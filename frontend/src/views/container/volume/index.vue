@@ -49,7 +49,7 @@
                     </el-table-column>
                     <el-table-column :label="$t('container.volumeDir')" min-width="100">
                         <template #default="{ row }">
-                            <el-button type="primary" link @click="toFolder(row.mountpoint)">
+                            <el-button type="primary" link @click="routerToFileWithPath(row.mountpoint)">
                                 <el-icon>
                                     <FolderOpened />
                                 </el-icon>
@@ -97,9 +97,9 @@ import { deleteVolume, searchVolume, inspect, containerPrune } from '@/api/modul
 import { Container } from '@/api/interface/container';
 import TaskLog from '@/components/log/task/index.vue';
 import i18n from '@/lang';
-import router from '@/routers';
 import { ElMessageBox } from 'element-plus';
 import { GlobalStore } from '@/store';
+import { routerToFileWithPath } from '@/utils/router';
 const globalStore = GlobalStore();
 
 const taskLogRef = ref();
@@ -124,9 +124,6 @@ const searchName = ref();
 const isActive = ref(false);
 const isExist = ref(false);
 
-const toFolder = (folder: string) => {
-    router.push({ path: '/hosts/files', query: { path: folder } });
-};
 const dialogCreateRef = ref<DialogExpose>();
 
 interface DialogExpose {

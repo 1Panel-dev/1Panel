@@ -8,7 +8,7 @@
                 <el-form-item :label="$t('website.primaryPath')">
                     <el-space wrap>
                         {{ website.sitePath + '/index' }}
-                        <el-button type="primary" link @click="toFolder(website.sitePath + '/index')">
+                        <el-button type="primary" link @click="routerToFileWithPath(website.sitePath + '/index')">
                             <el-icon>
                                 <FolderOpened />
                             </el-icon>
@@ -67,10 +67,9 @@ import { Website } from '@/api/interface/website';
 import { getDirConfig, getWebsite, updateWebsiteDir, updateWebsiteDirPermission } from '@/api/modules/website';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
+import { routerToFileWithPath } from '@/utils/router';
 import { FormInstance } from 'element-plus';
 import { computed, onMounted, reactive, ref } from 'vue';
-import { useRouter } from 'vue-router';
-const router = useRouter();
 
 const props = defineProps({
     id: {
@@ -167,10 +166,6 @@ const getConfig = async () => {
         dirs.value = res.data.dirs;
         dirConfig.value = res.data;
     } catch (error) {}
-};
-
-const toFolder = (folder: string) => {
-    router.push({ path: '/hosts/files', query: { path: folder } });
 };
 
 onMounted(() => {

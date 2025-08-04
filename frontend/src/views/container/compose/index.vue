@@ -100,7 +100,7 @@ import { inspect, searchCompose } from '@/api/modules/container';
 import DockerStatus from '@/views/container/docker-status/index.vue';
 import i18n from '@/lang';
 import { Container } from '@/api/interface/container';
-import router from '@/routers';
+import { routerToFileWithPath } from '@/utils/router';
 
 const data = ref();
 const selects = ref<any>([]);
@@ -120,7 +120,7 @@ const isActive = ref(false);
 const isExist = ref(false);
 
 const toComposeFolder = async (row: Container.ComposeInfo) => {
-    router.push({ path: '/hosts/files', query: { path: row.workdir } });
+    routerToFileWithPath(row.workdir);
 };
 
 const search = async () => {

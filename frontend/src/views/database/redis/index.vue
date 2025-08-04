@@ -145,13 +145,13 @@ import AppStatus from '@/components/app-status/index.vue';
 import QuickCmd from '@/views/database/redis/command/index.vue';
 import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
 import { checkAppInstalled } from '@/api/modules/app';
-import router from '@/routers';
 import { GlobalStore } from '@/store';
 import { listDatabases, checkRedisCli, installRedisCli } from '@/api/modules/database';
 import { Database } from '@/api/interface/database';
 import { MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
 import { getCommandList } from '@/api/modules/command';
+import { routerToName, routerToNameWithQuery } from '@/utils/router';
 const globalStore = GlobalStore();
 
 const loading = ref(false);
@@ -196,13 +196,13 @@ const loadHeight = () => {
 };
 
 const getAppDetail = (key: string) => {
-    router.push({ name: 'AppAll', query: { install: key } });
+    routerToNameWithQuery('AppAll', { install: key });
 };
 const goRemoteDB = async () => {
     if (currentDB.value) {
         globalStore.setCurrentRedisDB(currentDBName.value);
     }
-    router.push({ name: 'Redis-Remote' });
+    routerToName('Redis-Remote');
 };
 
 const connRef = ref();
@@ -216,10 +216,10 @@ const onLoadConn = async () => {
 
 const goRouter = async (target: string) => {
     if (target === 'app') {
-        router.push({ name: 'AppAll', query: { install: 'redis' } });
+        routerToNameWithQuery('AppAll', { install: 'redis' });
         return;
     }
-    router.push({ name: 'Redis-Remote' });
+    routerToName('Redis-Remote');
 };
 
 const changeDatabase = async () => {

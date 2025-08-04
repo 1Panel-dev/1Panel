@@ -7,6 +7,7 @@
 </template>
 
 <script setup lang="ts">
+import { routerToName, routerToPath } from '@/utils/router';
 import { inject, useSlots } from 'vue';
 import { useRouter } from 'vue-router';
 
@@ -25,10 +26,10 @@ function jump() {
         reloadPage();
     }
     if (path) {
-        router.push(path);
+        routerToPath(path);
     }
     if (name) {
-        router.push({ name: name });
+        routerToName(name);
     }
     if (to) {
         router.push(to);

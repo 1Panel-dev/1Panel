@@ -455,6 +455,7 @@ import TaskLog from '@/components/log/task/index.vue';
 import { checkIpV4V6, checkPort, newUUID } from '@/utils/util';
 import router from '@/routers';
 import TerminalDialog from '@/views/host/file-management/terminal/index.vue';
+import { routerToName } from '@/utils/router';
 
 const loading = ref(false);
 const isCreate = ref();
@@ -584,7 +585,7 @@ type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
 
 const goBack = () => {
-    router.push({ name: 'ContainerItem' });
+    routerToName('ContainerItem');
 };
 const closeTask = () => {
     taskLogRef.value.handleClose();
@@ -609,7 +610,7 @@ const handlePortsDelete = (index: number) => {
 };
 
 const goRouter = async () => {
-    router.push({ name: 'AppInstalled' });
+    routerToName('AppInstalled');
 };
 
 const handleVolumesAdd = () => {

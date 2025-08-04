@@ -255,12 +255,7 @@
                                     :content="$t('app.app') + ': ' + row.appName + '[' + row.appInstallName + ']'"
                                     placement="top"
                                 >
-                                    <el-button
-                                        icon="Position"
-                                        plain
-                                        size="small"
-                                        @click="router.push({ name: 'AppInstalled' })"
-                                    >
+                                    <el-button icon="Position" plain size="small" @click="routerToName('AppInstalled')">
                                         {{ $t('app.app') }}: {{ row.appName }} [{{ row.appInstallName }}]
                                     </el-button>
                                 </el-tooltip>
@@ -273,12 +268,7 @@
                                     placement="top"
                                     class="mt-1"
                                 >
-                                    <el-button
-                                        icon="Position"
-                                        plain
-                                        size="small"
-                                        @click="router.push({ name: 'Website' })"
-                                    >
+                                    <el-button icon="Position" plain size="small" @click="routerToName('Website')">
                                         {{ $t('menu.website') }}:
                                         {{ row.websites.join(',') }}
                                     </el-button>
@@ -383,9 +373,9 @@ import {
 } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
 import i18n from '@/lang';
-import router from '@/routers';
 import { MsgWarning } from '@/utils/message';
 import { GlobalStore } from '@/store';
+import { routerToName, routerToNameWithQuery } from '@/utils/router';
 const globalStore = GlobalStore();
 
 const mobile = computed(() => {
@@ -604,7 +594,7 @@ function loadMemValue(t: number) {
 }
 
 const onContainerOperate = async (containerID: string) => {
-    router.push({ name: 'ContainerCreate', query: { containerID: containerID } });
+    routerToNameWithQuery('ContainerCreate', { containerID: containerID });
 };
 
 const dialogMonitorRef = ref();

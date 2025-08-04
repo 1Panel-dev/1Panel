@@ -24,6 +24,8 @@ const settingRouter = {
                     component: () => import('@/views/setting/panel/index.vue'),
                     hidden: true,
                     meta: {
+                        parent: 'menu.settings',
+                        title: 'setting.panel',
                         requiresAuth: true,
                         activeMenu: '/settings',
                     },
@@ -34,6 +36,8 @@ const settingRouter = {
                     component: () => import('@/views/setting/alert/index.vue'),
                     hidden: true,
                     meta: {
+                        parent: 'menu.settings',
+                        title: 'xpack.alert.alertNotice',
                         requiresAuth: true,
                         activeMenu: '/settings',
                     },
@@ -44,6 +48,8 @@ const settingRouter = {
                     component: () => import('@/views/setting/backup-account/index.vue'),
                     hidden: true,
                     meta: {
+                        parent: 'menu.settings',
+                        title: 'setting.backupAccount',
                         requiresAuth: true,
                         activeMenu: '/settings',
                     },
@@ -54,6 +60,8 @@ const settingRouter = {
                     component: () => import('@/views/setting/license/index.vue'),
                     hidden: true,
                     meta: {
+                        parent: 'menu.settings',
+                        title: 'setting.license',
                         requiresAuth: true,
                         activeMenu: '/settings',
                     },
@@ -64,6 +72,8 @@ const settingRouter = {
                     component: () => import('@/views/setting/about/index.vue'),
                     hidden: true,
                     meta: {
+                        parent: 'menu.settings',
+                        title: 'setting.about',
                         requiresAuth: true,
                         activeMenu: '/settings',
                     },
@@ -74,6 +84,8 @@ const settingRouter = {
                     component: () => import('@/views/setting/safe/index.vue'),
                     hidden: true,
                     meta: {
+                        parent: 'menu.settings',
+                        title: 'setting.safe',
                         requiresAuth: true,
                         activeMenu: '/settings',
                     },
@@ -84,6 +96,8 @@ const settingRouter = {
                     hidden: true,
                     component: () => import('@/views/setting/snapshot/index.vue'),
                     meta: {
+                        parent: 'menu.settings',
+                        title: 'setting.snapshot',
                         requiresAuth: true,
                         activeMenu: '/settings',
                     },

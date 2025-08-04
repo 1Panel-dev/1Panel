@@ -6,6 +6,7 @@ import { MsgError, MsgSuccess } from '@/utils/message';
 import { v4 as uuidv4 } from 'uuid';
 import JSEncrypt from 'jsencrypt';
 import CryptoJS from 'crypto-js';
+import { routerToPathWithQuery } from './router';
 
 export function deepCopy<T>(obj: any): T {
     let newObj: any;
@@ -792,7 +793,7 @@ export async function loadJson(lang: string): Promise<Object> {
 }
 
 export const jumpToPath = (router: any, path: string) => {
-    router.push({ path: path, query: { uncached: 'true' } });
+    routerToPathWithQuery(path, { uncached: 'true' });
 };
 
 export const toLink = (link: string) => {

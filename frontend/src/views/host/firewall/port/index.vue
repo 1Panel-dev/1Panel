@@ -155,7 +155,7 @@ import { Host } from '@/api/interface/host';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { ElMessageBox } from 'element-plus';
-import router from '@/routers';
+import { routerToName } from '@/utils/router';
 
 const loading = ref();
 const activeTag = ref('port');
@@ -226,7 +226,7 @@ const onOpenDialog = async (
 };
 
 const quickJump = () => {
-    router.push({ name: 'AppInstalled' });
+    routerToName('AppInstalled');
 };
 
 const onChangeStatus = async (row: Host.RuleInfo, status: string) => {

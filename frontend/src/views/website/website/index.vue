@@ -177,7 +177,7 @@
                     </el-table-column>
                     <el-table-column :label="$t('website.sitePath')" prop="sitePath" width="90px">
                         <template #default="{ row }">
-                            <el-button type="primary" link @click="toFolder(row.sitePath + '/index')">
+                            <el-button type="primary" link @click="routerToFileWithPath(row.sitePath + '/index')">
                                 <el-icon>
                                     <FolderOpened />
                                 </el-icon>
@@ -303,7 +303,6 @@ import NginxConfig from '@/views/website/website/nginx/index.vue';
 import GroupDialog from '@/components/agent-group/index.vue';
 import AppStatus from '@/components/app-status/index.vue';
 import i18n from '@/lang';
-import router from '@/routers';
 import { onMounted, reactive, ref, computed } from 'vue';
 import { listDomains, opWebsite, searchWebsites, updateWebsite } from '@/api/modules/website';
 import { Website } from '@/api/interface/website';
@@ -316,6 +315,7 @@ import { getAgentGroupList } from '@/api/modules/group';
 import { Group } from '@/api/interface/group';
 import { GlobalStore } from '@/store';
 import { getWebsiteTypes } from '@/global/mimetype';
+import { routerToFileWithPath, routerToNameWithParams, routerToNameWithQuery } from '@/utils/router';
 const globalStore = GlobalStore();
 
 const shortcuts = [
@@ -376,7 +376,7 @@ const mobile = computed(() => {
 });
 
 const goRouter = async (key: string) => {
-    router.push({ name: 'AppAll', query: { install: key } });
+    routerToNameWithQuery('AppAll', { install: key });
 };
 
 const showFavorite = (row: any) => {
@@ -439,7 +439,7 @@ const setting = () => {
 };
 
 const openConfig = (id: number) => {
-    router.push({ name: 'WebsiteConfig', params: { id: id, tab: 'basic' } });
+    routerToNameWithParams('WebsiteConfig', { id: id, tab: 'basic' });
 };
 
 const isEver = (time: string) => {
@@ -601,10 +601,6 @@ const operateWebsite = (op: string, id: number) => {
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         search();
     });
-};
-
-const toFolder = (folder: string) => {
-    router.push({ path: '/hosts/files', query: { path: folder } });
 };
 
 const searchDomains = (id: number) => {

@@ -45,7 +45,7 @@
                     </el-table-column>
                     <el-table-column :label="$t('home.dir')" prop="codeDir" width="80px">
                         <template #default="{ row }">
-                            <el-button type="primary" link @click="toFolder(row.path)">
+                            <el-button type="primary" link @click="routerToFileWithPath(row.path)">
                                 <el-icon>
                                     <FolderOpened />
                                 </el-icon>
@@ -151,9 +151,9 @@ import RuntimeStatus from '@/views/website/runtime/components/runtime-status.vue
 import Terminal from '@/views/website/runtime/components/terminal.vue';
 import { disabledButton } from '@/utils/runtime';
 import { GlobalStore } from '@/store';
-import router from '@/routers/router';
 import DockerStatus from '@/views/container/docker-status/index.vue';
 import { operateRuntime, updateRuntimeRemark } from '../common/utils';
+import { routerToFileWithPath } from '@/utils/router';
 const globalStore = GlobalStore();
 const mobile = computed(() => {
     return globalStore.isMobile();
@@ -372,10 +372,6 @@ const onOpenBuildCache = () => {
 };
 const openTaskLog = (taskID: string) => {
     taskLogRef.value.openWithTaskID(taskID);
-};
-
-const toFolder = (folder: string) => {
-    router.push({ path: '/hosts/files', query: { path: folder } });
 };
 
 onMounted(() => {

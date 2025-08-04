@@ -23,6 +23,7 @@
 </template>
 
 <script lang="ts" setup>
+import { routerToName, routerToPath } from '@/utils/router';
 import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
@@ -41,12 +42,6 @@ const buttonArray = computed(() => {
 
 const router = useRouter();
 const activeName = ref('');
-const routerToPath = (path: string) => {
-    router.push({ path: path });
-};
-const routerToName = (name: string) => {
-    router.push({ name: name });
-};
 
 const handleChange = (label: string) => {
     const btn = buttonArray.value.find((btn) => btn.label === label);

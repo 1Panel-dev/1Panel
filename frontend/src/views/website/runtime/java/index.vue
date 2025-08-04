@@ -29,7 +29,7 @@
                     </el-table-column>
                     <el-table-column :label="$t('runtime.codeDir')" prop="codeDir" min-width="120px">
                         <template #default="{ row }">
-                            <el-button type="primary" link @click="toFolder(row.codeDir)">
+                            <el-button type="primary" link @click="routerToFileWithPath(row.codeDir)">
                                 <el-icon>
                                     <FolderOpened />
                                 </el-icon>
@@ -104,7 +104,6 @@ import OperateJava from '@/views/website/runtime/java/operate/index.vue';
 import Delete from '@/views/website/runtime/delete/index.vue';
 import i18n from '@/lang';
 import RouterMenu from '../index.vue';
-import router from '@/routers/router';
 import ComposeLogs from '@/components/log/compose/index.vue';
 import PortJumpDialog from '@/components/port-jump/index.vue';
 import AppResources from '@/views/website/runtime/php/check/index.vue';
@@ -115,6 +114,7 @@ import DockerStatus from '@/views/container/docker-status/index.vue';
 import { disabledButton } from '@/utils/runtime';
 import { GlobalStore } from '@/store';
 import { operateRuntime, updateRuntimeRemark } from '../common/utils';
+import { routerToFileWithPath } from '@/utils/router';
 const globalStore = GlobalStore();
 const mobile = computed(() => {
     return globalStore.isMobile();
@@ -249,10 +249,6 @@ const openTerminal = (row: Runtime.Runtime) => {
 
 const goDashboard = async (port: any, protocol: string) => {
     dialogPortJumpRef.value.acceptParams({ port: port, protocol: protocol });
-};
-
-const toFolder = (folder: string) => {
-    router.push({ path: '/hosts/files', query: { path: folder } });
 };
 
 onMounted(() => {

@@ -330,9 +330,9 @@ import { MsgSuccess } from '@/utils/message';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { getSettingInfo } from '@/api/modules/setting';
-import router from '@/routers';
 import { GlobalStore } from '@/store';
 import { storeToRefs } from 'pinia';
+import { routerToName } from '@/utils/router';
 
 const globalStore = GlobalStore();
 const { isMaster } = storeToRefs(globalStore);
@@ -721,7 +721,7 @@ const isEver = (time: string) => {
 
 const quickJump = (name: string) => {
     handleClose();
-    router.push({ name: name });
+    routerToName(name);
 };
 
 defineExpose({

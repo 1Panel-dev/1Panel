@@ -212,7 +212,6 @@ import {
     getAgentSettingInfo,
 } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
-import { useI18n } from 'vue-i18n';
 import { useTheme } from '@/global/use-theme';
 import { MsgSuccess } from '@/utils/message';
 import ThemeColor from '@/views/setting/panel/theme-color/index.vue';
@@ -227,9 +226,9 @@ import HideMenu from '@/views/setting/panel/hidemenu/index.vue';
 import { storeToRefs } from 'pinia';
 import { getXpackSetting, updateXpackSettingByKey } from '@/utils/xpack';
 import { setPrimaryColor } from '@/utils/theme';
+import i18n from '@/lang';
 
 const loading = ref(false);
-const i18n = useI18n();
 const globalStore = GlobalStore();
 
 const { isMasterProductPro, isMaster } = storeToRefs(globalStore);
@@ -289,7 +288,7 @@ const timeoutRef = ref();
 const hideMenuRef = ref();
 const themeColorRef = ref();
 const apiInterfaceRef = ref();
-const unset = ref(i18n.t('setting.unSetting'));
+const unset = ref(i18n.global.t('setting.unSetting'));
 
 const languageOptions = ref([
     { value: 'zh', label: '中文(简体)' },
@@ -400,9 +399,9 @@ const onChangeApiInterfaceStatus = async () => {
         });
         return;
     }
-    ElMessageBox.confirm(i18n.t('setting.apiInterfaceClose'), i18n.t('setting.apiInterface'), {
-        confirmButtonText: i18n.t('commons.button.confirm'),
-        cancelButtonText: i18n.t('commons.button.cancel'),
+    ElMessageBox.confirm(i18n.global.t('setting.apiInterfaceClose'), i18n.global.t('setting.apiInterface'), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
     })
         .then(async () => {
             loading.value = true;
@@ -417,7 +416,7 @@ const onChangeApiInterfaceStatus = async () => {
                 .then(() => {
                     loading.value = false;
                     search();
-                    MsgSuccess(i18n.t('commons.msg.operationSuccess'));
+                    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 })
                 .catch(() => {
                     loading.value = false;
@@ -454,7 +453,7 @@ const onSave = async (key: string, val: any) => {
     await updateSetting(param)
         .then(() => {
             if (key === 'Language') {
-                i18n.locale.value = val;
+                i18n.global.locale.value = val;
                 globalStore.updateLanguage(val);
                 location.reload();
             }
@@ -464,7 +463,7 @@ const onSave = async (key: string, val: any) => {
             if (key === 'MenuTabs') {
                 globalStore.setOpenMenuTabs(val === 'Enable');
             }
-            MsgSuccess(i18n.t('commons.msg.operationSuccess'));
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             search();
             loading.value = false;
         })

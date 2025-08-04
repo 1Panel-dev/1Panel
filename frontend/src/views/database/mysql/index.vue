@@ -282,9 +282,9 @@ import i18n from '@/lang';
 import { Database } from '@/api/interface/database';
 import { App } from '@/api/interface/app';
 import { getAppPort } from '@/api/modules/app';
-import router from '@/routers';
 import { MsgSuccess } from '@/utils/message';
 import { GlobalStore } from '@/store';
+import { routerToName, routerToNameWithParams, routerToNameWithQuery } from '@/utils/router';
 const globalStore = GlobalStore();
 
 const mobile = computed(() => {
@@ -367,7 +367,7 @@ const goRemoteDB = async () => {
     if (currentDB.value) {
         globalStore.setCurrentDB(currentDB.value.database);
     }
-    router.push({ name: 'MySQL-Remote' });
+    routerToName('MySQL-Remote');
 };
 
 const passwordRef = ref();
@@ -376,7 +376,7 @@ const onSetting = async () => {
     if (currentDB.value) {
         globalStore.setCurrentDB(currentDB.value.database);
     }
-    router.push({ name: 'MySQL-Setting', params: { type: currentDB.value.type, database: currentDB.value.database } });
+    routerToNameWithParams('MySQL-Setting', { type: currentDB.value.type, database: currentDB.value.database });
 };
 
 const changeDatabase = async () => {
@@ -441,10 +441,10 @@ const loadDB = async () => {
 
 const goRouter = async (target: string) => {
     if (target === 'app') {
-        router.push({ name: 'AppAll', query: { install: 'mysql' } });
+        routerToNameWithQuery('AppAll', { install: 'mysql' });
         return;
     }
-    router.push({ name: 'MySQL-Remote' });
+    routerToName('MySQL-Remote');
 };
 
 const onChange = async (info: any) => {
@@ -473,7 +473,7 @@ const goDashboard = async (name: string) => {
 };
 
 const getAppDetail = () => {
-    router.push({ name: 'AppAll', query: { install: dashboardKey.value } });
+    routerToNameWithQuery('AppAll', { install: dashboardKey.value });
 };
 
 const loadPhpMyAdminPort = async () => {

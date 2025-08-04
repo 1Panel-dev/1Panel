@@ -51,7 +51,7 @@
                         show-overflow-tooltip
                     >
                         <template #default="{ row }">
-                            <el-button text type="primary" @click="toFolder(row.dir)">
+                            <el-button text type="primary" @click="routerToFileWithPath(row.dir)">
                                 {{ row.dir }}
                             </el-button>
                         </template>
@@ -160,7 +160,7 @@ import { GlobalStore } from '@/store';
 import i18n from '@/lang';
 import { HostTool } from '@/api/interface/host-tool';
 import { MsgSuccess } from '@/utils/message';
-import router from '@/routers';
+import { routerToFileWithPath } from '@/utils/router';
 const globalStore = GlobalStore();
 
 const loading = ref(false);
@@ -184,10 +184,6 @@ const setting = () => {
 const getStatus = (status: any) => {
     supervisorStatus.value = status;
     search();
-};
-
-const toFolder = (folder: string) => {
-    router.push({ path: '/hosts/files', query: { path: folder } });
 };
 
 const showStopped = computed((): boolean => {

@@ -50,8 +50,8 @@ import { snapshotImport } from '@/api/modules/setting';
 import { listBackupOptions, getFilesFromBackup } from '@/api/modules/backup';
 import { Rules } from '@/global/form-rules';
 import { MsgError, MsgSuccess } from '@/utils/message';
-import router from '@/routers';
 import { checkFile } from '@/api/modules/files';
+import { routerToFileWithPath } from '@/utils/router';
 
 const drawerVisible = ref(false);
 const loading = ref();
@@ -101,7 +101,7 @@ const checkDisable = (val: string) => {
 const toFolder = async () => {
     const res = await checkFile(backupPath.value, true);
     if (res.data) {
-        router.push({ path: '/hosts/files', query: { path: backupPath.value } });
+        routerToFileWithPath(backupPath.value);
     } else {
         MsgError(i18n.global.t('file.noSuchFile'));
     }

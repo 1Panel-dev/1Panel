@@ -235,9 +235,9 @@ import { ElMessageBox } from 'element-plus';
 import { MsgSuccess } from '@/utils/message';
 import { hasBackup, transSpecToStr } from './helper';
 import { GlobalStore } from '@/store';
-import router from '@/routers';
 import { getCurrentDateFormatted } from '@/utils/util';
 import { getGroupList } from '@/api/modules/group';
+import { routerToNameWithQuery } from '@/utils/router';
 
 const globalStore = GlobalStore();
 const mobile = computed(() => {
@@ -304,7 +304,7 @@ const dialogRecordRef = ref();
 const dialogBackupRef = ref();
 
 const onOpenDialog = async (id: string) => {
-    router.push({ name: 'CronjobOperate', query: { id: id } });
+    routerToNameWithQuery('CronjobOperate', { id: id });
 };
 
 const onDelete = async (row: Cronjob.CronjobInfo | null) => {

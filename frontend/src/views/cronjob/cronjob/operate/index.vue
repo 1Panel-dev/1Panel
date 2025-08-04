@@ -775,6 +775,7 @@ import { GlobalStore } from '@/store';
 import LicenseImport from '@/components/license-import/index.vue';
 import { transferTimeToSecond } from '@/utils/util';
 import { getGroupList } from '@/api/modules/group';
+import { routerToName, routerToPath } from '@/utils/router';
 const router = useRouter();
 
 const globalStore = GlobalStore();
@@ -953,7 +954,7 @@ const search = async () => {
 };
 
 const goRouter = async (path: string) => {
-    router.push({ path: path });
+    routerToPath(path);
 };
 
 const containerOptions = ref([]);
@@ -1156,7 +1157,7 @@ const loadGroups = async () => {
 };
 
 const goBack = () => {
-    router.push({ name: 'CronjobItem' });
+    routerToName('CronjobItem');
 };
 
 const loadFile = async (path: string) => {

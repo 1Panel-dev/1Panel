@@ -52,9 +52,8 @@ import { App } from '@/api/interface/app';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { ref } from 'vue';
-import { useRouter } from 'vue-router';
 import { DeleteRuntime } from '@/api/modules/runtime';
-const router = useRouter();
+import { routerToName } from '@/utils/router';
 
 interface CheckRrops {
     items: App.AppInstallResource[];
@@ -92,7 +91,7 @@ const acceptParams = (props: CheckRrops) => {
 
 const toPage = (key: string) => {
     if (key === 'website') {
-        router.push({ name: 'Website' });
+        routerToName('Website');
     }
 };
 

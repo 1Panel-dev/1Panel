@@ -202,9 +202,9 @@ import {
 import { AI } from '@/api/interface/ai';
 import { getAppPort } from '@/api/modules/app';
 import { dateFormat, newUUID } from '@/utils/util';
-import router from '@/routers';
 import { MsgInfo, MsgSuccess } from '@/utils/message';
 import BindDomain from '@/views/ai/model/domain/index.vue';
+import { routerToNameWithQuery } from '@/utils/router';
 const globalStore = GlobalStore();
 
 const loading = ref(false);
@@ -322,7 +322,7 @@ const bindDomain = () => {
 };
 
 const goInstall = (name: string) => {
-    router.push({ name: 'AppAll', query: { install: name } });
+    routerToNameWithQuery('AppAll', { install: name });
 };
 
 const loadWebUIPort = async () => {

@@ -190,6 +190,7 @@ import { MsgError, MsgSuccess } from '@/utils/message';
 import { useI18n } from 'vue-i18n';
 import { encryptPassword } from '@/utils/util';
 import { getXpackSettingForTheme } from '@/utils/xpack';
+import { routerToName } from '@/utils/router';
 
 const i18n = useI18n();
 const themeConfig = computed(() => globalStore.themeConfig);
@@ -346,7 +347,7 @@ const login = (formEl: FormInstance | undefined) => {
             tabsStore.removeAllTabs();
             globalStore.currentNode = 'local';
             MsgSuccess(i18n.t('commons.msg.loginSuccess'));
-            router.push({ name: 'home' });
+            routerToName('home');
             document.onkeydown = null;
         } catch (res) {
             if (res.code === 401) {
@@ -387,7 +388,7 @@ const mfaLogin = async (auto: boolean) => {
             tabsStore.removeAllTabs();
             MsgSuccess(i18n.t('commons.msg.loginSuccess'));
             globalStore.currentNode = 'local';
-            router.push({ name: 'home' });
+            routerToName('home');
             document.onkeydown = null;
         } catch (res) {
             if (res.code === 401) {

@@ -106,7 +106,7 @@
                                                                     <el-button
                                                                         type="primary"
                                                                         link
-                                                                        @click="toFolder(installed.path)"
+                                                                        @click="routerToFileWithPath(installed.path)"
                                                                     >
                                                                         <el-icon>
                                                                             <FolderOpened />
@@ -427,13 +427,13 @@ import Status from '@/components/status/index.vue';
 import { getAge, jumpToPath, toLink } from '@/utils/util';
 import { useRouter } from 'vue-router';
 import { MsgSuccess } from '@/utils/message';
-import { toFolder } from '@/global/business';
 import TaskLog from '@/components/log/task/index.vue';
 import Detail from '@/views/app-store/detail/index.vue';
 import IgnoreApp from '@/views/app-store/installed/ignore/create/index.vue';
 import { getAgentSettingByKey } from '@/api/modules/setting';
 import Tags from '@/views/app-store/components/tag.vue';
 import SvgIcon from '@/components/svg-icon/svg-icon.vue';
+import { routerToFileWithPath } from '@/utils/router';
 
 const data = ref<any>();
 const loading = ref(false);

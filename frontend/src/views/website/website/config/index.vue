@@ -44,10 +44,10 @@ import { onMounted, ref, watch } from 'vue';
 import Basic from './basic/index.vue';
 import Resource from './resource/index.vue';
 import Log from './log/index.vue';
-import router from '@/routers';
 import WebsiteStatus from '@/views/website/website/status/index.vue';
 import { getWebsite } from '@/api/modules/website';
 import { GetRuntime } from '@/api/modules/runtime';
+import { routerToNameWithParams } from '@/utils/router';
 
 const props = defineProps({
     id: {
@@ -73,7 +73,7 @@ watch(index, (curr, old) => {
 });
 
 const changeTab = (index: string) => {
-    router.push({ name: 'WebsiteConfig', params: { id: id.value, tab: index } });
+    routerToNameWithParams('WebsiteConfig', { id: id.value, tab: index });
 };
 
 onMounted(() => {

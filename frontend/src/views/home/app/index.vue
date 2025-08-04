@@ -100,7 +100,7 @@
                                             size="small"
                                             type="primary"
                                             link
-                                            @click="toFolder(app.currentRow.path)"
+                                            @click="routerToFileWithPath(app.currentRow.path)"
                                         >
                                             {{ $t('home.dir') }}
                                         </el-button>
@@ -187,9 +187,9 @@ import { GlobalStore } from '@/store';
 import { MsgSuccess } from '@/utils/message';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { toFolder } from '@/global/business';
 import { jumpToPath } from '@/utils/util';
 import { jumpToInstall } from '@/utils/app';
+import { routerToFileWithPath, routerToNameWithQuery } from '@/utils/router';
 
 const router = useRouter();
 const globalStore = GlobalStore();
@@ -211,7 +211,7 @@ const acceptParams = (): void => {
 
 const goInstall = (key: string, type: string) => {
     if (!jumpToInstall(type, key)) {
-        router.push({ name: 'AppAll', query: { install: key } });
+        routerToNameWithQuery('AppAll', { install: key });
     }
 };
 

@@ -25,9 +25,8 @@
     </DialogPro>
 </template>
 <script lang="ts" setup>
+import { routerToName } from '@/utils/router';
 import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-const router = useRouter();
 
 interface InstallProps {
     items: Array<string>;
@@ -41,7 +40,7 @@ const acceptParams = (props: InstallProps) => {
 };
 
 const toApp = () => {
-    router.push({ name: 'AppInstalled' });
+    routerToName('AppInstalled');
 };
 
 defineExpose({

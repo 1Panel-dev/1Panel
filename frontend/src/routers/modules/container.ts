@@ -27,6 +27,8 @@ const containerRouter = {
                     meta: {
                         activeMenu: '/containers',
                         requiresAuth: false,
+                        parent: 'menu.container',
+                        title: 'menu.home',
                     },
                 },
                 {
@@ -38,6 +40,8 @@ const containerRouter = {
                     meta: {
                         activeMenu: '/containers',
                         requiresAuth: false,
+                        parent: 'menu.container',
+                        title: 'menu.container',
                     },
                 },
                 {
@@ -49,6 +53,9 @@ const containerRouter = {
                     meta: {
                         activeMenu: '/containers',
                         requiresAuth: false,
+                        parent: 'menu.container',
+                        title: 'menu.container',
+                        detail: 'commons.table.operate',
                     },
                 },
                 {
@@ -60,6 +67,9 @@ const containerRouter = {
                     meta: {
                         activeMenu: '/containers',
                         requiresAuth: false,
+                        parent: 'menu.container',
+                        title: 'container.compose',
+                        detail: 'commons.button.view',
                     },
                 },
                 {
@@ -70,6 +80,8 @@ const containerRouter = {
                     meta: {
                         activeMenu: '/containers',
                         requiresAuth: false,
+                        parent: 'menu.container',
+                        title: 'container.image',
                     },
                 },
                 {
@@ -80,6 +92,8 @@ const containerRouter = {
                     meta: {
                         activeMenu: '/containers',
                         requiresAuth: false,
+                        parent: 'menu.container',
+                        title: 'container.network',
                     },
                 },
                 {
@@ -90,6 +104,8 @@ const containerRouter = {
                     meta: {
                         activeMenu: '/containers',
                         requiresAuth: false,
+                        parent: 'menu.container',
+                        title: 'container.volume',
                     },
                 },
                 {
@@ -100,6 +116,8 @@ const containerRouter = {
                     meta: {
                         activeMenu: '/containers',
                         requiresAuth: false,
+                        parent: 'menu.container',
+                        title: 'container.repo',
                     },
                 },
                 {
@@ -110,6 +128,8 @@ const containerRouter = {
                     meta: {
                         activeMenu: '/containers',
                         requiresAuth: false,
+                        parent: 'menu.container',
+                        title: 'container.compose',
                     },
                 },
                 {
@@ -120,6 +140,8 @@ const containerRouter = {
                     meta: {
                         activeMenu: '/containers',
                         requiresAuth: false,
+                        parent: 'menu.container',
+                        title: 'container.composeTemplate',
                     },
                 },
                 {
@@ -130,6 +152,8 @@ const containerRouter = {
                     meta: {
                         activeMenu: '/containers',
                         requiresAuth: false,
+                        parent: 'menu.container',
+                        title: 'container.setting',
                     },
                 },
             ],

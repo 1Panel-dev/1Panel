@@ -11,6 +11,7 @@ import tr from './modules/tr';
 
 const i18n = createI18n({
     legacy: false,
+    missingWarn: false,
     locale: localStorage.getItem('lang') || 'en',
     fallbackLocale: 'en',
     globalInjection: true,

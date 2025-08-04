@@ -157,7 +157,7 @@
                     </el-row>
                     <template #reference>
                         <v-charts
-                            @click="toFolder(item.path)"
+                            @click="routerToFileWithPath(item.path)"
                             height="160px"
                             :id="`disk${index}`"
                             type="pie"
@@ -267,10 +267,9 @@
 <script setup lang="ts">
 import { Dashboard } from '@/api/interface/dashboard';
 import { computeSize } from '@/utils/util';
-import router from '@/routers';
 import i18n from '@/lang';
 import { nextTick, ref } from 'vue';
-import { toFolder } from '@/global/business';
+import { routerToFileWithPath, routerToName } from '@/utils/router';
 const showMore = ref(false);
 const totalCount = ref();
 
@@ -424,7 +423,7 @@ function loadStatus(val: number) {
 }
 
 const goGPU = () => {
-    router.push({ name: 'GPU' });
+    routerToName('GPU');
 };
 
 const loadWidth = () => {

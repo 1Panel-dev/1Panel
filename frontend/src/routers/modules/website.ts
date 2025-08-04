@@ -27,6 +27,8 @@ const webSiteRouter = {
             hidden: true,
             props: true,
             meta: {
+                parent: 'menu.website',
+                title: 'commons.button.',
                 activeMenu: '/websites',
                 requiresAuth: false,
             },
@@ -46,6 +48,7 @@ const webSiteRouter = {
             component: () => import('@/views/website/runtime/php/index.vue'),
             meta: {
                 title: 'menu.runtime',
+                detail: 'PHP',
                 activeMenu: '/websites/runtimes/php',
                 requiresAuth: false,
             },
@@ -56,6 +59,8 @@ const webSiteRouter = {
             hidden: true,
             component: () => import('@/views/website/runtime/node/index.vue'),
             meta: {
+                title: 'menu.runtime',
+                detail: 'Node',
                 activeMenu: '/websites/runtimes/php',
                 requiresAuth: false,
             },
@@ -66,6 +71,8 @@ const webSiteRouter = {
             hidden: true,
             component: () => import('@/views/website/runtime/java/index.vue'),
             meta: {
+                title: 'menu.runtime',
+                detail: 'Java',
                 activeMenu: '/websites/runtimes/php',
                 requiresAuth: false,
             },
@@ -76,6 +83,8 @@ const webSiteRouter = {
             hidden: true,
             component: () => import('@/views/website/runtime/go/index.vue'),
             meta: {
+                title: 'menu.runtime',
+                detail: 'Go',
                 activeMenu: '/websites/runtimes/php',
                 requiresAuth: false,
             },
@@ -86,6 +95,8 @@ const webSiteRouter = {
             hidden: true,
             component: () => import('@/views/website/runtime/python/index.vue'),
             meta: {
+                title: 'menu.runtime',
+                detail: 'Python',
                 activeMenu: '/websites/runtimes/php',
                 requiresAuth: false,
             },
@@ -96,6 +107,8 @@ const webSiteRouter = {
             hidden: true,
             component: () => import('@/views/website/runtime/dotnet/index.vue'),
             meta: {
+                title: 'menu.runtime',
+                detail: '.Net',
                 activeMenu: '/websites/runtimes/php',
                 requiresAuth: false,
             },

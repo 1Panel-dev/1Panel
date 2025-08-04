@@ -139,6 +139,7 @@ import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 import TaskLog from '@/components/log/task/index.vue';
 import { newUUID } from '@/utils/util';
 import { computeSizeFromMB } from '@/utils/util';
+import { routerToName } from '@/utils/router';
 
 interface InstallRrops {
     params?: App.AppParams;
@@ -192,7 +193,7 @@ const handleClose = () => {
     open.value = false;
     resetForm();
     if (router.currentRoute.value.query.install) {
-        router.push({ name: 'AppAll' });
+        routerToName('AppAll');
     }
 };
 const paramKey = ref(1);

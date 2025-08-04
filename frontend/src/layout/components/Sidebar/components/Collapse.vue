@@ -88,6 +88,7 @@ import bus from '@/global/bus';
 import { logOutApi } from '@/api/modules/auth';
 import router from '@/routers';
 import { loadProductProFromDB } from '@/utils/xpack';
+import { routerToNameWithQuery } from '@/utils/router';
 
 const filter = ref();
 const globalStore = GlobalStore();
@@ -178,7 +179,7 @@ const changeNode = (command: string) => {
         globalStore.currentNode = command || 'local';
         globalStore.currentNodeAddr = '';
         loadProductProFromDB();
-        router.push({ name: 'home', query: { t: Date.now() } });
+        routerToNameWithQuery('home', { t: Date.now() });
         return;
     }
     for (const item of nodes.value) {
@@ -198,7 +199,7 @@ const changeNode = (command: string) => {
             globalStore.currentNode = command || 'local';
             globalStore.currentNodeAddr = item.addr;
             loadProductProFromDB();
-            router.push({ name: 'home', query: { t: Date.now() } });
+            routerToNameWithQuery('home', { t: Date.now() });
         }
     }
 };

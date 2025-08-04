@@ -131,10 +131,10 @@ import {
 } from '@/api/modules/backup';
 import i18n from '@/lang';
 import { Backup } from '@/api/interface/backup';
-import router from '@/routers';
 import { MsgSuccess } from '@/utils/message';
 import TaskLog from '@/components/log/task/index.vue';
 import { GlobalStore } from '@/store';
+import { routerToFileWithPath } from '@/utils/router';
 const globalStore = GlobalStore();
 
 const selects = ref<any>([]);
@@ -194,7 +194,7 @@ const loadBackupDir = async () => {
 };
 
 const goFile = async () => {
-    router.push({ name: 'File', query: { path: `${backupPath.value}/app/${name.value}/${detailName.value}` } });
+    routerToFileWithPath(`${backupPath.value}/app/${name.value}/${detailName.value}`);
 };
 
 const onChange = async (info: any) => {

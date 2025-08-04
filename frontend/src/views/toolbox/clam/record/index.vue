@@ -166,8 +166,7 @@ import { shortcuts } from '@/utils/shortcuts';
 import { Toolbox } from '@/api/interface/toolbox';
 import HighlightLog from '@/components/log/hightlight-log/index.vue';
 import { cleanClamRecord, getClamRecordLog, handleClamScan, searchClamRecord } from '@/api/modules/toolbox';
-import { useRouter } from 'vue-router';
-const router = useRouter();
+import { routerToFileWithPath } from '@/utils/router';
 
 const loading = ref();
 const refresh = ref(false);
@@ -241,7 +240,7 @@ const onHandle = async (row: Toolbox.ClamInfo) => {
 };
 const toFolder = async (path: string) => {
     let folder = dialogData.value.rowData!.infectedDir + '/1panel-infected/' + path;
-    router.push({ path: '/hosts/files', query: { path: folder } });
+    routerToFileWithPath(folder);
 };
 
 const search = async () => {

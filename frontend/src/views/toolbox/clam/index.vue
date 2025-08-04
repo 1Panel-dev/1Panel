@@ -64,7 +64,9 @@
                         show-overflow-tooltip
                     >
                         <template #default="{ row }">
-                            <el-button link type="primary" @click="toFolder(row.path)">{{ row.path }}</el-button>
+                            <el-button link type="primary" @click="routerToFileWithPath(row.path)">
+                                {{ row.path }}
+                            </el-button>
                         </template>
                     </el-table-column>
                     <el-table-column
@@ -111,7 +113,7 @@
                                 v-if="row.infectedStrategy === 'copy' || row.infectedStrategy === 'move'"
                                 link
                                 type="primary"
-                                @click="toFolder(row.infectedDir + '/1panel-infected/' + row.name)"
+                                @click="routerToFileWithPath(row.infectedDir + '/1panel-infected/' + row.name)"
                             >
                                 {{ row.infectedDir + '/1panel-infected/' + row.name }}
                             </el-button>
@@ -170,10 +172,10 @@ import LogDialog from '@/views/toolbox/clam/record/index.vue';
 import ClamStatus from '@/views/toolbox/clam/status/index.vue';
 import SettingDialog from '@/views/toolbox/clam/setting/index.vue';
 import { Toolbox } from '@/api/interface/toolbox';
-import router from '@/routers';
 import { transSpecToStr } from '@/views/cronjob/cronjob/helper';
 import { GlobalStore } from '@/store';
 import { storeToRefs } from 'pinia';
+import { routerToFileWithPath, routerToName } from '@/utils/router';
 
 const loading = ref();
 const selects = ref<any>([]);
@@ -230,15 +232,11 @@ const search = async (column?: any) => {
 };
 
 const setting = () => {
-    router.push({ name: 'Clam-Setting' });
+    routerToName('Clam-Setting');
 };
 const getStatus = (status: any) => {
     clamStatus.value = status;
     search();
-};
-
-const toFolder = (folder: string) => {
-    router.push({ path: '/hosts/files', query: { path: folder } });
 };
 
 const toDoc = () => {

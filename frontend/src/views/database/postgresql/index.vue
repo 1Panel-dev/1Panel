@@ -249,9 +249,9 @@ import i18n from '@/lang';
 import { Database } from '@/api/interface/database';
 import { App } from '@/api/interface/app';
 import { getAppPort } from '@/api/modules/app';
-import router from '@/routers';
 import { MsgSuccess } from '@/utils/message';
 import { GlobalStore } from '@/store';
+import { routerToName, routerToNameWithParams, routerToNameWithQuery } from '@/utils/router';
 const globalStore = GlobalStore();
 
 const mobile = computed(() => {
@@ -326,7 +326,7 @@ const goRemoteDB = async () => {
     if (currentDB.value) {
         globalStore.setCurrentDB(currentDB.value.database);
     }
-    router.push({ name: 'PostgreSQL-Remote' });
+    routerToName('PostgreSQL-Remote');
 };
 
 const passwordRef = ref();
@@ -335,10 +335,7 @@ const onSetting = async () => {
     if (currentDB.value) {
         globalStore.setCurrentDB(currentDB.value.database);
     }
-    router.push({
-        name: 'PostgreSQL-Setting',
-        params: { type: currentDB.value.type, database: currentDB.value.database },
-    });
+    routerToNameWithParams('PostgreSQL-Setting', { type: currentDB.value.type, database: currentDB.value.database });
 };
 
 const changeDatabase = async () => {
@@ -406,10 +403,10 @@ const loadDB = async () => {
 
 const goRouter = async (target: string) => {
     if (target === 'app') {
-        router.push({ name: 'AppAll', query: { install: 'postgresql' } });
+        routerToNameWithQuery('AppAll', { install: 'postgresql' });
         return;
     }
-    router.push({ name: 'PostgreSQL-Remote' });
+    routerToName('PostgreSQL-Remote');
 };
 
 const onChange = async (info: any) => {
@@ -429,7 +426,7 @@ const goDashboard = async () => {
 };
 
 const getAppDetail = () => {
-    router.push({ name: 'AppAll', query: { install: dashboardKey.value } });
+    routerToNameWithQuery('AppAll', { install: dashboardKey.value });
 };
 
 const loadPGAdminPort = async () => {
