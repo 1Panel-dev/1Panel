@@ -1066,10 +1066,10 @@ defineExpose({ acceptParams });
     text-overflow: ellipsis;
 }
 .code-header {
-    background-color: var(--panel-color-primary-light-9);
+    background-color: var(--panel-code-header-footer-color);
 }
 .code-footer {
-    background-color: var(--panel-color-primary-light-9);
+    background-color: var(--panel-code-header-footer-color);
 }
 .card-action {
     .el-button + .el-button {
