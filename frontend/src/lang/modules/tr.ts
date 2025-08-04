@@ -3132,7 +3132,7 @@ const message = {
             noBlackIp: 'IP zaten engellenmiş, tekrar engellemeye gerek yok',
             noWhiteUrl: 'URL zaten beyaz listede, tekrar eklemeye gerek yok',
             spiderIpHelper:
-                'Varsayılan olarak örümcek IP’lerine izin verilir, Baidu, Bing, Google, 360, Shenma, Sogou, ByteDance, DuckDuckGo içerir',
+                "Baidu, Bing, Google, 360, Shenma, Sogou, ByteDance, DuckDuckGo, Yandex'i içerir. Bunu kapatmak tüm örümcek erişimlerini engeller.",
             spiderIp: 'Örümcek IP Havuzu',
             geoIp: 'IP Adres Kütüphanesi',
             geoIpHelper: 'IP’nin coğrafi konumunu doğrulamak için kullanılır',

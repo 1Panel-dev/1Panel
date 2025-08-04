@@ -3049,7 +3049,7 @@ const message = {
             noBlackIp: 'IP уже заблокирован, не нужно блокировать снова',
             noWhiteUrl: 'URL уже в белом списке, не нужно добавлять снова',
             spiderIpHelper:
-                'IP-адреса поисковых роботов разрешены по умолчанию, включая Baidu, Bing, Google, 360, Shenma, Sogou, ByteDance, DuckDuckGo',
+                'Включает Baidu, Bing, Google, 360, Shenma, Sogou, ByteDance, DuckDuckGo, Yandex. Закрытие этого параметра заблокирует доступ всех пауков.',
             spiderIp: 'Пул IP-адресов поисковых роботов',
             geoIp: 'Библиотека IP-адресов',
             geoIpHelper: 'Используется для определения географического положения IP',

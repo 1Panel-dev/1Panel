@@ -2986,7 +2986,7 @@ const message = {
             noBlackIp: 'IP は既にブロックされているため、再度ブロックする必要はありません',
             noWhiteUrl: 'URL は既にホワイトリストに含まれているため、再度追加する必要はありません',
             spiderIpHelper:
-                'スパイダー IP はデフォルトで許可されています。Baidu、Bing、Google、360、Shenma、Sogou、ByteDance、DuckDuckGo を含みます',
+                '百度、Bing、Google、360、神马、搜狗、字节、DuckDuckGo、Yandexを含みます。これを閉じると、すべてのクローラーのアクセスがブロックされます。',
             spiderIp: 'スパイダー IP プール',
             geoIp: 'IP アドレスライブラリ',
             geoIpHelper: 'IP の地理的位置を確認するために使用されます',

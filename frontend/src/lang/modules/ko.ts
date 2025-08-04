@@ -2932,7 +2932,7 @@ const message = {
             noBlackIp: 'IP가 이미 차단되어 있으므로 다시 차단할 필요가 없습니다',
             noWhiteUrl: 'URL이 이미 허용 목록에 포함되어 있으므로 다시 추가할 필요가 없습니다',
             spiderIpHelper:
-                '스파이더 IP는 기본적으로 허용됩니다. 바이두, 빙, 구글, 360, 신마, 소쿠, 바이트댄스, DuckDuckGo 포함',
+                '바이두, 빙, 구글, 360, 신마, 소구, 바이트댄스, DuckDuckGo, Yandex가 포함됩니다. 이를 끄면 모든 스파이더의 접근이 차단됩니다.',
             spiderIp: '스파이더 IP 풀',
             geoIp: 'IP 주소 라이브러리',
             geoIpHelper: 'IP의 지리적 위치를 확인하는 데 사용됩니다',

@@ -3098,7 +3098,7 @@ const message = {
             noBlackIp: 'IP is already blocked, no need to block again',
             noWhiteUrl: 'URL is already in the white list, no need to add again',
             spiderIpHelper:
-                'Spider IPs are allowed by default, including Baidu, Bing, Google, 360, Shenma, Sogou, ByteDance, DuckDuckGo',
+                'Includes Baidu, Bing, Google, 360, Shenma, Sogou, ByteDance, DuckDuckGo, Yandex. Closing this will block all spider access.',
             spiderIp: 'Spider IP Pool',
             geoIp: 'IP Address Library',
             geoIpHelper: 'Used to confirm the geolocation of the IP',

@@ -2889,7 +2889,8 @@ const message = {
             addUrlsToWhite: '批量加白 URL',
             noBlackIp: 'IP 已拉黑，無需再次拉黑',
             noWhiteUrl: 'URL 已加白，無需再次加白',
-            spiderIpHelper: '蜘蛛 IP 默認放行，包含百度、Bing、谷歌、360、神馬、搜狗、字節、DuckDuckGo',
+            spiderIpHelper:
+                '包含百度、Bing、谷歌、360、神马、搜狗、字节、DuckDuckGo、Yandex，關閉之後會攔截所有蜘蛛訪問',
             spiderIp: '蜘蛛 IP 池',
             geoIp: 'IP 地址庫',
             geoIpHelper: '用來確認 IP 的地理位置',

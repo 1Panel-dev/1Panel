@@ -3053,7 +3053,7 @@ const message = {
             noBlackIp: 'IP telah disekat, tidak perlu disekat semula',
             noWhiteUrl: 'URL telah dimasukkan ke senarai putih, tidak perlu ditambah semula',
             spiderIpHelper:
-                'IP labah-labah dibenarkan secara lalai, termasuk Baidu, Bing, Google, 360, Shenma, Sogou, ByteDance, DuckDuckGo',
+                'Termasuk Baidu, Bing, Google, 360, Shenma, Sogou, ByteDance, DuckDuckGo, Yandex. Menutup ini akan menyekat semua akses labah-labah.',
             spiderIp: 'Kolam IP labah-labah',
             geoIp: 'Pustaka Alamat IP',
             geoIpHelper: 'Digunakan untuk mengesahkan lokasi geografi IP',

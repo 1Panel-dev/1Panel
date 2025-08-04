@@ -3059,7 +3059,7 @@ const message = {
             noBlackIp: 'O IP já está bloqueado, não é necessário bloquear novamente',
             noWhiteUrl: 'O URL já está na lista branca, não é necessário adicionar novamente',
             spiderIpHelper:
-                'IPs de spiders são permitidos por padrão, incluindo Baidu, Bing, Google, 360, Shenma, Sogou, ByteDance, DuckDuckGo',
+                'Inclui Baidu, Bing, Google, 360, Shenma, Sogou, ByteDance, DuckDuckGo, Yandex. Fechar isso bloqueará todos os acessos de spiders.',
             spiderIp: 'Pool de IPs de spiders',
             geoIp: 'Biblioteca de endereços IP',
             geoIpHelper: 'Usado para determinar a localização geográfica do IP',
