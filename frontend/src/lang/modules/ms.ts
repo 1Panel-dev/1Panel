@@ -2818,6 +2818,10 @@ const message = {
             manage: 'Pengurusan',
             autoRestart: 'Auto Restart',
             EXITED: 'Telah keluar',
+            autoRestartHelper:
+                'Sama ada untuk memulakan semula program secara automatik selepas ia tamat secara luar jangka',
+            autoStart: 'Mula Automatik',
+            autoStartHelper: 'Sama ada untuk memulakan perkhidmatan secara automatik selepas Supervisor mula',
         },
     },
     xpack: {

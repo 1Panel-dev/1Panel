@@ -33,6 +33,7 @@ type SupervisorProcessConfig struct {
 	Dir         string `json:"dir"`
 	Numprocs    string `json:"numprocs"`
 	AutoRestart string `json:"autoRestart"`
+	AutoStart   string `json:"autoStart"`
 }
 
 type SupervisorProcessFileReq struct {

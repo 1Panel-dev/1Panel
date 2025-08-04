@@ -2757,6 +2757,9 @@ const message = {
             manage: '管理',
             autoRestart: '自動再起動',
             EXITED: '終了しました',
+            autoRestartHelper: 'プログラムが異常終了した後に自動的に再起動するかどうか',
+            autoStart: '自動起動',
+            autoStartHelper: 'Supervisor 起動後にサービスを自動的に起動するかどうか',
         },
     },
     xpack: {

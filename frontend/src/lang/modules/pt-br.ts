@@ -2822,6 +2822,9 @@ const message = {
             manage: 'Gerenciamento',
             autoRestart: 'Reinicialização Automática',
             EXITED: 'Saiu',
+            autoRestartHelper: 'Se o programa falhar, reiniciar automaticamente',
+            autoStart: 'Início Automático',
+            autoStartHelper: 'Se o serviço deve ser iniciado automaticamente após o Supervisor iniciar',
         },
     },
     xpack: {

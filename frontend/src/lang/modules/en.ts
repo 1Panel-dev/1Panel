@@ -2863,6 +2863,9 @@ const message = {
             manage: 'Management',
             autoRestart: 'Auto Restart',
             EXITED: 'Exited',
+            autoRestartHelper: 'Whether to automatically restart the program after it crashes',
+            autoStart: 'Auto Start',
+            autoStartHelper: 'Whether to automatically start the service after Supervisor starts',
         },
     },
     xpack: {

@@ -323,6 +323,7 @@ func handleProcess(supervisordDir string, req request.SupervisorProcessConfig, c
 		_, _ = section.NewKey("command", strings.TrimSpace(req.Command))
 		_, _ = section.NewKey("directory", req.Dir)
 		_, _ = section.NewKey("autorestart", req.AutoRestart)
+		_, _ = section.NewKey("autostart", req.AutoStart)
 		_, _ = section.NewKey("startsecs", "3")
 		_, _ = section.NewKey("stdout_logfile", outLog)
 		_, _ = section.NewKey("stderr_logfile", errLog)
@@ -360,6 +361,8 @@ func handleProcess(supervisordDir string, req request.SupervisorProcessConfig, c
 		numprocsKey.SetValue(req.Numprocs)
 		autoRestart := section.Key("autorestart")
 		autoRestart.SetValue(req.AutoRestart)
+		autoStart := section.Key("autostart")
+		autoStart.SetValue(req.AutoStart)
 
 		if err = configFile.SaveTo(iniPath); err != nil {
 			return err
@@ -428,6 +431,9 @@ func handleProcessConfig(configDir, containerName string) ([]response.Supervisor
 			}
 			if autoRestart, _ := section.GetKey("autorestart"); autoRestart != nil {
 				config.AutoRestart = autoRestart.Value()
+			}
+			if autoStart, _ := section.GetKey("autostart"); autoStart != nil {
+				config.AutoStart = autoStart.Value()
 			}
 			_ = getProcessStatus(&config, containerName)
 			result = append(result, config)

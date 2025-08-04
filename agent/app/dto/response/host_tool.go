@@ -31,6 +31,7 @@ type SupervisorProcessConfig struct {
 	Msg         string          `json:"msg"`
 	Status      []ProcessStatus `json:"status"`
 	AutoRestart string          `json:"autoRestart"`
+	AutoStart   string          `json:"autoStart"`
 }
 
 type ProcessStatus struct {

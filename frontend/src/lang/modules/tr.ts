@@ -2900,6 +2900,9 @@ const message = {
             manage: 'Yönetim',
             autoRestart: 'Otomatik Yeniden Başlatma',
             EXITED: 'Çıkıldı',
+            autoRestartHelper: 'Program çöktükten sonra otomatik olarak yeniden başlatılsın mı?',
+            autoStart: 'Otomatik Başlat',
+            autoStartHelper: 'Supervisor başlatıldıktan sonra servis otomatik olarak başlatılsın mı?',
         },
     },
     xpack: {

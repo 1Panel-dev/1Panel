@@ -2814,6 +2814,9 @@ const message = {
             manage: 'Управление',
             autoRestart: 'Автоматический перезапуск',
             EXITED: 'Вышел',
+            autoRestartHelper: 'Автоматически перезапускать программу после её аварийного завершения',
+            autoStart: 'Автозапуск',
+            autoStartHelper: 'Автоматически запускать сервис после запуска Supervisor',
         },
     },
     xpack: {

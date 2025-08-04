@@ -43,6 +43,7 @@ export namespace HostTool {
         numprocs: string;
         status?: ProcessStatus[];
         autoRestart: string;
+        autoStart: string;
     }
 
     export interface ProcessStatus {

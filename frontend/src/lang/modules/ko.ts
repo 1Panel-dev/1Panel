@@ -2708,6 +2708,9 @@ const message = {
             manage: '관리',
             autoRestart: '자동 재시작',
             EXITED: '종료됨',
+            autoRestartHelper: '프로그램이 비정상적으로 종료된 후 자동으로 재시작할지 여부',
+            autoStart: '자동 시작',
+            autoStartHelper: 'Supervisor 시작 후 서비스를 자동으로 시작할지 여부',
         },
     },
     xpack: {

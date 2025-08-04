@@ -2661,6 +2661,9 @@ const message = {
             manage: '管理',
             autoRestart: '自动重启',
             EXITED: '已退出',
+            autoRestartHelper: '程序异常退出后是否自动重启',
+            autoStart: '自动启动',
+            autoStartHelper: 'Supervisor 启动后是否自动启动服务',
         },
     },
     xpack: {
