@@ -27,6 +27,9 @@
                     {{ $t('commons.button.create') + $t('tool.supervisor.list').toLowerCase() }}
                 </el-button>
             </template>
+            <template v-if="showTable" #rightToolBar>
+                <TableRefresh @search="search()" />
+            </template>
             <template #main v-if="showTable">
                 <ComplexTable :data="data" :class="{ mask: !supervisorStatus.isRunning }" v-loading="dataLoading">
                     <el-table-column

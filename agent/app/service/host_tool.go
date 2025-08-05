@@ -615,7 +615,7 @@ func getProcessStatus(config *response.SupervisorProcessConfig, containerName st
 	for _, line := range lines {
 		line = strings.TrimPrefix(line, "stdout:")
 		fields := strings.Fields(line)
-		if len(fields) >= 5 {
+		if len(fields) >= 4 {
 			status := response.ProcessStatus{
 				Name:   fields[0],
 				Status: fields[1],
