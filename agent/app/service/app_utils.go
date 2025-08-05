@@ -440,6 +440,11 @@ func deleteAppInstall(deleteReq request.AppInstallDelete) error {
 			_ = op.DeleteDir(parentDir)
 		}
 		tx.Commit()
+
+		existApps, _ := appInstallRepo.ListBy(context.Background(), appInstallRepo.WithAppId(install.AppId))
+		if len(existApps) == 0 {
+			_ = appIgnoreUpgradeRepo.Delete(appIgnoreUpgradeRepo.WithAppID(install.AppId))
+		}
 		return nil
 	}
 	uninstallTask.AddSubTask(task.GetTaskName(install.Name, task.TaskUninstall, task.TaskScopeApp), uninstall, nil)

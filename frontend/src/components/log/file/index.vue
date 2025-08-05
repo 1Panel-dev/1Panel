@@ -1,7 +1,9 @@
 <template>
     <div v-loading="firstLoading">
         <div v-if="defaultButton">
-            <el-button icon="Refresh" @click="getContent(false)">{{ $t('commons.button.refresh') }}</el-button>
+            <el-button icon="Refresh" v-if="!showTail" @click="getContent(false)">
+                {{ $t('commons.button.refresh') }}
+            </el-button>
             <el-checkbox
                 border
                 :disabled="isTailDisabled"

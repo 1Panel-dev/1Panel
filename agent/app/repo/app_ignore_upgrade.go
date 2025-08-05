@@ -11,6 +11,7 @@ type AppIgnoreUpgradeRepo struct {
 
 type IAppIgnoreUpgradeRepo interface {
 	WithScope(scope string) DBOption
+	WithAppID(appID uint) DBOption
 	List(opts ...DBOption) ([]model.AppIgnoreUpgrade, error)
 	Create(appIgnoreUpgrade *model.AppIgnoreUpgrade) error
 	Delete(opts ...DBOption) error
@@ -23,6 +24,12 @@ func NewIAppIgnoreUpgradeRepo() IAppIgnoreUpgradeRepo {
 func (a AppIgnoreUpgradeRepo) WithScope(scope string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("scope = ?", scope)
+	}
+}
+
+func (a AppIgnoreUpgradeRepo) WithAppID(appID uint) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("app_id = ?", appID)
 	}
 }
 
