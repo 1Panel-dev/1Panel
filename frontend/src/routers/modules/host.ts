@@ -47,8 +47,8 @@ const hostRouter = {
             name: 'FirewallPort',
             component: () => import('@/views/host/firewall/port/index.vue'),
             meta: {
-                parent: 'menu.firewall',
-                title: 'firewall.portRule',
+                title: 'menu.firewall',
+                detail: 'firewall.portRule',
                 requiresAuth: false,
             },
         },
