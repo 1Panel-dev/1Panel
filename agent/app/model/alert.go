@@ -18,7 +18,7 @@ type AlertTask struct {
 	Type      string `gorm:"type:varchar(64);not null" json:"type"`
 	Quota     string `gorm:"type:varchar(64)" json:"quota"`
 	QuotaType string `gorm:"type:varchar(64)" json:"quotaType"`
-	Method    string `gorm:"type:varchar(64);not null;default:'sms" json:"method"`
+	Method    string `gorm:"type:varchar(64);not null;default:'sms'" json:"method"`
 }
 
 type AlertLog struct {
@@ -33,7 +33,7 @@ type AlertLog struct {
 	Message     string `gorm:"type:varchar(256);" json:"message"`
 	RecordId    uint   `gorm:"type:integer;" json:"recordId"`
 	LicenseId   string `gorm:"type:varchar(256);not null;" json:"licenseId" `
-	Method      string `gorm:"type:varchar(64);not null;default:'sms" json:"method"`
+	Method      string `gorm:"type:varchar(64);not null;default:'sms'" json:"method"`
 }
 
 type AlertConfig struct {

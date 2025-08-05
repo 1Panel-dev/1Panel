@@ -130,10 +130,6 @@ func loadVersion(isLatest bool, currentVersion, mode string) string {
 		return ""
 	}
 	num, _ := strconv.Atoi(versionPart[1])
-	if num == 0 {
-		global.LOG.Errorf("current version is error format: %s", currentVersion)
-		return ""
-	}
 	if num >= 10 {
 		if version, ok := versionMap[currentVersion[0:5]]; ok {
 			return checkVersion(version, currentVersion)
