@@ -3759,6 +3759,7 @@ const message = {
             unhealthyDeleteError:
                 'Yükleme düğümü durumu anormal, lütfen düğüm listesini kontrol edin ve tekrar deneyin!',
             replicaStatusError: 'Durum alımı anormal, lütfen ana düğümü kontrol edin.',
+            masterHostError: "Ana düğüm IP'si 127.0.0.1 olamaz",
         },
     },
 };

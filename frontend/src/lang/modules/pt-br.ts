@@ -3689,6 +3689,7 @@ const message = {
             unhealthyDeleteError:
                 'O status do nó de instalação está anormal, verifique a lista de nós e tente novamente!',
             replicaStatusError: 'A aquisição do status está anormal, verifique o nó mestre.',
+            masterHostError: 'O IP do nó mestre não pode ser 127.0.0.1',
         },
     },
 };

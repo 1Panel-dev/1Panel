@@ -3717,6 +3717,7 @@ const message = {
             replicaStatus: 'Master-Slave Status',
             unhealthyDeleteError: 'The installation node status is abnormal, please check the node list and try again!',
             replicaStatusError: 'Status acquisition is abnormal, please check the master node.',
+            masterHostError: 'The master node IP cannot be 127.0.0.1',
         },
     },
 };

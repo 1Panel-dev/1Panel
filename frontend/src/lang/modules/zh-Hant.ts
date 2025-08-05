@@ -3465,6 +3465,7 @@ const message = {
             replicaStatus: '主從狀態',
             unhealthyDeleteError: '安裝節點狀態異常，請在節點列表檢查後重試！',
             replicaStatusError: '狀態獲取異常，請檢查主節點。',
+            masterHostError: '主節點 IP 不能為 127.0.0.1',
         },
     },
 };

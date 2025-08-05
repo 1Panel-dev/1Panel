@@ -3531,6 +3531,7 @@ const message = {
             replicaStatus: '마스터-슬레이브 상태',
             unhealthyDeleteError: '설치 노드 상태가 비정상입니다. 노드 목록을 확인한 후 다시 시도하세요!',
             replicaStatusError: '상태 획득이 비정상입니다. 마스터 노드를 확인하세요.',
+            masterHostError: '마스터 노드의 IP는 127.0.0.1이 될 수 없습니다',
         },
     },
 };

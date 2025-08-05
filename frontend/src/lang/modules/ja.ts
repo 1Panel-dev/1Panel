@@ -3597,6 +3597,7 @@ const message = {
             unhealthyDeleteError:
                 'インストールノードのステータスが異常です。ノードリストを確認してから再試行してください！',
             replicaStatusError: 'ステータスの取得が異常です。マスターノードを確認してください。',
+            masterHostError: 'マスターノードのIPは127.0.0.1にできません',
         },
     },
 };

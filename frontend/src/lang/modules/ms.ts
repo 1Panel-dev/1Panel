@@ -3679,6 +3679,7 @@ const message = {
             replicaStatus: 'Utama-Hamba Status',
             unhealthyDeleteError: 'Status nod pemasangan tidak normal, sila periksa senarai nod dan cuba lagi!',
             replicaStatusError: 'Pengambilan status tidak normal, sila periksa nod utama.',
+            masterHostError: 'IP nod utama tidak boleh 127.0.0.1',
         },
     },
 };
