@@ -221,6 +221,7 @@ export namespace Database {
 
     // redis
     export interface RedisConfUpdate {
+        dbType: string;
         database: string;
         timeout: string;
         maxclients: string;

@@ -28,7 +28,7 @@
 
             <template #main>
                 <div v-if="activeName === 'conf'">
-                    <CodemirrorPro v-model="postgresqlConf"></CodemirrorPro>
+                    <CodemirrorPro :heightDiff="320" v-model="postgresqlConf"></CodemirrorPro>
                     <el-button type="primary" class="mt-5" @click="onSaveConf">
                         {{ $t('commons.button.save') }}
                     </el-button>

@@ -672,7 +672,7 @@ func (a *AppInstallService) GetDefaultConfigByKey(key, name string) (string, err
 	if key == constant.AppMysql || key == constant.AppMariaDB || key == constant.AppMysqlCluster {
 		filePath = path.Join(filePath, "my.cnf")
 	}
-	if key == constant.AppRedis {
+	if key == constant.AppRedis || key == constant.AppRedisCluster {
 		filePath = path.Join(filePath, "redis.conf")
 	}
 	if key == constant.AppOpenresty {

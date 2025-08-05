@@ -53,7 +53,7 @@ func (u *RedisService) UpdateConf(req dto.RedisConfUpdate) error {
 	if err := confSet(redisInfo.Name, req.DBType, "", confs); err != nil {
 		return err
 	}
-	if _, err := compose.Restart(fmt.Sprintf("%s/redis/%s/docker-compose.yml", global.Dir.AppInstallDir, redisInfo.Name)); err != nil {
+	if _, err := compose.Restart(fmt.Sprintf("%s/%s/%s/docker-compose.yml", global.Dir.AppInstallDir, req.DBType, redisInfo.Name)); err != nil {
 		return err
 	}
 
