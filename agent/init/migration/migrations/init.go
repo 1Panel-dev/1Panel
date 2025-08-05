@@ -433,3 +433,16 @@ var UpdateMcpServer = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var InitCronjobGroup = &gormigrate.Migration{
+	ID: "20250805-init-cronjob-group",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.Cronjob{}); err != nil {
+			return err
+		}
+		if err := tx.Model(&model.Cronjob{}).Where("1=1").Updates(map[string]interface{}{"group_id": 0}).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}

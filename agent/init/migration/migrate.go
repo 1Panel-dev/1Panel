@@ -34,6 +34,7 @@ func InitAgentDB() {
 		migrations.AddMethodToAlertLog,
 		migrations.AddMethodToAlertTask,
 		migrations.UpdateMcpServer,
+		migrations.InitCronjobGroup,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)
