@@ -8,6 +8,7 @@ import (
 	"os/user"
 	"path"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -541,7 +542,7 @@ func loadSSHData(ctx *gin.Context, command string, showCountFrom, showCountTo, c
 		switch {
 		case strings.Contains(lines[i], "Failed password for"):
 			itemData = loadFailedSecureDatas(lines[i])
-			if len(itemData.Address) != 0 {
+			if checkIsStandard(itemData) {
 				if successCount+failedCount >= showCountFrom && successCount+failedCount < showCountTo {
 					itemData.Area, _ = geo.GetIPLocation(getLoc, itemData.Address, common.GetLang(ctx))
 					itemData.Date = loadDate(currentYear, itemData.DateStr, nyc)
@@ -551,7 +552,7 @@ func loadSSHData(ctx *gin.Context, command string, showCountFrom, showCountTo, c
 			}
 		case strings.Contains(lines[i], "Connection closed by authenticating user"):
 			itemData = loadFailedAuthDatas(lines[i])
-			if len(itemData.Address) != 0 {
+			if checkIsStandard(itemData) {
 				if successCount+failedCount >= showCountFrom && successCount+failedCount < showCountTo {
 					itemData.Area, _ = geo.GetIPLocation(getLoc, itemData.Address, common.GetLang(ctx))
 					itemData.Date = loadDate(currentYear, itemData.DateStr, nyc)
@@ -561,7 +562,7 @@ func loadSSHData(ctx *gin.Context, command string, showCountFrom, showCountTo, c
 			}
 		case strings.Contains(lines[i], "Accepted "):
 			itemData = loadSuccessDatas(lines[i])
-			if len(itemData.Address) != 0 {
+			if checkIsStandard(itemData) {
 				if successCount+failedCount >= showCountFrom && successCount+failedCount < showCountTo {
 					itemData.Area, _ = geo.GetIPLocation(getLoc, itemData.Address, common.GetLang(ctx))
 					itemData.Date = loadDate(currentYear, itemData.DateStr, nyc)
@@ -589,7 +590,6 @@ func loadSuccessDatas(line string) dto.SSHHistory {
 	data.Status = constant.StatusSuccess
 	return data
 }
-
 func loadFailedAuthDatas(line string) dto.SSHHistory {
 	var data dto.SSHHistory
 	parts := strings.Fields(line)
@@ -637,6 +637,14 @@ func loadFailedSecureDatas(line string) dto.SSHHistory {
 		data.Message = strings.Split(line, ": ")[1]
 	}
 	return data
+}
+
+func checkIsStandard(item dto.SSHHistory) bool {
+	if len(item.Address) == 0 {
+		return false
+	}
+	portItem, _ := strconv.Atoi(item.Port)
+	return portItem != 0
 }
 
 func handleGunzip(path string) error {
