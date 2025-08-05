@@ -81,8 +81,8 @@ const hostRouter = {
             name: 'Process',
             component: () => import('@/views/host/process/process/index.vue'),
             meta: {
-                parent: 'menu.processManage',
-                title: 'menu.process',
+                title: 'menu.processManage',
+                detail: 'menu.process',
                 activeMenu: '/hosts/process/process',
                 keepAlive: true,
                 requiresAuth: false,
@@ -105,8 +105,8 @@ const hostRouter = {
             name: 'SSH',
             component: () => import('@/views/host/ssh/ssh/index.vue'),
             meta: {
-                parent: 'menu.ssh',
-                title: 'menu.config',
+                title: 'menu.ssh',
+                detail: 'menu.config',
                 activeMenu: '/hosts/ssh/ssh',
                 keepAlive: true,
                 requiresAuth: false,
