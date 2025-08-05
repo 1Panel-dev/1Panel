@@ -71,7 +71,7 @@
                             {{ row.port }}
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('commons.table.status')" prop="status">
+                    <el-table-column :label="$t('commons.table.status')" prop="status" width="100px">
                         <template #default="{ row }">
                             <RuntimeStatus :row="row" />
                         </template>
