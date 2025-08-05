@@ -1,40 +1,42 @@
 <template>
-    <div class="app-status card-interval" v-if="baseInfo.isExist">
-        <el-card>
-            <div class="flex w-full flex-col gap-4 md:flex-row">
-                <div class="flex flex-wrap gap-4 ml-3">
-                    <el-tag effect="dark" type="success">{{ baseInfo.name }}</el-tag>
-                    <Status class="mt-0.5" :status="baseInfo.isActive ? 'enable' : 'disable'" />
-                    <el-tag>{{ $t('app.version') }}: {{ baseInfo.version }}</el-tag>
-                </div>
-                <div class="mt-0.5">
-                    <el-button type="primary" v-if="baseInfo.isActive" @click="onOperate('stop')" link>
-                        {{ $t('commons.button.stop') }}
-                    </el-button>
-                    <el-button type="primary" v-if="!baseInfo.isActive" @click="onOperate('start')" link>
-                        {{ $t('commons.button.start') }}
-                    </el-button>
-                    <el-divider direction="vertical" />
-                    <el-button type="primary" @click="onOperate('restart')" link>
-                        {{ $t('commons.button.restart') }}
-                    </el-button>
-                    <span v-if="onPing !== 'None'">
+    <div>
+        <div class="app-status card-interval" v-if="baseInfo.isExist">
+            <el-card>
+                <div class="flex w-full flex-col gap-4 md:flex-row">
+                    <div class="flex flex-wrap gap-4 ml-3">
+                        <el-tag effect="dark" type="success">{{ baseInfo.name }}</el-tag>
+                        <Status class="mt-0.5" :status="baseInfo.isActive ? 'enable' : 'disable'" />
+                        <el-tag>{{ $t('app.version') }}: {{ baseInfo.version }}</el-tag>
+                    </div>
+                    <div class="mt-0.5">
+                        <el-button type="primary" v-if="baseInfo.isActive" @click="onOperate('stop')" link>
+                            {{ $t('commons.button.stop') }}
+                        </el-button>
+                        <el-button type="primary" v-if="!baseInfo.isActive" @click="onOperate('start')" link>
+                            {{ $t('commons.button.start') }}
+                        </el-button>
                         <el-divider direction="vertical" />
-                        <el-button type="primary" link>{{ $t('firewall.noPing') }}</el-button>
-                        <el-switch
-                            size="small"
-                            class="ml-2"
-                            inactive-value="Disable"
-                            active-value="Enable"
-                            @change="onPingOperate"
-                            v-model="onPing"
-                        />
-                    </span>
+                        <el-button type="primary" @click="onOperate('restart')" link>
+                            {{ $t('commons.button.restart') }}
+                        </el-button>
+                        <span v-if="onPing !== 'None'">
+                            <el-divider direction="vertical" />
+                            <el-button type="primary" link>{{ $t('firewall.noPing') }}</el-button>
+                            <el-switch
+                                size="small"
+                                class="ml-2"
+                                inactive-value="Disable"
+                                active-value="Enable"
+                                @change="onPingOperate"
+                                v-model="onPing"
+                            />
+                        </span>
+                    </div>
                 </div>
-            </div>
-        </el-card>
+            </el-card>
+        </div>
+        <NoSuchService v-if="!baseInfo.isExist" name="Firewalld / Ufw" />
     </div>
-    <NoSuchService v-if="!baseInfo.isExist" name="Firewalld / Ufw" />
 </template>
 
 <script lang="ts" setup>
