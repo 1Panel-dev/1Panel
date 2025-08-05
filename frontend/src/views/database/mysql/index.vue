@@ -44,7 +44,7 @@
                     {{ $t('database.loadFromRemote') }}
                 </el-button>
                 <el-button @click="goRemoteDB()" type="primary" plain>
-                    {{ $t('database.manageRemoteDB') }}
+                    {{ $t('database.remoteDB') }}
                 </el-button>
                 <el-dropdown>
                     <el-button type="primary" plain>

@@ -494,7 +494,6 @@ const message = {
         passwordHelper: 'Alınamıyor, lütfen değiştirin',
         remote: 'Uzak',
         remoteDB: 'Uzak sunucu | Uzak sunucular',
-        manageRemoteDB: 'Uzak sunucuları yönet',
         createRemoteDB: '@.lower:database.remoteDB Bağla',
         unBindRemoteDB: '@.lower:database.remoteDB Bağlantısını Çöz',
         unBindForce: 'Zorla bağlantıyı çöz',

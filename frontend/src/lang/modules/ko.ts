@@ -473,7 +473,6 @@ const message = {
         passwordHelper: '불러올 수 없습니다. 수정해주세요.',
         remote: '원격',
         remoteDB: '원격 서버 | 원격 서버들',
-        manageRemoteDB: '원격 DB 관리',
         createRemoteDB: '원격 DB 바인딩',
         unBindRemoteDB: '원격 DB 바인딩 해제',
         unBindForce: '강제 바인딩 해제',

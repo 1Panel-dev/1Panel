@@ -485,7 +485,6 @@ const message = {
         passwordHelper: 'Tidak dapat diambil, sila ubah',
         remote: 'Jauh',
         remoteDB: 'Pelayan jauh | Pelayan-pelayan jauh',
-        manageRemoteDB: 'Pangkalan Data Jauh',
         createRemoteDB: 'Kaitkan @.lower:database.remoteDB',
         unBindRemoteDB: 'Nyahkaitkan @.lower:database.remoteDB',
         unBindForce: 'Paksa nyahkait',

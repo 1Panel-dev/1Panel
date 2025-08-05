@@ -470,7 +470,6 @@ const message = {
         passwordHelper: '无法获取密码，请修改',
         remote: '远程',
         remoteDB: '远程服务器',
-        manageRemoteDB: '管理远程服务器',
         createRemoteDB: '添加远程服务器',
         unBindRemoteDB: '解绑远程服务器',
         unBindForce: '强制解绑',

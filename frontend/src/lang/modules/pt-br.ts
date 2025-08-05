@@ -482,7 +482,6 @@ const message = {
         passwordHelper: 'Não é possível obter, por favor, modifique',
         remote: 'Remoto',
         remoteDB: 'Servidor remoto | Servidores remotos',
-        manageRemoteDB: 'Gerenciar DB remoto',
         createRemoteDB: 'Vincular @.lower:database.remoteDB',
         unBindRemoteDB: 'Desvincular @.lower:database.remoteDB',
         unBindForce: 'Forçar desvinculação',

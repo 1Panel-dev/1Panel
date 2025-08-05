@@ -488,7 +488,6 @@ const message = {
         passwordHelper: 'Unable to retrieve, please modify',
         remote: 'Remote',
         remoteDB: 'Remote server | Remote servers',
-        manageRemoteDB: 'Manage remote servers',
         createRemoteDB: 'Bind @.lower:database.remoteDB',
         unBindRemoteDB: 'Unbind @.lower:database.remoteDB',
         unBindForce: 'Force unbind',

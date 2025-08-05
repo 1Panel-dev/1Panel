@@ -474,7 +474,6 @@ const message = {
         passwordHelper: '取得できない場合は、変更してください',
         remote: 'リモート',
         remoteDB: 'リモートサーバー|リモートサーバー',
-        manageRemoteDB: 'リモートDB',
         createRemoteDB: 'リモートサーバーを追加',
         unBindRemoteDB: 'リモートサーバーのバインドを解除',
         unBindForce: '強制バインド',

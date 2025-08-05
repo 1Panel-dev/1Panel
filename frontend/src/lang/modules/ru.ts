@@ -476,7 +476,6 @@ const message = {
         passwordHelper: 'Невозможно получить, пожалуйста, измените',
         remote: 'Удаленный',
         remoteDB: 'Удаленный сервер | Удаленные серверы',
-        manageRemoteDB: 'Удаленная БД',
         createRemoteDB: 'Привязать @.lower:database.remoteDB',
         unBindRemoteDB: 'Отвязать @.lower:database.remoteDB',
         unBindForce: 'Принудительная отвязка',

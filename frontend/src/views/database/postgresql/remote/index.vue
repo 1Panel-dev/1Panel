@@ -127,12 +127,14 @@ const onOpenDialog = async (
         username: '',
         password: '',
         description: '',
+        timeout: 30,
     },
 ) => {
     let params = {
         title,
         rowData: { ...rowData },
     };
+    params.rowData.timeout = 30;
     dialogRef.value!.acceptParams(params);
 };
 

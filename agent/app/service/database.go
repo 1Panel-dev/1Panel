@@ -135,6 +135,7 @@ func (u *DatabaseService) CheckDatabase(req dto.DatabaseCreate) bool {
 			Address:  req.Address,
 			Port:     req.Port,
 			Password: req.Password,
+			Timeout:  req.Timeout,
 		})
 		return err == nil
 	case "mysql", "mariadb":
@@ -186,6 +187,7 @@ func (u *DatabaseService) Create(req dto.DatabaseCreate) error {
 			Address:  req.Address,
 			Port:     req.Port,
 			Password: req.Password,
+			Timeout:  req.Timeout,
 		}); err != nil {
 			return err
 		}
@@ -286,6 +288,7 @@ func (u *DatabaseService) Update(req dto.DatabaseUpdate) error {
 			Address:  req.Address,
 			Port:     req.Port,
 			Password: req.Password,
+			Timeout:  req.Timeout,
 		}); err != nil {
 			return err
 		}

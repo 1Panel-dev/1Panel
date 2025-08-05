@@ -472,7 +472,6 @@ const message = {
         passwordHelper: '無法獲取密碼，請修改',
         remote: '遠程',
         remoteDB: '遠程服務器',
-        manageRemoteDB: '管理遠程服務器',
         createRemoteDB: '添加遠程服務器',
         unBindRemoteDB: '解綁遠程服務器',
         unBindForce: '強制解綁',
