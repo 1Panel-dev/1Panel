@@ -138,7 +138,7 @@ func HandleUnTar(sourceFile, targetDir string, secret string) error {
 		commands = fmt.Sprintf("%s tar -zxvf - -C %s", extraCmd, targetDir+" > /dev/null 2>&1")
 		global.LOG.Debug(strings.ReplaceAll(commands, fmt.Sprintf(" '%s' ", secret), " ****** "))
 	} else {
-		commands = fmt.Sprintf("tar zxvfC %s %s", sourceFile, targetDir)
+		commands = fmt.Sprintf("tar zxvf '%s' -C '%s'", sourceFile, targetDir)
 		global.LOG.Debug(commands)
 	}
 
