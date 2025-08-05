@@ -177,7 +177,7 @@ func (r *Remote) Recover(info RecoverInfo) error {
 		}()
 	}
 	recoverCommand := exec.Command("bash", "-c",
-		fmt.Sprintf("docker run --rm --net=host -i %s /bin/bash -c 'PGPASSWORD=\"%s\" pg_restore -h %s -p %d --verbose --clean --no-privileges --no-owner -Fc -U %s -d %s --role=%s' < %s",
+		fmt.Sprintf("docker run --rm --net=host -i %s /bin/bash -c 'PGPASSWORD=\"%s\" pg_restore -h %s -p %d --verbose --clean --no-privileges --no-owner -Fc -c  --if-exists --no-owner -U %s -d %s --role=%s' < %s",
 			imageTag, r.Password, r.Address, r.Port, r.User, info.Name, info.Username, fileName))
 	pipe, _ := recoverCommand.StdoutPipe()
 	stderrPipe, _ := recoverCommand.StderrPipe()

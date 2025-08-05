@@ -167,7 +167,7 @@ func (r *Local) Recover(info RecoverInfo) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(info.Timeout*uint(time.Second)))
 	defer cancel()
 	cmd := exec.CommandContext(ctx, "docker", "exec", "-i", r.ContainerName, "sh", "-c",
-		fmt.Sprintf("PGPASSWORD=%s pg_restore -F c -U %s -d %s", r.Password, r.Username, info.Name),
+		fmt.Sprintf("PGPASSWORD=%s pg_restore -F c -c --if-exists --no-owner -U %s -d %s", r.Password, r.Username, info.Name),
 	)
 	if strings.HasSuffix(info.SourceFile, ".gz") {
 		gzipFile, err := os.Open(info.SourceFile)
