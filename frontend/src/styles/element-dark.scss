@@ -21,7 +21,8 @@ html.dark {
     --panel-main-bg-color-9: #2e313d;
     --panel-main-bg-color-10: #242633;
     --panel-main-bg-color-11: #60626f;
-    --panel-main-bg-color-12: #000000;
+    --panel-main-bg-color-12: #1f2329;
+    --panel-main-bg-color-13: #000000;
 
     --panel-alert-error-bg-color: #fef0f0;
     --panel-alert-error-text-color: #f56c6c;
@@ -117,7 +118,7 @@ html.dark {
     --el-box-shadow-dark: 0px 16px 48px 16px rgba(36, 38, 51, 0.72), 0px 12px 32px #242633, 0px 8px 16px -8px #242633;
     --el-bg-color: var(--panel-main-bg-color-9);
     --el-bg-color-overlay: var(--panel-main-bg-color-9);
-    --panel-code-header-footer-color: var(--panel-main-bg-color-6);
+    --panel-code-header-footer-color: var(--panel-main-bg-color-12);
 
 
     --el-text-color-placeholder: var(--panel-main-bg-color-4);
