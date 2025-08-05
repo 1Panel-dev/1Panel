@@ -76,11 +76,17 @@ const dropdownVisibleChange = (visible, tabPath) => {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 :deep(.el-tabs__header) {
     margin: 0;
+    .el-tabs__item.is-active {
+        border-bottom-color: var(--el-color-primary) !important;
+        border-bottom-width: 2px !important;
+    }
 }
 .common-tabs {
     margin-bottom: 7px;
+    margin-left: 20px;
+    margin-right: 20px;
 }
 </style>
