@@ -559,7 +559,7 @@ const message = {
         longQueryTime: 'しきい値',
         thresholdRangeHelper: '正しいしきい値（1-600）を入力してください。',
 
-        timeout: 'タイムアウト',
+        timeout: 'タイムアウト(s)',
         timeoutHelper: 'アイドル接続タイムアウト期間。0は、接続が継続的にオンになっていることを示します。',
         maxclients: 'マックスクライアント',
         requirepassHelper:

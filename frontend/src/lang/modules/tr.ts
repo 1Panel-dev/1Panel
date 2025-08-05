@@ -579,7 +579,7 @@ const message = {
         longQueryTime: 'eşik(saniye)',
         thresholdRangeHelper: 'Lütfen doğru eşik değerini girin (1 - 600).',
 
-        timeout: 'Zaman aşımı',
+        timeout: 'Zaman aşımı(saniye)',
         timeoutHelper: 'Boştaki bağlantı zaman aşımı süresi. 0, bağlantının sürekli açık olduğunu gösterir.',
         maxclients: 'Maksimum istemci',
         requirepassHelper:

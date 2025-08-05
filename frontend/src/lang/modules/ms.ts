@@ -571,7 +571,7 @@ const message = {
         longQueryTime: 'Ambang (saat)',
         thresholdRangeHelper: 'Sila masukkan ambang yang betul (1 - 600).',
 
-        timeout: 'Tamat masa',
+        timeout: 'Tamat masa(saat)',
         timeoutHelper: 'Tempoh tamat masa sambungan tidak aktif. 0 menunjukkan sambungan sentiasa aktif.',
         maxclients: 'Klien maksimum',
         requirepassHelper:

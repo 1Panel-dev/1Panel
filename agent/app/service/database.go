@@ -325,6 +325,7 @@ func (u *DatabaseService) Update(req dto.DatabaseUpdate) error {
 	upMap["port"] = req.Port
 	upMap["username"] = req.Username
 	upMap["password"] = pass
+	upMap["timeout"] = req.Timeout
 	upMap["description"] = req.Description
 	upMap["ssl"] = req.SSL
 	upMap["client_key"] = req.ClientKey

@@ -572,7 +572,7 @@ const message = {
         longQueryTime: 'threshold(s)',
         thresholdRangeHelper: 'Please enter the correct threshold (1 - 600).',
 
-        timeout: 'Timeout',
+        timeout: 'Timeout(s)',
         timeoutHelper: 'Idle connection timeout period. 0 indicates that the connection is on continuously.',
         maxclients: 'Max clients',
         requirepassHelper:

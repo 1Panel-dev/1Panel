@@ -554,7 +554,7 @@ const message = {
         longQueryTime: '閾值(秒)',
         thresholdRangeHelper: '請輸入正確的閾值(1 - 600)',
 
-        timeout: '超時時間',
+        timeout: '超時時間(秒)',
         timeoutHelper: '空閑連接超時時間，0表示不斷開',
         maxclients: '最大連接數',
         requirepassHelper: '留空代表沒有設置密碼，修改需要單獨保存並且重啟容器！',

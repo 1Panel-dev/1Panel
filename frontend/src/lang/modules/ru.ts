@@ -563,7 +563,7 @@ const message = {
         longQueryTime: 'порог (сек)',
         thresholdRangeHelper: 'Пожалуйста, введите корректный порог (1 - 600).',
 
-        timeout: 'Таймаут',
+        timeout: 'Таймаут(сек)',
         timeoutHelper: 'Период таймаута неактивного подключения. 0 означает, что подключение постоянно активно.',
         maxclients: 'Макс. клиентов',
         requirepassHelper:

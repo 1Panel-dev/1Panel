@@ -115,7 +115,7 @@
                                     :current-page="searchInfo.page"
                                     @current-change="handleCurrentChange"
                                     @size-change="handleSizeChange"
-                                    :pager-count="3"
+                                    :pager-count="5"
                                     :page-sizes="[6, 8, 10, 12, 14]"
                                     small
                                     layout="total, sizes, prev, pager, next"

@@ -568,7 +568,7 @@ const message = {
         longQueryTime: 'limite (segundos)',
         thresholdRangeHelper: 'Por favor, insira o limite correto (1 - 600).',
 
-        timeout: 'Tempo limite',
+        timeout: 'Tempo limite(segundos)',
         timeoutHelper: 'Período de timeout de conexão ociosa. 0 indica que a conexão permanece ativa continuamente.',
         maxclients: 'Máximo de clientes',
         requirepassHelper:

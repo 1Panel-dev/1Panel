@@ -134,7 +134,6 @@ const onOpenDialog = async (
         title,
         rowData: { ...rowData },
     };
-    params.rowData.timeout = 30;
     dialogRef.value!.acceptParams(params);
 };
 

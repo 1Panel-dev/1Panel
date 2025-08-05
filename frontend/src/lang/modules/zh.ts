@@ -552,7 +552,7 @@ const message = {
         longQueryTime: '阈值(秒)',
         thresholdRangeHelper: '请输入正确的阈值(1 - 600)',
 
-        timeout: '超时时间',
+        timeout: '超时时间(秒)',
         timeoutHelper: '空闲连接超时时间，0表示不断开',
         maxclients: '最大连接数',
         requirepassHelper: '留空代表没有设置密码，修改需要单独保存并且重启容器！',

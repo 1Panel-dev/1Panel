@@ -556,7 +556,7 @@ const message = {
         longQueryTime: '임계값(s)',
         thresholdRangeHelper: '올바른 임계값을 입력하십시오 (1 - 600).',
 
-        timeout: '타임아웃',
+        timeout: '타임아웃(s)',
         timeoutHelper: '유휴 연결의 타임아웃 기간. 0은 연결이 지속적으로 유지됨을 의미합니다.',
         maxclients: '최대 클라이언트',
         requirepassHelper:

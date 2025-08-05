@@ -260,6 +260,7 @@ type DatabaseInfo struct {
 	ClientCert string `json:"clientCert"`
 	SkipVerify bool   `json:"skipVerify"`
 
+	Timeout     uint   `json:"timeout"`
 	Description string `json:"description"`
 }
 
