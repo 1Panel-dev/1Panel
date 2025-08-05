@@ -185,6 +185,8 @@ func (w WebsiteSSLService) Create(create request.WebsiteSSLCreate) (request.Webs
 		return res, err
 	}
 	create.ID = websiteSSL.ID
+	logFile, _ := os.OpenFile(path.Join(global.Dir.SSLLogDir, fmt.Sprintf("%s-ssl-%d.log", websiteSSL.PrimaryDomain, websiteSSL.ID)), os.O_CREATE|os.O_WRONLY|os.O_TRUNC, constant.FilePerm)
+	logFile.Close()
 	go func() {
 		if create.Provider != constant.DnsManual {
 			if err = w.ObtainSSL(request.WebsiteSSLApply{
