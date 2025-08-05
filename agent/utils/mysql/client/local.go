@@ -234,7 +234,10 @@ func (r *Local) Backup(info BackupInfo) error {
 		dumpCmd = "mariadb-dump"
 	}
 	global.LOG.Infof("start to %s | gzip > %s.gzip", dumpCmd, info.TargetDir+"/"+info.FileName)
-	cmd := exec.Command("docker", "exec", r.ContainerName, dumpCmd, "--routines", "-uroot", "-p"+r.Password, "--default-character-set="+info.Format, info.Name)
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(info.Timeout*uint(time.Second)))
+	defer cancel()
+	cmd := exec.CommandContext(ctx, "docker", "exec", r.ContainerName, dumpCmd, "--routines", "-uroot", "-p"+r.Password, "--default-character-set="+info.Format, info.Name)
 	var stderr bytes.Buffer
 	cmd.Stderr = &stderr
 
@@ -258,7 +261,9 @@ func (r *Local) Recover(info RecoverInfo) error {
 		mysqlCli = "mysql"
 	}
 
-	cmd := exec.Command("docker", "exec", "-i", r.ContainerName, mysqlCli, "-uroot", "-p"+r.Password, "--default-character-set="+info.Format, info.Name)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(info.Timeout*uint(time.Second)))
+	defer cancel()
+	cmd := exec.CommandContext(ctx, "docker", "exec", "-i", r.ContainerName, mysqlCli, "-uroot", "-p"+r.Password, "--default-character-set="+info.Format, info.Name)
 	if strings.HasSuffix(info.SourceFile, ".gz") {
 		gzipFile, err := os.Open(info.SourceFile)
 		if err != nil {

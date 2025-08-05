@@ -244,6 +244,10 @@ func confSet(redisName string, redisType string, updateType string, changeConf [
 		}
 		newFiles = append(newFiles, files[i])
 	}
+	if startIndex == 0 {
+		newFiles = append(newFiles, "# Redis configuration rewrite by 1Panel")
+		startIndex = len(newFiles) - 1
+	}
 	endIndex = endIndex - emptyLine
 	for _, item := range changeConf {
 		if item.key == "save" {

@@ -11,7 +11,7 @@ type DBConfUpdateByFile struct {
 type ChangeDBInfo struct {
 	ID       uint   `json:"id"`
 	From     string `json:"from" validate:"required,oneof=local remote"`
-	Type     string `json:"type" validate:"required,oneof=mysql mariadb postgresql mysql-cluster postgresql-cluster redis-cluster"`
+	Type     string `json:"type" validate:"required,oneof=mysql mariadb postgresql redis mysql-cluster postgresql-cluster redis-cluster"`
 	Database string `json:"database" validate:"required"`
 	Value    string `json:"value" validate:"required"`
 }
