@@ -39,9 +39,7 @@ const databaseRouter = {
                     meta: {
                         activeMenu: '/databases',
                         requiresAuth: false,
-                        parent: 'menu.database',
-                        title: 'MySQL',
-                        detail: 'commons.button.set',
+                        ignoreTab: true,
                     },
                 },
                 {
@@ -91,9 +89,7 @@ const databaseRouter = {
                     meta: {
                         activeMenu: '/databases',
                         requiresAuth: false,
-                        parent: 'menu.database',
-                        title: 'PostgreSQL',
-                        detail: 'commons.button.set',
+                        ignoreTab: true,
                     },
                 },
                 {

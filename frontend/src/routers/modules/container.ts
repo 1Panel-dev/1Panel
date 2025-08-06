@@ -53,9 +53,7 @@ const containerRouter = {
                     meta: {
                         activeMenu: '/containers',
                         requiresAuth: false,
-                        parent: 'menu.container',
-                        title: 'menu.container',
-                        detail: 'commons.table.operate',
+                        ignoreTab: true,
                     },
                 },
                 {
@@ -67,9 +65,7 @@ const containerRouter = {
                     meta: {
                         activeMenu: '/containers',
                         requiresAuth: false,
-                        parent: 'menu.container',
-                        title: 'container.compose',
-                        detail: 'commons.button.view',
+                        ignoreTab: true,
                     },
                 },
                 {

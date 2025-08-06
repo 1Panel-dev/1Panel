@@ -60,8 +60,7 @@ const toolboxRouter = {
                     component: () => import('@/views/toolbox/clam/setting/index.vue'),
                     hidden: true,
                     meta: {
-                        parent: 'menu.toolbox',
-                        title: 'toolbox.device.toolbox',
+                        ignoreTab: true,
                         activeMenu: '/toolbox',
                         requiresAuth: false,
                     },

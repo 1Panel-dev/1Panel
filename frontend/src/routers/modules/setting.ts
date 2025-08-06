@@ -110,6 +110,7 @@ const settingRouter = {
                     meta: {
                         requiresAuth: true,
                         activeMenu: 'Expired',
+                        ignoreTab: true,
                     },
                 },
             ],

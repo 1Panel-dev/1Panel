@@ -33,8 +33,11 @@ export const routerToNameWithParams = async (name: string, params: any) => {
 
 const tabStoreMiddleWare = () => {
     try {
-        const tabsStore = TabsStore();
         let route = router.currentRoute;
+        if (route.value.meta.ignoreTab) {
+            return;
+        }
+        const tabsStore = TabsStore();
         tabsStore.addTab(route.value);
         tabsStore.activeTabPath = route.value?.path;
     } catch (error) {}

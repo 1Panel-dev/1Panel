@@ -27,10 +27,9 @@ const webSiteRouter = {
             hidden: true,
             props: true,
             meta: {
-                parent: 'menu.website',
-                title: 'menu.config',
                 activeMenu: '/websites',
                 requiresAuth: false,
+                ignoreTab: true,
             },
         },
         {

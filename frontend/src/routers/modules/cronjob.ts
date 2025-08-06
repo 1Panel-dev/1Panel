@@ -37,8 +37,7 @@ const cronRouter = {
                     meta: {
                         activeMenu: '/cronjobs',
                         requiresAuth: false,
-                        title: 'menu.cronjob',
-                        detail: 'commons.table.operate',
+                        ignoreTab: true,
                     },
                 },
                 {
