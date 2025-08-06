@@ -85,7 +85,7 @@
                             </fu-select-rw-switch>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('commons.table.status')" :min-width="80" prop="status" sortable>
+                    <el-table-column :label="$t('commons.table.status')" :min-width="90" prop="status" sortable>
                         <template #default="{ row }">
                             <Status
                                 v-if="row.status === 'Enable'"
@@ -178,9 +178,9 @@
                         </template>
                     </el-table-column>
                     <fu-table-operations
-                        width="300px"
+                        width="200px"
                         :buttons="buttons"
-                        :ellipsis="10"
+                        :ellipsis="2"
                         :label="$t('commons.table.operate')"
                         min-width="mobile ? 'auto' : 200"
                         :fixed="mobile ? false : 'right'"
@@ -496,15 +496,15 @@ const buttons = [
         },
     },
     {
-        label: i18n.global.t('commons.button.edit'),
-        click: (row: Cronjob.CronjobInfo) => {
-            onOpenDialog(row.id + '');
-        },
-    },
-    {
         label: i18n.global.t('cronjob.record'),
         click: (row: Cronjob.CronjobInfo) => {
             loadDetail(row);
+        },
+    },
+    {
+        label: i18n.global.t('commons.button.edit'),
+        click: (row: Cronjob.CronjobInfo) => {
+            onOpenDialog(row.id + '');
         },
     },
     {

@@ -785,6 +785,7 @@ const loading = ref();
 const nextTimes = ref([]);
 
 const isCreate = ref();
+const defaultGroupID = ref();
 const form = reactive<Cronjob.CronjobInfo>({
     id: 0,
     name: '',
@@ -852,7 +853,7 @@ const search = async () => {
             .then((res) => {
                 loading.value = false;
                 form.name = res.data.name;
-                form.groupID = res.data.groupID || null;
+                form.groupID = res.data.groupID || defaultGroupID.value;
                 form.type = res.data.type;
                 form.specCustom = res.data.specCustom;
                 form.spec = res.data.spec;
@@ -1147,13 +1148,14 @@ const loadScriptDir = async (path: string) => {
 const loadGroups = async () => {
     const res = await getGroupList('cronjob');
     groupOptions.value = res.data || [];
-    if (isCreate.value) {
-        for (const item of groupOptions.value) {
-            if (item.isDefault) {
-                form.groupID = item.id;
-                break;
-            }
+    for (const item of groupOptions.value) {
+        if (item.isDefault) {
+            defaultGroupID.value = item.id;
+            break;
         }
+    }
+    if (isCreate.value) {
+        form.groupID = defaultGroupID.value;
     }
 };
 
