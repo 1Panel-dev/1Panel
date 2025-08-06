@@ -873,9 +873,9 @@ func downloadApp(app model.App, appDetail model.AppDetail, appInstall *model.App
 		_ = fileOp.CreateDir(appVersionDir, constant.DirPerm)
 	}
 	if logger == nil {
-		global.LOG.Infof("download app[%s] from %s", app.Name, appDetail.DownloadUrl)
+		global.LOG.Infof("download app [%s] from %s", app.Name, appDetail.DownloadUrl)
 	} else {
-		logger.Printf("download app[%s] from %s", app.Name, appDetail.DownloadUrl)
+		logger.Printf("download app [%s] from %s", app.Name, appDetail.DownloadUrl)
 	}
 
 	filePath := path.Join(appVersionDir, app.Key+"-"+appDetail.Version+".tar.gz")
@@ -891,9 +891,9 @@ func downloadApp(app model.App, appDetail model.AppDetail, appInstall *model.App
 
 	if err = files.DownloadFileWithProxy(appDetail.DownloadUrl, filePath); err != nil {
 		if logger == nil {
-			global.LOG.Errorf("download app[%s] error %v", app.Name, err)
+			global.LOG.Errorf("download app [%s] error %v", app.Name, err)
 		} else {
-			logger.Printf("download app[%s] error %v", app.Name, err)
+			logger.Printf("download app [%s] error %v", app.Name, err)
 		}
 		return
 	}

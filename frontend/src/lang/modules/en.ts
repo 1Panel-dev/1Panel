@@ -2795,6 +2795,7 @@ const message = {
             'Provide a full startup command. For example, "pip install -r requirements.txt && python manage.py runserver 0.0.0.0:5000".',
         dotnetHelper: 'Provide a full startup command. For example, "dotnet MyWebApp.dll".',
         dirHelper: 'Note: Please fill in the directory path inside the container',
+        concurrency: 'Concurrency Scheme',
     },
     process: {
         pid: 'Process ID',

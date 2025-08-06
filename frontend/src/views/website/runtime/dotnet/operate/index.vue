@@ -19,7 +19,7 @@
                 <el-input :disabled="mode === 'edit'" v-model="runtime.name"></el-input>
             </el-form-item>
             <AppConfig v-model="runtime" :mode="mode" appKey="dotnet" />
-            <DirConfig v-model="runtime" :mode="mode" :scriptHelper="$t('runtime.donetHelper')" />
+            <DirConfig v-model="runtime" :mode="mode" :scriptHelper="$t('runtime.dotnetHelper')" />
             <el-form-item :label="$t('app.containerName')" prop="params.CONTAINER_NAME">
                 <el-input v-model.trim="runtime.params['CONTAINER_NAME']"></el-input>
             </el-form-item>

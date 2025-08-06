@@ -2832,6 +2832,7 @@ const message = {
             'Tam bir başlatma komutu sağlayın. Örneğin, "pip install -r requirements.txt && python manage.py runserver 0.0.0.0:5000".',
         dotnetHelper: 'Tam bir başlatma komutu sağlayın. Örneğin, "dotnet MyWebApp.dll".',
         dirHelper: 'Not: Lütfen kapsayıcı içindeki dizin yolunu doldurun',
+        concurrency: 'Eşzamanlılık Şeması',
     },
     process: {
         pid: 'İşlem Kimliği',

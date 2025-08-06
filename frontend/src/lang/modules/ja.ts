@@ -2685,8 +2685,9 @@ const message = {
         goDirHelper: 'ディレクトリまたはサブディレクトリには、goファイルまたはバイナリファイルを含める必要があります。',
         pythonHelper:
             '完全な起動コマンドを提供します。たとえば、「PIP Install -R Repormations.txt && python manage.py runserver 0.0.0.0:5000」。',
-        donetHelper: '完全な起動コマンドを入力してください。例えば、dotnet MyWebApp.dll',
+        dotnetHelper: '完全な起動コマンドを入力してください。例えば、dotnet MyWebApp.dll',
         dirHelper: 'ノート: コンテナ内のディレクトリパスを入力してください',
+        concurrency: '並行処理スキーム',
     },
     process: {
         pid: 'プロセスID',

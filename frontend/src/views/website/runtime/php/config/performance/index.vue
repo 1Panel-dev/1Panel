@@ -2,6 +2,16 @@
     <el-form :model="params" :rules="variablesRules" ref="phpFormRef" label-position="top" v-loading="loading">
         <el-row v-loading="loading">
             <el-col :span="22" :offset="1">
+                <el-form-item :label="$t('runtime.concurrency')">
+                    <el-select v-model="concurrency" @change="changeConcurrency">
+                        <el-option
+                            v-for="item in concurrencyOptions"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value"
+                        ></el-option>
+                    </el-select>
+                </el-form-item>
                 <el-form-item :label="$t('runtime.operateMode')" prop="pm">
                     <el-select v-model="params.pm">
                         <el-option :label="$t('runtime.dynamic')" :value="'dynamic'"></el-option>
@@ -85,6 +95,79 @@ const variablesRules = reactive({
     'pm.min_spare_servers': [checkNumberRange(0, 99999)],
     'pm.max_spare_servers': [checkNumberRange(0, 99999)],
 });
+const concurrency = ref('');
+const concurrencyOptions = ref([
+    { label: '4 GB', value: '4' },
+    { label: '8 GB', value: '8' },
+    { label: '16 GB', value: '16' },
+    { label: '32 GB', value: '32' },
+    { label: '48 GB', value: '48' },
+    { label: '64 GB', value: '64' },
+    { label: '96 GB', value: '96' },
+    { label: '128 GB', value: '128' },
+]);
+
+const fpmConfigMap = {
+    '4': {
+        max_children: 80,
+        start_servers: 10,
+        min_spare_servers: 10,
+        max_spare_servers: 30,
+    },
+    '8': {
+        max_children: 120,
+        start_servers: 10,
+        min_spare_servers: 10,
+        max_spare_servers: 30,
+    },
+    '16': {
+        max_children: 200,
+        start_servers: 15,
+        min_spare_servers: 15,
+        max_spare_servers: 50,
+    },
+    '32': {
+        max_children: 300,
+        start_servers: 20,
+        min_spare_servers: 20,
+        max_spare_servers: 50,
+    },
+    '48': {
+        max_children: 400,
+        start_servers: 20,
+        min_spare_servers: 20,
+        max_spare_servers: 50,
+    },
+    '64': {
+        max_children: 500,
+        start_servers: 30,
+        min_spare_servers: 30,
+        max_spare_servers: 60,
+    },
+    '96': {
+        max_children: 700,
+        start_servers: 40,
+        min_spare_servers: 40,
+        max_spare_servers: 70,
+    },
+    '128': {
+        max_children: 1000,
+        start_servers: 50,
+        min_spare_servers: 50,
+        max_spare_servers: 100,
+    },
+};
+
+const changeConcurrency = () => {
+    const config = fpmConfigMap[concurrency.value];
+
+    if (config) {
+        params['pm.max_children'] = config.max_children;
+        params['pm.start_servers'] = config.start_servers;
+        params['pm.min_spare_servers'] = config.min_spare_servers;
+        params['pm.max_spare_servers'] = config.max_spare_servers;
+    }
+};
 
 const get = () => {
     loading.value = true;
