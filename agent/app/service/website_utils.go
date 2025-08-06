@@ -216,6 +216,7 @@ func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, a
 	case constant.Proxy:
 		nginxInclude := fmt.Sprintf("/www/sites/%s/proxy/*.conf", website.Alias)
 		server.UpdateDirective("include", []string{nginxInclude})
+		server.UpdateRoot(rootIndex)
 	case constant.Runtime:
 		switch runtime.Type {
 		case constant.RuntimePHP:
