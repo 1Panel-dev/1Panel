@@ -28,7 +28,7 @@ const webSiteRouter = {
             props: true,
             meta: {
                 parent: 'menu.website',
-                title: 'commons.button.',
+                title: 'menu.config',
                 activeMenu: '/websites',
                 requiresAuth: false,
             },
