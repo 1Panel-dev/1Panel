@@ -1787,9 +1787,15 @@ func (w WebsiteService) GetProxies(id uint) (res []request.WebsiteProxyConfig, e
 		}
 		directives := config.GetDirectives()
 
-		location, ok := directives[0].(*components.Location)
-		if !ok {
-			err = errors.New("error")
+		var location *components.Location
+		for _, directive := range directives {
+			if loc, ok := directive.(*components.Location); ok {
+				location = loc
+				break
+			}
+		}
+		if location == nil {
+			err = errors.New("invalid proxy config, no location found")
 			return
 		}
 		proxyConfig.ProxyPass = location.ProxyPass
