@@ -40,7 +40,7 @@
                             v-for="item in nodeOptions"
                             :key="item.name"
                         >
-                            <div class="node">
+                            <div class="node" v-if="item.name !== 'local'">
                                 {{ item.name }}
                                 <el-tooltip
                                     v-if="item.status !== 'Healthy' || !item.isBound"
@@ -89,6 +89,7 @@ import { logOutApi } from '@/api/modules/auth';
 import router from '@/routers';
 import { loadProductProFromDB } from '@/utils/xpack';
 import { routerToNameWithQuery } from '@/utils/router';
+import { setDefaultNodeInfo } from '@/utils/node';
 
 const filter = ref();
 const globalStore = GlobalStore();
@@ -148,20 +149,21 @@ const loadNodes = async () => {
     loading.value = true;
     nodes.value = [];
     if (!isMasterPro.value) {
-        globalStore.currentNode = 'local';
+        setDefaultNodeInfo();
         loading.value = false;
         return;
     }
-    await listNodeOptions('')
+    await listNodeOptions('all')
         .then((res) => {
             if (!res) {
                 nodes.value = [];
+                setDefaultNodeInfo();
                 loading.value = false;
                 return;
             }
             nodes.value = res.data || [];
             if (nodes.value.length === 0) {
-                globalStore.currentNode = 'local';
+                setDefaultNodeInfo();
             }
             nodeOptions.value = nodes.value || [];
             loading.value = false;
@@ -175,15 +177,15 @@ const changeNode = (command: string) => {
     if (globalStore.currentNode === command) {
         return;
     }
-    if (command == 'local') {
-        globalStore.currentNode = command || 'local';
-        globalStore.currentNodeAddr = '';
-        loadProductProFromDB();
-        routerToNameWithQuery('home', { t: Date.now() });
-        return;
-    }
     for (const item of nodes.value) {
         if (item.name == command) {
+            if (command == 'local') {
+                globalStore.currentNode = 'local';
+                globalStore.currentNodeAddr = item.addr;
+                loadProductProFromDB();
+                routerToNameWithQuery('home', { t: Date.now() });
+                return;
+            }
             if (!item.isBound) {
                 MsgError(i18n.global.t('xpack.node.nodeUnbindHelper'));
                 return;

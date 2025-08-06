@@ -53,6 +53,7 @@ import { ElMessageBox, FormInstance } from 'element-plus';
 import { Rules } from '@/global/form-rules';
 import { GlobalStore } from '@/store';
 import { loadTimeZoneOptions, updateDevice } from '@/api/modules/toolbox';
+import { changeToLocal } from '@/utils/node';
 const globalStore = GlobalStore();
 
 interface DialogProps {
@@ -105,7 +106,7 @@ const onSave = async (formEl: FormInstance | undefined) => {
                         let href = window.location.href;
                         window.open(href, '_self');
                     } else {
-                        globalStore.currentNode = 'local';
+                        changeToLocal();
                         location.reload();
                     }
                 })

@@ -190,6 +190,7 @@ import { useI18n } from 'vue-i18n';
 import { encryptPassword } from '@/utils/util';
 import { getXpackSettingForTheme } from '@/utils/xpack';
 import { routerToName } from '@/utils/router';
+import { changeToLocal } from '@/utils/node';
 
 const i18n = useI18n();
 const themeConfig = computed(() => globalStore.themeConfig);
@@ -343,7 +344,7 @@ const login = (formEl: FormInstance | undefined) => {
             globalStore.setAgreeLicense(true);
             menuStore.setMenuList([]);
             tabsStore.removeAllTabs();
-            globalStore.currentNode = 'local';
+            changeToLocal();
             MsgSuccess(i18n.t('commons.msg.loginSuccess'));
             routerToName('home');
             document.onkeydown = null;
@@ -385,7 +386,7 @@ const mfaLogin = async (auto: boolean) => {
             menuStore.setMenuList([]);
             tabsStore.removeAllTabs();
             MsgSuccess(i18n.t('commons.msg.loginSuccess'));
-            globalStore.currentNode = 'local';
+            changeToLocal();
             routerToName('home');
             document.onkeydown = null;
         } catch (res) {
