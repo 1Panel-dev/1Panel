@@ -1632,9 +1632,16 @@ func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error)
 
 	config.FilePath = includePath
 	directives := config.Directives
-	location, ok := directives[0].(*components.Location)
-	if !ok {
-		err = errors.New("error")
+
+	var location *components.Location
+	for _, directive := range directives {
+		if loc, ok := directive.(*components.Location); ok {
+			location = loc
+			break
+		}
+	}
+	if location == nil {
+		err = errors.New("invalid proxy config, no location found")
 		return
 	}
 	location.UpdateDirective("proxy_pass", []string{req.ProxyPass})
