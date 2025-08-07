@@ -2688,6 +2688,7 @@ const message = {
         dotnetHelper: '完全な起動コマンドを入力してください。例えば、dotnet MyWebApp.dll',
         dirHelper: 'ノート: コンテナ内のディレクトリパスを入力してください',
         concurrency: '並行処理スキーム',
+        loadStatus: '負荷状態',
     },
     process: {
         pid: 'プロセスID',

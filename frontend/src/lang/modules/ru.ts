@@ -2745,6 +2745,7 @@ const message = {
         dotnetHelper: 'Пожалуйста, укажите полную команду запуска, например, dotnet MyWebApp.dll',
         dirHelper: 'Примечание: Укажите путь к каталогу внутри контейнера',
         concurrency: 'Схема параллелизма',
+        loadStatus: 'Состояние нагрузки',
     },
     process: {
         pid: 'ID процесса',

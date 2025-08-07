@@ -2833,6 +2833,7 @@ const message = {
         dotnetHelper: 'Tam bir başlatma komutu sağlayın. Örneğin, "dotnet MyWebApp.dll".',
         dirHelper: 'Not: Lütfen kapsayıcı içindeki dizin yolunu doldurun',
         concurrency: 'Eşzamanlılık Şeması',
+        loadStatus: 'Yük Durumu',
     },
     process: {
         pid: 'İşlem Kimliği',

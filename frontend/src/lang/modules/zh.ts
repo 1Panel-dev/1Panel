@@ -2596,6 +2596,7 @@ const message = {
         dotnetHelper: '请填写完整启动命令，例如 dotnet MyWebApp.dll',
         dirHelper: '说明：请填写容器内的目录路径',
         concurrency: '并发方案',
+        loadStatus: '负载状态',
     },
     process: {
         pid: '进程ID',

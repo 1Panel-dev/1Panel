@@ -78,3 +78,8 @@ type PHPExtensionRes struct {
 	Extensions        []string           `json:"extensions"`
 	SupportExtensions []SupportExtension `json:"supportExtensions"`
 }
+
+type FpmStatusItem struct {
+	Key   string      `json:"key"`
+	Value interface{} `json:"value"`
+}

@@ -2640,6 +2640,7 @@ const message = {
         dotnetHelper: '완전한 시작 명령을 입력하세요. 예: dotnet MyWebApp.dll',
         dirHelper: '주의: 컨테이너 내의 디렉토리 경로를 입력하세요',
         concurrency: '동시성 체계',
+        loadStatus: '부하 상태',
     },
     process: {
         pid: '프로세스 ID',

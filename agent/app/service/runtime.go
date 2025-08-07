@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	fcgiclient "github.com/tomasen/fcgi_client"
 	"os"
 	"path"
 	"path/filepath"
@@ -71,6 +72,8 @@ type IRuntimeService interface {
 	GetSupervisorProcess(id uint) ([]response.SupervisorProcessConfig, error)
 	OperateSupervisorProcess(req request.PHPSupervisorProcessConfig) error
 	OperateSupervisorProcessFile(req request.PHPSupervisorProcessFileReq) (string, error)
+
+	GetFPMStatus(runtimeID uint) ([]response.FpmStatusItem, error)
 }
 
 func NewRuntimeService() IRuntimeService {
@@ -1161,4 +1164,62 @@ func (r *RuntimeService) UpdateRemark(req request.RuntimeRemark) error {
 	}
 	runtime.Remark = req.Remark
 	return runtimeRepo.Save(runtime)
+}
+
+func (r *RuntimeService) GetFPMStatus(runtimeID uint) ([]response.FpmStatusItem, error) {
+	runtime, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(runtimeID))
+	if err != nil {
+		return nil, err
+	}
+	fcgiClient, err := fcgiclient.DialTimeout("tcp", "127.0.0.1:"+runtime.Port, 10*time.Second)
+	if err != nil {
+		return nil, errors.New("<UNK> FastCGI <UNK>: " + err.Error())
+	}
+	defer fcgiClient.Close()
+
+	reqEnv := map[string]string{
+		"REQUEST_METHOD":    "GET",
+		"REQUEST_URI":       "/status",
+		"SCRIPT_FILENAME":   "/status",
+		"SCRIPT_NAME":       "/status",
+		"QUERY_STRING":      "",
+		"CONTENT_TYPE":      "",
+		"CONTENT_LENGTH":    "0",
+		"SERVER_SOFTWARE":   "go-fcgi-client",
+		"SERVER_NAME":       "localhost",
+		"SERVER_PORT":       runtime.Port,
+		"REMOTE_ADDR":       "127.0.0.1",
+		"GATEWAY_INTERFACE": "CGI/1.1",
+	}
+
+	resp, err := fcgiClient.Get(reqEnv)
+	if err != nil {
+		return nil, errors.New("<UNK> FastCGI <UNK>: " + err.Error())
+	}
+	defer resp.Body.Close()
+
+	var status []response.FpmStatusItem
+	scanner := bufio.NewScanner(resp.Body)
+
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		if line == "" {
+			continue
+		}
+		parts := strings.SplitN(line, ":", 2)
+		if len(parts) != 2 {
+			continue
+		}
+		key := strings.TrimSpace(parts[0])
+		value := strings.TrimSpace(parts[1])
+		status = append(status, response.FpmStatusItem{
+			Key:   key,
+			Value: value,
+		})
+	}
+
+	if err := scanner.Err(); err != nil {
+		return nil, errors.New(fmt.Sprintf("<UNK> FastCGI <UNK>: %v", err))
+	}
+	return status, nil
 }

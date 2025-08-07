@@ -225,4 +225,9 @@ export namespace Runtime {
         id: number;
         remark: string;
     }
+
+    export interface FpmStatus {
+        key: string;
+        value: any;
+    }
 }

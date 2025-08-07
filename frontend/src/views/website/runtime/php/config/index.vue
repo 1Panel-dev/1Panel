@@ -23,6 +23,9 @@
                 <el-tab-pane :label="$t('website.nginxPer')" name="5">
                     <Performance :id="runtime.id" v-if="index == '5'"></Performance>
                 </el-tab-pane>
+                <el-tab-pane :label="$t('runtime.loadStatus')" name="7">
+                    <FpmStatus :id="runtime.id" v-if="index == '7'"></FpmStatus>
+                </el-tab-pane>
                 <el-tab-pane :label="$t('website.source')" name="4">
                     <PHP :id="runtime.id" v-if="index == '4'" :type="'php'"></PHP>
                 </el-tab-pane>
@@ -43,6 +46,7 @@ import Upload from './upload/index.vue';
 import PHP from './php-fpm/index.vue';
 import Performance from './performance/index.vue';
 import Container from './container/index.vue';
+import FpmStatus from './fpm-status/index.vue';
 
 const index = ref('6');
 const open = ref(false);

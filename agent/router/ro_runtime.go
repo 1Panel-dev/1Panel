@@ -41,6 +41,7 @@ func (r *RuntimeRouter) InitRouter(Router *gin.RouterGroup) {
 		groupRouter.POST("/php/file", baseApi.GetPHPConfigFile)
 		groupRouter.POST("/php/fpm/config", baseApi.UpdateFPMConfig)
 		groupRouter.GET("/php/fpm/config/:id", baseApi.GetFPMConfig)
+		groupRouter.GET("/php/fpm/status/:id", baseApi.GetFPMStatus)
 
 		groupRouter.POST("/php/container/update", baseApi.UpdatePHPContainer)
 		groupRouter.GET("/php/container/:id", baseApi.GetPHPContainerConfig)

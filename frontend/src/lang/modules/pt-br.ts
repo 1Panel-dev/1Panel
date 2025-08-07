@@ -2753,6 +2753,7 @@ const message = {
         dotnetHelper: 'Por favor, preencha o comando completo de inicialização, por exemplo, dotnet MyWebApp.dll',
         dirHelper: 'Nota: Preencha o caminho do diretório dentro do contêiner',
         concurrency: 'Esquema de Concorrência',
+        loadStatus: 'Status de Carga',
     },
     process: {
         pid: 'ID do Processo',

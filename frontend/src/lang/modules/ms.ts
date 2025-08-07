@@ -2749,6 +2749,7 @@ const message = {
         dotnetHelper: 'Sila isi arahan pelancaran lengkap, contohnya dotnet MyWebApp.dll',
         dirHelper: 'Nota: Sila isi laluan direktori di dalam bekas',
         concurrency: 'Skim Serentak',
+        loadStatus: 'Status Beban',
     },
     process: {
         pid: 'Process ID',

@@ -133,3 +133,7 @@ export const updatePHPContainerConfig = (req: Runtime.PHPContainerConfig) => {
 export const updateRemark = (req: Runtime.RemarkUpdate) => {
     return http.post(`/runtimes/remark`, req);
 };
+
+export const getFPMStatus = (id: number) => {
+    return http.get<Runtime.FpmStatus[]>(`/runtimes/php/fpm/status/${id}`);
+};

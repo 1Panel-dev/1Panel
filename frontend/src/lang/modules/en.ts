@@ -2796,6 +2796,7 @@ const message = {
         dotnetHelper: 'Provide a full startup command. For example, "dotnet MyWebApp.dll".',
         dirHelper: 'Note: Please fill in the directory path inside the container',
         concurrency: 'Concurrency Scheme',
+        loadStatus: 'Load Status',
     },
     process: {
         pid: 'Process ID',

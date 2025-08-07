@@ -555,3 +555,25 @@ func (b *BaseApi) UpdateRuntimeRemark(c *gin.Context) {
 	}
 	helper.Success(c)
 }
+
+// @Tags Runtime
+// @Summary Get PHP runtime status
+// @Accept json
+// @Param id path integer true "request"
+// @Success 200 {object} map[string]interface{}
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /runtimes/php/fpm/status/:id [get]
+func (b *BaseApi) GetFPMStatus(c *gin.Context) {
+	id, err := helper.GetParamID(c)
+	if err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	data, err := runtimeService.GetFPMStatus(id)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, data)
+}
