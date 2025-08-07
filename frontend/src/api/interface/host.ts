@@ -194,24 +194,6 @@ export namespace Host {
     export interface analysisSSHLog extends ReqPage {
         orderBy: string;
     }
-    export interface logAnalysisRes {
-        total: number;
-        items: Array<logAnalysis>;
-        successfulCount: number;
-        failedCount: number;
-    }
-    export interface sshLog {
-        logs: Array<sshHistory>;
-        successfulCount: number;
-        failedCount: number;
-    }
-    export interface logAnalysis {
-        address: string;
-        area: string;
-        successfulCount: number;
-        failedCount: number;
-        status: string;
-    }
     export interface sshHistory {
         date: Date;
         area: string;

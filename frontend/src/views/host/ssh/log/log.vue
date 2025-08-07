@@ -5,6 +5,11 @@
                 <el-alert type="info" :title="$t('ssh.sshAlert2')" :closable="false" />
                 <div class="mt-2"><el-alert type="info" :title="$t('ssh.sshAlert')" :closable="false" /></div>
             </template>
+            <template #leftToolBar>
+                <el-button type="primary" @click="onExport">
+                    {{ $t('commons.button.export') }}
+                </el-button>
+            </template>
             <template #rightToolBar>
                 <el-select v-model="searchStatus" @change="search()" class="p-w-200">
                     <template #prefix>{{ $t('commons.table.status') }}</template>
@@ -49,13 +54,46 @@
                 </ComplexTable>
             </template>
         </LayoutContent>
+
+        <DialogPro v-model="open" :title="$t('commons.button.export')" size="mini">
+            <el-form class="mt-5" ref="backupForm" @submit.prevent v-loading="loading">
+                <el-form-item :label="$t('commons.table.status')">
+                    <el-select v-model="exportConfig.status" class="w-full">
+                        <el-option :label="$t('commons.table.all')" value="All"></el-option>
+                        <el-option :label="$t('commons.status.success')" value="Success"></el-option>
+                        <el-option :label="$t('commons.status.failed')" value="Failed"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item :label="$t('container.lines')">
+                    <el-select class="tailClass" v-model.number="exportConfig.count">
+                        <el-option :value="-1" :label="$t('commons.table.all')" />
+                        <el-option :value="100" :label="100" />
+                        <el-option :value="200" :label="200" />
+                        <el-option :value="500" :label="500" />
+                        <el-option :value="1000" :label="1000" />
+                    </el-select>
+                </el-form-item>
+            </el-form>
+            <template #footer>
+                <span class="dialog-footer">
+                    <el-button @click="open = false" :disabled="loading">
+                        {{ $t('commons.button.cancel') }}
+                    </el-button>
+                    <el-button type="primary" @click="onSubmitExport" :disabled="loading">
+                        {{ $t('commons.button.confirm') }}
+                    </el-button>
+                </span>
+            </template>
+        </DialogPro>
     </div>
 </template>
 
 <script setup lang="ts">
-import { dateFormat } from '@/utils/util';
+import { dateFormat, getDateStr } from '@/utils/util';
 import { onMounted, reactive, ref } from 'vue';
-import { loadSSHLogs } from '@/api/modules/host';
+import { exportSSHLogs, loadSSHLogs } from '@/api/modules/host';
+import { MsgSuccess } from '@/utils/message';
+import i18n from '@/lang';
 
 const loading = ref();
 const data = ref();
@@ -64,6 +102,12 @@ const paginationConfig = reactive({
     currentPage: 1,
     pageSize: 10,
     total: 0,
+});
+
+const open = ref();
+const exportConfig = reactive({
+    count: 100,
+    status: 'All',
 });
 const searchInfo = ref();
 const searchStatus = ref('All');
@@ -79,16 +123,38 @@ const search = async () => {
     await loadSSHLogs(params)
         .then((res) => {
             loading.value = false;
-            data.value = res.data?.logs || [];
-            if (searchStatus.value === 'Success') {
-                paginationConfig.total = res.data.successfulCount;
-            }
-            if (searchStatus.value === 'Failed') {
-                paginationConfig.total = res.data.failedCount;
-            }
-            if (searchStatus.value === 'All') {
-                paginationConfig.total = res.data.failedCount + res.data.successfulCount;
-            }
+            data.value = res.data.items || [];
+            paginationConfig.total = res.data.total;
+        })
+        .catch(() => {
+            loading.value = false;
+        });
+};
+
+const onExport = async () => {
+    open.value = true;
+    exportConfig.status = 'All';
+    exportConfig.count = -1;
+};
+
+const onSubmitExport = async () => {
+    let params = {
+        info: '',
+        status: exportConfig.status,
+        page: 1,
+        pageSize: exportConfig.count,
+    };
+    await exportSSHLogs(params)
+        .then((res) => {
+            const downloadUrl = window.URL.createObjectURL(new Blob([res]));
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = downloadUrl;
+            a.download = '1panel-ssh-log-' + getDateStr() + '.csv';
+            const event = new MouseEvent('click');
+            a.dispatchEvent(event);
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            open.value = false;
         })
         .catch(() => {
             loading.value = false;

@@ -33,6 +33,7 @@ func (s *HostRouter) InitRouter(Router *gin.RouterGroup) {
 		hostRouter.POST("/ssh/search", baseApi.GetSSHInfo)
 		hostRouter.POST("/ssh/update", baseApi.UpdateSSH)
 		hostRouter.POST("/ssh/log", baseApi.LoadSSHLogs)
+		hostRouter.POST("/ssh/log/export", baseApi.ExportSSHLogs)
 		hostRouter.POST("/ssh/conffile/update", baseApi.UpdateSSHByfile)
 		hostRouter.POST("/ssh/operate", baseApi.OperateSSH)
 

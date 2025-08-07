@@ -2,6 +2,10 @@ package v2
 
 import (
 	"encoding/base64"
+	"net/http"
+	"net/url"
+	"os"
+	"strconv"
 
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
@@ -201,7 +205,7 @@ func (b *BaseApi) DeleteRootCert(c *gin.Context) {
 // @Summary Load host SSH logs
 // @Accept json
 // @Param request body dto.SearchSSHLog true "request"
-// @Success 200 {object} dto.SSHLog
+// @Success 200 {object} dto.PageResult
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /hosts/ssh/log [post]
@@ -211,12 +215,49 @@ func (b *BaseApi) LoadSSHLogs(c *gin.Context) {
 		return
 	}
 
-	data, err := sshService.LoadLog(c, req)
+	total, data, err := sshService.LoadLog(c, req)
 	if err != nil {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithData(c, data)
+
+	helper.SuccessWithData(c, dto.PageResult{
+		Total: total,
+		Items: data,
+	})
+}
+
+// @Tags SSH
+// @Summary Export host SSH logs
+// @Accept json
+// @Param request body dto.SearchSSHLog true "request"
+// @Success 200 {object} dto.PageResult
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /hosts/ssh/log/export [post]
+func (b *BaseApi) ExportSSHLogs(c *gin.Context) {
+	var req dto.SearchSSHLog
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	tmpFile, err := sshService.ExportLog(c, req)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	file, err := os.Open(tmpFile)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	defer func() {
+		_ = file.Close()
+		_ = os.RemoveAll(tmpFile)
+	}()
+	info, _ := file.Stat()
+	c.Header("Content-Length", strconv.FormatInt(info.Size(), 10))
+	c.Header("Content-Disposition", "attachment; filename*=utf-8''"+url.PathEscape(info.Name()))
+	http.ServeContent(c.Writer, c.Request, info.Name(), info.ModTime(), file)
 }
 
 // @Tags SSH
