@@ -89,4 +89,14 @@ defineExpose({
     width: 100%;
     height: calc(100vh - 350px);
 }
+.el-button--success:hover {
+    background-color: #4e8e2f !important;
+    border-color: #4e8e2f !important;
+    color: #fff !important;
+}
+.el-button--success:active {
+    background-color: #85ce61 !important;
+    border-color: #85ce61 !important;
+    color: #fff !important;
+}
 </style>
