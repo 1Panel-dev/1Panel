@@ -166,6 +166,7 @@
                                             :props="defaultProps"
                                             @check-change="onChange"
                                             class="responsive-tree"
+                                            :empty-text="$t('clean.statusEmpty')"
                                         >
                                             <template #default="{ node, data }">
                                                 <div class="tree-node">
@@ -203,6 +204,7 @@
                                             :props="defaultProps"
                                             @check-change="onChange"
                                             class="responsive-tree"
+                                            :empty-text="$t('clean.statusEmpty')"
                                         >
                                             <template #default="{ node, data }">
                                                 <div class="tree-node">
@@ -239,6 +241,7 @@
                                             :props="defaultProps"
                                             @check-change="onChange"
                                             class="responsive-tree"
+                                            :empty-text="$t('clean.statusEmpty')"
                                         >
                                             <template #default="{ node, data }">
                                                 <div class="tree-node">
@@ -275,6 +278,7 @@
                                             :props="defaultProps"
                                             @check-change="onChange"
                                             class="responsive-tree"
+                                            :empty-text="$t('clean.statusEmpty')"
                                         >
                                             <template #default="{ node, data }">
                                                 <div class="tree-node">
@@ -311,6 +315,7 @@
                                             :props="defaultProps"
                                             @check-change="onChange"
                                             class="responsive-tree"
+                                            :empty-text="$t('clean.statusEmpty')"
                                         >
                                             <template #default="{ node, data }">
                                                 <div class="tree-node">
@@ -595,26 +600,16 @@ function load18n(label: string) {
     switch (label) {
         case '1panel_original':
             return i18n.global.t('clean.panelOriginal');
+        case 'backup':
+            return i18n.global.t('clean.backup');
         case 'upgrade':
             return i18n.global.t('clean.upgrade');
         case 'cache':
             return i18n.global.t('clean.cache');
         case 'snapshot':
             return i18n.global.t('clean.snapshot');
-        case 'snapshot_tmp':
-            return i18n.global.t('clean.snapshotTmp');
-        case 'snapshot_local':
-            return i18n.global.t('clean.snapshotLocal');
         case 'rollback':
             return i18n.global.t('clean.rollback');
-        case 'unused':
-            return i18n.global.t('clean.unused');
-        case 'old_original':
-            return i18n.global.t('clean.oldOriginal');
-        case 'old_apps_bak':
-            return i18n.global.t('clean.oldAppsBak');
-        case 'old_upgrade':
-            return i18n.global.t('clean.oldUpgrade');
         case 'upload':
         case 'upload_tmp':
             return i18n.global.t('clean.upload');
@@ -622,20 +617,25 @@ function load18n(label: string) {
             return i18n.global.t('clean.download');
         case 'upload_website':
         case 'rollback_website':
+        case 'tmp_backup_website':
         case 'download_website':
             return i18n.global.t('menu.website');
         case 'upload_app':
         case 'rollback_app':
+        case 'tmp_backup_app':
         case 'download_app':
             return i18n.global.t('app.app');
         case 'upload_database':
         case 'rollback_database':
+        case 'tmp_backup_database':
         case 'download_database':
             return i18n.global.t('menu.database');
         case 'upload_directory':
+        case 'tmp_backup_directory':
         case 'download_directory':
             return i18n.global.t('clean.directory');
         case 'system_log':
+        case 'tmp_backup_log':
             return i18n.global.t('clean.systemLog');
         case 'script':
             return i18n.global.t('cronjob.library.script');
@@ -663,6 +663,7 @@ function load18n(label: string) {
         case 'Image':
             return i18n.global.t('container.image');
         case 'Snapshot':
+        case 'tmp_backup_snapshot':
             return i18n.global.t('setting.snapshot');
         case 'AppStore':
             return i18n.global.t('menu.apps');

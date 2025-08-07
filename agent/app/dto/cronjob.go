@@ -65,11 +65,6 @@ type CronjobUpdateStatus struct {
 	Status string `json:"status" validate:"required"`
 }
 
-type CronjobDownload struct {
-	RecordID        uint `json:"recordID" validate:"required"`
-	BackupAccountID uint `json:"backupAccountID" validate:"required"`
-}
-
 type CronjobClean struct {
 	IsDelete        bool `json:"isDelete"`
 	CleanData       bool `json:"cleanData"`

@@ -315,30 +315,6 @@ func (b *BaseApi) UpdateCronjobStatus(c *gin.Context) {
 }
 
 // @Tags Cronjob
-// @Summary Download cronjob records
-// @Accept json
-// @Param request body dto.CronjobDownload true "request"
-// @Success 200
-// @Security ApiKeyAuth
-// @Security Timestamp
-// @Router /cronjobs/download [post]
-// @x-panel-log {"bodyKeys":["recordID"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"recordID","isList":false,"db":"job_records","output_column":"file","output_value":"file"}],"formatZH":"下载计划任务记录 [file]","formatEN":"download the cronjob record [file]"}
-func (b *BaseApi) TargetDownload(c *gin.Context) {
-	var req dto.CronjobDownload
-	if err := helper.CheckBindAndValidate(&req, c); err != nil {
-		return
-	}
-
-	filePath, err := cronjobService.Download(req)
-	if err != nil {
-		helper.InternalServer(c, err)
-		return
-	}
-
-	c.File(filePath)
-}
-
-// @Tags Cronjob
 // @Summary Handle cronjob once
 // @Accept json
 // @Param request body dto.OperateByID true "request"

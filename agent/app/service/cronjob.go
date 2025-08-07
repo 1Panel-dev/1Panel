@@ -34,7 +34,6 @@ type ICronjobService interface {
 	UpdateStatus(id uint, status string) error
 	UpdateGroup(req dto.ChangeGroup) error
 	Delete(req dto.CronjobBatchDelete) error
-	Download(down dto.CronjobDownload) (string, error)
 	StartJob(cronjob *model.Cronjob, isUpdate bool) (string, error)
 	CleanRecord(req dto.CronjobClean) error
 
@@ -533,32 +532,6 @@ func (u *CronjobService) CleanRecord(req dto.CronjobClean) error {
 		return err
 	}
 	return nil
-}
-
-func (u *CronjobService) Download(req dto.CronjobDownload) (string, error) {
-	record, _ := cronjobRepo.GetRecord(repo.WithByID(req.RecordID))
-	if record.ID == 0 {
-		return "", buserr.New("ErrRecordNotFound")
-	}
-	account, client, err := NewBackupClientWithID(req.BackupAccountID)
-	if err != nil {
-		return "", err
-	}
-	if account.Type == "LOCAL" || record.FromLocal {
-		if _, err := os.Stat(record.File); err != nil && os.IsNotExist(err) {
-			return "", err
-		}
-		return record.File, nil
-	}
-	tempPath := fmt.Sprintf("%s/download/%s", global.Dir.DataDir, record.File)
-	if _, err := os.Stat(tempPath); err != nil && os.IsNotExist(err) {
-		_ = os.MkdirAll(path.Dir(tempPath), os.ModePerm)
-		isOK, err := client.Download(record.File, tempPath)
-		if !isOK || err != nil {
-			return "", err
-		}
-	}
-	return tempPath, nil
 }
 
 func (u *CronjobService) HandleOnce(id uint) error {

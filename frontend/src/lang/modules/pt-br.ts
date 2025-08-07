@@ -1989,17 +1989,12 @@ const message = {
         systemHelper:
             'Arquivos temporários gerados durante snapshots, atualizações e conteúdos obsoletos durante iterações de versão',
         panelOriginal: 'Arquivos de backup de recuperação de snapshot do sistema',
+        backup: 'Diretório de backup temporário',
         upgrade: 'Arquivos de backup de atualização do sistema',
         upgradeHelper: '(Recomenda-se manter o backup de atualização mais recente para rollback do sistema)',
         cache: 'Arquivos de cache do sistema',
         cacheHelper: '(Prossiga com cautela, a limpeza exige reinício do serviço)',
-        snapshotTmp: 'Arquivos temporários de upload de snapshot do sistema',
-        snapshotLocal: 'Arquivos temporários de criação de snapshot do sistema',
         rollback: 'Arquivos de backup antes da recuperação',
-        unused: 'Diretórios do sistema não utilizados',
-        oldUpgrade: 'Diretórios de backup não utilizados anteriores à atualização',
-        oldOriginal: 'Diretórios de backup de recuperação de snapshot não utilizados',
-        oldAppsBak: 'Diretórios de backup de aplicativos não utilizados',
 
         upload: 'Arquivos temporários de upload',
         uploadHelper: 'Arquivos temporários enviados da lista de backup do sistema',

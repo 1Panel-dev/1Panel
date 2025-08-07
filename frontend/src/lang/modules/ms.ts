@@ -1997,17 +1997,12 @@ const message = {
         systemHelper:
             'Fail sementara yang dihasilkan semasa snapshot, peningkatan, dan kandungan fail usang semasa iterasi versi',
         panelOriginal: 'Fail sandaran pemulihan snapshot sistem',
+        backup: 'Direktori sandaran sementara',
         upgrade: 'Fail sandaran peningkatan sistem',
         upgradeHelper: '(Disarankan untuk mengekalkan sandaran peningkatan terbaru untuk pemulihan sistem)',
         cache: 'Fail cache sistem',
         cacheHelper: '(Berhati-hati, pembersihan memerlukan permulaan semula perkhidmatan)',
-        snapshotTmp: 'Fail sementara muat naik snapshot sistem',
-        snapshotLocal: 'Fail sementara ciptaan snapshot sistem',
         rollback: 'Fail sandaran sebelum pemulihan',
-        unused: 'Direktori sistem yang tidak digunakan',
-        oldUpgrade: 'Direktori sandaran sebelum peningkatan yang tidak digunakan',
-        oldOriginal: 'Direktori sandaran pemulihan snapshot yang tidak digunakan',
-        oldAppsBak: 'Direktori sandaran aplikasi yang tidak digunakan',
 
         upload: 'Fail Muat Naik Sementara',
         uploadHelper: 'Fail sementara dimuat naik dari senarai sandaran sistem',
