@@ -30,6 +30,7 @@
                 </el-descriptions-item>
                 <el-descriptions-item v-for="(param, key) in params" :label="getLabel(param)" :key="key">
                     <span>{{ param.showValue && param.showValue != '' ? param.showValue : param.value }}</span>
+                    <CopyButton v-if="showCopyButton(param.key)" :content="param.value" type="icon" />
                 </el-descriptions-item>
             </el-descriptions>
         </div>
@@ -346,6 +347,23 @@ const updateAppConfig = async () => {
         MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
         handleClose();
     } catch (error) {}
+};
+
+const showCopyButton = (key: string) => {
+    const keys = [
+        'PANEL_DB_ROOT_PASSWORD',
+        'PANEL_DB_NAME',
+        'PANEL_DB_USER',
+        'PANEL_DB_USER_PASSWORD',
+        'PANEL_REDIS_ROOT_PASSWORD',
+        'PANEL_DB_ROOT_USER',
+    ];
+    for (let i = 0; i < keys.length; i++) {
+        if (key === keys[i]) {
+            return true;
+        }
+    }
+    return false;
 };
 
 defineExpose({ acceptParams });
