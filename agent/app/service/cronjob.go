@@ -381,7 +381,7 @@ func (u *CronjobService) Import(req []dto.CronjobTrans) error {
 			cronjob.Status = constant.StatusDisable
 		}
 		_ = cronjobRepo.Create(&cronjob)
-		if item.AlertCount != 0 {
+		if item.AlertCount != 0 && item.AlertTitle != "" && item.AlertMethod != "" {
 			createAlert := dto.AlertCreate{
 				Title:     item.AlertTitle,
 				SendCount: item.AlertCount,
@@ -579,7 +579,7 @@ func (u *CronjobService) Create(req dto.CronjobOperate) error {
 	if err := cronjobRepo.Create(&cronjob); err != nil {
 		return err
 	}
-	if req.AlertCount != 0 {
+	if req.AlertCount != 0 && req.AlertTitle != "" && req.AlertMethod != "" {
 		createAlert := dto.AlertCreate{
 			Title:     req.AlertTitle,
 			SendCount: req.AlertCount,

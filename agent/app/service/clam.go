@@ -192,7 +192,7 @@ func (c *ClamService) Create(req dto.ClamCreate) error {
 	if err := clamRepo.Create(&clam); err != nil {
 		return err
 	}
-	if req.AlertCount != 0 {
+	if req.AlertCount != 0 && req.AlertTitle != "" && req.AlertMethod != "" {
 		createAlert := dto.AlertCreate{
 			Title:     req.AlertTitle,
 			SendCount: req.AlertCount,

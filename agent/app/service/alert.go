@@ -483,23 +483,51 @@ func (a AlertService) TestAlertConfig(req dto.AlertConfigTest) (bool, error) {
 
 func (a AlertService) ExternalUpdateAlert(updateAlert dto.AlertCreate) error {
 	upMap := make(map[string]interface{})
+	var newStatus string
 	if updateAlert.SendCount == 0 {
-		upMap["status"] = constant.AlertDisable
+		newStatus = constant.AlertDisable
 	} else {
-		upMap["status"] = constant.AlertEnable
+		newStatus = constant.AlertEnable
 		upMap["send_count"] = updateAlert.SendCount
+		if updateAlert.Method != "" {
+			upMap["method"] = updateAlert.Method
+		}
 	}
-	upMap["method"] = updateAlert.Method
-	alertInfo, _ := alertRepo.Get(alertRepo.WithByType(updateAlert.Type), alertRepo.WithByProject(updateAlert.Project))
+	upMap["status"] = newStatus
+
+	alertInfo, _ := alertRepo.Get(
+		alertRepo.WithByType(updateAlert.Type),
+		alertRepo.WithByProject(updateAlert.Project),
+	)
+
 	if alertInfo.ID > 0 {
-		if err := alertRepo.Update(upMap, alertRepo.WithByProject(updateAlert.Project), alertRepo.WithByType(updateAlert.Type)); err != nil {
-			return err
+		shouldUpdate := false
+
+		if alertInfo.Status != newStatus {
+			shouldUpdate = true
+		}
+		if val, ok := upMap["send_count"]; ok && val != alertInfo.SendCount {
+			shouldUpdate = true
+		}
+		if val, ok := upMap["method"]; ok && val != "" && val != alertInfo.Method {
+			shouldUpdate = true
+		}
+
+		if shouldUpdate {
+			if err := alertRepo.Update(
+				upMap,
+				alertRepo.WithByProject(updateAlert.Project),
+				alertRepo.WithByType(updateAlert.Type),
+			); err != nil {
+				return err
+			}
 		}
 	} else {
-		updateAlert.Status = constant.AlertEnable
-		err := a.CreateAlert(updateAlert)
-		if err != nil {
-			return err
+		if updateAlert.Method != "" && updateAlert.Title != "" {
+			updateAlert.Status = newStatus
+			if err := a.CreateAlert(updateAlert); err != nil {
+				return err
+			}
 		}
 	}
 
