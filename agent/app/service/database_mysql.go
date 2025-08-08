@@ -42,7 +42,7 @@ type IMysqlService interface {
 	ChangePassword(info dto.ChangeDBInfo) error
 	UpdateVariables(req dto.MysqlVariablesUpdate) error
 	UpdateDescription(req dto.UpdateDescription) error
-	DeleteCheck(req dto.MysqlDBDeleteCheck) ([]string, error)
+	DeleteCheck(req dto.MysqlDBDeleteCheck) ([]dto.DBResource, error)
 	Delete(ctx context.Context, req dto.MysqlDBDelete) error
 
 	LoadStatus(req dto.OperationWithNameAndType) (*dto.MysqlStatus, error)
@@ -229,23 +229,41 @@ func (u *MysqlService) UpdateDescription(req dto.UpdateDescription) error {
 	return mysqlRepo.Update(req.ID, map[string]interface{}{"description": req.Description})
 }
 
-func (u *MysqlService) DeleteCheck(req dto.MysqlDBDeleteCheck) ([]string, error) {
-	var appInUsed []string
+func (u *MysqlService) DeleteCheck(req dto.MysqlDBDeleteCheck) ([]dto.DBResource, error) {
+	var res []dto.DBResource
 	db, err := mysqlRepo.Get(repo.WithByID(req.ID))
 	if err != nil {
-		return appInUsed, err
+		return res, err
+	}
+
+	website, _ := websiteRepo.GetFirst(websiteRepo.WithDBType(constant.AppMysql), websiteRepo.WithDBID(req.ID))
+	if website.ID != 0 {
+		res = append(res, dto.DBResource{
+			Type: constant.TypeWebsite,
+			Name: website.PrimaryDomain,
+		})
+	}
+	website, _ = websiteRepo.GetFirst(websiteRepo.WithDBType(constant.AppMysqlCluster), websiteRepo.WithDBID(req.ID))
+	if website.ID != 0 {
+		res = append(res, dto.DBResource{
+			Type: constant.TypeWebsite,
+			Name: website.PrimaryDomain,
+		})
 	}
 
 	if db.From == "local" {
 		app, err := appInstallRepo.LoadBaseInfo(req.Type, req.Database)
 		if err != nil {
-			return appInUsed, err
+			return res, err
 		}
 		apps, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithLinkId(app.ID), appInstallResourceRepo.WithResourceId(db.ID))
 		for _, app := range apps {
 			appInstall, _ := appInstallRepo.GetFirst(repo.WithByID(app.AppInstallId))
 			if appInstall.ID != 0 {
-				appInUsed = append(appInUsed, appInstall.Name)
+				res = append(res, dto.DBResource{
+					Type: constant.TypeApp,
+					Name: appInstall.Name,
+				})
 			}
 		}
 	} else {
@@ -253,12 +271,15 @@ func (u *MysqlService) DeleteCheck(req dto.MysqlDBDeleteCheck) ([]string, error)
 		for _, app := range apps {
 			appInstall, _ := appInstallRepo.GetFirst(repo.WithByID(app.AppInstallId))
 			if appInstall.ID != 0 {
-				appInUsed = append(appInUsed, appInstall.Name)
+				res = append(res, dto.DBResource{
+					Type: constant.TypeApp,
+					Name: appInstall.Name,
+				})
 			}
 		}
 	}
 
-	return appInUsed, nil
+	return res, nil
 }
 
 func (u *MysqlService) Delete(ctx context.Context, req dto.MysqlDBDelete) error {

@@ -2343,6 +2343,7 @@ const message = {
         serverCacheTimeHelper: '請求在伺服器端緩存的時間，到期前相同請求會直接返回緩存結果，不再請求源站。',
         browserCacheTime: '瀏覽器緩存時間',
         browserCacheTimeHelper: '靜態資源在瀏覽器本地緩存的時間，減少重複請求。到期前用戶刷新頁面會直接使用本地緩存。',
+        donotLinkeDB: '不關聯數據庫',
     },
     php: {
         short_open_tag: '短標簽支持',

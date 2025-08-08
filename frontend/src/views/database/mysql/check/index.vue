@@ -11,13 +11,21 @@
                 />
                 <br />
                 <el-descriptions :column="1" border>
-                    <el-descriptions-item label-class-name="check-label" class-name="check-content" min-width="60px">
+                    <el-descriptions-item
+                        v-for="(item, key) in installData"
+                        :key="key"
+                        label-class-name="check-label"
+                        class-name="check-content"
+                        min-width="60px"
+                    >
                         <template #label>
-                            <a href="javascript:void(0);" class="check-label-a" @click="toApp()">
-                                {{ $t('app.app') }}
+                            <a href="javascript:void(0);" class="check-label-a" @click="toPage(item.type)">
+                                {{ $t('menu.' + item.type) }}
                             </a>
                         </template>
-                        <pre>{{ installData.join('\n') }}</pre>
+                        <span class="resources">
+                            {{ item.name }}
+                        </span>
                     </el-descriptions-item>
                 </el-descriptions>
             </el-col>
@@ -25,22 +33,29 @@
     </DialogPro>
 </template>
 <script lang="ts" setup>
+import { Database } from '@/api/interface/database';
 import { routerToName } from '@/utils/router';
 import { ref } from 'vue';
 
 interface InstallProps {
-    items: Array<string>;
+    items: Array<Database.DBResource>;
 }
 const installData = ref();
 let open = ref(false);
 
 const acceptParams = (props: InstallProps) => {
     installData.value = props.items;
+    console.log('acceptParams', props.items);
     open.value = true;
 };
 
-const toApp = () => {
-    routerToName('AppInstalled');
+const toPage = (key: string) => {
+    if (key === 'app') {
+        routerToName('App');
+    }
+    if (key === 'website') {
+        routerToName('Website');
+    }
 };
 
 defineExpose({

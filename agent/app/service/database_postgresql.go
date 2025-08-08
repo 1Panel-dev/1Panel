@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/constant"
 	"os"
 	"path"
 	"strings"
@@ -33,7 +34,7 @@ type IPostgresqlService interface {
 	ChangePrivileges(req dto.PostgresqlPrivileges) error
 	ChangePassword(info dto.ChangeDBInfo) error
 	UpdateDescription(req dto.UpdateDescription) error
-	DeleteCheck(req dto.PostgresqlDBDeleteCheck) ([]string, error)
+	DeleteCheck(req dto.PostgresqlDBDeleteCheck) ([]dto.DBResource, error)
 	Delete(ctx context.Context, req dto.PostgresqlDBDelete) error
 }
 
@@ -250,23 +251,41 @@ func (u *PostgresqlService) UpdateDescription(req dto.UpdateDescription) error {
 	return postgresqlRepo.Update(req.ID, map[string]interface{}{"description": req.Description})
 }
 
-func (u *PostgresqlService) DeleteCheck(req dto.PostgresqlDBDeleteCheck) ([]string, error) {
-	var appInUsed []string
+func (u *PostgresqlService) DeleteCheck(req dto.PostgresqlDBDeleteCheck) ([]dto.DBResource, error) {
+	var res []dto.DBResource
 	db, err := postgresqlRepo.Get(repo.WithByID(req.ID))
 	if err != nil {
-		return appInUsed, err
+		return res, err
+	}
+
+	website, _ := websiteRepo.GetFirst(websiteRepo.WithDBType(constant.AppPostgresql), websiteRepo.WithDBID(req.ID))
+	if website.ID != 0 {
+		res = append(res, dto.DBResource{
+			Type: constant.TypeWebsite,
+			Name: website.PrimaryDomain,
+		})
+	}
+	website, _ = websiteRepo.GetFirst(websiteRepo.WithDBType(constant.AppPostgresqlCluster), websiteRepo.WithDBID(req.ID))
+	if website.ID != 0 {
+		res = append(res, dto.DBResource{
+			Type: constant.TypeWebsite,
+			Name: website.PrimaryDomain,
+		})
 	}
 
 	if db.From == "local" {
 		app, err := appInstallRepo.LoadBaseInfo(req.Type, req.Database)
 		if err != nil {
-			return appInUsed, err
+			return res, err
 		}
 		apps, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithLinkId(app.ID), appInstallResourceRepo.WithResourceId(db.ID))
 		for _, app := range apps {
 			appInstall, _ := appInstallRepo.GetFirst(repo.WithByID(app.AppInstallId))
 			if appInstall.ID != 0 {
-				appInUsed = append(appInUsed, appInstall.Name)
+				res = append(res, dto.DBResource{
+					Type: constant.TypeApp,
+					Name: appInstall.Name,
+				})
 			}
 		}
 	} else {
@@ -274,12 +293,15 @@ func (u *PostgresqlService) DeleteCheck(req dto.PostgresqlDBDeleteCheck) ([]stri
 		for _, app := range apps {
 			appInstall, _ := appInstallRepo.GetFirst(repo.WithByID(app.AppInstallId))
 			if appInstall.ID != 0 {
-				appInUsed = append(appInUsed, appInstall.Name)
+				res = append(res, dto.DBResource{
+					Type: constant.TypeApp,
+					Name: appInstall.Name,
+				})
 			}
 		}
 	}
 
-	return appInUsed, nil
+	return res, nil
 }
 
 func (u *PostgresqlService) Delete(ctx context.Context, req dto.PostgresqlDBDelete) error {

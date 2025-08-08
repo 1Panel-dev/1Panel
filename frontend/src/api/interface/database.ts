@@ -349,4 +349,9 @@ export namespace Database {
         forceDelete: boolean;
         deleteBackup: boolean;
     }
+
+    export interface DBResource {
+        type: string;
+        name: string;
+    }
 }

@@ -2482,6 +2482,7 @@ const message = {
         browserCacheTime: 'Masa Cache Pelayar',
         browserCacheTimeHelper:
             'Masa sumber statik di-cache secara tempatan di pelayar, mengurangkan permintaan berulang. Pengguna akan menggunakan cache tempatan secara langsung sebelum tamat tempoh semasa menyegarkan halaman.',
+        donotLinkeDB: 'Jangan Sambungkan Pangkalan Data',
     },
     php: {
         short_open_tag: 'Sokongan tag pendek',

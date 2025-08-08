@@ -329,3 +329,8 @@ type LoadRedisStatus struct {
 	Name string `json:"name" validate:"required"`
 	Type string `json:"type" validate:"required"`
 }
+
+type DBResource struct {
+	Type string `json:"type"`
+	Name string `json:"name"`
+}

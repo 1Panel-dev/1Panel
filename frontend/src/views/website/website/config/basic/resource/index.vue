@@ -15,6 +15,7 @@
         >
             <el-form-item :label="$t('website.changeDatabase')" prop="db">
                 <el-select v-model="req.db" class="w-full" @change="changeDB">
+                    <el-option :label="$t('website.donotLinkeDB')" :value="0"></el-option>
                     <el-option
                         v-for="(item, index) in databases"
                         :key="index"

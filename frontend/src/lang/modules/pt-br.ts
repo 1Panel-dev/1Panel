@@ -2483,6 +2483,7 @@ const message = {
         browserCacheTime: 'Tempo de Cache do Navegador',
         browserCacheTimeHelper:
             'O tempo que os recursos estáticos são armazenados em cache localmente no navegador, reduzindo requisições redundantes. Os usuários usarão o cache local diretamente antes de expirar ao atualizar a página.',
+        donotLinkeDB: 'Não Vincular Banco de Dados',
     },
     php: {
         short_open_tag: 'Suporte para short tags',

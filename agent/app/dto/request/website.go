@@ -285,8 +285,8 @@ type WebsiteRealIP struct {
 
 type ChangeDatabase struct {
 	WebsiteID    uint   `json:"websiteID" validate:"required"`
-	DatabaseID   uint   `json:"databaseID" validate:"required"`
-	DatabaseType string `json:"databaseType" validate:"required"`
+	DatabaseID   uint   `json:"databaseID" `
+	DatabaseType string `json:"databaseType" `
 }
 
 type WebsiteProxyDel struct {

@@ -2542,6 +2542,7 @@ const message = {
         browserCacheTime: 'Tarayıcı Önbellek Süresi',
         browserCacheTimeHelper:
             'Statik kaynakların tarayıcıda yerel olarak önbelleğe alındığı süre, tekrarlayan istekleri azaltır. Kullanıcılar süre dolmadan önce sayfayı yenilediğinde yerel önbelleği doğrudan kullanır.',
+        donotLinkeDB: 'Veritabanına Bağlanma',
     },
     php: {
         short_open_tag: 'Kısa etiket desteği',
