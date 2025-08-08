@@ -2505,6 +2505,12 @@ const message = {
         openBaseDir: 'Prevent Cross-Site Attacks',
         openBaseDirHelper:
             'open_basedir is used to restrict the PHP file access path, which helps prevent cross-site access and enhance security',
+        serverCacheTime: 'Server Cache Time',
+        serverCacheTimeHelper:
+            'The time a request is cached on the server. During this period, identical requests will return the cached result directly without requesting the origin server.',
+        browserCacheTime: 'Browser Cache Time',
+        browserCacheTimeHelper:
+            'The time static resources are cached locally in the browser, reducing redundant requests. Users will use the local cache directly before it expires when refreshing the page.',
     },
     php: {
         short_open_tag: 'Short tag support',

@@ -2477,6 +2477,12 @@ const message = {
         openBaseDir: 'Prevenir Ataques entre Sites',
         openBaseDirHelper:
             'open_basedir é usado para restringir o caminho de acesso a arquivos PHP, ajudando a prevenir acesso entre sites e aumentar a segurança',
+        serverCacheTime: 'Tempo de Cache do Servidor',
+        serverCacheTimeHelper:
+            'O tempo que uma requisição é armazenada em cache no servidor. Durante este período, requisições idênticas retornarão o resultado em cache diretamente, sem pedir ao servidor de origem.',
+        browserCacheTime: 'Tempo de Cache do Navegador',
+        browserCacheTimeHelper:
+            'O tempo que os recursos estáticos são armazenados em cache localmente no navegador, reduzindo requisições redundantes. Os usuários usarão o cache local diretamente antes de expirar ao atualizar a página.',
     },
     php: {
         short_open_tag: 'Suporte para short tags',

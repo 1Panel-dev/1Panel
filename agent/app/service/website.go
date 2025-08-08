@@ -1651,7 +1651,7 @@ func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error)
 		if err = openProxyCache(website); err != nil {
 			return
 		}
-		location.AddCache(req.CacheTime, req.CacheUnit, fmt.Sprintf("proxy_cache_zone_of_%s", website.Alias))
+		location.AddCache(req.CacheTime, req.CacheUnit, fmt.Sprintf("proxy_cache_zone_of_%s", website.Alias), req.ServerCacheTime, req.ServerCacheUnit)
 	} else {
 		location.RemoveCache(fmt.Sprintf("proxy_cache_zone_of_%s", website.Alias))
 	}
@@ -1810,6 +1810,10 @@ func (w WebsiteService) GetProxies(id uint) (res []request.WebsiteProxyConfig, e
 		if location.CacheTime > 0 {
 			proxyConfig.CacheTime = location.CacheTime
 			proxyConfig.CacheUnit = location.CacheUint
+		}
+		if location.ServerCacheTime > 0 {
+			proxyConfig.ServerCacheTime = location.ServerCacheTime
+			proxyConfig.ServerCacheUnit = location.ServerCacheUint
 		}
 		proxyConfig.Match = location.Match
 		proxyConfig.Modifier = location.Modifier

@@ -2476,6 +2476,12 @@ const message = {
         openBaseDir: 'Pencegahan Serangan Lintas Situs',
         openBaseDirHelper:
             'open_basedir digunakan untuk membatasi jalur akses file PHP, yang membantu mencegah akses lintas situs dan meningkatkan keamanan',
+        serverCacheTime: 'Masa Cache Pelayan',
+        serverCacheTimeHelper:
+            'Masa permintaan di-cache di pelayan. Semasa tempoh ini, permintaan yang sama akan mengembalikan hasil cache terus tanpa meminta pelayan asal.',
+        browserCacheTime: 'Masa Cache Pelayar',
+        browserCacheTimeHelper:
+            'Masa sumber statik di-cache secara tempatan di pelayar, mengurangkan permintaan berulang. Pengguna akan menggunakan cache tempatan secara langsung sebelum tamat tempoh semasa menyegarkan halaman.',
     },
     php: {
         short_open_tag: 'Sokongan tag pendek',

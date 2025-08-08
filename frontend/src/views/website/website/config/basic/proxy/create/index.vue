@@ -16,17 +16,10 @@
             <el-form-item :label="$t('website.enableCache')" prop="cache">
                 <el-switch v-model="proxy.cache" @change="changeCache(proxy.cache)"></el-switch>
             </el-form-item>
-            <el-form-item :label="$t('website.sni')" prop="sni">
-                <el-switch v-model="proxy.sni"></el-switch>
-                <span class="input-help">{{ $t('website.sniHelper') }}</span>
-            </el-form-item>
-            <el-form-item label="proxy_ssl_name" prop="proxySSLName" v-if="proxy.sni">
-                <el-input v-model.trim="proxy.proxySSLName"></el-input>
-            </el-form-item>
-            <el-form-item :label="$t('website.cacheTime')" prop="cacheTime" v-if="proxy.cache">
+            <el-form-item :label="$t('website.browserCacheTime')" prop="cacheTime" v-if="proxy.cache">
                 <el-input v-model.number="proxy.cacheTime" maxlength="15">
                     <template #append>
-                        <el-select v-model="proxy.cacheUnit" style="width: 100px">
+                        <el-select v-model="proxy.cacheUnit" class="p-w-100">
                             <el-option
                                 v-for="(unit, index) in Units"
                                 :key="index"
@@ -36,6 +29,29 @@
                         </el-select>
                     </template>
                 </el-input>
+                <span class="input-help">{{ $t('website.browserCacheTimeHelper') }}</span>
+            </el-form-item>
+            <el-form-item :label="$t('website.serverCacheTime')" prop="cacheTime" v-if="proxy.cache">
+                <el-input v-model.number="proxy.serverCacheTime" maxlength="15">
+                    <template #append>
+                        <el-select v-model="proxy.serverCacheUnit" class="p-w-100">
+                            <el-option
+                                v-for="(unit, index) in Units"
+                                :key="index"
+                                :label="unit.label"
+                                :value="unit.value"
+                            ></el-option>
+                        </el-select>
+                    </template>
+                </el-input>
+                <span class="input-help">{{ $t('website.serverCacheTimeHelper') }}</span>
+            </el-form-item>
+            <el-form-item :label="$t('website.sni')" prop="sni">
+                <el-switch v-model="proxy.sni"></el-switch>
+                <span class="input-help">{{ $t('website.sniHelper') }}</span>
+            </el-form-item>
+            <el-form-item label="proxy_ssl_name" prop="proxySSLName" v-if="proxy.sni">
+                <el-input v-model.trim="proxy.proxySSLName"></el-input>
             </el-form-item>
             <el-row :gutter="10">
                 <el-col :span="12">
@@ -140,6 +156,8 @@ const initData = (): Website.ProxyConfig => ({
     proxyProtocol: 'http://',
     sni: false,
     proxySSLName: '',
+    serverCacheTime: 10,
+    serverCacheUnit: 'm',
 });
 let proxy = ref(initData());
 const replaces = ref<any>([]);
@@ -174,9 +192,13 @@ const changeCache = (cache: boolean) => {
     if (cache) {
         proxy.value.cacheTime = 1;
         proxy.value.cacheUnit = 'm';
+        proxy.value.serverCacheTime = 10;
+        proxy.value.serverCacheUnit = 'm';
     } else {
         proxy.value.cacheTime = 0;
         proxy.value.cacheUnit = '';
+        proxy.value.serverCacheTime = 0;
+        proxy.value.serverCacheUnit = '';
     }
 };
 

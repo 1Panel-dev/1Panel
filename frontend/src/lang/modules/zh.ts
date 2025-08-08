@@ -2328,6 +2328,10 @@ const message = {
         westCN: '西部数码',
         openBaseDir: '防跨站攻击',
         openBaseDirHelper: 'open_basedir 用于限制 PHP 文件访问路径，有助于防止跨站访问和提升安全性',
+        serverCacheTime: '服务器缓存时间',
+        serverCacheTimeHelper: '请求在服务器端缓存的时间，到期前相同请求会直接返回缓存结果，不再请求源站。',
+        browserCacheTime: '浏览器缓存时间',
+        browserCacheTimeHelper: '静态资源在浏览器本地缓存的时间，减少重复请求。到期前用户刷新页面会直接使用本地缓存。',
     },
     php: {
         short_open_tag: '短标签支持',

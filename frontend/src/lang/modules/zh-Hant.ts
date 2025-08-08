@@ -2339,6 +2339,10 @@ const message = {
         westCN: '西部數碼',
         openBaseDir: '防跨站攻擊',
         openBaseDirHelper: 'open_basedir 用於限制 PHP 文件訪問路徑，有助於防止跨站訪問和提升安全性',
+        serverCacheTime: '伺服器緩存時間',
+        serverCacheTimeHelper: '請求在伺服器端緩存的時間，到期前相同請求會直接返回緩存結果，不再請求源站。',
+        browserCacheTime: '瀏覽器緩存時間',
+        browserCacheTimeHelper: '靜態資源在瀏覽器本地緩存的時間，減少重複請求。到期前用戶刷新頁面會直接使用本地緩存。',
     },
     php: {
         short_open_tag: '短標簽支持',

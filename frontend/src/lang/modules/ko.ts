@@ -2379,6 +2379,12 @@ const message = {
         openBaseDir: '사이트 간 공격 방지',
         openBaseDirHelper:
             'open_basedir는 PHP 파일 액세스 경로를 제한하여 사이트 간 액세스를 방지하고 보안을 향상시키는 데 사용됩니다',
+        serverCacheTime: '서버 캐시 시간',
+        serverCacheTimeHelper:
+            '요청이 서버에서 캐시되는 시간. 이 기간 동안 동일한 요청은 원본 서버에 요청하지 않고 캐시된 결과를 직접 반환합니다.',
+        browserCacheTime: '브라우저 캐시 시간',
+        browserCacheTimeHelper:
+            '정적 리소스가 브라우저 로컬에 캐시되는 시간, 중복 요청을 줄입니다. 유효기간 전에 사용자가 페이지를 새로 고치면 로컬 캐시가 직접 사용됩니다.',
     },
     php: {
         short_open_tag: '짧은 태그 지원',

@@ -2421,6 +2421,12 @@ const message = {
         openBaseDir: 'クロスサイト攻撃を防ぐ',
         openBaseDirHelper:
             'open_basedir は PHP ファイルのアクセスパスを制限し、クロスサイトアクセスを防ぎセキュリティを向上させるために使用されます',
+        serverCacheTime: 'サーバーキャッシュ時間',
+        serverCacheTimeHelper:
+            'リクエストがサーバー上でキャッシュされる時間。この期間中、同一のリクエストはオリジンサーバーにリクエストせず、キャッシュされた結果を直接返します。',
+        browserCacheTime: 'ブラウザキャッシュ時間',
+        browserCacheTimeHelper:
+            '静的リソースがブラウザのローカルにキャッシュされる時間、冗長なリクエストを減らします。有効期限前にユーザーがページをリフレッシュすると、ローカルキャッシュが直接使用されます。',
     },
     php: {
         short_open_tag: '短いタグサポート',

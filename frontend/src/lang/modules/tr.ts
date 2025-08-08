@@ -2536,6 +2536,12 @@ const message = {
         openBaseDir: 'Siteler Arası Saldırıları Önle',
         openBaseDirHelper:
             'open_basedir, PHP dosya erişim yolunu kısıtlamak için kullanılır, bu siteler arası erişimi önlemeye ve güvenliği artırmaya yardımcı olur',
+        serverCacheTime: 'Sunucu Önbellek Süresi',
+        serverCacheTimeHelper:
+            'Bir isteğin sunucuda önbelleğe alındığı süre. Bu süre boyunca, aynı istekler önbelleğe alınmış sonucu doğrudan döndürür ve kaynak sunucuya istekte bulunmaz.',
+        browserCacheTime: 'Tarayıcı Önbellek Süresi',
+        browserCacheTimeHelper:
+            'Statik kaynakların tarayıcıda yerel olarak önbelleğe alındığı süre, tekrarlayan istekleri azaltır. Kullanıcılar süre dolmadan önce sayfayı yenilediğinde yerel önbelleği doğrudan kullanır.',
     },
     php: {
         short_open_tag: 'Kısa etiket desteği',

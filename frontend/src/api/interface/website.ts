@@ -388,6 +388,8 @@ export namespace Website {
         cache: boolean;
         cacheTime: number;
         cacheUnit: string;
+        serverCacheTime: number;
+        serverCacheUnit: string;
         name: string;
         modifier: string;
         match: string;
