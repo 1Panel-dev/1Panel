@@ -783,6 +783,8 @@ const message = {
         upgradeWarning2: 'アップグレード操作では、コンテナを再構築する必要があります。続けたいですか？',
         oldImage: '現在の画像',
         targetImage: 'ターゲット画像',
+        sameImageContainer: '同一イメージコンテナ',
+        sameImageHelper: '同一イメージを使用するコンテナは選択後一括アップグレード可能',
         imageLoadErr: 'コンテナの画像名は検出されません',
         appHelper:
             'このコンテナはアプリストアから取得されたものであり、アップグレードによってサービスが利用不可になる可能性があります。',

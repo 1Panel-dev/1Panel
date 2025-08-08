@@ -107,10 +107,10 @@ type ContainerCreateByCommand struct {
 }
 
 type ContainerUpgrade struct {
-	TaskID    string `json:"taskID"`
-	Name      string `json:"name" validate:"required"`
-	Image     string `json:"image" validate:"required"`
-	ForcePull bool   `json:"forcePull"`
+	TaskID    string   `json:"taskID"`
+	Names     []string `json:"names" validate:"required"`
+	Image     string   `json:"image" validate:"required"`
+	ForcePull bool     `json:"forcePull"`
 }
 
 type ContainerListStats struct {

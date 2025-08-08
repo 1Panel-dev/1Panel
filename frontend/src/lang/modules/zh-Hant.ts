@@ -770,6 +770,8 @@ const message = {
         upgradeHelper: '倉庫名稱/鏡像名稱:鏡像版本',
         upgradeWarning2: '升級操作需要重建容器，任何未持久化的數據將會丟失，是否繼續？',
         oldImage: '當前鏡像',
+        sameImageContainer: '同鏡像容器',
+        sameImageHelper: '同鏡像容器可勾選後批量升級',
         targetImage: '目標鏡像',
         imageLoadErr: '未檢測到容器的鏡像名稱',
         appHelper: '該容器來源於應用商店，升級可能導致該服務不可用',

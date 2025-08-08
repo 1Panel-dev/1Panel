@@ -777,6 +777,8 @@ const message = {
         upgradeWarning2:
             '업그레이드 작업은 컨테이너를 재빌드해야 하며, 비지속적인 데이터가 손실됩니다. 계속하시겠습니까?',
         oldImage: '현재 이미지',
+        sameImageContainer: '동일 이미지 컨테이너',
+        sameImageHelper: '동일한 이미지를 사용하는 컨테이너는 선택 후 일괄 업그레이드 가능',
         targetImage: '대상 이미지',
         imageLoadErr: '컨테이너에 대한 이미지 이름이 감지되지 않았습니다.',
         appHelper: '이 컨테이너는 앱 스토어에서 왔으며 업그레이드 시 서비스가 중단될 수 있습니다.',

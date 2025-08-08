@@ -769,6 +769,8 @@ const message = {
         upgradeHelper: '仓库名称/镜像名称:镜像版本',
         upgradeWarning2: '升级操作需要重建容器，任何未持久化的数据将会丢失，是否继续？',
         oldImage: '当前镜像',
+        sameImageContainer: '同镜像容器',
+        sameImageHelper: '同镜像容器可勾选后批量升级',
         targetImage: '目标镜像',
         imageLoadErr: '未检测到容器的镜像名称',
         appHelper: '该容器来源于应用商店，升级可能导致该服务不可用',

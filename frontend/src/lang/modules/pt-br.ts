@@ -794,6 +794,8 @@ const message = {
         upgradeWarning2:
             'A operação de upgrade requer a reconstrução do contêiner, e qualquer dado não persistente será perdido. Deseja continuar?',
         oldImage: 'Imagem atual',
+        sameImageContainer: 'Contêineres com mesma imagem',
+        sameImageHelper: 'Contêineres usando a mesma imagem podem ser atualizados em lote após seleção',
         targetImage: 'Imagem alvo',
         imageLoadErr: 'Nenhum nome de imagem detectado para o contêiner',
         appHelper: 'O contêiner vem da loja de aplicativos, e o upgrade pode tornar o serviço indisponível.',

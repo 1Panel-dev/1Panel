@@ -805,6 +805,8 @@ const message = {
         upgradeWarning2:
             'The upgrade operation requires rebuilding the container, any unpersisted data will be lost. Do you wish to continue?',
         oldImage: 'Current image',
+        sameImageContainer: 'Same-image containers',
+        sameImageHelper: 'Containers using the same image can be batch upgraded after selection',
         targetImage: 'Target image',
         imageLoadErr: 'No image name detected for the container',
         appHelper: 'The container comes from the app store, and upgrading may make the service unavailable.',

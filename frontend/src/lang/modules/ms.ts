@@ -798,6 +798,8 @@ const message = {
         upgradeWarning2:
             'Operasi peningkatan memerlukan pembinaan semula kontena, sebarang data yang tidak disimpan akan hilang. Adakah anda mahu meneruskan?',
         oldImage: 'Imej semasa',
+        sameImageContainer: 'Kontena imej sama',
+        sameImageHelper: 'Kontena yang menggunakan imej sama boleh dinaik taraf secara berkumpulan setelah dipilih',
         targetImage: 'Imej sasaran',
         imageLoadErr: 'Tiada nama imej dikesan untuk kontena',
         appHelper:

@@ -815,6 +815,8 @@ const message = {
         upgradeWarning2:
             'Yükseltme işlemi konteynerin yeniden oluşturulmasını gerektirir, kalıcı olmayan tüm veriler kaybedilecektir. Devam etmek istiyor musunuz?',
         oldImage: 'Mevcut imaj',
+        sameImageContainer: 'Aynı imajlı konteynerler',
+        sameImageHelper: 'Aynı imajı kullanan konteynerlar seçilerek toplu şekilde güncellenebilir',
         targetImage: 'Hedef imaj',
         imageLoadErr: 'Konteyner için imaj adı algılanmadı',
         appHelper: 'Konteyner uygulama mağazasından geliyor ve yükseltme hizmeti kullanılamaz hale getirebilir.',
