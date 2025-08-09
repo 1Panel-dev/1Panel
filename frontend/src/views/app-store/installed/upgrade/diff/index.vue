@@ -7,10 +7,10 @@
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="success" @click="confirm(true)">
+                <el-button type="primary" @click="confirm(true)">
                     {{ $t('app.useNew') }}
                 </el-button>
-                <el-button type="primary" @click="confirm(false)">
+                <el-button @click="confirm(false)">
                     {{ $t('app.useDefault') }}
                 </el-button>
             </span>
@@ -88,15 +88,5 @@ defineExpose({
 .compose-diff {
     width: 100%;
     height: calc(100vh - 350px);
-}
-.el-button--success:hover {
-    background-color: #4e8e2f !important;
-    border-color: #4e8e2f !important;
-    color: #fff !important;
-}
-.el-button--success:active {
-    background-color: #85ce61 !important;
-    border-color: #85ce61 !important;
-    color: #fff !important;
 }
 </style>

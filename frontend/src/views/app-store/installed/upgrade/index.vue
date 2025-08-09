@@ -57,7 +57,7 @@
             <div v-if="operateReq.operate === 'upgrade'">
                 <el-text type="warning">{{ $t('app.upgradeWarn') }}</el-text>
                 <br />
-                <el-button @click="openDiff()" type="primary" style="margin-top: 12px">
+                <el-button @click="openDiff()" type="primary" class="mt-2">
                     {{ $t('app.showDiff') }}
                 </el-button>
                 <div>
