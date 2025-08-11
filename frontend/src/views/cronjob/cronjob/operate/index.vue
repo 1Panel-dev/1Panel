@@ -218,6 +218,12 @@
                                         </el-button>
                                         <el-divider v-if="form.specs.length > 1" class="divider" />
                                     </div>
+                                    <span class="input-help logText">
+                                        {{ $t('cronjob.cronSpecDoc') }}
+                                        <el-link class="link" icon="Position" @click="toDoc" type="primary">
+                                            {{ $t('firewall.quickJump') }}
+                                        </el-link>
+                                    </span>
                                 </el-form-item>
                                 <el-button class="mb-3" @click="handleSpecCustomAdd()">
                                     {{ $t('commons.button.add') }}
@@ -793,7 +799,7 @@ const form = reactive<Cronjob.CronjobInfo>({
     groupID: null,
     specCustom: false,
     spec: '',
-    specs: [],
+    specs: ['0 0 * * *'],
     specObjs: [{ specType: 'perMonth', week: 1, day: 3, hour: 1, minute: 30, second: 30 }],
 
     executor: '',
@@ -990,7 +996,7 @@ const verifySpec = (rule: any, value: any, callback: any) => {
             return;
         }
         for (let i = 0; i < form.specs.length; i++) {
-            if (form.specs[i]) {
+            if (form.specs[i] && form.specs[i].split(' ').length === 5) {
                 continue;
             }
             callback(new Error(i18n.global.t('cronjob.cronSpecRule', [i + 1])));
@@ -1136,6 +1142,10 @@ const rules = reactive({
 
 type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
+
+const toDoc = () => {
+    window.open(globalStore.docsUrl + '/user_manual/cronjobs/', '_blank', 'noopener,noreferrer');
+};
 
 const loadDir = async (path: string) => {
     form.sourceDir = path;

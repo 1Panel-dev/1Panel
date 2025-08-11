@@ -988,6 +988,8 @@ const message = {
         curl: '접속 URL',
         taskName: '작업 이름',
         cronSpec: '트리거 주기',
+        cronSpecDoc:
+            '사용자 정의 실행 주기는 [분 시 일 월 요일] 형식만 지원합니다 (예: 0 0 * * *). 자세한 내용은 공식 문서를 참조하세요.',
         cronSpecHelper: '올바른 실행 주기를 입력해 주세요',
         cleanHelper: '이 작업은 모든 작업 실행 레코드, 백업 파일, 로그 파일을 기록합니다. 계속하시겠습니까?',
         directory: '백업 디렉토리',

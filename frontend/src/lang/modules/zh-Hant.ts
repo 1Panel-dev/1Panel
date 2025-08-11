@@ -980,6 +980,7 @@ const message = {
         curl: '訪問 URL',
         taskName: '任務名稱',
         cronSpec: '執行周期',
+        cronSpecDoc: '自定義執行週期僅支援【分 時 日 月 週】格式，例如 0 0 * * *，具體可參考官方文件。',
         cronSpecHelper: '請輸入正確的執行周期',
         cleanHelper: '該操作將所有任務執行記錄、備份文件和日誌文件，是否繼續？',
         backupContent: '備份內容',

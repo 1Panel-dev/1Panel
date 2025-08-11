@@ -1043,6 +1043,8 @@ const message = {
         curl: 'URLe erişim',
         taskName: 'Ad',
         cronSpec: 'Tetikleme döngüsü',
+        cronSpecDoc:
+            'Özel çalışma döngüleri yalnızca [dakika saat gün ay hafta] formatını destekler, örneğin, 0 0 * * *. Ayrıntılar için resmi belgelere bakın.',
         cronSpecHelper: 'Doğru yürütme dönemini girin',
         cleanHelper:
             'Bu işlem tüm görev yürütme kayıtlarını, yedekleme dosyalarını ve log dosyalarını kaydeder. Devam etmek istiyor musunuz?',

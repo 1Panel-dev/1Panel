@@ -978,6 +978,7 @@ const message = {
         curl: '访问 URL',
         taskName: '任务名称',
         cronSpec: '执行周期',
+        cronSpecDoc: '自定义执行周期仅支持【分时日月周】格式，如 0 0 * * * ，具体可参考官方文档',
         cronSpecHelper: '请输入正确的执行周期',
         cleanHelper: '该操作将所有任务执行记录、备份文件和日志文件，是否继续？',
         backupContent: '备份内容',

@@ -1020,6 +1020,8 @@ const message = {
         curl: 'Akses URL',
         taskName: 'Nama',
         cronSpec: 'Kitaran pencetus',
+        cronSpecDoc:
+            'Kitaran pelaksanaan tersuai hanya menyokong format [minit jam hari bulan minggu], contohnya 0 0 * * *. Untuk maklumat lanjut, sila rujuk dokumen rasmi.',
         cronSpecHelper: 'Masukkan tempoh pelaksanaan yang betul',
         cleanHelper:
             'Operasi ini merekodkan semua rekod pelaksanaan tugas, fail sandaran, dan fail log. Adakah anda mahu meneruskan?',

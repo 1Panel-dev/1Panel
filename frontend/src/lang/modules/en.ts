@@ -1030,6 +1030,8 @@ const message = {
         curl: 'Access URL',
         taskName: 'Name',
         cronSpec: 'Trigger cycle',
+        cronSpecDoc:
+            'Custom execution cycles only support the [minute hour day month week] format, e.g., 0 0 * * *. For details, please refer to the official documentation.',
         cronSpecHelper: 'Enter the correct execution period',
         cleanHelper:
             'This operation records all job execution records, backup files, and log files. Do you want to continue?',

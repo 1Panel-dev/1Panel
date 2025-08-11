@@ -1016,6 +1016,8 @@ const message = {
         curl: 'URL de acesso',
         taskName: 'Nome',
         cronSpec: 'Ciclo de execução',
+        cronSpeDoc:
+            'Ciclos de execução personalizados suportam apenas o formato [minuto hora dia mês semana], por exemplo, 0 0 * * *. Consulte a documentação oficial para obter detalhes.',
         cronSpecHelper: 'Digite o período correto de execução',
         cleanHelper:
             'Esta operação registra todos os registros de execução de tarefas, arquivos de backup e logs. Você deseja continuar?',
