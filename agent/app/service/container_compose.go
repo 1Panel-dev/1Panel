@@ -10,12 +10,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/1Panel-dev/1Panel/agent/app/repo"
-
-	"github.com/docker/docker/api/types/container"
-
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
@@ -24,6 +21,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/compose"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
+	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 	"golang.org/x/net/context"
 )
@@ -54,14 +52,13 @@ func (u *ContainerService) PageCompose(req dto.SearchWithPage) (int64, interface
 	}
 
 	composeCreatedByLocal, _ := composeRepo.ListRecord()
-
 	composeLocalMap := make(map[string]dto.ComposeInfo)
 	for _, localItem := range composeCreatedByLocal {
 		composeItemLocal := dto.ComposeInfo{
-			ContainerNumber: 0,
-			CreatedAt:       localItem.CreatedAt.Format(constant.DateTimeLayout),
-			ConfigFile:      localItem.Path,
-			Workdir:         strings.TrimSuffix(localItem.Path, "/docker-compose.yml"),
+			ContainerCount: 0,
+			CreatedAt:      localItem.CreatedAt.Format(constant.DateTimeLayout),
+			ConfigFile:     localItem.Path,
+			Workdir:        strings.TrimSuffix(localItem.Path, "/docker-compose.yml"),
 		}
 		composeItemLocal.CreatedBy = "1Panel"
 		composeItemLocal.Path = localItem.Path
@@ -78,18 +75,24 @@ func (u *ContainerService) PageCompose(req dto.SearchWithPage) (int64, interface
 				CreateTime:  time.Unix(container.Created, 0).Format(constant.DateTimeLayout),
 			}
 			if compose, has := composeMap[name]; has {
-				compose.ContainerNumber++
+				compose.ContainerCount++
+				if strings.ToLower(containerItem.State) == "running" {
+					compose.RunningCount++
+				}
 				compose.Containers = append(compose.Containers, containerItem)
 				composeMap[name] = compose
 			} else {
 				config := container.Labels[composeConfigLabel]
 				workdir := container.Labels[composeWorkdirLabel]
 				composeItem := dto.ComposeInfo{
-					ContainerNumber: 1,
-					CreatedAt:       time.Unix(container.Created, 0).Format(constant.DateTimeLayout),
-					ConfigFile:      config,
-					Workdir:         workdir,
-					Containers:      []dto.ComposeContainer{containerItem},
+					ContainerCount: 1,
+					CreatedAt:      time.Unix(container.Created, 0).Format(constant.DateTimeLayout),
+					ConfigFile:     config,
+					Workdir:        workdir,
+					Containers:     []dto.ComposeContainer{containerItem},
+				}
+				if strings.ToLower(containerItem.State) == "running" {
+					composeItem.RunningCount = 1
 				}
 				createdBy, ok := container.Labels[composeCreatedBy]
 				if ok {
@@ -118,8 +121,8 @@ func (u *ContainerService) PageCompose(req dto.SearchWithPage) (int64, interface
 	}
 	for key, item := range composeMap {
 		if existingItem, exists := mergedMap[key]; exists {
-			if item.ContainerNumber > 0 {
-				if existingItem.ContainerNumber <= 0 {
+			if item.ContainerCount > 0 {
+				if existingItem.ContainerCount <= 0 {
 					mergedMap[key] = item
 				}
 			}

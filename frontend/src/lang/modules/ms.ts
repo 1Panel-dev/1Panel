@@ -923,7 +923,7 @@ const message = {
         containerNumber: 'Bilangan kontena',
         containerStatus: 'Status kontena',
         exited: 'Keluar',
-        running: 'Berjalan',
+        running: 'Berjalan ( {0} / {1} )',
         composeDetailHelper: 'Komposisi dibuat di luar 1Panel. Operasi mula dan berhenti tidak disokong.',
         composeOperatorHelper: 'Operasi {1} akan dilakukan pada {0}. Adakah anda mahu meneruskan?',
         composeDownHelper:

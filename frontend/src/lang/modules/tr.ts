@@ -943,7 +943,7 @@ const message = {
         containerNumber: 'Konteyner sayısı',
         containerStatus: 'Konteyner durumu',
         exited: 'Çıktı',
-        running: 'Çalışıyor',
+        running: 'Çalışıyor ( {0} / {1} )',
         composeDetailHelper: 'Compose, 1Panel dışında oluşturulmuştur. Başlatma ve durdurma işlemleri desteklenmez.',
         composeOperatorHelper: '{0} üzerinde {1} işlemi gerçekleştirilecek. Devam etmek istiyor musunuz?',
         composeDownHelper:

@@ -275,7 +275,8 @@ export namespace Container {
         name: string;
         createdAt: string;
         createdBy: string;
-        containerNumber: number;
+        containerCount: number;
+        runningCount: number;
         configFile: string;
         workdir: string;
         path: string;

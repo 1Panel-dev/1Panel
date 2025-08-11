@@ -150,6 +150,29 @@
                                                                     </el-button>
                                                                 </el-tooltip>
                                                             </span>
+                                                            <span class="ml-1">
+                                                                <el-tooltip
+                                                                    v-if="mode !== 'upgrade'"
+                                                                    effect="dark"
+                                                                    :content="$t('container.compose')"
+                                                                    placement="top"
+                                                                >
+                                                                    <el-button
+                                                                        type="primary"
+                                                                        link
+                                                                        @click="
+                                                                            routerToNameWithQuery('ComposeDetail', {
+                                                                                name: installed.name,
+                                                                                uncached: 'true',
+                                                                            })
+                                                                        "
+                                                                    >
+                                                                        <el-icon>
+                                                                            <SvgIcon iconName="p-docker" />
+                                                                        </el-icon>
+                                                                    </el-button>
+                                                                </el-tooltip>
+                                                            </span>
                                                             <span class="ml-1" v-if="mode === 'installed'">
                                                                 <el-tooltip
                                                                     effect="dark"
@@ -433,7 +456,7 @@ import IgnoreApp from '@/views/app-store/installed/ignore/create/index.vue';
 import { getAgentSettingByKey } from '@/api/modules/setting';
 import Tags from '@/views/app-store/components/tag.vue';
 import SvgIcon from '@/components/svg-icon/svg-icon.vue';
-import { routerToFileWithPath } from '@/utils/router';
+import { routerToFileWithPath, routerToNameWithQuery } from '@/utils/router';
 
 const data = ref<any>();
 const loading = ref(false);

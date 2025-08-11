@@ -917,7 +917,7 @@ const message = {
         containerNumber: 'Количество контейнеров',
         containerStatus: 'Статус контейнера',
         exited: 'Завершен',
-        running: 'Работает',
+        running: 'Работает ( {0} / {1} )',
         composeDetailHelper: 'Compose создан вне 1Panel. Операции запуска и остановки не поддерживаются.',
         composeOperatorHelper: 'Операция {1} будет выполнена для {0}. Хотите продолжить?',
         composeDownHelper: 'Это остановит и удалит все контейнеры и сети под compose {0}. Хотите продолжить?',

@@ -917,7 +917,7 @@ const message = {
         containerNumber: 'Número de containers',
         containerStatus: 'Status do container',
         exited: 'Finalizado',
-        running: 'Em execução',
+        running: 'Em execução ( {0} / {1} )',
         composeDetailHelper:
             'A composição foi criada externamente ao 1Panel. As operações de iniciar e parar não são suportadas.',
         composeOperatorHelper: 'A operação {1} será realizada no {0}. Deseja continuar?',

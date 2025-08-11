@@ -904,7 +904,7 @@ const message = {
         containerNumber: 'コンテナ番号',
         containerStatus: 'コンテナステータス',
         exited: '終了',
-        running: 'ランニング',
+        running: 'ランニング ( {0} / {1} )',
         composeDetailHelper: '構成は1パネルの外部に作成されます。開始および停止操作はサポートされていません。',
         composeOperatorHelper: '{1}操作は{0}で実行されます。続けたいですか？',
         composeDownHelper:

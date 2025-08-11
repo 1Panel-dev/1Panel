@@ -889,7 +889,7 @@ const message = {
         containerNumber: '容器数量',
         containerStatus: '容器状态',
         exited: '已停止',
-        running: '运行中',
+        running: '运行中 ( {0} / {1} )',
         composeDetailHelper: '该 compose 为 1Panel 编排外部创建。暂不支持启停操作。',
         composeOperatorHelper: '将对 {0} 进行 {1} 操作，是否继续？',
         composeDownHelper: '将停止并删除 {0} 编排下所有容器及网络，是否继续？',

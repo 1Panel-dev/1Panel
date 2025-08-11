@@ -930,7 +930,7 @@ const message = {
         containerNumber: 'Container number',
         containerStatus: 'Container status',
         exited: 'Exited',
-        running: 'Running',
+        running: 'Running ( {0} / {1} )',
         composeDetailHelper:
             'The compose is created external to 1Panel. The start and stop operations are not supported.',
         composeOperatorHelper: '{1} operation will be performed on {0}. Do you want to continue?',

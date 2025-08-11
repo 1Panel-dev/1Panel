@@ -1,63 +1,31 @@
 <template>
     <div v-loading="loading">
-        <div class="app-status card-interval">
-            <el-card>
-                <el-row :gutter="20" class="items-center">
-                    <div class="ml-5">
-                        <el-tag effect="dark" type="success">{{ composeName }}</el-tag>
-                    </div>
-                    <div v-if="createdBy === '1Panel'" class="ml-10">
-                        <el-button link type="primary" @click="onComposeOperate('up')">
-                            {{ $t('commons.operate.start') }}
-                        </el-button>
-                        <el-divider direction="vertical" />
-                        <el-button link type="primary" @click="onComposeOperate('stop')">
-                            {{ $t('commons.operate.stop') }}
-                        </el-button>
-                        <el-divider direction="vertical" />
-                        <el-button link type="primary" @click="onComposeOperate('down')">
-                            {{ $t('commons.button.delete') }}
-                        </el-button>
-                    </div>
-                    <div v-else>
-                        <el-alert
-                            style="margin-top: -5px; margin-left: 50px"
-                            :closable="false"
-                            show-icon
-                            :title="$t('container.composeDetailHelper')"
-                            type="info"
-                        />
-                    </div>
-                </el-row>
-            </el-card>
-        </div>
         <LayoutContent
-            style="margin-top: 10px"
             back-name="Compose"
-            :title="$t('container.containerList')"
+            :title="$t('container.containerList') + ' [ ' + composeName + ' ]'"
             :reload="true"
         >
             <template #main>
                 <el-button-group>
-                    <el-button :disabled="checkStatus('start')" @click="onOperate('start')">
+                    <el-button :disabled="checkStatus('start', null)" @click="onOperate('start', null)">
                         {{ $t('commons.operate.start') }}
                     </el-button>
-                    <el-button :disabled="checkStatus('stop')" @click="onOperate('stop')">
+                    <el-button :disabled="checkStatus('stop', null)" @click="onOperate('stop', null)">
                         {{ $t('commons.operate.stop') }}
                     </el-button>
-                    <el-button :disabled="checkStatus('restart')" @click="onOperate('restart')">
+                    <el-button :disabled="checkStatus('restart', null)" @click="onOperate('restart', null)">
                         {{ $t('commons.button.restart') }}
                     </el-button>
-                    <el-button :disabled="checkStatus('kill')" @click="onOperate('kill')">
+                    <el-button :disabled="checkStatus('kill', null)" @click="onOperate('kill', null)">
                         {{ $t('container.kill') }}
                     </el-button>
-                    <el-button :disabled="checkStatus('pause')" @click="onOperate('pause')">
+                    <el-button :disabled="checkStatus('pause', null)" @click="onOperate('pause', null)">
                         {{ $t('container.pause') }}
                     </el-button>
-                    <el-button :disabled="checkStatus('unpause')" @click="onOperate('unpause')">
+                    <el-button :disabled="checkStatus('unpause', null)" @click="onOperate('unpause', null)">
                         {{ $t('container.unpause') }}
                     </el-button>
-                    <el-button :disabled="checkStatus('remove')" @click="onOperate('remove')">
+                    <el-button :disabled="checkStatus('remove', null)" @click="onOperate('remove', null)">
                         {{ $t('commons.button.delete') }}
                     </el-button>
                 </el-button-group>
@@ -88,9 +56,51 @@
                         min-width="100"
                         prop="imageName"
                     />
-                    <el-table-column :label="$t('commons.table.status')" min-width="50" prop="state" fix>
+                    <el-table-column :label="$t('commons.table.status')" min-width="100" prop="state" sortable>
                         <template #default="{ row }">
-                            <Status :key="row.state" :status="row.state"></Status>
+                            <el-dropdown placement="bottom">
+                                <Status :key="row.state" :status="row.state" :operate="true"></Status>
+                                <template #dropdown>
+                                    <el-dropdown-menu>
+                                        <el-dropdown-item
+                                            :disabled="checkStatus('start', row)"
+                                            @click="onOperate('start', row)"
+                                        >
+                                            {{ $t('commons.operate.start') }}
+                                        </el-dropdown-item>
+                                        <el-dropdown-item
+                                            :disabled="checkStatus('stop', row)"
+                                            @click="onOperate('stop', row)"
+                                        >
+                                            {{ $t('commons.operate.stop') }}
+                                        </el-dropdown-item>
+                                        <el-dropdown-item
+                                            :disabled="checkStatus('restart', row)"
+                                            @click="onOperate('restart', row)"
+                                        >
+                                            {{ $t('commons.button.restart') }}
+                                        </el-dropdown-item>
+                                        <el-dropdown-item
+                                            :disabled="checkStatus('kill', row)"
+                                            @click="onOperate('kill', row)"
+                                        >
+                                            {{ $t('container.kill') }}
+                                        </el-dropdown-item>
+                                        <el-dropdown-item
+                                            :disabled="checkStatus('pause', row)"
+                                            @click="onOperate('pause', row)"
+                                        >
+                                            {{ $t('container.pause') }}
+                                        </el-dropdown-item>
+                                        <el-dropdown-item
+                                            :disabled="checkStatus('unpause', row)"
+                                            @click="onOperate('unpause', row)"
+                                        >
+                                            {{ $t('container.unpause') }}
+                                        </el-dropdown-item>
+                                    </el-dropdown-menu>
+                                </template>
+                            </el-dropdown>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('container.upTime')" min-width="100" prop="runTime" fix />
@@ -128,34 +138,14 @@ import TerminalDialog from '@/views/container/container/terminal/index.vue';
 import CodemirrorDrawer from '@/components/codemirror-pro/drawer.vue';
 import Status from '@/components/status/index.vue';
 import { dateFormat } from '@/utils/util';
-import { composeOperator, containerOperator, inspect, searchContainer } from '@/api/modules/container';
-import { ElMessageBox } from 'element-plus';
+import { containerOperator, inspect, searchContainer } from '@/api/modules/container';
 import i18n from '@/lang';
 import { Container } from '@/api/interface/container';
-import { MsgSuccess } from '@/utils/message';
+import router from '@/routers';
 
 const composeName = ref();
-const composePath = ref();
-const filters = ref();
-const createdBy = ref();
-
 const dialogContainerLogRef = ref();
-
 const opRef = ref();
-
-interface DialogProps {
-    createdBy: string;
-    name: string;
-    path: string;
-    filters: string;
-}
-const acceptParams = (props: DialogProps): void => {
-    composePath.value = props.path;
-    composeName.value = props.name;
-    filters.value = props.filters;
-    createdBy.value = props.createdBy;
-    search();
-};
 
 const data = ref();
 const selects = ref<any>([]);
@@ -169,13 +159,12 @@ const paginationConfig = reactive({
 const loading = ref(false);
 
 const search = async () => {
-    let filterItem = filters.value;
     let params = {
         name: '',
         state: 'all',
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
-        filters: filterItem,
+        filters: 'com.docker.compose.project=' + composeName.value,
         orderBy: 'createdAt',
         order: 'null',
     };
@@ -204,34 +193,35 @@ const onInspect = async (id: string) => {
     myDetail.value!.acceptParams(param);
 };
 
-const checkStatus = (operation: string) => {
-    if (selects.value.length < 1) {
+const checkStatus = (operation: string, row: Container.ContainerInfo | null) => {
+    let opList = row ? [row] : selects.value;
+    if (opList.length < 1) {
         return true;
     }
     switch (operation) {
         case 'start':
-            for (const item of selects.value) {
+            for (const item of opList) {
                 if (item.state === 'running') {
                     return true;
                 }
             }
             return false;
         case 'stop':
-            for (const item of selects.value) {
+            for (const item of opList) {
                 if (item.state === 'stopped' || item.state === 'exited') {
                     return true;
                 }
             }
             return false;
         case 'pause':
-            for (const item of selects.value) {
+            for (const item of opList) {
                 if (item.state === 'paused' || item.state === 'exited') {
                     return true;
                 }
             }
             return false;
         case 'unpause':
-            for (const item of selects.value) {
+            for (const item of opList) {
                 if (item.state !== 'paused') {
                     return true;
                 }
@@ -240,54 +230,24 @@ const checkStatus = (operation: string) => {
     }
 };
 
-const onOperate = async (op: string) => {
+const onOperate = async (op: string, row: Container.ContainerInfo | null) => {
+    let opList = row ? [row] : selects.value;
     let msg = i18n.global.t('container.operatorHelper', [i18n.global.t('container.' + op)]);
     let names = [];
-    for (const item of selects.value) {
+    for (const item of opList) {
         names.push(item.name);
         if (item.isFromApp) {
             msg = i18n.global.t('container.operatorAppHelper', [i18n.global.t('container.' + op)]);
         }
     }
+    const successMsg = `${i18n.global.t('container.' + op)}${i18n.global.t('commons.status.success')}`;
     opRef.value.acceptParams({
         title: i18n.global.t('container.' + op),
         names: names,
         msg: msg,
         api: containerOperator,
         params: { names: names, operation: op },
-        successMsg: `${i18n.global.t('container.' + op)}${i18n.global.t('commons.status.success')}`,
-    });
-};
-
-const onComposeOperate = async (operation: string) => {
-    let mes =
-        operation === 'down'
-            ? i18n.global.t('container.composeDownHelper', [composeName.value])
-            : i18n.global.t('container.composeOperatorHelper', [
-                  composeName.value,
-                  i18n.global.t('container.' + operation),
-              ]);
-    ElMessageBox.confirm(mes, i18n.global.t('container.' + operation), {
-        confirmButtonText: i18n.global.t('commons.button.confirm'),
-        cancelButtonText: i18n.global.t('commons.button.cancel'),
-        type: 'info',
-    }).then(async () => {
-        let params = {
-            name: composeName.value,
-            path: composePath.value,
-            operation: operation,
-            withFile: false,
-        };
-        loading.value = true;
-        await composeOperator(params)
-            .then(() => {
-                loading.value = false;
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                search();
-            })
-            .catch(() => {
-                loading.value = false;
-            });
+        successMsg,
     });
 };
 
@@ -329,17 +289,16 @@ const buttons = [
     },
 ];
 
-defineExpose({
-    acceptParams,
+onMounted(() => {
+    if (router.currentRoute.value.query?.name) {
+        composeName.value = router.currentRoute.value.query.name;
+    }
+    search();
 });
 </script>
 
 <style lang="scss" scoped>
 .app-content {
     height: 50px;
-}
-
-body {
-    margin: 0;
 }
 </style>

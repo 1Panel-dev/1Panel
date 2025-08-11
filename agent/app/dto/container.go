@@ -229,15 +229,16 @@ type BatchDelete struct {
 }
 
 type ComposeInfo struct {
-	Name            string             `json:"name"`
-	CreatedAt       string             `json:"createdAt"`
-	CreatedBy       string             `json:"createdBy"`
-	ContainerNumber int                `json:"containerNumber"`
-	ConfigFile      string             `json:"configFile"`
-	Workdir         string             `json:"workdir"`
-	Path            string             `json:"path"`
-	Containers      []ComposeContainer `json:"containers"`
-	Env             []string           `json:"env"`
+	Name           string             `json:"name"`
+	CreatedAt      string             `json:"createdAt"`
+	CreatedBy      string             `json:"createdBy"`
+	ContainerCount int                `json:"containerCount"`
+	RunningCount   int                `json:"runningCount"`
+	ConfigFile     string             `json:"configFile"`
+	Workdir        string             `json:"workdir"`
+	Path           string             `json:"path"`
+	Containers     []ComposeContainer `json:"containers"`
+	Env            []string           `json:"env"`
 }
 type ComposeContainer struct {
 	ContainerID string `json:"containerID"`

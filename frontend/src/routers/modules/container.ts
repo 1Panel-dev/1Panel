@@ -57,7 +57,7 @@ const containerRouter = {
                     },
                 },
                 {
-                    path: 'composeDetail/:filters?',
+                    path: 'compose/detail',
                     name: 'ComposeDetail',
                     component: () => import('@/views/container/compose/detail/index.vue'),
                     props: true,

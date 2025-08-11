@@ -895,7 +895,7 @@ const message = {
         containerNumber: '컨테이너 수',
         containerStatus: '컨테이너 상태',
         exited: '종료됨',
-        running: '실행 중',
+        running: '실행 중 ( {0} / {1} )',
         composeDetailHelper: '이 컴포즈는 1Panel 외부에서 생성되었습니다. 시작 및 중지 작업은 지원되지 않습니다.',
         composeOperatorHelper: '{1} 작업이 {0}에서 수행됩니다. 계속 하시겠습니까?',
         composeDownHelper:
