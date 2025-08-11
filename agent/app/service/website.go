@@ -202,6 +202,7 @@ func (w WebsiteService) PageWebsite(req request.WebsiteSearch) (int64, []respons
 			AppInstallID:  appInstallID,
 			RuntimeType:   runtimeType,
 			Favorite:      web.Favorite,
+			IPV6:          web.IPV6,
 		}
 
 		sites, _ := websiteRepo.List(websiteRepo.WithParentID(web.ID))

@@ -37,6 +37,7 @@ type WebsiteRes struct {
 	ChildSites    []string  `json:"childSites"`
 	RuntimeType   string    `json:"runtimeType"`
 	Favorite      bool      `json:"favorite"`
+	IPV6          bool      `json:"IPV6"`
 }
 
 type WebsiteOption struct {
