@@ -51,7 +51,6 @@ const getApps = async () => {
     try {
         const res = await getIgnoredApp();
         apps.value = res.data;
-        console.log(apps.value);
     } catch (error) {}
 };
 

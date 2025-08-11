@@ -45,7 +45,6 @@ let open = ref(false);
 
 const acceptParams = (props: InstallProps) => {
     installData.value = props.items;
-    console.log('acceptParams', props.items);
     open.value = true;
 };
 

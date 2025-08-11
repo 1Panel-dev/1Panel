@@ -357,7 +357,7 @@ func deleteAppInstall(deleteReq request.AppInstallDelete) error {
 				if err != nil {
 					return err
 				}
-				images, err := composeV2.GetDockerComposeImagesV2(content, []byte(install.DockerCompose))
+				images, err := composeV2.GetImagesFromDockerCompose(content, []byte(install.DockerCompose))
 				if err != nil {
 					return err
 				}
@@ -540,6 +540,9 @@ func handleUpgradeCompose(install model.AppInstall, detail model.AppDetail) (map
 	if oldServiceValue["deploy"] != nil {
 		serviceValue["deploy"] = oldServiceValue["deploy"]
 	}
+	if oldServiceValue["restart"] != nil {
+		serviceValue["restart"] = oldServiceValue["restart"]
+	}
 	servicesMap[install.ServiceName] = serviceValue
 	composeMap["services"] = servicesMap
 	return composeMap, nil
@@ -659,7 +662,7 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 			if req.DockerCompose != "" {
 				composeContent = []byte(req.DockerCompose)
 			}
-			images, err := composeV2.GetDockerComposeImagesV2(content, composeContent)
+			images, err := composeV2.GetImagesFromDockerCompose(content, composeContent)
 			if err != nil {
 				return err
 			}
@@ -1658,6 +1661,14 @@ func addDockerComposeCommonParam(composeMap map[string]interface{}, serviceName 
 	deploy["resources"] = resource
 	serviceValue["deploy"] = deploy
 
+	if req.RestartPolicy != "" {
+		if req.RestartPolicy == "on-failure" {
+			serviceValue["restart"] = "on-failure:5"
+		} else {
+			serviceValue["restart"] = req.RestartPolicy
+		}
+	}
+
 	ports, ok := serviceValue["ports"].([]interface{})
 	if ok {
 		for i, port := range ports {
@@ -1758,6 +1769,17 @@ func isHostModel(dockerCompose string) bool {
 		}
 	}
 	return false
+}
+
+func getRestartPolicy(yml string) string {
+	var project docker.ComposeProject
+	if err := yaml.Unmarshal([]byte(yml), &project); err != nil {
+		return ""
+	}
+	for _, service := range project.Services {
+		return service.Restart
+	}
+	return ""
 }
 
 func getMajorVersion(version string) string {

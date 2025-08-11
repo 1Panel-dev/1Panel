@@ -40,6 +40,7 @@ type AppContainerConfig struct {
 	WebUI         string  `json:"webUI"`
 	Type          string  `json:"type"`
 	SpecifyIP     string  `json:"specifyIP"`
+	RestartPolicy string  `json:"restartPolicy" validate:"omitempty,oneof=always unless-stopped no on-failure"`
 }
 
 type AppInstalledSearch struct {

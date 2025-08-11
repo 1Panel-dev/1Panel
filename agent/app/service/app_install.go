@@ -788,6 +788,7 @@ func (a *AppInstallService) GetParams(id uint) (*response.AppConfig, error) {
 	}
 	res.AppContainerConfig = config
 	res.HostMode = isHostModel(install.DockerCompose)
+	res.RestartPolicy = getRestartPolicy(install.DockerCompose)
 	res.WebUI = install.WebUI
 	res.Type = install.App.Type
 	return &res, nil

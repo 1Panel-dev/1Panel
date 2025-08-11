@@ -276,6 +276,7 @@ export namespace App {
         type: string;
         webUI: string;
         specifyIP: string;
+        restartPolicy: string;
     }
 
     export interface IgnoredApp {

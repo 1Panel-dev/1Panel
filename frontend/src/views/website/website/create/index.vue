@@ -100,48 +100,21 @@
                     </el-form-item>
                     <div v-if="website.appType == 'new'">
                         <el-form-item :label="$t('app.app')" prop="appinstall.appId">
-                            <el-row :gutter="20">
-                                <el-col :span="12">
-                                    <el-select
-                                        v-model="website.appinstall.appId"
-                                        @change="changeApp()"
-                                        class="p-w-200"
-                                        filterable
-                                    >
-                                        <el-option
-                                            v-for="(app, index) in apps"
-                                            :key="index"
-                                            :label="app.name"
-                                            :value="app.id"
-                                        ></el-option>
-                                    </el-select>
-                                </el-col>
-                                <el-col :span="12">
-                                    <el-select
-                                        v-model="website.appinstall.version"
-                                        @change="getDetail(website.appinstall.version)"
-                                        class="p-w-200"
-                                    >
-                                        <el-option
-                                            v-for="(version, index) in appVersions"
-                                            :key="index"
-                                            :label="version"
-                                            :value="version"
-                                        ></el-option>
-                                    </el-select>
-                                </el-col>
-                            </el-row>
+                            <el-select
+                                v-model="website.appinstall.appId"
+                                @change="changeApp()"
+                                class="p-w-300"
+                                filterable
+                            >
+                                <el-option
+                                    v-for="(app, index) in apps"
+                                    :key="index"
+                                    :label="app.name"
+                                    :value="app.id"
+                                ></el-option>
+                            </el-select>
                         </el-form-item>
-                        <el-form-item :label="$t('commons.table.name')" prop="appinstall.name">
-                            <el-input v-model.trim="website.appinstall.name"></el-input>
-                        </el-form-item>
-                        <Params
-                            :key="paramKey"
-                            v-model:form="website.appinstall.params"
-                            v-model:rules="rules.appinstall.params"
-                            :params="appParams"
-                            :propStart="'appinstall.params.'"
-                        ></Params>
+                        <AppInstallForm ref="installFormRef" v-model="website.appinstall" :loading="loading" />
                     </div>
                 </div>
                 <div v-if="website.type === 'subsite'">
@@ -245,49 +218,6 @@
                     >
                         {{ $t('website.runtimePortWarn') }}
                     </el-text>
-                </div>
-                <el-form-item prop="advanced" v-if="website.type === 'deployment' && website.appType === 'new'">
-                    <el-checkbox v-model="website.appinstall.advanced" :label="$t('app.advanced')" size="large" />
-                </el-form-item>
-
-                <div v-if="website.appinstall.advanced">
-                    <el-form-item :label="$t('app.containerName')" prop="containerName">
-                        <el-input
-                            v-model.trim="website.appinstall.containerName"
-                            :placeholder="$t('app.containerNameHelper')"
-                        ></el-input>
-                    </el-form-item>
-                    <el-form-item :label="$t('container.cpuQuota')" prop="appinstall.cpuQuota">
-                        <el-input
-                            type="number"
-                            style="width: 40%"
-                            v-model.number="website.appinstall.cpuQuota"
-                            maxlength="5"
-                        >
-                            <template #append>{{ $t('app.cpuCore') }}</template>
-                        </el-input>
-                        <span class="input-help">{{ $t('container.limitHelper', [99999]) }}</span>
-                    </el-form-item>
-                    <el-form-item :label="$t('container.memoryLimit')" prop="appinstall.memoryLimit">
-                        <el-input style="width: 40%" v-model.number="website.appinstall.memoryLimit" maxlength="10">
-                            <template #append>
-                                <el-select
-                                    v-model="website.appinstall.memoryUnit"
-                                    placeholder="Select"
-                                    class="pre-select"
-                                >
-                                    <el-option label="KB" value="K" />
-                                    <el-option label="MB" value="M" />
-                                    <el-option label="GB" value="G" />
-                                </el-select>
-                            </template>
-                        </el-input>
-                        <span class="input-help">{{ $t('container.limitHelper', ['9999999999']) }}</span>
-                    </el-form-item>
-                    <el-form-item prop="allowPort" v-if="website.type === 'deployment'">
-                        <el-checkbox v-model="website.appinstall.allowPort" :label="$t('app.allowPort')" size="large" />
-                        <span class="input-help">{{ $t('app.allowPortHelper') }}</span>
-                    </el-form-item>
                 </div>
                 <DomainCreate v-model:form="website" @gengerate="websiteForm.clearValidate()"></DomainCreate>
                 <el-form-item prop="IPV6">
@@ -521,7 +451,7 @@
 
 <script lang="ts" setup name="CreateWebSite">
 import { App } from '@/api/interface/app';
-import { getAppByKey, getAppDetail, searchApp, getAppInstalled } from '@/api/modules/app';
+import { searchApp, getAppInstalled } from '@/api/modules/app';
 import {
     createWebsite,
     getWebsiteOptions,
@@ -534,7 +464,6 @@ import { Rules, checkNumberRange } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm, FormInstance } from 'element-plus';
 import { reactive, ref } from 'vue';
-import Params from '@/views/app-store/detail/params/index.vue';
 import Check from '../check/index.vue';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { getAgentGroupList } from '@/api/modules/group';
@@ -550,6 +479,7 @@ import { Website } from '@/api/interface/website';
 import DomainCreate from '@/views/website/website/domain-create/index.vue';
 import { getPathByType } from '@/api/modules/files';
 import { getWebsiteTypes } from '@/global/mimetype';
+import AppInstallForm from '@/views/app-store/detail/form/index.vue';
 
 const websiteForm = ref<FormInstance>();
 
@@ -646,10 +576,6 @@ const appReq = reactive({
     pageSize: 100,
 });
 const apps = ref<App.App[]>([]);
-const appVersions = ref<string[]>([]);
-const appDetail = ref<App.AppDetail>();
-const appParams = ref<App.AppParams>();
-const paramKey = ref(1);
 const preCheckRef = ref();
 const staticPath = ref('');
 const runtimeResource = ref('appstore');
@@ -671,6 +597,7 @@ const parentWebsites = ref();
 const dirs = ref([]);
 const runtimePorts = ref([]);
 const WebsiteTypes = getWebsiteTypes();
+const installFormRef = ref();
 
 const handleClose = () => {
     open.value = false;
@@ -747,7 +674,7 @@ const searchAppList = () => {
         if (res.data.items.length > 0) {
             website.value.appinstall.appId = res.data.items[0].id;
             website.value.appinstall.appkey = res.data.items[0].key;
-            getApp();
+            changeApp();
         }
     });
 };
@@ -756,27 +683,8 @@ const changeApp = () => {
     apps.value.forEach((app) => {
         if (app.id === website.value.appinstall.appId) {
             website.value.appinstall.appkey = app.key;
-            getApp();
+            installFormRef.value.initForm(app.key);
         }
-    });
-};
-
-const getApp = () => {
-    getAppByKey(website.value.appinstall.appkey).then((res) => {
-        appVersions.value = res.data.versions;
-        if (res.data.versions.length > 0) {
-            website.value.appinstall.version = res.data.versions[0];
-            getDetail(res.data.versions[0]);
-        }
-    });
-};
-
-const getDetail = (version: string) => {
-    getAppDetail(website.value.appinstall.appId, version, 'app').then((res) => {
-        website.value.appinstall.appDetailId = res.data.id;
-        appDetail.value = res.data;
-        appParams.value = res.data.params;
-        paramKey.value++;
     });
 };
 
@@ -892,6 +800,10 @@ const submit = async (formEl: FormInstance | undefined) => {
     await formEl.validate(async (valid) => {
         if (!valid) {
             return;
+        }
+        if (website.value.type == 'deployment' && website.value.appType === 'new') {
+            const isValid = await installFormRef.value?.validate();
+            if (!isValid) return;
         }
         if (website.value.type === 'runtime' && website.value.runtimeType !== 'php' && website.value.port == 0) {
             MsgError(i18n.global.t('website.runtimePortWarn'));
