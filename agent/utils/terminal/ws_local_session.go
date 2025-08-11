@@ -108,9 +108,7 @@ func (sws *LocalWsSession) receiveWsMsg(exitCh chan bool) {
 				if err != nil {
 					global.LOG.Errorf("websock cmd string base64 decoding failed, err: %v", err)
 				}
-				if string(decodeBytes) != "\x03" || sws.allowCtrlC {
-					sws.sendWebsocketInputCommandToSshSessionStdinPipe(decodeBytes)
-				}
+				sws.sendWebsocketInputCommandToSshSessionStdinPipe(decodeBytes)
 			case WsMsgHeartbeat:
 				err = wsConn.WriteMessage(websocket.TextMessage, wsData)
 				if err != nil {
