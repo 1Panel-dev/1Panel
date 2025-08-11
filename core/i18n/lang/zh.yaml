@@ -103,13 +103,20 @@ AnalyticCompletion: "解析成功，现在开始同步到数据库..."
 
 #sync node
 Node: "节点"
-SyncNode: "同步节点数据"
+SyncNode: "同步数据到节点 {{ .name }}"
 LocalName: "local 名称仅用于系统本机标识"
-SyncPackageData: "打包同步数据 [{{ .detail }}]"
+SyncPackageData: "打包同步数据"
 SyncPackageEncrypt: "数据包加密"
 SyncRequest: "请求节点同步接口"
 SyncFailedRetry: "第 {{ .index }} 次同步节点数据失败超时，正在重试..."
 SyncFailed: "同步失败，请在节点列表中手动同步！"
+SyncSystemProxy: "系统代理配置"
+SyncScripts: "脚本库"
+SyncBackupAccounts: "备份账号"
+SyncAlertSetting: "告警设置"
+SyncCustomApp: "自定义应用"
+SyncLanguage: "系统语言"
+
 
 #upgrade node
 NodeUpgrade: "升级节点 {{ .name }}"

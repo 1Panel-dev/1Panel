@@ -103,13 +103,19 @@ DownloadPackage: "スクリプトライブラリパッケージをダウンロ�
 AnalyticCompletion: "解析が完了しました、データベースに同期しています..."
 
 Node: "ノード"
-SyncNode: "ノードデータ同期"
+SyncNode: "データをノード {{ .name }} に同期"
 LocalName: "'local'名称はシステムのローカル識別のみに使用されます"
-SyncPackageData: "同期データのパッケージ化 [{{ .detail }}]"
+SyncPackageData: "同期データのパッケージ化"
 SyncPackageEncrypt: "データパッケージの暗号化"
 SyncRequest: "ノード同期APIをリクエスト"
 SyncFailedRetry: "ノードデータ同期タイムアウト ({{ .index }}回目)、再試行中..."
 SyncFailed: "同期に失敗しました、ノードリストで手動同期してください！"
+SyncSystemProxy: "システムプロキシ設定"
+SyncScripts: "スクリプトライブラリ"
+SyncBackupAccounts: "バックアップアカウント"
+SyncAlertSetting: "アラート設定"
+SyncCustomApp: "カスタムアプリ"
+SyncLanguage: "システム言語"
 
 #upgrade node
 NodeUpgrade: "{{ .name }} ノードのアップグレード"

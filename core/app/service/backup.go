@@ -120,11 +120,9 @@ func (u *BackupService) Create(req dto.BackupOperate) error {
 	if err := backupRepo.Create(&backup); err != nil {
 		return err
 	}
-	go func() {
-		if err := xpack.Sync(constant.SyncBackupAccounts); err != nil {
-			global.LOG.Errorf("sync backup account to node failed, err: %v", err)
-		}
-	}()
+	if err := xpack.Sync(constant.SyncBackupAccounts); err != nil {
+		global.LOG.Errorf("sync backup account to node failed, err: %v", err)
+	}
 	return nil
 }
 
@@ -179,12 +177,13 @@ func (u *BackupService) Delete(name string) error {
 		return buserr.New("ErrBackupInUsed")
 	}
 
-	go func() {
-		if err := xpack.Sync(constant.SyncBackupAccounts); err != nil {
-			global.LOG.Errorf("sync backup account to node failed, err: %v", err)
-		}
-	}()
-	return backupRepo.Delete(repo.WithByName(name))
+	if err := backupRepo.Delete(repo.WithByName(name)); err != nil {
+		return err
+	}
+	if err := xpack.Sync(constant.SyncBackupAccounts); err != nil {
+		global.LOG.Errorf("sync backup account to node failed, err: %v", err)
+	}
+	return nil
 }
 
 func (u *BackupService) Update(req dto.BackupOperate) error {
@@ -241,11 +240,9 @@ func (u *BackupService) Update(req dto.BackupOperate) error {
 	if err := backupRepo.Save(&newBackup); err != nil {
 		return err
 	}
-	go func() {
-		if err := xpack.Sync(constant.SyncBackupAccounts); err != nil {
-			global.LOG.Errorf("sync backup account to node failed, err: %v", err)
-		}
-	}()
+	if err := xpack.Sync(constant.SyncBackupAccounts); err != nil {
+		global.LOG.Errorf("sync backup account to node failed, err: %v", err)
+	}
 	return nil
 }
 
@@ -285,11 +282,9 @@ func (u *BackupService) RefreshToken(req dto.OperateByName) error {
 	if err := backupRepo.Save(&backup); err != nil {
 		return err
 	}
-	go func() {
-		if err := xpack.Sync(constant.SyncBackupAccounts); err != nil {
-			global.LOG.Errorf("sync backup account to node failed, err: %v", err)
-		}
-	}()
+	if err := xpack.Sync(constant.SyncBackupAccounts); err != nil {
+		global.LOG.Errorf("sync backup account to node failed, err: %v", err)
+	}
 	return nil
 }
 

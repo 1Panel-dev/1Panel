@@ -103,13 +103,19 @@ AnalyticCompletion: "解析成功，現在開始同步到資料庫..."
 
 #sync node
 Node: "節點"
-SyncNode: "同步節點資料"
+SyncNode: "同步數據到節點 {{ .name }}"
 LocalName: "'local' 名稱僅用於系統本機標識"
-SyncPackageData: "打包同步資料 [{{ .detail }}]"
+SyncPackageData: "打包同步資料"
 SyncPackageEncrypt: "封包加密"
 SyncRequest: "請求節點同步介面"
 SyncFailedRetry: "第 {{ .index }} 次同步節點資料失敗逾時，正在重試..."
 SyncFailed: "同步失敗，請在節點列表中手動同步！"
+SyncSystemProxy: "系統代理配置"
+SyncScripts: "腳本庫"
+SyncBackupAccounts: "備份帳號"
+SyncAlertSetting: "告警設置"
+SyncCustomApp: "自定義應用"
+SyncLanguage: "系統語言"
 
 #upgrade node
 NodeUpgrade: "升級節點 {{ .name }}"

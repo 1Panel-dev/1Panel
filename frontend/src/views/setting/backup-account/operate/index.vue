@@ -703,7 +703,6 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
                 .then(() => {
                     loading.value = false;
                     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                    emit('search');
                     drawerVisible.value = false;
                 })
                 .catch(() => {
@@ -715,7 +714,6 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
             .then(() => {
                 loading.value = false;
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                emit('search');
                 drawerVisible.value = false;
             })
             .catch(() => {
