@@ -21,7 +21,7 @@ import (
 	"github.com/docker/docker/api/types/image"
 	"github.com/google/uuid"
 	"github.com/jinzhu/copier"
-	"github.com/shirou/gopsutil/v3/host"
+	"github.com/shirou/gopsutil/v4/host"
 )
 
 type SnapshotService struct {

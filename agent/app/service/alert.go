@@ -14,7 +14,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/copier"
 	"github.com/1Panel-dev/1Panel/agent/utils/email"
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
-	"github.com/shirou/gopsutil/v3/disk"
+	"github.com/shirou/gopsutil/v4/disk"
 	"sort"
 	"strings"
 	"sync"

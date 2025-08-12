@@ -2,7 +2,7 @@ package service
 
 import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
-	"github.com/shirou/gopsutil/v3/process"
+	"github.com/shirou/gopsutil/v4/process"
 )
 
 type ProcessService struct{}

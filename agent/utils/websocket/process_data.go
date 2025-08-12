@@ -11,9 +11,9 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
-	"github.com/shirou/gopsutil/v3/host"
-	"github.com/shirou/gopsutil/v3/net"
-	"github.com/shirou/gopsutil/v3/process"
+	"github.com/shirou/gopsutil/v4/host"
+	"github.com/shirou/gopsutil/v4/net"
+	"github.com/shirou/gopsutil/v4/process"
 )
 
 type WsInput struct {
@@ -287,6 +287,7 @@ func getSSHSessions(config SSHSessionConfig) (res []byte, err error) {
 	}
 	users, err = host.Users()
 	if err != nil {
+		res, err = json.Marshal(result)
 		return
 	}
 	for _, proc := range processes {
