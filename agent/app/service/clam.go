@@ -3,7 +3,6 @@ package service
 import (
 	"bufio"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/utils/alert_push"
 	"os"
 	"os/exec"
 	"path"
@@ -12,13 +11,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/1Panel-dev/1Panel/agent/app/repo"
-
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/utils/alert_push"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/systemctl"
@@ -345,7 +344,7 @@ func (c *ClamService) HandleOnce(req dto.OperateByID) error {
 			}
 		}
 		global.LOG.Debugf("clamdscan --fdpass %s %s -l %s", strategy, clam.Path, logFile)
-		stdout, err := cmd.RunDefaultWithStdoutBashCf("clamdscan --fdpass %s %s -l %s", strategy, clam.Path, logFile)
+		stdout, err := cmd.NewCommandMgr(cmd.WithIgnoreExist1(), cmd.WithTimeout(30*time.Minute)).RunWithStdoutBashCf("clamdscan --fdpass %s %s -l %s", strategy, clam.Path, logFile)
 		if err != nil {
 			global.LOG.Errorf("clamdscan failed, stdout: %v, err: %v", stdout, err)
 		}
