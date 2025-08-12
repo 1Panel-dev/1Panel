@@ -2465,7 +2465,8 @@ const message = {
             'IP alan adlarına sahip web sitelerinin normal şekilde erişilebilmesi için varsayılan site olarak ayarlanması gerekir.',
         hstsHelper: 'HSTS’nin etkinleştirilmesi web sitesi güvenliğini artırabilir',
         includeSubDomains: 'Alt Alan Adları',
-        hstsIncludeSubDomainsHelper: 'Etkinleştirildiğinde, HSTS politikası geçerli etki alanının tüm alt alan adlarına uygulanacaktır.',
+        hstsIncludeSubDomainsHelper:
+            'Etkinleştirildiğinde, HSTS politikası geçerli etki alanının tüm alt alan adlarına uygulanacaktır.',
         defaultHtml: 'Varsayılan sayfayı ayarla',
         website404: 'Web sitesi 404 hata sayfası',
         domain404: 'Web sitesi sayfası mevcut değil',

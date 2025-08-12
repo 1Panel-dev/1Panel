@@ -2406,7 +2406,8 @@ const message = {
             'Laman web dengan IP sebagai nama domain perlu disetkan sebagai laman web lalai untuk diakses secara normal.',
         hstsHelper: 'Mengaktifkan HSTS boleh meningkatkan keselamatan laman web',
         includeSubDomains: 'SubDomains',
-        hstsIncludeSubDomainsHelper: 'Apabila diaktifkan, dasar HSTS akan digunakan pada semua subdomain bagi domain semasa.',
+        hstsIncludeSubDomainsHelper:
+            'Apabila diaktifkan, dasar HSTS akan digunakan pada semua subdomain bagi domain semasa.',
         defaultHtml: 'Halaman lalai',
         website404: 'Halaman ralat 404 laman web',
         domain404: 'Domain laman web tidak wujud',

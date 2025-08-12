@@ -2406,7 +2406,8 @@ const message = {
             'Sites com IP como nomes de domínio precisam ser configurados como site padrão para serem acessados normalmente',
         hstsHelper: 'Ativar HSTS pode aumentar a segurança do site',
         includeSubDomains: 'SubDomains',
-        hstsIncludeSubDomainsHelper: 'Quando ativado, a política HSTS será aplicada a todos os subdomínios do domínio atual.',
+        hstsIncludeSubDomainsHelper:
+            'Quando ativado, a política HSTS será aplicada a todos os subdomínios do domínio atual.',
         defaultHtml: 'Página padrão',
         website404: 'Página de erro 404 do site',
         domain404: 'O domínio do site não existe',

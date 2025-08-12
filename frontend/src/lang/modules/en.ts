@@ -2436,7 +2436,8 @@ const message = {
         ipWebsiteWarn: 'Websites with IP as domain names need to be set as default site to be accessed normally.',
         hstsHelper: 'Enabling HSTS can increase website security',
         includeSubDomains: 'SubDomains',
-        hstsIncludeSubDomainsHelper: 'Once enabled, the HSTS policy will apply to all subdomains of the current domain.',
+        hstsIncludeSubDomainsHelper:
+            'Once enabled, the HSTS policy will apply to all subdomains of the current domain.',
         defaultHtml: 'Set default page',
         website404: 'Website 404 error page',
         domain404: 'Website page does not exist',
