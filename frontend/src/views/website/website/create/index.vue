@@ -536,7 +536,7 @@ const initData = () => ({
 const website = ref(initData());
 const rules = ref<any>({
     primaryDomain: [Rules.domainWithPort],
-    alias: [Rules.appName],
+    alias: [Rules.alias],
     type: [Rules.requiredInput],
     webSiteGroupId: [Rules.requiredSelectBusiness],
     appInstallId: [Rules.requiredSelectBusiness],

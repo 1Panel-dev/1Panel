@@ -261,6 +261,7 @@ const message = {
             authBasicPassword: 'Menyokong huruf, nombor, dan aksara khas biasa, panjang 1-72',
             length128Err: 'Panjang tidak boleh melebihi 128 aksara',
             maxLength: 'Panjang tidak boleh melebihi {0} aksara',
+            alias: 'Menyokong Bahasa Inggeris, nombor, - dan _, panjang 1-30, dan tidak boleh bermula atau berakhir dengan -_.',
         },
         res: {
             paramError: 'Permintaan gagal, sila cuba lagi nanti!',
