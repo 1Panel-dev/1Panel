@@ -1,5 +1,11 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('commons.button.upload')" @close="handleClose" size="normal">
+    <DrawerPro
+        v-model="open"
+        :header="$t('commons.button.upload')"
+        @before-close="handleClose"
+        size="normal"
+        :confirmBeforeClose="true"
+    >
         <template #content>
             <div class="button-container">
                 <div>
@@ -46,7 +52,7 @@
                 <template #tip>
                     <el-text>{{ uploadHelper }}</el-text>
                     <el-progress
-                        v-if="loading"
+                        v-if="upLoading"
                         text-inside
                         :stroke-width="20"
                         :percentage="uploadPercent"
@@ -84,8 +90,8 @@
 
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="submit()" :disabled="loading || uploaderFiles.length == 0">
+                <el-button @click="handleClose" :disabled="upLoading">{{ $t('commons.button.cancel') }}</el-button>
+                <el-button type="primary" @click="submit()" :disabled="upLoading || uploaderFiles.length == 0">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -115,10 +121,32 @@ const open = ref(false);
 const path = ref();
 let uploadHelper = ref('');
 const dialogExistFileRef = ref();
+const upLoading = ref(false);
+const abortController = ref<AbortController | null>(null);
 
 const em = defineEmits(['close']);
-const handleClose = () => {
+const handleClose = (done) => {
+    if (upLoading.value) {
+        ElMessageBox.confirm(i18n.global.t('file.cancelUploadHelper'), i18n.global.t('file.cancelUpload'), {
+            confirmButtonText: i18n.global.t('commons.button.confirm'),
+            cancelButtonText: i18n.global.t('commons.button.cancel'),
+            type: 'info',
+        })
+            .then(() => {
+                abortController.value.abort();
+                abortController.value = null;
+                closePage();
+                done();
+            })
+            .catch(() => {});
+    } else {
+        closePage();
+        done();
+    }
+};
+const closePage = () => {
     open.value = false;
+    upLoading.value = false;
     clearFiles();
     em('close', false);
 };
@@ -308,10 +336,16 @@ const uploadFile = async (files: any[]) => {
         clearFiles();
     } else {
         loading.value = true;
+        upLoading.value = true;
+        abortController.value = new AbortController();
         let successCount = 0;
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
             uploadHelper.value = i18n.global.t('file.fileUploadStart', [file.name]);
+
+            if (abortController.value.signal.aborted) {
+                break;
+            }
 
             let isSuccess =
                 file.size <= MAX_SINGLE_FILE_SIZE ? await uploadSingleFile(file) : await uploadLargeFile(file);
@@ -325,9 +359,10 @@ const uploadFile = async (files: any[]) => {
         }
 
         loading.value = false;
+        upLoading.value = false;
         uploadHelper.value = '';
 
-        if (successCount === files.length) {
+        if (successCount === files.length && !abortController.value.signal.aborted) {
             clearFiles();
             MsgSuccess(i18n.global.t('file.uploadSuccess'));
         }
@@ -345,6 +380,7 @@ const uploadSingleFile = async (file: { raw: string | Blob }) => {
             uploadPercent.value = Math.round((progressEvent.loaded / progressEvent.total) * 100);
         },
         timeout: 40000,
+        signal: abortController.value?.signal,
     });
     return true;
 };
@@ -354,6 +390,9 @@ const uploadLargeFile = async (file: { size: any; raw: string | Blob; name: stri
     const chunkCount = Math.ceil(fileSize / CHUNK_SIZE);
     let uploadedChunkCount = 0;
     for (let c = 0; c < chunkCount; c++) {
+        if (abortController.value?.signal.aborted) {
+            return false;
+        }
         const start = c * CHUNK_SIZE;
         const end = Math.min(start + CHUNK_SIZE, fileSize);
         const chunk = file.raw.slice(start, end);
@@ -372,9 +411,13 @@ const uploadLargeFile = async (file: { size: any; raw: string | Blob; name: stri
                     );
                 },
                 timeout: TimeoutEnum.T_60S,
+                signal: abortController.value?.signal,
             });
             uploadedChunkCount++;
         } catch (error) {
+            if (abortController.value?.signal.aborted) {
+                return false;
+            }
             return false;
         }
     }

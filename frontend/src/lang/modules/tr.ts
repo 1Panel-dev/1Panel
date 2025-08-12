@@ -1517,6 +1517,8 @@ const message = {
         setting: 'Ayar',
         showHide: 'Gizli dosyaları göster',
         noShowHide: 'Gizli dosyaları gösterme',
+        cancelUpload: 'Yüklemeyi İptal Et',
+        cancelUploadHelper: 'Yüklemeyi iptal etmek ister misiniz, iptal sonrası yükleme listesi temizlenecektir.',
     },
     ssh: {
         autoStart: 'Otomatik başlat',

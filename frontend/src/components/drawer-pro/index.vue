@@ -3,6 +3,7 @@
         v-model="localOpenPage"
         @close="handleClose"
         :destroy-on-close="true"
+        :before-close="beforeClose"
         :size="size"
         :close-on-press-escape="autoClose"
         :close-on-click-modal="autoClose"
@@ -78,10 +79,14 @@ const props = defineProps({
         type: Boolean,
         default: true,
     },
+    confirmBeforeClose: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const slots = useSlots();
-const emit = defineEmits(['update:modelValue', 'close']);
+const emit = defineEmits(['update:modelValue', 'close', 'beforeClose']);
 
 const size = computed(() => {
     switch (props.size) {
@@ -112,10 +117,25 @@ const localOpenPage = computed({
 });
 
 const handleBack = () => {
-    if (props.back) {
-        props.back();
+    if (props.confirmBeforeClose) {
+        const done = () => {
+            if (props.back) {
+                props.back();
+            } else {
+                localOpenPage.value = false;
+                globalStore.isFullScreen = false;
+                emit('close');
+            }
+        };
+        emit('beforeClose', done);
     } else {
-        handleClose();
+        if (props.back) {
+            props.back();
+        } else {
+            localOpenPage.value = false;
+            globalStore.isFullScreen = false;
+            emit('close');
+        }
     }
 };
 
@@ -123,6 +143,10 @@ const handleClose = () => {
     localOpenPage.value = false;
     globalStore.isFullScreen = false;
     emit('close');
+};
+
+const beforeClose = (done: () => void) => {
+    emit('beforeClose', done);
 };
 
 function toggleFullscreen() {

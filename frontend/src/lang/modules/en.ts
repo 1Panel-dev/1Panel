@@ -1500,6 +1500,8 @@ const message = {
         setting: 'Setting',
         showHide: 'Show hidden files',
         noShowHide: 'Don’t show hidden files',
+        cancelUpload: 'Cancel Upload',
+        cancelUploadHelper: 'Whether to cancel the upload, after cancellation the upload list will be cleared.',
     },
     ssh: {
         autoStart: 'Auto start',

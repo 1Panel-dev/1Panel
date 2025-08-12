@@ -1474,6 +1474,8 @@ const message = {
         setting: 'configuração',
         showHide: 'Mostrar arquivos ocultos',
         noShowHide: 'Não mostrar arquivos ocultos',
+        cancelUpload: 'Cancelar Upload',
+        cancelUploadHelper: 'Deseja cancelar o upload, após o cancelamento, a lista de upload será limpa.',
     },
     ssh: {
         autoStart: 'Início automático',

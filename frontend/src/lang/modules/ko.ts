@@ -1429,6 +1429,8 @@ const message = {
         setting: '설정',
         showHide: '숨김 파일 표시',
         noShowHide: '숨김 파일 숨기기',
+        cancelUpload: '업로드 취소',
+        cancelUploadHelper: '업로드를 취소할지 여부, 취소 후 업로드 목록이 비워집니다.',
     },
     ssh: {
         autoStart: '자동 시작',

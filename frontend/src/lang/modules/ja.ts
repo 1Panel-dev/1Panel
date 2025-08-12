@@ -1444,6 +1444,8 @@ const message = {
         setting: '設定',
         showHide: '隠しファイルを表示',
         noShowHide: '隠しファイルを表示しない',
+        cancelUpload: 'アップロードをキャンセル',
+        cancelUploadHelper: 'アップロードをキャンセルするかどうか、キャンセル後、アップロードリストはクリアされます。',
     },
     ssh: {
         autoStart: 'オートスタート',

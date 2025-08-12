@@ -1425,6 +1425,8 @@ const message = {
         setting: '设置',
         showHide: '显示隐藏文件',
         noShowHide: '不显示隐藏文件',
+        cancelUpload: '取消上传',
+        cancelUploadHelper: '是否取消上传，取消后将清空上传列表',
     },
     ssh: {
         autoStart: '开机自启',

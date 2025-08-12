@@ -1430,6 +1430,8 @@ const message = {
         setting: '设置',
         showHide: '顯示隱藏檔案',
         noShowHide: '不顯示隱藏檔案',
+        cancelUpload: '取消上傳',
+        cancelUploadHelper: '是否取消上傳，取消後將清空上傳列表',
     },
     ssh: {
         autoStart: '開機自啟',

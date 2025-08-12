@@ -1486,6 +1486,9 @@ const message = {
         setting: 'tetapan',
         showHide: 'Tunjukkan fail tersembunyi',
         noShowHide: 'Jangan tunjukkan fail tersembunyi',
+        cancelUpload: 'Batalkan Muat Naik',
+        cancelUploadHelper:
+            'Adakah hendak membatalkan muat naik, selepas pembatalan senarai muat naik akan dikosongkan.',
     },
     ssh: {
         autoStart: 'Mula automatik',
