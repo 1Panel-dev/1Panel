@@ -13,6 +13,7 @@
                 ref="tableRef"
                 @selection-change="handleSelectionChange"
                 :max-height="tableHeight"
+                @row-contextmenu="handleRightClick"
             >
                 <slot></slot>
                 <template #empty>
@@ -44,6 +45,26 @@
                 />
             </slot>
         </div>
+
+        <div
+            v-if="rightClick.visible"
+            class="custom-context-menu"
+            :style="{
+                left: rightClick.left + 'px',
+                top: rightClick.top + 'px',
+            }"
+        >
+            <el-button
+                class="no-border-button"
+                v-for="(btn, i) in rightButtons"
+                :disabled="disabled(btn)"
+                @click="rightButtonClick(btn)"
+                :key="i"
+                :command="btn"
+            >
+                {{ btn.label }}
+            </el-button>
+        </div>
     </div>
 </template>
 <script setup lang="ts">
@@ -52,6 +73,13 @@ import { GlobalStore } from '@/store';
 const slots = useSlots();
 
 defineOptions({ name: 'ComplexTable' });
+export interface DropdownProps {
+    disabled?: any;
+    command?: string | number | object;
+    label?: string | number;
+    [k: string]: any;
+}
+
 const props = defineProps({
     header: String,
     paginationConfig: {
@@ -66,6 +94,9 @@ const props = defineProps({
         type: Number,
         default: 0,
     },
+    rightButtons: {
+        type: Array as PropType<DropdownProps[]>,
+    },
 });
 const emit = defineEmits(['search', 'update:selects', 'update:paginationConfig']);
 const globalStore = GlobalStore();
@@ -74,6 +105,38 @@ const mobile = computed(() => {
 });
 const tableRef = ref();
 const tableHeight = ref(0);
+
+const rightClick = ref({
+    visible: false,
+    left: 0,
+    top: 0,
+    currentRow: null,
+});
+const handleRightClick = (row, column, event) => {
+    if (!props.rightButtons) {
+        return;
+    }
+    event.preventDefault();
+    rightClick.value = {
+        visible: true,
+        left: event.clientX + 5,
+        top: event.clientY,
+        currentRow: row,
+    };
+    document.addEventListener('click', closeRightClick);
+};
+const closeRightClick = () => {
+    rightClick.value.visible = false;
+    document.removeEventListener('click', closeRightClick);
+};
+const disabled = computed(() => {
+    return function (btn: any) {
+        return typeof btn.disabled === 'function' ? btn.disabled(rightClick.value.currentRow) : btn.disabled;
+    };
+});
+function rightButtonClick(btn: any) {
+    btn.click(rightClick.value.currentRow);
+}
 
 function currentChange() {
     emit('search');
@@ -159,5 +222,21 @@ onMounted(() => {
         margin-top: 20px;
         @include flex-row(flex-end);
     }
+}
+.custom-context-menu {
+    position: fixed;
+    z-index: 9999;
+    border: 1px solid #dcdfe6;
+    border-radius: 4px;
+    padding: 0;
+    width: 80px;
+}
+
+.no-border-button {
+    border: 0;
+    border-radius: 4;
+    margin: 0 !important;
+    width: 100%;
+    text-align: left;
 }
 </style>
