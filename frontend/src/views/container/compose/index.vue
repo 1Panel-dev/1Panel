@@ -61,19 +61,27 @@
                             <el-text class="mx-1" v-if="row.containerCount == 0" type="danger">
                                 {{ $t('container.exited') }}
                             </el-text>
-                            <el-text
-                                v-else
-                                class="mx-1"
-                                :type="row.containerCount === row.runningCount ? 'success' : 'warning'"
-                            >
-                                {{ $t('container.running', [row.runningCount, row.containerCount]) }}
-                            </el-text>
+                            <el-popover width="300px" v-else>
+                                <template #reference>
+                                    <el-text
+                                        class="cursor-pointer"
+                                        size="small"
+                                        :type="row.containerCount === row.runningCount ? 'success' : 'warning'"
+                                    >
+                                        {{ $t('container.running', [row.runningCount, row.containerCount]) }}
+                                    </el-text>
+                                </template>
+                                <div v-for="(item, index) in row.containers" :key="index" class="mt-2">
+                                    <span>{{ item.name }}</span>
+                                    <Status class="float-right" :key="item.state" :status="item.state" />
+                                </div>
+                            </el-popover>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.createdAt')" prop="createdAt" min-width="80" fix />
                     <fu-table-operations
-                        width="300px"
-                        :ellipsis="10"
+                        width="200px"
+                        :ellipsis="2"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
                         fix
@@ -82,6 +90,7 @@
             </template>
         </LayoutContent>
 
+        <ComposeLogs ref="composeLogRef" />
         <EditDialog ref="dialogEditRef" @search="search" />
         <CreateDialog @search="search" ref="dialogRef" />
         <DeleteDialog @search="search" ref="dialogDelRef" />
@@ -93,12 +102,13 @@ import { reactive, ref } from 'vue';
 import EditDialog from '@/views/container/compose/edit/index.vue';
 import CreateDialog from '@/views/container/compose/create/index.vue';
 import DeleteDialog from '@/views/container/compose/delete/index.vue';
+import ComposeLogs from '@/components/log/compose/index.vue';
 import { composeOperator, inspect, searchCompose } from '@/api/modules/container';
 import DockerStatus from '@/views/container/docker-status/index.vue';
 import i18n from '@/lang';
 import { Container } from '@/api/interface/container';
 import { routerToFileWithPath, routerToNameWithQuery } from '@/utils/router';
-import { MsgInfo, MsgSuccess } from '@/utils/message';
+import { MsgSuccess } from '@/utils/message';
 
 const data = ref();
 const selects = ref<any>([]);
@@ -111,6 +121,8 @@ const paginationConfig = reactive({
     total: 0,
 });
 const searchName = ref();
+
+const composeLogRef = ref();
 
 const isActive = ref(false);
 const isExist = ref(false);
@@ -141,7 +153,7 @@ const search = async () => {
 };
 
 const loadDetail = async (row: Container.ComposeInfo) => {
-    routerToNameWithQuery('ComposeDetail', { name: row.name });
+    routerToNameWithQuery('ContainerItem', { filters: 'com.docker.compose.project=' + row.name });
 };
 
 const dialogRef = ref();
@@ -172,10 +184,6 @@ const onEdit = async (row: Container.ComposeInfo) => {
 };
 
 const onComposeOperate = async (operation: string, row: any) => {
-    if (row.createdBy !== '1Panel' && row.createdBy !== 'App') {
-        MsgInfo(i18n.global.t('container.composeDetailHelper'));
-        return;
-    }
     let mes =
         operation === 'down'
             ? i18n.global.t('container.composeDownHelper', [row.name])
@@ -207,6 +215,14 @@ const onComposeOperate = async (operation: string, row: any) => {
     });
 };
 
+const openLog = (row: any) => {
+    composeLogRef.value.acceptParams({
+        compose: row.path,
+        resource: row.name,
+        container: row.container,
+    });
+};
+
 const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
@@ -215,6 +231,12 @@ const buttons = [
         },
         disabled: (row: any) => {
             return row.createdBy === 'Local';
+        },
+    },
+    {
+        label: i18n.global.t('commons.button.log'),
+        click: (row: Container.ComposeInfo) => {
+            openLog(row);
         },
     },
     {

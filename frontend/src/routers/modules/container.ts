@@ -57,18 +57,6 @@ const containerRouter = {
                     },
                 },
                 {
-                    path: 'compose/detail',
-                    name: 'ComposeDetail',
-                    component: () => import('@/views/container/compose/detail/index.vue'),
-                    props: true,
-                    hidden: true,
-                    meta: {
-                        activeMenu: '/containers',
-                        requiresAuth: false,
-                        ignoreTab: true,
-                    },
-                },
-                {
                     path: 'image',
                     name: 'Image',
                     component: () => import('@/views/container/image/index.vue'),

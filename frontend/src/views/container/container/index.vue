@@ -376,6 +376,7 @@ import i18n from '@/lang';
 import { MsgWarning } from '@/utils/message';
 import { GlobalStore } from '@/store';
 import { routerToName, routerToNameWithQuery } from '@/utils/router';
+import router from '@/routers';
 const globalStore = GlobalStore();
 
 const mobile = computed(() => {
@@ -441,7 +442,7 @@ const search = async (column?: any) => {
         return;
     }
     localStorage.setItem('includeAppStore', includeAppStore.value ? 'true' : 'false');
-    let filterItem = props.filters ? props.filters : '';
+    let filterItem = (router.currentRoute.value.query?.filters as string) || '';
     paginationConfig.orderBy = column?.order ? column.prop : paginationConfig.orderBy;
     paginationConfig.order = column?.order ? column.order : paginationConfig.order;
     let params = {

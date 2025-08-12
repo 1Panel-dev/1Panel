@@ -29,6 +29,8 @@
             </template>
             <template #rightToolBar>
                 <TableSearch @search="search()" v-model:searchName="searchName" />
+                <TableRefresh @search="search()" />
+                <TableSetting title="clam-refresh" @search="search()" />
             </template>
             <el-card v-if="clamStatus.isExist && !clamStatus.isRunning && maskShow" class="mask-prompt">
                 <span>{{ $t('toolbox.clam.notStart') }}</span>
