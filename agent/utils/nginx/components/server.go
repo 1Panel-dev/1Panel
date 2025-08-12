@@ -332,6 +332,34 @@ func (s *Server) UpdateRootProxy(proxy []string) {
 
 	block.AppendDirectives(
 		&Directive{
+			Name:       "proxy_set_header",
+			Parameters: []string{"Host", "$host"},
+		},
+		&Directive{
+			Name:       "proxy_set_header",
+			Parameters: []string{"X-Forwarded-For", "$proxy_add_x_forwarded_for"},
+		},
+		&Directive{
+			Name:       "proxy_set_header",
+			Parameters: []string{"X-Forwarded-Host", "$server_name"},
+		},
+		&Directive{
+			Name:       "proxy_set_header",
+			Parameters: []string{"X-Real-IP", "$remote_addr"},
+		},
+		&Directive{
+			Name:       "proxy_set_header",
+			Parameters: []string{"Connection", "upgrade"},
+		},
+		&Directive{
+			Name:       "proxy_set_header",
+			Parameters: []string{"Upgrade", "$http_upgrade"},
+		},
+		&Directive{
+			Name:       "proxy_http_version",
+			Parameters: []string{"1.1"},
+		},
+		&Directive{
 			Name:       "proxy_pass",
 			Parameters: proxy,
 		},
