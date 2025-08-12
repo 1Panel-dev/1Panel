@@ -2349,6 +2349,8 @@ const message = {
         ipWebsiteWarn:
             'ドメイン名としてIPを持つWebサイトは、正常にアクセスするデフォルトサイトとして設定する必要があります。',
         hstsHelper: 'HSTを有効にすると、Webサイトのセキュリティが向上する可能性があります',
+        includeSubDomains: 'サブドメイン',
+        hstsIncludeSubDomainsHelper: '有効化すると、HSTSポリシーが現在のドメインのすべてのサブドメインに適用されます。',
         defaultHtml: 'デフォルトページ',
         website404: 'ウェブサイト404エラーページ',
         domain404: 'ウェブサイトドメインは存在しません',

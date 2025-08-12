@@ -26932,6 +26932,9 @@ const docTemplate = `{
 				"hsts": {
 					"type": "boolean"
 				},
+				"hstsIncludeSubDomains": {
+        			"type": "boolean"
+    			},
 				"http3": {
 					"type": "boolean"
 				},
@@ -28911,6 +28914,9 @@ const docTemplate = `{
 				"hsts": {
 					"type": "boolean"
 				},
+				"hstsIncludeSubDomains": {
+        			"type": "boolean"
+    			},
 				"http3": {
 					"type": "boolean"
 				},

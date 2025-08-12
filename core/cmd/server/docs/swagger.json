@@ -26928,6 +26928,9 @@
 				"hsts": {
 					"type": "boolean"
 				},
+				"hstsIncludeSubDomains": {
+        			"type": "boolean"
+    			},
 				"http3": {
 					"type": "boolean"
 				},
@@ -28907,6 +28910,9 @@
 				"hsts": {
 					"type": "boolean"
 				},
+				"hstsIncludeSubDomains": {
+        			"type": "boolean"
+    			},
 				"http3": {
 					"type": "boolean"
 				},

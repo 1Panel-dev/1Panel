@@ -318,6 +318,7 @@ export namespace Website {
         SSLProtocol: string[];
         algorithm: string;
         hsts: boolean;
+        hstsIncludeSubDomains: boolean;
         httpsPort?: string;
         http3: boolean;
     }

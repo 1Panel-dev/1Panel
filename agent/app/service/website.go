@@ -474,6 +474,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 				SSLProtocol:  []string{"TLSv1.3", "TLSv1.2"},
 				Algorithm:    "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256:!aNULL:!eNULL:!EXPORT:!DSS:!DES:!RC4:!3DES:!MD5:!PSK:!KRB5:!SRP:!CAMELLIA:!SEED",
 				Hsts:         true,
+				HstsIncludeSubDomains:         true,
 			}
 			if err = applySSL(website, *websiteModel, appSSLReq); err != nil {
 				return err
@@ -959,6 +960,13 @@ func (w WebsiteService) GetWebsiteHTTPS(websiteId uint) (response.WebsiteHTTPS, 
 		if p.Name == "add_header" && len(p.Params) > 0 {
 			if p.Params[0] == "Strict-Transport-Security" {
 				res.Hsts = true
+				//增加HSTS下子域名检查逻辑
+				if len(p.Params) > 1 {
+					hstsValue := p.Params[1]
+					if strings.Contains(hstsValue, "includeSubDomains") {
+						res.HstsIncludeSubDomains = true
+					}
+				}
 			}
 			if p.Params[0] == "Alt-Svc" {
 				res.Http3 = true
@@ -977,12 +985,13 @@ func (w WebsiteService) OpWebsiteHTTPS(ctx context.Context, req request.WebsiteH
 		res        response.WebsiteHTTPS
 		websiteSSL model.WebsiteSSL
 	)
-	if err = ChangeHSTSConfig(req.Hsts, req.Http3, website); err != nil {
+	if err = ChangeHSTSConfig(req.Hsts, req.HstsIncludeSubDomains, req.Http3, website); err != nil {
 		return nil, err
 	}
 	res.Enable = req.Enable
 	res.SSLProtocol = req.SSLProtocol
 	res.Algorithm = req.Algorithm
+	res.HstsIncludeSubDomains = req.HstsIncludeSubDomains
 	if !req.Enable {
 		website.Protocol = constant.ProtocolHTTP
 		website.WebsiteSSLID = 0

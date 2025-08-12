@@ -2261,6 +2261,8 @@ const message = {
         websiteBackupWarn: '仅支持导入本机备份，导入其他机器备份可能会恢复失败',
         ipWebsiteWarn: 'IP 为域名的网站，需要设置为默认站点才能正常访问',
         hstsHelper: '开启 HSTS 可以增加网站安全性',
+        includeSubDomains: '子域',
+        hstsIncludeSubDomainsHelper: '启用后，HSTS策略将应用于当前域名的所有子域名',
         defaultHtml: '默认页面',
         website404: '网站 404 错误页',
         domain404: '网站不存在页',

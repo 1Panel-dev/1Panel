@@ -2309,6 +2309,8 @@ const message = {
         ipWebsiteWarn:
             'IP를 도메인 이름으로 사용하는 웹사이트는 정상적으로 접속되기 위해 기본 사이트로 설정해야 합니다.',
         hstsHelper: 'HSTS 를 활성화하면 웹사이트 보안을 강화할 수 있습니다.',
+        includeSubDomains: '서브도메인',
+        hstsIncludeSubDomainsHelper: '활성화하면 HSTS 정책이 현재 도메인의 모든 서브도메인에 적용됩니다.',
         defaultHtml: '기본 페이지',
         website404: '웹사이트 404 오류 페이지',
         domain404: '웹사이트 도메인이 존재하지 않습니다.',

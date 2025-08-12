@@ -753,6 +753,7 @@ func applySSL(website *model.Website, websiteSSL model.WebsiteSSL, req request.W
 
 	if !req.Hsts {
 		server.RemoveDirective("add_header", []string{"Strict-Transport-Security", "\"max-age=31536000\""})
+		server.RemoveDirective("add_header", []string{"Strict-Transport-Security", "\"max-age=31536000; includeSubDomains\""})
 	}
 	if !req.Http3 {
 		for port := range httpsPorts {
@@ -793,9 +794,15 @@ func applySSL(website *model.Website, websiteSSL model.WebsiteSSL, req request.W
 		}
 	}
 	if req.Hsts {
+		var hstsValue string
+		if req.HstsIncludeSubDomains {
+			hstsValue = "\"max-age=31536000; includeSubDomains\""
+		} else {
+			hstsValue = "\"max-age=31536000\""
+		}
 		nginxParams = append(nginxParams, dto.NginxParam{
 			Name:   "add_header",
-			Params: []string{"Strict-Transport-Security", "\"max-age=31536000\""},
+			Params: []string{"Strict-Transport-Security", hstsValue},
 		})
 	}
 	if req.Http3 {
@@ -1182,7 +1189,7 @@ func UpdateSSLConfig(websiteSSL model.WebsiteSSL) error {
 	return nil
 }
 
-func ChangeHSTSConfig(enable bool, http3Enable bool, website model.Website) error {
+func ChangeHSTSConfig(enable bool, includeSubDomains bool, http3Enable bool, website model.Website) error {
 	includeDir := GetSitePath(website, SiteProxyDir)
 	fileOp := files.NewFileOp()
 	if !fileOp.Stat(includeDir) {
@@ -1208,11 +1215,19 @@ func ChangeHSTSConfig(enable bool, http3Enable bool, website model.Website) erro
 				if !ok {
 					return nil
 				}
+				//前置移除HSTS配置
+				location.RemoveDirective("add_header", []string{"Strict-Transport-Security", "\"max-age=31536000\""})
+				location.RemoveDirective("add_header", []string{"Strict-Transport-Security", "\"max-age=31536000; includeSubDomains\""})
 				if enable {
-					location.UpdateDirective("add_header", []string{"Strict-Transport-Security", "\"max-age=31536000\""})
-				} else {
-					location.RemoveDirective("add_header", []string{"Strict-Transport-Security", "\"max-age=31536000\""})
+					var hstsValue string
+					if includeSubDomains {
+						hstsValue = "\"max-age=31536000; includeSubDomains\""
+					} else {
+						hstsValue = "\"max-age=31536000\""
+					}
+					location.UpdateDirective("add_header", []string{"Strict-Transport-Security", hstsValue})
 				}
+
 				if http3Enable {
 					location.UpdateDirective("add_header", []string{"Alt-Svc", "'h3=\":443\"; ma=2592000'"})
 				} else {

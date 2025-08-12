@@ -165,6 +165,7 @@ type WebsiteHTTPSOp struct {
 	SSLProtocol     []string `json:"SSLProtocol"`
 	Algorithm       string   `json:"algorithm"`
 	Hsts            bool     `json:"hsts"`
+	HstsIncludeSubDomains            bool     `json:"hstsIncludeSubDomains"`
 	HttpsPorts      []int    `json:"httpsPorts"`
 	Http3           bool     `json:"http3"`
 }

@@ -2272,6 +2272,8 @@ const message = {
         websiteBackupWarn: '僅支援導入本機備份，導入其他機器備份可能會恢復失敗',
         ipWebsiteWarn: 'IP 為網域名稱的網站，需要設定為預設網站才能正常存取',
         hstsHelper: '開啟 HSTS 可以增加網站安全性',
+        includeSubDomains: '子域',
+        hstsIncludeSubDomainsHelper: '啟用後，HSTS策略將應用於目前域名的所有子域名',
         defaultHtml: '預設頁面',
         website404: '網站 404 錯誤頁',
         domain404: '網站不存在頁面',

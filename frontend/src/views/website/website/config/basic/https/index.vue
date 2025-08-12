@@ -29,6 +29,18 @@
                         <el-checkbox v-model="form.hsts">{{ $t('commons.button.enable') }}</el-checkbox>
                         <span class="input-help">{{ $t('website.hstsHelper') }}</span>
                     </el-form-item>
+                    <el-form-item
+                        :label="'HSTS ' + $t('website.includeSubDomains')"
+                        prop="hstsIncludeSubDomains"
+                        v-if="form.hsts"
+                    >
+                        <el-checkbox v-model="form.hstsIncludeSubDomains">
+                            {{ $t('commons.button.enable') }}
+                        </el-checkbox>
+                        <span class="input-help">
+                            {{ $t('website.hstsIncludeSubDomainsHelper') }}
+                        </span>
+                    </el-form-item>
                     <el-form-item :label="'HTTP3'" prop="http3">
                         <el-checkbox v-model="form.http3">{{ $t('commons.button.enable') }}</el-checkbox>
                         <span class="input-help">{{ $t('website.http3Helper') }}</span>
@@ -205,6 +217,7 @@ const form = reactive({
     certificatePath: '',
     httpConfig: 'HTTPToHTTPS',
     hsts: true,
+    hstsIncludeSubDomains: false,
     algorithm:
         'ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256:!aNULL:!eNULL:!EXPORT:!DSS:!DES:!RC4:!3DES:!MD5:!PSK:!KRB5:!SRP:!CAMELLIA:!SEED',
     SSLProtocol: ['TLSv1.3', 'TLSv1.2'],
@@ -314,6 +327,7 @@ const get = () => {
                 form.acmeAccountID = data.SSL.acmeAccountId;
             }
             form.hsts = data.hsts;
+            form.hstsIncludeSubDomains = data.hstsIncludeSubDomains || false;
             form.http3 = data.http3;
             form.httpsPort = data.httpsPort;
         }
@@ -344,6 +358,8 @@ const changeEnable = (enable: boolean) => {
     if (enable) {
         listSSLs();
         form.hsts = true;
+    } else {
+        form.hstsIncludeSubDomains = false;
     }
     if (resData.value.enable && !enable) {
         ElMessageBox.confirm(i18n.global.t('website.disableHTTPSHelper'), i18n.global.t('website.disableHTTPS'), {
