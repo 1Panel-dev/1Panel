@@ -265,6 +265,7 @@ const message = {
             authBasicPassword: 'Supports letters, numbers, and common special characters, length 1-72',
             length128Err: 'Length cannot exceed 128 characters',
             maxLength: 'Length cannot exceed {0} characters',
+            alias: 'Supports English, numbers, - and _, length 1-30, and cannot start or end with -_.',
         },
         res: {
             paramError: 'The request failed, please try again later!',

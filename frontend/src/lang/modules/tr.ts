@@ -269,6 +269,7 @@ const message = {
             authBasicPassword: 'Harf, rakam ve yaygın özel karakterler destekler, uzunluk 1-72',
             length128Err: 'Uzunluk 128 karakteri geçemez',
             maxLength: 'Uzunluk {0} karakteri geçemez',
+            alias: 'İngilizce, rakamlar, - ve _ destekler, uzunluk 1-30, ve -_ ile başlayamaz veya bitiremez.',
         },
         res: {
             paramError: 'İstek başarısız, lütfen daha sonra tekrar deneyin!',

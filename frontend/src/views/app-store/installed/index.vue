@@ -154,18 +154,13 @@
                                                                 <el-tooltip
                                                                     v-if="mode !== 'upgrade'"
                                                                     effect="dark"
-                                                                    :content="$t('container.compose')"
+                                                                    :content="$t('menu.container')"
                                                                     placement="top"
                                                                 >
                                                                     <el-button
                                                                         type="primary"
                                                                         link
-                                                                        @click="
-                                                                            routerToNameWithQuery('ComposeDetail', {
-                                                                                name: installed.name,
-                                                                                uncached: 'true',
-                                                                            })
-                                                                        "
+                                                                        @click="toContainer(installed)"
                                                                     >
                                                                         <el-icon>
                                                                             <SvgIcon iconName="p-docker" />
@@ -708,6 +703,10 @@ const buttons = [
         },
     },
 ];
+
+const toContainer = async (row: App.AppInstalled) => {
+    routerToNameWithQuery('ContainerItem', { filters: 'com.docker.compose.project=' + row.name, uncached: true });
+};
 
 const openBackups = (key: string, name: string, status: string) => {
     let params = {

@@ -254,6 +254,7 @@ const message = {
             authBasicPassword: '支持字母、数字以及常见特殊字符，长度1-72',
             length128Err: '长度不能超过128位',
             maxLength: '长度不能超过 {0} 位',
+            alias: '支持英文、数字、-和_,长度1-30,并且不能以-_开头和结尾',
         },
         res: {
             paramError: '请求失败,请稍后重试!',
