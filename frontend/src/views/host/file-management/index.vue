@@ -1033,11 +1033,9 @@ const openDeCompress = (item: File.File) => {
         MsgWarning(i18n.global.t('file.canNotDeCompress'));
         return;
     }
-
+    fileDeCompress.mimeType = item.mimeType;
     if (CompressExtension[Mimetypes.get(item.mimeType)] != item.extension) {
         fileDeCompress.mimeType = MimetypeByExtensionObject[item.extension];
-    } else {
-        fileDeCompress.mimeType = item.mimeType;
     }
 
     fileDeCompress.name = item.name;
