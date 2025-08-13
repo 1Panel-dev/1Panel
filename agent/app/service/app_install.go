@@ -164,6 +164,11 @@ func (a *AppInstallService) CheckExist(req request.AppInstalledInfo) (*response.
 	res.HttpPort = appInstall.HttpPort
 	res.HttpsPort = appInstall.HttpsPort
 
+	if appInstall.App.Key == "openresty" {
+		websiteDir, _ := settingRepo.GetValueByKey("WEBSITE_DIR")
+		res.WebsiteDir = websiteDir
+	}
+
 	return res, nil
 }
 

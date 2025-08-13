@@ -19,21 +19,21 @@
                 ></AppStatus>
             </template>
             <template v-if="!openNginxConfig && nginxIsExist" #leftToolBar>
-                <el-button type="primary" @click="openCreate" :disabled="nginxStatus != 'Running'">
+                <el-button type="primary" @click="openCreate" :disabled="disabledConfig">
                     {{ $t('website.create') }}
                 </el-button>
-                <el-button type="primary" plain @click="openGroup" :disabled="nginxStatus != 'Running'">
+                <el-button type="primary" plain @click="openGroup" :disabled="disabledConfig">
                     {{ $t('commons.table.group') }}
                 </el-button>
-                <el-button type="primary" plain @click="openDefault" :disabled="nginxStatus != 'Running'">
+                <el-button type="primary" plain @click="openDefault" :disabled="disabledConfig">
                     {{ $t('website.defaultServer') }}
                 </el-button>
-                <el-button type="primary" plain @click="openDefaultHtml" :disabled="nginxStatus != 'Running'">
+                <el-button type="primary" plain @click="openDefaultHtml" :disabled="disabledConfig">
                     {{ $t('website.defaultHtml') }}
                 </el-button>
             </template>
             <template v-if="!openNginxConfig && nginxIsExist" #rightToolBar>
-                <el-select class="p-w-200" v-model="req.type" @change="search()" :disabled="nginxStatus != 'Running'">
+                <el-select class="p-w-200" v-model="req.type" @change="search()" :disabled="disabledConfig">
                     <template #prefix>{{ $t('commons.table.type') }}</template>
                     <el-option :label="$t('commons.table.all')" :value="''"></el-option>
                     <el-option
@@ -43,12 +43,7 @@
                         :key="item.value"
                     ></el-option>
                 </el-select>
-                <el-select
-                    v-model="req.websiteGroupId"
-                    @change="search()"
-                    class="p-w-200"
-                    :disabled="nginxStatus != 'Running'"
-                >
+                <el-select v-model="req.websiteGroupId" @change="search()" class="p-w-200" :disabled="disabledConfig">
                     <template #prefix>{{ $t('commons.table.group') }}</template>
                     <el-option :label="$t('commons.table.all')" :value="0"></el-option>
                     <div v-for="item in groups" :key="item.id">
@@ -60,8 +55,8 @@
                         <el-option v-else :label="item.name" :value="item.id" />
                     </div>
                 </el-select>
-                <TableSearch @search="search()" v-model:searchName="req.name" />
-                <TableRefresh @search="search()" />
+                <TableSearch @search="search()" v-model:searchName="req.name" :disabled="disabledConfig" />
+                <TableRefresh @search="search()" :disabled="disabledConfig" />
                 <fu-table-column-select
                     :columns="columns"
                     trigger="hover"
@@ -76,7 +71,7 @@
                     :data="data"
                     @sort-change="changeSort"
                     @search="search()"
-                    :class="{ mask: nginxStatus != 'Running' }"
+                    :class="{ mask: disabledConfig }"
                     :heightDiff="310"
                     :columns="columns"
                     @cell-mouse-enter="showFavorite"
@@ -270,8 +265,13 @@
                         fix
                     />
                 </ComplexTable>
-                <el-card width="30%" v-if="nginxStatus != 'Running' && maskShow" class="mask-prompt">
-                    <span v-if="nginxIsExist">{{ $t('commons.service.serviceNotStarted', ['OpenResty']) }}</span>
+                <el-card width="30%" v-if="disabledConfig && maskShow" class="mask-prompt">
+                    <span v-if="nginxIsExist">
+                        {{ $t('commons.service.serviceNotStarted', ['OpenResty']) }}
+                        <el-button type="primary" link @click="routerToFileWithPath(websiteDir)" icon="FolderOpened">
+                            {{ $t('website.toWebsiteDir') }}
+                        </el-button>
+                    </span>
                     <span v-else>
                         {{ $t('app.checkInstalledWarn', ['OpenResty']) }}
                         <el-button @click="goRouter('openresty')" link icon="Position" type="primary">
@@ -355,6 +355,7 @@ const dataRef = ref();
 const domains = ref<Website.Domain[]>([]);
 const columns = ref([]);
 const hoveredRowIndex = ref(-1);
+const websiteDir = ref();
 
 const paginationConfig = reactive({
     cacheSizeKey: 'website-page-size',
@@ -391,6 +392,10 @@ const favoriteWebsite = (row: Website.Website) => {
     row.favorite = !row.favorite;
     updateWebsitConfig(row);
 };
+
+const disabledConfig = computed(() => {
+    return nginxStatus.value != 'Running';
+});
 
 const changeSort = ({ prop, order }) => {
     if (order) {
@@ -585,6 +590,7 @@ const checkExist = (data: App.CheckInstalled) => {
     containerName.value = data.containerName;
     nginxStatus.value = data.status;
     installPath.value = data.installPath;
+    websiteDir.value = data.websiteDir;
 };
 
 const checkDate = (date: Date) => {

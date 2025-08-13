@@ -66,6 +66,7 @@ type AppInstalledCheck struct {
 	InstallPath   string    `json:"installPath"`
 	HttpPort      int       `json:"httpPort"`
 	HttpsPort     int       `json:"httpsPort"`
+	WebsiteDir    string    `json:"websiteDir"`
 }
 
 type AppDetailDTO struct {

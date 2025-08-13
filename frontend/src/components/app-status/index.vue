@@ -46,9 +46,7 @@
                         type="primary"
                         @click="setting"
                         link
-                        :disabled="
-                            data.status === 'Installing' || (data.status !== 'Running' && data.app === 'OpenResty')
-                        "
+                        :disabled="data.status === 'Installing'"
                     >
                         {{ $t('commons.button.set') }}
                     </el-button>

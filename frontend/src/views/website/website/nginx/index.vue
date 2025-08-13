@@ -12,7 +12,12 @@
             <el-button type="primary" :plain="activeName !== '2'" @click="changeTab('2')">
                 {{ $t('nginx.configResource') }}
             </el-button>
-            <el-button type="primary" :plain="activeName !== '3'" @click="changeTab('3')">
+            <el-button
+                type="primary"
+                :plain="activeName !== '3'"
+                @click="changeTab('3')"
+                :disabled="status != 'Running'"
+            >
                 {{ $t('website.nginxPer') }}
             </el-button>
             <el-button
@@ -26,7 +31,12 @@
             <el-button type="primary" :plain="activeName !== '5'" @click="changeTab('5')">
                 {{ $t('runtime.module') }}
             </el-button>
-            <el-button type="primary" :plain="activeName !== '6'" @click="changeTab('6')">
+            <el-button
+                type="primary"
+                :plain="activeName !== '6'"
+                @click="changeTab('6')"
+                :disabled="status != 'Running'"
+            >
                 {{ $t('website.other') }}
             </el-button>
         </template>

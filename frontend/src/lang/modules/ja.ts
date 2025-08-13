@@ -2437,6 +2437,7 @@ const message = {
         browserCacheTimeHelper:
             '静的リソースがブラウザのローカルにキャッシュされる時間、冗長なリクエストを減らします。有効期限前にユーザーがページをリフレッシュすると、ローカルキャッシュが直接使用されます。',
         donotLinkeDB: 'データベースをリンクしない',
+        toWebsiteDir: 'ウェブサイトディレクトリに入る',
     },
     php: {
         short_open_tag: '短いタグサポート',

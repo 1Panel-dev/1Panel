@@ -2341,6 +2341,7 @@ const message = {
         browserCacheTime: '浏览器缓存时间',
         browserCacheTimeHelper: '静态资源在浏览器本地缓存的时间，减少重复请求。到期前用户刷新页面会直接使用本地缓存。',
         donotLinkeDB: '不关联数据库',
+        toWebsiteDir: '进入网站目录',
     },
     php: {
         short_open_tag: '短标签支持',

@@ -2352,6 +2352,7 @@ const message = {
         browserCacheTime: '瀏覽器緩存時間',
         browserCacheTimeHelper: '靜態資源在瀏覽器本地緩存的時間，減少重複請求。到期前用戶刷新頁面會直接使用本地緩存。',
         donotLinkeDB: '不關聯數據庫',
+        toWebsiteDir: '進入網站目錄',
     },
     php: {
         short_open_tag: '短標簽支持',

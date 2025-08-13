@@ -202,6 +202,7 @@ export namespace App {
         installPath: string;
         httpPort: number;
         httpsPort: number;
+        websiteDir: string;
     }
 
     export interface DatabaseConnInfo {

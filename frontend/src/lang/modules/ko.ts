@@ -2395,6 +2395,7 @@ const message = {
         browserCacheTimeHelper:
             '정적 리소스가 브라우저 로컬에 캐시되는 시간, 중복 요청을 줄입니다. 유효기간 전에 사용자가 페이지를 새로 고치면 로컬 캐시가 직접 사용됩니다.',
         donotLinkeDB: '데이터베이스 연결하지 않기',
+        toWebsiteDir: '웹사이트 디렉토리로 이동',
     },
     php: {
         short_open_tag: '짧은 태그 지원',

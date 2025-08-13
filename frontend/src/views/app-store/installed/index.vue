@@ -107,11 +107,8 @@
                                                                         type="primary"
                                                                         link
                                                                         @click="routerToFileWithPath(installed.path)"
-                                                                    >
-                                                                        <el-icon>
-                                                                            <FolderOpened />
-                                                                        </el-icon>
-                                                                    </el-button>
+                                                                        icon="FolderOpened"
+                                                                    ></el-button>
                                                                 </el-tooltip>
                                                             </span>
                                                             <span class="ml-1">
