@@ -3,6 +3,9 @@ package router
 import (
 	"encoding/base64"
 	"fmt"
+	"net/http"
+	"path"
+
 	"github.com/1Panel-dev/1Panel/core/app/service"
 	"github.com/1Panel-dev/1Panel/core/cmd/server/docs"
 	"github.com/1Panel-dev/1Panel/core/cmd/server/web"
@@ -15,8 +18,6 @@ import (
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"net/http"
-	"path"
 )
 
 var (
@@ -61,6 +62,8 @@ func setWebStatic(rootRouter *gin.RouterGroup) {
 func Routers() *gin.Engine {
 	Router = gin.Default()
 	Router.Use(i18n.UseI18n())
+	Router.Use(middleware.WhiteAllow())
+	Router.Use(middleware.BindDomain())
 
 	swaggerRouter := Router.Group("1panel")
 	docs.SwaggerInfo.BasePath = "/api/v2"
@@ -77,8 +80,6 @@ func Routers() *gin.Engine {
 	Router.Use(middleware.OperationLog())
 	Router.Use(middleware.GlobalLoading())
 	Router.Use(middleware.PasswordExpired())
-	Router.Use(middleware.WhiteAllow())
-	Router.Use(middleware.BindDomain())
 	Router.Use(middleware.ApiAuth())
 
 	PrivateGroup := Router.Group("/api/v2/core")
