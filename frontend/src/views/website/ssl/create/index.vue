@@ -100,7 +100,7 @@
             <el-form-item :label="$t('ssl.dir')" prop="dir" v-if="ssl.pushDir">
                 <el-input v-model.trim="ssl.dir">
                     <template #prepend>
-                        <FileList :path="ssl.dir" @choose="getPath" :dir="true"></FileList>
+                        <el-button icon="Folder" @click="fileRef.acceptParams({ path: ssl.dir, dir: true })" />
                     </template>
                 </el-input>
                 <span class="input-help">
@@ -152,12 +152,14 @@
             </span>
         </template>
     </DrawerPro>
+    <FileList ref="fileRef" @choose="getPath" />
 </template>
 
 <script lang="ts" setup>
 import { Website } from '@/api/interface/website';
 import { createSSL, listWebsites, searchAcmeAccount, searchDnsAccount, updateSSL } from '@/api/modules/website';
 import { Rules, checkMaxLength } from '@/global/form-rules';
+import FileList from '@/components/file-list/index.vue';
 import i18n from '@/lang';
 import { FormInstance } from 'element-plus';
 import { computed, reactive, ref } from 'vue';
@@ -177,6 +179,7 @@ const id = computed(() => {
 });
 
 const open = ref(false);
+const fileRef = ref();
 const loading = ref(false);
 const dnsReq = reactive({
     page: 1,

@@ -24,7 +24,7 @@
             <el-form-item v-if="addForm.isLink" :label="$t('file.linkPath')" prop="linkPath">
                 <el-input v-model="addForm.linkPath">
                     <template #prepend>
-                        <FileList @choose="getLinkPath"></FileList>
+                        <el-button icon="Folder" @click="fileRef.acceptParams({})" />
                     </template>
                 </el-input>
             </el-form-item>
@@ -40,6 +40,7 @@
             </span>
         </template>
     </DrawerPro>
+    <FileList ref="fileRef" @choose="getLinkPath" />
 </template>
 
 <script setup lang="ts">
@@ -56,6 +57,7 @@ import { MsgSuccess, MsgWarning } from '@/utils/message';
 const fileForm = ref<FormInstance>();
 let loading = ref(false);
 let setRole = ref(false);
+const fileRef = ref();
 
 interface CreateProps {
     file: Object;

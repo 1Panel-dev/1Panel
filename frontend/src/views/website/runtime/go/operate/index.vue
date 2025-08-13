@@ -22,12 +22,12 @@
             <el-form-item :label="$t('tool.supervisor.dir')" prop="codeDir">
                 <el-input v-model.trim="runtime.codeDir" :disabled="mode === 'edit'">
                     <template #prepend>
-                        <FileList
-                            :disabled="mode === 'edit'"
-                            :path="runtime.codeDir"
-                            @choose="getPath"
-                            :dir="true"
-                        ></FileList>
+                        <el-button
+                            icon="Folder"
+                            @click="
+                                fileRef.acceptParams({ disabled: mode === 'edit', path: runtime.codeDir, dir: true })
+                            "
+                        />
                     </template>
                 </el-input>
                 <span class="input-help">
@@ -64,6 +64,7 @@
             </el-button>
         </template>
     </DrawerPro>
+    <FileList ref="fileRef" @choose="getPath" />
 </template>
 
 <script lang="ts" setup>
@@ -71,6 +72,7 @@ import { App } from '@/api/interface/app';
 import { Runtime } from '@/api/interface/runtime';
 import { CreateRuntime, GetRuntime, UpdateRuntime } from '@/api/modules/runtime';
 import { Rules, checkNumberRange } from '@/global/form-rules';
+import FileList from '@/components/file-list/index.vue';
 import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
@@ -87,6 +89,7 @@ interface OperateRrops {
 }
 
 const open = ref(false);
+const fileRef = ref();
 const runtimeForm = ref<FormInstance>();
 const loading = ref(false);
 const mode = ref('create');

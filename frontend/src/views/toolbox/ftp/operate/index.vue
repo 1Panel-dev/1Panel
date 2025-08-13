@@ -20,7 +20,7 @@
             <el-form-item :label="$t('file.root')" prop="path">
                 <el-input v-model="dialogData.rowData!.path">
                     <template #prepend>
-                        <FileList @choose="loadDir" :dir="true"></FileList>
+                        <el-button icon="Folder" @click="fileRef.acceptParams({ dir: true })" />
                     </template>
                 </el-input>
                 <span class="input-help">{{ $t('toolbox.ftp.dirHelper') }}</span>
@@ -38,6 +38,7 @@
             </span>
         </template>
     </DrawerPro>
+    <FileList ref="fileRef" @choose="loadDir" />
 </template>
 
 <script lang="ts" setup>
@@ -59,6 +60,7 @@ interface DialogProps {
 const loading = ref();
 const title = ref<string>('');
 const drawerVisible = ref(false);
+const fileRef = ref();
 const dialogData = ref<DialogProps>({
     title: '',
 });

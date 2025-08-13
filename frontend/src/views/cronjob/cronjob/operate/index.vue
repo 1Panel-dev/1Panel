@@ -485,7 +485,10 @@
                                                     v-model="form.script"
                                                 >
                                                     <template #prepend>
-                                                        <FileList @choose="loadScriptDir" :dir="false"></FileList>
+                                                        <el-button
+                                                            icon="Folder"
+                                                            @click="scriptFileRef.acceptParams({ dir: false })"
+                                                        />
                                                     </template>
                                                 </el-input>
                                             </el-form-item>
@@ -497,7 +500,10 @@
                                     <el-form-item :label="$t('cronjob.backupContent')" prop="sourceDir">
                                         <el-input v-model="form.sourceDir">
                                             <template #prepend>
-                                                <FileList @choose="loadDir" :dir="true" :path="form.sourceDir" />
+                                                <el-button
+                                                    icon="Folder"
+                                                    @click="dirRef.acceptParams({ dir: true, path: form.sourceDir })"
+                                                />
                                             </template>
                                         </el-input>
                                     </el-form-item>
@@ -506,7 +512,10 @@
                                     <el-form-item :label="$t('cronjob.backupContent')" prop="files">
                                         <el-input>
                                             <template #prepend>
-                                                <FileList @choose="loadFile" :dir="false" />
+                                                <el-button
+                                                    icon="Folder"
+                                                    @click="fileRef.acceptParams({ dir: false })"
+                                                />
                                             </template>
                                         </el-input>
                                         <div class="w-full">
@@ -744,6 +753,9 @@
         </template>
     </LayoutContent>
 
+    <FileList ref="scriptFileRef" @choose="loadScriptDir" />
+    <FileList ref="dirRef" @choose="loadDir" />
+    <FileList ref="fileRef" @choose="loadFile" />
     <LicenseImport ref="licenseRef" />
 </template>
 
@@ -786,6 +798,9 @@ const router = useRouter();
 
 const globalStore = GlobalStore();
 const licenseRef = ref();
+const scriptFileRef = ref();
+const dirRef = ref();
+const fileRef = ref();
 const { isProductPro } = storeToRefs(globalStore);
 const loading = ref();
 const nextTimes = ref([]);

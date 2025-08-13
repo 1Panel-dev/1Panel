@@ -14,7 +14,7 @@
             <el-form-item :label="$t('file.deCompressDst')" prop="dst">
                 <el-input v-model="form.dst">
                     <template #prepend>
-                        <FileList :path="form.dst" @choose="getLinkPath" :dir="true"></FileList>
+                        <el-button icon="Folder" @click="fileRef.acceptParams({ path: form.dst, dir: true })" />
                     </template>
                 </el-input>
             </el-form-item>
@@ -29,6 +29,7 @@
             </span>
         </template>
     </DrawerPro>
+    <FileList ref="fileRef" @choose="getLinkPath" />
 </template>
 
 <script setup lang="ts">
@@ -59,6 +60,7 @@ let loading = ref(false);
 let form = ref<File.FileDeCompress>({ type: 'zip', dst: '', path: '', secret: '' });
 let open = ref(false);
 let name = ref('');
+const fileRef = ref();
 
 const em = defineEmits(['close']);
 

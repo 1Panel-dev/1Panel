@@ -19,14 +19,14 @@
                 <el-form-item :label="$t('website.privateKeyPath')" prop="privateKeyPath">
                     <el-input v-model="ssl.privateKeyPath">
                         <template #prepend>
-                            <FileList @choose="getPrivateKeyPath" :dir="false"></FileList>
+                            <el-button icon="Folder" @click="keyFileRef.acceptParams({ dir: false })" />
                         </template>
                     </el-input>
                 </el-form-item>
                 <el-form-item :label="$t('website.certificatePath')" prop="certificatePath">
                     <el-input v-model="ssl.certificatePath">
                         <template #prepend>
-                            <FileList @choose="getCertificatePath" :dir="false"></FileList>
+                            <el-button icon="Folder" @click="certFileRef.acceptParams({ dir: false })" />
                         </template>
                     </el-input>
                 </el-form-item>
@@ -44,6 +44,8 @@
             </span>
         </template>
     </DrawerPro>
+    <FileList ref="keyFileRef" @choose="getPrivateKeyPath" />
+    <FileList ref="certFileRef" @choose="getCertificatePath" />
 </template>
 
 <script lang="ts" setup>
@@ -51,11 +53,14 @@ import { uploadSSL } from '@/api/modules/website';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { FormInstance } from 'element-plus';
+import FileList from '@/components/file-list/index.vue';
 import { ref } from 'vue';
 import { MsgSuccess } from '@/utils/message';
 import { Website } from '@/api/interface/website';
 
 const open = ref(false);
+const keyFileRef = ref();
+const certFileRef = ref();
 const loading = ref(false);
 const sslForm = ref<FormInstance>();
 

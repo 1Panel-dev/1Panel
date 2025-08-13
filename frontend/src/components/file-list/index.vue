@@ -1,37 +1,43 @@
 <template>
-    <el-popover
-        placement="right"
-        :width="400"
-        trigger="click"
-        :title="$t('file.list')"
-        :visible="popoverVisible"
-        popper-class="file-list"
-    >
-        <template #reference>
-            <el-button icon="Folder" :disabled="disabled" @click="openPage()"></el-button>
-        </template>
+    <DialogPro :title="$t('file.list')" size="w-60" v-model="open" @close="handleClose">
         <div>
-            <el-button class="close" link @click="closePage" icon="Close"></el-button>
-            <div>
-                <el-button link icon="HomeFilled" @click="jump(-1)"></el-button>
-                <el-button v-if="paths.length > 0" link @click="jump(0)">/{{ paths[0] }}</el-button>
-                <el-popover v-if="paths.length > 2" placement="bottom" trigger="hover">
-                    <template #reference>
-                        <el-button link>...</el-button>
-                    </template>
-                    <div class="hidden-paths">
-                        <div v-for="(item, index) in paths.slice(1, -1)" :key="index">
-                            <svg-icon :class="'table-icon'" iconName="p-file-folder"></svg-icon>
-                            <el-link underline="never" @click="jump(index + 1)">{{ item }}</el-link>
-                        </div>
-                    </div>
-                </el-popover>
-                <el-button v-if="paths.length > 1" link @click="jump(paths.length - 1)">
-                    /{{ paths[paths.length - 1] }}
-                </el-button>
+            <div
+                v-show="!searchableStatus"
+                @click="searchableStatus = true"
+                class="address-bar shadow-md rounded-md px-4 py-2 flex items-center flex-grow"
+            >
+                <span class="root mr-1">
+                    <el-link @click.stop="jump(-1)">
+                        <el-icon :size="20"><HomeFilled /></el-icon>
+                    </el-link>
+                </span>
+                <span v-if="paths.length > 0">
+                    <span v-for="(_, index) in paths" class="inline-flex items-center" :key="index">
+                        <span class="ml-1 mr-1 arrow">></span>
+                        <el-tooltip effect="dark" :content="paths[index]" placement="top">
+                            <el-link class="path-segment cursor-pointer mr-1 pathname" @click.stop="jump(index)">
+                                {{ paths[index].length > 25 ? paths[index].substring(0, 22) + '...' : paths[index] }}
+                            </el-link>
+                        </el-tooltip>
+                    </span>
+                </span>
             </div>
+            <el-input
+                ref="searchableInputRef"
+                v-show="searchableStatus"
+                v-model="searchablePath"
+                @blur="searchableInputBlur"
+                class="px-4 py-2 border rounded-md shadow-md"
+                @keyup.enter="
+                    jumpPath();
+                    searchableStatus = false;
+                "
+            />
         </div>
-        <div class="mt-4">
+        <el-button class="mt-4 float-left" link @click="jump(paths.length - 2)" type="primary" size="small">
+            {{ $t('file.top') }}
+        </el-button>
+        <div class="mt-4 float-right">
             <el-button link @click="onAddItem(true)" type="primary" size="small">
                 {{ $t('commons.button.createNewFolder') }}
             </el-button>
@@ -41,16 +47,6 @@
         </div>
         <div>
             <el-table :data="data" highlight-current-row height="40vh">
-                <el-table-column width="40" fix>
-                    <template #default="{ row }">
-                        <el-checkbox
-                            v-model="rowName"
-                            :true-value="row.name"
-                            :disabled="disabledDir(row)"
-                            @change="checkFile(row)"
-                        />
-                    </template>
-                </el-table-column>
                 <el-table-column show-overflow-tooltip fix>
                     <template #default="{ row }">
                         <div>
@@ -60,7 +56,7 @@
                             ></svg-icon>
 
                             <template v-if="!row.isCreate">
-                                <el-link underline="never" @click="open(row)">
+                                <el-link underline="never" @click="openDir(row)">
                                     {{ row.name }}
                                 </el-link>
                             </template>
@@ -96,93 +92,85 @@
                     </el-tag>
                 </el-tooltip>
             </div>
-            <div class="button">
-                <el-button @click="closePage">{{ $t('commons.button.cancel') }}</el-button>
+        </div>
+
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button @click="handleClose">{{ $t('commons.button.cancel') }}</el-button>
                 <el-button type="primary" @click="selectFile" :disabled="disBtn">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
-            </div>
-        </div>
-    </el-popover>
+            </span>
+        </template>
+    </DialogPro>
 </template>
 
 <script lang="ts" setup>
 import { File } from '@/api/interface/file';
 import { createFile, getFilesList } from '@/api/modules/files';
-import { onMounted, onUpdated, reactive, ref, nextTick } from 'vue';
+import { onUpdated, reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgSuccess, MsgWarning } from '@/utils/message';
+import { useSearchable } from '@/views/host/file-management/hooks/searchable';
 
-const rowName = ref('');
 const data = ref([]);
 const loading = ref(false);
 const paths = ref<string[]>([]);
 const req = reactive({ path: '/', expand: true, page: 1, pageSize: 300, showHidden: true });
 const selectRow = ref({ path: '', name: '' });
 const rowRefs = ref();
-const popoverVisible = ref(false);
+const open = ref(false);
 const newFolder = ref();
 const disBtn = ref(false);
 
-const props = defineProps({
-    path: {
-        type: String,
-        default: '/',
-    },
-    dir: {
-        type: Boolean,
-        default: false,
-    },
-    isAll: {
-        type: Boolean,
-        default: false,
-    },
-    disabled: {
-        type: Boolean,
-        default: false,
-    },
-});
+const { searchableStatus, searchablePath, searchableInputRef, searchableInputBlur } = useSearchable(paths);
+const oldUrl = ref<string>('');
 
 const em = defineEmits(['choose']);
 
-const checkFile = (row: any) => {
-    disBtn.value = row.isCreate;
-    selectRow.value = row;
-    rowName.value = selectRow.value.name;
+const form = reactive({
+    path: '/',
+    dir: false,
+    isAll: false,
+    disabled: false,
+});
+
+interface DialogProps {
+    path: string;
+    dir: boolean;
+    isAll: boolean;
+    disabled: boolean;
+}
+const acceptParams = (props: DialogProps): void => {
+    form.path = props.path || '/';
+    form.dir = props.dir;
+    form.isAll = props.isAll;
+    form.disabled = props.disabled;
+    openPage();
+    req.path = form.path;
+    oldUrl.value = form.path;
+    search(req);
+    open.value = true;
 };
 
 const selectFile = () => {
     if (selectRow.value) {
         em('choose', selectRow.value.path);
     }
-    closePage();
+    handleClose();
 };
 
-const closePage = () => {
-    popoverVisible.value = false;
+const handleClose = () => {
+    open.value = false;
     selectRow.value = { path: '', name: '' };
 };
 
 const openPage = () => {
-    popoverVisible.value = true;
-    selectRow.value.path = props.dir ? props.path || '/' : '';
-    rowName.value = '';
+    open.value = true;
+    selectRow.value.path = form.dir ? form.path || '/' : '';
 };
 
-const disabledDir = (row: File.File) => {
-    if (props.isAll) {
-        return false;
-    }
-    if (props.dir !== row.isDir) {
-        return true;
-    }
-    if (!props.dir) {
-        return row.isDir;
-    }
-    return false;
-};
-
-const open = async (row: File.File) => {
+const openDir = async (row: File.File) => {
     if (row.isDir) {
         const name = row.name;
         paths.value.push(name);
@@ -192,12 +180,22 @@ const open = async (row: File.File) => {
             req.path = req.path + '/' + name;
         }
         await search(req);
+        if (form.isAll || form.dir) {
+            selectRow.value.path = req.path;
+        } else {
+            selectRow.value.path = '';
+        }
+        return;
     }
-    selectRow.value.path = props.dir ? req.path : '';
-    rowName.value = '';
+    if (!form.isAll && !form.dir) {
+        selectRow.value.path = (req.path === '/' ? req.path : req.path + '/') + row.name;
+        return;
+    }
+    selectRow.value.path = '';
 };
 
 const jump = async (index: number) => {
+    oldUrl.value = req.path;
     let path = '';
     if (index != -1) {
         if (index !== -1) {
@@ -207,17 +205,50 @@ const jump = async (index: number) => {
     }
     path = path || '/';
     req.path = path;
-    selectRow.value.path = props.dir ? req.path : '';
-    rowName.value = '';
+    selectRow.value.path = form.dir ? req.path : '';
     await search(req);
-    popoverVisible.value = true;
+    open.value = true;
+};
+
+const jumpPath = async () => {
+    loading.value = true;
+    try {
+        oldUrl.value = req.path;
+        getPaths(searchablePath.value);
+        req.path = searchablePath.value || '/';
+        search(req);
+    } finally {
+        loading.value = false;
+    }
+};
+
+const getPaths = (reqPath: string) => {
+    const pathArray = reqPath.split('/');
+    paths.value = [];
+    let base = '/';
+    for (const p of pathArray) {
+        if (p != '') {
+            if (base.endsWith('/')) {
+                base = base + p;
+            } else {
+                base = base + '/' + p;
+            }
+            paths.value.push(p);
+        }
+    }
 };
 
 const search = async (req: File.ReqFile) => {
-    req.dir = props.dir;
+    req.dir = form.dir;
     loading.value = true;
     await getFilesList(req)
         .then((res) => {
+            if (!res.data.path) {
+                req.path = oldUrl.value;
+                getPaths(oldUrl.value);
+                MsgWarning(i18n.global.t('commons.res.notFound'));
+                return;
+            }
             data.value = res.data.items || [];
             req.path = res.data.path;
             const pathArray = req.path.split('/');
@@ -242,8 +273,7 @@ const onAddItem = async (isDir: boolean) => {
         return;
     }
     newFolder.value = isDir ? i18n.global.t('file.noNameFolder') : i18n.global.t('file.noNameFile');
-    if (props.dir === isDir) {
-        rowName.value = newFolder.value;
+    if (form.dir === isDir) {
         selectRow.value.name = newFolder.value;
         const basePath = req.path === '/' ? req.path : `${req.path}/`;
         selectRow.value.path = `${basePath}${newFolder.value}`;
@@ -263,19 +293,27 @@ const cancelFolder = (row: any) => {
     data.value.shift();
     row.isCreate = false;
     disBtn.value = false;
-    selectRow.value.path = props.dir ? req.path : '';
-    rowName.value = '';
+    selectRow.value.path = form.dir ? req.path : '';
     newFolder.value = '';
 };
 
 const handleChange = (value: string, row: any) => {
-    if (rowName.value === row.name) {
-        selectRow.value.name = value;
-        rowName.value = value;
-        row.name = value;
-        const basePath = req.path === '/' ? req.path : `${req.path}/`;
-        selectRow.value.path = `${basePath}${value}`;
+    row.name = value;
+    const basePath = req.path === '/' ? req.path : `${req.path}/`;
+    selectRow.value.path = `${basePath}${value}`;
+    if (row.isDir) {
+        if (form.isAll || form.dir) {
+            selectRow.value.path = `${basePath}${value}`;
+        } else {
+            selectRow.value.path = '';
+        }
+        return;
     }
+    if (form.isAll || !form.dir) {
+        selectRow.value.path = `${basePath}${value}`;
+        return;
+    }
+    selectRow.value.path = '';
 };
 
 const createFolder = async (row: any) => {
@@ -301,47 +339,37 @@ const createFolder = async (row: any) => {
         });
 };
 
-onMounted(() => {
-    if (props.path != '') {
-        req.path = props.path;
+onUpdated(() => {
+    if (form.path != '') {
+        req.path = form.path;
     }
-    rowName.value = '';
     search(req);
 });
 
-onUpdated(() => {
-    if (props.path != '') {
-        req.path = props.path;
-    }
-    search(req);
+defineExpose({
+    acceptParams,
 });
 </script>
 
-<style lang="scss" scoped>
-.file-list {
-    position: relative;
-    .close {
-        position: absolute;
-        right: 10px;
-        top: 10px;
+<style scoped lang="scss">
+.file-row {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.address-bar {
+    border: var(--el-border);
+    .arrow {
+        color: #726e6e;
     }
 }
 .file-list-bottom {
     margin-top: 10px;
     .path {
-        width: 250px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
     }
-    .button {
-        margin-top: 10px;
-        float: right;
-    }
-}
-
-.hidden-paths {
-    display: flex;
-    flex-direction: column;
 }
 </style>

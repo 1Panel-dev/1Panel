@@ -4,7 +4,7 @@
             <el-form-item :label="$t('container.path')" :rules="Rules.requiredInput" prop="path">
                 <el-input v-model="form.path">
                     <template #prepend>
-                        <FileList @choose="loadLoadDir" :dir="false"></FileList>
+                        <el-button icon="Folder" @click="fileRef.acceptParams({ dir: false })" />
                     </template>
                 </el-input>
             </el-form-item>
@@ -20,6 +20,7 @@
             </span>
         </template>
     </DrawerPro>
+    <FileList ref="fileRef" @choose="loadLoadDir" />
 </template>
 
 <script lang="ts" setup>
@@ -32,6 +33,7 @@ import { imageLoad } from '@/api/modules/container';
 import { MsgSuccess } from '@/utils/message';
 
 const loading = ref(false);
+const fileRef = ref();
 
 const loadVisible = ref(false);
 const form = reactive({

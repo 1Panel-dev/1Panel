@@ -381,7 +381,7 @@
             >
                 <el-input v-model="dialogData.rowData!.backupPath">
                     <template #prepend>
-                        <FileList @choose="loadDir" :dir="true"></FileList>
+                        <el-button icon="Folder" @click="fileRef.acceptParams({ dir: true })" />
                     </template>
                 </el-input>
             </el-form-item>
@@ -395,6 +395,7 @@
             </el-button>
         </template>
     </DrawerPro>
+    <FileList ref="fileRef" @choose="loadDir" />
 </template>
 
 <script lang="ts" setup>
@@ -403,6 +404,7 @@ import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { Backup } from '@/api/interface/backup';
+import FileList from '@/components/file-list/index.vue';
 import { addBackup, editBackup, getClientInfo, listBucket } from '@/api/modules/backup';
 import { cities } from './../helper';
 import { deepCopy, spliceHttp, splitHttp } from '@/utils/util';
@@ -416,6 +418,7 @@ type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
 const buckets = ref();
 const clientInfo = ref();
+const fileRef = ref();
 
 const regionInput = ref();
 

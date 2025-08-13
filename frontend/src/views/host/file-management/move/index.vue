@@ -20,7 +20,9 @@
             </el-alert>
             <el-form-item :label="$t('file.path')" prop="newPath">
                 <el-input v-model="addForm.newPath">
-                    <template #prepend><FileList @choose="getPath" :dir="true"></FileList></template>
+                    <template #prepend>
+                        <el-button icon="Folder" @click="fileRef.acceptParams({ dir: true })" />
+                    </template>
                 </el-input>
             </el-form-item>
             <div v-if="changeName">
@@ -61,6 +63,7 @@
             </span>
         </template>
     </DrawerPro>
+    <FileList ref="fileRef" @choose="getPath" />
 </template>
 
 <script lang="ts" setup>
@@ -92,6 +95,7 @@ const oldName = ref('');
 const existFiles = ref<File.ExistFileInfo[]>([]);
 const skipFiles = ref([]);
 const transferData = ref([]);
+const fileRef = ref();
 
 const title = computed(() => {
     if (type.value === 'cut') {

@@ -43,7 +43,10 @@
                     <el-form-item :label="$t('ssl.dir')" prop="dir" v-if="obtain.pushDir">
                         <el-input v-model.trim="obtain.dir">
                             <template #prepend>
-                                <FileList :path="obtain.dir" @choose="getPath" :dir="true"></FileList>
+                                <el-button
+                                    icon="Folder"
+                                    @click="fileRef.acceptParams({ path: obtain.dir, dir: true })"
+                                />
                             </template>
                         </el-input>
                         <span class="input-help">
@@ -71,18 +74,21 @@
             </span>
         </template>
     </DialogPro>
+    <FileList ref="fileRef" @choose="getPath" />
 </template>
 
 <script lang="ts" setup>
 import { obtainSSLByCA } from '@/api/modules/website';
 import { Rules, checkNumberRange, checkMaxLength } from '@/global/form-rules';
 import i18n from '@/lang';
+import FileList from '@/components/file-list/index.vue';
 import { MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
 import { ref } from 'vue';
 import { KeyTypes } from '@/global/mimetype';
 
 const open = ref(false);
+const fileRef = ref();
 const loading = ref(false);
 const obtainForm = ref<FormInstance>();
 const em = defineEmits(['close']);

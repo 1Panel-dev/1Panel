@@ -4,7 +4,7 @@
             <el-form-item :label="$t('toolbox.fail2ban.logPath')" prop="logPath" :rules="Rules.requiredInput">
                 <el-input v-model="form.logPath">
                     <template #prepend>
-                        <FileList @choose="loadLogPath"></FileList>
+                        <el-button icon="Folder" @click="fileRef.acceptParams({})" />
                     </template>
                 </el-input>
                 <span class="input-help">{{ $t('toolbox.fail2ban.logPathHelper') }}</span>
@@ -19,11 +19,13 @@
             </span>
         </template>
     </DrawerPro>
+    <FileList ref="fileRef" @choose="loadLogPath" />
 </template>
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
+import FileList from '@/components/file-list/index.vue';
 import { updateFail2ban } from '@/api/modules/toolbox';
 import { ElMessageBox, FormInstance } from 'element-plus';
 import { Rules } from '@/global/form-rules';
@@ -35,6 +37,7 @@ interface DialogProps {
 }
 const drawerVisible = ref();
 const loading = ref();
+const fileRef = ref();
 
 const form = reactive({
     logPath: '',

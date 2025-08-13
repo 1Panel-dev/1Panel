@@ -109,14 +109,14 @@
                             <el-form-item :label="$t('website.privateKeyPath')" prop="privateKeyPath">
                                 <el-input v-model="form.privateKeyPath">
                                     <template #prepend>
-                                        <FileList @choose="getPrivateKeyPath" :dir="false"></FileList>
+                                        <el-button icon="Folder" @click="keyFileRef.acceptParams({ dir: false })" />
                                     </template>
                                 </el-input>
                             </el-form-item>
                             <el-form-item :label="$t('website.certificatePath')" prop="certificatePath">
                                 <el-input v-model="form.certificatePath">
                                     <template #prepend>
-                                        <FileList @choose="getCertificatePath" :dir="false"></FileList>
+                                        <el-button icon="Folder" @click="certFileRef.acceptParams({ dir: false })" />
                                     </template>
                                 </el-input>
                             </el-form-item>
@@ -182,6 +182,9 @@
             </el-form>
         </el-col>
     </el-row>
+
+    <FileList ref="keyFileRef" @choose="getPrivateKeyPath" />
+    <FileList ref="certFileRef" @choose="getCertificatePath" />
 </template>
 <script lang="ts" setup>
 import { Website } from '@/api/interface/website';
@@ -194,6 +197,8 @@ import { dateFormatSimple, getProvider, getAccountName } from '@/utils/util';
 import { MsgSuccess } from '@/utils/message';
 import FileList from '@/components/file-list/index.vue';
 
+const keyFileRef = ref();
+const certFileRef = ref();
 const props = defineProps({
     id: {
         type: Number,

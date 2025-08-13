@@ -13,7 +13,7 @@
                     <el-input v-model="form.dockerSockPath">
                         <template #prepend>unix://</template>
                         <template #append>
-                            <FileList @choose="loadBuildDir"></FileList>
+                            <el-button icon="Folder" @click="fileRef.acceptParams({})" />
                         </template>
                     </el-input>
                     <span class="input-help">{{ $t('container.sockPathHelper1') }}</span>
@@ -26,12 +26,14 @@
                 </el-button>
             </template>
         </DrawerPro>
+        <FileList ref="fileRef" @choose="loadBuildDir" />
     </div>
 </template>
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
+import FileList from '@/components/file-list/index.vue';
 import { updateAgentSetting } from '@/api/modules/setting';
 import { ElMessageBox, FormInstance } from 'element-plus';
 
@@ -42,6 +44,7 @@ interface DialogProps {
 }
 const drawerVisible = ref();
 const loading = ref();
+const fileRef = ref();
 
 const form = reactive({
     dockerSockPath: '',
