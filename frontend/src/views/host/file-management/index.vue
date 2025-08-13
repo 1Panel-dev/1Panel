@@ -603,7 +603,7 @@ let selects = ref<any>([]);
 const initData = () => ({
     path: '/',
     expand: true,
-    showHidden: true,
+    showHidden: localStorage.getItem('show-hidden') === 'true',
     page: 1,
     pageSize: 100,
     search: '',
