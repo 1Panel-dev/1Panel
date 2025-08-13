@@ -51,6 +51,9 @@ useResize();
 const taskListRef = ref();
 const openTask = () => {
     taskListRef.value.acceptParams();
+    if (globalStore.isMobile()) {
+        menuStore.setCollapse();
+    }
 };
 const router = useRouter();
 const route = useRoute();
