@@ -1143,13 +1143,12 @@ func saveCertificateFile(websiteSSL *model.WebsiteSSL, logger *log.Logger) {
 }
 
 func GetSystemSSL() (bool, uint) {
-	sslSetting, err := settingRepo.Get(settingRepo.WithByKey("SSL"))
-	if err != nil {
-		return false, 0
-	}
-	if sslSetting.Value == "enable" {
-		sslID, _ := settingRepo.Get(settingRepo.WithByKey("SSLID"))
-		idValue, _ := strconv.Atoi(sslID.Value)
+	var sslSetting model.Setting
+	_ = global.CoreDB.Model(&model.Setting{}).Where("key = ?", "SSL").First(&sslSetting).Error
+	if sslSetting.Value == "Enable" {
+		var sslIDSetting model.Setting
+		_ = global.CoreDB.Model(&model.Setting{}).Where("key = ?", "SSLID").First(&sslIDSetting).Error
+		idValue, _ := strconv.Atoi(sslIDSetting.Value)
 		if idValue > 0 {
 			return true, uint(idValue)
 		}
