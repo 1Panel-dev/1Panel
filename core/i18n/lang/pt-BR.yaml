@@ -55,7 +55,6 @@ ErrLicenseSync: "Falha ao sincronizar as informações da licença, nenhuma info
 ErrLicenseExist: "Este registro de licença já existe. Você pode ir diretamente para a página de licenças para vincular nós."
 ErrXpackNotFound: "Esta parte é uma funcionalidade profissional, por favor importe a licença em Configurações do Painel - Licença."
 ErrXpackExceptional: "Esta parte é uma funcionalidade profissional, por favor sincronize a licença em Configurações do Painel - Licença."
-ErrXpackOutOfDate: "A licença atual expirou, por favor importe uma nova em Configurações do Painel - Licença."
 ErrXpackLost: "A licença atingiu o número máximo de tentativas, acesse [Configurações do Painel][Licença] e clique no botão de sincronização manual."
 ErrDeviceLost: "Arquivos necessários para a verificação da licença estão faltando, por favor verifique e tente novamente!"
 ErrDeviceErr: "O ambiente atual não corresponde ao ambiente de importação da licença. Por favor, edite a licença e reimporte!"
@@ -71,6 +70,16 @@ ErrNoSuchNode: "As informações deste nó não foram encontradas, por favor ver
 ErrNodeUnbind: "Nó fora do escopo da licença detectado, por favor verifique e tente novamente!"
 ErrNodeBind: "Este nó já está vinculado a uma licença, por favor verifique e tente novamente!"
 ErrNodeLocalRollback: "O nó principal não suporta rollback direto. Por favor, execute manualmente o comando '1pctl restore' para fazer o rollback!"
+
+InvalidRequestBodyType: "Formato do corpo da requisição inválido. Verifique se o conteúdo está no formato correto e tente novamente!"  
+InvalidLicenseCodeType: "Formato do código de licença inválido. Verifique e tente novamente!"  
+LicenseNotFoundType: "Licença não encontrada. Não há registros correspondentes no sistema para a licença fornecida. Verifique e tente novamente!"  
+LicenseRevokedType: "A licença solicitada foi revogada e não pode mais ser usada. Verifique e tente novamente!"  
+LicenseExpiredType: "A licença expirou. Renove-a ou reimporte-a na seção Configurações do Painel - Licença antes de tentar novamente!"  
+LicenseProductMismatchType: "A licença não corresponde ao produto ou serviço solicitado!"  
+InvalidAssigneeType: "Informações do usuário ou dispositivo alvo para atribuição de licença inválidas. Verifique e tente novamente!"  
+LicenseUsageNotFoundType: "Nenhum registro de uso encontrado. Esta licença ainda não foi ativada ou usada. Verifique e tente novamente!"  
+LicenseUsageLimitExceededType: "Esta licença já está vinculada a outro nó. Verifique e tente novamente!" 
 
 # alert
 ErrAlertSync: "Erro na sincronização das informações de alerta, verifique e tente novamente!"

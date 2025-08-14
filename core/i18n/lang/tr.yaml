@@ -55,7 +55,6 @@ ErrLicenseSync: "Lisans senkronizasyonu başarısız, veritabanında lisans bilg
 ErrLicenseExist: "Bu lisans kaydı zaten mevcut. Düğüm bağlama için doğrudan lisans sayfasına gidebilirsiniz."
 ErrXpackNotFound: "Bu bölüm profesyonel sürüm içindir, lütfen Panel Ayarları - Lisans'ta lisansı içe aktarın"
 ErrXpackExceptional: "Bu bölüm profesyonel sürüm içindir, lütfen Panel Ayarları - Lisans'ta lisans durumunu senkronize edin"
-ErrXpackOutOfDate: "Mevcut lisansın süresi dolmuş, lütfen Panel Ayarları - Lisans'ta lisansı tekrar içe aktarın"
 ErrXpackLost: "Lisans maksimum yeniden deneme sayısına ulaştı, lütfen [Panel Ayarları] [Lisans] sayfasına gidin ve profesyonel özelliklerin doğru çalışması için manuel olarak senkronize butonuna tıklayın"
 ErrDeviceLost: "Lisans doğrulama için gerekli dosyalar eksik, lütfen kontrol edip tekrar deneyin!"
 ErrXpackTimeout: "İstek zaman aşımı, ağ bağlantısı kararsız olabilir, lütfen daha sonra tekrar deneyin!"
@@ -70,6 +69,16 @@ ErrNoSuchNode: "Düğüm bilgisi bulunamadı, lütfen kontrol edip tekrar deneyi
 ErrNodeUnbind: "Bu düğüm lisans bağlama aralığında değil, lütfen kontrol edip tekrar deneyin!"
 ErrNodeBind: "Bu düğüm zaten bir lisansa bağlı, lütfen kontrol edip tekrar deneyin!"
 ErrNodeLocalRollback: "Ana düğüm doğrudan geri alma desteklemiyor. Lütfen geri almak için '1pctl restore' komutunu manuel olarak çalıştırın!"
+
+InvalidRequestBodyType: "Geçersiz istek gövdesi formatı, lütfen içeriğin format gereksinimlerine uygun olduğunu kontrol edip tekrar deneyin!"  
+InvalidLicenseCodeType: "Sağlanan lisans kodu formatı geçersiz, lütfen kontrol edip tekrar deneyin!"  
+LicenseNotFoundType: "Lisans bulunamadı, sistemde sağlanan lisansla eşleşen bir kayıt yok. Lütfen kontrol edip tekrar deneyin!"  
+LicenseRevokedType: "İstenen lisans iptal edilmiş ve artık kullanılamaz. Lütfen kontrol edip tekrar deneyin!"  
+LicenseExpiredType: "Lisansın süresi doldu. Lütfen yenileyin veya Panel Ayarları - Lisans bölümünden yeniden içe aktarın!"  
+LicenseProductMismatchType: "Lisans, istenen ürün veya hizmetle eşleşmiyor!"  
+InvalidAssigneeType: "Lisans ataması için hedef kullanıcı veya cihaz bilgisi geçersiz. Lütfen kontrol edip tekrar deneyin!"  
+LicenseUsageNotFoundType: "Kullanım kaydı bulunamadı. Bu lisans henüz etkinleştirilmemiş veya kullanılmamış. Lütfen kontrol edip tekrar deneyin!"  
+LicenseUsageLimitExceededType: "Bu lisans zaten başka bir düğüme bağlı. Lütfen kontrol edip tekrar deneyin!"  
 
 # alert
 ErrAlertSync: "Uyarı bilgisi senkronizasyon hatası, lütfen kontrol edip tekrar deneyin!"
