@@ -2438,6 +2438,12 @@ const message = {
             '静的リソースがブラウザのローカルにキャッシュされる時間、冗長なリクエストを減らします。有効期限前にユーザーがページをリフレッシュすると、ローカルキャッシュが直接使用されます。',
         donotLinkeDB: 'データベースをリンクしない',
         toWebsiteDir: 'ウェブサイトディレクトリに入る',
+        execParameters: '実行パラメータ',
+        extCommand: '補足コマンド',
+        mirror: 'ミラーソース',
+        execUser: '実行ユーザー',
+        execDir: '実行ディレクトリ',
+        packagist: '中国フルミラー',
     },
     php: {
         short_open_tag: '短いタグサポート',

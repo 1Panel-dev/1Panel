@@ -123,6 +123,8 @@ ErrBuildDirNotFound: 'The build directory does not exist'
 ErrImageNotExist: 'The operating environment {{ .name }} image does not exist, please re-edit the operating environment'
 ErrProxyIsUsed: "Load balancing has been used by reverse proxy, cannot be deleted"
 ErrSSLValid: 'Certificate file is abnormal, please check the certificate status!'
+ErrWebsiteDir: "Please select a directory within the website directory."
+ErrComposerFileNotFound: "composer.json file does not exist"
 
 #ssl
 ErrSSLCannotDelete: 'The {{ .name }} certificate is being used by a website and cannot be deleted'
@@ -328,6 +330,7 @@ SubTask: 'Subtask'
 RuntimeExtension: 'Runtime Environment Extension'
 TaskIsExecuting: 'Task is running'
 CustomAppstore: 'Custom application warehouse'
+TaskExec: 'Execute'
 
 # task - ai
 OllamaModelPull: 'Pull Ollama model {{ .name }}'

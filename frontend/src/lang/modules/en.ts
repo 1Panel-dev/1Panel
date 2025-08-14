@@ -2523,6 +2523,12 @@ const message = {
             'The time static resources are cached locally in the browser, reducing redundant requests. Users will use the local cache directly before it expires when refreshing the page.',
         donotLinkeDB: 'Do Not Link Database',
         toWebsiteDir: 'Enter Website Directory',
+        execParameters: 'Execution Parameters',
+        extCommand: 'Supplementary Command',
+        mirror: 'Mirror Source',
+        execUser: 'Executing User',
+        execDir: 'Execution Directory',
+        packagist: 'China Full Mirror',
     },
     php: {
         short_open_tag: 'Short tag support',

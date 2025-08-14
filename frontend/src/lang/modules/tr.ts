@@ -2554,6 +2554,12 @@ const message = {
             'Statik kaynakların tarayıcıda yerel olarak önbelleğe alındığı süre, tekrarlayan istekleri azaltır. Kullanıcılar süre dolmadan önce sayfayı yenilediğinde yerel önbelleği doğrudan kullanır.',
         donotLinkeDB: 'Veritabanına Bağlanma',
         toWebsiteDir: 'Web Sitesi Dizinine Gir',
+        execParameters: 'Çalıştırma Parametreleri',
+        extCommand: 'Ek Komut',
+        mirror: 'Ayna Kaynağı',
+        execUser: 'Çalıştıran Kullanıcı',
+        execDir: 'Çalıştırma Dizini',
+        packagist: 'Çin Tam Aynası',
     },
     php: {
         short_open_tag: 'Kısa etiket desteği',

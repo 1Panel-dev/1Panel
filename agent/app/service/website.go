@@ -126,6 +126,8 @@ type IWebsiteService interface {
 	ChangeDatabase(req request.ChangeDatabase) error
 
 	OperateCrossSiteAccess(req request.CrossSiteAccessOp) error
+
+	ExecComposer(req request.ExecComposerReq) error
 }
 
 func NewIWebsiteService() IWebsiteService {
@@ -466,15 +468,15 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 			website.Protocol = constant.ProtocolHTTPS
 			website.WebsiteSSLID = create.WebsiteSSLID
 			appSSLReq := request.WebsiteHTTPSOp{
-				WebsiteID:    website.ID,
-				Enable:       true,
-				WebsiteSSLID: websiteModel.ID,
-				Type:         "existed",
-				HttpConfig:   "HTTPToHTTPS",
-				SSLProtocol:  []string{"TLSv1.3", "TLSv1.2"},
-				Algorithm:    "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256:!aNULL:!eNULL:!EXPORT:!DSS:!DES:!RC4:!3DES:!MD5:!PSK:!KRB5:!SRP:!CAMELLIA:!SEED",
-				Hsts:         true,
-				HstsIncludeSubDomains:         true,
+				WebsiteID:             website.ID,
+				Enable:                true,
+				WebsiteSSLID:          websiteModel.ID,
+				Type:                  "existed",
+				HttpConfig:            "HTTPToHTTPS",
+				SSLProtocol:           []string{"TLSv1.3", "TLSv1.2"},
+				Algorithm:             "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256:!aNULL:!eNULL:!EXPORT:!DSS:!DES:!RC4:!3DES:!MD5:!PSK:!KRB5:!SRP:!CAMELLIA:!SEED",
+				Hsts:                  true,
+				HstsIncludeSubDomains: true,
 			}
 			if err = applySSL(website, *websiteModel, appSSLReq); err != nil {
 				return err
@@ -960,7 +962,6 @@ func (w WebsiteService) GetWebsiteHTTPS(websiteId uint) (response.WebsiteHTTPS, 
 		if p.Name == "add_header" && len(p.Params) > 0 {
 			if p.Params[0] == "Strict-Transport-Security" {
 				res.Hsts = true
-				//增加HSTS下子域名检查逻辑
 				if len(p.Params) > 1 {
 					hstsValue := p.Params[1]
 					if strings.Contains(hstsValue, "includeSubDomains") {
@@ -3317,5 +3318,52 @@ func (w WebsiteService) OperateCrossSiteAccess(req request.CrossSiteAccessOp) er
 		fileOp := files.NewFileOp()
 		return fileOp.DeleteFile(path.Join(GetSitePath(website, SiteIndexDir), ".user.ini"))
 	}
+	return nil
+}
+
+func (w WebsiteService) ExecComposer(req request.ExecComposerReq) error {
+	website, err := websiteRepo.GetFirst(repo.WithByID(req.WebsiteID))
+	if err != nil {
+		return err
+	}
+	sitePath := GetSitePath(website, SiteDir)
+	if !strings.Contains(req.Dir, sitePath) {
+		return buserr.New("ErrWebsiteDir")
+	}
+	if !files.NewFileOp().Stat(path.Join(req.Dir, "composer.json")) {
+		return buserr.New("ErrComposerFileNotFound")
+	}
+	if task.CheckResourceTaskIsExecuting(task.TaskExec, req.Command, website.ID) {
+		return buserr.New("ErrInstallExtension")
+	}
+	runtime, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(website.RuntimeID))
+	if err != nil {
+		return err
+	}
+	var command string
+	if req.Command != "custom" {
+		command = fmt.Sprintf("%s %s", req.Command, req.ExtCommand)
+	} else {
+		command = req.ExtCommand
+	}
+	resourceName := fmt.Sprintf("composer %s", command)
+	composerTask, err := task.NewTaskWithOps(resourceName, task.TaskExec, req.Command, req.TaskID, website.ID)
+	if err != nil {
+		return err
+	}
+	cmdMgr := cmd.NewCommandMgr(cmd.WithTask(*composerTask), cmd.WithTimeout(20*time.Minute))
+	siteDir, _ := settingRepo.Get(settingRepo.WithByKey("WEBSITE_DIR"))
+	execDir := strings.ReplaceAll(req.Dir, siteDir.Value, "/www")
+	composerTask.AddSubTask("", func(t *task.Task) error {
+		cmdStr := fmt.Sprintf("docker exec -u %s %s sh -c 'composer config -g repo.packagist composer %s && composer %s --working-dir=%s'", req.User, runtime.ContainerName, req.Mirror, command, execDir)
+		err = cmdMgr.RunBashCf(cmdStr)
+		if err != nil {
+			return err
+		}
+		return nil
+	}, nil)
+	go func() {
+		_ = composerTask.Execute()
+	}()
 	return nil
 }

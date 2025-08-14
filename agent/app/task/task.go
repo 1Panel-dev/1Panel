@@ -67,6 +67,7 @@ const (
 	TaskPush      = "TaskPush"
 	TaskClean     = "TaskClean"
 	TaskHandle    = "TaskHandle"
+	TaskExec      = "TaskExec"
 )
 
 const (

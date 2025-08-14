@@ -123,6 +123,8 @@ ErrBuildDirNotFound: 'O diretório de compilação não existe'
 ErrImageNotExist: 'A imagem do ambiente operacional {{ .name }} não existe, edite novamente o ambiente operacional'
 ErrProxyIsUsed: "Balanceamento de carga foi usado por proxy reverso, não pode ser excluído"
 ErrSSLValid: 'O arquivo do certificado está anormal, verifique o status do certificado!'
+ErrWebsiteDir: "Por favor, selecione um diretório dentro do diretório do site."
+ErrComposerFileNotFound: "O arquivo composer.json não existe"
 
 #ssl
 ErrSSLCannotDelete: 'O certificado {{ .name }} está sendo usado por um site e não pode ser excluído'
@@ -328,6 +330,7 @@ SubTask: 'Subtarefa'
 RuntimeExtension: 'Extensão do ambiente de tempo de execução'
 TaskIsExecuting: 'A tarefa está em execução'
 CustomAppstore: 'Armazém de aplicativos personalizados'
+TaskExec: 'Executar'
 
 # tarefa - ai
 OllamaModelPull: 'Puxar modelo Ollama {{ .name }}'

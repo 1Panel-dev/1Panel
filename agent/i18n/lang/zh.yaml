@@ -122,6 +122,8 @@ ErrBuildDirNotFound: "构建目录不存在"
 ErrImageNotExist: "运行环境 {{ .name }} 镜像不存在，请重新编辑运行环境"
 ErrProxyIsUsed: "负载均衡已被反向代理使用，无法删除"
 ErrSSLValid: '证书文件异常，请检查证书状态！'
+ErrWebsiteDir: '请选择网站目录下的目录'
+ErrComposerFileNotFound: 'composer.json 文件不存在'
 
 #ssl
 ErrSSLCannotDelete: "{{ .name }} 证书正在被网站使用，无法删除"
@@ -327,6 +329,7 @@ SubTask: "子任务"
 RuntimeExtension: "运行环境扩展"
 TaskIsExecuting: "任务正在运行"
 CustomAppstore: "自定义应用仓库"
+TaskExec: "执行"
 
 # task - ai
 OllamaModelPull: "拉取 Ollama 模型  {{ .name }} "

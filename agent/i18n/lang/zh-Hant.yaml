@@ -122,6 +122,8 @@ ErrBuildDirNotFound: '建置目錄不存在'
 ErrImageNotExist: '執行環境{{ .name }} 映像不存在，請重新編輯執行環境'
 ErrProxyIsUsed: "負載均衡已被反向代理使用，無法刪除"
 ErrSSLValid: '證書文件異常，請檢查證書狀態！'
+ErrWebsiteDir: "請選擇網站目錄下的目錄"
+ErrComposerFileNotFound: "composer.json 文件不存在"
 
 #ssl
 ErrSSLCannotDelete: '{{ .name }} 憑證正在被網站使用，無法刪除'
@@ -327,6 +329,7 @@ SubTask: '子任務'
 RuntimeExtension: '執行環境擴充'
 TaskIsExecuting: '任務正在運作'
 CustomAppstore: '自訂應用程式倉庫'
+TaskExec: '執行'
 
 # task - ai
 OllamaModelPull: '拉取 Ollama 模型{{ .name }} '

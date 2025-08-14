@@ -123,6 +123,8 @@ ErrBuildDirNotFound: '빌드 디렉토리가 존재하지 않습니다'
 ErrImageNotExist: '운영 환경 {{ .name }} 이미지가 존재하지 않습니다. 운영 환경을 다시 편집하세요.'
 ErrProxyIsUsed: "로드 밸런싱이 역방향 프록시에 의해 사용되었으므로 삭제할 수 없습니다"
 ErrSSLValid: '인증서 파일에 문제가 있습니다. 인증서 상태를 확인하세요!'
+ErrWebsiteDir: "웹사이트 디렉토리 내의 디렉토리를 선택하세요."
+ErrComposerFileNotFound: "composer.json 파일이 존재하지 않습니다"
 
 #SSL인증
 ErrSSLCannotDelete: '{{ .name }} 인증서는 웹사이트에서 사용 중이므로 삭제할 수 없습니다.'
@@ -328,6 +330,7 @@ SubTask: '하위 작업'
 RuntimeExtension: '런타임 환경 확장'
 TaskIsExecuting: '작업이 실행 중입니다'
 CustomAppstore: '사용자 정의 애플리케이션 웨어하우스'
+TaskExec": '실행'
 
 # 작업 - ai
 OllamaModelPull: 'Ollama 모델 {{ .name }}을(를) 끌어오세요'

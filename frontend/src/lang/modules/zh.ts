@@ -2342,6 +2342,12 @@ const message = {
         browserCacheTimeHelper: '静态资源在浏览器本地缓存的时间，减少重复请求。到期前用户刷新页面会直接使用本地缓存。',
         donotLinkeDB: '不关联数据库',
         toWebsiteDir: '进入网站目录',
+        execParameters: '执行参数',
+        extCommand: '补充命令',
+        mirror: '镜像源',
+        execUser: '执行用户',
+        execDir: '执行目录',
+        packagist: '中国全量镜像',
     },
     php: {
         short_open_tag: '短标签支持',

@@ -2353,6 +2353,12 @@ const message = {
         browserCacheTimeHelper: '靜態資源在瀏覽器本地緩存的時間，減少重複請求。到期前用戶刷新頁面會直接使用本地緩存。',
         donotLinkeDB: '不關聯數據庫',
         toWebsiteDir: '進入網站目錄',
+        execParameters: '執行參數',
+        extCommand: '補充命令',
+        mirror: '鏡像源',
+        execUser: '執行用戶',
+        execDir: '執行目錄',
+        packagist: '中國全量鏡像',
     },
     php: {
         short_open_tag: '短標簽支持',

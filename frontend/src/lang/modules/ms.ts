@@ -2495,6 +2495,12 @@ const message = {
             'Masa sumber statik di-cache secara tempatan di pelayar, mengurangkan permintaan berulang. Pengguna akan menggunakan cache tempatan secara langsung sebelum tamat tempoh semasa menyegarkan halaman.',
         donotLinkeDB: 'Jangan Sambungkan Pangkalan Data',
         toWebsiteDir: 'Masuk ke Direktori Laman Web',
+        execParameters: 'Parameter Pelaksanaan',
+        extCommand: 'Arahan Tambahan',
+        mirror: 'Sumber Cermin',
+        execUser: 'Pengguna Melaksanakan',
+        execDir: 'Direktori Pelaksanaan',
+        packagist: 'Cermin Penuh China',
     },
     php: {
         short_open_tag: 'Sokongan tag pendek',

@@ -123,6 +123,8 @@ ErrBuildDirNotFound: 'Yapı dizini mevcut değil'
 ErrImageNotExist: 'İşletim ortamı {{ .name }} image mevcut değil, lütfen işletim ortamını yeniden düzenleyin'
 ErrProxyIsUsed: "Yük dengeleme ters proxy tarafından kullanıldı, silinemez"
 ErrSSLValid: 'Sertifika dosyası anormal, lütfen sertifika durumunu kontrol edin!'
+ErrWebsiteDir: "Lütfen web sitesi dizini içindeki bir dizin seçin."
+ErrComposerFileNotFound: "composer.json dosyası mevcut değil"
 
 #ssl
 ErrSSLCannotDelete: '{{ .name }} sertifikası bir web sitesi tarafından kullanılıyor ve silinemez'
@@ -326,6 +328,7 @@ SubTask: 'Alt görev'
 RuntimeExtension: 'Çalışma Ortamı Uzantısı'
 TaskIsExecuting: 'Görev çalışıyor'
 CustomAppstore: 'Özel uygulama deposu'
+TaskExec: 'Çalıştır'
 
 # task - ai
 OllamaModelPull: 'Ollama modeli {{ .name }} çek'

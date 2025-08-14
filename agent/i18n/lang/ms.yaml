@@ -122,6 +122,8 @@ ErrBuildDirNotFound: 'Direktori binaan tidak wujud'
 ErrImageNotExist: 'Imej persekitaran operasi {{ .name }} tidak wujud, sila edit semula persekitaran pengendalian'
 ErrProxyIsUsed: "Pengimbang beban telah digunakan oleh pengganti terbalik, tidak boleh dipadamkan"
 ErrSSLValid: 'Fail sijil bermasalah, sila periksa status sijil!'
+ErrWebsiteDir: "Sila pilih direktori dalam direktori laman web."
+ErrComposerFileNotFound: "Fail composer.json tidak wujud"
 
 #ssl
 ErrSSLCannotDelete: 'Sijil {{ .name }} sedang digunakan oleh tapak web dan tidak boleh dipadamkan'
@@ -327,6 +329,7 @@ SubTask: 'Subtugas'
 RuntimeExtension: 'Sambungan Persekitaran Runtime'
 TaskIsExecuting: 'Tugas sedang berjalan'
 CustomAppstore: 'Gudang aplikasi tersuai'
+TaskExec: 'Laksanakan'
 
 # tugasan - ai
 OllamaModelPull: 'Tarik model Ollama {{ .name }}'

@@ -655,4 +655,14 @@ export namespace Website {
         websiteID: number;
         operation: string;
     }
+
+    export interface ExecComposer {
+        websiteID: number;
+        command: string;
+        extCommand?: string;
+        mirror: string;
+        dir: string;
+        user: string;
+        taskID: string;
+    }
 }

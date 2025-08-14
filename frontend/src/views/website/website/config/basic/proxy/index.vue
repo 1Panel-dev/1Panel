@@ -111,6 +111,8 @@ const initData = (id: number): Website.ProxyConfig => ({
     proxyHost: '$host',
     replaces: {},
     proxySSLName: '',
+    serverCacheTime: 10,
+    serverCacheUnit: 'm',
 });
 
 const openCreate = () => {

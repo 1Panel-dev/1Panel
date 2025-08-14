@@ -2495,6 +2495,12 @@ const message = {
             'O tempo que os recursos estáticos são armazenados em cache localmente no navegador, reduzindo requisições redundantes. Os usuários usarão o cache local diretamente antes de expirar ao atualizar a página.',
         donotLinkeDB: 'Não Vincular Banco de Dados',
         toWebsiteDir: 'Entrar no Diretório do Site',
+        execParameters: 'Parâmetros de Execução',
+        extCommand: 'Comando Suplementar',
+        mirror: 'Fonte de Espelho',
+        execUser: 'Usuário Executando',
+        execDir: 'Diretório de Execução',
+        packagist: 'Espelho Completo da China',
     },
     php: {
         short_open_tag: 'Suporte para short tags',

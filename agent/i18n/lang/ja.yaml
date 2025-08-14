@@ -123,6 +123,8 @@ ErrBuildDirNotFound: 'ビルド ディレクトリが存在しません'
 ErrImageNotExist: 'オペレーティング環境 {{ .name }} イメージが存在しません。オペレーティング環境を再編集してください'
 ErrProxyIsUsed: "ロードバランシングはリバースプロキシによって使用されているため、削除できません"
 ErrSSLValid: '証明書ファイルが異常です、証明書の状態を確認してください！'
+ErrWebsiteDir: "ウェブサイトディレクトリ内のディレクトリを選択してください。"
+ErrComposerFileNotFound: "composer.json ファイルが存在しません"
 
 #ssl
 ErrSSLCannotDelete: '{{ .name }} 証明書は Web サイトで使用されているため、削除できません'
@@ -328,6 +330,7 @@ SubTask: 'サブタスク'
 RuntimeExtension: 'ランタイム環境拡張'
 TaskIsExecuting: 'タスクは実行中です'
 CustomAppstore: 'カスタム アプリケーション ウェアハウス'
+TaskExec: '実行'
 
 #task - ai
 OllamaModelPull: 'Ollama モデル {{ .name }} をプルします'
