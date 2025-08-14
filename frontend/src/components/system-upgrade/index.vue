@@ -20,7 +20,7 @@
                     <el-link underline="never" type="primary" @click="toLxware">
                         {{ $t(!isMasterPro ? 'license.community' : 'license.pro') }}
                     </el-link>
-                    <el-link underline="never" class="version" type="primary" @click="copyText(version)">
+                    <el-link underline="never" class="version" type="primary" @click="releasesRef.acceptParams()">
                         {{ version }}
                     </el-link>
                     <el-badge is-dot class="-mt-0.5" :hidden="version === 'Waiting' || !globalStore.hasNewVersion">
@@ -36,15 +36,16 @@
         </div>
 
         <Upgrade ref="upgradeRef" @search="search" />
+        <Releases ref="releasesRef" />
     </div>
 </template>
 
 <script setup lang="ts">
 import { getSettingInfo, loadUpgradeInfo } from '@/api/modules/setting';
 import Upgrade from '@/components/system-upgrade/upgrade/index.vue';
+import Releases from '@/components/system-upgrade/releases/index.vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import { copyText } from '@/utils/util';
 import { onMounted, ref } from 'vue';
 import { GlobalStore } from '@/store';
 import { storeToRefs } from 'pinia';
@@ -52,6 +53,7 @@ import { storeToRefs } from 'pinia';
 const globalStore = GlobalStore();
 const { docsUrl } = storeToRefs(globalStore);
 const upgradeRef = ref();
+const releasesRef = ref();
 const isMasterPro = computed(() => {
     return globalStore.isMasterPro();
 });

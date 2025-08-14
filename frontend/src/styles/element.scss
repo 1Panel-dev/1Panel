@@ -271,3 +271,9 @@ html {
     background-color: var(--el-color-primary-light-9) !important;
     border-color: var(--el-button-border-color) !important;
 }
+
+.el-collapse-item__header {
+    color: var(--el-text-color-regular) !important;
+    border: 1px solid var(--panel-main-bg-color-10);
+    background-color: var(--panel-main-bg-color-10) !important;
+}

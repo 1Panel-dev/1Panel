@@ -6,6 +6,20 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "18536446",
+      "name": "feature视图",
+      "font_class": "featureshitu",
+      "unicode": "e63e",
+      "unicode_decimal": 58942
+    },
+    {
+      "icon_id": "18133027",
+      "name": "优化文档",
+      "font_class": "youhuawendang",
+      "unicode": "e7c4",
+      "unicode_decimal": 59332
+    },
+    {
       "icon_id": "88609",
       "name": "cluster-3",
       "font_class": "cluster-3",

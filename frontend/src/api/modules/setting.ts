@@ -170,6 +170,9 @@ export const loadUpgradeInfo = () => {
 export const loadReleaseNotes = (version: string) => {
     return http.post<string>(`/core/settings/upgrade/notes`, { version: version });
 };
+export const listReleases = () => {
+    return http.get<Array<Setting.ReleasesNotes>>(`/core/settings/upgrade/releases`);
+};
 export const upgrade = (version: string) => {
     return http.post(`/core/settings/upgrade`, { version: version });
 };

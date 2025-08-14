@@ -462,7 +462,8 @@ html.dark {
 
     .el-collapse-item__header {
         color: #ffffff;
-        background-color: var(--panel-main-bg-color-10) !important;
+        border: 1px solid var(--panel-main-bg-color-10);
+        background-color: var(--panel-main-bg-color-9) !important;
     }
 
     .el-checkbox__input.is-checked .el-checkbox__inner::after {

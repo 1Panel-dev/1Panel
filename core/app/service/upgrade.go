@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"path"
@@ -29,6 +30,7 @@ type IUpgradeService interface {
 	Rollback(req dto.OperateByID) error
 	LoadNotes(req dto.Upgrade) (string, error)
 	SearchUpgrade() (*dto.UpgradeInfo, error)
+	LoadRelease() ([]dto.ReleasesNotes, error)
 }
 
 func NewIUpgradeService() IUpgradeService {
@@ -206,6 +208,66 @@ func (u *UpgradeService) Rollback(req dto.OperateByID) error {
 	}
 	u.handleRollback(log.BackupFile, 3)
 	return nil
+}
+
+type noteHelper struct {
+	Docs []noteDetailHelper `json:"docs"`
+}
+type noteDetailHelper struct {
+	Location string `json:"location"`
+	Text     string `json:"text"`
+	Title    string `json:"title"`
+}
+
+func (u *UpgradeService) LoadRelease() ([]dto.ReleasesNotes, error) {
+	var notes []dto.ReleasesNotes
+	resp, err := req_helper.HandleGet("https://1panel.cn/docs/v2/search/search_index.json")
+	if err != nil {
+		return notes, err
+	}
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return notes, err
+	}
+	defer resp.Body.Close()
+	var nodeItem noteHelper
+	if err := json.Unmarshal(body, &nodeItem); err != nil {
+		return notes, err
+	}
+	for _, item := range nodeItem.Docs {
+		if !strings.HasPrefix(item.Location, "changelog/#v") {
+			continue
+		}
+		itemNote := analyzeDoc(item.Title, item.Text)
+		if len(itemNote.CreatedAt) != 0 {
+			notes = append(notes, analyzeDoc(item.Title, item.Text))
+		}
+	}
+
+	return notes, nil
+}
+
+func analyzeDoc(version, content string) dto.ReleasesNotes {
+	var item dto.ReleasesNotes
+	parts := strings.Split(content, "<p>")
+	if len(parts) < 3 {
+		return item
+	}
+	item.CreatedAt = strings.ReplaceAll(strings.TrimSpace(parts[1]), "</p>", "")
+	for i := 1; i < len(parts); i++ {
+		if strings.Contains(parts[i], "问题修复") {
+			item.FixCount = strings.Count(parts[i], "<li>")
+		}
+		if strings.Contains(parts[i], "新增功能") {
+			item.NewCount = strings.Count(parts[i], "<li>")
+		}
+		if strings.Contains(parts[i], "功能优化") {
+			item.OptimizationCount = strings.Count(parts[i], "<li>")
+		}
+	}
+	item.Content = strings.Replace(content, fmt.Sprintf("<p>%s</p>", item.CreatedAt), "", 1)
+	item.Version = version
+	return item
 }
 
 func (u *UpgradeService) handleBackup(originalDir string) error {

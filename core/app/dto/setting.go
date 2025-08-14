@@ -145,6 +145,15 @@ type Upgrade struct {
 	Version string `json:"version" validate:"required"`
 }
 
+type ReleasesNotes struct {
+	Version           string `json:"version"`
+	CreatedAt         string `json:"createdAt"`
+	Content           string `json:"content"`
+	NewCount          int    `json:"newCount"`
+	OptimizationCount int    `json:"optimizationCount"`
+	FixCount          int    `json:"fixCount"`
+}
+
 type ProxyUpdate struct {
 	ProxyUrl          string `json:"proxyUrl"`
 	ProxyType         string `json:"proxyType"`
