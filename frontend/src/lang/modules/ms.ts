@@ -3125,6 +3125,8 @@ const message = {
             notBelongToIpGroup: 'Tidak tergolong dalam Kumpulan IP',
             unknownWebsiteKey: 'Domain Tidak Diketahui',
             special: 'Peraturan Khas',
+            fileToLarge: 'Fail melebihi 1MB dan tidak dapat dimuat naik',
+            uploadOverLimit: 'Fail yang dimuat naik melebihi had kuantiti, maksimum 1 fail',
         },
         monitor: {
             name: 'Pemantauan Laman Web',

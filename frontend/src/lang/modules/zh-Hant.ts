@@ -2956,6 +2956,8 @@ const message = {
             notBelongToIpGroup: '不屬於 IP 組',
             unknownWebsiteKey: '未知域名',
             special: '指定',
+            fileToLarge: '檔案超過 1MB 無法上傳',
+            uploadOverLimit: '上傳檔案超過數量限制，最大1個',
         },
         monitor: {
             name: '網站監控',

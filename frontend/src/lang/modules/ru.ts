@@ -3120,6 +3120,8 @@ const message = {
             notBelongToIpGroup: 'Не принадлежит к группе IP',
             unknownWebsiteKey: 'Неизвестный домен',
             special: 'Специальный',
+            fileToLarge: 'Файл превышает 1MB и не может быть загружен',
+            uploadOverLimit: 'Загруженный файл превышает лимит количества, максимум 1 файл',
         },
         monitor: {
             name: 'Мониторинг веб-сайта',

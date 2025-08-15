@@ -3203,6 +3203,8 @@ const message = {
             notBelongToIpGroup: 'IP Grubuna Ait Değil',
             unknownWebsiteKey: 'Bilinmeyen Alan',
             special: 'Özel',
+            fileToLarge: "Dosya 1MB'yi aştığı için yüklenemez",
+            uploadOverLimit: 'Yüklenen dosya sayısı sınırı aşıyor, maksimum 1 dosya',
         },
         monitor: {
             name: 'Web Sitesi İzleme',

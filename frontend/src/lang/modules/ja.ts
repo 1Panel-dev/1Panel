@@ -3056,6 +3056,8 @@ const message = {
             notBelongToIpGroup: 'IP グループに属していません',
             unknownWebsiteKey: '未知のドメイン',
             special: '特別な文字は使用できません',
+            fileToLarge: 'ファイルが1MBを超えており、アップロードできません',
+            uploadOverLimit: 'アップロードファイル数が制限を超えています、最大1ファイル',
         },
         monitor: {
             name: 'ウェブサイトモニタリング',

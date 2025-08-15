@@ -273,6 +273,7 @@ deny: "禁止"
 OpenrestyNotFound: "Openresty 未安装"
 remoteIpIsNull: "IP 列表为空"
 OpenrestyVersionErr: "Openresty 版本过低，请升级 Openresty 至 1.27.1.2-2-2-focal"
+ErrFileTooLarge: "文件超过 1MB 无法上传"
 
 #task
 TaskStart: "{{ .name }} 任务开始 [START]"

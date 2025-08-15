@@ -3169,6 +3169,8 @@ const message = {
             notBelongToIpGroup: 'Does not belong to IP Group',
             unknownWebsiteKey: 'Unknown Domain',
             special: 'Special',
+            fileToLarge: 'File exceeds 1MB and cannot be uploaded',
+            uploadOverLimit: 'Uploaded file exceeds the quantity limit, maximum 1 file',
         },
         monitor: {
             name: 'Website Monitoring',

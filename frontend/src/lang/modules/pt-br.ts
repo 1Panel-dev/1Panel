@@ -3130,6 +3130,8 @@ const message = {
             notBelongToIpGroup: 'Não pertence ao Grupo de IP',
             unknownWebsiteKey: 'Domínio Desconhecido',
             special: 'Domínio Especial',
+            fileToLarge: 'O arquivo excede 1MB e não pode ser enviado',
+            uploadOverLimit: 'O arquivo enviado excede o limite de quantidade, máximo 1 arquivo',
         },
         monitor: {
             name: 'Monitoramento de Websites',

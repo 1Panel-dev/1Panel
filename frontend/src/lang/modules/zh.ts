@@ -2931,6 +2931,8 @@ const message = {
             notBelongToIpGroup: '不属于 IP 组',
             unknownWebsiteKey: '未知域名',
             special: '指定',
+            fileToLarge: '文件超过 1MB 无法上传',
+            uploadOverLimit: '上传文件超过数量限制，最大1个',
         },
         monitor: {
             name: '网站监控',

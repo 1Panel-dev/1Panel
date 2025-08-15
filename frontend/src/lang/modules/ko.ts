@@ -3002,6 +3002,8 @@ const message = {
             notBelongToIpGroup: 'IP 그룹에 속하지 않음',
             unknownWebsiteKey: '알 수 없는 도메인',
             special: '특수 문자',
+            fileToLarge: '파일이 1MB를 초과하여 업로드할 수 없습니다',
+            uploadOverLimit: '업로드된 파일 수가 제한을 초과했습니다, 최대 1개',
         },
         monitor: {
             name: '웹사이트 모니터링',
