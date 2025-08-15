@@ -1,6 +1,7 @@
 package service
 
 import (
+	"bufio"
 	"context"
 	"encoding/base64"
 	"encoding/json"
@@ -581,6 +582,76 @@ func getUpgradeCompose(install model.AppInstall, detail model.AppDetail) (string
 	return string(composeByte), nil
 }
 
+func buildNginx(parentTask *task.Task) error {
+	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
+	if err != nil {
+		return err
+	}
+	fileOp := files.NewFileOp()
+	buildPath := path.Join(nginxInstall.GetPath(), "build")
+	if !fileOp.Stat(buildPath) {
+		return buserr.New("ErrBuildDirNotFound")
+	}
+	moduleConfigPath := path.Join(buildPath, "module.json")
+	moduleContent, err := fileOp.GetContent(moduleConfigPath)
+	if err != nil {
+		return err
+	}
+	var (
+		modules         []dto.NginxModule
+		addModuleParams []string
+		addPackages     []string
+	)
+	if len(moduleContent) > 0 {
+		_ = json.Unmarshal(moduleContent, &modules)
+		bashFile, err := os.OpenFile(path.Join(buildPath, "tmp", "pre.sh"), os.O_CREATE|os.O_WRONLY|os.O_TRUNC, constant.DirPerm)
+		if err != nil {
+			return err
+		}
+		defer bashFile.Close()
+		bashFileWriter := bufio.NewWriter(bashFile)
+		for _, module := range modules {
+			if !module.Enable {
+				continue
+			}
+			_, err = bashFileWriter.WriteString(module.Script + "\n")
+			if err != nil {
+				return err
+			}
+			addModuleParams = append(addModuleParams, module.Params)
+			addPackages = append(addPackages, module.Packages...)
+		}
+		err = bashFileWriter.Flush()
+		if err != nil {
+			return err
+		}
+	}
+	envs, err := gotenv.Read(nginxInstall.GetEnvPath())
+	if err != nil {
+		return err
+	}
+	envs["RESTY_CONFIG_OPTIONS_MORE"] = ""
+	envs["RESTY_ADD_PACKAGE_BUILDDEPS"] = ""
+	if len(addModuleParams) > 0 {
+		envs["RESTY_CONFIG_OPTIONS_MORE"] = strings.Join(addModuleParams, " ")
+	}
+	if len(addPackages) > 0 {
+		envs["RESTY_ADD_PACKAGE_BUILDDEPS"] = strings.Join(addPackages, " ")
+	}
+	_ = gotenv.Write(envs, nginxInstall.GetEnvPath())
+	if len(addModuleParams) == 0 && len(addPackages) == 0 {
+		return nil
+	}
+	logStr := fmt.Sprintf("%s %s", i18n.GetMsgByKey("TaskBuild"), i18n.GetMsgByKey("Image"))
+	parentTask.LogStart(logStr)
+	cmdMgr := cmd.NewCommandMgr(cmd.WithTask(*parentTask), cmd.WithTimeout(60*time.Minute))
+	if err = cmdMgr.RunBashCf("docker compose -f %s build", nginxInstall.GetComposePath()); err != nil {
+		return err
+	}
+	parentTask.LogSuccess(logStr)
+	return nil
+}
+
 func upgradeInstall(req request.AppInstallUpgrade) error {
 	install, err := appInstallRepo.GetFirst(repo.WithByID(req.InstallID))
 	if err != nil {
@@ -713,6 +784,14 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 			return err
 		}
 		envParams := make(map[string]string, len(envs))
+		if install.App.Key == constant.AppOpenresty {
+			packageUrl, _ := env.GetEnvValueByKey(install.GetEnvPath(), "CONTAINER_PACKAGE_URL")
+			addPackage, _ := env.GetEnvValueByKey(install.GetEnvPath(), "RESTY_ADD_PACKAGE_BUILDDEPS")
+			options, _ := env.GetEnvValueByKey(install.GetEnvPath(), "RESTY_CONFIG_OPTIONS_MORE")
+			envParams["CONTAINER_PACKAGE_URL"] = packageUrl
+			envParams["RESTY_ADD_PACKAGE_BUILDDEPS"] = addPackage
+			envParams["RESTY_CONFIG_OPTIONS_MORE"] = options
+		}
 		handleMap(envs, envParams)
 		if err = env.Write(envParams, install.GetEnvPath()); err != nil {
 			return err
@@ -724,6 +803,12 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 
 		if err = fileOp.WriteFile(install.GetComposePath(), strings.NewReader(install.DockerCompose), constant.FilePerm); err != nil {
 			return err
+		}
+
+		if install.App.Key == constant.AppOpenresty {
+			if err = buildNginx(t); err != nil {
+				t.Log(err.Error())
+			}
 		}
 
 		logStr := fmt.Sprintf("%s %s", i18n.GetMsgByKey("Run"), i18n.GetMsgByKey("App"))
