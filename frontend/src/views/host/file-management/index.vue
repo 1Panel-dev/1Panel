@@ -1410,8 +1410,10 @@ const getHostMount = async () => {
 const handleDrop = async (event: DragEvent) => {
     event.preventDefault();
     fileUpload.path = req.path;
+    if (!uploadRef.value?.open) {
+        await uploadRef.value?.handleDrop(event);
+    }
     uploadRef.value.acceptParams(fileUpload);
-    await uploadRef.value?.handleDrop(event);
 };
 
 const handleDragover = (event: DragEvent) => {

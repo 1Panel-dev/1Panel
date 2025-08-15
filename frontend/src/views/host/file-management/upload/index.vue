@@ -448,7 +448,7 @@ const acceptParams = (props: UploadFileProps) => {
     });
 };
 
-defineExpose({ acceptParams, handleDrop });
+defineExpose({ acceptParams, handleDrop, open });
 </script>
 
 <style lang="scss" scoped>
