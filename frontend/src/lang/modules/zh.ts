@@ -2027,6 +2027,7 @@ const message = {
         uninstallDeleteBackup: '卸载应用-删除备份',
         uninstallDeleteImage: '卸载应用-删除镜像',
         upgradeBackup: '应用升级前备份应用',
+        noAppHelper: '未检测到应用，请前往任务中心查看应用商店同步日志',
     },
     website: {
         primaryDomain: '主域名',
