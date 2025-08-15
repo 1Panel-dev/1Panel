@@ -3132,6 +3132,7 @@ const message = {
             special: 'Domínio Especial',
             fileToLarge: 'O arquivo excede 1MB e não pode ser enviado',
             uploadOverLimit: 'O arquivo enviado excede o limite de quantidade, máximo 1 arquivo',
+            importRuleHelper: 'Uma regra por linha',
         },
         monitor: {
             name: 'Monitoramento de Websites',

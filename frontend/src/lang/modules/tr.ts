@@ -3205,6 +3205,7 @@ const message = {
             special: 'Özel',
             fileToLarge: "Dosya 1MB'yi aştığı için yüklenemez",
             uploadOverLimit: 'Yüklenen dosya sayısı sınırı aşıyor, maksimum 1 dosya',
+            importRuleHelper: 'Her satıra bir kural',
         },
         monitor: {
             name: 'Web Sitesi İzleme',

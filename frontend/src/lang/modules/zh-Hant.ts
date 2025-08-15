@@ -2958,6 +2958,7 @@ const message = {
             special: '指定',
             fileToLarge: '檔案超過 1MB 無法上傳',
             uploadOverLimit: '上傳檔案超過數量限制，最大1個',
+            importRuleHelper: '一行一個規則',
         },
         monitor: {
             name: '網站監控',

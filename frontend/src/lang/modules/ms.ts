@@ -3127,6 +3127,7 @@ const message = {
             special: 'Peraturan Khas',
             fileToLarge: 'Fail melebihi 1MB dan tidak dapat dimuat naik',
             uploadOverLimit: 'Fail yang dimuat naik melebihi had kuantiti, maksimum 1 fail',
+            importRuleHelper: 'Satu peraturan per baris',
         },
         monitor: {
             name: 'Pemantauan Laman Web',

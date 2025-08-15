@@ -3004,6 +3004,7 @@ const message = {
             special: '특수 문자',
             fileToLarge: '파일이 1MB를 초과하여 업로드할 수 없습니다',
             uploadOverLimit: '업로드된 파일 수가 제한을 초과했습니다, 최대 1개',
+            importRuleHelper: '한 줄에 하나의 규칙',
         },
         monitor: {
             name: '웹사이트 모니터링',

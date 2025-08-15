@@ -2933,6 +2933,7 @@ const message = {
             special: '指定',
             fileToLarge: '文件超过 1MB 无法上传',
             uploadOverLimit: '上传文件超过数量限制，最大1个',
+            importRuleHelper: '一行一个规则',
         },
         monitor: {
             name: '网站监控',

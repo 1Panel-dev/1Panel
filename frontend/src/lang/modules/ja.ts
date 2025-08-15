@@ -3058,6 +3058,7 @@ const message = {
             special: '特別な文字は使用できません',
             fileToLarge: 'ファイルが1MBを超えており、アップロードできません',
             uploadOverLimit: 'アップロードファイル数が制限を超えています、最大1ファイル',
+            importRuleHelper: '1行に1つのルール',
         },
         monitor: {
             name: 'ウェブサイトモニタリング',

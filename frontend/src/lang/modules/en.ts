@@ -3171,6 +3171,7 @@ const message = {
             special: 'Special',
             fileToLarge: 'File exceeds 1MB and cannot be uploaded',
             uploadOverLimit: 'Uploaded file exceeds the quantity limit, maximum 1 file',
+            importRuleHelper: 'One rule per line',
         },
         monitor: {
             name: 'Website Monitoring',
