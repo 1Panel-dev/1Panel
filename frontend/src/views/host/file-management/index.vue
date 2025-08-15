@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div @dragover="handleDragover" @drop="handleDrop" @dragleave="handleDragleave">
         <div class="flex sm:flex-row flex-col justify-start gap-y-2 items-center gap-x-4" ref="toolRef">
             <div class="flex-shrink-0 flex sm:w-min w-full items-center justify-start">
                 <el-tooltip :content="$t('file.back')" placement="top">
@@ -1405,6 +1405,21 @@ const getHostMount = async () => {
     } catch (error) {
         console.error('Error fetching host mount:', error);
     }
+};
+
+const handleDrop = async (event: DragEvent) => {
+    event.preventDefault();
+    fileUpload.path = req.path;
+    uploadRef.value.acceptParams(fileUpload);
+    await uploadRef.value?.handleDrop(event);
+};
+
+const handleDragover = (event: DragEvent) => {
+    event.preventDefault();
+};
+
+const handleDragleave = (event: { preventDefault: () => void }) => {
+    event.preventDefault();
 };
 
 onMounted(() => {
