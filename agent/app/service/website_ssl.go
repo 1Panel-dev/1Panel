@@ -207,6 +207,9 @@ func printSSLLog(logger *log.Logger, msgKey string, params map[string]interface{
 }
 
 func reloadSystemSSL(websiteSSL *model.WebsiteSSL, logger *log.Logger) {
+	if global.CoreDB == nil {
+		return
+	}
 	systemSSLEnable, sslID := GetSystemSSL()
 	if systemSSLEnable && sslID == websiteSSL.ID {
 		fileOp := files.NewFileOp()
