@@ -125,6 +125,7 @@ ErrProxyIsUsed: "ロードバランシングはリバースプロキシによっ
 ErrSSLValid: '証明書ファイルが異常です、証明書の状態を確認してください！'
 ErrWebsiteDir: "ウェブサイトディレクトリ内のディレクトリを選択してください。"
 ErrComposerFileNotFound: "composer.json ファイルが存在しません"
+ErrRuntimeNoPort: "ランタイム環境にポートが設定されていません。先にランタイム環境を編集してください。"
 
 #ssl
 ErrSSLCannotDelete: '{{ .name }} 証明書は Web サイトで使用されているため、削除できません'

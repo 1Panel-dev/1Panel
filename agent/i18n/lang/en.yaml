@@ -125,6 +125,7 @@ ErrProxyIsUsed: "Load balancing has been used by reverse proxy, cannot be delete
 ErrSSLValid: 'Certificate file is abnormal, please check the certificate status!'
 ErrWebsiteDir: "Please select a directory within the website directory."
 ErrComposerFileNotFound: "composer.json file does not exist"
+ErrRuntimeNoPort: "The runtime environment is not set with a port, please edit the runtime environment first."
 
 #ssl
 ErrSSLCannotDelete: 'The {{ .name }} certificate is being used by a website and cannot be deleted'

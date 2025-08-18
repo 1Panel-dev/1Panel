@@ -124,6 +124,7 @@ ErrProxyIsUsed: "負載均衡已被反向代理使用，無法刪除"
 ErrSSLValid: '證書文件異常，請檢查證書狀態！'
 ErrWebsiteDir: "請選擇網站目錄下的目錄"
 ErrComposerFileNotFound: "composer.json 文件不存在"
+ErrRuntimeNoPort: "運行環境未設置端口，請先編輯運行環境"
 
 #ssl
 ErrSSLCannotDelete: '{{ .name }} 憑證正在被網站使用，無法刪除'

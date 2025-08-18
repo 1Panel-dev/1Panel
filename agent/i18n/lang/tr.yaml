@@ -125,6 +125,7 @@ ErrProxyIsUsed: "Yük dengeleme ters proxy tarafından kullanıldı, silinemez"
 ErrSSLValid: 'Sertifika dosyası anormal, lütfen sertifika durumunu kontrol edin!'
 ErrWebsiteDir: "Lütfen web sitesi dizini içindeki bir dizin seçin."
 ErrComposerFileNotFound: "composer.json dosyası mevcut değil"
+ErrRuntimeNoPort: "Çalışma zamanı ortamı bir porta sahip değil, lütfen önce çalışma zamanı ortamını düzenleyin."
 
 #ssl
 ErrSSLCannotDelete: '{{ .name }} sertifikası bir web sitesi tarafından kullanılıyor ve silinemez'

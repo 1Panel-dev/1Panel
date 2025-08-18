@@ -17,36 +17,7 @@
             </span>
         </template>
         <div v-loading="loading" :class="{ mask: !versionExist }">
-            <el-alert
-                v-if="website.type == 'deployment'"
-                :title="$t('website.websiteDeploymentHelper')"
-                type="info"
-                :closable="false"
-            />
-            <el-alert
-                v-if="website.type == 'static'"
-                :title="$t('website.websiteStatictHelper')"
-                type="info"
-                :closable="false"
-            />
-            <el-alert
-                v-if="website.type == 'proxy'"
-                :title="$t('website.websiteProxyHelper')"
-                type="info"
-                :closable="false"
-            />
-            <el-alert
-                v-if="website.type == 'runtime'"
-                :title="$t('website.runtimeProxyHelper')"
-                type="info"
-                :closable="false"
-            />
-            <el-alert
-                v-if="website.type == 'subsite'"
-                :title="$t('website.subsiteHelper')"
-                type="info"
-                :closable="false"
-            />
+            <SSLAlert :websiteType="website.type" />
             <br />
             <el-form
                 ref="websiteForm"
@@ -480,6 +451,7 @@ import DomainCreate from '@/views/website/website/domain-create/index.vue';
 import { getPathByType } from '@/api/modules/files';
 import { getWebsiteTypes } from '@/global/mimetype';
 import AppInstallForm from '@/views/app-store/detail/form/index.vue';
+import SSLAlert from '@/views/website/website/create/site-alert/index.vue';
 
 const websiteForm = ref<FormInstance>();
 
@@ -721,9 +693,11 @@ const getRuntimes = async () => {
             const first = runtimes.value[0];
             website.value.runtimeID = first.id;
             runtimeResource.value = first.resource;
-            runtimePorts.value = first.port.split(',').map((port: string) => parseInt(port.trim(), 10));
-            if (runtimePorts.value.length > 0) {
-                website.value.port = runtimePorts.value[0];
+            if (first.port != '') {
+                runtimePorts.value = first.port.split(',').map((port: string) => parseInt(port.trim(), 10));
+                if (runtimePorts.value.length > 0) {
+                    website.value.port = runtimePorts.value[0];
+                }
             }
         }
     } catch (error) {}

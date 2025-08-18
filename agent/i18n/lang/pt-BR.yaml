@@ -125,6 +125,7 @@ ErrProxyIsUsed: "Balanceamento de carga foi usado por proxy reverso, não pode s
 ErrSSLValid: 'O arquivo do certificado está anormal, verifique o status do certificado!'
 ErrWebsiteDir: "Por favor, selecione um diretório dentro do diretório do site."
 ErrComposerFileNotFound: "O arquivo composer.json não existe"
+ErrRuntimeNoPort: "O ambiente de tempo de execução não está configurado com uma porta, edite o ambiente de tempo de execução primeiro."
 
 #ssl
 ErrSSLCannotDelete: 'O certificado {{ .name }} está sendo usado por um site e não pode ser excluído'
