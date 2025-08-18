@@ -449,3 +449,7 @@ DiskUsedAlert: "Your 1Panel disk '{{ .name }}' has used {{ .used }}. Please log 
 ResourceAlert: "The average {{ .name }} usage over {{ .time }} minutes on your 1Panel is {{ .used }}. Please log in to the panel for details."
 PanelVersionAlert: "A new version of 1Panel is available. Please log in to the panel to upgrade."
 PanelPwdExpirationAlert: "Your 1Panel password will expire in {{ .day }} days. Please log in to the panel for details."
+CommonAlert: "Your 1Panel, {{ .msg }}, please log in to the panel for details."
+NodeExceptionAlert: "Your 1Panel, {{ .num }} nodes are abnormal, please log in to the panel for details."
+LicenseExceptionAlert: "Your 1Panel, {{ .num }} licenses are abnormal, please log in to the panel for details."
+SSHAndPanelLoginAlert: "Your 1Panel, abnormal panel {{ .name }} login from {{ .ip }}, please log in to the panel for details."

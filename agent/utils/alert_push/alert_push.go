@@ -31,7 +31,7 @@ func PushAlert(pushAlert dto.PushAlert) error {
 		m = strings.TrimSpace(m)
 		switch m {
 		case constant.SMS:
-			if !alertUtil.CheckTaskFrequency(constant.SMS) {
+			if !alertUtil.CheckSMSSendLimit(constant.SMS) {
 				continue
 			}
 			todayCount, _, err := alertRepo.LoadTaskCount(alertUtil.GetCronJobType(alert.Type), strconv.Itoa(int(pushAlert.EntryID)), constant.SMS)
@@ -43,7 +43,7 @@ func PushAlert(pushAlert dto.PushAlert) error {
 				AlertId: alert.ID,
 				Count:   todayCount + 1,
 			}
-			_ = xpack.CreateTaskScanSMSAlertLog(alert, create, pushAlert, constant.SMS)
+			_ = xpack.CreateTaskScanSMSAlertLog(alert, alert.Type, create, pushAlert, constant.SMS)
 			alertUtil.CreateNewAlertTask(strconv.Itoa(int(pushAlert.EntryID)), alertUtil.GetCronJobType(alert.Type), strconv.Itoa(int(pushAlert.EntryID)), constant.SMS)
 		case constant.Email:
 			todayCount, _, err := alertRepo.LoadTaskCount(alertUtil.GetCronJobType(alert.Type), strconv.Itoa(int(pushAlert.EntryID)), constant.Email)

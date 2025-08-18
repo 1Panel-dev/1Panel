@@ -446,3 +446,18 @@ var InitCronjobGroup = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddColumnToAlert = &gormigrate.Migration{
+	ID: "20250729-add-column-to-alert",
+	Migrate: func(tx *gorm.DB) error {
+		if err := global.AlertDB.AutoMigrate(&model.Alert{}); err != nil {
+			return err
+		}
+		if err := global.AlertDB.Model(&model.Alert{}).
+			Where("advanced_params IS NULL").
+			Update("advanced_params", "").Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}

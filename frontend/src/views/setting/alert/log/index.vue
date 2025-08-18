@@ -98,7 +98,18 @@ const isProductPro = ref(false);
 const loading = ref(false);
 const data = ref();
 const isOffline = ref('Disable');
-const resourceTypes = ['cpu', 'memory', 'load', 'disk'];
+const resourceTypes = [
+    'cpu',
+    'memory',
+    'load',
+    'disk',
+    'nodeException',
+    'licenseException',
+    'panelLogin',
+    'sshLogin',
+    'panelIpLogin',
+    'sshIpLogin',
+];
 const paginationConfig = reactive({
     cacheSizeKey: 'alert-log-page-size',
     currentPage: 1,
@@ -125,7 +136,10 @@ const buttons = [
             syncAlert(row);
         },
         disabled: (row: Alert.AlertLog) => {
-            return row.method != 'sms' && row.status != 'PushSuccess' && row.status != 'SyncError';
+            return (
+                (row.method != 'sms' && row.status != 'PushSuccess' && row.status != 'SyncError') ||
+                row.status == 'Success'
+            );
         },
     },
 ];
@@ -188,6 +202,12 @@ const formatMessage = (row: Alert.AlertInfo) => {
         cutWebsiteLog: () => t('xpack.alert.cronJobCutWebsiteLogTitle', [row.project]),
         clean: () => t('xpack.alert.cronJobCleanTitle', [row.project]),
         ntp: () => t('xpack.alert.cronJobNtpTitle', [row.project]),
+        nodeException: () => t('xpack.alert.nodeException'),
+        licenseException: () => t('xpack.alert.licenseException'),
+        panelLogin: () => t('xpack.alert.panelLogin'),
+        sshLogin: () => t('xpack.alert.sshLogin'),
+        panelIpLogin: () => t('xpack.alert.panelIpLogin'),
+        sshIpLogin: () => t('xpack.alert.sshIpLogin'),
     };
     let type = row.type === 'cronJob' ? row.subType : row.type;
     return messageTemplates[type] ? messageTemplates[type]() : '';

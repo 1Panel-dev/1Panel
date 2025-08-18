@@ -3,14 +3,15 @@ package model
 type Alert struct {
 	BaseModel
 
-	Title     string `gorm:"type:varchar(256);not null" json:"title"`
-	Type      string `gorm:"type:varchar(64);not null" json:"type"`
-	Cycle     uint   `gorm:"type:integer;not null" json:"cycle"`
-	Count     uint   `gorm:"type:integer;not null" json:"count"`
-	Project   string `gorm:"type:varchar(64)" json:"project"`
-	Status    string `gorm:"type:varchar(64);not null" json:"status"`
-	Method    string `gorm:"type:varchar(64);not null" json:"method"`
-	SendCount uint   `gorm:"type:integer" json:"sendCount"`
+	Title          string `gorm:"type:varchar(256);not null" json:"title"`
+	Type           string `gorm:"type:varchar(64);not null" json:"type"`
+	Cycle          uint   `gorm:"type:integer;not null" json:"cycle"`
+	Count          uint   `gorm:"type:integer;not null" json:"count"`
+	Project        string `gorm:"type:varchar(64)" json:"project"`
+	Status         string `gorm:"type:varchar(64);not null" json:"status"`
+	Method         string `gorm:"type:varchar(64);not null" json:"method"`
+	SendCount      uint   `gorm:"type:integer" json:"sendCount"`
+	AdvancedParams string `gorm:"type:longText" json:"advancedParam"`
 }
 
 type AlertTask struct {
@@ -42,4 +43,13 @@ type AlertConfig struct {
 	Title  string `gorm:"type:varchar(64);not null" json:"title"`
 	Status string `gorm:"type:varchar(64);not null" json:"status"`
 	Config string `gorm:"type:varchar(256);not null" json:"config"`
+}
+
+type LoginLog struct {
+	BaseModel
+	IP      string `json:"ip"`
+	Address string `json:"address"`
+	Agent   string `json:"agent"`
+	Status  string `json:"status"`
+	Message string `json:"message"`
 }

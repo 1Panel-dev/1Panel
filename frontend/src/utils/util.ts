@@ -675,14 +675,12 @@ let fileTypes = {
     text: ['.iso', '.tiff', '.exe', '.so', '.bz', '.dmg', '.apk', '.pptx', '.ppt', '.xlsb'],
 };
 
-export const getFileType = (extension: string) => {
-    let type = 'text';
-    Object.entries(fileTypes).forEach(([key, extensions]) => {
-        if (extensions.includes(extension.toLowerCase())) {
-            type = key;
-        }
-    });
-    return type;
+export const getFileType = (extension?: string) => {
+    const ext = extension?.toLowerCase();
+    if (!ext) return 'text';
+
+    const match = Object.entries(fileTypes).find((extensions) => extensions.includes(ext));
+    return match ? match[0] : 'text';
 };
 
 export const newUUID = () => {

@@ -449,3 +449,7 @@ DiskUsedAlert: "1Panel のディスク '{{ .name }}' は {{ .used }} 使用さ�
 ResourceAlert: "1Panel の {{ .time }} 分間の平均 {{ .name }} 使用率は {{ .used }} です。詳細はパネルでご確認ください。"
 PanelVersionAlert: "1Panel に新しいバージョンが利用可能です。アップグレードはパネルから行ってください。"
 PanelPwdExpirationAlert: "1Panel のパスワードは {{ .day }} 日後に期限切れとなります。詳細はパネルでご確認ください。"
+CommonAlert: "お使いの1Panel、{{ .msg }}、詳細はパネルにログインしてご確認ください。"
+NodeExceptionAlert: "お使いの1Panel、{{ .num }}個のノードに異常があります。詳細はパネルにログインしてご確認ください。"
+LicenseExceptionAlert: "お使いの1Panel、{{ .num }}個のライセンスに異常があります。詳細はパネルにログインしてご確認ください。"
+SSHAndPanelLoginAlert: "お使いの1Panel、パネル{{ .name }}が{{ .ip }}から異常ログインしました。詳細はパネルにログインしてご確認ください。"

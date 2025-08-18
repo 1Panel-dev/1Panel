@@ -53,12 +53,20 @@ func IsUseCustomApp() bool {
 	return false
 }
 
-func CreateTaskScanSMSAlertLog(alert dto.AlertDTO, create dto.AlertLogCreate, pushAlert dto.PushAlert, method string) error {
+func CreateTaskScanSMSAlertLog(alert dto.AlertDTO, alertType string, create dto.AlertLogCreate, pushAlert dto.PushAlert, method string) error {
 	return nil
 }
 
-func CreateSMSAlertLog(info dto.AlertDTO, create dto.AlertLogCreate, project string, params []dto.Param, method string) error {
+func CreateSMSAlertLog(alertType string, info dto.AlertDTO, create dto.AlertLogCreate, project string, params []dto.Param, method string) error {
 	return nil
+}
+
+func GetLicenseErrorAlert() (uint, error) {
+	return 0, nil
+}
+
+func GetNodeErrorAlert() (uint, error) {
+	return 0, nil
 }
 
 func LoadRequestTransport() *http.Transport {

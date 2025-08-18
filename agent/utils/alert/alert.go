@@ -2,21 +2,24 @@ package alert
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
+	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/utils/email"
 	"github.com/jinzhu/copier"
 	"net/http"
+	"os"
+	"os/exec"
+	"regexp"
 	"strings"
 	"sync"
 	"time"
-
-	"github.com/1Panel-dev/1Panel/agent/app/dto"
-	"github.com/1Panel-dev/1Panel/agent/global"
 )
 
 var cronJobAlertTypes = []string{"shell", "app", "website", "database", "directory", "log", "snapshot", "curl", "cutWebsiteLog", "clean", "ntp"}
@@ -66,7 +69,7 @@ func CreateEmailAlertLog(create dto.AlertLogCreate, alert dto.AlertDTO, params [
 			Encryption: emailInfo.Encryption,
 			Recipient:  emailInfo.Recipient,
 		}
-		content := alert.Title
+		content := i18n.GetMsgWithMap("CommonAlert", map[string]interface{}{"msg": alert.Title})
 		if GetEmailContent(alert.Type, params) != "" {
 			content = GetEmailContent(alert.Type, params)
 		}
@@ -191,7 +194,7 @@ func CreateAlertParams(param string) []dto.Param {
 
 var checkTaskMutex sync.Mutex
 
-func CheckTaskFrequency(method string) bool {
+func CheckSMSSendLimit(method string) bool {
 	alertRepo := repo.NewIAlertRepo()
 	config, err := alertRepo.GetConfig(alertRepo.WithByType(constant.SMSConfig))
 	if err != nil {
@@ -204,8 +207,8 @@ func CheckTaskFrequency(method string) bool {
 	}
 	limitCount := cfg.AlertDailyNum
 	checkTaskMutex.Lock()
-	todayCount, err := alertRepo.GetLicensePushCount(method)
 	defer checkTaskMutex.Unlock()
+	todayCount, err := alertRepo.GetLicensePushCount(method)
 	if err != nil {
 		global.LOG.Errorf("error getting license push count info, err: %v", err)
 		return false
@@ -312,6 +315,18 @@ func GetEmailContent(alertType string, params []dto.Param) string {
 		return i18n.GetMsgWithMap("CronJobFailedAlert", map[string]interface{}{"name": getValueByIndex(params, "1")})
 	case "clams":
 		return i18n.GetMsgWithMap("ClamAlert", map[string]interface{}{"num": getValueByIndex(params, "1")})
+	case "panelLogin":
+		return i18n.GetMsgWithMap("SSHAndPanelLoginAlert", map[string]interface{}{"name": getValueByIndex(params, "1"), "ip": getValueByIndex(params, "2")})
+	case "sshLogin":
+		return i18n.GetMsgWithMap("SSHAndPanelLoginAlert", map[string]interface{}{"name": getValueByIndex(params, "1"), "ip": getValueByIndex(params, "2")})
+	case "panelIpLogin":
+		return i18n.GetMsgWithMap("SSHAndPanelLoginAlert", map[string]interface{}{"name": getValueByIndex(params, "1"), "ip": getValueByIndex(params, "2")})
+	case "sshIpLogin":
+		return i18n.GetMsgWithMap("SSHAndPanelLoginAlert", map[string]interface{}{"name": getValueByIndex(params, "1"), "ip": getValueByIndex(params, "2")})
+	case "nodeException":
+		return i18n.GetMsgWithMap("NodeExceptionAlert", map[string]interface{}{"num": getValueByIndex(params, "1")})
+	case "licenseException":
+		return i18n.GetMsgWithMap("LicenseExceptionAlert", map[string]interface{}{"num": getValueByIndex(params, "1")})
 	default:
 		return ""
 	}
@@ -324,4 +339,155 @@ func getValueByIndex(params []dto.Param, index string) string {
 		}
 	}
 	return ""
+}
+
+func CountRecentFailedLoginLogs(minutes uint, failCount uint) (int, bool, error) {
+	now := time.Now()
+	startTime := now.Add(-time.Duration(minutes) * time.Minute)
+	db := global.CoreDB.Model(&model.LoginLog{})
+	var count int64
+	err := db.Where("created_at >= ? AND status = ?", startTime, constant.StatusFailed).
+		Count(&count).Error
+	if err != nil {
+		return 0, false, err
+	}
+	return int(count), int(count) > int(failCount), nil
+}
+
+func FindRecentSuccessLoginsNotInWhitelist(minutes int, whitelist []string) ([]model.LoginLog, error) {
+	now := time.Now()
+	startTime := now.Add(-time.Duration(minutes) * time.Minute)
+
+	whitelistMap := make(map[string]struct{})
+	for _, ip := range whitelist {
+		whitelistMap[ip] = struct{}{}
+	}
+
+	var logs []model.LoginLog
+	err := global.CoreDB.Model(&model.LoginLog{}).
+		Where("created_at >= ? AND status = ?", startTime, constant.StatusSuccess).
+		Find(&logs).Error
+	if err != nil {
+		return nil, err
+	}
+
+	var abnormalLogs []model.LoginLog
+	for _, log := range logs {
+		if _, ok := whitelistMap[log.IP]; !ok {
+			abnormalLogs = append(abnormalLogs, log)
+		}
+	}
+	return abnormalLogs, nil
+}
+
+func CountRecentFailedSSHLog(minutes uint, maxAllowed uint) (int, bool, error) {
+	lines, err := grepSSHLog("Failed password")
+	if err != nil {
+		return 0, false, err
+	}
+
+	thresholdTime := time.Now().Add(-time.Duration(minutes) * time.Minute)
+	count := 0
+
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if line == "" {
+			continue
+		}
+		t, err := parseLogTime(line)
+		if err != nil {
+			continue
+		}
+		if t.After(thresholdTime) {
+			count++
+		}
+	}
+	return count, count > int(maxAllowed), nil
+}
+
+func FindRecentSuccessLoginNotInWhitelist(minutes int, whitelist []string) ([]string, error) {
+	lines, err := grepSSHLog("Accepted password")
+	if err != nil {
+		return nil, err
+	}
+
+	thresholdTime := time.Now().Add(-time.Duration(minutes) * time.Minute)
+	var abnormalLogins []string
+
+	whitelistMap := make(map[string]struct{}, len(whitelist))
+	for _, ip := range whitelist {
+		whitelistMap[ip] = struct{}{}
+	}
+
+	ipRegex := regexp.MustCompile(`from\s+([0-9.]+)\s+port\s+(\d+)`)
+
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if line == "" {
+			continue
+		}
+
+		t, err := parseLogTime(line)
+		if err != nil || t.Before(thresholdTime) {
+			continue
+		}
+
+		match := ipRegex.FindStringSubmatch(line)
+		if len(match) >= 2 {
+			ip := match[1]
+			if _, ok := whitelistMap[ip]; !ok {
+				abnormalLogins = append(abnormalLogins, fmt.Sprintf("%s-%s", ip, t.Format("2006-01-02 15:04:05")))
+			}
+		}
+	}
+
+	return abnormalLogins, nil
+}
+
+func shellEscape(s string) string {
+	return strings.ReplaceAll(s, `'`, `'\''`)
+}
+
+func grepSSHLog(keyword string) ([]string, error) {
+	logFiles := []string{"/var/log/secure", "/var/log/auth.log"}
+	var results []string
+
+	for _, logFile := range logFiles {
+		if _, err := os.Stat(logFile); err != nil {
+			continue
+		}
+
+		cmdStr := fmt.Sprintf(`grep -a '%s' %s`, shellEscape(keyword), logFile)
+		cmd := exec.Command("bash", "-c", cmdStr)
+		output, err := cmd.Output()
+		if err != nil {
+			var exitErr *exec.ExitError
+			if errors.As(err, &exitErr) && len(exitErr.Stderr) == 0 {
+				continue
+			}
+			return nil, fmt.Errorf("read log file fail [%s]: %w", logFile, err)
+		}
+
+		lines := strings.Split(string(output), "\n")
+		for _, line := range lines {
+			line = strings.TrimSpace(line)
+			if line != "" {
+				results = append(results, line)
+			}
+		}
+	}
+
+	return results, nil
+}
+
+func parseLogTime(line string) (time.Time, error) {
+	if len(line) < 15 {
+		return time.Time{}, errors.New("log line time is incorrect")
+	}
+	timeStr := line[:15]
+	parsedTime, err := time.ParseInLocation("Jan 2 15:04:05", timeStr, time.Local)
+	if err != nil {
+		return time.Time{}, err
+	}
+	return parsedTime.AddDate(time.Now().Year(), 0, 0), nil
 }

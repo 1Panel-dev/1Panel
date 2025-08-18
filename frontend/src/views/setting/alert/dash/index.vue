@@ -20,7 +20,11 @@
                         <template v-if="isMaster">
                             <el-option value="panelPwdEndTime" :label="$t('xpack.alert.panelPwdEndTime')" />
                             <el-option value="panelUpdate" :label="$t('xpack.alert.panelUpdate')" />
+                            <el-option value="nodeException" :label="$t('xpack.alert.nodeException')" />
+                            <el-option value="licenseException" :label="$t('xpack.alert.licenseException')" />
+                            <el-option value="panelLogin" :label="$t('xpack.alert.panelLogin')" />
                         </template>
+                        <el-option value="sshLogin" :label="$t('xpack.alert.sshLogin')" />
                         <el-option value="clams" :label="$t('xpack.alert.clams')" />
                         <el-option value="shell" :label="$t('xpack.alert.cronjob') + '-' + $t('cronjob.shell')" />
                         <el-option value="app" :label="$t('xpack.alert.cronjob') + '-' + $t('cronjob.app')" />
@@ -238,6 +242,10 @@ const formatRule = (row: Alert.AlertInfo) => {
         cutWebsiteLog: () => t('xpack.alert.cronJobCutWebsiteLogRule', [row.sendCount]),
         clean: () => t('xpack.alert.cronJobCleanRule', [row.sendCount]),
         ntp: () => t('xpack.alert.cronJobNtpRule', [row.sendCount]),
+        nodeException: () => t('xpack.alert.nodeExceptionRule', [row.sendCount]),
+        licenseException: () => t('xpack.alert.licenseExceptionRule', [row.sendCount]),
+        panelLogin: () => t('xpack.alert.panelLoginRule', [row.sendCount]),
+        sshLogin: () => t('xpack.alert.sshLoginRule', [row.sendCount]),
     };
 
     return ruleTemplates[row.type] ? ruleTemplates[row.type]() : '';

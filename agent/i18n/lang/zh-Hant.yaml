@@ -448,3 +448,7 @@ DiskUsedAlert: "您的 1Panel 面板磁碟 '{{ .name }}' 已使用 {{ .used }}�
 ResourceAlert: "您的 1Panel 面板於 {{ .time }} 分鐘內的平均 {{ .name }} 使用率為 {{ .used }}，詳情請登入面板查看。"
 PanelVersionAlert: "您的 1Panel 面板有可升級的新版本，詳情請登入面板查看。"
 PanelPwdExpirationAlert: "您的 1Panel 面板密碼將於 {{ .day }} 天後到期，詳情請登入面板查看。"
+CommonAlert: "您的 1Panel 面板，{{ .msg }}，詳情請登入面板查看。"
+NodeExceptionAlert: "您的 1Panel 面板，{{ .num }} 個節點存在異常，詳情請登入面板查看。"
+LicenseExceptionAlert: "您的 1Panel 面板，{{ .num }} 個許可證存在異常，詳情請登入面板查看。"
+SSHAndPanelLoginAlert: "您的 1Panel 面板，面板{{ .name }}從 {{ .ip }} 登錄異常，詳情請登入面板查看。"

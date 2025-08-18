@@ -4,24 +4,29 @@ import (
 	"encoding/json"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
-	versionUtil "github.com/1Panel-dev/1Panel/agent/utils/version"
-	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
-	"math"
-	"sort"
-	"strconv"
-	"strings"
-	"time"
-
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	alertUtil "github.com/1Panel-dev/1Panel/agent/utils/alert"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
+	versionUtil "github.com/1Panel-dev/1Panel/agent/utils/version"
+	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 	"github.com/shirou/gopsutil/v4/cpu"
 	"github.com/shirou/gopsutil/v4/disk"
 	"github.com/shirou/gopsutil/v4/load"
 	"github.com/shirou/gopsutil/v4/mem"
 	"github.com/shirou/gopsutil/v4/net"
+	"math"
+	"sort"
+	"strconv"
+	"strings"
+	"time"
+)
+
+const (
+	ResourceAlertInterval = 30
+	CheckIntervalSec      = 3
+	LoadCheckIntervalMin  = 5
 )
 
 type AlertTaskHelper struct {
@@ -39,16 +44,17 @@ type IAlertTaskHelper interface {
 var cpuLoad1, cpuLoad5, cpuLoad15 []float64
 var memoryLoad1, memoryLoad5, memoryLoad15 []float64
 
-const ResourceAlertInterval = 30
-
 var baseTypes = map[string]bool{"ssl": true, "siteEndTime": true, "panelPwdEndTime": true, "panelUpdate": true}
-var resourceTypes = map[string]bool{"cpu": true, "memory": true, "disk": true, "load": true}
+var resourceTypes = map[string]bool{"cpu": true, "memory": true, "disk": true, "load": true, "panelLogin": true, "sshLogin": true, "nodeException": true, "licenseException": true}
 
 func NewIAlertTaskHelper() IAlertTaskHelper {
-	return &AlertTaskHelper{}
+	return &AlertTaskHelper{
+		DiskIO: make(chan []disk.IOCountersStat, 1),
+		NetIO:  make(chan []net.IOCountersStat, 1),
+	}
 }
 func (m *AlertTaskHelper) StartTask() {
-	baseAlert, resourceAlert := handleTask()
+	baseAlert, resourceAlert := m.getClassifiedAlerts()
 	if len(baseAlert) == 0 && len(resourceAlert) == 0 {
 		return
 	}
@@ -67,16 +73,7 @@ func (m *AlertTaskHelper) ResetTask() {
 }
 
 func (m *AlertTaskHelper) InitTask(alertType string) {
-	if alertType == "cpu" {
-		cpuLoad1 = []float64{}
-		cpuLoad5 = []float64{}
-		cpuLoad15 = []float64{}
-	}
-	if alertType == "memory" {
-		memoryLoad1 = []float64{}
-		memoryLoad5 = []float64{}
-		memoryLoad15 = []float64{}
-	}
+	resetAlertState(alertType)
 	if baseTypes[alertType] {
 		stopBaseJob()
 	} else if resourceTypes[alertType] {
@@ -85,22 +82,81 @@ func (m *AlertTaskHelper) InitTask(alertType string) {
 	m.StartTask()
 }
 
-func resourceTask(resourceAlert []dto.AlertDTO) {
-	for _, alert := range resourceAlert {
-		if !alertUtil.CheckSendTimeRange(alert.Type) {
-			continue
+func resetAlertState(alertType string) {
+	switch alertType {
+	case "cpu":
+		cpuLoad1 = []float64{}
+		cpuLoad5 = []float64{}
+		cpuLoad15 = []float64{}
+	case "memory":
+		memoryLoad1 = []float64{}
+		memoryLoad5 = []float64{}
+		memoryLoad15 = []float64{}
+	}
+}
+
+func (m *AlertTaskHelper) getClassifiedAlerts() (baseAlerts, resourceAlerts []dto.AlertDTO) {
+	alertList, _ := NewIAlertService().GetAlerts()
+	for _, alert := range alertList {
+		if baseTypes[alert.Type] {
+			baseAlerts = append(baseAlerts, alert)
+		} else if resourceTypes[alert.Type] {
+			resourceAlerts = append(resourceAlerts, alert)
 		}
-		switch alert.Type {
-		case "cpu":
-			loadCPUUsage(alert)
-		case "memory":
-			loadMemUsage(alert)
-		case "load":
-			loadLoadInfo(alert)
-		case "disk":
-			loadDiskUsage(alert)
-		default:
+	}
+	return
+}
+
+func handleBaseAlerts(baseAlerts []dto.AlertDTO) {
+	if len(baseAlerts) == 0 {
+		stopResourceJob()
+		return
+	}
+	if global.AlertBaseJobID == 0 {
+		baseTask(baseAlerts)
+		jobID, err := global.Cron.AddFunc("*/30 * * * *", func() {
+			baseTask(baseAlerts)
+		})
+		if err != nil {
+			global.LOG.Errorf("alert base job start failed: %v", err)
+			return
 		}
+		global.AlertBaseJobID = jobID
+		global.LOG.Info("start alert base job")
+	}
+}
+
+func handleResourceAlerts(resourceAlerts []dto.AlertDTO) {
+	if len(resourceAlerts) == 0 {
+		stopResourceJob()
+		return
+	}
+	if global.AlertResourceJobID == 0 {
+		jobID, err := global.Cron.AddFunc("*/1 * * * *", func() {
+			resourceTask(resourceAlerts)
+		})
+		if err != nil {
+			global.LOG.Errorf("alert resource job start failed: %v", err)
+			return
+		}
+		global.AlertResourceJobID = jobID
+		global.LOG.Info("start alert resource job")
+	}
+}
+
+func stopBaseJob() {
+	if global.AlertBaseJobID != 0 {
+		global.Cron.Remove(global.AlertBaseJobID)
+		global.AlertBaseJobID = 0
+		global.LOG.Info("stop alert base job")
+	}
+}
+
+func stopResourceJob() {
+	if global.AlertResourceJobID != 0 {
+		global.Cron.Remove(global.AlertResourceJobID)
+		global.AlertResourceJobID = 0
+		global.LOG.Info("stop alert resource job")
 	}
 }
 
@@ -122,289 +178,99 @@ func baseTask(baseAlert []dto.AlertDTO) {
 			if global.IsMaster {
 				loadPanelUpdate(alert)
 			}
-		default:
 		}
 	}
 }
 
-func handleTask() (baseAlert []dto.AlertDTO, resourceAlert []dto.AlertDTO) {
-	alertList, _ := NewIAlertService().GetAlerts()
-	baseAlert, resourceAlert = classifyAlerts(alertList)
-	return baseAlert, resourceAlert
-}
-
-func classifyAlerts(alertList []dto.AlertDTO) (baseAlert, resourceAlert []dto.AlertDTO) {
-	for _, alert := range alertList {
-		if baseTypes[alert.Type] {
-			baseAlert = append(baseAlert, alert)
-		} else if resourceTypes[alert.Type] {
-			resourceAlert = append(resourceAlert, alert)
+func resourceTask(resourceAlert []dto.AlertDTO) {
+	minute := time.Now().Minute()
+	for _, alert := range resourceAlert {
+		if !alertUtil.CheckSendTimeRange(alert.Type) {
+			continue
 		}
-	}
-	return
-}
-
-func handleBaseAlerts(baseAlert []dto.AlertDTO) {
-	if len(baseAlert) > 0 {
-		if global.AlertBaseJobID == 0 {
-			baseTask(baseAlert)
-			jobID, err := global.Cron.AddFunc("*/30 * * * *", func() {
-				baseTask(baseAlert)
-			})
-			if err != nil {
-				global.LOG.Errorf("alert base job start failed: %v", err)
-				return
+		execute := minute%LoadCheckIntervalMin == 0
+		switch alert.Type {
+		case "cpu":
+			loadCPUUsage(alert)
+		case "memory":
+			loadMemUsage(alert)
+		case "load":
+			loadLoadInfo(alert)
+		case "disk":
+			loadDiskUsage(alert)
+		case "panelLogin":
+			loadPanelLogin(alert)
+		case "sshLogin":
+			loadSSHLogin(alert)
+		case "nodeException":
+			if execute && global.IsMaster {
+				loadNodeException(alert)
 			}
-			global.AlertBaseJobID = jobID
-			global.LOG.Info("start alert base job")
-		}
-	} else {
-		stopBaseJob()
-	}
-}
-
-func handleResourceAlerts(resourceAlert []dto.AlertDTO) {
-	if len(resourceAlert) > 0 {
-		if global.AlertResourceJobID == 0 {
-			jobID, err := global.Cron.AddFunc("*/1 * * * *", func() {
-				resourceTask(resourceAlert)
-			})
-			if err != nil {
-				global.LOG.Errorf("alert resource job start failed: %v", err)
-				return
+		case "licenseException":
+			if execute && global.IsMaster {
+				loadLicenseException(alert)
 			}
-			global.AlertResourceJobID = jobID
-			global.LOG.Info("start alert resource job")
 		}
-	} else {
-		stopResourceJob()
-	}
-}
-
-func stopBaseJob() {
-	if global.AlertBaseJobID != 0 {
-		global.Cron.Remove(global.AlertBaseJobID)
-		global.AlertBaseJobID = 0
-		global.LOG.Info("stop alert base job")
-	}
-}
-
-func stopResourceJob() {
-	if global.AlertResourceJobID != 0 {
-		global.Cron.Remove(global.AlertResourceJobID)
-		global.AlertResourceJobID = 0
-		global.LOG.Info("stop alert resource job")
 	}
 }
 
 func loadSSLInfo(alert dto.AlertDTO) {
-	var opts []repo.DBOption
-	if alert.Project != "all" {
-		itemID, _ := strconv.Atoi(alert.Project)
-		opts = append(opts, repo.WithByID(uint(itemID)))
-	}
-
+	opts := getRepoOptionsByProject(alert.Project)
 	sslList, _ := repo.NewISSLRepo().List(opts...)
-	currentDate := time.Now()
-	daysDifferenceMap := make(map[int][]string)
-	projectMap := make(map[uint][]time.Time)
-	for _, ssl := range sslList {
-		daysDifference := int(ssl.ExpireDate.Sub(currentDate).Hours() / 24)
-		if daysDifference > 0 && int(alert.Cycle) >= daysDifference {
-			daysDifferenceMap[daysDifference] = append(daysDifferenceMap[daysDifference], ssl.PrimaryDomain)
-			projectMap[ssl.ID] = append(projectMap[ssl.ID], ssl.ExpireDate)
-		}
-	}
-	projectJSON := serializeAndSortProjects(projectMap)
-	if projectJSON == "" {
+	if len(sslList) == 0 {
 		return
 	}
-	if len(daysDifferenceMap) > 0 {
-		for daysDifference, ssl := range daysDifferenceMap {
-			primaryDomain := strings.Join(ssl, ",")
-			var params []dto.Param
-			params = createAlertBaseParams(strconv.Itoa(len(ssl)), strconv.Itoa(daysDifference))
-			methods := strings.Split(alert.Method, ",")
-			for _, m := range methods {
-				m = strings.TrimSpace(m)
-				switch m {
-				case constant.SMS:
-					todayCount, totalCount, err := alertRepo.LoadTaskCount(alert.Type, projectJSON, constant.SMS)
-					if err != nil || todayCount >= 1 || alert.SendCount <= totalCount {
-						continue
-					}
-					create := dto.AlertLogCreate{
-						Status:  constant.AlertSuccess,
-						Count:   totalCount + 1,
-						AlertId: alert.ID,
-						Type:    alert.Type,
-					}
-					if !alertUtil.CheckTaskFrequency(constant.SMS) {
-						continue
-					}
-					_ = xpack.CreateSMSAlertLog(alert, create, primaryDomain, params, constant.SMS)
-					alertUtil.CreateNewAlertTask(alert.Project, alert.Type, projectJSON, constant.SMS)
-				case constant.Email:
-					todayCount, totalCount, err := alertRepo.LoadTaskCount(alert.Type, projectJSON, constant.Email)
-					if err != nil || todayCount >= 1 || alert.SendCount <= totalCount {
-						continue
-					}
-					create := dto.AlertLogCreate{
-						Status:  constant.AlertSuccess,
-						Count:   totalCount + 1,
-						AlertId: alert.ID,
-						Type:    alert.Type,
-					}
-					alertDetail := alertUtil.ProcessAlertDetail(alert, primaryDomain, params, constant.Email)
-					alertRule := alertUtil.ProcessAlertRule(alert)
-					create.AlertRule = alertRule
-					create.AlertDetail = alertDetail
-					transport := xpack.LoadRequestTransport()
-					_ = alertUtil.CreateEmailAlertLog(create, alert, params, transport)
-					alertUtil.CreateNewAlertTask(alert.Project, alert.Type, projectJSON, constant.Email)
-				default:
-				}
-			}
-		}
-		global.LOG.Info("SSL alert push successful")
+	daysDiffMap, projectMap := calculateSSLExpiryDays(sslList, alert.Cycle)
+	projectJSON := serializeAndSortProjects(projectMap)
+	if projectJSON == "" || len(daysDiffMap) == 0 {
+		return
+	}
+	sender := NewAlertSender(alert, projectJSON)
+	for daysDiff, domains := range daysDiffMap {
+		domainStr := strings.Join(domains, ",")
+		params := createAlertBaseParams(strconv.Itoa(len(domains)), strconv.Itoa(daysDiff))
+		sender.Send(domainStr, params)
 	}
 }
 
 func loadWebsiteInfo(alert dto.AlertDTO) {
-	var opts []repo.DBOption
-	if alert.Project != "all" {
-		itemID, _ := strconv.Atoi(alert.Project)
-		opts = append(opts, repo.WithByID(uint(itemID)))
-	}
-
+	opts := getRepoOptionsByProject(alert.Project)
 	websiteList, _ := websiteRepo.List(opts...)
-	currentDate := time.Now()
-	daysDifferenceMap := make(map[int][]string)
-	projectMap := make(map[uint][]time.Time)
-	for _, website := range websiteList {
-		daysDifference := int(website.ExpireDate.Sub(currentDate).Hours() / 24)
-		if daysDifference > 0 && int(alert.Cycle) >= daysDifference {
-			daysDifferenceMap[daysDifference] = append(daysDifferenceMap[daysDifference], website.PrimaryDomain)
-			projectMap[website.ID] = append(projectMap[website.ID], website.ExpireDate)
-		}
-	}
-	projectJSON := serializeAndSortProjects(projectMap)
-	if projectJSON == "" {
+	if len(websiteList) == 0 {
 		return
 	}
-	if len(daysDifferenceMap) > 0 {
-		methods := strings.Split(alert.Method, ",")
-		for daysDifference, websites := range daysDifferenceMap {
-			primaryDomain := strings.Join(websites, ",")
-			var params []dto.Param
-			params = createAlertBaseParams(strconv.Itoa(len(websites)), strconv.Itoa(daysDifference))
-			for _, m := range methods {
-				m = strings.TrimSpace(m)
-				switch m {
-				case constant.SMS:
-					if !alertUtil.CheckTaskFrequency(constant.SMS) {
-						continue
-					}
-					todayCount, totalCount, err := alertRepo.LoadTaskCount(alert.Type, projectJSON, constant.SMS)
-					if err != nil || todayCount >= 1 || alert.SendCount <= totalCount {
-						continue
-					}
-					create := dto.AlertLogCreate{
-						Status:  constant.AlertSuccess,
-						Count:   totalCount + 1,
-						AlertId: alert.ID,
-						Type:    alert.Type,
-					}
-					_ = xpack.CreateSMSAlertLog(alert, create, primaryDomain, params, constant.SMS)
-					alertUtil.CreateNewAlertTask(alert.Project, alert.Type, projectJSON, constant.SMS)
-				case constant.Email:
-					todayCount, totalCount, err := alertRepo.LoadTaskCount(alert.Type, projectJSON, constant.Email)
-					if err != nil || todayCount >= 1 || alert.SendCount <= totalCount {
-						continue
-					}
-					create := dto.AlertLogCreate{
-						Status:  constant.AlertSuccess,
-						Count:   totalCount + 1,
-						AlertId: alert.ID,
-						Type:    alert.Type,
-					}
-					alertDetail := alertUtil.ProcessAlertDetail(alert, primaryDomain, params, constant.Email)
-					alertRule := alertUtil.ProcessAlertRule(alert)
-					create.AlertDetail = alertDetail
-					create.AlertRule = alertRule
-					transport := xpack.LoadRequestTransport()
-					_ = alertUtil.CreateEmailAlertLog(create, alert, params, transport)
-					alertUtil.CreateNewAlertTask(alert.Project, alert.Type, projectJSON, constant.Email)
-				default:
-				}
-			}
-		}
-		global.LOG.Info("website expiration alert push successful")
+
+	daysDiffMap, projectMap := calculateWebsiteExpiryDays(websiteList, alert.Cycle)
+	projectJSON := serializeAndSortProjects(projectMap)
+	if projectJSON == "" || len(daysDiffMap) == 0 {
+		return
+	}
+	sender := NewAlertSender(alert, projectJSON)
+	for daysDiff, domains := range daysDiffMap {
+		domainStr := strings.Join(domains, ",")
+		params := createAlertBaseParams(strconv.Itoa(len(domains)), strconv.Itoa(daysDiff))
+		sender.Send(domainStr, params)
 	}
 }
 
 func loadPanelPwd(alert dto.AlertDTO) {
 	// only master alert
-	var expirationDays model.Setting
-	if err := global.CoreDB.Model(&model.Setting{}).Where("key = ?", "ExpirationDays").First(&expirationDays).Error; err != nil {
-		global.LOG.Errorf("load %s from db setting failed, err: %v", "ExpirationDays", err)
-		return
-	}
-	if expirationDays.Value == "0" {
+	expDays, err := getSettingValue("ExpirationDays")
+	if err != nil || expDays == "0" {
 		global.LOG.Info("panel password expiration setting not enabled, skip")
 		return
 	}
-	var expirationTime model.Setting
-	if err := global.CoreDB.Model(&model.Setting{}).Where("key = ?", "ExpirationTime").First(&expirationTime).Error; err != nil {
-		global.LOG.Errorf("load %s from db setting failed, err: %v", "ExpirationTime", err)
+
+	expTimeStr, err := getSettingValue("ExpirationTime")
+	if err != nil {
 		return
 	}
-
-	var params []dto.Param
-	defaultDate, _ := time.Parse(constant.DateTimeLayout, expirationTime.Value)
-	daysDifference := calculateDaysDifference(defaultDate)
-	if daysDifference >= 0 && int(alert.Cycle) >= daysDifference {
-		params = createAlertPwdParams(strconv.Itoa(daysDifference))
-		methods := strings.Split(alert.Method, ",")
-		for _, m := range methods {
-			m = strings.TrimSpace(m)
-			switch m {
-			case constant.SMS:
-				if !alertUtil.CheckTaskFrequency(constant.SMS) {
-					continue
-				}
-				todayCount, totalCount, err := alertRepo.LoadTaskCount(alert.Type, expirationTime.Value, constant.SMS)
-				if err != nil || todayCount >= 1 || alert.SendCount <= totalCount {
-					continue
-				}
-				create := dto.AlertLogCreate{
-					Count:   totalCount + 1,
-					AlertId: alert.ID,
-					Type:    alert.Type,
-				}
-				_ = xpack.CreateSMSAlertLog(alert, create, strconv.Itoa(daysDifference), params, constant.SMS)
-				alertUtil.CreateNewAlertTask(expirationTime.Value, alert.Type, expirationTime.Value, constant.SMS)
-			case constant.Email:
-				todayCount, totalCount, err := alertRepo.LoadTaskCount(alert.Type, expirationTime.Value, constant.Email)
-				if err != nil || todayCount >= 1 || alert.SendCount <= totalCount {
-					continue
-				}
-				create := dto.AlertLogCreate{
-					Count:   totalCount + 1,
-					AlertId: alert.ID,
-					Type:    alert.Type,
-				}
-				alertDetail := alertUtil.ProcessAlertDetail(alert, strconv.Itoa(daysDifference), params, constant.Email)
-				alertRule := alertUtil.ProcessAlertRule(alert)
-				create.AlertRule = alertRule
-				create.AlertDetail = alertDetail
-				transport := xpack.LoadRequestTransport()
-				_ = alertUtil.CreateEmailAlertLog(create, alert, params, transport)
-				alertUtil.CreateNewAlertTask(expirationTime.Value, alert.Type, expirationTime.Value, constant.Email)
-			default:
-			}
-		}
-		global.LOG.Info("panel password expiration alert push successful")
+	expTime, _ := time.Parse(constant.DateTimeLayout, expTimeStr)
+	daysDiff := calculateDaysDifference(expTime)
+	if daysDiff >= 0 && int(alert.Cycle) >= daysDiff {
+		params := createAlertPwdParams(strconv.Itoa(daysDiff))
+		sender := NewAlertSender(alert, expTimeStr)
+		sender.Send(strconv.Itoa(daysDiff), params)
 	}
 }
 
@@ -412,103 +278,48 @@ func loadPanelUpdate(alert dto.AlertDTO) {
 	// only master alert
 	info, err := versionUtil.GetUpgradeVersionInfo()
 	if err != nil {
-		global.LOG.Errorf("error getting version, err: %s", err)
+		global.LOG.Errorf("error getting version info: %s", err)
 		return
 	}
 
-	// 获取版本信息
-	var version string
-	// 检查哪个版本字段不为空，并赋值
-	if info.NewVersion != "" {
-		version = info.NewVersion
-	} else if info.TestVersion != "" {
-		version = info.TestVersion
-	} else if info.LatestVersion != "" {
-		version = info.LatestVersion
-	}
+	version := getValidVersion(info)
 	if version == "" {
 		return
 	}
 
-	var params []dto.Param
-	methods := strings.Split(alert.Method, ",")
-	for _, m := range methods {
-		m = strings.TrimSpace(m)
-		switch m {
-		case constant.SMS:
-			if !alertUtil.CheckTaskFrequency(constant.SMS) {
-				continue
-			}
-			todayCount, totalCount, err := alertRepo.LoadTaskCount(alert.Type, version, constant.SMS)
-			if err != nil || todayCount >= 1 || alert.SendCount <= totalCount {
-				continue
-			}
-			var create = dto.AlertLogCreate{
-				Type:    alert.Type,
-				AlertId: alert.ID,
-				Count:   totalCount + 1,
-			}
-			_ = xpack.CreateSMSAlertLog(alert, create, version, params, constant.SMS)
-			alertUtil.CreateNewAlertTask(version, alert.Type, version, constant.SMS)
-		case constant.Email:
-			todayCount, totalCount, err := alertRepo.LoadTaskCount(alert.Type, version, constant.Email)
-			if err != nil || todayCount >= 1 || alert.SendCount <= totalCount {
-				continue
-			}
-			var create = dto.AlertLogCreate{
-				Type:    alert.Type,
-				AlertId: alert.ID,
-				Count:   totalCount + 1,
-			}
-			alertDetail := alertUtil.ProcessAlertDetail(alert, version, params, constant.Email)
-			alertRule := alertUtil.ProcessAlertRule(alert)
-			create.AlertRule = alertRule
-			create.AlertDetail = alertDetail
-			transport := xpack.LoadRequestTransport()
-			_ = alertUtil.CreateEmailAlertLog(create, alert, params, transport)
-			alertUtil.CreateNewAlertTask(version, alert.Type, version, constant.Email)
-		default:
-		}
-	}
-	global.LOG.Info("panel update alert push successful")
+	sender := NewAlertSender(alert, version)
+	sender.Send(version, []dto.Param{})
 }
 
 // 获取 CPU 使用率数据并发送到通道
 func loadCPUUsage(alert dto.AlertDTO) {
-	percent, err := cpu.Percent(3*time.Second, false)
+	percent, err := cpu.Percent(time.Duration(CheckIntervalSec)*time.Second, false)
 	if err != nil {
 		global.LOG.Errorf("error getting cpu usage, err: %v", err)
 		return
 	}
 
 	if len(percent) > 0 {
-		var cpuLoad *[]float64
+		var usageLoad *[]float64
 		var threshold int
 
 		switch alert.Cycle {
 		case 1:
-			cpuLoad = &cpuLoad1
+			usageLoad = &cpuLoad1
 			threshold = 1
 		case 5:
-			cpuLoad = &cpuLoad5
+			usageLoad = &cpuLoad5
 			threshold = 5
 		case 15:
-			cpuLoad = &cpuLoad15
+			usageLoad = &cpuLoad15
 			threshold = 15
-		default:
-			return
 		}
-
-		if checkAndSendAlert(alert, percent[0], cpuLoad, threshold) {
-			global.LOG.Info("cpu alert push successful")
-		}
+		shouldSendResourceAlert(alert, percent[0], usageLoad, threshold)
 	}
-
 }
 
 // 获取内存使用情况数据并发送到通道
 func loadMemUsage(alert dto.AlertDTO) {
-
 	memStat, err := mem.VirtualMemory()
 	if err != nil {
 		global.LOG.Errorf("error getting memory usage, err: %v", err)
@@ -529,12 +340,8 @@ func loadMemUsage(alert dto.AlertDTO) {
 	case 15:
 		memoryLoad = &memoryLoad15
 		threshold = 15
-	default:
-		return
 	}
-	if checkAndSendAlert(alert, percent, memoryLoad, threshold) {
-		global.LOG.Info("memory alert push successful")
-	}
+	shouldSendResourceAlert(alert, percent, memoryLoad, threshold)
 }
 
 // 获取系统负载数据并发送到通道
@@ -556,108 +363,366 @@ func loadLoadInfo(alert dto.AlertDTO) {
 	default:
 		return
 	}
+	if loadValue < float64(alert.Count) {
+		return
+	}
 	newDate, err := alertRepo.GetTaskLog(alert.Type, alert.ID)
 	if err != nil {
 		global.LOG.Errorf("task log record not found, err: %v", err)
 	}
+	if isAlertDue(newDate) {
+		sendResourceAlert(alert, loadValue)
+	}
+}
+
+func loadDiskUsage(alert dto.AlertDTO) {
+	newDate, err := alertRepo.GetTaskLog(alert.Type, alert.ID)
+	if err != nil || !isAlertDue(newDate) {
+		global.LOG.Errorf("record not found, err: %v", err)
+		return
+	}
+	if strings.Contains(alert.Project, "all") {
+		err = processAllDisks(alert)
+	} else {
+		err = processSingleDisk(alert)
+	}
+
+}
+
+func loadPanelLogin(alert dto.AlertDTO) {
+	count, isAlert, err := alertUtil.CountRecentFailedLoginLogs(alert.Cycle, alert.Count)
+	alertType := alert.Type
+	quota := strconv.Itoa(count)
+	quotaType := strconv.Itoa(int(alert.Cycle))
+	var params []dto.Param
+	if err != nil {
+		global.LOG.Errorf("Failed to count recent failed login logs: %v", err)
+	}
+	if isAlert {
+		alertType = "panelLogin"
+		quota = strconv.Itoa(count)
+		quotaType = "panelLogin"
+		params = append([]dto.Param{
+			{
+				Index: "1",
+				Key:   "cycle",
+				Value: "",
+			},
+			{
+				Index: "2",
+				Key:   "project",
+				Value: "",
+			},
+		})
+		sendAlerts(alert, alertType, quota, quotaType, params)
+	}
+
+	whitelist := strings.Split(strings.TrimSpace(alert.AdvancedParams), "\n")
+	records, err := alertUtil.FindRecentSuccessLoginsNotInWhitelist(30, whitelist)
+	if err != nil {
+		global.LOG.Errorf("Failed to check recent failed ip login logs: %v", err)
+	}
+	if len(records) > 0 {
+		quota = strings.Join(func() []string {
+			var ips []string
+			for _, r := range records {
+				ips = append(ips, r.IP)
+			}
+			return ips
+		}(), "\n")
+		alertType = "panelIpLogin"
+		quotaType = "panelIpLogin"
+		params = append([]dto.Param{
+			{
+				Index: "1",
+				Key:   "cycle",
+				Value: "",
+			},
+			{
+				Index: "2",
+				Key:   "project",
+				Value: " IP ",
+			},
+		})
+		sendAlerts(alert, alertType, quota, quotaType, params)
+	}
+}
+
+func loadSSHLogin(alert dto.AlertDTO) {
+	count, isAlert, err := alertUtil.CountRecentFailedSSHLog(alert.Cycle, alert.Count)
+	alertType := alert.Type
+	quota := strconv.Itoa(count)
+	quotaType := strconv.Itoa(int(alert.Cycle))
+	var params []dto.Param
+	if err != nil {
+		global.LOG.Errorf("Failed to count recent failed ssh login logs: %v", err)
+	}
+	if isAlert {
+		alertType = "sshLogin"
+		quota = strconv.Itoa(count)
+		quotaType = "sshLogin"
+		params = append([]dto.Param{
+			{
+				Index: "1",
+				Key:   "cycle",
+				Value: " SSH ",
+			},
+			{
+				Index: "2",
+				Key:   "project",
+				Value: "",
+			},
+		})
+		sendAlerts(alert, alertType, quota, quotaType, params)
+	}
+	whitelist := strings.Split(strings.TrimSpace(alert.AdvancedParams), "\n")
+	records, err := alertUtil.FindRecentSuccessLoginNotInWhitelist(30, whitelist)
+	if err != nil {
+		global.LOG.Errorf("Failed to check recent failed ip ssh login logs: %v", err)
+	}
+	if len(records) > 0 {
+		quota = strings.Join(func() []string {
+			var ips []string
+			for _, r := range records {
+				ips = append(ips, r)
+			}
+			return ips
+		}(), "\n")
+		alertType = "sshIpLogin"
+		quotaType = "sshIpLogin"
+		params = append([]dto.Param{
+			{
+				Index: "1",
+				Key:   "cycle",
+				Value: " SSH ",
+			},
+			{
+				Index: "2",
+				Key:   "project",
+				Value: " IP ",
+			},
+		})
+		sendAlerts(alert, alertType, quota, quotaType, params)
+	}
+}
+
+func loadNodeException(alert dto.AlertDTO) {
+	// only master alert
+	failCount, err := xpack.GetNodeErrorAlert()
+	if err != nil {
+		global.LOG.Errorf("error getting node, err: %s", err)
+		return
+	}
+	if failCount > 0 {
+		quotaType := "node-error"
+		params := []dto.Param{
+			{
+				Index: "1",
+				Key:   "cycle",
+				Value: strconv.Itoa(int(failCount)),
+			},
+		}
+		newDate, err := alertRepo.GetTaskLog(alert.Type, alert.ID)
+		if err != nil || !isAlertDue(newDate) {
+			global.LOG.Errorf("record not found, err: %v", err)
+			return
+		}
+		sender := NewAlertSender(alert, quotaType)
+		sender.ResourceSend(strconv.Itoa(int(failCount)), params)
+	}
+
+}
+
+func loadLicenseException(alert dto.AlertDTO) {
+	// only master alert
+	failCount, err := xpack.GetLicenseErrorAlert()
+	if err != nil {
+		global.LOG.Errorf("error getting license, err: %s", err)
+		return
+	}
+	if failCount > 0 {
+		quotaType := "license-error"
+		params := []dto.Param{
+			{
+				Index: "1",
+				Key:   "cycle",
+				Value: strconv.Itoa(int(failCount)),
+			},
+		}
+		newDate, err := alertRepo.GetTaskLog(alert.Type, alert.ID)
+		if err != nil || !isAlertDue(newDate) {
+			global.LOG.Errorf("record not found, err: %v", err)
+			return
+		}
+		sender := NewAlertSender(alert, quotaType)
+		sender.ResourceSend(strconv.Itoa(int(failCount)), params)
+	}
+}
+
+func sendAlerts(alert dto.AlertDTO, alertType, quota, quotaType string, params []dto.Param) {
+	methods := strings.Split(alert.Method, ",")
+	newDate, err := alertRepo.GetTaskLog(alertType, alert.ID)
+	if err != nil {
+		global.LOG.Errorf("task log record not found, err: %v", err)
+	}
 	if newDate.IsZero() || calculateMinutesDifference(newDate) > ResourceAlertInterval {
-		if loadValue >= float64(alert.Count) {
-			global.LOG.Infof("%d minute load: %f,detail: %v", alert.Cycle, loadValue, avgStat)
-			createAndLogAlert(alert, loadValue)
-			global.LOG.Info("load alert task push successful")
+		for _, m := range methods {
+			m = strings.TrimSpace(m)
+			switch m {
+			case constant.SMS:
+				if !alertUtil.CheckSMSSendLimit(constant.SMS) {
+					continue
+				}
+				todayCount, isValid := canSendAlertToday(alertType, quotaType, alert.SendCount, constant.SMS)
+				if !isValid {
+					continue
+				}
+				create := dto.AlertLogCreate{
+					Type:    alertType,
+					AlertId: alert.ID,
+					Count:   todayCount + 1,
+				}
+				_ = xpack.CreateSMSAlertLog(alertType, alert, create, quotaType, params, constant.SMS)
+				alertUtil.CreateNewAlertTask(quota, alertType, quotaType, constant.SMS)
+				global.LOG.Infof("%s alert sms push successful", alertType)
+
+			case constant.Email:
+				todayCount, isValid := canSendAlertToday(alertType, quotaType, alert.SendCount, constant.Email)
+				if !isValid {
+					continue
+				}
+				create := dto.AlertLogCreate{
+					Type:    alertType,
+					AlertId: alert.ID,
+					Count:   todayCount + 1,
+				}
+				alertInfo := alert
+				alertInfo.Type = alertType
+				create.AlertRule = alertUtil.ProcessAlertRule(alert)
+				create.AlertDetail = alertUtil.ProcessAlertDetail(alertInfo, quotaType, params, constant.Email)
+				transport := xpack.LoadRequestTransport()
+				_ = alertUtil.CreateEmailAlertLog(create, alertInfo, params, transport)
+				alertUtil.CreateNewAlertTask(quota, alertType, quotaType, constant.Email)
+				global.LOG.Infof("%s alert email push successful", alertType)
+			}
 		}
 	}
 }
 
-// 内存/cpu检查是否需要发送告警并处理相关逻辑
-func checkAndSendAlert(alert dto.AlertDTO, currentUsage float64, usageLoad *[]float64, threshold int) bool {
+// ------------------------------
+func getRepoOptionsByProject(project string) []repo.DBOption {
+	var opts []repo.DBOption
+	if project != "all" {
+		itemID, _ := strconv.Atoi(project)
+		opts = append(opts, repo.WithByID(uint(itemID)))
+	}
+	return opts
+}
+
+func serializeAndSortProjects(projectMap map[uint][]time.Time) string {
+	if len(projectMap) == 0 {
+		return ""
+	}
+	keys := make([]int, 0, len(projectMap))
+	for k := range projectMap {
+		keys = append(keys, int(k))
+	}
+	sort.Ints(keys)
+	projectJSON, err := json.Marshal(projectMap)
+	if err != nil {
+		global.LOG.Errorf("Failed to serialize projectMap: %v", err)
+		return ""
+	}
+
+	return string(projectJSON)
+}
+
+func calculateSSLExpiryDays(sslList []model.WebsiteSSL, cycle uint) (map[int][]string, map[uint][]time.Time) {
+	currentDate := time.Now()
+	daysDiffMap := make(map[int][]string)
+	projectMap := make(map[uint][]time.Time)
+
+	for _, ssl := range sslList {
+		daysDiff := int(ssl.ExpireDate.Sub(currentDate).Hours() / 24)
+		if daysDiff > 0 && int(cycle) >= daysDiff {
+			daysDiffMap[daysDiff] = append(daysDiffMap[daysDiff], ssl.PrimaryDomain)
+			projectMap[ssl.ID] = append(projectMap[ssl.ID], ssl.ExpireDate)
+		}
+	}
+	return daysDiffMap, projectMap
+}
+
+func calculateWebsiteExpiryDays(websites []model.Website, cycle uint) (map[int][]string, map[uint][]time.Time) {
+	currentDate := time.Now()
+	daysDiffMap := make(map[int][]string)
+	projectMap := make(map[uint][]time.Time)
+
+	for _, website := range websites {
+		daysDiff := int(website.ExpireDate.Sub(currentDate).Hours() / 24)
+		if daysDiff > 0 && int(cycle) >= daysDiff {
+			daysDiffMap[daysDiff] = append(daysDiffMap[daysDiff], website.PrimaryDomain)
+			projectMap[website.ID] = append(projectMap[website.ID], website.ExpireDate)
+		}
+	}
+	return daysDiffMap, projectMap
+}
+
+func getSettingValue(key string) (string, error) {
+	var setting model.Setting
+	if err := global.CoreDB.Model(&model.Setting{}).Where("key = ?", key).First(&setting).Error; err != nil {
+		global.LOG.Errorf("load %s from db setting failed: %v", key, err)
+		return "", err
+	}
+	return setting.Value, nil
+}
+
+func getValidVersion(info *dto.UpgradeInfo) string {
+	if info.NewVersion != "" {
+		return info.NewVersion
+	} else if info.TestVersion != "" {
+		return info.TestVersion
+	} else if info.LatestVersion != "" {
+		return info.LatestVersion
+	}
+	return ""
+}
+
+func shouldSendResourceAlert(alert dto.AlertDTO, currentUsage float64, usageLoad *[]float64, threshold int) {
 	newDate, err := alertRepo.GetTaskLog(alert.Type, alert.ID)
 	if err != nil {
 		global.LOG.Errorf("record not found, err: %v", err)
-		return false
 	}
-
-	*usageLoad = append(*usageLoad, currentUsage)
-
-	if len(*usageLoad) > threshold {
-		*usageLoad = (*usageLoad)[1:]
-	}
-
-	if newDate.IsZero() || calculateMinutesDifference(newDate) > ResourceAlertInterval {
+	if isAlertDue(newDate) {
+		*usageLoad = append(*usageLoad, currentUsage)
+		if len(*usageLoad) > threshold {
+			*usageLoad = (*usageLoad)[1:]
+		}
 		if len(*usageLoad) == threshold {
 			avgUsage := average(*usageLoad)
 			if avgUsage >= float64(alert.Count) {
-				global.LOG.Infof("%d minute %s: %f , usage: %v", threshold, alert.Type, avgUsage, usageLoad)
-				createAndLogAlert(alert, avgUsage)
-				return true
+				//global.LOG.Infof("%d minute %s: %f , usage: %v", threshold, alert.Type, avgUsage, usageLoad)
+				sendResourceAlert(alert, avgUsage)
 			}
 		}
 	}
-	return false
 }
 
-// 检查是否超过今日发送次数限制
-func checkTaskFrequency(alertType, quotaType string, sendCount uint, method string) (uint, bool) {
-	todayCount, _, err := alertRepo.LoadTaskCount(alertType, quotaType, method)
-	if err != nil {
-		global.LOG.Errorf("error getting task info, err: %v", err)
-		return todayCount, false
+func isAlertDue(lastAlertTime time.Time) bool {
+	if lastAlertTime.IsZero() {
+		return true
 	}
-	if todayCount >= sendCount {
-		return todayCount, false
-	}
-
-	return todayCount, true
+	return calculateMinutesDifference(lastAlertTime) > ResourceAlertInterval
 }
 
-// 创建告警日志和详情
-func createAndLogAlert(alert dto.AlertDTO, avgUsage float64) {
-	avgUsagePercent := common.FormatPercent(avgUsage)
-	params := createAlertAvgParams(strconv.Itoa(int(alert.Cycle)), getModule(alert.Type), avgUsagePercent)
-	methods := strings.Split(alert.Method, ",")
-	for _, m := range methods {
-		m = strings.TrimSpace(m)
-		switch m {
-		case constant.SMS:
-			if !alertUtil.CheckTaskFrequency(constant.SMS) {
-				continue
-			}
-			todayCount, isValid := checkTaskFrequency(alert.Type, strconv.Itoa(int(alert.Cycle)), alert.SendCount, constant.SMS)
-			if !isValid {
-				continue
-			}
-			create := dto.AlertLogCreate{
-				Status:  constant.AlertSuccess,
-				Count:   todayCount + 1,
-				AlertId: alert.ID,
-				Type:    alert.Type,
-			}
-			_ = xpack.CreateSMSAlertLog(alert, create, avgUsagePercent, params, constant.SMS)
-			alertUtil.CreateNewAlertTask(avgUsagePercent, alert.Type, strconv.Itoa(int(alert.Cycle)), constant.SMS)
-		case constant.Email:
-			todayCount, isValid := checkTaskFrequency(alert.Type, strconv.Itoa(int(alert.Cycle)), alert.SendCount, constant.Email)
-			if !isValid {
-				continue
-			}
-			create := dto.AlertLogCreate{
-				Status:  constant.AlertSuccess,
-				Count:   todayCount + 1,
-				AlertId: alert.ID,
-				Type:    alert.Type,
-			}
-			alertDetail := alertUtil.ProcessAlertDetail(alert, avgUsagePercent, params, constant.Email)
-			alertRule := alertUtil.ProcessAlertRule(alert)
-			create.AlertRule = alertRule
-			create.AlertDetail = alertDetail
-			transport := xpack.LoadRequestTransport()
-			_ = alertUtil.CreateEmailAlertLog(create, alert, params, transport)
-			alertUtil.CreateNewAlertTask(avgUsagePercent, alert.Type, strconv.Itoa(int(alert.Cycle)), constant.Email)
-		default:
-		}
-	}
+func sendResourceAlert(alert dto.AlertDTO, value float64) {
+	valueStr := common.FormatPercent(value)
+	module := getModuleName(alert.Type)
+	params := createAlertAvgParams(strconv.Itoa(int(alert.Cycle)), module, valueStr)
+	sender := NewAlertSender(alert, strconv.Itoa(int(alert.Cycle)))
+	sender.ResourceSend(valueStr, params)
 }
 
-func getModule(alertType string) string {
+func getModuleName(alertType string) string {
 	var module string
 	switch alertType {
 	case "cpu":
@@ -671,143 +736,18 @@ func getModule(alertType string) string {
 	return module
 }
 
-func loadDiskUsage(alert dto.AlertDTO) {
-	newDate, err := alertRepo.GetTaskLog(alert.Type, alert.ID)
+// 检查是否超过今日发送次数限制
+func canSendAlertToday(alertType, quotaType string, sendCount uint, method string) (uint, bool) {
+	todayCount, _, err := alertRepo.LoadTaskCount(alertType, quotaType, method)
 	if err != nil {
-		global.LOG.Errorf("record not found, err: %v", err)
+		global.LOG.Errorf("error getting task info, err: %v", err)
+		return todayCount, false
+	}
+	if todayCount >= sendCount {
+		return todayCount, false
 	}
 
-	if newDate.IsZero() || calculateMinutesDifference(newDate) > ResourceAlertInterval {
-		if strings.Contains(alert.Project, "all") {
-			err = processAllDisks(alert)
-		} else {
-			err = processSingleDisk(alert)
-		}
-		if err != nil {
-			global.LOG.Errorf("error processing disk usage, err: %v", err)
-		}
-	}
-}
-
-func processAllDisks(alert dto.AlertDTO) error {
-	diskList, err := NewIAlertService().GetDisks()
-	if err != nil {
-		global.LOG.Errorf("error getting disk list, err: %v", err)
-		return err
-	}
-
-	var flag bool
-	for _, item := range diskList {
-		if success, err := checkAndCreateDiskAlert(alert, item.Path); err == nil && success {
-			flag = true
-		}
-	}
-	if flag {
-		global.LOG.Info("all disk alert push successful")
-	}
-	return nil
-}
-
-func processSingleDisk(alert dto.AlertDTO) error {
-	success, err := checkAndCreateDiskAlert(alert, alert.Project)
-	if err != nil {
-		return err
-	}
-	if success {
-		global.LOG.Info("disk alert push successful")
-	}
-	return nil
-}
-
-func checkAndCreateDiskAlert(alert dto.AlertDTO, path string) (bool, error) {
-	usageStat, err := disk.Usage(path)
-	if err != nil {
-		global.LOG.Errorf("error getting disk usage for %s, err: %v", path, err)
-		return false, err
-	}
-
-	usedTotal, usedStr := calculateUsedTotal(alert.Cycle, usageStat)
-	commonTotal := float64(alert.Count)
-	if alert.Cycle == 1 {
-		commonTotal *= 1024 * 1024 * 1024
-	}
-	if usedTotal < commonTotal {
-		return false, nil
-	}
-	global.LOG.Infof("disk「 %s 」usage: %s", path, usedStr)
-	var params []dto.Param
-	params = createAlertDiskParams(path, usedStr)
-	methods := strings.Split(alert.Method, ",")
-	for _, m := range methods {
-		m = strings.TrimSpace(m)
-		switch m {
-		case constant.SMS:
-			if !alertUtil.CheckTaskFrequency(constant.SMS) {
-				continue
-			}
-			todayCount, isValid := checkTaskFrequency(alert.Type, alert.Project, alert.SendCount, constant.SMS)
-			if !isValid {
-				continue
-			}
-			create := dto.AlertLogCreate{
-				Status:  constant.AlertSuccess,
-				Count:   todayCount + 1,
-				AlertId: alert.ID,
-				Type:    alert.Type,
-			}
-			_ = xpack.CreateSMSAlertLog(alert, create, path, params, constant.SMS)
-			alertUtil.CreateNewAlertTask(strconv.Itoa(int(alert.Cycle)), alert.Type, alert.Project, constant.SMS)
-		case constant.Email:
-			todayCount, isValid := checkTaskFrequency(alert.Type, alert.Project, alert.SendCount, constant.Email)
-			if !isValid {
-				continue
-			}
-			create := dto.AlertLogCreate{
-				Status:  constant.AlertSuccess,
-				Count:   todayCount + 1,
-				AlertId: alert.ID,
-				Type:    alert.Type,
-			}
-			alertDetail := alertUtil.ProcessAlertDetail(alert, path, params, constant.Email)
-			alertRule := alertUtil.ProcessAlertRule(alert)
-			create.AlertRule = alertRule
-			create.AlertDetail = alertDetail
-			transport := xpack.LoadRequestTransport()
-			_ = alertUtil.CreateEmailAlertLog(create, alert, params, transport)
-			alertUtil.CreateNewAlertTask(strconv.Itoa(int(alert.Cycle)), alert.Type, alert.Project, constant.Email)
-		default:
-		}
-	}
-
-	return true, nil
-}
-
-func calculateUsedTotal(cycle uint, usageStat *disk.UsageStat) (float64, string) {
-	if cycle == 1 {
-		return float64(usageStat.Used), common.FormatBytes(usageStat.Used)
-	}
-	return usageStat.UsedPercent, common.FormatPercent(usageStat.UsedPercent)
-}
-
-func calculateDaysDifference(expirationTime time.Time) int {
-	currentDate := time.Now()
-	formattedTime := currentDate.Format(constant.DateTimeLayout)
-	parsedTime, _ := time.Parse(constant.DateTimeLayout, formattedTime)
-	timeGap := expirationTime.Sub(parsedTime).Milliseconds()
-	if timeGap < 0 {
-		return -1
-	}
-	daysDifference := int(math.Floor(float64(timeGap) / (3600 * 1000 * 24)))
-	return daysDifference
-}
-
-func calculateMinutesDifference(newDate time.Time) int {
-	now := time.Now()
-	if newDate.After(now) {
-		return -1
-	}
-	minutesDifference := int(now.Sub(newDate).Minutes())
-	return minutesDifference
+	return todayCount, true
 }
 
 func average(arr []float64) float64 {
@@ -878,17 +818,82 @@ func createAlertDiskParams(project, count string) []dto.Param {
 	}
 }
 
-func serializeAndSortProjects(projectMap map[uint][]time.Time) string {
-	keys := make([]int, 0, len(projectMap))
-	for k := range projectMap {
-		keys = append(keys, int(k))
-	}
-	sort.Ints(keys)
-	projectJSON, err := json.Marshal(projectMap)
+func processAllDisks(alert dto.AlertDTO) error {
+	diskList, err := NewIAlertService().GetDisks()
 	if err != nil {
-		global.LOG.Errorf("Failed to serialize projectMap: %v", err)
-		return ""
+		global.LOG.Errorf("error getting disk list, err: %v", err)
+		return err
 	}
 
-	return string(projectJSON)
+	var flag bool
+	for _, item := range diskList {
+		if success, err := checkAndCreateDiskAlert(alert, item.Path); err == nil && success {
+			flag = true
+		}
+	}
+	if flag {
+		global.LOG.Info("all disk alert push successful")
+	}
+	return nil
+}
+
+func processSingleDisk(alert dto.AlertDTO) error {
+	success, err := checkAndCreateDiskAlert(alert, alert.Project)
+	if err != nil {
+		return err
+	}
+	if success {
+		global.LOG.Info("disk alert push successful")
+	}
+	return nil
+}
+
+func checkAndCreateDiskAlert(alert dto.AlertDTO, path string) (bool, error) {
+	usageStat, err := disk.Usage(path)
+	if err != nil {
+		global.LOG.Errorf("error getting disk usage for %s, err: %v", path, err)
+		return false, err
+	}
+
+	usedTotal, usedStr := calculateUsedTotal(alert.Cycle, usageStat)
+	commonTotal := float64(alert.Count)
+	if alert.Cycle == 1 {
+		commonTotal *= 1024 * 1024 * 1024
+	}
+	if usedTotal < commonTotal {
+		return false, nil
+	}
+	global.LOG.Infof("disk「 %s 」usage: %s", path, usedStr)
+	params := createAlertDiskParams(path, usedStr)
+	sender := NewAlertSender(alert, alert.Project)
+	sender.ResourceSend(path, params)
+	return true, nil
+}
+
+func calculateUsedTotal(cycle uint, usageStat *disk.UsageStat) (float64, string) {
+	if cycle == 1 {
+		return float64(usageStat.Used), common.FormatBytes(usageStat.Used)
+	}
+	return usageStat.UsedPercent, common.FormatPercent(usageStat.UsedPercent)
+}
+
+func calculateDaysDifference(expirationTime time.Time) int {
+	currentDate := time.Now()
+	formattedTime := currentDate.Format(constant.DateTimeLayout)
+	parsedTime, _ := time.Parse(constant.DateTimeLayout, formattedTime)
+	timeGap := expirationTime.Sub(parsedTime).Milliseconds()
+	if timeGap < 0 {
+		return -1
+	}
+	daysDifference := int(math.Floor(float64(timeGap) / (3600 * 1000 * 24)))
+	return daysDifference
+}
+
+func calculateMinutesDifference(newDate time.Time) int {
+	now := time.Now()
+	if newDate.After(now) {
+		return -1
+	}
+	minutesDifference := int(now.Sub(newDate).Minutes())
+	return minutesDifference
 }

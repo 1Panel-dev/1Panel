@@ -449,3 +449,7 @@ DiskUsedAlert: "1Panel 디스크 '{{ .name }}'의 사용량은 {{ .used }}입니
 ResourceAlert: "1Panel 의 평균 {{ .time }}분 동안 {{ .name }} 사용률은 {{ .used }}입니다. 자세한 내용은 패널에서 확인하세요."
 PanelVersionAlert: "1Panel 의 새로운 버전이 이용 가능합니다. 패널에 로그인하여 업그레이드하세요."
 PanelPwdExpirationAlert: "1Panel 비밀번호가 {{ .day }}일 후에 만료됩니다. 자세한 내용은 패널에서 확인하세요."
+CommonAlert: "귀하의 1Panel, {{ .msg }}. 자세한 내용은 패널에 로그인하여 확인하세요."
+NodeExceptionAlert: "귀하의 1Panel, {{ .num }}개의 노드에 이상이 있습니다. 자세한 내용은 패널에 로그인하여 확인하세요."
+LicenseExceptionAlert: "귀하의 1Panel, {{ .num }}개의 라이선스에 이상이 있습니다. 자세한 내용은 패널에 로그인하여 확인하세요."
+SSHAndPanelLoginAlert: "귀하의 1Panel, 패널 {{ .name }}이(가) {{ .ip }}에서 비정상 로그인했습니다. 자세한 내용은 패널에 로그인하여 확인하세요."

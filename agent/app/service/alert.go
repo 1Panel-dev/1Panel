@@ -70,17 +70,18 @@ func (a AlertService) PageAlert(search dto.AlertSearch) (int64, []dto.AlertDTO, 
 	for _, item := range alerts {
 
 		result = append(result, dto.AlertDTO{
-			ID:        item.ID,
-			Type:      item.Type,
-			Cycle:     item.Cycle,
-			Count:     item.Count,
-			Method:    item.Method,
-			Title:     item.Title,
-			Project:   item.Project,
-			Status:    item.Status,
-			SendCount: item.SendCount,
-			CreatedAt: item.CreatedAt,
-			UpdatedAt: item.UpdatedAt,
+			ID:             item.ID,
+			Type:           item.Type,
+			Cycle:          item.Cycle,
+			Count:          item.Count,
+			Method:         item.Method,
+			Title:          item.Title,
+			Project:        item.Project,
+			Status:         item.Status,
+			SendCount:      item.SendCount,
+			AdvancedParams: item.AdvancedParams,
+			CreatedAt:      item.CreatedAt,
+			UpdatedAt:      item.UpdatedAt,
 		})
 	}
 
@@ -100,17 +101,18 @@ func (a AlertService) GetAlerts() ([]dto.AlertDTO, error) {
 	for _, item := range alerts {
 
 		result = append(result, dto.AlertDTO{
-			ID:        item.ID,
-			Type:      item.Type,
-			Cycle:     item.Cycle,
-			Count:     item.Count,
-			Method:    item.Method,
-			Title:     item.Title,
-			Project:   item.Project,
-			Status:    item.Status,
-			SendCount: item.SendCount,
-			CreatedAt: item.CreatedAt,
-			UpdatedAt: item.UpdatedAt,
+			ID:             item.ID,
+			Type:           item.Type,
+			Cycle:          item.Cycle,
+			Count:          item.Count,
+			Method:         item.Method,
+			Title:          item.Title,
+			Project:        item.Project,
+			Status:         item.Status,
+			SendCount:      item.SendCount,
+			AdvancedParams: item.AdvancedParams,
+			CreatedAt:      item.CreatedAt,
+			UpdatedAt:      item.UpdatedAt,
 		})
 	}
 
@@ -165,6 +167,7 @@ func (a AlertService) UpdateAlert(req dto.AlertUpdate) error {
 	upMap["project"] = req.Project
 	upMap["status"] = req.Status
 	upMap["send_count"] = req.SendCount
+	upMap["advanced_params"] = req.AdvancedParams
 
 	if err := alertRepo.Update(upMap, repo.WithByID(req.ID)); err != nil {
 		return err

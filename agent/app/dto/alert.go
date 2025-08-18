@@ -36,40 +36,43 @@ type AlertSearch struct {
 }
 
 type AlertDTO struct {
-	ID        uint      `json:"id"`
-	Type      string    `json:"type"`
-	Cycle     uint      `json:"cycle"`
-	Count     uint      `json:"count"`
-	Method    string    `json:"method"`
-	Title     string    `json:"title"`
-	Project   string    `json:"project"`
-	Status    string    `json:"status"`
-	SendCount uint      `json:"sendCount"`
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
+	ID             uint      `json:"id"`
+	Type           string    `json:"type"`
+	Cycle          uint      `json:"cycle"`
+	Count          uint      `json:"count"`
+	Method         string    `json:"method"`
+	Title          string    `json:"title"`
+	Project        string    `json:"project"`
+	Status         string    `json:"status"`
+	SendCount      uint      `json:"sendCount"`
+	AdvancedParams string    `json:"advancedParams"`
+	CreatedAt      time.Time `json:"createdAt"`
+	UpdatedAt      time.Time `json:"updatedAt"`
 }
 
 type AlertCreate struct {
-	Type      string `json:"type" validate:"required"`
-	Cycle     uint   `json:"cycle"`
-	Count     uint   `json:"count"`
-	Method    string `json:"method" validate:"required"`
-	Title     string `json:"title"`
-	Project   string `json:"project"`
-	Status    string `json:"status"`
-	SendCount uint   `json:"sendCount"`
+	Type           string `json:"type" validate:"required"`
+	Cycle          uint   `json:"cycle"`
+	Count          uint   `json:"count"`
+	Method         string `json:"method" validate:"required"`
+	Title          string `json:"title"`
+	Project        string `json:"project"`
+	Status         string `json:"status"`
+	SendCount      uint   `json:"sendCount"`
+	AdvancedParams string `json:"advancedParams"`
 }
 
 type AlertUpdate struct {
-	ID        uint   `json:"id" validate:"required"`
-	Type      string `json:"type"`
-	Cycle     uint   `json:"cycle"`
-	Count     uint   `json:"count"`
-	Method    string `json:"method"`
-	Title     string `json:"title"`
-	Project   string `json:"project"`
-	Status    string `json:"status"`
-	SendCount uint   `json:"sendCount"`
+	ID             uint   `json:"id" validate:"required"`
+	Type           string `json:"type"`
+	Cycle          uint   `json:"cycle"`
+	Count          uint   `json:"count"`
+	Method         string `json:"method"`
+	Title          string `json:"title"`
+	Project        string `json:"project"`
+	Status         string `json:"status"`
+	SendCount      uint   `json:"sendCount"`
+	AdvancedParams string `json:"advancedParams"`
 }
 
 type DeleteRequest struct {

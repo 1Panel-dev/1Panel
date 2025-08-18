@@ -448,3 +448,7 @@ DiskUsedAlert: "Cakera '{{ .name }}' dalam 1Panel anda telah menggunakan {{ .use
 ResourceAlert: "Penggunaan purata {{ .name }} selama {{ .time }} minit dalam 1Panel anda ialah {{ .used }}. Sila log masuk ke panel untuk maklumat lanjut."
 PanelVersionAlert: "Versi baru 1Panel tersedia. Sila log masuk ke panel untuk menaik taraf."
 PanelPwdExpirationAlert: "Kata laluan 1Panel anda akan tamat dalam {{ .day }} hari. Sila log masuk ke panel untuk maklumat lanjut."
+CommonAlert: "1Panel anda, {{ .msg }}, sila log masuk ke panel untuk maklumat lanjut."
+NodeExceptionAlert: "1Panel anda, {{ .num }} nod bermasalah, sila log masuk ke panel untuk maklumat lanjut."
+LicenseExceptionAlert: "1Panel anda, {{ .num }} lesen bermasalah, sila log masuk ke panel untuk maklumat lanjut."
+SSHAndPanelLoginAlert: "1Panel anda, log masuk panel {{ .name }} yang tidak normal dari {{ .ip }}, sila log masuk ke panel untuk maklumat lanjut."
