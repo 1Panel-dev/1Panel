@@ -108,6 +108,9 @@ ErrFavoriteExist: 'Este caminho já foi favorito'
 ErrInvalidChar: 'Caracteres ilegais não são permitidos'
 ErrPathNotDelete: 'O diretório selecionado não pode ser excluído'
 ErrLogFileToLarge: "Fail log melebihi 500MB, tidak boleh dibuka"
+FileDropFailed: "Falha na limpeza de arquivos {{ .detail }}"
+FileDropSuccess: "Limpeza de arquivos bem-sucedida, {{ .count }} arquivos removidos, {{ .size }} de espaço em disco liberado"
+FileDropSum: "Limpeza de arquivos concluída com sucesso, total de {{ .count }} arquivos removidos, total de {{ .size }} de espaço em disco liberado"
 
 #site
 ErrAliasIsExist: 'Alias já existe'

@@ -108,6 +108,9 @@ ErrFavoriteExist: 'このパスはすでにお気に入りに登録されてい�
 ErrInvalidChar: '不正な文字は許可されません'
 ErrPathNotDelete: '選択されたディレクトリは削除できません'
 ErrLogFileToLarge: "ログファイルが500MBを超えており、開くことができません"
+FileDropFailed: "ファイルのクリーンアップに失敗しました {{ .detail }}"
+FileDropSuccess: "ファイルのクリーンアップ成功、{{ .count }} ファイルを削除、{{ .size }} のディスク領域を解放"
+FileDropSum: "ファイルのクリーンアップが完了しました、合計 {{ .count }} ファイルを削除、合計 {{ .size }} のディスク領域を解放"
 
 #website
 ErrAliasIsExist: 'エイリアスがすでに存在します'

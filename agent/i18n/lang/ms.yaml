@@ -107,6 +107,10 @@ ErrSourcePathNotFound: 'Direktori sumber tidak wujud'
 ErrFavoriteExist: 'Laluan ini telah digemari'
 ErrInvalidChar: 'Aksara haram tidak dibenarkan'
 ErrPathNotDelete: 'Direktori yang dipilih tidak boleh dipadamkan'
+ErrLogFileTooLarge: "Fail log melebihi 500MB dan tidak boleh dibuka"
+FileDropFailed: "Pembersihan fail gagal {{ .detail }}"
+FileDropSuccess: "Pembersihan fail berjaya, {{ .count }} fail dibersihkan, {{ .size }} ruang cakera dibebaskan"
+FileDropSum: "Pembersihan fail selesai, sejumlah {{ .count }} fail dibersihkan, sejumlah {{ .size }} ruang cakera dibebaskan"
 
 #laman web
 ErrAliasIsExist: 'Alias sudah wujud'

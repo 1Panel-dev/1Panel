@@ -107,6 +107,9 @@ ErrFavoriteExist: "已收藏此路径"
 ErrInvalidChar: "禁止使用非法字符"
 ErrPathNotDelete: "所选目录不可删除"
 ErrLogFileToLarge: "日志文件超过 500M，无法打开"
+FileDropFailed: "文件清理失败 {{ .detail }}"
+FileDropSuccess: "文件清理成功，清理文件 {{ .count }}，释放磁盘空间 {{ .size }}"
+FileDropSum: "文件清理成功，清理文件共计 {{ .count }}，释放磁盘空间共计 {{ .size }}"
 
 #website
 ErrAliasIsExist: "代号已存在"

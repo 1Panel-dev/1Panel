@@ -108,6 +108,9 @@ ErrFavoriteExist: '이 경로는 이미 즐겨찾기되었습니다'
 ErrInvalidChar: '불법 문자는 허용되지 않습니다'
 ErrPathNotDelete: '선택한 디렉토리를 삭제할 수 없습니다'
 ErrLogFileToLarge: "로그 파일이 500MB를 초과하여 열 수 없습니다"
+FileDropFailed: "파일 정리 실패 {{ .detail }}"
+FileDropSuccess: "파일 정리 성공, {{ .count }}개 파일 삭제, {{ .size }} 디스크 공간 확보"
+FileDropSum: "파일 정리 완료, 총 {{ .count }}개 파일 삭제, 총 {{ .size }} 디스크 공간 확보"
 
 #웹사이트
 ErrAliasIsExist: '별칭이 이미 존재합니다'

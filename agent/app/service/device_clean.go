@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/constant"
+	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/build"
@@ -307,7 +308,7 @@ func doSystemClean(taskItem *task.Task) func(t *task.Task) error {
 		}
 		timeNow := time.Now().Format(constant.DateTimeLayout)
 		if fileCount != 0 {
-			taskItem.LogSuccessF("%s: total clean: %s, total count: %d", timeNow, common.LoadSizeUnit2F(float64(size)), fileCount)
+			taskItem.Log(i18n.GetMsgWithMap("FileDropSum", map[string]interface{}{"size": common.LoadSizeUnit2F(float64(size)), "count": fileCount}))
 		}
 
 		_ = settingRepo.Update("LastCleanTime", timeNow)
@@ -587,7 +588,6 @@ func dropVolumes() {
 func dropWithExclude(pathToDelete string, excludeSubDirs []string, taskItem *task.Task, size *int64, count *int) {
 	entries, err := os.ReadDir(pathToDelete)
 	if err != nil {
-		taskItem.LogFailed(fmt.Sprintf("read dir %s failed: %v", pathToDelete, err))
 		return
 	}
 
@@ -615,11 +615,11 @@ func dropWithTask(itemPath string, taskItem *task.Task, size *int64, count *int)
 	*size += itemSize
 	*count += itemCount
 	if err := os.RemoveAll(itemPath); err != nil {
-		taskItem.LogFailed(fmt.Sprintf("drop file %s, err %v", itemPath, err))
+		taskItem.Log(i18n.GetMsgWithDetail("FileDropFailed", err.Error()))
 		return
 	}
 	if itemCount != 0 {
-		taskItem.LogSuccessF("drop file %s, size: %s, count: %d", itemPath, common.LoadSizeUnit2F(float64(itemSize)), itemCount)
+		taskItem.Log(i18n.GetMsgWithMap("FileDropSuccess", map[string]interface{}{"count": itemCount, "size": common.LoadSizeUnit2F(float64(itemSize))}))
 	}
 }
 
