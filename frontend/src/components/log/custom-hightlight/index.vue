@@ -25,7 +25,7 @@ const highlightRules: HighlightRule[] = [
     { regex: /\b\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(?:\.\d+)?Z?\b/g, className: 'hljs-number' },
     { regex: /\b\d+:[A-Z]\b/g, className: 'hljs-symbol' },
     { regex: /\b\d+(\.\d+)?\b/g, className: 'hljs-number' },
-    { regex: /([/~]?[A-Za-z0-9._-]+(?:\/[A-Za-z0-9._-]+)+)/g, className: 'hljs-string' },
+    { regex: /([/~]?[A-Za-z0-9._-]{1,255}(?:\/[A-Za-z0-9._-]{1,255})+)/g, className: 'hljs-string' },
     { regex: /\b\d{1,3}(?:\.\d{1,3}){3}\b/g, className: 'hljs-attr' },
     { regex: /\b(SELECT|INSERT|UPDATE|DELETE|FROM|WHERE|JOIN|ON|CREATE|DROP|ALTER)\b/gi, className: 'hljs-built_in' },
     { regex: /\[?(Thread|PID)[-:]?\d+\]?/gi, className: 'hljs-symbol' },
