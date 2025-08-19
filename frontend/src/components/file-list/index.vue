@@ -111,7 +111,7 @@ import { createFile, getFilesList } from '@/api/modules/files';
 import { onUpdated, reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgSuccess, MsgWarning } from '@/utils/message';
-import { useSearchable } from '@/views/host/file-management/hooks/searchable';
+import { useSearchableForSelect } from '@/views/host/file-management/hooks/searchable';
 
 const data = ref([]);
 const loading = ref(false);
@@ -123,7 +123,7 @@ const open = ref(false);
 const newFolder = ref();
 const disBtn = ref(false);
 
-const { searchableStatus, searchablePath, searchableInputRef, searchableInputBlur } = useSearchable(paths);
+const { searchableStatus, searchablePath, searchableInputRef, searchableInputBlur } = useSearchableForSelect(paths);
 const oldUrl = ref<string>('');
 
 const em = defineEmits(['choose']);
@@ -197,11 +197,9 @@ const openDir = async (row: File.File) => {
 const jump = async (index: number) => {
     oldUrl.value = req.path;
     let path = '';
-    if (index != -1) {
-        if (index !== -1) {
-            const jPaths = paths.value.slice(0, index + 1);
-            path = '/' + jPaths.join('/');
-        }
+    if (index !== -1) {
+        const jPaths = paths.value.slice(0, index + 1);
+        path = '/' + jPaths.join('/');
     }
     path = path || '/';
     req.path = path;

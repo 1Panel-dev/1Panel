@@ -24,3 +24,32 @@ export function useSearchable(paths) {
         searchableInputBlur,
     };
 }
+
+export function useSearchableForSelect(paths) {
+    const searchableStatus = ref(false);
+    const searchablePath = ref('');
+    const searchableInputRef = ref();
+
+    watch(searchableStatus, (val) => {
+        if (val) {
+            if (paths.value.length === 0) {
+                searchablePath.value = '/';
+            } else {
+                searchablePath.value = '/' + paths.value.join('/');
+            }
+            nextTick(() => {
+                searchableInputRef.value?.focus();
+            });
+        }
+    });
+    const searchableInputBlur = () => {
+        searchableStatus.value = false;
+    };
+
+    return {
+        searchableStatus,
+        searchablePath,
+        searchableInputRef,
+        searchableInputBlur,
+    };
+}
