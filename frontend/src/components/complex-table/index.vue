@@ -46,25 +46,22 @@
             </slot>
         </div>
 
-        <div
+        <ul
             v-if="rightClick.visible"
-            class="custom-context-menu"
-            :style="{
-                left: rightClick.left + 'px',
-                top: rightClick.top + 'px',
-            }"
+            class="context-menu"
+            ref="menuRef"
+            :style="{ top: `${adjustedY}px`, left: `${adjustedX}px` }"
+            @click.stop
         >
-            <el-button
-                class="no-border-button"
-                v-for="(btn, i) in rightButtons"
-                :disabled="disabled(btn)"
-                @click="rightButtonClick(btn)"
-                :key="i"
-                :command="btn"
+            <li
+                v-for="(btn, index) in rightButtons"
+                :key="index"
+                :class="[{ disabled: disabled(btn) }, { divided: btn.divided }]"
+                @click="!disabled(btn) && rightButtonClick(btn)"
             >
                 {{ btn.label }}
-            </el-button>
-        </div>
+            </li>
+        </ul>
     </div>
 </template>
 <script setup lang="ts">
@@ -105,6 +102,7 @@ const mobile = computed(() => {
 });
 const tableRef = ref();
 const tableHeight = ref(0);
+const menuRef = ref<HTMLElement | null>(null);
 
 const rightClick = ref({
     visible: false,
@@ -164,6 +162,34 @@ function clearSort() {
     tableRef.value.refElTable.clearSort();
 }
 
+const adjustedX = ref(rightClick.value.left);
+const adjustedY = ref(rightClick.value.top);
+
+watch(
+    () => [rightClick.value.left, rightClick.value.top],
+    async () => {
+        await nextTick();
+        if (!menuRef.value) return;
+
+        const menuRect = menuRef.value.getBoundingClientRect();
+        const windowWidth = window.innerWidth;
+        const windowHeight = window.innerHeight;
+
+        if (rightClick.value.left + menuRect.width > windowWidth) {
+            adjustedX.value = windowWidth - menuRect.width - 4;
+        } else {
+            adjustedX.value = rightClick.value.left;
+        }
+
+        if (rightClick.value.top + menuRect.height > windowHeight) {
+            adjustedY.value = windowHeight - menuRect.height - 4;
+        } else {
+            adjustedY.value = rightClick.value.top;
+        }
+    },
+    { immediate: true },
+);
+
 defineExpose({
     clearSelects,
     sort,
@@ -197,7 +223,7 @@ onMounted(() => {
 });
 </script>
 
-<style lang="scss">
+<style scoped lang="scss">
 @use '@/styles/mixins.scss' as *;
 
 .complex-table {
@@ -223,20 +249,32 @@ onMounted(() => {
         @include flex-row(flex-end);
     }
 }
-.custom-context-menu {
+.context-menu {
     position: fixed;
-    z-index: 9999;
-    border: 1px solid #dcdfe6;
+    background: var(--panel-main-bg-color-9);
+    border: 1px solid var(--el-border-color);
     border-radius: 4px;
-    padding: 0;
-    width: 80px;
+    color: var(--el-color-primary);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    list-style: none;
+    font-size: 14px;
+    padding: 4px 0;
+    margin: 0;
+    z-index: 9999;
+    min-width: 120px;
 }
-
-.no-border-button {
-    border: 0;
-    border-radius: 4;
-    margin: 0 !important;
-    width: 100%;
-    text-align: left;
+.context-menu li {
+    padding: 6px 12px;
+    cursor: pointer;
+}
+.context-menu li:hover {
+    background-color: var(--panel-menu-bg-color);
+}
+.context-menu li.disabled {
+    color: var(--el-border-color);
+    cursor: not-allowed;
+}
+.context-menu li.divided {
+    border-top: 1px solid var(--el-border-color);
 }
 </style>
