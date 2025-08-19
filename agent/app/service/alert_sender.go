@@ -9,17 +9,11 @@ import (
 	"strings"
 )
 
-// ------------------------------
-// 告警发送器
-// ------------------------------
-
-// AlertSender 告警发送器
 type AlertSender struct {
 	alert     dto.AlertDTO
 	quotaType string
 }
 
-// NewAlertSender 创建告警发送器
 func NewAlertSender(alert dto.AlertDTO, quotaType string) *AlertSender {
 	return &AlertSender{
 		alert:     alert,
@@ -27,7 +21,6 @@ func NewAlertSender(alert dto.AlertDTO, quotaType string) *AlertSender {
 	}
 }
 
-// Send 发送告警
 func (s *AlertSender) Send(quota string, params []dto.Param) {
 	methods := strings.Split(s.alert.Method, ",")
 	for _, method := range methods {
@@ -54,7 +47,6 @@ func (s *AlertSender) ResourceSend(quota string, params []dto.Param) {
 	}
 }
 
-// 发送SMS告警
 func (s *AlertSender) sendSMS(quota string, params []dto.Param) {
 	if !alertUtil.CheckSMSSendLimit(constant.SMS) {
 		return
@@ -77,7 +69,6 @@ func (s *AlertSender) sendSMS(quota string, params []dto.Param) {
 	global.LOG.Infof("%s alert sms push successful", s.alert.Type)
 }
 
-// 发送Email告警
 func (s *AlertSender) sendEmail(quota string, params []dto.Param) {
 	totalCount, isValid := s.canSendAlert(constant.Email)
 	if !isValid {
@@ -99,7 +90,6 @@ func (s *AlertSender) sendEmail(quota string, params []dto.Param) {
 	global.LOG.Infof("%s alert email push successful", s.alert.Type)
 }
 
-// 发送SMS告警
 func (s *AlertSender) sendResourceSMS(quota string, params []dto.Param) {
 	if !alertUtil.CheckSMSSendLimit(constant.SMS) {
 		return
@@ -125,7 +115,6 @@ func (s *AlertSender) sendResourceSMS(quota string, params []dto.Param) {
 	global.LOG.Infof("%s alert sms push successful", s.alert.Type)
 }
 
-// 发送Email告警
 func (s *AlertSender) sendResourceEmail(quota string, params []dto.Param) {
 	todayCount, isValid := s.canResourceSendAlert(constant.Email)
 	if !isValid {
@@ -150,7 +139,6 @@ func (s *AlertSender) sendResourceEmail(quota string, params []dto.Param) {
 	global.LOG.Infof("%s alert email push successful", s.alert.Type)
 }
 
-// 检查是否可以发送告警
 func (s *AlertSender) canSendAlert(method string) (uint, bool) {
 	todayCount, totalCount, err := alertRepo.LoadTaskCount(s.alert.Type, s.quotaType, method)
 	if err != nil {
