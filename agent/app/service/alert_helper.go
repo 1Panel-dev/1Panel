@@ -700,7 +700,6 @@ func shouldSendResourceAlert(alert dto.AlertDTO, currentUsage float64, usageLoad
 		if len(*usageLoad) == threshold {
 			avgUsage := average(*usageLoad)
 			if avgUsage >= float64(alert.Count) {
-				//global.LOG.Infof("%d minute %s: %f , usage: %v", threshold, alert.Type, avgUsage, usageLoad)
 				sendResourceAlert(alert, avgUsage)
 			}
 		}
@@ -736,7 +735,6 @@ func getModuleName(alertType string) string {
 	return module
 }
 
-// 检查是否超过今日发送次数限制
 func canSendAlertToday(alertType, quotaType string, sendCount uint, method string) (uint, bool) {
 	todayCount, _, err := alertRepo.LoadTaskCount(alertType, quotaType, method)
 	if err != nil {

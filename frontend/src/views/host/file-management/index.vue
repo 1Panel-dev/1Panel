@@ -725,6 +725,7 @@ const viewHideFile = async () => {
 };
 
 const open = async (row: File.File) => {
+    hideRightMenu();
     calculateBtn.value = false;
     disableBtn.value = false;
     if (row.isDir) {
@@ -866,6 +867,7 @@ const top = () => {
 };
 
 const jump = async (url: string) => {
+    hideRightMenu();
     history.splice(pointer + 1);
     history.push(url);
     pointer = history.length - 1;
@@ -1199,6 +1201,7 @@ const openMoveBtn = (type: string, item: File.File) => {
 const closeMove = () => {
     selects.value = [];
     tableRef.value.clearSelects();
+    hideRightMenu();
     fileMove.oldPaths = [];
     fileMove.name = '';
     fileMove.count = 0;
@@ -1309,7 +1312,6 @@ const buttons = [
             openDownload(row);
         },
         disabled: (row: File.File) => {
-            debugger;
             return row?.isDir;
         },
     },
@@ -1425,6 +1427,10 @@ const handleDragover = (event: DragEvent) => {
 const handleDragleave = (event: { preventDefault: () => void }) => {
     event.preventDefault();
 };
+
+function hideRightMenu() {
+    tableRef.value.closeRightClick();
+}
 
 onMounted(() => {
     if (localStorage.getItem('show-hidden') === null) {

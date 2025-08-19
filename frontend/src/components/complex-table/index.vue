@@ -194,6 +194,7 @@ defineExpose({
     clearSelects,
     sort,
     clearSort,
+    closeRightClick,
 });
 
 onMounted(() => {
