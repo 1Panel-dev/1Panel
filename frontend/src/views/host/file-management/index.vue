@@ -1,5 +1,11 @@
 <template>
-    <div @dragover="handleDragover" @drop="handleDrop" @dragleave="handleDragleave">
+    <div
+        @dragover="handleDragover"
+        @drop="handleDrop"
+        @dragleave="handleDragleave"
+        @contextmenu.prevent="onRightClick"
+        @click="onRightClick"
+    >
         <div class="flex sm:flex-row flex-col justify-start gap-y-2 items-center gap-x-4" ref="toolRef">
             <div class="flex-shrink-0 flex sm:w-min w-full items-center justify-start">
                 <el-tooltip :content="$t('file.back')" placement="top">
@@ -388,6 +394,7 @@
                     @cell-mouse-enter="showFavorite"
                     @cell-mouse-leave="hideFavorite"
                     :heightDiff="300"
+                    @row-contextmenu="openRight"
                 >
                     <el-table-column type="selection" width="30" />
                     <el-table-column
@@ -535,6 +542,14 @@
             <VscodeOpenDialog ref="dialogVscodeOpenRef" />
             <Preview ref="previewRef" />
             <TerminalDialog ref="dialogTerminalRef" />
+            <RightContextMenu
+                v-if="menuVisible"
+                :x="menuPosition.x"
+                :y="menuPosition.y"
+                :row="currentRow"
+                :buttons="buttons"
+                @close="hideRightMenu"
+            />
         </LayoutContent>
     </div>
 </template>
@@ -865,6 +880,7 @@ const top = () => {
 };
 
 const jump = async (url: string) => {
+    hideRightMenu();
     history.splice(pointer + 1);
     history.push(url);
     pointer = history.length - 1;
@@ -1308,7 +1324,8 @@ const buttons = [
             openDownload(row);
         },
         disabled: (row: File.File) => {
-            return row.isDir;
+            debugger;
+            return row?.isDir;
         },
     },
     {
@@ -1366,8 +1383,8 @@ const buttons = [
     {
         label: i18n.global.t('file.addFavorite'),
         click: (row: File.File) => {
-            if (row.favoriteID > 0) {
-                remove(row.favoriteID);
+            if (row?.favoriteID > 0) {
+                remove(row?.favoriteID);
             } else {
                 addToFavorite(row);
             }
@@ -1423,6 +1440,36 @@ const handleDragover = (event: DragEvent) => {
 const handleDragleave = (event: { preventDefault: () => void }) => {
     event.preventDefault();
 };
+
+const menuVisible = ref(false);
+const noMenuVisible = ref(false);
+const menuPosition = reactive({ x: 0, y: 0 });
+const currentRow = ref<File.File>({} as File.File);
+
+function openRight(row: File.File, _column: any, event: MouseEvent) {
+    noMenuVisible.value = true;
+    if (row.name === currentRow.value?.name && menuVisible.value) {
+        menuVisible.value = false;
+    } else {
+        event.preventDefault();
+        currentRow.value = row;
+        menuPosition.x = event.clientX;
+        menuPosition.y = event.clientY;
+        menuVisible.value = true;
+    }
+}
+
+function hideRightMenu() {
+    menuVisible.value = false;
+}
+
+function onRightClick() {
+    if (noMenuVisible.value) {
+        noMenuVisible.value = false;
+    } else {
+        menuVisible.value = false;
+    }
+}
 
 onMounted(() => {
     if (localStorage.getItem('show-hidden') === null) {
