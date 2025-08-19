@@ -156,6 +156,7 @@ func (u *SnapshotService) Delete(req dto.SnapshotBatchDelete) error {
 			}
 			_ = backupRepo.DeleteRecord(context.Background(), repo.WithByType("snapshot"), backupRepo.WithByFileName(snap.Name+".tar.gz"))
 		}
+		_ = os.Remove(path.Join(global.Dir.LocalBackupDir, "tmp/system", snap.Name+".tar.gz"))
 
 		if err := snapshotRepo.Delete(repo.WithByID(snap.ID)); err != nil {
 			return err
