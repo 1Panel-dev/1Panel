@@ -1309,7 +1309,6 @@ const buttons = [
             openDownload(row);
         },
         disabled: (row: File.File) => {
-            debugger;
             return row?.isDir;
         },
     },
