@@ -25,12 +25,12 @@ import (
 
 func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
 	record := cronjobRepo.StartRecords(cronjob.ID, "", cronjob.Type)
+	taskItem, err := task.NewTaskWithOps(fmt.Sprintf("cronjob-%s", cronjob.Name), task.TaskHandle, task.TaskScopeCronjob, record.TaskID, cronjob.ID)
+	if err != nil {
+		global.LOG.Errorf("new task for exec shell failed, err: %v", err)
+		return
+	}
 	go func() {
-		taskItem, err := task.NewTaskWithOps(fmt.Sprintf("cronjob-%s", cronjob.Name), task.TaskHandle, task.TaskScopeCronjob, record.TaskID, cronjob.ID)
-		if err != nil {
-			global.LOG.Errorf("new task for exec shell failed, err: %v", err)
-			return
-		}
 		err = u.loadTask(cronjob, &record, taskItem)
 		if cronjob.Type == "snapshot" {
 			if err != nil {
