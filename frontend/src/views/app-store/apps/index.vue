@@ -258,13 +258,13 @@ onMounted(async () => {
     padding-bottom: 10px;
 }
 
-.tag-button {
-    margin-right: 10px;
-    &.no-active {
-        background: none;
-        border: none;
-    }
-}
+// .tag-button {
+//     margin-right: 10px;
+//     &.no-active {
+//         background: none;
+//         border: none;
+//     }
+// }
 
 @media only screen and (min-width: 768px) and (max-width: 1200px) {
     .app-col-12 {
