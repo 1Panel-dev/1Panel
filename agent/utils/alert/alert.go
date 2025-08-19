@@ -444,26 +444,34 @@ func FindRecentSuccessLoginNotInWhitelist(minutes int, whitelist []string) ([]st
 	return abnormalLogins, nil
 }
 
-func shellEscape(s string) string {
-	return strings.ReplaceAll(s, `'`, `'\''`)
+func findGrepPath() (string, error) {
+	path, err := exec.LookPath("grep")
+	if err != nil {
+		return "", fmt.Errorf("grep not found in PATH: %w", err)
+	}
+	return path, nil
 }
 
 func grepSSHLog(keyword string) ([]string, error) {
 	logFiles := []string{"/var/log/secure", "/var/log/auth.log"}
 	var results []string
+	grepPath, err := findGrepPath()
+	if err != nil {
+		panic(err)
+	}
 
 	for _, logFile := range logFiles {
 		if _, err := os.Stat(logFile); err != nil {
 			continue
 		}
-
-		cmdStr := fmt.Sprintf(`grep -a '%s' %s`, shellEscape(keyword), logFile)
-		cmd := exec.Command("bash", "-c", cmdStr)
+		cmd := exec.Command(grepPath, "-a", keyword, logFile)
 		output, err := cmd.Output()
 		if err != nil {
 			var exitErr *exec.ExitError
-			if errors.As(err, &exitErr) && len(exitErr.Stderr) == 0 {
-				continue
+			if errors.As(err, &exitErr) {
+				if exitErr.ExitCode() == 1 {
+					continue
+				}
 			}
 			return nil, fmt.Errorf("read log file fail [%s]: %w", logFile, err)
 		}
