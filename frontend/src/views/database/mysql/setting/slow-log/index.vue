@@ -18,7 +18,7 @@
                 </el-button>
             </el-form-item>
         </el-form>
-        <LogFile v-if="variables.slow_query_log === 'ON'" :config="config" />
+        <LogFile v-if="currentStatus" :config="config" />
         <ConfirmDialog @cancel="onCancel" ref="confirmDialogRef" @confirm="onSave"></ConfirmDialog>
     </div>
 </template>

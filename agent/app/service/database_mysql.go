@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"path"
+	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
@@ -303,11 +303,11 @@ func (u *MysqlService) Delete(ctx context.Context, req dto.MysqlDBDelete) error 
 	}
 
 	if req.DeleteBackup {
-		uploadDir := path.Join(global.Dir.DataDir, fmt.Sprintf("uploads/database/%s/%s/%s", req.Type, req.Database, db.Name))
+		uploadDir := filepath.Join(global.Dir.DataDir, fmt.Sprintf("uploads/database/%s/%s/%s", req.Type, req.Database, db.Name))
 		if _, err := os.Stat(uploadDir); err == nil {
 			_ = os.RemoveAll(uploadDir)
 		}
-		backupDir := path.Join(global.Dir.LocalBackupDir, fmt.Sprintf("database/%s/%s/%s", req.Type, db.MysqlName, db.Name))
+		backupDir := filepath.Join(global.Dir.LocalBackupDir, fmt.Sprintf("database/%s/%s/%s", req.Type, db.MysqlName, db.Name))
 		if _, err := os.Stat(backupDir); err == nil {
 			_ = os.RemoveAll(backupDir)
 		}
@@ -459,6 +459,17 @@ func (u *MysqlService) UpdateVariables(req dto.MysqlVariablesUpdate) error {
 
 	group := "[mysqld]"
 	for _, info := range req.Variables {
+		if info.Param == "slow_query_log" && info.Value == "ON" {
+			logFilePath := filepath.Join(global.Dir.DataDir, fmt.Sprintf("apps/%s/%s/data/1Panel-slow.log", app.Key, app.Name))
+			if req.Type == "mariadb" {
+				logFilePath = filepath.Join(global.Dir.DataDir, fmt.Sprintf("apps/%s/%s/db/data/1Panel-slow.log", app.Key, app.Name))
+			}
+			file, err := os.OpenFile(logFilePath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
+			if err != nil {
+				return err
+			}
+			defer file.Close()
+		}
 		if !strings.HasPrefix(app.Version, "5.7") && !strings.HasPrefix(app.Version, "5.6") {
 			if info.Param == "query_cache_size" {
 				continue
