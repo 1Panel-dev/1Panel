@@ -14,6 +14,7 @@
                 @selection-change="handleSelectionChange"
                 :max-height="tableHeight"
                 @row-contextmenu="handleRightClick"
+                @row-click="handleRowClick"
             >
                 <slot></slot>
                 <template #empty>
@@ -189,6 +190,23 @@ watch(
     },
     { immediate: true },
 );
+
+function handleRowClick(row: any, column: any, event: MouseEvent) {
+    if (!tableRef.value) return;
+    const target = event.target as HTMLElement;
+
+    if (target.closest('.el-checkbox')) return;
+    if (
+        target.closest('button') ||
+        target.closest('a') ||
+        target.closest('.el-switch') ||
+        target.closest('.table-link') ||
+        target.closest('.cursor-pointer')
+    ) {
+        return;
+    }
+    tableRef.value.refElTable.toggleRowSelection(row);
+}
 
 defineExpose({
     clearSelects,
