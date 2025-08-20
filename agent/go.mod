@@ -44,7 +44,6 @@ require (
 	github.com/spf13/afero v1.11.0
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/viper v1.19.0
-	github.com/studio-b12/gowebdav v0.9.0
 	github.com/subosito/gotenv v1.6.0
 	github.com/tencentyun/cos-go-sdk-v5 v0.7.54
 	github.com/tomasen/fcgi_client v0.0.0-20180423082037-2bb3d819fd19
