@@ -421,6 +421,9 @@ func (u *ImageService) ImageRemove(req dto.BatchDelete) error {
 			return nil
 		}, nil)
 	}
+	if len(req.TaskID) == 0 {
+		return taskItem.Execute()
+	}
 	go func() {
 		_ = taskItem.Execute()
 	}()
