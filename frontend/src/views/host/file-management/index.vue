@@ -414,7 +414,18 @@
                                     ></svg-icon>
                                 </div>
                                 <div class="file-name">
-                                    <span class="table-link" @click="open(row)" type="primary">{{ row.name }}</span>
+                                    <el-input
+                                        v-if="fileRename.oldName === row.name && isEdit"
+                                        v-model.trim="fileRename.newName"
+                                        ref="renameInput"
+                                        :autofocus="isEdit"
+                                        class="table-link table-input"
+                                        placeholder="file name"
+                                        @blur="handleSave(row)"
+                                    />
+                                    <span v-else class="table-link" @click="open(row)" type="primary">
+                                        {{ row.name }}
+                                    </span>
                                     <span v-if="row.isSymlink">-> {{ row.linkPath }}</span>
                                 </div>
                                 <div>
@@ -550,6 +561,7 @@ import {
     getFileContent,
     getFilesList,
     removeFavorite,
+    renameRile,
     searchFavorite,
     searchHostMount,
 } from '@/api/modules/files';
@@ -557,7 +569,7 @@ import { computeSize, copyText, dateFormat, downloadFile, getFileType, getIcon, 
 import { File } from '@/api/interface/file';
 import { Languages, Mimetypes } from '@/global/mimetype';
 import { useRouter } from 'vue-router';
-import { MsgWarning } from '@/utils/message';
+import { MsgSuccess, MsgWarning } from '@/utils/message';
 import { useSearchable } from './hooks/searchable';
 import { ResultData } from '@/api/interface';
 import { GlobalStore } from '@/store';
@@ -627,7 +639,7 @@ const fileEdit = reactive({ content: '', path: '', name: '', language: 'plaintex
 const filePreview = reactive({ path: '', name: '', extension: '', fileType: '', imageFiles: [], currentNode: '' });
 const codeReq = reactive({ path: '', expand: false, page: 1, pageSize: 100, isDetail: false });
 const fileUpload = reactive({ path: '' });
-const fileRename = reactive({ path: '', oldName: '' });
+const fileRename = reactive({ path: '', oldName: '', newName: '' });
 const fileWget = reactive({ path: '' });
 const fileMove = reactive({ oldPaths: [''], allNames: [''], type: '', path: '', name: '', count: 0, isDir: false });
 
@@ -664,6 +676,8 @@ const calculateBtn = ref(false);
 const dirNum = ref(0);
 const fileNum = ref(0);
 const imageFiles = ref([]);
+const isEdit = ref(false);
+const renameInput = ref(null);
 
 const { searchableStatus, searchablePath, searchableInputRef, searchableInputBlur } = useSearchable(paths);
 
@@ -1165,7 +1179,39 @@ const getWgetProcess = async () => {
 const openRename = (item: File.File) => {
     fileRename.path = req.path;
     fileRename.oldName = item.name;
-    renameRef.value.acceptParams(fileRename);
+    fileRename.newName = item.name;
+    isEdit.value = true;
+    nextTick(() => {
+        renameInput.value?.focus();
+    });
+};
+
+const handleSave = async (row: File.File): Promise<void> => {
+    if (fileRename.newName === fileRename.oldName) {
+        isEdit.value = false;
+        fileRename.oldName = '';
+        return;
+    }
+    const addItem: File.FileRename = {
+        oldName: getPath(fileRename.path, fileRename.oldName),
+        newName: getPath(fileRename.path, fileRename.newName),
+    };
+    loading.value = true;
+    try {
+        await renameRile(addItem);
+        MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
+        row.name = fileRename.newName;
+    } catch (error) {
+        console.error(error);
+    } finally {
+        loading.value = false;
+        isEdit.value = false;
+        fileRename.oldName = '';
+    }
+};
+
+const getPath = (path: string, name: string) => {
+    return path + '/' + name;
 };
 
 const openMove = (type: string) => {
@@ -1533,5 +1579,8 @@ onBeforeUnmount(() => {
 }
 .el-button-group > .el-dropdown > .el-button {
     border-left-color: var(--el-border-color);
+}
+.table-input {
+    --el-input-inner-height: 22px !important;
 }
 </style>
