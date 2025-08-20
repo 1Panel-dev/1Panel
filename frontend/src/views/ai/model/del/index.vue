@@ -39,7 +39,7 @@ import { deleteOllamaModel } from '@/api/modules/ai';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { CheckboxValueType } from 'element-plus';
-import { onMounted, ref } from 'vue';
+import { ref } from 'vue';
 
 defineOptions({ name: 'OpDialog' });
 
@@ -96,8 +96,6 @@ const handleClose = () => {
     emit('search');
     open.value = false;
 };
-
-onMounted(() => {});
 
 defineExpose({
     acceptParams,

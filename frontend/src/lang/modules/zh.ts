@@ -2479,6 +2479,9 @@ const message = {
         customAcme: '自定义 ACME 服务',
         customAcmeURL: 'ACME 服务 URL',
         baiduCloud: '百度云',
+        pushNode: '同步到其他节点',
+        pushNodeHelper: '申请/续期之后推送到选择的节点',
+        fromMaster: '主节点推送',
     },
     firewall: {
         create: '创建规则',

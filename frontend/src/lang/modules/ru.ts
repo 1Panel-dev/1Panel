@@ -2638,6 +2638,9 @@ const message = {
         customAcme: 'Пользовательская служба ACME',
         customAcmeURL: 'URL службы ACME',
         baiduCloud: 'Baidu Cloud',
+        pushNode: 'Синхронизация с другими узлами',
+        pushNodeHelper: 'Отправить на выбранные узлы после заявки/продления',
+        fromMaster: 'Отправка с главного узла',
     },
     firewall: {
         create: 'Создать правило',

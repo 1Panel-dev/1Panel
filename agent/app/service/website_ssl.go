@@ -5,6 +5,7 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 	"github.com/go-acme/lego/v4/certificate"
 	"log"
 	"os"
@@ -46,6 +47,7 @@ type IWebsiteSSLService interface {
 	ObtainSSL(apply request.WebsiteSSLApply) error
 	SyncForRestart() error
 	DownloadFile(id uint) (*os.File, error)
+	ImportMasterSSL(create model.WebsiteSSL) error
 }
 
 func NewIWebsiteSSLService() IWebsiteSSLService {
@@ -146,6 +148,10 @@ func (w WebsiteSSLService) Create(create request.WebsiteSSLCreate) (request.Webs
 		}
 		websiteSSL.Dir = create.Dir
 	}
+	if create.PushNode && global.IsMaster && len(create.Nodes) > 0 {
+		websiteSSL.PushNode = true
+		websiteSSL.Nodes = strings.Join(create.Nodes, ",")
+	}
 
 	var domains []string
 	if create.OtherDomains != "" {
@@ -207,7 +213,7 @@ func printSSLLog(logger *log.Logger, msgKey string, params map[string]interface{
 }
 
 func reloadSystemSSL(websiteSSL *model.WebsiteSSL, logger *log.Logger) {
-	if global.CoreDB == nil {
+	if !global.IsMaster {
 		return
 	}
 	systemSSLEnable, sslID := GetSystemSSL()
@@ -387,6 +393,14 @@ func (w WebsiteSSLService) ObtainSSL(apply request.WebsiteSSLApply) error {
 			printSSLLog(logger, "ApplyWebSiteSSLSuccess", nil, apply.DisableLog)
 		}
 		reloadSystemSSL(websiteSSL, logger)
+		if websiteSSL.PushNode {
+			printSSLLog(logger, "StartPushSSLToNode", nil, apply.DisableLog)
+			if err = xpack.PushSSLToNode(websiteSSL); err != nil {
+				printSSLLog(logger, "PushSSLToNodeFailed", map[string]interface{}{"err": err.Error()}, apply.DisableLog)
+				return
+			}
+			printSSLLog(logger, "PushSSLToNodeSuccess", nil, apply.DisableLog)
+		}
 	}()
 
 	return nil
@@ -708,6 +722,58 @@ func (w WebsiteSSLService) SyncForRestart() error {
 			ssl.Status = constant.SystemRestart
 			ssl.Message = "System restart causing interrupt"
 			_ = websiteSSLRepo.Save(&ssl)
+		}
+	}
+	return nil
+}
+
+func (w WebsiteSSLService) ImportMasterSSL(create model.WebsiteSSL) error {
+	websiteSSL, _ := websiteSSLRepo.GetFirst(websiteSSLRepo.WithByMasterSSLID(create.ID))
+	if websiteSSL == nil {
+		websiteSSL = &model.WebsiteSSL{
+			Status:        constant.SSLReady,
+			Provider:      constant.FromMaster,
+			PrimaryDomain: create.PrimaryDomain,
+			StartDate:     create.StartDate,
+			ExpireDate:    create.ExpireDate,
+			KeyType:       create.KeyType,
+			Description:   create.Description,
+			MasterSSLID:   create.ID,
+			PrivateKey:    create.PrivateKey,
+			Pem:           create.Pem,
+			Type:          create.Type,
+			Organization:  create.Organization,
+		}
+		if err := websiteSSLRepo.Create(context.TODO(), websiteSSL); err != nil {
+			return err
+		}
+	} else {
+		websiteSSL.PrimaryDomain = create.PrimaryDomain
+		websiteSSL.StartDate = create.StartDate
+		websiteSSL.ExpireDate = create.ExpireDate
+		websiteSSL.KeyType = create.KeyType
+		websiteSSL.Description = create.Description
+		websiteSSL.PrivateKey = create.PrivateKey
+		websiteSSL.Pem = create.Pem
+		websiteSSL.Type = create.Type
+		websiteSSL.Organization = create.Organization
+		if err := websiteSSLRepo.Save(websiteSSL); err != nil {
+			return err
+		}
+	}
+	websites, _ := websiteRepo.GetBy(websiteRepo.WithWebsiteSSLID(websiteSSL.ID))
+	if len(websites) == 0 {
+		return nil
+	}
+	for _, website := range websites {
+		if err := createPemFile(website, *websiteSSL); err != nil {
+			continue
+		}
+	}
+	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
+	if err == nil {
+		if err := opNginx(nginxInstall.ContainerName, constant.NginxReload); err != nil {
+			return err
 		}
 	}
 	return nil

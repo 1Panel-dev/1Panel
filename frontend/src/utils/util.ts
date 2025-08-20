@@ -440,6 +440,8 @@ export function getProvider(provider: string): string {
             return 'HTTP';
         case 'selfSigned':
             return i18n.global.t('ssl.selfSigned');
+        case 'fromMaster':
+            return i18n.global.t('ssl.fromMaster');
         default:
             return i18n.global.t('ssl.manualCreate');
     }

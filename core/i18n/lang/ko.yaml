@@ -228,3 +228,6 @@ ClusterNameIsExist: "클러스터 이름이 이미 존재합니다."
 AppStatusUnHealthy: "애플리케이션 상태 획득이 비정상입니다. 노드 목록에서 설치 노드 상태를 확인하세요."
 MasterNodePortNotAvailable: "노드 {{ .name }} 포트 {{ .port }} 연결성 검증에 실패했습니다. 방화벽/보안 그룹 설정 및 마스터 노드 상태를 확인하세요."
 ClusterMasterNotExist: "클러스터의 마스터 노드가 연결이 끊어졌습니다. 자식 노드를 삭제하세요."
+
+#ssl
+ErrReqFailed: "{{.name}} 요청 실패: {{ .err }}"

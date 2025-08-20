@@ -161,6 +161,9 @@ StartUpdateSystemSSL: "开始更新系统证书"
 UpdateSystemSSLSuccess: "更新系统证书成功"
 ErrWildcardDomain: "HTTP 模式无法申请泛域名证书"
 ErrApplySSLCanNotDelete: "正在申请的证书{{.name}}无法删除，请稍后再试"
+StartPushSSLToNode: "开始推送证书到节点"
+PushSSLToNodeFailed: "推送证书到节点失败: {{ .err }}"
+PushSSLToNodeSuccess: "推送证书到节点成功"
 
 #mysql
 ErrUserIsExist: "当前用户已存在，请重新输入"

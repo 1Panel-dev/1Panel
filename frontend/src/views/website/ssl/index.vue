@@ -57,7 +57,7 @@
                         prop="domains"
                         min-width="90px"
                     ></el-table-column>
-                    <el-table-column :label="$t('ssl.applyType')" show-overflow-tooltip prop="provider" width="90px">
+                    <el-table-column :label="$t('ssl.applyType')" show-overflow-tooltip prop="provider" width="120px">
                         <template #default="{ row }">{{ getProvider(row.provider) }}</template>
                     </el-table-column>
                     <el-table-column
@@ -97,7 +97,12 @@
                     </el-table-column>
                     <el-table-column :label="$t('commons.button.log')" width="80px">
                         <template #default="{ row }">
-                            <el-button @click="openSSLLog(row)" link type="primary" v-if="row.provider != 'manual'">
+                            <el-button
+                                @click="openSSLLog(row)"
+                                link
+                                type="primary"
+                                v-if="row.provider != 'manual' && row.provider !== 'fromMaster'"
+                            >
                                 {{ $t('website.check') }}
                             </el-button>
                         </template>
@@ -224,7 +229,7 @@ const buttons = [
     {
         label: i18n.global.t('ssl.apply'),
         disabled: function (row: Website.SSLDTO) {
-            return row.status === 'applying' || row.provider === 'manual';
+            return row.status === 'applying' || row.provider === 'manual' || row.provider === 'fromMaster';
         },
         click: function (row: Website.SSLDTO) {
             if (row.provider === 'dnsManual') {
@@ -248,6 +253,9 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.edit'),
+        disabled: function (row: Website.SSLDTO) {
+            return row.provider === 'fromMaster';
+        },
         click: function (row: Website.SSLDTO) {
             onEdit(row);
         },

@@ -162,6 +162,9 @@ StartUpdateSystemSSL: '시스템 인증서 업데이트 시작'
 UpdateSystemSSLSuccess: '시스템 인증서 업데이트가 성공적으로 완료되었습니다.'
 ErrWildcardDomain: 'HTTP 모드에서 와일드카드 도메인 이름 인증서를 신청할 수 없습니다'
 ErrApplySSLCanNotDelete: "신청 중인 인증서 {{.name}}는 삭제할 수 없습니다. 나중에 다시 시도해 주세요."
+StartPushSSLToNode: "인증서를 노드로 푸시 시작"
+PushSSLToNodeFailed: "노드로 인증서 푸시 실패: {{ .err }}"
+PushSSLToNodeSuccess: "노드로 인증서 푸시 성공"
 
 #마이SQL
 ErrUserIsExist: '현재 사용자가 이미 존재합니다. 다시 입력하세요'

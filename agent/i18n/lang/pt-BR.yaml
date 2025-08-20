@@ -14,6 +14,9 @@ ErrApiConfigKeyInvalid: 'Erro de chave da interface da API: {{ .detail }}'
 ErrApiConfigIPInvalid: 'O IP usado para chamar a interface da API não está na lista de permissões: {{ .detail }}'
 ErrApiConfigDisable: 'Esta interface proíbe o uso de chamadas de interface de API: {{ .detail }}'
 ErrApiConfigKeyTimeInvalid: 'Erro de registro de data e hora da interface da API: {{ .detail }}'
+StartPushSSLToNode: "Iniciando o envio do certificado para o nó"
+PushSSLToNodeFailed: "Falha ao enviar o certificado para o nó: {{ .err }}"
+PushSSLToNodeSuccess: "Certificado enviado com sucesso para o nó"
 
 #comum
 ErrUsernameIsExist: 'Nome de usuário já existe'

@@ -14,6 +14,9 @@ ErrApiConfigKeyInvalid: 'Ошибка ключа интерфейса API: {{ .d
 ErrApiConfigIPInvalid: 'IP-адрес, используемый для вызова интерфейса API, отсутствует в белом списке: {{ .detail }}'
 ErrApiConfigDisable: 'Этот интерфейс запрещает использование вызовов интерфейса API: {{ .detail }}'
 ErrApiConfigKeyTimeInvalid: 'Ошибка временной метки интерфейса API: {{ .detail }}'
+StartPushSSLToNode: "Начало отправки сертификата на узел"
+PushSSLToNodeFailed: "Не удалось отправить сертификат на узел: {{ .err }}"
+PushSSLToNodeSuccess: "Сертификат успешно отправлен на узел"
 
 #общий
 ErrUsernameIsExist: 'Имя пользователя уже существует'

@@ -237,3 +237,6 @@ ClusterNameIsExist: "集群名称已存在"
 AppStatusUnHealthy: "应用获取状态异常，请在节点列表检查安装节点状态"
 MasterNodePortNotAvailable: "节点 {{ .name }} 端口 {{ .port }} 连通性校验失败，请检查防火墙/安全组设置和主节点状态"
 ClusterMasterNotExist: "集群主节点失联，请删除子节点"
+
+#ssl
+ErrReqFailed: "{{.name}} 请求失败: {{ .err }}"

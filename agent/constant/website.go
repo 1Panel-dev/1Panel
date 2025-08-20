@@ -25,6 +25,7 @@ const (
 	Http       = "http"
 	Manual     = "manual"
 	SelfSigned = "selfSigned"
+	FromMaster = "fromMaster"
 
 	StartWeb = "start"
 	StopWeb  = "stop"

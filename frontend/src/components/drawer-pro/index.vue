@@ -146,7 +146,11 @@ const handleClose = () => {
 };
 
 const beforeClose = (done: () => void) => {
-    emit('beforeClose', done);
+    if (!props.confirmBeforeClose) {
+        done();
+    } else {
+        emit('beforeClose', done);
+    }
 };
 
 function toggleFullscreen() {

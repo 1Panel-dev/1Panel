@@ -1,6 +1,7 @@
 package v2
 
 import (
+	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"net/http"
 	"net/url"
 	"reflect"
@@ -244,4 +245,16 @@ func (b *BaseApi) DownloadWebsiteSSL(c *gin.Context) {
 	c.Header("Content-Length", strconv.FormatInt(info.Size(), 10))
 	c.Header("Content-Disposition", "attachment; filename*=utf-8''"+url.PathEscape(info.Name()))
 	http.ServeContent(c.Writer, c.Request, info.Name(), info.ModTime(), file)
+}
+
+func (b *BaseApi) ImportMasterSSL(c *gin.Context) {
+	var req model.WebsiteSSL
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := websiteSSLService.ImportMasterSSL(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
 }

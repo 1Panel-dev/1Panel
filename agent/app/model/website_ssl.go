@@ -36,6 +36,9 @@ type WebsiteSSL struct {
 	DisableCNAME  bool      `json:"disableCNAME"`
 	ExecShell     bool      `json:"execShell"`
 	Shell         string    `json:"shell"`
+	MasterSSLID   uint      `json:"masterSslId"`
+	Nodes         string    `json:"nodes"`
+	PushNode      bool      `json:"pushNode"`
 
 	AcmeAccount WebsiteAcmeAccount `json:"acmeAccount" gorm:"-:migration"`
 	DnsAccount  WebsiteDnsAccount  `json:"dnsAccount" gorm:"-:migration"`

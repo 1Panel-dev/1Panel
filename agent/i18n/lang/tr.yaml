@@ -14,6 +14,9 @@ ErrApiConfigKeyInvalid: 'API arayüz anahtarı hatası: {{ .detail }}'
 ErrApiConfigIPInvalid: 'API arayüzünü çağırmak için kullanılan IP beyaz listede değil: {{ .detail }}'
 ErrApiConfigDisable: 'Bu arayüz API arayüz çağrılarının kullanımını yasaklıyor: {{ .detail }}'
 ErrApiConfigKeyTimeInvalid: 'API arayüz zaman damgası hatası: {{ .detail }}'
+StartPushSSLToNode: "Sertifika düğüme gönderilmeye başlandı"
+PushSSLToNodeFailed: "Sertifika düğüme gönderilemedi: {{ .err }}"
+PushSSLToNodeSuccess: "Sertifika düğüme başarıyla gönderildi"
 
 #common
 ErrUsernameIsExist: 'Kullanıcı adı zaten mevcut'

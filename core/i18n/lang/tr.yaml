@@ -227,3 +227,6 @@ ClusterNameIsExist: "Küme adı zaten var."
 AppStatusUnHealthy: "Uygulama durumu alımı anormal, lütfen düğüm listesindeki yükleme düğümü durumunu kontrol edin."
 MasterNodePortNotAvailable: "Düğüm {{ .name }} portu {{ .port }} bağlantı doğrulaması başarısız oldu, lütfen güvenlik duvarı/güvenlik grubu ayarlarını ve ana düğüm durumunu kontrol edin."
 ClusterMasterNotExist: "Küme ana düğümü bağlantısı kesildi, lütfen alt düğümleri silin."
+
+#ssl
+ErrReqFailed: "{{.name}} istek başarısız: {{ .err }}"

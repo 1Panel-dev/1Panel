@@ -9,24 +9,26 @@ type WebsiteSSLSearch struct {
 }
 
 type WebsiteSSLCreate struct {
-	PrimaryDomain string `json:"primaryDomain" validate:"required"`
-	OtherDomains  string `json:"otherDomains"`
-	Provider      string `json:"provider" validate:"required"`
-	AcmeAccountID uint   `json:"acmeAccountId" validate:"required"`
-	DnsAccountID  uint   `json:"dnsAccountId"`
-	AutoRenew     bool   `json:"autoRenew"`
-	KeyType       string `json:"keyType"`
-	Apply         bool   `json:"apply"`
-	PushDir       bool   `json:"pushDir"`
-	Dir           string `json:"dir"`
-	ID            uint   `json:"id"`
-	Description   string `json:"description"`
-	DisableCNAME  bool   `json:"disableCNAME"`
-	SkipDNS       bool   `json:"skipDNS"`
-	Nameserver1   string `json:"nameserver1"`
-	Nameserver2   string `json:"nameserver2"`
-	ExecShell     bool   `json:"execShell"`
-	Shell         string `json:"shell"`
+	PrimaryDomain string   `json:"primaryDomain" validate:"required"`
+	OtherDomains  string   `json:"otherDomains"`
+	Provider      string   `json:"provider" validate:"required"`
+	AcmeAccountID uint     `json:"acmeAccountId" validate:"required"`
+	DnsAccountID  uint     `json:"dnsAccountId"`
+	AutoRenew     bool     `json:"autoRenew"`
+	KeyType       string   `json:"keyType"`
+	Apply         bool     `json:"apply"`
+	PushDir       bool     `json:"pushDir"`
+	Dir           string   `json:"dir"`
+	ID            uint     `json:"id"`
+	Description   string   `json:"description"`
+	DisableCNAME  bool     `json:"disableCNAME"`
+	SkipDNS       bool     `json:"skipDNS"`
+	Nameserver1   string   `json:"nameserver1"`
+	Nameserver2   string   `json:"nameserver2"`
+	ExecShell     bool     `json:"execShell"`
+	Shell         string   `json:"shell"`
+	PushNode      bool     `json:"pushNode"`
+	Nodes         []string `json:"nodes"`
 }
 
 type WebsiteDNSReq struct {

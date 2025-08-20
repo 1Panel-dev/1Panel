@@ -161,6 +161,9 @@ StartUpdateSystemSSL: '開始更新系統憑證'
 UpdateSystemSSLSuccess: '更新系統憑證成功'
 ErrWildcardDomain: 'HTTP 模式無法申請泛網域憑證'
 ErrApplySSLCanNotDelete: "正在申請的證書 {{.name}} 無法刪除，請稍後再試"
+StartPushSSLToNode: "開始推送證書到節點"
+PushSSLToNodeFailed: "推送證書到節點失敗: {{ .err }}"
+PushSSLToNodeSuccess: "推送證書到節點成功"
 
 #mysql
 ErrUserIsExist: '目前使用者已存在，請重新輸入'

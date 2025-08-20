@@ -162,6 +162,9 @@ StartUpdateSystemSSL: 'システム証明書の更新を開始します'
 UpdateSystemSSLSuccess: 'システム証明書を正常に更新しました'
 ErrWildcardDomain: 'HTTP モードでワイルドカード ドメイン名証明書を申請できません'
 ErrApplySSLCanNotDelete: "申請中の証明書 {{.name}} は削除できません。しばらくしてからもう一度お試しください。"
+StartPushSSLToNode: "証明書をノードにプッシュ開始"
+PushSSLToNodeFailed: "ノードに証明書をプッシュ失敗: {{ .err }}"
+PushSSLToNodeSuccess: "ノードに証明書をプッシュ成功"
 
 #mysql
 ErrUserIsExist: '現在のユーザーは既に存在します。再入力してください'

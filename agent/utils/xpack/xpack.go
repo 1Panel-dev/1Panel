@@ -85,3 +85,7 @@ func LoadRequestTransport() *http.Transport {
 func ValidateCertificate(c *gin.Context) bool {
 	return true
 }
+
+func PushSSLToNode(websiteSSL *model.WebsiteSSL) error {
+	return nil
+}

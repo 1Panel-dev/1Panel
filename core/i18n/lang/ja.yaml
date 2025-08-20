@@ -229,3 +229,6 @@ ClusterNameIsExist: "クラスタ名は既に存在します。"
 AppStatusUnHealthy: "アプリケーションのステータス取得が異常です。ノードリストでインストールノードのステータスを確認してください。"
 MasterNodePortNotAvailable: "ノード {{ .name }} のポート {{ .port }} の接続性検証が失敗しました。ファイアウォール/セキュリティグループの設定とマスターノードのステータスを確認してください。"
 ClusterMasterNotExist: "クラスタのマスターノードが切断されています。子ノードを削除してください。"
+
+#ssl
+ErrReqFailed: "{{.name}} リクエスト失敗: {{ .err }}"

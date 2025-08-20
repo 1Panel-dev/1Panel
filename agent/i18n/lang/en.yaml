@@ -162,6 +162,9 @@ StartUpdateSystemSSL: 'Start updating system certificate'
 UpdateSystemSSLSuccess: 'Update system certificate successfully'
 ErrWildcardDomain: 'Unable to apply for wildcard domain name certificate in HTTP mode'
 ErrApplySSLCanNotDelete: "The certificate {{.name}} being applied for cannot be deleted, please try again later."
+StartPushSSLToNode: "Starting to push certificate to node"
+PushSSLToNodeFailed: "Failed to push certificate to node: {{ .err }}"
+PushSSLToNodeSuccess: "Successfully pushed certificate to node"
 
 #mysql
 ErrUserIsExist: 'The current user already exists, please re-enter'

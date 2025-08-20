@@ -94,28 +94,6 @@
             <el-form-item :label="''" prop="autoRenew" v-if="ssl.provider !== 'dnsManual'">
                 <el-checkbox v-model="ssl.autoRenew" :label="$t('ssl.autoRenew')" />
             </el-form-item>
-            <el-form-item :label="''" prop="pushDir">
-                <el-checkbox v-model="ssl.pushDir" :label="$t('ssl.pushDir')" />
-            </el-form-item>
-            <el-form-item :label="$t('ssl.dir')" prop="dir" v-if="ssl.pushDir">
-                <el-input v-model.trim="ssl.dir">
-                    <template #prepend>
-                        <el-button icon="Folder" @click="fileRef.acceptParams({ path: ssl.dir, dir: true })" />
-                    </template>
-                </el-input>
-                <span class="input-help">
-                    {{ $t('ssl.pushDirHelper') }}
-                </span>
-            </el-form-item>
-            <el-form-item :label="''" prop="execShell">
-                <el-checkbox v-model="ssl.execShell" :label="$t('ssl.execShell')" />
-            </el-form-item>
-            <el-form-item :label="$t('ssl.shell')" prop="shell" v-if="ssl.execShell">
-                <el-input type="textarea" :rows="4" v-model="ssl.shell" />
-                <span class="input-help">
-                    {{ $t('ssl.shellHelper') }}
-                </span>
-            </el-form-item>
             <div v-if="ssl.provider != 'selfSigned'">
                 <el-form-item :label="''" prop="disableCNAME">
                     <el-checkbox v-model="ssl.disableCNAME" :label="$t('ssl.disableCNAME')" />
@@ -141,6 +119,35 @@
                         {{ $t('ssl.nameserverHelper') }}
                     </span>
                 </el-form-item>
+                <el-form-item :label="''" prop="pushDir">
+                    <el-checkbox v-model="ssl.pushDir" :label="$t('ssl.pushDir')" />
+                </el-form-item>
+                <el-form-item :label="$t('ssl.dir')" prop="dir" v-if="ssl.pushDir">
+                    <el-input v-model.trim="ssl.dir">
+                        <template #prepend>
+                            <el-button icon="Folder" @click="fileRef.acceptParams({ path: ssl.dir, dir: true })" />
+                        </template>
+                    </el-input>
+                    <span class="input-help">
+                        {{ $t('ssl.pushDirHelper') }}
+                    </span>
+                </el-form-item>
+                <el-form-item :label="''" prop="execShell">
+                    <el-checkbox v-model="ssl.execShell" :label="$t('ssl.execShell')" />
+                </el-form-item>
+                <el-form-item :label="$t('ssl.shell')" prop="shell" v-if="ssl.execShell">
+                    <el-input type="textarea" :rows="4" v-model="ssl.shell" />
+                    <span class="input-help">
+                        {{ $t('ssl.shellHelper') }}
+                    </span>
+                </el-form-item>
+                <PushtoNode
+                    v-if="isMaster && isMasterProductPro"
+                    :push-node="ssl.pushNode"
+                    :nodes="ssl.nodes"
+                    @update:push-node="ssl.pushNode = $event"
+                    @update:nodes="ssl.nodes = $event"
+                />
             </div>
         </el-form>
         <template #footer>
@@ -166,6 +173,18 @@ import { computed, reactive, ref } from 'vue';
 import { MsgSuccess } from '@/utils/message';
 import { KeyTypes } from '@/global/mimetype';
 import { getDNSName, getAccountName } from '@/utils/util';
+import { defineAsyncComponent } from 'vue';
+import { useGlobalStore } from '@/composables/useGlobalStore';
+const { isMasterProductPro, isMaster } = useGlobalStore();
+
+const PushtoNode = defineAsyncComponent(async () => {
+    const modules = import.meta.glob('@/xpack/views/ssl/index.vue');
+    const loader = modules['/src/xpack/views/ssl/index.vue'];
+    if (loader) {
+        return ((await loader()) as any).default;
+    }
+    return { template: '<div></div>' };
+});
 
 const props = defineProps({
     id: {
@@ -205,6 +224,7 @@ const rules = ref({
     nameserver2: [Rules.ipv4],
     shell: [Rules.requiredInput],
     description: [checkMaxLength(128)],
+    nodes: [Rules.requiredSelect],
 });
 const websiteID = ref();
 
@@ -227,6 +247,8 @@ const initData = () => ({
     nameserver2: '',
     execShell: false,
     shell: '',
+    pushNode: false,
+    nodes: [],
 });
 
 const ssl = ref(initData());

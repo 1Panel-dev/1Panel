@@ -2669,6 +2669,9 @@ const message = {
         customAcme: 'Custom ACME Service',
         customAcmeURL: 'ACME Service URL',
         baiduCloud: 'Baidu Cloud',
+        pushNode: 'Sync to Other Nodes',
+        pushNodeHelper: 'Push to selected nodes after application/renewal',
+        fromMaster: 'Master Node Push',
     },
     firewall: {
         create: 'Create rule',

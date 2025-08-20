@@ -14,6 +14,9 @@ ErrApiConfigKeyInvalid: 'Ralat kunci antara muka API: {{ .detail }}'
 ErrApiConfigIPInvalid: 'IP yang digunakan untuk memanggil antara muka API tiada dalam senarai putih: {{ .detail }}'
 ErrApiConfigDisable: 'Antara muka ini melarang penggunaan panggilan antara muka API: {{ .detail }}'
 ErrApiConfigKeyTimeInvalid: 'Ralat cap masa antara muka API: {{ .detail }}'
+StartPushSSLToNode: "Mula menolak sijil ke nod"
+PushSSLToNodeFailed: "Gagal menolak sijil ke nod: {{ .err }}"
+PushSSLToNodeSuccess: "Berjaya menolak sijil ke nod"
 
 #biasa
 ErrUsernameIsExist: 'Nama pengguna sudah wujud'
