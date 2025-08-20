@@ -1835,6 +1835,9 @@ func (w WebsiteService) GetProxies(id uint) (res []request.WebsiteProxyConfig, e
 			if directive.GetName() == "proxy_ssl_server_name" {
 				proxyConfig.SNI = directive.GetParameters()[0] == "on"
 			}
+			if directive.GetName() == "proxy_ssl_name" && len(directive.GetParameters()) > 0 {
+				proxyConfig.ProxySSLName = directive.GetParameters()[0]
+			}
 		}
 		res = append(res, proxyConfig)
 	}
