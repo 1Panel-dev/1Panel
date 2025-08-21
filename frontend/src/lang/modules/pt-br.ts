@@ -3446,6 +3446,8 @@ const message = {
                 'O nó atual já está habilitado como nó mestre e não pode ser adicionado diretamente como nó escravo. Por favor, faça o downgrade para nó escravo primeiro antes de adicionar, consulte a documentação para detalhes.',
             agentExist:
                 'Detectado que 1panel-agent já está instalado neste nó. Continuar irá reter os dados existentes e apenas substituir o serviço 1panel-agent.',
+            agentNotExist:
+                'Foi detectado que o 1panel-agent não está instalado neste nó, portanto, as informações do nó não podem ser editadas diretamente. Por favor, exclua e adicione novamente.',
             oldDataExist:
                 'Detectados dados históricos do 1Panel V2 neste nó. As seguintes informações serão usadas para sobrescrever as configurações atuais:',
             errLicense: 'A licença vinculada a este nó está indisponível. Por favor verifique e tente novamente!',

@@ -3207,6 +3207,7 @@ const message = {
             coreExist:
                 '当前节点已作为主节点启用，无法直接作为从节点添加。请先将其降级为从节点后再添加，具体可参考文档。',
             agentExist: '检查到该节点已安装 1panel-agent，继续添加将保留现有数据，仅替换 1panel-agent 服务。',
+            agentNotExist: '检查到该节点未安装 1panel-agent，无法直接编辑该节点信息，请先删除后重新添加。',
             oldDataExist: '检查到该节点存在 1Panel V2 历史数据，将使用以下信息覆盖当前设置',
             errLicense: '检查到该节点绑定的许可证不可用，请检查后重试！',
             errNodePort: '检查到节点端口 [ {0} ] 无法访问，请检查防火墙或安全组是否已放行该端口。',

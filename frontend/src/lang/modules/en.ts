@@ -3477,6 +3477,8 @@ const message = {
                 'The current node is already enabled as a master node and cannot be directly added as a slave node. Please downgrade it to a slave node first before adding, refer to the documentation for details.',
             agentExist:
                 'Detected that 1panel-agent is already installed on this node. Continuing will retain existing data and only replace the 1panel-agent service.',
+            agentNotExist:
+                'It is detected that 1panel-agent is not installed on this node, so the node information cannot be edited directly. Please delete it and add it again.',
             oldDataExist:
                 'Detected historical 1Panel V2 data on this node. The following information will be used to overwrite current settings:',
             errLicense: 'The license bound to this node is unavailable. Please check and try again!',

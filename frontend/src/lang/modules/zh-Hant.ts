@@ -3237,6 +3237,7 @@ const message = {
             coreExist:
                 '當前節點已作為主節點啟用，無法直接作為從節點添加。請先將其降級為從節點後再添加，具體可參考文件。',
             agentExist: '檢查到該節點已安裝 1panel-agent，繼續添加將保留現有數據，僅替換 1panel-agent 服務。',
+            agentNotExist: '檢測到該節點未安裝 1panel-agent，無法直接編輯該節點資訊，請先刪除後重新新增。',
             oldDataExist: '檢查到該節點存在 1Panel V2 歷史數據，將使用以下信息覆蓋當前設置',
             errLicense: '檢查到該節點綁定的許可證不可用，請檢查後重試！',
             errNodePort: '檢查到節點端口 [ {0} ] 無法訪問，請檢查防火牆或安全組是否已放行該端口。',

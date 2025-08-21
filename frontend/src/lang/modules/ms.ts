@@ -3436,6 +3436,8 @@ const message = {
                 'Nod semasa telah didayakan sebagai nod induk dan tidak boleh ditambah terus sebagai nod hamba. Sila turun taraf kepada nod hamba terlebih dahulu sebelum menambah, rujuk dokumentasi untuk butiran.',
             agentExist:
                 'Mengesan 1panel-agent telah dipasang pada nod ini. Penerusan akan mengekalkan data sedia ada dan hanya menggantikan perkhidmatan 1panel-agent.',
+            agentNotExist:
+                'Terdapat pengesahan bahawa 1panel-agent tidak dipasang pada nod ini, maklumat nod tidak boleh disunting secara langsung. Sila padam dan tambah semula.',
             oldDataExist:
                 'Mengesan data sejarah 1Panel V2 pada nod ini. Maklumat berikut akan digunakan untuk menimpa tetapan semasa:',
             errLicense: 'Lesen yang terikat pada nod ini tidak tersedia. Sila semak dan cuba lagi!',

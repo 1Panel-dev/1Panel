@@ -3514,6 +3514,8 @@ const message = {
                 'Mevcut düğüm zaten ana düğüm olarak etkinleştirilmiş durumda ve doğrudan alt düğüm olarak eklenemez. Lütfen eklemeden önce alt düğüme dönüştürün, ayrıntılar için belgelere bakın.',
             agentExist:
                 'Bu düğümde 1panel-agent’ın zaten kurulu olduğu algılandı. Devam edilmesi mevcut verileri koruyacak ve yalnızca 1panel-agent hizmetini değiştirecektir.',
+            agentNotExist:
+                'Bu düğümde 1panel-agent yüklü olmadığı tespit edildi, düğüm bilgileri doğrudan düzenlenemez. Lütfen silip tekrar ekleyin.',
             oldDataExist:
                 'Bu düğümde geçmiş 1Panel V2 verileri algılandı. Aşağıdaki bilgiler mevcut ayarları üzerine yazmak için kullanılacaktır:',
             errLicense: 'Bu düğüme bağlı lisans kullanılamıyor. Lütfen kontrol edin ve tekrar deneyin!',
