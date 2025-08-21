@@ -32,7 +32,7 @@
             class="log-item"
             :style="{ top: `${(startIndex + index) * logHeight}px` }"
         >
-            <hightlight :log="log" type="container"></hightlight>
+            <hightlight :log="log" type="container" :container="container"></hightlight>
         </div>
     </div>
 </template>

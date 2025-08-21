@@ -1,113 +1,373 @@
 <template>
-    <code ref="codeRef" class="log-highlight whitespace-pre" v-html="highlightedLog" />
+    <span v-for="(token, index) in tokens" :key="index" :class="['token', token.type]" :style="{ color: token.color }">
+        <span v-if="token.type != 'html'" class="whitespace-pre">{{ token.text }}</span>
+        <span v-else v-html="token.text" class="whitespace-pre"></span>
+    </span>
 </template>
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue';
 import anser from 'anser';
+interface TokenRule {
+    type: string;
+    pattern: RegExp;
+    color: string;
+}
+
+interface Token {
+    text: string;
+    type: string;
+    color: string;
+    html?: string;
+}
+
 const props = defineProps<{
     log: string;
     type: string;
+    container?: string;
 }>();
 
-const codeRef = ref<HTMLElement | null>(null);
-const highlightedLog = ref('');
-
-interface HighlightRule {
-    regex: RegExp;
-    className: string;
-}
-
-const highlightRules: HighlightRule[] = [
-    { regex: /\b(INFO|TRACE|System|Note|notice)\b/gi, className: 'hljs-keyword' },
-    { regex: /\b(ERROR|DEBUG|FATAL)\b/gi, className: 'hljs-error' },
-    { regex: /\b(WARN|WARNING)\b/gi, className: 'hljs-warn' },
-    { regex: /\b(true|false|null)\b/g, className: 'hljs-literal' },
-    { regex: /\b\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(?:\.\d+)?Z?\b/g, className: 'hljs-number' },
-    { regex: /\b\d+:[A-Z]\b/g, className: 'hljs-symbol' },
-    { regex: /\b\d+(\.\d+)?\b/g, className: 'hljs-number' },
-    { regex: /([/~]?[A-Za-z0-9._-]{1,255}(?:\/[A-Za-z0-9._-]{1,255})+)/g, className: 'hljs-string' },
-    { regex: /\b\d{1,3}(?:\.\d{1,3}){3}\b/g, className: 'hljs-attr' },
-    { regex: /\b(SELECT|INSERT|UPDATE|DELETE|FROM|WHERE|JOIN|ON|CREATE|DROP|ALTER)\b/gi, className: 'hljs-built_in' },
-    { regex: /\[?(Thread|PID)[-:]?\d+\]?/gi, className: 'hljs-symbol' },
-    { regex: /\b([A-Za-z0-9_\-./]+\.([a-z]+)):(\d+)\b/g, className: 'hljs-title' },
-    { regex: /\bhttps?:\/\/[^\s]+/gi, className: 'hljs-link' },
-    { regex: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g, className: 'hljs-link' },
-    { regex: /\b[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\b/gi, className: 'hljs-meta' },
-    { regex: /\b\d+(\.\d+)?(%|ms|s|GB|MB|KB)?\b/g, className: 'hljs-number' },
-    { regex: /(['])(?:\\.|[^\1\\])*?\1/g, className: 'hljs-string' },
-    { regex: /[{}\[\]()|+*%&^~!]/g, className: 'hljs-symbol' },
+const rules = ref<TokenRule[]>([]);
+const nginxRules: TokenRule[] = [
+    {
+        type: 'log-level',
+        pattern: /\[(error|warn|notice|info|debug)\]/gi,
+        color: '#E74C3C',
+    },
+    {
+        type: 'path',
+        pattern: /(?<=[\s"])\/[^"\s]+(?:\.\w+)?(?:\?\w+=\w+)?/g,
+        color: '#B87A2B',
+    },
+    {
+        type: 'http-method',
+        pattern: /(?<=)(?:GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS)(?=\s)/g,
+        color: '#27AE60',
+    },
+    {
+        type: 'status-success',
+        pattern: /\s(2\d{2})\s/g,
+        color: '#2ECC71',
+    },
+    {
+        type: 'status-error',
+        pattern: /\s([45]\d{2})\s/g,
+        color: '#E74C3C',
+    },
+    {
+        type: 'process-info',
+        pattern: /\d+#\d+/g,
+        color: '#7F8C8D',
+    },
 ];
 
-function extraHighlightPlugin(html: string, rules: HighlightRule[] = highlightRules): string {
-    let result = html;
-    for (const rule of rules) {
-        result = result.replace(rule.regex, `<span class="${rule.className}">$&</span>`);
+const systemRules: TokenRule[] = [
+    {
+        type: 'log-error',
+        pattern: /\[(ERROR|WARN|FATAL)\]/g,
+        color: '#E74C3C',
+    },
+    {
+        type: 'log-normal',
+        pattern: /\[(INFO|DEBUG)\]/g,
+        color: '#8B8B8B',
+    },
+    {
+        type: 'timestamp',
+        pattern: /\[\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}\]/g,
+        color: '#8B8B8B',
+    },
+    {
+        type: 'bracket-text',
+        pattern: /\[([^\]]+)\]/g,
+        color: '#B87A2B',
+    },
+    {
+        type: 'referrer-ua',
+        pattern: /https?:\/\/(?:[\w-]+\.)+[\w-]+(?::\d+)?(?:\/[^\s\]\)"]*)?/g,
+        color: '#786C88',
+    },
+];
+
+const taskRules: TokenRule[] = [
+    {
+        type: 'bracket-text',
+        pattern: /\[(?:[^\[\]]*(?:\[[^\[\]]*\])*[^\[\]]*)*\]/g,
+        color: '#B87A2B',
+    },
+];
+
+const defaultRules: TokenRule[] = [
+    {
+        type: 'timestamp',
+        pattern:
+            /(?:\[\d{2}\/\w{3}\/\d{4}:\d{2}:\d{2}:\d{2}\s[+-]\d{4}\]|\d{4}[-\/]\d{2}[-\/]\d{2}\s\d{2}:\d{2}:\d{2})/g,
+        color: '#8B8B8B',
+    },
+    {
+        type: 'referrer-ua',
+        pattern: /"(?:https?:\/\/[^"]+|Mozilla[^"]+|curl[^"]+)"/g,
+        color: '#786C88',
+    },
+    {
+        type: 'ip',
+        pattern: /\b(?<!\[)\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b(?!\])/g,
+        color: '#4A90E2',
+    },
+    {
+        type: 'ipv6',
+        pattern: /\b(?:[A-Fa-f0-9]{1,4}:){7}[A-Fa-f0-9]{1,4}\b/g,
+        color: '#4A90E2',
+    },
+    {
+        type: 'server-host',
+        pattern: /(?:server|host):\s*[^,\s]+/g,
+        color: '#5D6D7E',
+    },
+];
+
+const commonContainerRules: TokenRule[] = [
+    {
+        type: 'timestamp',
+        pattern: /\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}\+\d{2}:\d{2}/g,
+        color: '#8B8B8B',
+    },
+    {
+        type: 'path',
+        pattern: /(?<=[\s"]|^)\/[^\s"]+/g,
+        color: '#9B59B6',
+    },
+    {
+        type: 'ip',
+        pattern: /\b(?<!\[)\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b(?!\])/g,
+        color: '#4A90E2',
+    },
+    {
+        type: 'ipv6',
+        pattern: /\b(?:[A-Fa-f0-9]{1,4}:){7}[A-Fa-f0-9]{1,4}\b/g,
+        color: '#4A90E2',
+    },
+    {
+        type: 'log-level-warn',
+        pattern: /\b(WARN|WARNING|NOTICE)\b/g,
+        color: '#F39C12',
+    },
+    {
+        type: 'log-level-info',
+        pattern: /\b(INFO|DEBUG)\b/g,
+        color: '#3498DB',
+    },
+    {
+        type: 'log-level-error',
+        pattern: /\[(CRIT|ERROR)\]/g,
+        color: '#E74C3C',
+    },
+    {
+        type: 'url',
+        pattern: /https?:\/\/(?:[\w-]+\.)+[\w-]+(?::\d+)?(?:\/[^\s\]\)"]*)?/g,
+        color: '#786C88',
+    },
+];
+
+const mysqlContainerRules: TokenRule[] = [
+    {
+        type: 'mysql-timestamp',
+        pattern: /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}Z/g,
+        color: '#8B8B8D',
+    },
+    {
+        type: 'mysql-thread-id',
+        pattern: /(?<=T\d{2}:\d{2}:\d{2}\.\d{6}Z\s)\d+(?=\s)/g,
+        color: '#7F8C8D',
+    },
+    {
+        type: 'mysql-log-error',
+        pattern: /\[(Error)\]/g,
+        color: '#E74C3C',
+    },
+    {
+        type: 'mysql-log-warn',
+        pattern: /\[(Warning)\]/g,
+        color: '#F39C12',
+    },
+    {
+        type: 'mysql-log-info',
+        pattern: /\[(System|Note|Entrypoint)\]/g,
+        color: '#3498DB',
+    },
+    {
+        type: 'mysql-error-code',
+        pattern: /\[MY-\d{6}\]/g,
+        color: '#9B59B6',
+    },
+    {
+        type: 'mysql-component',
+        pattern: /\[(Server|Repl|InnoDB|Audit|Query)\]/g,
+        color: '#3498DB',
+    },
+];
+
+const redisContainerRules: TokenRule[] = [
+    {
+        type: 'redis-role',
+        pattern: /\b(Master|Slave|Replica)\b/g,
+        color: '#E67E22',
+    },
+    {
+        type: 'redis-signal',
+        pattern: /\b(SIGTERM|SIGINT|SIGHUP)\b/g,
+        color: '#9B59B6',
+    },
+    {
+        type: 'redis-memory',
+        pattern: /\d+\s*[KMG]B?\b/g,
+        color: '#3498DB',
+    },
+];
+
+const postgresContainerRules: TokenRule[] = [
+    {
+        type: 'postgres-severity',
+        pattern: /\b(LOG|INFO|NOTICE|WARNING|ERROR|FATAL|PANIC)\b/g,
+        color: '#E74C3C',
+    },
+    {
+        type: 'postgres-process',
+        pattern: /\[\d+\]/g,
+        color: '#7F8C8D',
+    },
+    {
+        type: 'postgres-statement',
+        pattern: /\b(SELECT|INSERT|UPDATE|DELETE|CREATE|DROP|ALTER)\b/gi,
+        color: '#27AE60',
+    },
+];
+
+const phpContainerRules: TokenRule[] = [];
+
+const getContainerRules = (containerName?: string): TokenRule[] => {
+    if (!containerName) {
+        return commonContainerRules;
     }
-    return result;
-}
+
+    const name = containerName.toLowerCase();
+    let specificRules: TokenRule[] = [];
+
+    if (name.includes('openresty') || name.includes('nginx')) {
+        specificRules = nginxRules;
+    } else if (name.includes('mysql') || name.includes('mariadb')) {
+        specificRules = mysqlContainerRules;
+    } else if (name.includes('redis')) {
+        specificRules = redisContainerRules;
+    } else if (name.includes('postgres') || name.includes('postgresql')) {
+        specificRules = postgresContainerRules;
+    } else if (name.includes('php')) {
+        specificRules = phpContainerRules;
+    }
+
+    return [...specificRules, ...commonContainerRules];
+};
 
 function hasANSICodes(text: string) {
     const ansiRegex = /\x1b\[[0-9;]*[mK]/;
     return ansiRegex.test(text);
 }
 
-const highlightContent = (): string => {
-    if (!props.log) return '';
-    if (hasANSICodes(props.log)) {
-        return anser.ansiToHtml(props.log);
-    } else {
-        return extraHighlightPlugin(props.log);
+function tokenizeLog(log: string): Token[] {
+    if (hasANSICodes(log)) {
+        const html = anser.ansiToHtml(log);
+        return [
+            {
+                text: html,
+                type: 'html',
+                color: '',
+            },
+        ];
+    }
+
+    const tokens: Token[] = [];
+    let lastIndex = 0;
+    const matches: { index: number; text: string; type: string; color: string }[] = [];
+
+    for (const rule of rules.value) {
+        const regex = new RegExp(rule.pattern.source, rule.pattern.flags);
+        let match;
+        while ((match = regex.exec(log)) !== null) {
+            matches.push({
+                index: match.index,
+                text: match[0],
+                type: rule.type,
+                color: rule.color,
+            });
+        }
+    }
+
+    matches.sort((a, b) => a.index - b.index);
+
+    const filteredMatches = matches.filter((match, index) => {
+        if (index === 0) return true;
+        const prev = matches[index - 1];
+        return match.index >= prev.index + prev.text.length;
+    });
+
+    for (const match of filteredMatches) {
+        if (match.index > lastIndex) {
+            tokens.push({
+                text: log.substring(lastIndex, match.index),
+                type: 'plain',
+                color: '#666666',
+            });
+        }
+        tokens.push({
+            text: match.text,
+            type: match.type,
+            color: match.color,
+        });
+        lastIndex = match.index + match.text.length;
+    }
+
+    if (lastIndex < log.length) {
+        const rest = log.substring(lastIndex).replace(/\n?$/, '\n');
+        tokens.push({
+            text: rest,
+            type: 'plain',
+            color: '#666666',
+        });
+    }
+
+    return tokens;
+}
+
+const tokens = computed(() => tokenizeLog(props.log));
+
+const initRules = () => {
+    switch (props.type) {
+        case 'nginx':
+            return [...nginxRules, ...defaultRules];
+        case 'system':
+            return [...systemRules, ...defaultRules];
+        case 'container':
+            return [...getContainerRules(props.container), ...defaultRules];
+        case 'task':
+            return [...taskRules, ...defaultRules];
+        default:
+            return defaultRules;
     }
 };
 
-watch(
-    () => [props.log, props.type],
-    () => {
-        highlightedLog.value = highlightContent();
-    },
-    { immediate: true },
-);
-
-onMounted(() => {
-    highlightedLog.value = highlightContent();
+watchEffect(() => {
+    rules.value = initRules();
 });
 </script>
 
 <style scoped>
-.log-highlight {
-    color: #e06c75;
+.token {
+    font-family: 'JetBrains Mono', Monaco, Menlo, Consolas, 'Courier New', monospace;
     font-size: 14px;
-    line-height: inherit;
-    white-space: inherit;
-    text-align: left;
+    font-weight: 500;
 }
 
-:deep(.hljs-attr) {
-    color: #56b6c2;
-}
-:deep(.hljs-built_in, .hljs-meta) {
-    color: #e6c07b;
-}
-:deep(.hljs-title) {
-    color: #d19a66;
-}
-:deep(.hljs-symbol) {
-    color: #61afef;
-}
-:deep(.hljs-link) {
-    color: #56b6c2;
-}
-:deep(.hljs-debug) {
-    color: #61aeee !important;
-}
-:deep(.hljs-info) {
-    color: #00bb00 !important;
-}
-:deep(.hljs-warn) {
-    color: #bbbb00 !important;
-}
-:deep(.hljs-error) {
-    color: #f91306 !important;
-    font-weight: bold;
+.ip {
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    text-decoration-thickness: 1px;
 }
 </style>
