@@ -860,6 +860,8 @@ const message = {
         image: 'İmaj | İmajlar',
         imagePull: 'Çek',
         imagePush: 'Gönder',
+        imagePushHelper:
+            'Bu imgenin birden fazla etiketi olduğu tespit edildi. Lütfen gönderimde kullanılan imge adının şu olduğunu onaylayın: {0}',
         imageDelete: 'İmaj sil',
         imageTagDeleteHelper: 'Bu imaj IDsi ile ilişkili diğer etiketleri kaldır',
         repoName: 'Konteyner kayıt defteri',

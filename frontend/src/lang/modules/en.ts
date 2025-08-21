@@ -850,6 +850,8 @@ const message = {
         image: 'Image | Images',
         imagePull: 'Pull',
         imagePush: 'Push',
+        imagePushHelper:
+            'Detected that this image has multiple tags. Please confirm that the image name used for pushing is: {0}',
         imageDelete: 'Image delete',
         imageTagDeleteHelper: 'Remove other tags associated with this image ID',
         repoName: 'Container registry',

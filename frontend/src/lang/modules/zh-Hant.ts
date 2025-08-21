@@ -815,6 +815,7 @@ const message = {
         image: '鏡像',
         imagePull: '拉取鏡像',
         imagePush: '推送鏡像',
+        imagePushHelper: '檢測到該映像存在多個標籤，請確認推送時使用的映像名稱為：{0}',
         imageDelete: '刪除鏡像',
         imageTagDeleteHelper: '移除與該映像 ID 相關聯的其他標籤',
         repoName: '倉庫名',

@@ -817,6 +817,8 @@ const message = {
         image: '이미지 | 이미지들',
         imagePull: '풀',
         imagePush: '푸시',
+        imagePushHelper:
+            '이 이미지에 여러 태그가 있는 것으로 감지되었습니다. 푸시 시 사용할 이미지 이름이 다음인지 확인하세요: {0}',
         imageDelete: '이미지 삭제',
         imageTagDeleteHelper: '이 이미지 ID와 관련된 다른 태그를 제거합니다.',
         repoName: '컨테이너 저장소 이름',

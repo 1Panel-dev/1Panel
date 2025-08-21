@@ -825,6 +825,8 @@ const message = {
         image: '画像|画像',
         imagePull: '引く',
         imagePush: '押す',
+        imagePushHelper:
+            'このイメージに複数のタグが存在することが検出されました。プッシュ時に使用するイメージ名が以下であることを確認してください：{0}',
         imageDelete: '画像削除',
         imageTagDeleteHelper: 'この画像IDに関連付けられた他のタグを削除します',
         repoName: 'コンテナレジストリ',
