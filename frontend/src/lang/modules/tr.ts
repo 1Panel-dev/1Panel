@@ -2407,11 +2407,15 @@ const message = {
         modifier: 'Eşleştirme kuralları',
         modifierHelper: 'Örnek: "=" tam eşleşme, "~" düzenli eşleşme, "^~" yolun başlangıcıyla eşleşme vb.',
         replace: 'Metin değiştirmeleri',
+        replaceHelper:
+            'Nginx metin değiştirme özelliği, ters proxy sırasında yanıt içeriğindeki dizelerin değiştirilmesine olanak tanır. Genellikle arka uç tarafından döndürülen HTML, CSS, JavaScript ve diğer dosyalardaki bağlantıları, API adreslerini vb. değiştirmek için kullanılır. Karmaşık içerik değiştirme ihtiyaçları için normal ifade eşleştirmeyi destekler.',
         addReplace: 'Ekle',
         replaced: 'Arama Dizisi (boş olamaz)',
         replaceText: 'Şununla değiştir',
         replacedErr: 'Arama Dizisi boş olamaz',
         replacedErr2: 'Arama Dizisi tekrarlanamaz',
+        replacedListEmpty: 'Metin değiştirme kuralı yok',
+        proxySslName: 'Proxy SNI Adı',
         basicAuth: 'Temel kimlik doğrulama',
         editBasicAuthHelper:
             'Şifre asimetrik olarak şifrelenir ve geri alınamaz. Düzenleme, şifrenin sıfırlanmasını gerektirir',

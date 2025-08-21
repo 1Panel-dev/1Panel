@@ -2293,11 +2293,15 @@ const message = {
         modifier: '一致するルール',
         modifierHelper: '例: "="は正確な一致、 "〜"は通常の一致、^〜」はパスの始まりなどと一致します。',
         replace: 'テキスト置換',
+        replaceHelper:
+            'nginxのテキスト置換機能は、リバースプロキシ時にレスポンス内容の文字列を置換することができます。バックエンドから返されるHTML、CSS、JavaScriptなどのファイル内のリンクアドレス、APIアドレスなどを変更するためによく使用されます。正規表現マッチングをサポートしており、複雑なコンテンツ置換のニーズに対応できます。',
         addReplace: '追加',
         replaced: '検索文字列（空にすることはできません）',
         replaceText: '文字列に置き換えます',
         replacedErr: '検索文字列を空にすることはできません',
         replacedErr2: '検索文字列を繰り返すことはできません',
+        replacedListEmpty: 'テキスト置換ルールがありません',
+        proxySslName: 'プロキシSNI名',
         basicAuth: '基本認証',
         editBasicAuthHelper:
             'パスワードは非対称的に暗号化されており、反響することはできません。編集はパスワードをリセットする必要があります',

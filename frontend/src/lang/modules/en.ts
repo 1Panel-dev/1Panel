@@ -2379,11 +2379,15 @@ const message = {
         modifierHelper:
             'Example: "=" is exact match, "~" is regular match, "^~" matches the beginning of the path, etc.',
         replace: 'Text replacements',
+        replaceHelper:
+            'The nginx text replacement feature allows for string substitution in the response content during reverse proxying. It is commonly used to modify links, API addresses, etc., in HTML, CSS, JavaScript, and other files returned by the backend. It supports regular expression matching for complex content replacement needs.',
         addReplace: 'Add',
         replaced: 'Search String (cannot be empty)',
         replaceText: 'Replace with string',
         replacedErr: 'The Search String cannot be empty',
         replacedErr2: 'The Search String cannot be repeated',
+        replacedListEmpty: 'No text replacement rules',
+        proxySslName: 'Proxy SNI Name',
         basicAuth: 'Basic authentication',
         editBasicAuthHelper:
             'The password is asymmetrically encrypted and cannot be echoed. Editing needs to reset the password',

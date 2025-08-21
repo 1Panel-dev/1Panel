@@ -2347,11 +2347,15 @@ const message = {
         modifierHelper:
             'Contoh: "=" adalah padanan tepat, "~" adalah padanan biasa, "^~" memadankan permulaan laluan, dan sebagainya.',
         replace: 'Penggantian Teks',
+        replaceHelper:
+            'Ciri penggantian teks nginx membenarkan penggantian rentetan dalam kandungan respons semasa proksi terbalik. Ia biasanya digunakan untuk mengubah suai pautan, alamat API, dll., dalam HTML, CSS, JavaScript, dan fail lain yang dikembalikan oleh backend. Ia menyokong padanan ungkapan biasa untuk keperluan penggantian kandungan yang kompleks.',
         addReplace: 'Tambah',
         replaced: 'String Carian (tidak boleh kosong)',
         replaceText: 'Ganti dengan string',
         replacedErr: 'String Carian tidak boleh kosong',
         replacedErr2: 'String Carian tidak boleh berulang',
+        replacedListEmpty: 'Tiada peraturan penggantian teks',
+        proxySslName: 'Nama SNI Proksi',
         basicAuth: 'Pengesahan Asas',
         editBasicAuthHelper:
             'Kata laluan disulitkan secara tidak simetri dan tidak dapat dipaparkan. Penyuntingan perlu menetapkan semula kata laluan',

@@ -2252,11 +2252,15 @@ const message = {
         modifier: '매칭 규칙',
         modifierHelper: '예: = 는 정확히 일치, ~ 는 정규식 일치, ^~ 는 경로 시작 부분 일치 등을 나타냅니다.',
         replace: '텍스트 교체',
+        replaceHelper:
+            'nginx 텍스트 교체 기능은 리버스 프록시 중 응답 내용의 문자열을 대체할 수 있습니다. 백엔드에서 반환된 HTML, CSS, JavaScript 및 기타 파일의 링크, API 주소 등을 수정하는 데 일반적으로 사용됩니다. 복잡한 콘텐츠 교체 요구 사항에 대해 정규식 일치를 지원합니다.',
         addReplace: '추가',
         replaced: '검색 문자열 (비울 수 없음)',
         replaceText: '교체할 문자열',
         replacedErr: '검색 문자열은 비워둘 수 없습니다',
         replacedErr2: '검색 문자열은 중복될 수 없습니다',
+        replacedListEmpty: '텍스트 교체 규칙 없음',
+        proxySslName: '프록시 SNI 이름',
         basicAuth: '기본 인증',
         editBasicAuthHelper:
             '비밀번호는 비대칭으로 암호화되어 표시할 수 없습니다. 수정하려면 비밀번호를 재설정해야 합니다.',
