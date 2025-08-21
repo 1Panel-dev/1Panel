@@ -38,7 +38,6 @@
                                         <el-select v-model="proxy.proxyProtocol" style="width: 100px">
                                             <el-option label="http" value="http://" />
                                             <el-option label="https" value="https://" />
-                                            <el-option :label="$t('website.other')" value="" />
                                         </el-select>
                                     </template>
                                 </el-input>
@@ -59,27 +58,29 @@
                         </el-col>
                     </el-row>
 
-                    <el-divider content-position="left">{{ $t('website.sniSettings') }}</el-divider>
+                    <template v-if="proxy.proxyProtocol === 'https://'">
+                        <el-divider content-position="left">{{ $t('website.sniSettings') }}</el-divider>
 
-                    <div class="switch-item">
-                        <div class="switch-label">
-                            <span>{{ $t('website.sni') }}</span>
-                            <div class="form-tip">
-                                <el-icon><QuestionFilled /></el-icon>
-                                <span>{{ $t('website.sniHelper') }}</span>
+                        <div class="switch-item">
+                            <div class="switch-label">
+                                <span>{{ $t('website.sni') }}</span>
+                                <div class="form-tip">
+                                    <el-icon><QuestionFilled /></el-icon>
+                                    <span>{{ $t('website.sniHelper') }}</span>
+                                </div>
                             </div>
+                            <el-switch v-model="proxy.sni" size="large" />
                         </div>
-                        <el-switch v-model="proxy.sni" size="large" />
-                    </div>
 
-                    <el-form-item
-                        :label="$t('website.proxySslName')"
-                        prop="proxySSLName"
-                        v-if="proxy.sni"
-                        style="margin-top: 16px"
-                    >
-                        <el-input v-model.trim="proxy.proxySSLName" />
-                    </el-form-item>
+                        <el-form-item
+                            :label="$t('website.proxySslName')"
+                            prop="proxySSLName"
+                            v-if="proxy.sni"
+                            style="margin-top: 16px"
+                        >
+                            <el-input v-model.trim="proxy.proxySSLName" />
+                        </el-form-item>
+                    </template>
                 </el-tab-pane>
 
                 <el-tab-pane :label="$t('website.advancedSettings')" name="advanced">
