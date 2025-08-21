@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('commons.button.' + proxy.operate)" @close="handleClose" size="large">
+    <DrawerPro v-model="open" :header="$t('commons.button.' + proxy.operate)" @close="handleClose" size="normal">
         <el-form ref="proxyForm" label-position="top" :model="proxy" :rules="rules" v-loading="loading">
             <el-tabs v-model="activeTab" type="border-card">
                 <el-tab-pane :label="$t('website.proxySettings')" name="basic">
@@ -234,8 +234,8 @@ const initData = (): Website.ProxyConfig => ({
     operate: 'create',
     enable: true,
     cache: false,
-    cacheTime: 4,
-    cacheUnit: 'h',
+    cacheTime: 1,
+    cacheUnit: 'm',
     name: '',
     modifier: '^~',
     match: '/',
