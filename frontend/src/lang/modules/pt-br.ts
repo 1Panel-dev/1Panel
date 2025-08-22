@@ -1903,6 +1903,9 @@ const message = {
             'Detectado que o nó {0} já está na última versão atualizável. Por favor, verifique a versão do nó principal e tente novamente!',
 
         about: 'Sobre',
+        release: 'Registro de Atualizações de Versão',
+        releaseHelper:
+            'Falha ao obter o registro de atualizações para o ambiente atual. Você pode verificar a documentação oficial manualmente.',
         project: 'GitHub',
         issue: 'Problema',
         doc: 'Documento oficial',

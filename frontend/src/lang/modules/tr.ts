@@ -1960,6 +1960,9 @@ const message = {
         versionCompare:
             '{0} düğümünün zaten en son yükseltilebilir sürümde olduğu tespit edildi. Lütfen birincil düğüm sürümünü kontrol edin ve tekrar deneyin!',
         about: 'Hakkında',
+        release: 'Sürüm Güncelleme Günlüğü',
+        releaseHelper:
+            'Mevcut ortam için güncelleme günlükleri alınırken hata oluştu. Resmi belgeleri manuel olarak kontrol edebilirsiniz.',
         project: 'GitHub',
         issue: 'Geri bildirim',
         doc: 'Resmi belge',

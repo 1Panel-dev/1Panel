@@ -1808,6 +1808,8 @@ const message = {
         certificate: '证书',
 
         about: '关于',
+        release: '版本更新日志',
+        releaseHelper: '当前环境更新日志获取异常，可手动前往官方文档查看',
         project: '项目地址',
         issue: '问题反馈',
         doc: '官方文档',

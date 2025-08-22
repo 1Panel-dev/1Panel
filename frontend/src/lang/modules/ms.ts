@@ -1915,6 +1915,9 @@ const message = {
             'Nod {0} telah berada pada versi terkini yang boleh dinaik taraf. Sila periksa versi nod utama dan cuba lagi!',
 
         about: 'Mengenai',
+        release: 'Log Kemaskini Versi',
+        releaseHelper:
+            'Pengambilan log kemaskini untuk persekitaran semasa mengalami异常. Anda boleh menyemak dokumentasi rasmi secara manual.',
         project: 'GitHub',
         issue: 'Isu',
         doc: 'Dokumen rasmi',

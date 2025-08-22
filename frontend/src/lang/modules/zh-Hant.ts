@@ -1816,6 +1816,8 @@ const message = {
         certificate: '證書',
 
         about: '關於',
+        release: '版本更新日誌',
+        releaseHelper: '目前環境更新日誌取得異常，可手動前往官方文件查看',
         project: '項目地址',
         issue: '問題反饋',
         doc: '官方文檔',

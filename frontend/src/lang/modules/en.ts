@@ -1941,6 +1941,9 @@ const message = {
             'Detected that node {0} is already at the latest upgradable version. Please check the primary node version and try again!',
 
         about: 'About',
+        release: 'Release Notes',
+        releaseHelper:
+            'Failed to fetch release notes for the current environment. You can manually check the official documentation.',
         project: 'GitHub',
         issue: 'Feedback',
         doc: 'Official document',
