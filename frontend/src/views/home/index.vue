@@ -178,6 +178,9 @@
             </el-col>
             <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
                 <CardWithHeader :header="$t('home.systemInfo')">
+                    <template #header-r>
+                        <el-button class="h-button-setting" @click="handleCopy" link icon="CopyDocument" />
+                    </template>
                     <template #body>
                         <el-scrollbar>
                             <el-descriptions :column="1" class="h-systemInfo" border>
@@ -259,7 +262,7 @@ import LicenseImport from '@/components/license-import/index.vue';
 import CardWithHeader from '@/components/card-with-header/index.vue';
 import i18n from '@/lang';
 import { Dashboard } from '@/api/interface/dashboard';
-import { dateFormatForSecond, computeSize, computeSizeFromKBs, loadUpTime, jumpToPath } from '@/utils/util';
+import { dateFormatForSecond, computeSize, computeSizeFromKBs, loadUpTime, jumpToPath, copyText } from '@/utils/util';
 import { useRouter } from 'vue-router';
 import { loadBaseInfo, loadCurrentInfo } from '@/api/modules/dashboard';
 import { getIOOptions, getNetworkOptions } from '@/api/modules/host';
@@ -483,6 +486,41 @@ const onLoadCurrentInfo = async () => {
     loadData();
     currentInfo.value = res.data;
     statusRef.value?.acceptParams(currentInfo.value, baseInfo.value);
+};
+
+const handleCopy = () => {
+    let content =
+        i18n.global.t('home.hostname') +
+        ': ' +
+        baseInfo.value.hostname +
+        '\n' +
+        i18n.global.t('home.platformVersion') +
+        ': ' +
+        (baseInfo.value.platformVersion
+            ? baseInfo.value.platform + '-' + baseInfo.value.platformVersion
+            : baseInfo.value.platform) +
+        '\n' +
+        i18n.global.t('home.kernelVersion') +
+        ': ' +
+        baseInfo.value.kernelVersion +
+        '\n' +
+        i18n.global.t('home.kernelVersion') +
+        ': ' +
+        baseInfo.value.kernelArch +
+        '\n' +
+        i18n.global.t('home.ip') +
+        ': ' +
+        baseInfo.value.ipV4Addr +
+        '\n' +
+        i18n.global.t('home.uptime') +
+        ': ' +
+        currentInfo.value.timeSinceUptime +
+        '\n' +
+        i18n.global.t('home.runningTime') +
+        ': ' +
+        loadUpTime(currentInfo.value.uptime) +
+        '\n';
+    copyText(content);
 };
 
 const loadData = async () => {
