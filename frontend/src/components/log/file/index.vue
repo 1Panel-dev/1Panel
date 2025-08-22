@@ -149,24 +149,42 @@ const totalHeight = computed(() => logHeight * logCount.value);
 const containerHeight = ref(500);
 const visibleCount = computed(() => Math.ceil(containerHeight.value / logHeight));
 const startIndex = ref(0);
+const lastScrollTop = ref(0);
 
 const visibleLogs = computed(() => {
     return logs.value.slice(startIndex.value, startIndex.value + visibleCount.value);
 });
 
+let scrollTimer: ReturnType<typeof setTimeout> | null = null;
+
 const onScroll = () => {
-    if (logContainer.value) {
-        const scrollTop = logContainer.value.scrollTop;
-        if (scrollTop == 0) {
-            readReq.page = minPage.value - 1;
-            if (readReq.page < 1) {
-                return;
-            }
-            minPage.value = readReq.page;
-            getContent(true);
-        }
-        startIndex.value = Math.floor(scrollTop / logHeight);
+    if (!logContainer.value || isLoading.value) return;
+
+    const scrollTop = logContainer.value.scrollTop;
+    const newStartIndex = Math.max(0, Math.floor(scrollTop / logHeight));
+
+    if (scrollTimer) {
+        clearTimeout(scrollTimer);
     }
+
+    startIndex.value = newStartIndex;
+
+    scrollTimer = setTimeout(() => {
+        if (scrollTop <= logHeight && minPage.value > 1) {
+            const currentScrollTop = scrollTop;
+            readReq.page = minPage.value - 1;
+            if (readReq.page >= 1) {
+                minPage.value = readReq.page;
+                lastScrollTop.value = currentScrollTop;
+                getContent(true);
+            }
+        }
+
+        if (!tailLog.value && scrollTop + containerHeight.value >= totalHeight.value - logHeight && maxPage.value > 1) {
+            readReq.page = maxPage.value;
+            getContent(false);
+        }
+    }, 50);
 };
 
 const changeLoading = () => {
@@ -276,11 +294,19 @@ const getContent = async (pre: boolean) => {
         }
 
         nextTick(() => {
-            if (pre) {
-                logContainer.value.scrollTop = 2000;
-            } else {
-                logContainer.value.scrollTop = totalHeight.value;
-                containerHeight.value = logContainer.value.getBoundingClientRect().height;
+            if (logContainer.value) {
+                if (pre) {
+                    if (!end.value) {
+                        const addedLines = newLogs.length;
+                        const newScrollPosition = lastScrollTop.value + addedLines * logHeight;
+                        logContainer.value.scrollTop = newScrollPosition;
+                        startIndex.value = Math.max(0, Math.floor(newScrollPosition / logHeight));
+                    }
+                } else {
+                    logContainer.value.scrollTop = totalHeight.value;
+                    containerHeight.value = logContainer.value.getBoundingClientRect().height;
+                    startIndex.value = Math.max(0, logs.value.length - visibleCount.value);
+                }
             }
         });
     }

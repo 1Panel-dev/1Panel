@@ -170,7 +170,12 @@
                                         :key="currentRecord?.taskID"
                                         @stop-reading="search(false)"
                                         :heightDiff="410"
-                                        :config="{ type: 'task', taskID: currentRecord?.taskID, tail: true }"
+                                        :config="{
+                                            type: 'task',
+                                            colorMode: 'task',
+                                            taskID: currentRecord?.taskID,
+                                            tail: true,
+                                        }"
                                     />
                                 </el-row>
                             </el-form>

@@ -101,7 +101,6 @@ const search = () => {
     loading.value = true;
     getWebsite(req.websiteID)
         .then((res) => {
-            console.log(res.data);
             req.dir = res.data.sitePath + '/index';
         })
         .finally(() => {
