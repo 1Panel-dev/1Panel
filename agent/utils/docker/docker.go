@@ -173,7 +173,7 @@ func setLog(id, newLastLine string, task *task.Task) error {
 		}
 	}
 	if !exist {
-		task.Log(newLastLine)
+		task.Log(strings.TrimPrefix(newLastLine, " "))
 		return nil
 	}
 	output := strings.Join(lines, "\n")
@@ -253,7 +253,7 @@ func (c Client) PushImageWithProcessAndOptions(task *task.Task, imageName string
 			_ = setLog(id, progressStr, task)
 		default:
 			progressStr, _ := json.Marshal(progress)
-			task.Log(string(progressStr))
+			task.Log(strings.TrimPrefix(string(progressStr), " "))
 		}
 	}
 	return nil
@@ -285,7 +285,7 @@ func (c Client) BuildImageWithProcessAndOptions(task *task.Task, tar io.ReadClos
 		stream, _ := progress["stream"].(string)
 		if len(status) == 0 && len(stream) != 0 {
 			if stream != "\n" {
-				task.Log(stream)
+				task.Log(strings.TrimPrefix(stream, " "))
 			}
 			continue
 		}
@@ -308,7 +308,7 @@ func (c Client) BuildImageWithProcessAndOptions(task *task.Task, tar io.ReadClos
 			_ = setLog(id, progressStr, task)
 		default:
 			progressStr, _ := json.Marshal(progress)
-			task.Log(string(progressStr))
+			task.Log(strings.TrimPrefix(string(progressStr), " "))
 		}
 	}
 	return nil
