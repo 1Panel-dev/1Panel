@@ -44,7 +44,7 @@ func (a AppRepo) WithByLikeName(name string) DBOption {
 		if len(name) == 0 {
 			return g
 		}
-		return g.Where("name like ? or short_desc_zh like ? or short_desc_en like ?", "%"+name+"%", "%"+name+"%", "%"+name+"%")
+		return g.Where("name like ? or  description like ? or short_desc_zh like ? or short_desc_en like ?", "%"+name+"%", "%"+name+"%", "%"+name+"%", "%"+name+"%")
 	}
 }
 

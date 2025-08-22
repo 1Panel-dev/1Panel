@@ -56,7 +56,7 @@ func (a AppService) PageApp(ctx *gin.Context, req request.AppSearch) (interface{
 	var opts []repo.DBOption
 	opts = append(opts, appRepo.OrderByRecommend())
 	if req.Name != "" {
-		opts = append(opts, appRepo.WithByLikeName(req.Name))
+		opts = append(opts, appRepo.WithByLikeName(strings.TrimSpace(req.Name)))
 	}
 	if req.Type != "" {
 		opts = append(opts, appRepo.WithType(req.Type))
@@ -100,7 +100,7 @@ func (a AppService) PageApp(ctx *gin.Context, req request.AppSearch) (interface{
 	if err != nil {
 		return nil, err
 	}
-	var appDTOs []*response.AppItem
+	appDTOs := make([]*response.AppItem, 0)
 	info := &dto.SettingInfo{}
 	if req.Type == "php" {
 		info, _ = NewISettingService().GetSettingInfo()
