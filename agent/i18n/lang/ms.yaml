@@ -96,6 +96,15 @@ ErrAppVersionDeprecated: "Aplikasi {{ .name }} tidak sesuai dengan versi 1Panel 
 ErrDockerFailed: "Keadaan Docker tidak normal, sila periksa status perkhidmatan"
 ErrDockerComposeCmdNotFound: "Perintah Docker Compose tidak wujud, sila pasang perintah ini di mesin tuan terlebih dahulu"
 
+#ssh
+ExportIP: "IP Log Masuk"
+ExportArea: "Lokasi"
+ExportPort: "Port"
+ExportAuthMode: "Kaedah Log Masuk"
+ExportUser: "Pengguna"
+ExportStatus: "Status Log Masuk"
+ExportDate: "Masa"
+
 #fail
 ErrFileCanNotRead: 'Fail ini tidak menyokong pratonton'
 ErrFileToLarge: 'Fail lebih besar daripada 10M dan tidak boleh dibuka'

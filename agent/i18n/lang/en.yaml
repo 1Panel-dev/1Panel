@@ -93,6 +93,15 @@ ErrAppVersionDeprecated: "The {{ .name }} application is not compatible with the
 ErrDockerFailed: "The state of Docker is abnormal, please check the service status"
 ErrDockerComposeCmdNotFound: "The Docker Compose command does not exist, please install this command on the host machine first"
 
+#ssh
+ExportIP: "Login IP"
+ExportArea: "Location"
+ExportPort: "Port"
+ExportAuthMode: "Login Method"
+ExportUser: "User"
+ExportStatus: "Login Status"
+ExportDate: "Time"
+
 #file
 ErrFileCanNotRead: 'This file does not support preview'
 ErrFileToLarge: 'The file is larger than 10M and cannot be opened'

@@ -96,6 +96,15 @@ ErrAppVersionDeprecated: "O aplicativo {{ .name }} não é compatível com a ver
 ErrDockerFailed: "O estado do Docker está anormal, verifique o status do serviço"
 ErrDockerComposeCmdNotFound: "O comando Docker Compose não existe, por favor, instale este comando na máquina host primeiro"
 
+#ssh
+ExportIP: "IP de Login"
+ExportArea: "Localização"
+ExportPort: "Porta"
+ExportAuthMode: "Método de Login"
+ExportUser: "Usuário"
+ExportStatus: "Status de Login"
+ExportDate: "Hora"
+
 #arquivo
 ErrFileCanNotRead: 'Este arquivo não suporta visualização'
 ErrFileToLarge: 'O arquivo é maior que 10M e não pode ser aberto'

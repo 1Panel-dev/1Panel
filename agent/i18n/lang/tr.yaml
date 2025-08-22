@@ -96,6 +96,15 @@ ErrAppVersionDeprecated: "{{ .name }} uygulaması mevcut 1Panel sürümü ile uy
 ErrDockerFailed: "Docker durumu anormal, lütfen servis durumunu kontrol edin"
 ErrDockerComposeCmdNotFound: "Docker Compose komutu mevcut değil, lütfen önce bu komutu host makinesine yükleyin"
 
+#ssh
+ExportIP: "Giriş IP"
+ExportArea: "Konum"
+ExportPort: "Port"
+ExportAuthMode: "Giriş Yöntemi"
+ExportUser: "Kullanıcı"
+ExportStatus: "Giriş Durumu"
+ExportDate: "Zaman"
+
 #file
 ErrFileCanNotRead: 'Bu dosya önizlemeyi desteklemiyor'
 ErrFileToLarge: 'Dosya 10M'dan büyük ve açılamıyor'

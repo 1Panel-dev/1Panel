@@ -99,8 +99,5 @@ export const loadSSHLogs = (params: Host.searchSSHLog) => {
     return http.post<ResPage<Host.sshHistory>>(`/hosts/ssh/log`, params);
 };
 export const exportSSHLogs = (params: Host.searchSSHLog) => {
-    return http.download<BlobPart>('/hosts/ssh/log/export', params, {
-        responseType: 'blob',
-        timeout: TimeoutEnum.T_40S,
-    });
+    return http.post<string>('/hosts/ssh/log/export', params, TimeoutEnum.T_40S);
 };

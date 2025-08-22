@@ -89,11 +89,11 @@
 </template>
 
 <script setup lang="ts">
-import { dateFormat, getDateStr } from '@/utils/util';
+import { dateFormat, downloadFile } from '@/utils/util';
 import { onMounted, reactive, ref } from 'vue';
 import { exportSSHLogs, loadSSHLogs } from '@/api/modules/host';
-import { MsgSuccess } from '@/utils/message';
-import i18n from '@/lang';
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
 
 const loading = ref();
 const data = ref();
@@ -146,14 +146,9 @@ const onSubmitExport = async () => {
     };
     await exportSSHLogs(params)
         .then((res) => {
-            const downloadUrl = window.URL.createObjectURL(new Blob([res]));
-            const a = document.createElement('a');
-            a.style.display = 'none';
-            a.href = downloadUrl;
-            a.download = '1panel-ssh-log-' + getDateStr() + '.csv';
-            const event = new MouseEvent('click');
-            a.dispatchEvent(event);
-            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            if (res.data) {
+                downloadFile(res.data, globalStore.currentNode);
+            }
             open.value = false;
         })
         .catch(() => {

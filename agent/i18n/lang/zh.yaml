@@ -92,6 +92,15 @@ ErrAppVersionDeprecated: " {{ .name }} 应用不适配当前 1Panel 版本，跳
 ErrDockerFailed: "Docker 状态异常，请检查服务状态"
 ErrDockerComposeCmdNotFound: "Docker Compose 命令不存在，请先在宿主机安装此命令"
 
+#ssh 
+ExportIP: "登录 IP"
+ExportArea: "归属地"
+ExportPort: "端口"
+ExportAuthMode: "登录方式"
+ExportUser: "用户"
+ExportStatus: "登录状态"
+ExportDate: "时间"
+
 #file
 ErrFileCanNotRead: "此文件不支持预览"
 ErrFileToLarge: "文件超过10M，无法打开"

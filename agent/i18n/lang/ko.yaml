@@ -93,6 +93,15 @@ ErrAppVersionDeprecated: "{{ .name }} 응용 프로그램은 현재 1Panel 버�
 ErrDockerFailed: "Docker의 상태가 비정상입니다. 서비스 상태를 확인하세요"
 ErrDockerComposeCmdNotFound: "Docker Compose 명령이 없습니다. 호스트 머신에 먼저 이 명령을 설치하세요"
 
+#ssh
+ExportIP: "로그인 IP"
+ExportArea: "위치"
+ExportPort: "포트"
+ExportAuthMode: "로그인 방식"
+ExportUser: "사용자"
+ExportStatus: "로그인 상태"
+ExportDate: "시간"
+
 #파일
 ErrFileCanNotRead: '이 파일은 미리보기를 지원하지 않습니다'
 ErrFileToLarge: '파일이 10M보다 커서 열 수 없습니다'

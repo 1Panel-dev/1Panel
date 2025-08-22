@@ -93,6 +93,15 @@ ErrAppVersionDeprecated: "{{ .name }} アプリケーションは現在の 1Pane
 ErrDockerFailed: "Docker の状態が異常です。サービス状態を確認してください"
 ErrDockerComposeCmdNotFound: "Docker Compose コマンドは存在しません。ホストマシンにこのコマンドを先にインストールしてください"
 
+#ssh
+ExportIP: "ログインIP"
+ExportArea: "地域"
+ExportPort: "ポート"
+ExportAuthMode: "ログイン方式"
+ExportUser: "ユーザー"
+ExportStatus: "ログイン状態"
+ExportDate: "時間"
+
 #file
 ErrFileCanNotRead: 'このファイルはプレビューをサポートしていません'
 ErrFileToLarge: 'ファイルは 10M より大きいため開けません'
