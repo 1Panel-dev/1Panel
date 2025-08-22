@@ -2096,7 +2096,6 @@ const message = {
         advancedSettings: '高级设置',
         cacheSettings: '缓存设置',
         sniSettings: 'SNI 设置',
-        proxyTarget: '代理目标',
         basic: '基本',
         source: '配置文件',
         security: '安全',
