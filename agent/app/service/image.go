@@ -10,6 +10,7 @@ import (
 	"io"
 	"os"
 	"path"
+	"sort"
 	"strings"
 	"time"
 
@@ -34,7 +35,7 @@ import (
 type ImageService struct{}
 
 type IImageService interface {
-	Page(req dto.SearchWithPage) (int64, interface{}, error)
+	Page(req dto.PageImage) (int64, interface{}, error)
 	List() ([]dto.Options, error)
 	ListAll() ([]dto.ImageInfo, error)
 	ImageBuild(req dto.ImageBuild) error
@@ -49,7 +50,7 @@ type IImageService interface {
 func NewIImageService() IImageService {
 	return &ImageService{}
 }
-func (u *ImageService) Page(req dto.SearchWithPage) (int64, interface{}, error) {
+func (u *ImageService) Page(req dto.PageImage) (int64, interface{}, error) {
 	var (
 		list      []image.Summary
 		records   []dto.ImageInfo
@@ -65,12 +66,12 @@ func (u *ImageService) Page(req dto.SearchWithPage) (int64, interface{}, error) 
 		return 0, nil, err
 	}
 	containers, _ := client.ContainerList(context.Background(), container.ListOptions{All: true})
-	if len(req.Info) != 0 {
+	if len(req.Name) != 0 {
 		length, count := len(list), 0
 		for count < length {
 			hasTag := false
 			for _, tag := range list[count].RepoTags {
-				if strings.Contains(tag, req.Info) {
+				if strings.Contains(tag, req.Name) {
 					hasTag = true
 					break
 				}
@@ -85,15 +86,41 @@ func (u *ImageService) Page(req dto.SearchWithPage) (int64, interface{}, error) 
 	}
 
 	for _, image := range list {
-		size := formatFileSize(image.Size)
 		records = append(records, dto.ImageInfo{
 			ID:        image.ID,
 			Tags:      image.RepoTags,
 			IsUsed:    checkUsed(image.ID, containers),
 			CreatedAt: time.Unix(image.Created, 0),
-			Size:      size,
+			Size:      image.Size,
 		})
 	}
+	switch req.OrderBy {
+	case "size":
+		sort.Slice(records, func(i, j int) bool {
+			if req.Order == constant.OrderAsc {
+				return records[i].Size < records[j].Size
+			}
+			return records[i].Size > records[j].Size
+		})
+	case "tags":
+		sort.Slice(records, func(i, j int) bool {
+			if len(records[i].Tags) == 0 || len(records[j].Tags) == 0 {
+				return true
+			}
+			if req.Order == constant.OrderAsc {
+				return records[i].Tags[0] < records[j].Tags[0]
+			}
+			return records[i].Tags[0] > records[j].Tags[0]
+		})
+	default:
+		sort.Slice(records, func(i, j int) bool {
+			if req.Order == constant.OrderAsc {
+				return records[i].CreatedAt.Before(records[j].CreatedAt)
+			}
+			return records[i].CreatedAt.After(records[j].CreatedAt)
+		})
+	}
+
 	total, start, end := len(records), (req.Page-1)*req.PageSize, req.Page*req.PageSize
 	if start > total {
 		backDatas = make([]dto.ImageInfo, 0)
@@ -120,13 +147,12 @@ func (u *ImageService) ListAll() ([]dto.ImageInfo, error) {
 	}
 	containers, _ := client.ContainerList(context.Background(), container.ListOptions{All: true})
 	for _, image := range list {
-		size := formatFileSize(image.Size)
 		records = append(records, dto.ImageInfo{
 			ID:        image.ID,
 			Tags:      image.RepoTags,
 			IsUsed:    checkUsed(image.ID, containers),
 			CreatedAt: time.Unix(image.Created, 0),
-			Size:      size,
+			Size:      image.Size,
 		})
 	}
 	return records, nil

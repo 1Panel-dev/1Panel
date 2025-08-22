@@ -2,12 +2,19 @@ package dto
 
 import "time"
 
+type PageImage struct {
+	PageInfo
+	Name    string `json:"name"`
+	OrderBy string `json:"orderBy" validate:"required,oneof=size tags createdAt isUsed"`
+	Order   string `json:"order" validate:"required,oneof=null ascending descending"`
+}
+
 type ImageInfo struct {
 	ID        string    `json:"id"`
 	CreatedAt time.Time `json:"createdAt"`
 	IsUsed    bool      `json:"isUsed"`
 	Tags      []string  `json:"tags"`
-	Size      string    `json:"size"`
+	Size      int64     `json:"size"`
 }
 
 type ImageLoad struct {

@@ -70,7 +70,7 @@ export const DownloadFile = (params: Container.ContainerLogInfo) => {
 };
 
 // image
-export const searchImage = (params: SearchWithPage) => {
+export const searchImage = (params: Container.ImageSearch) => {
     return http.post<ResPage<Container.ImageInfo>>(`/containers/image/search`, params);
 };
 export const listAllImage = () => {

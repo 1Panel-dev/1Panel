@@ -27,12 +27,19 @@
                 </el-button>
             </template>
             <template #rightToolBar>
-                <TableSearch @search="search()" v-model:searchName="searchName" />
+                <TableSearch @search="search()" v-model:searchName="paginationConfig.name" />
                 <TableRefresh @search="search()" />
                 <TableSetting title="image-refresh" @search="search()" />
             </template>
             <template #main>
-                <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search" :heightDiff="300">
+                <ComplexTable
+                    :pagination-config="paginationConfig"
+                    :data="data"
+                    @sort-change="search"
+                    :columns="columns"
+                    @search="search"
+                    :heightDiff="300"
+                >
                     <el-table-column label="ID" prop="id" width="140">
                         <template #default="{ row }">
                             <el-text type="primary" class="cursor-pointer" @click="onInspect(row.id)">
@@ -40,7 +47,7 @@
                             </el-text>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('commons.table.status')" prop="isUsed" width="100">
+                    <el-table-column :label="$t('commons.table.status')" prop="isUsed" width="100" sortable>
                         <template #default="{ row }">
                             <Status :status="row.isUsed ? 'used' : 'unused'" />
                         </template>
@@ -48,6 +55,7 @@
                     <el-table-column
                         :label="$t('container.tag')"
                         prop="tags"
+                        sortable
                         min-width="160"
                         :width="mobile ? 400 : 'auto'"
                         fix
@@ -64,8 +72,13 @@
                             </el-tag>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('container.size')" prop="size" min-width="60" fix />
+                    <el-table-column :label="$t('container.size')" prop="size" min-width="60" fix sortable>
+                        <template #default="{ row }">
+                            {{ computeSize(row.size) }}
+                        </template>
+                    </el-table-column>
                     <el-table-column
+                        sortable
                         prop="createdAt"
                         min-width="80"
                         :label="$t('commons.table.date')"
@@ -113,6 +126,7 @@ import CodemirrorDrawer from '@/components/codemirror-pro/drawer.vue';
 import TaskLog from '@/components/log/task/index.vue';
 import { searchImage, listImageRepo, imageRemove, inspect, containerPrune } from '@/api/modules/container';
 import i18n from '@/lang';
+import { computeSize } from '@/utils/util';
 import { GlobalStore } from '@/store';
 import { ElMessageBox } from 'element-plus';
 const globalStore = GlobalStore();
@@ -133,8 +147,11 @@ const paginationConfig = reactive({
     currentPage: 1,
     pageSize: 10,
     total: 0,
+    name: '',
+    orderBy: 'createdAt',
+    order: 'null',
 });
-const searchName = ref();
+const columns = ref([]);
 
 const isActive = ref(false);
 const isExist = ref(false);
@@ -149,17 +166,21 @@ const dialogBuildRef = ref();
 const dialogDeleteRef = ref();
 const dialogPruneRef = ref();
 
-const search = async () => {
+const search = async (column?: any) => {
     if (!isActive.value || !isExist.value) {
         return;
     }
-    const repoSearch = {
-        info: searchName.value,
+    paginationConfig.orderBy = column?.order ? column.prop : paginationConfig.orderBy;
+    paginationConfig.order = column?.order ? column.order : paginationConfig.order;
+    const params = {
+        name: paginationConfig.name,
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
+        orderBy: paginationConfig.orderBy,
+        order: paginationConfig.order,
     };
     loading.value = true;
-    await searchImage(repoSearch)
+    await searchImage(params)
         .then((res) => {
             loading.value = false;
             data.value = res.data.items || [];

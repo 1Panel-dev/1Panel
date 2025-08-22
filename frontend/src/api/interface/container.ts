@@ -164,6 +164,11 @@ export namespace Container {
         option: string;
     }
 
+    export interface ImageSearch extends ReqPage {
+        name: string;
+        orderBy: string;
+        order: string;
+    }
     export interface ImageInfo {
         id: string;
         createdAt: Date;
