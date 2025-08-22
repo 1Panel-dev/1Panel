@@ -108,8 +108,8 @@ ErrFavoriteExist: 'This path has already been favorited'
 ErrInvalidChar: 'Illegal characters are not allowed'
 ErrPathNotDelete: 'The selected directory cannot be deleted'
 ErrLogFileToLarge: "The log file exceeds 500MB and cannot be opened"
-FileDropFailed: "File cleanup failed {{ .detail }}"
-FileDropSuccess: "File cleanup successful, cleaned {{ .count }} files, freed {{ .size }} disk space"
+FileDropFailed: "Failed to clean up file {{ .name }}: {{ .err }}"
+FileDropSuccess: "Successfully cleaned up file {{ .name }}, cleaned {{ .count }} files, freed {{ .size }} disk space"
 FileDropSum: "File cleanup completed successfully, total {{ .count }} files cleaned, total {{ .size }} disk space freed"
 
 #website

@@ -274,7 +274,7 @@ func doSystemClean(taskItem *task.Task) func(t *task.Task) error {
 		}
 
 		dropWithTask(path.Join(global.Dir.BaseDir, snapshotTmpPath), taskItem, &size, &fileCount)
-		dropWithTask(path.Join(global.Dir.LocalBackupDir, "system"), taskItem, &size, &fileCount)
+		dropWithTask(path.Join(global.Dir.LocalBackupDir, "tmp/system"), taskItem, &size, &fileCount)
 
 		dropWithTask(path.Join(global.Dir.BaseDir, rollbackPath, "app"), taskItem, &size, &fileCount)
 		dropWithTask(path.Join(global.Dir.BaseDir, rollbackPath, "website"), taskItem, &size, &fileCount)
@@ -615,11 +615,11 @@ func dropWithTask(itemPath string, taskItem *task.Task, size *int64, count *int)
 	*size += itemSize
 	*count += itemCount
 	if err := os.RemoveAll(itemPath); err != nil {
-		taskItem.Log(i18n.GetMsgWithDetail("FileDropFailed", err.Error()))
+		taskItem.Log(i18n.GetWithNameAndErr("FileDropFailed", itemPath, err))
 		return
 	}
 	if itemCount != 0 {
-		taskItem.Log(i18n.GetMsgWithMap("FileDropSuccess", map[string]interface{}{"count": itemCount, "size": common.LoadSizeUnit2F(float64(itemSize))}))
+		taskItem.Log(i18n.GetMsgWithMap("FileDropSuccess", map[string]interface{}{"name": itemPath, "count": itemCount, "size": common.LoadSizeUnit2F(float64(itemSize))}))
 	}
 }
 

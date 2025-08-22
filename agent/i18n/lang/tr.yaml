@@ -111,8 +111,8 @@ ErrFavoriteExist: 'Bu yol zaten favorilere eklendi'
 ErrInvalidChar: 'Yasak karakterlere izin verilmiyor'
 ErrPathNotDelete: 'Seçilen dizin silinemez'
 ErrLogFileToLarge: "Günlük dosyası 500MB'ı aşıyor ve açılamıyor"
-FileDropFailed: "Dosya temizleme başarısız {{ .detail }}"
-FileDropSuccess: "Dosya temizleme başarılı, {{ .count }} dosya silindi, {{ .size }} disk alanı boşaltıldı"
+FileDropFailed: "{{ .name }} dosyası temizlenemedi: {{ .err }}"
+FileDropSuccess: "{{ .name }} dosyası başarıyla temizlendi, {{ .count }} dosya silindi, {{ .size }} disk alanı boşaltıldı"
 FileDropSum: "Dosya temizleme tamamlandı, toplam {{ .count }} dosya silindi, toplam {{ .size }} disk alanı boşaltıldı"
 
 

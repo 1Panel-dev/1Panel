@@ -111,8 +111,8 @@ ErrFavoriteExist: 'Laluan ini telah digemari'
 ErrInvalidChar: 'Aksara haram tidak dibenarkan'
 ErrPathNotDelete: 'Direktori yang dipilih tidak boleh dipadamkan'
 ErrLogFileTooLarge: "Fail log melebihi 500MB dan tidak boleh dibuka"
-FileDropFailed: "Pembersihan fail gagal {{ .detail }}"
-FileDropSuccess: "Pembersihan fail berjaya, {{ .count }} fail dibersihkan, {{ .size }} ruang cakera dibebaskan"
+FileDropFailed: "Gagal membersihkan fail {{ .name }}: {{ .err }}"
+FileDropSuccess: "Berjaya membersihkan fail {{ .name }}, {{ .count }} fail dibersihkan, {{ .size }} ruang cakera dibebaskan"
 FileDropSum: "Pembersihan fail selesai, sejumlah {{ .count }} fail dibersihkan, sejumlah {{ .size }} ruang cakera dibebaskan"
 
 #laman web
