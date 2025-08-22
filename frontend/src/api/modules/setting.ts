@@ -136,7 +136,7 @@ export const updateAppStoreConfig = (req: App.AppStoreConfigUpdate) => {
 
 // snapshot
 export const loadSnapshotInfo = () => {
-    return http.get<Setting.SnapshotData>(`/settings/snapshot/load`);
+    return http.get<Setting.SnapshotData>(`/settings/snapshot/load`, {}, TimeoutEnum.T_60S);
 };
 export const snapshotCreate = (param: Setting.SnapshotCreate) => {
     return http.post(`/settings/snapshot`, param);

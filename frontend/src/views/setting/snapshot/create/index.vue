@@ -397,6 +397,8 @@ const load18n = (node: any, label: string) => {
                 return i18n.global.t('setting.' + label + 'Label');
             case 'system_snapshot':
                 return i18n.global.t('setting.snapshotLabel');
+            case 'master':
+                return i18n.global.t('xpack.node.masterBackup');
             default:
                 return label;
         }

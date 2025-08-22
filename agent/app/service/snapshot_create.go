@@ -242,6 +242,7 @@ func loadDbConn(snap *snapHelper, targetDir string, req dto.SnapshotCreate) erro
 		return err
 	}
 	snap.snapAgentDB = agentDb
+	_ = snap.snapAgentDB.Model(&model.Setting{}).Where("key = ?", "SystemIP").Updates(map[string]interface{}{"value": ""}).Error
 	coreDb, err := common.LoadDBConnByPathWithErr(path.Join(targetDir, "db/core.db"), "core.db")
 	snap.Task.LogWithStatus(i18n.GetWithName("SnapNewDB", "core"), err)
 	if err != nil {
