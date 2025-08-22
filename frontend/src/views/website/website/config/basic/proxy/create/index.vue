@@ -13,8 +13,8 @@
                         <el-col :span="12">
                             <el-form-item :label="$t('website.modifier')" prop="modifier">
                                 <el-input v-model.trim="proxy.modifier" />
-                                <div class="form-tip">
-                                    <el-icon><QuestionFilled /></el-icon>
+                                <div class="flex items-center gap-1 mt-1 text-xs">
+                                    <el-icon class="text-sm"><QuestionFilled /></el-icon>
                                     <span>{{ $t('website.modifierHelper') }}</span>
                                 </div>
                             </el-form-item>
@@ -35,14 +35,14 @@
                                     @blur="getProxyHost"
                                 >
                                     <template #prepend>
-                                        <el-select v-model="proxy.proxyProtocol" style="width: 100px">
+                                        <el-select v-model="proxy.proxyProtocol" class="!w-24">
                                             <el-option label="http" value="http://" />
                                             <el-option label="https" value="https://" />
                                         </el-select>
                                     </template>
                                 </el-input>
-                                <div class="form-tip">
-                                    <el-icon><QuestionFilled /></el-icon>
+                                <div class="flex items-center gap-1 mt-1 text-xs">
+                                    <el-icon class="text-sm"><QuestionFilled /></el-icon>
                                     <span>{{ $t('website.proxyPassHelper') }}</span>
                                 </div>
                             </el-form-item>
@@ -50,8 +50,8 @@
                         <el-col :span="12">
                             <el-form-item :label="$t('website.proxyHost')" prop="proxyHost">
                                 <el-input v-model.trim="proxy.proxyHost" />
-                                <div class="form-tip">
-                                    <el-icon><QuestionFilled /></el-icon>
+                                <div class="flex items-center gap-1 mt-1 text-xs">
+                                    <el-icon class="text-sm"><QuestionFilled /></el-icon>
                                     <span>{{ $t('website.proxyHostHelper') }}</span>
                                 </div>
                             </el-form-item>
@@ -61,11 +61,11 @@
                     <template v-if="proxy.proxyProtocol === 'https://'">
                         <el-divider content-position="left">{{ $t('website.sniSettings') }}</el-divider>
 
-                        <div class="switch-item">
-                            <div class="switch-label">
-                                <span>{{ $t('website.sni') }}</span>
-                                <div class="form-tip">
-                                    <el-icon><QuestionFilled /></el-icon>
+                        <div class="flex justify-between items-center py-3">
+                            <div class="flex flex-col gap-1">
+                                <span class="font-medium">{{ $t('website.sni') }}</span>
+                                <div class="flex items-center gap-1 mt-1 text-xs">
+                                    <el-icon class="text-sm"><QuestionFilled /></el-icon>
                                     <span>{{ $t('website.sniHelper') }}</span>
                                 </div>
                             </div>
@@ -76,7 +76,7 @@
                             :label="$t('website.proxySslName')"
                             prop="proxySSLName"
                             v-if="proxy.sni"
-                            style="margin-top: 16px"
+                            class="mt-4"
                         >
                             <el-input v-model.trim="proxy.proxySSLName" />
                         </el-form-item>
@@ -86,21 +86,21 @@
                 <el-tab-pane :label="$t('website.advancedSettings')" name="advanced">
                     <el-divider content-position="left">{{ $t('website.cacheSettings') }}</el-divider>
 
-                    <div class="switch-item">
-                        <div class="switch-label">
-                            <span>{{ $t('website.enableCache') }}</span>
+                    <div class="flex justify-between items-center py-3">
+                        <div class="flex flex-col gap-1">
+                            <span class="font-medium">{{ $t('website.enableCache') }}</span>
                         </div>
                         <el-switch v-model="proxy.cache" @change="changeCache(proxy.cache)" size="large" />
                     </div>
 
                     <el-collapse-transition>
-                        <div v-if="proxy.cache" style="margin-top: 16px">
+                        <div v-if="proxy.cache" class="mt-4">
                             <el-row :gutter="16">
                                 <el-col :span="12">
                                     <el-form-item :label="$t('website.browserCacheTime')" prop="cacheTime">
                                         <el-input v-model.number="proxy.cacheTime" maxlength="15">
                                             <template #append>
-                                                <el-select v-model="proxy.cacheUnit" style="width: 80px">
+                                                <el-select v-model="proxy.cacheUnit" class="!w-24">
                                                     <el-option
                                                         v-for="(unit, index) in Units"
                                                         :key="index"
@@ -110,8 +110,8 @@
                                                 </el-select>
                                             </template>
                                         </el-input>
-                                        <div class="form-tip">
-                                            <el-icon><QuestionFilled /></el-icon>
+                                        <div class="flex items-center gap-1 mt-1 text-xs">
+                                            <el-icon class="text-sm"><QuestionFilled /></el-icon>
                                             <span>{{ $t('website.browserCacheTimeHelper') }}</span>
                                         </div>
                                     </el-form-item>
@@ -120,7 +120,7 @@
                                     <el-form-item :label="$t('website.serverCacheTime')" prop="serverCacheTime">
                                         <el-input v-model.number="proxy.serverCacheTime" maxlength="15">
                                             <template #append>
-                                                <el-select v-model="proxy.serverCacheUnit" style="width: 80px">
+                                                <el-select v-model="proxy.serverCacheUnit" class="!w-24">
                                                     <el-option
                                                         v-for="(unit, index) in Units"
                                                         :key="index"
@@ -130,8 +130,8 @@
                                                 </el-select>
                                             </template>
                                         </el-input>
-                                        <div class="form-tip">
-                                            <el-icon><QuestionFilled /></el-icon>
+                                        <div class="flex items-center gap-1 mt-1 text-xs">
+                                            <el-icon class="text-sm"><QuestionFilled /></el-icon>
                                             <span>{{ $t('website.serverCacheTimeHelper') }}</span>
                                         </div>
                                     </el-form-item>
@@ -147,9 +147,9 @@
                             <el-empty :image-size="60" :description="$t('website.replacedListEmpty')" />
                         </div>
                         <div v-else class="replace-list">
-                            <div v-for="(replace, index) in replaces" :key="index" class="replace-item">
-                                <div class="replace-item-header">
-                                    <span class="replace-index">Rule {{ index + 1 }}</span>
+                            <div v-for="(replace, index) in replaces" :key="index" class="mb-3">
+                                <div class="flex justify-between items-center mb-3">
+                                    <span class="text-sm font-medium">Rule {{ index + 1 }}</span>
                                     <el-button @click="removeReplace(index)" type="danger" link size="small">
                                         <el-icon><Delete /></el-icon>
                                         {{ $t('commons.button.delete') }}
@@ -165,10 +165,7 @@
                                             <template #prepend>Search</template>
                                         </el-input>
                                     </el-col>
-                                    <el-col
-                                        :span="2"
-                                        style="display: flex; align-items: center; justify-content: center"
-                                    >
+                                    <el-col :span="2" class="flex items-center justify-center">
                                         <el-icon size="16"><ArrowRight /></el-icon>
                                     </el-col>
                                     <el-col :span="11">
@@ -183,13 +180,13 @@
                                 </el-row>
                             </div>
                         </div>
-                        <div style="text-align: center; margin-top: 16px">
+                        <div class="text-center mt-4">
                             <el-button type="primary" @click="addReplaces" :icon="Plus">
                                 {{ $t('website.addReplace') }}
                             </el-button>
                         </div>
-                        <div class="form-tip">
-                            <el-icon><QuestionFilled /></el-icon>
+                        <div class="flex items-center gap-1 mt-1 text-xs">
+                            <el-icon class="text-sm"><QuestionFilled /></el-icon>
                             <span>{{ $t('website.replaceHelper') }}</span>
                         </div>
                     </div>
@@ -364,60 +361,3 @@ defineExpose({
     acceptParams,
 });
 </script>
-
-<style lang="scss" scoped>
-.form-tip {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    margin-top: 4px;
-    font-size: 12px;
-
-    .el-icon {
-        font-size: 14px;
-    }
-}
-
-.switch-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 0;
-
-    .switch-label {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-
-        > span {
-            font-weight: 500;
-        }
-    }
-}
-
-.replace-section {
-    .replace-list {
-        .replace-item {
-            margin-bottom: 12px;
-
-            .replace-item-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 12px;
-
-                .replace-index {
-                    font-size: 14px;
-                    font-weight: 500;
-                }
-            }
-
-            :deep(.el-input-group__prepend) {
-                font-weight: 500;
-                min-width: 60px;
-                text-align: center;
-            }
-        }
-    }
-}
-</style>
