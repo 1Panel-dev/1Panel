@@ -486,6 +486,11 @@ func (a AppService) Install(req request.AppInstallCreate) (appInstall *model.App
 			req.Params["DATABASE_NAME"] = database.Name
 		}
 	}
+	if app.Key == "openresty" {
+		req.Params["CONTAINER_PACKAGE_URL"] = "http://archive.ubuntu.com/ubuntu/"
+		req.Params["RESTY_ADD_PACKAGE_BUILDDEPS"] = ""
+		req.Params["RESTY_CONFIG_OPTIONS_MORE"] = ""
+	}
 	paramByte, err = json.Marshal(req.Params)
 	if err != nil {
 		return

@@ -290,6 +290,9 @@ const get = async () => {
         paramModel.isHostMode = res.data.hostMode;
         paramModel.specifyIP = res.data.specifyIP;
         paramModel.restartPolicy = res.data.restartPolicy || 'no';
+        if (paramModel.restartPolicy === 'on-failure:5') {
+            paramModel.restartPolicy = 'on-failure';
+        }
         appConfigUpdate.value.webUI = res.data.webUI;
         if (res.data.webUI != '') {
             const httpConfig = splitHttp(res.data.webUI);

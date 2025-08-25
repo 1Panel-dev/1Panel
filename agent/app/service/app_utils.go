@@ -808,6 +808,7 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 		if install.App.Key == constant.AppOpenresty {
 			if err = buildNginx(t); err != nil {
 				t.Log(err.Error())
+				return err
 			}
 		}
 
