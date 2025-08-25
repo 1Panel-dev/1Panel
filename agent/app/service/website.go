@@ -2278,10 +2278,10 @@ func (w WebsiteService) UpdateAntiLeech(req request.NginxAntiLeechUpdate) (err e
 			},
 		}
 		newBlock.Directives = append(newBlock.Directives, ifDir)
-		if website.Type == "deployment" {
+		if website.Type == constant.Deployment {
 			newBlock.Directives = append(newBlock.Directives, &components.Directive{
 				Name:       "proxy_pass",
-				Parameters: []string{website.Proxy},
+				Parameters: []string{fmt.Sprintf("http://%s", website.Proxy)},
 			})
 		}
 		newDirective.Block = newBlock
