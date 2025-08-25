@@ -13,10 +13,7 @@
                         <el-col :span="12">
                             <el-form-item :label="$t('website.modifier')" prop="modifier">
                                 <el-input v-model.trim="proxy.modifier" />
-                                <div class="flex items-center gap-1 mt-1 text-xs">
-                                    <el-icon class="text-sm"><QuestionFilled /></el-icon>
-                                    <span>{{ $t('website.modifierHelper') }}</span>
-                                </div>
+                                <span class="input-help">{{ $t('website.modifierHelper') }}</span>
                             </el-form-item>
                         </el-col>
                         <el-col :span="12">
@@ -41,19 +38,13 @@
                                         </el-select>
                                     </template>
                                 </el-input>
-                                <div class="flex items-center gap-1 mt-1 text-xs">
-                                    <el-icon class="text-sm"><QuestionFilled /></el-icon>
-                                    <span>{{ $t('website.proxyPassHelper') }}</span>
-                                </div>
+                                <span class="input-help">{{ $t('website.proxyPassHelper') }}</span>
                             </el-form-item>
                         </el-col>
                         <el-col :span="12">
                             <el-form-item :label="$t('website.proxyHost')" prop="proxyHost">
                                 <el-input v-model.trim="proxy.proxyHost" />
-                                <div class="flex items-center gap-1 mt-1 text-xs">
-                                    <el-icon class="text-sm"><QuestionFilled /></el-icon>
-                                    <span>{{ $t('website.proxyHostHelper') }}</span>
-                                </div>
+                                <span class="input-help">{{ $t('website.proxyHostHelper') }}</span>
                             </el-form-item>
                         </el-col>
                     </el-row>
@@ -64,10 +55,7 @@
                         <div class="flex justify-between items-center py-3">
                             <div class="flex flex-col gap-1">
                                 <span class="font-medium">{{ $t('website.sni') }}</span>
-                                <div class="flex items-center gap-1 mt-1 text-xs">
-                                    <el-icon class="text-sm"><QuestionFilled /></el-icon>
-                                    <span>{{ $t('website.sniHelper') }}</span>
-                                </div>
+                                <span class="input-help">{{ $t('website.sniHelper') }}</span>
                             </div>
                             <el-switch v-model="proxy.sni" size="large" />
                         </div>
@@ -110,10 +98,7 @@
                                                 </el-select>
                                             </template>
                                         </el-input>
-                                        <div class="flex items-center gap-1 mt-1 text-xs">
-                                            <el-icon class="text-sm"><QuestionFilled /></el-icon>
-                                            <span>{{ $t('website.browserCacheTimeHelper') }}</span>
-                                        </div>
+                                        <span class="input-help">{{ $t('website.browserCacheTimeHelper') }}</span>
                                     </el-form-item>
                                 </el-col>
                                 <el-col :span="12">
@@ -130,10 +115,7 @@
                                                 </el-select>
                                             </template>
                                         </el-input>
-                                        <div class="flex items-center gap-1 mt-1 text-xs">
-                                            <el-icon class="text-sm"><QuestionFilled /></el-icon>
-                                            <span>{{ $t('website.serverCacheTimeHelper') }}</span>
-                                        </div>
+                                        <span class="input-help">{{ $t('website.serverCacheTimeHelper') }}</span>
                                     </el-form-item>
                                 </el-col>
                             </el-row>
@@ -142,52 +124,42 @@
 
                     <el-divider content-position="left">{{ $t('website.replace') }}</el-divider>
 
-                    <div class="replace-section">
-                        <div v-if="replaces.length === 0" class="empty-state">
-                            <el-empty :image-size="60" :description="$t('website.replacedListEmpty')" />
-                        </div>
-                        <div v-else class="replace-list">
-                            <div v-for="(replace, index) in replaces" :key="index" class="mb-3">
-                                <div class="flex justify-between items-center mb-3">
-                                    <span class="text-sm font-medium">Rule {{ index + 1 }}</span>
-                                    <el-button @click="removeReplace(index)" type="danger" link size="small">
+                    <div>
+                        <div v-for="(replace, index) in replaces" :key="index" class="mb-3">
+                            <el-row :gutter="16">
+                                <el-col :span="10">
+                                    <el-input
+                                        v-model.trim="replace.key"
+                                        :placeholder="$t('website.replaced')"
+                                        size="default"
+                                    ></el-input>
+                                </el-col>
+                                <el-col :span="10">
+                                    <el-input
+                                        v-model.trim="replace.value"
+                                        :placeholder="$t('website.replaceText')"
+                                        size="default"
+                                    ></el-input>
+                                </el-col>
+                                <el-col :span="2">
+                                    <el-button
+                                        @click="removeReplace(index)"
+                                        type="danger"
+                                        link
+                                        size="small"
+                                        class="mt-1"
+                                    >
                                         <el-icon><Delete /></el-icon>
                                         {{ $t('commons.button.delete') }}
                                     </el-button>
-                                </div>
-                                <el-row :gutter="16">
-                                    <el-col :span="11">
-                                        <el-input
-                                            v-model.trim="replace.key"
-                                            :placeholder="$t('website.replaced')"
-                                            size="default"
-                                        >
-                                            <template #prepend>Search</template>
-                                        </el-input>
-                                    </el-col>
-                                    <el-col :span="2" class="flex items-center justify-center">
-                                        <el-icon size="16"><ArrowRight /></el-icon>
-                                    </el-col>
-                                    <el-col :span="11">
-                                        <el-input
-                                            v-model.trim="replace.value"
-                                            :placeholder="$t('website.replaceText')"
-                                            size="default"
-                                        >
-                                            <template #prepend>Replace</template>
-                                        </el-input>
-                                    </el-col>
-                                </el-row>
-                            </div>
+                                </el-col>
+                            </el-row>
                         </div>
-                        <div class="text-center mt-4">
+                        <div class="mt-4">
                             <el-button type="primary" @click="addReplaces" :icon="Plus">
                                 {{ $t('website.addReplace') }}
                             </el-button>
-                        </div>
-                        <div class="flex items-center gap-1 mt-1 text-xs">
-                            <el-icon class="text-sm"><QuestionFilled /></el-icon>
-                            <span>{{ $t('website.replaceHelper') }}</span>
+                            <span class="input-help mt-4">{{ $t('website.replaceHelper') }}</span>
                         </div>
                     </div>
                 </el-tab-pane>
@@ -212,7 +184,7 @@ import { MsgError, MsgSuccess } from '@/utils/message';
 import { Website } from '@/api/interface/website';
 import { Units } from '@/global/mimetype';
 import { isDomain } from '@/utils/util';
-import { QuestionFilled, Delete, Plus, ArrowRight } from '@element-plus/icons-vue';
+import { Delete, Plus } from '@element-plus/icons-vue';
 
 const proxyForm = ref<FormInstance>();
 const rules = ref({
@@ -235,7 +207,7 @@ const initData = (): Website.ProxyConfig => ({
     cacheTime: 1,
     cacheUnit: 'm',
     name: '',
-    modifier: '^~',
+    modifier: '',
     match: '/',
     proxyPass: 'http://127.0.0.1:8080',
     proxyHost: '$host',
@@ -260,6 +232,7 @@ const handleClose = () => {
 const acceptParams = (proxyParam: Website.ProxyConfig) => {
     replaces.value = [];
     proxy.value = proxyParam;
+    activeTab.value = 'basic';
 
     const res = getProtocolAndHost(proxyParam.proxyPass);
     if (res != null) {
