@@ -836,7 +836,7 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 		}
 	}
 
-	upgradeTask.AddSubTask(task.GetTaskName(install.Name, task.TaskScopeApp, task.TaskUpgrade), upgradeApp, rollBackApp)
+	upgradeTask.AddSubTaskWithOps(task.GetTaskName(install.Name, task.TaskScopeApp, task.TaskUpgrade), upgradeApp, rollBackApp, 0, 1*time.Hour)
 
 	go func() {
 		err = upgradeTask.Execute()
