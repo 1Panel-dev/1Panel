@@ -59,11 +59,5 @@ func (n NvidiaSMI) LoadGpuInfo() (*common.GpuInfo, error) {
 		break
 	}
 
-	if version == "v12" || version == "v11" {
-		return schema.Parse(data, version)
-	} else {
-		global.LOG.Errorf("don't support such schema version %s", version)
-	}
-
-	return &common.GpuInfo{}, nil
+	return schema.Parse(data, version)
 }
