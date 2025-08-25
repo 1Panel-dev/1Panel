@@ -646,7 +646,7 @@ onBeforeUnmount(() => {
 
 .h-systemInfo {
     margin-left: 18px;
-    height: 276px;
+    height: 286px;
 }
 @-moz-document url-prefix() {
     .h-systemInfo {

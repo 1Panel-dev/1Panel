@@ -3360,7 +3360,7 @@ func (w WebsiteService) ExecComposer(req request.ExecComposerReq) error {
 	execDir := strings.ReplaceAll(req.Dir, siteDir.Value, "/www")
 	composerTask.AddSubTask("", func(t *task.Task) error {
 		cmdStr := fmt.Sprintf("docker exec -u %s %s sh -c 'composer config -g repo.packagist composer %s && composer %s --working-dir=%s'", req.User, runtime.ContainerName, req.Mirror, command, execDir)
-		err = cmdMgr.RunBashCf(cmdStr)
+		err = cmdMgr.RunBashC(cmdStr)
 		if err != nil {
 			return err
 		}

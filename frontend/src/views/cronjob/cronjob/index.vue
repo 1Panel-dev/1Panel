@@ -54,7 +54,7 @@
                     :data="data"
                     :heightDiff="300"
                 >
-                    <el-table-column type="selection" fix />
+                    <el-table-column type="selection" :selectable="selectable" fix />
                     <el-table-column
                         :label="$t('cronjob.taskName')"
                         :min-width="120"
@@ -306,6 +306,10 @@ const dialogBackupRef = ref();
 const onOpenDialog = async (id: string) => {
     routerToNameWithQuery('CronjobOperate', { id: id });
 };
+
+function selectable(row) {
+    return row.status !== 'Pending';
+}
 
 const onDelete = async (row: Cronjob.CronjobInfo | null) => {
     let names = [];

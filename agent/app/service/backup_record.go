@@ -6,6 +6,7 @@ import (
 	"os"
 	"path"
 	"sync"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
@@ -256,13 +257,25 @@ func (u *BackupRecordService) LoadRecordSize(req dto.SearchForSize) ([]dto.Recor
 
 	var datas []dto.RecordFileSize
 	var wg sync.WaitGroup
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
 	for i := 0; i < len(list); i++ {
 		datas = append(datas, dto.RecordFileSize{ID: list[i].ID})
 		if val, ok := clientMap[fmt.Sprintf("%v", list[i].DownloadID)]; ok {
 			wg.Add(1)
 			go func(index int) {
-				datas[index].Size, _ = val.client.Size(path.Join(val.backupPath, list[i].FilePath))
-				wg.Done()
+				defer wg.Done()
+				done := make(chan struct{}, 1)
+				go func() {
+					datas[index].Size, _ = val.client.Size(path.Join(val.backupPath, list[i].FilePath))
+					defer close(done)
+				}()
+				select {
+				case <-ctx.Done():
+					return
+				case <-done:
+					return
+				}
 			}(i)
 		}
 	}
