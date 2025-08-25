@@ -268,10 +268,7 @@ func (u *DashboardService) LoadCurrentInfo(ioOption string, netOption string) *d
 }
 
 func (u *DashboardService) LoadAppLauncher(ctx *gin.Context) ([]dto.AppLauncher, error) {
-	var (
-		data          []dto.AppLauncher
-		recommendList []dto.AppLauncher
-	)
+	var data []dto.AppLauncher
 	appInstalls, err := appInstallRepo.ListBy(context.Background())
 	if err != nil {
 		return data, err
@@ -281,8 +278,11 @@ func (u *DashboardService) LoadAppLauncher(ctx *gin.Context) ([]dto.AppLauncher,
 		return data, err
 	}
 
-	showList, _ := launcherRepo.ListName()
-	defaultList := []string{"openresty", "mysql", "halo", "redis", "maxkb", "wordpress"}
+	showList, err := launcherRepo.ListName()
+	defaultList, err := appRepo.GetTopRecomment()
+	if err != nil {
+		return data, nil
+	}
 	allList := common.RemoveRepeatStr(append(defaultList, showList...))
 	for _, showItem := range allList {
 		var itemData dto.AppLauncher
@@ -317,24 +317,21 @@ func (u *DashboardService) LoadAppLauncher(ctx *gin.Context) ([]dto.AppLauncher,
 				})
 			}
 		}
-		if ArryContains(defaultList, showItem) && len(itemData.Detail) == 0 {
-			itemData.IsRecommend = true
-			recommendList = append(recommendList, itemData)
-			continue
+		if (ArryContains(showList, showItem) && len(itemData.Detail) != 0) ||
+			(ArryContains(defaultList, showItem) && len(itemData.Detail) == 0) {
+			data = append(data, itemData)
 		}
-		if !ArryContains(showList, showItem) && len(itemData.Detail) != 0 {
-			continue
-		}
-		data = append(data, itemData)
 	}
 
-	sort.Slice(recommendList, func(i, j int) bool {
-		return recommendList[i].Recommend < recommendList[j].Recommend
-	})
 	sort.Slice(data, func(i, j int) bool {
-		return data[i].Name < data[j].Name
+		if data[i].IsInstall != data[j].IsInstall {
+			return data[i].IsInstall
+		}
+		if data[i].IsInstall && data[j].IsInstall {
+			return data[i].Name < data[j].Name
+		}
+		return data[i].Recommend < data[j].Recommend
 	})
-	data = append(data, recommendList...)
 	return data, nil
 }
 
