@@ -49,11 +49,13 @@
                     </el-table-column>
                     <el-table-column :label="$t('container.composeDirectory')" min-width="80" fix>
                         <template #default="{ row }">
-                            <el-button type="primary" link @click="toComposeFolder(row)">
-                                <el-icon>
-                                    <FolderOpened />
-                                </el-icon>
-                            </el-button>
+                            <el-tooltip :content="row.workdir">
+                                <el-button type="primary" link @click="toComposeFolder(row)">
+                                    <el-icon>
+                                        <FolderOpened />
+                                    </el-icon>
+                                </el-button>
+                            </el-tooltip>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('container.containerStatus')" min-width="80" fix>
@@ -249,6 +251,12 @@ const buttons = [
         label: i18n.global.t('commons.operate.stop'),
         click: (row: Container.ComposeInfo) => {
             onComposeOperate('stop', row);
+        },
+    },
+    {
+        label: i18n.global.t('commons.operate.restart'),
+        click: (row: Container.ComposeInfo) => {
+            onComposeOperate('restart', row);
         },
     },
     {
