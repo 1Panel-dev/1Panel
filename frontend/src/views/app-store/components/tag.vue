@@ -141,4 +141,8 @@ onBeforeUnmount(() => {
 .el-check-tag.el-check-tag--primary.is-checked {
     background-color: var(--el-color-info-light-9) !important;
 }
+
+.el-check-tag:hover {
+    background-color: var(--el-color-info-light-9) !important;
+}
 </style>
