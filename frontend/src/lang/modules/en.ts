@@ -348,6 +348,9 @@ const message = {
             hourUnit: 'h',
             dayUnit: 'd',
         },
+        log: {
+            noLog: 'No logs available',
+        },
     },
     menu: {
         home: 'Overview',

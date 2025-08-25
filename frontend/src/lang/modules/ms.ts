@@ -345,6 +345,9 @@ const message = {
             dayUnit: 'd',
             millisecond: 'Milisaat',
         },
+        log: {
+            noLog: 'Tiada log sedia ada',
+        },
     },
     menu: {
         home: 'Overview',

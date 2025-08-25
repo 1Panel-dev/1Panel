@@ -37,6 +37,7 @@
             >
                 <hightlight :log="log" :type="config.colorMode ?? 'nginx'"></hightlight>
             </div>
+            <hightlight v-if="visibleLogs.length === 0" :log="$t('commons.log.noLog')" type="system"></hightlight>
         </div>
     </div>
 </template>

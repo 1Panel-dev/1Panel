@@ -339,6 +339,9 @@ const message = {
             dayUnit: '일',
             millisecond: '밀리초',
         },
+        log: {
+            noLog: '로그 없음',
+        },
     },
     menu: {
         home: '개요',

@@ -343,6 +343,9 @@ const message = {
             dayUnit: 'd',
             millisecond: 'Milissegundo',
         },
+        log: {
+            noLog: 'Nenhum log disponível',
+        },
     },
     menu: {
         home: 'Visão Geral',

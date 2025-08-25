@@ -337,6 +337,9 @@ const message = {
             dayUnit: '天',
             millisecond: '毫秒',
         },
+        log: {
+            noLog: '暂无日志',
+        },
     },
     menu: {
         home: '概览',

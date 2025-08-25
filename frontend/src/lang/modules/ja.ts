@@ -337,6 +337,9 @@ const message = {
             dayUnit: 'd',
             millisecond: 'ミリ秒',
         },
+        log: {
+            noLog: 'ログはありません',
+        },
     },
     menu: {
         home: '概要',

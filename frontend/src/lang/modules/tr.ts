@@ -352,6 +352,9 @@ const message = {
             hourUnit: 'sa',
             dayUnit: 'g',
         },
+        log: {
+            noLog: 'Günlük yok',
+        },
     },
     menu: {
         home: 'Genel Bakış',
