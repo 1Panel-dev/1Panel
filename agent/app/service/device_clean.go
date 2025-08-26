@@ -235,13 +235,13 @@ func (u *DeviceService) Clean(req []dto.Clean) {
 		case "script":
 			dropFileOrDir(path.Join(global.Dir.TmpDir, "script", item.Name))
 		case "images":
-			dropImages()
+			_, _ = dropImages()
 		case "containers":
-			dropContainers()
+			_, _ = dropContainers()
 		case "volumes":
-			dropVolumes()
+			_, _ = dropVolumes()
 		case "build_cache":
-			dropBuildCache()
+			_, _ = dropBuildCache()
 		}
 	}
 
@@ -306,6 +306,14 @@ func doSystemClean(taskItem *task.Task) func(t *task.Task) error {
 				}
 			}
 		}
+
+		count1, size1 := dropVolumes()
+		size += int64(size1)
+		fileCount += count1
+		count2, size2 := dropBuildCache()
+		size += int64(size2)
+		fileCount += count2
+
 		timeNow := time.Now().Format(constant.DateTimeLayout)
 		if fileCount != 0 {
 			taskItem.Log(i18n.GetMsgWithMap("FileDropSum", map[string]interface{}{"size": common.LoadSizeUnit2F(float64(size)), "count": fileCount}))
@@ -528,61 +536,74 @@ func dropFileOrDir(itemPath string) {
 	}
 }
 
-func dropBuildCache() {
+func dropBuildCache() (int, int) {
 	client, err := docker.NewDockerClient()
 	if err != nil {
 		global.LOG.Errorf("do not get docker client")
+		return 0, 0
 	}
 	opts := build.CachePruneOptions{}
 	opts.All = true
-	_, err = client.BuildCachePrune(context.Background(), opts)
+	res, err := client.BuildCachePrune(context.Background(), opts)
 	if err != nil {
 		global.LOG.Errorf("drop build cache failed, err %v", err)
+		return 0, 0
 	}
+	return len(res.CachesDeleted), int(res.SpaceReclaimed)
 }
 
-func dropImages() {
+func dropImages() (int, int) {
 	client, err := docker.NewDockerClient()
 	if err != nil {
 		global.LOG.Errorf("do not get docker client")
+		return 0, 0
 	}
 	pruneFilters := filters.NewArgs()
 	pruneFilters.Add("dangling", "false")
-	_, err = client.ImagesPrune(context.Background(), pruneFilters)
+	res, err := client.ImagesPrune(context.Background(), pruneFilters)
 	if err != nil {
 		global.LOG.Errorf("drop images failed, err %v", err)
+		return 0, 0
 	}
+	return len(res.ImagesDeleted), int(res.SpaceReclaimed)
 }
 
-func dropContainers() {
+func dropContainers() (int, int) {
 	client, err := docker.NewDockerClient()
 	if err != nil {
 		global.LOG.Errorf("do not get docker client")
+		return 0, 0
 	}
 	pruneFilters := filters.NewArgs()
-	_, err = client.ContainersPrune(context.Background(), pruneFilters)
+	res, err := client.ContainersPrune(context.Background(), pruneFilters)
 	if err != nil {
 		global.LOG.Errorf("drop containers failed, err %v", err)
+		return 0, 0
 	}
+	return len(res.ContainersDeleted), int(res.SpaceReclaimed)
 }
 
-func dropVolumes() {
+func dropVolumes() (int, int) {
 	client, err := docker.NewDockerClient()
 	if err != nil {
 		global.LOG.Errorf("do not get docker client")
+		return 0, 0
 	}
 	pruneFilters := filters.NewArgs()
 	versions, err := client.ServerVersion(context.Background())
 	if err != nil {
 		global.LOG.Errorf("do not get docker api versions")
+		return 0, 0
 	}
 	if common.ComparePanelVersion(versions.APIVersion, "1.42") {
 		pruneFilters.Add("all", "true")
 	}
-	_, err = client.VolumesPrune(context.Background(), pruneFilters)
+	res, err := client.VolumesPrune(context.Background(), pruneFilters)
 	if err != nil {
 		global.LOG.Errorf("drop volumes failed, err %v", err)
+		return 0, 0
 	}
+	return len(res.VolumesDeleted), int(res.SpaceReclaimed)
 }
 
 func dropWithExclude(pathToDelete string, excludeSubDirs []string, taskItem *task.Task, size *int64, count *int) {
