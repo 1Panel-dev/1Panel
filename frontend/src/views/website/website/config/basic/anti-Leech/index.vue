@@ -62,13 +62,7 @@
                                 <el-divider />
 
                                 <el-form-item :label="$t('website.leechReturn')" prop="return">
-                                    <el-select
-                                        v-model="form.return"
-                                        filterable
-                                        allow-create
-                                        placeholder="请选择返回状态码"
-                                        class="p-w-600"
-                                    >
+                                    <el-select v-model="form.return" class="p-w-600">
                                         <el-option
                                             v-for="option in returnOptions"
                                             :key="option.value"
