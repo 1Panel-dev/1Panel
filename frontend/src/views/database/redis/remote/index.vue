@@ -92,7 +92,7 @@ const data = ref();
 const paginationConfig = reactive({
     cacheSizeKey: 'redis-remote-page-size',
     currentPage: 1,
-    pageSize: 10,
+    pageSize: Number(localStorage.getItem('redis-remote-page-size')) || 10,
     total: 0,
     orderBy: 'createdAt',
     order: 'null',

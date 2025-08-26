@@ -43,7 +43,7 @@ import { getDNSName } from '@/utils/util';
 const paginationConfig = reactive({
     cacheSizeKey: 'dns-account-page-size',
     currentPage: 1,
-    pageSize: 20,
+    pageSize: Number(localStorage.getItem('dns-account-page-size')) || 20,
     total: 0,
 });
 let data = ref<Website.DnsAccount[]>();

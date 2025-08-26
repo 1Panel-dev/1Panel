@@ -134,7 +134,7 @@ const data = ref();
 const paginationConfig = reactive({
     cacheSizeKey: 'script-page-size',
     currentPage: 1,
-    pageSize: 10,
+    pageSize: Number(localStorage.getItem('script-page-size')) || 10,
     total: 0,
 });
 const searchInfo = ref<string>('');

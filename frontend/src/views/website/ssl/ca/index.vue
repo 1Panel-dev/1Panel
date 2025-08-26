@@ -50,7 +50,7 @@ const createRef = ref();
 const paginationConfig = reactive({
     cacheSizeKey: 'ca-page-size',
     currentPage: 1,
-    pageSize: 20,
+    pageSize: Number(localStorage.getItem('ca-page-size')) || 20,
     total: 0,
 });
 const opRef = ref();

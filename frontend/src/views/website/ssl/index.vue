@@ -188,7 +188,7 @@ const globalStore = GlobalStore();
 const paginationConfig = reactive({
     cacheSizeKey: 'ssl-page-size',
     currentPage: 1,
-    pageSize: 10,
+    pageSize: Number(localStorage.getItem('ssl-page-size')) || 10,
     total: 0,
 });
 const acmeAccountRef = ref();

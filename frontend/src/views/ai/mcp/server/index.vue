@@ -118,7 +118,7 @@ const items = ref<AI.McpServer[]>([]);
 const paginationConfig = reactive({
     cacheSizeKey: 'mcp-server-page-size',
     currentPage: 1,
-    pageSize: 10,
+    pageSize: Number(localStorage.getItem('mcp-server-page-size')) || 10,
     total: 0,
 });
 const mobile = computed(() => {
