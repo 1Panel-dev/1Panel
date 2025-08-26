@@ -448,6 +448,18 @@ const acceptParams = (props: UploadFileProps) => {
     });
 };
 
+onMounted(() => {
+    window.addEventListener('beforeunload', (e) => {
+        if (upLoading.value) {
+            if (upLoading.value) {
+                e.preventDefault();
+                e.returnValue = i18n.global.t('file.cancelUploadHelper');
+                return i18n.global.t('file.cancelUploadHelper');
+            }
+        }
+    });
+});
+
 defineExpose({ acceptParams, handleDrop, open });
 </script>
 
