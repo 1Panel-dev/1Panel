@@ -15,38 +15,35 @@
                 <div class="dropdowns">
                     <el-select filterable clearable v-model="req.type" @change="search()" class="!w-52 dropdown">
                         <template #prefix>{{ $t('commons.table.type') }}</template>
-                        <el-option value="ssl" :label="$t('xpack.alert.ssl')" />
-                        <el-option value="siteEndTime" :label="$t('xpack.alert.siteEndTime')" />
                         <template v-if="isMaster">
                             <el-option value="panelPwdEndTime" :label="$t('xpack.alert.panelPwdEndTime')" />
-                            <el-option value="panelUpdate" :label="$t('xpack.alert.panelUpdate')" />
-                            <el-option value="nodeException" :label="$t('xpack.alert.nodeException')" />
-                            <el-option value="licenseException" :label="$t('xpack.alert.licenseException')" />
                             <el-option value="panelLogin" :label="$t('xpack.alert.panelLogin')" />
+                            <el-option value="licenseException" :label="$t('xpack.alert.licenseException')" />
+                            <el-option value="nodeException" :label="$t('xpack.alert.nodeException')" />
+                            <el-option value="panelUpdate" :label="$t('xpack.alert.panelUpdate')" />
                         </template>
                         <el-option value="sshLogin" :label="$t('xpack.alert.sshLogin')" />
-                        <el-option value="clams" :label="$t('xpack.alert.clams')" />
-                        <el-option value="shell" :label="$t('xpack.alert.cronjob') + '-' + $t('cronjob.shell')" />
-                        <el-option value="app" :label="$t('xpack.alert.cronjob') + '-' + $t('cronjob.app')" />
-                        <el-option value="website" :label="$t('xpack.alert.cronjob') + '-' + $t('cronjob.website')" />
-                        <el-option value="database" :label="$t('xpack.alert.cronjob') + '-' + $t('cronjob.database')" />
-                        <el-option
-                            value="directory"
-                            :label="$t('xpack.alert.cronjob') + '-' + $t('cronjob.directory')"
-                        />
-                        <el-option value="log" :label="$t('xpack.alert.cronjob') + '-' + $t('cronjob.log')" />
-                        <el-option value="snapshot" :label="$t('xpack.alert.cronjob') + '-' + $t('cronjob.snapshot')" />
-                        <el-option value="curl" :label="$t('xpack.alert.cronjob') + '-' + $t('cronjob.curl')" />
-                        <el-option
-                            value="cutWebsiteLog"
-                            :label="$t('xpack.alert.cronjob') + '-' + $t('cronjob.cutWebsiteLog')"
-                        />
-                        <el-option value="clean" :label="$t('xpack.alert.cronjob') + '-' + $t('setting.diskClean')" />
-                        <el-option value="ntp" :label="$t('xpack.alert.cronjob') + '-' + $t('cronjob.ntp')" />
+                        <el-option value="ssl" :label="$t('xpack.alert.ssl')" />
+                        <el-option value="siteEndTime" :label="$t('xpack.alert.siteEndTime')" />
                         <el-option value="cpu" :label="$t('xpack.alert.cpu')" />
                         <el-option value="memory" :label="$t('xpack.alert.memory')" />
-                        <el-option value="load" :label="$t('xpack.alert.load')" />
                         <el-option value="disk" :label="$t('xpack.alert.disk')" />
+                        <el-option value="load" :label="$t('xpack.alert.load')" />
+                        <el-option value="clams" :label="$t('xpack.alert.clams')" />
+                        <el-option value="shell" :label="$t('xpack.alert.cronjob', [$t('cronjob.shell')])" />
+                        <el-option value="app" :label="$t('xpack.alert.cronjob', [$t('cronjob.app')])" />
+                        <el-option value="website" :label="$t('xpack.alert.cronjob', [$t('cronjob.website')])" />
+                        <el-option value="database" :label="$t('xpack.alert.cronjob', [$t('cronjob.database')])" />
+                        <el-option value="directory" :label="$t('xpack.alert.cronjob', [$t('cronjob.directory')])" />
+                        <el-option value="log" :label="$t('xpack.alert.cronjob', [$t('cronjob.log')])" />
+                        <el-option value="snapshot" :label="$t('xpack.alert.cronjob', [$t('cronjob.snapshot')])" />
+                        <el-option value="curl" :label="$t('xpack.alert.cronjob', [$t('cronjob.curl')])" />
+                        <el-option
+                            value="cutWebsiteLog"
+                            :label="$t('xpack.alert.cronjob', [$t('cronjob.cutWebsiteLog')])"
+                        />
+                        <el-option value="clean" :label="$t('xpack.alert.cronjob', [$t('cronjob.clean')])" />
+                        <el-option value="ntp" :label="$t('xpack.alert.cronjob', [$t('cronjob.ntp')])" />
                     </el-select>
                     <el-select
                         clearable
@@ -191,12 +188,12 @@ const buttons = [
 const openView = async (
     title: string,
     rowData: Partial<Alert.AlertInfo> = {
-        type: 'ssl',
+        type: 'panelPwdEndTime',
         cycle: 15,
         count: 0,
         sendCount: 3,
         method: '',
-        project: 'all',
+        project: '',
         status: 'Enable',
         title: '',
     },

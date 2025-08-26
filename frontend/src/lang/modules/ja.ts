@@ -3444,7 +3444,7 @@ const message = {
             alertRule: 'アラートルール',
             titleSearchHelper: 'アラートタイトルを入力して検索します',
             taskType: 'タイプ',
-            ssl: '証明書 (SSL) 期限切れ',
+            ssl: '証明書期限切れ',
             siteEndTime: 'ウェブサイト期限切れ',
             panelPwdEndTime: 'パネルパスワード期限切れ',
             panelUpdate: '新しいパネルバージョンあり',

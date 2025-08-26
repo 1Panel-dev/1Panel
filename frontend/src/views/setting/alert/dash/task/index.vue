@@ -436,20 +436,20 @@ const rules = reactive({
 });
 
 const allTaskOptions = [
-    { value: 'ssl', label: 'xpack.alert.ssl', show: true },
-    { value: 'siteEndTime', label: 'xpack.alert.siteEndTime', show: true },
     { value: 'panelPwdEndTime', label: 'xpack.alert.panelPwdEndTime', show: isMaster.value },
-    { value: 'panelUpdate', label: 'xpack.alert.panelUpdate', show: isMaster.value },
-    { value: 'nodeException', label: 'xpack.alert.nodeException', show: isMaster.value },
-    { value: 'licenseException', label: 'xpack.alert.licenseException', show: isMaster.value },
     { value: 'panelLogin', label: 'xpack.alert.panelLogin', show: isMaster.value },
     { value: 'sshLogin', label: 'xpack.alert.sshLogin', show: true },
-    { value: 'clams', label: 'xpack.alert.clams', show: true },
-    { value: 'cronJob', label: 'xpack.alert.cronjob', show: true },
+    { value: 'licenseException', label: 'xpack.alert.licenseException', show: isMaster.value },
+    { value: 'ssl', label: 'xpack.alert.ssl', show: true },
+    { value: 'siteEndTime', label: 'xpack.alert.siteEndTime', show: true },
+    { value: 'nodeException', label: 'xpack.alert.nodeException', show: isMaster.value },
     { value: 'cpu', label: 'xpack.alert.cpu', show: true },
     { value: 'memory', label: 'xpack.alert.memory', show: true },
-    { value: 'load', label: 'xpack.alert.load', show: true },
     { value: 'disk', label: 'xpack.alert.disk', show: true },
+    { value: 'load', label: 'xpack.alert.load', show: true },
+    { value: 'cronJob', label: 'xpack.alert.cronjob', show: true },
+    { value: 'clams', label: 'xpack.alert.clams', show: true },
+    { value: 'panelUpdate', label: 'xpack.alert.panelUpdate', show: isMaster.value },
 ];
 
 function checkCycle(rule: any, value: any, callback: any) {

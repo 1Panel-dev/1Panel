@@ -3522,7 +3522,7 @@ const message = {
             alertRule: 'Peraturan Amaran',
             titleSearchHelper: 'Masukkan tajuk amaran untuk pencarian kabur',
             taskType: 'Jenis',
-            ssl: 'Sijil (SSL) Tamat Tempoh',
+            ssl: 'Sijil Tamat Tempoh',
             siteEndTime: 'Tamat Tempoh Laman Web',
             panelPwdEndTime: 'Kata Laluan Panel Tamat Tempoh',
             panelUpdate: 'Versi Panel Baharu Tersedia',

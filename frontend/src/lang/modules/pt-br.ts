@@ -3531,7 +3531,7 @@ const message = {
             alertRule: 'Regras de Alerta',
             titleSearchHelper: 'Digite o título do alerta para busca aproximada',
             taskType: 'Tipo',
-            ssl: 'Expiração do Certificado (SSL)',
+            ssl: 'Expiração do Certificado',
             siteEndTime: 'Expiração do Site',
             panelPwdEndTime: 'Expiração da Senha do Painel',
             panelUpdate: 'Nova Versão do Painel Disponível',

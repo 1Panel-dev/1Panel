@@ -3599,7 +3599,7 @@ const message = {
             alertRule: 'Uyarı Kuralları',
             titleSearchHelper: 'Bulanık arama için uyarı başlığını girin',
             taskType: 'Tür',
-            ssl: 'Sertifika (SSL) Sona Ermesi',
+            ssl: 'Sertifika Sona Ermesi',
             siteEndTime: 'Web Sitesi Sona Ermesi',
             panelPwdEndTime: 'Panel Şifresi Sona Ermesi',
             panelUpdate: 'Yeni Panel Sürümü Mevcut',
