@@ -12,7 +12,7 @@
                         <template #title>
                             <div>
                                 <span class="version">{{ item.version }}</span>
-                                <span class="date">{{ item.createdAt }}</span>
+                                <span v-if="!mobile" class="date">{{ item.createdAt }}</span>
                             </div>
                             <svg-icon class="icon" iconName="p-featureshitu"></svg-icon>
                             <span class="icon-span">{{ item.newCount }}</span>
@@ -55,6 +55,10 @@ import { GlobalStore } from '@/store';
 import { storeToRefs } from 'pinia';
 
 const globalStore = GlobalStore();
+const mobile = computed(() => {
+    return globalStore.isMobile();
+});
+
 const { isDarkTheme } = storeToRefs(globalStore);
 
 const drawerVisible = ref(false);
