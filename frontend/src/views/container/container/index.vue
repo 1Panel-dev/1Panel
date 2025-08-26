@@ -341,7 +341,7 @@
         <PruneDialog @search="search" ref="dialogPruneRef" />
 
         <RenameDialog @search="search" ref="dialogRenameRef" />
-        <ContainerLogDialog ref="dialogContainerLogRef" :highlightDiff="235" />
+        <ContainerLogDialog ref="dialogContainerLogRef" :highlightDiff="210" />
         <UpgradeDialog @search="search" ref="dialogUpgradeRef" />
         <CommitDialog @search="search" ref="dialogCommitRef" />
         <MonitorDialog ref="dialogMonitorRef" />

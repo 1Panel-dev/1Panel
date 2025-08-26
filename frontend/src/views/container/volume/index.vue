@@ -49,11 +49,13 @@
                     </el-table-column>
                     <el-table-column :label="$t('container.volumeDir')" min-width="100">
                         <template #default="{ row }">
-                            <el-button type="primary" link @click="routerToFileWithPath(row.mountpoint)">
-                                <el-icon>
-                                    <FolderOpened />
-                                </el-icon>
-                            </el-button>
+                            <el-tooltip :content="row.mountpoint">
+                                <el-button type="primary" link @click="routerToFileWithPath(row.mountpoint)">
+                                    <el-icon>
+                                        <FolderOpened />
+                                    </el-icon>
+                                </el-button>
+                            </el-tooltip>
                         </template>
                     </el-table-column>
                     <el-table-column

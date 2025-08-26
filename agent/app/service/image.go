@@ -456,22 +456,6 @@ func (u *ImageService) ImageRemove(req dto.BatchDelete) error {
 	return nil
 }
 
-func formatFileSize(fileSize int64) (size string) {
-	if fileSize < 1024 {
-		return fmt.Sprintf("%.2fB", float64(fileSize)/float64(1))
-	} else if fileSize < (1024 * 1024) {
-		return fmt.Sprintf("%.2fKB", float64(fileSize)/float64(1024))
-	} else if fileSize < (1024 * 1024 * 1024) {
-		return fmt.Sprintf("%.2fMB", float64(fileSize)/float64(1024*1024))
-	} else if fileSize < (1024 * 1024 * 1024 * 1024) {
-		return fmt.Sprintf("%.2fGB", float64(fileSize)/float64(1024*1024*1024))
-	} else if fileSize < (1024 * 1024 * 1024 * 1024 * 1024) {
-		return fmt.Sprintf("%.2fTB", float64(fileSize)/float64(1024*1024*1024*1024))
-	} else {
-		return fmt.Sprintf("%.2fEB", float64(fileSize)/float64(1024*1024*1024*1024*1024))
-	}
-}
-
 func checkUsed(imageID string, containers []container.Summary) bool {
 	for _, container := range containers {
 		if container.ImageID == imageID {
