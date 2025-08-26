@@ -156,14 +156,15 @@
                                                 <span class="status-label">{{ $t('commons.table.status') }}</span>
                                             </template>
                                             <Status :status="currentRecord?.status" />
-                                        </el-form-item>
-                                    </el-row>
-                                    <el-row v-if="currentRecord?.status === 'Failed'">
-                                        <el-form-item class="w-full">
-                                            <template #label>
-                                                <span class="status-label">{{ $t('commons.table.message') }}</span>
-                                            </template>
-                                            {{ currentRecord?.message }}
+                                            <el-tooltip :content="currentRecord?.message">
+                                                <el-button
+                                                    class="mt-0.5"
+                                                    type="danger"
+                                                    v-if="currentRecord?.status === 'Failed'"
+                                                    icon="Warning"
+                                                    link
+                                                />
+                                            </el-tooltip>
                                         </el-form-item>
                                     </el-row>
                                     <el-row v-if="currentRecord?.taskID && currentRecord?.taskID != ''">

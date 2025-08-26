@@ -228,8 +228,10 @@ SystemLog: 'System Log'
 CutWebsiteLog: 'Rotate Website Log'
 FileOrDir: 'Directory / File'
 UploadFile: 'Uploading backup file {{ .file }} to {{ .backup }}'
-IgnoreBackupErr: 'Backup failed, error: {{ .detail }}, ignoring this error...'
-IgnoreUploadErr: 'Upload failed, error: {{ .detail }}, ignoring this error...'
+Upload: "Upload"
+IgnoreBackupErr: "Backup failed, error: {{ .detail }}, ignoring this error..."
+IgnoreUploadErr: "Upload failed, error: {{ .detail }}, ignoring this error..."
+LoadBackupFailed: "Failed to get backup account connection, error: {{ .detail }}"
 
 #toolbox
 ErrNotExistUser: 'The current user does not exist, please modify and try again!'
@@ -376,7 +378,6 @@ SnapCompressFile: 'Compress snapshot file'
 SnapCheckCompress: 'Check snapshot compression file'
 SnapCompressSize: 'Snapshot file size {{ .name }}'
 SnapUpload: 'Upload snapshot file'
-SnapLoadBackup: 'Get backup account information'
 SnapUploadTo: 'Upload snapshot file to {{ .name }}'
 SnapUploadRes: 'Upload snapshot file to {{ .name }}'
 

@@ -250,11 +250,8 @@ func (u *BackupRecordService) LoadRecordSize(req dto.SearchForSize) ([]dto.Recor
 			recordIds = append(recordIds, fmt.Sprintf("%v", record.DownloadID))
 		}
 	}
-	clientMap, err := NewBackupClientMap(recordIds)
-	if err != nil {
-		return nil, err
-	}
 
+	clientMap := NewBackupClientMap(recordIds)
 	var datas []dto.RecordFileSize
 	var wg sync.WaitGroup
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)

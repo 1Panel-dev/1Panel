@@ -36,35 +36,33 @@
                         fix
                     />
                     <el-table-column prop="version" :label="$t('app.version')" />
-                    <el-table-column :label="$t('setting.backupAccount')" min-width="80" prop="from">
+                    <el-table-column :label="$t('setting.backupAccount')" :min-width="120" prop="from">
                         <template #default="{ row }">
-                            <div class="flex items-center justify-start gap-0.5">
-                                <div v-for="(item, index) of row.sourceAccounts" :key="index" class="mt-1">
-                                    <div v-if="row.expand || (!row.expand && index < 3)">
-                                        <span type="info">
-                                            <span>
-                                                {{ item === 'localhost' ? $t('setting.LOCAL') : item }}
-                                            </span>
-                                            <el-icon
-                                                v-if="item === row.downloadAccount"
-                                                size="12"
-                                                class="relative top-px left-1"
-                                            >
-                                                <Star />
-                                            </el-icon>
+                            <div v-for="(item, index) of row.sourceAccounts" :key="index">
+                                <div v-if="row.expand || (!row.expand && index < 3)">
+                                    <span type="info">
+                                        <span>
+                                            {{ item === 'localhost' ? $t('setting.LOCAL') : item }}
                                         </span>
-                                    </div>
+                                        <el-icon
+                                            v-if="item === row.downloadAccount"
+                                            size="12"
+                                            class="relative top-px left-1"
+                                        >
+                                            <Star />
+                                        </el-icon>
+                                    </span>
                                 </div>
-                                <div v-if="!row.expand && row.sourceAccounts?.length > 3">
-                                    <el-button type="primary" link @click="row.expand = true">
-                                        {{ $t('commons.button.expand') }}...
-                                    </el-button>
-                                </div>
-                                <div v-if="row.expand && row.sourceAccounts?.length > 3">
-                                    <el-button type="primary" link @click="row.expand = false">
-                                        {{ $t('commons.button.collapse') }}
-                                    </el-button>
-                                </div>
+                            </div>
+                            <div v-if="!row.expand && row.sourceAccounts?.length > 3">
+                                <el-button type="primary" link @click="row.expand = true">
+                                    {{ $t('commons.button.expand') }}...
+                                </el-button>
+                            </div>
+                            <div v-if="row.expand && row.sourceAccounts?.length > 3">
+                                <el-button type="primary" link @click="row.expand = false">
+                                    {{ $t('commons.button.collapse') }}
+                                </el-button>
                             </div>
                         </template>
                     </el-table-column>

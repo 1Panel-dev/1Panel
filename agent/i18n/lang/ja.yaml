@@ -228,8 +228,10 @@ SystemLog: 'システムログ'
 CutWebsiteLog: 'ウェブサイトログのローテーション'
 FileOrDir: 'ディレクトリ / ファイル'
 UploadFile: 'バックアップファイル {{ .file }} を {{ .backup }} にアップロード中'
-IgnoreBackupErr: 'バックアップ失敗、エラー：{{ .detail }}、このエラーを無視します...'
-IgnoreUploadErr: 'アップロード失敗、エラー：{{ .detail }}、このエラーを無視します...'
+Upload: "アップロード"
+IgnoreBackupErr: "バックアップ失敗、エラー: {{ .detail }}、このエラーを無視します..."
+IgnoreUploadErr: "アップロード失敗、エラー: {{ .detail }}、このエラーを無視します..."
+LoadBackupFailed: "バックアップアカウントの接続取得に失敗、エラー: {{ .detail }}"
 
 #toolbox
 ErrNotExistUser: '現在のユーザーは存在しません。変更してもう一度お試しください。'
@@ -376,7 +378,6 @@ SnapCompressFile: 'スナップショット ファイルを圧縮する'
 SnapCheckCompress: 'スナップショット圧縮ファイルをチェックする'
 SnapCompressSize: 'スナップショット ファイル サイズ {{ .name }}'
 SnapUpload: 'スナップショット ファイルをアップロード'
-SnapLoadBackup: 'バックアップ アカウント情報を取得する'
 SnapUploadTo: 'スナップショット ファイルを {{ .name }} にアップロードします'
 SnapUploadRes: 'スナップショット ファイルを {{ .name }} にアップロードします'
 

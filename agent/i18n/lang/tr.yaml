@@ -229,6 +229,10 @@ SystemLog: 'Sistem Günlüğü'
 CutWebsiteLog: 'Web Sitesi Günlüğünü Döndür'
 FileOrDir: 'Dizin / Dosya'
 UploadFile: 'Yedekleme dosyası {{ .file }} {{ .backup }} konumuna yükleniyor'
+Upload: "Yükle"
+IgnoreBackupErr: "Yedekleme başarısız, hata: {{ .detail }}, bu hata yoksayılıyor..."
+IgnoreUploadErr: "Yükleme başarısız, hata: {{ .detail }}, bu hata yoksayılıyor..."
+LoadBackupFailed: "Yedek hesap bağlantısı alınamadı, hata: {{ .detail }}"
 
 #toolbox
 ErrNotExistUser: 'Mevcut kullanıcı mevcut değil, lütfen değiştirin ve tekrar deneyin!'
@@ -375,7 +379,6 @@ SnapCompressFile: 'Anlık görüntü dosyasını sıkıştır'
 SnapCheckCompress: 'Anlık görüntü sıkıştırma dosyasını kontrol et'
 SnapCompressSize: 'Anlık görüntü dosya boyutu {{ .name }}'
 SnapUpload: 'Anlık görüntü dosyasını yükle'
-SnapLoadBackup: 'Yedekleme hesabı bilgilerini al'
 SnapUploadTo: 'Anlık görüntü dosyasını {{ .name }} konumuna yükle'
 SnapUploadRes: 'Anlık görüntü dosyasını {{ .name }} konumuna yükle'
 

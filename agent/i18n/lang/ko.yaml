@@ -228,8 +228,10 @@ SystemLog: '시스템 로그'
 CutWebsiteLog: '웹사이트 로그 회전'
 FileOrDir: '디렉터리 / 파일'
 UploadFile: '백업 파일 {{ .file }} 을(를) {{ .backup }}(으)로 업로드 중'
-IgnoreBackupErr: 'Sandaran gagal, ralat: {{ .detail }}, abaikan ralat ini...'
-IgnoreUploadErr: 'Muat naik gagal, ralat: {{ .detail }}, abaikan ralat ini...'
+Upload: "업로드"
+IgnoreBackupErr: "백업 실패, 오류: {{ .detail }}, 이 오류를 무시합니다..."
+IgnoreUploadErr: "업로드 실패, 오류: {{ .detail }}, 이 오류를 무시합니다..."
+LoadBackupFailed: "백업 계정 연결 획득 실패, 오류: {{ .detail }}"
 
 #도구상자
 ErrNotExistUser: '현재 사용자가 존재하지 않습니다. 수정한 후 다시 시도하세요!'
@@ -376,7 +378,6 @@ SnapCompressFile: '스냅샷 파일 압축'
 SnapCheckCompress: '스냅샷 압축 파일 확인'
 SnapCompressSize: '스냅샷 파일 크기 {{ .name }}'
 SnapUpload: '스냅샷 파일 업로드'
-SnapLoadBackup: '백업 계정 정보 가져오기'
 SnapUploadTo: '스냅샷 파일을 {{ .name }}에 업로드'
 SnapUploadRes: '스냅샷 파일을 {{ .name }}에 업로드'
 

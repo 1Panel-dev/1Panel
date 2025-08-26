@@ -227,8 +227,10 @@ SystemLog: "系统日志"
 CutWebsiteLog: "切割网站日志"
 FileOrDir: "目录 / 文件"
 UploadFile: "上传备份文件 {{ .file }} 到 {{ .backup }}"
+Upload: "上传"
 IgnoreBackupErr: "备份失败，错误：{{ .detail }}，忽略本次错误..."
 IgnoreUploadErr: "上传失败，错误：{{ .detail }}，忽略本次错误..."
+LoadBackupFailed: "获取备份账号连接失败，错误：{{ .detail }}"
 
 #toolbox
 ErrNotExistUser: "当前用户不存在，请修改后重试！"
@@ -376,7 +378,6 @@ SnapCompressFile: "压缩快照文件"
 SnapCheckCompress: "检查快照压缩文件"
 SnapCompressSize: "快照文件大小 {{ .name }}"
 SnapUpload: "上传快照文件"
-SnapLoadBackup: "获取备份账号信息"
 SnapUploadTo: "上传快照文件到 {{ .name }}"
 SnapUploadRes: "上传快照文件到 {{ .name }}"
 

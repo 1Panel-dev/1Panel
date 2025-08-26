@@ -146,12 +146,13 @@ func (u *SnapshotService) Delete(req dto.SnapshotBatchDelete) error {
 	snaps, _ := snapshotRepo.GetList(repo.WithByIDs(req.Ids))
 	for _, snap := range snaps {
 		if req.DeleteWithFile {
-			accounts, err := NewBackupClientMap(strings.Split(snap.SourceAccountIDs, ","))
-			if err != nil {
-				return err
-			}
+			accounts := NewBackupClientMap(strings.Split(snap.SourceAccountIDs, ","))
 			for _, item := range accounts {
 				global.LOG.Debugf("remove snapshot file %s.tar.gz from %s", snap.Name, item.name)
+				if !item.isOk {
+					global.LOG.Errorf("remove snapshot file %s.tar.gz from %s failed, err: %s", snap.Name, item.name, item.message)
+					continue
+				}
 				_, _ = item.client.Delete(path.Join(item.backupPath, "system_snapshot", snap.Name+".tar.gz"))
 			}
 			_ = backupRepo.DeleteRecord(context.Background(), repo.WithByType("snapshot"), backupRepo.WithByFileName(snap.Name+".tar.gz"))

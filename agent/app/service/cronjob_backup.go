@@ -29,9 +29,9 @@ func (u *CronjobService) handleApp(cronjob model.Cronjob, startTime time.Time, t
 	if len(apps) == 0 {
 		return errors.New("no such app in database!")
 	}
-	accountMap, err := NewBackupClientMap(strings.Split(cronjob.SourceAccountIDs, ","))
-	if err != nil {
-		return err
+	accountMap := NewBackupClientMap(strings.Split(cronjob.SourceAccountIDs, ","))
+	if !accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].isOk {
+		return errors.New(i18n.GetMsgWithDetail("LoadBackupFailed", accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].message))
 	}
 	for _, app := range apps {
 		retry := 0
@@ -54,8 +54,10 @@ func (u *CronjobService) handleApp(cronjob model.Cronjob, startTime time.Time, t
 					return nil
 				}
 			}
-			downloadPath, err := u.uploadCronjobBackFile(cronjob, task, accountMap, path.Join(backupDir, record.FileName))
-			if err != nil {
+
+			src := path.Join(backupDir, record.FileName)
+			dst := strings.TrimPrefix(src, global.Dir.LocalBackupDir+"/tmp/")
+			if err := uploadWithMap(*task, accountMap, src, dst, cronjob.SourceAccountIDs, cronjob.DownloadAccountID, cronjob.RetryTimes); err != nil {
 				if retry < int(cronjob.RetryTimes) || !cronjob.IgnoreErr {
 					retry++
 					return err
@@ -63,7 +65,7 @@ func (u *CronjobService) handleApp(cronjob model.Cronjob, startTime time.Time, t
 				task.Log(i18n.GetMsgWithDetail("IgnoreUploadErr", err.Error()))
 				return nil
 			}
-			record.FileDir = path.Dir(downloadPath)
+			record.FileDir = path.Dir(dst)
 			if err := backupRepo.CreateRecord(&record); err != nil {
 				global.LOG.Errorf("save backup record failed, err: %v", err)
 				return err
@@ -80,9 +82,9 @@ func (u *CronjobService) handleWebsite(cronjob model.Cronjob, startTime time.Tim
 	if len(webs) == 0 {
 		return errors.New("no such website in database!")
 	}
-	accountMap, err := NewBackupClientMap(strings.Split(cronjob.SourceAccountIDs, ","))
-	if err != nil {
-		return err
+	accountMap := NewBackupClientMap(strings.Split(cronjob.SourceAccountIDs, ","))
+	if !accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].isOk {
+		return errors.New(i18n.GetMsgWithDetail("LoadBackupFailed", accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].message))
 	}
 	for _, web := range webs {
 		retry := 0
@@ -107,8 +109,9 @@ func (u *CronjobService) handleWebsite(cronjob model.Cronjob, startTime time.Tim
 				}
 			}
 
-			downloadPath, err := u.uploadCronjobBackFile(cronjob, task, accountMap, path.Join(backupDir, record.FileName))
-			if err != nil {
+			src := path.Join(backupDir, record.FileName)
+			dst := strings.TrimPrefix(src, global.Dir.LocalBackupDir+"/tmp/")
+			if err := uploadWithMap(*task, accountMap, src, dst, cronjob.SourceAccountIDs, cronjob.DownloadAccountID, cronjob.RetryTimes); err != nil {
 				if retry < int(cronjob.RetryTimes) || !cronjob.IgnoreErr {
 					retry++
 					return err
@@ -116,7 +119,7 @@ func (u *CronjobService) handleWebsite(cronjob model.Cronjob, startTime time.Tim
 				task.Log(i18n.GetMsgWithDetail("IgnoreUploadErr", err.Error()))
 				return nil
 			}
-			record.FileDir = path.Dir(downloadPath)
+			record.FileDir = path.Dir(dst)
 			if err := backupRepo.CreateRecord(&record); err != nil {
 				global.LOG.Errorf("save backup record failed, err: %v", err)
 				return err
@@ -133,9 +136,9 @@ func (u *CronjobService) handleDatabase(cronjob model.Cronjob, startTime time.Ti
 	if len(dbs) == 0 {
 		return errors.New("no such db in database!")
 	}
-	accountMap, err := NewBackupClientMap(strings.Split(cronjob.SourceAccountIDs, ","))
-	if err != nil {
-		return err
+	accountMap := NewBackupClientMap(strings.Split(cronjob.SourceAccountIDs, ","))
+	if !accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].isOk {
+		return errors.New(i18n.GetMsgWithDetail("LoadBackupFailed", accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].message))
 	}
 	for _, dbInfo := range dbs {
 		retry := 0
@@ -173,8 +176,9 @@ func (u *CronjobService) handleDatabase(cronjob model.Cronjob, startTime time.Ti
 				}
 			}
 
-			downloadPath, err := u.uploadCronjobBackFile(cronjob, task, accountMap, path.Join(backupDir, record.FileName))
-			if err != nil {
+			src := path.Join(backupDir, record.FileName)
+			dst := strings.TrimPrefix(src, global.Dir.LocalBackupDir+"/tmp/")
+			if err := uploadWithMap(*task, accountMap, src, dst, cronjob.SourceAccountIDs, cronjob.DownloadAccountID, cronjob.RetryTimes); err != nil {
 				if retry < int(cronjob.RetryTimes) || !cronjob.IgnoreErr {
 					retry++
 					return err
@@ -182,7 +186,7 @@ func (u *CronjobService) handleDatabase(cronjob model.Cronjob, startTime time.Ti
 				task.Log(i18n.GetMsgWithDetail("IgnoreUploadErr", err.Error()))
 				return nil
 			}
-			record.FileDir = path.Dir(downloadPath)
+			record.FileDir = path.Dir(dst)
 			if err := backupRepo.CreateRecord(&record); err != nil {
 				global.LOG.Errorf("save backup record failed, err: %v", err)
 				return err
@@ -195,11 +199,11 @@ func (u *CronjobService) handleDatabase(cronjob model.Cronjob, startTime time.Ti
 }
 
 func (u *CronjobService) handleDirectory(cronjob model.Cronjob, startTime time.Time, taskItem *task.Task) error {
+	accountMap := NewBackupClientMap(strings.Split(cronjob.SourceAccountIDs, ","))
+	if !accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].isOk {
+		return errors.New(i18n.GetMsgWithDetail("LoadBackupFailed", accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].message))
+	}
 	taskItem.AddSubTaskWithOps(task.GetTaskName(cronjob.SourceDir, task.TaskBackup, task.TaskScopeCronjob), func(task *task.Task) error {
-		accountMap, err := NewBackupClientMap(strings.Split(cronjob.SourceAccountIDs, ","))
-		if err != nil {
-			return err
-		}
 		fileName := fmt.Sprintf("%s.tar.gz", startTime.Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(2))
 		if cronjob.IsDir || len(strings.Split(cronjob.SourceDir, ",")) == 1 {
 			fileName = loadFileName(cronjob.SourceDir)
@@ -226,15 +230,15 @@ func (u *CronjobService) handleDirectory(cronjob model.Cronjob, startTime time.T
 		record.CronjobID = cronjob.ID
 		record.Name = cronjob.Name
 		record.DownloadAccountID, record.SourceAccountIDs = cronjob.DownloadAccountID, cronjob.SourceAccountIDs
-		downloadPath, err := u.uploadCronjobBackFile(cronjob, task, accountMap, path.Join(backupDir, fileName))
-		if err != nil {
-			taskItem.LogFailedWithErr("Upload backup file", err)
+
+		src := path.Join(backupDir, fileName)
+		dst := strings.TrimPrefix(src, global.Dir.LocalBackupDir+"/tmp/")
+		if err := uploadWithMap(*task, accountMap, src, dst, cronjob.SourceAccountIDs, cronjob.DownloadAccountID, cronjob.RetryTimes); err != nil {
 			return err
 		}
-		record.FileDir = path.Dir(downloadPath)
+		record.FileDir = path.Dir(dst)
 		record.FileName = fileName
 		if err := backupRepo.CreateRecord(&record); err != nil {
-			taskItem.LogFailedWithErr("Save record", err)
 			return err
 		}
 		u.removeExpiredBackup(cronjob, accountMap, record)
@@ -244,11 +248,11 @@ func (u *CronjobService) handleDirectory(cronjob model.Cronjob, startTime time.T
 }
 
 func (u *CronjobService) handleSystemLog(cronjob model.Cronjob, startTime time.Time, taskItem *task.Task) error {
-	taskItem.AddSubTaskWithOps(task.GetTaskName(i18n.GetMsgByKey("BackupSystemLog"), task.TaskBackup, task.TaskScopeCronjob), func(task *task.Task) error {
-		accountMap, err := NewBackupClientMap(strings.Split(cronjob.SourceAccountIDs, ","))
-		if err != nil {
-			return err
-		}
+	accountMap := NewBackupClientMap(strings.Split(cronjob.SourceAccountIDs, ","))
+	if !accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].isOk {
+		return errors.New(i18n.GetMsgWithDetail("LoadBackupFailed", accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].message))
+	}
+	taskItem.AddSubTaskWithOps(task.GetTaskName(i18n.GetMsgByKey("SystemLog"), task.TaskBackup, task.TaskScopeCronjob), func(task *task.Task) error {
 		nameItem := startTime.Format(constant.DateTimeSlimLayout) + common.RandStrAndNum(5)
 		fileName := fmt.Sprintf("system_log_%s.tar.gz", nameItem)
 		backupDir := path.Join(global.Dir.LocalBackupDir, "tmp/log", nameItem)
@@ -261,15 +265,15 @@ func (u *CronjobService) handleSystemLog(cronjob model.Cronjob, startTime time.T
 		record.CronjobID = cronjob.ID
 		record.Name = cronjob.Name
 		record.DownloadAccountID, record.SourceAccountIDs = cronjob.DownloadAccountID, cronjob.SourceAccountIDs
-		downloadPath, err := u.uploadCronjobBackFile(cronjob, task, accountMap, path.Join(path.Dir(backupDir), fileName))
-		if err != nil {
-			taskItem.LogFailedWithErr("Upload backup file", err)
+
+		src := path.Join(path.Dir(backupDir), fileName)
+		dst := strings.TrimPrefix(src, global.Dir.LocalBackupDir+"/tmp/")
+		if err := uploadWithMap(*task, accountMap, src, dst, cronjob.SourceAccountIDs, cronjob.DownloadAccountID, cronjob.RetryTimes); err != nil {
 			return err
 		}
-		record.FileDir = path.Dir(downloadPath)
+		record.FileDir = path.Dir(dst)
 		record.FileName = fileName
 		if err := backupRepo.CreateRecord(&record); err != nil {
-			taskItem.LogFailedWithErr("Save record", err)
 			return err
 		}
 		u.removeExpiredBackup(cronjob, accountMap, record)
@@ -279,11 +283,10 @@ func (u *CronjobService) handleSystemLog(cronjob model.Cronjob, startTime time.T
 }
 
 func (u *CronjobService) handleSnapshot(cronjob model.Cronjob, jobRecord model.JobRecords, taskItem *task.Task) error {
-	accountMap, err := NewBackupClientMap(strings.Split(cronjob.SourceAccountIDs, ","))
-	if err != nil {
-		return err
+	accountMap := NewBackupClientMap(strings.Split(cronjob.SourceAccountIDs, ","))
+	if !accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].isOk {
+		return errors.New(i18n.GetMsgWithDetail("LoadBackupFailed", accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].message))
 	}
-
 	var record model.BackupRecord
 	record.From = "cronjob"
 	record.Type = "snapshot"
@@ -461,6 +464,7 @@ func handleBackupLogs(taskItem *task.Task, targetDir, fileName string, secret st
 			}
 		}
 	}
+	taskItem.Logf("%s Website logs...", i18n.GetMsgByKey("TaskBackup"))
 
 	systemDir := path.Join(targetDir, "system")
 	if _, err := os.Stat(systemDir); err != nil && os.IsNotExist(err) {
@@ -469,7 +473,6 @@ func handleBackupLogs(taskItem *task.Task, targetDir, fileName string, secret st
 		}
 	}
 
-	taskItem.Logf("%s System logs...", i18n.GetMsgByKey("TaskBackup"))
 	systemLogFiles, _ := os.ReadDir(global.Dir.LogDir)
 	if len(systemLogFiles) != 0 {
 		for i := 0; i < len(systemLogFiles); i++ {
@@ -478,8 +481,8 @@ func handleBackupLogs(taskItem *task.Task, targetDir, fileName string, secret st
 			}
 		}
 	}
+	taskItem.Logf("%s System logs...", i18n.GetMsgByKey("TaskBackup"))
 
-	taskItem.Logf("%s SSH logs...", i18n.GetMsgByKey("TaskBackup"))
 	loginLogFiles, _ := os.ReadDir("/var/log")
 	loginDir := path.Join(targetDir, "login")
 	if _, err := os.Stat(loginDir); err != nil && os.IsNotExist(err) {
@@ -494,7 +497,7 @@ func handleBackupLogs(taskItem *task.Task, targetDir, fileName string, secret st
 			}
 		}
 	}
-	taskItem.Log("backup ssh log successful!")
+	taskItem.Logf("%s SSH logs...", i18n.GetMsgByKey("TaskBackup"))
 
 	if err := fileOp.TarGzCompressPro(true, targetDir, path.Join(path.Dir(targetDir), fileName), secret, ""); err != nil {
 		return err

@@ -228,8 +228,10 @@ SystemLog: 'Log Sistem'
 CutWebsiteLog: 'Putar Log Laman Web'
 FileOrDir: 'Direktori / Fail'
 UploadFile: 'Muat naik fail sandaran {{ .file }} ke {{ .backup }}'
-IgnoreBackupErr: 'Sandaran gagal, ralat: {{ .detail }}, abaikan ralat ini...'
-IgnoreUploadErr: 'Muat naik gagal, ralat: {{ .detail }}, abaikan ralat ini...'
+Upload: "Muat Naik"
+IgnoreBackupErr: "Sandaran gagal, ralat: {{ .detail }}, abaikan ralat ini..."
+IgnoreUploadErr: "Muat naik gagal, ralat: {{ .detail }}, abaikan ralat ini..."
+LoadBackupFailed: "Gagal mendapatkan sambungan akaun sandaran, ralat: {{ .detail }}"
 
 #kotak alat
 ErrNotExistUser: 'Pengguna semasa tidak wujud, sila ubah suai dan cuba lagi!'
@@ -376,7 +378,6 @@ SnapCompressFile: 'Mampatkan fail syot kilat'
 SnapCheckCompress: 'Semak fail mampatan syot kilat'
 SnapCompressSize: 'Saiz fail syot kilat {{ .name }}'
 SnapUpload: 'Muat naik fail syot kilat'
-SnapLoadBackup: 'Dapatkan maklumat akaun sandaran'
 SnapUploadTo: 'Muat naik fail syot kilat ke {{ .name }}'
 SnapUploadRes: 'Muat naik fail syot kilat ke {{ .name }}'
 

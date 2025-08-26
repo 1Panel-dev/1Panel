@@ -228,8 +228,10 @@ SystemLog: 'Log do Sistema'
 CutWebsiteLog: 'Rotacionar Log do Website'
 FileOrDir: 'Diretório / Arquivo'
 UploadFile: 'Enviando arquivo de backup {{ .file }} para {{ .backup }}'
-IgnoreBackupErr: 'Backup falhou, erro: {{ .detail }}, ignorando este erro...'
-IgnoreUploadErr: 'Upload falhou, erro: {{ .detail }}, ignorando este erro...'
+Upload: "Enviar"
+IgnoreBackupErr: "Backup falhou, erro: {{ .detail }}, ignorando este erro..."
+IgnoreUploadErr: "Upload falhou, erro: {{ .detail }}, ignorando este erro..."
+LoadBackupFailed: "Falha ao obter conexão da conta de backup, erro: {{ .detail }}"
 
 #caixa de ferramentas
 ErrNotExistUser: 'O usuário atual não existe, modifique e tente novamente!'
@@ -376,7 +378,6 @@ SnapCompressFile: 'Compactar arquivo de instantâneo'
 SnapCheckCompress: 'Verificar arquivo de compactação de instantâneo'
 SnapCompressSize: 'Tamanho do arquivo de instantâneo {{ .name }}'
 SnapUpload: 'Carregar arquivo de instantâneo'
-SnapLoadBackup: 'Obter informações da conta de backup'
 SnapUploadTo: 'Carregar arquivo de instantâneo para {{ .name }}'
 SnapUploadRes: 'Carregar arquivo de instantâneo para {{ .name }}'
 

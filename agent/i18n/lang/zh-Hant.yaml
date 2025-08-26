@@ -227,8 +227,10 @@ SystemLog: '系統日誌'
 CutWebsiteLog: '切割網站日誌'
 FileOrDir: '目錄 / 檔案'
 UploadFile: '上傳備份文件 {{ .file }} 到 {{ .backup }}'
-IgnoreBackupErr: '備份失敗，錯誤：{{ .detail }}，忽略本次錯誤...'
-IgnoreUploadErr: '上傳失敗，錯誤：{{ .detail }}，忽略本次錯誤...'
+Upload: "上傳"
+IgnoreBackupErr: "備份失敗，錯誤：{{ .detail }}，忽略本次錯誤..."
+IgnoreUploadErr: "上傳失敗，錯誤：{{ .detail }}，忽略本次錯誤..."
+LoadBackupFailed: "獲取備份帳號連接失敗，錯誤：{{ .detail }}"
 
 #toolbox
 ErrNotExistUser: '目前使用者不存在，請修改後重試！'
@@ -375,7 +377,6 @@ SnapCompressFile: '壓縮快照檔案'
 SnapCheckCompress: '檢查快照壓縮檔'
 SnapCompressSize: '快照檔案大小{{ .name }}'
 SnapUpload: '上傳快照檔案'
-SnapLoadBackup: '取得備份帳號資訊'
 SnapUploadTo: '上傳快照檔案到{{ .name }}'
 SnapUploadRes: '上傳快照檔案到{{ .name }}'
 

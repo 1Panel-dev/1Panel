@@ -93,10 +93,6 @@ func (u *SnapshotService) SnapshotReCreate(id uint) error {
 	if err != nil {
 		return err
 	}
-	taskModel, err := taskRepo.GetFirst(taskRepo.WithResourceID(snap.ID), repo.WithByType(task.TaskScopeSnapshot))
-	if err != nil {
-		return err
-	}
 
 	var req dto.SnapshotCreate
 	_ = copier.Copy(&req, snap)
@@ -109,7 +105,7 @@ func (u *SnapshotService) SnapshotReCreate(id uint) error {
 	if err := json.Unmarshal([]byte(snap.BackupData), &req.BackupData); err != nil {
 		return err
 	}
-	req.TaskID = taskModel.ID
+	req.TaskID = snap.TaskID
 	taskItem, err := task.ReNewTaskWithOps(req.Name, task.TaskCreate, task.TaskScopeSnapshot, req.TaskID, req.ID)
 	if err != nil {
 		global.LOG.Errorf("new task for create snapshot failed, err: %v", err)
@@ -117,7 +113,7 @@ func (u *SnapshotService) SnapshotReCreate(id uint) error {
 	}
 	_ = snapshotRepo.Update(req.ID, map[string]interface{}{"status": constant.StatusWaiting, "message": ""})
 	go func() {
-		_ = handleSnapshot(req, taskItem, 0, 3, 0)
+		_ = handleSnapshot(req, taskItem, 0, 3, req.Timeout)
 	}()
 
 	return nil
@@ -197,7 +193,7 @@ func handleSnapshot(req dto.SnapshotCreate, taskItem *task.Task, jobID, retry, t
 		taskItem.AddSubTaskWithAliasAndOps(
 			"SnapUpload",
 			func(t *task.Task) error {
-				return snapUpload(itemHelper, req.SourceAccountIDs, fmt.Sprintf("%s.tar.gz", rootDir))
+				return snapUpload(itemHelper, req.SourceAccountIDs, req.DownloadAccountID, retry, fmt.Sprintf("%s.tar.gz", rootDir))
 			}, nil, int(retry), time.Duration(timeout)*time.Second,
 		)
 		req.InterruptStep = ""
@@ -427,7 +423,7 @@ func loadBackupExcludes(snap snapHelper, req []dto.DataTree) []string {
 			if err := snap.snapAgentDB.Where("file_dir = ? AND file_name = ?", strings.TrimPrefix(path.Dir(item.Path), global.Dir.LocalBackupDir+"/"), path.Base(item.Path)).Delete(&model.BackupRecord{}).Error; err != nil {
 				snap.Task.LogWithStatus("delete backup file from database", err)
 			}
-			itemDir, _ := filepath.Rel(item.Path, global.Dir.LocalBackupDir)
+			itemDir, _ := filepath.Rel(global.Dir.LocalBackupDir, item.Path)
 			excludes = append(excludes, itemDir)
 		} else {
 			excludes = append(excludes, loadBackupExcludes(snap, item.Children)...)
@@ -440,7 +436,7 @@ func loadAppBackupExcludes(req []dto.DataTree) []string {
 	for _, item := range req {
 		if len(item.Children) == 0 {
 			if !item.IsCheck {
-				itemDir, _ := filepath.Rel(item.Path, global.Dir.LocalBackupDir)
+				itemDir, _ := filepath.Rel(global.Dir.LocalBackupDir, item.Path)
 				excludes = append(excludes, itemDir)
 			}
 		} else {
@@ -502,7 +498,7 @@ func loadPanelExcludes(req []dto.DataTree) []string {
 	for _, item := range req {
 		if len(item.Children) == 0 {
 			if !item.IsCheck {
-				itemDir, _ := filepath.Rel(item.Path, path.Join(global.Dir.BaseDir, "1panel"))
+				itemDir, _ := filepath.Rel(path.Join(global.Dir.BaseDir, "1panel"), item.Path)
 				excludes = append(excludes, itemDir)
 			}
 		} else {
@@ -536,26 +532,12 @@ func snapCompress(snap snapHelper, rootDir string, secret string) error {
 	return nil
 }
 
-func snapUpload(snap snapHelper, accounts string, file string) error {
+func snapUpload(snap snapHelper, accounts string, downloadID, retry uint, file string) error {
 	snap.Task.Log("---------------------- 8 / 8 ----------------------")
 	snap.Task.LogStart(i18n.GetMsgByKey("SnapUpload"))
 
-	source := path.Join(global.Dir.LocalBackupDir, "tmp/system", path.Base(file))
-	accountMap, err := NewBackupClientMap(strings.Split(accounts, ","))
-	snap.Task.LogWithStatus(i18n.GetMsgByKey("SnapLoadBackup"), err)
-	if err != nil {
-		return err
-	}
-
-	targetAccounts := strings.Split(accounts, ",")
-	for _, item := range targetAccounts {
-		snap.Task.LogStart(i18n.GetWithName("SnapUploadTo", fmt.Sprintf("[%s] %s", accountMap[item].name, path.Join("system_snapshot", path.Base(file)))))
-		_, err := accountMap[item].client.Upload(source, path.Join(accountMap[item].backupPath, "system_snapshot", path.Base(file)))
-		snap.Task.LogWithStatus(i18n.GetWithName("SnapUploadRes", accountMap[item].name), err)
-		if err != nil {
-			return err
-		}
-	}
-	_ = os.Remove(source)
-	return nil
+	src := path.Join(global.Dir.LocalBackupDir, "tmp/system", path.Base(file))
+	dst := path.Join("system_snapshot", path.Base(file))
+	accountMap := NewBackupClientMap(strings.Split(accounts, ","))
+	return uploadWithMap(snap.Task, accountMap, src, dst, accounts, downloadID, retry)
 }
