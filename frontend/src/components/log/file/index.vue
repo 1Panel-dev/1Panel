@@ -156,36 +156,34 @@ const visibleLogs = computed(() => {
     return logs.value.slice(startIndex.value, startIndex.value + visibleCount.value);
 });
 
-let scrollTimer: ReturnType<typeof setTimeout> | null = null;
-
-const onScroll = () => {
+const onScroll = async () => {
     if (!logContainer.value || isLoading.value) return;
 
     const scrollTop = logContainer.value.scrollTop;
+    const scrollHeight = logContainer.value.scrollHeight;
+    const clientHeight = logContainer.value.clientHeight;
+
+    lastScrollTop.value = scrollTop;
+
     const newStartIndex = Math.max(0, Math.floor(scrollTop / logHeight));
-
-    if (scrollTimer) {
-        clearTimeout(scrollTimer);
-    }
-
     startIndex.value = newStartIndex;
 
-    scrollTimer = setTimeout(() => {
-        if (scrollTop <= logHeight && minPage.value > 1) {
-            const currentScrollTop = scrollTop;
-            readReq.page = minPage.value - 1;
-            if (readReq.page >= 1) {
-                minPage.value = readReq.page;
-                lastScrollTop.value = currentScrollTop;
-                getContent(true);
-            }
+    if (scrollTop <= 50 && readReq.page > 1) {
+        if (minPage.value <= 1) {
+            return;
         }
+        readReq.page = minPage.value > 1 ? minPage.value - 1 : 1;
+        minPage.value = readReq.page;
+        await getContent(true);
+        return;
+    }
 
-        if (!tailLog.value && scrollTop + containerHeight.value >= totalHeight.value - logHeight && maxPage.value > 1) {
-            readReq.page = maxPage.value;
-            getContent(false);
+    if (scrollHeight - scrollTop - clientHeight <= 50 && !end.value) {
+        if (readReq.page < maxPage.value) {
+            readReq.page++;
+            await getContent(false);
         }
-    }, 50);
+    }
 };
 
 const changeLoading = () => {
@@ -222,13 +220,6 @@ const getContent = async (pre: boolean) => {
     if (isLoading.value) {
         return;
     }
-    readReq.id = props.config.id;
-    readReq.type = props.config.type;
-    readReq.name = props.config.name;
-    readReq.taskID = props.config.taskID;
-    readReq.taskType = props.config.taskType;
-    readReq.taskOperate = props.config.taskOperate;
-    readReq.resourceID = props.config.resourceID;
     if (readReq.page < 1) {
         readReq.page = 1;
     }
@@ -280,15 +271,12 @@ const getContent = async (pre: boolean) => {
         if (stopSignals.some((signal) => newLogs[newLogs.length - 1].endsWith(signal))) {
             onCloseLog();
         }
-        if (end.value) {
-            if ((logs.value.length = 0)) {
-                logs.value = newLogs;
-            } else {
-                logs.value = pre ? [...newLogs, ...lastLogs.value] : [...lastLogs.value, ...newLogs];
-            }
+
+        if (logs.value.length == 0) {
+            logs.value = newLogs;
         } else {
-            if ((logs.value.length = 0)) {
-                logs.value = newLogs;
+            if (end.value) {
+                logs.value = pre ? [...newLogs, ...lastLogs.value] : [...lastLogs.value, ...newLogs];
             } else {
                 logs.value = pre ? [...newLogs, ...logs.value] : [...logs.value, ...newLogs];
             }
@@ -297,9 +285,9 @@ const getContent = async (pre: boolean) => {
         nextTick(() => {
             if (logContainer.value) {
                 if (pre) {
-                    if (!end.value) {
+                    if (readReq.page > 1) {
                         const addedLines = newLogs.length;
-                        const newScrollPosition = lastScrollTop.value + addedLines * logHeight;
+                        const newScrollPosition = lastScrollTop.value + (addedLines * logHeight) / 3;
                         logContainer.value.scrollTop = newScrollPosition;
                         startIndex.value = Math.max(0, Math.floor(newScrollPosition / logHeight));
                     }
@@ -319,7 +307,11 @@ const getContent = async (pre: boolean) => {
         readReq.page = res.data.total;
         readReq.latest = false;
         maxPage.value = res.data.total;
-        minPage.value = res.data.total;
+        if (res.data.lines && res.data.lines.length > 500) {
+            minPage.value = res.data.total - 1;
+        } else {
+            minPage.value = res.data.total;
+        }
     }
     if (logs.value && logs.value.length > 3000) {
         if (pre) {
@@ -379,6 +371,13 @@ onMounted(async () => {
     logs.value = [];
     isTailDisabled.value = false;
     firstLoading.value = true;
+    readReq.id = props.config.id;
+    readReq.type = props.config.type;
+    readReq.name = props.config.name;
+    readReq.taskID = props.config.taskID;
+    readReq.taskType = props.config.taskType;
+    readReq.taskOperate = props.config.taskOperate;
+    readReq.resourceID = props.config.resourceID;
     await init();
     nextTick(() => {
         if (logContainer.value) {

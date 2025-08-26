@@ -28,10 +28,21 @@ const props = defineProps<{
 const rules = ref<TokenRule[]>([]);
 const nginxRules: TokenRule[] = [
     {
-        type: 'log-level',
-        pattern: /\[(error|warn|notice|info|debug)\]/gi,
+        type: 'log-level-warn',
+        pattern: /\b(warn|warning|NOTICE)\b/g,
+        color: '#F39C12',
+    },
+    {
+        type: 'log-level-info',
+        pattern: /\b(info|debug)\b/g,
+        color: '#3498DB',
+    },
+    {
+        type: 'log-level-error',
+        pattern: /\[(crit|error)\]/g,
         color: '#E74C3C',
     },
+
     {
         type: 'path',
         pattern: /(?<=[\s"])\/[^"\s]+(?:\.\w+)?(?:\?\w+=\w+)?/g,
