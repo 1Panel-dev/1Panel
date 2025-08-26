@@ -994,6 +994,9 @@ func (r *RuntimeService) UpdateFPMConfig(req request.FPMConfig) error {
 	if err := cfg.SaveTo(runtime.GetFPMPath()); err != nil {
 		return err
 	}
+	if _, err := compose.Restart(runtime.GetComposePath()); err != nil {
+		return err
+	}
 	return nil
 }
 

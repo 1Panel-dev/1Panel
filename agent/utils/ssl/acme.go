@@ -181,8 +181,7 @@ func getCaDirURL(accountType, customCaURL string) string {
 	var caDirURL string
 	switch accountType {
 	case "letsencrypt":
-		//caDirURL = "https://acme-v02.api.letsencrypt.org/directory"
-		caDirURL = "https://acme-staging-v02.api.letsencrypt.org/directory"
+		caDirURL = "https://acme-v02.api.letsencrypt.org/directory"
 	case "zerossl":
 		caDirURL = "https://acme.zerossl.com/v2/DV90"
 	case "buypass":
