@@ -2379,6 +2379,16 @@ const message = {
         disableLeech: 'Отключить анти-лич',
         ipv6: 'Прослушивать IPv6',
         leechReturnError: 'Пожалуйста, заполните HTTP код статуса',
+        blockedRef: 'Разрешить нестандартный Referer',
+        accessControl: 'Управление анти-личем',
+        leechcacheControl: 'Управление кэшем',
+        leechlogControl: 'Управление журналом',
+        logEnableControl: 'Логировать запросы статических ресурсов',
+        leechSpecialValidHelper:
+            'При включённой опции «Разрешить пустой referrer» запросы без Referer (прямой доступ и т. п.) не блокируются; включение «Разрешить нестандартный Referer» пропускает любой Referer, не начинающийся с http/https (клиентские запросы и т. п.).',
+        leechInvalidReturnHelper: 'HTTP‑код статуса, возвращаемый после блокировки хотлинкинга',
+        leechlogControlHelper:
+            'Записывает запросы к статическим ресурсам; в продакшене обычно отключают, чтобы избежать избыточных и шумных логов',
         selectAcme: 'Выберите Acme аккаунт',
         imported: 'Создан вручную',
         importType: 'Тип импорта',

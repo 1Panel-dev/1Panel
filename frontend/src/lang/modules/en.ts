@@ -2415,6 +2415,16 @@ const message = {
         disableLeech: 'Disable anti-leech',
         ipv6: 'Listen IPv6',
         leechReturnError: 'Please fill in the HTTP status code',
+        blockedRef: 'Allow non-standard Referer',
+        accessControl: 'Anti-leech control',
+        leechcacheControl: 'Cache control',
+        leechlogControl: 'Log control',
+        logEnableControl: 'Log static asset requests',
+        leechSpecialValidHelper:
+            "When 'Allow empty Referer' is enabled, requests without a Referer (direct access, etc.) are not blocked; enabling 'Allow non-standard Referer' allows any Referer that does not start with http/https (client requests, etc.).",
+        leechInvalidReturnHelper: 'HTTP status code returned after blocking hotlinking requests',
+        leechlogControlHelper:
+            'Logs static asset requests; usually disabled in production to avoid excessive, noisy logs',
         selectAcme: 'Select Acme account',
         imported: 'Created manually',
         importType: 'Import type',

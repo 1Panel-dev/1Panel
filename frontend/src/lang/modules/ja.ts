@@ -2328,6 +2328,16 @@ const message = {
         disableLeech: '反リーチを無効にします',
         ipv6: '緑',
         leechReturnError: 'HTTPステータスコードを入力してください',
+        blockedRef: '非標準のリファラーを許可',
+        accessControl: '反リーチ制御',
+        leechcacheControl: 'キャッシュ制御',
+        leechlogControl: 'ログ制御',
+        logEnableControl: '静的アセットのリクエストを記録',
+        leechSpecialValidHelper:
+            '「空のリファラーを許可」を有効にすると、リファラーのないリクエスト（直接アクセス等）はブロックされません。「非標準のリファラーを許可」を有効にすると、http/httpsで始まらないリファラー（クライアントからのリクエスト等）をすべて許可します。',
+        leechInvalidReturnHelper: 'ブロック後に返すHTTPステータスコード',
+        leechlogControlHelper:
+            '静的アセットのリクエストを記録します。運用環境では過剰で無意味なログを避けるため、通常は無効にします',
         selectAcme: 'ACMEアカウントを選択します',
         imported: '手動で作成されます',
         importType: 'インポートタイプ',

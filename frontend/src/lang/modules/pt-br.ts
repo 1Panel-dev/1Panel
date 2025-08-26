@@ -2381,6 +2381,16 @@ const message = {
         disableLeech: 'Desabilitar anti-leech',
         ipv6: 'Ouvir IPv6',
         leechReturnError: 'Por favor, preencha o código de status HTTP',
+        blockedRef: 'Permitir Referer não padrão',
+        accessControl: 'Controle anti-leech',
+        leechcacheControl: 'Controle de cache',
+        leechlogControl: 'Controle de log',
+        logEnableControl: 'Registrar solicitações de ativos estáticos',
+        leechSpecialValidHelper:
+            "Quando 'Permitir Referer vazio' estiver ativado, as solicitações sem Referer (acesso direto etc.) não serão bloqueadas; ao ativar 'Permitir Referer não padrão', qualquer Referer que não comece com http/https será permitido (solicitações de cliente etc.).",
+        leechInvalidReturnHelper: 'Código de status HTTP retornado após bloquear solicitações de hotlink',
+        leechlogControlHelper:
+            'Registra solicitações de ativos estáticos; geralmente desativado em produção para evitar logs excessivos e ruidosos',
         selectAcme: 'Selecionar conta Acme',
         imported: 'Criado manualmente',
         importType: 'Tipo de importação',

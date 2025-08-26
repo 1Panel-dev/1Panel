@@ -2443,6 +2443,16 @@ const message = {
         disableLeech: 'Sömürü karşıtını devre dışı bırak',
         ipv6: 'IPv6’yı dinle',
         leechReturnError: 'Lütfen HTTP durum kodunu doldurun',
+        blockedRef: 'Standart olmayan Referer’e izin ver',
+        accessControl: 'Sömürü karşıtı kontrol',
+        leechcacheControl: 'Önbellek kontrolü',
+        leechlogControl: 'Günlük kontrolü',
+        logEnableControl: 'Statik varlık isteklerini günlüğe al',
+        leechSpecialValidHelper:
+            "'Boş yönlendirme izni ver' etkinse yönlendiricisi olmayan istekler (doğrudan erişim vb.) engellenmez; 'Standart olmayan Referer’e izin ver' etkinse http/https ile başlamayan tüm Referer isteklerine (istemci istekleri vb.) izin verilir.",
+        leechInvalidReturnHelper: 'Hotlink isteklerini engelledikten sonra döndürülecek HTTP durum kodu',
+        leechlogControlHelper:
+            'Statik varlık isteklerini kaydeder; üretimde genellikle aşırı ve gereksiz günlüklerden kaçınmak için kapatılır',
         selectAcme: 'Acme hesabını seç',
         imported: 'Manuel olarak oluşturuldu',
         importType: 'İçe aktarma türü',

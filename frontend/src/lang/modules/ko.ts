@@ -2288,6 +2288,16 @@ const message = {
         disableLeech: '링크 차단 비활성화',
         ipv6: 'IPv6 수신 대기',
         leechReturnError: 'HTTP 상태 코드를 입력하세요',
+        blockedRef: '비표준 참조 허용',
+        accessControl: '링크 차단 제어',
+        leechcacheControl: '캐시 제어',
+        leechlogControl: '로그 제어',
+        logEnableControl: '정적 리소스 요청 로그 기록',
+        leechSpecialValidHelper:
+            "'빈 참조 허용'을 활성화하면 리퍼러가 없는 요청(직접 접근 등)은 차단되지 않습니다. '비표준 참조 허용'을 활성화하면 http/https로 시작하지 않는 모든 리퍼러 요청(클라이언트 요청 등)을 허용합니다.",
+        leechInvalidReturnHelper: '차단된 요청에 대해 반환할 HTTP 상태 코드',
+        leechlogControlHelper:
+            '정적 리소스 요청을 기록합니다. 운영 환경에서는 과도하고 불필요한 로그를 피하기 위해 보통 비활성화합니다',
         selectAcme: 'Acme 계정 선택',
         imported: '수동으로 생성됨',
         importType: '가져오기 유형',

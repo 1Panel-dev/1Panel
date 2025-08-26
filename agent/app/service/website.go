@@ -2230,7 +2230,7 @@ func (w WebsiteService) UpdateAntiLeech(req request.NginxAntiLeechUpdate) (err e
 			}
 		}
 	}
-	if req.Enable {
+	if req.Enable || req.Cache {
 		exts := strings.Split(req.Extends, ",")
 		newDirective := components.Directive{
 			Name:       "location",
@@ -2240,49 +2240,84 @@ func (w WebsiteService) UpdateAntiLeech(req request.NginxAntiLeechUpdate) (err e
 		newBlock := &components.Block{}
 		newBlock.Directives = make([]components.IDirective, 0)
 		if req.Cache {
-			newBlock.Directives = append(newBlock.Directives, &components.Directive{
+			newBlock.AppendDirectives(&components.Directive{
 				Name:       "expires",
 				Parameters: []string{strconv.Itoa(req.CacheTime) + req.CacheUint},
 			})
 		}
-		newBlock.Directives = append(newBlock.Directives, &components.Directive{
+		if !req.LogEnable {
+			newBlock.AppendDirectives(&components.Directive{
+				Name:       "access_log",
+				Parameters: []string{"off"},
+			})
+		}
+		newBlock.AppendDirectives(&components.Directive{
 			Name:       "log_not_found",
 			Parameters: []string{"off"},
 		})
-		validDir := &components.Directive{
-			Name:       "valid_referers",
-			Parameters: []string{},
-		}
-		if req.NoneRef {
-			validDir.Parameters = append(validDir.Parameters, "none")
-		}
-		if len(req.ServerNames) > 0 {
-			validDir.Parameters = append(validDir.Parameters, strings.Join(req.ServerNames, " "))
-		}
-		newBlock.Directives = append(newBlock.Directives, validDir)
+		if req.Enable {
+			validDir := &components.Directive{
+				Name:       "valid_referers",
+				Parameters: []string{},
+			}
+			if req.NoneRef {
+				validDir.Parameters = append(validDir.Parameters, "none")
+			}
+			if req.Blocked {
+				validDir.Parameters = append(validDir.Parameters, "blocked")
+			}
+			if len(req.ServerNames) > 0 {
+				validDir.Parameters = append(validDir.Parameters, strings.Join(req.ServerNames, " "))
+			}
+			newBlock.AppendDirectives(validDir)
 
-		ifDir := &components.Directive{
-			Name:       "if",
-			Parameters: []string{"($invalid_referer)"},
+			ifDir := &components.Directive{
+				Name:       "if",
+				Parameters: []string{"($invalid_referer)"},
+			}
+			if !req.LogEnable {
+				ifDir.Block = &components.Block{
+					Directives: []components.IDirective{
+						&components.Directive{
+							Name:       "access_log",
+							Parameters: []string{"off"},
+						},
+						&components.Directive{
+							Name:       "return",
+							Parameters: []string{req.Return},
+						},
+					},
+				}
+			} else {
+				ifDir.Block = &components.Block{
+					Directives: []components.IDirective{
+						&components.Directive{
+							Name:       "return",
+							Parameters: []string{req.Return},
+						},
+					},
+				}
+			}
+			newBlock.AppendDirectives(ifDir)
 		}
-		ifDir.Block = &components.Block{
-			Directives: []components.IDirective{
-				&components.Directive{
-					Name:       "return",
-					Parameters: []string{req.Return},
-				},
-				&components.Directive{
-					Name:       "access_log",
-					Parameters: []string{"off"},
-				},
-			},
-		}
-		newBlock.Directives = append(newBlock.Directives, ifDir)
 		if website.Type == constant.Deployment {
-			newBlock.Directives = append(newBlock.Directives, &components.Directive{
-				Name:       "proxy_pass",
-				Parameters: []string{fmt.Sprintf("http://%s", website.Proxy)},
-			})
+			newBlock.AppendDirectives(
+				&components.Directive{
+					Name:       "proxy_set_header",
+					Parameters: []string{"Host", "$host"},
+				},
+				&components.Directive{
+					Name:       "proxy_set_header",
+					Parameters: []string{"X-Real-IP", "$remote_addr"},
+				},
+				&components.Directive{
+					Name:       "proxy_set_header",
+					Parameters: []string{"X-Forwarded-For", "$proxy_add_x_forwarded_for"},
+				},
+				&components.Directive{
+					Name:       "proxy_pass",
+					Parameters: []string{fmt.Sprintf("http://%s", website.Proxy)},
+				})
 		}
 		newDirective.Block = newBlock
 		index := -1
@@ -2336,6 +2371,11 @@ func (w WebsiteService) GetAntiLeech(id uint) (*response.NginxAntiLeechRes, erro
 		}
 		lDirectives := location.GetBlock().GetDirectives()
 		for _, lDir := range lDirectives {
+			if lDir.GetName() == "access_log" {
+				if strings.Join(lDir.GetParameters(), "") == "off" {
+					res.LogEnable = false
+				}
+			}
 			if lDir.GetName() == "valid_referers" {
 				res.Enable = true
 				params := lDir.GetParameters()
@@ -2359,11 +2399,6 @@ func (w WebsiteService) GetAntiLeech(id uint) (*response.NginxAntiLeechRes, erro
 				for _, dir := range directives {
 					if dir.GetName() == "return" {
 						res.Return = strings.Join(dir.GetParameters(), " ")
-					}
-					if dir.GetName() == "access_log" {
-						if strings.Join(dir.GetParameters(), "") == "off" {
-							res.LogEnable = false
-						}
 					}
 				}
 			}

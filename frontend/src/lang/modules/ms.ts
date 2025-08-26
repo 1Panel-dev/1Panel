@@ -2383,6 +2383,16 @@ const message = {
         disableLeech: 'Matikan anti-leech',
         ipv6: 'Dengar IPv6',
         leechReturnError: 'Sila isikan kod status HTTP',
+        blockedRef: 'Benarkan referrer tidak standard',
+        accessControl: 'Kawalan anti-leech',
+        leechcacheControl: 'Kawalan cache',
+        leechlogControl: 'Kawalan log',
+        logEnableControl: 'Log permintaan aset statik',
+        leechSpecialValidHelper:
+            "Apabila 'Benarkan referrer kosong' didayakan, permintaan tanpa referrer (akses terus dan sebagainya) tidak akan disekat; mendayakan 'Benarkan referrer tidak standard' akan membenarkan mana-mana referrer yang tidak bermula dengan http/https (permintaan klien dan sebagainya).",
+        leechInvalidReturnHelper: 'Kod status HTTP yang dipulangkan selepas menyekat permintaan hotlink',
+        leechlogControlHelper:
+            'Merekod permintaan aset statik; biasanya dimatikan dalam produksi untuk mengelakkan log berlebihan yang tidak perlu',
         selectAcme: 'Pilih akaun Acme',
         imported: 'Dibuat secara manual',
         importType: 'Jenis import',
