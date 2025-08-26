@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"maps"
 	"os"
 	"os/exec"
 	"path"
@@ -522,9 +523,7 @@ func handleParams(create request.RuntimeCreate, projectDir string) (composeConte
 
 	newMap := make(map[string]string)
 	handleMap(create.Params, newMap)
-	for k, v := range newMap {
-		env[k] = v
-	}
+	maps.Copy(env, newMap)
 
 	envStr, err := gotenv.Marshal(env)
 	if err != nil {

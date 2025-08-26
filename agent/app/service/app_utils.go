@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"maps"
 	"math"
 	"net/http"
 	"os"
@@ -1044,11 +1045,11 @@ func copyData(task *task.Task, app model.App, appDetail model.AppDetail, appInst
 		return
 	}
 	envPath := path.Join(appDir, ".env")
-	envParams := make(map[string]string, len(req.Params))
+	var envParams map[string]string
 	if fileOp.Stat(envPath) {
 		envs, _ := gotenv.Read(envPath)
-		for k, v := range envs {
-			envParams[k] = v
+		if envParams = maps.Clone(envs); envParams == nil {
+			envParams = make(map[string]string)
 		}
 	}
 	handleMap(req.Params, envParams)
