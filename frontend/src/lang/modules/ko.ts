@@ -1356,6 +1356,7 @@ const message = {
         downloadStart: '다운로드 시작됨',
         moveSuccess: '이동 성공',
         copySuccess: '복사 성공',
+        pasteMsg: '대상 디렉토리의 오른쪽 상단에 있는 [붙여넣기] 버튼을 클릭하세요',
         move: '이동',
         calculate: '계산',
         canNotDeCompress: '이 파일은 압축 해제할 수 없습니다',

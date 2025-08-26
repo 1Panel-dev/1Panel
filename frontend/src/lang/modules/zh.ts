@@ -1353,6 +1353,7 @@ const message = {
         downloadStart: '下载开始!',
         moveSuccess: '移动成功',
         copySuccess: '复制成功',
+        pasteMsg: '请在目标目录点击右上角【粘贴】按钮',
         move: '移动',
         calculate: '计算',
         canNotDeCompress: '无法解压此文件',

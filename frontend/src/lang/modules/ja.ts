@@ -1370,6 +1370,7 @@ const message = {
         downloadStart: 'ダウンロードが始まりました',
         moveSuccess: '正常に移動しました',
         copySuccess: '正常にコピーされました',
+        pasteMsg: '対象ディレクトリの右上にある「貼り付け」ボタンをクリックしてください',
         move: '動く',
         calculate: '計算します',
         canNotDeCompress: 'このファイルを解凍できません',

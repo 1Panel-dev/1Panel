@@ -1397,6 +1397,7 @@ const message = {
         downloadStart: 'Download iniciado',
         moveSuccess: 'Movido com sucesso',
         copySuccess: 'Copiado com sucesso',
+        pasteMsg: 'Clique no botão "Colar" no canto superior direito do diretório de destino',
         move: 'Mover',
         calculate: 'Calcular',
         canNotDeCompress: 'Não é possível descompactar este arquivo',

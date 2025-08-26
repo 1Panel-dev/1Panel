@@ -1441,6 +1441,7 @@ const message = {
         downloadStart: 'İndirme başladı',
         moveSuccess: 'Başarıyla taşındı',
         copySuccess: 'Başarıyla kopyalandı',
+        pasteMsg: 'Hedef dizinin sağ üst köşesindeki "Yapıştır" düğmesine tıklayın',
         move: 'Taşı',
         calculate: 'Hesapla',
         canNotDeCompress: 'Bu dosyanın sıkıştırması açılamaz',

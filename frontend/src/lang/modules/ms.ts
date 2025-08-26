@@ -1411,6 +1411,7 @@ const message = {
         downloadStart: 'Muat turun bermula',
         moveSuccess: 'Berjaya dipindahkan',
         copySuccess: 'Berjaya disalin',
+        pasteMsg: 'Sila klik butang "Tampal" di bahagian kanan atas direktori sasaran',
         move: 'Pindah',
         calculate: 'Kira',
         canNotDeCompress: 'Tidak dapat nyahmampatkan fail ini',

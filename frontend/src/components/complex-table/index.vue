@@ -112,6 +112,8 @@ const rightClick = ref({
     currentRow: null,
 });
 const handleRightClick = (row, column, event) => {
+    tableRef.value.refElTable.clearSelection();
+    tableRef.value.refElTable.toggleRowSelection(row);
     if (!props.rightButtons) {
         return;
     }
@@ -126,6 +128,7 @@ const handleRightClick = (row, column, event) => {
 };
 const closeRightClick = () => {
     rightClick.value.visible = false;
+    tableRef.value.refElTable.clearSelection();
     document.removeEventListener('click', closeRightClick);
 };
 const disabled = computed(() => {
@@ -134,6 +137,7 @@ const disabled = computed(() => {
     };
 });
 function rightButtonClick(btn: any) {
+    closeRightClick();
     btn.click(rightClick.value.currentRow);
 }
 

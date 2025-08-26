@@ -1424,6 +1424,7 @@ const message = {
         downloadStart: 'Download started',
         moveSuccess: 'Successfully moved',
         copySuccess: 'Successfully copied',
+        pasteMsg: 'Please click the [Paste] button at the top right of the target directory',
         move: 'Move',
         calculate: 'Calculate',
         canNotDeCompress: 'Cannot decompress this file',
