@@ -225,6 +225,8 @@ export namespace Website {
         skipDNS: boolean;
         execShell: boolean;
         shell: string;
+        pushNode: boolean;
+        nodes: string;
     }
 
     export interface SSLDTO extends SSL {

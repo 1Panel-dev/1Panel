@@ -128,7 +128,11 @@
                     <el-table-column :label="$t('ssl.autoRenew')" width="100px">
                         <template #default="{ row }">
                             <el-switch
-                                :disabled="row.provider === 'dnsManual' || row.provider === 'manual'"
+                                :disabled="
+                                    row.provider === 'dnsManual' ||
+                                    row.provider === 'manual' ||
+                                    row.provider === 'fromMaster'
+                                "
                                 v-model="row.autoRenew"
                                 @change="updateConfig(row)"
                             />

@@ -150,7 +150,7 @@ func (w WebsiteSSLService) Create(create request.WebsiteSSLCreate) (request.Webs
 	}
 	if create.PushNode && global.IsMaster && len(create.Nodes) > 0 {
 		websiteSSL.PushNode = true
-		websiteSSL.Nodes = strings.Join(create.Nodes, ",")
+		websiteSSL.Nodes = create.Nodes
 	}
 
 	var domains []string
@@ -539,6 +539,13 @@ func (w WebsiteSSLService) Update(update request.WebsiteSSLUpdate) error {
 	} else {
 		updateParams["shell"] = ""
 	}
+	if update.PushNode {
+		updateParams["push_node"] = true
+		updateParams["nodes"] = update.Nodes
+	} else {
+		updateParams["push_node"] = false
+		updateParams["nodes"] = ""
+	}
 
 	if websiteSSL.Provider != constant.SelfSigned && websiteSSL.Provider != constant.Manual {
 		acmeAccount, err := websiteAcmeRepo.GetFirst(repo.WithByID(update.AcmeAccountID))
@@ -729,37 +736,19 @@ func (w WebsiteSSLService) SyncForRestart() error {
 
 func (w WebsiteSSLService) ImportMasterSSL(create model.WebsiteSSL) error {
 	websiteSSL, _ := websiteSSLRepo.GetFirst(websiteSSLRepo.WithByMasterSSLID(create.ID))
-	if websiteSSL == nil {
-		websiteSSL = &model.WebsiteSSL{
-			Status:        constant.SSLReady,
-			Provider:      constant.FromMaster,
-			PrimaryDomain: create.PrimaryDomain,
-			StartDate:     create.StartDate,
-			ExpireDate:    create.ExpireDate,
-			KeyType:       create.KeyType,
-			Description:   create.Description,
-			MasterSSLID:   create.ID,
-			PrivateKey:    create.PrivateKey,
-			Pem:           create.Pem,
-			Type:          create.Type,
-			Organization:  create.Organization,
-		}
-		if err := websiteSSLRepo.Create(context.TODO(), websiteSSL); err != nil {
-			return err
-		}
-	} else {
-		websiteSSL.PrimaryDomain = create.PrimaryDomain
-		websiteSSL.StartDate = create.StartDate
-		websiteSSL.ExpireDate = create.ExpireDate
-		websiteSSL.KeyType = create.KeyType
-		websiteSSL.Description = create.Description
-		websiteSSL.PrivateKey = create.PrivateKey
-		websiteSSL.Pem = create.Pem
-		websiteSSL.Type = create.Type
-		websiteSSL.Organization = create.Organization
-		if err := websiteSSLRepo.Save(websiteSSL); err != nil {
-			return err
-		}
+	websiteSSL.Status = constant.SSLReady
+	websiteSSL.Provider = constant.FromMaster
+	websiteSSL.PrimaryDomain = create.PrimaryDomain
+	websiteSSL.StartDate = create.StartDate
+	websiteSSL.ExpireDate = create.ExpireDate
+	websiteSSL.KeyType = create.KeyType
+	websiteSSL.Description = create.Description
+	websiteSSL.PrivateKey = create.PrivateKey
+	websiteSSL.Pem = create.Pem
+	websiteSSL.Type = create.Type
+	websiteSSL.Organization = create.Organization
+	if err := websiteSSLRepo.Save(websiteSSL); err != nil {
+		return err
 	}
 	websites, _ := websiteRepo.GetBy(websiteRepo.WithWebsiteSSLID(websiteSSL.ID))
 	if len(websites) == 0 {
