@@ -1433,6 +1433,7 @@ const message = {
         noShowHide: '不显示隐藏文件',
         cancelUpload: '取消上传',
         cancelUploadHelper: '是否取消上传，取消后将清空上传列表',
+        keepOneTab: '至少保留一个标签页',
     },
     ssh: {
         autoStart: '开机自启',
