@@ -1453,6 +1453,7 @@ const message = {
         noShowHide: '隠しファイルを表示しない',
         cancelUpload: 'アップロードをキャンセル',
         cancelUploadHelper: 'アップロードをキャンセルするかどうか、キャンセル後、アップロードリストはクリアされます。',
+        keepOneTab: '少なくとも1つのタブを保持してください',
     },
     ssh: {
         autoStart: 'オートスタート',
@@ -3538,7 +3539,7 @@ const message = {
             taskName: 'タスク名',
             cronJobType: 'タスクタイプ',
             clamPath: 'スキャンディレクトリ',
-            cronjob: 'Cronジョブ',
+            cronjob: 'スケジュールタスクの実行{0}で異常が発生しました',
             app: 'アプリバックアップ',
             web: 'ウェブサイトバックアップ',
             database: 'データベースバックアップ',

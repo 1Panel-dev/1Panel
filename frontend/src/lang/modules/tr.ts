@@ -1526,6 +1526,7 @@ const message = {
         noShowHide: 'Gizli dosyaları gösterme',
         cancelUpload: 'Yüklemeyi İptal Et',
         cancelUploadHelper: 'Yüklemeyi iptal etmek ister misiniz, iptal sonrası yükleme listesi temizlenecektir.',
+        keepOneTab: 'En az bir sekme açık kalmalıdır',
     },
     ssh: {
         autoStart: 'Otomatik başlat',
@@ -3693,7 +3694,7 @@ const message = {
             success: 'Uyarı Başarılı',
             pushing: 'Gönderiliyor...',
             error: 'Uyarı Başarısız',
-            cleanLog: 'Günlükleri Temizle',
+            cleanLog: 'Zamanlanmış görev yürütmesi {0} hatası',
             cleanAlertLogs: 'Uyarı Günlüklerini Temizle',
             daily: 'Günlük Uyarı Sayısı: {0}',
             cumulative: 'Toplam Uyarı Sayısı: {0}',

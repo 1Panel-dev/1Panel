@@ -1509,6 +1509,7 @@ const message = {
         noShowHide: 'Don’t show hidden files',
         cancelUpload: 'Cancel Upload',
         cancelUploadHelper: 'Whether to cancel the upload, after cancellation the upload list will be cleared.',
+        keepOneTab: 'Keep at least one tab',
     },
     ssh: {
         autoStart: 'Auto start',
@@ -3660,7 +3661,7 @@ const message = {
             taskName: 'Task Name',
             cronJobType: 'Task Type',
             clamPath: 'Scan Directory',
-            cronjob: 'Cronjob',
+            cronjob: 'Cronjob execution {0} failed',
             app: 'Backup App',
             web: 'Backup Website',
             database: 'Backup Database',

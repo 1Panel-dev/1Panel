@@ -1438,6 +1438,7 @@ const message = {
         noShowHide: '숨김 파일 숨기기',
         cancelUpload: '업로드 취소',
         cancelUploadHelper: '업로드를 취소할지 여부, 취소 후 업로드 목록이 비워집니다.',
+        keepOneTab: '최소한 하나의 탭을 유지하세요',
     },
     ssh: {
         autoStart: '자동 시작',
@@ -3476,7 +3477,7 @@ const message = {
             taskName: '작업 이름',
             cronJobType: '작업 유형',
             clamPath: '검사 디렉토리',
-            cronjob: '크론 작업',
+            cronjob: '예약 작업 실행 {0} 중 오류가 발생했습니다',
             app: '백업 애플리케이션',
             web: '백업 웹사이트',
             database: '백업 데이터베이스',

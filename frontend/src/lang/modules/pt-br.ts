@@ -1483,6 +1483,7 @@ const message = {
         noShowHide: 'Não mostrar arquivos ocultos',
         cancelUpload: 'Cancelar Upload',
         cancelUploadHelper: 'Deseja cancelar o upload, após o cancelamento, a lista de upload será limpa.',
+        keepOneTab: 'Mantenha pelo menos uma aba',
     },
     ssh: {
         autoStart: 'Início automático',
@@ -3632,7 +3633,7 @@ const message = {
             taskName: 'Nome da Tarefa',
             cronJobType: 'Tipo de Tarefa',
             clamPath: 'Diretório de Varredura',
-            cronjob: 'Tarefa Cron',
+            cronjob: 'Tarefa Cron agendada {0} falhou',
             app: 'Backup do Aplicativo',
             web: 'Backup do Site',
             database: 'Backup do Banco de Dados',

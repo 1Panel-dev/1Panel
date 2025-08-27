@@ -471,7 +471,8 @@
                                                 :autofocus="isEdit"
                                                 class="table-link table-input"
                                                 placeholder="file name"
-                                                @blur="handleRename(row)"
+                                                @keydown.enter="handleRename(row)"
+                                                @blur="onRenameBlur($event, row)"
                                             />
                                             <span v-else class="table-link" @click="open(row)" type="primary">
                                                 {{ row.name }}
@@ -584,7 +585,7 @@
                 </LayoutContent>
             </div>
         </el-tab-pane>
-        <el-tab-pane :closable="false">
+        <el-tab-pane :closable="false" v-if="editableTabs.length < 6">
             <template #label>
                 <el-icon @click="addTab()"><Plus /></el-icon>
             </template>
@@ -906,8 +907,8 @@ const updateButtons = async () => {
 
 const handlePath = () => {
     nextTick(function () {
-        let breadCrumbWidth = breadCrumbRef.value.offsetWidth;
-        let pathWidth = toolRef.value.offsetWidth;
+        let breadCrumbWidth = breadCrumbRef.value?.offsetWidth;
+        let pathWidth = toolRef.value?.offsetWidth;
         if (pathWidth - breadCrumbWidth < 50 && paths.value.length > 1) {
             const removed = paths.value.shift();
             if (removed) hidePaths.value.push(removed);
@@ -1281,6 +1282,20 @@ const openRename = (item: File.File) => {
     hideRightMenu();
 };
 
+const onRenameBlur = (e: FocusEvent, row: File.File) => {
+    const related = e.relatedTarget as HTMLElement | null;
+    if (
+        related &&
+        (related.closest('.fu-table-more-button') || related.closest('.fu-table-more-button .el-dropdown__item'))
+    ) {
+        setTimeout(() => {
+            getCurrentRename()?.focus();
+        }, 0);
+        return;
+    }
+    handleRename(row);
+};
+
 const handleRename = async (row: File.File): Promise<void> => {
     if (fileRename.newName === fileRename.oldName) {
         isEdit.value = false;
@@ -1584,7 +1599,7 @@ onMounted(() => {
         req.path = globalStore.lastFilePath;
         getPaths(req.path);
     }
-    pathWidth.value = getCurrentPath().offsetWidth;
+    pathWidth.value = getCurrentPath()?.offsetWidth;
     paths.value = [];
 
     const segments = editableTabsValue.value.split('/').filter(Boolean);
@@ -1670,6 +1685,9 @@ function updateTab(newPath?: string) {
 
 const addTab = () => {
     let tabIndex = editableTabs.value.length;
+    if (tabIndex >= 6) {
+        return;
+    }
     const newTabId = `${++tabIndex}`;
     editableTabs.value.push({
         id: newTabId,
@@ -1695,6 +1713,11 @@ const changeTab = (targetPath: TabPaneName) => {
 };
 
 const removeTab = (targetPath: TabPaneName) => {
+    let tabIndex = editableTabs.value.length;
+    if (tabIndex === 1) {
+        MsgWarning(i18n.global.t('file.keepOneTab'));
+        return;
+    }
     editableTabsKey.value = targetPath.toString();
     const tabs = editableTabs.value;
     let activeKey = editableTabsKey.value;

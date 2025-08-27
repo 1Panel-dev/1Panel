@@ -1438,6 +1438,7 @@ const message = {
         noShowHide: '不顯示隱藏檔案',
         cancelUpload: '取消上傳',
         cancelUploadHelper: '是否取消上傳，取消後將清空上傳列表',
+        keepOneTab: '至少保留一個標籤頁',
     },
     ssh: {
         autoStart: '開機自啟',
@@ -3405,7 +3406,7 @@ const message = {
             taskName: '任務名稱',
             cronJobType: '任務類型',
             clamPath: '掃描目錄',
-            cronjob: '計劃任務',
+            cronjob: '計劃任務執行{0}異常',
             app: '備份應用',
             web: '備份網站',
             database: '備份資料庫',

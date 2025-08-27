@@ -112,7 +112,7 @@ const rightClick = ref({
     currentRow: null,
 });
 const handleRightClick = (row, column, event) => {
-    tableRef.value.refElTable.clearSelection();
+    clearSelects();
     tableRef.value.refElTable.toggleRowSelection(row);
     if (!props.rightButtons) {
         return;
@@ -128,7 +128,7 @@ const handleRightClick = (row, column, event) => {
 };
 const closeRightClick = () => {
     rightClick.value.visible = false;
-    tableRef.value.refElTable.clearSelection();
+    clearSelects();
     document.removeEventListener('click', closeRightClick);
 };
 const disabled = computed(() => {

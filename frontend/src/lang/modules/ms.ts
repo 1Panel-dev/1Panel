@@ -1496,6 +1496,7 @@ const message = {
         cancelUpload: 'Batalkan Muat Naik',
         cancelUploadHelper:
             'Adakah hendak membatalkan muat naik, selepas pembatalan senarai muat naik akan dikosongkan.',
+        keepOneTab: 'Pastikan sekurang-kurangnya satu tab dikekalkan',
     },
     ssh: {
         autoStart: 'Mula automatik',
@@ -3624,7 +3625,7 @@ const message = {
             taskName: 'Nama Tugas',
             cronJobType: 'Jenis Tugas',
             clamPath: 'Direktori Imbasan',
-            cronjob: 'Cronjob',
+            cronjob: 'Pelaksanaan tugas berjadual {0} gagal',
             app: 'Sandaran Aplikasi',
             web: 'Sandaran Laman Web',
             database: 'Sandaran Pangkalan Data',
