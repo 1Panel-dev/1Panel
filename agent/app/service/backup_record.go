@@ -259,6 +259,9 @@ func (u *BackupRecordService) LoadRecordSize(req dto.SearchForSize) ([]dto.Recor
 	for i := 0; i < len(list); i++ {
 		datas = append(datas, dto.RecordFileSize{ID: list[i].ID})
 		if val, ok := clientMap[fmt.Sprintf("%v", list[i].DownloadID)]; ok {
+			if !val.isOk {
+				continue
+			}
 			wg.Add(1)
 			go func(index int) {
 				defer wg.Done()

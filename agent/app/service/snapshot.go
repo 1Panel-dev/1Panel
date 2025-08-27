@@ -31,7 +31,7 @@ type SnapshotService struct {
 type ISnapshotService interface {
 	SearchWithPage(req dto.PageSnapshot) (int64, interface{}, error)
 	LoadSnapshotData() (dto.SnapshotData, error)
-	SnapshotCreate(parentTask *task.Task, req dto.SnapshotCreate, jobID, retry, timeout uint) error
+	SnapshotCreate(parentTask *task.Task, req dto.SnapshotCreate, jobID, retry uint) error
 	SnapshotReCreate(id uint) error
 	SnapshotRecover(req dto.SnapshotRecover) error
 	SnapshotRollback(req dto.SnapshotRecover) error

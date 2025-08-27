@@ -27,7 +27,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func (u *SnapshotService) SnapshotCreate(parentTask *task.Task, req dto.SnapshotCreate, jobID, retry, timeout uint) error {
+func (u *SnapshotService) SnapshotCreate(parentTask *task.Task, req dto.SnapshotCreate, jobID, retry uint) error {
 	versionItem, _ := settingRepo.Get(settingRepo.WithByKey("SystemVersion"))
 
 	scope := "core"
@@ -85,7 +85,7 @@ func (u *SnapshotService) SnapshotCreate(parentTask *task.Task, req dto.Snapshot
 		return nil
 	}
 
-	return handleSnapshot(req, taskItem, jobID, retry, timeout)
+	return handleSnapshot(req, taskItem, jobID, retry, snap.Timeout)
 }
 
 func (u *SnapshotService) SnapshotReCreate(id uint) error {

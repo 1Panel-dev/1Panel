@@ -51,6 +51,7 @@ func (u *CronjobService) handleApp(cronjob model.Cronjob, startTime time.Time, t
 					return err
 				} else {
 					task.Log(i18n.GetMsgWithDetail("IgnoreBackupErr", err.Error()))
+					cleanAccountMap(accountMap)
 					return nil
 				}
 			}
@@ -63,6 +64,7 @@ func (u *CronjobService) handleApp(cronjob model.Cronjob, startTime time.Time, t
 					return err
 				}
 				task.Log(i18n.GetMsgWithDetail("IgnoreUploadErr", err.Error()))
+				cleanAccountMap(accountMap)
 				return nil
 			}
 			record.FileDir = path.Dir(dst)
@@ -71,6 +73,7 @@ func (u *CronjobService) handleApp(cronjob model.Cronjob, startTime time.Time, t
 				return err
 			}
 			u.removeExpiredBackup(cronjob, accountMap, record)
+			cleanAccountMap(accountMap)
 			return nil
 		}, nil, int(cronjob.RetryTimes), time.Duration(cronjob.Timeout)*time.Second)
 	}
@@ -105,6 +108,7 @@ func (u *CronjobService) handleWebsite(cronjob model.Cronjob, startTime time.Tim
 					return err
 				} else {
 					task.Log(i18n.GetMsgWithDetail("IgnoreBackupErr", err.Error()))
+					cleanAccountMap(accountMap)
 					return nil
 				}
 			}
@@ -117,6 +121,7 @@ func (u *CronjobService) handleWebsite(cronjob model.Cronjob, startTime time.Tim
 					return err
 				}
 				task.Log(i18n.GetMsgWithDetail("IgnoreUploadErr", err.Error()))
+				cleanAccountMap(accountMap)
 				return nil
 			}
 			record.FileDir = path.Dir(dst)
@@ -125,6 +130,7 @@ func (u *CronjobService) handleWebsite(cronjob model.Cronjob, startTime time.Tim
 				return err
 			}
 			u.removeExpiredBackup(cronjob, accountMap, record)
+			cleanAccountMap(accountMap)
 			return nil
 		}, nil, int(cronjob.RetryTimes), time.Duration(cronjob.Timeout)*time.Second)
 	}
@@ -161,6 +167,7 @@ func (u *CronjobService) handleDatabase(cronjob model.Cronjob, startTime time.Ti
 						return err
 					} else {
 						task.Log(i18n.GetMsgWithDetail("IgnoreBackupErr", err.Error()))
+						cleanAccountMap(accountMap)
 						return nil
 					}
 				}
@@ -171,6 +178,7 @@ func (u *CronjobService) handleDatabase(cronjob model.Cronjob, startTime time.Ti
 						return err
 					} else {
 						task.Log(i18n.GetMsgWithDetail("IgnoreBackupErr", err.Error()))
+						cleanAccountMap(accountMap)
 						return nil
 					}
 				}
@@ -184,6 +192,7 @@ func (u *CronjobService) handleDatabase(cronjob model.Cronjob, startTime time.Ti
 					return err
 				}
 				task.Log(i18n.GetMsgWithDetail("IgnoreUploadErr", err.Error()))
+				cleanAccountMap(accountMap)
 				return nil
 			}
 			record.FileDir = path.Dir(dst)
@@ -192,6 +201,7 @@ func (u *CronjobService) handleDatabase(cronjob model.Cronjob, startTime time.Ti
 				return err
 			}
 			u.removeExpiredBackup(cronjob, accountMap, record)
+			cleanAccountMap(accountMap)
 			return nil
 		}, nil, int(cronjob.RetryTimes), time.Duration(cronjob.Timeout)*time.Second)
 	}
@@ -306,9 +316,10 @@ func (u *CronjobService) handleSnapshot(cronjob model.Cronjob, jobRecord model.J
 		return err
 	}
 	req := dto.SnapshotCreate{
-		Name:   fmt.Sprintf("snapshot-1panel-%s-%s-linux-%s-%s", scope, versionItem.Value, loadOs(), jobRecord.StartTime.Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(5)),
-		Secret: cronjob.Secret,
-		TaskID: jobRecord.TaskID,
+		Name:    fmt.Sprintf("snapshot-1panel-%s-%s-linux-%s-%s", scope, versionItem.Value, loadOs(), jobRecord.StartTime.Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(5)),
+		Secret:  cronjob.Secret,
+		TaskID:  jobRecord.TaskID,
+		Timeout: cronjob.Timeout,
 
 		SourceAccountIDs:  record.SourceAccountIDs,
 		DownloadAccountID: cronjob.DownloadAccountID,
@@ -324,7 +335,7 @@ func (u *CronjobService) handleSnapshot(cronjob model.Cronjob, jobRecord model.J
 		IgnoreFiles:       strings.Split(cronjob.ExclusionRules, ","),
 	}
 
-	if err := NewISnapshotService().SnapshotCreate(taskItem, req, jobRecord.ID, cronjob.RetryTimes, cronjob.Timeout); err != nil {
+	if err := NewISnapshotService().SnapshotCreate(taskItem, req, jobRecord.ID, cronjob.RetryTimes); err != nil {
 		return err
 	}
 	record.FileName = req.Name + ".tar.gz"
@@ -578,4 +589,11 @@ func simplifiedFileName(name string) string {
 	name = strings.ReplaceAll(name, ">", "_")
 	name = strings.ReplaceAll(name, "|", "_")
 	return name
+}
+
+func cleanAccountMap(accountMap map[string]backupClientHelper) {
+	for key, val := range accountMap {
+		val.hasBackup = false
+		accountMap[key] = val
+	}
 }

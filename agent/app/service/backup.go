@@ -396,9 +396,9 @@ type backupClientHelper struct {
 	backupPath  string
 	client      cloud_storage.CloudStorageClient
 
-	isOk        bool
-	hasBackuped bool
-	message     string
+	isOk      bool
+	hasBackup bool
+	message   string
 }
 
 func NewBackupClientMap(ids []string) map[string]backupClientHelper {
@@ -438,7 +438,7 @@ func uploadWithMap(taskItem task.Task, accountMap map[string]backupClientHelper,
 		if !ok {
 			continue
 		}
-		if itemBackup.hasBackuped {
+		if itemBackup.hasBackup {
 			continue
 		}
 		if !itemBackup.isOk {
@@ -460,7 +460,7 @@ func uploadWithMap(taskItem task.Task, accountMap map[string]backupClientHelper,
 				break
 			}
 		}
-		itemBackup.hasBackuped = true
+		itemBackup.hasBackup = true
 		accountMap[account] = itemBackup
 	}
 	os.RemoveAll(src)

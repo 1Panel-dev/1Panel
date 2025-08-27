@@ -31,12 +31,12 @@ func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
 		global.LOG.Errorf("new task for exec shell failed, err: %v", err)
 		return
 	}
-	go func() {
-		err = u.loadTask(cronjob, &record, taskItem)
-		if cronjob.Type == "snapshot" {
-			if err != nil {
-				taskItem, _ := taskRepo.GetFirst(taskRepo.WithByID(record.TaskID))
-				if len(taskItem.ID) == 0 {
+	if cronjob.Type == "snapshot" {
+		go func() {
+			_ = cronjobRepo.UpdateRecords(record.ID, map[string]interface{}{"records": record.Records})
+			if err = u.handleSnapshot(*cronjob, record, taskItem); err != nil {
+				item, _ := taskRepo.GetFirst(taskRepo.WithByID(record.TaskID))
+				if len(item.ID) == 0 {
 					record.TaskID = ""
 				}
 				cronjobRepo.EndRecords(record, constant.StatusFailed, err.Error(), record.Records)
@@ -44,15 +44,20 @@ func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
 				return
 			}
 			cronjobRepo.EndRecords(record, constant.StatusSuccess, "", record.Records)
-			return
-		}
-		if err != nil {
-			global.LOG.Debugf("preper to handle cron job [%s] %s failed, err: %v", cronjob.Type, cronjob.Name, err)
+		}()
+		return
+	}
+	if err = u.loadTask(cronjob, &record, taskItem); err != nil {
+		global.LOG.Debugf("preper to handle cron job [%s] %s failed, err: %v", cronjob.Type, cronjob.Name, err)
+		item, _ := taskRepo.GetFirst(taskRepo.WithByID(record.TaskID))
+		if len(item.ID) == 0 {
 			record.TaskID = ""
-			cronjobRepo.EndRecords(record, constant.StatusFailed, err.Error(), record.Records)
-			handleCronJobAlert(cronjob)
-			return
 		}
+		cronjobRepo.EndRecords(record, constant.StatusFailed, err.Error(), record.Records)
+		handleCronJobAlert(cronjob)
+		return
+	}
+	go func() {
 		if err := taskItem.Execute(); err != nil {
 			taskItem, _ := taskRepo.GetFirst(taskRepo.WithByID(record.TaskID))
 			if len(taskItem.ID) == 0 {
@@ -110,9 +115,6 @@ func (u *CronjobService) loadTask(cronjob *model.Cronjob, record *model.JobRecor
 		err = u.handleDirectory(*cronjob, record.StartTime, taskItem)
 	case "log":
 		err = u.handleSystemLog(*cronjob, record.StartTime, taskItem)
-	case "snapshot":
-		_ = cronjobRepo.UpdateRecords(record.ID, map[string]interface{}{"records": record.Records})
-		err = u.handleSnapshot(*cronjob, *record, taskItem)
 	}
 	return err
 }
