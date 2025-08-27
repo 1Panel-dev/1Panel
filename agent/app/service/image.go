@@ -102,6 +102,13 @@ func (u *ImageService) Page(req dto.PageImage) (int64, interface{}, error) {
 			}
 			return records[i].Size > records[j].Size
 		})
+	case "isUsed":
+		sort.Slice(records, func(i, j int) bool {
+			if req.Order == constant.OrderAsc {
+				return !records[i].IsUsed
+			}
+			return records[i].IsUsed
+		})
 	case "tags":
 		sort.Slice(records, func(i, j int) bool {
 			if len(records[i].Tags) == 0 || len(records[j].Tags) == 0 {
