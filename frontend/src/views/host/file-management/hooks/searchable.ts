@@ -53,3 +53,42 @@ export function useSearchableForSelect(paths) {
         searchableInputBlur,
     };
 }
+
+export function useMultipleSearchable(paths) {
+    const searchableStatus = ref(false);
+    const searchablePath = ref('');
+    const searchableInputRefs = ref<Record<string, HTMLInputElement | null>>({});
+
+    const setSearchableInputRef = (id: string, el: HTMLInputElement | null) => {
+        if (el) {
+            searchableInputRefs.value[id] = el;
+        } else {
+            delete searchableInputRefs.value[id];
+        }
+    };
+
+    watch(searchableStatus, (val) => {
+        if (val) {
+            searchablePath.value = paths.value.at(-1)?.url || '';
+            nextTick(() => {
+                const keys = Object.keys(searchableInputRefs.value);
+                if (keys.length > 0) {
+                    const lastKey = keys[keys.length - 1];
+                    searchableInputRefs.value[lastKey]?.focus();
+                }
+            });
+        }
+    });
+
+    const searchableInputBlur = () => {
+        searchableStatus.value = false;
+    };
+
+    return {
+        searchableStatus,
+        searchablePath,
+        searchableInputRefs,
+        setSearchableInputRef,
+        searchableInputBlur,
+    };
+}

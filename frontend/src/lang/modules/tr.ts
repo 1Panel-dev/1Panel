@@ -1527,6 +1527,7 @@ const message = {
         cancelUpload: 'Yüklemeyi İptal Et',
         cancelUploadHelper: 'Yüklemeyi iptal etmek ister misiniz, iptal sonrası yükleme listesi temizlenecektir.',
         keepOneTab: 'En az bir sekme açık kalmalıdır',
+        notCanTab: 'Daha fazla sekme eklenemez',
     },
     ssh: {
         autoStart: 'Otomatik başlat',

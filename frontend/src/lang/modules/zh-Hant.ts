@@ -1439,6 +1439,7 @@ const message = {
         cancelUpload: '取消上傳',
         cancelUploadHelper: '是否取消上傳，取消後將清空上傳列表',
         keepOneTab: '至少保留一個標籤頁',
+        notCanTab: '無法新增更多標籤頁',
     },
     ssh: {
         autoStart: '開機自啟',

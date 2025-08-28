@@ -1510,6 +1510,7 @@ const message = {
         cancelUpload: 'Cancel Upload',
         cancelUploadHelper: 'Whether to cancel the upload, after cancellation the upload list will be cleared.',
         keepOneTab: 'Keep at least one tab',
+        notCanTab: 'Cannot add more tabs',
     },
     ssh: {
         autoStart: 'Auto start',

@@ -1497,6 +1497,7 @@ const message = {
         cancelUploadHelper:
             'Adakah hendak membatalkan muat naik, selepas pembatalan senarai muat naik akan dikosongkan.',
         keepOneTab: 'Pastikan sekurang-kurangnya satu tab dikekalkan',
+        notCanTab: 'Tidak dapat menambah tab lagi',
     },
     ssh: {
         autoStart: 'Mula automatik',

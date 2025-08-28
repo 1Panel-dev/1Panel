@@ -1484,6 +1484,7 @@ const message = {
         cancelUpload: 'Cancelar Upload',
         cancelUploadHelper: 'Deseja cancelar o upload, após o cancelamento, a lista de upload será limpa.',
         keepOneTab: 'Mantenha pelo menos uma aba',
+        notCanTab: 'Não é possível adicionar mais abas',
     },
     ssh: {
         autoStart: 'Início automático',

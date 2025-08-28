@@ -257,6 +257,10 @@ html {
     }
 }
 
+.el-tabs--card > .el-tabs__header .el-tabs__item.is-active {
+    border-bottom-color: var(--panel-color-primary) !important;
+}
+
 .logo {
     color: var(--el-color-primary);
 }

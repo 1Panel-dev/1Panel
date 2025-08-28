@@ -1434,6 +1434,7 @@ const message = {
         cancelUpload: '取消上传',
         cancelUploadHelper: '是否取消上传，取消后将清空上传列表',
         keepOneTab: '至少保留一个标签页',
+        notCanTab: '不可增加更多的标签页',
     },
     ssh: {
         autoStart: '开机自启',

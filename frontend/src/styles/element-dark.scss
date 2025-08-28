@@ -155,6 +155,7 @@ html.dark {
 
     .el-tabs--card > .el-tabs__header .el-tabs__nav {
         border: 1px solid var(--panel-main-bg-color-8);
+        border-bottom: none;
     }
 
     .el-tabs--card > .el-tabs__header .el-tabs__item.is-active {

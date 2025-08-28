@@ -1454,6 +1454,7 @@ const message = {
         cancelUpload: 'アップロードをキャンセル',
         cancelUploadHelper: 'アップロードをキャンセルするかどうか、キャンセル後、アップロードリストはクリアされます。',
         keepOneTab: '少なくとも1つのタブを保持してください',
+        notCanTab: 'これ以上タブを追加できません',
     },
     ssh: {
         autoStart: 'オートスタート',

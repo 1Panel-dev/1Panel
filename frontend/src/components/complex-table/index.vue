@@ -219,30 +219,30 @@ defineExpose({
     closeRightClick,
 });
 
-onMounted(() => {
-    let heightDiff = 320;
-    let tabHeight = 0;
-    if (props.heightDiff) {
-        heightDiff = props.heightDiff;
-    }
-    if (globalStore.openMenuTabs) {
-        tabHeight = 48;
-    }
+function calcHeight() {
+    let heightDiff = props.heightDiff ?? 320;
+    let tabHeight = globalStore.openMenuTabs ? 48 : 0;
+
     if (props.height) {
         tableHeight.value = props.height - tabHeight;
     } else {
         tableHeight.value = window.innerHeight - heightDiff - tabHeight;
     }
+}
 
-    window.onresize = () => {
-        return (() => {
-            if (props.height) {
-                tableHeight.value = props.height - tabHeight;
-            } else {
-                tableHeight.value = window.innerHeight - heightDiff - tabHeight;
-            }
-        })();
-    };
+onMounted(() => {
+    calcHeight();
+    window.addEventListener('resize', calcHeight);
+    watch(
+        () => props.height,
+        () => {
+            calcHeight();
+        },
+    );
+});
+
+onBeforeUnmount(() => {
+    window.removeEventListener('resize', calcHeight);
 });
 </script>
 

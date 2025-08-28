@@ -1439,6 +1439,7 @@ const message = {
         cancelUpload: '업로드 취소',
         cancelUploadHelper: '업로드를 취소할지 여부, 취소 후 업로드 목록이 비워집니다.',
         keepOneTab: '최소한 하나의 탭을 유지하세요',
+        notCanTab: '더 이상 탭을 추가할 수 없습니다',
     },
     ssh: {
         autoStart: '자동 시작',
