@@ -17,6 +17,7 @@ type IRuntimeRepo interface {
 	WithNotId(id uint) DBOption
 	WithStatus(status string) DBOption
 	WithDetailId(id uint) DBOption
+	WithDetailIdsIn(ids []uint) DBOption
 	WithPort(port int) DBOption
 	WithNormalStatus(status string) DBOption
 	Page(page, size int, opts ...DBOption) (int64, []model.Runtime, error)
@@ -52,6 +53,12 @@ func (r *RuntimeRepo) WithImage(image string) DBOption {
 func (r *RuntimeRepo) WithDetailId(id uint) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("app_detail_id = ?", id)
+	}
+}
+
+func (r *RuntimeRepo) WithDetailIdsIn(ids []uint) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("app_detail_id in(?) ", ids)
 	}
 }
 

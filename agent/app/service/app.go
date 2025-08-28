@@ -132,8 +132,21 @@ func (a AppService) PageApp(ctx *gin.Context, req request.AppSearch) (interface{
 			continue
 		}
 		appDTO.Tags = tags
-		installs, _ := appInstallRepo.ListBy(context.Background(), appInstallRepo.WithAppId(ap.ID))
-		appDTO.Installed = len(installs) > 0
+		if ap.Type == constant.RuntimePHP || ap.Type == constant.RuntimeGo || ap.Type == constant.RuntimeNode || ap.Type == constant.RuntimePython || ap.Type == constant.RuntimeJava || ap.Type == constant.RuntimeDotNet {
+			details, _ := appDetailRepo.GetBy(appDetailRepo.WithAppId(ap.ID))
+			var ids []uint
+			if len(details) == 0 {
+				continue
+			}
+			for _, d := range details {
+				ids = append(ids, d.ID)
+			}
+			runtimes, _ := runtimeRepo.List(runtimeRepo.WithDetailIdsIn(ids))
+			appDTO.Installed = len(runtimes) > 0
+		} else {
+			installs, _ := appInstallRepo.ListBy(context.Background(), appInstallRepo.WithAppId(ap.ID))
+			appDTO.Installed = len(installs) > 0
+		}
 	}
 	res.Items = appDTOs
 	res.Total = total
