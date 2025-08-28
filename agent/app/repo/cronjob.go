@@ -29,9 +29,10 @@ type ICronjobRepo interface {
 	Update(id uint, vars map[string]interface{}) error
 	Delete(opts ...DBOption) error
 	DeleteRecord(opts ...DBOption) error
-	StartRecords(cronjobID uint, targetPath, cronjobType string) model.JobRecords
+	StartRecords(cronjobID uint) model.JobRecords
 	UpdateRecords(id uint, vars map[string]interface{}) error
 	EndRecords(record model.JobRecords, status, message, records string)
+	AddFailedRecord(cronjobID uint)
 	PageRecords(page, size int, opts ...DBOption) (int64, []model.JobRecords, error)
 }
 
@@ -143,7 +144,7 @@ func (c *CronjobRepo) WithByRecordDropID(id int) DBOption {
 	}
 }
 
-func (u *CronjobRepo) StartRecords(cronjobID uint, targetPath, cronjobType string) model.JobRecords {
+func (u *CronjobRepo) StartRecords(cronjobID uint) model.JobRecords {
 	var record model.JobRecords
 	record.StartTime = time.Now()
 	record.CronjobID = cronjobID
@@ -152,6 +153,7 @@ func (u *CronjobRepo) StartRecords(cronjobID uint, targetPath, cronjobType strin
 	if err := global.DB.Create(&record).Error; err != nil {
 		global.LOG.Errorf("create record status failed, err: %v", err)
 	}
+	_ = u.Update(cronjobID, map[string]interface{}{"is_executing": true})
 	return record
 }
 func (u *CronjobRepo) EndRecords(record model.JobRecords, status, message, records string) {
@@ -164,6 +166,17 @@ func (u *CronjobRepo) EndRecords(record model.JobRecords, status, message, recor
 	errMap["interval"] = time.Since(record.StartTime).Milliseconds()
 	if err := global.DB.Model(&model.JobRecords{}).Where("id = ?", record.ID).Updates(errMap).Error; err != nil {
 		global.LOG.Errorf("update record status failed, err: %v", err)
+	}
+	_ = u.Update(record.CronjobID, map[string]interface{}{"is_executing": false})
+}
+func (u *CronjobRepo) AddFailedRecord(cronjobID uint) {
+	var record model.JobRecords
+	record.StartTime = time.Now()
+	record.CronjobID = cronjobID
+	record.Status = constant.StatusFailed
+	record.Message = "The current cronjob is being executed"
+	if err := global.DB.Create(&record).Error; err != nil {
+		global.LOG.Errorf("create record status failed, err: %v", err)
 	}
 }
 

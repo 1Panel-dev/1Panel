@@ -1,16 +1,16 @@
 package hook
 
 import (
-	"github.com/1Panel-dev/1Panel/agent/app/service"
-	"github.com/1Panel-dev/1Panel/agent/utils/alert_push"
 	"os"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
+	"github.com/1Panel-dev/1Panel/agent/app/service"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/utils/alert_push"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 )
@@ -68,6 +68,7 @@ func handleSnapStatus() {
 
 func handleCronjobStatus() {
 	var jobRecords []model.JobRecords
+	_ = global.DB.Model(&model.Cronjob{}).Where("is_executing = ?", true).Updates(map[string]interface{}{"is_executing": false}).Error
 	_ = global.DB.Where("status = ?", constant.StatusWaiting).Find(&jobRecords).Error
 	for _, record := range jobRecords {
 		err := global.DB.Model(&model.JobRecords{}).Where("status = ?", constant.StatusWaiting).

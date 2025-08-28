@@ -4,8 +4,6 @@ import (
 	"time"
 )
 
-// BackupAccounts ---> SourceAccountIDs
-// BackupAccounts ---> DownloadAccountID
 type Cronjob struct {
 	BaseModel
 
@@ -40,10 +38,11 @@ type Cronjob struct {
 	IgnoreErr         bool   `json:"ignoreErr"`
 	RetainCopies      uint64 `json:"retainCopies"`
 
-	Status   string       `json:"status"`
-	EntryIDs string       `json:"entryIDs"`
-	Records  []JobRecords `json:"records"`
-	Secret   string       `json:"secret"`
+	IsExecuting bool         `json:"isExecuting"`
+	Status      string       `json:"status"`
+	EntryIDs    string       `json:"entryIDs"`
+	Records     []JobRecords `json:"records"`
+	Secret      string       `json:"secret"`
 }
 
 type JobRecords struct {

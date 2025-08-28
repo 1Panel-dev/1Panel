@@ -25,7 +25,12 @@ import (
 )
 
 func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
-	record := cronjobRepo.StartRecords(cronjob.ID, "", cronjob.Type)
+	cronjobItem, _ := cronjobRepo.Get(repo.WithByID(cronjob.ID))
+	if cronjobItem.IsExecuting {
+		cronjobRepo.AddFailedRecord(cronjob.ID)
+		return
+	}
+	record := cronjobRepo.StartRecords(cronjob.ID)
 	taskItem, err := task.NewTaskWithOps(fmt.Sprintf("cronjob-%s", cronjob.Name), task.TaskHandle, task.TaskScopeCronjob, record.TaskID, cronjob.ID)
 	if err != nil {
 		global.LOG.Errorf("new task for exec shell failed, err: %v", err)
