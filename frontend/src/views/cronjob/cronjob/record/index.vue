@@ -83,6 +83,7 @@
                     <el-option :label="$t('commons.status.waiting')" value="Waiting" />
                     <el-option :label="$t('commons.status.failed')" value="Failed" />
                 </el-select>
+                <TableRefresh @search="search(false)" />
             </template>
             <template #main>
                 <div class="mainClass">

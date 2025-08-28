@@ -20,7 +20,7 @@ import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { updateSetting } from '@/api/modules/setting';
 import { ElMessageBox, FormInstance } from 'element-plus';
-import { checkCidr, checkIpV4V6 } from '@/utils/util';
+import { checkCidr, checkCidrV6, checkIpV4V6 } from '@/utils/util';
 
 const emit = defineEmits<{ (e: 'search'): void }>();
 
@@ -28,26 +28,28 @@ const form = reactive({
     allowIPs: '',
 });
 const rules = reactive({
-    allowIPs: [{ validator: checkAddress, trigger: 'blur' }],
+    allowIPs: [{ validator: checkIPs, trigger: 'blur' }],
 });
-function checkAddress(rule: any, value: any, callback: any) {
-    if (form.allowIPs !== '') {
-        let addrs = form.allowIPs.split('\n');
-        for (const item of addrs) {
+function checkIPs(rule: any, value: any, callback: any) {
+    if (typeof value === 'string' && value.trim() !== '') {
+        let addr = value.split('\n');
+        for (const item of addr) {
             if (item === '') {
                 continue;
             }
-            if (item === '0.0.0.0') {
+            if (item === '0.0.0.0' || item === '::') {
                 return callback(new Error(i18n.global.t('firewall.addressFormatError')));
             }
             if (item.indexOf('/') !== -1) {
-                if (checkCidr(item)) {
+                if (item.indexOf(':') !== -1) {
+                    if (checkCidrV6(item)) {
+                        return callback(new Error(i18n.global.t('firewall.addressFormatError')));
+                    }
+                } else if (checkCidr(item)) {
                     return callback(new Error(i18n.global.t('firewall.addressFormatError')));
                 }
-            } else {
-                if (checkIpV4V6(item)) {
-                    return callback(new Error(i18n.global.t('firewall.addressFormatError')));
-                }
+            } else if (checkIpV4V6(item)) {
+                return callback(new Error(i18n.global.t('firewall.addressFormatError')));
             }
         }
     }
