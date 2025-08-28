@@ -63,6 +63,7 @@
                 <ComplexTable
                     :pagination-config="paginationConfig"
                     :data="data"
+                    :height-diff="380"
                     @sort-change="changeSort"
                     @search="search()"
                 >

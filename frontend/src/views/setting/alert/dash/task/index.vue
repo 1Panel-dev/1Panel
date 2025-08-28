@@ -272,8 +272,10 @@
                         v-if="ipTypes.includes(dialogData.rowData!.type)"
                         prop="count"
                     >
-                        <div class="flex items-center flex-row md:flex-nowrap flex-wrap justify-between gap-x-3 w-full">
-                            <el-form-item prop="cycle">
+                        <div
+                            class="flex items-center flex-row md:flex-nowrap sm:flex-nowrap flex-wrap justify-between gap-2 w-full"
+                        >
+                            <el-form-item prop="cycle" class="md:flex-1 sm:flex-1">
                                 <el-input v-model.number="dialogData.rowData!.cycle" :max="200">
                                     <template #append>{{ $t('commons.units.minute') }}</template>
                                 </el-input>
@@ -282,7 +284,7 @@
                             <span class="whitespace-nowrap input-help w-[4.5rem]">
                                 {{ $t('xpack.alert.loginFail') }}
                             </span>
-                            <el-form-item prop="count">
+                            <el-form-item prop="count" class="md:flex-1 sm:flex-1">
                                 <el-input v-model.number="dialogData.rowData!.count">
                                     <template #append>{{ $t('commons.units.time') }}</template>
                                 </el-input>
@@ -498,7 +500,11 @@ function checkSendCount(rule: any, value: any, callback: any) {
     if (value === '') {
         callback();
     }
-    if (dialogData.value.rowData.type === 'disk' || avgTypes.includes(dialogData.value.rowData.type)) {
+    if (
+        dialogData.value.rowData.type === 'disk' ||
+        avgTypes.includes(dialogData.value.rowData.type) ||
+        ipTypes.includes(dialogData.value.rowData.type)
+    ) {
         const regex = /^(?:[1-9]|[1-4][0-9]|50)$/;
         if (!regex.test(value)) {
             return callback(new Error(i18n.global.t('commons.rule.numberRange', [1, 50])));
