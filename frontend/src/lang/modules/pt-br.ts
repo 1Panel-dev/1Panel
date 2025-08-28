@@ -1675,6 +1675,8 @@ const message = {
         code: 'Código de autorização',
         codeHelper:
             'Clique no botão "Adquirir", faça login no OneDrive e copie o conteúdo após "code" no link redirecionado. Cole-o neste campo. Para instruções específicas, consulte a documentação oficial.',
+        googleHelper:
+            'Por favor, primeiro crie um aplicativo Google e obtenha as informações do cliente, preencha o formulário e clique no botão obter. Para operações específicas, consulte a documentação oficial.',
         loadCode: 'Obter',
         COS: 'Tencent COS',
         ap_beijing_1: 'Beijing Zona 1',

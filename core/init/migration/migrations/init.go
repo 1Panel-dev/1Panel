@@ -255,19 +255,6 @@ var InitOneDrive = &gormigrate.Migration{
 	},
 }
 
-var InitGoogle = &gormigrate.Migration{
-	ID: "20241111-init-google",
-	Migrate: func(tx *gorm.DB) error {
-		if err := tx.Create(&model.Setting{Key: "GoogleID", Value: "NTU2NTQ3NDYwMTQtY2Q0bGR0dDk2aGNsNWcxYWtwdmJhZTFmcjJlZ2Y0MXAuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20K"}).Error; err != nil {
-			return err
-		}
-		if err := tx.Create(&model.Setting{Key: "GoogleSc", Value: "R09DU1BYLXRibXg0QVdVZ3d3Ykc2QW1XTHQ3YUdaZElVeE4K"}).Error; err != nil {
-			return err
-		}
-		return nil
-	},
-}
-
 var AddTaskDB = &gormigrate.Migration{
 	ID: "20241125-add-task-table",
 	Migrate: func(tx *gorm.DB) error {
@@ -453,23 +440,6 @@ var UpdateXpackHideMenu = &gormigrate.Migration{
 		}
 
 		return tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Update("value", string(updatedJSON)).Error
-	},
-}
-
-var UpdateGoogle = &gormigrate.Migration{
-	ID: "20250616-update-google",
-	Migrate: func(tx *gorm.DB) error {
-		if err := tx.Model(&model.Setting{}).
-			Where("key = ?", "GoogleID").
-			Update("value", "NTU2NTQ3NDYwMTQtY2Q0bGR0dDk2aGNsNWcxYWtwdmJhZTFmcjJlZ2Y0MXAuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20=").Error; err != nil {
-			return err
-		}
-		if err := tx.Model(&model.Setting{}).
-			Where("key = ?", "GoogleSc").
-			Update("value", "R09DU1BYLXRibXg0QVdVZ3d3Ykc2QW1XTHQ3YUdaZElVeE4=").Error; err != nil {
-			return err
-		}
-		return nil
 	},
 }
 

@@ -140,7 +140,7 @@
                         <template #default="{ row }">
                             <el-button v-if="row.lastRecordStatus === 'Success'" icon="Select" link type="success" />
                             <el-button v-if="row.lastRecordStatus === 'Failed'" icon="CloseBold" link type="danger" />
-                            <el-button v-if="row.lastRecordStatus === 'Waiting'" icon="SemiSelect" link type="info" />
+                            <el-button v-if="row.lastRecordStatus === 'Waiting'" :loading="true" link type="info" />
                             {{ row.lastRecordTime }}
                         </template>
                     </el-table-column>

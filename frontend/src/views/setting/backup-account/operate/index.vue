@@ -40,6 +40,17 @@
                     <el-option :label="$t('setting.UPYUN')" value="UPYUN"></el-option>
                 </el-select>
                 <span v-if="isALIYUNYUN()" class="input-help">{{ $t('setting.ALIYUNHelper') }}</span>
+                <span v-if="dialogData.rowData?.type === 'GoogleDrive'" class="input-help">
+                    {{ $t('setting.googleHelper', [$t('setting.' + dialogData.rowData?.type)]) }}
+                    <el-link
+                        style="font-size: 12px; margin-left: 5px"
+                        icon="Position"
+                        @click="toDoc('google-drive')"
+                        type="primary"
+                    >
+                        {{ $t('firewall.quickJump') }}
+                    </el-link>
+                </span>
             </el-form-item>
             <el-form-item
                 v-if="dialogData.rowData!.type === 'S3'"
@@ -349,17 +360,6 @@
                             {{ $t('setting.loadCode') }}
                         </el-button>
                     </div>
-                    <span class="input-help">
-                        {{ $t('setting.codeHelper', [$t('setting.' + dialogData.rowData?.type)]) }}
-                        <el-link
-                            style="font-size: 12px; margin-left: 5px"
-                            icon="Position"
-                            @click="toDoc(dialogData.rowData!.type === 'OneDrive' ? 'onedrive-bind' : 'google-drive')"
-                            type="primary"
-                        >
-                            {{ $t('firewall.quickJump') }}
-                        </el-link>
-                    </span>
                 </el-form-item>
             </div>
             <el-form-item v-if="hasBackDir()" :label="$t('setting.backupDir')" prop="backupPath">
@@ -605,17 +605,6 @@ const changeType = async () => {
                     client_id: res.data.client_id,
                     client_secret: res.data.client_secret,
                     redirect_uri: res.data.redirect_uri,
-                };
-            }
-            break;
-        case 'GoogleDrive':
-            const res2 = await getClientInfo('GoogleDrive');
-            clientInfo.value = res2.data;
-            if (!dialogData.value.rowData.id) {
-                dialogData.value.rowData.varsJson = {
-                    client_id: res2.data.client_id,
-                    client_secret: res2.data.client_secret,
-                    redirect_uri: res2.data.redirect_uri,
                 };
             }
             break;

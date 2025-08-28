@@ -1690,6 +1690,8 @@ const message = {
         code: 'Kod Auth',
         codeHelper:
             'Sila klik butang "Peroleh", kemudian log masuk ke OneDrive dan salin kandungan selepas "code" dalam pautan yang telah diarahkan semula. Tampalkan kandungan tersebut ke dalam kotak input ini. Untuk arahan spesifik, sila rujuk dokumentasi rasmi.',
+        googleHelper:
+            'Sila buat aplikasi Google dan dapatkan maklumat klien terlebih dahulu, isi borang dan klik butang dapatkan. Untuk operasi khusus, sila rujuk dokumentasi rasmi.',
         loadCode: 'Peroleh',
         COS: 'Tencent COS',
         ap_beijing_1: 'Beijing Zone 1',

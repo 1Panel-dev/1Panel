@@ -1619,6 +1619,8 @@ const message = {
         code: '인증 코드',
         codeHelper:
             '"획득" 버튼을 클릭한 다음 OneDrive 에 로그인하여 리디렉션된 링크에서 "code" 이후의 내용을 복사하십시오. 이 입력 상자에 붙여넣으십시오. 자세한 지침은 공식 문서를 참조하십시오.',
+        googleHelper:
+            '먼저 Google 애플리케이션을 생성하고 클라이언트 정보를 획득한 후 양식을 작성하고 획득 버튼을 클릭하세요. 구체적인 작업은 공식 문서를 참조하십시오.',
         loadCode: '획득',
         COS: 'Tencent COS',
         ap_beijing_1: '베이징 지역 1',

@@ -1735,6 +1735,8 @@ const message = {
         code: 'Yetki kodu',
         codeHelper:
             '"Edin" düğmesine tıklayın, ardından {0}’a giriş yapın ve yönlendirilen bağlantıdaki "code" sonrası içeriği kopyalayın. Bu içeriği giriş kutusuna yapıştırın. Özel talimatlar için lütfen resmi belgelere bakın.',
+        googleHelper:
+            'Lütfen önce bir Google uygulaması oluşturun ve istemci bilgilerini alın, formu doldurun ve al butonuna tıklayın. Belirli işlemler için lütfen resmi belgelere bakın.',
         loadCode: 'Edin',
         COS: 'Tencent COS',
         ap_beijing_1: 'Pekin Bölgesi 1',

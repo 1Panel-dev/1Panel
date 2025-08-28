@@ -1613,6 +1613,7 @@ const message = {
         code: '授权码',
         codeHelper:
             '请点击获取按钮，然后登录 {0} 复制跳转链接中 code 后面的内容，粘贴到该输入框中，具体操作可参考官方文档。',
+        googleHelper: '请先在创建 google 应用并获取客户端信息，写入表单后点击获取按钮，具体操作可参考官方文档。',
         loadCode: '获取',
         COS: '腾讯云 COS',
         ap_beijing_1: '北京一区',

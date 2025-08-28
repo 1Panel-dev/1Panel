@@ -1618,6 +1618,7 @@ const message = {
         code: '授權碼',
         codeHelper:
             '請點擊獲取按鈕，然後登錄 {0} 復製跳轉鏈接中 code 後面的內容，粘貼到該輸入框中，具體操作可參考官方文檔。',
+        googleHelper: '請先創建Google應用並獲取客戶端信息，填寫表單後點擊獲取按鈕，具體操作可參考官方文檔。',
         loadCode: '獲取',
         COS: '騰訊雲 COS',
         ap_beijing_1: '北京一區',

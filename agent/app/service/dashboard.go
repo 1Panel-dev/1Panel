@@ -327,9 +327,6 @@ func (u *DashboardService) LoadAppLauncher(ctx *gin.Context) ([]dto.AppLauncher,
 		if data[i].IsInstall != data[j].IsInstall {
 			return data[i].IsInstall
 		}
-		if data[i].IsInstall && data[j].IsInstall {
-			return data[i].Name < data[j].Name
-		}
 		return data[i].Recommend < data[j].Recommend
 	})
 	return data, nil

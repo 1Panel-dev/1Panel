@@ -1,12 +1,7 @@
 <template>
     <DrawerPro v-model="drawerVisible" :header="$t('setting.release')" @close="handleClose" size="large">
-        <div class="note">
-            <el-collapse
-                v-if="notes && notes.length !== 0"
-                v-model="currentVersion"
-                :accordion="true"
-                v-loading="loading"
-            >
+        <div class="note" v-loading="loading">
+            <el-collapse v-if="notes && notes.length !== 0" v-model="currentVersion" :accordion="true">
                 <div v-for="(item, index) in notes" :key="index">
                     <el-collapse-item :name="index">
                         <template #title>

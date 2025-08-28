@@ -1715,6 +1715,8 @@ const message = {
         code: 'Auth code',
         codeHelper:
             'Please click on the "Acquire" button, then login to {0} and copy the content after "code" in the redirected link. Paste it into this input box. For specific instructions, please refer to the official documentation.',
+        googleHelper:
+            'Please first create a Google application and obtain client information, fill in the form and click the get button. For specific operations, please refer to the official documentation.',
         loadCode: 'Acquire',
         COS: 'Tencent COS',
         ap_beijing_1: 'Beijing Zone 1',

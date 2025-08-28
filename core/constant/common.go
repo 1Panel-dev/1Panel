@@ -32,7 +32,6 @@ const (
 	GoogleDrive = "GoogleDrive"
 
 	OneDriveRedirectURI = "http://localhost/login/authorized"
-	GoogleRedirectURI   = "https://localhost:8080"
 )
 
 const (
