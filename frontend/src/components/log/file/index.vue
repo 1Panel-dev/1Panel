@@ -178,11 +178,9 @@ const onScroll = async () => {
         return;
     }
 
-    if (scrollHeight - scrollTop - clientHeight <= 50 && !end.value) {
-        if (readReq.page < maxPage.value) {
-            readReq.page++;
-            await getContent(false);
-        }
+    if (scrollHeight - scrollTop - clientHeight <= 50 && !end.value && maxPage.value > 1) {
+        readReq.page = maxPage.value;
+        await getContent(false);
     }
 };
 
@@ -255,7 +253,7 @@ const getContent = async (pre: boolean) => {
             }),
         );
         const newLogs = res.data.lines;
-        if (newLogs.length === readReq.pageSize && readReq.page < res.data.total) {
+        if (tailLog.value && newLogs.length === readReq.pageSize && readReq.page < res.data.total) {
             readReq.page++;
         }
         if (
@@ -274,17 +272,43 @@ const getContent = async (pre: boolean) => {
 
         if (logs.value.length == 0) {
             logs.value = newLogs;
+            console.log('首次加载');
         } else {
-            if (end.value) {
-                logs.value = pre ? [...newLogs, ...lastLogs.value] : [...lastLogs.value, ...newLogs];
+            // if (end.value) {
+            //     console.log('加载到底了');
+            //     if (pre) {
+            //         console.log('向上拼接' + newLogs.length + '行');
+            //     } else {
+            //         console.log('向下拼接' + newLogs.length + '行');
+            //     }
+            //     logs.value = pre ? [...newLogs, ...logs.value] : [...lastLogs.value, ...newLogs];
+            // } else {
+            //     console.log('未加载到底');
+            //     if (pre) {
+            //         console.log('向上拼接' + newLogs.length + '行');
+            //     } else {
+            //         console.log('向下拼接' + newLogs.length + '行');
+            //     }
+            //     logs.value = pre ? [...newLogs, ...logs.value] : [...lastLogs.value, ...newLogs];
+            // }
+            // pre 向上拼接
+            if (pre) {
+                logs.value = [...newLogs, ...logs.value];
             } else {
-                logs.value = pre ? [...newLogs, ...logs.value] : [...logs.value, ...newLogs];
+                if (end.value) {
+                    console.log('lastLogs 拼接');
+                    logs.value = [...lastLogs.value, ...newLogs];
+                } else {
+                    logs.value = [...logs.value, ...newLogs];
+                }
             }
         }
-
+        console.log(logs.value.length);
         nextTick(() => {
             if (logContainer.value) {
                 if (pre) {
+                    console.log(logs.value[0]);
+
                     if (readReq.page > 1) {
                         const addedLines = newLogs.length;
                         const newScrollPosition = lastScrollTop.value + (addedLines * logHeight) / 3;
@@ -302,6 +326,7 @@ const getContent = async (pre: boolean) => {
 
     logCount.value = logs.value.length;
     end.value = res.data.end;
+    console.log('end=' + end.value);
     emit('update:hasContent', logs.value.length > 0);
     if (readReq.latest) {
         readReq.page = res.data.total;
@@ -314,6 +339,7 @@ const getContent = async (pre: boolean) => {
         }
     }
     if (logs.value && logs.value.length > 3000) {
+        console.log('日志过长，进行裁剪');
         if (pre) {
             logs.value.splice(logs.value.length - readReq.pageSize, readReq.pageSize);
             if (maxPage.value > 1) {

@@ -1045,7 +1045,7 @@ func copyData(task *task.Task, app model.App, appDetail model.AppDetail, appInst
 		return
 	}
 	envPath := path.Join(appDir, ".env")
-	var envParams map[string]string
+	envParams := make(map[string]string)
 	if fileOp.Stat(envPath) {
 		envs, _ := gotenv.Read(envPath)
 		if envParams = maps.Clone(envs); envParams == nil {
