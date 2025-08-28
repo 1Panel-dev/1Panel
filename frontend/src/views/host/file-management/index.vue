@@ -1627,39 +1627,63 @@ function hideRightMenu() {
 }
 
 onMounted(() => {
-    if (localStorage.getItem('show-hidden') === null) {
-        localStorage.setItem('show-hidden', 'true');
-    }
-    req.showHidden = localStorage.getItem('show-hidden') === 'true';
+    initShowHidden();
+    initTabsAndPaths();
     getHostMount();
-    if (router.currentRoute.value.query.path) {
-        req.path = String(router.currentRoute.value.query.path);
-        getPaths(req.path);
-        globalStore.setLastFilePath(req.path);
-    } else if (globalStore.lastFilePath && globalStore.lastFilePath != '') {
-        req.path = globalStore.lastFilePath;
-        getPaths(req.path);
-    }
-    pathWidth.value = getCurrentPath()?.offsetWidth;
-    paths.value = [];
-
-    const segments = editableTabsValue.value.split('/').filter(Boolean);
-    let url = '';
-    segments.forEach((segment) => {
-        url += '/' + segment;
-        paths.value.push({
-            url,
-            name: segment,
-        });
-    });
-    search();
-    history.push(req.path);
-    pointer = history.length - 1;
+    initHistory();
     nextTick(function () {
         handlePath();
         observeResize();
     });
 });
+
+function initShowHidden() {
+    const showHidden = localStorage.getItem('show-hidden');
+    if (showHidden === null) {
+        localStorage.setItem('show-hidden', 'true');
+        req.showHidden = true;
+    } else {
+        req.showHidden = showHidden === 'true';
+    }
+}
+
+function initTabsAndPaths() {
+    initTabs();
+    let path = getInitialPath();
+    req.path = path;
+    getPaths(path);
+    editableTabsValue.value = path;
+    updateTab(path);
+    paths.value = buildPaths(path);
+    pathWidth.value = getCurrentPath()?.offsetWidth;
+}
+
+function buildPaths(path: string) {
+    const segments = path.split('/').filter(Boolean);
+    let url = '';
+    return segments.map((segment) => {
+        url += '/' + segment;
+        return { url, name: segment };
+    });
+}
+
+function initHistory() {
+    search();
+    history.push(req.path);
+    pointer = history.length - 1;
+}
+
+function getInitialPath(): string {
+    const routePath = router.currentRoute.value.query.path;
+    if (routePath) {
+        const p = String(routePath);
+        globalStore.setLastFilePath(p);
+        return p;
+    } else if (globalStore.lastFilePath && globalStore.lastFilePath !== '') {
+        return globalStore.lastFilePath;
+    }
+    return '/';
+}
 
 const editableTabsKey = ref('');
 const editableTabsValue = ref('');
@@ -1698,8 +1722,6 @@ function setFirstTab() {
         editableTabsName.value = first.name;
     }
 }
-
-initTabs();
 
 watch(
     [editableTabs, editableTabsKey],
