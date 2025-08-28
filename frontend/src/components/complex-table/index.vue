@@ -234,15 +234,13 @@ onMounted(() => {
         tableHeight.value = window.innerHeight - heightDiff - tabHeight;
     }
 
-    window.onresize = () => {
-        return (() => {
-            if (props.height) {
-                tableHeight.value = props.height - tabHeight;
-            } else {
-                tableHeight.value = window.innerHeight - heightDiff - tabHeight;
-            }
-        })();
-    };
+    window.addEventListener('resize', () => {
+        if (props.height) {
+            tableHeight.value = props.height - tabHeight;
+        } else {
+            tableHeight.value = window.innerHeight - heightDiff - tabHeight;
+        }
+    });
 });
 </script>
 
