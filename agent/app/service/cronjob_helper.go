@@ -34,10 +34,17 @@ func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
 	if cronjob.Type == "snapshot" {
 		go func() {
 			_ = cronjobRepo.UpdateRecords(record.ID, map[string]interface{}{"records": record.Records})
+			if err := taskRepo.Save(context.Background(), taskItem.Task); err != nil {
+				global.LOG.Errorf("save task for snapshot cronjob failed, err: %v", err)
+				return
+			}
 			if err = u.handleSnapshot(*cronjob, record, taskItem); err != nil {
-				item, _ := taskRepo.GetFirst(taskRepo.WithByID(record.TaskID))
-				if len(item.ID) == 0 {
-					record.TaskID = ""
+				if len(taskItem.Task.CurrentStep) == 0 {
+					taskItem.Log(err.Error())
+					taskItem.Task.Status = constant.StatusFailed
+					taskItem.Task.ErrorMsg = err.Error()
+					taskItem.Task.EndAt = time.Now()
+					_ = taskRepo.Save(context.Background(), taskItem.Task)
 				}
 				cronjobRepo.EndRecords(record, constant.StatusFailed, err.Error(), record.Records)
 				handleCronJobAlert(cronjob)
