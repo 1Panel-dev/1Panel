@@ -3801,7 +3801,8 @@ const message = {
             sshLogin: 'SSH Girişi Hatası Uyarısı',
             panelIpLogin: 'Panel Girişi IP Hatası Uyarısı',
             sshIpLogin: 'SSH Girişi IP Hatası Uyarısı',
-            ipWhiteListHelper: 'Beyaz listedeki IP’ler herhangi bir kuralla kısıtlanmaz',
+            ipWhiteListHelper:
+                'Beyaz listedeki IP’ler kurallara tabi değildir ve başarılı girişlerde uyarı oluşturulmaz',
             nodeExceptionRule: 'Düğüm hatası uyarısı, günde {0} kez gönderilir',
             licenseExceptionRule: 'Lisans hatası uyarısı, günde {0} kez gönderilir',
             panelLoginRule: 'Panel girişi uyarısı, günde {0} kez gönderilir',

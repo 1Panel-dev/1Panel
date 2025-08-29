@@ -1,6 +1,7 @@
 package hook
 
 import (
+	"github.com/1Panel-dev/1Panel/agent/app/service"
 	"github.com/1Panel-dev/1Panel/agent/utils/alert_push"
 	"os"
 	"strings"
@@ -23,6 +24,7 @@ func Init() {
 	loadLocalDir()
 
 	initDockerConf()
+	initAlertTask()
 }
 
 func initGlobalData() {
@@ -124,4 +126,8 @@ func initDockerConf() {
 	if strings.Contains(dockerPath, "snap") {
 		constant.DaemonJsonPath = "/var/snap/docker/current/config/daemon.json"
 	}
+}
+
+func initAlertTask() {
+	service.NewIAlertTaskHelper().ResetTask()
 }

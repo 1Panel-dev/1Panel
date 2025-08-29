@@ -3469,7 +3469,7 @@ const message = {
             sshLogin: 'SSH 登录异常告警',
             panelIpLogin: '面板登录 IP 异常告警',
             sshIpLogin: 'SSH 登录 IP 异常告警',
-            ipWhiteListHelper: '白名单中的 IP 不受任何规则限制',
+            ipWhiteListHelper: '白名单中的 IP 不受规则限制，登录成功不进行告警',
             nodeExceptionRule: '节点异常告警，每天发送 {0} 次',
             licenseExceptionRule: '许可证异常告警，每天发送 {0} 次',
             panelLoginRule: '面板登录告警，每天发送 {0} 次',

@@ -371,7 +371,7 @@ import { routerToName } from '@/utils/router';
 import { checkCidr, checkCidrV6, checkIpV4V6 } from '@/utils/util';
 
 const globalStore = GlobalStore();
-const { isMaster } = storeToRefs(globalStore);
+const { isMaster, isProductPro } = storeToRefs(globalStore);
 
 interface DialogProps {
     title: string;
@@ -441,10 +441,10 @@ const allTaskOptions = [
     { value: 'panelPwdEndTime', label: 'xpack.alert.panelPwdEndTime', show: isMaster.value },
     { value: 'panelLogin', label: 'xpack.alert.panelLogin', show: isMaster.value },
     { value: 'sshLogin', label: 'xpack.alert.sshLogin', show: true },
-    { value: 'licenseException', label: 'xpack.alert.licenseException', show: isMaster.value },
+    { value: 'licenseException', label: 'xpack.alert.licenseException', show: isMaster.value && isProductPro.value },
     { value: 'ssl', label: 'xpack.alert.ssl', show: true },
     { value: 'siteEndTime', label: 'xpack.alert.siteEndTime', show: true },
-    { value: 'nodeException', label: 'xpack.alert.nodeException', show: isMaster.value },
+    { value: 'nodeException', label: 'xpack.alert.nodeException', show: isMaster.value && isProductPro.value },
     { value: 'cpu', label: 'xpack.alert.cpu', show: true },
     { value: 'memory', label: 'xpack.alert.memory', show: true },
     { value: 'disk', label: 'xpack.alert.disk', show: true },

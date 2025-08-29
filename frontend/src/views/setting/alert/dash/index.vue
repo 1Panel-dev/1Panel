@@ -18,8 +18,16 @@
                         <template v-if="isMaster">
                             <el-option value="panelPwdEndTime" :label="$t('xpack.alert.panelPwdEndTime')" />
                             <el-option value="panelLogin" :label="$t('xpack.alert.panelLogin')" />
-                            <el-option value="licenseException" :label="$t('xpack.alert.licenseException')" />
-                            <el-option value="nodeException" :label="$t('xpack.alert.nodeException')" />
+                            <el-option
+                                v-if="isProductPro"
+                                value="licenseException"
+                                :label="$t('xpack.alert.licenseException')"
+                            />
+                            <el-option
+                                v-if="isProductPro"
+                                value="nodeException"
+                                :label="$t('xpack.alert.nodeException')"
+                            />
                             <el-option value="panelUpdate" :label="$t('xpack.alert.panelUpdate')" />
                         </template>
                         <el-option value="sshLogin" :label="$t('xpack.alert.sshLogin')" />
@@ -142,7 +150,7 @@ import { UpdateAlertStatus, SearchAlerts, DeleteAlert } from '@/api/modules/aler
 import { storeToRefs } from 'pinia';
 
 const globalStore = GlobalStore();
-const { isMaster } = storeToRefs(globalStore);
+const { isMaster, isProductPro } = storeToRefs(globalStore);
 
 const { t } = i18n.global;
 const loading = ref(false);

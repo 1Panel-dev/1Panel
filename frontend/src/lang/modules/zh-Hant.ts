@@ -3499,7 +3499,7 @@ const message = {
             sshLogin: 'SSH 登入異常告警',
             panelIpLogin: '面板登入 IP 異常告警',
             sshIpLogin: 'SSH 登入 IP 異常告警',
-            ipWhiteListHelper: '白名單中的 IP 不受任何規則限制',
+            ipWhiteListHelper: '在白名單中的 IP 不受規則限制，成功登入時也不會產生警報',
             nodeExceptionRule: '節點異常告警，每天發送 {0} 次',
             licenseExceptionRule: '許可證異常告警，每天發送 {0} 次',
             panelLoginRule: '面板登入告警，每天發送 {0} 次',

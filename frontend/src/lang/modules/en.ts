@@ -3759,7 +3759,8 @@ const message = {
             sshLogin: 'SSH Login Exception Alert',
             panelIpLogin: 'Panel Login IP Exception Alert',
             sshIpLogin: 'SSH Login IP Exception Alert',
-            ipWhiteListHelper: 'IPs in the whitelist are not restricted by any rules',
+            ipWhiteListHelper:
+                'IPs in the whitelist are not restricted by rules, and there will be no alert upon successful login',
             nodeExceptionRule: 'Node exception alert, sent {0} times per day',
             licenseExceptionRule: 'License exception alert, sent {0} times per day',
             panelLoginRule: 'Panel login alert, sent {0} times per day',

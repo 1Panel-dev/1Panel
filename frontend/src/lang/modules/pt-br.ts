@@ -3731,7 +3731,8 @@ const message = {
             sshLogin: 'Alerta de Exceção de Login SSH',
             panelIpLogin: 'Alerta de Exceção de IP de Login no Painel',
             sshIpLogin: 'Alerta de Exceção de IP de Login SSH',
-            ipWhiteListHelper: 'IPs na lista branca não estão sujeitos a nenhuma regra',
+            ipWhiteListHelper:
+                'Os IPs na lista de permissões não são restringidos pelas regras e não haverá alerta em caso de login bem-sucedido',
             nodeExceptionRule: 'Alerta de exceção de nó, enviado {0} vezes por dia',
             licenseExceptionRule: 'Alerta de exceção de licença, enviado {0} vezes por dia',
             panelLoginRule: 'Alerta de login no painel, enviado {0} vezes por dia',

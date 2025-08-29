@@ -3723,7 +3723,8 @@ const message = {
             sshLogin: 'Amaran Log Masuk SSH Tidak Normal',
             panelIpLogin: 'Amaran IP Log Masuk Panel Tidak Normal',
             sshIpLogin: 'Amaran IP Log Masuk SSH Tidak Normal',
-            ipWhiteListHelper: 'IP dalam senarai putih tidak tertakluk kepada sebarang peraturan',
+            ipWhiteListHelper:
+                'IP dalam senarai putih tidak tertakluk kepada peraturan, dan tiada amaran akan dikeluarkan apabila log masuk berjaya',
             nodeExceptionRule: 'Amaran kerosakan nod, dihantar {0} kali sehari',
             licenseExceptionRule: 'Amaran kerosakan lesen, dihantar {0} kali sehari',
             panelLoginRule: 'Amaran log masuk panel, dihantar {0} kali sehari',

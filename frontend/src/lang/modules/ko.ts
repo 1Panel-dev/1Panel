@@ -3573,7 +3573,8 @@ const message = {
             sshLogin: 'SSH 로그인 이상 알림',
             panelIpLogin: '패널 로그인 IP 이상 알림',
             sshIpLogin: 'SSH 로그인 IP 이상 알림',
-            ipWhiteListHelper: '화이트리스트에 있는 IP는 어떠한 규칙의 제한도 받지 않습니다',
+            ipWhiteListHelper:
+                '화이트리스트에 있는 IP는 규칙의 제한을 받지 않으며, 로그인에 성공해도 알림이 발생하지 않습니다',
             nodeExceptionRule: '노드 이상 알림은 하루 {0}회 전송',
             licenseExceptionRule: '라이선스 이상 알림은 하루 {0}회 전송',
             panelLoginRule: '패널 로그인 알림은 하루 {0}회 전송',

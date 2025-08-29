@@ -3637,7 +3637,8 @@ const message = {
             sshLogin: 'SSHログイン異常アラート',
             panelIpLogin: 'パネルログインIP異常アラート',
             sshIpLogin: 'SSHログインIP異常アラート',
-            ipWhiteListHelper: 'ホワイトリスト内のIPは、いかなるルールの制限も受けません',
+            ipWhiteListHelper:
+                'ホワイトリストに登録されたIPはルールの制限を受けず、ログインが成功してもアラートは発生しません',
             nodeExceptionRule: 'ノード異常アラートは、1日あたり{0}回送信',
             licenseExceptionRule: 'ライセンス異常アラートは、1日あたり{0}回送信',
             panelLoginRule: 'パネルログインアラートは、1日あたり{0}回送信',
