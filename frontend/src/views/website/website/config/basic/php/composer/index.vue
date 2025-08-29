@@ -31,7 +31,7 @@
         <el-form-item :label="$t('website.execDir')">
             <el-input v-model.trim="req.dir" class="p-w-400">
                 <template #prepend>
-                    <FileList :path="req.dir" @choose="getPath" :dir="true"></FileList>
+                    <el-button icon="Folder" @click="dirRef.acceptParams({ dir: true, path: req.dir })" />
                 </template>
             </el-input>
         </el-form-item>
@@ -40,12 +40,14 @@
         </el-form-item>
     </el-form>
     <TaskLog ref="taskLogRef" @close="search" />
+    <FileList ref="dirRef" :dir="true" @choose="getPath" />
 </template>
 <script setup lang="ts">
 import { execComposer, getWebsite } from '@/api/modules/website';
 import i18n from '@/lang';
 import { newUUID } from '@/utils/util';
 import TaskLog from '@/components/log/task/index.vue';
+import FileList from '@/components/file-list/index.vue';
 
 const props = defineProps({
     websiteID: {
@@ -65,6 +67,7 @@ const req = reactive({
 });
 const loading = ref(false);
 const taskLogRef = ref();
+const dirRef = ref();
 
 const mirrors = [
     {

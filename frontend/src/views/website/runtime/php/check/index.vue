@@ -54,6 +54,7 @@ import { MsgSuccess } from '@/utils/message';
 import { ref } from 'vue';
 import { DeleteRuntime } from '@/api/modules/runtime';
 import { routerToName } from '@/utils/router';
+import ErrPrompt from './error-prompt/index.vue';
 
 interface CheckRrops {
     items: App.AppInstallResource[];

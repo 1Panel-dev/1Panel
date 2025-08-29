@@ -448,6 +448,7 @@ import IgnoreApp from '@/views/app-store/installed/ignore/create/index.vue';
 import { getAgentSettingByKey } from '@/api/modules/setting';
 import Tags from '@/views/app-store/components/tag.vue';
 import SvgIcon from '@/components/svg-icon/svg-icon.vue';
+import MainDiv from '@/components/main-div/index.vue';
 import { routerToFileWithPath, routerToNameWithQuery } from '@/utils/router';
 
 const data = ref<any>();

@@ -53,6 +53,7 @@ import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { routerToName } from '@/utils/router';
 import { ref } from 'vue';
+import ErrPrompt from './error-prompt/index.vue';
 
 interface CheckRrops {
     items: App.AppInstallResource[];

@@ -84,6 +84,7 @@ import Tags from '@/views/app-store/components/tag.vue';
 import DockerStatus from '@/views/container/docker-status/index.vue';
 import NoApp from '@/views/app-store/apps/no-app/index.vue';
 import AppCard from '@/views/app-store/apps/app/index.vue';
+import MainDiv from '@/components/main-div/index.vue';
 import { jumpToInstall } from '@/utils/app';
 
 const globalStore = GlobalStore();
