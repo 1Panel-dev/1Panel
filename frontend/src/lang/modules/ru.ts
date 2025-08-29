@@ -456,6 +456,9 @@ const message = {
         serviceNameHelper: 'Доступ между контейнерами в одной сети.',
         backupList: 'Резервное копирование',
         loadBackup: 'Импорт',
+        localUpload: 'Локальная загрузка',
+        hostSelect: 'Выбор сервера',
+        selectHelper: 'Вы уверены, что хотите импортировать файл резервной копии {0}?',
         remoteAccess: 'Удаленный доступ',
         remoteHelper: 'Несколько IP через запятую, например: 172.16.10.111, 172.16.10.112',
         remoteConnHelper:

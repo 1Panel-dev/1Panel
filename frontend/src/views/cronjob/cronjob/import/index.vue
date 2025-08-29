@@ -6,10 +6,10 @@
                 action="#"
                 :auto-upload="false"
                 ref="uploadRef"
-                class="upload mt-2"
+                class="float-left mt-2"
                 :show-file-list="false"
                 :limit="1"
-                :accept="'.json'"
+                accept=".json"
                 :on-change="fileOnChange"
                 :on-exceed="handleExceed"
                 v-model:file-list="uploaderFiles"
@@ -176,10 +176,3 @@ defineExpose({
     acceptParams,
 });
 </script>
-
-<style lang="scss" scoped>
-.upload {
-    width: 60px;
-    float: left;
-}
-</style>

@@ -9,71 +9,57 @@
         >
             <template #content>
                 <div v-loading="loading">
-                    <div class="mb-4" v-if="type === 'mysql' || type === 'mariadb'">
-                        <el-alert type="error" :title="$t('database.formatHelper', [remark])" />
+                    <div>
+                        <el-alert :closable="false" type="warning">
+                            <template #default>
+                                <ul>
+                                    <li v-if="type === 'mysql' || type === 'mariadb'">
+                                        {{ $t('database.formatHelper', [remark]) }}
+                                    </li>
+                                    <li v-if="type === 'website'">{{ $t('website.websiteBackupWarn') }}</li>
+                                    <span v-if="isDb()">
+                                        <li>{{ $t('database.supportUpType') }}</li>
+                                        <li>{{ $t('database.zipFormat') }}</li>
+                                    </span>
+                                    <span v-else>
+                                        <li>{{ $t('website.supportUpType') }}</li>
+                                        <li>{{ $t('website.zipFormat', [type + '.json']) }}</li>
+                                    </span>
+                                </ul>
+                            </template>
+                        </el-alert>
                     </div>
-                    <div class="mb-4" v-if="type === 'website'">
-                        <el-alert :closable="false" type="warning" :title="$t('website.websiteBackupWarn')"></el-alert>
-                    </div>
-                    <el-upload
-                        :limit="1"
-                        ref="uploadRef"
-                        drag
-                        :on-exceed="handleExceed"
-                        :on-change="fileOnChange"
-                        :on-remove="fileOnRemove"
-                        class="upload-demo"
-                        :auto-upload="false"
-                    >
-                        <el-icon class="el-icon--upload"><upload-filled /></el-icon>
-                        <div class="el-upload__text">
-                            {{ $t('database.dropHelper') }}
-                            <em>{{ $t('database.clickHelper') }}</em>
-                        </div>
-                        <template #tip>
-                            <el-progress
-                                v-if="isUpload"
-                                text-inside
-                                :stroke-width="12"
-                                :percentage="uploadPercent"
-                            ></el-progress>
-                            <div
-                                v-if="type === 'mysql' || type === 'mariadb' || type === 'postgresql'"
-                                class="w-4/5 el-upload__tip"
-                            >
-                                <span class="input-help">{{ $t('database.supportUpType') }}</span>
-                                <span class="input-help">
-                                    {{ $t('database.zipFormat') }}
-                                </span>
-                            </div>
-                            <div v-else class="w-4/5 el-upload__tip">
-                                <span class="input-help">{{ $t('website.supportUpType') }}</span>
-                                <span class="input-help">
-                                    {{ $t('website.zipFormat', [type + '.json']) }}
-                                </span>
-                            </div>
-                        </template>
-                    </el-upload>
-                    <el-button :disabled="isUpload || uploaderFiles.length !== 1" icon="Upload" @click="onSubmit">
-                        {{ $t('commons.button.upload') }}
-                    </el-button>
 
-                    <el-divider />
                     <ComplexTable
                         :pagination-config="paginationConfig"
+                        class="mt-5"
                         @search="search"
                         v-model:selects="selects"
                         :data="data"
                     >
                         <template #toolbar>
-                            <el-button
-                                class="ml-2.5"
-                                plain
-                                :disabled="selects.length === 0"
-                                @click="onBatchDelete(null)"
+                            <el-upload
+                                :limit="1"
+                                class="float-left"
+                                ref="uploadRef"
+                                accept=".tar.gz,.sql,.sql.gz"
+                                :show-file-list="false"
+                                :on-exceed="handleExceed"
+                                :on-change="fileOnChange"
+                                :auto-upload="false"
                             >
+                                <el-button class="float-left">
+                                    {{ $t('database.localUpload') }}
+                                </el-button>
+                            </el-upload>
+                            <el-button class="float-left ml-3" @click="fileRef.acceptParams({ dir: false })">
+                                {{ $t('database.hostSelect') }}
+                            </el-button>
+                            <el-button :disabled="selects.length === 0" @click="onBatchDelete(null)">
                                 {{ $t('commons.button.delete') }}
                             </el-button>
+
+                            <el-progress v-if="isUpload" text-inside :stroke-width="12" :percentage="uploadPercent" />
                         </template>
                         <el-table-column type="selection" fix />
                         <el-table-column :label="$t('commons.table.name')" show-overflow-tooltip prop="name" />
@@ -131,6 +117,7 @@
         </DialogPro>
 
         <OpDialog ref="opRef" @search="search" />
+        <FileList ref="fileRef" @choose="loadFile" />
         <TaskLog ref="taskLogRef" @close="search" />
     </div>
 </template>
@@ -144,7 +131,7 @@ import { File } from '@/api/interface/file';
 import { batchDeleteFile, checkFile, chunkUploadFileData, getUploadList } from '@/api/modules/files';
 import { loadBaseDir } from '@/api/modules/setting';
 import { MsgError, MsgSuccess } from '@/utils/message';
-import { handleRecoverByUpload } from '@/api/modules/backup';
+import { handleRecoverByUpload, uploadByRecover } from '@/api/modules/backup';
 import TaskLog from '@/components/log/task/index.vue';
 
 interface DialogProps {
@@ -154,6 +141,7 @@ interface DialogProps {
     remark: string;
 }
 const loading = ref();
+const fileRef = ref();
 const isUpload = ref();
 const uploadPercent = ref<number>(0);
 const selects = ref<any>([]);
@@ -220,6 +208,32 @@ const search = async () => {
     paginationConfig.total = res.data.total;
 };
 
+const loadFile = async (path: string) => {
+    let filaName = path.split('/').pop();
+    if (!filaName) {
+        MsgError(i18n.global.t('commons.msg.fileNameErr'));
+        return;
+    }
+    let reg = /^[a-zA-Z0-9\u4e00-\u9fa5]{1}[a-z:A-Z0-9_.\u4e00-\u9fa5-]{0,256}$/;
+    if (!reg.test(filaName)) {
+        MsgError(i18n.global.t('commons.msg.fileNameErr'));
+        return;
+    }
+    ElMessageBox.confirm(i18n.global.t('database.selectHelper', [path]), i18n.global.t('database.loadBackup'), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+    }).then(async () => {
+        uploadByRecover(path, baseDir.value)
+            .then(() => {
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                search();
+            })
+            .finally(() => {
+                loading.value = false;
+            });
+    });
+};
+
 const openTaskLog = (taskID: string) => {
     taskLogRef.value.openWithTaskID(taskID);
 };
@@ -267,30 +281,32 @@ const onRecover = async (row: File.File) => {
     recoverDialog.value = true;
 };
 
+const isDb = () => {
+    return type.value === 'mysql' || type.value === 'mariadb' || type.value === 'postgresql';
+};
 const uploaderFiles = ref<UploadFiles>([]);
 const uploadRef = ref<UploadInstance>();
 
-const beforeAvatarUpload = (rawFile) => {
-    if (type.value === 'app' || type.value === 'website') {
-        if (!rawFile.name.endsWith('.tar.gz')) {
-            MsgError(i18n.global.t('commons.msg.unSupportType'));
-            return false;
-        }
-        return true;
-    }
-    if (!rawFile.name.endsWith('.sql') && !rawFile.name.endsWith('.tar.gz') && !rawFile.name.endsWith('.sql.gz')) {
-        MsgError(i18n.global.t('commons.msg.unSupportType'));
-        return false;
-    }
-    return true;
-};
-
 const fileOnChange = (_uploadFile: UploadFile, uploadFiles: UploadFiles) => {
     uploaderFiles.value = uploadFiles;
-};
-
-const fileOnRemove = (_uploadFile: UploadFile, uploadFiles: UploadFiles) => {
-    uploaderFiles.value = uploadFiles;
+    if (uploaderFiles.value.length !== 1) {
+        return;
+    }
+    const file = uploaderFiles.value[0];
+    if (!file.raw.name) {
+        MsgError(i18n.global.t('commons.msg.fileNameErr'));
+        return;
+    }
+    ElMessageBox.confirm(
+        i18n.global.t('database.selectHelper', [file.raw.name]),
+        i18n.global.t('database.loadBackup'),
+        {
+            confirmButtonText: i18n.global.t('commons.button.confirm'),
+            cancelButtonText: i18n.global.t('commons.button.cancel'),
+        },
+    ).then(async () => {
+        onSubmit();
+    });
 };
 
 const handleUploadClose = () => {
@@ -311,14 +327,7 @@ const handleExceed: UploadProps['onExceed'] = (files) => {
 };
 
 const onSubmit = async () => {
-    if (uploaderFiles.value.length !== 1) {
-        return;
-    }
     const file = uploaderFiles.value[0];
-    if (!file.raw.name) {
-        MsgError(i18n.global.t('commons.msg.fileNameErr'));
-        return;
-    }
     let reg = /^[a-zA-Z0-9\u4e00-\u9fa5]{1}[a-z:A-Z0-9_.\u4e00-\u9fa5-]{0,256}$/;
     if (!reg.test(file.raw.name)) {
         MsgError(i18n.global.t('commons.msg.fileNameErr'));
@@ -327,10 +336,6 @@ const onSubmit = async () => {
     const res = await checkFile(baseDir.value + file.raw.name, false);
     if (res.data) {
         MsgError(i18n.global.t('commons.msg.fileExist'));
-        return;
-    }
-    let isOk = beforeAvatarUpload(file.raw);
-    if (!isOk) {
         return;
     }
     submitUpload(file);

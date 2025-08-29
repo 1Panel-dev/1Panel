@@ -39,6 +39,7 @@ type IBackupService interface {
 	Delete(id uint) error
 	RefreshToken(req dto.OperateByID) error
 	GetLocalDir() (string, error)
+	UploadForRecover(req dto.UploadForRecover) error
 
 	MysqlBackup(db dto.CommonBackup) error
 	PostgresqlBackup(db dto.CommonBackup) error
@@ -307,6 +308,16 @@ func (u *BackupService) RefreshToken(req dto.OperateByID) error {
 	varsItem, _ := json.Marshal(varMap)
 	backup.Vars = string(varsItem)
 	return backupRepo.Save(&backup)
+}
+
+func (u *BackupService) UploadForRecover(req dto.UploadForRecover) error {
+	fileOp := files.NewFileOp()
+	if !fileOp.Stat(req.TargetDir) {
+		if err := fileOp.CreateDir(req.TargetDir, constant.DirPerm); err != nil {
+			return err
+		}
+	}
+	return fileOp.Copy(req.FilePath, req.TargetDir)
 }
 
 func (u *BackupService) checkBackupConn(backup *model.BackupAccount) (bool, error) {

@@ -463,6 +463,9 @@ const message = {
         serviceNameHelper: 'Akses antara kontena dalam rangkaian yang sama.',
         backupList: 'Sandaran',
         loadBackup: 'Import',
+        localUpload: 'Muat Naik Tempatan',
+        hostSelect: 'Pemilihan Pelayan',
+        selectHelper: 'Adakah anda pasti ingin mengimport fail sandaran {0}?',
         remoteAccess: 'Akses jauh',
         remoteHelper: 'Berbilang IP dipisahkan dengan koma, contoh: 172.16.10.111, 172.16.10.112',
         remoteConnHelper:

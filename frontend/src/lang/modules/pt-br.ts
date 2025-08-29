@@ -461,6 +461,9 @@ const message = {
         serviceNameHelper: 'Acesso entre containers na mesma rede.',
         backupList: 'Backup',
         loadBackup: 'Importar',
+        localUpload: 'Upload Local',
+        hostSelect: 'Seleção de Servidor',
+        selectHelper: 'Tem certeza de que deseja importar o arquivo de backup {0}?',
         remoteAccess: 'Acesso remoto',
         remoteHelper: 'Vários IPs separados por vírgula, exemplo: 172.16.10.111, 172.16.10.112',
         remoteConnHelper:

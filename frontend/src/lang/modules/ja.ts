@@ -454,6 +454,9 @@ const message = {
         serviceNameHelper: '同じネットワーク内のコンテナ間のアクセス。',
         backupList: 'バックアップ',
         loadBackup: '輸入',
+        localUpload: 'ローカルアップロード',
+        hostSelect: 'サーバー選択',
+        selectHelper: 'バックアップファイル {0} をインポートしてもよろしいですか？',
         remoteAccess: 'リモートアクセス',
         remoteHelper: '複数のIP Comma delimited、例:172.16.10.111、172.16.10.112',
         remoteConnHelper:

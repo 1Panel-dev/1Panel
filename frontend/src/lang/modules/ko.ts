@@ -457,6 +457,9 @@ const message = {
         serviceNameHelper: '같은 네트워크 내 컨테이너 간의 접근.',
         backupList: '백업',
         loadBackup: '불러오기',
+        localUpload: '로컬 업로드',
+        hostSelect: '서버 선택',
+        selectHelper: '백업 파일 {0}을(를) 가져오시겠습니까?',
         remoteAccess: '원격 접근',
         remoteHelper: '여러 IP 를 쉼표로 구분하여 입력, 예: 172.16.10.111, 172.16.10.112',
         remoteConnHelper:

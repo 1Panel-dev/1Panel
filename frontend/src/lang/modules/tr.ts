@@ -472,6 +472,9 @@ const message = {
         serviceNameHelper: 'Aynı ağdaki konteynerler arası erişim.',
         backupList: 'Yedekleme',
         loadBackup: 'İçe Aktar',
+        localUpload: 'Yerel Yükleme',
+        hostSelect: 'Sunucu Seçimi',
+        selectHelper: '{0} yedek dosyasını içe aktarmak istediğinizden emin misiniz?',
         remoteAccess: 'Uzaktan erişim',
         remoteHelper: 'Birden fazla IP virgülle ayrılır, örnek: 172.16.10.111, 172.16.10.112',
         remoteConnHelper:

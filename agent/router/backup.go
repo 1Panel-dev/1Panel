@@ -21,6 +21,7 @@ func (s *BackupRouter) InitRouter(Router *gin.RouterGroup) {
 		backupRouter.POST("", baseApi.CreateBackup)
 		backupRouter.POST("/del", baseApi.DeleteBackup)
 		backupRouter.POST("/update", baseApi.UpdateBackup)
+		backupRouter.POST("/upload", baseApi.UploadForRecover)
 
 		backupRouter.POST("/backup", baseApi.Backup)
 		backupRouter.POST("/recover", baseApi.Recover)
