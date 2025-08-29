@@ -626,7 +626,7 @@
         <FileRename ref="renameRef" @close="search" />
         <Upload ref="uploadRef" @close="search" />
         <Wget ref="wgetRef" @close="closeWget" />
-        <Move ref="moveRef" @close="closeMovePage" />
+        <Move ref="moveRef" @close="closeMovePage" @loading="onLoading" />
         <Download ref="downloadRef" @close="search" />
         <Process ref="processRef" @close="closeProcess" />
         <Owner ref="chownRef" @close="search"></Owner>
@@ -1416,6 +1416,10 @@ const openPaste = () => {
     fileMove.path = req.path;
     moveRef.value.acceptParams(fileMove);
 };
+
+function onLoading(isLoading: boolean) {
+    loading.value = isLoading;
+}
 
 const openDownload = (file: File.File) => {
     downloadFile(file.path, globalStore.currentNode);
