@@ -16,7 +16,7 @@
         </template>
         <template #main>
             <div>
-                <MainDiv :heightDiff="mode === 'upgrade' ? 270 : 300">
+                <MainDiv :heightDiff="mode === 'upgrade' ? 315 : 350">
                     <el-alert type="info" :closable="false" v-if="mode === 'installed'">
                         <template #title>
                             <span class="flx-align-center">
@@ -33,7 +33,7 @@
                             </span>
                         </template>
                     </el-alert>
-                    <div class="update-prompt" v-if="data == null">
+                    <div class="update-prompt" v-if="data === null">
                         <span>{{ mode === 'upgrade' ? $t('app.updatePrompt') : $t('app.installPrompt') }}</span>
                         <div>
                             <img src="@/assets/images/no_update_app.svg" />

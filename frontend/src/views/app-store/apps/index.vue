@@ -30,7 +30,7 @@
             </template>
             <template #main>
                 <div>
-                    <MainDiv :heightDiff="300">
+                    <MainDiv :heightDiff="350">
                         <el-alert type="info" :title="$t('app.appHelper')" :closable="false" />
                         <el-row :gutter="5" v-if="apps.length > 0">
                             <el-col
@@ -121,7 +121,7 @@ const taskLogRef = ref();
 const syncCustomAppstore = ref(false);
 const isActive = ref(false);
 const isExist = ref(false);
-const noApp = ref(true);
+const noApp = ref(false);
 
 const refresh = () => {
     search(req);
