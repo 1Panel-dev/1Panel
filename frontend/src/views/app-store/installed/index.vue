@@ -16,7 +16,7 @@
         </template>
         <template #main>
             <div>
-                <MainDiv :heightDiff="mode === 'upgrade' ? 315 : 350">
+                <MainDiv :heightDiff="mode === 'upgrade' ? 280 : 300">
                     <el-alert type="info" :closable="false" v-if="mode === 'installed'">
                         <template #title>
                             <span class="flx-align-center">

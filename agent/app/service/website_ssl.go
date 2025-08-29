@@ -747,6 +747,7 @@ func (w WebsiteSSLService) ImportMasterSSL(create model.WebsiteSSL) error {
 	websiteSSL.Pem = create.Pem
 	websiteSSL.Type = create.Type
 	websiteSSL.Organization = create.Organization
+	websiteSSL.MasterSSLID = create.ID
 	if err := websiteSSLRepo.Save(websiteSSL); err != nil {
 		return err
 	}
