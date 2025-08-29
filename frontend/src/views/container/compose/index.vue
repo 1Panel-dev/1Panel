@@ -203,6 +203,7 @@ const onComposeOperate = async (operation: string, row: any) => {
             path: row.path,
             operation: operation,
             withFile: false,
+            force: false,
         };
         loading.value = true;
         await composeOperator(params)

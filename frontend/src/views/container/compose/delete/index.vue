@@ -8,6 +8,12 @@
                 </span>
             </el-form-item>
             <el-form-item>
+                <el-checkbox v-model="force" :label="$t('website.forceDelete')" />
+                <span class="input-help">
+                    {{ $t('website.forceDeleteHelper') }}
+                </span>
+            </el-form-item>
+            <el-form-item>
                 <div class="font">
                     <span>{{ $t('database.delete') }}</span>
                     <span class="warning">{{ composeName }}</span>
@@ -40,6 +46,7 @@ let loading = ref(false);
 let deleteInfo = ref('');
 
 const deleteFile = ref();
+const force = ref();
 const composeName = ref();
 const composePath = ref();
 
@@ -53,6 +60,7 @@ const emit = defineEmits<{ (e: 'search'): void }>();
 
 const acceptParams = async (prop: DialogProps) => {
     deleteFile.value = false;
+    force.value = false;
     composeName.value = prop.name;
     composePath.value = prop.path;
     deleteInfo.value = '';
@@ -66,6 +74,7 @@ const submit = async () => {
         path: composePath.value,
         operation: 'delete',
         withFile: deleteFile.value,
+        force: force.value,
     };
     await composeOperator(params)
         .then(() => {

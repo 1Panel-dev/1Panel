@@ -309,6 +309,7 @@ export namespace Container {
         operation: string;
         path: string;
         withFile: boolean;
+        force: boolean;
     }
     export interface ComposeUpdate {
         name: string;
