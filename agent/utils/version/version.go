@@ -6,17 +6,18 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/app/dto"
-	"github.com/1Panel-dev/1Panel/agent/app/model"
-	"github.com/1Panel-dev/1Panel/agent/constant"
-	"github.com/1Panel-dev/1Panel/agent/global"
-	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"io"
 	"net"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/1Panel-dev/1Panel/agent/app/model"
+	"github.com/1Panel-dev/1Panel/agent/constant"
+	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/utils/common"
 )
 
 func GetUpgradeVersionInfo() (*dto.UpgradeInfo, error) {
@@ -34,14 +35,14 @@ func GetUpgradeVersionInfo() (*dto.UpgradeInfo, error) {
 
 	upgrade.TestVersion, upgrade.NewVersion, upgrade.LatestVersion = loadVersionByMode(developerMode.Value, currentVersion.Value)
 	var itemVersion string
-	if len(upgrade.LatestVersion) != 0 {
-		itemVersion = upgrade.LatestVersion
-	}
 	if len(upgrade.NewVersion) != 0 {
 		itemVersion = upgrade.NewVersion
 	}
 	if (global.CONF.Base.Mode == "dev" || developerMode.Value == constant.StatusEnable) && len(upgrade.TestVersion) != 0 {
 		itemVersion = upgrade.TestVersion
+	}
+	if len(upgrade.LatestVersion) != 0 {
+		itemVersion = upgrade.LatestVersion
 	}
 	if len(itemVersion) == 0 {
 		return &upgrade, nil

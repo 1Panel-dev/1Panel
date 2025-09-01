@@ -104,12 +104,12 @@ const onLoadUpgradeInfo = async () => {
             loading.value = false;
             if (res.data.testVersion || res.data.newVersion || res.data.latestVersion) {
                 upgradeInfo.value = res.data;
-                if (upgradeInfo.value.newVersion) {
-                    upgradeVersion.value = upgradeInfo.value.newVersion;
-                } else if (upgradeInfo.value.latestVersion) {
+                if (upgradeInfo.value.latestVersion) {
                     upgradeVersion.value = upgradeInfo.value.latestVersion;
                 } else if (upgradeInfo.value.testVersion) {
                     upgradeVersion.value = upgradeInfo.value.testVersion;
+                } else if (upgradeInfo.value.newVersion) {
+                    upgradeVersion.value = upgradeInfo.value.newVersion;
                 }
                 upgradeRef.value.acceptParams({ upgradeInfo: upgradeInfo.value, upgradeVersion: upgradeVersion.value });
             } else {
