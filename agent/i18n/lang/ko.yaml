@@ -15,6 +15,9 @@ ErrApiConfigIPInvalid: 'API 인터페이스를 호출하는 데 사용된 IP가 
 ErrApiConfigDisable: '이 인터페이스는 API 인터페이스 호출 사용을 금지합니다: {{ .detail }}'
 ErrApiConfigKeyTimeInvalid: 'API 인터페이스 타임스탬프 오류: {{ .detail }}'
 
+ErrMinQuickJump: "최소 하나의 빠른 점프 항목을 설정해 주세요!"
+ErrMaxQuickJump: "최대 네 개의 빠른 점프 항목을 설정할 수 있습니다!"
+
 #흔한
 ErrUsernameIsExist: '사용자 이름이 이미 존재합니다'
 ErrNameIsExist: '이름이 이미 존재합니다'

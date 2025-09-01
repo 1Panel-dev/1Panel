@@ -386,6 +386,8 @@ const message = {
     home: {
         recommend: 'recommend',
         dir: 'dir',
+        quickDir: 'Quick Dir',
+        database: 'Database - All',
         restart_1panel: 'Restart panel',
         restart_system: 'Restart server',
         operationSuccess: 'Operation succeeded, rebooting, please refresh the browser manually later!',

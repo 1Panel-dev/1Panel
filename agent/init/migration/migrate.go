@@ -37,6 +37,7 @@ func InitAgentDB() {
 		migrations.InitCronjobGroup,
 		migrations.AddColumnToAlert,
 		migrations.UpdateWebsiteSSL,
+		migrations.AddQuickJump,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

@@ -381,6 +381,10 @@ const message = {
         msgCenter: 'Pusat Tugas',
     },
     home: {
+        recommend: 'cadangan',
+        dir: 'direktori',
+        quickDir: 'Direktori Pantas',
+        database: 'Pangkalan Data - Semua',
         restart_1panel: 'Mulakan semula panel',
         restart_system: 'Mulakan semula pelayan',
         operationSuccess: 'Operasi berjaya, sedang memulakan semula, sila segarkan pelayar secara manual nanti!',

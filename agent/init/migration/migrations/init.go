@@ -471,3 +471,28 @@ var UpdateWebsiteSSL = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddQuickJump = &gormigrate.Migration{
+	ID: "20250901-add-quick-jump",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.QuickJump{}); err != nil {
+			return err
+		}
+		if err := tx.Create(&model.QuickJump{Name: "Website", Title: "menu.website", Recommend: 10, IsShow: true, Router: "/websites"}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.QuickJump{Name: "Database", Title: "home.database", Recommend: 30, IsShow: true, Router: "/databases"}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.QuickJump{Name: "Cronjob", Title: "menu.cronjob", Recommend: 50, IsShow: true, Router: "/cronjobs"}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.QuickJump{Name: "AppInstalled", Title: "home.appInstalled", Recommend: 70, IsShow: true, Router: "/apps/installed"}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.QuickJump{Name: "File", Detail: "/", Title: "home.quickDir", Recommend: 90, IsShow: false, Router: "/hosts/files"}).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}

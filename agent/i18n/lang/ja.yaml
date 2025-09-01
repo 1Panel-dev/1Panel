@@ -15,6 +15,9 @@ ErrApiConfigIPInvalid: 'API インターフェースの呼び出しに使用さ�
 ErrApiConfigDisable: 'このインターフェースは、API インターフェース呼び出しの使用を禁止しています: {{ .detail }}'
 ErrApiConfigKeyTimeInvalid: 'API インターフェースのタイムスタンプ エラー: {{ .detail }}'
 
+ErrMinQuickJump: "少なくとも1つのクイックジャンプエントリを設定してください！"
+ErrMaxQuickJump: "最大4つのクイックジャンプエントリを設定できます！"
+
 #common
 ErrUsernameIsExist: 'ユーザー名は既に存在します'
 ErrNameIsExist: '名前は既に存在します'

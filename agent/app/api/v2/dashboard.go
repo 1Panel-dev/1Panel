@@ -84,6 +84,38 @@ func (b *BaseApi) UpdateAppLauncher(c *gin.Context) {
 }
 
 // @Tags Dashboard
+// @Summary Load quick jump options
+// @Success 200 {Array} dto.QuickJump
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /dashboard/quick/option [post]
+func (b *BaseApi) LoadQuickOption(c *gin.Context) {
+	helper.SuccessWithData(c, dashboardService.LoadQuickOptions())
+}
+
+// @Tags Dashboard
+// @Summary Update quick jump
+// @Accept json
+// @Param request body dto.ChangeQuicks true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /dashboard/quick/change [post]
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"切换快速跳转","formatEN":"change quick jump"}
+func (b *BaseApi) UpdateQuickJump(c *gin.Context) {
+	var req dto.ChangeQuicks
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	if err := dashboardService.ChangeQuick(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags Dashboard
 // @Summary Load dashboard base info
 // @Accept json
 // @Param ioOption path string true "request"

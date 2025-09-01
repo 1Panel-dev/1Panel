@@ -15,6 +15,9 @@ ErrApiConfigIPInvalid: "调用 API 接口 IP 不在白名单: {{ .detail }}"
 ErrApiConfigDisable: "此接口禁止使用 API 接口调用: {{ .detail }}"
 ErrApiConfigKeyTimeInvalid: "API 接口时间戳错误: {{ .detail }}"
 
+ErrMinQuickJump: "请至少设置一个快速跳转入口！"
+ErrMaxQuickJump: "最多可设置四个快速跳转入口！"
+
 #common
 ErrUsernameIsExist: "用户名已存在"
 ErrNameIsExist: "名称已存在"

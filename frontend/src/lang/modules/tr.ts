@@ -388,8 +388,10 @@ const message = {
         msgCenter: 'Görev Merkezi',
     },
     home: {
-        recommend: 'önerilen',
+        recommend: 'tavsiye etmek',
         dir: 'dizin',
+        quickDir: 'Hızlı Dizin',
+        database: 'Veritabanı - Tümü',
         restart_1panel: 'Paneli yeniden başlat',
         restart_system: 'Sunucuyu yeniden başlat',
         operationSuccess: 'İşlem başarılı, yeniden başlatılıyor, lütfen tarayıcıyı daha sonra manuel olarak yenileyin!',

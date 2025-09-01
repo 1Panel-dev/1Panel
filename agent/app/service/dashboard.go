@@ -14,6 +14,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
+	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/ai_tools/gpu"
@@ -37,6 +38,9 @@ type IDashboardService interface {
 	LoadBaseInfo(ioOption string, netOption string) (*dto.DashboardBase, error)
 	LoadCurrentInfoForNode() *dto.NodeCurrent
 	LoadCurrentInfo(ioOption string, netOption string) *dto.DashboardCurrent
+
+	LoadQuickOptions() []dto.QuickJump
+	ChangeQuick(req dto.ChangeQuicks) error
 
 	LoadAppLauncher(ctx *gin.Context) ([]dto.AppLauncher, error)
 	ChangeShow(req dto.SettingUpdate) error
@@ -140,7 +144,7 @@ func (u *DashboardService) LoadBaseInfo(ioOption string, netOption string) (*dto
 	baseInfo.KernelVersion = hostInfo.KernelVersion
 	ss, _ := json.Marshal(hostInfo)
 	baseInfo.VirtualizationSystem = string(ss)
-	baseInfo.IpV4Addr = GetOutboundIP()
+	baseInfo.IpV4Addr = loadOutboundIP()
 	httpProxy := os.Getenv("http_proxy")
 	if httpProxy == "" {
 		httpProxy = os.Getenv("HTTP_PROXY")
@@ -150,30 +154,7 @@ func (u *DashboardService) LoadBaseInfo(ioOption string, netOption string) (*dto
 	}
 	baseInfo.SystemProxy = "noProxy"
 
-	appInstall, err := appInstallRepo.ListBy(context.Background())
-	if err != nil {
-		return nil, err
-	}
-	baseInfo.AppInstalledNumber = len(appInstall)
-	postgresqlDbs, err := postgresqlRepo.List()
-	if err != nil {
-		return nil, err
-	}
-	mysqlDbs, err := mysqlRepo.List()
-	if err != nil {
-		return nil, err
-	}
-	baseInfo.DatabaseNumber = len(mysqlDbs) + len(postgresqlDbs)
-	website, err := websiteRepo.GetBy()
-	if err != nil {
-		return nil, err
-	}
-	baseInfo.WebsiteNumber = len(website)
-	cronjobs, err := cronjobRepo.List()
-	if err != nil {
-		return nil, err
-	}
-	baseInfo.CronjobNumber = len(cronjobs)
+	loadQuickJump(&baseInfo)
 
 	cpuInfo, err := cpu.Info()
 	if err == nil {
@@ -345,6 +326,39 @@ func (u *DashboardService) ChangeShow(req dto.SettingUpdate) error {
 		}
 	}
 	return nil
+}
+
+func (u *DashboardService) LoadQuickOptions() []dto.QuickJump {
+	quicks := launcherRepo.ListQuickJump(true)
+	var list []dto.QuickJump
+	for _, quick := range quicks {
+		var item dto.QuickJump
+		_ = copier.Copy(&item, &quick)
+		list = append(list, item)
+	}
+	return list
+}
+func (u *DashboardService) ChangeQuick(req dto.ChangeQuicks) error {
+	showCount := 0
+	var quicks []model.QuickJump
+	for _, item := range req.Quicks {
+		var quick model.QuickJump
+		if item.IsShow {
+			showCount++
+		}
+		if err := copier.Copy(&quick, &item); err != nil {
+			return err
+		}
+		quicks = append(quicks, quick)
+	}
+	if showCount == 0 {
+		return buserr.New("ErrMinQuickJump")
+	}
+	if showCount > 4 {
+		return buserr.New("ErrMaxQuickJump")
+	}
+
+	return launcherRepo.UpdateQuicks(quicks)
 }
 
 func (u *DashboardService) ListLauncherOption(filter string) ([]dto.LauncherOption, error) {
@@ -545,7 +559,7 @@ func loadXpuInfo() []dto.XPUInfo {
 	return data
 }
 
-func GetOutboundIP() string {
+func loadOutboundIP() string {
 	conn, err := network.Dial("udp", "8.8.8.8:80")
 
 	if err != nil {
@@ -555,4 +569,31 @@ func GetOutboundIP() string {
 
 	localAddr := conn.LocalAddr().(*network.UDPAddr)
 	return localAddr.IP.String()
+}
+
+func loadQuickJump(base *dto.DashboardBase) {
+	quicks := launcherRepo.ListQuickJump(false)
+	for i := 0; i < len(quicks); i++ {
+		switch quicks[i].Name {
+		case "Website":
+			website, _ := websiteRepo.GetBy()
+			quicks[i].Detail = fmt.Sprintf("%d", len(website))
+		case "Database":
+			postgresqlDbs, _ := postgresqlRepo.List()
+			mysqlDbs, _ := mysqlRepo.List()
+			quicks[i].Detail = fmt.Sprintf("%d", len(mysqlDbs)+len(postgresqlDbs))
+		case "Cronjob":
+			cronjobs, _ := cronjobRepo.List()
+			quicks[i].Detail = fmt.Sprintf("%d", len(cronjobs))
+		case "AppInstalled":
+			appInstall, _ := appInstallRepo.ListBy(context.Background())
+			quicks[i].Detail = fmt.Sprintf("%d", len(appInstall))
+		}
+		var item dto.QuickJump
+		_ = copier.Copy(&item, quicks[i])
+		base.QuickJumps = append(base.QuickJumps, item)
+	}
+	sort.Slice(quicks, func(i, j int) bool {
+		return quicks[i].Recommend < quicks[j].Recommend
+	})
 }

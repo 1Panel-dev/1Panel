@@ -43,39 +43,25 @@
         <el-row :gutter="7" class="card-interval">
             <el-col :xs="24" :sm="24" :md="16" :lg="16" :xl="16">
                 <CardWithHeader :header="$t('menu.home')" height="166px">
+                    <template #header-r>
+                        <el-button class="h-button-setting" @click="quickJumpRef.acceptParams()" link icon="Setting" />
+                    </template>
                     <template #body>
                         <div class="h-overview">
                             <el-row>
-                                <el-col :span="6">
-                                    <span>{{ $t('menu.website', 2) }}</span>
+                                <el-col :span="6" v-for="item in baseInfo.quickJump" :key="item.name">
+                                    <span>{{ $t(item.title, 2) }}</span>
                                     <div class="count">
-                                        <span @click="jumpToPath(router, '/websites')">
-                                            {{ baseInfo?.websiteNumber }}
-                                        </span>
-                                    </div>
-                                </el-col>
-                                <el-col :span="6">
-                                    <span>{{ $t('menu.database', 2) }} - {{ $t('commons.table.all') }}</span>
-                                    <div class="count">
-                                        <span @click="jumpToPath(router, '/databases')">
-                                            {{ baseInfo?.databaseNumber }}
-                                        </span>
-                                    </div>
-                                </el-col>
-                                <el-col :span="6">
-                                    <span>{{ $t('menu.cronjob', 2) }}</span>
-                                    <div class="count">
-                                        <span @click="jumpToPath(router, '/cronjobs')">
-                                            {{ baseInfo?.cronjobNumber }}
-                                        </span>
-                                    </div>
-                                </el-col>
-                                <el-col :span="6">
-                                    <span>{{ $t('home.appInstalled') }}</span>
-                                    <div class="count">
-                                        <span @click="jumpToPath(router, '/apps/installed')">
-                                            {{ baseInfo?.appInstalledNumber }}
-                                        </span>
+                                        <el-tooltip
+                                            v-if="item.detail.length > 20"
+                                            :content="item.detail"
+                                            placement="bottom"
+                                        >
+                                            <span @click="quickJump(item)">
+                                                {{ item.detail.substring(0, 18) + '...' }}
+                                            </span>
+                                        </el-tooltip>
+                                        <span @click="quickJump(item)" v-else>{{ item.detail }}</span>
                                     </div>
                                 </el-col>
                             </el-row>
@@ -250,6 +236,7 @@
         </el-row>
 
         <LicenseImport ref="licenseRef" />
+        <QuickJump @search="onLoadBaseInfo(false, 'all')" ref="quickJumpRef" />
     </div>
 </template>
 
@@ -259,6 +246,7 @@ import Status from '@/views/home/status/index.vue';
 import AppLauncher from '@/views/home/app/index.vue';
 import VCharts from '@/components/v-charts/index.vue';
 import LicenseImport from '@/components/license-import/index.vue';
+import QuickJump from '@/views/home/quick/index.vue';
 import CardWithHeader from '@/components/card-with-header/index.vue';
 import i18n from '@/lang';
 import { Dashboard } from '@/api/interface/dashboard';
@@ -269,6 +257,7 @@ import { getIOOptions, getNetworkOptions } from '@/api/modules/host';
 import { getSettingInfo, loadUpgradeInfo } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
 import { storeToRefs } from 'pinia';
+import { routerToFileWithPath, routerToPath } from '@/utils/router';
 const router = useRouter();
 const globalStore = GlobalStore();
 
@@ -295,6 +284,7 @@ const ioOptions = ref();
 const netOptions = ref();
 
 const licenseRef = ref();
+const quickJumpRef = ref();
 const { isProductPro } = storeToRefs(globalStore);
 
 const searchInfo = reactive({
@@ -303,11 +293,6 @@ const searchInfo = reactive({
 });
 
 const baseInfo = ref<Dashboard.BaseInfo>({
-    websiteNumber: 0,
-    databaseNumber: 0,
-    cronjobNumber: 0,
-    appInstalledNumber: 0,
-
     hostname: '',
     os: '',
     platform: '',
@@ -323,6 +308,8 @@ const baseInfo = ref<Dashboard.BaseInfo>({
     cpuLogicalCores: 0,
     cpuModelName: '',
     currentInfo: null,
+
+    quickJump: [],
 });
 const currentInfo = ref<Dashboard.CurrentInfo>({
     uptime: 0,
@@ -427,6 +414,13 @@ const onLoadBaseInfo = async (isInit: boolean, range: string) => {
             }
         }, 3000);
     }
+};
+
+const quickJump = (item: any) => {
+    if (item.name === 'File') {
+        routerToFileWithPath(item.detail);
+    }
+    return routerToPath(item.router);
 };
 
 const onLoadCurrentInfo = async () => {
@@ -635,9 +629,8 @@ onBeforeUnmount(() => {
     .count {
         margin-top: 10px;
         span {
-            font-size: 25px;
+            font-size: 18px;
             color: $primary-color;
-            font-weight: 500;
             line-height: 32px;
             cursor: pointer;
         }

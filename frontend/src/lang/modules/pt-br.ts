@@ -379,6 +379,10 @@ const message = {
         msgCenter: 'Central de Tarefas',
     },
     home: {
+        recommend: 'recomendar',
+        dir: 'dir',
+        quickDir: 'Diretório Rápido',
+        database: 'Banco de Dados - Todos',
         restart_1panel: 'Reiniciar painel',
         restart_system: 'Reiniciar servidor',
         operationSuccess: 'Operação bem-sucedida, reiniciando, por favor, atualize o navegador manualmente mais tarde!',

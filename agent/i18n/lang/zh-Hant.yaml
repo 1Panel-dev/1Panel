@@ -15,6 +15,9 @@ ErrApiConfigIPInvalid: '呼叫 API 介面 IP 不在白名單: {{ .detail }}'
 ErrApiConfigDisable: '此介面禁止使用 API 介面呼叫: {{ .detail }}'
 ErrApiConfigKeyTimeInvalid: 'API 介面時間戳記錯誤: {{ .detail }}'
 
+ErrMinQuickJump: "請至少設定一個快速跳轉入口！"
+ErrMaxQuickJump: "最多可設定四個快速跳轉入口！"
+
 #common
 ErrUsernameIsExist: '使用者名稱已存在'
 ErrNameIsExist: '名稱已存在'

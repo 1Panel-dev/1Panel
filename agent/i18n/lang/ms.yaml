@@ -18,6 +18,9 @@ StartPushSSLToNode: "Mula menolak sijil ke nod"
 PushSSLToNodeFailed: "Gagal menolak sijil ke nod: {{ .err }}"
 PushSSLToNodeSuccess: "Berjaya menolak sijil ke nod"
 
+ErrMinQuickJump: "Sila tetapkan sekurang-kurangnya satu entri lompat pantas!"
+ErrMaxQuickJump: "Anda boleh menetapkan sehingga empat entri lompat pantas!"
+
 #biasa
 ErrUsernameIsExist: 'Nama pengguna sudah wujud'
 ErrNameIsExist: 'Nama sudah wujud'

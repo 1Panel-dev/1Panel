@@ -373,6 +373,10 @@ const message = {
         msgCenter: 'タスクセンター',
     },
     home: {
+        recommend: 'おすすめ',
+        dir: 'ディレクトリ',
+        quickDir: 'クイックディレクトリ',
+        database: 'データベース - すべて',
         restart_1panel: 'パネルを再起動します',
         restart_system: 'サーバーを再起動します',
         operationSuccess: '操作が成功し、再起動します。後で手動でブラウザを更新してください！',

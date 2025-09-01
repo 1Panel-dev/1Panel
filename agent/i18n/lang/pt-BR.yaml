@@ -18,6 +18,9 @@ StartPushSSLToNode: "Iniciando o envio do certificado para o nó"
 PushSSLToNodeFailed: "Falha ao enviar o certificado para o nó: {{ .err }}"
 PushSSLToNodeSuccess: "Certificado enviado com sucesso para o nó"
 
+ErrMinQuickJump: "Defina pelo menos uma entrada de salto rápido!"
+ErrMaxQuickJump: "Você pode definir até quatro entradas de salto rápido!"
+
 #comum
 ErrUsernameIsExist: 'Nome de usuário já existe'
 ErrNameIsExist: 'Nome já existe'

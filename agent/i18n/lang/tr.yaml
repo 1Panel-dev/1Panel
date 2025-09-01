@@ -18,6 +18,9 @@ StartPushSSLToNode: "Sertifika düğüme gönderilmeye başlandı"
 PushSSLToNodeFailed: "Sertifika düğüme gönderilemedi: {{ .err }}"
 PushSSLToNodeSuccess: "Sertifika düğüme başarıyla gönderildi"
 
+ErrMinQuickJump: "Lütfen en az bir hızlı atlama girişi ayarlayın!"
+ErrMaxQuickJump: "En fazla dört hızlı atlama girişi ayarlayabilirsiniz!"
+
 #common
 ErrUsernameIsExist: 'Kullanıcı adı zaten mevcut'
 ErrNameIsExist: 'İsim zaten mevcut'

@@ -3,11 +3,6 @@ package dto
 import "time"
 
 type DashboardBase struct {
-	WebsiteNumber      int `json:"websiteNumber"`
-	DatabaseNumber     int `json:"databaseNumber"`
-	CronjobNumber      int `json:"cronjobNumber"`
-	AppInstalledNumber int `json:"appInstalledNumber"`
-
 	Hostname             string `json:"hostname"`
 	OS                   string `json:"os"`
 	Platform             string `json:"platform"`
@@ -23,7 +18,22 @@ type DashboardBase struct {
 	CPULogicalCores int    `json:"cpuLogicalCores"`
 	CPUModelName    string `json:"cpuModelName"`
 
+	QuickJumps  []QuickJump      `json:"quickJump"`
 	CurrentInfo DashboardCurrent `json:"currentInfo"`
+}
+
+type ChangeQuicks struct {
+	Quicks []QuickJump `json:"quicks"`
+}
+
+type QuickJump struct {
+	ID        uint   `json:"id"`
+	Name      string `json:"name"`
+	Title     string `json:"title"`
+	Detail    string `json:"detail"`
+	Recommend int    `json:"recommend"`
+	IsShow    bool   `json:"isShow"`
+	Router    string `json:"router"`
 }
 
 type OsInfo struct {

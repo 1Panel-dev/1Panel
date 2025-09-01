@@ -375,6 +375,10 @@ const message = {
         msgCenter: '작업 센터',
     },
     home: {
+        recommend: '추천',
+        dir: '디렉토리',
+        quickDir: '빠른 디렉토리',
+        database: '데이터베이스 - 전체',
         restart_1panel: '패널 재시작',
         restart_system: '서버 재시작',
         operationSuccess:

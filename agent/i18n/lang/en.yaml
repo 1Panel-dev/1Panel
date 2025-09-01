@@ -15,6 +15,9 @@ ErrApiConfigIPInvalid: 'The IP used to call the API interface is not in the whit
 ErrApiConfigDisable: 'This interface prohibits the use of API interface calls: {{ .detail }}'
 ErrApiConfigKeyTimeInvalid: 'API interface timestamp error: {{ .detail }}'
 
+ErrMinQuickJump: "Please set at least one quick jump entry!"
+ErrMaxQuickJump: "You can set up to four quick jump entries!"
+
 #common
 ErrUsernameIsExist: 'Username already exists'
 ErrNameIsExist: 'Name already exists'
