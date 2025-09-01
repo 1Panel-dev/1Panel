@@ -212,6 +212,24 @@ func ScanPortWithProto(port int, proto string) bool {
 	return ScanPort(port)
 }
 
+func ScanPortWithIP(ip string, port int) bool {
+	if len(ip) == 0 {
+		return ScanPort(port)
+	}
+	address := net.JoinHostPort(ip, fmt.Sprintf("%d", port))
+	timeout := time.Second * 2
+	conn, err := net.DialTimeout("tcp", address, timeout)
+
+	if err != nil {
+		if opErr, ok := err.(*net.OpError); ok && opErr.Timeout() {
+			return true
+		}
+		return false
+	}
+	defer conn.Close()
+	return true
+}
+
 func IsNum(s string) bool {
 	_, err := strconv.ParseFloat(s, 64)
 	return err == nil

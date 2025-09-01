@@ -1429,7 +1429,7 @@ func checkPortStats(ports []dto.PortHelper) (nat.PortMap, error) {
 				portMap[nat.Port(fmt.Sprintf("%d/%s", containerStart+i, port.Protocol))] = []nat.PortBinding{bindItem}
 			}
 			for i := hostStart; i <= hostEnd; i++ {
-				if common.ScanPort(i) {
+				if common.ScanPortWithIP(port.HostIP, i) {
 					return portMap, buserr.WithDetail("ErrPortInUsed", i, nil)
 				}
 			}
@@ -1440,7 +1440,7 @@ func checkPortStats(ports []dto.PortHelper) (nat.PortMap, error) {
 			} else {
 				portItem, _ = strconv.Atoi(port.HostPort)
 			}
-			if common.ScanPort(portItem) {
+			if common.ScanPortWithIP(port.HostIP, portItem) {
 				return portMap, buserr.WithDetail("ErrPortInUsed", portItem, nil)
 			}
 			bindItem := nat.PortBinding{HostPort: strconv.Itoa(portItem), HostIP: port.HostIP}
