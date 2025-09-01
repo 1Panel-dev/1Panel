@@ -650,7 +650,7 @@ func (w WebsiteSSLService) Upload(req request.WebsiteSSLUpload) error {
 		}
 		pemData = reset
 	}
-	if pemData == nil {
+	if pemData == nil || cert == nil {
 		return buserr.New("ErrSSLCertificateFormat")
 	}
 
