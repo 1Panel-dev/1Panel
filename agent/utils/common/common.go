@@ -213,7 +213,7 @@ func ScanPortWithProto(port int, proto string) bool {
 }
 
 func ScanPortWithIP(ip string, port int) bool {
-	if len(ip) == 0 {
+	if len(ip) == 0 || ip == "0.0.0.0" || ip == "::" {
 		return ScanPort(port)
 	}
 	address := net.JoinHostPort(ip, fmt.Sprintf("%d", port))
