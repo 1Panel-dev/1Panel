@@ -1875,7 +1875,7 @@ const message = {
         node: '升级专业版可以使用 1Panel 管理多台 linux 服务器。',
         fileExchange: '升级专业版可以在多台服务器之间快速传输文件。',
         app: '升级专业版可通过手机 APP，查看服务信息、异常监控等。',
-        cluster: '升级专业版可以管理 MySQL/Postgres/Reids 主从集群。',
+        cluster: '升级专业版可以管理 MySQL/Postgres/Redis 主从集群。',
     },
     clean: {
         scan: '开始扫描',

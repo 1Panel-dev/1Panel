@@ -2019,7 +2019,7 @@ const message = {
         fileExchange: 'Upgrade to the Professional Edition to quickly transfer files between multiple servers.',
         app: 'Upgrade to the professional version to view service information, abnormal monitoring, etc. through the mobile APP. ',
         cluster:
-            'Upgrading to the Professional Edition allows you to manage MySQL/Postgres/Reids master-slave clusters.',
+            'Upgrading to the Professional Edition allows you to manage MySQL/Postgres/Redis master-slave clusters.',
     },
     clean: {
         scan: 'Start scanning',

@@ -1884,7 +1884,7 @@ const message = {
         node: '升級專業版可以使用 1Panel 管理多台 linux 伺服器。',
         fileExchange: '升級專業版可以在多台服務器之間快速傳輸文件。',
         app: '升級專業版可通過手機APP，查看服務資訊、异常監控等。',
-        cluster: '升級專業版可以管理 MySQL/Postgres/Reids 主從集群。',
+        cluster: '升級專業版可以管理 MySQL/Postgres/Redis 主從集群。',
     },
     clean: {
         scan: '開始掃描',

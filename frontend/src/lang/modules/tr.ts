@@ -2039,7 +2039,7 @@ const message = {
         node: 'Profesyonel sürüme yükseltme, birden fazla Linux sunucusunu 1Panel ile yönetmenize olanak tanır.',
         fileExchange: 'Profesyonel Sürüme yükseltme, birden fazla sunucu arasında hızlı dosya aktarımı sağlar.',
         app: 'Profesyonel sürüme yükseltme, mobil uygulama üzerinden hizmet bilgilerini, anormal izlemeyi vb. görüntülemenize olanak tanır. ',
-        cluster: 'Profesyonel Sürüme Yükseltme, MySQL/Postgers/Reids ana-çalışan kümelerini yönetmenizi sağlar.',
+        cluster: 'Profesyonel Sürüme Yükseltme, MySQL/Postgers/Redis ana-çalışan kümelerini yönetmenizi sağlar.',
     },
     clean: {
         scan: 'Taramayı başlat',

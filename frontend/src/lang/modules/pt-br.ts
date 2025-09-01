@@ -1985,7 +1985,7 @@ const message = {
             'Atualize para a Edição Profissional para transferir arquivos rapidamente entre vários servidores.',
         app: 'Upgrade para a versão profissional para visualizar informações do serviço, monitoramento anômalo, etc., através do aplicativo móvel.',
         cluster:
-            'A atualização para a Edição Profissional permite gerenciar clusters mestre-escravo MySQL/Postgres/Reids.',
+            'A atualização para a Edição Profissional permite gerenciar clusters mestre-escravo MySQL/Postgres/Redis.',
     },
     clean: {
         scan: 'Iniciar escaneamento',

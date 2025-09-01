@@ -1993,7 +1993,7 @@ const message = {
         fileExchange: 'Naik taraf ke Edisi Professional untuk menghantar fail dengan cepat antara pelbagai pelayan.',
         app: 'Tingkatkan ke versi profesional untuk melihat maklumat perkhidmatan, pemantauan abnormal, dll melalui aplikasi mudah alih.',
         cluster:
-            'Versi Profesional menaik taraf membolehkan anda menguruskan kelompok induk-hamba MySQL/Postgres/Reids.',
+            'Versi Profesional menaik taraf membolehkan anda menguruskan kelompok induk-hamba MySQL/Postgres/Redis.',
     },
     clean: {
         scan: 'Mulakan imbasan',
