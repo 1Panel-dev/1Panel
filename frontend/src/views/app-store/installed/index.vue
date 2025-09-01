@@ -528,6 +528,9 @@ const hasLinkButton = (installed: any) => {
 const search = async () => {
     searchReq.page = paginationConfig.currentPage;
     searchReq.pageSize = paginationConfig.pageSize;
+
+    localStorage.setItem('app-installed-page-size', String(searchReq.pageSize));
+
     const res = await searchAppInstalled(searchReq);
     data.value = res.data.items;
     paginationConfig.total = res.data.total;
