@@ -1233,13 +1233,13 @@ func (w WebsiteService) OpWebsiteLog(req request.WebsiteLogReq) (*response.Websi
 			}
 		}
 		filePath := path.Join(sitePath, "log", req.LogType)
-		lines, end, _, err := files.ReadFileByLine(filePath, req.Page, req.PageSize, false)
+		logFileRes, err := files.ReadFileByLine(filePath, req.Page, req.PageSize, false)
 		if err != nil {
 			return nil, err
 		}
-		res.End = end
+		res.End = logFileRes.IsEndOfFile
 		res.Path = filePath
-		res.Content = strings.Join(lines, "\n")
+		res.Content = strings.Join(logFileRes.Lines, "\n")
 		return res, nil
 	case constant.DisableLog:
 		params := dto.NginxParam{}

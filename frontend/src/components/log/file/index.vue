@@ -37,7 +37,7 @@
             >
                 <hightlight :log="log" :type="config.colorMode ?? 'nginx'"></hightlight>
             </div>
-            <hightlight v-if="visibleLogs.length === 0" :log="$t('commons.log.noLog')" type="system"></hightlight>
+            <hightlight v-if="logs.length === 0" :log="$t('commons.log.noLog')" type="system"></hightlight>
         </div>
     </div>
 </template>
@@ -151,13 +151,20 @@ const containerHeight = ref(500);
 const visibleCount = computed(() => Math.ceil(containerHeight.value / logHeight));
 const startIndex = ref(0);
 const lastScrollTop = ref(0);
-
+const totalLines = ref(0);
+const stopReading = ref(false);
 const visibleLogs = computed(() => {
-    return logs.value.slice(startIndex.value, startIndex.value + visibleCount.value);
+    const safeStartIndex = Math.max(0, Math.min(startIndex.value, Math.max(0, logs.value.length - visibleCount.value)));
+    if (safeStartIndex !== startIndex.value) {
+        nextTick(() => {
+            startIndex.value = safeStartIndex;
+        });
+    }
+    return logs.value.slice(safeStartIndex, safeStartIndex + visibleCount.value);
 });
 
 const onScroll = async () => {
-    if (!logContainer.value || isLoading.value) return;
+    if (!logContainer.value) return;
 
     const scrollTop = logContainer.value.scrollTop;
     const scrollHeight = logContainer.value.scrollHeight;
@@ -165,8 +172,15 @@ const onScroll = async () => {
 
     lastScrollTop.value = scrollTop;
 
-    const newStartIndex = Math.max(0, Math.floor(scrollTop / logHeight));
-    startIndex.value = newStartIndex;
+    if (!isLoading.value) {
+        const newStartIndex = Math.max(
+            0,
+            Math.min(Math.floor(scrollTop / logHeight), Math.max(0, logs.value.length - visibleCount.value)),
+        );
+        startIndex.value = newStartIndex;
+    }
+
+    if (isLoading.value) return;
 
     if (scrollTop <= 50 && readReq.page > 1) {
         if (minPage.value <= 1) {
@@ -178,7 +192,7 @@ const onScroll = async () => {
         return;
     }
 
-    if (scrollHeight - scrollTop - clientHeight <= 50 && !end.value && maxPage.value > 1) {
+    if (scrollHeight - scrollTop - clientHeight <= 50 && !end.value && readReq.page < maxPage.value) {
         readReq.page = maxPage.value;
         await getContent(false);
     }
@@ -210,6 +224,7 @@ const changeTail = (fromOutSide: boolean) => {
 
 const clearLog = (): void => {
     logs.value = [];
+    startIndex.value = 0;
     readReq.page = 1;
     lastLogs.value = [];
 };
@@ -231,6 +246,12 @@ const getContent = async (pre: boolean) => {
         isLoading.value = false;
         firstLoading.value = false;
     }
+    if (res.data.scope != 'tail' && !pre && res.data.end && res.data.totalLines == totalLines.value) {
+        isLoading.value = false;
+        return;
+    }
+
+    totalLines.value = res.data.totalLines;
 
     if (res.data.scope == 'tail') {
         showTail.value = false;
@@ -238,6 +259,7 @@ const getContent = async (pre: boolean) => {
 
     if (res.data.taskStatus && res.data.taskStatus !== 'Executing') {
         isTailDisabled.value = true;
+        tailLog.value = false;
     }
 
     logPath.value = res.data.path;
@@ -279,18 +301,29 @@ const getContent = async (pre: boolean) => {
                 if (end.value) {
                     logs.value = [...lastLogs.value, ...newLogs];
                 } else {
-                    logs.value = [...logs.value, ...newLogs];
+                    if (newLogs.length > logs.value.length) {
+                        logs.value = newLogs;
+                    } else {
+                        logs.value = [...logs.value, ...newLogs];
+                    }
                 }
             }
         }
+
         nextTick(() => {
             if (logContainer.value) {
                 if (pre) {
                     if (readReq.page > 1) {
                         const addedLines = newLogs.length;
-                        const newScrollPosition = lastScrollTop.value + (addedLines * logHeight) / 3;
+                        const newScrollPosition = lastScrollTop.value + addedLines * logHeight;
                         logContainer.value.scrollTop = newScrollPosition;
-                        startIndex.value = Math.max(0, Math.floor(newScrollPosition / logHeight));
+                        startIndex.value = Math.max(
+                            0,
+                            Math.min(
+                                Math.floor(newScrollPosition / logHeight),
+                                Math.max(0, logs.value.length - visibleCount.value),
+                            ),
+                        );
                     }
                 } else {
                     logContainer.value.scrollTop = totalHeight.value;
@@ -313,24 +346,33 @@ const getContent = async (pre: boolean) => {
         } else {
             minPage.value = res.data.total;
         }
+    } else {
+        maxPage.value = Math.max(maxPage.value, readReq.page);
     }
     if (logs.value && logs.value.length > 3000) {
+        const removedCount = readReq.pageSize;
         if (pre) {
-            logs.value.splice(logs.value.length - readReq.pageSize, readReq.pageSize);
+            logs.value.splice(logs.value.length - removedCount, removedCount);
             if (maxPage.value > 1) {
                 maxPage.value--;
             }
         } else {
-            logs.value.splice(0, readReq.pageSize);
+            logs.value.splice(0, removedCount);
+            startIndex.value = Math.max(0, startIndex.value - removedCount);
             if (minPage.value > 1) {
                 minPage.value++;
             }
         }
+        logCount.value = logs.value.length;
     }
     isLoading.value = false;
 };
 
 const onCloseLog = async () => {
+    if (stopReading.value) {
+        return;
+    }
+    stopReading.value = true;
     tailLog.value = false;
     if (timer) {
         clearInterval(Number(timer));

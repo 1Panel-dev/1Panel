@@ -568,36 +568,40 @@ func (f *FileService) ReadLogByLine(req request.FileReadByLineReq) (*response.Fi
 	var (
 		lines       []string
 		isEndOfFile bool
-		total       int
 		scope       string
+		logFileRes  *dto.LogFileRes
 	)
-
 	if stat.Size() > 500*1024*1024 {
 		lines, err = files.TailFromEnd(logFilePath, req.PageSize)
 		isEndOfFile = true
 		scope = "tail"
 	} else {
-		lines, isEndOfFile, total, err = files.ReadFileByLine(logFilePath, req.Page, req.PageSize, req.Latest)
+		logFileRes, err = files.ReadFileByLine(logFilePath, req.Page, req.PageSize, req.Latest)
 		if err != nil {
 			return nil, err
 		}
-		if req.Latest && req.Page == 1 && len(lines) < 1000 && total > 1 {
-			preLines, _, _, err := files.ReadFileByLine(logFilePath, total-1, req.PageSize, false)
+		if req.Latest && req.Page == 1 && len(logFileRes.Lines) < 1000 && logFileRes.TotalPages > 1 {
+			res, err := files.ReadFileByLine(logFilePath, logFileRes.TotalPages-1, req.PageSize, false)
 			if err != nil {
 				return nil, err
 			}
-			lines = append(preLines, lines...)
+			logFileRes.Lines = append(res.Lines, logFileRes.Lines...)
 		}
 		scope = "page"
+		lines = logFileRes.Lines
 	}
 
 	res := &response.FileLineContent{
 		End:        isEndOfFile,
 		Path:       logFilePath,
-		Total:      total,
 		TaskStatus: taskStatus,
 		Lines:      lines,
 		Scope:      scope,
+	}
+	if logFileRes != nil {
+		res.TotalLines = logFileRes.TotalLines
+		res.Total = logFileRes.TotalPages
+		res.End = logFileRes.IsEndOfFile
 	}
 	return res, nil
 }
