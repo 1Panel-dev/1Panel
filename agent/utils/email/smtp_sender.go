@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/smtp"
 	"strings"
+	"time"
 )
 
 // SMTPConfig holds SMTP connection info
@@ -28,9 +29,7 @@ type EmailMessage struct {
 	IsHTML  bool
 }
 
-// SendMail sends the email using the given config
 func SendMail(config SMTPConfig, message EmailMessage, transport *http.Transport) error {
-	// 验证配置
 	if err := validateConfig(config); err != nil {
 		return err
 	}
@@ -38,13 +37,11 @@ func SendMail(config SMTPConfig, message EmailMessage, transport *http.Transport
 	addr := fmt.Sprintf("%s:%d", config.Host, config.Port)
 	toList := parseRecipients(config.Recipient)
 
-	// 构建邮件内容
 	msg, err := buildMessage(config, message, toList)
 	if err != nil {
 		return err
 	}
 
-	// 根据加密类型选择发送方式
 	switch strings.ToLower(config.Encryption) {
 	case "ssl":
 		return sendWithSSL(config, addr, toList, msg, transport)
@@ -57,7 +54,6 @@ func SendMail(config SMTPConfig, message EmailMessage, transport *http.Transport
 	}
 }
 
-// 验证配置有效性
 func validateConfig(config SMTPConfig) error {
 	if config.Host == "" {
 		return fmt.Errorf("SMTP host is required")
@@ -83,7 +79,6 @@ func validateConfig(config SMTPConfig) error {
 	return nil
 }
 
-// 检查加密类型是否有效
 func isValidEncryption(enc string) bool {
 	enc = strings.ToLower(enc)
 	return enc == "ssl" || enc == "starttls" || enc == "none" || enc == "tls"
@@ -97,12 +92,12 @@ func parseRecipients(recipient string) []string {
 	return toList
 }
 
-// 构建邮件内容
 func buildMessage(config SMTPConfig, message EmailMessage, toList []string) (string, error) {
 	headers := make(map[string]string)
 	headers["From"] = config.From
 	headers["To"] = strings.Join(toList, ",")
 	headers["Subject"] = message.Subject
+	headers["Date"] = time.Now().UTC().Format(time.RFC1123Z)
 
 	if message.IsHTML {
 		headers["MIME-version"] = "1.0"
@@ -123,12 +118,10 @@ func buildMessage(config SMTPConfig, message EmailMessage, toList []string) (str
 	return msg.String(), nil
 }
 
-// 验证邮件头安全性
 func isValidHeader(key, value string) bool {
 	return !strings.ContainsAny(key, "\r\n") && !strings.ContainsAny(value, "\r\n")
 }
 
-// SSL/TLS方式发送邮件
 func sendWithSSL(config SMTPConfig, addr string, toList []string, msg string, transport *http.Transport) error {
 	var err error
 	var conn net.Conn
@@ -149,7 +142,6 @@ func sendWithSSL(config SMTPConfig, addr string, toList []string, msg string, tr
 		return fmt.Errorf("TLS handshake failed: %w", err)
 	}
 
-	// 创建SMTP客户端
 	client, err := smtp.NewClient(tlsConn, config.Host)
 	if err != nil {
 		return fmt.Errorf("failed to create SMTP client: %w", err)
@@ -159,7 +151,6 @@ func sendWithSSL(config SMTPConfig, addr string, toList []string, msg string, tr
 	return sendEmailWithClient(client, config, toList, msg)
 }
 
-// STARTTLS方式发送邮件
 func sendWithStartTLS(config SMTPConfig, addr string, toList []string, msg string, transport *http.Transport) error {
 	var err error
 	var conn net.Conn
@@ -173,14 +164,12 @@ func sendWithStartTLS(config SMTPConfig, addr string, toList []string, msg strin
 	}
 	defer conn.Close()
 
-	// 创建SMTP客户端
 	client, err := smtp.NewClient(conn, config.Host)
 	if err != nil {
 		return fmt.Errorf("failed to create SMTP client: %w", err)
 	}
 	defer client.Quit()
 
-	// 启用TLS
 	if err = client.StartTLS(&tls.Config{ServerName: config.Host}); err != nil {
 		return fmt.Errorf("failed to start TLS: %w", err)
 	}
@@ -188,7 +177,6 @@ func sendWithStartTLS(config SMTPConfig, addr string, toList []string, msg strin
 	return sendEmailWithClient(client, config, toList, msg)
 }
 
-// 明文方式发送邮件
 func sendPlaintext(config SMTPConfig, addr string, toList []string, msg string, transport *http.Transport) error {
 	var err error
 	var conn net.Conn
@@ -210,7 +198,6 @@ func sendPlaintext(config SMTPConfig, addr string, toList []string, msg string, 
 	return sendEmailWithClient(client, config, toList, msg)
 }
 
-// 使用SMTP客户端发送邮件
 func sendEmailWithClient(client *smtp.Client, config SMTPConfig, toList []string, msg string) error {
 	auth := smtp.PlainAuth("", config.Username, config.Password, config.Host)
 	if err := client.Auth(auth); err != nil {
