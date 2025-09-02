@@ -209,11 +209,12 @@ type NetworkCreate struct {
 }
 
 type Volume struct {
-	Name       string    `json:"name"`
-	Labels     []string  `json:"labels"`
-	Driver     string    `json:"driver"`
-	Mountpoint string    `json:"mountpoint"`
-	CreatedAt  time.Time `json:"createdAt"`
+	Name       string         `json:"name"`
+	Labels     []VolumeOption `json:"labels"`
+	Driver     string         `json:"driver"`
+	Mountpoint string         `json:"mountpoint"`
+	CreatedAt  time.Time      `json:"createdAt"`
+	Options    []VolumeOption `json:"options"`
 }
 type VolumeCreate struct {
 	Name    string   `json:"name" validate:"required"`
@@ -221,7 +222,10 @@ type VolumeCreate struct {
 	Options []string `json:"options"`
 	Labels  []string `json:"labels"`
 }
-
+type VolumeOption struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
+}
 type BatchDelete struct {
 	TaskID string   `json:"taskID"`
 	Force  bool     `json:"force"`

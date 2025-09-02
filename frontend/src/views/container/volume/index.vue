@@ -47,15 +47,35 @@
                             </el-text>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('container.volumeDir')" min-width="100">
+                    <el-table-column label="Options" min-width="160">
                         <template #default="{ row }">
-                            <el-tooltip :content="row.mountpoint">
-                                <el-button type="primary" link @click="routerToFileWithPath(row.mountpoint)">
-                                    <el-icon>
-                                        <FolderOpened />
-                                    </el-icon>
+                            <div v-for="(item, index) in row.options" :key="index">
+                                <div v-if="row.expand || (!row.expand && index < 3)">
+                                    <el-button
+                                        v-if="item.key === 'device'"
+                                        @click="jumpTo(item.value)"
+                                        class="mt-0.5"
+                                        icon="Position"
+                                        plain
+                                        size="small"
+                                    >
+                                        {{ item.key + ': ' + item.value }}
+                                    </el-button>
+                                    <el-button v-else class="mt-0.5" plain size="small">
+                                        {{ item.key + ': ' + item.value }}
+                                    </el-button>
+                                </div>
+                            </div>
+                            <div v-if="!row.expand && row.options.length > 3">
+                                <el-button type="primary" link @click="row.expand = true">
+                                    {{ $t('commons.button.expand') }}...
                                 </el-button>
-                            </el-tooltip>
+                            </div>
+                            <div v-if="row.expand && row.options.length > 3">
+                                <el-button type="primary" link @click="row.expand = false">
+                                    {{ $t('commons.button.collapse') }}
+                                </el-button>
+                            </div>
                         </template>
                     </el-table-column>
                     <el-table-column
@@ -63,7 +83,18 @@
                         show-overflow-tooltip
                         min-width="120"
                         prop="mountpoint"
-                    />
+                    >
+                        <template #default="{ row }">
+                            <el-tooltip :content="row.mountpoint">
+                                <el-button
+                                    type="primary"
+                                    icon="FolderOpened"
+                                    link
+                                    @click="routerToFileWithPath(row.mountpoint)"
+                                />
+                            </el-tooltip>
+                        </template>
+                    </el-table-column>
                     <el-table-column
                         :label="$t('container.driver')"
                         show-overflow-tooltip
@@ -102,6 +133,8 @@ import i18n from '@/lang';
 import { ElMessageBox } from 'element-plus';
 import { GlobalStore } from '@/store';
 import { routerToFileWithPath } from '@/utils/router';
+import { checkFile } from '@/api/modules/files';
+import { MsgError } from '@/utils/message';
 const globalStore = GlobalStore();
 
 const taskLogRef = ref();
@@ -191,6 +224,16 @@ const onClean = () => {
 };
 const openTaskLog = (taskID: string) => {
     taskLogRef.value.openWithTaskID(taskID);
+};
+
+const jumpTo = async (path: any) => {
+    await checkFile(path, false).then((res) => {
+        if (res.data) {
+            routerToFileWithPath(path);
+        } else {
+            MsgError(i18n.global.t('file.noSuchFile'));
+        }
+    });
 };
 
 const batchDelete = async (row: Container.VolumeInfo | null) => {
