@@ -153,6 +153,7 @@ const startIndex = ref(0);
 const lastScrollTop = ref(0);
 const totalLines = ref(0);
 const stopReading = ref(false);
+const totalPages = ref(0);
 const visibleLogs = computed(() => {
     const safeStartIndex = Math.max(0, Math.min(startIndex.value, Math.max(0, logs.value.length - visibleCount.value)));
     if (safeStartIndex !== startIndex.value) {
@@ -191,10 +192,15 @@ const onScroll = async () => {
         await getContent(true);
         return;
     }
-
-    if (scrollHeight - scrollTop - clientHeight <= 50 && !end.value && readReq.page < maxPage.value) {
-        readReq.page = maxPage.value;
-        await getContent(false);
+    if (scrollHeight - scrollTop - clientHeight <= 50 && !end.value) {
+        if (readReq.page < maxPage.value) {
+            readReq.page = maxPage.value;
+            await getContent(false);
+        } else if (readReq.page < totalPages.value) {
+            maxPage.value++;
+            readReq.page = maxPage.value;
+            await getContent(false);
+        }
     }
 };
 
@@ -245,10 +251,6 @@ const getContent = async (pre: boolean) => {
     } catch (error) {
         isLoading.value = false;
         firstLoading.value = false;
-    }
-    if (res.data.scope != 'tail' && !pre && res.data.end && res.data.totalLines == totalLines.value) {
-        isLoading.value = false;
-        return;
     }
 
     totalLines.value = res.data.totalLines;
@@ -336,6 +338,7 @@ const getContent = async (pre: boolean) => {
 
     logCount.value = logs.value.length;
     end.value = res.data.end;
+    totalPages.value = res.data.total;
     emit('update:hasContent', logs.value.length > 0);
     if (readReq.latest) {
         readReq.page = res.data.total;
