@@ -805,14 +805,6 @@ func (u *ContainerService) ContainerUpgrade(req dto.ContainerUpgrade) error {
 				if err != nil {
 					return err
 				}
-				inspected, err := client.ImageInspect(ctx, req.Image)
-				if err != nil {
-					return fmt.Errorf("inspect image failed, err: %v", err)
-				}
-				if isDynamicImage(inspected) {
-					oldContainer.Config.Entrypoint = nil
-					oldContainer.Config.Cmd = nil
-				}
 				return nil
 			}, nil)
 
@@ -1742,24 +1734,4 @@ func loadContainerPortForInfo(itemPorts []container.Port) []dto.PortHelper {
 		exposedPorts = append(exposedPorts, val)
 	}
 	return exposedPorts
-}
-
-func isDynamicImage(inspected image.InspectResponse) bool {
-	if len(inspected.Config.Entrypoint) > 0 {
-		entrypointStr := strings.Join(inspected.Config.Entrypoint, " ")
-		if strings.Contains(entrypointStr, "entrypoint") {
-			return true
-		}
-	}
-
-	dirs := []string{"/docker-entrypoint.d", "/docker-entrypoint-initdb.d"}
-	for _, dir := range dirs {
-		for _, layer := range inspected.RootFS.Layers {
-			if strings.Contains(layer, dir) {
-				return true
-			}
-		}
-	}
-
-	return false
 }
