@@ -799,7 +799,7 @@ const { searchableStatus, searchablePath, setSearchableInputRef, searchableInput
 const paginationConfig = reactive({
     cacheSizeKey: 'file-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('file-page-size')) || 10,
+    pageSize: Number(localStorage.getItem('file-page-size')) || 100,
     total: 0,
 });
 
