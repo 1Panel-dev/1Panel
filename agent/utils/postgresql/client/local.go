@@ -101,15 +101,12 @@ func (r *Local) Delete(info DeleteInfo) error {
 	if len(info.Name) != 0 {
 		dropSql := fmt.Sprintf("DROP DATABASE \"%s\"", info.Name)
 		if err := r.ExecSQL(dropSql, info.Timeout); err != nil && !info.ForceDelete {
-			return err
+			return fmt.Errorf("drop database failed, err: %v", err)
 		}
 	}
 	dropSql := fmt.Sprintf("DROP USER \"%s\"", info.Username)
 	if err := r.ExecSQL(dropSql, info.Timeout); err != nil && !info.ForceDelete {
-		if strings.Contains(strings.ToLower(err.Error()), "depend on it") {
-			return buserr.WithDetail("ErrInUsed", info.Username, nil)
-		}
-		return err
+		return fmt.Errorf("drop user failed, err: %v", err)
 	}
 	return nil
 }

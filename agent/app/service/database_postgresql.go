@@ -3,10 +3,11 @@ package service
 import (
 	"context"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"os"
 	"path"
 	"strings"
+
+	"github.com/1Panel-dev/1Panel/agent/constant"
 
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 
@@ -320,6 +321,9 @@ func (u *PostgresqlService) Delete(ctx context.Context, req dto.PostgresqlDBDele
 		ForceDelete: req.ForceDelete,
 		Timeout:     300,
 	}); err != nil && !req.ForceDelete {
+		if strings.HasPrefix(err.Error(), "drop user") {
+			_ = postgresqlRepo.Update(db.ID, map[string]interface{}{"is_delete": true})
+		}
 		return err
 	}
 
