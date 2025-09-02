@@ -80,6 +80,7 @@
                                 size="large"
                                 name="username"
                                 autocomplete="username"
+                                ref="userNameRef"
                             ></el-input>
                         </el-form-item>
                         <el-form-item prop="password" class="w-full">
@@ -253,6 +254,7 @@ function checkAgreeLicense(rule: any, value: any, callback: any) {
 }
 
 let isLoggingIn = false;
+const userNameRef = ref();
 const mfaLoginRef = ref();
 const mfaButtonFocused = ref();
 const mfaLoginForm = reactive({
@@ -489,7 +491,9 @@ onMounted(() => {
         '--login-loading-mask-color',
         adjustColorToRGBA(loginBtnLinkColor.value, 30, 15),
     );
-
+    nextTick(() => {
+        userNameRef.value?.focus();
+    });
     loginForm.agreeLicense = globalStore.agreeLicense;
     document.onkeydown = (e: any) => {
         e = window.event || e;
