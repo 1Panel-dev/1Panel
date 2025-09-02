@@ -86,7 +86,7 @@ class RequestHttp {
                 if (data.code && data.code !== ResultEnum.SUCCESS) {
                     if (data.message.toLowerCase().indexOf('operation not permitted') !== -1) {
                         MsgError(i18n.global.t('license.tamperHelper'));
-                        return data;
+                        return Promise.reject(data);
                     }
                     MsgError(data.message);
                     return Promise.reject(data);
