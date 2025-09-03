@@ -2703,6 +2703,7 @@ const message = {
         quickJump: 'Acesso rápido',
         used: 'Usado',
         unUsed: 'Não usado',
+        dockerRestart: 'Operações de firewall exigem reinicialização do serviço Docker',
         firewallHelper: 'Firewall do sistema {0}',
         firewallNotStart: 'O firewall do sistema não está habilitado atualmente. Habilite-o primeiro.',
         restartFirewallHelper: 'Esta operação reiniciará o firewall atual. Deseja continuar?',

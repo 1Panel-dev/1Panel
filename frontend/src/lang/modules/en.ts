@@ -2725,6 +2725,7 @@ const message = {
         quickJump: 'Quick access',
         used: 'Used',
         unUsed: 'Unused',
+        dockerRestart: 'Firewall operations require restarting the Docker service',
         firewallHelper: '{0} system firewall',
         firewallNotStart: `The system firewall isn't enabled at present. Enable it first.`,
         restartFirewallHelper: 'This operation will restart the current firewall. Do you want to continue?',

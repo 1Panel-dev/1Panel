@@ -2640,6 +2640,7 @@ const message = {
         quickJump: 'クイックアクセス',
         used: '使用済み',
         unUsed: '未使用',
+        dockerRestart: 'ファイアウォール操作にはDockerサービスの再起動が必要です',
         firewallHelper: '{0}システムファイアウォール',
         firewallNotStart: `現在、システムファイアウォールは有効になっていません。最初に有効にします。`,
         restartFirewallHelper: 'この操作は、現在のファイアウォールを再起動します。続けたいですか？',

@@ -36,6 +36,16 @@
             </el-card>
         </div>
         <NoSuchService v-if="!baseInfo.isExist" name="Firewalld / Ufw" />
+        <DockerRestart
+            ref="dockerRef"
+            v-model:withDockerRestart="withDockerRestart"
+            @submit="onSubmit"
+            :title="$t('firewall.firewallHelper', [i18n.global.t('commons.button.' + operation)])"
+        >
+            <template #helper>
+                <span>{{ $t('firewall.' + operation + 'FirewallHelper') }}</span>
+            </template>
+        </DockerRestart>
     </div>
 </template>
 
@@ -44,6 +54,7 @@ import { Host } from '@/api/interface/host';
 import { loadFireBaseInfo, operateFire } from '@/api/modules/host';
 import i18n from '@/lang';
 import NoSuchService from '@/components/layout-content/no-such-service.vue';
+import DockerRestart from '@/components/docker-proxy/docker-restart.vue';
 import { MsgSuccess } from '@/utils/message';
 import { ElMessageBox } from 'element-plus';
 import { ref } from 'vue';
@@ -51,6 +62,9 @@ import { ref } from 'vue';
 const baseInfo = ref<Host.FirewallBase>({ isActive: false, isExist: true, name: '', version: '', pingStatus: '' });
 const onPing = ref('Disable');
 const oldStatus = ref();
+const dockerRef = ref();
+const operation = ref('restart');
+const withDockerRestart = ref(false);
 
 const acceptParams = (): void => {
     loadBaseInfo(true);
@@ -78,28 +92,21 @@ const loadBaseInfo = async (search: boolean) => {
         });
 };
 
-const onOperate = async (operation: string) => {
-    emit('update:maskShow', false);
-    let operationHelper = i18n.global.t('firewall.' + operation + 'FirewallHelper');
-    let title = i18n.global.t('firewall.firewallHelper', [i18n.global.t('commons.button.' + operation)]);
-    ElMessageBox.confirm(operationHelper, title, {
-        confirmButtonText: i18n.global.t('commons.button.confirm'),
-        cancelButtonText: i18n.global.t('commons.button.cancel'),
-    })
-        .then(async () => {
-            emit('update:loading', true);
-            emit('update:maskShow', true);
-            await operateFire(operation)
-                .then(() => {
-                    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                    loadBaseInfo(true);
-                })
-                .catch(() => {
-                    loadBaseInfo(true);
-                });
+const onOperate = async (op: string) => {
+    operation.value = op;
+    dockerRef.value.acceptParams({ title: i18n.global.t('firewall.dockerRestart') });
+};
+
+const onSubmit = async () => {
+    emit('update:loading', true);
+    emit('update:maskShow', true);
+    await operateFire(operation.value, withDockerRestart.value)
+        .then(() => {
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            loadBaseInfo(true);
         })
         .catch(() => {
-            emit('update:maskShow', true);
+            loadBaseInfo(true);
         });
 };
 
@@ -115,7 +122,7 @@ const onPingOperate = async (operation: string) => {
             emit('update:loading', true);
             operation = operation === 'Disable' ? 'disablePing' : 'enablePing';
             emit('update:maskShow', true);
-            await operateFire(operation)
+            await operateFire(operation, false)
                 .then(() => {
                     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                     loadBaseInfo(false);

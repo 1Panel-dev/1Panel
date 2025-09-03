@@ -2759,6 +2759,7 @@ const message = {
         quickJump: 'Hızlı erişim',
         used: 'Kullanıldı',
         unUsed: 'Kullanılmadı',
+        dockerRestart: 'Güvenlik duvarı işlemleri Docker hizmetinin yeniden başlatılmasını gerektirir',
         firewallHelper: '{0} sistem güvenlik duvarı',
         firewallNotStart: 'Sistem güvenlik duvarı şu anda etkin değil. Önce etkinleştirin.',
         restartFirewallHelper: 'Bu işlem mevcut güvenlik duvarını yeniden başlatacak. Devam etmek istiyor musunuz?',

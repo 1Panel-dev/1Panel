@@ -2531,6 +2531,7 @@ const message = {
         quickJump: '快速跳转',
         used: '已使用',
         unUsed: '未使用',
+        dockerRestart: '防火墙操作需要重启 Docker 服务',
         firewallHelper: '{0}系统防火墙',
         firewallNotStart: '当前未开启系统防火墙，请先开启！',
         restartFirewallHelper: '该操作将对当前防火墙进行重启操作，是否继续？',

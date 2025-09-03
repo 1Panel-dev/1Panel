@@ -12,8 +12,15 @@ export const loadFireBaseInfo = () => {
 export const searchFireRule = (params: Host.RuleSearch) => {
     return http.post<ResPage<Host.RuleInfo>>(`/hosts/firewall/search`, params, TimeoutEnum.T_40S);
 };
-export const operateFire = (operation: string) => {
-    return http.post(`/hosts/firewall/operate`, { operation: operation }, TimeoutEnum.T_40S);
+export const operateFire = (operation: string, withDockerRestart: boolean) => {
+    return http.post(
+        `/hosts/firewall/operate`,
+        {
+            operation: operation,
+            withDockerRestart: withDockerRestart,
+        },
+        TimeoutEnum.T_60S,
+    );
 };
 export const operatePortRule = (params: Host.RulePort) => {
     return http.post<Host.RulePort>(`/hosts/firewall/port`, params, TimeoutEnum.T_40S);

@@ -2700,6 +2700,7 @@ const message = {
         quickJump: 'Akses pantas',
         used: 'Digunakan',
         unUsed: 'Tidak Digunakan',
+        dockerRestart: 'Operasi firewall memerlukan memulakan semula perkhidmatan Docker',
         firewallHelper: '{0} firewall sistem',
         firewallNotStart: `Firewall sistem belum diaktifkan. Aktifkannya dahulu.`,
         restartFirewallHelper: 'Operasi ini akan memulakan semula firewall semasa. Adakah anda mahu meneruskan?',

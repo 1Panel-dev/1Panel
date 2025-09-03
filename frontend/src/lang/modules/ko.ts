@@ -2593,6 +2593,7 @@ const message = {
         quickJump: '빠른 접근',
         used: '사용됨',
         unUsed: '사용 안 함',
+        dockerRestart: '방화벽 작업에는 Docker 서비스 재시작이 필요합니다',
         firewallHelper: '{0} 시스템 방화벽',
         firewallNotStart: '현재 시스템 방화벽이 활성화되지 않았습니다. 먼저 활성화하세요.',
         restartFirewallHelper: '이 작업은 현재 방화벽을 재시작합니다. 계속하시겠습니까?',
