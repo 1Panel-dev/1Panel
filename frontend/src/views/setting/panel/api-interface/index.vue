@@ -26,7 +26,7 @@
             <el-form-item :label="$t('setting.apiKey')" prop="apiKey">
                 <el-input v-model="form.apiKey" readonly>
                     <template #suffix>
-                        <CopyButton type="icon" :content="form.apiKey" class="w-30" />
+                        <CopyButton :content="form.apiKey" class="w-30" />
                     </template>
                     <template #append>
                         <el-button @click="resetApiKey()">

@@ -35,14 +35,14 @@
                 <el-input v-model="ca.csr" :rows="15" type="textarea" id="textArea" />
                 <div>
                     <br />
-                    <CopyButton :content="ca.csr" />
+                    <CopyButton :content="ca.csr" :isIcon="false" />
                 </div>
             </div>
             <div v-else class="mt-5">
                 <el-input v-model="ca.privateKey" :rows="15" type="textarea" id="textArea" />
                 <div>
                     <br />
-                    <CopyButton :content="ca.privateKey" />
+                    <CopyButton :content="ca.privateKey" :isIcon="false" />
                 </div>
             </div>
         </div>

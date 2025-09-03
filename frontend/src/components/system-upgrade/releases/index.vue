@@ -1,5 +1,9 @@
 <template>
     <DrawerPro v-model="drawerVisible" :header="$t('setting.release')" @close="handleClose" size="large">
+        <template #buttons>
+            <span>{{ version }}</span>
+            <CopyButton :content="version" type="primary" />
+        </template>
         <div class="note" v-loading="loading">
             <el-collapse v-if="notes && notes.length !== 0" v-model="currentVersion" :accordion="true">
                 <div v-for="(item, index) in notes" :key="index">
@@ -60,8 +64,13 @@ const drawerVisible = ref(false);
 const currentVersion = ref(0);
 const notes = ref([]);
 const loading = ref();
+const version = ref();
 
-const acceptParams = (): void => {
+interface DialogProps {
+    version: string;
+}
+const acceptParams = (params: DialogProps): void => {
+    version.value = params.version;
     search();
     drawerVisible.value = true;
 };

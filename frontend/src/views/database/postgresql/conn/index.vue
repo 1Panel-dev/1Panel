@@ -11,11 +11,11 @@
                             <span else>
                                 {{ loadPgInfo(true) }}
                             </span>
-                            <CopyButton :content="loadPgInfo(true)" type="icon" />
+                            <CopyButton :content="loadPgInfo(true)" />
                         </el-descriptions-item>
                         <el-descriptions-item :label="$t('commons.table.port')">
                             5432
-                            <CopyButton content="5432" type="icon" />
+                            <CopyButton content="5432" />
                         </el-descriptions-item>
                     </el-descriptions>
                 </el-card>
@@ -37,11 +37,11 @@
                             <span else>
                                 {{ loadPgInfo(false) }}
                             </span>
-                            <CopyButton :content="loadPgInfo(false)" type="icon" />
+                            <CopyButton :content="loadPgInfo(false)" />
                         </el-descriptions-item>
                         <el-descriptions-item :label="$t('commons.table.port')">
                             {{ form.port }}
-                            <CopyButton :content="form.port + ''" type="icon" />
+                            <CopyButton :content="form.port + ''" />
                         </el-descriptions-item>
                     </el-descriptions>
                 </el-card>
@@ -70,7 +70,7 @@
                         v-model="form.password"
                     />
                     <el-button-group>
-                        <CopyButton class="copy_button" :content="form.password" />
+                        <CopyButton :isIcon="false" class="copy_button" :content="form.password" />
                         <el-button @click="random">
                             {{ $t('commons.button.random') }}
                         </el-button>
@@ -81,11 +81,11 @@
             <div v-if="form.from !== 'local'">
                 <el-form-item :label="$t('commons.login.username')">
                     <el-tag>{{ form.username }}</el-tag>
-                    <CopyButton :content="form.username" type="icon" />
+                    <CopyButton :content="form.username" />
                 </el-form-item>
                 <el-form-item :label="$t('commons.login.password')">
                     <el-tag>{{ form.password }}</el-tag>
-                    <CopyButton :content="form.password" type="icon" />
+                    <CopyButton :content="form.password" />
                 </el-form-item>
             </div>
         </el-form>

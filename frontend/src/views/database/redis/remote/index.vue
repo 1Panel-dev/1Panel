@@ -39,7 +39,7 @@
                                     class="ml-1.5"
                                 ></el-button>
                                 <div>
-                                    <CopyButton :content="row.password" type="icon" />
+                                    <CopyButton :content="row.password" />
                                 </div>
                             </div>
                         </template>

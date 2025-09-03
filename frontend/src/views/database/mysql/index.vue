@@ -171,7 +171,7 @@
                                     class="ml-1.5"
                                 ></el-button>
                                 <div>
-                                    <CopyButton :content="row.password" type="icon" />
+                                    <CopyButton :content="row.password" />
                                 </div>
                             </div>
                             <div v-if="row.password === '' && row.username">

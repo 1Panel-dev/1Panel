@@ -30,7 +30,7 @@
                 </el-descriptions-item>
                 <el-descriptions-item v-for="(param, key) in params" :label="getLabel(param)" :key="key">
                     <span>{{ param.showValue && param.showValue != '' ? param.showValue : param.value }}</span>
-                    <CopyButton v-if="showCopyButton(param.key)" :content="param.value" type="icon" />
+                    <CopyButton v-if="showCopyButton(param.key)" :content="param.value" />
                 </el-descriptions-item>
             </el-descriptions>
         </div>

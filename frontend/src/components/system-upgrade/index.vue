@@ -20,7 +20,12 @@
                     <el-link underline="never" type="primary" @click="toLxware">
                         {{ $t(!isMasterPro ? 'license.community' : 'license.pro') }}
                     </el-link>
-                    <el-link underline="never" class="version" type="primary" @click="releasesRef.acceptParams()">
+                    <el-link
+                        underline="never"
+                        class="version"
+                        type="primary"
+                        @click="releasesRef.acceptParams({ version: version })"
+                    >
                         {{ version }}
                     </el-link>
                     <el-badge is-dot class="-mt-0.5" :hidden="version === 'Waiting' || !globalStore.hasNewVersion">

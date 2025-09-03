@@ -8,11 +8,11 @@
                             <el-descriptions :column="1">
                                 <el-descriptions-item :label="$t('database.connAddress')">
                                     {{ form.containerName }}
-                                    <CopyButton :content="form.containerName" type="icon" />
+                                    <CopyButton :content="form.containerName" />
                                 </el-descriptions-item>
                                 <el-descriptions-item :label="$t('commons.table.port')">
                                     11434
-                                    <CopyButton content="11434" type="icon" />
+                                    <CopyButton content="11434" />
                                 </el-descriptions-item>
                             </el-descriptions>
                         </el-card>
@@ -25,7 +25,7 @@
                             <el-descriptions :column="1">
                                 <el-descriptions-item :label="$t('database.connAddress')">
                                     {{ bindDomain.connUrl }}
-                                    <CopyButton :content="bindDomain.connUrl" type="icon" />
+                                    <CopyButton :content="bindDomain.connUrl" />
                                 </el-descriptions-item>
                             </el-descriptions>
                         </el-card>
@@ -38,11 +38,11 @@
                             <el-descriptions :column="1">
                                 <el-descriptions-item :label="$t('database.connAddress')">
                                     {{ form.systemIP }}
-                                    <CopyButton :content="form.systemIP" type="icon" />
+                                    <CopyButton :content="form.systemIP" />
                                 </el-descriptions-item>
                                 <el-descriptions-item :label="$t('commons.table.port')">
                                     {{ form.port }}
-                                    <CopyButton :content="form.port + ''" type="icon" />
+                                    <CopyButton :content="form.port + ''" />
                                 </el-descriptions-item>
                             </el-descriptions>
                         </el-card>
