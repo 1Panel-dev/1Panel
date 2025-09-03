@@ -1,12 +1,5 @@
 <template>
-    <el-dialog
-        v-model="open"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        :show-close="showClose"
-        @close="handleClose"
-        :width="width"
-    >
+    <el-dialog v-model="open" :show-close="showClose" @close="handleClose" :width="width">
         <div v-if="open">
             <LogFile :config="config" :showTail="showTail"></LogFile>
         </div>
