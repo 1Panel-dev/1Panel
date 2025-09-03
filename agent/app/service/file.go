@@ -580,13 +580,6 @@ func (f *FileService) ReadLogByLine(req request.FileReadByLineReq) (*response.Fi
 		if err != nil {
 			return nil, err
 		}
-		if req.Latest && req.Page == 1 && len(logFileRes.Lines) < 1000 && logFileRes.TotalPages > 1 {
-			res, err := files.ReadFileByLine(logFilePath, logFileRes.TotalPages-1, req.PageSize, false)
-			if err != nil {
-				return nil, err
-			}
-			logFileRes.Lines = append(res.Lines, logFileRes.Lines...)
-		}
 		scope = "page"
 		lines = logFileRes.Lines
 	}
