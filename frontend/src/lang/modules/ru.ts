@@ -513,8 +513,8 @@ const message = {
         selectFile: 'Выбрать файл',
         dropHelper: 'Вы можете перетащить загружаемый файл сюда или',
         clickHelper: 'нажмите для загрузки',
-        supportUpType: 'Поддерживаются только файлы sql, sql.gz и tar.gz',
-        zipFormat: 'Структура архива tar.gz: архив test.tar.gz должен содержать файл test.sql',
+        supportUpType:
+            'Поддерживаются только форматы файлов sql, sql.gz, tar.gz, .zip. Импортируемый сжатый файл должен содержать только один файл .sql или включать test.sql',
 
         currentStatus: 'Текущее состояние',
         baseParam: 'Базовые параметры',
@@ -2174,8 +2174,7 @@ const message = {
         otherDomains: 'Другие домены',
         static: 'Статический',
         deployment: 'Развертывание',
-        supportUpType: 'Поддерживаются только файлы .tar.gz',
-        zipFormat: 'Структура архива .tar.gz: архив test.tar.gz должен содержать файл {0}',
+        supportUpType: 'Поддерживается только формат файла .tar.gz, и сжатый пакет должен содержать файл {0}.json',
         proxy: 'Обратный прокси',
         alias: 'Псевдоним',
         ftpUser: 'FTP аккаунт',

@@ -507,8 +507,8 @@ const message = {
         selectFile: '파일 선택',
         dropHelper: '여기에 업로드한 파일을 드래그 앤 드롭하거나',
         clickHelper: '클릭하여 업로드',
-        supportUpType: 'sql, sql.gz, tar.gz 파일만 지원됩니다.',
-        zipFormat: 'tar.gz 압축 패키지 구조: test.tar.gz 압축 패키지에는 test.sql이 포함되어야 합니다.',
+        supportUpType:
+            'sql, sql.gz, tar.gz, .zip 파일 형식만 지원합니다. 가져오는 압축 파일에는 하나의 .sql 파일만 있거나 test.sql이 포함되어 있어야 합니다',
 
         currentStatus: '현재 상태',
         baseParam: '기본 파라미터',
@@ -2090,8 +2090,7 @@ const message = {
         otherDomains: '기타 도메인',
         static: '정적',
         deployment: '배포',
-        supportUpType: '지원되는 파일 형식: .tar.gz',
-        zipFormat: '.tar.gz 압축 패키지 구조: test.tar.gz 패키지에는 반드시 {0} 파일이 포함되어야 합니다.',
+        supportUpType: '.tar.gz 파일 형식만 지원되며, 압축 패키지에는 {0}.json 파일이 포함되어야 합니다',
         proxy: '리버스 프록시',
         alias: '별칭',
         ftpUser: 'FTP 계정',

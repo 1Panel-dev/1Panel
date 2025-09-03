@@ -16,15 +16,9 @@
                                     <li v-if="type === 'mysql' || type === 'mariadb'">
                                         {{ $t('database.formatHelper', [remark]) }}
                                     </li>
-                                    <li v-if="type === 'website'">{{ $t('website.websiteBackupWarn') }}</li>
-                                    <span v-if="isDb()">
-                                        <li>{{ $t('database.supportUpType') }}</li>
-                                        <li>{{ $t('database.zipFormat') }}</li>
-                                    </span>
-                                    <span v-else>
-                                        <li>{{ $t('website.supportUpType') }}</li>
-                                        <li>{{ $t('website.zipFormat', [type + '.json']) }}</li>
-                                    </span>
+                                    <li v-if="isDb()">{{ $t('database.supportUpType') }}</li>
+                                    <li v-if="!isDb()">{{ $t('website.websiteBackupWarn') }}</li>
+                                    <li v-if="!isDb()">{{ $t('website.supportUpType', [type]) }}</li>
                                 </ul>
                             </template>
                         </el-alert>
@@ -42,7 +36,7 @@
                                 :limit="1"
                                 class="float-left"
                                 ref="uploadRef"
-                                accept=".tar.gz,.sql,.sql.gz"
+                                accept=".tar.gz,.sql,.gz,.zip"
                                 :show-file-list="false"
                                 :on-exceed="handleExceed"
                                 :on-change="fileOnChange"
@@ -156,7 +150,7 @@ const paginationConfig = reactive({
     total: 0,
 });
 const uploadOpen = ref(false);
-const type = ref();
+const type = ref('mysql');
 const name = ref();
 const detailName = ref();
 const remark = ref();
@@ -208,15 +202,38 @@ const search = async () => {
     paginationConfig.total = res.data.total;
 };
 
+const beforeUpload = (fileName: string) => {
+    const itemName = fileName.toLowerCase();
+    let reg = /^[a-zA-Z0-9\u4e00-\u9fa5]{1}[a-z:A-Z0-9_.\u4e00-\u9fa5-]{0,256}$/;
+    if (!reg.test(itemName)) {
+        MsgError(i18n.global.t('commons.msg.fileNameErr'));
+        return false;
+    }
+    if (isDb()) {
+        const allowedExtensions = ['.sql', '.sql.gz', '.tar.gz', '.zip'];
+        const isValidFile = allowedExtensions.some((ext) => itemName.endsWith(ext));
+        if (!isValidFile) {
+            MsgError(i18n.global.t('database.supportUpType'));
+            return false;
+        }
+        return true;
+    }
+    const allowedExtensions = ['.tar.gz'];
+    const isValidFile = allowedExtensions.some((ext) => itemName.endsWith(ext));
+    if (!isValidFile) {
+        MsgError(i18n.global.t('website.supportUpType'));
+        return false;
+    }
+    return true;
+};
+
 const loadFile = async (path: string) => {
     let filaName = path.split('/').pop();
     if (!filaName) {
         MsgError(i18n.global.t('commons.msg.fileNameErr'));
         return;
     }
-    let reg = /^[a-zA-Z0-9\u4e00-\u9fa5]{1}[a-z:A-Z0-9_.\u4e00-\u9fa5-]{0,256}$/;
-    if (!reg.test(filaName)) {
-        MsgError(i18n.global.t('commons.msg.fileNameErr'));
+    if (!beforeUpload(filaName)) {
         return;
     }
     ElMessageBox.confirm(i18n.global.t('database.selectHelper', [path]), i18n.global.t('database.loadBackup'), {
@@ -295,6 +312,9 @@ const fileOnChange = (_uploadFile: UploadFile, uploadFiles: UploadFiles) => {
     const file = uploaderFiles.value[0];
     if (!file.raw.name) {
         MsgError(i18n.global.t('commons.msg.fileNameErr'));
+        return;
+    }
+    if (!beforeUpload(file.raw.name)) {
         return;
     }
     ElMessageBox.confirm(

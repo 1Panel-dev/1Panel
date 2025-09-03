@@ -521,8 +521,8 @@ const message = {
         selectFile: 'Pilih fail',
         dropHelper: 'Anda boleh seret dan lepaskan fail yang ingin dimuat naik di sini atau',
         clickHelper: 'klik untuk memuat naik',
-        supportUpType: 'Hanya fail sql, sql.gz, dan tar.gz yang disokong',
-        zipFormat: 'Struktur pakej mampatan tar.gz: Pakej mampatan test.tar.gz mesti mengandungi test.sql',
+        supportUpType:
+            'Hanya menyokong format fail sql, sql.gz, tar.gz, .zip. Fail termampat yang diimport mesti mengandungi hanya satu fail .sql atau termasuk test.sql',
 
         currentStatus: 'Keadaan semasa',
         baseParam: 'Parameter asas',
@@ -2181,8 +2181,7 @@ const message = {
         otherDomains: 'Domain Lain',
         static: 'Statik',
         deployment: 'Penerapan',
-        supportUpType: 'Hanya fail .tar.gz disokong',
-        zipFormat: 'Struktur fail .tar.gz: fail test.tar.gz mesti mengandungi fail {0}',
+        supportUpType: 'Hanya format fail .tar.gz yang disokong, dan pakej termampat mesti mengandungi fail {0}.json',
         proxy: 'Proksi Terbalik',
         alias: 'Alias',
         ftpUser: 'Akaun FTP',

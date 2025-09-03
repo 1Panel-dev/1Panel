@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path"
-	"path/filepath"
-	"strings"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
@@ -59,44 +57,12 @@ func (u *BackupService) PostgresqlRecover(req dto.CommonRecover) error {
 }
 
 func (u *BackupService) PostgresqlRecoverByUpload(req dto.CommonRecover) error {
-	file := req.File
-	fileName := path.Base(req.File)
-	if strings.HasSuffix(fileName, ".tar.gz") {
-		fileNameItem := time.Now().Format(constant.DateTimeSlimLayout)
-		dstDir := fmt.Sprintf("%s/%s", path.Dir(req.File), fileNameItem)
-		fileOp := files.NewFileOp()
-		if !fileOp.Stat(dstDir) {
-			if err := fileOp.CreateDir(dstDir, os.ModePerm); err != nil {
-				return fmt.Errorf("mkdir %s failed, err: %v", dstDir, err)
-			}
-		}
-		if err := fileOp.TarGzExtractPro(req.File, dstDir, ""); err != nil {
-			_ = os.RemoveAll(dstDir)
-			return err
-		}
-		global.LOG.Infof("decompress file %s successful, now start to check test.sql is exist", req.File)
-		hasTestSql := false
-		_ = filepath.Walk(dstDir, func(path string, info os.FileInfo, err error) error {
-			if err != nil {
-				return nil
-			}
-			if !info.IsDir() && info.Name() == "test.sql" {
-				hasTestSql = true
-				file = path
-				fileName = "test.sql"
-			}
-			return nil
-		})
-		if !hasTestSql {
-			_ = os.RemoveAll(dstDir)
-			return fmt.Errorf("no such file named test.sql in %s", fileName)
-		}
-		defer func() {
-			_ = os.RemoveAll(dstDir)
-		}()
+	recoveFile, err := loadSqlFile(req.File)
+	if err != nil {
+		return err
 	}
-
-	req.File = path.Dir(file) + "/" + fileName
+	req.File = recoveFile
+	defer os.RemoveAll(path.Dir(recoveFile))
 	if err := handlePostgresqlRecover(req, nil, false); err != nil {
 		return err
 	}

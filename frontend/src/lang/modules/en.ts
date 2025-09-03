@@ -521,8 +521,8 @@ const message = {
         selectFile: 'Select file',
         dropHelper: 'You can drag and drop the uploaded file here or',
         clickHelper: 'click to upload',
-        supportUpType: 'Only sql, sql.gz, and tar.gz files are supported',
-        zipFormat: 'tar.gz compressed package structure: test.tar.gz compressed package must contain test.sql',
+        supportUpType:
+            'Only supports sql, sql.gz, tar.gz, .zip file formats. The imported compressed file must contain only one .sql file or include test.sql',
 
         currentStatus: 'Current state',
         baseParam: 'Basic parameter',
@@ -2211,8 +2211,7 @@ const message = {
         otherDomains: 'Other domains',
         static: 'Static',
         deployment: 'Deployment',
-        supportUpType: 'Only .tar.gz files are supported',
-        zipFormat: '.tar.gz compressed package structure: test.tar.gz compressed package must contain {0} file',
+        supportUpType: 'Only .tar.gz file format is supported, and the compressed package must contain {0}.json file',
         proxy: 'Reverse proxy',
         alias: 'Alias',
         ftpUser: 'FTP account',

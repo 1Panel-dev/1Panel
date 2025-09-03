@@ -509,8 +509,8 @@ const message = {
         selectFile: '[ファイル]を選択します',
         dropHelper: 'ここでアップロードされたファイルをドラッグアンドドロップするか、',
         clickHelper: 'クリックしてアップロードします',
-        supportUpType: 'SQL、SQL.GZ、およびTAR.GZファイルのみがサポートされています',
-        zipFormat: 'tar.gz圧縮パッケージ構造:test.tar.gz圧縮パッケージにはtest.sqlが含まれている必要があります',
+        supportUpType:
+            'sql、sql.gz、tar.gz、.zip ファイル形式のみサポートしています。インポートする圧縮ファイルには、1つの.sqlファイルのみ、またはtest.sqlが含まれている必要があります',
 
         currentStatus: '現在の状態',
         baseParam: '基本パラメーター',
@@ -2125,8 +2125,8 @@ const message = {
         otherDomains: '他のドメイン',
         static: '静的',
         deployment: '展開',
-        supportUpType: '.tar.gzファイルのみがサポートされています',
-        zipFormat: '.tar.gz圧縮パッケージ構造:test.tar.gz圧縮パッケージは{0}ファイルを含める必要があります',
+        supportUpType:
+            '.tar.gz ファイル形式のみサポートされており、圧縮パッケージには {0}.json ファイルが含まれている必要があります',
         proxy: '逆プロキシ',
         alias: 'エイリアス',
         ftpUser: 'FTPアカウント',

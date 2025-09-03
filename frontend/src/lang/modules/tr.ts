@@ -528,8 +528,8 @@ const message = {
         selectFile: 'Dosya seç',
         dropHelper: 'Yüklenen dosyayı buraya sürükleyip bırakabilir veya',
         clickHelper: 'yüklemek için tıklayın',
-        supportUpType: 'Yalnızca sql, sql.gz ve tar.gz dosyaları desteklenir',
-        zipFormat: 'tar.gz sıkıştırılmış paket yapısı: test.tar.gz sıkıştırılmış paketi test.sql içermelidir',
+        supportUpType:
+            'Yalnızca sql, sql.gz, tar.gz, .zip dosya formatlarını destekler. İçe aktarılan sıkıştırılmış dosya yalnızca bir .sql dosyası içermeli veya test.sql içermelidir',
 
         currentStatus: 'Mevcut durum',
         baseParam: 'Temel parametre',
@@ -2237,8 +2237,7 @@ const message = {
         otherDomains: 'Diğer alan adları',
         static: 'Statik',
         deployment: 'Dağıtım',
-        supportUpType: 'Yalnızca .tar.gz dosyaları desteklenir',
-        zipFormat: '.tar.gz sıkıştırılmış paket yapısı: test.tar.gz sıkıştırılmış paket {0} dosyasını içermelidir',
+        supportUpType: 'Yalnızca .tar.gz dosya formatı desteklenir ve sıkıştırılmış paket {0}.json dosyası içermelidir',
         proxy: 'Ters vekil',
         alias: 'Takma ad',
         ftpUser: 'FTP hesabı',

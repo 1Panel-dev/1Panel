@@ -519,8 +519,8 @@ const message = {
         selectFile: 'Selecionar arquivo',
         dropHelper: 'Você pode arrastar e soltar o arquivo carregado aqui ou',
         clickHelper: 'clicar para fazer upload',
-        supportUpType: 'Apenas arquivos sql, sql.gz e tar.gz são suportados',
-        zipFormat: 'Estrutura do pacote comprimido tar.gz: o pacote comprimido test.tar.gz deve conter test.sql',
+        supportUpType:
+            'Suporta apenas os formatos de arquivo sql, sql.gz, tar.gz, .zip. O arquivo compactado importado deve conter apenas um arquivo .sql ou incluir test.sql',
 
         currentStatus: 'Estado atual',
         baseParam: 'Parâmetro básico',
@@ -2178,8 +2178,8 @@ const message = {
         otherDomains: 'Outros domínios',
         static: 'Estático',
         deployment: 'Implantação',
-        supportUpType: 'Somente arquivos .tar.gz são suportados',
-        zipFormat: 'Estrutura de pacote comprimido .tar.gz: o pacote comprimido test.tar.gz deve conter o arquivo {0}',
+        supportUpType:
+            'Apenas o formato de arquivo .tar.gz é suportado, e o pacote compactado deve conter o arquivo {0}.json',
         proxy: 'Proxy reverso',
         alias: 'Alias',
         ftpUser: 'Conta FTP',

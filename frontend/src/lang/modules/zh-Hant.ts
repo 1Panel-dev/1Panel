@@ -503,8 +503,8 @@ const message = {
         selectFile: '選擇文件',
         dropHelper: '將上傳文件拖拽到此處，或者',
         clickHelper: '點擊上傳',
-        supportUpType: '僅支持 sql、sql.gz、tar.gz 文件',
-        zipFormat: 'tar.gz 壓縮包結構：test.tar.gz 壓縮包內，必需包含 test.sql',
+        supportUpType:
+            '僅支持 sql、sql.gz、tar.gz、.zip 文件格式，導入的壓縮文件必須保證只有一個 .sql 文件或者包含 test.sql',
 
         currentStatus: '當前狀態',
         baseParam: '基礎參數',
@@ -2059,8 +2059,7 @@ const message = {
         otherDomains: '其他域名',
         static: '靜態網站',
         deployment: '一鍵部署',
-        supportUpType: '僅支持 .tar.gz 文件',
-        zipFormat: '.tar.gz 壓縮包結構：test.tar.gz 壓縮包內，必需包含 {0} 文件',
+        supportUpType: '僅支持 .tar.gz 文件格式，且壓縮包內必須包含 {0}.json 文件',
         proxy: '反向代理',
         alias: '代號',
         ftpUser: 'FTP 帳號',
