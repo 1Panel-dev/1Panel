@@ -195,8 +195,14 @@ watch(
     { immediate: true },
 );
 
-function handleRowClick(row: any, column: any, event: MouseEvent) {
+function handleRowClick(row: any, column: any, event: any) {
     if (!tableRef.value) return;
+    try {
+        const selectionColumn = tableRef.value.refElTable.columns.find((col) => col.type === 'selection');
+        const isSelectable = selectionColumn.selectable(row);
+        if (!isSelectable) return;
+    } catch {}
+
     const target = event.target as HTMLElement;
 
     if (target.closest('.el-checkbox')) return;

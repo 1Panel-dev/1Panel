@@ -63,7 +63,7 @@
                         <template #default="{ row }">
                             <div v-for="(item, index) in row.labels" :key="index">
                                 <div v-if="row.expand || (!row.expand && index < 3)">
-                                    <el-tag type="info">{{ item }}</el-tag>
+                                    <el-button class="mt-0.5" plain size="small">{{ item }}</el-button>
                                 </div>
                             </div>
                             <div v-if="!row.expand && row.labels.length > 3">
