@@ -187,6 +187,7 @@ const updateDomainsString = () => {
 const initDomainList = (domainsStr: string) => {
     if (domainsStr) {
         domainList.value = domainsStr.split('\n').filter((domain) => domain.trim() !== '');
+        domainList.value = Array.from(new Set(domainList.value));
         if (domainList.value.length === 0) {
             domainList.value = [''];
         }
