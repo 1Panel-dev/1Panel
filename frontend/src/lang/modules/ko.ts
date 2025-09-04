@@ -680,7 +680,6 @@ const message = {
             server: 'MCP サーバー',
             create: 'サーバーを追加',
             edit: 'サーバーを編集',
-            commandHelper: '例: npx -y {0}',
             baseUrl: '外部アクセスパス',
             baseUrlHelper: '例: http://192.168.1.2:8000',
             ssePath: 'SSE パス',
@@ -701,6 +700,8 @@ const message = {
             outputTransport: '출력 유형',
             streamableHttpPath: '스트리밍 경로',
             streamableHttpPathHelper: '예: /mcp, 다른 서버와 중복되지 않도록 주의하세요',
+            npxHelper: 'npx 또는 바이너리로 시작하는 mcp에 적합',
+            uvxHelper: 'uvx로 시작하는 mcp에 적합',
         },
     },
     container: {

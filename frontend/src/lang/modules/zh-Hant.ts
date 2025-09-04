@@ -671,7 +671,6 @@ const message = {
             server: 'MCP Server',
             create: '创建 MCP Server',
             edit: '編輯 MCP Server',
-            commandHelper: '例如：npx -y {0}',
             baseUrl: '外部訪問路徑',
             baseUrlHelper: '例如：http://192.168.1.2:8000',
             ssePath: 'SSE 路徑',
@@ -691,6 +690,8 @@ const message = {
             outputTransport: '輸出類型',
             streamableHttpPath: '流式傳輸路徑',
             streamableHttpPathHelper: '例如：/mcp, 注意不要與其他 Server 重複',
+            npxHelper: '適合 npx 或者 二進制啟動的 mcp',
+            uvxHelper: '適合 uvx 啟動的 mcp',
         },
     },
     container: {

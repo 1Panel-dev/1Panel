@@ -697,7 +697,6 @@ const message = {
             server: 'Pelayan MCP',
             create: 'Tambah Pelayan',
             edit: 'Edit Pelayan',
-            commandHelper: 'Contoh: npx -y {0}',
             baseUrl: 'Laluan Akses Luar',
             baseUrlHelper: 'Contoh: http://192.168.1.2:8000',
             ssePath: 'Laluan SSE',
@@ -718,6 +717,8 @@ const message = {
             outputTransport: 'Jenis Output',
             streamableHttpPath: 'Laluan Streaming',
             streamableHttpPathHelper: 'Contoh: /mcp, elakkan daripada bertindan dengan pelayan lain',
+            npxHelper: 'Sesuai untuk mcp yang dimulakan dengan npx atau binari',
+            uvxHelper: 'Sesuai untuk mcp yang dimulakan dengan uvx',
         },
     },
     container: {

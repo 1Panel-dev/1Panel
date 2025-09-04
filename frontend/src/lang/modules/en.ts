@@ -696,7 +696,6 @@ const message = {
             server: 'MCP Server',
             create: 'Add MCP Server',
             edit: 'Edit MCP Server',
-            commandHelper: 'For example: npx -y {0}',
             baseUrl: 'External Access Path',
             baseUrlHelper: 'For example: http://192.168.1.2:8000',
             ssePath: 'SSE Path',
@@ -717,6 +716,8 @@ const message = {
             outputTransport: 'Output Type',
             streamableHttpPath: 'Streaming Path',
             streamableHttpPathHelper: 'For example: /mcp, note that it should not overlap with other Servers',
+            npxHelper: 'Suitable for mcp started with npx or binary',
+            uvxHelper: 'Suitable for mcp started with uvx',
         },
     },
     container: {

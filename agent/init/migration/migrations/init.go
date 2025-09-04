@@ -496,3 +496,16 @@ var AddQuickJump = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var UpdateMcpServerAddType = &gormigrate.Migration{
+	ID: "20250904-update-mcp-server",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.McpServer{}); err != nil {
+			return err
+		}
+		if err := tx.Model(&model.McpServer{}).Where("1=1").Update("type", "npx").Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}

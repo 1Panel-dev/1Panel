@@ -690,7 +690,6 @@ const message = {
             server: 'Сервер MCP',
             create: 'Добавить сервер',
             edit: 'Редактировать сервер',
-            commandHelper: 'Например: npx -y {0}',
             baseUrl: 'Внешний путь доступа',
             baseUrlHelper: 'Например: http://192.168.1.2:8000',
             ssePath: 'Путь SSE',
@@ -711,6 +710,8 @@ const message = {
             outputTransport: 'Тип вывода',
             streamableHttpPath: 'Путь потоковой передачи',
             streamableHttpPathHelper: 'Например: /mcp, обратите внимание, чтобы не перекрывать другие серверы',
+            npxHelper: 'Подходит для mcp, запущенного с помощью npx или бинарного файла',
+            uvxHelper: 'Подходит для mcp, запущенного с помощью uvx',
         },
     },
     container: {

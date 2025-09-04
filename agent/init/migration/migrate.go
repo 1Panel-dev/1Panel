@@ -38,6 +38,7 @@ func InitAgentDB() {
 		migrations.AddColumnToAlert,
 		migrations.UpdateWebsiteSSL,
 		migrations.AddQuickJump,
+		migrations.UpdateMcpServerAddType,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

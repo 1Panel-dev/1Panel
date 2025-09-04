@@ -17,4 +17,5 @@ type McpServer struct {
 	HostIP             string `json:"hostIP"`
 	StreamableHttpPath string `json:"streamableHttpPath"`
 	OutputTransport    string `json:"outputTransport"`
+	Type               string `json:"type"`
 }

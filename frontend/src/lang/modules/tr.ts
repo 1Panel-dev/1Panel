@@ -706,7 +706,6 @@ const message = {
             server: 'MCP Sunucusu',
             create: 'MCP Sunucusu Ekle',
             edit: 'MCP Sunucusunu Düzenle',
-            commandHelper: 'Örneğin: npx -y {0}',
             baseUrl: 'Harici Erişim Yolu',
             baseUrlHelper: 'Örneğin: http://192.168.1.2:8000',
             ssePath: 'SSE Yolu',
@@ -727,6 +726,8 @@ const message = {
             outputTransport: 'Çıktı Türü',
             streamableHttpPath: 'Akış Yolu',
             streamableHttpPathHelper: 'Örneğin: /mcp, diğer Sunucularla çakışmaması gerektiğine dikkat edin',
+            npxHelper: 'npx veya ikili dosya ile başlatılan mcp için uygundur',
+            uvxHelper: 'uvx ile başlatılan mcp için uygundur',
         },
     },
     container: {

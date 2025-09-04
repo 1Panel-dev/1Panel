@@ -22,16 +22,27 @@
             <el-form-item :label="$t('commons.table.name')" prop="name">
                 <el-input v-model="mcpServer.name" :disabled="mode == 'edit'" />
             </el-form-item>
+            <el-form-item :label="$t('commons.table.type')" prop="type">
+                <el-select v-model="mcpServer.type">
+                    <el-option label="npx" value="npx" />
+                    <el-option label="uvx" value="uvx" />
+                </el-select>
+                <span class="input-help">
+                    {{ $t('aiTools.mcp.' + mcpServer.type + 'Helper') }}
+                </span>
+            </el-form-item>
             <el-form-item :label="$t('runtime.runScript')" prop="command">
                 <el-input
                     v-model="mcpServer.command"
                     type="textarea"
                     :rows="3"
-                    :placeholder="$t('aiTools.mcp.commandPlaceHolder')"
+                    :placeholder="
+                        $t('ssl.commonNameHelper') +
+                        (mcpServer.type == 'npx'
+                            ? ' npx -y @modelcontextprotocol/server-github'
+                            : ' uvx mcp-server-fetch')
+                    "
                 ></el-input>
-                <span class="input-help">
-                    {{ $t('aiTools.mcp.commandHelper', ['@modelcontextprotocol/server-github']) }}
-                </span>
             </el-form-item>
             <div>
                 <el-text>{{ $t('aiTools.mcp.environment') }}</el-text>
@@ -160,6 +171,7 @@ const newMcpServer = () => {
         url: '',
         outputTransport: 'sse',
         streamableHttpPath: '',
+        type: 'npx',
     };
 };
 const em = defineEmits(['close']);
@@ -175,6 +187,7 @@ const rules = ref({
     value: [Rules.requiredInput],
     outputTransport: [Rules.requiredSelect],
     streamableHttpPath: [Rules.requiredInput],
+    type: [Rules.requiredSelect],
 });
 const hasWebsite = ref(false);
 
@@ -201,6 +214,7 @@ const acceptParams = async (params: AI.McpServer) => {
         mcpServer.value.protocol = parts[0];
         mcpServer.value.url = parts[1];
         mcpServer.value.outputTransport = mcpServer.value.outputTransport || 'sse';
+        mcpServer.value.type = mcpServer.value.type || 'npx';
     } else {
         mcpServer.value = newMcpServer();
         if (params.port) {
