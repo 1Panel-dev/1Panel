@@ -2427,7 +2427,6 @@ const message = {
         blockedRef: 'Allow non-standard Referer',
         accessControl: 'Anti-leech control',
         leechcacheControl: 'Cache control',
-        leechlogControl: 'Log control',
         logEnableControl: 'Log static asset requests',
         leechSpecialValidHelper:
             "When 'Allow empty Referer' is enabled, requests without a Referer (direct access, etc.) are not blocked; enabling 'Allow non-standard Referer' allows any Referer that does not start with http/https (client requests, etc.).",

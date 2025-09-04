@@ -2255,8 +2255,7 @@ const message = {
         blockedRef: '允许非标准 Referer',
         accessControl: '防盗链控制',
         leechcacheControl: '缓存控制',
-        leechlogControl: '日志控制',
-        logEnableControl: '记录静态资源请求日志',
+        logEnableControl: '记录请求日志',
         leechSpecialValidHelper:
             '允许 Referer 为空启用时，不会阻止无 Referer 的请求（直接访问等），启用非标准 Referer 时会放行任何不以 http/https 开头的 Referer 请求（客户端请求等）',
         leechInvalidReturnHelper: '拦截盗链请求后，返回的 HTTP 状态码',

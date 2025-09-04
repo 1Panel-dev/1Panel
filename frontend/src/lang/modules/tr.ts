@@ -2455,7 +2455,6 @@ const message = {
         blockedRef: 'Standart olmayan Referer’e izin ver',
         accessControl: 'Sömürü karşıtı kontrol',
         leechcacheControl: 'Önbellek kontrolü',
-        leechlogControl: 'Günlük kontrolü',
         logEnableControl: 'Statik varlık isteklerini günlüğe al',
         leechSpecialValidHelper:
             "'Boş yönlendirme izni ver' etkinse yönlendiricisi olmayan istekler (doğrudan erişim vb.) engellenmez; 'Standart olmayan Referer’e izin ver' etkinse http/https ile başlamayan tüm Referer isteklerine (istemci istekleri vb.) izin verilir.",

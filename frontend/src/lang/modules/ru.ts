@@ -2393,7 +2393,6 @@ const message = {
         blockedRef: 'Разрешить нестандартный Referer',
         accessControl: 'Управление анти-личем',
         leechcacheControl: 'Управление кэшем',
-        leechlogControl: 'Управление журналом',
         logEnableControl: 'Логировать запросы статических ресурсов',
         leechSpecialValidHelper:
             'При включённой опции «Разрешить пустой referrer» запросы без Referer (прямой доступ и т. п.) не блокируются; включение «Разрешить нестандартный Referer» пропускает любой Referer, не начинающийся с http/https (клиентские запросы и т. п.).',

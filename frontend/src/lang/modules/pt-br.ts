@@ -2396,7 +2396,6 @@ const message = {
         blockedRef: 'Permitir Referer não padrão',
         accessControl: 'Controle anti-leech',
         leechcacheControl: 'Controle de cache',
-        leechlogControl: 'Controle de log',
         logEnableControl: 'Registrar solicitações de ativos estáticos',
         leechSpecialValidHelper:
             "Quando 'Permitir Referer vazio' estiver ativado, as solicitações sem Referer (acesso direto etc.) não serão bloqueadas; ao ativar 'Permitir Referer não padrão', qualquer Referer que não comece com http/https será permitido (solicitações de cliente etc.).",

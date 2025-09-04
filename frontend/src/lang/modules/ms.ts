@@ -2397,7 +2397,6 @@ const message = {
         blockedRef: 'Benarkan referrer tidak standard',
         accessControl: 'Kawalan anti-leech',
         leechcacheControl: 'Kawalan cache',
-        leechlogControl: 'Kawalan log',
         logEnableControl: 'Log permintaan aset statik',
         leechSpecialValidHelper:
             "Apabila 'Benarkan referrer kosong' didayakan, permintaan tanpa referrer (akses terus dan sebagainya) tidak akan disekat; mendayakan 'Benarkan referrer tidak standard' akan membenarkan mana-mana referrer yang tidak bermula dengan http/https (permintaan klien dan sebagainya).",

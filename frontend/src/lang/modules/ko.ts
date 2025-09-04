@@ -2302,7 +2302,6 @@ const message = {
         blockedRef: '비표준 참조 허용',
         accessControl: '링크 차단 제어',
         leechcacheControl: '캐시 제어',
-        leechlogControl: '로그 제어',
         logEnableControl: '정적 리소스 요청 로그 기록',
         leechSpecialValidHelper:
             "'빈 참조 허용'을 활성화하면 리퍼러가 없는 요청(직접 접근 등)은 차단되지 않습니다. '비표준 참조 허용'을 활성화하면 http/https로 시작하지 않는 모든 리퍼러 요청(클라이언트 요청 등)을 허용합니다.",

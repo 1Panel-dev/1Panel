@@ -2265,7 +2265,6 @@ const message = {
         blockedRef: '允許非標準 Referer',
         accessControl: '防盜鏈控制',
         leechcacheControl: '快取控制',
-        leechlogControl: '日誌控制',
         logEnableControl: '記錄靜態資源請求日誌',
         leechSpecialValidHelper:
             '啟用「允許 Referer 為空」時，不會阻止無 Referer 的請求（直接訪問等）；啟用「允許非標準 Referer」時，會放行任何不以 http/https 開頭的 Referer 請求（客戶端請求等）',
