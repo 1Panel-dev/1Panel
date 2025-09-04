@@ -1246,7 +1246,6 @@ const message = {
             notStart: 'ClamAV 서비스가 현재 실행 중이 아닙니다. 먼저 시작하세요!',
             removeRecord: '보고서 파일 삭제',
             noRecords: '"Trigger" 버튼을 클릭하여 스캔을 시작하면 이곳에서 기록을 확인할 수 있습니다.',
-            removeResultHelper: '작업 실행 중 생성된 보고서 파일을 삭제하여 저장 공간을 확보합니다.',
             removeInfected: '바이러스 파일 삭제',
             removeInfectedHelper: '작업 중 감지된 바이러스 파일을 삭제하여 서버 보안 및 정상 작동을 보장합니다.',
             clamCreate: '스캔 규칙 생성',

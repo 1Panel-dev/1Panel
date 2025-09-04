@@ -1243,7 +1243,6 @@ const message = {
             notStart: '当前未开启 ClamAV 服务，请先开启！',
             removeRecord: '删除报告文件',
             noRecords: '点击“执行”按钮开始扫描，扫描结果将会记录在这里。',
-            removeResultHelper: '删除任务执行过程中生成的报告文件，以清理存储空间。',
             removeInfected: '删除病毒文件',
             removeInfectedHelper: '删除任务检测到的病毒文件，以确保服务器的安全和正常运行。',
             clamCreate: '创建扫描规则',

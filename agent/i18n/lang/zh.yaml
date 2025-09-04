@@ -351,6 +351,10 @@ TaskIsExecuting: "任务正在运行"
 CustomAppstore: "自定义应用仓库"
 TaskExec: "执行"
 
+# task - clam
+Clamscan: "扫描 {{ .name }}"
+TaskScan: "扫描"
+
 # task - ai
 OllamaModelPull: "拉取 Ollama 模型  {{ .name }} "
 OllamaModelSize: "获取 Ollama 模型  {{ .name }} 大小 "

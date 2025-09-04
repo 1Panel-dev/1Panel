@@ -1286,8 +1286,6 @@ const message = {
         notStart: 'O serviço ClamAV não está em execução, por favor, inicie-o primeiro!',
         removeRecord: 'Excluir arquivos de relatório',
         noRecords: 'Clique no botão "Acionar" para iniciar o scan e você verá registros aqui.',
-        removeResultHelper:
-            'Excluir arquivos de relatório gerados durante a execução da tarefa para liberar espaço de armazenamento.',
         removeInfected: 'Excluir arquivos infectados',
         removeInfectedHelper:
             'Excluir arquivos de vírus detectados durante a tarefa para garantir a segurança e o funcionamento normal do servidor.',

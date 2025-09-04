@@ -1313,7 +1313,6 @@ const message = {
             notStart: 'ClamAV service is currently not running, please start it first!',
             removeRecord: 'Delete peport files',
             noRecords: 'Click the "Trigger" button to start the scan and you will see records here.',
-            removeResultHelper: 'Delete report files generated during task execution to free up storage space.',
             removeInfected: 'Delete virus files',
             removeInfectedHelper:
                 'Delete virus files detected during the task to ensure server security and normal operation.',

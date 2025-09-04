@@ -351,6 +351,10 @@ TaskIsExecuting: 'タスクは実行中です'
 CustomAppstore: 'カスタム アプリケーション ウェアハウス'
 TaskExec: '実行'
 
+# task - clam
+Clamscan: "{{ .name }} をスキャン"
+TaskScan: "スキャン"
+
 #task - ai
 OllamaModelPull: 'Ollama モデル {{ .name }} をプルします'
 OllamaModelSize: "Ollama モデル {{ .name }} のサイズを取得します"

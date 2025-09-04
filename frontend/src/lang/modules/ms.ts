@@ -1299,8 +1299,6 @@ const message = {
             notStart: 'Perkhidmatan ClamAV tidak berjalan pada masa ini, sila mulakan dahulu!',
             removeRecord: 'Padam fail laporan',
             noRecords: 'Klik butang "Picu" untuk memulakan imbasan dan anda akan melihat rekod di sini.',
-            removeResultHelper:
-                'Padam fail laporan yang dijana semasa pelaksanaan tugas untuk membebaskan ruang storan.',
             removeInfected: 'Padam fail virus',
             removeInfectedHelper:
                 'Padam fail virus yang dikesan semasa tugas untuk memastikan keselamatan pelayan dan operasi normal.',

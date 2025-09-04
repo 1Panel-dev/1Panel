@@ -124,10 +124,17 @@
                     </el-table-column>
                     <el-table-column
                         :label="$t('cronjob.lastRecordTime')"
-                        :min-width="100"
-                        prop="lastHandleDate"
+                        :min-width="120"
                         show-overflow-tooltip
-                    />
+                        prop="lastRecordTime"
+                    >
+                        <template #default="{ row }">
+                            <el-button v-if="row.lastRecordStatus === 'Done'" icon="Select" link type="success" />
+                            <el-button v-if="row.lastRecordStatus === 'Failed'" icon="CloseBold" link type="danger" />
+                            <el-button v-if="row.lastRecordStatus === 'Waiting'" :loading="true" link type="info" />
+                            {{ row.lastRecordTime }}
+                        </template>
+                    </el-table-column>
                     <el-table-column :label="$t('commons.table.description')" prop="description" show-overflow-tooltip>
                         <template #default="{ row }">
                             <fu-input-rw-switch v-model="row.description" @blur="onChange(row)" />
@@ -147,10 +154,6 @@
         <OpDialog ref="opRef" @search="search" @submit="onSubmitDelete()">
             <template #content>
                 <el-form class="mt-4 mb-1" ref="deleteForm" label-position="left">
-                    <el-form-item>
-                        <el-checkbox v-model="removeRecord" :label="$t('toolbox.clam.removeRecord')" />
-                        <span class="input-help">{{ $t('toolbox.clam.removeResultHelper') }}</span>
-                    </el-form-item>
                     <el-form-item>
                         <el-checkbox v-model="removeInfected" :label="$t('toolbox.clam.removeInfected')" />
                         <span class="input-help">{{ $t('toolbox.clam.removeInfectedHelper') }}</span>
@@ -201,7 +204,6 @@ const operateIDs = ref();
 const dialogLogRef = ref();
 const isRecordShow = ref();
 
-const removeRecord = ref();
 const removeInfected = ref();
 
 const isSettingShow = ref();
@@ -305,7 +307,7 @@ const onDelete = async (row: Toolbox.ClamInfo | null) => {
 
 const onSubmitDelete = async () => {
     loading.value = true;
-    await deleteClam({ ids: operateIDs.value, removeRecord: removeRecord.value, removeInfected: removeInfected.value })
+    await deleteClam({ ids: operateIDs.value, removeInfected: removeInfected.value })
         .then(() => {
             loading.value = false;
             MsgSuccess(i18n.global.t('commons.msg.deleteSuccess'));

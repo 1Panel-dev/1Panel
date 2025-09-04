@@ -349,7 +349,11 @@ SubTask: '하위 작업'
 RuntimeExtension: '런타임 환경 확장'
 TaskIsExecuting: '작업이 실행 중입니다'
 CustomAppstore: '사용자 정의 애플리케이션 웨어하우스'
-TaskExec": '실행'
+TaskExec: '실행'
+
+# task - clam
+Clamscan: "{{ .name }} 스캔"
+TaskScan: "스캔"
 
 # 작업 - ai
 OllamaModelPull: 'Ollama 모델 {{ .name }}을(를) 끌어오세요'

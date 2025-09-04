@@ -306,7 +306,7 @@ const timeRangeLoad = ref<[Date, Date]>([
 const searchInfo = reactive({
     cacheSizeKey: 'cronjob-record-page-size',
     page: 1,
-    pageSize: 8,
+    pageSize: 10,
     recordTotal: 0,
     cronjobID: 0,
     startTime: new Date(),

@@ -352,6 +352,10 @@ TaskIsExecuting: 'Görev çalışıyor'
 CustomAppstore: 'Özel uygulama deposu'
 TaskExec: 'Çalıştır'
 
+# task - clam
+Clamscan: "{{ .name }} Tara"
+TaskScan: "Tara"
+
 # task - ai
 OllamaModelPull: 'Ollama modeli {{ .name }} çek'
 OllamaModelSize: 'Ollama modeli {{ .name }} boyutunu al'

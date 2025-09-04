@@ -1259,7 +1259,6 @@ const message = {
             notStart: 'Clamav Serviceは現在実行されていません。最初に開始してください！',
             removeRecord: 'ペポートファイルを削除します',
             noRecords: '[トリガー]ボタンをクリックしてスキャンを開始すると、ここにレコードが表示されます。',
-            removeResultHelper: 'タスク実行中に生成されたレポートファイルを削除して、ストレージスペースを解放します。',
             removeInfected: 'ウイルスファイルを削除します',
             removeInfectedHelper:
                 'サーバーのセキュリティと通常の操作を確保するために、タスク中に検出されたウイルスファイルを削除します。',

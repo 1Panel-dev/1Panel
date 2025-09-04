@@ -351,6 +351,10 @@ TaskIsExecuting: 'Задача выполняется'
 CustomAppstore: 'Хранилище пользовательских приложений'
 TaskExec: 'Выполнить'
 
+# task - clam
+Clamscan: "Сканировать {{ .name }}"
+TaskScan: "Сканировать"
+
 # задача - ай
 OllamaModelPull: 'Вытянуть модель Ollama {{ .name }}'
 OllamaModelSize: 'Получить размер модели Ollama {{ .name }}'

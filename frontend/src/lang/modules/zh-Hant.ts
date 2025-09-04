@@ -1244,7 +1244,6 @@ const message = {
             notStart: '當前未 ClamAV 服務，請先開啟！',
             removeRecord: '刪除報告文件',
             noRecords: '點擊“執行”按鈕開始掃描，掃描結果將會記錄在這裏。',
-            removeResultHelper: '刪除任務執行過程中生成的報告文件，以清理存儲空間。',
             removeInfected: '刪除病毒文件',
             removeInfectedHelper: '刪除任務檢測到的病毒文件，以確保伺服器的安全和正常運行。',
             clamCreate: '創建掃描規則',

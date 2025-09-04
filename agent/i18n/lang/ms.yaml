@@ -351,6 +351,10 @@ TaskIsExecuting: 'Tugas sedang berjalan'
 CustomAppstore: 'Gudang aplikasi tersuai'
 TaskExec: 'Laksanakan'
 
+# task - clam
+Clamscan: "Imbas {{ .name }}"
+TaskScan: "Imbas"
+
 # tugasan - ai
 OllamaModelPull: 'Tarik model Ollama {{ .name }}'
 OllamaModelSize: 'Dapatkan saiz model Ollama {{ .name }}'

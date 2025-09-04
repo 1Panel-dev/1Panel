@@ -351,6 +351,10 @@ TaskIsExecuting: 'A tarefa está em execução'
 CustomAppstore: 'Armazém de aplicativos personalizados'
 TaskExec: 'Executar'
 
+# task - clam
+Clamscan: "Escanear {{ .name }}"
+TaskScan: "Escanear"
+
 # tarefa - ai
 OllamaModelPull: 'Puxar modelo Ollama {{ .name }}'
 OllamaModelSize: 'Obtenha o tamanho do modelo Ollama {{ .name }}'

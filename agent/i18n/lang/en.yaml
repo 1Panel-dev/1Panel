@@ -351,6 +351,10 @@ TaskIsExecuting: 'Task is running'
 CustomAppstore: 'Custom application warehouse'
 TaskExec: 'Execute'
 
+# task - clam
+Clamscan: "Scan {{ .name }}"
+TaskScan: "Scan"
+
 # task - ai
 OllamaModelPull: 'Pull Ollama model {{ .name }}'
 OllamaModelSize: 'Get the size of Ollama model {{ .name }}'

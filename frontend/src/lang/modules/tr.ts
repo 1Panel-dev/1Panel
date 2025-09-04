@@ -1329,8 +1329,6 @@ const message = {
             notStart: 'ClamAV servisi şu anda çalışmıyor, lütfen önce başlatın!',
             removeRecord: 'Rapor dosyalarını sil',
             noRecords: 'Taramayı başlatmak için "Tetikle" düğmesine tıklayın ve kayıtları burada göreceksiniz.',
-            removeResultHelper:
-                'Depolama alanını boşaltmak için görev yürütme sırasında oluşturulan rapor dosyalarını silin.',
             removeInfected: 'Virüs dosyalarını sil',
             removeInfectedHelper:
                 'Sunucu güvenliğini ve normal çalışmasını sağlamak için görev sırasında tespit edilen virüs dosyalarını silin.',

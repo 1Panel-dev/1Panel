@@ -18,6 +18,7 @@ import (
 func Init() {
 	initGlobalData()
 	handleCronjobStatus()
+	handleClamStatus()
 	handleSnapStatus()
 	handleOllamaModelStatus()
 
@@ -85,6 +86,24 @@ func handleCronjobStatus() {
 		var cronjob *model.Cronjob
 		_ = global.DB.Where("id = ?", record.CronjobID).First(&cronjob).Error
 		handleCronJobAlert(cronjob)
+	}
+}
+
+func handleClamStatus() {
+	var jobRecords []model.ClamRecord
+	_ = global.DB.Model(&model.Clam{}).Where("is_executing = ?", true).Updates(map[string]interface{}{"is_executing": false}).Error
+	_ = global.DB.Where("status = ?", constant.StatusWaiting).Find(&jobRecords).Error
+	for _, record := range jobRecords {
+		err := global.DB.Model(&model.ClamRecord{}).Where("status = ?", constant.StatusWaiting).
+			Updates(map[string]interface{}{
+				"status":  constant.StatusFailed,
+				"message": "the task was interrupted due to the restart of the 1panel service",
+			}).Error
+
+		if err != nil {
+			global.LOG.Errorf("Failed to update job ID: %v, Error:%v", record.ID, err)
+			continue
+		}
 	}
 }
 
