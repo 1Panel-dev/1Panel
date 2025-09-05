@@ -2822,6 +2822,27 @@ const message = {
             autoStartHelper: 'Supervisor 起動後にサービスを自動的に起動するかどうか',
         },
     },
+    disk: {
+        management: 'ディスク管理',
+        partition: 'パーティション',
+        unmount: 'アンマウント',
+        unmountHelper: 'パーティション {0} をアンマウントしますか？',
+        mount: 'マウント',
+        partitionAlert:
+            'ディスクのパーティション分割にはディスクのフォーマットが必要で、既存のデータは削除されます。事前にデータを保存またはスナップショットを取ってください。',
+        mountPoint: 'マウントディレクトリ',
+        systemDisk: 'システムディスク',
+        unpartitionedDisk: '未パーティションディスク',
+        handlePartition: '今すぐパーティション',
+        filesystem: 'ファイルシステム',
+        unmounted: 'アンマウント',
+        cannotOperate: '操作不可',
+        systemDiskHelper: 'ヒント: 現在のディスクはシステムディスクです。操作できません。',
+        autoMount: '自動マウント',
+        model: 'デバイスモデル',
+        diskType: 'ディスクタイプ',
+        serial: 'シリアルナンバー',
+    },
     xpack: {
         expiresTrialAlert:
             'ご注意: あなたのProトライアルは{0}日後に終了し、すべてのPro機能が使用できなくなります。適時に更新またはフルバージョンにアップグレードしてください。',

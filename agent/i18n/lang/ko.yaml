@@ -475,3 +475,12 @@ CommonAlert: "귀하의 1Panel, {{ .msg }}. 자세한 내용은 패널에 로그
 NodeExceptionAlert: "귀하의 1Panel, {{ .num }}개의 노드에 이상이 있습니다. 자세한 내용은 패널에 로그인하여 확인하세요."
 LicenseExceptionAlert: "귀하의 1Panel, {{ .num }}개의 라이선스에 이상이 있습니다. 자세한 내용은 패널에 로그인하여 확인하세요."
 SSHAndPanelLoginAlert: "귀하의 1Panel, 패널 {{ .name }}이(가) {{ .ip }}에서 비정상 로그인했습니다. 자세한 내용은 패널에 로그인하여 확인하세요."
+
+#disk
+DeviceNotFound: "장치 {{ .name }} 을(를) 찾을 수 없습니다"
+DeviceIsMounted: "장치 {{ .name }} 이(가) 마운트되었습니다, 먼저 마운트 해제하세요"
+PartitionDiskErr: "파티션 분할에 실패했습니다, {{ .err }}"
+FormatDiskErr: "디스크 포맷에 실패했습니다, {{ .err }}"
+MountDiskErr: "디스크 마운트에 실패했습니다, {{ .err }}"
+UnMountDiskErr: "디스크 마운트 해제에 실패했습니다, {{ .err }}"
+XfsNotFound: "xfs 파일 시스템이 감지되지 않았습니다, 먼저 xfsprogs 를 설치하세요"

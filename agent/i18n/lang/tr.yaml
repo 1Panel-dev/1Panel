@@ -476,3 +476,12 @@ CommonAlert: "1Panel'iniz, {{ .msg }}. Detaylar için panele giriş yapınız."
 NodeExceptionAlert: "1Panel'iniz, {{ .num }} düğümde sorun var. Detaylar için panele giriş yapınız."
 LicenseExceptionAlert: "1Panel'iniz, {{ .num }} lisansda sorun var. Detaylar için panele giriş yapınız."
 SSHAndPanelLoginAlert: "1Panel'iniz, {{ .ip }} adresinden {{ .name }} paneline anormal giriş tespit edildi. Detaylar için panele giriş yapınız."
+
+#disk
+DeviceNotFound: "Cihaz {{ .name }} bulunamadı"
+DeviceIsMounted: "Cihaz {{ .name }} bağlandı, önce çıkarın"
+PartitionDiskErr: "Bölümleme başarısız, {{ .err }}"
+FormatDiskErr: "Disk biçimlendirme başarısız, {{ .err }}"
+MountDiskErr: "Disk bağlama başarısız, {{ .err }}"
+UnMountDiskErr: "Disk bağının kaldırılması başarısız, {{ .err }}"
+XfsNotFound: "XFS dosya sistemi algılanmadı, lütfen önce xfsprogs'i yükleyin"

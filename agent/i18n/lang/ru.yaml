@@ -475,3 +475,12 @@ CommonAlert: "Ваш 1Panel, {{ .msg }}. Подробности смотрите
 NodeExceptionAlert: "Ваш 1Panel, {{ .num }} узлов работают неправильно. Подробности смотрите, войдя в панель."
 LicenseExceptionAlert: "Ваш 1Panel, {{ .num }} лицензий работают неправильно. Подробности смотрите, войдя в панель."
 SSHAndPanelLoginAlert: "Ваш 1Panel, обнаружен аномальный вход в панель {{ .name }} с {{ .ip }}. Подробности смотрите, войдя в панель."
+
+#disk
+DeviceNotFound: "Устройство {{ .name }} не найдено"
+DeviceIsMounted: "Устройство {{ .name }} подключено, сначала отключите"
+PartitionDiskErr: "Не удалось разделить, {{ .err }}"
+FormatDiskErr: "Не удалось отформатировать диск, {{ .err }}"
+MountDiskErr: "Не удалось подключить диск, {{ .err }}"
+UnMountDiskErr: "Не удалось отключить диск, {{ .err }}"
+XfsNotFound: "Файловая система xfs не обнаружена, сначала установите xfsprogs"

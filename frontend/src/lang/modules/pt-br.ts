@@ -2889,6 +2889,27 @@ const message = {
             autoStartHelper: 'Se o serviço deve ser iniciado automaticamente após o Supervisor iniciar',
         },
     },
+    disk: {
+        management: 'Gerenciamento de Disco',
+        partition: 'Partição',
+        unmount: 'Desmontar',
+        unmountHelper: 'Deseja desmontar a partição {0}?',
+        mount: 'Montar',
+        partitionAlert:
+            'O particionamento de disco requer formatação do disco, e os dados existentes serão excluídos. Salve ou tire snapshots dos dados com antecedência.',
+        mountPoint: 'Diretório de Montagem',
+        systemDisk: 'Disco do Sistema',
+        unpartitionedDisk: 'Disco Não Particionado',
+        handlePartition: 'Particionar Agora',
+        filesystem: 'Sistema de Arquivos',
+        unmounted: 'Desmontado',
+        cannotOperate: 'Não Pode Operar',
+        systemDiskHelper: 'Dica: O disco atual é o disco do sistema, não pode ser operado.',
+        autoMount: 'Montagem Automática',
+        model: 'Modelo do Dispositivo',
+        diskType: 'Tipo de Disco',
+        serial: 'Número de Série',
+    },
     xpack: {
         expiresTrialAlert:
             'Lembrete: Sua versão de avaliação profissional expirará em {0} dias. Após isso, todas as funcionalidades da versão profissional não estarão mais disponíveis. Por favor, renove ou faça upgrade para a versão oficial a tempo.',

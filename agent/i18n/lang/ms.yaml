@@ -475,3 +475,12 @@ CommonAlert: "1Panel anda, {{ .msg }}, sila log masuk ke panel untuk maklumat la
 NodeExceptionAlert: "1Panel anda, {{ .num }} nod bermasalah, sila log masuk ke panel untuk maklumat lanjut."
 LicenseExceptionAlert: "1Panel anda, {{ .num }} lesen bermasalah, sila log masuk ke panel untuk maklumat lanjut."
 SSHAndPanelLoginAlert: "1Panel anda, log masuk panel {{ .name }} yang tidak normal dari {{ .ip }}, sila log masuk ke panel untuk maklumat lanjut."
+
+#disk
+DeviceNotFound: "Peranti {{ .name }} tidak ditemui"
+DeviceIsMounted: "Peranti {{ .name }} telah dikaitkan, sila nyahkaitkan terlebih dahulu"
+PartitionDiskErr: "Gagal membahagikan, {{ .err }}"
+FormatDiskErr: "Gagal memformat cakera, {{ .err }}"
+MountDiskErr: "Gagal mengkaitkan cakera, {{ .err }}"
+UnMountDiskErr: "Gagal nyahkaitkan cakera, {{ .err }}"
+XfsNotFound: "Sistem fail xfs tidak dikesan, sila pasang xfsprogs terlebih dahulu"

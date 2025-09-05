@@ -2927,6 +2927,27 @@ const message = {
             autoStartHelper: 'Whether to automatically start the service after Supervisor starts',
         },
     },
+    disk: {
+        management: 'Disk Management',
+        partition: 'Partition',
+        unmount: 'Unmount',
+        unmountHelper: 'Do you want to unmount the partition {0}?',
+        mount: 'Mount',
+        partitionAlert:
+            'Disk partitioning requires formatting the disk, and existing data will be deleted. Please save or take snapshots of your data in advance.',
+        mountPoint: 'Mount Directory',
+        systemDisk: 'System Disk',
+        unpartitionedDisk: 'Unpartitioned Disk',
+        handlePartition: 'Partition Now',
+        filesystem: 'Filesystem',
+        unmounted: 'Unmounted',
+        cannotOperate: 'Cannot Operate',
+        systemDiskHelper: 'Hint: The current disk is the system disk. It cannot be operated on.',
+        autoMount: 'Auto Mount',
+        model: 'Device Model',
+        diskType: 'Disk Type',
+        serial: 'Serial Number',
+    },
     xpack: {
         expiresTrialAlert:
             'Friendly reminder: Your Pro trial will expire in {0} days, and all Pro features will no longer be accessible. Please renew or upgrade to the full version in a timely manner.',

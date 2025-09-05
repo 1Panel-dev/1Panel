@@ -474,3 +474,12 @@ CommonAlert: "您的 1Panel 面板，{{ .msg }}，詳情請登入面板查看。
 NodeExceptionAlert: "您的 1Panel 面板，{{ .num }} 個節點存在異常，詳情請登入面板查看。"
 LicenseExceptionAlert: "您的 1Panel 面板，{{ .num }} 個許可證存在異常，詳情請登入面板查看。"
 SSHAndPanelLoginAlert: "您的 1Panel 面板，面板{{ .name }}從 {{ .ip }} 登錄異常，詳情請登入面板查看。"
+
+#disk
+DeviceNotFound: "設備 {{ .name }} 未找到"
+DeviceIsMounted: "設備 {{ .name }} 已掛載，請先卸載"
+PartitionDiskErr: "分區失敗，{{ .err }}"
+FormatDiskErr: "格式化磁盤失敗，{{ .err }}"
+MountDiskErr: "掛載磁盤失敗，{{ .err }}"
+UnMountDiskErr: "卸載磁盤失敗，{{ .err }}"
+XfsNotFound: "未檢測到 xfs 文件系統，請先安裝 xfsprogs"

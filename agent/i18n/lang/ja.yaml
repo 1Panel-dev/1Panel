@@ -475,3 +475,12 @@ CommonAlert: "お使いの1Panel、{{ .msg }}、詳細はパネルにログイ�
 NodeExceptionAlert: "お使いの1Panel、{{ .num }}個のノードに異常があります。詳細はパネルにログインしてご確認ください。"
 LicenseExceptionAlert: "お使いの1Panel、{{ .num }}個のライセンスに異常があります。詳細はパネルにログインしてご確認ください。"
 SSHAndPanelLoginAlert: "お使いの1Panel、パネル{{ .name }}が{{ .ip }}から異常ログインしました。詳細はパネルにログインしてご確認ください。"
+
+#disk
+DeviceNotFound: "デバイス {{ .name }} が見つかりません"
+DeviceIsMounted: "デバイス {{ .name }} はマウントされています、まずアンマウントしてください"
+PartitionDiskErr: "パーティションに失敗しました、{{ .err }}"
+FormatDiskErr: "ディスクのフォーマットに失敗しました、{{ .err }}"
+MountDiskErr: "ディスクのマウントに失敗しました、{{ .err }}"
+UnMountDiskErr: "ディスクのアンマウントに失敗しました、{{ .err }}"
+XfsNotFound: "xfs ファイルシステムが検出されませんでした、最初に xfsprogs をインストールしてください"

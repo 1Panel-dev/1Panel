@@ -106,5 +106,21 @@ export const loadSSHLogs = (params: Host.searchSSHLog) => {
     return http.post<ResPage<Host.sshHistory>>(`/hosts/ssh/log`, params);
 };
 export const exportSSHLogs = (params: Host.searchSSHLog) => {
-    return http.post<string>('/hosts/ssh/log/export', params, TimeoutEnum.T_40S);
+    return http.post<string>(`/hosts/ssh/log/export`, params, TimeoutEnum.T_40S);
+};
+
+export const listDisks = () => {
+    return http.get<Host.CompleteDiskInfo>(`/hosts/disks`);
+};
+
+export const partitionDisk = (params: Host.DiskPartition) => {
+    return http.post(`/hosts/disks/partition`, params, TimeoutEnum.T_60S);
+};
+
+export const mountDisk = (params: Host.DiskMount) => {
+    return http.post(`/hosts/disks/mount`, params, TimeoutEnum.T_60S);
+};
+
+export const unmountDisk = (params: Host.DiskUmount) => {
+    return http.post(`/hosts/disks/unmount`, params, TimeoutEnum.T_60S);
 };

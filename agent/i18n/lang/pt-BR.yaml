@@ -475,3 +475,12 @@ CommonAlert: "Seu 1Panel, {{ .msg }}. Para mais detalhes, faça login no painel.
 NodeExceptionAlert: "Seu 1Panel, {{ .num }} nós estão com problemas. Para mais detalhes, faça login no painel."
 LicenseExceptionAlert: "Seu 1Panel, {{ .num }} licenças estão com problemas. Para mais detalhes, faça login no painel."
 SSHAndPanelLoginAlert: "Seu 1Panel, login anormal no painel {{ .name }} a partir de {{ .ip }}. Para mais detalhes, faça login no painel."
+
+#disk
+DeviceNotFound: "Dispositivo {{ .name }} não encontrado"
+DeviceIsMounted: "Dispositivo {{ .name }} está montado, por favor desmonte primeiro"
+PartitionDiskErr: "Falha ao particionar, {{ .err }}"
+FormatDiskErr: "Falha ao formatar disco, {{ .err }}"
+MountDiskErr: "Falha ao montar disco, {{ .err }}"
+UnMountDiskErr: "Falha ao desmontar disco, {{ .err }}"
+XfsNotFound: "Sistema de arquivos xfs não detectado, por favor instale xfsprogs primeiro"

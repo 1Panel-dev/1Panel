@@ -2964,6 +2964,27 @@ const message = {
             autoStartHelper: 'Supervisor başlatıldıktan sonra servis otomatik olarak başlatılsın mı?',
         },
     },
+    disk: {
+        management: 'Disk Yönetimi',
+        partition: 'Bölüm',
+        unmount: 'Bağını Kaldır',
+        unmountHelper: "Bölüm {0}'ın bağını kaldırmak istiyor musunuz?",
+        mount: 'Bağla',
+        partitionAlert:
+            'Disk bölümleme, diske biçimlendirme gerektirir ve mevcut veriler silinir. Lütfen verilerinizi önceden kaydedin veya anlık görüntü alın.',
+        mountPoint: 'Bağlama Noktası',
+        systemDisk: 'Sistem Diski',
+        unpartitionedDisk: 'Bölümlendirilmemiş Disk',
+        handlePartition: 'Şimdi Bölümle',
+        filesystem: 'Dosya Sistemi',
+        unmounted: 'Bağlı Değil',
+        cannotOperate: 'Operasyon Yapılamıyor',
+        systemDiskHelper: 'İpucu: Mevcut disk sistem diskidir, işlem yapılamaz.',
+        autoMount: 'Otomatik Bağlama',
+        model: 'Cihaz Modeli',
+        diskType: 'Disk Türü',
+        serial: 'Seri Numarası',
+    },
     xpack: {
         expiresTrialAlert:
             'Nazik hatırlatma: Pro deneme sürümünüz {0} gün içinde sona erecek ve tüm Pro özellikleri kullanılamaz hale gelecektir. Lütfen zamanında yenileyin veya tam sürüme yükseltin.',

@@ -475,3 +475,12 @@ CommonAlert: "Your 1Panel, {{ .msg }}, please log in to the panel for details."
 NodeExceptionAlert: "Your 1Panel, {{ .num }} nodes are abnormal, please log in to the panel for details."
 LicenseExceptionAlert: "Your 1Panel, {{ .num }} licenses are abnormal, please log in to the panel for details."
 SSHAndPanelLoginAlert: "Your 1Panel, abnormal panel {{ .name }} login from {{ .ip }}, please log in to the panel for details."
+
+#disk
+DeviceNotFound: "Device {{ .name }} not found"
+DeviceIsMounted: "Device {{ .name }} is mounted, please unmount first"
+PartitionDiskErr: "Failed to partition, {{ .err }}"
+FormatDiskErr: "Failed to format disk, {{ .err }}"
+MountDiskErr: "Failed to mount disk, {{ .err }}"
+UnMountDiskErr: "Failed to unmount disk, {{ .err }}"
+XfsNotFound: "xfs filesystem not detected, please install xfsprogs first"

@@ -204,4 +204,50 @@ export namespace Host {
         status: string;
         message: string;
     }
+
+    export interface DiskBasicInfo {
+        device: string;
+        size: string;
+        model: string;
+        diskType: string;
+        isRemovable: boolean;
+        isSystem: boolean;
+        filesystem: string;
+        used: string;
+        avail: string;
+        usePercent: number;
+        mountPoint: string;
+        isMounted: boolean;
+        serial: string;
+    }
+
+    export interface DiskInfo extends DiskBasicInfo {
+        partitions?: DiskBasicInfo[];
+    }
+
+    export interface CompleteDiskInfo {
+        disks: DiskInfo[];
+        unpartitionedDisks: DiskBasicInfo[];
+        systemDisk?: DiskInfo;
+        totalDisks: number;
+        totalCapacity: number;
+    }
+
+    export interface DiskPartition {
+        device: string;
+        filesystem: string;
+        label: string;
+        autoMount: boolean;
+        mountPoint: string;
+    }
+
+    export interface DiskMount {
+        device: string;
+        mountPoint: string;
+        filesystem?: string;
+    }
+
+    export interface DiskUmount {
+        mountPoint: string;
+    }
 }

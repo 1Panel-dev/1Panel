@@ -511,3 +511,17 @@ var AddCronjobGroup = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddDiskMenu = &gormigrate.Migration{
+	ID: "20250811-add-disk-menu",
+	Migrate: func(tx *gorm.DB) error {
+		return helper.AddMenu(dto.ShowMenu{
+			ID:       "77",
+			Disabled: false,
+			Title:    "menu.disk",
+			IsShow:   true,
+			Label:    "Disk",
+			Path:     "/hosts/disk",
+		}, "7", tx)
+	},
+}

@@ -2886,6 +2886,19 @@ const message = {
             autoStartHelper: 'Sama ada untuk memulakan perkhidmatan secara automatik selepas Supervisor mula',
         },
     },
+    disk: {
+        systemDisk: 'Cakera Sistem',
+        unpartitionedDisk: 'Cakera Tidak Dibahagikan',
+        handlePartition: 'Bahagikan Sekarang',
+        filesystem: 'Sistem Fail',
+        unmounted: 'Tidak Dikaitkan',
+        cannotOperate: 'Tidak Boleh Beroperasi',
+        systemDiskHelper: 'Petunjuk: Cakera semasa adalah cakera sistem, tidak boleh dioperasikan.',
+        autoMount: 'Pemasangan Automatik',
+        model: 'Model Peranti',
+        diskType: 'Jenis Cakera',
+        serial: 'Nombor Siri',
+    },
     xpack: {
         expiresTrialAlert:
             'Peringatan mesra: Percubaan Pro anda akan tamat dalam {0} hari, dan semua ciri Pro tidak lagi dapat diakses. Sila perbaharui atau naik taraf ke versi penuh tepat pada masanya.',

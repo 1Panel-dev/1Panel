@@ -2773,6 +2773,27 @@ const message = {
             autoStartHelper: 'Supervisor 시작 후 서비스를 자동으로 시작할지 여부',
         },
     },
+    disk: {
+        management: '디스크 관리',
+        partition: '파티션',
+        unmount: '마운트 해제',
+        unmountHelper: '파티션 {0} 을(를) 마운트 해제하시겠습니까?',
+        mount: '마운트',
+        partitionAlert:
+            '디스크 파티션 작업은 디스크 포맷이 필요하며, 기존 데이터는 삭제됩니다. 데이터를 미리 저장하거나 스냅샷을 찍어주세요.',
+        mountPoint: '마운트 디렉토리',
+        systemDisk: '시스템 디스크',
+        unpartitionedDisk: '미파티션 디스크',
+        handlePartition: '지금 파티션',
+        filesystem: '파일 시스템',
+        unmounted: '마운트 해제됨',
+        cannotOperate: '작업 불가',
+        systemDiskHelper: '힌트: 현재 디스크는 시스템 디스크입니다. 작업할 수 없습니다.',
+        autoMount: '자동 마운트',
+        model: '장치 모델',
+        diskType: '디스크 유형',
+        serial: '시리얼 번호',
+    },
     xpack: {
         expiresTrialAlert:
             '친절한 알림: 귀하의 Pro 체험판이 {0}일 후 만료되며, 모든 Pro 기능에 더 이상 접근할 수 없습니다. 제때 갱신하거나 전체 버전으로 업그레이드하시기 바랍니다.',
