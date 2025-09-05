@@ -177,7 +177,24 @@ func (a AlertService) UpdateAlert(req dto.AlertUpdate) error {
 }
 
 func (a AlertService) DeleteAlert(id uint) error {
-	return alertRepo.Delete(repo.WithByID(id))
+	alertInfo, _ := alertRepo.Get(repo.WithByID(id))
+	if alertInfo.ID == 0 {
+		return buserr.New("ErrRecordNotFound")
+	}
+	err := alertRepo.Delete(repo.WithByID(id))
+	if err != nil {
+		return err
+	}
+	alerts, err := a.GetAlerts()
+	if err != nil {
+		return err
+	}
+	if len(alerts) > 0 {
+		NewIAlertTaskHelper().InitTask(alertInfo.Type)
+	} else {
+		NewIAlertTaskHelper().StopTask()
+	}
+	return nil
 }
 
 func (a AlertService) GetAlert(id uint) (dto.AlertDTO, error) {
