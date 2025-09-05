@@ -1,17 +1,23 @@
 package migrations
 
 import (
+	"encoding/json"
 	"fmt"
+	"os"
+	"os/user"
 	"path"
 	"time"
 
+	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/service"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
+	"github.com/1Panel-dev/1Panel/agent/utils/copier"
 	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
+	"github.com/1Panel-dev/1Panel/agent/utils/ssh"
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 
 	"github.com/go-gormigrate/gormigrate/v2"
@@ -505,6 +511,43 @@ var UpdateMcpServerAddType = &gormigrate.Migration{
 			return err
 		}
 		if err := tx.Model(&model.McpServer{}).Where("1=1").Update("type", "npx").Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}
+
+var InitLocalSSHConn = &gormigrate.Migration{
+	ID: "20250905-init-local-ssh",
+	Migrate: func(tx *gorm.DB) error {
+		itemPath := ""
+		currentInfo, _ := user.Current()
+		if len(currentInfo.HomeDir) == 0 {
+			itemPath = "/root/.ssh/id_ed25519_1panel"
+		} else {
+			itemPath = path.Join(currentInfo.HomeDir, ".ssh/id_ed25519_1panel")
+		}
+		if _, err := os.Stat(itemPath); err != nil {
+			_ = service.NewISSHService().CreateRootCert(dto.CreateRootCert{EncryptionMode: "ed25519", Name: "id_ed25519_1panel", Description: "1Panel Terminal"})
+		}
+		privateKey, _ := os.ReadFile(itemPath)
+		connWithKey := ssh.ConnInfo{
+			Addr:       "127.0.0.1",
+			User:       "root",
+			Port:       22,
+			AuthMode:   "key",
+			PrivateKey: privateKey,
+		}
+		if _, err := ssh.NewClient(connWithKey); err != nil {
+			return nil
+		}
+		var conn model.LocalConnInfo
+		_ = copier.Copy(&conn, &connWithKey)
+		conn.PrivateKey = string(privateKey)
+		conn.PassPhrase = ""
+		localConn, _ := json.Marshal(&conn)
+		connAfterEncrypt, _ := encrypt.StringEncrypt(string(localConn))
+		if err := tx.Model(&model.Setting{}).Where("key = ?", "LocalSSHConn").Updates(map[string]interface{}{"value": connAfterEncrypt}).Error; err != nil {
 			return err
 		}
 		return nil

@@ -1118,6 +1118,8 @@ const message = {
     },
     terminal: {
         local: '로컬',
+        defaultConn: '기본 연결',
+        defaultConnHelper: '터미널을 연 후 기본적으로 호스트에 연결할지 여부',
         localHelper: '로컬 이름은 시스템 로컬 식별에만 사용됩니다.',
         connLocalErr: '자동 인증에 실패했습니다. 로컬 서버 로그인 정보를 입력해주세요.',
         testConn: '연결 테스트',

@@ -47,6 +47,7 @@ export namespace Host {
         user: string;
         authMode: string;
         privateKey: string;
+        passPhrase: string;
         password: string;
     }
     export interface GroupChange {

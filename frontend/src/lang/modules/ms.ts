@@ -1154,6 +1154,8 @@ const message = {
     },
     terminal: {
         local: 'Tempatan',
+        defaultConn: 'Sambungan Lalai',
+        defaultConnHelper: 'Sama ada untuk menyambung ke hos secara lalai selepas membuka terminal',
         localHelper: 'Nama tempatan hanya digunakan untuk pengenalan sistem tempatan.',
         connLocalErr: 'Tidak dapat mengesahkan secara automatik, sila isi maklumat log masuk pelayan tempatan.',
         testConn: 'Uji sambungan',

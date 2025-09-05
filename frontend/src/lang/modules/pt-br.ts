@@ -1146,6 +1146,8 @@ const message = {
     },
     terminal: {
         local: 'Local',
+        defaultConn: 'Conexão Padrão',
+        defaultConnHelper: 'Se deve conectar ao host por padrão após abrir o terminal',
         localHelper: 'O nome local é usado apenas para identificação local do sistema.',
         connLocalErr:
             'Невозможно автоматически аутентифицироваться, пожалуйста, заполните информацию для входа на локальный сервер.',

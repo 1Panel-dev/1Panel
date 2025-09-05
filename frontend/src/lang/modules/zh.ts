@@ -1110,6 +1110,8 @@ const message = {
     },
     terminal: {
         local: '本机',
+        defaultConn: '默认连接',
+        defaultConnHelper: '打开终端后是否默认连接主机',
         localHelper: 'local 名称仅用于系统本机标识',
         connLocalErr: '无法自动认证，请填写本地服务器的登录信息！',
         testConn: '连接测试',

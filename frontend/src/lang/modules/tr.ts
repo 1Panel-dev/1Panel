@@ -1178,6 +1178,8 @@ const message = {
     },
     terminal: {
         local: 'Yerel',
+        defaultConn: 'Varsayılan Bağlantı',
+        defaultConnHelper: 'Terminal açıldıktan sonra varsayılan olarak ana bilgisayara bağlanılsın mı',
         localHelper: '`local` adı sadece sistem yerel tanımlaması için kullanılır',
         connLocalErr: 'Otomatik kimlik doğrulama yapılamıyor, lütfen yerel sunucu giriş bilgilerini doldurun.',
         testConn: 'Bağlantıyı test et',

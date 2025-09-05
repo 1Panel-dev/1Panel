@@ -1165,6 +1165,8 @@ const message = {
     },
     terminal: {
         local: 'Local',
+        defaultConn: 'Default Connection',
+        defaultConnHelper: 'Whether to connect to the host by default after opening the terminal',
         localHelper: 'The `local` name is used only for system local identification',
         connLocalErr: 'Unable to automatically authenticate, please fill in the local server login information.',
         testConn: 'Test connection',

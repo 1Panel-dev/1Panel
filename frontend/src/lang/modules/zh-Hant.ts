@@ -1110,6 +1110,8 @@ const message = {
     },
     terminal: {
         local: '本機',
+        defaultConn: '預設連接',
+        defaultConnHelper: '開啟終端後是否預設連線到主機',
         localHelper: 'local 名稱僅用於系統本機標識',
         connLocalErr: '無法自動認證，請填寫本地服務器的登錄信息！',
         testConn: '連接測試',

@@ -1126,6 +1126,8 @@ const message = {
     },
     terminal: {
         local: 'ローカル',
+        defaultConn: 'デフォルト接続',
+        defaultConnHelper: 'ターミナルを開いた後にデフォルトでホストに接続するかどうか',
         localHelper: 'ローカル名はシステムのローカル識別にのみ使用されます。',
         connLocalErr: '自動的に認証できない場合は、ローカルサーバーのログイン情報を入力してください。',
         testConn: 'テスト接続',
