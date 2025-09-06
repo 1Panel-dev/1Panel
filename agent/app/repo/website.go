@@ -2,6 +2,7 @@ package repo
 
 import (
 	"context"
+
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"gorm.io/gorm"
@@ -33,6 +34,8 @@ type IWebsiteRepo interface {
 	DeleteAll(ctx context.Context) error
 
 	UpdateGroup(group, newGroup uint) error
+
+	UpdateWebp(websiteid uint, srcpath string, status int) error
 }
 
 func NewIWebsiteRepo() IWebsiteRepo {
@@ -169,4 +172,8 @@ func (w *WebsiteRepo) DeleteAll(ctx context.Context) error {
 
 func (w *WebsiteRepo) UpdateGroup(group, newGroup uint) error {
 	return global.DB.Model(&model.Website{}).Where("website_group_id = ?", group).Updates(map[string]interface{}{"website_group_id": newGroup}).Error
+}
+
+func (w *WebsiteRepo) UpdateWebp(websiteid uint, srcpath string, status int) error {
+	return global.DB.Model(&model.Website{}).Where("id=?", websiteid).Updates(model.Website{WebpSrcPath: srcpath, WebpStatus: status}).Error
 }

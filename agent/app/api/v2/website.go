@@ -1141,3 +1141,23 @@ func (b *BaseApi) ExecComposer(c *gin.Context) {
 	}
 	helper.Success(c)
 }
+
+// @Tags Website
+// @Summary start webp
+// @Accept json
+// @Param request body request.SatrtWebp true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /websites/webp [post]
+func (b *BaseApi) StartWebp(ctx *gin.Context) {
+	var webp request.SatrtWebp
+	if err := helper.CheckBindAndValidate(&webp, ctx); err != nil {
+		return
+	}
+	if err := websiteService.StartWebp(webp); err != nil {
+		helper.InternalServer(ctx, err)
+	}
+	helper.Success(ctx)
+
+}

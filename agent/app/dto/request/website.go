@@ -309,3 +309,10 @@ type ExecComposerReq struct {
 	WebsiteID  uint   `json:"websiteID" validate:"required"`
 	TaskID     string `json:"taskID" validate:"required"`
 }
+
+type SatrtWebp struct {
+	Quality int    `json:"quality" validate:"required"`
+	Status  int    `json:"status" validate:"oneof=0 1"`
+	Path    string `json:"path" validate:"required"`
+	Id      uint   `json:"id" validate:"required"`
+}

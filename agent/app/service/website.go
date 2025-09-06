@@ -13,6 +13,7 @@ import (
 	"net"
 	"os"
 	"path"
+
 	"reflect"
 	"regexp"
 	"strconv"
@@ -128,6 +129,8 @@ type IWebsiteService interface {
 	OperateCrossSiteAccess(req request.CrossSiteAccessOp) error
 
 	ExecComposer(req request.ExecComposerReq) error
+
+	StartWebp(webp request.SatrtWebp) error
 }
 
 func NewIWebsiteService() IWebsiteService {
@@ -3369,5 +3372,31 @@ func (w WebsiteService) ExecComposer(req request.ExecComposerReq) error {
 	go func() {
 		_ = composerTask.Execute()
 	}()
+	return nil
+}
+
+func (w WebsiteService) StartWebp(webp request.SatrtWebp) error {
+
+	nginxconfig, conferr := w.GetWebsiteNginxConfig(webp.Id, constant.AppOpenresty) //获取对应的配置文件
+	if conferr != nil {
+
+		return errors.New("Unable to open webp")
+	}
+	websitedata, err := w.GetWebsite(webp.Id)
+	if err != nil {
+		errors.New("Unable to open webp")
+	}
+	if err = WebpConfig(webp.Path, websitedata.Proxy, webp.Status, nginxconfig); err != nil { //写入nginx配置
+		return err
+	}
+
+	//开始转换
+	if err := files.NewWebp(webp.Path, webp.Quality, webp.Id, webp.Status); err != nil {
+
+		return errors.New("Unable to open webp")
+	}
+	if err = websiteRepo.UpdateWebp(webp.Id, webp.Path, webp.Status); err != nil {
+		return errors.New("Unable to update webp")
+	}
 	return nil
 }

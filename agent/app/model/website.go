@@ -39,6 +39,9 @@ type Website struct {
 
 	Domains    []WebsiteDomain `json:"domains" gorm:"-:migration"`
 	WebsiteSSL WebsiteSSL      `json:"webSiteSSL" gorm:"-:migration"`
+
+	WebpStatus  int    `gorm:"default:0;"`
+	WebpSrcPath string `gorm:"not null"`
 }
 
 func (w Website) TableName() string {

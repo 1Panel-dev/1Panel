@@ -14,6 +14,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/1Panel-dev/1Panel/agent/app/dto/response"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
@@ -1477,4 +1478,38 @@ func ParseDomain(domain string) (*model.WebsiteDomain, error) {
 		Domain: host,
 		Port:   port,
 	}, nil
+}
+
+func WebpConfig(path, Proxy string, status int, nginxconfig *response.FileInfo) error {
+	if status == 0 {
+		return nil
+	}
+
+	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
+	if err != nil {
+		return err
+	}
+	config, err := parser.NewStringParser(nginxconfig.Content).Parse()
+	if err != nil {
+		return errors.New("nginx config is not valid")
+	}
+	servers := config.FindServers()
+	if len(servers) == 0 {
+		return errors.New("nginx config is not valid")
+	}
+	server := servers[0]
+	if server.UpdateWebp(filepath.Base(path), Proxy) {
+		return nil
+	}
+	config.FilePath = nginxconfig.Path
+	if err = nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
+		return errors.New("nginx config is not valid")
+	}
+	if err = opNginx(nginxInstall.ContainerName, constant.NginxCheck); err != nil { //重载
+		return err
+	}
+	if err = opNginx(nginxInstall.ContainerName, constant.NginxReload); err != nil {
+		return err
+	}
+	return nil
 }

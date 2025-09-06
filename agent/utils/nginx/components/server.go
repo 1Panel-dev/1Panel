@@ -2,6 +2,8 @@ package components
 
 import (
 	"errors"
+	"fmt"
+	"strings"
 )
 
 type Server struct {
@@ -367,6 +369,69 @@ func (s *Server) UpdateRootProxy(proxy []string) {
 
 	newDir.Block = block
 	s.UpdateDirectiveBySecondKey("location", "/", newDir)
+}
+
+func (s *Server) UpdateWebp(imageDir, proxyURL string) bool {
+	for _, data := range s.GetBlock().GetDirectives() {
+		//存在配置
+		pattern := fmt.Sprintf("^/(?<site_path>.*/)?%s/(?<path>.+)\\.(?<ext>jpe?g|png|gif)$", imageDir)
+		if len(data.GetParameters()) > 1 && strings.Contains(data.GetParameters()[1], pattern) {
+
+			return true
+		}
+	}
+	newDir := Directive{
+		Name:       "location",
+		Parameters: []string{"~", fmt.Sprintf("^/(?<site_path>.*/)?%s/(?<path>.+)\\.(?<ext>jpe?g|png|gif)$", imageDir)},
+		Block:      &Block{},
+	}
+	block := &Block{}
+	block.AppendDirectives(
+		&Directive{Name: "set", Parameters: []string{"$original_uri", "\"$uri\""}},
+		&Directive{Name: "add_header", Parameters: []string{"Vary", "Accept"}},
+		&Directive{
+			Name:       "proxy_set_header",
+			Parameters: []string{"Host", "$host"},
+		},
+		&Directive{
+			Name:       "proxy_set_header",
+			Parameters: []string{"X-Forwarded-For", "$proxy_add_x_forwarded_for"},
+		},
+		&Directive{
+			Name:       "proxy_set_header",
+			Parameters: []string{"X-Forwarded-Host", "$server_name"},
+		},
+		&Directive{
+			Name:       "proxy_set_header",
+			Parameters: []string{"X-Real-IP", "$remote_addr"},
+		},
+		&Directive{
+			Name:       "proxy_set_header",
+			Parameters: []string{"Connection", "upgrade"},
+		},
+		&Directive{
+			Name:       "proxy_set_header",
+			Parameters: []string{"Upgrade", "$http_upgrade"},
+		},
+		&Directive{Name: "expires", Parameters: []string{"365d"}},
+		&Directive{Name: "proxy_intercept_errors", Parameters: []string{"on"}},
+		&Directive{Name: "error_page", Parameters: []string{"404", "=", "@fallback"}},
+		&Directive{Name: "proxy_pass", Parameters: []string{fmt.Sprintf("http://%s/${site_path}webpdir/$path.$ext.webp", proxyURL)}},
+	)
+	newDir.Block = block
+	s.UpdateDirectiveBySecondKey("location", "~"+fmt.Sprintf("^/(?<site_path>.*/)?%s/(?<path>.+)\\.(?<ext>jpe?g|png|gif)$", imageDir), newDir)
+	fallbacknewDir := Directive{
+		Name:       "location",
+		Parameters: []string{"@fallback"},
+		Block:      &Block{},
+	}
+	fallbackblock := &Block{}
+	fallbackblock.AppendDirectives(
+		&Directive{Name: "proxy_pass", Parameters: []string{fmt.Sprintf("http://%s$original_uri", proxyURL)}},
+	)
+	fallbacknewDir.Block = fallbackblock
+	s.UpdateDirectiveBySecondKey("location", "@fallback", fallbacknewDir)
+	return false
 }
 
 func (s *Server) UpdatePHPProxy(proxy []string, localPath string) {

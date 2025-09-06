@@ -88,5 +88,7 @@ func (a *WebsiteRouter) InitRouter(Router *gin.RouterGroup) {
 		websiteRouter.POST("/crosssite", baseApi.OperateCrossSiteAccess)
 
 		websiteRouter.POST("/exec/composer", baseApi.ExecComposer)
+
+		websiteRouter.POST("/webp", baseApi.StartWebp)
 	}
 }
