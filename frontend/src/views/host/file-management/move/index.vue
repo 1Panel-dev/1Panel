@@ -121,7 +121,7 @@ const rules = reactive<FormRules>({
     name: [Rules.requiredInput],
 });
 
-const em = defineEmits(['close']);
+const em = defineEmits(['close', 'loading']);
 
 const handleClose = (search: boolean) => {
     open.value = false;
@@ -169,6 +169,8 @@ const changeType = () => {
 };
 
 const mvFile = () => {
+    loading.value = true;
+    em('loading', true);
     moveFile(addForm)
         .then(() => {
             if (type.value === 'cut') {
@@ -180,6 +182,7 @@ const mvFile = () => {
         })
         .finally(() => {
             loading.value = false;
+            em('loading', false);
         });
 };
 

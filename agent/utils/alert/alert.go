@@ -351,7 +351,7 @@ func CountRecentFailedLoginLogs(minutes uint, failCount uint) (int, bool, error)
 	if err != nil {
 		return 0, false, err
 	}
-	return int(count), int(count) > int(failCount), nil
+	return int(count), int(count) >= int(failCount), nil
 }
 
 func FindRecentSuccessLoginsNotInWhitelist(minutes int, whitelist []string) ([]model.LoginLog, error) {
@@ -381,7 +381,7 @@ func FindRecentSuccessLoginsNotInWhitelist(minutes int, whitelist []string) ([]m
 }
 
 func CountRecentFailedSSHLog(minutes uint, maxAllowed uint) (int, bool, error) {
-	lines, err := grepSSHLog("Failed password")
+	lines, err := grepSSHLog([]string{"Failed password", "Invalid user", "authentication failure"})
 	if err != nil {
 		return 0, false, err
 	}
@@ -402,11 +402,11 @@ func CountRecentFailedSSHLog(minutes uint, maxAllowed uint) (int, bool, error) {
 			count++
 		}
 	}
-	return count, count > int(maxAllowed), nil
+	return count, count >= int(maxAllowed), nil
 }
 
 func FindRecentSuccessLoginNotInWhitelist(minutes int, whitelist []string) ([]string, error) {
-	lines, err := grepSSHLog("Accepted password")
+	lines, err := grepSSHLog([]string{"Accepted password", "Accepted publickey"})
 	if err != nil {
 		return nil, err
 	}
@@ -452,35 +452,42 @@ func findGrepPath() (string, error) {
 	return path, nil
 }
 
-func grepSSHLog(keyword string) ([]string, error) {
+func grepSSHLog(keywords []string) ([]string, error) {
 	logFiles := []string{"/var/log/secure", "/var/log/auth.log"}
 	var results []string
+	seen := make(map[string]struct{})
+
 	grepPath, err := findGrepPath()
 	if err != nil {
-		panic(err)
+		return nil, fmt.Errorf("find grep failed: %w", err)
 	}
 
 	for _, logFile := range logFiles {
 		if _, err := os.Stat(logFile); err != nil {
 			continue
 		}
-		cmd := exec.Command(grepPath, "-a", keyword, logFile)
-		output, err := cmd.Output()
-		if err != nil {
-			var exitErr *exec.ExitError
-			if errors.As(err, &exitErr) {
-				if exitErr.ExitCode() == 1 {
-					continue
+		for _, keyword := range keywords {
+			cmd := exec.Command(grepPath, "-a", keyword, logFile)
+			output, err := cmd.Output()
+			if err != nil {
+				var exitErr *exec.ExitError
+				if errors.As(err, &exitErr) {
+					if exitErr.ExitCode() == 1 {
+						continue
+					}
 				}
+				return nil, fmt.Errorf("read log file fail [%s]: %w", logFile, err)
 			}
-			return nil, fmt.Errorf("read log file fail [%s]: %w", logFile, err)
-		}
 
-		lines := strings.Split(string(output), "\n")
-		for _, line := range lines {
-			line = strings.TrimSpace(line)
-			if line != "" {
-				results = append(results, line)
+			lines := strings.Split(string(output), "\n")
+			for _, line := range lines {
+				line = strings.TrimSpace(line)
+				if line != "" {
+					if _, exists := seen[line]; !exists {
+						results = append(results, line)
+						seen[line] = struct{}{}
+					}
+				}
 			}
 		}
 	}
@@ -490,12 +497,12 @@ func grepSSHLog(keyword string) ([]string, error) {
 
 func parseLogTime(line string) (time.Time, error) {
 	if len(line) < 15 {
-		return time.Time{}, errors.New("log line time is incorrect")
+		return time.Time{}, nil
 	}
 	timeStr := line[:15]
 	parsedTime, err := time.ParseInLocation("Jan 2 15:04:05", timeStr, time.Local)
 	if err != nil {
-		return time.Time{}, err
+		return time.Time{}, nil
 	}
 	return parsedTime.AddDate(time.Now().Year(), 0, 0), nil
 }

@@ -30,7 +30,8 @@ type ClamInfo struct {
 	Path             string `json:"path"`
 	InfectedStrategy string `json:"infectedStrategy"`
 	InfectedDir      string `json:"infectedDir"`
-	LastHandleDate   string `json:"lastHandleDate"`
+	LastRecordStatus string `json:"lastRecordStatus"`
+	LastRecordTime   string `json:"lastRecordTime"`
 	Spec             string `json:"spec"`
 	Description      string `json:"description"`
 	AlertCount       uint   `json:"alertCount"`
@@ -41,6 +42,7 @@ type ClamLogSearch struct {
 	PageInfo
 
 	ClamID    uint      `json:"clamID"`
+	Status    string    `json:"status"`
 	StartTime time.Time `json:"startTime"`
 	EndTime   time.Time `json:"endTime"`
 }
@@ -56,13 +58,16 @@ type ClamFileReq struct {
 	Name string `json:"name" validate:"required"`
 }
 
-type ClamLog struct {
-	Name          string `json:"name"`
-	ScanDate      string `json:"scanDate"`
-	ScanTime      string `json:"scanTime"`
-	InfectedFiles string `json:"infectedFiles"`
-	TotalError    string `json:"totalError"`
-	Status        string `json:"status"`
+type ClamRecord struct {
+	ID            uint      `json:"id"`
+	TaskID        string    `json:"taskID"`
+	StartTime     time.Time `json:"startTime"`
+	ScanTime      string    `json:"scanTime"`
+	InfectedFiles string    `json:"infectedFiles"`
+	TotalError    string    `json:"totalError"`
+
+	Status  string `json:"status"`
+	Message string `json:"message"`
 }
 
 type ClamCreate struct {
@@ -98,7 +103,6 @@ type ClamUpdateStatus struct {
 }
 
 type ClamDelete struct {
-	RemoveRecord   bool   `json:"removeRecord"`
 	RemoveInfected bool   `json:"removeInfected"`
 	Ids            []uint `json:"ids" validate:"required"`
 }

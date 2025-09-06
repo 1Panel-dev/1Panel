@@ -59,44 +59,12 @@ func (u *BackupService) MysqlRecover(req dto.CommonRecover) error {
 }
 
 func (u *BackupService) MysqlRecoverByUpload(req dto.CommonRecover) error {
-	file := req.File
-	fileName := path.Base(req.File)
-	if strings.HasSuffix(fileName, ".tar.gz") {
-		fileNameItem := time.Now().Format(constant.DateTimeSlimLayout)
-		dstDir := fmt.Sprintf("%s/%s", path.Dir(req.File), fileNameItem)
-		fileOp := files.NewFileOp()
-		if !fileOp.Stat(dstDir) {
-			if err := fileOp.CreateDir(dstDir, os.ModePerm); err != nil {
-				return fmt.Errorf("mkdir %s failed, err: %v", dstDir, err)
-			}
-		}
-		if err := fileOp.TarGzExtractPro(req.File, dstDir, ""); err != nil {
-			_ = os.RemoveAll(dstDir)
-			return err
-		}
-		global.LOG.Infof("decompress file %s successful, now start to check test.sql is exist", req.File)
-		hasTestSql := false
-		_ = filepath.Walk(dstDir, func(path string, info os.FileInfo, err error) error {
-			if err != nil {
-				return nil
-			}
-			if !info.IsDir() && info.Name() == "test.sql" {
-				hasTestSql = true
-				file = path
-				fileName = "test.sql"
-			}
-			return nil
-		})
-		if !hasTestSql {
-			_ = os.RemoveAll(dstDir)
-			return fmt.Errorf("no such file named test.sql in %s", fileName)
-		}
-		defer func() {
-			_ = os.RemoveAll(dstDir)
-		}()
+	recoveFile, err := loadSqlFile(req.File)
+	if err != nil {
+		return err
 	}
-
-	req.File = path.Dir(file) + "/" + fileName
+	req.File = recoveFile
+	defer os.RemoveAll(path.Dir(recoveFile))
 	if err := handleMysqlRecover(req, nil, false, req.TaskID); err != nil {
 		return err
 	}
@@ -242,4 +210,56 @@ func doMysqlBackup(db DatabaseHelper, targetDir, fileName string) error {
 		Timeout: 300,
 	}
 	return cli.Backup(backupInfo)
+}
+
+func loadSqlFile(file string) (string, error) {
+	if !strings.HasSuffix(file, ".tar.gz") && !strings.HasSuffix(file, ".zip") {
+		return file, nil
+	}
+	fileName := path.Base(file)
+	fileDir := path.Dir(file)
+	fileNameItem := time.Now().Format(constant.DateTimeSlimLayout)
+	dstDir := fmt.Sprintf("%s/%s", fileDir, fileNameItem)
+	_ = os.Mkdir(dstDir, constant.DirPerm)
+	if strings.HasSuffix(fileName, ".tar.gz") {
+		fileOp := files.NewFileOp()
+		if err := fileOp.TarGzExtractPro(file, dstDir, ""); err != nil {
+			_ = os.RemoveAll(dstDir)
+			return "", err
+		}
+	}
+	if strings.HasSuffix(fileName, ".zip") {
+		archiver, err := files.NewShellArchiver(files.Zip)
+		if err != nil {
+			_ = os.RemoveAll(dstDir)
+			return "", err
+		}
+		if err := archiver.Extract(file, dstDir, ""); err != nil {
+			_ = os.RemoveAll(dstDir)
+			return "", err
+		}
+	}
+	global.LOG.Infof("decompress file %s successful, now start to check test.sql is exist", file)
+	var sqlFiles []string
+	hasTestSql := false
+	_ = filepath.Walk(dstDir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return nil
+		}
+		if !info.IsDir() && strings.HasSuffix(info.Name(), ".sql") {
+			sqlFiles = append(sqlFiles, path)
+			if info.Name() == "test.sql" {
+				hasTestSql = true
+			}
+		}
+		return nil
+	})
+	if len(sqlFiles) == 1 {
+		return sqlFiles[0], nil
+	}
+	if !hasTestSql {
+		_ = os.RemoveAll(dstDir)
+		return "", fmt.Errorf("no such file named test.sql in %s", fileName)
+	}
+	return "", nil
 }

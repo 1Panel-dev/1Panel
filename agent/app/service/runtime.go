@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	fcgiclient "github.com/tomasen/fcgi_client"
+	"maps"
 	"os"
 	"path"
 	"path/filepath"
@@ -994,6 +995,9 @@ func (r *RuntimeService) UpdateFPMConfig(req request.FPMConfig) error {
 	if err := cfg.SaveTo(runtime.GetFPMPath()); err != nil {
 		return err
 	}
+	if _, err := compose.Restart(runtime.GetComposePath()); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -1089,9 +1093,7 @@ func (r *RuntimeService) UpdatePHPContainer(req request.PHPContainerConfig) erro
 	}
 	newMap := make(map[string]string)
 	handleMap(create.Params, newMap)
-	for k, v := range newMap {
-		envs[k] = v
-	}
+	maps.Copy(envs, newMap)
 	envs["PANEL_APP_PORT_HTTP"] = runtime.Port
 	envStr, err := gotenv.Marshal(envs)
 	if err != nil {

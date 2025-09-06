@@ -2,145 +2,167 @@
     <div v-if="recordShow" v-loading="loading">
         <div class="app-status p-mt-20">
             <el-card>
-                <div>
-                    <el-tag class="float-left" effect="dark" type="success">
-                        {{ $t('commons.table.name') }}: {{ dialogData.rowData.name }}
-                    </el-tag>
-                    <el-popover
-                        v-if="dialogData.rowData.path.length >= 35"
-                        placement="top-start"
-                        trigger="hover"
-                        width="250"
-                        :content="dialogData.rowData.path"
-                    >
-                        <template #reference>
-                            <el-tag style="float: left" effect="dark" type="success">
-                                {{ $t('file.path') }}: {{ dialogData.rowData.path.substring(0, 20) }}...
-                            </el-tag>
-                        </template>
-                    </el-popover>
-                    <el-tag
-                        v-if="dialogData.rowData.path.length < 35"
-                        class="float-left ml-5"
-                        effect="dark"
-                        type="success"
-                    >
-                        {{ $t('toolbox.clam.scanDir') }}: {{ dialogData.rowData.path }}
-                    </el-tag>
+                <div class="flex w-full flex-col gap-4 md:flex-row">
+                    <div class="flex flex-wrap gap-4 ml-3">
+                        <el-tag class="float-left" effect="dark" type="success">
+                            {{ $t('commons.table.name') }}: {{ dialogData.rowData.name }}
+                        </el-tag>
+                        <el-popover
+                            v-if="dialogData.rowData.path.length >= 35"
+                            placement="top-start"
+                            trigger="hover"
+                            width="250"
+                            :content="dialogData.rowData.path"
+                        >
+                            <template #reference>
+                                <el-tag style="float: left" effect="dark" type="success">
+                                    {{ $t('file.path') }}: {{ dialogData.rowData.path.substring(0, 20) }}...
+                                </el-tag>
+                            </template>
+                        </el-popover>
+                        <el-tag
+                            v-if="dialogData.rowData.path.length < 35"
+                            class="float-left"
+                            effect="dark"
+                            type="success"
+                        >
+                            {{ $t('toolbox.clam.scanDir') }}: {{ dialogData.rowData.path }}
+                        </el-tag>
 
-                    <span class="buttons">
-                        <el-button type="primary" @click="onHandle(dialogData.rowData)" link>
-                            {{ $t('commons.button.handle') }}
-                        </el-button>
-                        <el-divider direction="vertical" />
-                        <el-button :disabled="!hasRecords" type="primary" @click="onClean" link>
-                            {{ $t('commons.button.clean') }}
-                        </el-button>
-                    </span>
+                        <span class="mt-0.5">
+                            <el-button type="primary" @click="onHandle(dialogData.rowData)" link>
+                                {{ $t('commons.button.handle') }}
+                            </el-button>
+                            <el-divider direction="vertical" />
+                            <el-button :disabled="!hasRecords" type="primary" @click="onClean" link>
+                                {{ $t('commons.button.clean') }}
+                            </el-button>
+                        </span>
+                    </div>
                 </div>
             </el-card>
         </div>
 
         <LayoutContent :title="$t('cronjob.record')" :reload="true">
-            <template #search>
-                <el-row :gutter="20">
-                    <el-col :span="8">
-                        <el-date-picker
-                            style="width: calc(100% - 20px)"
-                            @change="search()"
-                            v-model="timeRangeLoad"
-                            type="datetimerange"
-                            range-separator="-"
-                            :start-placeholder="$t('commons.search.timeStart')"
-                            :end-placeholder="$t('commons.search.timeEnd')"
-                            :shortcuts="shortcuts"
-                        ></el-date-picker>
-                    </el-col>
-                </el-row>
+            <template #rightToolBar>
+                <el-date-picker
+                    class="mr-2.5"
+                    @change="search(true)"
+                    v-model="timeRangeLoad"
+                    type="datetimerange"
+                    range-separator="-"
+                    :start-placeholder="$t('commons.search.timeStart')"
+                    :end-placeholder="$t('commons.search.timeEnd')"
+                    :shortcuts="shortcuts"
+                ></el-date-picker>
+                <el-select @change="search(true)" v-model="searchInfo.status" class="p-w-200">
+                    <template #prefix>{{ $t('commons.table.status') }}</template>
+                    <el-option :label="$t('commons.table.all')" value="" />
+                    <el-option :label="$t('commons.status.done')" value="Done" />
+                    <el-option :label="$t('commons.status.waiting')" value="Waiting" />
+                    <el-option :label="$t('commons.status.failed')" value="Failed" />
+                </el-select>
+                <TableRefresh @search="search(false)" />
             </template>
             <template #main>
                 <div class="mainClass">
-                    <el-row :gutter="20" v-show="hasRecords" class="mainRowClass">
+                    <el-row :gutter="20" v-show="hasRecords" class="mainRowClass row-box">
                         <el-col :span="7">
-                            <div class="infinite-list" style="overflow: auto">
-                                <el-table
-                                    style="cursor: pointer"
-                                    :data="records"
-                                    border
-                                    :show-header="false"
-                                    @row-click="clickRow"
-                                >
-                                    <el-table-column>
-                                        <template #default="{ row }">
-                                            <span v-if="row.name === currentRecord.name" class="select-sign"></span>
-                                            <Status :status="row.status" />
-                                            <span>
-                                                {{ row.name }}
-                                            </span>
-                                        </template>
-                                    </el-table-column>
-                                </el-table>
-                            </div>
-                            <div class="page-item">
-                                <el-pagination
-                                    :page-size="searchInfo.pageSize"
-                                    :current-page="searchInfo.page"
-                                    @current-change="handleCurrentChange"
-                                    @size-change="handleSizeChange"
-                                    :pager-count="3"
-                                    :page-sizes="[6, 8, 10, 12, 14]"
-                                    small
-                                    layout="total, sizes, prev, pager, next"
-                                    :total="searchInfo.recordTotal"
-                                />
-                            </div>
+                            <el-card class="el-card">
+                                <div class="infinite-list" style="overflow: auto">
+                                    <el-table
+                                        style="cursor: pointer"
+                                        :data="records"
+                                        border
+                                        :show-header="false"
+                                        @row-click="forDetail"
+                                    >
+                                        <el-table-column>
+                                            <template #default="{ row }">
+                                                <span v-if="row.id === currentRecord.id" class="select-sign"></span>
+                                                <Status class="mr-2 ml-1 float-left" :status="row.status" />
+                                                <div class="mt-0.5 float-left">
+                                                    <span>
+                                                        {{ dateFormat(0, 0, row.startTime) }}
+                                                    </span>
+                                                </div>
+                                                <el-button
+                                                    class="mt-0.5 float-right"
+                                                    type="danger"
+                                                    icon="Warning"
+                                                    link
+                                                    v-if="row.infectedFiles && row.infectedFiles !== '0'"
+                                                />
+                                            </template>
+                                        </el-table-column>
+                                    </el-table>
+                                </div>
+                                <div class="page-item">
+                                    <el-pagination
+                                        :page-size="searchInfo.pageSize"
+                                        :current-page="searchInfo.page"
+                                        @current-change="handleCurrentChange"
+                                        @size-change="handleSizeChange"
+                                        :pager-count="5"
+                                        :page-sizes="[5, 10, 20, 50, 100, 200, 500, 1000]"
+                                        small
+                                        layout="total, sizes, prev, pager, next"
+                                        :total="searchInfo.recordTotal"
+                                    />
+                                </div>
+                            </el-card>
                         </el-col>
                         <el-col :span="17">
-                            <el-form label-position="top" :v-key="refresh">
-                                <el-row>
-                                    <el-form-item class="descriptionWide">
-                                        <template #label>
-                                            <span class="status-label">{{ $t('commons.table.interval') }}</span>
-                                        </template>
-                                        <span class="status-count">
-                                            {{ currentRecord?.status === 'Done' ? currentRecord?.scanTime : '-' }}
-                                        </span>
-                                    </el-form-item>
-                                    <el-form-item class="descriptionWide">
-                                        <template #label>
-                                            <span class="status-label">{{ $t('toolbox.clam.infectedFiles') }}</span>
-                                        </template>
-                                        <span class="status-count" v-if="!hasInfectedDir()">
-                                            {{ currentRecord?.status === 'Done' ? currentRecord?.infectedFiles : '-' }}
-                                        </span>
-                                        <div class="count" v-else>
-                                            <span @click="toFolder(currentRecord?.name)">
+                            <el-card class="el-card">
+                                <el-form label-position="top" :v-key="refresh">
+                                    <el-row>
+                                        <el-form-item class="descriptionWide">
+                                            <template #label>
+                                                <span class="status-label">{{ $t('commons.table.interval') }}</span>
+                                            </template>
+                                            <span class="status-count">
+                                                {{ currentRecord?.status === 'Done' ? currentRecord?.scanTime : '-' }}
+                                            </span>
+                                        </el-form-item>
+                                        <el-form-item class="descriptionWide">
+                                            <template #label>
+                                                <span class="status-label">{{ $t('toolbox.clam.infectedFiles') }}</span>
+                                            </template>
+                                            <span class="status-count" v-if="!hasInfectedDir()">
                                                 {{
                                                     currentRecord?.status === 'Done'
                                                         ? currentRecord?.infectedFiles
                                                         : '-'
                                                 }}
                                             </span>
-                                        </div>
-                                    </el-form-item>
-                                </el-row>
-                                <el-row>
-                                    <el-select
-                                        class="descriptionWide"
-                                        @change="search"
-                                        v-model.number="searchInfo.tail"
-                                    >
-                                        <template #prefix>{{ $t('toolbox.clam.scanResult') }}</template>
-                                        <el-option :value="0" :label="$t('commons.table.all')" />
-                                        <el-option :value="10" :label="10" />
-                                        <el-option :value="100" :label="100" />
-                                        <el-option :value="200" :label="200" />
-                                        <el-option :value="500" :label="500" />
-                                        <el-option :value="1000" :label="1000" />
-                                    </el-select>
-                                    <HighlightLog :modelValue="logContent" :heightDiff="533" />
-                                </el-row>
-                            </el-form>
+                                            <div class="count" v-else>
+                                                <span @click="toFolder(currentRecord)">
+                                                    {{
+                                                        currentRecord?.status === 'Done'
+                                                            ? currentRecord?.infectedFiles
+                                                            : '-'
+                                                    }}
+                                                </span>
+                                            </div>
+                                        </el-form-item>
+                                    </el-row>
+                                    <el-row v-if="currentRecord?.taskID && currentRecord?.taskID != ''">
+                                        <LogFile
+                                            :defaultButton="true"
+                                            class="w-full"
+                                            :key="currentRecord?.taskID"
+                                            @stop-reading="search(false)"
+                                            :heightDiff="430"
+                                            :config="{
+                                                type: 'task',
+                                                colorMode: 'task',
+                                                taskID: currentRecord?.taskID,
+                                                tail: true,
+                                            }"
+                                        />
+                                    </el-row>
+                                </el-form>
+                            </el-card>
                         </el-col>
                     </el-row>
                 </div>
@@ -158,30 +180,28 @@
 </template>
 
 <script lang="ts" setup>
-import { onBeforeUnmount, reactive, ref } from 'vue';
+import { reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { ElMessageBox } from 'element-plus';
 import { MsgSuccess } from '@/utils/message';
 import { shortcuts } from '@/utils/shortcuts';
+import { dateFormat, dateFormatForName } from '@/utils/util';
 import { Toolbox } from '@/api/interface/toolbox';
-import HighlightLog from '@/components/log/hightlight-log/index.vue';
-import { cleanClamRecord, getClamRecordLog, handleClamScan, searchClamRecord } from '@/api/modules/toolbox';
+import LogFile from '@/components/log/file/index.vue';
+import { cleanClamRecord, handleClamScan, searchClamRecord } from '@/api/modules/toolbox';
 import { routerToFileWithPath } from '@/utils/router';
 
 const loading = ref();
 const refresh = ref(false);
 const hasRecords = ref();
 
-let timer: NodeJS.Timer | null = null;
-
 const recordShow = ref(false);
 interface DialogProps {
     rowData: Toolbox.ClamInfo;
 }
 const dialogData = ref();
-const records = ref<Array<Toolbox.ClamLog>>([]);
-const currentRecord = ref<Toolbox.ClamLog>();
-const logContent = ref();
+const records = ref<Array<Toolbox.ClamRecord>>([]);
+const currentRecord = ref<Toolbox.ClamRecord>();
 
 const acceptParams = async (params: DialogProps): Promise<void> => {
     let itemSize = Number(localStorage.getItem(searchInfo.cacheSizeKey));
@@ -191,20 +211,17 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
 
     recordShow.value = true;
     dialogData.value = params;
-    search();
-    timer = setInterval(() => {
-        search();
-    }, 1000 * 5);
+    search(true);
 };
 
 const handleSizeChange = (val: number) => {
     searchInfo.pageSize = val;
     localStorage.setItem(searchInfo.cacheSizeKey, val + '');
-    search();
+    search(true);
 };
 const handleCurrentChange = (val: number) => {
     searchInfo.page = val;
-    search();
+    search(false);
 };
 const hasInfectedDir = () => {
     return (
@@ -219,8 +236,8 @@ const timeRangeLoad = ref<[Date, Date]>([
 const searchInfo = reactive({
     cacheSizeKey: 'clam-record-page-size',
     page: 1,
-    pageSize: 8,
-    tail: '100',
+    pageSize: 10,
+    status: '',
     recordTotal: 0,
     startTime: new Date(),
     endTime: new Date(),
@@ -232,18 +249,23 @@ const onHandle = async (row: Toolbox.ClamInfo) => {
         .then(() => {
             loading.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            search();
+            search(true);
         })
         .catch(() => {
             loading.value = false;
         });
 };
-const toFolder = async (path: string) => {
-    let folder = dialogData.value.rowData!.infectedDir + '/1panel-infected/' + path;
+const toFolder = async (row: any) => {
+    let folder =
+        dialogData.value.rowData!.infectedDir +
+        '/1panel-infected/' +
+        dialogData.value.rowData!.name +
+        '/' +
+        dateFormatForName(row.startTime);
     routerToFileWithPath(folder);
 };
 
-const search = async () => {
+const search = async (changeToLatest: boolean) => {
     if (timeRangeLoad.value && timeRangeLoad.value.length === 2) {
         searchInfo.startTime = timeRangeLoad.value[0];
         searchInfo.endTime = timeRangeLoad.value[1];
@@ -255,7 +277,7 @@ const search = async () => {
         page: searchInfo.page,
         pageSize: searchInfo.pageSize,
         clamID: dialogData.value.rowData!.id,
-        tail: searchInfo.tail,
+        status: searchInfo.status,
         startTime: searchInfo.startTime,
         endTime: searchInfo.endTime,
     };
@@ -266,28 +288,20 @@ const search = async () => {
     if (!hasRecords.value) {
         return;
     }
-    if (!currentRecord.value) {
+    if (changeToLatest) {
         currentRecord.value = records.value[0];
-    }
-    loadRecordLog();
-};
-
-const clickRow = async (row: Toolbox.ClamLog) => {
-    currentRecord.value = row;
-    loadRecordLog();
-};
-
-const loadRecordLog = async () => {
-    let param = {
-        tail: searchInfo.tail + '',
-        clamName: dialogData.value.rowData?.name,
-        recordName: currentRecord.value.name,
-    };
-    const res = await getClamRecordLog(param);
-    if (logContent.value === res.data) {
         return;
     }
-    logContent.value = res.data;
+    for (const item of records.value) {
+        if (item.id === currentRecord.value.id) {
+            currentRecord.value = item;
+            break;
+        }
+    }
+};
+
+const forDetail = async (row: Toolbox.ClamRecord) => {
+    currentRecord.value = row;
 };
 
 const onClean = async () => {
@@ -301,18 +315,13 @@ const onClean = async () => {
             .then(() => {
                 loading.value = false;
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                search();
+                search(false);
             })
             .catch(() => {
                 loading.value = false;
             });
     });
 };
-
-onBeforeUnmount(() => {
-    clearInterval(Number(timer));
-    timer = null;
-});
 
 defineExpose({
     acceptParams,
@@ -321,7 +330,7 @@ defineExpose({
 
 <style lang="scss" scoped>
 .infinite-list {
-    height: calc(100vh - 420px);
+    height: calc(100vh - 320px);
     .select-sign {
         &::before {
             float: left;

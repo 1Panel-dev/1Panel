@@ -155,6 +155,7 @@ html.dark {
 
     .el-tabs--card > .el-tabs__header .el-tabs__nav {
         border: 1px solid var(--panel-main-bg-color-8);
+        border-bottom: none;
     }
 
     .el-tabs--card > .el-tabs__header .el-tabs__item.is-active {
@@ -462,8 +463,7 @@ html.dark {
 
     .el-collapse-item__header {
         color: #ffffff;
-        border: 1px solid var(--panel-main-bg-color-10);
-        background-color: var(--panel-main-bg-color-9) !important;
+        background-color: transparent !important;
     }
 
     .el-checkbox__input.is-checked .el-checkbox__inner::after {

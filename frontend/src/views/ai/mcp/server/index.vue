@@ -30,7 +30,7 @@
                     <el-table-column :label="$t('aiTools.mcp.externalUrl')" prop="baseUrl" min-width="200px">
                         <template #default="{ row }">
                             {{ row.baseUrl + row.ssePath }}
-                            <CopyButton :content="row.baseUrl + row.ssePath" type="icon" />
+                            <CopyButton :content="row.baseUrl + row.ssePath" />
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.status')" prop="status" width="120px">
@@ -118,7 +118,7 @@ const items = ref<AI.McpServer[]>([]);
 const paginationConfig = reactive({
     cacheSizeKey: 'mcp-server-page-size',
     currentPage: 1,
-    pageSize: 10,
+    pageSize: Number(localStorage.getItem('mcp-server-page-size')) || 10,
     total: 0,
 });
 const mobile = computed(() => {

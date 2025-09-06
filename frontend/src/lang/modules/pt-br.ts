@@ -343,6 +343,9 @@ const message = {
             dayUnit: 'd',
             millisecond: 'Milissegundo',
         },
+        log: {
+            noLog: 'Nenhum log disponível',
+        },
     },
     menu: {
         home: 'Visão Geral',
@@ -376,6 +379,10 @@ const message = {
         msgCenter: 'Central de Tarefas',
     },
     home: {
+        recommend: 'recomendar',
+        dir: 'dir',
+        quickDir: 'Diretório Rápido',
+        database: 'Banco de Dados - Todos',
         restart_1panel: 'Reiniciar painel',
         restart_system: 'Reiniciar servidor',
         operationSuccess: 'Operação bem-sucedida, reiniciando, por favor, atualize o navegador manualmente mais tarde!',
@@ -458,6 +465,9 @@ const message = {
         serviceNameHelper: 'Acesso entre containers na mesma rede.',
         backupList: 'Backup',
         loadBackup: 'Importar',
+        localUpload: 'Upload Local',
+        hostSelect: 'Seleção de Servidor',
+        selectHelper: 'Tem certeza de que deseja importar o arquivo de backup {0}?',
         remoteAccess: 'Acesso remoto',
         remoteHelper: 'Vários IPs separados por vírgula, exemplo: 172.16.10.111, 172.16.10.112',
         remoteConnHelper:
@@ -509,8 +519,8 @@ const message = {
         selectFile: 'Selecionar arquivo',
         dropHelper: 'Você pode arrastar e soltar o arquivo carregado aqui ou',
         clickHelper: 'clicar para fazer upload',
-        supportUpType: 'Apenas arquivos sql, sql.gz e tar.gz são suportados',
-        zipFormat: 'Estrutura do pacote comprimido tar.gz: o pacote comprimido test.tar.gz deve conter test.sql',
+        supportUpType:
+            'Suporta apenas os formatos de arquivo sql, sql.gz, tar.gz, .zip. O arquivo compactado importado deve conter apenas um arquivo .sql ou incluir test.sql',
 
         currentStatus: 'Estado atual',
         baseParam: 'Parâmetro básico',
@@ -683,7 +693,6 @@ const message = {
             server: 'Servidor MCP',
             create: 'Adicionar Servidor',
             edit: 'Editar Servidor',
-            commandHelper: 'Por exemplo: npx -y {0}',
             baseUrl: 'Caminho de Acesso Externo',
             baseUrlHelper: 'Por exemplo: http://192.168.1.2:8000',
             ssePath: 'Caminho SSE',
@@ -704,6 +713,8 @@ const message = {
             outputTransport: 'Tipo de Saída',
             streamableHttpPath: 'Caminho de Streaming',
             streamableHttpPathHelper: 'Por exemplo: /mcp, certifique-se de que não se sobreponha a outros Servidores',
+            npxHelper: 'Adequado para mcp iniciado com npx ou binário',
+            uvxHelper: 'Adequado para mcp iniciado com uvx',
         },
     },
     container: {
@@ -1135,6 +1146,8 @@ const message = {
     },
     terminal: {
         local: 'Local',
+        defaultConn: 'Conexão Padrão',
+        defaultConnHelper: 'Se deve conectar ao host por padrão após abrir o terminal',
         localHelper: 'O nome local é usado apenas para identificação local do sistema.',
         connLocalErr:
             'Невозможно автоматически аутентифицироваться, пожалуйста, заполните информацию для входа на локальный сервер.',
@@ -1275,8 +1288,6 @@ const message = {
         notStart: 'O serviço ClamAV não está em execução, por favor, inicie-o primeiro!',
         removeRecord: 'Excluir arquivos de relatório',
         noRecords: 'Clique no botão "Acionar" para iniciar o scan e você verá registros aqui.',
-        removeResultHelper:
-            'Excluir arquivos de relatório gerados durante a execução da tarefa para liberar espaço de armazenamento.',
         removeInfected: 'Excluir arquivos infectados',
         removeInfectedHelper:
             'Excluir arquivos de vírus detectados durante a tarefa para garantir a segurança e o funcionamento normal do servidor.',
@@ -1394,6 +1405,7 @@ const message = {
         downloadStart: 'Download iniciado',
         moveSuccess: 'Movido com sucesso',
         copySuccess: 'Copiado com sucesso',
+        pasteMsg: 'Clique no botão "Colar" no canto superior direito do diretório de destino',
         move: 'Mover',
         calculate: 'Calcular',
         canNotDeCompress: 'Não é possível descompactar este arquivo',
@@ -1479,6 +1491,8 @@ const message = {
         noShowHide: 'Não mostrar arquivos ocultos',
         cancelUpload: 'Cancelar Upload',
         cancelUploadHelper: 'Deseja cancelar o upload, após o cancelamento, a lista de upload será limpa.',
+        keepOneTab: 'Mantenha pelo menos uma aba',
+        notCanTab: 'Não é possível adicionar mais abas',
     },
     ssh: {
         autoStart: 'Início automático',
@@ -1670,6 +1684,8 @@ const message = {
         code: 'Código de autorização',
         codeHelper:
             'Clique no botão "Adquirir", faça login no OneDrive e copie o conteúdo após "code" no link redirecionado. Cole-o neste campo. Para instruções específicas, consulte a documentação oficial.',
+        googleHelper:
+            'Por favor, primeiro crie um aplicativo Google e obtenha as informações do cliente, preencha o formulário e clique no botão obter. Para operações específicas, consulte a documentação oficial.',
         loadCode: 'Obter',
         COS: 'Tencent COS',
         ap_beijing_1: 'Beijing Zona 1',
@@ -1903,6 +1919,9 @@ const message = {
             'Detectado que o nó {0} já está na última versão atualizável. Por favor, verifique a versão do nó principal e tente novamente!',
 
         about: 'Sobre',
+        release: 'Registro de Atualizações de Versão',
+        releaseHelper:
+            'Falha ao obter o registro de atualizações para o ambiente atual. Você pode verificar a documentação oficial manualmente.',
         project: 'GitHub',
         issue: 'Problema',
         doc: 'Documento oficial',
@@ -1974,7 +1993,7 @@ const message = {
             'Atualize para a Edição Profissional para transferir arquivos rapidamente entre vários servidores.',
         app: 'Upgrade para a versão profissional para visualizar informações do serviço, monitoramento anômalo, etc., através do aplicativo móvel.',
         cluster:
-            'A atualização para a Edição Profissional permite gerenciar clusters mestre-escravo MySQL/Postgres/Reids.',
+            'A atualização para a Edição Profissional permite gerenciar clusters mestre-escravo MySQL/Postgres/Redis.',
     },
     clean: {
         scan: 'Iniciar escaneamento',
@@ -2160,8 +2179,8 @@ const message = {
         otherDomains: 'Outros domínios',
         static: 'Estático',
         deployment: 'Implantação',
-        supportUpType: 'Somente arquivos .tar.gz são suportados',
-        zipFormat: 'Estrutura de pacote comprimido .tar.gz: o pacote comprimido test.tar.gz deve conter o arquivo {0}',
+        supportUpType:
+            'Apenas o formato de arquivo .tar.gz é suportado, e o pacote compactado deve conter o arquivo {0}.json',
         proxy: 'Proxy reverso',
         alias: 'Alias',
         ftpUser: 'Conta FTP',
@@ -2220,6 +2239,10 @@ const message = {
         null: 'nenhum',
         nginxConfig: 'Configuração Nginx',
         websiteConfig: 'Configurações do site',
+        proxySettings: 'Configurações de Proxy',
+        advancedSettings: 'Configurações Avançadas',
+        cacheSettings: 'Configurações de Cache',
+        sniSettings: 'Configurações de SNI',
         basic: 'Básico',
         source: 'Configuração',
         security: 'Segurança',
@@ -2347,11 +2370,15 @@ const message = {
         modifierHelper:
             'Exemplo: "=" é correspondência exata, "~" é correspondência regular, "^~" corresponde ao início do caminho, etc.',
         replace: 'Substituições de texto',
+        replaceHelper:
+            'O recurso de substituição de texto do nginx permite a substituição de strings no conteúdo da resposta durante o proxy reverso. É comumente usado para modificar links, endereços de API, etc., em arquivos HTML, CSS, JavaScript e outros retornados pelo backend. Suporta correspondência de expressão regular para necessidades complexas de substituição de conteúdo.',
         addReplace: 'Adicionar',
         replaced: 'String de busca (não pode estar vazia)',
         replaceText: 'Substituir por string',
         replacedErr: 'A string de busca não pode estar vazia',
         replacedErr2: 'A string de busca não pode ser repetida',
+        replacedListEmpty: 'Nenhuma regra de substituição de texto',
+        proxySslName: 'Nome SNI do Proxy',
         basicAuth: 'Autenticação básica',
         editBasicAuthHelper:
             'A senha é criptografada de forma assimétrica e não pode ser exibida. A edição requer a redefinição da senha',
@@ -2367,6 +2394,15 @@ const message = {
         disableLeech: 'Desabilitar anti-leech',
         ipv6: 'Ouvir IPv6',
         leechReturnError: 'Por favor, preencha o código de status HTTP',
+        blockedRef: 'Permitir Referer não padrão',
+        accessControl: 'Controle anti-leech',
+        leechcacheControl: 'Controle de cache',
+        logEnableControl: 'Registrar solicitações de ativos estáticos',
+        leechSpecialValidHelper:
+            "Quando 'Permitir Referer vazio' estiver ativado, as solicitações sem Referer (acesso direto etc.) não serão bloqueadas; ao ativar 'Permitir Referer não padrão', qualquer Referer que não comece com http/https será permitido (solicitações de cliente etc.).",
+        leechInvalidReturnHelper: 'Código de status HTTP retornado após bloquear solicitações de hotlink',
+        leechlogControlHelper:
+            'Registra solicitações de ativos estáticos; geralmente desativado em produção para evitar logs excessivos e ruidosos',
         selectAcme: 'Selecionar conta Acme',
         imported: 'Criado manualmente',
         importType: 'Tipo de importação',
@@ -2667,6 +2703,7 @@ const message = {
         quickJump: 'Acesso rápido',
         used: 'Usado',
         unUsed: 'Não usado',
+        dockerRestart: 'Operações de firewall exigem reinicialização do serviço Docker',
         firewallHelper: 'Firewall do sistema {0}',
         firewallNotStart: 'O firewall do sistema não está habilitado atualmente. Habilite-o primeiro.',
         restartFirewallHelper: 'Esta operação reiniciará o firewall atual. Deseja continuar?',
@@ -2853,6 +2890,27 @@ const message = {
             autoStart: 'Início Automático',
             autoStartHelper: 'Se o serviço deve ser iniciado automaticamente após o Supervisor iniciar',
         },
+    },
+    disk: {
+        management: 'Gerenciamento de Disco',
+        partition: 'Partição',
+        unmount: 'Desmontar',
+        unmountHelper: 'Deseja desmontar a partição {0}?',
+        mount: 'Montar',
+        partitionAlert:
+            'O particionamento de disco requer formatação do disco, e os dados existentes serão excluídos. Salve ou tire snapshots dos dados com antecedência.',
+        mountPoint: 'Diretório de Montagem',
+        systemDisk: 'Disco do Sistema',
+        unpartitionedDisk: 'Disco Não Particionado',
+        handlePartition: 'Particionar Agora',
+        filesystem: 'Sistema de Arquivos',
+        unmounted: 'Desmontado',
+        cannotOperate: 'Não Pode Operar',
+        systemDiskHelper: 'Dica: O disco atual é o disco do sistema, não pode ser operado.',
+        autoMount: 'Montagem Automática',
+        model: 'Modelo do Dispositivo',
+        diskType: 'Tipo de Disco',
+        serial: 'Número de Série',
     },
     xpack: {
         expiresTrialAlert:
@@ -3516,7 +3574,7 @@ const message = {
             alertRule: 'Regras de Alerta',
             titleSearchHelper: 'Digite o título do alerta para busca aproximada',
             taskType: 'Tipo',
-            ssl: 'Expiração do Certificado (SSL)',
+            ssl: 'Expiração do Certificado',
             siteEndTime: 'Expiração do Site',
             panelPwdEndTime: 'Expiração da Senha do Painel',
             panelUpdate: 'Nova Versão do Painel Disponível',
@@ -3607,7 +3665,7 @@ const message = {
             taskName: 'Nome da Tarefa',
             cronJobType: 'Tipo de Tarefa',
             clamPath: 'Diretório de Varredura',
-            cronjob: 'Tarefa Cron',
+            cronjob: 'Tarefa Cron agendada {0} falhou',
             app: 'Backup do Aplicativo',
             web: 'Backup do Site',
             database: 'Backup do Banco de Dados',
@@ -3702,7 +3760,8 @@ const message = {
             sshLogin: 'Alerta de Exceção de Login SSH',
             panelIpLogin: 'Alerta de Exceção de IP de Login no Painel',
             sshIpLogin: 'Alerta de Exceção de IP de Login SSH',
-            ipWhiteListHelper: 'IPs na lista branca não estão sujeitos a nenhuma regra',
+            ipWhiteListHelper:
+                'Os IPs na lista de permissões não são restringidos pelas regras e não haverá alerta em caso de login bem-sucedido',
             nodeExceptionRule: 'Alerta de exceção de nó, enviado {0} vezes por dia',
             licenseExceptionRule: 'Alerta de exceção de licença, enviado {0} vezes por dia',
             panelLoginRule: 'Alerta de login no painel, enviado {0} vezes por dia',

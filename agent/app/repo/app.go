@@ -33,6 +33,8 @@ type IAppRepo interface {
 	BatchDelete(ctx context.Context, apps []model.App) error
 	DeleteByIDs(ctx context.Context, ids []uint) error
 	DeleteBy(opts ...DBOption) error
+
+	GetTopRecomment() ([]string, error)
 }
 
 func NewIAppRepo() IAppRepo {
@@ -44,7 +46,7 @@ func (a AppRepo) WithByLikeName(name string) DBOption {
 		if len(name) == 0 {
 			return g
 		}
-		return g.Where("name like ? or short_desc_zh like ? or short_desc_en like ?", "%"+name+"%", "%"+name+"%", "%"+name+"%")
+		return g.Where("name like ? or  description like ? or short_desc_zh like ? or short_desc_en like ?", "%"+name+"%", "%"+name+"%", "%"+name+"%", "%"+name+"%")
 	}
 }
 
@@ -121,6 +123,21 @@ func (a AppRepo) GetBy(opts ...DBOption) ([]model.App, error) {
 		return apps, err
 	}
 	return apps, nil
+}
+
+func (a AppRepo) GetTopRecomment() ([]string, error) {
+	var (
+		apps  []model.App
+		names []string
+	)
+	db := getDb().Model(&model.App{})
+	if err := db.Order("recommend asc").Limit(6).Find(&apps).Error; err != nil {
+		return names, err
+	}
+	for _, item := range apps {
+		names = append(names, item.Key)
+	}
+	return names, nil
 }
 
 func (a AppRepo) BatchCreate(ctx context.Context, apps []model.App) error {

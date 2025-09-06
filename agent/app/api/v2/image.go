@@ -9,14 +9,14 @@ import (
 // @Tags Container Image
 // @Summary Page images
 // @Accept json
-// @Param request body dto.SearchWithPage true "request"
+// @Param request body dto.PageImage true "request"
 // @Produce json
 // @Success 200 {object} dto.PageResult
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /containers/image/search [post]
 func (b *BaseApi) SearchImage(c *gin.Context) {
-	var req dto.SearchWithPage
+	var req dto.PageImage
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}

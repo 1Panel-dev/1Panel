@@ -1,15 +1,16 @@
 package hook
 
 import (
-	"github.com/1Panel-dev/1Panel/agent/utils/alert_push"
 	"os"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
+	"github.com/1Panel-dev/1Panel/agent/app/service"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/utils/alert_push"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 )
@@ -17,12 +18,14 @@ import (
 func Init() {
 	initGlobalData()
 	handleCronjobStatus()
+	handleClamStatus()
 	handleSnapStatus()
 	handleOllamaModelStatus()
 
 	loadLocalDir()
 
 	initDockerConf()
+	initAlertTask()
 }
 
 func initGlobalData() {
@@ -66,6 +69,7 @@ func handleSnapStatus() {
 
 func handleCronjobStatus() {
 	var jobRecords []model.JobRecords
+	_ = global.DB.Model(&model.Cronjob{}).Where("is_executing = ?", true).Updates(map[string]interface{}{"is_executing": false}).Error
 	_ = global.DB.Where("status = ?", constant.StatusWaiting).Find(&jobRecords).Error
 	for _, record := range jobRecords {
 		err := global.DB.Model(&model.JobRecords{}).Where("status = ?", constant.StatusWaiting).
@@ -82,6 +86,24 @@ func handleCronjobStatus() {
 		var cronjob *model.Cronjob
 		_ = global.DB.Where("id = ?", record.CronjobID).First(&cronjob).Error
 		handleCronJobAlert(cronjob)
+	}
+}
+
+func handleClamStatus() {
+	var jobRecords []model.ClamRecord
+	_ = global.DB.Model(&model.Clam{}).Where("is_executing = ?", true).Updates(map[string]interface{}{"is_executing": false}).Error
+	_ = global.DB.Where("status = ?", constant.StatusWaiting).Find(&jobRecords).Error
+	for _, record := range jobRecords {
+		err := global.DB.Model(&model.ClamRecord{}).Where("status = ?", constant.StatusWaiting).
+			Updates(map[string]interface{}{
+				"status":  constant.StatusFailed,
+				"message": "the task was interrupted due to the restart of the 1panel service",
+			}).Error
+
+		if err != nil {
+			global.LOG.Errorf("Failed to update job ID: %v, Error:%v", record.ID, err)
+			continue
+		}
 	}
 }
 
@@ -124,4 +146,8 @@ func initDockerConf() {
 	if strings.Contains(dockerPath, "snap") {
 		constant.DaemonJsonPath = "/var/snap/docker/current/config/daemon.json"
 	}
+}
+
+func initAlertTask() {
+	service.NewIAlertTaskHelper().ResetTask()
 }

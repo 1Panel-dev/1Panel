@@ -114,7 +114,7 @@
                                                         </el-button>
                                                     </td>
                                                     <td>
-                                                        <CopyButton :content="getUrl(domain, row)" type="icon" />
+                                                        <CopyButton :content="getUrl(domain, row)" />
                                                     </td>
                                                 </tr>
                                             </tbody>

@@ -18,6 +18,9 @@ StartPushSSLToNode: "Начало отправки сертификата на �
 PushSSLToNodeFailed: "Не удалось отправить сертификат на узел: {{ .err }}"
 PushSSLToNodeSuccess: "Сертификат успешно отправлен на узел"
 
+ErrMinQuickJump: "Пожалуйста, установите хотя бы одну запись быстрого перехода!"
+ErrMaxQuickJump: "Можно установить до четырех записей быстрого перехода!"
+
 #общий
 ErrUsernameIsExist: 'Имя пользователя уже существует'
 ErrNameIsExist: 'Имя уже существует'
@@ -82,9 +85,7 @@ AppStoreIsLastVersion: 'В App Store уже установлена послед�
 AppStoreSyncSuccess: 'Синхронизация с App Store прошла успешно'
 SyncAppDetail: 'Синхронизировать конфигурацию приложения'
 AppVersionNotMatch: 'Приложению {{ .name }} требуется более высокая версия 1Panel, синхронизация пропускается'
-MoveSiteDir: 'Текущее обновление требует миграции каталога веб-сайта OpenResty'
-MoveSiteToDir: 'Перенести каталог сайта в {{ .name }}'
-ErrMoveSiteDir: 'Не удалось перенести каталог сайта'
+MoveSiteDir: "Обнаружено изменение каталога сайта. Необходимо перенести каталог сайта OpenResty в {{ .name }}"
 MoveSiteDirSuccess: 'Успешная миграция каталога веб-сайта'
 DeleteRuntimePHP: 'Удалить среду выполнения PHP'
 CustomAppStoreFileValid: 'Пакеты магазина приложений должны быть в формате .tar.gz'
@@ -95,6 +96,15 @@ ErrCustomRuntimes: 'Установлена среда выполнения. Сн
 ErrAppVersionDeprecated: "Приложение {{ .name }} несовместимо с текущей версией 1Panel, пропущено"
 ErrDockerFailed: "Состояние Docker аномально, проверьте состояние сервиса"
 ErrDockerComposeCmdNotFound: "Команда Docker Compose отсутствует, пожалуйста, установите эту команду на хост-машине сначала"
+
+#ssh
+ExportIP: "IP входа"
+ExportArea: "Местоположение"
+ExportPort: "Порт"
+ExportAuthMode: "Способ входа"
+ExportUser: "Пользователь"
+ExportStatus: "Статус входа"
+ExportDate: "Время"
 
 #файл
 ErrFileCanNotRead: 'Этот файл не поддерживает предварительный просмотр'
@@ -111,8 +121,8 @@ ErrFavoriteExist: 'Этот путь уже добавлен в избранно
 ErrInvalidChar: 'Недопустимые символы не допускаются'
 ErrPathNotDelete: 'Выбранный каталог не может быть удален'
 ErrLogFileToLarge: "Файл журнала превышает 500MB и не может быть открыт"
-FileDropFailed: "Очистка файлов не удалась {{ .detail }}"
-FileDropSuccess: "Очистка файлов успешна, удалено {{ .count }} файлов, освобождено {{ .size }} дискового пространства"
+FileDropFailed: "Не удалось очистить файл {{ .name }}: {{ .err }}"
+FileDropSuccess: "Файл {{ .name }} успешно очищен, удалено {{ .count }} файлов, освобождено {{ .size }} дискового пространства"
 FileDropSum: "Очистка файлов завершена успешно, всего удалено {{ .count }} файлов, освобождено {{ .size }} дискового пространства"
 
 #веб-сайт
@@ -219,8 +229,10 @@ SystemLog: 'Системный лог'
 CutWebsiteLog: 'Ротация логов сайта'
 FileOrDir: 'Каталог / Файл'
 UploadFile: 'Загрузка файла резервной копии {{ .file }} в {{ .backup }}'
-IgnoreBackupErr: 'Ошибка резервного копирования: {{ .detail }}, игнорируем эту ошибку...'
-IgnoreUploadErr: 'Ошибка загрузки: {{ .detail }}, игнорируем эту ошибку...'
+Upload: "Загрузить"
+IgnoreBackupErr: "Ошибка резервного копирования: {{ .detail }}, игнорируем эту ошибку..."
+IgnoreUploadErr: "Ошибка загрузки: {{ .detail }}, игнорируем эту ошибку..."
+LoadBackupFailed: "Не удалось получить подключение к учетной записи резервной копии, ошибка: {{ .detail }}"
 
 #ящик для инструментов
 ErrNotExistUser: 'Текущий пользователь не существует, измените его и повторите попытку!'
@@ -339,6 +351,10 @@ TaskIsExecuting: 'Задача выполняется'
 CustomAppstore: 'Хранилище пользовательских приложений'
 TaskExec: 'Выполнить'
 
+# task - clam
+Clamscan: "Сканировать {{ .name }}"
+TaskScan: "Сканировать"
+
 # задача - ай
 OllamaModelPull: 'Вытянуть модель Ollama {{ .name }}'
 OllamaModelSize: 'Получить размер модели Ollama {{ .name }}'
@@ -367,7 +383,6 @@ SnapCompressFile: 'Сжать файл моментального снимка'
 SnapCheckCompress: 'Проверить файл сжатия снимка'
 SnapCompressSize: 'Размер файла снимка {{ .name }}'
 SnapUpload: 'Загрузить файл снимка'
-SnapLoadBackup: 'Получить резервную информацию об учетной записи'
 SnapUploadTo: 'Загрузить файл снимка в {{ .name }}'
 SnapUploadRes: 'Загрузить файл снимка в {{ .name }}'
 
@@ -460,3 +475,12 @@ CommonAlert: "Ваш 1Panel, {{ .msg }}. Подробности смотрите
 NodeExceptionAlert: "Ваш 1Panel, {{ .num }} узлов работают неправильно. Подробности смотрите, войдя в панель."
 LicenseExceptionAlert: "Ваш 1Panel, {{ .num }} лицензий работают неправильно. Подробности смотрите, войдя в панель."
 SSHAndPanelLoginAlert: "Ваш 1Panel, обнаружен аномальный вход в панель {{ .name }} с {{ .ip }}. Подробности смотрите, войдя в панель."
+
+#disk
+DeviceNotFound: "Устройство {{ .name }} не найдено"
+DeviceIsMounted: "Устройство {{ .name }} подключено, сначала отключите"
+PartitionDiskErr: "Не удалось разделить, {{ .err }}"
+FormatDiskErr: "Не удалось отформатировать диск, {{ .err }}"
+MountDiskErr: "Не удалось подключить диск, {{ .err }}"
+UnMountDiskErr: "Не удалось отключить диск, {{ .err }}"
+XfsNotFound: "Файловая система xfs не обнаружена, сначала установите xfsprogs"

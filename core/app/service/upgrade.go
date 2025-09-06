@@ -50,14 +50,14 @@ func (u *UpgradeService) SearchUpgrade() (*dto.UpgradeInfo, error) {
 
 	upgrade.TestVersion, upgrade.NewVersion, upgrade.LatestVersion = u.loadVersionByMode(DeveloperMode.Value, currentVersion.Value)
 	var itemVersion string
-	if len(upgrade.LatestVersion) != 0 {
-		itemVersion = upgrade.LatestVersion
-	}
 	if len(upgrade.NewVersion) != 0 {
 		itemVersion = upgrade.NewVersion
 	}
 	if (global.CONF.Base.Mode == "dev" || DeveloperMode.Value == constant.StatusEnable) && len(upgrade.TestVersion) != 0 {
 		itemVersion = upgrade.TestVersion
+	}
+	if len(upgrade.LatestVersion) != 0 {
+		itemVersion = upgrade.LatestVersion
 	}
 	if len(itemVersion) == 0 {
 		return &upgrade, nil

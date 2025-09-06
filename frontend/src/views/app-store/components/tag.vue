@@ -13,16 +13,12 @@
         </el-check-tag>
         <div class="inline" v-if="hiddenTags.length > 0">
             <el-dropdown>
-                <el-button
-                    class="tag-button"
-                    :type="moreTag !== '' ? 'primary' : ''"
-                    :class="moreTag !== '' ? '' : 'no-active'"
-                >
+                <el-check-tag :checked="moreTag !== ''">
                     {{ moreTag == '' ? $t('tabs.more') : getTagValue(moreTag) }}
-                    <el-icon class="el-icon--right">
+                    <el-icon :size="10">
                         <arrow-down />
                     </el-icon>
-                </el-button>
+                </el-check-tag>
                 <template #dropdown>
                     <el-dropdown-menu>
                         <el-dropdown-item v-for="item in hiddenTags" @click="changeTag(item.key)" :key="item.key">
@@ -139,6 +135,10 @@ onBeforeUnmount(() => {
 
 <style lang="scss" scoped>
 .el-check-tag.el-check-tag--primary.is-checked {
+    background-color: var(--el-color-info-light-9) !important;
+}
+
+.el-check-tag:hover {
     background-color: var(--el-color-info-light-9) !important;
 }
 </style>

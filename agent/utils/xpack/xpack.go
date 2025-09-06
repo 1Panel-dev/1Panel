@@ -20,7 +20,7 @@ import (
 
 func RemoveTamper(website string) {}
 
-func StartClam(startClam model.Clam, isUpdate bool) (int, error) {
+func StartClam(startClam *model.Clam, isUpdate bool) (int, error) {
 	return 0, buserr.New("ErrXpackNotFound")
 }
 

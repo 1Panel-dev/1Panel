@@ -2,10 +2,6 @@ package v2
 
 import (
 	"encoding/base64"
-	"net/http"
-	"net/url"
-	"os"
-	"strconv"
 
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
@@ -231,7 +227,7 @@ func (b *BaseApi) LoadSSHLogs(c *gin.Context) {
 // @Summary Export host SSH logs
 // @Accept json
 // @Param request body dto.SearchSSHLog true "request"
-// @Success 200 {object} dto.PageResult
+// @Success 200 {string} path
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /hosts/ssh/log/export [post]
@@ -245,19 +241,7 @@ func (b *BaseApi) ExportSSHLogs(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	file, err := os.Open(tmpFile)
-	if err != nil {
-		helper.InternalServer(c, err)
-		return
-	}
-	defer func() {
-		_ = file.Close()
-		_ = os.RemoveAll(tmpFile)
-	}()
-	info, _ := file.Stat()
-	c.Header("Content-Length", strconv.FormatInt(info.Size(), 10))
-	c.Header("Content-Disposition", "attachment; filename*=utf-8''"+url.PathEscape(info.Name()))
-	http.ServeContent(c.Writer, c.Request, info.Name(), info.ModTime(), file)
+	helper.SuccessWithData(c, tmpFile)
 }
 
 // @Tags SSH

@@ -478,6 +478,9 @@ func (u *SSHService) ExportLog(ctx *gin.Context, req dto.SearchSSHLog) (string, 
 	if err != nil {
 		return "", err
 	}
+	if len(logs) == 0 {
+		return "", buserr.New("ErrRecordNotFound")
+	}
 	tmpFileName := path.Join(global.Dir.TmpDir, "export/ssh-log", fmt.Sprintf("1panel-ssh-log-%s.csv", time.Now().Format(constant.DateTimeSlimLayout)))
 	if _, err := os.Stat(path.Dir(tmpFileName)); err != nil {
 		_ = os.MkdirAll(path.Dir(tmpFileName), constant.DirPerm)

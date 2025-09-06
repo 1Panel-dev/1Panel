@@ -152,7 +152,7 @@ func (b *BaseApi) CleanClamRecord(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	if err := clamService.CleanRecord(req); err != nil {
+	if err := clamService.CleanRecord(req.ID); err != nil {
 		helper.InternalServer(c, err)
 		return
 	}
@@ -174,7 +174,7 @@ func (b *BaseApi) SearchClamRecord(c *gin.Context) {
 		return
 	}
 
-	total, list, err := clamService.LoadRecords(req)
+	total, list, err := clamService.SearchRecords(req)
 	if err != nil {
 		helper.InternalServer(c, err)
 		return
@@ -184,29 +184,6 @@ func (b *BaseApi) SearchClamRecord(c *gin.Context) {
 		Items: list,
 		Total: total,
 	})
-}
-
-// @Tags Clam
-// @Summary Load clam record detail
-// @Accept json
-// @Param request body dto.ClamLogReq true "request"
-// @Success 200 {string} content
-// @Security ApiKeyAuth
-// @Security Timestamp
-// @Router /toolbox/clam/record/log [post]
-func (b *BaseApi) LoadClamRecordLog(c *gin.Context) {
-	var req dto.ClamLogReq
-	if err := helper.CheckBindAndValidate(&req, c); err != nil {
-		return
-	}
-
-	content, err := clamService.LoadRecordLog(req)
-	if err != nil {
-		helper.InternalServer(c, err)
-		return
-	}
-
-	helper.SuccessWithData(c, content)
 }
 
 // @Tags Clam
@@ -289,7 +266,7 @@ func (b *BaseApi) HandleClamScan(c *gin.Context) {
 		return
 	}
 
-	if err := clamService.HandleOnce(req); err != nil {
+	if err := clamService.HandleOnce(req.ID); err != nil {
 		helper.InternalServer(c, err)
 		return
 	}

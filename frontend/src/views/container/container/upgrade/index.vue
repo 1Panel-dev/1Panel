@@ -54,7 +54,7 @@
                 <el-button :disabled="loading" @click="drawerVisible = false">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
-                <el-button :disabled="loading" type="primary" @click="onSubmit(formRef)">
+                <el-button :disabled="loading || form.names.length === 0" type="primary" @click="onSubmit(formRef)">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>

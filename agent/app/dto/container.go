@@ -209,11 +209,12 @@ type NetworkCreate struct {
 }
 
 type Volume struct {
-	Name       string    `json:"name"`
-	Labels     []string  `json:"labels"`
-	Driver     string    `json:"driver"`
-	Mountpoint string    `json:"mountpoint"`
-	CreatedAt  time.Time `json:"createdAt"`
+	Name       string         `json:"name"`
+	Labels     []VolumeOption `json:"labels"`
+	Driver     string         `json:"driver"`
+	Mountpoint string         `json:"mountpoint"`
+	CreatedAt  time.Time      `json:"createdAt"`
+	Options    []VolumeOption `json:"options"`
 }
 type VolumeCreate struct {
 	Name    string   `json:"name" validate:"required"`
@@ -221,7 +222,10 @@ type VolumeCreate struct {
 	Options []string `json:"options"`
 	Labels  []string `json:"labels"`
 }
-
+type VolumeOption struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
+}
 type BatchDelete struct {
 	TaskID string   `json:"taskID"`
 	Force  bool     `json:"force"`
@@ -258,8 +262,9 @@ type ComposeCreate struct {
 type ComposeOperation struct {
 	Name      string `json:"name" validate:"required"`
 	Path      string `json:"path"`
-	Operation string `json:"operation" validate:"required,oneof=up start stop down delete"`
+	Operation string `json:"operation" validate:"required,oneof=up start restart stop down delete"`
 	WithFile  bool   `json:"withFile"`
+	Force     bool   `josn:"force"`
 }
 type ComposeUpdate struct {
 	Name    string   `json:"name" validate:"required"`

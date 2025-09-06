@@ -52,5 +52,10 @@ func (s *HostRouter) InitRouter(Router *gin.RouterGroup) {
 		hostRouter.POST("/tool/supervisor/process/file", baseApi.GetProcessFile)
 
 		hostRouter.GET("/terminal", baseApi.WsSSH)
+
+		hostRouter.GET("/disks", baseApi.GetCompleteDiskInfo)
+		hostRouter.POST("/disks/partition", baseApi.PartitionDisk)
+		hostRouter.POST("/disks/mount", baseApi.MountDisk)
+		hostRouter.POST("/disks/unmount", baseApi.UnmountDisk)
 	}
 }

@@ -348,6 +348,9 @@ const message = {
             hourUnit: 'h',
             dayUnit: 'd',
         },
+        log: {
+            noLog: 'No logs available',
+        },
     },
     menu: {
         home: 'Overview',
@@ -383,6 +386,8 @@ const message = {
     home: {
         recommend: 'recommend',
         dir: 'dir',
+        quickDir: 'Quick Dir',
+        database: 'Database - All',
         restart_1panel: 'Restart panel',
         restart_system: 'Restart server',
         operationSuccess: 'Operation succeeded, rebooting, please refresh the browser manually later!',
@@ -464,6 +469,9 @@ const message = {
         serviceNameHelper: 'Access between containers in the same network.',
         backupList: 'Backup',
         loadBackup: 'Import',
+        localUpload: 'Local Upload',
+        hostSelect: 'Server Selection',
+        selectHelper: 'Are you sure you want to import backup file {0}?',
         remoteAccess: 'Remote access',
         remoteHelper: 'Multiple IP comma-delimited, example: 172.16.10.111, 172.16.10.112',
         remoteConnHelper:
@@ -513,8 +521,8 @@ const message = {
         selectFile: 'Select file',
         dropHelper: 'You can drag and drop the uploaded file here or',
         clickHelper: 'click to upload',
-        supportUpType: 'Only sql, sql.gz, and tar.gz files are supported',
-        zipFormat: 'tar.gz compressed package structure: test.tar.gz compressed package must contain test.sql',
+        supportUpType:
+            'Only supports sql, sql.gz, tar.gz, .zip file formats. The imported compressed file must contain only one .sql file or include test.sql',
 
         currentStatus: 'Current state',
         baseParam: 'Basic parameter',
@@ -688,7 +696,6 @@ const message = {
             server: 'MCP Server',
             create: 'Add MCP Server',
             edit: 'Edit MCP Server',
-            commandHelper: 'For example: npx -y {0}',
             baseUrl: 'External Access Path',
             baseUrlHelper: 'For example: http://192.168.1.2:8000',
             ssePath: 'SSE Path',
@@ -709,6 +716,8 @@ const message = {
             outputTransport: 'Output Type',
             streamableHttpPath: 'Streaming Path',
             streamableHttpPathHelper: 'For example: /mcp, note that it should not overlap with other Servers',
+            npxHelper: 'Suitable for mcp started with npx or binary',
+            uvxHelper: 'Suitable for mcp started with uvx',
         },
     },
     container: {
@@ -1156,6 +1165,8 @@ const message = {
     },
     terminal: {
         local: 'Local',
+        defaultConn: 'Default Connection',
+        defaultConnHelper: 'Whether to connect to the host by default after opening the terminal',
         localHelper: 'The `local` name is used only for system local identification',
         connLocalErr: 'Unable to automatically authenticate, please fill in the local server login information.',
         testConn: 'Test connection',
@@ -1304,7 +1315,6 @@ const message = {
             notStart: 'ClamAV service is currently not running, please start it first!',
             removeRecord: 'Delete peport files',
             noRecords: 'Click the "Trigger" button to start the scan and you will see records here.',
-            removeResultHelper: 'Delete report files generated during task execution to free up storage space.',
             removeInfected: 'Delete virus files',
             removeInfectedHelper:
                 'Delete virus files detected during the task to ensure server security and normal operation.',
@@ -1421,6 +1431,7 @@ const message = {
         downloadStart: 'Download started',
         moveSuccess: 'Successfully moved',
         copySuccess: 'Successfully copied',
+        pasteMsg: 'Please click the [Paste] button at the top right of the target directory',
         move: 'Move',
         calculate: 'Calculate',
         canNotDeCompress: 'Cannot decompress this file',
@@ -1505,6 +1516,8 @@ const message = {
         noShowHide: 'Don’t show hidden files',
         cancelUpload: 'Cancel Upload',
         cancelUploadHelper: 'Whether to cancel the upload, after cancellation the upload list will be cleared.',
+        keepOneTab: 'Keep at least one tab',
+        notCanTab: 'Cannot add more tabs',
     },
     ssh: {
         autoStart: 'Auto start',
@@ -1710,6 +1723,8 @@ const message = {
         code: 'Auth code',
         codeHelper:
             'Please click on the "Acquire" button, then login to {0} and copy the content after "code" in the redirected link. Paste it into this input box. For specific instructions, please refer to the official documentation.',
+        googleHelper:
+            'Please first create a Google application and obtain client information, fill in the form and click the get button. For specific operations, please refer to the official documentation.',
         loadCode: 'Acquire',
         COS: 'Tencent COS',
         ap_beijing_1: 'Beijing Zone 1',
@@ -1941,6 +1956,9 @@ const message = {
             'Detected that node {0} is already at the latest upgradable version. Please check the primary node version and try again!',
 
         about: 'About',
+        release: 'Release Notes',
+        releaseHelper:
+            'Failed to fetch release notes for the current environment. You can manually check the official documentation.',
         project: 'GitHub',
         issue: 'Feedback',
         doc: 'Official document',
@@ -2008,7 +2026,7 @@ const message = {
         fileExchange: 'Upgrade to the Professional Edition to quickly transfer files between multiple servers.',
         app: 'Upgrade to the professional version to view service information, abnormal monitoring, etc. through the mobile APP. ',
         cluster:
-            'Upgrading to the Professional Edition allows you to manage MySQL/Postgres/Reids master-slave clusters.',
+            'Upgrading to the Professional Edition allows you to manage MySQL/Postgres/Redis master-slave clusters.',
     },
     clean: {
         scan: 'Start scanning',
@@ -2195,8 +2213,7 @@ const message = {
         otherDomains: 'Other domains',
         static: 'Static',
         deployment: 'Deployment',
-        supportUpType: 'Only .tar.gz files are supported',
-        zipFormat: '.tar.gz compressed package structure: test.tar.gz compressed package must contain {0} file',
+        supportUpType: 'Only .tar.gz file format is supported, and the compressed package must contain {0}.json file',
         proxy: 'Reverse proxy',
         alias: 'Alias',
         ftpUser: 'FTP account',
@@ -2254,6 +2271,10 @@ const message = {
         null: 'none',
         nginxConfig: 'Nginx configuration',
         websiteConfig: 'Website settings',
+        proxySettings: 'Proxy Settings',
+        advancedSettings: 'Advanced Settings',
+        cacheSettings: 'Cache Settings',
+        sniSettings: 'SNI Settings',
         basic: 'Basic',
         source: 'Configuration',
         security: 'Security',
@@ -2381,11 +2402,15 @@ const message = {
         modifierHelper:
             'Example: "=" is exact match, "~" is regular match, "^~" matches the beginning of the path, etc.',
         replace: 'Text replacements',
+        replaceHelper:
+            'The nginx text replacement feature allows for string substitution in the response content during reverse proxying. It is commonly used to modify links, API addresses, etc., in HTML, CSS, JavaScript, and other files returned by the backend. It supports regular expression matching for complex content replacement needs.',
         addReplace: 'Add',
         replaced: 'Search String (cannot be empty)',
         replaceText: 'Replace with string',
         replacedErr: 'The Search String cannot be empty',
         replacedErr2: 'The Search String cannot be repeated',
+        replacedListEmpty: 'No text replacement rules',
+        proxySslName: 'Proxy SNI Name',
         basicAuth: 'Basic authentication',
         editBasicAuthHelper:
             'The password is asymmetrically encrypted and cannot be echoed. Editing needs to reset the password',
@@ -2401,6 +2426,15 @@ const message = {
         disableLeech: 'Disable anti-leech',
         ipv6: 'Listen IPv6',
         leechReturnError: 'Please fill in the HTTP status code',
+        blockedRef: 'Allow non-standard Referer',
+        accessControl: 'Anti-leech control',
+        leechcacheControl: 'Cache control',
+        logEnableControl: 'Log static asset requests',
+        leechSpecialValidHelper:
+            "When 'Allow empty Referer' is enabled, requests without a Referer (direct access, etc.) are not blocked; enabling 'Allow non-standard Referer' allows any Referer that does not start with http/https (client requests, etc.).",
+        leechInvalidReturnHelper: 'HTTP status code returned after blocking hotlinking requests',
+        leechlogControlHelper:
+            'Logs static asset requests; usually disabled in production to avoid excessive, noisy logs',
         selectAcme: 'Select Acme account',
         imported: 'Created manually',
         importType: 'Import type',
@@ -2692,6 +2726,7 @@ const message = {
         quickJump: 'Quick access',
         used: 'Used',
         unUsed: 'Unused',
+        dockerRestart: 'Firewall operations require restarting the Docker service',
         firewallHelper: '{0} system firewall',
         firewallNotStart: `The system firewall isn't enabled at present. Enable it first.`,
         restartFirewallHelper: 'This operation will restart the current firewall. Do you want to continue?',
@@ -2893,6 +2928,27 @@ const message = {
             autoStart: 'Auto Start',
             autoStartHelper: 'Whether to automatically start the service after Supervisor starts',
         },
+    },
+    disk: {
+        management: 'Disk Management',
+        partition: 'Partition',
+        unmount: 'Unmount',
+        unmountHelper: 'Do you want to unmount the partition {0}?',
+        mount: 'Mount',
+        partitionAlert:
+            'Disk partitioning requires formatting the disk, and existing data will be deleted. Please save or take snapshots of your data in advance.',
+        mountPoint: 'Mount Directory',
+        systemDisk: 'System Disk',
+        unpartitionedDisk: 'Unpartitioned Disk',
+        handlePartition: 'Partition Now',
+        filesystem: 'Filesystem',
+        unmounted: 'Unmounted',
+        cannotOperate: 'Cannot Operate',
+        systemDiskHelper: 'Hint: The current disk is the system disk. It cannot be operated on.',
+        autoMount: 'Auto Mount',
+        model: 'Device Model',
+        diskType: 'Disk Type',
+        serial: 'Serial Number',
     },
     xpack: {
         expiresTrialAlert:
@@ -3547,7 +3603,7 @@ const message = {
             alertRule: 'Alert Rules',
             titleSearchHelper: 'Enter alert title for fuzzy search',
             taskType: 'Type',
-            ssl: 'Certificate (SSL) Expiry',
+            ssl: 'Certificate Expiry',
             siteEndTime: 'Website Expiry',
             panelPwdEndTime: 'Panel Password Expiry',
             panelUpdate: 'New Panel Version Available',
@@ -3631,11 +3687,11 @@ const message = {
             cleanAlertLogs: 'Clean Alert Logs',
             daily: 'Daily Alert Count: {0}',
             cumulative: 'Cumulative Alert Count: {0}',
-            clams: 'Virus scan',
+            clams: 'Virus scan alert',
             taskName: 'Task Name',
             cronJobType: 'Task Type',
             clamPath: 'Scan Directory',
-            cronjob: 'Cronjob',
+            cronjob: 'Cronjob execution {0} failed',
             app: 'Backup App',
             web: 'Backup Website',
             database: 'Backup Database',
@@ -3730,7 +3786,8 @@ const message = {
             sshLogin: 'SSH Login Exception Alert',
             panelIpLogin: 'Panel Login IP Exception Alert',
             sshIpLogin: 'SSH Login IP Exception Alert',
-            ipWhiteListHelper: 'IPs in the whitelist are not restricted by any rules',
+            ipWhiteListHelper:
+                'IPs in the whitelist are not restricted by rules, and there will be no alert upon successful login',
             nodeExceptionRule: 'Node exception alert, sent {0} times per day',
             licenseExceptionRule: 'License exception alert, sent {0} times per day',
             panelLoginRule: 'Panel login alert, sent {0} times per day',

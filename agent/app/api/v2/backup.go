@@ -134,6 +134,28 @@ func (b *BaseApi) UpdateBackup(c *gin.Context) {
 }
 
 // @Tags Backup Account
+// @Summary Upload file for recover
+// @Accept json
+// @Param request body dto.UploadForRecover true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /backups/upload [post]
+// @x-panel-log {"bodyKeys":["filePath"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"上传备份文件 [filePath]","formatEN":"upload backup file [filePath]"}
+func (b *BaseApi) UploadForRecover(c *gin.Context) {
+	var req dto.UploadForRecover
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	if err := backupService.UploadForRecover(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags Backup Account
 // @Summary Load backup account options
 // @Accept json
 // @Success 200 {array} dto.BackupOption

@@ -137,6 +137,16 @@ const hostRouter = {
                 requiresAuth: false,
             },
         },
+        {
+            path: '/hosts/disk',
+            name: 'Disk',
+            props: true,
+            component: () => import('@/views/host/disk-management/disk/index.vue'),
+            meta: {
+                title: 'menu.disk',
+                requiresAuth: false,
+            },
+        },
     ],
 };
 

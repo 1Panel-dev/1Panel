@@ -1,12 +1,19 @@
 <template>
     <DrawerPro v-model="open" :header="$t('tool.supervisor.list')" size="60%" @close="handleClose">
         <template #content>
-            <ComplexTable :data="data" v-loading="loading">
+            <ComplexTable :data="data" v-loading="loading" v-model:selects="selects">
                 <template #toolbar>
                     <el-button type="primary" @click="openCreate">
-                        {{ $t('commons.button.create') + $t('tool.supervisor.list') }}
+                        {{ $t('commons.button.create') }}
+                    </el-button>
+                    <el-button
+                        @click="batchRestart"
+                        :disabled="!selects.length || selects.every((item) => item.name === 'php-fpm')"
+                    >
+                        {{ $t('commons.button.restart') }}
                     </el-button>
                 </template>
+                <el-table-column type="selection" width="55" :selectable="checkSelectable" />
                 <el-table-column
                     :label="$t('commons.table.name')"
                     fix
@@ -137,6 +144,11 @@ const createRef = ref();
 const dataLoading = ref(false);
 const open = ref(false);
 const runtimeID = ref(0);
+const selects = ref<any>([]);
+
+function checkSelectable(row) {
+    return row.name != 'php-fpm';
+}
 
 const handleClose = () => {
     open.value = false;
@@ -241,6 +253,48 @@ const operate = async (operation: string, name: string) => {
             })
             .catch(() => {});
     } catch (error) {}
+};
+
+const batchRestart = async () => {
+    if (!selects.value.length) return;
+
+    const filteredSelects = selects.value.filter((item) => item.name !== 'php-fpm');
+    if (!filteredSelects.length) {
+        return;
+    }
+
+    const names = filteredSelects.map((item) => item.name).join(', ');
+
+    try {
+        await ElMessageBox.confirm(
+            i18n.global.t('tool.supervisor.operatorHelper', [names, i18n.global.t('commons.operate.restart')]),
+            i18n.global.t('commons.button.restart'),
+            {
+                confirmButtonText: i18n.global.t('commons.button.confirm'),
+                cancelButtonText: i18n.global.t('commons.button.cancel'),
+                type: 'warning',
+            },
+        );
+
+        loading.value = true;
+
+        const promises = filteredSelects.map((item) =>
+            operateSupervisorProcess({
+                operate: 'restart',
+                name: item.name,
+                id: runtimeID.value,
+            }),
+        );
+
+        await Promise.all(promises);
+
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+        selects.value = [];
+        search();
+    } catch (error) {
+    } finally {
+        loading.value = false;
+    }
 };
 
 const getFile = (name: string, file: string, runtimeID: number) => {

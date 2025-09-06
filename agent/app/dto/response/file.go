@@ -44,6 +44,7 @@ type FileLineContent struct {
 	TaskStatus string   `json:"taskStatus"`
 	Lines      []string `json:"lines"`
 	Scope      string   `json:"scope"`
+	TotalLines int      `json:"totalLines"`
 }
 
 type FileExist struct {

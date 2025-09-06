@@ -20,6 +20,7 @@ type McpServerCreate struct {
 	HostIP             string        `json:"hostIP"`
 	StreamableHttpPath string        `json:"streamableHttpPath"`
 	OutputTransport    string        `json:"outputTransport" validate:"required"`
+	Type               string        `json:"type" validate:"required"`
 }
 
 type McpServerUpdate struct {

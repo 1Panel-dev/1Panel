@@ -78,7 +78,7 @@ const selects = ref<any>([]);
 const paginationConfig = reactive({
     cacheSizeKey: 'compose-template-page-size',
     currentPage: 1,
-    pageSize: 10,
+    pageSize: Number(localStorage.getItem('compose-template-page-size')) || 10,
     total: 0,
 });
 const searchName = ref();

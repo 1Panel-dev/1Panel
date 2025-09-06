@@ -15,6 +15,9 @@ ErrApiConfigIPInvalid: "调用 API 接口 IP 不在白名单: {{ .detail }}"
 ErrApiConfigDisable: "此接口禁止使用 API 接口调用: {{ .detail }}"
 ErrApiConfigKeyTimeInvalid: "API 接口时间戳错误: {{ .detail }}"
 
+ErrMinQuickJump: "请至少设置一个快速跳转入口！"
+ErrMaxQuickJump: "最多可设置四个快速跳转入口！"
+
 #common
 ErrUsernameIsExist: "用户名已存在"
 ErrNameIsExist: "名称已存在"
@@ -78,9 +81,7 @@ PullImageSuccess: "镜像拉取成功"
 AppStoreSyncSuccess: "应用商店同步成功"
 SyncAppDetail: "同步应用配置"
 AppVersionNotMatch: "{{ .name }} 应用需要更高的 1Panel 版本，跳过"
-MoveSiteDir: "当前升级需要迁移 OpenResty 网站目录"
-MoveSiteToDir: "迁移网站目录到 {{ .name }}"
-ErrMoveSiteDir: "迁移网站目录失败"
+MoveSiteDir: "检测到网站目录变更 需要迁移 OpenResty 网站目录到 {{ .name }}"
 MoveSiteDirSuccess: "迁移网站目录成功"
 DeleteRuntimePHP: "删除 PHP 运行环境"
 CustomAppStoreFileValid: "应用商店包需要 .tar.gz 格式"
@@ -91,6 +92,15 @@ ErrCustomRuntimes: "存在已经安装的运行环境，请先删除"
 ErrAppVersionDeprecated: " {{ .name }} 应用不适配当前 1Panel 版本，跳过"
 ErrDockerFailed: "Docker 状态异常，请检查服务状态"
 ErrDockerComposeCmdNotFound: "Docker Compose 命令不存在，请先在宿主机安装此命令"
+
+#ssh 
+ExportIP: "登录 IP"
+ExportArea: "归属地"
+ExportPort: "端口"
+ExportAuthMode: "登录方式"
+ExportUser: "用户"
+ExportStatus: "登录状态"
+ExportDate: "时间"
 
 #file
 ErrFileCanNotRead: "此文件不支持预览"
@@ -107,8 +117,8 @@ ErrFavoriteExist: "已收藏此路径"
 ErrInvalidChar: "禁止使用非法字符"
 ErrPathNotDelete: "所选目录不可删除"
 ErrLogFileToLarge: "日志文件超过 500M，无法打开"
-FileDropFailed: "文件清理失败 {{ .detail }}"
-FileDropSuccess: "文件清理成功，清理文件 {{ .count }}，释放磁盘空间 {{ .size }}"
+FileDropFailed: "清理文件 {{ .name }} 失败 {{ .err }}"
+FileDropSuccess: "清理文件 {{ .name }} 成功，清理文件 {{ .count }}，释放磁盘空间 {{ .size }}"
 FileDropSum: "文件清理成功，清理文件共计 {{ .count }}，释放磁盘空间共计 {{ .size }}"
 
 #website
@@ -218,8 +228,10 @@ SystemLog: "系统日志"
 CutWebsiteLog: "切割网站日志"
 FileOrDir: "目录 / 文件"
 UploadFile: "上传备份文件 {{ .file }} 到 {{ .backup }}"
+Upload: "上传"
 IgnoreBackupErr: "备份失败，错误：{{ .detail }}，忽略本次错误..."
 IgnoreUploadErr: "上传失败，错误：{{ .detail }}，忽略本次错误..."
+LoadBackupFailed: "获取备份账号连接失败，错误：{{ .detail }}"
 
 #toolbox
 ErrNotExistUser: "当前用户不存在，请修改后重试！"
@@ -339,6 +351,10 @@ TaskIsExecuting: "任务正在运行"
 CustomAppstore: "自定义应用仓库"
 TaskExec: "执行"
 
+# task - clam
+Clamscan: "扫描 {{ .name }}"
+TaskScan: "扫描"
+
 # task - ai
 OllamaModelPull: "拉取 Ollama 模型  {{ .name }} "
 OllamaModelSize: "获取 Ollama 模型  {{ .name }} 大小 "
@@ -367,7 +383,6 @@ SnapCompressFile: "压缩快照文件"
 SnapCheckCompress: "检查快照压缩文件"
 SnapCompressSize: "快照文件大小 {{ .name }}"
 SnapUpload: "上传快照文件"
-SnapLoadBackup: "获取备份账号信息"
 SnapUploadTo: "上传快照文件到 {{ .name }}"
 SnapUploadRes: "上传快照文件到 {{ .name }}"
 
@@ -460,3 +475,12 @@ CommonAlert: "您的 1Panel 面板，{{ .msg }}，详情请登录面板查看。
 NodeExceptionAlert: "您的 1Panel 面板，{{ .num }} 个节点存在异常，详情请登录面板查看。"
 LicenseExceptionAlert: "您的 1Panel 面板，{{ .num }} 个许可证存在异常，详情请登录面板查看。"
 SSHAndPanelLoginAlert: "您的 1Panel 面板，面板{{ .name }}登录{{ .ip }}异常，详情请登录面板查看。"
+
+#disk
+DeviceNotFound: "设备 {{ .name }} 未找到"
+DeviceIsMounted: "设备 {{ .name }} 已挂载，请先卸载"
+PartitionDiskErr: "分区失败，{{ .err }}"
+FormatDiskErr: "格式化磁盘失败，{{ .err }}"
+MountDiskErr: "挂载磁盘失败，{{ .err }}"
+UnMountDiskErr: "卸载磁盘失败，{{ .err }}"
+XfsNotFound: "未检测到 xfs 文件系统，请先安装 xfsprogs"

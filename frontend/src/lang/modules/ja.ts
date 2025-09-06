@@ -337,6 +337,9 @@ const message = {
             dayUnit: 'd',
             millisecond: 'ミリ秒',
         },
+        log: {
+            noLog: 'ログはありません',
+        },
     },
     menu: {
         home: '概要',
@@ -370,6 +373,10 @@ const message = {
         msgCenter: 'タスクセンター',
     },
     home: {
+        recommend: 'おすすめ',
+        dir: 'ディレクトリ',
+        quickDir: 'クイックディレクトリ',
+        database: 'データベース - すべて',
         restart_1panel: 'パネルを再起動します',
         restart_system: 'サーバーを再起動します',
         operationSuccess: '操作が成功し、再起動します。後で手動でブラウザを更新してください！',
@@ -451,6 +458,9 @@ const message = {
         serviceNameHelper: '同じネットワーク内のコンテナ間のアクセス。',
         backupList: 'バックアップ',
         loadBackup: '輸入',
+        localUpload: 'ローカルアップロード',
+        hostSelect: 'サーバー選択',
+        selectHelper: 'バックアップファイル {0} をインポートしてもよろしいですか？',
         remoteAccess: 'リモートアクセス',
         remoteHelper: '複数のIP Comma delimited、例:172.16.10.111、172.16.10.112',
         remoteConnHelper:
@@ -499,8 +509,8 @@ const message = {
         selectFile: '[ファイル]を選択します',
         dropHelper: 'ここでアップロードされたファイルをドラッグアンドドロップするか、',
         clickHelper: 'クリックしてアップロードします',
-        supportUpType: 'SQL、SQL.GZ、およびTAR.GZファイルのみがサポートされています',
-        zipFormat: 'tar.gz圧縮パッケージ構造:test.tar.gz圧縮パッケージにはtest.sqlが含まれている必要があります',
+        supportUpType:
+            'sql、sql.gz、tar.gz、.zip ファイル形式のみサポートしています。インポートする圧縮ファイルには、1つの.sqlファイルのみ、またはtest.sqlが含まれている必要があります',
 
         currentStatus: '現在の状態',
         baseParam: '基本パラメーター',
@@ -674,7 +684,6 @@ const message = {
             server: 'MCP サーバー',
             create: 'サーバーを追加',
             edit: 'サーバーを編集',
-            commandHelper: '例: npx -y {0}',
             baseUrl: '外部アクセスパス',
             baseUrlHelper: '例: http://192.168.1.2:8000',
             ssePath: 'SSE パス',
@@ -695,6 +704,8 @@ const message = {
             outputTransport: '出力タイプ',
             streamableHttpPath: 'ストリーミングパス',
             streamableHttpPathHelper: '例：/mcp、他のサーバーと重複しないように注意してください',
+            npxHelper: 'npx またはバイナリで起動する mcp に適しています',
+            uvxHelper: 'uvx で起動する mcp に適しています',
         },
     },
     container: {
@@ -1115,6 +1126,8 @@ const message = {
     },
     terminal: {
         local: 'ローカル',
+        defaultConn: 'デフォルト接続',
+        defaultConnHelper: 'ターミナルを開いた後にデフォルトでホストに接続するかどうか',
         localHelper: 'ローカル名はシステムのローカル識別にのみ使用されます。',
         connLocalErr: '自動的に認証できない場合は、ローカルサーバーのログイン情報を入力してください。',
         testConn: 'テスト接続',
@@ -1248,7 +1261,6 @@ const message = {
             notStart: 'Clamav Serviceは現在実行されていません。最初に開始してください！',
             removeRecord: 'ペポートファイルを削除します',
             noRecords: '[トリガー]ボタンをクリックしてスキャンを開始すると、ここにレコードが表示されます。',
-            removeResultHelper: 'タスク実行中に生成されたレポートファイルを削除して、ストレージスペースを解放します。',
             removeInfected: 'ウイルスファイルを削除します',
             removeInfectedHelper:
                 'サーバーのセキュリティと通常の操作を確保するために、タスク中に検出されたウイルスファイルを削除します。',
@@ -1367,6 +1379,7 @@ const message = {
         downloadStart: 'ダウンロードが始まりました',
         moveSuccess: '正常に移動しました',
         copySuccess: '正常にコピーされました',
+        pasteMsg: '対象ディレクトリの右上にある「貼り付け」ボタンをクリックしてください',
         move: '動く',
         calculate: '計算します',
         canNotDeCompress: 'このファイルを解凍できません',
@@ -1449,6 +1462,8 @@ const message = {
         noShowHide: '隠しファイルを表示しない',
         cancelUpload: 'アップロードをキャンセル',
         cancelUploadHelper: 'アップロードをキャンセルするかどうか、キャンセル後、アップロードリストはクリアされます。',
+        keepOneTab: '少なくとも1つのタブを保持してください',
+        notCanTab: 'これ以上タブを追加できません',
     },
     ssh: {
         autoStart: 'オートスタート',
@@ -1631,6 +1646,8 @@ const message = {
         code: '認証コード',
         codeHelper:
             '[取得]ボタンをクリックしてから、リダイレクトリンクの「コード」の後にコンテンツをログインしてコピーします。この入力ボックスに貼り付けます。特定の手順については、公式のドキュメントを参照してください。',
+        googleHelper:
+            'まずGoogleアプリケーションを作成し、クライアント情報を取得してフォームに記入し、取得ボタンをクリックしてください。具体的な操作は公式ドキュメントを参照してください。',
         loadCode: '取得する',
         COS: 'tencent cos',
         ap_beijing_1: '北京ゾーン1',
@@ -1857,6 +1874,8 @@ const message = {
             'ノード {0} は既にアップグレード可能な最新バージョンです。マスターノードのバージョンを確認後、再試行してください！',
 
         about: 'について',
+        release: 'バージョン更新履歴',
+        releaseHelper: '現在の環境の更新履歴の取得に異常が発生しました。手動で公式ドキュメントを確認してください。',
         project: 'GitHub',
         issue: '問題',
         doc: '公式文書',
@@ -1924,7 +1943,7 @@ const message = {
         app: 'モバイルアプリでサービス情報、異常監視などを表示するには、プロフェッショナル版にアップグレードしてください。',
         fileExchange: 'プロフェッショナル版にアップグレードすると、複数のサーバー間でファイルを迅速に転送できます。',
         cluster:
-            'プロフェッショナル版にアップグレードすると、MySQL/Postgres/Reidsマスタースレーブクラスタを管理できます。',
+            'プロフェッショナル版にアップグレードすると、MySQL/Postgres/Redisマスタースレーブクラスタを管理できます。',
     },
     clean: {
         scan: 'スキャンを開始します',
@@ -2108,8 +2127,8 @@ const message = {
         otherDomains: '他のドメイン',
         static: '静的',
         deployment: '展開',
-        supportUpType: '.tar.gzファイルのみがサポートされています',
-        zipFormat: '.tar.gz圧縮パッケージ構造:test.tar.gz圧縮パッケージは{0}ファイルを含める必要があります',
+        supportUpType:
+            '.tar.gz ファイル形式のみサポートされており、圧縮パッケージには {0}.json ファイルが含まれている必要があります',
         proxy: '逆プロキシ',
         alias: 'エイリアス',
         ftpUser: 'FTPアカウント',
@@ -2169,6 +2188,10 @@ const message = {
         null: 'なし',
         nginxConfig: 'nginx構成',
         websiteConfig: 'ウェブサイトの設定',
+        proxySettings: 'プロキシ設定',
+        advancedSettings: '詳細設定',
+        cacheSettings: 'キャッシュ設定',
+        sniSettings: 'SNI設定',
         basic: '基本',
         source: '構成',
         security: '安全',
@@ -2295,11 +2318,15 @@ const message = {
         modifier: '一致するルール',
         modifierHelper: '例: "="は正確な一致、 "〜"は通常の一致、^〜」はパスの始まりなどと一致します。',
         replace: 'テキスト置換',
+        replaceHelper:
+            'nginxのテキスト置換機能は、リバースプロキシ時にレスポンス内容の文字列を置換することができます。バックエンドから返されるHTML、CSS、JavaScriptなどのファイル内のリンクアドレス、APIアドレスなどを変更するためによく使用されます。正規表現マッチングをサポートしており、複雑なコンテンツ置換のニーズに対応できます。',
         addReplace: '追加',
         replaced: '検索文字列（空にすることはできません）',
         replaceText: '文字列に置き換えます',
         replacedErr: '検索文字列を空にすることはできません',
         replacedErr2: '検索文字列を繰り返すことはできません',
+        replacedListEmpty: 'テキスト置換ルールがありません',
+        proxySslName: 'プロキシSNI名',
         basicAuth: '基本認証',
         editBasicAuthHelper:
             'パスワードは非対称的に暗号化されており、反響することはできません。編集はパスワードをリセットする必要があります',
@@ -2315,6 +2342,15 @@ const message = {
         disableLeech: '反リーチを無効にします',
         ipv6: '緑',
         leechReturnError: 'HTTPステータスコードを入力してください',
+        blockedRef: '非標準のリファラーを許可',
+        accessControl: '反リーチ制御',
+        leechcacheControl: 'キャッシュ制御',
+        logEnableControl: '静的アセットのリクエストを記録',
+        leechSpecialValidHelper:
+            '「空のリファラーを許可」を有効にすると、リファラーのないリクエスト（直接アクセス等）はブロックされません。「非標準のリファラーを許可」を有効にすると、http/httpsで始まらないリファラー（クライアントからのリクエスト等）をすべて許可します。',
+        leechInvalidReturnHelper: 'ブロック後に返すHTTPステータスコード',
+        leechlogControlHelper:
+            '静的アセットのリクエストを記録します。運用環境では過剰で無意味なログを避けるため、通常は無効にします',
         selectAcme: 'ACMEアカウントを選択します',
         imported: '手動で作成されます',
         importType: 'インポートタイプ',
@@ -2605,6 +2641,7 @@ const message = {
         quickJump: 'クイックアクセス',
         used: '使用済み',
         unUsed: '未使用',
+        dockerRestart: 'ファイアウォール操作にはDockerサービスの再起動が必要です',
         firewallHelper: '{0}システムファイアウォール',
         firewallNotStart: `現在、システムファイアウォールは有効になっていません。最初に有効にします。`,
         restartFirewallHelper: 'この操作は、現在のファイアウォールを再起動します。続けたいですか？',
@@ -2786,6 +2823,27 @@ const message = {
             autoStart: '自動起動',
             autoStartHelper: 'Supervisor 起動後にサービスを自動的に起動するかどうか',
         },
+    },
+    disk: {
+        management: 'ディスク管理',
+        partition: 'パーティション',
+        unmount: 'アンマウント',
+        unmountHelper: 'パーティション {0} をアンマウントしますか？',
+        mount: 'マウント',
+        partitionAlert:
+            'ディスクのパーティション分割にはディスクのフォーマットが必要で、既存のデータは削除されます。事前にデータを保存またはスナップショットを取ってください。',
+        mountPoint: 'マウントディレクトリ',
+        systemDisk: 'システムディスク',
+        unpartitionedDisk: '未パーティションディスク',
+        handlePartition: '今すぐパーティション',
+        filesystem: 'ファイルシステム',
+        unmounted: 'アンマウント',
+        cannotOperate: '操作不可',
+        systemDiskHelper: 'ヒント: 現在のディスクはシステムディスクです。操作できません。',
+        autoMount: '自動マウント',
+        model: 'デバイスモデル',
+        diskType: 'ディスクタイプ',
+        serial: 'シリアルナンバー',
     },
     xpack: {
         expiresTrialAlert:
@@ -3430,7 +3488,7 @@ const message = {
             alertRule: 'アラートルール',
             titleSearchHelper: 'アラートタイトルを入力して検索します',
             taskType: 'タイプ',
-            ssl: '証明書 (SSL) 期限切れ',
+            ssl: '証明書期限切れ',
             siteEndTime: 'ウェブサイト期限切れ',
             panelPwdEndTime: 'パネルパスワード期限切れ',
             panelUpdate: '新しいパネルバージョンあり',
@@ -3514,7 +3572,7 @@ const message = {
             taskName: 'タスク名',
             cronJobType: 'タスクタイプ',
             clamPath: 'スキャンディレクトリ',
-            cronjob: 'Cronジョブ',
+            cronjob: 'スケジュールタスクの実行{0}で異常が発生しました',
             app: 'アプリバックアップ',
             web: 'ウェブサイトバックアップ',
             database: 'データベースバックアップ',
@@ -3609,7 +3667,8 @@ const message = {
             sshLogin: 'SSHログイン異常アラート',
             panelIpLogin: 'パネルログインIP異常アラート',
             sshIpLogin: 'SSHログインIP異常アラート',
-            ipWhiteListHelper: 'ホワイトリスト内のIPは、いかなるルールの制限も受けません',
+            ipWhiteListHelper:
+                'ホワイトリストに登録されたIPはルールの制限を受けず、ログインが成功してもアラートは発生しません',
             nodeExceptionRule: 'ノード異常アラートは、1日あたり{0}回送信',
             licenseExceptionRule: 'ライセンス異常アラートは、1日あたり{0}回送信',
             panelLoginRule: 'パネルログインアラートは、1日あたり{0}回送信',

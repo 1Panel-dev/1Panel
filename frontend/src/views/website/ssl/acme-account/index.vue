@@ -63,7 +63,7 @@ const createRef = ref();
 const paginationConfig = reactive({
     cacheSizeKey: 'acme-account-page-size',
     currentPage: 1,
-    pageSize: 20,
+    pageSize: Number(localStorage.getItem('acme-account-page-size')) || 20,
     total: 0,
 });
 const opRef = ref();

@@ -52,14 +52,14 @@
                     <el-input v-model="ssl.pem" :rows="15" type="textarea" id="textArea" />
                     <div>
                         <br />
-                        <CopyButton :content="ssl.pem" />
+                        <CopyButton :content="ssl.pem" :isIcon="false" />
                     </div>
                 </div>
                 <div v-else class="mt-5">
                     <el-input v-model="ssl.privateKey" :rows="15" type="textarea" id="textArea" />
                     <div>
                         <br />
-                        <CopyButton :content="ssl.privateKey" />
+                        <CopyButton :content="ssl.privateKey" :isIcon="false" />
                     </div>
                 </div>
             </div>

@@ -1,5 +1,5 @@
 <template>
-    <el-button v-if="type == 'icon'" link @click="copyText(content)" icon="DocumentCopy" class="ml-1.5"></el-button>
+    <el-button v-if="isIcon" link @click="copyText(content)" icon="DocumentCopy" class="ml-1.5"></el-button>
     <el-button @click="copyText(content)" v-else>{{ $t('commons.button.copy') }}</el-button>
 </template>
 
@@ -9,6 +9,9 @@ defineOptions({ name: 'CopyButton' });
 
 defineProps({
     content: String,
-    type: String,
+    isIcon: {
+        type: Boolean,
+        default: true,
+    },
 });
 </script>

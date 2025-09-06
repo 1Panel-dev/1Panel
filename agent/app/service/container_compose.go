@@ -227,18 +227,18 @@ func (u *ContainerService) ComposeOperation(req dto.ComposeOperation) error {
 	if cmd.CheckIllegal(req.Path, req.Operation) {
 		return buserr.New("ErrCmdIllegal")
 	}
-	if _, err := os.Stat(req.Path); err != nil {
-		return fmt.Errorf("load file with path %s failed, %v", req.Path, err)
-	}
 	if req.Operation == "delete" {
-		if stdout, err := compose.Operate(req.Path, "down"); err != nil {
-			return errors.New(string(stdout))
+		if err := removeContainerForCompose(req.Name, req.Path); err != nil && !req.Force {
+			return err
 		}
 		if req.WithFile {
 			_ = os.RemoveAll(path.Dir(req.Path))
 		}
 		_ = composeRepo.DeleteRecord(repo.WithByName(req.Name))
 		return nil
+	}
+	if _, err := os.Stat(req.Path); err != nil {
+		return fmt.Errorf("load file with path %s failed, %v", req.Path, err)
 	}
 	if req.Operation == "up" {
 		if stdout, err := compose.Up(req.Path); err != nil {
@@ -304,6 +304,33 @@ func (u *ContainerService) loadPath(req *dto.ComposeCreate) error {
 		_, _ = write.WriteString(string(req.File))
 		write.Flush()
 		req.Path = path
+	}
+	return nil
+}
+
+func removeContainerForCompose(composeName, composePath string) error {
+	if _, err := os.Stat(composePath); err == nil {
+		if stdout, err := compose.Operate(composePath, "down"); err != nil {
+			return errors.New(stdout)
+		}
+		return nil
+	}
+	var options container.ListOptions
+	options.All = true
+	options.Filters = filters.NewArgs()
+	options.Filters.Add("label", "com.docker.compose.project="+composeName)
+	client, err := docker.NewDockerClient()
+	if err != nil {
+		return err
+	}
+	defer client.Close()
+	ctx := context.Background()
+	containers, err := client.ContainerList(ctx, options)
+	if err != nil {
+		return err
+	}
+	for _, c := range containers {
+		_ = client.ContainerRemove(ctx, c.ID, container.RemoveOptions{RemoveVolumes: true, Force: true})
 	}
 	return nil
 }

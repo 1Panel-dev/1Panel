@@ -15,6 +15,9 @@ ErrApiConfigIPInvalid: 'The IP used to call the API interface is not in the whit
 ErrApiConfigDisable: 'This interface prohibits the use of API interface calls: {{ .detail }}'
 ErrApiConfigKeyTimeInvalid: 'API interface timestamp error: {{ .detail }}'
 
+ErrMinQuickJump: "Please set at least one quick jump entry!"
+ErrMaxQuickJump: "You can set up to four quick jump entries!"
+
 #common
 ErrUsernameIsExist: 'Username already exists'
 ErrNameIsExist: 'Name already exists'
@@ -79,9 +82,7 @@ AppStoreIsLastVersion: 'The App Store is already the latest version'
 AppStoreSyncSuccess: 'App Store synchronization successful'
 SyncAppDetail: 'Synchronize application configuration'
 AppVersionNotMatch: '{{ .name }} application requires a higher 1Panel version, skipping synchronization'
-MoveSiteDir: 'The current upgrade requires migration of the OpenResty website directory'
-MoveSiteToDir: 'Migrate site directory to {{ .name }}'
-ErrMoveSiteDir: 'Failed to migrate site directory'
+MoveSiteDir: "Detected website directory change. Need to migrate OpenResty website directory to {{ .name }}"
 MoveSiteDirSuccess: 'Successful migration of website directory'
 DeleteRuntimePHP: 'Delete PHP runtime'
 CustomAppStoreFileValid: 'App store packages need to be in .tar.gz format'
@@ -92,6 +93,15 @@ ErrCustomRuntimes: 'There is an installed runtime environment, please delete it 
 ErrAppVersionDeprecated: "The {{ .name }} application is not compatible with the current 1Panel version, skipped"
 ErrDockerFailed: "The state of Docker is abnormal, please check the service status"
 ErrDockerComposeCmdNotFound: "The Docker Compose command does not exist, please install this command on the host machine first"
+
+#ssh
+ExportIP: "Login IP"
+ExportArea: "Location"
+ExportPort: "Port"
+ExportAuthMode: "Login Method"
+ExportUser: "User"
+ExportStatus: "Login Status"
+ExportDate: "Time"
 
 #file
 ErrFileCanNotRead: 'This file does not support preview'
@@ -108,8 +118,8 @@ ErrFavoriteExist: 'This path has already been favorited'
 ErrInvalidChar: 'Illegal characters are not allowed'
 ErrPathNotDelete: 'The selected directory cannot be deleted'
 ErrLogFileToLarge: "The log file exceeds 500MB and cannot be opened"
-FileDropFailed: "File cleanup failed {{ .detail }}"
-FileDropSuccess: "File cleanup successful, cleaned {{ .count }} files, freed {{ .size }} disk space"
+FileDropFailed: "Failed to clean up file {{ .name }}: {{ .err }}"
+FileDropSuccess: "Successfully cleaned up file {{ .name }}, cleaned {{ .count }} files, freed {{ .size }} disk space"
 FileDropSum: "File cleanup completed successfully, total {{ .count }} files cleaned, total {{ .size }} disk space freed"
 
 #website
@@ -219,8 +229,10 @@ SystemLog: 'System Log'
 CutWebsiteLog: 'Rotate Website Log'
 FileOrDir: 'Directory / File'
 UploadFile: 'Uploading backup file {{ .file }} to {{ .backup }}'
-IgnoreBackupErr: 'Backup failed, error: {{ .detail }}, ignoring this error...'
-IgnoreUploadErr: 'Upload failed, error: {{ .detail }}, ignoring this error...'
+Upload: "Upload"
+IgnoreBackupErr: "Backup failed, error: {{ .detail }}, ignoring this error..."
+IgnoreUploadErr: "Upload failed, error: {{ .detail }}, ignoring this error..."
+LoadBackupFailed: "Failed to get backup account connection, error: {{ .detail }}"
 
 #toolbox
 ErrNotExistUser: 'The current user does not exist, please modify and try again!'
@@ -339,6 +351,10 @@ TaskIsExecuting: 'Task is running'
 CustomAppstore: 'Custom application warehouse'
 TaskExec: 'Execute'
 
+# task - clam
+Clamscan: "Scan {{ .name }}"
+TaskScan: "Scan"
+
 # task - ai
 OllamaModelPull: 'Pull Ollama model {{ .name }}'
 OllamaModelSize: 'Get the size of Ollama model {{ .name }}'
@@ -367,7 +383,6 @@ SnapCompressFile: 'Compress snapshot file'
 SnapCheckCompress: 'Check snapshot compression file'
 SnapCompressSize: 'Snapshot file size {{ .name }}'
 SnapUpload: 'Upload snapshot file'
-SnapLoadBackup: 'Get backup account information'
 SnapUploadTo: 'Upload snapshot file to {{ .name }}'
 SnapUploadRes: 'Upload snapshot file to {{ .name }}'
 
@@ -460,3 +475,12 @@ CommonAlert: "Your 1Panel, {{ .msg }}, please log in to the panel for details."
 NodeExceptionAlert: "Your 1Panel, {{ .num }} nodes are abnormal, please log in to the panel for details."
 LicenseExceptionAlert: "Your 1Panel, {{ .num }} licenses are abnormal, please log in to the panel for details."
 SSHAndPanelLoginAlert: "Your 1Panel, abnormal panel {{ .name }} login from {{ .ip }}, please log in to the panel for details."
+
+#disk
+DeviceNotFound: "Device {{ .name }} not found"
+DeviceIsMounted: "Device {{ .name }} is mounted, please unmount first"
+PartitionDiskErr: "Failed to partition, {{ .err }}"
+FormatDiskErr: "Failed to format disk, {{ .err }}"
+MountDiskErr: "Failed to mount disk, {{ .err }}"
+UnMountDiskErr: "Failed to unmount disk, {{ .err }}"
+XfsNotFound: "xfs filesystem not detected, please install xfsprogs first"

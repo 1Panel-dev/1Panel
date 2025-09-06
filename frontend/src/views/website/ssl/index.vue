@@ -128,7 +128,11 @@
                     <el-table-column :label="$t('ssl.autoRenew')" width="100px">
                         <template #default="{ row }">
                             <el-switch
-                                :disabled="row.provider === 'dnsManual' || row.provider === 'manual'"
+                                :disabled="
+                                    row.provider === 'dnsManual' ||
+                                    row.provider === 'manual' ||
+                                    row.provider === 'fromMaster'
+                                "
                                 v-model="row.autoRenew"
                                 @change="updateConfig(row)"
                             />
@@ -188,7 +192,7 @@ const globalStore = GlobalStore();
 const paginationConfig = reactive({
     cacheSizeKey: 'ssl-page-size',
     currentPage: 1,
-    pageSize: 10,
+    pageSize: Number(localStorage.getItem('ssl-page-size')) || 10,
     total: 0,
 });
 const acmeAccountRef = ref();

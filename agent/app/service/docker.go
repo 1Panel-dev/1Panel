@@ -60,7 +60,7 @@ func (u *DockerService) LoadDockerStatus() *dto.DockerStatus {
 		return &data
 	}
 	data.IsExist = true
-	data.IsActive, _ = systemctl.IsActive("docker")
+	data.IsActive = true
 	client, err := docker.NewDockerClient()
 	if err != nil {
 		global.LOG.Errorf("load docker client failed, err: %v", err)

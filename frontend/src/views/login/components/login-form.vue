@@ -12,6 +12,7 @@
                     <div class="space-y-6 flex-grow">
                         <el-form-item>
                             <el-input
+                                ref="mfaLoginRef"
                                 size="large"
                                 :placeholder="$t('commons.login.mfaCode')"
                                 v-model.trim="mfaLoginForm.code"
@@ -27,7 +28,7 @@
                             <el-button
                                 @focus="mfaButtonFocused = true"
                                 @blur="mfaButtonFocused = false"
-                                class="w-full"
+                                class="w-full login-button"
                                 type="primary"
                                 @click="mfaLogin(false)"
                             >
@@ -79,6 +80,7 @@
                                 size="large"
                                 name="username"
                                 autocomplete="username"
+                                ref="userNameRef"
                             ></el-input>
                         </el-form-item>
                         <el-form-item prop="password" class="w-full">
@@ -181,7 +183,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed } from 'vue';
+import { ref, reactive, onMounted, computed, nextTick } from 'vue';
 import type { ElForm } from 'element-plus';
 import { loginApi, getCaptcha, mfaLoginApi, getLoginSetting } from '@/api/modules/auth';
 import { GlobalStore, MenuStore, TabsStore } from '@/store';
@@ -252,6 +254,8 @@ function checkAgreeLicense(rule: any, value: any, callback: any) {
 }
 
 let isLoggingIn = false;
+const userNameRef = ref();
+const mfaLoginRef = ref();
 const mfaButtonFocused = ref();
 const mfaLoginForm = reactive({
     name: '',
@@ -338,6 +342,9 @@ const login = (formEl: FormInstance | undefined) => {
             if (res.data.mfaStatus === 'Enable') {
                 mfaShow.value = true;
                 errMfaInfo.value = false;
+                nextTick(() => {
+                    mfaLoginRef.value?.focus();
+                });
                 return;
             }
             globalStore.setLogStatus(true);
@@ -484,7 +491,9 @@ onMounted(() => {
         '--login-loading-mask-color',
         adjustColorToRGBA(loginBtnLinkColor.value, 30, 15),
     );
-
+    nextTick(() => {
+        userNameRef.value?.focus();
+    });
     loginForm.agreeLicense = globalStore.agreeLicense;
     document.onkeydown = (e: any) => {
         e = window.event || e;

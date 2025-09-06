@@ -61,7 +61,7 @@ const confirmDialogRef = ref();
 const paginationConfig = reactive({
     cacheSizeKey: 'login-log-page-size',
     currentPage: 1,
-    pageSize: 10,
+    pageSize: Number(localStorage.getItem('login-log-page-size')) || 10,
     total: 0,
 });
 const searchIP = ref<string>('');

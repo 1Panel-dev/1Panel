@@ -53,6 +53,11 @@ type BackupOption struct {
 	IsPublic bool   `json:"isPublic"`
 }
 
+type UploadForRecover struct {
+	FilePath  string `json:"filePath"`
+	TargetDir string `json:"targetDir"`
+}
+
 type CommonBackup struct {
 	Type       string `json:"type" validate:"required,oneof=app mysql mariadb redis website postgresql mysql-cluster postgresql-cluster redis-cluster"`
 	Name       string `json:"name"`

@@ -29,10 +29,10 @@
                 <TableSearch @search="searchByName()" v-model:searchName="req.name" />
             </template>
             <template #main>
-                <div v-if="apps.length > 0">
+                <div>
                     <MainDiv :heightDiff="300">
                         <el-alert type="info" :title="$t('app.appHelper')" :closable="false" />
-                        <el-row :gutter="5">
+                        <el-row :gutter="5" v-if="apps.length > 0">
                             <el-col
                                 class="app-col-12"
                                 v-for="(app, index) in apps"
@@ -46,6 +46,7 @@
                                 <AppCard :app="app" @open-install="openInstall" @open-detail="openDetail" />
                             </el-col>
                         </el-row>
+                        <NoApp v-if="noApp" />
                     </MainDiv>
                     <div class="page-button">
                         <fu-table-pagination
@@ -58,7 +59,6 @@
                         />
                     </div>
                 </div>
-                <NoApp v-if="apps.length == 0 && !loading" />
             </template>
         </LayoutContent>
     </div>
@@ -84,6 +84,7 @@ import Tags from '@/views/app-store/components/tag.vue';
 import DockerStatus from '@/views/container/docker-status/index.vue';
 import NoApp from '@/views/app-store/apps/no-app/index.vue';
 import AppCard from '@/views/app-store/apps/app/index.vue';
+import MainDiv from '@/components/main-div/index.vue';
 import { jumpToInstall } from '@/utils/app';
 
 const globalStore = GlobalStore();
@@ -121,6 +122,7 @@ const taskLogRef = ref();
 const syncCustomAppstore = ref(false);
 const isActive = ref(false);
 const isExist = ref(false);
+const noApp = ref(false);
 
 const refresh = () => {
     search(req);
@@ -147,6 +149,9 @@ const search = async (req: App.AppReq) => {
         .then((res) => {
             apps.value = res.data.items;
             paginationConfig.total = res.data.total;
+            if (noApp.value && apps.value.length > 0) {
+                noApp.value = false;
+            }
         })
         .finally(() => {
             loading.value = false;
