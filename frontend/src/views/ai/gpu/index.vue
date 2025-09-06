@@ -20,7 +20,7 @@
                     <el-row>
                         <el-col :xs="24" :sm="16" :md="16" :lg="16" :xl="16" />
                         <el-col :xs="24" :sm="8" :md="8" :lg="8" :xl="8">
-                            <TableSetting @search="refresh()" />
+                            <TableSetting title="gpu-refresh" @search="refresh()" />
                         </el-col>
                     </el-row>
                 </template>
@@ -181,7 +181,7 @@
                     <el-row>
                         <el-col :xs="24" :sm="16" :md="16" :lg="16" :xl="16" />
                         <el-col :xs="24" :sm="8" :md="8" :lg="8" :xl="8">
-                            <TableSetting @search="refresh()" />
+                            <TableSetting title="xpu-refresh" @search="refresh()" />
                         </el-col>
                     </el-row>
                 </template>

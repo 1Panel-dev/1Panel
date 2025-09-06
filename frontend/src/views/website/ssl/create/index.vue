@@ -144,9 +144,9 @@
                 <PushtoNode
                     v-if="isMaster && isMasterProductPro"
                     :push-node="ssl.pushNode"
-                    :nodes="ssl.nodes"
+                    :nodes="ssl.pushNodes"
                     @update:push-node="ssl.pushNode = $event"
-                    @update:nodes="ssl.nodes = $event"
+                    @update:nodes="ssl.pushNodes = $event"
                 />
             </div>
         </el-form>
@@ -224,7 +224,7 @@ const rules = ref({
     nameserver2: [Rules.ipv4],
     shell: [Rules.requiredInput],
     description: [checkMaxLength(128)],
-    nodes: [Rules.requiredSelect],
+    pushNodes: [Rules.requiredSelect],
 });
 const websiteID = ref();
 
@@ -248,7 +248,8 @@ const initData = () => ({
     execShell: false,
     shell: '',
     pushNode: false,
-    nodes: [],
+    pushNodes: [],
+    nodes: '',
 });
 
 const ssl = ref(initData());
@@ -295,6 +296,13 @@ const acceptParams = (op: string, websiteSSL: Website.SSLDTO) => {
         ssl.value.shell = websiteSSL.shell;
         if (ssl.value.provider == 'selfSigned') {
             rules.value.primaryDomain = [];
+        }
+        ssl.value.pushNode = websiteSSL.pushNode;
+        if (websiteSSL.nodes != '') {
+            ssl.value.pushNodes = websiteSSL.nodes
+                .split(',')
+                .map((item) => item.trim())
+                .filter((item) => item !== '');
         }
     }
     ssl.value.websiteId = Number(id.value);
@@ -356,6 +364,10 @@ const submit = async (formEl: FormInstance | undefined) => {
         if (!valid) {
             return;
         }
+        let nodes = '';
+        if (ssl.value.pushNode) {
+            nodes = ssl.value.pushNodes.join(',');
+        }
         loading.value = true;
         if (operate.value == 'create') {
             createSSL(ssl.value)
@@ -389,6 +401,8 @@ const submit = async (formEl: FormInstance | undefined) => {
                 nameserver2: ssl.value.nameserver2,
                 execShell: ssl.value.execShell,
                 shell: ssl.value.shell,
+                pushNode: ssl.value.pushNode,
+                nodes: nodes,
             };
             updateSSL(sslUpdate)
                 .then(() => {

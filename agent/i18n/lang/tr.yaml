@@ -18,6 +18,9 @@ StartPushSSLToNode: "Sertifika düğüme gönderilmeye başlandı"
 PushSSLToNodeFailed: "Sertifika düğüme gönderilemedi: {{ .err }}"
 PushSSLToNodeSuccess: "Sertifika düğüme başarıyla gönderildi"
 
+ErrMinQuickJump: "Lütfen en az bir hızlı atlama girişi ayarlayın!"
+ErrMaxQuickJump: "En fazla dört hızlı atlama girişi ayarlayabilirsiniz!"
+
 #common
 ErrUsernameIsExist: 'Kullanıcı adı zaten mevcut'
 ErrNameIsExist: 'İsim zaten mevcut'
@@ -82,9 +85,7 @@ AppStoreIsLastVersion: 'Uygulama Mağazası zaten en son sürüm'
 AppStoreSyncSuccess: 'Uygulama Mağazası senkronizasyonu başarılı'
 SyncAppDetail: 'Uygulama yapılandırmasını senkronize et'
 AppVersionNotMatch: '{{ .name }} uygulaması daha yüksek 1Panel sürümü gerektiriyor, senkronizasyon atlanıyor'
-MoveSiteDir: 'Mevcut yükseltme OpenResty web sitesi dizininin taşınmasını gerektiriyor'
-MoveSiteToDir: 'Site dizinini {{ .name }} konumuna taşı'
-ErrMoveSiteDir: 'Site dizini taşıma başarısız'
+MoveSiteDir: "Web sitesi dizini değişikliği tespit edildi. OpenResty web sitesi dizinini {{ .name }} adresine taşımak gerekiyor"
 MoveSiteDirSuccess: 'Web sitesi dizini taşıma başarılı'
 DeleteRuntimePHP: 'PHP çalışma zamanını sil'
 CustomAppStoreFileValid: 'Uygulama mağazası paketlerinin .tar.gz formatında olması gerekiyor'
@@ -95,6 +96,15 @@ ErrCustomRuntimes: 'Yüklü bir çalışma ortamı var, lütfen önce silin'
 ErrAppVersionDeprecated: "{{ .name }} uygulaması mevcut 1Panel sürümü ile uyumlu değil, atlandı"
 ErrDockerFailed: "Docker durumu anormal, lütfen servis durumunu kontrol edin"
 ErrDockerComposeCmdNotFound: "Docker Compose komutu mevcut değil, lütfen önce bu komutu host makinesine yükleyin"
+
+#ssh
+ExportIP: "Giriş IP"
+ExportArea: "Konum"
+ExportPort: "Port"
+ExportAuthMode: "Giriş Yöntemi"
+ExportUser: "Kullanıcı"
+ExportStatus: "Giriş Durumu"
+ExportDate: "Zaman"
 
 #file
 ErrFileCanNotRead: 'Bu dosya önizlemeyi desteklemiyor'
@@ -111,8 +121,8 @@ ErrFavoriteExist: 'Bu yol zaten favorilere eklendi'
 ErrInvalidChar: 'Yasak karakterlere izin verilmiyor'
 ErrPathNotDelete: 'Seçilen dizin silinemez'
 ErrLogFileToLarge: "Günlük dosyası 500MB'ı aşıyor ve açılamıyor"
-FileDropFailed: "Dosya temizleme başarısız {{ .detail }}"
-FileDropSuccess: "Dosya temizleme başarılı, {{ .count }} dosya silindi, {{ .size }} disk alanı boşaltıldı"
+FileDropFailed: "{{ .name }} dosyası temizlenemedi: {{ .err }}"
+FileDropSuccess: "{{ .name }} dosyası başarıyla temizlendi, {{ .count }} dosya silindi, {{ .size }} disk alanı boşaltıldı"
 FileDropSum: "Dosya temizleme tamamlandı, toplam {{ .count }} dosya silindi, toplam {{ .size }} disk alanı boşaltıldı"
 
 
@@ -220,6 +230,10 @@ SystemLog: 'Sistem Günlüğü'
 CutWebsiteLog: 'Web Sitesi Günlüğünü Döndür'
 FileOrDir: 'Dizin / Dosya'
 UploadFile: 'Yedekleme dosyası {{ .file }} {{ .backup }} konumuna yükleniyor'
+Upload: "Yükle"
+IgnoreBackupErr: "Yedekleme başarısız, hata: {{ .detail }}, bu hata yoksayılıyor..."
+IgnoreUploadErr: "Yükleme başarısız, hata: {{ .detail }}, bu hata yoksayılıyor..."
+LoadBackupFailed: "Yedek hesap bağlantısı alınamadı, hata: {{ .detail }}"
 
 #toolbox
 ErrNotExistUser: 'Mevcut kullanıcı mevcut değil, lütfen değiştirin ve tekrar deneyin!'
@@ -338,6 +352,10 @@ TaskIsExecuting: 'Görev çalışıyor'
 CustomAppstore: 'Özel uygulama deposu'
 TaskExec: 'Çalıştır'
 
+# task - clam
+Clamscan: "{{ .name }} Tara"
+TaskScan: "Tara"
+
 # task - ai
 OllamaModelPull: 'Ollama modeli {{ .name }} çek'
 OllamaModelSize: 'Ollama modeli {{ .name }} boyutunu al'
@@ -366,7 +384,6 @@ SnapCompressFile: 'Anlık görüntü dosyasını sıkıştır'
 SnapCheckCompress: 'Anlık görüntü sıkıştırma dosyasını kontrol et'
 SnapCompressSize: 'Anlık görüntü dosya boyutu {{ .name }}'
 SnapUpload: 'Anlık görüntü dosyasını yükle'
-SnapLoadBackup: 'Yedekleme hesabı bilgilerini al'
 SnapUploadTo: 'Anlık görüntü dosyasını {{ .name }} konumuna yükle'
 SnapUploadRes: 'Anlık görüntü dosyasını {{ .name }} konumuna yükle'
 
@@ -459,3 +476,12 @@ CommonAlert: "1Panel'iniz, {{ .msg }}. Detaylar için panele giriş yapınız."
 NodeExceptionAlert: "1Panel'iniz, {{ .num }} düğümde sorun var. Detaylar için panele giriş yapınız."
 LicenseExceptionAlert: "1Panel'iniz, {{ .num }} lisansda sorun var. Detaylar için panele giriş yapınız."
 SSHAndPanelLoginAlert: "1Panel'iniz, {{ .ip }} adresinden {{ .name }} paneline anormal giriş tespit edildi. Detaylar için panele giriş yapınız."
+
+#disk
+DeviceNotFound: "Cihaz {{ .name }} bulunamadı"
+DeviceIsMounted: "Cihaz {{ .name }} bağlandı, önce çıkarın"
+PartitionDiskErr: "Bölümleme başarısız, {{ .err }}"
+FormatDiskErr: "Disk biçimlendirme başarısız, {{ .err }}"
+MountDiskErr: "Disk bağlama başarısız, {{ .err }}"
+UnMountDiskErr: "Disk bağının kaldırılması başarısız, {{ .err }}"
+XfsNotFound: "XFS dosya sistemi algılanmadı, lütfen önce xfsprogs'i yükleyin"

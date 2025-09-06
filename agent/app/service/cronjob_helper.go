@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/utils/alert_push"
+	"github.com/pkg/errors"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
@@ -24,34 +25,51 @@ import (
 )
 
 func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
-	record := cronjobRepo.StartRecords(cronjob.ID, "", cronjob.Type)
+	cronjobItem, _ := cronjobRepo.Get(repo.WithByID(cronjob.ID))
+	if cronjobItem.IsExecuting {
+		cronjobRepo.AddFailedRecord(cronjob.ID)
+		return
+	}
+	record := cronjobRepo.StartRecords(cronjob.ID)
 	taskItem, err := task.NewTaskWithOps(fmt.Sprintf("cronjob-%s", cronjob.Name), task.TaskHandle, task.TaskScopeCronjob, record.TaskID, cronjob.ID)
 	if err != nil {
 		global.LOG.Errorf("new task for exec shell failed, err: %v", err)
 		return
 	}
-	go func() {
-		err = u.loadTask(cronjob, &record, taskItem)
-		if cronjob.Type == "snapshot" {
-			if err != nil {
-				taskItem, _ := taskRepo.GetFirst(taskRepo.WithByID(record.TaskID))
-				if len(taskItem.ID) == 0 {
-					record.TaskID = ""
+	if cronjob.Type == "snapshot" {
+		go func() {
+			_ = cronjobRepo.UpdateRecords(record.ID, map[string]interface{}{"records": record.Records})
+			if err := taskRepo.Save(context.Background(), taskItem.Task); err != nil {
+				global.LOG.Errorf("save task for snapshot cronjob failed, err: %v", err)
+				return
+			}
+			if err = u.handleSnapshot(*cronjob, record, taskItem); err != nil {
+				if len(taskItem.Task.CurrentStep) == 0 {
+					taskItem.Log(err.Error())
+					taskItem.Task.Status = constant.StatusFailed
+					taskItem.Task.ErrorMsg = err.Error()
+					taskItem.Task.EndAt = time.Now()
+					_ = taskRepo.Save(context.Background(), taskItem.Task)
 				}
 				cronjobRepo.EndRecords(record, constant.StatusFailed, err.Error(), record.Records)
 				handleCronJobAlert(cronjob)
 				return
 			}
 			cronjobRepo.EndRecords(record, constant.StatusSuccess, "", record.Records)
-			return
-		}
-		if err != nil {
-			global.LOG.Debugf("preper to handle cron job [%s] %s failed, err: %v", cronjob.Type, cronjob.Name, err)
+		}()
+		return
+	}
+	if err = u.loadTask(cronjob, &record, taskItem); err != nil {
+		global.LOG.Debugf("preper to handle cron job [%s] %s failed, err: %v", cronjob.Type, cronjob.Name, err)
+		item, _ := taskRepo.GetFirst(taskRepo.WithByID(record.TaskID))
+		if len(item.ID) == 0 {
 			record.TaskID = ""
-			cronjobRepo.EndRecords(record, constant.StatusFailed, err.Error(), record.Records)
-			handleCronJobAlert(cronjob)
-			return
 		}
+		cronjobRepo.EndRecords(record, constant.StatusFailed, err.Error(), record.Records)
+		handleCronJobAlert(cronjob)
+		return
+	}
+	go func() {
 		if err := taskItem.Execute(); err != nil {
 			taskItem, _ := taskRepo.GetFirst(taskRepo.WithByID(record.TaskID))
 			if len(taskItem.ID) == 0 {
@@ -109,9 +127,6 @@ func (u *CronjobService) loadTask(cronjob *model.Cronjob, record *model.JobRecor
 		err = u.handleDirectory(*cronjob, record.StartTime, taskItem)
 	case "log":
 		err = u.handleSystemLog(*cronjob, record.StartTime, taskItem)
-	case "snapshot":
-		_ = cronjobRepo.UpdateRecords(record.ID, map[string]interface{}{"records": record.Records})
-		err = u.handleSnapshot(*cronjob, *record, taskItem)
 	}
 	return err
 }
@@ -191,14 +206,14 @@ func (u *CronjobService) handleNtpSync(cronjob model.Cronjob, taskItem *task.Tas
 }
 
 func (u *CronjobService) handleCutWebsiteLog(cronjob *model.Cronjob, startTime time.Time, taskItem *task.Task) error {
+	clientMap := NewBackupClientMap([]string{fmt.Sprintf("%v", cronjob.DownloadAccountID)})
+	if !clientMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].isOk {
+		return errors.New(i18n.GetMsgWithDetail("LoadBackupFailed", clientMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].message))
+	}
 	taskItem.AddSubTaskWithOps(i18n.GetWithName("CutWebsiteLog", cronjob.Name), func(t *task.Task) error {
 		websites := loadWebsForJob(*cronjob)
 		fileOp := files.NewFileOp()
 		baseDir := GetOpenrestyDir(SitesRootDir)
-		clientMap, err := NewBackupClientMap([]string{fmt.Sprintf("%v", cronjob.DownloadAccountID)})
-		if err != nil {
-			return fmt.Errorf("load local backup client failed, err: %v", err)
-		}
 		for _, website := range websites {
 			taskItem.Log(website.Alias)
 			var record model.BackupRecord
@@ -264,34 +279,6 @@ func (u *CronjobService) handleSystemClean(cronjob model.Cronjob, taskItem *task
 	taskItem.AddSubTaskWithOps(i18n.GetMsgByKey("HandleSystemClean"), cleanTask, nil, int(cronjob.RetryTimes), time.Duration(cronjob.Timeout)*time.Second)
 }
 
-func (u *CronjobService) uploadCronjobBackFile(cronjob model.Cronjob, task *task.Task, accountMap map[string]backupClientHelper, file string) (string, error) {
-	defer func() {
-		_ = os.Remove(file)
-	}()
-	var errItem error
-	accounts := strings.Split(cronjob.SourceAccountIDs, ",")
-	cloudSrc := strings.TrimPrefix(file, global.Dir.LocalBackupDir+"/tmp/")
-	for _, account := range accounts {
-		if len(account) != 0 {
-			task.LogStart(i18n.GetMsgWithMap("UploadFile", map[string]interface{}{
-				"file":   pathUtils.Join(accountMap[account].backupPath, cloudSrc),
-				"backup": accountMap[account].name,
-			}))
-			_, err := accountMap[account].client.Upload(file, pathUtils.Join(accountMap[account].backupPath, cloudSrc))
-			task.LogWithStatus(
-				i18n.GetMsgWithMap("UploadFile", map[string]interface{}{
-					"file":   pathUtils.Join(accountMap[account].backupPath, cloudSrc),
-					"backup": accountMap[account].name,
-				}), err)
-			if err != nil {
-				errItem = err
-				continue
-			}
-		}
-	}
-	return cloudSrc, errItem
-}
-
 func (u *CronjobService) removeExpiredBackup(cronjob model.Cronjob, accountMap map[string]backupClientHelper, record model.BackupRecord) {
 	var opts []repo.DBOption
 	opts = append(opts, repo.WithByFrom("cronjob"))
@@ -314,6 +301,9 @@ func (u *CronjobService) removeExpiredBackup(cronjob model.Cronjob, accountMap m
 					if _, ok := accountMap[account]; !ok {
 						continue
 					}
+					if !accountMap[account].isOk {
+						continue
+					}
 					_, _ = accountMap[account].client.Delete(pathUtils.Join(accountMap[account].backupPath, "system_snapshot", records[i].FileName))
 				}
 			}
@@ -322,6 +312,9 @@ func (u *CronjobService) removeExpiredBackup(cronjob model.Cronjob, accountMap m
 			for _, account := range accounts {
 				if len(account) != 0 {
 					if _, ok := accountMap[account]; !ok {
+						continue
+					}
+					if !accountMap[account].isOk {
 						continue
 					}
 					_, _ = accountMap[account].client.Delete(pathUtils.Join(accountMap[account].backupPath, records[i].FileDir, records[i].FileName))

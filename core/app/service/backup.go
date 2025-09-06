@@ -44,13 +44,7 @@ func (u *BackupService) LoadBackupClientInfo(clientType string) (dto.BackupClien
 	var data dto.BackupClientInfo
 	clientIDKey := "OneDriveID"
 	clientIDSc := "OneDriveSc"
-	if clientType == constant.GoogleDrive {
-		clientIDKey = "GoogleID"
-		clientIDSc = "GoogleSc"
-		data.RedirectUri = constant.GoogleRedirectURI
-	} else {
-		data.RedirectUri = constant.OneDriveRedirectURI
-	}
+	data.RedirectUri = constant.OneDriveRedirectURI
 	clientID, err := settingRepo.Get(repo.WithByKey(clientIDKey))
 	if err != nil {
 		return data, err

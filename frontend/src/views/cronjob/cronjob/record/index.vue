@@ -83,97 +83,113 @@
                     <el-option :label="$t('commons.status.waiting')" value="Waiting" />
                     <el-option :label="$t('commons.status.failed')" value="Failed" />
                 </el-select>
+                <TableRefresh @search="search(false)" />
             </template>
             <template #main>
                 <div class="mainClass">
-                    <el-row :gutter="20" v-show="hasRecords" class="mainRowClass">
+                    <el-row :gutter="20" v-show="hasRecords" class="mainRowClass row-box">
                         <el-col :span="7">
-                            <div class="infinite-list" style="overflow: auto">
-                                <el-table
-                                    style="cursor: pointer"
-                                    :data="records"
-                                    border
-                                    :show-header="false"
-                                    @row-click="forDetail"
-                                >
-                                    <el-table-column>
-                                        <template #default="{ row }">
-                                            <span v-if="row.id === currentRecord.id" class="select-sign"></span>
-                                            <Status class="mr-2 ml-1 float-left" :status="row.status" />
-                                            <div class="mt-0.5">
-                                                <span>
-                                                    {{ row.startTime }}
-                                                </span>
-                                            </div>
-                                        </template>
-                                    </el-table-column>
-                                </el-table>
-                            </div>
-                            <div class="page-item">
-                                <el-pagination
-                                    :page-size="searchInfo.pageSize"
-                                    :current-page="searchInfo.page"
-                                    @current-change="handleCurrentChange"
-                                    @size-change="handleSizeChange"
-                                    :pager-count="5"
-                                    :page-sizes="[6, 8, 10, 12, 14]"
-                                    small
-                                    layout="total, sizes, prev, pager, next"
-                                    :total="searchInfo.recordTotal"
-                                />
-                            </div>
+                            <el-card class="el-card">
+                                <div class="infinite-list" style="overflow: auto">
+                                    <el-table
+                                        style="cursor: pointer"
+                                        :data="records"
+                                        border
+                                        :show-header="false"
+                                        @row-click="forDetail"
+                                    >
+                                        <el-table-column>
+                                            <template #default="{ row }">
+                                                <span v-if="row.id === currentRecord.id" class="select-sign"></span>
+                                                <Status class="mr-2 ml-1 float-left" :status="row.status" />
+                                                <div class="mt-0.5">
+                                                    <span>
+                                                        {{ row.startTime }}
+                                                    </span>
+                                                </div>
+                                            </template>
+                                        </el-table-column>
+                                    </el-table>
+                                </div>
+                                <div class="page-item">
+                                    <el-pagination
+                                        :page-size="searchInfo.pageSize"
+                                        :current-page="searchInfo.page"
+                                        @current-change="handleCurrentChange"
+                                        @size-change="handleSizeChange"
+                                        :pager-count="5"
+                                        :page-sizes="[5, 10, 20, 50, 100, 200, 500, 1000]"
+                                        small
+                                        layout="total, sizes, prev, pager, next"
+                                        :total="searchInfo.recordTotal"
+                                    />
+                                </div>
+                            </el-card>
                         </el-col>
                         <el-col :span="17">
-                            <el-form label-position="top">
-                                <el-row type="flex" justify="center">
-                                    <el-form-item class="descriptionWide">
-                                        <template #label>
-                                            <span class="status-label">{{ $t('commons.search.timeStart') }}</span>
-                                        </template>
-                                        <span class="status-count">
-                                            {{ dateFormat(0, 0, currentRecord?.startTime) }}
-                                        </span>
-                                    </el-form-item>
-                                    <el-form-item class="description">
-                                        <template #label>
-                                            <span class="status-label">{{ $t('commons.table.interval') }}</span>
-                                        </template>
-                                        <el-button link v-if="!currentRecord?.interval" :loading="true" />
-                                        <span v-else>
-                                            <span class="status-count" v-if="currentRecord?.interval! <= 1000">
-                                                {{ currentRecord?.interval }} ms
+                            <el-card class="el-card">
+                                <el-form label-position="top">
+                                    <el-row type="flex" justify="center">
+                                        <el-form-item class="descriptionWide">
+                                            <template #label>
+                                                <span class="status-label">{{ $t('commons.search.timeStart') }}</span>
+                                            </template>
+                                            <span class="status-count">
+                                                {{ dateFormat(0, 0, currentRecord?.startTime) }}
                                             </span>
-                                            <span class="status-count" v-if="currentRecord?.interval! > 1000">
-                                                {{ currentRecord?.interval! / 1000 }} s
+                                        </el-form-item>
+                                        <el-form-item class="description">
+                                            <template #label>
+                                                <span class="status-label">{{ $t('commons.table.interval') }}</span>
+                                            </template>
+                                            <el-button
+                                                link
+                                                v-if="currentRecord?.status === 'Waiting' && !currentRecord?.interval"
+                                                :loading="true"
+                                            />
+                                            <span v-else>
+                                                <span class="status-count" v-if="currentRecord?.interval! <= 1000">
+                                                    {{ currentRecord?.interval === 0 ? '-' : currentRecord?.interval }}
+                                                    ms
+                                                </span>
+                                                <span class="status-count" v-if="currentRecord?.interval! > 1000">
+                                                    {{ currentRecord?.interval! / 1000 }} s
+                                                </span>
                                             </span>
-                                        </span>
-                                    </el-form-item>
-                                    <el-form-item class="description">
-                                        <template #label>
-                                            <span class="status-label">{{ $t('commons.table.status') }}</span>
-                                        </template>
-                                        <Status :status="currentRecord?.status" />
-                                    </el-form-item>
-                                </el-row>
-                                <el-row v-if="currentRecord?.status === 'Failed'">
-                                    <el-form-item class="w-full">
-                                        <template #label>
-                                            <span class="status-label">{{ $t('commons.table.message') }}</span>
-                                        </template>
-                                        {{ currentRecord?.message }}
-                                    </el-form-item>
-                                </el-row>
-                                <el-row v-if="currentRecord?.taskID && currentRecord?.taskID != ''">
-                                    <LogFile
-                                        :defaultButton="true"
-                                        class="w-full"
-                                        :key="currentRecord?.taskID"
-                                        @stop-reading="search(false)"
-                                        :heightDiff="410"
-                                        :config="{ type: 'task', taskID: currentRecord?.taskID, tail: true }"
-                                    />
-                                </el-row>
-                            </el-form>
+                                        </el-form-item>
+                                        <el-form-item class="description">
+                                            <template #label>
+                                                <span class="status-label">{{ $t('commons.table.status') }}</span>
+                                            </template>
+                                            <Status :status="currentRecord?.status" />
+                                            <el-tooltip :content="currentRecord?.message">
+                                                <el-button
+                                                    class="mt-0.5"
+                                                    type="danger"
+                                                    v-if="currentRecord?.status === 'Failed'"
+                                                    icon="Warning"
+                                                    link
+                                                />
+                                            </el-tooltip>
+                                        </el-form-item>
+                                    </el-row>
+                                    <el-row v-if="currentRecord?.taskID && currentRecord?.taskID != ''">
+                                        <LogFile
+                                            :defaultButton="true"
+                                            class="w-full"
+                                            :key="currentRecord?.taskID"
+                                            @stop-reading="search(false)"
+                                            :heightDiff="420"
+                                            :config="{
+                                                type: 'task',
+                                                colorMode: 'task',
+                                                taskID: currentRecord?.taskID,
+                                                tail: true,
+                                            }"
+                                        />
+                                    </el-row>
+                                </el-form>
+                            </el-card>
                         </el-col>
                     </el-row>
                 </div>
@@ -290,7 +306,7 @@ const timeRangeLoad = ref<[Date, Date]>([
 const searchInfo = reactive({
     cacheSizeKey: 'cronjob-record-page-size',
     page: 1,
-    pageSize: 8,
+    pageSize: 10,
     recordTotal: 0,
     cronjobID: 0,
     startTime: new Date(),
@@ -405,7 +421,7 @@ defineExpose({
 
 <style lang="scss" scoped>
 .infinite-list {
-    height: calc(100vh - 420px);
+    height: calc(100vh - 320px);
     .select-sign {
         &::before {
             float: left;
@@ -443,11 +459,5 @@ defineExpose({
     .mainRowClass {
         min-width: 1200px;
     }
-}
-.editor-main {
-    height: calc(100vh - 488px);
-    width: 100%;
-    margin-top: 5px;
-    overflow-x: auto;
 }
 </style>

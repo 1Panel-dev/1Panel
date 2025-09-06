@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"maps"
 	"math"
 	"net/http"
 	"os"
@@ -808,6 +809,7 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 		if install.App.Key == constant.AppOpenresty {
 			if err = buildNginx(t); err != nil {
 				t.Log(err.Error())
+				return err
 			}
 		}
 
@@ -836,7 +838,7 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 		}
 	}
 
-	upgradeTask.AddSubTask(task.GetTaskName(install.Name, task.TaskScopeApp, task.TaskUpgrade), upgradeApp, rollBackApp)
+	upgradeTask.AddSubTaskWithOps(task.GetTaskName(install.Name, task.TaskScopeApp, task.TaskUpgrade), upgradeApp, rollBackApp, 0, 1*time.Hour)
 
 	go func() {
 		err = upgradeTask.Execute()
@@ -1043,11 +1045,11 @@ func copyData(task *task.Task, app model.App, appDetail model.AppDetail, appInst
 		return
 	}
 	envPath := path.Join(appDir, ".env")
-	envParams := make(map[string]string, len(req.Params))
+	envParams := make(map[string]string)
 	if fileOp.Stat(envPath) {
 		envs, _ := gotenv.Read(envPath)
-		for k, v := range envs {
-			envParams[k] = v
+		if envParams = maps.Clone(envs); envParams == nil {
+			envParams = make(map[string]string)
 		}
 	}
 	handleMap(req.Params, envParams)
@@ -1080,7 +1082,7 @@ func runScript(task *task.Task, appInstall *model.AppInstall, operate string) er
 	task.LogStart(logStr)
 
 	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(10*time.Minute), cmd.WithWorkDir(workDir))
-	out, err := cmdMgr.RunWithStdoutBashCf(scriptPath)
+	out, err := cmdMgr.RunWithStdoutBashC(scriptPath)
 	if err != nil {
 		if out != "" {
 			err = errors.New(out)
@@ -1893,6 +1895,11 @@ func ignoreUpdate(installed model.AppInstall) bool {
 		}
 		return true
 	}
+	if installed.App.Key == "sqlbot" {
+		if common.CompareVersion("1.1.0", installed.Version) {
+			return true
+		}
+	}
 	return false
 }
 
@@ -1930,6 +1937,53 @@ func getAppTags(appID uint, lang string) ([]response.TagDTO, error) {
 		}
 	}
 	return res, nil
+}
+
+func handleSiteDir(app model.App, appDetail model.AppDetail, req request.AppInstallCreate, t *task.Task) error {
+	if app.Key == "openresty" && (app.Resource == "remote" || app.Resource == "custom") && common.CompareVersion(appDetail.Version, "1.27") {
+		if dir, ok := req.Params["WEBSITE_DIR"]; ok {
+			siteDir := dir.(string)
+			if siteDir == "" || !strings.HasPrefix(siteDir, "/") {
+				siteDir = path.Join(global.Dir.DataDir, dir.(string))
+			}
+			req.Params["WEBSITE_DIR"] = siteDir
+			oldWebStePath, _ := settingRepo.GetValueByKey("WEBSITE_DIR")
+			fileOp := files.NewFileOp()
+			if oldWebStePath != "" && oldWebStePath != siteDir && fileOp.Stat(oldWebStePath) {
+				t.Log(i18n.GetWithName("MoveSiteDir", siteDir))
+				if fileOp.Stat(siteDir) {
+					if fileOp.Stat(path.Join(siteDir, "conf.d")) {
+						_ = fileOp.Rename(path.Join(siteDir, "conf.d"), path.Join(siteDir, "conf.d.bak"))
+					}
+					if fileOp.Stat(path.Join(siteDir, "sites")) {
+						_ = fileOp.Rename(path.Join(siteDir, "sites"), path.Join(siteDir, "sites.bak"))
+					}
+					if err := fileOp.Rename(path.Join(oldWebStePath, "sites"), path.Join(siteDir, "sites")); err != nil {
+						return err
+					}
+					if err := fileOp.Rename(path.Join(oldWebStePath, "conf.d"), path.Join(siteDir, "conf.d")); err != nil {
+						return err
+					}
+				} else {
+					err := fileOp.Rename(oldWebStePath, siteDir)
+					if err != nil {
+						return err
+					}
+				}
+				t.Log(i18n.GetMsgByKey("MoveSiteDirSuccess"))
+			}
+			if !fileOp.Stat(siteDir) {
+				_ = fileOp.CreateDir(siteDir, constant.DirPerm)
+				_ = fileOp.CreateDir(path.Join(siteDir, "conf.d"), constant.DirPerm)
+			}
+			err := settingRepo.UpdateOrCreate("WEBSITE_DIR", siteDir)
+			if err != nil {
+				return err
+			}
+			go RestartPHPRuntime()
+		}
+	}
+	return nil
 }
 
 func handleOpenrestyFile(appInstall *model.AppInstall) error {

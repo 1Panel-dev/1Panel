@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/utils/req_helper"
@@ -161,7 +162,7 @@ func TailFromEnd(filename string, lines int) ([]string, error) {
 	return result, nil
 }
 
-func ReadFileByLine(filename string, page, pageSize int, latest bool) (lines []string, isEndOfFile bool, total int, err error) {
+func ReadFileByLine(filename string, page, pageSize int, latest bool) (res *dto.LogFileRes, err error) {
 	if !NewFileOp().Stat(filename) {
 		return
 	}
@@ -185,7 +186,10 @@ func ReadFileByLine(filename string, page, pageSize int, latest bool) (lines []s
 	if err != nil {
 		return
 	}
-	total = (totalLines + pageSize - 1) / pageSize
+	res = &dto.LogFileRes{}
+	total := (totalLines + pageSize - 1) / pageSize
+	res.TotalPages = total
+	res.TotalLines = totalLines
 	reader := bufio.NewReaderSize(file, 8192)
 
 	if latest {
@@ -194,7 +198,7 @@ func ReadFileByLine(filename string, page, pageSize int, latest bool) (lines []s
 	currentLine := 0
 	startLine := (page - 1) * pageSize
 	endLine := startLine + pageSize
-
+	lines := make([]string, 0, pageSize)
 	for {
 		line, _, err := reader.ReadLine()
 		if err == io.EOF {
@@ -208,8 +212,8 @@ func ReadFileByLine(filename string, page, pageSize int, latest bool) (lines []s
 			break
 		}
 	}
-
-	isEndOfFile = currentLine < endLine
+	res.Lines = lines
+	res.IsEndOfFile = currentLine < endLine
 	return
 }
 

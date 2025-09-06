@@ -148,7 +148,7 @@
                                     class="ml-1.5"
                                 ></el-button>
                                 <div>
-                                    <CopyButton :content="row.password" type="icon" />
+                                    <CopyButton :content="row.password" />
                                 </div>
                             </div>
                         </template>
@@ -236,6 +236,7 @@ import AppStatus from '@/components/app-status/index.vue';
 import Backups from '@/components/backup/index.vue';
 import UploadDialog from '@/components/upload/index.vue';
 import PortJumpDialog from '@/components/port-jump/index.vue';
+import Tooltip from '@/components/tooltip/index.vue';
 import { dateFormat } from '@/utils/util';
 import { computed, onMounted, reactive, ref } from 'vue';
 import {

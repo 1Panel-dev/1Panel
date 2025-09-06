@@ -29,19 +29,22 @@
         </div>
         <div class="log-container" ref="logContainer" @scroll="onScroll" :style="containerStyle">
             <div class="log-spacer" :style="{ height: `${totalHeight}px` }"></div>
-            <div
-                v-for="(log, index) in visibleLogs"
-                :key="startIndex + index"
-                class="log-item"
-                :style="{ top: `${(startIndex + index) * logHeight}px` }"
-            >
-                <hightlight :log="log" :type="config.colorMode ?? 'nginx'"></hightlight>
+            <div class="log-viewport" :style="{ transform: `translateY(${offsetY}px)` }">
+                <div
+                    v-for="(log, index) in visibleLogs"
+                    :key="`${startIndex + index}-${log}`"
+                    class="log-item"
+                    :style="{ height: `${logHeight}px` }"
+                >
+                    <hightlight :log="log" :type="config.colorMode ?? 'nginx'"></hightlight>
+                </div>
             </div>
+            <hightlight v-if="logs.length === 0" :log="$t('commons.log.noLog')" type="system"></hightlight>
         </div>
     </div>
 </template>
 <script lang="ts" setup>
-import { nextTick, onMounted, onUnmounted, reactive, ref } from 'vue';
+import { nextTick, onMounted, onUnmounted, reactive, ref, computed } from 'vue';
 import { downloadFile } from '@/utils/util';
 import { readByLine } from '@/api/modules/files';
 import { GlobalStore } from '@/store';
@@ -143,29 +146,77 @@ const isTailDisabled = ref();
 const firstLoading = ref(false);
 const logs = ref<string[]>([]);
 const logContainer = ref<HTMLElement | null>(null);
-const logHeight = 20;
-const logCount = ref(0);
-const totalHeight = computed(() => logHeight * logCount.value);
+const logHeight = 23;
 const containerHeight = ref(500);
-const visibleCount = computed(() => Math.ceil(containerHeight.value / logHeight));
-const startIndex = ref(0);
+const scrollTop = ref(0);
+const lastScrollTop = ref(0);
+const totalLines = ref(0);
+const stopReading = ref(false);
+const totalPages = ref(0);
+let resizeObserver: ResizeObserver | null = null;
+const isEndOfFile = ref(false);
 
-const visibleLogs = computed(() => {
-    return logs.value.slice(startIndex.value, startIndex.value + visibleCount.value);
+const totalHeight = computed(() => logs.value.length * logHeight);
+
+const visibleCount = computed(() => {
+    const buffer = 5;
+    return Math.ceil(containerHeight.value / logHeight) + buffer * 2;
 });
 
-const onScroll = () => {
+const startIndex = computed(() => {
+    const buffer = 5;
+    const index = Math.floor(scrollTop.value / logHeight) - buffer;
+    return Math.max(0, index);
+});
+
+const endIndex = computed(() => {
+    return Math.min(logs.value.length, startIndex.value + visibleCount.value);
+});
+
+const visibleLogs = computed(() => {
+    return logs.value.slice(startIndex.value, endIndex.value);
+});
+
+const offsetY = computed(() => {
+    return startIndex.value * logHeight;
+});
+
+const updateContainerHeight = () => {
     if (logContainer.value) {
-        const scrollTop = logContainer.value.scrollTop;
-        if (scrollTop == 0) {
-            readReq.page = minPage.value - 1;
-            if (readReq.page < 1) {
-                return;
-            }
-            minPage.value = readReq.page;
-            getContent(true);
+        const rect = logContainer.value.getBoundingClientRect();
+        containerHeight.value = rect.height;
+    }
+};
+
+const onScroll = async () => {
+    if (!logContainer.value) return;
+
+    scrollTop.value = logContainer.value.scrollTop;
+    const scrollHeight = logContainer.value.scrollHeight;
+    const clientHeight = logContainer.value.clientHeight;
+
+    lastScrollTop.value = scrollTop.value;
+
+    if (isLoading.value) return;
+
+    if (scrollTop.value <= 50 && readReq.page > 1) {
+        if (minPage.value <= 1) {
+            return;
         }
-        startIndex.value = Math.floor(scrollTop / logHeight);
+        readReq.page = minPage.value > 1 ? minPage.value - 1 : 1;
+        minPage.value = readReq.page;
+        await getContent(true);
+        return;
+    }
+    if (scrollHeight - scrollTop.value - clientHeight <= 50 && !end.value && !isEndOfFile.value) {
+        if (readReq.page < maxPage.value) {
+            readReq.page = maxPage.value;
+            await getContent(false);
+        } else if (readReq.page < totalPages.value) {
+            maxPage.value++;
+            readReq.page = maxPage.value;
+            await getContent(false);
+        }
     }
 };
 
@@ -195,6 +246,7 @@ const changeTail = (fromOutSide: boolean) => {
 
 const clearLog = (): void => {
     logs.value = [];
+    scrollTop.value = 0;
     readReq.page = 1;
     lastLogs.value = [];
 };
@@ -203,13 +255,6 @@ const getContent = async (pre: boolean) => {
     if (isLoading.value) {
         return;
     }
-    readReq.id = props.config.id;
-    readReq.type = props.config.type;
-    readReq.name = props.config.name;
-    readReq.taskID = props.config.taskID;
-    readReq.taskType = props.config.taskType;
-    readReq.taskOperate = props.config.taskOperate;
-    readReq.resourceID = props.config.resourceID;
     if (readReq.page < 1) {
         readReq.page = 1;
     }
@@ -222,7 +267,10 @@ const getContent = async (pre: boolean) => {
     } catch (error) {
         isLoading.value = false;
         firstLoading.value = false;
+        return;
     }
+
+    totalLines.value = res.data.totalLines;
 
     if (res.data.scope == 'tail') {
         showTail.value = false;
@@ -230,6 +278,7 @@ const getContent = async (pre: boolean) => {
 
     if (res.data.taskStatus && res.data.taskStatus !== 'Executing') {
         isTailDisabled.value = true;
+        tailLog.value = false;
     }
 
     logPath.value = res.data.path;
@@ -245,7 +294,7 @@ const getContent = async (pre: boolean) => {
             }),
         );
         const newLogs = res.data.lines;
-        if (newLogs.length === readReq.pageSize && readReq.page < res.data.total) {
+        if (tailLog.value && newLogs.length === readReq.pageSize && readReq.page < res.data.total) {
             readReq.page++;
         }
         if (
@@ -261,47 +310,74 @@ const getContent = async (pre: boolean) => {
         if (stopSignals.some((signal) => newLogs[newLogs.length - 1].endsWith(signal))) {
             onCloseLog();
         }
-        if (end.value) {
-            if ((logs.value.length = 0)) {
-                logs.value = newLogs;
-            } else {
-                logs.value = pre ? [...newLogs, ...lastLogs.value] : [...lastLogs.value, ...newLogs];
-            }
+
+        if (logs.value.length == 0) {
+            logs.value = newLogs;
         } else {
-            if ((logs.value.length = 0)) {
-                logs.value = newLogs;
+            if (pre) {
+                logs.value = [...newLogs, ...logs.value];
             } else {
-                logs.value = pre ? [...newLogs, ...logs.value] : [...logs.value, ...newLogs];
+                if (end.value) {
+                    logs.value = [...lastLogs.value, ...newLogs];
+                } else {
+                    if (newLogs.length > logs.value.length) {
+                        logs.value = newLogs;
+                    } else {
+                        logs.value = [...logs.value, ...newLogs];
+                    }
+                }
             }
         }
 
         nextTick(() => {
-            if (pre) {
-                logContainer.value.scrollTop = 2000;
-            } else {
-                logContainer.value.scrollTop = totalHeight.value;
-                containerHeight.value = logContainer.value.getBoundingClientRect().height;
+            if (logContainer.value) {
+                if (pre) {
+                    if (readReq.page > 1) {
+                        const addedLines = newLogs.length;
+                        const newScrollPosition = lastScrollTop.value + addedLines * logHeight;
+                        logContainer.value.scrollTop = newScrollPosition;
+                    }
+                } else {
+                    logContainer.value.scrollTop = logContainer.value.scrollHeight;
+                }
             }
         });
     }
 
-    logCount.value = logs.value.length;
     end.value = res.data.end;
+    totalPages.value = res.data.total;
     emit('update:hasContent', logs.value.length > 0);
     if (readReq.latest) {
         readReq.page = res.data.total;
         readReq.latest = false;
         maxPage.value = res.data.total;
-        minPage.value = res.data.total;
+        isEndOfFile.value = true;
+        if (res.data.lines && res.data.lines.length > 500) {
+            minPage.value = res.data.total - 1;
+        } else {
+            minPage.value = res.data.total;
+        }
+    } else {
+        maxPage.value = Math.max(maxPage.value, readReq.page);
     }
     if (logs.value && logs.value.length > 3000) {
+        const removedCount = readReq.pageSize;
+        const currentScrollRatio = scrollTop.value / (logs.value.length * logHeight);
+
         if (pre) {
-            logs.value.splice(logs.value.length - readReq.pageSize, readReq.pageSize);
+            logs.value.splice(logs.value.length - removedCount, removedCount);
             if (maxPage.value > 1) {
                 maxPage.value--;
             }
         } else {
-            logs.value.splice(0, readReq.pageSize);
+            isEndOfFile.value = false;
+            logs.value.splice(0, removedCount);
+            nextTick(() => {
+                if (logContainer.value) {
+                    const newScrollTop = currentScrollRatio * (logs.value.length * logHeight);
+                    logContainer.value.scrollTop = Math.max(0, newScrollTop - removedCount * logHeight);
+                }
+            });
             if (minPage.value > 1) {
                 minPage.value++;
             }
@@ -311,6 +387,10 @@ const getContent = async (pre: boolean) => {
 };
 
 const onCloseLog = async () => {
+    if (stopReading.value) {
+        return;
+    }
+    stopReading.value = true;
     tailLog.value = false;
     if (timer) {
         clearInterval(Number(timer));
@@ -331,16 +411,19 @@ watch(
 );
 
 const init = async () => {
+    tailLog.value = false;
     if (props.config.tail) {
         tailLog.value = props.config.tail;
-    } else {
-        tailLog.value = false;
     }
     if (tailLog.value) {
         changeTail(false);
     }
     readReq.latest = true;
     await getContent(false);
+    if (readReq.page > 1 && totalPages.value == maxPage.value) {
+        readReq.page--;
+        await getContent(true);
+    }
 };
 
 const containerStyle = computed(() => ({
@@ -352,17 +435,37 @@ onMounted(async () => {
     logs.value = [];
     isTailDisabled.value = false;
     firstLoading.value = true;
+    readReq.id = props.config.id;
+    readReq.type = props.config.type;
+    readReq.name = props.config.name;
+    readReq.taskID = props.config.taskID;
+    readReq.taskType = props.config.taskType;
+    readReq.taskOperate = props.config.taskOperate;
+    readReq.resourceID = props.config.resourceID;
     await init();
+
+    updateContainerHeight();
+
+    if (logContainer.value) {
+        resizeObserver = new ResizeObserver(() => {
+            updateContainerHeight();
+        });
+        resizeObserver.observe(logContainer.value);
+    }
+
     nextTick(() => {
         if (logContainer.value) {
-            logContainer.value.scrollTop = totalHeight.value;
-            containerHeight.value = logContainer.value.getBoundingClientRect().height;
+            logContainer.value.scrollTop = logContainer.value.scrollHeight;
         }
     });
 });
 
 onUnmounted(() => {
     onCloseLog();
+    if (resizeObserver && logContainer.value) {
+        resizeObserver.unobserve(logContainer.value);
+        resizeObserver.disconnect();
+    }
 });
 
 defineExpose({ changeTail, onDownload, clearLog });
@@ -381,13 +484,21 @@ defineExpose({ changeTail, onDownload, clearLog });
     width: 100%;
 }
 
-.log-item {
+.log-viewport {
     position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    will-change: transform;
+}
+
+.log-item {
     width: 100%;
     padding: 5px;
     color: #f5f5f5;
     box-sizing: border-box;
     white-space: nowrap;
+    overflow: hidden;
 }
 
 .log-content {

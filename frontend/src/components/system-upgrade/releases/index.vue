@@ -1,13 +1,17 @@
 <template>
-    <DrawerPro v-model="drawerVisible" :header="$t('app.version')" @close="handleClose" size="large">
-        <div class="note">
-            <el-collapse v-model="currentVersion" :accordion="true" v-loading="loading">
+    <DrawerPro v-model="drawerVisible" :header="$t('setting.release')" @close="handleClose" size="large">
+        <template #buttons>
+            <span>{{ version }}</span>
+            <CopyButton :content="version" type="primary" />
+        </template>
+        <div class="note" v-loading="loading">
+            <el-collapse v-if="notes && notes.length !== 0" v-model="currentVersion" :accordion="true">
                 <div v-for="(item, index) in notes" :key="index">
                     <el-collapse-item :name="index">
                         <template #title>
                             <div>
                                 <span class="version">{{ item.version }}</span>
-                                <span class="date">{{ item.createdAt }}</span>
+                                <span v-if="!mobile" class="date">{{ item.createdAt }}</span>
                             </div>
                             <svg-icon class="icon" iconName="p-featureshitu"></svg-icon>
                             <span class="icon-span">{{ item.newCount }}</span>
@@ -22,6 +26,16 @@
                     </el-collapse-item>
                 </div>
             </el-collapse>
+            <el-empty v-else>
+                <template #description>
+                    <span class="input-help">
+                        {{ $t('setting.releaseHelper') }}
+                        <el-link class="pageRoute" icon="Position" type="primary">
+                            {{ $t('firewall.quickJump') }}
+                        </el-link>
+                    </span>
+                </template>
+            </el-empty>
         </div>
         <template #footer>
             <span class="dialog-footer">
@@ -40,14 +54,23 @@ import { GlobalStore } from '@/store';
 import { storeToRefs } from 'pinia';
 
 const globalStore = GlobalStore();
+const mobile = computed(() => {
+    return globalStore.isMobile();
+});
+
 const { isDarkTheme } = storeToRefs(globalStore);
 
 const drawerVisible = ref(false);
 const currentVersion = ref(0);
 const notes = ref([]);
 const loading = ref();
+const version = ref();
 
-const acceptParams = (): void => {
+interface DialogProps {
+    version: string;
+}
+const acceptParams = (params: DialogProps): void => {
+    version.value = params.version;
     search();
     drawerVisible.value = true;
 };
@@ -60,7 +83,7 @@ const search = async () => {
     loading.value = true;
     await listReleases()
         .then((res) => {
-            notes.value = res.data;
+            notes.value = res.data || [];
             loading.value = false;
         })
         .catch(() => {
@@ -97,8 +120,16 @@ defineExpose({
 :deep(.md-editor-dark) {
     background-color: var(--panel-main-bg-color-9);
 }
+:deep(.el-collapse-item__content) {
+    padding: 0px;
+}
 .icon {
     font-size: 7px;
     margin-left: 50px;
+}
+.pageRoute {
+    font-size: 12px;
+    margin-left: 5px;
+    margin-top: -4px;
 }
 </style>

@@ -341,7 +341,7 @@
         <PruneDialog @search="search" ref="dialogPruneRef" />
 
         <RenameDialog @search="search" ref="dialogRenameRef" />
-        <ContainerLogDialog ref="dialogContainerLogRef" :highlightDiff="235" />
+        <ContainerLogDialog ref="dialogContainerLogRef" :highlightDiff="210" />
         <UpgradeDialog @search="search" ref="dialogUpgradeRef" />
         <CommitDialog @search="search" ref="dialogCommitRef" />
         <MonitorDialog ref="dialogMonitorRef" />
@@ -391,7 +391,7 @@ const selects = ref<any>([]);
 const paginationConfig = reactive({
     cacheSizeKey: 'container-page-size',
     currentPage: 1,
-    pageSize: 10,
+    pageSize: Number(localStorage.getItem('container-page-size')) || 10,
     total: 0,
     state: 'all',
     orderBy: 'createdAt',

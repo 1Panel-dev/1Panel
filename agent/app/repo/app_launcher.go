@@ -13,6 +13,10 @@ type ILauncherRepo interface {
 	Create(launcher *model.AppLauncher) error
 	Save(launcher *model.AppLauncher) error
 	Delete(opts ...DBOption) error
+
+	GetQuickJump(opts ...DBOption) (model.QuickJump, error)
+	ListQuickJump(withAll bool) []model.QuickJump
+	UpdateQuicks(quicks []model.QuickJump) error
 }
 
 func NewILauncherRepo() ILauncherRepo {
@@ -56,4 +60,46 @@ func (u *LauncherRepo) Delete(opts ...DBOption) error {
 		db = opt(db)
 	}
 	return db.Delete(&model.AppLauncher{}).Error
+}
+
+func (u *LauncherRepo) GetQuickJump(opts ...DBOption) (model.QuickJump, error) {
+	var launcher model.QuickJump
+	db := global.DB
+	for _, opt := range opts {
+		db = opt(db)
+	}
+	err := db.First(&launcher).Error
+	return launcher, err
+}
+func (u *LauncherRepo) ListQuickJump(withAll bool) []model.QuickJump {
+	var quicks []model.QuickJump
+	if withAll {
+		_ = global.DB.Find(&quicks).Error
+	} else {
+		_ = global.DB.Where("is_show = ?", true).Find(&quicks).Error
+	}
+	if !withAll && len(quicks) == 0 {
+		return []model.QuickJump{
+			{Name: "Website", Title: "menu.website", Recommend: 10, IsShow: true, Router: "/websites"},
+			{Name: "Database", Title: "menu.database", Recommend: 30, IsShow: true, Router: "/databases"},
+			{Name: "Cronjob", Title: "menu.cronjob", Recommend: 50, IsShow: true, Router: "/cronjobs"},
+			{Name: "AppInstalled", Title: "home.appInstalled", Recommend: 70, IsShow: true, Router: "/apps/installed"},
+		}
+	}
+
+	return quicks
+}
+func (u *LauncherRepo) UpdateQuicks(quicks []model.QuickJump) error {
+	tx := global.DB.Begin()
+	for _, item := range quicks {
+		if err := tx.Model(&model.QuickJump{}).Where("id = ?", item.ID).Updates(map[string]interface{}{
+			"is_show": item.IsShow,
+			"detail":  item.Detail,
+		}).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+	tx.Commit()
+	return nil
 }

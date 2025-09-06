@@ -140,7 +140,7 @@ import { App } from '@/api/interface/app';
 import { getAppByKey, getAppDetail, getAppInstalledByID } from '@/api/modules/app';
 import { Rules, checkNumberRange } from '@/global/form-rules';
 import { FormInstance, FormRules } from 'element-plus';
-import { reactive, ref, watch } from 'vue';
+import { ref, watch } from 'vue';
 import Params from '../params/index.vue';
 import { Container } from '@/api/interface/container';
 import CodemirrorPro from '@/components/codemirror-pro/index.vue';
@@ -222,10 +222,10 @@ const initFormData = () => ({
     restartPolicy: 'always',
 });
 
-const formData = reactive(props.modelValue || initFormData());
+const formData = ref(props.modelValue || initFormData());
 
 watch(
-    formData,
+    formData.value,
     (newVal) => {
         emit('update:modelValue', newVal);
     },
@@ -236,14 +236,14 @@ watch(
     () => props.modelValue,
     (newVal) => {
         if (newVal) {
-            Object.assign(formData, newVal);
+            Object.assign(formData.value, newVal);
         }
     },
     { immediate: true, deep: true },
 );
 
 const changeUnit = () => {
-    if (formData.memoryUnit == 'M') {
+    if (formData.value.memoryUnit == 'M') {
         limits.value.memory = oldMemory.value;
     } else {
         limits.value.memory = Number((oldMemory.value / 1024).toFixed(2));
@@ -257,8 +257,8 @@ const handleVersionChange = async (version: string) => {
 const getVersionDetail = async (version: string) => {
     try {
         const res = await getAppDetail(currentApp.value.id, version, 'app', operateNode.value);
-        formData.appDetailId = res.data.id;
-        formData.dockerCompose = res.data.dockerCompose;
+        formData.value.appDetailId = res.data.id;
+        formData.value.dockerCompose = res.data.dockerCompose;
         isHostMode.value = res.data.hostMode;
         if (env.value) {
             installParams.value = addMasterParams(res.data.params);
@@ -273,13 +273,13 @@ const getVersionDetail = async (version: string) => {
 };
 
 const initForm = async (appKey: string) => {
-    formData.name = appKey;
+    formData.value.name = appKey;
     const res = await getAppByKey(appKey);
     currentApp.value = res.data;
     appVersions.value = currentApp.value.versions;
     if (appVersions.value.length > 0) {
         const defaultVersion = appVersions.value[0];
-        formData.version = defaultVersion;
+        formData.value.version = defaultVersion;
         getVersionDetail(defaultVersion);
     }
 };
@@ -332,10 +332,10 @@ const initClusterForm = async (props: ClusterProps) => {
             return v.includes(props.role) && v.includes(props.masterVersion);
         });
         const defaultVersion = appVersions.value[0];
-        formData.version = defaultVersion;
+        formData.value.version = defaultVersion;
         getVersionDetail(defaultVersion);
     }
-    formData.name = props.key + '-' + props.role;
+    formData.value.name = props.key + '-' + props.role;
 };
 
 const resetForm = () => {
@@ -343,7 +343,7 @@ const resetForm = () => {
         formRef.value.clearValidate();
         formRef.value.resetFields();
     }
-    Object.assign(formData, initFormData());
+    Object.assign(formData.value, initFormData());
     isHostMode.value = false;
     memoryRequired.value = 0;
     gpuSupport.value = false;
@@ -367,11 +367,11 @@ const clearValidate = () => {
 };
 
 const getFormData = () => {
-    return { ...formData };
+    return { ...formData.value };
 };
 
 const setFormData = (data: any) => {
-    Object.assign(formData, data);
+    Object.assign(formData.value, data);
 };
 
 const loadLimit = async () => {

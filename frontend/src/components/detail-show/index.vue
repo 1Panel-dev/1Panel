@@ -4,7 +4,7 @@
             <el-descriptions border :column="1">
                 <el-descriptions-item v-for="(item, key) in list" :label="item.label" :key="key">
                     {{ item.value }}
-                    <CopyButton v-if="!item.hideCopy" :content="item.value" type="icon" />
+                    <CopyButton v-if="!item.hideCopy" :content="item.value" />
                 </el-descriptions-item>
             </el-descriptions>
         </div>

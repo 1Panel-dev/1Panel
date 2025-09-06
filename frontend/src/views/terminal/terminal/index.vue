@@ -161,6 +161,7 @@ import { getHostTree, testByID, testLocalConn } from '@/api/modules/terminal';
 import { GlobalStore } from '@/store';
 import router from '@/routers';
 import { getCommandTree } from '@/api/modules/command';
+import { getAgentSettingByKey } from '@/api/modules/setting';
 
 const dialogRef = ref();
 const ctx = getCurrentInstance() as any;
@@ -207,20 +208,24 @@ const initCmd = ref('');
 const acceptParams = async () => {
     globalStore.isFullScreen = false;
     loadCommandTree();
-    const res = await getHostTree({});
-    hostTree.value = res.data;
+    loadHostTree();
+    if (terminalTabs.value.length === 0) {
+        await getAgentSettingByKey('LocalSSHConn').then((res) => {
+            if (res.data.length !== 0) {
+                onNewLocal();
+            }
+        });
+    }
     timer = setInterval(() => {
         syncTerminal();
     }, 1000 * 5);
-    if (terminalTabs.value.length === 0) {
-        onNewLocal();
-    }
     if (!mobile.value) {
         screenfull.on('change', () => {
             globalStore.isFullScreen = screenfull.isFullscreen;
         });
     }
 };
+
 const cleanTimer = () => {
     clearInterval(Number(timer));
     timer = null;

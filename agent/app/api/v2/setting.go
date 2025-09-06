@@ -1,13 +1,12 @@
 package v2
 
 import (
+	"encoding/base64"
 	"encoding/json"
-	"os"
-	"os/user"
-	"path"
 
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/ssh"
 	"github.com/gin-gonic/gin"
@@ -71,6 +70,35 @@ func (b *BaseApi) LoadBaseDir(c *gin.Context) {
 	helper.SuccessWithData(c, global.Dir.DataDir)
 }
 
+// @Tags System Setting
+// @Summary Load local conn
+// @Success 200 {object} dto.SSHConnData
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /settings/ssh [get]
+func (b *BaseApi) LoadLocalConn(c *gin.Context) {
+	connInfoInDB, err := settingService.GetSSHInfo()
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	var data dto.SSHConnData
+	if err := json.Unmarshal([]byte(connInfoInDB), &data); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	if len(data.Password) != 0 {
+		data.Password = base64.StdEncoding.EncodeToString([]byte(data.Password))
+	}
+	if len(data.PrivateKey) != 0 {
+		data.PrivateKey = base64.StdEncoding.EncodeToString([]byte(data.PrivateKey))
+	}
+	if len(data.PassPhrase) != 0 {
+		data.PassPhrase = base64.StdEncoding.EncodeToString([]byte(data.PassPhrase))
+	}
+	helper.SuccessWithData(c, data)
+}
+
 func (b *BaseApi) CheckLocalConn(c *gin.Context) {
 	_, err := loadLocalConn()
 	helper.SuccessWithData(c, err == nil)
@@ -87,6 +115,7 @@ func (b *BaseApi) CheckLocalConnByInfo(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
+
 	helper.SuccessWithData(c, settingService.TestConnByInfo(req))
 }
 
@@ -96,39 +125,20 @@ func (b *BaseApi) CheckLocalConnByInfo(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /settings/ssh [post]
-func (b *BaseApi) SaveLocalConnInfo(c *gin.Context) {
+func (b *BaseApi) SaveLocalConn(c *gin.Context) {
 	var req dto.SSHConnData
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	helper.SuccessWithData(c, settingService.SaveConnInfo(req))
+
+	if err := settingService.SaveConnInfo(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
 }
 
 func loadLocalConn() (*ssh.SSHClient, error) {
-	itemPath := ""
-	currentInfo, _ := user.Current()
-	if len(currentInfo.HomeDir) == 0 {
-		itemPath = "/root/.ssh/id_ed25519_1panel"
-	} else {
-		itemPath = path.Join(currentInfo.HomeDir, ".ssh/id_ed25519_1panel")
-	}
-	if _, err := os.Stat(itemPath); err != nil {
-		_ = sshService.CreateRootCert(dto.CreateRootCert{EncryptionMode: "ed25519", Name: "id_ed25519_1panel", Description: "1Panel Terminal"})
-	}
-
-	privateKey, _ := os.ReadFile(itemPath)
-	connWithKey := ssh.ConnInfo{
-		Addr:       "127.0.0.1",
-		User:       "root",
-		Port:       22,
-		AuthMode:   "key",
-		PrivateKey: privateKey,
-	}
-	client, err := ssh.NewClient(connWithKey)
-	if err == nil {
-		return client, nil
-	}
-
 	connInfoInDB, err := settingService.GetSSHInfo()
 	if err != nil {
 		return nil, err
@@ -136,11 +146,20 @@ func loadLocalConn() (*ssh.SSHClient, error) {
 	if len(connInfoInDB) == 0 {
 		return nil, errors.New("no such ssh conn info in db!")
 	}
-	var connInDB ssh.ConnInfo
+	var connInDB model.LocalConnInfo
 	if err := json.Unmarshal([]byte(connInfoInDB), &connInDB); err != nil {
 		return nil, err
 	}
-	return ssh.NewClient(connInDB)
+	sshInfo := ssh.ConnInfo{
+		Addr:       connInDB.Addr,
+		Port:       int(connInDB.Port),
+		User:       connInDB.User,
+		AuthMode:   connInDB.AuthMode,
+		Password:   connInDB.Password,
+		PrivateKey: []byte(connInDB.PrivateKey),
+		PassPhrase: []byte(connInDB.PassPhrase),
+	}
+	return ssh.NewClient(sshInfo)
 }
 
 // @Tags System Setting

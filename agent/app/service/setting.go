@@ -143,6 +143,13 @@ func (u *SettingService) GetSettingByKey(key string) string {
 	case "SystemIP":
 		value, _ := settingRepo.GetValueByKey(key)
 		return value
+	case "LocalSSHConn":
+		value, _ := settingRepo.GetValueByKey(key)
+		if len(value) == 0 {
+			return ""
+		}
+		itemStr, _ := encrypt.StringDecryptWithBase64(value)
+		return itemStr
 	default:
 		return ""
 	}

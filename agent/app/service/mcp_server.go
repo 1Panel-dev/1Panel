@@ -59,7 +59,11 @@ func (m McpServerService) Page(req request.McpServerSearch) response.McpServersR
 			Environments: make([]request.Environment, 0),
 			Volumes:      make([]request.Volume, 0),
 		}
-		project, _ := docker.GetComposeProject(item.Name, path.Join(global.Dir.McpDir, item.Name), []byte(item.DockerCompose), []byte(item.Env), true)
+		project, err := docker.GetComposeProject(item.Name, path.Join(global.Dir.McpDir, item.Name), []byte(item.DockerCompose), []byte(item.Env), true)
+		if err != nil {
+			global.LOG.Errorf("get mcp compose project error: %s", err.Error())
+			continue
+		}
 		for _, service := range project.Services {
 			if service.Environment != nil {
 				for key, value := range service.Environment {
@@ -86,11 +90,7 @@ func (m McpServerService) Page(req request.McpServerSearch) response.McpServersR
 }
 
 func (m McpServerService) Update(req request.McpServerUpdate) error {
-	go func() {
-		if err := docker.PullImage("supercorp/supergateway:latest"); err != nil {
-			global.LOG.Errorf("docker pull mcp image error: %s", err.Error())
-		}
-	}()
+	go pullImage(req.Type)
 	mcpServer, err := mcpServerRepo.GetFirst(repo.WithByID(req.ID))
 	if err != nil {
 		return err
@@ -115,6 +115,7 @@ func (m McpServerService) Update(req request.McpServerUpdate) error {
 	mcpServer.HostIP = req.HostIP
 	mcpServer.StreamableHttpPath = req.StreamableHttpPath
 	mcpServer.OutputTransport = req.OutputTransport
+	mcpServer.Type = req.Type
 	if err := handleCreateParams(mcpServer, req.Environments, req.Volumes); err != nil {
 		return err
 	}
@@ -137,11 +138,7 @@ func (m McpServerService) Update(req request.McpServerUpdate) error {
 }
 
 func (m McpServerService) Create(create request.McpServerCreate) error {
-	go func() {
-		if err := docker.PullImage("supercorp/supergateway:latest"); err != nil {
-			global.LOG.Errorf("docker pull mcp image error: %s", err.Error())
-		}
-	}()
+	go pullImage(create.Type)
 	servers, _ := mcpServerRepo.List()
 	for _, server := range servers {
 		if server.Port == create.Port {
@@ -177,6 +174,7 @@ func (m McpServerService) Create(create request.McpServerCreate) error {
 		HostIP:             create.HostIP,
 		StreamableHttpPath: create.StreamableHttpPath,
 		OutputTransport:    create.OutputTransport,
+		Type:               create.Type,
 	}
 	if err := handleCreateParams(mcpServer, create.Environments, create.Volumes); err != nil {
 		return err
@@ -590,6 +588,11 @@ func handleCreateParams(mcpServer *model.McpServer, environments []request.Envir
 		}
 		serviceValue["volumes"] = volumeList
 	}
+	if mcpServer.Type == "npx" {
+		serviceValue["image"] = "supercorp/supergateway:latest"
+	} else {
+		serviceValue["image"] = "supercorp/supergateway:uvx"
+	}
 
 	services[mcpServer.Name] = serviceValue
 	composeByte, err := yaml.Marshal(composeMap)
@@ -641,7 +644,7 @@ func syncMcpServerContainerStatus(mcpServer *model.McpServer) error {
 	case "restarting":
 		mcpServer.Status = constant.StatusRestarting
 	default:
-		if mcpServer.Status != constant.StatusBuilding {
+		if mcpServer.Status != constant.StatusStarting {
 			mcpServer.Status = constant.StatusStopped
 		}
 	}
@@ -655,4 +658,16 @@ func GetWebsiteID() uint {
 	}
 	websiteIDUint, _ := strconv.ParseUint(websiteID.Value, 10, 64)
 	return uint(websiteIDUint)
+}
+
+func pullImage(imageType string) {
+	if imageType == "npx" {
+		if err := docker.PullImage("supercorp/supergateway:latest"); err != nil {
+			global.LOG.Errorf("docker pull mcp image error: %s", err.Error())
+		}
+	} else {
+		if err := docker.PullImage("supercorp/supergateway:uvx"); err != nil {
+			global.LOG.Errorf("docker pull mcp image error: %s", err.Error())
+		}
+	}
 }

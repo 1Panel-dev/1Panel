@@ -272,8 +272,10 @@
                         v-if="ipTypes.includes(dialogData.rowData!.type)"
                         prop="count"
                     >
-                        <div class="flex items-center flex-row md:flex-nowrap flex-wrap justify-between gap-x-3 w-full">
-                            <el-form-item prop="cycle">
+                        <div
+                            class="flex items-center flex-row md:flex-nowrap sm:flex-nowrap flex-wrap justify-between gap-2 w-full"
+                        >
+                            <el-form-item prop="cycle" class="md:flex-1 sm:flex-1">
                                 <el-input v-model.number="dialogData.rowData!.cycle" :max="200">
                                     <template #append>{{ $t('commons.units.minute') }}</template>
                                 </el-input>
@@ -282,7 +284,7 @@
                             <span class="whitespace-nowrap input-help w-[4.5rem]">
                                 {{ $t('xpack.alert.loginFail') }}
                             </span>
-                            <el-form-item prop="count">
+                            <el-form-item prop="count" class="md:flex-1 sm:flex-1">
                                 <el-input v-model.number="dialogData.rowData!.count">
                                     <template #append>{{ $t('commons.units.time') }}</template>
                                 </el-input>
@@ -369,7 +371,7 @@ import { routerToName } from '@/utils/router';
 import { checkCidr, checkCidrV6, checkIpV4V6 } from '@/utils/util';
 
 const globalStore = GlobalStore();
-const { isMaster } = storeToRefs(globalStore);
+const { isMaster, isProductPro } = storeToRefs(globalStore);
 
 interface DialogProps {
     title: string;
@@ -436,91 +438,77 @@ const rules = reactive({
 });
 
 const allTaskOptions = [
-    { value: 'ssl', label: 'xpack.alert.ssl', show: true },
-    { value: 'siteEndTime', label: 'xpack.alert.siteEndTime', show: true },
     { value: 'panelPwdEndTime', label: 'xpack.alert.panelPwdEndTime', show: isMaster.value },
-    { value: 'panelUpdate', label: 'xpack.alert.panelUpdate', show: isMaster.value },
-    { value: 'nodeException', label: 'xpack.alert.nodeException', show: isMaster.value },
-    { value: 'licenseException', label: 'xpack.alert.licenseException', show: isMaster.value },
     { value: 'panelLogin', label: 'xpack.alert.panelLogin', show: isMaster.value },
     { value: 'sshLogin', label: 'xpack.alert.sshLogin', show: true },
-    { value: 'clams', label: 'xpack.alert.clams', show: true },
-    { value: 'cronJob', label: 'xpack.alert.cronjob', show: true },
+    { value: 'licenseException', label: 'xpack.alert.licenseException', show: isMaster.value && isProductPro.value },
+    { value: 'ssl', label: 'xpack.alert.ssl', show: true },
+    { value: 'siteEndTime', label: 'xpack.alert.siteEndTime', show: true },
+    { value: 'nodeException', label: 'xpack.alert.nodeException', show: isMaster.value && isProductPro.value },
     { value: 'cpu', label: 'xpack.alert.cpu', show: true },
     { value: 'memory', label: 'xpack.alert.memory', show: true },
-    { value: 'load', label: 'xpack.alert.load', show: true },
     { value: 'disk', label: 'xpack.alert.disk', show: true },
+    { value: 'load', label: 'xpack.alert.load', show: true },
+    { value: 'cronJob', label: 'xpack.alert.cronjob', show: true },
+    { value: 'clams', label: 'xpack.alert.clams', show: true },
+    { value: 'panelUpdate', label: 'xpack.alert.panelUpdate', show: isMaster.value },
 ];
 
-function checkCycle(rule: any, value: any, callback: any) {
-    if (value === '') {
-        callback();
+function checkRange(value: any, min: number, max: number, callback: any) {
+    const num = Number(value);
+    if (isNaN(num)) {
+        return callback(new Error(i18n.global.t('commons.rule.number')));
     }
-    if (dialogData.value.rowData.type === 'ssl') {
-        const regex = /^(?:[1-9]|[1-5][0-9]|60)$/;
-        if (!regex.test(value)) {
-            return callback(new Error(i18n.global.t('commons.rule.numberRange', [1, 60])));
-        }
-    } else if (ipTypes.includes(dialogData.value.rowData.type)) {
-        const regex = /^(?:[1-9]|[1-5][0-9]|200)$/;
-        if (!regex.test(value)) {
-            return callback(new Error(i18n.global.t('commons.rule.numberRange', [1, 200])));
-        }
-    } else {
-        const regex = /^(?:[1-9]|[12][0-9]|30)$/;
-        if (!regex.test(value)) {
-            return callback(new Error(i18n.global.t('commons.rule.numberRange', [1, 30])));
-        }
+    if (num < min || num > max) {
+        return callback(new Error(i18n.global.t('commons.rule.numberRange', [min, max])));
     }
     callback();
 }
 
+function checkCycle(rule: any, value: any, callback: any) {
+    if (value === '') return callback();
+
+    const type = dialogData.value.rowData.type;
+
+    if (type === 'ssl') {
+        return checkRange(value, 1, 60, callback);
+    } else if (ipTypes.includes(type)) {
+        return checkRange(value, 1, 200, callback);
+    } else {
+        return checkRange(value, 1, 30, callback);
+    }
+}
+
 function checkCount(rule: any, value: any, callback: any) {
-    if (value === '') {
-        callback();
+    if (value === '') return callback();
+
+    const type = dialogData.value.rowData.type;
+    const cycle = dialogData.value.rowData.cycle;
+
+    if (avgTypes.includes(type) || ipTypes.includes(type)) {
+        return checkRange(value, 1, 100, callback);
     }
-    if (avgTypes.includes(dialogData.value.rowData.type) || ipTypes.includes(dialogData.value.rowData.type)) {
-        const regex = /^(?:[1-9]|[1-9][0-9]|100)$/;
-        if (!regex.test(value)) {
-            return callback(new Error(i18n.global.t('commons.rule.numberRange', [1, 100])));
-        }
-    }
-    if (dialogData.value.rowData.type === 'disk' && dialogData.value.rowData.cycle === 2) {
-        const regex = /^(?:[1-9]|[1-9][0-9]|100)$/;
-        if (!regex.test(value)) {
-            return callback(new Error(i18n.global.t('commons.rule.numberRange', [1, 100])));
-        }
+    if (type === 'disk' && cycle === 2) {
+        return checkRange(value, 1, 100, callback);
     }
     callback();
 }
 
 function checkSendCount(rule: any, value: any, callback: any) {
-    if (value === '') {
-        callback();
-    }
-    if (dialogData.value.rowData.type === 'disk' || avgTypes.includes(dialogData.value.rowData.type)) {
-        const regex = /^(?:[1-9]|[1-4][0-9]|50)$/;
-        if (!regex.test(value)) {
-            return callback(new Error(i18n.global.t('commons.rule.numberRange', [1, 50])));
-        }
-    } else if (noParamTypes.includes(dialogData.value.rowData.type)) {
-        const regex = /^(?:[1-9]|[12][0-9]|30)$/;
-        if (!regex.test(value)) {
-            return callback(new Error(i18n.global.t('commons.rule.numberRange', [1, 30])));
-        }
-    } else {
-        if (dialogData.value.rowData.cycle > 0) {
-            const minValue = 1;
-            const maxValue = dialogData.value.rowData.cycle;
-            const regex = new RegExp(`^(${minValue}|[2-9]|[1-9][0-9]*|${maxValue})$`);
-            if (!regex.test(value) || value > maxValue) {
-                return callback(
-                    new Error(i18n.global.t('commons.rule.numberRange', [1, dialogData.value.rowData.cycle])),
-                );
-            }
-        }
-    }
+    if (value === '') return callback();
 
+    const type = dialogData.value.rowData.type;
+    const cycle = dialogData.value.rowData.cycle;
+
+    if (type === 'disk' || avgTypes.includes(type) || ipTypes.includes(type)) {
+        return checkRange(value, 1, 50, callback);
+    } else if (noParamTypes.includes(type)) {
+        return checkRange(value, 1, 30, callback);
+    } else {
+        if (cycle > 0) {
+            return checkRange(value, 1, cycle, callback);
+        }
+    }
     callback();
 }
 

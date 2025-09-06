@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
+	"maps"
 	"net/http"
 	"strings"
 )
@@ -46,9 +47,9 @@ func (d *DigestAuth) Close() error {
 }
 
 func (d *DigestAuth) Clone() Authenticator {
-	parts := make(map[string]string, len(d.digestParts))
-	for k, v := range d.digestParts {
-		parts[k] = v
+	var parts map[string]string
+	if parts = maps.Clone(parts); parts == nil {
+		parts = make(map[string]string)
 	}
 	return &DigestAuth{user: d.user, pw: d.pw, digestParts: parts}
 }

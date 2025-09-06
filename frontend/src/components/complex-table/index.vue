@@ -112,6 +112,8 @@ const rightClick = ref({
     currentRow: null,
 });
 const handleRightClick = (row, column, event) => {
+    clearSelects();
+    tableRef.value.refElTable.toggleRowSelection(row);
     if (!props.rightButtons) {
         return;
     }
@@ -126,6 +128,7 @@ const handleRightClick = (row, column, event) => {
 };
 const closeRightClick = () => {
     rightClick.value.visible = false;
+    clearSelects();
     document.removeEventListener('click', closeRightClick);
 };
 const disabled = computed(() => {
@@ -134,6 +137,7 @@ const disabled = computed(() => {
     };
 });
 function rightButtonClick(btn: any) {
+    closeRightClick();
     btn.click(rightClick.value.currentRow);
 }
 
@@ -191,8 +195,14 @@ watch(
     { immediate: true },
 );
 
-function handleRowClick(row: any, column: any, event: MouseEvent) {
+function handleRowClick(row: any, column: any, event: any) {
     if (!tableRef.value) return;
+    try {
+        const selectionColumn = tableRef.value.refElTable.columns.find((col) => col.type === 'selection');
+        const isSelectable = selectionColumn.selectable(row);
+        if (!isSelectable) return;
+    } catch {}
+
     const target = event.target as HTMLElement;
 
     if (target.closest('.el-checkbox')) return;
@@ -215,30 +225,30 @@ defineExpose({
     closeRightClick,
 });
 
-onMounted(() => {
-    let heightDiff = 320;
-    let tabHeight = 0;
-    if (props.heightDiff) {
-        heightDiff = props.heightDiff;
-    }
-    if (globalStore.openMenuTabs) {
-        tabHeight = 48;
-    }
+function calcHeight() {
+    let heightDiff = props.heightDiff ?? 320;
+    let tabHeight = globalStore.openMenuTabs ? 48 : 0;
+
     if (props.height) {
         tableHeight.value = props.height - tabHeight;
     } else {
         tableHeight.value = window.innerHeight - heightDiff - tabHeight;
     }
+}
 
-    window.onresize = () => {
-        return (() => {
-            if (props.height) {
-                tableHeight.value = props.height - tabHeight;
-            } else {
-                tableHeight.value = window.innerHeight - heightDiff - tabHeight;
-            }
-        })();
-    };
+onMounted(() => {
+    calcHeight();
+    window.addEventListener('resize', calcHeight);
+    watch(
+        () => props.height,
+        () => {
+            calcHeight();
+        },
+    );
+});
+
+onBeforeUnmount(() => {
+    window.removeEventListener('resize', calcHeight);
 });
 </script>
 

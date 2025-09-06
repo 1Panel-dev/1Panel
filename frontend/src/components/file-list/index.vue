@@ -46,37 +46,54 @@
             </el-button>
         </div>
         <div>
-            <el-table :data="data" highlight-current-row height="40vh">
-                <el-table-column show-overflow-tooltip fix>
+            <el-table :data="data" highlight-current-row height="40vh" @row-click="openDir" class="cursor-pointer">
+                <el-table-column prop="name" show-overflow-tooltip fix>
                     <template #default="{ row }">
-                        <div>
-                            <svg-icon
-                                :class="'table-icon'"
-                                :iconName="row.isDir ? 'p-file-folder' : 'p-file-normal'"
-                            ></svg-icon>
+                        <svg-icon
+                            :class="'table-icon'"
+                            :iconName="row.isDir ? 'p-file-folder' : 'p-file-normal'"
+                        ></svg-icon>
+                        <template v-if="!row.isCreate">
+                            {{ row.name }}
+                        </template>
 
-                            <template v-if="!row.isCreate">
-                                <el-link underline="never" @click="openDir(row)">
-                                    {{ row.name }}
-                                </el-link>
-                            </template>
-
-                            <template v-else>
-                                <el-input
-                                    ref="rowRefs"
-                                    v-model="newFolder"
-                                    class="p-w-200"
-                                    placeholder="new folder"
-                                    @input="handleChange(newFolder, row)"
-                                ></el-input>
-                                <el-button link @click="createFolder(row)" type="primary" size="small" class="ml-2">
-                                    {{ $t('commons.button.save') }}
-                                </el-button>
-                                <el-button link @click="cancelFolder(row)" type="primary" size="small" class="!ml-2">
-                                    {{ $t('commons.button.cancel') }}
-                                </el-button>
-                            </template>
-                        </div>
+                        <template v-else>
+                            <el-input
+                                ref="rowRefs"
+                                v-model="newFolder"
+                                class="p-w-200"
+                                placeholder="new folder"
+                                @input="handleChange(newFolder, row)"
+                            ></el-input>
+                            <el-button link @click="createFolder(row)" type="primary" size="small" class="ml-2">
+                                {{ $t('commons.button.save') }}
+                            </el-button>
+                            <el-button link @click="cancelFolder(row)" type="primary" size="small" class="!ml-2">
+                                {{ $t('commons.button.cancel') }}
+                            </el-button>
+                        </template>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="size" width="160px" fix>
+                    <template #default="{ row }">
+                        <el-button
+                            type="primary"
+                            link
+                            small
+                            v-if="!row.isCreate"
+                            :loading="row.btnLoading"
+                            @click="row.isDir ? getDirSize(row.path) : getFileSize(row.path)"
+                        >
+                            <span v-if="row.isDir">
+                                <span v-if="row.dirSize === undefined">
+                                    {{ $t('file.calculate') }}
+                                </span>
+                                <span v-else>{{ computeSize(row.dirSize) }}</span>
+                            </span>
+                            <span v-else>
+                                {{ computeSize(row.size) }}
+                            </span>
+                        </el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -107,11 +124,12 @@
 
 <script lang="ts" setup>
 import { File } from '@/api/interface/file';
-import { createFile, getFilesList } from '@/api/modules/files';
+import { computeDirSize, createFile, getFileContent, getFilesList } from '@/api/modules/files';
 import { onUpdated, reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgSuccess, MsgWarning } from '@/utils/message';
 import { useSearchableForSelect } from '@/views/host/file-management/hooks/searchable';
+import { computeSize } from '@/utils/util';
 
 const data = ref([]);
 const loading = ref(false);
@@ -170,7 +188,10 @@ const openPage = () => {
     selectRow.value.path = form.dir ? form.path || '/' : '';
 };
 
-const openDir = async (row: File.File) => {
+const openDir = async (row: File.File, column: any, event: any) => {
+    if (event?.target?.tagName === 'BUTTON' || event?.target?.tagName === 'SPAN') {
+        return;
+    }
     if (row.isDir) {
         const name = row.name;
         paths.value.push(name);
@@ -218,6 +239,40 @@ const jumpPath = async () => {
     } finally {
         loading.value = false;
     }
+};
+
+const getFileSize = async (path: string) => {
+    let params = {
+        path: path,
+        expand: true,
+        isDetail: true,
+        page: 1,
+        pageSize: 100,
+    };
+    updateByPath(path, { btnLoading: true });
+    try {
+        const res = await getFileContent(params);
+        updateByPath(path, { dirSize: res.data.size });
+    } finally {
+        updateByPath(path, { btnLoading: false });
+    }
+};
+
+const getDirSize = async (path: string) => {
+    const req = {
+        path: path,
+    };
+    updateByPath(path, { btnLoading: true });
+    try {
+        const res = await computeDirSize(req);
+        updateByPath(path, { dirSize: res.data.size });
+    } finally {
+        updateByPath(path, { btnLoading: false });
+    }
+};
+
+const updateByPath = (path: string, patch: Partial<(typeof data.value)[0]>) => {
+    data.value = data.value.map((item) => (item.path === path ? { ...item, ...patch } : item));
 };
 
 const getPaths = (reqPath: string) => {

@@ -21,7 +21,7 @@
                 <el-image class="w-32 h-32" :src="qrImage" />
                 <span class="input-help flex items-center">
                     <span>{{ $t('setting.secret') }}: {{ form.secret }}</span>
-                    <CopyButton :content="form.secret" type="icon" />
+                    <CopyButton :content="form.secret" />
                 </span>
             </el-form-item>
             <el-form-item :label="$t('commons.table.title')" prop="title">

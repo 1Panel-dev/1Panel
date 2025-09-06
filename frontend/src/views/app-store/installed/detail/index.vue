@@ -30,7 +30,7 @@
                 </el-descriptions-item>
                 <el-descriptions-item v-for="(param, key) in params" :label="getLabel(param)" :key="key">
                     <span>{{ param.showValue && param.showValue != '' ? param.showValue : param.value }}</span>
-                    <CopyButton v-if="showCopyButton(param.key)" :content="param.value" type="icon" />
+                    <CopyButton v-if="showCopyButton(param.key)" :content="param.value" />
                 </el-descriptions-item>
             </el-descriptions>
         </div>
@@ -290,6 +290,9 @@ const get = async () => {
         paramModel.isHostMode = res.data.hostMode;
         paramModel.specifyIP = res.data.specifyIP;
         paramModel.restartPolicy = res.data.restartPolicy || 'no';
+        if (paramModel.restartPolicy === 'on-failure:5') {
+            paramModel.restartPolicy = 'on-failure';
+        }
         appConfigUpdate.value.webUI = res.data.webUI;
         if (res.data.webUI != '') {
             const httpConfig = splitHttp(res.data.webUI);

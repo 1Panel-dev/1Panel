@@ -67,6 +67,7 @@ const (
 	TaskPush      = "TaskPush"
 	TaskClean     = "TaskClean"
 	TaskHandle    = "TaskHandle"
+	TaskScan      = "TaskScan"
 	TaskExec      = "TaskExec"
 )
 
@@ -77,6 +78,7 @@ const (
 	TaskScopeRuntime          = "Runtime"
 	TaskScopeDatabase         = "Database"
 	TaskScopeCronjob          = "Cronjob"
+	TaskScopeClam             = "Clam"
 	TaskScopeSystem           = "System"
 	TaskScopeAppStore         = "AppStore"
 	TaskScopeSnapshot         = "Snapshot"

@@ -78,6 +78,18 @@
                                     @change="changeItem()"
                                 />
                             </el-form-item>
+                            <el-form-item :label="$t('terminal.defaultConn')">
+                                <el-switch v-model="form.showDefaultConn" @change="changeShow" />
+                                <span class="input-help">{{ $t('terminal.defaultConnHelper') }}</span>
+                                <el-button
+                                    type="primary"
+                                    @click="dialogRef.acceptParams(false)"
+                                    v-if="form.showDefaultConn"
+                                    link
+                                >
+                                    {{ $t('commons.button.view') }}
+                                </el-button>
+                            </el-form-item>
                             <el-form-item>
                                 <el-button @click="onSetDefault()" plain>
                                     {{ $t('commons.button.setDefault') }}
@@ -90,14 +102,16 @@
                 </el-form>
             </template>
         </LayoutContent>
+        <OperateDialog @search="loadConnShow" ref="dialogRef" />
     </div>
 </template>
 
 <script lang="ts" setup>
 import { ref, reactive } from 'vue';
 import { ElForm } from 'element-plus';
-import { getTerminalInfo, UpdateTerminalInfo } from '@/api/modules/setting';
+import { getAgentSettingByKey, getTerminalInfo, updateAgentSetting, UpdateTerminalInfo } from '@/api/modules/setting';
 import { Terminal } from '@xterm/xterm';
+import OperateDialog from '@/views/terminal/setting/default_conn/index.vue';
 import '@xterm/xterm/css/xterm.css';
 import { FitAddon } from '@xterm/addon-fit';
 import i18n from '@/lang';
@@ -106,6 +120,7 @@ import { TerminalStore } from '@/store';
 
 const loading = ref(false);
 const terminalStore = TerminalStore();
+const dialogRef = ref();
 
 const terminalElement = ref<HTMLDivElement | null>(null);
 const fitAddon = new FitAddon();
@@ -119,10 +134,12 @@ const form = reactive({
     cursorStyle: 'underline',
     scrollback: 1000,
     scrollSensitivity: 10,
+    showDefaultConn: false,
 });
 
 const acceptParams = () => {
     search(true);
+    loadConnShow();
     iniTerm();
 };
 
@@ -146,6 +163,22 @@ const search = async (withReset?: boolean) => {
         .catch(() => {
             loading.value = false;
         });
+};
+
+const loadConnShow = async () => {
+    await getAgentSettingByKey('LocalSSHConn').then((res) => {
+        form.showDefaultConn = res.data.length !== 0;
+    });
+};
+
+const changeShow = async () => {
+    if (form.showDefaultConn) {
+        dialogRef.value.acceptParams(true);
+        return;
+    }
+    await updateAgentSetting({ key: 'LocalSSHConn', value: '' }).then(() => {
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+    });
 };
 
 const iniTerm = () => {

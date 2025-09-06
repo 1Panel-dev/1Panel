@@ -54,7 +54,7 @@
                     :data="data"
                     :heightDiff="300"
                 >
-                    <el-table-column type="selection" fix />
+                    <el-table-column type="selection" :selectable="selectable" fix />
                     <el-table-column
                         :label="$t('cronjob.taskName')"
                         :min-width="120"
@@ -140,7 +140,7 @@
                         <template #default="{ row }">
                             <el-button v-if="row.lastRecordStatus === 'Success'" icon="Select" link type="success" />
                             <el-button v-if="row.lastRecordStatus === 'Failed'" icon="CloseBold" link type="danger" />
-                            <el-button v-if="row.lastRecordStatus === 'Waiting'" icon="SemiSelect" link type="info" />
+                            <el-button v-if="row.lastRecordStatus === 'Waiting'" :loading="true" link type="info" />
                             {{ row.lastRecordTime }}
                         </template>
                     </el-table-column>
@@ -260,7 +260,7 @@ const data = ref();
 const paginationConfig = reactive({
     cacheSizeKey: 'cronjob-page-size',
     currentPage: 1,
-    pageSize: 10,
+    pageSize: Number(localStorage.getItem('cronjob-page-size')) || 10,
     total: 0,
     orderBy: 'createdAt',
     order: 'null',
@@ -306,6 +306,10 @@ const dialogBackupRef = ref();
 const onOpenDialog = async (id: string) => {
     routerToNameWithQuery('CronjobOperate', { id: id });
 };
+
+function selectable(row) {
+    return row.status !== 'Pending';
+}
 
 const onDelete = async (row: Cronjob.CronjobInfo | null) => {
     let names = [];

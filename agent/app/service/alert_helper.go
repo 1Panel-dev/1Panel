@@ -394,7 +394,6 @@ func loadPanelLogin(alert dto.AlertDTO) {
 	alertType := alert.Type
 	quota := strconv.Itoa(count)
 	quotaType := strconv.Itoa(int(alert.Cycle))
-	var params []dto.Param
 	if err != nil {
 		global.LOG.Errorf("Failed to count recent failed login logs: %v", err)
 	}
@@ -402,7 +401,7 @@ func loadPanelLogin(alert dto.AlertDTO) {
 		alertType = "panelLogin"
 		quota = strconv.Itoa(count)
 		quotaType = "panelLogin"
-		params = append([]dto.Param{
+		params := []dto.Param{
 			{
 				Index: "1",
 				Key:   "cycle",
@@ -413,7 +412,7 @@ func loadPanelLogin(alert dto.AlertDTO) {
 				Key:   "project",
 				Value: "",
 			},
-		})
+		}
 		sendAlerts(alert, alertType, quota, quotaType, params)
 	}
 
@@ -432,7 +431,7 @@ func loadPanelLogin(alert dto.AlertDTO) {
 		}(), "\n")
 		alertType = "panelIpLogin"
 		quotaType = "panelIpLogin"
-		params = append([]dto.Param{
+		params := []dto.Param{
 			{
 				Index: "1",
 				Key:   "cycle",
@@ -443,7 +442,7 @@ func loadPanelLogin(alert dto.AlertDTO) {
 				Key:   "project",
 				Value: " IP ",
 			},
-		})
+		}
 		sendAlerts(alert, alertType, quota, quotaType, params)
 	}
 }
@@ -453,7 +452,6 @@ func loadSSHLogin(alert dto.AlertDTO) {
 	alertType := alert.Type
 	quota := strconv.Itoa(count)
 	quotaType := strconv.Itoa(int(alert.Cycle))
-	var params []dto.Param
 	if err != nil {
 		global.LOG.Errorf("Failed to count recent failed ssh login logs: %v", err)
 	}
@@ -461,7 +459,7 @@ func loadSSHLogin(alert dto.AlertDTO) {
 		alertType = "sshLogin"
 		quota = strconv.Itoa(count)
 		quotaType = "sshLogin"
-		params = append([]dto.Param{
+		params := []dto.Param{
 			{
 				Index: "1",
 				Key:   "cycle",
@@ -472,7 +470,7 @@ func loadSSHLogin(alert dto.AlertDTO) {
 				Key:   "project",
 				Value: "",
 			},
-		})
+		}
 		sendAlerts(alert, alertType, quota, quotaType, params)
 	}
 	whitelist := strings.Split(strings.TrimSpace(alert.AdvancedParams), "\n")
@@ -481,16 +479,10 @@ func loadSSHLogin(alert dto.AlertDTO) {
 		global.LOG.Errorf("Failed to check recent failed ip ssh login logs: %v", err)
 	}
 	if len(records) > 0 {
-		quota = strings.Join(func() []string {
-			var ips []string
-			for _, r := range records {
-				ips = append(ips, r)
-			}
-			return ips
-		}(), "\n")
+		quota = strings.Join(records, "\n")
 		alertType = "sshIpLogin"
 		quotaType = "sshIpLogin"
-		params = append([]dto.Param{
+		params := []dto.Param{
 			{
 				Index: "1",
 				Key:   "cycle",
@@ -501,7 +493,7 @@ func loadSSHLogin(alert dto.AlertDTO) {
 				Key:   "project",
 				Value: " IP ",
 			},
-		})
+		}
 		sendAlerts(alert, alertType, quota, quotaType, params)
 	}
 }

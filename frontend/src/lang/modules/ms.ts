@@ -345,6 +345,9 @@ const message = {
             dayUnit: 'd',
             millisecond: 'Milisaat',
         },
+        log: {
+            noLog: 'Tiada log sedia ada',
+        },
     },
     menu: {
         home: 'Overview',
@@ -378,6 +381,10 @@ const message = {
         msgCenter: 'Pusat Tugas',
     },
     home: {
+        recommend: 'cadangan',
+        dir: 'direktori',
+        quickDir: 'Direktori Pantas',
+        database: 'Pangkalan Data - Semua',
         restart_1panel: 'Mulakan semula panel',
         restart_system: 'Mulakan semula pelayan',
         operationSuccess: 'Operasi berjaya, sedang memulakan semula, sila segarkan pelayar secara manual nanti!',
@@ -460,6 +467,9 @@ const message = {
         serviceNameHelper: 'Akses antara kontena dalam rangkaian yang sama.',
         backupList: 'Sandaran',
         loadBackup: 'Import',
+        localUpload: 'Muat Naik Tempatan',
+        hostSelect: 'Pemilihan Pelayan',
+        selectHelper: 'Adakah anda pasti ingin mengimport fail sandaran {0}?',
         remoteAccess: 'Akses jauh',
         remoteHelper: 'Berbilang IP dipisahkan dengan koma, contoh: 172.16.10.111, 172.16.10.112',
         remoteConnHelper:
@@ -511,8 +521,8 @@ const message = {
         selectFile: 'Pilih fail',
         dropHelper: 'Anda boleh seret dan lepaskan fail yang ingin dimuat naik di sini atau',
         clickHelper: 'klik untuk memuat naik',
-        supportUpType: 'Hanya fail sql, sql.gz, dan tar.gz yang disokong',
-        zipFormat: 'Struktur pakej mampatan tar.gz: Pakej mampatan test.tar.gz mesti mengandungi test.sql',
+        supportUpType:
+            'Hanya menyokong format fail sql, sql.gz, tar.gz, .zip. Fail termampat yang diimport mesti mengandungi hanya satu fail .sql atau termasuk test.sql',
 
         currentStatus: 'Keadaan semasa',
         baseParam: 'Parameter asas',
@@ -687,7 +697,6 @@ const message = {
             server: 'Pelayan MCP',
             create: 'Tambah Pelayan',
             edit: 'Edit Pelayan',
-            commandHelper: 'Contoh: npx -y {0}',
             baseUrl: 'Laluan Akses Luar',
             baseUrlHelper: 'Contoh: http://192.168.1.2:8000',
             ssePath: 'Laluan SSE',
@@ -708,6 +717,8 @@ const message = {
             outputTransport: 'Jenis Output',
             streamableHttpPath: 'Laluan Streaming',
             streamableHttpPathHelper: 'Contoh: /mcp, elakkan daripada bertindan dengan pelayan lain',
+            npxHelper: 'Sesuai untuk mcp yang dimulakan dengan npx atau binari',
+            uvxHelper: 'Sesuai untuk mcp yang dimulakan dengan uvx',
         },
     },
     container: {
@@ -1143,6 +1154,8 @@ const message = {
     },
     terminal: {
         local: 'Tempatan',
+        defaultConn: 'Sambungan Lalai',
+        defaultConnHelper: 'Sama ada untuk menyambung ke hos secara lalai selepas membuka terminal',
         localHelper: 'Nama tempatan hanya digunakan untuk pengenalan sistem tempatan.',
         connLocalErr: 'Tidak dapat mengesahkan secara automatik, sila isi maklumat log masuk pelayan tempatan.',
         testConn: 'Uji sambungan',
@@ -1288,8 +1301,6 @@ const message = {
             notStart: 'Perkhidmatan ClamAV tidak berjalan pada masa ini, sila mulakan dahulu!',
             removeRecord: 'Padam fail laporan',
             noRecords: 'Klik butang "Picu" untuk memulakan imbasan dan anda akan melihat rekod di sini.',
-            removeResultHelper:
-                'Padam fail laporan yang dijana semasa pelaksanaan tugas untuk membebaskan ruang storan.',
             removeInfected: 'Padam fail virus',
             removeInfectedHelper:
                 'Padam fail virus yang dikesan semasa tugas untuk memastikan keselamatan pelayan dan operasi normal.',
@@ -1408,6 +1419,7 @@ const message = {
         downloadStart: 'Muat turun bermula',
         moveSuccess: 'Berjaya dipindahkan',
         copySuccess: 'Berjaya disalin',
+        pasteMsg: 'Sila klik butang "Tampal" di bahagian kanan atas direktori sasaran',
         move: 'Pindah',
         calculate: 'Kira',
         canNotDeCompress: 'Tidak dapat nyahmampatkan fail ini',
@@ -1492,6 +1504,8 @@ const message = {
         cancelUpload: 'Batalkan Muat Naik',
         cancelUploadHelper:
             'Adakah hendak membatalkan muat naik, selepas pembatalan senarai muat naik akan dikosongkan.',
+        keepOneTab: 'Pastikan sekurang-kurangnya satu tab dikekalkan',
+        notCanTab: 'Tidak dapat menambah tab lagi',
     },
     ssh: {
         autoStart: 'Mula automatik',
@@ -1685,6 +1699,8 @@ const message = {
         code: 'Kod Auth',
         codeHelper:
             'Sila klik butang "Peroleh", kemudian log masuk ke OneDrive dan salin kandungan selepas "code" dalam pautan yang telah diarahkan semula. Tampalkan kandungan tersebut ke dalam kotak input ini. Untuk arahan spesifik, sila rujuk dokumentasi rasmi.',
+        googleHelper:
+            'Sila buat aplikasi Google dan dapatkan maklumat klien terlebih dahulu, isi borang dan klik butang dapatkan. Untuk operasi khusus, sila rujuk dokumentasi rasmi.',
         loadCode: 'Peroleh',
         COS: 'Tencent COS',
         ap_beijing_1: 'Beijing Zone 1',
@@ -1915,6 +1931,9 @@ const message = {
             'Nod {0} telah berada pada versi terkini yang boleh dinaik taraf. Sila periksa versi nod utama dan cuba lagi!',
 
         about: 'Mengenai',
+        release: 'Log Kemaskini Versi',
+        releaseHelper:
+            'Pengambilan log kemaskini untuk persekitaran semasa mengalami异常. Anda boleh menyemak dokumentasi rasmi secara manual.',
         project: 'GitHub',
         issue: 'Isu',
         doc: 'Dokumen rasmi',
@@ -1982,7 +2001,7 @@ const message = {
         fileExchange: 'Naik taraf ke Edisi Professional untuk menghantar fail dengan cepat antara pelbagai pelayan.',
         app: 'Tingkatkan ke versi profesional untuk melihat maklumat perkhidmatan, pemantauan abnormal, dll melalui aplikasi mudah alih.',
         cluster:
-            'Versi Profesional menaik taraf membolehkan anda menguruskan kelompok induk-hamba MySQL/Postgres/Reids.',
+            'Versi Profesional menaik taraf membolehkan anda menguruskan kelompok induk-hamba MySQL/Postgres/Redis.',
     },
     clean: {
         scan: 'Mulakan imbasan',
@@ -2163,8 +2182,7 @@ const message = {
         otherDomains: 'Domain Lain',
         static: 'Statik',
         deployment: 'Penerapan',
-        supportUpType: 'Hanya fail .tar.gz disokong',
-        zipFormat: 'Struktur fail .tar.gz: fail test.tar.gz mesti mengandungi fail {0}',
+        supportUpType: 'Hanya format fail .tar.gz yang disokong, dan pakej termampat mesti mengandungi fail {0}.json',
         proxy: 'Proksi Terbalik',
         alias: 'Alias',
         ftpUser: 'Akaun FTP',
@@ -2223,6 +2241,10 @@ const message = {
         null: 'tiada',
         nginxConfig: 'Konfigurasi Nginx',
         websiteConfig: 'Tetapan Laman Web',
+        proxySettings: 'Tetapan Proksi',
+        advancedSettings: 'Tetapan Lanjutan',
+        cacheSettings: 'Tetapan Cache',
+        sniSettings: 'Tetapan SNI',
         basic: 'Asas',
         source: 'Konfigurasi',
         security: 'Keselamatan',
@@ -2349,11 +2371,15 @@ const message = {
         modifierHelper:
             'Contoh: "=" adalah padanan tepat, "~" adalah padanan biasa, "^~" memadankan permulaan laluan, dan sebagainya.',
         replace: 'Penggantian Teks',
+        replaceHelper:
+            'Ciri penggantian teks nginx membenarkan penggantian rentetan dalam kandungan respons semasa proksi terbalik. Ia biasanya digunakan untuk mengubah suai pautan, alamat API, dll., dalam HTML, CSS, JavaScript, dan fail lain yang dikembalikan oleh backend. Ia menyokong padanan ungkapan biasa untuk keperluan penggantian kandungan yang kompleks.',
         addReplace: 'Tambah',
         replaced: 'String Carian (tidak boleh kosong)',
         replaceText: 'Ganti dengan string',
         replacedErr: 'String Carian tidak boleh kosong',
         replacedErr2: 'String Carian tidak boleh berulang',
+        replacedListEmpty: 'Tiada peraturan penggantian teks',
+        proxySslName: 'Nama SNI Proksi',
         basicAuth: 'Pengesahan Asas',
         editBasicAuthHelper:
             'Kata laluan disulitkan secara tidak simetri dan tidak dapat dipaparkan. Penyuntingan perlu menetapkan semula kata laluan',
@@ -2369,6 +2395,15 @@ const message = {
         disableLeech: 'Matikan anti-leech',
         ipv6: 'Dengar IPv6',
         leechReturnError: 'Sila isikan kod status HTTP',
+        blockedRef: 'Benarkan referrer tidak standard',
+        accessControl: 'Kawalan anti-leech',
+        leechcacheControl: 'Kawalan cache',
+        logEnableControl: 'Log permintaan aset statik',
+        leechSpecialValidHelper:
+            "Apabila 'Benarkan referrer kosong' didayakan, permintaan tanpa referrer (akses terus dan sebagainya) tidak akan disekat; mendayakan 'Benarkan referrer tidak standard' akan membenarkan mana-mana referrer yang tidak bermula dengan http/https (permintaan klien dan sebagainya).",
+        leechInvalidReturnHelper: 'Kod status HTTP yang dipulangkan selepas menyekat permintaan hotlink',
+        leechlogControlHelper:
+            'Merekod permintaan aset statik; biasanya dimatikan dalam produksi untuk mengelakkan log berlebihan yang tidak perlu',
         selectAcme: 'Pilih akaun Acme',
         imported: 'Dibuat secara manual',
         importType: 'Jenis import',
@@ -2665,6 +2700,7 @@ const message = {
         quickJump: 'Akses pantas',
         used: 'Digunakan',
         unUsed: 'Tidak Digunakan',
+        dockerRestart: 'Operasi firewall memerlukan memulakan semula perkhidmatan Docker',
         firewallHelper: '{0} firewall sistem',
         firewallNotStart: `Firewall sistem belum diaktifkan. Aktifkannya dahulu.`,
         restartFirewallHelper: 'Operasi ini akan memulakan semula firewall semasa. Adakah anda mahu meneruskan?',
@@ -2851,6 +2887,19 @@ const message = {
             autoStart: 'Mula Automatik',
             autoStartHelper: 'Sama ada untuk memulakan perkhidmatan secara automatik selepas Supervisor mula',
         },
+    },
+    disk: {
+        systemDisk: 'Cakera Sistem',
+        unpartitionedDisk: 'Cakera Tidak Dibahagikan',
+        handlePartition: 'Bahagikan Sekarang',
+        filesystem: 'Sistem Fail',
+        unmounted: 'Tidak Dikaitkan',
+        cannotOperate: 'Tidak Boleh Beroperasi',
+        systemDiskHelper: 'Petunjuk: Cakera semasa adalah cakera sistem, tidak boleh dioperasikan.',
+        autoMount: 'Pemasangan Automatik',
+        model: 'Model Peranti',
+        diskType: 'Jenis Cakera',
+        serial: 'Nombor Siri',
     },
     xpack: {
         expiresTrialAlert:
@@ -3507,7 +3556,7 @@ const message = {
             alertRule: 'Peraturan Amaran',
             titleSearchHelper: 'Masukkan tajuk amaran untuk pencarian kabur',
             taskType: 'Jenis',
-            ssl: 'Sijil (SSL) Tamat Tempoh',
+            ssl: 'Sijil Tamat Tempoh',
             siteEndTime: 'Tamat Tempoh Laman Web',
             panelPwdEndTime: 'Kata Laluan Panel Tamat Tempoh',
             panelUpdate: 'Versi Panel Baharu Tersedia',
@@ -3599,7 +3648,7 @@ const message = {
             taskName: 'Nama Tugas',
             cronJobType: 'Jenis Tugas',
             clamPath: 'Direktori Imbasan',
-            cronjob: 'Cronjob',
+            cronjob: 'Pelaksanaan tugas berjadual {0} gagal',
             app: 'Sandaran Aplikasi',
             web: 'Sandaran Laman Web',
             database: 'Sandaran Pangkalan Data',
@@ -3694,7 +3743,8 @@ const message = {
             sshLogin: 'Amaran Log Masuk SSH Tidak Normal',
             panelIpLogin: 'Amaran IP Log Masuk Panel Tidak Normal',
             sshIpLogin: 'Amaran IP Log Masuk SSH Tidak Normal',
-            ipWhiteListHelper: 'IP dalam senarai putih tidak tertakluk kepada sebarang peraturan',
+            ipWhiteListHelper:
+                'IP dalam senarai putih tidak tertakluk kepada peraturan, dan tiada amaran akan dikeluarkan apabila log masuk berjaya',
             nodeExceptionRule: 'Amaran kerosakan nod, dihantar {0} kali sehari',
             licenseExceptionRule: 'Amaran kerosakan lesen, dihantar {0} kali sehari',
             panelLoginRule: 'Amaran log masuk panel, dihantar {0} kali sehari',

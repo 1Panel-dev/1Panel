@@ -6,6 +6,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/constant"
+	"github.com/1Panel-dev/1Panel/agent/i18n"
 )
 
 func ExportSSHLogs(filename string, logs []dto.SSHHistory) error {
@@ -18,7 +19,15 @@ func ExportSSHLogs(filename string, logs []dto.SSHHistory) error {
 	writer := csv.NewWriter(file)
 	defer writer.Flush()
 
-	if err := writer.Write([]string{"IP", "Area", "Port", "AuthMode", "User", "Status", "Date"}); err != nil {
+	if err := writer.Write([]string{
+		i18n.GetMsgByKey("ExportIP"),
+		i18n.GetMsgByKey("ExportArea"),
+		i18n.GetMsgByKey("ExportPort"),
+		i18n.GetMsgByKey("ExportAuthMode"),
+		i18n.GetMsgByKey("ExportUser"),
+		i18n.GetMsgByKey("ExportStatus"),
+		i18n.GetMsgByKey("ExportDate"),
+	}); err != nil {
 		return err
 	}
 

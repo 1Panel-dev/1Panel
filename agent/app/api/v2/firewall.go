@@ -63,7 +63,7 @@ func (b *BaseApi) OperateFirewall(c *gin.Context) {
 		return
 	}
 
-	if err := firewallService.OperateFirewall(req.Operation); err != nil {
+	if err := firewallService.OperateFirewall(req); err != nil {
 		helper.InternalServer(c, err)
 		return
 	}

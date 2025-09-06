@@ -1173,6 +1173,9 @@ func UpdateSSLConfig(websiteSSL model.WebsiteSSL) error {
 			return buserr.WithErr("ErrSSLApply", err)
 		}
 	}
+	if !global.IsMaster {
+		return nil
+	}
 	enable, sslID := GetSystemSSL()
 	if enable && sslID == websiteSSL.ID {
 		fileOp := files.NewFileOp()

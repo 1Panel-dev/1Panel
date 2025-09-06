@@ -83,7 +83,7 @@ const status = ref('Enable');
 const paginationConfig = reactive({
     cacheSizeKey: 'recycle-page-size',
     currentPage: 1,
-    pageSize: 20,
+    pageSize: Number(localStorage.getItem('recycle-page-size')) || 20,
     total: 0,
 });
 

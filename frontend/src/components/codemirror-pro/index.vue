@@ -17,6 +17,8 @@ import { dockerFile } from '@codemirror/legacy-modes/mode/dockerfile';
 import { javascript } from '@codemirror/legacy-modes/mode/javascript';
 import { placeholder } from '@codemirror/view';
 import { json } from '@codemirror/lang-json';
+import { keymap } from '@codemirror/view';
+import { defaultKeymap, indentWithTab } from '@codemirror/commands';
 
 defineOptions({ name: 'CodemirrorPro' });
 
@@ -78,6 +80,7 @@ const initCodeMirror = () => {
         defaultTheme,
         oneDark,
         basicSetup,
+        keymap.of([...defaultKeymap, indentWithTab]),
         EditorView.updateListener.of((v: any) => {
             if (v.docChanged) {
                 emit('update:modelValue', v.state.doc.toString());

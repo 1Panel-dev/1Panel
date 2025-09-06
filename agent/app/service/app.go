@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"path"
 	"path/filepath"
 	"reflect"
 	"strconv"
@@ -56,7 +55,7 @@ func (a AppService) PageApp(ctx *gin.Context, req request.AppSearch) (interface{
 	var opts []repo.DBOption
 	opts = append(opts, appRepo.OrderByRecommend())
 	if req.Name != "" {
-		opts = append(opts, appRepo.WithByLikeName(req.Name))
+		opts = append(opts, appRepo.WithByLikeName(strings.TrimSpace(req.Name)))
 	}
 	if req.Type != "" {
 		opts = append(opts, appRepo.WithType(req.Type))
@@ -100,7 +99,7 @@ func (a AppService) PageApp(ctx *gin.Context, req request.AppSearch) (interface{
 	if err != nil {
 		return nil, err
 	}
-	var appDTOs []*response.AppItem
+	appDTOs := make([]*response.AppItem, 0)
 	info := &dto.SettingInfo{}
 	if req.Type == "php" {
 		info, _ = NewISettingService().GetSettingInfo()
@@ -132,8 +131,21 @@ func (a AppService) PageApp(ctx *gin.Context, req request.AppSearch) (interface{
 			continue
 		}
 		appDTO.Tags = tags
-		installs, _ := appInstallRepo.ListBy(context.Background(), appInstallRepo.WithAppId(ap.ID))
-		appDTO.Installed = len(installs) > 0
+		if ap.Type == constant.RuntimePHP || ap.Type == constant.RuntimeGo || ap.Type == constant.RuntimeNode || ap.Type == constant.RuntimePython || ap.Type == constant.RuntimeJava || ap.Type == constant.RuntimeDotNet {
+			details, _ := appDetailRepo.GetBy(appDetailRepo.WithAppId(ap.ID))
+			var ids []uint
+			if len(details) == 0 {
+				continue
+			}
+			for _, d := range details {
+				ids = append(ids, d.ID)
+			}
+			runtimes, _ := runtimeRepo.List(runtimeRepo.WithDetailIdsIn(ids))
+			appDTO.Installed = len(runtimes) > 0
+		} else {
+			installs, _ := appInstallRepo.ListBy(context.Background(), appInstallRepo.WithAppId(ap.ID))
+			appDTO.Installed = len(installs) > 0
+		}
 	}
 	res.Items = appDTOs
 	res.Total = total
@@ -355,29 +367,6 @@ func (a AppService) Install(req request.AppInstallCreate) (appInstall *model.App
 			}
 		}
 	}
-	if app.Key == "openresty" && (app.Resource == "remote" || app.Resource == "custom") && common.CompareVersion(appDetail.Version, "1.27") {
-		if dir, ok := req.Params["WEBSITE_DIR"]; ok {
-			siteDir := dir.(string)
-			if siteDir == "" || !strings.HasPrefix(siteDir, "/") {
-				siteDir = path.Join(global.Dir.DataDir, dir.(string))
-			}
-			req.Params["WEBSITE_DIR"] = siteDir
-			oldWebStePath, _ := settingRepo.GetValueByKey("WEBSITE_DIR")
-			fileOp := files.NewFileOp()
-			if oldWebStePath != "" && oldWebStePath != siteDir && fileOp.Stat(oldWebStePath) {
-				_ = fileOp.Rename(oldWebStePath, siteDir)
-			}
-			if !fileOp.Stat(siteDir) {
-				_ = fileOp.CreateDir(siteDir, constant.DirPerm)
-				_ = fileOp.CreateDir(path.Join(siteDir, "conf.d"), constant.DirPerm)
-			}
-			err = settingRepo.UpdateOrCreate("WEBSITE_DIR", siteDir)
-			if err != nil {
-				return
-			}
-			go RestartPHPRuntime()
-		}
-	}
 	for key := range req.Params {
 		if !strings.Contains(key, "PANEL_APP_PORT") {
 			continue
@@ -486,6 +475,11 @@ func (a AppService) Install(req request.AppInstallCreate) (appInstall *model.App
 			req.Params["DATABASE_NAME"] = database.Name
 		}
 	}
+	if app.Key == "openresty" {
+		req.Params["CONTAINER_PACKAGE_URL"] = "http://archive.ubuntu.com/ubuntu/"
+		req.Params["RESTY_ADD_PACKAGE_BUILDDEPS"] = ""
+		req.Params["RESTY_CONFIG_OPTIONS_MORE"] = ""
+	}
 	paramByte, err = json.Marshal(req.Params)
 	if err != nil {
 		return
@@ -513,6 +507,9 @@ func (a AppService) Install(req request.AppInstallCreate) (appInstall *model.App
 			return err
 		}
 		if app.Key == "openresty" {
+			if err = handleSiteDir(app, appDetail, req, t); err != nil {
+				return err
+			}
 			if err = handleOpenrestyFile(appInstall); err != nil {
 				return err
 			}

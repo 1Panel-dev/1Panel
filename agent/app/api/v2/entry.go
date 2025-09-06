@@ -71,4 +71,6 @@ var (
 	taskService      = service.NewITaskService()
 	groupService     = service.NewIGroupService()
 	alertService     = service.NewIAlertService()
+
+	diskService = service.NewIDiskService()
 )
