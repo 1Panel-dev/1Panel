@@ -2,10 +2,8 @@ package main
 
 import (
 	"fmt"
-	"os"
-	"runtime"
-
 	_ "net/http/pprof"
+	"os"
 
 	"github.com/1Panel-dev/1Panel/core/cmd/server/cmd"
 	_ "github.com/1Panel-dev/1Panel/core/cmd/server/docs"
@@ -39,15 +37,6 @@ import (
 // @description - `1Panel-Timestamp` is the Unix timestamp of the current time in seconds.
 
 func main() {
-	defer func() {
-		if r := recover(); r != nil {
-			fmt.Println("捕获到 panic:", r)
-			buf := make([]byte, 1<<16) // 64KB 缓冲
-			stackSize := runtime.Stack(buf, false)
-			fmt.Printf("调用栈:\n%s\n", string(buf[:stackSize]))
-			os.Exit(2)
-		}
-	}()
 
 	if err := cmd.RootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
