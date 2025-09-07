@@ -1731,9 +1731,14 @@ func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error)
 		if err = openProxyCache(website); err != nil {
 			return
 		}
-		location.AddCache(req.CacheTime, req.CacheUnit, fmt.Sprintf("proxy_cache_zone_of_%s", website.Alias), req.ServerCacheTime, req.ServerCacheUnit)
+		location.AddServerCache(fmt.Sprintf("proxy_cache_zone_of_%s", website.Alias), req.ServerCacheTime, req.ServerCacheUnit)
 	} else {
-		location.RemoveCache(fmt.Sprintf("proxy_cache_zone_of_%s", website.Alias))
+		location.RemoveServerCache(fmt.Sprintf("proxy_cache_zone_of_%s", website.Alias))
+	}
+	if req.CacheTime != 0 {
+		location.AddBroswerCache(req.CacheTime, req.CacheUnit)
+	} else {
+		location.RemoveBroswerCache()
 	}
 	if len(req.Replaces) > 0 {
 		location.AddSubFilter(req.Replaces)

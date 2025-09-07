@@ -2527,6 +2527,7 @@ const message = {
         antiLeech: 'Sömürü karşıtı',
         extends: 'Uzantı',
         browserCache: 'Önbellek',
+        serverCache: 'Sunucu önbelleği',
         leechLog: 'Sömürü karşıtı günlüğü kaydet',
         accessDomain: 'İzin verilen alan adları',
         leechReturn: 'Yanıt kaynağı',

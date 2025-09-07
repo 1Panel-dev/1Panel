@@ -2408,6 +2408,7 @@ const message = {
         antiLeech: '反リーチ',
         extends: '拡大',
         browserCache: 'キャッシュ',
+        serverCache: 'サーバーキャッシュ',
         leechLog: '反リーチログを記録します',
         accessDomain: '許可されたドメイン',
         leechReturn: '応答リソース',

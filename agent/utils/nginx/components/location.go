@@ -253,10 +253,9 @@ func (l *Location) ChangePath(Modifier string, Match string) {
 	l.Match = Match
 }
 
-func (l *Location) AddCache(cacheTime int, cacheUint, cacheKey string, serverCacheTime int, serverCacheUint string) {
+func (l *Location) AddBroswerCache(cacheTime int, cacheUint string) {
 	l.RemoveDirective("add_header", []string{"Cache-Control", "no-cache"})
-	l.RemoveDirectiveByFullParams("if", []string{"(", "$uri", "~*", `"\.(gif|png|jpg|css|js|woff|woff2)$"`, ")"})
-	l.RemoveDirectiveByFullParams("if", []string{"(", "$uri", "~*", `"\.(gif|png|jpg|css|js|woff|woff2|jpeg|svg|webp|avif)$"`, ")"})
+	l.RemoveDirective("if", []string{"(", "$uri", "~*", `"\.(gif|png|jpg|css|js|woff|woff2)$"`, ")"})
 	directives := l.GetDirectives()
 	newDir := &Directive{
 		Name:       "if",
@@ -271,29 +270,79 @@ func (l *Location) AddCache(cacheTime int, cacheUint, cacheKey string, serverCac
 	newDir.Block = block
 	directives = append(directives, newDir)
 	l.Directives = directives
+	l.CacheTime = cacheTime
+	l.CacheUint = cacheUint
+}
+
+func (l *Location) AddServerCache(cacheKey string, serverCacheTime int, serverCacheUint string) {
 	l.UpdateDirective("proxy_ignore_headers", []string{"Set-Cookie", "Cache-Control", "expires"})
 	l.UpdateDirective("proxy_cache", []string{cacheKey})
 	l.UpdateDirective("proxy_cache_key", []string{"$host$uri$is_args$args"})
 	l.UpdateDirective("proxy_cache_valid", []string{"200", "304", "301", "302", strconv.Itoa(serverCacheTime) + serverCacheUint})
 	l.Cache = true
-	l.CacheTime = cacheTime
-	l.CacheUint = cacheUint
+	l.ServerCacheTime = serverCacheTime
+	l.ServerCacheUint = serverCacheUint
 }
 
-func (l *Location) RemoveCache(cacheKey string) {
-	l.RemoveDirectiveByFullParams("if", []string{"(", "$uri", "~*", `"\.(gif|png|jpg|css|js|woff|woff2)$"`, ")"})
-	l.RemoveDirectiveByFullParams("if", []string{"(", "$uri", "~*", `"\.(gif|png|jpg|css|js|woff|woff2|jpeg|svg|webp|avif)$"`, ")"})
-	l.RemoveDirective("proxy_ignore_headers", []string{"Set-Cookie"})
+// func (l *Location) AddCache(cacheKey string, serverCacheTime int, serverCacheUint string) {
+// 	l.RemoveDirective("add_header", []string{"Cache-Control", "no-cache"})
+// 	l.RemoveDirective("if", []string{"(", "$uri", "~*", `"\.(gif|png|jpg|css|js|woff|woff2)$"`, ")"})
+// 	l.RemoveDirective("if", []string{"(", "$uri", "~*", `"\.(gif|png|jpg|css|js|woff|woff2|jpeg|svg|webp|avif)$"`, ")"})
+// 	directives := l.GetDirectives()
+// 	newDir := &Directive{
+// 		Name:       "if",
+// 		Parameters: []string{"(", "$uri", "~*", `"\.(gif|png|jpg|css|js|woff|woff2|jpeg|svg|webp|avif)$"`, ")"},
+// 		Block:      &Block{},
+// 	}
+// 	block := &Block{}
+// 	block.Directives = append(block.Directives, &Directive{
+// 		Name:       "expires",
+// 		Parameters: []string{strconv.Itoa(cacheTime) + cacheUint},
+// 	})
+// 	newDir.Block = block
+// 	directives = append(directives, newDir)
+// 	l.Directives = directives
+// 	l.UpdateDirective("proxy_ignore_headers", []string{"Set-Cookie", "Cache-Control", "expires"})
+// 	l.UpdateDirective("proxy_cache", []string{cacheKey})
+// 	l.UpdateDirective("proxy_cache_key", []string{"$host$uri$is_args$args"})
+// 	l.UpdateDirective("proxy_cache_valid", []string{"200", "304", "301", "302", strconv.Itoa(serverCacheTime) + serverCacheUint})
+// 	l.Cache = true
+// 	l.CacheTime = cacheTime
+// 	l.CacheUint = cacheUint
+// }
+
+func (l *Location) RemoveBroswerCache() {
+	l.RemoveDirective("if", []string{"(", "$uri", "~*", `"\.(gif|png|jpg|css|js|woff|woff2)$"`, ")"})
+	l.RemoveDirective("if", []string{"(", "$uri", "~*", `"\.(gif|png|jpg|css|js|woff|woff2|jpeg|svg|webp|avif)$"`, ")"})
+	l.UpdateDirective("add_header", []string{"Cache-Control", "no-cache"})
+	l.CacheTime = 0
+	l.CacheUint = ""
+}
+
+func (l *Location) RemoveServerCache(cacheKey string) {
+	l.RemoveDirective("proxy_ignore_headers", []string{"Set-Cookie", "Cache-Control", "expires"})
 	l.RemoveDirective("proxy_cache", []string{cacheKey})
 	l.RemoveDirective("proxy_cache_key", []string{"$host$uri$is_args$args"})
 	l.RemoveDirective("proxy_cache_valid", []string{"200"})
-
-	l.UpdateDirective("add_header", []string{"Cache-Control", "no-cache"})
-
-	l.CacheTime = 0
-	l.CacheUint = ""
 	l.Cache = false
+	l.ServerCacheTime = 0
+	l.ServerCacheUint = ""
 }
+
+// func (l *Location) RemoveCache(cacheKey string) {
+// 	l.RemoveDirective("if", []string{"(", "$uri", "~*", `"\.(gif|png|jpg|css|js|woff|woff2)$"`, ")"})
+// 	l.RemoveDirective("if", []string{"(", "$uri", "~*", `"\.(gif|png|jpg|css|js|woff|woff2|jpeg|svg|webp|avif)$"`, ")"})
+// 	l.RemoveDirective("proxy_ignore_headers", []string{"Set-Cookie"})
+// 	l.RemoveDirective("proxy_cache", []string{cacheKey})
+// 	l.RemoveDirective("proxy_cache_key", []string{"$host$uri$is_args$args"})
+// 	l.RemoveDirective("proxy_cache_valid", []string{"200"})
+
+// 	l.UpdateDirective("add_header", []string{"Cache-Control", "no-cache"})
+
+// 	l.CacheTime = 0
+// 	l.CacheUint = ""
+// 	l.Cache = false
+// }
 
 func (l *Location) AddSubFilter(subFilters map[string]string) {
 	l.RemoveDirective("sub_filter", []string{})

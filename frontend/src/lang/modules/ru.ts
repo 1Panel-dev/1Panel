@@ -2467,6 +2467,7 @@ const message = {
         antiLeech: 'Анти-лич',
         extends: 'Расширение',
         browserCache: 'Кэш',
+        serverCache: 'Кэш сервера',
         leechLog: 'Записывать лог анти-лича',
         accessDomain: 'Разрешенные домены',
         leechReturn: 'Ответ ресурса',

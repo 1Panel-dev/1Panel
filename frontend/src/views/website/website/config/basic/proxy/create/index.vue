@@ -74,51 +74,89 @@
                 <el-tab-pane :label="$t('website.advancedSettings')" name="advanced">
                     <el-divider content-position="left">{{ $t('website.cacheSettings') }}</el-divider>
 
+                    <!-- Server Cache Control -->
                     <div class="flex justify-between items-center py-3">
                         <div class="flex flex-col gap-1">
-                            <span class="font-medium">{{ $t('website.enableCache') }}</span>
+                            <span class="font-medium">{{ $t('website.serverCache') }}</span>
                         </div>
-                        <el-switch v-model="proxy.cache" @change="changeCache(proxy.cache)" size="large" />
+                        <el-button-group>
+                            <el-button
+                                :type="proxy.cache ? 'primary' : 'default'"
+                                @click="changeServerCache(true)"
+                                size="small"
+                            >
+                                {{ $t('commons.button.enable') }}
+                            </el-button>
+                            <el-button
+                                :type="!proxy.cache ? 'primary' : 'default'"
+                                @click="changeServerCache(false)"
+                                size="small"
+                            >
+                                {{ $t('commons.button.disable') }}
+                            </el-button>
+                        </el-button-group>
                     </div>
 
                     <el-collapse-transition>
-                        <div v-if="proxy.cache" class="mt-4">
-                            <el-row :gutter="16">
-                                <el-col :span="12">
-                                    <el-form-item :label="$t('website.browserCacheTime')" prop="cacheTime">
-                                        <el-input v-model.number="proxy.cacheTime" maxlength="15">
-                                            <template #append>
-                                                <el-select v-model="proxy.cacheUnit" class="!w-24">
-                                                    <el-option
-                                                        v-for="(unit, index) in Units"
-                                                        :key="index"
-                                                        :label="unit.label"
-                                                        :value="unit.value"
-                                                    />
-                                                </el-select>
-                                            </template>
-                                        </el-input>
-                                        <span class="input-help">{{ $t('website.browserCacheTimeHelper') }}</span>
-                                    </el-form-item>
-                                </el-col>
-                                <el-col :span="12">
-                                    <el-form-item :label="$t('website.serverCacheTime')" prop="serverCacheTime">
-                                        <el-input v-model.number="proxy.serverCacheTime" maxlength="15">
-                                            <template #append>
-                                                <el-select v-model="proxy.serverCacheUnit" class="!w-24">
-                                                    <el-option
-                                                        v-for="(unit, index) in Units"
-                                                        :key="index"
-                                                        :label="unit.label"
-                                                        :value="unit.value"
-                                                    />
-                                                </el-select>
-                                            </template>
-                                        </el-input>
-                                        <span class="input-help">{{ $t('website.serverCacheTimeHelper') }}</span>
-                                    </el-form-item>
-                                </el-col>
-                            </el-row>
+                        <div v-if="proxy.cache" class="mt-4 mb-6">
+                            <el-form-item :label="$t('website.serverCacheTime')" prop="serverCacheTime">
+                                <el-input v-model.number="proxy.serverCacheTime" maxlength="15" class="!w-64">
+                                    <template #append>
+                                        <el-select v-model="proxy.serverCacheUnit" class="!w-24">
+                                            <el-option
+                                                v-for="(unit, index) in Units"
+                                                :key="index"
+                                                :label="unit.label"
+                                                :value="unit.value"
+                                            />
+                                        </el-select>
+                                    </template>
+                                </el-input>
+                                <span class="input-help">{{ $t('website.serverCacheTimeHelper') }}</span>
+                            </el-form-item>
+                        </div>
+                    </el-collapse-transition>
+
+                    <!-- Browser Cache Control -->
+                    <div class="flex justify-between items-center py-3">
+                        <div class="flex flex-col gap-1">
+                            <span class="font-medium">{{ $t('website.browserCache') }}</span>
+                        </div>
+                        <el-button-group>
+                            <el-button
+                                :type="proxy.browserCache ? 'primary' : 'default'"
+                                @click="changeBrowserCache(true)"
+                                size="small"
+                            >
+                                {{ $t('commons.button.enable') }}
+                            </el-button>
+                            <el-button
+                                :type="!proxy.browserCache ? 'primary' : 'default'"
+                                @click="changeBrowserCache(false)"
+                                size="small"
+                            >
+                                {{ $t('commons.button.disable') }}
+                            </el-button>
+                        </el-button-group>
+                    </div>
+
+                    <el-collapse-transition>
+                        <div v-if="proxy.browserCache" class="mt-4 mb-6">
+                            <el-form-item :label="$t('website.browserCacheTime')" prop="cacheTime">
+                                <el-input v-model.number="proxy.cacheTime" maxlength="15" class="!w-64">
+                                    <template #append>
+                                        <el-select v-model="proxy.cacheUnit" class="!w-24">
+                                            <el-option
+                                                v-for="(unit, index) in Units"
+                                                :key="index"
+                                                :label="unit.label"
+                                                :value="unit.value"
+                                            />
+                                        </el-select>
+                                    </template>
+                                </el-input>
+                                <span class="input-help">{{ $t('website.browserCacheTimeHelper') }}</span>
+                            </el-form-item>
                         </div>
                     </el-collapse-transition>
 
@@ -234,6 +272,7 @@ const initData = (): Website.ProxyConfig => ({
     proxySSLName: '',
     serverCacheTime: 10,
     serverCacheUnit: 'm',
+    browserCache: false,
     cors: false,
     allowOrigins: '*',
     allowMethods: 'GET,POST,OPTIONS,PUT,DELETE',
@@ -255,6 +294,11 @@ const acceptParams = (proxyParam: Website.ProxyConfig) => {
     proxy.value = proxyParam;
     activeTab.value = 'basic';
 
+    // Initialize browserCache based on cacheTime value
+    if (proxy.value.browserCache === undefined) {
+        proxy.value.browserCache = proxy.value.cacheTime > 0;
+    }
+
     const res = getProtocolAndHost(proxyParam.proxyPass);
     if (res != null) {
         proxy.value.proxyProtocol = res.protocol;
@@ -271,17 +315,25 @@ const acceptParams = (proxyParam: Website.ProxyConfig) => {
     }
 };
 
-const changeCache = (cache: boolean) => {
+const changeServerCache = (cache: boolean) => {
+    proxy.value.cache = cache;
     if (cache) {
-        proxy.value.cacheTime = 1;
-        proxy.value.cacheUnit = 'm';
         proxy.value.serverCacheTime = 10;
         proxy.value.serverCacheUnit = 'm';
     } else {
-        proxy.value.cacheTime = 0;
-        proxy.value.cacheUnit = '';
         proxy.value.serverCacheTime = 0;
         proxy.value.serverCacheUnit = '';
+    }
+};
+
+const changeBrowserCache = (cache: boolean) => {
+    proxy.value.browserCache = cache;
+    if (cache) {
+        proxy.value.cacheTime = 1;
+        proxy.value.cacheUnit = 'm';
+    } else {
+        proxy.value.cacheTime = 0;
+        proxy.value.cacheUnit = '';
     }
 };
 

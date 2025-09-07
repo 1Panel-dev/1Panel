@@ -413,6 +413,7 @@ export namespace Website {
         allowHeaders: string;
         allowCredentials: boolean;
         preflight: boolean;
+        browserCache?: boolean;
     }
 
     export interface ProxReplace {

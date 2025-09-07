@@ -2468,6 +2468,7 @@ const message = {
         antiLeech: 'Anti-leech',
         extends: 'Extensão',
         browserCache: 'Cache',
+        serverCache: 'Cache do servidor',
         leechLog: 'Registrar log anti-leech',
         accessDomain: 'Domínios permitidos',
         leechReturn: 'Recurso de resposta',

@@ -2313,6 +2313,7 @@ const message = {
         antiLeech: '防盗链',
         extends: '扩展名',
         browserCache: '浏览器缓存',
+        serverCache: '服务器缓存',
         leechLog: '记录防盗链日志',
         accessDomain: '允许的域名',
         leechReturn: '响应资源',
