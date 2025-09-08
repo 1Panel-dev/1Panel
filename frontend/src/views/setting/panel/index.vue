@@ -78,6 +78,24 @@
                                 </el-radio-group>
                             </el-form-item>
 
+                            <el-form-item :label="$t('setting.watermark')" v-if="isMasterProductPro" prop="watermark">
+                                <el-radio-group class="w-full" @change="onChangeWatermark" v-model="form.watermarkItem">
+                                    <el-radio-button value="Enable">
+                                        <span>{{ $t('commons.button.enable') }}</span>
+                                    </el-radio-button>
+                                    <el-radio-button value="Disable">
+                                        <span>{{ $t('commons.button.disable') }}</span>
+                                    </el-radio-button>
+                                </el-radio-group>
+                                <div v-if="form.watermarkItem === 'Enable'">
+                                    <div>
+                                        <el-button link type="primary" @click="onChangeWatermark">
+                                            {{ $t('commons.button.view') }}
+                                        </el-button>
+                                    </div>
+                                </div>
+                            </el-form-item>
+
                             <el-form-item :label="$t('setting.title')" prop="panelName">
                                 <el-input disabled v-model="form.panelName">
                                     <template #append>
@@ -198,6 +216,7 @@
         <Timeout ref="timeoutRef" @search="search()" />
         <HideMenu ref="hideMenuRef" @search="search()" />
         <ThemeColor ref="themeColorRef" />
+        <Watermark ref="watermarkRef" @search="search()" />
     </div>
 </template>
 
@@ -217,6 +236,7 @@ import { MsgSuccess } from '@/utils/message';
 import ThemeColor from '@/views/setting/panel/theme-color/index.vue';
 import ApiInterface from '@/views/setting/panel/api-interface/index.vue';
 import Password from '@/views/setting/panel/password/index.vue';
+import Watermark from '@/views/setting/panel/watermark/index.vue';
 import UserName from '@/views/setting/panel/username/index.vue';
 import Timeout from '@/views/setting/panel/timeout/index.vue';
 import PanelName from '@/views/setting/panel/name/index.vue';
@@ -253,6 +273,8 @@ const form = reactive({
     sessionTimeout: 0,
     panelName: '',
     theme: '',
+    watermark: '',
+    watermarkItem: '',
     themeColor: {} as ThemeColor,
     menuTabs: '',
     language: '',
@@ -286,6 +308,7 @@ const systemIPRef = ref();
 const proxyRef = ref();
 const timeoutRef = ref();
 const hideMenuRef = ref();
+const watermarkRef = ref();
 const themeColorRef = ref();
 const apiInterfaceRef = ref();
 const unset = ref(i18n.global.t('setting.unSetting'));
@@ -347,6 +370,8 @@ const search = async () => {
                 : '{"light":"#005eeb","dark":"#F0BE96"}';
             globalStore.themeConfig.theme = form.theme;
             form.proxyDocker = xpackRes.data.proxyDocker;
+            form.watermark = xpackRes.data.watermark;
+            form.watermarkItem = xpackRes.data.watermark ? 'Enable' : 'Disable';
         }
     } else {
         globalStore.themeConfig.theme = form.theme;
@@ -387,6 +412,33 @@ const onChangeHideMenus = () => {
 const onChangeThemeColor = () => {
     const themeColor: ThemeColor = JSON.parse(globalStore.themeConfig.themeColor);
     themeColorRef.value.acceptParams({ themeColor: themeColor, theme: globalStore.themeConfig.theme });
+};
+
+const onChangeWatermark = async () => {
+    if (form.watermarkItem === 'Enable') {
+        watermarkRef.value.acceptParams(form.watermark);
+        return;
+    }
+    ElMessageBox.confirm(i18n.global.t('setting.watermarkCloseHelper'), i18n.global.t('setting.watermark'), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+    })
+        .then(async () => {
+            loading.value = true;
+            await updateXpackSettingByKey('Watermark', '')
+                .then(() => {
+                    loading.value = false;
+                    globalStore.watermark = null;
+                    search();
+                    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                })
+                .catch(() => {
+                    loading.value = false;
+                });
+        })
+        .catch(() => {
+            form.watermarkItem = 'Enable';
+        });
 };
 
 const onChangeApiInterfaceStatus = async () => {
