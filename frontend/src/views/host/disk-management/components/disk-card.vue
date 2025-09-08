@@ -30,7 +30,7 @@
                             <span class="ml-2">{{ diskInfo.model }}</span>
                         </el-text>
                         <el-text type="info" v-if="diskInfo.serial" class="flex items-center">
-                            {{ $t('disk.model') }}:
+                            {{ $t('disk.serial') }}:
                             <span class="ml-2">{{ diskInfo.serial }}</span>
                         </el-text>
                         <div v-if="scope == 'unpartitioned'">
@@ -118,10 +118,14 @@ const mount = (diskInfo: Host.DiskInfo) => {
 };
 
 const unmount = (diskInfo: Host.DiskInfo) => {
-    ElMessageBox.confirm(i18n.global.t('disk.unmountHelper', [diskInfo.device]), i18n.global.t('disk.unmount'), {
-        confirmButtonText: i18n.global.t('commons.button.confirm'),
-        cancelButtonText: i18n.global.t('commons.button.cancel'),
-    }).then(async () => {
+    ElMessageBox.confirm(
+        i18n.global.t('disk.unmountHelper', [diskInfo.device.split('/').pop()]),
+        i18n.global.t('disk.unmount'),
+        {
+            confirmButtonText: i18n.global.t('commons.button.confirm'),
+            cancelButtonText: i18n.global.t('commons.button.cancel'),
+        },
+    ).then(async () => {
         unmountDisk({
             mountPoint: diskInfo.mountPoint,
         }).then(() => {

@@ -98,6 +98,7 @@ var WebUrlMap = map[string]struct{}{
 	"/hosts/ssh/ssh":          {},
 	"/hosts/ssh/log":          {},
 	"/hosts/ssh/session":      {},
+	"/hosts/disk":             {},
 
 	"/terminal": {},
 

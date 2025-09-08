@@ -2,7 +2,7 @@
     <DrawerPro
         v-model="open"
         :header="$t('disk.' + operate)"
-        :resource="form.device"
+        :resource="form.device.split('/').pop()"
         @close="handleClose"
         v-loading="loading"
     >
@@ -109,6 +109,7 @@ const submit = async () => {
 
 const handleClose = () => {
     open.value = false;
+    loading.value = false;
     emit('search');
 };
 
