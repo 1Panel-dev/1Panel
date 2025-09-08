@@ -418,7 +418,7 @@ const onLoadBaseInfo = async (isInit: boolean, range: string) => {
 
 const quickJump = (item: any) => {
     if (item.name === 'File') {
-        routerToFileWithPath(item.detail);
+        return routerToFileWithPath(item.detail);
     }
     return routerToPath(item.router);
 };

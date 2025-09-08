@@ -12,7 +12,7 @@ export const routerToPath = async (path: string) => {
 };
 
 export const routerToFileWithPath = async (pathItem: string) => {
-    await router.push({ name: 'File', query: { path: pathItem } });
+    await router.push({ name: 'File', query: { path: pathItem, uncached: 'true' } });
     tabStoreMiddleWare();
 };
 

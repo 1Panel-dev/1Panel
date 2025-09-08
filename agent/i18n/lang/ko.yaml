@@ -37,6 +37,7 @@ ErrGroupIsDefault: '기본 그룹, 삭제할 수 없습니다'
 ErrGroupIsInWebsiteUse: '그룹이 다른 웹사이트에서 사용 중이므로 삭제할 수 없습니다.'
 
 #지원
+Localhost: '로컬 머신'
 ErrBackupInUsed: '백업 계정이 예약된 작업에 사용되었으므로 삭제할 수 없습니다.'
 ErrBackupCheck: '백업 계정 테스트 연결에 실패했습니다 {{ .err }}'
 ErrBackupLocalDelete: '로컬 서버 백업 계정 삭제는 아직 지원되지 않습니다.'

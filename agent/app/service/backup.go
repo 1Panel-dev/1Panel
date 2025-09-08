@@ -456,9 +456,13 @@ func uploadWithMap(taskItem task.Task, accountMap map[string]backupClientHelper,
 			taskItem.LogFailed(i18n.GetMsgWithDetail("LoadBackupFailed", itemBackup.message))
 			continue
 		}
+		name := itemBackup.name
+		if itemBackup.name == "localhost" {
+			name = i18n.GetMsgByKey("Localhost")
+		}
 		taskItem.LogStart(i18n.GetMsgWithMap("UploadFile", map[string]interface{}{
 			"file":   path.Join(itemBackup.backupPath, dst),
-			"backup": itemBackup.name,
+			"backup": name,
 		}))
 		for i := 0; i < int(retry); i++ {
 			_, err := itemBackup.client.Upload(src, path.Join(itemBackup.backupPath, dst))

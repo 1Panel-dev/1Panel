@@ -37,6 +37,7 @@ ErrGroupIsDefault: 'デフォルト グループ、削除できません'
 ErrGroupIsInWebsiteUse: 'グループは別の Web サイトで使用されているため、削除できません。'
 
 #backup
+Localhost: 'ローカルマシン'
 ErrBackupInUsed: 'バックアップ アカウントはスケジュールされたタスクで使用されているため、削除できません。'
 ErrBackupCheck: 'バックアップ アカウントのテスト接続に失敗しました {{ .err }}'
 ErrBackupLocalDelete: 'ローカル サーバーのバックアップ アカウントの削除はまだサポートされていません'

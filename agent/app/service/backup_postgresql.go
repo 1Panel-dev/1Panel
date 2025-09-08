@@ -62,7 +62,6 @@ func (u *BackupService) PostgresqlRecoverByUpload(req dto.CommonRecover) error {
 		return err
 	}
 	req.File = recoveFile
-	defer os.RemoveAll(path.Dir(recoveFile))
 	if err := handlePostgresqlRecover(req, nil, false); err != nil {
 		return err
 	}

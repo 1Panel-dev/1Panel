@@ -711,12 +711,6 @@ func (u *ContainerService) ContainerUpdate(req dto.ContainerOperate) error {
 		return err
 	}
 
-	if len(oldContainer.Config.Entrypoint) != 0 {
-		if oldContainer.Config.Entrypoint[0] == "/docker-entrypoint.sh" {
-			oldContainer.Config.Entrypoint = []string{}
-		}
-	}
-
 	taskItem, err := task.NewTaskWithOps(req.Name, task.TaskUpdate, task.TaskScopeContainer, req.TaskID, 1)
 	if err != nil {
 		global.LOG.Errorf("new task for create container failed, err: %v", err)
@@ -809,7 +803,6 @@ func (u *ContainerService) ContainerUpgrade(req dto.ContainerUpgrade) error {
 			}, nil)
 
 			taskItem.AddSubTask(i18n.GetWithName("ContainerCreate", item), func(t *task.Task) error {
-				oldContainer.Config.Cmd = nil
 				config := oldContainer.Config
 				config.Image = req.Image
 				hostConf := oldContainer.HostConfig

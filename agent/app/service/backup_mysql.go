@@ -64,7 +64,6 @@ func (u *BackupService) MysqlRecoverByUpload(req dto.CommonRecover) error {
 		return err
 	}
 	req.File = recoveFile
-	defer os.RemoveAll(path.Dir(recoveFile))
 	if err := handleMysqlRecover(req, nil, false, req.TaskID); err != nil {
 		return err
 	}

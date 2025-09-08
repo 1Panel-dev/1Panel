@@ -40,6 +40,7 @@ ErrGroupIsDefault: 'Varsayılan grup, silinemez'
 ErrGroupIsInWebsiteUse: 'Grup başka bir web sitesi tarafından kullanılıyor ve silinemez.'
 
 #backup
+Localhost: 'Yerel Makine'
 ErrBackupInUsed: 'Yedekleme hesabı zamanlanmış görevde kullanıldı ve silinemez.'
 ErrBackupCheck: 'Yedekleme hesabı test bağlantısı başarısız {{ .err }}'
 ErrBackupLocalDelete: 'Yerel sunucu yedekleme hesabını silme henüz desteklenmiyor'

@@ -40,6 +40,7 @@ ErrGroupIsDefault: 'Kumpulan lalai, tidak boleh dipadamkan'
 ErrGroupIsInWebsiteUse: 'Kumpulan sedang digunakan oleh tapak web lain dan tidak boleh dipadamkan.'
 
 #sandaran
+Localhost: 'Mesin Tempatan'
 ErrBackupInUsed: 'Akaun sandaran telah digunakan dalam tugas yang dijadualkan dan tidak boleh dipadamkan.'
 ErrBackupCheck: 'Sambungan ujian akaun sandaran gagal {{ .err }}'
 ErrBackupLocalDelete: 'Memadam akaun sandaran pelayan tempatan belum disokong lagi'

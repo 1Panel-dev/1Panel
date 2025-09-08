@@ -37,6 +37,7 @@ ErrGroupIsDefault: 'Default group, cannot be deleted'
 ErrGroupIsInWebsiteUse: 'The group is being used by another website and cannot be deleted.'
 
 #backup
+Localhost: 'Local Machine'
 ErrBackupInUsed: 'The backup account has been used in the scheduled task and cannot be deleted.'
 ErrBackupCheck: 'Backup account test connection failed {{ .err }}'
 ErrBackupLocalDelete: 'Deleting the local server backup account is not supported yet'

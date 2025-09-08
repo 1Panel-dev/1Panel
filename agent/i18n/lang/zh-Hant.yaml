@@ -37,6 +37,7 @@ ErrGroupIsDefault: '預設分組，無法刪除'
 ErrGroupIsInWebsiteUse: '分組正在被其他網站使用，無法刪除'
 
 #backup
+Localhost: '本機'
 ErrBackupInUsed: '此備份帳號已在排程任務中使用，無法刪除'
 ErrBackupCheck: '備份帳號測試連線失敗{{ .err }}'
 ErrBackupLocalDelete: '暫時不支援刪除本機伺服器備份帳號'
