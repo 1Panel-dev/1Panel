@@ -75,16 +75,16 @@ func (b *BaseApi) LoadBaseDir(c *gin.Context) {
 // @Success 200 {object} dto.SSHConnData
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /settings/ssh [get]
+// @Router /settings/ssh/conn [get]
 func (b *BaseApi) LoadLocalConn(c *gin.Context) {
-	connInfoInDB, err := settingService.GetSSHInfo()
-	if err != nil {
-		helper.InternalServer(c, err)
+	connInfoInDB := settingService.GetSettingByKey("LocalSSHConn")
+	if len(connInfoInDB) == 0 {
+		helper.Success(c)
 		return
 	}
 	var data dto.SSHConnData
 	if err := json.Unmarshal([]byte(connInfoInDB), &data); err != nil {
-		helper.InternalServer(c, err)
+		helper.Success(c)
 		return
 	}
 	if len(data.Password) != 0 {
@@ -139,10 +139,7 @@ func (b *BaseApi) SaveLocalConn(c *gin.Context) {
 }
 
 func loadLocalConn() (*ssh.SSHClient, error) {
-	connInfoInDB, err := settingService.GetSSHInfo()
-	if err != nil {
-		return nil, err
-	}
+	connInfoInDB := settingService.GetSettingByKey("LocalSSHConn")
 	if len(connInfoInDB) == 0 {
 		return nil, errors.New("no such ssh conn info in db!")
 	}

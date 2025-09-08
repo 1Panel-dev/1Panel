@@ -47,6 +47,7 @@ import { Rules } from '@/global/form-rules';
 import { addHost, loadLocalConn, testByInfo } from '@/api/modules/terminal';
 import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';
+import { Base64 } from 'js-base64';
 
 const loading = ref();
 const isOK = ref(false);
@@ -81,21 +82,21 @@ const rules = reactive({
     privateKey: [Rules.requiredInput],
 });
 
-const acceptParams = (init: boolean): void => {
-    if (!init) {
-        search();
-    }
+const acceptParams = (): void => {
+    search();
     drawerVisible.value = true;
 };
 
 const search = async () => {
     await loadLocalConn().then((res) => {
-        form.addr = res.data.addr;
-        form.port = res.data.port;
-        form.authMode = res.data.authMode;
-        form.password = res.data.password;
-        form.privateKey = res.data.privateKey;
-        form.passPhrase = res.data.passPhrase;
+        if (res.data) {
+            form.addr = res.data.addr;
+            form.port = res.data.port;
+            form.authMode = res.data.authMode;
+            form.password = Base64.decode(res.data.password);
+            form.privateKey = res.data.privateKey;
+            form.passPhrase = res.data.passPhrase;
+        }
     });
 };
 

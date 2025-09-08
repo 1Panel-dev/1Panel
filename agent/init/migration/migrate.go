@@ -40,6 +40,7 @@ func InitAgentDB() {
 		migrations.AddQuickJump,
 		migrations.UpdateMcpServerAddType,
 		migrations.InitLocalSSHConn,
+		migrations.InitLocalSSHShow,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

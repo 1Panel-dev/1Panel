@@ -166,8 +166,8 @@ const search = async (withReset?: boolean) => {
 };
 
 const loadConnShow = async () => {
-    await getAgentSettingByKey('LocalSSHConn').then((res) => {
-        form.showDefaultConn = res.data.length !== 0;
+    await getAgentSettingByKey('LocalSSHConnShow').then((res) => {
+        form.showDefaultConn = res.data === 'Enable';
     });
 };
 
@@ -176,7 +176,7 @@ const changeShow = async () => {
         dialogRef.value.acceptParams(true);
         return;
     }
-    await updateAgentSetting({ key: 'LocalSSHConn', value: '' }).then(() => {
+    await updateAgentSetting({ key: 'LocalSSHConnShow', value: 'Disable' }).then(() => {
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
     });
 };

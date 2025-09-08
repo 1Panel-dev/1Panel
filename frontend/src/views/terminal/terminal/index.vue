@@ -210,8 +210,8 @@ const acceptParams = async () => {
     loadCommandTree();
     loadHostTree();
     if (terminalTabs.value.length === 0) {
-        await getAgentSettingByKey('LocalSSHConn').then((res) => {
-            if (res.data.length !== 0) {
+        await getAgentSettingByKey('LocalSSHConnShow').then((res) => {
+            if (res.data === 'Enable') {
                 onNewLocal();
             }
         });

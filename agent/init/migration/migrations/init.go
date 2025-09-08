@@ -553,3 +553,13 @@ var InitLocalSSHConn = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var InitLocalSSHShow = &gormigrate.Migration{
+	ID: "20250908-init-local-ssh-show",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.Create(&model.Setting{Key: "LocalSSHConnShow", Value: constant.StatusEnable}).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}
