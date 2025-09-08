@@ -109,7 +109,7 @@ const confirmDialogRef = ref();
 const paginationConfig = reactive({
     cacheSizeKey: 'operation-log-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('operation-log-page-size')) || 10,
+    pageSize: Number(localStorage.getItem('operation-log-page-size')) || 20,
     total: 0,
 });
 const searchName = ref<string>('');

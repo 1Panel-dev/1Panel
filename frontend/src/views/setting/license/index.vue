@@ -124,7 +124,7 @@ const data = ref();
 const paginationConfig = reactive({
     cacheSizeKey: 'license-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('license-page-size')) || 10,
+    pageSize: Number(localStorage.getItem('license-page-size')) || 20,
     total: 0,
     type: '',
     name: '',

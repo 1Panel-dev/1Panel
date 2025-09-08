@@ -135,7 +135,7 @@ const data = ref();
 const paginationConfig = reactive({
     cacheSizeKey: 'backup-account-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('backup-account-size')) || 10,
+    pageSize: Number(localStorage.getItem('backup-account-size')) || 20,
     total: 0,
     type: '',
     name: '',

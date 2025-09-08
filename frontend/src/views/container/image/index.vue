@@ -145,7 +145,7 @@ const repos = ref();
 const paginationConfig = reactive({
     cacheSizeKey: 'container-image-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('container-image-page-size')) || 10,
+    pageSize: Number(localStorage.getItem('container-image-page-size')) || 20,
     total: 0,
     name: '',
     orderBy: 'createdAt',

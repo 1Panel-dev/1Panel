@@ -225,7 +225,7 @@ const data = ref();
 const paginationConfig = reactive({
     cacheSizeKey: 'model-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('page-size')) || 10,
+    pageSize: Number(localStorage.getItem('page-size')) || 20,
     total: 0,
 });
 const searchName = ref();

@@ -168,7 +168,7 @@ const req = reactive({
 const paginationConfig = reactive({
     cacheSizeKey: 'alert-list-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('alert-list-page-size')) || 10,
+    pageSize: Number(localStorage.getItem('alert-list-page-size')) || 20,
     total: 0,
     orderBy: 'created_at',
     order: 'null',

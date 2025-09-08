@@ -191,7 +191,7 @@ const data = ref();
 const paginationConfig = reactive({
     cacheSizeKey: 'clam-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('clam-page-size')) || 10,
+    pageSize: Number(localStorage.getItem('clam-page-size')) || 20,
     total: 0,
     orderBy: 'createdAt',
     order: 'null',

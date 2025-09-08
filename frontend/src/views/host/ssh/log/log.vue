@@ -100,7 +100,7 @@ const data = ref();
 const paginationConfig = reactive({
     cacheSizeKey: 'ssh-log-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('ssh-log-page-size')) || 10,
+    pageSize: Number(localStorage.getItem('ssh-log-page-size')) || 20,
     total: 0,
 });
 

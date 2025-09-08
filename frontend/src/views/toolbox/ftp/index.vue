@@ -169,7 +169,7 @@ const data = ref();
 const paginationConfig = reactive({
     cacheSizeKey: 'ftp-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('ftp-page-size')) || 10,
+    pageSize: Number(localStorage.getItem('ftp-page-size')) || 20,
     total: 0,
     orderBy: 'createdAt',
     order: 'null',

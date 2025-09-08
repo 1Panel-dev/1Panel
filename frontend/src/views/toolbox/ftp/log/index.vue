@@ -46,7 +46,7 @@ import i18n from '@/lang';
 const paginationConfig = reactive({
     cacheSizeKey: 'ftp-log-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('ftp-log-page-size')) || 10,
+    pageSize: Number(localStorage.getItem('ftp-log-page-size')) || 20,
     total: 0,
     user: '',
     operation: '',

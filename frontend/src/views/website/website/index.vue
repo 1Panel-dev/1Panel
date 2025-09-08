@@ -360,7 +360,7 @@ const websiteDir = ref();
 const paginationConfig = reactive({
     cacheSizeKey: 'website-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('website-page-size')) || 10,
+    pageSize: Number(localStorage.getItem('website-page-size')) || 20,
     total: 0,
 });
 let req = reactive({

@@ -58,7 +58,7 @@ const data = ref();
 const paginationConfig = reactive({
     cacheSizeKey: 'task-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('task-page-size')) || 10,
+    pageSize: Number(localStorage.getItem('task-page-size')) || 20,
     total: 0,
 });
 const taskLogRef = ref();

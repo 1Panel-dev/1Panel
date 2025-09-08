@@ -218,7 +218,7 @@ const selects = ref<any>([]);
 const paginationConfig = reactive({
     cacheSizeKey: 'login-log-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('login-log-page-size')) || 10,
+    pageSize: Number(localStorage.getItem('login-log-page-size')) || 20,
     total: 0,
     small: true,
 });

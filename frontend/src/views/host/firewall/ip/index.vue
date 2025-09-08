@@ -123,7 +123,7 @@ const data = ref();
 const paginationConfig = reactive({
     cacheSizeKey: 'firewall-ip-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('firewall-ip-page-size')) || 10,
+    pageSize: Number(localStorage.getItem('firewall-ip-page-size')) || 20,
     total: 0,
 });
 

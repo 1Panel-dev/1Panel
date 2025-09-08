@@ -113,7 +113,7 @@ const resourceTypes = [
 const paginationConfig = reactive({
     cacheSizeKey: 'alert-log-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('alert-log-page-size')) || 10,
+    pageSize: Number(localStorage.getItem('alert-log-page-size')) || 20,
     total: 0,
 });
 const req = reactive({

@@ -137,7 +137,7 @@ const isExist = ref(false);
 const paginationConfig = reactive({
     cacheSizeKey: 'runtime-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('runtime-page-size')) || 10,
+    pageSize: Number(localStorage.getItem('runtime-page-size')) || 20,
     total: 0,
 });
 const req = reactive<Runtime.RuntimeReq>({

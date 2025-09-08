@@ -171,7 +171,7 @@ const confirmDialogRef = ref();
 const paginationConfig = reactive({
     cacheSizeKey: 'redis-backup-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('redis-backup-page-size')) || 10,
+    pageSize: Number(localStorage.getItem('redis-backup-page-size')) || 20,
     total: 0,
 });
 

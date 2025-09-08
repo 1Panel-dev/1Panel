@@ -106,7 +106,7 @@ const groupList = ref();
 const paginationConfig = reactive({
     cacheSizeKey: 'terminal-command-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('terminal-command-page-size')) || 10,
+    pageSize: Number(localStorage.getItem('terminal-command-page-size')) || 20,
     total: 0,
     orderBy: 'name',
     order: 'ascending',

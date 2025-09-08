@@ -94,7 +94,7 @@ const selects = ref<any>([]);
 const paginationConfig = reactive({
     cacheSizeKey: 'terminal-host-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('terminal-host-page-size')) || 10,
+    pageSize: Number(localStorage.getItem('terminal-host-page-size')) || 20,
     total: 0,
 });
 const info = ref();

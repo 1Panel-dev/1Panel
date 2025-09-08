@@ -119,7 +119,7 @@ const loading = ref(false);
 const paginationConfig = reactive({
     cacheSizeKey: 'container-compose-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('container-compose-page-size')) || 10,
+    pageSize: Number(localStorage.getItem('container-compose-page-size')) || 20,
     total: 0,
 });
 const searchName = ref();
