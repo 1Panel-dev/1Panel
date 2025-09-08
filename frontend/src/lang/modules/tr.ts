@@ -1371,6 +1371,7 @@ const message = {
         deleteLogs: 'Logları temizle',
         resource: 'Kaynak',
         detail: {
+            dashboard: 'Genel Bakış',
             ai: 'AI',
             groups: 'Grup',
             hosts: 'Ana Bilgisayar',

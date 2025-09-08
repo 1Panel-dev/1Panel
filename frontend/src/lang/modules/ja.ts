@@ -1301,6 +1301,7 @@ const message = {
         deleteLogs: 'クリーンログ',
         resource: 'リソース',
         detail: {
+            dashboard: '概要',
             ai: 'AI',
             groups: 'グループ',
             hosts: 'ホスト',

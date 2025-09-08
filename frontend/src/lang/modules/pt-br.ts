@@ -1327,6 +1327,7 @@ const message = {
         deleteLogs: 'Limpar logs',
         resource: 'Recurso',
         detail: {
+            dashboard: 'Visão Geral',
             ai: 'AI',
             groups: 'Grupos',
             hosts: 'Hosts',

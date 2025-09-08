@@ -1287,6 +1287,7 @@ const message = {
         deleteLogs: '로그 정리',
         resource: '자원',
         detail: {
+            dashboard: '개요',
             ai: 'AI',
             groups: '그룹',
             hosts: '호스트',

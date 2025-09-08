@@ -1341,6 +1341,7 @@ const message = {
         deleteLogs: 'Bersihkan Log',
         resource: 'Sumber',
         detail: {
+            dashboard: 'Overview',
             ai: 'AI',
             groups: 'Kumpulan',
             hosts: 'Hos',

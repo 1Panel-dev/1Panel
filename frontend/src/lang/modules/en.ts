@@ -1355,6 +1355,7 @@ const message = {
         deleteLogs: 'Clean logs',
         resource: 'Resource',
         detail: {
+            dashboard: 'Overview',
             ai: 'AI',
             groups: 'Group',
             hosts: 'Host',

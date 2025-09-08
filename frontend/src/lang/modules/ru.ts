@@ -1333,6 +1333,7 @@ const message = {
         deleteLogs: 'Очистить логи',
         resource: 'Ресурс',
         detail: {
+            dashboard: 'Обзор',
             ai: 'AI',
             groups: 'Группы',
             hosts: 'Хосты',

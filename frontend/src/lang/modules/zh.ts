@@ -1285,6 +1285,7 @@ const message = {
         deleteLogs: '清空日志',
         resource: '资源',
         detail: {
+            dashboard: '概览',
             ai: 'AI',
             groups: '分组',
             hosts: '主机',
