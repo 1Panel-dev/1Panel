@@ -3,6 +3,7 @@ package files
 import (
 	"archive/zip"
 	"bufio"
+	"compress/gzip"
 	"context"
 	"crypto/tls"
 	"encoding/json"
@@ -597,10 +598,10 @@ func getFormat(cType CompressType) archiver.CompressedArchive {
 		format.Archival = archiver.Zip{
 			Compression: zip.Deflate,
 		}
-	case Bz2:
+	case Bz2, TarBz2:
 		format.Compression = archiver.Bz2{}
 		format.Archival = archiver.Tar{}
-	case Xz:
+	case Xz, TarXz:
 		format.Compression = archiver.Xz{}
 		format.Archival = archiver.Tar{}
 	}
@@ -680,6 +681,13 @@ func decodeGBK(input string) (string, error) {
 
 func (f FileOp) decompressWithSDK(srcFile string, dst string, cType CompressType) error {
 	format := getFormat(cType)
+	if cType == Gz {
+		err := f.DecompressGzFile(srcFile, dst)
+		if err != nil {
+			return err
+		}
+	}
+
 	handler := func(ctx context.Context, archFile archiver.File) error {
 		info := archFile.FileInfo
 		if isIgnoreFile(archFile.Name()) {
@@ -791,6 +799,41 @@ func ZipFile(files []archiver.File, dst afero.File) error {
 			}
 		}
 	}
+	return nil
+}
+
+func (f FileOp) DecompressGzFile(srcFile, dst string) error {
+	in, err := f.Fs.Open(srcFile)
+	if err != nil {
+		return fmt.Errorf("open source file failed: %w", err)
+	}
+	defer in.Close()
+
+	gr, err := gzip.NewReader(in)
+	if err != nil {
+		return fmt.Errorf("gzip reader creation failed: %w", err)
+	}
+	defer gr.Close()
+
+	outName := strings.TrimSuffix(filepath.Base(srcFile), ".gz")
+	outPath := filepath.Join(dst, outName)
+	parentDir := filepath.Dir(outPath)
+	if !f.Stat(parentDir) {
+		if err := f.Fs.MkdirAll(parentDir, 0755); err != nil {
+			return err
+		}
+	}
+
+	fw, err := f.Fs.OpenFile(outPath, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0644)
+	if err != nil {
+		return fmt.Errorf("create output file failed: %w", err)
+	}
+	defer fw.Close()
+
+	if _, err := io.Copy(fw, gr); err != nil {
+		return fmt.Errorf("copy content failed: %w", err)
+	}
+
 	return nil
 }
 

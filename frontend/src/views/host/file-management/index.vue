@@ -688,7 +688,7 @@ import VscodeOpenDialog from '@/components/vscode-open/index.vue';
 import { debounce } from 'lodash-es';
 import TerminalDialog from './terminal/index.vue';
 import { Dashboard } from '@/api/interface/dashboard';
-import { CompressExtension, MimetypeByExtensionObject } from '@/enums/files';
+import { CompressExtension } from '@/enums/files';
 import type { TabPaneName } from 'element-plus';
 
 const globalStore = GlobalStore();
@@ -733,7 +733,7 @@ let pointer = -1;
 
 const fileCreate = reactive({ path: '/', isDir: false, mode: 0o755 });
 const fileCompress = reactive({ files: [''], name: '', dst: '', operate: 'compress' });
-const fileDeCompress = reactive({ path: '', name: '', dst: '', mimeType: '' });
+const fileDeCompress = reactive({ path: '', name: '', dst: '', type: '' });
 const fileEdit = reactive({ content: '', path: '', name: '', language: 'plaintext', extension: '' });
 const filePreview = reactive({ path: '', name: '', extension: '', fileType: '', imageFiles: [], currentNode: '' });
 const codeReq = reactive({ path: '', expand: false, page: 1, pageSize: 100, isDetail: false });
@@ -1186,9 +1186,9 @@ const openDeCompress = (item: File.File) => {
         MsgWarning(i18n.global.t('file.canNotDeCompress'));
         return;
     }
-    fileDeCompress.mimeType = item.mimeType;
+    fileDeCompress.type = Mimetypes.get(item.mimeType);
     if (CompressExtension[Mimetypes.get(item.mimeType)] != item.extension) {
-        fileDeCompress.mimeType = MimetypeByExtensionObject[item.extension];
+        fileDeCompress.type = getEnumKeyByValue(item.extension);
     }
 
     fileDeCompress.name = item.name;
@@ -1197,6 +1197,12 @@ const openDeCompress = (item: File.File) => {
 
     deCompressRef.value.acceptParams(fileDeCompress);
 };
+
+function getEnumKeyByValue(value: string): keyof typeof CompressExtension | undefined {
+    return (Object.keys(CompressExtension) as Array<keyof typeof CompressExtension>).find(
+        (k) => CompressExtension[k] === value,
+    );
+}
 
 const openView = (item: File.File) => {
     const fileType = getFileType(item.extension);

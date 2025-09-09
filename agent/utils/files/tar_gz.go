@@ -2,6 +2,7 @@ package files
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -17,6 +18,9 @@ func NewTarGzArchiver() ShellArchiver {
 }
 
 func (t TarGzArchiver) Extract(filePath, dstDir string, secret string) error {
+	if err := os.MkdirAll(dstDir, 0755); err != nil {
+		return fmt.Errorf("failed to create destination dir: %w", err)
+	}
 	var err error
 	commands := ""
 	if len(secret) != 0 {

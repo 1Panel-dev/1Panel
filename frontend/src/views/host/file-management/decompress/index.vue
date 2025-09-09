@@ -39,7 +39,6 @@ import { File } from '@/api/interface/file';
 import { FormInstance, FormRules } from 'element-plus';
 import { Rules } from '@/global/form-rules';
 import { deCompressFile } from '@/api/modules/files';
-import { Mimetypes } from '@/global/mimetype';
 import FileList from '@/components/file-list/index.vue';
 import { MsgSuccess } from '@/utils/message';
 
@@ -48,7 +47,7 @@ interface CompressProps {
     dst: string;
     name: string;
     path: string;
-    mimeType: string;
+    type: string;
 }
 
 const rules = reactive<FormRules>({
@@ -70,14 +69,6 @@ const handleClose = () => {
     }
     open.value = false;
     em('close', open);
-};
-
-const getFileType = (mime: string): string => {
-    if (Mimetypes.get(mime) != undefined) {
-        return String(Mimetypes.get(mime));
-    } else {
-        return '';
-    }
 };
 
 const getLinkPath = (path: string) => {
@@ -103,7 +94,7 @@ const submit = async (formEl: FormInstance | undefined) => {
 };
 
 const acceptParams = (props: CompressProps) => {
-    form.value.type = getFileType(props.mimeType);
+    form.value.type = props.type;
     form.value.dst = props.dst;
     form.value.path = props.path;
     name.value = props.name;
