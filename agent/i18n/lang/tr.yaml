@@ -236,6 +236,7 @@ IgnoreBackupErr: "Yedekleme başarısız, hata: {{ .detail }}, bu hata yoksayıl
 IgnoreUploadErr: "Yükleme başarısız, hata: {{ .detail }}, bu hata yoksayılıyor..."
 LoadBackupFailed: "Yedek hesap bağlantısı alınamadı, hata: {{ .detail }}"
 InExecuting: "Mevcut görev yürütülüyor, lütfen tekrar yürütmeyin!"
+NoSuchResource: "Veritabanında yedek içeriği bulunamadı, atlanıyor..."
 
 #toolbox
 ErrNotExistUser: 'Mevcut kullanıcı mevcut değil, lütfen değiştirin ve tekrar deneyin!'

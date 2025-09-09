@@ -235,6 +235,7 @@ IgnoreBackupErr: "Backup falhou, erro: {{ .detail }}, ignorando este erro..."
 IgnoreUploadErr: "Upload falhou, erro: {{ .detail }}, ignorando este erro..."
 LoadBackupFailed: "Falha ao obter conexão da conta de backup, erro: {{ .detail }}"
 InExecuting: "A tarefa atual está sendo executada, não repita a execução!"
+NoSuchResource: "Nenhum conteúdo de backup encontrado no banco de dados, ignorando..."
 
 #caixa de ferramentas
 ErrNotExistUser: 'O usuário atual não existe, modifique e tente novamente!'

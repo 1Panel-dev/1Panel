@@ -27,7 +27,8 @@ import (
 func (u *CronjobService) handleApp(cronjob model.Cronjob, startTime time.Time, taskItem *task.Task) error {
 	apps := loadAppsForJob(cronjob)
 	if len(apps) == 0 {
-		return errors.New("no such app in database!")
+		addSkipTask("App", taskItem)
+		return nil
 	}
 	accountMap := NewBackupClientMap(strings.Split(cronjob.SourceAccountIDs, ","))
 	if !accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].isOk {
@@ -83,7 +84,8 @@ func (u *CronjobService) handleApp(cronjob model.Cronjob, startTime time.Time, t
 func (u *CronjobService) handleWebsite(cronjob model.Cronjob, startTime time.Time, taskItem *task.Task) error {
 	webs := loadWebsForJob(cronjob)
 	if len(webs) == 0 {
-		return errors.New("no such website in database!")
+		addSkipTask("Website", taskItem)
+		return nil
 	}
 	accountMap := NewBackupClientMap(strings.Split(cronjob.SourceAccountIDs, ","))
 	if !accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].isOk {
@@ -140,7 +142,8 @@ func (u *CronjobService) handleWebsite(cronjob model.Cronjob, startTime time.Tim
 func (u *CronjobService) handleDatabase(cronjob model.Cronjob, startTime time.Time, taskItem *task.Task) error {
 	dbs := loadDbsForJob(cronjob)
 	if len(dbs) == 0 {
-		return errors.New("no such db in database!")
+		addSkipTask("Database", taskItem)
+		return nil
 	}
 	accountMap := NewBackupClientMap(strings.Split(cronjob.SourceAccountIDs, ","))
 	if !accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].isOk {
@@ -370,6 +373,13 @@ type DatabaseHelper struct {
 	DBType   string
 	Database string
 	Name     string
+}
+
+func addSkipTask(source string, taskItem *task.Task) {
+	taskItem.AddSubTask(task.GetTaskName(i18n.GetMsgByKey(source), task.TaskBackup, task.TaskScopeCronjob), func(task *task.Task) error {
+		taskItem.Log(i18n.GetMsgByKey("NoSuchResource"))
+		return nil
+	}, nil)
 }
 
 func loadDbsForJob(cronjob model.Cronjob) []DatabaseHelper {

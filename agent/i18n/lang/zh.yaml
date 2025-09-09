@@ -234,6 +234,7 @@ IgnoreBackupErr: "备份失败，错误：{{ .detail }}，忽略本次错误..."
 IgnoreUploadErr: "上传失败，错误：{{ .detail }}，忽略本次错误..."
 LoadBackupFailed: "获取备份账号连接失败，错误：{{ .detail }}"
 InExecuting: "当前任务正在执行中，请勿重复执行！"
+NoSuchResource: "数据库中未能查询到备份内容，跳过..."
 
 #toolbox
 ErrNotExistUser: "当前用户不存在，请修改后重试！"
