@@ -370,6 +370,7 @@ const submit = async (formEl: FormInstance | undefined) => {
         }
         loading.value = true;
         if (operate.value == 'create') {
+            ssl.value.nodes = nodes;
             createSSL(ssl.value)
                 .then((res: any) => {
                     if (ssl.value.provider != 'dnsManual') {
