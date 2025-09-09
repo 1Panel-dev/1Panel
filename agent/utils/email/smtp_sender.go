@@ -11,22 +11,46 @@ import (
 	"time"
 )
 
-// SMTPConfig holds SMTP connection info
 type SMTPConfig struct {
 	Host       string
-	Port       int // 465, 587, 25
+	Port       int
 	Username   string
 	Password   string
 	From       string
-	Encryption string // "ssl", "starttls", "none"
+	Encryption string
 	Recipient  string
 }
 
-// EmailMessage represents an email
 type EmailMessage struct {
 	Subject string
-	Body    string // HTML or plain text
+	Body    string
 	IsHTML  bool
+}
+
+type loginAuth struct {
+	username, password string
+}
+
+func LoginAuth(username, password string) smtp.Auth {
+	return &loginAuth{username, password}
+}
+
+func (a *loginAuth) Start(server *smtp.ServerInfo) (string, []byte, error) {
+	return "LOGIN", []byte{}, nil
+}
+
+func (a *loginAuth) Next(fromServer []byte, more bool) ([]byte, error) {
+	if more {
+		switch string(fromServer) {
+		case "Username:":
+			return []byte(a.username), nil
+		case "Password:":
+			return []byte(a.password), nil
+		default:
+			return nil, fmt.Errorf("unknown server challenge: %s", fromServer)
+		}
+	}
+	return nil, nil
 }
 
 func SendMail(config SMTPConfig, message EmailMessage, transport *http.Transport) error {
@@ -147,7 +171,9 @@ func sendWithSSL(config SMTPConfig, addr string, toList []string, msg string, tr
 		return fmt.Errorf("failed to create SMTP client: %w", err)
 	}
 	defer client.Quit()
-
+	if err := tryAuth(client, config.Username, config.Password, config.Host); err != nil {
+		return fmt.Errorf("authentication failed: %w", err)
+	}
 	return sendEmailWithClient(client, config, toList, msg)
 }
 
@@ -173,7 +199,9 @@ func sendWithStartTLS(config SMTPConfig, addr string, toList []string, msg strin
 	if err = client.StartTLS(&tls.Config{ServerName: config.Host}); err != nil {
 		return fmt.Errorf("failed to start TLS: %w", err)
 	}
-
+	if err := tryAuth(client, config.Username, config.Password, config.Host); err != nil {
+		return fmt.Errorf("authentication failed: %w", err)
+	}
 	return sendEmailWithClient(client, config, toList, msg)
 }
 
@@ -199,10 +227,6 @@ func sendPlaintext(config SMTPConfig, addr string, toList []string, msg string, 
 }
 
 func sendEmailWithClient(client *smtp.Client, config SMTPConfig, toList []string, msg string) error {
-	auth := smtp.PlainAuth("", config.Username, config.Password, config.Host)
-	if err := client.Auth(auth); err != nil {
-		return fmt.Errorf("authentication failed: %w", err)
-	}
 	if err := client.Mail(config.Username); err != nil {
 		return fmt.Errorf("setting sender failed: %w", err)
 	}
@@ -222,4 +246,27 @@ func sendEmailWithClient(client *smtp.Client, config SMTPConfig, toList []string
 	}
 
 	return nil
+}
+
+func tryAuth(client *smtp.Client, username, password, host string) error {
+	ok, authCap := client.Extension("AUTH")
+	if !ok {
+		return fmt.Errorf("server does not support AUTH")
+	}
+	authCap = strings.ToUpper(authCap)
+	if strings.Contains(authCap, "PLAIN") {
+		auth := smtp.PlainAuth("", username, password, host)
+		if err := client.Auth(auth); err != nil {
+			return fmt.Errorf("plain auth failed: %w", err)
+		}
+		return nil
+	}
+	if strings.Contains(authCap, "LOGIN") {
+		if err := client.Auth(LoginAuth(username, password)); err != nil {
+			return fmt.Errorf("login auth failed: %w", err)
+		}
+		return nil
+	}
+
+	return fmt.Errorf("no supported auth mechanism, server supports: %s", authCap)
 }
