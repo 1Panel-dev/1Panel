@@ -247,11 +247,7 @@
                                                     : form.websiteList
                                             "
                                         >
-                                            <el-option
-                                                :disabled="websiteOptions.length === 0"
-                                                :label="$t('commons.table.all')"
-                                                value="all"
-                                            />
+                                            <el-option :label="$t('commons.table.all')" value="all" />
                                             <el-option
                                                 v-for="(item, index) in websiteOptions"
                                                 :key="index"
@@ -281,11 +277,7 @@
                                                     : form.appIdList
                                             "
                                         >
-                                            <el-option
-                                                :disabled="appOptions.length === 0"
-                                                :label="$t('commons.table.all')"
-                                                value="all"
-                                            />
+                                            <el-option :label="$t('commons.table.all')" value="all" />
                                             <div v-for="item in appOptions" :key="item.id">
                                                 <el-option :value="item.id + ''" :label="item.name">
                                                     <span>{{ item.name }}</span>
@@ -320,11 +312,7 @@
                                                     : form.dbNameList
                                             "
                                         >
-                                            <el-option
-                                                :disabled="dbInfo.dbs.length === 0"
-                                                :label="$t('commons.table.all')"
-                                                value="all"
-                                            />
+                                            <el-option :label="$t('commons.table.all')" value="all" />
                                             <el-option
                                                 v-for="item in dbInfo.dbs"
                                                 :key="item.id"

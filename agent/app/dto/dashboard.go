@@ -3,6 +3,11 @@ package dto
 import "time"
 
 type DashboardBase struct {
+	WebsiteNumber      int `json:"websiteNumber"`
+	DatabaseNumber     int `json:"databaseNumber"`
+	CronjobNumber      int `json:"cronjobNumber"`
+	AppInstalledNumber int `json:"appInstalledNumber"`
+
 	Hostname             string `json:"hostname"`
 	OS                   string `json:"os"`
 	Platform             string `json:"platform"`

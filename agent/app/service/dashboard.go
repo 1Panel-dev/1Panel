@@ -572,22 +572,30 @@ func loadOutboundIP() string {
 }
 
 func loadQuickJump(base *dto.DashboardBase) {
+	website, _ := websiteRepo.GetBy()
+	base.WebsiteNumber = len(website)
+
+	postgresqlDbs, _ := postgresqlRepo.List()
+	mysqlDbs, _ := mysqlRepo.List()
+	base.DatabaseNumber = len(mysqlDbs) + len(postgresqlDbs)
+
+	cronjobs, _ := cronjobRepo.List()
+	base.CronjobNumber = len(cronjobs)
+
+	appInstall, _ := appInstallRepo.ListBy(context.Background())
+	base.AppInstalledNumber = len(appInstall)
+
 	quicks := launcherRepo.ListQuickJump(false)
 	for i := 0; i < len(quicks); i++ {
 		switch quicks[i].Name {
 		case "Website":
-			website, _ := websiteRepo.GetBy()
-			quicks[i].Detail = fmt.Sprintf("%d", len(website))
+			quicks[i].Detail = fmt.Sprintf("%d", base.WebsiteNumber)
 		case "Database":
-			postgresqlDbs, _ := postgresqlRepo.List()
-			mysqlDbs, _ := mysqlRepo.List()
-			quicks[i].Detail = fmt.Sprintf("%d", len(mysqlDbs)+len(postgresqlDbs))
+			quicks[i].Detail = fmt.Sprintf("%d", base.DatabaseNumber)
 		case "Cronjob":
-			cronjobs, _ := cronjobRepo.List()
-			quicks[i].Detail = fmt.Sprintf("%d", len(cronjobs))
+			quicks[i].Detail = fmt.Sprintf("%d", base.CronjobNumber)
 		case "AppInstalled":
-			appInstall, _ := appInstallRepo.ListBy(context.Background())
-			quicks[i].Detail = fmt.Sprintf("%d", len(appInstall))
+			quicks[i].Detail = fmt.Sprintf("%d", base.AppInstalledNumber)
 		}
 		var item dto.QuickJump
 		_ = copier.Copy(&item, quicks[i])
