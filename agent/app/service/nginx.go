@@ -241,13 +241,13 @@ func (n NginxService) Build(req request.NginxBuildReq) error {
 		return err
 	}
 	buildTask.AddSubTaskWithOps("", func(t *task.Task) error {
-		cmdMgr := cmd2.NewCommandMgr(cmd.WithTask(*buildTask), cmd.WithTimeout(60*time.Minute))
+		cmdMgr := cmd2.NewCommandMgr(cmd.WithTask(*buildTask), cmd.WithTimeout(120*time.Minute))
 		if err = cmdMgr.RunBashCf("docker compose -f %s build", nginxInstall.GetComposePath()); err != nil {
 			return err
 		}
 		_, err = compose.DownAndUp(nginxInstall.GetComposePath())
 		return err
-	}, nil, 0, 60*time.Minute)
+	}, nil, 0, 120*time.Minute)
 
 	go func() {
 		_ = buildTask.Execute()
