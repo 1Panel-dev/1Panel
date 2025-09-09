@@ -490,15 +490,16 @@ defineExpose({ changeTail, onDownload, clearLog });
     left: 0;
     right: 0;
     will-change: transform;
+    width: max-content;
+    min-width: 100%;
 }
 
 .log-item {
-    width: 100%;
+    min-width: 100%;
     padding: 5px;
     color: #f5f5f5;
     box-sizing: border-box;
     white-space: nowrap;
-    overflow: hidden;
 }
 
 .log-content {

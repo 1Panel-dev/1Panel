@@ -1,11 +1,10 @@
 <template>
     <span v-for="(token, index) in tokens" :key="index" :class="['token', token.type]" :style="{ color: token.color }">
-        <span v-if="token.type != 'html'" class="whitespace-pre">{{ token.text }}</span>
-        <span v-else v-html="token.text" class="whitespace-pre"></span>
+        <span class="whitespace-pre">{{ token.text }}</span>
     </span>
 </template>
 <script setup lang="ts">
-import anser from 'anser';
+import { ansiToJson } from 'anser';
 interface TokenRule {
     type: string;
     pattern: RegExp;
@@ -277,19 +276,51 @@ const getContainerRules = (containerName?: string): TokenRule[] => {
     return [...specificRules, ...commonContainerRules];
 };
 
-function hasANSICodes(text: string) {
-    const ansiRegex = /\x1b\[[0-9;]*[mK]/;
-    return ansiRegex.test(text);
-}
-
 function tokenizeLog(log: string): Token[] {
-    if (hasANSICodes(log)) {
-        const html = anser.ansiToHtml(log);
+    if (
+        log.indexOf('<div') !== -1 ||
+        log.indexOf('<span') !== -1 ||
+        log.indexOf('<p>') !== -1 ||
+        log.indexOf('<img') !== -1 ||
+        log.indexOf('</div>') !== -1 ||
+        log.indexOf('</span>') !== -1 ||
+        log.indexOf('<script>') !== -1
+    ) {
         return [
             {
-                text: html,
-                type: 'html',
-                color: '',
+                text: log,
+                type: 'plain',
+                color: '#666666',
+            },
+        ];
+    }
+
+    if (log.indexOf('\x1b[') !== -1) {
+        try {
+            const parsed = ansiToJson(log, { json: true, remove_empty: true });
+            return parsed.map((item: any) => ({
+                text: item.content,
+                type: 'ansi',
+                color: item.fg ? `rgb(${item.fg})` : '#666666',
+            }));
+        } catch (error) {
+            return [
+                {
+                    text: log,
+                    type: 'plain',
+                    color: '#666666',
+                },
+            ];
+        }
+    }
+
+    const textLength = log.length;
+    if (textLength > 5000) {
+        return [
+            {
+                text: log,
+                type: 'plain',
+                color: '#666666',
             },
         ];
     }
