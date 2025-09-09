@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
@@ -113,6 +114,8 @@ func (u *SettingService) SaveConnInfo(req dto.SSHConnData) error {
 	}
 	defer client.Close()
 
+	var connItem model.LocalConnInfo
+	_ = copier.Copy(&connItem, &req)
 	localConn, _ := json.Marshal(&connInfo)
 	connAfterEncrypt, _ := encrypt.StringEncrypt(string(localConn))
 	_ = settingRepo.Update("LocalSSHConn", connAfterEncrypt)

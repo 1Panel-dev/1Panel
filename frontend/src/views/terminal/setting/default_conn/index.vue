@@ -94,8 +94,8 @@ const search = async () => {
             form.port = res.data.port;
             form.authMode = res.data.authMode;
             form.password = Base64.decode(res.data.password);
-            form.privateKey = res.data.privateKey;
-            form.passPhrase = res.data.passPhrase;
+            form.privateKey = Base64.decode(res.data.privateKey);
+            form.passPhrase = Base64.decode(res.data.passPhrase);
         }
     });
 };
