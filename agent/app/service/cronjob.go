@@ -536,6 +536,9 @@ func (u *CronjobService) HandleOnce(id uint) error {
 	if cronjob.ID == 0 {
 		return buserr.New("ErrRecordNotFound")
 	}
+	if cronjob.IsExecuting {
+		return buserr.New("InExecuting")
+	}
 	u.HandleJob(&cronjob)
 	return nil
 }

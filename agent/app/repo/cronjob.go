@@ -32,7 +32,7 @@ type ICronjobRepo interface {
 	StartRecords(cronjobID uint) model.JobRecords
 	UpdateRecords(id uint, vars map[string]interface{}) error
 	EndRecords(record model.JobRecords, status, message, records string)
-	AddFailedRecord(cronjobID uint)
+	AddFailedRecord(cronjobID uint, message string)
 	PageRecords(page, size int, opts ...DBOption) (int64, []model.JobRecords, error)
 }
 
@@ -169,12 +169,12 @@ func (u *CronjobRepo) EndRecords(record model.JobRecords, status, message, recor
 	}
 	_ = u.Update(record.CronjobID, map[string]interface{}{"is_executing": false})
 }
-func (u *CronjobRepo) AddFailedRecord(cronjobID uint) {
+func (u *CronjobRepo) AddFailedRecord(cronjobID uint, message string) {
 	var record model.JobRecords
 	record.StartTime = time.Now()
 	record.CronjobID = cronjobID
 	record.Status = constant.StatusFailed
-	record.Message = "The current cronjob is being executed"
+	record.Message = message
 	if err := global.DB.Create(&record).Error; err != nil {
 		global.LOG.Errorf("create record status failed, err: %v", err)
 	}

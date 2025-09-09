@@ -234,6 +234,7 @@ Upload: "アップロード"
 IgnoreBackupErr: "バックアップ失敗、エラー: {{ .detail }}、このエラーを無視します..."
 IgnoreUploadErr: "アップロード失敗、エラー: {{ .detail }}、このエラーを無視します..."
 LoadBackupFailed: "バックアップアカウントの接続取得に失敗、エラー: {{ .detail }}"
+InExecuting: "現在のタスクは実行中です。重複して実行しないでください！"
 
 #toolbox
 ErrNotExistUser: '現在のユーザーは存在しません。変更してもう一度お試しください。'

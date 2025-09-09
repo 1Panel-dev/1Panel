@@ -233,6 +233,7 @@ Upload: "上傳"
 IgnoreBackupErr: "備份失敗，錯誤：{{ .detail }}，忽略本次錯誤..."
 IgnoreUploadErr: "上傳失敗，錯誤：{{ .detail }}，忽略本次錯誤..."
 LoadBackupFailed: "獲取備份帳號連接失敗，錯誤：{{ .detail }}"
+InExecuting: "當前任務正在執行中，請勿重複執行！"
 
 #toolbox
 ErrNotExistUser: '目前使用者不存在，請修改後重試！'

@@ -234,6 +234,7 @@ Upload: "Upload"
 IgnoreBackupErr: "Backup failed, error: {{ .detail }}, ignoring this error..."
 IgnoreUploadErr: "Upload failed, error: {{ .detail }}, ignoring this error..."
 LoadBackupFailed: "Failed to get backup account connection, error: {{ .detail }}"
+InExecuting: "The current task is being executed, please do not repeat the execution!"
 
 #toolbox
 ErrNotExistUser: 'The current user does not exist, please modify and try again!'

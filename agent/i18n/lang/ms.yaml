@@ -234,6 +234,7 @@ Upload: "Muat Naik"
 IgnoreBackupErr: "Sandaran gagal, ralat: {{ .detail }}, abaikan ralat ini..."
 IgnoreUploadErr: "Muat naik gagal, ralat: {{ .detail }}, abaikan ralat ini..."
 LoadBackupFailed: "Gagal mendapatkan sambungan akaun sandaran, ralat: {{ .detail }}"
+InExecuting: "Tugas semasa sedang dilaksanakan, jangan ulangi pelaksanaan!"
 
 #kotak alat
 ErrNotExistUser: 'Pengguna semasa tidak wujud, sila ubah suai dan cuba lagi!'

@@ -27,7 +27,7 @@ import (
 func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
 	cronjobItem, _ := cronjobRepo.Get(repo.WithByID(cronjob.ID))
 	if cronjobItem.IsExecuting {
-		cronjobRepo.AddFailedRecord(cronjob.ID)
+		cronjobRepo.AddFailedRecord(cronjob.ID, i18n.GetMsgByKey("InExecuting"))
 		return
 	}
 	record := cronjobRepo.StartRecords(cronjob.ID)

@@ -235,6 +235,7 @@ Upload: "Yükle"
 IgnoreBackupErr: "Yedekleme başarısız, hata: {{ .detail }}, bu hata yoksayılıyor..."
 IgnoreUploadErr: "Yükleme başarısız, hata: {{ .detail }}, bu hata yoksayılıyor..."
 LoadBackupFailed: "Yedek hesap bağlantısı alınamadı, hata: {{ .detail }}"
+InExecuting: "Mevcut görev yürütülüyor, lütfen tekrar yürütmeyin!"
 
 #toolbox
 ErrNotExistUser: 'Mevcut kullanıcı mevcut değil, lütfen değiştirin ve tekrar deneyin!'

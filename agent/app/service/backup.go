@@ -464,7 +464,7 @@ func uploadWithMap(taskItem task.Task, accountMap map[string]backupClientHelper,
 			"file":   path.Join(itemBackup.backupPath, dst),
 			"backup": name,
 		}))
-		for i := 0; i < int(retry); i++ {
+		for i := 0; i < int(retry)+1; i++ {
 			_, err := itemBackup.client.Upload(src, path.Join(itemBackup.backupPath, dst))
 			taskItem.LogWithStatus(i18n.GetMsgByKey("Upload"), err)
 			if err != nil {
