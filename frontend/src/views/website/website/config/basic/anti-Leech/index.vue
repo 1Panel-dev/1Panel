@@ -240,9 +240,9 @@ const update = async (enable: boolean) => {
     if (enable) {
         updateDomainsString();
         form.serverNames = form.domains.split('\n');
-    }
-    if (!checkReturn()) {
-        return;
+        if (!checkReturn()) {
+            return;
+        }
     }
     form.enable = enable;
     loading.value = true;
