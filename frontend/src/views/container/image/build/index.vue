@@ -5,6 +5,7 @@
         @close="handleClose"
         size="large"
         :autoClose="false"
+        :fullScreen="true"
     >
         <el-form ref="formRef" label-position="top" :model="form" label-width="80px" :rules="rules">
             <el-form-item :label="$t('commons.table.name')" prop="name">

@@ -4,8 +4,8 @@
         :title="$t('menu.terminal')"
         @close="handleClose"
         :resource="title"
-        :size="globalStore.isFullScreen ? 'full' : 'large'"
         :autoClose="false"
+        :fullScreen="true"
     >
         <Terminal class="mt-2" style="height: calc(100vh - 175px)" ref="terminalRef"></Terminal>
 
@@ -23,8 +23,6 @@
 import { nextTick, ref } from 'vue';
 import Terminal from '@/components/terminal/index.vue';
 import { closeOllamaModel } from '@/api/modules/ai';
-import { GlobalStore } from '@/store';
-const globalStore = GlobalStore();
 
 const title = ref();
 const open = ref(false);

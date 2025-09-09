@@ -1,6 +1,6 @@
 <template>
     <div v-if="recordShow" v-loading="loading">
-        <div class="app-status p-mt-20">
+        <div class="app-status card-interval">
             <el-card>
                 <div class="flex w-full flex-col gap-4 md:flex-row">
                     <div class="flex flex-wrap gap-4 ml-3">
@@ -152,7 +152,7 @@
                                             class="w-full"
                                             :key="currentRecord?.taskID"
                                             @stop-reading="search(false)"
-                                            :heightDiff="430"
+                                            :heightDiff="420"
                                             :config="{
                                                 type: 'task',
                                                 colorMode: 'task',
@@ -330,7 +330,7 @@ defineExpose({
 
 <style lang="scss" scoped>
 .infinite-list {
-    height: calc(100vh - 320px);
+    height: calc(100vh - 318px);
     .select-sign {
         &::before {
             float: left;

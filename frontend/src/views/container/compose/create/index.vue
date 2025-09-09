@@ -5,6 +5,7 @@
         @close="handleClose"
         size="large"
         :autoClose="false"
+        :fullScreen="true"
     >
         <el-form ref="formRef" @submit.prevent label-position="top" :model="form" :rules="rules" v-loading="loading">
             <el-form-item :label="$t('app.source')">

@@ -4,7 +4,7 @@
         @close="handleClose"
         :destroy-on-close="true"
         :before-close="beforeClose"
-        :size="size"
+        :size="isFull ? '100%' : size"
         :close-on-press-escape="autoClose"
         :close-on-click-modal="autoClose"
     >
@@ -24,7 +24,13 @@
                 </template>
                 <template #extra>
                     <el-tooltip :content="loadTooltip()" placement="top" v-if="fullScreen">
-                        <el-button @click="toggleFullscreen" link icon="FullScreen" plain class="mr-5"></el-button>
+                        <el-button
+                            @click="toggleFullscreen"
+                            link
+                            icon="FullScreen"
+                            plain
+                            class="-mt-1 mr-2"
+                        ></el-button>
                     </el-tooltip>
                     <slot v-if="slots.extra" name="extra"></slot>
                 </template>
@@ -55,6 +61,8 @@ import i18n from '@/lang';
 import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();
 const drawerContent = ref();
+
+const isFull = ref();
 
 const props = defineProps({
     header: String,
@@ -155,6 +163,7 @@ const beforeClose = (done: () => void) => {
 
 function toggleFullscreen() {
     globalStore.isFullScreen = !globalStore.isFullScreen;
+    isFull.value = globalStore.isFullScreen;
 }
 const loadTooltip = () => {
     return i18n.global.t('commons.button.' + (globalStore.isFullScreen ? 'quitFullscreen' : 'fullscreen'));
