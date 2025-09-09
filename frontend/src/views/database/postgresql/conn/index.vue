@@ -56,7 +56,7 @@
                     <el-input type="text" style="width: calc(100% - 60px)" readonly disabled v-model="form.username">
                         <template #append>
                             <el-button-group>
-                                <CopyButton :content="form.username" />
+                                <CopyButton :content="form.username" :isIcon="false" />
                             </el-button-group>
                         </template>
                     </el-input>
