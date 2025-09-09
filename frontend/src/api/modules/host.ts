@@ -124,3 +124,12 @@ export const mountDisk = (params: Host.DiskMount) => {
 export const unmountDisk = (params: Host.DiskUmount) => {
     return http.post(`/hosts/disks/unmount`, params, TimeoutEnum.T_60S);
 };
+
+export const getComponentInfo = (name: string, operateNode?: string) => {
+    if (operateNode) {
+        return http.get<Host.ComponentInfo>(`/hosts/components/${name}`, {
+            CurrentNode: operateNode,
+        });
+    }
+    return http.get<Host.ComponentInfo>(`/hosts/components/${name}`);
+};

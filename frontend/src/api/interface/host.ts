@@ -251,4 +251,11 @@ export namespace Host {
     export interface DiskUmount {
         mountPoint: string;
     }
+
+    export interface ComponentInfo {
+        exists: boolean;
+        version: string;
+        path: string;
+        error: string;
+    }
 }

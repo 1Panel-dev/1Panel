@@ -57,5 +57,7 @@ func (s *HostRouter) InitRouter(Router *gin.RouterGroup) {
 		hostRouter.POST("/disks/partition", baseApi.PartitionDisk)
 		hostRouter.POST("/disks/mount", baseApi.MountDisk)
 		hostRouter.POST("/disks/unmount", baseApi.UnmountDisk)
+
+		hostRouter.GET("/components/:name", baseApi.CheckComponentExistence)
 	}
 }
