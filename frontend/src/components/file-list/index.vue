@@ -45,8 +45,14 @@
                 {{ $t('commons.button.createNewFile') }}
             </el-button>
         </div>
-        <div>
-            <el-table :data="data" highlight-current-row height="40vh" @row-click="openDir" class="cursor-pointer">
+        <div v-loading="loading">
+            <el-table
+                :data="data"
+                highlight-current-row
+                height="40vh"
+                @row-click="handleRowClick"
+                class="cursor-pointer"
+            >
                 <el-table-column prop="name" show-overflow-tooltip fix>
                     <template #default="{ row }">
                         <svg-icon
@@ -129,7 +135,7 @@ import { onUpdated, reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgSuccess, MsgWarning } from '@/utils/message';
 import { useSearchableForSelect } from '@/views/host/file-management/hooks/searchable';
-import { computeSize } from '@/utils/util';
+import { computeSize, debounce } from '@/utils/util';
 
 const data = ref([]);
 const loading = ref(false);
@@ -200,12 +206,19 @@ const openDir = async (row: File.File, column: any, event: any) => {
         } else {
             req.path = req.path + '/' + name;
         }
-        await search(req);
-        if (form.isAll || form.dir) {
-            selectRow.value.path = req.path;
-        } else {
-            selectRow.value.path = '';
-        }
+        loading.value = true;
+        await search(req)
+            .then(() => {
+                loading.value = false;
+                if (form.isAll || form.dir) {
+                    selectRow.value.path = req.path;
+                } else {
+                    selectRow.value.path = '';
+                }
+            })
+            .catch(() => {
+                loading.value = false;
+            });
         return;
     }
     if (!form.isAll && !form.dir) {
@@ -214,6 +227,10 @@ const openDir = async (row: File.File, column: any, event: any) => {
     }
     selectRow.value.path = '';
 };
+const handleRowClick = (row: File.File, column: any, event: any) => {
+    debouncedOpenDir(row, column, event);
+};
+const debouncedOpenDir = debounce(openDir, 300);
 
 const jump = async (index: number) => {
     oldUrl.value = req.path;

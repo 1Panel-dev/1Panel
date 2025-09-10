@@ -29,6 +29,18 @@ export function randomNum(min: number, max: number): number {
     return num;
 }
 
+export function debounce(func: Function, wait: number) {
+    let timeout: NodeJS.Timeout | null = null;
+    return function executedFunction(...args: any[]) {
+        const later = () => {
+            if (timeout) clearTimeout(timeout);
+            func(...args);
+        };
+        if (timeout) clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
 export function getBrowserLang() {
     let browserLang = navigator.language ? navigator.language : navigator.browserLanguage;
     let defaultBrowserLang = '';
