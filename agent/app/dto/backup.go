@@ -99,6 +99,9 @@ type BackupRecords struct {
 	DownloadAccountID uint      `json:"downloadAccountID"`
 	FileDir           string    `json:"fileDir"`
 	FileName          string    `json:"fileName"`
+	TaskID            string    `json:"taskID"`
+	Status            string    `json:"status"`
+	Message           string    `json:"message"`
 	Description       string    `json:"description"`
 }
 

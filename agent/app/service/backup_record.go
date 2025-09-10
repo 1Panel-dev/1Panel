@@ -11,6 +11,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
+	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/jinzhu/copier"
 )
@@ -239,6 +240,9 @@ func (u *BackupRecordService) LoadRecordSize(req dto.SearchForSize) ([]dto.Recor
 			return nil, err
 		}
 		for _, item := range records {
+			if item.Status == constant.StatusWaiting {
+				continue
+			}
 			list = append(list, backupSizeHelper{ID: item.ID, DownloadID: item.DownloadAccountID, FilePath: path.Join(item.FileDir, item.FileName)})
 		}
 	}

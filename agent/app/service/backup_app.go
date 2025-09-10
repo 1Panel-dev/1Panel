@@ -45,35 +45,28 @@ func (u *BackupService) AppBackup(req dto.CommonBackup) (*model.BackupRecord, er
 		fileName = fmt.Sprintf("%s_%s.tar.gz", req.DetailName, timeNow+common.RandStrAndNum(5))
 	}
 
-	backupApp := func() (*model.BackupRecord, error) {
-		if err = handleAppBackup(&install, nil, backupDir, fileName, "", req.Secret, req.TaskID); err != nil {
-			global.LOG.Errorf("backup app %s failed, err: %v", req.DetailName, err)
-			return nil, err
-		}
-		record := &model.BackupRecord{
-			Type:              "app",
-			Name:              req.Name,
-			DetailName:        req.DetailName,
-			SourceAccountIDs:  "1",
-			DownloadAccountID: 1,
-			FileDir:           itemDir,
-			FileName:          fileName,
-			Description:       req.Description,
-		}
-		if err := backupRepo.CreateRecord(record); err != nil {
-			global.LOG.Errorf("save backup record failed, err: %v", err)
-			return nil, err
-		}
-		return record, nil
+	record := &model.BackupRecord{
+		Type:              "app",
+		Name:              req.Name,
+		DetailName:        req.DetailName,
+		SourceAccountIDs:  "1",
+		DownloadAccountID: 1,
+		FileDir:           itemDir,
+		FileName:          fileName,
+		TaskID:            req.TaskID,
+		Status:            constant.StatusWaiting,
+		Description:       req.Description,
+	}
+	if err := backupRepo.CreateRecord(record); err != nil {
+		global.LOG.Errorf("save backup record failed, err: %v", err)
+		return nil, err
 	}
 
-	if req.TaskID != "" {
-		go func() {
-			_, _ = backupApp()
-		}()
-	} else {
-		return backupApp()
+	if err = handleAppBackup(&install, nil, record.ID, backupDir, fileName, "", req.Secret, req.TaskID); err != nil {
+		global.LOG.Errorf("backup app %s failed, err: %v", req.DetailName, err)
+		return nil, err
 	}
+
 	return nil, nil
 }
 
@@ -94,11 +87,9 @@ func (u *BackupService) AppRecover(req dto.CommonRecover) error {
 	if _, err := compose.Down(install.GetComposePath()); err != nil {
 		return err
 	}
-	go func() {
-		if err := handleAppRecover(&install, nil, req.File, false, req.Secret, req.TaskID); err != nil {
-			global.LOG.Errorf("recover app %s failed, err: %v", req.DetailName, err)
-		}
-	}()
+	if err := handleAppRecover(&install, nil, req.File, false, req.Secret, req.TaskID); err != nil {
+		global.LOG.Errorf("recover app %s failed, err: %v", req.DetailName, err)
+	}
 	return nil
 }
 
@@ -111,7 +102,7 @@ func backupDatabaseWithTask(parentTask *task.Task, resourceKey, tmpDir, name str
 		}
 		parentTask.LogStart(task.GetTaskName(db.Name, task.TaskBackup, task.TaskScopeDatabase))
 		databaseHelper := DatabaseHelper{Database: db.MysqlName, DBType: resourceKey, Name: db.Name}
-		if err := handleMysqlBackup(databaseHelper, parentTask, tmpDir, fmt.Sprintf("%s.sql.gz", name), ""); err != nil {
+		if err := handleMysqlBackup(databaseHelper, parentTask, 0, tmpDir, fmt.Sprintf("%s.sql.gz", name), ""); err != nil {
 			return err
 		}
 		parentTask.LogSuccess(task.GetTaskName(db.Name, task.TaskBackup, task.TaskScopeDatabase))
@@ -122,7 +113,7 @@ func backupDatabaseWithTask(parentTask *task.Task, resourceKey, tmpDir, name str
 		}
 		parentTask.LogStart(task.GetTaskName(db.Name, task.TaskBackup, task.TaskScopeDatabase))
 		databaseHelper := DatabaseHelper{Database: db.PostgresqlName, DBType: resourceKey, Name: db.Name}
-		if err := handlePostgresqlBackup(databaseHelper, parentTask, tmpDir, fmt.Sprintf("%s.sql.gz", name), ""); err != nil {
+		if err := handlePostgresqlBackup(databaseHelper, parentTask, 0, tmpDir, fmt.Sprintf("%s.sql.gz", name), ""); err != nil {
 			return err
 		}
 		parentTask.LogSuccess(task.GetTaskName(db.Name, task.TaskBackup, task.TaskScopeDatabase))
@@ -130,7 +121,7 @@ func backupDatabaseWithTask(parentTask *task.Task, resourceKey, tmpDir, name str
 	return nil
 }
 
-func handleAppBackup(install *model.AppInstall, parentTask *task.Task, backupDir, fileName, excludes, secret, taskID string) error {
+func handleAppBackup(install *model.AppInstall, parentTask *task.Task, recordID uint, backupDir, fileName, excludes, secret, taskID string) error {
 	var (
 		err        error
 		backupTask *task.Task
@@ -144,11 +135,20 @@ func handleAppBackup(install *model.AppInstall, parentTask *task.Task, backupDir
 	}
 
 	itemHandler := func() error { return doAppBackup(install, backupTask, backupDir, fileName, excludes, secret) }
-	backupTask.AddSubTask(task.GetTaskName(install.Name, task.TaskBackup, task.TaskScopeApp), func(t *task.Task) error { return itemHandler() }, nil)
 	if parentTask != nil {
 		return itemHandler()
 	}
-	return backupTask.Execute()
+
+	backupTask.AddSubTaskWithOps(task.GetTaskName(install.Name, task.TaskBackup, task.TaskScopeApp), func(t *task.Task) error { return itemHandler() }, nil, 3, time.Hour)
+	go func() {
+		if err := backupTask.Execute(); err != nil {
+			backupRepo.UpdateRecordByMap(recordID, map[string]interface{}{"status": constant.StatusFailed, "message": err.Error()})
+			return
+		}
+		backupRepo.UpdateRecordByMap(recordID, map[string]interface{}{"status": constant.StatusSuccess})
+	}()
+
+	return nil
 }
 
 func handleAppRecover(install *model.AppInstall, parentTask *task.Task, recoverFile string, isRollback bool, secret, taskID string) error {
@@ -170,7 +170,7 @@ func handleAppRecover(install *model.AppInstall, parentTask *task.Task, recoverF
 		fileOp := files.NewFileOp()
 		if !isRollback {
 			rollbackFile = path.Join(global.Dir.TmpDir, fmt.Sprintf("app/%s_%s.tar.gz", install.Name, time.Now().Format(constant.DateTimeSlimLayout)))
-			if err := handleAppBackup(install, recoverTask, path.Dir(rollbackFile), path.Base(rollbackFile), "", "", taskID); err != nil {
+			if err := handleAppBackup(install, recoverTask, 0, path.Dir(rollbackFile), path.Base(rollbackFile), "", "", taskID); err != nil {
 				t.Log(fmt.Sprintf("backup app %s for rollback before recover failed, err: %v", install.Name, err))
 			}
 		}
@@ -324,12 +324,15 @@ func handleAppRecover(install *model.AppInstall, parentTask *task.Task, recoverF
 			_ = os.RemoveAll(rollbackFile)
 		}
 	}
-
-	recoverTask.AddSubTask(task.GetTaskName(install.Name, task.TaskRecover, task.TaskScopeApp), recoverApp, rollBackApp)
 	if parentTask != nil {
 		return recoverApp(parentTask)
 	}
-	return recoverTask.Execute()
+
+	recoverTask.AddSubTask(task.GetTaskName(install.Name, task.TaskRecover, task.TaskScopeApp), recoverApp, rollBackApp)
+	go func() {
+		_ = recoverTask.Execute()
+	}()
+	return nil
 }
 
 func doAppBackup(install *model.AppInstall, parentTask *task.Task, backupDir, fileName, excludes, secret string) error {

@@ -38,26 +38,26 @@ func (u *BackupService) WebsiteBackup(req dto.CommonBackup) error {
 	backupDir := path.Join(global.Dir.LocalBackupDir, itemDir)
 	fileName := fmt.Sprintf("%s_%s.tar.gz", website.Alias, timeNow+common.RandStrAndNum(5))
 
-	go func() {
-		if err = handleWebsiteBackup(&website, nil, backupDir, fileName, "", req.Secret, req.TaskID); err != nil {
-			global.LOG.Errorf("backup website %s failed, err: %v", website.Alias, err)
-			return
-		}
-		record := &model.BackupRecord{
-			Type:              "website",
-			Name:              website.Alias,
-			DetailName:        website.Alias,
-			SourceAccountIDs:  "1",
-			DownloadAccountID: 1,
-			FileDir:           itemDir,
-			FileName:          fileName,
-			Description:       req.Description,
-		}
-		if err = backupRepo.CreateRecord(record); err != nil {
-			global.LOG.Errorf("save backup record failed, err: %v", err)
-			return
-		}
-	}()
+	record := &model.BackupRecord{
+		Type:              "website",
+		Name:              website.Alias,
+		DetailName:        website.Alias,
+		SourceAccountIDs:  "1",
+		DownloadAccountID: 1,
+		FileDir:           itemDir,
+		FileName:          fileName,
+		TaskID:            req.TaskID,
+		Status:            constant.StatusWaiting,
+		Description:       req.Description,
+	}
+	if err = backupRepo.CreateRecord(record); err != nil {
+		global.LOG.Errorf("save backup record failed, err: %v", err)
+		return err
+	}
+	if err = handleWebsiteBackup(&website, nil, record.ID, backupDir, fileName, "", req.Secret, req.TaskID); err != nil {
+		global.LOG.Errorf("backup website %s failed, err: %v", website.Alias, err)
+		return err
+	}
 	return nil
 }
 
@@ -66,11 +66,9 @@ func (u *BackupService) WebsiteRecover(req dto.CommonRecover) error {
 	if err != nil {
 		return err
 	}
-	go func() {
-		if err := handleWebsiteRecover(&website, req.File, false, req.Secret, req.TaskID); err != nil {
-			global.LOG.Errorf("recover website %s failed, err: %v", website.Alias, err)
-		}
-	}()
+	if err := handleWebsiteRecover(&website, req.File, false, req.Secret, req.TaskID); err != nil {
+		global.LOG.Errorf("recover website %s failed, err: %v", website.Alias, err)
+	}
 	return nil
 }
 
@@ -83,7 +81,7 @@ func handleWebsiteRecover(website *model.Website, recoverFile string, isRollback
 		isOk := false
 		if !isRollback {
 			rollbackFile := path.Join(global.Dir.TmpDir, fmt.Sprintf("website/%s_%s.tar.gz", website.Alias, time.Now().Format(constant.DateTimeSlimLayout)))
-			if err := handleWebsiteBackup(website, recoverTask, path.Dir(rollbackFile), path.Base(rollbackFile), "", "", taskID); err != nil {
+			if err := handleWebsiteBackup(website, recoverTask, 0, path.Dir(rollbackFile), path.Base(rollbackFile), "", "", taskID); err != nil {
 				return fmt.Errorf("backup website %s for rollback before recover failed, err: %v", website.Alias, err)
 			}
 			defer func() {
@@ -200,10 +198,14 @@ func handleWebsiteRecover(website *model.Website, recoverFile string, isRollback
 		isOk = true
 		return nil
 	}, nil)
-	return recoverTask.Execute()
+
+	go func() {
+		_ = recoverTask.Execute()
+	}()
+	return nil
 }
 
-func handleWebsiteBackup(website *model.Website, parentTask *task.Task, backupDir, fileName, excludes, secret, taskID string) error {
+func handleWebsiteBackup(website *model.Website, parentTask *task.Task, recordID uint, backupDir, fileName, excludes, secret, taskID string) error {
 	var (
 		err        error
 		backupTask *task.Task
@@ -216,11 +218,18 @@ func handleWebsiteBackup(website *model.Website, parentTask *task.Task, backupDi
 		}
 	}
 	itemHandler := func() error { return doWebsiteBackup(website, backupTask, backupDir, fileName, excludes, secret) }
-	backupTask.AddSubTask(task.GetTaskName(website.Alias, task.TaskBackup, task.TaskScopeWebsite), func(t *task.Task) error { return itemHandler() }, nil)
 	if parentTask != nil {
 		return itemHandler()
 	}
-	return backupTask.Execute()
+	backupTask.AddSubTaskWithOps(task.GetTaskName(website.Alias, task.TaskBackup, task.TaskScopeWebsite), func(t *task.Task) error { return itemHandler() }, nil, 3, time.Hour)
+	go func() {
+		if err := backupTask.Execute(); err != nil {
+			backupRepo.UpdateRecordByMap(recordID, map[string]interface{}{"status": constant.StatusFailed, "message": err.Error()})
+			return
+		}
+		backupRepo.UpdateRecordByMap(recordID, map[string]interface{}{"status": constant.StatusSuccess})
+	}()
+	return nil
 }
 
 func doWebsiteBackup(website *model.Website, parentTask *task.Task, backupDir, fileName, excludes, secret string) error {
@@ -252,7 +261,7 @@ func doWebsiteBackup(website *model.Website, parentTask *task.Task, backupDir, f
 			return err
 		}
 		parentTask.LogStart(task.GetTaskName(app.Name, task.TaskBackup, task.TaskScopeApp))
-		if err = handleAppBackup(&app, parentTask, tmpDir, fmt.Sprintf("%s.app.tar.gz", website.Alias), excludes, "", ""); err != nil {
+		if err = handleAppBackup(&app, parentTask, 0, tmpDir, fmt.Sprintf("%s.app.tar.gz", website.Alias), excludes, "", ""); err != nil {
 			return err
 		}
 		parentTask.LogSuccess(task.GetTaskName(app.Name, task.TaskBackup, task.TaskScopeApp))

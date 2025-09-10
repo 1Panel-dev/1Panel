@@ -29,11 +29,6 @@ func (u *BackupService) PostgresqlBackup(req dto.CommonBackup) error {
 	targetDir := path.Join(global.Dir.LocalBackupDir, itemDir)
 	fileName := fmt.Sprintf("%s_%s.sql.gz", req.DetailName, timeNow+common.RandStrAndNum(5))
 
-	databaseHelper := DatabaseHelper{Database: req.Name, DBType: req.Type, Name: req.DetailName}
-	if err := handlePostgresqlBackup(databaseHelper, nil, targetDir, fileName, req.TaskID); err != nil {
-		return err
-	}
-
 	record := &model.BackupRecord{
 		Type:              req.Type,
 		Name:              req.Name,
@@ -42,10 +37,17 @@ func (u *BackupService) PostgresqlBackup(req dto.CommonBackup) error {
 		DownloadAccountID: 1,
 		FileDir:           itemDir,
 		FileName:          fileName,
+		TaskID:            req.TaskID,
+		Status:            constant.StatusWaiting,
 		Description:       req.Description,
 	}
 	if err := backupRepo.CreateRecord(record); err != nil {
 		global.LOG.Errorf("save backup record failed, err: %v", err)
+	}
+
+	databaseHelper := DatabaseHelper{Database: req.Name, DBType: req.Type, Name: req.DetailName}
+	if err := handlePostgresqlBackup(databaseHelper, nil, record.ID, targetDir, fileName, req.TaskID); err != nil {
+		return err
 	}
 	return nil
 }
@@ -69,7 +71,7 @@ func (u *BackupService) PostgresqlRecoverByUpload(req dto.CommonRecover) error {
 	return nil
 }
 
-func handlePostgresqlBackup(db DatabaseHelper, parentTask *task.Task, targetDir, fileName, taskID string) error {
+func handlePostgresqlBackup(db DatabaseHelper, parentTask *task.Task, recordID uint, targetDir, fileName, taskID string) error {
 	var (
 		err        error
 		backupTask *task.Task
@@ -84,11 +86,18 @@ func handlePostgresqlBackup(db DatabaseHelper, parentTask *task.Task, targetDir,
 	}
 
 	itemHandler := func() error { return doPostgresqlgBackup(db, targetDir, fileName) }
-	backupTask.AddSubTask(task.GetTaskName(itemName, task.TaskBackup, task.TaskScopeDatabase), func(task *task.Task) error { return itemHandler() }, nil)
 	if parentTask != nil {
 		return itemHandler()
 	}
-	return backupTask.Execute()
+	backupTask.AddSubTaskWithOps(task.GetTaskName(itemName, task.TaskBackup, task.TaskScopeDatabase), func(t *task.Task) error { return itemHandler() }, nil, 3, time.Hour)
+	go func() {
+		if err := backupTask.Execute(); err != nil {
+			backupRepo.UpdateRecordByMap(recordID, map[string]interface{}{"status": constant.StatusFailed, "message": err.Error()})
+			return
+		}
+		backupRepo.UpdateRecordByMap(recordID, map[string]interface{}{"status": constant.StatusSuccess})
+	}()
+	return nil
 }
 
 func handlePostgresqlRecover(req dto.CommonRecover, parentTask *task.Task, isRollback bool) error {
@@ -163,12 +172,15 @@ func handlePostgresqlRecover(req dto.CommonRecover, parentTask *task.Task, isRol
 		isOk = true
 		return nil
 	}
-	itemTask.AddSubTask(i18n.GetMsgByKey("TaskRecover"), recoverDatabase, nil)
 	if parentTask != nil {
 		return recoverDatabase(parentTask)
 	}
 
-	return itemTask.Execute()
+	itemTask.AddSubTaskWithOps(i18n.GetMsgByKey("TaskRecover"), recoverDatabase, nil, 3, time.Hour)
+	go func() {
+		_ = itemTask.Execute()
+	}()
+	return nil
 }
 
 func doPostgresqlgBackup(db DatabaseHelper, targetDir, fileName string) error {

@@ -33,18 +33,32 @@
                     <el-button type="primary" plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
                         {{ $t('commons.button.delete') }}
                     </el-button>
+
+                    <TableRefresh class="float-right" @search="search()" />
                 </template>
-                <el-table-column type="selection" fix />
+                <el-table-column type="selection" :selectable="selectable" fix />
                 <el-table-column :label="$t('commons.table.name')" prop="fileName" show-overflow-tooltip />
-                <el-table-column :label="$t('file.size')" prop="size" show-overflow-tooltip>
+                <el-table-column min-width="80px" :label="$t('commons.table.status')" prop="status">
                     <template #default="{ row }">
-                        <div v-if="row.hasLoad">
+                        <Status
+                            v-if="row.status === 'Waiting'"
+                            :status="row.status"
+                            @click="openTaskLog(row.taskID)"
+                            :msg="row.message"
+                            :operate="true"
+                        />
+                        <Status v-else :status="row.status" :msg="row.message" />
+                    </template>
+                </el-table-column>
+                <el-table-column min-width="80px" :label="$t('file.size')" prop="size" show-overflow-tooltip>
+                    <template #default="{ row }">
+                        <div v-if="row.hasLoad && (row.status === 'Success' || row.status === 'Failed')">
                             <span v-if="row.size">
                                 {{ computeSize(row.size) }}
                             </span>
                             <span v-else>-</span>
                         </div>
-                        <div v-if="!row.hasLoad">
+                        <div v-else>
                             <el-button link loading></el-button>
                         </div>
                     </template>
@@ -249,6 +263,10 @@ const openTaskLog = (taskID: string) => {
     taskLogRef.value.openWithTaskID(taskID);
 };
 
+function selectable(row) {
+    return row.status !== 'Waiting';
+}
+
 const backup = async (close: boolean) => {
     const taskID = newUUID();
     let params = {
@@ -378,6 +396,9 @@ const onBatchDelete = async (row: Backup.RecordInfo | null) => {
 const buttons = [
     {
         label: i18n.global.t('commons.button.delete'),
+        disabled: (row: any) => {
+            return row.status === 'Waiting';
+        },
         click: (row: Backup.RecordInfo) => {
             onBatchDelete(row);
         },
@@ -385,7 +406,7 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.recover'),
         disabled: (row: any) => {
-            return row.size === 0;
+            return row.size === 0 || row.status === 'Failed';
         },
         click: (row: Backup.RecordInfo) => {
             onRecover(row);
@@ -394,7 +415,7 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.download'),
         disabled: (row: any) => {
-            return row.size === 0;
+            return row.size === 0 || row.status === 'Failed';
         },
         click: (row: Backup.RecordInfo) => {
             onDownload(row);
