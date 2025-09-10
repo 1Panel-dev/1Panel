@@ -159,7 +159,7 @@ const detailRef = ref();
 const isGetData = ref(true);
 
 const openDetail = (row: any) => {
-    detailRef.value.acceptParams({ info: row });
+    detailRef.value.acceptParams(row.PID);
 };
 
 const changeSort = ({ prop, order }) => {

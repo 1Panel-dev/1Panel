@@ -3,13 +3,13 @@ package websocket
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"sort"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/global"
-	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/shirou/gopsutil/v4/host"
 	"github.com/shirou/gopsutil/v4/net"
@@ -74,10 +74,10 @@ type PsProcessData struct {
 	Envs []string `json:"envs"`
 
 	OpenFiles []process.OpenFilesStat `json:"openFiles"`
-	Connects  []processConnect        `json:"connects"`
+	Connects  []ProcessConnect        `json:"connects"`
 }
 
-type processConnect struct {
+type ProcessConnect struct {
 	Type   string   `json:"type"`
 	Status string   `json:"status"`
 	Laddr  net.Addr `json:"localaddr"`
@@ -86,7 +86,7 @@ type processConnect struct {
 	Name   string   `json:"name"`
 }
 
-type ProcessConnects []processConnect
+type ProcessConnects []ProcessConnect
 
 type sshSession struct {
 	Username  string `json:"username"`
@@ -196,53 +196,15 @@ func getProcessData(processConfig PsProcessConfig) (res []byte, err error) {
 			procData.StartTime = t.Format("2006-1-2 15:04:05")
 		}
 		procData.NumThreads, _ = proc.NumThreads()
-		connections, procErr := proc.Connections()
-		if procErr == nil {
-			procData.NumConnections = len(connections)
-			for _, conn := range connections {
-				if conn.Laddr.IP != "" || conn.Raddr.IP != "" {
-					procData.Connects = append(procData.Connects, processConnect{
-						Status: conn.Status,
-						Laddr:  conn.Laddr,
-						Raddr:  conn.Raddr,
-					})
-				}
-			}
-		}
 		procData.CpuValue, _ = proc.CPUPercent()
 		procData.CpuPercent = fmt.Sprintf("%.2f", procData.CpuValue) + "%"
-		menInfo, procErr := proc.MemoryInfo()
-		if procErr == nil {
-			procData.Rss = common.FormatBytes(menInfo.RSS)
-			procData.RssValue = menInfo.RSS
-			procData.Data = common.FormatBytes(menInfo.Data)
-			procData.VMS = common.FormatBytes(menInfo.VMS)
-			procData.HWM = common.FormatBytes(menInfo.HWM)
-			procData.Stack = common.FormatBytes(menInfo.Stack)
-			procData.Locked = common.FormatBytes(menInfo.Locked)
-			procData.Swap = common.FormatBytes(menInfo.Swap)
-		} else {
-			procData.Rss = "--"
-			procData.Data = "--"
-			procData.VMS = "--"
-			procData.HWM = "--"
-			procData.Stack = "--"
-			procData.Locked = "--"
-			procData.Swap = "--"
 
+		if memInfo, err := proc.MemoryInfo(); err == nil {
+			procData.RssValue = memInfo.RSS
+			procData.Rss = common.FormatBytes(memInfo.RSS)
+		} else {
 			procData.RssValue = 0
 		}
-		ioStat, procErr := proc.IOCounters()
-		if procErr == nil {
-			procData.DiskWrite = common.FormatBytes(ioStat.WriteBytes)
-			procData.DiskRead = common.FormatBytes(ioStat.ReadBytes)
-		} else {
-			procData.DiskWrite = "--"
-			procData.DiskRead = "--"
-		}
-		procData.CmdLine, _ = proc.Cmdline()
-		procData.OpenFiles, _ = proc.OpenFiles()
-		procData.Envs, _ = proc.Environ()
 
 		resultMutex.Lock()
 		result = append(result, procData)
@@ -333,7 +295,7 @@ var netTypes = [...]string{"tcp", "udp"}
 
 func getNetConnections(config NetConfig) (res []byte, err error) {
 	var (
-		result []processConnect
+		result []ProcessConnect
 		proc   *process.Process
 	)
 	for _, netType := range netTypes {
@@ -352,7 +314,7 @@ func getNetConnections(config NetConfig) (res []byte, err error) {
 					if config.Port > 0 && config.Port != conn.Laddr.Port && config.Port != conn.Raddr.Port {
 						continue
 					}
-					result = append(result, processConnect{
+					result = append(result, ProcessConnect{
 						Type:   netType,
 						Status: conn.Status,
 						Laddr:  conn.Laddr,

@@ -1,7 +1,7 @@
 <template>
     <DrawerPro v-model="open" :header="$t('app.detail')" :resource="resourceName" @close="handleClose" size="large">
         <template #content>
-            <el-tabs v-model="activeName" type="card">
+            <el-tabs v-model="activeName" type="card" v-loading="loading">
                 <el-tab-pane :label="$t('process.basic')" name="basic">
                     <el-descriptions :column="2" border>
                         <el-descriptions-item :label="$t('commons.table.name')" min-width="100px">
@@ -83,30 +83,38 @@
 </template>
 
 <script lang="ts" setup>
+import { getProcessByID } from '@/api/modules/process';
 import { ref } from 'vue';
 
-interface InfoProps {
-    info: object;
-}
-
-let open = ref(false);
-let data = ref();
+const open = ref(false);
+const data = ref({
+    name: '',
+    envs: [] as string[],
+});
 const resourceName = ref('');
 const activeName = ref('basic');
 const envStr = ref('');
+const loading = ref(false);
 
 const handleClose = () => {
     open.value = false;
 };
 
-const acceptParams = async (params: InfoProps): Promise<void> => {
-    activeName.value = 'basic';
-    data.value = params.info;
-    resourceName.value = data.value.name;
-    if (data.value.envs) {
-        envStr.value = data.value.envs.join('\n');
-    }
+const acceptParams = async (pid: number): Promise<void> => {
     open.value = true;
+    activeName.value = 'basic';
+    loading.value = true;
+    try {
+        const res = await getProcessByID(pid);
+        data.value = res.data;
+        resourceName.value = data.value.name;
+        if (data.value.envs) {
+            envStr.value = data.value.envs.join('\n');
+        }
+    } catch (error) {
+    } finally {
+        loading.value = false;
+    }
 };
 
 defineExpose({
