@@ -116,7 +116,7 @@ func (u *SettingService) SaveConnInfo(req dto.SSHConnData) error {
 
 	var connItem model.LocalConnInfo
 	_ = copier.Copy(&connItem, &req)
-	localConn, _ := json.Marshal(&connInfo)
+	localConn, _ := json.Marshal(&connItem)
 	connAfterEncrypt, _ := encrypt.StringEncrypt(string(localConn))
 	_ = settingRepo.Update("LocalSSHConn", connAfterEncrypt)
 	_ = settingRepo.Update("LocalSSHConnShow", constant.StatusEnable)
