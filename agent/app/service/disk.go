@@ -81,11 +81,12 @@ func (s *DiskService) PartitionDisk(req request.DiskPartitionRequest) (string, e
 		return "", buserr.WithErr("FormatDiskErr", err)
 	}
 
-	if req.AutoMount && req.MountPoint != "" {
+	if req.MountPoint != "" {
 		mountReq := request.DiskMountRequest{
 			Device:     partition,
 			MountPoint: req.MountPoint,
 			Filesystem: req.Filesystem,
+			AutoMount:  req.AutoMount,
 		}
 		if err := s.MountDisk(mountReq); err != nil {
 			return "", buserr.WithErr("MountDiskErr", err)
@@ -122,9 +123,10 @@ func (s *DiskService) MountDisk(req request.DiskMountRequest) error {
 	if err := cmdMgr.RunBashC(fmt.Sprintf("mount  -t %s %s %s", req.Filesystem, req.Device, req.MountPoint)); err != nil {
 		return buserr.WithErr("MountDiskErr", err)
 	}
-
-	if err := addToFstabWithOptions(req.Device, req.MountPoint, req.Filesystem, ""); err != nil {
-		return buserr.WithErr("MountDiskErr", err)
+	if req.AutoMount {
+		if err := addToFstabWithOptions(req.Device, req.MountPoint, req.Filesystem, ""); err != nil {
+			return buserr.WithErr("MountDiskErr", err)
+		}
 	}
 
 	return nil

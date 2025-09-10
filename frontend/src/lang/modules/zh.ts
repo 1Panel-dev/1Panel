@@ -2737,7 +2737,7 @@ const message = {
         unmounted: '未挂载',
         cannotOperate: '无法操作',
         systemDiskHelper: '提示:当前磁盘为系统盘，无法进行操作',
-        autoMount: '自动挂载',
+        autoMount: '开机自动挂载',
         model: '设备型号',
         diskType: '磁盘类型',
         serial: '序列号',

@@ -27,15 +27,15 @@
                     <el-radio-button label="xfs" value="xfs" />
                 </el-radio-group>
             </el-form-item>
-            <el-form-item :label="$t('disk.autoMount')" prop="autoMount">
-                <el-switch v-model="form.autoMount" />
-            </el-form-item>
             <el-form-item :label="$t('disk.mountPoint')" prop="mountPoint">
                 <el-input v-model="form.mountPoint">
                     <template #prepend>
                         <el-button icon="Folder" @click="fileRef.acceptParams({ dir: true })" />
                     </template>
                 </el-input>
+            </el-form-item>
+            <el-form-item :label="$t('disk.autoMount')" prop="autoMount">
+                <el-switch v-model="form.autoMount" />
             </el-form-item>
         </el-form>
         <template #footer>
