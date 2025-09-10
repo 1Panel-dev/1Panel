@@ -197,7 +197,7 @@ const buttons = [
 const openView = async (
     title: string,
     rowData: Partial<Alert.AlertInfo> = {
-        type: 'panelPwdEndTime',
+        type: isMaster.value ? 'panelPwdEndTime' : 'sshLogin',
         cycle: 15,
         count: 0,
         sendCount: 3,

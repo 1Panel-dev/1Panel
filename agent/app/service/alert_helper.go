@@ -377,16 +377,17 @@ func loadLoadInfo(alert dto.AlertDTO) {
 
 func loadDiskUsage(alert dto.AlertDTO) {
 	newDate, err := alertRepo.GetTaskLog(alert.Type, alert.ID)
-	if err != nil || !isAlertDue(newDate) {
+	if err != nil {
 		global.LOG.Errorf("record not found, err: %v", err)
 		return
 	}
-	if strings.Contains(alert.Project, "all") {
-		err = processAllDisks(alert)
-	} else {
-		err = processSingleDisk(alert)
+	if isAlertDue(newDate) {
+		if strings.Contains(alert.Project, "all") {
+			err = processAllDisks(alert)
+		} else {
+			err = processSingleDisk(alert)
+		}
 	}
-
 }
 
 func loadPanelLogin(alert dto.AlertDTO) {
@@ -515,12 +516,14 @@ func loadNodeException(alert dto.AlertDTO) {
 			},
 		}
 		newDate, err := alertRepo.GetTaskLog(alert.Type, alert.ID)
-		if err != nil || !isAlertDue(newDate) {
+		if err != nil {
 			global.LOG.Errorf("record not found, err: %v", err)
 			return
 		}
-		sender := NewAlertSender(alert, quotaType)
-		sender.ResourceSend(strconv.Itoa(int(failCount)), params)
+		if isAlertDue(newDate) {
+			sender := NewAlertSender(alert, quotaType)
+			sender.ResourceSend(strconv.Itoa(int(failCount)), params)
+		}
 	}
 
 }
@@ -542,12 +545,14 @@ func loadLicenseException(alert dto.AlertDTO) {
 			},
 		}
 		newDate, err := alertRepo.GetTaskLog(alert.Type, alert.ID)
-		if err != nil || !isAlertDue(newDate) {
+		if err != nil {
 			global.LOG.Errorf("record not found, err: %v", err)
 			return
 		}
-		sender := NewAlertSender(alert, quotaType)
-		sender.ResourceSend(strconv.Itoa(int(failCount)), params)
+		if isAlertDue(newDate) {
+			sender := NewAlertSender(alert, quotaType)
+			sender.ResourceSend(strconv.Itoa(int(failCount)), params)
+		}
 	}
 }
 
@@ -814,15 +819,10 @@ func processAllDisks(alert dto.AlertDTO) error {
 		global.LOG.Errorf("error getting disk list, err: %v", err)
 		return err
 	}
-
-	var flag bool
 	for _, item := range diskList {
 		if success, err := checkAndCreateDiskAlert(alert, item.Path); err == nil && success {
-			flag = true
+			global.LOG.Infof("disk alert pushed successfully for %s", item.Path)
 		}
-	}
-	if flag {
-		global.LOG.Info("all disk alert push successful")
 	}
 	return nil
 }
@@ -833,7 +833,7 @@ func processSingleDisk(alert dto.AlertDTO) error {
 		return err
 	}
 	if success {
-		global.LOG.Info("disk alert push successful")
+		global.LOG.Infof("disk alert pushed successfully for %s", alert.Project)
 	}
 	return nil
 }
