@@ -686,6 +686,7 @@ func (f FileOp) decompressWithSDK(srcFile string, dst string, cType CompressType
 		if err != nil {
 			return err
 		}
+		return nil
 	}
 
 	handler := func(ctx context.Context, archFile archiver.File) error {
