@@ -127,10 +127,8 @@ export const addFavorite = (path: string) => {
 };
 
 export const readByLine = (req: File.FileReadByLine, operateNode?: string) => {
-    if (operateNode) {
-        return http.post<any>('files/read', req, TimeoutEnum.T_40S, { CurrentNode: operateNode });
-    }
-    return http.post<any>('files/read', req);
+    const params = operateNode ? `?operateNode=${operateNode}` : '';
+    return http.post<any>(`files/read${params}`, req, TimeoutEnum.T_40S);
 };
 
 export const removeFavorite = (id: number) => {

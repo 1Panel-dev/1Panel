@@ -78,6 +78,16 @@ const hostRouter = {
             },
         },
         {
+            path: '/hosts/disk',
+            name: 'Disk',
+            props: true,
+            component: () => import('@/views/host/disk-management/disk/index.vue'),
+            meta: {
+                title: 'menu.disk',
+                requiresAuth: false,
+            },
+        },
+        {
             path: '/hosts/process/process',
             name: 'Process',
             component: () => import('@/views/host/process/process/index.vue'),
@@ -134,16 +144,6 @@ const hostRouter = {
                 parent: 'menu.ssh',
                 title: 'ssh.session',
                 activeMenu: '/hosts/ssh/ssh',
-                requiresAuth: false,
-            },
-        },
-        {
-            path: '/hosts/disk',
-            name: 'Disk',
-            props: true,
-            component: () => import('@/views/host/disk-management/disk/index.vue'),
-            meta: {
-                title: 'menu.disk',
                 requiresAuth: false,
             },
         },

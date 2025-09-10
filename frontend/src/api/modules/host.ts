@@ -126,10 +126,6 @@ export const unmountDisk = (params: Host.DiskUmount) => {
 };
 
 export const getComponentInfo = (name: string, operateNode?: string) => {
-    if (operateNode) {
-        return http.get<Host.ComponentInfo>(`/hosts/components/${name}`, {
-            CurrentNode: operateNode,
-        });
-    }
-    return http.get<Host.ComponentInfo>(`/hosts/components/${name}`);
+    const params = operateNode ? `?operateNode=${operateNode}` : '';
+    return http.get<Host.ComponentInfo>(`/hosts/components/${name}${params}`);
 };
