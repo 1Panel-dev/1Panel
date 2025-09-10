@@ -2,7 +2,7 @@
     <div>
         <RouterMenu />
         <LayoutContent :title="'Servers'" v-loading="loading">
-            <template #toolbar>
+            <template #leftToolBar>
                 <div class="flex flex-wrap gap-3">
                     <el-button type="primary" @click="openCreate">
                         {{ $t('aiTools.mcp.create') }}
@@ -11,6 +11,9 @@
                         {{ $t('aiTools.mcp.bindDomain') }}
                     </el-button>
                 </div>
+            </template>
+            <template #rightToolBar>
+                <TableRefresh @search="search()" />
             </template>
             <template #main>
                 <ComplexTable :pagination-config="paginationConfig" :data="items" @search="search()">
@@ -29,8 +32,8 @@
                     </el-table-column>
                     <el-table-column :label="$t('aiTools.mcp.externalUrl')" prop="baseUrl" min-width="200px">
                         <template #default="{ row }">
-                            {{ row.baseUrl + row.ssePath }}
-                            <CopyButton :content="row.baseUrl + row.ssePath" />
+                            {{ getUrl(row) }}
+                            <CopyButton :content="getUrl(row)" />
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.status')" prop="status" width="120px">
@@ -124,6 +127,14 @@ const paginationConfig = reactive({
 const mobile = computed(() => {
     return globalStore.isMobile();
 });
+
+const getUrl = (row: AI.McpServer) => {
+    if (row.outputTransport == 'sse') {
+        return row.baseUrl + row.ssePath;
+    } else {
+        return row.baseUrl + row.streamableHttpPath;
+    }
+};
 
 const buttons = [
     {

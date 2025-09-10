@@ -111,11 +111,14 @@ func (m McpServerService) Update(req request.McpServerUpdate) error {
 	mcpServer.Port = req.Port
 	mcpServer.Command = req.Command
 	mcpServer.BaseURL = req.BaseURL
-	mcpServer.SsePath = req.SsePath
 	mcpServer.HostIP = req.HostIP
-	mcpServer.StreamableHttpPath = req.StreamableHttpPath
 	mcpServer.OutputTransport = req.OutputTransport
 	mcpServer.Type = req.Type
+	if req.OutputTransport == "sse" {
+		mcpServer.SsePath = req.SsePath
+	} else {
+		mcpServer.StreamableHttpPath = req.StreamableHttpPath
+	}
 	if err := handleCreateParams(mcpServer, req.Environments, req.Volumes); err != nil {
 		return err
 	}
@@ -163,19 +166,23 @@ func (m McpServerService) Create(create request.McpServerCreate) error {
 	}
 	mcpDir := path.Join(global.Dir.McpDir, create.Name)
 	mcpServer := &model.McpServer{
-		Name:               create.Name,
-		ContainerName:      create.ContainerName,
-		Port:               create.Port,
-		Command:            create.Command,
-		Status:             constant.StatusStarting,
-		BaseURL:            create.BaseURL,
-		SsePath:            create.SsePath,
-		Dir:                mcpDir,
-		HostIP:             create.HostIP,
-		StreamableHttpPath: create.StreamableHttpPath,
-		OutputTransport:    create.OutputTransport,
-		Type:               create.Type,
+		Name:            create.Name,
+		ContainerName:   create.ContainerName,
+		Port:            create.Port,
+		Command:         create.Command,
+		Status:          constant.StatusStarting,
+		BaseURL:         create.BaseURL,
+		Dir:             mcpDir,
+		HostIP:          create.HostIP,
+		OutputTransport: create.OutputTransport,
+		Type:            create.Type,
 	}
+	if create.OutputTransport == "sse" {
+		mcpServer.SsePath = create.SsePath
+	} else {
+		mcpServer.StreamableHttpPath = create.StreamableHttpPath
+	}
+
 	if err := handleCreateParams(mcpServer, create.Environments, create.Volumes); err != nil {
 		return err
 	}
@@ -445,8 +452,14 @@ func addProxy(server *model.McpServer) {
 	if !ok {
 		return
 	}
-	location.UpdateDirective("proxy_pass", []string{fmt.Sprintf("http://127.0.0.1:%d%s", server.Port, server.SsePath)})
-	location.ChangePath("^~", server.SsePath)
+	var proxyPath string
+	if server.OutputTransport == "sse" {
+		proxyPath = server.SsePath
+	} else {
+		proxyPath = server.StreamableHttpPath
+	}
+	location.UpdateDirective("proxy_pass", []string{fmt.Sprintf("http://127.0.0.1:%d%s", server.Port, proxyPath)})
+	location.ChangePath("^~", proxyPath)
 	if err = nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
 		global.LOG.Errorf("write config failed, err: %v", buserr.WithErr("ErrUpdateBuWebsite", err))
 		return
@@ -497,8 +510,14 @@ func addMCPProxy(websiteID uint) error {
 			err = errors.New("error")
 			return err
 		}
-		location.UpdateDirective("proxy_pass", []string{fmt.Sprintf("http://127.0.0.1:%d%s", server.Port, server.SsePath)})
-		location.ChangePath("^~", server.SsePath)
+		var proxyPath string
+		if server.OutputTransport == "sse" {
+			proxyPath = server.SsePath
+		} else {
+			proxyPath = server.StreamableHttpPath
+		}
+		location.UpdateDirective("proxy_pass", []string{fmt.Sprintf("http://127.0.0.1:%d%s", server.Port, proxyPath)})
+		location.ChangePath("^~", proxyPath)
 		if err = nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
 			return buserr.WithErr("ErrUpdateBuWebsite", err)
 		}
