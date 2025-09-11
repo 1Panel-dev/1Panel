@@ -10,7 +10,7 @@ import (
 // @Summary Get complete disk information
 // @Description Get information about all disks including partitioned and unpartitioned disks
 // @Produce json
-// @Success 200 {object} dto.CompleteDiskInfo
+// @Success 200 {object} response.CompleteDiskInfo
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /disks [get]

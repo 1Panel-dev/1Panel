@@ -26,7 +26,7 @@ import (
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /script [post]
+// @Router /core/script [post]
 // @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"添加脚本库脚本 [name]","formatEN":"add script [name]"}
 func (b *BaseApi) CreateScript(c *gin.Context) {
 	var req dto.ScriptOperate
@@ -48,7 +48,7 @@ func (b *BaseApi) CreateScript(c *gin.Context) {
 // @Success 200 {object} dto.PageResult
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /script/search [post]
+// @Router /core/script/search [post]
 func (b *BaseApi) SearchScript(c *gin.Context) {
 	var req dto.SearchPageWithGroup
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -74,7 +74,7 @@ func (b *BaseApi) SearchScript(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /script/del [post]
+// @Router /core/script/del [post]
 // @x-panel-log {"bodyKeys":["ids"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"ids","isList":true,"db":"script_librarys","output_column":"name","output_value":"names"}],"formatZH":"删除脚本库脚本 [names]","formatEN":"delete script [names]"}
 func (b *BaseApi) DeleteScript(c *gin.Context) {
 	var req dto.OperateByIDs
@@ -96,7 +96,7 @@ func (b *BaseApi) DeleteScript(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /script/sync [post]
+// @Router /core/script/sync [post]
 // @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"同步脚本库脚本","formatEN":"sync scripts"}
 func (b *BaseApi) SyncScript(c *gin.Context) {
 	var req dto.OperateByTaskID
@@ -117,7 +117,7 @@ func (b *BaseApi) SyncScript(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /script/update [post]
+// @Router /core/script/update [post]
 // @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"cronjobs","output_column":"name","output_value":"name"}],"formatZH":"更新脚本库脚本 [name]","formatEN":"update script [name]"}
 func (b *BaseApi) UpdateScript(c *gin.Context) {
 	var req dto.ScriptOperate
