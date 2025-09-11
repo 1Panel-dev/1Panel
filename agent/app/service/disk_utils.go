@@ -104,7 +104,7 @@ func parseLsblkOutput(output string) ([]response.DiskBasicInfo, error) {
 
 		if diskType == "lvm" {
 			total, used, avail, usePercent, _ := getDiskUsageInfo("/dev/mapper/" + name)
-			if total != "" {
+			if total != "" && fsType != "" {
 				size = total
 			}
 
@@ -139,10 +139,17 @@ func parseLsblkOutput(output string) ([]response.DiskBasicInfo, error) {
 		tran := fields["TRAN"]
 		rota := fields["ROTA"]
 
-		totalSize, used, avail, usePercent, _ := getDiskUsageInfo("/dev/" + name)
-		if totalSize != "" && fsType != "" {
-			size = totalSize
+		var (
+			used, avail, totalSize string
+			usePercent             int
+		)
+		if mountPoint != "" {
+			totalSize, used, avail, usePercent, _ = getDiskUsageInfo("/dev/" + name)
+			if totalSize != "" {
+				size = totalSize
+			}
 		}
+
 		actualMountPoint := mountPoint
 		actualFsType := fsType
 		actualUsed := used
