@@ -71,6 +71,7 @@ func GetNodeErrorAlert() (uint, error) {
 
 func LoadRequestTransport() *http.Transport {
 	return &http.Transport{
+		Proxy: http.ProxyFromEnvironment,
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		DialContext: (&net.Dialer{
 			Timeout:   60 * time.Second,
