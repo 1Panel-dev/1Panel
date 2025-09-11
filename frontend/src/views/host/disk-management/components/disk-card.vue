@@ -8,7 +8,15 @@
                         <el-tag size="small" type="warning" v-if="scope === 'system'">
                             {{ $t('disk.systemDisk') }}
                         </el-tag>
-                        <el-tag size="small" type="warning" v-if="scope === 'unpartitioned'">
+                        <el-tag
+                            size="small"
+                            type="warning"
+                            v-if="
+                                scope == 'unpartitioned' &&
+                                diskInfo.partitions == undefined &&
+                                diskInfo.mountPoint == ''
+                            "
+                        >
                             {{ $t('disk.unpartitionedDisk') }}
                         </el-tag>
                     </h3>
@@ -33,7 +41,13 @@
                             {{ $t('disk.serial') }}:
                             <span class="ml-2">{{ diskInfo.serial }}</span>
                         </el-text>
-                        <div v-if="scope == 'unpartitioned'">
+                        <div
+                            v-if="
+                                scope == 'unpartitioned' &&
+                                diskInfo.partitions == undefined &&
+                                diskInfo.mountPoint == ''
+                            "
+                        >
                             <el-button type="primary" size="small" @click="handlePartition(diskInfo)">
                                 {{ $t('disk.handlePartition') }}
                             </el-button>
@@ -86,6 +100,50 @@
                 </el-table-column>
             </el-table>
             <el-text v-if="scope === 'system'">{{ $t('disk.systemDiskHelper') }}</el-text>
+        </div>
+        <div v-if="diskInfo.partitions == undefined && diskInfo.mountPoint != ''">
+            <el-table :data="[diskInfo]" class="w-full">
+                <el-table-column prop="device" :label="$t('disk.partition') + $t('commons.table.name')" min-width="100">
+                    <template #default="{ row }">
+                        <span class="font-medium">{{ row.device.split('/').pop() }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="size" :label="$t('container.size')" min-width="40" />
+                <el-table-column prop="used" :label="$t('home.used')" min-width="40" />
+                <el-table-column prop="avail" :label="$t('home.available')" min-width="40" />
+                <el-table-column prop="usePercent" :label="$t('home.percent')" min-width="60">
+                    <template #default="{ row }">
+                        <el-progress
+                            :percentage="row.usePercent"
+                            :status="row.usePercent >= 90 ? 'exception' : 'success'"
+                            :text-inside="true"
+                            :stroke-width="14"
+                        />
+                    </template>
+                </el-table-column>
+                <el-table-column prop="mountPoint" :label="$t('disk.mountPoint')" min-width="120">
+                    <template #default="{ row }">
+                        <span v-if="row.mountPoint != ''">
+                            {{ row.mountPoint }}
+                        </span>
+                        <el-tag v-else size="small" type="warning">{{ $t('disk.unmounted') }}</el-tag>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="filesystem" :label="$t('disk.filesystem')" min-width="80">
+                    <template #default="{ row }">
+                        <el-tag size="small" type="info" v-if="row.filesystem != ''">{{ row.filesystem }}</el-tag>
+                    </template>
+                </el-table-column>
+                <el-table-column :label="$t('commons.table.operate')" width="150">
+                    <template #default="{ row }">
+                        <el-text type="info" v-if="scope === 'system'">{{ $t('disk.cannotOperate') }}</el-text>
+                        <el-button type="primary" link v-else-if="row.mountPoint != ''" @click="unmount(row)">
+                            {{ $t('disk.unmount') }}
+                        </el-button>
+                        <el-button type="primary" link v-else @click="mount(row)">{{ $t('disk.mount') }}</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
         </div>
     </el-card>
 </template>
