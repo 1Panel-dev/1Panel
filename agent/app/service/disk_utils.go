@@ -140,7 +140,7 @@ func parseLsblkOutput(output string) ([]response.DiskBasicInfo, error) {
 		rota := fields["ROTA"]
 
 		totalSize, used, avail, usePercent, _ := getDiskUsageInfo("/dev/" + name)
-		if totalSize != "" {
+		if totalSize != "" && fsType != "" {
 			size = totalSize
 		}
 		actualMountPoint := mountPoint
@@ -167,7 +167,7 @@ func parseLsblkOutput(output string) ([]response.DiskBasicInfo, error) {
 			}
 		}
 
-		diskInfo := response.DiskBasicInfo{
+		info := response.DiskBasicInfo{
 			Device:      name,
 			Size:        size,
 			Model:       model,
@@ -183,7 +183,7 @@ func parseLsblkOutput(output string) ([]response.DiskBasicInfo, error) {
 			Serial:      serial,
 		}
 
-		diskInfos = append(diskInfos, diskInfo)
+		diskInfos = append(diskInfos, info)
 	}
 
 	return diskInfos, nil
