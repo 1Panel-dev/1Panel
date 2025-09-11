@@ -688,7 +688,7 @@ import VscodeOpenDialog from '@/components/vscode-open/index.vue';
 import { debounce } from 'lodash-es';
 import TerminalDialog from './terminal/index.vue';
 import { Dashboard } from '@/api/interface/dashboard';
-import { CompressExtension } from '@/enums/files';
+import { CompressExtension, CompressType } from '@/enums/files';
 import type { TabPaneName } from 'element-plus';
 
 const globalStore = GlobalStore();
@@ -1189,6 +1189,9 @@ const openDeCompress = (item: File.File) => {
     fileDeCompress.type = Mimetypes.get(item.mimeType);
     if (CompressExtension[Mimetypes.get(item.mimeType)] != item.extension) {
         fileDeCompress.type = getEnumKeyByValue(item.extension);
+    }
+    if (item.name.endsWith('.tar.gz') || item.name.endsWith('.tgz')) {
+        fileDeCompress.type = CompressType.TarGz;
     }
 
     fileDeCompress.name = item.name;

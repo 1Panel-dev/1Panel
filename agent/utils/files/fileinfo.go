@@ -463,6 +463,7 @@ const (
 	TarBz2   CompressType = "tar.bz2"
 	Tar      CompressType = "tar"
 	TarGz    CompressType = "tar.gz"
+	Tgz      CompressType = "tgz"
 	Xz       CompressType = "xz"
 	TarXz    CompressType = "tar.xz"
 	SdkZip   CompressType = "sdkZip"

@@ -588,7 +588,7 @@ func getFormat(cType CompressType) archiver.CompressedArchive {
 	switch cType {
 	case Tar:
 		format.Archival = archiver.Tar{}
-	case TarGz, Gz:
+	case TarGz, Gz, Tgz:
 		format.Compression = archiver.Gz{}
 		format.Archival = archiver.Tar{}
 	case SdkTarGz:
