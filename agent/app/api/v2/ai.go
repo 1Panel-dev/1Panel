@@ -60,7 +60,7 @@ func (b *BaseApi) RecreateOllamaModel(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /ai/ollama/model/close [post]
+// @Router /ai/ollama/close [post]
 // @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"关闭 Ollama 模型连接 [name]","formatEN":"close conn for Ollama model [name]"}
 func (b *BaseApi) CloseOllamaModel(c *gin.Context) {
 	var req dto.OllamaModelName

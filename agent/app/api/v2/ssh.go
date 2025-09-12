@@ -74,7 +74,7 @@ func (b *BaseApi) UpdateSSH(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /hosts/conffile/update [post]
+// @Router /hosts/ssh/conffile/update [post]
 // @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"修改 SSH 配置文件","formatEN":"update SSH conf"}
 func (b *BaseApi) UpdateSSHByfile(c *gin.Context) {
 	var req dto.SSHConf

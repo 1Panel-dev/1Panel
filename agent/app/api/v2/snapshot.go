@@ -50,7 +50,7 @@ func (b *BaseApi) CreateSnapshot(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /settings/snapshot/recrete [post]
+// @Router /settings/snapshot/recreate [post]
 // @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"snapshots","output_column":"name","output_value":"name"}],"formatZH":"重试创建快照 [name]","formatEN":"recrete the snapshot [name]"}
 func (b *BaseApi) RecreateSnapshot(c *gin.Context) {
 	var req dto.OperateByID

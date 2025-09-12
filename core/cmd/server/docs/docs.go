@@ -115,6 +115,325 @@ const docTemplate = `{
 				]
 			}
 		},
+		"/ai/mcp/domain/bind": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.McpBindDomain"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Bind Domain for mcp server",
+				"tags": [
+					"McpServer"
+				]
+			}
+		},
+		"/ai/mcp/domain/get": {
+			"get": {
+				"consumes": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/response.McpBindDomainRes"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get bin Domain for mcp server",
+				"tags": [
+					"McpServer"
+				]
+			}
+		},
+		"/ai/mcp/domain/update": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.McpBindDomainUpdate"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update bind Domain for mcp server",
+				"tags": [
+					"McpServer"
+				]
+			}
+		},
+		"/ai/mcp/search": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.McpServerSearch"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/response.McpServersRes"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "List mcp servers",
+				"tags": [
+					"McpServer"
+				]
+			}
+		},
+		"/ai/mcp/server": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.McpServerCreate"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Create mcp server",
+				"tags": [
+					"McpServer"
+				]
+			}
+		},
+		"/ai/mcp/server/del": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.McpServerDelete"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Delete mcp server",
+				"tags": [
+					"McpServer"
+				]
+			}
+		},
+		"/ai/mcp/server/op": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.McpServerOperate"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Operate mcp server",
+				"tags": [
+					"McpServer"
+				]
+			}
+		},
+		"/ai/mcp/server/update": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.McpServerUpdate"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update mcp server",
+				"tags": [
+					"McpServer"
+				]
+			}
+		},
+		"/ai/ollama/close": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.OllamaModelName"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Close Ollama model conn",
+				"tags": [
+					"AI"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"name"
+					],
+					"formatEN": "close conn for Ollama model [name]",
+					"formatZH": "关闭 Ollama 模型连接 [name]",
+					"paramKeys": []
+				}
+			}
+		},
 		"/ai/ollama/model": {
 			"post": {
 				"consumes": [
@@ -155,50 +474,6 @@ const docTemplate = `{
 					],
 					"formatEN": "add Ollama model [name]",
 					"formatZH": "添加 Ollama 模型 [name]",
-					"paramKeys": []
-				}
-			}
-		},
-		"/ai/ollama/model/close": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/dto.OllamaModelName"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK"
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Close Ollama model conn",
-				"tags": [
-					"AI"
-				],
-				"x-panel-log": {
-					"BeforeFunctions": [],
-					"bodyKeys": [
-						"name"
-					],
-					"formatEN": "close conn for Ollama model [name]",
-					"formatZH": "关闭 Ollama 模型连接 [name]",
 					"paramKeys": []
 				}
 			}
@@ -796,8 +1071,8 @@ const docTemplate = `{
 				}
 			}
 		},
-		"/apps/installed/conninfo/:key": {
-			"get": {
+		"/apps/installed/conninfo": {
+			"post": {
 				"consumes": [
 					"application/json"
 				],
@@ -1453,89 +1728,6 @@ const docTemplate = `{
 				}
 			}
 		},
-		"/backup/record/description/update": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/dto.UpdateDescription"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK"
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Update backup record description",
-				"tags": [
-					"Backup Account"
-				]
-			}
-		},
-		"/backup/record/download": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/dto.DownloadRecord"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"type": "string"
-						}
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Download backup record",
-				"tags": [
-					"Backup Account"
-				],
-				"x-panel-log": {
-					"BeforeFunctions": [],
-					"bodyKeys": [
-						"source",
-						"fileName"
-					],
-					"formatEN": "download backup records [source][fileName]",
-					"formatZH": "下载备份记录 [source][fileName]",
-					"paramKeys": []
-				}
-			}
-		},
 		"/backups": {
 			"post": {
 				"consumes": [
@@ -1624,6 +1816,47 @@ const docTemplate = `{
 					"formatZH": "备份 [type] 数据 [name][detailName]",
 					"paramKeys": []
 				}
+			}
+		},
+		"/backups/buckets": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.ForBuckets"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"type": "object"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "List buckets",
+				"tags": [
+					"Backup Account"
+				]
 			}
 		},
 		"/backups/del": {
@@ -1731,6 +1964,142 @@ const docTemplate = `{
 				"tags": [
 					"Backup Account"
 				]
+			}
+		},
+		"/backups/record/del": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.BatchDeleteReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Delete backup record",
+				"tags": [
+					"Backup Account"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [
+						{
+							"db": "backup_records",
+							"input_column": "id",
+							"input_value": "ids",
+							"isList": true,
+							"output_column": "file_name",
+							"output_value": "files"
+						}
+					],
+					"bodyKeys": [
+						"ids"
+					],
+					"formatEN": "delete backup records [files]",
+					"formatZH": "删除备份记录 [files]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/backups/record/description/update": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.UpdateDescription"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update backup record description",
+				"tags": [
+					"Backup Account"
+				]
+			}
+		},
+		"/backups/record/download": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.DownloadRecord"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"type": "string"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Download backup record",
+				"tags": [
+					"Backup Account"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"source",
+						"fileName"
+					],
+					"formatEN": "download backup records [source][fileName]",
+					"formatZH": "下载备份记录 [source][fileName]",
+					"paramKeys": []
+				}
 			}
 		},
 		"/backups/record/search": {
@@ -2141,47 +2510,6 @@ const docTemplate = `{
 					"formatZH": "上传备份文件 [filePath]",
 					"paramKeys": []
 				}
-			}
-		},
-		"/buckets": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/dto.ForBuckets"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"items": {
-								"type": "object"
-							},
-							"type": "array"
-						}
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "List buckets",
-				"tags": [
-					"Backup Account"
-				]
 			}
 		},
 		"/containers": {
@@ -3961,7 +4289,7 @@ const docTemplate = `{
 			}
 		},
 		"/containers/repo/status": {
-			"get": {
+			"post": {
 				"consumes": [
 					"application/json"
 				],
@@ -4096,7 +4424,7 @@ const docTemplate = `{
 			}
 		},
 		"/containers/search/log": {
-			"post": {
+			"get": {
 				"parameters": [
 					{
 						"description": "容器名称",
@@ -8141,7 +8469,7 @@ const docTemplate = `{
 			}
 		},
 		"/dashboard/quick/option": {
-			"post": {
+			"get": {
 				"responses": {
 					"200": {
 						"description": "OK",
@@ -8681,6 +9009,47 @@ const docTemplate = `{
 					"formatZH": "删除远程数据库 [names]",
 					"paramKeys": []
 				}
+			}
+		},
+		"/databases/db/del/check": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.OperateByID"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"type": "string"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Check before delete remote database",
+				"tags": [
+					"Database"
+				]
 			}
 		},
 		"/databases/db/item/:type": {
@@ -9898,223 +10267,6 @@ const docTemplate = `{
 				}
 			}
 		},
-		"/db/remote/del/check": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/dto.OperateByID"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"items": {
-								"type": "string"
-							},
-							"type": "array"
-						}
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Check before delete remote database",
-				"tags": [
-					"Database"
-				]
-			}
-		},
-		"/disks": {
-			"get": {
-				"description": "Get information about all disks including partitioned and unpartitioned disks",
-				"produces": [
-					"application/json"
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"$ref": "#/definitions/response.CompleteDiskInfo"
-						}
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Get complete disk information",
-				"tags": [
-					"Disk Management"
-				]
-			}
-		},
-		"/disks/mount": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"description": "Mount partition to specified mount point",
-				"parameters": [
-					{
-						"description": "mount request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/request.DiskMountRequest"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "Disk mounted successfully",
-						"schema": {
-							"type": "string"
-						}
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Mount disk",
-				"tags": [
-					"Disk Management"
-				],
-				"x-panel-log": {
-					"BeforeFunctions": [],
-					"bodyKeys": [
-						"device",
-						"mountPoint"
-					],
-					"formatEN": "Mount disk [device] to [mountPoint]",
-					"formatZH": "挂载磁盘 [device] 到 [mountPoint]",
-					"paramKeys": []
-				}
-			}
-		},
-		"/disks/partition": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"description": "Create partition and format disk with specified filesystem",
-				"parameters": [
-					{
-						"description": "partition request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/request.DiskPartitionRequest"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "Partition created successfully",
-						"schema": {
-							"type": "string"
-						}
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Partition disk",
-				"tags": [
-					"Disk Management"
-				],
-				"x-panel-log": {
-					"BeforeFunctions": [],
-					"bodyKeys": [
-						"device",
-						"filesystem",
-						"mountPoint"
-					],
-					"formatEN": "Partition disk [device] with filesystem [filesystem], mount point [mountPoint]",
-					"formatZH": "对磁盘 [device] 进行分区，文件系统 [filesystem]，挂载点 [mountPoint]",
-					"paramKeys": []
-				}
-			}
-		},
-		"/disks/unmount": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"description": "Unmount partition from mount point",
-				"parameters": [
-					{
-						"description": "unmount request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/request.DiskUnmountRequest"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "Disk unmounted successfully",
-						"schema": {
-							"type": "string"
-						}
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Unmount disk",
-				"tags": [
-					"Disk Management"
-				],
-				"x-panel-log": {
-					"BeforeFunctions": [],
-					"bodyKeys": [
-						"device",
-						"mountPoint"
-					],
-					"formatEN": "Unmount disk [device] from [mountPoint]",
-					"formatZH": "卸载磁盘 [device] 从 [mountPoint]",
-					"paramKeys": []
-				}
-			}
-		},
 		"/files": {
 			"post": {
 				"consumes": [
@@ -10839,6 +10991,33 @@ const docTemplate = `{
 				}
 			}
 		},
+		"/files/mount": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.DiskInfo"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "system mount",
+				"tags": [
+					"File"
+				]
+			}
+		},
 		"/files/move": {
 			"post": {
 				"consumes": [
@@ -11398,6 +11577,33 @@ const docTemplate = `{
 				]
 			}
 		},
+		"/files/user/group": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/response.UserGroupResponse"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "system user and group",
+				"tags": [
+					"File"
+				]
+			}
+		},
 		"/files/wget": {
 			"post": {
 				"consumes": [
@@ -11675,25 +11881,18 @@ const docTemplate = `{
 				]
 			}
 		},
-		"/hosts/conffile/update": {
-			"post": {
-				"consumes": [
+		"/hosts/disks": {
+			"get": {
+				"description": "Get information about all disks including partitioned and unpartitioned disks",
+				"produces": [
 					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/dto.SSHConf"
-						}
-					}
 				],
 				"responses": {
 					"200": {
-						"description": "OK"
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/response.CompleteDiskInfo"
+						}
 					}
 				},
 				"security": [
@@ -11704,15 +11903,156 @@ const docTemplate = `{
 						"Timestamp": []
 					}
 				],
-				"summary": "Update host SSH setting by file",
+				"summary": "Get complete disk information",
 				"tags": [
-					"SSH"
+					"Disk Management"
+				]
+			}
+		},
+		"/hosts/disks/mount": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"description": "Mount partition to specified mount point",
+				"parameters": [
+					{
+						"description": "mount request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.DiskMountRequest"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Disk mounted successfully",
+						"schema": {
+							"type": "string"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Mount disk",
+				"tags": [
+					"Disk Management"
 				],
 				"x-panel-log": {
 					"BeforeFunctions": [],
-					"bodyKeys": [],
-					"formatEN": "update SSH conf",
-					"formatZH": "修改 SSH 配置文件",
+					"bodyKeys": [
+						"device",
+						"mountPoint"
+					],
+					"formatEN": "Mount disk [device] to [mountPoint]",
+					"formatZH": "挂载磁盘 [device] 到 [mountPoint]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/hosts/disks/partition": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"description": "Create partition and format disk with specified filesystem",
+				"parameters": [
+					{
+						"description": "partition request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.DiskPartitionRequest"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Partition created successfully",
+						"schema": {
+							"type": "string"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Partition disk",
+				"tags": [
+					"Disk Management"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"device",
+						"filesystem",
+						"mountPoint"
+					],
+					"formatEN": "Partition disk [device] with filesystem [filesystem], mount point [mountPoint]",
+					"formatZH": "对磁盘 [device] 进行分区，文件系统 [filesystem]，挂载点 [mountPoint]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/hosts/disks/unmount": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"description": "Unmount partition from mount point",
+				"parameters": [
+					{
+						"description": "unmount request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.DiskUnmountRequest"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Disk unmounted successfully",
+						"schema": {
+							"type": "string"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Unmount disk",
+				"tags": [
+					"Disk Management"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"device",
+						"mountPoint"
+					],
+					"formatEN": "Unmount disk [device] from [mountPoint]",
+					"formatZH": "卸载磁盘 [device] 从 [mountPoint]",
 					"paramKeys": []
 				}
 			}
@@ -12403,6 +12743,48 @@ const docTemplate = `{
 				]
 			}
 		},
+		"/hosts/ssh/conffile/update": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.SSHConf"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update host SSH setting by file",
+				"tags": [
+					"SSH"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [],
+					"formatEN": "update SSH conf",
+					"formatZH": "修改 SSH 配置文件",
+					"paramKeys": []
+				}
+			}
+		},
 		"/hosts/ssh/log": {
 			"post": {
 				"consumes": [
@@ -12677,7 +13059,7 @@ const docTemplate = `{
 				}
 			}
 		},
-		"/hosts/tool/create": {
+		"/hosts/tool/init": {
 			"post": {
 				"consumes": [
 					"application/json"
@@ -12920,36 +13302,6 @@ const docTemplate = `{
 				}
 			}
 		},
-		"/installed/delete/check/:id": {
-			"get": {
-				"consumes": [
-					"application/json"
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"items": {
-								"$ref": "#/definitions/dto.AppResource"
-							},
-							"type": "array"
-						}
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Delete runtime",
-				"tags": [
-					"Website"
-				]
-			}
-		},
 		"/logs/system/files": {
 			"get": {
 				"responses": {
@@ -13036,308 +13388,6 @@ const docTemplate = `{
 				"summary": "Page task logs",
 				"tags": [
 					"TaskLog"
-				]
-			}
-		},
-		"/mcp/domain/bind": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/request.McpBindDomain"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK"
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Bind Domain for mcp server",
-				"tags": [
-					"McpServer"
-				]
-			}
-		},
-		"/mcp/domain/get": {
-			"get": {
-				"consumes": [
-					"application/json"
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"$ref": "#/definitions/response.McpBindDomainRes"
-						}
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Get bin Domain for mcp server",
-				"tags": [
-					"McpServer"
-				]
-			}
-		},
-		"/mcp/domain/update": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/request.McpBindDomainUpdate"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK"
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Update bind Domain for mcp server",
-				"tags": [
-					"McpServer"
-				]
-			}
-		},
-		"/mcp/search": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/request.McpServerSearch"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"$ref": "#/definitions/response.McpServersRes"
-						}
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "List mcp servers",
-				"tags": [
-					"McpServer"
-				]
-			}
-		},
-		"/mcp/server": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/request.McpServerCreate"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK"
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Create mcp server",
-				"tags": [
-					"McpServer"
-				]
-			}
-		},
-		"/mcp/server/del": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/request.McpServerDelete"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK"
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Delete mcp server",
-				"tags": [
-					"McpServer"
-				]
-			}
-		},
-		"/mcp/server/op": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/request.McpServerOperate"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK"
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Operate mcp server",
-				"tags": [
-					"McpServer"
-				]
-			}
-		},
-		"/mcp/server/update": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/request.McpServerUpdate"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK"
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Update mcp server",
-				"tags": [
-					"McpServer"
-				]
-			}
-		},
-		"/mount": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"$ref": "#/definitions/dto.DiskInfo"
-						}
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "system mount",
-				"tags": [
-					"File"
 				]
 			}
 		},
@@ -13506,7 +13556,31 @@ const docTemplate = `{
 				]
 			}
 		},
-		"/openresty/module/update": {
+		"/openresty/modules": {
+			"get": {
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/response.NginxBuildConfig"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get OpenResty modules",
+				"tags": [
+					"OpenResty"
+				]
+			}
+		},
+		"/openresty/modules/update": {
 			"post": {
 				"consumes": [
 					"application/json"
@@ -13546,30 +13620,6 @@ const docTemplate = `{
 					"formatZH": "更新 OpenResty 模块",
 					"paramKeys": []
 				}
-			}
-		},
-		"/openresty/modules": {
-			"get": {
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"$ref": "#/definitions/response.NginxBuildConfig"
-						}
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Get OpenResty modules",
-				"tags": [
-					"OpenResty"
-				]
 			}
 		},
 		"/openresty/scope": {
@@ -13764,59 +13814,6 @@ const docTemplate = `{
 				]
 			}
 		},
-		"/record/del": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/dto.BatchDeleteReq"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK"
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Delete backup record",
-				"tags": [
-					"Backup Account"
-				],
-				"x-panel-log": {
-					"BeforeFunctions": [
-						{
-							"db": "backup_records",
-							"input_column": "id",
-							"input_value": "ids",
-							"isList": true,
-							"output_column": "file_name",
-							"output_value": "files"
-						}
-					],
-					"bodyKeys": [
-						"ids"
-					],
-					"formatEN": "delete backup records [files]",
-					"formatZH": "删除备份记录 [files]",
-					"paramKeys": []
-				}
-			}
-		},
 		"/runtimes": {
 			"post": {
 				"consumes": [
@@ -13942,6 +13939,36 @@ const docTemplate = `{
 					"formatZH": "删除运行环境 [name]",
 					"paramKeys": []
 				}
+			}
+		},
+		"/runtimes/installed/delete/check/:id": {
+			"get": {
+				"consumes": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/dto.AppResource"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Delete runtime",
+				"tags": [
+					"Website"
+				]
 			}
 		},
 		"/runtimes/node/modules": {
@@ -14786,6 +14813,41 @@ const docTemplate = `{
 				]
 			}
 		},
+		"/runtimes/supervisor/process": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.PHPSupervisorProcessConfig"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Operate supervisor process",
+				"tags": [
+					"Runtime"
+				]
+			}
+		},
 		"/runtimes/supervisor/process/:id": {
 			"get": {
 				"consumes": [
@@ -14825,7 +14887,7 @@ const docTemplate = `{
 				]
 			}
 		},
-		"/runtimes/supervisor/process/file/operate": {
+		"/runtimes/supervisor/process/file": {
 			"post": {
 				"consumes": [
 					"application/json"
@@ -14858,41 +14920,6 @@ const docTemplate = `{
 					}
 				],
 				"summary": "Operate supervisor process file",
-				"tags": [
-					"Runtime"
-				]
-			}
-		},
-		"/runtimes/supervisor/process/operate": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/request.PHPSupervisorProcessConfig"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK"
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Operate supervisor process",
 				"tags": [
 					"Runtime"
 				]
@@ -15339,7 +15366,7 @@ const docTemplate = `{
 				}
 			}
 		},
-		"/settings/snapshot/recrete": {
+		"/settings/snapshot/recreate": {
 			"post": {
 				"consumes": [
 					"application/json"
@@ -15643,7 +15670,7 @@ const docTemplate = `{
 			}
 		},
 		"/toolbox/clam/base": {
-			"get": {
+			"post": {
 				"consumes": [
 					"application/json"
 				],
@@ -17101,33 +17128,6 @@ const docTemplate = `{
 					"formatZH": "扫描系统垃圾文件",
 					"paramKeys": []
 				}
-			}
-		},
-		"/user/group": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"$ref": "#/definitions/response.UserGroupResponse"
-						}
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "system user and group",
-				"tags": [
-					"File"
-				]
 			}
 		},
 		"/websites": {
@@ -19040,7 +19040,7 @@ const docTemplate = `{
 				]
 			}
 		},
-		"/websites/lbs/delete": {
+		"/websites/lbs/del": {
 			"post": {
 				"consumes": [
 					"application/json"
@@ -19530,6 +19530,59 @@ const docTemplate = `{
 				]
 			}
 		},
+		"/websites/proxies/file": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.NginxProxyUpdate"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update proxy file",
+				"tags": [
+					"Website"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [
+						{
+							"db": "websites",
+							"input_column": "id",
+							"input_value": "websiteID",
+							"isList": false,
+							"output_column": "primary_domain",
+							"output_value": "domain"
+						}
+					],
+					"bodyKeys": [
+						"websiteID"
+					],
+					"formatEN": "Nginx conf proxy file update [domain]",
+					"formatZH": "更新反向代理文件 [domain]",
+					"paramKeys": []
+				}
+			}
+		},
 		"/websites/proxies/update": {
 			"post": {
 				"consumes": [
@@ -19679,60 +19732,7 @@ const docTemplate = `{
 				"summary": "Get website proxy cache config"
 			}
 		},
-		"/websites/proxy/file": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/request.NginxProxyUpdate"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK"
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Update proxy file",
-				"tags": [
-					"Website"
-				],
-				"x-panel-log": {
-					"BeforeFunctions": [
-						{
-							"db": "websites",
-							"input_column": "id",
-							"input_value": "websiteID",
-							"isList": false,
-							"output_column": "primary_domain",
-							"output_value": "domain"
-						}
-					],
-					"bodyKeys": [
-						"websiteID"
-					],
-					"formatEN": "Nginx conf proxy file update [domain]",
-					"formatZH": "更新反向代理文件 [domain]",
-					"paramKeys": []
-				}
-			}
-		},
-		"/websites/realip": {
+		"/websites/realip/config": {
 			"post": {
 				"consumes": [
 					"application/json"
@@ -32016,20 +32016,20 @@ const docTemplate = `{
 				"PID": {
 					"type": "integer"
 				},
+				"localaddr": {
+					"type": "object"
+				},
 				"name": {
 					"type": "string"
+				},
+				"remoteaddr": {
+					"type": "object"
 				},
 				"status": {
 					"type": "string"
 				},
 				"type": {
 					"type": "string"
-				},
-				"localaddr": {
-					"type": "object"
-				},
-				"remoteaddr": {
-					"type": "object"
 				}
 			},
 			"type": "object"
@@ -32087,6 +32087,12 @@ const docTemplate = `{
 				"numThreads": {
 					"type": "integer"
 				},
+				"openFiles": {
+					"items": {
+						"type": "object"
+					},
+					"type": "array"
+				},
 				"rss": {
 					"type": "string"
 				},
@@ -32110,12 +32116,6 @@ const docTemplate = `{
 				},
 				"vms": {
 					"type": "string"
-				},
-				"openFiles": {
-					"items": {
-						"type": "object"
-					},
-					"type": "array"
 				}
 			},
 			"type": "object"

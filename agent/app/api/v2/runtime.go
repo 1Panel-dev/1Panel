@@ -81,7 +81,7 @@ func (b *BaseApi) DeleteRuntime(c *gin.Context) {
 // @Success 200 {array} dto.AppResource
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /installed/delete/check/:id [get]
+// @Router /runtimes/installed/delete/check/:id [get]
 func (b *BaseApi) DeleteRuntimeCheck(c *gin.Context) {
 	runTimeId, err := helper.GetIntParamByKey(c, "id")
 	if err != nil {
@@ -459,7 +459,7 @@ func (b *BaseApi) GetSupervisorProcess(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /runtimes/supervisor/process/operate [post]
+// @Router /runtimes/supervisor/process [post]
 func (b *BaseApi) OperateSupervisorProcess(c *gin.Context) {
 	var req request.PHPSupervisorProcessConfig
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -480,7 +480,7 @@ func (b *BaseApi) OperateSupervisorProcess(c *gin.Context) {
 // @Success 200 {string} content
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /runtimes/supervisor/process/file/operate [post]
+// @Router /runtimes/supervisor/process/file [post]
 func (b *BaseApi) OperateSupervisorProcessFile(c *gin.Context) {
 	var req request.PHPSupervisorProcessFileReq
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {

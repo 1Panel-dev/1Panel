@@ -35,7 +35,7 @@ func (b *BaseApi) GetToolStatus(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /hosts/tool/create [post]
+// @Router /hosts/tool/init [post]
 // @x-panel-log {"bodyKeys":["type"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"创建 [type] 配置","formatEN":"create [type] config"}
 func (b *BaseApi) InitToolConfig(c *gin.Context) {
 	var req request.HostToolCreate

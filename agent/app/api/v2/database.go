@@ -160,7 +160,7 @@ func (b *BaseApi) GetDatabase(c *gin.Context) {
 // @Success 200 {array} string
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /db/remote/del/check [post]
+// @Router /databases/db/del/check [post]
 func (b *BaseApi) DeleteCheckDatabase(c *gin.Context) {
 	var req dto.OperateByID
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {

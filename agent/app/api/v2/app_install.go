@@ -109,7 +109,7 @@ func (b *BaseApi) LoadPort(c *gin.Context) {
 // @Success 200 {object} response.DatabaseConn
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /apps/installed/conninfo/:key [get]
+// @Router /apps/installed/conninfo [POST]
 func (b *BaseApi) LoadConnInfo(c *gin.Context) {
 	var req dto.OperationWithNameAndType
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {

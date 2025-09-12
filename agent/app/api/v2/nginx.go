@@ -129,7 +129,7 @@ func (b *BaseApi) BuildNginx(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /openresty/module/update [post]
+// @Router /openresty/modules/update [post]
 // @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新 OpenResty 模块","formatEN":"Update OpenResty module"}
 func (b *BaseApi) UpdateNginxModule(c *gin.Context) {
 	var req request.NginxModuleUpdate
