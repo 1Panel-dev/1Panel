@@ -54,12 +54,6 @@ type SearchSSHLog struct {
 	Info   string `json:"info"`
 	Status string `json:"Status" validate:"required,oneof=Success Failed All"`
 }
-type SSHLog struct {
-	Logs            []SSHHistory `json:"logs"`
-	TotalCount      int          `json:"totalCount"`
-	SuccessfulCount int          `json:"successfulCount"`
-	FailedCount     int          `json:"failedCount"`
-}
 
 type SSHHistory struct {
 	Date     time.Time `json:"date"`

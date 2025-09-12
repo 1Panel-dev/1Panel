@@ -10,7 +10,7 @@
         <div v-if="isExist" :class="{ mask: !isActive }">
             <CardWithHeader :header="$t('menu.container')" class="card-interval">
                 <template #body>
-                    <span class="count" @click="goRouter('ContainerItem')">{{ countItem.containerCount }}</span>
+                    <span class="count" @click="routerToName('ContainerItem')">{{ countItem.containerCount }}</span>
                 </template>
                 <template #header-l>
                     <el-tag size="small" class="ml-5" v-if="countItem.all" effect="plain">
@@ -43,14 +43,14 @@
                 <el-col :span="8">
                     <CardWithHeader :header="$t('container.compose')">
                         <template #body>
-                            <span class="count" @click="goRouter('Compose')">{{ countItem.composeCount }}</span>
+                            <span class="count" @click="routerToName('Compose')">{{ countItem.composeCount }}</span>
                         </template>
                     </CardWithHeader>
                 </el-col>
                 <el-col :span="8">
                     <CardWithHeader :header="$t('container.composeTemplate')">
                         <template #body>
-                            <span class="count" @click="goRouter('ComposeTemplate')">
+                            <span class="count" @click="routerToName('ComposeTemplate')">
                                 {{ countItem.composeTemplateCount }}
                             </span>
                         </template>
@@ -59,7 +59,7 @@
                 <el-col :span="8">
                     <CardWithHeader :header="$t('container.image')">
                         <template #body>
-                            <span class="count" @click="goRouter('Image')">{{ countItem.imageCount }}</span>
+                            <span class="count" @click="routerToName('Image')">{{ countItem.imageCount }}</span>
                         </template>
                         <template #header-l>
                             <span v-if="countItem.imageSize" effect="plain" class="ml-2 text-xs">
@@ -73,21 +73,21 @@
                 <el-col :span="8">
                     <CardWithHeader :header="$t('container.imageRepo')">
                         <template #body>
-                            <span class="count" @click="goRouter('Repo')">{{ countItem.repoCount }}</span>
+                            <span class="count" @click="routerToName('Repo')">{{ countItem.repoCount }}</span>
                         </template>
                     </CardWithHeader>
                 </el-col>
                 <el-col :span="8">
                     <CardWithHeader :header="$t('container.network')">
                         <template #body>
-                            <span class="count" @click="goRouter('Network')">{{ countItem.networkCount }}</span>
+                            <span class="count" @click="routerToName('Network')">{{ countItem.networkCount }}</span>
                         </template>
                     </CardWithHeader>
                 </el-col>
                 <el-col :span="8">
                     <CardWithHeader :header="$t('container.volume')">
                         <template #body>
-                            <span class="count" @click="goRouter('Volume')">{{ countItem.volumeCount }}</span>
+                            <span class="count" @click="routerToName('Volume')">{{ countItem.volumeCount }}</span>
                         </template>
                     </CardWithHeader>
                 </el-col>
@@ -106,7 +106,7 @@
                             </div>
                         </el-descriptions-item>
                     </el-descriptions>
-                    <el-button class="mt-2" type="primary" link @click="goRouter('ContainerSetting')">
+                    <el-button class="mt-2" type="primary" link @click="routerToName('ContainerSetting')">
                         <el-icon class="mr-1"><Position /></el-icon>
                         {{ $t('container.goSetting') }}
                     </el-button>
@@ -120,8 +120,8 @@
 import { loadContainerStatus, loadDaemonJson } from '@/api/modules/container';
 import DockerStatus from '@/views/container/docker-status/index.vue';
 import { getSettingInfo } from '@/api/modules/setting';
-import router from '@/routers';
 import { computeSize } from '@/utils/util';
+import { routerToName } from '@/utils/router';
 import { onMounted, reactive, ref } from 'vue';
 
 const loading = ref();
@@ -186,10 +186,6 @@ const loadContainerSetting = async () => {
 
     const settingRes = await getSettingInfo();
     countItem.sockPath = settingRes.data.dockerSockPath || 'unix:///var/run/docker.sock';
-};
-
-const goRouter = async (val: string) => {
-    router.push({ name: val });
 };
 
 onMounted(() => {

@@ -45,8 +45,8 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/docker/go-connections/nat"
 	v1 "github.com/opencontainers/image-spec/specs-go/v1"
-	"github.com/shirou/gopsutil/v3/cpu"
-	"github.com/shirou/gopsutil/v3/mem"
+	"github.com/shirou/gopsutil/v4/cpu"
+	"github.com/shirou/gopsutil/v4/mem"
 )
 
 type ContainerService struct{}
@@ -54,6 +54,7 @@ type ContainerService struct{}
 type IContainerService interface {
 	Page(req dto.PageContainer) (int64, interface{}, error)
 	List() []dto.ContainerOptions
+	ListByImage(imageName string) []dto.ContainerOptions
 	LoadStatus() (dto.ContainerStatus, error)
 	PageNetwork(req dto.SearchWithPage) (int64, interface{}, error)
 	ListNetwork() ([]dto.Options, error)
@@ -236,6 +237,33 @@ func (u *ContainerService) List() []dto.ContainerOptions {
 		return nil
 	}
 	for _, container := range containers {
+		for _, name := range container.Names {
+			if len(name) != 0 {
+				options = append(options, dto.ContainerOptions{Name: strings.TrimPrefix(name, "/"), State: container.State})
+			}
+		}
+	}
+
+	return options
+}
+
+func (u *ContainerService) ListByImage(imageName string) []dto.ContainerOptions {
+	var options []dto.ContainerOptions
+	client, err := docker.NewDockerClient()
+	if err != nil {
+		global.LOG.Errorf("load docker client for contianer list failed, err: %v", err)
+		return nil
+	}
+	defer client.Close()
+	containers, err := client.ContainerList(context.Background(), container.ListOptions{All: true})
+	if err != nil {
+		global.LOG.Errorf("load container list failed, err: %v", err)
+		return nil
+	}
+	for _, container := range containers {
+		if container.Image != imageName {
+			continue
+		}
 		for _, name := range container.Names {
 			if len(name) != 0 {
 				options = append(options, dto.ContainerOptions{Name: strings.TrimPrefix(name, "/"), State: container.State})
@@ -745,17 +773,14 @@ func (u *ContainerService) ContainerUpgrade(req dto.ContainerUpgrade) error {
 	}
 	defer client.Close()
 	ctx := context.Background()
-	oldContainer, err := client.ContainerInspect(ctx, req.Name)
-	if err != nil {
-		return err
-	}
-	taskItem, err := task.NewTaskWithOps(req.Name, task.TaskUpgrade, task.TaskScopeContainer, req.TaskID, 1)
+	taskItem, err := task.NewTaskWithOps(req.Image, task.TaskUpgrade, task.TaskScopeImage, req.TaskID, 1)
 	if err != nil {
 		global.LOG.Errorf("new task for create container failed, err: %v", err)
 		return err
 	}
 	go func() {
 		taskItem.AddSubTask(i18n.GetWithName("ContainerImagePull", req.Image), func(t *task.Task) error {
+			taskItem.LogStart(i18n.GetWithName("ContainerImagePull", req.Image))
 			if !checkImageExist(client, req.Image) || req.ForcePull {
 				if err := pullImages(taskItem, client, req.Image); err != nil {
 					if !req.ForcePull {
@@ -766,38 +791,49 @@ func (u *ContainerService) ContainerUpgrade(req dto.ContainerUpgrade) error {
 			}
 			return nil
 		}, nil)
-
-		taskItem.AddSubTask(i18n.GetWithName("ContainerCreate", req.Name), func(t *task.Task) error {
-			config := oldContainer.Config
-			config.Image = req.Image
-			hostConf := oldContainer.HostConfig
-			var networkConf network.NetworkingConfig
-			if oldContainer.NetworkSettings != nil {
-				for networkKey := range oldContainer.NetworkSettings.Networks {
-					networkConf.EndpointsConfig = map[string]*network.EndpointSettings{networkKey: {}}
-					break
+		for _, item := range req.Names {
+			var oldContainer container.InspectResponse
+			taskItem.AddSubTask(i18n.GetWithName("ContainerLoadInfo", item), func(t *task.Task) error {
+				taskItem.Logf("----------------- %s -----------------", item)
+				oldContainer, err = client.ContainerInspect(ctx, item)
+				if err != nil {
+					return err
 				}
-			}
-			err := client.ContainerRemove(ctx, req.Name, container.RemoveOptions{Force: true})
-			taskItem.LogWithStatus(i18n.GetWithName("ContainerRemoveOld", req.Name), err)
-			if err != nil {
-				return err
-			}
+				return nil
+			}, nil)
 
-			con, err := client.ContainerCreate(ctx, config, hostConf, &networkConf, &v1.Platform{}, req.Name)
-			if err != nil {
-				taskItem.Log(i18n.GetMsgByKey("ContainerRecreate"))
-				reCreateAfterUpdate(req.Name, client, oldContainer.Config, oldContainer.HostConfig, oldContainer.NetworkSettings)
-				return fmt.Errorf("upgrade container failed, err: %v", err)
-			}
-			err = client.ContainerStart(ctx, con.ID, container.StartOptions{})
-			taskItem.LogWithStatus(i18n.GetMsgByKey("ContainerStartCheck"), err)
-			if err != nil {
-				return fmt.Errorf("upgrade successful but start failed, err: %v", err)
-			}
-			return nil
-		}, nil)
+			taskItem.AddSubTask(i18n.GetWithName("ContainerCreate", item), func(t *task.Task) error {
+				config := oldContainer.Config
+				config.Image = req.Image
+				hostConf := oldContainer.HostConfig
+				var networkConf network.NetworkingConfig
+				if oldContainer.NetworkSettings != nil {
+					for networkKey := range oldContainer.NetworkSettings.Networks {
+						networkConf.EndpointsConfig = map[string]*network.EndpointSettings{networkKey: {}}
+						break
+					}
+				}
+				err := client.ContainerRemove(ctx, item, container.RemoveOptions{Force: true})
+				taskItem.LogWithStatus(i18n.GetWithName("ContainerRemoveOld", item), err)
+				if err != nil {
+					return err
+				}
 
+				con, err := client.ContainerCreate(ctx, config, hostConf, &networkConf, &v1.Platform{}, item)
+				if err != nil {
+					taskItem.Log(i18n.GetMsgByKey("ContainerRecreate"))
+					reCreateAfterUpdate(item, client, oldContainer.Config, oldContainer.HostConfig, oldContainer.NetworkSettings)
+					return fmt.Errorf("upgrade container failed, err: %v", err)
+				}
+				err = client.ContainerStart(ctx, con.ID, container.StartOptions{})
+				taskItem.LogWithStatus(i18n.GetMsgByKey("ContainerStartCheck"), err)
+				if err != nil {
+					return fmt.Errorf("upgrade successful but start failed, err: %v", err)
+				}
+				return nil
+			}, nil)
+
+		}
 		if err := taskItem.Execute(); err != nil {
 			global.LOG.Error(err.Error())
 		}
@@ -1378,7 +1414,7 @@ func checkPortStats(ports []dto.PortHelper) (nat.PortMap, error) {
 				portMap[nat.Port(fmt.Sprintf("%d/%s", containerStart+i, port.Protocol))] = []nat.PortBinding{bindItem}
 			}
 			for i := hostStart; i <= hostEnd; i++ {
-				if common.ScanPort(i) {
+				if common.ScanPortWithIP(port.HostIP, i) {
 					return portMap, buserr.WithDetail("ErrPortInUsed", i, nil)
 				}
 			}
@@ -1389,7 +1425,7 @@ func checkPortStats(ports []dto.PortHelper) (nat.PortMap, error) {
 			} else {
 				portItem, _ = strconv.Atoi(port.HostPort)
 			}
-			if common.ScanPort(portItem) {
+			if common.ScanPortWithIP(port.HostIP, portItem) {
 				return portMap, buserr.WithDetail("ErrPortInUsed", portItem, nil)
 			}
 			bindItem := nat.PortBinding{HostPort: strconv.Itoa(portItem), HostIP: port.HostIP}

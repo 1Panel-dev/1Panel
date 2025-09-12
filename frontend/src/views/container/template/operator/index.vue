@@ -6,6 +6,7 @@
         @close="handleClose"
         size="large"
         :autoClose="false"
+        :fullScreen="true"
     >
         <el-form
             v-loading="loading"

@@ -27,6 +27,8 @@ const appStoreRouter = {
                     meta: {
                         activeMenu: '/apps',
                         requiresAuth: false,
+                        parent: 'menu.app',
+                        title: 'app.all',
                     },
                 },
                 {
@@ -38,6 +40,8 @@ const appStoreRouter = {
                     meta: {
                         activeMenu: '/apps',
                         requiresAuth: false,
+                        parent: 'menu.app',
+                        title: 'app.installed',
                     },
                 },
                 {
@@ -49,6 +53,8 @@ const appStoreRouter = {
                     meta: {
                         activeMenu: '/apps',
                         requiresAuth: false,
+                        parent: 'menu.app',
+                        title: 'app.canUpgrade',
                     },
                 },
                 {
@@ -60,6 +66,8 @@ const appStoreRouter = {
                     meta: {
                         activeMenu: '/apps',
                         requiresAuth: false,
+                        parent: 'menu.app',
+                        title: 'commons.button.set',
                     },
                 },
             ],

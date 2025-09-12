@@ -19,8 +19,8 @@
                                     v-model="noticeTimeRange"
                                     class="!w-[235px] mx-1 mt-1"
                                     is-range
-                                    :start-placeholder="$t('xpack.commons.search.timeStart')"
-                                    :end-placeholder="$t('xpack.commons.search.结束时间')"
+                                    :start-placeholder="$t('commons.search.timeStart')"
+                                    :end-placeholder="$t('commons.search.timeEnd')"
                                 />
                                 <span class="input-help ml-2">
                                     {{
@@ -37,8 +37,8 @@
                                     v-model="resourceTimeRange"
                                     class="!w-[235px] mx-1 mt-1"
                                     is-range
-                                    :start-placeholder="$t('xpack.commons.search.timeStart')"
-                                    :end-placeholder="$t('xpack.commons.search.结束时间')"
+                                    :start-placeholder="$t('commons.search.timeStart')"
+                                    :end-placeholder="$t('commons.search.timeEnd')"
                                 />
                                 <span class="input-help ml-2">
                                     {{
@@ -123,23 +123,38 @@ const config = ref<Alert.AlertConfigInfo>({
     status: '',
     config: '',
 });
-const resourceValue = ref(['clams', 'cronJob', 'cpu', 'memory', 'load', 'disk']);
+const resourceValue = ref([
+    'clams',
+    'cronJob',
+    'cpu',
+    'memory',
+    'load',
+    'disk',
+    'nodeException',
+    'licenseException',
+    'panelLogin',
+    'sshLogin',
+]);
 const noticeDefaultTime: [Date, Date] = [new Date(0, 0, 1, 8, 0, 0), new Date(0, 0, 1, 23, 59, 59)];
 const resourceDefaultTime: [Date, Date] = [new Date(0, 0, 1, 0, 0, 0), new Date(0, 0, 1, 23, 59, 59)];
 const noticeTimeRange = ref(noticeDefaultTime);
 const resourceTimeRange = ref(resourceDefaultTime);
 const generateData = (): Option[] => {
     const data: Option[] = [];
+    data.push({ key: 'panelPwdEndTime', label: i18n.global.t('xpack.alert.panelPwdEndTime'), disabled: false });
+    data.push({ key: 'panelLogin', label: i18n.global.t('xpack.alert.panelLogin'), disabled: false });
+    data.push({ key: 'sshLogin', label: i18n.global.t('xpack.alert.sshLogin'), disabled: false });
+    data.push({ key: 'licenseException', label: i18n.global.t('xpack.alert.licenseException'), disabled: false });
+    data.push({ key: 'nodeException', label: i18n.global.t('xpack.alert.nodeException'), disabled: false });
     data.push({ key: 'ssl', label: i18n.global.t('xpack.alert.ssl'), disabled: false });
     data.push({ key: 'siteEndTime', label: i18n.global.t('xpack.alert.siteEndTime'), disabled: false });
-    data.push({ key: 'panelPwdEndTime', label: i18n.global.t('xpack.alert.panelPwdEndTime'), disabled: false });
-    data.push({ key: 'panelUpdate', label: i18n.global.t('xpack.alert.panelUpdate'), disabled: false });
-    data.push({ key: 'clams', label: i18n.global.t('xpack.alert.clams'), disabled: false });
-    data.push({ key: 'cronJob', label: i18n.global.t('xpack.alert.cronjob'), disabled: false });
     data.push({ key: 'cpu', label: i18n.global.t('xpack.alert.cpu'), disabled: false });
     data.push({ key: 'memory', label: i18n.global.t('xpack.alert.memory'), disabled: false });
-    data.push({ key: 'load', label: i18n.global.t('xpack.alert.load'), disabled: false });
     data.push({ key: 'disk', label: i18n.global.t('xpack.alert.disk'), disabled: false });
+    data.push({ key: 'load', label: i18n.global.t('xpack.alert.load'), disabled: false });
+    data.push({ key: 'clams', label: i18n.global.t('xpack.alert.clams'), disabled: false });
+    data.push({ key: 'cronJob', label: i18n.global.t('xpack.alert.cronjob'), disabled: false });
+    data.push({ key: 'panelUpdate', label: i18n.global.t('xpack.alert.panelUpdate'), disabled: false });
     return data;
 };
 

@@ -216,6 +216,7 @@ func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, a
 	case constant.Proxy:
 		nginxInclude := fmt.Sprintf("/www/sites/%s/proxy/*.conf", website.Alias)
 		server.UpdateDirective("include", []string{nginxInclude})
+		server.UpdateRoot(rootIndex)
 	case constant.Runtime:
 		switch runtime.Type {
 		case constant.RuntimePHP:
@@ -752,6 +753,7 @@ func applySSL(website *model.Website, websiteSSL model.WebsiteSSL, req request.W
 
 	if !req.Hsts {
 		server.RemoveDirective("add_header", []string{"Strict-Transport-Security", "\"max-age=31536000\""})
+		server.RemoveDirective("add_header", []string{"Strict-Transport-Security", "\"max-age=31536000; includeSubDomains\""})
 	}
 	if !req.Http3 {
 		for port := range httpsPorts {
@@ -792,9 +794,15 @@ func applySSL(website *model.Website, websiteSSL model.WebsiteSSL, req request.W
 		}
 	}
 	if req.Hsts {
+		var hstsValue string
+		if req.HstsIncludeSubDomains {
+			hstsValue = "\"max-age=31536000; includeSubDomains\""
+		} else {
+			hstsValue = "\"max-age=31536000\""
+		}
 		nginxParams = append(nginxParams, dto.NginxParam{
 			Name:   "add_header",
-			Params: []string{"Strict-Transport-Security", "\"max-age=31536000\""},
+			Params: []string{"Strict-Transport-Security", hstsValue},
 		})
 	}
 	if req.Http3 {
@@ -955,7 +963,7 @@ func opWebsite(website *model.Website, operate string) error {
 				}
 				server.UpdatePHPProxy([]string{website.Proxy}, localPath)
 			} else {
-				proxy := fmt.Sprintf("http://127.0.0.1:%s", runtime.Port)
+				proxy := fmt.Sprintf("http://%s", website.Proxy)
 				server.UpdateRootProxy([]string{proxy})
 			}
 		}
@@ -1135,13 +1143,12 @@ func saveCertificateFile(websiteSSL *model.WebsiteSSL, logger *log.Logger) {
 }
 
 func GetSystemSSL() (bool, uint) {
-	sslSetting, err := settingRepo.Get(settingRepo.WithByKey("SSL"))
-	if err != nil {
-		return false, 0
-	}
-	if sslSetting.Value == "enable" {
-		sslID, _ := settingRepo.Get(settingRepo.WithByKey("SSLID"))
-		idValue, _ := strconv.Atoi(sslID.Value)
+	var sslSetting model.Setting
+	_ = global.CoreDB.Model(&model.Setting{}).Where("key = ?", "SSL").First(&sslSetting).Error
+	if sslSetting.Value == "Enable" {
+		var sslIDSetting model.Setting
+		_ = global.CoreDB.Model(&model.Setting{}).Where("key = ?", "SSLID").First(&sslIDSetting).Error
+		idValue, _ := strconv.Atoi(sslIDSetting.Value)
 		if idValue > 0 {
 			return true, uint(idValue)
 		}
@@ -1165,6 +1172,9 @@ func UpdateSSLConfig(websiteSSL model.WebsiteSSL) error {
 			return buserr.WithErr("ErrSSLApply", err)
 		}
 	}
+	if !global.IsMaster {
+		return nil
+	}
 	enable, sslID := GetSystemSSL()
 	if enable && sslID == websiteSSL.ID {
 		fileOp := files.NewFileOp()
@@ -1181,7 +1191,7 @@ func UpdateSSLConfig(websiteSSL model.WebsiteSSL) error {
 	return nil
 }
 
-func ChangeHSTSConfig(enable bool, http3Enable bool, website model.Website) error {
+func ChangeHSTSConfig(enable bool, includeSubDomains bool, http3Enable bool, website model.Website) error {
 	includeDir := GetSitePath(website, SiteProxyDir)
 	fileOp := files.NewFileOp()
 	if !fileOp.Stat(includeDir) {
@@ -1207,11 +1217,19 @@ func ChangeHSTSConfig(enable bool, http3Enable bool, website model.Website) erro
 				if !ok {
 					return nil
 				}
+				//前置移除HSTS配置
+				location.RemoveDirective("add_header", []string{"Strict-Transport-Security", "\"max-age=31536000\""})
+				location.RemoveDirective("add_header", []string{"Strict-Transport-Security", "\"max-age=31536000; includeSubDomains\""})
 				if enable {
-					location.UpdateDirective("add_header", []string{"Strict-Transport-Security", "\"max-age=31536000\""})
-				} else {
-					location.RemoveDirective("add_header", []string{"Strict-Transport-Security", "\"max-age=31536000\""})
+					var hstsValue string
+					if includeSubDomains {
+						hstsValue = "\"max-age=31536000; includeSubDomains\""
+					} else {
+						hstsValue = "\"max-age=31536000\""
+					}
+					location.UpdateDirective("add_header", []string{"Strict-Transport-Security", hstsValue})
 				}
+
 				if http3Enable {
 					location.UpdateDirective("add_header", []string{"Alt-Svc", "'h3=\":443\"; ma=2592000'"})
 				} else {

@@ -267,7 +267,7 @@ func (s *Server) UpdateRootProxyForAi(proxy []string) {
 		Block:      &Block{},
 	}
 	block := &Block{}
-	block.Directives = []IDirective{
+	block.AppendDirectives(
 		&Directive{
 			Name: "proxy_buffering",
 			Parameters: []string{
@@ -298,11 +298,12 @@ func (s *Server) UpdateRootProxyForAi(proxy []string) {
 				"off",
 			},
 		},
-	}
-	block.Directives = append(block.Directives, &Directive{
-		Name:       "proxy_pass",
-		Parameters: proxy,
-	})
+		&Directive{
+			Name:       "proxy_pass",
+			Parameters: proxy,
+		},
+	)
+
 	newDir.Block = block
 	s.UpdateDirectiveBySecondKey("location", "/", newDir)
 }
@@ -314,7 +315,7 @@ func (s *Server) UpdateRootLocation() {
 		Block:      &Block{},
 	}
 	block := &Block{}
-	block.Directives = append(block.Directives, &Directive{
+	block.AppendDirectives(&Directive{
 		Name:       "root",
 		Parameters: []string{"index.html"},
 	})
@@ -328,10 +329,42 @@ func (s *Server) UpdateRootProxy(proxy []string) {
 		Block:      &Block{},
 	}
 	block := &Block{}
-	block.Directives = append(block.Directives, &Directive{
-		Name:       "proxy_pass",
-		Parameters: proxy,
-	})
+
+	block.AppendDirectives(
+		&Directive{
+			Name:       "proxy_set_header",
+			Parameters: []string{"Host", "$host"},
+		},
+		&Directive{
+			Name:       "proxy_set_header",
+			Parameters: []string{"X-Forwarded-For", "$proxy_add_x_forwarded_for"},
+		},
+		&Directive{
+			Name:       "proxy_set_header",
+			Parameters: []string{"X-Forwarded-Host", "$server_name"},
+		},
+		&Directive{
+			Name:       "proxy_set_header",
+			Parameters: []string{"X-Real-IP", "$remote_addr"},
+		},
+		&Directive{
+			Name:       "proxy_set_header",
+			Parameters: []string{"Connection", "upgrade"},
+		},
+		&Directive{
+			Name:       "proxy_set_header",
+			Parameters: []string{"Upgrade", "$http_upgrade"},
+		},
+		&Directive{
+			Name:       "proxy_http_version",
+			Parameters: []string{"1.1"},
+		},
+		&Directive{
+			Name:       "proxy_pass",
+			Parameters: proxy,
+		},
+	)
+
 	newDir.Block = block
 	s.UpdateDirectiveBySecondKey("location", "/", newDir)
 }
@@ -343,20 +376,22 @@ func (s *Server) UpdatePHPProxy(proxy []string, localPath string) {
 		Block:      &Block{},
 	}
 	block := &Block{}
-	block.Directives = append(block.Directives, &Directive{
-		Name:       "fastcgi_pass",
-		Parameters: proxy,
-	})
-	block.Directives = append(block.Directives, &Directive{
-		Name:       "include",
-		Parameters: []string{"fastcgi-php.conf"},
-	})
-	block.Directives = append(block.Directives, &Directive{
-		Name:       "include",
-		Parameters: []string{"fastcgi_params"},
-	})
+	block.AppendDirectives(
+		&Directive{
+			Name:       "fastcgi_pass",
+			Parameters: proxy,
+		},
+		&Directive{
+			Name:       "include",
+			Parameters: []string{"fastcgi-php.conf"},
+		},
+		&Directive{
+			Name:       "include",
+			Parameters: []string{"fastcgi_params"},
+		},
+	)
 	if localPath == "" {
-		block.Directives = append(block.Directives, &Directive{
+		block.AppendDirectives(&Directive{
 			Name:       "set",
 			Parameters: []string{"$real_script_name", "$fastcgi_script_name"},
 		})
@@ -376,21 +411,23 @@ func (s *Server) UpdatePHPProxy(proxy []string, localPath string) {
 				},
 			},
 		}
-		block.Directives = append(block.Directives, ifDir)
-		block.Directives = append(block.Directives, &Directive{
-			Name:       "fastcgi_param",
-			Parameters: []string{"SCRIPT_FILENAME", "$document_root$real_script_name"},
-		})
-		block.Directives = append(block.Directives, &Directive{
-			Name:       "fastcgi_param",
-			Parameters: []string{"SCRIPT_NAME", "$real_script_name"},
-		})
-		block.Directives = append(block.Directives, &Directive{
-			Name:       "fastcgi_param",
-			Parameters: []string{"PATH_INFO", "$path_info"},
-		})
+		block.AppendDirectives(
+			ifDir,
+			&Directive{
+				Name:       "fastcgi_param",
+				Parameters: []string{"SCRIPT_FILENAME", "$document_root$real_script_name"},
+			},
+			&Directive{
+				Name:       "fastcgi_param",
+				Parameters: []string{"SCRIPT_NAME", "$real_script_name"},
+			},
+			&Directive{
+				Name:       "fastcgi_param",
+				Parameters: []string{"PATH_INFO", "$path_info"},
+			},
+		)
 	} else {
-		block.Directives = append(block.Directives, &Directive{
+		block.AppendDirectives(&Directive{
 			Name:       "fastcgi_param",
 			Parameters: []string{"SCRIPT_FILENAME", localPath},
 		})
@@ -433,7 +470,7 @@ func (s *Server) AddHTTP2HTTPS() {
 		Block:      &Block{},
 	}
 	block := &Block{}
-	block.Directives = append(block.Directives, &Directive{
+	block.AppendDirectives(&Directive{
 		Name:       "return",
 		Parameters: []string{"301", "https://$host$request_uri"},
 	})

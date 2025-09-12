@@ -13,7 +13,7 @@ import (
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /agent/groups [post]
+// @Router /groups [post]
 // @x-panel-log {"bodyKeys":["name","type"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"创建组 [name][type]","formatEN":"create group [name][type]"}
 func (b *BaseApi) CreateGroup(c *gin.Context) {
 	var req dto.GroupCreate
@@ -35,7 +35,7 @@ func (b *BaseApi) CreateGroup(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /agent/groups/del [post]
+// @Router /groups/del [post]
 // @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"groups","output_column":"name","output_value":"name"},{"input_column":"id","input_value":"id","isList":false,"db":"groups","output_column":"type","output_value":"type"}],"formatZH":"删除组 [type][name]","formatEN":"delete group [type][name]"}
 func (b *BaseApi) DeleteGroup(c *gin.Context) {
 	var req dto.OperateByID
@@ -57,7 +57,7 @@ func (b *BaseApi) DeleteGroup(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /agent/groups/update [post]
+// @Router /groups/update [post]
 // @x-panel-log {"bodyKeys":["name","type"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新组 [name][type]","formatEN":"update group [name][type]"}
 func (b *BaseApi) UpdateGroup(c *gin.Context) {
 	var req dto.GroupUpdate
@@ -79,7 +79,7 @@ func (b *BaseApi) UpdateGroup(c *gin.Context) {
 // @Success 200 {array} dto.OperateByType
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /agent/groups/search [post]
+// @Router /groups/search [post]
 func (b *BaseApi) ListGroup(c *gin.Context) {
 	var req dto.OperateByType
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {

@@ -44,6 +44,10 @@ var userinfoCmd = &cobra.Command{
 		ssl := getSettingByKey(db, "SSL")
 		entrance := getSettingByKey(db, "SecurityEntrance")
 		address := getSettingByKey(agentDB, "SystemIP")
+		domain := getSettingByKey(db, "BindDomain")
+		if len(domain) != 0 {
+			address = domain
+		}
 
 		protocol := "http"
 		if ssl == constant.StatusEnable {

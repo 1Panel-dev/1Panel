@@ -29,6 +29,8 @@
             </template>
             <template #rightToolBar>
                 <TableSearch @search="search()" v-model:searchName="searchName" />
+                <TableRefresh @search="search()" />
+                <TableSetting title="clam-refresh" @search="search()" />
             </template>
             <el-card v-if="clamStatus.isExist && !clamStatus.isRunning && maskShow" class="mask-prompt">
                 <span>{{ $t('toolbox.clam.notStart') }}</span>
@@ -64,7 +66,9 @@
                         show-overflow-tooltip
                     >
                         <template #default="{ row }">
-                            <el-button link type="primary" @click="toFolder(row.path)">{{ row.path }}</el-button>
+                            <el-button link type="primary" @click="routerToFileWithPath(row.path)">
+                                {{ row.path }}
+                            </el-button>
                         </template>
                     </el-table-column>
                     <el-table-column
@@ -111,7 +115,7 @@
                                 v-if="row.infectedStrategy === 'copy' || row.infectedStrategy === 'move'"
                                 link
                                 type="primary"
-                                @click="toFolder(row.infectedDir + '/1panel-infected/' + row.name)"
+                                @click="routerToFileWithPath(row.infectedDir + '/1panel-infected/' + row.name)"
                             >
                                 {{ row.infectedDir + '/1panel-infected/' + row.name }}
                             </el-button>
@@ -120,10 +124,17 @@
                     </el-table-column>
                     <el-table-column
                         :label="$t('cronjob.lastRecordTime')"
-                        :min-width="100"
-                        prop="lastHandleDate"
+                        :min-width="120"
                         show-overflow-tooltip
-                    />
+                        prop="lastRecordTime"
+                    >
+                        <template #default="{ row }">
+                            <el-button v-if="row.lastRecordStatus === 'Done'" icon="Select" link type="success" />
+                            <el-button v-if="row.lastRecordStatus === 'Failed'" icon="CloseBold" link type="danger" />
+                            <el-button v-if="row.lastRecordStatus === 'Waiting'" :loading="true" link type="info" />
+                            {{ row.lastRecordTime }}
+                        </template>
+                    </el-table-column>
                     <el-table-column :label="$t('commons.table.description')" prop="description" show-overflow-tooltip>
                         <template #default="{ row }">
                             <fu-input-rw-switch v-model="row.description" @blur="onChange(row)" />
@@ -143,10 +154,6 @@
         <OpDialog ref="opRef" @search="search" @submit="onSubmitDelete()">
             <template #content>
                 <el-form class="mt-4 mb-1" ref="deleteForm" label-position="left">
-                    <el-form-item>
-                        <el-checkbox v-model="removeRecord" :label="$t('toolbox.clam.removeRecord')" />
-                        <span class="input-help">{{ $t('toolbox.clam.removeResultHelper') }}</span>
-                    </el-form-item>
                     <el-form-item>
                         <el-checkbox v-model="removeInfected" :label="$t('toolbox.clam.removeInfected')" />
                         <span class="input-help">{{ $t('toolbox.clam.removeInfectedHelper') }}</span>
@@ -170,10 +177,10 @@ import LogDialog from '@/views/toolbox/clam/record/index.vue';
 import ClamStatus from '@/views/toolbox/clam/status/index.vue';
 import SettingDialog from '@/views/toolbox/clam/setting/index.vue';
 import { Toolbox } from '@/api/interface/toolbox';
-import router from '@/routers';
 import { transSpecToStr } from '@/views/cronjob/cronjob/helper';
 import { GlobalStore } from '@/store';
 import { storeToRefs } from 'pinia';
+import { routerToFileWithPath, routerToName } from '@/utils/router';
 
 const loading = ref();
 const selects = ref<any>([]);
@@ -184,7 +191,7 @@ const data = ref();
 const paginationConfig = reactive({
     cacheSizeKey: 'clam-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('clam-page-size')) || 10,
+    pageSize: Number(localStorage.getItem('clam-page-size')) || 20,
     total: 0,
     orderBy: 'createdAt',
     order: 'null',
@@ -197,7 +204,6 @@ const operateIDs = ref();
 const dialogLogRef = ref();
 const isRecordShow = ref();
 
-const removeRecord = ref();
 const removeInfected = ref();
 
 const isSettingShow = ref();
@@ -230,15 +236,11 @@ const search = async (column?: any) => {
 };
 
 const setting = () => {
-    router.push({ name: 'Clam-Setting' });
+    routerToName('Clam-Setting');
 };
 const getStatus = (status: any) => {
     clamStatus.value = status;
     search();
-};
-
-const toFolder = (folder: string) => {
-    router.push({ path: '/hosts/files', query: { path: folder } });
 };
 
 const toDoc = () => {
@@ -305,7 +307,7 @@ const onDelete = async (row: Toolbox.ClamInfo | null) => {
 
 const onSubmitDelete = async () => {
     loading.value = true;
-    await deleteClam({ ids: operateIDs.value, removeRecord: removeRecord.value, removeInfected: removeInfected.value })
+    await deleteClam({ ids: operateIDs.value, removeInfected: removeInfected.value })
         .then(() => {
             loading.value = false;
             MsgSuccess(i18n.global.t('commons.msg.deleteSuccess'));

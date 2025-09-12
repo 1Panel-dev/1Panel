@@ -18,6 +18,7 @@ export const Mimetypes = new Map([
     ['application/octet-stream', CompressType.Tar],
     ['application/x-rar-compressed', CompressType.Rar],
     ['application/vnd.rar', CompressType.Rar],
+    ['application/rar', CompressType.Rar],
     ['application/x-7z-compressed', CompressType['7z']],
 ]);
 

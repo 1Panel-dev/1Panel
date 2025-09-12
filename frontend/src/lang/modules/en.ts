@@ -265,6 +265,7 @@ const message = {
             authBasicPassword: 'Supports letters, numbers, and common special characters, length 1-72',
             length128Err: 'Length cannot exceed 128 characters',
             maxLength: 'Length cannot exceed {0} characters',
+            alias: 'Supports English, numbers, - and _, length 1-30, and cannot start or end with -_.',
         },
         res: {
             paramError: 'The request failed, please try again later!',
@@ -347,6 +348,9 @@ const message = {
             hourUnit: 'h',
             dayUnit: 'd',
         },
+        log: {
+            noLog: 'No logs available',
+        },
     },
     menu: {
         home: 'Overview',
@@ -382,6 +386,8 @@ const message = {
     home: {
         recommend: 'recommend',
         dir: 'dir',
+        quickDir: 'Quick Dir',
+        database: 'Database - All',
         restart_1panel: 'Restart panel',
         restart_system: 'Restart server',
         operationSuccess: 'Operation succeeded, rebooting, please refresh the browser manually later!',
@@ -463,6 +469,9 @@ const message = {
         serviceNameHelper: 'Access between containers in the same network.',
         backupList: 'Backup',
         loadBackup: 'Import',
+        localUpload: 'Local Upload',
+        hostSelect: 'Server Selection',
+        selectHelper: 'Are you sure you want to import backup file {0}?',
         remoteAccess: 'Remote access',
         remoteHelper: 'Multiple IP comma-delimited, example: 172.16.10.111, 172.16.10.112',
         remoteConnHelper:
@@ -488,7 +497,6 @@ const message = {
         passwordHelper: 'Unable to retrieve, please modify',
         remote: 'Remote',
         remoteDB: 'Remote server | Remote servers',
-        manageRemoteDB: 'Manage remote servers',
         createRemoteDB: 'Bind @.lower:database.remoteDB',
         unBindRemoteDB: 'Unbind @.lower:database.remoteDB',
         unBindForce: 'Force unbind',
@@ -513,8 +521,8 @@ const message = {
         selectFile: 'Select file',
         dropHelper: 'You can drag and drop the uploaded file here or',
         clickHelper: 'click to upload',
-        supportUpType: 'Only sql, sql.gz, and tar.gz files are supported',
-        zipFormat: 'tar.gz compressed package structure: test.tar.gz compressed package must contain test.sql',
+        supportUpType:
+            'Only supports sql, sql.gz, tar.gz, .zip file formats. The imported compressed file must contain only one .sql file or include test.sql',
 
         currentStatus: 'Current state',
         baseParam: 'Basic parameter',
@@ -573,7 +581,7 @@ const message = {
         longQueryTime: 'threshold(s)',
         thresholdRangeHelper: 'Please enter the correct threshold (1 - 600).',
 
-        timeout: 'Timeout',
+        timeout: 'Timeout(s)',
         timeoutHelper: 'Idle connection timeout period. 0 indicates that the connection is on continuously.',
         maxclients: 'Max clients',
         requirepassHelper:
@@ -688,7 +696,6 @@ const message = {
             server: 'MCP Server',
             create: 'Add MCP Server',
             edit: 'Edit MCP Server',
-            commandHelper: 'For example: npx -y {0}',
             baseUrl: 'External Access Path',
             baseUrlHelper: 'For example: http://192.168.1.2:8000',
             ssePath: 'SSE Path',
@@ -709,6 +716,8 @@ const message = {
             outputTransport: 'Output Type',
             streamableHttpPath: 'Streaming Path',
             streamableHttpPathHelper: 'For example: /mcp, note that it should not overlap with other Servers',
+            npxHelper: 'Suitable for mcp started with npx or binary',
+            uvxHelper: 'Suitable for mcp started with uvx',
         },
     },
     container: {
@@ -806,6 +815,8 @@ const message = {
         upgradeWarning2:
             'The upgrade operation requires rebuilding the container, any unpersisted data will be lost. Do you wish to continue?',
         oldImage: 'Current image',
+        sameImageContainer: 'Same-image containers',
+        sameImageHelper: 'Containers using the same image can be batch upgraded after selection',
         targetImage: 'Target image',
         imageLoadErr: 'No image name detected for the container',
         appHelper: 'The container comes from the app store, and upgrading may make the service unavailable.',
@@ -848,6 +859,8 @@ const message = {
         image: 'Image | Images',
         imagePull: 'Pull',
         imagePush: 'Push',
+        imagePushHelper:
+            'Detected that this image has multiple tags. Please confirm that the image name used for pushing is: {0}',
         imageDelete: 'Image delete',
         imageTagDeleteHelper: 'Remove other tags associated with this image ID',
         repoName: 'Container registry',
@@ -929,7 +942,7 @@ const message = {
         containerNumber: 'Container number',
         containerStatus: 'Container status',
         exited: 'Exited',
-        running: 'Running',
+        running: 'Running ( {0} / {1} )',
         composeDetailHelper:
             'The compose is created external to 1Panel. The start and stop operations are not supported.',
         composeOperatorHelper: '{1} operation will be performed on {0}. Do you want to continue?',
@@ -1029,6 +1042,8 @@ const message = {
         curl: 'Access URL',
         taskName: 'Name',
         cronSpec: 'Trigger cycle',
+        cronSpecDoc:
+            'Custom execution cycles only support the [minute hour day month week] format, e.g., 0 0 * * *. For details, please refer to the official documentation.',
         cronSpecHelper: 'Enter the correct execution period',
         cleanHelper:
             'This operation records all job execution records, backup files, and log files. Do you want to continue?',
@@ -1150,6 +1165,8 @@ const message = {
     },
     terminal: {
         local: 'Local',
+        defaultConn: 'Default Connection',
+        defaultConnHelper: 'Whether to connect to the host by default after opening the terminal',
         localHelper: 'The `local` name is used only for system local identification',
         connLocalErr: 'Unable to automatically authenticate, please fill in the local server login information.',
         testConn: 'Test connection',
@@ -1298,7 +1315,6 @@ const message = {
             notStart: 'ClamAV service is currently not running, please start it first!',
             removeRecord: 'Delete peport files',
             noRecords: 'Click the "Trigger" button to start the scan and you will see records here.',
-            removeResultHelper: 'Delete report files generated during task execution to free up storage space.',
             removeInfected: 'Delete virus files',
             removeInfectedHelper:
                 'Delete virus files detected during the task to ensure server security and normal operation.',
@@ -1339,6 +1355,7 @@ const message = {
         deleteLogs: 'Clean logs',
         resource: 'Resource',
         detail: {
+            dashboard: 'Overview',
             ai: 'AI',
             groups: 'Group',
             hosts: 'Host',
@@ -1415,6 +1432,7 @@ const message = {
         downloadStart: 'Download started',
         moveSuccess: 'Successfully moved',
         copySuccess: 'Successfully copied',
+        pasteMsg: 'Please click the [Paste] button at the top right of the target directory',
         move: 'Move',
         calculate: 'Calculate',
         canNotDeCompress: 'Cannot decompress this file',
@@ -1497,6 +1515,10 @@ const message = {
         setting: 'Setting',
         showHide: 'Show hidden files',
         noShowHide: 'Don’t show hidden files',
+        cancelUpload: 'Cancel Upload',
+        cancelUploadHelper: 'Whether to cancel the upload, after cancellation the upload list will be cleared.',
+        keepOneTab: 'Keep at least one tab',
+        notCanTab: 'Cannot add more tabs',
     },
     ssh: {
         autoStart: 'Auto start',
@@ -1533,6 +1555,7 @@ const message = {
         createMode: 'Creation Method',
         generate: 'Auto-generate',
         unSyncPass: 'Key password cannot be synchronized',
+        syncHelper: 'The sync operation will clean invalid keys and sync new complete key pairs. Continue?',
         input: 'Manual Input',
         import: 'File Upload',
         pubkey: 'Key info',
@@ -1701,6 +1724,8 @@ const message = {
         code: 'Auth code',
         codeHelper:
             'Please click on the "Acquire" button, then login to {0} and copy the content after "code" in the redirected link. Paste it into this input box. For specific instructions, please refer to the official documentation.',
+        googleHelper:
+            'Please first create a Google application and obtain client information, fill in the form and click the get button. For specific operations, please refer to the official documentation.',
         loadCode: 'Acquire',
         COS: 'Tencent COS',
         ap_beijing_1: 'Beijing Zone 1',
@@ -1932,6 +1957,9 @@ const message = {
             'Detected that node {0} is already at the latest upgradable version. Please check the primary node version and try again!',
 
         about: 'About',
+        release: 'Release Notes',
+        releaseHelper:
+            'Failed to fetch release notes for the current environment. You can manually check the official documentation.',
         project: 'GitHub',
         issue: 'Feedback',
         doc: 'Official document',
@@ -1999,7 +2027,7 @@ const message = {
         fileExchange: 'Upgrade to the Professional Edition to quickly transfer files between multiple servers.',
         app: 'Upgrade to the professional version to view service information, abnormal monitoring, etc. through the mobile APP. ',
         cluster:
-            'Upgrading to the Professional Edition allows you to manage MySQL/Postgres/Reids master-slave clusters.',
+            'Upgrading to the Professional Edition allows you to manage MySQL/Postgres/Redis master-slave clusters.',
     },
     clean: {
         scan: 'Start scanning',
@@ -2023,18 +2051,13 @@ const message = {
         systemHelper:
             'Temporary files generated during snapshots, upgrades, and obsolete file contents during version iterations',
         panelOriginal: 'System snapshot recovery backup files',
+        backup: 'Temporary backup directory',
         upgrade: 'System upgrade backup files',
         upgradeHelper: '(Recommend keeping the latest upgrade backup for system rollback)',
         cache: 'System cache files',
         cacheHelper: '(Proceed with caution, cleaning requires a service restart)',
         snapshot: 'System snapshot temporary files',
-        snapshotTmp: 'System snapshot upload temporary files',
-        snapshotLocal: 'System snapshot creation temporary files',
         rollback: 'Backup files before recover',
-        unused: 'Unused system directories',
-        oldUpgrade: 'Unused pre-upgrade backup directories',
-        oldOriginal: 'Unused pre-snapshot recovery backup directories',
-        oldAppsBak: 'Unused application backup directories',
 
         upload: 'Temporary Upload Files',
         uploadHelper: 'Temporary files uploaded from the system backup list',
@@ -2191,8 +2214,7 @@ const message = {
         otherDomains: 'Other domains',
         static: 'Static',
         deployment: 'Deployment',
-        supportUpType: 'Only .tar.gz files are supported',
-        zipFormat: '.tar.gz compressed package structure: test.tar.gz compressed package must contain {0} file',
+        supportUpType: 'Only .tar.gz file format is supported, and the compressed package must contain {0}.json file',
         proxy: 'Reverse proxy',
         alias: 'Alias',
         ftpUser: 'FTP account',
@@ -2250,6 +2272,10 @@ const message = {
         null: 'none',
         nginxConfig: 'Nginx configuration',
         websiteConfig: 'Website settings',
+        proxySettings: 'Proxy Settings',
+        advancedSettings: 'Advanced Settings',
+        cacheSettings: 'Cache Settings',
+        sniSettings: 'SNI Settings',
         basic: 'Basic',
         source: 'Configuration',
         security: 'Security',
@@ -2377,11 +2403,15 @@ const message = {
         modifierHelper:
             'Example: "=" is exact match, "~" is regular match, "^~" matches the beginning of the path, etc.',
         replace: 'Text replacements',
+        replaceHelper:
+            'The nginx text replacement feature allows for string substitution in the response content during reverse proxying. It is commonly used to modify links, API addresses, etc., in HTML, CSS, JavaScript, and other files returned by the backend. It supports regular expression matching for complex content replacement needs.',
         addReplace: 'Add',
         replaced: 'Search String (cannot be empty)',
         replaceText: 'Replace with string',
         replacedErr: 'The Search String cannot be empty',
         replacedErr2: 'The Search String cannot be repeated',
+        replacedListEmpty: 'No text replacement rules',
+        proxySslName: 'Proxy SNI Name',
         basicAuth: 'Basic authentication',
         editBasicAuthHelper:
             'The password is asymmetrically encrypted and cannot be echoed. Editing needs to reset the password',
@@ -2397,6 +2427,15 @@ const message = {
         disableLeech: 'Disable anti-leech',
         ipv6: 'Listen IPv6',
         leechReturnError: 'Please fill in the HTTP status code',
+        blockedRef: 'Allow non-standard Referer',
+        accessControl: 'Anti-leech control',
+        leechcacheControl: 'Cache control',
+        logEnableControl: 'Log static asset requests',
+        leechSpecialValidHelper:
+            "When 'Allow empty Referer' is enabled, requests without a Referer (direct access, etc.) are not blocked; enabling 'Allow non-standard Referer' allows any Referer that does not start with http/https (client requests, etc.).",
+        leechInvalidReturnHelper: 'HTTP status code returned after blocking hotlinking requests',
+        leechlogControlHelper:
+            'Logs static asset requests; usually disabled in production to avoid excessive, noisy logs',
         selectAcme: 'Select Acme account',
         imported: 'Created manually',
         importType: 'Import type',
@@ -2433,6 +2472,9 @@ const message = {
             'Only supports importing local backups, importing backups from other machines may cause recovery failure',
         ipWebsiteWarn: 'Websites with IP as domain names need to be set as default site to be accessed normally.',
         hstsHelper: 'Enabling HSTS can increase website security',
+        includeSubDomains: 'SubDomains',
+        hstsIncludeSubDomainsHelper:
+            'Once enabled, the HSTS policy will apply to all subdomains of the current domain.',
         defaultHtml: 'Set default page',
         website404: 'Website 404 error page',
         domain404: 'Website page does not exist',
@@ -2510,6 +2552,20 @@ const message = {
         openBaseDir: 'Prevent Cross-Site Attacks',
         openBaseDirHelper:
             'open_basedir is used to restrict the PHP file access path, which helps prevent cross-site access and enhance security',
+        serverCacheTime: 'Server Cache Time',
+        serverCacheTimeHelper:
+            'The time a request is cached on the server. During this period, identical requests will return the cached result directly without requesting the origin server.',
+        browserCacheTime: 'Browser Cache Time',
+        browserCacheTimeHelper:
+            'The time static resources are cached locally in the browser, reducing redundant requests. Users will use the local cache directly before it expires when refreshing the page.',
+        donotLinkeDB: 'Do Not Link Database',
+        toWebsiteDir: 'Enter Website Directory',
+        execParameters: 'Execution Parameters',
+        extCommand: 'Supplementary Command',
+        mirror: 'Mirror Source',
+        execUser: 'Executing User',
+        execDir: 'Execution Directory',
+        packagist: 'China Full Mirror',
     },
     php: {
         short_open_tag: 'Short tag support',
@@ -2650,6 +2706,9 @@ const message = {
         customAcme: 'Custom ACME Service',
         customAcmeURL: 'ACME Service URL',
         baiduCloud: 'Baidu Cloud',
+        pushNode: 'Sync to Other Nodes',
+        pushNodeHelper: 'Push to selected nodes after application/renewal',
+        fromMaster: 'Master Node Push',
     },
     firewall: {
         create: 'Create rule',
@@ -2668,6 +2727,7 @@ const message = {
         quickJump: 'Quick access',
         used: 'Used',
         unUsed: 'Unused',
+        dockerRestart: 'Firewall operations require restarting the Docker service',
         firewallHelper: '{0} system firewall',
         firewallNotStart: `The system firewall isn't enabled at present. Enable it first.`,
         restartFirewallHelper: 'This operation will restart the current firewall. Do you want to continue?',
@@ -2795,6 +2855,8 @@ const message = {
             'Provide a full startup command. For example, "pip install -r requirements.txt && python manage.py runserver 0.0.0.0:5000".',
         dotnetHelper: 'Provide a full startup command. For example, "dotnet MyWebApp.dll".',
         dirHelper: 'Note: Please fill in the directory path inside the container',
+        concurrency: 'Concurrency Scheme',
+        loadStatus: 'Load Status',
     },
     process: {
         pid: 'Process ID',
@@ -2863,7 +2925,31 @@ const message = {
             manage: 'Management',
             autoRestart: 'Auto Restart',
             EXITED: 'Exited',
+            autoRestartHelper: 'Whether to automatically restart the program after it crashes',
+            autoStart: 'Auto Start',
+            autoStartHelper: 'Whether to automatically start the service after Supervisor starts',
         },
+    },
+    disk: {
+        management: 'Disk Management',
+        partition: 'Partition',
+        unmount: 'Unmount',
+        unmountHelper: 'Do you want to unmount the partition {0}?',
+        mount: 'Mount',
+        partitionAlert:
+            'Disk partitioning requires formatting the disk, and existing data will be deleted. Please save or take snapshots of your data in advance.',
+        mountPoint: 'Mount Directory',
+        systemDisk: 'System Disk',
+        unpartitionedDisk: 'Unpartitioned Disk',
+        handlePartition: 'Partition Now',
+        filesystem: 'Filesystem',
+        unmounted: 'Unmounted',
+        cannotOperate: 'Cannot Operate',
+        systemDiskHelper: 'Hint: The current disk is the system disk. It cannot be operated on.',
+        autoMount: 'Auto Mount',
+        model: 'Device Model',
+        diskType: 'Disk Type',
+        serial: 'Serial Number',
     },
     xpack: {
         expiresTrialAlert:
@@ -3094,7 +3180,7 @@ const message = {
             noBlackIp: 'IP is already blocked, no need to block again',
             noWhiteUrl: 'URL is already in the white list, no need to add again',
             spiderIpHelper:
-                'Spider IPs are allowed by default, including Baidu, Bing, Google, 360, Shenma, Sogou, ByteDance, DuckDuckGo',
+                'Includes Baidu, Bing, Google, 360, Shenma, Sogou, ByteDance, DuckDuckGo, Yandex. Closing this will block all spider access.',
             spiderIp: 'Spider IP Pool',
             geoIp: 'IP Address Library',
             geoIpHelper: 'Used to confirm the geolocation of the IP',
@@ -3145,6 +3231,9 @@ const message = {
             notBelongToIpGroup: 'Does not belong to IP Group',
             unknownWebsiteKey: 'Unknown Domain',
             special: 'Special',
+            fileToLarge: 'File exceeds 1MB and cannot be uploaded',
+            uploadOverLimit: 'Uploaded file exceeds the quantity limit, maximum 1 file',
+            importRuleHelper: 'One rule per line',
         },
         monitor: {
             name: 'Website Monitoring',
@@ -3447,6 +3536,8 @@ const message = {
                 'The current node is already enabled as a master node and cannot be directly added as a slave node. Please downgrade it to a slave node first before adding, refer to the documentation for details.',
             agentExist:
                 'Detected that 1panel-agent is already installed on this node. Continuing will retain existing data and only replace the 1panel-agent service.',
+            agentNotExist:
+                'It is detected that 1panel-agent is not installed on this node, so the node information cannot be edited directly. Please delete it and add it again.',
             oldDataExist:
                 'Detected historical 1Panel V2 data on this node. The following information will be used to overwrite current settings:',
             errLicense: 'The license bound to this node is unavailable. Please check and try again!',
@@ -3513,7 +3604,7 @@ const message = {
             alertRule: 'Alert Rules',
             titleSearchHelper: 'Enter alert title for fuzzy search',
             taskType: 'Type',
-            ssl: 'Certificate (SSL) Expiry',
+            ssl: 'Certificate Expiry',
             siteEndTime: 'Website Expiry',
             panelPwdEndTime: 'Panel Password Expiry',
             panelUpdate: 'New Panel Version Available',
@@ -3556,7 +3647,7 @@ const message = {
             cpuUseExceedAvgHelper: 'The average cpu usage within the specified time exceeds the specified value',
             memoryUseExceedAvgHelper: 'The average memory usage within the specified time exceeds the specified value',
             loadUseExceedAvgHelper: 'The average load usage within the specified time exceeds the specified value',
-            resourceAlertRulesHelper: 'Note: Continuous alerts within 30 minutes will send only one SMS',
+            resourceAlertRulesHelper: 'Note: Continuous alerts within 30 minutes will send only one',
             specifiedTime: 'Specified Time',
             deleteTitle: 'Delete Alert',
             deleteMsg: 'Are you sure you want to delete the alert task?',
@@ -3597,11 +3688,11 @@ const message = {
             cleanAlertLogs: 'Clean Alert Logs',
             daily: 'Daily Alert Count: {0}',
             cumulative: 'Cumulative Alert Count: {0}',
-            clams: 'Virus scan',
+            clams: 'Virus scan alert',
             taskName: 'Task Name',
             cronJobType: 'Task Type',
             clamPath: 'Scan Directory',
-            cronjob: 'Cronjob',
+            cronjob: 'Cronjob execution {0} failed',
             app: 'Backup App',
             web: 'Backup Website',
             database: 'Backup Database',
@@ -3688,6 +3779,20 @@ const message = {
             portHelper: 'SSL usually uses 465, TLS usually uses 587',
             sslHelper: 'If the SMTP port is 465, SSL is usually required',
             tlsHelper: 'If the SMTP port is 587, TLS is usually required',
+            triggerCondition: 'Trigger Condition',
+            loginFail: ' login failures within',
+            nodeException: 'Node Exception Alert',
+            licenseException: 'License Exception Alert',
+            panelLogin: 'Panel Login Exception Alert',
+            sshLogin: 'SSH Login Exception Alert',
+            panelIpLogin: 'Panel Login IP Exception Alert',
+            sshIpLogin: 'SSH Login IP Exception Alert',
+            ipWhiteListHelper:
+                'IPs in the whitelist are not restricted by rules, and there will be no alert upon successful login',
+            nodeExceptionRule: 'Node exception alert, sent {0} times per day',
+            licenseExceptionRule: 'License exception alert, sent {0} times per day',
+            panelLoginRule: 'Panel login alert, sent {0} times per day',
+            sshLoginRule: 'SSH login alert, sent {0} times per day',
         },
         theme: {
             lingXiaGold: 'Ling Xia Gold',
@@ -3713,6 +3818,7 @@ const message = {
             replicaStatus: 'Master-Slave Status',
             unhealthyDeleteError: 'The installation node status is abnormal, please check the node list and try again!',
             replicaStatusError: 'Status acquisition is abnormal, please check the master node.',
+            masterHostError: 'The master node IP cannot be 127.0.0.1',
         },
     },
 };

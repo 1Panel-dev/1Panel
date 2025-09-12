@@ -14,6 +14,12 @@ ErrApiConfigKeyInvalid: 'Erro de chave da interface da API: {{ .detail }}'
 ErrApiConfigIPInvalid: 'O IP usado para chamar a interface da API não está na lista de permissões: {{ .detail }}'
 ErrApiConfigDisable: 'Esta interface proíbe o uso de chamadas de interface de API: {{ .detail }}'
 ErrApiConfigKeyTimeInvalid: 'Erro de registro de data e hora da interface da API: {{ .detail }}'
+StartPushSSLToNode: "Iniciando o envio do certificado para o nó"
+PushSSLToNodeFailed: "Falha ao enviar o certificado para o nó: {{ .err }}"
+PushSSLToNodeSuccess: "Certificado enviado com sucesso para o nó"
+
+ErrMinQuickJump: "Defina pelo menos uma entrada de salto rápido!"
+ErrMaxQuickJump: "Você pode definir até quatro entradas de salto rápido!"
 
 #comum
 ErrUsernameIsExist: 'Nome de usuário já existe'
@@ -34,6 +40,7 @@ ErrGroupIsDefault: 'Grupo padrão, não pode ser excluído'
 ErrGroupIsInWebsiteUse: 'O grupo está sendo usado por outro site e não pode ser excluído.'
 
 #backup
+Localhost: 'Máquina Local'
 ErrBackupInUsed: 'A conta de backup foi usada na tarefa agendada e não pode ser excluída.'
 ErrBackupCheck: 'Falha na conexão de teste da conta de backup {{ .err }}'
 ErrBackupLocalDelete: 'A exclusão da conta de backup do servidor local ainda não é suportada'
@@ -79,9 +86,7 @@ AppStoreIsLastVersion: 'A App Store já é a versão mais recente'
 AppStoreSyncSuccess: 'Sincronização da App Store bem-sucedida'
 SyncAppDetail: 'Sincronizar configuração do aplicativo'
 AppVersionNotMatch: 'o aplicativo {{ .name }} requer uma versão superior do 1Panel, ignorando a sincronização'
-MoveSiteDir: 'A atualização atual requer a migração do diretório do site OpenResty'
-MoveSiteToDir: 'Migrar diretório do site para {{ .name }}'
-ErrMoveSiteDir: 'Falha ao migrar o diretório do site'
+MoveSiteDir: "Detecção de alteração no diretório do site. É necessário migrar o diretório do site OpenResty para {{ .name }}"
 MoveSiteDirSuccess: 'Migração bem-sucedida do diretório do site'
 DeleteRuntimePHP: 'Excluir tempo de execução do PHP'
 CustomAppStoreFileValid: 'Os pacotes da App Store precisam estar no formato .tar.gz'
@@ -92,6 +97,15 @@ ErrCustomRuntimes: 'Há um ambiente de execução instalado, exclua-o primeiro'
 ErrAppVersionDeprecated: "O aplicativo {{ .name }} não é compatível com a versão atual do 1Panel, ignorado"
 ErrDockerFailed: "O estado do Docker está anormal, verifique o status do serviço"
 ErrDockerComposeCmdNotFound: "O comando Docker Compose não existe, por favor, instale este comando na máquina host primeiro"
+
+#ssh
+ExportIP: "IP de Login"
+ExportArea: "Localização"
+ExportPort: "Porta"
+ExportAuthMode: "Método de Login"
+ExportUser: "Usuário"
+ExportStatus: "Status de Login"
+ExportDate: "Hora"
 
 #arquivo
 ErrFileCanNotRead: 'Este arquivo não suporta visualização'
@@ -108,6 +122,9 @@ ErrFavoriteExist: 'Este caminho já foi favorito'
 ErrInvalidChar: 'Caracteres ilegais não são permitidos'
 ErrPathNotDelete: 'O diretório selecionado não pode ser excluído'
 ErrLogFileToLarge: "Fail log melebihi 500MB, tidak boleh dibuka"
+FileDropFailed: "Falha ao limpar arquivo {{ .name }}: {{ .err }}"
+FileDropSuccess: "Arquivo {{ .name }} limpo com sucesso, {{ .count }} arquivos removidos, {{ .size }} de espaço em disco liberado"
+FileDropSum: "Limpeza de arquivos concluída com sucesso, total de {{ .count }} arquivos removidos, total de {{ .size }} de espaço em disco liberado"
 
 #site
 ErrAliasIsExist: 'Alias já existe'
@@ -123,6 +140,9 @@ ErrBuildDirNotFound: 'O diretório de compilação não existe'
 ErrImageNotExist: 'A imagem do ambiente operacional {{ .name }} não existe, edite novamente o ambiente operacional'
 ErrProxyIsUsed: "Balanceamento de carga foi usado por proxy reverso, não pode ser excluído"
 ErrSSLValid: 'O arquivo do certificado está anormal, verifique o status do certificado!'
+ErrWebsiteDir: "Por favor, selecione um diretório dentro do diretório do site."
+ErrComposerFileNotFound: "O arquivo composer.json não existe"
+ErrRuntimeNoPort: "O ambiente de tempo de execução não está configurado com uma porta, edite o ambiente de tempo de execução primeiro."
 
 #ssl
 ErrSSLCannotDelete: 'O certificado {{ .name }} está sendo usado por um site e não pode ser excluído'
@@ -210,8 +230,12 @@ SystemLog: 'Log do Sistema'
 CutWebsiteLog: 'Rotacionar Log do Website'
 FileOrDir: 'Diretório / Arquivo'
 UploadFile: 'Enviando arquivo de backup {{ .file }} para {{ .backup }}'
-IgnoreBackupErr: 'Backup falhou, erro: {{ .detail }}, ignorando este erro...'
-IgnoreUploadErr: 'Upload falhou, erro: {{ .detail }}, ignorando este erro...'
+Upload: "Enviar"
+IgnoreBackupErr: "Backup falhou, erro: {{ .detail }}, ignorando este erro..."
+IgnoreUploadErr: "Upload falhou, erro: {{ .detail }}, ignorando este erro..."
+LoadBackupFailed: "Falha ao obter conexão da conta de backup, erro: {{ .detail }}"
+InExecuting: "A tarefa atual está sendo executada, não repita a execução!"
+NoSuchResource: "Nenhum conteúdo de backup encontrado no banco de dados, ignorando..."
 
 #caixa de ferramentas
 ErrNotExistUser: 'O usuário atual não existe, modifique e tente novamente!'
@@ -271,6 +295,7 @@ allow: 'permitir'
 deny: 'negar'
 OpenrestyNotFound: 'Openresty não está instalado'
 remoteIpIsNull: "A lista de IP está vazia"
+OpenrestyVersionErr: "A versão do Openresty é muito baixa, por favor atualize o Openresty para 1.27.1.2-2-2-focal"
 
 #tarefa
 TaskStart: '{{ .name }} A tarefa inicia [START]'
@@ -327,6 +352,11 @@ SubTask: 'Subtarefa'
 RuntimeExtension: 'Extensão do ambiente de tempo de execução'
 TaskIsExecuting: 'A tarefa está em execução'
 CustomAppstore: 'Armazém de aplicativos personalizados'
+TaskExec: 'Executar'
+
+# task - clam
+Clamscan: "Escanear {{ .name }}"
+TaskScan: "Escanear"
 
 # tarefa - ai
 OllamaModelPull: 'Puxar modelo Ollama {{ .name }}'
@@ -356,7 +386,6 @@ SnapCompressFile: 'Compactar arquivo de instantâneo'
 SnapCheckCompress: 'Verificar arquivo de compactação de instantâneo'
 SnapCompressSize: 'Tamanho do arquivo de instantâneo {{ .name }}'
 SnapUpload: 'Carregar arquivo de instantâneo'
-SnapLoadBackup: 'Obter informações da conta de backup'
 SnapUploadTo: 'Carregar arquivo de instantâneo para {{ .name }}'
 SnapUploadRes: 'Carregar arquivo de instantâneo para {{ .name }}'
 
@@ -445,3 +474,16 @@ DiskUsedAlert: "O disco '{{ .name }}' do seu 1Panel está com uso de {{ .used }}
 ResourceAlert: "O uso médio de {{ .name }} em {{ .time }} minutos no seu 1Panel é de {{ .used }}. Acesse o painel para mais detalhes."
 PanelVersionAlert: "Uma nova versão do 1Panel está disponível. Acesse o painel para atualizá-lo."
 PanelPwdExpirationAlert: "A senha do 1Panel expirará em {{ .day }} dias. Acesse o painel para mais detalhes."
+CommonAlert: "Seu 1Panel, {{ .msg }}. Para mais detalhes, faça login no painel."
+NodeExceptionAlert: "Seu 1Panel, {{ .num }} nós estão com problemas. Para mais detalhes, faça login no painel."
+LicenseExceptionAlert: "Seu 1Panel, {{ .num }} licenças estão com problemas. Para mais detalhes, faça login no painel."
+SSHAndPanelLoginAlert: "Seu 1Panel, login anormal no painel {{ .name }} a partir de {{ .ip }}. Para mais detalhes, faça login no painel."
+
+#disk
+DeviceNotFound: "Dispositivo {{ .name }} não encontrado"
+DeviceIsMounted: "Dispositivo {{ .name }} está montado, por favor desmonte primeiro"
+PartitionDiskErr: "Falha ao particionar, {{ .err }}"
+FormatDiskErr: "Falha ao formatar disco, {{ .err }}"
+MountDiskErr: "Falha ao montar disco, {{ .err }}"
+UnMountDiskErr: "Falha ao desmontar disco, {{ .err }}"
+XfsNotFound: "Sistema de arquivos xfs não detectado, por favor instale xfsprogs primeiro"

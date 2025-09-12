@@ -76,7 +76,6 @@ require (
 	github.com/goccy/go-json v0.10.3 // indirect
 	github.com/gofrs/flock v0.8.1 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
-	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/go-querystring v1.0.0 // indirect
 	github.com/h2non/filetype v1.1.1 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
@@ -120,7 +119,6 @@ require (
 	golang.org/x/sync v0.15.0 // indirect
 	golang.org/x/time v0.6.0 // indirect
 	golang.org/x/tools v0.34.0 // indirect
-	google.golang.org/appengine v1.6.8 // indirect
 	google.golang.org/protobuf v1.34.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gorm.io/driver/sqlite v1.4.4 // indirect

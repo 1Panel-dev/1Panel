@@ -54,22 +54,8 @@ export const cleanRecords = (id: number, cleanData: boolean, cleanRemoteData: bo
     return http.post(`cronjobs/records/clean`, { cronjobID: id, cleanData: cleanData, cleanRemoteData });
 };
 
-export const getRecordDetail = (params: string) => {
-    return http.post<string>(`cronjobs/search/detail`, { path: params });
-};
-
 export const updateStatus = (params: Cronjob.UpdateStatus) => {
     return http.post(`cronjobs/status`, params);
-};
-
-export const downloadRecordCheck = (params: Cronjob.Download) => {
-    return http.post<string>(`cronjobs/download`, params, TimeoutEnum.T_40S);
-};
-export const downloadRecord = (params: Cronjob.Download) => {
-    return http.download<BlobPart>(`cronjobs/download`, params, {
-        responseType: 'blob',
-        timeout: TimeoutEnum.T_40S,
-    });
 };
 
 export const handleOnce = (id: number) => {

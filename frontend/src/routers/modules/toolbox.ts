@@ -24,6 +24,8 @@ const toolboxRouter = {
                     component: () => import('@/views/toolbox/device/index.vue'),
                     hidden: true,
                     meta: {
+                        parent: 'menu.toolbox',
+                        title: 'toolbox.device.toolbox',
                         activeMenu: '/toolbox',
                         requiresAuth: false,
                     },
@@ -34,6 +36,8 @@ const toolboxRouter = {
                     component: () => import('@/views/toolbox/supervisor/index.vue'),
                     hidden: true,
                     meta: {
+                        parent: 'menu.toolbox',
+                        title: 'menu.supervisor',
                         activeMenu: '/toolbox',
                         requiresAuth: false,
                     },
@@ -44,6 +48,8 @@ const toolboxRouter = {
                     component: () => import('@/views/toolbox/clam/index.vue'),
                     hidden: true,
                     meta: {
+                        parent: 'menu.toolbox',
+                        title: 'toolbox.clam.clam',
                         activeMenu: '/toolbox',
                         requiresAuth: false,
                     },
@@ -54,6 +60,7 @@ const toolboxRouter = {
                     component: () => import('@/views/toolbox/clam/setting/index.vue'),
                     hidden: true,
                     meta: {
+                        ignoreTab: true,
                         activeMenu: '/toolbox',
                         requiresAuth: false,
                     },
@@ -64,16 +71,20 @@ const toolboxRouter = {
                     component: () => import('@/views/toolbox/ftp/index.vue'),
                     hidden: true,
                     meta: {
+                        parent: 'menu.toolbox',
+                        title: 'FTP',
                         activeMenu: '/toolbox',
                         requiresAuth: false,
                     },
                 },
                 {
-                    path: 'fail2Ban',
+                    path: 'fail2ban',
                     name: 'Fail2ban',
                     component: () => import('@/views/toolbox/fail2ban/index.vue'),
                     hidden: true,
                     meta: {
+                        parent: 'menu.toolbox',
+                        title: 'Fail2Ban',
                         activeMenu: '/toolbox',
                         requiresAuth: false,
                     },
@@ -84,6 +95,8 @@ const toolboxRouter = {
                     component: () => import('@/views/toolbox/clean/index.vue'),
                     hidden: true,
                     meta: {
+                        parent: 'menu.toolbox',
+                        title: 'setting.diskClean',
                         activeMenu: '/toolbox',
                         requiresAuth: false,
                     },

@@ -15,34 +15,43 @@
                 <div class="dropdowns">
                     <el-select filterable clearable v-model="req.type" @change="search()" class="!w-52 dropdown">
                         <template #prefix>{{ $t('commons.table.type') }}</template>
-                        <el-option value="ssl" :label="$t('xpack.alert.ssl')" />
-                        <el-option value="siteEndTime" :label="$t('xpack.alert.siteEndTime')" />
                         <template v-if="isMaster">
                             <el-option value="panelPwdEndTime" :label="$t('xpack.alert.panelPwdEndTime')" />
+                            <el-option value="panelLogin" :label="$t('xpack.alert.panelLogin')" />
+                            <el-option
+                                v-if="isProductPro"
+                                value="licenseException"
+                                :label="$t('xpack.alert.licenseException')"
+                            />
+                            <el-option
+                                v-if="isProductPro"
+                                value="nodeException"
+                                :label="$t('xpack.alert.nodeException')"
+                            />
                             <el-option value="panelUpdate" :label="$t('xpack.alert.panelUpdate')" />
                         </template>
-                        <el-option value="clams" :label="$t('xpack.alert.clams')" />
-                        <el-option value="shell" :label="$t('xpack.alert.cronjob') + '-' + $t('cronjob.shell')" />
-                        <el-option value="app" :label="$t('xpack.alert.cronjob') + '-' + $t('cronjob.app')" />
-                        <el-option value="website" :label="$t('xpack.alert.cronjob') + '-' + $t('cronjob.website')" />
-                        <el-option value="database" :label="$t('xpack.alert.cronjob') + '-' + $t('cronjob.database')" />
-                        <el-option
-                            value="directory"
-                            :label="$t('xpack.alert.cronjob') + '-' + $t('cronjob.directory')"
-                        />
-                        <el-option value="log" :label="$t('xpack.alert.cronjob') + '-' + $t('cronjob.log')" />
-                        <el-option value="snapshot" :label="$t('xpack.alert.cronjob') + '-' + $t('cronjob.snapshot')" />
-                        <el-option value="curl" :label="$t('xpack.alert.cronjob') + '-' + $t('cronjob.curl')" />
-                        <el-option
-                            value="cutWebsiteLog"
-                            :label="$t('xpack.alert.cronjob') + '-' + $t('cronjob.cutWebsiteLog')"
-                        />
-                        <el-option value="clean" :label="$t('xpack.alert.cronjob') + '-' + $t('setting.diskClean')" />
-                        <el-option value="ntp" :label="$t('xpack.alert.cronjob') + '-' + $t('cronjob.ntp')" />
+                        <el-option value="sshLogin" :label="$t('xpack.alert.sshLogin')" />
+                        <el-option value="ssl" :label="$t('xpack.alert.ssl')" />
+                        <el-option value="siteEndTime" :label="$t('xpack.alert.siteEndTime')" />
                         <el-option value="cpu" :label="$t('xpack.alert.cpu')" />
                         <el-option value="memory" :label="$t('xpack.alert.memory')" />
-                        <el-option value="load" :label="$t('xpack.alert.load')" />
                         <el-option value="disk" :label="$t('xpack.alert.disk')" />
+                        <el-option value="load" :label="$t('xpack.alert.load')" />
+                        <el-option value="clams" :label="$t('xpack.alert.clams')" />
+                        <el-option value="shell" :label="$t('xpack.alert.cronjob', [$t('cronjob.shell')])" />
+                        <el-option value="app" :label="$t('xpack.alert.cronjob', [$t('cronjob.app')])" />
+                        <el-option value="website" :label="$t('xpack.alert.cronjob', [$t('cronjob.website')])" />
+                        <el-option value="database" :label="$t('xpack.alert.cronjob', [$t('cronjob.database')])" />
+                        <el-option value="directory" :label="$t('xpack.alert.cronjob', [$t('cronjob.directory')])" />
+                        <el-option value="log" :label="$t('xpack.alert.cronjob', [$t('cronjob.log')])" />
+                        <el-option value="snapshot" :label="$t('xpack.alert.cronjob', [$t('cronjob.snapshot')])" />
+                        <el-option value="curl" :label="$t('xpack.alert.cronjob', [$t('cronjob.curl')])" />
+                        <el-option
+                            value="cutWebsiteLog"
+                            :label="$t('xpack.alert.cronjob', [$t('cronjob.cutWebsiteLog')])"
+                        />
+                        <el-option value="clean" :label="$t('xpack.alert.cronjob', [$t('cronjob.clean')])" />
+                        <el-option value="ntp" :label="$t('xpack.alert.cronjob', [$t('cronjob.ntp')])" />
                     </el-select>
                     <el-select
                         clearable
@@ -62,6 +71,7 @@
                 <ComplexTable
                     :pagination-config="paginationConfig"
                     :data="data"
+                    :height-diff="380"
                     @sort-change="changeSort"
                     @search="search()"
                 >
@@ -140,7 +150,7 @@ import { UpdateAlertStatus, SearchAlerts, DeleteAlert } from '@/api/modules/aler
 import { storeToRefs } from 'pinia';
 
 const globalStore = GlobalStore();
-const { isMaster } = storeToRefs(globalStore);
+const { isMaster, isProductPro } = storeToRefs(globalStore);
 
 const { t } = i18n.global;
 const loading = ref(false);
@@ -158,7 +168,7 @@ const req = reactive({
 const paginationConfig = reactive({
     cacheSizeKey: 'alert-list-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('alert-list-page-size')) || 10,
+    pageSize: Number(localStorage.getItem('alert-list-page-size')) || 20,
     total: 0,
     orderBy: 'created_at',
     order: 'null',
@@ -187,12 +197,12 @@ const buttons = [
 const openView = async (
     title: string,
     rowData: Partial<Alert.AlertInfo> = {
-        type: 'ssl',
+        type: isMaster.value ? 'panelPwdEndTime' : 'sshLogin',
         cycle: 15,
         count: 0,
         sendCount: 3,
         method: '',
-        project: 'all',
+        project: '',
         status: 'Enable',
         title: '',
     },
@@ -238,6 +248,10 @@ const formatRule = (row: Alert.AlertInfo) => {
         cutWebsiteLog: () => t('xpack.alert.cronJobCutWebsiteLogRule', [row.sendCount]),
         clean: () => t('xpack.alert.cronJobCleanRule', [row.sendCount]),
         ntp: () => t('xpack.alert.cronJobNtpRule', [row.sendCount]),
+        nodeException: () => t('xpack.alert.nodeExceptionRule', [row.sendCount]),
+        licenseException: () => t('xpack.alert.licenseExceptionRule', [row.sendCount]),
+        panelLogin: () => t('xpack.alert.panelLoginRule', [row.sendCount]),
+        sshLogin: () => t('xpack.alert.sshLoginRule', [row.sendCount]),
     };
 
     return ruleTemplates[row.type] ? ruleTemplates[row.type]() : '';

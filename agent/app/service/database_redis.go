@@ -53,7 +53,7 @@ func (u *RedisService) UpdateConf(req dto.RedisConfUpdate) error {
 	if err := confSet(redisInfo.Name, req.DBType, "", confs); err != nil {
 		return err
 	}
-	if _, err := compose.Restart(fmt.Sprintf("%s/redis/%s/docker-compose.yml", global.Dir.AppInstallDir, redisInfo.Name)); err != nil {
+	if _, err := compose.Restart(fmt.Sprintf("%s/%s/%s/docker-compose.yml", global.Dir.AppInstallDir, req.DBType, redisInfo.Name)); err != nil {
 		return err
 	}
 
@@ -243,6 +243,10 @@ func confSet(redisName string, redisType string, updateType string, changeConf [
 			continue
 		}
 		newFiles = append(newFiles, files[i])
+	}
+	if startIndex == 0 {
+		newFiles = append(newFiles, "# Redis configuration rewrite by 1Panel")
+		startIndex = len(newFiles) - 1
 	}
 	endIndex = endIndex - emptyLine
 	for _, item := range changeConf {

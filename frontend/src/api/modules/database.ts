@@ -40,7 +40,7 @@ export const loadPgFromRemote = (database: string) => {
     return http.post(`/databases/pg/${database}/load`);
 };
 export const deleteCheckPostgresqlDB = (params: Database.PostgresqlDBDeleteCheck) => {
-    return http.post<Array<string>>(`/databases/pg/del/check`, params, TimeoutEnum.T_40S);
+    return http.post<Database.DBResource[]>(`/databases/pg/del/check`, params, TimeoutEnum.T_40S);
 };
 export const updatePostgresqlPassword = (params: Database.ChangeInfo) => {
     let request = deepCopy(params) as Database.ChangeInfo;
@@ -163,7 +163,7 @@ export const checkDatabase = (params: Database.DatabaseCreate) => {
         request.rootCert = Base64.encode(request.rootCert);
     }
 
-    return http.post<boolean>(`/databases/db/check`, request, TimeoutEnum.T_40S);
+    return http.post<boolean>(`/databases/db/check`, request, TimeoutEnum.T_60S);
 };
 export const addDatabase = (params: Database.DatabaseCreate) => {
     let request = deepCopy(params) as Database.DatabaseCreate;
@@ -173,7 +173,7 @@ export const addDatabase = (params: Database.DatabaseCreate) => {
         request.rootCert = Base64.encode(request.rootCert);
     }
 
-    return http.post(`/databases/db`, request, TimeoutEnum.T_40S);
+    return http.post(`/databases/db`, request, TimeoutEnum.T_60S);
 };
 export const editDatabase = (params: Database.DatabaseUpdate) => {
     let request = deepCopy(params) as Database.DatabaseCreate;
@@ -183,10 +183,10 @@ export const editDatabase = (params: Database.DatabaseUpdate) => {
         request.rootCert = Base64.encode(request.rootCert);
     }
 
-    return http.post(`/databases/db/update`, request, TimeoutEnum.T_40S);
+    return http.post(`/databases/db/update`, request, TimeoutEnum.T_60S);
 };
 export const deleteCheckDatabase = (id: number) => {
-    return http.post<Array<string>>(`/databases/db/del/check`, { id: id });
+    return http.post<Database.DBResource[]>(`/databases/db/del/check`, { id: id });
 };
 export const deleteDatabase = (params: Database.DatabaseDelete) => {
     return http.post(`/databases/db/del`, params);

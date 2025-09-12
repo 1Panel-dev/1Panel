@@ -53,14 +53,14 @@
                 <el-form-item :label="$t('website.privateKey')" prop="key">
                     <el-input v-model="form.key">
                         <template #prepend>
-                            <FileList @choose="getKeyPath" :dir="false"></FileList>
+                            <el-button icon="Folder" @click="keyFileRef.acceptParams({ dir: false })" />
                         </template>
                     </el-input>
                 </el-form-item>
                 <el-form-item class="marginTop" :label="$t('website.certificate')" prop="cert">
                     <el-input v-model="form.cert">
                         <template #prepend>
-                            <FileList @choose="getCertPath" :dir="false"></FileList>
+                            <el-button icon="Folder" @click="certFileRef.acceptParams({ dir: false })" />
                         </template>
                     </el-input>
                 </el-form-item>
@@ -112,6 +112,8 @@
             </el-button>
         </template>
     </DrawerPro>
+    <FileList ref="keyFileRef" @choose="getKeyPath" />
+    <FileList ref="certFileRef" @choose="getCertPath" />
 </template>
 <script lang="ts" setup>
 import { Website } from '@/api/interface/website';
@@ -129,6 +131,8 @@ const globalStore = GlobalStore();
 
 const loading = ref();
 const drawerVisible = ref();
+const keyFileRef = ref();
+const certFileRef = ref();
 
 const form = reactive({
     ssl: 'Enable',

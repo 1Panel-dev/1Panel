@@ -7,6 +7,7 @@ import { GlobalStore } from '@/store';
 import { MsgError } from '@/utils/message';
 import { Base64 } from 'js-base64';
 import i18n from '@/lang';
+import { changeToLocal } from '@/utils/node';
 
 const globalStore = GlobalStore();
 
@@ -66,7 +67,7 @@ class RequestHttp {
                     return Promise.reject(data);
                 }
                 if (data.code == ResultEnum.NodeUnBind) {
-                    globalStore.currentNode = 'local';
+                    changeToLocal();
                     window.location.reload();
                     return;
                 }
@@ -85,7 +86,7 @@ class RequestHttp {
                 if (data.code && data.code !== ResultEnum.SUCCESS) {
                     if (data.message.toLowerCase().indexOf('operation not permitted') !== -1) {
                         MsgError(i18n.global.t('license.tamperHelper'));
-                        return data;
+                        return Promise.reject(data);
                     }
                     MsgError(data.message);
                     return Promise.reject(data);

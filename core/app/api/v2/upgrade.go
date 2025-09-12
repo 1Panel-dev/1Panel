@@ -22,13 +22,28 @@ func (b *BaseApi) GetUpgradeInfo(c *gin.Context) {
 }
 
 // @Tags System Setting
+// @Summary Load upgrade notes
+// @Success 200 {array} dto.ReleasesNotes
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /core/settings/upgrade/releases [get]
+func (b *BaseApi) LoadRelease(c *gin.Context) {
+	notes, err := upgradeService.LoadRelease()
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, notes)
+}
+
+// @Tags System Setting
 // @Summary Load release notes by version
 // @Accept json
 // @Param request body dto.Upgrade true "request"
 // @Success 200 {string} notes
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /core/settings/upgrade [get]
+// @Router /core/settings/upgrade/notes [post]
 func (b *BaseApi) GetNotesByVersion(c *gin.Context) {
 	var req dto.Upgrade
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {

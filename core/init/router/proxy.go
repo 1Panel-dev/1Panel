@@ -44,7 +44,7 @@ func Proxy() gin.HandlerFunc {
 
 		apiReq := c.GetBool("API_AUTH")
 
-		if !apiReq && strings.HasPrefix(c.Request.URL.Path, "/api/v2/") && !checkSession(c) {
+		if !apiReq && strings.HasPrefix(c.Request.URL.Path, "/api/v2/") && !isLocalAPI(c.Request.URL.Path) && !checkSession(c) {
 			data, _ := res.ErrorMsg.ReadFile("html/401.html")
 			c.Data(401, "text/html; charset=utf-8", data)
 			c.Abort()
@@ -88,4 +88,8 @@ func checkSession(c *gin.Context) bool {
 	}
 	_ = global.SESSION.Set(c, psession, httpsSetting.Value == constant.StatusEnable, lifeTime)
 	return true
+}
+
+func isLocalAPI(urlPath string) bool {
+	return urlPath == "/api/v2/core/xpack/sync/ssl"
 }

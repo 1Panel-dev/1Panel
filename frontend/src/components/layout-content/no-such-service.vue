@@ -20,13 +20,13 @@
 </template>
 
 <script lang="ts" setup>
-import router from '@/routers';
+import { routerToNameWithQuery } from '@/utils/router';
 
 const prop = defineProps({
     name: String,
 });
 
 const toDoc = () => {
-    router.push({ name: 'Library', query: { uncached: 'true' } });
+    routerToNameWithQuery('Library', { uncached: 'true' });
 };
 </script>

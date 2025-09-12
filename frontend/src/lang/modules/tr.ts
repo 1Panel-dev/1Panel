@@ -269,6 +269,7 @@ const message = {
             authBasicPassword: 'Harf, rakam ve yaygın özel karakterler destekler, uzunluk 1-72',
             length128Err: 'Uzunluk 128 karakteri geçemez',
             maxLength: 'Uzunluk {0} karakteri geçemez',
+            alias: 'İngilizce, rakamlar, - ve _ destekler, uzunluk 1-30, ve -_ ile başlayamaz veya bitiremez.',
         },
         res: {
             paramError: 'İstek başarısız, lütfen daha sonra tekrar deneyin!',
@@ -351,6 +352,9 @@ const message = {
             hourUnit: 'sa',
             dayUnit: 'g',
         },
+        log: {
+            noLog: 'Günlük yok',
+        },
     },
     menu: {
         home: 'Genel Bakış',
@@ -384,8 +388,10 @@ const message = {
         msgCenter: 'Görev Merkezi',
     },
     home: {
-        recommend: 'önerilen',
+        recommend: 'tavsiye etmek',
         dir: 'dizin',
+        quickDir: 'Hızlı Dizin',
+        database: 'Veritabanı - Tümü',
         restart_1panel: 'Paneli yeniden başlat',
         restart_system: 'Sunucuyu yeniden başlat',
         operationSuccess: 'İşlem başarılı, yeniden başlatılıyor, lütfen tarayıcıyı daha sonra manuel olarak yenileyin!',
@@ -468,6 +474,9 @@ const message = {
         serviceNameHelper: 'Aynı ağdaki konteynerler arası erişim.',
         backupList: 'Yedekleme',
         loadBackup: 'İçe Aktar',
+        localUpload: 'Yerel Yükleme',
+        hostSelect: 'Sunucu Seçimi',
+        selectHelper: '{0} yedek dosyasını içe aktarmak istediğinizden emin misiniz?',
         remoteAccess: 'Uzaktan erişim',
         remoteHelper: 'Birden fazla IP virgülle ayrılır, örnek: 172.16.10.111, 172.16.10.112',
         remoteConnHelper:
@@ -494,7 +503,6 @@ const message = {
         passwordHelper: 'Alınamıyor, lütfen değiştirin',
         remote: 'Uzak',
         remoteDB: 'Uzak sunucu | Uzak sunucular',
-        manageRemoteDB: 'Uzak sunucuları yönet',
         createRemoteDB: '@.lower:database.remoteDB Bağla',
         unBindRemoteDB: '@.lower:database.remoteDB Bağlantısını Çöz',
         unBindForce: 'Zorla bağlantıyı çöz',
@@ -520,8 +528,8 @@ const message = {
         selectFile: 'Dosya seç',
         dropHelper: 'Yüklenen dosyayı buraya sürükleyip bırakabilir veya',
         clickHelper: 'yüklemek için tıklayın',
-        supportUpType: 'Yalnızca sql, sql.gz ve tar.gz dosyaları desteklenir',
-        zipFormat: 'tar.gz sıkıştırılmış paket yapısı: test.tar.gz sıkıştırılmış paketi test.sql içermelidir',
+        supportUpType:
+            'Yalnızca sql, sql.gz, tar.gz, .zip dosya formatlarını destekler. İçe aktarılan sıkıştırılmış dosya yalnızca bir .sql dosyası içermeli veya test.sql içermelidir',
 
         currentStatus: 'Mevcut durum',
         baseParam: 'Temel parametre',
@@ -580,7 +588,7 @@ const message = {
         longQueryTime: 'eşik(saniye)',
         thresholdRangeHelper: 'Lütfen doğru eşik değerini girin (1 - 600).',
 
-        timeout: 'Zaman aşımı',
+        timeout: 'Zaman aşımı(saniye)',
         timeoutHelper: 'Boştaki bağlantı zaman aşımı süresi. 0, bağlantının sürekli açık olduğunu gösterir.',
         maxclients: 'Maksimum istemci',
         requirepassHelper:
@@ -698,7 +706,6 @@ const message = {
             server: 'MCP Sunucusu',
             create: 'MCP Sunucusu Ekle',
             edit: 'MCP Sunucusunu Düzenle',
-            commandHelper: 'Örneğin: npx -y {0}',
             baseUrl: 'Harici Erişim Yolu',
             baseUrlHelper: 'Örneğin: http://192.168.1.2:8000',
             ssePath: 'SSE Yolu',
@@ -719,6 +726,8 @@ const message = {
             outputTransport: 'Çıktı Türü',
             streamableHttpPath: 'Akış Yolu',
             streamableHttpPathHelper: 'Örneğin: /mcp, diğer Sunucularla çakışmaması gerektiğine dikkat edin',
+            npxHelper: 'npx veya ikili dosya ile başlatılan mcp için uygundur',
+            uvxHelper: 'uvx ile başlatılan mcp için uygundur',
         },
     },
     container: {
@@ -816,6 +825,8 @@ const message = {
         upgradeWarning2:
             'Yükseltme işlemi konteynerin yeniden oluşturulmasını gerektirir, kalıcı olmayan tüm veriler kaybedilecektir. Devam etmek istiyor musunuz?',
         oldImage: 'Mevcut imaj',
+        sameImageContainer: 'Aynı imajlı konteynerler',
+        sameImageHelper: 'Aynı imajı kullanan konteynerlar seçilerek toplu şekilde güncellenebilir',
         targetImage: 'Hedef imaj',
         imageLoadErr: 'Konteyner için imaj adı algılanmadı',
         appHelper: 'Konteyner uygulama mağazasından geliyor ve yükseltme hizmeti kullanılamaz hale getirebilir.',
@@ -858,6 +869,8 @@ const message = {
         image: 'İmaj | İmajlar',
         imagePull: 'Çek',
         imagePush: 'Gönder',
+        imagePushHelper:
+            'Bu imgenin birden fazla etiketi olduğu tespit edildi. Lütfen gönderimde kullanılan imge adının şu olduğunu onaylayın: {0}',
         imageDelete: 'İmaj sil',
         imageTagDeleteHelper: 'Bu imaj IDsi ile ilişkili diğer etiketleri kaldır',
         repoName: 'Konteyner kayıt defteri',
@@ -942,7 +955,7 @@ const message = {
         containerNumber: 'Konteyner sayısı',
         containerStatus: 'Konteyner durumu',
         exited: 'Çıktı',
-        running: 'Çalışıyor',
+        running: 'Çalışıyor ( {0} / {1} )',
         composeDetailHelper: 'Compose, 1Panel dışında oluşturulmuştur. Başlatma ve durdurma işlemleri desteklenmez.',
         composeOperatorHelper: '{0} üzerinde {1} işlemi gerçekleştirilecek. Devam etmek istiyor musunuz?',
         composeDownHelper:
@@ -1042,6 +1055,8 @@ const message = {
         curl: 'URLe erişim',
         taskName: 'Ad',
         cronSpec: 'Tetikleme döngüsü',
+        cronSpecDoc:
+            'Özel çalışma döngüleri yalnızca [dakika saat gün ay hafta] formatını destekler, örneğin, 0 0 * * *. Ayrıntılar için resmi belgelere bakın.',
         cronSpecHelper: 'Doğru yürütme dönemini girin',
         cleanHelper:
             'Bu işlem tüm görev yürütme kayıtlarını, yedekleme dosyalarını ve log dosyalarını kaydeder. Devam etmek istiyor musunuz?',
@@ -1163,6 +1178,8 @@ const message = {
     },
     terminal: {
         local: 'Yerel',
+        defaultConn: 'Varsayılan Bağlantı',
+        defaultConnHelper: 'Terminal açıldıktan sonra varsayılan olarak ana bilgisayara bağlanılsın mı',
         localHelper: '`local` adı sadece sistem yerel tanımlaması için kullanılır',
         connLocalErr: 'Otomatik kimlik doğrulama yapılamıyor, lütfen yerel sunucu giriş bilgilerini doldurun.',
         testConn: 'Bağlantıyı test et',
@@ -1314,8 +1331,6 @@ const message = {
             notStart: 'ClamAV servisi şu anda çalışmıyor, lütfen önce başlatın!',
             removeRecord: 'Rapor dosyalarını sil',
             noRecords: 'Taramayı başlatmak için "Tetikle" düğmesine tıklayın ve kayıtları burada göreceksiniz.',
-            removeResultHelper:
-                'Depolama alanını boşaltmak için görev yürütme sırasında oluşturulan rapor dosyalarını silin.',
             removeInfected: 'Virüs dosyalarını sil',
             removeInfectedHelper:
                 'Sunucu güvenliğini ve normal çalışmasını sağlamak için görev sırasında tespit edilen virüs dosyalarını silin.',
@@ -1356,6 +1371,7 @@ const message = {
         deleteLogs: 'Logları temizle',
         resource: 'Kaynak',
         detail: {
+            dashboard: 'Genel Bakış',
             ai: 'AI',
             groups: 'Grup',
             hosts: 'Ana Bilgisayar',
@@ -1432,6 +1448,7 @@ const message = {
         downloadStart: 'İndirme başladı',
         moveSuccess: 'Başarıyla taşındı',
         copySuccess: 'Başarıyla kopyalandı',
+        pasteMsg: 'Hedef dizinin sağ üst köşesindeki "Yapıştır" düğmesine tıklayın',
         move: 'Taşı',
         calculate: 'Hesapla',
         canNotDeCompress: 'Bu dosyanın sıkıştırması açılamaz',
@@ -1514,6 +1531,10 @@ const message = {
         setting: 'Ayar',
         showHide: 'Gizli dosyaları göster',
         noShowHide: 'Gizli dosyaları gösterme',
+        cancelUpload: 'Yüklemeyi İptal Et',
+        cancelUploadHelper: 'Yüklemeyi iptal etmek ister misiniz, iptal sonrası yükleme listesi temizlenecektir.',
+        keepOneTab: 'En az bir sekme açık kalmalıdır',
+        notCanTab: 'Daha fazla sekme eklenemez',
     },
     ssh: {
         autoStart: 'Otomatik başlat',
@@ -1551,6 +1572,8 @@ const message = {
         createMode: 'Oluşturma Yöntemi',
         generate: 'Otomatik Oluştur',
         unSyncPass: 'Anahtar parolası senkronize edilemez',
+        syncHelper:
+            'Eşitleme işlemi geçersiz anahtarları temizleyecek ve yeni tam anahtar çiftlerini eşitleyecek. Devam edilsin mi?',
         input: 'Manuel Giriş',
         import: 'Dosya Yükleme',
         pubkey: 'Anahtar bilgisi',
@@ -1720,6 +1743,8 @@ const message = {
         code: 'Yetki kodu',
         codeHelper:
             '"Edin" düğmesine tıklayın, ardından {0}’a giriş yapın ve yönlendirilen bağlantıdaki "code" sonrası içeriği kopyalayın. Bu içeriği giriş kutusuna yapıştırın. Özel talimatlar için lütfen resmi belgelere bakın.',
+        googleHelper:
+            'Lütfen önce bir Google uygulaması oluşturun ve istemci bilgilerini alın, formu doldurun ve al butonuna tıklayın. Belirli işlemler için lütfen resmi belgelere bakın.',
         loadCode: 'Edin',
         COS: 'Tencent COS',
         ap_beijing_1: 'Pekin Bölgesi 1',
@@ -1950,6 +1975,9 @@ const message = {
         versionCompare:
             '{0} düğümünün zaten en son yükseltilebilir sürümde olduğu tespit edildi. Lütfen birincil düğüm sürümünü kontrol edin ve tekrar deneyin!',
         about: 'Hakkında',
+        release: 'Sürüm Güncelleme Günlüğü',
+        releaseHelper:
+            'Mevcut ortam için güncelleme günlükleri alınırken hata oluştu. Resmi belgeleri manuel olarak kontrol edebilirsiniz.',
         project: 'GitHub',
         issue: 'Geri bildirim',
         doc: 'Resmi belge',
@@ -2018,7 +2046,7 @@ const message = {
         node: 'Profesyonel sürüme yükseltme, birden fazla Linux sunucusunu 1Panel ile yönetmenize olanak tanır.',
         fileExchange: 'Profesyonel Sürüme yükseltme, birden fazla sunucu arasında hızlı dosya aktarımı sağlar.',
         app: 'Profesyonel sürüme yükseltme, mobil uygulama üzerinden hizmet bilgilerini, anormal izlemeyi vb. görüntülemenize olanak tanır. ',
-        cluster: 'Profesyonel Sürüme Yükseltme, MySQL/Postgers/Reids ana-çalışan kümelerini yönetmenizi sağlar.',
+        cluster: 'Profesyonel Sürüme Yükseltme, MySQL/Postgers/Redis ana-çalışan kümelerini yönetmenizi sağlar.',
     },
     clean: {
         scan: 'Taramayı başlat',
@@ -2043,18 +2071,13 @@ const message = {
         systemHelper:
             'Anlık görüntüler, yükseltmeler ve sürüm iterasyonları sırasında eski dosya içerikleri sırasında üretilen geçici dosyalar',
         panelOriginal: 'Sistem anlık görüntü kurtarma yedek dosyaları',
+        backup: 'Geçici yedekleme dizini',
         upgrade: 'Sistem yükseltme yedek dosyaları',
         upgradeHelper: '(Sistem geri alımı için en son yükseltme yedeğini tutmanız önerilir)',
         cache: 'Sistem önbellek dosyaları',
         cacheHelper: '(Dikkatli ilerleyin, temizleme servis yeniden başlatılmasını gerektirir)',
         snapshot: 'Sistem anlık görüntü geçici dosyaları',
-        snapshotTmp: 'Sistem anlık görüntü yükleme geçici dosyaları',
-        snapshotLocal: 'Sistem anlık görüntü oluşturma geçici dosyaları',
         rollback: 'Kurtarma öncesi yedek dosyaları',
-        unused: 'Kullanılmayan sistem dizinleri',
-        oldUpgrade: 'Kullanılmayan yükseltme öncesi yedek dizinler',
-        oldOriginal: 'Kullanılmayan anlık görüntü kurtarma öncesi yedek dizinler',
-        oldAppsBak: 'Kullanılmayan uygulama yedek dizinleri',
 
         upload: 'Geçici Yükleme Dosyaları',
         uploadHelper: 'Sistem yedek listesinden yüklenen geçici dosyalar',
@@ -2216,8 +2239,7 @@ const message = {
         otherDomains: 'Diğer alan adları',
         static: 'Statik',
         deployment: 'Dağıtım',
-        supportUpType: 'Yalnızca .tar.gz dosyaları desteklenir',
-        zipFormat: '.tar.gz sıkıştırılmış paket yapısı: test.tar.gz sıkıştırılmış paket {0} dosyasını içermelidir',
+        supportUpType: 'Yalnızca .tar.gz dosya formatı desteklenir ve sıkıştırılmış paket {0}.json dosyası içermelidir',
         proxy: 'Ters vekil',
         alias: 'Takma ad',
         ftpUser: 'FTP hesabı',
@@ -2276,6 +2298,10 @@ const message = {
         null: 'hiçbiri',
         nginxConfig: 'Nginx yapılandırması',
         websiteConfig: 'Web sitesi ayarları',
+        proxySettings: 'Proxy Ayarları',
+        advancedSettings: 'Gelişmiş Ayarlar',
+        cacheSettings: 'Önbellek Ayarları',
+        sniSettings: 'SNI Ayarları',
         basic: 'Temel',
         source: 'Yapılandırma',
         security: 'Güvenlik',
@@ -2404,11 +2430,15 @@ const message = {
         modifier: 'Eşleştirme kuralları',
         modifierHelper: 'Örnek: "=" tam eşleşme, "~" düzenli eşleşme, "^~" yolun başlangıcıyla eşleşme vb.',
         replace: 'Metin değiştirmeleri',
+        replaceHelper:
+            'Nginx metin değiştirme özelliği, ters proxy sırasında yanıt içeriğindeki dizelerin değiştirilmesine olanak tanır. Genellikle arka uç tarafından döndürülen HTML, CSS, JavaScript ve diğer dosyalardaki bağlantıları, API adreslerini vb. değiştirmek için kullanılır. Karmaşık içerik değiştirme ihtiyaçları için normal ifade eşleştirmeyi destekler.',
         addReplace: 'Ekle',
         replaced: 'Arama Dizisi (boş olamaz)',
         replaceText: 'Şununla değiştir',
         replacedErr: 'Arama Dizisi boş olamaz',
         replacedErr2: 'Arama Dizisi tekrarlanamaz',
+        replacedListEmpty: 'Metin değiştirme kuralı yok',
+        proxySslName: 'Proxy SNI Adı',
         basicAuth: 'Temel kimlik doğrulama',
         editBasicAuthHelper:
             'Şifre asimetrik olarak şifrelenir ve geri alınamaz. Düzenleme, şifrenin sıfırlanmasını gerektirir',
@@ -2424,6 +2454,15 @@ const message = {
         disableLeech: 'Sömürü karşıtını devre dışı bırak',
         ipv6: 'IPv6’yı dinle',
         leechReturnError: 'Lütfen HTTP durum kodunu doldurun',
+        blockedRef: 'Standart olmayan Referer’e izin ver',
+        accessControl: 'Sömürü karşıtı kontrol',
+        leechcacheControl: 'Önbellek kontrolü',
+        logEnableControl: 'Statik varlık isteklerini günlüğe al',
+        leechSpecialValidHelper:
+            "'Boş yönlendirme izni ver' etkinse yönlendiricisi olmayan istekler (doğrudan erişim vb.) engellenmez; 'Standart olmayan Referer’e izin ver' etkinse http/https ile başlamayan tüm Referer isteklerine (istemci istekleri vb.) izin verilir.",
+        leechInvalidReturnHelper: 'Hotlink isteklerini engelledikten sonra döndürülecek HTTP durum kodu',
+        leechlogControlHelper:
+            'Statik varlık isteklerini kaydeder; üretimde genellikle aşırı ve gereksiz günlüklerden kaçınmak için kapatılır',
         selectAcme: 'Acme hesabını seç',
         imported: 'Manuel olarak oluşturuldu',
         importType: 'İçe aktarma türü',
@@ -2461,6 +2500,9 @@ const message = {
         ipWebsiteWarn:
             'IP alan adlarına sahip web sitelerinin normal şekilde erişilebilmesi için varsayılan site olarak ayarlanması gerekir.',
         hstsHelper: 'HSTS’nin etkinleştirilmesi web sitesi güvenliğini artırabilir',
+        includeSubDomains: 'Alt Alan Adları',
+        hstsIncludeSubDomainsHelper:
+            'Etkinleştirildiğinde, HSTS politikası geçerli etki alanının tüm alt alan adlarına uygulanacaktır.',
         defaultHtml: 'Varsayılan sayfayı ayarla',
         website404: 'Web sitesi 404 hata sayfası',
         domain404: 'Web sitesi sayfası mevcut değil',
@@ -2540,6 +2582,20 @@ const message = {
         openBaseDir: 'Siteler Arası Saldırıları Önle',
         openBaseDirHelper:
             'open_basedir, PHP dosya erişim yolunu kısıtlamak için kullanılır, bu siteler arası erişimi önlemeye ve güvenliği artırmaya yardımcı olur',
+        serverCacheTime: 'Sunucu Önbellek Süresi',
+        serverCacheTimeHelper:
+            'Bir isteğin sunucuda önbelleğe alındığı süre. Bu süre boyunca, aynı istekler önbelleğe alınmış sonucu doğrudan döndürür ve kaynak sunucuya istekte bulunmaz.',
+        browserCacheTime: 'Tarayıcı Önbellek Süresi',
+        browserCacheTimeHelper:
+            'Statik kaynakların tarayıcıda yerel olarak önbelleğe alındığı süre, tekrarlayan istekleri azaltır. Kullanıcılar süre dolmadan önce sayfayı yenilediğinde yerel önbelleği doğrudan kullanır.',
+        donotLinkeDB: 'Veritabanına Bağlanma',
+        toWebsiteDir: 'Web Sitesi Dizinine Gir',
+        execParameters: 'Çalıştırma Parametreleri',
+        extCommand: 'Ek Komut',
+        mirror: 'Ayna Kaynağı',
+        execUser: 'Çalıştıran Kullanıcı',
+        execDir: 'Çalıştırma Dizini',
+        packagist: 'Çin Tam Aynası',
     },
     php: {
         short_open_tag: 'Kısa etiket desteği',
@@ -2682,6 +2738,9 @@ const message = {
         customAcme: 'Özel ACME Servisi',
         customAcmeURL: 'ACME Servis URL’si',
         baiduCloud: 'Baidu Cloud',
+        pushNode: 'Diğer Düğümlere Senkronize Et',
+        pushNodeHelper: 'Başvuru/yenilemeden sonra seçilen düğümlere gönder',
+        fromMaster: 'Ana Düğümden Gönder',
     },
     firewall: {
         create: 'Kural oluştur',
@@ -2701,6 +2760,7 @@ const message = {
         quickJump: 'Hızlı erişim',
         used: 'Kullanıldı',
         unUsed: 'Kullanılmadı',
+        dockerRestart: 'Güvenlik duvarı işlemleri Docker hizmetinin yeniden başlatılmasını gerektirir',
         firewallHelper: '{0} sistem güvenlik duvarı',
         firewallNotStart: 'Sistem güvenlik duvarı şu anda etkin değil. Önce etkinleştirin.',
         restartFirewallHelper: 'Bu işlem mevcut güvenlik duvarını yeniden başlatacak. Devam etmek istiyor musunuz?',
@@ -2831,6 +2891,8 @@ const message = {
             'Tam bir başlatma komutu sağlayın. Örneğin, "pip install -r requirements.txt && python manage.py runserver 0.0.0.0:5000".',
         dotnetHelper: 'Tam bir başlatma komutu sağlayın. Örneğin, "dotnet MyWebApp.dll".',
         dirHelper: 'Not: Lütfen kapsayıcı içindeki dizin yolunu doldurun',
+        concurrency: 'Eşzamanlılık Şeması',
+        loadStatus: 'Yük Durumu',
     },
     process: {
         pid: 'İşlem Kimliği',
@@ -2900,7 +2962,31 @@ const message = {
             manage: 'Yönetim',
             autoRestart: 'Otomatik Yeniden Başlatma',
             EXITED: 'Çıkıldı',
+            autoRestartHelper: 'Program çöktükten sonra otomatik olarak yeniden başlatılsın mı?',
+            autoStart: 'Otomatik Başlat',
+            autoStartHelper: 'Supervisor başlatıldıktan sonra servis otomatik olarak başlatılsın mı?',
         },
+    },
+    disk: {
+        management: 'Disk Yönetimi',
+        partition: 'Bölüm',
+        unmount: 'Bağını Kaldır',
+        unmountHelper: "Bölüm {0}'ın bağını kaldırmak istiyor musunuz?",
+        mount: 'Bağla',
+        partitionAlert:
+            'Disk bölümleme, diske biçimlendirme gerektirir ve mevcut veriler silinir. Lütfen verilerinizi önceden kaydedin veya anlık görüntü alın.',
+        mountPoint: 'Bağlama Noktası',
+        systemDisk: 'Sistem Diski',
+        unpartitionedDisk: 'Bölümlendirilmemiş Disk',
+        handlePartition: 'Şimdi Bölümle',
+        filesystem: 'Dosya Sistemi',
+        unmounted: 'Bağlı Değil',
+        cannotOperate: 'Operasyon Yapılamıyor',
+        systemDiskHelper: 'İpucu: Mevcut disk sistem diskidir, işlem yapılamaz.',
+        autoMount: 'Otomatik Bağlama',
+        model: 'Cihaz Modeli',
+        diskType: 'Disk Türü',
+        serial: 'Seri Numarası',
     },
     xpack: {
         expiresTrialAlert:
@@ -3127,7 +3213,7 @@ const message = {
             noBlackIp: 'IP zaten engellenmiş, tekrar engellemeye gerek yok',
             noWhiteUrl: 'URL zaten beyaz listede, tekrar eklemeye gerek yok',
             spiderIpHelper:
-                'Varsayılan olarak örümcek IP’lerine izin verilir, Baidu, Bing, Google, 360, Shenma, Sogou, ByteDance, DuckDuckGo içerir',
+                "Baidu, Bing, Google, 360, Shenma, Sogou, ByteDance, DuckDuckGo, Yandex'i içerir. Bunu kapatmak tüm örümcek erişimlerini engeller.",
             spiderIp: 'Örümcek IP Havuzu',
             geoIp: 'IP Adres Kütüphanesi',
             geoIpHelper: 'IP’nin coğrafi konumunu doğrulamak için kullanılır',
@@ -3178,6 +3264,9 @@ const message = {
             notBelongToIpGroup: 'IP Grubuna Ait Değil',
             unknownWebsiteKey: 'Bilinmeyen Alan',
             special: 'Özel',
+            fileToLarge: "Dosya 1MB'yi aştığı için yüklenemez",
+            uploadOverLimit: 'Yüklenen dosya sayısı sınırı aşıyor, maksimum 1 dosya',
+            importRuleHelper: 'Her satıra bir kural',
         },
         monitor: {
             name: 'Web Sitesi İzleme',
@@ -3483,6 +3572,8 @@ const message = {
                 'Mevcut düğüm zaten ana düğüm olarak etkinleştirilmiş durumda ve doğrudan alt düğüm olarak eklenemez. Lütfen eklemeden önce alt düğüme dönüştürün, ayrıntılar için belgelere bakın.',
             agentExist:
                 'Bu düğümde 1panel-agent’ın zaten kurulu olduğu algılandı. Devam edilmesi mevcut verileri koruyacak ve yalnızca 1panel-agent hizmetini değiştirecektir.',
+            agentNotExist:
+                'Bu düğümde 1panel-agent yüklü olmadığı tespit edildi, düğüm bilgileri doğrudan düzenlenemez. Lütfen silip tekrar ekleyin.',
             oldDataExist:
                 'Bu düğümde geçmiş 1Panel V2 verileri algılandı. Aşağıdaki bilgiler mevcut ayarları üzerine yazmak için kullanılacaktır:',
             errLicense: 'Bu düğüme bağlı lisans kullanılamıyor. Lütfen kontrol edin ve tekrar deneyin!',
@@ -3549,7 +3640,7 @@ const message = {
             alertRule: 'Uyarı Kuralları',
             titleSearchHelper: 'Bulanık arama için uyarı başlığını girin',
             taskType: 'Tür',
-            ssl: 'Sertifika (SSL) Sona Ermesi',
+            ssl: 'Sertifika Sona Ermesi',
             siteEndTime: 'Web Sitesi Sona Ermesi',
             panelPwdEndTime: 'Panel Şifresi Sona Ermesi',
             panelUpdate: 'Yeni Panel Sürümü Mevcut',
@@ -3594,7 +3685,7 @@ const message = {
             cpuUseExceedAvgHelper: 'Belirtilen süre içinde ortalama CPU kullanımı belirtilen değeri aşar',
             memoryUseExceedAvgHelper: 'Belirtilen süre içinde ortalama bellek kullanımı belirtilen değeri aşar',
             loadUseExceedAvgHelper: 'Belirtilen süre içinde ortalama yük kullanımı belirtilen değeri aşar',
-            resourceAlertRulesHelper: 'Not: 30 dakika içinde sürekli uyarılar yalnızca bir SMS gönderir',
+            resourceAlertRulesHelper: 'Not: 30 dakika içinde sürekli uyarılar yalnızca bir gönderir',
             specifiedTime: 'Belirtilen Süre',
             deleteTitle: 'Uyarıyı Sil',
             deleteMsg: 'Uyarı görevini silmek istediğinizden emin misiniz?',
@@ -3633,7 +3724,7 @@ const message = {
             success: 'Uyarı Başarılı',
             pushing: 'Gönderiliyor...',
             error: 'Uyarı Başarısız',
-            cleanLog: 'Günlükleri Temizle',
+            cleanLog: 'Zamanlanmış görev yürütmesi {0} hatası',
             cleanAlertLogs: 'Uyarı Günlüklerini Temizle',
             daily: 'Günlük Uyarı Sayısı: {0}',
             cumulative: 'Toplam Uyarı Sayısı: {0}',
@@ -3729,6 +3820,20 @@ const message = {
             portHelper: 'SSL genellikle 465, TLS genellikle 587',
             sslHelper: 'SMTP portu 465 ise genellikle SSL gerekir',
             tlsHelper: 'SMTP portu 587 ise genellikle TLS gerekir',
+            triggerCondition: 'Tetikleme Koşulu',
+            loginFail: ' içinde oturum açma başarısızlığı',
+            nodeException: 'Düğüm Hatası Uyarısı',
+            licenseException: 'Lisans Hatası Uyarısı',
+            panelLogin: 'Panel Girişi Hatası Uyarısı',
+            sshLogin: 'SSH Girişi Hatası Uyarısı',
+            panelIpLogin: 'Panel Girişi IP Hatası Uyarısı',
+            sshIpLogin: 'SSH Girişi IP Hatası Uyarısı',
+            ipWhiteListHelper:
+                'Beyaz listedeki IP’ler kurallara tabi değildir ve başarılı girişlerde uyarı oluşturulmaz',
+            nodeExceptionRule: 'Düğüm hatası uyarısı, günde {0} kez gönderilir',
+            licenseExceptionRule: 'Lisans hatası uyarısı, günde {0} kez gönderilir',
+            panelLoginRule: 'Panel girişi uyarısı, günde {0} kez gönderilir',
+            sshLoginRule: 'SSH girişi uyarısı, günde {0} kez gönderilir',
         },
         theme: {
             lingXiaGold: 'Ling Xia Altın',
@@ -3754,6 +3859,7 @@ const message = {
             unhealthyDeleteError:
                 'Yükleme düğümü durumu anormal, lütfen düğüm listesini kontrol edin ve tekrar deneyin!',
             replicaStatusError: 'Durum alımı anormal, lütfen ana düğümü kontrol edin.',
+            masterHostError: "Ana düğüm IP'si 127.0.0.1 olamaz",
         },
     },
 };

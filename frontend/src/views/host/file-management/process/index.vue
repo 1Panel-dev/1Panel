@@ -5,7 +5,7 @@
                 <div
                     v-for="(value, index) in res"
                     :key="index"
-                    class="bg-white rounded-lg p-4 shadow-sm border border-gray-100 transition-all duration-200 hover:shadow-md"
+                    class="rounded-lg p-4 shadow-sm border border-gray-100 transition-all duration-200 hover:shadow-md"
                     :class="{ completed: value.percent === 100 }"
                 >
                     <div class="flex items-center gap-3">

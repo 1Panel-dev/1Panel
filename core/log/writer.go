@@ -1,6 +1,7 @@
 package log
 
 import (
+	"github.com/1Panel-dev/1Panel/core/constant"
 	"log"
 	"os"
 	"path"
@@ -9,9 +10,6 @@ import (
 	"sync"
 	"sync/atomic"
 	"time"
-	"unsafe"
-
-	"github.com/1Panel-dev/1Panel/core/constant"
 
 	"github.com/1Panel-dev/1Panel/core/global"
 )
@@ -23,12 +21,12 @@ type Writer struct {
 	fire          chan string
 	cf            *Config
 	rollingfilech chan string
+	queue         chan []byte
 }
 
 type AsynchronousWriter struct {
 	Writer
 	ctx     chan int
-	queue   chan []byte
 	errChan chan error
 	closed  int32
 	wg      sync.WaitGroup
@@ -100,6 +98,7 @@ func NewWriterFromConfig(c *Config) (RollingWriter, error) {
 
 	var rollingWriter RollingWriter
 	writer := Writer{
+		queue:   make(chan []byte, BufferSize),
 		m:       mng,
 		file:    file,
 		absPath: filepath,
@@ -156,17 +155,15 @@ func NewWriterFromConfig(c *Config) (RollingWriter, error) {
 
 	wr := &AsynchronousWriter{
 		ctx:     make(chan int),
-		queue:   make(chan []byte, QueueSize),
 		errChan: make(chan error, QueueSize),
 		wg:      sync.WaitGroup{},
 		closed:  0,
 		Writer:  writer,
 	}
-
+	rollingWriter = wr
 	wr.wg.Add(1)
 	go wr.writer()
 	wr.wg.Wait()
-	rollingWriter = wr
 
 	return rollingWriter, nil
 }
@@ -211,9 +208,10 @@ func (w *Writer) Write(b []byte) (int, error) {
 		}
 	}
 
-	fp := atomic.LoadPointer((*unsafe.Pointer)(unsafe.Pointer(&w.file)))
-	file := (*os.File)(fp)
-	return file.Write(b)
+	select {
+	case w.queue <- b:
+		return len(b), nil
+	}
 }
 
 func (w *Writer) Reopen(file string) error {

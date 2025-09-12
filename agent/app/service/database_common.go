@@ -74,11 +74,11 @@ func (u *DBCommonService) UpdateConfByFile(req dto.DBConfUpdateByFile) error {
 	}
 	path := ""
 	switch req.Type {
-	case constant.AppMariaDB, constant.AppMysql:
+	case constant.AppMariaDB, constant.AppMysql, constant.AppMysqlCluster:
 		path = fmt.Sprintf("%s/%s/%s/conf/my.cnf", global.Dir.AppInstallDir, req.Type, app.Name)
-	case constant.AppPostgresql:
+	case constant.AppPostgresql, constant.AppPostgresqlCluster:
 		path = fmt.Sprintf("%s/%s/%s/data/postgresql.conf", global.Dir.AppInstallDir, req.Type, app.Name)
-	case constant.AppRedis:
+	case constant.AppRedis, constant.AppRedisCluster:
 		path = fmt.Sprintf("%s/%s/%s/conf/redis.conf", global.Dir.AppInstallDir, req.Type, app.Name)
 	}
 	file, err := os.OpenFile(path, os.O_WRONLY|os.O_TRUNC, 0640)

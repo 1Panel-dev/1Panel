@@ -11,13 +11,13 @@
                 <el-table-column prop="resolve" :label="$t('ssl.resolveDomain')">
                     <template #default="{ row }">
                         <span>{{ row.resolve }}</span>
-                        <CopyButton :content="row.resolve" type="icon" />
+                        <CopyButton :content="row.resolve" />
                     </template>
                 </el-table-column>
                 <el-table-column prop="value" :label="$t('ssl.value')">
                     <template #default="{ row }">
                         <span>{{ row.value }}</span>
-                        <CopyButton :content="row.value" type="icon" />
+                        <CopyButton :content="row.value" />
                     </template>
                 </el-table-column>
                 <el-table-column :label="$t('commons.table.type')">TXT</el-table-column>

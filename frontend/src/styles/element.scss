@@ -23,6 +23,7 @@
     --el-color-primary-light-7: var(--panel-color-primary-light-7);
     --el-color-primary-light-8: var(--panel-color-primary-light-8);
     --el-color-primary-light-9: var(--panel-color-primary-light-9);
+    --panel-code-header-footer-color: var(--panel-color-primary-light-9);
 
     --el-text-color-regular: #646a73;
 }
@@ -256,6 +257,10 @@ html {
     }
 }
 
+.el-tabs--card > .el-tabs__header .el-tabs__item.is-active {
+    border-bottom-color: var(--panel-color-primary) !important;
+}
+
 .logo {
     color: var(--el-color-primary);
 }
@@ -269,4 +274,10 @@ html {
     color: var(--el-color-primary) !important;
     background-color: var(--el-color-primary-light-9) !important;
     border-color: var(--el-button-border-color) !important;
+}
+
+.el-collapse-item__header {
+    color: var(--el-text-color-regular) !important;
+    border: 1px solid var(--panel-main-bg-color-10);
+    background-color: var(--panel-main-bg-color-10) !important;
 }

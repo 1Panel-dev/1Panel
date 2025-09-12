@@ -108,6 +108,7 @@ type smi struct {
 		} `xml:"gpu_operation_mode"`
 		GpuPartNumber    string `xml:"gpu_part_number"`
 		GpuPowerReadings struct {
+			InstantPowerDraw    string `xml:"instant_power_draw"`
 			CurrentPowerLimit   string `xml:"current_power_limit"`
 			DefaultPowerLimit   string `xml:"default_power_limit"`
 			MaxPowerLimit       string `xml:"max_power_limit"`

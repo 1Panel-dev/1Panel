@@ -83,8 +83,8 @@ import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { HostTool } from '@/api/interface/host-tool';
 import InitPage from './init/index.vue';
-import router from '@/routers';
 import { GlobalStore } from '@/store';
+import { routerToNameWithQuery } from '@/utils/router';
 
 const globalStore = GlobalStore();
 
@@ -111,7 +111,7 @@ const setting = () => {
 };
 
 const toLibrary = () => {
-    router.push({ name: 'Library', query: { uncached: 'true' } });
+    routerToNameWithQuery('Library', { uncached: 'true' });
 };
 
 const toDoc = () => {

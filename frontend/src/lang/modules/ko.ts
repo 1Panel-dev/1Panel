@@ -255,6 +255,7 @@ const message = {
             authBasicPassword: '알파벳, 숫자 및 일반 특수 문자 지원, 길이 1-72',
             length128Err: '길이는 128자를 초과할 수 없습니다',
             maxLength: '길이는 {0}자를 초과할 수 없습니다',
+            alias: '영어, 숫자, - 및 _ 지원, 길이 1-30, -_로 시작하거나 끝날 수 없습니다.',
         },
         res: {
             paramError: '요청이 실패했습니다. 나중에 다시 시도하세요!',
@@ -338,6 +339,9 @@ const message = {
             dayUnit: '일',
             millisecond: '밀리초',
         },
+        log: {
+            noLog: '로그 없음',
+        },
     },
     menu: {
         home: '개요',
@@ -371,6 +375,10 @@ const message = {
         msgCenter: '작업 센터',
     },
     home: {
+        recommend: '추천',
+        dir: '디렉토리',
+        quickDir: '빠른 디렉토리',
+        database: '데이터베이스 - 전체',
         restart_1panel: '패널 재시작',
         restart_system: '서버 재시작',
         operationSuccess:
@@ -453,6 +461,9 @@ const message = {
         serviceNameHelper: '같은 네트워크 내 컨테이너 간의 접근.',
         backupList: '백업',
         loadBackup: '불러오기',
+        localUpload: '로컬 업로드',
+        hostSelect: '서버 선택',
+        selectHelper: '백업 파일 {0}을(를) 가져오시겠습니까?',
         remoteAccess: '원격 접근',
         remoteHelper: '여러 IP 를 쉼표로 구분하여 입력, 예: 172.16.10.111, 172.16.10.112',
         remoteConnHelper:
@@ -473,7 +484,6 @@ const message = {
         passwordHelper: '불러올 수 없습니다. 수정해주세요.',
         remote: '원격',
         remoteDB: '원격 서버 | 원격 서버들',
-        manageRemoteDB: '원격 DB 관리',
         createRemoteDB: '원격 DB 바인딩',
         unBindRemoteDB: '원격 DB 바인딩 해제',
         unBindForce: '강제 바인딩 해제',
@@ -497,8 +507,8 @@ const message = {
         selectFile: '파일 선택',
         dropHelper: '여기에 업로드한 파일을 드래그 앤 드롭하거나',
         clickHelper: '클릭하여 업로드',
-        supportUpType: 'sql, sql.gz, tar.gz 파일만 지원됩니다.',
-        zipFormat: 'tar.gz 압축 패키지 구조: test.tar.gz 압축 패키지에는 test.sql이 포함되어야 합니다.',
+        supportUpType:
+            'sql, sql.gz, tar.gz, .zip 파일 형식만 지원합니다. 가져오는 압축 파일에는 하나의 .sql 파일만 있거나 test.sql이 포함되어 있어야 합니다',
 
         currentStatus: '현재 상태',
         baseParam: '기본 파라미터',
@@ -557,7 +567,7 @@ const message = {
         longQueryTime: '임계값(s)',
         thresholdRangeHelper: '올바른 임계값을 입력하십시오 (1 - 600).',
 
-        timeout: '타임아웃',
+        timeout: '타임아웃(s)',
         timeoutHelper: '유휴 연결의 타임아웃 기간. 0은 연결이 지속적으로 유지됨을 의미합니다.',
         maxclients: '최대 클라이언트',
         requirepassHelper:
@@ -670,7 +680,6 @@ const message = {
             server: 'MCP サーバー',
             create: 'サーバーを追加',
             edit: 'サーバーを編集',
-            commandHelper: '例: npx -y {0}',
             baseUrl: '外部アクセスパス',
             baseUrlHelper: '例: http://192.168.1.2:8000',
             ssePath: 'SSE パス',
@@ -691,6 +700,8 @@ const message = {
             outputTransport: '출력 유형',
             streamableHttpPath: '스트리밍 경로',
             streamableHttpPathHelper: '예: /mcp, 다른 서버와 중복되지 않도록 주의하세요',
+            npxHelper: 'npx 또는 바이너리로 시작하는 mcp에 적합',
+            uvxHelper: 'uvx로 시작하는 mcp에 적합',
         },
     },
     container: {
@@ -778,6 +789,8 @@ const message = {
         upgradeWarning2:
             '업그레이드 작업은 컨테이너를 재빌드해야 하며, 비지속적인 데이터가 손실됩니다. 계속하시겠습니까?',
         oldImage: '현재 이미지',
+        sameImageContainer: '동일 이미지 컨테이너',
+        sameImageHelper: '동일한 이미지를 사용하는 컨테이너는 선택 후 일괄 업그레이드 가능',
         targetImage: '대상 이미지',
         imageLoadErr: '컨테이너에 대한 이미지 이름이 감지되지 않았습니다.',
         appHelper: '이 컨테이너는 앱 스토어에서 왔으며 업그레이드 시 서비스가 중단될 수 있습니다.',
@@ -815,6 +828,8 @@ const message = {
         image: '이미지 | 이미지들',
         imagePull: '풀',
         imagePush: '푸시',
+        imagePushHelper:
+            '이 이미지에 여러 태그가 있는 것으로 감지되었습니다. 푸시 시 사용할 이미지 이름이 다음인지 확인하세요: {0}',
         imageDelete: '이미지 삭제',
         imageTagDeleteHelper: '이 이미지 ID와 관련된 다른 태그를 제거합니다.',
         repoName: '컨테이너 저장소 이름',
@@ -894,7 +909,7 @@ const message = {
         containerNumber: '컨테이너 수',
         containerStatus: '컨테이너 상태',
         exited: '종료됨',
-        running: '실행 중',
+        running: '실행 중 ( {0} / {1} )',
         composeDetailHelper: '이 컴포즈는 1Panel 외부에서 생성되었습니다. 시작 및 중지 작업은 지원되지 않습니다.',
         composeOperatorHelper: '{1} 작업이 {0}에서 수행됩니다. 계속 하시겠습니까?',
         composeDownHelper:
@@ -987,6 +1002,8 @@ const message = {
         curl: '접속 URL',
         taskName: '작업 이름',
         cronSpec: '트리거 주기',
+        cronSpecDoc:
+            '사용자 정의 실행 주기는 [분 시 일 월 요일] 형식만 지원합니다 (예: 0 0 * * *). 자세한 내용은 공식 문서를 참조하세요.',
         cronSpecHelper: '올바른 실행 주기를 입력해 주세요',
         cleanHelper: '이 작업은 모든 작업 실행 레코드, 백업 파일, 로그 파일을 기록합니다. 계속하시겠습니까?',
         directory: '백업 디렉토리',
@@ -1101,6 +1118,8 @@ const message = {
     },
     terminal: {
         local: '로컬',
+        defaultConn: '기본 연결',
+        defaultConnHelper: '터미널을 연 후 기본적으로 호스트에 연결할지 여부',
         localHelper: '로컬 이름은 시스템 로컬 식별에만 사용됩니다.',
         connLocalErr: '자동 인증에 실패했습니다. 로컬 서버 로그인 정보를 입력해주세요.',
         testConn: '연결 테스트',
@@ -1229,7 +1248,6 @@ const message = {
             notStart: 'ClamAV 서비스가 현재 실행 중이 아닙니다. 먼저 시작하세요!',
             removeRecord: '보고서 파일 삭제',
             noRecords: '"Trigger" 버튼을 클릭하여 스캔을 시작하면 이곳에서 기록을 확인할 수 있습니다.',
-            removeResultHelper: '작업 실행 중 생성된 보고서 파일을 삭제하여 저장 공간을 확보합니다.',
             removeInfected: '바이러스 파일 삭제',
             removeInfectedHelper: '작업 중 감지된 바이러스 파일을 삭제하여 서버 보안 및 정상 작동을 보장합니다.',
             clamCreate: '스캔 규칙 생성',
@@ -1269,6 +1287,7 @@ const message = {
         deleteLogs: '로그 정리',
         resource: '자원',
         detail: {
+            dashboard: '개요',
             ai: 'AI',
             groups: '그룹',
             hosts: '호스트',
@@ -1347,6 +1366,7 @@ const message = {
         downloadStart: '다운로드 시작됨',
         moveSuccess: '이동 성공',
         copySuccess: '복사 성공',
+        pasteMsg: '대상 디렉토리의 오른쪽 상단에 있는 [붙여넣기] 버튼을 클릭하세요',
         move: '이동',
         calculate: '계산',
         canNotDeCompress: '이 파일은 압축 해제할 수 없습니다',
@@ -1426,6 +1446,10 @@ const message = {
         setting: '설정',
         showHide: '숨김 파일 표시',
         noShowHide: '숨김 파일 숨기기',
+        cancelUpload: '업로드 취소',
+        cancelUploadHelper: '업로드를 취소할지 여부, 취소 후 업로드 목록이 비워집니다.',
+        keepOneTab: '최소한 하나의 탭을 유지하세요',
+        notCanTab: '더 이상 탭을 추가할 수 없습니다',
     },
     ssh: {
         autoStart: '자동 시작',
@@ -1461,6 +1485,7 @@ const message = {
         createMode: '생성 방식',
         generate: '자동 생성',
         unSyncPass: '키 비밀번호 동기화 불가',
+        syncHelper: '동기화 작업으로 유효하지 않은 키를 정리하고 새로운 완전한 키 쌍을 동기화합니다. 계속하시겠습니까?',
         input: '수동 입력',
         import: '파일 업로드',
         pubkey: '키 정보',
@@ -1605,6 +1630,8 @@ const message = {
         code: '인증 코드',
         codeHelper:
             '"획득" 버튼을 클릭한 다음 OneDrive 에 로그인하여 리디렉션된 링크에서 "code" 이후의 내용을 복사하십시오. 이 입력 상자에 붙여넣으십시오. 자세한 지침은 공식 문서를 참조하십시오.',
+        googleHelper:
+            '먼저 Google 애플리케이션을 생성하고 클라이언트 정보를 획득한 후 양식을 작성하고 획득 버튼을 클릭하세요. 구체적인 작업은 공식 문서를 참조하십시오.',
         loadCode: '획득',
         COS: 'Tencent COS',
         ap_beijing_1: '베이징 지역 1',
@@ -1818,6 +1845,9 @@ const message = {
             '노드 {0}이(가) 이미 업그레이드 가능한 최신 버전입니다. 마스터 노드 버전을 확인 후 다시 시도하세요!',
 
         about: '정보',
+        release: '버전 업데이트 로그',
+        releaseHelper:
+            '현재 환경의 업데이트 로그를 가져오는 중 오류가 발생했습니다. 공식 문서에서 수동으로 확인하실 수 있습니다.',
         project: 'GitHub',
         issue: '이슈',
         doc: '공식 문서',
@@ -1883,7 +1913,7 @@ const message = {
         fileExchange: '프로페셔널 에디션으로 업그레이드하여 여러 서버 간에 파일을 빠르게 전송할 수 있습니다.',
         app: '프로페셔널 버전으로 업그레이드하면 모바일 APP을 통해 서비스 정보, 이상 모니터링 등을 확인할 수 있습니다.',
         cluster:
-            '프로페셔널 에디션으로 업그레이드하면 MySQL/Postgres/Reids 마스터-슬레이브 클러스터를 관리할 수 있습니다.',
+            '프로페셔널 에디션으로 업그레이드하면 MySQL/Postgres/Redis 마스터-슬레이브 클러스터를 관리할 수 있습니다.',
     },
     clean: {
         scan: '스캔 시작',
@@ -1906,17 +1936,12 @@ const message = {
         system: '시스템 불필요 파일',
         systemHelper: '스냅샷, 업그레이드 중에 생성된 임시 파일과 버전 업데이트 중에 불필요해진 파일 내용',
         panelOriginal: '시스템 스냅샷 복구 백업 파일',
+        backup: '임시 백업 디렉터리',
         upgrade: '시스템 업그레이드 백업 파일',
         upgradeHelper: '(시스템 롤백을 위해 최신 업그레이드 백업을 유지하는 것이 좋습니다)',
         cache: '시스템 캐시 파일',
         cacheHelper: '(주의하여 진행, 정리 후 서비스 재시작 필요)',
-        snapshotTmp: '시스템 스냅샷 업로드 임시 파일',
-        snapshotLocal: '시스템 스냅샷 생성 임시 파일',
         rollback: '복구 전 백업 파일',
-        unused: '사용되지 않는 시스템 디렉터리',
-        oldUpgrade: '사용되지 않는 구버전 업그레이드 백업 디렉터리',
-        oldOriginal: '사용되지 않는 구버전 스냅샷 복구 백업 디렉터리',
-        oldAppsBak: '사용되지 않는 애플리케이션 백업 디렉터리',
 
         upload: '임시 업로드 파일',
         uploadHelper: '시스템 백업 리스트에서 업로드된 임시 파일',
@@ -2068,8 +2093,7 @@ const message = {
         otherDomains: '기타 도메인',
         static: '정적',
         deployment: '배포',
-        supportUpType: '지원되는 파일 형식: .tar.gz',
-        zipFormat: '.tar.gz 압축 패키지 구조: test.tar.gz 패키지에는 반드시 {0} 파일이 포함되어야 합니다.',
+        supportUpType: '.tar.gz 파일 형식만 지원되며, 압축 패키지에는 {0}.json 파일이 포함되어야 합니다',
         proxy: '리버스 프록시',
         alias: '별칭',
         ftpUser: 'FTP 계정',
@@ -2127,6 +2151,10 @@ const message = {
         null: '없음',
         nginxConfig: 'Nginx 설정',
         websiteConfig: '웹사이트 설정',
+        proxySettings: '프록시 설정',
+        advancedSettings: '고급 설정',
+        cacheSettings: '캐시 설정',
+        sniSettings: 'SNI 설정',
         basic: '기본',
         source: '구성',
         security: '보안',
@@ -2250,11 +2278,15 @@ const message = {
         modifier: '매칭 규칙',
         modifierHelper: '예: = 는 정확히 일치, ~ 는 정규식 일치, ^~ 는 경로 시작 부분 일치 등을 나타냅니다.',
         replace: '텍스트 교체',
+        replaceHelper:
+            'nginx 텍스트 교체 기능은 리버스 프록시 중 응답 내용의 문자열을 대체할 수 있습니다. 백엔드에서 반환된 HTML, CSS, JavaScript 및 기타 파일의 링크, API 주소 등을 수정하는 데 일반적으로 사용됩니다. 복잡한 콘텐츠 교체 요구 사항에 대해 정규식 일치를 지원합니다.',
         addReplace: '추가',
         replaced: '검색 문자열 (비울 수 없음)',
         replaceText: '교체할 문자열',
         replacedErr: '검색 문자열은 비워둘 수 없습니다',
         replacedErr2: '검색 문자열은 중복될 수 없습니다',
+        replacedListEmpty: '텍스트 교체 규칙 없음',
+        proxySslName: '프록시 SNI 이름',
         basicAuth: '기본 인증',
         editBasicAuthHelper:
             '비밀번호는 비대칭으로 암호화되어 표시할 수 없습니다. 수정하려면 비밀번호를 재설정해야 합니다.',
@@ -2270,6 +2302,15 @@ const message = {
         disableLeech: '링크 차단 비활성화',
         ipv6: 'IPv6 수신 대기',
         leechReturnError: 'HTTP 상태 코드를 입력하세요',
+        blockedRef: '비표준 참조 허용',
+        accessControl: '링크 차단 제어',
+        leechcacheControl: '캐시 제어',
+        logEnableControl: '정적 리소스 요청 로그 기록',
+        leechSpecialValidHelper:
+            "'빈 참조 허용'을 활성화하면 리퍼러가 없는 요청(직접 접근 등)은 차단되지 않습니다. '비표준 참조 허용'을 활성화하면 http/https로 시작하지 않는 모든 리퍼러 요청(클라이언트 요청 등)을 허용합니다.",
+        leechInvalidReturnHelper: '차단된 요청에 대해 반환할 HTTP 상태 코드',
+        leechlogControlHelper:
+            '정적 리소스 요청을 기록합니다. 운영 환경에서는 과도하고 불필요한 로그를 피하기 위해 보통 비활성화합니다',
         selectAcme: 'Acme 계정 선택',
         imported: '수동으로 생성됨',
         importType: '가져오기 유형',
@@ -2308,6 +2349,8 @@ const message = {
         ipWebsiteWarn:
             'IP를 도메인 이름으로 사용하는 웹사이트는 정상적으로 접속되기 위해 기본 사이트로 설정해야 합니다.',
         hstsHelper: 'HSTS 를 활성화하면 웹사이트 보안을 강화할 수 있습니다.',
+        includeSubDomains: '서브도메인',
+        hstsIncludeSubDomainsHelper: '활성화하면 HSTS 정책이 현재 도메인의 모든 서브도메인에 적용됩니다.',
         defaultHtml: '기본 페이지',
         website404: '웹사이트 404 오류 페이지',
         domain404: '웹사이트 도메인이 존재하지 않습니다.',
@@ -2384,6 +2427,20 @@ const message = {
         openBaseDir: '사이트 간 공격 방지',
         openBaseDirHelper:
             'open_basedir는 PHP 파일 액세스 경로를 제한하여 사이트 간 액세스를 방지하고 보안을 향상시키는 데 사용됩니다',
+        serverCacheTime: '서버 캐시 시간',
+        serverCacheTimeHelper:
+            '요청이 서버에서 캐시되는 시간. 이 기간 동안 동일한 요청은 원본 서버에 요청하지 않고 캐시된 결과를 직접 반환합니다.',
+        browserCacheTime: '브라우저 캐시 시간',
+        browserCacheTimeHelper:
+            '정적 리소스가 브라우저 로컬에 캐시되는 시간, 중복 요청을 줄입니다. 유효기간 전에 사용자가 페이지를 새로 고치면 로컬 캐시가 직접 사용됩니다.',
+        donotLinkeDB: '데이터베이스 연결하지 않기',
+        toWebsiteDir: '웹사이트 디렉토리로 이동',
+        execParameters: '실행 매개변수',
+        extCommand: '추가 명령',
+        mirror: '미러 소스',
+        execUser: '실행 사용자',
+        execDir: '실행 디렉토리',
+        packagist: '중국 전체 미러',
     },
     php: {
         short_open_tag: '짧은 태그 지원',
@@ -2517,6 +2574,9 @@ const message = {
         customAcme: '사용자 정의 ACME 서비스',
         customAcmeURL: 'ACME 서비스 URL',
         baiduCloud: '바이두 클라우드',
+        pushNode: '다른 노드에 동기화',
+        pushNodeHelper: '신청/갱신 후 선택한 노드로 푸시',
+        fromMaster: '마스터 노드에서 푸시',
     },
     firewall: {
         create: '규칙 만들기',
@@ -2535,6 +2595,7 @@ const message = {
         quickJump: '빠른 접근',
         used: '사용됨',
         unUsed: '사용 안 함',
+        dockerRestart: '방화벽 작업에는 Docker 서비스 재시작이 필요합니다',
         firewallHelper: '{0} 시스템 방화벽',
         firewallNotStart: '현재 시스템 방화벽이 활성화되지 않았습니다. 먼저 활성화하세요.',
         restartFirewallHelper: '이 작업은 현재 방화벽을 재시작합니다. 계속하시겠습니까?',
@@ -2637,8 +2698,10 @@ const message = {
         goDirHelper: '디렉터리 또는 하위 디렉터리는 Go 또는 바이너리 파일을 포함해야 합니다.',
         pythonHelper:
             '전체 시작 명령을 제공하세요. 예: "pip install -r requirements.txt && python manage.py runserver 0.0.0.0:5000".',
-        donetHelper: '완전한 시작 명령을 입력하세요. 예: dotnet MyWebApp.dll',
+        dotnetHelper: '완전한 시작 명령을 입력하세요. 예: dotnet MyWebApp.dll',
         dirHelper: '주의: 컨테이너 내의 디렉토리 경로를 입력하세요',
+        concurrency: '동시성 체계',
+        loadStatus: '부하 상태',
     },
     process: {
         pid: '프로세스 ID',
@@ -2708,7 +2771,31 @@ const message = {
             manage: '관리',
             autoRestart: '자동 재시작',
             EXITED: '종료됨',
+            autoRestartHelper: '프로그램이 비정상적으로 종료된 후 자동으로 재시작할지 여부',
+            autoStart: '자동 시작',
+            autoStartHelper: 'Supervisor 시작 후 서비스를 자동으로 시작할지 여부',
         },
+    },
+    disk: {
+        management: '디스크 관리',
+        partition: '파티션',
+        unmount: '마운트 해제',
+        unmountHelper: '파티션 {0} 을(를) 마운트 해제하시겠습니까?',
+        mount: '마운트',
+        partitionAlert:
+            '디스크 파티션 작업은 디스크 포맷이 필요하며, 기존 데이터는 삭제됩니다. 데이터를 미리 저장하거나 스냅샷을 찍어주세요.',
+        mountPoint: '마운트 디렉토리',
+        systemDisk: '시스템 디스크',
+        unpartitionedDisk: '미파티션 디스크',
+        handlePartition: '지금 파티션',
+        filesystem: '파일 시스템',
+        unmounted: '마운트 해제됨',
+        cannotOperate: '작업 불가',
+        systemDiskHelper: '힌트: 현재 디스크는 시스템 디스크입니다. 작업할 수 없습니다.',
+        autoMount: '자동 마운트',
+        model: '장치 모델',
+        diskType: '디스크 유형',
+        serial: '시리얼 번호',
     },
     xpack: {
         expiresTrialAlert:
@@ -2928,7 +3015,7 @@ const message = {
             noBlackIp: 'IP가 이미 차단되어 있으므로 다시 차단할 필요가 없습니다',
             noWhiteUrl: 'URL이 이미 허용 목록에 포함되어 있으므로 다시 추가할 필요가 없습니다',
             spiderIpHelper:
-                '스파이더 IP는 기본적으로 허용됩니다. 바이두, 빙, 구글, 360, 신마, 소쿠, 바이트댄스, DuckDuckGo 포함',
+                '바이두, 빙, 구글, 360, 신마, 소구, 바이트댄스, DuckDuckGo, Yandex가 포함됩니다. 이를 끄면 모든 스파이더의 접근이 차단됩니다.',
             spiderIp: '스파이더 IP 풀',
             geoIp: 'IP 주소 라이브러리',
             geoIpHelper: 'IP의 지리적 위치를 확인하는 데 사용됩니다',
@@ -2979,6 +3066,9 @@ const message = {
             notBelongToIpGroup: 'IP 그룹에 속하지 않음',
             unknownWebsiteKey: '알 수 없는 도메인',
             special: '특수 문자',
+            fileToLarge: '파일이 1MB를 초과하여 업로드할 수 없습니다',
+            uploadOverLimit: '업로드된 파일 수가 제한을 초과했습니다, 최대 1개',
+            importRuleHelper: '한 줄에 하나의 규칙',
         },
         monitor: {
             name: '웹사이트 모니터링',
@@ -3272,6 +3362,8 @@ const message = {
                 '현재 노드가 마스터 노드로 활성화되어 있어 슬레이브 노드로 직접 추가할 수 없습니다. 추가하기 전에 먼저 슬레이브 노드로 다운그레이드하십시오. 자세한 내용은 문서를 참조하십시오.',
             agentExist:
                 '이 노드에 1panel-agent가 이미 설치되어 있는 것으로 감지되었습니다. 계속하면 기존 데이터를 유지하고 1panel-agent 서비스만 교체됩니다.',
+            agentNotExist:
+                '이 노드에 1panel-agent가 설치되지 않아 노드 정보를 직접 편집할 수 없습니다. 삭제 후 다시 추가해 주세요.',
             oldDataExist:
                 '이 노드에서 1Panel V2 기록 데이터가 감지되었습니다. 다음 정보를 사용하여 현재 설정을 덮어씁니다:',
             errLicense: '이 노드에 바인딩된 라이선스를 사용할 수 없습니다. 확인 후 다시 시도하십시오!',
@@ -3378,7 +3470,7 @@ const message = {
             cpuUseExceedAvgHelper: '지정된 시간 내의 평균 CPU 사용량이 지정된 값을 초과함',
             memoryUseExceedAvgHelper: '지정된 시간 내의 평균 메모리 사용량이 지정된 값을 초과함',
             loadUseExceedAvgHelper: '지정된 시간 내의 평균 부하 사용량이 지정된 값을 초과함',
-            resourceAlertRulesHelper: '참고: 30분 내에 연속적인 알림은 SMS 한 번만 발송됩니다',
+            resourceAlertRulesHelper: '참고: 30분 내에 연속적인 알림은 한 번만 발송됩니다',
             specifiedTime: '지정된 시간',
             deleteTitle: '알림 삭제',
             deleteMsg: '알림 작업을 삭제하시겠습니까?',
@@ -3418,7 +3510,7 @@ const message = {
             taskName: '작업 이름',
             cronJobType: '작업 유형',
             clamPath: '검사 디렉토리',
-            cronjob: '크론 작업',
+            cronjob: '예약 작업 실행 {0} 중 오류가 발생했습니다',
             app: '백업 애플리케이션',
             web: '백업 웹사이트',
             database: '백업 데이터베이스',
@@ -3503,6 +3595,20 @@ const message = {
             portHelper: 'SSL 은 일반적으로 465, TLS 는 587',
             sslHelper: 'SMTP 포트가 465 이면 일반적으로 SSL 이 필요합니다',
             tlsHelper: 'SMTP 포트가 587 이면 일반적으로 TLS 가 필요합니다',
+            triggerCondition: '트리거 조건',
+            loginFail: ' 이내 로그인 실패',
+            nodeException: '노드 이상 알림',
+            licenseException: '라이선스 이상 알림',
+            panelLogin: '패널 로그인 이상 알림',
+            sshLogin: 'SSH 로그인 이상 알림',
+            panelIpLogin: '패널 로그인 IP 이상 알림',
+            sshIpLogin: 'SSH 로그인 IP 이상 알림',
+            ipWhiteListHelper:
+                '화이트리스트에 있는 IP는 규칙의 제한을 받지 않으며, 로그인에 성공해도 알림이 발생하지 않습니다',
+            nodeExceptionRule: '노드 이상 알림은 하루 {0}회 전송',
+            licenseExceptionRule: '라이선스 이상 알림은 하루 {0}회 전송',
+            panelLoginRule: '패널 로그인 알림은 하루 {0}회 전송',
+            sshLoginRule: 'SSH 로그인 알림은 하루 {0}회 전송',
         },
         theme: {
             lingXiaGold: '링샤 골드',
@@ -3527,6 +3633,7 @@ const message = {
             replicaStatus: '마스터-슬레이브 상태',
             unhealthyDeleteError: '설치 노드 상태가 비정상입니다. 노드 목록을 확인한 후 다시 시도하세요!',
             replicaStatusError: '상태 획득이 비정상입니다. 마스터 노드를 확인하세요.',
+            masterHostError: '마스터 노드의 IP는 127.0.0.1이 될 수 없습니다',
         },
     },
 };

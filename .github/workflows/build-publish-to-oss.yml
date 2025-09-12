@@ -12,7 +12,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20.2'
+          node-version: '22.19.0'
       - name: Build Web
         run: |
           cd frontend && npm install && npm run build:pro

@@ -241,6 +241,14 @@ export namespace Setting {
         isBound: boolean;
         name: string;
     }
+    export interface ReleasesNotes {
+        Version: string;
+        CreatedAt: string;
+        Content: string;
+        NewCount: number;
+        OptimizationCount: number;
+        FixCount: number;
+    }
 
     export interface LicenseBind {
         nodeID: number;

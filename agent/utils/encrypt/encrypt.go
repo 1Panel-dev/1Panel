@@ -69,6 +69,11 @@ func StringDecryptWithBase64(text string) (string, error) {
 }
 
 func StringDecryptWithKey(text, key string) (string, error) {
+	defer func() {
+		if r := recover(); r != nil {
+			global.LOG.Errorf("A panic occurred during string decrypt with key, error message: %v", r)
+		}
+	}()
 	if len(text) == 0 {
 		return "", nil
 	}

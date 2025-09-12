@@ -15,11 +15,11 @@
                             <span else>
                                 {{ loadRedisInfo(true) }}
                             </span>
-                            <CopyButton :content="loadRedisInfo(true)" type="icon" />
+                            <CopyButton :content="loadRedisInfo(true)" />
                         </el-descriptions-item>
                         <el-descriptions-item :label="$t('commons.table.port')">
                             6379
-                            <CopyButton content="6379" type="icon" />
+                            <CopyButton content="6379" />
                         </el-descriptions-item>
                     </el-descriptions>
                 </el-card>
@@ -41,11 +41,11 @@
                             <span else>
                                 {{ loadRedisInfo(false) }}
                             </span>
-                            <CopyButton :content="loadRedisInfo(false)" type="icon" />
+                            <CopyButton :content="loadRedisInfo(false)" />
                         </el-descriptions-item>
                         <el-descriptions-item :label="$t('commons.table.port')">
                             {{ form.port }}
-                            <CopyButton :content="form.port + ''" type="icon" />
+                            <CopyButton :content="form.port + ''" />
                         </el-descriptions-item>
                     </el-descriptions>
                 </el-card>
@@ -64,7 +64,7 @@
                     v-model.trim="form.password"
                 />
                 <el-button-group>
-                    <CopyButton class="copy_button" :content="form.password" />
+                    <CopyButton class="copy_button" :isIcon="false" :content="form.password" />
                     <el-button @click="random">
                         {{ $t('commons.button.random') }}
                     </el-button>
@@ -74,7 +74,7 @@
             <div v-if="form.from !== 'local'">
                 <el-form-item :label="$t('commons.login.password')">
                     <el-tag>{{ form.password }}</el-tag>
-                    <CopyButton :content="form.password" type="icon" />
+                    <CopyButton :content="form.password" />
                 </el-form-item>
             </div>
         </el-form>

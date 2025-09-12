@@ -1,11 +1,5 @@
 <template>
-    <DrawerPro
-        v-model="drawerVisible"
-        :header="$t('commons.button.upgrade')"
-        @close="handleClose"
-        size="large"
-        :key="refresh"
-    >
+    <DrawerPro v-model="drawerVisible" :header="$t('commons.button.upgrade')" @close="handleClose" size="large">
         <div class="panel-MdEditor">
             <div class="default-theme" style="margin-left: 20px">
                 <h2 class="inline-block">{{ $t('app.version') }}</h2>
@@ -21,7 +15,12 @@
                     {{ upgradeInfo.testVersion }}
                 </el-radio>
             </el-radio-group>
-            <MdEditor v-model="upgradeInfo.releaseNote" previewOnly :theme="isDarkTheme ? 'dark' : 'light'" />
+            <MdEditor
+                v-loading="loading"
+                v-model="upgradeInfo.releaseNote"
+                previewOnly
+                :theme="isDarkTheme ? 'dark' : 'light'"
+            />
         </div>
         <template #footer>
             <span class="dialog-footer">
@@ -48,7 +47,7 @@ const { isDarkTheme } = storeToRefs(globalStore);
 
 const drawerVisible = ref(false);
 const upgradeInfo = ref();
-const refresh = ref();
+const loading = ref();
 const upgradeVersion = ref();
 
 interface DialogProps {
@@ -68,8 +67,15 @@ const handleClose = () => {
 };
 
 const changeOption = async () => {
-    const res = await loadReleaseNotes(upgradeVersion.value);
-    upgradeInfo.value.releaseNote = res.data;
+    loading.value = true;
+    await loadReleaseNotes(upgradeVersion.value)
+        .then((res) => {
+            loading.value = false;
+            upgradeInfo.value.releaseNote = res.data;
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
 const onUpgrade = async () => {

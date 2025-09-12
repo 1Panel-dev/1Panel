@@ -1,17 +1,23 @@
 package migrations
 
 import (
+	"encoding/json"
 	"fmt"
+	"os"
+	"os/user"
 	"path"
 	"time"
 
+	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/service"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
+	"github.com/1Panel-dev/1Panel/agent/utils/copier"
 	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
+	"github.com/1Panel-dev/1Panel/agent/utils/ssh"
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 
 	"github.com/go-gormigrate/gormigrate/v2"
@@ -19,7 +25,7 @@ import (
 )
 
 var AddTable = &gormigrate.Migration{
-	ID: "20250729-add-table",
+	ID: "20250902-add-table",
 	Migrate: func(tx *gorm.DB) error {
 		return tx.AutoMigrate(
 			&model.AppDetail{},
@@ -64,6 +70,7 @@ var AddTable = &gormigrate.Migration{
 			&model.AppIgnoreUpgrade{},
 			&model.McpServer{},
 			&model.RootCert{},
+			&model.ClamRecord{},
 		)
 	},
 }
@@ -428,6 +435,129 @@ var UpdateMcpServer = &gormigrate.Migration{
 			return err
 		}
 		if err := tx.Model(&model.McpServer{}).Where("1=1").Update("output_transport", "sse").Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}
+
+var InitCronjobGroup = &gormigrate.Migration{
+	ID: "20250805-init-cronjob-group",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.Cronjob{}); err != nil {
+			return err
+		}
+		if err := tx.Model(&model.Cronjob{}).Where("1=1").Updates(map[string]interface{}{"group_id": 0}).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}
+
+var AddColumnToAlert = &gormigrate.Migration{
+	ID: "20250729-add-column-to-alert",
+	Migrate: func(tx *gorm.DB) error {
+		if err := global.AlertDB.AutoMigrate(&model.Alert{}); err != nil {
+			return err
+		}
+		if err := global.AlertDB.Model(&model.Alert{}).
+			Where("advanced_params IS NULL").
+			Update("advanced_params", "").Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}
+
+var UpdateWebsiteSSL = &gormigrate.Migration{
+	ID: "20250819-update-website-ssl",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.WebsiteSSL{}); err != nil {
+			return err
+		}
+		return nil
+	},
+}
+
+var AddQuickJump = &gormigrate.Migration{
+	ID: "20250901-add-quick-jump",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.QuickJump{}); err != nil {
+			return err
+		}
+		if err := tx.Create(&model.QuickJump{Name: "Website", Title: "menu.website", Recommend: 10, IsShow: true, Router: "/websites"}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.QuickJump{Name: "Database", Title: "home.database", Recommend: 30, IsShow: true, Router: "/databases"}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.QuickJump{Name: "Cronjob", Title: "menu.cronjob", Recommend: 50, IsShow: true, Router: "/cronjobs"}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.QuickJump{Name: "AppInstalled", Title: "home.appInstalled", Recommend: 70, IsShow: true, Router: "/apps/installed"}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.QuickJump{Name: "File", Detail: "/", Title: "home.quickDir", Recommend: 90, IsShow: false, Router: "/hosts/files"}).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}
+
+var UpdateMcpServerAddType = &gormigrate.Migration{
+	ID: "20250904-update-mcp-server",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.McpServer{}); err != nil {
+			return err
+		}
+		if err := tx.Model(&model.McpServer{}).Where("1=1").Update("type", "npx").Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}
+
+var InitLocalSSHConn = &gormigrate.Migration{
+	ID: "20250905-init-local-ssh",
+	Migrate: func(tx *gorm.DB) error {
+		itemPath := ""
+		currentInfo, _ := user.Current()
+		if len(currentInfo.HomeDir) == 0 {
+			itemPath = "/root/.ssh/id_ed25519_1panel"
+		} else {
+			itemPath = path.Join(currentInfo.HomeDir, ".ssh/id_ed25519_1panel")
+		}
+		if _, err := os.Stat(itemPath); err != nil {
+			_ = service.NewISSHService().CreateRootCert(dto.CreateRootCert{EncryptionMode: "ed25519", Name: "id_ed25519_1panel", Description: "1Panel Terminal"})
+		}
+		privateKey, _ := os.ReadFile(itemPath)
+		connWithKey := ssh.ConnInfo{
+			Addr:       "127.0.0.1",
+			User:       "root",
+			Port:       22,
+			AuthMode:   "key",
+			PrivateKey: privateKey,
+		}
+		if _, err := ssh.NewClient(connWithKey); err != nil {
+			return nil
+		}
+		var conn model.LocalConnInfo
+		_ = copier.Copy(&conn, &connWithKey)
+		conn.PrivateKey = string(privateKey)
+		conn.PassPhrase = ""
+		localConn, _ := json.Marshal(&conn)
+		connAfterEncrypt, _ := encrypt.StringEncrypt(string(localConn))
+		if err := tx.Model(&model.Setting{}).Where("key = ?", "LocalSSHConn").Updates(map[string]interface{}{"value": connAfterEncrypt}).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}
+
+var InitLocalSSHShow = &gormigrate.Migration{
+	ID: "20250908-init-local-ssh-show",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.Create(&model.Setting{Key: "LocalSSHConnShow", Value: constant.StatusEnable}).Error; err != nil {
 			return err
 		}
 		return nil

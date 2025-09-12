@@ -34,7 +34,6 @@ type ICronjobService interface {
 	UpdateStatus(id uint, status string) error
 	UpdateGroup(req dto.ChangeGroup) error
 	Delete(req dto.CronjobBatchDelete) error
-	Download(down dto.CronjobDownload) (string, error)
 	StartJob(cronjob *model.Cronjob, isUpdate bool) (string, error)
 	CleanRecord(req dto.CronjobClean) error
 
@@ -382,7 +381,7 @@ func (u *CronjobService) Import(req []dto.CronjobTrans) error {
 			cronjob.Status = constant.StatusDisable
 		}
 		_ = cronjobRepo.Create(&cronjob)
-		if item.AlertCount != 0 {
+		if item.AlertCount != 0 && item.AlertTitle != "" && item.AlertMethod != "" {
 			createAlert := dto.AlertCreate{
 				Title:     item.AlertTitle,
 				SendCount: item.AlertCount,
@@ -498,10 +497,7 @@ func (u *CronjobService) CleanRecord(req dto.CronjobClean) error {
 	}
 	if req.CleanData {
 		if hasBackup(cronjob.Type) {
-			accountMap, err := NewBackupClientMap(strings.Split(cronjob.SourceAccountIDs, ","))
-			if err != nil {
-				return err
-			}
+			accountMap := NewBackupClientMap(strings.Split(cronjob.SourceAccountIDs, ","))
 			if !req.CleanRemoteData {
 				for key := range accountMap {
 					if key != constant.Local {
@@ -535,36 +531,13 @@ func (u *CronjobService) CleanRecord(req dto.CronjobClean) error {
 	return nil
 }
 
-func (u *CronjobService) Download(req dto.CronjobDownload) (string, error) {
-	record, _ := cronjobRepo.GetRecord(repo.WithByID(req.RecordID))
-	if record.ID == 0 {
-		return "", buserr.New("ErrRecordNotFound")
-	}
-	account, client, err := NewBackupClientWithID(req.BackupAccountID)
-	if err != nil {
-		return "", err
-	}
-	if account.Type == "LOCAL" || record.FromLocal {
-		if _, err := os.Stat(record.File); err != nil && os.IsNotExist(err) {
-			return "", err
-		}
-		return record.File, nil
-	}
-	tempPath := fmt.Sprintf("%s/download/%s", global.Dir.DataDir, record.File)
-	if _, err := os.Stat(tempPath); err != nil && os.IsNotExist(err) {
-		_ = os.MkdirAll(path.Dir(tempPath), os.ModePerm)
-		isOK, err := client.Download(record.File, tempPath)
-		if !isOK || err != nil {
-			return "", err
-		}
-	}
-	return tempPath, nil
-}
-
 func (u *CronjobService) HandleOnce(id uint) error {
 	cronjob, _ := cronjobRepo.Get(repo.WithByID(id))
 	if cronjob.ID == 0 {
 		return buserr.New("ErrRecordNotFound")
+	}
+	if cronjob.IsExecuting {
+		return buserr.New("InExecuting")
 	}
 	u.HandleJob(&cronjob)
 	return nil
@@ -606,7 +579,7 @@ func (u *CronjobService) Create(req dto.CronjobOperate) error {
 	if err := cronjobRepo.Create(&cronjob); err != nil {
 		return err
 	}
-	if req.AlertCount != 0 {
+	if req.AlertCount != 0 && req.AlertTitle != "" && req.AlertMethod != "" {
 		createAlert := dto.AlertCreate{
 			Title:     req.AlertTitle,
 			SendCount: req.AlertCount,
@@ -710,6 +683,7 @@ func (u *CronjobService) Update(id uint, req dto.CronjobOperate) error {
 		upMap["status"] = constant.StatusEnable
 	}
 	upMap["name"] = req.Name
+	upMap["group_id"] = req.GroupID
 	upMap["spec_custom"] = req.SpecCustom
 	upMap["spec"] = spec
 	upMap["script"] = req.Script

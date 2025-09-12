@@ -15,6 +15,9 @@ ErrApiConfigIPInvalid: 'API インターフェースの呼び出しに使用さ�
 ErrApiConfigDisable: 'このインターフェースは、API インターフェース呼び出しの使用を禁止しています: {{ .detail }}'
 ErrApiConfigKeyTimeInvalid: 'API インターフェースのタイムスタンプ エラー: {{ .detail }}'
 
+ErrMinQuickJump: "少なくとも1つのクイックジャンプエントリを設定してください！"
+ErrMaxQuickJump: "最大4つのクイックジャンプエントリを設定できます！"
+
 #common
 ErrUsernameIsExist: 'ユーザー名は既に存在します'
 ErrNameIsExist: '名前は既に存在します'
@@ -34,6 +37,7 @@ ErrGroupIsDefault: 'デフォルト グループ、削除できません'
 ErrGroupIsInWebsiteUse: 'グループは別の Web サイトで使用されているため、削除できません。'
 
 #backup
+Localhost: 'ローカルマシン'
 ErrBackupInUsed: 'バックアップ アカウントはスケジュールされたタスクで使用されているため、削除できません。'
 ErrBackupCheck: 'バックアップ アカウントのテスト接続に失敗しました {{ .err }}'
 ErrBackupLocalDelete: 'ローカル サーバーのバックアップ アカウントの削除はまだサポートされていません'
@@ -79,9 +83,7 @@ AppStoreIsLastVersion: 'App Store はすでに最新バージョンです'
 AppStoreSyncSuccess: 'App Store の同期が成功しました'
 SyncAppDetail: 'アプリケーション構成を同期する'
 AppVersionNotMatch: '{{ .name }} アプリケーションには、より高い 1Panel バージョンが必要なため、同期をスキップします'
-MoveSiteDir: '現在のアップグレードでは、OpenResty Web サイト ディレクトリの移行が必要です'
-MoveSiteToDir: 'サイト ディレクトリを {{ .name }} に移行します'
-ErrMoveSiteDir: 'サイト ディレクトリの移行に失敗しました'
+MoveSiteDir: "ウェブサイトディレクトリの変更を検出しました。OpenResty ウェブサイトディレクトリを {{ .name }} に移行する必要があります"
 MoveSiteDirSuccess: 'Web サイト ディレクトリの移行に成功しました'
 DeleteRuntimePHP: 'PHP ランタイムを削除する'
 CustomAppStoreFileValid: 'App Store パッケージは .tar.gz 形式である必要があります'
@@ -92,6 +94,15 @@ ErrCustomRuntimes: 'ランタイム環境がインストールされています
 ErrAppVersionDeprecated: "{{ .name }} アプリケーションは現在の 1Panel バージョンと互換性がありません、スキップしました"
 ErrDockerFailed: "Docker の状態が異常です。サービス状態を確認してください"
 ErrDockerComposeCmdNotFound: "Docker Compose コマンドは存在しません。ホストマシンにこのコマンドを先にインストールしてください"
+
+#ssh
+ExportIP: "ログインIP"
+ExportArea: "地域"
+ExportPort: "ポート"
+ExportAuthMode: "ログイン方式"
+ExportUser: "ユーザー"
+ExportStatus: "ログイン状態"
+ExportDate: "時間"
 
 #file
 ErrFileCanNotRead: 'このファイルはプレビューをサポートしていません'
@@ -108,6 +119,9 @@ ErrFavoriteExist: 'このパスはすでにお気に入りに登録されてい�
 ErrInvalidChar: '不正な文字は許可されません'
 ErrPathNotDelete: '選択されたディレクトリは削除できません'
 ErrLogFileToLarge: "ログファイルが500MBを超えており、開くことができません"
+FileDropFailed: "ファイル {{ .name }} のクリーンアップに失敗しました: {{ .err }}"
+FileDropSuccess: "ファイル {{ .name }} のクリーンアップに成功しました、{{ .count }} ファイルを削除、{{ .size }} のディスク領域を解放"
+FileDropSum: "ファイルのクリーンアップが完了しました、合計 {{ .count }} ファイルを削除、合計 {{ .size }} のディスク領域を解放"
 
 #website
 ErrAliasIsExist: 'エイリアスがすでに存在します'
@@ -123,6 +137,9 @@ ErrBuildDirNotFound: 'ビルド ディレクトリが存在しません'
 ErrImageNotExist: 'オペレーティング環境 {{ .name }} イメージが存在しません。オペレーティング環境を再編集してください'
 ErrProxyIsUsed: "ロードバランシングはリバースプロキシによって使用されているため、削除できません"
 ErrSSLValid: '証明書ファイルが異常です、証明書の状態を確認してください！'
+ErrWebsiteDir: "ウェブサイトディレクトリ内のディレクトリを選択してください。"
+ErrComposerFileNotFound: "composer.json ファイルが存在しません"
+ErrRuntimeNoPort: "ランタイム環境にポートが設定されていません。先にランタイム環境を編集してください。"
 
 #ssl
 ErrSSLCannotDelete: '{{ .name }} 証明書は Web サイトで使用されているため、削除できません'
@@ -156,6 +173,9 @@ StartUpdateSystemSSL: 'システム証明書の更新を開始します'
 UpdateSystemSSLSuccess: 'システム証明書を正常に更新しました'
 ErrWildcardDomain: 'HTTP モードでワイルドカード ドメイン名証明書を申請できません'
 ErrApplySSLCanNotDelete: "申請中の証明書 {{.name}} は削除できません。しばらくしてからもう一度お試しください。"
+StartPushSSLToNode: "証明書をノードにプッシュ開始"
+PushSSLToNodeFailed: "ノードに証明書をプッシュ失敗: {{ .err }}"
+PushSSLToNodeSuccess: "ノードに証明書をプッシュ成功"
 
 #mysql
 ErrUserIsExist: '現在のユーザーは既に存在します。再入力してください'
@@ -210,8 +230,12 @@ SystemLog: 'システムログ'
 CutWebsiteLog: 'ウェブサイトログのローテーション'
 FileOrDir: 'ディレクトリ / ファイル'
 UploadFile: 'バックアップファイル {{ .file }} を {{ .backup }} にアップロード中'
-IgnoreBackupErr: 'バックアップ失敗、エラー：{{ .detail }}、このエラーを無視します...'
-IgnoreUploadErr: 'アップロード失敗、エラー：{{ .detail }}、このエラーを無視します...'
+Upload: "アップロード"
+IgnoreBackupErr: "バックアップ失敗、エラー: {{ .detail }}、このエラーを無視します..."
+IgnoreUploadErr: "アップロード失敗、エラー: {{ .detail }}、このエラーを無視します..."
+LoadBackupFailed: "バックアップアカウントの接続取得に失敗、エラー: {{ .detail }}"
+InExecuting: "現在のタスクは実行中です。重複して実行しないでください！"
+NoSuchResource: "データベースにバックアップ内容が見つかりませんでした。スキップします..."
 
 #toolbox
 ErrNotExistUser: '現在のユーザーは存在しません。変更してもう一度お試しください。'
@@ -271,6 +295,7 @@ allow: '許可'
 deny: '拒否'
 OpenrestyNotFound: 'Openresty がインストールされていません'
 remoteIpIsNull: "IPリストが空です"
+OpenrestyVersionErr: "Openrestyのバージョンが低すぎます。Openrestyを1.27.1.2-2-2-focalにアップグレードしてください"
 
 #task
 TaskStart: '{{ .name }} タスクが開始されました [START]'
@@ -327,6 +352,11 @@ SubTask: 'サブタスク'
 RuntimeExtension: 'ランタイム環境拡張'
 TaskIsExecuting: 'タスクは実行中です'
 CustomAppstore: 'カスタム アプリケーション ウェアハウス'
+TaskExec: '実行'
+
+# task - clam
+Clamscan: "{{ .name }} をスキャン"
+TaskScan: "スキャン"
 
 #task - ai
 OllamaModelPull: 'Ollama モデル {{ .name }} をプルします'
@@ -356,7 +386,6 @@ SnapCompressFile: 'スナップショット ファイルを圧縮する'
 SnapCheckCompress: 'スナップショット圧縮ファイルをチェックする'
 SnapCompressSize: 'スナップショット ファイル サイズ {{ .name }}'
 SnapUpload: 'スナップショット ファイルをアップロード'
-SnapLoadBackup: 'バックアップ アカウント情報を取得する'
 SnapUploadTo: 'スナップショット ファイルを {{ .name }} にアップロードします'
 SnapUploadRes: 'スナップショット ファイルを {{ .name }} にアップロードします'
 
@@ -445,3 +474,16 @@ DiskUsedAlert: "1Panel のディスク '{{ .name }}' は {{ .used }} 使用さ�
 ResourceAlert: "1Panel の {{ .time }} 分間の平均 {{ .name }} 使用率は {{ .used }} です。詳細はパネルでご確認ください。"
 PanelVersionAlert: "1Panel に新しいバージョンが利用可能です。アップグレードはパネルから行ってください。"
 PanelPwdExpirationAlert: "1Panel のパスワードは {{ .day }} 日後に期限切れとなります。詳細はパネルでご確認ください。"
+CommonAlert: "お使いの1Panel、{{ .msg }}、詳細はパネルにログインしてご確認ください。"
+NodeExceptionAlert: "お使いの1Panel、{{ .num }}個のノードに異常があります。詳細はパネルにログインしてご確認ください。"
+LicenseExceptionAlert: "お使いの1Panel、{{ .num }}個のライセンスに異常があります。詳細はパネルにログインしてご確認ください。"
+SSHAndPanelLoginAlert: "お使いの1Panel、パネル{{ .name }}が{{ .ip }}から異常ログインしました。詳細はパネルにログインしてご確認ください。"
+
+#disk
+DeviceNotFound: "デバイス {{ .name }} が見つかりません"
+DeviceIsMounted: "デバイス {{ .name }} はマウントされています、まずアンマウントしてください"
+PartitionDiskErr: "パーティションに失敗しました、{{ .err }}"
+FormatDiskErr: "ディスクのフォーマットに失敗しました、{{ .err }}"
+MountDiskErr: "ディスクのマウントに失敗しました、{{ .err }}"
+UnMountDiskErr: "ディスクのアンマウントに失敗しました、{{ .err }}"
+XfsNotFound: "xfs ファイルシステムが検出されませんでした、最初に xfsprogs をインストールしてください"

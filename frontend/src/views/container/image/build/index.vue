@@ -5,6 +5,7 @@
         @close="handleClose"
         size="large"
         :autoClose="false"
+        :fullScreen="true"
     >
         <el-form ref="formRef" label-position="top" :model="form" label-width="80px" :rules="rules">
             <el-form-item :label="$t('commons.table.name')" prop="name">
@@ -26,7 +27,7 @@
             <el-form-item v-else :rules="Rules.requiredSelect" prop="dockerfile">
                 <el-input clearable v-model="form.dockerfile">
                     <template #prepend>
-                        <FileList @choose="loadBuildDir"></FileList>
+                        <el-button icon="Folder" @click="fileRef.acceptParams({})" />
                     </template>
                 </el-input>
             </el-form-item>
@@ -45,6 +46,7 @@
         </template>
     </DrawerPro>
     <TaskLog ref="taskLogRef" width="70%" />
+    <FileList ref="fileRef" @choose="loadBuildDir" />
 </template>
 
 <script lang="ts" setup>
@@ -60,6 +62,7 @@ import { MsgSuccess } from '@/utils/message';
 
 const drawerVisible = ref(false);
 const taskLogRef = ref();
+const fileRef = ref();
 
 const form = reactive({
     taskID: '',

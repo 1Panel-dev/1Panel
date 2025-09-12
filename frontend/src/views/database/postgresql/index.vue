@@ -148,7 +148,7 @@
                                     class="ml-1.5"
                                 ></el-button>
                                 <div>
-                                    <CopyButton :content="row.password" type="icon" />
+                                    <CopyButton :content="row.password" />
                                 </div>
                             </div>
                         </template>
@@ -236,6 +236,7 @@ import AppStatus from '@/components/app-status/index.vue';
 import Backups from '@/components/backup/index.vue';
 import UploadDialog from '@/components/upload/index.vue';
 import PortJumpDialog from '@/components/port-jump/index.vue';
+import Tooltip from '@/components/tooltip/index.vue';
 import { dateFormat } from '@/utils/util';
 import { computed, onMounted, reactive, ref } from 'vue';
 import {
@@ -249,9 +250,9 @@ import i18n from '@/lang';
 import { Database } from '@/api/interface/database';
 import { App } from '@/api/interface/app';
 import { getAppPort } from '@/api/modules/app';
-import router from '@/routers';
 import { MsgSuccess } from '@/utils/message';
 import { GlobalStore } from '@/store';
+import { routerToName, routerToNameWithParams, routerToNameWithQuery } from '@/utils/router';
 const globalStore = GlobalStore();
 
 const mobile = computed(() => {
@@ -288,7 +289,7 @@ const data = ref();
 const paginationConfig = reactive({
     cacheSizeKey: 'postgresql-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('postgresql-page-size')) || 10,
+    pageSize: Number(localStorage.getItem('postgresql-page-size')) || 20,
     total: 0,
     orderBy: 'createdAt',
     order: 'null',
@@ -326,7 +327,7 @@ const goRemoteDB = async () => {
     if (currentDB.value) {
         globalStore.setCurrentDB(currentDB.value.database);
     }
-    router.push({ name: 'PostgreSQL-Remote' });
+    routerToName('PostgreSQL-Remote');
 };
 
 const passwordRef = ref();
@@ -335,10 +336,7 @@ const onSetting = async () => {
     if (currentDB.value) {
         globalStore.setCurrentDB(currentDB.value.database);
     }
-    router.push({
-        name: 'PostgreSQL-Setting',
-        params: { type: currentDB.value.type, database: currentDB.value.database },
-    });
+    routerToNameWithParams('PostgreSQL-Setting', { type: currentDB.value.type, database: currentDB.value.database });
 };
 
 const changeDatabase = async () => {
@@ -406,10 +404,10 @@ const loadDB = async () => {
 
 const goRouter = async (target: string) => {
     if (target === 'app') {
-        router.push({ name: 'AppAll', query: { install: 'postgresql' } });
+        routerToNameWithQuery('AppAll', { install: 'postgresql' });
         return;
     }
-    router.push({ name: 'PostgreSQL-Remote' });
+    routerToName('PostgreSQL-Remote');
 };
 
 const onChange = async (info: any) => {
@@ -429,7 +427,7 @@ const goDashboard = async () => {
 };
 
 const getAppDetail = () => {
-    router.push({ name: 'AppAll', query: { install: dashboardKey.value } });
+    routerToNameWithQuery('AppAll', { install: dashboardKey.value });
 };
 
 const loadPGAdminPort = async () => {

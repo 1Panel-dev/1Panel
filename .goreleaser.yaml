@@ -32,6 +32,7 @@ builds:
       - arm
       - ppc64le
       - s390x
+      - riscv64
     hooks:
       post:
         - ./ci/script.sh compress_binary {{ .Path }} {{ .Arch }}
@@ -57,6 +58,7 @@ builds:
       - arm
       - ppc64le
       - s390x
+      - riscv64
     hooks:
       post:
         - ./ci/script.sh compress_binary {{ .Path }} {{ .Arch }}

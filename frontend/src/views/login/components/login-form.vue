@@ -12,6 +12,7 @@
                     <div class="space-y-6 flex-grow">
                         <el-form-item>
                             <el-input
+                                ref="mfaLoginRef"
                                 size="large"
                                 :placeholder="$t('commons.login.mfaCode')"
                                 v-model.trim="mfaLoginForm.code"
@@ -27,7 +28,7 @@
                             <el-button
                                 @focus="mfaButtonFocused = true"
                                 @blur="mfaButtonFocused = false"
-                                class="w-full"
+                                class="w-full login-button"
                                 type="primary"
                                 @click="mfaLogin(false)"
                             >
@@ -79,6 +80,7 @@
                                 size="large"
                                 name="username"
                                 autocomplete="username"
+                                ref="userNameRef"
                             ></el-input>
                         </el-form-item>
                         <el-form-item prop="password" class="w-full">
@@ -181,8 +183,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, reactive, onMounted, computed, nextTick } from 'vue';
 import type { ElForm } from 'element-plus';
 import { loginApi, getCaptcha, mfaLoginApi, getLoginSetting } from '@/api/modules/auth';
 import { GlobalStore, MenuStore, TabsStore } from '@/store';
@@ -190,6 +191,8 @@ import { MsgError, MsgSuccess } from '@/utils/message';
 import { useI18n } from 'vue-i18n';
 import { encryptPassword } from '@/utils/util';
 import { getXpackSettingForTheme } from '@/utils/xpack';
+import { routerToName } from '@/utils/router';
+import { changeToLocal } from '@/utils/node';
 
 const i18n = useI18n();
 const themeConfig = computed(() => globalStore.themeConfig);
@@ -251,6 +254,8 @@ function checkAgreeLicense(rule: any, value: any, callback: any) {
 }
 
 let isLoggingIn = false;
+const userNameRef = ref();
+const mfaLoginRef = ref();
 const mfaButtonFocused = ref();
 const mfaLoginForm = reactive({
     name: '',
@@ -268,7 +273,6 @@ const captcha = reactive({
 
 const loading = ref<boolean>(false);
 const mfaShow = ref<boolean>(false);
-const router = useRouter();
 const dropdownText = ref('中文(简体)');
 
 function handleCommand(command: string) {
@@ -338,15 +342,18 @@ const login = (formEl: FormInstance | undefined) => {
             if (res.data.mfaStatus === 'Enable') {
                 mfaShow.value = true;
                 errMfaInfo.value = false;
+                nextTick(() => {
+                    mfaLoginRef.value?.focus();
+                });
                 return;
             }
             globalStore.setLogStatus(true);
             globalStore.setAgreeLicense(true);
             menuStore.setMenuList([]);
             tabsStore.removeAllTabs();
-            globalStore.currentNode = 'local';
+            changeToLocal();
             MsgSuccess(i18n.t('commons.msg.loginSuccess'));
-            router.push({ name: 'home' });
+            routerToName('home');
             document.onkeydown = null;
         } catch (res) {
             if (res.code === 401) {
@@ -386,8 +393,8 @@ const mfaLogin = async (auto: boolean) => {
             menuStore.setMenuList([]);
             tabsStore.removeAllTabs();
             MsgSuccess(i18n.t('commons.msg.loginSuccess'));
-            globalStore.currentNode = 'local';
-            router.push({ name: 'home' });
+            changeToLocal();
+            routerToName('home');
             document.onkeydown = null;
         } catch (res) {
             if (res.code === 401) {
@@ -484,7 +491,9 @@ onMounted(() => {
         '--login-loading-mask-color',
         adjustColorToRGBA(loginBtnLinkColor.value, 30, 15),
     );
-
+    nextTick(() => {
+        userNameRef.value?.focus();
+    });
     loginForm.agreeLicense = globalStore.agreeLicense;
     document.onkeydown = (e: any) => {
         e = window.event || e;

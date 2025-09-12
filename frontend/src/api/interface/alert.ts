@@ -13,6 +13,7 @@ export namespace Alert {
         status: string;
         sendCount: number;
         sendMethod: string[];
+        advancedParams: string;
     }
 
     export interface AlertDetail {

@@ -14,6 +14,12 @@ ErrApiConfigKeyInvalid: 'Ошибка ключа интерфейса API: {{ .d
 ErrApiConfigIPInvalid: 'IP-адрес, используемый для вызова интерфейса API, отсутствует в белом списке: {{ .detail }}'
 ErrApiConfigDisable: 'Этот интерфейс запрещает использование вызовов интерфейса API: {{ .detail }}'
 ErrApiConfigKeyTimeInvalid: 'Ошибка временной метки интерфейса API: {{ .detail }}'
+StartPushSSLToNode: "Начало отправки сертификата на узел"
+PushSSLToNodeFailed: "Не удалось отправить сертификат на узел: {{ .err }}"
+PushSSLToNodeSuccess: "Сертификат успешно отправлен на узел"
+
+ErrMinQuickJump: "Пожалуйста, установите хотя бы одну запись быстрого перехода!"
+ErrMaxQuickJump: "Можно установить до четырех записей быстрого перехода!"
 
 #общий
 ErrUsernameIsExist: 'Имя пользователя уже существует'
@@ -34,6 +40,7 @@ ErrGroupIsDefault: 'Группа по умолчанию, не может быт
 ErrGroupIsInWebsiteUse: 'Группа используется другим веб-сайтом и не может быть удалена.'
 
 #резервное копирование
+Localhost: 'Локальная машина'
 ErrBackupInUsed: 'Учетная запись резервного копирования использовалась в запланированной задаче и не может быть удалена.'
 ErrBackupCheck: 'Проверка подключения к резервной копии учетной записи не удалась {{ .err }}'
 ErrBackupLocalDelete: 'Удаление учетной записи резервного копирования локального сервера пока не поддерживается'
@@ -79,9 +86,7 @@ AppStoreIsLastVersion: 'В App Store уже установлена послед�
 AppStoreSyncSuccess: 'Синхронизация с App Store прошла успешно'
 SyncAppDetail: 'Синхронизировать конфигурацию приложения'
 AppVersionNotMatch: 'Приложению {{ .name }} требуется более высокая версия 1Panel, синхронизация пропускается'
-MoveSiteDir: 'Текущее обновление требует миграции каталога веб-сайта OpenResty'
-MoveSiteToDir: 'Перенести каталог сайта в {{ .name }}'
-ErrMoveSiteDir: 'Не удалось перенести каталог сайта'
+MoveSiteDir: "Обнаружено изменение каталога сайта. Необходимо перенести каталог сайта OpenResty в {{ .name }}"
 MoveSiteDirSuccess: 'Успешная миграция каталога веб-сайта'
 DeleteRuntimePHP: 'Удалить среду выполнения PHP'
 CustomAppStoreFileValid: 'Пакеты магазина приложений должны быть в формате .tar.gz'
@@ -92,6 +97,15 @@ ErrCustomRuntimes: 'Установлена среда выполнения. Сн
 ErrAppVersionDeprecated: "Приложение {{ .name }} несовместимо с текущей версией 1Panel, пропущено"
 ErrDockerFailed: "Состояние Docker аномально, проверьте состояние сервиса"
 ErrDockerComposeCmdNotFound: "Команда Docker Compose отсутствует, пожалуйста, установите эту команду на хост-машине сначала"
+
+#ssh
+ExportIP: "IP входа"
+ExportArea: "Местоположение"
+ExportPort: "Порт"
+ExportAuthMode: "Способ входа"
+ExportUser: "Пользователь"
+ExportStatus: "Статус входа"
+ExportDate: "Время"
 
 #файл
 ErrFileCanNotRead: 'Этот файл не поддерживает предварительный просмотр'
@@ -108,6 +122,9 @@ ErrFavoriteExist: 'Этот путь уже добавлен в избранно
 ErrInvalidChar: 'Недопустимые символы не допускаются'
 ErrPathNotDelete: 'Выбранный каталог не может быть удален'
 ErrLogFileToLarge: "Файл журнала превышает 500MB и не может быть открыт"
+FileDropFailed: "Не удалось очистить файл {{ .name }}: {{ .err }}"
+FileDropSuccess: "Файл {{ .name }} успешно очищен, удалено {{ .count }} файлов, освобождено {{ .size }} дискового пространства"
+FileDropSum: "Очистка файлов завершена успешно, всего удалено {{ .count }} файлов, освобождено {{ .size }} дискового пространства"
 
 #веб-сайт
 ErrAliasIsExist: 'Псевдоним уже существует'
@@ -123,6 +140,9 @@ ErrBuildDirNotFound: 'Каталог сборки не существует'
 ErrImageNotExist: 'Образ операционной среды {{ .name }} не существует, пожалуйста, отредактируйте операционную среду заново'
 ErrProxyIsUsed: "Балансировка нагрузки используется обратным прокси, невозможно удалить"
 ErrSSLValid: 'Файл сертификата аномален, проверьте статус сертификата!'
+ErrWebsiteDir: "Пожалуйста, выберите директорию внутри директории сайта."
+ErrComposerFileNotFound: "Файл composer.json не существует"
+ErrRuntimeNoPort: "Среда выполнения не настроена с портом, сначала отредактируйте среду выполнения."
 
 #ssl
 ErrSSLCannotDelete: 'Сертификат {{ .name }} используется веб-сайтом и не может быть удален'
@@ -210,8 +230,12 @@ SystemLog: 'Системный лог'
 CutWebsiteLog: 'Ротация логов сайта'
 FileOrDir: 'Каталог / Файл'
 UploadFile: 'Загрузка файла резервной копии {{ .file }} в {{ .backup }}'
-IgnoreBackupErr: 'Ошибка резервного копирования: {{ .detail }}, игнорируем эту ошибку...'
-IgnoreUploadErr: 'Ошибка загрузки: {{ .detail }}, игнорируем эту ошибку...'
+Upload: "Загрузить"
+IgnoreBackupErr: "Ошибка резервного копирования: {{ .detail }}, игнорируем эту ошибку..."
+IgnoreUploadErr: "Ошибка загрузки: {{ .detail }}, игнорируем эту ошибку..."
+LoadBackupFailed: "Не удалось получить подключение к учетной записи резервной копии, ошибка: {{ .detail }}"
+InExecuting: "Текущая задача выполняется, не повторяйте выполнение!"
+NoSuchResource: "В базе данных не найдено содержимое резервной копии, пропускаем..."
 
 #ящик для инструментов
 ErrNotExistUser: 'Текущий пользователь не существует, измените его и повторите попытку!'
@@ -271,6 +295,7 @@ allow: 'разрешить'
 deny: 'отрицать'
 OpenrestyNotFound: 'Openresty не установлен'
 remoteIpIsNull: "Список IP пуст"
+OpenrestyVersionErr: "Версия Openresty слишком низкая, пожалуйста, обновите Openresty до 1.27.1.2-2-2-focal"
 
 #задача
 TaskStart: '{{ .name }} Задача начинается [START]'
@@ -327,6 +352,11 @@ SubTask: 'Подзадача'
 RuntimeExtension: 'Расширение среды выполнения'
 TaskIsExecuting: 'Задача выполняется'
 CustomAppstore: 'Хранилище пользовательских приложений'
+TaskExec: 'Выполнить'
+
+# task - clam
+Clamscan: "Сканировать {{ .name }}"
+TaskScan: "Сканировать"
 
 # задача - ай
 OllamaModelPull: 'Вытянуть модель Ollama {{ .name }}'
@@ -356,7 +386,6 @@ SnapCompressFile: 'Сжать файл моментального снимка'
 SnapCheckCompress: 'Проверить файл сжатия снимка'
 SnapCompressSize: 'Размер файла снимка {{ .name }}'
 SnapUpload: 'Загрузить файл снимка'
-SnapLoadBackup: 'Получить резервную информацию об учетной записи'
 SnapUploadTo: 'Загрузить файл снимка в {{ .name }}'
 SnapUploadRes: 'Загрузить файл снимка в {{ .name }}'
 
@@ -445,3 +474,16 @@ DiskUsedAlert: "Диск '{{ .name }}' на вашем 1Panel используе
 ResourceAlert: "Средняя загрузка {{ .name }} за {{ .time }} минут составляет {{ .used }}. Подробности смотрите в панели."
 PanelVersionAlert: "Доступна новая версия 1Panel. Обновитесь через панель."
 PanelPwdExpirationAlert: "Пароль для 1Panel истекает через {{ .day }} дней. Подробности смотрите в панели."
+CommonAlert: "Ваш 1Panel, {{ .msg }}. Подробности смотрите, войдя в панель."
+NodeExceptionAlert: "Ваш 1Panel, {{ .num }} узлов работают неправильно. Подробности смотрите, войдя в панель."
+LicenseExceptionAlert: "Ваш 1Panel, {{ .num }} лицензий работают неправильно. Подробности смотрите, войдя в панель."
+SSHAndPanelLoginAlert: "Ваш 1Panel, обнаружен аномальный вход в панель {{ .name }} с {{ .ip }}. Подробности смотрите, войдя в панель."
+
+#disk
+DeviceNotFound: "Устройство {{ .name }} не найдено"
+DeviceIsMounted: "Устройство {{ .name }} подключено, сначала отключите"
+PartitionDiskErr: "Не удалось разделить, {{ .err }}"
+FormatDiskErr: "Не удалось отформатировать диск, {{ .err }}"
+MountDiskErr: "Не удалось подключить диск, {{ .err }}"
+UnMountDiskErr: "Не удалось отключить диск, {{ .err }}"
+XfsNotFound: "Файловая система xfs не обнаружена, сначала установите xfsprogs"

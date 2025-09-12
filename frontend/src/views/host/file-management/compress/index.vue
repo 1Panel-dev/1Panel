@@ -21,7 +21,7 @@
             <el-form-item :label="$t('file.compressDst')" prop="dst">
                 <el-input v-model="form.dst">
                     <template #prepend>
-                        <FileList :path="form.dst" @choose="getLinkPath" :dir="true"></FileList>
+                        <el-button icon="Folder" @click="fileRef.acceptParams({ dir: true, path: form.dst })" />
                     </template>
                 </el-input>
             </el-form-item>
@@ -39,6 +39,7 @@
             </span>
         </template>
     </DrawerPro>
+    <FileList ref="fileRef" @choose="getLinkPath" />
 </template>
 
 <script setup lang="ts">
@@ -72,6 +73,7 @@ const options = ref<string[]>([]);
 const open = ref(false);
 const title = ref('');
 const operate = ref('compress');
+const fileRef = ref();
 
 const em = defineEmits(['close']);
 

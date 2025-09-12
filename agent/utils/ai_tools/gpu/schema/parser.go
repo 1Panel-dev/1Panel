@@ -33,9 +33,12 @@ func Parse(buf []byte, version string) (*common.GpuInfo, error) {
 
 		gpuItem.Temperature = s.Gpu[i].Temperature.GpuTemp
 		gpuItem.PerformanceState = s.Gpu[i].PerformanceState
-		if version == "v12" {
+		if version == "v12" || version == "v13" {
 			gpuItem.PowerDraw = s.Gpu[i].GpuPowerReadings.PowerDraw
-			gpuItem.MaxPowerLimit = s.Gpu[i].GpuPowerReadings.MaxPowerLimit
+			if len(gpuItem.PowerDraw) == 0 {
+				gpuItem.PowerDraw = s.Gpu[i].GpuPowerReadings.InstantPowerDraw
+			}
+			gpuItem.MaxPowerLimit = s.Gpu[i].GpuPowerReadings.CurrentPowerLimit
 		} else {
 			gpuItem.PowerDraw = s.Gpu[i].PowerReadings.PowerDraw
 			gpuItem.MaxPowerLimit = s.Gpu[i].PowerReadings.MaxPowerLimit

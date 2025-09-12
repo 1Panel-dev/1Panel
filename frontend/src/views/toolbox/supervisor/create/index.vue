@@ -21,7 +21,9 @@
             </el-form-item>
             <el-form-item :label="$t('tool.supervisor.dir')" prop="dir">
                 <el-input v-model.trim="process.dir">
-                    <template #prepend><FileList @choose="getPath" :dir="true"></FileList></template>
+                    <template #prepend>
+                        <el-button icon="Folder" @click="fileRef.acceptParams({ dir: true })" />
+                    </template>
                 </el-input>
             </el-form-item>
             <el-form-item :label="$t('tool.supervisor.command')" prop="command">
@@ -32,6 +34,11 @@
             </el-form-item>
             <el-form-item :label="$t('tool.supervisor.autoRestart')" prop="autoRestart">
                 <el-switch v-model="process.autoRestart" active-value="true" inactive-value="false"></el-switch>
+                <span class="input-help">{{ $t('tool.supervisor.autoRestartHelper') }}</span>
+            </el-form-item>
+            <el-form-item :label="$t('tool.supervisor.autoStart')" prop="autoStart">
+                <el-switch v-model="process.autoStart" active-value="true" inactive-value="false"></el-switch>
+                <span class="input-help">{{ $t('tool.supervisor.autoStartHelper') }}</span>
             </el-form-item>
         </el-form>
         <template #footer>
@@ -43,6 +50,7 @@
             </span>
         </template>
     </DrawerPro>
+    <FileList ref="fileRef" @choose="getPath" />
 </template>
 
 <script lang="ts" setup>
@@ -57,6 +65,7 @@ import { HostTool } from '@/api/interface/host-tool';
 
 const open = ref(false);
 const loading = ref(false);
+const fileRef = ref();
 const processForm = ref<FormInstance>();
 const rules = ref({
     name: [Rules.requiredInput, Rules.supervisorName],
@@ -74,6 +83,7 @@ const initData = () => ({
     numprocsNum: 1,
     numprocs: '1',
     autoRestart: 'true',
+    autoStart: 'true',
 });
 const process = ref(initData());
 
@@ -105,6 +115,7 @@ const acceptParams = (operate: string, config: HostTool.SupersivorProcess) => {
             numprocsNum: 1,
             numprocs: config.numprocs,
             autoRestart: config.autoRestart,
+            autoStart: config.autoStart,
         };
         process.value.numprocsNum = Number(config.numprocs);
     }

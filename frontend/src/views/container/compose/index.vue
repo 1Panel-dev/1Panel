@@ -1,8 +1,5 @@
 <template>
     <div v-loading="loading">
-        <div v-show="isOnDetail">
-            <ComposeDetail ref="composeDetailRef" />
-        </div>
         <docker-status
             v-model:isActive="isActive"
             v-model:isExist="isExist"
@@ -10,7 +7,7 @@
             @search="search"
         />
 
-        <LayoutContent v-if="!isOnDetail && isExist" :title="$t('container.compose', 2)" :class="{ mask: !isActive }">
+        <LayoutContent v-if="isExist" :title="$t('container.compose', 2)" :class="{ mask: !isActive }">
             <template #leftToolBar>
                 <el-button type="primary" @click="onOpenDialog()">
                     {{ $t('container.createCompose') }}
@@ -52,30 +49,41 @@
                     </el-table-column>
                     <el-table-column :label="$t('container.composeDirectory')" min-width="80" fix>
                         <template #default="{ row }">
-                            <el-button type="primary" link @click="toComposeFolder(row)">
-                                <el-icon>
-                                    <FolderOpened />
-                                </el-icon>
-                            </el-button>
+                            <el-tooltip :content="row.workdir">
+                                <el-button type="primary" link @click="toComposeFolder(row)">
+                                    <el-icon>
+                                        <FolderOpened />
+                                    </el-icon>
+                                </el-button>
+                            </el-tooltip>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('container.containerStatus')" min-width="80" fix>
-                        <template #default="scope">
-                            <div>
-                                {{ getContainerStatus(scope.row.containers) }}
-                            </div>
+                        <template #default="{ row }">
+                            <el-text class="mx-1" v-if="row.containerCount == 0" type="danger">
+                                {{ $t('container.exited') }}
+                            </el-text>
+                            <el-popover width="300px" v-else>
+                                <template #reference>
+                                    <el-text
+                                        class="cursor-pointer"
+                                        size="small"
+                                        :type="row.containerCount === row.runningCount ? 'success' : 'warning'"
+                                    >
+                                        {{ $t('container.running', [row.runningCount, row.containerCount]) }}
+                                    </el-text>
+                                </template>
+                                <div v-for="(item, index) in row.containers" :key="index" class="mt-2">
+                                    <span>{{ item.name }}</span>
+                                    <Status class="float-right" :key="item.state" :status="item.state" />
+                                </div>
+                            </el-popover>
                         </template>
                     </el-table-column>
-                    <el-table-column
-                        :label="$t('container.containerNumber')"
-                        prop="containerNumber"
-                        min-width="80"
-                        fix
-                    />
                     <el-table-column :label="$t('commons.table.createdAt')" prop="createdAt" min-width="80" fix />
                     <fu-table-operations
                         width="200px"
-                        :ellipsis="10"
+                        :ellipsis="2"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
                         fix
@@ -84,6 +92,7 @@
             </template>
         </LayoutContent>
 
+        <ComposeLogs ref="composeLogRef" />
         <EditDialog ref="dialogEditRef" @search="search" />
         <CreateDialog @search="search" ref="dialogRef" />
         <DeleteDialog @search="search" ref="dialogDelRef" />
@@ -95,32 +104,33 @@ import { reactive, ref } from 'vue';
 import EditDialog from '@/views/container/compose/edit/index.vue';
 import CreateDialog from '@/views/container/compose/create/index.vue';
 import DeleteDialog from '@/views/container/compose/delete/index.vue';
-import ComposeDetail from '@/views/container/compose/detail/index.vue';
-import { inspect, searchCompose } from '@/api/modules/container';
+import ComposeLogs from '@/components/log/compose/index.vue';
+import { composeOperator, inspect, searchCompose } from '@/api/modules/container';
 import DockerStatus from '@/views/container/docker-status/index.vue';
 import i18n from '@/lang';
 import { Container } from '@/api/interface/container';
-import router from '@/routers';
+import { routerToFileWithPath, routerToNameWithQuery } from '@/utils/router';
+import { MsgSuccess } from '@/utils/message';
 
 const data = ref();
 const selects = ref<any>([]);
 const loading = ref(false);
 
-const isOnDetail = ref(false);
-
 const paginationConfig = reactive({
     cacheSizeKey: 'container-compose-page-size',
     currentPage: 1,
-    pageSize: 10,
+    pageSize: Number(localStorage.getItem('container-compose-page-size')) || 20,
     total: 0,
 });
 const searchName = ref();
+
+const composeLogRef = ref();
 
 const isActive = ref(false);
 const isExist = ref(false);
 
 const toComposeFolder = async (row: Container.ComposeInfo) => {
-    router.push({ path: '/hosts/files', query: { path: row.workdir } });
+    routerToFileWithPath(row.workdir);
 };
 
 const search = async () => {
@@ -144,28 +154,8 @@ const search = async () => {
         });
 };
 
-const composeDetailRef = ref();
 const loadDetail = async (row: Container.ComposeInfo) => {
-    let params = {
-        createdBy: row.createdBy,
-        name: row.name,
-        path: row.path,
-        filters: 'com.docker.compose.project=' + row.name,
-    };
-    isOnDetail.value = true;
-    composeDetailRef.value!.acceptParams(params);
-};
-
-const getContainerStatus = (containers) => {
-    const safeContainers = containers || [];
-    const runningCount = safeContainers.filter((container) => container.state.toLowerCase() === 'running').length;
-    const totalCount = safeContainers.length;
-    const statusText = runningCount > 0 ? 'Running' : 'Exited';
-    if (statusText === 'Exited') {
-        return i18n.global.t('container.exited');
-    } else {
-        return i18n.global.t('container.running') + ` (${runningCount}/${totalCount})`;
-    }
+    routerToNameWithQuery('ContainerItem', { filters: 'com.docker.compose.project=' + row.name });
 };
 
 const dialogRef = ref();
@@ -195,6 +185,47 @@ const onEdit = async (row: Container.ComposeInfo) => {
     dialogEditRef.value!.acceptParams(params);
 };
 
+const onComposeOperate = async (operation: string, row: any) => {
+    let mes =
+        operation === 'down'
+            ? i18n.global.t('container.composeDownHelper', [row.name])
+            : i18n.global.t('container.composeOperatorHelper', [
+                  row.name,
+                  i18n.global.t('commons.operate.' + operation),
+              ]);
+    ElMessageBox.confirm(mes, i18n.global.t('commons.operate.' + operation), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+        type: 'info',
+    }).then(async () => {
+        let params = {
+            name: row.name,
+            path: row.path,
+            operation: operation,
+            withFile: false,
+            force: false,
+        };
+        loading.value = true;
+        await composeOperator(params)
+            .then(() => {
+                loading.value = false;
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                search();
+            })
+            .catch(() => {
+                loading.value = false;
+            });
+    });
+};
+
+const openLog = (row: any) => {
+    composeLogRef.value.acceptParams({
+        compose: row.path,
+        resource: row.name,
+        container: row.container,
+    });
+};
+
 const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
@@ -206,7 +237,31 @@ const buttons = [
         },
     },
     {
-        label: i18n.global.t('commons.button.delete'),
+        label: i18n.global.t('commons.button.log'),
+        click: (row: Container.ComposeInfo) => {
+            openLog(row);
+        },
+    },
+    {
+        label: i18n.global.t('commons.operate.start'),
+        click: (row: Container.ComposeInfo) => {
+            onComposeOperate('up', row);
+        },
+    },
+    {
+        label: i18n.global.t('commons.operate.stop'),
+        click: (row: Container.ComposeInfo) => {
+            onComposeOperate('stop', row);
+        },
+    },
+    {
+        label: i18n.global.t('commons.operate.restart'),
+        click: (row: Container.ComposeInfo) => {
+            onComposeOperate('restart', row);
+        },
+    },
+    {
+        label: i18n.global.t('commons.operate.delete'),
         click: (row: Container.ComposeInfo) => {
             onDelete(row);
         },

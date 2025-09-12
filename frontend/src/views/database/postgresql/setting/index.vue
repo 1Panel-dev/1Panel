@@ -28,7 +28,7 @@
 
             <template #main>
                 <div v-if="activeName === 'conf'">
-                    <CodemirrorPro v-model="postgresqlConf"></CodemirrorPro>
+                    <CodemirrorPro :heightDiff="320" v-model="postgresqlConf"></CodemirrorPro>
                     <el-button type="primary" class="mt-5" @click="onSaveConf">
                         {{ $t('commons.button.save') }}
                     </el-button>
@@ -82,8 +82,8 @@ import { changePort, checkAppInstalled } from '@/api/modules/app';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import router from '@/routers';
 import CodemirrorPro from '@/components/codemirror-pro/index.vue';
+import { routerToName } from '@/utils/router';
 
 const loading = ref(false);
 
@@ -205,7 +205,7 @@ const loadPostgresqlConf = async () => {
 };
 
 const goUpgrade = () => {
-    router.push({ name: 'AppUpgrade' });
+    routerToName('AppUpgrade');
 };
 
 const onLoadInfo = async () => {

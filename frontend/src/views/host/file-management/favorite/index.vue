@@ -17,7 +17,7 @@ import { reactive, ref } from 'vue';
 const paginationConfig = reactive({
     cacheSizeKey: 'favorite-page-size',
     currentPage: 1,
-    pageSize: 20,
+    pageSize: Number(localStorage.getItem('favorite-page-size')) || 20,
     total: 0,
 });
 const req = reactive({

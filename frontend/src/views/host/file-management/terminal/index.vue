@@ -5,6 +5,7 @@
         @close="handleClose"
         size="large"
         :autoClose="false"
+        :fullScreen="true"
     >
         <template #content>
             <Terminal style="height: calc(100vh - 100px)" ref="terminalRef"></Terminal>

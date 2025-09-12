@@ -2,7 +2,10 @@
     <el-form-item :label="$t('runtime.codeDir')" prop="codeDir">
         <el-input v-model.trim="runtime.codeDir" :disabled="mode === 'edit'" @blur="changeDir">
             <template #prepend>
-                <FileList :disabled="mode === 'edit'" :path="runtime.codeDir" @choose="getPath" :dir="true"></FileList>
+                <el-button
+                    icon="Folder"
+                    @click="fileRef.acceptParams({ path: runtime.codeDir, dir: true, disabled: mode === 'edit' })"
+                />
             </template>
         </el-input>
         <span class="input-help">
@@ -55,12 +58,16 @@
             </span>
         </el-form-item>
     </div>
+    <FileList ref="fileRef" @choose="getPath" />
 </template>
 
 <script setup lang="ts">
 import { Runtime } from '@/api/interface/runtime';
+import FileList from '@/components/file-list/index.vue';
 import { GetNodeScripts } from '@/api/modules/runtime';
 import { useVModel } from '@vueuse/core';
+
+const fileRef = ref();
 
 const props = defineProps({
     mode: {

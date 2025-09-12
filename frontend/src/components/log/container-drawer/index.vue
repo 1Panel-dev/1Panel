@@ -79,6 +79,7 @@ const config = ref<DialogProps>({
 const acceptParams = (props: DialogProps): void => {
     config.value.containerID = props.containerID;
     config.value.container = props.container;
+    logSearch.container = props.container;
     logVisible.value = true;
 
     if (!mobile.value) {

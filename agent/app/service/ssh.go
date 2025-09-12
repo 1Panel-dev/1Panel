@@ -8,10 +8,12 @@ import (
 	"os/user"
 	"path"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/utils/copier"
+	csvexport "github.com/1Panel-dev/1Panel/agent/utils/csv_export"
 	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
 	"github.com/1Panel-dev/1Panel/agent/utils/geo"
 	"github.com/gin-gonic/gin"
@@ -37,8 +39,10 @@ type ISSHService interface {
 	OperateSSH(operation string) error
 	UpdateByFile(value string) error
 	Update(req dto.SSHUpdate) error
-	LoadLog(ctx *gin.Context, req dto.SearchSSHLog) (*dto.SSHLog, error)
 	LoadSSHConf() (string, error)
+
+	LoadLog(ctx *gin.Context, req dto.SearchSSHLog) (int64, []dto.SSHHistory, error)
+	ExportLog(ctx *gin.Context, req dto.SearchSSHLog) (string, error)
 
 	SyncRootCert() error
 	CreateRootCert(req dto.CreateRootCert) error
@@ -235,11 +239,6 @@ func (u *SSHService) SyncRootCert() error {
 		return fmt.Errorf("load current user failed, err: %v", err)
 	}
 	sshDir := fmt.Sprintf("%s/.ssh", currentUser.HomeDir)
-	authFilePath := currentUser.HomeDir + "/.ssh/authorized_keys"
-	authItem, err := os.ReadFile(authFilePath)
-	if err != nil {
-		return err
-	}
 
 	fileList, err := os.ReadDir(sshDir)
 	if err != nil {
@@ -266,10 +265,6 @@ func (u *SSHService) SyncRootCert() error {
 			continue
 		}
 		cert.EncryptionMode = loadEncryptioMode(string(pubItem))
-		if !bytes.Contains(authItem, pubItem) {
-			global.LOG.Error("the public key is not in authorized_keys, skip...")
-			continue
-		}
 		rootCerts = append(rootCerts, cert)
 	}
 	return hostRepo.SyncCert(rootCerts)
@@ -400,13 +395,13 @@ type sshFileItem struct {
 	Year int
 }
 
-func (u *SSHService) LoadLog(ctx *gin.Context, req dto.SearchSSHLog) (*dto.SSHLog, error) {
+func (u *SSHService) LoadLog(ctx *gin.Context, req dto.SearchSSHLog) (int64, []dto.SSHHistory, error) {
 	var fileList []sshFileItem
-	var data dto.SSHLog
+	var data []dto.SSHHistory
 	baseDir := "/var/log"
 	fileItems, err := os.ReadDir(baseDir)
 	if err != nil {
-		return &data, err
+		return 0, data, err
 	}
 	for _, item := range fileItems {
 		if item.IsDir() || (!strings.HasPrefix(item.Name(), "secure") && !strings.HasPrefix(item.Name(), "auth")) {
@@ -435,6 +430,7 @@ func (u *SSHService) LoadLog(ctx *gin.Context, req dto.SearchSSHLog) (*dto.SSHLo
 	showCountFrom := (req.Page - 1) * req.PageSize
 	showCountTo := req.Page * req.PageSize
 	nyc, _ := time.LoadLocation(common.LoadTimeZoneByCmd())
+	itemFailed, itemTotal := 0, 0
 	for _, file := range fileList {
 		commandItem := ""
 		if strings.HasPrefix(path.Base(file.Name), "secure") {
@@ -458,15 +454,41 @@ func (u *SSHService) LoadLog(ctx *gin.Context, req dto.SearchSSHLog) (*dto.SSHLo
 			}
 		}
 		dataItem, successCount, failedCount := loadSSHData(ctx, commandItem, showCountFrom, showCountTo, file.Year, nyc)
-		data.FailedCount += failedCount
-		data.TotalCount += successCount + failedCount
+		itemFailed += failedCount
+		itemTotal += successCount + failedCount
 		showCountFrom = showCountFrom - (successCount + failedCount)
-		showCountTo = showCountTo - (successCount + failedCount)
-		data.Logs = append(data.Logs, dataItem...)
+		if showCountTo != -1 {
+			showCountTo = showCountTo - (successCount + failedCount)
+		}
+		data = append(data, dataItem...)
 	}
 
-	data.SuccessfulCount = data.TotalCount - data.FailedCount
-	return &data, nil
+	total := itemTotal
+	if req.Status == constant.StatusFailed {
+		total = itemFailed
+	}
+	if req.Status == constant.StatusSuccess {
+		total = itemTotal - itemFailed
+	}
+	return int64(total), data, nil
+}
+
+func (u *SSHService) ExportLog(ctx *gin.Context, req dto.SearchSSHLog) (string, error) {
+	_, logs, err := u.LoadLog(ctx, req)
+	if err != nil {
+		return "", err
+	}
+	if len(logs) == 0 {
+		return "", buserr.New("ErrRecordNotFound")
+	}
+	tmpFileName := path.Join(global.Dir.TmpDir, "export/ssh-log", fmt.Sprintf("1panel-ssh-log-%s.csv", time.Now().Format(constant.DateTimeSlimLayout)))
+	if _, err := os.Stat(path.Dir(tmpFileName)); err != nil {
+		_ = os.MkdirAll(path.Dir(tmpFileName), constant.DirPerm)
+	}
+	if err := csvexport.ExportSSHLogs(tmpFileName, logs); err != nil {
+		return "", err
+	}
+	return tmpFileName, nil
 }
 
 func (u *SSHService) LoadSSHConf() (string, error) {
@@ -550,8 +572,8 @@ func loadSSHData(ctx *gin.Context, command string, showCountFrom, showCountTo, c
 		switch {
 		case strings.Contains(lines[i], "Failed password for"):
 			itemData = loadFailedSecureDatas(lines[i])
-			if len(itemData.Address) != 0 {
-				if successCount+failedCount >= showCountFrom && successCount+failedCount < showCountTo {
+			if checkIsStandard(itemData) {
+				if successCount+failedCount >= showCountFrom && (showCountTo == -1 || successCount+failedCount < showCountTo) {
 					itemData.Area, _ = geo.GetIPLocation(getLoc, itemData.Address, common.GetLang(ctx))
 					itemData.Date = loadDate(currentYear, itemData.DateStr, nyc)
 					datas = append(datas, itemData)
@@ -560,8 +582,8 @@ func loadSSHData(ctx *gin.Context, command string, showCountFrom, showCountTo, c
 			}
 		case strings.Contains(lines[i], "Connection closed by authenticating user"):
 			itemData = loadFailedAuthDatas(lines[i])
-			if len(itemData.Address) != 0 {
-				if successCount+failedCount >= showCountFrom && successCount+failedCount < showCountTo {
+			if checkIsStandard(itemData) {
+				if successCount+failedCount >= showCountFrom && (showCountTo == -1 || successCount+failedCount < showCountTo) {
 					itemData.Area, _ = geo.GetIPLocation(getLoc, itemData.Address, common.GetLang(ctx))
 					itemData.Date = loadDate(currentYear, itemData.DateStr, nyc)
 					datas = append(datas, itemData)
@@ -570,8 +592,8 @@ func loadSSHData(ctx *gin.Context, command string, showCountFrom, showCountTo, c
 			}
 		case strings.Contains(lines[i], "Accepted "):
 			itemData = loadSuccessDatas(lines[i])
-			if len(itemData.Address) != 0 {
-				if successCount+failedCount >= showCountFrom && successCount+failedCount < showCountTo {
+			if checkIsStandard(itemData) {
+				if successCount+failedCount >= showCountFrom && (showCountTo == -1 || successCount+failedCount < showCountTo) {
 					itemData.Area, _ = geo.GetIPLocation(getLoc, itemData.Address, common.GetLang(ctx))
 					itemData.Date = loadDate(currentYear, itemData.DateStr, nyc)
 					datas = append(datas, itemData)
@@ -598,7 +620,6 @@ func loadSuccessDatas(line string) dto.SSHHistory {
 	data.Status = constant.StatusSuccess
 	return data
 }
-
 func loadFailedAuthDatas(line string) dto.SSHHistory {
 	var data dto.SSHHistory
 	parts := strings.Fields(line)
@@ -646,6 +667,14 @@ func loadFailedSecureDatas(line string) dto.SSHHistory {
 		data.Message = strings.Split(line, ": ")[1]
 	}
 	return data
+}
+
+func checkIsStandard(item dto.SSHHistory) bool {
+	if len(item.Address) == 0 {
+		return false
+	}
+	portItem, _ := strconv.Atoi(item.Port)
+	return portItem != 0
 }
 
 func handleGunzip(path string) error {

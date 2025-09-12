@@ -39,7 +39,11 @@
             </template>
             <template #main>
                 <div v-if="activeName === 'conf'">
-                    <CodemirrorPro v-model="redisConf" :placeholder="$t('commons.msg.noneData')"></CodemirrorPro>
+                    <CodemirrorPro
+                        :heightDiff="340"
+                        v-model="redisConf"
+                        :placeholder="$t('commons.msg.noneData')"
+                    ></CodemirrorPro>
                     <el-button class="mt-5" @click="getDefaultConfig()">
                         {{ $t('app.defaultConfig') }}
                     </el-button>
@@ -232,6 +236,7 @@ const onChangePort = async (formEl: FormInstance | undefined) => {
         return;
     }
     let params = {
+        type: dbType.value,
         key: dbType.value,
         name: form.name,
         port: form.port,
@@ -262,7 +267,7 @@ const onSubmitForm = async (formEl: FormInstance | undefined) => {
 };
 const submitForm = async () => {
     let param = {
-        dbType: 'redis',
+        dbType: dbType.value,
         database: database.value,
         timeout: form.timeout + '',
         maxclients: form.maxclients + '',

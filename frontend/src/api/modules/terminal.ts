@@ -60,6 +60,9 @@ export const deleteHost = (params: { ids: number[] }) => {
 };
 
 // agent
+export const loadLocalConn = () => {
+    return http.get<Host.HostConnTest>(`/settings/ssh/conn`);
+};
 export const testLocalConn = () => {
     return http.post<boolean>(`/settings/ssh/check`);
 };

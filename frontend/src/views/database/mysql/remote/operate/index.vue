@@ -87,6 +87,16 @@
                     <el-input type="textarea" @change="isOK = false" clearable v-model="dialogData.rowData!.rootCert" />
                 </el-form-item>
             </div>
+            <el-form-item :label="$t('database.timeout')" prop="timeout">
+                <el-input-number
+                    class="p-w-200"
+                    :min="1"
+                    :precision="0"
+                    step-strictly
+                    :step="1"
+                    v-model.number="dialogData.rowData!.timeout"
+                />
+            </el-form-item>
             <el-form-item :label="$t('commons.table.description')" prop="description">
                 <el-input clearable v-model.trim="dialogData.rowData!.description" />
             </el-form-item>
@@ -111,7 +121,7 @@ import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { Database } from '@/api/interface/database';
 import { MsgError, MsgSuccess } from '@/utils/message';
-import { Rules } from '@/global/form-rules';
+import { checkNumberRange, Rules } from '@/global/form-rules';
 import { addDatabase, checkDatabase, editDatabase } from '@/api/modules/database';
 
 interface DialogProps {
@@ -159,6 +169,7 @@ const rules = reactive({
     port: [Rules.port],
     username: [Rules.requiredInput],
     password: [Rules.requiredInput],
+    timeout: [Rules.number, checkNumberRange(1, 600)],
 });
 
 type FormInstance = InstanceType<typeof ElForm>;

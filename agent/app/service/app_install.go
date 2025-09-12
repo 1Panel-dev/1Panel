@@ -164,6 +164,11 @@ func (a *AppInstallService) CheckExist(req request.AppInstalledInfo) (*response.
 	res.HttpPort = appInstall.HttpPort
 	res.HttpsPort = appInstall.HttpsPort
 
+	if appInstall.App.Key == "openresty" {
+		websiteDir, _ := settingRepo.GetValueByKey("WEBSITE_DIR")
+		res.WebsiteDir = websiteDir
+	}
+
 	return res, nil
 }
 
@@ -672,7 +677,7 @@ func (a *AppInstallService) GetDefaultConfigByKey(key, name string) (string, err
 	if key == constant.AppMysql || key == constant.AppMariaDB || key == constant.AppMysqlCluster {
 		filePath = path.Join(filePath, "my.cnf")
 	}
-	if key == constant.AppRedis {
+	if key == constant.AppRedis || key == constant.AppRedisCluster {
 		filePath = path.Join(filePath, "redis.conf")
 	}
 	if key == constant.AppOpenresty {
@@ -788,6 +793,7 @@ func (a *AppInstallService) GetParams(id uint) (*response.AppConfig, error) {
 	}
 	res.AppContainerConfig = config
 	res.HostMode = isHostModel(install.DockerCompose)
+	res.RestartPolicy = getRestartPolicy(install.DockerCompose)
 	res.WebUI = install.WebUI
 	res.Type = install.App.Type
 	return &res, nil

@@ -3,19 +3,19 @@ package client
 import (
 	"crypto/tls"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"io"
 	"net/http"
 	"os"
 	"path"
 	"strings"
 
-	"github.com/studio-b12/gowebdav"
+	"github.com/1Panel-dev/1Panel/agent/constant"
+	"github.com/1Panel-dev/1Panel/agent/utils/cloud_storage/client/helper/webdav"
 )
 
 type webDAVClient struct {
 	Bucket string
-	client *gowebdav.Client
+	client *webdav.Client
 }
 
 func NewWebDAVClient(vars map[string]interface{}) (*webDAVClient, error) {
@@ -29,7 +29,7 @@ func NewWebDAVClient(vars map[string]interface{}) (*webDAVClient, error) {
 	if len(port) == 0 {
 		url = address
 	}
-	client := gowebdav.NewClient(url, username, password)
+	client := webdav.NewClient(url, username, password)
 	tlsConfig := &tls.Config{}
 	if strings.HasPrefix(address, "https") {
 		tlsConfig.InsecureSkipVerify = true
@@ -103,7 +103,7 @@ func (s webDAVClient) Size(pathItem string) (int64, error) {
 }
 
 func (s webDAVClient) Delete(pathItem string) (bool, error) {
-	if err := s.client.Remove(path.Join(s.Bucket, pathItem)); err != nil {
+	if err := s.client.RemoveAll(path.Join(s.Bucket, pathItem)); err != nil {
 		return false, err
 	}
 	return true, nil

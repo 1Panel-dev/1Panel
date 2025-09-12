@@ -1,10 +1,10 @@
 <template>
     <div v-loading="loading">
-        <el-row>
-            <el-col :xs="20" :sm="12" :md="10" :lg="10" :xl="8">
-                <el-form label-position="right" label-width="120px">
-                    <el-form-item>
-                        <el-text type="info" v-if="website.type === 'static'">
+        <el-tabs type="border-card" v-model="tabIndex">
+            <el-tab-pane :label="$t('website.changeVersion')">
+                <el-form label-position="right" label-width="100px" v-if="tabIndex == '0'">
+                    <el-form-item v-if="website.type === 'static'">
+                        <el-text type="info">
                             {{ $t('website.staticChangePHPHelper') }}
                         </el-text>
                     </el-form-item>
@@ -32,13 +32,23 @@
                             </el-col>
                         </el-row>
                     </el-form-item>
+                </el-form>
+            </el-tab-pane>
+            <el-tab-pane
+                :label="$t('website.openBaseDir')"
+                v-if="website.type === 'runtime' && website.runtimeType == 'php'"
+            >
+                <el-form label-position="right" label-width="100px" v-if="tabIndex == '1'">
                     <el-form-item :label="$t('website.openBaseDir')">
                         <el-switch v-model="openBaseDir" @change="operateCrossSite"></el-switch>
                         <span class="input-help">{{ $t('website.openBaseDirHelper') }}</span>
                     </el-form-item>
                 </el-form>
-            </el-col>
-        </el-row>
+            </el-tab-pane>
+            <el-tab-pane :label="'Composer'" v-if="website.type === 'runtime' && website.runtimeType == 'php'">
+                <Composer :websiteID="id" v-if="tabIndex == '2'" />
+            </el-tab-pane>
+        </el-tabs>
     </div>
 </template>
 
@@ -50,6 +60,7 @@ import { Website } from '@/api/interface/website';
 import { changePHPVersion, getWebsite, operateCrossSiteAccess } from '@/api/modules/website';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
+import Composer from './composer/index.vue';
 const props = defineProps({
     id: {
         type: Number,
@@ -68,8 +79,10 @@ const oldRuntimeID = ref(0);
 const website = ref({
     type: '',
     openBaseDir: false,
+    runtimeType: '',
 });
 const openBaseDir = ref(false);
+const tabIndex = ref('0');
 
 const getRuntimes = async () => {
     try {

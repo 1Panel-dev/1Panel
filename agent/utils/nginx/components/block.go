@@ -38,6 +38,10 @@ func (b *Block) FindDirectives(directiveName string) []IDirective {
 	return directives
 }
 
+func (b *Block) AppendDirectives(directives ...IDirective) {
+	b.Directives = append(b.Directives, directives...)
+}
+
 func (b *Block) UpdateDirective(key string, params []string) {
 	if key == "" || len(params) == 0 {
 		return

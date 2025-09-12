@@ -10,7 +10,7 @@
                         type="textarea"
                         :placeholder="$t('setting.ignoreHelper1')"
                     />
-                    <FileList @choose="loadDir" :path="baseDir" :isAll="true"></FileList>
+                    <el-button icon="Folder" @click="fileRef.acceptParams({ path: baseDir, isAll: true })" />
                 </div>
                 <span class="input-help">{{ $t('cronjob.exclusionRulesHelper') }}</span>
             </el-form-item>
@@ -31,6 +31,7 @@
             </el-table-column>
         </el-table>
     </div>
+    <FileList ref="fileRef" @choose="loadDir" />
 </template>
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
@@ -40,6 +41,7 @@ import { FormInstance } from 'element-plus';
 import { loadBaseDir } from '@/api/modules/setting';
 
 const loading = ref();
+const fileRef = ref();
 const baseDir = ref();
 const tableList = ref();
 const em = defineEmits(['update:files']);

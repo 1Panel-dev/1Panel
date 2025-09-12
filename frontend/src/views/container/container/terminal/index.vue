@@ -6,6 +6,7 @@
         :resource="title"
         :autoClose="!terminalOpen"
         size="large"
+        :fullScreen="true"
     >
         <template #content>
             <el-form ref="formRef" :model="form" label-position="top">

@@ -13,7 +13,7 @@
 import { onMounted, ref } from 'vue';
 import { loadDockerStatus } from '@/api/modules/container';
 import NoSuchService from '@/components/layout-content/no-such-service.vue';
-import router from '@/routers';
+import { routerToName } from '@/utils/router';
 
 const prop = defineProps({
     isHide: Boolean,
@@ -42,7 +42,7 @@ const loadStatus = async () => {
 };
 
 const goSetting = async () => {
-    router.push({ name: 'ContainerSetting' });
+    routerToName('ContainerSetting');
 };
 
 onMounted(() => {

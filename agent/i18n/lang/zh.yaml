@@ -15,6 +15,9 @@ ErrApiConfigIPInvalid: "调用 API 接口 IP 不在白名单: {{ .detail }}"
 ErrApiConfigDisable: "此接口禁止使用 API 接口调用: {{ .detail }}"
 ErrApiConfigKeyTimeInvalid: "API 接口时间戳错误: {{ .detail }}"
 
+ErrMinQuickJump: "请至少设置一个快速跳转入口！"
+ErrMaxQuickJump: "最多可设置四个快速跳转入口！"
+
 #common
 ErrUsernameIsExist: "用户名已存在"
 ErrNameIsExist: "名称已存在"
@@ -34,6 +37,7 @@ ErrGroupIsDefault: "默认分组，无法删除"
 ErrGroupIsInWebsiteUse: "分组正在被其他网站使用，无法删除"
 
 #backup
+Localhost: '本机'
 ErrBackupInUsed: "该备份账号已在计划任务中使用，无法删除"
 ErrBackupCheck: "备份账号测试连接失败 {{ .err }}"
 ErrBackupLocalDelete: "暂不支持删除本地服务器备份账号"
@@ -78,9 +82,7 @@ PullImageSuccess: "镜像拉取成功"
 AppStoreSyncSuccess: "应用商店同步成功"
 SyncAppDetail: "同步应用配置"
 AppVersionNotMatch: "{{ .name }} 应用需要更高的 1Panel 版本，跳过"
-MoveSiteDir: "当前升级需要迁移 OpenResty 网站目录"
-MoveSiteToDir: "迁移网站目录到 {{ .name }}"
-ErrMoveSiteDir: "迁移网站目录失败"
+MoveSiteDir: "检测到网站目录变更 需要迁移 OpenResty 网站目录到 {{ .name }}"
 MoveSiteDirSuccess: "迁移网站目录成功"
 DeleteRuntimePHP: "删除 PHP 运行环境"
 CustomAppStoreFileValid: "应用商店包需要 .tar.gz 格式"
@@ -91,6 +93,15 @@ ErrCustomRuntimes: "存在已经安装的运行环境，请先删除"
 ErrAppVersionDeprecated: " {{ .name }} 应用不适配当前 1Panel 版本，跳过"
 ErrDockerFailed: "Docker 状态异常，请检查服务状态"
 ErrDockerComposeCmdNotFound: "Docker Compose 命令不存在，请先在宿主机安装此命令"
+
+#ssh 
+ExportIP: "登录 IP"
+ExportArea: "归属地"
+ExportPort: "端口"
+ExportAuthMode: "登录方式"
+ExportUser: "用户"
+ExportStatus: "登录状态"
+ExportDate: "时间"
 
 #file
 ErrFileCanNotRead: "此文件不支持预览"
@@ -107,6 +118,9 @@ ErrFavoriteExist: "已收藏此路径"
 ErrInvalidChar: "禁止使用非法字符"
 ErrPathNotDelete: "所选目录不可删除"
 ErrLogFileToLarge: "日志文件超过 500M，无法打开"
+FileDropFailed: "清理文件 {{ .name }} 失败 {{ .err }}"
+FileDropSuccess: "清理文件 {{ .name }} 成功，清理文件 {{ .count }}，释放磁盘空间 {{ .size }}"
+FileDropSum: "文件清理成功，清理文件共计 {{ .count }}，释放磁盘空间共计 {{ .size }}"
 
 #website
 ErrAliasIsExist: "代号已存在"
@@ -122,6 +136,9 @@ ErrBuildDirNotFound: "构建目录不存在"
 ErrImageNotExist: "运行环境 {{ .name }} 镜像不存在，请重新编辑运行环境"
 ErrProxyIsUsed: "负载均衡已被反向代理使用，无法删除"
 ErrSSLValid: '证书文件异常，请检查证书状态！'
+ErrWebsiteDir: '请选择网站目录下的目录'
+ErrComposerFileNotFound: 'composer.json 文件不存在'
+ErrRuntimeNoPort: '运行环境未设置端口，请先编辑运行环境'
 
 #ssl
 ErrSSLCannotDelete: "{{ .name }} 证书正在被网站使用，无法删除"
@@ -155,6 +172,9 @@ StartUpdateSystemSSL: "开始更新系统证书"
 UpdateSystemSSLSuccess: "更新系统证书成功"
 ErrWildcardDomain: "HTTP 模式无法申请泛域名证书"
 ErrApplySSLCanNotDelete: "正在申请的证书{{.name}}无法删除，请稍后再试"
+StartPushSSLToNode: "开始推送证书到节点"
+PushSSLToNodeFailed: "推送证书到节点失败: {{ .err }}"
+PushSSLToNodeSuccess: "推送证书到节点成功"
 
 #mysql
 ErrUserIsExist: "当前用户已存在，请重新输入"
@@ -209,8 +229,12 @@ SystemLog: "系统日志"
 CutWebsiteLog: "切割网站日志"
 FileOrDir: "目录 / 文件"
 UploadFile: "上传备份文件 {{ .file }} 到 {{ .backup }}"
+Upload: "上传"
 IgnoreBackupErr: "备份失败，错误：{{ .detail }}，忽略本次错误..."
 IgnoreUploadErr: "上传失败，错误：{{ .detail }}，忽略本次错误..."
+LoadBackupFailed: "获取备份账号连接失败，错误：{{ .detail }}"
+InExecuting: "当前任务正在执行中，请勿重复执行！"
+NoSuchResource: "数据库中未能查询到备份内容，跳过..."
 
 #toolbox
 ErrNotExistUser: "当前用户不存在，请修改后重试！"
@@ -270,6 +294,8 @@ allow: "允许"
 deny: "禁止"
 OpenrestyNotFound: "Openresty 未安装"
 remoteIpIsNull: "IP 列表为空"
+OpenrestyVersionErr: "Openresty 版本过低，请升级 Openresty 至 1.27.1.2-2-2-focal"
+ErrFileTooLarge: "文件超过 1MB 无法上传"
 
 #task
 TaskStart: "{{ .name }} 任务开始 [START]"
@@ -326,6 +352,11 @@ SubTask: "子任务"
 RuntimeExtension: "运行环境扩展"
 TaskIsExecuting: "任务正在运行"
 CustomAppstore: "自定义应用仓库"
+TaskExec: "执行"
+
+# task - clam
+Clamscan: "扫描 {{ .name }}"
+TaskScan: "扫描"
 
 # task - ai
 OllamaModelPull: "拉取 Ollama 模型  {{ .name }} "
@@ -355,7 +386,6 @@ SnapCompressFile: "压缩快照文件"
 SnapCheckCompress: "检查快照压缩文件"
 SnapCompressSize: "快照文件大小 {{ .name }}"
 SnapUpload: "上传快照文件"
-SnapLoadBackup: "获取备份账号信息"
 SnapUploadTo: "上传快照文件到 {{ .name }}"
 SnapUploadRes: "上传快照文件到 {{ .name }}"
 
@@ -444,3 +474,16 @@ DiskUsedAlert: "您的 1Panel 面板，磁盘 {{ .name }} 已使用 {{ .used }}�
 ResourceAlert: "您的 1Panel 面板，平均 {{ .time }} 分钟内的 {{ .name }} 使用率为 {{ .used }}，详情请登录面板查看。"
 PanelVersionAlert: "您的 1Panel 面板，有最新面板版本可供升级，详情请登录面板查看。"
 PanelPwdExpirationAlert: "您的 1Panel 面板，面板密码将在 {{ .day }} 天后到期，详情请登录面板查看。"
+CommonAlert: "您的 1Panel 面板，{{ .msg }}，详情请登录面板查看。"
+NodeExceptionAlert: "您的 1Panel 面板，{{ .num }} 个节点存在异常，详情请登录面板查看。"
+LicenseExceptionAlert: "您的 1Panel 面板，{{ .num }} 个许可证存在异常，详情请登录面板查看。"
+SSHAndPanelLoginAlert: "您的 1Panel 面板，面板{{ .name }}登录{{ .ip }}异常，详情请登录面板查看。"
+
+#disk
+DeviceNotFound: "设备 {{ .name }} 未找到"
+DeviceIsMounted: "设备 {{ .name }} 已挂载，请先卸载"
+PartitionDiskErr: "分区失败，{{ .err }}"
+FormatDiskErr: "格式化磁盘失败，{{ .err }}"
+MountDiskErr: "挂载磁盘失败，{{ .err }}"
+UnMountDiskErr: "卸载磁盘失败，{{ .err }}"
+XfsNotFound: "未检测到 xfs 文件系统，请先安装 xfsprogs"

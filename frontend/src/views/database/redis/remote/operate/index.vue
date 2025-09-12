@@ -33,6 +33,16 @@
                     v-model.trim="dialogData.rowData!.password"
                 />
             </el-form-item>
+            <el-form-item :label="$t('database.timeout')" prop="timeout">
+                <el-input-number
+                    class="p-w-200"
+                    :min="1"
+                    :precision="0"
+                    step-strictly
+                    :step="1"
+                    v-model.number="dialogData.rowData!.timeout"
+                />
+            </el-form-item>
             <el-form-item :label="$t('commons.table.description')" prop="description">
                 <el-input clearable v-model.trim="dialogData.rowData!.description" />
             </el-form-item>

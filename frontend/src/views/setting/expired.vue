@@ -51,8 +51,8 @@ import { getSettingInfo, handleExpired } from '@/api/modules/setting';
 import { ElForm } from 'element-plus';
 import i18n from '@/lang';
 import { Rules } from '@/global/form-rules';
-import router from '@/routers';
 import { MsgError, MsgSuccess } from '@/utils/message';
+import { routerToName } from '@/utils/router';
 
 let isComplexity = ref(false);
 
@@ -90,7 +90,7 @@ const submitChangePassword = async (formEl: FormInstance | undefined) => {
         }
         await handleExpired({ oldPassword: passForm.oldPass, newPassword: password });
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-        router.push({ name: 'home' });
+        routerToName('home');
     });
 };
 const search = async () => {

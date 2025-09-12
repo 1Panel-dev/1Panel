@@ -39,7 +39,7 @@
                                     class="ml-1.5"
                                 ></el-button>
                                 <div>
-                                    <CopyButton :content="row.password" type="icon" />
+                                    <CopyButton :content="row.password" />
                                 </div>
                             </div>
                         </template>
@@ -92,7 +92,7 @@ const data = ref();
 const paginationConfig = reactive({
     cacheSizeKey: 'redis-remote-page-size',
     currentPage: 1,
-    pageSize: 10,
+    pageSize: Number(localStorage.getItem('redis-remote-page-size')) || 20,
     total: 0,
     orderBy: 'createdAt',
     order: 'null',
@@ -127,6 +127,7 @@ const onOpenDialog = async (
         username: '-',
         password: '',
         description: '',
+        timeout: 30,
     },
 ) => {
     let params = {

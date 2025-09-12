@@ -14,6 +14,12 @@ ErrApiConfigKeyInvalid: 'API arayüz anahtarı hatası: {{ .detail }}'
 ErrApiConfigIPInvalid: 'API arayüzünü çağırmak için kullanılan IP beyaz listede değil: {{ .detail }}'
 ErrApiConfigDisable: 'Bu arayüz API arayüz çağrılarının kullanımını yasaklıyor: {{ .detail }}'
 ErrApiConfigKeyTimeInvalid: 'API arayüz zaman damgası hatası: {{ .detail }}'
+StartPushSSLToNode: "Sertifika düğüme gönderilmeye başlandı"
+PushSSLToNodeFailed: "Sertifika düğüme gönderilemedi: {{ .err }}"
+PushSSLToNodeSuccess: "Sertifika düğüme başarıyla gönderildi"
+
+ErrMinQuickJump: "Lütfen en az bir hızlı atlama girişi ayarlayın!"
+ErrMaxQuickJump: "En fazla dört hızlı atlama girişi ayarlayabilirsiniz!"
 
 #common
 ErrUsernameIsExist: 'Kullanıcı adı zaten mevcut'
@@ -34,6 +40,7 @@ ErrGroupIsDefault: 'Varsayılan grup, silinemez'
 ErrGroupIsInWebsiteUse: 'Grup başka bir web sitesi tarafından kullanılıyor ve silinemez.'
 
 #backup
+Localhost: 'Yerel Makine'
 ErrBackupInUsed: 'Yedekleme hesabı zamanlanmış görevde kullanıldı ve silinemez.'
 ErrBackupCheck: 'Yedekleme hesabı test bağlantısı başarısız {{ .err }}'
 ErrBackupLocalDelete: 'Yerel sunucu yedekleme hesabını silme henüz desteklenmiyor'
@@ -79,9 +86,7 @@ AppStoreIsLastVersion: 'Uygulama Mağazası zaten en son sürüm'
 AppStoreSyncSuccess: 'Uygulama Mağazası senkronizasyonu başarılı'
 SyncAppDetail: 'Uygulama yapılandırmasını senkronize et'
 AppVersionNotMatch: '{{ .name }} uygulaması daha yüksek 1Panel sürümü gerektiriyor, senkronizasyon atlanıyor'
-MoveSiteDir: 'Mevcut yükseltme OpenResty web sitesi dizininin taşınmasını gerektiriyor'
-MoveSiteToDir: 'Site dizinini {{ .name }} konumuna taşı'
-ErrMoveSiteDir: 'Site dizini taşıma başarısız'
+MoveSiteDir: "Web sitesi dizini değişikliği tespit edildi. OpenResty web sitesi dizinini {{ .name }} adresine taşımak gerekiyor"
 MoveSiteDirSuccess: 'Web sitesi dizini taşıma başarılı'
 DeleteRuntimePHP: 'PHP çalışma zamanını sil'
 CustomAppStoreFileValid: 'Uygulama mağazası paketlerinin .tar.gz formatında olması gerekiyor'
@@ -92,6 +97,15 @@ ErrCustomRuntimes: 'Yüklü bir çalışma ortamı var, lütfen önce silin'
 ErrAppVersionDeprecated: "{{ .name }} uygulaması mevcut 1Panel sürümü ile uyumlu değil, atlandı"
 ErrDockerFailed: "Docker durumu anormal, lütfen servis durumunu kontrol edin"
 ErrDockerComposeCmdNotFound: "Docker Compose komutu mevcut değil, lütfen önce bu komutu host makinesine yükleyin"
+
+#ssh
+ExportIP: "Giriş IP"
+ExportArea: "Konum"
+ExportPort: "Port"
+ExportAuthMode: "Giriş Yöntemi"
+ExportUser: "Kullanıcı"
+ExportStatus: "Giriş Durumu"
+ExportDate: "Zaman"
 
 #file
 ErrFileCanNotRead: 'Bu dosya önizlemeyi desteklemiyor'
@@ -108,6 +122,10 @@ ErrFavoriteExist: 'Bu yol zaten favorilere eklendi'
 ErrInvalidChar: 'Yasak karakterlere izin verilmiyor'
 ErrPathNotDelete: 'Seçilen dizin silinemez'
 ErrLogFileToLarge: "Günlük dosyası 500MB'ı aşıyor ve açılamıyor"
+FileDropFailed: "{{ .name }} dosyası temizlenemedi: {{ .err }}"
+FileDropSuccess: "{{ .name }} dosyası başarıyla temizlendi, {{ .count }} dosya silindi, {{ .size }} disk alanı boşaltıldı"
+FileDropSum: "Dosya temizleme tamamlandı, toplam {{ .count }} dosya silindi, toplam {{ .size }} disk alanı boşaltıldı"
+
 
 #website
 ErrAliasIsExist: 'Takma ad zaten mevcut'
@@ -123,6 +141,9 @@ ErrBuildDirNotFound: 'Yapı dizini mevcut değil'
 ErrImageNotExist: 'İşletim ortamı {{ .name }} image mevcut değil, lütfen işletim ortamını yeniden düzenleyin'
 ErrProxyIsUsed: "Yük dengeleme ters proxy tarafından kullanıldı, silinemez"
 ErrSSLValid: 'Sertifika dosyası anormal, lütfen sertifika durumunu kontrol edin!'
+ErrWebsiteDir: "Lütfen web sitesi dizini içindeki bir dizin seçin."
+ErrComposerFileNotFound: "composer.json dosyası mevcut değil"
+ErrRuntimeNoPort: "Çalışma zamanı ortamı bir porta sahip değil, lütfen önce çalışma zamanı ortamını düzenleyin."
 
 #ssl
 ErrSSLCannotDelete: '{{ .name }} sertifikası bir web sitesi tarafından kullanılıyor ve silinemez'
@@ -210,6 +231,12 @@ SystemLog: 'Sistem Günlüğü'
 CutWebsiteLog: 'Web Sitesi Günlüğünü Döndür'
 FileOrDir: 'Dizin / Dosya'
 UploadFile: 'Yedekleme dosyası {{ .file }} {{ .backup }} konumuna yükleniyor'
+Upload: "Yükle"
+IgnoreBackupErr: "Yedekleme başarısız, hata: {{ .detail }}, bu hata yoksayılıyor..."
+IgnoreUploadErr: "Yükleme başarısız, hata: {{ .detail }}, bu hata yoksayılıyor..."
+LoadBackupFailed: "Yedek hesap bağlantısı alınamadı, hata: {{ .detail }}"
+InExecuting: "Mevcut görev yürütülüyor, lütfen tekrar yürütmeyin!"
+NoSuchResource: "Veritabanında yedek içeriği bulunamadı, atlanıyor..."
 
 #toolbox
 ErrNotExistUser: 'Mevcut kullanıcı mevcut değil, lütfen değiştirin ve tekrar deneyin!'
@@ -269,6 +296,7 @@ allow: 'izin ver'
 deny: 'reddet'
 OpenrestyNotFound: 'Openresty yüklü değil'
 remoteIpIsNull: "IP listesi boş"
+OpenrestyVersionErr: "Openresty sürümü çok düşük, lütfen Openresty'i 1.27.1.2-2-2-focal olarak güncelleyin"
 
 #task
 TaskStart: '{{ .name }} görevi başlıyor [BAŞLAT]'
@@ -325,6 +353,11 @@ SubTask: 'Alt görev'
 RuntimeExtension: 'Çalışma Ortamı Uzantısı'
 TaskIsExecuting: 'Görev çalışıyor'
 CustomAppstore: 'Özel uygulama deposu'
+TaskExec: 'Çalıştır'
+
+# task - clam
+Clamscan: "{{ .name }} Tara"
+TaskScan: "Tara"
 
 # task - ai
 OllamaModelPull: 'Ollama modeli {{ .name }} çek'
@@ -354,7 +387,6 @@ SnapCompressFile: 'Anlık görüntü dosyasını sıkıştır'
 SnapCheckCompress: 'Anlık görüntü sıkıştırma dosyasını kontrol et'
 SnapCompressSize: 'Anlık görüntü dosya boyutu {{ .name }}'
 SnapUpload: 'Anlık görüntü dosyasını yükle'
-SnapLoadBackup: 'Yedekleme hesabı bilgilerini al'
 SnapUploadTo: 'Anlık görüntü dosyasını {{ .name }} konumuna yükle'
 SnapUploadRes: 'Anlık görüntü dosyasını {{ .name }} konumuna yükle'
 
@@ -443,3 +475,16 @@ DiskUsedAlert: "1Panel diski '{{ .name }}' {{ .used }} kullanıldı. Detaylar i�
 ResourceAlert: "1Panel üzerinde ortalama {{ .time }} dakikalık {{ .name }} kullanım oranı {{ .used }}. Detaylar için panele giriş yapın."
 PanelVersionAlert: "1Panel için yeni bir sürüm mevcut. Güncellemek için panele giriş yapın."
 PanelPwdExpirationAlert: "1Panel şifreniz {{ .day }} gün içinde sona erecek. Detaylar için panele giriş yapın."
+CommonAlert: "1Panel'iniz, {{ .msg }}. Detaylar için panele giriş yapınız."
+NodeExceptionAlert: "1Panel'iniz, {{ .num }} düğümde sorun var. Detaylar için panele giriş yapınız."
+LicenseExceptionAlert: "1Panel'iniz, {{ .num }} lisansda sorun var. Detaylar için panele giriş yapınız."
+SSHAndPanelLoginAlert: "1Panel'iniz, {{ .ip }} adresinden {{ .name }} paneline anormal giriş tespit edildi. Detaylar için panele giriş yapınız."
+
+#disk
+DeviceNotFound: "Cihaz {{ .name }} bulunamadı"
+DeviceIsMounted: "Cihaz {{ .name }} bağlandı, önce çıkarın"
+PartitionDiskErr: "Bölümleme başarısız, {{ .err }}"
+FormatDiskErr: "Disk biçimlendirme başarısız, {{ .err }}"
+MountDiskErr: "Disk bağlama başarısız, {{ .err }}"
+UnMountDiskErr: "Disk bağının kaldırılması başarısız, {{ .err }}"
+XfsNotFound: "XFS dosya sistemi algılanmadı, lütfen önce xfsprogs'i yükleyin"

@@ -9,11 +9,6 @@
                 @visible-change="$emit('dropdownVisibleChange', $event, tabItem.path)"
             >
                 <span class="custom-tabs-label">
-                    <el-icon v-if="tabsStore.isShowTabIcon && menuIcon">
-                        <el-icon>
-                            <SvgIcon :iconName="menuIcon" />
-                        </el-icon>
-                    </el-icon>
                     <span>{{ menuName }}</span>
                 </span>
                 <template #dropdown>
@@ -56,11 +51,9 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { TabsStore } from '@/store';
-import { useI18n } from 'vue-i18n';
+import i18n from '@/lang';
 import { Close, DArrowLeft, DArrowRight, More } from '@element-plus/icons-vue';
-import SvgIcon from '@/components/svg-icon/svg-icon.vue';
 
-const i18n = useI18n();
 const tabsStore = TabsStore();
 
 const props = defineProps({
@@ -73,12 +66,18 @@ const props = defineProps({
 defineEmits(['closeTab', 'closeOtherTabs', 'closeTabs', 'dropdownVisibleChange']);
 
 const menuName = computed(() => {
-    return i18n.t(props.tabItem.meta.title);
+    let title;
+    if (props.tabItem.meta.parent) {
+        title = i18n.global.t(props.tabItem.meta.parent) + '-' + i18n.global.t(props.tabItem.meta.title);
+    } else {
+        title = i18n.global.t(props.tabItem.meta.title);
+    }
+    if (props.tabItem.meta.detail) {
+        title = title + '-' + i18n.global.t(props.tabItem.meta.detail);
+    }
+    return title;
 });
 
-const menuIcon = computed(() => {
-    return props.tabItem.meta.icon;
-});
 const dropdownRef = ref();
 
 defineExpose({
@@ -87,9 +86,6 @@ defineExpose({
 </script>
 
 <style scoped>
-.common-tabs .custom-tabs-label .el-icon {
-    vertical-align: middle;
-}
 .common-tabs .custom-tabs-label span {
     vertical-align: middle;
     margin-left: 4px;

@@ -7,6 +7,7 @@
                 @clear="search()"
                 suffix-icon="Search"
                 @change="search()"
+                :disabled="props.disabled"
                 :placeholder="props.placeholder || $t('commons.button.search')"
             ></el-input>
         </div>
@@ -21,6 +22,10 @@ const emit = defineEmits(['search', 'update:searchName']);
 const searchInfo = ref();
 const props = defineProps({
     placeholder: String,
+    disabled: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const search = () => {

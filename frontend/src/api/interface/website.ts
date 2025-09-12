@@ -225,6 +225,8 @@ export namespace Website {
         skipDNS: boolean;
         execShell: boolean;
         shell: string;
+        pushNode: boolean;
+        nodes: string;
     }
 
     export interface SSLDTO extends SSL {
@@ -318,6 +320,7 @@ export namespace Website {
         SSLProtocol: string[];
         algorithm: string;
         hsts: boolean;
+        hstsIncludeSubDomains: boolean;
         httpsPort?: string;
         http3: boolean;
     }
@@ -388,6 +391,8 @@ export namespace Website {
         cache: boolean;
         cacheTime: number;
         cacheUnit: string;
+        serverCacheTime: number;
+        serverCacheUnit: string;
         name: string;
         modifier: string;
         match: string;
@@ -651,5 +656,15 @@ export namespace Website {
     export interface CrossSiteAccessOp {
         websiteID: number;
         operation: string;
+    }
+
+    export interface ExecComposer {
+        websiteID: number;
+        command: string;
+        extCommand?: string;
+        mirror: string;
+        dir: string;
+        user: string;
+        taskID: string;
     }
 }

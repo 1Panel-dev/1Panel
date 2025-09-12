@@ -152,21 +152,22 @@ type WebsiteDomainDelete struct {
 }
 
 type WebsiteHTTPSOp struct {
-	WebsiteID       uint     `json:"websiteId" validate:"required"`
-	Enable          bool     `json:"enable"`
-	WebsiteSSLID    uint     `json:"websiteSSLId"`
-	Type            string   `json:"type"  validate:"oneof=existed auto manual"`
-	PrivateKey      string   `json:"privateKey"`
-	Certificate     string   `json:"certificate"`
-	PrivateKeyPath  string   `json:"privateKeyPath"`
-	CertificatePath string   `json:"certificatePath"`
-	ImportType      string   `json:"importType"`
-	HttpConfig      string   `json:"httpConfig"  validate:"oneof=HTTPSOnly HTTPAlso HTTPToHTTPS"`
-	SSLProtocol     []string `json:"SSLProtocol"`
-	Algorithm       string   `json:"algorithm"`
-	Hsts            bool     `json:"hsts"`
-	HttpsPorts      []int    `json:"httpsPorts"`
-	Http3           bool     `json:"http3"`
+	WebsiteID             uint     `json:"websiteId" validate:"required"`
+	Enable                bool     `json:"enable"`
+	WebsiteSSLID          uint     `json:"websiteSSLId"`
+	Type                  string   `json:"type"  validate:"oneof=existed auto manual"`
+	PrivateKey            string   `json:"privateKey"`
+	Certificate           string   `json:"certificate"`
+	PrivateKeyPath        string   `json:"privateKeyPath"`
+	CertificatePath       string   `json:"certificatePath"`
+	ImportType            string   `json:"importType"`
+	HttpConfig            string   `json:"httpConfig"  validate:"oneof=HTTPSOnly HTTPAlso HTTPToHTTPS"`
+	SSLProtocol           []string `json:"SSLProtocol"`
+	Algorithm             string   `json:"algorithm"`
+	Hsts                  bool     `json:"hsts"`
+	HstsIncludeSubDomains bool     `json:"hstsIncludeSubDomains"`
+	HttpsPorts            []int    `json:"httpsPorts"`
+	Http3                 bool     `json:"http3"`
 }
 
 type WebsiteNginxUpdate struct {
@@ -203,22 +204,24 @@ type WebsiteUpdateDirPermission struct {
 }
 
 type WebsiteProxyConfig struct {
-	ID           uint              `json:"id" validate:"required"`
-	Operate      string            `json:"operate" validate:"required"`
-	Enable       bool              `json:"enable" `
-	Cache        bool              `json:"cache" `
-	CacheTime    int               `json:"cacheTime"  `
-	CacheUnit    string            `json:"cacheUnit"`
-	Name         string            `json:"name" validate:"required"`
-	Modifier     string            `json:"modifier"`
-	Match        string            `json:"match" validate:"required"`
-	ProxyPass    string            `json:"proxyPass" validate:"required"`
-	ProxyHost    string            `json:"proxyHost" validate:"required"`
-	Content      string            `json:"content"`
-	FilePath     string            `json:"filePath"`
-	Replaces     map[string]string `json:"replaces"`
-	SNI          bool              `json:"sni"`
-	ProxySSLName string            `json:"proxySSLName"`
+	ID              uint              `json:"id" validate:"required"`
+	Operate         string            `json:"operate" validate:"required"`
+	Enable          bool              `json:"enable" `
+	Cache           bool              `json:"cache" `
+	CacheTime       int               `json:"cacheTime"`
+	CacheUnit       string            `json:"cacheUnit"`
+	ServerCacheTime int               `json:"serverCacheTime"`
+	ServerCacheUnit string            `json:"serverCacheUnit"`
+	Name            string            `json:"name" validate:"required"`
+	Modifier        string            `json:"modifier"`
+	Match           string            `json:"match" validate:"required"`
+	ProxyPass       string            `json:"proxyPass" validate:"required"`
+	ProxyHost       string            `json:"proxyHost" validate:"required"`
+	Content         string            `json:"content"`
+	FilePath        string            `json:"filePath"`
+	Replaces        map[string]string `json:"replaces"`
+	SNI             bool              `json:"sni"`
+	ProxySSLName    string            `json:"proxySSLName"`
 }
 
 type WebsiteProxyReq struct {
@@ -283,8 +286,8 @@ type WebsiteRealIP struct {
 
 type ChangeDatabase struct {
 	WebsiteID    uint   `json:"websiteID" validate:"required"`
-	DatabaseID   uint   `json:"databaseID" validate:"required"`
-	DatabaseType string `json:"databaseType" validate:"required"`
+	DatabaseID   uint   `json:"databaseID" `
+	DatabaseType string `json:"databaseType" `
 }
 
 type WebsiteProxyDel struct {
@@ -295,4 +298,14 @@ type WebsiteProxyDel struct {
 type CrossSiteAccessOp struct {
 	WebsiteID uint   `json:"websiteID" validate:"required"`
 	Operation string `json:"operation" validate:"required,oneof=Enable Disable"`
+}
+
+type ExecComposerReq struct {
+	Command    string `json:"command" validate:"required"`
+	ExtCommand string `json:"extCommand"`
+	Mirror     string `json:"mirror" validate:"required"`
+	Dir        string `json:"dir" validate:"required"`
+	User       string `json:"user" validate:"required"`
+	WebsiteID  uint   `json:"websiteID" validate:"required"`
+	TaskID     string `json:"taskID" validate:"required"`
 }

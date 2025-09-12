@@ -94,28 +94,6 @@
             <el-form-item :label="''" prop="autoRenew" v-if="ssl.provider !== 'dnsManual'">
                 <el-checkbox v-model="ssl.autoRenew" :label="$t('ssl.autoRenew')" />
             </el-form-item>
-            <el-form-item :label="''" prop="pushDir">
-                <el-checkbox v-model="ssl.pushDir" :label="$t('ssl.pushDir')" />
-            </el-form-item>
-            <el-form-item :label="$t('ssl.dir')" prop="dir" v-if="ssl.pushDir">
-                <el-input v-model.trim="ssl.dir">
-                    <template #prepend>
-                        <FileList :path="ssl.dir" @choose="getPath" :dir="true"></FileList>
-                    </template>
-                </el-input>
-                <span class="input-help">
-                    {{ $t('ssl.pushDirHelper') }}
-                </span>
-            </el-form-item>
-            <el-form-item :label="''" prop="execShell">
-                <el-checkbox v-model="ssl.execShell" :label="$t('ssl.execShell')" />
-            </el-form-item>
-            <el-form-item :label="$t('ssl.shell')" prop="shell" v-if="ssl.execShell">
-                <el-input type="textarea" :rows="4" v-model="ssl.shell" />
-                <span class="input-help">
-                    {{ $t('ssl.shellHelper') }}
-                </span>
-            </el-form-item>
             <div v-if="ssl.provider != 'selfSigned'">
                 <el-form-item :label="''" prop="disableCNAME">
                     <el-checkbox v-model="ssl.disableCNAME" :label="$t('ssl.disableCNAME')" />
@@ -141,6 +119,35 @@
                         {{ $t('ssl.nameserverHelper') }}
                     </span>
                 </el-form-item>
+                <el-form-item :label="''" prop="pushDir">
+                    <el-checkbox v-model="ssl.pushDir" :label="$t('ssl.pushDir')" />
+                </el-form-item>
+                <el-form-item :label="$t('ssl.dir')" prop="dir" v-if="ssl.pushDir">
+                    <el-input v-model.trim="ssl.dir">
+                        <template #prepend>
+                            <el-button icon="Folder" @click="fileRef.acceptParams({ path: ssl.dir, dir: true })" />
+                        </template>
+                    </el-input>
+                    <span class="input-help">
+                        {{ $t('ssl.pushDirHelper') }}
+                    </span>
+                </el-form-item>
+                <el-form-item :label="''" prop="execShell">
+                    <el-checkbox v-model="ssl.execShell" :label="$t('ssl.execShell')" />
+                </el-form-item>
+                <el-form-item :label="$t('ssl.shell')" prop="shell" v-if="ssl.execShell">
+                    <el-input type="textarea" :rows="4" v-model="ssl.shell" />
+                    <span class="input-help">
+                        {{ $t('ssl.shellHelper') }}
+                    </span>
+                </el-form-item>
+                <PushtoNode
+                    v-if="isMaster && isMasterProductPro"
+                    :push-node="ssl.pushNode"
+                    :nodes="ssl.pushNodes"
+                    @update:push-node="ssl.pushNode = $event"
+                    @update:nodes="ssl.pushNodes = $event"
+                />
             </div>
         </el-form>
         <template #footer>
@@ -152,18 +159,32 @@
             </span>
         </template>
     </DrawerPro>
+    <FileList ref="fileRef" @choose="getPath" />
 </template>
 
 <script lang="ts" setup>
 import { Website } from '@/api/interface/website';
 import { createSSL, listWebsites, searchAcmeAccount, searchDnsAccount, updateSSL } from '@/api/modules/website';
 import { Rules, checkMaxLength } from '@/global/form-rules';
+import FileList from '@/components/file-list/index.vue';
 import i18n from '@/lang';
 import { FormInstance } from 'element-plus';
 import { computed, reactive, ref } from 'vue';
 import { MsgSuccess } from '@/utils/message';
 import { KeyTypes } from '@/global/mimetype';
 import { getDNSName, getAccountName } from '@/utils/util';
+import { defineAsyncComponent } from 'vue';
+import { useGlobalStore } from '@/composables/useGlobalStore';
+const { isMasterProductPro, isMaster } = useGlobalStore();
+
+const PushtoNode = defineAsyncComponent(async () => {
+    const modules = import.meta.glob('@/xpack/views/ssl/index.vue');
+    const loader = modules['/src/xpack/views/ssl/index.vue'];
+    if (loader) {
+        return ((await loader()) as any).default;
+    }
+    return { template: '<div></div>' };
+});
 
 const props = defineProps({
     id: {
@@ -177,6 +198,7 @@ const id = computed(() => {
 });
 
 const open = ref(false);
+const fileRef = ref();
 const loading = ref(false);
 const dnsReq = reactive({
     page: 1,
@@ -202,6 +224,7 @@ const rules = ref({
     nameserver2: [Rules.ipv4],
     shell: [Rules.requiredInput],
     description: [checkMaxLength(128)],
+    pushNodes: [Rules.requiredSelect],
 });
 const websiteID = ref();
 
@@ -224,6 +247,9 @@ const initData = () => ({
     nameserver2: '',
     execShell: false,
     shell: '',
+    pushNode: false,
+    pushNodes: [],
+    nodes: '',
 });
 
 const ssl = ref(initData());
@@ -270,6 +296,13 @@ const acceptParams = (op: string, websiteSSL: Website.SSLDTO) => {
         ssl.value.shell = websiteSSL.shell;
         if (ssl.value.provider == 'selfSigned') {
             rules.value.primaryDomain = [];
+        }
+        ssl.value.pushNode = websiteSSL.pushNode;
+        if (websiteSSL.nodes != '') {
+            ssl.value.pushNodes = websiteSSL.nodes
+                .split(',')
+                .map((item) => item.trim())
+                .filter((item) => item !== '');
         }
     }
     ssl.value.websiteId = Number(id.value);
@@ -331,8 +364,13 @@ const submit = async (formEl: FormInstance | undefined) => {
         if (!valid) {
             return;
         }
+        let nodes = '';
+        if (ssl.value.pushNode) {
+            nodes = ssl.value.pushNodes.join(',');
+        }
         loading.value = true;
         if (operate.value == 'create') {
+            ssl.value.nodes = nodes;
             createSSL(ssl.value)
                 .then((res: any) => {
                     if (ssl.value.provider != 'dnsManual') {
@@ -364,6 +402,8 @@ const submit = async (formEl: FormInstance | undefined) => {
                 nameserver2: ssl.value.nameserver2,
                 execShell: ssl.value.execShell,
                 shell: ssl.value.shell,
+                pushNode: ssl.value.pushNode,
+                nodes: nodes,
             };
             updateSSL(sslUpdate)
                 .then(() => {

@@ -20,7 +20,12 @@
                     <el-link underline="never" type="primary" @click="toLxware">
                         {{ $t(!isMasterPro ? 'license.community' : 'license.pro') }}
                     </el-link>
-                    <el-link underline="never" class="version" type="primary" @click="copyText(version)">
+                    <el-link
+                        underline="never"
+                        class="version"
+                        type="primary"
+                        @click="releasesRef.acceptParams({ version: version })"
+                    >
                         {{ version }}
                     </el-link>
                     <el-badge is-dot class="-mt-0.5" :hidden="version === 'Waiting' || !globalStore.hasNewVersion">
@@ -36,15 +41,16 @@
         </div>
 
         <Upgrade ref="upgradeRef" @search="search" />
+        <Releases ref="releasesRef" />
     </div>
 </template>
 
 <script setup lang="ts">
 import { getSettingInfo, loadUpgradeInfo } from '@/api/modules/setting';
 import Upgrade from '@/components/system-upgrade/upgrade/index.vue';
+import Releases from '@/components/system-upgrade/releases/index.vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import { copyText } from '@/utils/util';
 import { onMounted, ref } from 'vue';
 import { GlobalStore } from '@/store';
 import { storeToRefs } from 'pinia';
@@ -52,6 +58,7 @@ import { storeToRefs } from 'pinia';
 const globalStore = GlobalStore();
 const { docsUrl } = storeToRefs(globalStore);
 const upgradeRef = ref();
+const releasesRef = ref();
 const isMasterPro = computed(() => {
     return globalStore.isMasterPro();
 });
@@ -102,12 +109,12 @@ const onLoadUpgradeInfo = async () => {
             loading.value = false;
             if (res.data.testVersion || res.data.newVersion || res.data.latestVersion) {
                 upgradeInfo.value = res.data;
-                if (upgradeInfo.value.newVersion) {
-                    upgradeVersion.value = upgradeInfo.value.newVersion;
-                } else if (upgradeInfo.value.latestVersion) {
+                if (upgradeInfo.value.latestVersion) {
                     upgradeVersion.value = upgradeInfo.value.latestVersion;
                 } else if (upgradeInfo.value.testVersion) {
                     upgradeVersion.value = upgradeInfo.value.testVersion;
+                } else if (upgradeInfo.value.newVersion) {
+                    upgradeVersion.value = upgradeInfo.value.newVersion;
                 }
                 upgradeRef.value.acceptParams({ upgradeInfo: upgradeInfo.value, upgradeVersion: upgradeVersion.value });
             } else {

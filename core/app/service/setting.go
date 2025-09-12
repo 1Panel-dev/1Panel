@@ -142,11 +142,9 @@ func (u *SettingService) Update(key, value string) error {
 	case "UserName", "Password":
 		_ = global.SESSION.Clean()
 	case "Language":
-		go func() {
-			if err := xpack.Sync(constant.SyncLanguage); err != nil {
-				global.LOG.Errorf("sync language to node failed, err: %v", err)
-			}
-		}()
+		if err := xpack.Sync(constant.SyncLanguage); err != nil {
+			global.LOG.Errorf("sync language to node failed, err: %v", err)
+		}
 	}
 
 	return nil
@@ -215,15 +213,13 @@ func (u *SettingService) UpdateProxy(req dto.ProxyUpdate) error {
 	if err := xpack.ProxyDocker(loadDockerProxy(req)); err != nil {
 		return err
 	}
-	go func() {
-		syncScope := constant.SyncSystemProxy
-		if req.WithDockerRestart {
-			syncScope = constant.SyncSystemProxyWithRestartDocker
-		}
-		if err := xpack.Sync(syncScope); err != nil {
-			global.LOG.Errorf("sync proxy to node failed, err: %v", err)
-		}
-	}()
+	syncScope := constant.SyncSystemProxy
+	if req.WithDockerRestart {
+		syncScope = constant.SyncSystemProxyWithRestartDocker
+	}
+	if err := xpack.Sync(syncScope); err != nil {
+		global.LOG.Errorf("sync proxy to node failed, err: %v", err)
+	}
 	return nil
 }
 

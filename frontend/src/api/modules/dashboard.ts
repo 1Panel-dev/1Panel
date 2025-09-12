@@ -5,6 +5,12 @@ export const loadOsInfo = () => {
     return http.get<Dashboard.OsInfo>(`/dashboard/base/os`);
 };
 
+export const loadQuickOption = () => {
+    return http.get<Array<Dashboard.QuickJump>>(`/dashboard/quick/option`);
+};
+export const changeQuick = (quicks: Array<Dashboard.QuickJump>) => {
+    return http.post(`/dashboard/quick/change`, { quicks: quicks });
+};
 export const loadAppLauncher = () => {
     return http.get<Array<Dashboard.AppLauncher>>(`/dashboard/app/launcher`);
 };

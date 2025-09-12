@@ -26,6 +26,7 @@ const cronRouter = {
                     meta: {
                         activeMenu: '/cronjobs',
                         requiresAuth: false,
+                        title: 'menu.cronjob',
                     },
                 },
                 {
@@ -36,6 +37,7 @@ const cronRouter = {
                     meta: {
                         activeMenu: '/cronjobs',
                         requiresAuth: false,
+                        ignoreTab: true,
                     },
                 },
                 {
@@ -46,6 +48,7 @@ const cronRouter = {
                     meta: {
                         activeMenu: '/cronjobs',
                         requiresAuth: false,
+                        title: 'cronjob.library.library',
                     },
                 },
             ],

@@ -35,7 +35,7 @@
     </div>
 </template>
 <script setup lang="ts">
-import { useRouter } from 'vue-router';
+import { routerToName } from '@/utils/router';
 
 defineProps({
     current: {
@@ -43,8 +43,7 @@ defineProps({
         default: 'LoginLog',
     },
 });
-const router = useRouter();
 const onChangeRoute = async (addr: string) => {
-    router.push({ name: addr });
+    routerToName(addr);
 };
 </script>

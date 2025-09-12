@@ -3,7 +3,8 @@
         v-model="localOpenPage"
         @close="handleClose"
         :destroy-on-close="true"
-        :size="size"
+        :before-close="beforeClose"
+        :size="isFull ? '100%' : size"
         :close-on-press-escape="autoClose"
         :close-on-click-modal="autoClose"
     >
@@ -23,7 +24,13 @@
                 </template>
                 <template #extra>
                     <el-tooltip :content="loadTooltip()" placement="top" v-if="fullScreen">
-                        <el-button @click="toggleFullscreen" link icon="FullScreen" plain class="mr-5"></el-button>
+                        <el-button
+                            @click="toggleFullscreen"
+                            link
+                            icon="FullScreen"
+                            plain
+                            class="-mt-1 mr-2"
+                        ></el-button>
                     </el-tooltip>
                     <slot v-if="slots.extra" name="extra"></slot>
                 </template>
@@ -55,6 +62,8 @@ import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();
 const drawerContent = ref();
 
+const isFull = ref();
+
 const props = defineProps({
     header: String,
     back: Function,
@@ -78,10 +87,14 @@ const props = defineProps({
         type: Boolean,
         default: true,
     },
+    confirmBeforeClose: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const slots = useSlots();
-const emit = defineEmits(['update:modelValue', 'close']);
+const emit = defineEmits(['update:modelValue', 'close', 'beforeClose']);
 
 const size = computed(() => {
     switch (props.size) {
@@ -112,10 +125,25 @@ const localOpenPage = computed({
 });
 
 const handleBack = () => {
-    if (props.back) {
-        props.back();
+    if (props.confirmBeforeClose) {
+        const done = () => {
+            if (props.back) {
+                props.back();
+            } else {
+                localOpenPage.value = false;
+                globalStore.isFullScreen = false;
+                emit('close');
+            }
+        };
+        emit('beforeClose', done);
     } else {
-        handleClose();
+        if (props.back) {
+            props.back();
+        } else {
+            localOpenPage.value = false;
+            globalStore.isFullScreen = false;
+            emit('close');
+        }
     }
 };
 
@@ -125,8 +153,17 @@ const handleClose = () => {
     emit('close');
 };
 
+const beforeClose = (done: () => void) => {
+    if (!props.confirmBeforeClose) {
+        done();
+    } else {
+        emit('beforeClose', done);
+    }
+};
+
 function toggleFullscreen() {
     globalStore.isFullScreen = !globalStore.isFullScreen;
+    isFull.value = globalStore.isFullScreen;
 }
 const loadTooltip = () => {
     return i18n.global.t('commons.button.' + (globalStore.isFullScreen ? 'quitFullscreen' : 'fullscreen'));

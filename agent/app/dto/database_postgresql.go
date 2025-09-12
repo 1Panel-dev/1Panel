@@ -60,26 +60,20 @@ type PostgresqlPrivileges struct {
 
 type PostgresqlLoadDB struct {
 	From     string `json:"from" validate:"required,oneof=local remote"`
-	Type     string `json:"type" validate:"required,oneof=postgresql"`
+	Type     string `json:"type" validate:"required,oneof=postgresql postgresql-cluster"`
 	Database string `json:"database" validate:"required"`
 }
 
 type PostgresqlDBDeleteCheck struct {
 	ID       uint   `json:"id" validate:"required"`
-	Type     string `json:"type" validate:"required,oneof=postgresql"`
+	Type     string `json:"type" validate:"required,oneof=postgresql postgresql-cluster"`
 	Database string `json:"database" validate:"required"`
 }
 
 type PostgresqlDBDelete struct {
 	ID           uint   `json:"id" validate:"required"`
-	Type         string `json:"type" validate:"required,oneof=postgresql"`
+	Type         string `json:"type" validate:"required,oneof=postgresql postgresql-cluster"`
 	Database     string `json:"database" validate:"required"`
 	ForceDelete  bool   `json:"forceDelete"`
 	DeleteBackup bool   `json:"deleteBackup"`
-}
-
-type PostgresqlConfUpdateByFile struct {
-	Type     string `json:"type" validate:"required,oneof=postgresql mariadb"`
-	Database string `json:"database" validate:"required"`
-	File     string `json:"file"`
 }

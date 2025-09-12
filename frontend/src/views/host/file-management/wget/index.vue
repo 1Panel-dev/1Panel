@@ -13,7 +13,9 @@
             </el-form-item>
             <el-form-item :label="$t('file.path')" prop="path">
                 <el-input v-model="addForm.path">
-                    <template #prepend><FileList :path="addForm.path" @choose="getPath"></FileList></template>
+                    <template #prepend>
+                        <el-button icon="Folder" @click="fileRef.acceptParams({ path: addForm.path })" />
+                    </template>
                 </el-input>
             </el-form-item>
             <el-form-item :label="$t('commons.table.name')" prop="name">
@@ -35,6 +37,7 @@
             </span>
         </template>
     </DrawerPro>
+    <FileList ref="fileRef" @choose="getPath" />
 </template>
 
 <script lang="ts" setup>
@@ -54,6 +57,7 @@ const fileForm = ref<FormInstance>();
 const loading = ref(false);
 let open = ref(false);
 let submitData = ref(false);
+const fileRef = ref();
 
 const rules = reactive<FormRules>({
     name: [Rules.requiredInput],

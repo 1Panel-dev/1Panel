@@ -6,6 +6,7 @@
         :resource="name"
         size="large"
         :autoClose="false"
+        :fullScreen="true"
     >
         <div v-loading="loading">
             <el-form ref="formRef" @submit.prevent label-position="top">

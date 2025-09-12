@@ -20,7 +20,9 @@
             </el-alert>
             <el-form-item :label="$t('file.path')" prop="newPath">
                 <el-input v-model="addForm.newPath">
-                    <template #prepend><FileList @choose="getPath" :dir="true"></FileList></template>
+                    <template #prepend>
+                        <el-button icon="Folder" @click="fileRef.acceptParams({ dir: true })" />
+                    </template>
                 </el-input>
             </el-form-item>
             <div v-if="changeName">
@@ -61,6 +63,7 @@
             </span>
         </template>
     </DrawerPro>
+    <FileList ref="fileRef" @choose="getPath" />
 </template>
 
 <script lang="ts" setup>
@@ -92,6 +95,7 @@ const oldName = ref('');
 const existFiles = ref<File.ExistFileInfo[]>([]);
 const skipFiles = ref([]);
 const transferData = ref([]);
+const fileRef = ref();
 
 const title = computed(() => {
     if (type.value === 'cut') {
@@ -117,7 +121,7 @@ const rules = reactive<FormRules>({
     name: [Rules.requiredInput],
 });
 
-const em = defineEmits(['close']);
+const em = defineEmits(['close', 'loading']);
 
 const handleClose = (search: boolean) => {
     open.value = false;
@@ -165,6 +169,8 @@ const changeType = () => {
 };
 
 const mvFile = () => {
+    loading.value = true;
+    em('loading', true);
     moveFile(addForm)
         .then(() => {
             if (type.value === 'cut') {
@@ -176,6 +182,7 @@ const mvFile = () => {
         })
         .finally(() => {
             loading.value = false;
+            em('loading', false);
         });
 };
 
@@ -247,6 +254,7 @@ const acceptParams = async (props: MoveProps) => {
     addForm.allNames = props.allNames;
     type.value = props.type;
     existFiles.value = [];
+    addForm.coverPaths = [];
     if (props.name && props.name != '') {
         oldName.value = props.name;
         const res = await checkFile(props.path + '/' + props.name, false);

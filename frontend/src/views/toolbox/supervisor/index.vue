@@ -27,6 +27,9 @@
                     {{ $t('commons.button.create') + $t('tool.supervisor.list').toLowerCase() }}
                 </el-button>
             </template>
+            <template v-if="showTable" #rightToolBar>
+                <TableRefresh @search="search()" />
+            </template>
             <template #main v-if="showTable">
                 <ComplexTable :data="data" :class="{ mask: !supervisorStatus.isRunning }" v-loading="dataLoading">
                     <el-table-column
@@ -51,7 +54,7 @@
                         show-overflow-tooltip
                     >
                         <template #default="{ row }">
-                            <el-button text type="primary" @click="toFolder(row.dir)">
+                            <el-button link type="primary" @click="routerToFileWithPath(row.dir)">
                                 {{ row.dir }}
                             </el-button>
                         </template>
@@ -90,7 +93,7 @@
                     <el-table-column :label="$t('commons.table.status')" min-width="60px">
                         <template #default="{ row }">
                             <div v-if="row.hasLoad">
-                                <el-popover placement="bottom" :width="600" trigger="hover">
+                                <el-popover placement="bottom" :width="700" trigger="hover">
                                     <template #reference>
                                         <el-button type="primary" link v-if="row.status.length > 1">
                                             {{ $t('website.check') }}
@@ -103,7 +106,6 @@
                                         <el-table-column
                                             property="name"
                                             :label="$t('commons.table.name')"
-                                            fix
                                             show-overflow-tooltip
                                         />
                                         <el-table-column
@@ -111,7 +113,18 @@
                                             :label="$t('tool.supervisor.statusCode')"
                                             width="100px"
                                         />
-                                        <el-table-column property="PID" label="PID" width="100px" />
+                                        <el-table-column property="PID" label="PID" width="120px">
+                                            <template #default="scope">
+                                                <el-button
+                                                    link
+                                                    type="primary"
+                                                    v-if="scope.row.PID != ''"
+                                                    @click="processDetailRef.acceptParams(scope.row.PID)"
+                                                >
+                                                    {{ scope.row.PID }}
+                                                </el-button>
+                                            </template>
+                                        </el-table-column>
                                         <el-table-column
                                             property="uptime"
                                             :label="$t('tool.supervisor.uptime')"
@@ -120,7 +133,6 @@
                                         <el-table-column
                                             property="msg"
                                             :label="$t('commons.table.message')"
-                                            fix
                                             show-overflow-tooltip
                                         />
                                     </el-table>
@@ -145,6 +157,7 @@
         </LayoutContent>
         <Create ref="createRef" @close="search"></Create>
         <File ref="fileRef" @search="search"></File>
+        <ProcessDetail ref="processDetailRef" />
     </div>
 </template>
 
@@ -155,18 +168,20 @@ import ConfigSuperVisor from './config/index.vue';
 import { computed, onMounted } from 'vue';
 import Create from './create/index.vue';
 import File from './file/index.vue';
+import ProcessDetail from '@/views/host/process/process/detail/index.vue';
 import { getSupervisorProcess, operateSupervisorProcess } from '@/api/modules/host-tool';
 import { GlobalStore } from '@/store';
 import i18n from '@/lang';
 import { HostTool } from '@/api/interface/host-tool';
 import { MsgSuccess } from '@/utils/message';
-import router from '@/routers';
+import { routerToFileWithPath } from '@/utils/router';
 const globalStore = GlobalStore();
 
 const loading = ref(false);
 const setSuperVisor = ref(false);
 const createRef = ref();
 const fileRef = ref();
+const processDetailRef = ref();
 const data = ref();
 const maskShow = ref(true);
 const supervisorStatus = ref({
@@ -184,10 +199,6 @@ const setting = () => {
 const getStatus = (status: any) => {
     supervisorStatus.value = status;
     search();
-};
-
-const toFolder = (folder: string) => {
-    router.push({ path: '/hosts/files', query: { path: folder } });
 };
 
 const showStopped = computed((): boolean => {

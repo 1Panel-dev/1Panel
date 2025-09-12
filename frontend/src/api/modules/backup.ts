@@ -35,6 +35,9 @@ export const deleteBackupRecord = (params: { ids: number[] }) => {
 export const updateRecordDescription = (id: Number, description: String) => {
     return http.post(`/backups/record/description/update`, { id: id, description: description });
 };
+export const uploadByRecover = (filePath: string, targetDir: String) => {
+    return http.post(`/backups/upload`, { filePath: filePath, targetDir: targetDir });
+};
 export const searchBackupRecords = (params: Backup.SearchBackupRecord) => {
     return http.post<ResPage<Backup.RecordInfo>>(`/backups/record/search`, params, TimeoutEnum.T_5M);
 };

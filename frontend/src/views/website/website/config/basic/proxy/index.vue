@@ -17,7 +17,7 @@
         </el-table-column>
         <el-table-column :label="$t('commons.table.status')" prop="enable">
             <template #default="{ row }">
-                <Status :status="row.enable ? 'enable' : 'disable'" @click="opProxy(row)" />
+                <Status :status="row.enable ? 'enable' : 'disable'" @click="opProxy(row)" :operate="true" />
             </template>
         </el-table-column>
         <fu-table-operations
@@ -105,12 +105,14 @@ const initData = (id: number): Website.ProxyConfig => ({
     cacheTime: 1,
     cacheUnit: 'm',
     name: '',
-    modifier: '^~',
+    modifier: '',
     match: '/',
     proxyPass: 'http://',
     proxyHost: '$host',
     replaces: {},
     proxySSLName: '',
+    serverCacheTime: 10,
+    serverCacheUnit: 'm',
 });
 
 const openCreate = () => {

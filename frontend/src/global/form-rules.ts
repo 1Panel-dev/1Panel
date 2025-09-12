@@ -329,6 +329,19 @@ const checkAppName = (rule: any, value: any, callback: any) => {
     }
 };
 
+const checkAlias = (rule: any, value: any, callback: any) => {
+    if (!value) {
+        callback(new Error(i18n.global.t('commons.rule.alias')));
+        return;
+    }
+    const reg = /^(?![-_])[A-Za-z0-9._-]{1,30}(?<![-_])$/;
+    if (!reg.test(value)) {
+        callback(new Error(i18n.global.t('commons.rule.alias')));
+    } else {
+        callback();
+    }
+};
+
 const checkDomain = (rule: any, value: any, callback: any) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.domain')));
@@ -671,6 +684,7 @@ interface CommonRule {
     domainOrIP: FormItemRule;
     authBasicPassword: FormItemRule;
     ipv4orV6: FormItemRule;
+    alias: FormItemRule;
 
     paramCommon: FormItemRule;
     paramComplexity: FormItemRule;
@@ -920,6 +934,11 @@ export const Rules: CommonRule = {
     },
     ipv4orV6: {
         validator: checkIpv4orV6,
+        trigger: 'blur',
+    },
+    alias: {
+        required: true,
+        validator: checkAlias,
         trigger: 'blur',
     },
 };

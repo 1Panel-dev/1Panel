@@ -14,7 +14,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/copier"
 	"github.com/1Panel-dev/1Panel/agent/utils/email"
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
-	"github.com/shirou/gopsutil/v3/disk"
+	"github.com/shirou/gopsutil/v4/disk"
 	"sort"
 	"strings"
 	"sync"
@@ -70,17 +70,18 @@ func (a AlertService) PageAlert(search dto.AlertSearch) (int64, []dto.AlertDTO, 
 	for _, item := range alerts {
 
 		result = append(result, dto.AlertDTO{
-			ID:        item.ID,
-			Type:      item.Type,
-			Cycle:     item.Cycle,
-			Count:     item.Count,
-			Method:    item.Method,
-			Title:     item.Title,
-			Project:   item.Project,
-			Status:    item.Status,
-			SendCount: item.SendCount,
-			CreatedAt: item.CreatedAt,
-			UpdatedAt: item.UpdatedAt,
+			ID:             item.ID,
+			Type:           item.Type,
+			Cycle:          item.Cycle,
+			Count:          item.Count,
+			Method:         item.Method,
+			Title:          item.Title,
+			Project:        item.Project,
+			Status:         item.Status,
+			SendCount:      item.SendCount,
+			AdvancedParams: item.AdvancedParams,
+			CreatedAt:      item.CreatedAt,
+			UpdatedAt:      item.UpdatedAt,
 		})
 	}
 
@@ -100,17 +101,18 @@ func (a AlertService) GetAlerts() ([]dto.AlertDTO, error) {
 	for _, item := range alerts {
 
 		result = append(result, dto.AlertDTO{
-			ID:        item.ID,
-			Type:      item.Type,
-			Cycle:     item.Cycle,
-			Count:     item.Count,
-			Method:    item.Method,
-			Title:     item.Title,
-			Project:   item.Project,
-			Status:    item.Status,
-			SendCount: item.SendCount,
-			CreatedAt: item.CreatedAt,
-			UpdatedAt: item.UpdatedAt,
+			ID:             item.ID,
+			Type:           item.Type,
+			Cycle:          item.Cycle,
+			Count:          item.Count,
+			Method:         item.Method,
+			Title:          item.Title,
+			Project:        item.Project,
+			Status:         item.Status,
+			SendCount:      item.SendCount,
+			AdvancedParams: item.AdvancedParams,
+			CreatedAt:      item.CreatedAt,
+			UpdatedAt:      item.UpdatedAt,
 		})
 	}
 
@@ -165,6 +167,7 @@ func (a AlertService) UpdateAlert(req dto.AlertUpdate) error {
 	upMap["project"] = req.Project
 	upMap["status"] = req.Status
 	upMap["send_count"] = req.SendCount
+	upMap["advanced_params"] = req.AdvancedParams
 
 	if err := alertRepo.Update(upMap, repo.WithByID(req.ID)); err != nil {
 		return err
@@ -174,7 +177,24 @@ func (a AlertService) UpdateAlert(req dto.AlertUpdate) error {
 }
 
 func (a AlertService) DeleteAlert(id uint) error {
-	return alertRepo.Delete(repo.WithByID(id))
+	alertInfo, _ := alertRepo.Get(repo.WithByID(id))
+	if alertInfo.ID == 0 {
+		return buserr.New("ErrRecordNotFound")
+	}
+	err := alertRepo.Delete(repo.WithByID(id))
+	if err != nil {
+		return err
+	}
+	alerts, err := a.GetAlerts()
+	if err != nil {
+		return err
+	}
+	if len(alerts) > 0 {
+		NewIAlertTaskHelper().InitTask(alertInfo.Type)
+	} else {
+		NewIAlertTaskHelper().StopTask()
+	}
+	return nil
 }
 
 func (a AlertService) GetAlert(id uint) (dto.AlertDTO, error) {
@@ -483,23 +503,51 @@ func (a AlertService) TestAlertConfig(req dto.AlertConfigTest) (bool, error) {
 
 func (a AlertService) ExternalUpdateAlert(updateAlert dto.AlertCreate) error {
 	upMap := make(map[string]interface{})
+	var newStatus string
 	if updateAlert.SendCount == 0 {
-		upMap["status"] = constant.AlertDisable
+		newStatus = constant.AlertDisable
 	} else {
-		upMap["status"] = constant.AlertEnable
+		newStatus = constant.AlertEnable
 		upMap["send_count"] = updateAlert.SendCount
+		if updateAlert.Method != "" {
+			upMap["method"] = updateAlert.Method
+		}
 	}
-	upMap["method"] = updateAlert.Method
-	alertInfo, _ := alertRepo.Get(alertRepo.WithByType(updateAlert.Type), alertRepo.WithByProject(updateAlert.Project))
+	upMap["status"] = newStatus
+
+	alertInfo, _ := alertRepo.Get(
+		alertRepo.WithByType(updateAlert.Type),
+		alertRepo.WithByProject(updateAlert.Project),
+	)
+
 	if alertInfo.ID > 0 {
-		if err := alertRepo.Update(upMap, alertRepo.WithByProject(updateAlert.Project), alertRepo.WithByType(updateAlert.Type)); err != nil {
-			return err
+		shouldUpdate := false
+
+		if alertInfo.Status != newStatus {
+			shouldUpdate = true
+		}
+		if val, ok := upMap["send_count"]; ok && val != alertInfo.SendCount {
+			shouldUpdate = true
+		}
+		if val, ok := upMap["method"]; ok && val != "" && val != alertInfo.Method {
+			shouldUpdate = true
+		}
+
+		if shouldUpdate {
+			if err := alertRepo.Update(
+				upMap,
+				alertRepo.WithByProject(updateAlert.Project),
+				alertRepo.WithByType(updateAlert.Type),
+			); err != nil {
+				return err
+			}
 		}
 	} else {
-		updateAlert.Status = constant.AlertEnable
-		err := a.CreateAlert(updateAlert)
-		if err != nil {
-			return err
+		if updateAlert.Method != "" && updateAlert.Title != "" {
+			updateAlert.Status = newStatus
+			if err := a.CreateAlert(updateAlert); err != nil {
+				return err
+			}
 		}
 	}
 

@@ -32,6 +32,9 @@
             <el-form-item :label="$t('tool.supervisor.autoRestart')" prop="autoRestart">
                 <el-switch v-model="process.autoRestart" active-value="true" inactive-value="false"></el-switch>
             </el-form-item>
+            <el-form-item :label="$t('tool.supervisor.autoStart')" prop="autoStart">
+                <el-switch v-model="process.autoStart" active-value="true" inactive-value="false"></el-switch>
+            </el-form-item>
         </el-form>
         <template #footer>
             <span class="dialog-footer">
@@ -73,6 +76,7 @@ const initData = (runtimeID: number) => ({
     numprocs: '1',
     id: runtimeID,
     autoRestart: 'true',
+    autoStart: 'true',
 });
 const process = ref(initData(0));
 const em = defineEmits(['close']);
@@ -100,6 +104,7 @@ const acceptParams = (operate: string, config: HostTool.SupersivorProcess, id: n
             numprocs: config.numprocs,
             id: id,
             autoRestart: config.autoRestart,
+            autoStart: config.autoStart,
         };
         process.value.numprocsNum = Number(config.numprocs);
     }

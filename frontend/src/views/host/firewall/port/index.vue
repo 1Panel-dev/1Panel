@@ -155,7 +155,7 @@ import { Host } from '@/api/interface/host';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { ElMessageBox } from 'element-plus';
-import router from '@/routers';
+import { routerToName } from '@/utils/router';
 
 const loading = ref();
 const activeTag = ref('port');
@@ -175,7 +175,7 @@ const data = ref();
 const paginationConfig = reactive({
     cacheSizeKey: 'firewall-port-page-size',
     currentPage: 1,
-    pageSize: 10,
+    pageSize: Number(localStorage.getItem('firewall-port-page-size')) || 20,
     total: 0,
 });
 
@@ -226,7 +226,7 @@ const onOpenDialog = async (
 };
 
 const quickJump = () => {
-    router.push({ name: 'AppInstalled' });
+    routerToName('AppInstalled');
 };
 
 const onChangeStatus = async (row: Host.RuleInfo, status: string) => {

@@ -28,7 +28,7 @@ type FirewallService struct{}
 type IFirewallService interface {
 	LoadBaseInfo() (dto.FirewallBaseInfo, error)
 	SearchWithPage(search dto.RuleSearch) (int64, interface{}, error)
-	OperateFirewall(operation string) error
+	OperateFirewall(req dto.FirewallOperation) error
 	OperatePortRule(req dto.PortRuleOperate, reload bool) error
 	OperateForwardRule(req dto.ForwardRuleOperate) error
 	OperateAddressRule(req dto.AddrRuleOperate, reload bool) error
@@ -177,13 +177,13 @@ func (u *FirewallService) SearchWithPage(req dto.RuleSearch) (int64, interface{}
 	return int64(total), backDatas, nil
 }
 
-func (u *FirewallService) OperateFirewall(operation string) error {
+func (u *FirewallService) OperateFirewall(req dto.FirewallOperation) error {
 	client, err := firewall.NewFirewallClient()
 	if err != nil {
 		return err
 	}
 	needRestartDocker := false
-	switch operation {
+	switch req.Operation {
 	case "start":
 		if err := client.Start(); err != nil {
 			return err
@@ -208,9 +208,9 @@ func (u *FirewallService) OperateFirewall(operation string) error {
 	case "enablePing":
 		return u.updatePingStatus("1")
 	default:
-		return fmt.Errorf("not supported operation: %s", operation)
+		return fmt.Errorf("not supported operation: %s", req.Operation)
 	}
-	if needRestartDocker {
+	if needRestartDocker && req.WithDockerRestart {
 		if err := restartDocker(); err != nil {
 			return err
 		}

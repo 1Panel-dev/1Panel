@@ -6,7 +6,9 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
+	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
 	"github.com/1Panel-dev/1Panel/agent/utils/ssh"
 	"github.com/jinzhu/copier"
@@ -18,7 +20,6 @@ type ISettingService interface {
 	GetSettingInfo() (*dto.SettingInfo, error)
 	Update(key, value string) error
 
-	GetSSHInfo() (string, error)
 	TestConnByInfo(req dto.SSHConnData) bool
 	SaveConnInfo(req dto.SSHConnData) error
 	GetSystemProxy() (*dto.SystemProxy, error)
@@ -53,14 +54,6 @@ func (u *SettingService) GetSettingInfo() (*dto.SettingInfo, error) {
 
 func (u *SettingService) Update(key, value string) error {
 	return settingRepo.UpdateOrCreate(key, value)
-}
-
-func (u *SettingService) GetSSHInfo() (string, error) {
-	conn, err := settingRepo.GetValueByKey("LocalSSHConn")
-	if err != nil || len(conn) == 0 {
-		return "", err
-	}
-	return encrypt.StringDecrypt(conn)
 }
 
 func (u *SettingService) TestConnByInfo(req dto.SSHConnData) bool {
@@ -121,9 +114,12 @@ func (u *SettingService) SaveConnInfo(req dto.SSHConnData) error {
 	}
 	defer client.Close()
 
-	localConn, _ := json.Marshal(&connInfo)
+	var connItem model.LocalConnInfo
+	_ = copier.Copy(&connItem, &req)
+	localConn, _ := json.Marshal(&connItem)
 	connAfterEncrypt, _ := encrypt.StringEncrypt(string(localConn))
 	_ = settingRepo.Update("LocalSSHConn", connAfterEncrypt)
+	_ = settingRepo.Update("LocalSSHConnShow", constant.StatusEnable)
 	return nil
 }
 
@@ -140,10 +136,15 @@ func (u *SettingService) GetSystemProxy() (*dto.SystemProxy, error) {
 
 func (u *SettingService) GetSettingByKey(key string) string {
 	switch key {
-	case "SystemIP":
+	case "LocalSSHConn":
+		value, _ := settingRepo.GetValueByKey(key)
+		if len(value) == 0 {
+			return ""
+		}
+		itemStr, _ := encrypt.StringDecrypt(value)
+		return itemStr
+	default:
 		value, _ := settingRepo.GetValueByKey(key)
 		return value
-	default:
-		return ""
 	}
 }

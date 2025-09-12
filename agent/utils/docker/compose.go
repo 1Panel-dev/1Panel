@@ -58,6 +58,7 @@ type Service struct {
 	Image       string      `yaml:"image"`
 	Environment Environment `yaml:"environment"`
 	Volumes     []string    `json:"volumes"`
+	Restart     string      `json:"restart"`
 }
 
 type Environment struct {
@@ -90,69 +91,6 @@ func (e *Environment) UnmarshalYAML(value *yaml.Node) error {
 		return fmt.Errorf("unsupported environment format")
 	}
 	return nil
-}
-
-func replaceEnvVariables(input string, envVars map[string]string) string {
-	for key, value := range envVars {
-		placeholder := fmt.Sprintf("${%s}", key)
-		input = strings.ReplaceAll(input, placeholder, value)
-	}
-	return input
-}
-func GetDockerComposeImagesV2(env, yml []byte) ([]string, error) {
-	var (
-		compose ComposeProject
-		err     error
-		images  []string
-	)
-	err = yaml.Unmarshal(yml, &compose)
-	if err != nil {
-		return nil, err
-	}
-	envMap, err := godotenv.UnmarshalBytes(env)
-	if err != nil {
-		return nil, err
-	}
-	for _, service := range compose.Services {
-		image := replaceEnvVariables(service.Image, envMap)
-		images = append(images, image)
-	}
-	return images, nil
-}
-
-func GetDockerComposeImages(projectName string, env, yml []byte) ([]string, error) {
-	var (
-		configFiles []types.ConfigFile
-		images      []string
-		imagesMap   = make(map[string]struct{})
-	)
-	configFiles = append(configFiles, types.ConfigFile{
-		Filename: "docker-compose.yml",
-		Content:  yml},
-	)
-	envMap, err := godotenv.UnmarshalBytes(env)
-	if err != nil {
-		return nil, err
-	}
-	details := types.ConfigDetails{
-		ConfigFiles: configFiles,
-		Environment: envMap,
-	}
-
-	project, err := loader.LoadWithContext(context.Background(), details, func(options *loader.Options) {
-		options.SetProjectName(projectName, true)
-		options.ResolvePaths = true
-	})
-	if err != nil {
-		return nil, err
-	}
-	for _, service := range project.AllServices() {
-		imagesMap[service.Image] = struct{}{}
-	}
-	for image := range imagesMap {
-		images = append(images, image)
-	}
-	return images, nil
 }
 
 func GetImagesFromDockerCompose(env, yml []byte) ([]string, error) {

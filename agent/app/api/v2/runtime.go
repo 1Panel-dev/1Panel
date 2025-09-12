@@ -497,7 +497,7 @@ func (b *BaseApi) OperateSupervisorProcessFile(c *gin.Context) {
 // @Tags Runtime
 // @Summary Update PHP container config
 // @Accept json
-// @Param request body request.PHPContainerUpdate true "request"
+// @Param request body request.PHPContainerConfig true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
@@ -518,7 +518,7 @@ func (b *BaseApi) UpdatePHPContainer(c *gin.Context) {
 // @Summary Get PHP container config
 // @Accept json
 // @Param id path integer true "request"
-// @Success 200 {object} response.PHPContainerConfig
+// @Success 200 {object} request.PHPContainerConfig
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /runtimes/php/container/:id [get]
@@ -539,7 +539,7 @@ func (b *BaseApi) GetPHPContainerConfig(c *gin.Context) {
 // @Tags Runtime
 // @Summary Update runtime remark
 // @Accept json
-// @Param request body request.RuntimeRemarkUpdate true "request"
+// @Param request body request.RuntimeRemark true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
@@ -554,4 +554,26 @@ func (b *BaseApi) UpdateRuntimeRemark(c *gin.Context) {
 		return
 	}
 	helper.Success(c)
+}
+
+// @Tags Runtime
+// @Summary Get PHP runtime status
+// @Accept json
+// @Param id path integer true "request"
+// @Success 200 {object} map[string]interface{}
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /runtimes/php/fpm/status/:id [get]
+func (b *BaseApi) GetFPMStatus(c *gin.Context) {
+	id, err := helper.GetParamID(c)
+	if err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	data, err := runtimeService.GetFPMStatus(id)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, data)
 }

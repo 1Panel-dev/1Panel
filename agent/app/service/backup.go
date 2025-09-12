@@ -14,9 +14,11 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
+	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/utils/cloud_storage"
 	"github.com/1Panel-dev/1Panel/agent/utils/cloud_storage/client"
 	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
@@ -37,6 +39,7 @@ type IBackupService interface {
 	Delete(id uint) error
 	RefreshToken(req dto.OperateByID) error
 	GetLocalDir() (string, error)
+	UploadForRecover(req dto.UploadForRecover) error
 
 	MysqlBackup(db dto.CommonBackup) error
 	PostgresqlBackup(db dto.CommonBackup) error
@@ -307,6 +310,16 @@ func (u *BackupService) RefreshToken(req dto.OperateByID) error {
 	return backupRepo.Save(&backup)
 }
 
+func (u *BackupService) UploadForRecover(req dto.UploadForRecover) error {
+	fileOp := files.NewFileOp()
+	if !fileOp.Stat(req.TargetDir) {
+		if err := fileOp.CreateDir(req.TargetDir, constant.DirPerm); err != nil {
+			return err
+		}
+	}
+	return fileOp.Copy(req.FilePath, req.TargetDir)
+}
+
 func (u *BackupService) checkBackupConn(backup *model.BackupAccount) (bool, error) {
 	client, err := newClient(backup, false)
 	if err != nil {
@@ -393,9 +406,13 @@ type backupClientHelper struct {
 	name        string
 	backupPath  string
 	client      cloud_storage.CloudStorageClient
+
+	isOk      bool
+	hasBackup bool
+	message   string
 }
 
-func NewBackupClientMap(ids []string) (map[string]backupClientHelper, error) {
+func NewBackupClientMap(ids []string) map[string]backupClientHelper {
 	var accounts []model.BackupAccount
 	var idItems []uint
 	for i := 0; i < len(ids); i++ {
@@ -406,18 +423,63 @@ func NewBackupClientMap(ids []string) (map[string]backupClientHelper, error) {
 	clientMap := make(map[string]backupClientHelper)
 	for _, item := range accounts {
 		backClient, err := newClient(&item, true)
-		if err != nil {
-			return nil, err
-		}
-		clientMap[fmt.Sprintf("%v", item.ID)] = backupClientHelper{
+		itemHelper := backupClientHelper{
 			client:      backClient,
 			name:        item.Name,
 			backupPath:  item.BackupPath,
 			accountType: item.Type,
 			id:          item.ID,
+			isOk:        err == nil,
 		}
+		if err != nil {
+			itemHelper.message = err.Error()
+		}
+		clientMap[fmt.Sprintf("%v", item.ID)] = itemHelper
 	}
-	return clientMap, nil
+	return clientMap
+}
+
+func uploadWithMap(taskItem task.Task, accountMap map[string]backupClientHelper, src, dst, accountIDs string, downloadAccountID, retry uint) error {
+	accounts := strings.Split(accountIDs, ",")
+	for _, account := range accounts {
+		if len(account) == 0 {
+			continue
+		}
+		itemBackup, ok := accountMap[account]
+		if !ok {
+			continue
+		}
+		if itemBackup.hasBackup {
+			continue
+		}
+		if !itemBackup.isOk {
+			taskItem.LogFailed(i18n.GetMsgWithDetail("LoadBackupFailed", itemBackup.message))
+			continue
+		}
+		name := itemBackup.name
+		if itemBackup.name == "localhost" {
+			name = i18n.GetMsgByKey("Localhost")
+		}
+		taskItem.LogStart(i18n.GetMsgWithMap("UploadFile", map[string]interface{}{
+			"file":   path.Join(itemBackup.backupPath, dst),
+			"backup": name,
+		}))
+		for i := 0; i < int(retry)+1; i++ {
+			_, err := itemBackup.client.Upload(src, path.Join(itemBackup.backupPath, dst))
+			taskItem.LogWithStatus(i18n.GetMsgByKey("Upload"), err)
+			if err != nil {
+				if account == fmt.Sprintf("%d", downloadAccountID) {
+					return err
+				}
+			} else {
+				break
+			}
+		}
+		itemBackup.hasBackup = true
+		accountMap[account] = itemBackup
+	}
+	os.RemoveAll(src)
+	return nil
 }
 
 func newClient(account *model.BackupAccount, isEncrypt bool) (cloud_storage.CloudStorageClient, error) {

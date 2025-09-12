@@ -101,6 +101,7 @@ const search = async () => {
         form.webSiteGroupId = res.data.webSiteGroupId;
         form.IPV6 = res.data.IPV6;
         form.alias = res.data.alias;
+        form.favorite = res.data.favorite;
     });
 };
 

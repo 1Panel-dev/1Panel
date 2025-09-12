@@ -2,12 +2,12 @@
     <DrawerPro v-model="drawerVisible" :header="$t('container.imagePush')" @close="onCloseLog" size="large">
         <el-form ref="formRef" label-position="top" :model="form" label-width="80px">
             <el-form-item :label="$t('container.tag')" :rules="Rules.requiredSelect" prop="tagName">
-                <el-select filterable v-model="form.tagName">
+                <el-select filterable v-model="form.tagName" @change="handleChange">
                     <el-option v-for="item in form.tags" :key="item" :value="item" :label="item" />
                 </el-select>
             </el-form-item>
             <el-form-item :label="$t('container.repoName')" :rules="Rules.requiredSelect" prop="repoID">
-                <el-select clearable style="width: 100%" filterable v-model="form.repoID">
+                <el-select clearable class="w-full" filterable v-model="form.repoID" @change="handleChange">
                     <el-option v-for="item in dialogData.repos" :key="item.id" :value="item.id" :label="item.name" />
                 </el-select>
             </el-form-item>
@@ -15,6 +15,9 @@
                 <el-input v-model.trim="form.name">
                     <template #prepend>{{ loadDetailInfo(form.repoID) }}/</template>
                 </el-input>
+                <span v-if="form.tags?.length !== 1" class="input-help">
+                    {{ $t('container.imagePushHelper', [loadDetailInfo(form.repoID) + '/' + form.name]) }}
+                </span>
             </el-form-item>
         </el-form>
 
@@ -74,6 +77,11 @@ const emit = defineEmits<{ (e: 'search'): void }>();
 
 type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
+
+const handleChange = () => {
+    let repoURL = loadDetailInfo(form.repoID);
+    form.name = form.tagName.indexOf(repoURL) !== -1 ? form.tagName.replaceAll(repoURL, '') : form.tagName;
+};
 
 const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;

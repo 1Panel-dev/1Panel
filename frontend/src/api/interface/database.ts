@@ -221,6 +221,7 @@ export namespace Database {
 
     // redis
     export interface RedisConfUpdate {
+        dbType: string;
         database: string;
         timeout: string;
         maxclients: string;
@@ -283,6 +284,7 @@ export namespace Database {
         clientCert: string;
         skipVerify: boolean;
 
+        timeout: number;
         description: string;
     }
     export interface SearchDatabasePage {
@@ -322,6 +324,7 @@ export namespace Database {
         clientCert: string;
         skipVerify: boolean;
 
+        timeout: number;
         description: string;
     }
     export interface DatabaseUpdate {
@@ -338,11 +341,17 @@ export namespace Database {
         clientCert: string;
         skipVerify: boolean;
 
+        timeout: number;
         description: string;
     }
     export interface DatabaseDelete {
         id: number;
         forceDelete: boolean;
         deleteBackup: boolean;
+    }
+
+    export interface DBResource {
+        type: string;
+        name: string;
     }
 }

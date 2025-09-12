@@ -116,7 +116,11 @@ func CheckBind(req interface{}, c *gin.Context) error {
 	return nil
 }
 
-func ErrResponse(ctx *gin.Context, code int) {
-	ctx.JSON(code, nil)
-	ctx.Abort()
+func GetParamInt32(paramName string, c *gin.Context) (int32, error) {
+	idParam, ok := c.Params.Get(paramName)
+	if !ok {
+		return 0, errors.New("error id in path")
+	}
+	intNum, _ := strconv.Atoi(idParam)
+	return int32(intNum), nil
 }

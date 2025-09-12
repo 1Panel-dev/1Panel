@@ -86,5 +86,7 @@ func (a *WebsiteRouter) InitRouter(Router *gin.RouterGroup) {
 		websiteRouter.POST("/databases", baseApi.ChangeWebsiteDatabase)
 
 		websiteRouter.POST("/crosssite", baseApi.OperateCrossSiteAccess)
+
+		websiteRouter.POST("/exec/composer", baseApi.ExecComposer)
 	}
 }

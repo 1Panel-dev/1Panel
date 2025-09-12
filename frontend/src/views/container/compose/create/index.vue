@@ -5,6 +5,7 @@
         @close="handleClose"
         size="large"
         :autoClose="false"
+        :fullScreen="true"
     >
         <el-form ref="formRef" @submit.prevent label-position="top" :model="form" :rules="rules" v-loading="loading">
             <el-form-item :label="$t('app.source')">
@@ -21,7 +22,7 @@
                     v-model="form.path"
                 >
                     <template #prepend>
-                        <FileList @choose="loadDir" :dir="false"></FileList>
+                        <el-button icon="Folder" @click="fileRef.acceptParams({ dir: false })" />
                     </template>
                 </el-input>
             </el-form-item>
@@ -69,6 +70,7 @@
         </template>
     </DrawerPro>
     <TaskLog ref="taskLogRef" width="70%" />
+    <FileList ref="fileRef" @choose="loadDir" />
 </template>
 
 <script lang="ts" setup>
@@ -91,6 +93,7 @@ const templateOptions = ref();
 const baseDir = ref();
 const composeFile = ref();
 const taskLogRef = ref();
+const fileRef = ref();
 
 const form = reactive({
     taskID: '',
@@ -227,5 +230,3 @@ defineExpose({
     acceptParams,
 });
 </script>
-
-<style scoped lang="scss"></style>

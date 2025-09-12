@@ -17,7 +17,8 @@ type RuleSearch struct {
 }
 
 type FirewallOperation struct {
-	Operation string `json:"operation" validate:"required,oneof=start stop restart disablePing enablePing"`
+	Operation         string `json:"operation" validate:"required,oneof=start stop restart disablePing enablePing"`
+	WithDockerRestart bool   `json:"withDockerRestart"`
 }
 
 type PortRuleOperate struct {

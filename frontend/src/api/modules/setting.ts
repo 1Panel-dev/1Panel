@@ -136,7 +136,7 @@ export const updateAppStoreConfig = (req: App.AppStoreConfigUpdate) => {
 
 // snapshot
 export const loadSnapshotInfo = () => {
-    return http.get<Setting.SnapshotData>(`/settings/snapshot/load`);
+    return http.get<Setting.SnapshotData>(`/settings/snapshot/load`, {}, { timeout: TimeoutEnum.T_60S });
 };
 export const snapshotCreate = (param: Setting.SnapshotCreate) => {
     return http.post(`/settings/snapshot`, param);
@@ -169,6 +169,9 @@ export const loadUpgradeInfo = () => {
 };
 export const loadReleaseNotes = (version: string) => {
     return http.post<string>(`/core/settings/upgrade/notes`, { version: version });
+};
+export const listReleases = () => {
+    return http.get<Array<Setting.ReleasesNotes>>(`/core/settings/upgrade/releases`);
 };
 export const upgrade = (version: string) => {
     return http.post(`/core/settings/upgrade`, { version: version });

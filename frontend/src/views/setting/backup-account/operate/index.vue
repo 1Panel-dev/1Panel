@@ -40,6 +40,17 @@
                     <el-option :label="$t('setting.UPYUN')" value="UPYUN"></el-option>
                 </el-select>
                 <span v-if="isALIYUNYUN()" class="input-help">{{ $t('setting.ALIYUNHelper') }}</span>
+                <span v-if="dialogData.rowData?.type === 'GoogleDrive'" class="input-help">
+                    {{ $t('setting.googleHelper', [$t('setting.' + dialogData.rowData?.type)]) }}
+                    <el-link
+                        style="font-size: 12px; margin-left: 5px"
+                        icon="Position"
+                        @click="toDoc('google-drive')"
+                        type="primary"
+                    >
+                        {{ $t('firewall.quickJump') }}
+                    </el-link>
+                </span>
             </el-form-item>
             <el-form-item
                 v-if="dialogData.rowData!.type === 'S3'"
@@ -349,17 +360,6 @@
                             {{ $t('setting.loadCode') }}
                         </el-button>
                     </div>
-                    <span class="input-help">
-                        {{ $t('setting.codeHelper', [$t('setting.' + dialogData.rowData?.type)]) }}
-                        <el-link
-                            style="font-size: 12px; margin-left: 5px"
-                            icon="Position"
-                            @click="toDoc(dialogData.rowData!.type === 'OneDrive' ? 'onedrive-bind' : 'google-drive')"
-                            type="primary"
-                        >
-                            {{ $t('firewall.quickJump') }}
-                        </el-link>
-                    </span>
                 </el-form-item>
             </div>
             <el-form-item v-if="hasBackDir()" :label="$t('setting.backupDir')" prop="backupPath">
@@ -381,7 +381,7 @@
             >
                 <el-input v-model="dialogData.rowData!.backupPath">
                     <template #prepend>
-                        <FileList @choose="loadDir" :dir="true"></FileList>
+                        <el-button icon="Folder" @click="fileRef.acceptParams({ dir: true })" />
                     </template>
                 </el-input>
             </el-form-item>
@@ -395,6 +395,7 @@
             </el-button>
         </template>
     </DrawerPro>
+    <FileList ref="fileRef" @choose="loadDir" />
 </template>
 
 <script lang="ts" setup>
@@ -403,6 +404,7 @@ import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { Backup } from '@/api/interface/backup';
+import FileList from '@/components/file-list/index.vue';
 import { addBackup, editBackup, getClientInfo, listBucket } from '@/api/modules/backup';
 import { cities } from './../helper';
 import { deepCopy, spliceHttp, splitHttp } from '@/utils/util';
@@ -416,6 +418,7 @@ type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
 const buckets = ref();
 const clientInfo = ref();
+const fileRef = ref();
 
 const regionInput = ref();
 
@@ -605,17 +608,6 @@ const changeType = async () => {
                 };
             }
             break;
-        case 'GoogleDrive':
-            const res2 = await getClientInfo('GoogleDrive');
-            clientInfo.value = res2.data;
-            if (!dialogData.value.rowData.id) {
-                dialogData.value.rowData.varsJson = {
-                    client_id: res2.data.client_id,
-                    client_secret: res2.data.client_secret,
-                    redirect_uri: res2.data.redirect_uri,
-                };
-            }
-            break;
         case 'SFTP':
             dialogData.value.rowData.varsJson['port'] = 22;
             dialogData.value.rowData.varsJson['authMode'] = 'password';
@@ -703,7 +695,6 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
                 .then(() => {
                     loading.value = false;
                     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                    emit('search');
                     drawerVisible.value = false;
                 })
                 .catch(() => {
@@ -715,7 +706,6 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
             .then(() => {
                 loading.value = false;
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                emit('search');
                 drawerVisible.value = false;
             })
             .catch(() => {

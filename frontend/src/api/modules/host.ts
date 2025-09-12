@@ -12,8 +12,15 @@ export const loadFireBaseInfo = () => {
 export const searchFireRule = (params: Host.RuleSearch) => {
     return http.post<ResPage<Host.RuleInfo>>(`/hosts/firewall/search`, params, TimeoutEnum.T_40S);
 };
-export const operateFire = (operation: string) => {
-    return http.post(`/hosts/firewall/operate`, { operation: operation }, TimeoutEnum.T_40S);
+export const operateFire = (operation: string, withDockerRestart: boolean) => {
+    return http.post(
+        `/hosts/firewall/operate`,
+        {
+            operation: operation,
+            withDockerRestart: withDockerRestart,
+        },
+        TimeoutEnum.T_60S,
+    );
 };
 export const operatePortRule = (params: Host.RulePort) => {
     return http.post<Host.RulePort>(`/hosts/firewall/port`, params, TimeoutEnum.T_40S);
@@ -96,5 +103,29 @@ export const syncCert = () => {
     return http.post(`/hosts/ssh/cert/sync`);
 };
 export const loadSSHLogs = (params: Host.searchSSHLog) => {
-    return http.post<Host.sshLog>(`/hosts/ssh/log`, params);
+    return http.post<ResPage<Host.sshHistory>>(`/hosts/ssh/log`, params);
+};
+export const exportSSHLogs = (params: Host.searchSSHLog) => {
+    return http.post<string>(`/hosts/ssh/log/export`, params, TimeoutEnum.T_40S);
+};
+
+export const listDisks = () => {
+    return http.get<Host.CompleteDiskInfo>(`/hosts/disks`);
+};
+
+export const partitionDisk = (params: Host.DiskPartition) => {
+    return http.post(`/hosts/disks/partition`, params, TimeoutEnum.T_60S);
+};
+
+export const mountDisk = (params: Host.DiskMount) => {
+    return http.post(`/hosts/disks/mount`, params, TimeoutEnum.T_60S);
+};
+
+export const unmountDisk = (params: Host.DiskUmount) => {
+    return http.post(`/hosts/disks/unmount`, params, TimeoutEnum.T_60S);
+};
+
+export const getComponentInfo = (name: string, operateNode?: string) => {
+    const params = operateNode ? `?operateNode=${operateNode}` : '';
+    return http.get<Host.ComponentInfo>(`/hosts/components/${name}${params}`);
 };

@@ -119,7 +119,7 @@
             </div>
         </el-form>
     </DrawerPro>
-    <SnapRecover ref="recoverRef" @close="handleClose" />
+    <SnapRecover ref="recoverRef" />
 </template>
 
 <script setup lang="ts">

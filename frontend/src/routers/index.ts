@@ -73,6 +73,8 @@ router.afterEach((to) => {
                 localStorage.setItem('cachedRoute' + to.meta.activeMenu, '/cronjobs/cronjob');
             } else if (to.meta.activeMenu === '/containers' && to.path === '/containers/container/operate') {
                 localStorage.setItem('cachedRoute' + to.meta.activeMenu, '/containers/container');
+            } else if (to.meta.activeMenu === '/toolbox' && to.path === '/toolbox/clam/setting') {
+                localStorage.setItem('cachedRoute' + to.meta.activeMenu, '/toolbox/clam');
             } else {
                 localStorage.setItem('cachedRoute' + to.meta.activeMenu, to.path);
             }

@@ -19,7 +19,7 @@
                     <el-form-item :label="$t('toolbox.clam.scanDir')" prop="path">
                         <el-input v-model="dialogData.rowData!.path">
                             <template #prepend>
-                                <FileList @choose="loadDir" :dir="true"></FileList>
+                                <el-button icon="Folder" @click="scanDirRef.acceptParams({ dir: true })" />
                             </template>
                         </el-input>
                     </el-form-item>
@@ -38,7 +38,7 @@
                     <el-form-item v-if="hasInfectedDir()" :label="$t('toolbox.clam.infectedDir')" prop="infectedDir">
                         <el-input v-model="dialogData.rowData!.infectedDir">
                             <template #prepend>
-                                <FileList @choose="loadInfectedDir" :dir="true"></FileList>
+                                <el-button icon="Folder" @click="infectedDirRef.acceptParams({ dir: true })" />
                             </template>
                         </el-input>
                     </el-form-item>
@@ -189,6 +189,8 @@
         </template>
         <LicenseImport ref="licenseRef" />
     </DrawerPro>
+    <FileList ref="scanDirRef" @choose="loadDir" />
+    <FileList ref="infectedDirRef" @choose="loadInfectedDir" />
 </template>
 
 <script lang="ts" setup>
@@ -207,6 +209,8 @@ import { specOptions, transObjToSpec, transSpecToObj, weekOptions } from '@/view
 
 const globalStore = GlobalStore();
 const licenseRef = ref();
+const scanDirRef = ref();
+const infectedDirRef = ref();
 const { isProductPro } = storeToRefs(globalStore);
 interface DialogProps {
     title: string;

@@ -14,6 +14,12 @@ ErrApiConfigKeyInvalid: 'Ralat kunci antara muka API: {{ .detail }}'
 ErrApiConfigIPInvalid: 'IP yang digunakan untuk memanggil antara muka API tiada dalam senarai putih: {{ .detail }}'
 ErrApiConfigDisable: 'Antara muka ini melarang penggunaan panggilan antara muka API: {{ .detail }}'
 ErrApiConfigKeyTimeInvalid: 'Ralat cap masa antara muka API: {{ .detail }}'
+StartPushSSLToNode: "Mula menolak sijil ke nod"
+PushSSLToNodeFailed: "Gagal menolak sijil ke nod: {{ .err }}"
+PushSSLToNodeSuccess: "Berjaya menolak sijil ke nod"
+
+ErrMinQuickJump: "Sila tetapkan sekurang-kurangnya satu entri lompat pantas!"
+ErrMaxQuickJump: "Anda boleh menetapkan sehingga empat entri lompat pantas!"
 
 #biasa
 ErrUsernameIsExist: 'Nama pengguna sudah wujud'
@@ -34,6 +40,7 @@ ErrGroupIsDefault: 'Kumpulan lalai, tidak boleh dipadamkan'
 ErrGroupIsInWebsiteUse: 'Kumpulan sedang digunakan oleh tapak web lain dan tidak boleh dipadamkan.'
 
 #sandaran
+Localhost: 'Mesin Tempatan'
 ErrBackupInUsed: 'Akaun sandaran telah digunakan dalam tugas yang dijadualkan dan tidak boleh dipadamkan.'
 ErrBackupCheck: 'Sambungan ujian akaun sandaran gagal {{ .err }}'
 ErrBackupLocalDelete: 'Memadam akaun sandaran pelayan tempatan belum disokong lagi'
@@ -79,9 +86,7 @@ AppStoreIsLastVersion: 'App Store sudah pun versi terkini'
 AppStoreSyncSuccess: 'Penyegerakan App Store berjaya'
 SyncAppDetail: 'Segerakkan konfigurasi aplikasi'
 AppVersionNotMatch: 'Aplikasi {{ .name }} memerlukan versi 1Panel yang lebih tinggi, melangkau penyegerakan'
-MoveSiteDir: 'Peningkatan semasa memerlukan penghijrahan direktori tapak web OpenResty'
-MoveSiteToDir: 'Pindahkan direktori tapak ke {{ .name }}'
-ErrMoveSiteDir: 'Gagal memindahkan direktori tapak'
+MoveSiteDir: "Perubahan direktori laman web didapati. Perlu memindahkan direktori laman web OpenResty ke {{ .name }}"
 MoveSiteDirSuccess: 'Penghijrahan direktori tapak web yang berjaya'
 DeleteRuntimePHP: 'Padam masa jalan PHP'
 CustomAppStoreFileValid: 'Pakej gedung apl perlu dalam format .tar.gz'
@@ -92,6 +97,15 @@ ErrCustomRuntimes: 'Terdapat persekitaran masa jalan yang dipasang, sila padamka
 ErrAppVersionDeprecated: "Aplikasi {{ .name }} tidak sesuai dengan versi 1Panel saat ini, dilewati"
 ErrDockerFailed: "Keadaan Docker tidak normal, sila periksa status perkhidmatan"
 ErrDockerComposeCmdNotFound: "Perintah Docker Compose tidak wujud, sila pasang perintah ini di mesin tuan terlebih dahulu"
+
+#ssh
+ExportIP: "IP Log Masuk"
+ExportArea: "Lokasi"
+ExportPort: "Port"
+ExportAuthMode: "Kaedah Log Masuk"
+ExportUser: "Pengguna"
+ExportStatus: "Status Log Masuk"
+ExportDate: "Masa"
 
 #fail
 ErrFileCanNotRead: 'Fail ini tidak menyokong pratonton'
@@ -107,6 +121,10 @@ ErrSourcePathNotFound: 'Direktori sumber tidak wujud'
 ErrFavoriteExist: 'Laluan ini telah digemari'
 ErrInvalidChar: 'Aksara haram tidak dibenarkan'
 ErrPathNotDelete: 'Direktori yang dipilih tidak boleh dipadamkan'
+ErrLogFileTooLarge: "Fail log melebihi 500MB dan tidak boleh dibuka"
+FileDropFailed: "Gagal membersihkan fail {{ .name }}: {{ .err }}"
+FileDropSuccess: "Berjaya membersihkan fail {{ .name }}, {{ .count }} fail dibersihkan, {{ .size }} ruang cakera dibebaskan"
+FileDropSum: "Pembersihan fail selesai, sejumlah {{ .count }} fail dibersihkan, sejumlah {{ .size }} ruang cakera dibebaskan"
 
 #laman web
 ErrAliasIsExist: 'Alias sudah wujud'
@@ -122,6 +140,9 @@ ErrBuildDirNotFound: 'Direktori binaan tidak wujud'
 ErrImageNotExist: 'Imej persekitaran operasi {{ .name }} tidak wujud, sila edit semula persekitaran pengendalian'
 ErrProxyIsUsed: "Pengimbang beban telah digunakan oleh pengganti terbalik, tidak boleh dipadamkan"
 ErrSSLValid: 'Fail sijil bermasalah, sila periksa status sijil!'
+ErrWebsiteDir: "Sila pilih direktori dalam direktori laman web."
+ErrComposerFileNotFound: "Fail composer.json tidak wujud"
+ErrRuntimeNoPort: "Persekitaran runtime tidak diset dengan port, sila edit persekitaran runtime terlebih dahulu."
 
 #ssl
 ErrSSLCannotDelete: 'Sijil {{ .name }} sedang digunakan oleh tapak web dan tidak boleh dipadamkan'
@@ -209,8 +230,12 @@ SystemLog: 'Log Sistem'
 CutWebsiteLog: 'Putar Log Laman Web'
 FileOrDir: 'Direktori / Fail'
 UploadFile: 'Muat naik fail sandaran {{ .file }} ke {{ .backup }}'
-IgnoreBackupErr: 'Sandaran gagal, ralat: {{ .detail }}, abaikan ralat ini...'
-IgnoreUploadErr: 'Muat naik gagal, ralat: {{ .detail }}, abaikan ralat ini...'
+Upload: "Muat Naik"
+IgnoreBackupErr: "Sandaran gagal, ralat: {{ .detail }}, abaikan ralat ini..."
+IgnoreUploadErr: "Muat naik gagal, ralat: {{ .detail }}, abaikan ralat ini..."
+LoadBackupFailed: "Gagal mendapatkan sambungan akaun sandaran, ralat: {{ .detail }}"
+InExecuting: "Tugas semasa sedang dilaksanakan, jangan ulangi pelaksanaan!"
+NoSuchResource: "Tiada kandungan sandaran ditemui dalam pangkalan data, dilangkau..."
 
 #kotak alat
 ErrNotExistUser: 'Pengguna semasa tidak wujud, sila ubah suai dan cuba lagi!'
@@ -270,6 +295,7 @@ allow: 'membenarkan'
 deny: 'menafikan'
 OpenrestyNotFound: 'Openresty tidak dipasang'
 remoteIpIsNull: "Senarai IP kosong"
+OpenrestyVersionErr: "Versi Openresty terlalu rendah, sila naik taraf Openresty ke 1.27.1.2-2-2-focal"
 
 #tugas
 TaskStart: '{{ .name }} Task mula [MULA]'
@@ -326,6 +352,11 @@ SubTask: 'Subtugas'
 RuntimeExtension: 'Sambungan Persekitaran Runtime'
 TaskIsExecuting: 'Tugas sedang berjalan'
 CustomAppstore: 'Gudang aplikasi tersuai'
+TaskExec: 'Laksanakan'
+
+# task - clam
+Clamscan: "Imbas {{ .name }}"
+TaskScan: "Imbas"
 
 # tugasan - ai
 OllamaModelPull: 'Tarik model Ollama {{ .name }}'
@@ -355,7 +386,6 @@ SnapCompressFile: 'Mampatkan fail syot kilat'
 SnapCheckCompress: 'Semak fail mampatan syot kilat'
 SnapCompressSize: 'Saiz fail syot kilat {{ .name }}'
 SnapUpload: 'Muat naik fail syot kilat'
-SnapLoadBackup: 'Dapatkan maklumat akaun sandaran'
 SnapUploadTo: 'Muat naik fail syot kilat ke {{ .name }}'
 SnapUploadRes: 'Muat naik fail syot kilat ke {{ .name }}'
 
@@ -444,3 +474,16 @@ DiskUsedAlert: "Cakera '{{ .name }}' dalam 1Panel anda telah menggunakan {{ .use
 ResourceAlert: "Penggunaan purata {{ .name }} selama {{ .time }} minit dalam 1Panel anda ialah {{ .used }}. Sila log masuk ke panel untuk maklumat lanjut."
 PanelVersionAlert: "Versi baru 1Panel tersedia. Sila log masuk ke panel untuk menaik taraf."
 PanelPwdExpirationAlert: "Kata laluan 1Panel anda akan tamat dalam {{ .day }} hari. Sila log masuk ke panel untuk maklumat lanjut."
+CommonAlert: "1Panel anda, {{ .msg }}, sila log masuk ke panel untuk maklumat lanjut."
+NodeExceptionAlert: "1Panel anda, {{ .num }} nod bermasalah, sila log masuk ke panel untuk maklumat lanjut."
+LicenseExceptionAlert: "1Panel anda, {{ .num }} lesen bermasalah, sila log masuk ke panel untuk maklumat lanjut."
+SSHAndPanelLoginAlert: "1Panel anda, log masuk panel {{ .name }} yang tidak normal dari {{ .ip }}, sila log masuk ke panel untuk maklumat lanjut."
+
+#disk
+DeviceNotFound: "Peranti {{ .name }} tidak ditemui"
+DeviceIsMounted: "Peranti {{ .name }} telah dikaitkan, sila nyahkaitkan terlebih dahulu"
+PartitionDiskErr: "Gagal membahagikan, {{ .err }}"
+FormatDiskErr: "Gagal memformat cakera, {{ .err }}"
+MountDiskErr: "Gagal mengkaitkan cakera, {{ .err }}"
+UnMountDiskErr: "Gagal nyahkaitkan cakera, {{ .err }}"
+XfsNotFound: "Sistem fail xfs tidak dikesan, sila pasang xfsprogs terlebih dahulu"

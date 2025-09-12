@@ -101,15 +101,12 @@ func (r *Local) Delete(info DeleteInfo) error {
 	if len(info.Name) != 0 {
 		dropSql := fmt.Sprintf("DROP DATABASE \"%s\"", info.Name)
 		if err := r.ExecSQL(dropSql, info.Timeout); err != nil && !info.ForceDelete {
-			return err
+			return fmt.Errorf("drop database failed, err: %v", err)
 		}
 	}
 	dropSql := fmt.Sprintf("DROP USER \"%s\"", info.Username)
 	if err := r.ExecSQL(dropSql, info.Timeout); err != nil && !info.ForceDelete {
-		if strings.Contains(strings.ToLower(err.Error()), "depend on it") {
-			return buserr.WithDetail("ErrInUsed", info.Username, nil)
-		}
-		return err
+		return fmt.Errorf("drop user failed, err: %v", err)
 	}
 	return nil
 }
@@ -136,7 +133,11 @@ func (r *Local) Backup(info BackupInfo) error {
 	}
 	defer outfile.Close()
 	global.LOG.Infof("start to pg_dump | gzip > %s.gzip", info.TargetDir+"/"+info.FileName)
-	cmd := exec.Command(
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(info.Timeout*uint(time.Second)))
+	defer cancel()
+	cmd := exec.CommandContext(
+		ctx,
 		"docker", "exec", "-i", r.ContainerName,
 		"sh", "-c",
 		fmt.Sprintf("PGPASSWORD=%s pg_dump -F c -U %s -d %s", r.Password, r.Username, info.Name),
@@ -159,8 +160,11 @@ func (r *Local) Backup(info BackupInfo) error {
 func (r *Local) Recover(info RecoverInfo) error {
 	fi, _ := os.Open(info.SourceFile)
 	defer fi.Close()
-	cmd := exec.Command("docker", "exec", r.ContainerName, "sh", "-c",
-		fmt.Sprintf("PGPASSWORD=%s pg_dump -F c -U %s -d %s", r.Password, r.Username, info.Name),
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(info.Timeout*uint(time.Second)))
+	defer cancel()
+	cmd := exec.CommandContext(ctx, "docker", "exec", "-i", r.ContainerName, "sh", "-c",
+		fmt.Sprintf("PGPASSWORD=%s pg_restore -F c -c --if-exists --no-owner -U %s -d %s", r.Password, r.Username, info.Name),
 	)
 	if strings.HasSuffix(info.SourceFile, ".gz") {
 		gzipFile, err := os.Open(info.SourceFile)

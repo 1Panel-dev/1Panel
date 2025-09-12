@@ -4,14 +4,14 @@ import "time"
 
 // common
 type DBConfUpdateByFile struct {
-	Type     string `json:"type" validate:"required,oneof=mysql mariadb postgresql redis mysql-cluster postgresql-cluster"`
+	Type     string `json:"type" validate:"required,oneof=mysql mariadb postgresql redis mysql-cluster postgresql-cluster redis-cluster"`
 	Database string `json:"database" validate:"required"`
 	File     string `json:"file"`
 }
 type ChangeDBInfo struct {
 	ID       uint   `json:"id"`
 	From     string `json:"from" validate:"required,oneof=local remote"`
-	Type     string `json:"type" validate:"required,oneof=mysql mariadb postgresql mysql-cluster postgresql-cluster"`
+	Type     string `json:"type" validate:"required,oneof=mysql mariadb postgresql redis mysql-cluster postgresql-cluster redis-cluster"`
 	Database string `json:"database" validate:"required"`
 	Value    string `json:"value" validate:"required"`
 }
@@ -260,6 +260,7 @@ type DatabaseInfo struct {
 	ClientCert string `json:"clientCert"`
 	SkipVerify bool   `json:"skipVerify"`
 
+	Timeout     uint   `json:"timeout"`
 	Description string `json:"description"`
 }
 
@@ -295,6 +296,7 @@ type DatabaseCreate struct {
 	ClientCert string `json:"clientCert"`
 	SkipVerify bool   `json:"skipVerify"`
 
+	Timeout     uint   `json:"timeout"`
 	Description string `json:"description"`
 }
 
@@ -313,6 +315,7 @@ type DatabaseUpdate struct {
 	ClientCert string `json:"clientCert"`
 	SkipVerify bool   `json:"skipVerify"`
 
+	Timeout     uint   `json:"timeout"`
 	Description string `json:"description"`
 }
 
@@ -325,4 +328,9 @@ type DatabaseDelete struct {
 type LoadRedisStatus struct {
 	Name string `json:"name" validate:"required"`
 	Type string `json:"type" validate:"required"`
+}
+
+type DBResource struct {
+	Type string `json:"type"`
+	Name string `json:"name"`
 }

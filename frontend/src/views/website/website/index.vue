@@ -19,21 +19,21 @@
                 ></AppStatus>
             </template>
             <template v-if="!openNginxConfig && nginxIsExist" #leftToolBar>
-                <el-button type="primary" @click="openCreate" :disabled="nginxStatus != 'Running'">
+                <el-button type="primary" @click="openCreate" :disabled="disabledConfig">
                     {{ $t('website.create') }}
                 </el-button>
-                <el-button type="primary" plain @click="openGroup" :disabled="nginxStatus != 'Running'">
+                <el-button type="primary" plain @click="openGroup" :disabled="disabledConfig">
                     {{ $t('commons.table.group') }}
                 </el-button>
-                <el-button type="primary" plain @click="openDefault" :disabled="nginxStatus != 'Running'">
+                <el-button type="primary" plain @click="openDefault" :disabled="disabledConfig">
                     {{ $t('website.defaultServer') }}
                 </el-button>
-                <el-button type="primary" plain @click="openDefaultHtml" :disabled="nginxStatus != 'Running'">
+                <el-button type="primary" plain @click="openDefaultHtml" :disabled="disabledConfig">
                     {{ $t('website.defaultHtml') }}
                 </el-button>
             </template>
             <template v-if="!openNginxConfig && nginxIsExist" #rightToolBar>
-                <el-select class="p-w-200" v-model="req.type" @change="search()" :disabled="nginxStatus != 'Running'">
+                <el-select class="p-w-200" v-model="req.type" @change="search()" :disabled="disabledConfig">
                     <template #prefix>{{ $t('commons.table.type') }}</template>
                     <el-option :label="$t('commons.table.all')" :value="''"></el-option>
                     <el-option
@@ -43,12 +43,7 @@
                         :key="item.value"
                     ></el-option>
                 </el-select>
-                <el-select
-                    v-model="req.websiteGroupId"
-                    @change="search()"
-                    class="p-w-200"
-                    :disabled="nginxStatus != 'Running'"
-                >
+                <el-select v-model="req.websiteGroupId" @change="search()" class="p-w-200" :disabled="disabledConfig">
                     <template #prefix>{{ $t('commons.table.group') }}</template>
                     <el-option :label="$t('commons.table.all')" :value="0"></el-option>
                     <div v-for="item in groups" :key="item.id">
@@ -60,8 +55,8 @@
                         <el-option v-else :label="item.name" :value="item.id" />
                     </div>
                 </el-select>
-                <TableSearch @search="search()" v-model:searchName="req.name" />
-                <TableRefresh @search="search()" />
+                <TableSearch @search="search()" v-model:searchName="req.name" :disabled="disabledConfig" />
+                <TableRefresh @search="search()" :disabled="disabledConfig" />
                 <fu-table-column-select
                     :columns="columns"
                     trigger="hover"
@@ -76,7 +71,7 @@
                     :data="data"
                     @sort-change="changeSort"
                     @search="search()"
-                    :class="{ mask: nginxStatus != 'Running' }"
+                    :class="{ mask: disabledConfig }"
                     :heightDiff="310"
                     :columns="columns"
                     @cell-mouse-enter="showFavorite"
@@ -119,7 +114,7 @@
                                                         </el-button>
                                                     </td>
                                                     <td>
-                                                        <CopyButton :content="getUrl(domain, row)" type="icon" />
+                                                        <CopyButton :content="getUrl(domain, row)" />
                                                     </td>
                                                 </tr>
                                             </tbody>
@@ -177,7 +172,7 @@
                     </el-table-column>
                     <el-table-column :label="$t('website.sitePath')" prop="sitePath" width="90px">
                         <template #default="{ row }">
-                            <el-button type="primary" link @click="toFolder(row.sitePath + '/index')">
+                            <el-button type="primary" link @click="routerToFileWithPath(row.sitePath + '/index')">
                                 <el-icon>
                                     <FolderOpened />
                                 </el-icon>
@@ -270,8 +265,13 @@
                         fix
                     />
                 </ComplexTable>
-                <el-card width="30%" v-if="nginxStatus != 'Running' && maskShow" class="mask-prompt">
-                    <span v-if="nginxIsExist">{{ $t('commons.service.serviceNotStarted', ['OpenResty']) }}</span>
+                <el-card width="30%" v-if="disabledConfig && maskShow" class="mask-prompt">
+                    <span v-if="nginxIsExist">
+                        {{ $t('commons.service.serviceNotStarted', ['OpenResty']) }}
+                        <el-button type="primary" link @click="routerToFileWithPath(websiteDir)" icon="FolderOpened">
+                            {{ $t('website.toWebsiteDir') }}
+                        </el-button>
+                    </span>
                     <span v-else>
                         {{ $t('app.checkInstalledWarn', ['OpenResty']) }}
                         <el-button @click="goRouter('openresty')" link icon="Position" type="primary">
@@ -303,7 +303,6 @@ import NginxConfig from '@/views/website/website/nginx/index.vue';
 import GroupDialog from '@/components/agent-group/index.vue';
 import AppStatus from '@/components/app-status/index.vue';
 import i18n from '@/lang';
-import router from '@/routers';
 import { onMounted, reactive, ref, computed } from 'vue';
 import { listDomains, opWebsite, searchWebsites, updateWebsite } from '@/api/modules/website';
 import { Website } from '@/api/interface/website';
@@ -316,6 +315,7 @@ import { getAgentGroupList } from '@/api/modules/group';
 import { Group } from '@/api/interface/group';
 import { GlobalStore } from '@/store';
 import { getWebsiteTypes } from '@/global/mimetype';
+import { routerToFileWithPath, routerToNameWithParams, routerToNameWithQuery } from '@/utils/router';
 const globalStore = GlobalStore();
 
 const shortcuts = [
@@ -355,11 +355,12 @@ const dataRef = ref();
 const domains = ref<Website.Domain[]>([]);
 const columns = ref([]);
 const hoveredRowIndex = ref(-1);
+const websiteDir = ref();
 
 const paginationConfig = reactive({
     cacheSizeKey: 'website-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('website-page-size')) || 10,
+    pageSize: Number(localStorage.getItem('website-page-size')) || 20,
     total: 0,
 });
 let req = reactive({
@@ -376,7 +377,7 @@ const mobile = computed(() => {
 });
 
 const goRouter = async (key: string) => {
-    router.push({ name: 'AppAll', query: { install: key } });
+    routerToNameWithQuery('AppAll', { install: key });
 };
 
 const showFavorite = (row: any) => {
@@ -391,6 +392,10 @@ const favoriteWebsite = (row: Website.Website) => {
     row.favorite = !row.favorite;
     updateWebsitConfig(row);
 };
+
+const disabledConfig = computed(() => {
+    return nginxStatus.value != 'Running';
+});
 
 const changeSort = ({ prop, order }) => {
     if (order) {
@@ -439,7 +444,7 @@ const setting = () => {
 };
 
 const openConfig = (id: number) => {
-    router.push({ name: 'WebsiteConfig', params: { id: id, tab: 'basic' } });
+    routerToNameWithParams('WebsiteConfig', { id: id, tab: 'basic' });
 };
 
 const isEver = (time: string) => {
@@ -585,6 +590,7 @@ const checkExist = (data: App.CheckInstalled) => {
     containerName.value = data.containerName;
     nginxStatus.value = data.status;
     installPath.value = data.installPath;
+    websiteDir.value = data.websiteDir;
 };
 
 const checkDate = (date: Date) => {
@@ -601,10 +607,6 @@ const operateWebsite = (op: string, id: number) => {
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         search();
     });
-};
-
-const toFolder = (folder: string) => {
-    router.push({ path: '/hosts/files', query: { path: folder } });
 };
 
 const searchDomains = (id: number) => {

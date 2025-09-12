@@ -15,12 +15,9 @@ export const searchApp = (req: App.AppReq) => {
     return http.post<App.AppResPage>('apps/search', req);
 };
 
-export const getAppByKey = (key: string) => {
-    return http.get<App.AppDTO>('apps/' + key);
-};
-
-export const getAppByKeyWithNode = (key: string, node: string) => {
-    return http.get<App.AppDTO>('apps/' + key + `?operateNode=${node}`);
+export const getAppByKey = (key: string, node?: string) => {
+    const params = node ? `?operateNode=${node}` : '';
+    return http.get<App.AppDTO>('apps/' + key + `${params}`);
 };
 
 export const getAppTags = () => {

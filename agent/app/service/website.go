@@ -126,6 +126,8 @@ type IWebsiteService interface {
 	ChangeDatabase(req request.ChangeDatabase) error
 
 	OperateCrossSiteAccess(req request.CrossSiteAccessOp) error
+
+	ExecComposer(req request.ExecComposerReq) error
 }
 
 func NewIWebsiteService() IWebsiteService {
@@ -137,7 +139,7 @@ func (w WebsiteService) PageWebsite(req request.WebsiteSearch) (int64, []respons
 		websiteDTOs []response.WebsiteRes
 		opts        []repo.DBOption
 	)
-	opts = append(opts, repo.WithOrderRuleBy(req.OrderBy, req.Order))
+	opts = append(opts, repo.WithOrderRuleBy(req.OrderBy, req.Order), repo.WithOrderRuleBy("updated_at", "descending"))
 	if req.Name != "" {
 		domains, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithDomainLike(req.Name))
 		if len(domains) > 0 {
@@ -202,6 +204,7 @@ func (w WebsiteService) PageWebsite(req request.WebsiteSearch) (int64, []respons
 			AppInstallID:  appInstallID,
 			RuntimeType:   runtimeType,
 			Favorite:      web.Favorite,
+			IPV6:          web.IPV6,
 		}
 
 		sites, _ := websiteRepo.List(websiteRepo.WithParentID(web.ID))
@@ -404,9 +407,10 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 			}
 		case constant.RuntimeNode, constant.RuntimeJava, constant.RuntimeGo, constant.RuntimePython, constant.RuntimeDotNet:
 			proxyPort := runtime.Port
-			if create.Port > 0 {
-				proxyPort = strconv.Itoa(create.Port)
+			if proxyPort == "" {
+				return buserr.New("ErrRuntimeNoPort")
 			}
+			proxyPort = strconv.Itoa(create.Port)
 			website.Proxy = fmt.Sprintf("127.0.0.1:%s", proxyPort)
 		}
 	case constant.Subsite:
@@ -465,14 +469,15 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 			website.Protocol = constant.ProtocolHTTPS
 			website.WebsiteSSLID = create.WebsiteSSLID
 			appSSLReq := request.WebsiteHTTPSOp{
-				WebsiteID:    website.ID,
-				Enable:       true,
-				WebsiteSSLID: websiteModel.ID,
-				Type:         "existed",
-				HttpConfig:   "HTTPToHTTPS",
-				SSLProtocol:  []string{"TLSv1.3", "TLSv1.2"},
-				Algorithm:    "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256:!aNULL:!eNULL:!EXPORT:!DSS:!DES:!RC4:!3DES:!MD5:!PSK:!KRB5:!SRP:!CAMELLIA:!SEED",
-				Hsts:         true,
+				WebsiteID:             website.ID,
+				Enable:                true,
+				WebsiteSSLID:          websiteModel.ID,
+				Type:                  "existed",
+				HttpConfig:            "HTTPToHTTPS",
+				SSLProtocol:           []string{"TLSv1.3", "TLSv1.2"},
+				Algorithm:             "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256:!aNULL:!eNULL:!EXPORT:!DSS:!DES:!RC4:!3DES:!MD5:!PSK:!KRB5:!SRP:!CAMELLIA:!SEED",
+				Hsts:                  true,
+				HstsIncludeSubDomains: true,
 			}
 			if err = applySSL(website, *websiteModel, appSSLReq); err != nil {
 				return err
@@ -958,6 +963,12 @@ func (w WebsiteService) GetWebsiteHTTPS(websiteId uint) (response.WebsiteHTTPS, 
 		if p.Name == "add_header" && len(p.Params) > 0 {
 			if p.Params[0] == "Strict-Transport-Security" {
 				res.Hsts = true
+				if len(p.Params) > 1 {
+					hstsValue := p.Params[1]
+					if strings.Contains(hstsValue, "includeSubDomains") {
+						res.HstsIncludeSubDomains = true
+					}
+				}
 			}
 			if p.Params[0] == "Alt-Svc" {
 				res.Http3 = true
@@ -976,12 +987,13 @@ func (w WebsiteService) OpWebsiteHTTPS(ctx context.Context, req request.WebsiteH
 		res        response.WebsiteHTTPS
 		websiteSSL model.WebsiteSSL
 	)
-	if err = ChangeHSTSConfig(req.Hsts, req.Http3, website); err != nil {
+	if err = ChangeHSTSConfig(req.Hsts, req.HstsIncludeSubDomains, req.Http3, website); err != nil {
 		return nil, err
 	}
 	res.Enable = req.Enable
 	res.SSLProtocol = req.SSLProtocol
 	res.Algorithm = req.Algorithm
+	res.HstsIncludeSubDomains = req.HstsIncludeSubDomains
 	if !req.Enable {
 		website.Protocol = constant.ProtocolHTTP
 		website.WebsiteSSLID = 0
@@ -1221,13 +1233,13 @@ func (w WebsiteService) OpWebsiteLog(req request.WebsiteLogReq) (*response.Websi
 			}
 		}
 		filePath := path.Join(sitePath, "log", req.LogType)
-		lines, end, _, err := files.ReadFileByLine(filePath, req.Page, req.PageSize, false)
+		logFileRes, err := files.ReadFileByLine(filePath, req.Page, req.PageSize, false)
 		if err != nil {
 			return nil, err
 		}
-		res.End = end
+		res.End = logFileRes.IsEndOfFile
 		res.Path = filePath
-		res.Content = strings.Join(lines, "\n")
+		res.Content = strings.Join(logFileRes.Lines, "\n")
 		return res, nil
 	case constant.DisableLog:
 		params := dto.NginxParam{}
@@ -1632,9 +1644,16 @@ func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error)
 
 	config.FilePath = includePath
 	directives := config.Directives
-	location, ok := directives[0].(*components.Location)
-	if !ok {
-		err = errors.New("error")
+
+	var location *components.Location
+	for _, directive := range directives {
+		if loc, ok := directive.(*components.Location); ok {
+			location = loc
+			break
+		}
+	}
+	if location == nil {
+		err = errors.New("invalid proxy config, no location found")
 		return
 	}
 	location.UpdateDirective("proxy_pass", []string{req.ProxyPass})
@@ -1644,7 +1663,7 @@ func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error)
 		if err = openProxyCache(website); err != nil {
 			return
 		}
-		location.AddCache(req.CacheTime, req.CacheUnit, fmt.Sprintf("proxy_cache_zone_of_%s", website.Alias))
+		location.AddCache(req.CacheTime, req.CacheUnit, fmt.Sprintf("proxy_cache_zone_of_%s", website.Alias), req.ServerCacheTime, req.ServerCacheUnit)
 	} else {
 		location.RemoveCache(fmt.Sprintf("proxy_cache_zone_of_%s", website.Alias))
 	}
@@ -1787,9 +1806,15 @@ func (w WebsiteService) GetProxies(id uint) (res []request.WebsiteProxyConfig, e
 		}
 		directives := config.GetDirectives()
 
-		location, ok := directives[0].(*components.Location)
-		if !ok {
-			err = errors.New("error")
+		var location *components.Location
+		for _, directive := range directives {
+			if loc, ok := directive.(*components.Location); ok {
+				location = loc
+				break
+			}
+		}
+		if location == nil {
+			err = errors.New("invalid proxy config, no location found")
 			return
 		}
 		proxyConfig.ProxyPass = location.ProxyPass
@@ -1798,6 +1823,10 @@ func (w WebsiteService) GetProxies(id uint) (res []request.WebsiteProxyConfig, e
 			proxyConfig.CacheTime = location.CacheTime
 			proxyConfig.CacheUnit = location.CacheUint
 		}
+		if location.ServerCacheTime > 0 {
+			proxyConfig.ServerCacheTime = location.ServerCacheTime
+			proxyConfig.ServerCacheUnit = location.ServerCacheUint
+		}
 		proxyConfig.Match = location.Match
 		proxyConfig.Modifier = location.Modifier
 		proxyConfig.ProxyHost = location.Host
@@ -1805,6 +1834,9 @@ func (w WebsiteService) GetProxies(id uint) (res []request.WebsiteProxyConfig, e
 		for _, directive := range location.Directives {
 			if directive.GetName() == "proxy_ssl_server_name" {
 				proxyConfig.SNI = directive.GetParameters()[0] == "on"
+			}
+			if directive.GetName() == "proxy_ssl_name" && len(directive.GetParameters()) > 0 {
+				proxyConfig.ProxySSLName = directive.GetParameters()[0]
 			}
 		}
 		res = append(res, proxyConfig)
@@ -2198,7 +2230,7 @@ func (w WebsiteService) UpdateAntiLeech(req request.NginxAntiLeechUpdate) (err e
 			}
 		}
 	}
-	if req.Enable {
+	if req.Enable || req.Cache {
 		exts := strings.Split(req.Extends, ",")
 		newDirective := components.Directive{
 			Name:       "location",
@@ -2208,44 +2240,85 @@ func (w WebsiteService) UpdateAntiLeech(req request.NginxAntiLeechUpdate) (err e
 		newBlock := &components.Block{}
 		newBlock.Directives = make([]components.IDirective, 0)
 		if req.Cache {
-			newBlock.Directives = append(newBlock.Directives, &components.Directive{
+			newBlock.AppendDirectives(&components.Directive{
 				Name:       "expires",
 				Parameters: []string{strconv.Itoa(req.CacheTime) + req.CacheUint},
 			})
 		}
-		newBlock.Directives = append(newBlock.Directives, &components.Directive{
+		if !req.LogEnable {
+			newBlock.AppendDirectives(&components.Directive{
+				Name:       "access_log",
+				Parameters: []string{"off"},
+			})
+		}
+		newBlock.AppendDirectives(&components.Directive{
 			Name:       "log_not_found",
 			Parameters: []string{"off"},
 		})
-		validDir := &components.Directive{
-			Name:       "valid_referers",
-			Parameters: []string{},
-		}
-		if req.NoneRef {
-			validDir.Parameters = append(validDir.Parameters, "none")
-		}
-		if len(req.ServerNames) > 0 {
-			validDir.Parameters = append(validDir.Parameters, strings.Join(req.ServerNames, " "))
-		}
-		newBlock.Directives = append(newBlock.Directives, validDir)
+		if req.Enable {
+			validDir := &components.Directive{
+				Name:       "valid_referers",
+				Parameters: []string{},
+			}
+			if req.NoneRef {
+				validDir.Parameters = append(validDir.Parameters, "none")
+			}
+			if req.Blocked {
+				validDir.Parameters = append(validDir.Parameters, "blocked")
+			}
+			if len(req.ServerNames) > 0 {
+				validDir.Parameters = append(validDir.Parameters, strings.Join(req.ServerNames, " "))
+			}
+			newBlock.AppendDirectives(validDir)
 
-		ifDir := &components.Directive{
-			Name:       "if",
-			Parameters: []string{"($invalid_referer)"},
+			ifDir := &components.Directive{
+				Name:       "if",
+				Parameters: []string{"($invalid_referer)"},
+			}
+			if !req.LogEnable {
+				ifDir.Block = &components.Block{
+					Directives: []components.IDirective{
+						&components.Directive{
+							Name:       "access_log",
+							Parameters: []string{"off"},
+						},
+						&components.Directive{
+							Name:       "return",
+							Parameters: []string{req.Return},
+						},
+					},
+				}
+			} else {
+				ifDir.Block = &components.Block{
+					Directives: []components.IDirective{
+						&components.Directive{
+							Name:       "return",
+							Parameters: []string{req.Return},
+						},
+					},
+				}
+			}
+			newBlock.AppendDirectives(ifDir)
 		}
-		ifDir.Block = &components.Block{
-			Directives: []components.IDirective{
+		if website.Type == constant.Deployment {
+			newBlock.AppendDirectives(
 				&components.Directive{
-					Name:       "return",
-					Parameters: []string{req.Return},
+					Name:       "proxy_set_header",
+					Parameters: []string{"Host", "$host"},
 				},
 				&components.Directive{
-					Name:       "access_log",
-					Parameters: []string{"off"},
+					Name:       "proxy_set_header",
+					Parameters: []string{"X-Real-IP", "$remote_addr"},
 				},
-			},
+				&components.Directive{
+					Name:       "proxy_set_header",
+					Parameters: []string{"X-Forwarded-For", "$proxy_add_x_forwarded_for"},
+				},
+				&components.Directive{
+					Name:       "proxy_pass",
+					Parameters: []string{fmt.Sprintf("http://%s", website.Proxy)},
+				})
 		}
-		newBlock.Directives = append(newBlock.Directives, ifDir)
 		newDirective.Block = newBlock
 		index := -1
 		for i, directive := range block.Directives {
@@ -2298,6 +2371,11 @@ func (w WebsiteService) GetAntiLeech(id uint) (*response.NginxAntiLeechRes, erro
 		}
 		lDirectives := location.GetBlock().GetDirectives()
 		for _, lDir := range lDirectives {
+			if lDir.GetName() == "access_log" {
+				if strings.Join(lDir.GetParameters(), "") == "off" {
+					res.LogEnable = false
+				}
+			}
 			if lDir.GetName() == "valid_referers" {
 				res.Enable = true
 				params := lDir.GetParameters()
@@ -2321,11 +2399,6 @@ func (w WebsiteService) GetAntiLeech(id uint) (*response.NginxAntiLeechRes, erro
 				for _, dir := range directives {
 					if dir.GetName() == "return" {
 						res.Return = strings.Join(dir.GetParameters(), " ")
-					}
-					if dir.GetName() == "access_log" {
-						if strings.Join(dir.GetParameters(), "") == "off" {
-							res.LogEnable = false
-						}
 					}
 				}
 			}
@@ -3290,5 +3363,52 @@ func (w WebsiteService) OperateCrossSiteAccess(req request.CrossSiteAccessOp) er
 		fileOp := files.NewFileOp()
 		return fileOp.DeleteFile(path.Join(GetSitePath(website, SiteIndexDir), ".user.ini"))
 	}
+	return nil
+}
+
+func (w WebsiteService) ExecComposer(req request.ExecComposerReq) error {
+	website, err := websiteRepo.GetFirst(repo.WithByID(req.WebsiteID))
+	if err != nil {
+		return err
+	}
+	sitePath := GetSitePath(website, SiteDir)
+	if !strings.Contains(req.Dir, sitePath) {
+		return buserr.New("ErrWebsiteDir")
+	}
+	if !files.NewFileOp().Stat(path.Join(req.Dir, "composer.json")) {
+		return buserr.New("ErrComposerFileNotFound")
+	}
+	if task.CheckResourceTaskIsExecuting(task.TaskExec, req.Command, website.ID) {
+		return buserr.New("ErrInstallExtension")
+	}
+	runtime, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(website.RuntimeID))
+	if err != nil {
+		return err
+	}
+	var command string
+	if req.Command != "custom" {
+		command = fmt.Sprintf("%s %s", req.Command, req.ExtCommand)
+	} else {
+		command = req.ExtCommand
+	}
+	resourceName := fmt.Sprintf("composer %s", command)
+	composerTask, err := task.NewTaskWithOps(resourceName, task.TaskExec, req.Command, req.TaskID, website.ID)
+	if err != nil {
+		return err
+	}
+	cmdMgr := cmd.NewCommandMgr(cmd.WithTask(*composerTask), cmd.WithTimeout(20*time.Minute))
+	siteDir, _ := settingRepo.Get(settingRepo.WithByKey("WEBSITE_DIR"))
+	execDir := strings.ReplaceAll(req.Dir, siteDir.Value, "/www")
+	composerTask.AddSubTask("", func(t *task.Task) error {
+		cmdStr := fmt.Sprintf("docker exec -u %s %s sh -c 'composer config -g repo.packagist composer %s && composer %s --working-dir=%s'", req.User, runtime.ContainerName, req.Mirror, command, execDir)
+		err = cmdMgr.RunBashC(cmdStr)
+		if err != nil {
+			return err
+		}
+		return nil
+	}, nil)
+	go func() {
+		_ = composerTask.Execute()
+	}()
 	return nil
 }

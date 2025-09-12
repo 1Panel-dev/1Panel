@@ -128,17 +128,17 @@ func (r *Remote) Delete(info DeleteInfo) error {
 	for _, user := range userlist {
 		if strings.HasPrefix(info.Version, "5.6") {
 			if err := r.ExecSQL(fmt.Sprintf("drop user %s", user), info.Timeout); err != nil && !info.ForceDelete {
-				return err
+				return fmt.Errorf("drop user failed, err: %v", err)
 			}
 		} else {
 			if err := r.ExecSQL(fmt.Sprintf("drop user if exists %s", user), info.Timeout); err != nil && !info.ForceDelete {
-				return err
+				return fmt.Errorf("drop user failed, err: %v", err)
 			}
 		}
 	}
 	if len(info.Name) != 0 {
 		if err := r.ExecSQL(fmt.Sprintf("drop database if exists `%s`", info.Name), info.Timeout); err != nil && !info.ForceDelete {
-			return err
+			return fmt.Errorf("drop database failed, err: %v", err)
 		}
 	}
 	if !info.ForceDelete {

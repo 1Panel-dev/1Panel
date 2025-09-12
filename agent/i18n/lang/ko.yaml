@@ -15,6 +15,9 @@ ErrApiConfigIPInvalid: 'API 인터페이스를 호출하는 데 사용된 IP가 
 ErrApiConfigDisable: '이 인터페이스는 API 인터페이스 호출 사용을 금지합니다: {{ .detail }}'
 ErrApiConfigKeyTimeInvalid: 'API 인터페이스 타임스탬프 오류: {{ .detail }}'
 
+ErrMinQuickJump: "최소 하나의 빠른 점프 항목을 설정해 주세요!"
+ErrMaxQuickJump: "최대 네 개의 빠른 점프 항목을 설정할 수 있습니다!"
+
 #흔한
 ErrUsernameIsExist: '사용자 이름이 이미 존재합니다'
 ErrNameIsExist: '이름이 이미 존재합니다'
@@ -34,6 +37,7 @@ ErrGroupIsDefault: '기본 그룹, 삭제할 수 없습니다'
 ErrGroupIsInWebsiteUse: '그룹이 다른 웹사이트에서 사용 중이므로 삭제할 수 없습니다.'
 
 #지원
+Localhost: '로컬 머신'
 ErrBackupInUsed: '백업 계정이 예약된 작업에 사용되었으므로 삭제할 수 없습니다.'
 ErrBackupCheck: '백업 계정 테스트 연결에 실패했습니다 {{ .err }}'
 ErrBackupLocalDelete: '로컬 서버 백업 계정 삭제는 아직 지원되지 않습니다.'
@@ -79,9 +83,7 @@ AppStoreIsLastVersion: '앱스토어가 이미 최신 버전입니다'
 AppStoreSyncSuccess: '앱스토어 동기화 성공'
 SyncAppDetail: '애플리케이션 구성 동기화'
 AppVersionNotMatch: '{{ .name }} 애플리케이션에 더 높은 1Panel 버전이 필요하므로 동기화를 건너뜁니다.'
-MoveSiteDir: '현재 업그레이드에는 OpenResty 웹사이트 디렉토리 마이그레이션이 필요합니다.'
-MoveSiteToDir: '사이트 디렉토리를 {{ .name }}로 마이그레이션'
-ErrMoveSiteDir: '사이트 디렉토리를 마이그레이션하지 못했습니다'
+MoveSiteDir: "웹사이트 디렉토리 변경이 감지되었습니다. OpenResty 웹사이트 디렉토리를 {{ .name }} 로 마이그레이션해야 합니다"
 MoveSiteDirSuccess: '웹사이트 디렉토리 마이그레이션 성공'
 DeleteRuntimePHP: 'PHP 런타임 삭제'
 CustomAppStoreFileValid: '앱 스토어 패키지는 .tar.gz 형식이어야 합니다.'
@@ -92,6 +94,15 @@ ErrCustomRuntimes: '설치된 런타임 환경이 있습니다. 먼저 삭제해
 ErrAppVersionDeprecated: "{{ .name }} 응용 프로그램은 현재 1Panel 버전과 호환되지 않아 건너뛰었습니다"
 ErrDockerFailed: "Docker의 상태가 비정상입니다. 서비스 상태를 확인하세요"
 ErrDockerComposeCmdNotFound: "Docker Compose 명령이 없습니다. 호스트 머신에 먼저 이 명령을 설치하세요"
+
+#ssh
+ExportIP: "로그인 IP"
+ExportArea: "위치"
+ExportPort: "포트"
+ExportAuthMode: "로그인 방식"
+ExportUser: "사용자"
+ExportStatus: "로그인 상태"
+ExportDate: "시간"
 
 #파일
 ErrFileCanNotRead: '이 파일은 미리보기를 지원하지 않습니다'
@@ -108,6 +119,9 @@ ErrFavoriteExist: '이 경로는 이미 즐겨찾기되었습니다'
 ErrInvalidChar: '불법 문자는 허용되지 않습니다'
 ErrPathNotDelete: '선택한 디렉토리를 삭제할 수 없습니다'
 ErrLogFileToLarge: "로그 파일이 500MB를 초과하여 열 수 없습니다"
+FileDropFailed: "파일 {{ .name }} 정리 실패: {{ .err }}"
+FileDropSuccess: "파일 {{ .name }} 정리 성공, {{ .count }}개 파일 삭제, {{ .size }} 디스크 공간 확보"
+FileDropSum: "파일 정리 완료, 총 {{ .count }}개 파일 삭제, 총 {{ .size }} 디스크 공간 확보"
 
 #웹사이트
 ErrAliasIsExist: '별칭이 이미 존재합니다'
@@ -123,6 +137,9 @@ ErrBuildDirNotFound: '빌드 디렉토리가 존재하지 않습니다'
 ErrImageNotExist: '운영 환경 {{ .name }} 이미지가 존재하지 않습니다. 운영 환경을 다시 편집하세요.'
 ErrProxyIsUsed: "로드 밸런싱이 역방향 프록시에 의해 사용되었으므로 삭제할 수 없습니다"
 ErrSSLValid: '인증서 파일에 문제가 있습니다. 인증서 상태를 확인하세요!'
+ErrWebsiteDir: "웹사이트 디렉토리 내의 디렉토리를 선택하세요."
+ErrComposerFileNotFound: "composer.json 파일이 존재하지 않습니다"
+ErrRuntimeNoPort: "런타임 환경에 포트가 설정되지 않았습니다. 먼저 런타임 환경을 편집하세요."
 
 #SSL인증
 ErrSSLCannotDelete: '{{ .name }} 인증서는 웹사이트에서 사용 중이므로 삭제할 수 없습니다.'
@@ -156,6 +173,9 @@ StartUpdateSystemSSL: '시스템 인증서 업데이트 시작'
 UpdateSystemSSLSuccess: '시스템 인증서 업데이트가 성공적으로 완료되었습니다.'
 ErrWildcardDomain: 'HTTP 모드에서 와일드카드 도메인 이름 인증서를 신청할 수 없습니다'
 ErrApplySSLCanNotDelete: "신청 중인 인증서 {{.name}}는 삭제할 수 없습니다. 나중에 다시 시도해 주세요."
+StartPushSSLToNode: "인증서를 노드로 푸시 시작"
+PushSSLToNodeFailed: "노드로 인증서 푸시 실패: {{ .err }}"
+PushSSLToNodeSuccess: "노드로 인증서 푸시 성공"
 
 #마이SQL
 ErrUserIsExist: '현재 사용자가 이미 존재합니다. 다시 입력하세요'
@@ -210,8 +230,12 @@ SystemLog: '시스템 로그'
 CutWebsiteLog: '웹사이트 로그 회전'
 FileOrDir: '디렉터리 / 파일'
 UploadFile: '백업 파일 {{ .file }} 을(를) {{ .backup }}(으)로 업로드 중'
-IgnoreBackupErr: 'Sandaran gagal, ralat: {{ .detail }}, abaikan ralat ini...'
-IgnoreUploadErr: 'Muat naik gagal, ralat: {{ .detail }}, abaikan ralat ini...'
+Upload: "업로드"
+IgnoreBackupErr: "백업 실패, 오류: {{ .detail }}, 이 오류를 무시합니다..."
+IgnoreUploadErr: "업로드 실패, 오류: {{ .detail }}, 이 오류를 무시합니다..."
+LoadBackupFailed: "백업 계정 연결 획득 실패, 오류: {{ .detail }}"
+InExecuting: "현재 작업이 실행 중입니다. 중복 실행하지 마세요!"
+NoSuchResource: "데이터베이스에서 백업 내용을 찾을 수 없어 건너뜁니다..."
 
 #도구상자
 ErrNotExistUser: '현재 사용자가 존재하지 않습니다. 수정한 후 다시 시도하세요!'
@@ -271,6 +295,7 @@ allow: '허용하다'
 deny: '거부하다'
 OpenrestyNotFound: 'Openresty가 설치되지 않았습니다'
 remoteIpIsNull: "IP 목록이 비어 있습니다"
+OpenrestyVersionErr: "Openresty 버전이 너무 낮습니다. Openresty를 1.27.1.2-2-2-focal로 업그레이드하세요"
 
 #일
 TaskStart: '[START] {{ .name }} 작업이 시작됩니다.'
@@ -327,6 +352,11 @@ SubTask: '하위 작업'
 RuntimeExtension: '런타임 환경 확장'
 TaskIsExecuting: '작업이 실행 중입니다'
 CustomAppstore: '사용자 정의 애플리케이션 웨어하우스'
+TaskExec: '실행'
+
+# task - clam
+Clamscan: "{{ .name }} 스캔"
+TaskScan: "스캔"
 
 # 작업 - ai
 OllamaModelPull: 'Ollama 모델 {{ .name }}을(를) 끌어오세요'
@@ -356,7 +386,6 @@ SnapCompressFile: '스냅샷 파일 압축'
 SnapCheckCompress: '스냅샷 압축 파일 확인'
 SnapCompressSize: '스냅샷 파일 크기 {{ .name }}'
 SnapUpload: '스냅샷 파일 업로드'
-SnapLoadBackup: '백업 계정 정보 가져오기'
 SnapUploadTo: '스냅샷 파일을 {{ .name }}에 업로드'
 SnapUploadRes: '스냅샷 파일을 {{ .name }}에 업로드'
 
@@ -445,3 +474,16 @@ DiskUsedAlert: "1Panel 디스크 '{{ .name }}'의 사용량은 {{ .used }}입니
 ResourceAlert: "1Panel 의 평균 {{ .time }}분 동안 {{ .name }} 사용률은 {{ .used }}입니다. 자세한 내용은 패널에서 확인하세요."
 PanelVersionAlert: "1Panel 의 새로운 버전이 이용 가능합니다. 패널에 로그인하여 업그레이드하세요."
 PanelPwdExpirationAlert: "1Panel 비밀번호가 {{ .day }}일 후에 만료됩니다. 자세한 내용은 패널에서 확인하세요."
+CommonAlert: "귀하의 1Panel, {{ .msg }}. 자세한 내용은 패널에 로그인하여 확인하세요."
+NodeExceptionAlert: "귀하의 1Panel, {{ .num }}개의 노드에 이상이 있습니다. 자세한 내용은 패널에 로그인하여 확인하세요."
+LicenseExceptionAlert: "귀하의 1Panel, {{ .num }}개의 라이선스에 이상이 있습니다. 자세한 내용은 패널에 로그인하여 확인하세요."
+SSHAndPanelLoginAlert: "귀하의 1Panel, 패널 {{ .name }}이(가) {{ .ip }}에서 비정상 로그인했습니다. 자세한 내용은 패널에 로그인하여 확인하세요."
+
+#disk
+DeviceNotFound: "장치 {{ .name }} 을(를) 찾을 수 없습니다"
+DeviceIsMounted: "장치 {{ .name }} 이(가) 마운트되었습니다, 먼저 마운트 해제하세요"
+PartitionDiskErr: "파티션 분할에 실패했습니다, {{ .err }}"
+FormatDiskErr: "디스크 포맷에 실패했습니다, {{ .err }}"
+MountDiskErr: "디스크 마운트에 실패했습니다, {{ .err }}"
+UnMountDiskErr: "디스크 마운트 해제에 실패했습니다, {{ .err }}"
+XfsNotFound: "xfs 파일 시스템이 감지되지 않았습니다, 먼저 xfsprogs 를 설치하세요"

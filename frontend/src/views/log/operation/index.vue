@@ -109,7 +109,7 @@ const confirmDialogRef = ref();
 const paginationConfig = reactive({
     cacheSizeKey: 'operation-log-page-size',
     currentPage: 1,
-    pageSize: 10,
+    pageSize: Number(localStorage.getItem('operation-log-page-size')) || 20,
     total: 0,
 });
 const searchName = ref<string>('');
@@ -172,9 +172,6 @@ const loadNodes = async () => {
                 return;
             }
             nodes.value = res.data || [];
-            if (nodes.value.length === 0) {
-                globalStore.currentNode = 'local';
-            }
         })
         .catch(() => {
             nodes.value = [];

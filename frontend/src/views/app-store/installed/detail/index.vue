@@ -30,6 +30,7 @@
                 </el-descriptions-item>
                 <el-descriptions-item v-for="(param, key) in params" :label="getLabel(param)" :key="key">
                     <span>{{ param.showValue && param.showValue != '' ? param.showValue : param.value }}</span>
+                    <CopyButton v-if="showCopyButton(param.key)" :content="param.value" />
                 </el-descriptions-item>
             </el-descriptions>
         </div>
@@ -89,6 +90,14 @@
                     <el-form-item :label="$t('app.specifyIP')" v-if="paramModel.allowPort" prop="specifyIP">
                         <el-input v-model="paramModel.specifyIP"></el-input>
                         <span class="input-help">{{ $t('app.specifyIPHelper') }}</span>
+                    </el-form-item>
+                    <el-form-item :label="$t('container.restartPolicy')" prop="restartPolicy">
+                        <el-select v-model="paramModel.restartPolicy" class="p-w-300">
+                            <el-option :label="$t('container.no')" value="no"></el-option>
+                            <el-option :label="$t('container.always')" value="always"></el-option>
+                            <el-option :label="$t('container.onFailure')" value="on-failure"></el-option>
+                            <el-option :label="$t('container.unlessStopped')" value="unless-stopped"></el-option>
+                        </el-select>
                     </el-form-item>
                     <el-form-item :label="$t('container.cpuQuota')" prop="cpuQuota">
                         <el-input type="number" class="!w-2/5" v-model.number="paramModel.cpuQuota" maxlength="5">
@@ -158,7 +167,7 @@ const loading = ref(false);
 const params = ref<EditForm[]>();
 const edit = ref(false);
 const paramForm = ref<FormInstance>();
-const paramModel = ref<any>({
+const paramModel = reactive<any>({
     params: {},
 });
 const rules = reactive({
@@ -166,8 +175,9 @@ const rules = reactive({
     cpuQuota: [Rules.requiredInput, checkNumberRange(0, 999)],
     memoryLimit: [Rules.requiredInput, checkNumberRange(0, 9999999999)],
     containerName: [Rules.containerName],
+    restartPolicy: [Rules.requiredSelect],
 });
-const submitModel = ref<any>({
+const submitModel = reactive<any>({
     webUI: '',
 });
 const appType = ref('');
@@ -207,10 +217,10 @@ function checkPort(port: string) {
 }
 
 const acceptParams = async (props: ParamProps) => {
-    submitModel.value.installId = props.id;
+    submitModel.installId = props.id;
     params.value = [];
     paramData.value.id = props.id;
-    paramModel.value.params = {};
+    paramModel.params = {};
     edit.value = false;
     await get();
     open.value = true;
@@ -223,14 +233,14 @@ const handleClose = () => {
 };
 const editParam = () => {
     params.value.forEach((param: EditForm) => {
-        paramModel.value.params[param.key] = param.value;
+        paramModel.params[param.key] = param.value;
     });
     edit.value = !edit.value;
 };
 
 const changeAllowPort = () => {
-    if (paramModel.value.allowPort) {
-        paramModel.value.specifyIP = '';
+    if (paramModel.allowPort) {
+        paramModel.specifyIP = '';
     }
 };
 
@@ -270,15 +280,19 @@ const get = async () => {
                 }
             });
         }
-        paramModel.value.memoryLimit = res.data.memoryLimit;
-        paramModel.value.cpuQuota = res.data.cpuQuota;
-        paramModel.value.memoryUnit = res.data.memoryUnit !== '' ? res.data.memoryUnit : 'MB';
-        paramModel.value.allowPort = res.data.allowPort;
-        paramModel.value.containerName = res.data.containerName;
-        paramModel.value.advanced = false;
-        paramModel.value.dockerCompose = res.data.dockerCompose;
-        paramModel.value.isHostMode = res.data.hostMode;
-        paramModel.value.specifyIP = res.data.specifyIP;
+        paramModel.memoryLimit = res.data.memoryLimit;
+        paramModel.cpuQuota = res.data.cpuQuota;
+        paramModel.memoryUnit = res.data.memoryUnit !== '' ? res.data.memoryUnit : 'MB';
+        paramModel.allowPort = res.data.allowPort;
+        paramModel.containerName = res.data.containerName;
+        paramModel.advanced = false;
+        paramModel.dockerCompose = res.data.dockerCompose;
+        paramModel.isHostMode = res.data.hostMode;
+        paramModel.specifyIP = res.data.specifyIP;
+        paramModel.restartPolicy = res.data.restartPolicy || 'no';
+        if (paramModel.restartPolicy === 'on-failure:5') {
+            paramModel.restartPolicy = 'on-failure';
+        }
         appConfigUpdate.value.webUI = res.data.webUI;
         if (res.data.webUI != '') {
             const httpConfig = splitHttp(res.data.webUI);
@@ -303,22 +317,23 @@ const submit = async (formEl: FormInstance) => {
             cancelButtonText: i18n.global.t('commons.button.cancel'),
             type: 'info',
         }).then(async () => {
-            submitModel.value.params = paramModel.value.params;
-            if (paramModel.value.advanced) {
-                submitModel.value.advanced = paramModel.value.advanced;
-                submitModel.value.memoryLimit = paramModel.value.memoryLimit;
-                submitModel.value.cpuQuota = paramModel.value.cpuQuota;
-                submitModel.value.memoryUnit = paramModel.value.memoryUnit;
-                submitModel.value.allowPort = paramModel.value.allowPort;
-                submitModel.value.containerName = paramModel.value.containerName;
-                if (paramModel.value.editCompose) {
-                    submitModel.value.editCompose = paramModel.value.editCompose;
-                    submitModel.value.dockerCompose = paramModel.value.dockerCompose;
+            submitModel.params = paramModel.params;
+            if (paramModel.advanced) {
+                submitModel.advanced = paramModel.advanced;
+                submitModel.memoryLimit = paramModel.memoryLimit;
+                submitModel.cpuQuota = paramModel.cpuQuota;
+                submitModel.memoryUnit = paramModel.memoryUnit;
+                submitModel.allowPort = paramModel.allowPort;
+                submitModel.containerName = paramModel.containerName;
+                if (paramModel.editCompose) {
+                    submitModel.editCompose = paramModel.editCompose;
+                    submitModel.dockerCompose = paramModel.dockerCompose;
                 }
+                submitModel.restartPolicy = paramModel.restartPolicy;
             }
             try {
                 loading.value = true;
-                await updateAppInstallParams(submitModel.value);
+                await updateAppInstallParams(submitModel);
                 loading.value = false;
                 MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
                 handleClose();
@@ -346,6 +361,23 @@ const updateAppConfig = async () => {
         MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
         handleClose();
     } catch (error) {}
+};
+
+const showCopyButton = (key: string) => {
+    const keys = [
+        'PANEL_DB_ROOT_PASSWORD',
+        'PANEL_DB_NAME',
+        'PANEL_DB_USER',
+        'PANEL_DB_USER_PASSWORD',
+        'PANEL_REDIS_ROOT_PASSWORD',
+        'PANEL_DB_ROOT_USER',
+    ];
+    for (let i = 0; i < keys.length; i++) {
+        if (key === keys[i]) {
+            return true;
+        }
+    }
+    return false;
 };
 
 defineExpose({ acceptParams });

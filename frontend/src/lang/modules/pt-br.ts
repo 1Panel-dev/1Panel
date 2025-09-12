@@ -259,6 +259,7 @@ const message = {
             authBasicPassword: 'Suporta letras, números e caracteres especiais comuns, comprimento 1-72',
             length128Err: 'O comprimento não pode exceder 128 caracteres',
             maxLength: 'O comprimento não pode exceder {0} caracteres',
+            alias: 'Suporta letras, números, - e _, comprimento de 1 a 30, e não pode começar ou terminar com -_.',
         },
         res: {
             paramError: 'A solicitação falhou, por favor, tente novamente mais tarde!',
@@ -342,6 +343,9 @@ const message = {
             dayUnit: 'd',
             millisecond: 'Milissegundo',
         },
+        log: {
+            noLog: 'Nenhum log disponível',
+        },
     },
     menu: {
         home: 'Visão Geral',
@@ -375,6 +379,10 @@ const message = {
         msgCenter: 'Central de Tarefas',
     },
     home: {
+        recommend: 'recomendar',
+        dir: 'dir',
+        quickDir: 'Diretório Rápido',
+        database: 'Banco de Dados - Todos',
         restart_1panel: 'Reiniciar painel',
         restart_system: 'Reiniciar servidor',
         operationSuccess: 'Operação bem-sucedida, reiniciando, por favor, atualize o navegador manualmente mais tarde!',
@@ -457,6 +465,9 @@ const message = {
         serviceNameHelper: 'Acesso entre containers na mesma rede.',
         backupList: 'Backup',
         loadBackup: 'Importar',
+        localUpload: 'Upload Local',
+        hostSelect: 'Seleção de Servidor',
+        selectHelper: 'Tem certeza de que deseja importar o arquivo de backup {0}?',
         remoteAccess: 'Acesso remoto',
         remoteHelper: 'Vários IPs separados por vírgula, exemplo: 172.16.10.111, 172.16.10.112',
         remoteConnHelper:
@@ -482,7 +493,6 @@ const message = {
         passwordHelper: 'Não é possível obter, por favor, modifique',
         remote: 'Remoto',
         remoteDB: 'Servidor remoto | Servidores remotos',
-        manageRemoteDB: 'Gerenciar DB remoto',
         createRemoteDB: 'Vincular @.lower:database.remoteDB',
         unBindRemoteDB: 'Desvincular @.lower:database.remoteDB',
         unBindForce: 'Forçar desvinculação',
@@ -509,8 +519,8 @@ const message = {
         selectFile: 'Selecionar arquivo',
         dropHelper: 'Você pode arrastar e soltar o arquivo carregado aqui ou',
         clickHelper: 'clicar para fazer upload',
-        supportUpType: 'Apenas arquivos sql, sql.gz e tar.gz são suportados',
-        zipFormat: 'Estrutura do pacote comprimido tar.gz: o pacote comprimido test.tar.gz deve conter test.sql',
+        supportUpType:
+            'Suporta apenas os formatos de arquivo sql, sql.gz, tar.gz, .zip. O arquivo compactado importado deve conter apenas um arquivo .sql ou incluir test.sql',
 
         currentStatus: 'Estado atual',
         baseParam: 'Parâmetro básico',
@@ -569,7 +579,7 @@ const message = {
         longQueryTime: 'limite (segundos)',
         thresholdRangeHelper: 'Por favor, insira o limite correto (1 - 600).',
 
-        timeout: 'Tempo limite',
+        timeout: 'Tempo limite(segundos)',
         timeoutHelper: 'Período de timeout de conexão ociosa. 0 indica que a conexão permanece ativa continuamente.',
         maxclients: 'Máximo de clientes',
         requirepassHelper:
@@ -683,7 +693,6 @@ const message = {
             server: 'Servidor MCP',
             create: 'Adicionar Servidor',
             edit: 'Editar Servidor',
-            commandHelper: 'Por exemplo: npx -y {0}',
             baseUrl: 'Caminho de Acesso Externo',
             baseUrlHelper: 'Por exemplo: http://192.168.1.2:8000',
             ssePath: 'Caminho SSE',
@@ -704,6 +713,8 @@ const message = {
             outputTransport: 'Tipo de Saída',
             streamableHttpPath: 'Caminho de Streaming',
             streamableHttpPathHelper: 'Por exemplo: /mcp, certifique-se de que não se sobreponha a outros Servidores',
+            npxHelper: 'Adequado para mcp iniciado com npx ou binário',
+            uvxHelper: 'Adequado para mcp iniciado com uvx',
         },
     },
     container: {
@@ -795,6 +806,8 @@ const message = {
         upgradeWarning2:
             'A operação de upgrade requer a reconstrução do contêiner, e qualquer dado não persistente será perdido. Deseja continuar?',
         oldImage: 'Imagem atual',
+        sameImageContainer: 'Contêineres com mesma imagem',
+        sameImageHelper: 'Contêineres usando a mesma imagem podem ser atualizados em lote após seleção',
         targetImage: 'Imagem alvo',
         imageLoadErr: 'Nenhum nome de imagem detectado para o contêiner',
         appHelper: 'O contêiner vem da loja de aplicativos, e o upgrade pode tornar o serviço indisponível.',
@@ -833,6 +846,8 @@ const message = {
         image: 'Imagem | Imagens',
         imagePull: 'Puxar',
         imagePush: 'Enviar',
+        imagePushHelper:
+            'Detectado que esta imagem possui múltiplas tags. Por favor, confirme que o nome da imagem usada para push é: {0}',
         imageDelete: 'Excluir imagem',
         imageTagDeleteHelper: 'Remover outras tags associadas a este ID de imagem',
         repoName: 'Registro de contêiner',
@@ -916,7 +931,7 @@ const message = {
         containerNumber: 'Número de containers',
         containerStatus: 'Status do container',
         exited: 'Finalizado',
-        running: 'Em execução',
+        running: 'Em execução ( {0} / {1} )',
         composeDetailHelper:
             'A composição foi criada externamente ao 1Panel. As operações de iniciar e parar não são suportadas.',
         composeOperatorHelper: 'A operação {1} será realizada no {0}. Deseja continuar?',
@@ -1015,6 +1030,8 @@ const message = {
         curl: 'URL de acesso',
         taskName: 'Nome',
         cronSpec: 'Ciclo de execução',
+        cronSpeDoc:
+            'Ciclos de execução personalizados suportam apenas o formato [minuto hora dia mês semana], por exemplo, 0 0 * * *. Consulte a documentação oficial para obter detalhes.',
         cronSpecHelper: 'Digite o período correto de execução',
         cleanHelper:
             'Esta operação registra todos os registros de execução de tarefas, arquivos de backup e logs. Você deseja continuar?',
@@ -1129,6 +1146,8 @@ const message = {
     },
     terminal: {
         local: 'Local',
+        defaultConn: 'Conexão Padrão',
+        defaultConnHelper: 'Se deve conectar ao host por padrão após abrir o terminal',
         localHelper: 'O nome local é usado apenas para identificação local do sistema.',
         connLocalErr:
             'Невозможно автоматически аутентифицироваться, пожалуйста, заполните информацию для входа на локальный сервер.',
@@ -1269,8 +1288,6 @@ const message = {
         notStart: 'O serviço ClamAV não está em execução, por favor, inicie-o primeiro!',
         removeRecord: 'Excluir arquivos de relatório',
         noRecords: 'Clique no botão "Acionar" para iniciar o scan e você verá registros aqui.',
-        removeResultHelper:
-            'Excluir arquivos de relatório gerados durante a execução da tarefa para liberar espaço de armazenamento.',
         removeInfected: 'Excluir arquivos infectados',
         removeInfectedHelper:
             'Excluir arquivos de vírus detectados durante a tarefa para garantir a segurança e o funcionamento normal do servidor.',
@@ -1310,6 +1327,7 @@ const message = {
         deleteLogs: 'Limpar logs',
         resource: 'Recurso',
         detail: {
+            dashboard: 'Visão Geral',
             ai: 'AI',
             groups: 'Grupos',
             hosts: 'Hosts',
@@ -1388,6 +1406,7 @@ const message = {
         downloadStart: 'Download iniciado',
         moveSuccess: 'Movido com sucesso',
         copySuccess: 'Copiado com sucesso',
+        pasteMsg: 'Clique no botão "Colar" no canto superior direito do diretório de destino',
         move: 'Mover',
         calculate: 'Calcular',
         canNotDeCompress: 'Não é possível descompactar este arquivo',
@@ -1471,6 +1490,10 @@ const message = {
         setting: 'configuração',
         showHide: 'Mostrar arquivos ocultos',
         noShowHide: 'Não mostrar arquivos ocultos',
+        cancelUpload: 'Cancelar Upload',
+        cancelUploadHelper: 'Deseja cancelar o upload, após o cancelamento, a lista de upload será limpa.',
+        keepOneTab: 'Mantenha pelo menos uma aba',
+        notCanTab: 'Não é possível adicionar mais abas',
     },
     ssh: {
         autoStart: 'Início automático',
@@ -1507,6 +1530,8 @@ const message = {
         createMode: 'Método de Criação',
         generate: 'Gerar Automaticamente',
         unSyncPass: 'Senha da chave não pode ser sincronizada',
+        syncHelper:
+            'A operação de sincronização limpará chaves inválidas e sincronizará novos pares de chaves completos. Continuar?',
         input: 'Entrada Manual',
         import: 'Upload de Arquivo',
         pubkey: 'Informações da chave',
@@ -1660,6 +1685,8 @@ const message = {
         code: 'Código de autorização',
         codeHelper:
             'Clique no botão "Adquirir", faça login no OneDrive e copie o conteúdo após "code" no link redirecionado. Cole-o neste campo. Para instruções específicas, consulte a documentação oficial.',
+        googleHelper:
+            'Por favor, primeiro crie um aplicativo Google e obtenha as informações do cliente, preencha o formulário e clique no botão obter. Para operações específicas, consulte a documentação oficial.',
         loadCode: 'Obter',
         COS: 'Tencent COS',
         ap_beijing_1: 'Beijing Zona 1',
@@ -1893,6 +1920,9 @@ const message = {
             'Detectado que o nó {0} já está na última versão atualizável. Por favor, verifique a versão do nó principal e tente novamente!',
 
         about: 'Sobre',
+        release: 'Registro de Atualizações de Versão',
+        releaseHelper:
+            'Falha ao obter o registro de atualizações para o ambiente atual. Você pode verificar a documentação oficial manualmente.',
         project: 'GitHub',
         issue: 'Problema',
         doc: 'Documento oficial',
@@ -1964,7 +1994,7 @@ const message = {
             'Atualize para a Edição Profissional para transferir arquivos rapidamente entre vários servidores.',
         app: 'Upgrade para a versão profissional para visualizar informações do serviço, monitoramento anômalo, etc., através do aplicativo móvel.',
         cluster:
-            'A atualização para a Edição Profissional permite gerenciar clusters mestre-escravo MySQL/Postgres/Reids.',
+            'A atualização para a Edição Profissional permite gerenciar clusters mestre-escravo MySQL/Postgres/Redis.',
     },
     clean: {
         scan: 'Iniciar escaneamento',
@@ -1988,17 +2018,12 @@ const message = {
         systemHelper:
             'Arquivos temporários gerados durante snapshots, atualizações e conteúdos obsoletos durante iterações de versão',
         panelOriginal: 'Arquivos de backup de recuperação de snapshot do sistema',
+        backup: 'Diretório de backup temporário',
         upgrade: 'Arquivos de backup de atualização do sistema',
         upgradeHelper: '(Recomenda-se manter o backup de atualização mais recente para rollback do sistema)',
         cache: 'Arquivos de cache do sistema',
         cacheHelper: '(Prossiga com cautela, a limpeza exige reinício do serviço)',
-        snapshotTmp: 'Arquivos temporários de upload de snapshot do sistema',
-        snapshotLocal: 'Arquivos temporários de criação de snapshot do sistema',
         rollback: 'Arquivos de backup antes da recuperação',
-        unused: 'Diretórios do sistema não utilizados',
-        oldUpgrade: 'Diretórios de backup não utilizados anteriores à atualização',
-        oldOriginal: 'Diretórios de backup de recuperação de snapshot não utilizados',
-        oldAppsBak: 'Diretórios de backup de aplicativos não utilizados',
 
         upload: 'Arquivos temporários de upload',
         uploadHelper: 'Arquivos temporários enviados da lista de backup do sistema',
@@ -2155,8 +2180,8 @@ const message = {
         otherDomains: 'Outros domínios',
         static: 'Estático',
         deployment: 'Implantação',
-        supportUpType: 'Somente arquivos .tar.gz são suportados',
-        zipFormat: 'Estrutura de pacote comprimido .tar.gz: o pacote comprimido test.tar.gz deve conter o arquivo {0}',
+        supportUpType:
+            'Apenas o formato de arquivo .tar.gz é suportado, e o pacote compactado deve conter o arquivo {0}.json',
         proxy: 'Proxy reverso',
         alias: 'Alias',
         ftpUser: 'Conta FTP',
@@ -2215,6 +2240,10 @@ const message = {
         null: 'nenhum',
         nginxConfig: 'Configuração Nginx',
         websiteConfig: 'Configurações do site',
+        proxySettings: 'Configurações de Proxy',
+        advancedSettings: 'Configurações Avançadas',
+        cacheSettings: 'Configurações de Cache',
+        sniSettings: 'Configurações de SNI',
         basic: 'Básico',
         source: 'Configuração',
         security: 'Segurança',
@@ -2342,11 +2371,15 @@ const message = {
         modifierHelper:
             'Exemplo: "=" é correspondência exata, "~" é correspondência regular, "^~" corresponde ao início do caminho, etc.',
         replace: 'Substituições de texto',
+        replaceHelper:
+            'O recurso de substituição de texto do nginx permite a substituição de strings no conteúdo da resposta durante o proxy reverso. É comumente usado para modificar links, endereços de API, etc., em arquivos HTML, CSS, JavaScript e outros retornados pelo backend. Suporta correspondência de expressão regular para necessidades complexas de substituição de conteúdo.',
         addReplace: 'Adicionar',
         replaced: 'String de busca (não pode estar vazia)',
         replaceText: 'Substituir por string',
         replacedErr: 'A string de busca não pode estar vazia',
         replacedErr2: 'A string de busca não pode ser repetida',
+        replacedListEmpty: 'Nenhuma regra de substituição de texto',
+        proxySslName: 'Nome SNI do Proxy',
         basicAuth: 'Autenticação básica',
         editBasicAuthHelper:
             'A senha é criptografada de forma assimétrica e não pode ser exibida. A edição requer a redefinição da senha',
@@ -2362,6 +2395,15 @@ const message = {
         disableLeech: 'Desabilitar anti-leech',
         ipv6: 'Ouvir IPv6',
         leechReturnError: 'Por favor, preencha o código de status HTTP',
+        blockedRef: 'Permitir Referer não padrão',
+        accessControl: 'Controle anti-leech',
+        leechcacheControl: 'Controle de cache',
+        logEnableControl: 'Registrar solicitações de ativos estáticos',
+        leechSpecialValidHelper:
+            "Quando 'Permitir Referer vazio' estiver ativado, as solicitações sem Referer (acesso direto etc.) não serão bloqueadas; ao ativar 'Permitir Referer não padrão', qualquer Referer que não comece com http/https será permitido (solicitações de cliente etc.).",
+        leechInvalidReturnHelper: 'Código de status HTTP retornado após bloquear solicitações de hotlink',
+        leechlogControlHelper:
+            'Registra solicitações de ativos estáticos; geralmente desativado em produção para evitar logs excessivos e ruidosos',
         selectAcme: 'Selecionar conta Acme',
         imported: 'Criado manualmente',
         importType: 'Tipo de importação',
@@ -2402,6 +2444,9 @@ const message = {
         ipWebsiteWarn:
             'Sites com IP como nomes de domínio precisam ser configurados como site padrão para serem acessados normalmente',
         hstsHelper: 'Ativar HSTS pode aumentar a segurança do site',
+        includeSubDomains: 'SubDomains',
+        hstsIncludeSubDomainsHelper:
+            'Quando ativado, a política HSTS será aplicada a todos os subdomínios do domínio atual.',
         defaultHtml: 'Página padrão',
         website404: 'Página de erro 404 do site',
         domain404: 'O domínio do site não existe',
@@ -2481,6 +2526,20 @@ const message = {
         openBaseDir: 'Prevenir Ataques entre Sites',
         openBaseDirHelper:
             'open_basedir é usado para restringir o caminho de acesso a arquivos PHP, ajudando a prevenir acesso entre sites e aumentar a segurança',
+        serverCacheTime: 'Tempo de Cache do Servidor',
+        serverCacheTimeHelper:
+            'O tempo que uma requisição é armazenada em cache no servidor. Durante este período, requisições idênticas retornarão o resultado em cache diretamente, sem pedir ao servidor de origem.',
+        browserCacheTime: 'Tempo de Cache do Navegador',
+        browserCacheTimeHelper:
+            'O tempo que os recursos estáticos são armazenados em cache localmente no navegador, reduzindo requisições redundantes. Os usuários usarão o cache local diretamente antes de expirar ao atualizar a página.',
+        donotLinkeDB: 'Não Vincular Banco de Dados',
+        toWebsiteDir: 'Entrar no Diretório do Site',
+        execParameters: 'Parâmetros de Execução',
+        extCommand: 'Comando Suplementar',
+        mirror: 'Fonte de Espelho',
+        execUser: 'Usuário Executando',
+        execDir: 'Diretório de Execução',
+        packagist: 'Espelho Completo da China',
     },
     php: {
         short_open_tag: 'Suporte para short tags',
@@ -2623,6 +2682,9 @@ const message = {
         customAcme: 'Serviço ACME Personalizado',
         customAcmeURL: 'URL do Serviço ACME',
         baiduCloud: 'Baidu Cloud',
+        pushNode: 'Sincronizar com Outros Nós',
+        pushNodeHelper: 'Enviar para os nós selecionados após a aplicação/renovação',
+        fromMaster: 'Envio do Nó Mestre',
     },
     firewall: {
         create: 'Criar regra',
@@ -2642,6 +2704,7 @@ const message = {
         quickJump: 'Acesso rápido',
         used: 'Usado',
         unUsed: 'Não usado',
+        dockerRestart: 'Operações de firewall exigem reinicialização do serviço Docker',
         firewallHelper: 'Firewall do sistema {0}',
         firewallNotStart: 'O firewall do sistema não está habilitado atualmente. Habilite-o primeiro.',
         restartFirewallHelper: 'Esta operação reiniciará o firewall atual. Deseja continuar?',
@@ -2749,8 +2812,10 @@ const message = {
         goDirHelper: 'O diretório ou subdiretório deve conter arquivos Go ou binários.',
         pythonHelper:
             'Forneça um comando completo de inicialização. Por exemplo, "pip install -r requirements.txt && python manage.py runserver 0.0.0.0:5000".',
-        donetHelper: 'Por favor, preencha o comando completo de inicialização, por exemplo, dotnet MyWebApp.dll',
+        dotnetHelper: 'Por favor, preencha o comando completo de inicialização, por exemplo, dotnet MyWebApp.dll',
         dirHelper: 'Nota: Preencha o caminho do diretório dentro do contêiner',
+        concurrency: 'Esquema de Concorrência',
+        loadStatus: 'Status de Carga',
     },
     process: {
         pid: 'ID do Processo',
@@ -2822,7 +2887,31 @@ const message = {
             manage: 'Gerenciamento',
             autoRestart: 'Reinicialização Automática',
             EXITED: 'Saiu',
+            autoRestartHelper: 'Se o programa falhar, reiniciar automaticamente',
+            autoStart: 'Início Automático',
+            autoStartHelper: 'Se o serviço deve ser iniciado automaticamente após o Supervisor iniciar',
         },
+    },
+    disk: {
+        management: 'Gerenciamento de Disco',
+        partition: 'Partição',
+        unmount: 'Desmontar',
+        unmountHelper: 'Deseja desmontar a partição {0}?',
+        mount: 'Montar',
+        partitionAlert:
+            'O particionamento de disco requer formatação do disco, e os dados existentes serão excluídos. Salve ou tire snapshots dos dados com antecedência.',
+        mountPoint: 'Diretório de Montagem',
+        systemDisk: 'Disco do Sistema',
+        unpartitionedDisk: 'Disco Não Particionado',
+        handlePartition: 'Particionar Agora',
+        filesystem: 'Sistema de Arquivos',
+        unmounted: 'Desmontado',
+        cannotOperate: 'Não Pode Operar',
+        systemDiskHelper: 'Dica: O disco atual é o disco do sistema, não pode ser operado.',
+        autoMount: 'Montagem Automática',
+        model: 'Modelo do Dispositivo',
+        diskType: 'Tipo de Disco',
+        serial: 'Número de Série',
     },
     xpack: {
         expiresTrialAlert:
@@ -3054,7 +3143,7 @@ const message = {
             noBlackIp: 'O IP já está bloqueado, não é necessário bloquear novamente',
             noWhiteUrl: 'O URL já está na lista branca, não é necessário adicionar novamente',
             spiderIpHelper:
-                'IPs de spiders são permitidos por padrão, incluindo Baidu, Bing, Google, 360, Shenma, Sogou, ByteDance, DuckDuckGo',
+                'Inclui Baidu, Bing, Google, 360, Shenma, Sogou, ByteDance, DuckDuckGo, Yandex. Fechar isso bloqueará todos os acessos de spiders.',
             spiderIp: 'Pool de IPs de spiders',
             geoIp: 'Biblioteca de endereços IP',
             geoIpHelper: 'Usado para determinar a localização geográfica do IP',
@@ -3105,6 +3194,9 @@ const message = {
             notBelongToIpGroup: 'Não pertence ao Grupo de IP',
             unknownWebsiteKey: 'Domínio Desconhecido',
             special: 'Domínio Especial',
+            fileToLarge: 'O arquivo excede 1MB e não pode ser enviado',
+            uploadOverLimit: 'O arquivo enviado excede o limite de quantidade, máximo 1 arquivo',
+            importRuleHelper: 'Uma regra por linha',
         },
         monitor: {
             name: 'Monitoramento de Websites',
@@ -3415,6 +3507,8 @@ const message = {
                 'O nó atual já está habilitado como nó mestre e não pode ser adicionado diretamente como nó escravo. Por favor, faça o downgrade para nó escravo primeiro antes de adicionar, consulte a documentação para detalhes.',
             agentExist:
                 'Detectado que 1panel-agent já está instalado neste nó. Continuar irá reter os dados existentes e apenas substituir o serviço 1panel-agent.',
+            agentNotExist:
+                'Foi detectado que o 1panel-agent não está instalado neste nó, portanto, as informações do nó não podem ser editadas diretamente. Por favor, exclua e adicione novamente.',
             oldDataExist:
                 'Detectados dados históricos do 1Panel V2 neste nó. As seguintes informações serão usadas para sobrescrever as configurações atuais:',
             errLicense: 'A licença vinculada a este nó está indisponível. Por favor verifique e tente novamente!',
@@ -3481,7 +3575,7 @@ const message = {
             alertRule: 'Regras de Alerta',
             titleSearchHelper: 'Digite o título do alerta para busca aproximada',
             taskType: 'Tipo',
-            ssl: 'Expiração do Certificado (SSL)',
+            ssl: 'Expiração do Certificado',
             siteEndTime: 'Expiração do Site',
             panelPwdEndTime: 'Expiração da Senha do Painel',
             panelUpdate: 'Nova Versão do Painel Disponível',
@@ -3526,7 +3620,7 @@ const message = {
             cpuUseExceedAvgHelper: 'O uso médio da CPU dentro do tempo especificado excede o valor especificado',
             memoryUseExceedAvgHelper: 'O uso médio da memória dentro do tempo especificado excede o valor especificado',
             loadUseExceedAvgHelper: 'O uso médio da carga dentro do tempo especificado excede o valor especificado',
-            resourceAlertRulesHelper: 'Nota: Alertas contínuos em 30 minutos enviarão apenas um SMS',
+            resourceAlertRulesHelper: 'Nota: Alertas contínuos em 30 minutos enviarão apenas um',
             specifiedTime: 'Hora Especificada',
             deleteTitle: 'Excluir Alerta',
             deleteMsg: 'Tem certeza de que deseja excluir a tarefa de alerta?',
@@ -3572,7 +3666,7 @@ const message = {
             taskName: 'Nome da Tarefa',
             cronJobType: 'Tipo de Tarefa',
             clamPath: 'Diretório de Varredura',
-            cronjob: 'Tarefa Cron',
+            cronjob: 'Tarefa Cron agendada {0} falhou',
             app: 'Backup do Aplicativo',
             web: 'Backup do Site',
             database: 'Backup do Banco de Dados',
@@ -3659,6 +3753,20 @@ const message = {
             portHelper: 'SSL geralmente usa 465, TLS geralmente usa 587',
             sslHelper: 'Se a porta SMTP for 465, normalmente é necessário SSL',
             tlsHelper: 'Se a porta SMTP for 587, normalmente é necessário TLS',
+            triggerCondition: 'Condição de Disparo',
+            loginFail: ' falhas de login em',
+            nodeException: 'Alerta de Exceção de Nó',
+            licenseException: 'Alerta de Exceção de Licença',
+            panelLogin: 'Alerta de Exceção de Login no Painel',
+            sshLogin: 'Alerta de Exceção de Login SSH',
+            panelIpLogin: 'Alerta de Exceção de IP de Login no Painel',
+            sshIpLogin: 'Alerta de Exceção de IP de Login SSH',
+            ipWhiteListHelper:
+                'Os IPs na lista de permissões não são restringidos pelas regras e não haverá alerta em caso de login bem-sucedido',
+            nodeExceptionRule: 'Alerta de exceção de nó, enviado {0} vezes por dia',
+            licenseExceptionRule: 'Alerta de exceção de licença, enviado {0} vezes por dia',
+            panelLoginRule: 'Alerta de login no painel, enviado {0} vezes por dia',
+            sshLoginRule: 'Alerta de login SSH, enviado {0} vezes por dia',
         },
         theme: {
             lingXiaGold: 'Ling Xia Gold',
@@ -3684,6 +3792,7 @@ const message = {
             unhealthyDeleteError:
                 'O status do nó de instalação está anormal, verifique a lista de nós e tente novamente!',
             replicaStatusError: 'A aquisição do status está anormal, verifique o nó mestre.',
+            masterHostError: 'O IP do nó mestre não pode ser 127.0.0.1',
         },
     },
 };

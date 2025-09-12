@@ -2,7 +2,6 @@ package repo
 
 import (
 	"github.com/1Panel-dev/1Panel/agent/app/model"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
 )
@@ -144,7 +143,7 @@ func (u *HostRepo) SyncCert(data []model.RootCert) error {
 		}
 	}
 	for _, val := range oldCertsMap {
-		if err := tx.Model(&model.RootCert{}).Where("id = ?", val).Updates(map[string]interface{}{"status": constant.StatusDeleted}).Error; err != nil {
+		if err := tx.Where("id = ?", val).Delete(&model.RootCert{}).Error; err != nil {
 			tx.Rollback()
 			return err
 		}

@@ -174,12 +174,15 @@ export namespace Toolbox {
         clamName: string;
         recordName: string;
     }
-    export interface ClamLog {
-        name: string;
+    export interface ClamRecord {
+        id: number;
+        taskID: string;
         scanDate: string;
         scanTime: string;
-        totalError: string;
         infectedFiles: string;
+        totalError: string;
+        startTime: Date;
         status: string;
+        message: string;
     }
 }

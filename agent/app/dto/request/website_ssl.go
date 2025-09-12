@@ -27,6 +27,8 @@ type WebsiteSSLCreate struct {
 	Nameserver2   string `json:"nameserver2"`
 	ExecShell     bool   `json:"execShell"`
 	Shell         string `json:"shell"`
+	PushNode      bool   `json:"pushNode"`
+	Nodes         string `json:"nodes"`
 }
 
 type WebsiteDNSReq struct {
@@ -105,6 +107,8 @@ type WebsiteSSLUpdate struct {
 	Nameserver2   string `json:"nameserver2"`
 	ExecShell     bool   `json:"execShell"`
 	Shell         string `json:"shell"`
+	PushNode      bool   `json:"pushNode"`
+	Nodes         string `json:"nodes"`
 }
 
 type WebsiteSSLUpload struct {

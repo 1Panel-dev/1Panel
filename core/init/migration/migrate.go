@@ -14,15 +14,14 @@ func Init() {
 		migrations.InitOneDrive,
 		migrations.InitHost,
 		migrations.InitTerminalSetting,
-		migrations.InitGoogle,
 		migrations.AddTaskDB,
 		migrations.AddXpackHideMenu,
-		migrations.UpdateGoogle,
 		migrations.UpdateXpackHideMenu,
 		migrations.UpdateOnedrive,
 		migrations.AddClusterMenu,
 		migrations.DeleteXpackHideMenu,
 		migrations.AddCronjobGroup,
+		migrations.AddDiskMenu,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

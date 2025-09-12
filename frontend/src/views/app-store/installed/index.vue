@@ -16,7 +16,7 @@
         </template>
         <template #main>
             <div>
-                <MainDiv :heightDiff="mode === 'upgrade' ? 270 : 300">
+                <MainDiv :heightDiff="mode === 'upgrade' ? 280 : 300">
                     <el-alert type="info" :closable="false" v-if="mode === 'installed'">
                         <template #title>
                             <span class="flx-align-center">
@@ -33,7 +33,7 @@
                             </span>
                         </template>
                     </el-alert>
-                    <div class="update-prompt" v-if="data == null">
+                    <div class="update-prompt" v-if="data === null">
                         <span>{{ mode === 'upgrade' ? $t('app.updatePrompt') : $t('app.installPrompt') }}</span>
                         <div>
                             <img src="@/assets/images/no_update_app.svg" />
@@ -106,12 +106,9 @@
                                                                     <el-button
                                                                         type="primary"
                                                                         link
-                                                                        @click="toFolder(installed.path)"
-                                                                    >
-                                                                        <el-icon>
-                                                                            <FolderOpened />
-                                                                        </el-icon>
-                                                                    </el-button>
+                                                                        @click="routerToFileWithPath(installed.path)"
+                                                                        icon="FolderOpened"
+                                                                    ></el-button>
                                                                 </el-tooltip>
                                                             </span>
                                                             <span class="ml-1">
@@ -146,6 +143,24 @@
                                                                     >
                                                                         <el-icon>
                                                                             <SvgIcon iconName="p-terminal2" />
+                                                                        </el-icon>
+                                                                    </el-button>
+                                                                </el-tooltip>
+                                                            </span>
+                                                            <span class="ml-1">
+                                                                <el-tooltip
+                                                                    v-if="mode !== 'upgrade'"
+                                                                    effect="dark"
+                                                                    :content="$t('menu.container')"
+                                                                    placement="top"
+                                                                >
+                                                                    <el-button
+                                                                        type="primary"
+                                                                        link
+                                                                        @click="toContainer(installed)"
+                                                                    >
+                                                                        <el-icon>
+                                                                            <SvgIcon iconName="p-docker" />
                                                                         </el-icon>
                                                                     </el-button>
                                                                 </el-tooltip>
@@ -427,13 +442,14 @@ import Status from '@/components/status/index.vue';
 import { getAge, jumpToPath, toLink } from '@/utils/util';
 import { useRouter } from 'vue-router';
 import { MsgSuccess } from '@/utils/message';
-import { toFolder } from '@/global/business';
 import TaskLog from '@/components/log/task/index.vue';
 import Detail from '@/views/app-store/detail/index.vue';
 import IgnoreApp from '@/views/app-store/installed/ignore/create/index.vue';
 import { getAgentSettingByKey } from '@/api/modules/setting';
 import Tags from '@/views/app-store/components/tag.vue';
 import SvgIcon from '@/components/svg-icon/svg-icon.vue';
+import MainDiv from '@/components/main-div/index.vue';
+import { routerToFileWithPath, routerToNameWithQuery } from '@/utils/router';
 
 const data = ref<any>();
 const loading = ref(false);
@@ -512,6 +528,9 @@ const hasLinkButton = (installed: any) => {
 const search = async () => {
     searchReq.page = paginationConfig.currentPage;
     searchReq.pageSize = paginationConfig.pageSize;
+
+    localStorage.setItem('app-installed-page-size', String(searchReq.pageSize));
+
     const res = await searchAppInstalled(searchReq);
     data.value = res.data.items;
     paginationConfig.total = res.data.total;
@@ -685,6 +704,10 @@ const buttons = [
         },
     },
 ];
+
+const toContainer = async (row: App.AppInstalled) => {
+    routerToNameWithQuery('ContainerItem', { filters: 'com.docker.compose.project=' + row.name, uncached: true });
+};
 
 const openBackups = (key: string, name: string, status: string) => {
     let params = {

@@ -6,6 +6,7 @@ import { MsgError, MsgSuccess } from '@/utils/message';
 import { v4 as uuidv4 } from 'uuid';
 import JSEncrypt from 'jsencrypt';
 import CryptoJS from 'crypto-js';
+import { routerToPathWithQuery } from './router';
 
 export function deepCopy<T>(obj: any): T {
     let newObj: any;
@@ -26,6 +27,18 @@ export function deepCopy<T>(obj: any): T {
 export function randomNum(min: number, max: number): number {
     let num = Math.floor(Math.random() * (min - max) + max);
     return num;
+}
+
+export function debounce(func: Function, wait: number) {
+    let timeout: NodeJS.Timeout | null = null;
+    return function executedFunction(...args: any[]) {
+        const later = () => {
+            if (timeout) clearTimeout(timeout);
+            func(...args);
+        };
+        if (timeout) clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
 }
 
 export function getBrowserLang() {
@@ -439,6 +452,8 @@ export function getProvider(provider: string): string {
             return 'HTTP';
         case 'selfSigned':
             return i18n.global.t('ssl.selfSigned');
+        case 'fromMaster':
+            return i18n.global.t('ssl.fromMaster');
         default:
             return i18n.global.t('ssl.manualCreate');
     }
@@ -792,7 +807,7 @@ export async function loadJson(lang: string): Promise<Object> {
 }
 
 export const jumpToPath = (router: any, path: string) => {
-    router.push({ path: path, query: { uncached: 'true' } });
+    routerToPathWithQuery(path, { uncached: 'true' });
 };
 
 export const toLink = (link: string) => {

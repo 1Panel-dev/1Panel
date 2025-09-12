@@ -21,7 +21,8 @@ html.dark {
     --panel-main-bg-color-9: #2e313d;
     --panel-main-bg-color-10: #242633;
     --panel-main-bg-color-11: #60626f;
-    --panel-main-bg-color-12: #000000;
+    --panel-main-bg-color-12: #1f2329;
+    --panel-main-bg-color-13: #000000;
 
     --panel-alert-error-bg-color: #fef0f0;
     --panel-alert-error-text-color: #f56c6c;
@@ -95,7 +96,7 @@ html.dark {
     --panel-terminal-bg-color: var(--panel-main-bg-color-10);
     --panel-terminal-tag-active-text-color: var(--panel-color-primary);
     --panel-terminal-tag-hover-text-color: var(--panel-color-primary);
-    --panel-logs-bg-color: var(--panel-main-bg-color-9);
+    --panel-logs-bg-color: #1b1b1b;
     --panel-alert-bg-color: var(--panel-main-bg-color-10);
 
     --el-menu-item-bg-color: var(--panel-main-bg-color-9);
@@ -117,6 +118,9 @@ html.dark {
     --el-box-shadow-dark: 0px 16px 48px 16px rgba(36, 38, 51, 0.72), 0px 12px 32px #242633, 0px 8px 16px -8px #242633;
     --el-bg-color: var(--panel-main-bg-color-9);
     --el-bg-color-overlay: var(--panel-main-bg-color-9);
+    --el-dialog-bg-color: var(--panel-main-bg-color-9);
+    --panel-code-header-footer-color: var(--panel-main-bg-color-12);
+
 
     --el-text-color-placeholder: var(--panel-main-bg-color-4);
 
@@ -152,6 +156,7 @@ html.dark {
 
     .el-tabs--card > .el-tabs__header .el-tabs__nav {
         border: 1px solid var(--panel-main-bg-color-8);
+        border-bottom: none;
     }
 
     .el-tabs--card > .el-tabs__header .el-tabs__item.is-active {
@@ -368,13 +373,13 @@ html.dark {
     }
     .el-drawer {
         .cm-editor {
-            background-color: var(--panel-main-bg-color-10);
+            background-color: var(--panel-logs-bg-color);
         }
         .cm-gutters {
-            background-color: var(--panel-main-bg-color-10);
+            background-color: var(--panel-logs-bg-color);
         }
         .log-container {
-            background-color: var(--panel-main-bg-color-10);
+            background-color: var(--panel-logs-bg-color);
         }
     }
 
@@ -459,7 +464,7 @@ html.dark {
 
     .el-collapse-item__header {
         color: #ffffff;
-        background-color: var(--panel-main-bg-color-10) !important;
+        background-color: transparent !important;
     }
 
     .el-checkbox__input.is-checked .el-checkbox__inner::after {

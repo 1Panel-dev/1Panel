@@ -81,8 +81,8 @@ type NginxCommonReq struct {
 
 type NginxAntiLeechUpdate struct {
 	WebsiteID   uint     `json:"websiteID" validate:"required"`
-	Extends     string   `json:"extends" validate:"required"`
-	Return      string   `json:"return" validate:"required"`
+	Extends     string   `json:"extends"`
+	Return      string   `json:"return"`
 	Enable      bool     `json:"enable" `
 	ServerNames []string `json:"serverNames"`
 	Cache       bool     `json:"cache"`

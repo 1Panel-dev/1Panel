@@ -26,6 +26,8 @@ const databaseRouter = {
                     meta: {
                         activeMenu: '/databases',
                         requiresAuth: false,
+                        parent: 'menu.database',
+                        title: 'MySQL',
                     },
                 },
                 {
@@ -37,6 +39,7 @@ const databaseRouter = {
                     meta: {
                         activeMenu: '/databases',
                         requiresAuth: false,
+                        ignoreTab: true,
                     },
                 },
                 {
@@ -47,6 +50,9 @@ const databaseRouter = {
                     meta: {
                         activeMenu: '/databases',
                         requiresAuth: false,
+                        parent: 'menu.database',
+                        title: 'MySQL',
+                        detail: 'database.remote',
                     },
                 },
                 {
@@ -57,6 +63,8 @@ const databaseRouter = {
                     meta: {
                         activeMenu: '/databases',
                         requiresAuth: false,
+                        parent: 'menu.database',
+                        title: 'PostgreSQL',
                     },
                 },
                 {
@@ -67,6 +75,9 @@ const databaseRouter = {
                     meta: {
                         activeMenu: '/databases',
                         requiresAuth: false,
+                        parent: 'menu.database',
+                        title: 'PostgreSQL',
+                        detail: 'database.remote',
                     },
                 },
                 {
@@ -78,6 +89,7 @@ const databaseRouter = {
                     meta: {
                         activeMenu: '/databases',
                         requiresAuth: false,
+                        ignoreTab: true,
                     },
                 },
                 {
@@ -88,6 +100,8 @@ const databaseRouter = {
                     meta: {
                         activeMenu: '/databases',
                         requiresAuth: false,
+                        parent: 'menu.database',
+                        title: 'Redis',
                     },
                 },
                 {
@@ -98,6 +112,9 @@ const databaseRouter = {
                     meta: {
                         activeMenu: '/databases',
                         requiresAuth: false,
+                        parent: 'menu.database',
+                        title: 'Redis',
+                        detail: 'database.remote',
                     },
                 },
             ],

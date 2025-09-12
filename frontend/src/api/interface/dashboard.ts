@@ -8,6 +8,15 @@ export namespace Dashboard {
 
         diskSize: number;
     }
+    export interface QuickJump {
+        id: number;
+        name: string;
+        title: string;
+        detail: string;
+        recommend: number;
+        isShow: boolean ;
+        router: string;
+    }
     export interface AppLauncher {
         key: string;
         icon: string;
@@ -37,11 +46,6 @@ export namespace Dashboard {
         httpsPort: string;
     }
     export interface BaseInfo {
-        websiteNumber: number;
-        databaseNumber: number;
-        cronjobNumber: number;
-        appInstalledNumber: number;
-
         hostname: string;
         os: string;
         platform: string;
@@ -58,6 +62,7 @@ export namespace Dashboard {
         cpuModelName: string;
 
         currentInfo: CurrentInfo;
+        quickJump: Array<QuickJump>;
     }
     export interface CurrentInfo {
         uptime: number;

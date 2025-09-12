@@ -65,6 +65,7 @@ import { ref, nextTick } from 'vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import LogFile from '@/components/log/file/index.vue';
+import MainDiv from '@/components/main-div/index.vue';
 
 const logConfig = reactive({
     type: 'website',

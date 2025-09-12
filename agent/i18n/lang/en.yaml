@@ -15,6 +15,9 @@ ErrApiConfigIPInvalid: 'The IP used to call the API interface is not in the whit
 ErrApiConfigDisable: 'This interface prohibits the use of API interface calls: {{ .detail }}'
 ErrApiConfigKeyTimeInvalid: 'API interface timestamp error: {{ .detail }}'
 
+ErrMinQuickJump: "Please set at least one quick jump entry!"
+ErrMaxQuickJump: "You can set up to four quick jump entries!"
+
 #common
 ErrUsernameIsExist: 'Username already exists'
 ErrNameIsExist: 'Name already exists'
@@ -34,6 +37,7 @@ ErrGroupIsDefault: 'Default group, cannot be deleted'
 ErrGroupIsInWebsiteUse: 'The group is being used by another website and cannot be deleted.'
 
 #backup
+Localhost: 'Local Machine'
 ErrBackupInUsed: 'The backup account has been used in the scheduled task and cannot be deleted.'
 ErrBackupCheck: 'Backup account test connection failed {{ .err }}'
 ErrBackupLocalDelete: 'Deleting the local server backup account is not supported yet'
@@ -79,9 +83,7 @@ AppStoreIsLastVersion: 'The App Store is already the latest version'
 AppStoreSyncSuccess: 'App Store synchronization successful'
 SyncAppDetail: 'Synchronize application configuration'
 AppVersionNotMatch: '{{ .name }} application requires a higher 1Panel version, skipping synchronization'
-MoveSiteDir: 'The current upgrade requires migration of the OpenResty website directory'
-MoveSiteToDir: 'Migrate site directory to {{ .name }}'
-ErrMoveSiteDir: 'Failed to migrate site directory'
+MoveSiteDir: "Detected website directory change. Need to migrate OpenResty website directory to {{ .name }}"
 MoveSiteDirSuccess: 'Successful migration of website directory'
 DeleteRuntimePHP: 'Delete PHP runtime'
 CustomAppStoreFileValid: 'App store packages need to be in .tar.gz format'
@@ -92,6 +94,15 @@ ErrCustomRuntimes: 'There is an installed runtime environment, please delete it 
 ErrAppVersionDeprecated: "The {{ .name }} application is not compatible with the current 1Panel version, skipped"
 ErrDockerFailed: "The state of Docker is abnormal, please check the service status"
 ErrDockerComposeCmdNotFound: "The Docker Compose command does not exist, please install this command on the host machine first"
+
+#ssh
+ExportIP: "Login IP"
+ExportArea: "Location"
+ExportPort: "Port"
+ExportAuthMode: "Login Method"
+ExportUser: "User"
+ExportStatus: "Login Status"
+ExportDate: "Time"
 
 #file
 ErrFileCanNotRead: 'This file does not support preview'
@@ -108,6 +119,9 @@ ErrFavoriteExist: 'This path has already been favorited'
 ErrInvalidChar: 'Illegal characters are not allowed'
 ErrPathNotDelete: 'The selected directory cannot be deleted'
 ErrLogFileToLarge: "The log file exceeds 500MB and cannot be opened"
+FileDropFailed: "Failed to clean up file {{ .name }}: {{ .err }}"
+FileDropSuccess: "Successfully cleaned up file {{ .name }}, cleaned {{ .count }} files, freed {{ .size }} disk space"
+FileDropSum: "File cleanup completed successfully, total {{ .count }} files cleaned, total {{ .size }} disk space freed"
 
 #website
 ErrAliasIsExist: 'Alias already exists'
@@ -123,6 +137,9 @@ ErrBuildDirNotFound: 'The build directory does not exist'
 ErrImageNotExist: 'The operating environment {{ .name }} image does not exist, please re-edit the operating environment'
 ErrProxyIsUsed: "Load balancing has been used by reverse proxy, cannot be deleted"
 ErrSSLValid: 'Certificate file is abnormal, please check the certificate status!'
+ErrWebsiteDir: "Please select a directory within the website directory."
+ErrComposerFileNotFound: "composer.json file does not exist"
+ErrRuntimeNoPort: "The runtime environment is not set with a port, please edit the runtime environment first."
 
 #ssl
 ErrSSLCannotDelete: 'The {{ .name }} certificate is being used by a website and cannot be deleted'
@@ -156,6 +173,9 @@ StartUpdateSystemSSL: 'Start updating system certificate'
 UpdateSystemSSLSuccess: 'Update system certificate successfully'
 ErrWildcardDomain: 'Unable to apply for wildcard domain name certificate in HTTP mode'
 ErrApplySSLCanNotDelete: "The certificate {{.name}} being applied for cannot be deleted, please try again later."
+StartPushSSLToNode: "Starting to push certificate to node"
+PushSSLToNodeFailed: "Failed to push certificate to node: {{ .err }}"
+PushSSLToNodeSuccess: "Successfully pushed certificate to node"
 
 #mysql
 ErrUserIsExist: 'The current user already exists, please re-enter'
@@ -210,8 +230,12 @@ SystemLog: 'System Log'
 CutWebsiteLog: 'Rotate Website Log'
 FileOrDir: 'Directory / File'
 UploadFile: 'Uploading backup file {{ .file }} to {{ .backup }}'
-IgnoreBackupErr: 'Backup failed, error: {{ .detail }}, ignoring this error...'
-IgnoreUploadErr: 'Upload failed, error: {{ .detail }}, ignoring this error...'
+Upload: "Upload"
+IgnoreBackupErr: "Backup failed, error: {{ .detail }}, ignoring this error..."
+IgnoreUploadErr: "Upload failed, error: {{ .detail }}, ignoring this error..."
+LoadBackupFailed: "Failed to get backup account connection, error: {{ .detail }}"
+InExecuting: "The current task is being executed, please do not repeat the execution!"
+NoSuchResource: "No backup content found in the database, skipping..."
 
 #toolbox
 ErrNotExistUser: 'The current user does not exist, please modify and try again!'
@@ -271,6 +295,7 @@ allow: 'allow'
 deny: 'deny'
 OpenrestyNotFound: 'Openresty is not installed'
 remoteIpIsNull: "IP list is empty"
+OpenrestyVersionErr: "Openresty version is too low, please upgrade Openresty to 1.27.1.2-2-2-focal"
 
 #task
 TaskStart: '{{ .name }} task starts [START]'
@@ -327,6 +352,11 @@ SubTask: 'Subtask'
 RuntimeExtension: 'Runtime Environment Extension'
 TaskIsExecuting: 'Task is running'
 CustomAppstore: 'Custom application warehouse'
+TaskExec: 'Execute'
+
+# task - clam
+Clamscan: "Scan {{ .name }}"
+TaskScan: "Scan"
 
 # task - ai
 OllamaModelPull: 'Pull Ollama model {{ .name }}'
@@ -356,7 +386,6 @@ SnapCompressFile: 'Compress snapshot file'
 SnapCheckCompress: 'Check snapshot compression file'
 SnapCompressSize: 'Snapshot file size {{ .name }}'
 SnapUpload: 'Upload snapshot file'
-SnapLoadBackup: 'Get backup account information'
 SnapUploadTo: 'Upload snapshot file to {{ .name }}'
 SnapUploadRes: 'Upload snapshot file to {{ .name }}'
 
@@ -445,3 +474,16 @@ DiskUsedAlert: "Your 1Panel disk '{{ .name }}' has used {{ .used }}. Please log 
 ResourceAlert: "The average {{ .name }} usage over {{ .time }} minutes on your 1Panel is {{ .used }}. Please log in to the panel for details."
 PanelVersionAlert: "A new version of 1Panel is available. Please log in to the panel to upgrade."
 PanelPwdExpirationAlert: "Your 1Panel password will expire in {{ .day }} days. Please log in to the panel for details."
+CommonAlert: "Your 1Panel, {{ .msg }}, please log in to the panel for details."
+NodeExceptionAlert: "Your 1Panel, {{ .num }} nodes are abnormal, please log in to the panel for details."
+LicenseExceptionAlert: "Your 1Panel, {{ .num }} licenses are abnormal, please log in to the panel for details."
+SSHAndPanelLoginAlert: "Your 1Panel, abnormal panel {{ .name }} login from {{ .ip }}, please log in to the panel for details."
+
+#disk
+DeviceNotFound: "Device {{ .name }} not found"
+DeviceIsMounted: "Device {{ .name }} is mounted, please unmount first"
+PartitionDiskErr: "Failed to partition, {{ .err }}"
+FormatDiskErr: "Failed to format disk, {{ .err }}"
+MountDiskErr: "Failed to mount disk, {{ .err }}"
+UnMountDiskErr: "Failed to unmount disk, {{ .err }}"
+XfsNotFound: "xfs filesystem not detected, please install xfsprogs first"

@@ -32,7 +32,6 @@ const (
 	GoogleDrive = "GoogleDrive"
 
 	OneDriveRedirectURI = "http://localhost/login/authorized"
-	GoogleRedirectURI   = "https://localhost:8080"
 )
 
 const (
@@ -99,6 +98,7 @@ var WebUrlMap = map[string]struct{}{
 	"/hosts/ssh/ssh":          {},
 	"/hosts/ssh/log":          {},
 	"/hosts/ssh/session":      {},
+	"/hosts/disk":             {},
 
 	"/terminal": {},
 

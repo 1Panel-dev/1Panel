@@ -36,7 +36,7 @@ const container = ref('');
 const globalStore = GlobalStore();
 const logVisible = ref(false);
 const compose = ref('');
-const highlightDiff = ref(320);
+const highlightDiff = ref(150);
 const node = ref('');
 
 interface DialogProps {
@@ -49,7 +49,7 @@ interface DialogProps {
 const defaultProps = defineProps({
     highlightDiff: {
         type: Number,
-        default: 320,
+        default: 150,
     },
 });
 

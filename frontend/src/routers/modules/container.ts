@@ -27,6 +27,8 @@ const containerRouter = {
                     meta: {
                         activeMenu: '/containers',
                         requiresAuth: false,
+                        parent: 'menu.container',
+                        title: 'menu.home',
                     },
                 },
                 {
@@ -38,6 +40,8 @@ const containerRouter = {
                     meta: {
                         activeMenu: '/containers',
                         requiresAuth: false,
+                        parent: 'menu.container',
+                        title: 'menu.container',
                     },
                 },
                 {
@@ -49,17 +53,7 @@ const containerRouter = {
                     meta: {
                         activeMenu: '/containers',
                         requiresAuth: false,
-                    },
-                },
-                {
-                    path: 'composeDetail/:filters?',
-                    name: 'ComposeDetail',
-                    component: () => import('@/views/container/compose/detail/index.vue'),
-                    props: true,
-                    hidden: true,
-                    meta: {
-                        activeMenu: '/containers',
-                        requiresAuth: false,
+                        ignoreTab: true,
                     },
                 },
                 {
@@ -70,6 +64,8 @@ const containerRouter = {
                     meta: {
                         activeMenu: '/containers',
                         requiresAuth: false,
+                        parent: 'menu.container',
+                        title: 'container.image',
                     },
                 },
                 {
@@ -80,6 +76,8 @@ const containerRouter = {
                     meta: {
                         activeMenu: '/containers',
                         requiresAuth: false,
+                        parent: 'menu.container',
+                        title: 'container.network',
                     },
                 },
                 {
@@ -90,6 +88,8 @@ const containerRouter = {
                     meta: {
                         activeMenu: '/containers',
                         requiresAuth: false,
+                        parent: 'menu.container',
+                        title: 'container.volume',
                     },
                 },
                 {
@@ -100,6 +100,8 @@ const containerRouter = {
                     meta: {
                         activeMenu: '/containers',
                         requiresAuth: false,
+                        parent: 'menu.container',
+                        title: 'container.repo',
                     },
                 },
                 {
@@ -110,6 +112,8 @@ const containerRouter = {
                     meta: {
                         activeMenu: '/containers',
                         requiresAuth: false,
+                        parent: 'menu.container',
+                        title: 'container.compose',
                     },
                 },
                 {
@@ -120,6 +124,8 @@ const containerRouter = {
                     meta: {
                         activeMenu: '/containers',
                         requiresAuth: false,
+                        parent: 'menu.container',
+                        title: 'container.composeTemplate',
                     },
                 },
                 {
@@ -130,6 +136,8 @@ const containerRouter = {
                     meta: {
                         activeMenu: '/containers',
                         requiresAuth: false,
+                        parent: 'menu.container',
+                        title: 'container.setting',
                     },
                 },
             ],

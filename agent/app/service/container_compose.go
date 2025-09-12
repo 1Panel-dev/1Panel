@@ -10,12 +10,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/1Panel-dev/1Panel/agent/app/repo"
-
-	"github.com/docker/docker/api/types/container"
-
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
@@ -24,6 +21,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/compose"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
+	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 	"golang.org/x/net/context"
 )
@@ -54,14 +52,13 @@ func (u *ContainerService) PageCompose(req dto.SearchWithPage) (int64, interface
 	}
 
 	composeCreatedByLocal, _ := composeRepo.ListRecord()
-
 	composeLocalMap := make(map[string]dto.ComposeInfo)
 	for _, localItem := range composeCreatedByLocal {
 		composeItemLocal := dto.ComposeInfo{
-			ContainerNumber: 0,
-			CreatedAt:       localItem.CreatedAt.Format(constant.DateTimeLayout),
-			ConfigFile:      localItem.Path,
-			Workdir:         strings.TrimSuffix(localItem.Path, "/docker-compose.yml"),
+			ContainerCount: 0,
+			CreatedAt:      localItem.CreatedAt.Format(constant.DateTimeLayout),
+			ConfigFile:     localItem.Path,
+			Workdir:        strings.TrimSuffix(localItem.Path, "/docker-compose.yml"),
 		}
 		composeItemLocal.CreatedBy = "1Panel"
 		composeItemLocal.Path = localItem.Path
@@ -78,18 +75,24 @@ func (u *ContainerService) PageCompose(req dto.SearchWithPage) (int64, interface
 				CreateTime:  time.Unix(container.Created, 0).Format(constant.DateTimeLayout),
 			}
 			if compose, has := composeMap[name]; has {
-				compose.ContainerNumber++
+				compose.ContainerCount++
+				if strings.ToLower(containerItem.State) == "running" {
+					compose.RunningCount++
+				}
 				compose.Containers = append(compose.Containers, containerItem)
 				composeMap[name] = compose
 			} else {
 				config := container.Labels[composeConfigLabel]
 				workdir := container.Labels[composeWorkdirLabel]
 				composeItem := dto.ComposeInfo{
-					ContainerNumber: 1,
-					CreatedAt:       time.Unix(container.Created, 0).Format(constant.DateTimeLayout),
-					ConfigFile:      config,
-					Workdir:         workdir,
-					Containers:      []dto.ComposeContainer{containerItem},
+					ContainerCount: 1,
+					CreatedAt:      time.Unix(container.Created, 0).Format(constant.DateTimeLayout),
+					ConfigFile:     config,
+					Workdir:        workdir,
+					Containers:     []dto.ComposeContainer{containerItem},
+				}
+				if strings.ToLower(containerItem.State) == "running" {
+					composeItem.RunningCount = 1
 				}
 				createdBy, ok := container.Labels[composeCreatedBy]
 				if ok {
@@ -118,8 +121,8 @@ func (u *ContainerService) PageCompose(req dto.SearchWithPage) (int64, interface
 	}
 	for key, item := range composeMap {
 		if existingItem, exists := mergedMap[key]; exists {
-			if item.ContainerNumber > 0 {
-				if existingItem.ContainerNumber <= 0 {
+			if item.ContainerCount > 0 {
+				if existingItem.ContainerCount <= 0 {
 					mergedMap[key] = item
 				}
 			}
@@ -224,18 +227,18 @@ func (u *ContainerService) ComposeOperation(req dto.ComposeOperation) error {
 	if cmd.CheckIllegal(req.Path, req.Operation) {
 		return buserr.New("ErrCmdIllegal")
 	}
-	if _, err := os.Stat(req.Path); err != nil {
-		return fmt.Errorf("load file with path %s failed, %v", req.Path, err)
-	}
 	if req.Operation == "delete" {
-		if stdout, err := compose.Operate(req.Path, "down"); err != nil {
-			return errors.New(string(stdout))
+		if err := removeContainerForCompose(req.Name, req.Path); err != nil && !req.Force {
+			return err
 		}
 		if req.WithFile {
 			_ = os.RemoveAll(path.Dir(req.Path))
 		}
 		_ = composeRepo.DeleteRecord(repo.WithByName(req.Name))
 		return nil
+	}
+	if _, err := os.Stat(req.Path); err != nil {
+		return fmt.Errorf("load file with path %s failed, %v", req.Path, err)
 	}
 	if req.Operation == "up" {
 		if stdout, err := compose.Up(req.Path); err != nil {
@@ -301,6 +304,33 @@ func (u *ContainerService) loadPath(req *dto.ComposeCreate) error {
 		_, _ = write.WriteString(string(req.File))
 		write.Flush()
 		req.Path = path
+	}
+	return nil
+}
+
+func removeContainerForCompose(composeName, composePath string) error {
+	if _, err := os.Stat(composePath); err == nil {
+		if stdout, err := compose.Operate(composePath, "down"); err != nil {
+			return errors.New(stdout)
+		}
+		return nil
+	}
+	var options container.ListOptions
+	options.All = true
+	options.Filters = filters.NewArgs()
+	options.Filters.Add("label", "com.docker.compose.project="+composeName)
+	client, err := docker.NewDockerClient()
+	if err != nil {
+		return err
+	}
+	defer client.Close()
+	ctx := context.Background()
+	containers, err := client.ContainerList(ctx, options)
+	if err != nil {
+		return err
+	}
+	for _, c := range containers {
+		_ = client.ContainerRemove(ctx, c.ID, container.RemoveOptions{RemoveVolumes: true, Force: true})
 	}
 	return nil
 }

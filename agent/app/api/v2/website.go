@@ -1121,3 +1121,23 @@ func (b *BaseApi) OperateCrossSiteAccess(c *gin.Context) {
 	}
 	helper.Success(c)
 }
+
+// @Tags Website
+// @Summary Exec Composer
+// @Accept json
+// @Param request body request.ExecComposerReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /websites/exec/composer [post]
+func (b *BaseApi) ExecComposer(c *gin.Context) {
+	var req request.ExecComposerReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := websiteService.ExecComposer(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}

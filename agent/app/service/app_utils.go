@@ -1,11 +1,13 @@
 package service
 
 import (
+	"bufio"
 	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"log"
+	"maps"
 	"math"
 	"net/http"
 	"os"
@@ -357,7 +359,7 @@ func deleteAppInstall(deleteReq request.AppInstallDelete) error {
 				if err != nil {
 					return err
 				}
-				images, err := composeV2.GetDockerComposeImagesV2(content, []byte(install.DockerCompose))
+				images, err := composeV2.GetImagesFromDockerCompose(content, []byte(install.DockerCompose))
 				if err != nil {
 					return err
 				}
@@ -440,6 +442,11 @@ func deleteAppInstall(deleteReq request.AppInstallDelete) error {
 			_ = op.DeleteDir(parentDir)
 		}
 		tx.Commit()
+
+		existApps, _ := appInstallRepo.ListBy(context.Background(), appInstallRepo.WithAppId(install.AppId))
+		if len(existApps) == 0 {
+			_ = appIgnoreUpgradeRepo.Delete(appIgnoreUpgradeRepo.WithAppID(install.AppId))
+		}
 		return nil
 	}
 	uninstallTask.AddSubTask(task.GetTaskName(install.Name, task.TaskUninstall, task.TaskScopeApp), uninstall, nil)
@@ -535,6 +542,9 @@ func handleUpgradeCompose(install model.AppInstall, detail model.AppDetail) (map
 	if oldServiceValue["deploy"] != nil {
 		serviceValue["deploy"] = oldServiceValue["deploy"]
 	}
+	if oldServiceValue["restart"] != nil {
+		serviceValue["restart"] = oldServiceValue["restart"]
+	}
 	servicesMap[install.ServiceName] = serviceValue
 	composeMap["services"] = servicesMap
 	return composeMap, nil
@@ -571,6 +581,76 @@ func getUpgradeCompose(install model.AppInstall, detail model.AppDetail) (string
 		return "", err
 	}
 	return string(composeByte), nil
+}
+
+func buildNginx(parentTask *task.Task) error {
+	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
+	if err != nil {
+		return err
+	}
+	fileOp := files.NewFileOp()
+	buildPath := path.Join(nginxInstall.GetPath(), "build")
+	if !fileOp.Stat(buildPath) {
+		return buserr.New("ErrBuildDirNotFound")
+	}
+	moduleConfigPath := path.Join(buildPath, "module.json")
+	moduleContent, err := fileOp.GetContent(moduleConfigPath)
+	if err != nil {
+		return err
+	}
+	var (
+		modules         []dto.NginxModule
+		addModuleParams []string
+		addPackages     []string
+	)
+	if len(moduleContent) > 0 {
+		_ = json.Unmarshal(moduleContent, &modules)
+		bashFile, err := os.OpenFile(path.Join(buildPath, "tmp", "pre.sh"), os.O_CREATE|os.O_WRONLY|os.O_TRUNC, constant.DirPerm)
+		if err != nil {
+			return err
+		}
+		defer bashFile.Close()
+		bashFileWriter := bufio.NewWriter(bashFile)
+		for _, module := range modules {
+			if !module.Enable {
+				continue
+			}
+			_, err = bashFileWriter.WriteString(module.Script + "\n")
+			if err != nil {
+				return err
+			}
+			addModuleParams = append(addModuleParams, module.Params)
+			addPackages = append(addPackages, module.Packages...)
+		}
+		err = bashFileWriter.Flush()
+		if err != nil {
+			return err
+		}
+	}
+	envs, err := gotenv.Read(nginxInstall.GetEnvPath())
+	if err != nil {
+		return err
+	}
+	envs["RESTY_CONFIG_OPTIONS_MORE"] = ""
+	envs["RESTY_ADD_PACKAGE_BUILDDEPS"] = ""
+	if len(addModuleParams) > 0 {
+		envs["RESTY_CONFIG_OPTIONS_MORE"] = strings.Join(addModuleParams, " ")
+	}
+	if len(addPackages) > 0 {
+		envs["RESTY_ADD_PACKAGE_BUILDDEPS"] = strings.Join(addPackages, " ")
+	}
+	_ = gotenv.Write(envs, nginxInstall.GetEnvPath())
+	if len(addModuleParams) == 0 && len(addPackages) == 0 {
+		return nil
+	}
+	logStr := fmt.Sprintf("%s %s", i18n.GetMsgByKey("TaskBuild"), i18n.GetMsgByKey("Image"))
+	parentTask.LogStart(logStr)
+	cmdMgr := cmd.NewCommandMgr(cmd.WithTask(*parentTask), cmd.WithTimeout(60*time.Minute))
+	if err = cmdMgr.RunBashCf("docker compose -f %s build", nginxInstall.GetComposePath()); err != nil {
+		return err
+	}
+	parentTask.LogSuccess(logStr)
+	return nil
 }
 
 func upgradeInstall(req request.AppInstallUpgrade) error {
@@ -654,7 +734,7 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 			if req.DockerCompose != "" {
 				composeContent = []byte(req.DockerCompose)
 			}
-			images, err := composeV2.GetDockerComposeImagesV2(content, composeContent)
+			images, err := composeV2.GetImagesFromDockerCompose(content, composeContent)
 			if err != nil {
 				return err
 			}
@@ -705,6 +785,14 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 			return err
 		}
 		envParams := make(map[string]string, len(envs))
+		if install.App.Key == constant.AppOpenresty {
+			packageUrl, _ := env.GetEnvValueByKey(install.GetEnvPath(), "CONTAINER_PACKAGE_URL")
+			addPackage, _ := env.GetEnvValueByKey(install.GetEnvPath(), "RESTY_ADD_PACKAGE_BUILDDEPS")
+			options, _ := env.GetEnvValueByKey(install.GetEnvPath(), "RESTY_CONFIG_OPTIONS_MORE")
+			envParams["CONTAINER_PACKAGE_URL"] = packageUrl
+			envParams["RESTY_ADD_PACKAGE_BUILDDEPS"] = addPackage
+			envParams["RESTY_CONFIG_OPTIONS_MORE"] = options
+		}
 		handleMap(envs, envParams)
 		if err = env.Write(envParams, install.GetEnvPath()); err != nil {
 			return err
@@ -716,6 +804,13 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 
 		if err = fileOp.WriteFile(install.GetComposePath(), strings.NewReader(install.DockerCompose), constant.FilePerm); err != nil {
 			return err
+		}
+
+		if install.App.Key == constant.AppOpenresty {
+			if err = buildNginx(t); err != nil {
+				t.Log(err.Error())
+				return err
+			}
 		}
 
 		logStr := fmt.Sprintf("%s %s", i18n.GetMsgByKey("Run"), i18n.GetMsgByKey("App"))
@@ -743,7 +838,7 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 		}
 	}
 
-	upgradeTask.AddSubTask(task.GetTaskName(install.Name, task.TaskScopeApp, task.TaskUpgrade), upgradeApp, rollBackApp)
+	upgradeTask.AddSubTaskWithOps(task.GetTaskName(install.Name, task.TaskScopeApp, task.TaskUpgrade), upgradeApp, rollBackApp, 0, 1*time.Hour)
 
 	go func() {
 		err = upgradeTask.Execute()
@@ -868,9 +963,9 @@ func downloadApp(app model.App, appDetail model.AppDetail, appInstall *model.App
 		_ = fileOp.CreateDir(appVersionDir, constant.DirPerm)
 	}
 	if logger == nil {
-		global.LOG.Infof("download app[%s] from %s", app.Name, appDetail.DownloadUrl)
+		global.LOG.Infof("download app [%s] from %s", app.Name, appDetail.DownloadUrl)
 	} else {
-		logger.Printf("download app[%s] from %s", app.Name, appDetail.DownloadUrl)
+		logger.Printf("download app [%s] from %s", app.Name, appDetail.DownloadUrl)
 	}
 
 	filePath := path.Join(appVersionDir, app.Key+"-"+appDetail.Version+".tar.gz")
@@ -886,9 +981,9 @@ func downloadApp(app model.App, appDetail model.AppDetail, appInstall *model.App
 
 	if err = files.DownloadFileWithProxy(appDetail.DownloadUrl, filePath); err != nil {
 		if logger == nil {
-			global.LOG.Errorf("download app[%s] error %v", app.Name, err)
+			global.LOG.Errorf("download app [%s] error %v", app.Name, err)
 		} else {
-			logger.Printf("download app[%s] error %v", app.Name, err)
+			logger.Printf("download app [%s] error %v", app.Name, err)
 		}
 		return
 	}
@@ -950,11 +1045,11 @@ func copyData(task *task.Task, app model.App, appDetail model.AppDetail, appInst
 		return
 	}
 	envPath := path.Join(appDir, ".env")
-	envParams := make(map[string]string, len(req.Params))
+	envParams := make(map[string]string)
 	if fileOp.Stat(envPath) {
 		envs, _ := gotenv.Read(envPath)
-		for k, v := range envs {
-			envParams[k] = v
+		if envParams = maps.Clone(envs); envParams == nil {
+			envParams = make(map[string]string)
 		}
 	}
 	handleMap(req.Params, envParams)
@@ -987,7 +1082,7 @@ func runScript(task *task.Task, appInstall *model.AppInstall, operate string) er
 	task.LogStart(logStr)
 
 	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(10*time.Minute), cmd.WithWorkDir(workDir))
-	out, err := cmdMgr.RunWithStdoutBashCf(scriptPath)
+	out, err := cmdMgr.RunWithStdoutBashC(scriptPath)
 	if err != nil {
 		if out != "" {
 			err = errors.New(out)
@@ -1653,6 +1748,14 @@ func addDockerComposeCommonParam(composeMap map[string]interface{}, serviceName 
 	deploy["resources"] = resource
 	serviceValue["deploy"] = deploy
 
+	if req.RestartPolicy != "" {
+		if req.RestartPolicy == "on-failure" {
+			serviceValue["restart"] = "on-failure:5"
+		} else {
+			serviceValue["restart"] = req.RestartPolicy
+		}
+	}
+
 	ports, ok := serviceValue["ports"].([]interface{})
 	if ok {
 		for i, port := range ports {
@@ -1755,6 +1858,17 @@ func isHostModel(dockerCompose string) bool {
 	return false
 }
 
+func getRestartPolicy(yml string) string {
+	var project docker.ComposeProject
+	if err := yaml.Unmarshal([]byte(yml), &project); err != nil {
+		return ""
+	}
+	for _, service := range project.Services {
+		return service.Restart
+	}
+	return ""
+}
+
 func getMajorVersion(version string) string {
 	parts := strings.Split(version, ".")
 	if len(parts) >= 2 {
@@ -1780,6 +1894,11 @@ func ignoreUpdate(installed model.AppInstall) bool {
 			}
 		}
 		return true
+	}
+	if installed.App.Key == "sqlbot" {
+		if common.CompareVersion("1.1.0", installed.Version) {
+			return true
+		}
 	}
 	return false
 }
@@ -1818,6 +1937,53 @@ func getAppTags(appID uint, lang string) ([]response.TagDTO, error) {
 		}
 	}
 	return res, nil
+}
+
+func handleSiteDir(app model.App, appDetail model.AppDetail, req request.AppInstallCreate, t *task.Task) error {
+	if app.Key == "openresty" && (app.Resource == "remote" || app.Resource == "custom") && common.CompareVersion(appDetail.Version, "1.27") {
+		if dir, ok := req.Params["WEBSITE_DIR"]; ok {
+			siteDir := dir.(string)
+			if siteDir == "" || !strings.HasPrefix(siteDir, "/") {
+				siteDir = path.Join(global.Dir.DataDir, dir.(string))
+			}
+			req.Params["WEBSITE_DIR"] = siteDir
+			oldWebStePath, _ := settingRepo.GetValueByKey("WEBSITE_DIR")
+			fileOp := files.NewFileOp()
+			if oldWebStePath != "" && oldWebStePath != siteDir && fileOp.Stat(oldWebStePath) {
+				t.Log(i18n.GetWithName("MoveSiteDir", siteDir))
+				if fileOp.Stat(siteDir) {
+					if fileOp.Stat(path.Join(siteDir, "conf.d")) {
+						_ = fileOp.Rename(path.Join(siteDir, "conf.d"), path.Join(siteDir, "conf.d.bak"))
+					}
+					if fileOp.Stat(path.Join(siteDir, "sites")) {
+						_ = fileOp.Rename(path.Join(siteDir, "sites"), path.Join(siteDir, "sites.bak"))
+					}
+					if err := fileOp.Rename(path.Join(oldWebStePath, "sites"), path.Join(siteDir, "sites")); err != nil {
+						return err
+					}
+					if err := fileOp.Rename(path.Join(oldWebStePath, "conf.d"), path.Join(siteDir, "conf.d")); err != nil {
+						return err
+					}
+				} else {
+					err := fileOp.Rename(oldWebStePath, siteDir)
+					if err != nil {
+						return err
+					}
+				}
+				t.Log(i18n.GetMsgByKey("MoveSiteDirSuccess"))
+			}
+			if !fileOp.Stat(siteDir) {
+				_ = fileOp.CreateDir(siteDir, constant.DirPerm)
+				_ = fileOp.CreateDir(path.Join(siteDir, "conf.d"), constant.DirPerm)
+			}
+			err := settingRepo.UpdateOrCreate("WEBSITE_DIR", siteDir)
+			if err != nil {
+				return err
+			}
+			go RestartPHPRuntime()
+		}
+	}
+	return nil
 }
 
 func handleOpenrestyFile(appInstall *model.AppInstall) error {

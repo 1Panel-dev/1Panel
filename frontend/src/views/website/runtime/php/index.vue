@@ -45,7 +45,7 @@
                     </el-table-column>
                     <el-table-column :label="$t('home.dir')" prop="codeDir" width="80px">
                         <template #default="{ row }">
-                            <el-button type="primary" link @click="toFolder(row.path)">
+                            <el-button type="primary" link @click="routerToFileWithPath(row.path)">
                                 <el-icon>
                                     <FolderOpened />
                                 </el-icon>
@@ -71,7 +71,7 @@
                             {{ row.port }}
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('commons.table.status')" prop="status">
+                    <el-table-column :label="$t('commons.table.status')" prop="status" width="100px">
                         <template #default="{ row }">
                             <RuntimeStatus :row="row" />
                         </template>
@@ -151,9 +151,9 @@ import RuntimeStatus from '@/views/website/runtime/components/runtime-status.vue
 import Terminal from '@/views/website/runtime/components/terminal.vue';
 import { disabledButton } from '@/utils/runtime';
 import { GlobalStore } from '@/store';
-import router from '@/routers/router';
 import DockerStatus from '@/views/container/docker-status/index.vue';
 import { operateRuntime, updateRuntimeRemark } from '../common/utils';
+import { routerToFileWithPath } from '@/utils/router';
 const globalStore = GlobalStore();
 const mobile = computed(() => {
     return globalStore.isMobile();
@@ -163,7 +163,7 @@ const taskLogRef = ref();
 const paginationConfig = reactive({
     cacheSizeKey: 'runtime-page-size',
     currentPage: 1,
-    pageSize: 10,
+    pageSize: Number(localStorage.getItem('runtime-page-size')) || 20,
     total: 0,
 });
 let req = reactive<Runtime.RuntimeReq>({
@@ -372,10 +372,6 @@ const onOpenBuildCache = () => {
 };
 const openTaskLog = (taskID: string) => {
     taskLogRef.value.openWithTaskID(taskID);
-};
-
-const toFolder = (folder: string) => {
-    router.push({ path: '/hosts/files', query: { path: folder } });
 };
 
 onMounted(() => {

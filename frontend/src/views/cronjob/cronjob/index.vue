@@ -54,7 +54,7 @@
                     :data="data"
                     :heightDiff="300"
                 >
-                    <el-table-column type="selection" fix />
+                    <el-table-column type="selection" :selectable="selectable" fix />
                     <el-table-column
                         :label="$t('cronjob.taskName')"
                         :min-width="120"
@@ -85,7 +85,7 @@
                             </fu-select-rw-switch>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('commons.table.status')" :min-width="80" prop="status" sortable>
+                    <el-table-column :label="$t('commons.table.status')" :min-width="90" prop="status" sortable>
                         <template #default="{ row }">
                             <Status
                                 v-if="row.status === 'Enable'"
@@ -140,7 +140,7 @@
                         <template #default="{ row }">
                             <el-button v-if="row.lastRecordStatus === 'Success'" icon="Select" link type="success" />
                             <el-button v-if="row.lastRecordStatus === 'Failed'" icon="CloseBold" link type="danger" />
-                            <el-button v-if="row.lastRecordStatus === 'Waiting'" icon="SemiSelect" link type="info" />
+                            <el-button v-if="row.lastRecordStatus === 'Waiting'" :loading="true" link type="info" />
                             {{ row.lastRecordTime }}
                         </template>
                     </el-table-column>
@@ -178,9 +178,9 @@
                         </template>
                     </el-table-column>
                     <fu-table-operations
-                        width="300px"
+                        width="200px"
                         :buttons="buttons"
-                        :ellipsis="10"
+                        :ellipsis="2"
                         :label="$t('commons.table.operate')"
                         min-width="mobile ? 'auto' : 200"
                         :fixed="mobile ? false : 'right'"
@@ -235,9 +235,9 @@ import { ElMessageBox } from 'element-plus';
 import { MsgSuccess } from '@/utils/message';
 import { hasBackup, transSpecToStr } from './helper';
 import { GlobalStore } from '@/store';
-import router from '@/routers';
 import { getCurrentDateFormatted } from '@/utils/util';
 import { getGroupList } from '@/api/modules/group';
+import { routerToNameWithQuery } from '@/utils/router';
 
 const globalStore = GlobalStore();
 const mobile = computed(() => {
@@ -260,7 +260,7 @@ const data = ref();
 const paginationConfig = reactive({
     cacheSizeKey: 'cronjob-page-size',
     currentPage: 1,
-    pageSize: 10,
+    pageSize: Number(localStorage.getItem('cronjob-page-size')) || 20,
     total: 0,
     orderBy: 'createdAt',
     order: 'null',
@@ -304,8 +304,12 @@ const dialogRecordRef = ref();
 const dialogBackupRef = ref();
 
 const onOpenDialog = async (id: string) => {
-    router.push({ name: 'CronjobOperate', query: { id: id } });
+    routerToNameWithQuery('CronjobOperate', { id: id });
 };
+
+function selectable(row) {
+    return row.status !== 'Pending';
+}
 
 const onDelete = async (row: Cronjob.CronjobInfo | null) => {
     let names = [];
@@ -398,16 +402,20 @@ const onSubmitExport = async () => {
 const loadGroups = async () => {
     const res = await getGroupList('cronjob');
     groupOptions.value = res.data || [];
+    for (const group of groupOptions.value) {
+        if (group.name === 'Default') {
+            defaultGroupID.value = group.id;
+            break;
+        }
+    }
     for (const item of data.value) {
         if (item.groupID === 0) {
             item.groupBelong = 'Default';
+            item.groupID = defaultGroupID.value;
             continue;
         }
         let hasGroup = false;
         for (const group of groupOptions.value) {
-            if (group.name === 'Default') {
-                defaultGroupID.value = group.id;
-            }
             if (item.groupID === group.id) {
                 hasGroup = true;
                 item.groupBelong = group.name;
@@ -492,15 +500,15 @@ const buttons = [
         },
     },
     {
-        label: i18n.global.t('commons.button.edit'),
-        click: (row: Cronjob.CronjobInfo) => {
-            onOpenDialog(row.id + '');
-        },
-    },
-    {
         label: i18n.global.t('cronjob.record'),
         click: (row: Cronjob.CronjobInfo) => {
             loadDetail(row);
+        },
+    },
+    {
+        label: i18n.global.t('commons.button.edit'),
+        click: (row: Cronjob.CronjobInfo) => {
+            onOpenDialog(row.id + '');
         },
     },
     {

@@ -218,7 +218,7 @@ const selects = ref<any>([]);
 const paginationConfig = reactive({
     cacheSizeKey: 'login-log-page-size',
     currentPage: 1,
-    pageSize: 10,
+    pageSize: Number(localStorage.getItem('login-log-page-size')) || 20,
     total: 0,
     small: true,
 });
@@ -393,16 +393,22 @@ const search = async () => {
 };
 
 const onSync = async () => {
-    loading.value = true;
-    await syncCert()
-        .then(() => {
-            loading.value = false;
-            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            search();
-        })
-        .catch(() => {
-            loading.value = false;
-        });
+    ElMessageBox.confirm(i18n.global.t('ssh.syncHelper'), i18n.global.t('commons.button.sync'), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+        type: 'info',
+    }).then(async () => {
+        loading.value = true;
+        await syncCert()
+            .then(() => {
+                loading.value = false;
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                search();
+            })
+            .catch(() => {
+                loading.value = false;
+            });
+    });
 };
 
 const onDelete = async (row: Host.RootCertInfo | null) => {

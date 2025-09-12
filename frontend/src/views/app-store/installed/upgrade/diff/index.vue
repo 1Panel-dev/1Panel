@@ -7,10 +7,10 @@
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="success" @click="confirm(true)">
+                <el-button type="primary" @click="confirm(true)">
                     {{ $t('app.useNew') }}
                 </el-button>
-                <el-button type="primary" @click="confirm(false)">
+                <el-button @click="confirm(false)">
                     {{ $t('app.useDefault') }}
                 </el-button>
             </span>

@@ -5,6 +5,7 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 	"github.com/go-acme/lego/v4/certificate"
 	"log"
 	"os"
@@ -46,6 +47,7 @@ type IWebsiteSSLService interface {
 	ObtainSSL(apply request.WebsiteSSLApply) error
 	SyncForRestart() error
 	DownloadFile(id uint) (*os.File, error)
+	ImportMasterSSL(create model.WebsiteSSL) error
 }
 
 func NewIWebsiteSSLService() IWebsiteSSLService {
@@ -146,6 +148,10 @@ func (w WebsiteSSLService) Create(create request.WebsiteSSLCreate) (request.Webs
 		}
 		websiteSSL.Dir = create.Dir
 	}
+	if create.PushNode && global.IsMaster && len(create.Nodes) > 0 {
+		websiteSSL.PushNode = true
+		websiteSSL.Nodes = create.Nodes
+	}
 
 	var domains []string
 	if create.OtherDomains != "" {
@@ -185,6 +191,8 @@ func (w WebsiteSSLService) Create(create request.WebsiteSSLCreate) (request.Webs
 		return res, err
 	}
 	create.ID = websiteSSL.ID
+	logFile, _ := os.OpenFile(path.Join(global.Dir.SSLLogDir, fmt.Sprintf("%s-ssl-%d.log", websiteSSL.PrimaryDomain, websiteSSL.ID)), os.O_CREATE|os.O_WRONLY|os.O_TRUNC, constant.FilePerm)
+	logFile.Close()
 	go func() {
 		if create.Provider != constant.DnsManual {
 			if err = w.ObtainSSL(request.WebsiteSSLApply{
@@ -205,6 +213,9 @@ func printSSLLog(logger *log.Logger, msgKey string, params map[string]interface{
 }
 
 func reloadSystemSSL(websiteSSL *model.WebsiteSSL, logger *log.Logger) {
+	if !global.IsMaster {
+		return
+	}
 	systemSSLEnable, sslID := GetSystemSSL()
 	if systemSSLEnable && sslID == websiteSSL.ID {
 		fileOp := files.NewFileOp()
@@ -382,6 +393,14 @@ func (w WebsiteSSLService) ObtainSSL(apply request.WebsiteSSLApply) error {
 			printSSLLog(logger, "ApplyWebSiteSSLSuccess", nil, apply.DisableLog)
 		}
 		reloadSystemSSL(websiteSSL, logger)
+		if websiteSSL.PushNode {
+			printSSLLog(logger, "StartPushSSLToNode", nil, apply.DisableLog)
+			if err = xpack.PushSSLToNode(websiteSSL); err != nil {
+				printSSLLog(logger, "PushSSLToNodeFailed", map[string]interface{}{"err": err.Error()}, apply.DisableLog)
+				return
+			}
+			printSSLLog(logger, "PushSSLToNodeSuccess", nil, apply.DisableLog)
+		}
 	}()
 
 	return nil
@@ -520,6 +539,13 @@ func (w WebsiteSSLService) Update(update request.WebsiteSSLUpdate) error {
 	} else {
 		updateParams["shell"] = ""
 	}
+	if update.PushNode {
+		updateParams["push_node"] = true
+		updateParams["nodes"] = update.Nodes
+	} else {
+		updateParams["push_node"] = false
+		updateParams["nodes"] = ""
+	}
 
 	if websiteSSL.Provider != constant.SelfSigned && websiteSSL.Provider != constant.Manual {
 		acmeAccount, err := websiteAcmeRepo.GetFirst(repo.WithByID(update.AcmeAccountID))
@@ -624,7 +650,7 @@ func (w WebsiteSSLService) Upload(req request.WebsiteSSLUpload) error {
 		}
 		pemData = reset
 	}
-	if pemData == nil {
+	if pemData == nil || cert == nil {
 		return buserr.New("ErrSSLCertificateFormat")
 	}
 
@@ -703,6 +729,41 @@ func (w WebsiteSSLService) SyncForRestart() error {
 			ssl.Status = constant.SystemRestart
 			ssl.Message = "System restart causing interrupt"
 			_ = websiteSSLRepo.Save(&ssl)
+		}
+	}
+	return nil
+}
+
+func (w WebsiteSSLService) ImportMasterSSL(create model.WebsiteSSL) error {
+	websiteSSL, _ := websiteSSLRepo.GetFirst(websiteSSLRepo.WithByMasterSSLID(create.ID))
+	websiteSSL.Status = constant.SSLReady
+	websiteSSL.Provider = constant.FromMaster
+	websiteSSL.PrimaryDomain = create.PrimaryDomain
+	websiteSSL.StartDate = create.StartDate
+	websiteSSL.ExpireDate = create.ExpireDate
+	websiteSSL.KeyType = create.KeyType
+	websiteSSL.Description = create.Description
+	websiteSSL.PrivateKey = create.PrivateKey
+	websiteSSL.Pem = create.Pem
+	websiteSSL.Type = create.Type
+	websiteSSL.Organization = create.Organization
+	websiteSSL.MasterSSLID = create.ID
+	if err := websiteSSLRepo.Save(websiteSSL); err != nil {
+		return err
+	}
+	websites, _ := websiteRepo.GetBy(websiteRepo.WithWebsiteSSLID(websiteSSL.ID))
+	if len(websites) == 0 {
+		return nil
+	}
+	for _, website := range websites {
+		if err := createPemFile(website, *websiteSSL); err != nil {
+			continue
+		}
+	}
+	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
+	if err == nil {
+		if err := opNginx(nginxInstall.ContainerName, constant.NginxReload); err != nil {
+			return err
 		}
 	}
 	return nil

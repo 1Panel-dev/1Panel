@@ -5,6 +5,7 @@ import (
 	"sort"
 	"strings"
 	"time"
+	"unicode"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
@@ -53,25 +54,27 @@ func (u *ContainerService) PageVolume(req dto.SearchWithPage) (int64, interface{
 
 	nyc, _ := time.LoadLocation(common.LoadTimeZoneByCmd())
 	for _, item := range records {
-		tag := make([]string, 0)
-		for _, val := range item.Labels {
-			tag = append(tag, val)
+		var volume dto.Volume
+		volume.Driver = item.Driver
+		volume.Mountpoint = item.Mountpoint
+		volume.Name = simplifyVolumeName(item.Name)
+		for key, val := range item.Labels {
+			volume.Labels = append(volume.Labels, dto.VolumeOption{Key: key, Value: val})
 		}
-		var createTime time.Time
-		if strings.Contains(item.CreatedAt, "Z") {
-			createTime, _ = time.ParseInLocation("2006-01-02T15:04:05Z", item.CreatedAt, nyc)
-		} else if strings.Contains(item.CreatedAt, "+") {
-			createTime, _ = time.ParseInLocation("2006-01-02T15:04:05+08:00", item.CreatedAt, nyc)
-		} else {
-			createTime, _ = time.ParseInLocation("2006-01-02T15:04:05", item.CreatedAt, nyc)
+		for key, val := range item.Options {
+			volume.Options = append(volume.Options, dto.VolumeOption{Key: key, Value: val})
 		}
-		data = append(data, dto.Volume{
-			CreatedAt:  createTime,
-			Name:       item.Name,
-			Driver:     item.Driver,
-			Mountpoint: item.Mountpoint,
-			Labels:     tag,
+		sort.Slice(volume.Options, func(i, j int) bool {
+			return volume.Options[i].Key < volume.Options[j].Key
 		})
+		if strings.Contains(item.CreatedAt, "Z") {
+			volume.CreatedAt, _ = time.ParseInLocation("2006-01-02T15:04:05Z", item.CreatedAt, nyc)
+		} else if strings.Contains(item.CreatedAt, "+") {
+			volume.CreatedAt, _ = time.ParseInLocation("2006-01-02T15:04:05+08:00", item.CreatedAt, nyc)
+		} else {
+			volume.CreatedAt, _ = time.ParseInLocation("2006-01-02T15:04:05", item.CreatedAt, nyc)
+		}
+		data = append(data, volume)
 	}
 
 	return int64(total), data, nil
@@ -139,4 +142,17 @@ func (u *ContainerService) CreateVolume(req dto.VolumeCreate) error {
 		return err
 	}
 	return nil
+}
+
+func simplifyVolumeName(name string) string {
+	if len(name) != 64 {
+		return name
+	}
+
+	for _, char := range name {
+		if !unicode.Is(unicode.ASCII_Hex_Digit, char) {
+			return name
+		}
+	}
+	return name[:12]
 }

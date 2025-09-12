@@ -218,6 +218,12 @@
                                         </el-button>
                                         <el-divider v-if="form.specs.length > 1" class="divider" />
                                     </div>
+                                    <span class="input-help logText">
+                                        {{ $t('cronjob.cronSpecDoc') }}
+                                        <el-link class="link" icon="Position" @click="toDoc" type="primary">
+                                            {{ $t('firewall.quickJump') }}
+                                        </el-link>
+                                    </span>
                                 </el-form-item>
                                 <el-button class="mb-3" @click="handleSpecCustomAdd()">
                                     {{ $t('commons.button.add') }}
@@ -241,11 +247,7 @@
                                                     : form.websiteList
                                             "
                                         >
-                                            <el-option
-                                                :disabled="websiteOptions.length === 0"
-                                                :label="$t('commons.table.all')"
-                                                value="all"
-                                            />
+                                            <el-option :label="$t('commons.table.all')" value="all" />
                                             <el-option
                                                 v-for="(item, index) in websiteOptions"
                                                 :key="index"
@@ -275,11 +277,7 @@
                                                     : form.appIdList
                                             "
                                         >
-                                            <el-option
-                                                :disabled="appOptions.length === 0"
-                                                :label="$t('commons.table.all')"
-                                                value="all"
-                                            />
+                                            <el-option :label="$t('commons.table.all')" value="all" />
                                             <div v-for="item in appOptions" :key="item.id">
                                                 <el-option :value="item.id + ''" :label="item.name">
                                                     <span>{{ item.name }}</span>
@@ -314,11 +312,7 @@
                                                     : form.dbNameList
                                             "
                                         >
-                                            <el-option
-                                                :disabled="dbInfo.dbs.length === 0"
-                                                :label="$t('commons.table.all')"
-                                                value="all"
-                                            />
+                                            <el-option :label="$t('commons.table.all')" value="all" />
                                             <el-option
                                                 v-for="item in dbInfo.dbs"
                                                 :key="item.id"
@@ -479,7 +473,10 @@
                                                     v-model="form.script"
                                                 >
                                                     <template #prepend>
-                                                        <FileList @choose="loadScriptDir" :dir="false"></FileList>
+                                                        <el-button
+                                                            icon="Folder"
+                                                            @click="scriptFileRef.acceptParams({ dir: false })"
+                                                        />
                                                     </template>
                                                 </el-input>
                                             </el-form-item>
@@ -491,7 +488,10 @@
                                     <el-form-item :label="$t('cronjob.backupContent')" prop="sourceDir">
                                         <el-input v-model="form.sourceDir">
                                             <template #prepend>
-                                                <FileList @choose="loadDir" :dir="true" :path="form.sourceDir" />
+                                                <el-button
+                                                    icon="Folder"
+                                                    @click="dirRef.acceptParams({ dir: true, path: form.sourceDir })"
+                                                />
                                             </template>
                                         </el-input>
                                     </el-form-item>
@@ -500,7 +500,10 @@
                                     <el-form-item :label="$t('cronjob.backupContent')" prop="files">
                                         <el-input>
                                             <template #prepend>
-                                                <FileList @choose="loadFile" :dir="false" />
+                                                <el-button
+                                                    icon="Folder"
+                                                    @click="fileRef.acceptParams({ dir: false })"
+                                                />
                                             </template>
                                         </el-input>
                                         <div class="w-full">
@@ -738,6 +741,9 @@
         </template>
     </LayoutContent>
 
+    <FileList ref="scriptFileRef" @choose="loadScriptDir" />
+    <FileList ref="dirRef" @choose="loadDir" />
+    <FileList ref="fileRef" @choose="loadFile" />
     <LicenseImport ref="licenseRef" />
 </template>
 
@@ -775,15 +781,20 @@ import { GlobalStore } from '@/store';
 import LicenseImport from '@/components/license-import/index.vue';
 import { transferTimeToSecond } from '@/utils/util';
 import { getGroupList } from '@/api/modules/group';
+import { routerToName, routerToPath } from '@/utils/router';
 const router = useRouter();
 
 const globalStore = GlobalStore();
 const licenseRef = ref();
+const scriptFileRef = ref();
+const dirRef = ref();
+const fileRef = ref();
 const { isProductPro } = storeToRefs(globalStore);
 const loading = ref();
 const nextTimes = ref([]);
 
 const isCreate = ref();
+const defaultGroupID = ref();
 const form = reactive<Cronjob.CronjobInfo>({
     id: 0,
     name: '',
@@ -791,7 +802,7 @@ const form = reactive<Cronjob.CronjobInfo>({
     groupID: null,
     specCustom: false,
     spec: '',
-    specs: [],
+    specs: ['0 0 * * *'],
     specObjs: [{ specType: 'perMonth', week: 1, day: 3, hour: 1, minute: 30, second: 30 }],
 
     executor: '',
@@ -851,6 +862,7 @@ const search = async () => {
             .then((res) => {
                 loading.value = false;
                 form.name = res.data.name;
+                form.groupID = res.data.groupID || defaultGroupID.value;
                 form.type = res.data.type;
                 form.specCustom = res.data.specCustom;
                 form.spec = res.data.spec;
@@ -953,7 +965,7 @@ const search = async () => {
 };
 
 const goRouter = async (path: string) => {
-    router.push({ path: path });
+    routerToPath(path);
 };
 
 const containerOptions = ref([]);
@@ -987,7 +999,7 @@ const verifySpec = (rule: any, value: any, callback: any) => {
             return;
         }
         for (let i = 0; i < form.specs.length; i++) {
-            if (form.specs[i]) {
+            if (form.specs[i] && form.specs[i].split(' ').length === 5) {
                 continue;
             }
             callback(new Error(i18n.global.t('cronjob.cronSpecRule', [i + 1])));
@@ -1134,6 +1146,10 @@ const rules = reactive({
 type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
 
+const toDoc = () => {
+    window.open(globalStore.docsUrl + '/user_manual/cronjobs/', '_blank', 'noopener,noreferrer');
+};
+
 const loadDir = async (path: string) => {
     form.sourceDir = path;
 };
@@ -1145,18 +1161,19 @@ const loadScriptDir = async (path: string) => {
 const loadGroups = async () => {
     const res = await getGroupList('cronjob');
     groupOptions.value = res.data || [];
-    if (isCreate.value) {
-        for (const item of groupOptions.value) {
-            if (item.isDefault) {
-                form.groupID = item.id;
-                break;
-            }
+    for (const item of groupOptions.value) {
+        if (item.isDefault) {
+            defaultGroupID.value = item.id;
+            break;
         }
+    }
+    if (isCreate.value) {
+        form.groupID = defaultGroupID.value;
     }
 };
 
 const goBack = () => {
-    router.push({ name: 'CronjobItem' });
+    routerToName('CronjobItem');
 };
 
 const loadFile = async (path: string) => {

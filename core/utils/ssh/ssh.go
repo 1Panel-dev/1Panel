@@ -1,11 +1,14 @@
 package ssh
 
 import (
+	"errors"
 	"fmt"
 	"net"
+	"path"
 	"strings"
 	"time"
 
+	"github.com/1Panel-dev/1Panel/core/global"
 	gossh "golang.org/x/crypto/ssh"
 )
 
@@ -79,6 +82,35 @@ func (c *SSHClient) Run(shell string) (string, error) {
 	return string(buf), err
 }
 
+func (c *SSHClient) CpFileWithCheck(src, dst string) error {
+	localMd5, err := c.Runf("md5sum %s | awk '{print $1}'", src)
+	if err != nil {
+		global.LOG.Debugf("load md5sum with src for %s failed, std: %s, err: %v", path.Base(src), localMd5, err)
+		localMd5 = ""
+	}
+	for i := 0; i < 3; i++ {
+		std, cpErr := c.Runf("cp %s %s", src, dst)
+		if err != nil {
+			err = fmt.Errorf("cp file %s failed, std: %s, err: %v", src, std, cpErr)
+			continue
+		}
+		if len(strings.TrimSpace(localMd5)) == 0 {
+			return nil
+		}
+		remoteMd5, errDst := c.Runf("md5sum %s | awk '{print $1}'", dst)
+		if errDst != nil {
+			global.LOG.Debugf("load md5sum with dst for %s failed, std: %s, err: %v", path.Base(src), remoteMd5, errDst)
+			return nil
+		}
+		if strings.TrimSpace(localMd5) == strings.TrimSpace(remoteMd5) {
+			return nil
+		}
+		err = errors.New("cp file failed, file is not match!")
+	}
+
+	return err
+}
+
 func (c *SSHClient) SudoHandleCmd() string {
 	if _, err := c.Run("sudo -n ls"); err == nil {
 		return "sudo "
@@ -108,7 +140,9 @@ func (c *SSHClient) Runf(shell string, args ...interface{}) (string, error) {
 }
 
 func (c *SSHClient) Close() {
-	_ = c.Client.Close()
+	if c.Client != nil {
+		_ = c.Client.Close()
+	}
 }
 
 func makePrivateKeySigner(privateKey []byte, passPhrase []byte) (gossh.Signer, error) {

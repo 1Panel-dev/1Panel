@@ -44,7 +44,7 @@
                     {{ $t('database.loadFromRemote') }}
                 </el-button>
                 <el-button @click="goRemoteDB()" type="primary" plain>
-                    {{ $t('database.manageRemoteDB') }}
+                    {{ $t('database.remoteDB') }}
                 </el-button>
                 <el-dropdown>
                     <el-button type="primary" plain>
@@ -171,7 +171,7 @@
                                     class="ml-1.5"
                                 ></el-button>
                                 <div>
-                                    <CopyButton :content="row.password" type="icon" />
+                                    <CopyButton :content="row.password" />
                                 </div>
                             </div>
                             <div v-if="row.password === '' && row.username">
@@ -268,6 +268,7 @@ import AppStatus from '@/components/app-status/index.vue';
 import Backups from '@/components/backup/index.vue';
 import UploadDialog from '@/components/upload/index.vue';
 import PortJumpDialog from '@/components/port-jump/index.vue';
+import Tooltip from '@/components/tooltip/index.vue';
 import { dateFormat } from '@/utils/util';
 import { ElMessageBox } from 'element-plus';
 import { computed, onMounted, reactive, ref } from 'vue';
@@ -282,9 +283,9 @@ import i18n from '@/lang';
 import { Database } from '@/api/interface/database';
 import { App } from '@/api/interface/app';
 import { getAppPort } from '@/api/modules/app';
-import router from '@/routers';
 import { MsgSuccess } from '@/utils/message';
 import { GlobalStore } from '@/store';
+import { routerToName, routerToNameWithParams, routerToNameWithQuery } from '@/utils/router';
 const globalStore = GlobalStore();
 
 const mobile = computed(() => {
@@ -321,7 +322,7 @@ const data = ref();
 const paginationConfig = reactive({
     cacheSizeKey: 'mysql-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('mysql-page-size')) || 10,
+    pageSize: Number(localStorage.getItem('mysql-page-size')) || 20,
     total: 0,
     orderBy: 'createdAt',
     order: 'null',
@@ -367,7 +368,7 @@ const goRemoteDB = async () => {
     if (currentDB.value) {
         globalStore.setCurrentDB(currentDB.value.database);
     }
-    router.push({ name: 'MySQL-Remote' });
+    routerToName('MySQL-Remote');
 };
 
 const passwordRef = ref();
@@ -376,7 +377,7 @@ const onSetting = async () => {
     if (currentDB.value) {
         globalStore.setCurrentDB(currentDB.value.database);
     }
-    router.push({ name: 'MySQL-Setting', params: { type: currentDB.value.type, database: currentDB.value.database } });
+    routerToNameWithParams('MySQL-Setting', { type: currentDB.value.type, database: currentDB.value.database });
 };
 
 const changeDatabase = async () => {
@@ -441,10 +442,10 @@ const loadDB = async () => {
 
 const goRouter = async (target: string) => {
     if (target === 'app') {
-        router.push({ name: 'AppAll', query: { install: 'mysql' } });
+        routerToNameWithQuery('AppAll', { install: 'mysql' });
         return;
     }
-    router.push({ name: 'MySQL-Remote' });
+    routerToName('MySQL-Remote');
 };
 
 const onChange = async (info: any) => {
@@ -473,7 +474,7 @@ const goDashboard = async (name: string) => {
 };
 
 const getAppDetail = () => {
-    router.push({ name: 'AppAll', query: { install: dashboardKey.value } });
+    routerToNameWithQuery('AppAll', { install: dashboardKey.value });
 };
 
 const loadPhpMyAdminPort = async () => {

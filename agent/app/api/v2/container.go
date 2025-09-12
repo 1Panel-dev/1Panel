@@ -57,12 +57,29 @@ func (b *BaseApi) LoadContainerUsers(c *gin.Context) {
 // @Summary List containers
 // @Accept json
 // @Produce json
-// @Success 200 {array} string
+// @Success 200 {array} dto.ContainerOptions
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /containers/list [post]
 func (b *BaseApi) ListContainer(c *gin.Context) {
 	helper.SuccessWithData(c, containerService.List())
+}
+
+// @Tags Container
+// @Summary List containers by image
+// @Accept json
+// @Produce json
+// @Success 200 {array} dto.ContainerOptions
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /containers/list/byimage [post]
+func (b *BaseApi) ListContainerByImage(c *gin.Context) {
+	var req dto.OperationWithName
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	helper.SuccessWithData(c, containerService.ListByImage(req.Name))
 }
 
 // @Tags Container

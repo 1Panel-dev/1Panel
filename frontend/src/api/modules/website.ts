@@ -347,3 +347,7 @@ export const listCustomRewrite = () => {
 export const operateCrossSiteAccess = (req: Website.CrossSiteAccessOp) => {
     return http.post(`/websites/crosssite`, req);
 };
+
+export const execComposer = (req: Website.ExecComposer) => {
+    return http.post(`/websites/exec/composer`, req);
+};

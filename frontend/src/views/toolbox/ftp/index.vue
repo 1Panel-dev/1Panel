@@ -36,7 +36,7 @@
                 </template>
                 <template #leftToolBar>
                     <el-button type="primary" @click="onOpenDialog('add')">
-                        {{ $t('commons.button.add') }} {{ $t('toolbox.ftp.ftp') }}
+                        {{ $t('commons.button.add') }}
                     </el-button>
                     <el-button @click="onSync()">
                         {{ $t('commons.button.sync') }}
@@ -90,7 +90,7 @@
                                         class="ml-1.5"
                                     ></el-button>
                                     <div>
-                                        <CopyButton :content="row.password" type="icon" />
+                                        <CopyButton :content="row.password" />
                                     </div>
                                 </div>
                             </template>
@@ -112,7 +112,9 @@
                         </el-table-column>
                         <el-table-column :label="$t('file.root')" :min-width="120" prop="path" show-overflow-tooltip>
                             <template #default="{ row }">
-                                <el-button text type="primary" @click="toFolder(row.path)">{{ row.path }}</el-button>
+                                <el-button text type="primary" @click="routerToFileWithPath(row.path)">
+                                    {{ row.path }}
+                                </el-button>
                             </template>
                         </el-table-column>
                         <el-table-column
@@ -155,8 +157,8 @@ import { deleteFtp, searchFtp, updateFtp, syncFtp, operateFtp, getFtpBase } from
 import OperateDialog from '@/views/toolbox/ftp/operate/index.vue';
 import LogDialog from '@/views/toolbox/ftp/log/index.vue';
 import { Toolbox } from '@/api/interface/toolbox';
-import router from '@/routers';
 import { GlobalStore } from '@/store';
+import { routerToFileWithPath } from '@/utils/router';
 
 const globalStore = GlobalStore();
 
@@ -167,7 +169,7 @@ const data = ref();
 const paginationConfig = reactive({
     cacheSizeKey: 'ftp-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('ftp-page-size')) || 10,
+    pageSize: Number(localStorage.getItem('ftp-page-size')) || 20,
     total: 0,
     orderBy: 'createdAt',
     order: 'null',
@@ -210,10 +212,6 @@ const search = async (column?: any) => {
         .catch(() => {
             loading.value = false;
         });
-};
-
-const toFolder = (folder: string) => {
-    router.push({ path: '/hosts/files', query: { path: folder } });
 };
 
 const onOperate = async (operation: string) => {

@@ -36,3 +36,24 @@ func (b *BaseApi) StopProcess(c *gin.Context) {
 	}
 	helper.Success(c)
 }
+
+// @Tags Process
+// @Summary Get Process Info By PID
+// @Param pid path int true "PID"
+// @Success 200 {object} websocket.PsProcessData
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /process/{pid} [get]
+func (b *BaseApi) GetProcessInfoByPID(c *gin.Context) {
+	pid, err := helper.GetParamInt32("pid", c)
+	if err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	data, err := processService.GetProcessInfoByPID(pid)
+	if err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.SuccessWithData(c, data)
+}

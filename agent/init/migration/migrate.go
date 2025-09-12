@@ -34,6 +34,13 @@ func InitAgentDB() {
 		migrations.AddMethodToAlertLog,
 		migrations.AddMethodToAlertTask,
 		migrations.UpdateMcpServer,
+		migrations.InitCronjobGroup,
+		migrations.AddColumnToAlert,
+		migrations.UpdateWebsiteSSL,
+		migrations.AddQuickJump,
+		migrations.UpdateMcpServerAddType,
+		migrations.InitLocalSSHConn,
+		migrations.InitLocalSSHShow,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

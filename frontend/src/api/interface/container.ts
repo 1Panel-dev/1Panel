@@ -45,6 +45,10 @@ export namespace Container {
 
         imageSize: number;
     }
+    export interface ContainerOption {
+        name: string;
+        state: string;
+    }
     export interface ResourceLimit {
         cpu: number;
         memory: number;
@@ -86,7 +90,7 @@ export namespace Container {
     }
     export interface ContainerUpgrade {
         taskID: string;
-        name: string;
+        names: Array<string>;
         image: string;
         forcePull: boolean;
     }
@@ -160,6 +164,11 @@ export namespace Container {
         option: string;
     }
 
+    export interface ImageSearch extends ReqPage {
+        name: string;
+        orderBy: string;
+        order: string;
+    }
     export interface ImageInfo {
         id: string;
         createdAt: Date;
@@ -271,7 +280,8 @@ export namespace Container {
         name: string;
         createdAt: string;
         createdBy: string;
-        containerNumber: number;
+        containerCount: number;
+        runningCount: number;
         configFile: string;
         workdir: string;
         path: string;
@@ -299,6 +309,7 @@ export namespace Container {
         operation: string;
         path: string;
         withFile: boolean;
+        force: boolean;
     }
     export interface ComposeUpdate {
         name: string;

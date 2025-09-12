@@ -37,6 +37,7 @@ type WebsiteRes struct {
 	ChildSites    []string  `json:"childSites"`
 	RuntimeType   string    `json:"runtimeType"`
 	Favorite      bool      `json:"favorite"`
+	IPV6          bool      `json:"IPV6"`
 }
 
 type WebsiteOption struct {
@@ -64,6 +65,7 @@ type WebsiteHTTPS struct {
 	SSLProtocol []string         `json:"SSLProtocol"`
 	Algorithm   string           `json:"algorithm"`
 	Hsts        bool             `json:"hsts"`
+	HstsIncludeSubDomains         bool             `json:"hstsIncludeSubDomains"`
 	HttpsPorts  []int            `json:"httpsPorts"`
 	HttpsPort   string           `json:"httpsPort"`
 	Http3       bool             `json:"http3"`

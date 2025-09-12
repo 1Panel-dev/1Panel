@@ -402,7 +402,7 @@ func (b *BaseApi) ReloadSSL(c *gin.Context) {
 // @Success 200 {string} key
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /settings/api/config/generate/key [post]
+// @Router /core/settings/api/config/generate/key [post]
 // @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"生成 API 接口密钥","formatEN":"generate api key"}
 func (b *BaseApi) GenerateApiKey(c *gin.Context) {
 	panelToken := c.GetHeader("1Panel-Token")
@@ -425,7 +425,7 @@ func (b *BaseApi) GenerateApiKey(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /settings/api/config/update [post]
+// @Router /core/settings/api/config/update [post]
 // @x-panel-log {"bodyKeys":["ipWhiteList"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新 API 接口配置 => IP 白名单: [ipWhiteList]","formatEN":"update api config => IP White List: [ipWhiteList]"}
 func (b *BaseApi) UpdateApiConfig(c *gin.Context) {
 	panelToken := c.GetHeader("1Panel-Token")
@@ -452,7 +452,7 @@ func (b *BaseApi) UpdateApiConfig(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /settings/apps/store/update [post]
+// @Router /core/settings/apps/store/update [post]
 func (b *BaseApi) UpdateAppstoreConfig(c *gin.Context) {
 	var req dto.AppstoreUpdate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -471,7 +471,7 @@ func (b *BaseApi) UpdateAppstoreConfig(c *gin.Context) {
 // @Success 200 {object} dto.AppstoreConfig
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /settings/apps/store/config [get]
+// @Router /core/settings/apps/store/config [get]
 func (b *BaseApi) GetAppstoreConfig(c *gin.Context) {
 	res, err := settingService.GetAppstoreConfig()
 	if err != nil {

@@ -8,29 +8,52 @@ import (
 	"net/http"
 	"net/smtp"
 	"strings"
+	"time"
 )
 
-// SMTPConfig holds SMTP connection info
 type SMTPConfig struct {
 	Host       string
-	Port       int // 465, 587, 25
+	Port       int
 	Username   string
 	Password   string
 	From       string
-	Encryption string // "ssl", "starttls", "none"
+	Encryption string
 	Recipient  string
 }
 
-// EmailMessage represents an email
 type EmailMessage struct {
 	Subject string
-	Body    string // HTML or plain text
+	Body    string
 	IsHTML  bool
 }
 
-// SendMail sends the email using the given config
+type loginAuth struct {
+	username, password string
+}
+
+func LoginAuth(username, password string) smtp.Auth {
+	return &loginAuth{username, password}
+}
+
+func (a *loginAuth) Start(server *smtp.ServerInfo) (string, []byte, error) {
+	return "LOGIN", []byte{}, nil
+}
+
+func (a *loginAuth) Next(fromServer []byte, more bool) ([]byte, error) {
+	if more {
+		switch string(fromServer) {
+		case "Username:":
+			return []byte(a.username), nil
+		case "Password:":
+			return []byte(a.password), nil
+		default:
+			return nil, fmt.Errorf("unknown server challenge: %s", fromServer)
+		}
+	}
+	return nil, nil
+}
+
 func SendMail(config SMTPConfig, message EmailMessage, transport *http.Transport) error {
-	// 验证配置
 	if err := validateConfig(config); err != nil {
 		return err
 	}
@@ -38,13 +61,11 @@ func SendMail(config SMTPConfig, message EmailMessage, transport *http.Transport
 	addr := fmt.Sprintf("%s:%d", config.Host, config.Port)
 	toList := parseRecipients(config.Recipient)
 
-	// 构建邮件内容
 	msg, err := buildMessage(config, message, toList)
 	if err != nil {
 		return err
 	}
 
-	// 根据加密类型选择发送方式
 	switch strings.ToLower(config.Encryption) {
 	case "ssl":
 		return sendWithSSL(config, addr, toList, msg, transport)
@@ -57,7 +78,6 @@ func SendMail(config SMTPConfig, message EmailMessage, transport *http.Transport
 	}
 }
 
-// 验证配置有效性
 func validateConfig(config SMTPConfig) error {
 	if config.Host == "" {
 		return fmt.Errorf("SMTP host is required")
@@ -83,7 +103,6 @@ func validateConfig(config SMTPConfig) error {
 	return nil
 }
 
-// 检查加密类型是否有效
 func isValidEncryption(enc string) bool {
 	enc = strings.ToLower(enc)
 	return enc == "ssl" || enc == "starttls" || enc == "none" || enc == "tls"
@@ -97,12 +116,12 @@ func parseRecipients(recipient string) []string {
 	return toList
 }
 
-// 构建邮件内容
 func buildMessage(config SMTPConfig, message EmailMessage, toList []string) (string, error) {
 	headers := make(map[string]string)
 	headers["From"] = config.From
 	headers["To"] = strings.Join(toList, ",")
 	headers["Subject"] = message.Subject
+	headers["Date"] = time.Now().UTC().Format(time.RFC1123Z)
 
 	if message.IsHTML {
 		headers["MIME-version"] = "1.0"
@@ -123,12 +142,10 @@ func buildMessage(config SMTPConfig, message EmailMessage, toList []string) (str
 	return msg.String(), nil
 }
 
-// 验证邮件头安全性
 func isValidHeader(key, value string) bool {
 	return !strings.ContainsAny(key, "\r\n") && !strings.ContainsAny(value, "\r\n")
 }
 
-// SSL/TLS方式发送邮件
 func sendWithSSL(config SMTPConfig, addr string, toList []string, msg string, transport *http.Transport) error {
 	var err error
 	var conn net.Conn
@@ -149,17 +166,17 @@ func sendWithSSL(config SMTPConfig, addr string, toList []string, msg string, tr
 		return fmt.Errorf("TLS handshake failed: %w", err)
 	}
 
-	// 创建SMTP客户端
 	client, err := smtp.NewClient(tlsConn, config.Host)
 	if err != nil {
 		return fmt.Errorf("failed to create SMTP client: %w", err)
 	}
 	defer client.Quit()
-
+	if err := tryAuth(client, config.Username, config.Password, config.Host); err != nil {
+		return fmt.Errorf("authentication failed: %w", err)
+	}
 	return sendEmailWithClient(client, config, toList, msg)
 }
 
-// STARTTLS方式发送邮件
 func sendWithStartTLS(config SMTPConfig, addr string, toList []string, msg string, transport *http.Transport) error {
 	var err error
 	var conn net.Conn
@@ -173,22 +190,21 @@ func sendWithStartTLS(config SMTPConfig, addr string, toList []string, msg strin
 	}
 	defer conn.Close()
 
-	// 创建SMTP客户端
 	client, err := smtp.NewClient(conn, config.Host)
 	if err != nil {
 		return fmt.Errorf("failed to create SMTP client: %w", err)
 	}
 	defer client.Quit()
 
-	// 启用TLS
 	if err = client.StartTLS(&tls.Config{ServerName: config.Host}); err != nil {
 		return fmt.Errorf("failed to start TLS: %w", err)
 	}
-
+	if err := tryAuth(client, config.Username, config.Password, config.Host); err != nil {
+		return fmt.Errorf("authentication failed: %w", err)
+	}
 	return sendEmailWithClient(client, config, toList, msg)
 }
 
-// 明文方式发送邮件
 func sendPlaintext(config SMTPConfig, addr string, toList []string, msg string, transport *http.Transport) error {
 	var err error
 	var conn net.Conn
@@ -210,12 +226,7 @@ func sendPlaintext(config SMTPConfig, addr string, toList []string, msg string, 
 	return sendEmailWithClient(client, config, toList, msg)
 }
 
-// 使用SMTP客户端发送邮件
 func sendEmailWithClient(client *smtp.Client, config SMTPConfig, toList []string, msg string) error {
-	auth := smtp.PlainAuth("", config.Username, config.Password, config.Host)
-	if err := client.Auth(auth); err != nil {
-		return fmt.Errorf("authentication failed: %w", err)
-	}
 	if err := client.Mail(config.Username); err != nil {
 		return fmt.Errorf("setting sender failed: %w", err)
 	}
@@ -235,4 +246,27 @@ func sendEmailWithClient(client *smtp.Client, config SMTPConfig, toList []string
 	}
 
 	return nil
+}
+
+func tryAuth(client *smtp.Client, username, password, host string) error {
+	ok, authCap := client.Extension("AUTH")
+	if !ok {
+		return fmt.Errorf("server does not support AUTH")
+	}
+	authCap = strings.ToUpper(authCap)
+	if strings.Contains(authCap, "PLAIN") {
+		auth := smtp.PlainAuth("", username, password, host)
+		if err := client.Auth(auth); err != nil {
+			return fmt.Errorf("plain auth failed: %w", err)
+		}
+		return nil
+	}
+	if strings.Contains(authCap, "LOGIN") {
+		if err := client.Auth(LoginAuth(username, password)); err != nil {
+			return fmt.Errorf("login auth failed: %w", err)
+		}
+		return nil
+	}
+
+	return fmt.Errorf("no supported auth mechanism, server supports: %s", authCap)
 }

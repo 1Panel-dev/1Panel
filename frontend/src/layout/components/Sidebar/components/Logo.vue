@@ -24,11 +24,11 @@
 </template>
 
 <script setup lang="ts">
-import router from '@/routers';
 import { GlobalStore } from '@/store';
 import PrimaryLogo from '@/assets/images/1panel-logo.svg?component';
 import MenuLogo from '@/assets/images/1panel-menu-logo.svg?component';
 import { ref } from 'vue';
+import { routerToNameWithQuery } from '@/utils/router';
 
 defineProps<{ isCollapse: boolean }>();
 
@@ -37,7 +37,7 @@ const logoWithTextLoadFailed = ref(false);
 const globalStore = GlobalStore();
 
 const goHome = () => {
-    router.push({ name: 'home' });
+    routerToNameWithQuery('home', { t: Date.now() });
 };
 </script>
 

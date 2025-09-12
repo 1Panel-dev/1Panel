@@ -255,12 +255,7 @@
                                     :content="$t('app.app') + ': ' + row.appName + '[' + row.appInstallName + ']'"
                                     placement="top"
                                 >
-                                    <el-button
-                                        icon="Position"
-                                        plain
-                                        size="small"
-                                        @click="router.push({ name: 'AppInstalled' })"
-                                    >
+                                    <el-button icon="Position" plain size="small" @click="routerToName('AppInstalled')">
                                         {{ $t('app.app') }}: {{ row.appName }} [{{ row.appInstallName }}]
                                     </el-button>
                                 </el-tooltip>
@@ -273,12 +268,7 @@
                                     placement="top"
                                     class="mt-1"
                                 >
-                                    <el-button
-                                        icon="Position"
-                                        plain
-                                        size="small"
-                                        @click="router.push({ name: 'Website' })"
-                                    >
+                                    <el-button icon="Position" plain size="small" @click="routerToName('Website')">
                                         {{ $t('menu.website') }}:
                                         {{ row.websites.join(',') }}
                                     </el-button>
@@ -351,7 +341,7 @@
         <PruneDialog @search="search" ref="dialogPruneRef" />
 
         <RenameDialog @search="search" ref="dialogRenameRef" />
-        <ContainerLogDialog ref="dialogContainerLogRef" :highlightDiff="235" />
+        <ContainerLogDialog ref="dialogContainerLogRef" :highlightDiff="210" />
         <UpgradeDialog @search="search" ref="dialogUpgradeRef" />
         <CommitDialog @search="search" ref="dialogCommitRef" />
         <MonitorDialog ref="dialogMonitorRef" />
@@ -383,9 +373,10 @@ import {
 } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
 import i18n from '@/lang';
-import router from '@/routers';
 import { MsgWarning } from '@/utils/message';
 import { GlobalStore } from '@/store';
+import { routerToName, routerToNameWithQuery } from '@/utils/router';
+import router from '@/routers';
 const globalStore = GlobalStore();
 
 const mobile = computed(() => {
@@ -400,7 +391,7 @@ const selects = ref<any>([]);
 const paginationConfig = reactive({
     cacheSizeKey: 'container-page-size',
     currentPage: 1,
-    pageSize: 10,
+    pageSize: Number(localStorage.getItem('container-page-size')) || 20,
     total: 0,
     state: 'all',
     orderBy: 'createdAt',
@@ -451,7 +442,7 @@ const search = async (column?: any) => {
         return;
     }
     localStorage.setItem('includeAppStore', includeAppStore.value ? 'true' : 'false');
-    let filterItem = props.filters ? props.filters : '';
+    let filterItem = (router.currentRoute.value.query?.filters as string) || '';
     paginationConfig.orderBy = column?.order ? column.prop : paginationConfig.orderBy;
     paginationConfig.order = column?.order ? column.order : paginationConfig.order;
     let params = {
@@ -604,7 +595,7 @@ function loadMemValue(t: number) {
 }
 
 const onContainerOperate = async (containerID: string) => {
-    router.push({ name: 'ContainerCreate', query: { containerID: containerID } });
+    routerToNameWithQuery('ContainerCreate', { containerID: containerID });
 };
 
 const dialogMonitorRef = ref();
