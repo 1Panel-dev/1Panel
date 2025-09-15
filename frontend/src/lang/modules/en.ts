@@ -3360,6 +3360,16 @@ const message = {
                 'The tamper protection feature for the following websites will be enabled to enhance website security. Do you want to continue?',
             disableHelper:
                 'The tamper protection feature for the following websites will be disabled. Do you want to continue?',
+            appendOnly: 'Append Only',
+            appendOnlyHelper:
+                'Restrict deletion operations for files in this directory, only allowing addition of excluded directories or non-protected files',
+            immutable: 'Immutable',
+            immutableHelper: 'Restrict editing, deletion, permission, and owner modification operations for this file',
+            onWatch: 'Watch',
+            onWatchHelper:
+                'Monitor and intercept creation of protected files or non-excluded directories in this directory',
+            forceStop: 'Force Close',
+            forceStopHelper: 'About to force disable the anti-tamper function for this website directory. Continue?',
         },
         setting: {
             setting: 'Panel Settings',

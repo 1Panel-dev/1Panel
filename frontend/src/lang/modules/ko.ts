@@ -3193,6 +3193,15 @@ const message = {
             enableHelper:
                 '다음 웹사이트의 변조 방지 기능이 활성화됩니다. 웹사이트 보안을 강화하기 위해 계속하시겠습니까?',
             disableHelper: '다음 웹사이트의 변조 방지 기능이 비활성화됩니다. 계속하시겠습니까?',
+            appendOnly: '추가 전용',
+            appendOnlyHelper:
+                '이 디렉토리 내 파일의 삭제 작업을 제한하며, 제외 디렉토리 또는 비보호 파일 추가만 허용합니다',
+            immutable: '편집 금지',
+            immutableHelper: '이 파일의 편집, 삭제, 권한 및 소유자 수정 작업을 제한합니다',
+            onWatch: '감시',
+            onWatchHelper: '이 디렉토리 내 보호 파일 또는 비제외 디렉토리 생성에 대한 감시 및 가로채기를 수행합니다',
+            forceStop: '강제 종료',
+            forceStopHelper: '이 웹사이트 디렉토리의 변조 방지 기능을 강제로 비활성화하려고 합니다. 계속하시겠습니까?',
         },
         setting: {
             setting: '패널 설정',

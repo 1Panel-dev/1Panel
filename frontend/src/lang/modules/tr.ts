@@ -3393,6 +3393,17 @@ const message = {
                 'Aşağıdaki web siteleri için değiştirme koruma özelliği etkinleştirilecek ve web sitesi güvenliği artırılacak. Devam etmek istiyor musunuz?',
             disableHelper:
                 'Aşağıdaki web siteleri için değiştirme koruma özelliği devre dışı bırakılacak. Devam etmek istiyor musunuz?',
+            appendOnly: 'Sadece Ekleme',
+            appendOnlyHelper:
+                'Bu dizindeki dosya silme işlemlerini kısıtlar, yalnızca hariç tutulan dizinlerin veya korunmayan dosyaların eklenmesine izin verir',
+            immutable: 'Düzenleme Yasak',
+            immutableHelper: 'Bu dosya için düzenleme, silme, izin ve sahip değiştirme işlemlerini kısıtlar',
+            onWatch: 'İzleme',
+            onWatchHelper:
+                'Bu dizinde korumalı dosyaların veya hariç tutulmayan dizinlerin oluşturulmasını izler ve kesintiye uğratır',
+            forceStop: 'Zorla Kapat',
+            forceStopHelper:
+                'Bu web sitesi dizini için değişiklik önleme işlevini zorla devre dışı bırakacak. Devam etmek istiyor musunuz?',
         },
         setting: {
             setting: 'Panel Ayarları',

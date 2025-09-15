@@ -3327,6 +3327,17 @@ const message = {
                 'A função de proteção contra adulteração será ativada para os seguintes sites para aumentar a segurança do site, deseja continuar?',
             disableHelper:
                 'A função de proteção contra adulteração será desativada para os seguintes sites, deseja continuar?',
+            appendOnly: 'Somente Acréscimo',
+            appendOnlyHelper:
+                'Restringe operações de exclusão de arquivos neste diretório, permitindo apenas adição de diretórios excluídos ou arquivos não protegidos',
+            immutable: 'Imutável',
+            immutableHelper:
+                'Restringe operações de edição, exclusão, permissão e modificação de proprietário para este arquivo',
+            onWatch: 'Monitorar',
+            onWatchHelper:
+                'Monitora e intercepta a criação de arquivos protegidos ou diretórios não excluídos neste diretório',
+            forceStop: 'Forçar Fechamento',
+            forceStopHelper: 'Desativará forçadamente a função anti-violência para este diretório do site. Continuar?',
         },
         setting: {
             setting: 'Configurações do Painel',
