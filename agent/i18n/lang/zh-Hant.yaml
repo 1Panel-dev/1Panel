@@ -232,7 +232,7 @@ UploadFile: '上傳備份文件 {{ .file }} 到 {{ .backup }}'
 Upload: "上傳"
 IgnoreBackupErr: "備份失敗，錯誤：{{ .detail }}，忽略本次錯誤..."
 IgnoreUploadErr: "上傳失敗，錯誤：{{ .detail }}，忽略本次錯誤..."
-LoadBackupFailed: "獲取備份帳號連線失敗，錯誤：{{ .detail }}"
+LoadBackupFailed: "取得備份帳號連線失敗，錯誤：{{ .detail }}"
 InExecuting: "目前任務正在執行中，請勿重複執行！"
 NoSuchResource: "資料庫中未能查詢到備份內容，跳過..."
 
