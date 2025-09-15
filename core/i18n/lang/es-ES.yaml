@@ -71,6 +71,15 @@ ErrNoSuchNode: "Información del nodo no encontrada, ¡verifique e intente de nu
 ErrNodeUnbind: "Este nodo no está dentro del rango de vinculación de la licencia, ¡verifique e intente de nuevo!"
 ErrNodeBind: "Este nodo ya está vinculado a una licencia, ¡verifique e intente de nuevo!"
 ErrNodeLocalRollback: "El nodo principal no admite la reversión directa. ¡Ejecute manualmente el comando '1pctl restore' para revertir!"
+InvalidRequestBodyType: "Formato del cuerpo de la solicitud no válido, por favor revisa y asegúrate de que el contenido cumpla con el formato requerido antes de reintentar."
+InvalidLicenseCodeType: "Formato de código de licencia no válido, por favor revisa e inténtalo de nuevo."
+LicenseNotFoundType: "Licencia no encontrada, no existe ningún registro coincidente en el sistema para la licencia proporcionada. Por favor revisa e inténtalo de nuevo."
+LicenseRevokedType: "La licencia solicitada ha sido revocada y ya no se puede utilizar. Por favor revisa e inténtalo de nuevo."
+LicenseExpiredType: "La licencia ha expirado. Renuévala o vuelve a importarla en Configuración del Panel - Sección de Licencia antes de reintentar."
+LicenseProductMismatchType: "La licencia no corresponde con el producto o servicio solicitado."
+InvalidAssigneeType: "Información de usuario o dispositivo de destino no válida para la asignación de licencia. Por favor revisa e inténtalo de nuevo."
+LicenseUsageNotFoundType: "No se encontraron registros de uso. Esta licencia no ha sido activada o utilizada aún. Por favor revisa e inténtalo de nuevo."
+LicenseUsageLimitExceededType: "Esta licencia ya está vinculada a otro nodo. Por favor revisa e inténtalo de nuevo."
 
 # alert
 ErrAlertSync: "Error al sincronizar la información de alertas, ¡verifique e intente de nuevo!"
@@ -109,6 +118,12 @@ SyncPackageEncrypt: "Encriptación del paquete de datos"
 SyncRequest: "Solicitar API de sincronización de nodos"
 SyncFailedRetry: "Tiempo de espera en la sincronización de datos del nodo (intento {{ .index }}), reintentando..."
 SyncFailed: "¡La sincronización falló, sincronice manualmente en la lista de nodos!"
+SyncSystemProxy: "Configuración del proxy del sistema"
+SyncScripts: "Biblioteca de scripts"
+SyncBackupAccounts: "Cuentas de copia de seguridad"
+SyncAlertSetting: "Configuración de alertas"
+SyncCustomApp: "Aplicación personalizada"
+SyncLanguage: "Idioma del sistema"
 
 #upgrade node
 NodeUpgrade: "Actualizar nodo {{ .name }}"
@@ -213,3 +228,6 @@ ClusterNameIsExist: "El nombre del clúster ya existe."
 AppStatusUnHealthy: "Adquisición anormal del estado de la aplicación, revise el estado del nodo en la lista de nodos."
 MasterNodePortNotAvailable: "Verificación de conectividad del puerto {{ .port }} del nodo {{ .name }} fallida, verifique la configuración del firewall/grupo de seguridad y el estado del nodo principal."
 ClusterMasterNotExist: "El nodo principal del clúster está desconectado, elimine los nodos secundarios."
+
+#ssl
+ErrReqFailed: "{{.name}} petición fallida: {{ .err }}"
