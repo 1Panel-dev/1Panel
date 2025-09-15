@@ -43,6 +43,7 @@
                     :columns="columns"
                     localKey="sslColumn"
                     :height-diff="260"
+                    @sort-change="changeSort"
                 >
                     <el-table-column type="selection" width="30" />
                     <el-table-column
@@ -144,6 +145,7 @@
                         :formatter="dateFormat"
                         show-overflow-tooltip
                         width="180px"
+                        sortable
                     />
                     <fu-table-operations
                         :ellipsis="3"
@@ -211,6 +213,8 @@ let selects = ref<any>([]);
 const columns = ref([]);
 const req = reactive({
     domain: '',
+    orderBy: 'expire_date',
+    order: 'ascending',
 });
 
 const routerButton = [
@@ -302,11 +306,19 @@ const mobile = computed(() => {
     return globalStore.isMobile();
 });
 
+const changeSort = ({ order }) => {
+    req.orderBy = 'expire_date';
+    req.order = order;
+    search();
+};
+
 const search = () => {
     const request = {
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
         domain: req.domain,
+        orderBy: req.orderBy,
+        order: req.order,
     };
     loading.value = true;
     searchSSL(request)

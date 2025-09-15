@@ -59,7 +59,11 @@ func (w WebsiteSSLService) Page(search request.WebsiteSSLSearch) (int64, []respo
 		result []response.WebsiteSSLDTO
 		opts   []repo.DBOption
 	)
-	opts = append(opts, repo.WithOrderBy("created_at desc"))
+	if search.OrderBy != "" && search.Order != "null" {
+		opts = append(opts, repo.WithOrderRuleBy(search.OrderBy, search.Order))
+	} else {
+		opts = append(opts, repo.WithOrderBy("created_at desc"))
+	}
 	if search.Domain != "" {
 		opts = append(opts, websiteSSLRepo.WithByDomain(search.Domain))
 	}
