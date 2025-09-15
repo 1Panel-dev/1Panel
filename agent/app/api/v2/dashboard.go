@@ -88,7 +88,7 @@ func (b *BaseApi) UpdateAppLauncher(c *gin.Context) {
 // @Success 200 {Array} dto.QuickJump
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /dashboard/quick/option [post]
+// @Router /dashboard/quick/option [get]
 func (b *BaseApi) LoadQuickOption(c *gin.Context) {
 	helper.SuccessWithData(c, dashboardService.LoadQuickOptions())
 }

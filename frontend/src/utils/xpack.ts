@@ -9,6 +9,7 @@ export function resetXSetting() {
     globalStore.themeConfig.logo = '';
     globalStore.themeConfig.logoWithText = '';
     globalStore.themeConfig.favicon = '';
+    globalStore.watermark = null;
 }
 
 export function initFavicon() {
@@ -118,6 +119,11 @@ export async function getXpackSettingForTheme() {
             globalStore.themeConfig.themeColor = res2.data?.themeColor;
             if (res2.data?.theme) {
                 globalStore.themeConfig.theme = res2.data.theme;
+            }
+            try {
+                globalStore.watermark = JSON.parse(res2.data.watermark);
+            } catch {
+                globalStore.watermark = null;
             }
         } else {
             resetXSetting();

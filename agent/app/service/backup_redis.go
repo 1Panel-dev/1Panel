@@ -44,22 +44,24 @@ func (u *BackupService) RedisBackup(req dto.CommonBackup) error {
 	}
 	itemDir := fmt.Sprintf("database/redis/%s", redisInfo.Name)
 	backupDir := path.Join(global.Dir.LocalBackupDir, itemDir)
-	if err := handleRedisBackup(redisInfo, nil, backupDir, fileName, req.Secret, req.TaskID); err != nil {
-		return err
-	}
 	record := &model.BackupRecord{
-		Type:              "redis",
+		Type:              req.Type,
 		Name:              req.Name,
 		SourceAccountIDs:  "1",
 		DownloadAccountID: 1,
 		FileDir:           itemDir,
 		FileName:          fileName,
+		TaskID:            req.TaskID,
+		Status:            constant.StatusWaiting,
 		Description:       req.Description,
 	}
 	if err := backupRepo.CreateRecord(record); err != nil {
 		global.LOG.Errorf("save backup record failed, err: %v", err)
 	}
 
+	if err := handleRedisBackup(redisInfo, nil, record.ID, backupDir, fileName, req.Secret, req.TaskID); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -75,8 +77,7 @@ func (u *BackupService) RedisRecover(req dto.CommonRecover) error {
 	return nil
 }
 
-func handleRedisBackup(redisInfo *repo.RootInfo, parentTask *task.Task, backupDir, fileName, secret, taskID string) error {
-
+func handleRedisBackup(redisInfo *repo.RootInfo, parentTask *task.Task, recordID uint, backupDir, fileName, secret, taskID string) error {
 	var (
 		err      error
 		itemTask *task.Task
@@ -128,6 +129,14 @@ func handleRedisBackup(redisInfo *repo.RootInfo, parentTask *task.Task, backupDi
 		return backupDatabase(parentTask)
 	}
 
+	itemTask.AddSubTaskWithOps(i18n.GetMsgByKey("TaskBackup"), backupDatabase, nil, 3, time.Hour)
+	go func() {
+		if err := itemTask.Execute(); err != nil {
+			backupRepo.UpdateRecordByMap(recordID, map[string]interface{}{"status": constant.StatusFailed, "message": err.Error()})
+			return
+		}
+		backupRepo.UpdateRecordByMap(recordID, map[string]interface{}{"status": constant.StatusSuccess})
+	}()
 	return itemTask.Execute()
 }
 
@@ -180,7 +189,7 @@ func handleRedisRecover(redisInfo *repo.RootInfo, parentTask *task.Task, recover
 				}
 			}
 			rollbackFile := path.Join(global.Dir.TmpDir, fmt.Sprintf("database/redis/%s_%s.%s", redisInfo.Name, time.Now().Format(constant.DateTimeSlimLayout), suffix))
-			if err := handleRedisBackup(redisInfo, nil, path.Dir(rollbackFile), path.Base(rollbackFile), secret, ""); err != nil {
+			if err := handleRedisBackup(redisInfo, nil, 0, path.Dir(rollbackFile), path.Base(rollbackFile), secret, ""); err != nil {
 				return fmt.Errorf("backup database %s for rollback before recover failed, err: %v", redisInfo.Name, err)
 			}
 			defer func() {
@@ -230,5 +239,8 @@ func handleRedisRecover(redisInfo *repo.RootInfo, parentTask *task.Task, recover
 		return recoverDatabase(parentTask)
 	}
 
-	return itemTask.Execute()
+	go func() {
+		_ = itemTask.Execute()
+	}()
+	return nil
 }

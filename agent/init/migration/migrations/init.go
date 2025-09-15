@@ -563,3 +563,16 @@ var InitLocalSSHShow = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var InitRecordStatus = &gormigrate.Migration{
+	ID: "20250910-init-record-status",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.BackupRecord{}); err != nil {
+			return err
+		}
+		if err := tx.Model(&model.BackupRecord{}).Where("1 == 1").Updates(map[string]interface{}{"status": constant.StatusSuccess}).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}

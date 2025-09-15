@@ -17,6 +17,14 @@ export interface ThemeConfigProp {
     themeColor: string;
 }
 
+export interface Watermark {
+    color: string,
+    fontSize: number,
+    content: string,
+    rotate: number,
+    gap: number,
+}
+
 export interface GlobalState {
     isLoading: boolean;
     loadingText: string;
@@ -26,6 +34,7 @@ export interface GlobalState {
     themeConfig: ThemeConfigProp;
     isFullScreen: boolean;
     openMenuTabs: boolean;
+    watermark: Watermark;
     isOnRestart: boolean;
     agreeLicense: boolean;
     hasNewVersion: boolean;

@@ -30,11 +30,6 @@ func (u *BackupService) MysqlBackup(req dto.CommonBackup) error {
 	targetDir := path.Join(global.Dir.LocalBackupDir, itemDir)
 	fileName := fmt.Sprintf("%s_%s.sql.gz", req.DetailName, timeNow+common.RandStrAndNum(5))
 
-	databaseHelper := DatabaseHelper{Database: req.Name, DBType: req.Type, Name: req.DetailName}
-	if err := handleMysqlBackup(databaseHelper, nil, targetDir, fileName, req.TaskID); err != nil {
-		return err
-	}
-
 	record := &model.BackupRecord{
 		Type:              req.Type,
 		Name:              req.Name,
@@ -43,19 +38,25 @@ func (u *BackupService) MysqlBackup(req dto.CommonBackup) error {
 		DownloadAccountID: 1,
 		FileDir:           itemDir,
 		FileName:          fileName,
+		TaskID:            req.TaskID,
+		Status:            constant.StatusWaiting,
 		Description:       req.Description,
 	}
 	if err := backupRepo.CreateRecord(record); err != nil {
 		global.LOG.Errorf("save backup record failed, err: %v", err)
+		return err
+	}
+
+	databaseHelper := DatabaseHelper{Database: req.Name, DBType: req.Type, Name: req.DetailName}
+	if err := handleMysqlBackup(databaseHelper, nil, record.ID, targetDir, fileName, req.TaskID); err != nil {
+		backupRepo.UpdateRecordByMap(record.ID, map[string]interface{}{"status": constant.StatusFailed, "message": err.Error()})
+		return err
 	}
 	return nil
 }
 
 func (u *BackupService) MysqlRecover(req dto.CommonRecover) error {
-	if err := handleMysqlRecover(req, nil, false, req.TaskID); err != nil {
-		return err
-	}
-	return nil
+	return handleMysqlRecover(req, nil, false, req.TaskID)
 }
 
 func (u *BackupService) MysqlRecoverByUpload(req dto.CommonRecover) error {
@@ -64,14 +65,14 @@ func (u *BackupService) MysqlRecoverByUpload(req dto.CommonRecover) error {
 		return err
 	}
 	req.File = recoveFile
+
 	if err := handleMysqlRecover(req, nil, false, req.TaskID); err != nil {
 		return err
 	}
-	global.LOG.Info("recover from uploads successful!")
 	return nil
 }
 
-func handleMysqlBackup(db DatabaseHelper, parentTask *task.Task, targetDir, fileName, taskID string) error {
+func handleMysqlBackup(db DatabaseHelper, parentTask *task.Task, recordID uint, targetDir, fileName, taskID string) error {
 	var (
 		err        error
 		backupTask *task.Task
@@ -90,11 +91,18 @@ func handleMysqlBackup(db DatabaseHelper, parentTask *task.Task, targetDir, file
 	}
 
 	itemHandler := func() error { return doMysqlBackup(db, targetDir, fileName) }
-	backupTask.AddSubTask(task.GetTaskName(itemName, task.TaskBackup, task.TaskScopeDatabase), func(t *task.Task) error { return itemHandler() }, nil)
 	if parentTask != nil {
 		return itemHandler()
 	}
-	return backupTask.Execute()
+	backupTask.AddSubTaskWithOps(task.GetTaskName(itemName, task.TaskBackup, task.TaskScopeDatabase), func(t *task.Task) error { return itemHandler() }, nil, 3, time.Hour)
+	go func() {
+		if err := backupTask.Execute(); err != nil {
+			backupRepo.UpdateRecordByMap(recordID, map[string]interface{}{"status": constant.StatusFailed, "message": err.Error()})
+			return
+		}
+		backupRepo.UpdateRecordByMap(recordID, map[string]interface{}{"status": constant.StatusSuccess})
+	}()
+	return nil
 }
 
 func handleMysqlRecover(req dto.CommonRecover, parentTask *task.Task, isRollback bool, taskID string) error {
@@ -139,8 +147,6 @@ func handleMysqlRecover(req dto.CommonRecover, parentTask *task.Task, isRollback
 				Format:    dbInfo.Format,
 				TargetDir: path.Dir(rollbackFile),
 				FileName:  path.Base(rollbackFile),
-
-				Timeout: 300,
 			}); err != nil {
 				return fmt.Errorf("backup mysql db %s for rollback before recover failed, err: %v", req.DetailName, err)
 			}
@@ -153,8 +159,6 @@ func handleMysqlRecover(req dto.CommonRecover, parentTask *task.Task, isRollback
 						Version:    version,
 						Format:     dbInfo.Format,
 						SourceFile: rollbackFile,
-
-						Timeout: 300,
 					}); err != nil {
 						global.LOG.Errorf("rollback mysql db %s from %s failed, err: %v", req.DetailName, rollbackFile, err)
 					} else {
@@ -172,8 +176,6 @@ func handleMysqlRecover(req dto.CommonRecover, parentTask *task.Task, isRollback
 			Version:    version,
 			Format:     dbInfo.Format,
 			SourceFile: req.File,
-
-			Timeout: 300,
 		}); err != nil {
 			global.LOG.Errorf("recover mysql db %s from %s failed, err: %v", req.DetailName, req.File, err)
 			return err
@@ -181,12 +183,15 @@ func handleMysqlRecover(req dto.CommonRecover, parentTask *task.Task, isRollback
 		isOk = true
 		return nil
 	}
-	itemTask.AddSubTask(i18n.GetMsgByKey("TaskRecover"), recoverDatabase, nil)
 	if parentTask != nil {
 		return recoverDatabase(parentTask)
 	}
 
-	return itemTask.Execute()
+	itemTask.AddSubTaskWithOps(i18n.GetMsgByKey("TaskRecover"), recoverDatabase, nil, 3, time.Hour)
+	go func() {
+		_ = itemTask.Execute()
+	}()
+	return nil
 }
 
 func doMysqlBackup(db DatabaseHelper, targetDir, fileName string) error {
@@ -205,8 +210,6 @@ func doMysqlBackup(db DatabaseHelper, targetDir, fileName string) error {
 		Format:    dbInfo.Format,
 		TargetDir: targetDir,
 		FileName:  fileName,
-
-		Timeout: 300,
 	}
 	return cli.Backup(backupInfo)
 }

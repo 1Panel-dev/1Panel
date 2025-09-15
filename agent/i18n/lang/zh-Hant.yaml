@@ -92,12 +92,12 @@ ErrCustomApps: '存在已安裝的應用程式，請先解除安裝'
 ErrCustomRuntimes: '存在已安裝的運作環境，請先刪除'
 ErrAppVersionDeprecated: "{{ .name }} 應用不適配目前 1Panel 版本，跳過"
 ErrDockerFailed: "Docker 狀態異常，請檢查服務狀態"
-ErrDockerComposeCmdNotFound: "Docker Compose 命令不存在，請先在宿主機安裝此命令"
+ErrDockerComposeCmdNotFound: "Docker Compose 指令不存在，請先在宿主機安裝此指令"
 
 #ssh
 ExportIP: "登入IP"
 ExportArea: "歸屬地"
-ExportPort: "端口"
+ExportPort: "埠"
 ExportAuthMode: "登入方式"
 ExportUser: "使用者"
 ExportStatus: "登入狀態"
@@ -115,9 +115,9 @@ ErrFileDownloadDir: '不支援下載資料夾'
 ErrCmdNotFound: '{{ .name}} 指令不存在，請先在宿主機安裝此指令'
 ErrSourcePathNotFound: '來源目錄不存在'
 ErrFavoriteExist: '已收藏此路徑'
-ErrInvalidChar: '禁止使用非法字元'
+ErrInvalidChar: '禁止使用無效字元'
 ErrPathNotDelete: '所選目錄不可刪除'
-ErrLogFileToLarge: "日志文件超过 500M，無法打開"
+ErrLogFileToLarge: "日誌檔案超過 500M，無法打開"
 FileDropFailed: "清理文件 {{ .name }} 失敗: {{ .err }}"
 FileDropSuccess: "清理文件 {{ .name }} 成功，清理 {{ .count }} 個文件，釋放 {{ .size }} 磁碟空間"
 FileDropSum: "文件清理完成，共清理 {{ .count }} 個文件，共釋放 {{ .size }} 磁碟空間"
@@ -138,7 +138,7 @@ ErrProxyIsUsed: "負載均衡已被反向代理使用，無法刪除"
 ErrSSLValid: '證書文件異常，請檢查證書狀態！'
 ErrWebsiteDir: "請選擇網站目錄下的目錄"
 ErrComposerFileNotFound: "composer.json 文件不存在"
-ErrRuntimeNoPort: "運行環境未設置端口，請先編輯運行環境"
+ErrRuntimeNoPort: "執行環境未設定埠，請先編輯執行環境"
 
 #ssl
 ErrSSLCannotDelete: '{{ .name }} 憑證正在被網站使用，無法刪除'
@@ -192,11 +192,11 @@ ErrObjectInUsed: '該物件正被使用，無法刪除'
 ErrObjectBeDependent: '此鏡像依賴其他鏡像，無法刪除'
 ErrPortRules: '連接埠數目不匹配，請重新輸入！'
 ErrPgImagePull: '鏡像拉取逾時，請配置鏡像加速或手動拉取{{ .name }} 鏡像後重試'
-PruneHelper: "本次清理 {{ .name }} {{ .count }} 個，釋放磁盤空間 {{ .size }}"
-ImageRemoveHelper: "刪除鏡像 {{ .name }} ，釋放磁盤空間 {{ .size }}"
-BuildCache: "構建緩存"
-Volume: "存儲卷"
-Network: "網絡"
+PruneHelper: "本次清理 {{ .name }} {{ .count }} 個，釋放磁碟空間 {{ .size }}"
+ImageRemoveHelper: "刪除鏡像 {{ .name }} ，釋放磁碟空間 {{ .size }}"
+BuildCache: "構建快取"
+Volume: "磁碟區"
+Network: "網路"
 
 #runtime
 ErrFileNotExist: '{{ .detail }} 檔案不存在！請檢查來源檔案完整性！'
@@ -232,8 +232,8 @@ UploadFile: '上傳備份文件 {{ .file }} 到 {{ .backup }}'
 Upload: "上傳"
 IgnoreBackupErr: "備份失敗，錯誤：{{ .detail }}，忽略本次錯誤..."
 IgnoreUploadErr: "上傳失敗，錯誤：{{ .detail }}，忽略本次錯誤..."
-LoadBackupFailed: "獲取備份帳號連接失敗，錯誤：{{ .detail }}"
-InExecuting: "當前任務正在執行中，請勿重複執行！"
+LoadBackupFailed: "取得備份帳號連線失敗，錯誤：{{ .detail }}"
+InExecuting: "目前任務正在執行中，請勿重複執行！"
 NoSuchResource: "資料庫中未能查詢到備份內容，跳過..."
 
 #toolbox
@@ -316,7 +316,7 @@ TaskBackup: '備份'
 TaskRecover: '復原'
 TaskRollback: '回滾'
 TaskPull: '拉取'
-TaskCommit: '制作'
+TaskCommit: '製作'
 TaskBuild: '建置'
 TaskPush: '推送'
 TaskClean: "清理"
@@ -371,7 +371,7 @@ SnapDeleteLoginLog: '刪除存取日誌'
 SnapDeleteMonitor: '刪除監控資料'
 SnapRemoveSystemIP: '移除系統IP'
 SnapBaseInfo: '寫入1Panel 基本資料'
-SnapInstallAppImageEmpty: '當前未勾選應用鏡像，跳過...'
+SnapInstallAppImageEmpty: '目前未勾選應用鏡像，跳過...'
 SnapInstallApp: '備份 1Panel 已安裝應用'
 SnapDockerSave: '壓縮已安裝應用'
 SnapLocalBackup: '備份1Panel 本機備份目錄'
@@ -462,7 +462,7 @@ ErrInstallExtension: "已有安裝任務正在進行，請等待任務結束"
 
 # alert mail template
 PanelAlertTitle: "面板警示通知"
-TestAlertTitle: "測試郵件 - 驗證郵箱連通性"
+TestAlertTitle: "測試郵件 - 驗證信箱連通性"
 TestAlert: "這是一封測試郵件，用於確認您的郵件發送設定是否正確。"
 LicenseExpirationAlert: "您的 1Panel 授權將於 {{ .day }} 天後到期，詳情請登入面板查看。"
 CronJobFailedAlert: "您的 1Panel 面板中，計畫任務 '{{ .name }}' 執行失敗，詳情請登入面板查看。"
@@ -476,13 +476,13 @@ PanelPwdExpirationAlert: "您的 1Panel 面板密碼將於 {{ .day }} 天後到�
 CommonAlert: "您的 1Panel 面板，{{ .msg }}，詳情請登入面板查看。"
 NodeExceptionAlert: "您的 1Panel 面板，{{ .num }} 個節點存在異常，詳情請登入面板查看。"
 LicenseExceptionAlert: "您的 1Panel 面板，{{ .num }} 個許可證存在異常，詳情請登入面板查看。"
-SSHAndPanelLoginAlert: "您的 1Panel 面板，面板{{ .name }}從 {{ .ip }} 登錄異常，詳情請登入面板查看。"
+SSHAndPanelLoginAlert: "您的 1Panel 面板，面板{{ .name }}從 {{ .ip }} 登入異常，詳情請登入面板查看。"
 
 #disk
-DeviceNotFound: "設備 {{ .name }} 未找到"
-DeviceIsMounted: "設備 {{ .name }} 已掛載，請先卸載"
+DeviceNotFound: "裝置 {{ .name }} 未找到"
+DeviceIsMounted: "裝置 {{ .name }} 已掛載，請先移除"
 PartitionDiskErr: "分區失敗，{{ .err }}"
-FormatDiskErr: "格式化磁盤失敗，{{ .err }}"
-MountDiskErr: "掛載磁盤失敗，{{ .err }}"
-UnMountDiskErr: "卸載磁盤失敗，{{ .err }}"
+FormatDiskErr: "格式化磁碟失敗，{{ .err }}"
+MountDiskErr: "掛載磁碟失敗，{{ .err }}"
+UnMountDiskErr: "移除磁碟失敗，{{ .err }}"
 XfsNotFound: "未檢測到 xfs 文件系統，請先安裝 xfsprogs"

@@ -26,7 +26,20 @@
         <div class="main-container">
             <mobile-header v-if="classObj.mobile" />
             <Tabs v-if="classObj.openMenuTabs" />
-            <app-main :keep-alive="classObj.openMenuTabs ? tabsStore.cachedTabs : null" class="app-main" />
+            <el-watermark
+                v-if="globalStore.isMasterProductPro && globalStore.watermark"
+                class="app-main"
+                :content="loadContent()"
+                :font="{
+                    fontSize: globalStore.watermark.fontSize,
+                    color: globalStore.watermark.color,
+                }"
+                :rotate="globalStore.watermark.rotate"
+                :gap="[globalStore.watermark.gap, globalStore.watermark.gap]"
+            >
+                <app-main :keep-alive="classObj.openMenuTabs ? tabsStore.cachedTabs : null" />
+            </el-watermark>
+            <app-main class="app-main" v-else :keep-alive="classObj.openMenuTabs ? tabsStore.cachedTabs : null" />
             <Footer class="app-footer" v-if="!globalStore.isFullScreen" />
             <TaskList ref="taskListRef" />
         </div>
@@ -44,6 +57,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { loadMasterProductProFromDB, loadProductProFromDB } from '@/utils/xpack';
 import { useTheme } from '@/global/use-theme';
 import TaskList from '@/components/task-list/index.vue';
+import i18n from '@/lang';
 const { switchTheme } = useTheme();
 
 useResize();
@@ -82,6 +96,15 @@ const handleClickOutside = () => {
 
 const handleCollapse = () => {
     menuStore.setCollapse();
+};
+
+const loadContent = () => {
+    let itemName = globalStore.watermark.content.replaceAll(
+        '${nodeName}',
+        globalStore.currentNode === 'local' ? i18n.global.t('xpack.node.master') : globalStore.currentNode,
+    );
+    itemName = itemName.replaceAll('${nodeAddr}', globalStore.currentNodeAddr);
+    return itemName;
 };
 
 watch(

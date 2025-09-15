@@ -104,7 +104,7 @@ func (b *BaseApi) SearchClam(c *gin.Context) {
 // @Success 200 {object} dto.ClamBaseInfo
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /toolbox/clam/base [get]
+// @Router /toolbox/clam/base [post]
 func (b *BaseApi) LoadClamBaseInfo(c *gin.Context) {
 	info, err := clamService.LoadBaseInfo()
 	if err != nil {

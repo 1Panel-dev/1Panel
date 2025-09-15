@@ -14,6 +14,11 @@ export const useLogo = async () => {
         globalStore.themeConfig.loginBackground = res.data?.loginBackground;
         globalStore.themeConfig.loginBtnLinkColor = res.data?.loginBtnLinkColor;
         globalStore.themeConfig.favicon = res.data.favicon;
+        try {
+            globalStore.watermark = JSON.parse(res.data.watermark);
+        } catch {
+            globalStore.watermark = null;
+        }
     }
 
     const link = (document.querySelector("link[rel*='icon']") || document.createElement('link')) as HTMLLinkElement;

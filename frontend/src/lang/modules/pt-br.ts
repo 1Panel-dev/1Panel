@@ -1567,6 +1567,17 @@ const message = {
         userChangeHelper: 'Alterar o usuário do painel irá desconectá-lo. Continuar?',
         passwd: 'Senha do painel',
         emailHelper: 'Para recuperação de senha',
+        watermark: 'Configurações de Marca d Água',
+        watermarkContent: 'Conteúdo da Marca d Água',
+        contentHelper: 'Use {0} para representar o nome do nó atual e o IP do nó',
+        watermarkColor: 'Cor da Marca d Água',
+        watermarkFont: 'Tamanho da Fonte da Marca d Água',
+        watermarkHeight: 'Altura da Marca d Água',
+        watermarkWidth: 'Largura da Marca d Água',
+        watermarkRotate: 'Ângulo de Rotação',
+        watermarkGap: 'Espaçamento',
+        watermarkCloseHelper: 'Tem certeza de que deseja desativar as configurações de marca d água do sistema?',
+        watermarkOpenHelper: 'Tem certeza de que deseja salvar as configurações atuais de marca d água do sistema?',
         title: 'Alias do painel',
         panelPort: 'Porta do painel',
         titleHelper:
@@ -3327,6 +3338,17 @@ const message = {
                 'A função de proteção contra adulteração será ativada para os seguintes sites para aumentar a segurança do site, deseja continuar?',
             disableHelper:
                 'A função de proteção contra adulteração será desativada para os seguintes sites, deseja continuar?',
+            appendOnly: 'Somente Acréscimo',
+            appendOnlyHelper:
+                'Restringe operações de exclusão de arquivos neste diretório, permitindo apenas adição de diretórios excluídos ou arquivos não protegidos',
+            immutable: 'Imutável',
+            immutableHelper:
+                'Restringe operações de edição, exclusão, permissão e modificação de proprietário para este arquivo',
+            onWatch: 'Monitorar',
+            onWatchHelper:
+                'Monitora e intercepta a criação de arquivos protegidos ou diretórios não excluídos neste diretório',
+            forceStop: 'Forçar Fechamento',
+            forceStopHelper: 'Desativará forçadamente a função anti-violência para este diretório do site. Continuar?',
         },
         setting: {
             setting: 'Configurações do Painel',

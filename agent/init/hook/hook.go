@@ -19,6 +19,7 @@ func Init() {
 	initGlobalData()
 	handleCronjobStatus()
 	handleClamStatus()
+	handleRecordStatus()
 	handleSnapStatus()
 	handleOllamaModelStatus()
 
@@ -44,26 +45,25 @@ func initGlobalData() {
 }
 
 func handleSnapStatus() {
-	msgFailed := "the task was interrupted due to the restart of the 1panel service"
 	_ = global.DB.Model(&model.Snapshot{}).Where("status = ?", "OnSaveData").
 		Updates(map[string]interface{}{"status": constant.StatusSuccess}).Error
 
 	_ = global.DB.Model(&model.Snapshot{}).Where("status = ?", constant.StatusWaiting).
 		Updates(map[string]interface{}{
 			"status":  constant.StatusFailed,
-			"message": msgFailed,
+			"message": constant.InterruptedMsg,
 		}).Error
 
 	_ = global.DB.Model(&model.Snapshot{}).Where("recover_status = ?", constant.StatusWaiting).
 		Updates(map[string]interface{}{
 			"recover_status":  constant.StatusFailed,
-			"recover_message": msgFailed,
+			"recover_message": constant.InterruptedMsg,
 		}).Error
 
 	_ = global.DB.Model(&model.Snapshot{}).Where("rollback_status = ?", constant.StatusWaiting).
 		Updates(map[string]interface{}{
 			"rollback_status":  constant.StatusFailed,
-			"rollback_message": msgFailed,
+			"rollback_message": constant.InterruptedMsg,
 		}).Error
 }
 
@@ -75,7 +75,7 @@ func handleCronjobStatus() {
 		err := global.DB.Model(&model.JobRecords{}).Where("status = ?", constant.StatusWaiting).
 			Updates(map[string]interface{}{
 				"status":  constant.StatusFailed,
-				"message": "the task was interrupted due to the restart of the 1panel service",
+				"message": constant.InterruptedMsg,
 			}).Error
 
 		if err != nil {
@@ -90,26 +90,25 @@ func handleCronjobStatus() {
 }
 
 func handleClamStatus() {
-	var jobRecords []model.ClamRecord
 	_ = global.DB.Model(&model.Clam{}).Where("is_executing = ?", true).Updates(map[string]interface{}{"is_executing": false}).Error
-	_ = global.DB.Where("status = ?", constant.StatusWaiting).Find(&jobRecords).Error
-	for _, record := range jobRecords {
-		err := global.DB.Model(&model.ClamRecord{}).Where("status = ?", constant.StatusWaiting).
-			Updates(map[string]interface{}{
-				"status":  constant.StatusFailed,
-				"message": "the task was interrupted due to the restart of the 1panel service",
-			}).Error
+	_ = global.DB.Model(&model.ClamRecord{}).Where("status = ?", constant.StatusWaiting).Updates(map[string]interface{}{
+		"status":  constant.StatusFailed,
+		"message": constant.InterruptedMsg,
+	}).Error
+}
 
-		if err != nil {
-			global.LOG.Errorf("Failed to update job ID: %v, Error:%v", record.ID, err)
-			continue
-		}
-	}
+func handleRecordStatus() {
+	_ = global.DB.Model(&model.BackupRecord{}).Where("status = ?", constant.StatusWaiting).Updates(map[string]interface{}{
+		"status":  constant.StatusFailed,
+		"message": constant.InterruptedMsg,
+	}).Error
 }
 
 func handleOllamaModelStatus() {
-	message := "the task was interrupted due to the restart of the 1panel service"
-	_ = global.DB.Model(&model.OllamaModel{}).Where("status = ?", constant.StatusWaiting).Updates(map[string]interface{}{"status": constant.StatusCanceled, "message": message}).Error
+	_ = global.DB.Model(&model.OllamaModel{}).Where("status = ?", constant.StatusWaiting).Updates(map[string]interface{}{
+		"status":  constant.StatusCanceled,
+		"message": constant.InterruptedMsg,
+	}).Error
 }
 
 func handleCronJobAlert(cronjob *model.Cronjob) {

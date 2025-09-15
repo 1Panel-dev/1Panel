@@ -1580,6 +1580,17 @@ const message = {
         userChangeHelper: 'Menukar pengguna panel akan menyebabkan anda log keluar. Teruskan?',
         passwd: 'Kata laluan panel',
         emailHelper: 'Untuk pemulihan kata laluan',
+        watermark: 'Tetapan Tanda Air',
+        watermarkContent: 'Kandungan Tanda Air',
+        contentHelper: 'Gunakan {0} untuk mewakili nama nod semasa dan IP nod',
+        watermarkColor: 'Warna Tanda Air',
+        watermarkFont: 'Saiz Fon Tanda Air',
+        watermarkHeight: 'Ketinggian Tanda Air',
+        watermarkWidth: 'Lebar Tanda Air',
+        watermarkRotate: 'Sudut Putaran',
+        watermarkGap: 'Jarak',
+        watermarkCloseHelper: 'Adakah anda pasti ingin mematikan tetapan tanda air sistem?',
+        watermarkOpenHelper: 'Adakah anda pasti ingin menyimpan tetapan tanda air sistem semasa?',
         title: 'Alias panel',
         panelPort: 'Port panel',
         titleHelper:
@@ -3311,6 +3322,18 @@ const message = {
                 'Fungsi perlindungan daripada peng篡改 akan diaktifkan untuk laman web berikut untuk meningkatkan keselamatan laman web, adakah anda ingin meneruskan?',
             disableHelper:
                 'Fungsi perlindungan daripada peng篡改 akan dimatikan untuk laman web berikut, adakah anda ingin meneruskan?',
+            appendOnly: 'Hanya Tambahan',
+            appendOnlyHelper:
+                'Menyekat operasi pemadaman fail dalam direktori ini, hanya membenarkan penambahan direktori yang dikecualikan atau fail tidak dilindungi',
+            immutable: 'Larangan Sunting',
+            immutableHelper:
+                'Menyekat operasi suntingan, pemadaman, keizinan, dan pengubahsuaian pemilik untuk fail ini',
+            onWatch: 'Pantau',
+            onWatchHelper:
+                'Memantau dan mencegat penciptaan fail dilindungi atau direktori tidak dikecualikan dalam direktori ini',
+            forceStop: 'Tutup Paksa',
+            forceStopHelper:
+                'Akan melumpuhkan fungsi anti-pengubahsuaian untuk direktori laman web ini secara paksa. Teruskan?',
         },
         setting: {
             setting: 'Tetapan Panel',

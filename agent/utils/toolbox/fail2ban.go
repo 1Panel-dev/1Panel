@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
@@ -76,17 +77,17 @@ func (f *Fail2ban) Operate(operate string) error {
 
 func (f *Fail2ban) ReBanIPs(ips []string) error {
 	ipItems, _ := f.ListBanned()
-	stdout, err := cmd.RunDefaultWithStdoutBashCf("fail2ban-client unban --all")
+	stdout, err := cmd.RunDefaultWithStdoutBashCfAndTimeOut("fail2ban-client unban --all", 10*time.Minute)
 	if err != nil {
-		stdout1, err := cmd.RunDefaultWithStdoutBashCf("fail2ban-client set sshd banip %s", strings.Join(ipItems, " "))
+		stdout1, err := cmd.RunDefaultWithStdoutBashCfAndTimeOut("fail2ban-client set sshd banip %s", 10*time.Minute, strings.Join(ipItems, " "))
 		if err != nil {
 			global.LOG.Errorf("rebanip after fail2ban-client unban --all failed, err: %s", stdout1)
 		}
 		return fmt.Errorf("fail2ban-client unban --all failed, err: %s", stdout)
 	}
-	stdout1, err := cmd.RunDefaultWithStdoutBashCf("fail2ban-client set sshd banip %s", strings.Join(ips, " "))
+	stdout, err = cmd.RunDefaultWithStdoutBashCfAndTimeOut("fail2ban-client set sshd banip %s", 10*time.Minute, strings.Join(ips, " "))
 	if err != nil {
-		return fmt.Errorf("handle `fail2ban-client set sshd banip %s` failed, err: %s", strings.Join(ips, " "), stdout1)
+		return fmt.Errorf("handle `fail2ban-client set sshd banip %s` failed, err: %s", strings.Join(ips, " "), stdout)
 	}
 	return nil
 }

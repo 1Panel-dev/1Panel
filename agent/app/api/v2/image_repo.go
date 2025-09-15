@@ -58,7 +58,7 @@ func (b *BaseApi) ListRepo(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /containers/repo/status [get]
+// @Router /containers/repo/status [post]
 func (b *BaseApi) CheckRepoStatus(c *gin.Context) {
 	var req dto.OperateByID
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {

@@ -11,19 +11,19 @@ import (
 )
 
 // @title 1Panel
-// @version 1.0
-// @description  Open Source Linux Panel
+// @version 2.0
+// @description Top-Rated Web-based Linux Server Management Tool
 // @termsOfService http://swagger.io/terms/
-// @license.name Apache 2.0
-// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
-// @BasePath /api/v1
+// @license.name GPL-3.0
+// @license.url https://www.gnu.org/licenses/gpl-3.0.html
+// @BasePath /api/v2
 // @schemes http https
 
 // @securityDefinitions.apikey ApiKeyAuth
 // @description Custom Token Format, Format: md5('1panel' + API-Key + UnixTimestamp).
 // @description ```
 // @description eg:
-// @description curl -X GET "http://localhost:4004/api/v1/dashboard/current" \
+// @description curl -X GET "http://{host}:{port}/api/v2/toolbox/device/base" \
 // @description -H "1Panel-Token: <1panel_token>" \
 // @description -H "1Panel-Timestamp: <current_unix_timestamp>"
 // @description ```

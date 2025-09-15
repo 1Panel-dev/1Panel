@@ -880,7 +880,7 @@ func (b *BaseApi) GetPathByType(c *gin.Context) {
 // @Success 200 {object} dto.DiskInfo
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /mount [post]
+// @Router /files/mount [post]
 func (b *BaseApi) GetHostMount(c *gin.Context) {
 	disks := fileService.GetHostMount()
 	helper.SuccessWithData(c, disks)
@@ -892,7 +892,7 @@ func (b *BaseApi) GetHostMount(c *gin.Context) {
 // @Success 200 {object} response.UserGroupResponse
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /user/group [post]
+// @Router /files/user/group [post]
 func (b *BaseApi) GetUsersAndGroups(c *gin.Context) {
 	res, err := fileService.GetUsersAndGroups()
 	if err != nil {

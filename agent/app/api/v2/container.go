@@ -697,7 +697,7 @@ func (b *BaseApi) ComposeUpdate(c *gin.Context) {
 // @Param tail query string false "显示行号"
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /containers/search/log [post]
+// @Router /containers/search/log [get]
 func (b *BaseApi) ContainerStreamLogs(c *gin.Context) {
 	c.Header("Content-Type", "text/event-stream")
 	c.Header("Cache-Control", "no-cache")

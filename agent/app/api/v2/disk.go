@@ -13,7 +13,7 @@ import (
 // @Success 200 {object} response.CompleteDiskInfo
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /disks [get]
+// @Router /hosts/disks [get]
 func (b *BaseApi) GetCompleteDiskInfo(c *gin.Context) {
 	diskInfo, err := diskService.GetCompleteDiskInfo()
 	if err != nil {
@@ -31,7 +31,7 @@ func (b *BaseApi) GetCompleteDiskInfo(c *gin.Context) {
 // @Success 200 {string} string "Partition created successfully"
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /disks/partition [post]
+// @Router /hosts/disks/partition [post]
 // @x-panel-log {"bodyKeys":["device", "filesystem", "mountPoint"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"对磁盘 [device] 进行分区，文件系统 [filesystem]，挂载点 [mountPoint]","formatEN":"Partition disk [device] with filesystem [filesystem], mount point [mountPoint]"}
 func (b *BaseApi) PartitionDisk(c *gin.Context) {
 	var req request.DiskPartitionRequest
@@ -56,7 +56,7 @@ func (b *BaseApi) PartitionDisk(c *gin.Context) {
 // @Success 200 {string} string "Disk mounted successfully"
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /disks/mount [post]
+// @Router /hosts/disks/mount [post]
 // @x-panel-log {"bodyKeys":["device", "mountPoint"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"挂载磁盘 [device] 到 [mountPoint]","formatEN":"Mount disk [device] to [mountPoint]"}
 func (b *BaseApi) MountDisk(c *gin.Context) {
 	var req request.DiskMountRequest
@@ -81,7 +81,7 @@ func (b *BaseApi) MountDisk(c *gin.Context) {
 // @Success 200 {string} string "Disk unmounted successfully"
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /disks/unmount [post]
+// @Router /hosts/disks/unmount [post]
 // @x-panel-log {"bodyKeys":["device", "mountPoint"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"卸载磁盘 [device] 从 [mountPoint]","formatEN":"Unmount disk [device] from [mountPoint]"}
 func (b *BaseApi) UnmountDisk(c *gin.Context) {
 	var req request.DiskUnmountRequest

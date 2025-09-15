@@ -527,7 +527,7 @@ func (b *BaseApi) UpdateProxyConfig(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /websites/proxy/file [post]
+// @Router /websites/proxies/file [post]
 // @x-panel-log {"bodyKeys":["websiteID"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"websiteID","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"更新反向代理文件 [domain]","formatEN":"Nginx conf proxy file update [domain]"}
 func (b *BaseApi) UpdateProxyConfigFile(c *gin.Context) {
 	var req request.NginxProxyUpdate
@@ -840,7 +840,7 @@ func (b *BaseApi) CreateLoadBalance(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /websites/lbs/delete [post]
+// @Router /websites/lbs/del [post]
 func (b *BaseApi) DeleteLoadBalance(c *gin.Context) {
 	var req request.WebsiteLBDelete
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -953,7 +953,7 @@ func (b *BaseApi) GetProxyCache(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /websites/realip [post]
+// @Router /websites/realip/config [post]
 // @x-panel-log {"bodyKeys":["websiteID"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"websiteID","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"修改 [domain] 网站真实IP配置 ","formatEN":"Modify the real IP configuration of [domain] website"}
 func (b *BaseApi) SetRealIPConfig(c *gin.Context) {
 	var req request.WebsiteRealIP

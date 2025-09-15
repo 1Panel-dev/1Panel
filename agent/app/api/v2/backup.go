@@ -74,7 +74,7 @@ func (b *BaseApi) RefreshToken(c *gin.Context) {
 // @Success 200 {array} object
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /buckets [post]
+// @Router /backups/buckets [post]
 func (b *BaseApi) ListBuckets(c *gin.Context) {
 	var req dto.ForBuckets
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -295,7 +295,7 @@ func (b *BaseApi) SearchBackupRecordsByCronjob(c *gin.Context) {
 // @Success 200 {string} filePath
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /backup/record/download [post]
+// @Router /backups/record/download [post]
 // @x-panel-log {"bodyKeys":["source","fileName"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"下载备份记录 [source][fileName]","formatEN":"download backup records [source][fileName]"}
 func (b *BaseApi) DownloadRecord(c *gin.Context) {
 	var req dto.DownloadRecord
@@ -318,7 +318,7 @@ func (b *BaseApi) DownloadRecord(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /backup/record/description/update [post]
+// @Router /backups/record/description/update [post]
 func (b *BaseApi) UpdateRecordDescription(c *gin.Context) {
 	var req dto.UpdateDescription
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -339,7 +339,7 @@ func (b *BaseApi) UpdateRecordDescription(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /record/del [post]
+// @Router /backups/record/del [post]
 // @x-panel-log {"bodyKeys":["ids"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"ids","isList":true,"db":"backup_records","output_column":"file_name","output_value":"files"}],"formatZH":"删除备份记录 [files]","formatEN":"delete backup records [files]"}
 func (b *BaseApi) DeleteBackupRecord(c *gin.Context) {
 	var req dto.BatchDeleteReq

@@ -13,7 +13,7 @@ import (
 // @Success 200 {object} response.McpServersRes
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /mcp/search [post]
+// @Router /ai/mcp/search [post]
 func (b *BaseApi) PageMcpServers(c *gin.Context) {
 	var req request.McpServerSearch
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -30,7 +30,7 @@ func (b *BaseApi) PageMcpServers(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /mcp/server [post]
+// @Router /ai/mcp/server [post]
 func (b *BaseApi) CreateMcpServer(c *gin.Context) {
 	var req request.McpServerCreate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -51,7 +51,7 @@ func (b *BaseApi) CreateMcpServer(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /mcp/server/update [post]
+// @Router /ai/mcp/server/update [post]
 func (b *BaseApi) UpdateMcpServer(c *gin.Context) {
 	var req request.McpServerUpdate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -72,7 +72,7 @@ func (b *BaseApi) UpdateMcpServer(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /mcp/server/del [post]
+// @Router /ai/mcp/server/del [post]
 func (b *BaseApi) DeleteMcpServer(c *gin.Context) {
 	var req request.McpServerDelete
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -93,7 +93,7 @@ func (b *BaseApi) DeleteMcpServer(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /mcp/server/op [post]
+// @Router /ai/mcp/server/op [post]
 func (b *BaseApi) OperateMcpServer(c *gin.Context) {
 	var req request.McpServerOperate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -114,7 +114,7 @@ func (b *BaseApi) OperateMcpServer(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /mcp/domain/bind [post]
+// @Router /ai/mcp/domain/bind [post]
 func (b *BaseApi) BindMcpDomain(c *gin.Context) {
 	var req request.McpBindDomain
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -135,7 +135,7 @@ func (b *BaseApi) BindMcpDomain(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /mcp/domain/update [post]
+// @Router /ai/mcp/domain/update [post]
 func (b *BaseApi) UpdateMcpBindDomain(c *gin.Context) {
 	var req request.McpBindDomainUpdate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -155,7 +155,7 @@ func (b *BaseApi) UpdateMcpBindDomain(c *gin.Context) {
 // @Success 200 {object} response.McpBindDomainRes
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /mcp/domain/get [get]
+// @Router /ai/mcp/domain/get [get]
 func (b *BaseApi) GetMcpBindDomain(c *gin.Context) {
 	res, err := mcpServerService.GetBindDomain()
 	if err != nil {

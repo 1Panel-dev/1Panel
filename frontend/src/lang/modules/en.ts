@@ -1591,6 +1591,17 @@ const message = {
         userChangeHelper: 'Changing the panel user will log you out. Continue?',
         passwd: 'Panel password',
         emailHelper: 'For password retrieval',
+        watermark: 'Watermark Settings',
+        watermarkContent: 'Watermark Content',
+        contentHelper: 'Use {0} to represent the current node name and node IP',
+        watermarkColor: 'Watermark Color',
+        watermarkFont: 'Watermark Font Size',
+        watermarkHeight: 'Watermark Height',
+        watermarkWidth: 'Watermark Width',
+        watermarkRotate: 'Rotation Angle',
+        watermarkGap: 'Spacing',
+        watermarkCloseHelper: 'Are you sure you want to turn off the system watermark settings?',
+        watermarkOpenHelper: 'Are you sure you want to save the current system watermark settings?',
         title: 'Panel alias',
         panelPort: 'Panel port',
         titleHelper:
@@ -3360,6 +3371,16 @@ const message = {
                 'The tamper protection feature for the following websites will be enabled to enhance website security. Do you want to continue?',
             disableHelper:
                 'The tamper protection feature for the following websites will be disabled. Do you want to continue?',
+            appendOnly: 'Append Only',
+            appendOnlyHelper:
+                'Restrict deletion operations for files in this directory, only allowing addition of excluded directories or non-protected files',
+            immutable: 'Immutable',
+            immutableHelper: 'Restrict editing, deletion, permission, and owner modification operations for this file',
+            onWatch: 'Watch',
+            onWatchHelper:
+                'Monitor and intercept creation of protected files or non-excluded directories in this directory',
+            forceStop: 'Force Close',
+            forceStopHelper: 'About to force disable the anti-tamper function for this website directory. Continue?',
         },
         setting: {
             setting: 'Panel Settings',
