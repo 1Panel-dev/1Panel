@@ -6,16 +6,16 @@ const docTemplate = `{
 	"swagger": "2.0",
 	"info": {
 		"contact": {},
-		"description": "开源Linux面板",
+		"description": "Top-Rated Web-based Linux Server Management Tool",
 		"license": {
-			"name": "Apache 2.0",
-			"url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+			"name": "GPL-3.0",
+			"url": "https://www.gnu.org/licenses/gpl-3.0.html"
 		},
 		"termsOfService": "http://swagger.io/terms/",
 		"title": "1Panel",
 		"version": "2.0"
 	},
-	"host": "localhost",
+	"host": "",
 	"basePath": "/api/v2",
 	"paths": {
 		"/ai/domain/bind": {
@@ -20740,6 +20740,23 @@ const docTemplate = `{
 			},
 			"type": "object"
 		},
+		"dto.ApiInterfaceConfig": {
+			"properties": {
+				"apiInterfaceStatus": {
+					"type": "string"
+				},
+				"apiKey": {
+					"type": "string"
+				},
+				"apiKeyValidityTime": {
+					"type": "string"
+				},
+				"ipWhiteList": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
 		"dto.AppConfigVersion": {
 			"properties": {
 				"additionalProperties": {},
@@ -20920,6 +20937,58 @@ const docTemplate = `{
 			},
 			"type": "object"
 		},
+		"dto.AppstoreConfig": {
+			"properties": {
+				"uninstallDeleteBackup": {
+					"type": "string"
+				},
+				"uninstallDeleteImage": {
+					"type": "string"
+				},
+				"upgradeBackup": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AppstoreUpdate": {
+			"properties": {
+				"scope": {
+					"enum": [
+						"UninstallDeleteImage",
+						"UpgradeBackup",
+						"UninstallDeleteBackup"
+					],
+					"type": "string"
+				},
+				"status": {
+					"enum": [
+						"Disable",
+						"Enable"
+					],
+					"type": "string"
+				}
+			},
+			"required": [
+				"scope",
+				"status"
+			],
+			"type": "object"
+		},
+		"dto.BackupClientInfo": {
+			"properties": {
+				"client_id": {
+					"type": "string"
+				},
+				"client_secret": {
+					"type": "string"
+				},
+				"redirect_uri": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
 		"dto.BackupOperate": {
 			"properties": {
 				"accessKey": {
@@ -21027,6 +21096,25 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
+		"dto.BindInfo": {
+			"properties": {
+				"bindAddress": {
+					"type": "string"
+				},
+				"ipv6": {
+					"enum": [
+						"Enable",
+						"Disable"
+					],
+					"type": "string"
+				}
+			},
+			"required": [
+				"bindAddress",
+				"ipv6"
+			],
+			"type": "object"
+		},
 		"dto.BindUser": {
 			"properties": {
 				"database": {
@@ -21052,6 +21140,17 @@ const docTemplate = `{
 				"permission",
 				"username"
 			],
+			"type": "object"
+		},
+		"dto.CaptchaResponse": {
+			"properties": {
+				"captchaID": {
+					"type": "string"
+				},
+				"imagePath": {
+					"type": "string"
+				}
+			},
 			"type": "object"
 		},
 		"dto.ChangeDBInfo": {
@@ -21094,6 +21193,21 @@ const docTemplate = `{
 			"type": "object"
 		},
 		"dto.ChangeGroup": {
+			"properties": {
+				"groupID": {
+					"type": "integer"
+				},
+				"id": {
+					"type": "integer"
+				}
+			},
+			"required": [
+				"groupID",
+				"id"
+			],
+			"type": "object"
+		},
+		"dto.ChangeHostGroup": {
 			"properties": {
 				"groupID": {
 					"type": "integer"
@@ -21355,6 +21469,21 @@ const docTemplate = `{
 			},
 			"type": "object"
 		},
+		"dto.CleanLog": {
+			"properties": {
+				"logType": {
+					"enum": [
+						"login",
+						"operation"
+					],
+					"type": "string"
+				}
+			},
+			"required": [
+				"logType"
+			],
+			"type": "object"
+		},
 		"dto.CleanTree": {
 			"properties": {
 				"children": {
@@ -21385,6 +21514,56 @@ const docTemplate = `{
 					"type": "string"
 				}
 			},
+			"type": "object"
+		},
+		"dto.CommandInfo": {
+			"properties": {
+				"command": {
+					"type": "string"
+				},
+				"groupBelong": {
+					"type": "string"
+				},
+				"groupID": {
+					"type": "integer"
+				},
+				"id": {
+					"type": "integer"
+				},
+				"name": {
+					"type": "string"
+				},
+				"type": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.CommandOperate": {
+			"properties": {
+				"command": {
+					"type": "string"
+				},
+				"groupBelong": {
+					"type": "string"
+				},
+				"groupID": {
+					"type": "integer"
+				},
+				"id": {
+					"type": "integer"
+				},
+				"name": {
+					"type": "string"
+				},
+				"type": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"command",
+				"name"
+			],
 			"type": "object"
 		},
 		"dto.CommonBackup": {
@@ -23408,12 +23587,165 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
+		"dto.HostConnTest": {
+			"properties": {
+				"addr": {
+					"type": "string"
+				},
+				"authMode": {
+					"enum": [
+						"password",
+						"key"
+					],
+					"type": "string"
+				},
+				"passPhrase": {
+					"type": "string"
+				},
+				"password": {
+					"type": "string"
+				},
+				"port": {
+					"maximum": 65535,
+					"minimum": 1,
+					"type": "integer"
+				},
+				"privateKey": {
+					"type": "string"
+				},
+				"user": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"addr",
+				"port",
+				"user"
+			],
+			"type": "object"
+		},
 		"dto.HostHelper": {
 			"properties": {
 				"host": {
 					"type": "string"
 				},
 				"ip": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.HostInfo": {
+			"properties": {
+				"addr": {
+					"type": "string"
+				},
+				"authMode": {
+					"type": "string"
+				},
+				"createdAt": {
+					"type": "string"
+				},
+				"description": {
+					"type": "string"
+				},
+				"groupBelong": {
+					"type": "string"
+				},
+				"groupID": {
+					"type": "integer"
+				},
+				"id": {
+					"type": "integer"
+				},
+				"name": {
+					"type": "string"
+				},
+				"passPhrase": {
+					"type": "string"
+				},
+				"password": {
+					"type": "string"
+				},
+				"port": {
+					"type": "integer"
+				},
+				"privateKey": {
+					"type": "string"
+				},
+				"rememberPassword": {
+					"type": "boolean"
+				},
+				"user": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.HostOperate": {
+			"properties": {
+				"addr": {
+					"type": "string"
+				},
+				"authMode": {
+					"enum": [
+						"password",
+						"key"
+					],
+					"type": "string"
+				},
+				"description": {
+					"type": "string"
+				},
+				"groupID": {
+					"type": "integer"
+				},
+				"id": {
+					"type": "integer"
+				},
+				"name": {
+					"type": "string"
+				},
+				"passPhrase": {
+					"type": "string"
+				},
+				"password": {
+					"type": "string"
+				},
+				"port": {
+					"maximum": 65535,
+					"minimum": 1,
+					"type": "integer"
+				},
+				"privateKey": {
+					"type": "string"
+				},
+				"rememberPassword": {
+					"type": "boolean"
+				},
+				"user": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"addr",
+				"port",
+				"user"
+			],
+			"type": "object"
+		},
+		"dto.HostTree": {
+			"properties": {
+				"children": {
+					"items": {
+						"$ref": "#/definitions/dto.TreeChild"
+					},
+					"type": "array"
+				},
+				"id": {
+					"type": "integer"
+				},
+				"label": {
 					"type": "string"
 				}
 			},
@@ -23676,6 +24008,83 @@ const docTemplate = `{
 					"type": "string"
 				}
 			},
+			"type": "object"
+		},
+		"dto.Login": {
+			"properties": {
+				"captcha": {
+					"type": "string"
+				},
+				"captchaID": {
+					"type": "string"
+				},
+				"ignoreCaptcha": {
+					"type": "boolean"
+				},
+				"language": {
+					"enum": [
+						"zh",
+						"en",
+						"zh-Hant",
+						"ko",
+						"ja",
+						"ru",
+						"ms",
+						"pt-BR",
+						"tr"
+					],
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"password": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"language",
+				"name",
+				"password"
+			],
+			"type": "object"
+		},
+		"dto.MFALogin": {
+			"properties": {
+				"code": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"password": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"code",
+				"name",
+				"password"
+			],
+			"type": "object"
+		},
+		"dto.MfaCredential": {
+			"properties": {
+				"code": {
+					"type": "string"
+				},
+				"interval": {
+					"type": "string"
+				},
+				"secret": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"code",
+				"interval",
+				"secret"
+			],
 			"type": "object"
 		},
 		"dto.MonitorData": {
@@ -24450,9 +24859,6 @@ const docTemplate = `{
 					"type": "integer"
 				}
 			},
-			"required": [
-				"id"
-			],
 			"type": "object"
 		},
 		"dto.OperateByIDs": {
@@ -24462,6 +24868,22 @@ const docTemplate = `{
 						"type": "integer"
 					},
 					"type": "array"
+				}
+			},
+			"type": "object"
+		},
+		"dto.OperateByName": {
+			"properties": {
+				"name": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.OperateByTaskID": {
+			"properties": {
+				"taskID": {
+					"type": "string"
 				}
 			},
 			"type": "object"
@@ -24724,6 +25146,21 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
+		"dto.PasswordUpdate": {
+			"properties": {
+				"newPassword": {
+					"type": "string"
+				},
+				"oldPassword": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"newPassword",
+				"oldPassword"
+			],
+			"type": "object"
+		},
 		"dto.PortHelper": {
 			"properties": {
 				"containerPort": {
@@ -24792,6 +25229,19 @@ const docTemplate = `{
 					"$ref": "#/definitions/dto.PortRuleOperate"
 				}
 			},
+			"type": "object"
+		},
+		"dto.PortUpdate": {
+			"properties": {
+				"serverPort": {
+					"maximum": 65535,
+					"minimum": 1,
+					"type": "integer"
+				}
+			},
+			"required": [
+				"serverPort"
+			],
 			"type": "object"
 		},
 		"dto.PostgresqlBindUser": {
@@ -24976,6 +25426,35 @@ const docTemplate = `{
 				"from",
 				"type"
 			],
+			"type": "object"
+		},
+		"dto.ProxyUpdate": {
+			"properties": {
+				"proxyDocker": {
+					"type": "boolean"
+				},
+				"proxyPasswd": {
+					"type": "string"
+				},
+				"proxyPasswdKeep": {
+					"type": "string"
+				},
+				"proxyPort": {
+					"type": "string"
+				},
+				"proxyType": {
+					"type": "string"
+				},
+				"proxyUrl": {
+					"type": "string"
+				},
+				"proxyUser": {
+					"type": "string"
+				},
+				"withDockerRestart": {
+					"type": "boolean"
+				}
+			},
 			"type": "object"
 		},
 		"dto.QuickJump": {
@@ -25228,6 +25707,29 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
+		"dto.ReleasesNotes": {
+			"properties": {
+				"content": {
+					"type": "string"
+				},
+				"createdAt": {
+					"type": "string"
+				},
+				"fixCount": {
+					"type": "integer"
+				},
+				"newCount": {
+					"type": "integer"
+				},
+				"optimizationCount": {
+					"type": "integer"
+				},
+				"version": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
 		"dto.ResourceLimit": {
 			"properties": {
 				"cpu": {
@@ -25367,6 +25869,90 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
+		"dto.SSLInfo": {
+			"properties": {
+				"cert": {
+					"type": "string"
+				},
+				"domain": {
+					"type": "string"
+				},
+				"key": {
+					"type": "string"
+				},
+				"rootPath": {
+					"type": "string"
+				},
+				"sslID": {
+					"type": "integer"
+				},
+				"timeout": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.SSLUpdate": {
+			"properties": {
+				"cert": {
+					"type": "string"
+				},
+				"domain": {
+					"type": "string"
+				},
+				"key": {
+					"type": "string"
+				},
+				"ssl": {
+					"enum": [
+						"Enable",
+						"Disable"
+					],
+					"type": "string"
+				},
+				"sslID": {
+					"type": "integer"
+				},
+				"sslType": {
+					"enum": [
+						"self",
+						"select",
+						"import",
+						"import-paste",
+						"import-local"
+					],
+					"type": "string"
+				}
+			},
+			"required": [
+				"ssl",
+				"sslType"
+			],
+			"type": "object"
+		},
+		"dto.ScriptOperate": {
+			"properties": {
+				"description": {
+					"type": "string"
+				},
+				"groups": {
+					"type": "string"
+				},
+				"id": {
+					"type": "integer"
+				},
+				"isInteractive": {
+					"type": "boolean"
+				},
+				"name": {
+					"type": "string"
+				},
+				"script": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
 		"dto.ScriptOptions": {
 			"properties": {
 				"id": {
@@ -25456,6 +26042,83 @@ const docTemplate = `{
 				"page",
 				"pageSize",
 				"type"
+			],
+			"type": "object"
+		},
+		"dto.SearchForTree": {
+			"properties": {
+				"info": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.SearchLgLogWithPage": {
+			"properties": {
+				"ip": {
+					"type": "string"
+				},
+				"page": {
+					"type": "integer"
+				},
+				"pageSize": {
+					"type": "integer"
+				},
+				"status": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"page",
+				"pageSize"
+			],
+			"type": "object"
+		},
+		"dto.SearchOpLogWithPage": {
+			"properties": {
+				"node": {
+					"type": "string"
+				},
+				"operation": {
+					"type": "string"
+				},
+				"page": {
+					"type": "integer"
+				},
+				"pageSize": {
+					"type": "integer"
+				},
+				"source": {
+					"type": "string"
+				},
+				"status": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"page",
+				"pageSize"
+			],
+			"type": "object"
+		},
+		"dto.SearchPageWithGroup": {
+			"properties": {
+				"groupID": {
+					"type": "integer"
+				},
+				"info": {
+					"type": "string"
+				},
+				"page": {
+					"type": "integer"
+				},
+				"pageSize": {
+					"type": "integer"
+				}
+			},
+			"required": [
+				"page",
+				"pageSize"
 			],
 			"type": "object"
 		},
@@ -25575,6 +26238,18 @@ const docTemplate = `{
 		},
 		"dto.SettingInfo": {
 			"properties": {
+				"allowIPs": {
+					"type": "string"
+				},
+				"apiInterfaceStatus": {
+					"type": "string"
+				},
+				"apiKey": {
+					"type": "string"
+				},
+				"apiKeyValidityTime": {
+					"type": "string"
+				},
 				"appStoreLastModified": {
 					"type": "string"
 				},
@@ -25584,46 +26259,97 @@ const docTemplate = `{
 				"appStoreVersion": {
 					"type": "string"
 				},
-				"defaultNetwork": {
+				"bindAddress": {
 					"type": "string"
 				},
-				"dockerSockPath": {
+				"bindDomain": {
 					"type": "string"
 				},
-				"fileRecycleBin": {
+				"complexityVerification": {
 					"type": "string"
 				},
-				"lastCleanData": {
+				"developerMode": {
 					"type": "string"
 				},
-				"lastCleanSize": {
+				"expirationDays": {
 					"type": "string"
 				},
-				"lastCleanTime": {
+				"expirationTime": {
 					"type": "string"
 				},
-				"localTime": {
+				"hideMenu": {
 					"type": "string"
 				},
-				"monitorInterval": {
+				"ipWhiteList": {
 					"type": "string"
 				},
-				"monitorStatus": {
+				"ipv6": {
 					"type": "string"
 				},
-				"monitorStoreDays": {
+				"language": {
 					"type": "string"
 				},
-				"ntpSite": {
+				"menuTabs": {
 					"type": "string"
 				},
-				"systemIP": {
+				"mfaInterval": {
+					"type": "string"
+				},
+				"mfaSecret": {
+					"type": "string"
+				},
+				"mfaStatus": {
+					"type": "string"
+				},
+				"noAuthSetting": {
+					"type": "string"
+				},
+				"panelName": {
+					"type": "string"
+				},
+				"port": {
+					"type": "string"
+				},
+				"proxyPasswd": {
+					"type": "string"
+				},
+				"proxyPasswdKeep": {
+					"type": "string"
+				},
+				"proxyPort": {
+					"type": "string"
+				},
+				"proxyType": {
+					"type": "string"
+				},
+				"proxyUrl": {
+					"type": "string"
+				},
+				"proxyUser": {
+					"type": "string"
+				},
+				"securityEntrance": {
+					"type": "string"
+				},
+				"serverPort": {
+					"type": "string"
+				},
+				"sessionTimeout": {
+					"type": "string"
+				},
+				"ssl": {
+					"type": "string"
+				},
+				"sslType": {
 					"type": "string"
 				},
 				"systemVersion": {
 					"type": "string"
 				},
-				"timeZone": {
+				"theme": {
+					"type": "string"
+				},
+				"userName": {
 					"type": "string"
 				}
 			},
@@ -25875,6 +26601,20 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
+		"dto.SystemSetting": {
+			"properties": {
+				"isDemo": {
+					"type": "boolean"
+				},
+				"isIntl": {
+					"type": "boolean"
+				},
+				"language": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
 		"dto.Tag": {
 			"properties": {
 				"key": {
@@ -25892,12 +26632,49 @@ const docTemplate = `{
 			},
 			"type": "object"
 		},
+		"dto.TerminalInfo": {
+			"properties": {
+				"cursorBlink": {
+					"type": "string"
+				},
+				"cursorStyle": {
+					"type": "string"
+				},
+				"fontSize": {
+					"type": "string"
+				},
+				"letterSpacing": {
+					"type": "string"
+				},
+				"lineHeight": {
+					"type": "string"
+				},
+				"scrollSensitivity": {
+					"type": "string"
+				},
+				"scrollback": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
 		"dto.TransHelper": {
 			"properties": {
 				"detailName": {
 					"type": "string"
 				},
 				"name": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.TreeChild": {
+			"properties": {
+				"id": {
+					"type": "integer"
+				},
+				"label": {
 					"type": "string"
 				}
 			},
@@ -25967,12 +26744,54 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
+		"dto.Upgrade": {
+			"properties": {
+				"version": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"version"
+			],
+			"type": "object"
+		},
+		"dto.UpgradeInfo": {
+			"properties": {
+				"latestVersion": {
+					"type": "string"
+				},
+				"newVersion": {
+					"type": "string"
+				},
+				"releaseNote": {
+					"type": "string"
+				},
+				"testVersion": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
 		"dto.UploadForRecover": {
 			"properties": {
 				"filePath": {
 					"type": "string"
 				},
 				"targetDir": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.UserLoginInfo": {
+			"properties": {
+				"mfaStatus": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"token": {
 					"type": "string"
 				}
 			},
@@ -26117,6 +26936,17 @@ const docTemplate = `{
 					"type": "string"
 				},
 				"user": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"mfa.Otp": {
+			"properties": {
+				"qrImage": {
+					"type": "string"
+				},
+				"secret": {
 					"type": "string"
 				}
 			},
@@ -32129,7 +32959,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "/api/v2",
 	Schemes:          []string{},
 	Title:            "1Panel",
-	Description:      "开源Linux面板",
+	Description:      "Top-Rated Web-based Linux Server Management Tool",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

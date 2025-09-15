@@ -124,6 +124,12 @@ func TestGenerateSwaggerDoc(t *testing.T) {
 		}
 		newSwagger.Paths[key] = val
 	}
+	for key, val := range coreSwagger.Definitions {
+		if _, ok := newSwagger.Definitions[key]; ok {
+			fmt.Printf("duplicate definitions were found: %s \n", key)
+		}
+		newSwagger.Definitions[key] = val
+	}
 
 	newJson, err := json.MarshalIndent(newSwagger, "", "\t")
 	if err != nil {
@@ -150,7 +156,7 @@ type Swagger struct {
 	Host        string                 `json:"host"`
 	BasePath    string                 `json:"basePath"`
 	Paths       map[string]interface{} `json:"paths"`
-	Definitions interface{}            `json:"definitions"`
+	Definitions map[string]interface{} `json:"definitions"`
 }
 
 func loadDefaultDocs() string {
@@ -166,7 +172,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "/api/v2",
 	Schemes:          []string{},
 	Title:            "1Panel",
-	Description:      "开源Linux面板",
+	Description:      "Top-Rated Web-based Linux Server Management Tool",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",
