@@ -2053,8 +2053,7 @@ const message = {
         webUI: 'Web 訪問地址',
         webUIPlaceholder: '例如：example.com:8080/login',
         defaultWebDomain: '預設訪問地址',
-        defaultWebDomainHepler:
-            '預設訪問用於應用埠跳轉，例如應用埠為 8080 則跳轉地址為 http(s)://預設訪問地址:8080',
+        defaultWebDomainHepler: '預設訪問用於應用埠跳轉，例如應用埠為 8080 則跳轉地址為 http(s)://預設訪問地址:8080',
         webUIConfig: '目前節點尚未配置預設存取地址，請在應用參數或者前往面板設定進行設定！',
         toLink: '連結',
         customAppHelper: '在安裝自訂應用商店包之前，請確保沒有任何已安裝的應用。',
@@ -2213,8 +2212,7 @@ const message = {
             '設定預設站點後,所有未綁定的域名和IP都被定向到預設站點\n可有效防止惡意解析\n但同時會導致 WAF 未授權域名攔截失敗',
         websiteDeploymentHelper: '使用從 1Panel 部署的應用建立網站',
         websiteStatictHelper: '在主機上建立網站目錄',
-        websiteProxyHelper:
-            '代理已有服務,例如本機已安裝使用 8080 埠的 halo 服務，那麼代理地址為 http://127.0.0.1:8080',
+        websiteProxyHelper: '代理已有服務,例如本機已安裝使用 8080 埠的 halo 服務，那麼代理地址為 http://127.0.0.1:8080',
         restoreHelper: '確認使用此備份復原？',
         wafValueHelper: '值',
         runtimeProxyHelper: '使用從 1Panel 建立的執行環境',
@@ -2394,7 +2392,8 @@ const message = {
         serverCacheTime: '伺服器快取時間',
         serverCacheTimeHelper: '請求在伺服器端快取的時間，到期前相同請求會直接返回快取結果，不再請求源站。',
         browserCacheTime: '瀏覽器快取時間',
-        browserCacheTimeHelper: '靜態資源在瀏覽器本機快取的時間，減少重複請求。到期前使用者重新整理頁面會直接使用本機快取。',
+        browserCacheTimeHelper:
+            '靜態資源在瀏覽器本機快取的時間，減少重複請求。到期前使用者重新整理頁面會直接使用本機快取。',
         donotLinkeDB: '不關聯資料庫',
         toWebsiteDir: '進入網站目錄',
         execParameters: '執行參數',
@@ -3563,18 +3562,6 @@ const message = {
             setDefault: '復原預設',
             setDefaultHelper: '即將復原主題配色到初始狀態，是否繼續？',
             setHelper: '即將儲存目前選定的主題配色，是否繼續？',
-        },
-        app: {
-            app: 'APP',
-            title: '面板別名',
-            titleHelper: '面板別名用於 APP 端的顯示（預設面板別名）',
-            qrCode: '二維碼',
-            apiStatusHelper: '面板 APP 需要開啟 API 介面功能',
-            apiInterfaceHelper: '支援面板 API 介面訪問功能（面板 APP 需要開啟該功能）',
-            apiInterfaceHelper1:
-                '面板 APP 訪問需將訪問者新增至白名單，非固定 IP 建議新增 0.0.0.0/0（所有 IPv4），::/0（所有 IPv6）',
-            qrCodeExpired: '重新整理時間',
-            apiLeakageHelper: '請勿洩露二維碼，確保僅在受信任的環境中使用',
         },
         exchange: {
             exchange: '文件對傳',

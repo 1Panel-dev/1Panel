@@ -1,6 +1,6 @@
 import { createI18n } from 'vue-i18n';
 import zh from './modules/zh';
-import zhHnat from './modules/zh-Hant';
+import zhHant from './modules/zh-Hant';
 import en from './modules/en';
 import ptBr from './modules/pt-br';
 import ja from './modules/ja';
@@ -17,7 +17,7 @@ const i18n = createI18n({
     globalInjection: true,
     messages: {
         zh,
-        'zh-Hant': zhHnat,
+        'zh-Hant': zhHant,
         en,
         'pt-BR': ptBr,
         ja,
