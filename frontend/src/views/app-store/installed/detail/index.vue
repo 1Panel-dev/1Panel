@@ -10,7 +10,7 @@
                 <el-descriptions-item :label="$t('app.webUI')">
                     <span v-if="!openConfig">
                         {{ appConfigUpdate.webUI }}
-                        <el-button type="primary" @click="openConfig = true">
+                        <el-button size="small" @click="openConfig = true">
                             {{ $t('commons.button.edit') }}
                         </el-button>
                     </span>
