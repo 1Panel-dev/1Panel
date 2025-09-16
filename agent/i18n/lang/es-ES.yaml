@@ -14,6 +14,8 @@ ErrApiConfigKeyInvalid: 'Error en la clave de la interfaz API: {{ .detail }}'
 ErrApiConfigIPInvalid: 'La IP usada para llamar a la API no está en la lista blanca: {{ .detail }}'
 ErrApiConfigDisable: 'Esta interfaz prohíbe el uso de llamadas a la API: {{ .detail }}'
 ErrApiConfigKeyTimeInvalid: 'Error en la marca de tiempo de la interfaz API: {{ .detail }}'
+ErrMinQuickJump: "¡Por favor configure al menos una entrada de acceso rápido!"
+ErrMaxQuickJump: "¡Puede configurar hasta cuatro entradas de acceso rápido!"
 
 #común
 ErrUsernameIsExist: 'El nombre de usuario ya existe'
@@ -38,6 +40,7 @@ ErrBackupInUsed: 'La cuenta de respaldo está siendo utilizada en una tarea prog
 ErrBackupCheck: 'Error al probar la conexión de la cuenta de respaldo {{ .err }}'
 ErrBackupLocalDelete: 'No se admite aún la eliminación de la cuenta de respaldo del servidor local'
 ErrBackupLocalCreate: 'No se admite aún la creación de cuentas de respaldo del servidor local'
+Localhost: "Máquina local"
 
 #app
 ErrPortInUsed: '¡El puerto {{ .detail }} ya está ocupado!'
@@ -62,7 +65,6 @@ ErrHttpReqTimeOut: 'La solicitud superó el tiempo de espera {{ .err }}'
 ErrHttpReqFailed: 'La solicitud falló {{ .err }}'
 ErrNoSuchHost: 'No se pudo encontrar el servidor solicitado {{ .err }}'
 ErrHttpReqNotFound: 'No se pudo encontrar el recurso solicitado {{ .err }}'
-ErrImagePullTimeOut: 'Tiempo de espera al descargar la imagen'
 ErrContainerNotFound: 'El contenedor {{ .name }} no existe'
 ErrContainerMsg: 'El contenedor {{ .name }} presenta anomalías. Revise el log en la página de contenedores para más detalles'
 ErrAppBackup: 'Falló el respaldo de la aplicación {{ .name }} {{ .err }}'
@@ -81,8 +83,6 @@ AppStoreSyncSuccess: 'Sincronización de la tienda de aplicaciones exitosa'
 SyncAppDetail: 'Sincronizar configuración de la aplicación'
 AppVersionNotMatch: 'La aplicación {{ .name }} requiere una versión superior de 1Panel, se omite la sincronización'
 MoveSiteDir: 'La actualización actual requiere migrar el directorio del sitio web OpenResty'
-MoveSiteToDir: 'Migrar directorio del sitio a {{ .name }}'
-ErrMoveSiteDir: 'Falló la migración del directorio del sitio'
 MoveSiteDirSuccess: 'Migración del directorio del sitio exitosa'
 DeleteRuntimePHP: 'Eliminar entorno de ejecución PHP'
 CustomAppStoreFileValid: 'Los paquetes de la tienda de aplicaciones deben estar en formato .tar.gz'
@@ -93,6 +93,15 @@ ErrCustomRuntimes: 'Hay un entorno de ejecución instalado, elimínelo primero'
 ErrAppVersionDeprecated: "La aplicación {{ .name }} no es compatible con la versión actual de 1Panel, omitida"
 ErrDockerFailed: "El estado de Docker es anómalo, revise el servicio"
 ErrDockerComposeCmdNotFound: "El comando Docker Compose no existe, por favor instálelo primero en el host"
+
+#ssh
+ExportIP: "IP de inicio de sesión"
+ExportArea: "Ubicación"
+ExportPort: "Puerto"
+ExportAuthMode: "Método de inicio de sesión"
+ExportUser: "Usuario"
+ExportStatus: "Estado de inicio de sesión"
+ExportDate: "Fecha y hora"
 
 #file
 ErrFileCanNotRead: 'Este archivo no soporta vista previa'
@@ -108,7 +117,9 @@ ErrSourcePathNotFound: 'El directorio fuente no existe'
 ErrFavoriteExist: 'Esta ruta ya ha sido marcada como favorita'
 ErrInvalidChar: 'No se permiten caracteres ilegales'
 ErrPathNotDelete: 'No se puede eliminar el directorio seleccionado'
-ErrLogFileToLarge: "El archivo de log supera los 500MB y no puede abrirse"
+FileDropFailed: "Error al limpiar el archivo {{ .name }}: {{ .err }}"
+FileDropSuccess: "Archivo {{ .name }} limpiado correctamente, {{ .count }} archivos eliminados, {{ .size }} de espacio liberado"
+FileDropSum: "Limpieza de archivos completada, total {{ .count }} archivos eliminados, {{ .size }} de espacio liberado"
 
 #website
 ErrAliasIsExist: 'El alias ya existe'
@@ -124,6 +135,9 @@ ErrBuildDirNotFound: 'El directorio de compilación no existe'
 ErrImageNotExist: 'La imagen del entorno {{ .name }} no existe, edítela de nuevo'
 ErrProxyIsUsed: "El balanceo de carga ya está usado por un proxy reverso, no se puede eliminar"
 ErrSSLValid: 'Archivo de certificado anómalo, ¡revise el estado del certificado!'
+ErrWebsiteDir: "Por favor seleccione un directorio dentro del directorio del sitio web"
+ErrComposerFileNotFound: "El archivo composer.json no existe"
+ErrRuntimeNoPort: "El entorno de ejecución no tiene configurado un puerto, edítelo primero"
 
 #ssl
 ErrSSLCannotDelete: 'El certificado {{ .name }} está siendo utilizado por un sitio web y no puede eliminarse'
@@ -156,6 +170,11 @@ ExecShellSuccess: 'Ejecución de script exitosa'
 StartUpdateSystemSSL: 'Iniciando actualización del certificado del sistema'
 UpdateSystemSSLSuccess: 'Certificado del sistema actualizado correctamente'
 ErrWildcardDomain: 'No se puede solicitar certificado de dominio wildcard en modo HTTP'
+ErrDeleteCAWithSSL: "La organización actual tiene un certificado emitido y no puede eliminarse."
+ErrApplySSLCanNotDelete: "El certificado {{ .name }} en proceso de solicitud no puede eliminarse, inténtelo más tarde"
+StartPushSSLToNode: "Iniciando envío de certificado al nodo"
+PushSSLToNodeFailed: "Error al enviar el certificado al nodo: {{ .err }}"
+PushSSLToNodeSuccess: "Certificado enviado correctamente al nodo"
 
 #mysql
 ErrUserIsExist: 'El usuario actual ya existe, intente con otro'
@@ -173,6 +192,11 @@ ErrObjectInUsed: 'El objeto está en uso y no puede eliminarse'
 ErrObjectBeDependent: 'Esta imagen depende de otras imágenes y no puede eliminarse'
 ErrPortRules: 'El número de puerto no coincide, ingrese de nuevo'
 ErrPgImagePull: 'Tiempo de espera al descargar la imagen, configure la aceleración o descárguela manualmente ({{ .name }}) e intente de nuevo'
+PruneHelper: "Esta limpieza eliminó {{ .name }} {{ .count }} elementos, liberando {{ .size }} de espacio en disco"
+ImageRemoveHelper: "Imagen {{ .name }} eliminada, liberando {{ .size }} de espacio en disco"
+BuildCache: "Caché de compilación"
+Volume: "Volumen de almacenamiento"
+Network: "Red"
 
 #runtime
 ErrFileNotExist: 'El archivo {{ .detail }} no existe, ¡verifique la integridad!'
@@ -207,6 +231,10 @@ FileOrDir: 'Directorio / Archivo'
 UploadFile: 'Subiendo archivo de respaldo {{ .file }} a {{ .backup }}'
 IgnoreBackupErr: 'Fallo en el respaldo, error: {{ .detail }}, se ignora este error...'
 IgnoreUploadErr: 'Fallo en la subida, error: {{ .detail }}, se ignora este error...'
+Upload: "Subir"
+LoadBackupFailed: "Error al obtener la conexión de la cuenta de respaldo, error: {{ .detail }}"
+InExecuting: "La tarea actual se está ejecutando, por favor no la repita"
+NoSuchResource: "No se encontraron contenidos de respaldo en la base de datos, omitiendo..."
 
 #toolbox
 ErrNotExistUser: 'El usuario actual no existe, modifíquelo e intente de nuevo'
@@ -266,6 +294,7 @@ allow: 'permitir'
 deny: 'denegar'
 OpenrestyNotFound: 'Openresty no está instalado'
 remoteIpIsNull: "La lista de IP está vacía"
+OpenrestyVersionErr: "La versión de Openresty es demasiado baja, actualice a 1.27.1.2-2-2-focal"
 
 #task
 TaskStart: 'La tarea {{ .name }} inicia [INICIO]'
@@ -321,10 +350,16 @@ SubTask: 'Subtarea'
 RuntimeExtension: 'Extensión del entorno de ejecución'
 TaskIsExecuting: 'Tarea en ejecución'
 CustomAppstore: 'Almacén de aplicaciones personalizado'
+TaskClean: "Limpieza"
+TaskExec: "Ejecutar"
 
 # task - ai
 OllamaModelPull: 'Descargar modelo Ollama {{ .name }}'
 OllamaModelSize: 'Obtener tamaño del modelo Ollama {{ .name }}'
+
+# task - clam
+Clamscan: "Escanear {{ .name }}"
+TaskScan: "Escaneo"
 
 # task-snapshot
 Snapshot: 'Instantánea'
@@ -350,9 +385,7 @@ SnapCompressFile: 'Comprimir archivo de instantánea'
 SnapCheckCompress: 'Verificar archivo de compresión de instantánea'
 SnapCompressSize: 'Tamaño del archivo de instantánea {{ .name }}'
 SnapUpload: 'Subir archivo de instantánea'
-SnapLoadBackup: 'Obtener información de cuenta de respaldo'
 SnapUploadTo: 'Subir archivo de instantánea a {{ .name }}'
-SnapUploadRes: 'Subir archivo de instantánea a {{ .name }}'
 
 SnapshotRecover: 'Restaurar instantánea'
 RecoverDownload: 'Descargar archivo de instantánea'
@@ -403,6 +436,9 @@ ImageNewTag: 'Nueva etiqueta de imagen {{ .name }}'
 ImaegPushRes: 'Salida de subida de imagen: {{ .name }}'
 ComposeCreate: 'Crear orquestación'
 ComposeCreateRes: 'Salida de creación de orquestación: {{ .name }}'
+ImageRepoAuthFromDB: "Obtener información de autenticación del repositorio desde la base de datos"
+ImaegPullRes: "Salida de descarga de imagen: {{ .name }}"
+ImaegPushRes: "Salida de subida de imagen: {{ .name }}"
 
 # task - website
 BackupNginxConfig: 'Respaldar archivo de configuración OpenResty'
@@ -422,6 +458,10 @@ ErrAlertPush: 'Error al enviar la alerta, ¡revise e intente de nuevo!'
 ErrAlertSave: 'Error al guardar la alerta, ¡revise e intente de nuevo!'
 ErrAlertSync: 'Error en la sincronización de la alerta, ¡revise e intente de nuevo!'
 ErrAlertRemote: 'Error remoto de alerta, ¡revise e intente de nuevo!'
+CommonAlert: "Su 1Panel: {{ .msg }}, por favor inicie sesión en el panel para más detalles."
+NodeExceptionAlert: "Su 1Panel tiene {{ .num }} nodos anómalos, inicie sesión para más detalles."
+LicenseExceptionAlert: "Su 1Panel tiene {{ .num }} licencias anómalas, inicie sesión para más detalles."
+SSHAndPanelLoginAlert: "Su 1Panel detectó un inicio de sesión anómalo en el panel {{ .name }} desde {{ .ip }}, revise en el panel para más detalles."
 
 #task - runtime
 ErrInstallExtension: "Ya hay una tarea de instalación en curso, espere a que termine"
@@ -439,3 +479,12 @@ DiskUsedAlert: "El disco '{{ .name }}' de su 1Panel ha utilizado {{ .used }}. In
 ResourceAlert: "El uso promedio de {{ .name }} en {{ .time }} minutos es de {{ .used }}. Inicie sesión para más detalles."
 PanelVersionAlert: "Hay una nueva versión de 1Panel disponible. Inicie sesión para actualizar."
 PanelPwdExpirationAlert: "Su contraseña de 1Panel expirará en {{ .day }} días. Inicie sesión para más detalles."
+
+#disk
+DeviceNotFound: "Dispositivo {{ .name }} no encontrado"
+DeviceIsMounted: "El dispositivo {{ .name }} está montado, desmóntelo primero"
+PartitionDiskErr: "Error al particionar, {{ .err }}"
+FormatDiskErr: "Error al formatear disco, {{ .err }}"
+MountDiskErr: "Error al montar disco, {{ .err }}"
+UnMountDiskErr: "Error al desmontar disco, {{ .err }}"
+XfsNotFound: "No se detectó el sistema de archivos xfs, por favor instale xfsprogs primero"
