@@ -10,7 +10,7 @@
                 <el-descriptions-item :label="$t('app.webUI')">
                     <span v-if="!openConfig">
                         {{ appConfigUpdate.webUI }}
-                        <el-button type="primary" @click="openConfig = true">
+                        <el-button size="small" @click="openConfig = true">
                             {{ $t('commons.button.edit') }}
                         </el-button>
                     </span>
@@ -222,6 +222,7 @@ const acceptParams = async (props: ParamProps) => {
     paramData.value.id = props.id;
     paramModel.params = {};
     edit.value = false;
+    rules.params = {};
     await get();
     open.value = true;
     openConfig.value = false;
@@ -272,11 +273,11 @@ const get = async () => {
                 });
                 if (d.required) {
                     rules.params[d.key] = [Rules.requiredInput];
+                    if (d.rule) {
+                        rules.params[d.key].push(Rules[d.rule]);
+                    }
                 } else {
                     rules.params[d.key] = [];
-                }
-                if (d.rule) {
-                    rules.params[d.key].push(Rules[d.rule]);
                 }
             });
         }
