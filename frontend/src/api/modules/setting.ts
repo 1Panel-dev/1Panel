@@ -47,6 +47,9 @@ export const listNodeOptions = (type: string) => {
 export const listAllNodes = () => {
     return http.get<Array<Setting.NodeItem>>(`/core/nodes/all`);
 };
+export const listAllSimpleNodes = () => {
+    return http.get<Array<Setting.SimpleNodeItem>>(`/core/nodes/simple/all`);
+};
 
 export const getLicenseSmsInfo = () => {
     return http.get<Setting.SmsInfo>(`/core/licenses/sms/info`);

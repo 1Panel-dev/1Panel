@@ -70,7 +70,7 @@
                 </CardWithHeader>
                 <CardWithHeader :header="$t('commons.table.status')" class="card-interval">
                     <template #body>
-                        <Status ref="statusRef" style="margin-bottom: 33px" />
+                        <SystemStatus ref="statusRef" style="margin-bottom: 33px" />
                     </template>
                 </CardWithHeader>
                 <CardWithHeader
@@ -163,73 +163,137 @@
                 </CardWithHeader>
             </el-col>
             <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
-                <CardWithHeader :header="$t('home.systemInfo')">
-                    <template #header-r>
-                        <el-button class="h-button-setting" @click="handleCopy" link icon="CopyDocument" />
-                    </template>
-                    <template #body>
-                        <el-scrollbar>
-                            <el-descriptions :column="1" class="h-systemInfo" border>
-                                <el-descriptions-item class-name="system-content" label-class-name="system-label">
-                                    <template #label>
-                                        <span class="system-label">{{ $t('home.hostname') }}</span>
-                                    </template>
-                                    {{ baseInfo.hostname }}
-                                </el-descriptions-item>
-                                <el-descriptions-item class-name="system-content" label-class-name="system-label">
-                                    <template #label>
-                                        <span class="system-label">{{ $t('home.platformVersion') }}</span>
-                                    </template>
-                                    {{
-                                        baseInfo.platformVersion
-                                            ? baseInfo.platform + '-' + baseInfo.platformVersion
-                                            : baseInfo.platform
-                                    }}
-                                </el-descriptions-item>
-                                <el-descriptions-item class-name="system-content" label-class-name="system-label">
-                                    <template #label>
-                                        <span class="system-label">{{ $t('home.kernelVersion') }}</span>
-                                    </template>
-                                    {{ baseInfo.kernelVersion }}
-                                </el-descriptions-item>
-                                <el-descriptions-item class-name="system-content" label-class-name="system-label">
-                                    <template #label>
-                                        <span class="system-label">{{ $t('home.kernelArch') }}</span>
-                                    </template>
-                                    {{ baseInfo.kernelArch }}
-                                </el-descriptions-item>
-                                <el-descriptions-item class-name="system-content" label-class-name="system-label">
-                                    <template #label>
-                                        <span class="system-label">{{ $t('home.ip') }}</span>
-                                    </template>
-                                    {{ baseInfo.ipV4Addr }}
-                                </el-descriptions-item>
-                                <el-descriptions-item
-                                    v-if="baseInfo.httpProxy && baseInfo.httpProxy !== 'noProxy'"
-                                    class-name="system-content"
-                                    label-class-name="system-label"
-                                >
-                                    <template #label>
-                                        <span class="system-label">{{ $t('home.proxy') }}</span>
-                                        {{ baseInfo.httpProxy }}
-                                    </template>
-                                </el-descriptions-item>
-                                <el-descriptions-item class-name="system-content" label-class-name="system-label">
-                                    <template #label>
-                                        <span class="system-label">{{ $t('home.uptime') }}</span>
-                                    </template>
-                                    {{ currentInfo.timeSinceUptime }}
-                                </el-descriptions-item>
-                                <el-descriptions-item class-name="system-content" label-class-name="system-label">
-                                    <template #label>
-                                        <span class="system-label">{{ $t('home.runningTime') }}</span>
-                                    </template>
-                                    {{ loadUpTime(currentInfo.uptime) }}
-                                </el-descriptions-item>
-                            </el-descriptions>
-                        </el-scrollbar>
-                    </template>
-                </CardWithHeader>
+                <el-carousel
+                    :key="simpleNodes.length"
+                    indicator-position="none"
+                    height="346px"
+                    :arrow="showSimpleNode() ? 'hover' : 'never'"
+                >
+                    <el-carousel-item key="systemInfo">
+                        <CardWithHeader :header="$t('home.systemInfo')">
+                            <template #header-r>
+                                <el-button class="h-button-setting" @click="handleCopy" link icon="CopyDocument" />
+                            </template>
+                            <template #body>
+                                <el-scrollbar>
+                                    <el-descriptions :column="1" class="ml-5" border>
+                                        <el-descriptions-item
+                                            class-name="system-content"
+                                            label-class-name="system-label"
+                                        >
+                                            <template #label>
+                                                <span class="system-label">{{ $t('home.hostname') }}</span>
+                                            </template>
+                                            {{ baseInfo.hostname }}
+                                        </el-descriptions-item>
+                                        <el-descriptions-item
+                                            class-name="system-content"
+                                            label-class-name="system-label"
+                                        >
+                                            <template #label>
+                                                <span class="system-label">{{ $t('home.platformVersion') }}</span>
+                                            </template>
+                                            {{
+                                                baseInfo.platformVersion
+                                                    ? baseInfo.platform + '-' + baseInfo.platformVersion
+                                                    : baseInfo.platform
+                                            }}
+                                        </el-descriptions-item>
+                                        <el-descriptions-item
+                                            class-name="system-content"
+                                            label-class-name="system-label"
+                                        >
+                                            <template #label>
+                                                <span class="system-label">{{ $t('home.kernelVersion') }}</span>
+                                            </template>
+                                            {{ baseInfo.kernelVersion }}
+                                        </el-descriptions-item>
+                                        <el-descriptions-item
+                                            class-name="system-content"
+                                            label-class-name="system-label"
+                                        >
+                                            <template #label>
+                                                <span class="system-label">{{ $t('home.kernelArch') }}</span>
+                                            </template>
+                                            {{ baseInfo.kernelArch }}
+                                        </el-descriptions-item>
+                                        <el-descriptions-item
+                                            class-name="system-content"
+                                            label-class-name="system-label"
+                                        >
+                                            <template #label>
+                                                <span class="system-label">{{ $t('home.ip') }}</span>
+                                            </template>
+                                            {{ baseInfo.ipV4Addr }}
+                                        </el-descriptions-item>
+                                        <el-descriptions-item
+                                            v-if="baseInfo.httpProxy && baseInfo.httpProxy !== 'noProxy'"
+                                            class-name="system-content"
+                                            label-class-name="system-label"
+                                        >
+                                            <template #label>
+                                                <span class="system-label">{{ $t('home.proxy') }}</span>
+                                                {{ baseInfo.httpProxy }}
+                                            </template>
+                                        </el-descriptions-item>
+                                        <el-descriptions-item
+                                            class-name="system-content"
+                                            label-class-name="system-label"
+                                        >
+                                            <template #label>
+                                                <span class="system-label">{{ $t('home.uptime') }}</span>
+                                            </template>
+                                            {{ currentInfo.timeSinceUptime }}
+                                        </el-descriptions-item>
+                                        <el-descriptions-item
+                                            class-name="system-content"
+                                            label-class-name="system-label"
+                                        >
+                                            <template #label>
+                                                <span class="system-label">{{ $t('home.runningTime') }}</span>
+                                            </template>
+                                            {{ loadUpTime(currentInfo.uptime) }}
+                                        </el-descriptions-item>
+                                    </el-descriptions>
+                                </el-scrollbar>
+                            </template>
+                        </CardWithHeader>
+                    </el-carousel-item>
+                    <el-carousel-item key="simpleNode" v-if="showSimpleNode()">
+                        <CardWithHeader :header="$t('setting.panel')">
+                            <template #body>
+                                <el-scrollbar height="266px">
+                                    <div class="simple-node cursor-pointer" v-for="row in simpleNodes" :key="row.id">
+                                        <el-row :gutter="5">
+                                            <el-col :span="21">
+                                                <div class="name">
+                                                    {{ row.name }}
+                                                </div>
+                                                <div class="detail">
+                                                    {{ loadSource(row) }}
+                                                </div>
+                                            </el-col>
+
+                                            <el-col :span="1">
+                                                <el-button
+                                                    @click="jumpPanel(row)"
+                                                    size="small"
+                                                    class="visit"
+                                                    round
+                                                    plain
+                                                    type="primary"
+                                                >
+                                                    {{ $t('commons.button.visit') }}
+                                                </el-button>
+                                            </el-col>
+                                        </el-row>
+                                        <div class="h-app-divider" />
+                                    </div>
+                                </el-scrollbar>
+                            </template>
+                        </CardWithHeader>
+                    </el-carousel-item>
+                </el-carousel>
 
                 <AppLauncher ref="appRef" class="card-interval" />
             </el-col>
@@ -242,7 +306,7 @@
 
 <script lang="ts" setup>
 import { onMounted, onBeforeUnmount, ref, reactive } from 'vue';
-import Status from '@/views/home/status/index.vue';
+import SystemStatus from '@/views/home/status/index.vue';
 import AppLauncher from '@/views/home/app/index.vue';
 import VCharts from '@/components/v-charts/index.vue';
 import LicenseImport from '@/components/license-import/index.vue';
@@ -254,7 +318,7 @@ import { dateFormatForSecond, computeSize, computeSizeFromKBs, loadUpTime, jumpT
 import { useRouter } from 'vue-router';
 import { loadBaseInfo, loadCurrentInfo } from '@/api/modules/dashboard';
 import { getIOOptions, getNetworkOptions } from '@/api/modules/host';
-import { getSettingInfo, loadUpgradeInfo } from '@/api/modules/setting';
+import { getSettingInfo, listAllSimpleNodes, loadUpgradeInfo } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
 import { storeToRefs } from 'pinia';
 import { routerToFileWithPath, routerToPath } from '@/utils/router';
@@ -280,6 +344,7 @@ const netBytesRecvs = ref<Array<number>>([]);
 const timeIODatas = ref<Array<string>>([]);
 const timeNetDatas = ref<Array<string>>([]);
 
+const simpleNodes = ref([]);
 const ioOptions = ref();
 const netOptions = ref();
 
@@ -376,6 +441,11 @@ const onLoadNetworkOptions = async () => {
     searchInfo.netOption = globalStore.defaultNetwork || (netOptions.value && netOptions.value[0]);
 };
 
+const onLoadSimpleNode = async () => {
+    const res = await listAllSimpleNodes();
+    simpleNodes.value = res.data || [];
+};
+
 const onLoadIOOptions = async () => {
     const res = await getIOOptions();
     ioOptions.value = res.data;
@@ -407,6 +477,7 @@ const onLoadBaseInfo = async (isInit: boolean, range: string) => {
                 }
                 if (isActive.value && !globalStore.isOnRestart) {
                     await onLoadCurrentInfo();
+                    await onLoadSimpleNode();
                 }
             } catch {
                 clearInterval(Number(timer));
@@ -421,6 +492,14 @@ const quickJump = (item: any) => {
         return routerToFileWithPath(item.detail);
     }
     return routerToPath(item.router);
+};
+
+const showSimpleNode = () => {
+    return globalStore.isMasterProductPro && simpleNodes.value?.length !== 0;
+};
+
+const jumpPanel = (row: any) => {
+    window.open(row.addr, '_blank', 'noopener,noreferrer');
 };
 
 const onLoadCurrentInfo = async () => {
@@ -569,6 +648,24 @@ const loadSafeStatus = async () => {
     isSafety.value = res.data.securityEntrance;
 };
 
+const loadSource = (row: any) => {
+    if (row.status !== 'Healthy') {
+        return '-';
+    }
+    return (
+        row.cpuTotal +
+        ' ' +
+        i18n.global.t('commons.units.core') +
+        ' (' +
+        row.cpuUsedPercent?.toFixed(2) +
+        '%) / ' +
+        computeSize(row.memoryTotal) +
+        ' (' +
+        row.memoryUsedPercent?.toFixed(2) +
+        '%)'
+    );
+};
+
 const onFocus = () => {
     isActive.value = true;
 };
@@ -588,6 +685,7 @@ const fetchData = () => {
     onLoadNetworkOptions();
     onLoadIOOptions();
     onLoadBaseInfo(true, 'all');
+    onLoadSimpleNode();
 };
 
 onBeforeRouteUpdate((to, from, next) => {
@@ -661,6 +759,31 @@ onBeforeUnmount(() => {
     font-size: 13px !important;
     border: none !important;
     width: 100% !important;
+}
+
+.simple-node {
+    padding: 10px 15px 10px 0px;
+    margin: 3px 10px 3px 20px;
+    &:hover {
+        background-color: rgba(0, 94, 235, 0.03);
+    }
+    .name {
+        font-weight: 500 !important;
+        font-size: 16px !important;
+        color: var(--panel-text-color);
+    }
+    .detail {
+        font-size: 12px !important;
+    }
+    .visit {
+        margin-bottom: -25px;
+    }
+}
+
+.h-app-divider {
+    margin-top: 3px;
+    border: 0;
+    border-top: var(--panel-border);
 }
 
 .monitor-tags {

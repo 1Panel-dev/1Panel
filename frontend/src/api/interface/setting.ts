@@ -241,6 +241,18 @@ export namespace Setting {
         isBound: boolean;
         name: string;
     }
+    export interface SimpleNodeItem {
+        id: number;
+        name: string;
+        addr: string;
+        description:  string;
+        systemVersion: string;
+        securityEntrance: string;
+        cpuUsedPercent: number;
+        cpuTotal: number;
+        memoryTotal: number;
+        memoryUsedPercent: number;
+    }
     export interface ReleasesNotes {
         Version: string;
         CreatedAt: string;
