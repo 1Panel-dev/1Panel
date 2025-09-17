@@ -380,6 +380,7 @@ const message = {
         tamper: 'Bukti Pengubahsuaian',
         app: 'Aplikasi',
         msgCenter: 'Pusat Tugas',
+        disk: 'Disk',
     },
     home: {
         recommend: 'cadangan',

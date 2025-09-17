@@ -372,6 +372,7 @@ const message = {
         tamper: '改ざん防止',
         app: 'アプリケーション',
         msgCenter: 'タスクセンター',
+        disk: 'ディスク',
     },
     home: {
         recommend: 'おすすめ',

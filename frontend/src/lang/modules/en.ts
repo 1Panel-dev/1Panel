@@ -383,6 +383,7 @@ const message = {
         tamper: 'Tamper-proof',
         app: 'Application',
         msgCenter: 'Task Center',
+        disk: 'Disk',
     },
     home: {
         recommend: 'recommend',
@@ -1626,6 +1627,8 @@ const message = {
         sessionTimeoutHelper:
             'The panel will automatically be logged out if there is no operation for more than {0} second(s).',
         systemIP: 'System address',
+        systemIPHelper:
+            'The address will be used for application redirection, container access, and other functions. Each node can be configured with a different address.',
         proxy: 'Server proxy',
         proxyHelper: 'It will be effective in the following scenarios after you set up the proxy server:',
         proxyHelper1:

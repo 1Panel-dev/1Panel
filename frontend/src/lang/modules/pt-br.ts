@@ -378,6 +378,7 @@ const message = {
         tamper: 'À prova de violação',
         app: 'Aplicativo',
         msgCenter: 'Central de Tarefas',
+        disk: 'Disco',
     },
     home: {
         recommend: 'recomendar',

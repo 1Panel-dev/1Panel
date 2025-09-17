@@ -323,6 +323,7 @@ const languageOptions = ref([
     { value: 'ru', label: 'Русский' },
     { value: 'ms', label: 'Bahasa Melayu' },
     { value: 'tr', label: 'Turkish' },
+    { value: 'es-ES', label: 'España - Español' },
 ]);
 
 if (globalStore.isIntl) {

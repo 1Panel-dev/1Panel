@@ -373,6 +373,7 @@ const message = {
         tamper: '防篡改',
         app: '應用',
         msgCenter: '任務中心',
+        disk: '磁碟',
     },
     home: {
         recommend: '推薦',

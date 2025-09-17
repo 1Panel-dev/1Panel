@@ -297,6 +297,8 @@ function handleCommand(command: string) {
         dropdownText.value = 'Bahasa Melayu';
     } else if (command === 'tr') {
         dropdownText.value = 'Turkish';
+    } else if (command === 'es-ES') {
+        dropdownText.value = 'España - Español';
     }
 }
 

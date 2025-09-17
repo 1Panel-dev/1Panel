@@ -16,7 +16,7 @@ import ptBR from 'element-plus/es/locale/lang/pt-br';
 import ru from 'element-plus/es/locale/lang/ru';
 import ko from 'element-plus/es/locale/lang/ko';
 import tr from 'element-plus/es/locale/lang/tr';
-import esES from 'element-plus/es/locale/lang/es-es';    
+import esES from 'element-plus/es/locale/lang/es';
 import { useTheme } from '@/global/use-theme';
 useTheme();
 

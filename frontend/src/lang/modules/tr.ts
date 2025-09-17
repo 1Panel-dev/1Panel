@@ -1643,6 +1643,8 @@ const message = {
         sessionTimeoutError: 'Minimum oturum zaman aşımı 300 saniyedir',
         sessionTimeoutHelper: 'Panel, {0} saniye boyunca işlem yapılmazsa otomatik olarak oturumu kapatır.',
         systemIP: 'Sistem adresi',
+        systemIPHelper:
+            'Adres, uygulama yönlendirmesi, konteyner erişimi ve diğer işlevler için kullanılacaktır. Her düğüm farklı bir adresle yapılandırılabilir.',
         proxy: 'Sunucu vekili',
         proxyHelper: 'Vekil sunucuyu ayarladıktan sonra aşağıdaki senaryolarda etkili olacaktır:',
         proxyHelper1: 'Uygulama mağazasından kurulum paketi indirme ve senkronizasyon (Yalnızca Profesyonel sürüm)',
