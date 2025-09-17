@@ -81,6 +81,7 @@ const message = {
             sure: 'Confirmar',
             show: 'Exibir',
             hide: 'Ocultar',
+            visit: 'Visitar',
         },
         operate: {
             start: 'Iniciar',
@@ -3493,6 +3494,8 @@ const message = {
                 'Detectamos que este nó não está vinculado a uma licença. Por favor vincule no menu [Configurações do Painel - Licença] e tente novamente!',
             memTotal: 'Memória Total',
             nodeManagement: 'Gerenciamento de Nó',
+            panelManagement: 'Gerenciamento de Painel',
+            addPanel: 'Adicionar Painel',
             addNode: 'Adicionar Nó',
             connInfo: 'Informações de Conexão',
             nodeInfo: 'Informações do Nó',
@@ -3550,6 +3553,7 @@ const message = {
             fixAPI: 'Verifique os logs do nó e confirme se as portas do firewall estão devidamente abertas.',
             forceDelete: 'Excluir Forçadamente',
             operateHelper: 'A operação {0} será realizada nos seguintes nós, deseja continuar?',
+            operatePanelHelper: 'A operação {0} será executada nos painéis a seguir. Continuar?',
             forceDeleteHelper:
                 'Excluir forçadamente ignorará erros de exclusão do nó e removerá os metadados do banco de dados',
             uninstall: 'Excluir dados do nó',

@@ -22,6 +22,7 @@ func Init() {
 		migrations.DeleteXpackHideMenu,
 		migrations.AddCronjobGroup,
 		migrations.AddDiskMenu,
+		migrations.AddSimpleNodeGroup,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

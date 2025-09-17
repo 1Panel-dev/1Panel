@@ -24,16 +24,13 @@
         </el-alert>
         <el-form :model="form" ref="formRef" @submit.prevent v-loading="loading" label-position="top" :rules="rules">
             <el-form-item :label="$t('setting.apiKey')" prop="apiKey">
-                <el-input v-model="form.apiKey" readonly>
-                    <template #suffix>
-                        <CopyButton :content="form.apiKey" class="w-30" />
-                    </template>
-                    <template #append>
-                        <el-button @click="resetApiKey()">
-                            {{ $t('commons.button.reset') }}
-                        </el-button>
-                    </template>
-                </el-input>
+                <el-input v-model="form.apiKey" readonly style="width: calc(100% - 225px)" />
+                <el-button-group>
+                    <CopyButton class="copy_button" :isIcon="false" :content="form.apiKey" />
+                    <el-button @click="resetApiKey()">
+                        {{ $t('commons.button.reset') }}
+                    </el-button>
+                </el-button-group>
                 <span class="input-help">{{ $t('setting.apiKeyHelper') }}</span>
             </el-form-item>
             <el-form-item :label="$t('setting.ipWhiteList')" prop="ipWhiteList">
@@ -188,3 +185,14 @@ defineExpose({
     acceptParams,
 });
 </script>
+
+<style lang="scss" scoped>
+.copy_button {
+    border-radius: 0px;
+    border-left-width: 0px;
+}
+:deep(.el-input__wrapper) {
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+}
+</style>

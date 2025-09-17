@@ -81,6 +81,7 @@ const message = {
             sure: 'Sahkan',
             show: 'Tunjukkan',
             hide: 'Sembunyikan',
+            visit: 'Lawati',
         },
         operate: {
             start: 'Mula',
@@ -3475,6 +3476,8 @@ const message = {
                 'Terdeteksi nod ini tidak terikat pada lesen. Sila ikat dalam menu [Tetapan Panel - Lesen] dan cuba lagi!',
             memTotal: 'Jumlah Memori',
             nodeManagement: 'Pengurusan Nod',
+            panelManagement: 'Pengurusan Panel',
+            addPanel: 'Tambah Panel',
             addNode: 'Tambah Nod',
             connInfo: 'Maklumat Sambungan',
             nodeInfo: 'Maklumat Nod',
@@ -3533,6 +3536,7 @@ const message = {
             fixAPI: 'Semak log nod dan periksa sama ada port firewall dibuka dengan betul.',
             forceDelete: 'Hapus Secara Paksa',
             operateHelper: 'Operasi {0} akan dilakukan pada nod berikut, adakah anda ingin meneruskan?',
+            operatePanelHelper: 'Operasi {0} akan dilakukan pada panel berikut. Teruskan?',
             forceDeleteHelper:
                 'Hapus secara paksa akan mengabaikan ralat penghapusan nod dan menghapus metadata pangkalan data',
             uninstall: 'Padam data nod',

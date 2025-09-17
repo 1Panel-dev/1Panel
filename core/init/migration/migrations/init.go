@@ -525,3 +525,13 @@ var AddDiskMenu = &gormigrate.Migration{
 		}, "7", tx)
 	},
 }
+
+var AddSimpleNodeGroup = &gormigrate.Migration{
+	ID: "20250916-add-simple-node-group",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.Create(&model.Group{Name: "Default", Type: "SimpleNode", IsDefault: true}).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}

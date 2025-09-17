@@ -1,6 +1,8 @@
 package common
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"fmt"
 	mathRand "math/rand"
 	"net"
@@ -34,6 +36,12 @@ func RandStrAndNum(n int) string {
 		b[i] = charset[randGen.Intn(len(charset)-1)]
 	}
 	return (string(b))
+}
+
+func Md5(val string) string {
+	hash := md5.New()
+	hash.Write([]byte(val))
+	return hex.EncodeToString(hash.Sum(nil))
 }
 
 func LoadTimeZoneByCmd() string {
