@@ -1882,6 +1882,7 @@ const message = {
         backupRecoverMessage: '압축 또는 압축 해제 비밀번호를 입력하세요 (설정하지 않으려면 비워 두세요)',
     },
     license: {
+        offLine: '오프라인 버전',
         community: 'OSS',
         oss: '오픈 소스 소프트웨어',
         pro: 'Pro',

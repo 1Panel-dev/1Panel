@@ -9,6 +9,8 @@
 
 <script lang="ts" setup>
 import i18n from '@/lang';
+import { useGlobalStore } from '@/composables/useGlobalStore';
+const { isOffLine } = useGlobalStore();
 
 const buttons = [
     {
@@ -40,4 +42,10 @@ const buttons = [
         path: '/settings/about',
     },
 ];
+
+onMounted(() => {
+    if (isOffLine.value) {
+        buttons.splice(5, 1);
+    }
+});
 </script>

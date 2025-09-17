@@ -137,6 +137,7 @@ func (b *BaseApi) GetLoginSetting(c *gin.Context) {
 	res := &dto.LoginSetting{
 		IsDemo:    global.CONF.Base.IsDemo,
 		IsIntl:    global.CONF.Base.IsIntl,
+		IsOffLine: global.CONF.Base.IsOffLine,
 		Language:  settingInfo.Language,
 		MenuTabs:  settingInfo.MenuTabs,
 		PanelName: settingInfo.PanelName,

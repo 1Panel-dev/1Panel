@@ -146,6 +146,8 @@ import { Container } from '@/api/interface/container';
 import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 import { computeSizeFromMB } from '@/utils/util';
 import { loadResourceLimit } from '@/api/modules/container';
+import { useGlobalStore } from '@/composables/useGlobalStore';
+const { isOffLine } = useGlobalStore();
 
 interface ClusterProps {
     key: string;
@@ -281,6 +283,9 @@ const initForm = async (appKey: string) => {
         const defaultVersion = appVersions.value[0];
         formData.value.version = defaultVersion;
         getVersionDetail(defaultVersion);
+    }
+    if (isOffLine.value) {
+        formData.value.pullImage = false;
     }
 };
 

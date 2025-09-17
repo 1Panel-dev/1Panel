@@ -2011,6 +2011,7 @@ const message = {
         backupRecoverMessage: 'Lütfen sıkıştırma veya sıkıştırma açma parolasını girin (ayarlamamak için boş bırakın)',
     },
     license: {
+        offLine: 'Çevrimdışı Sürüm',
         community: 'OSS',
         oss: 'Açık Kaynak Yazılım',
         pro: 'Pro',

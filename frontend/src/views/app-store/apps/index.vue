@@ -7,7 +7,7 @@
             </template>
             <template #leftToolBar>
                 <el-button @click="sync" type="primary" plain :disabled="syncing">
-                    <span>{{ syncCustomAppstore ? $t('app.syncCustomApp') : $t('app.syncAppList') }}</span>
+                    <span>{{ syncCustomAppstore || isOffLine ? $t('app.syncCustomApp') : $t('app.syncAppList') }}</span>
                 </el-button>
                 <el-button @click="syncLocal" type="primary" plain :disabled="syncing" class="ml-2">
                     {{ $t('app.syncLocalApp') }}
@@ -74,11 +74,9 @@ import { searchApp, syncApp, syncCutomAppStore, syncLocalApp, getCurrentNodeCust
 import Install from '../detail/install/index.vue';
 import router from '@/routers';
 import { MsgSuccess } from '@/utils/message';
-import { GlobalStore } from '@/store';
 import { newUUID } from '@/utils/util';
 import Detail from '../detail/index.vue';
 import TaskLog from '@/components/log/task/index.vue';
-import { storeToRefs } from 'pinia';
 import bus from '@/global/bus';
 import Tags from '@/views/app-store/components/tag.vue';
 import DockerStatus from '@/views/container/docker-status/index.vue';
@@ -86,9 +84,8 @@ import NoApp from '@/views/app-store/apps/no-app/index.vue';
 import AppCard from '@/views/app-store/apps/app/index.vue';
 import MainDiv from '@/components/main-div/index.vue';
 import { jumpToInstall } from '@/utils/app';
-
-const globalStore = GlobalStore();
-const { isProductPro } = storeToRefs(globalStore);
+import { useGlobalStore } from '@/composables/useGlobalStore';
+const { globalStore, isProductPro, isOffLine } = useGlobalStore();
 
 const mobile = computed(() => {
     return globalStore.isMobile();
@@ -183,7 +180,7 @@ const sync = async () => {
     };
     try {
         let res;
-        if (isProductPro.value && syncCustomAppstore.value) {
+        if (isOffLine.value || (isProductPro.value && syncCustomAppstore.value)) {
             res = await syncCutomAppStore(syncReq);
         } else {
             res = await syncApp(syncReq);
@@ -248,6 +245,9 @@ onMounted(async () => {
         if (res && res.data) {
             syncCustomAppstore.value = res.data.status === 'Enable';
         }
+    }
+    if (isOffLine.value) {
+        syncCustomAppstore.value = true;
     }
     mainHeight.value = window.innerHeight - 380;
     window.onresize = () => {

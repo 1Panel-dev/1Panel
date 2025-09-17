@@ -1994,6 +1994,7 @@ const message = {
         backupRecoverMessage: 'Please enter the compression or decompression password (leave blank to not set)',
     },
     license: {
+        offLine: 'Offline',
         community: 'OSS',
         oss: 'Open Source Software',
         pro: 'Pro',

@@ -1957,6 +1957,7 @@ const message = {
             'Пожалуйста, введите пароль для сжатия или распаковки (оставьте пустым, чтобы не устанавливать)',
     },
     license: {
+        offLine: 'Офлайн версия',
         community: 'OSS',
         oss: 'Open Source Software',
         pro: 'Pro',

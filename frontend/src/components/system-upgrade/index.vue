@@ -18,7 +18,15 @@
                 </span>
                 <div class="flex flex-wrap items-center">
                     <el-link underline="never" type="primary" @click="toLxware">
-                        {{ $t(!isMasterPro ? 'license.community' : 'license.pro') }}
+                        <span v-if="isMasterPro">
+                            {{ $t('license.pro') }}
+                        </span>
+                        <span v-else-if="isOffLine">
+                            {{ $t('license.offLine') }}
+                        </span>
+                        <span v-else>
+                            {{ $t('license.community') }}
+                        </span>
                     </el-link>
                     <el-link
                         underline="never"
@@ -56,7 +64,7 @@ import { GlobalStore } from '@/store';
 import { storeToRefs } from 'pinia';
 
 const globalStore = GlobalStore();
-const { docsUrl } = storeToRefs(globalStore);
+const { docsUrl, isOffLine } = storeToRefs(globalStore);
 const upgradeRef = ref();
 const releasesRef = ref();
 const isMasterPro = computed(() => {

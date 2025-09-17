@@ -91,6 +91,7 @@ func Init() {
 	global.CONF.Base.InstallDir = baseDir
 	global.CONF.Base.IsDemo = v.GetBool("base.is_demo")
 	global.CONF.Base.IsIntl = v.GetBool("base.is_intl")
+	global.CONF.Base.IsOffLine = v.GetBool("base.is_offline")
 	global.CONF.Base.Version = version
 	global.CONF.Base.Username = username
 	global.CONF.Base.Password = password

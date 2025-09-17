@@ -1970,6 +1970,7 @@ const message = {
             'Sila masukkan kata laluan mampatan atau nyahmampatan (biarkan kosong jika tidak menetapkan)',
     },
     license: {
+        offLine: 'Versi Luar Talian',
         community: 'OSS',
         oss: 'Perisian Sumber Terbuka',
         pro: 'Pro',

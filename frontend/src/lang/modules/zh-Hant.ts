@@ -1867,6 +1867,7 @@ const message = {
         backupRecoverMessage: '請輸入壓縮或解壓縮密碼（留空則不設定）',
     },
     license: {
+        offLine: '離線版',
         community: '社區版',
         oss: '社區版',
         pro: '專業版：',

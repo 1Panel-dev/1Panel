@@ -422,6 +422,7 @@ const getSetting = async () => {
         handleCommand(loginForm.language);
         isIntl.value = res.data.isIntl;
         globalStore.isIntl = isIntl.value;
+        globalStore.isOffLine = res.data.isOffLine;
 
         document.title = res.data.panelName;
         i18n.locale.value = res.data.language;

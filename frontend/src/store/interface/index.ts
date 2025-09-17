@@ -18,11 +18,11 @@ export interface ThemeConfigProp {
 }
 
 export interface Watermark {
-    color: string,
-    fontSize: number,
-    content: string,
-    rotate: number,
-    gap: number,
+    color: string;
+    fontSize: number;
+    content: string;
+    rotate: number;
+    gap: number;
 }
 
 export interface GlobalState {
@@ -50,6 +50,7 @@ export interface GlobalState {
     isIntl: boolean;
     productProExpires: number;
     isMasterProductPro: boolean;
+    isOffLine: boolean;
 
     currentNode: string;
     currentNodeAddr: string;

@@ -14,6 +14,7 @@ type Base struct {
 	Mode       string `mapstructure:"mode"` // xpack [ Enable / Disable ]
 	IsDemo     bool   `mapstructure:"is_demo"`
 	InstallDir string `mapstructure:"install_dir"`
+	IsOffLine  bool   `mapstructure:"is_offline"`
 }
 
 type RemoteURL struct {

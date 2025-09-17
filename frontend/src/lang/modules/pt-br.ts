@@ -1958,6 +1958,7 @@ const message = {
             'Por favor, insira a senha de compressão ou descompressão (deixe em branco para não definir)',
     },
     license: {
+        offLine: 'Versão Offline',
         community: 'Gratuito',
         oss: 'Open Source Software',
         pro: 'Pro',

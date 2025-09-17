@@ -38,6 +38,9 @@ func NewIUpgradeService() IUpgradeService {
 }
 
 func (u *UpgradeService) SearchUpgrade() (*dto.UpgradeInfo, error) {
+	if global.CONF.Base.IsOffLine {
+		return &dto.UpgradeInfo{}, nil
+	}
 	var upgrade dto.UpgradeInfo
 	currentVersion, err := settingRepo.Get(repo.WithByKey("SystemVersion"))
 	if err != nil {

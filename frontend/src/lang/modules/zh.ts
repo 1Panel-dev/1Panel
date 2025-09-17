@@ -1860,6 +1860,7 @@ const message = {
         backupRecoverMessage: '请输入压缩或解压缩密码（留空则不设置）',
     },
     license: {
+        offLine: '离线版',
         community: '社区版',
         oss: '社区版',
         pro: '专业版',

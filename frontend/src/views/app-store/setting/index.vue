@@ -39,7 +39,7 @@
                                 @change="updateConfig('UpgradeBackup', config.upgradeBackup)"
                             />
                         </el-form-item>
-                        <CustomSetting v-if="globalStore.isProductPro" />
+                        <CustomSetting v-if="isProductPro" />
                         <span class="input-help logText" v-else>
                             {{ $t('xpack.customApp.licenseHelper') }}
                             <el-link class="link" @click="toUpload" type="primary">
@@ -58,10 +58,11 @@
 import { getCurrentNodeCustomAppConfig } from '@/api/modules/app';
 import { getAppStoreConfig, updateAppStoreConfig } from '@/api/modules/setting';
 import { FormRules } from 'element-plus';
-import { GlobalStore } from '@/store';
 import { MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
 import { defineAsyncComponent } from 'vue';
+import { useGlobalStore } from '@/composables/useGlobalStore';
+const { isProductPro, isMasterProductPro } = useGlobalStore();
 
 const CustomSetting = defineAsyncComponent(async () => {
     const modules = import.meta.glob('@/xpack/views/appstore/index.vue');
@@ -72,7 +73,6 @@ const CustomSetting = defineAsyncComponent(async () => {
     return { template: '<div></div>' };
 });
 
-const globalStore = GlobalStore();
 const rules = ref<FormRules>({});
 const config = ref({
     uninstallDeleteImage: '',
@@ -107,7 +107,7 @@ const toUpload = () => {
 };
 
 const getNodeConfig = async () => {
-    if (globalStore.isMasterProductPro) {
+    if (isMasterProductPro.value) {
         return;
     }
     const res = await getCurrentNodeCustomAppConfig();

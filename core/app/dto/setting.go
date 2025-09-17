@@ -232,6 +232,7 @@ type AppstoreConfig struct {
 type LoginSetting struct {
 	IsDemo    bool   `json:"isDemo"`
 	IsIntl    bool   `json:"isIntl"`
+	IsOffLine bool   `json:"isOffLine"`
 	Language  string `json:"language"`
 	MenuTabs  string `json:"menuTabs"`
 	PanelName string `json:"panelName"`

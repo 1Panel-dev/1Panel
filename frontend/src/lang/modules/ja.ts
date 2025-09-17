@@ -1911,6 +1911,7 @@ const message = {
         backupRecoverMessage: '圧縮または減圧パスワードを入力してください（設定しないように空白のままにしてください）',
     },
     license: {
+        offLine: 'オフライン版',
         community: '無料',
         oss: '無料',
         pro: '専門',
