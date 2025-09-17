@@ -3,6 +3,7 @@ package service
 import (
 	"bytes"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/user"
@@ -207,6 +208,10 @@ func (u *SSHService) Update(req dto.SSHUpdate) error {
 		}
 		if err := NewIFirewallService().UpdatePortRule(ruleItem); err != nil {
 			global.LOG.Errorf("reset firewall rules %s -> %s failed, err: %v", req.OldValue, req.NewValue, err)
+		}
+		newPort, _ := strconv.Atoi(req.NewValue)
+		if err := updateLocalConn(uint(newPort)); err != nil {
+			global.LOG.Errorf("update local conn for terminal failed, err: %v", err)
 		}
 	}
 
@@ -737,4 +742,29 @@ func loadEncryptioMode(content string) string {
 		return "dsa"
 	}
 	return ""
+}
+
+func updateLocalConn(newPort uint) error {
+	conn, _ := settingRepo.GetValueByKey("LocalSSHConn")
+	if len(conn) == 0 {
+		return nil
+	}
+	connItem, err := encrypt.StringDecrypt(conn)
+	if err != nil {
+		return err
+	}
+	var data dto.SSHConnData
+	if err := json.Unmarshal([]byte(connItem), &data); err != nil {
+		return err
+	}
+	data.Port = newPort
+	connNew, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+	connNewItem, err := encrypt.StringEncrypt(string(connNew))
+	if err != nil {
+		return err
+	}
+	return settingRepo.Update("LocalSSHConn", connNewItem)
 }
