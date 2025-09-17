@@ -10,6 +10,11 @@ import (
 
 func BindDomain() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		localRequest := c.GetBool("LOCAL_REQUEST")
+		if localRequest {
+			c.Next()
+			return
+		}
 		settingRepo := repo.NewISettingRepo()
 		status, err := settingRepo.Get(repo.WithByKey("BindDomain"))
 		if err != nil {

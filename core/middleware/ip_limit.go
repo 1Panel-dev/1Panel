@@ -11,6 +11,14 @@ import (
 
 func WhiteAllow() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		tokenString := c.GetHeader("X-Panel-Local-Token")
+		clientIP := c.ClientIP()
+		if clientIP == "127.0.0.1" && tokenString != "" && c.Request.URL.Path == "/api/v2/core/xpack/sync/ssl" {
+			c.Set("LOCAL_REQUEST", true)
+			c.Next()
+			return
+		}
+
 		settingRepo := repo.NewISettingRepo()
 		status, err := settingRepo.Get(repo.WithByKey("AllowIPs"))
 		if err != nil {
@@ -22,7 +30,6 @@ func WhiteAllow() gin.HandlerFunc {
 			c.Next()
 			return
 		}
-		clientIP := c.ClientIP()
 		for _, ip := range strings.Split(status.Value, ",") {
 			if len(ip) == 0 {
 				continue
