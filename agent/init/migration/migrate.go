@@ -42,6 +42,7 @@ func InitAgentDB() {
 		migrations.InitLocalSSHConn,
 		migrations.InitLocalSSHShow,
 		migrations.InitRecordStatus,
+		migrations.AddShowNameForQuickJump,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

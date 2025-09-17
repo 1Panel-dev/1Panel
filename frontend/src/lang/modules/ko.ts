@@ -378,6 +378,7 @@ const message = {
     home: {
         recommend: '추천',
         dir: '디렉토리',
+        alias: '별칭',
         quickDir: '빠른 디렉토리',
         database: '데이터베이스 - 전체',
         restart_1panel: '패널 재시작',

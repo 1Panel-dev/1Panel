@@ -53,12 +53,12 @@
                                     <span>{{ $t(item.title, 2) }}</span>
                                     <div class="count">
                                         <el-tooltip
-                                            v-if="item.detail.length > 20"
+                                            v-if="item.alias || item.detail.length > 20"
                                             :content="item.detail"
                                             placement="bottom"
                                         >
                                             <span @click="quickJump(item)">
-                                                {{ item.detail.substring(0, 18) + '...' }}
+                                                {{ item.alias || item.detail.substring(0, 18) + '...' }}
                                             </span>
                                         </el-tooltip>
                                         <span @click="quickJump(item)" v-else>{{ item.detail }}</span>

@@ -391,6 +391,7 @@ const message = {
     home: {
         recommend: 'tavsiye etmek',
         dir: 'dizin',
+        alias: 'Takma Ad',
         quickDir: 'Hızlı Dizin',
         database: 'Veritabanı - Tümü',
         restart_1panel: 'Paneli yeniden başlat',

@@ -382,6 +382,7 @@ const message = {
     home: {
         recommend: 'recomendar',
         dir: 'dir',
+        alias: 'Apelido',
         quickDir: 'Diretório Rápido',
         database: 'Banco de Dados - Todos',
         restart_1panel: 'Reiniciar painel',

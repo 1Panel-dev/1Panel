@@ -376,6 +376,7 @@ const message = {
     home: {
         recommend: 'おすすめ',
         dir: 'ディレクトリ',
+        alias: 'エイリアス',
         quickDir: 'クイックディレクトリ',
         database: 'データベース - すべて',
         restart_1panel: 'パネルを再起動します',

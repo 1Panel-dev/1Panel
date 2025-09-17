@@ -576,3 +576,10 @@ var InitRecordStatus = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddShowNameForQuickJump = &gormigrate.Migration{
+	ID: "20250918-add-show-name-for-quick-jump",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(&model.QuickJump{})
+	},
+}

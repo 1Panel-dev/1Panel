@@ -11,6 +11,7 @@ export namespace Dashboard {
     export interface QuickJump {
         id: number;
         name: string;
+        alias: string;
         title: string;
         detail: string;
         recommend: number;

@@ -379,6 +379,7 @@ const message = {
     home: {
         recommend: 'рекомендовать',
         dir: 'каталог',
+        alias: 'Псевдоним',
         quickDir: 'Быстрый каталог',
         database: 'База данных - Все',
         restart_1panel: 'Перезапустить панель',

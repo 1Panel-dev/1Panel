@@ -14,10 +14,18 @@
                             <el-input v-model="row.detail" class="w-full">
                                 <template #prepend>
                                     <el-button
+                                        class="w-16"
                                         v-if="row.name === 'File' && row.isShow"
                                         icon="Folder"
                                         @click="fileRef.acceptParams({ path: row.detail, isAll: true })"
                                     />
+                                </template>
+                            </el-input>
+                            <el-input v-model="row.alias" class="mt-1">
+                                <template #prepend>
+                                    <el-button class="w-16">
+                                        {{ $t('home.alias') }}
+                                    </el-button>
                                 </template>
                             </el-input>
                         </div>

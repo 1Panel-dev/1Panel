@@ -384,6 +384,7 @@ const message = {
     home: {
         recommend: 'cadangan',
         dir: 'direktori',
+        alias: 'Alias',
         quickDir: 'Direktori Pantas',
         database: 'Pangkalan Data - Semua',
         restart_1panel: 'Mulakan semula panel',

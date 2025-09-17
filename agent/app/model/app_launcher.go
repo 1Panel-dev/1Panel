@@ -8,6 +8,7 @@ type AppLauncher struct {
 type QuickJump struct {
 	BaseModel
 	Name      string `json:"name"`
+	Alias     string `json:"alias"`
 	Title     string `json:"title"`
 	Detail    string `json:"detail"`
 	Recommend int    `json:"recommend"`

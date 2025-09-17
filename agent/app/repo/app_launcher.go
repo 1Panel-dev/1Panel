@@ -95,6 +95,7 @@ func (u *LauncherRepo) UpdateQuicks(quicks []model.QuickJump) error {
 		if err := tx.Model(&model.QuickJump{}).Where("id = ?", item.ID).Updates(map[string]interface{}{
 			"is_show": item.IsShow,
 			"detail":  item.Detail,
+			"alias":   item.Alias,
 		}).Error; err != nil {
 			tx.Rollback()
 			return err

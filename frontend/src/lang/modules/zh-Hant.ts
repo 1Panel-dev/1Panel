@@ -377,6 +377,7 @@ const message = {
     home: {
         recommend: '推薦',
         dir: '目錄',
+        alias: '別名',
         quickDir: '快捷目錄',
         database: '資料庫 - 全部',
         restart_1panel: '重啟面板',

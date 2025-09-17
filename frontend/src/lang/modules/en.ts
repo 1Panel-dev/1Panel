@@ -387,6 +387,7 @@ const message = {
     home: {
         recommend: 'recommend',
         dir: 'dir',
+        alias: 'Alias',
         quickDir: 'Quick Dir',
         database: 'Database - All',
         restart_1panel: 'Restart panel',
