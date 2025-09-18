@@ -9,9 +9,9 @@
         :autoClose="false"
     >
         <template #content>
-            <el-form ref="formRef" :model="form" label-position="top">
+            <el-form ref="formRef" :model="form" label-position="top" @submit.prevent>
                 <el-form-item :label="$t('commons.table.user')" prop="user">
-                    <el-input placeholder="root" clearable v-model="form.user">
+                    <el-input placeholder="root" clearable v-model="form.user" @keyup.enter="reConnect">
                         <template #append>
                             <el-button @click="reConnect">{{ $t('commons.button.conn') }}</el-button>
                         </template>

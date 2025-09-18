@@ -1,5 +1,26 @@
 [
   {
+    "name": "amqp",
+    "check": "amqp",
+    "file": "amqp.so",
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
+    "installed": false
+  },
+  {
+    "name": "apcu",
+    "check": "apcu",
+    "file": "apcu.so",
+    "versions": ["56", "70", "71", "72", "73", "74", "80", "81", "82", "83","84"],
+    "installed": false
+  },
+  {
+    "name": "bcmath",
+    "check": "bcmath",
+    "file": "bcmath.so",
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
+    "installed": false
+  },
+  {
     "name": "ionCube",
     "check": "ionCube Loader",
     "file": "ioncube_loader.so",
@@ -41,13 +62,7 @@
     "versions": ["70", "71", "72", "73", "74", "80", "81", "82", "83","84"],
     "installed": false
   },
-  {
-    "name": "apcu",
-    "check": "apcu",
-    "file": "apcu.so",
-    "versions": ["56", "70", "71", "72", "73", "74", "80", "81", "82", "83","84"],
-    "installed": false
-  },
+
   {
     "name": "imagick",
     "check": "imagick",
@@ -363,13 +378,7 @@
     "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
     "installed": false
   },
-  {
-    "name": "bcmath",
-    "check": "bcmath",
-    "file": "bcmath.so",
-    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
-    "installed": false
-  },
+
   {
     "name": "pcntl",
     "check": "pcntl",
@@ -382,6 +391,41 @@
     "check": "sodium",
     "file": "sodium.so",
     "versions": ["70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
+    "installed": false
+  },
+  {
+    "name": "gettext",
+    "check": "gettext",
+    "file": "gettext.so",
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
+    "installed": false
+  },
+  {
+    "name": "soap",
+    "check": "soap",
+    "file": "soap.so",
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
+    "installed": false
+  },
+  {
+    "name": "sysvsem",
+    "check": "sysvsem",
+    "file": "sysvsem.so",
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
+    "installed": false
+  },
+  {
+    "name": "sockets",
+    "check": "sockets",
+    "file": "sockets.so",
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
+    "installed": false
+  },
+  {
+    "name": "xmlrpc",
+    "check": "xmlrpc",
+    "file": "xmlrpc.so",
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
     "installed": false
   }
 ]

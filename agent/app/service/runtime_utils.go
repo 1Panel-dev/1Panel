@@ -689,9 +689,15 @@ func checkContainerStatus(name string) (string, error) {
 	return "", nil
 }
 
+func delPHPExtensions(dir, phpExtensionDir, fileName, extName string) {
+	fileOp := files.NewFileOp()
+	_ = fileOp.DeleteFile(path.Join(phpExtensionDir, fileName))
+	_ = fileOp.DeleteFile(path.Join(dir, "conf", "conf.d", "docker-php-ext-"+extName+".ini"))
+	_ = removePHPIniExt(path.Join(dir, "conf", "php.ini"), fileName)
+}
+
 func unInstallPHPExtension(runtime *model.Runtime, delExtensions []string) error {
 	dir := runtime.GetPath()
-	fileOP := files.NewFileOp()
 	var phpExtensions []response.SupportExtension
 	if err := json.Unmarshal(nginx_conf.GetWebsiteFile("php_extensions.json"), &phpExtensions); err != nil {
 		return err
@@ -700,15 +706,19 @@ func unInstallPHPExtension(runtime *model.Runtime, delExtensions []string) error
 	phpExtensionDir := path.Join(dir, "extensions", getExtensionDir(phpVersion))
 
 	delMap := make(map[string]struct{})
-	for _, ext := range phpExtensions {
-		for _, del := range delExtensions {
+	for _, del := range delExtensions {
+		exist := false
+		for _, ext := range phpExtensions {
 			if ext.Name == del {
+				exist = true
 				delMap[ext.Check] = struct{}{}
-				_ = fileOP.DeleteFile(path.Join(phpExtensionDir, ext.File))
-				_ = fileOP.DeleteFile(path.Join(dir, "conf", "conf.d", "docker-php-ext-"+ext.Check+".ini"))
-				_ = removePHPIniExt(path.Join(dir, "conf", "php.ini"), ext.File)
+				delPHPExtensions(dir, phpExtensionDir, ext.Check, ext.Name)
 				break
 			}
+		}
+		if !exist {
+			delMap[del] = struct{}{}
+			delPHPExtensions(dir, phpExtensionDir, del+".so", del)
 		}
 	}
 	extensions := getRuntimeEnv(runtime.Env, "PHP_EXTENSIONS")
