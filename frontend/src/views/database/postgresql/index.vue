@@ -44,6 +44,9 @@
                 <el-button @click="goRemoteDB" type="primary" plain>
                     {{ $t('database.remoteDB') }}
                 </el-button>
+                <el-button @click="goTerminal()" :disabled="currentDB?.from !== 'local'" type="primary" plain>
+                    {{ $t('menu.terminal') }}
+                </el-button>
                 <el-button @click="goDashboard()" type="primary" plain>PGAdmin4</el-button>
             </template>
             <template #rightToolBar>
@@ -221,6 +224,7 @@
         <DeleteDialog ref="deleteRef" @search="search" />
 
         <PortJumpDialog ref="dialogPortJumpRef" />
+        <TerminalDialog ref="dialogTerminalRef" />
     </div>
 </template>
 
@@ -229,6 +233,7 @@ import BindDialog from '@/views/database/postgresql/bind/index.vue';
 import OperateDialog from '@/views/database/postgresql/create/index.vue';
 import DeleteDialog from '@/views/database/postgresql/delete/index.vue';
 import PasswordDialog from '@/views/database/postgresql/password/index.vue';
+import TerminalDialog from '@/components/terminal/database.vue';
 import PrivilegesDialog from '@/views/database/postgresql/privileges/index.vue';
 import RootPasswordDialog from '@/views/database/postgresql/conn/index.vue';
 import AppResources from '@/views/database/postgresql/check/index.vue';
@@ -275,6 +280,7 @@ const checkRef = ref();
 const deleteRef = ref();
 const bindRef = ref();
 const privilegesRef = ref();
+const dialogTerminalRef = ref();
 
 const pgadminPort = ref();
 const dashboardName = ref();
@@ -328,6 +334,10 @@ const goRemoteDB = async () => {
         globalStore.setCurrentDB(currentDB.value.database);
     }
     routerToName('PostgreSQL-Remote');
+};
+
+const goTerminal = () => {
+    dialogTerminalRef.value.acceptParams({ databaseType: currentDB.value.type, database: currentDB.value.database });
 };
 
 const passwordRef = ref();

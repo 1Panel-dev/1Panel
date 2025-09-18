@@ -60,8 +60,23 @@ func (lcmd *LocalCommand) Write(p []byte) (n int, err error) {
 }
 
 func (lcmd *LocalCommand) Close() error {
+	if lcmd.pty != nil {
+		lcmd.pty.Write([]byte{3})
+		time.Sleep(50 * time.Millisecond)
+
+		lcmd.pty.Write([]byte{4})
+		time.Sleep(50 * time.Millisecond)
+
+		lcmd.pty.Write([]byte("exit\n"))
+		time.Sleep(50 * time.Millisecond)
+	}
 	if lcmd.cmd != nil && lcmd.cmd.Process != nil {
-		_ = lcmd.cmd.Process.Kill()
+		lcmd.cmd.Process.Signal(syscall.SIGTERM)
+		time.Sleep(50 * time.Millisecond)
+
+		if lcmd.cmd.ProcessState == nil || !lcmd.cmd.ProcessState.Exited() {
+			lcmd.cmd.Process.Kill()
+		}
 	}
 	_ = lcmd.pty.Close()
 	return nil

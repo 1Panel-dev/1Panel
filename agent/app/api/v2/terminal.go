@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
@@ -86,15 +85,16 @@ func (b *BaseApi) ContainerWsSSH(c *gin.Context) {
 		return
 	}
 	source := c.Query("source")
-	var containerID string
 	var initCmd []string
 	switch source {
 	case "redis", "redis-cluster":
-		containerID, initCmd, err = loadRedisInitCmd(c, source)
+		initCmd, err = loadRedisInitCmd(c, source)
 	case "ollama":
-		containerID, initCmd, err = loadOllamaInitCmd(c)
+		initCmd, err = loadOllamaInitCmd(c)
 	case "container":
-		containerID, initCmd, err = loadContainerInitCmd(c)
+		initCmd, err = loadContainerInitCmd(c)
+	case "database":
+		initCmd, err = loadDatabaseInitCmd(c)
 	default:
 		if wshandleError(wsConn, fmt.Errorf("not support such source %s", source)) {
 			return
@@ -103,12 +103,10 @@ func (b *BaseApi) ContainerWsSSH(c *gin.Context) {
 	if wshandleError(wsConn, err) {
 		return
 	}
-	pidMap := loadMapFromDockerTop(containerID)
 	slave, err := terminal.NewCommand("docker", initCmd...)
 	if wshandleError(wsConn, err) {
 		return
 	}
-	defer killBash(containerID, strings.ReplaceAll(strings.Join(initCmd, " "), fmt.Sprintf("exec -it %s ", containerID), ""), pidMap)
 	defer slave.Close()
 
 	tty, err := terminal.NewLocalWsSession(cols, rows, wsConn, slave, false)
@@ -127,18 +125,18 @@ func (b *BaseApi) ContainerWsSSH(c *gin.Context) {
 	_ = wsConn.WriteControl(websocket.CloseMessage, nil, dt)
 }
 
-func loadRedisInitCmd(c *gin.Context, redisType string) (string, []string, error) {
+func loadRedisInitCmd(c *gin.Context, redisType string) ([]string, error) {
 	name := c.Query("name")
 	from := c.Query("from")
 	commands := []string{"exec", "-it"}
 	database, err := databaseService.Get(name)
 	if err != nil {
-		return "", nil, fmt.Errorf("no such database in db, err: %v", err)
+		return nil, fmt.Errorf("no such database in db, err: %v", err)
 	}
 	if from == "local" {
 		redisInfo, err := appInstallService.LoadConnInfo(dto.OperationWithNameAndType{Name: name, Type: redisType})
 		if err != nil {
-			return "", nil, fmt.Errorf("no such app in db, err: %v", err)
+			return nil, fmt.Errorf("no such app in db, err: %v", err)
 		}
 		name = redisInfo.ContainerName
 		commands = append(commands, []string{name, "redis-cli"}...)
@@ -152,38 +150,61 @@ func loadRedisInitCmd(c *gin.Context, redisType string) (string, []string, error
 			commands = append(commands, []string{"-a", database.Password, "--no-auth-warning"}...)
 		}
 	}
-	return name, commands, nil
+	return commands, nil
 }
 
-func loadOllamaInitCmd(c *gin.Context) (string, []string, error) {
+func loadOllamaInitCmd(c *gin.Context) ([]string, error) {
 	name := c.Query("name")
 	if cmd.CheckIllegal(name) {
-		return "", nil, fmt.Errorf("ollama model %s contains illegal characters", name)
+		return nil, fmt.Errorf("ollama model %s contains illegal characters", name)
 	}
 	ollamaInfo, err := appInstallService.LoadConnInfo(dto.OperationWithNameAndType{Name: "", Type: "ollama"})
 	if err != nil {
-		return "", nil, fmt.Errorf("no such app in db, err: %v", err)
+		return nil, fmt.Errorf("no such app in db, err: %v", err)
 	}
 	containerName := ollamaInfo.ContainerName
-	return containerName, []string{"exec", "-it", containerName, "ollama", "run", name}, nil
+	return []string{"exec", "-it", containerName, "ollama", "run", name}, nil
 }
 
-func loadContainerInitCmd(c *gin.Context) (string, []string, error) {
+func loadContainerInitCmd(c *gin.Context) ([]string, error) {
 	containerID := c.Query("containerid")
 	command := c.Query("command")
 	user := c.Query("user")
 	if cmd.CheckIllegal(user, containerID, command) {
-		return "", nil, fmt.Errorf("the command contains illegal characters. command: %s, user: %s, containerID: %s", command, user, containerID)
+		return nil, fmt.Errorf("the command contains illegal characters. command: %s, user: %s, containerID: %s", command, user, containerID)
 	}
 	if len(command) == 0 || len(containerID) == 0 {
-		return "", nil, fmt.Errorf("error param of command: %s or containerID: %s", command, containerID)
+		return nil, fmt.Errorf("error param of command: %s or containerID: %s", command, containerID)
 	}
 	commands := []string{"exec", "-it", containerID, command}
 	if len(user) != 0 {
 		commands = []string{"exec", "-it", "-u", user, containerID, command}
 	}
 
-	return containerID, commands, nil
+	return commands, nil
+}
+
+func loadDatabaseInitCmd(c *gin.Context) ([]string, error) {
+	database := c.Query("database")
+	databaseType := c.Query("databaseType")
+	if len(database) == 0 || len(databaseType) == 0 {
+		return nil, fmt.Errorf("error param of database: %s or database type: %s", database, databaseType)
+	}
+	databaseConn, err := appInstallService.LoadConnInfo(dto.OperationWithNameAndType{Type: databaseType, Name: database})
+	if err != nil {
+		return nil, fmt.Errorf("no such database in db, err: %v", err)
+	}
+	commands := []string{"exec", "-it", databaseConn.ContainerName}
+	switch databaseType {
+	case "mysql", "mysql-cluster":
+		commands = append(commands, []string{"mysql", "-uroot", "-p" + databaseConn.Password}...)
+	case "mariadb":
+		commands = append(commands, []string{"mariadb", "-uroot", "-p" + databaseConn.Password}...)
+	case "postgresql", "postgresql-cluster":
+		commands = []string{"exec", "-e", fmt.Sprintf("PGPASSWORD=%s", databaseConn.Password), "-it", databaseConn.ContainerName, "psql", "-t", "-U", databaseConn.Username}
+	}
+
+	return commands, nil
 }
 
 func wshandleError(ws *websocket.Conn, err error) bool {
@@ -204,42 +225,6 @@ func wshandleError(ws *websocket.Conn, err error) bool {
 		return true
 	}
 	return false
-}
-
-func loadMapFromDockerTop(containerID string) map[string]string {
-	pidMap := make(map[string]string)
-	sudo := cmd.SudoHandleCmd()
-
-	stdout, err := cmd.RunDefaultWithStdoutBashCf("%s docker top %s -eo pid,command ", sudo, containerID)
-	if err != nil {
-		return pidMap
-	}
-	lines := strings.Split(stdout, "\n")
-	for _, line := range lines {
-		parts := strings.Fields(line)
-		if len(parts) < 2 {
-			continue
-		}
-		pidMap[parts[0]] = strings.Join(parts[1:], " ")
-	}
-	return pidMap
-}
-
-func killBash(containerID, comm string, pidMap map[string]string) {
-	sudo := cmd.SudoHandleCmd()
-	newPidMap := loadMapFromDockerTop(containerID)
-	for pid, command := range newPidMap {
-		isOld := false
-		for pid2 := range pidMap {
-			if pid == pid2 {
-				isOld = true
-				break
-			}
-		}
-		if !isOld && command == comm {
-			_, _ = cmd.RunDefaultWithStdoutBashCf("%s kill -9 %s", sudo, pid)
-		}
-	}
 }
 
 var upGrader = websocket.Upgrader{

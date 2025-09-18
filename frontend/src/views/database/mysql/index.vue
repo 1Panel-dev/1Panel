@@ -46,6 +46,9 @@
                 <el-button @click="goRemoteDB()" type="primary" plain>
                     {{ $t('database.remoteDB') }}
                 </el-button>
+                <el-button @click="goTerminal()" :disabled="currentDB?.from !== 'local'" type="primary" plain>
+                    {{ $t('menu.terminal') }}
+                </el-button>
                 <el-dropdown>
                     <el-button type="primary" plain>
                         {{ $t('database.manage') }}
@@ -254,6 +257,7 @@
         <AppResources ref="checkRef"></AppResources>
         <DeleteDialog ref="deleteRef" @search="search" />
         <PortJumpDialog ref="dialogPortJumpRef" />
+        <TerminalDialog ref="dialogTerminalRef" />
     </div>
 </template>
 
@@ -263,6 +267,7 @@ import OperateDialog from '@/views/database/mysql/create/index.vue';
 import DeleteDialog from '@/views/database/mysql/delete/index.vue';
 import PasswordDialog from '@/views/database/mysql/password/index.vue';
 import RootPasswordDialog from '@/views/database/mysql/conn/index.vue';
+import TerminalDialog from '@/components/terminal/database.vue';
 import AppResources from '@/views/database/mysql/check/index.vue';
 import AppStatus from '@/components/app-status/index.vue';
 import Backups from '@/components/backup/index.vue';
@@ -307,6 +312,7 @@ const currentDBName = ref();
 const bindRef = ref();
 const checkRef = ref();
 const deleteRef = ref();
+const dialogTerminalRef = ref();
 
 const phpadminPort = ref();
 const adminerPort = ref();
@@ -369,6 +375,10 @@ const goRemoteDB = async () => {
         globalStore.setCurrentDB(currentDB.value.database);
     }
     routerToName('MySQL-Remote');
+};
+
+const goTerminal = () => {
+    dialogTerminalRef.value.acceptParams({ databaseType: currentDB.value.type, database: currentDB.value.database });
 };
 
 const passwordRef = ref();
