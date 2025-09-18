@@ -28,9 +28,9 @@ type CommandInfo struct {
 }
 
 type CommandTree struct {
-	ID       uint          `json:"id"`
 	Label    string        `json:"label"`
-	Children []CommandInfo `json:"children"`
+	Value    string        `json:"value"`
+	Children []CommandTree `json:"children"`
 }
 
 type CommandDelete struct {

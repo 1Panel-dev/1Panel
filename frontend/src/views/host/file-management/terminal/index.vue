@@ -10,17 +10,17 @@
         <template #content>
             <Terminal style="height: calc(100vh - 120px)" ref="terminalRef"></Terminal>
             <div>
-                <el-select v-model="quickCmd" clearable filterable @change="quickInput" class="w-full -mt-6">
+                <el-cascader
+                    v-model="quickCmd"
+                    :options="commandTree"
+                    @change="quickInput"
+                    :show-all-levels="false"
+                    class="w-full -mt-6"
+                    placeholder=" "
+                    filterable
+                >
                     <template #prefix>{{ $t('terminal.quickCommand') }}</template>
-                    <el-option-group v-for="group in commandTree" :key="group.label" :label="group.label">
-                        <el-option
-                            v-for="(cmd, index) in group.children"
-                            :key="index"
-                            :label="cmd.name"
-                            :value="cmd.command"
-                        />
-                    </el-option-group>
-                </el-select>
+                </el-cascader>
             </div>
         </template>
     </DrawerPro>
@@ -62,8 +62,12 @@ const loadCommandTree = async () => {
     commandTree.value = res.data || [];
 };
 
-function quickInput(val: any) {
-    terminalRef.value?.sendMsg(val + '\n');
+function quickInput(val: Array<string>) {
+    if (val.length < 1) {
+        return;
+    }
+    quickCmd.value = val[val.length - 1];
+    terminalRef.value?.sendMsg(quickCmd.value + '\n');
     quickCmd.value = '';
 }
 

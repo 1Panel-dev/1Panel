@@ -52,17 +52,17 @@
                     :key="item.Refresh"
                 ></Terminal>
                 <div>
-                    <el-select v-model="quickCmd" clearable filterable @change="quickInput" style="width: 25%">
+                    <el-cascader
+                        v-model="quickCmd"
+                        :options="commandTree"
+                        @change="quickInput"
+                        :show-all-levels="false"
+                        style="width: 25%"
+                        placeholder=" "
+                        filterable
+                    >
                         <template #prefix>{{ $t('terminal.quickCommand') }}</template>
-                        <el-option-group v-for="group in commandTree" :key="group.label" :label="group.label">
-                            <el-option
-                                v-for="(cmd, index) in group.children"
-                                :key="index"
-                                :label="cmd.name"
-                                :value="cmd.command"
-                            />
-                        </el-option-group>
-                    </el-select>
+                    </el-cascader>
                     <el-input v-model="batchVal" @keyup.enter="batchInput" style="width: 75%">
                         <template #prepend>
                             <el-checkbox :label="$t('terminal.batchInput')" v-model="isBatch" />
@@ -283,19 +283,30 @@ const filterHost = (value: string, data: any) => {
 const loadCommandTree = async () => {
     const res = await getCommandTree('command');
     commandTree.value = res.data || [];
+    for (const item of commandTree.value) {
+        if (item.label === 'Default') {
+            item.label = i18n.global.t('commons.table.default');
+        }
+    }
 };
 
-function quickInput(val: any) {
-    if (val !== '' && ctx) {
-        if (isBatch.value) {
-            for (const tab of terminalTabs.value) {
-                ctx.refs[`t-${tab.index}`] && ctx.refs[`t-${tab.index}`][0].sendMsg(val + '\n');
-            }
-            return;
-        }
-        ctx.refs[`t-${terminalValue.value}`] && ctx.refs[`t-${terminalValue.value}`][0].sendMsg(val + '\n');
-        quickCmd.value = '';
+function quickInput(val: Array<string>) {
+    if (val.length < 1) {
+        return;
     }
+    if (!ctx) {
+        return;
+    }
+    quickCmd.value = val[val.length - 1];
+    if (isBatch.value) {
+        for (const tab of terminalTabs.value) {
+            ctx.refs[`t-${tab.index}`] && ctx.refs[`t-${tab.index}`][0].sendMsg(quickCmd.value + '\n');
+        }
+        quickCmd.value = '';
+        return;
+    }
+    ctx.refs[`t-${terminalValue.value}`] && ctx.refs[`t-${terminalValue.value}`][0].sendMsg(quickCmd.value + '\n');
+    quickCmd.value = '';
 }
 
 function batchInput() {

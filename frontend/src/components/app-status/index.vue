@@ -5,7 +5,7 @@
                 <div class="flex flex-wrap gap-4 ml-3">
                     <el-tag effect="dark" type="success">{{ data.app }}</el-tag>
                     <Status class="mt-0.5" :key="refresh" :status="data.status"></Status>
-                    <el-tag>{{ $t('app.version') }}{{ data.version }}</el-tag>
+                    <el-tag>{{ $t('app.version') }}: {{ data.version }}</el-tag>
                 </div>
 
                 <div class="mt-0.5">

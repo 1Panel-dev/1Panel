@@ -51,11 +51,11 @@ func (u *CommandService) SearchForTree(req dto.OperateByType) ([]dto.CommandTree
 	var lists []dto.CommandTree
 	for _, group := range groups {
 		var data dto.CommandTree
-		data.ID = group.ID + 10000
 		data.Label = group.Name
+		data.Value = group.Name
 		for _, cmd := range cmdList {
 			if cmd.GroupID == group.ID {
-				data.Children = append(data.Children, dto.CommandInfo{ID: cmd.ID, Name: cmd.Name, Command: cmd.Command})
+				data.Children = append(data.Children, dto.CommandTree{Label: cmd.Name, Value: cmd.Command})
 			}
 		}
 		if len(data.Children) != 0 {
