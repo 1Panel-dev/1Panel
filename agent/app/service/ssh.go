@@ -213,6 +213,10 @@ func (u *SSHService) Update(req dto.SSHUpdate) error {
 		if err := updateLocalConn(uint(newPort)); err != nil {
 			global.LOG.Errorf("update local conn for terminal failed, err: %v", err)
 		}
+
+		if err := updateSSHSocketFile(req.NewValue); err != nil {
+			global.LOG.Errorf("update port for ssh.socket failed, err: %v", err)
+		}
 	}
 
 	_, _ = cmd.RunDefaultWithStdoutBashCf("%s systemctl restart %s", sudo, serviceName)
@@ -767,4 +771,40 @@ func updateLocalConn(newPort uint) error {
 		return err
 	}
 	return settingRepo.Update("LocalSSHConn", connNewItem)
+}
+
+func updateSSHSocketFile(newPort string) error {
+	active, _ := systemctl.IsActive("ssh.socket")
+	if !active {
+		return nil
+	}
+	filepath := "/usr/lib/systemd/system/ssh.socket"
+	file, err := os.ReadFile(filepath)
+	if err != nil {
+		return err
+	}
+	lines := strings.Split(string(file), "\n")
+	for i := 0; i < len(lines); i++ {
+		if strings.HasPrefix(lines[i], "ListenStream=") {
+			parts := strings.Split(lines[i], ":")
+			if len(parts) > 1 {
+				lines[i] = strings.ReplaceAll(lines[i], parts[len(parts)-1], newPort)
+				continue
+			}
+			parts = strings.Split(lines[i], "=")
+			if len(parts) > 1 {
+				lines[i] = strings.ReplaceAll(lines[i], parts[len(parts)-1], newPort)
+			}
+		}
+	}
+	fileItem, err := os.OpenFile(filepath, os.O_WRONLY|os.O_TRUNC, constant.FilePerm)
+	if err != nil {
+		return err
+	}
+	defer fileItem.Close()
+	if _, err = fileItem.WriteString(strings.Join(lines, "\n")); err != nil {
+		return err
+	}
+	_ = cmd.RunDefaultBashC("systemctl daemon-reload && systemctl restart ssh.socket")
+	return nil
 }
