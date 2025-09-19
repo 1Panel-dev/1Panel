@@ -124,7 +124,7 @@ const defaultRules: TokenRule[] = [
     },
     {
         type: 'ipv6',
-        pattern: /\b(?:[A-Fa-f0-9]{1,4}:){7}[A-Fa-f0-9]{1,4}\b/g,
+        pattern: /\b(?:[A-Fa-f0-9]{0,4}:){1,7}[A-Fa-f0-9]{0,4}\b|\b::[A-Fa-f0-9:]*\b|\b[A-Fa-f0-9:]*::\b/g,
         color: '#4A90E2',
     },
     {
