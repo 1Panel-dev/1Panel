@@ -69,6 +69,7 @@ const (
 	TaskHandle    = "TaskHandle"
 	TaskScan      = "TaskScan"
 	TaskExec      = "TaskExec"
+	TaskBatch     = "TaskBatch"
 )
 
 const (
@@ -317,7 +318,7 @@ func (t *Task) LogFailedWithErr(msg string, err error) {
 }
 
 func (t *Task) LogSuccess(msg string) {
-	t.Logger.Println(msg + i18n.GetMsgByKey("Success"))
+	t.Logger.Println(msg + " " + i18n.GetMsgByKey("Success"))
 }
 func (t *Task) LogSuccessF(format string, v ...any) {
 	t.Logger.Println(fmt.Sprintf(format, v...) + i18n.GetMsgByKey("Success"))

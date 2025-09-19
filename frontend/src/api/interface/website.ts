@@ -667,4 +667,10 @@ export namespace Website {
         user: string;
         taskID: string;
     }
+
+    export interface BatchOperate {
+        ids: number[];
+        operate: string;
+        taskID: string;
+    }
 }

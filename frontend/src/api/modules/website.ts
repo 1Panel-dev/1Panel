@@ -351,3 +351,7 @@ export const operateCrossSiteAccess = (req: Website.CrossSiteAccessOp) => {
 export const execComposer = (req: Website.ExecComposer) => {
     return http.post(`/websites/exec/composer`, req);
 };
+
+export const batchOpreate = (req: Website.BatchOperate) => {
+    return http.post(`/websites/batch/operate`, req);
+};

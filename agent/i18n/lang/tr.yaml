@@ -144,6 +144,10 @@ ErrSSLValid: 'Sertifika dosyası anormal, lütfen sertifika durumunu kontrol edi
 ErrWebsiteDir: "Lütfen web sitesi dizini içindeki bir dizin seçin."
 ErrComposerFileNotFound: "composer.json dosyası mevcut değil"
 ErrRuntimeNoPort: "Çalışma zamanı ortamı bir porta sahip değil, lütfen önce çalışma zamanı ortamını düzenleyin."
+Status: 'Durum'
+start: 'Başlat'
+stop: 'Durdur'
+delete: 'Sil'
 
 #ssl
 ErrSSLCannotDelete: '{{ .name }} sertifikası bir web sitesi tarafından kullanılıyor ve silinemez'
@@ -354,6 +358,7 @@ RuntimeExtension: 'Çalışma Ortamı Uzantısı'
 TaskIsExecuting: 'Görev çalışıyor'
 CustomAppstore: 'Özel uygulama deposu'
 TaskExec: 'Çalıştır'
+TaskBatch: "Toplu İşlem"
 
 # task - clam
 Clamscan: "{{ .name }} Tara"

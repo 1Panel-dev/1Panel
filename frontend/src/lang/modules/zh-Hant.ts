@@ -2406,6 +2406,9 @@ const message = {
         execUser: '執行使用者',
         execDir: '執行目錄',
         packagist: '中國全量鏡像',
+
+        batchOpreate: '批次操作',
+        batchOpreateHelper: '批次{0}網站，是否繼續操作？',
     },
     php: {
         short_open_tag: '短標籤支援',

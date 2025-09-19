@@ -2555,6 +2555,9 @@ const message = {
         execUser: 'Usuário Executando',
         execDir: 'Diretório de Execução',
         packagist: 'Espelho Completo da China',
+
+        batchOpreate: 'Operação em Lote',
+        batchOpreateHelper: 'Lote {0} sites, continuar operação?',
     },
     php: {
         short_open_tag: 'Suporte para short tags',

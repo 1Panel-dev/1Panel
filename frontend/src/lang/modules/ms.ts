@@ -2554,6 +2554,9 @@ const message = {
         execUser: 'Pengguna Melaksanakan',
         execDir: 'Direktori Pelaksanaan',
         packagist: 'Cermin Penuh China',
+
+        batchOpreate: 'Operasi Pukal',
+        batchOpreateHelper: 'Pukal {0} laman web, teruskan operasi?',
     },
     php: {
         short_open_tag: 'Sokongan tag pendek',

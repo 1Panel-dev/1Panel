@@ -143,6 +143,10 @@ ErrSSLValid: 'Файл сертификата аномален, проверьт
 ErrWebsiteDir: "Пожалуйста, выберите директорию внутри директории сайта."
 ErrComposerFileNotFound: "Файл composer.json не существует"
 ErrRuntimeNoPort: "Среда выполнения не настроена с портом, сначала отредактируйте среду выполнения."
+Status: 'Статус'
+start: 'Запустить'
+stop: 'Остановить'
+delete: 'Удалить'
 
 #ssl
 ErrSSLCannotDelete: 'Сертификат {{ .name }} используется веб-сайтом и не может быть удален'
@@ -353,6 +357,7 @@ RuntimeExtension: 'Расширение среды выполнения'
 TaskIsExecuting: 'Задача выполняется'
 CustomAppstore: 'Хранилище пользовательских приложений'
 TaskExec: 'Выполнить'
+TaskBatch: "Пакетная операция"
 
 # task - clam
 Clamscan: "Сканировать {{ .name }}"

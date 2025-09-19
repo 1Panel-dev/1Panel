@@ -77,7 +77,9 @@
                     @cell-mouse-enter="showFavorite"
                     @cell-mouse-leave="hideFavorite"
                     localKey="websiteColumn"
+                    v-model:selects="selects"
                 >
+                    <el-table-column type="selection" width="30" />
                     <el-table-column
                         :label="$t('commons.table.name')"
                         fix
@@ -264,6 +266,33 @@
                         :fixed="mobile ? false : 'right'"
                         fix
                     />
+                    <template #footerLeft>
+                        <div class="footer-left-button">
+                            <el-select class="p-w-200" v-model="batchReq.operate">
+                                <el-option
+                                    :label="$t('commons.button.start') + $t('menu.website')"
+                                    value="start"
+                                ></el-option>
+                                <el-option
+                                    :label="$t('commons.button.stop') + $t('menu.website')"
+                                    value="stop"
+                                ></el-option>
+                                <el-option
+                                    :label="$t('commons.button.delete') + $t('menu.website')"
+                                    value="delete"
+                                ></el-option>
+                            </el-select>
+                            <el-button
+                                class="ml-2"
+                                type="primary"
+                                :disabled="selects.length == 0 || batchReq.operate == ''"
+                                @click="batchOp"
+                            >
+                                {{ $t('website.batchOpreate') }}
+                                <span class="ml-1" v-if="selects.length > 0">({{ selects.length }})</span>
+                            </el-button>
+                        </div>
+                    </template>
                 </ComplexTable>
                 <el-card width="30%" v-if="disabledConfig && maskShow" class="mask-prompt">
                     <span v-if="nginxIsExist">
@@ -289,6 +318,7 @@
         <GroupDialog @search="listGroup" ref="groupRef" />
         <NginxConfig v-if="openNginxConfig" v-loading="loading" :containerName="containerName" :status="nginxStatus" />
         <DefaultHtml ref="defaultHtmlRef" />
+        <TaskLog ref="taskLogRef" @close="search" />
     </div>
 </template>
 
@@ -302,13 +332,14 @@ import DeleteWebsite from '@/views/website/website/delete/index.vue';
 import NginxConfig from '@/views/website/website/nginx/index.vue';
 import GroupDialog from '@/components/agent-group/index.vue';
 import AppStatus from '@/components/app-status/index.vue';
+import TaskLog from '@/components/log/task/index.vue';
 import i18n from '@/lang';
 import { onMounted, reactive, ref, computed } from 'vue';
-import { listDomains, opWebsite, searchWebsites, updateWebsite } from '@/api/modules/website';
+import { batchOpreate, listDomains, opWebsite, searchWebsites, updateWebsite } from '@/api/modules/website';
 import { Website } from '@/api/interface/website';
 import { App } from '@/api/interface/app';
 import { ElMessageBox } from 'element-plus';
-import { dateFormatSimple } from '@/utils/util';
+import { dateFormatSimple, newUUID } from '@/utils/util';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { useI18n } from 'vue-i18n';
 import { getAgentGroupList } from '@/api/modules/group';
@@ -356,6 +387,13 @@ const domains = ref<Website.Domain[]>([]);
 const columns = ref([]);
 const hoveredRowIndex = ref(-1);
 const websiteDir = ref();
+const selects = ref([]);
+const batchReq = reactive({
+    operate: '',
+    ids: [] as number[],
+    taskID: '',
+});
+const taskLogRef = ref();
 
 const paginationConfig = reactive({
     cacheSizeKey: 'website-page-size',
@@ -638,6 +676,25 @@ const updateRemark = (row: Website.Website, bulr: Function) => {
         return;
     }
     updateWebsitConfig(row);
+};
+
+const batchOp = () => {
+    ElMessageBox.confirm(
+        i18n.global.t('website.batchOpreateHelper', [i18n.global.t('commons.button.' + batchReq.operate)]),
+        i18n.global.t('website.batchOpreate'),
+        {
+            confirmButtonText: i18n.global.t('commons.button.confirm'),
+            cancelButtonText: i18n.global.t('commons.button.cancel'),
+        },
+    ).then(async () => {
+        batchReq.ids = selects.value.map((item) => item.id);
+        const taskID = newUUID();
+        batchReq.taskID = taskID;
+        await batchOpreate(batchReq);
+        taskLogRef.value.openWithTaskID(taskID);
+        selects.value = [];
+        batchReq.operate = '';
+    });
 };
 
 onMounted(() => {

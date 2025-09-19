@@ -140,6 +140,10 @@ ErrSSLValid: '証明書ファイルが異常です、証明書の状態を確認
 ErrWebsiteDir: "ウェブサイトディレクトリ内のディレクトリを選択してください。"
 ErrComposerFileNotFound: "composer.json ファイルが存在しません"
 ErrRuntimeNoPort: "ランタイム環境にポートが設定されていません。先にランタイム環境を編集してください。"
+Status: 'ステータス'
+start: '開始'
+stop: '停止'
+delete: '削除'
 
 #ssl
 ErrSSLCannotDelete: '{{ .name }} 証明書は Web サイトで使用されているため、削除できません'
@@ -353,6 +357,7 @@ RuntimeExtension: 'ランタイム環境拡張'
 TaskIsExecuting: 'タスクは実行中です'
 CustomAppstore: 'カスタム アプリケーション ウェアハウス'
 TaskExec: '実行'
+TaskBatch: "一括操作"
 
 # task - clam
 Clamscan: "{{ .name }} をスキャン"

@@ -140,6 +140,10 @@ ErrSSLValid: 'Certificate file is abnormal, please check the certificate status!
 ErrWebsiteDir: "Please select a directory within the website directory."
 ErrComposerFileNotFound: "composer.json file does not exist"
 ErrRuntimeNoPort: "The runtime environment is not set with a port, please edit the runtime environment first."
+Status: 'Status'
+start: 'Start'
+stop: 'Stop'
+delete: 'Delete'
 
 #ssl
 ErrSSLCannotDelete: 'The {{ .name }} certificate is being used by a website and cannot be deleted'
@@ -353,6 +357,7 @@ RuntimeExtension: 'Runtime Environment Extension'
 TaskIsExecuting: 'Task is running'
 CustomAppstore: 'Custom application warehouse'
 TaskExec: 'Execute'
+TaskBatch: "Batch Operation"
 
 # task - clam
 Clamscan: "Scan {{ .name }}"

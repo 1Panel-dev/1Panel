@@ -60,6 +60,7 @@ type IWebsiteService interface {
 	UpdateWebsite(req request.WebsiteUpdate) error
 	DeleteWebsite(req request.WebsiteDelete) error
 	GetWebsite(id uint) (response.WebsiteDTO, error)
+	BatchOpWebsite(req request.BatchWebsiteOp) error
 
 	CreateWebsiteDomain(create request.WebsiteDomainCreate) ([]model.WebsiteDomain, error)
 	GetWebsiteDomain(websiteId uint) ([]model.WebsiteDomain, error)
@@ -515,6 +516,43 @@ func (w WebsiteService) OpWebsite(req request.WebsiteOp) error {
 		return err
 	}
 	return websiteRepo.Save(context.Background(), &website)
+}
+
+func (w WebsiteService) BatchOpWebsite(req request.BatchWebsiteOp) error {
+	websites, _ := websiteRepo.List(repo.WithByIDs(req.IDs))
+	opTask, err := task.NewTaskWithOps(i18n.GetMsgByKey("Status"), task.TaskBatch, task.TaskScopeWebsite, req.TaskID, 0)
+	if err != nil {
+		return err
+	}
+	opWebsiteTask := func(t *task.Task) error {
+		for _, web := range websites {
+			msg := fmt.Sprintf("%s %s", i18n.GetMsgByKey(req.Operate), web.PrimaryDomain)
+			switch req.Operate {
+			case constant.StopWeb, constant.StartWeb:
+				if err := opWebsite(&web, req.Operate); err != nil {
+					t.LogFailedWithErr(msg, err)
+					continue
+				}
+				_ = websiteRepo.Save(context.Background(), &web)
+			case "delete":
+				if err := w.DeleteWebsite(request.WebsiteDelete{
+					ID: web.ID,
+				}); err != nil {
+					t.LogFailedWithErr(msg, err)
+					continue
+				}
+			}
+
+			t.LogSuccess(msg)
+		}
+		return nil
+	}
+	opTask.AddSubTask("", opWebsiteTask, nil)
+
+	go func() {
+		_ = opTask.Execute()
+	}()
+	return nil
 }
 
 func (w WebsiteService) GetWebsiteOptions(req request.WebsiteOptionReq) ([]response.WebsiteOption, error) {

@@ -139,6 +139,10 @@ ErrSSLValid: '證書文件異常，請檢查證書狀態！'
 ErrWebsiteDir: "請選擇網站目錄下的目錄"
 ErrComposerFileNotFound: "composer.json 文件不存在"
 ErrRuntimeNoPort: "執行環境未設定埠，請先編輯執行環境"
+Status: '狀態'
+start: '開啟'
+stop: '關閉'
+delete: '刪除'
 
 #ssl
 ErrSSLCannotDelete: '{{ .name }} 憑證正在被網站使用，無法刪除'
@@ -352,6 +356,7 @@ RuntimeExtension: '執行環境擴充'
 TaskIsExecuting: '任務正在運作'
 CustomAppstore: '自訂應用程式倉庫'
 TaskExec: '執行'
+TaskBatch: "批量操作"
 
 # task - clam
 Clamscan: "掃描 {{ .name }}"

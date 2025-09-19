@@ -1141,3 +1141,23 @@ func (b *BaseApi) ExecComposer(c *gin.Context) {
 	}
 	helper.Success(c)
 }
+
+// @Tags Website
+// @Summary Batch operate websites
+// @Accept json
+// @Param request body request.BatchOpWebsite true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /websites/batch/operate [post]
+func (b *BaseApi) BatchOpWebsites(c *gin.Context) {
+	var req request.BatchWebsiteOp
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := websiteService.BatchOpWebsite(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}

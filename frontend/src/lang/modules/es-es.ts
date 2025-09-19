@@ -2552,6 +2552,9 @@ const message = {
         execUser: 'Usuario de ejecución',
         execDir: 'Directorio de ejecución',
         packagist: 'Mirror China completo',
+
+        batchOpreate: 'Operación en Lote',
+        batchOpreateHelper: 'Lote {0} sitios web, ¿continuar operación?',
     },
     php: {
         short_open_tag: 'Soporte de etiquetas cortas',

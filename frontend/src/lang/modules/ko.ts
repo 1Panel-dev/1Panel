@@ -2456,6 +2456,9 @@ const message = {
         execUser: '실행 사용자',
         execDir: '실행 디렉토리',
         packagist: '중국 전체 미러',
+
+        batchOpreate: '일괄 작업',
+        batchOpreateHelper: '웹사이트를 일괄 {0}, 계속 작업하시겠습니까?',
     },
     php: {
         short_open_tag: '짧은 태그 지원',

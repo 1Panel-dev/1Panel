@@ -2397,6 +2397,9 @@ const message = {
         execUser: '执行用户',
         execDir: '执行目录',
         packagist: '中国全量镜像',
+
+        batchOpreate: '批量操作',
+        batchOpreateHelper: '批量{0}网站，是否继续操作？',
     },
     php: {
         short_open_tag: '短标签支持',

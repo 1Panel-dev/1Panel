@@ -22,31 +22,38 @@
                 </template>
             </fu-table>
         </div>
+        <div class="table-footer-container">
+            <div class="footer-left" v-if="slots.footerLeft">
+                <el-checkbox v-model="leftSelect" @change="toggleSelection"></el-checkbox>
+                <div class="ml-4">
+                    <slot name="footerLeft"></slot>
+                </div>
+            </div>
 
-        <div
-            class="complex-table__pagination flex items-center w-full sm:flex-row flex-col text-xs sm:text-sm"
-            v-if="props.paginationConfig"
-            :class="{ '!justify-between': slots.paginationLeft, '!justify-end': !slots.paginationLeft }"
-        >
-            <slot name="paginationLeft"></slot>
-            <slot name="pagination">
-                <el-pagination
-                    v-model:current-page="paginationConfig.currentPage"
-                    v-model:page-size="paginationConfig.pageSize"
-                    :total="paginationConfig.total"
-                    :page-sizes="[5, 10, 20, 50, 100, 200, 500]"
-                    @size-change="sizeChange"
-                    @current-change="currentChange"
-                    :size="mobile || paginationConfig.small ? 'small' : 'default'"
-                    :layout="
-                        mobile || paginationConfig.small
-                            ? 'total, prev, pager, next'
-                            : 'total, sizes, prev, pager, next, jumper'
-                    "
-                />
-            </slot>
+            <div
+                class="complex-table__pagination flex items-center w-full sm:flex-row flex-col text-xs sm:text-sm"
+                v-if="props.paginationConfig"
+                :class="{ '!justify-between': slots.paginationLeft, '!justify-end': !slots.paginationLeft }"
+            >
+                <slot name="paginationLeft"></slot>
+                <slot name="pagination">
+                    <el-pagination
+                        v-model:current-page="paginationConfig.currentPage"
+                        v-model:page-size="paginationConfig.pageSize"
+                        :total="paginationConfig.total"
+                        :page-sizes="[5, 10, 20, 50, 100, 200, 500]"
+                        @size-change="sizeChange"
+                        @current-change="currentChange"
+                        :size="mobile || paginationConfig.small ? 'small' : 'default'"
+                        :layout="
+                            mobile || paginationConfig.small
+                                ? 'total, prev, pager, next'
+                                : 'total, sizes, prev, pager, next, jumper'
+                        "
+                    />
+                </slot>
+            </div>
         </div>
-
         <ul
             v-if="rightClick.visible"
             class="context-menu"
@@ -104,6 +111,7 @@ const mobile = computed(() => {
 const tableRef = ref();
 const tableHeight = ref(0);
 const menuRef = ref<HTMLElement | null>(null);
+const leftSelect = ref(false);
 
 const rightClick = ref({
     visible: false,
@@ -153,6 +161,11 @@ function sizeChange() {
 
 function handleSelectionChange(row: any) {
     emit('update:selects', row);
+    if (row.length > 0) {
+        leftSelect.value = true;
+    } else {
+        leftSelect.value = false;
+    }
 }
 
 function sort(prop: string, order: string) {
@@ -236,6 +249,10 @@ function calcHeight() {
     }
 }
 
+const toggleSelection = () => {
+    tableRef.value.refElTable.toggleAllSelection();
+};
+
 onMounted(() => {
     calcHeight();
     window.addEventListener('resize', calcHeight);
@@ -305,5 +322,27 @@ onBeforeUnmount(() => {
 }
 .context-menu li.divided {
     border-top: 1px solid var(--el-border-color);
+}
+.table-footer-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .footer-left {
+        flex-shrink: 0;
+        margin-right: 16px;
+        margin-left: 12px;
+        display: flex;
+
+        .footer-left-button {
+            margin-left: 17px;
+            display: flex;
+        }
+    }
+}
+
+.complex-table__pagination {
+    flex: 1;
+    @include flex-row(flex-end);
 }
 </style>

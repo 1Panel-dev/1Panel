@@ -2583,6 +2583,9 @@ const message = {
         execUser: 'Executing User',
         execDir: 'Execution Directory',
         packagist: 'China Full Mirror',
+
+        batchOpreate: 'Batch Operation',
+        batchOpreateHelper: 'Batch {0} websites, continue operation?',
     },
     php: {
         short_open_tag: 'Short tag support',

@@ -143,6 +143,10 @@ ErrSSLValid: 'O arquivo do certificado está anormal, verifique o status do cert
 ErrWebsiteDir: "Por favor, selecione um diretório dentro do diretório do site."
 ErrComposerFileNotFound: "O arquivo composer.json não existe"
 ErrRuntimeNoPort: "O ambiente de tempo de execução não está configurado com uma porta, edite o ambiente de tempo de execução primeiro."
+Status: 'Status'
+start: 'Iniciar'
+stop: 'Parar'
+delete: 'Excluir'
 
 #ssl
 ErrSSLCannotDelete: 'O certificado {{ .name }} está sendo usado por um site e não pode ser excluído'
@@ -353,6 +357,7 @@ RuntimeExtension: 'Extensão do ambiente de tempo de execução'
 TaskIsExecuting: 'A tarefa está em execução'
 CustomAppstore: 'Armazém de aplicativos personalizados'
 TaskExec: 'Executar'
+TaskBatch: "Operação em Lote"
 
 # task - clam
 Clamscan: "Escanear {{ .name }}"

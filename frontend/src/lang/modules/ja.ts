@@ -2498,6 +2498,9 @@ const message = {
         execUser: '実行ユーザー',
         execDir: '実行ディレクトリ',
         packagist: '中国フルミラー',
+
+        batchOpreate: 'バッチ操作',
+        batchOpreateHelper: 'ウェブサイトをバッチ{0}しますか？',
     },
     php: {
         short_open_tag: '短いタグサポート',

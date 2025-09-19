@@ -138,6 +138,10 @@ ErrSSLValid: 'Archivo de certificado anómalo, ¡revise el estado del certificad
 ErrWebsiteDir: "Por favor seleccione un directorio dentro del directorio del sitio web"
 ErrComposerFileNotFound: "El archivo composer.json no existe"
 ErrRuntimeNoPort: "El entorno de ejecución no tiene configurado un puerto, edítelo primero"
+Status: 'Estado'
+start: 'Iniciar'
+stop: 'Detener'
+delete: 'Eliminar'
 
 #ssl
 ErrSSLCannotDelete: 'El certificado {{ .name }} está siendo utilizado por un sitio web y no puede eliminarse'
@@ -158,7 +162,6 @@ ApplySSLFailed: 'Solicitud de certificado para [{{ .domain }}] fallida, {{ .deta
 ApplySSLSuccess: '¡Solicitud de certificado para [{{ .domain }}] exitosa!'
 DNSAccountName: 'Cuenta DNS [{{ .name }}] proveedor [{{ .type }}]'
 PushDirLog: 'Certificado empujado al directorio [{{ .path }}] {{ .status }}'
-ErrDeleteCAWithSSL: 'La organización actual tiene un certificado emitido y no puede eliminarse.'
 ErrDeleteWithPanelSSL: 'La configuración SSL del panel utiliza este certificado y no puede eliminarse'
 ErrDefaultCA: 'La autoridad por defecto no puede eliminarse'
 ApplyWebSiteSSLLog: 'Iniciando renovación del certificado del sitio web {{ .name }}'
@@ -352,6 +355,7 @@ TaskIsExecuting: 'Tarea en ejecución'
 CustomAppstore: 'Almacén de aplicaciones personalizado'
 TaskClean: "Limpieza"
 TaskExec: "Ejecutar"
+TaskBatch: "Operación por Lotes"
 
 # task - ai
 OllamaModelPull: 'Descargar modelo Ollama {{ .name }}'
@@ -428,12 +432,9 @@ ImageBuild: 'Construcción de imagen'
 ImageBuildStdoutCheck: 'Analizar salida de la imagen'
 ImageBuildRes: 'Salida de construcción de imagen: {{ .name }}'
 ImagePull: 'Descargar imagen'
-ImageRepoAuthFromDB: 'Obtener autenticación de repositorio desde base de datos'
-ImaegPullRes: 'Salida de descarga de imagen: {{ .name }}'
 ImagePush: 'Subir imagen'
 ImageRenameTag: 'Modificar etiqueta de imagen'
 ImageNewTag: 'Nueva etiqueta de imagen {{ .name }}'
-ImaegPushRes: 'Salida de subida de imagen: {{ .name }}'
 ComposeCreate: 'Crear orquestación'
 ComposeCreateRes: 'Salida de creación de orquestación: {{ .name }}'
 ImageRepoAuthFromDB: "Obtener información de autenticación del repositorio desde la base de datos"

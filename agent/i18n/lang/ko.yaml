@@ -140,6 +140,10 @@ ErrSSLValid: '인증서 파일에 문제가 있습니다. 인증서 상태를 �
 ErrWebsiteDir: "웹사이트 디렉토리 내의 디렉토리를 선택하세요."
 ErrComposerFileNotFound: "composer.json 파일이 존재하지 않습니다"
 ErrRuntimeNoPort: "런타임 환경에 포트가 설정되지 않았습니다. 먼저 런타임 환경을 편집하세요."
+Status: '상태'
+start: '시작'
+stop: '중지'
+delete: '삭제'
 
 #SSL인증
 ErrSSLCannotDelete: '{{ .name }} 인증서는 웹사이트에서 사용 중이므로 삭제할 수 없습니다.'
@@ -353,6 +357,7 @@ RuntimeExtension: '런타임 환경 확장'
 TaskIsExecuting: '작업이 실행 중입니다'
 CustomAppstore: '사용자 정의 애플리케이션 웨어하우스'
 TaskExec: '실행'
+TaskBatch: "일괄 작업"
 
 # task - clam
 Clamscan: "{{ .name }} 스캔"

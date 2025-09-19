@@ -2612,6 +2612,9 @@ const message = {
         execUser: 'Çalıştıran Kullanıcı',
         execDir: 'Çalıştırma Dizini',
         packagist: 'Çin Tam Aynası',
+
+        batchOpreate: 'Toplu İşlem',
+        batchOpreateHelper: 'Toplu {0} web siteleri, işlemi devam ettir?',
     },
     php: {
         short_open_tag: 'Kısa etiket desteği',
