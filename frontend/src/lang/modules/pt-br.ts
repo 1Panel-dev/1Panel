@@ -2503,6 +2503,8 @@ const message = {
         strategy: 'Estratégia',
         strategyDown: 'Desativar',
         strategyBackup: 'Backup',
+        ipHashBackupErr: 'Hash IP não suporta nós de backup',
+
         staticChangePHPHelper: 'Atualmente um site estático, pode ser alterado para um site PHP.',
         proxyCache: 'Cache de Proxy Reverso',
         cacheLimit: 'Limite de Espaço de Cache',

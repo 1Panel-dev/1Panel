@@ -2405,6 +2405,8 @@ const message = {
         strategy: '전략',
         strategyDown: '비활성화',
         strategyBackup: '백업',
+        ipHashBackupErr: 'IP 해시는 백업 노드를 지원하지 않습니다',
+
         staticChangePHPHelper: '현재 정적 웹사이트이며 PHP 웹사이트로 전환할 수 있습니다.',
         proxyCache: '리버스 프록시 캐시',
         cacheLimit: '캐시 공간 제한',

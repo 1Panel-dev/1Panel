@@ -2358,6 +2358,8 @@ const message = {
         strategy: '策略',
         strategyDown: '停用',
         strategyBackup: '備用',
+        ipHashBackupErr: 'IP 哈希不支援備用節點',
+
         staticChangePHPHelper: '目前為靜態網站，可切換為 PHP 網站',
         proxyCache: '反向代理快取',
         cacheLimit: '快取空間限制',

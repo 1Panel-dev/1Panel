@@ -2447,6 +2447,8 @@ const message = {
         strategy: '戦略',
         strategyDown: '無効',
         strategyBackup: 'バックアップ',
+        ipHashBackupErr: 'IPハッシュはバックアップノードをサポートしていません',
+
         staticChangePHPHelper: '現在は静的ウェブサイトですが、PHPウェブサイトに切り替えることができます。',
         proxyCache: 'リバースプロキシキャッシュ',
         cacheLimit: 'キャッシュスペース制限',

@@ -110,7 +110,7 @@ import { createLoadBalance, updateLoadBalance } from '@/api/modules/website';
 import i18n from '@/lang';
 import { FormInstance } from 'element-plus';
 import { ref } from 'vue';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
 import { Rules, checkNumberRange } from '@/global/form-rules';
 import { getAlgorithms, getStatusStrategy } from '@/global/mimetype';
 import { Website } from '@/api/interface/website';
@@ -204,23 +204,51 @@ const acceptParams = async (req: LoadBalanceOperate) => {
     open.value = true;
 };
 
+const handleServers = () => {
+    for (const server of item.value.servers) {
+        if (!server.weight || server.weight == '') {
+            server.weight = 0;
+        }
+        if (!server.maxFails || server.maxFails == '') {
+            server.maxFails = 0;
+        }
+        if (!server.maxConns || server.maxConns == '') {
+            server.maxConns = 0;
+        }
+    }
+};
+
+const rollBackServers = () => {
+    for (const server of item.value.servers) {
+        if (server.weight == 0) {
+            server.weight = undefined;
+        }
+        if (server.maxFails == 0) {
+            server.maxFails = undefined;
+        }
+        if (server.maxConns == 0) {
+            server.maxConns = undefined;
+        }
+    }
+};
+
 const submit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     await formEl.validate(async (valid) => {
         if (!valid) {
             return;
         }
+        let checkBackup = false;
+        if (item.value.algorithm == 'ip_hash') {
+            checkBackup = true;
+        }
         for (const server of item.value.servers) {
-            if (!server.weight || server.weight == '') {
-                server.weight = 0;
-            }
-            if (!server.maxFails || server.maxFails == '') {
-                server.maxFails = 0;
-            }
-            if (!server.maxConns || server.maxConns == '') {
-                server.maxConns = 0;
+            if (checkBackup && server.flag == 'backup') {
+                MsgError(i18n.global.t('website.ipHashBackupErr'));
+                return;
             }
         }
+        handleServers();
         loading.value = true;
         try {
             if (item.value.operate === 'edit') {
@@ -231,6 +259,8 @@ const submit = async (formEl: FormInstance | undefined) => {
                 MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
             }
             handleClose();
+        } catch {
+            rollBackServers();
         } finally {
             loading.value = false;
         }

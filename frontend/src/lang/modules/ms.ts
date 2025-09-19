@@ -2502,6 +2502,8 @@ const message = {
         strategy: 'Strategi',
         strategyDown: 'Lumpuh',
         strategyBackup: 'Sandaran',
+        ipHashBackupErr: 'Hash IP tidak menyokong nod sandaran',
+
         staticChangePHPHelper: 'Kini laman web statik, boleh ditukar ke laman web PHP.',
         proxyCache: 'Cache Proksi Terbalik',
         cacheLimit: 'Had Ruang Cache',

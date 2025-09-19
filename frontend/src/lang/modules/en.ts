@@ -2531,6 +2531,8 @@ const message = {
         strategy: 'Strategy',
         strategyDown: 'Down',
         strategyBackup: 'Backup',
+        ipHashBackupErr: 'IP hash does not support backup nodes',
+
         staticChangePHPHelper: 'Currently a static website, you can switch to a PHP website',
         proxyCache: 'Reverse Proxy Cache',
         cacheLimit: 'Cache Space Limit',

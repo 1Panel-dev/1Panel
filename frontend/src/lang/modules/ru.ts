@@ -2500,6 +2500,8 @@ const message = {
         strategy: 'Стратегия',
         strategyDown: 'Отключить',
         strategyBackup: 'Резервный',
+        ipHashBackupErr: 'IP хэш не поддерживает резервные узлы',
+
         staticChangePHPHelper: 'В настоящее время статический сайт, можно переключить на PHP сайт.',
         proxyCache: 'Кэш Обратного Прокси',
         cacheLimit: 'Ограничение Пространства Кэша',

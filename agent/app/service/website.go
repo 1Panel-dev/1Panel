@@ -3074,6 +3074,10 @@ func (w WebsiteService) UpdateLoadBalance(req request.WebsiteLBUpdate) error {
 	if !fileOp.Stat(filePath) {
 		return nil
 	}
+	oldContent, err := fileOp.GetContent(filePath)
+	if err != nil {
+		return err
+	}
 	parser, err := parser.NewParser(filePath)
 	if err != nil {
 		return err
@@ -3125,10 +3129,7 @@ func (w WebsiteService) UpdateLoadBalance(req request.WebsiteLBUpdate) error {
 	if err = nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
 		return buserr.WithErr("ErrUpdateBuWebsite", err)
 	}
-	if err = opNginx(nginxInstall.ContainerName, constant.NginxReload); err != nil {
-		return err
-	}
-	return nil
+	return nginxCheckAndReload(string(oldContent), filePath, nginxInstall.ContainerName)
 }
 
 func (w WebsiteService) DeleteLoadBalance(req request.WebsiteLBDelete) error {

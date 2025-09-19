@@ -2559,6 +2559,8 @@ const message = {
         strategy: 'Strateji',
         strategyDown: 'Kapalı',
         strategyBackup: 'Yedek',
+        ipHashBackupErr: 'IP 哈希不支持备用节点',
+
         staticChangePHPHelper: 'Şu anda statik bir web sitesi, PHP web sitesine geçiş yapabilirsiniz',
         proxyCache: 'Ters Vekil Önbelleği',
         cacheLimit: 'Önbellek Alanı Sınırı',

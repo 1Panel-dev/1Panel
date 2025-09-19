@@ -7,7 +7,7 @@
                 </el-button>
                 <el-alert :closable="false" class="!mt-2">
                     <template #default>
-                        <span style="white-space: pre-line">{{ $t('website.loadBalanceHelper') }}</span>
+                        <span class="whitespace-pre-line">{{ $t('website.loadBalanceHelper') }}</span>
                     </template>
                 </el-alert>
             </template>
@@ -39,7 +39,15 @@
                                 <el-tag>{{ $t('website.maxConns') }}: {{ item.maxConns }}</el-tag>
                             </td>
                             <td v-if="item.flag != ''">
-                                <el-tag type="info">{{ $t('website.strategy') }}: {{ item.flag }}</el-tag>
+                                <el-tag type="info">
+                                    {{ $t('website.strategy') }}:
+                                    <span v-if="item.flag === 'backup'">
+                                        {{ $t('website.strategyBackup') }}
+                                    </span>
+                                    <span v-if="item.flag === 'down'">
+                                        {{ $t('website.strategyDown') }}
+                                    </span>
+                                </el-tag>
                             </td>
                         </tr>
                     </table>
