@@ -3386,38 +3386,41 @@ const message = {
             tamper: 'Web Sitesi Değiştirme Koruması',
             ignoreTemplate: 'Dizin Şablonunu Hariç Tut',
             protectTemplate: 'Dosya Şablonunu Koru',
-            templateContent: 'Şablon İçeriği',
-            template: 'Şablon',
-            tamperHelper1:
-                'Tek tıkla dağıtım türü web siteleri için, uygulama dizini değiştirme koruma özelliğinin etkinleştirilmesi önerilir; web sitesi düzgün çalışmıyorsa veya yedekleme ve kurtarma başarısızlıkları varsa, lütfen önce değiştirme koruma özelliğini devre dışı bırakın;',
-            tamperHelper2:
-                'Hariç tutulan dizinler dışındaki korunan dosyalara okuma, yazma, silme, izin değiştirme ve sahip değiştirme işlemleri kısıtlanacaktır',
-            tamperPath: 'Korunan Dizin',
-            tamperPathEdit: 'Yolu Düzenle',
-            log: 'Engelleme Günlüğü',
-            totalProtect: 'Toplam Koruma',
-            todayProtect: 'Bugünün Koruması',
-            addRule: 'Kural Ekle',
-            ignore: 'Dizini Hariç Tut',
-            ignoreHelper: 'Satır başına bir tane, ör.: \ntmp\n./tmp',
-            ignoreTemplateHelper: 'Hariç tutulacak klasör adlarını ekleyin, virgülle ayrılmış, ör.: tmp,cache',
-            templateRule: 'Uzunluk 1-512, isim {0} gibi semboller içeremez',
-            ignoreHelper1: 'Hariç tutulacak klasör adlarını veya belirli yolları ekleyin',
-            ignoreHelper2: 'Belirli bir klasörü hariç tutmak için ./ ile başlayan göreceli bir yol kullanın',
-            protect: 'Dosyayı Koru',
-            protectHelper: 'Satır başına bir tane, ör.: \npng\n./test.css',
+            ignoreTemplateHelper:
+                'Hariç tutma içeriğini girin (dizin adı tmp, dosya uzantısı .html, dosya türü js), Enter veya boşlukla ayrılmış.',
             protectTemplateHelper:
-                'Hariç tutulacak dosya adlarını veya uzantıları ekleyin, virgülle ayrılmış, ör.: conf,.css',
-            protectHelper1: 'Korunacak dosya adlarını, uzantıları veya belirli dosyaları belirtebilirsiniz',
-            protectHelper2: 'Belirli bir dosyayı korumak için ./ ile başlayan göreceli bir yol kullanın',
-            enableHelper:
-                'Aşağıdaki web siteleri için değiştirme koruma özelliği etkinleştirilecek ve web sitesi güvenliği artırılacak. Devam etmek istiyor musunuz?',
+                'Koruma içeriğini girin (dosya uzantısı .html, dosya türü js), Enter veya boşlukla ayrılmış.',
+            templateContent: 'Şablon içeriği',
+            template: 'Şablon',
+            saveTemplate: 'Şablon olarak kaydet',
+            tamperHelper1:
+                'Tek tıklamayla dağıtım web siteleri için uygulama dizini değişiklik korumasını etkinleştirmeniz önerilir; web sitesi normal olarak kullanılamıyorsa veya yedekleme/geri yükleme başarısız olursa, lütfen önce değişiklik korumasını devre dışı bırakın;',
+            tamperHelper2:
+                'Hariç tutulmayan dizinlerdeki korumalı dosyalar için okuma/yazma, silme, izin ve sahip değiştirme işlemlerini kısıtlayacaktır',
+            tamperPath: 'Koruma dizini',
+            tamperPathEdit: 'Yolu değiştir',
+            log: 'Engelleme günlüğü',
+            totalProtect: 'Toplam koruma',
+            todayProtect: 'Bugünkü koruma',
+            templateRule: 'Uzunluk 1-512, isim {0} ve diğer sembolleri içeremez',
+            ignore: 'Dizin/dosya hariç tut',
+            ignoreHelper:
+                'Hariç tutma içeriğini seçin veya girin (belirli dosya veya dizin ./log, dizin adı tmp, dosya uzantısı .html, dosya türü js), Enter veya boşlukla ayrılmış.',
+            protect: 'Dosyayı koru',
+            protectHelper:
+                'Koruma içeriğini seçin veya girin (belirli dosya ./index.html, dosya uzantısı .html, dosya türü js), Enter veya boşlukla ayrılmış.',
+            tamperHelper01:
+                'Değişiklik korumasını etkinleştirdikten sonra sistem, hariç tutulmayan dizinlerdeki korumalı dosyaların oluşturulmasını, düzenlenmesini ve silinmesini kısıtlayacaktır;',
+            tamperHelper02:
+                'Hariç tutulan dizinlerdeki tüm dosyalar kısıtlanmayacaktır, ancak korumalı dosyalarda belirli dosya yolları belirtilirse (en yüksek öncelik);',
+            tamperHelper03:
+                'İzleme işlemleri yalnızca hariç tutulmayan dizinleri hedefler, bu dizinlerdeki korunmayan dosyaların oluşturulmasını izler.',
             disableHelper:
-                'Aşağıdaki web siteleri için değiştirme koruma özelliği devre dışı bırakılacak. Devam etmek istiyor musunuz?',
+                'Aşağıdaki web siteleri için değişiklik korumasını devre dışı bırakmak üzeresiniz, devam etmek istiyor musunuz?',
             appendOnly: 'Sadece Ekleme',
             appendOnlyHelper:
                 'Bu dizindeki dosya silme işlemlerini kısıtlar, yalnızca hariç tutulan dizinlerin veya korunmayan dosyaların eklenmesine izin verir',
-            immutable: 'Düzenleme Yasak',
+            immutable: 'Değişmez',
             immutableHelper: 'Bu dosya için düzenleme, silme, izin ve sahip değiştirme işlemlerini kısıtlar',
             onWatch: 'İzleme',
             onWatchHelper:

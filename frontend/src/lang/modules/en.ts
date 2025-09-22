@@ -3355,33 +3355,36 @@ const message = {
             tamper: 'Website Tamper Protection',
             ignoreTemplate: 'Exclude Directory Template',
             protectTemplate: 'Protect File Template',
-            templateContent: 'Template Content',
+            ignoreTemplateHelper:
+                'Please enter exclusion content (directory name tmp, file extension .html, file type js), separated by Enter or space.',
+            protectTemplateHelper:
+                'Please enter protection content (file extension .html, file type js), separated by Enter or space.',
+            templateContent: 'Template content',
             template: 'Template',
+            saveTemplate: 'Save as template',
             tamperHelper1:
-                'For one-click deployment type websites, it is recommended to enable the application directory tamper protection feature; if the website is not functioning properly or there are backup and recovery failures, please first disable the tamper protection feature;',
+                'For one-click deployment websites, it is recommended to enable application directory tamper protection; if the website cannot be used normally or backup/restore fails, please disable tamper protection first;',
             tamperHelper2:
-                'Operations for reading, writing, deleting, changing permissions, and modifying owners of protected files outside the excluded directories will be restricted',
-            tamperPath: 'Protected Directory',
-            tamperPathEdit: 'Edit Path',
-            log: 'Intercept Log',
-            totalProtect: 'Total Protection',
-            todayProtect: 'Today’s Protection',
-            addRule: 'Add Rule',
-            ignore: 'Exclude Directory',
-            ignoreHelper: 'One per line, e.g.: \ntmp\n./tmp',
-            ignoreTemplateHelper: 'Add folder names to ignore, separated by commas, e.g.: tmp,cache',
-            templateRule: 'Length 1-512, name cannot contain symbols like {0}',
-            ignoreHelper1: 'Add folder names or specific paths to ignore',
-            ignoreHelper2: 'To ignore a specific folder, use a relative path starting with ./',
-            protect: 'Protect File',
-            protectHelper: 'One per line, e.g.: \npng\n./test.css',
-            protectTemplateHelper: 'Add file names or extensions to ignore, separated by commas, e.g.: conf,.css',
-            protectHelper1: 'You can specify file names, extensions, or specific files to protect',
-            protectHelper2: 'To protect a specific file, use a relative path starting with ./',
-            enableHelper:
-                'The tamper protection feature for the following websites will be enabled to enhance website security. Do you want to continue?',
-            disableHelper:
-                'The tamper protection feature for the following websites will be disabled. Do you want to continue?',
+                'Will restrict read/write, delete, permission, and owner modification operations for protected files in non-excluded directories',
+            tamperPath: 'Protection directory',
+            tamperPathEdit: 'Modify path',
+            log: 'Block log',
+            totalProtect: 'Total protection',
+            todayProtect: 'Today protection',
+            templateRule: 'Length 1-512, name cannot contain {0} and other symbols',
+            ignore: 'Exclude directory/file',
+            ignoreHelper:
+                'Please select or enter exclusion content (specific file or directory ./log, directory name tmp, file extension .html, file type js), separated by Enter or space.',
+            protect: 'Protect file',
+            protectHelper:
+                'Please select or enter protection content (specific file ./index.html, file extension .html, file type js), separated by Enter or space.',
+            tamperHelper01:
+                'After enabling tamper protection, the system will restrict creation, editing, and deletion operations of protected files in non-excluded directories;',
+            tamperHelper02:
+                'All files in excluded directories will not be restricted, unless specific file paths are specified in protected files (highest priority);',
+            tamperHelper03:
+                'Monitoring operations only target non-excluded directories, monitoring the creation of non-protected files in these directories.',
+            disableHelper: 'About to disable tamper protection for the following websites, continue?',
             appendOnly: 'Append Only',
             appendOnlyHelper:
                 'Restrict deletion operations for files in this directory, only allowing addition of excluded directories or non-protected files',

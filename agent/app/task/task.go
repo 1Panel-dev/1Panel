@@ -70,6 +70,7 @@ const (
 	TaskScan      = "TaskScan"
 	TaskExec      = "TaskExec"
 	TaskBatch     = "TaskBatch"
+	TaskProtect   = "TaskProtect"
 )
 
 const (
@@ -88,6 +89,7 @@ const (
 	TaskScopeImage            = "Image"
 	TaskScopeRuntimeExtension = "RuntimeExtension"
 	TaskScopeCustomAppstore   = "CustomAppstore"
+	TaskScopeTamper           = "Tamper"
 )
 
 func GetTaskName(resourceName, operate, scope string) string {

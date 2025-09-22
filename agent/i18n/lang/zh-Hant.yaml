@@ -245,6 +245,14 @@ ErrNotExistUser: '目前使用者不存在，請修改後重試！'
 ErrBanAction: '設定失敗，目前{{ .name }} 服務不可用，請檢查後再試一次！'
 ErrClamdscanNotFound: '未偵測到clamdscan 指令，請參考文件安裝！'
 
+#tamper
+CleanTamperSetting: "清理歷史防護設定"
+SetTamperWithRules: "根據規則啟動目錄防護"
+ProtectDir: "防護目錄 {{ .name }}"
+IgnoreFile: "保護文件 {{ .name }}"
+AbsoluteProtectFile: "受保護的絕對路徑文件"
+TamperSetSucessful: "防護設定完成，開始監聽以下目錄："
+
 #waf
 ErrScope: '不支援修改此配置'
 ErrStateChange: '狀態修改失敗'
@@ -316,6 +324,7 @@ TaskDelete: '刪除'
 TaskUpgrade: '升級'
 TaskUpdate: '更新'
 TaskRestart: '重啟'
+TaskProtect: "防護"
 TaskBackup: '備份'
 TaskRecover: '復原'
 TaskRollback: '回滾'

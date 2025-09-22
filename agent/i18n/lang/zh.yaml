@@ -245,6 +245,14 @@ ErrNotExistUser: "当前用户不存在，请修改后重试！"
 ErrBanAction: "设置失败，当前 {{ .name }} 服务不可用，请检查后重试！"
 ErrClamdscanNotFound: "未检测到 clamdscan 命令，请参考文档安装！"
 
+#tamper
+CleanTamperSetting: "清理历史防护设置"
+SetTamperWithRules: "根据规则启动目录防护"
+ProtectDir: "防护目录 {{ .name }}"
+IgnoreFile: "保护文件 {{ .name }}"
+AbsoluteProtectFile: "受保护的绝对路径文件"
+TamperSetSucessful: "防护设置完成，开始监听以下目录："
+
 #waf
 ErrScope: "不支持修改此配置"
 ErrStateChange: "状态修改失败"
@@ -317,6 +325,7 @@ TaskDelete: "删除"
 TaskUpgrade: "升级"
 TaskUpdate: "更新"
 TaskRestart: "重启"
+TaskProtect: "防护"
 TaskBackup: "备份"
 TaskRecover: "恢复"
 TaskRollback: "回滚"

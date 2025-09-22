@@ -3187,36 +3187,40 @@ const message = {
             tamper: '웹사이트 변조 방지',
             ignoreTemplate: '디렉토리 템플릿 제외',
             protectTemplate: '파일 템플릿 보호',
+            ignoreTemplateHelper:
+                '제외 내용을 입력하세요 (디렉토리 이름 tmp, 파일 확장자 .html, 파일 유형 js), Enter 또는 공백으로 구분합니다.',
+            protectTemplateHelper:
+                '보호 내용을 입력하세요 (파일 확장자 .html, 파일 유형 js), Enter 또는 공백으로 구분합니다.',
             templateContent: '템플릿 내용',
             template: '템플릿',
+            saveTemplate: '템플릿으로 저장',
             tamperHelper1:
-                '원클릭 배포 유형의 웹사이트는 애플리케이션 디렉토리 변조 방지 기능을 활성화하는 것이 좋습니다; 웹사이트가 정상적으로 작동하지 않거나 백업 및 복구에 실패하는 경우, 먼저 변조 방지 기능을 비활성화하십시오;',
+                '원클릭 배포 유형의 웹사이트의 경우 애플리케이션 디렉토리 변조 방지 기능을 활성화하는 것이 좋습니다. 웹사이트가 정상적으로 사용되지 않거나 백업/복원이 실패하는 경우 먼저 변조 방지 기능을 비활성화하세요.',
             tamperHelper2:
-                '제외된 디렉토리 외부의 보호된 파일에 대한 읽기, 쓰기, 삭제, 권한 및 소유자 변경 작업이 제한됩니다',
+                '제외되지 않은 디렉토리에서 보호된 파일에 대한 읽기/쓰기, 삭제, 권한 및 소유자 수정 작업을 제한합니다',
             tamperPath: '보호 디렉토리',
             tamperPathEdit: '경로 수정',
             log: '차단 로그',
             totalProtect: '총 보호',
-            todayProtect: '오늘의 보호',
-            addRule: '규칙 추가',
-            ignore: '디렉토리 제외',
-            ignoreHelper: '한 줄에 하나씩, 예: \ntmp\n./tmp',
-            ignoreTemplateHelper: '무시할 폴더 이름을 추가하고, 쉼표로 구분하십시오. 예: tmp,cache',
-            templateRule: '길이 1-512, 이름에 {0}와 같은 기호를 포함할 수 없습니다',
-            ignoreHelper1: '무시할 폴더 이름이나 특정 경로를 추가하십시오',
-            ignoreHelper2: '특정 폴더를 무시하려면 ./로 시작하는 상대 경로를 사용하십시오',
-            protect: '파일 보호',
-            protectHelper: '한 줄에 하나씩, 예: \npng\n./test.css',
-            protectTemplateHelper: '무시할 파일 이름이나 확장자를 추가하고, 쉼표로 구분하십시오. 예: conf,.css',
-            protectHelper1: '파일 이름, 확장자 또는 특정 파일을 보호할 수 있습니다',
-            protectHelper2: '특정 파일을 보호하려면 ./로 시작하는 상대 경로를 사용하십시오',
-            enableHelper:
-                '다음 웹사이트의 변조 방지 기능이 활성화됩니다. 웹사이트 보안을 강화하기 위해 계속하시겠습니까?',
-            disableHelper: '다음 웹사이트의 변조 방지 기능이 비활성화됩니다. 계속하시겠습니까?',
+            todayProtect: '오늘 보호',
+            templateRule: '길이 1-512, 이름에 {0} 등의 기호를 포함할 수 없습니다',
+            ignore: '제외 디렉토리/파일',
+            ignoreHelper:
+                '제외 내용을 선택하거나 입력하세요 (특정 파일 또는 디렉토리 ./log, 디렉토리 이름 tmp, 파일 확장자 .html, 파일 유형 js), Enter 또는 공백으로 구분합니다.',
+            protect: '보호 파일',
+            protectHelper:
+                '보호 내용을 선택하거나 입력하세요 (특정 파일 ./index.html, 파일 확장자 .html, 파일 유형 js), Enter 또는 공백으로 구분합니다.',
+            tamperHelper01:
+                '변조 방지를 활성화한 후 시스템은 제외되지 않은 디렉토리에서 보호된 파일의 생성, 편집 및 삭제 작업을 제한합니다.',
+            tamperHelper02:
+                '제외된 디렉토리의 모든 파일은 제한되지 않으며, 보호된 파일에서 특정 파일 경로가 지정된 경우는 예외입니다 (최고 우선순위).',
+            tamperHelper03:
+                '모니터링 작업은 제외되지 않은 디렉토리만 대상으로 하며, 이러한 디렉토리에서 비보호 파일의 생성을 모니터링합니다.',
+            disableHelper: '다음 웹사이트의 변조 방지 기능을 비활성화하려고 합니다. 계속하시겠습니까?',
             appendOnly: '추가 전용',
             appendOnlyHelper:
                 '이 디렉토리 내 파일의 삭제 작업을 제한하며, 제외 디렉토리 또는 비보호 파일 추가만 허용합니다',
-            immutable: '편집 금지',
+            immutable: '불변',
             immutableHelper: '이 파일의 편집, 삭제, 권한 및 소유자 수정 작업을 제한합니다',
             onWatch: '감시',
             onWatchHelper: '이 디렉토리 내 보호 파일 또는 비제외 디렉토리 생성에 대한 감시 및 가로채기를 수행합니다',

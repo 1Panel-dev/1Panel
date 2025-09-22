@@ -221,7 +221,7 @@ const openDir = async (row: File.File, column: any, event: any) => {
             });
         return;
     }
-    if (!form.isAll && !form.dir) {
+    if (form.isAll || !form.dir) {
         selectRow.value.path = (req.path === '/' ? req.path : req.path + '/') + row.name;
         return;
     }

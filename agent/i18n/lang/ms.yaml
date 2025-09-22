@@ -246,6 +246,14 @@ ErrNotExistUser: 'Pengguna semasa tidak wujud, sila ubah suai dan cuba lagi!'
 ErrBanAction: 'Tetapan gagal. Perkhidmatan {{ .name }} semasa tidak tersedia. Sila semak dan cuba lagi!'
 ErrClamdscanNotFound: 'Arahan clamdscan tidak dikesan, sila rujuk dokumentasi untuk memasangnya!'
 
+#tamper
+CleanTamperSetting: "Bersihkan tetapan perlindungan sejarah"
+SetTamperWithRules: "Mulakan perlindungan direktori mengikut peraturan"
+ProtectDir: "Lindungi direktori {{ .name }}"
+IgnoreFile: "Lindungi fail {{ .name }}"
+AbsoluteProtectFile: "Fail laluan mutlak yang dilindungi"
+TamperSetSucessful: "Tetapan perlindungan selesai, mula memantau direktori berikut:"
+
 #waf
 ErrScope: 'Mengubah suai konfigurasi ini tidak disokong'
 ErrStateChange: 'Perubahan keadaan gagal'
@@ -317,6 +325,7 @@ TaskDelete: 'Padam'
 TaskUpgrade: 'Naik taraf'
 TaskUpdate: 'Kemas kini'
 TaskRestart: 'Mulakan semula'
+TaskProtect: "Lindungi"
 TaskBackup: 'Sandaran'
 TaskRecover: 'Pulihkan'
 TaskRollback: 'Rollback'

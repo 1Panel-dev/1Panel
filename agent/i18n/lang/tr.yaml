@@ -247,6 +247,14 @@ ErrNotExistUser: 'Mevcut kullanıcı mevcut değil, lütfen değiştirin ve tekr
 ErrBanAction: 'Ayarlama başarısız. Mevcut {{ .name }} servisi kullanılamıyor. Lütfen kontrol edin ve tekrar deneyin!'
 ErrClamdscanNotFound: 'clamdscan komutu tespit edilmedi, lütfen yüklemek için belgeleri inceleyin!'
 
+#tamper
+CleanTamperSetting: "Geçmiş koruma ayarlarını temizle"
+SetTamperWithRules: "Kurallara göre dizin korumasını başlat"
+ProtectDir: "Dizini koru {{ .name }}"
+IgnoreFile: "Dosyayı koru {{ .name }}"
+AbsoluteProtectFile: "Korumalı mutlak yol dosyası"
+TamperSetSucessful: "Koruma ayarları tamamlandı, aşağıdaki dizinler izlenmeye başlanıyor:"
+
 #waf
 ErrScope: 'Bu yapılandırmayı değiştirme desteklenmiyor'
 ErrStateChange: 'Durum değiştirme başarısız'
@@ -318,6 +326,7 @@ TaskDelete: 'Sil'
 TaskUpgrade: 'Yükselt'
 TaskUpdate: 'Güncelle'
 TaskRestart: 'Yeniden Başlat'
+TaskProtect: "Koru"
 TaskBackup: 'Yedekle'
 TaskRecover: 'Kurtar'
 TaskRollback: 'Geri Al'

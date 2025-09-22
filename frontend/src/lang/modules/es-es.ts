@@ -3306,32 +3306,37 @@ const message = {
             tamper: 'Protección contra manipulación web',
             ignoreTemplate: 'Plantilla de exclusión de directorios',
             protectTemplate: 'Plantilla de archivos protegidos',
-            templateContent: 'Contenido de la plantilla',
+            ignoreTemplateHelper:
+                'Ingrese contenido de exclusión (nombre de directorio tmp, extensión de archivo .html, tipo de archivo js), separado por Enter o espacio.',
+            protectTemplateHelper:
+                'Ingrese contenido de protección (extensión de archivo .html, tipo de archivo js), separado por Enter o espacio.',
+            templateContent: 'Contenido de plantilla',
             template: 'Plantilla',
+            saveTemplate: 'Guardar como plantilla',
             tamperHelper1:
-                'Para sitios de despliegue automático, se recomienda habilitar la protección contra manipulación en el directorio de la aplicación; si el sitio no funciona correctamente o fallan las copias de seguridad, desactiva primero esta función.',
+                'Para sitios web de implementación con un clic, se recomienda habilitar la protección contra manipulaciones del directorio de aplicaciones; si el sitio web no se puede usar normalmente o falla la copia de seguridad/restauración, desactive primero la protección contra manipulaciones;',
             tamperHelper2:
-                'Las operaciones de lectura, escritura, borrado, cambios de permisos o de propietario en archivos protegidos fuera de directorios excluidos estarán restringidas.',
-            tamperPath: 'Directorio protegido',
-            tamperPathEdit: 'Editar ruta',
-            log: 'Log de intercepciones',
-            totalProtect: 'Protecciones totales',
-            todayProtect: 'Protecciones de hoy',
-            addRule: 'Añadir regla',
-            ignore: 'Excluir directorio',
-            ignoreHelper: 'Uno por línea, ej.: \ntmp\n./tmp',
-            ignoreTemplateHelper: 'Añade nombres de carpetas separados por comas, ej.: tmp,cache',
-            templateRule: 'Longitud 1-512, el nombre no puede contener símbolos como {0}',
-            ignoreHelper1: 'Añade carpetas o rutas específicas a excluir',
-            ignoreHelper2: 'Para excluir un directorio usa ruta relativa con ./',
+                'Restringirá las operaciones de lectura/escritura, eliminación, permisos y modificación de propietario para archivos protegidos en directorios no excluidos',
+            tamperPath: 'Directorio de protección',
+            tamperPathEdit: 'Modificar ruta',
+            log: 'Registro de bloqueo',
+            totalProtect: 'Protección total',
+            todayProtect: 'Protección de hoy',
+            templateRule: 'Longitud 1-512, el nombre no puede contener {0} y otros símbolos',
+            ignore: 'Excluir directorio/archivo',
+            ignoreHelper:
+                'Seleccione o ingrese contenido de exclusión (archivo o directorio específico ./log, nombre de directorio tmp, extensión de archivo .html, tipo de archivo js), separado por Enter o espacio.',
             protect: 'Proteger archivo',
-            protectHelper: 'Uno por línea, ej.: \npng\n./test.css',
-            protectTemplateHelper: 'Añade nombres de archivos o extensiones separados por comas, ej.: conf,.css',
-            protectHelper1: 'Puedes especificar nombres, extensiones o archivos concretos',
-            protectHelper2: 'Para proteger un archivo usa ruta relativa con ./',
-            enableHelper:
-                'La protección contra manipulación se activará en los siguientes sitios para mejorar la seguridad. ¿Continuar?',
-            disableHelper: 'La protección contra manipulación se desactivará en los siguientes sitios. ¿Continuar?',
+            protectHelper:
+                'Seleccione o ingrese contenido de protección (archivo específico ./index.html, extensión de archivo .html, tipo de archivo js), separado por Enter o espacio.',
+            tamperHelper01:
+                'Después de habilitar la protección contra manipulaciones, el sistema restringirá las operaciones de creación, edición y eliminación de archivos protegidos en directorios no excluidos;',
+            tamperHelper02:
+                'Todos los archivos en directorios excluidos no estarán restringidos, a menos que se especifiquen rutas de archivo específicas en archivos protegidos (prioridad más alta);',
+            tamperHelper03:
+                'Las operaciones de monitoreo solo se dirigen a directorios no excluidos, monitoreando la creación de archivos no protegidos en estos directorios.',
+            disableHelper:
+                'A punto de desactivar la protección contra manipulaciones para los siguientes sitios web, ¿continuar?',
             appendOnly: 'Solo añadir',
             appendOnlyHelper:
                 'Restringe el borrado en este directorio, solo se permite añadir directorios excluidos o archivos no protegidos',

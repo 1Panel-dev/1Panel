@@ -246,6 +246,14 @@ ErrNotExistUser: '現在のユーザーは存在しません。変更しても�
 ErrBanAction: '設定に失敗しました。現在の {{ .name }} サービスは利用できません。確認してもう一度お試しください。'
 ErrClamdscanNotFound: 'clamdscan コマンドが検出されませんでした。インストールするにはドキュメントを参照してください。'
 
+#tamper
+CleanTamperSetting: "履歴保護設定をクリーンアップ"
+SetTamperWithRules: "ルールに従ってディレクトリ保護を開始"
+ProtectDir: "ディレクトリを保護 {{ .name }}"
+IgnoreFile: "ファイルを保護 {{ .name }}"
+AbsoluteProtectFile: "保護された絶対パスファイル"
+TamperSetSucessful: "保護設定が完了し、以下のディレクトリの監視を開始します："
+
 #waf
 ErrScope: 'この構成の変更はサポートされていません'
 ErrStateChange: '状態の変更に失敗しました'
@@ -317,6 +325,7 @@ TaskDelete: '削除'
 TaskUpgrade: 'アップグレード'
 TaskUpdate: '更新'
 TaskRestart: '再起動'
+TaskProtect: "保護"
 TaskBackup: 'バックアップ'
 TaskRecover: '回復'
 TaskRollback: 'ロールバック'

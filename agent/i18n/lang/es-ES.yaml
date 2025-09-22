@@ -244,6 +244,14 @@ ErrNotExistUser: 'El usuario actual no existe, modifíquelo e intente de nuevo'
 ErrBanAction: 'Fallo al configurar. El servicio {{ .name }} no está disponible, revise e intente de nuevo'
 ErrClamdscanNotFound: 'El comando clamdscan no fue detectado, siga la documentación para instalarlo'
 
+#tamper
+CleanTamperSetting: "Limpiar configuraciones de protección históricas"
+SetTamperWithRules: "Iniciar protección de directorio según reglas"
+ProtectDir: "Proteger directorio {{ .name }}"
+IgnoreFile: "Proteger archivo {{ .name }}"
+AbsoluteProtectFile: "Archivo de ruta absoluta protegido"
+TamperSetSucessful: "Configuración de protección completada, comenzando monitoreo de los siguientes directorios:"
+
 #waf
 ErrScope: 'No se admite la modificación de esta configuración'
 ErrStateChange: 'Fallo al cambiar de estado'
@@ -311,6 +319,7 @@ SubTaskFailed: '{{ .name }} falló: {{ .err }}'
 TaskInstall: 'Instalar'
 TaskUninstall: 'Desinstalar'
 TaskCreate: 'Crear'
+TaskProtect: "Proteger"
 TaskDelete: 'Eliminar'
 TaskUpgrade: 'Actualizar'
 TaskUpdate: 'Actualizar'
