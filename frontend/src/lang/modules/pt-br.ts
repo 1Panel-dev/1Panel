@@ -493,7 +493,7 @@ const message = {
         pgSuperUser: 'Superusuário',
         loadFromRemoteHelper:
             'Isso sincronizará as informações do banco de dados no servidor para o 1Panel. Deseja continuar?',
-        passwordHelper: 'Não é possível obter, por favor, modifique',
+        passwordHelper: 'Não é possível obter, clique para modificar',
         remote: 'Remoto',
         remoteDB: 'Servidor remoto | Servidores remotos',
         createRemoteDB: 'Vincular @.lower:database.remoteDB',

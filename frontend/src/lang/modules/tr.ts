@@ -502,7 +502,7 @@ const message = {
         pgSuperUser: 'Süper Kullanıcı',
         loadFromRemoteHelper:
             'Bu, sunucudaki veritabanı bilgilerini 1Panele senkronize edecek. Devam etmek istiyor musunuz?',
-        passwordHelper: 'Alınamıyor, lütfen değiştirin',
+        passwordHelper: 'Alınamıyor, değiştirmek için tıklayın',
         remote: 'Uzak',
         remoteDB: 'Uzak sunucu | Uzak sunucular',
         createRemoteDB: '@.lower:database.remoteDB Bağla',

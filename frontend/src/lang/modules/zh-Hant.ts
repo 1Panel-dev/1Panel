@@ -481,7 +481,7 @@ const message = {
         pgBindHelper: '此操作用於建立新使用者並將其綁定到目標資料庫，暫不支援選擇已存在於資料庫中的使用者。',
         pgSuperUser: '超級使用者',
         loadFromRemoteHelper: '此操作將同步伺服器上資料庫資訊到 1Panel，是否繼續？',
-        passwordHelper: '無法取得密碼，請修改',
+        passwordHelper: '無法獲取，可點擊修改',
         remote: '遠端',
         remoteDB: '遠端伺服器',
         createRemoteDB: '新增遠端伺服器',

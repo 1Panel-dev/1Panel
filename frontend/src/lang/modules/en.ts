@@ -497,7 +497,7 @@ const message = {
         pgSuperUser: 'Super User',
         loadFromRemoteHelper:
             'This will synchronize the database info on the server to 1Panel. Do you want to continue?',
-        passwordHelper: 'Unable to retrieve, please modify',
+        passwordHelper: 'Cannot obtain, click to modify',
         remote: 'Remote',
         remoteDB: 'Remote server | Remote servers',
         createRemoteDB: 'Bind @.lower:database.remoteDB',

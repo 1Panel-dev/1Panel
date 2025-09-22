@@ -484,7 +484,7 @@ const message = {
         pgBindHelper: `이 작업은 새 사용자를 생성하여 대상 데이터베이스에 바인딩하는 데 사용됩니다. 현재 데이터베이스에 이미 존재하는 사용자 선택은 지원되지 않습니다.`,
         pgSuperUser: '슈퍼 사용자',
         loadFromRemoteHelper: '이 작업은 서버의 데이터베이스 정보를 1Panel로 동기화합니다. 계속 진행하시겠습니까?',
-        passwordHelper: '불러올 수 없습니다. 수정해주세요.',
+        passwordHelper: '확인 불가, 수정하려면 클릭',
         remote: '원격',
         remoteDB: '원격 서버 | 원격 서버들',
         createRemoteDB: '원격 DB 바인딩',

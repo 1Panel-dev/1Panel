@@ -479,7 +479,7 @@ const message = {
         pgBindHelper: '该操作用于创建新用户并将其绑定到目标数据库，暂不支持选择已存在于数据库中的用户。',
         pgSuperUser: '超级用户',
         loadFromRemoteHelper: '此操作将同步服务器上数据库信息到 1Panel，是否继续？',
-        passwordHelper: '无法获取密码，请修改',
+        passwordHelper: '无法获取，可点击修改',
         remote: '远程',
         remoteDB: '远程服务器',
         createRemoteDB: '添加远程服务器',

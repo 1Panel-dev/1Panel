@@ -485,7 +485,7 @@ const message = {
         pgBindHelper: `この操作は、新しいユーザーを作成し、ターゲットデータベースにバインドするために使用されます。現在、データベースに既存のユーザーを選択することはサポートされていません。`,
         pgSuperUser: 'スーパーユーザー',
         loadFromRemoteHelper: 'これにより、サーバー上のデータベース情報が1パネルに同期します。続けたいですか？',
-        passwordHelper: '取得できない場合は、変更してください',
+        passwordHelper: '取得できません、クリックして修正',
         remote: 'リモート',
         remoteDB: 'リモートサーバー|リモートサーバー',
         createRemoteDB: 'リモートサーバーを追加',

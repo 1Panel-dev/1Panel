@@ -496,7 +496,7 @@ const message = {
         pgSuperUser: 'Pengguna Super',
         loadFromRemoteHelper:
             'Ini akan menyelaraskan maklumat pangkalan data di pelayan ke 1Panel. Adakah anda mahu meneruskan?',
-        passwordHelper: 'Tidak dapat diambil, sila ubah',
+        passwordHelper: 'Tidak dapat diperoleh, klik untuk ubah',
         remote: 'Jauh',
         remoteDB: 'Pelayan jauh | Pelayan-pelayan jauh',
         createRemoteDB: 'Kaitkan @.lower:database.remoteDB',

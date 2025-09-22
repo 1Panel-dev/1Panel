@@ -500,7 +500,7 @@ const message = {
         pgSuperUser: 'Superusuario',
         loadFromRemoteHelper:
             'Esto sincronizará la información de la base de datos del servidor a 1Panel. ¿Desea continuar?',
-        passwordHelper: 'No se puede recuperar, por favor modifique',
+        passwordHelper: 'No se puede obtener, haga clic para modificar',
         remote: 'Remoto',
         remoteDB: 'Servidor remoto | Servidores remotos',
         manageRemoteDB: 'Administrar servidores remotos',
