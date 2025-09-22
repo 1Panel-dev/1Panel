@@ -275,7 +275,7 @@ const getVersionDetail = async (version: string) => {
 };
 
 const initForm = async (appKey: string) => {
-    formData.value.name = appKey;
+    formData.value.name = appKey.replace(/^local/, '');
     const res = await getAppByKey(appKey);
     currentApp.value = res.data;
     appVersions.value = currentApp.value.versions;
