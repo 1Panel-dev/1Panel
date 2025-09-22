@@ -168,6 +168,9 @@ func LoadScriptInfo(id uint) (model.ScriptLibrary, error) {
 }
 
 func (u *ScriptService) Sync(req dto.OperateByTaskID) error {
+	if global.CONF.Base.IsOffLine {
+		return nil
+	}
 	syncTask, err := task.NewTaskWithOps(i18n.GetMsgByKey("ScriptLibrary"), task.TaskSync, task.TaskScopeScript, req.TaskID, 0)
 	if err != nil {
 		global.LOG.Errorf("create sync task failed %v", err)

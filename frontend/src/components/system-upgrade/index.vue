@@ -37,13 +37,17 @@
                         {{ version }}
                     </el-link>
                     <el-badge is-dot class="-mt-0.5" :hidden="version === 'Waiting' || !globalStore.hasNewVersion">
-                        <el-link class="ml-2" underline="never" type="primary" @click="onLoadUpgradeInfo">
+                        <el-link
+                            class="ml-2"
+                            underline="never"
+                            type="primary"
+                            @click="onLoadUpgradeInfo"
+                            v-if="!globalStore.isOffLine"
+                        >
                             {{ $t('commons.button.update') }}
                         </el-link>
                     </el-badge>
-                    <el-tag v-if="version === 'Waiting'" round class="ml-2.5">
-                        {{ $t('setting.upgrading') }}
-                    </el-tag>
+                    <el-tag v-if="version === 'Waiting'" round class="ml-2.5">{{ $t('setting.upgrading') }}</el-tag>
                 </div>
             </div>
         </div>

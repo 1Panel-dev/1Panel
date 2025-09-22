@@ -19,9 +19,12 @@ func Init() {
 		global.LOG.Errorf("[core] can not add backup token refresh corn job: %s", err.Error())
 	}
 
-	scriptJob := job.NewScriptJob()
-	if _, err := global.Cron.AddJob(fmt.Sprintf("%v %v * * *", mathRand.Intn(60), mathRand.Intn(3)), scriptJob); err != nil {
-		global.LOG.Errorf("[core] can not add script sync corn job: %s", err.Error())
+	if !global.CONF.Base.IsOffLine {
+		scriptJob := job.NewScriptJob()
+		if _, err := global.Cron.AddJob(fmt.Sprintf("%v %v * * *", mathRand.Intn(60), mathRand.Intn(3)), scriptJob); err != nil {
+			global.LOG.Errorf("[core] can not add script sync corn job: %s", err.Error())
+		}
 	}
+
 	global.Cron.Start()
 }
