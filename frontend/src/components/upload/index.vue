@@ -13,7 +13,7 @@
                         <el-alert :closable="false" type="warning">
                             <template #default>
                                 <ul>
-                                    <li v-if="type === 'mysql' || type === 'mariadb'">
+                                    <li v-if="type === 'mysql' || type === 'mariadb' || type === 'mysql-cluster'">
                                         {{ $t('database.formatHelper', [remark]) }}
                                     </li>
                                     <li v-if="isDb()">{{ $t('database.supportUpType') }}</li>
@@ -299,7 +299,13 @@ const onRecover = async (row: File.File) => {
 };
 
 const isDb = () => {
-    return type.value === 'mysql' || type.value === 'mariadb' || type.value === 'postgresql';
+    return (
+        type.value === 'mysql' ||
+        type.value === 'mariadb' ||
+        type.value === 'postgresql' ||
+        type.value === 'mysql-cluster' ||
+        type.value === 'postgresql-cluster'
+    );
 };
 const uploaderFiles = ref<UploadFiles>([]);
 const uploadRef = ref<UploadInstance>();
