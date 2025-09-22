@@ -16,7 +16,6 @@
 </template>
 
 <script lang="ts" setup name="AppInstallPage">
-import { ref, reactive } from 'vue';
 import { useRouter } from 'vue-router';
 import AppInstallForm from '@/views/app-store/detail/form/index.vue';
 import { installApp } from '@/api/modules/app';
@@ -32,7 +31,7 @@ const loading = ref(false);
 const installFormRef = ref<InstanceType<typeof AppInstallForm>>();
 const taskLogRef = ref();
 
-const formData = reactive({
+const formData = ref({
     appDetailId: 0,
     params: {},
     name: '',

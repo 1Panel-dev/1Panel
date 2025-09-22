@@ -4,7 +4,7 @@
     "version": "2.0",
     "description": "1Panel 前端",
     "scripts": {
-        "dev": "vite",
+        "dev": "node --max-old-space-size=8192 ./node_modules/.bin/vite --host",
         "serve": "vite",
         "build:dev": "vite build --mode development",
         "build:test": "vue-tsc --noEmit && vite build --mode test",
@@ -56,8 +56,7 @@
         "vue-codemirror": "^6.1.1",
         "vue-demi": "^0.14.6",
         "vue-i18n": "^10.0.5",
-        "vue-router": "^4.3.3",
-        "vue-virtual-scroller": "^2.0.0-beta.8"
+        "vue-router": "^4.5.1"
     },
     "devDependencies": {
         "@types/node": "^20.14.8",

@@ -31,8 +31,17 @@
         },
         // 跳过库检查，解决打包失败
         "skipLibCheck": true,
-        "ignoreDeprecations": "5.0",
+        "ignoreDeprecations": "5.0"
     },
-    // "include": ["./src/views"],
+    "include": [
+        "src/**/*.ts",
+        "src/**/*.d.ts",
+        "src/**/*.tsx",
+        "src/**/*.vue",
+        "build/**/*.ts",
+        "build/**/*.d.ts",
+        "vite.config.ts",
+        "auto-imports.d.ts"
+    ],
     "exclude": ["node_modules", "dist", "**/*.js", "*.json", "*.md"]
 }
