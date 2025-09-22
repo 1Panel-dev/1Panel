@@ -163,6 +163,7 @@ export namespace Runtime {
         params: any;
         disableFunctions: string[];
         uploadMaxSize: string;
+        maxExecutionTime: string;
     }
 
     export interface PHPConfigUpdate {
@@ -171,6 +172,7 @@ export namespace Runtime {
         disableFunctions?: string[];
         scope: string;
         uploadMaxSize?: string;
+        maxExecutionTime?: string;
     }
 
     export interface PHPUpdate {

@@ -87,7 +87,7 @@ export const GetPHPConfig = (id: number) => {
 };
 
 export const UpdatePHPConfig = (req: Runtime.PHPConfigUpdate) => {
-    return http.post<any>(`/runtimes/php/config/`, req);
+    return http.post<any>(`/runtimes/php/config`, req);
 };
 
 export const UpdatePHPFile = (req: Runtime.PHPUpdate) => {

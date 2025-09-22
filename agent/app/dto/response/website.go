@@ -59,16 +59,16 @@ type WebsiteNginxConfig struct {
 }
 
 type WebsiteHTTPS struct {
-	Enable      bool             `json:"enable"`
-	HttpConfig  string           `json:"httpConfig"`
-	SSL         model.WebsiteSSL `json:"SSL"`
-	SSLProtocol []string         `json:"SSLProtocol"`
-	Algorithm   string           `json:"algorithm"`
-	Hsts        bool             `json:"hsts"`
-	HstsIncludeSubDomains         bool             `json:"hstsIncludeSubDomains"`
-	HttpsPorts  []int            `json:"httpsPorts"`
-	HttpsPort   string           `json:"httpsPort"`
-	Http3       bool             `json:"http3"`
+	Enable                bool             `json:"enable"`
+	HttpConfig            string           `json:"httpConfig"`
+	SSL                   model.WebsiteSSL `json:"SSL"`
+	SSLProtocol           []string         `json:"SSLProtocol"`
+	Algorithm             string           `json:"algorithm"`
+	Hsts                  bool             `json:"hsts"`
+	HstsIncludeSubDomains bool             `json:"hstsIncludeSubDomains"`
+	HttpsPorts            []int            `json:"httpsPorts"`
+	HttpsPort             string           `json:"httpsPort"`
+	Http3                 bool             `json:"http3"`
 }
 
 type WebsiteLog struct {
@@ -82,6 +82,7 @@ type PHPConfig struct {
 	Params           map[string]string `json:"params"`
 	DisableFunctions []string          `json:"disableFunctions"`
 	UploadMaxSize    string            `json:"uploadMaxSize"`
+	MaxExecutionTime string            `json:"maxExecutionTime"`
 }
 
 type NginxRewriteRes struct {

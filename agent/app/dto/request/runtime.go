@@ -100,6 +100,7 @@ type PHPConfigUpdate struct {
 	Scope            string            `json:"scope" validate:"required"`
 	DisableFunctions []string          `json:"disableFunctions"`
 	UploadMaxSize    string            `json:"uploadMaxSize"`
+	MaxExecutionTime string            `json:"maxExecutionTime"`
 }
 
 type PHPFileUpdate struct {

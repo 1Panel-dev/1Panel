@@ -860,6 +860,10 @@ func (r *RuntimeService) GetPHPConfig(id uint) (*response.PHPConfig, error) {
 	if uploadMaxSize != "" {
 		res.UploadMaxSize = uploadMaxSize
 	}
+	timeout := phpConfig.Key("max_execution_time").Value()
+	if timeout != "" {
+		res.MaxExecutionTime = timeout
+	}
 	return res, nil
 }
 
@@ -911,6 +915,15 @@ func (r *RuntimeService) UpdatePHPConfig(req request.PHPConfigUpdate) (err error
 			patternUpload := "^" + regexp.QuoteMeta("upload_max_filesize") + "\\s*=\\s*.*$"
 			if matched, _ := regexp.MatchString(patternUpload, line); matched {
 				lines[i] = "upload_max_filesize" + " = " + req.UploadMaxSize
+			}
+		case "max_execution_time":
+			pattern := "^" + regexp.QuoteMeta("max_execution_time") + "\\s*=\\s*.*$"
+			if matched, _ := regexp.MatchString(pattern, line); matched {
+				lines[i] = "max_execution_time" + " = " + req.MaxExecutionTime
+			}
+			patternInput := "^" + regexp.QuoteMeta("max_input_time") + "\\s*=\\s*.*$"
+			if matched, _ := regexp.MatchString(patternInput, line); matched {
+				lines[i] = "max_input_time" + " = " + req.MaxExecutionTime
 			}
 		}
 	}

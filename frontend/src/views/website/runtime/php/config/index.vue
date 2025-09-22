@@ -20,6 +20,9 @@
                 <el-tab-pane :label="$t('php.uploadMaxSize')" name="2">
                     <Upload :id="runtime.id" v-if="index == '2'"></Upload>
                 </el-tab-pane>
+                <el-tab-pane :label="$t('cronjob.timeout')" name="8">
+                    <Timeout :id="runtime.id" v-if="index == '8'"></Timeout>
+                </el-tab-pane>
                 <el-tab-pane :label="$t('website.nginxPer')" name="5">
                     <Performance :id="runtime.id" v-if="index == '5'"></Performance>
                 </el-tab-pane>
@@ -47,6 +50,7 @@ import PHP from './php-fpm/index.vue';
 import Performance from './performance/index.vue';
 import Container from './container/index.vue';
 import FpmStatus from './fpm-status/index.vue';
+import Timeout from './timeout/index.vue';
 
 const index = ref('6');
 const open = ref(false);
