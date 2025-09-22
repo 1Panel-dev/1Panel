@@ -1,10 +1,101 @@
 package v2
 
 import (
+	"encoding/csv"
+	"errors"
+	"fmt"
+	"io"
+
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/core/app/dto"
+	"github.com/1Panel-dev/1Panel/core/app/repo"
 	"github.com/gin-gonic/gin"
 )
+
+// @Tags Command
+// @Summary Export command
+// @Success 200 {string} path
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /core/commands/upload [post]
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"导出快速命令","formatEN":"export quick commands"}
+func (b *BaseApi) UploadCommandCsv(c *gin.Context) {
+	form, err := c.MultipartForm()
+	if err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	files := form.File["file"]
+	if len(files) == 0 {
+		helper.BadRequest(c, errors.New("no such files"))
+		return
+	}
+	uploadFile, _ := files[0].Open()
+	reader := csv.NewReader(uploadFile)
+	if _, err := reader.Read(); err != nil {
+		helper.BadRequest(c, fmt.Errorf("read title failed, err: %v", err))
+		return
+	}
+	groupRepo := repo.NewIGroupRepo()
+	group, _ := groupRepo.Get(groupRepo.WithByDefault(true))
+	var commands []dto.CommandInfo
+	for {
+		record, err := reader.Read()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			helper.BadRequest(c, fmt.Errorf("read content failed, err: %v", err))
+			return
+		}
+		if len(record) >= 2 {
+			commands = append(commands, dto.CommandInfo{
+				Name:        record[0],
+				Type:        "command",
+				GroupID:     group.ID,
+				Command:     record[1],
+				GroupBelong: group.Name,
+			})
+		}
+	}
+
+	helper.SuccessWithData(c, commands)
+}
+
+// @Tags Command
+// @Summary Export command
+// @Success 200 {string} path
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /core/commands/export [post]
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"导出快速命令","formatEN":"export quick commands"}
+func (b *BaseApi) ExportCommands(c *gin.Context) {
+	file, err := commandService.Export()
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, file)
+}
+
+// @Tags Command
+// @Summary Import command
+// @Success 200 {string} path
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /core/commands/import [post]
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"导入快速命令","formatEN":"import quick commands"}
+func (b *BaseApi) ImportCommands(c *gin.Context) {
+	var req dto.CommandImport
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	for _, item := range req.Items {
+		_ = commandService.Create(item)
+	}
+	helper.Success(c)
+}
 
 // @Tags Command
 // @Summary Create command

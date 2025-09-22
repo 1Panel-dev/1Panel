@@ -241,3 +241,7 @@ ClusterMasterNotExist: "叢集主節點失聯，請刪除子節點"
 
 #ssl
 ErrReqFailed: "{{.name}} 請求失敗: {{ .err }}"
+
+#command
+Name: "名稱"
+Command: "命令"

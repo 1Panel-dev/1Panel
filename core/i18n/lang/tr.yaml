@@ -230,3 +230,7 @@ ClusterMasterNotExist: "Küme ana düğümü bağlantısı kesildi, lütfen alt 
 
 #ssl
 ErrReqFailed: "{{.name}} istek başarısız: {{ .err }}"
+
+#command
+Name: "Ad"
+Command: "Komut"

@@ -1174,6 +1174,7 @@ const message = {
         fold: 'Kontrak semua',
         batchInput: 'Pemprosesan kelompok',
         quickCommand: 'Arahan pantas | Arahan pantas',
+        noSuchCommand: 'Tiada data arahan pantas ditemui dalam fail CSV yang diimport, sila periksa dan cuba lagi!',
         quickCommandHelper: 'Anda boleh menggunakan arahan pantas di bahagian bawah "Terminal -> Terminal".',
         groupDeleteHelper:
             'Selepas kumpulan dikeluarkan, semua sambungan dalam kumpulan akan dipindahkan ke kumpulan lalai. Adakah anda mahu meneruskan?',

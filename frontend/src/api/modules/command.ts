@@ -5,6 +5,15 @@ import { Command } from '../interface/command';
 export const getCommandList = (type: string) => {
     return http.post<Array<Command.CommandInfo>>(`/core/commands/list`, { type: type });
 };
+export const exportCommands = () => {
+    return http.post<string>(`/core/commands/export`);
+};
+export const uploadCommands = (params: FormData) => {
+    return http.upload<Array<Command.CommandInfo>>(`/core/commands/upload`, params);
+};
+export const importCommands = (list: Array<Command.CommandOperate>) => {
+    return http.post(`/core/commands/import`, { items: list });
+};
 export const getCommandPage = (params: SearchWithPage) => {
     return http.post<ResPage<Command.CommandInfo>>(`/core/commands/search`, params);
 };

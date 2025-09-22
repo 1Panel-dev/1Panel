@@ -231,3 +231,7 @@ ClusterMasterNotExist: "클러스터의 마스터 노드가 연결이 끊어졌�
 
 #ssl
 ErrReqFailed: "{{.name}} 요청 실패: {{ .err }}"
+
+#command
+Name: "이름"
+Command: "명령어"

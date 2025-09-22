@@ -1167,6 +1167,8 @@ const message = {
         fold: 'Contrair tudo',
         batchInput: 'Processamento em lote',
         quickCommand: 'Comando rápido | Comandos rápidos',
+        noSuchCommand:
+            'Nenhum dado de comando rápido encontrado no arquivo CSV importado, verifique e tente novamente!',
         quickCommandHelper: 'Você pode usar os comandos rápidos na parte inferior de "Terminais -> Terminais".',
         groupDeleteHelper:
             'Após o grupo ser removido, todas as conexões no grupo serão migradas para o grupo padrão. Você deseja continuar?',

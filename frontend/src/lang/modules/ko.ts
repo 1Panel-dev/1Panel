@@ -1138,6 +1138,7 @@ const message = {
         fold: '모두 축소',
         batchInput: '배치 처리',
         quickCommand: '빠른 명령 | 빠른 명령들',
+        noSuchCommand: '가져온 CSV 파일에서 빠른 명령어 데이터를 찾을 수 없습니다. 확인 후 다시 시도하세요!',
         quickCommandHelper: '"터미널 -> 터미널" 하단에서 빠른 명령을 사용할 수 있습니다.',
         groupDeleteHelper: '그룹을 제거하면 해당 그룹의 모든 연결이 기본 그룹으로 이동됩니다. 계속하시겠습니까?',
         command: '명령',

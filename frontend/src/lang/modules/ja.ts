@@ -1146,6 +1146,8 @@ const message = {
         fold: 'すべての契約',
         batchInput: 'バッチ処理',
         quickCommand: 'クイックコマンド|クイックコマンド',
+        noSuchCommand:
+            'インポートしたCSVファイルにクイックコマンドデータが見つかりませんでした。確認して再試行してください！',
         quickCommandHelper: '「端末 - >端子」の下部にあるクイックコマンドを使用できます。',
         groupDeleteHelper:
             'グループが削除された後、グループ内のすべての接続がデフォルトグループに移行されます。続けたいですか？',

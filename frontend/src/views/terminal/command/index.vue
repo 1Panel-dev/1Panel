@@ -14,6 +14,15 @@
                 <el-button type="primary" plain :disabled="selects.length === 0" @click="batchDelete(null)">
                     {{ $t('commons.button.delete') }}
                 </el-button>
+
+                <el-button-group>
+                    <el-button @click="onImport">
+                        {{ $t('commons.button.import') }}
+                    </el-button>
+                    <el-button @click="onExport">
+                        {{ $t('commons.button.export') }}
+                    </el-button>
+                </el-button-group>
             </template>
             <template #rightToolBar>
                 <el-select v-model="group" @change="search()" clearable class="p-w-200">
@@ -85,6 +94,7 @@
 
         <OpDialog ref="opRef" @search="search" />
         <OperateDialog @search="search" ref="dialogRef" />
+        <ImportDialog @search="search" ref="importDialogRef" />
         <GroupDialog @search="loadGroups" ref="dialogGroupRef" />
     </div>
 </template>
@@ -93,11 +103,13 @@
 import { Command } from '@/api/interface/command';
 import GroupDialog from '@/components/group/index.vue';
 import OperateDialog from '@/views/terminal/command/operate/index.vue';
-import { editCommand, deleteCommand, getCommandPage } from '@/api/modules/command';
+import ImportDialog from '@/views/terminal/command/import/index.vue';
+import { editCommand, deleteCommand, getCommandPage, exportCommands } from '@/api/modules/command';
 import { reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { getGroupList } from '@/api/modules/group';
+import { downloadFile } from '@/utils/util';
 
 const loading = ref();
 const data = ref();
@@ -115,6 +127,7 @@ const info = ref();
 const group = ref<string>('');
 const dialogRef = ref();
 const opRef = ref();
+const importDialogRef = ref();
 
 const acceptParams = () => {
     search();
@@ -148,6 +161,24 @@ const updateGroup = async (row: any) => {
     await editCommand(row);
     search();
     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+};
+
+const onExport = async () => {
+    loading.value = true;
+    await exportCommands()
+        .then((res) => {
+            if (res.data) {
+                loading.value = false;
+                downloadFile(res.data, 'local');
+            }
+        })
+        .catch(() => {
+            loading.value = false;
+        });
+};
+
+const onImport = () => {
+    importDialogRef.value.acceptParams();
 };
 
 const batchDelete = async (row: Command.CommandInfo | null) => {

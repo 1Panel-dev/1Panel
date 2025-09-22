@@ -231,3 +231,7 @@ ClusterMasterNotExist: "El nodo principal del clúster está desconectado, elimi
 
 #ssl
 ErrReqFailed: "{{.name}} petición fallida: {{ .err }}"
+
+#command
+Name: "Nombre"
+Command: "Comando"

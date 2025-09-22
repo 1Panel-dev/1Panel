@@ -1128,6 +1128,7 @@ const message = {
         fold: '全部收缩',
         batchInput: '批量输入',
         quickCommand: '快速命令',
+        noSuchCommand: '导入的 csv 文件中未能发现快速命令数据，请检查后重试！',
         quickCommandHelper: '常用命令列表，用于在终端界面底部快速选择',
         groupDeleteHelper: '移除组后，组内所有连接将迁移到 default 组内，是否继续？',
         command: '命令',

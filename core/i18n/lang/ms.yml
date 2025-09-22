@@ -226,3 +226,7 @@ ClusterMasterNotExist: "Node utama kluster terputus, sila padamkan nod anak."
 
 #ssl
 ErrReqFailed: "{{.name}} permintaan gagal: {{ .err }}"
+
+#command
+Name: "Nama"
+Command: "Arahan"

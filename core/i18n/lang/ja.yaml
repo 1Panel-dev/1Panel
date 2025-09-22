@@ -232,3 +232,7 @@ ClusterMasterNotExist: "クラスタのマスターノードが切断されて�
 
 #ssl
 ErrReqFailed: "{{.name}} リクエスト失敗: {{ .err }}"
+
+#command
+Name: "名前"
+Command: "コマンド"

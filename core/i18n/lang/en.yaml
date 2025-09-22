@@ -231,3 +231,7 @@ ClusterMasterNotExist: "The master node of the cluster is disconnected, please d
 
 #ssl
 ErrReqFailed: "{{.name}} request failed: {{ .err }}"
+
+#command
+Name: "Name"
+Command: "Command"

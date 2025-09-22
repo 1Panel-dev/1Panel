@@ -1,10 +1,17 @@
 package service
 
 import (
+	"fmt"
+	"os"
+	"path"
+	"time"
+
 	"github.com/1Panel-dev/1Panel/core/app/dto"
 	"github.com/1Panel-dev/1Panel/core/app/repo"
 	"github.com/1Panel-dev/1Panel/core/buserr"
+	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
+	"github.com/1Panel-dev/1Panel/core/utils/csv"
 	"github.com/jinzhu/copier"
 )
 
@@ -17,6 +24,8 @@ type ICommandService interface {
 	Create(req dto.CommandOperate) error
 	Update(req dto.CommandOperate) error
 	Delete(ids []uint) error
+
+	Export() (string, error)
 }
 
 func NewICommandService() ICommandService {
@@ -96,6 +105,28 @@ func (u *CommandService) SearchWithPage(req dto.SearchCommandWithPage) (int64, i
 		dtoCommands = append(dtoCommands, item)
 	}
 	return total, dtoCommands, err
+}
+
+func (u *CommandService) Export() (string, error) {
+	commands, err := commandRepo.List(repo.WithByType("command"))
+	if err != nil {
+		return "", err
+	}
+	var list []csv.CommandTemplate
+	for _, item := range commands {
+		list = append(list, csv.CommandTemplate{
+			Name:    item.Name,
+			Command: item.Command,
+		})
+	}
+	tmpFileName := path.Join(global.CONF.Base.InstallDir, "1panel/tmp/export/commands", fmt.Sprintf("1panel-commands-%s.csv", time.Now().Format(constant.DateTimeSlimLayout)))
+	if _, err := os.Stat(path.Dir(tmpFileName)); err != nil {
+		_ = os.MkdirAll(path.Dir(tmpFileName), constant.DirPerm)
+	}
+	if err := csv.ExportCommands(tmpFileName, list); err != nil {
+		return "", err
+	}
+	return tmpFileName, err
 }
 
 func (u *CommandService) Create(req dto.CommandOperate) error {

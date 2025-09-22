@@ -240,3 +240,7 @@ ClusterMasterNotExist: "集群主节点失联，请删除子节点"
 
 #ssl
 ErrReqFailed: "{{.name}} 请求失败: {{ .err }}"
+
+#command
+Name: "名称"
+Command: "命令"

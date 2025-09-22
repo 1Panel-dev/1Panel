@@ -230,4 +230,8 @@ MasterNodePortNotAvailable: "A verificação de conectividade da porta {{ .port 
 ClusterMasterNotExist: "O nó mestre do cluster está desconectado, por favor, exclua os nós filhos."
 
 #ssl
-ErrReqFailed: "{{.name}} solicitação falhou: {{ .err }}
+ErrReqFailed: "{{.name}} solicitação falhou: {{ .err }}"
+
+#command
+Name: "Название"
+Command: "Команда"

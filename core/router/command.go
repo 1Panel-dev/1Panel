@@ -20,5 +20,8 @@ func (s *CommandRouter) InitRouter(Router *gin.RouterGroup) {
 		commandRouter.POST("/search", baseApi.SearchCommand)
 		commandRouter.POST("/tree", baseApi.SearchCommandTree)
 		commandRouter.POST("/update", baseApi.UpdateCommand)
+		commandRouter.POST("/export", baseApi.ExportCommands)
+		commandRouter.POST("/upload", baseApi.UploadCommandCsv)
+		commandRouter.POST("/import", baseApi.ImportCommands)
 	}
 }

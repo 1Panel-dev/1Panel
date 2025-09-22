@@ -1196,6 +1196,8 @@ const message = {
         fold: 'Tümünü daralt',
         batchInput: 'Toplu işleme',
         quickCommand: 'Hızlı komut | Hızlı komutlar',
+        noSuchCommand:
+            'İçe aktarılan CSV dosyasında hızlı komut verisi bulunamadı, lütfen kontrol edip tekrar deneyin!',
         quickCommandHelper: '"Terminaller -> Terminaller" altındaki hızlı komutları kullanabilirsiniz.',
         groupDeleteHelper:
             'Grup kaldırıldıktan sonra, gruptaki tüm bağlantılar varsayılan gruba taşınacaktır. Devam etmek istiyor musunuz?',

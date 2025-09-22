@@ -9,6 +9,10 @@ type SearchCommandWithPage struct {
 	Info    string `json:"info"`
 }
 
+type CommandImport struct {
+	Items []CommandOperate `json:"items"`
+}
+
 type CommandOperate struct {
 	ID          uint   `json:"id"`
 	Type        string `json:"type"`

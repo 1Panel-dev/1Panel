@@ -1184,6 +1184,7 @@ const message = {
         fold: 'All contract',
         batchInput: 'Batch processing',
         quickCommand: 'Quick command | Quick commands',
+        noSuchCommand: 'No quick command data found in the imported CSV file, please check and try again!',
         quickCommandHelper: 'You can use the quick commands at the bottom of the "Terminals -> Terminals".',
         groupDeleteHelper:
             'After the group is removed, all connections in the group will be migrated to the default group. Do you want to continue?',
