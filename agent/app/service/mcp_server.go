@@ -680,6 +680,9 @@ func GetWebsiteID() uint {
 }
 
 func pullImage(imageType string) {
+	if global.CONF.Base.IsOffLine {
+		return
+	}
 	if imageType == "npx" {
 		if err := docker.PullImage("supercorp/supergateway:latest"); err != nil {
 			global.LOG.Errorf("docker pull mcp image error: %s", err.Error())
