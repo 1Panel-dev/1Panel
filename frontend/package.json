@@ -44,7 +44,7 @@
         "js-base64": "^3.7.7",
         "jsencrypt": "^3.3.2",
         "md-editor-v3": "^2.11.3",
-        "monaco-editor": "^0.50.0",
+        "monaco-editor": "^0.53.0",
         "nprogress": "^0.2.0",
         "pinia": "^2.1.7",
         "pinia-plugin-persistedstate": "^1.6.1",
