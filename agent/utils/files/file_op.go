@@ -751,6 +751,9 @@ func (f FileOp) Decompress(srcFile string, dst string, cType CompressType, secre
 			if err = shellArchiver.Extract(srcFile, dst, secret); err == nil {
 				return nil
 			}
+			if cType == TarGz && strings.Contains(err.Error(), "bad decrypt") {
+				return buserr.New("ErrBadDecrypt")
+			}
 		} else {
 			if cType == Rar || cType == X7z {
 				return err

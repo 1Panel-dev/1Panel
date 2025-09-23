@@ -125,6 +125,7 @@ ErrLogFileToLarge: "Fail log melebihi 500MB, tidak boleh dibuka"
 FileDropFailed: "Falha ao limpar arquivo {{ .name }}: {{ .err }}"
 FileDropSuccess: "Arquivo {{ .name }} limpo com sucesso, {{ .count }} arquivos removidos, {{ .size }} de espaço em disco liberado"
 FileDropSum: "Limpeza de arquivos concluída com sucesso, total de {{ .count }} arquivos removidos, total de {{ .size }} de espaço em disco liberado"
+ErrBadDecrypt: "Erro de senha de descriptografia do pacote compactado, descompactação falhou, verifique e tente novamente!"
 
 #site
 ErrAliasIsExist: 'Alias já existe'

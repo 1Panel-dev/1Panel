@@ -125,6 +125,7 @@ ErrLogFileTooLarge: "Fail log melebihi 500MB dan tidak boleh dibuka"
 FileDropFailed: "Gagal membersihkan fail {{ .name }}: {{ .err }}"
 FileDropSuccess: "Berjaya membersihkan fail {{ .name }}, {{ .count }} fail dibersihkan, {{ .size }} ruang cakera dibebaskan"
 FileDropSum: "Pembersihan fail selesai, sejumlah {{ .count }} fail dibersihkan, sejumlah {{ .size }} ruang cakera dibebaskan"
+ErrBadDecrypt: "Kata laluan penyahsulitan pakej termampat salah, penyahmampatan gagal, sila periksa dan cuba lagi!"
 
 #laman web
 ErrAliasIsExist: 'Alias sudah wujud'

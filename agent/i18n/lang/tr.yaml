@@ -125,6 +125,7 @@ ErrLogFileToLarge: "Günlük dosyası 500MB'ı aşıyor ve açılamıyor"
 FileDropFailed: "{{ .name }} dosyası temizlenemedi: {{ .err }}"
 FileDropSuccess: "{{ .name }} dosyası başarıyla temizlendi, {{ .count }} dosya silindi, {{ .size }} disk alanı boşaltıldı"
 FileDropSum: "Dosya temizleme tamamlandı, toplam {{ .count }} dosya silindi, toplam {{ .size }} disk alanı boşaltıldı"
+ErrBadDecrypt: "Sıkıştırılmış paket şifre çözme parolası hatalı, açma başarısız, lütfen kontrol edip tekrar deneyin!"
 
 
 #website

@@ -121,6 +121,7 @@ ErrLogFileToLarge: "日志文件超过 500M，无法打开"
 FileDropFailed: "清理文件 {{ .name }} 失败 {{ .err }}"
 FileDropSuccess: "清理文件 {{ .name }} 成功，清理文件 {{ .count }}，释放磁盘空间 {{ .size }}"
 FileDropSum: "文件清理成功，清理文件共计 {{ .count }}，释放磁盘空间共计 {{ .size }}"
+ErrBadDecrypt: "压缩包解压密码错误，解压失败，请检查后重试！"
 
 #website
 ErrAliasIsExist: "代号已存在"

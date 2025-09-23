@@ -120,6 +120,7 @@ ErrPathNotDelete: 'No se puede eliminar el directorio seleccionado'
 FileDropFailed: "Error al limpiar el archivo {{ .name }}: {{ .err }}"
 FileDropSuccess: "Archivo {{ .name }} limpiado correctamente, {{ .count }} archivos eliminados, {{ .size }} de espacio liberado"
 FileDropSum: "Limpieza de archivos completada, total {{ .count }} archivos eliminados, {{ .size }} de espacio liberado"
+ErrBadDecrypt: "Error de contraseña de descifrado del paquete comprimido, descompresión fallida, ¡compruebe e inténtelo de nuevo!"
 
 #website
 ErrAliasIsExist: 'El alias ya existe'

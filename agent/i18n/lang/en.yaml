@@ -122,6 +122,7 @@ ErrLogFileToLarge: "The log file exceeds 500MB and cannot be opened"
 FileDropFailed: "Failed to clean up file {{ .name }}: {{ .err }}"
 FileDropSuccess: "Successfully cleaned up file {{ .name }}, cleaned {{ .count }} files, freed {{ .size }} disk space"
 FileDropSum: "File cleanup completed successfully, total {{ .count }} files cleaned, total {{ .size }} disk space freed"
+ErrBadDecrypt: "Compressed package decryption password error, decompression failed, please check and try again!"
 
 #website
 ErrAliasIsExist: 'Alias already exists'

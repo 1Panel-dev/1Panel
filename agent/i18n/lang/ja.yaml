@@ -122,6 +122,7 @@ ErrLogFileToLarge: "ログファイルが500MBを超えており、開くこと�
 FileDropFailed: "ファイル {{ .name }} のクリーンアップに失敗しました: {{ .err }}"
 FileDropSuccess: "ファイル {{ .name }} のクリーンアップに成功しました、{{ .count }} ファイルを削除、{{ .size }} のディスク領域を解放"
 FileDropSum: "ファイルのクリーンアップが完了しました、合計 {{ .count }} ファイルを削除、合計 {{ .size }} のディスク領域を解放"
+ErrBadDecrypt: "圧縮パッケージの解凍パスワードが間違っています。解凍に失敗しました。確認して再試行してください！"
 
 #website
 ErrAliasIsExist: 'エイリアスがすでに存在します'
