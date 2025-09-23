@@ -3243,9 +3243,9 @@ const message = {
             ignoreTemplate: 'ディレクトリテンプレートを除外',
             protectTemplate: 'ファイルテンプレートを保護',
             ignoreTemplateHelper:
-                '除外コンテンツを入力してください（ディレクトリ名 tmp、ファイル拡張子 .html、ファイルタイプ js）、Enterまたはスペースで区切ります。',
+                '除外コンテンツを入力してください（特定のファイルまたはディレクトリ ./log、ディレクトリ名 tmp、ファイル拡張子 .html、ファイルタイプ js）、Enterまたはスペースで区切ります。',
             protectTemplateHelper:
-                '保護コンテンツを入力してください（ファイル拡張子 .html、ファイルタイプ js）、Enterまたはスペースで区切ります。',
+                '保護コンテンツを入力してください（特定のファイル ./index.html、ファイル拡張子 .html、ファイルタイプ js）、Enterまたはスペースで区切ります。',
             templateContent: 'テンプレート内容',
             template: 'テンプレート',
             saveTemplate: 'テンプレートとして保存',

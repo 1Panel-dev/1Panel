@@ -3309,9 +3309,9 @@ const message = {
             ignoreTemplate: 'Plantilla de exclusión de directorios',
             protectTemplate: 'Plantilla de archivos protegidos',
             ignoreTemplateHelper:
-                'Ingrese contenido de exclusión (nombre de directorio tmp, extensión de archivo .html, tipo de archivo js), separado por Enter o espacio.',
+                'Ingrese contenido de exclusión (archivo o directorio específico ./log, nombre de directorio tmp, extensión de archivo .html, tipo de archivo js), separado por Enter o espacio.',
             protectTemplateHelper:
-                'Ingrese contenido de protección (extensión de archivo .html, tipo de archivo js), separado por Enter o espacio.',
+                'Ingrese contenido de protección (archivo específico ./index.html, extensión de archivo .html, tipo de archivo js), separado por Enter o espacio.',
             templateContent: 'Contenido de plantilla',
             template: 'Plantilla',
             saveTemplate: 'Guardar como plantilla',

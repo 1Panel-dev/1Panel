@@ -3304,9 +3304,9 @@ const message = {
             ignoreTemplate: 'Pengecualian templat direktori',
             protectTemplate: 'Lindungi templat fail',
             ignoreTemplateHelper:
-                'Sila masukkan kandungan pengecualian (nama direktori tmp, sambungan fail .html, jenis fail js), dipisahkan oleh Enter atau ruang.',
+                'Sila masukkan kandungan pengecualian (fail atau direktori tertentu ./log, nama direktori tmp, sambungan fail .html, jenis fail js), dipisahkan oleh Enter atau ruang.',
             protectTemplateHelper:
-                'Sila masukkan kandungan perlindungan (sambungan fail .html, jenis fail js), dipisahkan oleh Enter atau ruang.',
+                'Sila masukkan kandungan perlindungan (fail tertentu ./index.html, sambungan fail .html, jenis fail js), dipisahkan oleh Enter atau ruang.',
             templateContent: 'Kandungan templat',
             template: 'Templat',
             saveTemplate: 'Simpan sebagai templat',

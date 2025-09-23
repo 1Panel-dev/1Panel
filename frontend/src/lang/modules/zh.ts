@@ -3105,8 +3105,10 @@ const message = {
             tamper: '网站防篡改',
             ignoreTemplate: '排除目录模版',
             protectTemplate: '保护文件模版',
-            ignoreTemplateHelper: '请输入排除内容（目录名 tmp、文件后缀 .html、 文件类型 js），回车或空格分隔。',
-            protectTemplateHelper: '请输入保护内容（文件后缀 .html、 文件类型 js），回车或空格分隔。',
+            ignoreTemplateHelper:
+                '请输入排除内容（具体文件或目录 ./log、目录名 tmp、文件后缀 .html、 文件类型 js），回车或空格分隔。',
+            protectTemplateHelper:
+                '请输入保护内容（具体文件 ./index.html、文件后缀 .html、 文件类型 js），回车或空格分隔。',
             templateContent: '模版内容',
             template: '模版',
             saveTemplate: '保存为模版',

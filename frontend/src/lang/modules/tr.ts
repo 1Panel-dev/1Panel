@@ -3389,9 +3389,9 @@ const message = {
             ignoreTemplate: 'Dizin Şablonunu Hariç Tut',
             protectTemplate: 'Dosya Şablonunu Koru',
             ignoreTemplateHelper:
-                'Hariç tutma içeriğini girin (dizin adı tmp, dosya uzantısı .html, dosya türü js), Enter veya boşlukla ayrılmış.',
+                'Hariç tutma içeriğini girin (belirli dosya veya dizin ./log, dizin adı tmp, dosya uzantısı .html, dosya türü js), Enter veya boşlukla ayrılmış.',
             protectTemplateHelper:
-                'Koruma içeriğini girin (dosya uzantısı .html, dosya türü js), Enter veya boşlukla ayrılmış.',
+                'Koruma içeriğini girin (belirli dosya ./index.html, dosya uzantısı .html, dosya türü js), Enter veya boşlukla ayrılmış.',
             templateContent: 'Şablon içeriği',
             template: 'Şablon',
             saveTemplate: 'Şablon olarak kaydet',

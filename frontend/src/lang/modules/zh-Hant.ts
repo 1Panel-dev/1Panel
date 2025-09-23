@@ -3133,8 +3133,10 @@ const message = {
             tamper: '網站防篡改',
             ignoreTemplate: '排除目錄模板',
             protectTemplate: '保護文件模板',
-            ignoreTemplateHelper: '請輸入排除內容（目錄名 tmp、文件後綴 .html、 文件類型 js），回車或空格分隔。',
-            protectTemplateHelper: '請輸入保護內容（文件後綴 .html、 文件類型 js），回車或空格分隔。',
+            ignoreTemplateHelper:
+                '請輸入排除內容（具體文件或目錄 ./log、目錄名 tmp、文件後綴 .html、文件類型 js），回車或空格分隔。',
+            protectTemplateHelper:
+                '請輸入保護內容（具體文件 ./index.html、文件後綴 .html、文件類型 js），回車或空格分隔。',
             templateContent: '模版內容',
             template: '模版',
             saveTemplate: '保存為模版',

@@ -3189,9 +3189,9 @@ const message = {
             ignoreTemplate: '디렉토리 템플릿 제외',
             protectTemplate: '파일 템플릿 보호',
             ignoreTemplateHelper:
-                '제외 내용을 입력하세요 (디렉토리 이름 tmp, 파일 확장자 .html, 파일 유형 js), Enter 또는 공백으로 구분합니다.',
+                '제외 내용을 입력하세요 (특정 파일 또는 디렉토리 ./log, 디렉토리 이름 tmp, 파일 확장자 .html, 파일 유형 js), Enter 또는 공백으로 구분합니다.',
             protectTemplateHelper:
-                '보호 내용을 입력하세요 (파일 확장자 .html, 파일 유형 js), Enter 또는 공백으로 구분합니다.',
+                '보호 내용을 입력하세요 (특정 파일 ./index.html, 파일 확장자 .html, 파일 유형 js), Enter 또는 공백으로 구분합니다.',
             templateContent: '템플릿 내용',
             template: '템플릿',
             saveTemplate: '템플릿으로 저장',

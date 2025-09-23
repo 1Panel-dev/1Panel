@@ -3320,9 +3320,9 @@ const message = {
             ignoreTemplate: 'Excluir modelo de diretório',
             protectTemplate: 'Proteger modelo de arquivo',
             ignoreTemplateHelper:
-                'Digite o conteúdo de exclusão (nome do diretório tmp, extensão de arquivo .html, tipo de arquivo js), separado por Enter ou espaço.',
+                'Digite o conteúdo de exclusão (arquivo ou diretório específico ./log, nome do diretório tmp, extensão de arquivo .html, tipo de arquivo js), separado por Enter ou espaço.',
             protectTemplateHelper:
-                'Digite o conteúdo de proteção (extensão de arquivo .html, tipo de arquivo js), separado por Enter ou espaço.',
+                'Digite o conteúdo de proteção (arquivo específico ./index.html, extensão de arquivo .html, tipo de arquivo js), separado por Enter ou espaço.',
             templateContent: 'Conteúdo do modelo',
             template: 'Modelo',
             saveTemplate: 'Salvar como modelo',

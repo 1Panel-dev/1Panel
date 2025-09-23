@@ -3357,9 +3357,9 @@ const message = {
             ignoreTemplate: 'Exclude Directory Template',
             protectTemplate: 'Protect File Template',
             ignoreTemplateHelper:
-                'Please enter exclusion content (directory name tmp, file extension .html, file type js), separated by Enter or space.',
+                'Please enter exclusion content (specific file or directory ./log, directory name tmp, file extension .html, file type js), separated by Enter or space.',
             protectTemplateHelper:
-                'Please enter protection content (file extension .html, file type js), separated by Enter or space.',
+                'Please enter protection content (specific file ./index.html, file extension .html, file type js), separated by Enter or space.',
             templateContent: 'Template content',
             template: 'Template',
             saveTemplate: 'Save as template',
