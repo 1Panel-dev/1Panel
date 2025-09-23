@@ -28,12 +28,7 @@
                             {{ $t('license.community') }}
                         </span>
                     </el-link>
-                    <el-link
-                        underline="never"
-                        class="version"
-                        type="primary"
-                        @click="releasesRef.acceptParams({ version: version })"
-                    >
+                    <el-link underline="never" class="version" type="primary" @click="getVersionLog()">
                         {{ version }}
                     </el-link>
                     <el-badge is-dot class="-mt-0.5" :hidden="version === 'Waiting' || !globalStore.hasNewVersion">
@@ -91,12 +86,27 @@ const search = async () => {
     version.value = res.data.systemVersion;
 };
 
+const getVersionLog = () => {
+    if (isOffLine) {
+        return;
+    }
+    releasesRef.value.acceptParams({ version: version });
+};
+
 const toLxware = () => {
+    if (isOffLine) {
+        to1Panel();
+        return;
+    }
     if (!globalStore.isIntl) {
         window.open('https://www.lxware.cn/1panel' + '', '_blank', 'noopener,noreferrer');
     } else {
         window.open('https://1panel.hk/pricing' + '', '_blank', 'noopener,noreferrer');
     }
+};
+
+const to1Panel = () => {
+    window.open('https://1panel.cn', '_blank', 'noopener,noreferrer');
 };
 
 const toDoc = () => {
