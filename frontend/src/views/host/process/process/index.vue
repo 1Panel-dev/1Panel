@@ -3,102 +3,57 @@
         <FireRouter />
         <LayoutContent :title="$t('menu.process', 2)" v-loading="loading">
             <template #rightToolBar>
-                <div class="w-full">
-                    <el-form-item class="float-right">
-                        <el-row :gutter="20">
-                            <el-col :span="8">
-                                <TableSearch
-                                    @search="search()"
-                                    :placeholder="$t('process.pid')"
-                                    v-model:searchName="processSearch.pid"
-                                />
-                            </el-col>
-                            <el-col :span="8">
-                                <TableSearch
-                                    @search="search()"
-                                    :placeholder="$t('commons.table.name')"
-                                    v-model:searchName="processSearch.name"
-                                />
-                            </el-col>
-                            <el-col :span="8">
-                                <TableSearch
-                                    @search="search()"
-                                    :placeholder="$t('commons.table.user')"
-                                    v-model:searchName="processSearch.username"
-                                />
-                            </el-col>
-                        </el-row>
-                    </el-form-item>
+                <div class="w-full flex justify-end items-center gap-5">
+                    <el-select
+                        v-model="filters"
+                        :placeholder="$t('commons.table.status')"
+                        clearable
+                        @change="search()"
+                        class="p-w-400"
+                        multiple
+                        collapse-tags
+                        collapse-tags-tooltip
+                        :max-collapse-tags="4"
+                    >
+                        <el-option
+                            v-for="item in statusOptions"
+                            :key="item.value"
+                            :label="item.text"
+                            :value="item.value"
+                        />
+                    </el-select>
+                    <TableSearch
+                        @search="search()"
+                        :placeholder="$t('process.pid')"
+                        v-model:searchName="processSearch.pid"
+                    />
+                    <TableSearch
+                        @search="search()"
+                        :placeholder="$t('commons.table.name')"
+                        v-model:searchName="processSearch.name"
+                    />
+                    <TableSearch
+                        @search="search()"
+                        :placeholder="$t('commons.table.user')"
+                        v-model:searchName="processSearch.username"
+                    />
                 </div>
             </template>
             <template #main>
-                <ComplexTable
-                    :data="data"
-                    @sort-change="changeSort"
-                    @filter-change="changeFilter"
-                    ref="tableRef"
-                    :heightDiff="220"
-                >
-                    <el-table-column :label="'PID'" prop="PID" max-width="60px" sortable></el-table-column>
-                    <el-table-column :label="$t('commons.table.name')" prop="name" min-width="120px"></el-table-column>
-                    <el-table-column
-                        :label="$t('process.ppid')"
-                        max-width="60px"
-                        prop="PPID"
-                        sortable
-                    ></el-table-column>
-                    <el-table-column
-                        :label="$t('process.numThreads')"
-                        max-width="60px"
-                        prop="numThreads"
-                    ></el-table-column>
-                    <el-table-column
-                        :label="$t('commons.table.user')"
-                        max-width="60px"
-                        prop="username"
-                    ></el-table-column>
-                    <el-table-column
-                        :label="'CPU'"
-                        max-width="60px"
-                        prop="cpuValue"
-                        :formatter="cpuFormatter"
-                        sortable
-                    ></el-table-column>
-                    <el-table-column
-                        :label="$t('process.memory')"
-                        max-width="60px"
-                        prop="rssValue"
-                        :formatter="memFormatter"
-                        sortable
-                    ></el-table-column>
-                    <el-table-column :label="$t('process.numConnections')" prop="numConnections"></el-table-column>
-                    <el-table-column
-                        :label="$t('commons.table.status')"
-                        prop="status"
-                        column-key="status"
-                        :filters="[
-                            { text: $t('process.running'), value: 'running' },
-                            { text: $t('process.sleep'), value: 'sleep' },
-                            { text: $t('process.stop'), value: 'stop' },
-                            { text: $t('process.idle'), value: 'idle' },
-                            { text: $t('process.wait'), value: 'wait' },
-                            { text: $t('process.lock'), value: 'lock' },
-                            { text: $t('process.zombie'), value: 'zombie' },
-                        ]"
-                        :filter-method="filterStatus"
-                        :filtered-value="sortConfig.filters"
-                    >
-                        <template #default="{ row }">
-                            <span v-if="row.status">{{ $t('process.' + row.status) }}</span>
+                <div class="!h-[900px]">
+                    <el-auto-resizer>
+                        <template #default="{ height, width }">
+                            <el-table-v2
+                                @column-sort="changeSort"
+                                :columns="columns"
+                                :data="data"
+                                :width="width"
+                                :height="height"
+                                :sort-by="sortState"
+                            ></el-table-v2>
                         </template>
-                    </el-table-column>
-                    <el-table-column
-                        :label="$t('process.startTime')"
-                        prop="startTime"
-                        min-width="140px"
-                    ></el-table-column>
-                    <fu-table-operations :ellipsis="10" :buttons="buttons" :label="$t('commons.table.operate')" fix />
-                </ComplexTable>
+                    </el-auto-resizer>
+                </div>
             </template>
         </LayoutContent>
 
@@ -109,23 +64,23 @@
 
 <script setup lang="ts">
 import FireRouter from '@/views/host/process/index.vue';
-import { ref, onMounted, onUnmounted, nextTick, reactive } from 'vue';
+import { ref, onMounted, onUnmounted, reactive } from 'vue';
 import ProcessDetail from './detail/index.vue';
 import i18n from '@/lang';
 import { stopProcess } from '@/api/modules/process';
 import { GlobalStore } from '@/store';
+import { SortBy, TableV2SortOrder, ElButton } from 'element-plus';
 const globalStore = GlobalStore();
 
-interface SortStatus {
-    prop: '';
-    order: '';
-    filters: [];
-}
-const sortConfig: SortStatus = {
-    prop: '',
-    order: '',
-    filters: [],
-};
+const statusOptions = computed(() => [
+    { text: i18n.global.t('process.running'), value: 'running' },
+    { text: i18n.global.t('process.sleep'), value: 'sleep' },
+    { text: i18n.global.t('process.stop'), value: 'stop' },
+    { text: i18n.global.t('process.idle'), value: 'idle' },
+    { text: i18n.global.t('process.wait'), value: 'wait' },
+    { text: i18n.global.t('process.lock'), value: 'lock' },
+    { text: i18n.global.t('process.zombie'), value: 'zombie' },
+]);
 
 const processSearch = reactive({
     type: 'ps',
@@ -134,61 +89,163 @@ const processSearch = reactive({
     name: '',
 });
 const opRef = ref();
-
-const buttons = [
-    {
-        label: i18n.global.t('process.viewDetails'),
-        click: function (row: any) {
-            openDetail(row);
-        },
-    },
-    {
-        label: i18n.global.t('process.stopProcess'),
-        click: function (row: any) {
-            stop(row);
-        },
-    },
-];
+const sortState = ref<SortBy>({
+    key: 'PID',
+    order: TableV2SortOrder.ASC,
+});
 
 let processSocket = ref(null) as unknown as WebSocket;
 const data = ref([]);
 const loading = ref(false);
-const tableRef = ref();
 const oldData = ref([]);
 const detailRef = ref();
 const isGetData = ref(true);
+const filters = ref([]);
+
+const sortByNum = (a: any, b: any, prop: string): number => {
+    const aVal = parseFloat(a[prop]) || 0;
+    const bVal = parseFloat(b[prop]) || 0;
+    return aVal - bVal;
+};
+
+const columns = ref([
+    {
+        key: 'PID',
+        title: 'PID',
+        dataKey: 'PID',
+        width: 120,
+    },
+    {
+        key: 'name',
+        title: i18n.global.t('commons.table.name'),
+        dataKey: 'name',
+        width: 400,
+    },
+    {
+        key: 'ppid',
+        title: i18n.global.t('process.ppid'),
+        dataKey: 'PPID',
+        width: 120,
+        sortable: true,
+    },
+    {
+        key: 'numThreads',
+        title: i18n.global.t('process.numThreads'),
+        dataKey: 'numThreads',
+        width: 120,
+    },
+    {
+        key: 'username',
+        title: i18n.global.t('commons.table.user'),
+        dataKey: 'username',
+        width: 200,
+    },
+    {
+        key: 'cpuValue',
+        title: 'CPU',
+        dataKey: 'cpuValue',
+        width: 200,
+        sortable: true,
+        sortMethod: sortByNum,
+        cellRenderer: ({ rowData }) => {
+            return rowData.cpuPercent;
+        },
+    },
+    {
+        key: 'rssValue',
+        title: i18n.global.t('process.memory'),
+        dataKey: 'rssValue',
+        width: 200,
+        sortable: true,
+        sortMethod: sortByNum,
+        cellRenderer: ({ rowData }) => {
+            return rowData.rss;
+        },
+    },
+    {
+        key: 'numConnections',
+        title: i18n.global.t('process.numConnections'),
+        dataKey: 'numConnections',
+        width: 100,
+    },
+    {
+        key: 'status',
+        title: i18n.global.t('commons.table.status'),
+        dataKey: 'status',
+        width: 100,
+        cellRenderer: ({ rowData }) => {
+            if (rowData.status) {
+                return i18n.global.t('process.' + rowData.status);
+            }
+            return '';
+        },
+    },
+    {
+        key: 'startTime',
+        title: i18n.global.t('process.startTime'),
+        dataKey: 'startTime',
+        width: 300,
+    },
+    {
+        key: 'actions',
+        title: i18n.global.t('commons.table.operate'),
+        dataKey: 'actions',
+        width: 200,
+        cellRenderer: ({ rowData }) => {
+            return h('div', { class: 'action-buttons' }, [
+                h(
+                    ElButton,
+                    {
+                        type: 'text',
+                        onClick: () => openDetail(rowData),
+                    },
+                    () => i18n.global.t('process.viewDetails'),
+                ),
+                h(
+                    ElButton,
+                    {
+                        type: 'text',
+                        onClick: () => stop(rowData),
+                    },
+                    () => i18n.global.t('process.stopProcess'),
+                ),
+            ]);
+        },
+    },
+]);
+
+watch(
+    [sortState, oldData],
+    ([newState, newData]) => {
+        if (!newData?.length) return;
+
+        const { key, order } = newState ?? {};
+        if (!key || !order) {
+            data.value = filterByStatus();
+            return;
+        }
+
+        const currCol = columns.value.find((c) => c.key === key);
+        if (!currCol) return;
+
+        const currSortMethod = currCol.sortMethod ?? sortByNum;
+        const filteredData = filterByStatus();
+
+        data.value = filteredData.slice(0).sort((a, b) => {
+            const res = (currSortMethod as any)(a, b, currCol.dataKey);
+            return order === TableV2SortOrder.ASC ? res : 0 - res;
+        });
+    },
+    { immediate: true },
+);
 
 const openDetail = (row: any) => {
     detailRef.value.acceptParams(row.PID);
 };
 
-const changeSort = ({ prop, order }) => {
-    sortConfig.prop = prop;
-    sortConfig.order = order;
-};
-
-const changeFilter = (filters: any) => {
-    if (filters.status && filters.status.length > 0) {
-        sortConfig.filters = filters.status;
-        data.value = filterByStatus();
-        sortTable();
-    } else {
-        data.value = oldData.value;
-        sortConfig.filters = [];
-        sortTable();
-    }
-};
-
-const filterStatus = (value: string, row: any) => {
-    return row.status === value;
-};
-
-const cpuFormatter = (row: any) => {
-    return row.cpuPercent;
-};
-
-const memFormatter = (row: any) => {
-    return row.rss;
+const changeSort = ({ key, order }) => {
+    if (!order) order = TableV2SortOrder.ASC;
+    sortState.value = { key, order };
 };
 
 const isWsOpen = () => {
@@ -210,26 +267,17 @@ const onMessage = (message: any) => {
     isGetData.value = false;
     oldData.value = JSON.parse(message.data);
     data.value = filterByStatus();
-    sortTable();
     loading.value = false;
 };
 
 const filterByStatus = () => {
-    if (sortConfig.filters.length > 0) {
+    if (filters.value.length > 0) {
         const newData = oldData.value.filter((re: any) => {
-            return (sortConfig.filters as string[]).indexOf(re.status) > -1;
+            return (filters.value as string[]).indexOf(re.status) > -1;
         });
         return newData;
     } else {
         return oldData.value;
-    }
-};
-
-const sortTable = () => {
-    if (sortConfig.prop != '' && sortConfig.order != '') {
-        nextTick(() => {
-            tableRef.value?.sort(sortConfig.prop, sortConfig.order);
-        });
     }
 };
 
