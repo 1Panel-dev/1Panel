@@ -144,6 +144,7 @@ type VolumeHelper struct {
 	SourceDir    string `json:"sourceDir"`
 	ContainerDir string `json:"containerDir"`
 	Mode         string `json:"mode"`
+	Shared       string `json:"shared"`
 }
 type PortHelper struct {
 	HostIP        string `json:"hostIP"`

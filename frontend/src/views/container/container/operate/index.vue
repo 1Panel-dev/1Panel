@@ -193,75 +193,7 @@
                                 </el-tab-pane>
 
                                 <el-tab-pane :label="$t('container.mount')">
-                                    <el-form-item>
-                                        <el-table v-if="form.volumes.length !== 0" :data="form.volumes">
-                                            <el-table-column :label="$t('container.server')" min-width="150">
-                                                <template #default="{ row }">
-                                                    <el-radio-group v-model="row.type">
-                                                        <el-radio-button value="volume">
-                                                            {{ $t('container.volumeOption') }}
-                                                        </el-radio-button>
-                                                        <el-radio-button value="bind">
-                                                            {{ $t('container.hostOption') }}
-                                                        </el-radio-button>
-                                                    </el-radio-group>
-                                                </template>
-                                            </el-table-column>
-                                            <el-table-column
-                                                :label="$t('container.volumeOption') + '/' + $t('container.hostOption')"
-                                                min-width="200"
-                                            >
-                                                <template #default="{ row }">
-                                                    <el-select
-                                                        v-if="row.type === 'volume'"
-                                                        filterable
-                                                        v-model="row.sourceDir"
-                                                    >
-                                                        <div v-for="(item, indexV) of volumes" :key="indexV">
-                                                            <el-tooltip
-                                                                :hide-after="20"
-                                                                :content="item.option"
-                                                                placement="top"
-                                                            >
-                                                                <el-option
-                                                                    :value="item.option"
-                                                                    :label="item.option.substring(0, 30)"
-                                                                />
-                                                            </el-tooltip>
-                                                        </div>
-                                                    </el-select>
-                                                    <el-input v-else v-model="row.sourceDir" />
-                                                </template>
-                                            </el-table-column>
-                                            <el-table-column :label="$t('container.mode')" min-width="130">
-                                                <template #default="{ row }">
-                                                    <el-radio-group v-model="row.mode">
-                                                        <el-radio value="rw">{{ $t('container.modeRW') }}</el-radio>
-                                                        <el-radio value="ro">{{ $t('container.modeR') }}</el-radio>
-                                                    </el-radio-group>
-                                                </template>
-                                            </el-table-column>
-                                            <el-table-column :label="$t('container.containerDir')" min-width="200">
-                                                <template #default="{ row }">
-                                                    <el-input v-model="row.containerDir" />
-                                                </template>
-                                            </el-table-column>
-                                            <el-table-column min-width="80">
-                                                <template #default="scope">
-                                                    <el-button
-                                                        link
-                                                        type="primary"
-                                                        @click="handleVolumesDelete(scope.$index)"
-                                                    >
-                                                        {{ $t('commons.button.delete') }}
-                                                    </el-button>
-                                                </template>
-                                            </el-table-column>
-                                        </el-table>
-                                        <el-button class="ml-3 mt-2" @click="handleVolumesAdd()">
-                                            {{ $t('commons.button.add') }}
-                                        </el-button>
-                                    </el-form-item>
+                                    <Volume ref="volumeRef" :volumes="form.volumes"></Volume>
                                 </el-tab-pane>
 
                                 <el-tab-pane :label="$t('terminal.command')">
@@ -439,9 +371,9 @@ import { Rules, checkFloatNumberRange, checkNumberRange } from '@/global/form-ru
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import Confirm from '@/views/container/container/operate/confirm.vue';
+import Volume from '@/views/container/container/operate/volume.vue';
 import {
     listImage,
-    listVolume,
     createContainer,
     updateContainer,
     loadResourceLimit,
@@ -460,6 +392,7 @@ import { routerToName } from '@/utils/router';
 const loading = ref(false);
 const isCreate = ref();
 const confirmRef = ref();
+const volumeRef = ref();
 const form = reactive<Container.ContainerHelper>({
     taskID: '',
     containerID: '',
@@ -560,13 +493,11 @@ const search = async () => {
     }
     loadLimit();
     loadImageOptions();
-    loadVolumeOptions();
     loadNetworkOptions();
 };
 
 const taskLogRef = ref();
 const images = ref();
-const volumes = ref();
 const networks = ref();
 const limits = ref<Container.ResourceLimit>({
     cpu: null as number,
@@ -613,19 +544,6 @@ const goRouter = async () => {
     routerToName('AppInstalled');
 };
 
-const handleVolumesAdd = () => {
-    let item = {
-        type: 'bind',
-        sourceDir: '',
-        containerDir: '',
-        mode: 'rw',
-    };
-    form.volumes.push(item);
-};
-const handleVolumesDelete = (index: number) => {
-    form.volumes.splice(index, 1);
-};
-
 const loadLimit = async () => {
     const res = await loadResourceLimit();
     limits.value = res.data;
@@ -636,15 +554,12 @@ const loadImageOptions = async () => {
     const res = await listImage();
     images.value = res.data;
 };
-const loadVolumeOptions = async () => {
-    const res = await listVolume();
-    volumes.value = res.data;
-};
 const loadNetworkOptions = async () => {
     const res = await listNetwork();
     networks.value = res.data;
 };
 const onSubmit = async (formEl: FormInstance | undefined) => {
+    form.volumes = volumeRef.value.loadVolumes();
     if (form.volumes.length !== 0) {
         for (const item of form.volumes) {
             if (!item.containerDir || !item.sourceDir) {

@@ -1509,6 +1509,9 @@ func loadConfigInfo(isCreate bool, req dto.ContainerOperate, oldContainer *conta
 				Source:   volume.SourceDir,
 				Target:   volume.ContainerDir,
 				ReadOnly: volume.Mode == "ro",
+				BindOptions: &mount.BindOptions{
+					Propagation: mount.Propagation(volume.Shared),
+				},
 			})
 			config.Volumes[volume.ContainerDir] = struct{}{}
 		} else {
@@ -1555,6 +1558,7 @@ func loadVolumeBinds(binds []container.MountPoint) []dto.VolumeHelper {
 		if bind.RW {
 			volumeItem.Mode = "rw"
 		}
+		volumeItem.Shared = string(bind.Propagation)
 		datas = append(datas, volumeItem)
 	}
 	return datas
