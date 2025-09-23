@@ -258,6 +258,7 @@ const message = {
             length128Err: 'Длина не может превышать 128 символов',
             maxLength: 'Длина не может превышать {0} символов',
             alias: 'Поддерживает английский, цифры, - и _, длина 1-30, и не может начинаться или заканчиваться на -_.',
+            inputTags: 'После ввода набора {0} нажмите Enter для продолжения ввода',
         },
         res: {
             paramError: 'Запрос не удался, попробуйте позже!',
@@ -871,7 +872,6 @@ const message = {
         exportImage: 'Экспорт образа',
         size: 'Размер',
         tag: 'Теги',
-        tagHelper: 'По одному в строке. Например,\nkey1=value1\nkey2=value2',
         imageNameHelper: 'Имя образа и тег, например: nginx:latest',
         cleanBuildCache: 'Очистить кэш сборки',
         delBuildCacheHelper:

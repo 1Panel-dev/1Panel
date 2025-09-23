@@ -261,6 +261,7 @@ const message = {
             length128Err: 'O comprimento não pode exceder 128 caracteres',
             maxLength: 'O comprimento não pode exceder {0} caracteres',
             alias: 'Suporta letras, números, - e _, comprimento de 1 a 30, e não pode começar ou terminar com -_.',
+            inputTags: 'Após inserir um conjunto de {0}, pressione Enter para continuar a inserção',
         },
         res: {
             paramError: 'A solicitação falhou, por favor, tente novamente mais tarde!',
@@ -869,7 +870,6 @@ const message = {
         exportImage: 'Exportar imagem',
         size: 'Tamanho',
         tag: 'Tags',
-        tagHelper: 'Uma por linha. Por exemplo,\nchave1=valor1\nchave2=valor2',
         imageNameHelper: 'Nome da imagem e tag, por exemplo: nginx:latest',
         cleanBuildCache: 'Limpar cache de construção',
         delBuildCacheHelper:

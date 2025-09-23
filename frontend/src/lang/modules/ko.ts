@@ -257,6 +257,7 @@ const message = {
             length128Err: '길이는 128자를 초과할 수 없습니다',
             maxLength: '길이는 {0}자를 초과할 수 없습니다',
             alias: '영어, 숫자, - 및 _ 지원, 길이 1-30, -_로 시작하거나 끝날 수 없습니다.',
+            inputTags: '{0} 세트를 입력한 후 Enter 키를 눌러 입력을 계속하세요',
         },
         res: {
             paramError: '요청이 실패했습니다. 나중에 다시 시도하세요!',
@@ -851,7 +852,6 @@ const message = {
         exportImage: '이미지 내보내기',
         size: '크기',
         tag: '태그',
-        tagHelper: '한 줄에 하나씩. 예시:\nkey1=value1\nkey2=value2',
         imageNameHelper: '이미지 이름과 태그, 예시: nginx:latest',
         cleanBuildCache: '빌드 캐시 정리',
         delBuildCacheHelper: `이 작업은 빌드 중 생성된 모든 캐시된 아티팩트를 삭제하며 되돌릴 수 없습니다. 계속 하시겠습니까?`,

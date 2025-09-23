@@ -19,13 +19,8 @@
                     ></CodemirrorPro>
                 </el-form-item>
                 <div v-if="createdBy === '1Panel'">
-                    <el-form-item :label="$t('container.env')" prop="environmentStr">
-                        <el-input
-                            type="textarea"
-                            :placeholder="$t('container.tagHelper')"
-                            :rows="3"
-                            v-model="environmentStr"
-                        />
+                    <el-form-item :label="$t('container.env')" prop="env">
+                        <InputTag class="w-full" v-model:tags="env" />
                     </el-form-item>
                     <span class="input-help whitespace-break-spaces">
                         {{ $t('container.editComposeHelper') }}
@@ -55,6 +50,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 import { composeUpdate } from '@/api/modules/container';
+import InputTag from '@/components/input-tag/index.vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 
@@ -63,8 +59,7 @@ const composeVisible = ref(false);
 const path = ref();
 const content = ref();
 const name = ref();
-const environmentStr = ref();
-const environmentEnv = ref();
+const env = ref([]);
 const createdBy = ref();
 const envFileContent = ref(`env_file:\n  - 1panel.env`);
 
@@ -76,16 +71,14 @@ const onSubmitEdit = async () => {
         path: path.value,
         content: content.value,
         createdBy: createdBy.value,
-        env: environmentStr.value?.split('\n') || [],
+        env: env.value || [],
     };
     loading.value = true;
     await composeUpdate(param)
         .then(() => {
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             composeVisible.value = false;
-            if (environmentStr.value) {
-                emit('search');
-            }
+            emit('search');
         })
         .finally(() => {
             loading.value = false;
@@ -97,17 +90,15 @@ interface DialogProps {
     path: string;
     content: string;
     env: Array<string>;
-    envStr: string;
     createdBy: string;
 }
 const acceptParams = (props: DialogProps): void => {
-    composeVisible.value = true;
     path.value = props.path;
     name.value = props.name;
     content.value = props.content;
     createdBy.value = props.createdBy;
-    environmentEnv.value = props.env || [];
-    environmentStr.value = environmentEnv.value.join('\n');
+    env.value = props.env || [];
+    composeVisible.value = true;
 };
 const handleClose = () => {
     composeVisible.value = false;

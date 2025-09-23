@@ -32,7 +32,7 @@
                 </el-input>
             </el-form-item>
             <el-form-item :label="$t('container.tag')">
-                <el-input :placeholder="$t('container.tagHelper')" type="textarea" :rows="3" v-model="form.tagStr" />
+                <InputTag class="w-full" v-model:tags="form.tags" />
             </el-form-item>
         </el-form>
 
@@ -56,6 +56,7 @@ import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { imageBuild } from '@/api/modules/container';
+import InputTag from '@/components/input-tag/index.vue';
 import TaskLog from '@/components/log/task/index.vue';
 import { newUUID } from '@/utils/util';
 import { MsgSuccess } from '@/utils/message';
@@ -69,7 +70,6 @@ const form = reactive({
     from: 'path',
     dockerfile: '',
     name: '',
-    tagStr: '',
     tags: [] as Array<string>,
 });
 
@@ -82,7 +82,7 @@ const acceptParams = async () => {
     drawerVisible.value = true;
     form.from = 'path';
     form.dockerfile = '';
-    form.tagStr = '';
+    form.tags = [];
     form.name = '';
 };
 const emit = defineEmits<{ (e: 'search'): void }>();
@@ -99,9 +99,6 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        if (form.tagStr !== '') {
-            form.tags = form.tagStr.split('\n');
-        }
         form.taskID = newUUID();
         await imageBuild(form);
         openTaskLog(form.taskID);

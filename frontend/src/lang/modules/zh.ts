@@ -256,6 +256,7 @@ const message = {
             length128Err: '长度不能超过128位',
             maxLength: '长度不能超过 {0} 位',
             alias: '支持英文、数字、-和_,长度1-30,并且不能以-_开头和结尾',
+            inputTags: '输入完一组 {0} 后回车再继续输入',
         },
         res: {
             paramError: '请求失败,请稍后重试!',
@@ -848,7 +849,6 @@ const message = {
         exportImage: '导出镜像',
         size: '大小',
         tag: '标签',
-        tagHelper: '一行一个，例： \nkey1=value1\nkey2=value2',
         imageNameHelper: '镜像名称及 Tag，例：nginx:latest',
         cleanBuildCache: '清理构建缓存',
         delBuildCacheHelper: '清理构建缓存 将删除所有构建产生的缓存，该操作无法回滚，是否继续？',

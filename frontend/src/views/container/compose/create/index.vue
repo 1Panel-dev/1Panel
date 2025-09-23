@@ -52,8 +52,8 @@
                     ></CodemirrorPro>
                 </div>
             </el-form-item>
-            <el-form-item :label="$t('container.env')" prop="envStr">
-                <el-input type="textarea" :placeholder="$t('container.tagHelper')" :rows="3" v-model="form.envStr" />
+            <el-form-item :label="$t('container.env')" prop="env">
+                <InputTag class="w-full" v-model:tags="form.env" />
             </el-form-item>
             <span class="input-help">{{ $t('container.editComposeHelper') }}</span>
             <CodemirrorPro v-model="form.envFileContent" :height="45" :minHeight="45" disabled mode="yaml" />
@@ -80,6 +80,7 @@ import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm, ElMessageBox } from 'element-plus';
 import { loadBaseDir } from '@/api/modules/setting';
+import InputTag from '@/components/input-tag/index.vue';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 import TaskLog from '@/components/log/task/index.vue';
@@ -103,7 +104,6 @@ const form = reactive({
     file: '',
     template: null as number,
     env: [],
-    envStr: '',
     envFileContent: `env_file:\n  - 1panel.env`,
 });
 const rules = reactive({
@@ -125,7 +125,6 @@ const acceptParams = (): void => {
     form.file = '';
     form.template = null;
     form.env = [];
-    form.envStr = '';
     loadTemplates();
     loadPath();
 };
@@ -198,9 +197,6 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         if ((form.from === 'edit' || form.from === 'template') && form.file.length === 0) {
             MsgError(i18n.global.t('container.contentEmpty'));
             return;
-        }
-        if (form.envStr) {
-            form.env = form.envStr.split('\n');
         }
         loading.value = true;
         await testCompose(form)

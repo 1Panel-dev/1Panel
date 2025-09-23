@@ -171,22 +171,9 @@
                                                 />
                                             </el-form-item>
                                         </el-col>
-                                        <el-col :xs="24" :sm="10" :md="10" :lg="10" :xl="10">
+                                        <el-col :xs="24" :sm="20" :md="20" :lg="20" :xl="20">
                                             <el-form-item label="DNS" prop="dns">
-                                                <div v-for="(_, index) of form.dns" :key="index" class="w-full">
-                                                    <el-input class="mt-2" v-model="form.dns[index]">
-                                                        <template #append>
-                                                            <el-button
-                                                                link
-                                                                icon="Delete"
-                                                                @click="form.dns.splice(index, 1)"
-                                                            />
-                                                        </template>
-                                                    </el-input>
-                                                </div>
-                                                <el-button class="mt-2" @click="form.dns.push('')">
-                                                    {{ $t('commons.button.add') }}
-                                                </el-button>
+                                                <InputTag class="w-full" v-model:tags="form.dns" egHelp="dns" />
                                             </el-form-item>
                                         </el-col>
                                     </el-row>
@@ -350,46 +337,12 @@
                                     <el-row :gutter="20">
                                         <el-col :xs="24" :sm="20" :md="20" :lg="20" :xl="20">
                                             <el-form-item :label="$t('container.tag')" prop="labels">
-                                                <div v-for="(_, index) of form.labels" :key="index" class="w-full">
-                                                    <el-input
-                                                        class="mt-2"
-                                                        placeholder="e.g. key=val"
-                                                        v-model="form.labels[index]"
-                                                    >
-                                                        <template #append>
-                                                            <el-button
-                                                                link
-                                                                icon="Delete"
-                                                                @click="form.labels.splice(index, 1)"
-                                                            />
-                                                        </template>
-                                                    </el-input>
-                                                </div>
-                                                <el-button class="mt-2" @click="form.labels.push('')">
-                                                    {{ $t('commons.button.add') }}
-                                                </el-button>
+                                                <InputTag class="w-full" v-model:tags="form.labels" />
                                             </el-form-item>
                                         </el-col>
                                         <el-col :xs="24" :sm="20" :md="20" :lg="20" :xl="20">
                                             <el-form-item :label="$t('container.env')" prop="envStr">
-                                                <div v-for="(_, index) of form.env" :key="index" class="w-full">
-                                                    <el-input
-                                                        class="mt-2"
-                                                        placeholder="e.g. key=val"
-                                                        v-model="form.env[index]"
-                                                    >
-                                                        <template #append>
-                                                            <el-button
-                                                                link
-                                                                icon="Delete"
-                                                                @click="form.env.splice(index, 1)"
-                                                            />
-                                                        </template>
-                                                    </el-input>
-                                                </div>
-                                                <el-button class="mt-2" @click="form.env.push('')">
-                                                    {{ $t('commons.button.add') }}
-                                                </el-button>
+                                                <InputTag class="w-full" v-model:tags="form.env" />
                                             </el-form-item>
                                         </el-col>
                                     </el-row>
@@ -454,6 +407,7 @@ import { MsgError } from '@/utils/message';
 import TaskLog from '@/components/log/task/index.vue';
 import { checkIpV4V6, checkPort, newUUID } from '@/utils/util';
 import router from '@/routers';
+import InputTag from '@/components/input-tag/index.vue';
 import TerminalDialog from '@/views/host/file-management/terminal/index.vue';
 import { routerToName } from '@/utils/router';
 
@@ -645,6 +599,7 @@ const loadNetworkOptions = async () => {
     networks.value = res.data;
 };
 const onSubmit = async (formEl: FormInstance | undefined) => {
+    console.log(form.labels);
     if (form.volumes.length !== 0) {
         for (const item of form.volumes) {
             if (!item.containerDir || !item.sourceDir) {

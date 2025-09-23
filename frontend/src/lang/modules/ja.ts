@@ -255,6 +255,7 @@ const message = {
             length128Err: '長さは128文字を超えることはできません',
             maxLength: '長さは {0} 文字を超えることはできません',
             alias: '英字、数字、-と_をサポート、長さ1-30、-_で始まるまたは終わることはできません。',
+            inputTags: '{0}のセットを入力後、Enterキーを押して入力を続行',
         },
         res: {
             paramError: 'リクエストが失敗しました。後でもう一度やり直してください！',
@@ -859,7 +860,6 @@ const message = {
         exportImage: '画像エクスポート',
         size: 'サイズ',
         tag: 'タグ',
-        tagHelper: '1行に1つ。たとえば、 nkey1 = value1  nkey2 = value2',
         imageNameHelper: '画像名とタグ、例:nginx:最新',
         cleanBuildCache: 'クリーンビルドキャッシュ',
         delBuildCacheHelper: `これにより、ビルド中に生成され、元に戻すことができないすべてのキャッシュされたアーティファクトが削除されます。続けたいですか？`,

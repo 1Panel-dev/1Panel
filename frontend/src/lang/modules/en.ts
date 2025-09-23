@@ -267,6 +267,7 @@ const message = {
             length128Err: 'Length cannot exceed 128 characters',
             maxLength: 'Length cannot exceed {0} characters',
             alias: 'Supports English, numbers, - and _, length 1-30, and cannot start or end with -_.',
+            inputTags: 'After entering a set of {0}, press Enter to continue inputting',
         },
         res: {
             paramError: 'The request failed, please try again later!',
@@ -882,7 +883,6 @@ const message = {
         exportImage: 'Image export',
         size: 'Size',
         tag: 'Tags',
-        tagHelper: 'One per line. For example,\nkey1=value1\nkey2=value2',
         imageNameHelper: 'Image name and Tag, for example: nginx:latest',
         cleanBuildCache: 'Clean build cache',
         delBuildCacheHelper: `This will delete all cached artifacts that are generated during builds and can't be undone. Do you want to continue?`,

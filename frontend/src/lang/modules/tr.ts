@@ -271,6 +271,7 @@ const message = {
             length128Err: 'Uzunluk 128 karakteri geçemez',
             maxLength: 'Uzunluk {0} karakteri geçemez',
             alias: 'İngilizce, rakamlar, - ve _ destekler, uzunluk 1-30, ve -_ ile başlayamaz veya bitiremez.',
+            inputTags: 'Bir {0} kümesi girdikten sonra, girişe devam etmek için Enter basın',
         },
         res: {
             paramError: 'İstek başarısız, lütfen daha sonra tekrar deneyin!',
@@ -891,7 +892,6 @@ const message = {
         exportImage: 'İmaj dışa aktarma',
         size: 'Boyut',
         tag: 'Etiketler',
-        tagHelper: 'Satır başına bir tane. Örneğin,\nkey1=value1\nkey2=value2',
         imageNameHelper: 'İmaj adı ve Etiketi, örneğin: nginx:latest',
         cleanBuildCache: 'Oluşturma önbelleğini temizle',
         delBuildCacheHelper:

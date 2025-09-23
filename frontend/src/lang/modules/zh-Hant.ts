@@ -258,6 +258,7 @@ const message = {
             length128Err: '長度不能超過128位',
             maxLength: '長度不能超過 {0} 位',
             alias: '支援英文、數字、-和_,長度1-30,並且不能以-、_開頭或結尾',
+            inputTags: '輸入完一組 {0} 後回車再繼續輸入',
         },
         res: {
             paramError: '請求失敗,請稍後重試!',
@@ -849,7 +850,6 @@ const message = {
         exportImage: '匯出鏡像',
         size: '大小',
         tag: '標籤',
-        tagHelper: '一行一個，例： \nkey1=value1\nkey2=value2',
         imageNameHelper: '鏡像名稱及 Tag，例：nginx:latest',
         cleanBuildCache: '清理建置快取',
         delBuildCacheHelper: '清理建置快取將刪除所有建置所產生的快取，此操作無法回復。是否繼續？',

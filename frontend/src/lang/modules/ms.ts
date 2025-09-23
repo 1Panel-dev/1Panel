@@ -263,6 +263,7 @@ const message = {
             length128Err: 'Panjang tidak boleh melebihi 128 aksara',
             maxLength: 'Panjang tidak boleh melebihi {0} aksara',
             alias: 'Menyokong Bahasa Inggeris, nombor, - dan _, panjang 1-30, dan tidak boleh bermula atau berakhir dengan -_.',
+            inputTags: 'Selepas memasukkan satu set {0}, tekan Enter untuk terus memasukkan',
         },
         res: {
             paramError: 'Permintaan gagal, sila cuba lagi nanti!',
@@ -875,7 +876,6 @@ const message = {
         exportImage: 'Eksport imej',
         size: 'Saiz',
         tag: 'Tag',
-        tagHelper: 'Satu setiap baris. Sebagai contoh,\nkey1=value1\nkey2=value2',
         imageNameHelper: 'Nama dan Tag imej, sebagai contoh: nginx:latest',
         cleanBuildCache: 'Bersihkan cache bina',
         delBuildCacheHelper:

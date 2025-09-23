@@ -274,6 +274,7 @@ const message = {
             length128Err: 'La longitud no puede exceder los 128 caracteres',
             maxLength: 'La longitud no puede exceder los {0} caracteres',
             alias: 'Soporta A->Z, números, - and _, largo 1-30 carácteres, no puede empezar ni terminar con -_.',
+            inputTags: 'Después de ingresar un conjunto de {0}, presione Enter para continuar ingresando',
         },
         res: {
             paramError: 'La solicitud falló, por favor intente de nuevo más tarde.',
@@ -883,7 +884,6 @@ const message = {
         exportImage: 'Exportar imagen',
         size: 'Tamaño',
         tag: 'Etiquetas',
-        tagHelper: 'Una por línea. Por ejemplo,\nkey1=value1\nkey2=value2',
         imageNameHelper: 'Nombre de imagen y etiqueta, por ejemplo: nginx:latest',
         cleanBuildCache: 'Limpiar caché de compilación',
         delBuildCacheHelper:

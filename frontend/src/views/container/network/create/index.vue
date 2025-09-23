@@ -105,11 +105,11 @@
                 </el-form-item>
             </div>
 
-            <el-form-item :label="$t('container.option')" prop="optionStr">
-                <el-input type="textarea" :placeholder="$t('container.tagHelper')" :rows="3" v-model="form.optionStr" />
+            <el-form-item :label="$t('container.option')" prop="options">
+                <InputTag class="w-full" v-model:tags="form.options" />
             </el-form-item>
-            <el-form-item :label="$t('container.tag')" prop="labelStr">
-                <el-input type="textarea" :placeholder="$t('container.tagHelper')" :rows="3" v-model="form.labelStr" />
+            <el-form-item :label="$t('container.tag')" prop="labels">
+                <InputTag class="w-full" v-model:tags="form.labels" />
             </el-form-item>
         </el-form>
         <template #footer>
@@ -131,6 +131,7 @@ import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { createNetwork } from '@/api/modules/container';
+import InputTag from '@/components/input-tag/index.vue';
 import { MsgSuccess } from '@/utils/message';
 import { checkIp, checkIpV6 } from '@/utils/util';
 
@@ -139,9 +140,7 @@ const loading = ref(false);
 const drawerVisible = ref(false);
 const form = reactive({
     name: '',
-    labelStr: '',
     labels: [] as Array<string>,
-    optionStr: '',
     options: [] as Array<string>,
     driver: '',
     ipv4: true,
@@ -158,9 +157,7 @@ const form = reactive({
 
 const acceptParams = (): void => {
     form.name = '';
-    form.labelStr = '';
     form.labels = [];
-    form.optionStr = '';
     form.options = [];
     form.driver = 'bridge';
     form.ipv4 = true;
@@ -269,12 +266,6 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        if (form.labelStr !== '') {
-            form.labels = form.labelStr.split('\n');
-        }
-        if (form.optionStr !== '') {
-            form.options = form.optionStr.split('\n');
-        }
         loading.value = true;
         await createNetwork(form)
             .then(() => {
