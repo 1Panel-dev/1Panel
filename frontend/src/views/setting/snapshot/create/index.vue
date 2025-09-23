@@ -48,7 +48,7 @@
                     <el-form-item :label="$t('cronjob.timeout')" prop="timeoutItem">
                         <el-input type="number" class="selectClass" v-model.number="form.timeoutItem">
                             <template #append>
-                                <el-select v-model="form.timeoutUint" style="width: 80px">
+                                <el-select v-model="form.timeoutUnit" style="width: 80px">
                                     <el-option :label="$t('commons.units.second')" value="s" />
                                     <el-option :label="$t('commons.units.minute')" value="m" />
                                     <el-option :label="$t('commons.units.hour')" value="h" />
@@ -210,7 +210,7 @@ const form = reactive({
 
     timeout: 3600,
     timeoutItem: 3600,
-    timeoutUint: 's',
+    timeoutUnit: 's',
 
     backupAllImage: false,
     withDockerConf: true,
@@ -422,7 +422,7 @@ const submitAddSnapshot = async () => {
     loading.value = true;
     form.taskID = newUUID();
     form.sourceAccountIDs = form.fromAccounts.join(',');
-    form.timeout = transferTimeToSecond(form.timeoutItem + form.timeoutUint);
+    form.timeout = transferTimeToSecond(form.timeoutItem + form.timeoutUnit);
     await snapshotCreate(form)
         .then(() => {
             loading.value = false;

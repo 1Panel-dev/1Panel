@@ -56,7 +56,7 @@ export namespace Cronjob {
         retryTimes: number;
         timeout: number;
         timeoutItem: number;
-        timeoutUint: string;
+        timeoutUnit: string;
         status: string;
         secret: string;
         hasAlert: boolean;

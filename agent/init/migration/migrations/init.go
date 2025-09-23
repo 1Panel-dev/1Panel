@@ -583,3 +583,16 @@ var AddShowNameForQuickJump = &gormigrate.Migration{
 		return tx.AutoMigrate(&model.QuickJump{})
 	},
 }
+
+var AddTimeoutForClam = &gormigrate.Migration{
+	ID: "20250922-add-timeout-for-clam",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.Clam{}); err != nil {
+			return err
+		}
+		if err := tx.Model(&model.Clam{}).Where("1 == 1").Updates(map[string]interface{}{"timeout": 18000}).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}

@@ -138,6 +138,9 @@ export namespace Toolbox {
         hasSpec: boolean;
         spec: string;
         specObj: Cronjob.SpecObj;
+        timeout: number;
+        timeoutItem: number;
+        timeoutUnit: string;
         description: string;
         hasAlert: boolean;
         alertCount: number;
@@ -151,6 +154,7 @@ export namespace Toolbox {
         infectedStrategy: string;
         infectedDir: string;
         spec: string;
+        timeout: number;
         specObj: Cronjob.SpecObj;
         description: string;
     }
@@ -161,6 +165,7 @@ export namespace Toolbox {
         infectedStrategy: string;
         infectedDir: string;
         spec: string;
+        timeout: number;
         specObj: Cronjob.SpecObj;
         description: string;
     }

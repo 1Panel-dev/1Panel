@@ -702,7 +702,7 @@
                                     <el-form-item :label="$t('cronjob.timeout')" prop="timeoutItem">
                                         <el-input type="number" class="selectClass" v-model.number="form.timeoutItem">
                                             <template #append>
-                                                <el-select v-model="form.timeoutUint" style="width: 80px">
+                                                <el-select v-model="form.timeoutUnit" style="width: 80px">
                                                     <el-option :label="$t('commons.units.second')" value="s" />
                                                     <el-option :label="$t('commons.units.minute')" value="m" />
                                                     <el-option :label="$t('commons.units.hour')" value="h" />
@@ -779,7 +779,7 @@ import { loadContainerUsers } from '@/api/modules/container';
 import { storeToRefs } from 'pinia';
 import { GlobalStore } from '@/store';
 import LicenseImport from '@/components/license-import/index.vue';
-import { transferTimeToSecond } from '@/utils/util';
+import { splitTimeFromSecond, transferTimeToSecond } from '@/utils/util';
 import { getGroupList } from '@/api/modules/group';
 import { routerToName, routerToPath } from '@/utils/router';
 const router = useRouter();
@@ -845,7 +845,7 @@ const form = reactive<Cronjob.CronjobInfo>({
     retryTimes: 3,
     timeout: 3600,
     timeoutItem: 3600,
-    timeoutUint: 's',
+    timeoutUnit: 's',
     status: '',
     secret: '',
     hasAlert: false,
@@ -935,8 +935,12 @@ const search = async () => {
                 form.ignoreErr = res.data.ignoreErr;
                 form.retainCopies = res.data.retainCopies;
                 form.retryTimes = res.data.retryTimes;
-                form.timeout = res.data.timeout;
-                form.timeoutItem = res.data.timeout || 3600;
+
+                form.timeout = res.data.timeout || 3600;
+                let item = splitTimeFromSecond(form.timeout);
+                form.timeoutItem = item.timeItem;
+                form.timeoutUnit = item.timeUnit;
+
                 form.secret = res.data.secret;
                 form.hasAlert = res.data.alertCount > 0;
                 form.alertCount = res.data.alertCount || 3;
@@ -1138,7 +1142,7 @@ const rules = reactive({
     retainCopies: [Rules.number],
     retryTimes: [Rules.number],
     timeoutItem: [Rules.number],
-    timeoutUint: [Rules.requiredSelect],
+    timeoutUnit: [Rules.requiredSelect],
     alertCount: [Rules.integerNumber, { validator: checkSendCount, trigger: 'blur' }],
     alertMethodItems: [Rules.requiredSelect],
 });
@@ -1420,7 +1424,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         if (!form.inContainer) {
             form.containerName = '';
         }
-        form.timeout = transferTimeToSecond(form.timeoutItem + form.timeoutUint);
+        form.timeout = transferTimeToSecond(form.timeoutItem + form.timeoutUnit);
         if (form.appIdList) {
             form.appID = form.appIdList.join(',');
         }

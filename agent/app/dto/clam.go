@@ -33,6 +33,7 @@ type ClamInfo struct {
 	LastRecordStatus string `json:"lastRecordStatus"`
 	LastRecordTime   string `json:"lastRecordTime"`
 	Spec             string `json:"spec"`
+	Timeout          uint   `json:"timeout"`
 	Description      string `json:"description"`
 	AlertCount       uint   `json:"alertCount"`
 	AlertMethod      string `json:"alertMethod"`
@@ -77,6 +78,7 @@ type ClamCreate struct {
 	InfectedStrategy string `json:"infectedStrategy"`
 	InfectedDir      string `json:"infectedDir"`
 	Spec             string `json:"spec"`
+	Timeout          uint   `json:"timeout"`
 	Description      string `json:"description"`
 	AlertCount       uint   `json:"alertCount"`
 	AlertTitle       string `json:"alertTitle"`
@@ -91,6 +93,7 @@ type ClamUpdate struct {
 	InfectedStrategy string `json:"infectedStrategy"`
 	InfectedDir      string `json:"infectedDir"`
 	Spec             string `json:"spec"`
+	Timeout          uint   `json:"timeout"`
 	Description      string `json:"description"`
 	AlertCount       uint   `json:"alertCount"`
 	AlertTitle       string `json:"alertTitle"`

@@ -8,6 +8,7 @@ import (
 	"path"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
@@ -19,6 +20,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/alert_push"
 	"github.com/1Panel-dev/1Panel/agent/utils/clam"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
+	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/systemctl"
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 	"github.com/jinzhu/copier"
@@ -238,6 +240,7 @@ func (c *ClamService) Update(req dto.ClamUpdate) error {
 	upMap["infected_dir"] = req.InfectedDir
 	upMap["infected_strategy"] = req.InfectedStrategy
 	upMap["spec"] = req.Spec
+	upMap["timeout"] = req.Timeout
 	upMap["description"] = req.Description
 	if err := clamRepo.Update(req.ID, upMap); err != nil {
 		return err
@@ -339,6 +342,9 @@ func (c *ClamService) SearchRecords(req dto.ClamLogSearch) (int64, interface{}, 
 	if clam.ID == 0 {
 		return 0, nil, buserr.New("ErrRecordNotFound")
 	}
+	loc, _ := time.LoadLocation(common.LoadTimeZoneByCmd())
+	req.StartTime = req.StartTime.In(loc)
+	req.EndTime = req.EndTime.In(loc)
 
 	total, records, err := clamRepo.PageRecords(req.Page, req.PageSize, clamRepo.WithByClamID(req.ClamID), repo.WithByStatus(req.Status), repo.WithByCreatedAt(req.StartTime, req.EndTime))
 	if err != nil {

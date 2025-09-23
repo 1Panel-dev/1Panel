@@ -173,6 +173,17 @@
                             <span class="input-help">{{ $t('xpack.alert.alertCountHelper') }}</span>
                         </el-form-item>
                     </div>
+                    <el-form-item :label="$t('cronjob.timeout')" prop="timeoutItem">
+                        <el-input type="number" class="selectClass" v-model.number="dialogData.rowData!.timeoutItem">
+                            <template #append>
+                                <el-select v-model="dialogData.rowData!.timeoutUnit" style="width: 80px">
+                                    <el-option :label="$t('commons.units.second')" value="s" />
+                                    <el-option :label="$t('commons.units.minute')" value="m" />
+                                    <el-option :label="$t('commons.units.hour')" value="h" />
+                                </el-select>
+                            </template>
+                        </el-input>
+                    </el-form-item>
                     <el-form-item :label="$t('commons.table.description')" prop="description">
                         <el-input type="textarea" :rows="3" clearable v-model="dialogData.rowData!.description" />
                     </el-form-item>
@@ -206,6 +217,7 @@ import { createClam, updateClam } from '@/api/modules/toolbox';
 import { storeToRefs } from 'pinia';
 import { GlobalStore } from '@/store';
 import { specOptions, transObjToSpec, transSpecToObj, weekOptions } from '@/views/cronjob/cronjob/helper';
+import { splitTimeFromSecond, transferTimeToSecond } from '@/utils/util';
 
 const globalStore = GlobalStore();
 const licenseRef = ref();
@@ -238,6 +250,11 @@ const acceptParams = (params: DialogProps): void => {
             minute: 30,
             second: 30,
         };
+    }
+    if (dialogData.value.rowData!.timeout) {
+        let item = splitTimeFromSecond(dialogData.value.rowData!.timeout);
+        dialogData.value.rowData.timeoutItem = item.timeItem;
+        dialogData.value.rowData.timeoutUnit = item.timeUnit;
     }
     dialogData.value.rowData.hasAlert = dialogData.value.rowData!.alertCount > 0;
     dialogData.value.rowData!.alertCount = dialogData.value.rowData!.alertCount || 3;
@@ -429,6 +446,9 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
                 return;
             }
         }
+        dialogData.value.rowData.timeout = transferTimeToSecond(
+            dialogData.value.rowData.timeoutItem + dialogData.value.rowData.timeoutUnit,
+        );
         dialogData.value.rowData.spec = spec;
         if (dialogData.value.rowData!.hasAlert) {
             dialogData.value.rowData.alertCount = dialogData.value.rowData!.hasAlert

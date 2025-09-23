@@ -10,6 +10,8 @@ type Clam struct {
 	InfectedStrategy string `json:"infectedStrategy"`
 	InfectedDir      string `json:"infectedDir"`
 	Spec             string `json:"spec"`
+	RetryTimes       uint   `json:"retryTimes"`
+	Timeout          uint   `json:"timeout"`
 	EntryID          int    `json:"entryID"`
 	Description      string `json:"description"`
 

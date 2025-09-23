@@ -510,6 +510,11 @@ export function transTimeUnit(val: string): any {
     }
     return val + i18n.global.t('commons.units.second');
 }
+export function splitTimeFromSecond(item: number): any {
+    if (item < 60) return { timeItem: item, timeUnit: 's' };
+    if (item < 3600) return { timeItem: item / 60, timeUnit: 'm' };
+    return { timeItem: item / 3600, timeUnit: 'h' };
+}
 
 export function splitHttp(url: string) {
     if (url.indexOf('https://') != -1) {

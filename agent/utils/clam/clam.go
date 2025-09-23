@@ -33,7 +33,7 @@ func AddScanTask(taskItem *task.Task, clam model.Clam, timeNow string) {
 			strategy = fmt.Sprintf("--%s=%s", clam.InfectedStrategy, dir)
 		}
 		taskItem.Logf("clamdscan --fdpass %s %s", strategy, clam.Path)
-		mgr := cmd.NewCommandMgr(cmd.WithIgnoreExist1(), cmd.WithTimeout(10*time.Hour), cmd.WithTask(*taskItem))
+		mgr := cmd.NewCommandMgr(cmd.WithIgnoreExist1(), cmd.WithTimeout(time.Duration(clam.Timeout)*time.Second), cmd.WithTask(*taskItem))
 		stdout, err := mgr.RunWithStdoutBashCf("clamdscan --fdpass %s %s", strategy, clam.Path)
 		if err != nil {
 			return fmt.Errorf("clamdscan failed, stdout: %v, err: %v", stdout, err)
