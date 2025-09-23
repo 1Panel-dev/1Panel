@@ -16,6 +16,7 @@ import (
 	"github.com/go-acme/lego/v4/providers/dns/namecheap"
 	"github.com/go-acme/lego/v4/providers/dns/namedotcom"
 	"github.com/go-acme/lego/v4/providers/dns/namesilo"
+	"github.com/go-acme/lego/v4/providers/dns/ovh"
 	"github.com/go-acme/lego/v4/providers/dns/rainyun"
 	"github.com/go-acme/lego/v4/providers/dns/regru"
 	"github.com/go-acme/lego/v4/providers/dns/spaceship"
@@ -49,6 +50,7 @@ const (
 	RegRu        DnsType = "RegRu"
 	Dynu         DnsType = "Dynu"
 	BaiduCloud   DnsType = "BaiduCloud"
+	Ovh          DnsType = "Ovh"
 )
 
 type DNSParam struct {
@@ -68,6 +70,8 @@ type DNSParam struct {
 	AuthID       string `json:"authID"`
 	SubAuthID    string `json:"subAuthID"`
 	AuthPassword string `json:"authPassword"`
+	Endpoint     string `json:"endpoint"`
+	AccessToken  string `json:"accessToken"`
 }
 
 var (
@@ -246,6 +250,14 @@ func getDNSProviderConfig(dnsType DnsType, params string) (challenge.Provider, e
 		config.PollingInterval = pollingInterval
 		config.TTL = ttl
 		p, err = baiducloud.NewDNSProviderConfig(config)
+	case Ovh:
+		config := ovh.NewDefaultConfig()
+		config.APIEndpoint = param.Endpoint
+		config.AccessToken = param.AccessToken
+		config.PropagationTimeout = propagationTimeout
+		config.PollingInterval = pollingInterval
+		config.TTL = ttl
+		p, err = ovh.NewDNSProviderConfig(config)
 	}
 
 	if err != nil {

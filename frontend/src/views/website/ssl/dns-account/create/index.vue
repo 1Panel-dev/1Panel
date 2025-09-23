@@ -136,6 +136,18 @@
                             <el-input v-model.trim="account.authorization['password']"></el-input>
                         </el-form-item>
                     </div>
+                    <div v-if="account.type === 'Ovh'">
+                        <el-form-item label="Endpoint" prop="authorization.endpoint" :rules="[Rules.requiredInput]">
+                            <el-input v-model.trim="account.authorization['endpoint']"></el-input>
+                        </el-form-item>
+                        <el-form-item
+                            label="AccessToken"
+                            prop="authorization.accessToken"
+                            :rules="[Rules.requiredInput]"
+                        >
+                            <el-input v-model.trim="account.authorization['accessToken']"></el-input>
+                        </el-form-item>
+                    </div>
                 </el-form>
             </el-col>
         </el-row>

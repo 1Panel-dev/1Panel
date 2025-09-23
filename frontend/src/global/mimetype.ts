@@ -245,6 +245,10 @@ export const DNSTypes = [
         value: 'Spaceship',
     },
     {
+        label: 'OVH',
+        value: 'Ovh',
+    },
+    {
         label: i18n.global.t('website.volcengine'),
         value: 'Volcengine',
     },
