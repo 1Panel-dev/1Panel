@@ -8,6 +8,7 @@ import (
 	"os"
 	"path"
 	"strings"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/constant"
@@ -457,7 +458,7 @@ func restartDocker() error {
 	if err != nil {
 		return err
 	}
-	stdout, err := cmd.RunDefaultWithStdoutBashCf("%s restart docker", restartCmd)
+	stdout, err := cmd.NewCommandMgr(cmd.WithTimeout(3*time.Minute)).RunWithStdoutBashCf("%s restart docker", restartCmd)
 	if err != nil {
 		return fmt.Errorf("failed to restart Docker: %s", stdout)
 	}

@@ -20,6 +20,7 @@ export enum ResultEnum {
 export enum TimeoutEnum {
     T_40S = 40000,
     T_60S = 60000,
+    T_3M = 180000,
     T_5M = 300000,
     T_10M = 600000,
     T_1H = 3600000,

@@ -185,7 +185,7 @@ export const composeUpdate = (params: Container.ComposeUpdate) => {
 
 // docker
 export const dockerOperate = (operation: string) => {
-    return http.post(`/containers/docker/operate`, { operation: operation });
+    return http.post(`/containers/docker/operate`, { operation: operation }, TimeoutEnum.T_3M);
 };
 export const loadDaemonJson = () => {
     return http.get<Container.DaemonJsonConf>(`/containers/daemonjson`);
@@ -197,18 +197,18 @@ export const loadDockerStatus = () => {
     return http.get<Container.DockerStatus>(`/containers/docker/status`);
 };
 export const updateDaemonJson = (key: string, value: string) => {
-    return http.post(`/containers/daemonjson/update`, { key: key, value: value }, TimeoutEnum.T_60S);
+    return http.post(`/containers/daemonjson/update`, { key: key, value: value }, TimeoutEnum.T_3M);
 };
 export const updateLogOption = (maxSize: string, maxFile: string) => {
-    return http.post(`/containers/logoption/update`, { logMaxSize: maxSize, logMaxFile: maxFile }, TimeoutEnum.T_60S);
+    return http.post(`/containers/logoption/update`, { logMaxSize: maxSize, logMaxFile: maxFile }, TimeoutEnum.T_3M);
 };
 export const updateIpv6Option = (fixedCidrV6: string, ip6Tables: boolean, experimental: boolean) => {
     return http.post(
         `/containers/ipv6option/update`,
         { fixedCidrV6: fixedCidrV6, ip6Tables: ip6Tables, experimental: experimental },
-        TimeoutEnum.T_60S,
+        TimeoutEnum.T_3M,
     );
 };
 export const updateDaemonJsonByfile = (params: Container.DaemonJsonUpdateByFile) => {
-    return http.post(`/containers/daemonjson/update/byfile`, params);
+    return http.post(`/containers/daemonjson/update/byfile`, params, TimeoutEnum.T_3M);
 };
