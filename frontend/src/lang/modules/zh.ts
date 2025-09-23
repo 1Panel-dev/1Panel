@@ -2093,7 +2093,7 @@ const message = {
         perip: '单IP限制',
         peripHelper: '限制单个IP访问最大并发数',
         rate: '流量限制',
-        rateHelper: '限制每个请求的流量上(单位:KB)',
+        rateHelper: '限制每个请求的流量上限(单位:KB)',
         limitHelper: '启用流量控制',
         other: '其他',
         currentSSL: '当前证书',

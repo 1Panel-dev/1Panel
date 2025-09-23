@@ -2102,7 +2102,7 @@ const message = {
         perip: '單IP限制',
         peripHelper: '限制單個IP訪問最大並發數',
         rate: '流量限制',
-        rateHelper: '限制每個請求的流量上(單位:KB)',
+        rateHelper: '限制每個請求的流量上限(單位:KB)',
         limitHelper: '啟用流量控制',
         other: '其他',
         currentSSL: '目前證書',
