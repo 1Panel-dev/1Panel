@@ -103,19 +103,27 @@
                         <el-input type="number" class="!w-2/5" v-model.number="paramModel.cpuQuota" maxlength="5">
                             <template #append>{{ $t('app.cpuCore') }}</template>
                         </el-input>
-                        <span class="input-help">{{ $t('container.limitHelper') }}</span>
+                        <span class="input-help">
+                            {{ $t('container.limitHelper', [limits.cpu]) }}{{ $t('commons.units.core') }}
+                        </span>
                     </el-form-item>
                     <el-form-item :label="$t('container.memoryLimit')" prop="memoryLimit">
                         <el-input class="!w-2/5" v-model.number="paramModel.memoryLimit" maxlength="10">
                             <template #append>
-                                <el-select v-model="paramModel.memoryUnit" placeholder="Select" style="width: 85px">
-                                    <el-option label="KB" value="K" />
+                                <el-select
+                                    v-model="paramModel.memoryUnit"
+                                    placeholder="Select"
+                                    class="!w-[85px]"
+                                    @change="changeUnit"
+                                >
                                     <el-option label="MB" value="M" />
                                     <el-option label="GB" value="G" />
                                 </el-select>
                             </template>
                         </el-input>
-                        <span class="input-help">{{ $t('container.limitHelper') }}</span>
+                        <span class="input-help">
+                            {{ $t('container.limitHelper', [limits.memory]) }}{{ paramModel.memoryUnit }}B
+                        </span>
                     </el-form-item>
 
                     <el-form-item prop="editCompose">
@@ -147,6 +155,8 @@ import { Rules, checkNumberRange } from '@/global/form-rules';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { getLabel, splitHttp, checkIpV4V6, checkDomain } from '@/utils/util';
 import i18n from '@/lang';
+import { loadResourceLimit } from '@/api/modules/container';
+import { Container } from '@/api/interface/container';
 
 interface ParamProps {
     id: Number;
@@ -190,6 +200,11 @@ const webUI = reactive({
     protocol: 'http://',
     domain: '',
 });
+const limits = ref<Container.ResourceLimit>({
+    cpu: null as number,
+    memory: null as number,
+});
+const oldMemory = ref<number>(0);
 
 function checkWebUI() {
     if (webUI.domain !== '') {
@@ -237,6 +252,7 @@ const editParam = () => {
         paramModel.params[param.key] = param.value;
     });
     edit.value = !edit.value;
+    loadLimit();
 };
 
 const changeAllowPort = () => {
@@ -379,6 +395,21 @@ const showCopyButton = (key: string) => {
         }
     }
     return false;
+};
+
+const loadLimit = async () => {
+    const res = await loadResourceLimit();
+    limits.value = res.data;
+    limits.value.memory = Number((limits.value.memory / 1024 / 1024).toFixed(2));
+    oldMemory.value = limits.value.memory;
+};
+
+const changeUnit = () => {
+    if (paramModel.memoryUnit == 'M') {
+        limits.value.memory = oldMemory.value;
+    } else {
+        limits.value.memory = Number((oldMemory.value / 1024).toFixed(2));
+    }
 };
 
 defineExpose({ acceptParams });
