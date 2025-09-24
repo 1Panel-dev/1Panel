@@ -5,7 +5,7 @@
         </template>
         <template #leftToolBar>
             <el-button @click="sync" type="primary" plain v-if="mode === 'installed' && data != null">
-                {{ $t('commons.button.sync') }}
+                {{ $t('commons.button.refresh') }}
             </el-button>
             <el-button @click="openIgnore" type="primary" plain v-if="mode === 'upgrade'">
                 {{ $t('app.showIgnore') }}

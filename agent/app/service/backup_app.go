@@ -67,7 +67,7 @@ func (u *BackupService) AppBackup(req dto.CommonBackup) (*model.BackupRecord, er
 		return nil, err
 	}
 
-	return nil, nil
+	return record, nil
 }
 
 func (u *BackupService) AppRecover(req dto.CommonRecover) error {

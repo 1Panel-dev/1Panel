@@ -677,29 +677,29 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 		backupFile string
 	)
 	backUpApp := func(t *task.Task) error {
-		if req.Backup {
-			backupService := NewIBackupService()
-			backupRecordService := NewIBackupRecordService()
-			fileName := fmt.Sprintf("upgrade_backup_%s_%s.tar.gz", install.Name, time.Now().Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(5))
-			backupRecord, err := backupService.AppBackup(dto.CommonBackup{Name: install.App.Key, DetailName: install.Name, FileName: fileName})
-			if err == nil {
-				backups, _ := backupRecordService.ListAppRecords(install.App.Key, install.Name, "upgrade_backup")
-				if len(backups) > 3 {
-					backupsToDelete := backups[:len(backups)-3]
-					var deleteIDs []uint
-					for _, backup := range backupsToDelete {
-						deleteIDs = append(deleteIDs, backup.ID)
-					}
-					_ = backupRecordService.BatchDeleteRecord(deleteIDs)
+		backupService := NewIBackupService()
+		backupRecordService := NewIBackupRecordService()
+		fileName := fmt.Sprintf("upgrade_backup_%s_%s.tar.gz", install.Name, time.Now().Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(5))
+		backupRecord, err := backupService.AppBackup(dto.CommonBackup{Name: install.App.Key, DetailName: install.Name, FileName: fileName})
+		if err == nil {
+			backups, _ := backupRecordService.ListAppRecords(install.App.Key, install.Name, "upgrade_backup")
+			if len(backups) > 3 {
+				backupsToDelete := backups[:len(backups)-3]
+				var deleteIDs []uint
+				for _, backup := range backupsToDelete {
+					deleteIDs = append(deleteIDs, backup.ID)
 				}
-				backupFile = path.Join(global.Dir.LocalBackupDir, backupRecord.FileDir, backupRecord.FileName)
-			} else {
-				return buserr.WithNameAndErr("ErrAppBackup", install.Name, err)
+				_ = backupRecordService.BatchDeleteRecord(deleteIDs)
 			}
+			backupFile = path.Join(global.Dir.LocalBackupDir, backupRecord.FileDir, backupRecord.FileName)
+		} else {
+			return buserr.WithNameAndErr("ErrAppBackup", install.Name, err)
 		}
 		return nil
 	}
-	upgradeTask.AddSubTask(task.GetTaskName(install.Name, task.TaskBackup, task.TaskScopeApp), backUpApp, nil)
+	if req.Backup {
+		upgradeTask.AddSubTask(task.GetTaskName(install.Name, task.TaskBackup, task.TaskScopeApp), backUpApp, nil)
+	}
 
 	upgradeApp := func(t *task.Task) error {
 		fileOp := files.NewFileOp()
