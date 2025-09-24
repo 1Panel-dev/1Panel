@@ -249,6 +249,10 @@ export const DNSTypes = [
         value: 'Ovh',
     },
     {
+        label: 'Acme DNS',
+        value: 'AcmeDNS',
+    },
+    {
         label: i18n.global.t('website.volcengine'),
         value: 'Volcengine',
     },

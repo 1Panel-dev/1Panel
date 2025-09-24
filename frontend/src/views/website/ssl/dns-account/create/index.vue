@@ -148,6 +148,14 @@
                             <el-input v-model.trim="account.authorization['accessToken']"></el-input>
                         </el-form-item>
                     </div>
+                    <div v-if="account.type === 'AcmeDNS'">
+                        <el-form-item label="API BASE" prop="authorization.endpoint" :rules="[Rules.requiredInput]">
+                            <el-input v-model.trim="account.authorization['endpoint']"></el-input>
+                        </el-form-item>
+                        <el-form-item label="BASE URL" prop="authorization.baseURL" :rules="[Rules.requiredInput]">
+                            <el-input v-model.trim="account.authorization['baseURL']"></el-input>
+                        </el-form-item>
+                    </div>
                 </el-form>
             </el-col>
         </el-row>

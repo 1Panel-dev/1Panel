@@ -3,6 +3,7 @@ package ssl
 import (
 	"encoding/json"
 	"github.com/go-acme/lego/v4/challenge"
+	"github.com/go-acme/lego/v4/providers/dns/acmedns"
 	"github.com/go-acme/lego/v4/providers/dns/alidns"
 	"github.com/go-acme/lego/v4/providers/dns/baiducloud"
 	"github.com/go-acme/lego/v4/providers/dns/clouddns"
@@ -51,6 +52,7 @@ const (
 	Dynu         DnsType = "Dynu"
 	BaiduCloud   DnsType = "BaiduCloud"
 	Ovh          DnsType = "Ovh"
+	AcmeDNS      DnsType = "AcmeDNS"
 )
 
 type DNSParam struct {
@@ -72,6 +74,7 @@ type DNSParam struct {
 	AuthPassword string `json:"authPassword"`
 	Endpoint     string `json:"endpoint"`
 	AccessToken  string `json:"accessToken"`
+	BaseURL      string `json:"baseURL"`
 }
 
 var (
@@ -258,6 +261,11 @@ func getDNSProviderConfig(dnsType DnsType, params string) (challenge.Provider, e
 		config.PollingInterval = pollingInterval
 		config.TTL = ttl
 		p, err = ovh.NewDNSProviderConfig(config)
+	case AcmeDNS:
+		config := acmedns.NewDefaultConfig()
+		config.APIBase = param.Endpoint
+		config.StorageBaseURL = param.BaseURL
+		p, err = acmedns.NewDNSProviderConfig(config)
 	}
 
 	if err != nil {
