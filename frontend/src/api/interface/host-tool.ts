@@ -44,6 +44,7 @@ export namespace HostTool {
         status?: ProcessStatus[];
         autoRestart: string;
         autoStart: string;
+        environment: string;
     }
 
     export interface ProcessStatus {

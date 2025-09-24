@@ -34,6 +34,7 @@ type SupervisorProcessConfig struct {
 	Numprocs    string `json:"numprocs"`
 	AutoRestart string `json:"autoRestart"`
 	AutoStart   string `json:"autoStart"`
+	Environment string `json:"environment"`
 }
 
 type SupervisorProcessFileReq struct {

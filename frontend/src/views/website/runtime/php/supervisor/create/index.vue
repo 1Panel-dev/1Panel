@@ -29,6 +29,9 @@
             <el-form-item :label="$t('tool.supervisor.numprocs')" prop="numprocsNum">
                 <el-input type="number" v-model.number="process.numprocsNum"></el-input>
             </el-form-item>
+            <el-form-item :label="$t('process.env')" prop="environment">
+                <el-input type="text" v-model="process.environment"></el-input>
+            </el-form-item>
             <el-form-item :label="$t('tool.supervisor.autoRestart')" prop="autoRestart">
                 <el-switch v-model="process.autoRestart" active-value="true" inactive-value="false"></el-switch>
             </el-form-item>
@@ -77,6 +80,7 @@ const initData = (runtimeID: number) => ({
     id: runtimeID,
     autoRestart: 'true',
     autoStart: 'true',
+    environment: '',
 });
 const process = ref(initData(0));
 const em = defineEmits(['close']);
@@ -105,6 +109,7 @@ const acceptParams = (operate: string, config: HostTool.SupersivorProcess, id: n
             id: id,
             autoRestart: config.autoRestart,
             autoStart: config.autoStart,
+            environment: config.environment || '',
         };
         process.value.numprocsNum = Number(config.numprocs);
     }

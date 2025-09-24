@@ -213,6 +213,7 @@ export namespace Runtime {
         dir: string;
         numprocs: string;
         id: number;
+        environment: string;
     }
 
     export interface PHPContainerConfig {
