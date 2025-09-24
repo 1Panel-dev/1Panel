@@ -2,7 +2,7 @@ package client
 
 import (
 	"crypto/tls"
-	"fmt"
+	"net"
 	"net/http"
 	"os"
 	"path"
@@ -25,7 +25,7 @@ func NewWebDAVClient(vars map[string]interface{}) (*webDAVClient, error) {
 	username := loadParamFromVars("username", vars)
 	bucket := loadParamFromVars("bucket", vars)
 
-	url := fmt.Sprintf("%s:%s", address, port)
+	url := net.JoinHostPort(address, port)
 	if len(port) == 0 {
 		url = address
 	}

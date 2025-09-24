@@ -29,12 +29,9 @@ type SSHClient struct {
 }
 
 func NewClient(c ConnInfo) (*SSHClient, error) {
-	if strings.Contains(c.Addr, ":") {
-		c.Addr = fmt.Sprintf("[%s]", c.Addr)
-	}
 	config := &gossh.ClientConfig{}
 	config.SetDefaults()
-	addr := fmt.Sprintf("%s:%d", c.Addr, c.Port)
+	addr := net.JoinHostPort(c.Addr, fmt.Sprintf("%d", c.Port))
 	config.User = c.User
 	if c.AuthMode == "password" {
 		config.Auth = []gossh.AuthMethod{gossh.Password(c.Password)}

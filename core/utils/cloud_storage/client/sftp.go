@@ -1,7 +1,6 @@
 package client
 
 import (
-	"fmt"
 	"io"
 	"net"
 	"os"
@@ -56,11 +55,12 @@ func NewSftpClient(vars map[string]interface{}) (*sftpClient, error) {
 			return nil
 		},
 	}
-	if _, err := ssh.Dial("tcp", fmt.Sprintf("%s:%s", address, port), clientConfig); err != nil {
+	addr := net.JoinHostPort(address, port)
+	if _, err := ssh.Dial("tcp", addr, clientConfig); err != nil {
 		return nil, err
 	}
 
-	return &sftpClient{connInfo: fmt.Sprintf("%s:%s", address, port), config: clientConfig, bucket: bucket}, nil
+	return &sftpClient{connInfo: addr, config: clientConfig, bucket: bucket}, nil
 }
 
 func (s sftpClient) Upload(src, target string) (bool, error) {
