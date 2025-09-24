@@ -47,6 +47,7 @@ const GlobalStore = defineStore({
         isMasterProductPro: false,
         isOffLine: false,
 
+        masterAlias: i18n.global.t('xpack.node.master'),
         currentNode: 'local',
         currentNodeAddr: '',
     }),

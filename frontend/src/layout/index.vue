@@ -57,7 +57,6 @@ import { useRoute, useRouter } from 'vue-router';
 import { loadMasterProductProFromDB, loadProductProFromDB } from '@/utils/xpack';
 import { useTheme } from '@/global/use-theme';
 import TaskList from '@/components/task-list/index.vue';
-import i18n from '@/lang';
 const { switchTheme } = useTheme();
 
 useResize();
@@ -101,7 +100,7 @@ const handleCollapse = () => {
 const loadContent = () => {
     let itemName = globalStore.watermark.content.replaceAll(
         '${nodeName}',
-        globalStore.currentNode === 'local' ? i18n.global.t('xpack.node.master') : globalStore.currentNode,
+        globalStore.currentNode === 'local' ? globalStore.masterAlias : globalStore.currentNode,
     );
     itemName = itemName.replaceAll('${nodeAddr}', globalStore.currentNodeAddr);
     return itemName;

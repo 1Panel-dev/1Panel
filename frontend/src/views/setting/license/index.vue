@@ -108,6 +108,8 @@ import BindXpack from '@/views/setting/license/bind/xpack.vue';
 import { dateFormat } from '@/utils/util';
 import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
 
 const loading = ref();
 const licenseRef = ref();
@@ -168,7 +170,7 @@ const loadBindNode = (row: any) => {
     if (row.freeNodes) {
         for (const item of row.freeNodes) {
             if (item.addr === row.bindNode) {
-                return item.name === 'local' ? i18n.global.t('xpack.node.master') : item.addr;
+                return item.name === 'local' ? globalStore.masterAlias : item.addr;
             }
         }
     }
@@ -221,7 +223,7 @@ const search = async () => {
                 item.expiresAt = item.productPro === '0' ? '' : timestampToDate(Number(item.productPro));
             }
             data.value.sort((a, b) => {
-                const masterLabel = i18n.global.t('xpack.node.master');
+                const masterLabel = globalStore.masterAlias;
                 const nodeA = loadBindNode(a);
                 const nodeB = loadBindNode(b);
 

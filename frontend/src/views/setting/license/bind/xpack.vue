@@ -113,7 +113,7 @@ const submit = async () => {
 
 const loadNodes = async () => {
     if (!globalStore.isMasterProductPro) {
-        freeNodes.value = [{ id: 0, name: i18n.global.t('xpack.node.master') }];
+        freeNodes.value = [{ id: 0, name: globalStore.masterAlias }];
         return;
     }
     await listNodeOptions('free')

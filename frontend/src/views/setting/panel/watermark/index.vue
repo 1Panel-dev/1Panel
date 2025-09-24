@@ -84,7 +84,7 @@ const acceptParams = (watermark: string): void => {
 const loadContent = () => {
     let itemName = form.content.replaceAll(
         '${nodeName}',
-        globalStore.currentNode === 'local' ? i18n.global.t('xpack.node.master') : globalStore.currentNode,
+        globalStore.currentNode === 'local' ? globalStore.masterAlias : globalStore.currentNode,
     );
     itemName = itemName.replaceAll('${nodeAddr}', globalStore.currentNodeAddr);
     return itemName;

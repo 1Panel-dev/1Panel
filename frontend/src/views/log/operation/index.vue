@@ -44,7 +44,7 @@
                 <el-select v-model="searchNode" @change="search()" clearable class="p-w-200">
                     <template #prefix>{{ $t('xpack.node.node') }}</template>
                     <el-option :label="$t('commons.table.all')" value="" />
-                    <el-option :label="$t('xpack.node.master')" value="local" />
+                    <el-option :label="globalStore.masterAlias" value="local" />
                     <el-option v-for="(node, index) in nodes" :key="index" :label="node.name" :value="node.name" />
                 </el-select>
                 <TableSearch @search="search()" v-model:searchName="searchName" />
@@ -70,7 +70,7 @@
                     </el-table-column>
                     <el-table-column v-if="globalStore.isMasterProductPro" :label="$t('xpack.node.node')" prop="node">
                         <template #default="{ row }">
-                            <span>{{ row.node === 'local' ? $t('xpack.node.master') : row.node }}</span>
+                            <span>{{ row.node === 'local' ? globalStore.masterAlias : row.node }}</span>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.status')" prop="status">

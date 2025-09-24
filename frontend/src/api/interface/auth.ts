@@ -34,5 +34,6 @@ export namespace Login {
         menuTabs: string;
         panelName: string;
         theme: string;
+        isOffLine: boolean;
     }
 }

@@ -57,7 +57,7 @@
                         </div>
                     </el-scrollbar>
                     <div class="dropdown-item -mb-1" @click="changeNode('local')">
-                        <div class="node">{{ $t('xpack.node.master') }}</div>
+                        <div class="node">{{ globalStore.masterAlias }}</div>
                     </div>
                 </div>
                 <el-input
@@ -123,11 +123,11 @@ const openChangeNode = () => {
 const loadCurrentName = () => {
     if (globalStore.currentNode) {
         if (globalStore.currentNode === 'local') {
-            return i18n.global.t('xpack.node.master');
+            return globalStore.masterAlias;
         }
         return globalStore.currentNode;
     }
-    return i18n.global.t('xpack.node.master');
+    return globalStore.masterAlias;
 };
 
 const showPopover = () => {

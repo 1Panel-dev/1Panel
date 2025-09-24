@@ -52,6 +52,7 @@ export interface GlobalState {
     isMasterProductPro: boolean;
     isOffLine: boolean;
 
+    masterAlias: string;
     currentNode: string;
     currentNodeAddr: string;
 }

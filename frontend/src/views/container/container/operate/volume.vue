@@ -92,7 +92,6 @@ const props = defineProps({
 watch(
     () => props.volumes,
     (newVal) => {
-        console.log(newVal);
         tmpVolumes.value = newVal || [];
     },
 );
