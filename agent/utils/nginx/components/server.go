@@ -349,6 +349,10 @@ func (s *Server) UpdateRootProxy(proxy []string) {
 		},
 		&Directive{
 			Name:       "proxy_set_header",
+			Parameters: []string{"X-Forwarded-Proto", "$scheme"},
+		},
+		&Directive{
+			Name:       "proxy_set_header",
 			Parameters: []string{"Connection", "upgrade"},
 		},
 		&Directive{
