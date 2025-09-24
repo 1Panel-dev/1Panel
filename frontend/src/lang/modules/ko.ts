@@ -172,6 +172,7 @@ const message = {
             rootInfoErr: '이미 루트 디렉토리입니다',
             resetSuccess: '초기화 완료',
             creatingInfo: '생성 중입니다. 이 작업이 필요하지 않습니다',
+            offlineTips: '오프라인 버전은 이 작업을 지원하지 않습니다',
         },
         login: {
             username: '사용자 이름',

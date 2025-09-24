@@ -150,11 +150,13 @@ import Supervisor from '@/views/website/runtime/php/supervisor/index.vue';
 import RuntimeStatus from '@/views/website/runtime/components/runtime-status.vue';
 import Terminal from '@/views/website/runtime/components/terminal.vue';
 import { disabledButton } from '@/utils/runtime';
-import { GlobalStore } from '@/store';
 import DockerStatus from '@/views/container/docker-status/index.vue';
 import { operateRuntime, updateRuntimeRemark } from '../common/utils';
 import { routerToFileWithPath } from '@/utils/router';
-const globalStore = GlobalStore();
+import { MsgWarning } from '@/utils/message';
+import { useGlobalStore } from '@/composables/useGlobalStore';
+const { globalStore, isOffLine } = useGlobalStore();
+
 const mobile = computed(() => {
     return globalStore.isMobile();
 });
@@ -284,6 +286,10 @@ const search = async () => {
 };
 
 const openCreate = () => {
+    if (isOffLine) {
+        MsgWarning(i18n.global.t('commons.msg.offlineTips'));
+        return;
+    }
     createRef.value.acceptParams({ type: 'php', mode: 'create' });
 };
 

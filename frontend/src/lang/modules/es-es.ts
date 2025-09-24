@@ -182,6 +182,7 @@ const message = {
             creatingInfo: 'Creando, no es necesario realizar esta operación',
             installSuccess: 'Instalación completada correctamente',
             uninstallSuccess: 'Desinstalación completada correctamente',
+            offlineTips: 'La versión offline no admite esta operación',
         },
         login: {
             username: 'Usuario',

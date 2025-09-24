@@ -181,6 +181,7 @@ const message = {
             creatingInfo: '正在建立，無需此操作',
             installSuccess: '安裝成功',
             uninstallSuccess: '移除成功',
+            offlineTips: '離線版本不支援此操作',
         },
         login: {
             username: '使用者名稱',

@@ -175,6 +175,7 @@ const message = {
             rootInfoErr: 'Ia sudah menjadi direktori akar',
             resetSuccess: 'Berjaya ditetapkan semula',
             creatingInfo: 'Sedang mencipta, operasi ini tidak diperlukan',
+            offlineTips: 'Versi luar talian tidak menyokong operasi ini',
         },
         login: {
             username: 'Nama Pengguna',

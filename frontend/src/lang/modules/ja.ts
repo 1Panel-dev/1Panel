@@ -173,6 +173,7 @@ const message = {
             rootInfoErr: 'すでにルートディレクトリです',
             resetSuccess: 'リセット成功',
             creatingInfo: '作成、この操作は必要ありません',
+            offlineTips: 'オフライン版はこの操作をサポートしていません',
         },
         login: {
             username: 'ユーザー名',

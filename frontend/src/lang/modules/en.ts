@@ -183,6 +183,7 @@ const message = {
             creatingInfo: 'Creating, no need for this operation',
             installSuccess: 'Install successful',
             uninstallSuccess: 'Uninstall successful',
+            offlineTips: 'Offline version does not support this operation',
         },
         login: {
             username: 'Username',

@@ -184,6 +184,7 @@ const message = {
             creatingInfo: 'Oluşturuluyor, bu işlem gerekli değil',
             installSuccess: 'Yükleme başarılı',
             uninstallSuccess: 'Kaldırma başarılı',
+            offlineTips: 'A versão offline não suporta esta operação',
         },
         login: {
             username: 'Kullanıcı adı',
