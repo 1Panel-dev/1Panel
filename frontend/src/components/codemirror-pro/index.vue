@@ -15,7 +15,7 @@ import { yaml } from '@codemirror/legacy-modes/mode/yaml';
 import { shell } from '@codemirror/legacy-modes/mode/shell';
 import { dockerFile } from '@codemirror/legacy-modes/mode/dockerfile';
 import { javascript } from '@codemirror/legacy-modes/mode/javascript';
-import { placeholder } from '@codemirror/view';
+import { KeyBinding, placeholder } from '@codemirror/view';
 import { json } from '@codemirror/lang-json';
 import { keymap } from '@codemirror/view';
 import { defaultKeymap, indentWithTab } from '@codemirror/commands';
@@ -68,6 +68,49 @@ const customStyle = computed<CSSProperties>(() => ({
     width: '100%',
 }));
 
+const toggleLineComment = (mode: string) => {
+    return (view: EditorView) => {
+        const commentChar =
+            mode === 'yaml' || mode === 'shell' || mode === 'nginx' || mode === 'dockerfile' ? '#' : '//';
+
+        const { state } = view;
+
+        const transaction = state.changeByRange((range) => {
+            let line = state.doc.lineAt(range.from);
+            let text = line.text;
+            let changes;
+
+            if (text.trim().startsWith(commentChar)) {
+                const pos = line.from + text.indexOf(commentChar);
+                changes = { from: pos, to: pos + commentChar.length, insert: '' };
+            } else {
+                changes = { from: line.from, insert: commentChar };
+            }
+
+            return {
+                changes,
+                range,
+            };
+        });
+
+        view.dispatch(transaction);
+        return true;
+    };
+};
+
+const customKeymap: KeyBinding[] = [
+    {
+        key: 'Alt-/',
+        run: toggleLineComment(props.mode),
+        preventDefault: true,
+    },
+    {
+        key: 'Mod-/',
+        run: toggleLineComment(props.mode),
+        preventDefault: true,
+    },
+];
+
 const initCodeMirror = () => {
     const defaultTheme = EditorView.theme({
         '&.cm-editor': {
@@ -80,7 +123,7 @@ const initCodeMirror = () => {
         defaultTheme,
         oneDark,
         basicSetup,
-        keymap.of([...defaultKeymap, indentWithTab]),
+        keymap.of([...defaultKeymap, indentWithTab, ...customKeymap]),
         EditorView.updateListener.of((v: any) => {
             if (v.docChanged) {
                 emit('update:modelValue', v.state.doc.toString());
@@ -89,9 +132,11 @@ const initCodeMirror = () => {
         placeholder(props.placeholder),
         EditorView.editable.of(!props.disabled),
     ];
+
     if (props.lineWrapping) {
         extensions.push(EditorView.lineWrapping);
     }
+
     switch (props.mode) {
         case 'dockerfile':
             extensions.push(StreamLanguage.define(dockerFile));
@@ -112,10 +157,12 @@ const initCodeMirror = () => {
             extensions.push(StreamLanguage.define(shell));
             break;
     }
+
     let startState = EditorState.create({
         doc: content.value,
         extensions: extensions,
     });
+
     editorView.value = new EditorView({
         state: startState,
         parent: editorRef.value,
