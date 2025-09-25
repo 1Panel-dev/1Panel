@@ -38,13 +38,16 @@
         </div>
 
         <LayoutContent>
-            <template #main>
+            <template #leftToolBar>
                 <el-radio-group v-model="confShowType" @change="changeMode">
                     <el-radio-button value="base">{{ $t('database.baseConf') }}</el-radio-button>
                     <el-radio-button value="all">{{ $t('database.allConf') }}</el-radio-button>
                 </el-radio-group>
 
-                <el-button @click="onOpenDrawer" class="mt-2 ml-2">{{ $t('ssh.pubkey') }}</el-button>
+                <el-button @click="onOpenDrawer">{{ $t('ssh.pubkey') }}</el-button>
+                <el-button @click="onOpenAuthKeys">{{ $t('ssh.authKeys') }}</el-button>
+            </template>
+            <template #main>
                 <el-row class="mt-10" v-if="confShowType === 'base'">
                     <el-col :xs="24" :sm="20" :md="20" :lg="10" :xl="10">
                         <el-form :model="form" label-position="right" ref="formRef" label-width="100px">
@@ -111,7 +114,7 @@
 
                 <div v-if="confShowType === 'all'">
                     <CodemirrorPro
-                        :heightDiff="450"
+                        :heightDiff="320"
                         :minHeight="350"
                         class="mt-5"
                         v-model="sshConf"
@@ -124,6 +127,7 @@
             </template>
         </LayoutContent>
 
+        <AuthKeys ref="authKeyRef" />
         <Cert ref="pubKeyRef" @search="search" />
         <Port ref="portRef" @search="search" />
         <Address ref="addressRef" @search="search" />
@@ -134,13 +138,14 @@
 <script lang="ts" setup>
 import { onMounted, reactive, ref } from 'vue';
 import FireRouter from '@/views/host/ssh/index.vue';
+import AuthKeys from '@/views/host/ssh/ssh/auth-keys/index.vue';
 import Cert from '@/views/host/ssh/ssh/certification/index.vue';
 import Root from '@/views/host/ssh/ssh/root/index.vue';
 import Port from '@/views/host/ssh/ssh/port/index.vue';
 import Address from '@/views/host/ssh/ssh/address/index.vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import { getSSHConf, getSSHInfo, operateSSH, updateSSH, updateSSHByfile } from '@/api/modules/host';
+import { loadSSHFile, getSSHInfo, operateSSH, updateSSH, updateSSHByFile } from '@/api/modules/host';
 import { ElMessageBox, FormInstance } from 'element-plus';
 import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 
@@ -151,6 +156,7 @@ const pubKeyRef = ref();
 const portRef = ref();
 const addressRef = ref();
 const rootsRef = ref();
+const authKeyRef = ref();
 
 const autoStart = ref('enable');
 
@@ -178,7 +184,7 @@ const onSaveFile = async () => {
         type: 'info',
     }).then(async () => {
         loading.value = true;
-        await updateSSHByfile(sshConf.value)
+        await updateSSHByFile('sshdConf', sshConf.value)
             .then(() => {
                 loading.value = false;
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
@@ -191,6 +197,9 @@ const onSaveFile = async () => {
 
 const onOpenDrawer = () => {
     pubKeyRef.value.acceptParams(form.currentUser);
+};
+const onOpenAuthKeys = () => {
+    authKeyRef.value.acceptParams();
 };
 
 const onChangePort = () => {
@@ -285,7 +294,7 @@ const changeI18n = (value: string) => {
 };
 
 const loadSSHConf = async () => {
-    const res = await getSSHConf();
+    const res = await loadSSHFile('sshdConf');
     sshConf.value = res.data || '';
 };
 

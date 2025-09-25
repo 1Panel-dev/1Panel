@@ -1554,6 +1554,8 @@ const message = {
             'A operação de sincronização limpará chaves inválidas e sincronizará novos pares de chaves completos. Continuar?',
         input: 'Entrada Manual',
         import: 'Upload de Arquivo',
+        authKeys: 'Gerenciamento de Chaves Públicas',
+        authKeysHelper: 'Salvar informações atuais da chave pública?',
         pubkey: 'Informações da chave',
         pubKeyHelper: 'A informação da chave atual só tem efeito para o usuário {0}',
         encryptionMode: 'Modo de criptografia',

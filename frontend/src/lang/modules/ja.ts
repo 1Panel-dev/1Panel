@@ -1523,6 +1523,8 @@ const message = {
         syncHelper: '同期操作は無効なキーをクリーンアップし、新しい完全なキーペアを同期します。続行しますか？',
         input: '手動入力',
         import: 'ファイルアップロード',
+        authKeys: '公開鍵管理',
+        authKeysHelper: '現在の公開鍵情報を保存しますか？',
         pubkey: '重要な情報',
         encryptionMode: '暗号化モード',
         pubKeyHelper: '現在の鍵情報はユーザー {0} にのみ有効です',

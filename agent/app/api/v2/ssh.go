@@ -68,28 +68,6 @@ func (b *BaseApi) UpdateSSH(c *gin.Context) {
 }
 
 // @Tags SSH
-// @Summary Update host SSH setting by file
-// @Accept json
-// @Param request body dto.SSHConf true "request"
-// @Success 200
-// @Security ApiKeyAuth
-// @Security Timestamp
-// @Router /hosts/ssh/conffile/update [post]
-// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"修改 SSH 配置文件","formatEN":"update SSH conf"}
-func (b *BaseApi) UpdateSSHByfile(c *gin.Context) {
-	var req dto.SSHConf
-	if err := helper.CheckBindAndValidate(&req, c); err != nil {
-		return
-	}
-
-	if err := sshService.UpdateByFile(req.File); err != nil {
-		helper.InternalServer(c, err)
-		return
-	}
-	helper.Success(c)
-}
-
-// @Tags SSH
 // @Summary Generate host SSH secret
 // @Accept json
 // @Param request body dto.CreateRootCert true "request"
@@ -246,15 +224,44 @@ func (b *BaseApi) ExportSSHLogs(c *gin.Context) {
 
 // @Tags SSH
 // @Summary Load host SSH conf
+// @Accept json
+// @Param request body dto.OperationWithName true "request"
 // @Success 200 {string} conf
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /hosts/ssh/conf [get]
-func (b *BaseApi) LoadSSHConf(c *gin.Context) {
-	data, err := sshService.LoadSSHConf()
+// @Router /hosts/ssh/file [post]
+func (b *BaseApi) LoadSSHFile(c *gin.Context) {
+	var req dto.OperationWithName
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	data, err := sshService.LoadSSHFile(req.Name)
 	if err != nil {
 		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, data)
+}
+
+// @Tags SSH
+// @Summary Update host SSH setting by file
+// @Accept json
+// @Param request body dto.SSHConf true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /hosts/ssh/file/update [post]
+// @x-panel-log {"bodyKeys":["key"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"修改 SSH 配置文件 [key]","formatEN":"update SSH conf [key]"}
+func (b *BaseApi) UpdateSSHByFile(c *gin.Context) {
+	var req dto.SettingUpdate
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	if err := sshService.UpdateByFile(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
 }

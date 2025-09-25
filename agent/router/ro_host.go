@@ -29,13 +29,13 @@ func (s *HostRouter) InitRouter(Router *gin.RouterGroup) {
 		hostRouter.GET("/monitor/setting", baseApi.LoadMonitorSetting)
 		hostRouter.POST("/monitor/setting/update", baseApi.UpdateMonitorSetting)
 
-		hostRouter.GET("/ssh/conf", baseApi.LoadSSHConf)
 		hostRouter.POST("/ssh/search", baseApi.GetSSHInfo)
 		hostRouter.POST("/ssh/update", baseApi.UpdateSSH)
 		hostRouter.POST("/ssh/log", baseApi.LoadSSHLogs)
 		hostRouter.POST("/ssh/log/export", baseApi.ExportSSHLogs)
-		hostRouter.POST("/ssh/conffile/update", baseApi.UpdateSSHByfile)
 		hostRouter.POST("/ssh/operate", baseApi.OperateSSH)
+		hostRouter.POST("/ssh/file", baseApi.LoadSSHFile)
+		hostRouter.POST("/ssh/file/update", baseApi.UpdateSSHByFile)
 
 		hostRouter.POST("/ssh/cert", baseApi.CreateRootCert)
 		hostRouter.POST("/ssh/cert/sync", baseApi.SyncRootCert)

@@ -1594,6 +1594,8 @@ const message = {
             'Eşitleme işlemi geçersiz anahtarları temizleyecek ve yeni tam anahtar çiftlerini eşitleyecek. Devam edilsin mi?',
         input: 'Manuel Giriş',
         import: 'Dosya Yükleme',
+        authKeys: 'Ortak Anahtar Yönetimi',
+        authKeysHelper: 'Mevcut ortak anahtar bilgilerini kaydet?',
         pubkey: 'Anahtar bilgisi',
         pubKeyHelper: 'Mevcut anahtar bilgileri yalnızca {0} kullanıcısı için geçerlidir',
         encryptionMode: 'Şifreleme modu',

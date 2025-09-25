@@ -1576,6 +1576,8 @@ const message = {
         syncHelper: 'The sync operation will clean invalid keys and sync new complete key pairs. Continue?',
         input: 'Manual Input',
         import: 'File Upload',
+        authKeys: 'Public Key Management',
+        authKeysHelper: 'Save current public key information?',
         pubkey: 'Key info',
         pubKeyHelper: 'The current key information only takes effect for user {0}',
         encryptionMode: 'Encryption mode',

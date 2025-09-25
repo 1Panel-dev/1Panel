@@ -68,17 +68,17 @@ export const updateMonitorSetting = (key: string, value: string) => {
 export const getSSHInfo = () => {
     return http.post<Host.SSHInfo>(`/hosts/ssh/search`);
 };
-export const getSSHConf = () => {
-    return http.get<string>(`/hosts/ssh/conf`);
-};
 export const operateSSH = (operation: string) => {
     return http.post(`/hosts/ssh/operate`, { operation: operation }, TimeoutEnum.T_40S);
 };
 export const updateSSH = (params: Host.SSHUpdate) => {
     return http.post(`/hosts/ssh/update`, params, TimeoutEnum.T_40S);
 };
-export const updateSSHByfile = (file: string) => {
-    return http.post(`/hosts/ssh/conffile/update`, { file: file }, TimeoutEnum.T_40S);
+export const loadSSHFile = (name: string) => {
+    return http.post<string>(`/hosts/ssh/file`, { name: name });
+};
+export const updateSSHByFile = (key: string, file: string) => {
+    return http.post(`/hosts/ssh/file/update`, { key: key, value: file }, TimeoutEnum.T_60S);
 };
 export const createCert = (params: Host.RootCert) => {
     let request = deepCopy(params) as Host.RootCert;

@@ -38,9 +38,9 @@ type SSHService struct{}
 type ISSHService interface {
 	GetSSHInfo() (*dto.SSHInfo, error)
 	OperateSSH(operation string) error
-	UpdateByFile(value string) error
 	Update(req dto.SSHUpdate) error
-	LoadSSHConf() (string, error)
+	LoadSSHFile(name string) (string, error)
+	UpdateByFile(req dto.SettingUpdate) error
 
 	LoadLog(ctx *gin.Context, req dto.SearchSSHLog) (int64, []dto.SSHHistory, error)
 	ExportLog(ctx *gin.Context, req dto.SearchSSHLog) (string, error)
@@ -219,25 +219,6 @@ func (u *SSHService) Update(req dto.SSHUpdate) error {
 		}
 	}
 
-	_, _ = cmd.RunDefaultWithStdoutBashCf("%s systemctl restart %s", sudo, serviceName)
-	return nil
-}
-
-func (u *SSHService) UpdateByFile(value string) error {
-	serviceName, err := loadServiceName()
-	if err != nil {
-		return err
-	}
-
-	file, err := os.OpenFile(sshPath, os.O_WRONLY|os.O_TRUNC, constant.FilePerm)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-	if _, err = file.WriteString(value); err != nil {
-		return err
-	}
-	sudo := cmd.SudoHandleCmd()
 	_, _ = cmd.RunDefaultWithStdoutBashCf("%s systemctl restart %s", sudo, serviceName)
 	return nil
 }
@@ -500,15 +481,62 @@ func (u *SSHService) ExportLog(ctx *gin.Context, req dto.SearchSSHLog) (string, 
 	return tmpFileName, nil
 }
 
-func (u *SSHService) LoadSSHConf() (string, error) {
-	if _, err := os.Stat("/etc/ssh/sshd_config"); err != nil {
-		return "", buserr.New("ErrHttpReqNotFound")
+func (u *SSHService) LoadSSHFile(name string) (string, error) {
+	var fileName string
+	switch name {
+	case "authKeys":
+		currentUser, err := user.Current()
+		if err != nil {
+			return "", fmt.Errorf("load current user failed, err: %v", err)
+		}
+		fileName = currentUser.HomeDir + "/.ssh/authorized_keys"
+	case "sshdConf":
+		fileName = "/etc/ssh/sshd_config"
+	default:
+		return "", buserr.WithName("ErrNotSupportType", name)
 	}
-	content, err := os.ReadFile("/etc/ssh/sshd_config")
+	if _, err := os.Stat(fileName); err != nil {
+		return "", buserr.WithErr("ErrHttpReqNotFound", err)
+	}
+	content, err := os.ReadFile(fileName)
 	if err != nil {
 		return "", err
 	}
 	return string(content), nil
+}
+
+func (u *SSHService) UpdateByFile(req dto.SettingUpdate) error {
+	var fileName string
+	switch req.Key {
+	case "authKeys":
+		currentUser, err := user.Current()
+		if err != nil {
+			return fmt.Errorf("load current user failed, err: %v", err)
+		}
+		fileName = currentUser.HomeDir + "/.ssh/authorized_keys"
+	case "sshdConf":
+		fileName = "/etc/ssh/sshd_config"
+	default:
+		return buserr.WithName("ErrNotSupportType", req.Key)
+	}
+	file, err := os.OpenFile(fileName, os.O_WRONLY|os.O_TRUNC, constant.FilePerm)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	if _, err = file.WriteString(req.Value); err != nil {
+		return err
+	}
+	if req.Key == "authKeys" {
+		return nil
+	}
+	serviceName, err := loadServiceName()
+	if err != nil {
+		return err
+	}
+	sudo := cmd.SudoHandleCmd()
+	_, _ = cmd.RunDefaultWithStdoutBashCf("%s systemctl restart %s", sudo, serviceName)
+	return nil
 }
 
 func sortFileList(fileNames []sshFileItem) []sshFileItem {
