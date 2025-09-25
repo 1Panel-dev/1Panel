@@ -1862,6 +1862,10 @@ const message = {
         certificate: '證書',
 
         about: '關於',
+        versionItem: '目前版本',
+        backupCopies: '保留份數',
+        backupCopiesHelper: '設定用於版本回滾的升級備份保留份數。0 表示保留所有。',
+        backupCopiesRule: '請至少保存 3 份升級備份記錄',
         release: '版本更新日誌',
         releaseHelper: '目前環境更新日誌取得異常，可手動前往官方文件查看',
         project: '項目地址',

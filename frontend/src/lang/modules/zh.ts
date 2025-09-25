@@ -1854,6 +1854,10 @@ const message = {
         certificate: '证书',
 
         about: '关于',
+        versionItem: '当前版本',
+        backupCopies: '保留份数',
+        backupCopiesHelper: '设置用于版本回滚的升级备份保留份数，为 0 则保留所有。',
+        backupCopiesRule: '请至少保存 3 份升级备份记录',
         release: '版本更新日志',
         releaseHelper: '当前环境更新日志获取异常，可手动前往官方文档查看',
         project: '项目地址',

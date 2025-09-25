@@ -145,6 +145,8 @@ func (u *SettingService) Update(key, value string) error {
 		if err := xpack.Sync(constant.SyncLanguage); err != nil {
 			global.LOG.Errorf("sync language to node failed, err: %v", err)
 		}
+	case "UpgradeBackupCopies":
+		dropBackupCopies()
 	}
 
 	return nil

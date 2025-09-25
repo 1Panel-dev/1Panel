@@ -1990,6 +1990,10 @@ const message = {
             'Detected that node {0} is already at the latest upgradable version. Please check the primary node version and try again!',
 
         about: 'About',
+        versionItem: 'Current Version',
+        backupCopies: 'Number of Copies to Keep',
+        backupCopiesHelper: 'Set the number of upgrade backup copies to keep for version rollback. 0 means keep all.',
+        backupCopiesRule: 'Please keep at least 3 upgrade backup records',
         release: 'Release Notes',
         releaseHelper:
             'Failed to fetch release notes for the current environment. You can manually check the official documentation.',

@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -190,6 +191,7 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 		}
 
 		global.LOG.Info("upgrade successful!")
+		dropBackupCopies()
 		go writeLogs(req.Version)
 		_ = settingRepo.Update("SystemVersion", req.Version)
 		_ = global.AgentDB.Model(&model.Setting{}).Where("key = ?", "SystemVersion").Updates(map[string]interface{}{"value": req.Version}).Error
@@ -472,4 +474,33 @@ func loadArch() (string, error) {
 		return "riscv64", nil
 	}
 	return "", fmt.Errorf("unsupported such arch: %s", std)
+}
+
+func dropBackupCopies() {
+	backupCopies, _ := settingRepo.GetValueByKey("UpgradeBackupCopies")
+	copies, _ := strconv.Atoi(backupCopies)
+	if copies == 0 {
+		return
+	}
+	backupDir := path.Join(global.CONF.Base.InstallDir, "1panel/tmp/upgrade")
+	upgradeDir, err := os.ReadDir(backupDir)
+	if err != nil {
+		global.LOG.Errorf("read upgrade dir failed, err: %v", err)
+		return
+	}
+	var versions []string
+	for _, item := range upgradeDir {
+		if item.IsDir() && strings.HasPrefix(item.Name(), "v") {
+			versions = append(versions, item.Name())
+		}
+	}
+	if len(versions) <= copies {
+		return
+	}
+	sort.Slice(versions, func(i, j int) bool {
+		return common.ComparePanelVersion(versions[i], versions[j])
+	})
+	for i := copies - 1; i < len(versions); i++ {
+		_ = os.RemoveAll(backupDir + "/" + versions[i])
+	}
 }

@@ -5,9 +5,10 @@ import (
 )
 
 type SettingInfo struct {
-	UserName      string `json:"userName"`
-	SystemVersion string `json:"systemVersion"`
-	DeveloperMode string `json:"developerMode"`
+	UserName            string `json:"userName"`
+	SystemVersion       string `json:"systemVersion"`
+	DeveloperMode       string `json:"developerMode"`
+	UpgradeBackupCopies string `json:"upgradeBackupCopies"`
 
 	SessionTimeout string `json:"sessionTimeout"`
 	Port           string `json:"port"`

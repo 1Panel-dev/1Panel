@@ -535,3 +535,13 @@ var AddSimpleNodeGroup = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddUpgradeBackupCopies = &gormigrate.Migration{
+	ID: "20250925-add-upgrade-backup-copies",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.Create(&model.Setting{Key: "UpgradeBackupCopies", Value: "0"}).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}

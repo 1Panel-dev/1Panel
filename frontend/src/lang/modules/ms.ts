@@ -1963,6 +1963,11 @@ const message = {
             'Nod {0} telah berada pada versi terkini yang boleh dinaik taraf. Sila periksa versi nod utama dan cuba lagi!',
 
         about: 'Mengenai',
+        versionItem: 'Versi Semasa',
+        backupCopies: 'Bilangan Salinan untuk Disimpan',
+        backupCopiesHelper:
+            'Tetapkan bilangan salinan sandaran naik taraf untuk disimpan untuk pemulihan versi. 0 bermakna simpan semua.',
+        backupCopiesRule: 'Sila simpan sekurang-kurangnya 3 rekod sandaran naik taraf',
         release: 'Log Kemaskini Versi',
         releaseHelper:
             'Pengambilan log kemaskini untuk persekitaran semasa mengalami异常. Anda boleh menyemak dokumentasi rasmi secara manual.',

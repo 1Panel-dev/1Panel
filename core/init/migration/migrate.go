@@ -23,6 +23,7 @@ func Init() {
 		migrations.AddCronjobGroup,
 		migrations.AddDiskMenu,
 		migrations.AddSimpleNodeGroup,
+		migrations.AddUpgradeBackupCopies,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

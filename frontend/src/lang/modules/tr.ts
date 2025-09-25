@@ -2007,7 +2007,13 @@ const message = {
         versionNotSame: 'Düğüm sürümü ana düğümle uyuşmuyor. Lütfen Düğüm Yönetiminde yükseltin ve tekrar deneyin.',
         versionCompare:
             '{0} düğümünün zaten en son yükseltilebilir sürümde olduğu tespit edildi. Lütfen birincil düğüm sürümünü kontrol edin ve tekrar deneyin!',
+
         about: 'Hakkında',
+        versionItem: 'Mevcut Sürüm',
+        backupCopies: 'Saklanacak Kopya Sayısı',
+        backupCopiesHelper:
+            'Sürüm geri alma için saklanacak yükseltme yedek kopya sayısını ayarlayın. 0, tümünü sakla anlamına gelir.',
+        backupCopiesRule: 'Lütfen en az 3 yükseltme yedek kaydı saklayın',
         release: 'Sürüm Güncelleme Günlüğü',
         releaseHelper:
             'Mevcut ortam için güncelleme günlükleri alınırken hata oluştu. Resmi belgeleri manuel olarak kontrol edebilirsiniz.',

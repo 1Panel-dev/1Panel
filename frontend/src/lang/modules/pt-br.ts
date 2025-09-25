@@ -1953,6 +1953,11 @@ const message = {
             'Detectado que o nó {0} já está na última versão atualizável. Por favor, verifique a versão do nó principal e tente novamente!',
 
         about: 'Sobre',
+        versionItem: 'Versão Atual',
+        backupCopies: 'Número de Cópias a Manter',
+        backupCopiesHelper:
+            'Defina o número de cópias de backup de atualização para manter para reversão de versão. 0 significa manter todas.',
+        backupCopiesRule: 'Mantenha pelo menos 3 registros de backup de atualização',
         release: 'Registro de Atualizações de Versão',
         releaseHelper:
             'Falha ao obter o registro de atualizações para o ambiente atual. Você pode verificar a documentação oficial manualmente.',

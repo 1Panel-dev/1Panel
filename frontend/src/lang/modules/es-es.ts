@@ -1994,7 +1994,13 @@ const message = {
             'La versión del nodo no coincide con la del nodo principal. Actualiza en la gestión de nodos antes de reintentar.',
         versionCompare:
             'Se detectó que el nodo {0} ya está en la última versión actualizable. Verifica la versión del nodo principal e inténtalo de nuevo.',
+
         about: 'Acerca de',
+        versionItem: 'Versión Actual',
+        backupCopies: 'Número de Copias a Conservar',
+        backupCopiesHelper:
+            'Establezca el número de copias de respaldo de actualización para conservar para la reversión de versión. 0 significa conservar todas.',
+        backupCopiesRule: 'Conserve al menos 3 registros de respaldo de actualización',
         release: 'Notas de lanzamiento',
         releaseHelper:
             'No se pudieron obtener las notas de lanzamiento para el entorno actual. Puedes consultarlas manualmente en la documentación oficial.',

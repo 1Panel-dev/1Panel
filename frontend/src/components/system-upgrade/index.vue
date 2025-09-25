@@ -90,7 +90,7 @@ const getVersionLog = () => {
     if (isOffLine) {
         return;
     }
-    releasesRef.value.acceptParams({ version: version });
+    releasesRef.value.acceptParams();
 };
 
 const toLxware = () => {

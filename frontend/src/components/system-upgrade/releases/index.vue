@@ -1,18 +1,29 @@
 <template>
     <DrawerPro v-model="drawerVisible" :header="$t('setting.release')" @close="handleClose" size="large">
-        <template #buttons>
-            <span>{{ version }}</span>
-            <CopyButton :content="version" type="primary" />
-        </template>
         <div class="note" v-loading="loading">
+            <el-form ref="formRef" :model="form" :rules="rules">
+                <el-form-item :label="$t('setting.versionItem')" prop="version">
+                    <el-input class="p-w-200" disabled v-model="form.version">
+                        <template #append>
+                            <CopyButton class="w-16" :isIcon="false" :content="form.version" type="primary" />
+                        </template>
+                    </el-input>
+                </el-form-item>
+                <el-form-item :label="$t('setting.backupCopies')" prop="backupCopies">
+                    <el-input class="p-w-200" type="number" v-model.number="form.backupCopies">
+                        <template #append>
+                            <el-button @click="onSave(formRef)" class="w-16">{{ $t('commons.button.save') }}</el-button>
+                        </template>
+                    </el-input>
+                    <span class="input-help">{{ $t('setting.backupCopiesHelper') }}</span>
+                </el-form-item>
+            </el-form>
             <el-collapse v-if="notes && notes.length !== 0" v-model="currentVersion" :accordion="true">
                 <div v-for="(item, index) in notes" :key="index">
                     <el-collapse-item :name="index">
                         <template #title>
-                            <div>
-                                <span class="version">{{ item.version }}</span>
-                                <span v-if="!mobile" class="date">{{ item.createdAt }}</span>
-                            </div>
+                            <span class="version">{{ item.version }}</span>
+                            <span v-if="!mobile" class="date">{{ item.createdAt }}</span>
                             <svg-icon class="icon" iconName="p-featureshitu"></svg-icon>
                             <span class="icon-span">{{ item.newCount }}</span>
                             <svg-icon class="icon" iconName="p-youhuawendang"></svg-icon>
@@ -46,12 +57,16 @@
 </template>
 
 <script setup lang="ts">
-import { listReleases } from '@/api/modules/setting';
+import { getSettingInfo, listReleases, updateSetting } from '@/api/modules/setting';
 import MdEditor from 'md-editor-v3';
 import 'md-editor-v3/lib/style.css';
 import { ref } from 'vue';
 import { GlobalStore } from '@/store';
 import { storeToRefs } from 'pinia';
+import { FormInstance } from 'element-plus';
+import { MsgSuccess } from '@/utils/message';
+import i18n from '@/lang';
+import { Rules } from '@/global/form-rules';
 
 const globalStore = GlobalStore();
 const mobile = computed(() => {
@@ -64,15 +79,53 @@ const drawerVisible = ref(false);
 const currentVersion = ref(0);
 const notes = ref([]);
 const loading = ref();
-const version = ref();
+const formRef = ref();
 
-interface DialogProps {
-    version: string;
-}
-const acceptParams = (params: DialogProps): void => {
-    version.value = params.version;
+const form = reactive({
+    version: '',
+    backupCopies: 0,
+});
+const rules = reactive({
+    version: [Rules.requiredInput],
+    backupCopies: [{ validator: checkBackupCopies, trigger: 'blur', required: true }],
+});
+
+const acceptParams = (): void => {
     search();
+    loadInfo();
     drawerVisible.value = true;
+};
+
+const loadInfo = async () => {
+    const res = await getSettingInfo();
+    form.version = res.data.systemVersion;
+    form.backupCopies = Number(res.data.upgradeBackupCopies) || 0;
+};
+
+function checkBackupCopies(rule: any, value: any, callback: any) {
+    if (value === 0) {
+        return callback();
+    }
+    if (value < 3) {
+        return callback(new Error(i18n.global.t('setting.backupCopiesRule')));
+    }
+    callback();
+}
+
+const onSave = async (formEl: FormInstance | undefined) => {
+    if (!formEl) return;
+    formEl.validate(async (valid) => {
+        if (!valid) return;
+        loading.value = true;
+        await updateSetting({ key: 'UpgradeBackupCopies', value: form.backupCopies + '' })
+            .then(() => {
+                loading.value = false;
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            })
+            .finally(() => {
+                loading.value = false;
+            });
+    });
 };
 
 const handleClose = () => {
@@ -124,6 +177,7 @@ defineExpose({
     padding: 0px;
 }
 .icon {
+    display: inline-block;
     font-size: 7px;
     margin-left: 50px;
 }
