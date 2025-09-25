@@ -1131,6 +1131,13 @@ const message = {
         alertTitle: 'Tarea programada - {0} 「{1}」 Alerta de fallo',
         library: {
             script: 'Script',
+            syncNow: 'Sincronizar Ahora',
+            turnOnSync: 'Activar Sincronización Automática',
+            turnOnSyncHelper:
+                'Activar la sincronización automática realizará sincronizaciones automáticas durante las primeras horas de la madrugada diariamente',
+            turnOffSync: 'Desactivar Sincronización Automática',
+            turnOffSyncHelper:
+                'Desactivar la sincronización automática puede causar retrasos en la sincronización de scripts, ¿confirmar?',
             isInteractive: 'Interactivo',
             interactive: 'Script interactivo',
             interactiveHelper:

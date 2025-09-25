@@ -1142,6 +1142,13 @@ const message = {
         alertTitle: 'Planlanmış Görev - {0} 「{1}」 Görev Başarısızlık Uyarısı',
         library: {
             script: 'Script',
+            syncNow: 'Hemen Senkronize Et',
+            turnOnSync: 'Otomatik Senkronizasyonu Aç',
+            turnOnSyncHelper:
+                'Otomatik senkronizasyonu açmak, her gün sabahın erken saatlerinde otomatik senkronizasyon gerçekleştirecektir',
+            turnOffSync: 'Otomatik Senkronizasyonu Kapat',
+            turnOffSyncHelper:
+                'Otomatik senkronizasyonu kapatmak, betik senkronizasyon gecikmelerine neden olabilir, onaylıyor musunuz?',
             isInteractive: 'Etkileşimli',
             interactive: 'Etkileşimli script',
             interactiveHelper: 'Yürütme sırasında kullanıcı girişi gerektirir ve zamanlanmış görevlerde kullanılamaz.',

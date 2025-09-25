@@ -1087,6 +1087,11 @@ const message = {
         alertTitle: '예정된 작업 - {0} 「{1}」 작업 실패 경고',
         library: {
             script: '스크립트',
+            syncNow: '지금 동기화',
+            turnOnSync: '자동 동기화 켜기',
+            turnOnSyncHelper: '자동 동기화를 켜면 매일 새벽 시간에 자동 동기화가 수행됩니다',
+            turnOffSync: '자동 동기화 끄기',
+            turnOffSyncHelper: '자동 동기화를 끄면 스크립트 동기화가 지연될 수 있습니다. 확인하시겠습니까?',
             isInteractive: '대화형',
             interactive: '대화형 스크립트',
             interactiveHelper: '실행 중 사용자 입력이 필요하며 예약 작업에서는 사용할 수 없습니다.',

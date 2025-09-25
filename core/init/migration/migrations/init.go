@@ -545,3 +545,13 @@ var AddUpgradeBackupCopies = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddScriptSync = &gormigrate.Migration{
+	ID: "20250916-add-script-sync",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.Create(&model.Setting{Key: "ScriptSync", Value: constant.StatusEnable}).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}

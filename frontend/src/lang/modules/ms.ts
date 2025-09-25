@@ -1122,6 +1122,12 @@ const message = {
         alertTitle: 'Tugas Terancang - {0} 「{1}」 Amaran Kegagalan Tugas',
         library: {
             script: 'Skrip',
+            syncNow: 'Segerakan Sekarang',
+            turnOnSync: 'Hidupkan Segerakan Auto',
+            turnOnSyncHelper:
+                'Menghidupkan segerakan auto akan melakukan penyegerakan automatik pada waktu awal pagi setiap hari',
+            turnOffSync: 'Matikan Segerakan Auto',
+            turnOffSyncHelper: 'Mematikan segerakan auto mungkin menyebabkan kelewatan penyegerakan skrip, sahkan?',
             isInteractive: 'Interaktif',
             interactive: 'Skrip interaktif',
             interactiveHelper:

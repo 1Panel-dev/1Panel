@@ -5,9 +5,26 @@
                 <el-button type="primary" @click="onOpenDialog('create')">
                     {{ $t('commons.button.create') }}
                 </el-button>
-                <el-button type="primary" plain @click="onSync()">
-                    {{ $t('commons.button.sync') }}
-                </el-button>
+                <el-dropdown @command="handleSyncOp" class="mr-2.5">
+                    <el-button type="primary" plain>
+                        {{ $t('commons.button.sync') }}
+                        <el-icon><arrow-down /></el-icon>
+                    </el-button>
+                    <template #dropdown>
+                        <el-dropdown-menu>
+                            <el-dropdown-item command="sync">
+                                {{ $t('cronjob.library.syncNow') }}
+                            </el-dropdown-item>
+                            <el-dropdown-item v-if="scriptSync === 'Disable'" command="turnOnSync">
+                                {{ $t('cronjob.library.turnOnSync') }}
+                            </el-dropdown-item>
+                            <el-dropdown-item v-if="scriptSync === 'Enable'" command="turnOffSync">
+                                {{ $t('cronjob.library.turnOffSync') }}
+                            </el-dropdown-item>
+                        </el-dropdown-menu>
+                    </template>
+                </el-dropdown>
+
                 <el-button type="primary" plain @click="onOpenGroupDialog()">
                     {{ $t('commons.table.group') }}
                 </el-button>
@@ -116,6 +133,7 @@ import { GlobalStore } from '@/store';
 import { getGroupList } from '@/api/modules/group';
 import CodemirrorDrawer from '@/components/codemirror-pro/drawer.vue';
 import { MsgSuccess } from '@/utils/message';
+import { getSettingBy, updateSetting } from '@/api/modules/setting';
 
 const globalStore = GlobalStore();
 const mobile = computed(() => {
@@ -129,6 +147,7 @@ const opRef = ref();
 
 const runRef = ref();
 const taskLogRef = ref();
+const scriptSync = ref();
 
 const data = ref();
 const paginationConfig = reactive({
@@ -194,7 +213,7 @@ const onDelete = async (row: Cronjob.ScriptInfo | null) => {
 };
 
 const onSync = async () => {
-    ElMessageBox.confirm(i18n.global.t('cronjob.library.syncHelper', i18n.global.t('commons.button.sync')), {
+    ElMessageBox.confirm(i18n.global.t('cronjob.library.syncHelper'), i18n.global.t('commons.button.syncNow'), {
         confirmButtonText: i18n.global.t('commons.button.confirm'),
         cancelButtonText: i18n.global.t('commons.button.cancel'),
         type: 'info',
@@ -215,6 +234,46 @@ const onSync = async () => {
 
 const openTaskLog = (taskID: string) => {
     taskLogRef.value.openWithTaskID(taskID, true, 'local');
+};
+
+const loadSyncStatus = async () => {
+    const res = await getSettingBy('ScriptSync');
+    scriptSync.value = res.data;
+};
+const handleSyncOp = async (command: string) => {
+    let val = 'Enable';
+    switch (command) {
+        case 'sync':
+            onSync();
+            return;
+        case 'turnOnSync':
+            val = 'Enable';
+            break;
+        case 'turnOffSync':
+            val = 'Disable';
+            break;
+        default:
+            return;
+    }
+    ElMessageBox.confirm(
+        i18n.global.t('cronjob.library.' + command + 'Helper'),
+        i18n.global.t('cronjob.library.' + command),
+        {
+            confirmButtonText: i18n.global.t('commons.button.confirm'),
+            cancelButtonText: i18n.global.t('commons.button.cancel'),
+            type: 'info',
+        },
+    ).then(async () => {
+        loading.value = true;
+        await updateSetting({ key: 'ScriptSync', value: val })
+            .then(() => {
+                loadSyncStatus();
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            })
+            .finally(() => {
+                loading.value = false;
+            });
+    });
 };
 
 const search = async () => {
@@ -297,6 +356,7 @@ const buttons = [
 
 onMounted(() => {
     search();
+    loadSyncStatus();
     loadGroupOptions();
 });
 </script>

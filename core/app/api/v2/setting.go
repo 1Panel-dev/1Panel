@@ -11,6 +11,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/core/app/dto"
+	"github.com/1Panel-dev/1Panel/core/app/repo"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/utils/mfa"
@@ -25,6 +26,25 @@ import (
 // @Router /core/settings/search [post]
 func (b *BaseApi) GetSettingInfo(c *gin.Context) {
 	setting, err := settingService.GetSettingInfo()
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, setting)
+}
+
+// @Tags System Setting
+// @Summary Load system setting by key
+// @Success 200 {string} info
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /core/settings/by [post]
+func (b *BaseApi) GetSettingByKey(c *gin.Context) {
+	var req dto.SettingKey
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	setting, err := repo.NewISettingRepo().GetValueByKey(req.Key)
 	if err != nil {
 		helper.InternalServer(c, err)
 		return

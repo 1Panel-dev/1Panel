@@ -1094,6 +1094,11 @@ const message = {
         alertTitle: '計画タスク -  {0}「{1}」タスク障害アラート',
         library: {
             script: 'スクリプト',
+            syncNow: '今すぐ同期',
+            turnOnSync: '自動同期を有効化',
+            turnOnSyncHelper: '自動同期を有効にすると、毎日未明の時間帯に自動同期が実行されます',
+            turnOffSync: '自動同期を無効化',
+            turnOffSyncHelper: '自動同期を無効にするとスクリプトの同期が遅れる可能性がありますが、よろしいですか？',
             isInteractive: '対話型',
             interactive: '対話型スクリプト',
             interactiveHelper: '実行中にユーザー入力が必要で、スケジュールタスクでは使用できません。',

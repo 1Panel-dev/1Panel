@@ -1131,6 +1131,12 @@ const message = {
         alertTitle: 'Planned Task - {0} 「{1}」 Task Failure Alert',
         library: {
             script: 'Script',
+            syncNow: 'Sync Now',
+            turnOnSync: 'Enable Auto Sync',
+            turnOnSyncHelper:
+                'Enabling auto sync will perform automatic synchronization during early morning hours daily',
+            turnOffSync: 'Disable Auto Sync',
+            turnOffSyncHelper: 'Disabling auto sync may cause script synchronization delays, confirm?',
             isInteractive: 'Interactive',
             interactive: 'Interactive script',
             interactiveHelper: 'Requires user input during execution and cannot be used in scheduled tasks.',

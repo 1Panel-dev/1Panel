@@ -52,6 +52,10 @@ type SettingInfo struct {
 	ApiKeyValidityTime string `json:"apiKeyValidityTime"`
 }
 
+type SettingKey struct {
+	Key string `json:"key" validate:"required,oneof=ScriptSync"`
+}
+
 type SettingUpdate struct {
 	Key   string `json:"key" validate:"required"`
 	Value string `json:"value"`

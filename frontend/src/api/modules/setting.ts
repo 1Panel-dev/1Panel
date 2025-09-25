@@ -76,6 +76,9 @@ export const getAgentSettingByKey = (key: string) => {
 export const getSettingInfo = () => {
     return http.post<Setting.SettingInfo>(`/core/settings/search`);
 };
+export const getSettingBy = (key: string) => {
+    return http.post<string>(`/core/settings/by`, { key: key });
+};
 export const getTerminalInfo = () => {
     return http.post<Setting.TerminalInfo>(`/core/settings/terminal/search`);
 };

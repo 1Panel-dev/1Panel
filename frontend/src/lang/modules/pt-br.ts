@@ -1114,6 +1114,13 @@ const message = {
         alertTitle: 'Tarefa Planejada - {0} 「{1}」 Alerta de Falha na Tarefa',
         library: {
             script: 'Script',
+            syncNow: 'Sincronizar Agora',
+            turnOnSync: 'Ativar Sincronização Automática',
+            turnOnSyncHelper:
+                'Ativar a sincronização automática realizará sincronizações automáticas durante as primeiras horas da manhã diariamente',
+            turnOffSync: 'Desativar Sincronização Automática',
+            turnOffSyncHelper:
+                'Desativar a sincronização automática pode causar atrasos na sincronização de scripts, confirmar?',
             isInteractive: 'Interativo',
             interactive: 'Script interativo',
             interactiveHelper:

@@ -1076,6 +1076,11 @@ const message = {
         alertTitle: '计划任务-{0}「 {1} 」任务失败告警',
         library: {
             script: '脚本',
+            syncNow: '立即同步',
+            turnOnSync: '开启自动同步',
+            turnOnSyncHelper: '开启自动同步将在每天凌晨时段进行自动同步',
+            turnOffSync: '关闭自动同步',
+            turnOffSyncHelper: '关闭自动同步可能导致脚本同步不及时，是否确认？',
             isInteractive: '交互式',
             interactive: '交互式脚本',
             interactiveHelper: '在脚本执行过程中需要用户输入参数或做出选择，且无法用于计划任务中。',

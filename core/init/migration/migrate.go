@@ -24,6 +24,7 @@ func Init() {
 		migrations.AddDiskMenu,
 		migrations.AddSimpleNodeGroup,
 		migrations.AddUpgradeBackupCopies,
+		migrations.AddScriptSync,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)
