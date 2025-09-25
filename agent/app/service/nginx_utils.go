@@ -119,7 +119,16 @@ func updateDefaultServerConfig(enable bool) error {
 	}
 	defaultConfig.FilePath = defaultConfigPath
 	defaultServer := defaultConfig.FindServers()[0]
-	updateDefaultServer(defaultServer, nginxInstall.HttpPort, nginxInstall.HttpsPort, enable)
+
+	includeSSL := false
+	for _, dir := range defaultServer.GetDirectives() {
+		if dir.GetName() == "include" && dir.GetParameters()[0] == "/usr/local/openresty/nginx/conf/ssl/root_ssl.conf" {
+			includeSSL = true
+			break
+		}
+	}
+	updateDefaultServer(defaultServer, nginxInstall.HttpPort, nginxInstall.HttpsPort, enable, includeSSL)
+
 	if err = nginx.WriteConfig(defaultConfig, nginx.IndentedStyle); err != nil {
 		return err
 	}
@@ -262,11 +271,13 @@ func nginxCheckAndReload(oldContent string, filePath string, containerName strin
 	return nil
 }
 
-func updateDefaultServer(server *components.Server, httpPort int, httpsPort int, defaultServer bool) {
+func updateDefaultServer(server *components.Server, httpPort int, httpsPort int, defaultServer bool, ssl bool) {
 	server.UpdateListen(fmt.Sprintf("%d", httpPort), defaultServer)
 	server.UpdateListen(fmt.Sprintf("[::]:%d", httpPort), defaultServer)
-	server.UpdateListen(fmt.Sprintf("%d", httpsPort), defaultServer, "ssl")
-	server.UpdateListen(fmt.Sprintf("[::]:%d", httpsPort), defaultServer, "ssl")
-	server.UpdateListen(fmt.Sprintf("%d", httpsPort), defaultServer, "quic", "reuseport")
-	server.UpdateListen(fmt.Sprintf("[::]:%d", httpsPort), defaultServer, "quic", "reuseport")
+	if ssl {
+		server.UpdateListen(fmt.Sprintf("%d", httpsPort), defaultServer, "ssl")
+		server.UpdateListen(fmt.Sprintf("[::]:%d", httpsPort), defaultServer, "ssl")
+		server.UpdateListen(fmt.Sprintf("%d", httpsPort), defaultServer, "quic", "reuseport")
+		server.UpdateListen(fmt.Sprintf("[::]:%d", httpsPort), defaultServer, "quic", "reuseport")
+	}
 }
