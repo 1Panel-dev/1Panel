@@ -946,7 +946,7 @@ func handleMap(params map[string]interface{}, envParams map[string]string) {
 }
 
 func downloadApp(app model.App, appDetail model.AppDetail, appInstall *model.AppInstall, logger *log.Logger) (err error) {
-	if app.IsLocalApp() {
+	if app.IsLocalApp() || app.IsCustomApp() {
 		return nil
 	}
 	appResourceDir := path.Join(global.Dir.AppResourceDir, app.Resource)

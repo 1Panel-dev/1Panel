@@ -43,10 +43,16 @@ type App struct {
 func (i *App) IsLocalApp() bool {
 	return i.Resource == constant.ResourceLocal
 }
+func (i *App) IsCustomApp() bool {
+	return i.Resource == constant.AppResourceCustom
+}
+
 func (i *App) GetAppResourcePath() string {
 	if i.IsLocalApp() {
-		//这里要去掉本地应用的local前缀
 		return filepath.Join(global.Dir.LocalAppResourceDir, strings.TrimPrefix(i.Key, "local"))
+	}
+	if i.IsCustomApp() {
+		return filepath.Join(global.Dir.CustomAppResourceDir, i.Key)
 	}
 	return filepath.Join(global.Dir.RemoteAppResourceDir, i.Key)
 }
