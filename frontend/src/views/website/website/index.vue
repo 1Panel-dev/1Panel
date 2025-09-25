@@ -89,71 +89,12 @@
                         show-overflow-tooltip
                     >
                         <template #default="{ row, $index }">
-                            <div class="name-row">
-                                <div>
-                                    <el-text type="primary" class="cursor-pointer" @click="openConfig(row.id)">
-                                        {{ row.primaryDomain }}
-                                    </el-text>
-                                    <el-popover
-                                        placement="right"
-                                        trigger="hover"
-                                        :width="300"
-                                        @before-enter="searchDomains(row.id)"
-                                    >
-                                        <template #reference>
-                                            <el-button link icon="Promotion" class="ml-2.5"></el-button>
-                                        </template>
-                                        <table>
-                                            <tbody>
-                                                <tr v-for="(domain, index) in domains" :key="index">
-                                                    <td>
-                                                        <el-button
-                                                            type="primary"
-                                                            link
-                                                            @click="openUrl(getUrl(domain, row))"
-                                                        >
-                                                            {{ getUrl(domain, row) }}
-                                                        </el-button>
-                                                    </td>
-                                                    <td>
-                                                        <CopyButton :content="getUrl(domain, row)" />
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </el-popover>
-                                </div>
-                                <div>
-                                    <el-tooltip
-                                        effect="dark"
-                                        :content="$t('website.cancelFavorite')"
-                                        placement="top-start"
-                                        v-if="row.favorite"
-                                    >
-                                        <el-button
-                                            link
-                                            size="large"
-                                            icon="StarFilled"
-                                            type="warning"
-                                            @click="favoriteWebsite(row)"
-                                        ></el-button>
-                                    </el-tooltip>
-
-                                    <el-tooltip
-                                        effect="dark"
-                                        :content="$t('website.favorite')"
-                                        placement="top-start"
-                                        v-if="!row.favorite && hoveredRowIndex === $index"
-                                    >
-                                        <el-button
-                                            link
-                                            icon="Star"
-                                            type="info"
-                                            @click="favoriteWebsite(row)"
-                                        ></el-button>
-                                    </el-tooltip>
-                                </div>
-                            </div>
+                            <Domain
+                                :row="row"
+                                :is-hovered="hoveredRowIndex === $index"
+                                @favorite-change="favoriteWebsite"
+                                @domain-edit="handleDomainEdit"
+                            />
                         </template>
                     </el-table-column>
                     <el-table-column
@@ -333,9 +274,10 @@ import NginxConfig from '@/views/website/website/nginx/index.vue';
 import GroupDialog from '@/components/agent-group/index.vue';
 import AppStatus from '@/components/app-status/index.vue';
 import TaskLog from '@/components/log/task/index.vue';
+import Domain from '@/views/website/website/domain/index.vue';
 import i18n from '@/lang';
 import { onMounted, reactive, ref, computed } from 'vue';
-import { batchOpreate, listDomains, opWebsite, searchWebsites, updateWebsite } from '@/api/modules/website';
+import { batchOpreate, opWebsite, searchWebsites, updateWebsite } from '@/api/modules/website';
 import { Website } from '@/api/interface/website';
 import { App } from '@/api/interface/app';
 import { ElMessageBox } from 'element-plus';
@@ -383,7 +325,6 @@ const defaultRef = ref();
 const data = ref();
 let groups = ref<Group.GroupInfo[]>([]);
 const dataRef = ref();
-const domains = ref<Website.Domain[]>([]);
 const columns = ref([]);
 const hoveredRowIndex = ref(-1);
 const websiteDir = ref();
@@ -428,6 +369,11 @@ const hideFavorite = () => {
 
 const favoriteWebsite = (row: Website.Website) => {
     row.favorite = !row.favorite;
+    updateWebsitConfig(row);
+};
+
+const handleDomainEdit = (row: Website.Website, domain: string) => {
+    row.primaryDomain = domain;
     updateWebsitConfig(row);
 };
 
@@ -647,28 +593,6 @@ const operateWebsite = (op: string, id: number) => {
     });
 };
 
-const searchDomains = (id: number) => {
-    listDomains(id).then((res) => {
-        domains.value = res.data;
-    });
-};
-
-const openUrl = (url: string) => {
-    window.open(url);
-};
-
-const getUrl = (domain: Website.Domain, website: Website.Website): string => {
-    const protocol = website.protocol.toLowerCase();
-    let url = protocol + '://' + domain.domain;
-    if (protocol == 'http' && domain.port != 80) {
-        url = url + ':' + domain.port;
-    }
-    if (protocol == 'https' && domain.ssl) {
-        url = url + ':' + domain.port;
-    }
-    return url;
-};
-
 const updateRemark = (row: Website.Website, bulr: Function) => {
     bulr();
     if (row.remark && row.remark.length > 128) {
@@ -702,12 +626,3 @@ onMounted(() => {
     listGroup();
 });
 </script>
-
-<style lang="css" scoped>
-.name-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-}
-</style>
