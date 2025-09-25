@@ -94,6 +94,9 @@ const GlobalStore = defineStore({
         isMobile() {
             return this.device === DeviceType.Mobile;
         },
+        getMasterAlias() {
+            return this.masterAlias || i18n.global.t('xpack.node.master');
+        },
         isMasterPro() {
             return this.isMasterProductPro;
         },

@@ -113,7 +113,7 @@ const submit = async () => {
 
 const loadNodes = async () => {
     if (!globalStore.isMasterProductPro) {
-        freeNodes.value = [{ id: 0, name: globalStore.masterAlias }];
+        freeNodes.value = [{ id: 0, name: globalStore.getMasterAlias() }];
         return;
     }
     await listNodeOptions('free')

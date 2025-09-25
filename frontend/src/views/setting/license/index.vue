@@ -170,7 +170,7 @@ const loadBindNode = (row: any) => {
     if (row.freeNodes) {
         for (const item of row.freeNodes) {
             if (item.addr === row.bindNode) {
-                return item.name === 'local' ? globalStore.masterAlias : item.addr;
+                return item.name === 'local' ? globalStore.getMasterAlias() : item.addr;
             }
         }
     }
@@ -223,7 +223,7 @@ const search = async () => {
                 item.expiresAt = item.productPro === '0' ? '' : timestampToDate(Number(item.productPro));
             }
             data.value.sort((a, b) => {
-                const masterLabel = globalStore.masterAlias;
+                const masterLabel = globalStore.getMasterAlias();
                 const nodeA = loadBindNode(a);
                 const nodeB = loadBindNode(b);
 

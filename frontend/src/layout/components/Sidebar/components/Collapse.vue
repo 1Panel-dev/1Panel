@@ -57,7 +57,7 @@
                         </div>
                     </el-scrollbar>
                     <div class="dropdown-item -mb-1" @click="changeNode('local')">
-                        <div class="node">{{ globalStore.masterAlias }}</div>
+                        <div class="node">{{ globalStore.getMasterAlias() }}</div>
                     </div>
                 </div>
                 <el-input
@@ -123,11 +123,11 @@ const openChangeNode = () => {
 const loadCurrentName = () => {
     if (globalStore.currentNode) {
         if (globalStore.currentNode === 'local') {
-            return globalStore.masterAlias;
+            return globalStore.getMasterAlias();
         }
         return globalStore.currentNode;
     }
-    return globalStore.masterAlias;
+    return globalStore.getMasterAlias();
 };
 
 const showPopover = () => {

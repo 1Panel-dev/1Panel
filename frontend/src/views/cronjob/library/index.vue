@@ -247,7 +247,7 @@ const buttons = [
         click: (row: Cronjob.ScriptInfo) => {
             ElMessageBox.confirm(
                 i18n.global.t('cronjob.library.handleHelper', [
-                    globalStore.currentNode === 'local' ? globalStore.masterAlias : globalStore.currentNode,
+                    globalStore.currentNode === 'local' ? globalStore.getMasterAlias() : globalStore.currentNode,
                     row.name,
                 ]),
                 i18n.global.t('commons.button.handle'),

@@ -100,7 +100,7 @@ const handleCollapse = () => {
 const loadContent = () => {
     let itemName = globalStore.watermark.content.replaceAll(
         '${nodeName}',
-        globalStore.currentNode === 'local' ? globalStore.masterAlias : globalStore.currentNode,
+        globalStore.currentNode === 'local' ? globalStore.getMasterAlias() : globalStore.currentNode,
     );
     itemName = itemName.replaceAll('${nodeAddr}', globalStore.currentNodeAddr);
     return itemName;
