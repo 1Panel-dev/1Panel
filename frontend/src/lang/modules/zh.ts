@@ -1015,7 +1015,7 @@ const message = {
         snapshot: '系统快照',
         allOptionHelper: '当前计划任务为备份所有【{0}】，暂不支持直接下载，可在【{0}】备份列表中查看',
         exclusionRules: '排除规则',
-        exclusionRulesHelper: '排除规则将对此次备份的所有压缩操作生效',
+        exclusionRulesHelper: '选择或输入排除规则，输入完一组后回车继续，排除规则将对此次备份的所有压缩操作生效',
         default_download_path: '默认下载地址',
         saveLocal: '同时保留本地备份（和云存储保留份数一致）',
         url: 'URL 地址',

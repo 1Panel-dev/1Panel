@@ -1083,7 +1083,8 @@ const message = {
         allOptionHelper:
             'Mevcut görev planı tüm [{0}] öğelerini yedeklemektir. Doğrudan indirme şu anda desteklenmiyor. [{0}] menüsünün yedekleme listesini kontrol edebilirsiniz.',
         exclusionRules: 'Hariç tutma kuralı',
-        exclusionRulesHelper: 'Hariç tutma kuralları bu yedeğin tüm sıkıştırma işlemlerine uygulanacaktır.',
+        exclusionRulesHelper:
+            'Hariç tutma kurallarını seçin veya girin, her setten sonra Enter basarak devam edin. Hariç tutma kuralları bu yedeklemedeki tüm sıkıştırma işlemlerine uygulanacaktır',
         default_download_path: 'Varsayılan indirme bağlantısı',
         saveLocal: 'Yerel yedeklemeleri sakla (bulut depolama kopyalarının sayısı ile aynı)',
         url: 'URL Adresi',

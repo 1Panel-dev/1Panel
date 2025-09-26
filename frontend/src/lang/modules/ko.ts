@@ -1028,7 +1028,8 @@ const message = {
         snapshot: '시스템 스냅샷',
         allOptionHelper: `현재 작업 계획은 모든 [{0}]을 백업하는 것입니다. 현재 직접 다운로드는 지원되지 않습니다. [{0}] 메뉴에서 백업 목록을 확인하실 수 있습니다.`,
         exclusionRules: '배제 규칙',
-        exclusionRulesHelper: '배제 규칙은 이 백업의 모든 압축 작업에 적용됩니다.',
+        exclusionRulesHelper:
+            '제외 규칙을 선택하거나 입력하고, 각 세트 입력 후 Enter 키를 눌러 계속합니다. 제외 규칙은 이 백업의 모든 압축 작업에 적용됩니다',
         default_download_path: '기본 다운로드 링크',
         saveLocal: '로컬 백업 보관 (클라우드 저장소 복사본 수와 동일)',
         url: 'URL 주소',

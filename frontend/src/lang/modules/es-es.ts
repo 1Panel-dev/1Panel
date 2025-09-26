@@ -1069,7 +1069,7 @@ const message = {
         allOptionHelper: `El plan actual es respaldar todos los [{0}]. La descarga directa no está soportada por ahora. Puede consultar la lista de respaldos en el menú [{0}].`,
         exclusionRules: 'Reglas de exclusión',
         exclusionRulesHelper:
-            'Las reglas de exclusión se aplicarán a todas las operaciones de compresión de este respaldo.',
+            'Seleccione o ingrese reglas de exclusión, presione Enter después de cada conjunto para continuar. Las reglas de exclusión se aplicarán a todas las operaciones de compresión en esta copia de seguridad',
         default_download_path: 'Enlace de descarga predeterminado',
         saveLocal: 'Retener respaldos locales (igual al número de copias en la nube)',
         url: 'Dirección URL',

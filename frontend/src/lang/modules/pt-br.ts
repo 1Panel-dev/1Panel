@@ -1059,7 +1059,8 @@ const message = {
         allOptionHelper:
             'O plano de tarefa atual é fazer backup de todos os [{0}]. O download direto não é suportado no momento. Você pode verificar a lista de backups no menu [{0}].',
         exclusionRules: 'Regras de exclusão',
-        exclusionRulesHelper: 'As regras de exclusão se aplicam a todas as operações de compressão deste backup.',
+        exclusionRulesHelper:
+            'Selecione ou insira regras de exclusão, pressione Enter após cada conjunto para continuar. As regras de exclusão se aplicarão a todas as operações de compactação neste backup',
         default_download_path: 'Link de download padrão',
         saveLocal: 'Manter backups locais (o mesmo número de cópias na nuvem)',
         url: 'Endereço URL',

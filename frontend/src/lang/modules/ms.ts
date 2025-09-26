@@ -1062,7 +1062,8 @@ const message = {
         allOptionHelper:
             'Pelan tugas semasa adalah untuk menyandarkan semua [{0}]. Muat turun terus tidak disokong buat masa ini. Anda boleh menyemak senarai sandaran dalam menu [{0}].',
         exclusionRules: 'Peraturan pengecualian',
-        exclusionRulesHelper: 'Peraturan pengecualian akan terpakai pada semua operasi mampatan bagi sandaran ini.',
+        exclusionRulesHelper:
+            'Pilih atau masukkan peraturan pengecualian, tekan Enter selepas setiap set untuk teruskan. Peraturan pengecualian akan digunakan untuk semua operasi mampatan dalam sandaran ini',
         default_download_path: 'Pautan muat turun lalai',
         saveLocal: 'Simpan sandaran tempatan (sama seperti bilangan salinan storan awan)',
         url: 'Alamat URL',

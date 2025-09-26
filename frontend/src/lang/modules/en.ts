@@ -1070,7 +1070,8 @@ const message = {
         snapshot: 'System snapshot',
         allOptionHelper: `The current task plan is to back up all [{0}]. Direct download isn't supported at the moment. You can check the backup list of [{0}] menu.`,
         exclusionRules: 'Exclusive rule',
-        exclusionRulesHelper: 'The exclusion rules will apply to all compression operations of this backup.',
+        exclusionRulesHelper:
+            'Select or enter exclusion rules, press Enter after each set to continue. Exclusion rules will apply to all compression operations in this backup',
         default_download_path: 'Default download link',
         saveLocal: 'Retain local backups (the same as the number of cloud storage copies)',
         url: 'URL Address',
