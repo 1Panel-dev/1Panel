@@ -2847,7 +2847,8 @@ const message = {
         nodeOperatorHelper:
             'Adakah {0} {1} modul? Operasi ini mungkin menyebabkan ketidaknormalan dalam persekitaran operasi. Sila pastikan sebelum meneruskan',
         customScript: 'Arahan permulaan tersuai',
-        customScriptHelper: 'Sediakan arahan permulaan penuh. Contohnya, "npm run start".',
+        customScriptHelper:
+            'Sila masukkan arahan permulaan penuh, contoh: npm run start. Untuk arahan permulaan PM2, sila gantikan dengan pm2-runtime, jika tidak ia akan gagal bermula.',
         portError: 'Jangan ulangi port yang sama.',
         systemRestartHelper: 'Huraian status: Gangguan - status gagal diperoleh kerana sistem dimulakan semula',
         javaScriptHelper: 'Sediakan arahan permulaan penuh. Contohnya, "java -jar halo.jar -Xmx1024M -Xms256M".',

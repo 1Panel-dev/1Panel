@@ -2663,7 +2663,7 @@ const message = {
         module: '模块',
         nodeOperatorHelper: '是否{0} {1} 模块？操作可能导致运行环境异常，请确认后操作',
         customScript: '自定义启动命令',
-        customScriptHelper: '请填写完整的启动命令，例如：npm run start',
+        customScriptHelper: '请填写完整的启动命令，例如：npm run start，pm2 启动命令请换为 pm2-runtime，否则会启动失败',
         portError: '不能填写相同端口',
         systemRestartHelper: '状态说明：中断-系统重启导致状态获取失败',
         javaScriptHelper: '请填写完整启动命令，例如：java -jar halo.jar -Xmx1024M -Xms256M',

@@ -2869,7 +2869,8 @@ const message = {
         nodeOperatorHelper:
             'Is {0} {1} module? The operation may cause abnormality in the operating environment, please confirm before proceeding',
         customScript: 'Custom startup command',
-        customScriptHelper: 'Provide a full startup command. For example, "npm run start".',
+        customScriptHelper:
+            'Please enter the complete startup command, for example: npm run start. For PM2 startup commands, please replace with pm2-runtime, otherwise it will fail to start.',
         portError: `Don't repeat the same port.`,
         systemRestartHelper: 'Status description: Interruption - status acquisition failed due to system restart',
         javaScriptHelper: 'Provide a full startup command. For example, "java -jar halo.jar -Xmx1024M -Xms256M".',

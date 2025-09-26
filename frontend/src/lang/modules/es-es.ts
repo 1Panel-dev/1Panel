@@ -2836,7 +2836,8 @@ const message = {
         nodeOperatorHelper:
             '¿Quieres {0} el módulo {1}? La operación puede causar fallos en el entorno de ejecución, confirma antes de continuar',
         customScript: 'Comando de inicio personalizado',
-        customScriptHelper: 'Proporciona un comando de inicio completo. Ejemplo: "npm run start".',
+        customScriptHelper:
+            'Por favor, ingresa el comando de inicio completo, por ejemplo: npm run start. Para comandos de inicio de PM2, por favor reemplaza con pm2-runtime, de lo contrario fallará al iniciar.',
         portError: 'No repitas el mismo puerto.',
         systemRestartHelper:
             'Descripción de estado: Interrupción - fallo al obtener estado debido a reinicio del sistema',

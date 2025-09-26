@@ -2785,7 +2785,8 @@ const message = {
         nodeOperatorHelper:
             '{0} {1}モジュールですか？操作は、動作環境で異常を引き起こす可能性があります。進む前に確認してください',
         customScript: 'カスタムスタートアップコマンド',
-        customScriptHelper: '完全な起動コマンドを提供します。たとえば、「NPM Run Start」。',
+        customScriptHelper:
+            '完全な起動コマンドを入力してください。例：npm run start。PM2の起動コマンドはpm2-runtimeに置き換えてください。そうしないと起動に失敗します。',
         portError: `同じポートを繰り返さないでください。`,
         systemRestartHelper: 'ステータスの説明:中断 - システムの再起動によりステータスの取得が失敗しました',
         javaScriptHelper: '完全な起動コマンドを提供します。たとえば、「Java -Jar Halo.Jar -XMX1024M -XMS256M」。',

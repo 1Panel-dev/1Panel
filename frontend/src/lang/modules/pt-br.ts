@@ -2852,7 +2852,8 @@ const message = {
         nodeOperatorHelper:
             'Deseja {0} o módulo {1}? Esta operação pode causar instabilidade no ambiente, confirme antes de prosseguir.',
         customScript: 'Comando de inicialização personalizado',
-        customScriptHelper: 'Forneça um comando completo de inicialização. Por exemplo, "npm run start".',
+        customScriptHelper:
+            'Por favor, insira o comando de inicialização completo, por exemplo: npm run start. Para comandos de inicialização do PM2, substitua por pm2-runtime, caso contrário irá falhar ao iniciar.',
         portError: `Evite repetir a mesma porta.`,
         systemRestartHelper:
             'Descrição do status: Interrupção - falha ao adquirir status devido à reinicialização do sistema.',

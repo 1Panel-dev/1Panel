@@ -2736,7 +2736,8 @@ const message = {
         nodeOperatorHelper:
             '{0} {1} 모듈인가요? 이 작업은 운영 환경에 비정상을 일으킬 수 있으므로 진행 전에 확인해 주세요.',
         customScript: '사용자 정의 시작 명령',
-        customScriptHelper: '전체 시작 명령을 제공하세요. 예: "npm run start".',
+        customScriptHelper:
+            '전체 시작 명령어를 입력해 주세요. 예: npm run start. PM2 시작 명령어는 pm2-runtime로 변경해 주세요. 그렇지 않으면 시작에 실패합니다.',
         portError: '포트를 중복 사용하지 마세요.',
         systemRestartHelper: '상태 설명: 중단 - 시스템 재시작으로 인해 상태 가져오기가 실패했습니다.',
         javaScriptHelper: '전체 시작 명령을 제공하세요. 예: "java -jar halo.jar -Xmx1024M -Xms256M".',

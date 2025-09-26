@@ -2907,7 +2907,8 @@ const message = {
         nodeOperatorHelper:
             '{0} {1} modülü mü? İşlem, çalışma ortamında anormalliklere neden olabilir, lütfen devam etmeden önce onaylayın',
         customScript: 'Özel başlatma komutu',
-        customScriptHelper: 'Tam bir başlatma komutu sağlayın. Örneğin, "npm run start".',
+        customScriptHelper:
+            'Lütfen tam başlatma komutunu girin, örneğin: npm run start. PM2 başlatma komutları için lütfen pm2-runtime ile değiştirin, aksi takdirde başlatma başarısız olacaktır.',
         portError: 'Aynı portu tekrarlamayın.',
         systemRestartHelper:
             'Durum açıklaması: Kesinti - sistem yeniden başlatılması nedeniyle durum alımı başarısız oldu',
