@@ -87,6 +87,7 @@ const (
 	TaskScopeContainer        = "Container"
 	TaskScopeCompose          = "Compose"
 	TaskScopeImage            = "Image"
+	TaskScopeBackup           = "Backup "
 	TaskScopeRuntimeExtension = "RuntimeExtension"
 	TaskScopeCustomAppstore   = "CustomAppstore"
 	TaskScopeTamper           = "Tamper"

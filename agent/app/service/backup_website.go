@@ -73,11 +73,11 @@ func (u *BackupService) WebsiteRecover(req dto.CommonRecover) error {
 }
 
 func handleWebsiteRecover(website *model.Website, recoverFile string, isRollback bool, secret, taskID string) error {
-	recoverTask, err := task.NewTaskWithOps(website.PrimaryDomain, task.TaskRecover, task.TaskScopeWebsite, taskID, website.ID)
+	recoverTask, err := task.NewTaskWithOps(website.PrimaryDomain, task.TaskRecover, task.TaskScopeBackup, taskID, website.ID)
 	if err != nil {
 		return err
 	}
-	recoverTask.AddSubTask(task.GetTaskName(website.PrimaryDomain, task.TaskRecover, task.TaskScopeWebsite), func(t *task.Task) error {
+	recoverTask.AddSubTask(task.GetTaskName(website.PrimaryDomain, task.TaskRecover, task.TaskScopeBackup), func(t *task.Task) error {
 		isOk := false
 		if !isRollback {
 			rollbackFile := path.Join(global.Dir.TmpDir, fmt.Sprintf("website/%s_%s.tar.gz", website.Alias, time.Now().Format(constant.DateTimeSlimLayout)))
@@ -212,7 +212,7 @@ func handleWebsiteBackup(website *model.Website, parentTask *task.Task, recordID
 	)
 	backupTask = parentTask
 	if parentTask == nil {
-		backupTask, err = task.NewTaskWithOps(website.Alias, task.TaskBackup, task.TaskScopeWebsite, taskID, website.ID)
+		backupTask, err = task.NewTaskWithOps(website.Alias, task.TaskBackup, task.TaskScopeBackup, taskID, website.ID)
 		if err != nil {
 			return err
 		}
@@ -221,7 +221,7 @@ func handleWebsiteBackup(website *model.Website, parentTask *task.Task, recordID
 	if parentTask != nil {
 		return itemHandler()
 	}
-	backupTask.AddSubTaskWithOps(task.GetTaskName(website.Alias, task.TaskBackup, task.TaskScopeWebsite), func(t *task.Task) error { return itemHandler() }, nil, 3, time.Hour)
+	backupTask.AddSubTaskWithOps(task.GetTaskName(website.Alias, task.TaskBackup, task.TaskScopeBackup), func(t *task.Task) error { return itemHandler() }, nil, 3, time.Hour)
 	go func() {
 		if err := backupTask.Execute(); err != nil {
 			backupRepo.UpdateRecordByMap(recordID, map[string]interface{}{"status": constant.StatusFailed, "message": err.Error()})

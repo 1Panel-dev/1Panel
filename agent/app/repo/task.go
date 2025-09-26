@@ -24,6 +24,7 @@ type ITaskRepo interface {
 	DeleteAll() error
 
 	WithByID(id string) DBOption
+	WithByIDNotIn(ids []string) DBOption
 	WithResourceID(id uint) DBOption
 	WithOperate(taskOperate string) DBOption
 	WithByStatus(status string) DBOption
@@ -55,6 +56,12 @@ func getTaskTx(ctx context.Context, opts ...DBOption) *gorm.DB {
 func (t TaskRepo) WithByID(id string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("id = ?", id)
+	}
+}
+
+func (t TaskRepo) WithByIDNotIn(ids []string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("id not in (?)", ids)
 	}
 }
 
