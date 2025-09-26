@@ -21,6 +21,7 @@ ErrHttpReqNotFound: "無法找到請求的資源 {{ .err }}"
 ErrHttpReqFailed: "請求失敗 {{ .err }}"
 ErrHttpReqTimeOut: "請求逾時 {{ .err }}"
 ErrCreateHttpClient: "建立請求失敗 {{ .err }}"
+ErrProxySetting: "代理伺服器資訊不可用 {{ .err }}，請檢查後重試！"
 
 #common
 ErrDemoEnvironment: "示範伺服器，禁止此操作！"

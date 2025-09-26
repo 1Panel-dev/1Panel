@@ -21,6 +21,7 @@ ErrHttpReqNotFound: "无法找到请求的资源 {{ .err }}"
 ErrHttpReqFailed: "请求失败 {{ .err }}"
 ErrHttpReqTimeOut: "请求超时 {{ .err }}"
 ErrCreateHttpClient: "创建请求失败 {{ .err }}"
+ErrProxySetting: "代理服务器信息不可用 {{ .err }}，请检查后重试！"
 
 #common
 ErrDemoEnvironment: "演示服务器，禁止此操作!"

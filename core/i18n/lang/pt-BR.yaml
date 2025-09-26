@@ -21,6 +21,7 @@ ErrHttpReqNotFound: "Recurso solicitado não encontrado {{ .err }}"
 ErrHttpReqFailed: "Falha na requisição {{ .err }}"
 ErrHttpReqTimeOut: "Tempo de requisição esgotado {{ .err }}"
 ErrCreateHttpClient: "Falha ao criar a requisição {{ .err }}"
+ErrProxySetting: "Informação do servidor proxy indisponível {{ .err }}, verifique e tente novamente!"
 
 # common
 ErrDemoEnvironment: "Servidor de demonstração, essa operação é proibida!"

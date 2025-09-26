@@ -21,6 +21,7 @@ ErrHttpReqNotFound: "Sumber yang diminta tidak dapat ditemui {{ .err }}"
 ErrHttpReqFailed: "Permintaan gagal {{ .err }}"
 ErrHttpReqTimeOut: "Permintaan telah tamat masa {{ .err }}"
 ErrCreateHttpClient: "Gagal mencipta permintaan {{ .err }}"
+ErrProxySetting: "Maklumat pelayan proksi tidak tersedia {{ .err }}, sila periksa dan cuba lagi!"
 
 # common
 ErrDemoEnvironment: "Pelayan demo, operasi ini dilarang!"

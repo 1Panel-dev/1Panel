@@ -21,6 +21,7 @@ ErrHttpReqNotFound: "İstenen kaynak bulunamıyor {{ .err }}"
 ErrHttpReqFailed: "İstek başarısız {{ .err }}"
 ErrHttpReqTimeOut: "İstek zaman aşımına uğradı {{ .err }}"
 ErrCreateHttpClient: "İstek oluşturma başarısız {{ .err }}"
+ErrProxySetting: "Proxy sunucu bilgisi kullanılamıyor {{ .err }}, lütfen kontrol edip tekrar deneyin!"
 
 # common
 ErrDemoEnvironment: "Demo sunucu, bu işlem yasak!"

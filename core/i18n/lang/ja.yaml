@@ -21,6 +21,7 @@ ErrHttpReqNotFound: "要求されたリソースが見つかりません {{ .err
 ErrHttpReqFailed: "リクエスト失敗 {{ .err }}"
 ErrHttpReqTimeOut: "リクエストタイムアウト {{ .err }}"
 ErrCreateHttpClient: "リクエストの作成に失敗しました {{ .err }}"
+ErrProxySetting: "プロキシサーバー情報が利用できません {{ .err }}、確認して再試行してください！"
 
 # common
 ErrDemoEnvironment: "デモサーバーではこの操作は許可されていません！"
