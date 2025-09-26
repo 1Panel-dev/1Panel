@@ -318,7 +318,6 @@ const openNginxConfig = ref(false);
 const nginxIsExist = ref(false);
 const containerName = ref('');
 const nginxStatus = ref('');
-const installPath = ref('');
 const uploadRef = ref();
 const dialogBackupRef = ref();
 const defaultRef = ref();
@@ -554,7 +553,7 @@ const openDelete = (website: Website.Website) => {
 };
 
 const openCreate = () => {
-    createRef.value.acceptParams(installPath.value);
+    createRef.value.acceptParams();
 };
 
 const openGroup = () => {
@@ -573,7 +572,6 @@ const checkExist = (data: App.CheckInstalled) => {
     nginxIsExist.value = data.isExist;
     containerName.value = data.containerName;
     nginxStatus.value = data.status;
-    installPath.value = data.installPath;
     websiteDir.value = data.websiteDir;
 };
 
