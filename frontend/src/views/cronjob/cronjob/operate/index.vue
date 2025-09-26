@@ -869,13 +869,13 @@ const search = async () => {
                 form.specs = res.data.specs || [];
                 if (!form.specCustom && form.spec) {
                     let objs = [];
-                    for (const item of res.data.spec.split(',')) {
+                    for (const item of res.data.spec.split('&&')) {
                         objs.push(transSpecToObj(item));
                     }
                     form.specObjs = objs || [];
                 }
                 if (form.specCustom && form.spec) {
-                    form.specs = form.spec.split(',') || [];
+                    form.specs = form.spec.split('&&') || [];
                 }
 
                 form.script = res.data.script;
@@ -1417,7 +1417,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         form.sourceDir = files.join(',');
     }
     form.sourceAccountIDs = form.sourceAccountItems.join(',');
-    form.spec = specs.join(',');
+    form.spec = specs.join('&&');
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;

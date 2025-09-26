@@ -104,19 +104,19 @@
                     </el-table-column>
                     <el-table-column :label="$t('cronjob.cronSpec')" show-overflow-tooltip :min-width="120">
                         <template #default="{ row }">
-                            <div v-for="(item, index) of row.spec.split(',')" :key="index">
+                            <div v-for="(item, index) of row.spec.split('&&')" :key="index">
                                 <div v-if="row.expand || (!row.expand && index < 3)">
                                     <span>
                                         {{ row.specCustom ? item : transSpecToStr(item) }}
                                     </span>
                                 </div>
                             </div>
-                            <div v-if="!row.expand && row.spec.split(',').length > 3">
+                            <div v-if="!row.expand && row.spec.split('&&').length > 3">
                                 <el-button type="primary" link @click="row.expand = true">
                                     {{ $t('commons.button.expand') }}...
                                 </el-button>
                             </div>
-                            <div v-if="row.expand && row.spec.split(',').length > 3">
+                            <div v-if="row.expand && row.spec.split('&&').length > 3">
                                 <el-button type="primary" link @click="row.expand = false">
                                     {{ $t('commons.button.collapse') }}
                                 </el-button>

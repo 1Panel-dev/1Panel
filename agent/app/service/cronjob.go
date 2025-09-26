@@ -604,7 +604,7 @@ func (u *CronjobService) StartJob(cronjob *model.Cronjob, isUpdate bool) (string
 			global.Cron.Remove(cron.EntryID(idItem))
 		}
 	}
-	specs := strings.Split(cronjob.Spec, ",")
+	specs := strings.Split(cronjob.Spec, "&&")
 	var ids []string
 	for _, spec := range specs {
 		cronjob.Spec = spec

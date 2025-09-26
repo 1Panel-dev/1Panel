@@ -44,6 +44,7 @@ func InitAgentDB() {
 		migrations.InitRecordStatus,
 		migrations.AddShowNameForQuickJump,
 		migrations.AddTimeoutForClam,
+		migrations.UpdataCronjobSpec,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)
