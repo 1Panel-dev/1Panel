@@ -147,9 +147,9 @@ func (u *CronjobService) handleShell(cronjob model.Cronjob, taskItem *task.Task)
 				command = cronjob.Command
 			}
 			if len(cronjob.User) != 0 {
-				return cmdMgr.Run("docker", "exec", "-u", cronjob.User, cronjob.ContainerName, command, "-c", strings.ReplaceAll(scriptItem, "\"", "\\\""))
+				return cmdMgr.Run("docker", "exec", "-u", cronjob.User, cronjob.ContainerName, command, "-c", scriptItem)
 			}
-			return cmdMgr.Run("docker", "exec", cronjob.ContainerName, command, "-c", strings.ReplaceAll(scriptItem, "\"", "\\\""))
+			return cmdMgr.Run("docker", "exec", cronjob.ContainerName, command, "-c", scriptItem)
 		}
 		if len(cronjob.Executor) == 0 {
 			cronjob.Executor = "bash"
