@@ -1006,6 +1006,8 @@ const message = {
         record: '記録',
         viewRecords: '記録',
         shell: 'シェル',
+        stop: '手動終了',
+        stopHelper: 'この操作により現在のタスクの実行が強制停止されます。続行しますか？',
         log: 'バックアップログ',
         logHelper: 'バックアップシステムログ',
         ogHelper1: '1.1パネルシステムログ',

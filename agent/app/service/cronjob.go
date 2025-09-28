@@ -36,6 +36,7 @@ type ICronjobService interface {
 	Delete(req dto.CronjobBatchDelete) error
 	StartJob(cronjob *model.Cronjob, isUpdate bool) (string, error)
 	CleanRecord(req dto.CronjobClean) error
+	HandleStop(id uint) error
 
 	Export(req dto.OperateByIDs) (string, error)
 	Import(req []dto.CronjobTrans) error
@@ -615,6 +616,20 @@ func (u *CronjobService) StartJob(cronjob *model.Cronjob, isUpdate bool) (string
 		ids = append(ids, fmt.Sprintf("%v", entryID))
 	}
 	return strings.Join(ids, ","), nil
+}
+
+func (u *CronjobService) HandleStop(id uint) error {
+	record, _ := cronjobRepo.GetRecord(repo.WithByID(id))
+	if record.ID == 0 {
+		return buserr.New("ErrRecordNotFound")
+	}
+	if len(record.TaskID) == 0 {
+		return nil
+	}
+	if cancle, ok := global.TaskCtxMap[record.TaskID]; ok {
+		cancle()
+	}
+	return nil
 }
 
 func (u *CronjobService) Delete(req dto.CronjobBatchDelete) error {

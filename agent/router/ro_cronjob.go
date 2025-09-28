@@ -18,6 +18,7 @@ func (s *CronjobRouter) InitRouter(Router *gin.RouterGroup) {
 		cmdRouter.POST("/load/info", baseApi.LoadCronjobInfo)
 		cmdRouter.GET("/script/options", baseApi.LoadScriptOptions)
 		cmdRouter.POST("/del", baseApi.DeleteCronjob)
+		cmdRouter.POST("/stop", baseApi.StopCronJob)
 		cmdRouter.POST("/update", baseApi.UpdateCronjob)
 		cmdRouter.POST("/group/update", baseApi.UpdateCronjobGroup)
 		cmdRouter.POST("/status", baseApi.UpdateCronjobStatus)

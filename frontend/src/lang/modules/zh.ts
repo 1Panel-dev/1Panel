@@ -986,6 +986,8 @@ const message = {
         record: '报告',
         viewRecords: '查看报告',
         shell: 'Shell 脚本',
+        stop: '手动结束',
+        stopHelper: '该操作将强制停止该次任务执行，是否继续？',
         log: '备份日志',
         logHelper: '备份系统日志',
         logHelper1: '1. 1Panel 系统日志',

@@ -1033,6 +1033,8 @@ const message = {
         record: 'Registros',
         viewRecords: 'Ver registros',
         shell: 'Shell',
+        stop: 'Detención Manual',
+        stopHelper: 'Esta operación forzará la detención de la ejecución de la tarea actual. ¿Continuar?',
         log: 'Registros de respaldo',
         logHelper: 'Registro del sistema de copias de seguridad',
         ogHelper1: '1. Registro del sistema de 1Panel',

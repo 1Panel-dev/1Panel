@@ -25,6 +25,8 @@ type ActionFunc func(*Task) error
 type RollbackFunc func(*Task)
 
 type Task struct {
+	TaskCtx context.Context
+
 	Name      string
 	TaskID    string
 	Logger    *log.Logger
@@ -147,7 +149,9 @@ func NewTask(name, operate, taskScope, taskID string, resourceID uint) (*Task, e
 		Operate:    operate,
 	}
 	taskRepo := repo.NewITaskRepo()
-	task := &Task{Name: name, logFile: file, Logger: logger, taskRepo: taskRepo, Task: taskModel, Writer: writer}
+	ctx, cancle := context.WithCancel(context.Background())
+	global.TaskCtxMap[taskID] = cancle
+	task := &Task{TaskCtx: ctx, Name: name, logFile: file, Logger: logger, taskRepo: taskRepo, Task: taskModel, Writer: writer}
 	return task, nil
 }
 
@@ -211,6 +215,7 @@ func (t *Task) AddSubTaskWithIgnoreErr(name string, action ActionFunc) {
 }
 
 func (s *SubTask) Execute() error {
+	defer delete(global.TaskCtxMap, s.RootTask.TaskID)
 	subTaskName := s.Name
 	if s.Name == "" {
 		subTaskName = i18n.GetMsgByKey("SubTask")

@@ -1047,6 +1047,8 @@ const message = {
         record: 'Kayıtlar',
         viewRecords: 'Kayıtları görüntüle',
         shell: 'Shell',
+        stop: 'Manuel Durdur',
+        stopHelper: 'Bu işlem mevcut görev yürütmesini zorla durduracaktır. Devam etmek istiyor musunuz?',
         log: 'Yedekleme logları',
         logHelper: 'Sistem logunu yedekle',
         ogHelper1: '1.1Panel Sistem logu ',

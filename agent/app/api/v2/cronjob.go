@@ -227,6 +227,28 @@ func (b *BaseApi) CleanRecord(c *gin.Context) {
 }
 
 // @Tags Cronjob
+// @Summary Handle stop job
+// @Accept json
+// @Param request body dto.OperateByID true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /cronjobs/stop [post]
+func (b *BaseApi) StopCronJob(c *gin.Context) {
+	var req dto.OperateByID
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	if err := cronjobService.HandleStop(req.ID); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+
+	helper.Success(c)
+}
+
+// @Tags Cronjob
 // @Summary Delete cronjob
 // @Accept json
 // @Param request body dto.CronjobBatchDelete true "request"

@@ -17,6 +17,7 @@ ErrApiConfigKeyTimeInvalid: 'Ralat cap masa antara muka API: {{ .detail }}'
 StartPushSSLToNode: "Mula menolak sijil ke nod"
 PushSSLToNodeFailed: "Gagal menolak sijil ke nod: {{ .err }}"
 PushSSLToNodeSuccess: "Berjaya menolak sijil ke nod"
+ErrShutDown: "Arahan dihentikan secara manual!"
 
 ErrMinQuickJump: "Sila tetapkan sekurang-kurangnya satu entri lompat pantas!"
 ErrMaxQuickJump: "Anda boleh menetapkan sehingga empat entri lompat pantas!"

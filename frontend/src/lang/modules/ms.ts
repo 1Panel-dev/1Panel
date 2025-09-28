@@ -1028,6 +1028,8 @@ const message = {
         record: 'Rekod',
         viewRecords: 'Rekod',
         shell: 'Shell',
+        stop: 'Hentikan Manual',
+        stopHelper: 'Operasi ini akan memaksa menghentikan pelaksanaan tugas semasa. Teruskan?',
         log: 'Log sandaran',
         logHelper: 'Log sistem sandaran',
         ogHelper1: '1. Log Sistem 1Panel ',

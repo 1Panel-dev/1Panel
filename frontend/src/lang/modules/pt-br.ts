@@ -1025,6 +1025,8 @@ const message = {
         record: 'Registros',
         viewRecords: 'Visualizar registros',
         shell: 'Shell',
+        stop: 'Parada Manual',
+        stopHelper: 'Esta operação forçará a parada da execução da tarefa atual. Continuar?',
         log: 'Logs de backup',
         logHelper: 'Backup do log do sistema',
         ogHelper1: '1. Log do sistema 1Panel',

@@ -132,7 +132,8 @@ func (u *CronjobService) loadTask(cronjob *model.Cronjob, record *model.JobRecor
 }
 
 func (u *CronjobService) handleShell(cronjob model.Cronjob, taskItem *task.Task) {
-	cmdMgr := cmd.NewCommandMgr(cmd.WithTask(*taskItem))
+	cmdMgr := cmd.NewCommandMgr(cmd.WithTask(*taskItem), cmd.WithContext(taskItem.TaskCtx))
+
 	taskItem.AddSubTaskWithOps(i18n.GetWithName("HandleShell", cronjob.Name), func(t *task.Task) error {
 		if len(cronjob.ContainerName) != 0 {
 			scriptItem := cronjob.Script

@@ -996,6 +996,8 @@ const message = {
         record: '레코드',
         viewRecords: '레코드 보기',
         shell: '셸',
+        stop: '수동 중지',
+        stopHelper: '이 작업은 현재 작업 실행을 강제로 중지합니다. 계속하시겠습니까?',
         log: '백업 로그',
         logHelper: '시스템 백업 로그',
         ogHelper1: '1. 1Panel 시스템 로그',

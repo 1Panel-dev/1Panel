@@ -14,6 +14,8 @@ ErrApiConfigKeyInvalid: 'Error en la clave de la interfaz API: {{ .detail }}'
 ErrApiConfigIPInvalid: 'La IP usada para llamar a la API no está en la lista blanca: {{ .detail }}'
 ErrApiConfigDisable: 'Esta interfaz prohíbe el uso de llamadas a la API: {{ .detail }}'
 ErrApiConfigKeyTimeInvalid: 'Error en la marca de tiempo de la interfaz API: {{ .detail }}'
+ErrShutDown: "¡Comando terminado manualmente!"
+
 ErrMinQuickJump: "¡Por favor configure al menos una entrada de acceso rápido!"
 ErrMaxQuickJump: "¡Puede configurar hasta cuatro entradas de acceso rápido!"
 

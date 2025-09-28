@@ -1035,6 +1035,8 @@ const message = {
         record: 'Records',
         viewRecords: 'View records',
         shell: 'Shell',
+        stop: 'Manual Stop',
+        stopHelper: 'This operation will force stop the current task execution. Continue?',
         log: 'Backup logs',
         logHelper: 'Backup system log',
         ogHelper1: '1.1Panel System log ',
