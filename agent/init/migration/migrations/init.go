@@ -598,7 +598,7 @@ var AddTimeoutForClam = &gormigrate.Migration{
 	},
 }
 
-var UpdataCronjobSpec = &gormigrate.Migration{
+var UpdateCronjobSpec = &gormigrate.Migration{
 	ID: "20250925-update-cronjob-spec",
 	Migrate: func(tx *gorm.DB) error {
 		var cronjobs []model.Cronjob
@@ -613,6 +613,16 @@ var UpdataCronjobSpec = &gormigrate.Migration{
 				map[string]interface{}{"spec": strings.ReplaceAll(item.Spec, ",", "&&")}).Error; err != nil {
 				return err
 			}
+		}
+		return nil
+	},
+}
+
+var UpdateWebsiteSSLAddColumn = &gormigrate.Migration{
+	ID: "20250928-update-website-ssl",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.WebsiteSSL{}); err != nil {
+			return err
 		}
 		return nil
 	},
