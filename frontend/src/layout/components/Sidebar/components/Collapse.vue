@@ -82,7 +82,7 @@ import { DropdownInstance } from 'element-plus';
 import { countExecutingTask } from '@/api/modules/log';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
-import { listNodeOptions } from '@/api/modules/setting';
+import { getAgentSettingInfo, listNodeOptions } from '@/api/modules/setting';
 import { ref, watch } from 'vue';
 import bus from '@/global/bus';
 import { logOutApi } from '@/api/modules/auth';
@@ -182,6 +182,7 @@ const changeNode = (command: string) => {
             if (command == 'local') {
                 globalStore.currentNode = 'local';
                 globalStore.currentNodeAddr = item.addr;
+                loadGlobalSetting();
                 loadProductProFromDB();
                 routerToNameWithQuery('home', { t: Date.now() });
                 return;
@@ -198,12 +199,19 @@ const changeNode = (command: string) => {
                 MsgError(i18n.global.t('setting.versionNotSame'));
                 return;
             }
+            loadGlobalSetting();
             globalStore.currentNode = command || 'local';
             globalStore.currentNodeAddr = item.addr;
             loadProductProFromDB();
             routerToNameWithQuery('home', { t: Date.now() });
         }
     }
+};
+
+const loadGlobalSetting = async () => {
+    await getAgentSettingInfo().then((res) => {
+        globalStore.defaultNetwork = res.data.defaultNetwork;
+    });
 };
 
 const showNodes = () => {
