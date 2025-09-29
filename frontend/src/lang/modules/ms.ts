@@ -388,6 +388,8 @@ const message = {
         dir: 'direktori',
         alias: 'Alias',
         quickDir: 'Direktori Pantas',
+        minQuickJump: 'Sila tetapkan sekurang-kurangnya satu entri lompat pantas!',
+        maxQuickJump: 'Anda boleh menetapkan sehingga empat entri lompat pantas!',
         database: 'Pangkalan Data - Semua',
         restart_1panel: 'Mulakan semula panel',
         restart_system: 'Mulakan semula pelayan',

@@ -382,6 +382,8 @@ const message = {
         dir: '디렉토리',
         alias: '별칭',
         quickDir: '빠른 디렉토리',
+        minQuickJump: '최소 하나의 빠른 점프 항목을 설정해 주세요!',
+        maxQuickJump: '최대 네 개의 빠른 점프 항목을 설정할 수 있습니다!',
         database: '데이터베이스 - 전체',
         restart_1panel: '패널 재시작',
         restart_system: '서버 재시작',

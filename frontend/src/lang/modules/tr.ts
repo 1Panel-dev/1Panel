@@ -394,6 +394,8 @@ const message = {
         dir: 'dizin',
         alias: 'Takma Ad',
         quickDir: 'Hızlı Dizin',
+        minQuickJump: 'Lütfen en az bir hızlı atlama girişi ayarlayın!',
+        maxQuickJump: 'En fazla dört hızlı atlama girişi ayarlayabilirsiniz!',
         database: 'Veritabanı - Tümü',
         restart_1panel: 'Paneli yeniden başlat',
         restart_system: 'Sunucuyu yeniden başlat',

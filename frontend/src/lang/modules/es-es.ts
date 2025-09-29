@@ -397,6 +397,8 @@ const message = {
         recommend: 'recomendar',
         dir: 'directorio',
         quickDir: 'Directorio rápido',
+        minQuickJump: '¡Establezca al menos una entrada de salto rápido!',
+        maxQuickJump: '¡Puede establecer hasta cuatro entradas de salto rápido!',
         database: 'Database - All',
         restart_1panel: 'Reiniciar panel',
         restart_system: 'Reiniciar servidor',

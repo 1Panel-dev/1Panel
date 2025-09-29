@@ -386,6 +386,8 @@ const message = {
         dir: 'dir',
         alias: 'Apelido',
         quickDir: 'Diretório Rápido',
+        minQuickJump: 'Defina pelo menos uma entrada de salto rápido!',
+        maxQuickJump: 'Você pode definir até quatro entradas de salto rápido!',
         database: 'Banco de Dados - Todos',
         restart_1panel: 'Reiniciar painel',
         restart_system: 'Reiniciar servidor',

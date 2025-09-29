@@ -391,6 +391,8 @@ const message = {
         dir: 'dir',
         alias: 'Alias',
         quickDir: 'Quick Dir',
+        minQuickJump: 'Please set at least one quick jump entry!',
+        maxQuickJump: 'You can set up to four quick jump entries!',
         database: 'Database - All',
         restart_1panel: 'Restart panel',
         restart_system: 'Restart server',

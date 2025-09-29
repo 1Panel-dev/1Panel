@@ -380,6 +380,8 @@ const message = {
         dir: 'ディレクトリ',
         alias: 'エイリアス',
         quickDir: 'クイックディレクトリ',
+        minQuickJump: '少なくとも1つのクイックジャンプエントリを設定してください！',
+        maxQuickJump: '最大4つのクイックジャンプエントリを設定できます！',
         database: 'データベース - すべて',
         restart_1panel: 'パネルを再起動します',
         restart_system: 'サーバーを再起動します',

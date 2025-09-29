@@ -45,7 +45,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 import i18n from '@/lang';
-import { MsgSuccess } from '@/utils/message';
+import { MsgInfo, MsgSuccess } from '@/utils/message';
 import FileList from '@/components/file-list/index.vue';
 import { changeQuick, loadQuickOption } from '@/api/modules/dashboard';
 
@@ -71,6 +71,20 @@ const search = async () => {
         });
 };
 const onChangeShow = async () => {
+    let i = 0;
+    for (const item of quickOptions.value) {
+        if (item.isShow) {
+            i++;
+        }
+    }
+    if (i === 0) {
+        MsgInfo(i18n.global.t('home.minQuickJump'));
+        return;
+    }
+    if (i > 4) {
+        MsgInfo(i18n.global.t('home.maxQuickJump'));
+        return;
+    }
     loading.value = true;
     await changeQuick(quickOptions.value)
         .then(() => {

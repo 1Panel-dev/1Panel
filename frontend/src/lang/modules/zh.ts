@@ -379,6 +379,8 @@ const message = {
         dir: '目录',
         alias: '别名',
         quickDir: '快捷目录',
+        minQuickJump: '请至少设置一个快速跳转入口！',
+        maxQuickJump: '最多可设置四个快速跳转入口！',
         database: '数据库 - 所有',
         restart_1panel: '重启面板',
         restart_system: '重启服务器',
