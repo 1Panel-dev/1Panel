@@ -30,9 +30,9 @@ type ImageBuild struct {
 }
 
 type ImagePull struct {
-	TaskID    string `json:"taskID"`
-	RepoID    uint   `json:"repoID"`
-	ImageName string `json:"imageName" validate:"required"`
+	TaskID    string   `json:"taskID"`
+	RepoID    uint     `json:"repoID"`
+	ImageName []string `json:"imageName" validate:"required"`
 }
 
 type ImageTag struct {

@@ -187,7 +187,7 @@ export namespace Container {
     export interface ImagePull {
         taskID: string;
         repoID: number;
-        imageName: string;
+        imageName: Array<string>;
     }
     export interface ImageTag {
         sourceID: string;

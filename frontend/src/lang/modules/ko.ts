@@ -844,6 +844,7 @@ const message = {
         cache: '캐시',
         image: '이미지 | 이미지들',
         imagePull: '풀',
+        imagePullHelper: '여러 이미지 선택 풀링을 지원하며, 각 이미지 입력 후 Enter 키를 눌러 계속합니다',
         imagePush: '푸시',
         imagePushHelper:
             '이 이미지에 여러 태그가 있는 것으로 감지되었습니다. 푸시 시 사용할 이미지 이름이 다음인지 확인하세요: {0}',

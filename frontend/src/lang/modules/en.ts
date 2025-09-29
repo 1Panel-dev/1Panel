@@ -875,6 +875,8 @@ const message = {
 
         image: 'Image | Images',
         imagePull: 'Pull',
+        imagePullHelper:
+            'Supports selecting multiple images to pull, press Enter after entering each image to continue',
         imagePush: 'Push',
         imagePushHelper:
             'Detected that this image has multiple tags. Please confirm that the image name used for pushing is: {0}',

@@ -868,6 +868,8 @@ const message = {
 
         image: 'Imej | Imej-imej',
         imagePull: 'Tarik',
+        imagePullHelper:
+            'Menyokong pemilihan berbilang imej untuk ditarik, tekan Enter selepas memasukkan setiap imej untuk teruskan',
         imagePush: 'Tekan',
         imagePushHelper:
             'Terdapat pengesahan bahawa imej ini mempunyai beberapa tag. Sila pastikan nama imej yang digunakan untuk menolak adalah: {0}',

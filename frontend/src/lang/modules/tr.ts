@@ -884,6 +884,8 @@ const message = {
 
         image: 'İmaj | İmajlar',
         imagePull: 'Çek',
+        imagePullHelper:
+            'Birden fazla görüntü seçmeyi destekler, her görüntü girdikten sonra Entera basarak devam edin',
         imagePush: 'Gönder',
         imagePushHelper:
             'Bu imgenin birden fazla etiketi olduğu tespit edildi. Lütfen gönderimde kullanılan imge adının şu olduğunu onaylayın: {0}',

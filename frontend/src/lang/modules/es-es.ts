@@ -877,6 +877,8 @@ const message = {
         cache: 'Caché',
         image: 'Imagen | Imágenes',
         imagePull: 'Descargar',
+        imagePullHelper:
+            'Admite seleccionar múltiples imágenes para descargar, presione Enter después de ingresar cada imagen para continuar',
         imagePush: 'Subir',
         imagePushHelper:
             'Detected that this image has multiple tags. Please confirm that the image name used for pushing is: {0}',

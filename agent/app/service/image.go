@@ -256,17 +256,19 @@ func (u *ImageService) ImagePull(req dto.ImagePull) error {
 		return err
 	}
 	defer client.Close()
-	imageItemName := strings.ReplaceAll(path.Base(req.ImageName), ":", "_")
-	taskItem, err := task.NewTaskWithOps(imageItemName, task.TaskPull, task.TaskScopeImage, req.TaskID, 1)
+	taskItem, err := task.NewTaskWithOps(strings.Join(req.ImageName, ","), task.TaskPull, task.TaskScopeImage, req.TaskID, 1)
 	if err != nil {
 		return fmt.Errorf("new task for image pull failed, err: %v", err)
 	}
-	go func() {
-		taskItem.AddSubTask(i18n.GetWithName("ImagePull", req.ImageName), func(t *task.Task) error {
+
+	for _, item := range req.ImageName {
+		itemName := strings.ReplaceAll(path.Base(item), ":", "_")
+		taskItem.AddSubTask(i18n.GetWithName("ImagePull", itemName), func(t *task.Task) error {
+			taskItem.Logf("----------------- %s -----------------", itemName)
 			options := image.PullOptions{}
-			imageName := req.ImageName
+			imageName := item
 			if req.RepoID == 0 {
-				hasAuth, authStr := loadAuthInfo(req.ImageName)
+				hasAuth, authStr := loadAuthInfo(item)
 				if hasAuth {
 					options.RegistryAuth = authStr
 				}
@@ -288,7 +290,7 @@ func (u *ImageService) ImagePull(req dto.ImagePull) error {
 					authStr := base64.URLEncoding.EncodeToString(encodedJSON)
 					options.RegistryAuth = authStr
 				}
-				imageName = repo.DownloadUrl + "/" + req.ImageName
+				imageName = repo.DownloadUrl + "/" + item
 			}
 			dockerCli := docker.NewClientWithExist(client)
 			err = dockerCli.PullImageWithProcessAndOptions(taskItem, imageName, options)
@@ -298,6 +300,8 @@ func (u *ImageService) ImagePull(req dto.ImagePull) error {
 			}
 			return nil
 		}, nil)
+	}
+	go func() {
 		_ = taskItem.Execute()
 	}()
 	return nil

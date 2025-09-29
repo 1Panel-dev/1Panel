@@ -863,6 +863,8 @@ const message = {
         cache: 'Cache',
         image: 'Imagem | Imagens',
         imagePull: 'Puxar',
+        imagePullHelper:
+            'Suporta selecionar múltiplas imagens para puxar, pressione Enter após inserir cada imagem para continuar',
         imagePush: 'Enviar',
         imagePushHelper:
             'Detectado que esta imagem possui múltiplas tags. Por favor, confirme que o nome da imagem usada para push é: {0}',

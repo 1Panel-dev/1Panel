@@ -852,6 +852,7 @@ const message = {
 
         image: '画像|画像',
         imagePull: '引く',
+        imagePullHelper: '複数のイメージの選択をサポートし、各イメージ入力後にEnterキーを押して続行します',
         imagePush: '押す',
         imagePushHelper:
             'このイメージに複数のタグが存在することが検出されました。プッシュ時に使用するイメージ名が以下であることを確認してください：{0}',

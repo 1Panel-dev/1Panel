@@ -1,25 +1,21 @@
 <template>
     <DrawerPro v-model="drawerVisible" :header="$t('container.imagePull')" @close="onCloseLog" size="large">
-        <el-form ref="formRef" label-position="top" :model="form">
+        <el-form ref="formRef" label-position="top" :model="form" :rules="rules">
             <el-form-item :label="$t('app.source')">
                 <el-checkbox v-model="form.fromRepo">
                     {{ $t('container.imageRepo') }}
                 </el-checkbox>
             </el-form-item>
-            <el-form-item
-                v-if="form.fromRepo"
-                :label="$t('container.repoName')"
-                :rules="Rules.requiredSelect"
-                prop="repoID"
-            >
+            <el-form-item v-if="form.fromRepo" :label="$t('container.repoName')" prop="repoID">
                 <el-select clearable style="width: 100%" filterable v-model="form.repoID">
                     <el-option v-for="item in repos" :key="item.id" :value="item.id" :label="item.name" />
                 </el-select>
             </el-form-item>
-            <el-form-item :label="$t('container.imageName')" :rules="Rules.imageName" prop="imageName">
-                <el-input v-model.trim="form.imageName">
-                    <template v-if="form.fromRepo" #prepend>{{ loadDetailInfo(form.repoID) }}/</template>
-                </el-input>
+            <el-form-item :label="$t('container.imageName')" prop="imageName">
+                <el-input-tag v-model="form.imageName">
+                    <template v-if="form.fromRepo" #prefix>{{ loadDetailInfo(form.repoID) }}/</template>
+                </el-input-tag>
+                <span class="input-help">{{ $t('container.imagePullHelper') }}</span>
             </el-form-item>
         </el-form>
         <template #footer>
@@ -52,8 +48,31 @@ const form = reactive({
     taskID: '',
     fromRepo: true,
     repoID: null as number,
-    imageName: '',
+    imageName: [],
 });
+const verifyImage = (rule: any, value: any, callback: any) => {
+    if (!value || value.length === 0) {
+        callback(new Error(i18n.global.t('commons.rule.requiredInput')));
+        return;
+    }
+    for (const item of value) {
+        if (item === '' || typeof item === 'undefined' || item == null) {
+            callback(new Error(i18n.global.t('commons.rule.imageName')));
+        } else {
+            const reg = /^[a-zA-Z0-9]{1}[a-z:@A-Z0-9_/.-]{0,255}$/;
+            if (!reg.test(item) && item !== '') {
+                callback(new Error(i18n.global.t('commons.rule.imageName')));
+                return;
+            }
+        }
+    }
+    callback();
+};
+const rules = reactive({
+    imageName: [{ validator: verifyImage, trigger: 'blur', required: true }],
+    repoID: Rules.requiredSelect,
+});
+
 const taskLogRef = ref();
 
 interface DialogProps {
@@ -64,7 +83,7 @@ const repos = ref();
 const acceptParams = async (params: DialogProps): Promise<void> => {
     drawerVisible.value = true;
     form.fromRepo = true;
-    form.imageName = '';
+    form.imageName = [];
     repos.value = params.repos;
     form.repoID = 1;
     for (const item of repos.value) {

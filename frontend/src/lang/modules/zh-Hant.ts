@@ -840,6 +840,7 @@ const message = {
 
         image: '鏡像',
         imagePull: '拉取鏡像',
+        imagePullHelper: '支援選擇拉取多個鏡像，輸入一組鏡像後回車繼續',
         imagePush: '推送鏡像',
         imagePushHelper: '檢測到該映像存在多個標籤，請確認推送時使用的映像名稱為：{0}',
         imageDelete: '刪除鏡像',
