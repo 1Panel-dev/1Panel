@@ -52,5 +52,7 @@ func (f *FileRouter) InitRouter(Router *gin.RouterGroup) {
 		fileRouter.GET("/path/:type", baseApi.GetPathByType)
 		fileRouter.POST("/mount", baseApi.GetHostMount)
 		fileRouter.POST("/user/group", baseApi.GetUsersAndGroups)
+		fileRouter.POST("/convert", baseApi.ConvertFile)
+		fileRouter.POST("/convert/log", baseApi.ConvertLog)
 	}
 }

@@ -638,6 +638,7 @@
         <VscodeOpenDialog ref="dialogVscodeOpenRef" />
         <Preview ref="previewRef" />
         <TerminalDialog ref="dialogTerminalRef" />
+        <Convert ref="convertRef" @close="search" />
     </div>
 </template>
 
@@ -655,7 +656,16 @@ import {
     searchFavorite,
     searchHostMount,
 } from '@/api/modules/files';
-import { computeSize, copyText, dateFormat, downloadFile, getFileType, getIcon, getRandomStr } from '@/utils/util';
+import {
+    computeSize,
+    copyText,
+    dateFormat,
+    downloadFile,
+    getFileType,
+    getIcon,
+    getRandomStr,
+    isConvertible,
+} from '@/utils/util';
 import { File } from '@/api/interface/file';
 import { Languages, Mimetypes } from '@/global/mimetype';
 import { useRouter } from 'vue-router';
@@ -685,11 +695,14 @@ import Favorite from './favorite/index.vue';
 import BatchRole from './batch-role/index.vue';
 import Preview from './preview/index.vue';
 import VscodeOpenDialog from '@/components/vscode-open/index.vue';
+import Convert from './convert/index.vue';
 import { debounce } from 'lodash-es';
 import TerminalDialog from './terminal/index.vue';
 import { Dashboard } from '@/api/interface/dashboard';
 import { CompressExtension, CompressType } from '@/enums/files';
 import type { TabPaneName } from 'element-plus';
+import { getComponentInfo } from '@/api/modules/host';
+import { routerToNameWithQuery } from '@/utils/router';
 
 const globalStore = GlobalStore();
 
@@ -741,6 +754,22 @@ const fileUpload = reactive({ path: '' });
 const fileRename = reactive({ path: '', oldName: '', newName: '' });
 const fileWget = reactive({ path: '' });
 const fileMove = reactive({ oldPaths: [''], allNames: [''], type: '', path: '', name: '', count: 0, isDir: false });
+const fileConvert = reactive<{
+    outputPath: string;
+    files: File.ConvertFile[];
+}>({
+    outputPath: '',
+    files: [
+        {
+            type: '',
+            inputFile: '',
+            extension: '',
+            path: '',
+            outputFormat: '',
+        },
+    ],
+});
+const ffmpegExist = ref(false);
 
 const createRef = ref();
 const roleRef = ref();
@@ -775,6 +804,7 @@ const dirNum = ref(0);
 const fileNum = ref(0);
 const imageFiles = ref([]);
 const isEdit = ref(false);
+const convertRef = ref();
 
 const renameRefs = ref<Record<string, any>>({});
 
@@ -1585,6 +1615,15 @@ const buttons = [
         },
     },
     {
+        label: i18n.global.t('file.convert'),
+        click: (row: File.File) => {
+            openConvert(row);
+        },
+        disabled: (row: File.File) => {
+            return row?.isDir || !isConvertible(row?.extension, row?.mimeType);
+        },
+    },
+    {
         label: i18n.global.t('file.openWithVscode'),
         click: openWithVSCode,
     },
@@ -1594,6 +1633,36 @@ const buttons = [
         divided: true,
     },
 ];
+
+const openConvert = (item: File.File) => {
+    if (!ffmpegExist.value) {
+        ElMessageBox.confirm(i18n.global.t('cronjob.library.noSuchApp', ['FFmpeg']), i18n.global.t('file.convert'), {
+            confirmButtonText: i18n.global.t('app.toInstall'),
+            cancelButtonText: i18n.global.t('commons.button.cancel'),
+        }).then(() => {
+            routerToNameWithQuery('Library', { t: Date.now(), uncached: 'true' });
+        });
+        return;
+    } else {
+        if (!isConvertible(item.extension, item.mimeType)) {
+            MsgWarning(i18n.global.t('file.fileCanNotConvert'));
+            return;
+        }
+        const fileType = getFileType(item.extension);
+        fileConvert.outputPath = req.path;
+        fileConvert.files = [
+            {
+                type: fileType,
+                path: req.path,
+                extension: item.extension,
+                inputFile: item.name,
+                outputFormat: item.extension.slice(1),
+            },
+        ];
+
+        convertRef.value.acceptParams(fileConvert);
+    }
+};
 
 const isDecompressFile = (row: File.File) => {
     if (row.isDir) {
@@ -1644,6 +1713,7 @@ onMounted(() => {
     initTabsAndPaths();
     getHostMount();
     initHistory();
+    checkFFmpeg();
     nextTick(function () {
         handlePath();
         observeResize();
@@ -1824,6 +1894,12 @@ const removeTab = (targetId: TabPaneName) => {
     editableTabs.value = tabs.filter((t) => String(t.id) !== target);
     editableTabsKey.value = String(nextActive);
     changeTab(String(nextActive));
+};
+
+const checkFFmpeg = () => {
+    getComponentInfo('ffmpeg', globalStore.currentNode).then((res) => {
+        ffmpegExist.value = res.data.exists ?? false;
+    });
 };
 
 onBeforeUnmount(() => {

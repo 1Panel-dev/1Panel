@@ -369,6 +369,7 @@ TaskIsExecuting: 'Task is running'
 CustomAppstore: 'Custom application warehouse'
 TaskExec: 'Execute'
 TaskBatch: "Batch Operation"
+FileConvert: 'File Conversion'
 
 # task - clam
 Clamscan: "Scan {{ .name }}"

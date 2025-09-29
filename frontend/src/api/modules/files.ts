@@ -158,3 +158,11 @@ export const searchHostMount = () => {
 export const searchUserGroup = () => {
     return http.post<File.UserGroupResponse>(`/files/user/group`);
 };
+
+export const convertFiles = (params: File.ConvertFileRequest) => {
+    return http.post<File.ConvertFile>('files/convert', params, TimeoutEnum.T_5M);
+};
+
+export const convertLogs = (params: ReqPage) => {
+    return http.post<ResPage<File.ConvertLogResponse>>('files/convert/log', params, TimeoutEnum.T_5M);
+};

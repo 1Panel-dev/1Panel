@@ -95,7 +95,7 @@ ErrAppVersionDeprecated: " {{ .name }} 应用不适配当前 1Panel 版本，跳
 ErrDockerFailed: "Docker 状态异常，请检查服务状态"
 ErrDockerComposeCmdNotFound: "Docker Compose 命令不存在，请先在宿主机安装此命令"
 
-#ssh 
+#ssh
 ExportIP: "登录 IP"
 ExportArea: "归属地"
 ExportPort: "端口"
@@ -369,6 +369,7 @@ TaskIsExecuting: "任务正在运行"
 CustomAppstore: "自定义应用仓库"
 TaskExec: "执行"
 TaskBatch: "批量操作"
+FileConvert: "文件格式转换"
 
 # task - clam
 Clamscan: "扫描 {{ .name }}"

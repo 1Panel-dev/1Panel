@@ -369,6 +369,7 @@ TaskIsExecuting: 'A tarefa está em execução'
 CustomAppstore: 'Armazém de aplicativos personalizados'
 TaskExec: 'Executar'
 TaskBatch: "Operação em Lote"
+FileConvert: 'Conversão de Formato de Arquivo'
 
 # task - clam
 Clamscan: "Escanear {{ .name }}"

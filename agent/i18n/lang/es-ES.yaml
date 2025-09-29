@@ -368,6 +368,7 @@ CustomAppstore: 'Almacén de aplicaciones personalizado'
 TaskClean: "Limpieza"
 TaskExec: "Ejecutar"
 TaskBatch: "Operación por Lotes"
+FileConvert: 'Conversión de Formato de Archivo'
 
 # task - ai
 OllamaModelPull: 'Descargar modelo Ollama {{ .name }}'

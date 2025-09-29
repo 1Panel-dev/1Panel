@@ -222,4 +222,27 @@ export namespace File {
         username: string;
         group: string;
     }
+
+    export interface ConvertFile {
+        type: string;
+        path: string;
+        extension: string;
+        inputFile: string;
+        outputFormat: string;
+    }
+
+    export interface ConvertFileRequest {
+        files: ConvertFile[];
+        outputPath: string;
+        deleteSource: boolean;
+        taskID: string;
+    }
+
+    export interface ConvertLogResponse {
+        date: string;
+        type: string;
+        log: string;
+        status: string;
+        message: string;
+    }
 }

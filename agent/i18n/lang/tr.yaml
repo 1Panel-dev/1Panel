@@ -370,6 +370,7 @@ TaskIsExecuting: 'Görev çalışıyor'
 CustomAppstore: 'Özel uygulama deposu'
 TaskExec: 'Çalıştır'
 TaskBatch: "Toplu İşlem"
+FileConvert: 'Dosya Formatı Dönüştürme'
 
 # task - clam
 Clamscan: "{{ .name }} Tara"

@@ -35,7 +35,7 @@ const i18nLocale = computed(() => {
     if (globalStore.language === 'pt-br') return ptBR;
     if (globalStore.language === 'ko') return ko;
     if (globalStore.language === 'tr') return tr;
-    if (globalStore.language === 'es-es') return esES;
+    if (globalStore.language === 'es-ES') return esES;
     return zhCn;
 });
 

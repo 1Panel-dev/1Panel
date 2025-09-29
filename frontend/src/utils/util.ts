@@ -861,3 +861,10 @@ export const isSensitiveLinuxPath = (path) => {
     ];
     return sensitivePath.indexOf(path) !== -1;
 };
+
+const convertTypes = ['image', 'video', 'audio'] as const;
+type ConvertType = (typeof convertTypes)[number];
+
+export function isConvertible(extension: string, mimeType: string): boolean {
+    return convertTypes.includes(getFileType(extension) as ConvertType) && /^(image|audio|video)\//.test(mimeType);
+}

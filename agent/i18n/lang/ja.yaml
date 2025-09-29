@@ -368,6 +368,7 @@ TaskIsExecuting: 'タスクは実行中です'
 CustomAppstore: 'カスタム アプリケーション ウェアハウス'
 TaskExec: '実行'
 TaskBatch: "一括操作"
+FileConvert: 'ファイル形式の変換'
 
 # task - clam
 Clamscan: "{{ .name }} をスキャン"

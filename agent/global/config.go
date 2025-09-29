@@ -44,6 +44,7 @@ type SystemDir struct {
 	RecycleBinDir        string
 	SSLLogDir            string
 	McpDir               string
+	ConvertLogDir        string
 }
 
 type LogConfig struct {

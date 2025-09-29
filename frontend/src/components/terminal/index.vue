@@ -268,5 +268,10 @@ onBeforeUnmount(() => {
 }
 :deep(.xterm) {
     padding: 5px !important;
+    background-color: var(--panel-logs-bg-color) !important;
+}
+
+:deep(.xterm .xterm-viewport) {
+    background-color: var(--panel-logs-bg-color) !important;
 }
 </style>

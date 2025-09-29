@@ -3,7 +3,11 @@ package service
 import (
 	"bufio"
 	"context"
+	"encoding/json"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/app/task"
+	"github.com/1Panel-dev/1Panel/agent/i18n"
+	"github.com/1Panel-dev/1Panel/agent/utils/convert"
 	"io"
 	"io/fs"
 	"os"
@@ -66,6 +70,8 @@ type IFileService interface {
 	BatchCheckFiles(req request.FilePathsCheck) []response.ExistFileInfo
 	GetHostMount() []dto.DiskInfo
 	GetUsersAndGroups() (*response.UserGroupResponse, error)
+	Convert(req request.FileConvertRequest)
+	ConvertLog(req dto.PageInfo) (int64, []response.FileConvertLog, error)
 }
 
 var filteredPaths = []string{
@@ -722,4 +728,103 @@ func getValidUsers(validGroups map[string]bool) ([]response.UserInfo, map[string
 		return nil, nil, fmt.Errorf("failed to scan /etc/passwd: %w", err)
 	}
 	return users, groupSet, nil
+}
+
+func (f *FileService) Convert(req request.FileConvertRequest) {
+	convertTask, err := task.NewTaskWithOps(i18n.GetMsgByKey("FileConvert"), task.TaskExec, task.TaskScopeFileConvert, req.TaskID, 1)
+	if err != nil {
+		global.LOG.Errorf("Create convert task failed %v", err)
+		return
+	}
+	convertTask.AddSubTask(task.GetTaskName(i18n.GetMsgByKey("FileConvert"), task.TaskExec, task.TaskScopeFileConvert), func(t *task.Task) (err error) {
+		for _, file := range req.Files {
+			input := filepath.Join(file.Path, file.InputFile)
+			nameOnly := file.InputFile[0 : len(file.InputFile)-len(file.Extension)]
+			output := filepath.Join(req.OutputPath, nameOnly+"."+file.OutputFormat)
+			status, errMsg := convert.MediaFile(input, output, file.OutputFormat, req.DeleteSource)
+			if status == "FAILED" {
+				convertTask.Log(fmt.Sprintf("%s -> %s [%s]: %s\n",
+					input, output, status, errMsg))
+			} else {
+				convertTask.Log(fmt.Sprintf("%s -> %s [%s]: %s\n",
+					input, output, status, "SUCCESS"))
+			}
+		}
+		return nil
+	}, nil)
+	go func() {
+		_ = convertTask.Execute()
+	}()
+}
+
+func (f *FileService) ConvertLog(req dto.PageInfo) (total int64, data []response.FileConvertLog, err error) {
+	logFilePath := filepath.Join(global.Dir.ConvertLogDir, "convert.log")
+	file, err := os.Open(logFilePath)
+	if err != nil {
+		return 0, nil, err
+	}
+	defer file.Close()
+
+	stat, err := file.Stat()
+	if err != nil {
+		return 0, nil, err
+	}
+	size := stat.Size()
+
+	buffer := make([]byte, 1)
+	var line strings.Builder
+	var lines []response.FileConvertLog
+	var lineCount int64
+
+	skipCount := int64((req.Page - 1) * req.PageSize)
+
+	for offset := size - 1; offset >= 0; offset-- {
+		_, err := file.ReadAt(buffer, offset)
+		if err != nil {
+			break
+		}
+
+		if buffer[0] == '\n' {
+			text := reverse(line.String())
+			line.Reset()
+			if text == "" {
+				continue
+			}
+
+			var entry response.FileConvertLog
+			if err := json.Unmarshal([]byte(text), &entry); err != nil {
+				continue
+			}
+
+			if lineCount >= skipCount && len(lines) < req.PageSize {
+				lines = append(lines, entry)
+			}
+			lineCount++
+		} else {
+			line.WriteByte(buffer[0])
+		}
+	}
+
+	if line.Len() > 0 {
+		text := reverse(line.String())
+		var entry response.FileConvertLog
+		if err := json.Unmarshal([]byte(text), &entry); err == nil {
+			if lineCount >= skipCount && len(lines) < req.PageSize {
+				lines = append(lines, entry)
+			}
+			lineCount++
+		}
+	}
+
+	total = lineCount
+	data = lines
+	return total, data, nil
+}
+
+func reverse(s string) string {
+	runes := []rune(s)
+	for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
+		runes[i], runes[j] = runes[j], runes[i]
+	}
+	return string(runes)
 }

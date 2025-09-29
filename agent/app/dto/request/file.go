@@ -148,3 +148,19 @@ type FileExistReq struct {
 	Name string `json:"name" validate:"required"`
 	Dir  string `json:"dir" validate:"required"`
 }
+
+type FileConvert struct {
+	Path         string `json:"path" validate:"required"`
+	Type         string `json:"type" validate:"required"`
+	InputFile    string `json:"inputFile" validate:"required"`
+	Extension    string `json:"extension" validate:"required"`
+	OutputFormat string `json:"outputFormat" validate:"required"`
+	Status       string `json:"status"`
+}
+
+type FileConvertRequest struct {
+	Files        []FileConvert `json:"files" validate:"required"`
+	OutputPath   string        `json:"outputPath" validate:"required"`
+	DeleteSource bool          `json:"deleteSource"`
+	TaskID       string        `json:"taskID"`
+}

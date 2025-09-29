@@ -368,6 +368,7 @@ TaskIsExecuting: '任務正在運作'
 CustomAppstore: '自訂應用程式倉庫'
 TaskExec: '執行'
 TaskBatch: "批量操作"
+FileConvert: '文件格式轉換'
 
 # task - clam
 Clamscan: "掃描 {{ .name }}"

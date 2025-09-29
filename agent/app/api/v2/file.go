@@ -901,3 +901,44 @@ func (b *BaseApi) GetUsersAndGroups(c *gin.Context) {
 	}
 	helper.SuccessWithData(c, res)
 }
+
+// @Tags File
+// @Summary Convert file
+// @Accept json
+// @Param request body request.FileConvert true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /files/convert [post]
+func (b *BaseApi) ConvertFile(c *gin.Context) {
+	var req request.FileConvertRequest
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	fileService.Convert(req)
+	helper.SuccessWithData(c, nil)
+}
+
+// @Tags File
+// @Summary Convert file
+// @Accept json
+// @Param request body dto.PageInfo true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /files/convert/log [post]
+func (b *BaseApi) ConvertLog(c *gin.Context) {
+	var req dto.PageInfo
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	total, logs, err := fileService.ConvertLog(req)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, dto.PageResult{
+		Items: logs,
+		Total: total,
+	})
+}

@@ -369,6 +369,7 @@ TaskIsExecuting: '작업이 실행 중입니다'
 CustomAppstore: '사용자 정의 애플리케이션 웨어하우스'
 TaskExec: '실행'
 TaskBatch: "일괄 작업"
+FileConvert: '파일 형식 변환'
 
 # task - clam
 Clamscan: "{{ .name }} 스캔"

@@ -73,3 +73,11 @@ type DepthDirSizeRes struct {
 	Path string `json:"path"`
 	Size int64  `json:"size"`
 }
+
+type FileConvertLog struct {
+	Date    string `json:"date"`
+	Type    string `json:"type"`
+	Log     string `json:"log"`
+	Status  string `json:"status"`
+	Message string `json:"message"`
+}

@@ -369,6 +369,7 @@ TaskIsExecuting: 'Задача выполняется'
 CustomAppstore: 'Хранилище пользовательских приложений'
 TaskExec: 'Выполнить'
 TaskBatch: "Пакетная операция"
+FileConvert: 'Преобразование формата файла'
 
 # task - clam
 Clamscan: "Сканировать {{ .name }}"

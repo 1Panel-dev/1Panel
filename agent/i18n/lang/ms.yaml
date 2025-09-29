@@ -369,6 +369,7 @@ TaskIsExecuting: 'Tugas sedang berjalan'
 CustomAppstore: 'Gudang aplikasi tersuai'
 TaskExec: 'Laksanakan'
 TaskBatch: "Operasi Batch"
+FileConvert: 'Penukaran Format Fail'
 
 # task - clam
 Clamscan: "Imbas {{ .name }}"

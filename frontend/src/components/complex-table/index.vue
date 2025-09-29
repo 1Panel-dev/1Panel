@@ -223,6 +223,7 @@ function handleRowClick(row: any, column: any, event: any) {
         target.closest('button') ||
         target.closest('a') ||
         target.closest('.el-switch') ||
+        target.closest('.el-select') ||
         target.closest('.table-link') ||
         target.closest('.cursor-pointer')
     ) {
