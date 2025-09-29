@@ -95,6 +95,7 @@ type WebsiteDelete struct {
 	DeleteApp    bool `json:"deleteApp"`
 	DeleteBackup bool `json:"deleteBackup"`
 	ForceDelete  bool `json:"forceDelete"`
+	DeleteDB     bool `json:"deleteDB"`
 }
 
 type WebsiteOp struct {

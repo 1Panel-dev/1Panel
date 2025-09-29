@@ -2347,6 +2347,7 @@ const message = {
             'Force deletion will ignore errors during the deletion process and eventually delete metadata.',
         deleteAppHelper: 'Delete associated applications and application backups at the same time',
         deleteBackupHelper: 'Also delete website backups.',
+        deleteDatabaseHelper: 'Also delete the database associated with the website',
         deleteConfirmHelper: `The delete operation can't be undone. Enter <span style="color:red"> "{0}" </span> to confirm deletion.`,
         staticPath: 'The corresponding main directory is ',
         limit: 'Scheme',

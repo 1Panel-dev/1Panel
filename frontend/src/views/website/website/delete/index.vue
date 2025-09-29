@@ -14,11 +14,16 @@
                         {{ $t('website.deleteAppHelper') }}
                     </span>
                 </el-form-item>
-
                 <el-form-item>
                     <el-checkbox v-model="deleteReq.deleteBackup" :label="$t('website.deleteBackup')" />
                     <span class="input-help">
                         {{ $t('website.deleteBackupHelper') }}
+                    </span>
+                </el-form-item>
+                <el-form-item v-if="type === 'runtime'">
+                    <el-checkbox v-model="deleteReq.deleteDB" :label="$t('app.deleteDB')" />
+                    <span class="input-help">
+                        {{ $t('website.deleteDatabaseHelper') }}
                     </span>
                 </el-form-item>
                 <el-form-item v-if="subSites != ''">
@@ -51,15 +56,17 @@ import { ref } from 'vue';
 import { Website } from '@/api/interface/website';
 import { MsgSuccess } from '@/utils/message';
 
-const key = 1;
-const open = ref(false);
-const loading = ref(false);
-const deleteReq = ref({
+const initData = () => ({
     id: 0,
     deleteApp: false,
     deleteBackup: false,
     forceDelete: false,
+    deleteDB: false,
 });
+const key = 1;
+const open = ref(false);
+const loading = ref(false);
+const deleteReq = ref(initData());
 const type = ref('');
 const em = defineEmits(['close']);
 const deleteForm = ref<FormInstance>();
@@ -74,12 +81,7 @@ const handleClose = () => {
 };
 
 const acceptParams = async (website: Website.WebsiteDTO) => {
-    deleteReq.value = {
-        id: 0,
-        deleteApp: false,
-        deleteBackup: false,
-        forceDelete: false,
-    };
+    deleteReq.value = initData();
 
     subSites.value = '';
     if (website.childSites && website.childSites.length > 0) {

@@ -641,6 +641,36 @@ func (w WebsiteService) DeleteWebsite(req request.WebsiteDelete) error {
 			return buserr.WithName("ErrParentWebsite", strings.Join(names, ","))
 		}
 	}
+
+	if website.Type == constant.Runtime && req.DeleteDB && website.DbID != 0 {
+		switch website.DbType {
+		case constant.AppMysql, constant.AppMariaDB:
+			mysqlDB, _ := mysqlRepo.Get(repo.WithByID(website.DbID))
+			if mysqlDB.ID > 0 {
+				deleteReq := dto.MysqlDBDelete{
+					ID:          mysqlDB.ID,
+					Database:    mysqlDB.MysqlName,
+					ForceDelete: req.ForceDelete,
+				}
+				if err = NewIMysqlService().Delete(context.TODO(), deleteReq); err != nil && !req.ForceDelete {
+					return err
+				}
+			}
+		case constant.AppPostgresql, constant.AppPostgres:
+			pgDB, _ := postgresqlRepo.Get(repo.WithByID(website.DbID))
+			if pgDB.ID > 0 {
+				deleteReq := dto.PostgresqlDBDelete{
+					ID:          pgDB.ID,
+					ForceDelete: req.ForceDelete,
+					Database:    pgDB.PostgresqlName,
+				}
+				if err = NewIPostgresqlService().Delete(context.TODO(), deleteReq); err != nil && !req.ForceDelete {
+					return err
+				}
+			}
+		}
+	}
+
 	if err = delNginxConfig(website, req.ForceDelete); err != nil {
 		return err
 	}

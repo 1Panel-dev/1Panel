@@ -2376,6 +2376,7 @@ const message = {
             'Zorla silme, silme işlemi sırasında oluşan hataları yok sayar ve nihayetinde meta verileri siler.',
         deleteAppHelper: 'İlgili uygulamaları ve uygulama yedeklerini aynı anda sil',
         deleteBackupHelper: 'Web sitesi yedeklerini de sil.',
+        deleteDatabaseHelper: 'Ayrıca web sitesi ile ilişkili veritabanını da sil',
         deleteConfirmHelper:
             'Silme işlemi geri alınamaz. Silmeyi onaylamak için <span style="color:red"> "{0}" </span> yazın.',
         staticPath: 'Karşılık gelen ana dizin ',

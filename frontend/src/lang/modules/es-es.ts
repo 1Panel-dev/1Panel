@@ -2336,6 +2336,7 @@ const message = {
         forceDeleteHelper: 'La eliminación forzada ignorará errores y eliminará metadatos igualmente.',
         deleteAppHelper: 'Eliminar también aplicaciones y backups asociados',
         deleteBackupHelper: 'Eliminar también copias de seguridad del sitio',
+        deleteDatabaseHelper: 'También eliminar la base de datos asociada al sitio web',
         deleteConfirmHelper: `Esta acción es irreversible. Escribe <span style="color:red"> "{0}" </span> para confirmar.`,
         staticPath: 'El directorio principal correspondiente es ',
         limit: 'Esquema',

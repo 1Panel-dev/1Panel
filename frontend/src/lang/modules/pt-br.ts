@@ -2317,6 +2317,7 @@ const message = {
         forceDeleteHelper: 'A exclusão forçada ignorará erros durante o processo de exclusão e excluirá os metadados.',
         deleteAppHelper: 'Excluir aplicativos associados e backups de aplicativos ao mesmo tempo',
         deleteBackupHelper: 'Excluir também backups do site.',
+        deleteDatabaseHelper: 'Também excluir o banco de dados associado ao site',
         deleteConfirmHelper: `A operação de exclusão não pode ser desfeita. Digite <span style="color:red"> "{0}" </span> para confirmar a exclusão.`,
         staticPath: 'O diretório principal correspondente é ',
         limit: 'Plano',

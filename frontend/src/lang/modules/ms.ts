@@ -2316,6 +2316,7 @@ const message = {
         forceDeleteHelper: 'Padam paksa akan mengabaikan ralat semasa proses pemadaman dan akhirnya memadam metadata.',
         deleteAppHelper: 'Padam aplikasi yang berkaitan dan sandaran aplikasi pada masa yang sama',
         deleteBackupHelper: 'Juga padamkan sandaran laman web.',
+        deleteDatabaseHelper: 'Juga hapuskan pangkalan data yang berkaitan dengan laman web',
         deleteConfirmHelper: `Operasi pemadaman tidak boleh dibatalkan. Masukkan <span style="color:red"> "{0}" </span> untuk mengesahkan pemadaman.`,
         staticPath: 'Direktori utama yang sepadan ialah ',
         limit: 'Skim',

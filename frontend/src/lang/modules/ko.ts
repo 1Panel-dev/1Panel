@@ -2223,6 +2223,7 @@ const message = {
         forceDeleteHelper: '강제 삭제는 삭제 과정에서 발생하는 오류를 무시하고 최종적으로 메타데이터를 삭제합니다.',
         deleteAppHelper: '관련 애플리케이션 및 애플리케이션 백업을 동시에 삭제합니다.',
         deleteBackupHelper: '웹사이트 백업도 삭제합니다.',
+        deleteDatabaseHelper: '웹사이트와 연결된 데이터베이스도 삭제합니다',
         deleteConfirmHelper:
             '삭제 작업은 되돌릴 수 없습니다. 확인하려면 <span style=\'color:red\'>"{0}"</span>을(를) 입력하세요.',
         staticPath: '해당 주요 디렉터리는',

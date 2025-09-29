@@ -2178,6 +2178,7 @@ const message = {
         forceDeleteHelper: '强制删除，会忽略删除过程中产生的错误并最终删除元数据',
         deleteAppHelper: '同时删除关联应用、数据库以及应用备份',
         deleteBackupHelper: '同时删除网站备份',
+        deleteDatabaseHelper: '同时删除网站关联数据库',
         deleteConfirmHelper: '删除操作无法回滚，请输入 <span style="color:red"> "{0}" </span> 删除',
         staticPath: '对应主目录:',
         limit: '限制方案',

@@ -47,7 +47,7 @@
                     </el-descriptions>
                 </el-tab-pane>
                 <el-tab-pane :label="$t('process.openFiles')" name="openFiles">
-                    <el-table :data="data.openFiles" border style="width: 100%">
+                    <el-table max-height="800px" :data="data.openFiles" border class="w-full">
                         <el-table-column prop="path" :label="$t('menu.files')" />
                         <el-table-column prop="fd" label="fd" width="100px" />
                     </el-table>
@@ -61,7 +61,7 @@
                     ></CodemirrorPro>
                 </el-tab-pane>
                 <el-tab-pane :label="$t('process.net')" name="net">
-                    <el-table :data="data.connects" border style="width: 100%">
+                    <el-table max-height="800px" :data="data.connects" border class="w-full">
                         <el-table-column prop="localaddr" :label="$t('process.laddr')">
                             <template #default="{ row }">
                                 <span>{{ row.localaddr.ip }}</span>
@@ -90,6 +90,25 @@ const open = ref(false);
 const data = ref({
     name: '',
     envs: [] as string[],
+    status: '',
+    PID: 0,
+    PPID: 0,
+    numThreads: 0,
+    numConnections: 0,
+    diskRead: '',
+    diskWrite: '',
+    username: '',
+    startTime: '',
+    cmdLine: '',
+    rss: '',
+    swap: '',
+    vms: '',
+    hwm: '',
+    data: '',
+    stack: '',
+    locked: '',
+    openFiles: [],
+    connects: [],
 });
 const resourceName = ref('');
 const activeName = ref('basic');

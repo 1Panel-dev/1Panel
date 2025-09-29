@@ -2187,6 +2187,7 @@ const message = {
         forceDeleteHelper: '強制刪除，會忽略刪除過程中產生的錯誤並最終刪除中繼資料',
         deleteAppHelper: '同時刪除關聯應用、資料庫以及應用備份',
         deleteBackupHelper: '同時刪除網站備份',
+        deleteDatabaseHelper: '同時刪除網站關聯資料庫',
         deleteConfirmHelper: '刪除操作無法回滾，請輸入 <span style="color:red"> "{0}" </span> 刪除',
         staticPath: '對應主目錄:',
         limit: '限制方案',

@@ -2262,6 +2262,7 @@ const message = {
         forceDeleteHelper: 'フォース削除は、削除プロセス中のエラーを無視し、最終的にメタデータを削除します。',
         deleteAppHelper: '関連するアプリケーションとアプリケーションのバックアップを同時に削除する',
         deleteBackupHelper: 'また、Webサイトのバックアップを削除します。',
+        deleteDatabaseHelper: 'ウェブサイトに関連付けられたデータベースも削除します',
         deleteConfirmHelper:
             '削除操作を元に戻すことはできません。<span style = "color:red"> "{0}" </span>を入力して、削除を確認します。',
         staticPath: '対応するメインディレクトリはです',
