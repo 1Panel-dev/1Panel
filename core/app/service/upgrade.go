@@ -70,6 +70,9 @@ func (u *UpgradeService) SearchUpgrade() (*dto.UpgradeInfo, error) {
 	if strings.Contains(itemVersion, "beta") {
 		mode = "beta"
 	}
+	if strings.HasPrefix(upgrade.TestVersion, upgrade.LatestVersion+"-beta") {
+		upgrade.TestVersion = ""
+	}
 	notes, err := u.loadReleaseNotes(fmt.Sprintf("%s/%s/%s/release/1panel-%s-release-notes", global.CONF.RemoteURL.RepoUrl, mode, itemVersion, itemVersion))
 	if err != nil {
 		return nil, fmt.Errorf("load releases-notes of version %s failed, err: %v", itemVersion, err)
@@ -115,6 +118,7 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 	fileName := fmt.Sprintf("1panel-%s-%s-%s.tar.gz", req.Version, "linux", itemArch)
 	_ = settingRepo.Update("SystemStatus", "Upgrading")
 	go func() {
+		oldLang := common.LoadParams("LANGUAGE")
 		if err := files.DownloadFileWithProxy(downloadPath+"/"+fileName, downloadDir+"/"+fileName); err != nil {
 			global.LOG.Errorf("download service file failed, err: %v", err)
 			_ = settingRepo.Update("SystemStatus", "Free")
@@ -161,6 +165,11 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 			return
 		}
 		if _, err := cmd.RunDefaultWithStdoutBashCf("sed -i -e 's#BASE_DIR=.*#BASE_DIR=%s#g' /usr/local/bin/1pctl", global.CONF.Base.InstallDir); err != nil {
+			global.LOG.Errorf("upgrade basedir in 1pctl failed, err: %v", err)
+			u.handleRollback(originalDir, 2)
+			return
+		}
+		if _, err := cmd.RunDefaultWithStdoutBashCf("sed -i -e 's#LANGUAGE=.*#LANGUAGE=%s#g' /usr/local/bin/1pctl", oldLang); err != nil {
 			global.LOG.Errorf("upgrade basedir in 1pctl failed, err: %v", err)
 			u.handleRollback(originalDir, 2)
 			return
