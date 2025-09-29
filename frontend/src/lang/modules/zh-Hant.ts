@@ -504,7 +504,6 @@ const message = {
         skipVerify: '忽略校驗證書可用性檢測',
 
         formatHelper: '目前資料庫字元集為 {0}，字元集不一致可能導致復原失敗',
-        selectFile: '選擇文件',
         dropHelper: '將上傳文件拖曳到此處，或者',
         clickHelper: '點擊上傳',
         supportUpType:
@@ -3205,7 +3204,6 @@ const message = {
             logoWithTextHelper: '將會顯示在選單展開時管理頁面左上方 (建議圖片大小為: 185px*55px)',
             favicon: '網站圖示',
             faviconHelper: '網站圖示 (建議圖片大小為: 16px*16px)',
-            reUpload: '選擇文件',
             setDefault: '復原預設',
             setHelper: '即將儲存目前介面設定內容，是否繼續？',
             setDefaultHelper: '即將復原所有介面設定到初始狀態，是否繼續？',

@@ -157,3 +157,9 @@ type WebsiteCAObtain struct {
 type WebsiteCARenew struct {
 	SSLID uint `json:"SSLID" validate:"required"`
 }
+
+type WebsiteSSLFileUpload struct {
+	Type        string `json:"type"`
+	Description string `json:"description"`
+	SSLID       uint64 `json:"sslID"`
+}

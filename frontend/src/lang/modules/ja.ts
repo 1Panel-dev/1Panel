@@ -510,7 +510,6 @@ const message = {
         skipVerify: '証明書の有効性チェックを無視します',
 
         formatHelper: '現在のデータベース文字セットは{0}です。文字セットの矛盾は回復の故障を引き起こす可能性があります',
-        selectFile: '[ファイル]を選択します',
         dropHelper: 'ここでアップロードされたファイルをドラッグアンドドロップするか、',
         clickHelper: 'クリックしてアップロードします',
         supportUpType:
@@ -3326,7 +3325,6 @@ const message = {
                 'メニューが展開されている場合、管理ページの左上隅に表示されます（推奨画像サイズ：185px*55px）',
             favicon: 'ウェブサイトアイコン',
             faviconHelper: 'ウェブサイトアイコン（推奨画像サイズ：16px*16px）',
-            reUpload: 'ファイルを選択',
             setDefault: 'デフォルトに戻す',
             setHelper: '現在の設定が保存されます。続けますか？',
             setDefaultHelper: 'すべてのパネル設定がデフォルトに戻されます。続けますか？',

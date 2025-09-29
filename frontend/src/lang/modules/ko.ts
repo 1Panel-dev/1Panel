@@ -508,7 +508,6 @@ const message = {
         skipVerify: '인증서 유효성 검사 무시',
 
         formatHelper: '현재 데이터베이스 문자셋은 {0} 입니다. 문자셋 불일치로 인해 복구에 실패할 수 있습니다.',
-        selectFile: '파일 선택',
         dropHelper: '여기에 업로드한 파일을 드래그 앤 드롭하거나',
         clickHelper: '클릭하여 업로드',
         supportUpType:
@@ -3269,7 +3268,6 @@ const message = {
                 '메뉴가 확장되었을 때 관리 페이지의 왼쪽 상단에 표시됩니다 (권장 이미지 크기: 185px*55px)',
             favicon: '웹사이트 아이콘',
             faviconHelper: '웹사이트 아이콘 (권장 이미지 크기: 16px*16px)',
-            reUpload: '파일 선택',
             setDefault: '기본값 복원',
             setHelper: '현재 설정이 저장됩니다. 계속하시겠습니까?',
             setDefaultHelper: '모든 패널 설정이 기본값으로 복원됩니다. 계속하시겠습니까?',

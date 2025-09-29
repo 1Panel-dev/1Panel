@@ -522,7 +522,6 @@ const message = {
 
         formatHelper:
             'The current database character set is {0}, the character set inconsistency may cause recovery failure',
-        selectFile: 'Select file',
         dropHelper: 'You can drag and drop the uploaded file here or',
         clickHelper: 'click to upload',
         supportUpType:
@@ -3440,7 +3439,6 @@ const message = {
                 'Will be displayed in the upper left corner of the management page when the menu is expanded (recommended image size: 185px*55px)',
             favicon: 'Website Icon',
             faviconHelper: 'Website icon (recommended image size: 16px*16px)',
-            reUpload: 'Choose File',
             setDefault: 'Restore Default',
             setHelper: 'The current settings will be saved. Do you want to continue?',
             setDefaultHelper: 'All panel settings will be restored to default. Do you want to continue?',

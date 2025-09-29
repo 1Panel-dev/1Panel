@@ -2,6 +2,8 @@ package v2
 
 import (
 	"github.com/1Panel-dev/1Panel/agent/app/model"
+	"io"
+	"mime/multipart"
 	"net/http"
 	"net/url"
 	"reflect"
@@ -215,6 +217,79 @@ func (b *BaseApi) UploadWebsiteSSL(c *gin.Context) {
 		return
 	}
 	helper.Success(c)
+}
+
+// @Tags Website SSL
+// @Summary Upload SSL file
+// @Accept multipart/form-data
+// @Param type formData string true "type"
+// @Param description formData string false "description"
+// @Param sslID formData string false "sslID"
+// @Param privateKeyFile formData file true "privateKeyFile"
+// @Param certificateFile formData file true "certificateFile"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /websites/ssl/upload/file [post]
+// @x-panel-log {"bodyKeys":["type"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"上传 ssl 文件 [type]","formatEN":"Upload ssl file [type]"}
+func (b *BaseApi) UploadSSLFile(c *gin.Context) {
+	var req request.WebsiteSSLFileUpload
+
+	req.Type = c.PostForm("type")
+	req.Description = c.PostForm("description")
+	sslID := c.PostForm("sslID")
+	if sslID != "" {
+		req.SSLID, _ = strconv.ParseUint(sslID, 10, 64)
+	}
+
+	privateKeyFile, err := c.FormFile("privateKeyFile")
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+
+	certificateFile, err := c.FormFile("certificateFile")
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+
+	privateKeyContent, err := readUploadedFile(privateKeyFile)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+
+	certificateContent, err := readUploadedFile(certificateFile)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+
+	uploadReq := request.WebsiteSSLUpload{
+		Type:        "paste",
+		PrivateKey:  string(privateKeyContent),
+		Certificate: string(certificateContent),
+		Description: req.Description,
+		SSLID:       uint(req.SSLID),
+	}
+
+	if err := websiteSSLService.Upload(uploadReq); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+
+	helper.SuccessWithData(c, nil)
+}
+
+func readUploadedFile(fileHeader *multipart.FileHeader) ([]byte, error) {
+	file, err := fileHeader.Open()
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	return io.ReadAll(file)
 }
 
 // @Tags Website SSL

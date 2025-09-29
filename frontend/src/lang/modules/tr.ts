@@ -528,7 +528,6 @@ const message = {
         skipVerify: 'Sertifika geçerlilik kontrolünü yoksay',
         formatHelper:
             'Mevcut veritabanı karakter seti {0}, karakter seti tutarsızlığı kurtarma işleminin başarısız olmasına neden olabilir',
-        selectFile: 'Dosya seç',
         dropHelper: 'Yüklenen dosyayı buraya sürükleyip bırakabilir veya',
         clickHelper: 'yüklemek için tıklayın',
         supportUpType:
@@ -3477,7 +3476,6 @@ const message = {
                 'Menü genişletildiğinde yönetim sayfasının sol üst köşesinde gösterilecektir (önerilen görüntü boyutu: 185px*55px)',
             favicon: 'Web Sitesi Simgesi',
             faviconHelper: 'Web sitesi simgesi (önerilen görüntü boyutu: 16px*16px)',
-            reUpload: 'Dosya Seç',
             setDefault: 'Varsayılana Geri Yükle',
             setHelper: 'Mevcut ayarlar kaydedilecek. Devam etmek istiyor musunuz?',
             setDefaultHelper: 'Tüm panel ayarları varsayılana geri yüklenecek. Devam etmek istiyor musunuz?',

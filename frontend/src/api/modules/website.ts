@@ -242,6 +242,10 @@ export const uploadSSL = (req: Website.SSLUpload) => {
     return http.post<any>(`/websites/ssl/upload`, req);
 };
 
+export const uploadSSLFile = (params: FormData) => {
+    return http.upload<File.File>(`/websites/ssl/upload/file`, params, {});
+};
+
 export const searchCAs = (req: ReqPage) => {
     return http.post<ResPage<Website.CA>>(`/websites/ca/search`, req);
 };

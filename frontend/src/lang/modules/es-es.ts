@@ -526,7 +526,6 @@ const message = {
         skipVerify: 'Omitir la verificación de validez del certificado',
         formatHelper:
             'El conjunto de caracteres actual de la base de datos es {0}, la inconsistencia de conjuntos puede causar errores al recuperar',
-        selectFile: 'Seleccionar archivo',
         dropHelper: 'Puede arrastrar y soltar el archivo aquí o',
         clickHelper: 'hacer clic para subir',
         supportUpType:
@@ -3396,7 +3395,6 @@ const message = {
                 'Se mostrará arriba a la izquierda cuando el menú esté expandido (tamaño recomendado: 185px*55px)',
             favicon: 'Icono del sitio',
             faviconHelper: 'Icono del sitio (tamaño recomendado: 16px*16px)',
-            reUpload: 'Elegir archivo',
             setDefault: 'Restaurar por defecto',
             setHelper: 'Se guardará la configuración actual. ¿Continuar?',
             setDefaultHelper: 'Todas las configuraciones se restaurarán a valores por defecto. ¿Continuar?',

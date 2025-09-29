@@ -502,7 +502,6 @@ const message = {
         skipVerify: '忽略校验证书可用性检测',
 
         formatHelper: '当前数据库字符集为 {0}，字符集不一致可能导致恢复失败',
-        selectFile: '选择文件',
         dropHelper: '将上传文件拖拽到此处，或者',
         clickHelper: '点击上传',
         supportUpType:
@@ -3177,7 +3176,6 @@ const message = {
             logoWithTextHelper: '将会显示在菜单展开时管理页面左上方 (建议图片大小为: 185px*55px)',
             favicon: '网站图标',
             faviconHelper: '网站图标 (建议图片大小为: 16px*16px)',
-            reUpload: '选择文件',
             setHelper: '即将保存当前界面设置内容，是否继续？',
             setDefaultHelper: '即将恢复所有界面设置到初始状态，是否继续？',
             logoGroup: 'Logo',

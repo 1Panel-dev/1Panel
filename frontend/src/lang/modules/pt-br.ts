@@ -520,7 +520,6 @@ const message = {
 
         formatHelper:
             'O conjunto de caracteres atual do banco de dados é {0}, a inconsistência no conjunto de caracteres pode causar falha na recuperação',
-        selectFile: 'Selecionar arquivo',
         dropHelper: 'Você pode arrastar e soltar o arquivo carregado aqui ou',
         clickHelper: 'clicar para fazer upload',
         supportUpType:
@@ -3407,7 +3406,6 @@ const message = {
                 'Será exibido no canto superior esquerdo da página de gerenciamento quando o menu estiver expandido (tamanho recomendado da imagem: 185px*55px)',
             favicon: 'Ícone do Site',
             faviconHelper: 'Ícone do site (tamanho recomendado da imagem: 16px*16px)',
-            reUpload: 'Selecionar Arquivo',
             setDefault: 'Restaurar Padrão',
             setHelper: 'As configurações atuais serão salvas. Deseja continuar?',
             setDefaultHelper: 'Todas as configurações do painel serão restauradas para o padrão. Deseja continuar?',

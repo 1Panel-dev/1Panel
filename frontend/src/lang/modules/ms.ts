@@ -522,7 +522,6 @@ const message = {
 
         formatHelper:
             'Set aksara pangkalan data semasa adalah {0}, ketidakkonsistenan set aksara mungkin menyebabkan kegagalan pemulihan.',
-        selectFile: 'Pilih fail',
         dropHelper: 'Anda boleh seret dan lepaskan fail yang ingin dimuat naik di sini atau',
         clickHelper: 'klik untuk memuat naik',
         supportUpType:
@@ -3390,7 +3389,6 @@ const message = {
                 'Akan dipaparkan di sudut kiri atas halaman pengurusan apabila menu diperluaskan (saiz imej yang disarankan: 185px*55px)',
             favicon: 'Ikon Laman Web',
             faviconHelper: 'Ikon laman web (saiz imej yang disarankan: 16px*16px)',
-            reUpload: 'Pilih Fail',
             setDefault: 'Pulihkan Tetapan Asal',
             setHelper: 'Tetapan semasa akan disimpan. Adakah anda ingin meneruskan?',
             setDefaultHelper: 'Semua tetapan panel akan dikembalikan ke asal. Adakah anda ingin meneruskan?',
