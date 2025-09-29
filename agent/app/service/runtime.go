@@ -381,6 +381,9 @@ func (r *RuntimeService) Get(id uint) (*response.RuntimeDTO, error) {
 							appParam.Value = []string{}
 						} else {
 							appParam.Value = strings.Split(v, ",")
+							if strSlice, ok := appParam.Value.([]string); ok && len(strSlice) > 0 && strSlice[0] == "" {
+								appParam.Value = strSlice[1:]
+							}
 						}
 					} else {
 						for _, fv := range form.Values {

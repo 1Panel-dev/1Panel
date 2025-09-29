@@ -95,7 +95,7 @@
                         :rules="rules.params.CONTAINER_PACKAGE_URL"
                         v-if="runtime.params['PHP_VERSION'] != '5.6.40' && formFields['CONTAINER_PACKAGE_URL']"
                     >
-                        <el-select v-model="runtime.source" filterable default-first-option>
+                        <el-select v-model="runtime.source" filterable default-first-option allow-create>
                             <el-option
                                 v-for="source in phpSources"
                                 :key="source.label"
@@ -391,32 +391,26 @@ const getApp = (appkey: string, mode: string) => {
 
 const submit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
-    await formEl.validate((valid) => {
+    await formEl.validate(async (valid) => {
         if (!valid) {
             return;
         }
-        if (mode.value == 'create') {
-            loading.value = true;
-            CreateRuntime(runtime)
-                .then((res) => {
-                    MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
-                    handleClose();
-                    em('submit', res.data.id);
-                })
-                .finally(() => {
-                    loading.value = false;
-                });
-        } else {
-            loading.value = true;
-            UpdateRuntime(runtime)
-                .then(() => {
-                    MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
-                    handleClose();
-                    em('submit', runtime.id);
-                })
-                .finally(() => {
-                    loading.value = false;
-                });
+        try {
+            let res;
+            if (mode.value == 'create') {
+                loading.value = true;
+                res = await CreateRuntime(runtime);
+                MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
+            } else {
+                loading.value = true;
+                res = await UpdateRuntime(runtime);
+                MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
+            }
+            handleClose();
+            em('submit', res.data.id);
+        } catch (error) {
+        } finally {
+            loading.value = false;
         }
     });
 };
@@ -447,7 +441,9 @@ const getRuntime = async (id: number) => {
         }
         formFields.value = forms;
         if (data.params['PHP_EXTENSIONS'] != '') {
-            runtime.params['PHP_EXTENSIONS'] = runtime.params['PHP_EXTENSIONS'].split(',');
+            runtime.params['PHP_EXTENSIONS'] = runtime.params['PHP_EXTENSIONS']
+                .split(',')
+                .filter((item) => item !== '');
         }
         initParam.value = true;
     } catch (error) {}
