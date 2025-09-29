@@ -1025,6 +1025,8 @@ const message = {
         record: 'Registros',
         viewRecords: 'Visualizar registros',
         shell: 'Shell',
+        stop: 'Parada Manual',
+        stopHelper: 'Esta operação forçará a parada da execução da tarefa atual. Continuar?',
         log: 'Logs de backup',
         logHelper: 'Backup do log do sistema',
         ogHelper1: '1. Log do sistema 1Panel',
@@ -1059,7 +1061,8 @@ const message = {
         allOptionHelper:
             'O plano de tarefa atual é fazer backup de todos os [{0}]. O download direto não é suportado no momento. Você pode verificar a lista de backups no menu [{0}].',
         exclusionRules: 'Regras de exclusão',
-        exclusionRulesHelper: 'As regras de exclusão se aplicam a todas as operações de compressão deste backup.',
+        exclusionRulesHelper:
+            'Selecione ou insira regras de exclusão, pressione Enter após cada conjunto para continuar. As regras de exclusão se aplicarão a todas as operações de compactação neste backup',
         default_download_path: 'Link de download padrão',
         saveLocal: 'Manter backups locais (o mesmo número de cópias na nuvem)',
         url: 'Endereço URL',
@@ -2852,7 +2855,8 @@ const message = {
         nodeOperatorHelper:
             'Deseja {0} o módulo {1}? Esta operação pode causar instabilidade no ambiente, confirme antes de prosseguir.',
         customScript: 'Comando de inicialização personalizado',
-        customScriptHelper: 'Forneça um comando completo de inicialização. Por exemplo, "npm run start".',
+        customScriptHelper:
+            'Por favor, insira o comando de inicialização completo, por exemplo: npm run start. Para comandos de inicialização do PM2, substitua por pm2-runtime, caso contrário irá falhar ao iniciar.',
         portError: `Evite repetir a mesma porta.`,
         systemRestartHelper:
             'Descrição do status: Interrupção - falha ao adquirir status devido à reinicialização do sistema.',

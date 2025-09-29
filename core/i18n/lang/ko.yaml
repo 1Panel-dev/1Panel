@@ -21,6 +21,7 @@ ErrHttpReqNotFound: "요청한 리소스를 찾을 수 없습니다 {{ .err }}"
 ErrHttpReqFailed: "요청 실패 {{ .err }}"
 ErrHttpReqTimeOut: "요청 시간이 초과되었습니다 {{ .err }}"
 ErrCreateHttpClient: "요청 생성 실패 {{ .err }}"
+ErrProxySetting: "프록시 서버 정보를 사용할 수 없음 {{ .err }}, 확인 후 다시 시도하세요!"
 
 # common
 ErrDemoEnvironment: "데모 서버에서는 이 작업이 금지되어 있습니다!"

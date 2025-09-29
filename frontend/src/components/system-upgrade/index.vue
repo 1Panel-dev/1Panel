@@ -87,14 +87,14 @@ const search = async () => {
 };
 
 const getVersionLog = () => {
-    if (isOffLine) {
+    if (isOffLine.value) {
         return;
     }
     releasesRef.value.acceptParams();
 };
 
 const toLxware = () => {
-    if (isOffLine) {
+    if (isOffLine.value) {
         to1Panel();
         return;
     }

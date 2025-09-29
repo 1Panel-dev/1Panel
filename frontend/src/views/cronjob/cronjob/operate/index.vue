@@ -624,8 +624,13 @@
                             <el-row :gutter="20">
                                 <LayoutCol :span="20" v-if="hasExclusionRules()">
                                     <el-form-item :label="$t('cronjob.exclusionRules')" prop="exclusionRules">
-                                        <IgnoreFile class="w-full" v-model:files="form.ignoreFiles"></IgnoreFile>
-                                        <span class="input-help">{{ $t('cronjob.exclusionRulesHelper') }}</span>
+                                        <InputTag
+                                            class="w-full"
+                                            v-model:tags="form.ignoreFiles"
+                                            :withFile="true"
+                                            :baseDir="loadItemDir()"
+                                            :egHelp="$t('cronjob.exclusionRulesHelper')"
+                                        />
                                     </el-form-item>
                                 </LayoutCol>
                             </el-row>
@@ -757,7 +762,7 @@ import { ElForm } from 'element-plus';
 import { Cronjob } from '@/api/interface/cronjob';
 import { addCronjob, editCronjob, loadCronjobInfo, loadNextHandle, loadScriptOptions } from '@/api/modules/cronjob';
 import CodemirrorPro from '@/components/codemirror-pro/index.vue';
-import IgnoreFile from '@/components/file-batch/index.vue';
+import InputTag from '@/components/input-tag/index.vue';
 import LayoutCol from '@/components/layout-col/form.vue';
 import { listDbItems } from '@/api/modules/database';
 import { getWebsiteOptions } from '@/api/modules/website';
@@ -782,6 +787,7 @@ import LicenseImport from '@/components/license-import/index.vue';
 import { splitTimeFromSecond, transferTimeToSecond } from '@/utils/util';
 import { getGroupList } from '@/api/modules/group';
 import { routerToName, routerToPath } from '@/utils/router';
+import { loadBaseDir } from '@/api/modules/setting';
 const router = useRouter();
 
 const globalStore = GlobalStore();
@@ -792,6 +798,8 @@ const fileRef = ref();
 const { isProductPro } = storeToRefs(globalStore);
 const loading = ref();
 const nextTimes = ref([]);
+
+const baseDir = ref();
 
 const isCreate = ref();
 const defaultGroupID = ref();
@@ -869,13 +877,13 @@ const search = async () => {
                 form.specs = res.data.specs || [];
                 if (!form.specCustom && form.spec) {
                     let objs = [];
-                    for (const item of res.data.spec.split(',')) {
+                    for (const item of res.data.spec.split('&&')) {
                         objs.push(transSpecToObj(item));
                     }
                     form.specObjs = objs || [];
                 }
                 if (form.specCustom && form.spec) {
-                    form.specs = form.spec.split(',') || [];
+                    form.specs = form.spec.split('&&') || [];
                 }
 
                 form.script = res.data.script;
@@ -1162,6 +1170,18 @@ const loadScriptDir = async (path: string) => {
     form.script = path;
 };
 
+const loadItemDir = () => {
+    if (form.type === 'directory' && form.isDir) {
+        return form.sourceDir;
+    }
+    return baseDir.value;
+};
+
+const loadInstallDir = async () => {
+    const pathRes = await loadBaseDir();
+    baseDir.value = pathRes.data;
+};
+
 const loadGroups = async () => {
     const res = await getGroupList('cronjob');
     groupOptions.value = res.data || [];
@@ -1417,7 +1437,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         form.sourceDir = files.join(',');
     }
     form.sourceAccountIDs = form.sourceAccountItems.join(',');
-    form.spec = specs.join(',');
+    form.spec = specs.join('&&');
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
@@ -1468,6 +1488,7 @@ onMounted(() => {
     }
     loadGroups();
     search();
+    loadInstallDir();
 });
 </script>
 <style scoped lang="scss">

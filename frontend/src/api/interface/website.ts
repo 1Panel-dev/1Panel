@@ -227,6 +227,8 @@ export namespace Website {
         shell: string;
         pushNode: boolean;
         nodes: string;
+        privateKeyPath: string;
+        certPath: string;
     }
 
     export interface SSLDTO extends SSL {

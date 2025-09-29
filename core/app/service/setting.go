@@ -2,6 +2,7 @@ package service
 
 import (
 	"bytes"
+	"context"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/tls"
@@ -9,8 +10,10 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
+	"io"
 	"net"
 	"net/http"
+	"net/url"
 	"os"
 	"path"
 	"strconv"
@@ -30,6 +33,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/utils/req_helper/proxy_local"
 	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 	"github.com/gin-gonic/gin"
+	"golang.org/x/net/proxy"
 )
 
 type SettingService struct{}
@@ -38,7 +42,6 @@ type ISettingService interface {
 	GetSettingInfo() (*dto.SettingInfo, error)
 	LoadInterfaceAddr() ([]string, error)
 	Update(key, value string) error
-	UpdateProxy(req dto.ProxyUpdate) error
 	UpdatePassword(c *gin.Context, old, new string) error
 	UpdatePort(port uint) error
 	UpdateBindInfo(req dto.BindInfo) error
@@ -47,6 +50,8 @@ type ISettingService interface {
 	HandlePasswordExpired(c *gin.Context, old, new string) error
 	GenerateApiKey() (string, error)
 	UpdateApiConfig(req dto.ApiInterfaceConfig) error
+
+	UpdateProxy(req dto.ProxyUpdate) error
 
 	GetTerminalInfo() (*dto.TerminalInfo, error)
 	UpdateTerminal(req dto.TerminalInfo) error
@@ -192,6 +197,10 @@ func (u *SettingService) UpdateProxy(req dto.ProxyUpdate) error {
 	proxyUrl := req.ProxyUrl
 	if req.ProxyType == "https" || req.ProxyType == "http" {
 		proxyUrl = req.ProxyType + "://" + req.ProxyUrl
+		req.ProxyUrl = proxyUrl
+	}
+	if err := checkProxy(req); err != nil {
+		return err
 	}
 	if err := settingRepo.Update("ProxyUrl", proxyUrl); err != nil {
 		return err
@@ -690,4 +699,62 @@ func loadDockerProxy(req dto.ProxyUpdate) string {
 	}
 
 	return fmt.Sprintf("%s://%s%s:%s", req.ProxyType, account, req.ProxyUrl, req.ProxyPort)
+}
+
+func checkProxy(req dto.ProxyUpdate) error {
+	var transport http.Transport
+	proxyItem := net.JoinHostPort(req.ProxyUrl, req.ProxyPort)
+	switch req.ProxyType {
+	case "http", "https":
+		proxyURL, err := url.Parse(proxyItem)
+		if err != nil {
+			return buserr.WithErr("ErrProxySetting", fmt.Errorf("parse url %s failed, err: %v", proxyItem, err))
+		}
+		if len(req.ProxyUser) != 0 {
+			proxyURL.User = url.UserPassword(req.ProxyUser, req.ProxyPasswd)
+		}
+		transport = http.Transport{Proxy: http.ProxyURL(proxyURL)}
+	case "socks5":
+		var auth *proxy.Auth
+		if len(req.ProxyUser) == 0 {
+			auth = nil
+		} else {
+			auth = &proxy.Auth{User: req.ProxyUser, Password: req.ProxyPasswd}
+		}
+		dialer, err := proxy.SOCKS5("tcp", proxyItem, auth, proxy.Direct)
+		if err != nil {
+			return buserr.WithErr("ErrProxySetting", fmt.Errorf("new socks5 proxy failed, err: %v", err))
+		}
+		dialContext := func(ctx context.Context, network, addr string) (net.Conn, error) {
+			return dialer.Dial(network, addr)
+		}
+		transport = http.Transport{DialContext: dialContext}
+	case "", "close":
+	default:
+		return buserr.WithDetail("ErrNotSupportType", req.ProxyType, nil)
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			global.LOG.Errorf("handle request failed, error message: %v", r)
+			return
+		}
+	}()
+
+	client := http.Client{Timeout: 3 * time.Second, Transport: &transport}
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	request, err := http.NewRequestWithContext(ctx, http.MethodGet, "https://1panel.cn/", nil)
+	if err != nil {
+		return buserr.WithErr("ErrProxySetting", err)
+	}
+	request.Header.Set("Content-Type", "application/json")
+	resp, err := client.Do(request)
+	if err != nil {
+		return buserr.WithErr("ErrProxySetting", err)
+	}
+	if _, err := io.ReadAll(resp.Body); err != nil {
+		return buserr.WithErr("ErrProxySetting", err)
+	}
+	defer resp.Body.Close()
+	return nil
 }

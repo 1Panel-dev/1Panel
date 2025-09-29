@@ -150,7 +150,7 @@
                         <div :class="mobile ? 'flx-wrap' : 'flex justify-between'">
                             <div>
                                 <span class="title">{{ $t('monitor.network') }}{{ $t('commons.colon') }}</span>
-                                <el-dropdown>
+                                <el-dropdown max-height="300px">
                                     <span class="networkOption">
                                         {{ networkChoose === 'all' ? $t('commons.table.all') : networkChoose }}
                                     </span>

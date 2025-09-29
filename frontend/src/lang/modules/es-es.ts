@@ -1033,6 +1033,8 @@ const message = {
         record: 'Registros',
         viewRecords: 'Ver registros',
         shell: 'Shell',
+        stop: 'Detención Manual',
+        stopHelper: 'Esta operación forzará la detención de la ejecución de la tarea actual. ¿Continuar?',
         log: 'Registros de respaldo',
         logHelper: 'Registro del sistema de copias de seguridad',
         ogHelper1: '1. Registro del sistema de 1Panel',
@@ -1069,7 +1071,7 @@ const message = {
         allOptionHelper: `El plan actual es respaldar todos los [{0}]. La descarga directa no está soportada por ahora. Puede consultar la lista de respaldos en el menú [{0}].`,
         exclusionRules: 'Reglas de exclusión',
         exclusionRulesHelper:
-            'Las reglas de exclusión se aplicarán a todas las operaciones de compresión de este respaldo.',
+            'Seleccione o ingrese reglas de exclusión, presione Enter después de cada conjunto para continuar. Las reglas de exclusión se aplicarán a todas las operaciones de compresión en esta copia de seguridad',
         default_download_path: 'Enlace de descarga predeterminado',
         saveLocal: 'Retener respaldos locales (igual al número de copias en la nube)',
         url: 'Dirección URL',
@@ -2836,7 +2838,8 @@ const message = {
         nodeOperatorHelper:
             '¿Quieres {0} el módulo {1}? La operación puede causar fallos en el entorno de ejecución, confirma antes de continuar',
         customScript: 'Comando de inicio personalizado',
-        customScriptHelper: 'Proporciona un comando de inicio completo. Ejemplo: "npm run start".',
+        customScriptHelper:
+            'Por favor, ingresa el comando de inicio completo, por ejemplo: npm run start. Para comandos de inicio de PM2, por favor reemplaza con pm2-runtime, de lo contrario fallará al iniciar.',
         portError: 'No repitas el mismo puerto.',
         systemRestartHelper:
             'Descripción de estado: Interrupción - fallo al obtener estado debido a reinicio del sistema',

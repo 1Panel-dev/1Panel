@@ -98,6 +98,11 @@ const acceptParams = (websiteSSL: Website.SSLDTO) => {
     if (websiteSSL && websiteSSL.id > 0) {
         ssl.value.sslID = websiteSSL.id;
         ssl.value.description = websiteSSL.description;
+        ssl.value.privateKeyPath = websiteSSL.privateKeyPath;
+        ssl.value.certificatePath = websiteSSL.certPath;
+        if (ssl.value.certificatePath != '' && ssl.value.privateKeyPath != '') {
+            ssl.value.type = 'local';
+        }
     }
     open.value = true;
 };

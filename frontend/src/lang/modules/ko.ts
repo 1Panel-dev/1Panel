@@ -996,6 +996,8 @@ const message = {
         record: '레코드',
         viewRecords: '레코드 보기',
         shell: '셸',
+        stop: '수동 중지',
+        stopHelper: '이 작업은 현재 작업 실행을 강제로 중지합니다. 계속하시겠습니까?',
         log: '백업 로그',
         logHelper: '시스템 백업 로그',
         ogHelper1: '1. 1Panel 시스템 로그',
@@ -1028,7 +1030,8 @@ const message = {
         snapshot: '시스템 스냅샷',
         allOptionHelper: `현재 작업 계획은 모든 [{0}]을 백업하는 것입니다. 현재 직접 다운로드는 지원되지 않습니다. [{0}] 메뉴에서 백업 목록을 확인하실 수 있습니다.`,
         exclusionRules: '배제 규칙',
-        exclusionRulesHelper: '배제 규칙은 이 백업의 모든 압축 작업에 적용됩니다.',
+        exclusionRulesHelper:
+            '제외 규칙을 선택하거나 입력하고, 각 세트 입력 후 Enter 키를 눌러 계속합니다. 제외 규칙은 이 백업의 모든 압축 작업에 적용됩니다',
         default_download_path: '기본 다운로드 링크',
         saveLocal: '로컬 백업 보관 (클라우드 저장소 복사본 수와 동일)',
         url: 'URL 주소',
@@ -2736,7 +2739,8 @@ const message = {
         nodeOperatorHelper:
             '{0} {1} 모듈인가요? 이 작업은 운영 환경에 비정상을 일으킬 수 있으므로 진행 전에 확인해 주세요.',
         customScript: '사용자 정의 시작 명령',
-        customScriptHelper: '전체 시작 명령을 제공하세요. 예: "npm run start".',
+        customScriptHelper:
+            '전체 시작 명령어를 입력해 주세요. 예: npm run start. PM2 시작 명령어는 pm2-runtime로 변경해 주세요. 그렇지 않으면 시작에 실패합니다.',
         portError: '포트를 중복 사용하지 마세요.',
         systemRestartHelper: '상태 설명: 중단 - 시스템 재시작으로 인해 상태 가져오기가 실패했습니다.',
         javaScriptHelper: '전체 시작 명령을 제공하세요. 예: "java -jar halo.jar -Xmx1024M -Xms256M".',

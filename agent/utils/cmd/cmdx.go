@@ -18,6 +18,7 @@ import (
 )
 
 type CommandHelper struct {
+	context      context.Context
 	workDir      string
 	outputFile   string
 	scriptPath   string
@@ -95,15 +96,23 @@ func (c *CommandHelper) RunWithStdoutBashCf(command string, arg ...interface{}) 
 
 func (c *CommandHelper) run(name string, arg ...string) (string, error) {
 	var cmd *exec.Cmd
-	var ctx context.Context
 	var cancel context.CancelFunc
 
 	if c.timeout != 0 {
-		ctx, cancel = context.WithTimeout(context.Background(), c.timeout)
-		defer cancel()
-		cmd = exec.CommandContext(ctx, name, arg...)
+		if c.context == nil {
+			c.context, cancel = context.WithTimeout(context.Background(), c.timeout)
+			defer cancel()
+		} else {
+			c.context, cancel = context.WithTimeout(c.context, c.timeout)
+			defer cancel()
+		}
+		cmd = exec.CommandContext(c.context, name, arg...)
 	} else {
-		cmd = exec.Command(name, arg...)
+		if c.context == nil {
+			cmd = exec.Command(name, arg...)
+		} else {
+			cmd = exec.CommandContext(c.context, name, arg...)
+		}
 	}
 
 	customWriter := &CustomWriter{taskItem: c.taskItem}
@@ -141,16 +150,24 @@ func (c *CommandHelper) run(name string, arg ...string) (string, error) {
 		customWriter.Flush()
 	}
 	if c.timeout != 0 {
-		if ctx != nil && errors.Is(ctx.Err(), context.DeadlineExceeded) {
+		if c.context != nil && errors.Is(c.context.Err(), context.DeadlineExceeded) {
 			return "", buserr.New("ErrCmdTimeout")
 		}
 	}
 	if err != nil {
+		if err.Error() == "signal: killed" {
+			return "", buserr.New("ErrShutDown")
+		}
 		return handleErr(stdout, stderr, c.IgnoreExist1, err)
 	}
 	return stdout.String(), nil
 }
 
+func WithContext(ctx context.Context) Option {
+	return func(s *CommandHelper) {
+		s.context = ctx
+	}
+}
 func WithOutputFile(outputFile string) Option {
 	return func(s *CommandHelper) {
 		s.outputFile = outputFile

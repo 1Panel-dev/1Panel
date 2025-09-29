@@ -17,6 +17,7 @@ ErrApiConfigKeyTimeInvalid: 'Ошибка временной метки инте
 StartPushSSLToNode: "Начало отправки сертификата на узел"
 PushSSLToNodeFailed: "Не удалось отправить сертификат на узел: {{ .err }}"
 PushSSLToNodeSuccess: "Сертификат успешно отправлен на узел"
+ErrShutDown: "Команда завершена вручную!"
 
 ErrMinQuickJump: "Пожалуйста, установите хотя бы одну запись быстрого перехода!"
 ErrMaxQuickJump: "Можно установить до четырех записей быстрого перехода!"

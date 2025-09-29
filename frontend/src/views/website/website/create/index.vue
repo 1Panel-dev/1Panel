@@ -585,6 +585,7 @@ const randomDbPassword = async () => {
 };
 
 const changeType = (type: string) => {
+    localStorage.setItem('website-type', type);
     switch (type) {
         case 'deployment':
             website.value.appType = 'installed';
@@ -708,18 +709,18 @@ const acceptParams = async () => {
     if (websiteForm.value) {
         websiteForm.value.resetFields();
     }
-    getPathByType('websiteDir').then((res) => {
-        staticPath.value = res.data + '/sites/';
-    });
+    const websiteType = localStorage.getItem('website-type') || 'deployment';
+    website.value.type = websiteType;
+    const dirRes = await getPathByType('websiteDir');
+    staticPath.value = dirRes.data + '/sites/';
 
     const res = await getAgentGroupList('website');
     groups.value = res.data;
     website.value.webSiteGroupId = res.data[0].id;
-    website.value.type = 'deployment';
     runtimeResource.value = 'appstore';
     runtimeReq.value = initRuntimeReq();
+    changeType(websiteType);
 
-    searchAppInstalled('website');
     listAcmeAccount();
 
     open.value = true;

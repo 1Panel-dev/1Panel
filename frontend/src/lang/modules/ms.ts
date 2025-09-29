@@ -1028,6 +1028,8 @@ const message = {
         record: 'Rekod',
         viewRecords: 'Rekod',
         shell: 'Shell',
+        stop: 'Hentikan Manual',
+        stopHelper: 'Operasi ini akan memaksa menghentikan pelaksanaan tugas semasa. Teruskan?',
         log: 'Log sandaran',
         logHelper: 'Log sistem sandaran',
         ogHelper1: '1. Log Sistem 1Panel ',
@@ -1062,7 +1064,8 @@ const message = {
         allOptionHelper:
             'Pelan tugas semasa adalah untuk menyandarkan semua [{0}]. Muat turun terus tidak disokong buat masa ini. Anda boleh menyemak senarai sandaran dalam menu [{0}].',
         exclusionRules: 'Peraturan pengecualian',
-        exclusionRulesHelper: 'Peraturan pengecualian akan terpakai pada semua operasi mampatan bagi sandaran ini.',
+        exclusionRulesHelper:
+            'Pilih atau masukkan peraturan pengecualian, tekan Enter selepas setiap set untuk teruskan. Peraturan pengecualian akan digunakan untuk semua operasi mampatan dalam sandaran ini',
         default_download_path: 'Pautan muat turun lalai',
         saveLocal: 'Simpan sandaran tempatan (sama seperti bilangan salinan storan awan)',
         url: 'Alamat URL',
@@ -2847,7 +2850,8 @@ const message = {
         nodeOperatorHelper:
             'Adakah {0} {1} modul? Operasi ini mungkin menyebabkan ketidaknormalan dalam persekitaran operasi. Sila pastikan sebelum meneruskan',
         customScript: 'Arahan permulaan tersuai',
-        customScriptHelper: 'Sediakan arahan permulaan penuh. Contohnya, "npm run start".',
+        customScriptHelper:
+            'Sila masukkan arahan permulaan penuh, contoh: npm run start. Untuk arahan permulaan PM2, sila gantikan dengan pm2-runtime, jika tidak ia akan gagal bermula.',
         portError: 'Jangan ulangi port yang sama.',
         systemRestartHelper: 'Huraian status: Gangguan - status gagal diperoleh kerana sistem dimulakan semula',
         javaScriptHelper: 'Sediakan arahan permulaan penuh. Contohnya, "java -jar halo.jar -Xmx1024M -Xms256M".',

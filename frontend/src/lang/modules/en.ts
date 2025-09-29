@@ -1035,6 +1035,8 @@ const message = {
         record: 'Records',
         viewRecords: 'View records',
         shell: 'Shell',
+        stop: 'Manual Stop',
+        stopHelper: 'This operation will force stop the current task execution. Continue?',
         log: 'Backup logs',
         logHelper: 'Backup system log',
         ogHelper1: '1.1Panel System log ',
@@ -1070,7 +1072,8 @@ const message = {
         snapshot: 'System snapshot',
         allOptionHelper: `The current task plan is to back up all [{0}]. Direct download isn't supported at the moment. You can check the backup list of [{0}] menu.`,
         exclusionRules: 'Exclusive rule',
-        exclusionRulesHelper: 'The exclusion rules will apply to all compression operations of this backup.',
+        exclusionRulesHelper:
+            'Select or enter exclusion rules, press Enter after each set to continue. Exclusion rules will apply to all compression operations in this backup',
         default_download_path: 'Default download link',
         saveLocal: 'Retain local backups (the same as the number of cloud storage copies)',
         url: 'URL Address',
@@ -2869,7 +2872,8 @@ const message = {
         nodeOperatorHelper:
             'Is {0} {1} module? The operation may cause abnormality in the operating environment, please confirm before proceeding',
         customScript: 'Custom startup command',
-        customScriptHelper: 'Provide a full startup command. For example, "npm run start".',
+        customScriptHelper:
+            'Please enter the complete startup command, for example: npm run start. For PM2 startup commands, please replace with pm2-runtime, otherwise it will fail to start.',
         portError: `Don't repeat the same port.`,
         systemRestartHelper: 'Status description: Interruption - status acquisition failed due to system restart',
         javaScriptHelper: 'Provide a full startup command. For example, "java -jar halo.jar -Xmx1024M -Xms256M".',

@@ -1047,6 +1047,8 @@ const message = {
         record: 'Kayıtlar',
         viewRecords: 'Kayıtları görüntüle',
         shell: 'Shell',
+        stop: 'Manuel Durdur',
+        stopHelper: 'Bu işlem mevcut görev yürütmesini zorla durduracaktır. Devam etmek istiyor musunuz?',
         log: 'Yedekleme logları',
         logHelper: 'Sistem logunu yedekle',
         ogHelper1: '1.1Panel Sistem logu ',
@@ -1083,7 +1085,8 @@ const message = {
         allOptionHelper:
             'Mevcut görev planı tüm [{0}] öğelerini yedeklemektir. Doğrudan indirme şu anda desteklenmiyor. [{0}] menüsünün yedekleme listesini kontrol edebilirsiniz.',
         exclusionRules: 'Hariç tutma kuralı',
-        exclusionRulesHelper: 'Hariç tutma kuralları bu yedeğin tüm sıkıştırma işlemlerine uygulanacaktır.',
+        exclusionRulesHelper:
+            'Hariç tutma kurallarını seçin veya girin, her setten sonra Enter basarak devam edin. Hariç tutma kuralları bu yedeklemedeki tüm sıkıştırma işlemlerine uygulanacaktır',
         default_download_path: 'Varsayılan indirme bağlantısı',
         saveLocal: 'Yerel yedeklemeleri sakla (bulut depolama kopyalarının sayısı ile aynı)',
         url: 'URL Adresi',
@@ -2907,7 +2910,8 @@ const message = {
         nodeOperatorHelper:
             '{0} {1} modülü mü? İşlem, çalışma ortamında anormalliklere neden olabilir, lütfen devam etmeden önce onaylayın',
         customScript: 'Özel başlatma komutu',
-        customScriptHelper: 'Tam bir başlatma komutu sağlayın. Örneğin, "npm run start".',
+        customScriptHelper:
+            'Lütfen tam başlatma komutunu girin, örneğin: npm run start. PM2 başlatma komutları için lütfen pm2-runtime ile değiştirin, aksi takdirde başlatma başarısız olacaktır.',
         portError: 'Aynı portu tekrarlamayın.',
         systemRestartHelper:
             'Durum açıklaması: Kesinti - sistem yeniden başlatılması nedeniyle durum alımı başarısız oldu',

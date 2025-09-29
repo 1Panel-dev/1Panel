@@ -79,7 +79,7 @@ func handlePostgresqlBackup(db DatabaseHelper, parentTask *task.Task, recordID u
 	backupTask = parentTask
 	itemName := fmt.Sprintf("%s - %s", db.Database, db.Name)
 	if parentTask == nil {
-		backupTask, err = task.NewTaskWithOps(itemName, task.TaskBackup, task.TaskScopeDatabase, taskID, db.ID)
+		backupTask, err = task.NewTaskWithOps(itemName, task.TaskBackup, task.TaskScopeBackup, taskID, db.ID)
 		if err != nil {
 			return err
 		}
@@ -89,7 +89,7 @@ func handlePostgresqlBackup(db DatabaseHelper, parentTask *task.Task, recordID u
 	if parentTask != nil {
 		return itemHandler()
 	}
-	backupTask.AddSubTaskWithOps(task.GetTaskName(itemName, task.TaskBackup, task.TaskScopeDatabase), func(t *task.Task) error { return itemHandler() }, nil, 3, time.Hour)
+	backupTask.AddSubTaskWithOps(task.GetTaskName(itemName, task.TaskBackup, task.TaskScopeBackup), func(t *task.Task) error { return itemHandler() }, nil, 3, time.Hour)
 	go func() {
 		if err := backupTask.Execute(); err != nil {
 			backupRepo.UpdateRecordByMap(recordID, map[string]interface{}{"status": constant.StatusFailed, "message": err.Error()})
@@ -111,7 +111,7 @@ func handlePostgresqlRecover(req dto.CommonRecover, parentTask *task.Task, isRol
 	}
 	itemTask = parentTask
 	if parentTask == nil {
-		itemTask, err = task.NewTaskWithOps(req.Name, task.TaskRecover, task.TaskScopeDatabase, req.TaskID, dbInfo.ID)
+		itemTask, err = task.NewTaskWithOps(req.Name, task.TaskRecover, task.TaskScopeBackup, req.TaskID, dbInfo.ID)
 		if err != nil {
 			return err
 		}

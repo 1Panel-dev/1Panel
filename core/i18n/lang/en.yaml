@@ -21,6 +21,7 @@ ErrHttpReqNotFound: "Unable to find the requested resource {{ .err }}"
 ErrHttpReqFailed: "Request failed {{ .err }}"
 ErrHttpReqTimeOut: "Request timed out {{ .err }}"
 ErrCreateHttpClient: "Failed to create request {{ .err }}"
+ErrProxySetting: "Proxy server information unavailable {{ .err }}, please check and try again!"
 
 # common
 ErrDemoEnvironment: "Demo server, this operation is prohibited!"

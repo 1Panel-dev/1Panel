@@ -17,6 +17,7 @@ ErrApiConfigKeyTimeInvalid: 'API arayüz zaman damgası hatası: {{ .detail }}'
 StartPushSSLToNode: "Sertifika düğüme gönderilmeye başlandı"
 PushSSLToNodeFailed: "Sertifika düğüme gönderilemedi: {{ .err }}"
 PushSSLToNodeSuccess: "Sertifika düğüme başarıyla gönderildi"
+ErrShutDown: "Komut manuel olarak sonlandırıldı!"
 
 ErrMinQuickJump: "Lütfen en az bir hızlı atlama girişi ayarlayın!"
 ErrMaxQuickJump: "En fazla dört hızlı atlama girişi ayarlayabilirsiniz!"

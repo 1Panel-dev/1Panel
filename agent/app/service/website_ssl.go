@@ -626,9 +626,13 @@ func (w WebsiteSSLService) Upload(req request.WebsiteSSLUpload) error {
 		} else {
 			websiteSSL.Pem = string(content)
 		}
+		websiteSSL.CertPath = req.CertificatePath
+		websiteSSL.PrivateKeyPath = req.PrivateKeyPath
 	} else {
 		websiteSSL.PrivateKey = req.PrivateKey
 		websiteSSL.Pem = req.Certificate
+		websiteSSL.CertPath = ""
+		websiteSSL.PrivateKeyPath = ""
 	}
 
 	privateKeyCertBlock, _ := pem.Decode([]byte(websiteSSL.PrivateKey))

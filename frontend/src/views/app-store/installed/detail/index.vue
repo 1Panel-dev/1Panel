@@ -210,6 +210,11 @@ function checkWebUI() {
     if (webUI.domain !== '') {
         let domain = webUI.domain;
         let port = null;
+
+        if (domain.includes('/')) {
+            domain = domain.split('/')[0];
+        }
+
         if (domain.includes(':')) {
             const parts = domain.split(':');
             domain = parts[0];
@@ -219,6 +224,7 @@ function checkWebUI() {
                 return false;
             }
         }
+
         if (checkIpV4V6(domain) && checkDomain(domain)) {
             return false;
         }

@@ -46,6 +46,7 @@
                     @sort-change="changeSort"
                 >
                     <el-table-column type="selection" width="30" />
+                    <el-table-column label="ID" prop="id" width="50px" />
                     <el-table-column
                         :label="$t('website.domain')"
                         show-overflow-tooltip

@@ -17,6 +17,7 @@ ErrApiConfigKeyTimeInvalid: 'Erro de registro de data e hora da interface da API
 StartPushSSLToNode: "Iniciando o envio do certificado para o nó"
 PushSSLToNodeFailed: "Falha ao enviar o certificado para o nó: {{ .err }}"
 PushSSLToNodeSuccess: "Certificado enviado com sucesso para o nó"
+ErrShutDown: "Comando terminado manualmente!"
 
 ErrMinQuickJump: "Defina pelo menos uma entrada de salto rápido!"
 ErrMaxQuickJump: "Você pode definir até quatro entradas de salto rápido!"

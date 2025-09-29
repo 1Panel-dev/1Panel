@@ -227,7 +227,7 @@ export namespace Container {
         driver: string;
         subnet: string;
         gateway: string;
-        scope: string;
+        ipRange: string;
     }
 
     export interface VolumeInfo {

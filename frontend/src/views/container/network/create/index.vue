@@ -18,22 +18,22 @@
                 <el-row type="flex" justify="center" :gutter="20">
                     <el-col :span="12">
                         <el-form-item :label="$t('container.subnet')" prop="subnet">
-                            <el-input placeholder="172.16.10.0/24" clearable v-model.trim="form.subnet" />
+                            <el-input placeholder="172.13.0.0/16" clearable v-model.trim="form.subnet" />
                         </el-form-item>
                     </el-col>
                     <el-col :span="12">
                         <el-form-item :label="$t('container.gateway')" prop="gateway">
-                            <el-input placeholder="172.16.10.12" clearable v-model.trim="form.gateway" />
+                            <el-input placeholder="172.13.10.254" clearable v-model.trim="form.gateway" />
                         </el-form-item>
                     </el-col>
                     <el-col :span="12">
-                        <el-form-item :label="$t('container.scope')" prop="scope">
-                            <el-input placeholder="172.16.10.0/16" clearable v-model.trim="form.scope" />
+                        <el-form-item :label="$t('container.scope')" prop="ipRange">
+                            <el-input placeholder="172.13.1.0/24" clearable v-model.trim="form.ipRange" />
                         </el-form-item>
                     </el-col>
                     <el-col :span="12"></el-col>
                 </el-row>
-                <el-form-item :label="$t('container.auxAddress')" prop="scopeV6">
+                <el-form-item :label="$t('container.auxAddress')" prop="auxAddress">
                     <el-table :data="form.auxAddress" v-if="form.auxAddress.length !== 0">
                         <el-table-column :label="$t('container.label')" min-width="100">
                             <template #default="{ row }">
@@ -42,7 +42,7 @@
                         </el-table-column>
                         <el-table-column label="IP" min-width="150">
                             <template #default="{ row }">
-                                <el-input placeholder="172.16.10.13" v-model="row.value" />
+                                <el-input placeholder="172.13.1.13" v-model="row.value" />
                             </template>
                         </el-table-column>
                         <el-table-column min-width="40">
@@ -73,13 +73,13 @@
                         </el-form-item>
                     </el-col>
                     <el-col :span="12">
-                        <el-form-item :label="$t('container.scope')" prop="scopeV6">
-                            <el-input placeholder="2408:400e::/64" clearable v-model.trim="form.scopeV6" />
+                        <el-form-item :label="$t('container.scope')" prop="ipRangeV6">
+                            <el-input placeholder="2408:400e::/64" clearable v-model.trim="form.ipRangeV6" />
                         </el-form-item>
                     </el-col>
                     <el-col :span="12"></el-col>
                 </el-row>
-                <el-form-item :label="$t('container.auxAddress')" prop="scopeV6">
+                <el-form-item :label="$t('container.auxAddress')" prop="auxAddressV6">
                     <el-table :data="form.auxAddressV6" v-if="form.auxAddressV6.length !== 0">
                         <el-table-column :label="$t('container.label')" min-width="100">
                             <template #default="{ row }">
@@ -147,12 +147,12 @@ const form = reactive({
     ipv4: true,
     subnet: '',
     gateway: '',
-    scope: '',
+    ipRange: '',
     auxAddress: [],
     ipv6: false,
     subnetV6: '',
     gatewayV6: '',
-    scopeV6: '',
+    ipRangeV6: '',
     auxAddressV6: [],
 });
 
@@ -166,12 +166,12 @@ const acceptParams = (): void => {
     form.ipv4 = true;
     form.subnet = '';
     form.gateway = '';
-    form.scope = '';
+    form.ipRange = '';
     form.auxAddress = [];
     form.ipv6 = false;
     form.subnetV6 = '';
     form.gatewayV6 = '';
-    form.scopeV6 = '';
+    form.ipRangeV6 = '';
     form.auxAddressV6 = [];
     drawerVisible.value = true;
 };
@@ -186,10 +186,10 @@ const rules = reactive({
     driver: [Rules.requiredSelect],
     subnet: [{ validator: checkCidr, trigger: 'blur' }, Rules.requiredInput],
     gateway: [{ validator: checkGateway, trigger: 'blur' }],
-    scope: [{ validator: checkCidr, trigger: 'blur' }],
+    ipRange: [{ validator: checkCidr, trigger: 'blur' }],
     subnetV6: [{ validator: checkFixedCidrV6, trigger: 'blur' }, Rules.requiredInput],
     gatewayV6: [{ validator: checkGatewayV6, trigger: 'blur' }],
-    scopeV6: [{ validator: checkFixedCidrV6, trigger: 'blur' }],
+    ipRangeV6: [{ validator: checkFixedCidrV6, trigger: 'blur' }],
 });
 
 function checkGateway(rule: any, value: any, callback: any) {

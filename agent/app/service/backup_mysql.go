@@ -84,7 +84,7 @@ func handleMysqlBackup(db DatabaseHelper, parentTask *task.Task, recordID uint, 
 	}
 	itemName := fmt.Sprintf("%s[%s] - %s", db.Database, db.DBType, db.Name)
 	if parentTask == nil {
-		backupTask, err = task.NewTaskWithOps(itemName, task.TaskBackup, task.TaskScopeDatabase, taskID, dbInfo.ID)
+		backupTask, err = task.NewTaskWithOps(itemName, task.TaskBackup, task.TaskScopeBackup, taskID, dbInfo.ID)
 		if err != nil {
 			return err
 		}
@@ -94,7 +94,7 @@ func handleMysqlBackup(db DatabaseHelper, parentTask *task.Task, recordID uint, 
 	if parentTask != nil {
 		return itemHandler()
 	}
-	backupTask.AddSubTaskWithOps(task.GetTaskName(itemName, task.TaskBackup, task.TaskScopeDatabase), func(t *task.Task) error { return itemHandler() }, nil, 3, time.Hour)
+	backupTask.AddSubTaskWithOps(task.GetTaskName(itemName, task.TaskBackup, task.TaskScopeBackup), func(t *task.Task) error { return itemHandler() }, nil, 3, time.Hour)
 	go func() {
 		if err := backupTask.Execute(); err != nil {
 			backupRepo.UpdateRecordByMap(recordID, map[string]interface{}{"status": constant.StatusFailed, "message": err.Error()})
@@ -117,7 +117,7 @@ func handleMysqlRecover(req dto.CommonRecover, parentTask *task.Task, isRollback
 	}
 	itemName := fmt.Sprintf("%s[%s] - %s", req.Name, req.Type, req.DetailName)
 	if parentTask == nil {
-		itemTask, err = task.NewTaskWithOps(itemName, task.TaskRecover, task.TaskScopeDatabase, taskID, dbInfo.ID)
+		itemTask, err = task.NewTaskWithOps(itemName, task.TaskRecover, task.TaskScopeBackup, taskID, dbInfo.ID)
 		if err != nil {
 			return err
 		}

@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/user"
 	"path"
+	"strings"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
@@ -591,6 +592,36 @@ var AddTimeoutForClam = &gormigrate.Migration{
 			return err
 		}
 		if err := tx.Model(&model.Clam{}).Where("1 == 1").Updates(map[string]interface{}{"timeout": 18000}).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}
+
+var UpdateCronjobSpec = &gormigrate.Migration{
+	ID: "20250925-update-cronjob-spec",
+	Migrate: func(tx *gorm.DB) error {
+		var cronjobs []model.Cronjob
+		if err := tx.Where("1 == 1").Find(&cronjobs).Error; err != nil {
+			return err
+		}
+		for _, item := range cronjobs {
+			if !strings.Contains(item.Spec, ",") {
+				continue
+			}
+			if err := tx.Model(&model.Cronjob{}).Where("id = ?", item.ID).Updates(
+				map[string]interface{}{"spec": strings.ReplaceAll(item.Spec, ",", "&&")}).Error; err != nil {
+				return err
+			}
+		}
+		return nil
+	},
+}
+
+var UpdateWebsiteSSLAddColumn = &gormigrate.Migration{
+	ID: "20250928-update-website-ssl",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.WebsiteSSL{}); err != nil {
 			return err
 		}
 		return nil

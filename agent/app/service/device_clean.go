@@ -7,6 +7,7 @@ import (
 	"path"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -18,6 +19,7 @@ import (
 	"github.com/docker/docker/api/types/filters"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"github.com/1Panel-dev/1Panel/agent/global"
@@ -74,8 +76,21 @@ func (u *DeviceService) Scan() dto.CleanData {
 		sort.Slice(upgradeTree.Children, func(i, j int) bool {
 			return common.CompareVersion(upgradeTree.Children[i].Label, upgradeTree.Children[j].Label)
 		})
-		upgradeTree.Children[0].IsCheck = false
-		upgradeTree.Children[0].IsRecommend = false
+		if global.IsMaster {
+			var copiesSeeting model.Setting
+			_ = global.CoreDB.Where("key = ?", "UpgradeBackupCopies").First(&copiesSeeting).Error
+			copies, _ := strconv.Atoi(copiesSeeting.Value)
+			if copies == 0 || copies > len(upgradeTree.Children) {
+				copies = len(upgradeTree.Children)
+			}
+			for i := 0; i < copies; i++ {
+				upgradeTree.Children[i].IsCheck = false
+				upgradeTree.Children[i].IsRecommend = false
+			}
+		} else {
+			upgradeTree.Children[0].IsCheck = false
+			upgradeTree.Children[0].IsRecommend = false
+		}
 	}
 	treeData = append(treeData, upgradeTree)
 
@@ -214,7 +229,7 @@ func (u *DeviceService) Clean(req []dto.Clean) {
 			}
 		case "task_log":
 			if len(item.Name) == 0 {
-				files, _ := os.ReadDir(path.Join(global.Dir.TaskDir))
+				files, _ := os.ReadDir(global.Dir.TaskDir)
 				if len(files) == 0 {
 					continue
 				}
@@ -222,15 +237,10 @@ func (u *DeviceService) Clean(req []dto.Clean) {
 					if file.Name() == "ssl" || !file.IsDir() {
 						continue
 					}
-					dropFileOrDir(path.Join(global.Dir.TaskDir, file.Name()))
+					dropTaskLog(path.Join(global.Dir.TaskDir, file.Name()))
 				}
-				_ = taskRepo.DeleteAll()
 			} else {
-				pathItem := path.Join(global.Dir.TaskDir, item.Name)
-				dropFileOrDir(pathItem)
-				if len(item.Name) != 0 {
-					_ = taskRepo.Delete(repo.WithByType(item.Name))
-				}
+				dropTaskLog(path.Join(global.Dir.TaskDir, item.Name))
 			}
 		case "script":
 			dropFileOrDir(path.Join(global.Dir.TmpDir, "script", item.Name))
@@ -530,7 +540,6 @@ func loadTreeWithAllFile(isCheck bool, originalPath, treeType, pathItem string, 
 }
 
 func dropFileOrDir(itemPath string) {
-	global.LOG.Debugf("drop file %s", itemPath)
 	if err := os.RemoveAll(itemPath); err != nil {
 		global.LOG.Errorf("drop file %s failed, err %v", itemPath, err)
 	}
@@ -604,6 +613,62 @@ func dropVolumes() (int, int) {
 		return 0, 0
 	}
 	return len(res.VolumesDeleted), int(res.SpaceReclaimed)
+}
+
+func dropTaskLog(logDir string) {
+	files, err := os.ReadDir(logDir)
+	if err != nil {
+		return
+	}
+	taskType := path.Base(logDir)
+	var usedTasks []string
+	switch taskType {
+	case "Cronjob":
+		_ = global.DB.Model(&model.JobRecords{}).Where("task_id != ?", "").Select("task_id").Find(&usedTasks).Error
+	case "Snapshot":
+		var (
+			snapIDs     []string
+			recoverIDs  []string
+			rollbackIDs []string
+		)
+		_ = global.DB.Model(&model.Snapshot{}).Where("task_id != ?", "").Select("task_id").Find(&snapIDs).Error
+		_ = global.DB.Model(&model.Snapshot{}).Where("task_recover_id != ", "").Select("task_id").Find(&recoverIDs).Error
+		_ = global.DB.Model(&model.Snapshot{}).Where("task_rollback_id != ?", "").Select("task_id").Find(&rollbackIDs).Error
+		usedTasks = append(usedTasks, snapIDs...)
+		usedTasks = append(usedTasks, recoverIDs...)
+		usedTasks = append(usedTasks, rollbackIDs...)
+	case "Backup":
+		_ = global.DB.Model(&model.BackupRecord{}).Where("task_id != ?", "").Select("task_id").Find(&usedTasks).Error
+	case "Clam":
+		_ = global.DB.Model(&model.ClamRecord{}).Where("task_id != ?", "").Select("task_id").Find(&usedTasks).Error
+	case "Tamper":
+		xpackDB, err := common.LoadDBConnByPathWithErr(path.Join(global.CONF.Base.InstallDir, "1panel/db/xpack.db"), "xpack.db")
+		if err == nil {
+			_ = xpackDB.Table("tampers").Where("task_id != ?", "").Select("task_id").Find(&usedTasks).Error
+		}
+	case "System":
+		xpackDB, err := common.LoadDBConnByPathWithErr(path.Join(global.CONF.Base.InstallDir, "1panel/db/xpack.db"), "xpack.db")
+		if err == nil {
+			_ = xpackDB.Model("nodes").Where("task_id != ?", "").Select("task_id").Find(&usedTasks).Error
+		}
+	default:
+		dropFileOrDir(logDir)
+		_ = taskRepo.Delete(repo.WithByType(taskType))
+		return
+	}
+	usedMap := make(map[string]struct{})
+	for _, item := range usedTasks {
+		if _, ok := usedMap[item]; !ok {
+			usedMap[item] = struct{}{}
+		}
+	}
+	for _, item := range files {
+		if _, ok := usedMap[strings.TrimSuffix(item.Name(), ".log")]; ok {
+			continue
+		}
+		_ = os.Remove(logDir + "/" + item.Name())
+	}
+	_ = taskRepo.Delete(repo.WithByType(taskType), taskRepo.WithByIDNotIn(usedTasks))
 }
 
 func dropWithExclude(pathToDelete string, excludeSubDirs []string, taskItem *task.Task, size *int64, count *int) {

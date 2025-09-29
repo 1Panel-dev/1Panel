@@ -91,14 +91,13 @@
                         <el-col :span="7">
                             <el-card class="el-card">
                                 <div class="infinite-list" style="overflow: auto">
-                                    <el-table
+                                    <ComplexTable
                                         style="cursor: pointer"
                                         :data="records"
-                                        border
                                         :show-header="false"
                                         @row-click="forDetail"
                                     >
-                                        <el-table-column>
+                                        <el-table-column min-width="230px">
                                             <template #default="{ row }">
                                                 <span v-if="row.id === currentRecord.id" class="select-sign"></span>
                                                 <Status class="mr-2 ml-1 float-left" :status="row.status" />
@@ -109,7 +108,24 @@
                                                 </div>
                                             </template>
                                         </el-table-column>
-                                    </el-table>
+                                        <el-table-column min-width="30px">
+                                            <template #default="{ row }">
+                                                <el-tooltip :content="$t('cronjob.stop')">
+                                                    <el-button
+                                                        v-if="
+                                                            dialogData.rowData.type === 'shell' &&
+                                                            row.status === 'Waiting'
+                                                        "
+                                                        class="float-right"
+                                                        link
+                                                        type="primary"
+                                                        @click="onStop(row.id)"
+                                                        icon="SwitchButton"
+                                                    />
+                                                </el-tooltip>
+                                            </template>
+                                        </el-table-column>
+                                    </ComplexTable>
                                 </div>
                                 <div class="page-item">
                                     <el-pagination
@@ -231,7 +247,7 @@
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
 import { Cronjob } from '@/api/interface/cronjob';
-import { searchRecords, handleOnce, updateStatus, cleanRecords } from '@/api/modules/cronjob';
+import { searchRecords, handleOnce, updateStatus, cleanRecords, stopCronjob } from '@/api/modules/cronjob';
 import { dateFormat } from '@/utils/util';
 import LogFile from '@/components/log/file/index.vue';
 import i18n from '@/lang';
@@ -374,7 +390,8 @@ const search = async (changeToLatest: boolean) => {
     }
 };
 
-const forDetail = async (row: Cronjob.Record) => {
+const forDetail = (row: Cronjob.Record) => {
+    console.log('123');
     currentRecord.value = row;
 };
 
@@ -398,6 +415,17 @@ const onClean = async () => {
     } else {
         open.value = true;
     }
+};
+
+const onStop = async (id: number) => {
+    ElMessageBox.confirm(i18n.global.t('cronjob.stopHelper'), i18n.global.t('cronjob.stop'), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+        type: 'warning',
+    }).then(async () => {
+        await stopCronjob(id);
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+    });
 };
 
 const cleanRecord = async () => {

@@ -128,7 +128,7 @@ func handleAppBackup(install *model.AppInstall, parentTask *task.Task, recordID 
 	)
 	backupTask = parentTask
 	if parentTask == nil {
-		backupTask, err = task.NewTaskWithOps(install.Name, task.TaskBackup, task.TaskScopeApp, taskID, install.ID)
+		backupTask, err = task.NewTaskWithOps(install.Name, task.TaskBackup, task.TaskScopeBackup, taskID, install.ID)
 		if err != nil {
 			return err
 		}
@@ -139,7 +139,7 @@ func handleAppBackup(install *model.AppInstall, parentTask *task.Task, recordID 
 		return itemHandler()
 	}
 
-	backupTask.AddSubTaskWithOps(task.GetTaskName(install.Name, task.TaskBackup, task.TaskScopeApp), func(t *task.Task) error { return itemHandler() }, nil, 3, time.Hour)
+	backupTask.AddSubTaskWithOps(task.GetTaskName(install.Name, task.TaskBackup, task.TaskScopeBackup), func(t *task.Task) error { return itemHandler() }, nil, 3, time.Hour)
 	go func() {
 		if err := backupTask.Execute(); err != nil {
 			backupRepo.UpdateRecordByMap(recordID, map[string]interface{}{"status": constant.StatusFailed, "message": err.Error()})
@@ -160,7 +160,7 @@ func handleAppRecover(install *model.AppInstall, parentTask *task.Task, recoverF
 	)
 	recoverTask = parentTask
 	if parentTask == nil {
-		recoverTask, err = task.NewTaskWithOps(install.Name, task.TaskRecover, task.TaskScopeApp, taskID, install.ID)
+		recoverTask, err = task.NewTaskWithOps(install.Name, task.TaskRecover, task.TaskScopeBackup, taskID, install.ID)
 		if err != nil {
 			return err
 		}
@@ -328,7 +328,7 @@ func handleAppRecover(install *model.AppInstall, parentTask *task.Task, recoverF
 		return recoverApp(parentTask)
 	}
 
-	recoverTask.AddSubTask(task.GetTaskName(install.Name, task.TaskRecover, task.TaskScopeApp), recoverApp, rollBackApp)
+	recoverTask.AddSubTask(task.GetTaskName(install.Name, task.TaskRecover, task.TaskScopeBackup), recoverApp, rollBackApp)
 	go func() {
 		_ = recoverTask.Execute()
 	}()

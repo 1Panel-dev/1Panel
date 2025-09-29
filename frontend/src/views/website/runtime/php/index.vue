@@ -286,7 +286,7 @@ const search = async () => {
 };
 
 const openCreate = () => {
-    if (isOffLine) {
+    if (isOffLine.value) {
         MsgWarning(i18n.global.t('commons.msg.offlineTips'));
         return;
     }

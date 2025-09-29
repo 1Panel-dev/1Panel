@@ -84,7 +84,7 @@ func handleRedisBackup(redisInfo *repo.RootInfo, parentTask *task.Task, recordID
 	)
 	itemTask = parentTask
 	if parentTask == nil {
-		itemTask, err = task.NewTaskWithOps("Redis", task.TaskBackup, task.TaskScopeDatabase, taskID, redisInfo.ID)
+		itemTask, err = task.NewTaskWithOps("Redis", task.TaskBackup, task.TaskScopeBackup, taskID, redisInfo.ID)
 		if err != nil {
 			return err
 		}
@@ -147,7 +147,7 @@ func handleRedisRecover(redisInfo *repo.RootInfo, parentTask *task.Task, recover
 	)
 	itemTask = parentTask
 	if parentTask == nil {
-		itemTask, err = task.NewTaskWithOps("Redis", task.TaskRecover, task.TaskScopeDatabase, taskID, redisInfo.ID)
+		itemTask, err = task.NewTaskWithOps("Redis", task.TaskRecover, task.TaskScopeBackup, taskID, redisInfo.ID)
 		if err != nil {
 			return err
 		}

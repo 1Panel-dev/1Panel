@@ -93,7 +93,7 @@ const getApp = async (appkey: string, mode: string) => {
 
 const searchAppList = async (appID: number) => {
     try {
-        if (isOffLine) {
+        if (isOffLine.value) {
             appReq.resource = 'custom';
         }
         const res = await searchApp(appReq);

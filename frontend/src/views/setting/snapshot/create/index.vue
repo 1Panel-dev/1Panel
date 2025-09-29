@@ -158,7 +158,13 @@
             </fu-step>
             <template #footer></template>
             <fu-step id="ignoreFiles" :title="$t('cronjob.exclusionRules')">
-                <IgnoreFile v-model:files="form.ignoreFiles"></IgnoreFile>
+                <InputTag
+                    class="w-full"
+                    v-model:tags="form.ignoreFiles"
+                    :withFile="true"
+                    :baseDir="baseDir"
+                    :egHelp="$t('cronjob.exclusionRulesHelper')"
+                />
             </fu-step>
         </fu-steps>
         <template #footer>
@@ -174,11 +180,11 @@
 </template>
 <script lang="ts" setup>
 import { ref } from 'vue';
-import { loadSnapshotInfo, snapshotCreate } from '@/api/modules/setting';
+import { loadBaseDir, loadSnapshotInfo, snapshotCreate } from '@/api/modules/setting';
 import { computeSize, newUUID, transferTimeToSecond } from '@/utils/util';
 import i18n from '@/lang';
 import TaskLog from '@/components/log/task/index.vue';
-import IgnoreFile from '@/components/file-batch/index.vue';
+import InputTag from '@/components/input-tag/index.vue';
 import { listBackupOptions } from '@/api/modules/backup';
 import { Rules } from '@/global/form-rules';
 import { ElForm } from 'element-plus';
@@ -193,6 +199,8 @@ const appRef = ref();
 const panelRef = ref();
 const backupRef = ref();
 const taskLogRef = ref();
+
+const baseDir = ref();
 
 const backupOptions = ref();
 const accountOptions = ref();
@@ -249,6 +257,7 @@ const acceptParams = (): void => {
     nowIndex.value = 0;
     search();
     loadBackups();
+    loadInstallDir();
     drawerVisible.value = true;
 };
 
@@ -464,6 +473,11 @@ const selectAllImage = () => {
             }
         }
     }
+};
+
+const loadInstallDir = async () => {
+    const pathRes = await loadBaseDir();
+    baseDir.value = pathRes.data;
 };
 
 const search = async () => {
