@@ -2413,6 +2413,15 @@ const message = {
         ipFromExample3: '如果不确定，可以填 0.0.0.0/0（ipv4）  ::/0（ipv6） [注意：允许任意来源 IP 不安全]',
         http3Helper:
             'HTTP/3 是 HTTP/2 的升级版本，提供更快的连接速度和更好的性能，但是不是所有浏览器都支持 HTTP/3，开启后可能会导致部分浏览器无法访问',
+        cors: '跨域访问(CORS)',
+        enableCors: '开启跨域',
+        allowOrigins: '允许访问的域名',
+        allowMethods: '允许的请求方法',
+        allowHeaders: '允许的请求头',
+        allowCredentials: '允许携带cookies',
+        preflight: '预检请求快速响应',
+        preflightHleper:
+            '开启后，当浏览器发送跨域预检请求（OPTIONS 请求）时，系统会自动返回 204 状态码并设置必要的跨域响应头',
 
         changeDatabase: '切换数据库',
         changeDatabaseHelper1: '数据库关联用于备份恢复网站',

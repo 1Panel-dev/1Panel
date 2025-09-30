@@ -1681,7 +1681,7 @@ func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error)
 
 	switch req.Operate {
 	case "create":
-		config, err = parser.NewStringParser(string(nginx_conf.Proxy)).Parse()
+		config, err = parser.NewStringParser(string(nginx_conf.GetWebsiteFile("proxy.conf"))).Parse()
 		if err != nil {
 			return
 		}
@@ -1747,6 +1747,35 @@ func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error)
 		}
 	} else {
 		location.UpdateDirective("proxy_ssl_server_name", []string{"off"})
+	}
+	if req.Cors {
+		location.UpdateDirective("add_header", []string{"Access-Control-Allow-Origin", req.AllowOrigins, "always"})
+		if req.AllowMethods != "" {
+			location.UpdateDirective("add_header", []string{"Access-Control-Allow-Methods", req.AllowMethods, "always"})
+		} else {
+			location.RemoveDirective("add_header", []string{"Access-Control-Allow-Methods"})
+		}
+		if req.AllowHeaders != "" {
+			location.UpdateDirective("add_header", []string{"Access-Control-Allow-Headers", req.AllowHeaders, "always"})
+		} else {
+			location.RemoveDirective("add_header", []string{"Access-Control-Allow-Headers"})
+		}
+		if req.AllowCredentials {
+			location.UpdateDirective("add_header", []string{"Access-Control-Allow-Credentials", "true", "always"})
+		} else {
+			location.RemoveDirective("add_header", []string{"Access-Control-Allow-Credentials"})
+		}
+		if req.Preflight {
+			location.AddCorsOption()
+		} else {
+			location.RemoveDirective("if", []string{"(", "$request_method", "=", "'OPTIONS'", ")"})
+		}
+	} else {
+		location.RemoveDirective("add_header", []string{"Access-Control-Allow-Origin"})
+		location.RemoveDirective("add_header", []string{"Access-Control-Allow-Methods"})
+		location.RemoveDirective("add_header", []string{"Access-Control-Allow-Headers"})
+		location.RemoveDirective("add_header", []string{"Access-Control-Allow-Credentials"})
+		location.RemoveDirective("if", []string{"(", "$request_method", "=", "'OPTIONS'", ")"})
 	}
 	if err = nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
 		return buserr.WithErr("ErrUpdateBuWebsite", err)
@@ -1907,6 +1936,12 @@ func (w WebsiteService) GetProxies(id uint) (res []request.WebsiteProxyConfig, e
 				proxyConfig.ProxySSLName = directive.GetParameters()[0]
 			}
 		}
+		proxyConfig.Cors = location.Cors
+		proxyConfig.AllowCredentials = location.AllowCredentials
+		proxyConfig.AllowHeaders = location.AllowHeaders
+		proxyConfig.AllowOrigins = location.AllowOrigins
+		proxyConfig.AllowMethods = location.AllowMethods
+		proxyConfig.Preflight = location.Preflight
 		res = append(res, proxyConfig)
 	}
 	return

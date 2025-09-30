@@ -211,24 +211,30 @@ type WebsiteUpdateDirPermission struct {
 }
 
 type WebsiteProxyConfig struct {
-	ID              uint              `json:"id" validate:"required"`
-	Operate         string            `json:"operate" validate:"required"`
-	Enable          bool              `json:"enable" `
-	Cache           bool              `json:"cache" `
-	CacheTime       int               `json:"cacheTime"`
-	CacheUnit       string            `json:"cacheUnit"`
-	ServerCacheTime int               `json:"serverCacheTime"`
-	ServerCacheUnit string            `json:"serverCacheUnit"`
-	Name            string            `json:"name" validate:"required"`
-	Modifier        string            `json:"modifier"`
-	Match           string            `json:"match" validate:"required"`
-	ProxyPass       string            `json:"proxyPass" validate:"required"`
-	ProxyHost       string            `json:"proxyHost" validate:"required"`
-	Content         string            `json:"content"`
-	FilePath        string            `json:"filePath"`
-	Replaces        map[string]string `json:"replaces"`
-	SNI             bool              `json:"sni"`
-	ProxySSLName    string            `json:"proxySSLName"`
+	ID               uint              `json:"id" validate:"required"`
+	Operate          string            `json:"operate" validate:"required"`
+	Enable           bool              `json:"enable" `
+	Cache            bool              `json:"cache" `
+	CacheTime        int               `json:"cacheTime"`
+	CacheUnit        string            `json:"cacheUnit"`
+	ServerCacheTime  int               `json:"serverCacheTime"`
+	ServerCacheUnit  string            `json:"serverCacheUnit"`
+	Name             string            `json:"name" validate:"required"`
+	Modifier         string            `json:"modifier"`
+	Match            string            `json:"match" validate:"required"`
+	ProxyPass        string            `json:"proxyPass" validate:"required"`
+	ProxyHost        string            `json:"proxyHost" validate:"required"`
+	Content          string            `json:"content"`
+	FilePath         string            `json:"filePath"`
+	Replaces         map[string]string `json:"replaces"`
+	SNI              bool              `json:"sni"`
+	ProxySSLName     string            `json:"proxySSLName"`
+	Cors             bool              `json:"cors"`
+	AllowOrigins     string            `json:"allowOrigins"`
+	AllowMethods     string            `json:"allowMethods"`
+	AllowHeaders     string            `json:"allowHeaders"`
+	AllowCredentials bool              `json:"allowCredentials"`
+	Preflight        bool              `json:"preflight"`
 }
 
 type WebsiteProxyReq struct {

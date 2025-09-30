@@ -122,6 +122,38 @@
                         </div>
                     </el-collapse-transition>
 
+                    <el-divider content-position="left">{{ $t('website.cors') }}</el-divider>
+                    <div class="flex justify-between items-center py-3">
+                        <div class="flex flex-col gap-1">
+                            <span class="font-medium">{{ $t('website.enableCors') }}</span>
+                        </div>
+                        <el-switch v-model="proxy.cors" size="large" @change="changeCors(proxy.cors)" />
+                    </div>
+                    <el-collapse-transition>
+                        <div v-if="proxy.cors" class="mt-4">
+                            <el-form-item :label="$t('website.allowOrigins')" prop="allowOrigins">
+                                <el-input v-model="proxy.allowOrigins" type="textarea" placeholder="*"></el-input>
+                            </el-form-item>
+                            <el-form-item :label="$t('website.allowMethods')" prop="allowMethods">
+                                <el-input
+                                    v-model="proxy.allowMethods"
+                                    type="textarea"
+                                    placeholder="GET,POST,OPTIONS,PUT,DELETE"
+                                ></el-input>
+                            </el-form-item>
+                            <el-form-item :label="$t('website.allowHeaders')" prop="allowHeaders">
+                                <el-input v-model="proxy.allowHeaders" type="textarea"></el-input>
+                            </el-form-item>
+                            <el-form-item :label="$t('website.allowCredentials')" prop="allowCredentials">
+                                <el-switch v-model="proxy.allowCredentials" />
+                            </el-form-item>
+                            <el-form-item :label="$t('website.preflight')" prop="preflight">
+                                <el-switch v-model="proxy.preflight" />
+                                <span class="input-help">{{ $t('website.preflightHleper') }}</span>
+                            </el-form-item>
+                        </div>
+                    </el-collapse-transition>
+
                     <el-divider content-position="left">{{ $t('website.replace') }}</el-divider>
 
                     <div>
@@ -194,6 +226,7 @@ const rules = ref({
     proxyPass: [Rules.requiredInput],
     proxyHost: [Rules.requiredInput],
     proxyAddress: [Rules.requiredInput],
+    allowOrigins: [Rules.requiredInput],
 });
 const open = ref(false);
 const loading = ref(false);
@@ -219,6 +252,12 @@ const initData = (): Website.ProxyConfig => ({
     proxySSLName: '',
     serverCacheTime: 10,
     serverCacheUnit: 'm',
+    cors: false,
+    allowOrigins: '*',
+    allowMethods: 'GET,POST,OPTIONS,PUT,DELETE',
+    allowHeaders: '',
+    allowCredentials: false,
+    preflight: true,
 });
 let proxy = ref(initData());
 const replaces = ref<any>([]);
@@ -261,6 +300,22 @@ const changeCache = (cache: boolean) => {
         proxy.value.cacheUnit = '';
         proxy.value.serverCacheTime = 0;
         proxy.value.serverCacheUnit = '';
+    }
+};
+
+const changeCors = (cors: boolean) => {
+    if (cors) {
+        proxy.value.allowOrigins = '*';
+        proxy.value.allowMethods = 'GET,POST,OPTIONS,PUT,DELETE';
+        proxy.value.allowHeaders = '';
+        proxy.value.allowCredentials = false;
+        proxy.value.preflight = true;
+    } else {
+        proxy.value.allowOrigins = '';
+        proxy.value.allowMethods = '';
+        proxy.value.allowHeaders = '';
+        proxy.value.allowCredentials = false;
+        proxy.value.preflight = true;
     }
 };
 

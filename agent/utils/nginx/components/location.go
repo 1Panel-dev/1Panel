@@ -8,20 +8,26 @@ import (
 )
 
 type Location struct {
-	Modifier        string
-	Match           string
-	Cache           bool
-	ProxyPass       string
-	Host            string
-	CacheTime       int
-	CacheUint       string
-	Comment         string
-	Directives      []IDirective
-	Line            int
-	Parameters      []string
-	Replaces        map[string]string
-	ServerCacheTime int
-	ServerCacheUint string
+	Modifier         string
+	Match            string
+	Cache            bool
+	ProxyPass        string
+	Host             string
+	CacheTime        int
+	CacheUint        string
+	Comment          string
+	Directives       []IDirective
+	Line             int
+	Parameters       []string
+	Replaces         map[string]string
+	ServerCacheTime  int
+	ServerCacheUint  string
+	Cors             bool
+	AllowMethods     string
+	AllowHeaders     string
+	AllowOrigins     string
+	AllowCredentials bool
+	Preflight        bool
 }
 
 func (l *Location) GetCodeBlock() string {
@@ -69,6 +75,9 @@ func NewLocation(directive IDirective) *Location {
 					}
 				}
 			}
+			if params[0] == "(" && params[1] == "$request_method" && params[2] == `=` && params[3] == `'OPTIONS'` && params[4] == ")" {
+				location.Preflight = true
+			}
 		case "proxy_cache_valid":
 			timeParam := params[len(params)-1]
 			re := regexp.MustCompile(`^(\d+)(\w+)$`)
@@ -90,6 +99,20 @@ func NewLocation(directive IDirective) *Location {
 				location.Replaces = make(map[string]string, 0)
 			}
 			location.Replaces[strings.Trim(params[0], "\"")] = strings.Trim(params[1], "\"")
+		case "add_header":
+			if params[0] == "Access-Control-Allow-Origin" {
+				location.Cors = true
+				location.AllowOrigins = params[1]
+			}
+			if params[0] == "Access-Control-Allow-Methods" {
+				location.AllowMethods = params[1]
+			}
+			if params[0] == "Access-Control-Allow-Headers" {
+				location.AllowHeaders = params[1]
+			}
+			if params[0] == "Access-Control-Allow-Credentials" && params[1] == "true" {
+				location.AllowCredentials = true
+			}
 		}
 	}
 
@@ -263,4 +286,33 @@ func (l *Location) RemoveSubFilter() {
 	l.RemoveDirective("sub_filter_once", []string{"off"})
 	l.RemoveDirective("sub_filter_types", []string{"*"})
 	l.Replaces = nil
+}
+
+func (l *Location) AddCorsOption() {
+	newDir := &Directive{
+		Name:       "if",
+		Parameters: []string{"(", "$request_method", "=", "'OPTIONS'", ")"},
+		Block:      &Block{},
+	}
+	block := &Block{}
+	block.AppendDirectives(&Directive{
+		Name:       "add_header",
+		Parameters: []string{"Access-Control-Max-Age", "1728000"},
+	})
+	block.AppendDirectives(&Directive{
+		Name:       "add_header",
+		Parameters: []string{"Content-Type", "'text/plain;charset=UTF-8'"},
+	})
+	block.AppendDirectives(&Directive{
+		Name:       "add_header",
+		Parameters: []string{"Content-Length", "0"},
+	})
+	block.AppendDirectives(&Directive{
+		Name:       "return",
+		Parameters: []string{"204"},
+	})
+	newDir.Block = block
+	directives := l.GetDirectives()
+	directives = append(directives, newDir)
+	l.Directives = directives
 }

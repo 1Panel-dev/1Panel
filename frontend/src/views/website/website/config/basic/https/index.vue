@@ -1,184 +1,188 @@
 <template>
     <el-row :gutter="20" v-loading="loading">
         <el-col :xs="24" :sm="18" :md="18" :lg="14" :xl="14">
+            <el-alert :closable="false">
+                <template #default>
+                    <span class="whitespace-pre-line">{{ $t('website.SSLHelper') }}</span>
+                </template>
+            </el-alert>
             <el-form
                 class="moblie-form"
                 ref="httpsForm"
                 label-position="right"
-                label-width="auto"
+                label-width="150px"
                 :model="form"
                 :rules="rules"
             >
                 <el-form-item prop="enable" :label="$t('website.enableHTTPS')">
                     <el-switch v-model="form.enable" @change="changeEnable"></el-switch>
                 </el-form-item>
-                <div v-if="form.enable">
-                    <el-form-item :label="'HTTPS ' + $t('commons.table.port')" prop="HttpsPort">
-                        <el-text>{{ form.httpsPort }}</el-text>
-                    </el-form-item>
-                    <el-text type="warning" class="!ml-2">{{ $t('website.ipWebsiteWarn') }}</el-text>
-                    <el-divider content-position="left">{{ $t('website.SSLConfig') }}</el-divider>
-                    <el-form-item :label="$t('website.HTTPConfig')" prop="httpConfig">
-                        <el-select v-model="form.httpConfig" class="p-w-400">
-                            <el-option :label="$t('website.HTTPToHTTPS')" :value="'HTTPToHTTPS'"></el-option>
-                            <el-option :label="$t('website.HTTPAlso')" :value="'HTTPAlso'"></el-option>
-                            <el-option :label="$t('website.HTTPSOnly')" :value="'HTTPSOnly'"></el-option>
-                        </el-select>
-                    </el-form-item>
-                    <el-form-item :label="'HSTS'" prop="hsts">
-                        <el-checkbox v-model="form.hsts">{{ $t('commons.button.enable') }}</el-checkbox>
-                        <span class="input-help">{{ $t('website.hstsHelper') }}</span>
-                    </el-form-item>
-                    <el-form-item
-                        :label="'HSTS ' + $t('website.includeSubDomains')"
-                        prop="hstsIncludeSubDomains"
-                        v-if="form.hsts"
-                    >
-                        <el-checkbox v-model="form.hstsIncludeSubDomains">
-                            {{ $t('commons.button.enable') }}
-                        </el-checkbox>
-                        <span class="input-help">
-                            {{ $t('website.hstsIncludeSubDomainsHelper') }}
-                        </span>
-                    </el-form-item>
-                    <el-form-item :label="'HTTP3'" prop="http3">
-                        <el-checkbox v-model="form.http3">{{ $t('commons.button.enable') }}</el-checkbox>
-                        <span class="input-help">{{ $t('website.http3Helper') }}</span>
-                    </el-form-item>
-                    <el-form-item :label="$t('website.sslConfig')" prop="type">
-                        <el-select v-model="form.type" @change="changeType(form.type)" class="p-w-400">
-                            <el-option :label="$t('website.oldSSL')" :value="'existed'"></el-option>
-                            <el-option :label="$t('website.manualSSL')" :value="'manual'"></el-option>
-                        </el-select>
-                    </el-form-item>
-                    <div v-if="form.type === 'existed'">
-                        <el-form-item :label="$t('website.acmeAccountManage')" prop="acmeAccountID">
-                            <el-select
-                                v-model="form.acmeAccountID"
-                                :placeholder="$t('website.selectAcme')"
-                                @change="listSSLs"
-                                class="p-w-400"
-                            >
-                                <el-option :key="0" :label="$t('website.imported')" :value="0"></el-option>
-                                <el-option
-                                    v-for="(acme, index) in acmeAccounts"
-                                    :key="index"
-                                    :label="acme.email"
-                                    :value="acme.id"
+
+                <el-collapse-transition>
+                    <div v-if="form.enable">
+                        <el-form-item :label="'HTTPS ' + $t('commons.table.port')" prop="HttpsPort">
+                            <el-text>{{ form.httpsPort }}</el-text>
+                        </el-form-item>
+                        <el-text type="warning" class="!ml-2">{{ $t('website.ipWebsiteWarn') }}</el-text>
+                        <el-divider content-position="left">{{ $t('website.SSLConfig') }}</el-divider>
+                        <el-form-item :label="$t('website.HTTPConfig')" prop="httpConfig">
+                            <el-select v-model="form.httpConfig" class="p-w-400">
+                                <el-option :label="$t('website.HTTPToHTTPS')" :value="'HTTPToHTTPS'"></el-option>
+                                <el-option :label="$t('website.HTTPAlso')" :value="'HTTPAlso'"></el-option>
+                                <el-option :label="$t('website.HTTPSOnly')" :value="'HTTPSOnly'"></el-option>
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item :label="'HSTS'" prop="hsts">
+                            <el-checkbox v-model="form.hsts">{{ $t('commons.button.enable') }}</el-checkbox>
+                            <span class="input-help">{{ $t('website.hstsHelper') }}</span>
+                        </el-form-item>
+                        <el-form-item
+                            :label="'HSTS ' + $t('website.includeSubDomains')"
+                            prop="hstsIncludeSubDomains"
+                            v-if="form.hsts"
+                        >
+                            <el-checkbox v-model="form.hstsIncludeSubDomains">
+                                {{ $t('commons.button.enable') }}
+                            </el-checkbox>
+                            <span class="input-help">
+                                {{ $t('website.hstsIncludeSubDomainsHelper') }}
+                            </span>
+                        </el-form-item>
+                        <el-form-item :label="'HTTP3'" prop="http3">
+                            <el-checkbox v-model="form.http3">{{ $t('commons.button.enable') }}</el-checkbox>
+                            <span class="input-help">{{ $t('website.http3Helper') }}</span>
+                        </el-form-item>
+                        <el-form-item :label="$t('website.sslConfig')" prop="type">
+                            <el-select v-model="form.type" @change="changeType(form.type)" class="p-w-400">
+                                <el-option :label="$t('website.oldSSL')" :value="'existed'"></el-option>
+                                <el-option :label="$t('website.manualSSL')" :value="'manual'"></el-option>
+                            </el-select>
+                        </el-form-item>
+                        <div v-if="form.type === 'existed'">
+                            <el-form-item :label="$t('website.acmeAccountManage')" prop="acmeAccountID">
+                                <el-select
+                                    v-model="form.acmeAccountID"
+                                    :placeholder="$t('website.selectAcme')"
+                                    @change="listSSLs"
+                                    class="p-w-400"
                                 >
-                                    <span>
-                                        {{ acme.email }}
-                                        <el-tag class="ml-5">{{ getAccountName(acme.type) }}</el-tag>
-                                    </span>
-                                </el-option>
-                            </el-select>
-                        </el-form-item>
-                        <el-form-item :label="$t('website.ssl')" prop="websiteSSLId" :hide-required-asterisk="true">
-                            <el-select
-                                v-model="form.websiteSSLId"
-                                :placeholder="$t('website.selectSSL')"
-                                @change="changeSSl(form.websiteSSLId)"
-                                class="p-w-400"
-                            >
-                                <el-option
-                                    v-for="(ssl, index) in ssls"
-                                    :key="index"
-                                    :label="ssl.primaryDomain"
-                                    :value="ssl.id"
-                                    :disabled="ssl.pem === ''"
-                                ></el-option>
-                            </el-select>
-                        </el-form-item>
-                    </div>
-                    <div v-if="form.type === 'manual'">
-                        <el-form-item :label="$t('website.importType')" prop="type">
-                            <el-select v-model="form.importType">
-                                <el-option :label="$t('website.pasteSSL')" :value="'paste'"></el-option>
-                                <el-option :label="$t('website.localSSL')" :value="'local'"></el-option>
-                            </el-select>
-                        </el-form-item>
-                        <div v-if="form.importType === 'paste'">
-                            <el-form-item :label="$t('website.privateKey')" prop="privateKey">
-                                <el-input v-model="form.privateKey" :rows="6" type="textarea" />
+                                    <el-option :key="0" :label="$t('website.imported')" :value="0"></el-option>
+                                    <el-option
+                                        v-for="(acme, index) in acmeAccounts"
+                                        :key="index"
+                                        :label="acme.email"
+                                        :value="acme.id"
+                                    >
+                                        <span>
+                                            {{ acme.email }}
+                                            <el-tag class="ml-5">{{ getAccountName(acme.type) }}</el-tag>
+                                        </span>
+                                    </el-option>
+                                </el-select>
                             </el-form-item>
-                            <el-form-item :label="$t('website.certificate')" prop="certificate">
-                                <el-input v-model="form.certificate" :rows="6" type="textarea" />
+                            <el-form-item :label="$t('website.ssl')" prop="websiteSSLId" :hide-required-asterisk="true">
+                                <el-select
+                                    v-model="form.websiteSSLId"
+                                    :placeholder="$t('website.selectSSL')"
+                                    @change="changeSSl(form.websiteSSLId)"
+                                    class="p-w-400"
+                                >
+                                    <el-option
+                                        v-for="(ssl, index) in ssls"
+                                        :key="index"
+                                        :label="ssl.primaryDomain"
+                                        :value="ssl.id"
+                                        :disabled="ssl.pem === ''"
+                                    ></el-option>
+                                </el-select>
                             </el-form-item>
                         </div>
-                        <div v-if="form.importType === 'local'">
-                            <el-form-item :label="$t('website.privateKeyPath')" prop="privateKeyPath">
-                                <el-input v-model="form.privateKeyPath">
-                                    <template #prepend>
-                                        <el-button icon="Folder" @click="keyFileRef.acceptParams({ dir: false })" />
-                                    </template>
-                                </el-input>
+                        <div v-if="form.type === 'manual'">
+                            <el-form-item :label="$t('website.importType')" prop="type">
+                                <el-select v-model="form.importType">
+                                    <el-option :label="$t('website.pasteSSL')" :value="'paste'"></el-option>
+                                    <el-option :label="$t('website.localSSL')" :value="'local'"></el-option>
+                                </el-select>
                             </el-form-item>
-                            <el-form-item :label="$t('website.certificatePath')" prop="certificatePath">
-                                <el-input v-model="form.certificatePath">
-                                    <template #prepend>
-                                        <el-button icon="Folder" @click="certFileRef.acceptParams({ dir: false })" />
-                                    </template>
-                                </el-input>
-                            </el-form-item>
+                            <div v-if="form.importType === 'paste'">
+                                <el-form-item :label="$t('website.privateKey')" prop="privateKey">
+                                    <el-input v-model="form.privateKey" :rows="6" type="textarea" />
+                                </el-form-item>
+                                <el-form-item :label="$t('website.certificate')" prop="certificate">
+                                    <el-input v-model="form.certificate" :rows="6" type="textarea" />
+                                </el-form-item>
+                            </div>
+                            <div v-if="form.importType === 'local'">
+                                <el-form-item :label="$t('website.privateKeyPath')" prop="privateKeyPath">
+                                    <el-input v-model="form.privateKeyPath">
+                                        <template #prepend>
+                                            <el-button icon="Folder" @click="keyFileRef.acceptParams({ dir: false })" />
+                                        </template>
+                                    </el-input>
+                                </el-form-item>
+                                <el-form-item :label="$t('website.certificatePath')" prop="certificatePath">
+                                    <el-input v-model="form.certificatePath">
+                                        <template #prepend>
+                                            <el-button
+                                                icon="Folder"
+                                                @click="certFileRef.acceptParams({ dir: false })"
+                                            />
+                                        </template>
+                                    </el-input>
+                                </el-form-item>
+                            </div>
                         </div>
+                        <el-form-item :label="' '" v-if="websiteSSL && websiteSSL.id > 0">
+                            <el-descriptions :column="7" border direction="vertical">
+                                <el-descriptions-item :label="$t('website.primaryDomain')">
+                                    {{ websiteSSL.primaryDomain }}
+                                </el-descriptions-item>
+                                <el-descriptions-item :label="$t('website.otherDomains')">
+                                    {{ websiteSSL.domains }}
+                                </el-descriptions-item>
+                                <el-descriptions-item :label="$t('website.brand')">
+                                    {{ websiteSSL.organization }}
+                                </el-descriptions-item>
+                                <el-descriptions-item :label="$t('ssl.provider')">
+                                    {{ getProvider(websiteSSL.provider) }}
+                                </el-descriptions-item>
+                                <el-descriptions-item
+                                    :label="$t('ssl.acmeAccount')"
+                                    v-if="websiteSSL.acmeAccount && websiteSSL.provider !== 'manual'"
+                                >
+                                    {{ websiteSSL.acmeAccount.email }}
+                                </el-descriptions-item>
+                                <el-descriptions-item :label="$t('website.expireDate')">
+                                    {{ dateFormatSimple(websiteSSL.expireDate) }}
+                                </el-descriptions-item>
+                                <el-descriptions-item :label="$t('website.remark')">
+                                    {{ websiteSSL.description }}
+                                </el-descriptions-item>
+                            </el-descriptions>
+                        </el-form-item>
+                        <el-divider content-position="left">{{ $t('website.SSLProConfig') }}</el-divider>
+                        <el-form-item :label="$t('website.supportProtocol')" prop="SSLProtocol">
+                            <el-checkbox-group v-model="form.SSLProtocol">
+                                <el-checkbox :value="'TLSv1.3'">{{ 'TLS 1.3' }}</el-checkbox>
+                                <el-checkbox :value="'TLSv1.2'">{{ 'TLS 1.2' }}</el-checkbox>
+                                <el-checkbox :value="'TLSv1.1'">
+                                    {{ 'TLS 1.1' + $t('website.notSecurity') }}
+                                </el-checkbox>
+                                <el-checkbox :value="'TLSv1'">
+                                    {{ 'TLS 1.0' + $t('website.notSecurity') }}
+                                </el-checkbox>
+                            </el-checkbox-group>
+                        </el-form-item>
+                        <el-form-item prop="algorithm" :label="$t('website.encryptionAlgorithm')">
+                            <el-input type="textarea" :rows="3" v-model.trim="form.algorithm"></el-input>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button type="primary" @click="submit(httpsForm)">
+                                {{ $t('commons.button.save') }}
+                            </el-button>
+                        </el-form-item>
                     </div>
-                    <el-form-item :label="' '" v-if="websiteSSL && websiteSSL.id > 0">
-                        <el-descriptions :column="7" border direction="vertical">
-                            <el-descriptions-item :label="$t('website.primaryDomain')">
-                                {{ websiteSSL.primaryDomain }}
-                            </el-descriptions-item>
-                            <el-descriptions-item :label="$t('website.otherDomains')">
-                                {{ websiteSSL.domains }}
-                            </el-descriptions-item>
-                            <el-descriptions-item :label="$t('website.brand')">
-                                {{ websiteSSL.organization }}
-                            </el-descriptions-item>
-                            <el-descriptions-item :label="$t('ssl.provider')">
-                                {{ getProvider(websiteSSL.provider) }}
-                            </el-descriptions-item>
-                            <el-descriptions-item
-                                :label="$t('ssl.acmeAccount')"
-                                v-if="websiteSSL.acmeAccount && websiteSSL.provider !== 'manual'"
-                            >
-                                {{ websiteSSL.acmeAccount.email }}
-                            </el-descriptions-item>
-                            <el-descriptions-item :label="$t('website.expireDate')">
-                                {{ dateFormatSimple(websiteSSL.expireDate) }}
-                            </el-descriptions-item>
-                            <el-descriptions-item :label="$t('website.remark')">
-                                {{ websiteSSL.description }}
-                            </el-descriptions-item>
-                        </el-descriptions>
-                    </el-form-item>
-                    <el-divider content-position="left">{{ $t('website.SSLProConfig') }}</el-divider>
-                    <el-form-item :label="$t('website.supportProtocol')" prop="SSLProtocol">
-                        <el-checkbox-group v-model="form.SSLProtocol">
-                            <el-checkbox :value="'TLSv1.3'">{{ 'TLS 1.3' }}</el-checkbox>
-                            <el-checkbox :value="'TLSv1.2'">{{ 'TLS 1.2' }}</el-checkbox>
-                            <el-checkbox :value="'TLSv1.1'">
-                                {{ 'TLS 1.1' + $t('website.notSecurity') }}
-                            </el-checkbox>
-                            <el-checkbox :value="'TLSv1'">
-                                {{ 'TLS 1.0' + $t('website.notSecurity') }}
-                            </el-checkbox>
-                        </el-checkbox-group>
-                    </el-form-item>
-                    <el-form-item prop="algorithm" :label="$t('website.encryptionAlgorithm')">
-                        <el-input type="textarea" :rows="3" v-model.trim="form.algorithm"></el-input>
-                    </el-form-item>
-                    <el-form-item>
-                        <el-button type="primary" @click="submit(httpsForm)">
-                            {{ $t('commons.button.save') }}
-                        </el-button>
-                    </el-form-item>
-                </div>
-                <div v-else>
-                    <el-alert :closable="false">
-                        <template #default>
-                            <span style="white-space: pre-line">{{ $t('website.SSLHelper') }}</span>
-                        </template>
-                    </el-alert>
-                </div>
+                </el-collapse-transition>
             </el-form>
         </el-col>
     </el-row>

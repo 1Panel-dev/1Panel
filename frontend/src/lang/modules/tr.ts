@@ -2630,6 +2630,16 @@ const message = {
             'Emin değilseniz, 0.0.0.0/0 (ipv4) ::/0 (ipv6) girebilirsiniz [Not: Herhangi bir kaynak IP’ye izin vermek güvenli değildir]',
         http3Helper:
             'HTTP/3, HTTP/2’nin bir yükseltmesidir, daha hızlı bağlantı hızları ve daha iyi performans sunar, ancak tüm tarayıcılar HTTP/3’ü desteklemez. Etkinleştirilmesi bazı tarayıcıların siteye erişememesine neden olabilir.',
+        cors: 'Çapraz Kaynak Paylaşımı (CORS)',
+        enableCors: 'CORS etkinleştir',
+        allowOrigins: 'İzin verilen alan adları',
+        allowMethods: 'İzin verilen istek yöntemleri',
+        allowHeaders: 'İzin verilen istek başlıkları',
+        allowCredentials: 'Çerezlerin gönderilmesine izin ver',
+        preflight: 'Ön istek hızlı yanıtı',
+        preflightHleper:
+            'Etkinleştirildiğinde, tarayıcı çapraz kaynak ön isteği (OPTIONS isteği) gönderdiğinde, sistem otomatik olarak 204 durum kodunu döndürecek ve gerekli çapraz kaynak yanıt başlıklarını ayarlayacaktır',
+
         changeDatabase: 'Veritabanını Değiştir',
         changeDatabaseHelper1:
             'Veritabanı ilişkilendirmesi, web sitesinin yedeklenmesi ve geri yüklenmesi için kullanılır.',

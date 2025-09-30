@@ -2575,6 +2575,16 @@ const message = {
         ipFromExample2: 'Si el frontend es un CDN: rango IP del CDN',
         ipFromExample3: 'En caso de duda: 0.0.0.0/0 (IPv4) ::/0 (IPv6) [Nota: poco seguro]',
         http3Helper: 'HTTP/3 ofrece mayor velocidad y rendimiento, pero no todos los navegadores lo soportan.',
+        cors: 'Intercambio de Recursos de Origen Cruzado (CORS)',
+        enableCors: 'Habilitar CORS',
+        allowOrigins: 'Dominios permitidos',
+        allowMethods: 'Métodos de solicitud permitidos',
+        allowHeaders: 'Encabezados de solicitud permitidos',
+        allowCredentials: 'Permitir enviar cookies',
+        preflight: 'Respuesta rápida a solicitud de preflight',
+        preflightHleper:
+            'Cuando está habilitado, cuando el navegador envía una solicitud de preflight de origen cruzado (solicitud OPTIONS), el sistema devolverá automáticamente un código de estado 204 y establecerá los encabezados de respuesta de origen cruzado necesarios',
+
         changeDatabase: 'Cambiar base de datos',
         changeDatabaseHelper1: 'La asociación se usa en backups/restauraciones.',
         changeDatabaseHelper2: 'Cambiar de DB invalida backups previos.',

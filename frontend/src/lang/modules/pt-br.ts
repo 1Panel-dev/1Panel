@@ -2575,6 +2575,16 @@ const message = {
             'Se não tiver certeza, você pode preencher 0.0.0.0/0 (IPv4) ou ::/0 (IPv6). [Nota: Permitir qualquer fonte de IP não é seguro.]',
         http3Helper:
             'O HTTP/3 é uma versão atualizada do HTTP/2, fornecendo velocidades de conexão mais rápidas e melhor desempenho. No entanto, nem todos os navegadores suportam HTTP/3, e ativá-lo pode fazer com que alguns navegadores não consigam acessar o site.',
+        cors: 'Compartilhamento de Recursos de Origem Cruzada (CORS)',
+        enableCors: 'Habilitar CORS',
+        allowOrigins: 'Domínios permitidos',
+        allowMethods: 'Métodos de solicitação permitidos',
+        allowHeaders: 'Cabeçalhos de solicitação permitidos',
+        allowCredentials: 'Permitir envio de cookies',
+        preflight: 'Resposta rápida a solicitação de preflight',
+        preflightHleper:
+            'Quando habilitado, quando o navegador envia uma solicitação de preflight de origem cruzada (solicitação OPTIONS), o sistema retornará automaticamente um código de status 204 e definirá os cabeçalhos de resposta de origem cruzada necessários',
+
         changeDatabase: 'Alterar Banco de Dados',
         changeDatabaseHelper1: 'A associação do banco de dados é usada para backup e restauração do site.',
         changeDatabaseHelper2: 'Alternar para outro banco de dados pode tornar backups anteriores irrecuperáveis.',

@@ -2421,6 +2421,15 @@ const message = {
         ipFromExample3: '如果不確定，可以填 0.0.0.0/0（ipv4） ::/0（ipv6） [注意：允許任意來源 IP 不安全]',
         http3Helper:
             'HTTP/3 是 HTTP/2 的升級版本，提供更快的連線速度和更好的效能，但並非所有瀏覽器都支援 HTTP/3，啟用後可能會導致部分瀏覽器無法訪問',
+        cors: '跨域存取(CORS)',
+        enableCors: '開啟跨域',
+        allowOrigins: '允許存取的網域名稱',
+        allowMethods: '允許的請求方法',
+        allowHeaders: '允許的請求標頭',
+        allowCredentials: '允許攜帶cookies',
+        preflight: '預檢請求快速回應',
+        preflightHleper:
+            '開啟後，當瀏覽器發送跨域預檢請求（OPTIONS 請求）時，系統會自動返回 204 狀態碼並設定必要的跨域回應標頭',
 
         changeDatabase: '切換資料庫',
         changeDatabaseHelper1: '資料庫關聯用於備份復原網站。',

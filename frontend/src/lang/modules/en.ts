@@ -2598,6 +2598,15 @@ const message = {
             'If unsure, you can enter 0.0.0.0/0 (ipv4) ::/0 (ipv6) [Note: Allowing any source IP is not secure]',
         http3Helper:
             'HTTP/3 is an upgrade to HTTP/2, offering faster connection speeds and better performance, but not all browsers support HTTP/3. Enabling it may cause some browsers to be unable to access the site.',
+        cors: 'Cross-Origin Resource Sharing (CORS)',
+        enableCors: 'Enable CORS',
+        allowOrigins: 'Allowed domains',
+        allowMethods: 'Allowed request methods',
+        allowHeaders: 'Allowed request headers',
+        allowCredentials: 'Allow cookies to be sent',
+        preflight: 'Preflight request fast response',
+        preflightHleper:
+            'When enabled, when the browser sends a cross-origin preflight request (OPTIONS request), the system will automatically return a 204 status code and set the necessary cross-origin response headers',
 
         changeDatabase: 'Change Database',
         changeDatabaseHelper1: 'Database association is used for backing up and restoring the website.',

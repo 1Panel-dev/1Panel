@@ -2471,6 +2471,16 @@ const message = {
             '확실하지 않은 경우 0.0.0.0/0 (IPv4) 또는 ::/0 (IPv6)를 입력할 수 있습니다. [주의: 모든 소스 IP를 허용하는 것은 안전하지 않습니다.]',
         http3Helper:
             'HTTP/3는 HTTP/2의 업그레이드 버전으로, 더 빠른 연결 속도와 더 나은 성능을 제공합니다. 그러나 모든 브라우저가 HTTP/3를 지원하는 것은 아니며, 활성화하면 일부 브라우저가 사이트에 접근하지 못할 수 있습니다.',
+        cors: '교차 출처 리소스 공유(CORS)',
+        enableCors: 'CORS 활성화',
+        allowOrigins: '허용된 도메인',
+        allowMethods: '허용된 요청 메서드',
+        allowHeaders: '허용된 요청 헤더',
+        allowCredentials: '쿠키 전송 허용',
+        preflight: '프리플라이트 요청 빠른 응답',
+        preflightHleper:
+            '활성화하면 브라우저가 교차 출처 프리플라이트 요청(OPTIONS 요청)을 보낼 때 시스템이 자동으로 204 상태 코드를 반환하고 필요한 교차 출처 응답 헤더를 설정합니다',
+
         changeDatabase: '데이터베이스 전환',
         changeDatabaseHelper1: '데이터베이스 연관은 웹사이트 백업 및 복원에 사용됩니다.',
         changeDatabaseHelper2: '다른 데이터베이스로 전환하면 이전 백업을 복원할 수 없게 될 수 있습니다.',

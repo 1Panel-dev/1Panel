@@ -2570,6 +2570,16 @@ const message = {
             'Jika tidak pasti, anda boleh mengisi 0.0.0.0/0 (IPv4) atau ::/0 (IPv6). [Nota: Membenarkan sebarang sumber IP tidak selamat.]',
         http3Helper:
             'HTTP/3 adalah versi naik taraf HTTP/2, menyediakan kelajuan sambungan yang lebih pantas dan prestasi yang lebih baik. Walau bagaimanapun, tidak semua penyemak imbas menyokong HTTP/3, dan mengaktifkannya mungkin menyebabkan beberapa penyemak imbas tidak dapat mengakses laman web.',
+        cors: 'Perkongsian Sumber Asal Silang (CORS)',
+        enableCors: 'Dayakan CORS',
+        allowOrigins: 'Domain yang dibenarkan',
+        allowMethods: 'Kaedah permintaan yang dibenarkan',
+        allowHeaders: 'Pengepala permintaan yang dibenarkan',
+        allowCredentials: 'Benarkan kuki dihantar',
+        preflight: 'Tindak balas pantas permintaan preflight',
+        preflightHleper:
+            'Apabila didayakan, apabila pelayar menghantar permintaan preflight asal silang (permintaan OPTIONS), sistem akan secara automatik mengembalikan kod status 204 dan menetapkan pengepala respons asal silang yang diperlukan',
+
         changeDatabase: 'Tukar Pangkalan Data',
         changeDatabaseHelper1: 'Perkaitan pangkalan data digunakan untuk sandaran dan pemulihan laman web.',
         changeDatabaseHelper2:

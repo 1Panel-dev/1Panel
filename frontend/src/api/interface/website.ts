@@ -407,6 +407,12 @@ export namespace Website {
         proxyProtocol?: string;
         sni?: boolean;
         proxySSLName: string;
+        cors: boolean;
+        allowOrigins: string;
+        allowMethods: string;
+        allowHeaders: string;
+        allowCredentials: boolean;
+        preflight: boolean;
     }
 
     export interface ProxReplace {
