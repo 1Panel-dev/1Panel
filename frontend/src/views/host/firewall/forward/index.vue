@@ -43,6 +43,19 @@
                             <el-table-column :label="$t('firewall.sourcePort')" :min-width="70" prop="port" />
                             <el-table-column :min-width="80" :label="$t('firewall.targetIP')" prop="targetIP" />
                             <el-table-column :label="$t('firewall.targetPort')" :min-width="70" prop="targetPort" />
+                            <template v-if="fireName === 'ufw'">
+                                <el-table-column
+                                    :label="$t('firewall.forwardInboundInterface')"
+                                    :min-width="70"
+                                    prop="interface"
+                                >
+                                    <template #default="{ row }">
+                                        <span>
+                                            {{ row.interface === '' ? $t('commons.table.all') : row.interface }}
+                                        </span>
+                                    </template>
+                                </el-table-column>
+                            </template>
                             <fu-table-operations
                                 width="200px"
                                 :buttons="buttons"
@@ -125,7 +138,13 @@ const search = async () => {
     await searchFireRule(params)
         .then((res) => {
             loading.value = false;
-            data.value = res.data.items || [];
+            data.value =
+                res.data.items?.map((item) => {
+                    return {
+                        ...item,
+                        interface: item.interface === '*' ? '' : item.interface,
+                    };
+                }) || [];
             paginationConfig.total = res.data.total;
         })
         .catch(() => {
@@ -141,11 +160,13 @@ const onOpenDialog = async (
         port: '8080',
         targetIP: '',
         targetPort: '',
+        interface: '',
     },
 ) => {
     let params = {
         title,
         rowData: { ...rowData },
+        fireName: fireName.value,
     };
     dialogRef.value!.acceptParams(params);
 };

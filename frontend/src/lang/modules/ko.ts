@@ -2696,6 +2696,7 @@ const message = {
         forwardHelper1: "로컬 포트로 전달하려면, 대상 IP 를 '127.0.0.1'로 설정해야 합니다.",
         forwardHelper2: '대상 IP 를 비워두면 로컬 포트로 전달됩니다.',
         forwardHelper3: 'IPv4 포트 전달만 지원됩니다.',
+        forwardInboundInterface: '포워딩 인바운드 네트워크 인터페이스',
     },
     runtime: {
         runtime: '실행 환경',

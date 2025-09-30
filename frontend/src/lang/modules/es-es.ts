@@ -2797,6 +2797,7 @@ const message = {
         forwardHelper1: 'Si quieres reenviar al puerto local, la IP de destino debe ser "127.0.0.1".',
         forwardHelper2: 'Deja en blanco la IP de destino para reenviar al puerto local.',
         forwardHelper3: 'Solo se admite redirección de puertos IPv4.',
+        forwardInboundInterface: 'Interfaz de Red de Entrada para Reenvío',
     },
     runtime: {
         runtime: 'Runtime',

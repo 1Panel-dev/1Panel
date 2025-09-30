@@ -23,6 +23,19 @@
             <el-form-item :label="$t('firewall.targetPort')" prop="targetPort">
                 <el-input clearable v-model.trim="dialogData.rowData!.targetPort" />
             </el-form-item>
+
+            <template v-if="dialogData.fireName === 'ufw'">
+                <el-form-item :label="$t('firewall.forwardInboundInterface')" prop="interface">
+                    <el-select class="w-full" v-model="dialogData.rowData!.interface">
+                        <el-option
+                            v-for="item in interfaceOptions"
+                            :key="item.value"
+                            :label="item.label === 'all' ? $t('commons.table.all') : item.label"
+                            :value="item.value"
+                        />
+                    </el-select>
+                </el-form-item>
+            </template>
         </el-form>
         <template #footer>
             <span class="dialog-footer">
@@ -42,15 +55,18 @@ import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { MsgSuccess } from '@/utils/message';
 import { Host } from '@/api/interface/host';
-import { operateForwardRule } from '@/api/modules/host';
+import { operateForwardRule, getNetworkOptions } from '@/api/modules/host';
 import { checkCidr, checkCidrV6, checkIp, checkPort, deepCopy } from '@/utils/util';
 
 const loading = ref();
 const oldRule = ref<Host.RuleForward>();
 
+const interfaceOptions = ref<Array<{ label: string; value: string }>>([]);
+
 interface DialogProps {
     title: string;
     rowData?: Host.RuleForward;
+    fireName?: string;
     getTableList?: () => Promise<any>;
 }
 const title = ref<string>('');
@@ -62,6 +78,12 @@ const acceptParams = (params: DialogProps): void => {
     dialogData.value = params;
     if (dialogData.value.title === 'edit') {
         oldRule.value = deepCopy(params.rowData);
+    }
+    if (dialogData.value.fireName === 'ufw') {
+        getNetworkOptions().then((res) => {
+            interfaceOptions.value = res.data.map((item) => ({ label: item, value: item }));
+            dialogData.value.rowData!.interface = dialogData.value.rowData!.interface || 'all';
+        });
     }
     title.value = i18n.global.t('firewall.' + dialogData.value.title);
     drawerVisible.value = true;
@@ -126,6 +148,9 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         rowData.operation = 'add';
         if (rowData.targetIP === '') {
             rowData.targetIP = '127.0.0.1';
+        }
+        if (rowData.interface === 'all') {
+            rowData.interface = '';
         }
         rules.push(rowData);
         loading.value = true;

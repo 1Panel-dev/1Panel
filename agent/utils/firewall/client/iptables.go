@@ -25,7 +25,7 @@ const (
 const NatChain = "1PANEL"
 
 var (
-	natListRegex = regexp.MustCompile(`^(\d+)\s+(.+?)\s+(.+?)\s+(.+?)\s+(.+?)\s+(.+?)(?:\s+(.+?) .+?:(\d{1,5}(?::\d+)?).+?[ :](.+-.+|(?:.+:)?\d{1,5}(?:-\d{1,5})?))?$`)
+	natListRegex = regexp.MustCompile(`^(\d+)\s+(.+?)\s+(.+?)\s+(.+?)\s+(.+?)\s+(.+?)\s+(.+?)\s+(.+?)\s+(.+?)\s+(.+?)(?:\s+(.+?) .+?:(\d{1,5}(?::\d+)?).+?[ :](.+-.+|(?:.+:)?\d{1,5}(?:-\d{1,5})?))?$`)
 )
 
 type Iptables struct {
@@ -92,7 +92,7 @@ func (iptables *Iptables) NatList(chain ...string) ([]IptablesNatInfo, error) {
 	if len(chain) == 0 {
 		chain = append(chain, PreRoutingChain)
 	}
-	stdout, err := iptables.outf(NatTab, "-nL %s --line", chain[0])
+	stdout, err := iptables.outf(NatTab, "-nvL %s --line-numbers", chain[0])
 	if err != nil {
 		return nil, err
 	}
@@ -104,18 +104,20 @@ func (iptables *Iptables) NatList(chain ...string) ([]IptablesNatInfo, error) {
 		})
 		if natListRegex.MatchString(line) {
 			match := natListRegex.FindStringSubmatch(line)
-			if !strings.Contains(match[9], ":") {
-				match[9] = fmt.Sprintf(":%s", match[9])
+			if !strings.Contains(match[13], ":") {
+				match[13] = fmt.Sprintf(":%s", match[13])
 			}
 			forwardList = append(forwardList, IptablesNatInfo{
 				Num:         match[1],
-				Target:      match[2],
-				Protocol:    match[7],
-				Opt:         match[4],
-				Source:      match[5],
-				Destination: match[6],
-				SrcPort:     match[8],
-				DestPort:    match[9],
+				Target:      match[4],
+				Protocol:    match[11],
+				InIface:     match[7],
+				OutIface:    match[8],
+				Opt:         match[6],
+				Source:      match[9],
+				Destination: match[10],
+				SrcPort:     match[12],
+				DestPort:    match[13],
 			})
 		}
 	}
@@ -123,16 +125,14 @@ func (iptables *Iptables) NatList(chain ...string) ([]IptablesNatInfo, error) {
 	return forwardList, nil
 }
 
-func (iptables *Iptables) NatAdd(protocol, srcPort, dest, destPort string, save bool) error {
+func (iptables *Iptables) NatAdd(protocol, srcPort, dest, destPort, iface string, save bool) error {
 	if dest != "" && dest != "127.0.0.1" && dest != "localhost" {
-		if err := iptables.runf(NatTab, fmt.Sprintf(
-			"-A %s -p %s --dport %s -j DNAT --to-destination %s:%s",
-			PreRoutingChain,
-			protocol,
-			srcPort,
-			dest,
-			destPort,
-		)); err != nil {
+		iptablesArg := fmt.Sprintf("-A %s", PreRoutingChain)
+		if iface != "" {
+			iptablesArg += fmt.Sprintf(" -i %s", iface)
+		}
+		iptablesArg += fmt.Sprintf(" -p %s --dport %s -j DNAT --to-destination %s:%s", protocol, srcPort, dest, destPort)
+		if err := iptables.runf(NatTab, iptablesArg); err != nil {
 			return err
 		}
 
@@ -166,13 +166,12 @@ func (iptables *Iptables) NatAdd(protocol, srcPort, dest, destPort string, save 
 			return err
 		}
 	} else {
-		if err := iptables.runf(NatTab, fmt.Sprintf(
-			"-A %s -p %s --dport %s -j REDIRECT --to-port %s",
-			PreRoutingChain,
-			protocol,
-			srcPort,
-			destPort,
-		)); err != nil {
+		iptablesArg := fmt.Sprintf("-A %s", PreRoutingChain)
+		if iface != "" {
+			iptablesArg += fmt.Sprintf(" -i %s", iface)
+		}
+		iptablesArg += fmt.Sprintf(" -p %s --dport %s -j REDIRECT --to-port %s", protocol, srcPort, destPort)
+		if err := iptables.runf(NatTab, iptablesArg); err != nil {
 			return err
 		}
 	}
@@ -183,12 +182,13 @@ func (iptables *Iptables) NatAdd(protocol, srcPort, dest, destPort string, save 
 			Port:       srcPort,
 			TargetIP:   dest,
 			TargetPort: destPort,
+			Interface:  iface,
 		}).Error
 	}
 	return nil
 }
 
-func (iptables *Iptables) NatRemove(num string, protocol, srcPort, dest, destPort string) error {
+func (iptables *Iptables) NatRemove(num string, protocol, srcPort, dest, destPort, iface string) error {
 	if err := iptables.runf(NatTab, "-D %s %s", PreRoutingChain, num); err != nil {
 		return err
 	}
@@ -226,11 +226,13 @@ func (iptables *Iptables) NatRemove(num string, protocol, srcPort, dest, destPor
 	}
 
 	global.DB.Where(
-		"protocol = ? AND port = ? AND target_ip = ? AND target_port = ?",
+		"protocol = ? AND port = ? AND target_ip = ? AND target_port = ? AND (interface = ? OR (interface IS NULL AND ? = ''))",
 		protocol,
 		srcPort,
 		dest,
 		destPort,
+		iface,
+		iface,
 	).Delete(&model.Forward{})
 	return nil
 }
@@ -249,7 +251,7 @@ func (iptables *Iptables) Reload() error {
 	var rules []model.Forward
 	global.DB.Find(&rules)
 	for _, forward := range rules {
-		if err := iptables.NatAdd(forward.Protocol, forward.Port, forward.TargetIP, forward.TargetPort, false); err != nil {
+		if err := iptables.NatAdd(forward.Protocol, forward.Port, forward.TargetIP, forward.TargetPort, forward.Interface, false); err != nil {
 			return err
 		}
 	}

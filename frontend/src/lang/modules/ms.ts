@@ -2806,6 +2806,7 @@ const message = {
         forwardHelper1: 'Jika anda ingin memajukan ke port tempatan, IP sasaran harus ditetapkan kepada "127.0.0.1".',
         forwardHelper2: 'Biarkan IP sasaran kosong untuk memajukan ke port tempatan.',
         forwardHelper3: 'Hanya menyokong pemajuan port IPv4.',
+        forwardInboundInterface: 'Antara Muka Rangkaian Masukan Penerusan',
     },
     runtime: {
         runtime: 'Runtime',

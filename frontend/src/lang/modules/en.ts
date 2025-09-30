@@ -2831,6 +2831,7 @@ const message = {
         forwardHelper1: 'If you want to forward to the local port, the destination IP should be set to "127.0.0.1".',
         forwardHelper2: 'Leave the destination IP blank to forward to the local port.',
         forwardHelper3: 'Only support IPv4 port forwarding.',
+        forwardInboundInterface: 'Forward Inbound Network Interface',
     },
     runtime: {
         runtime: 'Runtime',

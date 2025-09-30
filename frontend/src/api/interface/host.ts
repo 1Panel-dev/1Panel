@@ -112,6 +112,7 @@ export namespace Host {
         port: string;
         targetIP: string;
         targetPort: string;
+        interface: string;
     }
     export interface RuleIP {
         operation: string;

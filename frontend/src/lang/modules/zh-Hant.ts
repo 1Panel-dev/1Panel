@@ -2634,6 +2634,7 @@ const message = {
         forwardHelper1: '如果是本機埠轉發，目標 IP 為：127.0.0.1',
         forwardHelper2: '如果目標 IP 不填寫，預設為本機埠轉發',
         forwardHelper3: '目前僅支援 IPv4 的埠轉發',
+        forwardInboundInterface: '轉發入站網路介面',
     },
     runtime: {
         runtime: '執行環境',

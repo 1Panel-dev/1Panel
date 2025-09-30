@@ -18,4 +18,5 @@ type Forward struct {
 	Port       string `gorm:"not null" json:"port"`
 	TargetIP   string `gorm:"not null" json:"targetIP"`
 	TargetPort string `gorm:"not null" json:"targetPort"`
+	Interface  string `json:"interface"`
 }

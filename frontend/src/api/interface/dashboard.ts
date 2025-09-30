@@ -15,7 +15,7 @@ export namespace Dashboard {
         title: string;
         detail: string;
         recommend: number;
-        isShow: boolean ;
+        isShow: boolean;
         router: string;
     }
     export interface AppLauncher {

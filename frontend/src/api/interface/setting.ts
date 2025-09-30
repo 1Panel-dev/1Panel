@@ -246,7 +246,7 @@ export namespace Setting {
         id: number;
         name: string;
         addr: string;
-        description:  string;
+        description: string;
         systemVersion: string;
         securityEntrance: string;
         cpuUsedPercent: number;

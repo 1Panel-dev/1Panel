@@ -37,6 +37,7 @@ type ForwardRuleOperate struct {
 		Operation  string `json:"operation" validate:"required,oneof=add remove"`
 		Num        string `json:"num"`
 		Protocol   string `json:"protocol" validate:"required,oneof=tcp udp tcp/udp"`
+		Interface  string `json:"interface"`
 		Port       string `json:"port" validate:"required"`
 		TargetIP   string `json:"targetIP"`
 		TargetPort string `json:"targetPort" validate:"required"`

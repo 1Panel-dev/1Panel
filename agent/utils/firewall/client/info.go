@@ -10,6 +10,7 @@ type FireInfo struct {
 	Num        string `json:"num"`
 	TargetIP   string `json:"targetIP"`
 	TargetPort string `json:"targetPort"`
+	Interface  string `json:"interface"`
 
 	UsedStatus  string `json:"usedStatus"`
 	Description string `json:"description"`
@@ -21,12 +22,15 @@ type Forward struct {
 	Port       string `json:"port"`
 	TargetIP   string `json:"targetIP"`
 	TargetPort string `json:"targetPort"`
+	Interface  string `json:"interface"`
 }
 
 type IptablesNatInfo struct {
 	Num         string `json:"num"`
 	Target      string `json:"target"`
 	Protocol    string `json:"protocol"`
+	InIface     string `json:"inIface"`
+	OutIface    string `json:"outIface"`
 	Opt         string `json:"opt"`
 	Source      string `json:"source"`
 	Destination string `json:"destination"`

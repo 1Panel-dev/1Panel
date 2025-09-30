@@ -2745,6 +2745,7 @@ const message = {
         forwardHelper1: 'ローカルポートに転送する場合は、宛先IPを「127.0.0.1」に設定する必要があります。',
         forwardHelper2: '宛先IPを空白のままにして、ローカルポートに転送します。',
         forwardHelper3: 'IPv4ポート転送のみをサポートします。',
+        forwardInboundInterface: '転送入站ネットワークインターフェース',
     },
     runtime: {
         runtime: 'ランタイム',

@@ -124,6 +124,7 @@ func (f *Ufw) ListForward() ([]FireInfo, error) {
 		list = append(list, FireInfo{
 			Num:        rule.Num,
 			Protocol:   rule.Protocol,
+			Interface:  rule.InIface,
 			Port:       rule.SrcPort,
 			TargetIP:   dest[0],
 			TargetPort: dest[1],
@@ -241,9 +242,9 @@ func (f *Ufw) PortForward(info Forward, operation string) error {
 	}
 
 	if operation == "add" {
-		err = iptables.NatAdd(info.Protocol, info.Port, info.TargetIP, info.TargetPort, true)
+		err = iptables.NatAdd(info.Protocol, info.Port, info.TargetIP, info.TargetPort, info.Interface, true)
 	} else {
-		err = iptables.NatRemove(info.Num, info.Protocol, info.Port, info.TargetIP, info.TargetPort)
+		err = iptables.NatRemove(info.Num, info.Protocol, info.Port, info.TargetIP, info.TargetPort, info.Interface)
 	}
 	if err != nil {
 		return fmt.Errorf("%s port forward failed, err: %s", operation, err)

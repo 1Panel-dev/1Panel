@@ -329,7 +329,8 @@ func (u *FirewallService) OperateForwardRule(req dto.ForwardRuleOperate) error {
 					if reqRule.Port == rule.Port &&
 						reqRule.TargetPort == rule.TargetPort &&
 						reqRule.TargetIP == rule.TargetIP &&
-						proto == rule.Protocol {
+						proto == rule.Protocol &&
+						reqRule.Interface == rule.Interface {
 						shouldKeep = false
 						break
 					}
@@ -353,7 +354,8 @@ func (u *FirewallService) OperateForwardRule(req dto.ForwardRuleOperate) error {
 				if reqRule.Port == rule.Port &&
 					reqRule.TargetPort == rule.TargetPort &&
 					reqRule.TargetIP == rule.TargetIP &&
-					proto == rule.Protocol {
+					proto == rule.Protocol &&
+					reqRule.Interface == rule.Interface {
 					return buserr.New("ErrRecordExist")
 				}
 			}
@@ -383,6 +385,7 @@ func (u *FirewallService) OperateForwardRule(req dto.ForwardRuleOperate) error {
 				Port:       r.Port,
 				TargetIP:   r.TargetIP,
 				TargetPort: r.TargetPort,
+				Interface:  r.Interface,
 			}, r.Operation); err != nil {
 				if req.ForceDelete {
 					global.LOG.Error(err)
