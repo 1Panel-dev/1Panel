@@ -63,6 +63,10 @@ Please refer to our [documentation](https://docs.1panel.pro/quick_start/) for mo
 
 Compared to the OSS Edition, 1Panel Pro Edition provides users with a wealth of enhanced features and technical support services. Enhanced features include WAF enhancement, website tamper protection, website monitoring, GPU monitoring, custom logo and theme color, etc. [Click to view the detailed introduction of the Pro Edition](https://1panel.pro/pricing).
 
+## Related Projects
+
+- [Roundtable](https://github.com/askbudi/roundtable) - Multi-session AI assistant orchestration for server administrators and DevOps teams
+
 ## Security Information
 
 If you discover any security issues, please refer to [SECURITY.md](/SECURITY.md).
