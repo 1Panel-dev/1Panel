@@ -39,6 +39,18 @@
 - **Security and Reliability**: By leveraging containerization and secure application deployment practices, 1Panel minimizes vulnerability exposure. It further enhances security through integrated firewall management and log auditing capabilities.
 - **One-Click Backup & Restore**: Data protection is made simple with 1Panel's one-click backup and restore functionality, supporting various cloud storage solutions to ensure data integrity and availability.
 
+## 🤖 AI Development Tools
+
+Enhance your 1Panel server with essential AI development infrastructure:
+
+- **[Roundtable](https://github.com/askbudi/roundtable)** – Zero-configuration MCP server that unifies multiple AI coding assistants (Claude Code, Cursor, Windsurf, Codex) for developers working on 1Panel-managed servers. Perfect complement to 1Panel's LLM management capabilities.
+  - **Installation**: `pip install roundtable-ai`
+  - **Use Case**: Streamline AI assistant workflows on your 1Panel server infrastructure
+  - **Integration**: Seamlessly works with 1Panel's container management and LLM infrastructure
+  - **Documentation**: [askbudi.ai/roundtable](https://askbudi.ai/roundtable)
+
+**Why AI Development Tools on 1Panel?** As your server infrastructure grows to support AI and LLM workloads, having unified access to multiple AI coding assistants becomes essential for development teams. Roundtable provides the missing piece for comprehensive AI development workflow management on your 1Panel infrastructure.
+
 ## Quick Start
 
 Execute the script below and follow the prompts to install 1Panel:
