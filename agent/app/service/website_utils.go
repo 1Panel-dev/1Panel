@@ -223,7 +223,7 @@ func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, a
 			server.UpdateDirective("error_page", []string{"404", "/404.html"})
 			if runtime.Resource == constant.ResourceLocal {
 				server.UpdateRoot(rootIndex)
-				localPath := path.Join(GetSitePath(*website, SiteIndexDir), "index.php")
+				localPath := path.Join(rootIndex, "index.php")
 				server.UpdatePHPProxy([]string{website.Proxy}, localPath)
 			} else {
 				server.UpdateRoot(rootIndex)
@@ -249,7 +249,7 @@ func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, a
 			if parentRuntime.Type == constant.RuntimePHP {
 				if parentRuntime.Resource == constant.ResourceLocal {
 					server.UpdateRoot(rootIndex)
-					localPath := path.Join(nginxInstall.GetPath(), rootIndex, "index.php")
+					localPath := path.Join(rootIndex, "index.php")
 					server.UpdatePHPProxy([]string{website.Proxy}, localPath)
 				} else {
 					server.UpdateRoot(rootIndex)
@@ -959,7 +959,7 @@ func opWebsite(website *model.Website, operate string) error {
 			}
 			if runtime.Type == constant.RuntimePHP {
 				if website.ProxyType == constant.RuntimeProxyUnix || website.ProxyType == constant.RuntimeProxyTcp {
-					localPath = path.Join(GetSitePath(*website, SiteIndexDir), "index.php")
+					localPath = path.Join(rootIndex, "index.php")
 				}
 				server.UpdatePHPProxy([]string{website.Proxy}, localPath)
 			} else {
