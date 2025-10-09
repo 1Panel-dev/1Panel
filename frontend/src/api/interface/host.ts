@@ -183,6 +183,7 @@ export namespace Host {
         id: number;
         createAt: Date;
         name: string;
+        mode: string;
         encryptionMode: string;
         passPhrase: string;
         description: string;

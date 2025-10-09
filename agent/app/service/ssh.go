@@ -46,7 +46,8 @@ type ISSHService interface {
 	ExportLog(ctx *gin.Context, req dto.SearchSSHLog) (string, error)
 
 	SyncRootCert() error
-	CreateRootCert(req dto.CreateRootCert) error
+	CreateRootCert(req dto.RootCertOperate) error
+	EditRootCert(req dto.RootCertOperate) error
 	SearchRootCerts(req dto.SearchWithPage) (int64, interface{}, error)
 	DeleteRootCerts(req dto.ForceDelete) error
 }
@@ -260,7 +261,7 @@ func (u *SSHService) SyncRootCert() error {
 	return hostRepo.SyncCert(rootCerts)
 }
 
-func (u *SSHService) CreateRootCert(req dto.CreateRootCert) error {
+func (u *SSHService) CreateRootCert(req dto.RootCertOperate) error {
 	if cmd.CheckIllegal(req.EncryptionMode, req.PassPhrase) {
 		return buserr.New("ErrCmdIllegal")
 	}
@@ -279,6 +280,19 @@ func (u *SSHService) CreateRootCert(req dto.CreateRootCert) error {
 	privatePath := fmt.Sprintf("%s/.ssh/%s", currentUser.HomeDir, req.Name)
 	publicPath := fmt.Sprintf("%s/.ssh/%s.pub", currentUser.HomeDir, req.Name)
 	authFilePath := currentUser.HomeDir + "/.ssh/authorized_keys"
+
+	authFileItem, _ := os.ReadFile(authFilePath)
+	authFile := string(authFileItem)
+	if authFile != "" && !strings.HasSuffix(authFile, "\n") {
+		file, err := os.OpenFile(authFilePath, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+		if _, err := file.WriteString("\n"); err != nil {
+			return err
+		}
+	}
 
 	if req.Mode == "input" || req.Mode == "import" {
 		if err := os.WriteFile(privatePath, []byte(req.PrivateKey), constant.FilePerm); err != nil {
@@ -308,7 +322,58 @@ func (u *SSHService) CreateRootCert(req dto.CreateRootCert) error {
 	if len(cert.PassPhrase) != 0 {
 		cert.PassPhrase, _ = encrypt.StringEncrypt(cert.PassPhrase)
 	}
-	return hostRepo.CreateCert(&cert)
+	return hostRepo.SaveCert(&cert)
+}
+
+func (u *SSHService) EditRootCert(req dto.RootCertOperate) error {
+	currentUser, err := user.Current()
+	if err != nil {
+		return fmt.Errorf("load current user failed, err: %v", err)
+	}
+	certItem, _ := hostRepo.GetCert(repo.WithByID(req.ID))
+	if certItem.ID == 0 {
+		return buserr.New("ErrRecordNotFound")
+	}
+	oldPublicItem, err := os.ReadFile(certItem.PublicKeyPath)
+	if err != nil {
+		return err
+	}
+
+	var cert model.RootCert
+	if err := copier.Copy(&cert, req); err != nil {
+		return err
+	}
+	cert.PrivateKeyPath = fmt.Sprintf("%s/.ssh/%s", currentUser.HomeDir, req.Name)
+	cert.PublicKeyPath = fmt.Sprintf("%s/.ssh/%s.pub", currentUser.HomeDir, req.Name)
+	if err := os.WriteFile(cert.PrivateKeyPath, []byte(req.PrivateKey), constant.FilePerm); err != nil {
+		return err
+	}
+	if err := os.WriteFile(cert.PublicKeyPath, []byte(req.PublicKey), constant.FilePerm); err != nil {
+		return err
+	}
+
+	authFilePath := currentUser.HomeDir + "/.ssh/authorized_keys"
+	authItem, err := os.ReadFile(authFilePath)
+	if err != nil {
+		return err
+	}
+	oldPublic := strings.ReplaceAll(string(oldPublicItem), "\n", "")
+	newPublic := strings.ReplaceAll(string(req.PublicKey), "\n", "")
+	lines := strings.Split(string(authItem), "\n")
+	var newFiles []string
+	for i := 0; i < len(lines); i++ {
+		if len(lines[i]) != 0 && lines[i] != oldPublic && lines[i] != newPublic {
+			newFiles = append(newFiles, lines[i])
+		}
+	}
+	newFiles = append(newFiles, newPublic)
+	if err := os.WriteFile(authFilePath, []byte(strings.Join(newFiles, "\n")), constant.FilePerm); err != nil {
+		return fmt.Errorf("refresh authorized_keys failed, err: %v", err)
+	}
+	if len(cert.PassPhrase) != 0 {
+		cert.PassPhrase, _ = encrypt.StringEncrypt(cert.PassPhrase)
+	}
+	return hostRepo.SaveCert(&cert)
 }
 
 func (u *SSHService) SearchRootCerts(req dto.SearchWithPage) (int64, interface{}, error) {

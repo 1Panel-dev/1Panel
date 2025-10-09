@@ -38,6 +38,7 @@ func (s *HostRouter) InitRouter(Router *gin.RouterGroup) {
 		hostRouter.POST("/ssh/file/update", baseApi.UpdateSSHByFile)
 
 		hostRouter.POST("/ssh/cert", baseApi.CreateRootCert)
+		hostRouter.POST("/ssh/cert/update", baseApi.EditRootCert)
 		hostRouter.POST("/ssh/cert/sync", baseApi.SyncRootCert)
 		hostRouter.POST("/ssh/cert/search", baseApi.SearchRootCert)
 		hostRouter.POST("/ssh/cert/delete", baseApi.DeleteRootCert)

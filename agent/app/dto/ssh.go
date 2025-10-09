@@ -22,7 +22,8 @@ type SSHInfo struct {
 	CurrentUser            string `json:"currentUser"`
 }
 
-type CreateRootCert struct {
+type RootCertOperate struct {
+	ID             uint   `json:"id"`
 	Name           string `json:"name"`
 	Mode           string `json:"mode"`
 	EncryptionMode string `json:"encryptionMode" validate:"required,oneof=rsa ed25519 ecdsa dsa"`

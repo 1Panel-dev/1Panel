@@ -529,7 +529,7 @@ var InitLocalSSHConn = &gormigrate.Migration{
 			itemPath = path.Join(currentInfo.HomeDir, ".ssh/id_ed25519_1panel")
 		}
 		if _, err := os.Stat(itemPath); err != nil {
-			_ = service.NewISSHService().CreateRootCert(dto.CreateRootCert{EncryptionMode: "ed25519", Name: "id_ed25519_1panel", Description: "1Panel Terminal"})
+			_ = service.NewISSHService().CreateRootCert(dto.RootCertOperate{EncryptionMode: "ed25519", Name: "id_ed25519_1panel", Description: "1Panel Terminal"})
 		}
 		privateKey, _ := os.ReadFile(itemPath)
 		connWithKey := ssh.ConnInfo{

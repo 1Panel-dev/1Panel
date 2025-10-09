@@ -19,7 +19,7 @@ type IHostRepo interface {
 	GetCert(opts ...DBOption) (model.RootCert, error)
 	PageCert(limit, offset int, opts ...DBOption) (int64, []model.RootCert, error)
 	ListCert(opts ...DBOption) ([]model.RootCert, error)
-	CreateCert(cert *model.RootCert) error
+	SaveCert(cert *model.RootCert) error
 	UpdateCert(id uint, vars map[string]interface{}) error
 	DeleteCert(opts ...DBOption) error
 }
@@ -107,8 +107,8 @@ func (u *HostRepo) ListCert(opts ...DBOption) ([]model.RootCert, error) {
 	return ops, err
 }
 
-func (u *HostRepo) CreateCert(cert *model.RootCert) error {
-	return global.DB.Create(cert).Error
+func (u *HostRepo) SaveCert(cert *model.RootCert) error {
+	return global.DB.Save(cert).Error
 }
 
 func (u *HostRepo) UpdateCert(id uint, vars map[string]interface{}) error {

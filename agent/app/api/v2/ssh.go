@@ -70,43 +70,45 @@ func (b *BaseApi) UpdateSSH(c *gin.Context) {
 // @Tags SSH
 // @Summary Generate host SSH secret
 // @Accept json
-// @Param request body dto.CreateRootCert true "request"
+// @Param request body dto.RootCertOperate true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /hosts/ssh/cert [post]
 // @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"生成 SSH 密钥 ","formatEN":"generate SSH secret"}
 func (b *BaseApi) CreateRootCert(c *gin.Context) {
-	var req dto.CreateRootCert
+	var req dto.RootCertOperate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	if len(req.PassPhrase) != 0 {
-		passPhrase, err := base64.StdEncoding.DecodeString(req.PassPhrase)
-		if err != nil {
-			helper.BadRequest(c, err)
-			return
-		}
-		req.PassPhrase = string(passPhrase)
+	if err := loadCertAfterDecrypt(&req); err != nil {
+		helper.BadRequest(c, err)
 	}
-	if len(req.PrivateKey) != 0 {
-		privateKey, err := base64.StdEncoding.DecodeString(req.PrivateKey)
-		if err != nil {
-			helper.BadRequest(c, err)
-			return
-		}
-		req.PrivateKey = string(privateKey)
-	}
-	if len(req.PublicKey) != 0 {
-		publicKey, err := base64.StdEncoding.DecodeString(req.PublicKey)
-		if err != nil {
-			helper.BadRequest(c, err)
-			return
-		}
-		req.PublicKey = string(publicKey)
-	}
-
 	if err := sshService.CreateRootCert(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags SSH
+// @Summary Update host SSH secret
+// @Accept json
+// @Param request body dto.RootCertOperate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /hosts/ssh/cert/update [post]
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"生成 SSH 密钥 ","formatEN":"generate SSH secret"}
+func (b *BaseApi) EditRootCert(c *gin.Context) {
+	var req dto.RootCertOperate
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := loadCertAfterDecrypt(&req); err != nil {
+		helper.BadRequest(c, err)
+	}
+	if err := sshService.EditRootCert(req); err != nil {
 		helper.InternalServer(c, err)
 		return
 	}
@@ -264,4 +266,29 @@ func (b *BaseApi) UpdateSSHByFile(c *gin.Context) {
 		return
 	}
 	helper.Success(c)
+}
+
+func loadCertAfterDecrypt(req *dto.RootCertOperate) error {
+	if len(req.PassPhrase) != 0 {
+		passPhrase, err := base64.StdEncoding.DecodeString(req.PassPhrase)
+		if err != nil {
+			return err
+		}
+		req.PassPhrase = string(passPhrase)
+	}
+	if len(req.PrivateKey) != 0 {
+		privateKey, err := base64.StdEncoding.DecodeString(req.PrivateKey)
+		if err != nil {
+			return err
+		}
+		req.PrivateKey = string(privateKey)
+	}
+	if len(req.PublicKey) != 0 {
+		publicKey, err := base64.StdEncoding.DecodeString(req.PublicKey)
+		if err != nil {
+			return err
+		}
+		req.PublicKey = string(publicKey)
+	}
+	return nil
 }

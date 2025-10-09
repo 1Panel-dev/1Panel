@@ -4,7 +4,7 @@
             <div class="mb-4">
                 <el-alert :closable="false">{{ $t('ssh.pubKeyHelper', [currentUser]) }}</el-alert>
             </div>
-            <el-button type="primary" plain @click="onCreate()">
+            <el-button type="primary" plain @click="onOpenDialog('create')">
                 {{ $t('commons.button.create') }}
             </el-button>
             <el-button plain @click="onSync()">
@@ -32,115 +32,6 @@
                 </span>
             </template>
         </DrawerPro>
-
-        <DialogPro v-model="formOpen" :title="$t('commons.button.create')" size="w-60">
-            <div>
-                <el-form ref="formRef" label-position="top" :rules="rules" :model="form" v-loading="loading">
-                    <el-row :gutter="20">
-                        <el-col :span="12">
-                            <el-form-item :label="$t('commons.table.name')" prop="name">
-                                <el-input v-model="form.name" />
-                            </el-form-item>
-                        </el-col>
-                    </el-row>
-                    <el-row :gutter="20">
-                        <el-col :span="12">
-                            <el-form-item :label="$t('ssh.encryptionMode')" prop="encryptionMode">
-                                <el-select v-model="form.encryptionMode">
-                                    <el-option label="ED25519" value="ed25519" />
-                                    <el-option label="ECDSA" value="ecdsa" />
-                                    <el-option label="RSA" value="rsa" />
-                                    <el-option label="DSA" value="dsa" />
-                                </el-select>
-                            </el-form-item>
-                        </el-col>
-                        <el-col :span="12">
-                            <el-form-item :label="$t('commons.login.password')" prop="passPhrase">
-                                <el-input v-model="form.passPhrase" type="password" show-password>
-                                    <template #append>
-                                        <el-button @click="random">
-                                            {{ $t('commons.button.random') }}
-                                        </el-button>
-                                    </template>
-                                </el-input>
-                            </el-form-item>
-                        </el-col>
-                    </el-row>
-                    <el-form-item :label="$t('ssh.createMode')" prop="privateKey">
-                        <el-radio-group v-model="form.mode">
-                            <el-radio value="generate">{{ $t('ssh.generate') }}</el-radio>
-                            <el-radio value="input">{{ $t('ssh.input') }}</el-radio>
-                            <el-radio value="import">{{ $t('ssh.import') }}</el-radio>
-                        </el-radio-group>
-                    </el-form-item>
-                    <div v-if="form.mode === 'input'">
-                        <el-row :gutter="20">
-                            <el-col :span="12">
-                                <el-form-item :label="$t('ssh.privateKey')" prop="privateKey">
-                                    <el-input type="textarea" :rows="2" v-model="form.privateKey" />
-                                </el-form-item>
-                            </el-col>
-                            <el-col :span="12">
-                                <el-form-item :label="$t('ssh.publicKey')" prop="publicKey">
-                                    <el-input type="textarea" :rows="2" v-model="form.publicKey" />
-                                </el-form-item>
-                            </el-col>
-                        </el-row>
-                    </div>
-                    <div v-if="form.mode === 'import'">
-                        <el-row :gutter="20">
-                            <el-col :span="12">
-                                <el-form-item :label="$t('ssh.privateKey')" prop="privateKey">
-                                    <el-upload
-                                        action="#"
-                                        :auto-upload="false"
-                                        ref="uploadPrivateRef"
-                                        class="upload mt-2 w-full"
-                                        :limit="1"
-                                        :on-change="privateOnChange"
-                                        :on-exceed="privateExceed"
-                                    >
-                                        <el-button size="small" icon="Upload">
-                                            {{ $t('commons.button.upload') }}
-                                        </el-button>
-                                    </el-upload>
-                                </el-form-item>
-                            </el-col>
-                            <el-col :span="12">
-                                <el-form-item :label="$t('ssh.publicKey')" prop="publicKey">
-                                    <el-upload
-                                        action="#"
-                                        :auto-upload="false"
-                                        ref="uploadPublicRef"
-                                        class="upload mt-2 w-full"
-                                        :limit="1"
-                                        :on-change="publicOnChange"
-                                        :on-exceed="publicExceed"
-                                    >
-                                        <el-button size="small" icon="Upload">
-                                            {{ $t('commons.button.upload') }}
-                                        </el-button>
-                                    </el-upload>
-                                </el-form-item>
-                            </el-col>
-                        </el-row>
-                    </div>
-                    <el-form-item :label="$t('commons.table.description')" prop="description">
-                        <el-input v-model="form.description" />
-                    </el-form-item>
-                </el-form>
-            </div>
-            <template #footer>
-                <span class="dialog-footer">
-                    <el-button @click="onCancel">
-                        {{ $t('commons.button.cancel') }}
-                    </el-button>
-                    <el-button type="primary" :disabled="loading" @click="onConfirm(formRef)">
-                        {{ $t('commons.button.confirm') }}
-                    </el-button>
-                </span>
-            </template>
-        </DialogPro>
 
         <DialogPro v-model="connOpen" :title="$t('ssh.pubkey')" size="small" :showClose="false">
             <el-descriptions class="margin-top" :column="1" border>
@@ -198,16 +89,16 @@
                 </el-form>
             </template>
         </OpDialog>
+        <Operate ref="dialogRef" @search="search" />
     </div>
 </template>
 <script lang="ts" setup>
 import { Host } from '@/api/interface/host';
-import { createCert, deleteCert, searchCert, syncCert } from '@/api/modules/host';
-import { Rules } from '@/global/form-rules';
+import { deleteCert, searchCert, syncCert } from '@/api/modules/host';
 import i18n from '@/lang';
-import { MsgError, MsgSuccess } from '@/utils/message';
-import { copyText, getRandomStr } from '@/utils/util';
-import { FormInstance, genFileId, UploadFile, UploadProps, UploadRawFile } from 'element-plus';
+import { MsgSuccess } from '@/utils/message';
+import Operate from '@/views/host/ssh/ssh/certification/operate/index.vue';
+import { copyText } from '@/utils/util';
 import { Base64 } from 'js-base64';
 import { reactive, ref } from 'vue';
 
@@ -229,46 +120,12 @@ const opRef = ref();
 
 const currentRow = ref();
 const connOpen = ref();
-
-const formOpen = ref();
-const formRef = ref();
-const uploadPrivateRef = ref();
-const uploadPublicRef = ref();
-
 const currentUser = ref();
-const form = reactive({
-    name: '',
-    mode: 'generate',
-    passPhrase: '',
-    encryptionMode: '',
-    privateKey: '',
-    publicKey: '',
-    description: '',
-});
-const rules = reactive({
-    name: Rules.simpleName,
-    encryptionMode: Rules.requiredSelect,
-    passPhrase: [{ validator: checkPassword, trigger: 'blur' }],
-});
-
-function checkPassword(rule: any, value: any, callback: any) {
-    if (form.passPhrase !== '') {
-        const reg = /^[A-Za-z0-9]{6,15}$/;
-        if (!reg.test(form.passPhrase)) {
-            return callback(new Error(i18n.global.t('ssh.passwordHelper')));
-        }
-    }
-    callback();
-}
 
 const acceptParams = async (user: string): Promise<void> => {
     search();
     currentUser.value = user || 'root';
     drawerVisible.value = true;
-};
-
-const random = async () => {
-    form.passPhrase = getRandomStr(10);
 };
 
 const loadPassPhrase = () => {
@@ -284,72 +141,19 @@ const onCopy = async (content: string) => {
     copyText(content);
 };
 
-const onCreate = () => {
-    form.name = '';
-    form.mode = 'generate';
-    form.encryptionMode = 'ed25519';
-    form.passPhrase = '';
-    form.privateKey = '';
-    form.publicKey = '';
-    form.description = '';
-    formOpen.value = true;
-};
-
-const onConfirm = async (formEl: FormInstance | undefined) => {
-    if (!formEl) return;
-    formEl.validate(async (valid) => {
-        if (!valid) return;
-        loading.value = true;
-        await createCert(form)
-            .then(() => {
-                loading.value = false;
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                formOpen.value = false;
-                search();
-            })
-            .catch(() => {
-                loading.value = false;
-            });
-    });
-};
-
-const privateOnChange = (_uploadFile: UploadFile) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        try {
-            form.privateKey = e.target.result as string;
-        } catch (error) {
-            MsgError(i18n.global.t('cronjob.errImport') + error.message);
-        }
+const dialogRef = ref();
+const onOpenDialog = async (
+    title: string,
+    rowData: Partial<Host.RootCertInfo> = {
+        mode: 'generate',
+        encryptionMode: 'ed25519',
+    },
+) => {
+    let params = {
+        title,
+        rowData: { ...rowData },
     };
-    reader.readAsText(_uploadFile.raw);
-};
-const privateExceed: UploadProps['onExceed'] = (files) => {
-    uploadPrivateRef.value!.clearFiles();
-    const file = files[0] as UploadRawFile;
-    file.uid = genFileId();
-    uploadPrivateRef.value!.handleStart(file);
-};
-const publicOnChange = (_uploadFile: UploadFile) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        try {
-            form.publicKey = e.target.result as string;
-        } catch (error) {
-            MsgError(i18n.global.t('cronjob.errImport') + error.message);
-        }
-    };
-    reader.readAsText(_uploadFile.raw);
-};
-const publicExceed: UploadProps['onExceed'] = (files) => {
-    uploadPublicRef.value!.clearFiles();
-    const file = files[0] as UploadRawFile;
-    file.uid = genFileId();
-    uploadPublicRef.value!.handleStart(file);
-};
-
-const onCancel = () => {
-    formOpen.value = false;
+    dialogRef.value!.acceptParams(params);
 };
 
 const onDownload = async (row: Host.RootCertInfo, type: string) => {
@@ -455,6 +259,12 @@ const handleClose = () => {
 };
 
 const buttons = [
+    {
+        label: i18n.global.t('commons.button.edit'),
+        click: (row: Host.RootCertInfo) => {
+            onOpenDialog('edit', row);
+        },
+    },
     {
         label: i18n.global.t('commons.button.view'),
         click: (row: Host.RootCertInfo) => {
