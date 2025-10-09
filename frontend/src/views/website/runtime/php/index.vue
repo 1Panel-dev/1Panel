@@ -153,9 +153,8 @@ import { disabledButton } from '@/utils/runtime';
 import DockerStatus from '@/views/container/docker-status/index.vue';
 import { operateRuntime, updateRuntimeRemark } from '../common/utils';
 import { routerToFileWithPath } from '@/utils/router';
-import { MsgWarning } from '@/utils/message';
 import { useGlobalStore } from '@/composables/useGlobalStore';
-const { globalStore, isOffLine } = useGlobalStore();
+const { globalStore } = useGlobalStore();
 
 const mobile = computed(() => {
     return globalStore.isMobile();
@@ -286,10 +285,6 @@ const search = async () => {
 };
 
 const openCreate = () => {
-    if (isOffLine.value) {
-        MsgWarning(i18n.global.t('commons.msg.offlineTips'));
-        return;
-    }
     createRef.value.acceptParams({ type: 'php', mode: 'create' });
 };
 

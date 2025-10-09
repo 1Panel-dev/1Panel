@@ -24,7 +24,7 @@
                     v-model="runtime.resource"
                     @change="changeResource(runtime.resource)"
                 >
-                    <el-radio :value="'appstore'">
+                    <el-radio :value="'appstore'" v-if="!globalStore.isOffLine">
                         {{ $t('menu.apps') }}
                     </el-radio>
                     <el-radio :value="'local'">
@@ -195,9 +195,9 @@ import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
 import { reactive, ref } from 'vue';
-import { GlobalStore } from '@/store';
 import { getLabel } from '@/utils/util';
-const globalStore = GlobalStore();
+import { useGlobalStore } from '@/composables/useGlobalStore';
+const { globalStore } = useGlobalStore();
 
 interface OperateRrops {
     id?: number;
@@ -472,7 +472,11 @@ const acceptParams = async (props: OperateRrops) => {
     initParam.value = false;
     if (props.mode === 'create') {
         Object.assign(runtime, initData(props.type));
-        searchAppList(null);
+        if (globalStore.isOffLine) {
+            runtime.resource = 'local';
+        } else {
+            searchAppList(null);
+        }
     } else {
         searchAppList(props.appID);
         getRuntime(props.id);
