@@ -32,19 +32,20 @@ type SystemDir struct {
 	TmpDir         string
 	LocalBackupDir string
 
-	AppDir               string
-	ResourceDir          string
-	AppResourceDir       string
-	AppInstallDir        string
-	LocalAppResourceDir  string
-	LocalAppInstallDir   string
-	RemoteAppResourceDir string
-	CustomAppResourceDir string
-	RuntimeDir           string
-	RecycleBinDir        string
-	SSLLogDir            string
-	McpDir               string
-	ConvertLogDir        string
+	AppDir                string
+	ResourceDir           string
+	AppResourceDir        string
+	AppInstallDir         string
+	LocalAppResourceDir   string
+	LocalAppInstallDir    string
+	RemoteAppResourceDir  string
+	CustomAppResourceDir  string
+	OfflineAppResourceDir string
+	RuntimeDir            string
+	RecycleBinDir         string
+	SSLLogDir             string
+	McpDir                string
+	ConvertLogDir         string
 }
 
 type LogConfig struct {

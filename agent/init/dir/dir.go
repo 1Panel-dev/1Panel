@@ -27,6 +27,7 @@ func Init() {
 	global.Dir.LocalAppInstallDir, _ = fileOp.CreateDirWithPath(true, path.Join(baseDir, "1panel/apps/local"))
 	global.Dir.RemoteAppResourceDir, _ = fileOp.CreateDirWithPath(true, path.Join(baseDir, "1panel/resource/apps/remote"))
 	global.Dir.CustomAppResourceDir, _ = fileOp.CreateDirWithPath(true, path.Join(baseDir, "1panel/resource/apps/custom"))
+	global.Dir.OfflineAppResourceDir, _ = fileOp.CreateDirWithPath(true, path.Join(baseDir, "1panel/resource/offline"))
 	global.Dir.RuntimeDir, _ = fileOp.CreateDirWithPath(true, path.Join(baseDir, "1panel/runtime"))
 	global.Dir.RecycleBinDir, _ = fileOp.CreateDirWithPath(true, "/.1panel_clash")
 	global.Dir.SSLLogDir, _ = fileOp.CreateDirWithPath(true, path.Join(baseDir, "1panel/log/ssl"))
