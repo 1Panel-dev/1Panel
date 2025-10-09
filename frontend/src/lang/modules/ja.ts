@@ -889,6 +889,7 @@ const message = {
         driver: 'ドライバ',
         option: 'オプション',
         attachable: '取り付け可能',
+        parentNetworkCard: '親ネットワークカード',
         subnet: 'サブネット',
         scope: 'IPスコープ',
         gateway: 'ゲートウェイ',

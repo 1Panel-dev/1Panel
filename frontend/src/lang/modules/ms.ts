@@ -907,6 +907,7 @@ const message = {
         driver: 'Pemacu',
         option: 'Pilihan',
         attachable: 'Boleh dilampirkan',
+        parentNetworkCard: 'Kad Rangkaian Induk',
         subnet: 'Subnet',
         scope: 'Skop IP',
         gateway: 'Gerbang',

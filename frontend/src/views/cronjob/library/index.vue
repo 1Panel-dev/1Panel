@@ -213,7 +213,7 @@ const onDelete = async (row: Cronjob.ScriptInfo | null) => {
 };
 
 const onSync = async () => {
-    ElMessageBox.confirm(i18n.global.t('cronjob.library.syncHelper'), i18n.global.t('commons.button.syncNow'), {
+    ElMessageBox.confirm(i18n.global.t('cronjob.library.syncHelper'), i18n.global.t('cronjob.library.syncNow'), {
         confirmButtonText: i18n.global.t('commons.button.confirm'),
         cancelButtonText: i18n.global.t('commons.button.cancel'),
         type: 'info',

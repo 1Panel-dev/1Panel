@@ -880,6 +880,7 @@ const message = {
         driver: '드라이버',
         option: '옵션',
         attachable: '연결 가능',
+        parentNetworkCard: '부모 네트워크 카드',
         subnet: '서브넷',
         scope: 'IP 범위',
         gateway: '게이트웨이',

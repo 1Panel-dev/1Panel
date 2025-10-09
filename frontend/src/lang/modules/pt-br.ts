@@ -902,6 +902,7 @@ const message = {
         driver: 'Driver',
         option: 'Opção',
         attachable: 'Anexável',
+        parentNetworkCard: 'Placa de Rede Principal',
         subnet: 'Sub-rede',
         scope: 'Escopo IP',
         gateway: 'Gateway',

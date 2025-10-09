@@ -12,6 +12,17 @@
                     <el-option label="overlay" value="overlay" />
                 </el-select>
             </el-form-item>
+            <el-form-item
+                v-if="form.driver === 'macvlan'"
+                :label="$t('container.parentNetworkCard')"
+                prop="parentNetworkCard"
+            >
+                <el-select v-model="form.parentNetworkCard">
+                    <span v-for="item in netOptions" :key="item">
+                        <el-option v-if="item !== 'all'" :label="item" :value="item" />
+                    </span>
+                </el-select>
+            </el-form-item>
 
             <el-checkbox v-model="form.ipv4">IPv4</el-checkbox>
             <div v-if="form.ipv4">
@@ -133,12 +144,14 @@ import { ElForm } from 'element-plus';
 import { createNetwork } from '@/api/modules/container';
 import { MsgSuccess } from '@/utils/message';
 import { checkIp, checkIpV6 } from '@/utils/util';
+import { getNetworkOptions } from '@/api/modules/host';
 
 const loading = ref(false);
 
 const drawerVisible = ref(false);
 const form = reactive({
     name: '',
+    parentNetworkCard: '',
     labelStr: '',
     labels: [] as Array<string>,
     optionStr: '',
@@ -163,6 +176,7 @@ const acceptParams = (): void => {
     form.optionStr = '';
     form.options = [];
     form.driver = 'bridge';
+    form.parentNetworkCard = '';
     form.ipv4 = true;
     form.subnet = '';
     form.gateway = '';
@@ -174,6 +188,7 @@ const acceptParams = (): void => {
     form.ipRangeV6 = '';
     form.auxAddressV6 = [];
     drawerVisible.value = true;
+    loadNetworkOptions();
 };
 const emit = defineEmits<{ (e: 'search'): void }>();
 
@@ -181,9 +196,12 @@ const handleClose = () => {
     drawerVisible.value = false;
 };
 
+const netOptions = ref();
+
 const rules = reactive({
     name: [Rules.requiredInput],
     driver: [Rules.requiredSelect],
+    parentNetworkCard: [Rules.requiredSelect],
     subnet: [{ validator: checkCidr, trigger: 'blur' }, Rules.requiredInput],
     gateway: [{ validator: checkGateway, trigger: 'blur' }],
     ipRange: [{ validator: checkCidr, trigger: 'blur' }],
@@ -263,6 +281,11 @@ const handleV6Delete = (index: number) => {
     form.auxAddressV6.splice(index, 1);
 };
 
+const loadNetworkOptions = async () => {
+    const res = await getNetworkOptions();
+    netOptions.value = res.data;
+};
+
 type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
 const onSubmit = async (formEl: FormInstance | undefined) => {
@@ -276,6 +299,9 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
             form.options = form.optionStr.split('\n');
         }
         loading.value = true;
+        if (form.driver === 'macvlan') {
+            form.options.push('parent=' + form.parentNetworkCard);
+        }
         await createNetwork(form)
             .then(() => {
                 loading.value = false;

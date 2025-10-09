@@ -915,6 +915,7 @@ const message = {
         driver: 'Driver',
         option: 'Opción',
         attachable: 'Adjuntable',
+        parentNetworkCard: 'Tarjeta de Red Principal',
         subnet: 'Subred',
         scope: 'Rango de IP',
         gateway: 'Puerta de enlace',

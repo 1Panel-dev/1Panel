@@ -905,6 +905,7 @@ const message = {
         driver: 'Драйвер',
         option: 'Опция',
         attachable: 'Подключаемая',
+        parentNetworkCard: 'Родительская Сетевая Карта',
         subnet: 'Подсеть',
         scope: 'Диапазон IP',
         gateway: 'Шлюз',

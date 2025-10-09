@@ -913,6 +913,7 @@ const message = {
         driver: 'Driver',
         option: 'Option',
         attachable: 'Attachable',
+        parentNetworkCard: 'Parent Network Card',
         subnet: 'Subnet',
         scope: 'IP scope',
         gateway: 'Gateway',

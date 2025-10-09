@@ -877,6 +877,7 @@ const message = {
         driver: '模式',
         option: '参数',
         attachable: '可用',
+        parentNetworkCard: '父网卡',
         subnet: '子网',
         scope: 'IP 范围',
         gateway: '网关',

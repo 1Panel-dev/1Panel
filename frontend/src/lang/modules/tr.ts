@@ -923,6 +923,7 @@ const message = {
         driver: 'Sürücü',
         option: 'Seçenek',
         attachable: 'Eklenebilir',
+        parentNetworkCard: 'Ana Ağ Kartı',
         subnet: 'Alt ağ',
         scope: 'IP kapsamı',
         gateway: 'Ağ geçidi',
