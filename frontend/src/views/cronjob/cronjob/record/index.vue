@@ -391,7 +391,6 @@ const search = async (changeToLatest: boolean) => {
 };
 
 const forDetail = (row: Cronjob.Record) => {
-    console.log('123');
     currentRecord.value = row;
 };
 
@@ -430,7 +429,7 @@ const onStop = async (id: number) => {
 
 const cleanRecord = async () => {
     delLoading.value = true;
-    await cleanRecords(dialogData.value.rowData.id, cleanData.value, false)
+    await cleanRecords(dialogData.value.rowData.id, cleanData.value, cleanRemoteData.value)
         .then(() => {
             delLoading.value = false;
             open.value = false;

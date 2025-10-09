@@ -500,8 +500,8 @@ func (u *CronjobService) CleanRecord(req dto.CronjobClean) error {
 		if hasBackup(cronjob.Type) {
 			accountMap := NewBackupClientMap(strings.Split(cronjob.SourceAccountIDs, ","))
 			if !req.CleanRemoteData {
-				for key := range accountMap {
-					if key != constant.Local {
+				for key, val := range accountMap {
+					if val.accountType != constant.Local {
 						delete(accountMap, key)
 					}
 				}

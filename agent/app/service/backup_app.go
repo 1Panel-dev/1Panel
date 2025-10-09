@@ -354,6 +354,7 @@ func doAppBackup(install *model.AppInstall, parentTask *task.Task, backupDir, fi
 	}
 
 	appPath := install.GetPath()
+	parentTask.LogStart(i18n.GetMsgByKey("TaskBackup"))
 	if err := fileOp.TarGzCompressPro(true, appPath, path.Join(tmpDir, "app.tar.gz"), "", excludes); err != nil {
 		return err
 	}
