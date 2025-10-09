@@ -3543,7 +3543,9 @@ const message = {
             nodeUnbindHelper:
                 'Se ha detectado que este nodo no está vinculado a una licencia. Vincúlalo desde [Ajustes del Panel - Licencia] e inténtalo de nuevo.',
             memTotal: 'Memoria Total',
-            nodeManagement: 'Gestión de Nodos',
+            nodeManagement: 'Gestión Multi-Máquina',
+            nodeItem: 'Gestión de Nodos',
+            panelItem: 'Gestión de Paneles',
             addNode: 'Añadir Nodo',
             connInfo: 'Información de Conexión',
             nodeInfo: 'Información del Nodo',

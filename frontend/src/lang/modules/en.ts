@@ -3592,8 +3592,9 @@ const message = {
             nodeUnbindHelper:
                 'Detected that this node is not bound to a license. Please bind it in [Panel Settings - License] menu and try again!',
             memTotal: 'Total Memory',
-            nodeManagement: 'Node Management',
-            panelManagement: 'Panel Management',
+            nodeManagement: 'Multi-Machine Management',
+            nodeItem: 'Node Management',
+            panelItem: 'Panel Management',
             addPanel: 'Add Panel',
             addNode: 'Add Node',
             connInfo: 'Connection Information',

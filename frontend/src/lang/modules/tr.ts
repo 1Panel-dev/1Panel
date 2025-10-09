@@ -3633,8 +3633,9 @@ const message = {
             nodeUnbindHelper:
                 'Bu düğümün lisansa bağlı olmadığı algılandı. Lütfen [Panel Ayarları - Lisans] menüsünde bağlayın ve tekrar deneyin!',
             memTotal: 'Toplam Bellek',
-            nodeManagement: 'Düğüm Yönetimi',
-            panelManagement: 'Panel Yönetimi',
+            nodeManagement: 'Çoklu Makine Yönetimi',
+            nodeItem: 'Düğüm Yönetimi',
+            panelItem: 'Panel Yönetimi',
             addPanel: 'Panel Ekle',
             addNode: 'Düğüm Ekle',
             connInfo: 'Bağlantı Bilgileri',

@@ -3544,8 +3544,9 @@ const message = {
             nodeUnbindHelper:
                 'Terdeteksi nod ini tidak terikat pada lesen. Sila ikat dalam menu [Tetapan Panel - Lesen] dan cuba lagi!',
             memTotal: 'Jumlah Memori',
-            nodeManagement: 'Pengurusan Nod',
-            panelManagement: 'Pengurusan Panel',
+            nodeManagement: 'Pengurusan Multi-Mesin',
+            nodeItem: 'Pengurusan Nod',
+            panelItem: 'Pengurusan Panel',
             addPanel: 'Tambah Panel',
             addNode: 'Tambah Nod',
             connInfo: 'Maklumat Sambungan',

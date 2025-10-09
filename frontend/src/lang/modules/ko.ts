@@ -3415,8 +3415,9 @@ const message = {
             nodeUnbindHelper:
                 '이 노드가 라이선스에 바인딩되지 않은 것으로 감지되었습니다. [패널 설정 - 라이선스] 메뉴에서 바인딩 후 다시 시도하세요!',
             memTotal: '총 메모리',
-            nodeManagement: '노드 관리',
-            panelManagement: '패널 관리',
+            nodeManagement: '다중 머신 관리',
+            nodeItem: '노드 관리',
+            panelItem: '패널 관리',
             addPanel: '패널 추가',
             addNode: '노드 추가',
             connInfo: '연결 정보',

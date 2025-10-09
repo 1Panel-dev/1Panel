@@ -3478,8 +3478,9 @@ const message = {
             nodeUnbindHelper:
                 'このノードがライセンスにバインドされていないことを検出しました。[パネル設定 - ライセンス]メニューでバインドしてから再試行してください！',
             memTotal: '総メモリ',
-            nodeManagement: 'ノード管理',
-            panelManagement: 'パネル管理',
+            nodeManagement: 'マルチマシン管理',
+            nodeItem: 'ノード管理',
+            panelItem: 'パネル管理',
             addPanel: 'パネル追加',
             addNode: 'ノードを追加',
             connInfo: '接続情報',

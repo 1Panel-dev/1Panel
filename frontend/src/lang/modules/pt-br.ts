@@ -3564,8 +3564,9 @@ const message = {
             nodeUnbindHelper:
                 'Detectamos que este nó não está vinculado a uma licença. Por favor vincule no menu [Configurações do Painel - Licença] e tente novamente!',
             memTotal: 'Memória Total',
-            nodeManagement: 'Gerenciamento de Nó',
-            panelManagement: 'Gerenciamento de Painel',
+            nodeManagement: 'Gerenciamento Multi-Máquina',
+            nodeItem: 'Gerenciamento de Nós',
+            panelItem: 'Gerenciamento de Painéis',
             addPanel: 'Adicionar Painel',
             addNode: 'Adicionar Nó',
             connInfo: 'Informações de Conexão',

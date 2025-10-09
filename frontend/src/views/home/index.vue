@@ -164,9 +164,10 @@
             </el-col>
             <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
                 <el-carousel
+                    class="my-carousel"
                     :key="simpleNodes.length"
-                    indicator-position="none"
                     height="346px"
+                    :indicator-position="showSimpleNode() ? '' : 'none'"
                     :arrow="showSimpleNode() ? 'hover' : 'never'"
                 >
                     <el-carousel-item key="systemInfo">
@@ -176,7 +177,7 @@
                             </template>
                             <template #body>
                                 <el-scrollbar>
-                                    <el-descriptions :column="1" class="ml-5" border>
+                                    <el-descriptions :column="1" class="ml-5 -mt-2" border>
                                         <el-descriptions-item
                                             class-name="system-content"
                                             label-class-name="system-label"
@@ -761,9 +762,22 @@ onBeforeUnmount(() => {
     width: 100% !important;
 }
 
+.my-carousel {
+    .el-carousel__button {
+        margin-bottom: -4px;
+        background-color: var(--el-text-color-regular);
+    }
+    .el-carousel__indicator.is-active .el-carousel__button {
+        background-color: var(--panel-color-primary);
+    }
+    .el-descriptions .el-descriptions__body .el-descriptions__table {
+        border-spacing: 0 5px !important; /* 垂直间距15px */
+    }
+}
+
 .simple-node {
     padding: 10px 15px 10px 0px;
-    margin: 3px 10px 3px 20px;
+    margin: -8px 10px 3px 20px;
     &:hover {
         background-color: rgba(0, 94, 235, 0.03);
     }
