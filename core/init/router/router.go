@@ -30,6 +30,10 @@ func setWebStatic(rootRouter *gin.RouterGroup) {
 	rootRouter.Static("/api/v2/images", path.Join(global.CONF.Base.InstallDir, "1panel/uploads/theme"))
 	rootRouter.GET("/assets/*filepath", func(c *gin.Context) {
 		c.Writer.Header().Set("Cache-Control", fmt.Sprintf("private, max-age=%d", 3600))
+		if c.Request.URL.Path[len(c.Request.URL.Path)-1] == '/' {
+	        c.AbortWithStatus(http.StatusForbidden)
+	        return
+	    }
 		staticServer := http.FileServer(http.FS(web.Assets))
 		staticServer.ServeHTTP(c.Writer, c.Request)
 	})
