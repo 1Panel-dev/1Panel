@@ -8,6 +8,7 @@ import (
 	fcgiclient "github.com/tomasen/fcgi_client"
 	"maps"
 	"os"
+	"os/exec"
 	"path"
 	"path/filepath"
 	"regexp"
@@ -587,7 +588,7 @@ func (r *RuntimeService) GetNodeModules(req request.NodeModuleReq) ([]response.N
 	nodeModulesPath := path.Join(runtime.CodeDir, "node_modules")
 	fileOp := files.NewFileOp()
 	if !fileOp.Stat(nodeModulesPath) {
-		return nil, buserr.New("ErrNodeModulesNotFound")
+		return res, nil
 	}
 	moduleDirs, err := os.ReadDir(nodeModulesPath)
 	if err != nil {
@@ -620,31 +621,17 @@ func (r *RuntimeService) OperateNodeModules(req request.NodeModuleOperateReq) er
 	if err != nil {
 		return err
 	}
-	cmd := req.PkgManager
-	switch req.Operate {
-	case constant.RuntimeInstall:
-		if req.PkgManager == constant.RuntimeNpm {
-			cmd += " install"
-		} else {
-			cmd += " add"
-		}
-	case constant.RuntimeUninstall:
-		if req.PkgManager == constant.RuntimeNpm {
-			cmd += " uninstall"
-		} else {
-			cmd += " remove"
-		}
-	case constant.RuntimeUpdate:
-		if req.PkgManager == constant.RuntimeNpm {
-			cmd += " update"
-		} else {
-			cmd += " upgrade"
-		}
-	}
-	cmd += " " + req.Module
+	operation := getOperation(req.Operate, req.PkgManager)
+	execScript := fmt.Sprintf("%s %s %s", req.PkgManager, operation, req.Module)
 
-	cmdMgr := cmd2.NewCommandMgr(cmd2.WithTimeout(5 * time.Minute))
-	return cmdMgr.Run("docker", "exec", "-i", containerName, "bash", "-c", fmt.Sprintf("'%s'", cmd))
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Minute)
+	defer cancel()
+	installCmd := exec.CommandContext(ctx, "docker", "exec", "-i", containerName, "bash", "-c", execScript)
+	output, err := installCmd.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("failed to execute command: %s, error: %w", string(output), err)
+	}
+	return nil
 }
 
 func (r *RuntimeService) SyncForRestart() error {

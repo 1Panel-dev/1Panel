@@ -1045,3 +1045,17 @@ func HandleOldPHPRuntime() {
 		}()
 	}
 }
+
+func getOperation(operate, pkgManager string) string {
+	operations := map[string][2]string{
+		constant.RuntimeInstall:   {"install", "add"},
+		constant.RuntimeUninstall: {"uninstall", "remove"},
+		constant.RuntimeUpdate:    {"update", "upgrade"},
+	}
+
+	ops := operations[operate]
+	if pkgManager == constant.RuntimeNpm {
+		return ops[0]
+	}
+	return ops[1]
+}
