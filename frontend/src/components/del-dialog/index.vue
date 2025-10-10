@@ -51,6 +51,7 @@ const form = reactive({
 const loading = ref();
 const open = ref();
 const successMsg = ref('');
+const noMsg = ref(false);
 
 interface DialogProps {
     title: string;
@@ -60,6 +61,7 @@ interface DialogProps {
     api: Function;
     params: Object;
     successMsg: string;
+    noMsg: boolean;
 }
 const acceptParams = (props: DialogProps): void => {
     form.title = props.title;
@@ -68,6 +70,9 @@ const acceptParams = (props: DialogProps): void => {
     form.api = props.api;
     form.params = props.params;
     successMsg.value = props.successMsg;
+    if (props.noMsg) {
+        noMsg.value = props.noMsg;
+    }
     open.value = true;
 };
 
@@ -85,10 +90,8 @@ const onConfirm = async () => {
         .then(() => {
             emit('cancel');
             emit('search');
-            if (successMsg.value) {
-                MsgSuccess(successMsg.value);
-            } else {
-                MsgSuccess(i18n.global.t('commons.msg.deleteSuccess'));
+            if (!noMsg.value) {
+                MsgSuccess(successMsg.value ?? i18n.global.t('commons.msg.deleteSuccess'));
             }
             open.value = false;
             loading.value = false;

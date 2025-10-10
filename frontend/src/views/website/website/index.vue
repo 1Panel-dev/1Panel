@@ -260,6 +260,7 @@
         <NginxConfig v-if="openNginxConfig" v-loading="loading" :containerName="containerName" :status="nginxStatus" />
         <DefaultHtml ref="defaultHtmlRef" />
         <TaskLog ref="taskLogRef" @close="search" />
+        <OpDialog ref="opRef" @search="openTaskLog" />
     </div>
 </template>
 
@@ -334,6 +335,7 @@ const batchReq = reactive({
     taskID: '',
 });
 const taskLogRef = ref();
+const opRef = ref();
 
 const paginationConfig = reactive({
     cacheSizeKey: 'website-page-size',
@@ -600,22 +602,24 @@ const updateRemark = (row: Website.Website, bulr: Function) => {
     updateWebsitConfig(row);
 };
 
+const openTaskLog = () => {
+    selects.value = [];
+    batchReq.operate = '';
+    taskLogRef.value.openWithTaskID(batchReq.taskID);
+};
+
 const batchOp = () => {
-    ElMessageBox.confirm(
-        i18n.global.t('website.batchOpreateHelper', [i18n.global.t('commons.button.' + batchReq.operate)]),
-        i18n.global.t('website.batchOpreate'),
-        {
-            confirmButtonText: i18n.global.t('commons.button.confirm'),
-            cancelButtonText: i18n.global.t('commons.button.cancel'),
-        },
-    ).then(async () => {
-        batchReq.ids = selects.value.map((item) => item.id);
-        const taskID = newUUID();
-        batchReq.taskID = taskID;
-        await batchOpreate(batchReq);
-        taskLogRef.value.openWithTaskID(taskID);
-        selects.value = [];
-        batchReq.operate = '';
+    const names = selects.value.map((item) => item.primaryDomain);
+    batchReq.ids = selects.value.map((item) => item.id);
+    const taskID = newUUID();
+    batchReq.taskID = taskID;
+    opRef.value.acceptParams({
+        names: names,
+        title: i18n.global.t('website.batchOpreate'),
+        api: batchOpreate,
+        msg: i18n.global.t('website.batchOpreateHelper', [i18n.global.t('commons.button.' + batchReq.operate)]),
+        params: batchReq,
+        noMsg: true,
     });
 };
 
