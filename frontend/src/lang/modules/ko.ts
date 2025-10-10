@@ -850,7 +850,6 @@ const message = {
         imagePushHelper:
             '이 이미지에 여러 태그가 있는 것으로 감지되었습니다. 푸시 시 사용할 이미지 이름이 다음인지 확인하세요: {0}',
         imageDelete: '이미지 삭제',
-        imageTagDeleteHelper: '이 이미지 ID와 관련된 다른 태그를 제거합니다.',
         repoName: '컨테이너 저장소 이름',
         imageName: '이미지 이름',
         pull: '풀',
@@ -861,6 +860,7 @@ const message = {
         pathSelect: '경로',
         label: '레이블',
         imageTag: '이미지 태그',
+        imageTagHelper: '여러 이미지 태그 설정을 지원하며, 각 태그 입력 후 Enter 키를 눌러 계속합니다',
         push: '푸시',
         fileName: '파일 이름',
         export: '내보내기',

@@ -1,6 +1,6 @@
 <template>
     <DrawerPro v-model="drawerVisible" :header="$t('container.imageTag')" @close="handleClose" size="large">
-        <el-form v-loading="loading" label-position="top" ref="formRef" :model="form" label-width="80px">
+        <el-form v-loading="loading" label-position="top" ref="formRef" :model="form" :rules="rules" label-width="80px">
             <el-form-item :label="$t('app.source')">
                 <el-checkbox v-model="form.fromRepo">{{ $t('container.imageRepo') }}</el-checkbox>
             </el-form-item>
@@ -14,19 +14,15 @@
                     <el-option v-for="item in repos" :key="item.id" :value="item.name" :label="item.name" />
                 </el-select>
             </el-form-item>
-            <el-form-item :label="$t('container.imageTag')" :rules="Rules.imageName" prop="targetName">
-                <el-input v-model="form.targetName" />
-            </el-form-item>
-
-            <el-form-item>
-                <div class="w-full">
-                    <el-checkbox v-model="form.deleteTag">
-                        {{ $t('container.imageTagDeleteHelper') }}
-                    </el-checkbox>
-                </div>
-                <el-checkbox-group v-if="form.deleteTag" v-model="form.deleteTags">
-                    <el-checkbox v-for="item in tags" :key="item" :value="item" :label="item" />
-                </el-checkbox-group>
+            <el-form-item :label="$t('container.imageTag')" prop="tags">
+                <el-input-tag ref="inputTagRef" @add-tag="handleAdd" v-model="form.tags">
+                    <template #tag="{ value }">
+                        <el-button @click="setInputValue(value)" size="small" link type="info">
+                            {{ value }}
+                        </el-button>
+                    </template>
+                </el-input-tag>
+                <span class="input-help">{{ $t('container.imageTagHelper') }}</span>
             </el-form-item>
         </el-form>
 
@@ -48,25 +44,44 @@ import { reactive, ref } from 'vue';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
-import { imageRemove, imageTag } from '@/api/modules/container';
+import { imageTag } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
 import { MsgSuccess } from '@/utils/message';
 
 const loading = ref(false);
+const inputTagRef = ref();
 
 const drawerVisible = ref(false);
 const repos = ref();
-const tags = ref();
 const form = reactive({
     imageID: '',
     fromRepo: false,
     repo: '',
     originName: '',
-    targetName: '',
 
-    deleteTag: false,
-    deleteTags: [],
+    tags: [],
 });
+const rules = reactive({
+    tags: [{ validator: checkTags, trigger: 'blur', required: true }],
+});
+function checkTags(rule: any, value: any, callback: any) {
+    if (value.length === 0) {
+        return callback(new Error(i18n.global.t('commons.rule.requiredInput')));
+    }
+    for (const item of value) {
+        if (item === '' || typeof item === 'undefined' || item == null) {
+            return callback(new Error(i18n.global.t('commons.rule.imageName')));
+        } else {
+            const reg = /^[a-zA-Z0-9]{1}[a-z:@A-Z0-9_/.-]{0,255}$/;
+            if (!reg.test(item) && item !== '') {
+                return callback(new Error(i18n.global.t('commons.rule.imageName')));
+            } else {
+                return callback();
+            }
+        }
+    }
+    callback();
+}
 
 interface DialogProps {
     repos: Array<Container.RepoOptions>;
@@ -78,13 +93,10 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
     drawerVisible.value = true;
     form.imageID = params.imageID;
     form.originName = params.tags?.length !== 0 ? params.tags[0] : '';
-    form.targetName = params.tags?.length !== 0 ? params.tags[0] : '';
+    form.tags = params.tags || [];
     form.fromRepo = false;
     form.repo = '';
-    form.deleteTag = false;
-    form.deleteTags = [];
     repos.value = params.repos;
-    tags.value = params.tags;
 };
 const emit = defineEmits<{ (e: 'search'): void }>();
 
@@ -95,21 +107,33 @@ const handleClose = () => {
 type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
 
+const handleAdd = (val: string) => {
+    form.tags = form.tags?.filter((item) => item !== val);
+    form.tags.push(val);
+};
+const setInputValue = async (text) => {
+    await nextTick();
+    const inputEl = inputTagRef.value?.$el?.querySelector('input');
+    if (!inputEl) return;
+
+    inputEl.value = text;
+    inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+    inputEl.dispatchEvent(new Event('change', { bubbles: true }));
+    inputEl.setSelectionRange(text.length, text.length);
+};
+
 const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
         let params = {
             sourceID: form.imageID,
-            targetName: form.targetName,
+            tags: form.tags,
         };
         loading.value = true;
         await imageTag(params)
             .then(async () => {
                 loading.value = false;
-                if (form.deleteTag && form.deleteTags.length !== 0) {
-                    await imageRemove({ names: form.deleteTags });
-                }
                 drawerVisible.value = false;
                 emit('search');
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
@@ -122,12 +146,11 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
 
 const changeRepo = (val) => {
     if (val === 'Docker Hub') {
-        form.targetName = form.originName;
         return;
     }
     for (const item of repos.value) {
         if (item.name == val) {
-            form.targetName = item.downloadUrl + '/' + form.originName;
+            form.tags.push(item.downloadUrl + '/' + form.originName);
             return;
         }
     }

@@ -36,8 +36,8 @@ type ImagePull struct {
 }
 
 type ImageTag struct {
-	SourceID   string `json:"sourceID" validate:"required"`
-	TargetName string `json:"targetName" validate:"required"`
+	SourceID string   `json:"sourceID" validate:"required"`
+	Tags     []string `json:"tags" validate:"required"`
 }
 
 type ImagePush struct {

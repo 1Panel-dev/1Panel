@@ -875,7 +875,6 @@ const message = {
         imagePushHelper:
             'Terdapat pengesahan bahawa imej ini mempunyai beberapa tag. Sila pastikan nama imej yang digunakan untuk menolak adalah: {0}',
         imageDelete: 'Padam imej',
-        imageTagDeleteHelper: 'Buang tag lain yang berkaitan dengan ID imej ini',
         repoName: 'Pendaftaran kontena',
         imageName: 'Nama imej',
         pull: 'Tarik',
@@ -886,6 +885,8 @@ const message = {
         pathSelect: 'Laluan',
         label: 'Label',
         imageTag: 'Tag imej',
+        imageTagHelper:
+            'Menyokong penetapan berbilang tag imej, tekan Enter selepas memasukkan setiap tag untuk teruskan',
         push: 'Tekan',
         fileName: 'Nama fail',
         export: 'Eksport',

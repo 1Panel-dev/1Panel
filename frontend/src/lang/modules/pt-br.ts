@@ -870,7 +870,6 @@ const message = {
         imagePushHelper:
             'Detectado que esta imagem possui múltiplas tags. Por favor, confirme que o nome da imagem usada para push é: {0}',
         imageDelete: 'Excluir imagem',
-        imageTagDeleteHelper: 'Remover outras tags associadas a este ID de imagem',
         repoName: 'Registro de contêiner',
         imageName: 'Nome da imagem',
         pull: 'Puxar',
@@ -881,6 +880,8 @@ const message = {
         pathSelect: 'Caminho',
         label: 'Etiqueta',
         imageTag: 'Tag de imagem',
+        imageTagHelper:
+            'Suporta definir múltiplas tags de imagem, pressione Enter após inserir cada tag para continuar',
         push: 'Enviar',
         fileName: 'Nome do arquivo',
         export: 'Exportar',

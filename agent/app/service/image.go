@@ -363,8 +363,38 @@ func (u *ImageService) ImageTag(req dto.ImageTag) error {
 	}
 	defer client.Close()
 
-	if err := client.ImageTag(context.TODO(), req.SourceID, req.TargetName); err != nil {
+	imageItem, err := client.ImageInspect(context.Background(), req.SourceID)
+	if err != nil {
 		return err
+	}
+
+	for _, tag := range req.Tags {
+		isNew := true
+		for _, tagOld := range imageItem.RepoTags {
+			if tag == tagOld {
+				isNew = false
+				break
+			}
+		}
+		if isNew {
+			if err := client.ImageTag(context.TODO(), req.SourceID, tag); err != nil {
+				return err
+			}
+		}
+	}
+	for _, tagOld := range imageItem.RepoTags {
+		isDel := true
+		for _, tag := range req.Tags {
+			if tag == tagOld {
+				isDel = false
+				break
+			}
+		}
+		if isDel {
+			if _, err := client.ImageRemove(context.TODO(), tagOld, image.RemoveOptions{}); err != nil {
+				return err
+			}
+		}
 	}
 	return nil
 }

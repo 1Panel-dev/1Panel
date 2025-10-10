@@ -858,7 +858,6 @@ const message = {
         imagePushHelper:
             'このイメージに複数のタグが存在することが検出されました。プッシュ時に使用するイメージ名が以下であることを確認してください：{0}',
         imageDelete: '画像削除',
-        imageTagDeleteHelper: 'この画像IDに関連付けられた他のタグを削除します',
         repoName: 'コンテナレジストリ',
         imageName: '画像名',
         pull: '引く',
@@ -869,6 +868,7 @@ const message = {
         pathSelect: 'パス',
         label: 'ラベル',
         imageTag: '画像タグ',
+        imageTagHelper: '複数のイメージタグの設定をサポートし、各タグ入力後にEnterキーを押して続行します',
         push: '押す',
         fileName: 'ファイル名',
         export: '輸出',

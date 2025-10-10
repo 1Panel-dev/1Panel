@@ -191,7 +191,7 @@ export namespace Container {
     }
     export interface ImageTag {
         sourceID: string;
-        targetName: string;
+        tags: Array<string>;
     }
     export interface ImagePush {
         taskID: string;

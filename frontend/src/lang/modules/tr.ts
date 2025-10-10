@@ -891,7 +891,6 @@ const message = {
         imagePushHelper:
             'Bu imgenin birden fazla etiketi olduğu tespit edildi. Lütfen gönderimde kullanılan imge adının şu olduğunu onaylayın: {0}',
         imageDelete: 'İmaj sil',
-        imageTagDeleteHelper: 'Bu imaj IDsi ile ilişkili diğer etiketleri kaldır',
         repoName: 'Konteyner kayıt defteri',
         imageName: 'İmaj adı',
         pull: 'Çek',
@@ -902,6 +901,8 @@ const message = {
         pathSelect: 'Yol',
         label: 'Etiket',
         imageTag: 'İmaj etiketi',
+        imageTagHelper:
+            "Birden fazla görüntü etiketi ayarlamayı destekler, her etiket girdikten sonra Enter'a basarak devam edin",
         push: 'Gönder',
         fileName: 'Dosya adı',
         export: 'Dışa aktar',
