@@ -100,7 +100,7 @@ const systemRules: TokenRule[] = [
 const taskRules: TokenRule[] = [
     {
         type: 'bracket-text',
-        pattern: /\[(?:[^\[\]]*(?:\[[^\[\]]*\])*[^\[\]]*)*\]/g,
+        pattern: /\[(?:[^\[\]]|\[[^\[\]]*\]){0,100}\]/g,
         color: '#B87A2B',
     },
 ];
