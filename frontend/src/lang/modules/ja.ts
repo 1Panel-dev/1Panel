@@ -3482,6 +3482,10 @@ const message = {
             nodeItem: 'ノード管理',
             panelItem: 'パネル管理',
             addPanel: 'パネル追加',
+            addPanelHelper:
+                'Después de agregar el panel exitosamente, puede acceder rápidamente al panel objetivo en [Resumen - Paneles].',
+            panel: 'Panel 1Panel',
+            others: 'Otros Paneles',
             addNode: 'ノードを追加',
             connInfo: '接続情報',
             nodeInfo: 'ノード情報',

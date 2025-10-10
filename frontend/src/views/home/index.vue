@@ -168,7 +168,7 @@
                     :key="simpleNodes.length"
                     height="346px"
                     :indicator-position="showSimpleNode() ? '' : 'none'"
-                    :arrow="showSimpleNode() ? 'hover' : 'never'"
+                    arrow="never"
                 >
                     <el-carousel-item key="systemInfo">
                         <CardWithHeader :header="$t('home.systemInfo')">
@@ -784,6 +784,7 @@ onBeforeUnmount(() => {
     .name {
         font-weight: 500 !important;
         font-size: 16px !important;
+        line-height: 30px;
         color: var(--panel-text-color);
     }
     .detail {

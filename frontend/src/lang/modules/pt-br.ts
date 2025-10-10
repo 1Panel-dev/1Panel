@@ -3568,6 +3568,10 @@ const message = {
             nodeItem: 'Gerenciamento de Nós',
             panelItem: 'Gerenciamento de Painéis',
             addPanel: 'Adicionar Painel',
+            addPanelHelper:
+                'Após adicionar o painel com sucesso, você pode acessar rapidamente o painel de destino em [Visão Geral - Painéis].',
+            panel: 'Painel 1Panel',
+            others: 'Outros Painéis',
             addNode: 'Adicionar Nó',
             connInfo: 'Informações de Conexão',
             nodeInfo: 'Informações do Nó',

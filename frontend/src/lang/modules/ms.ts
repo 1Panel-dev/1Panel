@@ -3548,6 +3548,10 @@ const message = {
             nodeItem: 'Pengurusan Nod',
             panelItem: 'Pengurusan Panel',
             addPanel: 'Tambah Panel',
+            addPanelHelper:
+                'Selepas berjaya menambah panel, anda boleh mengakses panel sasaran dengan pantas di [Gambaran Keseluruhan - Panel].',
+            panel: 'Panel 1Panel',
+            others: 'Panel Lain',
             addNode: 'Tambah Nod',
             connInfo: 'Maklumat Sambungan',
             nodeInfo: 'Maklumat Nod',

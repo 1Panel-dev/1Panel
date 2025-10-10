@@ -163,6 +163,7 @@ var WebUrlMap = map[string]struct{}{
 	"/xpack/alert/setting":   {},
 	"/xpack/setting":         {},
 	"/xpack/node":            {},
+	"/xpack/simple-node":     {},
 	"/xpack/exchange/file":   {},
 	"/xpack/app":             {},
 

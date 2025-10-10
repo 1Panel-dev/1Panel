@@ -3596,6 +3596,10 @@ const message = {
             nodeItem: 'Node Management',
             panelItem: 'Panel Management',
             addPanel: 'Add Panel',
+            addPanelHelper:
+                'After successfully adding the panel, you can quickly access the target panel in [Overview - Panels].',
+            panel: '1Panel Panel',
+            others: 'Other Panels',
             addNode: 'Add Node',
             connInfo: 'Connection Information',
             nodeInfo: 'Node Information',

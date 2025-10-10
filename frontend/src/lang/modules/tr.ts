@@ -3637,6 +3637,10 @@ const message = {
             nodeItem: 'Düğüm Yönetimi',
             panelItem: 'Panel Yönetimi',
             addPanel: 'Panel Ekle',
+            addPanelHelper:
+                'Panel başarıyla eklendikten sonra, [Genel Bakış - Paneller] bölümünden hedef panele hızlıca erişebilirsiniz.',
+            panel: '1Panel Paneli',
+            others: 'Diğer Paneller',
             addNode: 'Düğüm Ekle',
             connInfo: 'Bağlantı Bilgileri',
             nodeInfo: 'Düğüm Bilgileri',
