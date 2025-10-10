@@ -49,3 +49,7 @@ func (r *Runtime) GetPHPPath() string {
 func (r *Runtime) GetLogPath() string {
 	return path.Join(r.GetPath(), "build.log")
 }
+
+func (r *Runtime) GetSlowLogPath() string {
+	return path.Join(r.GetPath(), "log", "fpm.slow.log")
+}

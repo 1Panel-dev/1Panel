@@ -560,6 +560,12 @@ func (f *FileService) ReadLogByLine(req request.FileReadByLineReq) (*response.Fi
 		logFilePath = path.Join(global.Dir.DataDir, fmt.Sprintf("apps/mysql/%s/data/1Panel-slow.log", req.Name))
 	case "mariadb-slow-logs":
 		logFilePath = path.Join(global.Dir.DataDir, fmt.Sprintf("apps/mariadb/%s/db/data/1Panel-slow.log", req.Name))
+	case "php-fpm-slow-logs":
+		php, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(req.ID))
+		if err != nil {
+			return nil, err
+		}
+		logFilePath = php.GetSlowLogPath()
 	}
 
 	file, err := os.Open(logFilePath)

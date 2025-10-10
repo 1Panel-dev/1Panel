@@ -29,6 +29,9 @@
                 <el-tab-pane :label="$t('runtime.loadStatus')" name="7">
                     <FpmStatus :id="runtime.id" v-if="index == '7'"></FpmStatus>
                 </el-tab-pane>
+                <el-tab-pane :label="$t('database.slowLog')" name="9">
+                    <SlowLog :id="runtime.id" v-if="index == '9'"></SlowLog>
+                </el-tab-pane>
                 <el-tab-pane :label="$t('website.source')" name="4">
                     <PHP :id="runtime.id" v-if="index == '4'" :type="'php'"></PHP>
                 </el-tab-pane>
@@ -51,6 +54,7 @@ import Performance from './performance/index.vue';
 import Container from './container/index.vue';
 import FpmStatus from './fpm-status/index.vue';
 import Timeout from './timeout/index.vue';
+import SlowLog from './slow-log/index.vue';
 
 const index = ref('6');
 const open = ref(false);
