@@ -681,4 +681,17 @@ export namespace Website {
         operate: string;
         taskID: string;
     }
+
+    export interface CorsConfig {
+        cors: boolean;
+        allowOrigins: string;
+        allowMethods: string;
+        allowHeaders: string;
+        allowCredentials: boolean;
+        preflight: boolean;
+    }
+
+    export interface CorsConfigReq extends CorsConfig {
+        websiteID: number;
+    }
 }

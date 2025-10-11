@@ -5,10 +5,16 @@ import (
 )
 
 type Server struct {
-	Comment    string
-	Listens    []*ServerListen
-	Directives []IDirective
-	Line       int
+	Comment          string
+	Listens          []*ServerListen
+	Directives       []IDirective
+	Line             int
+	Cors             bool
+	AllowMethods     string
+	AllowHeaders     string
+	AllowOrigins     string
+	AllowCredentials bool
+	Preflight        bool
 }
 
 func (s *Server) GetCodeBlock() string {
@@ -25,6 +31,28 @@ func NewServer(directive IDirective) (*Server, error) {
 			switch dir.GetName() {
 			case "listen":
 				server.Listens = append(server.Listens, NewServerListen(dir.GetParameters(), dir.GetLine()))
+			case "add_header":
+				params := dir.GetParameters()
+				if params[0] == "Access-Control-Allow-Origin" {
+					server.Cors = true
+					server.AllowOrigins = params[1]
+				}
+				if params[0] == "Access-Control-Allow-Methods" {
+					server.AllowMethods = params[1]
+				}
+				if params[0] == "Access-Control-Allow-Headers" {
+					server.AllowHeaders = params[1]
+				}
+				if params[0] == "Access-Control-Allow-Credentials" && params[1] == "true" {
+					server.AllowCredentials = true
+				}
+				server.Directives = append(server.Directives, dir)
+			case "if":
+				params := dir.GetParameters()
+				if params[0] == "(" && params[1] == "$request_method" && params[2] == `=` && params[3] == `'OPTIONS'` && params[4] == ")" {
+					server.Preflight = true
+				}
+				server.Directives = append(server.Directives, dir)
 			default:
 				server.Directives = append(server.Directives, dir)
 			}
@@ -478,4 +506,27 @@ func (s *Server) UpdateAllowIPs(ips []string) {
 	} else {
 		s.Directives = append(s.Directives, ipDirectives...)
 	}
+}
+
+func (s *Server) AddCorsOption() {
+	newDir := &Directive{
+		Name:       "if",
+		Parameters: []string{"(", "$request_method", "=", "'OPTIONS'", ")"},
+		Block:      &Block{},
+	}
+	block := &Block{}
+	block.AppendDirectives(&Directive{
+		Name:       "return",
+		Parameters: []string{"204"},
+	})
+	newDir.Block = block
+	directives := s.GetDirectives()
+	newDirectives := make([]IDirective, 0)
+	for _, dir := range directives {
+		if dir.GetName() != "listen" {
+			newDirectives = append(newDirectives, dir)
+		}
+	}
+	newDirectives = append(newDirectives, newDir)
+	s.Directives = newDirectives
 }

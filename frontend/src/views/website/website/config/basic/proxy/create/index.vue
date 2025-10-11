@@ -123,39 +123,20 @@
                     </el-collapse-transition>
 
                     <el-divider content-position="left">{{ $t('website.cors') }}</el-divider>
-                    <div class="flex justify-between items-center py-3">
-                        <div class="flex flex-col gap-1">
-                            <span class="font-medium">{{ $t('website.enableCors') }}</span>
-                        </div>
-                        <el-switch v-model="proxy.cors" size="large" @change="changeCors(proxy.cors)" />
-                    </div>
-                    <el-collapse-transition>
-                        <div v-if="proxy.cors" class="mt-4">
-                            <el-form-item :label="$t('website.allowOrigins')" prop="allowOrigins">
-                                <el-input v-model="proxy.allowOrigins" type="textarea" placeholder="*"></el-input>
-                            </el-form-item>
-                            <el-form-item :label="$t('website.allowMethods')" prop="allowMethods">
-                                <el-input
-                                    v-model="proxy.allowMethods"
-                                    type="textarea"
-                                    placeholder="GET,POST,OPTIONS,PUT,DELETE"
-                                ></el-input>
-                            </el-form-item>
-                            <el-form-item :label="$t('website.allowHeaders')" prop="allowHeaders">
-                                <el-input v-model="proxy.allowHeaders" type="textarea"></el-input>
-                            </el-form-item>
-                            <el-form-item :label="$t('website.allowCredentials')" prop="allowCredentials">
-                                <el-switch v-model="proxy.allowCredentials" />
-                            </el-form-item>
-                            <el-form-item :label="$t('website.preflight')" prop="preflight">
-                                <el-switch v-model="proxy.preflight" />
-                                <span class="input-help">{{ $t('website.preflightHleper') }}</span>
-                            </el-form-item>
-                        </div>
-                    </el-collapse-transition>
+                    <CorsSetting
+                        v-model="proxy.cors"
+                        :config="{
+                            allowOrigins: proxy.allowOrigins,
+                            allowMethods: proxy.allowMethods,
+                            allowHeaders: proxy.allowHeaders,
+                            allowCredentials: proxy.allowCredentials,
+                            preflight: proxy.preflight,
+                        }"
+                        enable-size="large"
+                        @update:config="updateCorsConfig"
+                    ></CorsSetting>
 
                     <el-divider content-position="left">{{ $t('website.replace') }}</el-divider>
-
                     <div>
                         <div v-for="(replace, index) in replaces" :key="index" class="mb-3">
                             <el-row :gutter="16">
@@ -217,6 +198,7 @@ import { Website } from '@/api/interface/website';
 import { Units } from '@/global/mimetype';
 import { isDomain } from '@/utils/util';
 import { Delete, Plus } from '@element-plus/icons-vue';
+import CorsSetting from '@/views/website/website/cors/index.vue';
 
 const proxyForm = ref<FormInstance>();
 const rules = ref({
@@ -303,22 +285,6 @@ const changeCache = (cache: boolean) => {
     }
 };
 
-const changeCors = (cors: boolean) => {
-    if (cors) {
-        proxy.value.allowOrigins = '*';
-        proxy.value.allowMethods = 'GET,POST,OPTIONS,PUT,DELETE';
-        proxy.value.allowHeaders = '';
-        proxy.value.allowCredentials = false;
-        proxy.value.preflight = true;
-    } else {
-        proxy.value.allowOrigins = '';
-        proxy.value.allowMethods = '';
-        proxy.value.allowHeaders = '';
-        proxy.value.allowCredentials = false;
-        proxy.value.preflight = true;
-    }
-};
-
 const addReplaces = () => {
     replaces.value.push({ key: '', value: '' });
 };
@@ -333,6 +299,14 @@ const getProxyHost = () => {
     } else {
         proxy.value.proxyHost = '$host';
     }
+};
+
+const updateCorsConfig = (config: any) => {
+    proxy.value.allowOrigins = config.allowOrigins;
+    proxy.value.allowMethods = config.allowMethods;
+    proxy.value.allowHeaders = config.allowHeaders;
+    proxy.value.allowCredentials = config.allowCredentials;
+    proxy.value.preflight = config.preflight;
 };
 
 const submit = async (formEl: FormInstance | undefined) => {

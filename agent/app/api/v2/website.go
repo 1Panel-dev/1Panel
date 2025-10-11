@@ -1161,3 +1161,45 @@ func (b *BaseApi) BatchOpWebsites(c *gin.Context) {
 	}
 	helper.Success(c)
 }
+
+// @Tags Website
+// @Summary Get CORS Config
+// @Accept json
+// @Param id path int true "id"
+// @Success 200 {object} request.CorsConfig
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /websites/cors/{id} [get]
+func (b *BaseApi) GetCORSConfig(c *gin.Context) {
+	id, err := helper.GetParamID(c)
+	if err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	res, err := websiteService.GetCors(id)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, res)
+}
+
+// @Tags Website
+// @Summary Update CORS Config
+// @Accept json
+// @Param request body request.CorsConfigReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /websites/cors/update [post]
+func (b *BaseApi) UpdateCORSConfig(c *gin.Context) {
+	var req request.CorsConfigReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := websiteService.UpdateCors(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}

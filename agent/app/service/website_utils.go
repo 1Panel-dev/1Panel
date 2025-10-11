@@ -1303,6 +1303,7 @@ const (
 	SiteRootAuthBasicPath = "SiteRootAuthBasicPath"
 	SitePathAuthBasicDir  = "SitePathAuthBasicDir"
 	SiteUpstreamDir       = "SiteUpstreamDir"
+	SiteCorsPath          = "SiteCorsPath"
 )
 
 func GetSitePath(website model.Website, confType string) string {
@@ -1333,6 +1334,8 @@ func GetSitePath(website model.Website, confType string) string {
 		return path.Join(GteSiteDir(website.Alias), "path_auth")
 	case SiteUpstreamDir:
 		return path.Join(GteSiteDir(website.Alias), "upstream")
+	case SiteCorsPath:
+		return path.Join(GteSiteDir(website.Alias), "cors", "cors.conf")
 	}
 	return ""
 }
@@ -1480,4 +1483,54 @@ func ParseDomain(domain string) (*model.WebsiteDomain, error) {
 		Domain: host,
 		Port:   port,
 	}, nil
+}
+
+func updateWebsiteConfig(website model.Website, updateFunc func(server *components.Server) error) error {
+	configPath := GetSitePath(website, SiteConf)
+	nginxContent, err := files.NewFileOp().GetContent(configPath)
+	if err != nil {
+		return err
+	}
+
+	config, err := parser.NewStringParser(string(nginxContent)).Parse()
+	if err != nil {
+		return err
+	}
+	config.FilePath = configPath
+	servers := config.FindServers()
+	if len(servers) == 0 {
+		return errors.New("nginx config is not valid")
+	}
+	server := servers[0]
+	if err := updateFunc(server); err != nil {
+		return err
+	}
+	if err = nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
+		return err
+	}
+	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
+	if err != nil {
+		return err
+	}
+	return nginxCheckAndReload(string(nginxContent), configPath, nginxInstall.ContainerName)
+}
+
+func getServer(website model.Website) (*components.Server, error) {
+	configPath := GetSitePath(website, SiteConf)
+	nginxContent, err := files.NewFileOp().GetContent(configPath)
+	if err != nil {
+		return nil, err
+	}
+
+	config, err := parser.NewStringParser(string(nginxContent)).Parse()
+	if err != nil {
+		return nil, err
+	}
+
+	servers := config.FindServers()
+	if len(servers) == 0 {
+		return nil, errors.New("nginx config is not valid")
+	}
+	server := servers[0]
+	return server, nil
 }

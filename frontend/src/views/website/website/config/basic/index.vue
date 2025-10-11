@@ -1,40 +1,43 @@
 <template>
     <div :style="{ '--main-height': mainHeight + 'px' }">
         <el-tabs tab-position="left" v-model="tabIndex" v-if="id > 0" class="custom-tabs" ref="tabsRef">
-            <el-tab-pane :label="$t('website.domainConfig')">
+            <el-tab-pane :label="$t('website.domainConfig')" name="0">
                 <Domain :key="id" :id="id" v-if="tabIndex == '0'"></Domain>
             </el-tab-pane>
-            <el-tab-pane :label="$t('website.sitePath')">
+            <el-tab-pane :label="$t('website.sitePath')" name="1">
                 <SitePath :id="id" v-if="tabIndex == '1'"></SitePath>
             </el-tab-pane>
-            <el-tab-pane :label="$t('website.defaultDoc')">
+            <el-tab-pane :label="$t('website.defaultDoc')" name="2">
                 <Default :id="id" v-if="tabIndex == '2'"></Default>
             </el-tab-pane>
-            <el-tab-pane :label="$t('website.rate')">
+            <el-tab-pane :label="$t('website.rate')" name="3">
                 <LimitConn :id="id" v-if="tabIndex == '3'"></LimitConn>
             </el-tab-pane>
-            <el-tab-pane :label="$t('website.proxy')">
+            <el-tab-pane :label="$t('website.proxy')" name="4">
                 <Proxy :id="id" v-if="tabIndex == '4'"></Proxy>
             </el-tab-pane>
-            <el-tab-pane :label="$t('website.loadBalance')">
+            <el-tab-pane :label="$t('website.loadBalance')" name="5">
                 <LoadBalance :id="id" v-if="tabIndex == '5'"></LoadBalance>
             </el-tab-pane>
-            <el-tab-pane :label="$t('website.basicAuth')">
+            <el-tab-pane :label="$t('website.basicAuth')" name="6">
                 <AuthBasic :id="id" v-if="tabIndex == '6'"></AuthBasic>
             </el-tab-pane>
-            <el-tab-pane :label="'HTTPS'">
+            <el-tab-pane :label="$t('website.cors')" name="16">
+                <Cors :id="id" v-if="tabIndex == '16'"></Cors>
+            </el-tab-pane>
+            <el-tab-pane :label="'HTTPS'" name="7">
                 <HTTPS :id="id" v-if="tabIndex == '7'"></HTTPS>
             </el-tab-pane>
-            <el-tab-pane :label="$t('website.realIP')">
+            <el-tab-pane :label="$t('website.realIP')" name="8">
                 <RealIP :id="id" v-if="tabIndex == '8'"></RealIP>
             </el-tab-pane>
-            <el-tab-pane :label="$t('website.rewrite')">
+            <el-tab-pane :label="$t('website.rewrite')" name="9">
                 <Rewrite :id="id" v-if="tabIndex == '9'"></Rewrite>
             </el-tab-pane>
-            <el-tab-pane :label="$t('website.antiLeech')">
+            <el-tab-pane :label="$t('website.antiLeech')" name="10">
                 <AntiLeech :id="id" v-if="tabIndex == '10'"></AntiLeech>
             </el-tab-pane>
-            <el-tab-pane :label="$t('website.redirect')">
+            <el-tab-pane :label="$t('website.redirect')" name="11">
                 <Redirect :id="id" v-if="tabIndex == '11'"></Redirect>
             </el-tab-pane>
 
@@ -77,6 +80,7 @@ import LoadBalance from './load-balance/index.vue';
 import PHP from './php/index.vue';
 import RealIP from './real-ip/index.vue';
 import Resource from './resource/index.vue';
+import Cors from './cors/index.vue';
 
 const props = defineProps({
     website: {

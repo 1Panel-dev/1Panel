@@ -96,6 +96,9 @@ type IWebsiteService interface {
 	ClearProxyCache(req request.NginxCommonReq) error
 	DeleteProxy(req request.WebsiteProxyDel) (err error)
 
+	UpdateCors(req request.CorsConfigReq) error
+	GetCors(websiteID uint) (*request.CorsConfig, error)
+
 	GetAntiLeech(id uint) (*response.NginxAntiLeechRes, error)
 	UpdateAntiLeech(req request.NginxAntiLeechUpdate) (err error)
 
@@ -2016,6 +2019,65 @@ func (w WebsiteService) DeleteProxy(req request.WebsiteProxyDel) (err error) {
 	_ = fileOp.DeleteFile(includePath)
 	_ = fileOp.DeleteFile(backPath)
 	return updateNginxConfig(constant.NginxScopeServer, nil, &website)
+}
+
+func (w WebsiteService) UpdateCors(req request.CorsConfigReq) error {
+	website, err := websiteRepo.GetFirst(repo.WithByID(req.WebsiteID))
+	if err != nil {
+		return err
+	}
+	params := []dto.NginxParam{
+		{Name: "add_header", Params: []string{"Access-Control-Allow-Origin"}},
+		{Name: "add_header", Params: []string{"Access-Control-Allow-Methods"}},
+		{Name: "add_header", Params: []string{"Access-Control-Allow-Headers"}},
+		{Name: "add_header", Params: []string{"Access-Control-Allow-Credentials"}},
+		{Name: "if", Params: []string{"(", "$request_method", "=", "'OPTIONS'", ")"}},
+	}
+	if err := deleteNginxConfig(constant.NginxScopeServer, params, &website); err != nil {
+		return err
+	}
+	if req.Cors {
+		return updateWebsiteConfig(website, func(server *components.Server) error {
+			server.UpdateDirective("add_header", []string{"Access-Control-Allow-Origin", req.AllowOrigins, "always"})
+			if req.AllowMethods != "" {
+				server.UpdateDirective("add_header", []string{"Access-Control-Allow-Methods", req.AllowMethods, "always"})
+			}
+			if req.AllowHeaders != "" {
+				server.UpdateDirective("add_header", []string{"Access-Control-Allow-Headers", req.AllowHeaders, "always"})
+			}
+			if req.AllowCredentials {
+				server.UpdateDirective("add_header", []string{"Access-Control-Allow-Credentials", "true", "always"})
+			}
+			if req.Preflight {
+				server.AddCorsOption()
+			}
+			return nil
+		})
+	}
+	return nil
+}
+
+func (w WebsiteService) GetCors(websiteID uint) (*request.CorsConfig, error) {
+	website, err := websiteRepo.GetFirst(repo.WithByID(websiteID))
+	if err != nil {
+		return nil, err
+	}
+	server, err := getServer(website)
+	if err != nil {
+		return nil, err
+	}
+	if server == nil {
+		return nil, nil
+	}
+	cors := &request.CorsConfig{
+		Cors:             server.Cors,
+		AllowOrigins:     server.AllowOrigins,
+		AllowMethods:     server.AllowMethods,
+		AllowHeaders:     server.AllowHeaders,
+		AllowCredentials: server.AllowCredentials,
+		Preflight:        server.Preflight,
+	}
+	return cors, nil
 }
 
 func (w WebsiteService) GetAuthBasics(req request.NginxAuthReq) (res response.NginxAuthRes, err error) {

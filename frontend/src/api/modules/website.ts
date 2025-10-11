@@ -359,3 +359,11 @@ export const execComposer = (req: Website.ExecComposer) => {
 export const batchOpreate = (req: Website.BatchOperate) => {
     return http.post(`/websites/batch/operate`, req);
 };
+
+export const getCorsConfig = (id: number) => {
+    return http.get<Website.CorsConfig>(`/websites/cors/${id}`);
+};
+
+export const updateCorsConfig = (req: Website.CorsConfigReq) => {
+    return http.post(`/websites/cors/update`, req);
+};
