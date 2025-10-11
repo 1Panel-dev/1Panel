@@ -308,6 +308,10 @@ func handleAppRecover(install *model.AppInstall, parentTask *task.Task, recoverF
 		return nil
 	}
 
+	if parentTask != nil {
+		return recoverApp(parentTask)
+	}
+
 	rollBackApp := func(t *task.Task) {
 		if isRollback {
 			return
@@ -324,10 +328,6 @@ func handleAppRecover(install *model.AppInstall, parentTask *task.Task, recoverF
 			_ = os.RemoveAll(rollbackFile)
 		}
 	}
-	if parentTask != nil {
-		return recoverApp(parentTask)
-	}
-
 	recoverTask.AddSubTask(task.GetTaskName(install.Name, task.TaskRecover, task.TaskScopeBackup), recoverApp, rollBackApp)
 	go func() {
 		_ = recoverTask.Execute()

@@ -90,7 +90,7 @@ const (
 	TaskScopeContainer        = "Container"
 	TaskScopeCompose          = "Compose"
 	TaskScopeImage            = "Image"
-	TaskScopeBackup           = "Backup "
+	TaskScopeBackup           = "Backup"
 	TaskScopeRuntimeExtension = "RuntimeExtension"
 	TaskScopeCustomAppstore   = "CustomAppstore"
 	TaskScopeTamper           = "Tamper"
@@ -161,7 +161,9 @@ func ReNewTaskWithOps(resourceName, operate, scope, taskID string, resourceID ui
 	return ReNewTask(GetTaskName(resourceName, operate, scope), operate, scope, taskID, resourceID)
 }
 func ReNewTask(name, operate, taskScope, taskID string, resourceID uint) (*Task, error) {
-	if taskID == "" {
+	taskRepo := repo.NewITaskRepo()
+	taskItem, _ := taskRepo.GetFirst(taskRepo.WithByID(taskID))
+	if taskItem.ID == "" {
 		return NewTask(name, operate, taskScope, taskID, resourceID)
 	}
 	logDir := path.Join(global.Dir.TaskDir, taskScope)
@@ -177,17 +179,10 @@ func ReNewTask(name, operate, taskScope, taskID string, resourceID uint) (*Task,
 	}
 	writer := bufio.NewWriter(file)
 	logger := log.New(file, "", log.LstdFlags)
-	taskModel := &model.Task{
-		ID:         taskID,
-		Name:       name,
-		Type:       taskScope,
-		LogFile:    logPath,
-		Status:     constant.StatusExecuting,
-		ResourceID: resourceID,
-		Operate:    operate,
-	}
-	taskRepo := repo.NewITaskRepo()
-	task := &Task{Name: name, logFile: file, Logger: logger, taskRepo: taskRepo, Task: taskModel, Writer: writer}
+	logger.Print("\n --------------------------------------------------- \n")
+	taskItem.Status = constant.StatusExecuting
+	task := &Task{Name: name, logFile: file, Logger: logger, taskRepo: taskRepo, Task: &taskItem, Writer: writer}
+	task.updateTask(&taskItem)
 	return task, nil
 }
 

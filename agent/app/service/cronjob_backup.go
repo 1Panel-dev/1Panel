@@ -38,6 +38,7 @@ func (u *CronjobService) handleApp(cronjob model.Cronjob, startTime time.Time, t
 		retry := 0
 		taskItem.AddSubTaskWithOps(task.GetTaskName(app.Name, task.TaskBackup, task.TaskScopeCronjob), func(task *task.Task) error {
 			var record model.BackupRecord
+			record.Status = constant.StatusSuccess
 			record.From = "cronjob"
 			record.Type = "app"
 			record.CronjobID = cronjob.ID
@@ -95,6 +96,7 @@ func (u *CronjobService) handleWebsite(cronjob model.Cronjob, startTime time.Tim
 		retry := 0
 		taskItem.AddSubTaskWithOps(task.GetTaskName(web.Alias, task.TaskBackup, task.TaskScopeCronjob), func(task *task.Task) error {
 			var record model.BackupRecord
+			record.Status = constant.StatusSuccess
 			record.From = "cronjob"
 			record.Type = "website"
 			record.CronjobID = cronjob.ID
@@ -154,6 +156,7 @@ func (u *CronjobService) handleDatabase(cronjob model.Cronjob, startTime time.Ti
 		itemName := fmt.Sprintf("%s[%s] - %s", dbInfo.Database, dbInfo.DBType, dbInfo.Name)
 		taskItem.AddSubTaskWithOps(task.GetTaskName(itemName, task.TaskBackup, task.TaskScopeCronjob), func(task *task.Task) error {
 			var record model.BackupRecord
+			record.Status = constant.StatusSuccess
 			record.From = "cronjob"
 			record.Type = dbInfo.DBType
 			record.CronjobID = cronjob.ID
@@ -238,6 +241,7 @@ func (u *CronjobService) handleDirectory(cronjob model.Cronjob, startTime time.T
 			}
 		}
 		var record model.BackupRecord
+		record.Status = constant.StatusSuccess
 		record.From = "cronjob"
 		record.Type = "directory"
 		record.CronjobID = cronjob.ID
@@ -273,6 +277,7 @@ func (u *CronjobService) handleSystemLog(cronjob model.Cronjob, startTime time.T
 			return err
 		}
 		var record model.BackupRecord
+		record.Status = constant.StatusSuccess
 		record.From = "cronjob"
 		record.Type = "log"
 		record.CronjobID = cronjob.ID
@@ -301,6 +306,7 @@ func (u *CronjobService) handleSnapshot(cronjob model.Cronjob, jobRecord model.J
 		return errors.New(i18n.GetMsgWithDetail("LoadBackupFailed", accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].message))
 	}
 	var record model.BackupRecord
+	record.Status = constant.StatusSuccess
 	record.From = "cronjob"
 	record.Type = "snapshot"
 	record.CronjobID = cronjob.ID

@@ -218,6 +218,7 @@ func (u *CronjobService) handleCutWebsiteLog(cronjob *model.Cronjob, startTime t
 		for _, website := range websites {
 			taskItem.Log(website.Alias)
 			var record model.BackupRecord
+			record.Status = constant.StatusSuccess
 			record.From = "cronjob"
 			record.Type = "cut-website-log"
 			record.CronjobID = cronjob.ID

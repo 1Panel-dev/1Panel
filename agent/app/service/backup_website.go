@@ -66,38 +66,34 @@ func (u *BackupService) WebsiteRecover(req dto.CommonRecover) error {
 	if err != nil {
 		return err
 	}
-	if err := handleWebsiteRecover(&website, req.File, false, req.Secret, req.TaskID); err != nil {
+	if err := handleWebsiteRecover(&website, nil, req.File, false, req.Secret, req.TaskID); err != nil {
 		global.LOG.Errorf("recover website %s failed, err: %v", website.Alias, err)
 	}
 	return nil
 }
 
-func handleWebsiteRecover(website *model.Website, recoverFile string, isRollback bool, secret, taskID string) error {
-	recoverTask, err := task.NewTaskWithOps(website.PrimaryDomain, task.TaskRecover, task.TaskScopeBackup, taskID, website.ID)
-	if err != nil {
-		return err
+func handleWebsiteRecover(website *model.Website, parentTask *task.Task, recoverFile string, isRollback bool, secret, taskID string) error {
+	var (
+		err          error
+		recoverTask  *task.Task
+		isOk         = false
+		rollbackFile string
+	)
+	recoverTask = parentTask
+	if parentTask == nil {
+		recoverTask, err = task.NewTaskWithOps(website.PrimaryDomain, task.TaskRecover, task.TaskScopeBackup, taskID, website.ID)
+		if err != nil {
+			return err
+		}
 	}
-	recoverTask.AddSubTask(task.GetTaskName(website.PrimaryDomain, task.TaskRecover, task.TaskScopeBackup), func(t *task.Task) error {
-		isOk := false
+	recoverWebsite := func(t *task.Task) error {
 		if !isRollback {
-			rollbackFile := path.Join(global.Dir.TmpDir, fmt.Sprintf("website/%s_%s.tar.gz", website.Alias, time.Now().Format(constant.DateTimeSlimLayout)))
+			rollbackFile = path.Join(global.Dir.TmpDir, fmt.Sprintf("website/%s_%s.tar.gz", website.Alias, time.Now().Format(constant.DateTimeSlimLayout)))
 			if err := handleWebsiteBackup(website, recoverTask, 0, path.Dir(rollbackFile), path.Base(rollbackFile), "", "", taskID); err != nil {
 				return fmt.Errorf("backup website %s for rollback before recover failed, err: %v", website.Alias, err)
 			}
-			defer func() {
-				if !isOk {
-					t.LogStart(i18n.GetMsgByKey("Rollback"))
-					if err := handleWebsiteRecover(website, rollbackFile, true, "", taskID); err != nil {
-						t.LogFailedWithErr(i18n.GetMsgByKey("Rollback"), err)
-						return
-					}
-					t.LogSuccess(i18n.GetMsgByKey("Rollback"))
-					_ = os.RemoveAll(rollbackFile)
-				} else {
-					_ = os.RemoveAll(rollbackFile)
-				}
-			}()
 		}
+
 		fileOp := files.NewFileOp()
 		tmpPath := strings.ReplaceAll(recoverFile, ".tar.gz", "")
 		t.Log(i18n.GetWithName("DeCompressFile", recoverFile))
@@ -149,12 +145,10 @@ func handleWebsiteRecover(website *model.Website, recoverFile string, isRollback
 			taskName := task.GetTaskName(app.Name, task.TaskRecover, task.TaskScopeApp)
 			t.LogStart(taskName)
 			if err := handleAppRecover(&app, recoverTask, fmt.Sprintf("%s/%s.app.tar.gz", tmpPath, website.Alias), true, "", ""); err != nil {
-				t.LogFailedWithErr(taskName, err)
 				return err
 			}
 			t.LogSuccess(taskName)
 			if _, err = compose.DownAndUp(fmt.Sprintf("%s/%s/%s/docker-compose.yml", global.Dir.AppInstallDir, app.App.Key, app.Name)); err != nil {
-				t.LogFailedWithErr("Run", err)
 				return err
 			}
 		case constant.Runtime:
@@ -165,7 +159,6 @@ func handleWebsiteRecover(website *model.Website, recoverFile string, isRollback
 			taskName := task.GetTaskName(runtime.Name, task.TaskRecover, task.TaskScopeRuntime)
 			t.LogStart(taskName)
 			if err := handleRuntimeRecover(runtime, fmt.Sprintf("%s/%s.runtime.tar.gz", tmpPath, website.Alias), true, ""); err != nil {
-				t.LogFailedWithErr(taskName, err)
 				return err
 			}
 			t.LogSuccess(taskName)
@@ -184,7 +177,6 @@ func handleWebsiteRecover(website *model.Website, recoverFile string, isRollback
 		taskName := i18n.GetMsgByKey("TaskRecover") + i18n.GetMsgByKey("websiteDir")
 		t.Log(taskName)
 		if err = fileOp.TarGzExtractPro(fmt.Sprintf("%s/%s.web.tar.gz", tmpPath, website.Alias), GetOpenrestyDir(SitesRootDir), ""); err != nil {
-			t.LogFailedWithErr(taskName, err)
 			return err
 		}
 		stdout, err := cmd.RunDefaultWithStdoutBashCf("docker exec -i %s nginx -s reload", nginxInfo.ContainerName)
@@ -197,8 +189,29 @@ func handleWebsiteRecover(website *model.Website, recoverFile string, isRollback
 		}
 		isOk = true
 		return nil
-	}, nil)
+	}
 
+	if parentTask != nil {
+		return recoverWebsite(parentTask)
+	}
+
+	rollBackWebsite := func(t *task.Task) {
+		if isRollback {
+			return
+		}
+		if !isOk {
+			t.Log(i18n.GetMsgByKey("RecoverFailedStartRollBack"))
+			if err := handleWebsiteRecover(website, t, rollbackFile, true, "", ""); err != nil {
+				t.LogFailedWithErr(i18n.GetMsgByKey("Rollback"), err)
+				return
+			}
+			t.LogSuccess(i18n.GetMsgByKey("Rollback"))
+			_ = os.RemoveAll(rollbackFile)
+		} else {
+			_ = os.RemoveAll(rollbackFile)
+		}
+	}
+	recoverTask.AddSubTask(task.GetTaskName(website.PrimaryDomain, task.TaskRecover, task.TaskScopeBackup), recoverWebsite, rollBackWebsite)
 	go func() {
 		_ = recoverTask.Execute()
 	}()
