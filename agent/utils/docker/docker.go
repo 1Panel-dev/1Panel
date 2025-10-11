@@ -167,13 +167,16 @@ func setLog(id, newLastLine string, task *task.Task) error {
 	exist := false
 	for index, line := range lines {
 		if strings.Contains(line, id) {
-			lines[index] = newLastLine
+			timeStr := time.Now().Format("2006/01/02 15:04:05")
+			lines[index] = timeStr + " " + newLastLine
 			exist = true
 			break
+		} else {
+			lines[index] = strings.TrimSpace(lines[index])
 		}
 	}
 	if !exist {
-		task.Log(strings.TrimPrefix(newLastLine, " "))
+		task.Log(newLastLine)
 		return nil
 	}
 	output := strings.Join(lines, "\n")
@@ -202,8 +205,7 @@ func (c Client) PullImageWithProcessAndOptions(task *task.Task, imageName string
 		}
 		if status == "Pull complete" || status == "Download complete" {
 			id, _ := progress["id"].(string)
-			timeStr := time.Now().Format("2006/01/02 15:04:05")
-			progressStr := fmt.Sprintf("%s %s [%s] --- %.2f%%", timeStr, status, id, 100.0)
+			progressStr := fmt.Sprintf("%s [%s] --- %.2f%%", status, id, 100.0)
 			_ = setLog(id, progressStr, task)
 		}
 	}
@@ -231,7 +233,6 @@ func (c Client) PushImageWithProcessAndOptions(task *task.Task, imageName string
 		if msg, ok := progress["error"]; ok {
 			return fmt.Errorf("image push failed, err: %v", msg)
 		}
-		timeStr := time.Now().Format("2006/01/02 15:04:05")
 		status, _ := progress["status"].(string)
 		switch status {
 		case "Pushing":
@@ -241,19 +242,19 @@ func (c Client) PushImageWithProcessAndOptions(task *task.Task, imageName string
 			progressStr := ""
 			total, ok := progressDetail["total"].(float64)
 			if ok {
-				progressStr = fmt.Sprintf("%s %s [%s] --- %.2f%%", timeStr, status, id, (current/total)*100)
+				progressStr = fmt.Sprintf("%s [%s] --- %.2f%%", status, id, (current/total)*100)
 			} else {
-				progressStr = fmt.Sprintf("%s %s [%s] --- %.2f%%", timeStr, status, id, current)
+				progressStr = fmt.Sprintf("%s [%s] --- %.2f%%", status, id, current)
 			}
 
 			_ = setLog(id, progressStr, task)
 		case "Pushed":
 			id, _ := progress["id"].(string)
-			progressStr := fmt.Sprintf("%s %s [%s] --- %.2f%%", timeStr, status, id, 100.0)
+			progressStr := fmt.Sprintf("%s [%s] --- %.2f%%", status, id, 100.0)
 			_ = setLog(id, progressStr, task)
 		default:
 			progressStr, _ := json.Marshal(progress)
-			task.Log(strings.TrimPrefix(string(progressStr), " "))
+			task.Log(string(progressStr))
 		}
 	}
 	return nil
@@ -280,12 +281,11 @@ func (c Client) BuildImageWithProcessAndOptions(task *task.Task, tar io.ReadClos
 		if msg, ok := progress["error"]; ok {
 			return fmt.Errorf("image build failed, err: %v", msg)
 		}
-		timeStr := time.Now().Format("2006/01/02 15:04:05")
 		status, _ := progress["status"].(string)
 		stream, _ := progress["stream"].(string)
 		if len(status) == 0 && len(stream) != 0 {
 			if stream != "\n" {
-				task.Log(strings.TrimPrefix(stream, " "))
+				task.Log(stream)
 			}
 			continue
 		}
@@ -297,18 +297,18 @@ func (c Client) BuildImageWithProcessAndOptions(task *task.Task, tar io.ReadClos
 			progressStr := ""
 			total, ok := progressDetail["total"].(float64)
 			if ok {
-				progressStr = fmt.Sprintf("%s %s [%s] --- %.2f%%", timeStr, status, id, (current/total)*100)
+				progressStr = fmt.Sprintf("%s [%s] --- %.2f%%", status, id, (current/total)*100)
 			} else {
-				progressStr = fmt.Sprintf("%s %s [%s] --- %.2f%%", timeStr, status, id, current)
+				progressStr = fmt.Sprintf("%s [%s] --- %.2f%%", status, id, current)
 			}
 			_ = setLog(id, progressStr, task)
 		case "Pull complete", "Download complete", "Verifying Checksum":
 			id, _ := progress["id"].(string)
-			progressStr := fmt.Sprintf("%s %s [%s] --- %.2f%%", timeStr, status, id, 100.0)
+			progressStr := fmt.Sprintf("%s [%s] --- %.2f%%", status, id, 100.0)
 			_ = setLog(id, progressStr, task)
 		default:
 			progressStr, _ := json.Marshal(progress)
-			task.Log(strings.TrimPrefix(string(progressStr), " "))
+			task.Log(string(progressStr))
 		}
 	}
 	return nil
@@ -345,11 +345,10 @@ func logProcess(progress map[string]interface{}, task *task.Task) {
 	current, _ := progressDetail["current"].(float64)
 	progressStr := ""
 	total, ok := progressDetail["total"].(float64)
-	timeStr := time.Now().Format("2006/01/02 15:04:05")
 	if ok {
-		progressStr = fmt.Sprintf("%s %s [%s] --- %.2f%%", timeStr, status, id, (current/total)*100)
+		progressStr = fmt.Sprintf("%s [%s] --- %.2f%%", status, id, (current/total)*100)
 	} else {
-		progressStr = fmt.Sprintf("%s %s [%s] --- %s ", timeStr, status, id, formatBytes(uint64(current)))
+		progressStr = fmt.Sprintf("%s [%s] --- %s ", status, id, formatBytes(uint64(current)))
 	}
 	_ = setLog(id, progressStr, task)
 }

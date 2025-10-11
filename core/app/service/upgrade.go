@@ -509,7 +509,7 @@ func dropBackupCopies() {
 	sort.Slice(versions, func(i, j int) bool {
 		return common.ComparePanelVersion(versions[i], versions[j])
 	})
-	for i := copies - 1; i < len(versions); i++ {
+	for i := copies; i < len(versions); i++ {
 		_ = os.RemoveAll(backupDir + "/" + versions[i])
 	}
 }
