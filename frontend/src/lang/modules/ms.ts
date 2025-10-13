@@ -3362,35 +3362,36 @@ const message = {
         },
         tamper: {
             tamper: 'Perlindungan daripada peng篡改 laman web',
-            ignoreTemplate: 'Pengecualian templat direktori',
-            protectTemplate: 'Lindungi templat fail',
+            ignoreTemplate: 'Templat Pengecualian',
+            protectTemplate: 'Templat Perlindungan',
             ignoreTemplateHelper:
-                'Sila masukkan kandungan pengecualian (fail atau direktori tertentu ./log, nama direktori tmp, sambungan fail .html, jenis fail js), dipisahkan oleh Enter atau ruang.',
+                'Sila masukkan kandungan pengecualian, dipisahkan oleh Enter atau ruang. (Direktori khusus ./log atau nama direktori tmp, untuk mengecualikan fail perlu memasukkan fail khusus ./data/test.html)',
             protectTemplateHelper:
-                'Sila masukkan kandungan perlindungan (fail tertentu ./index.html, sambungan fail .html, jenis fail js), dipisahkan oleh Enter atau ruang.',
-            templateContent: 'Kandungan templat',
+                'Sila masukkan kandungan perlindungan, dipisahkan oleh Enter atau ruang. (Fail khusus ./index.html, sambungan fail .html, jenis fail js, untuk melindungi direktori perlu memasukkan direktori khusus ./log)',
+            templateContent: 'Kandungan Templat',
             template: 'Templat',
-            saveTemplate: 'Simpan sebagai templat',
+            saveTemplate: 'Simpan sebagai Templat',
             tamperHelper1:
                 'Untuk laman web jenis penyebaran satu klik, disyorkan untuk mengaktifkan fungsi anti-pengubahsuaian direktori aplikasi; jika laman web tidak dapat digunakan secara normal atau sandaran/pemulihan gagal, sila lumpuhkan fungsi anti-pengubahsuaian terlebih dahulu;',
             tamperHelper2:
                 'Akan menyekat operasi baca/tulis, padam, keizinan, dan pengubahsuaian pemilik untuk fail dilindungi dalam direktori tidak dikecualikan',
-            tamperPath: 'Direktori perlindungan',
-            tamperPathEdit: 'Ubah laluan',
-            log: 'Log sekatan',
-            totalProtect: 'Perlindungan total',
-            todayProtect: 'Perlindungan hari ini',
+            tamperPath: 'Direktori Perlindungan',
+            tamperPathEdit: 'Ubah Laluan',
+            log: 'Log Sekatan',
+            totalProtect: 'Perlindungan Total',
+            todayProtect: 'Perlindungan Hari Ini',
             templateRule: 'Panjang 1-512, nama tidak boleh mengandungi {0} dan simbol lain',
-            ignore: 'Kecualikan direktori/fail',
+            ignore: 'Kecualikan',
             ignoreHelper:
-                'Sila pilih atau masukkan kandungan pengecualian (fail atau direktori tertentu ./log, nama direktori tmp, sambungan fail .html, jenis fail js), dipisahkan oleh Enter atau ruang.',
-            protect: 'Lindungi fail',
+                'Sila pilih atau masukkan kandungan pengecualian, dipisahkan oleh Enter atau ruang. (Direktori khusus ./log atau nama direktori tmp, untuk mengecualikan fail perlu memasukkan atau memilih fail khusus ./data/test.html)',
+            protect: 'Lindungi',
             protectHelper:
-                'Sila pilih atau masukkan kandungan perlindungan (fail tertentu ./index.html, sambungan fail .html, jenis fail js), dipisahkan oleh Enter atau ruang.',
+                'Sila pilih atau masukkan kandungan perlindungan, dipisahkan oleh Enter atau ruang. (Fail khusus ./index.html, sambungan fail .html, jenis fail js, untuk melindungi direktori perlu memasukkan atau memilih direktori khusus ./log)',
+            tamperHelper00: 'Pengecualian dan perlindungan hanya menyokong laluan relatif;',
             tamperHelper01:
                 'Selepas mengaktifkan perlindungan anti-pengubahsuaian, sistem akan menyekat operasi penciptaan, penyuntingan, dan pemadaman fail dilindungi dalam direktori tidak dikecualikan;',
             tamperHelper02:
-                'Semua fail dalam direktori dikecualikan tidak akan disekat, melainkan laluan fail tertentu dinyatakan dalam fail dilindungi (keutamaan tertinggi);',
+                'Keutamaan: Perlindungan laluan khusus > Pengecualian laluan khusus > Perlindungan > Pengecualian',
             tamperHelper03:
                 'Operasi pemantauan hanya mensasarkan direktori tidak dikecualikan, memantau penciptaan fail tidak dilindungi dalam direktori ini.',
             disableHelper: 'Akan melumpuhkan fungsi anti-pengubahsuaian untuk laman web berikut, teruskan?',

@@ -252,8 +252,7 @@ CleanTamperSetting: "清理历史防护设置"
 SetTamperWithRules: "根据规则启动目录防护"
 ProtectDir: "防护目录 {{ .name }}"
 IgnoreFile: "保护文件 {{ .name }}"
-AbsoluteProtectFile: "受保护的绝对路径文件"
-TamperSetSucessful: "防护设置完成，开始监听以下目录："
+TamperSetSuccessful: "防护设置完成，开始监听以下目录："
 
 #waf
 ErrScope: "不支持修改此配置"

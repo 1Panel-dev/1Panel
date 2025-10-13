@@ -3369,35 +3369,36 @@ const message = {
         },
         tamper: {
             tamper: 'Protección contra manipulación web',
-            ignoreTemplate: 'Plantilla de exclusión de directorios',
-            protectTemplate: 'Plantilla de archivos protegidos',
+            ignoreTemplate: 'Plantilla de Exclusión',
+            protectTemplate: 'Plantilla de Protección',
             ignoreTemplateHelper:
-                'Ingrese contenido de exclusión (archivo o directorio específico ./log, nombre de directorio tmp, extensión de archivo .html, tipo de archivo js), separado por Enter o espacio.',
+                'Ingrese contenido de exclusión, separado por Enter o espacio. (Directorio específico ./log o nombre de directorio tmp, para excluir archivos necesita ingresar archivo específico ./data/test.html)',
             protectTemplateHelper:
-                'Ingrese contenido de protección (archivo específico ./index.html, extensión de archivo .html, tipo de archivo js), separado por Enter o espacio.',
-            templateContent: 'Contenido de plantilla',
+                'Ingrese contenido de protección, separado por Enter o espacio. (Archivo específico ./index.html, extensión de archivo .html, tipo de archivo js, para proteger directorios necesita ingresar directorio específico ./log)',
+            templateContent: 'Contenido de Plantilla',
             template: 'Plantilla',
-            saveTemplate: 'Guardar como plantilla',
+            saveTemplate: 'Guardar como Plantilla',
             tamperHelper1:
                 'Para sitios web de implementación con un clic, se recomienda habilitar la protección contra manipulaciones del directorio de aplicaciones; si el sitio web no se puede usar normalmente o falla la copia de seguridad/restauración, desactive primero la protección contra manipulaciones;',
             tamperHelper2:
                 'Restringirá las operaciones de lectura/escritura, eliminación, permisos y modificación de propietario para archivos protegidos en directorios no excluidos',
-            tamperPath: 'Directorio de protección',
-            tamperPathEdit: 'Modificar ruta',
-            log: 'Registro de bloqueo',
-            totalProtect: 'Protección total',
-            todayProtect: 'Protección de hoy',
+            tamperPath: 'Directorio de Protección',
+            tamperPathEdit: 'Modificar Ruta',
+            log: 'Registro de Bloqueo',
+            totalProtect: 'Protección Total',
+            todayProtect: 'Protección de Hoy',
             templateRule: 'Longitud 1-512, el nombre no puede contener {0} y otros símbolos',
-            ignore: 'Excluir directorio/archivo',
+            ignore: 'Excluir',
             ignoreHelper:
-                'Seleccione o ingrese contenido de exclusión (archivo o directorio específico ./log, nombre de directorio tmp, extensión de archivo .html, tipo de archivo js), separado por Enter o espacio.',
-            protect: 'Proteger archivo',
+                'Seleccione o ingrese contenido de exclusión, separado por Enter o espacio. (Directorio específico ./log o nombre de directorio tmp, para excluir archivos necesita ingresar o seleccionar archivo específico ./data/test.html)',
+            protect: 'Proteger',
             protectHelper:
-                'Seleccione o ingrese contenido de protección (archivo específico ./index.html, extensión de archivo .html, tipo de archivo js), separado por Enter o espacio.',
+                'Seleccione o ingrese contenido de protección, separado por Enter o espacio. (Archivo específico ./index.html, extensión de archivo .html, tipo de archivo js, para proteger directorios necesita ingresar o seleccionar directorio específico ./log)',
+            tamperHelper00: 'La exclusión y protección solo admiten rutas relativas;',
             tamperHelper01:
                 'Después de habilitar la protección contra manipulaciones, el sistema restringirá las operaciones de creación, edición y eliminación de archivos protegidos en directorios no excluidos;',
             tamperHelper02:
-                'Todos los archivos en directorios excluidos no estarán restringidos, a menos que se especifiquen rutas de archivo específicas en archivos protegidos (prioridad más alta);',
+                'Prioridad: Protección de ruta específica > Exclusión de ruta específica > Protección > Exclusión',
             tamperHelper03:
                 'Las operaciones de monitoreo solo se dirigen a directorios no excluidos, monitoreando la creación de archivos no protegidos en estos directorios.',
             disableHelper:

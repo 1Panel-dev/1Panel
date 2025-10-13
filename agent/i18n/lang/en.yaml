@@ -253,8 +253,7 @@ CleanTamperSetting: "Clean up historical protection settings"
 SetTamperWithRules: "Start directory protection according to rules"
 ProtectDir: "Protect directory {{ .name }}"
 IgnoreFile: "Protect file {{ .name }}"
-AbsoluteProtectFile: "Protected absolute path file"
-TamperSetSucessful: "Protection settings completed, start monitoring the following directories:"
+TamperSetSuccessful: "Protection settings completed, start monitoring the following directories:"
 
 #waf
 ErrScope: 'Modifying this configuration is not supported'

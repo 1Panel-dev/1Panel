@@ -253,8 +253,7 @@ CleanTamperSetting: "Bersihkan tetapan perlindungan sejarah"
 SetTamperWithRules: "Mulakan perlindungan direktori mengikut peraturan"
 ProtectDir: "Lindungi direktori {{ .name }}"
 IgnoreFile: "Lindungi fail {{ .name }}"
-AbsoluteProtectFile: "Fail laluan mutlak yang dilindungi"
-TamperSetSucessful: "Tetapan perlindungan selesai, mula memantau direktori berikut:"
+TamperSetSuccessful: "Tetapan perlindungan selesai, mula memantau direktori berikut:"
 
 #waf
 ErrScope: 'Mengubah suai konfigurasi ini tidak disokong'

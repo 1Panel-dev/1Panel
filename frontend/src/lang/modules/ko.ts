@@ -3244,12 +3244,12 @@ const message = {
         },
         tamper: {
             tamper: '웹사이트 변조 방지',
-            ignoreTemplate: '디렉토리 템플릿 제외',
-            protectTemplate: '파일 템플릿 보호',
+            ignoreTemplate: '제외 템플릿',
+            protectTemplate: '보호 템플릿',
             ignoreTemplateHelper:
-                '제외 내용을 입력하세요 (특정 파일 또는 디렉토리 ./log, 디렉토리 이름 tmp, 파일 확장자 .html, 파일 유형 js), Enter 또는 공백으로 구분합니다.',
+                '제외 내용을 입력하세요, Enter 또는 공백으로 구분합니다. (특정 디렉토리 ./log 또는 디렉토리 이름 tmp, 파일을 제외하려면 특정 파일 ./data/test.html을 입력해야 합니다)',
             protectTemplateHelper:
-                '보호 내용을 입력하세요 (특정 파일 ./index.html, 파일 확장자 .html, 파일 유형 js), Enter 또는 공백으로 구분합니다.',
+                '보호 내용을 입력하세요, Enter 또는 공백으로 구분합니다. (특정 파일 ./index.html, 파일 확장자 .html, 파일 유형 js, 디렉토리를 보호하려면 특정 디렉토리 ./log을 입력해야 합니다)',
             templateContent: '템플릿 내용',
             template: '템플릿',
             saveTemplate: '템플릿으로 저장',
@@ -3263,16 +3263,16 @@ const message = {
             totalProtect: '총 보호',
             todayProtect: '오늘 보호',
             templateRule: '길이 1-512, 이름에 {0} 등의 기호를 포함할 수 없습니다',
-            ignore: '제외 디렉토리/파일',
+            ignore: '제외',
             ignoreHelper:
-                '제외 내용을 선택하거나 입력하세요 (특정 파일 또는 디렉토리 ./log, 디렉토리 이름 tmp, 파일 확장자 .html, 파일 유형 js), Enter 또는 공백으로 구분합니다.',
-            protect: '보호 파일',
+                '제외 내용을 선택하거나 입력하세요, Enter 또는 공백으로 구분합니다. (특정 디렉토리 ./log 또는 디렉토리 이름 tmp, 파일을 제외하려면 특정 파일 ./data/test.html을 입력하거나 선택해야 합니다)',
+            protect: '보호',
             protectHelper:
-                '보호 내용을 선택하거나 입력하세요 (특정 파일 ./index.html, 파일 확장자 .html, 파일 유형 js), Enter 또는 공백으로 구분합니다.',
+                '보호 내용을 선택하거나 입력하세요, Enter 또는 공백으로 구분합니다. (특정 파일 ./index.html, 파일 확장자 .html, 파일 유형 js, 디렉토리를 보호하려면 특정 디렉토리 ./log을 입력하거나 선택해야 합니다)',
+            tamperHelper00: '제외와 보호는 상대 경로만 입력 가능합니다.',
             tamperHelper01:
                 '변조 방지를 활성화한 후 시스템은 제외되지 않은 디렉토리에서 보호된 파일의 생성, 편집 및 삭제 작업을 제한합니다.',
-            tamperHelper02:
-                '제외된 디렉토리의 모든 파일은 제한되지 않으며, 보호된 파일에서 특정 파일 경로가 지정된 경우는 예외입니다 (최고 우선순위).',
+            tamperHelper02: '우선순위: 특정 경로 보호 > 특정 경로 제외 > 보호 > 제외',
             tamperHelper03:
                 '모니터링 작업은 제외되지 않은 디렉토리만 대상으로 하며, 이러한 디렉토리에서 비보호 파일의 생성을 모니터링합니다.',
             disableHelper: '다음 웹사이트의 변조 방지 기능을 비활성화하려고 합니다. 계속하시겠습니까?',

@@ -3185,12 +3185,12 @@ const message = {
         },
         tamper: {
             tamper: '網站防篡改',
-            ignoreTemplate: '排除目錄模板',
-            protectTemplate: '保護文件模板',
+            ignoreTemplate: '排除模版',
+            protectTemplate: '保護模版',
             ignoreTemplateHelper:
-                '請輸入排除內容（具體文件或目錄 ./log、目錄名 tmp、文件後綴 .html、文件類型 js），回車或空格分隔。',
+                '請輸入排除內容，回車或空格分隔。（具體目錄 ./log 或目錄名 tmp，排除文件需要輸入具體文件 ./data/test.html）',
             protectTemplateHelper:
-                '請輸入保護內容（具體文件 ./index.html、文件後綴 .html、文件類型 js），回車或空格分隔。',
+                '請輸入保護內容，回車或空格分隔。（具體文件 ./index.html、文件後綴 .html、文件類型 js，保護目錄需要輸入具體目錄 ./log）',
             templateContent: '模版內容',
             template: '模版',
             saveTemplate: '保存為模版',
@@ -3203,14 +3203,15 @@ const message = {
             totalProtect: '總防護',
             todayProtect: '今日防護',
             templateRule: '長度1-512，名稱不能含有{0}等符號',
-            ignore: '排除目錄/文件',
+            ignore: '排除',
             ignoreHelper:
-                '請選擇或輸入排除內容（具體文件或目錄 ./log、目錄名 tmp、文件後綴 .html、 文件類型 js），回車或空格分隔。',
-            protect: '保護文件',
+                '請選擇或輸入排除內容，回車或空格分隔。（具體目錄 ./log 或目錄名 tmp，排除文件需要輸入或選擇具體文件 ./data/test.html）',
+            protect: '保護',
             protectHelper:
-                '請選擇或輸入保護內容（具體文件 ./index.html、文件後綴 .html、文件類型 js），回車或空格分隔。',
+                '請選擇或輸入保護內容，回車或空格分隔。（具體文件 ./index.html、文件後綴 .html、文件類型 js，保護目錄需要輸入或選擇具體目錄 ./log）',
+            tamperHelper00: '排除和保護僅支援輸入相對路徑；',
             tamperHelper01: '開啟防篡改後，系統將限制非排除目錄下保護文件的創建、編輯和刪除操作等操作；',
-            tamperHelper02: '排除目錄下所有文件將不做限制，除非在保護文件中指定具體的文件路徑（優先級最高）；',
+            tamperHelper02: '優先級：具體路徑保護 > 具體路徑排除 > 保護 > 排除',
             tamperHelper03: '監聽操作只針對於非排除目錄，監聽該目錄下非保護文件的創建操作。',
             disableHelper: '即將關閉下列網站的防篡改功能，是否繼續？',
             appendOnly: '僅追加',

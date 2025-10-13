@@ -252,8 +252,7 @@ CleanTamperSetting: "履歴保護設定をクリーンアップ"
 SetTamperWithRules: "ルールに従ってディレクトリ保護を開始"
 ProtectDir: "ディレクトリを保護 {{ .name }}"
 IgnoreFile: "ファイルを保護 {{ .name }}"
-AbsoluteProtectFile: "保護された絶対パスファイル"
-TamperSetSucessful: "保護設定が完了し、以下のディレクトリの監視を開始します："
+TamperSetSuccessful: "保護設定が完了し、以下のディレクトリの監視を開始します："
 
 #waf
 ErrScope: 'この構成の変更はサポートされていません'

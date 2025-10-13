@@ -3449,35 +3449,35 @@ const message = {
         },
         tamper: {
             tamper: 'Web Sitesi Değiştirme Koruması',
-            ignoreTemplate: 'Dizin Şablonunu Hariç Tut',
-            protectTemplate: 'Dosya Şablonunu Koru',
+            ignoreTemplate: 'Hariç Tutma Şablonu',
+            protectTemplate: 'Koruma Şablonu',
             ignoreTemplateHelper:
-                'Hariç tutma içeriğini girin (belirli dosya veya dizin ./log, dizin adı tmp, dosya uzantısı .html, dosya türü js), Enter veya boşlukla ayrılmış.',
+                'Hariç tutma içeriğini girin, Enter veya boşlukla ayrılmış. (Belirli dizin ./log veya dizin adı tmp, dosyaları hariç tutmak için belirli dosya ./data/test.html girmeniz gerekir)',
             protectTemplateHelper:
-                'Koruma içeriğini girin (belirli dosya ./index.html, dosya uzantısı .html, dosya türü js), Enter veya boşlukla ayrılmış.',
-            templateContent: 'Şablon içeriği',
+                'Koruma içeriğini girin, Enter veya boşlukla ayrılmış. (Belirli dosya ./index.html, dosya uzantısı .html, dosya türü js, dizinleri korumak için belirli dizin ./log girmeniz gerekir)',
+            templateContent: 'Şablon İçeriği',
             template: 'Şablon',
-            saveTemplate: 'Şablon olarak kaydet',
+            saveTemplate: 'Şablon Olarak Kaydet',
             tamperHelper1:
                 'Tek tıklamayla dağıtım web siteleri için uygulama dizini değişiklik korumasını etkinleştirmeniz önerilir; web sitesi normal olarak kullanılamıyorsa veya yedekleme/geri yükleme başarısız olursa, lütfen önce değişiklik korumasını devre dışı bırakın;',
             tamperHelper2:
                 'Hariç tutulmayan dizinlerdeki korumalı dosyalar için okuma/yazma, silme, izin ve sahip değiştirme işlemlerini kısıtlayacaktır',
-            tamperPath: 'Koruma dizini',
-            tamperPathEdit: 'Yolu değiştir',
-            log: 'Engelleme günlüğü',
-            totalProtect: 'Toplam koruma',
-            todayProtect: 'Bugünkü koruma',
+            tamperPath: 'Koruma Dizini',
+            tamperPathEdit: 'Yolu Değiştir',
+            log: 'Engelleme Günlüğü',
+            totalProtect: 'Toplam Koruma',
+            todayProtect: 'Bugünkü Koruma',
             templateRule: 'Uzunluk 1-512, isim {0} ve diğer sembolleri içeremez',
-            ignore: 'Dizin/dosya hariç tut',
+            ignore: 'Hariç Tut',
             ignoreHelper:
-                'Hariç tutma içeriğini seçin veya girin (belirli dosya veya dizin ./log, dizin adı tmp, dosya uzantısı .html, dosya türü js), Enter veya boşlukla ayrılmış.',
-            protect: 'Dosyayı koru',
+                'Hariç tutma içeriğini seçin veya girin, Enter veya boşlukla ayrılmış. (Belirli dizin ./log veya dizin adı tmp, dosyaları hariç tutmak için belirli dosya ./data/test.html girmeniz veya seçmeniz gerekir)',
+            protect: 'Koru',
             protectHelper:
-                'Koruma içeriğini seçin veya girin (belirli dosya ./index.html, dosya uzantısı .html, dosya türü js), Enter veya boşlukla ayrılmış.',
+                'Koruma içeriğini seçin veya girin, Enter veya boşlukla ayrılmış. (Belirli dosya ./index.html, dosya uzantısı .html, dosya türü js, dizinleri korumak için belirli dizin ./log girmeniz veya seçmeniz gerekir)',
+            tamperHelper00: 'Hariç tutma ve koruma yalnızca göreli yolları destekler;',
             tamperHelper01:
                 'Değişiklik korumasını etkinleştirdikten sonra sistem, hariç tutulmayan dizinlerdeki korumalı dosyaların oluşturulmasını, düzenlenmesini ve silinmesini kısıtlayacaktır;',
-            tamperHelper02:
-                'Hariç tutulan dizinlerdeki tüm dosyalar kısıtlanmayacaktır, ancak korumalı dosyalarda belirli dosya yolları belirtilirse (en yüksek öncelik);',
+            tamperHelper02: 'Öncelik: Belirli yol koruması > Belirli yol hariç tutma > Koruma > Hariç tutma',
             tamperHelper03:
                 'İzleme işlemleri yalnızca hariç tutulmayan dizinleri hedefler, bu dizinlerdeki korunmayan dosyaların oluşturulmasını izler.',
             disableHelper:

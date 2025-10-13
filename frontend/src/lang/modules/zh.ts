@@ -3157,12 +3157,12 @@ const message = {
         },
         tamper: {
             tamper: '网站防篡改',
-            ignoreTemplate: '排除目录模版',
-            protectTemplate: '保护文件模版',
+            ignoreTemplate: '排除模版',
+            protectTemplate: '保护模版',
             ignoreTemplateHelper:
-                '请输入排除内容（具体文件或目录 ./log、目录名 tmp、文件后缀 .html、 文件类型 js），回车或空格分隔。',
+                '请输入排除内容，回车或空格分隔。（具体目录 ./log 或目录名 tmp，排除文件需要输入具体文件 ./data/test.html）',
             protectTemplateHelper:
-                '请输入保护内容（具体文件 ./index.html、文件后缀 .html、 文件类型 js），回车或空格分隔。',
+                '请输入保护内容，回车或空格分隔。（具体文件 ./index.html、文件后缀 .html、 文件类型 js，保护目录需要输入具体目录 ./log）',
             templateContent: '模版内容',
             template: '模版',
             saveTemplate: '保存为模版',
@@ -3175,14 +3175,15 @@ const message = {
             totalProtect: '总防护',
             todayProtect: '今日防护',
             templateRule: '长度1-512，名称不能含有{0}等符号',
-            ignore: '排除目录/文件',
+            ignore: '排除',
             ignoreHelper:
-                '请选择或输入排除内容（具体文件或目录 ./log、目录名 tmp、文件后缀 .html、 文件类型 js），回车或空格分隔。',
-            protect: '保护文件',
+                '请选择或输入排除内容，回车或空格分隔。（具体目录 ./log 或目录名 tmp，排除文件需要输入或选择具体文件 ./data/test.html）',
+            protect: '保护',
             protectHelper:
-                '请选择或输入保护内容（具体文件 ./index.html、文件后缀 .html、文件类型 js），回车或空格分隔。',
+                '请选择或输入保护内容，回车或空格分隔。（具体文件 ./index.html、文件后缀 .html、文件类型 js, 保护目录需要输入或选择具体目录 ./log）',
+            tamperHelper00: '排除和保护仅支持输入相对路径；',
             tamperHelper01: '开启防篡改后，系统将限制非排除目录下保护文件的创建、编辑和删除操作等操作；',
-            tamperHelper02: '排除目录下所有文件将不做限制，除非在保护文件中指定具体的文件路径（优先级最高）；',
+            tamperHelper02: '优先级：具体路径保护 > 具体路径排除 > 保护 > 排除',
             tamperHelper03: '监听操作只针对于非排除目录，监听该目录下非保护文件的创建操作。',
             disableHelper: '即将关闭下列网站的防篡改功能，是否继续？',
             appendOnly: '仅追加',

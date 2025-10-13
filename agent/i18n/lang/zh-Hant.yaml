@@ -252,8 +252,7 @@ CleanTamperSetting: "清理歷史防護設定"
 SetTamperWithRules: "根據規則啟動目錄防護"
 ProtectDir: "防護目錄 {{ .name }}"
 IgnoreFile: "保護文件 {{ .name }}"
-AbsoluteProtectFile: "受保護的絕對路徑文件"
-TamperSetSucessful: "防護設定完成，開始監聽以下目錄："
+TamperSetSuccessful: "防護設定完成，開始監聽以下目錄："
 
 #waf
 ErrScope: '不支援修改此配置'

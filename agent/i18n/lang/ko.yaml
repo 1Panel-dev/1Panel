@@ -253,8 +253,7 @@ CleanTamperSetting: "히스토리 보호 설정 정리"
 SetTamperWithRules: "규칙에 따라 디렉토리 보호 시작"
 ProtectDir: "디렉토리 보호 {{ .name }}"
 IgnoreFile: "파일 보호 {{ .name }}"
-AbsoluteProtectFile: "보호된 절대 경로 파일"
-TamperSetSucessful: "보호 설정 완료, 다음 디렉토리 모니터링 시작:"
+TamperSetSuccessful: "보호 설정 완료, 다음 디렉토리 모니터링 시작:"
 
 #와프
 ErrScope: '이 구성을 수정하는 것은 지원되지 않습니다'

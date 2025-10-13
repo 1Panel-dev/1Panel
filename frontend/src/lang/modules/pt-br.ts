@@ -3380,35 +3380,36 @@ const message = {
         },
         tamper: {
             tamper: 'Proteção contra adulteração do site',
-            ignoreTemplate: 'Excluir modelo de diretório',
-            protectTemplate: 'Proteger modelo de arquivo',
+            ignoreTemplate: 'Modelo de Exclusão',
+            protectTemplate: 'Modelo de Proteção',
             ignoreTemplateHelper:
-                'Digite o conteúdo de exclusão (arquivo ou diretório específico ./log, nome do diretório tmp, extensão de arquivo .html, tipo de arquivo js), separado por Enter ou espaço.',
+                'Digite o conteúdo de exclusão, separado por Enter ou espaço. (Diretório específico ./log ou nome do diretório tmp, para excluir arquivos precisa inserir arquivo específico ./data/test.html)',
             protectTemplateHelper:
-                'Digite o conteúdo de proteção (arquivo específico ./index.html, extensão de arquivo .html, tipo de arquivo js), separado por Enter ou espaço.',
-            templateContent: 'Conteúdo do modelo',
+                'Digite o conteúdo de proteção, separado por Enter ou espaço. (Arquivo específico ./index.html, extensão de arquivo .html, tipo de arquivo js, para proteger diretórios precisa inserir diretório específico ./log)',
+            templateContent: 'Conteúdo do Modelo',
             template: 'Modelo',
-            saveTemplate: 'Salvar como modelo',
+            saveTemplate: 'Salvar como Modelo',
             tamperHelper1:
                 'Para sites de implantação com um clique, é recomendável ativar a proteção contra violação de diretório de aplicativos; se o site não puder ser usado normalmente ou o backup/restauração falhar, desative primeiro a proteção contra violação;',
             tamperHelper2:
                 'Restringirá operações de leitura/gravação, exclusão, permissão e modificação de proprietário para arquivos protegidos em diretórios não excluídos',
-            tamperPath: 'Diretório de proteção',
-            tamperPathEdit: 'Modificar caminho',
-            log: 'Log de bloqueio',
-            totalProtect: 'Proteção total',
-            todayProtect: 'Proteção de hoje',
+            tamperPath: 'Diretório de Proteção',
+            tamperPathEdit: 'Modificar Caminho',
+            log: 'Log de Bloqueio',
+            totalProtect: 'Proteção Total',
+            todayProtect: 'Proteção de Hoje',
             templateRule: 'Comprimento 1-512, o nome não pode conter {0} e outros símbolos',
-            ignore: 'Excluir diretório/arquivo',
+            ignore: 'Excluir',
             ignoreHelper:
-                'Selecione ou digite o conteúdo de exclusão (arquivo ou diretório específico ./log, nome do diretório tmp, extensão de arquivo .html, tipo de arquivo js), separado por Enter ou espaço.',
-            protect: 'Proteger arquivo',
+                'Selecione ou digite o conteúdo de exclusão, separado por Enter ou espaço. (Diretório específico ./log ou nome do diretório tmp, para excluir arquivos precisa inserir ou selecionar arquivo específico ./data/test.html)',
+            protect: 'Proteger',
             protectHelper:
-                'Selecione ou digite o conteúdo de proteção (arquivo específico ./index.html, extensão de arquivo .html, tipo de arquivo js), separado por Enter ou espaço.',
+                'Selecione ou digite o conteúdo de proteção, separado por Enter ou espaço. (Arquivo específico ./index.html, extensão de arquivo .html, tipo de arquivo js, para proteger diretórios precisa inserir ou selecionar diretório específico ./log)',
+            tamperHelper00: 'Exclusão e proteção suportam apenas caminhos relativos;',
             tamperHelper01:
                 'Após ativar a proteção contra violação, o sistema restringirá as operações de criação, edição e exclusão de arquivos protegidos em diretórios não excluídos;',
             tamperHelper02:
-                'Todos os arquivos em diretórios excluídos não serão restringidos, a menos que caminhos de arquivo específicos sejam especificados em arquivos protegidos (prioridade mais alta);',
+                'Prioridade: Proteção de caminho específico > Exclusão de caminho específico > Proteção > Exclusão',
             tamperHelper03:
                 'As operações de monitoramento visam apenas diretórios não excluídos, monitorando a criação de arquivos não protegidos nesses diretórios.',
             disableHelper: 'Prestes a desativar a proteção contra violação para os seguintes sites, continuar?',

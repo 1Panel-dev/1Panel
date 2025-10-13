@@ -254,8 +254,7 @@ CleanTamperSetting: "Geçmiş koruma ayarlarını temizle"
 SetTamperWithRules: "Kurallara göre dizin korumasını başlat"
 ProtectDir: "Dizini koru {{ .name }}"
 IgnoreFile: "Dosyayı koru {{ .name }}"
-AbsoluteProtectFile: "Korumalı mutlak yol dosyası"
-TamperSetSucessful: "Koruma ayarları tamamlandı, aşağıdaki dizinler izlenmeye başlanıyor:"
+TamperSetSuccessful: "Koruma ayarları tamamlandı, aşağıdaki dizinler izlenmeye başlanıyor:"
 
 #waf
 ErrScope: 'Bu yapılandırmayı değiştirme desteklenmiyor'
