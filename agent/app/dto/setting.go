@@ -69,6 +69,8 @@ type SSHConnData struct {
 	Password   string `json:"password"`
 	PrivateKey string `json:"privateKey"`
 	PassPhrase string `json:"passPhrase"`
+
+	LocalSSHConnShow string `json:"localSSHConnShow"`
 }
 
 type SystemProxy struct {

@@ -26,6 +26,8 @@ var (
 	I18nForCmd *i18n.Localizer
 
 	Cron *cron.Cron
+
+	ScriptSyncJobID cron.EntryID
 )
 
 type DBOption func(*gorm.DB) *gorm.DB

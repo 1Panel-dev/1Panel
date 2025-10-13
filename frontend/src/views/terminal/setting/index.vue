@@ -78,24 +78,25 @@
                                     @change="changeItem()"
                                 />
                             </el-form-item>
-                            <el-form-item :label="$t('terminal.defaultConn')">
-                                <el-switch v-model="form.showDefaultConn" @change="changeShow" />
-                                <span class="input-help">{{ $t('terminal.defaultConnHelper') }}</span>
-                                <el-button
-                                    type="primary"
-                                    @click="dialogRef.acceptParams(false)"
-                                    v-if="form.showDefaultConn"
-                                    link
-                                >
-                                    {{ $t('commons.button.view') }}
-                                </el-button>
-                            </el-form-item>
                             <el-form-item>
                                 <el-button @click="onSetDefault()" plain>
                                     {{ $t('commons.button.setDefault') }}
                                 </el-button>
                                 <el-button @click="search(true)" plain>{{ $t('commons.button.reset') }}</el-button>
                                 <el-button @click="onSave" type="primary">{{ $t('commons.button.save') }}</el-button>
+                            </el-form-item>
+                            <el-divider border-style="dashed" />
+                            <el-form-item :label="$t('terminal.defaultConn')">
+                                <el-switch v-model="form.showDefaultConn" @change="changeShow" />
+                            </el-form-item>
+                            <el-form-item :label="$t('xpack.node.connInfo')">
+                                <el-input disabled v-model="form.defaultConn">
+                                    <template #append>
+                                        <el-button @click="dialogRef.acceptParams(false)" icon="Setting">
+                                            {{ $t('commons.button.set') }}
+                                        </el-button>
+                                    </template>
+                                </el-input>
                             </el-form-item>
                         </el-col>
                     </el-row>
@@ -109,7 +110,7 @@
 <script lang="ts" setup>
 import { ref, reactive } from 'vue';
 import { ElForm } from 'element-plus';
-import { getAgentSettingByKey, getTerminalInfo, updateAgentSetting, UpdateTerminalInfo } from '@/api/modules/setting';
+import { getTerminalInfo, updateAgentSetting, UpdateTerminalInfo } from '@/api/modules/setting';
 import { Terminal } from '@xterm/xterm';
 import OperateDialog from '@/views/terminal/setting/default_conn/index.vue';
 import '@xterm/xterm/css/xterm.css';
@@ -117,6 +118,7 @@ import { FitAddon } from '@xterm/addon-fit';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { TerminalStore } from '@/store';
+import { loadLocalConn } from '@/api/modules/terminal';
 
 const loading = ref(false);
 const terminalStore = TerminalStore();
@@ -134,7 +136,9 @@ const form = reactive({
     cursorStyle: 'underline',
     scrollback: 1000,
     scrollSensitivity: 10,
+
     showDefaultConn: false,
+    defaultConn: '',
 });
 
 const acceptParams = () => {
@@ -166,18 +170,28 @@ const search = async (withReset?: boolean) => {
 };
 
 const loadConnShow = async () => {
-    await getAgentSettingByKey('LocalSSHConnShow').then((res) => {
-        form.showDefaultConn = res.data === 'Enable';
+    await loadLocalConn().then((res) => {
+        form.showDefaultConn = res.data.localSSHConnShow === 'Enable';
+        if (res.data.addr && res.data.port && res.data.user) {
+            form.defaultConn = res.data.user + '@' + res.data.addr + ':' + res.data.port;
+        } else {
+            form.defaultConn = '-';
+        }
     });
 };
 
 const changeShow = async () => {
-    if (form.showDefaultConn) {
-        dialogRef.value.acceptParams(true);
-        return;
-    }
-    await updateAgentSetting({ key: 'LocalSSHConnShow', value: 'Disable' }).then(() => {
-        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+    let op = form.showDefaultConn ? i18n.global.t('xpack.waf.allow') : i18n.global.t('xpack.waf.deny');
+    ElMessageBox.confirm(i18n.global.t('terminal.defaultConnHelper', [op]), i18n.global.t('terminal.defaultConn'), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+        type: 'info',
+    }).then(async () => {
+        await updateAgentSetting({ key: 'LocalSSHConnShow', value: form.showDefaultConn ? 'Enable' : 'Disable' }).then(
+            () => {
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            },
+        );
     });
 };
 

@@ -1196,7 +1196,10 @@ const message = {
     terminal: {
         local: 'Local',
         defaultConn: 'Default Connection',
-        defaultConnHelper: 'Whether to connect to the host by default after opening the terminal',
+        defaultConnHelper:
+            'This operation will automatically connect to the node terminal after opening the terminal for 【{0}】. Continue?',
+        localConnJump:
+            'Default connection information is maintained in [Terminal - Settings]. If connection fails, please edit there!',
         localHelper: 'The `local` name is used only for system local identification',
         connLocalErr: 'Unable to automatically authenticate, please fill in the local server login information.',
         testConn: 'Test connection',

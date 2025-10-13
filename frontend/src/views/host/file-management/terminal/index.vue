@@ -8,7 +8,8 @@
         :fullScreen="true"
     >
         <template #content>
-            <Terminal style="height: calc(100vh - 120px)" ref="terminalRef"></Terminal>
+            <el-alert :closable="false" :title="$t('terminal.localConnJump')" type="info" />
+            <Terminal class="mt-2" style="height: calc(100vh - 160px)" ref="terminalRef"></Terminal>
             <div>
                 <el-cascader
                     v-model="quickCmd"

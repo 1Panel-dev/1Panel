@@ -1,7 +1,6 @@
 package v2
 
 import (
-	"encoding/base64"
 	"encoding/json"
 
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
@@ -77,26 +76,7 @@ func (b *BaseApi) LoadBaseDir(c *gin.Context) {
 // @Security Timestamp
 // @Router /settings/ssh/conn [get]
 func (b *BaseApi) LoadLocalConn(c *gin.Context) {
-	connInfoInDB := settingService.GetSettingByKey("LocalSSHConn")
-	if len(connInfoInDB) == 0 {
-		helper.Success(c)
-		return
-	}
-	var data dto.SSHConnData
-	if err := json.Unmarshal([]byte(connInfoInDB), &data); err != nil {
-		helper.Success(c)
-		return
-	}
-	if len(data.Password) != 0 {
-		data.Password = base64.StdEncoding.EncodeToString([]byte(data.Password))
-	}
-	if len(data.PrivateKey) != 0 {
-		data.PrivateKey = base64.StdEncoding.EncodeToString([]byte(data.PrivateKey))
-	}
-	if len(data.PassPhrase) != 0 {
-		data.PassPhrase = base64.StdEncoding.EncodeToString([]byte(data.PassPhrase))
-	}
-	helper.SuccessWithData(c, data)
+	helper.SuccessWithData(c, settingService.GetLocalConn())
 }
 
 func (b *BaseApi) CheckLocalConn(c *gin.Context) {

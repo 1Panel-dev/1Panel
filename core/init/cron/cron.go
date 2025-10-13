@@ -1,12 +1,9 @@
 package cron
 
 import (
-	"fmt"
-	mathRand "math/rand"
 	"time"
 
-	"github.com/1Panel-dev/1Panel/core/app/repo"
-	"github.com/1Panel-dev/1Panel/core/constant"
+	"github.com/1Panel-dev/1Panel/core/app/service"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/init/cron/job"
 	"github.com/1Panel-dev/1Panel/core/utils/common"
@@ -21,13 +18,6 @@ func Init() {
 		global.LOG.Errorf("[core] can not add backup token refresh corn job: %s", err.Error())
 	}
 
-	scriptSync, _ := repo.NewISettingRepo().GetValueByKey("ScriptSync")
-	if !global.CONF.Base.IsOffLine && scriptSync == constant.StatusEnable {
-		scriptJob := job.NewScriptJob()
-		if _, err := global.Cron.AddJob(fmt.Sprintf("%v %v * * *", mathRand.Intn(60), mathRand.Intn(3)), scriptJob); err != nil {
-			global.LOG.Errorf("[core] can not add script sync corn job: %s", err.Error())
-		}
-	}
-
+	service.StartSync()
 	global.Cron.Start()
 }

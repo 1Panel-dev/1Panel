@@ -1198,7 +1198,10 @@ const message = {
     terminal: {
         local: 'Local',
         defaultConn: 'Conexión predeterminada',
-        defaultConnHelper: 'Indica si se conecta al host por defecto después de abrir la terminal',
+        defaultConnHelper:
+            'Esta operación conectará automáticamente al terminal del nodo después de abrir el terminal para 【{0}】. ¿Continuar?',
+        localConnJump:
+            'La información de conexión predeterminada se mantiene en [Terminal - Configuración]. Si la conexión falla, ¡edite allí!',
         localHelper: 'El nombre `local` se utiliza solo para identificación interna del sistema',
         connLocalErr:
             'No se puede autenticar automáticamente, por favor introduzca la información de inicio de sesión del servidor local.',

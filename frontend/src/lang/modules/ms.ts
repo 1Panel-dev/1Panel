@@ -1186,7 +1186,10 @@ const message = {
     terminal: {
         local: 'Tempatan',
         defaultConn: 'Sambungan Lalai',
-        defaultConnHelper: 'Sama ada untuk menyambung ke hos secara lalai selepas membuka terminal',
+        defaultConnHelper:
+            'Operasi ini akan menyambung secara automatik ke terminal nod selepas membuka terminal untuk 【{0}】. Teruskan?',
+        localConnJump:
+            'Maklumat sambungan lalai dikekalkan dalam [Terminal - Tetapan]. Jika sambungan gagal, sila edit di sana!',
         localHelper: 'Nama tempatan hanya digunakan untuk pengenalan sistem tempatan.',
         connLocalErr: 'Tidak dapat mengesahkan secara automatik, sila isi maklumat log masuk pelayan tempatan.',
         testConn: 'Uji sambungan',

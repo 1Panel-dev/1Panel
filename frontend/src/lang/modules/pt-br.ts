@@ -1180,7 +1180,10 @@ const message = {
     terminal: {
         local: 'Local',
         defaultConn: 'Conexão Padrão',
-        defaultConnHelper: 'Se deve conectar ao host por padrão após abrir o terminal',
+        defaultConnHelper:
+            'Esta operação conectará automaticamente ao terminal do nó após abrir o terminal para 【{0}】. Continuar?',
+        localConnJump:
+            'As informações de conexão padrão são mantidas em [Terminal - Configurações]. Se a conexão falhar, edite lá!',
         localHelper: 'O nome local é usado apenas para identificação local do sistema.',
         connLocalErr:
             'Невозможно автоматически аутентифицироваться, пожалуйста, заполните информацию для входа на локальный сервер.',

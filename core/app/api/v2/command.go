@@ -13,12 +13,12 @@ import (
 )
 
 // @Tags Command
-// @Summary Export command
+// @Summary Upload command csv for list
 // @Success 200 {string} path
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /core/commands/upload [post]
-// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"导出快速命令","formatEN":"export quick commands"}
+// @Router /core/commands/import [post]
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"上传快速命令文件","formatEN":"upload quick commands with csv"}
 func (b *BaseApi) UploadCommandCsv(c *gin.Context) {
 	form, err := c.MultipartForm()
 	if err != nil {
@@ -37,7 +37,7 @@ func (b *BaseApi) UploadCommandCsv(c *gin.Context) {
 		return
 	}
 	groupRepo := repo.NewIGroupRepo()
-	group, _ := groupRepo.Get(groupRepo.WithByDefault(true))
+	group, _ := groupRepo.Get(repo.WithByType("command"), groupRepo.WithByDefault(true))
 	var commands []dto.CommandInfo
 	for {
 		record, err := reader.Read()
@@ -91,7 +91,12 @@ func (b *BaseApi) ImportCommands(c *gin.Context) {
 		return
 	}
 
+	groupRepo := repo.NewIGroupRepo()
+	group, _ := groupRepo.Get(repo.WithByType("command"), groupRepo.WithByDefault(true))
 	for _, item := range req.Items {
+		if item.GroupID == 0 {
+			item.GroupID = group.ID
+		}
 		_ = commandService.Create(item)
 	}
 	helper.Success(c)

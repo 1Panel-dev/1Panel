@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"fmt"
+	mathRand "math/rand"
 	"net/http"
 	"os"
 	"path"
@@ -29,6 +30,7 @@ import (
 type ScriptService struct{}
 
 type IScriptService interface {
+	Run()
 	Search(ctx *gin.Context, req dto.SearchPageWithGroup) (int64, interface{}, error)
 	Create(req dto.ScriptOperate) error
 	Update(req dto.ScriptOperate) error
@@ -161,6 +163,27 @@ func (u *ScriptService) Update(req dto.ScriptOperate) error {
 		global.LOG.Errorf("sync scripts to node failed, err: %v", err)
 	}
 	return nil
+}
+
+func StartSync() {
+	if global.ScriptSyncJobID != 0 {
+		global.Cron.Remove(global.ScriptSyncJobID)
+	}
+	service := NewIScriptService()
+	scriptSync, _ := repo.NewISettingRepo().GetValueByKey("ScriptSync")
+	if !global.CONF.Base.IsOffLine && scriptSync == constant.StatusEnable {
+		id, err := global.Cron.AddJob(fmt.Sprintf("%v %v * * *", mathRand.Intn(60), mathRand.Intn(3)), service)
+		if err != nil {
+			global.LOG.Errorf("[core] can not add script sync corn job: %s", err.Error())
+		}
+		global.LOG.Info("add job for script library sync successful")
+		global.ScriptSyncJobID = id
+	}
+}
+func (u *ScriptService) Run() {
+	if err := u.Sync(dto.OperateByTaskID{}); err != nil {
+		global.LOG.Errorf("sync scripts from remote failed, err: %v", err)
+	}
 }
 
 func LoadScriptInfo(id uint) (model.ScriptLibrary, error) {

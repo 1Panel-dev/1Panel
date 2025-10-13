@@ -152,6 +152,12 @@ func (u *SettingService) Update(key, value string) error {
 		}
 	case "UpgradeBackupCopies":
 		dropBackupCopies()
+	case "ScriptSync":
+		if value == constant.StatusEnable {
+			StartSync()
+		} else {
+			global.Cron.Remove(global.ScriptSyncJobID)
+		}
 	}
 
 	return nil

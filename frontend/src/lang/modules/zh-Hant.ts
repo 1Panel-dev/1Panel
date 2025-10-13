@@ -1137,7 +1137,8 @@ const message = {
     terminal: {
         local: '本機',
         defaultConn: '預設連接',
-        defaultConnHelper: '開啟終端後是否預設連線到主機',
+        defaultConnHelper: '該操作將【{0}】開啟終端後自動連線到所在節點終端，是否繼續？',
+        localConnJump: '預設連線資訊在【終端 - 設定】中維護，連線失敗可前往編輯！',
         localHelper: 'local 名稱僅用於系統本機標識',
         connLocalErr: '無法自動認證，請填寫本機伺服器的登入資訊！',
         testConn: '連接測試',

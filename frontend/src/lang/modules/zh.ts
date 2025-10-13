@@ -1137,7 +1137,8 @@ const message = {
     terminal: {
         local: '本机',
         defaultConn: '默认连接',
-        defaultConnHelper: '打开终端后是否默认连接主机',
+        defaultConnHelper: '该操作将【{0}】打开终端后自动连接所在节点终端，是否继续？',
+        localConnJump: '默认连接信息在 【 终端 - 配置 】中维护，连接失败可前往编辑！',
         localHelper: 'local 名称仅用于系统本机标识',
         connLocalErr: '无法自动认证，请填写本地服务器的登录信息！',
         testConn: '连接测试',

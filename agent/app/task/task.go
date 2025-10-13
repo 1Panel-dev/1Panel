@@ -237,6 +237,9 @@ func (s *SubTask) Execute() error {
 		case err = <-done:
 			if err != nil {
 				s.RootTask.Log(i18n.GetWithNameAndErr("SubTaskFailed", subTaskName, err))
+				if err.Error() == i18n.GetMsgByKey("ErrShutDown") {
+					return err
+				}
 			} else {
 				s.RootTask.Log(i18n.GetWithName("SubTaskSuccess", subTaskName))
 				return nil

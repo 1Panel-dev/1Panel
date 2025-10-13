@@ -8,7 +8,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
 	"github.com/1Panel-dev/1Panel/agent/utils/ssh"
 	"github.com/jinzhu/copier"
@@ -23,6 +22,7 @@ type ISettingService interface {
 	TestConnByInfo(req dto.SSHConnData) bool
 	SaveConnInfo(req dto.SSHConnData) error
 	GetSystemProxy() (*dto.SystemProxy, error)
+	GetLocalConn() dto.SSHConnData
 	GetSettingByKey(key string) string
 }
 
@@ -119,7 +119,6 @@ func (u *SettingService) SaveConnInfo(req dto.SSHConnData) error {
 	localConn, _ := json.Marshal(&connItem)
 	connAfterEncrypt, _ := encrypt.StringEncrypt(string(localConn))
 	_ = settingRepo.Update("LocalSSHConn", connAfterEncrypt)
-	_ = settingRepo.Update("LocalSSHConnShow", constant.StatusEnable)
 	return nil
 }
 
@@ -132,6 +131,29 @@ func (u *SettingService) GetSystemProxy() (*dto.SystemProxy, error) {
 	passwd, _ := settingRepo.GetValueByKey("ProxyPasswd")
 	systemProxy.Password, _ = encrypt.StringDecrypt(passwd)
 	return &systemProxy, nil
+}
+
+func (u *SettingService) GetLocalConn() dto.SSHConnData {
+	var data dto.SSHConnData
+	connItem, _ := settingRepo.GetValueByKey("LocalSSHConn")
+	if len(connItem) == 0 {
+		return data
+	}
+	connInfoInDB, _ := encrypt.StringDecrypt(connItem)
+	data.LocalSSHConnShow, _ = settingRepo.GetValueByKey("LocalSSHConnShow")
+	if err := json.Unmarshal([]byte(connInfoInDB), &data); err != nil {
+		return data
+	}
+	if len(data.Password) != 0 {
+		data.Password = base64.StdEncoding.EncodeToString([]byte(data.Password))
+	}
+	if len(data.PrivateKey) != 0 {
+		data.PrivateKey = base64.StdEncoding.EncodeToString([]byte(data.PrivateKey))
+	}
+	if len(data.PassPhrase) != 0 {
+		data.PassPhrase = base64.StdEncoding.EncodeToString([]byte(data.PassPhrase))
+	}
+	return data
 }
 
 func (u *SettingService) GetSettingByKey(key string) string {

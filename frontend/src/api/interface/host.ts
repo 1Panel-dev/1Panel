@@ -49,6 +49,8 @@ export namespace Host {
         privateKey: string;
         passPhrase: string;
         password: string;
+
+        localSSHConnShow: string;
     }
     export interface GroupChange {
         id: number;
