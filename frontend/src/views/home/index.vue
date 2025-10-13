@@ -471,6 +471,7 @@ const onLoadBaseInfo = async (isInit: boolean, range: string) => {
     statusRef.value?.acceptParams(currentInfo.value, baseInfo.value);
     appRef.value?.acceptParams();
     if (isInit) {
+        clearTimer();
         timer = setInterval(async () => {
             try {
                 if (!isCurrentActive.value) {
@@ -481,8 +482,7 @@ const onLoadBaseInfo = async (isInit: boolean, range: string) => {
                     await onLoadSimpleNode();
                 }
             } catch {
-                clearInterval(Number(timer));
-                timer = null;
+                clearTimer();
             }
         }, 3000);
     }
@@ -691,10 +691,16 @@ const fetchData = () => {
 
 onBeforeRouteUpdate((to, from, next) => {
     if (to.name === 'home') {
+        clearTimer();
         fetchData();
     }
     next();
 });
+
+const clearTimer = () => {
+    clearInterval(Number(timer));
+    timer = null;
+};
 
 onMounted(() => {
     fetchData();
@@ -704,8 +710,7 @@ onBeforeUnmount(() => {
     window.removeEventListener('focus', onFocus);
     window.removeEventListener('blur', onBlur);
     isCurrentActive.value = false;
-    clearInterval(Number(timer));
-    timer = null;
+    clearTimer();
 });
 </script>
 
