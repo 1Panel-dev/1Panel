@@ -13,7 +13,7 @@
                         collapse-tags-tooltip
                         :max-collapse-tags="2"
                         @change="search()"
-                        class="p-w-400"
+                        class="p-w-300"
                     >
                         <el-option
                             v-for="item in statusOptions"

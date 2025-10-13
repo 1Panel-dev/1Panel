@@ -9,7 +9,7 @@
                         :placeholder="$t('commons.table.status')"
                         clearable
                         @change="search()"
-                        class="p-w-400"
+                        class="p-w-300"
                         multiple
                         collapse-tags
                         collapse-tags-tooltip
@@ -114,6 +114,8 @@ const columns = ref([
         title: 'PID',
         dataKey: 'PID',
         width: 120,
+        sortable: true,
+        sortMethod: sortByNum,
     },
     {
         key: 'name',
@@ -126,7 +128,6 @@ const columns = ref([
         title: i18n.global.t('process.ppid'),
         dataKey: 'PPID',
         width: 120,
-        sortable: true,
     },
     {
         key: 'numThreads',
@@ -190,7 +191,7 @@ const columns = ref([
         key: 'actions',
         title: i18n.global.t('commons.table.operate'),
         dataKey: 'actions',
-        width: 200,
+        width: 300,
         cellRenderer: ({ rowData }) => {
             return h('div', { class: 'action-buttons' }, [
                 h(
