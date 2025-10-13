@@ -72,7 +72,11 @@ func (a AppService) PageApp(ctx *gin.Context, req request.AppSearch) (interface{
 		if err != nil {
 			return nil, err
 		}
-		opts = append(opts, appRepo.WithArch(info.KernelArch))
+		kernelArch := info.KernelArch
+		if kernelArch == "aarch64" {
+			kernelArch = "arm64"
+		}
+		opts = append(opts, appRepo.WithArch(kernelArch))
 	}
 	if len(req.Tags) != 0 {
 		tags, err := tagRepo.GetByKeys(req.Tags)
