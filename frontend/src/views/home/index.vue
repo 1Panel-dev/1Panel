@@ -500,7 +500,10 @@ const showSimpleNode = () => {
 };
 
 const jumpPanel = (row: any) => {
-    window.open(row.addr, '_blank', 'noopener,noreferrer');
+    let entrance = row.securityEntrance.startsWith('/') ? row.securityEntrance.slice(1) : row.securityEntrance;
+    entrance = entrance ? '/' + entrance : '';
+    let addr = row.addr.endsWith('/') ? row.addr.slice(0, -1) : row.addr;
+    window.open(addr + entrance, '_blank', 'noopener,noreferrer');
 };
 
 const onLoadCurrentInfo = async () => {
