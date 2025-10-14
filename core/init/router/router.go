@@ -108,13 +108,9 @@ func Routers() *gin.Engine {
 
 func RegisterImages(rootRouter *gin.RouterGroup) {
 	staticDir := filepath.Join(global.CONF.Base.InstallDir, "1panel/uploads/theme")
-	rootRouter.GET("/api/v2/images/*filepath", func(c *gin.Context) {
-		requested := filepath.Clean(c.Param("filepath"))
-		filePath := filepath.Join(staticDir, requested)
-		if !strings.HasPrefix(filePath, filepath.Clean(staticDir)+string(filepath.Separator)) {
-			c.AbortWithStatus(http.StatusForbidden)
-			return
-		}
+	rootRouter.GET("/api/v2/images/*filename", func(c *gin.Context) {
+		fileName := filepath.Base(c.Param("filename"))
+		filePath := filepath.Join(staticDir, fileName)
 		f, err := os.Open(filePath)
 		if err != nil {
 			c.Status(http.StatusNotFound)
