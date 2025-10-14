@@ -47,7 +47,6 @@ func (s *HostRouter) InitRouter(Router *gin.RouterGroup) {
 		hostRouter.POST("/tool/init", baseApi.InitToolConfig)
 		hostRouter.POST("/tool/operate", baseApi.OperateTool)
 		hostRouter.POST("/tool/config", baseApi.OperateToolConfig)
-		hostRouter.POST("/tool/log", baseApi.GetToolLog)
 		hostRouter.POST("/tool/supervisor/process", baseApi.OperateProcess)
 		hostRouter.GET("/tool/supervisor/process", baseApi.GetProcess)
 		hostRouter.POST("/tool/supervisor/process/file", baseApi.GetProcessFile)

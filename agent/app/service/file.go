@@ -8,6 +8,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/utils/convert"
+	"github.com/1Panel-dev/1Panel/agent/utils/ini_conf"
 	"io"
 	"io/fs"
 	"os"
@@ -566,6 +567,13 @@ func (f *FileService) ReadLogByLine(req request.FileReadByLineReq) (*response.Fi
 			return nil, err
 		}
 		logFilePath = php.GetSlowLogPath()
+	case constant.Supervisord:
+		configPath := "/etc/supervisord.conf"
+		pathSet, _ := settingRepo.Get(settingRepo.WithByKey(constant.SupervisorConfigPath))
+		if pathSet.ID != 0 || pathSet.Value != "" {
+			configPath = pathSet.Value
+		}
+		logFilePath, _ = ini_conf.GetIniValue(configPath, "supervisord", "logfile")
 	}
 
 	file, err := os.Open(logFilePath)

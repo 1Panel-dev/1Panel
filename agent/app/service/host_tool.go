@@ -261,25 +261,6 @@ func (h *HostToolService) OperateToolConfig(req request.HostToolConfig) (*respon
 	return res, nil
 }
 
-func (h *HostToolService) GetToolLog(req request.HostToolLogReq) (string, error) {
-	fileOp := files.NewFileOp()
-	logfilePath := ""
-	switch req.Type {
-	case constant.Supervisord:
-		configPath := "/etc/supervisord.conf"
-		pathSet, _ := settingRepo.Get(settingRepo.WithByKey(constant.SupervisorConfigPath))
-		if pathSet.ID != 0 || pathSet.Value != "" {
-			configPath = pathSet.Value
-		}
-		logfilePath, _ = ini_conf.GetIniValue(configPath, "supervisord", "logfile")
-	}
-	oldContent, err := fileOp.GetContent(logfilePath)
-	if err != nil {
-		return "", err
-	}
-	return string(oldContent), nil
-}
-
 func (h *HostToolService) OperateSupervisorProcess(req request.SupervisorProcessConfig) error {
 	var (
 		supervisordDir = path.Join(global.Dir.DataDir, "tools", "supervisord")

@@ -96,28 +96,6 @@ func (b *BaseApi) OperateToolConfig(c *gin.Context) {
 }
 
 // @Tags Host tool
-// @Summary Get tool logs
-// @Accept json
-// @Param request body request.HostToolLogReq true "request"
-// @Success 200 {string} logContent
-// @Security ApiKeyAuth
-// @Security Timestamp
-// @Router /hosts/tool/log [post]
-func (b *BaseApi) GetToolLog(c *gin.Context) {
-	var req request.HostToolLogReq
-	if err := helper.CheckBindAndValidate(&req, c); err != nil {
-		return
-	}
-
-	logContent, err := hostToolService.GetToolLog(req)
-	if err != nil {
-		helper.InternalServer(c, err)
-		return
-	}
-	helper.SuccessWithData(c, logContent)
-}
-
-// @Tags Host tool
 // @Summary Create Supervisor process
 // @Accept json
 // @Param request body request.SupervisorProcessConfig true "request"

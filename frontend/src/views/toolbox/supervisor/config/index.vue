@@ -13,7 +13,12 @@
         </template>
         <template #main>
             <Source v-if="activeName === '1'"></Source>
-            <Log v-if="activeName === '2'"></Log>
+            <div v-if="activeName === '2'">
+                <LogFile
+                    :config="{ id: 0, type: 'supervisord', name: 'supervisor', colorMode: 'container' }"
+                    ref="logRef"
+                ></LogFile>
+            </div>
             <Basic v-if="activeName === '3'"></Basic>
         </template>
     </LayoutContent>
@@ -22,7 +27,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 import Source from './source/index.vue';
-import Log from './log/index.vue';
+import LogFile from '@/components/log/file/index.vue';
 import Basic from './basic/index.vue';
 
 const activeName = ref('1');
