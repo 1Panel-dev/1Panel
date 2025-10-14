@@ -3,8 +3,11 @@ package router
 import (
 	"encoding/base64"
 	"fmt"
+	"io"
 	"net/http"
-	"path"
+	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/1Panel-dev/1Panel/core/app/service"
 	"github.com/1Panel-dev/1Panel/core/cmd/server/docs"
@@ -27,13 +30,13 @@ var (
 func setWebStatic(rootRouter *gin.RouterGroup) {
 	rootRouter.StaticFS("/public", http.FS(web.Favicon))
 	rootRouter.StaticFS("/favicon.ico", http.FS(web.Favicon))
-	rootRouter.Static("/api/v2/images", path.Join(global.CONF.Base.InstallDir, "1panel/uploads/theme"))
+	RegisterImages(rootRouter)
 	rootRouter.GET("/assets/*filepath", func(c *gin.Context) {
 		c.Writer.Header().Set("Cache-Control", fmt.Sprintf("private, max-age=%d", 3600))
 		if c.Request.URL.Path[len(c.Request.URL.Path)-1] == '/' {
-	        c.AbortWithStatus(http.StatusForbidden)
-	        return
-	    }
+			c.AbortWithStatus(http.StatusForbidden)
+			return
+		}
 		staticServer := http.FileServer(http.FS(web.Assets))
 		staticServer.ServeHTTP(c.Writer, c.Request)
 	})
@@ -101,4 +104,32 @@ func Routers() *gin.Engine {
 	})
 
 	return Router
+}
+
+func RegisterImages(rootRouter *gin.RouterGroup) {
+	staticDir := filepath.Join(global.CONF.Base.InstallDir, "1panel/uploads/theme")
+	rootRouter.GET("/api/v2/images/*filename", func(c *gin.Context) {
+		fileName := filepath.Base(c.Param("filename"))
+		filePath := filepath.Join(staticDir, fileName)
+		if !strings.HasPrefix(filePath, staticDir) {
+			c.AbortWithStatus(http.StatusForbidden)
+			return
+		}
+		f, err := os.Open(filePath)
+		if err != nil {
+			c.Status(http.StatusNotFound)
+			return
+		}
+		defer f.Close()
+		buf := make([]byte, 512)
+		n, _ := f.Read(buf)
+		content := buf[:n]
+		mimeType := http.DetectContentType(buf[:n])
+		if strings.Contains(string(content), "<svg") {
+			mimeType = "image/svg+xml"
+		}
+		_, _ = f.Seek(0, io.SeekStart)
+		c.Header("Content-Type", mimeType)
+		_, _ = io.Copy(c.Writer, f)
+	})
 }
