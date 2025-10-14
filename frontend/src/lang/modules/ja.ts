@@ -3779,6 +3779,7 @@ const message = {
             licenseExceptionRule: 'ライセンス異常アラートは、1日あたり{0}回送信',
             panelLoginRule: 'パネルログインアラートは、1日あたり{0}回送信',
             sshLoginRule: 'SSHログインアラートは、1日あたり{0}回送信',
+            userNameHelper: 'ユーザー名が空の場合、送信者のアドレスがデフォルトで使用されます',
         },
         theme: {
             lingXiaGold: '凌霞金',

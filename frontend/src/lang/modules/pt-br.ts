@@ -3875,6 +3875,7 @@ const message = {
             licenseExceptionRule: 'Alerta de exceção de licença, enviado {0} vezes por dia',
             panelLoginRule: 'Alerta de login no painel, enviado {0} vezes por dia',
             sshLoginRule: 'Alerta de login SSH, enviado {0} vezes por dia',
+            userNameHelper: 'O nome de usuário está vazio, o endereço do remetente será usado por padrão',
         },
         theme: {
             lingXiaGold: 'Ling Xia Gold',

@@ -3857,6 +3857,7 @@ const message = {
             licenseExceptionRule: 'Amaran kerosakan lesen, dihantar {0} kali sehari',
             panelLoginRule: 'Amaran log masuk panel, dihantar {0} kali sehari',
             sshLoginRule: 'Amaran log masuk SSH, dihantar {0} kali sehari',
+            userNameHelper: 'Nama pengguna kosong, alamat penghantar akan digunakan secara lalai',
         },
         theme: {
             lingXiaGold: 'Ling Xia Emas',

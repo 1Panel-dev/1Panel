@@ -82,6 +82,9 @@
                                 <el-form-item :label="$t('xpack.alert.sender')" prop="sender">
                                     {{ emailConfig.config.sender }}
                                 </el-form-item>
+                                <el-form-item :label="$t('commons.login.username')" prop="userName">
+                                    {{ emailConfig.config.userName || emailConfig.config.sender }}
+                                </el-form-item>
                                 <el-form-item :label="$t('xpack.alert.host')" prop="host">
                                     {{ emailConfig.config.host }}
                                 </el-form-item>
@@ -186,6 +189,7 @@ export interface EmailConfig {
     config: {
         status?: string;
         sender?: string;
+        userName?: string;
         password?: string;
         displayName?: string;
         host?: string;
@@ -202,6 +206,7 @@ const defaultEmailConfig: EmailConfig = {
     config: {
         displayName: '',
         sender: '',
+        userName: '',
         password: '',
         host: '',
         port: 25,

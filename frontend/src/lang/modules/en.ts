@@ -3899,6 +3899,7 @@ const message = {
             licenseExceptionRule: 'License exception alert, sent {0} times per day',
             panelLoginRule: 'Panel login alert, sent {0} times per day',
             sshLoginRule: 'SSH login alert, sent {0} times per day',
+            userNameHelper: 'Username is empty, the sender address will be used by default',
         },
         theme: {
             lingXiaGold: 'Ling Xia Gold',

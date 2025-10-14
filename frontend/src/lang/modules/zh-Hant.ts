@@ -3627,6 +3627,7 @@ const message = {
             licenseExceptionRule: '許可證異常告警，每天發送 {0} 次',
             panelLoginRule: '面板登入告警，每天發送 {0} 次',
             sshLoginRule: 'SSH 登入告警，每天發送 {0} 次',
+            userNameHelper: '使用者名稱為空時，將預設使用寄件者地址',
         },
         theme: {
             lingXiaGold: '凌霞金',

@@ -152,6 +152,7 @@ export namespace Alert {
         port: number;
         host: string;
         sender: string;
+        userName: string;
         password: string;
         displayName: string;
         encryption: string;

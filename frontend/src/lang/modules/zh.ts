@@ -3595,6 +3595,7 @@ const message = {
             licenseExceptionRule: '许可证异常告警，每天发送 {0} 次',
             panelLoginRule: '面板登录告警，每天发送 {0} 次',
             sshLoginRule: 'SSH 登录告警告警，每天发送 {0} 次',
+            userNameHelper: '用户名为空会默认使用发件箱地址',
         },
         theme: {
             lingXiaGold: '凌霞金',

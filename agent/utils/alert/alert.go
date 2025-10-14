@@ -60,10 +60,14 @@ func CreateEmailAlertLog(create dto.AlertLogCreate, alert dto.AlertDTO, params [
 		if err != nil {
 			return err
 		}
+		username := emailInfo.UserName
+		if username == "" {
+			username = emailInfo.Sender
+		}
 		smtpConfig := email.SMTPConfig{
 			Host:       emailInfo.Host,
 			Port:       emailInfo.Port,
-			Username:   emailInfo.Sender,
+			Username:   username,
 			Password:   emailInfo.Password,
 			From:       fmt.Sprintf("%s <%s>", emailInfo.DisplayName, emailInfo.Sender),
 			Encryption: emailInfo.Encryption,

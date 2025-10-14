@@ -3709,6 +3709,7 @@ const message = {
             licenseExceptionRule: '라이선스 이상 알림은 하루 {0}회 전송',
             panelLoginRule: '패널 로그인 알림은 하루 {0}회 전송',
             sshLoginRule: 'SSH 로그인 알림은 하루 {0}회 전송',
+            userNameHelper: '사용자 이름이 비어 있으면 기본적으로 발신자 주소가 사용됩니다',
         },
         theme: {
             lingXiaGold: '링샤 골드',

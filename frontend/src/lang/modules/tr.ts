@@ -3945,6 +3945,7 @@ const message = {
             licenseExceptionRule: 'Lisans hatası uyarısı, günde {0} kez gönderilir',
             panelLoginRule: 'Panel girişi uyarısı, günde {0} kez gönderilir',
             sshLoginRule: 'SSH girişi uyarısı, günde {0} kez gönderilir',
+            userNameHelper: 'Kullanıcı adı boşsa, varsayılan olarak gönderici adresi kullanılacaktır',
         },
         theme: {
             lingXiaGold: 'Ling Xia Altın',

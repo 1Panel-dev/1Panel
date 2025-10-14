@@ -479,10 +479,14 @@ func (a AlertService) DeleteAlertConfig(id uint) error {
 }
 
 func (a AlertService) TestAlertConfig(req dto.AlertConfigTest) (bool, error) {
+	username := req.UserName
+	if username == "" {
+		username = req.Sender
+	}
 	cfg := email.SMTPConfig{
 		Host:       req.Host,
 		Port:       req.Port,
-		Username:   req.Sender,
+		Username:   username,
 		Password:   req.Password,
 		From:       fmt.Sprintf("%s <%s>", req.DisplayName, req.Sender),
 		Encryption: req.Encryption,

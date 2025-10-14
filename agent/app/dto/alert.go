@@ -292,6 +292,7 @@ type AlertConfigTest struct {
 	Host        string `json:"host"`
 	Port        int    `json:"port"`
 	Sender      string `json:"sender"`
+	UserName    string `json:"userName"`
 	Password    string `json:"password"`
 	DisplayName string `json:"displayName"`
 	Encryption  string `json:"encryption"` // "ssl" / "tls" / "none"
@@ -323,6 +324,7 @@ type AlertEmailConfig struct {
 	Host        string `json:"host"`
 	Port        int    `json:"port"`
 	Sender      string `json:"sender"`
+	UserName    string `json:"userName"`
 	Password    string `json:"password"`
 	DisplayName string `json:"displayName"`
 	Encryption  string `json:"encryption"` // "ssl" / "tls" / "none"

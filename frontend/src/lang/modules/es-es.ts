@@ -3836,6 +3836,7 @@ const message = {
             licenseExceptionRule: 'Alerta de licencia anómala, {0} envíos/día',
             panelLoginRule: 'Alerta de login en panel, {0} envíos/día',
             sshLoginRule: 'Alerta de login SSH, {0} envíos/día',
+            userNameHelper: 'El nombre de usuario está vacío, se usará la dirección del remitente por defecto',
         },
         theme: {
             lingXiaGold: 'Ling Xia Gold',

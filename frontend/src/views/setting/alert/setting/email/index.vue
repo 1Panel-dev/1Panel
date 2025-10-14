@@ -22,6 +22,12 @@
                             {{ $t('xpack.alert.senderHelper') }}
                         </span>
                     </el-form-item>
+                    <el-form-item :label="$t('commons.login.username')" prop="userName">
+                        <el-input v-model.trim="form.config.userName" />
+                        <span class="input-help">
+                            {{ $t('xpack.alert.userNameHelper') }}
+                        </span>
+                    </el-form-item>
                     <el-form-item :label="$t('xpack.alert.password')" prop="password">
                         <el-input v-model.trim="form.config.password" type="password" show-password />
                         <span class="input-help">
@@ -103,6 +109,7 @@ interface Config {
     status: string;
     displayName: string;
     sender: string;
+    userName: string;
     password: string;
     host: string;
     port: number;
@@ -122,6 +129,7 @@ const form = reactive({
         displayName: '',
         sender: '',
         password: '',
+        userName: '',
         host: '',
         port: 465,
         encryption: 'NONE',
@@ -170,6 +178,7 @@ const onTest = async (formEl: FormInstance | undefined) => {
         if (!valid) return;
         loading.value = true;
         try {
+            debugger;
             await TestAlertConfig(form.config)
                 .then((res) => {
                     loading.value = false;
