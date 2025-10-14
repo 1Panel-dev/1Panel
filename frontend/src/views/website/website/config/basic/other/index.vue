@@ -2,7 +2,7 @@
     <el-row :gutter="20" v-loading="loading">
         <el-col :xs="24" :sm="18" :md="8" :lg="8" :xl="8">
             <el-form ref="websiteForm" label-position="right" label-width="80px" :model="form" :rules="rules">
-                <el-form-item :label="$t('website.primaryDomain')" prop="primaryDomain">
+                <el-form-item :label="$t('commons.table.name')" prop="primaryDomain">
                     <el-input v-model="form.primaryDomain"></el-input>
                 </el-form-item>
                 <el-form-item :label="$t('website.alias')" prop="primaryDomain">

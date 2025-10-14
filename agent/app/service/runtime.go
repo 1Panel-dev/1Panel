@@ -232,6 +232,14 @@ func (r *RuntimeService) Page(req request.RuntimeSearch) (int64, []response.Runt
 		if err != nil {
 			return 0, nil, err
 		}
+		detail, _ := appDetailRepo.GetFirst(repo.WithByID(runtime.AppDetailID))
+		if detail.AppId == 0 {
+			appID, appDetailID := handleRuntimeDetailID(runtime)
+			runtimeDTO.AppDetailID = appDetailID
+			runtimeDTO.AppID = appID
+		} else {
+			runtimeDTO.AppID = detail.AppId
+		}
 		for k, v := range envs {
 			runtimeDTO.Params[k] = v
 			if strings.Contains(k, "CONTAINER_PORT") || strings.Contains(k, "HOST_PORT") {

@@ -1059,3 +1059,17 @@ func getOperation(operate, pkgManager string) string {
 	}
 	return ops[1]
 }
+
+func handleRuntimeDetailID(runtime model.Runtime) (uint, uint) {
+	app, _ := appRepo.GetFirst(appRepo.WithKey(runtime.Type))
+	if app.ID == 0 {
+		return 0, 0
+	}
+	appDetail, _ := appDetailRepo.GetFirst(appDetailRepo.WithVersion(runtime.Version), appDetailRepo.WithAppId(app.ID))
+	if appDetail.ID == 0 {
+		return 0, 0
+	}
+	runtime.AppDetailID = appDetail.ID
+	_ = runtimeRepo.Save(&runtime)
+	return app.ID, appDetail.ID
+}

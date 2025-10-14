@@ -478,6 +478,7 @@ const acceptParams = async (props: OperateRrops) => {
             searchAppList(null);
         }
     } else {
+        console.log(props);
         searchAppList(props.appID);
         getRuntime(props.id);
     }
