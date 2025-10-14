@@ -247,6 +247,11 @@ NoSuchResource: "Tiada kandungan sandaran ditemui dalam pangkalan data, dilangka
 ErrNotExistUser: 'Pengguna semasa tidak wujud, sila ubah suai dan cuba lagi!'
 ErrBanAction: 'Tetapan gagal. Perkhidmatan {{ .name }} semasa tidak tersedia. Sila semak dan cuba lagi!'
 ErrClamdscanNotFound: 'Arahan clamdscan tidak dikesan, sila rujuk dokumentasi untuk memasangnya!'
+TaskSwapSet: "Tetapkan Swap"
+SetSwap: "Tetapkan Swap {{ .path }} - {{ .size }}"
+CreateSwap: "Buat Fail Swap"
+FormatSwap: "Format Fail Swap"
+EnableSwap: "Dayakan Swap"
 
 #tamper
 CleanTamperSetting: "Bersihkan tetapan perlindungan sejarah"

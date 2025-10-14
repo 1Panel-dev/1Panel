@@ -246,6 +246,11 @@ NoSuchResource: "No se encontraron contenidos de respaldo en la base de datos, o
 ErrNotExistUser: 'El usuario actual no existe, modifíquelo e intente de nuevo'
 ErrBanAction: 'Fallo al configurar. El servicio {{ .name }} no está disponible, revise e intente de nuevo'
 ErrClamdscanNotFound: 'El comando clamdscan no fue detectado, siga la documentación para instalarlo'
+TaskSwapSet: "Configurar Swap"
+SetSwap: "Configurar Swap {{ .path }} - {{ .size }}"
+CreateSwap: "Crear Archivo Swap"
+FormatSwap: "Formatear Archivo Swap"
+EnableSwap: "Habilitar Swap"
 
 #tamper
 CleanTamperSetting: "Limpiar configuraciones de protección históricas"

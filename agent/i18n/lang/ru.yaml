@@ -247,6 +247,11 @@ NoSuchResource: "В базе данных не найдено содержимо
 ErrNotExistUser: 'Текущий пользователь не существует, измените его и повторите попытку!'
 ErrBanAction: 'Настройка не удалась. Текущая служба {{ .name }} недоступна. Проверьте и повторите попытку!'
 ErrClamdscanNotFound: 'Команда clamdscan не обнаружена, обратитесь к документации, чтобы установить ее!'
+TaskSwapSet: "Настройка Swap"
+SetSwap: "Настроить Swap {{ .path }} - {{ .size }}"
+CreateSwap: "Создать Файл Swap"
+FormatSwap: "Форматировать Файл Swap"
+EnableSwap: "Включить Swap"
 
 #tamper
 CleanTamperSetting: "Очистить исторические настройки защиты"

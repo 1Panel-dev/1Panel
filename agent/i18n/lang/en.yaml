@@ -247,6 +247,11 @@ NoSuchResource: "No backup content found in the database, skipping..."
 ErrNotExistUser: 'The current user does not exist, please modify and try again!'
 ErrBanAction: 'Setting failed. The current {{ .name }} service is unavailable. Please check and try again!'
 ErrClamdscanNotFound: 'The clamdscan command was not detected, please refer to the documentation to install it!'
+TaskSwapSet: "Set Swap"
+SetSwap: "Set Swap {{ .path }} - {{ .size }}"
+CreateSwap: "Create Swap File"
+FormatSwap: "Format Swap File"
+EnableSwap: "Enable Swap"
 
 #tamper
 CleanTamperSetting: "Clean up historical protection settings"

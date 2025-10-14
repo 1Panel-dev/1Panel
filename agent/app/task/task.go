@@ -74,6 +74,7 @@ const (
 	TaskBatch     = "TaskBatch"
 	TaskProtect   = "TaskProtect"
 	TaskConvert   = "TaskConvert"
+	TaskSwapSet   = "TaskSwapSet"
 )
 
 const (

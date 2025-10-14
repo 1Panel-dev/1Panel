@@ -80,13 +80,15 @@
             </span>
         </template>
     </DrawerPro>
+    <TaskLog ref="taskLogRef" width="70%" @close="search" />
 </template>
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { updateDeviceSwap, getDeviceBase } from '@/api/modules/toolbox';
-import { computeSize, splitSize } from '@/utils/util';
+import { computeSize, newUUID, splitSize } from '@/utils/util';
+import TaskLog from '@/components/log/task/index.vue';
 import { loadBaseDir } from '@/api/modules/setting';
 
 const form = reactive({
@@ -100,6 +102,7 @@ const form = reactive({
 
 const drawerVisible = ref();
 const loading = ref();
+const taskLogRef = ref();
 
 const acceptParams = (): void => {
     search();
@@ -176,18 +179,22 @@ const onSave = async (row) => {
             used: '0',
 
             isNew: row.isNew,
+            taskID: newUUID(),
         };
         loading.value = true;
         await updateDeviceSwap(params)
             .then(() => {
                 loading.value = false;
+                openTaskLog(params.taskID);
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                search();
             })
             .catch(() => {
                 loading.value = false;
             });
     });
+};
+const openTaskLog = (taskID: string) => {
+    taskLogRef.value.openWithTaskID(taskID);
 };
 
 const loadItemSize = (row: any) => {

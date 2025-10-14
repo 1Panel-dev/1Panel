@@ -12,9 +12,11 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/ntp"
@@ -231,40 +233,58 @@ func (u *DeviceService) UpdatePasswd(req dto.ChangePasswd) error {
 }
 
 func (u *DeviceService) UpdateSwap(req dto.SwapHelper) error {
-	if cmd.CheckIllegal(req.Path) {
-		return buserr.New("ErrCmdIllegal")
-	}
-	if !req.IsNew {
-		std, err := cmd.RunDefaultWithStdoutBashCf("%s swapoff %s", cmd.SudoHandleCmd(), req.Path)
-		if err != nil {
-			return fmt.Errorf("handle swapoff %s failed, err: %s", req.Path, std)
-		}
-	}
-	if req.Size == 0 {
-		if req.Path == path.Join(global.Dir.BaseDir, ".1panel_swap") {
-			_ = os.Remove(path.Join(global.Dir.BaseDir, ".1panel_swap"))
-		}
-		return operateSwapWithFile(true, req)
-	}
-	stdDD, err := cmd.RunDefaultWithStdoutBashCf("%s dd if=/dev/zero of=%s bs=1024 count=%d", cmd.SudoHandleCmd(), req.Path, req.Size)
+	taskItem, err := task.NewTaskWithOps(req.Path, task.TaskSwapSet, task.TaskScopeSystem, req.TaskID, 1)
 	if err != nil {
-		return fmt.Errorf("handle dd %s failed, std: %s, err: %s", req.Path, stdDD, err)
-	}
-	stdChmod, err := cmd.RunDefaultWithStdoutBashCf("%s chmod 0600 %s", cmd.SudoHandleCmd(), req.Path)
-	if err != nil {
-		return fmt.Errorf("handle chmod 0600 %s failed,std: %s, err: %s", req.Path, stdChmod, err)
-	}
-	stdMkswap, err := cmd.RunDefaultWithStdoutBashCf("%s mkswap -f %s", cmd.SudoHandleCmd(), req.Path)
-	if err != nil {
-		return fmt.Errorf("handle mkswap -f %s failed, std: %s, err: %s", req.Path, stdMkswap, err)
+		global.LOG.Errorf("new task for create container failed, err: %v", err)
+		return err
 	}
 
-	stdSwapon, err := cmd.RunDefaultWithStdoutBashCf("%s swapon %s", cmd.SudoHandleCmd(), req.Path)
-	if err != nil {
-		_, _ = cmd.RunDefaultWithStdoutBashCf("%s swapoff %s", cmd.SudoHandleCmd(), req.Path)
-		return fmt.Errorf("handle swapoff %s failed,std: %s, err: %s", req.Path, stdSwapon, err)
-	}
-	return operateSwapWithFile(false, req)
+	taskItem.AddSubTask(i18n.GetMsgWithMap("SetSwap", map[string]interface{}{"path": req.Path, "size": common.LoadSizeUnit2F(float64(req.Size * 1024))}), func(t *task.Task) error {
+		if cmd.CheckIllegal(req.Path) {
+			return buserr.New("ErrCmdIllegal")
+		}
+		cmdMgr := cmd.NewCommandMgr(cmd.WithTask(*taskItem))
+		if !req.IsNew {
+			std, err := cmdMgr.RunWithStdoutBashCf("%s swapoff %s", cmd.SudoHandleCmd(), req.Path)
+			if err != nil {
+				return fmt.Errorf("handle swapoff %s failed, err: %s", req.Path, std)
+			}
+		}
+		if req.Size == 0 {
+			if req.Path == path.Join(global.Dir.BaseDir, ".1panel_swap") {
+				_ = os.Remove(path.Join(global.Dir.BaseDir, ".1panel_swap"))
+			}
+			return operateSwapWithFile(true, req)
+		}
+		taskItem.LogStart(i18n.GetMsgByKey("CreateSwap"))
+		stdDD, err := cmdMgr.RunWithStdoutBashCf("%s dd if=/dev/zero of=%s bs=1024 count=%d", cmd.SudoHandleCmd(), req.Path, req.Size)
+		if err != nil {
+			return fmt.Errorf("handle dd %s failed, std: %s, err: %s", req.Path, stdDD, err)
+		}
+
+		taskItem.Log("chmod 0600 " + req.Path)
+		stdChmod, err := cmdMgr.RunWithStdoutBashCf("%s chmod 0600 %s", cmd.SudoHandleCmd(), req.Path)
+		if err != nil {
+			return fmt.Errorf("handle chmod 0600 %s failed,std: %s, err: %s", req.Path, stdChmod, err)
+		}
+		taskItem.LogStart(i18n.GetMsgByKey("FormatSwap"))
+		stdMkswap, err := cmdMgr.RunWithStdoutBashCf("%s mkswap -f %s", cmd.SudoHandleCmd(), req.Path)
+		if err != nil {
+			return fmt.Errorf("handle mkswap -f %s failed, std: %s, err: %s", req.Path, stdMkswap, err)
+		}
+
+		taskItem.LogStart(i18n.GetMsgByKey("EnableSwap"))
+		stdSwapon, err := cmdMgr.RunWithStdoutBashCf("%s swapon %s", cmd.SudoHandleCmd(), req.Path)
+		if err != nil {
+			_, _ = cmdMgr.RunWithStdoutBashCf("%s swapoff %s", cmd.SudoHandleCmd(), req.Path)
+			return fmt.Errorf("handle swapoff %s failed,std: %s, err: %s", req.Path, stdSwapon, err)
+		}
+		return operateSwapWithFile(false, req)
+	}, nil)
+	go func() {
+		_ = taskItem.Execute()
+	}()
+	return nil
 }
 
 func (u *DeviceService) LoadConf(name string) (string, error) {

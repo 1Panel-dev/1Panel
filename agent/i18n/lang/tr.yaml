@@ -248,6 +248,11 @@ NoSuchResource: "Veritabanında yedek içeriği bulunamadı, atlanıyor..."
 ErrNotExistUser: 'Mevcut kullanıcı mevcut değil, lütfen değiştirin ve tekrar deneyin!'
 ErrBanAction: 'Ayarlama başarısız. Mevcut {{ .name }} servisi kullanılamıyor. Lütfen kontrol edin ve tekrar deneyin!'
 ErrClamdscanNotFound: 'clamdscan komutu tespit edilmedi, lütfen yüklemek için belgeleri inceleyin!'
+TaskSwapSet: "Swap Ayarla"
+SetSwap: "Swap Ayarla {{ .path }} - {{ .size }}"
+CreateSwap: "Swap Dosyası Oluştur"
+FormatSwap: "Swap Dosyasını Biçimlendir"
+EnableSwap: "Swap Etkinleştir"
 
 #tamper
 CleanTamperSetting: "Geçmiş koruma ayarlarını temizle"

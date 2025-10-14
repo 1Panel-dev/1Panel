@@ -27,7 +27,8 @@ type SwapHelper struct {
 	Size uint64 `json:"size"`
 	Used string `json:"used"`
 
-	IsNew bool `json:"isNew"`
+	IsNew  bool   `json:"isNew"`
+	TaskID string `json:"taskID"`
 }
 
 type TimeZoneOptions struct {

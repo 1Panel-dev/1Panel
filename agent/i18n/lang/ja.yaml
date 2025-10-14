@@ -246,6 +246,11 @@ NoSuchResource: "データベースにバックアップ内容が見つかりま
 ErrNotExistUser: '現在のユーザーは存在しません。変更してもう一度お試しください。'
 ErrBanAction: '設定に失敗しました。現在の {{ .name }} サービスは利用できません。確認してもう一度お試しください。'
 ErrClamdscanNotFound: 'clamdscan コマンドが検出されませんでした。インストールするにはドキュメントを参照してください。'
+TaskSwapSet: "Swap設定"
+SetSwap: "Swap設定 {{ .path }} - {{ .size }}"
+CreateSwap: "Swapファイル作成"
+FormatSwap: "Swapファイルフォーマット"
+EnableSwap: "Swapファイル有効化"
 
 #tamper
 CleanTamperSetting: "履歴保護設定をクリーンアップ"
