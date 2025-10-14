@@ -31,7 +31,6 @@ type IHostToolService interface {
 	CreateToolConfig(req request.HostToolCreate) error
 	OperateTool(req request.HostToolReq) error
 	OperateToolConfig(req request.HostToolConfig) (*response.HostToolConfig, error)
-	GetToolLog(req request.HostToolLogReq) (string, error)
 	OperateSupervisorProcess(req request.SupervisorProcessConfig) error
 	GetSupervisorProcessConfig() ([]response.SupervisorProcessConfig, error)
 	OperateSupervisorProcessFile(req request.SupervisorProcessFileReq) (string, error)
