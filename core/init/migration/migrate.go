@@ -25,6 +25,7 @@ func Init() {
 		migrations.AddSimpleNodeGroup,
 		migrations.AddUpgradeBackupCopies,
 		migrations.AddScriptSync,
+		migrations.UpdateXpackHideMenuSort,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

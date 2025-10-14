@@ -57,6 +57,46 @@ func LoadMenus() string {
 	return string(menu)
 }
 
+func MenuSort() []dto.MenuLabelSort {
+	var MenuLabelsWithSort = []dto.MenuLabelSort{
+		{Label: "Home-Menu", Sort: 100},
+		{Label: "App-Menu", Sort: 200},
+		{Label: "Website-Menu", Sort: 300},
+		{Label: "Website", Sort: 100},
+		{Label: "SSL", Sort: 200},
+		{Label: "PHP", Sort: 300},
+		{Label: "AI-Menu", Sort: 400},
+		{Label: "OllamaModel", Sort: 100},
+		{Label: "MCPServer", Sort: 200},
+		{Label: "GPU", Sort: 300},
+		{Label: "Database-Menu", Sort: 500},
+		{Label: "Container-Menu", Sort: 600},
+		{Label: "System-Menu", Sort: 700},
+		{Label: "File", Sort: 100},
+		{Label: "Monitorx", Sort: 200},
+		{Label: "FirewallPort", Sort: 300},
+		{Label: "Process", Sort: 400},
+		{Label: "SSH", Sort: 500},
+		{Label: "Disk", Sort: 600},
+		{Label: "Terminal-Menu", Sort: 800},
+		{Label: "Cronjob-Menu", Sort: 900},
+		{Label: "Toolbox-Menu", Sort: 1000},
+		{Label: "Xpack-Menu", Sort: 1100},
+		{Label: "XApp", Sort: 100},
+		{Label: "Dashboard", Sort: 200},
+		{Label: "Node", Sort: 300},
+		{Label: "Upage", Sort: 400},
+		{Label: "MonitorDashboard", Sort: 500},
+		{Label: "Tamper", Sort: 600},
+		{Label: "Cluster", Sort: 700},
+		{Label: "FileExange", Sort: 800},
+		{Label: "XSetting", Sort: 900},
+		{Label: "Log-Menu", Sort: 1200},
+		{Label: "Setting-Menu", Sort: 1300},
+	}
+	return MenuLabelsWithSort
+}
+
 func AddMenu(newMenu dto.ShowMenu, parentMenuID string, tx *gorm.DB) error {
 	var menuJSON string
 	if err := tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Pluck("value", &menuJSON).Error; err != nil {

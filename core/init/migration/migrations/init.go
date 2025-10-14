@@ -555,3 +555,50 @@ var AddScriptSync = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var UpdateXpackHideMenuSort = &gormigrate.Migration{
+	ID: "20251009-update-xpack-hide-menu-sort",
+	Migrate: func(tx *gorm.DB) error {
+		var menuJSON string
+		if err := tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Pluck("value", &menuJSON).Error; err != nil {
+			return err
+		}
+
+		var menus []dto.ShowMenu
+		if err := json.Unmarshal([]byte(menuJSON), &menus); err != nil {
+			return tx.Model(&model.Setting{}).
+				Where("key = ?", "HideMenu").
+				Update("value", helper.LoadMenus()).Error
+		}
+
+		labelSortMap := make(map[string]int)
+		for _, item := range helper.MenuSort() {
+			labelSortMap[item.Label] = item.Sort
+		}
+
+		for i := range menus {
+			if sortVal, exists := labelSortMap[menus[i].Label]; exists {
+				menus[i].Sort = sortVal
+			} else if menus[i].Sort <= 0 {
+				menus[i].Sort = (i + 1) * 100
+			}
+
+			for j := range menus[i].Children {
+				if childSort, exists := labelSortMap[menus[i].Children[j].Label]; exists {
+					menus[i].Children[j].Sort = childSort
+				} else if menus[i].Children[j].Sort <= 0 {
+					menus[i].Children[j].Sort = menus[i].Sort + (j+1)*10
+				}
+			}
+		}
+
+		updatedJSON, err := json.Marshal(menus)
+		if err != nil {
+			return tx.Model(&model.Setting{}).
+				Where("key = ?", "HideMenu").
+				Update("value", helper.LoadMenus()).Error
+		}
+
+		return tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Update("value", string(updatedJSON)).Error
+	},
+}

@@ -204,7 +204,13 @@ type ShowMenu struct {
 	IsShow   bool       `json:"isShow"`
 	Title    string     `json:"title"`
 	Path     string     `json:"path,omitempty"`
+	Sort     int        `json:"sort"`
 	Children []ShowMenu `json:"children,omitempty"`
+}
+
+type MenuLabelSort struct {
+	Label string `json:"label"`
+	Sort  int    `json:"sort"`
 }
 
 type ApiInterfaceConfig struct {

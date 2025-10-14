@@ -868,3 +868,20 @@ type ConvertType = (typeof convertTypes)[number];
 export function isConvertible(extension: string, mimeType: string): boolean {
     return convertTypes.includes(getFileType(extension) as ConvertType) && /^(image|audio|video)\//.test(mimeType);
 }
+
+function compareById(a, b) {
+    return a.sort - b.sort;
+}
+
+export function sortMenu(arr) {
+    if (!arr || arr.length === 0) {
+        return;
+    }
+    arr.forEach((item) => {
+        if (item.children && Array.isArray(item.children)) {
+            item.children.sort(compareById);
+        }
+    });
+
+    arr.sort(compareById);
+}

@@ -39,6 +39,7 @@ import { GlobalStore, MenuStore } from '@/store';
 import { isString } from '@vueuse/core';
 import { getSettingInfo } from '@/api/modules/setting';
 import PrimaryMenu from '@/assets/images/menu-bg.svg?component';
+import { sortMenu } from '@/utils/util';
 
 const route = useRoute();
 const menuStore = MenuStore();
@@ -89,10 +90,16 @@ const openTask = () => {
 const search = async () => {
     const res = await getSettingInfo();
     version.value = res.data.systemVersion;
-    const menuItem = JSON.parse(res.data.hideMenu);
+    let hideMenu = JSON.parse(res.data.hideMenu);
+    sortMenu(hideMenu);
     const showMap = new Map();
-    getCheckedLabels(menuItem, showMap);
+    getCheckedLabels(hideMenu, showMap);
+    const rootMap = new Map();
+    hideMenu.forEach((m, index) => {
+        rootMap.set(m.label, index);
+    });
     let rstMenuList: RouteRecordRaw[] = [];
+    let resMenuList: RouteRecordRaw[] = [];
     for (const menu of menuStore.menuList) {
         let menuItem = JSON.parse(JSON.stringify(menu));
         if (!showMap[menuItem.name]) {
@@ -100,23 +107,94 @@ const search = async () => {
         } else if (menuItem.name === 'Xpack-Menu') {
             menuItem.meta.hideInSidebar = false;
         }
-        let itemChildren = [];
-        for (const item of menuItem.children) {
-            if (item.name === 'XAlertDashboard' && globalStore.isIntl) {
-                continue;
-            }
-            if (showMap[item.name]) {
-                itemChildren.push(item);
-            }
-        }
+        const childMenu = hideMenu.find((item) => item.label == menu.name);
+        const childMap = buildIndexMap(childMenu?.children || []);
+        const itemChildren =
+            (menuItem.children ?? [])
+                .filter(
+                    (item) =>
+                        item.name &&
+                        showMap[item.name as string] &&
+                        !(item.name === 'XAlertDashboard' && globalStore.isIntl),
+                )
+                .sort(sortByMap(childMap)) || [];
+
         if (itemChildren.length === 1) {
             menuItem.meta.title = itemChildren[0].meta.title;
         }
         menuItem.children = itemChildren;
         rstMenuList.push(menuItem);
     }
-    menuStore.menuList = rstMenuList;
+    rstMenuList.sort((a, b) => {
+        const labelA = a.name;
+        const labelB = b.name;
+        const indexA = rootMap.get(labelA) ?? Infinity;
+        const indexB = rootMap.get(labelB) ?? Infinity;
+        return indexA - indexB;
+    });
+    resMenuList = adjustAndCleanMenu(hideMenu, rstMenuList);
+    menuStore.menuList = resMenuList;
 };
+
+function buildIndexMap(list: any[]): Map<string, number> {
+    const map = new Map<string, number>();
+    list.forEach((m, i) => map.set(m.label, i));
+    return map;
+}
+
+function sortByMap(map: Map<string, number>) {
+    return (a: { name: string }, b: { name: string }) => {
+        const indexA = map.get(a.name) ?? Infinity;
+        const indexB = map.get(b.name) ?? Infinity;
+        return indexA - indexB;
+    };
+}
+
+function adjustAndCleanMenu(menuItem, list) {
+    const cleanList = JSON.parse(JSON.stringify(list));
+    const orderMap = new Map();
+    menuItem.forEach((item, index) => {
+        orderMap.set(item.label, index);
+    });
+    const newRootList = [];
+    const itemMap = new Map();
+    cleanList.forEach((parent) => {
+        if (!parent.children) {
+            parent.children = [];
+        }
+        itemMap.set(parent.name, parent);
+        parent.children.forEach((child) => {
+            itemMap.set(child.name, child);
+        });
+    });
+
+    menuItem.forEach((refItem) => {
+        const refName = refItem.label;
+        if (orderMap.has(refName)) {
+            const targetItem = itemMap.get(refName);
+
+            if (targetItem) {
+                newRootList.push(targetItem);
+                for (const parent of cleanList) {
+                    if (parent.children && parent.children.length > 0) {
+                        const originalLength = parent.children.length;
+                        parent.children = parent.children.filter((child) => child.name !== refName);
+                        if (parent.children.length < originalLength) {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    });
+    newRootList.sort((a, b) => {
+        const indexA = orderMap.get(a.name) ?? Infinity;
+        const indexB = orderMap.get(b.name) ?? Infinity;
+        return indexA - indexB;
+    });
+
+    return newRootList;
+}
 
 onMounted(() => {
     menuStore.setMenuList(menuList);
