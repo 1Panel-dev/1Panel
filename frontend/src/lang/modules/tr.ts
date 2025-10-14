@@ -1662,7 +1662,8 @@ const message = {
         emailHelper: 'Parola kurtarma için',
         watermark: 'Filigran Ayarları',
         watermarkContent: 'Filigran İçeriği',
-        contentHelper: 'Mevcut düğüm adını ve düğüm IP sini temsil etmek için {0} kullanın',
+        contentHelper:
+            'İpucu: ${nodeName} düğüm adını, ${nodeAddr} düğüm adresini temsil eder. Değişkenleri kullanabilir veya özel adlar girebilirsiniz.',
         watermarkColor: 'Filigran Rengi',
         watermarkFont: 'Filigran Yazı Tipi Boyutu',
         watermarkHeight: 'Filigran Yüksekliği',

@@ -1586,7 +1586,8 @@ const message = {
         emailHelper: 'パスワード取得用',
         watermark: '透かし設定',
         watermarkContent: '透かし内容',
-        contentHelper: '{0} を使用して現在のノード名とノードIPを表す',
+        contentHelper:
+            'ヒント：${nodeName}はノード名、${nodeAddr}はノードアドレスを表します。変数を使用するか、カスタム名を入力できます。',
         watermarkColor: '透かしの色',
         watermarkFont: '透かしのフォントサイズ',
         watermarkHeight: '透かしの高さ',

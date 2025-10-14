@@ -34,5 +34,5 @@ export const changeToLocal = async () => {
 
 export const setDefaultNodeInfo = () => {
     globalStore.currentNode = 'local';
-    globalStore.currentNodeAddr = '';
+    globalStore.currentNodeAddr = '127.0.0.1';
 };

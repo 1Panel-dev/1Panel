@@ -1503,15 +1503,18 @@ func loadConfigInfo(isCreate bool, req dto.ContainerOperate, oldContainer *conta
 	hostConf.DNS = req.DNS
 	config.Volumes = make(map[string]struct{})
 	for _, volume := range req.Volumes {
-		hostConf.Mounts = append(hostConf.Mounts, mount.Mount{
+		item := mount.Mount{
 			Type:     mount.Type(volume.Type),
 			Source:   volume.SourceDir,
 			Target:   volume.ContainerDir,
 			ReadOnly: volume.Mode == "ro",
-			BindOptions: &mount.BindOptions{
+		}
+		if volume.Type == "mount" {
+			item.BindOptions = &mount.BindOptions{
 				Propagation: mount.Propagation(volume.Shared),
-			},
-		})
+			}
+		}
+		hostConf.Mounts = append(hostConf.Mounts, item)
 		config.Volumes[volume.ContainerDir] = struct{}{}
 	}
 	return &config, &hostConf, &networkConf, nil

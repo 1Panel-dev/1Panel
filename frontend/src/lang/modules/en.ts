@@ -1642,7 +1642,8 @@ const message = {
         emailHelper: 'For password retrieval',
         watermark: 'Watermark Settings',
         watermarkContent: 'Watermark Content',
-        contentHelper: 'Use {0} to represent the current node name and node IP',
+        contentHelper:
+            'Tip: ${nodeName} represents node name, ${nodeAddr} represents node address. You can use variables or fill in custom names.',
         watermarkColor: 'Watermark Color',
         watermarkFont: 'Watermark Font Size',
         watermarkHeight: 'Watermark Height',

@@ -1555,7 +1555,8 @@ const message = {
         emailHelper: '用于密码找回',
         watermark: '水印设置',
         watermarkContent: '水印内容',
-        contentHelper: '使用 {0} 作为当前节点名称和节点 IP',
+        contentHelper:
+            '提示：${nodeName} 表示节点名称，${nodeAddr} 表示节点地址，既可以使用变量，也可以填写自定义名称。',
         watermarkColor: '水印颜色',
         watermarkFont: '水印字号',
         watermarkHeight: '水印高度',

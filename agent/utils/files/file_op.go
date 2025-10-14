@@ -751,12 +751,11 @@ func (f FileOp) Decompress(srcFile string, dst string, cType CompressType, secre
 			if err = shellArchiver.Extract(srcFile, dst, secret); err == nil {
 				return nil
 			}
-			if cType == TarGz && strings.Contains(err.Error(), "bad decrypt") {
-				return buserr.New("ErrBadDecrypt")
-			}
-			if cType == TarGz && cmd.Which("file") {
-				std, _ := cmd.RunDefaultWithStdoutBashCf("file %s", srcFile)
-				if strings.Contains(std, "openssl enc'd data with salted password") && len(secret) == 0 {
+			if cType == TarGz {
+				if strings.Contains(err.Error(), "bad decrypt") {
+					return buserr.New("ErrBadDecrypt")
+				}
+				if err := shellArchiver.Extract(srcFile, dst, "-"); strings.Contains(err.Error(), "bad decrypt") {
 					return buserr.New("ErrBadDecrypt")
 				}
 			}

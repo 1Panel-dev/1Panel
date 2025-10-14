@@ -1559,7 +1559,7 @@ const message = {
         emailHelper: '用於密碼找回',
         watermark: '浮水印設定',
         watermarkContent: '浮水印內容',
-        contentHelper: '使用 {0} 作為目前節點名稱和節點 IP',
+        contentHelper: '提示：${nodeName} 表示節點名稱，${nodeAddr} 表示節點地址，既可以使用變數，也可以填寫自訂名稱。',
         watermarkColor: '浮水印顏色',
         watermarkFont: '浮水印字型大小',
         watermarkHeight: '浮水印高度',

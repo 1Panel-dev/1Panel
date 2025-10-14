@@ -372,6 +372,11 @@ const search = async () => {
             globalStore.themeConfig.theme = form.theme;
             form.proxyDocker = xpackRes.data.proxyDocker;
             form.watermark = xpackRes.data.watermark;
+            try {
+                globalStore.watermark = JSON.parse(xpackRes.data.watermark);
+            } catch {
+                globalStore.watermark = null;
+            }
             form.watermarkItem = xpackRes.data.watermark ? 'Enable' : 'Disable';
         }
     } else {

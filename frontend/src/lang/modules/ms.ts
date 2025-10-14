@@ -1632,7 +1632,8 @@ const message = {
         emailHelper: 'Untuk pemulihan kata laluan',
         watermark: 'Tetapan Tanda Air',
         watermarkContent: 'Kandungan Tanda Air',
-        contentHelper: 'Gunakan {0} untuk mewakili nama nod semasa dan IP nod',
+        contentHelper:
+            'Petua: ${nodeName} mewakili nama nod, ${nodeAddr} mewakili alamat nod. Anda boleh menggunakan pembolehubah atau mengisi nama tersuai.',
         watermarkColor: 'Warna Tanda Air',
         watermarkFont: 'Saiz Fon Tanda Air',
         watermarkHeight: 'Ketinggian Tanda Air',

@@ -1640,7 +1640,8 @@ const message = {
         emailHelper: 'Para recuperación de contraseña',
         watermark: 'Configuración de marca de agua',
         watermarkContent: 'Contenido de la marca de agua',
-        contentHelper: 'Usa {0} para representar el nombre e IP del nodo actual',
+        contentHelper:
+            'Sugerencia: ${nodeName} representa el nombre del nodo, ${nodeAddr} representa la dirección del nodo. Puede usar variables o ingresar nombres personalizados.',
         watermarkColor: 'Color de la marca de agua',
         watermarkFont: 'Tamaño de fuente de la marca de agua',
         watermarkHeight: 'Altura de la marca de agua',

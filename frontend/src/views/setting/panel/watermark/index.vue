@@ -20,7 +20,7 @@
             >
                 <el-form-item :label="$t('setting.watermarkContent')" prop="content">
                     <el-input clearable v-model.trim="form.content" />
-                    <span class="input-help">{{ $t('setting.contentHelper', ['${nodeName} ${nodeAddr}']) }}</span>
+                    <span class="input-help">{{ $t('setting.contentHelper') }}</span>
                 </el-form-item>
                 <el-form-item :label="$t('setting.watermarkColor')" prop="color">
                     <el-color-picker v-model="form.color" show-alpha />
@@ -37,8 +37,8 @@
             </el-form>
         </el-watermark>
         <template #footer>
+            <el-button @click="setDefault">{{ $t('commons.button.setDefault') }}</el-button>
             <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
-            <el-button @click="setDefault">{{ $t('website.setDefault') }}</el-button>
             <el-button :disabled="loading" type="primary" @click="onSave(formRef)">
                 {{ $t('commons.button.confirm') }}
             </el-button>
@@ -61,7 +61,7 @@ const drawerVisible = ref();
 const loading = ref();
 
 let form = reactive({
-    color: 'rgba(0, 0, 0, 0.15)',
+    color: globalStore.isDarkTheme ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.15)',
     fontSize: 16,
     content: '${nodeName} - ${nodeAddr}',
     rotate: -22,
@@ -91,7 +91,7 @@ const loadContent = () => {
 };
 
 const setDefault = () => {
-    form.color = 'rgba(0, 0, 0, 0.15)';
+    form.color = globalStore.isDarkTheme ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.15)';
     form.fontSize = 16;
     form.content = '${nodeName} - ${nodeAddr}';
     form.rotate = -22;

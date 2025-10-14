@@ -38,7 +38,7 @@
 
             <el-table-column :label="$t('container.sharedLabel')" min-width="180">
                 <template #default="{ row }">
-                    <el-select popper-class="tall-options" v-model="row.shared">
+                    <el-select v-if="row.type !== 'volume'" popper-class="tall-options" v-model="row.shared">
                         <el-option value="private" :label="$t('container.private')">
                             <div class="title">{{ $t('container.private') }}</div>
                             <div class="description">{{ $t('container.privateHelper') }}</div>
@@ -64,6 +64,7 @@
                             <div class="description">{{ $t('container.rslaveHelper') }}</div>
                         </el-option>
                     </el-select>
+                    <span v-else>-</span>
                 </template>
             </el-table-column>
             <el-table-column min-width="80" :fixed="'right'">

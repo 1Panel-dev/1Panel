@@ -102,7 +102,7 @@ const loadContent = () => {
         '${nodeName}',
         globalStore.currentNode === 'local' ? globalStore.getMasterAlias() : globalStore.currentNode,
     );
-    itemName = itemName.replaceAll('${nodeAddr}', globalStore.currentNodeAddr);
+    itemName = itemName.replaceAll('${nodeAddr}', globalStore.currentNodeAddr || '127.0.0.1');
     return itemName;
 };
 
