@@ -1602,7 +1602,7 @@ const message = {
             'La operación de sincronización limpiará las claves inválidas y sincronizará nuevos pares de claves completos. ¿Desea continuar?',
         input: 'Entrada manual',
         import: 'Subir archivo',
-        authKeys: 'Gestión de Claves Públicas',
+        authKeys: 'Claves de Autorización',
         authKeysHelper: '¿Guardar información actual de clave pública?',
         pubkey: 'Información de clave',
         pubKeyHelper: 'La información de la clave actual solo tiene efecto para el usuario {0}',

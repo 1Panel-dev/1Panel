@@ -29,6 +29,8 @@ func init() {
 	updateCmd.AddCommand(updateUserName)
 	updateCmd.AddCommand(updatePassword)
 	updateCmd.AddCommand(updatePort)
+
+	updateCmd.AddCommand(updateVersion)
 }
 
 var updateCmd = &cobra.Command{
@@ -76,6 +78,32 @@ var updatePort = &cobra.Command{
 			return nil
 		}
 		port()
+		return nil
+	},
+}
+var updateVersion = &cobra.Command{
+	Use:  "version",
+	Args: cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		i18n.UseI18nForCmd(language)
+		if !isRoot() {
+			fmt.Println(i18n.GetMsgWithMapForCmd("SudoHelper", map[string]interface{}{"cmd": "sudo 1pctl update version"}))
+			return nil
+		}
+		version := args[0]
+		if len(version) == 0 || !strings.HasPrefix(version, "v2.") {
+			fmt.Println("err version in param input")
+			return nil
+		}
+		db, err := loadDBConn("core.db")
+		if err != nil {
+			fmt.Println(i18n.GetMsgWithMapForCmd("DBConnErr", map[string]interface{}{"err": err.Error()}))
+			return err
+		}
+		if err := setSettingByKey(db, "SystemVersion", version); err != nil {
+			fmt.Println(i18n.GetMsgWithMapForCmd("UpdateUserErr", map[string]interface{}{"err": err.Error()}))
+			return err
+		}
 		return nil
 	},
 }

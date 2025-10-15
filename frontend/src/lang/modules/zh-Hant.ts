@@ -1524,7 +1524,7 @@ const message = {
         syncHelper: '同步操作將清理失效金鑰並同步新增的完整金鑰對，是否繼續？',
         input: '手動輸入',
         import: '文件上傳',
-        authKeys: '公鑰管理',
+        authKeys: '授權金鑰',
         authKeysHelper: '是否儲存目前公鑰資訊？',
         pubkey: '金鑰資訊',
         pubKeyHelper: '目前金鑰資訊僅對使用者 {0} 生效',

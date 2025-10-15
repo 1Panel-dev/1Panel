@@ -1520,7 +1520,7 @@ const message = {
         syncHelper: '同步操作将清理失效密钥并同步新增的完整密钥对，是否继续？',
         input: '手动输入',
         import: '文件上传',
-        authKeys: '公钥管理',
+        authKeys: '授权密钥',
         authKeysHelper: '是否保存当前公钥信息？',
         pubkey: '密钥信息',
         pubKeyHelper: '当前密钥信息仅对用户 {0} 生效',

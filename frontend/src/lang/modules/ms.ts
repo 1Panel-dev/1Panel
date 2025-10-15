@@ -1595,7 +1595,7 @@ const message = {
             'Operasi segerak akan membersihkan kunci tidak sah dan menyegerakkan pasangan kunci baru yang lengkap. Teruskan?',
         input: 'Input Manual',
         import: 'Muat Naik Fail',
-        authKeys: 'Pengurusan Kunci Awam',
+        authKeys: 'Kunci Pengesahan',
         authKeysHelper: 'Simpan maklumat kunci awam semasa?',
         pubkey: 'Maklumat kunci',
         pubKeyHelper: 'Maklumat kunci semasa hanya berkuat kuasa untuk pengguna {0}',
