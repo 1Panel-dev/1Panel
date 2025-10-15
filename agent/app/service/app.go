@@ -511,7 +511,7 @@ func (a AppService) Install(req request.AppInstallCreate) (appInstall *model.App
 			return err
 		}
 		if app.Key == "openresty" {
-			if err = handleSiteDir(app, appDetail, req, t); err != nil {
+			if err = handleSiteDir(app, appDetail, &req, t); err != nil {
 				return err
 			}
 			if err = handleOpenrestyFile(appInstall); err != nil {
