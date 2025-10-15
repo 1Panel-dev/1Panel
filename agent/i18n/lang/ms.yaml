@@ -98,6 +98,7 @@ ErrCustomRuntimes: 'Terdapat persekitaran masa jalan yang dipasang, sila padamka
 ErrAppVersionDeprecated: "Aplikasi {{ .name }} tidak sesuai dengan versi 1Panel saat ini, dilewati"
 ErrDockerFailed: "Keadaan Docker tidak normal, sila periksa status perkhidmatan"
 ErrDockerComposeCmdNotFound: "Perintah Docker Compose tidak wujud, sila pasang perintah ini di mesin tuan terlebih dahulu"
+UseExistImage: 'Gagal menarik imej, menggunakan imej sedia ada'
 
 #ssh
 ExportIP: "IP Log Masuk"

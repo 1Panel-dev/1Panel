@@ -98,6 +98,7 @@ ErrCustomRuntimes: 'Установлена среда выполнения. Сн
 ErrAppVersionDeprecated: "Приложение {{ .name }} несовместимо с текущей версией 1Panel, пропущено"
 ErrDockerFailed: "Состояние Docker аномально, проверьте состояние сервиса"
 ErrDockerComposeCmdNotFound: "Команда Docker Compose отсутствует, пожалуйста, установите эту команду на хост-машине сначала"
+UseExistImage: 'Не удалось загрузить образ, используется существующий образ'
 
 #ssh
 ExportIP: "IP входа"

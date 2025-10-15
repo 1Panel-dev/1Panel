@@ -94,6 +94,7 @@ ErrCustomRuntimes: "存在已经安装的运行环境，请先删除"
 ErrAppVersionDeprecated: " {{ .name }} 应用不适配当前 1Panel 版本，跳过"
 ErrDockerFailed: "Docker 状态异常，请检查服务状态"
 ErrDockerComposeCmdNotFound: "Docker Compose 命令不存在，请先在宿主机安装此命令"
+UseExistImage: "拉取镜像失败，使用存量镜像"
 
 #ssh
 ExportIP: "登录 IP"

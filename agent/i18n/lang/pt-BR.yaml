@@ -98,6 +98,7 @@ ErrCustomRuntimes: 'Há um ambiente de execução instalado, exclua-o primeiro'
 ErrAppVersionDeprecated: "O aplicativo {{ .name }} não é compatível com a versão atual do 1Panel, ignorado"
 ErrDockerFailed: "O estado do Docker está anormal, verifique o status do serviço"
 ErrDockerComposeCmdNotFound: "O comando Docker Compose não existe, por favor, instale este comando na máquina host primeiro"
+UseExistImage: 'Falha ao puxar a imagem, usando imagem existente'
 
 #ssh
 ExportIP: "IP de Login"

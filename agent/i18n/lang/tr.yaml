@@ -98,6 +98,7 @@ ErrCustomRuntimes: 'Yüklü bir çalışma ortamı var, lütfen önce silin'
 ErrAppVersionDeprecated: "{{ .name }} uygulaması mevcut 1Panel sürümü ile uyumlu değil, atlandı"
 ErrDockerFailed: "Docker durumu anormal, lütfen servis durumunu kontrol edin"
 ErrDockerComposeCmdNotFound: "Docker Compose komutu mevcut değil, lütfen önce bu komutu host makinesine yükleyin"
+UseExistImage: 'Görüntü çekme başarısız, mevcut görüntü kullanılıyor'
 
 #ssh
 ExportIP: "Giriş IP"

@@ -95,6 +95,7 @@ ErrCustomRuntimes: 'There is an installed runtime environment, please delete it 
 ErrAppVersionDeprecated: "The {{ .name }} application is not compatible with the current 1Panel version, skipped"
 ErrDockerFailed: "The state of Docker is abnormal, please check the service status"
 ErrDockerComposeCmdNotFound: "The Docker Compose command does not exist, please install this command on the host machine first"
+UseExistImage: 'Failed to pull image, using existing image'
 
 #ssh
 ExportIP: "Login IP"

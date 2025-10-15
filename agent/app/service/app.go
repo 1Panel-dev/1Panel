@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"path"
 	"path/filepath"
 	"reflect"
 	"strconv"
@@ -484,6 +485,15 @@ func (a AppService) Install(req request.AppInstallCreate) (appInstall *model.App
 		req.Params["RESTY_ADD_PACKAGE_BUILDDEPS"] = ""
 		req.Params["RESTY_CONFIG_OPTIONS_MORE"] = ""
 	}
+	if app.Key == "openresty" && (app.Resource == "remote" || app.Resource == "custom") && common.CompareVersion(appDetail.Version, "1.27") {
+		if dir, ok := req.Params["WEBSITE_DIR"]; ok {
+			siteDir := dir.(string)
+			if siteDir == "" || !strings.HasPrefix(siteDir, "/") {
+				siteDir = path.Join(global.Dir.DataDir, dir.(string))
+			}
+			req.Params["WEBSITE_DIR"] = siteDir
+		}
+	}
 	paramByte, err = json.Marshal(req.Params)
 	if err != nil {
 		return
@@ -511,7 +521,7 @@ func (a AppService) Install(req request.AppInstallCreate) (appInstall *model.App
 			return err
 		}
 		if app.Key == "openresty" {
-			if err = handleSiteDir(app, appDetail, &req, t); err != nil {
+			if err = handleSiteDir(app, appDetail, req, t); err != nil {
 				return err
 			}
 			if err = handleOpenrestyFile(appInstall); err != nil {

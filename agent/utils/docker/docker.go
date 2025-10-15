@@ -115,6 +115,13 @@ func (c Client) DeleteImage(imageID string) error {
 	}
 	return nil
 }
+func (c Client) ImageExists(imageID string) (bool, error) {
+	_, err := c.cli.ImageInspect(context.Background(), imageID)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
 
 func (c Client) GetImageIDByName(imageName string) (string, error) {
 	filter := filters.NewArgs()

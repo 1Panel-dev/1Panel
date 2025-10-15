@@ -95,6 +95,7 @@ ErrCustomRuntimes: '설치된 런타임 환경이 있습니다. 먼저 삭제해
 ErrAppVersionDeprecated: "{{ .name }} 응용 프로그램은 현재 1Panel 버전과 호환되지 않아 건너뛰었습니다"
 ErrDockerFailed: "Docker의 상태가 비정상입니다. 서비스 상태를 확인하세요"
 ErrDockerComposeCmdNotFound: "Docker Compose 명령이 없습니다. 호스트 머신에 먼저 이 명령을 설치하세요"
+UseExistImage: '이미지 가져오기 실패, 기존 이미지 사용'
 
 #ssh
 ExportIP: "로그인 IP"
