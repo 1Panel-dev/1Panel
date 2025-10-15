@@ -1509,7 +1509,7 @@ func loadConfigInfo(isCreate bool, req dto.ContainerOperate, oldContainer *conta
 			Target:   volume.ContainerDir,
 			ReadOnly: volume.Mode == "ro",
 		}
-		if volume.Type == "mount" {
+		if volume.Type == "bind" {
 			item.BindOptions = &mount.BindOptions{
 				Propagation: mount.Propagation(volume.Shared),
 			}
