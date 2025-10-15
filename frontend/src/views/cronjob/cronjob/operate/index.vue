@@ -1543,7 +1543,9 @@ onMounted(() => {
         margin-top: -3px;
     }
 }
-
+.el-card {
+    border: 1px solid var(--el-border-color-light) !important;
+}
 .divider {
     display: block;
     height: 1px;

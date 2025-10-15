@@ -742,4 +742,7 @@ onMounted(() => {
 .widthClass {
     width: 100%;
 }
+.el-card {
+    border: 1px solid var(--el-border-color-light) !important;
+}
 </style>

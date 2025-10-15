@@ -33,6 +33,7 @@
                 :font="{
                     fontSize: globalStore.watermark.fontSize,
                     color: globalStore.watermark.color,
+                    textBaseline: 'top',
                 }"
                 :rotate="globalStore.watermark.rotate"
                 :gap="[globalStore.watermark.gap, globalStore.watermark.gap]"

@@ -6,6 +6,7 @@
             :font="{
                 fontSize: form.fontSize,
                 color: form.color,
+                textBaseline: 'top',
             }"
             :rotate="form.rotate"
             :gap="[form.gap, form.gap]"
