@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div @dragover="handleDragover" @drop="handleDrop" @dragleave="handleDragleave">
         <el-tabs
             type="card"
             class="file-tabs"
@@ -14,7 +14,7 @@
                 :label="item.name == '' ? $t('file.root') : item.name"
                 :name="item.id"
             >
-                <div @dragover="handleDragover" @drop="handleDrop" @dragleave="handleDragleave">
+                <div>
                     <div class="flex sm:flex-row flex-col justify-start gap-y-2 items-center gap-x-4" ref="toolRef">
                         <div class="flex-shrink-0 flex sm:w-min w-full items-center justify-start">
                             <el-tooltip :content="$t('file.back')" placement="top">
@@ -268,7 +268,7 @@
                                     </el-button>
                                     <el-popover
                                         placement="bottom"
-                                        :width="200"
+                                        :width="250"
                                         trigger="hover"
                                         @before-enter="getFavorites"
                                     >
@@ -281,30 +281,39 @@
                                             <el-table :data="favorites">
                                                 <el-table-column prop="name">
                                                     <template #default="{ row }">
-                                                        <el-tooltip
-                                                            class="box-item"
-                                                            effect="dark"
-                                                            :content="row.path"
-                                                            placement="top"
-                                                        >
-                                                            <span
-                                                                class="table-link text-ellipsis"
-                                                                @click="toFavorite(row)"
-                                                                type="primary"
+                                                        <div class="flex justify-between items-center group">
+                                                            <el-tooltip
+                                                                class="box-item"
+                                                                effect="dark"
+                                                                :content="row.path"
+                                                                placement="top"
                                                             >
-                                                                <svg-icon
-                                                                    v-if="row.isDir"
-                                                                    className="table-icon"
-                                                                    iconName="p-file-folder"
-                                                                ></svg-icon>
-                                                                <svg-icon
-                                                                    v-else
-                                                                    className="table-icon"
-                                                                    iconName="p-file-normal"
-                                                                ></svg-icon>
-                                                                {{ row.name }}
-                                                            </span>
-                                                        </el-tooltip>
+                                                                <span
+                                                                    class="table-link text-ellipsis"
+                                                                    @click="toFavorite(row)"
+                                                                    type="primary"
+                                                                >
+                                                                    <svg-icon
+                                                                        v-if="row.isDir"
+                                                                        className="table-icon"
+                                                                        iconName="p-file-folder"
+                                                                    ></svg-icon>
+                                                                    <svg-icon
+                                                                        v-else
+                                                                        className="table-icon"
+                                                                        iconName="p-file-normal"
+                                                                    ></svg-icon>
+                                                                    {{ row.name }}
+                                                                </span>
+                                                            </el-tooltip>
+                                                            <el-icon
+                                                                class="hidden group-hover:block"
+                                                                v-if="!row.isDir"
+                                                                @click="jump(row.path)"
+                                                            >
+                                                                <FolderOpened />
+                                                            </el-icon>
+                                                        </div>
                                                     </template>
                                                 </el-table-column>
                                             </el-table>
@@ -633,7 +642,7 @@
         <Detail ref="detailRef" />
         <DeleteFile ref="deleteRef" @close="search" />
         <RecycleBin ref="recycleBinRef" @close="search" />
-        <Favorite ref="favoriteRef" @close="search" />
+        <Favorite ref="favoriteRef" @close="search" @jump="jump" @toFavorite="toFavorite" />
         <BatchRole ref="batchRoleRef" @close="search" />
         <VscodeOpenDialog ref="dialogVscodeOpenRef" />
         <Preview ref="previewRef" />
