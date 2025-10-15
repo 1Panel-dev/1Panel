@@ -16,6 +16,7 @@ const webSiteRouter = {
             name: 'Website',
             component: () => import('@/views/website/website/index.vue'),
             meta: {
+                icon: 'p-website',
                 title: 'menu.website',
                 requiresAuth: false,
             },
@@ -37,6 +38,7 @@ const webSiteRouter = {
             name: 'SSL',
             component: () => import('@/views/website/ssl/index.vue'),
             meta: {
+                icon: 'p-ssl-menu',
                 title: 'menu.ssl',
                 requiresAuth: false,
             },
@@ -46,6 +48,7 @@ const webSiteRouter = {
             name: 'PHP',
             component: () => import('@/views/website/runtime/php/index.vue'),
             meta: {
+                icon: 'p-run-menu',
                 title: 'menu.runtime',
                 detail: 'PHP',
                 activeMenu: '/websites/runtimes/php',

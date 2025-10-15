@@ -6,6 +6,146 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "5041257",
+      "name": "运行环境",
+      "font_class": "run-menu",
+      "unicode": "e636",
+      "unicode_decimal": 58934
+    },
+    {
+      "icon_id": "36768791",
+      "name": "SSH密钥",
+      "font_class": "ssh-menu",
+      "unicode": "e668",
+      "unicode_decimal": 58984
+    },
+    {
+      "icon_id": "44603268",
+      "name": "MCP服务",
+      "font_class": "mcp-menu",
+      "unicode": "e62b",
+      "unicode_decimal": 58923
+    },
+    {
+      "icon_id": "44724034",
+      "name": "线性- AI建站",
+      "font_class": "ai-menu",
+      "unicode": "e7bf",
+      "unicode_decimal": 59327
+    },
+    {
+      "icon_id": "45110983",
+      "name": "大模型-大",
+      "font_class": "moxing-menu",
+      "unicode": "e62c",
+      "unicode_decimal": 58924
+    },
+    {
+      "icon_id": "15170483",
+      "name": "ahas 应用高可用",
+      "font_class": "ah-menu",
+      "unicode": "e6ba",
+      "unicode_decimal": 59066
+    },
+    {
+      "icon_id": "1598478",
+      "name": "网站防篡改",
+      "font_class": "tamper-menu",
+      "unicode": "e61c",
+      "unicode_decimal": 58908
+    },
+    {
+      "icon_id": "3141923",
+      "name": "SSL数字证书",
+      "font_class": "ssl-menu",
+      "unicode": "e7b0",
+      "unicode_decimal": 59312
+    },
+    {
+      "icon_id": "4608954",
+      "name": "文件夹，文件管理",
+      "font_class": "file-menu",
+      "unicode": "e609",
+      "unicode_decimal": 58889
+    },
+    {
+      "icon_id": "5653301",
+      "name": "监控",
+      "font_class": "system-monitor-menu",
+      "unicode": "e621",
+      "unicode_decimal": 58913
+    },
+    {
+      "icon_id": "7082471",
+      "name": "gpu",
+      "font_class": "gpu-menu",
+      "unicode": "e631",
+      "unicode_decimal": 58929
+    },
+    {
+      "icon_id": "7948556",
+      "name": "WAF",
+      "font_class": "waf-menu",
+      "unicode": "e623",
+      "unicode_decimal": 58915
+    },
+    {
+      "icon_id": "18270117",
+      "name": "界面设置",
+      "font_class": "xsetting-menu",
+      "unicode": "e624",
+      "unicode_decimal": 58916
+    },
+    {
+      "icon_id": "35113302",
+      "name": "磁盘管理",
+      "font_class": "disk-menu",
+      "unicode": "e6e5",
+      "unicode_decimal": 59109
+    },
+    {
+      "icon_id": "43864633",
+      "name": "文件互传",
+      "font_class": "exchange-menu",
+      "unicode": "e625",
+      "unicode_decimal": 58917
+    },
+    {
+      "icon_id": "397898",
+      "name": "移动端，手机端",
+      "font_class": "mobile-menu",
+      "unicode": "e628",
+      "unicode_decimal": 58920
+    },
+    {
+      "icon_id": "5767874",
+      "name": "任务进程",
+      "font_class": "process-menu",
+      "unicode": "ec35",
+      "unicode_decimal": 60469
+    },
+    {
+      "icon_id": "14095351",
+      "name": "防火墙",
+      "font_class": "firewalld-menu",
+      "unicode": "e798",
+      "unicode_decimal": 59288
+    },
+    {
+      "icon_id": "15009371",
+      "name": "监测数据",
+      "font_class": "monitor-menu",
+      "unicode": "e64a",
+      "unicode_decimal": 58954
+    },
+    {
+      "icon_id": "22231530",
+      "name": "Data server",
+      "font_class": "node-menu",
+      "unicode": "e813",
+      "unicode_decimal": 59411
+    },
+    {
       "icon_id": "18536446",
       "name": "feature视图",
       "font_class": "featureshitu",

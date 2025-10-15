@@ -16,6 +16,7 @@ const databaseRouter = {
             name: 'OllamaModel',
             component: () => import('@/views/ai/model/index.vue'),
             meta: {
+                icon: 'p-moxing-menu',
                 title: 'aiTools.model.model',
                 requiresAuth: true,
             },
@@ -25,6 +26,7 @@ const databaseRouter = {
             name: 'MCPServer',
             component: () => import('@/views/ai/mcp/server/index.vue'),
             meta: {
+                icon: 'p-mcp-menu',
                 title: 'menu.mcp',
                 requiresAuth: true,
             },
@@ -34,6 +36,7 @@ const databaseRouter = {
             name: 'GPU',
             component: () => import('@/views/ai/gpu/index.vue'),
             meta: {
+                icon: 'p-gpu-menu',
                 title: 'aiTools.gpu.gpu',
                 requiresAuth: true,
             },

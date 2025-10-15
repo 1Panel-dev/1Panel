@@ -20,7 +20,7 @@
                 @select="handleMenuClick"
                 class="custom-menu"
             >
-                <SubItem :menuList="routerMenus" />
+                <SubItem :menuList="routerMenus" :level="0" />
             </el-menu>
         </el-scrollbar>
         <Collapse :version="version" @open-task="openTask" />
@@ -53,7 +53,9 @@ const activeMenu = computed(() => {
 const isCollapse = computed((): boolean => menuStore.isCollapse);
 
 let routerMenus = computed((): RouteRecordRaw[] => {
-    return menuStore.menuList.filter((route) => route.meta && !route.meta.hideInSidebar) as RouteRecordRaw[];
+    const aa = menuStore.menuList.filter((route) => route.meta && !route.meta.hideInSidebar) as RouteRecordRaw[];
+    console.log(aa);
+    return aa;
 });
 
 const screenWidth = ref(0);
@@ -151,49 +153,50 @@ function sortByMap(map: Map<string, number>) {
 }
 
 function adjustAndCleanMenu(menuItem, list) {
-    const cleanList = JSON.parse(JSON.stringify(list));
+    const menuList = JSON.parse(JSON.stringify(list));
     const orderMap = new Map();
     menuItem.forEach((item, index) => {
         orderMap.set(item.label, index);
     });
-    const newRootList = [];
     const itemMap = new Map();
-    cleanList.forEach((parent) => {
-        if (!parent.children) {
-            parent.children = [];
-        }
+    for (const parent of menuList) {
         itemMap.set(parent.name, parent);
-        parent.children.forEach((child) => {
-            itemMap.set(child.name, child);
-        });
-    });
-
-    menuItem.forEach((refItem) => {
-        const refName = refItem.label;
-        if (orderMap.has(refName)) {
-            const targetItem = itemMap.get(refName);
-
-            if (targetItem) {
-                newRootList.push(targetItem);
-                for (const parent of cleanList) {
-                    if (parent.children && parent.children.length > 0) {
-                        const originalLength = parent.children.length;
-                        parent.children = parent.children.filter((child) => child.name !== refName);
-                        if (parent.children.length < originalLength) {
-                            break;
-                        }
-                    }
-                }
+        if (Array.isArray(parent.children)) {
+            for (const child of parent.children) {
+                itemMap.set(child.name, child);
             }
         }
-    });
-    newRootList.sort((a, b) => {
+    }
+
+    function buildTree(refList) {
+        const result = [];
+
+        for (const ref of refList) {
+            const refName = ref.label;
+            const matched = itemMap.get(refName);
+
+            if (!matched) continue;
+
+            if (Array.isArray(ref.children) && ref.children.length > 0) {
+                matched.children = buildTree(ref.children);
+            } else {
+                delete matched.children;
+            }
+
+            result.push(matched);
+        }
+
+        return result;
+    }
+
+    const newMenu = buildTree(menuItem);
+    newMenu.sort((a, b) => {
         const indexA = orderMap.get(a.name) ?? Infinity;
         const indexB = orderMap.get(b.name) ?? Infinity;
         return indexA - indexB;
     });
 
-    return newRootList;
+    return newMenu;
 }
 
 onMounted(() => {

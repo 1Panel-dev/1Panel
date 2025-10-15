@@ -11,7 +11,6 @@
             </template>
             <template #main>
                 <el-form
-                    :model="form"
                     @submit.prevent
                     ref="alertFormRef"
                     :label-position="mobile ? 'top' : 'left'"
@@ -70,7 +69,6 @@
                         <el-divider class="!mb-2 !mt-3" />
                         <div class="text-sm email-form" v-if="emailConfig.id">
                             <el-form
-                                :model="form"
                                 @submit.prevent
                                 ref="alertFormRef"
                                 :label-position="mobile ? 'top' : 'left'"
@@ -119,7 +117,6 @@
                                 </el-button>
                             </div>
                         </div>
-                        <!--                        <div class="text-sm mb-2">{{ $t('xpack.alert.smsConfigHelper') }}</div>-->
                         <div class="text-sm mb-2">
                             {{ $t('xpack.alert.alertSmsHelper', [totalSms, usedSms]) }}
                             <el-link class="ml-1 text-xs" @click="goBuy" type="primary" icon="Position">
@@ -129,7 +126,6 @@
                         <el-divider class="!mb-2 !mt-3" />
                         <div class="text-sm email-form">
                             <el-form
-                                :model="form"
                                 @submit.prevent
                                 ref="alertFormRef"
                                 :label-position="mobile ? 'top' : 'left'"

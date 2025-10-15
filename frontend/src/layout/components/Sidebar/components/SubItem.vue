@@ -7,7 +7,7 @@
                 </el-icon>
                 <span>{{ $t(subItem.meta?.title as string, 2) }}</span>
             </template>
-            <SubItem :menuList="subItem.children" />
+            <SubItem :menuList="subItem.children" :level="level + 1" />
         </el-sub-menu>
 
         <el-menu-item v-else-if="subItem?.children?.length === 1" :index="subItem.children[0].path">
@@ -18,17 +18,22 @@
                 <span>{{ $t(subItem.meta?.title as string, 2) }}</span>
             </template>
         </el-menu-item>
-        <el-menu-item :index="''" v-else-if="subItem.path === '/xpack/upage'" @click="goUpage">
-            <template #title>
-                <span style="margin-left: 10px">{{ $t('xpack.upage') }}</span>
-            </template>
-        </el-menu-item>
-        <el-menu-item v-else :index="subItem.path">
-            <el-icon v-if="subItem.meta?.icon">
+        <el-menu-item v-else-if="subItem.path === '/xpack/upage'" :index="''" @click="goUpage">
+            <el-icon v-if="subItem.meta?.icon && level === 0">
                 <SvgIcon :iconName="(subItem.meta?.icon as string)" />
             </el-icon>
             <template #title>
-                <span v-if="subItem.meta?.icon">{{ $t(subItem.meta?.title as string, 2) }}</span>
+                <span v-if="subItem.meta?.icon && level === 0">{{ $t(subItem.meta?.title as string, 2) }}</span>
+                <span v-else style="margin-left: 10px">{{ $t(subItem.meta?.title as string, 2) }}</span>
+            </template>
+        </el-menu-item>
+
+        <el-menu-item v-else :index="subItem.path">
+            <el-icon v-if="subItem.meta?.icon && level === 0">
+                <SvgIcon :iconName="(subItem.meta?.icon as string)" />
+            </el-icon>
+            <template #title>
+                <span v-if="subItem.meta?.icon && level === 0">{{ $t(subItem.meta?.title as string, 2) }}</span>
                 <span v-else style="margin-left: 10px">{{ $t(subItem.meta?.title as string, 2) }}</span>
             </template>
         </el-menu-item>
@@ -39,7 +44,7 @@
 import { RouteRecordRaw } from 'vue-router';
 import SvgIcon from '@/components/svg-icon/svg-icon.vue';
 
-defineProps<{ menuList: RouteRecordRaw[] }>();
+defineProps<{ menuList: RouteRecordRaw[]; level?: number }>();
 
 const goUpage = () => {
     window.open('https://www.lxware.cn/upage', '_blank', 'noopener,noreferrer');

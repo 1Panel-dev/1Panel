@@ -1,9 +1,9 @@
 @font-face {
   font-family: "iconfont"; /* Project id 4776196 */
-  src: url('iconfont.woff2?t=1755181498446') format('woff2'),
-       url('iconfont.woff?t=1755181498446') format('woff'),
-       url('iconfont.ttf?t=1755181498446') format('truetype'),
-       url('iconfont.svg?t=1755181498446#iconfont') format('svg');
+  src: url('iconfont.woff2?t=1760516880031') format('woff2'),
+       url('iconfont.woff?t=1760516880031') format('woff'),
+       url('iconfont.ttf?t=1760516880031') format('truetype'),
+       url('iconfont.svg?t=1760516880031#iconfont') format('svg');
 }
 
 .iconfont {
@@ -12,6 +12,86 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.p-run-menu:before {
+  content: "\e636";
+}
+
+.p-ssh-menu:before {
+  content: "\e668";
+}
+
+.p-mcp-menu:before {
+  content: "\e62b";
+}
+
+.p-ai-menu:before {
+  content: "\e7bf";
+}
+
+.p-moxing-menu:before {
+  content: "\e62c";
+}
+
+.p-ah-menu:before {
+  content: "\e6ba";
+}
+
+.p-tamper-menu:before {
+  content: "\e61c";
+}
+
+.p-ssl-menu:before {
+  content: "\e7b0";
+}
+
+.p-file-menu:before {
+  content: "\e609";
+}
+
+.p-system-monitor-menu:before {
+  content: "\e621";
+}
+
+.p-gpu-menu:before {
+  content: "\e631";
+}
+
+.p-waf-menu:before {
+  content: "\e623";
+}
+
+.p-xsetting-menu:before {
+  content: "\e624";
+}
+
+.p-disk-menu:before {
+  content: "\e6e5";
+}
+
+.p-exchange-menu:before {
+  content: "\e625";
+}
+
+.p-mobile-menu:before {
+  content: "\e628";
+}
+
+.p-process-menu:before {
+  content: "\ec35";
+}
+
+.p-firewalld-menu:before {
+  content: "\e798";
+}
+
+.p-monitor-menu:before {
+  content: "\e64a";
+}
+
+.p-node-menu:before {
+  content: "\e813";
 }
 
 .p-featureshitu:before {

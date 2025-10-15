@@ -17,6 +17,7 @@ const hostRouter = {
             props: true,
             component: () => import('@/views/host/file-management/index.vue'),
             meta: {
+                icon: 'p-file-menu',
                 title: 'menu.files',
                 requiresAuth: false,
             },
@@ -26,6 +27,7 @@ const hostRouter = {
             name: 'Monitorx',
             component: () => import('@/views/host/monitor/monitor/index.vue'),
             meta: {
+                icon: 'p-system-monitor-menu',
                 title: 'menu.monitor',
                 requiresAuth: false,
             },
@@ -47,6 +49,7 @@ const hostRouter = {
             name: 'FirewallPort',
             component: () => import('@/views/host/firewall/port/index.vue'),
             meta: {
+                icon: 'p-firewalld-menu',
                 activeMenu: '/hosts/firewall/port',
                 title: 'menu.firewall',
                 detail: 'firewall.portRule',
@@ -83,6 +86,7 @@ const hostRouter = {
             props: true,
             component: () => import('@/views/host/disk-management/disk/index.vue'),
             meta: {
+                icon: 'p-disk-menu',
                 title: 'menu.disk',
                 requiresAuth: false,
             },
@@ -92,6 +96,7 @@ const hostRouter = {
             name: 'Process',
             component: () => import('@/views/host/process/process/index.vue'),
             meta: {
+                icon: 'p-process-menu',
                 title: 'menu.processManage',
                 detail: 'menu.process',
                 activeMenu: '/hosts/process/process',
@@ -116,6 +121,7 @@ const hostRouter = {
             name: 'SSH',
             component: () => import('@/views/host/ssh/ssh/index.vue'),
             meta: {
+                icon: 'p-ssh-menu',
                 title: 'menu.ssh',
                 detail: 'menu.config',
                 activeMenu: '/hosts/ssh/ssh',
