@@ -28,7 +28,6 @@
             <Tabs v-if="classObj.openMenuTabs" />
             <el-watermark
                 v-if="globalStore.isMasterProductPro && globalStore.watermark"
-                class="app-main"
                 :content="loadContent()"
                 :font="{
                     fontSize: globalStore.watermark.fontSize,
@@ -38,10 +37,12 @@
                 :rotate="globalStore.watermark.rotate"
                 :gap="[globalStore.watermark.gap, globalStore.watermark.gap]"
             >
-                <app-main :keep-alive="classObj.openMenuTabs ? tabsStore.cachedTabs : null" />
+                <div class="app-main">
+                    <app-main :keep-alive="classObj.openMenuTabs ? tabsStore.cachedTabs : null" />
+                </div>
             </el-watermark>
             <app-main class="app-main" v-else :keep-alive="classObj.openMenuTabs ? tabsStore.cachedTabs : null" />
-            <Footer class="app-footer" v-if="!globalStore.isFullScreen" />
+            <Footer :class="[!classObj.mobile ? 'app-footer' : '']" v-if="!globalStore.isFullScreen" />
             <TaskList ref="taskListRef" />
         </div>
     </div>
@@ -212,6 +213,7 @@ onMounted(() => {
     padding: 7px 20px;
     flex: 1;
     overflow: auto;
+    margin-bottom: 50px;
 }
 .app-sidebar {
     z-index: 2;
@@ -227,7 +229,15 @@ onMounted(() => {
         z-index: 5;
     }
 }
-
+.app-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    margin-left: 180px;
+    width: calc(100% - 180px);
+    text-align: center;
+    z-index: 1000;
+}
 .hideSidebar {
     .main-container {
         margin-left: var(--panel-menu-hide-width);
@@ -237,6 +247,10 @@ onMounted(() => {
     }
     .fixed-header {
         width: calc(100% - var(--panel-menu-hide-width));
+    }
+    .app-footer {
+        margin-left: 75px;
+        width: calc(100% - 75px);
     }
 }
 
