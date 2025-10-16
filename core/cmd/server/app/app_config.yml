@@ -10,4 +10,12 @@ additionalProperties:
   limit:  #应用安装数量限制，0 代表无限制
   website:  #官网地址
   github:  #github 地址
-  document:  #文档地址
+  description:
+    en:
+    zh: #应用中文描述，不要超过30个字
+    zh-Hant:
+    ja:
+    ms:
+    pt-br:
+    ru:
+    ko: 
