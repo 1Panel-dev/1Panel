@@ -156,9 +156,13 @@ func (u *CronjobService) handleShell(cronjob model.Cronjob, taskItem *task.Task)
 			cronjob.Executor = "bash"
 		}
 		if cronjob.ScriptMode == "input" {
-			fileItem := pathUtils.Join(global.Dir.DataDir, "task", "shell", cronjob.Name, cronjob.Name+".sh")
+			suffix := ".sh"
+			if strings.HasPrefix(cronjob.Executor, "python") {
+				suffix = ".py"
+			}
+			fileItem := pathUtils.Join(global.Dir.DataDir, "task", "shell", cronjob.Name, cronjob.Name+suffix)
 			_ = os.MkdirAll(pathUtils.Dir(fileItem), os.ModePerm)
-			shellFile, err := os.OpenFile(fileItem, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, constant.FilePerm)
+			shellFile, err := os.OpenFile(fileItem, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, constant.DirPerm)
 			if err != nil {
 				return err
 			}

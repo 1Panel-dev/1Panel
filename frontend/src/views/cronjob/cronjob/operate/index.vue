@@ -427,8 +427,10 @@
                                                     v-model="form.executor"
                                                 >
                                                     <el-option value="bash" label="bash" />
-                                                    <el-option value="python" label="python" />
                                                     <el-option value="sh" label="sh" />
+                                                    <el-option value="python" label="python" />
+                                                    <el-option value="python2" label="python2" />
+                                                    <el-option value="python3" label="python3" />
                                                 </el-select>
                                                 <el-input
                                                     clearable
