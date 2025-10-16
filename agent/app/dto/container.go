@@ -71,7 +71,6 @@ type ResourceLimit struct {
 
 type ContainerOperate struct {
 	TaskID          string         `json:"taskID"`
-	ContainerID     string         `json:"containerID"`
 	ForcePull       bool           `json:"forcePull"`
 	Name            string         `json:"name" validate:"required"`
 	Image           string         `json:"image" validate:"required"`

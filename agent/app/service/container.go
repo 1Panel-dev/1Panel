@@ -640,7 +640,6 @@ func (u *ContainerService) ContainerInfo(req dto.OperationWithName) (*dto.Contai
 	}
 
 	var data dto.ContainerOperate
-	data.ContainerID = oldContainer.ID
 	data.Name = strings.ReplaceAll(oldContainer.Name, "/", "")
 	data.Image = oldContainer.Config.Image
 	if oldContainer.NetworkSettings != nil {
@@ -702,11 +701,7 @@ func (u *ContainerService) ContainerUpdate(req dto.ContainerOperate) error {
 	}
 	defer client.Close()
 	ctx := context.Background()
-	newContainer, _ := client.ContainerInspect(ctx, req.Name)
-	if newContainer.ContainerJSONBase != nil && newContainer.ID != req.ContainerID {
-		return buserr.New("ErrContainerName")
-	}
-	oldContainer, err := client.ContainerInspect(ctx, req.ContainerID)
+	oldContainer, err := client.ContainerInspect(ctx, req.Name)
 	if err != nil {
 		return err
 	}
@@ -730,7 +725,7 @@ func (u *ContainerService) ContainerUpdate(req dto.ContainerOperate) error {
 		}, nil)
 
 		taskItem.AddSubTask(i18n.GetWithName("ContainerCreate", req.Name), func(t *task.Task) error {
-			err := client.ContainerRemove(ctx, req.ContainerID, container.RemoveOptions{Force: true})
+			err := client.ContainerRemove(ctx, req.Name, container.RemoveOptions{Force: true})
 			taskItem.LogWithStatus(i18n.GetWithName("ContainerRemoveOld", req.Name), err)
 			if err != nil {
 				return err
