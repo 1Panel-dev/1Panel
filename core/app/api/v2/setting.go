@@ -184,6 +184,22 @@ func (b *BaseApi) UpdateMenu(c *gin.Context) {
 	helper.Success(c)
 }
 
+// @Tags Menu Setting
+// @Summary Default menu
+// @Accept json
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /core/settings/menu/default [post]
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"初始化菜单","formatEN":"Init menu."}
+func (b *BaseApi) DefaultMenu(c *gin.Context) {
+	if err := settingService.DefaultMenu(); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
 // @Tags System Setting
 // @Summary Update system password
 // @Accept json

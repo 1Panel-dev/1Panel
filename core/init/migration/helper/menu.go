@@ -3,55 +3,56 @@ package helper
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/core/app/dto"
 	"github.com/1Panel-dev/1Panel/core/app/model"
 	"gorm.io/gorm"
 	"strings"
-
-	"github.com/1Panel-dev/1Panel/core/app/dto"
 )
 
 func LoadMenus() string {
 	item := []dto.ShowMenu{
-		{ID: "1", Disabled: true, Title: "menu.home", IsShow: true, Label: "Home-Menu", Path: "/"},
-		{ID: "2", Disabled: true, Title: "menu.apps", IsShow: true, Label: "App-Menu", Path: "/apps/all"},
-		{ID: "3", Disabled: false, Title: "menu.website", IsShow: true, Label: "Website-Menu", Path: "/websites",
+		{ID: "1", Disabled: true, Title: "menu.home", IsShow: true, Label: "Home-Menu", Path: "/", Sort: 100},
+		{ID: "2", Disabled: true, Title: "menu.apps", IsShow: true, Label: "App-Menu", Path: "/apps/all", Sort: 200},
+		{ID: "3", Disabled: false, Title: "menu.website", IsShow: true, Label: "Website-Menu", Path: "/websites", Sort: 300,
 			Children: []dto.ShowMenu{
-				{ID: "31", Disabled: false, Title: "menu.website", IsShow: true, Label: "Website", Path: "/websites"},
-				{ID: "32", Disabled: false, Title: "menu.ssl", IsShow: true, Label: "SSL", Path: "/websites/ssl"},
-				{ID: "33", Disabled: false, Title: "menu.runtime", IsShow: true, Label: "PHP", Path: "/websites/runtimes/php"},
+				{ID: "31", Disabled: false, Title: "menu.website", IsShow: true, Label: "Website", Path: "/websites", Sort: 100},
+				{ID: "32", Disabled: false, Title: "menu.ssl", IsShow: true, Label: "SSL", Path: "/websites/ssl", Sort: 200},
+				{ID: "33", Disabled: false, Title: "menu.runtime", IsShow: true, Label: "PHP", Path: "/websites/runtimes/php", Sort: 300},
 			}},
-		{ID: "4", Disabled: false, Title: "menu.aiTools", IsShow: true, Label: "AI-Menu", Path: "/ai/model",
+		{ID: "4", Disabled: false, Title: "menu.aiTools", IsShow: true, Label: "AI-Menu", Path: "/ai/model", Sort: 400,
 			Children: []dto.ShowMenu{
-				{ID: "41", Disabled: false, Title: "aiTools.model.model", IsShow: true, Label: "OllamaModel", Path: "/ai/model"},
-				{ID: "42", Disabled: false, Title: "menu.mcp", IsShow: true, Label: "MCPServer", Path: "/ai/mcp"},
-				{ID: "43", Disabled: false, Title: "aiTools.gpu.gpu", IsShow: true, Label: "GPU", Path: "/ai/gpu"},
+				{ID: "41", Disabled: false, Title: "aiTools.model.model", IsShow: true, Label: "OllamaModel", Path: "/ai/model", Sort: 100},
+				{ID: "42", Disabled: false, Title: "menu.mcp", IsShow: true, Label: "MCPServer", Path: "/ai/mcp", Sort: 200},
+				{ID: "43", Disabled: false, Title: "aiTools.gpu.gpu", IsShow: true, Label: "GPU", Path: "/ai/gpu", Sort: 300},
 			}},
-		{ID: "5", Disabled: false, Title: "menu.database", IsShow: true, Label: "Database-Menu", Path: "/databases"},
-		{ID: "6", Disabled: false, Title: "menu.container", IsShow: true, Label: "Container-Menu", Path: "/containers"},
-		{ID: "7", Disabled: false, Title: "menu.system", IsShow: true, Label: "System-Menu", Path: "/hosts/files",
+		{ID: "5", Disabled: false, Title: "menu.database", IsShow: true, Label: "Database-Menu", Path: "/databases", Sort: 500},
+		{ID: "6", Disabled: false, Title: "menu.container", IsShow: true, Label: "Container-Menu", Path: "/containers", Sort: 600},
+		{ID: "7", Disabled: false, Title: "menu.system", IsShow: true, Label: "System-Menu", Path: "/hosts/files", Sort: 700,
 			Children: []dto.ShowMenu{
-				{ID: "71", Disabled: false, Title: "menu.files", IsShow: true, Label: "File", Path: "/hosts/files"},
-				{ID: "72", Disabled: false, Title: "menu.monitor", IsShow: true, Label: "Monitorx", Path: "/hosts/monitor/monitor"},
-				{ID: "74", Disabled: false, Title: "menu.firewall", IsShow: true, Label: "FirewallPort", Path: "/hosts/firewall/port"},
-				{ID: "75", Disabled: false, Title: "menu.processManage", IsShow: true, Label: "Process", Path: "/hosts/process/process"},
-				{ID: "76", Disabled: false, Title: "menu.ssh", IsShow: true, Label: "SSH", Path: "/hosts/ssh/ssh"},
+				{ID: "71", Disabled: false, Title: "menu.files", IsShow: true, Label: "File", Path: "/hosts/files", Sort: 100},
+				{ID: "72", Disabled: false, Title: "menu.monitor", IsShow: true, Label: "Monitorx", Path: "/hosts/monitor/monitor", Sort: 200},
+				{ID: "74", Disabled: false, Title: "menu.firewall", IsShow: true, Label: "FirewallPort", Path: "/hosts/firewall/port", Sort: 300},
+				{ID: "75", Disabled: false, Title: "menu.processManage", IsShow: true, Label: "Process", Path: "/hosts/process/process", Sort: 400},
+				{ID: "76", Disabled: false, Title: "menu.ssh", IsShow: true, Label: "SSH", Path: "/hosts/ssh/ssh", Sort: 500},
+				{ID: "77", Disabled: false, Title: "menu.disk", IsShow: true, Label: "Disk", Path: "/hosts/disk", Sort: 600},
 			}},
-		{ID: "8", Disabled: false, Title: "menu.terminal", IsShow: true, Label: "Terminal-Menu", Path: "/hosts/terminal"},
-		{ID: "10", Disabled: false, Title: "menu.cronjob", IsShow: true, Label: "Cronjob-Menu", Path: "/cronjobs"},
-		{ID: "9", Disabled: false, Title: "menu.toolbox", IsShow: true, Label: "Toolbox-Menu", Path: "/toolbox"},
-		{ID: "11", Disabled: false, Title: "xpack.menu", IsShow: true, Label: "Xpack-Menu",
+		{ID: "8", Disabled: false, Title: "menu.terminal", IsShow: true, Label: "Terminal-Menu", Path: "/hosts/terminal", Sort: 800},
+		{ID: "10", Disabled: false, Title: "menu.cronjob", IsShow: true, Label: "Cronjob-Menu", Path: "/cronjobs", Sort: 900},
+		{ID: "9", Disabled: false, Title: "menu.toolbox", IsShow: true, Label: "Toolbox-Menu", Path: "/toolbox", Sort: 1000},
+		{ID: "11", Disabled: false, Title: "xpack.menu", IsShow: true, Label: "Xpack-Menu", Sort: 1100,
 			Children: []dto.ShowMenu{
-				{ID: "118", Disabled: false, Title: "xpack.app.app", IsShow: true, Label: "XApp", Path: "/xpack/app"},
-				{ID: "112", Disabled: false, Title: "xpack.waf.name", IsShow: true, Label: "Dashboard", Path: "/xpack/waf/dashboard"},
-				{ID: "111", Disabled: false, Title: "xpack.node.nodeManagement", IsShow: true, Label: "Node", Path: "/xpack/node"},
-				{ID: "119", Disabled: false, Title: "xpack.upage", IsShow: true, Label: "Upage", Path: "/xpack/upage"},
-				{ID: "113", Disabled: false, Title: "xpack.monitor.name", IsShow: true, Label: "MonitorDashboard", Path: "/xpack/monitor/dashboard"},
-				{ID: "114", Disabled: false, Title: "xpack.tamper.tamper", IsShow: true, Label: "Tamper", Path: "/xpack/tamper"},
-				{ID: "115", Disabled: false, Title: "xpack.exchange.exchange", IsShow: true, Label: "FileExange", Path: "/xpack/exchange/file"},
-				{ID: "117", Disabled: false, Title: "xpack.setting.setting", IsShow: true, Label: "XSetting", Path: "/xpack/setting"},
+				{ID: "118", Disabled: false, Title: "xpack.app.app", IsShow: true, Label: "XApp", Path: "/xpack/app", Sort: 100},
+				{ID: "112", Disabled: false, Title: "xpack.waf.name", IsShow: true, Label: "Dashboard", Path: "/xpack/waf/dashboard", Sort: 200},
+				{ID: "111", Disabled: false, Title: "xpack.node.nodeManagement", IsShow: true, Label: "Node", Path: "/xpack/node", Sort: 300},
+				{ID: "119", Disabled: false, Title: "xpack.upage", IsShow: true, Label: "Upage", Path: "/xpack/upage", Sort: 400},
+				{ID: "113", Disabled: false, Title: "xpack.monitor.name", IsShow: true, Label: "MonitorDashboard", Path: "/xpack/monitor/dashboard", Sort: 500},
+				{ID: "114", Disabled: false, Title: "xpack.tamper.tamper", IsShow: true, Label: "Tamper", Path: "/xpack/tamper", Sort: 600},
+				{ID: "120", Disabled: false, Title: "xpack.cluster.cluster", IsShow: true, Label: "Cluster", Path: "/xpack/cluster", Sort: 700},
+				{ID: "115", Disabled: false, Title: "xpack.exchange.exchange", IsShow: true, Label: "FileExange", Path: "/xpack/exchange/file", Sort: 800},
+				{ID: "117", Disabled: false, Title: "xpack.setting.setting", IsShow: true, Label: "XSetting", Path: "/xpack/setting", Sort: 900},
 			}},
-		{ID: "12", Disabled: false, Title: "menu.logs", IsShow: true, Label: "Log-Menu", Path: "/logs"},
-		{ID: "13", Disabled: true, Title: "menu.settings", IsShow: true, Label: "Setting-Menu", Path: "/settings"},
+		{ID: "12", Disabled: false, Title: "menu.logs", IsShow: true, Label: "Log-Menu", Path: "/logs", Sort: 1200},
+		{ID: "13", Disabled: true, Title: "menu.settings", IsShow: true, Label: "Setting-Menu", Path: "/settings", Sort: 1300},
 	}
 	menu, _ := json.Marshal(item)
 	return string(menu)

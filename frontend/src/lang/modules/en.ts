@@ -2045,6 +2045,7 @@ const message = {
         ifShow: 'Whether to Show',
         menu: 'Menu',
         confirmMessage: 'The page will be refreshed to update the advanced menu list. Continue?',
+        recoverMessage: 'The page will be refreshed and restore the menu list to its initial state. Continue?',
         compressPassword: 'Compression password',
         backupRecoverMessage: 'Please enter the compression or decompression password (leave blank to not set)',
     },

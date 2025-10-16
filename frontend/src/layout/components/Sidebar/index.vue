@@ -53,9 +53,7 @@ const activeMenu = computed(() => {
 const isCollapse = computed((): boolean => menuStore.isCollapse);
 
 let routerMenus = computed((): RouteRecordRaw[] => {
-    const aa = menuStore.menuList.filter((route) => route.meta && !route.meta.hideInSidebar) as RouteRecordRaw[];
-    console.log(aa);
-    return aa;
+    return menuStore.menuList.filter((route) => route.meta && !route.meta.hideInSidebar) as RouteRecordRaw[];
 });
 
 const screenWidth = ref(0);
@@ -122,6 +120,7 @@ const search = async () => {
                 .sort(sortByMap(childMap)) || [];
 
         if (itemChildren.length === 1) {
+            menuItem.meta.icon = itemChildren[0].meta.icon;
             menuItem.meta.title = itemChildren[0].meta.title;
         }
         menuItem.children = itemChildren;
@@ -195,6 +194,12 @@ function adjustAndCleanMenu(menuItem, list) {
         const indexB = orderMap.get(b.name) ?? Infinity;
         return indexA - indexB;
     });
+    for (const menu of newMenu) {
+        if (menu.children?.length === 1) {
+            menu.meta.icon = menu.children[0].meta.icon;
+            menu.meta.title = menu.children[0].meta.title;
+        }
+    }
 
     return newMenu;
 }

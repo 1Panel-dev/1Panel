@@ -1,5 +1,5 @@
 <template>
-    <template v-for="subItem in menuList" :key="subItem.path">
+    <template v-for="subItem in menuList" :key="subItem.name">
         <el-sub-menu v-if="subItem?.children?.length > 1" :index="subItem.path" popper-class="sidebar-container-popper">
             <template #title>
                 <el-icon>
@@ -18,6 +18,7 @@
                 <span>{{ $t(subItem.meta?.title as string, 2) }}</span>
             </template>
         </el-menu-item>
+
         <el-menu-item v-else-if="subItem.path === '/xpack/upage'" :index="''" @click="goUpage">
             <el-icon v-if="subItem.meta?.icon && level === 0">
                 <SvgIcon :iconName="(subItem.meta?.icon as string)" />

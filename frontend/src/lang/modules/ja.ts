@@ -1960,6 +1960,7 @@ const message = {
         ifShow: '表示するかどうか',
         menu: 'メニュー',
         confirmMessage: 'ページは更新されて、高度なメニューリストを更新します。続く？',
+        recoverMessage: 'ページが更新され、メニューリストが初期状態に戻ります。続行しますか？',
         compressPassword: '圧縮パスワード',
         backupRecoverMessage: '圧縮または減圧パスワードを入力してください（設定しないように空白のままにしてください）',
     },

@@ -94,6 +94,9 @@ export const updateSetting = (param: Setting.SettingUpdate) => {
 export const updateMenu = (param: Setting.SettingUpdate) => {
     return http.post(`/core/settings/menu/update`, param);
 };
+export const defaultMenu = () => {
+    return http.post(`/core/settings/menu/default`);
+};
 export const updateProxy = (params: Setting.ProxyUpdate) => {
     let request = deepCopy(params) as Setting.ProxyUpdate;
     if (request.proxyPasswd) {

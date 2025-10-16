@@ -1928,6 +1928,7 @@ const message = {
         ifShow: '표시 여부',
         menu: '메뉴',
         confirmMessage: '고급 메뉴 목록을 업데이트하려면 페이지가 새로 고쳐집니다. 계속하시겠습니까?',
+        recoverMessage: '페이지가 새로고침되어 메뉴 목록이 초기 상태로 복원됩니다. 계속하시겠습니까?',
         compressPassword: '압축 비밀번호',
         backupRecoverMessage: '압축 또는 압축 해제 비밀번호를 입력하세요 (설정하지 않으려면 비워 두세요)',
     },

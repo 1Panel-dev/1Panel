@@ -63,6 +63,7 @@ type ISettingService interface {
 
 	UpdateAppstoreConfig(req dto.AppstoreUpdate) error
 	GetAppstoreConfig() (*dto.AppstoreConfig, error)
+	DefaultMenu() error
 }
 
 func NewISettingService() ISettingService {
@@ -763,4 +764,8 @@ func checkProxy(req dto.ProxyUpdate) error {
 	}
 	defer resp.Body.Close()
 	return nil
+}
+
+func (u *SettingService) DefaultMenu() error {
+	return settingRepo.DefaultMenu()
 }

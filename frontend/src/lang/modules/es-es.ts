@@ -2052,6 +2052,8 @@ const message = {
         ifShow: 'Mostrar o no',
         menu: 'Menú',
         confirmMessage: 'La página se actualizará para refrescar la lista de menús avanzados. ¿Deseas continuar?',
+        recoverMessage:
+            'La página se actualizará y la lista de menús se restaurará a su estado inicial. ¿Desea continuar?',
         compressPassword: 'Contraseña de compresión',
         backupRecoverMessage:
             'Introduce la contraseña de compresión o descompresión (déjalo en blanco para no establecerla)',

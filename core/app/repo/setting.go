@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/1Panel-dev/1Panel/core/app/model"
 	"github.com/1Panel-dev/1Panel/core/global"
+	"github.com/1Panel-dev/1Panel/core/init/migration/helper"
 	"gorm.io/gorm"
 )
 
@@ -16,6 +17,7 @@ type ISettingRepo interface {
 	Create(key, value string) error
 	Update(key, value string) error
 	UpdateOrCreate(key, value string) error
+	DefaultMenu() error
 }
 
 func NewISettingRepo() ISettingRepo {
@@ -72,4 +74,10 @@ func (u *SettingRepo) UpdateOrCreate(key, value string) error {
 		return result.Error
 	}
 	return global.DB.Model(&setting).UpdateColumn("value", value).Error
+}
+
+func (u *SettingRepo) DefaultMenu() error {
+	return global.DB.Model(&model.Setting{}).
+		Where("key = ?", "HideMenu").
+		Update("value", helper.LoadMenus()).Error
 }

@@ -2020,6 +2020,7 @@ const message = {
         ifShow: 'Sama ada untuk Dipaparkan',
         menu: 'Menu',
         confirmMessage: 'Halaman akan disegarkan untuk mengemas kini senarai menu lanjutan. Teruskan?',
+        recoverMessage: 'Halaman akan disegarkan dan senarai menu akan dipulihkan ke keadaan asal. Teruskan?',
         compressPassword: 'Kata laluan mampatan',
         backupRecoverMessage:
             'Sila masukkan kata laluan mampatan atau nyahmampatan (biarkan kosong jika tidak menetapkan)',

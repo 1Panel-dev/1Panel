@@ -1903,6 +1903,7 @@ const message = {
         ifShow: '是否显示',
         menu: '菜单',
         confirmMessage: '即将刷新页面更新高级功能菜单列表，是否继续？',
+        recoverMessage: '即将刷新页面恢复菜单列表到初始状态，是否继续？',
         compressPassword: '压缩密码',
         backupRecoverMessage: '请输入压缩或解压缩密码（留空则不设置）',
     },

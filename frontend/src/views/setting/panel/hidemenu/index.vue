@@ -31,6 +31,7 @@
         </el-tree>
         <template #footer>
             <span class="dialog-footer">
+                <el-button @click="defaultHideMenus">{{ $t('commons.button.setDefault') }}</el-button>
                 <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
                 <el-button :disabled="loading" type="primary" @click="saveHideMenus">
                     {{ $t('commons.button.confirm') }}
@@ -44,7 +45,7 @@
 import { reactive, ref } from 'vue';
 import { AllowDropType, ElMessageBox, RenderContentContext } from 'element-plus';
 import i18n from '@/lang';
-import { updateMenu } from '@/api/modules/setting';
+import { defaultMenu, updateMenu } from '@/api/modules/setting';
 import { MsgSuccess } from '@/utils/message';
 import { GlobalStore } from '@/store';
 import { ArrowRight } from '@element-plus/icons-vue';
@@ -190,6 +191,24 @@ const saveHideMenus = async () => {
     }).then(async () => {
         const updateJson = JSON.stringify(treeData.hideMenu);
         await updateMenu({ key: 'HideMenu', value: updateJson })
+            .then(async () => {
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                loading.value = false;
+                drawerVisible.value = false;
+                window.location.reload();
+            })
+            .catch(() => {
+                loading.value = false;
+            });
+    });
+};
+const defaultHideMenus = async () => {
+    ElMessageBox.confirm(i18n.global.t('setting.recoverMessage'), i18n.global.t('setting.menuSetting'), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+        type: 'info',
+    }).then(async () => {
+        await defaultMenu()
             .then(async () => {
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 loading.value = false;

@@ -2066,6 +2066,8 @@ const message = {
         ifShow: 'Gösterme Durumu',
         menu: 'Menü',
         confirmMessage: 'Gelişmiş menü listesini güncellemek için sayfa yenilenecek. Devam etmek istiyor musunuz?',
+        recoverMessage:
+            'Sayfa yenilenecek ve menü listesi başlangıç durumuna geri yüklenecektir. Devam etmek istiyor musunuz?',
         compressPassword: 'Sıkıştırma parolası',
         backupRecoverMessage: 'Lütfen sıkıştırma veya sıkıştırma açma parolasını girin (ayarlamamak için boş bırakın)',
     },

@@ -1910,6 +1910,7 @@ const message = {
         ifShow: '是否顯示',
         menu: '選單',
         confirmMessage: '即將重新整理頁面更新進階功能選單列表，是否繼續？',
+        recoverMessage: '即将重新整理頁面，並恢復選單列表至初始狀態。是否繼續？',
         compressPassword: '壓縮密碼',
         backupRecoverMessage: '請輸入壓縮或解壓縮密碼（留空則不設定）',
     },

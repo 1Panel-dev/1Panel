@@ -307,7 +307,7 @@
                                                                 </span>
                                                             </el-tooltip>
                                                             <el-icon
-                                                                class="hidden group-hover:block"
+                                                                class="hidden group-hover:block cursor-pointer"
                                                                 v-if="!row.isDir"
                                                                 @click="jump(row.path)"
                                                             >

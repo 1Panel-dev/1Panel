@@ -2011,6 +2011,8 @@ const message = {
         ifShow: 'Exibir?',
         menu: 'Menu',
         confirmMessage: 'A página será atualizada para atualizar a lista de menus avançados. Continuar?',
+        recoverMessage:
+            'A página será atualizada e a lista de menus será restaurada ao estado inicial. Deseja continuar?',
         compressPassword: 'Senha de compressão',
         backupRecoverMessage:
             'Por favor, insira a senha de compressão ou descompressão (deixe em branco para não definir)',

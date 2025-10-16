@@ -27,6 +27,7 @@ func (s *SettingRouter) InitRouter(Router *gin.RouterGroup) {
 		settingRouter.POST("/terminal/update", baseApi.UpdateTerminalSetting)
 		settingRouter.GET("/interface", baseApi.LoadInterfaceAddr)
 		settingRouter.POST("/menu/update", baseApi.UpdateMenu)
+		settingRouter.POST("/menu/default", baseApi.DefaultMenu)
 		settingRouter.POST("/proxy/update", baseApi.UpdateProxy)
 		settingRouter.POST("/bind/update", baseApi.UpdateBindInfo)
 		settingRouter.POST("/port/update", baseApi.UpdatePort)
