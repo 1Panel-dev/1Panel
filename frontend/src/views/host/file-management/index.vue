@@ -1,5 +1,5 @@
 <template>
-    <div @dragover="handleDragover" @drop="handleDrop" @dragleave="handleDragleave">
+    <div class="h-full" @dragover="handleDragover" @drop="handleDrop" @dragleave="handleDragleave">
         <el-tabs
             type="card"
             class="file-tabs"
