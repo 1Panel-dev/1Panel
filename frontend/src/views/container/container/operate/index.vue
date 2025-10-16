@@ -28,7 +28,7 @@
                                 </el-button>
                                 <el-form-item class="mt-5" :label="$t('commons.table.name')" prop="name">
                                     <el-input
-                                        :disabled="isFromApp(form)"
+                                        :disabled="!isCreate"
                                         class="mini-form-item"
                                         clearable
                                         v-model.trim="form.name"
@@ -378,8 +378,8 @@ import {
     updateContainer,
     loadResourceLimit,
     listNetwork,
-    searchContainer,
     loadContainerInfo,
+    searchContainer,
 } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
 import { MsgError } from '@/utils/message';
@@ -387,7 +387,7 @@ import TaskLog from '@/components/log/task/index.vue';
 import { checkIpV4V6, checkPort, newUUID } from '@/utils/util';
 import router from '@/routers';
 import TerminalDialog from '@/views/host/file-management/terminal/index.vue';
-import { routerToName } from '@/utils/router';
+import { routerToName, routerToNameWithQuery } from '@/utils/router';
 
 const loading = ref(false);
 const isCreate = ref();
@@ -395,7 +395,6 @@ const confirmRef = ref();
 const volumeRef = ref();
 const form = reactive<Container.ContainerHelper>({
     taskID: '',
-    containerID: '',
     name: '',
     image: '',
     imageInput: false,
@@ -431,7 +430,7 @@ const form = reactive<Container.ContainerHelper>({
 const search = async () => {
     if (!isCreate.value) {
         loading.value = true;
-        await loadContainerInfo(form.containerID)
+        await loadContainerInfo(form.name)
             .then((res) => {
                 loading.value = false;
                 form.name = res.data.name;
@@ -520,6 +519,7 @@ const goBack = () => {
 };
 const closeTask = () => {
     taskLogRef.value.handleClose();
+    checkExist();
 };
 const dialogTerminalRef = ref();
 const toTerminal = () => {
@@ -621,7 +621,6 @@ const submit = async () => {
                 openTaskLog(form.taskID);
             })
             .catch(() => {
-                updateContainerID();
                 loading.value = false;
             });
     }
@@ -629,24 +628,6 @@ const submit = async () => {
 
 const openTaskLog = (taskID: string) => {
     taskLogRef.value.openWithTaskID(taskID);
-};
-
-const updateContainerID = async () => {
-    let params = {
-        page: 1,
-        pageSize: 1,
-        state: 'all',
-        name: form.name,
-        filters: '',
-        orderBy: 'createdAt',
-        order: 'null',
-    };
-    await searchContainer(params).then((res) => {
-        if (res.data.items?.length === 1) {
-            form.containerID = res.data.items[0].containerID;
-            return;
-        }
-    });
 };
 
 const checkPortValid = () => {
@@ -727,10 +708,31 @@ const splitStringIgnoringQuotes = (input) => {
     return result;
 };
 
+const checkExist = async () => {
+    let params = {
+        page: 1,
+        pageSize: 1,
+        state: 'all',
+        name: form.name,
+        filters: '',
+        orderBy: 'createdAt',
+        order: 'null',
+    };
+    await searchContainer(params).then((res) => {
+        if (res.data.items?.length === 1) {
+            isCreate.value = false;
+            routerToNameWithQuery('ContainerCreate', { name: form.name, t: Date.now() });
+            return;
+        } else {
+            isCreate.value = true;
+        }
+    });
+};
+
 onMounted(() => {
-    if (router.currentRoute.value.query.containerID) {
+    if (router.currentRoute.value.query.name) {
         isCreate.value = false;
-        form.containerID = String(router.currentRoute.value.query.containerID);
+        form.name = String(router.currentRoute.value.query.name);
     } else {
         isCreate.value = true;
     }

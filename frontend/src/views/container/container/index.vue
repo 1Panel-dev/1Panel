@@ -594,8 +594,8 @@ function loadMemValue(t: number) {
     return Number((t / Math.pow(num, 3)).toFixed(2));
 }
 
-const onContainerOperate = async (containerID: string) => {
-    routerToNameWithQuery('ContainerCreate', { containerID: containerID });
+const onContainerOperate = async (container: string) => {
+    routerToNameWithQuery('ContainerCreate', { name: container });
 };
 
 const dialogMonitorRef = ref();
@@ -701,7 +701,7 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
         click: (row: Container.ContainerInfo) => {
-            onContainerOperate(row.containerID);
+            onContainerOperate(row.name);
         },
     },
     {

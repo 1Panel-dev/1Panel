@@ -9,7 +9,7 @@
     >
         <template #content>
             <el-alert :closable="false" :title="$t('terminal.localConnJump')" type="info" />
-            <Terminal class="mt-2" style="height: calc(100vh - 160px)" ref="terminalRef"></Terminal>
+            <Terminal class="mt-2" style="height: calc(100vh - 170px)" ref="terminalRef"></Terminal>
             <div>
                 <el-cascader
                     v-model="quickCmd"

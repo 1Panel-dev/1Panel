@@ -55,7 +55,6 @@ export namespace Container {
     }
     export interface ContainerHelper {
         taskID: string;
-        containerID: string;
         name: string;
         image: string;
         imageInput: boolean;
