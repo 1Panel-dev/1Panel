@@ -23,28 +23,31 @@
             <Sidebar @menu-click="handleMenuClick" :menu-router="!classObj.openMenuTabs" @open-task="openTask" />
         </div>
 
-        <div class="main-container">
+        <el-watermark
+            v-if="globalStore.isMasterProductPro && globalStore.watermark"
+            :content="loadContent()"
+            :font="{
+                fontSize: globalStore.watermark.fontSize,
+                color: globalStore.watermark.color,
+                textBaseline: 'top',
+            }"
+            :rotate="globalStore.watermark.rotate"
+            :gap="[globalStore.watermark.gap, globalStore.watermark.gap]"
+        >
+            <div class="main-container">
+                <mobile-header v-if="classObj.mobile" />
+                <Tabs v-if="classObj.openMenuTabs" />
+                <app-main :keep-alive="classObj.openMenuTabs ? tabsStore.cachedTabs : null" class="app-main" />
+                <Footer class="app-footer" v-if="!globalStore.isFullScreen" />
+            </div>
+        </el-watermark>
+        <div class="main-container" v-else>
             <mobile-header v-if="classObj.mobile" />
             <Tabs v-if="classObj.openMenuTabs" />
-            <el-watermark
-                v-if="globalStore.isMasterProductPro && globalStore.watermark"
-                :content="loadContent()"
-                :font="{
-                    fontSize: globalStore.watermark.fontSize,
-                    color: globalStore.watermark.color,
-                    textBaseline: 'top',
-                }"
-                :rotate="globalStore.watermark.rotate"
-                :gap="[globalStore.watermark.gap, globalStore.watermark.gap]"
-            >
-                <div class="app-main">
-                    <app-main :keep-alive="classObj.openMenuTabs ? tabsStore.cachedTabs : null" />
-                </div>
-            </el-watermark>
-            <app-main class="app-main" v-else :keep-alive="classObj.openMenuTabs ? tabsStore.cachedTabs : null" />
-            <Footer :class="[!classObj.mobile ? 'app-footer' : '']" v-if="!globalStore.isFullScreen" />
-            <TaskList ref="taskListRef" />
+            <app-main :keep-alive="classObj.openMenuTabs ? tabsStore.cachedTabs : null" class="app-main" />
+            <Footer class="app-footer" v-if="!globalStore.isFullScreen" />
         </div>
+        <TaskList ref="taskListRef" />
     </div>
 </template>
 
@@ -213,7 +216,6 @@ onMounted(() => {
     padding: 7px 20px;
     flex: 1;
     overflow: auto;
-    margin-bottom: 50px;
 }
 .app-sidebar {
     z-index: 2;
@@ -229,15 +231,7 @@ onMounted(() => {
         z-index: 5;
     }
 }
-.app-footer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    margin-left: 180px;
-    width: calc(100% - 180px);
-    text-align: center;
-    z-index: 1000;
-}
+
 .hideSidebar {
     .main-container {
         margin-left: var(--panel-menu-hide-width);
@@ -247,10 +241,6 @@ onMounted(() => {
     }
     .fixed-header {
         width: calc(100% - var(--panel-menu-hide-width));
-    }
-    .app-footer {
-        margin-left: 75px;
-        width: calc(100% - 75px);
     }
 }
 

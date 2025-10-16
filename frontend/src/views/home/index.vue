@@ -166,7 +166,7 @@
                 <el-carousel
                     class="my-carousel"
                     :key="simpleNodes.length"
-                    height="346px"
+                    height="368px"
                     :indicator-position="showSimpleNode() ? '' : 'none'"
                     arrow="never"
                 >
@@ -177,7 +177,7 @@
                             </template>
                             <template #body>
                                 <el-scrollbar>
-                                    <el-descriptions :column="1" class="ml-5 -mt-2" border>
+                                    <el-descriptions :column="1" class="ml-5 -mt-2 h-systemInfo" border>
                                         <el-descriptions-item
                                             class-name="system-content"
                                             label-class-name="system-label"
@@ -263,7 +263,7 @@
                     <el-carousel-item key="simpleNode" v-if="showSimpleNode()">
                         <CardWithHeader :header="$t('setting.panel')">
                             <template #body>
-                                <el-scrollbar height="266px">
+                                <el-scrollbar height="286px">
                                     <div class="simple-node cursor-pointer" v-for="row in simpleNodes" :key="row.id">
                                         <el-row :gutter="5">
                                             <el-col :span="21">
@@ -746,7 +746,7 @@ onBeforeUnmount(() => {
 
 .h-systemInfo {
     margin-left: 18px;
-    height: 286px;
+    height: 306px;
 }
 @-moz-document url-prefix() {
     .h-systemInfo {

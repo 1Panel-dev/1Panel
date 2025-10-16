@@ -75,34 +75,79 @@
             </span>
         </el-col>
         <el-col :xs="12" :sm="12" :md="6" :lg="6" :xl="6" align="center">
-            <el-popover placement="bottom" :width="160" trigger="hover" v-if="chartsOption['memory']">
-                <el-tag style="font-weight: 500">{{ $t('home.mem') }}:</el-tag>
-                <el-tag class="tagClass">{{ $t('home.total') }}: {{ computeSize(currentInfo.memoryTotal) }}</el-tag>
-                <el-tag class="tagClass">{{ $t('home.used') }}: {{ computeSize(currentInfo.memoryUsed) }}</el-tag>
-                <el-tag class="tagClass">{{ $t('home.free') }}: {{ computeSize(currentInfo.memoryFree) }}</el-tag>
-                <el-tag class="tagClass">{{ $t('home.shard') }}: {{ computeSize(currentInfo.memoryShard) }}</el-tag>
-                <el-tag class="tagClass">{{ $t('home.cache') }}: {{ computeSize(currentInfo.memoryCache) }}</el-tag>
-                <el-tag class="tagClass">
-                    {{ $t('home.available') }}: {{ computeSize(currentInfo.memoryAvailable) }}
-                </el-tag>
-                <el-tag class="tagClass">
-                    {{ $t('home.percent') }}: {{ formatNumber(currentInfo.memoryUsedPercent) }}%
-                </el-tag>
-                <div v-if="currentInfo.swapMemoryTotal" class="mt-2">
-                    <el-tag style="font-weight: 500">{{ $t('home.swapMem') }}:</el-tag>
-                    <el-tag class="tagClass">
-                        {{ $t('home.total') }}: {{ computeSize(currentInfo.swapMemoryTotal) }}
-                    </el-tag>
-                    <el-tag class="tagClass">
-                        {{ $t('home.used') }}: {{ computeSize(currentInfo.swapMemoryUsed) }}
-                    </el-tag>
-                    <el-tag class="tagClass">
-                        {{ $t('home.free') }}: {{ computeSize(currentInfo.swapMemoryAvailable) }}
-                    </el-tag>
-                    <el-tag class="tagClass">
-                        {{ $t('home.percent') }}: {{ formatNumber(currentInfo.swapMemoryUsedPercent) }}%
-                    </el-tag>
-                </div>
+            <el-popover
+                placement="bottom"
+                :width="currentInfo.swapMemoryTotal ? 360 : 160"
+                trigger="hover"
+                v-if="chartsOption['memory']"
+            >
+                <el-row :gutter="5">
+                    <el-col :span="12">
+                        <el-row>
+                            <el-tag style="font-weight: 500">{{ $t('home.mem') }}:</el-tag>
+                        </el-row>
+                        <el-row>
+                            <el-tag class="tagClass">
+                                {{ $t('home.total') }}: {{ computeSize(currentInfo.memoryTotal) }}
+                            </el-tag>
+                        </el-row>
+                        <el-row>
+                            <el-tag class="tagClass">
+                                {{ $t('home.used') }}: {{ computeSize(currentInfo.memoryUsed) }}
+                            </el-tag>
+                        </el-row>
+                        <el-row>
+                            <el-tag class="tagClass">
+                                {{ $t('home.free') }}: {{ computeSize(currentInfo.memoryFree) }}
+                            </el-tag>
+                        </el-row>
+                        <el-row>
+                            <el-tag class="tagClass">
+                                {{ $t('home.shard') }}: {{ computeSize(currentInfo.memoryShard) }}
+                            </el-tag>
+                        </el-row>
+                        <el-row>
+                            <el-tag class="tagClass">
+                                {{ $t('home.cache') }}: {{ computeSize(currentInfo.memoryCache) }}
+                            </el-tag>
+                        </el-row>
+                        <el-row>
+                            <el-tag class="tagClass">
+                                {{ $t('home.available') }}: {{ computeSize(currentInfo.memoryAvailable) }}
+                            </el-tag>
+                        </el-row>
+                        <el-row>
+                            <el-tag class="tagClass">
+                                {{ $t('home.percent') }}: {{ formatNumber(currentInfo.memoryUsedPercent) }}%
+                            </el-tag>
+                        </el-row>
+                    </el-col>
+                    <el-col :span="12" v-if="currentInfo.swapMemoryTotal" class="mt-20">
+                        <el-row>
+                            <el-tag style="font-weight: 500">{{ $t('home.swapMem') }}:</el-tag>
+                        </el-row>
+                        <el-row>
+                            <el-tag class="tagClass">
+                                {{ $t('home.total') }}: {{ computeSize(currentInfo.swapMemoryTotal) }}
+                            </el-tag>
+                        </el-row>
+                        <el-row>
+                            <el-tag class="tagClass">
+                                {{ $t('home.used') }}: {{ computeSize(currentInfo.swapMemoryUsed) }}
+                            </el-tag>
+                        </el-row>
+                        <el-row>
+                            <el-tag class="tagClass">
+                                {{ $t('home.free') }}: {{ computeSize(currentInfo.swapMemoryAvailable) }}
+                            </el-tag>
+                        </el-row>
+                        <el-row>
+                            <el-tag class="tagClass">
+                                {{ $t('home.percent') }}: {{ formatNumber(currentInfo.swapMemoryUsedPercent) }}%
+                            </el-tag>
+                        </el-row>
+                    </el-col>
+                </el-row>
                 <template #reference>
                     <v-charts
                         height="160px"
@@ -274,11 +319,6 @@ const showMore = ref(false);
 const totalCount = ref();
 
 const baseInfo = ref<Dashboard.BaseInfo>({
-    websiteNumber: 0,
-    databaseNumber: 0,
-    cronjobNumber: 0,
-    appInstalledNumber: 0,
-
     hostname: '',
     os: '',
     platform: '',
@@ -294,6 +334,7 @@ const baseInfo = ref<Dashboard.BaseInfo>({
     cpuLogicalCores: 0,
     cpuModelName: '',
     currentInfo: null,
+    quickJump: [],
 });
 const currentInfo = ref<Dashboard.CurrentInfo>({
     uptime: 0,
