@@ -37,7 +37,7 @@ const req = reactive({
 });
 const open = ref(false);
 const data = ref([]);
-const em = defineEmits(['close', 'jump', 'toFavorite']);
+const em = defineEmits(['close', 'jump', 'to-favorite']);
 
 const handleClose = () => {
     open.value = false;
@@ -46,7 +46,7 @@ const handleClose = () => {
 
 const toFavorite = (row: File.Favorite) => {
     open.value = false;
-    em('toFavorite', row);
+    em('to-favorite', row);
 };
 const openDir = (url: string) => {
     open.value = false;

@@ -100,7 +100,8 @@ const search = async () => {
     });
     let rstMenuList: RouteRecordRaw[] = [];
     let resMenuList: RouteRecordRaw[] = [];
-    for (const menu of menuStore.menuList) {
+    resMenuList = adjustAndCleanMenu(hideMenu, menuStore.menuList);
+    for (const menu of resMenuList) {
         let menuItem = JSON.parse(JSON.stringify(menu));
         if (!showMap[menuItem.name]) {
             continue;
@@ -133,8 +134,7 @@ const search = async () => {
         const indexB = rootMap.get(labelB) ?? Infinity;
         return indexA - indexB;
     });
-    resMenuList = adjustAndCleanMenu(hideMenu, rstMenuList);
-    menuStore.menuList = resMenuList;
+    menuStore.menuList = rstMenuList;
 };
 
 function buildIndexMap(list: any[]): Map<string, number> {
@@ -177,7 +177,15 @@ function adjustAndCleanMenu(menuItem, list) {
             if (!matched) continue;
 
             if (Array.isArray(ref.children) && ref.children.length > 0) {
+                const childMap = buildIndexMap(ref.children || []);
                 matched.children = buildTree(ref.children);
+                matched.children.sort((a, b) => {
+                    const labelA = a.name;
+                    const labelB = b.name;
+                    const indexA = childMap.get(labelA) ?? Infinity;
+                    const indexB = childMap.get(labelB) ?? Infinity;
+                    return indexA - indexB;
+                });
             } else {
                 delete matched.children;
             }

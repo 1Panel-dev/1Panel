@@ -51,7 +51,7 @@
                 highlight-current-row
                 height="40vh"
                 @row-click="handleRowClick"
-                class="cursor-pointer"
+                class="cursor-pointer dialog-file-list"
             >
                 <el-table-column prop="name" show-overflow-tooltip fix>
                     <template #default="{ row }">
@@ -441,5 +441,8 @@ defineExpose({
         overflow: hidden;
         text-overflow: ellipsis;
     }
+}
+:deep(.dialog-file-list .el-table__body tr.current-row > td.el-table__cell) {
+    background-color: var(--panel-main-bg-color-4);
 }
 </style>

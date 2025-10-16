@@ -642,7 +642,7 @@
         <Detail ref="detailRef" />
         <DeleteFile ref="deleteRef" @close="search" />
         <RecycleBin ref="recycleBinRef" @close="search" />
-        <Favorite ref="favoriteRef" @close="search" @jump="jump" @toFavorite="toFavorite" />
+        <Favorite ref="favoriteRef" @close="search" @jump="jump" @to-favorite="toFavorite" />
         <BatchRole ref="batchRoleRef" @close="search" />
         <VscodeOpenDialog ref="dialogVscodeOpenRef" />
         <Preview ref="previewRef" />
