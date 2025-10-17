@@ -89,7 +89,7 @@
                                 :label="$t('commons.table.type')"
                                 show-overflow-tooltip
                                 prop="type"
-                                width="60"
+                                width="70"
                             ></el-table-column>
                             <el-table-column :label="$t('commons.button.log')" prop="log" min-width="160">
                                 <template #default="{ row }">
@@ -100,20 +100,15 @@
                             </el-table-column>
                             <el-table-column :label="$t('commons.table.message')" prop="status" width="100">
                                 <template #default="{ row }">
-                                    <el-tooltip :content="row.message" placement="top">
-                                        <el-button
-                                            :type="
-                                                row.status === 'FAILED'
-                                                    ? 'danger'
-                                                    : row.status === 'SUCCESS'
-                                                    ? 'success'
-                                                    : 'default'
-                                            "
-                                            link
-                                        >
-                                            {{ row.status }}
+                                    <el-tooltip v-if="row.status === 'FAILED'" :content="row.message" placement="top">
+                                        <el-button type="danger" link>
+                                            {{ $t('commons.status.' + row.status.toLowerCase()) }}
                                         </el-button>
                                     </el-tooltip>
+
+                                    <el-button v-else :type="row.status === 'SUCCESS' ? 'success' : 'default'" link>
+                                        {{ $t('commons.status.' + row.status.toLowerCase()) }}
+                                    </el-button>
                                 </template>
                             </el-table-column>
                         </ComplexTable>

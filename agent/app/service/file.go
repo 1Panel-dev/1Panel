@@ -779,66 +779,67 @@ func (f *FileService) ConvertLog(req dto.PageInfo) (total int64, data []response
 	}
 	defer file.Close()
 
+	const chunkSize = 64 * 1024
 	stat, err := file.Stat()
 	if err != nil {
 		return 0, nil, err
 	}
-	size := stat.Size()
+	fileSize := stat.Size()
 
-	buffer := make([]byte, 1)
-	var line strings.Builder
-	var lines []response.FileConvertLog
-	var lineCount int64
+	var (
+		buf       []byte
+		remainder []byte
+		offset    = fileSize
+		lines     []string
+	)
 
-	skipCount := int64((req.Page - 1) * req.PageSize)
+	pageStart := int64((req.Page - 1) * req.PageSize)
+	pageEnd := pageStart + int64(req.PageSize)
 
-	for offset := size - 1; offset >= 0; offset-- {
-		_, err := file.ReadAt(buffer, offset)
-		if err != nil {
+	for offset > 0 {
+		readSize := chunkSize
+		if offset < int64(readSize) {
+			readSize = int(offset)
+		}
+		offset -= int64(readSize)
+
+		tmp := make([]byte, readSize)
+		if _, err := file.ReadAt(tmp, offset); err != nil && err != io.EOF {
+			return 0, nil, err
+		}
+
+		buf = append(tmp, remainder...)
+		linesSplit := strings.Split(string(buf), "\n")
+
+		if offset > 0 {
+			remainder = []byte(linesSplit[0])
+			linesSplit = linesSplit[1:]
+		}
+
+		for i := len(linesSplit) - 1; i >= 0; i-- {
+			line := strings.TrimSpace(linesSplit[i])
+			if line == "" {
+				continue
+			}
+			total++
+			if total > pageStart && total <= pageEnd {
+				lines = append(lines, line)
+			}
+			if total >= pageEnd {
+				break
+			}
+		}
+		if total >= pageEnd {
 			break
 		}
-
-		if buffer[0] == '\n' {
-			text := reverse(line.String())
-			line.Reset()
-			if text == "" {
-				continue
-			}
-
-			var entry response.FileConvertLog
-			if err := json.Unmarshal([]byte(text), &entry); err != nil {
-				continue
-			}
-
-			if lineCount >= skipCount && len(lines) < req.PageSize {
-				lines = append(lines, entry)
-			}
-			lineCount++
-		} else {
-			line.WriteByte(buffer[0])
-		}
 	}
 
-	if line.Len() > 0 {
-		text := reverse(line.String())
+	for _, line := range lines {
 		var entry response.FileConvertLog
-		if err := json.Unmarshal([]byte(text), &entry); err == nil {
-			if lineCount >= skipCount && len(lines) < req.PageSize {
-				lines = append(lines, entry)
-			}
-			lineCount++
+		if err := json.Unmarshal([]byte(line), &entry); err == nil {
+			data = append(data, entry)
 		}
 	}
 
-	total = lineCount
-	data = lines
 	return total, data, nil
-}
-
-func reverse(s string) string {
-	runes := []rune(s)
-	for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
-		runes[i], runes[j] = runes[j], runes[i]
-	}
-	return string(runes)
 }
