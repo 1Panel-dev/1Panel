@@ -5,7 +5,7 @@
             :content="loadContent()"
             :font="{
                 fontSize: form.fontSize,
-                color: form.color,
+                color: globalStore.isDarkTheme ? form.darkColor : form.lightColor,
                 textBaseline: 'top',
             }"
             :rotate="form.rotate"
@@ -23,8 +23,11 @@
                     <el-input clearable v-model.trim="form.content" />
                     <span class="input-help">{{ $t('setting.contentHelper') }}</span>
                 </el-form-item>
-                <el-form-item :label="$t('setting.watermarkColor')" prop="color">
-                    <el-color-picker v-model="form.color" show-alpha />
+                <el-form-item :label="$t('setting.light')" prop="lightColor">
+                    <el-color-picker v-model="form.lightColor" show-alpha />
+                </el-form-item>
+                <el-form-item :label="$t('setting.dark')" prop="darkColor">
+                    <el-color-picker v-model="form.darkColor" show-alpha />
                 </el-form-item>
                 <el-form-item :label="$t('setting.watermarkFont')" prop="fontSize">
                     <el-slider v-model="form.fontSize" :min="12" :max="100" />
@@ -62,7 +65,8 @@ const drawerVisible = ref();
 const loading = ref();
 
 let form = reactive({
-    color: globalStore.isDarkTheme ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.15)',
+    lightColor: 'rgba(0, 0, 0, 0.15)',
+    darkColor: 'rgba(255, 255, 255, 0.15)',
     fontSize: 16,
     content: '${nodeName} - ${nodeAddr}',
     rotate: -22,
@@ -92,7 +96,8 @@ const loadContent = () => {
 };
 
 const setDefault = () => {
-    form.color = globalStore.isDarkTheme ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.15)';
+    form.lightColor = 'rgba(0, 0, 0, 0.15)';
+    form.darkColor = 'rgba(255, 255, 255, 0.15)';
     form.fontSize = 16;
     form.content = '${nodeName} - ${nodeAddr}';
     form.rotate = -22;
@@ -115,7 +120,8 @@ const onSave = async (formEl: FormInstance | undefined) => {
                     loading.value = false;
                     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                     globalStore.watermark = {
-                        color: form.color,
+                        lightColor: form.lightColor,
+                        darkColor: form.darkColor,
                         fontSize: form.fontSize,
                         content: form.content,
                         rotate: form.rotate,

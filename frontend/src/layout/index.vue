@@ -28,7 +28,7 @@
             :content="loadContent()"
             :font="{
                 fontSize: globalStore.watermark.fontSize,
-                color: globalStore.watermark.color,
+                color: globalStore.isDarkTheme ? globalStore.watermark.darkColor : globalStore.watermark.lightColor,
                 textBaseline: 'top',
             }"
             :rotate="globalStore.watermark.rotate"

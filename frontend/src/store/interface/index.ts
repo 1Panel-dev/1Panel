@@ -18,7 +18,8 @@ export interface ThemeConfigProp {
 }
 
 export interface Watermark {
-    color: string;
+    lightColor: string;
+    darkColor: string;
     fontSize: number;
     content: string;
     rotate: number;
