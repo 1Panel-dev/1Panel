@@ -199,21 +199,21 @@
                                 <el-tab-pane :label="$t('terminal.command')">
                                     <el-row :gutter="20">
                                         <el-col :xs="24" :sm="20" :md="20" :lg="20" :xl="20">
-                                            <el-form-item label="Command" prop="cmdStr">
-                                                <el-input
-                                                    v-model="form.cmdStr"
-                                                    :placeholder="$t('container.cmdHelper')"
-                                                />
+                                            <el-form-item label="Command" prop="cmd">
+                                                <el-input-tag draggable v-model="form.cmd" />
+                                                <span class="input-help">{{ $t('container.cmdHelper') }}</span>
                                             </el-form-item>
                                         </el-col>
                                     </el-row>
                                     <el-row :gutter="20">
                                         <el-col :xs="24" :sm="20" :md="20" :lg="20" :xl="20">
-                                            <el-form-item label="Entrypoint" prop="entrypointStr">
-                                                <el-input
-                                                    v-model="form.entrypointStr"
-                                                    :placeholder="$t('container.entrypointHelper')"
+                                            <el-form-item label="Entrypoint" prop="entrypoint">
+                                                <el-input-tag
+                                                    draggable
+                                                    v-model="form.entrypoint"
+                                                    placeholder="docker-entrypoint.sh"
                                                 />
+                                                <span class="input-help">{{ $t('container.cmdHelper') }}</span>
                                             </el-form-item>
                                         </el-col>
                                     </el-row>
@@ -406,8 +406,6 @@ const form = reactive<Container.ContainerHelper>({
     ipv4: '',
     ipv6: '',
     dns: [],
-    cmdStr: '',
-    entrypointStr: '',
     memoryItem: 0,
     cmd: [],
     workingDir: '',
@@ -453,27 +451,8 @@ const search = async () => {
                 form.user = res.data.user;
                 form.workingDir = res.data.workingDir;
 
-                let itemCmd = '';
                 form.cmd = res.data.cmd || [];
-                for (const item of form.cmd) {
-                    if (item.indexOf(' ') !== -1) {
-                        itemCmd += `"${escapeQuotes(item)}" `;
-                    } else {
-                        itemCmd += item + ' ';
-                    }
-                }
-                form.cmdStr = itemCmd.trimEnd();
-                let itemEntrypoint = '';
                 form.entrypoint = res.data.entrypoint || [];
-                for (const item of form.entrypoint) {
-                    if (item.indexOf(' ') !== -1) {
-                        itemEntrypoint += `"${escapeQuotes(item)}" `;
-                    } else {
-                        itemEntrypoint += item + ' ';
-                    }
-                }
-                form.entrypointStr = itemEntrypoint.trimEnd();
-
                 form.labels = res.data.labels || [];
                 form.env = res.data.env || [];
                 form.exposedPorts = res.data.exposedPorts || [];
@@ -579,21 +558,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     });
 };
 const submit = async () => {
-    form.cmd = [];
     form.taskID = newUUID();
-    if (form.cmdStr) {
-        let itemCmd = splitStringIgnoringQuotes(form.cmdStr);
-        for (const item of itemCmd) {
-            form.cmd.push(item.replace(/(?<!\\)"/g, '').replaceAll('\\"', '"'));
-        }
-    }
-    form.entrypoint = [];
-    if (form.entrypointStr) {
-        let itemEntrypoint = splitStringIgnoringQuotes(form.entrypointStr);
-        for (const item of itemEntrypoint) {
-            form.entrypoint.push(item.replace(/(?<!\\)"/g, '').replaceAll('\\"', '"'));
-        }
-    }
     if (form.publishAllPorts) {
         form.exposedPorts = [];
     } else {
@@ -685,27 +650,6 @@ const isFromApp = (rowData: Container.ContainerHelper) => {
         return rowData.labels.indexOf('createdBy=Apps') > -1;
     }
     return false;
-};
-
-const escapeQuotes = (input) => {
-    return input.replace(/(?<!\\)"/g, '\\"');
-};
-
-const splitStringIgnoringQuotes = (input) => {
-    input = input.replace(/\\"/g, '<quota>');
-    const regex = /"([^"]*)"|(\S+)/g;
-    const result = [];
-    let match;
-
-    while ((match = regex.exec(input)) !== null) {
-        if (match[1]) {
-            result.push(match[1].replaceAll('<quota>', '\\"'));
-        } else if (match[2]) {
-            result.push(match[2].replaceAll('<quota>', '\\"'));
-        }
-    }
-
-    return result;
 };
 
 const checkExist = async () => {

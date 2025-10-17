@@ -66,8 +66,6 @@ export namespace Container {
         ipv4: string;
         ipv6: string;
         dns: Array<string>;
-        cmdStr: string;
-        entrypointStr: string;
         memoryItem: number;
         cmd: Array<string>;
         workingDir: string;
