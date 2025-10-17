@@ -4,6 +4,7 @@
         <div
             :style="{ opacity: backgroundOpacity, width: containerWidth, height: containerHeight }"
             class="bg-white shadow-lg relative z-10 border border-gray-200 flex overflow-hidden"
+            id="login-container"
         >
             <div class="grid grid-cols-1 md:grid-cols-2 items-stretch w-full">
                 <div v-if="showLogo" class="flex justify-center" :style="{ height: containerHeight }">
