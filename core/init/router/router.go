@@ -31,8 +31,9 @@ func setWebStatic(rootRouter *gin.RouterGroup) {
 	rootRouter.StaticFS("/public", http.FS(web.Favicon))
 	rootRouter.StaticFS("/favicon.ico", http.FS(web.Favicon))
 	RegisterImages(rootRouter)
+	setStaticResource(rootRouter)
 	rootRouter.GET("/assets/*filepath", func(c *gin.Context) {
-		c.Writer.Header().Set("Cache-Control", fmt.Sprintf("private, max-age=%d", 3600))
+		c.Writer.Header().Set("Cache-Control", fmt.Sprintf("private, max-age=%d", 2628000))
 		if c.Request.URL.Path[len(c.Request.URL.Path)-1] == '/' {
 			c.AbortWithStatus(http.StatusForbidden)
 			return
@@ -131,5 +132,20 @@ func RegisterImages(rootRouter *gin.RouterGroup) {
 		_, _ = f.Seek(0, io.SeekStart)
 		c.Header("Content-Type", mimeType)
 		_, _ = io.Copy(c.Writer, f)
+	})
+}
+
+func setStaticResource(rootRouter *gin.RouterGroup) {
+	rootRouter.GET("/api/v2/static/*filename", func(c *gin.Context) {
+		c.Writer.Header().Set("Cache-Control", fmt.Sprintf("private, max-age=%d", 2628000))
+		filename := c.Param("filename")
+		filePath := "static" + filename
+		data, err := web.Static.ReadFile(filePath)
+		if err != nil {
+			c.AbortWithStatus(http.StatusNotFound)
+			return
+		}
+		c.Writer.Header().Set("Content-Type", "application/json; charset=utf-8")
+		c.Writer.Write(data)
 	})
 }

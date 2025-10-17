@@ -10,3 +10,6 @@ var Assets embed.FS
 
 //go:embed favicon.png
 var Favicon embed.FS
+
+//go:embed static/*
+var Static embed.FS
