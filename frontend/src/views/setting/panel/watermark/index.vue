@@ -21,7 +21,7 @@
             >
                 <el-form-item :label="$t('setting.watermarkContent')" prop="content">
                     <el-input clearable v-model.trim="form.content" />
-                    <span class="input-help">{{ $t('setting.contentHelper') }}</span>
+                    <span class="input-help">{{ $t('setting.contentHelper', ['${nodeName}', '${nodeAddr}']) }}</span>
                 </el-form-item>
                 <el-form-item :label="$t('setting.light')" prop="lightColor">
                     <el-color-picker v-model="form.lightColor" show-alpha />

@@ -1633,7 +1633,7 @@ const message = {
         watermark: 'Tetapan Tanda Air',
         watermarkContent: 'Kandungan Tanda Air',
         contentHelper:
-            'Petua: ${nodeName} mewakili nama nod, ${nodeAddr} mewakili alamat nod. Anda boleh menggunakan pembolehubah atau mengisi nama tersuai.',
+            '{0} mewakili nama nod, {1} mewakili alamat nod. Anda boleh menggunakan pembolehubah atau mengisi nama tersuai.',
         watermarkColor: 'Warna Tanda Air',
         watermarkFont: 'Saiz Fon Tanda Air',
         watermarkHeight: 'Ketinggian Tanda Air',

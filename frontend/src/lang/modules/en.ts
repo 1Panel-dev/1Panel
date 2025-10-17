@@ -1643,7 +1643,7 @@ const message = {
         watermark: 'Watermark Settings',
         watermarkContent: 'Watermark Content',
         contentHelper:
-            'Tip: ${nodeName} represents node name, ${nodeAddr} represents node address. You can use variables or fill in custom names.',
+            '{0} represents node name, {1} represents node address. You can use variables or fill in custom names.',
         watermarkColor: 'Watermark Color',
         watermarkFont: 'Watermark Font Size',
         watermarkHeight: 'Watermark Height',

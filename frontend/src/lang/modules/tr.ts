@@ -1663,7 +1663,7 @@ const message = {
         watermark: 'Filigran Ayarları',
         watermarkContent: 'Filigran İçeriği',
         contentHelper:
-            'İpucu: ${nodeName} düğüm adını, ${nodeAddr} düğüm adresini temsil eder. Değişkenleri kullanabilir veya özel adlar girebilirsiniz.',
+            '{0} düğüm adını, {1} düğüm adresini temsil eder. Değişkenleri kullanabilir veya özel adlar girebilirsiniz.',
         watermarkColor: 'Filigran Rengi',
         watermarkFont: 'Filigran Yazı Tipi Boyutu',
         watermarkHeight: 'Filigran Yüksekliği',

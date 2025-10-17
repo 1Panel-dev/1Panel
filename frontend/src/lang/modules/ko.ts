@@ -1568,7 +1568,7 @@ const message = {
         watermark: '워터마크 설정',
         watermarkContent: '워터마크 내용',
         contentHelper:
-            '팁: ${nodeName}은 노드 이름, ${nodeAddr}은 노드 주소를 나타냅니다. 변수를 사용하거나 사용자 정의 이름을 입력할 수 있습니다.',
+            '{0} 은 노드 이름, {1} 은 노드 주소를 나타냅니다. 변수를 사용하거나 사용자 정의 이름을 입력할 수 있습니다.',
         watermarkColor: '워터마크 색상',
         watermarkFont: '워터마크 글꼴 크기',
         watermarkHeight: '워터마크 높이',
