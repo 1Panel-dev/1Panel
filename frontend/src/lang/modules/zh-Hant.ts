@@ -698,6 +698,10 @@ const message = {
             npxHelper: '適合 npx 或者 二進制啟動的 mcp',
             uvxHelper: '適合 uvx 啟動的 mcp',
         },
+        tensorRT: {
+            llm: 'TensorRT LLM',
+            modelDir: '模型目錄',
+        },
     },
     container: {
         create: '建立容器',

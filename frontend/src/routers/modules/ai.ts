@@ -12,9 +12,9 @@ const databaseRouter = {
     },
     children: [
         {
-            path: '/ai/model',
+            path: '/ai/model/ollama',
             name: 'OllamaModel',
-            component: () => import('@/views/ai/model/index.vue'),
+            component: () => import('@/views/ai/model/ollama/index.vue'),
             meta: {
                 icon: 'p-moxing-menu',
                 title: 'aiTools.model.model',
@@ -38,6 +38,17 @@ const databaseRouter = {
             meta: {
                 icon: 'p-gpu-menu',
                 title: 'aiTools.gpu.gpu',
+                requiresAuth: true,
+            },
+        },
+        {
+            path: '/ai/model/tensorrt',
+            hidden: true,
+            name: 'TensorRTLLm',
+            component: () => import('@/views/ai/model/tensorrt/index.vue'),
+            meta: {
+                title: 'aiTools.tensorRT.llm',
+                activeMenu: '/ai/model/ollama',
                 requiresAuth: true,
             },
         },

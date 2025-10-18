@@ -627,3 +627,10 @@ var UpdateWebsiteSSLAddColumn = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddTensorRTLLMModel = &gormigrate.Migration{
+	ID: "20251018-add-tensorrt-llm-model",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(&model.TensorRTLLM{})
+	},
+}

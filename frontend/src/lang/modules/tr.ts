@@ -733,6 +733,10 @@ const message = {
             npxHelper: 'npx veya ikili dosya ile başlatılan mcp için uygundur',
             uvxHelper: 'uvx ile başlatılan mcp için uygundur',
         },
+        tensorRT: {
+            llm: 'TensorRT LLM',
+            modelDir: 'Model Dizini',
+        },
     },
     container: {
         create: 'Oluştur',

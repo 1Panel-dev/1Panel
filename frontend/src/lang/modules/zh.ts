@@ -697,6 +697,10 @@ const message = {
             npxHelper: '适合 npx 或者 二进制启动的 mcp',
             uvxHelper: '适合 uvx 启动的 mcp',
         },
+        tensorRT: {
+            llm: 'TensorRT LLM',
+            modelDir: '模型目录',
+        },
     },
     container: {
         create: '创建容器',

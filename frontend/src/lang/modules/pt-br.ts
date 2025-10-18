@@ -721,6 +721,10 @@ const message = {
             npxHelper: 'Adequado para mcp iniciado com npx ou binário',
             uvxHelper: 'Adequado para mcp iniciado com uvx',
         },
+        tensorRT: {
+            llm: 'TensorRT LLM',
+            modelDir: 'Diretório do Modelo',
+        },
     },
     container: {
         create: 'Criar contêiner',

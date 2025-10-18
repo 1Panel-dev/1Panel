@@ -46,6 +46,7 @@ type SystemDir struct {
 	SSLLogDir             string
 	McpDir                string
 	ConvertLogDir         string
+	TensorRTLLMDir        string
 }
 
 type LogConfig struct {

@@ -71,3 +71,23 @@ export const getMcpDomain = () => {
 export const updateMcpDomain = (req: AI.McpBindDomainUpdate) => {
     return http.post(`/ai/mcp/domain/update`, req);
 };
+
+export const pageTensorRTLLM = (req: AI.TensorRTLLMSearch) => {
+    return http.post<ResPage<AI.TensorRTLLMDTO>>(`/ai/tensorrt/search`, req);
+};
+
+export const createTensorRTLLM = (req: AI.TensorRTLLM) => {
+    return http.post(`/ai/tensorrt/create`, req);
+};
+
+export const updateTensorRTLLM = (req: AI.TensorRTLLM) => {
+    return http.post(`/ai/tensorrt/update`, req);
+};
+
+export const deleteTensorRTLLM = (req: AI.TensorRTLLMDelete) => {
+    return http.post(`/ai/tensorrt/delete`, req);
+};
+
+export const operateTensorRTLLM = (req: AI.TensorRTLLMOperate) => {
+    return http.post(`/ai/tensorrt/operate`, req);
+};

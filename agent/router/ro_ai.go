@@ -33,5 +33,11 @@ func (a *AIToolsRouter) InitRouter(Router *gin.RouterGroup) {
 		aiToolsRouter.POST("/mcp/domain/bind", baseApi.BindMcpDomain)
 		aiToolsRouter.GET("/mcp/domain/get", baseApi.GetMcpBindDomain)
 		aiToolsRouter.POST("/mcp/domain/update", baseApi.UpdateMcpBindDomain)
+
+		aiToolsRouter.POST("/tensorrt/search", baseApi.PageTensorRTLLMs)
+		aiToolsRouter.POST("/tensorrt/create", baseApi.CreateTensorRTLLM)
+		aiToolsRouter.POST("/tensorrt/update", baseApi.UpdateTensorRTLLM)
+		aiToolsRouter.POST("/tensorrt/delete", baseApi.DeleteTensorRTLLM)
+		aiToolsRouter.POST("/tensorrt/operate", baseApi.OperateTensorRTLLM)
 	}
 }

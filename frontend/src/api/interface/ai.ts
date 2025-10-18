@@ -183,4 +183,35 @@ export namespace AI {
         containerName: string;
         environments: Environment[];
     }
+
+    export interface TensorRTLLM {
+        id?: number;
+        name: string;
+        containerName: string;
+        port: number;
+        version: string;
+        modelDir: string;
+        model: string;
+        hostIP: string;
+        status?: string;
+        message?: string;
+        createdAt?: string;
+    }
+
+    export interface TensorRTLLMDTO extends TensorRTLLM {
+        dir?: string;
+    }
+
+    export interface TensorRTLLMSearch extends ReqPage {
+        name: string;
+    }
+
+    export interface TensorRTLLMDelete {
+        id: number;
+    }
+
+    export interface TensorRTLLMOperate {
+        id: number;
+        operate: string;
+    }
 }

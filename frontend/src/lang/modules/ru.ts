@@ -719,6 +719,10 @@ const message = {
             npxHelper: 'Подходит для mcp, запущенного с помощью npx или бинарного файла',
             uvxHelper: 'Подходит для mcp, запущенного с помощью uvx',
         },
+        tensorRT: {
+            llm: 'TensorRT LLM',
+            modelDir: 'Каталог модели',
+        },
     },
     container: {
         create: 'Создать контейнер',

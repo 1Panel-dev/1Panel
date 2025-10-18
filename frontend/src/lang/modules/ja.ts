@@ -712,6 +712,10 @@ const message = {
             npxHelper: 'npx またはバイナリで起動する mcp に適しています',
             uvxHelper: 'uvx で起動する mcp に適しています',
         },
+        tensorRT: {
+            llm: 'TensorRT LLM',
+            modelDir: 'モデルディレクトリ',
+        },
     },
     container: {
         create: 'コンテナを作成します',

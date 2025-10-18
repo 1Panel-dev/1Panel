@@ -708,6 +708,10 @@ const message = {
             npxHelper: 'npx 또는 바이너리로 시작하는 mcp에 적합',
             uvxHelper: 'uvx로 시작하는 mcp에 적합',
         },
+        tensorRT: {
+            llm: 'TensorRT LLM',
+            modelDir: '모델 디렉토리',
+        },
     },
     container: {
         create: '컨테이너 만들기',

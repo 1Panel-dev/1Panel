@@ -725,6 +725,10 @@ const message = {
             npxHelper: 'Sesuai untuk mcp yang dimulakan dengan npx atau binari',
             uvxHelper: 'Sesuai untuk mcp yang dimulakan dengan uvx',
         },
+        tensorRT: {
+            llm: 'TensorRT LLM',
+            modelDir: 'Direktori Model',
+        },
     },
     container: {
         create: 'Cipta kontena',

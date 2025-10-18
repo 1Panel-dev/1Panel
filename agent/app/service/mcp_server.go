@@ -10,7 +10,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
-	"github.com/1Panel-dev/1Panel/agent/cmd/server/mcp"
+	"github.com/1Panel-dev/1Panel/agent/cmd/server/ai"
 	"github.com/1Panel-dev/1Panel/agent/cmd/server/nginx_conf"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
@@ -565,7 +565,7 @@ func handleEnv(mcpServer *model.McpServer) gotenv.Env {
 func handleCreateParams(mcpServer *model.McpServer, environments []request.Environment, volumes []request.Volume) error {
 	var composeContent []byte
 	if mcpServer.ID == 0 {
-		composeContent = mcp.DefaultMcpCompose
+		composeContent = ai.DefaultMcpCompose
 	} else {
 		composeContent = []byte(mcpServer.DockerCompose)
 	}
