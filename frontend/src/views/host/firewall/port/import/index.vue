@@ -159,7 +159,7 @@ const acceptParams = async (): Promise<void> => {
             strategy: '',
             info: '',
             page: 1,
-            pageSize: 10000, 
+            pageSize: 10000,
         });
         currentRules.value = res.data.items || [];
     } catch (error) {
