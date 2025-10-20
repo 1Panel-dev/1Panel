@@ -24,6 +24,14 @@
                         <el-button @click="onDelete(null)" plain :disabled="selects.length === 0">
                             {{ $t('commons.button.delete') }}
                         </el-button>
+                        <el-button-group>
+                            <el-button @click="onImport">
+                                {{ $t('commons.button.import') }}
+                            </el-button>
+                            <el-button :disabled="!data || data.length === 0" @click="onExport">
+                                {{ $t('commons.button.export') }}
+                            </el-button>
+                        </el-button-group>
                     </template>
                     <template #rightToolBar>
                         <TableSearch @search="search()" v-model:searchName="searchName" />
@@ -82,18 +90,21 @@
             </template>
         </OpDialog>
         <OperateDialog @search="search" ref="dialogRef" />
+        <ImportDialog @search="search" ref="dialogImportRef" />
     </div>
 </template>
 
 <script lang="ts" setup>
 import FireRouter from '@/views/host/firewall/index.vue';
 import OperateDialog from './operate/index.vue';
+import ImportDialog from './import/index.vue';
 import FireStatus from '@/views/host/firewall/status/index.vue';
 import { onMounted, reactive, ref } from 'vue';
 import { operateForwardRule, searchFireRule } from '@/api/modules/host';
 import { Host } from '@/api/interface/host';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
+import { downloadWithContent, getCurrentDateFormatted } from '@/utils/util';
 
 const loading = ref();
 const activeTag = ref('forward');
@@ -108,6 +119,7 @@ const fireName = ref();
 const fireStatusRef = ref();
 
 const opRef = ref();
+const dialogImportRef = ref();
 const forceDelete = ref(false);
 const operateRules = ref();
 
@@ -211,6 +223,24 @@ const onSubmitDelete = async () => {
         .catch(() => {
             loading.value = false;
         });
+};
+
+const onImport = () => {
+    dialogImportRef.value.acceptParams(fireName.value);
+};
+
+const onExport = () => {
+    const exportData = data.value.map((item: Host.RuleInfo) => ({
+        family: item.family,
+        protocol: item.protocol,
+        port: item.port,
+        targetIP: item.targetIP,
+        targetPort: item.targetPort,
+        interface: item.interface,
+    }));
+    const content = JSON.stringify(exportData, null, 2);
+    const fileName = `1panel-firewall-forward-${getCurrentDateFormatted()}.json`;
+    downloadWithContent(content, fileName);
 };
 
 const buttons = [

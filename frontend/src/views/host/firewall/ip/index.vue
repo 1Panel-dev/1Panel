@@ -25,6 +25,14 @@
                         <el-button @click="onDelete(null)" plain :disabled="selects.length === 0">
                             {{ $t('commons.button.delete') }}
                         </el-button>
+                        <el-button-group>
+                            <el-button @click="onImport">
+                                {{ $t('commons.button.import') }}
+                            </el-button>
+                            <el-button :disabled="!data || data.length === 0" @click="onExport">
+                                {{ $t('commons.button.export') }}
+                            </el-button>
+                        </el-button-group>
                     </template>
                     <template #rightToolBar>
                         <el-select v-model="searchStrategy" @change="search()" clearable class="p-w-200">
@@ -92,11 +100,13 @@
 
         <OpDialog ref="opRef" @search="search" />
         <OperateDialog @search="search" ref="dialogRef" />
+        <ImportDialog @search="search" ref="dialogImportRef" />
     </div>
 </template>
 
 <script lang="ts" setup>
 import OperateDialog from '@/views/host/firewall/ip/operate/index.vue';
+import ImportDialog from '@/views/host/firewall/ip/import/index.vue';
 import FireRouter from '@/views/host/firewall/index.vue';
 import FireStatus from '@/views/host/firewall/status/index.vue';
 import { onMounted, reactive, ref } from 'vue';
@@ -105,6 +115,7 @@ import { Host } from '@/api/interface/host';
 import { ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
+import { downloadWithContent, getCurrentDateFormatted } from '@/utils/util';
 
 const loading = ref();
 const activeTag = ref('address');
@@ -118,6 +129,7 @@ const isActive = ref(false);
 const fireStatusRef = ref();
 
 const opRef = ref();
+const dialogImportRef = ref();
 
 const data = ref();
 const paginationConfig = reactive({
@@ -246,6 +258,22 @@ const onDelete = async (row: Host.RuleIP | null) => {
         api: batchOperateRule,
         params: { type: 'address', rules: rules },
     });
+};
+
+const onImport = () => {
+    dialogImportRef.value.acceptParams();
+};
+
+const onExport = () => {
+    const exportData = data.value.map((item: Host.RuleInfo) => ({
+        family: item.family,
+        address: item.address,
+        strategy: item.strategy,
+        description: item.description,
+    }));
+    const content = JSON.stringify(exportData, null, 2);
+    const fileName = `1panel-firewall-ip-${getCurrentDateFormatted()}.json`;
+    downloadWithContent(content, fileName);
 };
 
 const buttons = [
