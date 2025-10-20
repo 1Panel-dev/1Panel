@@ -70,13 +70,17 @@ const acceptParams = (params: DialogProps): void => {
 type Node = RenderContentContext['node'];
 
 const allowDrag = (draggingNode: Node) => {
-    return !draggingNode.data.label.includes('Home-Menu') || draggingNode.level < 3;
+    const { label } = draggingNode.data;
+    const forbidden = ['Home-Menu'];
+    return draggingNode.level < 3 && !forbidden.some((key) => label.includes(key));
 };
 
 const allowDrop = (draggingNode: Node, dropNode: Node, type: AllowDropType) => {
     if (dropNode.data.label === 'Home-Menu') {
         return type !== 'prev' && type !== 'inner';
     }
+    const label = draggingNode.data.label;
+    const restricted = ['App-Menu', 'Setting-Menu'];
     const draggingHasChildren = draggingNode.childNodes?.length > 0;
     const isDraggingTooDeep = draggingNode.level > 2;
     const isDraggingFirstLevel = draggingNode.level === 1;
@@ -89,7 +93,7 @@ const allowDrop = (draggingNode: Node, dropNode: Node, type: AllowDropType) => {
         return false;
     }
 
-    if (isDropFirstLevel && dropHasChildren) {
+    if (isDropFirstLevel && dropHasChildren && !restricted.includes(label)) {
         return type === 'inner' || type === 'prev' || type === 'next';
     }
 
@@ -97,7 +101,12 @@ const allowDrop = (draggingNode: Node, dropNode: Node, type: AllowDropType) => {
         return type === 'prev' || type === 'next';
     }
 
-    if (isDraggingFirstLevel && draggingNode.childNodes?.length > 0 && dropNode.level !== 2) {
+    if (
+        isDraggingFirstLevel &&
+        draggingNode.childNodes?.length > 0 &&
+        dropNode.level !== 2 &&
+        !restricted.includes(label)
+    ) {
         return type === 'inner' || type === 'prev' || type === 'next';
     }
 
