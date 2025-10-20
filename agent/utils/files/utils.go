@@ -2,7 +2,6 @@ package files
 
 import (
 	"bufio"
-	"bytes"
 	"fmt"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
@@ -255,10 +254,12 @@ func IsEmptyDir(dir string) bool {
 }
 
 func DownloadFileWithProxy(url, dst string) error {
-	_, resp, err := req_helper.HandleRequest(url, http.MethodGet, constant.TimeOut5m)
+	resp, cancel, err := req_helper.RequestFile(url, http.MethodGet, constant.TimeOut5m)
 	if err != nil {
 		return err
 	}
+	defer cancel()
+	defer resp.Close()
 
 	out, err := os.Create(dst)
 	if err != nil {
@@ -266,8 +267,7 @@ func DownloadFileWithProxy(url, dst string) error {
 	}
 	defer out.Close()
 
-	reader := bytes.NewReader(resp)
-	if _, err = io.Copy(out, reader); err != nil {
+	if _, err = io.Copy(out, resp); err != nil {
 		return fmt.Errorf("save download file [%s] error, err %s", dst, err.Error())
 	}
 	return nil

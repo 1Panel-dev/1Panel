@@ -78,6 +78,31 @@ func HandleRequest(url, method string, timeout int) (int, []byte, error) {
 	return resp.StatusCode, body, nil
 }
 
+func RequestFile(url, method string, timeout int) (io.ReadCloser, context.CancelFunc, error) {
+	defer func() {
+		if r := recover(); r != nil {
+			global.LOG.Errorf("handle request failed, error message: %v", r)
+			return
+		}
+	}()
+	transport := xpack.LoadRequestTransport()
+	client := http.Client{Timeout: time.Duration(timeout) * time.Second, Transport: transport}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeout)*time.Second)
+	request, err := http.NewRequestWithContext(ctx, method, url, nil)
+	if err != nil {
+		return nil, cancel, err
+	}
+	request.Header.Set("Content-Type", "application/json")
+	resp, err := client.Do(request)
+	if err != nil {
+		return nil, cancel, err
+	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, cancel, errors.New(resp.Status)
+	}
+	return resp.Body, cancel, nil
+}
+
 func loadRequestTransport() *http.Transport {
 	return &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
