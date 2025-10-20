@@ -2856,7 +2856,7 @@ const message = {
         runtime: 'Runtime',
         workDir: 'Diretório de trabalho',
         create: 'Criar runtime',
-        localHelper: 'O ambiente local precisa ser instalado manualmente',
+        localHelper: 'Para problemas de instalação em ambiente local e uso em ambiente offline, consulte ',
         versionHelper: 'Versão do PHP, por exemplo, v8.0',
         buildHelper:
             'Quanto mais extensões, maior será o uso de CPU durante a criação da imagem. As extensões podem ser instaladas após a criação do ambiente.',

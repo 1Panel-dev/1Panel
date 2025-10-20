@@ -2913,7 +2913,7 @@ const message = {
         runtime: 'Çalışma Zamanı',
         workDir: 'Çalışma dizini',
         create: 'Oluştur',
-        localHelper: 'Yerel çalışma ortamı kendi kendine kurulmalıdır',
+        localHelper: 'Yerel ortam kurulumu ve çevrimdışı ortam kullanımı sorunları için lütfen bakın ',
         versionHelper: 'PHP sürümü, ör. v8.0',
         buildHelper:
             'Daha fazla eklenti seçilirse, görüntü oluşturma sürecinde CPU kullanımı artar. Tüm eklentileri seçmekten kaçının.',

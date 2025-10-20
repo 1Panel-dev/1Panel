@@ -168,7 +168,21 @@
             </div>
             <div v-else>
                 <el-form-item>
-                    <el-alert :title="$t('runtime.localHelper')" type="info" :closable="false" />
+                    <el-alert type="info" :closable="false">
+                        <template #title>
+                            <span>
+                                {{ $t('runtime.localHelper') }}
+                                <el-link
+                                    class="ml-1 text-xs"
+                                    type="primary"
+                                    target="_blank"
+                                    :href="globalStore.docsUrl + '/user_manual/websites/php/'"
+                                >
+                                    {{ $t('commons.button.helpDoc') }}
+                                </el-link>
+                            </span>
+                        </template>
+                    </el-alert>
                 </el-form-item>
                 <el-form-item :label="$t('app.version')" prop="version">
                     <el-input v-model="runtime.version" :placeholder="$t('runtime.versionHelper')"></el-input>

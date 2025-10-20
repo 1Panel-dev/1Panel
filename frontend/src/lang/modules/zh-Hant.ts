@@ -2672,7 +2672,7 @@ const message = {
         runtime: '執行環境',
         workDir: '工作目錄',
         create: '建立執行環境',
-        localHelper: '本機執行環境需要自行安裝',
+        localHelper: '本地環境安裝及離線環境使用相關問題，可參考 ',
         versionHelper: 'PHP的版本,例 v8.0',
         buildHelper: '擴展越多，製作映像檔時占用的 CPU 越高，可在建立環境後再安裝擴展。',
         openrestyWarn: 'PHP 需要升級  OpenResty 至 1.21.4.1 版本以上才能使用',

@@ -2850,7 +2850,8 @@ const message = {
         runtime: 'Runtime',
         workDir: 'Direktori kerja',
         create: 'Cipta runtime',
-        localHelper: 'Persekitaran operasi tempatan perlu dipasang sendiri',
+        localHelper:
+            'Untuk masalah pemasangan persekitaran tempatan dan penggunaan persekitaran luar talian, sila rujuk ',
         versionHelper: 'Versi PHP, contohnya v8.0',
         buildHelper:
             'Semakin banyak sambungan, semakin tinggi penggunaan CPU semasa membuat imej. Sambungan boleh dipasang selepas persekitaran dibuat.',

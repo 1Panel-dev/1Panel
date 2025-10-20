@@ -2873,7 +2873,7 @@ const message = {
         runtime: 'Runtime',
         workDir: 'Working directory',
         create: 'Create',
-        localHelper: 'The local operating environment needs to be installed by itself',
+        localHelper: 'For local environment installation and offline environment usage issues, please refer to ',
         versionHelper: 'PHP version, e.g. v8.0',
         buildHelper: `If more extensions are selected, the CPU usage will be higher during the image creation process. Avoid selecting all extensions.`,
         openrestyWarn: 'PHP needs to be upgraded to OpenResty to version 1.21.4.1 or later to use',

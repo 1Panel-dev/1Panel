@@ -2842,7 +2842,7 @@ const message = {
         runtime: 'Runtime',
         workDir: 'Directorio de trabajo',
         create: 'Crear',
-        localHelper: 'El entorno de ejecución local debe instalarse manualmente',
+        localHelper: 'Para problemas de instalación en entorno local y uso en entorno sin conexión, consulte ',
         versionHelper: 'Versión de PHP, ej. v8.0',
         buildHelper: `Si se seleccionan más extensiones, el uso de CPU será mayor durante el proceso de creación de la imagen. Evita seleccionar todas las extensiones.`,
         openrestyWarn: 'PHP necesita actualizarse a OpenResty versión 1.21.4.1 o superior para poder usarse',

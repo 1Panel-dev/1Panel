@@ -2736,7 +2736,7 @@ const message = {
         runtime: '실행 환경',
         workDir: '작업 디렉토리',
         create: '실행 환경 생성',
-        localHelper: '로컬 운영 환경은 직접 설치해야 합니다.',
+        localHelper: '로컬 환경 설치 및 오프라인 환경 사용 관련 문제는 다음을 참조하세요 ',
         versionHelper: 'PHP 버전, 예: v8.0',
         buildHelper:
             '확장 기능이 많을수록 이미지 생성 시 CPU 사용량이 증가합니다. 환경 생성 후 확장 기능을 설치하는 것도 가능합니다.',
