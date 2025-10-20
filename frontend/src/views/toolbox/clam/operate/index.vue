@@ -119,10 +119,12 @@
                     </el-form-item>
                     <div v-if="globalStore.isIntl">
                         <el-form-item v-if="(dialogData.rowData!.hasSpec) && !isProductPro">
-                            <span>{{ $t('toolbox.clam.alertHelper') }}</span>
-                            <el-button link type="primary" @click="toUpload">
-                                {{ $t('license.levelUpPro') }}
-                            </el-button>
+                            <span class="input-help logText">
+                                {{ $t('toolbox.clam.alertHelper') }}
+                                <el-link class="link" type="primary" @click="toUpload">
+                                    {{ $t('license.levelUpPro') }}
+                                </el-link>
+                            </span>
                         </el-form-item>
                     </div>
                     <div v-if="!globalStore.isIntl">
@@ -133,10 +135,12 @@
                         <el-form-item
                             v-if="(dialogData.rowData!.hasAlert || dialogData.rowData!.hasSpec) && !isProductPro"
                         >
-                            <span>{{ $t('toolbox.clam.alertHelper') }}</span>
-                            <el-button link type="primary" @click="toUpload">
-                                {{ $t('license.levelUpPro') }}
-                            </el-button>
+                            <span class="input-help logText">
+                                {{ $t('toolbox.clam.alertHelper') }}
+                                <el-link class="link" type="primary" @click="toUpload">
+                                    {{ $t('license.levelUpPro') }}
+                                </el-link>
+                            </span>
                         </el-form-item>
                         <el-form-item
                             :label="$t('xpack.alert.alertMethod')"
@@ -498,3 +502,13 @@ defineExpose({
     acceptParams,
 });
 </script>
+<style scoped lang="scss">
+.logText {
+    line-height: 22px;
+    font-size: 12px;
+    .link {
+        font-size: 12px !important;
+        margin-top: -3px;
+    }
+}
+</style>

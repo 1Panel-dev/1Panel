@@ -12,7 +12,7 @@
                 <TableSetting title="backup-account-refresh" @search="search()" />
             </template>
             <template #main>
-                <el-alert type="info" :closable="false" class="common-div">
+                <el-alert type="info" :closable="false" class="common-div" v-if="!globalStore.isFxplay">
                     <template #title>
                         <span>
                             {{ $t('setting.backupAlert') }}

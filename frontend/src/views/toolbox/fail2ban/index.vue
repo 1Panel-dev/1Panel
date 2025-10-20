@@ -38,7 +38,7 @@
 
         <div v-if="form.isExist">
             <LayoutContent title="Fail2ban" :divider="true">
-                <template #prompt>
+                <template #promp v-if="!globalStore.isFxplay">
                     <el-alert type="info" :closable="false">
                         <template #title>
                             {{ $t('toolbox.common.toolboxHelper') }}

@@ -138,7 +138,7 @@
                         <el-text v-if="isDemo" type="danger" class="demo">
                             {{ $t('commons.login.username') }}:demo {{ $t('commons.login.password') }}:1panel
                         </el-text>
-                        <el-form-item prop="agreeLicense" v-if="!isIntl">
+                        <el-form-item prop="agreeLicense" v-if="!isIntl && !isFxplay">
                             <el-checkbox v-model="loginForm.agreeLicense">
                                 <template #default>
                                     <span class="agree-title">
@@ -206,6 +206,7 @@ const errCaptcha = ref(false);
 const errMfaInfo = ref(false);
 const isDemo = ref(false);
 const isIntl = ref(true);
+const isFxplay = ref(false);
 const open = ref(false);
 const loginBtnLinkColor = ref<string | null>(null);
 
@@ -314,7 +315,7 @@ const login = (formEl: FormInstance | undefined) => {
     errCaptcha.value = false;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        if (isIntl.value) {
+        if (isIntl.value || isFxplay.value) {
             loginForm.agreeLicense = true;
         }
         if (!loginForm.agreeLicense) {
@@ -423,7 +424,8 @@ const getSetting = async () => {
         loginForm.language = res.data.language;
         handleCommand(loginForm.language);
         isIntl.value = res.data.isIntl;
-        globalStore.isIntl = isIntl.value;
+        isFxplay.value = res.data.isFxplay;
+        globalStore.isFxplay = isFxplay.value;
         globalStore.isOffLine = res.data.isOffLine;
 
         document.title = res.data.panelName;

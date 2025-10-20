@@ -30,6 +30,7 @@ export namespace Login {
     export interface LoginSetting {
         isDemo: boolean;
         isIntl: boolean;
+        isFxplay: boolean;
         language: string;
         menuTabs: string;
         panelName: string;

@@ -2,6 +2,7 @@ package v2
 
 import (
 	"encoding/base64"
+
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/core/app/dto"
 	"github.com/1Panel-dev/1Panel/core/app/model"
@@ -137,6 +138,7 @@ func (b *BaseApi) GetLoginSetting(c *gin.Context) {
 	res := &dto.LoginSetting{
 		IsDemo:    global.CONF.Base.IsDemo,
 		IsIntl:    global.CONF.Base.IsIntl,
+		IsFxplay:  global.CONF.Base.IsFxplay,
 		IsOffLine: global.CONF.Base.IsOffLine,
 		Language:  settingInfo.Language,
 		MenuTabs:  settingInfo.MenuTabs,

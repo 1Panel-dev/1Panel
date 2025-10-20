@@ -1,7 +1,7 @@
 <template>
     <div>
         <DrawerPro v-model="drawerVisible" header="IPv6" @close="handleClose" size="small">
-            <el-alert class="common-prompt" :closable="false" type="warning">
+            <el-alert class="common-prompt" :closable="false" type="warning" v-if="!globalStore.isFxplay">
                 <template #default>
                     <span class="input-help">
                         {{ $t('container.ipv6Helper') }}

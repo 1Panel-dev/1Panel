@@ -14,7 +14,7 @@
                             {{ $t('setting.apiInterfaceAlert3') }}
                         </el-link>
                     </li>
-                    <li>
+                    <li v-if="!globalStore.isFxplay">
                         <el-link :href="panelURL" type="warning" target="_blank" class="mb-0.5 ml-0.5">
                             {{ $t('setting.apiInterfaceAlert4') }}
                         </el-link>

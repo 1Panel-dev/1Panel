@@ -51,7 +51,11 @@
 
                         <template v-else-if="data.init">
                             <span>{{ $t('tool.supervisor.initHelper') }}</span>
-                            <span class="flex items-center justify-center gap-0.5" @click="toDoc()">
+                            <span
+                                v-if="!globalStore.isFxplay"
+                                class="flex items-center justify-center gap-0.5"
+                                @click="toDoc()"
+                            >
                                 <el-icon><Position /></el-icon>
                                 {{ $t('commons.button.helpDoc') }}
                             </span>

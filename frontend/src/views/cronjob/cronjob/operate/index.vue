@@ -218,7 +218,7 @@
                                         </el-button>
                                         <el-divider v-if="form.specs.length > 1" class="divider" />
                                     </div>
-                                    <span class="input-help logText">
+                                    <span class="input-help logText" v-if="!isFxplay">
                                         {{ $t('cronjob.cronSpecDoc') }}
                                         <el-link class="link" icon="Position" @click="toDoc" type="primary">
                                             {{ $t('firewall.quickJump') }}
@@ -797,7 +797,7 @@ const licenseRef = ref();
 const scriptFileRef = ref();
 const dirRef = ref();
 const fileRef = ref();
-const { isProductPro } = storeToRefs(globalStore);
+const { isProductPro, isFxplay } = storeToRefs(globalStore);
 const loading = ref();
 const nextTimes = ref([]);
 

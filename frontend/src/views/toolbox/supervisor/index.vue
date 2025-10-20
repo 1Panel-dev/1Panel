@@ -4,7 +4,7 @@
             <span>{{ $t('tool.supervisor.notStartWarn') }}</span>
         </el-card>
         <LayoutContent :title="$t('tool.supervisor.list', 2)" v-loading="loading">
-            <template #prompt>
+            <template #prompt v-if="!globalStore.isFxplay">
                 <el-alert type="info" :closable="false">
                     <template #title>
                         {{ $t('toolbox.common.toolboxHelper') }}

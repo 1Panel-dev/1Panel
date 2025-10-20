@@ -40,7 +40,7 @@
                     <el-option :label="$t('setting.UPYUN')" value="UPYUN"></el-option>
                 </el-select>
                 <span v-if="isALIYUNYUN()" class="input-help">{{ $t('setting.ALIYUNHelper') }}</span>
-                <span v-if="dialogData.rowData?.type === 'GoogleDrive'" class="input-help">
+                <span v-if="dialogData.rowData?.type === 'GoogleDrive' && !globalStore.isFxplay" class="input-help">
                     {{ $t('setting.googleHelper', [$t('setting.' + dialogData.rowData?.type)]) }}
                     <el-link
                         style="font-size: 12px; margin-left: 5px"
@@ -84,7 +84,7 @@
                 :rules="Rules.requiredInput"
             >
                 <el-input v-model="dialogData.rowData!.varsJson['address']" />
-                <span class="input-help">
+                <span class="input-help" v-if="!globalStore.isFxplay">
                     {{ $t('setting.WebDAVAlist') }}
                     <el-link
                         style="font-size: 12px; margin-left: 5px"
@@ -291,7 +291,7 @@
                         <el-button class="append-button" @click="loadFromTokenForAliyun()">
                             {{ $t('setting.analysis') }}
                         </el-button>
-                        <span class="input-help">
+                        <span class="input-help" v-if="!globalStore.isFxplay">
                             {{ $t('setting.analysisHelper') }}
                             <el-link
                                 style="font-size: 12px; margin-left: 5px"
@@ -318,7 +318,7 @@
                         <el-radio-button :value="false">{{ $t('setting.isNotCN') }}</el-radio-button>
                         <el-radio-button :value="true">{{ $t('setting.isCN') }}</el-radio-button>
                     </el-radio-group>
-                    <span class="input-help">
+                    <span class="input-help" v-if="!globalStore.isFxplay">
                         {{ $t('setting.onedrive_helper') }}
                         <el-link
                             style="font-size: 12px; margin-left: 5px"

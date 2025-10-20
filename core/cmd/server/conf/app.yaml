@@ -4,6 +4,7 @@ base:
   is_demo: false
   is_intl: false
   is_offline: false
+  is_fxplay: false
   port: 9999
   username: admin
   password: admin123

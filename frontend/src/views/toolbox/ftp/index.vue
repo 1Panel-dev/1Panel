@@ -24,7 +24,7 @@
         </div>
         <div v-if="form.isExist">
             <LayoutContent v-loading="loading" :title="$t('toolbox.ftp.ftp', 2)" :class="{ mask: !form.isActive }">
-                <template #prompt>
+                <template #prompt v-if="!globalStore.isFxplay">
                     <el-alert type="info" :closable="false">
                         <template #title>
                             {{ $t('toolbox.common.toolboxHelper') }}

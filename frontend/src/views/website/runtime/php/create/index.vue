@@ -134,6 +134,7 @@
                                         {{ $t('runtime.extendHelper') }}
                                     </span>
                                     <span
+                                        v-if="!globalStore.isFxplay"
                                         class="custom-link"
                                         @click="openLink(globalStore.docsUrl + '/user_manual/websites/php/#php_1')"
                                     >

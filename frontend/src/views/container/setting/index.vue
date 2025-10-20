@@ -69,7 +69,7 @@
                                     </template>
                                 </el-input>
                                 <span class="input-help">{{ $t('container.mirrorsHelper') }}</span>
-                                <span class="input-help flex flx-align-center">
+                                <span class="input-help flex flx-align-center" v-if="!globalStore.isFxplay">
                                     {{ $t('container.mirrorsHelper2') }}
                                     <el-link class="p-ml-5 text-xs" icon="Position" @click="toDoc()" type="primary">
                                         {{ $t('firewall.quickJump') }}

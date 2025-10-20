@@ -5,7 +5,7 @@
                 <el-alert type="info" :closable="false">
                     <template #title>
                         {{ $t('toolbox.clam.clamHelper') }}
-                        <el-link class="ml-1 text-xs" @click="toDoc()" type="primary">
+                        <el-link class="ml-1 text-xs" v-if="!globalStore.isFxplay" @click="toDoc()" type="primary">
                             {{ $t('commons.button.helpDoc') }}
                         </el-link>
                     </template>

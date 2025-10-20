@@ -3,15 +3,15 @@
         <div class="flex w-full flex-col gap-2 md:flex-row items-center">
             <div class="flex flex-wrap gap-y-2 items-center">
                 <span v-if="props.footer">
-                    <el-link type="primary" underline="never" @click="toForum">
+                    <el-link type="primary" underline="never" @click="toForum" v-if="!isFxplay">
                         <span class="font-normal">{{ $t('setting.forum') }}</span>
                     </el-link>
-                    <el-divider direction="vertical" />
+                    <el-divider direction="vertical" v-if="!isFxplay" />
                     <el-link type="primary" underline="never" @click="toDoc">
                         <span class="font-normal">{{ $t('setting.doc2') }}</span>
                     </el-link>
-                    <el-divider direction="vertical" />
-                    <el-link type="primary" underline="never" @click="toGithub">
+                    <el-divider direction="vertical" v-if="!isFxplay" />
+                    <el-link type="primary" underline="never" @click="toGithub" v-if="!isFxplay">
                         <span class="font-normal">{{ $t('setting.project') }}</span>
                     </el-link>
                     <el-divider direction="vertical" />
@@ -63,7 +63,7 @@ import { GlobalStore } from '@/store';
 import { storeToRefs } from 'pinia';
 
 const globalStore = GlobalStore();
-const { docsUrl, isOffLine } = storeToRefs(globalStore);
+const { docsUrl, isOffLine, isFxplay } = storeToRefs(globalStore);
 const upgradeRef = ref();
 const releasesRef = ref();
 const isMasterPro = computed(() => {

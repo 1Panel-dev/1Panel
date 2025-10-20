@@ -22,6 +22,7 @@
                     <el-link
                         target="_blank"
                         type="primary"
+                        v-if="!globalStore.isFxplay"
                         :href="globalStore.docsUrl + '/user_manual/websites/php/#php_1'"
                     >
                         {{ $t('php.toExtensionsList') }}

@@ -40,6 +40,7 @@ const GlobalStore = defineStore({
         currentRedisDB: '',
         showEntranceWarn: true,
         defaultNetwork: 'all',
+        isFxplay: false,
 
         isProductPro: false,
         isIntl: false,
