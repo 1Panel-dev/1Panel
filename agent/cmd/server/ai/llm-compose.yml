@@ -26,7 +26,7 @@ services:
         soft: 65535
         hard: 65535
       stack: 67108864
-    command: bach -c "trtllm-serve /models/${MODEL_NAME} --host 0.0.0.0 --port 8000"
+    command: bash -c "trtllm-serve /models/${MODEL_NAME} --host 0.0.0.0 --port 8000"
 networks:
   1panel-network:
     external: true
