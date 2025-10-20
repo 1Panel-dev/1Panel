@@ -56,10 +56,12 @@ var WebUrlMap = map[string]struct{}{
 	"/apps/upgrade":   {},
 	"/apps/setting":   {},
 
-	"/ai":       {},
-	"/ai/model": {},
-	"/ai/gpu":   {},
-	"/ai/mcp":   {},
+	"/ai":                {},
+	"/ai/model":          {},
+	"/ai/gpu":            {},
+	"/ai/mcp":            {},
+	"/ai/model/tensorrt": {},
+	"/ai/model/ollama":   {},
 
 	"/containers":                   {},
 	"/containers/container/operate": {},

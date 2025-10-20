@@ -9,12 +9,13 @@ type TensorRTLLMSearch struct {
 
 type TensorRTLLMCreate struct {
 	Name          string `json:"name" validate:"required"`
-	ContainerName string `json:"containerName"`
+	ContainerName string `json:"containerName"  validate:"required"`
 	Port          int    `json:"port" validate:"required"`
 	Version       string `json:"version"  validate:"required"`
 	ModelDir      string `json:"modelDir" validate:"required"`
 	Model         string `json:"model" validate:"required"`
 	HostIP        string `json:"hostIP"`
+	Image         string `json:"image"  validate:"required"`
 }
 
 type TensorRTLLMUpdate struct {

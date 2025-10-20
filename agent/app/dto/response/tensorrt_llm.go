@@ -13,4 +13,5 @@ type TensorRTLLMDTO struct {
 	Model    string `json:"model"`
 	Dir      string `json:"dir"`
 	ModelDir string `json:"modelDir"`
+	Image    string `json:"image"`
 }

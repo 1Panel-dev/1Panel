@@ -1,6 +1,6 @@
 services:
   tensorrt-llm:
-    image: nvcr.io/nvidia/tensorrt-llm/release:${VERSION}
+    image: ${IMAGE}:${VERSION}
     container_name: ${CONTAINER_NAME}
     restart: always
     runtime: nvidia

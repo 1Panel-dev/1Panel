@@ -7,6 +7,9 @@
             <el-form-item :label="$t('app.containerName')" prop="containerName">
                 <el-input v-model.trim="tensorRTLLM.containerName"></el-input>
             </el-form-item>
+            <el-form-item :label="$t('container.image')" prop="image">
+                <el-input v-model.trim="tensorRTLLM.image" />
+            </el-form-item>
             <el-form-item :label="$t('app.version')" prop="version">
                 <el-input v-model.trim="tensorRTLLM.version" />
             </el-form-item>
@@ -65,15 +68,10 @@ import i18n from '@/lang';
 import { ElForm, FormInstance } from 'element-plus';
 import DrawerPro from '@/components/drawer-pro/index.vue';
 import FileList from '@/components/file-list/index.vue';
-// import { AI } from '@/api/interface/ai';
 import { createTensorRTLLM, updateTensorRTLLM } from '@/api/modules/ai';
 import { MsgSuccess } from '@/utils/message';
 
 const loading = ref(false);
-
-// interface DialogProps {
-//     rowData?: AI.TensorRTLLM;
-// }
 const mode = ref('create');
 const drawerVisiable = ref(false);
 const newTensorRTLLM = () => {
@@ -81,10 +79,11 @@ const newTensorRTLLM = () => {
         name: '',
         containerName: '',
         port: 8000,
-        version: 'latest',
+        version: '1.2.0rc0',
         modelDir: '',
         model: '',
         hostIP: '',
+        image: 'nvcr.io/nvidia/tensorrt-llm/release',
     };
 };
 const modelDirRef = ref();
@@ -127,6 +126,7 @@ const rules = reactive({
     modelDir: [Rules.requiredInput],
     model: [Rules.requiredInput],
     containerName: [Rules.requiredInput],
+    image: [Rules.requiredInput],
 });
 
 const formRef = ref<FormInstance>();

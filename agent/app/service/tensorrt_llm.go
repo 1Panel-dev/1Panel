@@ -49,6 +49,7 @@ func (t TensorRTLLMService) Page(req request.TensorRTLLMSearch) response.TensorR
 		serverDTO.Model = env["MODEL_NAME"]
 		serverDTO.ModelDir = env["MODEL_PATH"]
 		serverDTO.Dir = path.Join(global.Dir.TensorRTLLMDir, item.Name)
+		serverDTO.Image = env["IMAGE"]
 		items = append(items, serverDTO)
 	}
 	res.Total = total
@@ -59,6 +60,7 @@ func (t TensorRTLLMService) Page(req request.TensorRTLLMSearch) response.TensorR
 func handleLLMParams(llm *model.TensorRTLLM) error {
 	var composeContent []byte
 	if llm.ID == 0 {
+		//nvcr.io/nvidia/tensorrt-llm/release
 		composeContent = ai.DefaultTensorrtLLMCompose
 	} else {
 		composeContent = []byte(llm.DockerCompose)
@@ -102,6 +104,7 @@ func handleLLMEnv(llm *model.TensorRTLLM, create request.TensorRTLLMCreate) gote
 	env["MODEL_PATH"] = create.ModelDir
 	env["MODEL_NAME"] = create.Model
 	env["VERSION"] = create.Version
+	env["IMAGE"] = create.Image
 	if create.HostIP != "" {
 		env["HOST_IP"] = create.HostIP
 	} else {
@@ -197,6 +200,7 @@ func (t TensorRTLLMService) Update(req request.TensorRTLLMUpdate) error {
 	newEnv["MODEL_PATH"] = req.ModelDir
 	newEnv["MODEL_NAME"] = req.Model
 	newEnv["VERSION"] = req.Version
+	newEnv["IMAGE"] = req.Image
 	if req.HostIP != "" {
 		newEnv["HOST_IP"] = req.HostIP
 	} else {
