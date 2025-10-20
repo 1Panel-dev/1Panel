@@ -86,9 +86,16 @@
                         v-if="currentFireName === 'ufw'"
                         :label="$t('firewall.forwardInboundInterface')"
                         :min-width="100"
+                        prop="interface"
                     >
                         <template #default="{ row }">
-                            <span>{{ row.interface === '' ? $t('commons.table.all') : row.interface }}</span>
+                            <span>
+                                {{
+                                    row.interface === '' || row.interface === 'all'
+                                        ? $t('commons.table.all')
+                                        : row.interface
+                                }}
+                            </span>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -112,7 +119,7 @@ import { ref } from 'vue';
 import { genFileId, UploadFile, UploadFiles, UploadProps, UploadRawFile } from 'element-plus';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
-import { operateForwardRule, searchFireRule } from '@/api/modules/host';
+import { operateForwardRule, searchFireRule, getNetworkOptions } from '@/api/modules/host';
 import { Host } from '@/api/interface/host';
 
 const emit = defineEmits<{ (e: 'search'): void }>();
@@ -123,6 +130,7 @@ const selects = ref<any>([]);
 const displayData = ref<any>([]);
 const currentRules = ref<Host.RuleInfo[]>([]);
 const currentFireName = ref('');
+const availableInterfaces = ref<string[]>([]);
 
 const uploadRef = ref();
 const uploaderFiles = ref();
@@ -146,7 +154,7 @@ const acceptParams = async (fireName: string): Promise<void> => {
     compareResult.value = { new: [], conflict: [], duplicate: [] };
     currentFireName.value = fireName;
 
-    // 获取当前所有规则用于比对
+    // Fetch all current rules for comparison
     loading.value = true;
     try {
         const res = await searchFireRule({
@@ -155,9 +163,15 @@ const acceptParams = async (fireName: string): Promise<void> => {
             strategy: '',
             info: '',
             page: 1,
-            pageSize: 10000, // 获取所有规则
+            pageSize: 10000, // Fetch all rules
         });
         currentRules.value = res.data.items || [];
+
+        // Fetch available network interfaces (UFW only)
+        if (fireName === 'ufw') {
+            const networkRes = await getNetworkOptions();
+            availableInterfaces.value = networkRes.data || [];
+        }
     } catch (error) {
         MsgError(i18n.global.t('commons.msg.searchFailed'));
     } finally {
@@ -187,7 +201,6 @@ const fileOnChange = (_uploadFile: UploadFile, uploadFiles: UploadFiles) => {
                 return;
             }
 
-            // 验证数据格式
             for (const item of parsed) {
                 if (!checkDataFormat(item)) {
                     MsgError(i18n.global.t('firewall.errImportFormat'));
@@ -196,7 +209,6 @@ const fileOnChange = (_uploadFile: UploadFile, uploadFiles: UploadFiles) => {
                 }
             }
 
-            // 比对规则
             compareRules(parsed);
             loading.value = false;
         } catch (error) {
@@ -221,6 +233,19 @@ const checkDataFormat = (item: any): boolean => {
     if (!['tcp', 'udp', 'tcp/udp'].includes(item.protocol)) {
         return false;
     }
+
+    // Validate network interface (UFW only)
+    if (currentFireName.value === 'ufw' && item.interface !== undefined && item.interface !== null) {
+        const interfaceValue = item.interface;
+        // Allow empty string or 'all' (represents all interfaces)
+        if (interfaceValue !== '' && interfaceValue !== 'all') {
+            // Must be in available interfaces list
+            if (!availableInterfaces.value.includes(interfaceValue)) {
+                return false;
+            }
+        }
+    }
+
     return true;
 };
 
@@ -232,17 +257,14 @@ const compareRules = (importedRules: any[]) => {
     for (const importedRule of importedRules) {
         const key = `${importedRule.protocol}:${importedRule.port}:${importedRule.targetIP}:${importedRule.targetPort}`;
 
-        // 查找是否存在相同的规则
         const existingRule = currentRules.value.find((rule) => {
             const existingKey = `${rule.protocol}:${rule.port}:${rule.targetIP}:${rule.targetPort}`;
             return existingKey === key;
         });
 
         if (!existingRule) {
-            // 新规则
             newRules.push({ ...importedRule, status: 'new' });
         } else {
-            // 完全重复的规则（转发规则一般不会有策略差异，所以只判断是否存在）
             duplicateRules.push({ ...importedRule, status: 'duplicate' });
         }
     }
@@ -253,7 +275,6 @@ const compareRules = (importedRules: any[]) => {
         duplicate: duplicateRules,
     };
 
-    // 显示所有规则供用户选择
     displayData.value = [...newRules, ...conflictRules, ...duplicateRules];
 };
 

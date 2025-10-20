@@ -151,7 +151,6 @@ const acceptParams = async (): Promise<void> => {
     selects.value = [];
     compareResult.value = { new: [], conflict: [], duplicate: [] };
 
-    // 获取当前所有规则用于比对
     loading.value = true;
     try {
         const res = await searchFireRule({
@@ -160,7 +159,7 @@ const acceptParams = async (): Promise<void> => {
             strategy: '',
             info: '',
             page: 1,
-            pageSize: 10000, // 获取所有规则
+            pageSize: 10000, 
         });
         currentRules.value = res.data.items || [];
     } catch (error) {
@@ -192,7 +191,6 @@ const fileOnChange = (_uploadFile: UploadFile, uploadFiles: UploadFiles) => {
                 return;
             }
 
-            // 验证数据格式
             for (const item of parsed) {
                 if (!checkDataFormat(item)) {
                     MsgError(i18n.global.t('firewall.errImportFormat'));
@@ -201,7 +199,6 @@ const fileOnChange = (_uploadFile: UploadFile, uploadFiles: UploadFiles) => {
                 }
             }
 
-            // 比对规则
             compareRules(parsed);
             loading.value = false;
         } catch (error) {
@@ -240,24 +237,20 @@ const compareRules = (importedRules: any[]) => {
     for (const importedRule of importedRules) {
         const key = `${importedRule.address || 'Anywhere'}:${importedRule.port}:${importedRule.protocol}`;
 
-        // 查找是否存在相同的规则
         const existingRule = currentRules.value.find((rule) => {
             const existingKey = `${rule.address || 'Anywhere'}:${rule.port}:${rule.protocol}`;
             return existingKey === key;
         });
 
         if (!existingRule) {
-            // 新规则
             newRules.push({ ...importedRule, status: 'new' });
         } else if (existingRule.strategy !== importedRule.strategy) {
-            // 冲突规则（端口、协议、地址相同，但策略不同）
             conflictRules.push({
                 ...importedRule,
                 status: 'conflict',
                 existingStrategy: existingRule.strategy,
             });
         } else {
-            // 完全重复的规则
             duplicateRules.push({ ...importedRule, status: 'duplicate' });
         }
     }
@@ -268,7 +261,6 @@ const compareRules = (importedRules: any[]) => {
         duplicate: duplicateRules,
     };
 
-    // 显示所有规则供用户选择
     displayData.value = [...newRules, ...conflictRules, ...duplicateRules];
 };
 
