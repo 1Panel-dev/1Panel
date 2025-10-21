@@ -10,12 +10,11 @@ type TensorRTLLMSearch struct {
 type TensorRTLLMCreate struct {
 	Name          string `json:"name" validate:"required"`
 	ContainerName string `json:"containerName"  validate:"required"`
-	Port          int    `json:"port" validate:"required"`
 	Version       string `json:"version"  validate:"required"`
 	ModelDir      string `json:"modelDir" validate:"required"`
-	Model         string `json:"model" validate:"required"`
-	HostIP        string `json:"hostIP"`
 	Image         string `json:"image"  validate:"required"`
+	Command       string `json:"command" validate:"required"`
+	DockerConfig
 }
 
 type TensorRTLLMUpdate struct {
@@ -30,4 +29,10 @@ type TensorRTLLMDelete struct {
 type TensorRTLLMOperate struct {
 	ID      uint   `json:"id" validate:"required"`
 	Operate string `json:"operate" validate:"required"`
+}
+
+type DockerConfig struct {
+	ExposedPorts []ExposedPort `json:"exposedPorts"`
+	Environments []Environment `json:"environments"`
+	Volumes      []Volume      `json:"volumes"`
 }

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/response"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
@@ -15,7 +16,9 @@ import (
 	"github.com/subosito/gotenv"
 	"gopkg.in/yaml.v3"
 	"path"
+	"regexp"
 	"strconv"
+	"strings"
 )
 
 type TensorRTLLMService struct{}
@@ -44,12 +47,67 @@ func (t TensorRTLLMService) Page(req request.TensorRTLLMSearch) response.TensorR
 		serverDTO := response.TensorRTLLMDTO{
 			TensorRTLLM: item,
 		}
-		env, _ := gotenv.Unmarshal(item.Env)
-		serverDTO.Version = env["VERSION"]
-		serverDTO.Model = env["MODEL_NAME"]
-		serverDTO.ModelDir = env["MODEL_PATH"]
+		envs, _ := gotenv.Unmarshal(item.Env)
+		serverDTO.Version = envs["VERSION"]
+		serverDTO.ModelDir = envs["MODEL_PATH"]
 		serverDTO.Dir = path.Join(global.Dir.TensorRTLLMDir, item.Name)
-		serverDTO.Image = env["IMAGE"]
+		serverDTO.Image = envs["IMAGE"]
+		serverDTO.Command = envs["COMMAND"]
+
+		for k, v := range envs {
+			if strings.Contains(k, "CONTAINER_PORT") || strings.Contains(k, "HOST_PORT") {
+				if strings.Contains(k, "CONTAINER_PORT") {
+					r := regexp.MustCompile(`_(\d+)$`)
+					matches := r.FindStringSubmatch(k)
+					containerPort, err := strconv.Atoi(v)
+					if err != nil {
+						continue
+					}
+					hostPort, err := strconv.Atoi(envs[fmt.Sprintf("HOST_PORT_%s", matches[1])])
+					if err != nil {
+						continue
+					}
+					hostIP := envs[fmt.Sprintf("HOST_IP_%s", matches[1])]
+					if hostIP == "" {
+						hostIP = "0.0.0.0"
+					}
+					serverDTO.ExposedPorts = append(serverDTO.ExposedPorts, request.ExposedPort{
+						ContainerPort: containerPort,
+						HostPort:      hostPort,
+						HostIP:        hostIP,
+					})
+				}
+			}
+		}
+
+		composeByte, err := files.NewFileOp().GetContent(path.Join(global.Dir.TensorRTLLMDir, item.Name, "docker-compose.yml"))
+		if err != nil {
+			continue
+		}
+		serverDTO.Environments, err = getDockerComposeEnvironments(composeByte)
+		if err != nil {
+			continue
+		}
+		volumes, err := getDockerComposeVolumes(composeByte)
+		if err != nil {
+			continue
+		}
+
+		var defaultVolumes = map[string]string{
+			"${MODEL_PATH}": "/models",
+		}
+		for _, volume := range volumes {
+			exist := false
+			for key, value := range defaultVolumes {
+				if key == volume.Source && value == volume.Target {
+					exist = true
+					break
+				}
+			}
+			if !exist {
+				serverDTO.Volumes = append(serverDTO.Volumes, volume)
+			}
+		}
 		items = append(items, serverDTO)
 	}
 	res.Total = total
@@ -57,10 +115,9 @@ func (t TensorRTLLMService) Page(req request.TensorRTLLMSearch) response.TensorR
 	return res
 }
 
-func handleLLMParams(llm *model.TensorRTLLM) error {
+func handleLLMParams(llm *model.TensorRTLLM, create request.TensorRTLLMCreate) error {
 	var composeContent []byte
 	if llm.ID == 0 {
-		//nvcr.io/nvidia/tensorrt-llm/release
 		composeContent = ai.DefaultTensorrtLLMCompose
 	} else {
 		composeContent = []byte(llm.DockerCompose)
@@ -88,6 +145,39 @@ func handleLLMParams(llm *model.TensorRTLLM) error {
 		delete(services, serviceName)
 	}
 
+	delete(serviceValue, "ports")
+	if len(create.ExposedPorts) > 0 {
+		var ports []interface{}
+		for i := range create.ExposedPorts {
+			containerPortStr := fmt.Sprintf("CONTAINER_PORT_%d", i)
+			hostPortStr := fmt.Sprintf("HOST_PORT_%d", i)
+			hostIPStr := fmt.Sprintf("HOST_IP_%d", i)
+			ports = append(ports, fmt.Sprintf("${%s}:${%s}:${%s}", hostIPStr, hostPortStr, containerPortStr))
+		}
+		serviceValue["ports"] = ports
+	}
+
+	delete(serviceValue, "environment")
+	var environments []interface{}
+	for _, e := range create.Environments {
+		environments = append(environments, fmt.Sprintf("%s=%s", e.Key, e.Value))
+	}
+	if len(environments) > 0 {
+		serviceValue["environment"] = environments
+	}
+
+	var volumes []interface{}
+	var defaultVolumes = map[string]string{
+		"${MODEL_PATH}": "/models",
+	}
+	for k, v := range defaultVolumes {
+		volumes = append(volumes, fmt.Sprintf("%s:%s", k, v))
+	}
+	for _, volume := range create.Volumes {
+		volumes = append(volumes, fmt.Sprintf("%s:%s", volume.Source, volume.Target))
+	}
+	serviceValue["volumes"] = volumes
+
 	services[llm.Name] = serviceValue
 	composeByte, err := yaml.Marshal(composeMap)
 	if err != nil {
@@ -100,15 +190,17 @@ func handleLLMParams(llm *model.TensorRTLLM) error {
 func handleLLMEnv(llm *model.TensorRTLLM, create request.TensorRTLLMCreate) gotenv.Env {
 	env := make(gotenv.Env)
 	env["CONTAINER_NAME"] = create.ContainerName
-	env["PANEL_APP_PORT_HTTP"] = strconv.Itoa(llm.Port)
 	env["MODEL_PATH"] = create.ModelDir
-	env["MODEL_NAME"] = create.Model
 	env["VERSION"] = create.Version
 	env["IMAGE"] = create.Image
-	if create.HostIP != "" {
-		env["HOST_IP"] = create.HostIP
-	} else {
-		env["HOST_IP"] = ""
+	env["COMMAND"] = create.Command
+	for i, port := range create.ExposedPorts {
+		containerPortStr := fmt.Sprintf("CONTAINER_PORT_%d", i)
+		hostPortStr := fmt.Sprintf("HOST_PORT_%d", i)
+		hostIPStr := fmt.Sprintf("HOST_IP_%d", i)
+		env[containerPortStr] = strconv.Itoa(port.ContainerPort)
+		env[hostPortStr] = strconv.Itoa(port.HostPort)
+		env[hostIPStr] = port.HostIP
 	}
 	envStr, _ := gotenv.Marshal(env)
 	llm.Env = envStr
@@ -118,9 +210,6 @@ func handleLLMEnv(llm *model.TensorRTLLM, create request.TensorRTLLMCreate) gote
 func (t TensorRTLLMService) Create(create request.TensorRTLLMCreate) error {
 	servers, _ := tensorrtLLMRepo.List()
 	for _, server := range servers {
-		if server.Port == create.Port {
-			return buserr.New("ErrPortInUsed")
-		}
 		if server.ContainerName == create.ContainerName {
 			return buserr.New("ErrContainerName")
 		}
@@ -128,8 +217,10 @@ func (t TensorRTLLMService) Create(create request.TensorRTLLMCreate) error {
 			return buserr.New("ErrNameIsExist")
 		}
 	}
-	if err := checkPortExist(create.Port); err != nil {
-		return err
+	for _, export := range create.ExposedPorts {
+		if err := checkPortExist(export.HostPort); err != nil {
+			return err
+		}
 	}
 	if err := checkContainerName(create.ContainerName); err != nil {
 		return err
@@ -143,11 +234,10 @@ func (t TensorRTLLMService) Create(create request.TensorRTLLMCreate) error {
 	tensorrtLLM := &model.TensorRTLLM{
 		Name:          create.Name,
 		ContainerName: create.ContainerName,
-		Port:          create.Port,
 		Status:        constant.StatusStarting,
 	}
 
-	if err := handleLLMParams(tensorrtLLM); err != nil {
+	if err := handleLLMParams(tensorrtLLM, create); err != nil {
 		return err
 	}
 	env := handleLLMEnv(tensorrtLLM, create)
@@ -174,11 +264,6 @@ func (t TensorRTLLMService) Update(req request.TensorRTLLMUpdate) error {
 	if err != nil {
 		return err
 	}
-	if tensorrtLLM.Port != req.Port {
-		if err := checkPortExist(req.Port); err != nil {
-			return err
-		}
-	}
 	if tensorrtLLM.ContainerName != req.ContainerName {
 		if err := checkContainerName(req.ContainerName); err != nil {
 			return err
@@ -186,31 +271,20 @@ func (t TensorRTLLMService) Update(req request.TensorRTLLMUpdate) error {
 	}
 
 	tensorrtLLM.ContainerName = req.ContainerName
-	tensorrtLLM.Port = req.Port
-	if err := handleLLMParams(tensorrtLLM); err != nil {
+	if err := handleLLMParams(tensorrtLLM, req.TensorRTLLMCreate); err != nil {
 		return err
 	}
 
-	newEnv, err := gotenv.Unmarshal(tensorrtLLM.Env)
-	if err != nil {
-		return err
-	}
-	newEnv["CONTAINER_NAME"] = req.ContainerName
-	newEnv["PANEL_APP_PORT_HTTP"] = strconv.Itoa(tensorrtLLM.Port)
-	newEnv["MODEL_PATH"] = req.ModelDir
-	newEnv["MODEL_NAME"] = req.Model
-	newEnv["VERSION"] = req.Version
-	newEnv["IMAGE"] = req.Image
-	if req.HostIP != "" {
-		newEnv["HOST_IP"] = req.HostIP
-	} else {
-		newEnv["HOST_IP"] = ""
-	}
-	envStr, _ := gotenv.Marshal(newEnv)
+	env := handleLLMEnv(tensorrtLLM, req.TensorRTLLMCreate)
+	envStr, _ := gotenv.Marshal(env)
 	tensorrtLLM.Env = envStr
 	llmDir := path.Join(global.Dir.TensorRTLLMDir, tensorrtLLM.Name)
 	envPath := path.Join(llmDir, ".env")
-	if err := gotenv.Write(newEnv, envPath); err != nil {
+	if err := gotenv.Write(env, envPath); err != nil {
+		return err
+	}
+	dockerComposePath := path.Join(llmDir, "docker-compose.yml")
+	if err := files.NewFileOp().SaveFile(dockerComposePath, tensorrtLLM.DockerCompose, 0644); err != nil {
 		return err
 	}
 	tensorrtLLM.Status = constant.StatusStarting

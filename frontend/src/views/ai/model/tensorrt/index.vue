@@ -26,14 +26,12 @@
                         prop="name"
                         show-overflow-tooltip
                     />
-                    <el-table-column :label="$t('commons.table.port')" min-width="80" prop="port" />
                     <el-table-column :label="$t('app.version')" min-width="100" prop="version" show-overflow-tooltip />
-                    <el-table-column
-                        :label="$t('aiTools.model.model')"
-                        min-width="120"
-                        prop="model"
-                        show-overflow-tooltip
-                    />
+                    <el-table-column :label="$t('commons.table.port')" min-width="80" prop="port">
+                        <template #default="{ row }">
+                            <PortJump :row="row" :jump="goDashboard" />
+                        </template>
+                    </el-table-column>
                     <el-table-column :label="$t('commons.table.status')" min-width="100" prop="status">
                         <template #default="{ row }">
                             <Status :key="row.status" :status="row.status"></Status>
@@ -62,8 +60,8 @@
                         fix
                     />
                     <fu-table-operations
-                        :ellipsis="mobile ? 0 : 2"
-                        :min-width="mobile ? 'auto' : 200"
+                        :ellipsis="mobile ? 0 : 5"
+                        :min-width="mobile ? 'auto' : 300"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
                         fixed="right"
@@ -75,13 +73,16 @@
         <OpDialog ref="opRef" @search="search" />
         <OperateDialog @search="search" ref="dialogRef" />
         <ComposeLogs ref="composeLogRef" />
+        <PortJumpDialog ref="dialogPortJumpRef" />
     </div>
 </template>
 
 <script lang="ts" setup>
-import ComposeLogs from '@/components/log/compose/index.vue';
 import OperateDialog from './operate/index.vue';
 import RouterMenu from '@/views/ai/model/index.vue';
+import ComposeLogs from '@/components/log/compose/index.vue';
+import PortJumpDialog from '@/components/port-jump/index.vue';
+import PortJump from '@/views/website/runtime/components/port-jump.vue';
 
 import { reactive, onMounted, ref } from 'vue';
 import { dateFormat } from '@/utils/util';
@@ -109,6 +110,7 @@ const searchName = ref();
 const opRef = ref();
 const dialogRef = ref();
 const composeLogRef = ref();
+const dialogPortJumpRef = ref();
 
 const search = async () => {
     const params = {
@@ -133,6 +135,10 @@ const openCreate = () => {
 
 const openEdit = (row: AI.TensorRTLLM) => {
     dialogRef.value.openEdit(row);
+};
+
+const goDashboard = async (port: any, protocol: string) => {
+    dialogPortJumpRef.value.acceptParams({ port: port, protocol: protocol });
 };
 
 const openLog = (row: AI.McpServer) => {

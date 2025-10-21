@@ -15,8 +15,6 @@ services:
       - 1panel-network
     volumes:
       - ${MODEL_PATH}:/models
-    ports:
-      - ${PANEL_APP_PORT_HTTP}:8000
     ipc: host
     ulimits:
       memlock:
@@ -26,7 +24,7 @@ services:
         soft: 65535
         hard: 65535
       stack: 67108864
-    command: bash -c "trtllm-serve /models/${MODEL_NAME} --host 0.0.0.0 --port 8000"
+    command: ${COMMAND}
 networks:
   1panel-network:
     external: true

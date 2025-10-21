@@ -13,23 +13,6 @@
             <el-form-item :label="$t('app.version')" prop="version">
                 <el-input v-model.trim="tensorRTLLM.version" />
             </el-form-item>
-            <el-row :gutter="20">
-                <el-col :span="8">
-                    <el-form-item :label="$t('commons.table.port')" prop="port">
-                        <el-input v-model.number="tensorRTLLM.port" />
-                    </el-form-item>
-                </el-col>
-                <el-col :span="6">
-                    <el-form-item :label="$t('app.allowPort')" prop="hostIP">
-                        <el-switch
-                            v-model="tensorRTLLM.hostIP"
-                            :active-value="'0.0.0.0'"
-                            :inactive-value="'127.0.0.1'"
-                        />
-                    </el-form-item>
-                </el-col>
-            </el-row>
-
             <el-form-item :label="$t('aiTools.tensorRT.modelDir')" prop="modelDir">
                 <el-input v-model="tensorRTLLM.modelDir">
                     <template #prepend>
@@ -37,16 +20,18 @@
                     </template>
                 </el-input>
             </el-form-item>
-            <el-form-item :label="$t('aiTools.model.model')" prop="model">
-                <el-input v-model="tensorRTLLM.model">
-                    <template #prepend>
-                        <el-button
-                            icon="Folder"
-                            @click="modelRef.acceptParams({ path: tensorRTLLM.modelDir, dir: true })"
-                        />
-                    </template>
-                </el-input>
+            <el-form-item :label="$t('runtime.runScript')" prop="command">
+                <el-input v-model="tensorRTLLM.command"></el-input>
             </el-form-item>
+            <el-tabs type="border-card">
+                <el-tab-pane :label="$t('commons.table.port')">
+                    <PortConfig v-model="tensorRTLLM" :mode="mode" />
+                </el-tab-pane>
+                <el-tab-pane :label="$t('runtime.environment')">
+                    <Environment :environments="tensorRTLLM.environments" />
+                </el-tab-pane>
+                <el-tab-pane :label="$t('container.mount')"><Volumes :volumes="tensorRTLLM.volumes" /></el-tab-pane>
+            </el-tabs>
         </el-form>
         <template #footer>
             <span class="dialog-footer">
@@ -57,17 +42,20 @@
             </span>
         </template>
         <FileList ref="modelDirRef" @choose="getModelDir" />
-        <FileList ref="modelRef" @choose="getModelPath" />
     </DrawerPro>
 </template>
 
 <script lang="ts" setup>
+import PortConfig from '@/views/website/runtime/port/index.vue';
+import Environment from '@/views/website/runtime/environment/index.vue';
+import Volumes from '@/views/website/runtime/volume/index.vue';
+import DrawerPro from '@/components/drawer-pro/index.vue';
+import FileList from '@/components/file-list/index.vue';
+
 import { reactive, ref } from 'vue';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm, FormInstance } from 'element-plus';
-import DrawerPro from '@/components/drawer-pro/index.vue';
-import FileList from '@/components/file-list/index.vue';
 import { createTensorRTLLM, updateTensorRTLLM } from '@/api/modules/ai';
 import { MsgSuccess } from '@/utils/message';
 
@@ -78,16 +66,16 @@ const newTensorRTLLM = () => {
     return {
         name: '',
         containerName: '',
-        port: 8000,
         version: '1.2.0rc0',
         modelDir: '',
-        model: '',
-        hostIP: '',
         image: 'nvcr.io/nvidia/tensorrt-llm/release',
+        command: 'bash -c "trtllm-serve /models/ --host 0.0.0.0 --port 8000"',
+        exposedPorts: [],
+        environments: [],
+        volumes: [],
     };
 };
 const modelDirRef = ref();
-const modelRef = ref();
 const tensorRTLLM = ref(newTensorRTLLM());
 const emit = defineEmits(['search']);
 
@@ -99,6 +87,15 @@ const openCreate = (): void => {
 const openEdit = (rowData: any): void => {
     mode.value = 'edit';
     tensorRTLLM.value = { ...rowData };
+    if (tensorRTLLM.value.environments == null) {
+        tensorRTLLM.value.environments = [];
+    }
+    if (tensorRTLLM.value.volumes == null) {
+        tensorRTLLM.value.volumes = [];
+    }
+    if (tensorRTLLM.value.exposedPorts == null) {
+        tensorRTLLM.value.exposedPorts = [];
+    }
     drawerVisiable.value = true;
 };
 
@@ -110,23 +107,13 @@ const getModelDir = (path: string) => {
     tensorRTLLM.value.modelDir = path;
 };
 
-const getModelPath = (path: string) => {
-    const modelDir = tensorRTLLM.value.modelDir;
-    if (modelDir && path.startsWith(modelDir)) {
-        tensorRTLLM.value.model = path.replace(modelDir, '').replace(/^[\/\\]+/, '');
-    } else {
-        tensorRTLLM.value.model = path;
-    }
-};
-
 const rules = reactive({
     name: [Rules.requiredInput],
-    port: [Rules.requiredInput],
     version: [Rules.requiredInput],
     modelDir: [Rules.requiredInput],
-    model: [Rules.requiredInput],
     containerName: [Rules.requiredInput],
     image: [Rules.requiredInput],
+    command: [Rules.requiredInput],
 });
 
 const formRef = ref<FormInstance>();

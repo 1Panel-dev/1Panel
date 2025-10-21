@@ -184,18 +184,33 @@ export namespace AI {
         environments: Environment[];
     }
 
+    export interface ExposedPort {
+        hostPort: number;
+        containerPort: number;
+        hostIP: string;
+    }
+
+    export interface Environment {
+        key: string;
+        value: string;
+    }
+    export interface Volume {
+        source: string;
+        target: string;
+    }
+
     export interface TensorRTLLM {
         id?: number;
         name: string;
         containerName: string;
-        port: number;
         version: string;
         modelDir: string;
-        model: string;
-        hostIP: string;
         status?: string;
         message?: string;
         createdAt?: string;
+        exposedPorts?: ExposedPort[];
+        environments?: Environment[];
+        volumes?: Volume[];
     }
 
     export interface TensorRTLLMDTO extends TensorRTLLM {
