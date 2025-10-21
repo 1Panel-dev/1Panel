@@ -86,6 +86,7 @@ const emit = defineEmits(['search']);
 const openCreate = (): void => {
     mode.value = 'create';
     drawerVisiable.value = true;
+    tensorRTLLM.value = newTensorRTLLM();
 };
 
 const openEdit = (rowData: any): void => {
