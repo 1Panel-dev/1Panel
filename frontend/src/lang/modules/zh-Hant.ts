@@ -701,6 +701,8 @@ const message = {
         tensorRT: {
             llm: 'TensorRT LLM',
             modelDir: '模型目錄',
+            commandHelper: '啟動命令中的 /models 後需補全模型名稱；若需外部訪問，請將命令中的端口設置為與應用端口相同',
+            imageAlert: '由於鏡像較大，建議先手動將鏡像下載到服務器後再進行安裝',
         },
     },
     container: {

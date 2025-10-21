@@ -1,5 +1,6 @@
 <template>
     <DrawerPro :header="$t('commons.button.' + mode)" v-model="drawerVisiable" size="large" @close="handleClose">
+        <el-alert :title="$t('aiTools.tensorRT.imageAlert')" class="common-prompt" :closable="false" type="warning" />
         <el-form ref="formRef" label-position="top" :model="tensorRTLLM" :rules="rules" v-loading="loading">
             <el-form-item :label="$t('commons.table.name')" prop="name">
                 <el-input clearable v-model.trim="tensorRTLLM.name" :disabled="mode == 'edit'" />
@@ -22,6 +23,9 @@
             </el-form-item>
             <el-form-item :label="$t('runtime.runScript')" prop="command">
                 <el-input v-model="tensorRTLLM.command"></el-input>
+                <span class="input-help">
+                    {{ $t('aiTools.tensorRT.commandHelper') }}
+                </span>
             </el-form-item>
             <el-tabs type="border-card">
                 <el-tab-pane :label="$t('commons.table.port')">

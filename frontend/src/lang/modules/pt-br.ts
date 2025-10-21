@@ -724,6 +724,10 @@ const message = {
         tensorRT: {
             llm: 'TensorRT LLM',
             modelDir: 'Diretório do Modelo',
+            commandHelper:
+                'Após /models no comando de inicialização, o nome do modelo precisa ser completado; se for necessário acesso externo, defina a porta no comando para ser a mesma que a porta do aplicativo',
+            imageAlert:
+                'Devido ao grande tamanho da imagem, recomenda-se baixar manualmente a imagem para o servidor antes da instalação',
         },
     },
     container: {

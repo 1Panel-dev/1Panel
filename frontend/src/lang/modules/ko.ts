@@ -711,6 +711,9 @@ const message = {
         tensorRT: {
             llm: 'TensorRT LLM',
             modelDir: '모델 디렉토리',
+            commandHelper:
+                '시작 명령의 /models 뒤에는 모델 이름을 완성해야 합니다; 외부 액세스가 필요한 경우 명령의 포트를 애플리케이션 포트와 동일하게 설정하세요',
+            imageAlert: '이미지 크기가 크므로 설치 전에 서버에 이미지를 수동으로 다운로드하는 것이 좋습니다',
         },
     },
     container: {

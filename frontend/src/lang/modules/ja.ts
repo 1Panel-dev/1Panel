@@ -715,6 +715,10 @@ const message = {
         tensorRT: {
             llm: 'TensorRT LLM',
             modelDir: 'モデルディレクトリ',
+            commandHelper:
+                '起動コマンドの /models の後にはモデル名を補完する必要があります；外部アクセスが必要な場合は、コマンド内のポートをアプリケーションポートと同じに設定してください',
+            imageAlert:
+                'イメージサイズが大きいため、インストール前にサーバーにイメージを手動でダウンロードすることをお勧めします',
         },
     },
     container: {

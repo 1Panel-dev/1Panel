@@ -736,6 +736,10 @@ const message = {
         tensorRT: {
             llm: 'TensorRT LLM',
             modelDir: 'Model Dizini',
+            commandHelper:
+                'Başlatma komutundaki /models sonrasında model adı tamamlanmalıdır; harici erişim gerekiyorsa, komuttaki bağlantı noktasını uygulama bağlantı noktasıyla aynı olacak şekilde ayarlayın',
+            imageAlert:
+                'Görüntü boyutu büyük olduğundan, kurulumdan önce görüntüyü sunucuya manuel olarak indirmeniz önerilir',
         },
     },
     container: {

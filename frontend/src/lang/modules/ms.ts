@@ -728,6 +728,10 @@ const message = {
         tensorRT: {
             llm: 'TensorRT LLM',
             modelDir: 'Direktori Model',
+            commandHelper:
+                'Selepas /models dalam arahan permulaan, nama model perlu dilengkapkan; jika akses luar diperlukan, tetapkan port dalam arahan sama dengan port aplikasi',
+            imageAlert:
+                'Disebabkan saiz imej yang besar, disyorkan untuk memuat turun imej secara manual ke pelayan sebelum pemasangan',
         },
     },
     container: {
