@@ -245,4 +245,4 @@ ErrReqFailed: "{{.name}} 請求失敗: {{ .err }}"
 
 #command
 Name: "名稱"
-Command: "命令"
+Command: "指令"

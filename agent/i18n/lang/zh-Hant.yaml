@@ -14,7 +14,7 @@ ErrApiConfigKeyInvalid: 'API 介面金鑰錯誤: {{ .detail }}'
 ErrApiConfigIPInvalid: '呼叫 API 介面 IP 不在白名單: {{ .detail }}'
 ErrApiConfigDisable: '此介面禁止使用 API 介面呼叫: {{ .detail }}'
 ErrApiConfigKeyTimeInvalid: 'API 介面時間戳記錯誤: {{ .detail }}'
-ErrShutDown: "命令被手動結束！"
+ErrShutDown: "指令被手動結束！"
 
 ErrMinQuickJump: "請至少設定一個快速跳轉入口！"
 ErrMaxQuickJump: "最多可設定四個快速跳轉入口！"
@@ -123,7 +123,7 @@ ErrLogFileToLarge: "日誌檔案超過 500M，無法打開"
 FileDropFailed: "清理文件 {{ .name }} 失敗: {{ .err }}"
 FileDropSuccess: "清理文件 {{ .name }} 成功，清理 {{ .count }} 個文件，釋放 {{ .size }} 磁碟空間"
 FileDropSum: "文件清理完成，共清理 {{ .count }} 個文件，共釋放 {{ .size }} 磁碟空間"
-ErrBadDecrypt: "壓縮包解壓密碼錯誤，解壓失敗，請檢查後重試！"
+ErrBadDecrypt: "壓縮檔解壓密碼錯誤，解壓失敗，請檢查後重試！"
 
 #website
 ErrAliasIsExist: '代號已存在'
@@ -267,7 +267,7 @@ ErrRuleExist: '規則已存在'
 ErrRuleNotExist: '規則不存在'
 ErrParseIP: 'IP 格式錯誤'
 ErrDefaultIP: 'default 為保留名稱，請更換其他名稱'
-ErrGroupInUse: 'IP 群組被駭/白名單使用，無法刪除'
+ErrGroupInUse: 'IP 群組被黑/白名單使用，無法刪除'
 ErrIPGroupAclUse: "IP 群組被網站 {{ .name }} 自訂規則使用，無法刪除"
 ErrGroupExist: 'IP 群組名稱已存在'
 ErrIPRange: 'IP 範圍錯誤'
@@ -372,8 +372,8 @@ RuntimeExtension: '執行環境擴充'
 TaskIsExecuting: '任務正在運作'
 CustomAppstore: '自訂應用程式倉庫'
 TaskExec: '執行'
-TaskBatch: "批量操作"
-FileConvert: '文件格式轉換'
+TaskBatch: "批次操作"
+FileConvert: '檔案格式轉換'
 
 # task - clam
 Clamscan: "掃描 {{ .name }}"
