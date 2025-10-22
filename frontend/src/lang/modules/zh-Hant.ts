@@ -3145,7 +3145,8 @@ const message = {
             xff1: '取得 X-Forwarded-For 的上一級代理程式',
             xff2: '取得 X-Forwarded-For 的上上一級代理程式',
             xff3: '取得 X-Forwarded-For 的上上上一級代理程式',
-            xffHelper: '例如：X-Forwarded-For: <client>,<proxy1>,<proxy2>,<proxy3> 上一階代理程式會取最後一個 IP <proxy3>',
+            xffHelper:
+                '例如：X-Forwarded-For: <client>,<proxy1>,<proxy2>,<proxy3> 上一階代理程式會取最後一個 IP <proxy3>',
             headersHelper: '從下列常用的 CDN 攜帶真實 IP 的 HTTP Header 中取得，取第一個能取得到的值',
             monitorCDNHelper: '修改網站監控的 CDN 設定會同步更新 WAF 的 CDN 設定',
             wafCDNHelper: '修改 WAF 的 CDN 設定會同步更新網站監控的 CDN 設定',
