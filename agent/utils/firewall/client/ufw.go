@@ -38,24 +38,22 @@ func (f *Ufw) Status() (bool, error) {
 func (f *Ufw) Version() (string, error) {
 	stdout, err := cmd.RunDefaultWithStdoutBashCf("%s version | grep ufw", f.CmdStr)
 	if err != nil {
-		return "", fmt.Errorf("load the firewall status failed, err: %s", stdout)
+		return "", fmt.Errorf("load the firewall status failed, %v", err)
 	}
 	info := strings.ReplaceAll(stdout, "\n", "")
 	return strings.ReplaceAll(info, "ufw ", ""), nil
 }
 
 func (f *Ufw) Start() error {
-	stdout, err := cmd.RunDefaultWithStdoutBashCf("echo y | %s enable", f.CmdStr)
-	if err != nil {
-		return fmt.Errorf("enable the firewall failed, err: %s", stdout)
+	if err := cmd.RunDefaultBashCf("echo y | %s enable", f.CmdStr); err != nil {
+		return fmt.Errorf("enable the firewall failed, %v", err)
 	}
 	return nil
 }
 
 func (f *Ufw) Stop() error {
-	stdout, err := cmd.RunDefaultWithStdoutBashCf("%s disable", f.CmdStr)
-	if err != nil {
-		return fmt.Errorf("stop the firewall failed, err: %s", stdout)
+	if err := cmd.RunDefaultBashCf("%s disable", f.CmdStr); err != nil {
+		return fmt.Errorf("stop the firewall failed, %v", err)
 	}
 	return nil
 }
@@ -184,9 +182,8 @@ func (f *Ufw) Port(port FireInfo, operation string) error {
 	if len(port.Protocol) != 0 {
 		command += fmt.Sprintf("/%s", port.Protocol)
 	}
-	stdout, err := cmd.RunDefaultWithStdoutBashC(command)
-	if err != nil {
-		return fmt.Errorf("%s (%s) failed, err: %s", operation, command, stdout)
+	if err := cmd.RunDefaultBashC(command); err != nil {
+		return fmt.Errorf("%s (%s) failed, %v", operation, command, err)
 	}
 	return nil
 }
@@ -224,13 +221,12 @@ func (f *Ufw) RichRules(rule FireInfo, operation string) error {
 	stdout, err := cmd.RunDefaultWithStdoutBashC(ruleStr)
 	if err != nil {
 		if strings.Contains(stdout, "ERROR: Invalid position") || strings.Contains(stdout, "ERROR: 无效位置") {
-			stdout, err := cmd.RunDefaultWithStdoutBashC(strings.ReplaceAll(ruleStr, "insert 1 ", ""))
-			if err != nil {
-				return fmt.Errorf("%s rich rules (%s), failed, err: %s", operation, ruleStr, stdout)
+			if err := cmd.RunDefaultBashC(strings.ReplaceAll(ruleStr, "insert 1 ", "")); err != nil {
+				return fmt.Errorf("%s rich rules (%s), failed, %v", operation, ruleStr, err)
 			}
 			return nil
 		}
-		return fmt.Errorf("%s rich rules (%s), failed, err: %s", operation, ruleStr, stdout)
+		return fmt.Errorf("%s rich rules (%s), failed, %v", operation, ruleStr, err)
 	}
 	return nil
 }

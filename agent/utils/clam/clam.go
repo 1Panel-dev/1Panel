@@ -14,7 +14,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
-	"github.com/1Panel-dev/1Panel/agent/utils/systemctl"
+	"github.com/1Panel-dev/1Panel/agent/utils/controller"
 	"github.com/robfig/cron/v3"
 )
 
@@ -34,35 +34,11 @@ func AddScanTask(taskItem *task.Task, clam model.Clam, timeNow string) {
 		}
 		taskItem.Logf("clamdscan --fdpass %s %s", strategy, clam.Path)
 		mgr := cmd.NewCommandMgr(cmd.WithIgnoreExist1(), cmd.WithTimeout(time.Duration(clam.Timeout)*time.Second), cmd.WithTask(*taskItem))
-		stdout, err := mgr.RunWithStdoutBashCf("clamdscan --fdpass %s %s", strategy, clam.Path)
-		if err != nil {
-			return fmt.Errorf("clamdscan failed, stdout: %v, err: %v", stdout, err)
+		if err := mgr.RunBashCf("clamdscan --fdpass %s %s", strategy, clam.Path); err != nil {
+			return fmt.Errorf("clamdscan failed, %v", err)
 		}
 		return nil
 	}, nil)
-}
-
-func CheckClamIsActive(withCheck bool, clamRepo repo.IClamRepo) bool {
-	if withCheck {
-		isActive := false
-		exist1, _ := systemctl.IsExist(constant.ClamServiceNameCentOs)
-		if exist1 {
-			isActive, _ = systemctl.IsActive(constant.ClamServiceNameCentOs)
-		}
-		exist2, _ := systemctl.IsExist(constant.ClamServiceNameUbuntu)
-		if exist2 {
-			isActive, _ = systemctl.IsActive(constant.ClamServiceNameUbuntu)
-		}
-		if isActive {
-			return true
-		}
-	}
-	clams, _ := clamRepo.List(repo.WithByStatus(constant.StatusEnable))
-	for i := 0; i < len(clams); i++ {
-		global.Cron.Remove(cron.EntryID(clams[i].EntryID))
-		_ = clamRepo.Update(clams[i].ID, map[string]interface{}{"status": constant.StatusDisable, "entry_id": 0})
-	}
-	return false
 }
 
 func AnalysisFromLog(pathItem string, record *model.ClamRecord) {
@@ -85,4 +61,23 @@ func AnalysisFromLog(pathItem string, record *model.ClamRecord) {
 			record.ScanTime = strings.TrimPrefix(line, "Time: ")
 		}
 	}
+}
+
+func StopAllClamJob(withCheck bool, clamRepo repo.IClamRepo) bool {
+	if withCheck {
+		isActive := false
+		isexist, _ := controller.CheckExist("clam")
+		if isexist {
+			isActive, _ = controller.CheckActive("clam")
+		}
+		if isActive {
+			return false
+		}
+	}
+	clams, _ := clamRepo.List(repo.WithByStatus(constant.StatusEnable))
+	for i := 0; i < len(clams); i++ {
+		global.Cron.Remove(cron.EntryID(clams[i].EntryID))
+		_ = clamRepo.Update(clams[i].ID, map[string]interface{}{"status": constant.StatusDisable, "entry_id": 0})
+	}
+	return true
 }

@@ -1032,8 +1032,7 @@ func checkIsLinkApp(website model.Website) bool {
 
 func chownRootDir(path string) error {
 	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(1 * time.Second))
-	_, err := cmdMgr.RunWithStdoutBashCf(`chown -R 1000:1000 "%s"`, path)
-	if err != nil {
+	if err := cmdMgr.RunBashCf(`chown -R 1000:1000 "%s"`, path); err != nil {
 		return err
 	}
 	return nil

@@ -17,9 +17,9 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
+	"github.com/1Panel-dev/1Panel/agent/utils/controller"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/1Panel-dev/1Panel/agent/utils/ini_conf"
-	"github.com/1Panel-dev/1Panel/agent/utils/systemctl"
 	"github.com/pkg/errors"
 	"gopkg.in/ini.v1"
 )
@@ -52,9 +52,9 @@ func (h *HostToolService) GetToolStatus(req request.HostToolReq) (*response.Host
 			return res, nil
 		}
 		supervisorConfig.IsExist = true
-		serviceExist, _ := systemctl.IsExist(constant.Supervisord)
+		serviceExist, _ := controller.CheckExist(constant.Supervisord)
 		if !serviceExist {
-			serviceExist, _ = systemctl.IsExist(constant.Supervisor)
+			serviceExist, _ = controller.CheckExist(constant.Supervisor)
 			if !serviceExist {
 				supervisorConfig.IsExist = false
 				res.Config = supervisorConfig
@@ -76,7 +76,7 @@ func (h *HostToolService) GetToolStatus(req request.HostToolReq) (*response.Host
 		_, ctlRrr := exec.LookPath("supervisorctl")
 		supervisorConfig.CtlExist = ctlRrr == nil
 
-		active, _ := systemctl.IsActive(supervisorConfig.ServiceName)
+		active, _ := controller.CheckActive(supervisorConfig.ServiceName)
 		if active {
 			supervisorConfig.Status = "running"
 		} else {
@@ -193,7 +193,7 @@ func (h *HostToolService) CreateToolConfig(req request.HostToolCreate) error {
 				return err
 			}
 		}
-		if err = systemctl.Restart(req.ServiceName); err != nil {
+		if err = controller.HandleRestart(req.ServiceName); err != nil {
 			global.LOG.Errorf("[init] restart %s failed err %s", req.ServiceName, err.Error())
 			return err
 		}
@@ -209,7 +209,7 @@ func (h *HostToolService) OperateTool(req request.HostToolReq) error {
 			serviceName = serviceNameSet.Value
 		}
 	}
-	return systemctl.Operate(req.Operate, serviceName)
+	return controller.Handle(req.Operate, serviceName)
 }
 
 func (h *HostToolService) OperateToolConfig(req request.HostToolConfig) (*response.HostToolConfig, error) {
@@ -251,7 +251,7 @@ func (h *HostToolService) OperateToolConfig(req request.HostToolConfig) (*respon
 		if err = fileOp.WriteFile(configPath, strings.NewReader(req.Content), fileInfo.Mode()); err != nil {
 			return nil, err
 		}
-		if err = systemctl.Restart(serviceName); err != nil {
+		if err = controller.HandleRestart(serviceName); err != nil {
 			_ = fileOp.WriteFile(configPath, bytes.NewReader(oldContent), fileInfo.Mode())
 			return nil, err
 		}

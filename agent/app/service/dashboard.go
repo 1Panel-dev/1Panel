@@ -21,6 +21,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/ai_tools/xpu"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
+	"github.com/1Panel-dev/1Panel/agent/utils/controller"
 	"github.com/1Panel-dev/1Panel/agent/utils/copier"
 	"github.com/gin-gonic/gin"
 	"github.com/shirou/gopsutil/v4/cpu"
@@ -53,23 +54,25 @@ func NewIDashboardService() IDashboardService {
 }
 
 func (u *DashboardService) Restart(operation string) error {
-	if operation != "1panel" && operation != "system" && operation != "1panel-agent" {
+	switch operation {
+	case "system":
+		{
+			go func() {
+				if err := cmd.RunDefaultBashCf("%s reboot", cmd.SudoHandleCmd()); err != nil {
+					global.LOG.Errorf("handle reboot failed, %v", err)
+				}
+			}()
+			return nil
+		}
+	case "1panel-agent":
+		controller.RestartPanel(false, true, false)
+		return nil
+	case "1panel":
+		controller.RestartPanel(true, true, false)
+		return nil
+	default:
 		return fmt.Errorf("handle restart operation %s failed, err: nonsupport such operation", operation)
 	}
-	itemCmd := fmt.Sprintf("%s systemctl restart 1panel-agent.service && %s systemctl restart 1panel-core.service", cmd.SudoHandleCmd(), cmd.SudoHandleCmd())
-	if operation == "system" {
-		itemCmd = fmt.Sprintf("%s reboot", cmd.SudoHandleCmd())
-	}
-	if operation == "1panel-agent" {
-		itemCmd = fmt.Sprintf("%s systemctl restart 1panel-agent.service", cmd.SudoHandleCmd())
-	}
-	go func() {
-		stdout, err := cmd.RunDefaultWithStdoutBashC(itemCmd)
-		if err != nil {
-			global.LOG.Errorf("handle %s failed, err: %v", itemCmd, stdout)
-		}
-	}()
-	return nil
 }
 
 func (u *DashboardService) LoadOsInfo() (*dto.OsInfo, error) {

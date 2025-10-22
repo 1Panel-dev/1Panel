@@ -13,6 +13,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
+	"github.com/1Panel-dev/1Panel/agent/utils/controller"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/build"
@@ -260,7 +261,7 @@ func (u *DeviceService) Clean(req []dto.Clean) {
 	_ = settingRepo.Update("LastCleanData", fmt.Sprintf("%v", len(req)))
 
 	if restart {
-		go common.RestartService(false, true, false)
+		go controller.RestartPanel(false, true, false)
 	}
 }
 

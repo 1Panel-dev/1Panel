@@ -16,7 +16,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/compose"
-	"github.com/pkg/errors"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
@@ -179,9 +178,8 @@ func handleWebsiteRecover(website *model.Website, parentTask *task.Task, recover
 		if err = fileOp.TarGzExtractPro(fmt.Sprintf("%s/%s.web.tar.gz", tmpPath, website.Alias), GetOpenrestyDir(SitesRootDir), ""); err != nil {
 			return err
 		}
-		stdout, err := cmd.RunDefaultWithStdoutBashCf("docker exec -i %s nginx -s reload", nginxInfo.ContainerName)
-		if err != nil {
-			return errors.New(stdout)
+		if err := cmd.RunDefaultBashCf("docker exec -i %s nginx -s reload", nginxInfo.ContainerName); err != nil {
+			return err
 		}
 		oldWebsite.ID = website.ID
 		if err := websiteRepo.SaveWithoutCtx(&oldWebsite); err != nil {

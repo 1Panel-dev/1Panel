@@ -30,7 +30,6 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/mholt/archiver/v4"
-	"github.com/pkg/errors"
 	"github.com/spf13/afero"
 )
 
@@ -178,10 +177,7 @@ func (f FileOp) ChownR(dst string, uid string, gid string, sub bool) error {
 		cmdStr = fmt.Sprintf(`chown -R %s:%s "%s"`, uid, gid, dst)
 	}
 	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(10 * time.Second))
-	if msg, err := cmdMgr.RunWithStdoutBashC(cmdStr); err != nil {
-		if msg != "" {
-			return errors.New(msg)
-		}
+	if err := cmdMgr.RunBashC(cmdStr); err != nil {
 		return err
 	}
 	return nil
@@ -193,10 +189,7 @@ func (f FileOp) ChmodR(dst string, mode int64, sub bool) error {
 		cmdStr = fmt.Sprintf(`%s chmod -R %v "%s"`, cmd.SudoHandleCmd(), fmt.Sprintf("%04o", mode), dst)
 	}
 	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(10 * time.Second))
-	if msg, err := cmdMgr.RunWithStdoutBashC(cmdStr); err != nil {
-		if msg != "" {
-			return errors.New(msg)
-		}
+	if err := cmdMgr.RunBashC(cmdStr); err != nil {
 		return err
 	}
 	return nil
@@ -208,10 +201,7 @@ func (f FileOp) ChmodRWithMode(dst string, mode fs.FileMode, sub bool) error {
 		cmdStr = fmt.Sprintf(`%s chmod -R %v "%s"`, cmd.SudoHandleCmd(), fmt.Sprintf("%o", mode.Perm()), dst)
 	}
 	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(10 * time.Second))
-	if msg, err := cmdMgr.RunWithStdoutBashC(cmdStr); err != nil {
-		if msg != "" {
-			return errors.New(msg)
-		}
+	if err := cmdMgr.RunBashC(cmdStr); err != nil {
 		return err
 	}
 	return nil

@@ -1082,11 +1082,7 @@ func runScript(task *task.Task, appInstall *model.AppInstall, operate string) er
 	task.LogStart(logStr)
 
 	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(10*time.Minute), cmd.WithWorkDir(workDir))
-	out, err := cmdMgr.RunWithStdoutBashC(scriptPath)
-	if err != nil {
-		if out != "" {
-			err = errors.New(out)
-		}
+	if err := cmdMgr.RunBashC(scriptPath); err != nil {
 		task.LogFailedWithErr(logStr, err)
 		return err
 	}

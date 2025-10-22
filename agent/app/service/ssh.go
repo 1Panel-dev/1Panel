@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"net"
 	"os"
 	"os/user"
 	"path"
@@ -13,6 +14,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/1Panel-dev/1Panel/agent/utils/controller"
 	"github.com/1Panel-dev/1Panel/agent/utils/copier"
 	csvexport "github.com/1Panel-dev/1Panel/agent/utils/csv_export"
 	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
@@ -27,7 +29,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
-	"github.com/1Panel-dev/1Panel/agent/utils/systemctl"
 	"github.com/pkg/errors"
 )
 
@@ -74,22 +75,18 @@ func (u *SSHService) GetSSHInfo() (*dto.SSHInfo, error) {
 		data.IsExist = false
 		data.Message = err.Error()
 	} else {
-		active, err := systemctl.IsActive(serviceName)
+		active, err := controller.CheckActive(serviceName)
 		data.IsActive = active
 		if !active && err != nil {
 			data.Message = err.Error()
 		}
 	}
 
-	out, err := systemctl.RunSystemCtl("is-enabled", serviceName)
+	enable, err := controller.CheckEnable(serviceName)
 	if err != nil {
 		data.AutoStart = false
 	} else {
-		if out == "alias\n" {
-			data.AutoStart, _ = systemctl.IsEnable("ssh")
-		} else {
-			data.AutoStart = out == "enabled\n"
-		}
+		data.AutoStart = enable
 	}
 
 	sshConf, err := os.ReadFile(sshPath)
@@ -139,29 +136,20 @@ func (u *SSHService) OperateSSH(operation string) error {
 	if err != nil {
 		return err
 	}
-	sudo := cmd.SudoHandleCmd()
 	if operation == "enable" || operation == "disable" {
 		serviceName += ".service"
 	}
 	if operation == "stop" {
-		isSocketActive, _ := systemctl.IsActive(serviceName + ".socket")
+		isSocketActive, _ := controller.CheckActive(serviceName + ".socket")
 		if isSocketActive {
-			std, err := cmd.RunDefaultWithStdoutBashCf("%s systemctl stop %s", sudo, serviceName+".socket")
-			if err != nil {
-				global.LOG.Errorf("handle systemctl stop %s.socket failed, err: %v", serviceName, std)
+			if err := controller.HandleStop(serviceName + ".socket"); err != nil {
+				global.LOG.Errorf("handle stop %s.socket failed, err: %v", serviceName, err)
 			}
 		}
 	}
 
-	stdout, err := cmd.RunDefaultWithStdoutBashCf("%s systemctl %s %s", sudo, operation, serviceName)
-	if err != nil {
-		if strings.Contains(stdout, "alias name or linked unit file") {
-			stdout, err := cmd.RunDefaultWithStdoutBashCf("%s systemctl %s ssh", sudo, operation)
-			if err != nil {
-				return fmt.Errorf("%s ssh(alias name or linked unit file) failed, stdout: %s, err: %v", operation, stdout, err)
-			}
-		}
-		return fmt.Errorf("%s %s failed, stdout: %s, err: %v", operation, serviceName, stdout, err)
+	if err := controller.Handle(operation, serviceName); err != nil {
+		return fmt.Errorf("%s %s failed, err: %v", operation, serviceName, err)
 	}
 	return nil
 }
@@ -190,7 +178,7 @@ func (u *SSHService) Update(req dto.SSHUpdate) error {
 	if req.Key == "Port" {
 		stdout, _ := cmd.RunDefaultWithStdoutBashCf("%s getenforce", sudo)
 		if stdout == "Enforcing\n" {
-			_, _ = cmd.RunDefaultWithStdoutBashCf("%s semanage port -a -t ssh_port_t -p tcp %s", sudo, req.NewValue)
+			_ = cmd.RunDefaultBashCf("%s semanage port -a -t ssh_port_t -p tcp %s", sudo, req.NewValue)
 		}
 
 		ruleItem := dto.PortRuleUpdate{
@@ -220,7 +208,7 @@ func (u *SSHService) Update(req dto.SSHUpdate) error {
 		}
 	}
 
-	_, _ = cmd.RunDefaultWithStdoutBashCf("%s systemctl restart %s", sudo, serviceName)
+	_ = controller.HandleRestart(serviceName)
 	return nil
 }
 
@@ -306,15 +294,13 @@ func (u *SSHService) CreateRootCert(req dto.RootCertOperate) error {
 		if len(req.PassPhrase) != 0 {
 			command = fmt.Sprintf("ssh-keygen -t %s -P %s -f %s/.ssh/%s | echo y", req.EncryptionMode, req.PassPhrase, currentUser.HomeDir, req.Name)
 		}
-		stdout, err := cmd.RunDefaultWithStdoutBashC(command)
-		if err != nil {
-			return fmt.Errorf("generate failed, err: %v, message: %s", err, stdout)
+		if err := cmd.RunDefaultBashC(command); err != nil {
+			return fmt.Errorf("generate failed, %v", err)
 		}
 	}
 
-	stdout, err := cmd.RunDefaultWithStdoutBashCf("cat %s >> %s", publicPath, authFilePath)
-	if err != nil {
-		return fmt.Errorf("generate failed, err: %v, message: %s", err, stdout)
+	if err := cmd.RunDefaultBashCf("cat %s >> %s", publicPath, authFilePath); err != nil {
+		return fmt.Errorf("generate failed, %v", err)
 	}
 
 	cert.PrivateKeyPath = privatePath
@@ -599,8 +585,7 @@ func (u *SSHService) UpdateByFile(req dto.SettingUpdate) error {
 	if err != nil {
 		return err
 	}
-	sudo := cmd.SudoHandleCmd()
-	_, _ = cmd.RunDefaultWithStdoutBashCf("%s systemctl restart %s", sudo, serviceName)
+	_ = controller.HandleRestart(serviceName)
 	return nil
 }
 
@@ -772,24 +757,24 @@ func loadFailedSecureDatas(line string) dto.SSHHistory {
 }
 
 func checkIsStandard(item dto.SSHHistory) bool {
-	if len(item.Address) == 0 {
+	if len(item.Address) == 0 || net.ParseIP(item.Address) == nil {
 		return false
 	}
 	portItem, _ := strconv.Atoi(item.Port)
-	return portItem != 0
+	return portItem > 0 && portItem < 65536
 }
 
 func handleGunzip(path string) error {
-	if _, err := cmd.RunDefaultWithStdoutBashCf("gunzip %s", path); err != nil {
+	if err := cmd.RunDefaultBashCf("gunzip %s", path); err != nil {
 		return err
 	}
 	return nil
 }
 
 func loadServiceName() (string, error) {
-	if exist, _ := systemctl.IsExist("sshd"); exist {
+	if exist, _ := controller.CheckExist("sshd"); exist {
 		return "sshd", nil
-	} else if exist, _ := systemctl.IsExist("ssh"); exist {
+	} else if exist, _ := controller.CheckExist("ssh"); exist {
 		return "ssh", nil
 	}
 	return "", errors.New("The ssh or sshd service is unavailable")
@@ -867,7 +852,7 @@ func updateLocalConn(newPort uint) error {
 }
 
 func updateSSHSocketFile(newPort string) error {
-	active, _ := systemctl.IsActive("ssh.socket")
+	active, _ := controller.CheckActive("ssh.socket")
 	if !active {
 		return nil
 	}
@@ -898,6 +883,7 @@ func updateSSHSocketFile(newPort string) error {
 	if _, err = fileItem.WriteString(strings.Join(lines, "\n")); err != nil {
 		return err
 	}
-	_ = cmd.RunDefaultBashC("systemctl daemon-reload && systemctl restart ssh.socket")
+	_ = controller.Reload()
+	_ = controller.HandleRestart("ssh.socket")
 	return nil
 }

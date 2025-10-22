@@ -8,7 +8,7 @@ import (
 	"sync"
 	"time"
 
-	baseGlobal "github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 )
 
@@ -45,31 +45,31 @@ func (x XpuSMI) loadDeviceData(device Device, wg *sync.WaitGroup, res *[]XPUSimp
 	wgCmd.Wait()
 
 	if xpuErr != nil {
-		baseGlobal.LOG.Errorf("calling xpu-smi discovery failed for device %d, err: %v\n", device.DeviceID, xpuErr)
+		global.LOG.Errorf("calling xpu-smi discovery failed for device %d, %v", device.DeviceID, xpuErr)
 		return
 	}
 
 	var info Device
 	if err := json.Unmarshal([]byte(xpuData), &info); err != nil {
-		baseGlobal.LOG.Errorf("xpuData json unmarshal failed for device %d, err: %v\n", device.DeviceID, err)
+		global.LOG.Errorf("xpuData json unmarshal failed for device %d, err: %v", device.DeviceID, err)
 		return
 	}
 
 	bytes, err := strconv.ParseInt(info.MemoryPhysicalSizeByte, 10, 64)
 	if err != nil {
-		baseGlobal.LOG.Errorf("Error parsing memory size for device %d, err: %v\n", device.DeviceID, err)
+		global.LOG.Errorf("Error parsing memory size for device %d, err: %v", device.DeviceID, err)
 		return
 	}
 	xpu.Memory = fmt.Sprintf("%.1f MB", float64(bytes)/(1024*1024))
 
 	if statsErr != nil {
-		baseGlobal.LOG.Errorf("calling xpu-smi stats failed for device %d, err: %v\n", device.DeviceID, statsErr)
+		global.LOG.Errorf("calling xpu-smi stats failed for device %d, err: %v", device.DeviceID, statsErr)
 		return
 	}
 
 	var stats DeviceStats
 	if err := json.Unmarshal([]byte(statsData), &stats); err != nil {
-		baseGlobal.LOG.Errorf("statsData json unmarshal failed for device %d, err: %v\n", device.DeviceID, err)
+		global.LOG.Errorf("statsData json unmarshal failed for device %d, err: %v", device.DeviceID, err)
 		return
 	}
 
@@ -95,7 +95,7 @@ func (x XpuSMI) LoadDashData() ([]XPUSimpleInfo, error) {
 	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(5 * time.Second))
 	data, err := cmdMgr.RunWithStdoutBashC("xpu-smi discovery -j")
 	if err != nil {
-		return nil, fmt.Errorf("calling xpu-smi failed, err: %w", err)
+		return nil, fmt.Errorf("calling xpu-smi failed, %v", err)
 	}
 
 	var deviceInfo DeviceInfo
@@ -124,7 +124,7 @@ func (x XpuSMI) LoadGpuInfo() (*XpuInfo, error) {
 	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(5 * time.Second))
 	data, err := cmdMgr.RunWithStdoutBashC("xpu-smi discovery -j")
 	if err != nil {
-		return nil, fmt.Errorf("calling xpu-smi  failed, err: %w", err)
+		return nil, fmt.Errorf("calling xpu-smi  failed, %v", err)
 	}
 	var deviceInfo DeviceInfo
 	if err := json.Unmarshal([]byte(data), &deviceInfo); err != nil {
@@ -146,7 +146,7 @@ func (x XpuSMI) LoadGpuInfo() (*XpuInfo, error) {
 
 	processData, err := cmdMgr.RunWithStdoutBashC("xpu-smi ps -j")
 	if err != nil {
-		return nil, fmt.Errorf("calling xpu-smi ps failed, err: %w", err)
+		return nil, fmt.Errorf("calling xpu-smi ps failed, %s", err)
 	}
 	var psList DeviceUtilByProcList
 	if err := json.Unmarshal([]byte(processData), &psList); err != nil {
@@ -205,13 +205,13 @@ func (x XpuSMI) loadDeviceInfo(device Device, wg *sync.WaitGroup, res *XpuInfo, 
 	wgCmd.Wait()
 
 	if xpuErr != nil {
-		baseGlobal.LOG.Errorf("calling xpu-smi discovery failed for device %d, err: %v\n", device.DeviceID, xpuErr)
+		global.LOG.Errorf("calling xpu-smi discovery failed for device %d, %v", device.DeviceID, xpuErr)
 		return
 	}
 
 	var info Device
 	if err := json.Unmarshal([]byte(xpuData), &info); err != nil {
-		baseGlobal.LOG.Errorf("xpuData json unmarshal failed for device %d, err: %v\n", device.DeviceID, err)
+		global.LOG.Errorf("xpuData json unmarshal failed for device %d, err: %v", device.DeviceID, err)
 		return
 	}
 
@@ -220,20 +220,20 @@ func (x XpuSMI) loadDeviceInfo(device Device, wg *sync.WaitGroup, res *XpuInfo, 
 
 	bytes, err := strconv.ParseInt(info.MemoryPhysicalSizeByte, 10, 64)
 	if err != nil {
-		baseGlobal.LOG.Errorf("Error parsing memory size for device %d, err: %v\n", device.DeviceID, err)
+		global.LOG.Errorf("Error parsing memory size for device %d, err: %v", device.DeviceID, err)
 		return
 	}
 	xpu.Basic.Memory = fmt.Sprintf("%.1f MB", float64(bytes)/(1024*1024))
 	xpu.Basic.FreeMemory = info.MemoryFreeSizeByte
 
 	if statsErr != nil {
-		baseGlobal.LOG.Errorf("calling xpu-smi stats failed for device %d, err: %v\n", device.DeviceID, statsErr)
+		global.LOG.Errorf("calling xpu-smi stats failed for device %d, err: %v", device.DeviceID, statsErr)
 		return
 	}
 
 	var stats DeviceStats
 	if err := json.Unmarshal([]byte(statsData), &stats); err != nil {
-		baseGlobal.LOG.Errorf("statsData json unmarshal failed for device %d, err: %v\n", device.DeviceID, err)
+		global.LOG.Errorf("statsData json unmarshal failed for device %d, err: %v", device.DeviceID, err)
 		return
 	}
 

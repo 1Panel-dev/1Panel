@@ -61,9 +61,8 @@ func initLang() {
 			downloadLangFromRemote()
 			return
 		}
-		std, err := cmd.RunDefaultWithStdoutBashCf("cp -r %s %s", path.Join(tmpPath, "lang"), "/usr/local/bin/")
-		if err != nil {
-			global.LOG.Errorf("load lang from package failed, std: %s, err: %v", std, err)
+		if err := cmd.RunDefaultBashCf("cp -r %s %s", path.Join(tmpPath, "lang"), "/usr/local/bin/"); err != nil {
+			global.LOG.Errorf("load lang from package failed, %v", err)
 			return
 		}
 		global.LOG.Info("init lang successful")
@@ -73,9 +72,8 @@ func initLang() {
 			downloadGeoFromRemote(geoPath)
 			return
 		}
-		std, err := cmd.RunDefaultWithStdoutBashCf("mkdir %s && cp %s %s/", path.Dir(geoPath), path.Join(tmpPath, "GeoIP.mmdb"), path.Dir(geoPath))
-		if err != nil {
-			global.LOG.Errorf("load geo ip from package failed, std: %s, err: %v", std, err)
+		if err := cmd.RunDefaultBashCf("mkdir %s && cp %s %s/", path.Dir(geoPath), path.Join(tmpPath, "GeoIP.mmdb"), path.Dir(geoPath)); err != nil {
+			global.LOG.Errorf("load geo ip from package failed, %v", err)
 			return
 		}
 		global.LOG.Info("init geo ip successful")
@@ -115,9 +113,8 @@ func downloadLangFromRemote() {
 		global.LOG.Error("download lang.tar.gz failed, no such file")
 		return
 	}
-	std, err := cmd.RunDefaultWithStdoutBashCf("tar zxvfC %s %s", "/usr/local/bin/lang.tar.gz", "/usr/local/bin/")
-	if err != nil {
-		fmt.Printf("decompress lang.tar.gz failed, std: %s, err: %v", std, err)
+	if err := cmd.RunDefaultBashCf("tar zxvfC %s %s", "/usr/local/bin/lang.tar.gz", "/usr/local/bin/"); err != nil {
+		global.LOG.Errorf("decompress lang.tar.gz failed, %v", err)
 		return
 	}
 	_ = os.Remove("/usr/local/bin/lang.tar.gz")

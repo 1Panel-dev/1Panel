@@ -70,16 +70,14 @@ func (c *CommandHelper) RunBashCWithArgs(arg ...string) error {
 }
 
 func (c *CommandHelper) RunBashC(command string) error {
-	std, err := c.run("bash", "-c", command)
-	if err != nil {
-		return fmt.Errorf("handle failed, std: %s, err: %v", std, err)
+	if _, err := c.run("bash", "-c", command); err != nil {
+		return err
 	}
 	return nil
 }
 func (c *CommandHelper) RunBashCf(command string, arg ...interface{}) error {
-	std, err := c.run("bash", "-c", fmt.Sprintf(command, arg...))
-	if err != nil {
-		return fmt.Errorf("handle failed, std: %s, err: %v", std, err)
+	if _, err := c.run("bash", "-c", fmt.Sprintf(command, arg...)); err != nil {
+		return err
 	}
 	return nil
 }
@@ -237,16 +235,16 @@ func handleErr(stdout, stderr bytes.Buffer, ignoreExist1 bool, err error) (strin
 			}
 		}
 	}
-	errMsg := ""
-	if len(stderr.String()) != 0 {
-		errMsg = fmt.Sprintf("stderr: %s", stderr.String())
+	outItem := stdout.String()
+	errItem := stderr.String()
+	if len(errItem) != 0 && len(outItem) != 0 {
+		return outItem, fmt.Errorf("stdout: %s; stderr: %s, err: %v", outItem, errItem, err)
 	}
-	if len(stdout.String()) != 0 {
-		if len(errMsg) != 0 {
-			errMsg = fmt.Sprintf("%s; stdout: %s", errMsg, stdout.String())
-		} else {
-			errMsg = fmt.Sprintf("stdout: %s", stdout.String())
-		}
+	if len(errItem) != 0 {
+		return outItem, fmt.Errorf("stderr: %s, err: %v", errItem, err)
 	}
-	return errMsg, err
+	if len(outItem) != 0 {
+		return outItem, fmt.Errorf("stdout: %s, err: %v", outItem, err)
+	}
+	return "", err
 }

@@ -16,6 +16,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
+	"github.com/1Panel-dev/1Panel/agent/utils/controller"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
 	fireClient "github.com/1Panel-dev/1Panel/agent/utils/firewall/client"
 	"github.com/jinzhu/copier"
@@ -211,8 +212,8 @@ func (u *FirewallService) OperateFirewall(req dto.FirewallOperation) error {
 		return fmt.Errorf("not supported operation: %s", req.Operation)
 	}
 	if needRestartDocker && req.WithDockerRestart {
-		if err := restartDocker(); err != nil {
-			return err
+		if err := controller.HandleRestart("docker"); err != nil {
+			return fmt.Errorf("failed to restart Docker: %v", err)
 		}
 	}
 	return nil
@@ -624,9 +625,8 @@ func (u *FirewallService) updatePingStatus(enable string) error {
 		return err
 	}
 
-	stdout, err := cmd.RunDefaultWithStdoutBashCf("%s sysctl -p", cmd.SudoHandleCmd())
-	if err != nil {
-		return fmt.Errorf("update ping status failed, err: %v", stdout)
+	if err := cmd.RunDefaultBashCf("%s sysctl -p", cmd.SudoHandleCmd()); err != nil {
+		return fmt.Errorf("update ping status failed, %v", err)
 	}
 
 	return nil

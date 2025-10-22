@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	fcgiclient "github.com/tomasen/fcgi_client"
 	"maps"
 	"os"
 	"os/exec"
@@ -16,6 +15,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	fcgiclient "github.com/tomasen/fcgi_client"
 
 	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"github.com/1Panel-dev/1Panel/agent/cmd/server/nginx_conf"
@@ -679,9 +680,6 @@ func (r *RuntimeService) GetPHPExtensions(runtimeID uint) (response.PHPExtension
 	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(20 * time.Second))
 	out, err := cmdMgr.RunWithStdoutBashCf("docker exec -i %s php -m", runtime.ContainerName)
 	if err != nil {
-		if out != "" {
-			return res, errors.New(out)
-		}
 		return res, err
 	}
 	extensions := strings.Split(out, "\n")

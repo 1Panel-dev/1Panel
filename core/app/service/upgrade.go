@@ -10,7 +10,6 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/1Panel-dev/1Panel/core/app/dto"
 	"github.com/1Panel-dev/1Panel/core/app/model"
@@ -20,6 +19,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/utils/cmd"
 	"github.com/1Panel-dev/1Panel/core/utils/common"
+	"github.com/1Panel-dev/1Panel/core/utils/controller"
 	"github.com/1Panel-dev/1Panel/core/utils/files"
 	"github.com/1Panel-dev/1Panel/core/utils/req_helper"
 )
@@ -207,10 +207,7 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 		global.CONF.Base.Version = req.Version
 		_ = settingRepo.Update("SystemStatus", "Free")
 
-		cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(10 * time.Second))
-		_, _ = cmdMgr.RunWithStdoutBashC("systemctl daemon-reload")
-		_, _ = cmdMgr.RunWithStdoutBashC("systemctl restart 1panel-agent.service")
-		_, _ = cmdMgr.RunWithStdoutBashC("systemctl restart 1panel-core.service")
+		controller.RestartPanel(true, true, true)
 	}()
 	return nil
 }

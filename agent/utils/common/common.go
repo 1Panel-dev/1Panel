@@ -18,7 +18,6 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/1Panel-dev/1Panel/agent/buserr"
-	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"golang.org/x/net/idna"
 )
@@ -396,28 +395,6 @@ func HandleIPList(content string) ([]string, error) {
 		res = append(res, ip)
 	}
 	return res, nil
-}
-
-func RestartService(core, agent, reload bool) {
-	command := ""
-	if reload {
-		command = "systemctl daemon-reload && "
-	}
-	switch {
-	case core && agent:
-		command += "systemctl restart 1panel-core.service && systemctl restart 1panel-agent.service"
-	case core:
-		command += "systemctl restart 1panel-core.service"
-	case agent:
-		command += "systemctl restart 1panel-agent.service"
-	default:
-		return
-	}
-	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(1 * time.Second))
-	std, err := cmdMgr.RunWithStdoutBashC(command)
-	if err != nil {
-		global.LOG.Errorf("restart 1panel service failed, err: %v, std: %s", err, std)
-	}
 }
 
 func GetSystemVersion(versionString string) string {

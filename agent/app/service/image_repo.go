@@ -16,6 +16,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
+	"github.com/1Panel-dev/1Panel/agent/utils/controller"
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
 )
@@ -134,7 +135,7 @@ func (u *ImageRepoService) Delete(req dto.OperateByID) error {
 		return err
 	}
 	go func() {
-		_ = restartDocker()
+		_ = controller.HandleRestart("docker")
 	}()
 	return nil
 }
@@ -262,8 +263,8 @@ func stopBeforeUpdateRepo() error {
 	if err := validateDockerConfig(); err != nil {
 		return err
 	}
-	if err := restartDocker(); err != nil {
-		return err
+	if err := controller.HandleRestart("docker"); err != nil {
+		return fmt.Errorf("failed to restart Docker: %v", err)
 	}
 	ticker := time.NewTicker(3 * time.Second)
 	defer ticker.Stop()
@@ -275,8 +276,8 @@ func stopBeforeUpdateRepo() error {
 				cancel()
 				return errors.New("the docker service cannot be restarted")
 			default:
-				stdout, err := cmd.RunDefaultWithStdoutBashC("systemctl is-active docker")
-				if string(stdout) == "active\n" && err == nil {
+				active, err := controller.CheckActive("docker")
+				if active && err != nil {
 					global.LOG.Info("docker restart with new conf successful!")
 					return nil
 				}

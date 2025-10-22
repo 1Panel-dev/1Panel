@@ -11,6 +11,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/i18n"
 	cmdUtils "github.com/1Panel-dev/1Panel/core/utils/cmd"
 	"github.com/1Panel-dev/1Panel/core/utils/common"
+	"github.com/1Panel-dev/1Panel/core/utils/controller"
 	"github.com/1Panel-dev/1Panel/core/utils/files"
 
 	"github.com/spf13/cobra"
@@ -88,11 +89,7 @@ var restoreCmd = &cobra.Command{
 		fmt.Println(i18n.GetMsgByKeyForCmd("RestoreStep5"))
 		fmt.Println(i18n.GetMsgByKeyForCmd("RestoreSuccessful"))
 
-		_, _ = cmdUtils.RunDefaultWithStdoutBashC("systemctl daemon-reload")
-		std, err := cmdUtils.RunDefaultWithStdoutBashC("1pctl restart all")
-		if err != nil {
-			fmt.Println(std)
-		}
+		controller.RestartPanel(true, true, true)
 		return nil
 	},
 }

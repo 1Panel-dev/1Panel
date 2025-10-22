@@ -1632,10 +1632,7 @@ func (w WebsiteService) UpdateSitePermission(req request.WebsiteUpdateDirPermiss
 	}
 	absoluteIndexPath := GetSitePath(website, SiteIndexDir)
 	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(10 * time.Second))
-	if out, err := cmdMgr.RunWithStdoutBashCf("%s chown -R %s:%s %s", cmd.SudoHandleCmd(), req.User, req.Group, absoluteIndexPath); err != nil {
-		if out != "" {
-			return errors.New(out)
-		}
+	if err := cmdMgr.RunBashCf("%s chown -R %s:%s %s", cmd.SudoHandleCmd(), req.User, req.Group, absoluteIndexPath); err != nil {
 		return err
 	}
 	website.User = req.User

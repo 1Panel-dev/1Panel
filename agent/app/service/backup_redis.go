@@ -19,7 +19,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/compose"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
-	"github.com/pkg/errors"
 )
 
 func (u *BackupService) RedisBackup(req dto.CommonBackup) error {
@@ -98,9 +97,8 @@ func handleRedisBackup(redisInfo *repo.RootInfo, parentTask *task.Task, recordID
 			}
 		}
 
-		stdout, err := cmd.RunDefaultWithStdoutBashCf("docker exec %s redis-cli -a %s --no-auth-warning save", redisInfo.ContainerName, redisInfo.Password)
-		if err != nil {
-			return errors.New(string(stdout))
+		if err := cmd.RunDefaultBashCf("docker exec %s redis-cli -a %s --no-auth-warning save", redisInfo.ContainerName, redisInfo.Password); err != nil {
+			return err
 		}
 
 		if strings.HasSuffix(fileName, ".tar.gz") {
@@ -111,16 +109,14 @@ func handleRedisBackup(redisInfo *repo.RootInfo, parentTask *task.Task, recordID
 			return nil
 		}
 		if strings.HasSuffix(fileName, ".aof") {
-			stdout1, err := cmd.RunDefaultWithStdoutBashCf("docker cp %s:/data/appendonly.aof %s/%s", redisInfo.ContainerName, backupDir, fileName)
-			if err != nil {
-				return errors.New(stdout1)
+			if err := cmd.RunDefaultBashCf("docker cp %s:/data/appendonly.aof %s/%s", redisInfo.ContainerName, backupDir, fileName); err != nil {
+				return err
 			}
 			return nil
 		}
 
-		stdout1, err1 := cmd.RunDefaultWithStdoutBashCf("docker cp %s:/data/dump.rdb %s/%s", redisInfo.ContainerName, backupDir, fileName)
-		if err1 != nil {
-			return errors.New(stdout1)
+		if err := cmd.RunDefaultBashCf("docker cp %s:/data/dump.rdb %s/%s", redisInfo.ContainerName, backupDir, fileName); err != nil {
+			return err
 		}
 		return nil
 	}

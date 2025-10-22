@@ -134,9 +134,8 @@ func (u *AIToolService) Close(name string) error {
 	if err != nil {
 		return err
 	}
-	stdout, err := cmd.RunDefaultWithStdoutBashCf("docker exec %s ollama stop %s", containerName, name)
-	if err != nil {
-		return fmt.Errorf("handle ollama stop %s failed, stdout: %s, err: %v", name, stdout, err)
+	if err := cmd.RunDefaultBashCf("docker exec %s ollama stop %s", containerName, name); err != nil {
+		return fmt.Errorf("handle ollama stop %s failed, %v", name, err)
 	}
 	return nil
 }
@@ -193,9 +192,8 @@ func (u *AIToolService) Delete(req dto.ForceDelete) error {
 	}
 	for _, item := range ollamaList {
 		if item.Status != constant.StatusDeleted {
-			stdout, err := cmd.RunDefaultWithStdoutBashCf("docker exec %s ollama rm %s", containerName, item.Name)
-			if err != nil && !req.ForceDelete {
-				return fmt.Errorf("handle ollama rm %s failed, stdout: %s, err: %v", item.Name, stdout, err)
+			if err := cmd.RunDefaultBashCf("docker exec %s ollama rm %s", containerName, item.Name); err != nil && !req.ForceDelete {
+				return fmt.Errorf("handle ollama rm %s failed, %v", item.Name, err)
 			}
 		}
 		_ = aiRepo.Delete(repo.WithByID(item.ID))

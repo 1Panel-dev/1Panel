@@ -26,8 +26,8 @@ import (
 	"github.com/1Panel-dev/1Panel/core/buserr"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
-	"github.com/1Panel-dev/1Panel/core/utils/cmd"
 	"github.com/1Panel-dev/1Panel/core/utils/common"
+	"github.com/1Panel-dev/1Panel/core/utils/controller"
 	"github.com/1Panel-dev/1Panel/core/utils/encrypt"
 	"github.com/1Panel-dev/1Panel/core/utils/firewall"
 	"github.com/1Panel-dev/1Panel/core/utils/req_helper/proxy_local"
@@ -192,10 +192,7 @@ func (u *SettingService) UpdateBindInfo(req dto.BindInfo) error {
 	}
 	go func() {
 		time.Sleep(1 * time.Second)
-		_, err := cmd.RunDefaultWithStdoutBashC("systemctl restart 1panel-core.service")
-		if err != nil {
-			global.LOG.Errorf("restart system with new bind info failed, err: %v", err)
-		}
+		controller.RestartPanel(true, false, false)
 	}()
 	return nil
 }
@@ -261,9 +258,7 @@ func (u *SettingService) UpdatePort(port uint) error {
 	}
 	go func() {
 		time.Sleep(1 * time.Second)
-		if _, err := cmd.RunDefaultWithStdoutBashC("systemctl restart 1panel-core.service"); err != nil {
-			global.LOG.Errorf("restart system port failed, err: %v", err)
-		}
+		controller.RestartPanel(true, false, false)
 	}()
 	return nil
 }
@@ -282,10 +277,7 @@ func (u *SettingService) UpdateSSL(c *gin.Context, req dto.SSLUpdate) error {
 		_ = os.Remove(path.Join(secretDir, "server.key"))
 		go func() {
 			time.Sleep(1 * time.Second)
-			_, err := cmd.RunDefaultWithStdoutBashC("systemctl restart 1panel-core.service")
-			if err != nil {
-				global.LOG.Errorf("restart system failed, err: %v", err)
-			}
+			controller.RestartPanel(true, false, false)
 		}()
 		return nil
 	}
@@ -380,10 +372,7 @@ func (u *SettingService) UpdateSSL(c *gin.Context, req dto.SSLUpdate) error {
 	if req.SSL != status {
 		go func() {
 			time.Sleep(1 * time.Second)
-			_, err := cmd.RunDefaultWithStdoutBashC("systemctl restart 1panel-core.service")
-			if err != nil {
-				global.LOG.Errorf("restart system failed, err: %v", err)
-			}
+			controller.RestartPanel(true, false, false)
 		}()
 	}
 	if err := settingRepo.Update("SSL", req.SSL); err != nil {

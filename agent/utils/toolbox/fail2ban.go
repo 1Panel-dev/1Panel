@@ -8,7 +8,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
-	"github.com/1Panel-dev/1Panel/agent/utils/systemctl"
+	"github.com/1Panel-dev/1Panel/agent/utils/controller"
 )
 
 type Fail2ban struct{}
@@ -23,15 +23,14 @@ type FirewallClient interface {
 }
 
 func NewFail2Ban() (*Fail2ban, error) {
-	isExist, _ := systemctl.IsExist("fail2ban.service")
+	isExist, _ := controller.CheckExist("fail2ban.service")
 	if isExist {
 		if _, err := os.Stat(defaultPath); err != nil {
 			if err := initLocalFile(); err != nil {
 				return nil, err
 			}
-			stdout, err := cmd.RunDefaultWithStdoutBashC("systemctl restart fail2ban.service")
-			if err != nil {
-				global.LOG.Errorf("restart fail2ban failed, err: %s", stdout)
+			if err := controller.HandleRestart("fail2ban.service"); err != nil {
+				global.LOG.Errorf("restart fail2ban failed, err: %v", err)
 				return nil, err
 			}
 		}
@@ -40,9 +39,9 @@ func NewFail2Ban() (*Fail2ban, error) {
 }
 
 func (f *Fail2ban) Status() (bool, bool, bool) {
-	isEnable, _ := systemctl.IsEnable("fail2ban.service")
-	isActive, _ := systemctl.IsActive("fail2ban.service")
-	isExist, _ := systemctl.IsExist("fail2ban.service")
+	isEnable, _ := controller.CheckEnable("fail2ban.service")
+	isActive, _ := controller.CheckActive("fail2ban.service")
+	isExist, _ := controller.CheckExist("fail2ban.service")
 
 	return isEnable, isActive, isExist
 }
@@ -50,7 +49,7 @@ func (f *Fail2ban) Status() (bool, bool, bool) {
 func (f *Fail2ban) Version() string {
 	stdout, err := cmd.RunDefaultWithStdoutBashC("fail2ban-client version")
 	if err != nil {
-		global.LOG.Errorf("load the fail2ban version failed, err: %s", stdout)
+		global.LOG.Errorf("load the fail2ban version failed, %v", err)
 		return "-"
 	}
 	return strings.ReplaceAll(stdout, "\n", "")
@@ -59,15 +58,13 @@ func (f *Fail2ban) Version() string {
 func (f *Fail2ban) Operate(operate string) error {
 	switch operate {
 	case "start", "restart", "stop", "enable", "disable":
-		stdout, err := cmd.RunDefaultWithStdoutBashCf("systemctl %s fail2ban.service", operate)
-		if err != nil {
-			return fmt.Errorf("%s the fail2ban.service failed, err: %s", operate, stdout)
+		if err := controller.Handle(operate, "fail2ban.service"); err != nil {
+			return fmt.Errorf("%s the fail2ban.service failed, err: %v", operate, err)
 		}
 		return nil
 	case "reload":
-		stdout, err := cmd.RunDefaultWithStdoutBashC("fail2ban-client reload")
-		if err != nil {
-			return fmt.Errorf("fail2ban-client reload, err: %s", stdout)
+		if err := cmd.RunDefaultBashC("fail2ban-client reload"); err != nil {
+			return fmt.Errorf("fail2ban-client reload, %v", err)
 		}
 		return nil
 	default:
@@ -159,9 +156,9 @@ action = %(action_mwl)s
 logpath = $logpath`
 
 	banaction := ""
-	if active, _ := systemctl.IsActive("firewalld"); active {
+	if active, _ := controller.CheckActive("firewalld"); active {
 		banaction = "firewallcmd-ipset"
-	} else if active, _ := systemctl.IsActive("ufw"); active {
+	} else if active, _ := controller.CheckActive("ufw"); active {
 		banaction = "ufw"
 	} else {
 		banaction = "iptables-allports"

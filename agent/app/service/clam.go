@@ -21,14 +21,15 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/clam"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
-	"github.com/1Panel-dev/1Panel/agent/utils/systemctl"
+	"github.com/1Panel-dev/1Panel/agent/utils/controller"
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 	"github.com/jinzhu/copier"
 	"github.com/robfig/cron/v3"
 )
 
 type ClamService struct {
-	serviceName string
+	serviceName      string
+	freshClamService string
 }
 
 type IClamService interface {
@@ -56,23 +57,31 @@ func (c *ClamService) LoadBaseInfo() (dto.ClamBaseInfo, error) {
 	var baseInfo dto.ClamBaseInfo
 	baseInfo.Version = "-"
 	baseInfo.FreshVersion = "-"
-	exist1, _ := systemctl.IsExist(constant.ClamServiceNameCentOs)
-	if exist1 {
-		c.serviceName = constant.ClamServiceNameCentOs
-		baseInfo.IsExist = true
-		baseInfo.IsActive, _ = systemctl.IsActive(constant.ClamServiceNameCentOs)
+
+	clamSvc, err := controller.LoadServiceName("clam")
+	if err != nil {
+		baseInfo.IsExist = false
+		return baseInfo, nil
 	}
-	exist2, _ := systemctl.IsExist(constant.ClamServiceNameUbuntu)
-	if exist2 {
-		c.serviceName = constant.ClamServiceNameUbuntu
+	c.serviceName = clamSvc
+	exist, _ := controller.CheckExist(clamSvc)
+	if exist {
 		baseInfo.IsExist = true
-		baseInfo.IsActive, _ = systemctl.IsActive(constant.ClamServiceNameUbuntu)
+		baseInfo.IsActive, _ = controller.CheckActive(clamSvc)
 	}
-	freshExist, _ := systemctl.IsExist(constant.FreshClamService)
+
+	freshSvc, err := controller.LoadServiceName("freshclam")
+	if err != nil {
+		baseInfo.FreshIsExist = false
+		return baseInfo, nil
+	}
+	c.freshClamService = freshSvc
+	freshExist, _ := controller.CheckExist(freshSvc)
 	if freshExist {
 		baseInfo.FreshIsExist = true
-		baseInfo.FreshIsActive, _ = systemctl.IsActive(constant.FreshClamService)
+		baseInfo.FreshIsActive, _ = controller.CheckActive(freshSvc)
 	}
+
 	if !cmd.Which("clamdscan") {
 		baseInfo.IsActive = false
 	}
@@ -87,7 +96,7 @@ func (c *ClamService) LoadBaseInfo() (dto.ClamBaseInfo, error) {
 			}
 		}
 	} else {
-		_ = clam.CheckClamIsActive(false, clamRepo)
+		_ = clam.StopAllClamJob(false, clamRepo)
 	}
 	if baseInfo.FreshIsActive {
 		version, err := cmd.RunDefaultWithStdoutBashC("freshclam --version")
@@ -105,15 +114,13 @@ func (c *ClamService) LoadBaseInfo() (dto.ClamBaseInfo, error) {
 func (c *ClamService) Operate(operate string) error {
 	switch operate {
 	case "start", "restart", "stop":
-		stdout, err := cmd.RunDefaultWithStdoutBashCf("systemctl %s %s", operate, c.serviceName)
-		if err != nil {
-			return fmt.Errorf("%s the %s failed, err: %s", operate, c.serviceName, stdout)
+		if err := controller.Handle(operate, c.serviceName); err != nil {
+			return fmt.Errorf("%s the %s failed, err: %s", operate, c.serviceName, err)
 		}
 		return nil
 	case "fresh-start", "fresh-restart", "fresh-stop":
-		stdout, err := cmd.RunDefaultWithStdoutBashCf("systemctl %s %s", strings.TrimPrefix(operate, "fresh-"), constant.FreshClamService)
-		if err != nil {
-			return fmt.Errorf("%s the %s failed, err: %s", operate, c.serviceName, stdout)
+		if err := controller.Handle(strings.TrimPrefix(operate, "fresh-"), c.freshClamService); err != nil {
+			return fmt.Errorf("%s the %s failed, err: %s", operate, c.serviceName, err)
 		}
 		return nil
 	default:
@@ -306,7 +313,7 @@ func (c *ClamService) Delete(req dto.ClamDelete) error {
 }
 
 func (c *ClamService) HandleOnce(id uint) error {
-	if active := clam.CheckClamIsActive(true, clamRepo); !active {
+	if active := clam.StopAllClamJob(true, clamRepo); !active {
 		return buserr.New("ErrClamdscanNotFound")
 	}
 	clamItem, _ := clamRepo.Get(repo.WithByID(id))
@@ -379,37 +386,13 @@ func (c *ClamService) LoadFile(req dto.ClamFileReq) (string, error) {
 	filePath := ""
 	switch req.Name {
 	case "clamd":
-		if c.serviceName == constant.ClamServiceNameUbuntu {
-			filePath = "/etc/clamav/clamd.conf"
-		} else {
-			filePath = "/etc/clamd.d/scan.conf"
-		}
+		filePath = c.loadConfigPath("clamd")
 	case "clamd-log":
 		filePath = c.loadLogPath("clamd-log")
-		if len(filePath) != 0 {
-			break
-		}
-		if c.serviceName == constant.ClamServiceNameUbuntu {
-			filePath = "/var/log/clamav/clamav.log"
-		} else {
-			filePath = "/var/log/clamd.scan"
-		}
 	case "freshclam":
-		if c.serviceName == constant.ClamServiceNameUbuntu {
-			filePath = "/etc/clamav/freshclam.conf"
-		} else {
-			filePath = "/etc/freshclam.conf"
-		}
+		filePath = c.loadConfigPath("freshclam")
 	case "freshclam-log":
 		filePath = c.loadLogPath("freshclam-log")
-		if len(filePath) != 0 {
-			break
-		}
-		if c.serviceName == constant.ClamServiceNameUbuntu {
-			filePath = "/var/log/clamav/freshclam.log"
-		} else {
-			filePath = "/var/log/freshclam.log"
-		}
 	default:
 		return "", fmt.Errorf("not support such type")
 	}
@@ -432,23 +415,11 @@ func (c *ClamService) LoadFile(req dto.ClamFileReq) (string, error) {
 
 func (c *ClamService) UpdateFile(req dto.UpdateByNameAndFile) error {
 	filePath := ""
-	service := ""
 	switch req.Name {
 	case "clamd":
-		if c.serviceName == constant.ClamServiceNameUbuntu {
-			service = constant.ClamServiceNameUbuntu
-			filePath = "/etc/clamav/clamd.conf"
-		} else {
-			service = constant.ClamServiceNameCentOs
-			filePath = "/etc/clamd.d/scan.conf"
-		}
+		filePath = c.loadConfigPath("clamd")
 	case "freshclam":
-		if c.serviceName == constant.ClamServiceNameUbuntu {
-			filePath = "/etc/clamav/freshclam.conf"
-		} else {
-			filePath = "/etc/freshclam.conf"
-		}
-		service = "clamav-freshclam.service"
+		filePath = c.loadConfigPath("freshclam")
 	default:
 		return fmt.Errorf("not support such type")
 	}
@@ -461,48 +432,63 @@ func (c *ClamService) UpdateFile(req dto.UpdateByNameAndFile) error {
 	_, _ = write.WriteString(req.File)
 	write.Flush()
 
-	_ = systemctl.Restart(service)
+	_ = controller.HandleRestart(c.serviceName)
 	return nil
 }
 
 func (c *ClamService) loadLogPath(name string) string {
-	confPath := ""
-	if name == "clamd-log" {
-		if c.serviceName == constant.ClamServiceNameUbuntu {
-			confPath = "/etc/clamav/clamd.conf"
-		} else {
-			confPath = "/etc/clamd.d/scan.conf"
-		}
-	} else {
-		if c.serviceName == constant.ClamServiceNameUbuntu {
-			confPath = "/etc/clamav/freshclam.conf"
-		} else {
-			confPath = "/etc/freshclam.conf"
-		}
+	configKey := "clamd"
+	searchPrefix := "LogFile "
+	if name != "clamd-log" {
+		configKey = "freshclam"
+		searchPrefix = "UpdateLogFile "
 	}
-	if _, err := os.Stat(confPath); err != nil {
-		return ""
-	}
+	confPath := c.loadConfigPath(configKey)
 	content, err := os.ReadFile(confPath)
 	if err != nil {
+		global.LOG.Debugf("read config of %s failed, err: %v", configKey, err)
 		return ""
 	}
 	lines := strings.Split(string(content), "\n")
-	if name == "clamd-log" {
-		for _, line := range lines {
-			if strings.HasPrefix(line, "LogFile ") {
-				return strings.Trim(strings.ReplaceAll(line, "LogFile ", ""), " ")
-			}
-		}
-	} else {
-		for _, line := range lines {
-			if strings.HasPrefix(line, "UpdateLogFile ") {
-				return strings.Trim(strings.ReplaceAll(line, "UpdateLogFile ", ""), " ")
-			}
+	for _, line := range lines {
+		if strings.HasPrefix(line, searchPrefix) {
+			return strings.Trim(strings.ReplaceAll(line, searchPrefix, ""), " ")
 		}
 	}
-
+	if configKey == "clamd" {
+		if _, err := os.Stat("/var/log/clamav/clamav.log"); err == nil {
+			return "/var/log/clamav/clamav.log"
+		}
+		if _, err := os.Stat("/var/log/clamd.scan"); err == nil {
+			return "/var/log/clamd.scan"
+		}
+	}
+	if configKey == "freshclam" {
+		if _, err := os.Stat("/var/log/clamav/freshclam.log"); err == nil {
+			return "/var/log/clamav/freshclam.log"
+		}
+		if _, err := os.Stat("/var/log/freshclam.log"); err == nil {
+			return "/var/log/freshclam.log"
+		}
+	}
 	return ""
+}
+
+func (c *ClamService) loadConfigPath(confType string) string {
+	switch confType {
+	case "clamd":
+		if _, err := os.Stat("/etc/clamav/clamd.conf"); err == nil {
+			return "/etc/clamav/clamd.conf"
+		}
+		return "/etc/clamd.d/scan.conf"
+	case "freshclam":
+		if _, err := os.Stat("/etc/clamav/freshclam.conf"); err == nil {
+			return "/etc/clamav/freshclam.conf"
+		}
+		return "/etc/freshclam.conf"
+	default:
+		return ""
+	}
 }
 
 func handleAlert(infectedFiles, clamName string, clamId uint) {

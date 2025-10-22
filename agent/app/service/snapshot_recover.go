@@ -17,7 +17,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
-	"github.com/1Panel-dev/1Panel/agent/utils/common"
+	"github.com/1Panel-dev/1Panel/agent/utils/controller"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/pkg/errors"
 )
@@ -226,7 +226,7 @@ func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
 			return
 		}
 		_ = os.RemoveAll(rootDir)
-		common.RestartService(true, true, true)
+		controller.RestartPanel(true, true, true)
 	}()
 	return nil
 }
@@ -352,10 +352,9 @@ func recoverAppData(src string, itemHelper *snapRecoverHelper) error {
 		itemHelper.Task.Log(i18n.GetMsgByKey("RecoverAppEmpty"))
 		return nil
 	}
-	std, err := cmd.NewCommandMgr(cmd.WithTimeout(10*time.Minute)).RunWithStdoutBashCf("docker load < %s", path.Join(src, "images.tar.gz"))
-	if err != nil {
-		itemHelper.Task.LogFailedWithErr(i18n.GetMsgByKey("RecoverAppImage"), errors.New(std))
-		return fmt.Errorf("docker load images failed, err: %v", err)
+	if err := cmd.NewCommandMgr(cmd.WithTimeout(10*time.Minute)).RunBashCf("docker load < %s", path.Join(src, "images.tar.gz")); err != nil {
+		itemHelper.Task.LogFailedWithErr(i18n.GetMsgByKey("RecoverAppImage"), err)
+		return fmt.Errorf("docker load images failed, %v", err)
 	}
 	itemHelper.Task.LogSuccess(i18n.GetMsgByKey("RecoverAppImage"))
 	return nil
@@ -404,8 +403,8 @@ func recoverBaseData(src string, itemHelper *snapRecoverHelper) error {
 		}
 	}
 
-	if err := restartDocker(); err != nil {
-		return err
+	if err := controller.HandleRestart("docker"); err != nil {
+		return fmt.Errorf("failed to restart Docker: %v", err)
 	}
 	return nil
 }
@@ -435,9 +434,8 @@ func restartCompose(composePath string, itemHelper *snapRecoverHelper) error {
 			continue
 		}
 		upCmd := fmt.Sprintf("docker compose -f %s up -d", pathItem)
-		stdout, err := cmd.RunDefaultWithStdoutBashC(upCmd)
-		if err != nil {
-			itemHelper.Task.LogFailedWithErr(i18n.GetMsgByKey("RecoverCompose"), errors.New(stdout))
+		if err := cmd.RunDefaultBashC(upCmd); err != nil {
+			itemHelper.Task.LogFailedWithErr(i18n.GetMsgByKey("RecoverCompose"), err)
 			continue
 		}
 		itemHelper.Task.LogSuccess(i18n.GetWithName("RecoverComposeItem", pathItem))
