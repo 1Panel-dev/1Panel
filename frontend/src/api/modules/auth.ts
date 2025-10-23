@@ -20,3 +20,8 @@ export const logOutApi = () => {
 export const getLoginSetting = () => {
     return http.get<Login.LoginSetting>('/core/auth/setting');
 };
+
+export const getWelcomePage = () => {
+    return http.get<string>('/core/auth/welcome');
+};
+

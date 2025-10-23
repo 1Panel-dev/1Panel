@@ -2,6 +2,8 @@ package v2
 
 import (
 	"encoding/base64"
+	"os"
+	"path"
 
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/core/app/dto"
@@ -123,6 +125,20 @@ func (b *BaseApi) GetResponsePage(c *gin.Context) {
 		return
 	}
 	helper.SuccessWithData(c, pageCode)
+}
+
+func (b *BaseApi) GetWelcomePage(c *gin.Context) {
+	count, _, _ := logService.PageLoginLog(c, dto.SearchLgLogWithPage{PageInfo: dto.PageInfo{Page: 1, PageSize: 10}})
+	if count != 1 {
+		helper.Success(c)
+		return
+	}
+	file, err := os.ReadFile(path.Join(global.CONF.Base.InstallDir, "1panel/welcome/index.html"))
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, string(file))
 }
 
 // @Tags Auth
