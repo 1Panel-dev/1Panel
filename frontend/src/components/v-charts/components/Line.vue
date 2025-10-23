@@ -3,7 +3,7 @@
 </template>
 <script lang="ts" setup>
 import { onMounted, nextTick, watch, onBeforeUnmount, ref } from 'vue';
-import * as echarts from 'echarts';
+import echarts from '@/utils/echarts';
 import { GlobalStore } from '@/store';
 import { computeSizeFromKBs, computeSizeFromKB, computeSizeFromMB } from '@/utils/util';
 import i18n from '@/lang';

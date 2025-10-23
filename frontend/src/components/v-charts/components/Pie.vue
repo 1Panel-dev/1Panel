@@ -3,7 +3,7 @@
 </template>
 <script lang="ts" setup>
 import { onMounted, nextTick, watch, onBeforeUnmount, ref } from 'vue';
-import * as echarts from 'echarts';
+import echarts from '@/utils/echarts';
 import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();
 const isDarkTheme = ref(false);
