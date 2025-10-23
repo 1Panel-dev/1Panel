@@ -302,6 +302,10 @@
 
         <LicenseImport ref="licenseRef" />
         <QuickJump @search="onLoadBaseInfo(false, 'all')" ref="quickJumpRef" />
+
+        <DialogPro v-model="welcomeOpen" size="w-70">
+            <div ref="shadowContainer" />
+        </DialogPro>
     </div>
 </template>
 
@@ -323,6 +327,7 @@ import { getSettingInfo, listAllSimpleNodes, loadUpgradeInfo } from '@/api/modul
 import { GlobalStore } from '@/store';
 import { storeToRefs } from 'pinia';
 import { routerToFileWithPath, routerToPath } from '@/utils/router';
+import { getWelcomePage } from '@/api/modules/auth';
 const router = useRouter();
 const globalStore = GlobalStore();
 
@@ -330,6 +335,9 @@ const statusRef = ref();
 const appRef = ref();
 
 const isSafety = ref();
+
+const welcomeOpen = ref();
+const shadowContainer = ref();
 
 const chartOption = ref('network');
 let timer: NodeJS.Timer | null = null;
@@ -692,6 +700,21 @@ const fetchData = () => {
     onLoadSimpleNode();
 };
 
+const loadWelcome = async () => {
+    await getWelcomePage().then((res) => {
+        if (res.data) {
+            welcomeOpen.value = true;
+            nextTick(() => {
+                const shadowRoot = shadowContainer.value.attachShadow({ mode: 'open' });
+                shadowRoot.innerHTML = res.data;
+            });
+            localStorage.setItem('welcomeShow', 'false');
+        } else {
+            localStorage.setItem('welcomeShow', 'false');
+        }
+    });
+};
+
 onBeforeRouteUpdate((to, from, next) => {
     if (to.name === 'home') {
         clearTimer();
@@ -707,6 +730,9 @@ const clearTimer = () => {
 
 onMounted(() => {
     fetchData();
+    if (localStorage.getItem('welcomeShow') !== 'false') {
+        loadWelcome();
+    }
 });
 
 onBeforeUnmount(() => {
