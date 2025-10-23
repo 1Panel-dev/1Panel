@@ -24,4 +24,3 @@ export const getLoginSetting = () => {
 export const getWelcomePage = () => {
     return http.get<string>('/core/auth/welcome');
 };
-
