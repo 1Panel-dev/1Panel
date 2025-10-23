@@ -32,7 +32,7 @@
                         <el-button
                             v-if="item.status === 'closed'"
                             icon="Refresh"
-                            style="color: white"
+                            class="text-white"
                             size="default"
                             link
                             @click="onReconnect(item)"
@@ -45,29 +45,95 @@
                 </template>
                 <Terminal
                     :style="{
-                        height: `calc(100vh - ${loadHeight()})`,
+                        height: cmdPanelVisible
+                            ? `calc(100vh - ${loadHeightWithPanel()})`
+                            : `calc(100vh - ${loadHeight()})`,
                         'background-color': `var(--panel-logs-bg-color)`,
                     }"
                     :ref="'t-' + item.index"
                     :key="item.Refresh"
                 ></Terminal>
-                <div>
-                    <el-cascader
-                        v-model="quickCmd"
-                        :options="commandTree"
-                        @change="quickInput"
-                        :show-all-levels="false"
-                        style="width: 25%"
-                        placeholder=" "
-                        filterable
+
+                <transition name="el-fade-in">
+                    <div
+                        v-show="cmdPanelVisible"
+                        class="mb-2 border-b border-[var(--el-border-color)] pb-2 w-full bg-[var(--el-bg-color)]"
                     >
-                        <template #prefix>{{ $t('terminal.quickCommand') }}</template>
-                    </el-cascader>
-                    <el-input v-model="batchVal" @keyup.enter="batchInput" style="width: 75%">
-                        <template #prepend>
-                            <el-checkbox :label="$t('terminal.batchInput')" v-model="isBatch" />
-                        </template>
-                    </el-input>
+                        <el-tabs v-model="activeGroupTab" type="card" class="command-tabs">
+                            <el-tab-pane
+                                v-for="group in commandTree"
+                                :key="group.value"
+                                :label="''"
+                                :name="group.value"
+                            >
+                                <template #label>
+                                    <span class="group-tab-label">
+                                        <span v-if="group.label.length <= 6">{{ group.label }}</span>
+                                        <el-tooltip v-else :content="group.label" placement="top">
+                                            <span>{{ group.label.substring(0, 6) }}...</span>
+                                        </el-tooltip>
+                                    </span>
+                                </template>
+                                <div class="grid grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-2 p-0">
+                                    <el-tag
+                                        v-for="cmd in group.children"
+                                        :key="cmd.value"
+                                        class="command-tag"
+                                        @click="executeCommand(cmd.value)"
+                                        type="info"
+                                        effect="plain"
+                                    >
+                                        <div class="flex items-center justify-between w-full gap-1.5">
+                                            <span class="command-tag-name" :title="cmd.label">
+                                                {{
+                                                    cmd.label.length > 8 ? cmd.label.substring(0, 8) + '...' : cmd.label
+                                                }}
+                                            </span>
+                                            <el-popover placement="top" :width="320" trigger="hover">
+                                                <template #reference>
+                                                    <el-icon class="command-preview-icon">
+                                                        <InfoFilled />
+                                                    </el-icon>
+                                                </template>
+                                                <div class="command-preview">
+                                                    <div class="command-preview-name">
+                                                        <strong>{{ cmd.label }}</strong>
+                                                    </div>
+                                                    <div class="command-preview-value">{{ cmd.value }}</div>
+                                                </div>
+                                            </el-popover>
+                                        </div>
+                                    </el-tag>
+                                </div>
+                            </el-tab-pane>
+                        </el-tabs>
+                    </div>
+                </transition>
+
+                <div class="flex items-center gap-3 w-full py-2 flex-wrap">
+                    <el-button
+                        @click="cmdPanelVisible = !cmdPanelVisible"
+                        type="primary"
+                        class="min-w-[120px] max-w-[150px] shrink-0"
+                    >
+                        {{ $t('terminal.quickCommand') }}
+                        <el-icon class="ml-1">
+                            <component :is="cmdPanelVisible ? 'ArrowUp' : 'ArrowDown'" />
+                        </el-icon>
+                    </el-button>
+                    <el-input
+                        v-model="batchVal"
+                        @keyup.enter.exact="batchInput"
+                        type="textarea"
+                        :autosize="{ minRows: 1, maxRows: 3 }"
+                        class="flex-1 basis-[300px] min-w-[200px]"
+                        placeholder=">"
+                    ></el-input>
+                    <el-checkbox
+                        :label="$t('terminal.batchInput')"
+                        v-model="isBatch"
+                        class="shrink-0 whitespace-nowrap"
+                    />
                 </div>
             </el-tab-pane>
             <el-tab-pane :closable="false" name="newTabs">
@@ -82,10 +148,10 @@
                                 {{ $t('terminal.localhost') }}
                             </el-button>
                         </div>
-                        <div class="search-button" style="float: none">
+                        <div class="search-button">
                             <el-input
                                 v-model="hostFilterInfo"
-                                style="margin-top: 5px; width: 90%"
+                                class="mt-1.5 w-[90%]"
                                 clearable
                                 suffix-icon="Search"
                                 :placeholder="$t('commons.button.search')"
@@ -133,7 +199,7 @@
             <el-button
                 @click="toggleFullscreen"
                 v-if="!mobile"
-                class="fullScreen"
+                class="bg-transparent border-0 absolute right-[50px] font-semibold text-sm"
                 :style="{ top: loadFullScreenHeight() }"
                 icon="FullScreen"
             ></el-button>
@@ -185,6 +251,8 @@ const terminalTabs = ref([]) as any;
 let tabIndex = 0;
 
 const commandTree = ref();
+const cmdPanelVisible = ref(false);
+const activeGroupTab = ref('');
 let quickCmd = ref();
 let batchVal = ref();
 let isBatch = ref<boolean>(false);
@@ -239,6 +307,9 @@ const cleanTimer = () => {
 const loadHeight = () => {
     return globalStore.openMenuTabs ? '230px' : '190px';
 };
+const loadHeightWithPanel = () => {
+    return globalStore.openMenuTabs ? '470px' : '430px';
+};
 const loadEmptyHeight = () => {
     return globalStore.openMenuTabs ? '201px' : '156px';
 };
@@ -288,26 +359,23 @@ const loadCommandTree = async () => {
             item.label = i18n.global.t('commons.table.default');
         }
     }
+    if (commandTree.value.length > 0) {
+        activeGroupTab.value = commandTree.value[0].value;
+    }
 };
 
-function quickInput(val: Array<string>) {
-    if (val.length < 1) {
-        return;
-    }
+const executeCommand = (command: string) => {
     if (!ctx) {
         return;
     }
-    quickCmd.value = val[val.length - 1];
     if (isBatch.value) {
         for (const tab of terminalTabs.value) {
-            ctx.refs[`t-${tab.index}`] && ctx.refs[`t-${tab.index}`][0].sendMsg(quickCmd.value + '\n');
+            ctx.refs[`t-${tab.index}`] && ctx.refs[`t-${tab.index}`][0].sendMsg(command + '\n');
         }
-        quickCmd.value = '';
-        return;
+    } else {
+        ctx.refs[`t-${terminalValue.value}`] && ctx.refs[`t-${terminalValue.value}`][0].sendMsg(command + '\n');
     }
-    ctx.refs[`t-${terminalValue.value}`] && ctx.refs[`t-${terminalValue.value}`][0].sendMsg(quickCmd.value + '\n');
-    quickCmd.value = '';
-}
+};
 
 function batchInput() {
     if (batchVal.value === '' || !ctx) {
@@ -494,22 +562,111 @@ onMounted(() => {
     font-size: 32px;
     font-weight: 600;
 }
-.fullScreen {
-    background-color: transparent;
-    border: none;
-    position: absolute;
-    right: 50px;
-    font-weight: 600;
-    font-size: 14px;
-}
 .el-tabs--top.el-tabs--card > .el-tabs__header .el-tabs__item:last-child {
     padding-right: 0px;
 }
 .el-input__wrapper {
     border-radius: 50px;
 }
-.el-input-group__prepend {
-    border-top-left-radius: 50px;
-    border-bottom-left-radius: 50px;
+
+:deep(.el-textarea__inner) {
+    border-radius: 4px;
+    resize: none;
+    min-height: 32px;
+    transition: height 0.2s ease;
+}
+
+.command-tabs {
+    :deep(.el-tabs__header) {
+        margin-bottom: 0;
+        background-color: var(--el-bg-color);
+    }
+    :deep(.el-tabs__content) {
+        height: 180px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        background-color: var(--el-bg-color);
+    }
+    :deep(.el-tabs__item) {
+        min-width: 80px;
+        max-width: 110px;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        padding: 0 8px;
+    }
+}
+.group-tab-label {
+    width: 90px;
+    display: inline-block;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 14px;
+}
+
+.command-tag {
+    cursor: pointer;
+    height: auto;
+    padding: 8px 12px;
+    transition: all 0.3s;
+    border-radius: 4px;
+    white-space: nowrap;
+    border: 1px solid transparent;
+
+    &:hover {
+        border-color: var(--el-color-primary);
+    }
+}
+
+.command-tag-name {
+    font-weight: 500;
+    font-size: 13px;
+    flex: 1;
+    text-align: left;
+}
+
+.command-preview-icon {
+    font-size: 14px;
+    opacity: 0.6;
+    transition: opacity 0.3s;
+    cursor: help;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+
+    &:hover {
+        opacity: 1;
+    }
+}
+
+.command-preview {
+    .command-preview-name {
+        font-size: 13px;
+        margin-bottom: 6px;
+        color: var(--el-text-color-primary);
+        word-break: break-word;
+    }
+
+    .command-preview-value {
+        font-size: 12px;
+        font-family: monospace;
+        padding: 8px;
+        background-color: var(--el-fill-color-light);
+        border-radius: 4px;
+        color: var(--el-text-color-regular);
+        word-break: break-all;
+        white-space: pre-wrap;
+    }
+}
+
+.command-tag-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
 }
 </style>
