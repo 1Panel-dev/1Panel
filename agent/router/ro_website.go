@@ -26,6 +26,7 @@ func (a *WebsiteRouter) InitRouter(Router *gin.RouterGroup) {
 		websiteRouter.POST("/default/server", baseApi.ChangeDefaultServer)
 		websiteRouter.POST("/group/change", baseApi.ChangeWebsiteGroup)
 		websiteRouter.POST("/batch/operate", baseApi.BatchOpWebsites)
+		websiteRouter.POST("/batch/group", baseApi.BatchSetWebsiteGroup)
 
 		websiteRouter.GET("/domains/:websiteId", baseApi.GetWebDomains)
 		websiteRouter.POST("/domains/del", baseApi.DeleteWebDomain)

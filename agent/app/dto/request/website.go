@@ -109,6 +109,11 @@ type BatchWebsiteOp struct {
 	TaskID  string `json:"taskID" validate:"required"`
 }
 
+type BatchWebsiteGroup struct {
+	IDs     []uint `json:"ids" validate:"required"`
+	GroupID uint   `json:"groupID" validate:"required"`
+}
+
 type WebsiteRedirectUpdate struct {
 	WebsiteID uint   `json:"websiteId" validate:"required"`
 	Key       string `json:"key" validate:"required"`

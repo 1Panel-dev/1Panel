@@ -694,4 +694,9 @@ export namespace Website {
     export interface CorsConfigReq extends CorsConfig {
         websiteID: number;
     }
+
+    export interface BatchSetGroup {
+        ids: number[];
+        groupID: number;
+    }
 }

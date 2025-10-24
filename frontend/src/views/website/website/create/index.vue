@@ -28,16 +28,11 @@
                 :validate-on-rule-change="false"
                 v-loading="loading"
             >
-                <el-form-item :label="$t('commons.table.group')" prop="webSiteGroupId">
-                    <el-select v-model="website.webSiteGroupId">
-                        <el-option
-                            v-for="(group, index) in groups"
-                            :key="index"
-                            :label="group.name == 'Default' ? $t('commons.table.default') : group.name"
-                            :value="group.id"
-                        ></el-option>
-                    </el-select>
-                </el-form-item>
+                <GroupSelect
+                    v-model="website.webSiteGroupId"
+                    :prop="'webSiteGroupId'"
+                    :groupType="'website'"
+                ></GroupSelect>
                 <div v-if="website.type === 'deployment'">
                     <el-form-item prop="appType">
                         <el-radio-group v-model="website.appType" @change="changeAppType(website.appType)">
@@ -421,6 +416,13 @@
 </template>
 
 <script lang="ts" setup name="CreateWebSite">
+import AppInstallForm from '@/views/app-store/detail/form/index.vue';
+import SSLAlert from '@/views/website/website/create/site-alert/index.vue';
+import DomainCreate from '@/views/website/website/domain-create/index.vue';
+import TaskLog from '@/components/log/task/index.vue';
+import Check from '../check/index.vue';
+import GroupSelect from '@/views/website/website/components/group/index.vue';
+
 import { App } from '@/api/interface/app';
 import { searchApp, getAppInstalled } from '@/api/modules/app';
 import {
@@ -435,23 +437,16 @@ import { Rules, checkNumberRange } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm, FormInstance } from 'element-plus';
 import { reactive, ref } from 'vue';
-import Check from '../check/index.vue';
 import { MsgError, MsgSuccess } from '@/utils/message';
-import { getAgentGroupList } from '@/api/modules/group';
-import { Group } from '@/api/interface/group';
 import { SearchRuntimes } from '@/api/modules/runtime';
 import { Runtime } from '@/api/interface/runtime';
 import { getRandomStr, getRuntimeLabel } from '@/utils/util';
-import TaskLog from '@/components/log/task/index.vue';
 import { getAppService } from '@/api/modules/app';
 import { v4 as uuidv4 } from 'uuid';
 import { dateFormatSimple, getProvider, getAccountName } from '@/utils/util';
 import { Website } from '@/api/interface/website';
-import DomainCreate from '@/views/website/website/domain-create/index.vue';
 import { getPathByType } from '@/api/modules/files';
 import { getWebsiteTypes } from '@/global/mimetype';
-import AppInstallForm from '@/views/app-store/detail/form/index.vue';
-import SSLAlert from '@/views/website/website/create/site-alert/index.vue';
 
 const websiteForm = ref<FormInstance>();
 
@@ -462,7 +457,7 @@ const initData = () => ({
     remark: '',
     appType: 'installed',
     appInstallId: undefined,
-    webSiteGroupId: 1,
+    webSiteGroupId: 0,
     otherDomains: '',
     proxy: '',
     runtimeID: undefined,
@@ -539,7 +534,6 @@ const rules = ref<any>({
 
 const open = ref(false);
 const loading = ref(false);
-const groups = ref<Group.GroupInfo[]>([]);
 const acmeAccounts = ref();
 const appInstalls = ref<App.AppInstalled[]>([]);
 const appReq = reactive({
@@ -714,9 +708,6 @@ const acceptParams = async () => {
     const dirRes = await getPathByType('websiteDir');
     staticPath.value = dirRes.data + '/sites/';
 
-    const res = await getAgentGroupList('website');
-    groups.value = res.data;
-    website.value.webSiteGroupId = res.data[0].id;
     runtimeResource.value = 'appstore';
     runtimeReq.value = initRuntimeReq();
     changeType(websiteType);

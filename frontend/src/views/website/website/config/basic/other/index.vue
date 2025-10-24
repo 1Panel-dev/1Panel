@@ -8,16 +8,11 @@
                 <el-form-item :label="$t('website.alias')" prop="primaryDomain">
                     <el-input v-model="form.alias" disabled></el-input>
                 </el-form-item>
-                <el-form-item :label="$t('commons.table.group')" prop="webSiteGroupID">
-                    <el-select v-model="form.webSiteGroupId">
-                        <el-option
-                            v-for="(group, index) in groups"
-                            :key="index"
-                            :label="group.name == 'Default' ? $t('commons.table.default') : group.name"
-                            :value="group.id"
-                        ></el-option>
-                    </el-select>
-                </el-form-item>
+                <GroupSelect
+                    v-model="form.webSiteGroupId"
+                    :prop="'webSiteGroupId'"
+                    :groupType="'website'"
+                ></GroupSelect>
                 <el-form-item :label="$t('website.remark')" prop="remark">
                     <el-input v-model="form.remark"></el-input>
                 </el-form-item>
@@ -35,14 +30,14 @@
 </template>
 
 <script lang="ts" setup>
+import GroupSelect from '@/views/website/website/components/group/index.vue';
+
 import { getWebsite, updateWebsite } from '@/api/modules/website';
 import { Rules } from '@/global/form-rules';
 import { computed, onMounted, reactive, ref } from 'vue';
 import { FormInstance } from 'element-plus';
 import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';
-import { getAgentGroupList } from '@/api/modules/group';
-import { Group } from '@/api/interface/group';
 
 const websiteForm = ref<FormInstance>();
 const props = defineProps({
@@ -68,7 +63,6 @@ const rules = ref({
     primaryDomain: [Rules.requiredInput],
     webSiteGroupId: [Rules.requiredSelect],
 });
-const groups = ref<Group.GroupInfo[]>([]);
 
 const submit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
@@ -92,9 +86,6 @@ const submit = async (formEl: FormInstance | undefined) => {
     });
 };
 const search = async () => {
-    const res = await getAgentGroupList('website');
-    groups.value = res.data;
-
     getWebsite(websiteId.value).then((res) => {
         form.primaryDomain = res.data.primaryDomain;
         form.remark = res.data.remark;

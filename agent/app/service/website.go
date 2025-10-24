@@ -61,6 +61,7 @@ type IWebsiteService interface {
 	DeleteWebsite(req request.WebsiteDelete) error
 	GetWebsite(id uint) (response.WebsiteDTO, error)
 	BatchOpWebsite(req request.BatchWebsiteOp) error
+	BatchSetGroup(req request.BatchWebsiteGroup) error
 
 	CreateWebsiteDomain(create request.WebsiteDomainCreate) ([]model.WebsiteDomain, error)
 	GetWebsiteDomain(websiteId uint) ([]model.WebsiteDomain, error)
@@ -519,6 +520,17 @@ func (w WebsiteService) OpWebsite(req request.WebsiteOp) error {
 		return err
 	}
 	return websiteRepo.Save(context.Background(), &website)
+}
+
+func (w WebsiteService) BatchSetGroup(req request.BatchWebsiteGroup) error {
+	websites, _ := websiteRepo.List(repo.WithByIDs(req.IDs))
+	for _, web := range websites {
+		web.WebsiteGroupID = req.GroupID
+		if err := websiteRepo.Save(context.Background(), &web); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (w WebsiteService) BatchOpWebsite(req request.BatchWebsiteOp) error {

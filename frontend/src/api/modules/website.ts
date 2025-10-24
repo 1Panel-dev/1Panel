@@ -367,3 +367,7 @@ export const getCorsConfig = (id: number) => {
 export const updateCorsConfig = (req: Website.CorsConfigReq) => {
     return http.post(`/websites/cors/update`, req);
 };
+
+export const batchSetGroup = (req: Website.BatchSetGroup) => {
+    return http.post(`/websites/batch/group`, req);
+};

@@ -1163,6 +1163,26 @@ func (b *BaseApi) BatchOpWebsites(c *gin.Context) {
 }
 
 // @Tags Website
+// @Summary Batch set website group
+// @Accept json
+// @Param request body request.BatchSetGroupReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /websites/batch/group [post]
+func (b *BaseApi) BatchSetWebsiteGroup(c *gin.Context) {
+	var req request.BatchWebsiteGroup
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := websiteService.BatchSetGroup(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags Website
 // @Summary Get CORS Config
 // @Accept json
 // @Param id path int true "id"
