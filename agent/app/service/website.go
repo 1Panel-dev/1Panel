@@ -1778,7 +1778,7 @@ func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error)
 		if req.Preflight {
 			location.AddCorsOption()
 		} else {
-			location.RemoveDirectiveByFullParams("if", []string{"(", "$request_method", "=", "'OPTIONS'", ")"})
+			location.RemoveCorsOption()
 		}
 	} else {
 		location.RemoveDirective("add_header", []string{"Access-Control-Allow-Origin"})

@@ -365,6 +365,7 @@ func (l *Location) RemoveSubFilter() {
 }
 
 func (l *Location) AddCorsOption() {
+	l.RemoveCorsOption()
 	newDir := &Directive{
 		Name:       "if",
 		Parameters: []string{"(", "$request_method", "=", "'OPTIONS'", ")"},
@@ -391,4 +392,8 @@ func (l *Location) AddCorsOption() {
 	directives := l.GetDirectives()
 	directives = append(directives, newDir)
 	l.Directives = directives
+}
+
+func (l *Location) RemoveCorsOption() {
+	l.RemoveDirectiveByFullParams("if", []string{"(", "$request_method", "=", "'OPTIONS'", ")"})
 }
