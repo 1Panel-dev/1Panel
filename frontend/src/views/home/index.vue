@@ -303,7 +303,7 @@
         <LicenseImport ref="licenseRef" />
         <QuickJump @search="onLoadBaseInfo(false, 'all')" ref="quickJumpRef" />
 
-        <DialogPro v-model="welcomeOpen" size="w-70">
+        <DialogPro v-model="welcomeOpen" size="w-70" id="welcomeDialog">
             <div ref="shadowContainer" />
         </DialogPro>
     </div>
