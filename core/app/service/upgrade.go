@@ -22,6 +22,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/utils/controller"
 	"github.com/1Panel-dev/1Panel/core/utils/files"
 	"github.com/1Panel-dev/1Panel/core/utils/req_helper"
+	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 )
 
 type UpgradeService struct{}
@@ -201,6 +202,7 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 
 		global.LOG.Info("upgrade successful!")
 		dropBackupCopies()
+		xpack.AutoUpgradeWithMaster()
 		go writeLogs(req.Version)
 		_ = settingRepo.Update("SystemVersion", req.Version)
 		_ = global.AgentDB.Model(&model.Setting{}).Where("key = ?", "SystemVersion").Updates(map[string]interface{}{"value": req.Version}).Error

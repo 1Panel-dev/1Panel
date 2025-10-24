@@ -38,3 +38,5 @@ func LoadNodeInfo(currentNode string) (*ssh.ConnInfo, string, error) {
 }
 
 func Sync(dataType string) error { return nil }
+
+func AutoUpgradeWithMaster() {}

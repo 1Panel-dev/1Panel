@@ -57,6 +57,7 @@ const message = {
             get: 'Obtener',
             upgrade: 'Actualizar',
             update: 'Actualizar',
+            updateNow: 'Actualizar Ahora',
             ignore: 'Ignorar actualización',
             copy: 'Copiar',
             random: 'Aleatorio',
@@ -292,6 +293,7 @@ const message = {
             scanFailed: 'Incompleto',
             success: 'Completado con éxito',
             waiting: 'En espera',
+            waitForUpgrade: 'Esperar Actualización',
             failed: 'Fallido',
             stopped: 'Detenido',
             error: 'Error',
@@ -3564,6 +3566,9 @@ const message = {
                 'No se ha configurado un respaldo del nodo principal. Para garantizar la seguridad de los datos, configura un nodo de respaldo lo antes posible y así facilitar el cambio manual en caso de fallo.',
             node: 'Nodo',
             addr: 'Dirección',
+            nodeUpgrade: 'Configuración de Actualización',
+            nodeUpgradeHelper:
+                'Los nodos seleccionados comenzarán a actualizarse automáticamente después de que se complete la actualización del nodo maestro, sin necesidad de operación manual.',
             nodeUnhealthy: 'Estado del nodo anómalo',
             deletedNode: 'El nodo eliminado {0} no soporta operaciones de actualización.',
             nodeUnhealthyHelper:

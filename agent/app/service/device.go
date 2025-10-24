@@ -244,7 +244,7 @@ func (u *DeviceService) UpdateSwap(req dto.SwapHelper) error {
 		cmdMgr := cmd.NewCommandMgr(cmd.WithTask(*taskItem))
 		if !req.IsNew {
 			if err := cmdMgr.RunBashCf("%s swapoff %s", cmd.SudoHandleCmd(), req.Path); err != nil {
-				return fmt.Errorf("handle swapoff %s failed, %v", req.Path)
+				return fmt.Errorf("handle swapoff %s failed, %v", req.Path, err)
 			}
 		}
 		if req.Size == 0 {

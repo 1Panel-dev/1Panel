@@ -55,6 +55,7 @@ const message = {
             get: 'Obter',
             upgrade: 'Atualizar versão',
             update: 'atualizar',
+            updateNow: 'Atualizar Agora',
             ignore: 'Ignorar atualização',
             install: 'instalar',
             copy: 'Copiar',
@@ -279,6 +280,7 @@ const message = {
             scanFailed: 'Incompleto',
             success: 'Sucesso',
             waiting: 'Aguardando',
+            waitForUpgrade: 'Aguardar Atualização',
             waiting1: 'Aguardando',
             failed: 'Falhou',
             stopped: 'Parado',
@@ -3585,6 +3587,9 @@ const message = {
                 'O backup do nó mestre não está configurado atualmente. Para garantir a segurança dos dados, configure um nó de backup o mais rápido possível para facilitar a troca manual para um novo nó mestre em caso de falha.',
             node: 'Nó',
             addr: 'Endereço',
+            nodeUpgrade: 'Configurações de Atualização',
+            nodeUpgradeHelper:
+                'Os nós selecionados começarão a atualizar automaticamente após a conclusão da atualização do nó mestre, nenhuma operação manual necessária.',
             nodeUnhealthy: 'Estado do nó anormal',
             deletedNode: 'O nó excluído {0} não suporta atualmente operações de atualização!',
             nodeUnhealthyHelper:

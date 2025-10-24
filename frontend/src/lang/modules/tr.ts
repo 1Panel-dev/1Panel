@@ -57,6 +57,7 @@ const message = {
             get: 'Al',
             upgrade: 'Yükselt',
             update: 'Güncelle',
+            updateNow: 'Şimdi Güncelle',
             ignore: 'Yükseltmeyi yoksay',
             copy: 'Kopyala',
             random: 'Rastgele',
@@ -289,6 +290,7 @@ const message = {
             scanFailed: 'Eksik',
             success: 'Başarılı',
             waiting: 'Bekliyor',
+            waitForUpgrade: 'Yükseltme Bekleniyor',
             failed: 'Başarısız',
             stopped: 'Durduruldu',
             error: 'Hata',
@@ -3652,6 +3654,9 @@ const message = {
                 'Ana düğüm yedeklemesi şu anda yapılandırılmamış. Veri güvenliği için, lütfen arıza durumunda yeni bir ana düğüme manuel geçiş yapabilmek amacıyla en kısa sürede bir yedek düğüm ayarlayın.',
             node: 'Düğüm',
             addr: 'Adres',
+            nodeUpgrade: 'Güncelleme Ayarları',
+            nodeUpgradeHelper:
+                'Seçilen düğümler, ana düğüm yükseltmesi tamamlandıktan sonra otomatik olarak yükseltmeye başlayacaktır, manuel işlem gerekmez.',
             nodeUnhealthy: 'Düğüm durumu anormal',
             deletedNode: 'Silinmiş düğüm {0} şu anda yükseltme işlemlerini desteklemiyor!',
             nodeUnhealthyHelper:
