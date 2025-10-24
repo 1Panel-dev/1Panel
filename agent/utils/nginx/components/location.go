@@ -253,7 +253,7 @@ func (l *Location) ChangePath(Modifier string, Match string) {
 	l.Match = Match
 }
 
-func (l *Location) AddBroswerCache(cacheTime int, cacheUint string) {
+func (l *Location) AddBrowserCache(cacheTime int, cacheUint string) {
 	l.RemoveDirective("add_header", []string{"Cache-Control", "no-cache"})
 	l.RemoveDirective("if", []string{"(", "$uri", "~*", `"\.(gif|png|jpg|css|js|woff|woff2)$"`, ")"})
 	directives := l.GetDirectives()
@@ -311,7 +311,7 @@ func (l *Location) AddServerCache(cacheKey string, serverCacheTime int, serverCa
 // 	l.CacheUint = cacheUint
 // }
 
-func (l *Location) RemoveBroswerCache() {
+func (l *Location) RemoveBrowserCache() {
 	l.RemoveDirective("if", []string{"(", "$uri", "~*", `"\.(gif|png|jpg|css|js|woff|woff2)$"`, ")"})
 	l.RemoveDirective("if", []string{"(", "$uri", "~*", `"\.(gif|png|jpg|css|js|woff|woff2|jpeg|svg|webp|avif)$"`, ")"})
 	l.UpdateDirective("add_header", []string{"Cache-Control", "no-cache"})
