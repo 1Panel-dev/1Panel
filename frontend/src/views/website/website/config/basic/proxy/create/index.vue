@@ -257,8 +257,8 @@ const initData = (): Website.ProxyConfig => ({
     operate: 'create',
     enable: true,
     cache: false,
-    cacheTime: 1,
-    cacheUnit: 'm',
+    cacheTime: 4,
+    cacheUnit: 'h',
     name: '',
     modifier: '',
     match: '/',
@@ -329,8 +329,8 @@ const changeServerCache = (cache: boolean) => {
 const changeBrowserCache = (cache: boolean) => {
     proxy.value.browserCache = cache;
     if (cache) {
-        proxy.value.cacheTime = 1;
-        proxy.value.cacheUnit = 'm';
+        proxy.value.cacheTime = 4;
+        proxy.value.cacheUnit = 'h';
     } else {
         proxy.value.cacheTime = 0;
         proxy.value.cacheUnit = '';
