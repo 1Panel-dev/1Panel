@@ -12,10 +12,17 @@
         <el-table-column :label="$t('website.proxyPass')" prop="proxyPass"></el-table-column>
         <el-table-column :label="$t('website.cache')" prop="cache">
             <template #default="{ row }">
-                <el-switch v-model="row.cache" @change="changeCache(row)" :disabled="!row.enable"></el-switch>
+                <el-tag :type="row.cacheTime > 0 ? 'success' : 'info'">
+                    {{ $t('website.browserCache') + ':' }}
+                    {{ row.cacheTime > 0 ? row.cacheTime + row.cacheUnit : $t('setting.sslDisable') }}
+                </el-tag>
+                <el-tag class="ml-2" :type="row.serverCacheTime > 0 ? 'success' : 'info'">
+                    {{ $t('website.serverCache') + ':' }}
+                    {{ row.serverCacheTime > 0 ? row.serverCacheTime + row.serverCacheUnit : $t('setting.sslDisable') }}
+                </el-tag>
             </template>
         </el-table-column>
-        <el-table-column :label="$t('commons.table.status')" prop="enable">
+        <el-table-column :label="$t('commons.table.status')" prop="enable" width="100">
             <template #default="{ row }">
                 <Status :status="row.enable ? 'enable' : 'disable'" @click="opProxy(row)" :operate="true" />
             </template>
@@ -102,8 +109,8 @@ const initData = (id: number): Website.ProxyConfig => ({
     operate: 'create',
     enable: true,
     cache: false,
-    cacheTime: 1,
-    cacheUnit: 'm',
+    cacheTime: 0,
+    cacheUnit: '',
     name: '',
     modifier: '',
     match: '/',
@@ -113,6 +120,12 @@ const initData = (id: number): Website.ProxyConfig => ({
     proxySSLName: '',
     serverCacheTime: 10,
     serverCacheUnit: 'm',
+    cors: false,
+    allowOrigins: '',
+    allowMethods: '',
+    allowHeaders: '',
+    allowCredentials: false,
+    preflight: false,
 });
 
 const openCreate = () => {
@@ -148,15 +161,6 @@ const deleteProxy = async (proxyConfig: Website.ProxyConfig) => {
         api: operateProxyConfig,
         params: proxyConfig,
     });
-};
-
-const changeCache = (proxyConfig: Website.ProxyConfig) => {
-    proxyConfig.operate = 'edit';
-    if (proxyConfig.cache) {
-        proxyConfig.cacheTime = 1;
-        proxyConfig.cacheUnit = 'm';
-    }
-    submit(proxyConfig);
 };
 
 const submit = async (proxyConfig: Website.ProxyConfig) => {
