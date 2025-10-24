@@ -65,7 +65,7 @@
                                         <el-dropdown-item command="ko">한국어</el-dropdown-item>
                                         <el-dropdown-item command="ru">Русский</el-dropdown-item>
                                         <el-dropdown-item command="ms">Bahasa Melayu</el-dropdown-item>
-                                        <el-dropdown-item command="Tr">Turkish</el-dropdown-item>
+                                        <el-dropdown-item command="tr">Turkish</el-dropdown-item>
                                     </el-dropdown-menu>
                                 </template>
                             </el-dropdown>
@@ -199,7 +199,6 @@ const themeConfig = computed(() => globalStore.themeConfig);
 const globalStore = GlobalStore();
 const menuStore = MenuStore();
 const tabsStore = TabsStore();
-const usei18n = useI18n();
 
 const errAuthInfo = ref(false);
 const errCaptcha = ref(false);
@@ -276,32 +275,24 @@ const loading = ref<boolean>(false);
 const mfaShow = ref<boolean>(false);
 const dropdownText = ref('中文(简体)');
 
-function handleCommand(command: string) {
-    loginForm.language = command;
-    usei18n.locale.value = command;
-    globalStore.updateLanguage(command);
-    if (command === 'zh') {
-        dropdownText.value = '中文(简体)';
-    } else if (command === 'en') {
-        dropdownText.value = 'English';
-    } else if (command === 'pt-BR') {
-        dropdownText.value = 'Português (Brasil)';
-    } else if (command === 'zh-Hant') {
-        dropdownText.value = '中文(繁體)';
-    } else if (command === 'ko') {
-        dropdownText.value = '한국어';
-    } else if (command === 'ja') {
-        dropdownText.value = '日本語';
-    } else if (command === 'ru') {
-        dropdownText.value = 'Русский';
-    } else if (command === 'ms') {
-        dropdownText.value = 'Bahasa Melayu';
-    } else if (command === 'tr') {
-        dropdownText.value = 'Turkish';
-    } else if (command === 'es-ES') {
-        dropdownText.value = 'España - Español';
-    }
-}
+const languageLabelMap: Record<string, string> = {
+    zh: '中文(简体)',
+    en: 'English',
+    'pt-BR': 'Português (Brasil)',
+    'zh-Hant': '中文(繁體)',
+    ko: '한국어',
+    ja: '日本語',
+    ru: 'Русский',
+    ms: 'Bahasa Melayu',
+    tr: 'Turkish',
+    'es-ES': 'España - Español',
+};
+
+const handleCommand = async (command: string) => {
+    const activeLocale = await globalStore.updateLanguage(command);
+    loginForm.language = activeLocale;
+    dropdownText.value = languageLabelMap[activeLocale] || languageLabelMap.zh;
+};
 
 const agreeWithLogin = () => {
     open.value = false;
@@ -421,18 +412,16 @@ const getSetting = async () => {
     try {
         const res = await getLoginSetting();
         isDemo.value = res.data.isDemo;
-        loginForm.language = res.data.language;
-        handleCommand(loginForm.language);
+        const language = res.data.language || loginForm.language;
+        await handleCommand(language);
         isIntl.value = res.data.isIntl;
         isFxplay.value = res.data.isFxplay;
         globalStore.isFxplay = isFxplay.value;
         globalStore.isOffLine = res.data.isOffLine;
 
         document.title = res.data.panelName;
-        i18n.locale.value = res.data.language;
         i18n.warnHtmlMessage = false;
         globalStore.setOpenMenuTabs(res.data.menuTabs === 'Enable');
-        globalStore.updateLanguage(res.data.language);
         globalStore.setThemeConfig({ ...themeConfig.value, theme: res.data.theme, panelName: res.data.panelName });
     } catch (error) {}
 };

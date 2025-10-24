@@ -508,26 +508,25 @@ const onSave = async (key: string, val: any) => {
         key: key,
         value: val + '',
     };
-    await updateSetting(param)
-        .then(() => {
-            if (key === 'Language') {
-                i18n.global.locale.value = val;
-                globalStore.updateLanguage(val);
-                location.reload();
-            }
-            if (key === 'Theme') {
-                handleThemeChange(val);
-            }
-            if (key === 'MenuTabs') {
-                globalStore.setOpenMenuTabs(val === 'Enable');
-            }
-            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            search();
-            loading.value = false;
-        })
-        .catch(() => {
-            loading.value = false;
-        });
+    try {
+        await updateSetting(param);
+        if (key === 'Language') {
+            await globalStore.updateLanguage(val);
+            location.reload();
+        }
+        if (key === 'Theme') {
+            handleThemeChange(val);
+        }
+        if (key === 'MenuTabs') {
+            globalStore.setOpenMenuTabs(val === 'Enable');
+        }
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+        search();
+    } catch (error) {
+        loading.value = false;
+        return;
+    }
+    loading.value = false;
 };
 
 onMounted(() => {

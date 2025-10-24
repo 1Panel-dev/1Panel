@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import piniaPersistConfig from '@/config/pinia-persist';
 import { GlobalState, ThemeConfigProp } from '../interface';
 import { DeviceType } from '@/enums/app';
-import i18n from '@/lang';
+import i18n, { setActiveLocale } from '@/lang';
 
 const GlobalStore = defineStore({
     id: 'GlobalState',
@@ -48,7 +48,7 @@ const GlobalStore = defineStore({
         isMasterProductPro: false,
         isOffLine: false,
 
-        masterAlias: i18n.global.t('xpack.node.master'),
+        masterAlias: '',
         currentNode: 'local',
         currentNodeAddr: '',
     }),
@@ -79,9 +79,10 @@ const GlobalStore = defineStore({
         setCsrfToken(token: string) {
             this.csrfToken = token;
         },
-        updateLanguage(language: any) {
-            this.language = language;
-            localStorage.setItem('lang', language);
+        async updateLanguage(language: string) {
+            const activeLocale = await setActiveLocale(language);
+            this.language = activeLocale;
+            return activeLocale;
         },
         setThemeConfig(themeConfig: ThemeConfigProp) {
             this.themeConfig = themeConfig;
