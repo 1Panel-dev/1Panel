@@ -255,7 +255,8 @@ func (l *Location) ChangePath(Modifier string, Match string) {
 
 func (l *Location) AddBrowserCache(cacheTime int, cacheUint string) {
 	l.RemoveDirective("add_header", []string{"Cache-Control", "no-cache"})
-	l.RemoveDirective("if", []string{"(", "$uri", "~*", `"\.(gif|png|jpg|css|js|woff|woff2)$"`, ")"})
+	l.RemoveDirectiveByFullParams("if", []string{"(", "$uri", "~*", `"\.(gif|png|jpg|css|js|woff|woff2)$"`, ")"})
+	l.RemoveDirectiveByFullParams("if", []string{"(", "$uri", "~*", `"\.(gif|png|jpg|css|js|woff|woff2|jpeg|svg|webp|avif)$"`, ")"}) 
 	directives := l.GetDirectives()
 	newDir := &Directive{
 		Name:       "if",
@@ -286,8 +287,8 @@ func (l *Location) AddServerCache(cacheKey string, serverCacheTime int, serverCa
 
 // func (l *Location) AddCache(cacheKey string, serverCacheTime int, serverCacheUint string) {
 // 	l.RemoveDirective("add_header", []string{"Cache-Control", "no-cache"})
-// 	l.RemoveDirective("if", []string{"(", "$uri", "~*", `"\.(gif|png|jpg|css|js|woff|woff2)$"`, ")"})
-// 	l.RemoveDirective("if", []string{"(", "$uri", "~*", `"\.(gif|png|jpg|css|js|woff|woff2|jpeg|svg|webp|avif)$"`, ")"})
+// 	l.RemoveDirectiveByFullParams("if", []string{"(", "$uri", "~*", `"\.(gif|png|jpg|css|js|woff|woff2)$"`, ")"})
+// 	l.RemoveDirectiveByFullParams("if", []string{"(", "$uri", "~*", `"\.(gif|png|jpg|css|js|woff|woff2|jpeg|svg|webp|avif)$"`, ")"})
 // 	directives := l.GetDirectives()
 // 	newDir := &Directive{
 // 		Name:       "if",
@@ -312,8 +313,8 @@ func (l *Location) AddServerCache(cacheKey string, serverCacheTime int, serverCa
 // }
 
 func (l *Location) RemoveBrowserCache() {
-	l.RemoveDirective("if", []string{"(", "$uri", "~*", `"\.(gif|png|jpg|css|js|woff|woff2)$"`, ")"})
-	l.RemoveDirective("if", []string{"(", "$uri", "~*", `"\.(gif|png|jpg|css|js|woff|woff2|jpeg|svg|webp|avif)$"`, ")"})
+	l.RemoveDirectiveByFullParams("if", []string{"(", "$uri", "~*", `"\.(gif|png|jpg|css|js|woff|woff2)$"`, ")"})
+	l.RemoveDirectiveByFullParams("if", []string{"(", "$uri", "~*", `"\.(gif|png|jpg|css|js|woff|woff2|jpeg|svg|webp|avif)$"`, ")"})
 	l.UpdateDirective("add_header", []string{"Cache-Control", "no-cache"})
 	l.CacheTime = 0
 	l.CacheUint = ""
@@ -330,8 +331,8 @@ func (l *Location) RemoveServerCache(cacheKey string) {
 }
 
 // func (l *Location) RemoveCache(cacheKey string) {
-// 	l.RemoveDirective("if", []string{"(", "$uri", "~*", `"\.(gif|png|jpg|css|js|woff|woff2)$"`, ")"})
-// 	l.RemoveDirective("if", []string{"(", "$uri", "~*", `"\.(gif|png|jpg|css|js|woff|woff2|jpeg|svg|webp|avif)$"`, ")"})
+// 	l.RemoveDirectiveByFullParams("if", []string{"(", "$uri", "~*", `"\.(gif|png|jpg|css|js|woff|woff2)$"`, ")"})
+// 	l.RemoveDirectiveByFullParams("if", []string{"(", "$uri", "~*", `"\.(gif|png|jpg|css|js|woff|woff2|jpeg|svg|webp|avif)$"`, ")"})
 // 	l.RemoveDirective("proxy_ignore_headers", []string{"Set-Cookie"})
 // 	l.RemoveDirective("proxy_cache", []string{cacheKey})
 // 	l.RemoveDirective("proxy_cache_key", []string{"$host$uri$is_args$args"})
