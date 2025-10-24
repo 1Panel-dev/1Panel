@@ -197,6 +197,7 @@ func (l *Location) UpdateDirective(key string, params []string) {
 	l.Directives = directives
 }
 
+// RemoveDirective removes a directive by its name and optional FIRST parameter match
 func (l *Location) RemoveDirective(key string, params []string) {
 	directives := l.Directives
 	var newDirectives []IDirective
@@ -209,6 +210,31 @@ func (l *Location) RemoveDirective(key string, params []string) {
 				}
 			} else {
 				continue
+			}
+		}
+		newDirectives = append(newDirectives, dir)
+	}
+	l.Directives = newDirectives
+}
+
+// RemoveDirectiveByFullParams removes a directive by its name and full parameter match
+func (l *Location) RemoveDirectiveByFullParams(key string, params []string) {
+	directives := l.Directives
+	var newDirectives []IDirective
+	for _, dir := range directives {
+		if dir.GetName() == key {
+			oldParams := dir.GetParameters()
+			if len(oldParams) == len(params) {
+				allMatch := true
+				for i, param := range params {
+					if oldParams[i] != param {
+						allMatch = false
+						break
+					}
+				}
+				if allMatch {
+					continue
+				}
 			}
 		}
 		newDirectives = append(newDirectives, dir)
@@ -229,8 +255,8 @@ func (l *Location) ChangePath(Modifier string, Match string) {
 
 func (l *Location) AddCache(cacheTime int, cacheUint, cacheKey string, serverCacheTime int, serverCacheUint string) {
 	l.RemoveDirective("add_header", []string{"Cache-Control", "no-cache"})
-	l.RemoveDirective("if", []string{"(", "$uri", "~*", `"\.(gif|png|jpg|css|js|woff|woff2)$"`, ")"})
-	l.RemoveDirective("if", []string{"(", "$uri", "~*", `"\.(gif|png|jpg|css|js|woff|woff2|jpeg|svg|webp|avif)$"`, ")"})
+	l.RemoveDirectiveByFullParams("if", []string{"(", "$uri", "~*", `"\.(gif|png|jpg|css|js|woff|woff2)$"`, ")"})
+	l.RemoveDirectiveByFullParams("if", []string{"(", "$uri", "~*", `"\.(gif|png|jpg|css|js|woff|woff2|jpeg|svg|webp|avif)$"`, ")"})
 	directives := l.GetDirectives()
 	newDir := &Directive{
 		Name:       "if",
@@ -255,8 +281,8 @@ func (l *Location) AddCache(cacheTime int, cacheUint, cacheKey string, serverCac
 }
 
 func (l *Location) RemoveCache(cacheKey string) {
-	l.RemoveDirective("if", []string{"(", "$uri", "~*", `"\.(gif|png|jpg|css|js|woff|woff2)$"`, ")"})
-	l.RemoveDirective("if", []string{"(", "$uri", "~*", `"\.(gif|png|jpg|css|js|woff|woff2|jpeg|svg|webp|avif)$"`, ")"})
+	l.RemoveDirectiveByFullParams("if", []string{"(", "$uri", "~*", `"\.(gif|png|jpg|css|js|woff|woff2)$"`, ")"})
+	l.RemoveDirectiveByFullParams("if", []string{"(", "$uri", "~*", `"\.(gif|png|jpg|css|js|woff|woff2|jpeg|svg|webp|avif)$"`, ")"})
 	l.RemoveDirective("proxy_ignore_headers", []string{"Set-Cookie"})
 	l.RemoveDirective("proxy_cache", []string{cacheKey})
 	l.RemoveDirective("proxy_cache_key", []string{"$host$uri$is_args$args"})

@@ -1768,14 +1768,14 @@ func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error)
 		if req.Preflight {
 			location.AddCorsOption()
 		} else {
-			location.RemoveDirective("if", []string{"(", "$request_method", "=", "'OPTIONS'", ")"})
+			location.RemoveDirectiveByFullParams("if", []string{"(", "$request_method", "=", "'OPTIONS'", ")"})
 		}
 	} else {
 		location.RemoveDirective("add_header", []string{"Access-Control-Allow-Origin"})
 		location.RemoveDirective("add_header", []string{"Access-Control-Allow-Methods"})
 		location.RemoveDirective("add_header", []string{"Access-Control-Allow-Headers"})
 		location.RemoveDirective("add_header", []string{"Access-Control-Allow-Credentials"})
-		location.RemoveDirective("if", []string{"(", "$request_method", "=", "'OPTIONS'", ")"})
+		location.RemoveDirectiveByFullParams("if", []string{"(", "$request_method", "=", "'OPTIONS'", ")"})
 	}
 	if err = nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
 		return buserr.WithErr("ErrUpdateBuWebsite", err)
