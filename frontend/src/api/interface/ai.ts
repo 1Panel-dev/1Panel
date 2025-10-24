@@ -199,6 +199,11 @@ export namespace AI {
         target: string;
     }
 
+    export interface ExtraHosts {
+        hostname: string;
+        ip: string;
+    }
+
     export interface TensorRTLLM {
         id?: number;
         name: string;
@@ -211,6 +216,7 @@ export namespace AI {
         exposedPorts?: ExposedPort[];
         environments?: Environment[];
         volumes?: Volume[];
+        extraHosts?: ExtraHosts[];
     }
 
     export interface TensorRTLLMDTO extends TensorRTLLM {

@@ -2751,6 +2751,7 @@ const message = {
         dirHelper: '說明：請填寫容器內的目錄路徑',
         concurrency: '並發方案',
         loadStatus: '負載狀態',
+        extraHosts: '主機映射',
     },
     process: {
         pid: '行程ID',

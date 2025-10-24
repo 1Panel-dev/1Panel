@@ -2934,6 +2934,7 @@ const message = {
         dirHelper: 'Nota: rellena la ruta del directorio dentro del contenedor',
         concurrency: 'Esquema de concurrencia',
         loadStatus: 'Estado de carga',
+        extraHosts: 'Mapeo de host',
     },
     process: {
         pid: 'ID de proceso',

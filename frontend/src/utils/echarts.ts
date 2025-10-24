@@ -10,6 +10,7 @@ import {
     VisualMapComponent,
     GeoComponent,
     PolarComponent,
+    DataZoomComponent,
 } from 'echarts/components';
 
 import { CanvasRenderer } from 'echarts/renderers';
@@ -27,6 +28,7 @@ echarts.use([
     VisualMapComponent,
     GeoComponent,
     PolarComponent,
+    DataZoomComponent,
 
     CanvasRenderer,
 ]);

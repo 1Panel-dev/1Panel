@@ -28,6 +28,7 @@ type RuntimeDTO struct {
 	ExposedPorts    []request.ExposedPort  `json:"exposedPorts"`
 	Environments    []request.Environment  `json:"environments"`
 	Volumes         []request.Volume       `json:"volumes"`
+	ExtraHosts      []request.ExtraHost    `json:"extraHosts"`
 	ContainerStatus string                 `json:"containerStatus"`
 	Container       string                 `json:"container"`
 	Remark          string                 `json:"remark"`

@@ -16,13 +16,16 @@
                     </el-form-item>
                     <el-tabs type="border-card">
                         <el-tab-pane :label="$t('commons.table.port')">
-                            <PortConfig v-model="containerConfig" :mode="'edit'" />
+                            <PortConfig :exposedPorts="containerConfig.exposedPorts" />
                         </el-tab-pane>
                         <el-tab-pane :label="$t('runtime.environment')">
                             <Environment :environments="containerConfig.environments" />
                         </el-tab-pane>
                         <el-tab-pane :label="$t('container.mount')">
                             <Volumes :volumes="containerConfig.volumes" />
+                        </el-tab-pane>
+                        <el-tab-pane :label="$t('runtime.extraHosts')">
+                            <ExtraHosts :extraHosts="containerConfig.extraHosts" />
                         </el-tab-pane>
                     </el-tabs>
                     <el-form-item class="mt-2">
@@ -37,13 +40,15 @@
 </template>
 
 <script lang="ts" setup>
+import PortConfig from '@/views/website/runtime/components/port/index.vue';
+import Environment from '@/views/website/runtime/components/environment/index.vue';
+import Volumes from '@/views/website/runtime/components/volume/index.vue';
+import ExtraHosts from '@/views/website/runtime/components/extra_hosts/index.vue';
+
 import { Runtime } from '@/api/interface/runtime';
 import { getPHPContainerConfig, updatePHPContainerConfig } from '@/api/modules/runtime';
 import { FormInstance } from 'element-plus';
 import { ref } from 'vue';
-import PortConfig from '@/views/website/runtime/port/index.vue';
-import Environment from '@/views/website/runtime/environment/index.vue';
-import Volumes from '@/views/website/runtime/volume/index.vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { Rules } from '@/global/form-rules';
@@ -59,6 +64,7 @@ const containerConfig = ref<Runtime.PHPContainerConfig>({
     exposedPorts: [],
     environments: [],
     volumes: [],
+    extraHosts: [],
 });
 
 const rules = {
@@ -71,6 +77,7 @@ const getConfig = async () => {
     containerConfig.value.environments = res.data.environments || [];
     containerConfig.value.volumes = res.data.volumes || [];
     containerConfig.value.containerName = res.data.containerName || '';
+    containerConfig.value.extraHosts = res.data.extraHosts || [];
 };
 
 const onSaveStart = async (formEl: FormInstance | undefined) => {
@@ -101,6 +108,7 @@ const submit = async () => {
             exposedPorts: containerConfig.value.exposedPorts,
             environments: containerConfig.value.environments,
             volumes: containerConfig.value.volumes,
+            extraHosts: containerConfig.value.extraHosts,
         });
         MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
     } catch (error) {

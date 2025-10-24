@@ -42,6 +42,7 @@ export namespace Runtime {
         exposedPorts?: ExposedPort[];
         environments?: Environment[];
         volumes?: Volume[];
+        extraHosts?: ExtraHost[];
         container: string;
     }
 
@@ -62,6 +63,7 @@ export namespace Runtime {
         exposedPorts?: ExposedPort[];
         environments?: Environment[];
         volumes?: Volume[];
+        extraHosts?: ExtraHost[];
         remark?: string;
     }
 
@@ -70,7 +72,6 @@ export namespace Runtime {
         containerPort: number;
         hostIP: string;
     }
-
     export interface Environment {
         key: string;
         value: string;
@@ -78,6 +79,11 @@ export namespace Runtime {
     export interface Volume {
         source: string;
         target: string;
+    }
+
+    export interface ExtraHost {
+        hostname: string;
+        ip: string;
     }
 
     export interface RuntimeUpdate {
@@ -222,6 +228,7 @@ export namespace Runtime {
         exposedPorts: ExposedPort[];
         environments: Environment[];
         volumes: Volume[];
+        extraHosts: ExtraHost[];
     }
 
     export interface RemarkUpdate {

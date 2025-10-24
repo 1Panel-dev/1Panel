@@ -3005,6 +3005,7 @@ const message = {
         dirHelper: 'Not: Lütfen kapsayıcı içindeki dizin yolunu doldurun',
         concurrency: 'Eşzamanlılık Şeması',
         loadStatus: 'Yük Durumu',
+        extraHosts: 'Ana bilgisayar eşleme',
     },
     process: {
         pid: 'İşlem Kimliği',

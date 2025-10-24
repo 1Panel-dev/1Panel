@@ -32,6 +32,7 @@ type NodeConfig struct {
 	ExposedPorts []ExposedPort `json:"exposedPorts"`
 	Environments []Environment `json:"environments"`
 	Volumes      []Volume      `json:"volumes"`
+	ExtraHosts   []ExtraHost   `json:"extraHosts"`
 }
 
 type Environment struct {
@@ -47,6 +48,11 @@ type ExposedPort struct {
 	HostPort      int    `json:"hostPort"`
 	ContainerPort int    `json:"containerPort"`
 	HostIP        string `json:"hostIP"`
+}
+
+type ExtraHost struct {
+	Hostname string `json:"hostname"`
+	IP       string `json:"ip"`
 }
 
 type RuntimeDelete struct {
@@ -135,6 +141,7 @@ type PHPContainerConfig struct {
 	ExposedPorts  []ExposedPort `json:"exposedPorts"`
 	Environments  []Environment `json:"environments"`
 	Volumes       []Volume      `json:"volumes"`
+	ExtraHosts    []ExtraHost   `json:"extraHosts"`
 }
 
 type RuntimeRemark struct {

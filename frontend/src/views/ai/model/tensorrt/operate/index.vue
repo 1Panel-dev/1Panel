@@ -27,15 +27,7 @@
                     {{ $t('aiTools.tensorRT.commandHelper') }}
                 </span>
             </el-form-item>
-            <el-tabs type="border-card">
-                <el-tab-pane :label="$t('commons.table.port')">
-                    <PortConfig v-model="tensorRTLLM" :mode="mode" />
-                </el-tab-pane>
-                <el-tab-pane :label="$t('runtime.environment')">
-                    <Environment :environments="tensorRTLLM.environments" />
-                </el-tab-pane>
-                <el-tab-pane :label="$t('container.mount')"><Volumes :volumes="tensorRTLLM.volumes" /></el-tab-pane>
-            </el-tabs>
+            <NodeConfig v-model="tensorRTLLM" />
         </el-form>
         <template #footer>
             <span class="dialog-footer">
@@ -50,9 +42,7 @@
 </template>
 
 <script lang="ts" setup>
-import PortConfig from '@/views/website/runtime/port/index.vue';
-import Environment from '@/views/website/runtime/environment/index.vue';
-import Volumes from '@/views/website/runtime/volume/index.vue';
+import NodeConfig from '@/views/website/runtime//components/node-config.vue';
 import DrawerPro from '@/components/drawer-pro/index.vue';
 import FileList from '@/components/file-list/index.vue';
 
@@ -76,6 +66,7 @@ const newTensorRTLLM = () => {
         command: 'bash -c "trtllm-serve /models/ --host 0.0.0.0 --port 8000"',
         exposedPorts: [],
         environments: [],
+        extraHosts: [],
         volumes: [],
     };
 };
@@ -100,6 +91,9 @@ const openEdit = (rowData: any): void => {
     }
     if (tensorRTLLM.value.exposedPorts == null) {
         tensorRTLLM.value.exposedPorts = [];
+    }
+    if (tensorRTLLM.value.extraHosts == null) {
+        tensorRTLLM.value.extraHosts = [];
     }
     drawerVisiable.value = true;
 };

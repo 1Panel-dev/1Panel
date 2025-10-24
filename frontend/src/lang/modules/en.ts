@@ -2963,6 +2963,7 @@ const message = {
         dirHelper: 'Note: Please fill in the directory path inside the container',
         concurrency: 'Concurrency Scheme',
         loadStatus: 'Load Status',
+        extraHosts: 'Host mapping',
     },
     process: {
         pid: 'Process ID',

@@ -2921,6 +2921,7 @@ const message = {
         dirHelper: 'Nota: Sila isi laluan direktori di dalam bekas',
         concurrency: 'Skim Serentak',
         loadStatus: 'Status Beban',
+        extraHosts: 'Pemetaan hos',
     },
     process: {
         pid: 'Process ID',

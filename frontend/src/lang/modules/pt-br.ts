@@ -2928,6 +2928,7 @@ const message = {
         dirHelper: 'Nota: Preencha o caminho do diretório dentro do contêiner',
         concurrency: 'Esquema de Concorrência',
         loadStatus: 'Status de Carga',
+        extraHosts: 'Mapeamento de host',
     },
     process: {
         pid: 'ID do Processo',

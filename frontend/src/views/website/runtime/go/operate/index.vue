@@ -46,15 +46,7 @@
             <el-form-item :label="$t('website.remark')" prop="remark">
                 <el-input type="textarea" :rows="1" clearable v-model="runtime.remark" />
             </el-form-item>
-            <el-tabs type="border-card">
-                <el-tab-pane :label="$t('commons.table.port')">
-                    <PortConfig v-model="runtime" :mode="mode" />
-                </el-tab-pane>
-                <el-tab-pane :label="$t('runtime.environment')">
-                    <Environment :environments="runtime.environments" />
-                </el-tab-pane>
-                <el-tab-pane :label="$t('container.mount')"><Volumes :volumes="runtime.volumes" /></el-tab-pane>
-            </el-tabs>
+            <NodeConfig v-model="runtime" />
         </el-form>
 
         <template #footer>
@@ -68,19 +60,18 @@
 </template>
 
 <script lang="ts" setup>
+import NodeConfig from '../../components/node-config.vue';
+import AppConfig from '@/views/website/runtime/app/index.vue';
+import FileList from '@/components/file-list/index.vue';
+
 import { App } from '@/api/interface/app';
 import { Runtime } from '@/api/interface/runtime';
 import { CreateRuntime, GetRuntime, UpdateRuntime } from '@/api/modules/runtime';
 import { Rules, checkNumberRange } from '@/global/form-rules';
-import FileList from '@/components/file-list/index.vue';
 import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
 import { reactive, ref, watch } from 'vue';
-import PortConfig from '@/views/website/runtime/port/index.vue';
-import Environment from '@/views/website/runtime/environment/index.vue';
-import Volumes from '@/views/website/runtime/volume/index.vue';
-import AppConfig from '@/views/website/runtime/app/index.vue';
 
 interface OperateRrops {
     id?: number;
@@ -110,6 +101,7 @@ const initData = (type: string) => ({
     environments: [],
     volumes: [],
     remark: '',
+    extraHosts: [],
 });
 let runtime = reactive<Runtime.RuntimeCreate>(initData('go'));
 const rules = ref<any>({
@@ -218,6 +210,7 @@ const getRuntime = async (id: number) => {
         runtime.exposedPorts = data.exposedPorts || [];
         runtime.environments = data.environments || [];
         runtime.volumes = data.volumes || [];
+        runtime.extraHosts = data.extraHosts || [];
         editParams.value = data.appParams;
         open.value = true;
     } catch (error) {}

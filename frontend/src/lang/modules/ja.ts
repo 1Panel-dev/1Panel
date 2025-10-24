@@ -2855,6 +2855,7 @@ const message = {
         dirHelper: 'ノート: コンテナ内のディレクトリパスを入力してください',
         concurrency: '並行処理スキーム',
         loadStatus: '負荷状態',
+        extraHosts: 'ホストマッピング',
     },
     process: {
         pid: 'プロセスID',

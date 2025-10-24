@@ -1135,6 +1135,7 @@ func (r *RuntimeService) GetPHPContainerConfig(id uint) (*request.PHPContainerCo
 		ExposedPorts:  runtimeDTO.ExposedPorts,
 		Environments:  runtimeDTO.Environments,
 		Volumes:       runtimeDTO.Volumes,
+		ExtraHosts:    runtimeDTO.ExtraHosts,
 	}
 	return res, nil
 }

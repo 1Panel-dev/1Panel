@@ -57,8 +57,9 @@ type ComposeProject struct {
 type Service struct {
 	Image       string      `yaml:"image"`
 	Environment Environment `yaml:"environment"`
-	Volumes     []string    `json:"volumes"`
-	Restart     string      `json:"restart"`
+	Volumes     []string    `yaml:"volumes"`
+	ExtraHosts  []string    `yaml:"extra_hosts"`
+	Restart     string      `yaml:"restart"`
 }
 
 type Environment struct {

@@ -635,6 +635,16 @@ func handleCompose(env gotenv.Env, composeContent []byte, create request.Runtime
 		for _, volume := range create.Volumes {
 			volumes = append(volumes, fmt.Sprintf("%s:%s", volume.Source, volume.Target))
 		}
+
+		var extraHosts []interface{}
+		for _, host := range create.ExtraHosts {
+			extraHosts = append(extraHosts, fmt.Sprintf("%s:%s", host.Hostname, host.IP))
+		}
+		delete(serviceValue, "extraHosts")
+		if len(extraHosts) > 0 {
+			serviceValue["extra_hosts"] = extraHosts
+		}
+
 		serviceValue["volumes"] = volumes
 		break
 	}
@@ -842,6 +852,33 @@ func getDockerComposeVolumes(yml []byte) ([]request.Volume, error) {
 	return res, nil
 }
 
+func getDockerComposeExtraHosts(yml []byte) ([]request.ExtraHost, error) {
+	var (
+		composeProject docker.ComposeProject
+		err            error
+	)
+	err = yaml.Unmarshal(yml, &composeProject)
+	if err != nil {
+		return nil, err
+	}
+	var res []request.ExtraHost
+	for _, service := range composeProject.Services {
+		for _, extraHosts := range service.ExtraHosts {
+			envArray := strings.Split(extraHosts, ":")
+			source := envArray[0]
+			target := ""
+			if len(envArray) > 1 {
+				target = envArray[1]
+			}
+			res = append(res, request.ExtraHost{
+				Hostname: source,
+				IP:       target,
+			})
+		}
+	}
+	return res, nil
+}
+
 func checkRuntimePortExist(port int, scanPort bool, runtimeID uint) error {
 	errMap := make(map[string]interface{})
 	errMap["port"] = port
@@ -978,6 +1015,11 @@ func handleRuntimeDTO(res *response.RuntimeDTO, runtime model.Runtime) error {
 		return err
 	}
 	volumes, err := getDockerComposeVolumes(composeByte)
+	if err != nil {
+		return err
+	}
+
+	res.ExtraHosts, err = getDockerComposeExtraHosts(composeByte)
 	if err != nil {
 		return err
 	}

@@ -2744,6 +2744,7 @@ const message = {
         dirHelper: '说明：请填写容器内的目录路径',
         concurrency: '并发方案',
         loadStatus: '负载状态',
+        extraHosts: '主机映射',
     },
     process: {
         pid: '进程ID',
