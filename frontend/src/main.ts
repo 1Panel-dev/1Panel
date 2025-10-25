@@ -18,7 +18,6 @@ import pinia from '@/store/index';
 import SvgIcon from './components/svg-icon/svg-icon.vue';
 import Components from '@/components';
 
-import ElementPlus from 'element-plus';
 import Fit2CloudPlus from 'fit2cloud-ui-plus';
 import * as Icons from '@element-plus/icons-vue';
 
@@ -26,7 +25,6 @@ import directives from '@/directives/index';
 
 const app = createApp(App);
 app.component('SvgIcon', SvgIcon);
-app.use(ElementPlus);
 app.use(Fit2CloudPlus, { locale: i18n.global.messages.value[localStorage.getItem('lang') || 'zh'] });
 
 Object.keys(Icons).forEach((key) => {
