@@ -28,7 +28,7 @@
                             <el-button @click="onImport">
                                 {{ $t('commons.button.import') }}
                             </el-button>
-                            <el-button :disabled="!data || data.length === 0" @click="onExport">
+                            <el-button :disabled="selects.length === 0" @click="onExport">
                                 {{ $t('commons.button.export') }}
                             </el-button>
                         </el-button-group>
@@ -230,17 +230,26 @@ const onImport = () => {
 };
 
 const onExport = () => {
-    const exportData = data.value.map((item: Host.RuleInfo) => ({
-        family: item.family,
-        protocol: item.protocol,
-        port: item.port,
-        targetIP: item.targetIP,
-        targetPort: item.targetPort,
-        interface: item.interface,
-    }));
-    const content = JSON.stringify(exportData, null, 2);
-    const fileName = `1panel-firewall-forward-${getCurrentDateFormatted()}.json`;
-    downloadWithContent(content, fileName);
+    ElMessageBox.confirm(
+        i18n.global.t('firewall.exportHelper', [selects.value.length]),
+        i18n.global.t('commons.button.export'),
+        {
+            confirmButtonText: i18n.global.t('commons.button.confirm'),
+            cancelButtonText: i18n.global.t('commons.button.cancel'),
+        },
+    ).then(async () => {
+        const exportData = data.value.map((item: Host.RuleInfo) => ({
+            family: item.family,
+            protocol: item.protocol,
+            port: item.port,
+            targetIP: item.targetIP,
+            targetPort: item.targetPort,
+            interface: item.interface,
+        }));
+        const content = JSON.stringify(exportData, null, 2);
+        const fileName = `1panel-firewall-forward-${getCurrentDateFormatted()}.json`;
+        downloadWithContent(content, fileName);
+    });
 };
 
 const buttons = [

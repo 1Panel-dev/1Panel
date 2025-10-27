@@ -2915,10 +2915,8 @@ const message = {
         forwardHelper3: 'Yalnızca IPv4 port yönlendirmesini destekler.',
         forwardInboundInterface: 'İletme Gelen Ağ Arayüzü',
         importHelper:
-            'Güvenlik duvarı kurallarını içe aktarmak için bir JSON dosyası yükleyin. Sistem otomatik olarak karşılaştırıp farkları gösterecektir',
-        importNew: 'Yeni kurallar',
-        importConflict: 'Çakışan kurallar',
-        importDuplicate: 'Yinelenen kurallar',
+            'Çakışan veya yinelenen güvenlik duvarı kurallarını içe aktarırken, içe aktarılan içerik orijinal güvenlik duvarı kurallarını güncellemek için standart olarak kullanılacaktır.',
+        exportHelper: '{0} güvenlik duvarı kuralını dışa aktarmak üzere. Devam etmek istiyor musunuz?',
         new: 'Yeni',
         conflict: 'Çakışma',
         duplicate: 'Yinelenen',

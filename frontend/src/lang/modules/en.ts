@@ -2875,10 +2875,8 @@ const message = {
         forwardHelper3: 'Only support IPv4 port forwarding.',
         forwardInboundInterface: 'Forward Inbound Network Interface',
         importHelper:
-            'Upload a JSON file to import firewall rules. The system will automatically compare and show differences',
-        importNew: 'New rules',
-        importConflict: 'Conflicting rules',
-        importDuplicate: 'Duplicate rules',
+            'When importing conflicting or duplicate firewall rules, the imported content will be used as the standard to update the original firewall rules.',
+        exportHelper: 'About to export {0} firewall rules. Continue?',
         new: 'New',
         conflict: 'Conflict',
         duplicate: 'Duplicate',

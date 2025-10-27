@@ -2845,10 +2845,8 @@ const message = {
         forwardHelper3: 'Solo se admite redirección de puertos IPv4.',
         forwardInboundInterface: 'Interfaz de Red de Entrada para Reenvío',
         importHelper:
-            'Sube un archivo JSON para importar reglas del firewall. El sistema comparará automáticamente y mostrará las diferencias',
-        importNew: 'Reglas nuevas',
-        importConflict: 'Reglas en conflicto',
-        importDuplicate: 'Reglas duplicadas',
+            'Al importar reglas de firewall conflictivas o duplicadas, el contenido importado se utilizará como estándar para actualizar las reglas de firewall originales.',
+        exportHelper: 'A punto de exportar {0} reglas de firewall. ¿Continuar?',
         new: 'Nueva',
         conflict: 'Conflicto',
         duplicate: 'Duplicada',

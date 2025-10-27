@@ -2737,10 +2737,9 @@ const message = {
         forwardHelper2: '대상 IP 를 비워두면 로컬 포트로 전달됩니다.',
         forwardHelper3: 'IPv4 포트 전달만 지원됩니다.',
         forwardInboundInterface: '포워딩 인바운드 네트워크 인터페이스',
-        importHelper: 'JSON 파일을 업로드하여 방화벽 규칙을 가져옵니다. 시스템이 자동으로 비교하고 차이를 표시합니다',
-        importNew: '새 규칙',
-        importConflict: '충돌 규칙',
-        importDuplicate: '중복 규칙',
+        importHelper:
+            '충돌하거나 중복되는 방화벽 규칙을 가져올 때 가져온 내용을 기준으로 원래 방화벽 규칙을 업데이트합니다.',
+        exportHelper: '{0}개의 방화벽 규칙을 내보내려고 합니다. 계속하시겠습니까?',
         new: '신규',
         conflict: '충돌',
         duplicate: '중복',

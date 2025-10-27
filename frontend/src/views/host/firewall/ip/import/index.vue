@@ -22,51 +22,6 @@
             </el-upload>
 
             <el-card class="mt-2 w-full" v-loading="loading">
-                <div v-if="compareResult.new.length > 0 || compareResult.conflict.length > 0">
-                    <el-alert
-                        :closable="false"
-                        show-icon
-                        type="success"
-                        class="mb-2"
-                        v-if="compareResult.new.length > 0"
-                    >
-                        <template #default>
-                            <span>
-                                {{ $t('firewall.importNew') }}:
-                                <strong>{{ compareResult.new.length }}</strong>
-                            </span>
-                        </template>
-                    </el-alert>
-                    <el-alert
-                        :closable="false"
-                        show-icon
-                        type="warning"
-                        class="mb-2"
-                        v-if="compareResult.conflict.length > 0"
-                    >
-                        <template #default>
-                            <span>
-                                {{ $t('firewall.importConflict') }}:
-                                <strong>{{ compareResult.conflict.length }}</strong>
-                            </span>
-                        </template>
-                    </el-alert>
-                    <el-alert
-                        :closable="false"
-                        show-icon
-                        type="info"
-                        class="mb-2"
-                        v-if="compareResult.duplicate.length > 0"
-                    >
-                        <template #default>
-                            <span>
-                                {{ $t('firewall.importDuplicate') }}:
-                                <strong>{{ compareResult.duplicate.length }}</strong>
-                            </span>
-                        </template>
-                    </el-alert>
-                </div>
-
                 <el-table :data="displayData" @selection-change="handleSelectionChange">
                     <el-table-column type="selection" fix />
                     <el-table-column :label="$t('commons.table.status')" :min-width="80">
@@ -86,8 +41,7 @@
                     </el-table-column>
                     <el-table-column :label="$t('firewall.strategy')" :min-width="80" prop="strategy">
                         <template #default="{ row }">
-                            <el-tag v-if="row.strategy === 'accept'" type="success">{{ $t('firewall.allow') }}</el-tag>
-                            <el-tag v-else type="danger">{{ $t('firewall.deny') }}</el-tag>
+                            {{ row.strategy === 'accept' ? $t('firewall.allow') : $t('firewall.deny') }}
                         </template>
                     </el-table-column>
                     <el-table-column

@@ -22,51 +22,6 @@
             </el-upload>
 
             <el-card class="mt-2 w-full" v-loading="loading">
-                <div v-if="compareResult.new.length > 0 || compareResult.conflict.length > 0">
-                    <el-alert
-                        :closable="false"
-                        show-icon
-                        type="success"
-                        class="mb-2"
-                        v-if="compareResult.new.length > 0"
-                    >
-                        <template #default>
-                            <span>
-                                {{ $t('firewall.importNew') }}:
-                                <strong>{{ compareResult.new.length }}</strong>
-                            </span>
-                        </template>
-                    </el-alert>
-                    <el-alert
-                        :closable="false"
-                        show-icon
-                        type="warning"
-                        class="mb-2"
-                        v-if="compareResult.conflict.length > 0"
-                    >
-                        <template #default>
-                            <span>
-                                {{ $t('firewall.importConflict') }}:
-                                <strong>{{ compareResult.conflict.length }}</strong>
-                            </span>
-                        </template>
-                    </el-alert>
-                    <el-alert
-                        :closable="false"
-                        show-icon
-                        type="info"
-                        class="mb-2"
-                        v-if="compareResult.duplicate.length > 0"
-                    >
-                        <template #default>
-                            <span>
-                                {{ $t('firewall.importDuplicate') }}:
-                                <strong>{{ compareResult.duplicate.length }}</strong>
-                            </span>
-                        </template>
-                    </el-alert>
-                </div>
-
                 <el-table :data="displayData" @selection-change="handleSelectionChange">
                     <el-table-column type="selection" fix />
                     <el-table-column :label="$t('commons.table.status')" :min-width="80">

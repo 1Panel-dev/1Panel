@@ -2788,10 +2788,8 @@ const message = {
         forwardHelper3: 'IPv4ポート転送のみをサポートします。',
         forwardInboundInterface: '転送入站ネットワークインターフェース',
         importHelper:
-            'JSON ファイルをアップロードしてファイアウォールルールをインポートします。システムが自動で比較し、差分を表示します',
-        importNew: '新規ルール',
-        importConflict: '競合ルール',
-        importDuplicate: '重複ルール',
+            '競合または重複するファイアウォールルールをインポートする場合、インポートされた内容を基準として元のファイアウォールルールを更新します。',
+        exportHelper: '{0} 件のファイアウォールルールをエクスポートします。続行しますか？',
         new: '新規',
         conflict: '競合',
         duplicate: '重複',

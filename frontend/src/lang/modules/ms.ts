@@ -2853,10 +2853,8 @@ const message = {
         forwardHelper3: 'Hanya menyokong pemajuan port IPv4.',
         forwardInboundInterface: 'Antara Muka Rangkaian Masukan Penerusan',
         importHelper:
-            'Muat naik fail JSON untuk mengimport peraturan firewall. Sistem akan membanding dan memaparkan perbezaan secara automatik',
-        importNew: 'Peraturan baharu',
-        importConflict: 'Peraturan konflik',
-        importDuplicate: 'Peraturan duplikat',
+            'Apabila mengimport peraturan firewall yang bercanggah atau pendua, kandungan yang diimport akan digunakan sebagai piawai untuk mengemas kini peraturan firewall asal.',
+        exportHelper: 'Akan mengeksport {0} peraturan firewall. Teruskan?',
         new: 'Baharu',
         conflict: 'Konflik',
         duplicate: 'Duplikat',
