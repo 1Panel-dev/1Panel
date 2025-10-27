@@ -158,7 +158,7 @@
                                 <el-tag size="small">{{ row.Type }}</el-tag>
                             </template>
                         </el-table-column>
-                        <el-table-column :label="$t('container.volumeOption')" show-overflow-tooltip>
+                        <el-table-column :label="$t('container.hostOption')" show-overflow-tooltip>
                             <template #default="{ row }">
                                 <el-text
                                     v-if="row.Source"
@@ -171,7 +171,11 @@
                                 <span v-else>-</span>
                             </template>
                         </el-table-column>
-                        <el-table-column :label="$t('container.hostOption')" prop="Destination" show-overflow-tooltip />
+                        <el-table-column
+                            :label="$t('container.volumeOption')"
+                            prop="Destination"
+                            show-overflow-tooltip
+                        />
                         <el-table-column :label="$t('container.tag')" width="80" align="center">
                             <template #default="{ row }">
                                 <el-tag :type="row.RW ? 'success' : 'warning'" size="small">
