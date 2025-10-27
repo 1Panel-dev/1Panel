@@ -1123,9 +1123,13 @@ const message = {
     },
     monitor: {
         globalFilter: '전역 필터',
-        enableMonitor: '활성화',
-        storeDays: '만료일',
-        cleanMonitor: '모니터링 기록 정리',
+        enableMonitor: '모니터링 상태',
+        storeDays: '보관 일수',
+        defaultNetwork: '기본 네트워크 카드',
+        defaultNetworkHelper: '모니터링 및 개요 인터페이스에 표시되는 기본 네트워크 카드 옵션',
+        defaultIO: '기본 디스크',
+        defaultIOHelper: '모니터링 및 개요 인터페이스에 표시되는 기본 디스크 옵션',
+        cleanMonitor: '모니터링 기록 지우기',
 
         avgLoad: '평균 부하',
         loadDetail: '부하 세부사항',
@@ -1144,7 +1148,8 @@ const message = {
         network: '네트워크',
         up: '업',
         down: '다운',
-        interval: '간격(분)',
+        interval: '수집 간격',
+        intervalHelper: '적절한 모니터링 수집 간격을 입력하세요 (5초 - 12시간)',
 
         gpuUtil: 'GPU 사용률',
         temperature: '온도',

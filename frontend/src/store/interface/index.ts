@@ -46,6 +46,7 @@ export interface GlobalState {
     currentRedisDB: string;
     showEntranceWarn: boolean;
     defaultNetwork: string;
+    defaultIO: string;
     isFxplay: boolean;
 
     isProductPro: boolean;

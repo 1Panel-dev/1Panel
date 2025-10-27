@@ -25,8 +25,8 @@
                                     </template>
                                 </el-input>
                             </el-form-item>
-                            <el-form-item :label="$t('monitor.interval')" prop="monitorInterval">
-                                <el-input disabled v-model="form.monitorInterval">
+                            <el-form-item :label="$t('monitor.interval')" prop="monitorIntervalItem">
+                                <el-input disabled v-model="form.monitorIntervalItem">
                                     <template #append>
                                         <el-button @click="onChangeInterval" icon="Setting">
                                             {{ $t('commons.button.set') }}
@@ -44,6 +44,16 @@
                                 </el-input>
                                 <span class="input-help">{{ $t('monitor.defaultNetworkHelper') }}</span>
                             </el-form-item>
+                            <el-form-item :label="$t('monitor.defaultIO')">
+                                <el-input disabled v-model="form.defaultIO">
+                                    <template #append>
+                                        <el-button @click="onChangeIO" icon="Setting">
+                                            {{ $t('commons.button.set') }}
+                                        </el-button>
+                                    </template>
+                                </el-input>
+                                <span class="input-help">{{ $t('monitor.defaultIOHelper') }}</span>
+                            </el-form-item>
                             <el-form-item>
                                 <el-button @click="onClean()" icon="Delete">{{ $t('monitor.cleanMonitor') }}</el-button>
                             </el-form-item>
@@ -56,6 +66,7 @@
         <Interval ref="intervalRef" @search="search" />
         <StoreDays ref="daysRef" @search="search" />
         <Network ref="networkRef" @search="search()" />
+        <IO ref="ioRef" @search="search()" />
     </div>
 </template>
 
@@ -67,29 +78,42 @@ import MonitorRouter from '@/views/host/monitor/index.vue';
 import Interval from '@/views/host/monitor/setting/interval/index.vue';
 import StoreDays from '@/views/host/monitor/setting/days/index.vue';
 import Network from '@/views/host/monitor/setting/default-network/index.vue';
+import IO from '@/views/host/monitor/setting/default-io/index.vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
+import { splitTimeFromSecond, transTimeUnit } from '@/utils/util';
 
 const loading = ref();
 const form = reactive({
     monitorStatus: 'Disable',
     monitorStoreDays: 30,
-    monitorInterval: 1,
+    monitorInterval: 300,
+    timeItem: 5,
+    timeUnit: 'm',
+    monitorIntervalItem: '',
     defaultNetwork: '',
+    defaultIO: '',
 });
 const panelFormRef = ref<FormInstance>();
 
 const intervalRef = ref();
 const daysRef = ref();
 const networkRef = ref();
+const ioRef = ref();
 
 const search = async () => {
     const res = await loadMonitorSetting();
     form.monitorStatus = res.data.monitorStatus;
     form.monitorInterval = Number(res.data.monitorInterval);
+    let item = splitTimeFromSecond(form.monitorInterval);
+    form.timeItem = item.timeItem;
+    form.timeUnit = item.timeUnit;
+    form.monitorIntervalItem = transTimeUnit(form.timeItem + form.timeUnit);
+
     form.monitorStoreDays = Number(res.data.monitorStoreDays);
     form.defaultNetwork =
         res.data.defaultNetwork === 'all' ? i18n.global.t('commons.table.all') : res.data.defaultNetwork;
+    form.defaultIO = res.data.defaultIO === 'all' ? i18n.global.t('commons.table.all') : res.data.defaultIO;
 };
 
 const onSaveStatus = async () => {
@@ -108,10 +132,13 @@ const onChangeStoreDays = () => {
     daysRef.value.acceptParams({ monitorStoreDays: form.monitorStoreDays });
 };
 const onChangeInterval = () => {
-    intervalRef.value.acceptParams({ monitorInterval: form.monitorInterval });
+    intervalRef.value.acceptParams({ timeItem: form.timeItem, timeUnit: form.timeUnit });
 };
 const onChangeNetwork = () => {
     networkRef.value.acceptParams({ defaultNetwork: form.defaultNetwork });
+};
+const onChangeIO = () => {
+    ioRef.value.acceptParams({ defaultIO: form.defaultIO });
 };
 
 const onClean = async () => {

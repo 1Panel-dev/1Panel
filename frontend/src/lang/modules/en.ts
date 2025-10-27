@@ -1168,11 +1168,13 @@ const message = {
     },
     monitor: {
         globalFilter: 'Global Filter',
-        enableMonitor: 'Enable',
-        storeDays: 'Expiration days',
-        defaultNetwork: 'Default Network Adapter',
-        defaultNetworkHelper: 'Network adapter option displayed in the default monitoring and overview interface',
-        cleanMonitor: 'Clean monitoring records',
+        enableMonitor: 'Monitoring Status',
+        storeDays: 'Retention Days',
+        defaultNetwork: 'Default Network Card',
+        defaultNetworkHelper: 'Default network card option displayed in monitoring and overview interfaces',
+        defaultIO: 'Default Disk',
+        defaultIOHelper: 'Default disk option displayed in monitoring and overview interfaces',
+        cleanMonitor: 'Clear Monitoring Records',
 
         avgLoad: 'Load average',
         loadDetail: 'Load detail',
@@ -1193,7 +1195,8 @@ const message = {
         network: 'Network',
         up: 'Up',
         down: 'Down',
-        interval: 'Interval(minute)',
+        interval: 'Collection Interval',
+        intervalHelper: 'Please enter an appropriate monitoring collection interval (5 seconds - 12 hours)',
 
         gpuUtil: 'GPU Utilization',
         temperature: 'Temperature',

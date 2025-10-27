@@ -458,7 +458,7 @@ const onLoadSimpleNode = async () => {
 const onLoadIOOptions = async () => {
     const res = await getIOOptions();
     ioOptions.value = res.data;
-    searchInfo.ioOption = ioOptions.value && ioOptions.value[0];
+    searchInfo.ioOption = globalStore.defaultIO || (ioOptions.value && ioOptions.value[0]);
 };
 
 const onLoadBaseInfo = async (isInit: boolean, range: string) => {

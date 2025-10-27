@@ -1182,11 +1182,13 @@ const message = {
     },
     monitor: {
         globalFilter: 'Genel Filtre',
-        enableMonitor: 'Etkinleştir',
-        storeDays: 'Son kullanma günleri',
-        defaultNetwork: 'Varsayılan Ağ Adaptörü',
-        defaultNetworkHelper: 'Varsayılan izleme ve genel bakış arayüzünde görüntülenen ağ adaptörü seçeneği',
-        cleanMonitor: 'İzleme kayıtlarını temizle',
+        enableMonitor: 'İzleme Durumu',
+        storeDays: 'Saklama Günleri',
+        defaultNetwork: 'Varsayılan Ağ Kartı',
+        defaultNetworkHelper: 'İzleme ve genel bakış arayüzlerinde görüntülenen varsayılan ağ kartı seçeneği',
+        defaultIO: 'Varsayılan Disk',
+        defaultIOHelper: 'İzleme ve genel bakış arayüzlerinde görüntülenen varsayılan disk seçeneği',
+        cleanMonitor: 'İzleme Kayıtlarını Temizle',
 
         avgLoad: 'Ortalama yük',
         loadDetail: 'Yük detayı',
@@ -1207,7 +1209,8 @@ const message = {
         network: 'Ağ',
         up: 'Yukarı',
         down: 'Aşağı',
-        interval: 'Aralık(dakika)',
+        interval: 'Toplama Aralığı',
+        intervalHelper: 'Lütfen uygun bir izleme toplama aralığı girin (5 saniye - 12 saat)',
 
         gpuUtil: 'GPU Kullanımı',
         temperature: 'Sıcaklık',

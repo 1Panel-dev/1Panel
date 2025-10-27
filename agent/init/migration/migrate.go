@@ -47,6 +47,7 @@ func InitAgentDB() {
 		migrations.UpdateCronjobSpec,
 		migrations.UpdateWebsiteSSLAddColumn,
 		migrations.AddTensorRTLLMModel,
+		migrations.UpdateMonitorInterval,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

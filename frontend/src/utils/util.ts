@@ -165,7 +165,9 @@ export function dateFormatWithoutYear(dataStr: any) {
     h = h < 10 ? `0${String(h)}` : h;
     let minute: string | number = date.getMinutes();
     minute = minute < 10 ? `0${String(minute)}` : minute;
-    return `${String(m)}-${String(d)}\n${String(h)}:${String(minute)}`;
+    let s: string | number = date.getSeconds();
+    s = s < 10 ? `0${String(s)}` : s;
+    return `${String(m)}-${String(d)}\n${String(h)}:${String(minute)}:${String(s)}`;
 }
 
 // 20221013151302

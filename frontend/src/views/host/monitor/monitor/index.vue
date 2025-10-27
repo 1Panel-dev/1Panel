@@ -16,6 +16,7 @@
                         style="max-width: 360px; width: 100%"
                         :size="mobile ? 'small' : 'default'"
                     ></el-date-picker>
+                    <TableRefresh class="float-right" @search="searchGlobal()" />
                 </div>
             </el-card>
         </div>
@@ -118,7 +119,26 @@
                 <el-card style="overflow: inherit">
                     <template #header>
                         <div :class="mobile ? 'flx-wrap' : 'flex justify-between'">
-                            <span class="title">{{ $t('monitor.disk') }} I/O</span>
+                            <div>
+                                <span class="title">{{ $t('monitor.disk') }} I/O{{ $t('commons.colon') }}</span>
+                                <el-dropdown max-height="300px">
+                                    <span class="networkOption">
+                                        {{ ioChoose === 'all' ? $t('commons.table.all') : ioChoose }}
+                                    </span>
+                                    <template #dropdown>
+                                        <el-dropdown-menu>
+                                            <div v-for="item in ioOptions" :key="item">
+                                                <el-dropdown-item v-if="item === 'all'" @click="changeIO('all')">
+                                                    {{ $t('commons.table.all') }}
+                                                </el-dropdown-item>
+                                                <el-dropdown-item v-else @click="changeIO(item)">
+                                                    {{ item }}
+                                                </el-dropdown-item>
+                                            </div>
+                                        </el-dropdown-menu>
+                                    </template>
+                                </el-dropdown>
+                            </div>
                             <el-date-picker
                                 @change="search('io')"
                                 v-model="timeRangeIO"
@@ -199,7 +219,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted, computed } from 'vue';
-import { loadMonitor, getNetworkOptions } from '@/api/modules/host';
+import { loadMonitor, getNetworkOptions, getIOOptions } from '@/api/modules/host';
 import { computeSizeFromKBs, dateFormatWithoutYear } from '@/utils/util';
 import i18n from '@/lang';
 import MonitorRouter from '@/views/host/monitor/index.vue';
@@ -223,6 +243,8 @@ const timeRangeIO = ref<[Date, Date]>([new Date(new Date().setHours(0, 0, 0, 0))
 const timeRangeNetwork = ref<[Date, Date]>([new Date(new Date().setHours(0, 0, 0, 0)), new Date()]);
 const networkChoose = ref();
 const netOptions = ref();
+const ioChoose = ref();
+const ioOptions = ref();
 const chartsOption = ref({ loadLoadChart: null, loadCPUChart: null, loadMemoryChart: null, loadNetworkChart: null });
 
 const searchTime = ref();
@@ -260,6 +282,7 @@ const search = async (param: string) => {
             break;
         case 'io':
             searchTime.value = timeRangeIO.value;
+            searchInfo.info = ioChoose.value;
             break;
         case 'network':
             searchTime.value = timeRangeNetwork.value;
@@ -366,11 +389,24 @@ const changeNetwork = (item: string) => {
     search('network');
 };
 
+const changeIO = (item: string) => {
+    ioChoose.value = item;
+    search('io');
+};
+
 const loadNetworkOptions = async () => {
     const res = await getNetworkOptions();
     netOptions.value = res.data;
     searchInfo.info = globalStore.defaultNetwork || (netOptions.value && netOptions.value[0]);
     networkChoose.value = searchInfo.info;
+    search('all');
+};
+
+const loadIOOptions = async () => {
+    const res = await getIOOptions();
+    ioOptions.value = res.data;
+    searchInfo.info = globalStore.defaultIO || (ioOptions.value && ioOptions.value[0]);
+    ioChoose.value = searchInfo.info;
     search('all');
 };
 
@@ -565,6 +601,7 @@ function getSideWidth(b: boolean) {
 onMounted(() => {
     zoomStart.value = dateFormatWithoutYear(new Date(new Date().setHours(0, 0, 0, 0)));
     loadNetworkOptions();
+    loadIOOptions();
 });
 </script>
 

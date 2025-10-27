@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/user"
 	"path"
+	"strconv"
 	"strings"
 	"time"
 
@@ -632,5 +633,29 @@ var AddTensorRTLLMModel = &gormigrate.Migration{
 	ID: "20251018-add-tensorrt-llm-model",
 	Migrate: func(tx *gorm.DB) error {
 		return tx.AutoMigrate(&model.TensorRTLLM{})
+	},
+}
+
+var UpdateMonitorInterval = &gormigrate.Migration{
+	ID: "20251026-update-monitor-interval",
+	Migrate: func(tx *gorm.DB) error {
+		var monitorInterval model.Setting
+		if err := tx.Where("key = ?", "MonitorInterval").First(&monitorInterval).Error; err != nil {
+			return err
+		}
+		interval, _ := strconv.Atoi(monitorInterval.Value)
+		if interval == 0 {
+			interval = 300
+		}
+		if err := tx.Model(&model.Setting{}).
+			Where("key = ?", "MonitorInterval").
+			Updates(map[string]interface{}{"value": fmt.Sprintf("%v", interval*60)}).
+			Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "DefaultIO", Value: "all"}).Error; err != nil {
+			return err
+		}
+		return nil
 	},
 }

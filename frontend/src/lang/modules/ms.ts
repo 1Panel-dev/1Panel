@@ -1163,9 +1163,14 @@ const message = {
     },
     monitor: {
         globalFilter: 'Penapis Global',
-        enableMonitor: 'Aktifkan',
-        storeDays: 'Hari luput',
-        cleanMonitor: 'Bersihkan rekod pemantauan',
+        enableMonitor: 'Status Pemantauan',
+        storeDays: 'Hari Penyimpanan',
+        defaultNetwork: 'Kad Rangkaian Lalai',
+        defaultNetworkHelper:
+            'Pilihan kad rangkaian lalai yang dipaparkan dalam antara muka pemantauan dan gambaran keseluruhan',
+        defaultIO: 'Cakera Lalai',
+        defaultIOHelper: 'Pilihan cakera lalai yang dipaparkan dalam antara muka pemantauan dan gambaran keseluruhan',
+        cleanMonitor: 'Kosongkan Rekod Pemantauan',
 
         avgLoad: 'Purata beban',
         loadDetail: 'Butiran beban',
@@ -1184,7 +1189,8 @@ const message = {
         network: 'Rangkaian',
         up: 'Naik',
         down: 'Turun',
-        interval: 'Selang (minit)',
+        interval: 'Selang Kumpulan',
+        intervalHelper: 'Sila masukkan selang kumpulan pemantauan yang sesuai (5 saat - 12 jam)',
 
         gpuUtil: 'Penggunaan GPU',
         temperature: 'Suhu',

@@ -1131,9 +1131,13 @@ const message = {
     },
     monitor: {
         globalFilter: 'グローバルフィルター',
-        enableMonitor: '有効にする',
-        storeDays: '有効期限',
-        cleanMonitor: '監視記録をきれいにします',
+        enableMonitor: '監視ステータス',
+        storeDays: '保存日数',
+        defaultNetwork: 'デフォルトネットワークカード',
+        defaultNetworkHelper: '監視および概要インターフェースに表示されるデフォルトのネットワークカードオプション',
+        defaultIO: 'デフォルトディスク',
+        defaultIOHelper: '監視および概要インターフェースに表示されるデフォルトのディスクオプション',
+        cleanMonitor: '監視記録をクリア',
 
         avgLoad: 'ロード平均',
         loadDetail: '詳細を読み込みます',
@@ -1152,7 +1156,8 @@ const message = {
         network: 'ネットワーク',
         up: '上',
         down: '下',
-        interval: '間隔（分）',
+        interval: '収集間隔',
+        intervalHelper: '適切な監視収集間隔を入力してください（5秒 - 12時間）',
 
         gpuUtil: 'GPU利用',
         temperature: '温度',

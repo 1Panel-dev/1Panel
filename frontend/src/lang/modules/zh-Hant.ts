@@ -1107,9 +1107,11 @@ const message = {
     monitor: {
         globalFilter: '全域過濾',
         enableMonitor: '監控狀態',
-        storeDays: '儲存天數',
+        storeDays: '保存天數',
         defaultNetwork: '預設網卡',
         defaultNetworkHelper: '預設監控和概覽介面顯示的網卡選項',
+        defaultIO: '預設磁碟',
+        defaultIOHelper: '預設監控和概覽介面顯示的磁碟選項',
         cleanMonitor: '清空監控記錄',
 
         avgLoad: '平均負載',
@@ -1131,7 +1133,8 @@ const message = {
         network: '網路',
         up: '上行',
         down: '下行',
-        interval: '採集間隔（分鐘）',
+        interval: '採集間隔',
+        intervalHelper: '請輸入合適的監控採集時間間隔（5秒 - 12小時）',
 
         gpuUtil: 'GPU 使用率',
         temperature: '溫度',

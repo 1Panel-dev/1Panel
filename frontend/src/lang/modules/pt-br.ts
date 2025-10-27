@@ -1156,10 +1156,14 @@ const message = {
         },
     },
     monitor: {
-        globalFilter: 'Filtro global',
-        enableMonitor: 'Ativar',
-        storeDays: 'Dias de expiração',
-        cleanMonitor: 'Limpar registros de monitoramento',
+        globalFilter: 'Filtro Global',
+        enableMonitor: 'Status de Monitoramento',
+        storeDays: 'Dias de Retenção',
+        defaultNetwork: 'Placa de Rede Padrão',
+        defaultNetworkHelper: 'Opção de placa de rede padrão exibida nas interfaces de monitoramento e visão geral',
+        defaultIO: 'Disco Padrão',
+        defaultIOHelper: 'Opção de disco padrão exibida nas interfaces de monitoramento e visão geral',
+        cleanMonitor: 'Limpar Registros de Monitoramento',
 
         avgLoad: 'Média de carga',
         loadDetail: 'Detalhes da carga',
@@ -1178,7 +1182,8 @@ const message = {
         network: 'Rede',
         up: 'Para cima',
         down: 'Para baixo',
-        interval: 'Intervalo (minuto)',
+        interval: 'Intervalo de Coleta',
+        intervalHelper: 'Insira um intervalo de coleta de monitoramento apropriado (5 segundos - 12 horas)',
 
         gpuUtil: 'Utilização da GPU',
         temperature: 'Temperatura',

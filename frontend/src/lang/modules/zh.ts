@@ -1111,6 +1111,8 @@ const message = {
         storeDays: '保存天数',
         defaultNetwork: '默认网卡',
         defaultNetworkHelper: '默认监控和概览界面显示的网卡选项',
+        defaultIO: '默认磁盘',
+        defaultIOHelper: '默认监控和概览界面显示的磁盘选项',
         cleanMonitor: '清空监控记录',
 
         avgLoad: '平均负载',
@@ -1132,7 +1134,8 @@ const message = {
         network: '网络',
         up: '上行',
         down: '下行',
-        interval: '采集间隔（分钟）',
+        interval: '采集间隔',
+        intervalHelper: '请输入合适的监控采集时间间隔（5秒 - 12小时）',
 
         gpuUtil: 'GPU 使用率',
         temperature: '温度',

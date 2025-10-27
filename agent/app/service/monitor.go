@@ -69,7 +69,7 @@ func (m *MonitorService) LoadMonitorData(req dto.MonitorSearch) ([]dto.MonitorDa
 		data = append(data, itemData)
 	}
 	if req.Param == "all" || req.Param == "io" {
-		bases, err := monitorRepo.GetIO(repo.WithByCreatedAt(req.StartTime, req.EndTime))
+		bases, err := monitorRepo.GetIO(repo.WithByName(req.Info), repo.WithByCreatedAt(req.StartTime, req.EndTime))
 		if err != nil {
 			return nil, err
 		}
@@ -201,9 +201,18 @@ func (m *MonitorService) Run() {
 func (m *MonitorService) loadDiskIO() {
 	ioStat, _ := disk.IOCounters()
 	var diskIOList []disk.IOCountersStat
+	var ioStatAll disk.IOCountersStat
 	for _, io := range ioStat {
+		ioStatAll.Name = "all"
+		ioStatAll.ReadBytes += io.ReadBytes
+		ioStatAll.WriteBytes += io.WriteBytes
+		ioStatAll.ReadTime += io.ReadTime
+		ioStatAll.WriteTime += io.WriteTime
+		ioStatAll.WriteCount += io.WriteCount
+		ioStatAll.ReadCount += io.ReadCount
 		diskIOList = append(diskIOList, io)
 	}
+	diskIOList = append(diskIOList, ioStatAll)
 	m.DiskIO <- diskIOList
 }
 
@@ -234,29 +243,29 @@ func (m *MonitorService) saveIODataToDB(ctx context.Context, interval float64) {
 							var itemIO model.MonitorIO
 							itemIO.Name = io1.Name
 							if io2.ReadBytes != 0 && io1.ReadBytes != 0 && io2.ReadBytes > io1.ReadBytes {
-								itemIO.Read = uint64(float64(io2.ReadBytes-io1.ReadBytes) / interval / 60)
+								itemIO.Read = uint64(float64(io2.ReadBytes-io1.ReadBytes) / interval)
 							}
 							if io2.WriteBytes != 0 && io1.WriteBytes != 0 && io2.WriteBytes > io1.WriteBytes {
-								itemIO.Write = uint64(float64(io2.WriteBytes-io1.WriteBytes) / interval / 60)
+								itemIO.Write = uint64(float64(io2.WriteBytes-io1.WriteBytes) / interval)
 							}
 
 							if io2.ReadCount != 0 && io1.ReadCount != 0 && io2.ReadCount > io1.ReadCount {
-								itemIO.Count = uint64(float64(io2.ReadCount-io1.ReadCount) / interval / 60)
+								itemIO.Count = uint64(float64(io2.ReadCount-io1.ReadCount) / interval)
 							}
 							writeCount := uint64(0)
 							if io2.WriteCount != 0 && io1.WriteCount != 0 && io2.WriteCount > io1.WriteCount {
-								writeCount = uint64(float64(io2.WriteCount-io1.WriteCount) / interval * 60)
+								writeCount = uint64(float64(io2.WriteCount-io1.WriteCount) / interval)
 							}
 							if writeCount > itemIO.Count {
 								itemIO.Count = writeCount
 							}
 
 							if io2.ReadTime != 0 && io1.ReadTime != 0 && io2.ReadTime > io1.ReadTime {
-								itemIO.Time = uint64(float64(io2.ReadTime-io1.ReadTime) / interval / 60)
+								itemIO.Time = uint64(float64(io2.ReadTime-io1.ReadTime) / interval)
 							}
 							writeTime := uint64(0)
 							if io2.WriteTime != 0 && io1.WriteTime != 0 && io2.WriteTime > io1.WriteTime {
-								writeTime = uint64(float64(io2.WriteTime-io1.WriteTime) / interval / 60)
+								writeTime = uint64(float64(io2.WriteTime-io1.WriteTime) / interval)
 							}
 							if writeTime > itemIO.Time {
 								itemIO.Time = writeTime
@@ -294,10 +303,10 @@ func (m *MonitorService) saveNetDataToDB(ctx context.Context, interval float64) 
 							itemNet.Name = net1.Name
 
 							if net2.BytesSent != 0 && net1.BytesSent != 0 && net2.BytesSent > net1.BytesSent {
-								itemNet.Up = float64(net2.BytesSent-net1.BytesSent) / 1024 / interval / 60
+								itemNet.Up = float64(net2.BytesSent-net1.BytesSent) / 1024 / interval
 							}
 							if net2.BytesRecv != 0 && net1.BytesRecv != 0 && net2.BytesRecv > net1.BytesRecv {
-								itemNet.Down = float64(net2.BytesRecv-net1.BytesRecv) / 1024 / interval / 60
+								itemNet.Down = float64(net2.BytesRecv-net1.BytesRecv) / 1024 / interval
 							}
 							netList = append(netList, itemNet)
 							break
@@ -330,7 +339,7 @@ func StartMonitor(removeBefore bool, interval string) error {
 	now := time.Now()
 	nextMinute := now.Truncate(time.Minute).Add(time.Minute)
 	time.AfterFunc(time.Until(nextMinute), func() {
-		monitorID, err := global.Cron.AddJob(fmt.Sprintf("@every %sm", interval), service)
+		monitorID, err := global.Cron.AddJob(fmt.Sprintf("@every %ss", interval), service)
 		if err != nil {
 			return
 		}

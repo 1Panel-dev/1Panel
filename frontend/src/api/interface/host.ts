@@ -137,6 +137,7 @@ export namespace Host {
 
     export interface MonitorSetting {
         defaultNetwork: string;
+        defaultIO: string;
         monitorStatus: string;
         monitorStoreDays: string;
         monitorInterval: string;

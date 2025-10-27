@@ -10,6 +10,7 @@ type SettingInfo struct {
 	NtpSite   string `json:"ntpSite"`
 
 	DefaultNetwork string `json:"defaultNetwork"`
+	DefaultIO      string `json:"defaultIO"`
 	LastCleanTime  string `json:"lastCleanTime"`
 	LastCleanSize  string `json:"lastCleanSize"`
 	LastCleanData  string `json:"lastCleanData"`

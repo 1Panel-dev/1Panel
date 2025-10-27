@@ -40,6 +40,7 @@ const GlobalStore = defineStore({
         currentRedisDB: '',
         showEntranceWarn: true,
         defaultNetwork: 'all',
+        defaultIO: 'all',
         isFxplay: false,
 
         isProductPro: false,
@@ -115,6 +116,9 @@ const GlobalStore = defineStore({
         },
         setDefaultNetwork(net: string) {
             this.defaultNetwork = net;
+        },
+        setDefaultIO(net: string) {
+            this.defaultIO = net;
         },
     },
     persist: piniaPersistConfig('GlobalState'),
