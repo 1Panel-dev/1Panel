@@ -42,7 +42,7 @@ onMounted(() => {
 const tabChange = (tabPath) => {
     const tab = tabsStore.findTab(tabPath);
     if (tab) {
-        router.push(tab);
+        router.push({ path: tab.path, query: { uncached: 'true' } });
         tabsStore.activeTabPath = tab.path;
     }
 };
