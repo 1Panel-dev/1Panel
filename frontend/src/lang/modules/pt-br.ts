@@ -2034,6 +2034,7 @@ const message = {
         pro: 'Pro',
         trial: 'Teste',
         add: 'Adicionar Edição Comunitária',
+        licenseBindHelper: 'As cotas de nó gratuitas só podem ser usadas quando a licença está vinculada a um nó',
         licenseAlert:
             'Nós da Edição Comunitária só podem ser adicionados quando a licença está devidamente vinculada a um nó. Apenas nós devidamente vinculados à licença suportam troca.',
         licenseUnbindHelper:

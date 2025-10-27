@@ -2087,6 +2087,7 @@ const message = {
         pro: 'Pro',
         trial: 'Deneme',
         add: 'Topluluk Sürümünü Ekle',
+        licenseBindHelper: 'Ücretsiz düğüm kotası yalnızca lisans bir düğüme bağlı olduğunda kullanılabilir',
         licenseAlert:
             'Topluluk Sürümü düğümleri yalnızca lisans bir düğüme düzgün şekilde bağlandığında eklenebilir. Yalnızca düzgün şekilde bağlanmış düğümler geçiş yapmayı destekler.',
         licenseUnbindHelper:

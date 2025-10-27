@@ -1920,6 +1920,7 @@ const message = {
         pro: '专业版',
         trial: '试用',
         add: '添加社区版',
+        licenseBindHelper: '仅当许可证已绑定节点时，才能使用其免费节点额度',
         licenseAlert: '仅当许可证正常绑定到节点时，该许可证才能添加社区版节点，只有正常绑定到许可证的节点支持切换。',
         licenseUnbindHelper: '检测到该许可证存在社区版节点，请解绑后重试！',
         subscription: '订阅',

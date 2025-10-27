@@ -2065,6 +2065,7 @@ const message = {
         pro: 'Pro',
         trial: 'Trial',
         add: 'Add Community Edition',
+        licenseBindHelper: 'Free node quotas can only be used when the license is bound to a node',
         licenseAlert:
             'Community Edition nodes can only be added when the license is properly bound to a node. Only nodes properly bound to the license support switching.',
         licenseUnbindHelper: 'Community Edition nodes detected for this license. Please unbind and try again!',

@@ -2042,6 +2042,7 @@ const message = {
         pro: 'Pro',
         trial: 'Percubaan',
         add: 'Tambah Edisi Komuniti',
+        licenseBindHelper: 'Kuota nod percuma hanya boleh digunakan apabila lesen terikat pada nod',
         licenseAlert:
             'Nod Edisi Komuniti hanya boleh ditambah apabila lesen terikat dengan betul pada nod. Hanya nod yang terikat dengan betul pada lesen menyokong penukaran.',
         licenseUnbindHelper: 'Nod Edisi Komuniti dikesan untuk lesen ini. Sila lepaskan ikatan dan cuba lagi!',

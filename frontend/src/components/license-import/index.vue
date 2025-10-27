@@ -63,8 +63,10 @@ import { uploadLicense } from '@/api/modules/setting';
 import DockerProxy from '@/components/docker-proxy/index.vue';
 import { GlobalStore } from '@/store';
 import { UploadFile, UploadFiles, UploadInstance, UploadProps, UploadRawFile, genFileId } from 'element-plus';
-import { getXpackSettingForTheme } from '@/utils/xpack';
+import { getXpackSettingForTheme, loadMasterProductProFromDB, loadProductProFromDB } from '@/utils/xpack';
 const globalStore = GlobalStore();
+
+const em = defineEmits(['search']);
 
 const loading = ref(false);
 const open = ref(false);
@@ -72,6 +74,7 @@ const uploadRef = ref<UploadInstance>();
 const uploaderFiles = ref<UploadFiles>([]);
 const isImport = ref();
 const isForce = ref();
+const withoutReload = ref();
 
 const withDockerRestart = ref();
 
@@ -79,6 +82,7 @@ const oldLicense = ref();
 interface DialogProps {
     oldLicense: string;
     isImport: boolean;
+    withoutReload: boolean;
 }
 
 const acceptParams = (params: DialogProps) => {
@@ -86,6 +90,8 @@ const acceptParams = (params: DialogProps) => {
     uploaderFiles.value = [];
     uploadRef.value?.clearFiles();
     isImport.value = params?.isImport;
+    withoutReload.value = params.withoutReload;
+
     open.value = true;
 };
 
@@ -131,17 +137,19 @@ const submit = async () => {
     loading.value = true;
     await uploadLicense(oldLicense.value, formData)
         .then(async () => {
-            globalStore.isProductPro = true;
-            if (globalStore.isMaster) {
-                globalStore.isMasterProductPro = true;
-            }
-            getXpackSettingForTheme();
             loading.value = false;
             uploadRef.value!.clearFiles();
             uploaderFiles.value = [];
             open.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            window.location.reload();
+            if (!withoutReload.value) {
+                loadMasterProductProFromDB();
+                loadProductProFromDB();
+                getXpackSettingForTheme();
+                window.location.reload();
+            } else {
+                em('search');
+            }
         })
         .catch(() => {
             loading.value = false;

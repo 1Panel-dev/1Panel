@@ -1927,6 +1927,7 @@ const message = {
         pro: '專業版：',
         trial: '試用',
         add: '新增社區版',
+        licenseBindHelper: '僅當授權已綁定節點時，才能使用其免費節點額度',
         licenseAlert: '僅當許可證正常綁定到節點時，該許可證才能新增社區版節點，只有正常綁定到許可證的節點支援切換。',
         licenseUnbindHelper: '檢測到該許可證存在社區版節點，請解除綁定後重試！',
         subscription: '訂閱',

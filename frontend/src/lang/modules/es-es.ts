@@ -2074,6 +2074,8 @@ const message = {
         pro: 'Pro',
         trial: 'Prueba',
         add: 'Agregar versión Community',
+        licenseBindHelper:
+            'Las cuotas de nodo gratuitas solo se pueden utilizar cuando la licencia está vinculada a un nodo',
         licenseAlert:
             'Solo se pueden agregar nodos Community cuando la licencia está correctamente vinculada. Solo los nodos vinculados admiten cambios.',
         licenseUnbindHelper: 'Nodos Community detectados en esta licencia. Desvincule e intente nuevamente.',
