@@ -49,6 +49,9 @@ const tabChange = (tabPath) => {
 
 const closeTab = (tabPath) => {
     const lastTabPath = tabsStore.removeTab(tabPath);
+    if (tabPath !== tabsStore.activeTabPath) {
+        return;
+    }
     if (lastTabPath) {
         tabChange(lastTabPath);
     }
