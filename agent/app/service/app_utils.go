@@ -1409,6 +1409,8 @@ func handleLocalApp(appDir string) (app *model.App, err error) {
 	desc, _ := json.Marshal(appDefine.Description)
 	app.Description = string(desc)
 	app.Key = "local" + appDefine.Key
+	app.Architectures = strings.Join(appDefine.Architectures, ",")
+	app.GpuSupport = appDefine.GpuSupport
 
 	app.Resource = constant.AppResourceLocal
 	app.Status = constant.AppNormal
