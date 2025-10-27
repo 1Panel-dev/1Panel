@@ -150,6 +150,7 @@ Status: 'Status'
 start: 'Iniciar'
 stop: 'Parar'
 delete: 'Excluir'
+ErrDefaultWebsite: 'O site padrão já foi definido, cancele-o antes de definir!'
 
 #ssl
 ErrSSLCannotDelete: 'O certificado {{ .name }} está sendo usado por um site e não pode ser excluído'

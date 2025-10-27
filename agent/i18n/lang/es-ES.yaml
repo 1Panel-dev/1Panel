@@ -146,6 +146,7 @@ Status: 'Estado'
 start: 'Iniciar'
 stop: 'Detener'
 delete: 'Eliminar'
+ErrDefaultWebsite: 'El sitio web predeterminado ya está configurado, ¡cancélelo antes de configurar!'
 
 #ssl
 ErrSSLCannotDelete: 'El certificado {{ .name }} está siendo utilizado por un sitio web y no puede eliminarse'

@@ -150,6 +150,7 @@ Status: 'Status'
 start: 'Mulakan'
 stop: 'Berhenti'
 delete: 'Padam'
+ErrDefaultWebsite: 'Laman web lalai telah ditetapkan, sila batalkan sebelum menetapkan!'
 
 #ssl
 ErrSSLCannotDelete: 'Sijil {{ .name }} sedang digunakan oleh tapak web dan tidak boleh dipadamkan'

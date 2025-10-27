@@ -2642,6 +2642,9 @@ const message = {
             'モジュールの追加/変更後にビルドをクリックします。ビルドが成功すると、OpenRestyは自動的に再起動します。',
         defaultHttps: 'HTTPS 改ざん防止',
         defaultHttpsHelper1: 'これを有効にすると、HTTPS 改ざん問題を解決できます。',
+        sslRejectHandshake: 'デフォルト SSL ハンドシェイクを拒否',
+        sslRejectHandshakeHelper:
+            '有効にすると証明書の漏洩を防げますが、デフォルト Web サイトを設定するとこの設定は無効になります',
     },
     ssl: {
         create: 'リクエスト',

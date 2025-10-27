@@ -147,6 +147,7 @@ Status: 'Status'
 start: 'Start'
 stop: 'Stop'
 delete: 'Delete'
+ErrDefaultWebsite: 'Default website has been set, please cancel it before setting!'
 
 #ssl
 ErrSSLCannotDelete: 'The {{ .name }} certificate is being used by a website and cannot be deleted'

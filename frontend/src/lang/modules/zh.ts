@@ -2528,6 +2528,8 @@ const message = {
         buildHelper: '添加/修改模块之后点击构建，构建成功后会自动重启 OpenResty',
         defaultHttps: 'HTTPS 防窜站',
         defaultHttpsHelper1: '开启后可以解决 HTTPS 窜站问题',
+        sslRejectHandshake: '拒绝默认 SSL 握手',
+        sslRejectHandshakeHelper: '开启之后可以避免证书泄露，设置默认网站会让此设置失效',
     },
     ssl: {
         create: '申请证书',

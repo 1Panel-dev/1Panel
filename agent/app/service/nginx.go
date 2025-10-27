@@ -45,7 +45,7 @@ type INginxService interface {
 	GetModules() (*response.NginxBuildConfig, error)
 	UpdateModule(req request.NginxModuleUpdate) error
 
-	OperateDefaultHTTPs(req request.NginxOperateReq) error
+	OperateDefaultHTTPs(req request.NginxDefaultHTTPSUpdate) error
 	GetDefaultHttpsStatus() (*response.NginxConfigRes, error)
 }
 
@@ -354,7 +354,7 @@ func (n NginxService) UpdateModule(req request.NginxModuleUpdate) error {
 	return fileOp.SaveFileWithByte(moduleConfigPath, moduleByte, constant.DirPerm)
 }
 
-func (n NginxService) OperateDefaultHTTPs(req request.NginxOperateReq) error {
+func (n NginxService) OperateDefaultHTTPs(req request.NginxDefaultHTTPSUpdate) error {
 	appInstall, err := getAppInstallByKey(constant.AppOpenresty)
 	if err != nil {
 		return err
@@ -372,11 +372,18 @@ func (n NginxService) OperateDefaultHTTPs(req request.NginxOperateReq) error {
 	if err != nil {
 		return err
 	}
-	if req.Operate == "enable" {
-		if err := handleSSLConfig(&appInstall, hasDefaultWebsite); err != nil {
+	switch req.Operate {
+	case "enable":
+		if req.SSLRejectHandshake {
+			defaultWebsite, _ := websiteRepo.GetFirst(websiteRepo.WithDefaultServer())
+			if defaultWebsite.ID > 0 {
+				return buserr.New("ErrDefaultWebsite")
+			}
+		}
+		if err := handleSSLConfig(&appInstall, hasDefaultWebsite, req.SSLRejectHandshake); err != nil {
 			return err
 		}
-	} else if req.Operate == "disable" {
+	case "disable":
 		defaultConfig, err := parser.NewStringParser(string(content)).Parse()
 		if err != nil {
 			return err
@@ -387,6 +394,7 @@ func (n NginxService) OperateDefaultHTTPs(req request.NginxOperateReq) error {
 		defaultServer.RemoveListen(fmt.Sprintf("[::]:%d", appInstall.HttpsPort))
 		defaultServer.RemoveDirective("include", []string{"/usr/local/openresty/nginx/conf/ssl/root_ssl.conf"})
 		defaultServer.RemoveDirective("http2", []string{"on"})
+		defaultServer.RemoveDirective("ssl_reject_handshake", []string{"on"})
 		if err = nginx.WriteConfig(defaultConfig, nginx.IndentedStyle); err != nil {
 			return err
 		}
@@ -413,9 +421,11 @@ func (n NginxService) GetDefaultHttpsStatus() (*response.NginxConfigRes, error) 
 	res := &response.NginxConfigRes{}
 	for _, directive := range defaultServer.GetDirectives() {
 		if directive.GetName() == "include" && directive.GetParameters()[0] == "/usr/local/openresty/nginx/conf/ssl/root_ssl.conf" {
-			return &response.NginxConfigRes{
-				Https: true,
-			}, nil
+			res.Https = true
+		}
+		if directive.GetName() == "ssl_reject_handshake" && directive.GetParameters()[0] == "on" {
+			res.Https = true
+			res.SSLRejectHandshake = true
 		}
 	}
 	return res, nil

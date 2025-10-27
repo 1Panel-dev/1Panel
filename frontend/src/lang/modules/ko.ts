@@ -2594,6 +2594,9 @@ const message = {
         buildHelper: '모듈 추가/수정 후 빌드를 클릭하세요. 빌드가 성공하면 OpenResty가 자동으로 재시작됩니다.',
         defaultHttps: 'HTTPS 변조 방지',
         defaultHttpsHelper1: '이를 활성화하면 HTTPS 변조 문제를 해결할 수 있습니다.',
+        sslRejectHandshake: '기본 SSL 핸드셰이크 거부',
+        sslRejectHandshakeHelper:
+            '활성화하면 인증서 누출을 방지할 수 있지만, 기본 웹사이트를 설정하면 이 설정이 무효화됩니다',
     },
     ssl: {
         create: '요청',

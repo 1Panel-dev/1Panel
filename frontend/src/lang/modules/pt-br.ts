@@ -2709,6 +2709,9 @@ const message = {
             'Clique em Construir após adicionar/modificar um módulo. Construção bem-sucedida reiniciará automaticamente o OpenResty.',
         defaultHttps: 'HTTPS Anti-tampering',
         defaultHttpsHelper1: 'A ativação desta opção pode resolver problemas de adulteração HTTPS.',
+        sslRejectHandshake: 'Rejeitar handshake SSL padrão',
+        sslRejectHandshakeHelper:
+            'Ativar isso pode evitar vazamento de certificados, definir um site padrão invalidará esta configuração',
     },
     ssl: {
         create: 'Solicitar',

@@ -146,6 +146,7 @@ Status: '状态'
 start: '开启'
 stop: '关闭'
 delete: '删除'
+ErrDefaultWebsite: "已经设置默认网站，请取消后再设置！"
 
 #ssl
 ErrSSLCannotDelete: "{{ .name }} 证书正在被网站使用，无法删除"

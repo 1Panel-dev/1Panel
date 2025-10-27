@@ -2764,6 +2764,9 @@ const message = {
             'Modül ekledikten/düzenledikten sonra oluştur’a tıklayın. OpenResty, başarılı oluşturma üzerine otomatik olarak yeniden başlatılacaktır.',
         defaultHttps: 'HTTPS Anti-sızdırma',
         defaultHttpsHelper1: 'Bu özelliği etkinleştirerek HTTPS sızdırma sorunlarını çözebilirsiniz.',
+        sslRejectHandshake: 'Varsayılan SSL el sıkışmasını reddet',
+        sslRejectHandshakeHelper:
+            'Etkinleştirilmesi sertifika sızıntısını önleyebilir, varsayılan bir web sitesi ayarlamak bu ayarı geçersiz kılar',
     },
     ssl: {
         create: 'İstek',

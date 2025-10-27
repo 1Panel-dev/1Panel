@@ -121,9 +121,11 @@ func updateDefaultServerConfig(enable bool) error {
 
 	includeSSL := false
 	for _, dir := range defaultServer.GetDirectives() {
+		if dir.GetName() == "ssl_reject_handshake" && dir.GetParameters()[0] == "on" {
+			defaultServer.RemoveDirective("ssl_reject_handshake", []string{"on"})
+		}
 		if dir.GetName() == "include" && dir.GetParameters()[0] == "/usr/local/openresty/nginx/conf/ssl/root_ssl.conf" {
 			includeSSL = true
-			break
 		}
 	}
 	updateDefaultServer(defaultServer, nginxInstall.HttpPort, nginxInstall.HttpsPort, enable, includeSSL)

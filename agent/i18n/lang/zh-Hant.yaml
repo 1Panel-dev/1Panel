@@ -146,6 +146,7 @@ Status: '狀態'
 start: '開啟'
 stop: '關閉'
 delete: '刪除'
+ErrDefaultWebsite: '已經設置默認網站，請取消後再設置！'
 
 #ssl
 ErrSSLCannotDelete: '{{ .name }} 憑證正在被網站使用，無法刪除'

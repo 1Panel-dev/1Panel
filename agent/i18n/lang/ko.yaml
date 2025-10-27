@@ -147,6 +147,7 @@ Status: '상태'
 start: '시작'
 stop: '중지'
 delete: '삭제'
+ErrDefaultWebsite: '기본 웹사이트가 이미 설정되었습니다. 설정하기 전에 취소하세요!'
 
 #SSL인증
 ErrSSLCannotDelete: '{{ .name }} 인증서는 웹사이트에서 사용 중이므로 삭제할 수 없습니다.'

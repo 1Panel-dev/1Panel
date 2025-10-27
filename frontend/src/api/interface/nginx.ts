@@ -53,9 +53,14 @@ export namespace Nginx {
 
     export interface NginxHttpsStatus {
         https: boolean;
+        sslRejectHandshake: boolean;
     }
 
     export interface NginxOperateReq {
         operate: string;
+    }
+
+    export interface NginxHttpsOperateReq extends NginxOperateReq {
+        sslRejectHandshake: boolean;
     }
 }

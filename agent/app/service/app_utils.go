@@ -1995,7 +1995,7 @@ func handleOpenrestyFile(appInstall *model.AppInstall) error {
 			break
 		}
 	}
-	if err := handleSSLConfig(appInstall, hasDefaultWebsite); err != nil {
+	if err := handleSSLConfig(appInstall, hasDefaultWebsite, true); err != nil {
 		return err
 	}
 	if len(websites) == 0 {
@@ -2024,34 +2024,37 @@ func handleDefaultServer(appInstall *model.AppInstall) error {
 	return nil
 }
 
-func handleSSLConfig(appInstall *model.AppInstall, hasDefaultWebsite bool) error {
+func handleSSLConfig(appInstall *model.AppInstall, hasDefaultWebsite bool, sslRejectHandshake bool) error {
 	sslDir := path.Join(appInstall.GetPath(), "conf", "ssl")
 	fileOp := files.NewFileOp()
 	if !fileOp.Stat(sslDir) {
 		return errors.New("ssl dir not found")
 	}
-	ca, _ := websiteCARepo.GetFirst(repo.WithByName("1Panel"))
-	if ca.ID == 0 {
-		global.LOG.Errorf("create openresty default ssl failed ca not found")
-		return nil
+	hasDefaultSSL := fileOp.Stat(path.Join(sslDir, "fullchain.pem")) && fileOp.Stat(path.Join(sslDir, "privkey.pem")) && fileOp.Stat(path.Join(sslDir, "root_ssl.conf"))
+	if !hasDefaultSSL {
+		ca, _ := websiteCARepo.GetFirst(repo.WithByName("1Panel"))
+		if ca.ID == 0 {
+			global.LOG.Errorf("create openresty default ssl failed ca not found")
+			return nil
+		}
+		caService := NewIWebsiteCAService()
+		caRequest := request.WebsiteCAObtain{
+			ID:      ca.ID,
+			Domains: "localhost",
+			KeyType: "4096",
+			Time:    99,
+			Unit:    "year",
+			Dir:     sslDir,
+			PushDir: true,
+		}
+		websiteSSL, err := caService.ObtainSSL(caRequest)
+		if err != nil {
+			return err
+		}
+		defer func() {
+			_ = NewIWebsiteSSLService().Delete([]uint{websiteSSL.ID})
+		}()
 	}
-	caService := NewIWebsiteCAService()
-	caRequest := request.WebsiteCAObtain{
-		ID:      ca.ID,
-		Domains: "localhost",
-		KeyType: "4096",
-		Time:    99,
-		Unit:    "year",
-		Dir:     sslDir,
-		PushDir: true,
-	}
-	websiteSSL, err := caService.ObtainSSL(caRequest)
-	if err != nil {
-		return err
-	}
-	defer func() {
-		_ = NewIWebsiteSSLService().Delete([]uint{websiteSSL.ID})
-	}()
 	defaultConfigPath := path.Join(appInstall.GetPath(), "conf", "default", "00.default.conf")
 	content, err := os.ReadFile(defaultConfigPath)
 	if err != nil {
@@ -2066,6 +2069,11 @@ func handleSSLConfig(appInstall *model.AppInstall, hasDefaultWebsite bool) error
 	updateDefaultServer(defaultServer, appInstall.HttpPort, appInstall.HttpsPort, !hasDefaultWebsite, true)
 	defaultServer.UpdateDirective("include", []string{"/usr/local/openresty/nginx/conf/ssl/root_ssl.conf"})
 	defaultServer.UpdateDirective("http2", []string{"on"})
+	if sslRejectHandshake {
+		defaultServer.UpdateDirective("ssl_reject_handshake", []string{"on"})
+	} else {
+		defaultServer.RemoveDirective("ssl_reject_handshake", []string{})
+	}
 	if err = nginx.WriteConfig(defaultConfig, nginx.IndentedStyle); err != nil {
 		return err
 	}

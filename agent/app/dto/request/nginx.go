@@ -130,3 +130,8 @@ type NginxModuleUpdate struct {
 type NginxOperateReq struct {
 	Operate string `json:"operate" validate:"required,oneof=enable disable"`
 }
+
+type NginxDefaultHTTPSUpdate struct {
+	Operate            string `json:"operate" validate:"required,oneof=enable disable"`
+	SSLRejectHandshake bool   `json:"sslRejectHandshake"`
+}

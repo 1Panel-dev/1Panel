@@ -82,5 +82,6 @@ type NginxBuildConfig struct {
 }
 
 type NginxConfigRes struct {
-	Https bool `json:"https"`
+	Https              bool `json:"https"`
+	SSLRejectHandshake bool `json:"sslRejectHandshake"`
 }

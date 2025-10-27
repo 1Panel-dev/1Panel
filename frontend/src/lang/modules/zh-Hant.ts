@@ -2536,6 +2536,8 @@ const message = {
         buildHelper: '新增/修改模組後點擊構建，構建成功後會自動重啟 OpenResty',
         defaultHttps: 'HTTPS 防竄站',
         defaultHttpsHelper1: '開啟後可以解決 HTTPS 竄站問題',
+        sslRejectHandshake: '拒絕默認 SSL 握手',
+        sslRejectHandshakeHelper: '開啟之後可以避免證書洩露，設置默認網站會讓此設置失效',
     },
     ssl: {
         create: '申請證書',

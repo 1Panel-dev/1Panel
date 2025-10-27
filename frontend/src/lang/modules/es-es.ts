@@ -2703,6 +2703,9 @@ const message = {
             'Haz clic en compilar después de agregar/modificar un módulo. OpenResty se reiniciará automáticamente tras una compilación exitosa.',
         defaultHttps: 'HTTPS Anti-manipulación',
         defaultHttpsHelper1: 'Habilitar esto puede resolver problemas de manipulación de HTTPS.',
+        sslRejectHandshake: 'Rechazar handshake SSL predeterminado',
+        sslRejectHandshakeHelper:
+            'Habilitar esto puede evitar la fuga de certificados, establecer un sitio web predeterminado invalidará esta configuración',
     },
     ssl: {
         create: 'Solicitar',

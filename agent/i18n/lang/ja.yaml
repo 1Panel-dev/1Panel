@@ -146,6 +146,7 @@ Status: 'ステータス'
 start: '開始'
 stop: '停止'
 delete: '削除'
+ErrDefaultWebsite: 'デフォルト Web サイトが既に設定されています。設定する前にキャンセルしてください！'
 
 #ssl
 ErrSSLCannotDelete: '{{ .name }} 証明書は Web サイトで使用されているため、削除できません'

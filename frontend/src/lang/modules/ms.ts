@@ -2704,6 +2704,9 @@ const message = {
             'Klik Bina selepas menambah/mengubah suai modul. Pembinaan yang berjaya akan memulakan semula OpenResty secara automatik.',
         defaultHttps: 'HTTPS Anti-tampering',
         defaultHttpsHelper1: 'Mengaktifkan ini dapat menyelesaikan masalah tampering HTTPS.',
+        sslRejectHandshake: 'Tolak jabat tangan SSL lalai',
+        sslRejectHandshakeHelper:
+            'Mengaktifkan ini boleh mengelakkan kebocoran sijil, menetapkan laman web lalai akan membatalkan tetapan ini',
     },
     ssl: {
         create: 'Permintaan',
