@@ -2,6 +2,7 @@
     margin-top: 10px;
     cursor: pointer;
     padding: 10px;
+
     .icon {
         text-align: center;
     }
@@ -12,17 +13,45 @@
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
-                max-width: 120px;
                 font-weight: 500;
                 font-size: 18px;
                 color: var(--panel-text-color);
+
+                max-width: 100px;
+
+                @media (min-width: 576px) {
+                    max-width: 120px;
+                }
+
+                @media (min-width: 768px) {
+                    max-width: 150px;
+                }
+
+                @media (min-width: 992px) {
+                    max-width: 180px;
+                }
+
+                @media (min-width: 1200px) {
+                    max-width: 220px;
+                }
+
+                @media (min-width: 1600px) {
+                    max-width: 280px;
+                }
+
+                @media (min-width: 1920px) {
+                    max-width: 350px;
+                }
             }
+
             .status {
                 margin-left: 5px;
             }
+
             .h-button {
                 float: right;
             }
+
             .msg {
                 margin-left: 5px;
             }
@@ -31,15 +60,18 @@
         .d-description {
             margin-top: 10px;
             overflow: hidden;
+
             .el-tag {
                 margin-right: 5px;
             }
         }
+
         .description {
             margin-top: 10px;
             font-size: 14px;
             color: var(--el-text-color-regular);
         }
+
         .d-button {
             margin-top: 10px;
             min-width: 330px;
@@ -48,6 +80,7 @@
 
     .e-card {
         border: var(--panel-border) !important;
+
         &:hover {
             cursor: pointer;
             border: 1px solid var(--el-color-primary) !important;
@@ -91,4 +124,27 @@
     float: right;
     margin-bottom: 10px;
     margin-top: 10px;
+}
+
+@media (max-width: 575px) {
+    .install-card {
+        .a-detail {
+            .d-name {
+                .h-button {
+                    float: none;
+                    display: inline-block;
+                    margin-left: 5px;
+                }
+            }
+
+            .d-button {
+                min-width: auto;
+
+                .app-button {
+                    font-size: 12px;
+                    padding: 5px 10px;
+                }
+            }
+        }
+    }
 }
