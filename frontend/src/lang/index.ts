@@ -26,18 +26,6 @@ const getStoredLocale = () => {
 
 const initialLocale = getStoredLocale();
 
-const i18n = createI18n({
-    legacy: false,
-    missingWarn: false,
-    locale: initialLocale,
-    fallbackLocale: DEFAULT_LOCALE,
-    globalInjection: true,
-    messages: {
-        [initialLocale]: {},
-    },
-    warnHtmlMessage: false,
-});
-
 const loadedLocales = new Set<string>();
 
 export const loadLocaleMessages = async (locale: string) => {
@@ -51,10 +39,41 @@ export const loadLocaleMessages = async (locale: string) => {
     }
     const messagesModule = await loader();
     const messages = messagesModule.default || {};
+    if (!i18n) {
+        return targetLocale;
+    }
     i18n.global.setLocaleMessage(targetLocale, messages);
     loadedLocales.add(targetLocale);
     return targetLocale;
 };
+
+const getInitialMessages = async (): Promise<Record<string, LocaleMessage>> => {
+    const loader = LOCALE_LOADERS[initialLocale];
+    if (!loader) {
+        return { [initialLocale]: {} };
+    }
+    try {
+        const messagesModule = await loader();
+        const messages = messagesModule.default || {};
+        loadedLocales.add(initialLocale);
+        return { [initialLocale]: messages };
+    } catch {
+        return { [initialLocale]: {} };
+    }
+};
+
+const initialMessages = await getInitialMessages();
+
+const i18n = createI18n({
+    legacy: false,
+    missingWarn: false,
+    fallbackWarn: false,
+    locale: initialLocale,
+    fallbackLocale: DEFAULT_LOCALE,
+    globalInjection: true,
+    messages: initialMessages,
+    warnHtmlMessage: false,
+});
 
 export const ensureFallbackLocale = async () => {
     const fallback = i18n.global.fallbackLocale.value || DEFAULT_LOCALE;
