@@ -1131,7 +1131,7 @@ const checkSendCount = (rule: any, value: any, callback: any) => {
 };
 
 const rules = reactive({
-    name: [Rules.requiredInput, Rules.noSpace],
+    name: [Rules.requiredInput, Rules.noSpace, Rules.linuxName],
     type: [Rules.requiredSelect],
     spec: [
         { validator: verifySpec, trigger: 'blur', required: true },
