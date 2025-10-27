@@ -354,7 +354,7 @@
                         <el-select
                             v-model="website.websiteSSLID"
                             :placeholder="$t('website.selectSSL')"
-                            @change="changeSSl(website.websiteSSLID)"
+                            @change="handleSSLSelectChange"
                         >
                             <el-option
                                 v-for="(ssl, index) in ssls"
@@ -436,7 +436,7 @@ import {
 import { Rules, checkNumberRange } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm, FormInstance } from 'element-plus';
-import { reactive, ref } from 'vue';
+import { reactive, ref, watch } from 'vue';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { SearchRuntimes } from '@/api/modules/runtime';
 import { Runtime } from '@/api/interface/runtime';
@@ -447,6 +447,13 @@ import { dateFormatSimple, getProvider, getAccountName } from '@/utils/util';
 import { Website } from '@/api/interface/website';
 import { getPathByType } from '@/api/modules/files';
 import { getWebsiteTypes } from '@/global/mimetype';
+
+type SSLItem = Website.SSLDTO & {
+    organization?: string;
+    acmeAccount?: {
+        email?: string;
+    };
+};
 
 const websiteForm = ref<FormInstance>();
 
@@ -557,8 +564,9 @@ const versionExist = ref(true);
 const em = defineEmits(['close']);
 const taskLog = ref();
 const dbServices = ref();
-const ssls = ref();
-const websiteSSL = ref();
+const ssls = ref<SSLItem[]>([]);
+const websiteSSL = ref<SSLItem | undefined>(undefined);
+const userSelectedSSL = ref(false);
 const parentWebsites = ref();
 const dirs = ref([]);
 const runtimePorts = ref([]);
@@ -735,30 +743,182 @@ const listAcmeAccount = () => {
     });
 };
 
+const changeSSl = (sslid?: number) => {
+    if (!sslid) {
+        websiteSSL.value = undefined;
+        return;
+    }
+    const selected = ssls.value.find((element) => element.id === sslid);
+    websiteSSL.value = selected;
+};
+
+const applySSLSelection = (sslId: number | undefined, markManual = false) => {
+    if (markManual) {
+        userSelectedSSL.value = true;
+    }
+    if (!sslId) {
+        website.value.websiteSSLID = undefined;
+        websiteSSL.value = undefined;
+        return;
+    }
+    website.value.websiteSSLID = sslId;
+    changeSSl(sslId);
+};
+
+const selectFirstAvailableSSL = () => {
+    const fallback = ssls.value.find((item) => item.pem !== '');
+    if (fallback) {
+        applySSLSelection(fallback.id);
+    }
+};
+
+const normalizeDomain = (domain?: string) => {
+    if (!domain) {
+        return '';
+    }
+    return domain.split(':')[0].trim().toLowerCase();
+};
+
+const wildcardMatches = (pattern: string, target: string) => {
+    if (!pattern.startsWith('*.')) {
+        return false;
+    }
+    const suffix = pattern.slice(1);
+    if (!suffix) {
+        return false;
+    }
+    if (!target.endsWith(suffix)) {
+        return false;
+    }
+    const suffixLabels = suffix.slice(1).split('.');
+    const targetLabels = target.split('.');
+    return targetLabels.length > suffixLabels.length;
+};
+
+const domainMatches = (pattern: string, target: string) => {
+    if (!pattern || !target) {
+        return false;
+    }
+    if (pattern === target) {
+        return true;
+    }
+    return wildcardMatches(pattern, target);
+};
+
+const getWebsiteDomains = (): string[] => {
+    const domains = new Set<string>();
+    const pushDomain = (value?: string) => {
+        const normalized = normalizeDomain(value);
+        if (normalized) {
+            domains.add(normalized);
+        }
+    };
+    pushDomain(website.value.primaryDomain);
+    if (Array.isArray(website.value.domains)) {
+        website.value.domains.forEach((item: any) => {
+            pushDomain(item?.domain);
+        });
+    }
+    return Array.from(domains);
+};
+
+const getCertificateDomains = (ssl: SSLItem): string[] => {
+    const domains = new Set<string>();
+    const tokens: string[] = [];
+    if (ssl.primaryDomain) {
+        tokens.push(ssl.primaryDomain);
+    }
+    if (ssl.domains) {
+        ssl.domains
+            .replace(/\n/g, ',')
+            .split(',')
+            .map((item) => item.trim())
+            .filter((item) => item !== '')
+            .forEach((item) => tokens.push(item));
+    }
+    tokens.forEach((token) => {
+        const normalized = normalizeDomain(token);
+        if (normalized) {
+            domains.add(normalized);
+        }
+    });
+    return Array.from(domains);
+};
+
+const tryAutoSelectSSL = (): boolean => {
+    if (!website.value.enableSSL) {
+        return false;
+    }
+    if (userSelectedSSL.value) {
+        return false;
+    }
+    if (!ssls.value.length) {
+        return false;
+    }
+
+    const siteDomains = getWebsiteDomains();
+    if (!siteDomains.length) {
+        return false;
+    }
+
+    const candidates = ssls.value
+        .filter((ssl) => ssl.pem !== '')
+        .map((ssl) => {
+            const certDomains = getCertificateDomains(ssl);
+            if (!certDomains.length) {
+                return { ssl, ratio: 0, matchCount: 0 };
+            }
+            const matchCount = certDomains.reduce((count, domain) => {
+                return count + (siteDomains.some((candidate) => domainMatches(domain, candidate)) ? 1 : 0);
+            }, 0);
+            const ratio = certDomains.length > 0 ? matchCount / certDomains.length : 0;
+            return { ssl, ratio, matchCount };
+        })
+        .filter((item) => item.matchCount > 0 && item.ratio > 0);
+
+    if (!candidates.length) {
+        return false;
+    }
+
+    candidates.sort((a, b) => {
+        if (b.ratio !== a.ratio) {
+            return b.ratio - a.ratio;
+        }
+        if (b.matchCount !== a.matchCount) {
+            return b.matchCount - a.matchCount;
+        }
+        return b.ssl.id - a.ssl.id;
+    });
+
+    const best = candidates[0];
+    if (!best) {
+        return false;
+    }
+    if (website.value.websiteSSLID !== best.ssl.id) {
+        applySSLSelection(best.ssl.id);
+    } else {
+        changeSSl(best.ssl.id);
+    }
+    return true;
+};
+
+const handleSSLSelectChange = (sslId: number | undefined) => {
+    applySSLSelection(sslId, true);
+};
+
 const listSSLs = () => {
     listSSL({
         acmeAccountID: String(website.value.acmeAccountID),
     }).then((res) => {
         ssls.value = res.data || [];
         website.value.websiteSSLID = undefined;
-        websiteSSL.value = {};
-        if (ssls.value.length > 0) {
-            for (const ssl of ssls.value) {
-                if (ssl.pem != '') {
-                    website.value.websiteSSLID = ssl.id;
-                    changeSSl(website.value.websiteSSLID);
-                    break;
-                }
-            }
+        websiteSSL.value = undefined;
+        userSelectedSSL.value = false;
+        const autoSelected = tryAutoSelectSSL();
+        if (!autoSelected) {
+            selectFirstAvailableSSL();
         }
     });
-};
-
-const changeSSl = (sslid: number) => {
-    const res = ssls.value.filter((element: Website.SSL) => {
-        return element.id == sslid;
-    });
-    websiteSSL.value = res[0];
 };
 
 const submit = async (formEl: FormInstance | undefined) => {
@@ -805,12 +965,32 @@ const submit = async (formEl: FormInstance | undefined) => {
 watch(
     () => website.value.domains,
     (value) => {
-        if (value.length > 0) {
+        if (value && value.length > 0) {
             const firstDomain = value[0].domain;
             changeAlias(firstDomain);
         }
+        tryAutoSelectSSL();
     },
     { deep: true },
+);
+
+watch(
+    () => website.value.primaryDomain,
+    () => {
+        tryAutoSelectSSL();
+    },
+);
+
+watch(
+    () => website.value.enableSSL,
+    (enabled) => {
+        if (!enabled) {
+            applySSLSelection(undefined);
+            userSelectedSSL.value = false;
+            return;
+        }
+        tryAutoSelectSSL();
+    },
 );
 
 const changeAlias = (value: string) => {
