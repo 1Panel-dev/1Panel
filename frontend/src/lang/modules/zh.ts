@@ -980,6 +980,7 @@ const message = {
         author: '作者',
         ifPause: '制作过程中是否暂停容器',
         ifMakeImageWithContainer: '是否根据此容器制作新镜像？',
+        finishTime: '上一次停止时间',
     },
     cronjob: {
         create: '创建计划任务',

@@ -1027,6 +1027,7 @@ const message = {
         author: 'Pengarang',
         ifPause: 'Jeda Kontena Semasa Penciptaan',
         ifMakeImageWithContainer: 'Cipta Imej Baru daripada Kontena Ini?',
+        finishTime: 'Masa berhenti terakhir',
     },
     cronjob: {
         create: 'Cipta tugas cron',

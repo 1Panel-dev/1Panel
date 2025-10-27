@@ -1031,6 +1031,7 @@ const message = {
         author: 'Autor',
         ifPause: '¿Pausar el contenedor durante la creación?',
         ifMakeImageWithContainer: '¿Crear nueva imagen a partir de este contenedor?',
+        finishTime: 'Hora de la última detención',
     },
     cronjob: {
         create: 'Crear tarea programada',

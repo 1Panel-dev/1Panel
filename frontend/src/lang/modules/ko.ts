@@ -993,6 +993,7 @@ const message = {
         author: '작성자',
         ifPause: '생성 중 컨테이너 일시 정지',
         ifMakeImageWithContainer: '이 컨테이너에서 새 이미지를 생성하시겠습니까?',
+        finishTime: '마지막 중지 시간',
     },
     cronjob: {
         create: '크론 작업 생성',

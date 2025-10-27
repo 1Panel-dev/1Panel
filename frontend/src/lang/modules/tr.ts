@@ -1044,6 +1044,7 @@ const message = {
         author: 'Yazar',
         ifPause: 'Oluşturma Sırasında Konteyneri Duraklat',
         ifMakeImageWithContainer: 'Bu Konteynerden Yeni İmaj Oluşturulsun mu?',
+        finishTime: 'Son durdurma zamanı',
     },
     cronjob: {
         create: 'Cron görevi oluştur',

@@ -1022,6 +1022,7 @@ const message = {
         author: 'Автор',
         ifPause: 'Приостановить контейнер во время создания',
         ifMakeImageWithContainer: 'Создать новый образ из этого контейнера?',
+        finishTime: 'Время последней остановки',
     },
     cronjob: {
         create: 'Создать задачу cron',

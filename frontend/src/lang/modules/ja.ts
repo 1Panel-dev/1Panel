@@ -1003,6 +1003,7 @@ const message = {
         author: '著者',
         ifPause: '作成中にコンテナを一時停止します',
         ifMakeImageWithContainer: 'このコンテナから新しい画像を作成しますか？',
+        finishTime: '前回の停止時間',
     },
     cronjob: {
         create: 'Cronジョブを作成します',

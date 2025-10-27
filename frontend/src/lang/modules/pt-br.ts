@@ -1024,6 +1024,7 @@ const message = {
         author: 'Autor',
         ifPause: 'Pausar container durante a criação',
         ifMakeImageWithContainer: 'Criar nova imagem a partir deste container?',
+        finishTime: 'Horário da última parada',
     },
     cronjob: {
         create: 'Criar tarefa cron',
