@@ -337,7 +337,7 @@
 
         <OpDialog ref="opRef" @search="search" />
 
-        <CodemirrorDrawer ref="myDetail" />
+        <ContainerInspectDialog ref="containerInspectRef" />
         <PruneDialog @search="search" ref="dialogPruneRef" />
 
         <RenameDialog @search="search" ref="dialogRenameRef" />
@@ -358,7 +358,7 @@ import UpgradeDialog from '@/views/container/container/upgrade/index.vue';
 import CommitDialog from '@/views/container/container/commit/index.vue';
 import MonitorDialog from '@/views/container/container/monitor/index.vue';
 import TerminalDialog from '@/views/container/container/terminal/index.vue';
-import CodemirrorDrawer from '@/components/codemirror-pro/drawer.vue';
+import ContainerInspectDialog from '@/views/container/container/inspect/index.vue';
 import PortJumpDialog from '@/components/port-jump/index.vue';
 import DockerStatus from '@/views/container/docker-status/index.vue';
 import ContainerLogDialog from '@/components/log/container-drawer/index.vue';
@@ -431,7 +431,7 @@ const props = withDefaults(defineProps<Filters>(), {
     filters: '',
 });
 
-const myDetail = ref();
+const containerInspectRef = ref();
 
 const dialogContainerLogRef = ref();
 const dialogRenameRef = ref();
@@ -611,13 +611,7 @@ const onTerminal = (row: any) => {
 
 const onInspect = async (id: string) => {
     const res = await inspect({ id: id, type: 'container' });
-    let detailInfo = JSON.stringify(JSON.parse(res.data), null, 2);
-    let param = {
-        header: i18n.global.t('commons.button.view'),
-        detailInfo: detailInfo,
-        mode: 'json',
-    };
-    myDetail.value!.acceptParams(param);
+    containerInspectRef.value!.acceptParams({ data: res.data });
 };
 
 const onClean = () => {
