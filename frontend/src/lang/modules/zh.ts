@@ -1562,7 +1562,7 @@ const message = {
         panel: '面板',
         user: '面板用户',
         userChange: '修改面板用户',
-        userChangeHelper: '修改面板用户将退出登陆，是否继续？',
+        userChangeHelper: '修改面板用户将退出登录，是否继续？',
         passwd: '面板密码',
         emailHelper: '用于密码找回',
         watermark: '水印设置',
