@@ -2581,6 +2581,9 @@ const message = {
         strategyDown: 'Desativar',
         strategyBackup: 'Backup',
         ipHashBackupErr: 'Hash IP não suporta nós de backup',
+        failTimeout: 'Tempo limite de falha',
+        failTimeoutHelper:
+            'O comprimento da janela de tempo para verificações de integridade do servidor. Quando o número acumulado de falhas atinge o limite dentro deste período, o servidor será removido temporariamente e repetido após a mesma duração. Padrão 10 segundos',
 
         staticChangePHPHelper: 'Atualmente um site estático, pode ser alterado para um site PHP.',
         proxyCache: 'Cache de Proxy Reverso',

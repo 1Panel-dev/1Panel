@@ -2600,6 +2600,9 @@ const message = {
         strategyDown: 'Down',
         strategyBackup: 'Backup',
         ipHashBackupErr: 'IP hash does not support backup nodes',
+        failTimeout: 'Failure timeout',
+        failTimeoutHelper:
+            'The time window length for server health checks. When the cumulative number of failures reaches the threshold within this period, the server will be temporarily removed and retried after the same duration. Default 10 seconds',
 
         staticChangePHPHelper: 'Currently a static website, you can switch to a PHP website',
         proxyCache: 'Reverse Proxy Cache',

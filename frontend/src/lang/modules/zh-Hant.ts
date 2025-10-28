@@ -2418,6 +2418,9 @@ const message = {
         strategyDown: '停用',
         strategyBackup: '備用',
         ipHashBackupErr: 'IP 雜湊不支援備用節點',
+        failTimeout: '故障超時',
+        failTimeoutHelper:
+            '服務器健康檢查的時間窗口長度。在該時間段內累計失敗次數達到閾值時，服務器將被暫時移除，並在經過相同時長後重新嘗試。默認 10 秒',
 
         staticChangePHPHelper: '目前為靜態網站，可切換為 PHP 網站',
         proxyCache: '反向代理快取',

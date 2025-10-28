@@ -2517,6 +2517,9 @@ const message = {
         strategyDown: '無効',
         strategyBackup: 'バックアップ',
         ipHashBackupErr: 'IPハッシュはバックアップノードをサポートしていません',
+        failTimeout: '障害タイムアウト',
+        failTimeoutHelper:
+            'サーバーのヘルスチェックの時間ウィンドウの長さ。この期間内に累積障害回数がしきい値に達すると、サーバーは一時的に削除され、同じ時間経過後に再試行されます。デフォルト 10 秒',
 
         staticChangePHPHelper: '現在は静的ウェブサイトですが、PHPウェブサイトに切り替えることができます。',
         proxyCache: 'リバースプロキシキャッシュ',

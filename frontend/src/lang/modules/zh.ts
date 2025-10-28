@@ -2411,6 +2411,9 @@ const message = {
         strategyDown: '停用',
         strategyBackup: '备用',
         ipHashBackupErr: 'IP 哈希不支持备用节点',
+        failTimeout: '故障超时',
+        failTimeoutHelper:
+            '服务器健康检查的时间窗口长度。在该时间段内累计失败次数达到阈值时，服务器将被暂时移除，并在经过相同时长后重新尝试。默认 10 秒',
 
         staticChangePHPHelper: '当前为静态网站，可以切换为 PHP 网站',
         proxyCache: '反代缓存',

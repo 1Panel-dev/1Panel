@@ -30,7 +30,9 @@
                                 <el-tag type="success">{{ $t('website.weight') }}: {{ item.weight }}</el-tag>
                             </td>
                             <td v-if="item.failTimeout != ''">
-                                <el-tag type="warning">{{ $t('website.failTimeout') }}: {{ item.failTimeout }}</el-tag>
+                                <el-tag type="warning">
+                                    {{ $t('website.failTimeout') }}: {{ item.failTimeout }} {{ item.failTimeoutUnit }}
+                                </el-tag>
                             </td>
                             <td v-if="item.maxFails > 0">
                                 <el-tag type="danger">{{ $t('website.maxFails') }}: {{ item.maxFails }}</el-tag>

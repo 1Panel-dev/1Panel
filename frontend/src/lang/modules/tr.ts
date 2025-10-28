@@ -2634,6 +2634,9 @@ const message = {
         strategyDown: 'Kapalı',
         strategyBackup: 'Yedek',
         ipHashBackupErr: 'IP 哈希不支持备用节点',
+        failTimeout: 'Hata zaman aşımı',
+        failTimeoutHelper:
+            'Sunucu sağlık kontrolleri için zaman penceresi uzunluğu. Bu süre içinde biriken hata sayısı eşiğe ulaştığında, sunucu geçici olarak kaldırılacak ve aynı süre sonunda yeniden denenir. Varsayılan 10 saniye',
 
         staticChangePHPHelper: 'Şu anda statik bir web sitesi, PHP web sitesine geçiş yapabilirsiniz',
         proxyCache: 'Ters Vekil Önbelleği',

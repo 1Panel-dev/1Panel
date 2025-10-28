@@ -73,12 +73,13 @@ type NginxUpstream struct {
 }
 
 type NginxUpstreamServer struct {
-	Server      string `json:"server"`
-	Weight      int    `json:"weight"`
-	FailTimeout string `json:"failTimeout"`
-	MaxFails    int    `json:"maxFails"`
-	MaxConns    int    `json:"maxConns"`
-	Flag        string `json:"flag"`
+	Server          string `json:"server"`
+	Weight          int    `json:"weight"`
+	FailTimeout     int    `json:"failTimeout"`
+	FailTimeoutUnit string `json:"failTimeoutUnit"`
+	MaxFails        int    `json:"maxFails"`
+	MaxConns        int    `json:"maxConns"`
+	Flag            string `json:"flag"`
 }
 
 var LBAlgorithms = map[string]struct{}{"ip_hash": {}, "least_conn": {}}

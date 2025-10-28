@@ -2585,6 +2585,9 @@ const message = {
         strategyDown: 'Baja',
         strategyBackup: 'Backup',
         ipHashBackupErr: 'IP hash does not support backup nodes',
+        failTimeout: 'Tiempo de espera de fallo',
+        failTimeoutHelper:
+            'La duración de la ventana de tiempo para las comprobaciones de estado del servidor. Cuando el número acumulado de fallos alcanza el umbral dentro de este período, el servidor se eliminará temporalmente y se reintentará después de la misma duración. Por defecto 10 segundos',
 
         staticChangePHPHelper: 'Actualmente es un sitio estático, puedes cambiarlo a PHP',
         proxyCache: 'Caché de proxy inverso',

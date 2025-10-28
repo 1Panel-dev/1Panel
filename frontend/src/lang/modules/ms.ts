@@ -2577,6 +2577,9 @@ const message = {
         strategyDown: 'Lumpuh',
         strategyBackup: 'Sandaran',
         ipHashBackupErr: 'Hash IP tidak menyokong nod sandaran',
+        failTimeout: 'Masa tamat kegagalan',
+        failTimeoutHelper:
+            'Panjang tetingkap masa untuk pemeriksaan kesihatan pelayan. Apabila bilangan kegagalan terkumpul mencapai ambang dalam tempoh ini, pelayan akan dikeluarkan buat sementara waktu dan dicuba semula selepas tempoh yang sama. Lalai 10 saat',
 
         staticChangePHPHelper: 'Kini laman web statik, boleh ditukar ke laman web PHP.',
         proxyCache: 'Cache Proksi Terbalik',

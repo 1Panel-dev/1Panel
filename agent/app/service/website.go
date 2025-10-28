@@ -3094,39 +3094,7 @@ func (w WebsiteService) GetLoadBalances(id uint) ([]dto.NginxUpstream, error) {
 						upstream.Algorithm = dName
 					}
 				}
-				var servers []dto.NginxUpstreamServer
-				for _, ups := range up.UpstreamServers {
-					server := dto.NginxUpstreamServer{
-						Server: ups.Address,
-					}
-					parameters := ups.Parameters
-					if weight, ok := parameters["weight"]; ok {
-						num, err := strconv.Atoi(weight)
-						if err == nil {
-							server.Weight = num
-						}
-					}
-					if maxFails, ok := parameters["max_fails"]; ok {
-						num, err := strconv.Atoi(maxFails)
-						if err == nil {
-							server.MaxFails = num
-						}
-					}
-					if failTimeout, ok := parameters["fail_timeout"]; ok {
-						server.FailTimeout = failTimeout
-					}
-					if maxConns, ok := parameters["max_conns"]; ok {
-						num, err := strconv.Atoi(maxConns)
-						if err == nil {
-							server.MaxConns = num
-						}
-					}
-					for _, flag := range ups.Flags {
-						server.Flag = flag
-					}
-					servers = append(servers, server)
-				}
-				upstream.Servers = servers
+				upstream.Servers = getNginxUpstreamServers(up.UpstreamServers)
 			}
 		}
 		res = append(res, upstream)
@@ -3160,33 +3128,7 @@ func (w WebsiteService) CreateLoadBalance(req request.WebsiteLBCreate) error {
 	if req.Algorithm != "default" {
 		upstream.UpdateDirective(req.Algorithm, []string{})
 	}
-
-	servers := make([]*components.UpstreamServer, 0)
-
-	for _, server := range req.Servers {
-		upstreamServer := &components.UpstreamServer{
-			Address: server.Server,
-		}
-		parameters := make(map[string]string)
-		if server.Weight > 0 {
-			parameters["weight"] = strconv.Itoa(server.Weight)
-		}
-		if server.MaxFails > 0 {
-			parameters["max_fails"] = strconv.Itoa(server.MaxFails)
-		}
-		if server.FailTimeout != "" {
-			parameters["fail_timeout"] = server.FailTimeout
-		}
-		if server.MaxConns > 0 {
-			parameters["max_conns"] = strconv.Itoa(server.MaxConns)
-		}
-		if server.Flag != "" {
-			upstreamServer.Flags = []string{server.Flag}
-		}
-		upstreamServer.Parameters = parameters
-		servers = append(servers, upstreamServer)
-	}
-	upstream.UpstreamServers = servers
+	upstream.UpstreamServers = parseUpstreamServers(req.Servers)
 	config.Block.Directives = append(config.Block.Directives, &upstream)
 
 	defer func() {
@@ -3245,31 +3187,7 @@ func (w WebsiteService) UpdateLoadBalance(req request.WebsiteLBUpdate) error {
 			if req.Algorithm != "default" {
 				up.UpdateDirective(req.Algorithm, []string{})
 			}
-			var servers []*components.UpstreamServer
-			for _, server := range req.Servers {
-				upstreamServer := &components.UpstreamServer{
-					Address: server.Server,
-				}
-				parameters := make(map[string]string)
-				if server.Weight > 0 {
-					parameters["weight"] = strconv.Itoa(server.Weight)
-				}
-				if server.MaxFails > 0 {
-					parameters["max_fails"] = strconv.Itoa(server.MaxFails)
-				}
-				if server.FailTimeout != "" {
-					parameters["fail_timeout"] = server.FailTimeout
-				}
-				if server.MaxConns > 0 {
-					parameters["max_conns"] = strconv.Itoa(server.MaxConns)
-				}
-				if server.Flag != "" {
-					upstreamServer.Flags = []string{server.Flag}
-				}
-				upstreamServer.Parameters = parameters
-				servers = append(servers, upstreamServer)
-			}
-			up.UpstreamServers = servers
+			up.UpstreamServers = parseUpstreamServers(req.Servers)
 		}
 	}
 	if err = nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {

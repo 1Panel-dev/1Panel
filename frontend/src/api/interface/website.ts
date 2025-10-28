@@ -607,7 +607,8 @@ export namespace Website {
     interface NginxUpstreamServer {
         server: string;
         weight: number;
-        failTimeout: string;
+        failTimeout: number;
+        failTimeoutUnit: string;
         maxFails: number;
         maxConns: number;
         flag: string;

@@ -2473,6 +2473,9 @@ const message = {
         strategyDown: '비활성화',
         strategyBackup: '백업',
         ipHashBackupErr: 'IP 해시는 백업 노드를 지원하지 않습니다',
+        failTimeout: '장애 시간 초과',
+        failTimeoutHelper:
+            '서버 상태 점검 시간 창 길이. 이 기간 동안 누적 실패 횟수가 임계값에 도달하면 서버가 일시적으로 제거되고 동일한 시간 후에 재시도됩니다. 기본값 10초',
 
         staticChangePHPHelper: '현재 정적 웹사이트이며 PHP 웹사이트로 전환할 수 있습니다.',
         proxyCache: '리버스 프록시 캐시',

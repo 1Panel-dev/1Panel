@@ -21,78 +21,126 @@
                 </el-select>
                 <span class="input-help">{{ getHelper(item.algorithm) }}</span>
             </el-form-item>
-            <el-row :gutter="20" v-for="(server, index) of item.servers" :key="index">
-                <el-col :span="7">
-                    <el-form-item
-                        :label="index == 0 ? $t('setting.address') : ''"
-                        :prop="`servers.${index}.server`"
-                        :rules="rules.server"
-                    >
-                        <el-input
-                            type="string"
-                            v-model="item.servers[index].server"
-                            :placeholder="index > 0 ? $t('setting.address') : ''"
-                        ></el-input>
-                    </el-form-item>
-                </el-col>
-                <el-col :span="3">
-                    <el-form-item
-                        :label="index == 0 ? $t('website.weight') : ''"
-                        :prop="`servers.${index}.weight`"
-                        :rules="rules.weight"
-                    >
-                        <el-input type="number" v-model.number="item.servers[index].weight"></el-input>
-                    </el-form-item>
-                </el-col>
-                <el-col :span="4">
-                    <el-form-item
-                        :label="index == 0 ? $t('website.maxFails') : ''"
-                        :prop="`servers.${index}.maxFails`"
-                        :rules="rules.maxFails"
-                    >
-                        <el-input type="number" v-model.number="item.servers[index].maxFails"></el-input>
-                    </el-form-item>
-                </el-col>
-                <el-col :span="4">
-                    <el-form-item
-                        :label="index == 0 ? $t('website.maxConns') : ''"
-                        :prop="`servers.${index}.maxConns`"
-                        :rules="rules.maxConns"
-                    >
-                        <el-input type="number" v-model.number="item.servers[index].maxConns"></el-input>
-                    </el-form-item>
-                </el-col>
-                <el-col :span="3">
-                    <el-form-item
-                        :label="index == 0 ? $t('website.strategy') : ''"
-                        :prop="`servers.${index}.flag`"
-                        :rules="rules.flag"
-                    >
-                        <el-select v-model="item.servers[index].flag" clearable>
-                            <el-option
-                                v-for="flag in getStatusStrategy()"
-                                :label="flag.label"
-                                :key="flag.value"
-                                :value="flag.value"
-                            ></el-option>
-                        </el-select>
-                    </el-form-item>
-                </el-col>
-                <el-col :span="3" v-if="index == 0">
-                    <el-form-item :label="$t('commons.button.add') + $t('website.server')">
-                        <el-button @click="addServer">
-                            <el-icon><Plus /></el-icon>
-                        </el-button>
-                    </el-form-item>
-                </el-col>
-                <el-col :span="3" v-else>
-                    <el-form-item>
-                        <el-button @click="removeServer(index)" link type="primary">
-                            <el-icon><Delete /></el-icon>
-                        </el-button>
-                    </el-form-item>
-                </el-col>
-            </el-row>
+
+            <div>
+                <el-card v-for="(server, index) of item.servers" :key="index" class="server-card" shadow="hover">
+                    <template #header>
+                        <div class="card-header">
+                            <span class="server-title">
+                                <el-icon><Monitor /></el-icon>
+                                <span class="ml-2">{{ $t('website.server') }} - {{ server.server }}</span>
+                            </span>
+                            <el-button
+                                v-if="item.servers.length > 1"
+                                text
+                                type="danger"
+                                icon="Delete"
+                                size="small"
+                                @click="removeServer(index)"
+                            ></el-button>
+                        </div>
+                    </template>
+
+                    <div>
+                        <el-row :gutter="16">
+                            <el-col :span="24">
+                                <el-form-item
+                                    :label="$t('setting.address')"
+                                    :prop="`servers.${index}.server`"
+                                    :rules="rules.server"
+                                >
+                                    <el-input
+                                        v-model="item.servers[index].server"
+                                        :placeholder="'example.com:8080'"
+                                    ></el-input>
+                                </el-form-item>
+                            </el-col>
+                        </el-row>
+                        <el-row :gutter="16">
+                            <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
+                                <el-form-item
+                                    :label="$t('website.weight')"
+                                    :prop="`servers.${index}.weight`"
+                                    :rules="rules.weight"
+                                >
+                                    <el-input type="number" v-model.number="item.servers[index].weight"></el-input>
+                                </el-form-item>
+                            </el-col>
+                            <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
+                                <el-form-item
+                                    :label="$t('website.strategy')"
+                                    :prop="`servers.${index}.flag`"
+                                    :rules="rules.flag"
+                                >
+                                    <el-select v-model="item.servers[index].flag" clearable>
+                                        <el-option
+                                            v-for="flag in getStatusStrategy()"
+                                            :label="flag.label"
+                                            :key="flag.value"
+                                            :value="flag.value"
+                                        ></el-option>
+                                    </el-select>
+                                </el-form-item>
+                            </el-col>
+                        </el-row>
+                        <el-row :gutter="16">
+                            <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
+                                <el-form-item
+                                    :label="$t('website.maxFails')"
+                                    :prop="`servers.${index}.maxFails`"
+                                    :rules="rules.maxFails"
+                                >
+                                    <el-input type="number" v-model.number="item.servers[index].maxFails">
+                                        <template #append>{{ $t('commons.units.time') }}</template>
+                                    </el-input>
+                                </el-form-item>
+                            </el-col>
+                            <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
+                                <el-form-item :prop="`servers.${index}.failTimeout`" :rules="rules.failTimeout">
+                                    <template #label>
+                                        <span class="inline-flex items-center">
+                                            {{ $t('website.failTimeout') }}
+                                            <el-tooltip :content="$t('website.failTimeoutHelper')" placement="top">
+                                                <el-icon><QuestionFilled /></el-icon>
+                                            </el-tooltip>
+                                        </span>
+                                    </template>
+                                    <el-input type="number" v-model.number="item.servers[index].failTimeout">
+                                        <template #append>
+                                            <el-select
+                                                v-model.number="item.servers[index].failTimeoutUnit"
+                                                class="!w-24"
+                                            >
+                                                <el-option
+                                                    v-for="(unit, index) in Units"
+                                                    :key="index"
+                                                    :label="unit.label"
+                                                    :value="unit.value"
+                                                />
+                                            </el-select>
+                                        </template>
+                                    </el-input>
+                                </el-form-item>
+                            </el-col>
+                        </el-row>
+                        <el-row :gutter="16">
+                            <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
+                                <el-form-item
+                                    :label="$t('website.maxConns')"
+                                    :prop="`servers.${index}.maxConns`"
+                                    :rules="rules.maxConns"
+                                >
+                                    <el-input type="number" v-model.number="item.servers[index].maxConns"></el-input>
+                                </el-form-item>
+                            </el-col>
+                        </el-row>
+                    </div>
+                </el-card>
+
+                <el-button class="add-server-btn" type="primary" plain @click="addServer" icon="Plus">
+                    {{ $t('commons.button.add') + $t('website.server') }}
+                </el-button>
+            </div>
         </el-form>
         <template #footer>
             <span class="dialog-footer">
@@ -114,6 +162,8 @@ import { MsgError, MsgSuccess } from '@/utils/message';
 import { Rules, checkNumberRange } from '@/global/form-rules';
 import { getAlgorithms, getStatusStrategy } from '@/global/mimetype';
 import { Website } from '@/api/interface/website';
+import { Monitor, QuestionFilled } from '@element-plus/icons-vue';
+import { Units } from '@/global/mimetype';
 
 const rules = ref<any>({
     name: [Rules.appName],
@@ -124,7 +174,8 @@ const rules = ref<any>({
         type: Array,
     },
     maxFails: [checkNumberRange(1, 1000)],
-    maxConns: [checkNumberRange(1, 1000)],
+    maxConns: [checkNumberRange(0, 10000)],
+    failTimeout: [checkNumberRange(1, 300)],
 });
 
 interface LoadBalanceOperate {
@@ -137,6 +188,12 @@ const lbForm = ref<FormInstance>();
 
 const initServer = () => ({
     server: '',
+    weight: undefined,
+    maxFails: undefined,
+    maxConns: undefined,
+    failTimeout: undefined,
+    failTimeoutUnit: 's',
+    flag: '',
 });
 
 const open = ref(false);
@@ -188,11 +245,15 @@ const acceptParams = async (req: LoadBalanceOperate) => {
             const weight = server.weight == 0 ? undefined : server.weight;
             const maxFails = server.maxFails == 0 ? undefined : server.maxFails;
             const maxConns = server.maxConns == 0 ? undefined : server.maxConns;
+            const failTimeout = server.failTimeout == 0 ? undefined : server.failTimeout;
+            const failTimeoutUnit = server.failTimeoutUnit || 's';
             servers.push({
                 server: server.server,
                 weight: weight,
                 maxFails: maxFails,
                 maxConns: maxConns,
+                failTimeout: failTimeout,
+                failTimeoutUnit: failTimeoutUnit,
                 flag: server.flag,
             });
         });
@@ -215,6 +276,9 @@ const handleServers = () => {
         if (!server.maxConns || server.maxConns == '') {
             server.maxConns = 0;
         }
+        if (!server.failTimeout || server.failTimeout == '') {
+            server.failTimeout = 0;
+        }
     }
 };
 
@@ -228,6 +292,9 @@ const rollBackServers = () => {
         }
         if (server.maxConns == 0) {
             server.maxConns = undefined;
+        }
+        if (server.failTimeout == 0) {
+            server.failTimeout = undefined;
         }
     }
 };
@@ -271,3 +338,48 @@ defineExpose({
     acceptParams,
 });
 </script>
+
+<style scoped lang="scss">
+.server-card {
+    margin-bottom: 16px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+
+    &:hover {
+        border-color: var(--el-color-primary);
+    }
+
+    :deep(.el-card__header) {
+        padding: 12px 20px;
+        background-color: var(--el-fill-color-light);
+    }
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 20px;
+
+    .server-title {
+        display: flex;
+        align-items: center;
+        font-weight: 500;
+        font-size: 14px;
+        color: var(--el-text-color-primary);
+    }
+}
+
+.add-server-btn {
+    width: 100%;
+    height: 48px;
+    border-style: dashed;
+    font-size: 14px;
+    margin-top: 8px;
+
+    &:hover {
+        border-color: var(--el-color-primary);
+        background-color: var(--el-color-primary-light-9);
+    }
+}
+</style>

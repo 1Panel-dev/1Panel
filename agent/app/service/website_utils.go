@@ -9,6 +9,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
 	"syscall"
@@ -1532,4 +1533,90 @@ func getServer(website model.Website) (*components.Server, error) {
 	}
 	server := servers[0]
 	return server, nil
+}
+
+func parseTimeString(input string) (int, string, error) {
+	input = strings.TrimSpace(input)
+
+	re := regexp.MustCompile(`^(\d+)([smhdw]?)$`)
+	matches := re.FindStringSubmatch(input)
+
+	if len(matches) < 2 {
+		return 0, "", fmt.Errorf("invalid time format: %s", input)
+	}
+
+	value, err := strconv.Atoi(matches[1])
+	if err != nil {
+		return 0, "", fmt.Errorf("invalid number: %s", matches[1])
+	}
+
+	unit := matches[2]
+	if unit == "" {
+		unit = "s"
+	}
+	return value, unit, nil
+}
+
+func parseUpstreamServers(reqServers []dto.NginxUpstreamServer) []*components.UpstreamServer {
+	var servers []*components.UpstreamServer
+	for _, server := range reqServers {
+		upstreamServer := &components.UpstreamServer{
+			Address: server.Server,
+		}
+		parameters := make(map[string]string)
+		if server.Weight > 0 {
+			parameters["weight"] = strconv.Itoa(server.Weight)
+		}
+		if server.MaxFails > 0 {
+			parameters["max_fails"] = strconv.Itoa(server.MaxFails)
+		}
+		if server.FailTimeout > 0 {
+			parameters["fail_timeout"] = fmt.Sprintf("%d%s", server.FailTimeout, server.FailTimeoutUnit)
+		}
+		if server.MaxConns > 0 {
+			parameters["max_conns"] = strconv.Itoa(server.MaxConns)
+		}
+		if server.Flag != "" {
+			upstreamServer.Flags = []string{server.Flag}
+		}
+		upstreamServer.Parameters = parameters
+		servers = append(servers, upstreamServer)
+	}
+	return servers
+}
+
+func getNginxUpstreamServers(upstreamServers []*components.UpstreamServer) []dto.NginxUpstreamServer {
+	var servers []dto.NginxUpstreamServer
+	for _, ups := range upstreamServers {
+		server := dto.NginxUpstreamServer{
+			Server: ups.Address,
+		}
+		parameters := ups.Parameters
+		if weight, ok := parameters["weight"]; ok {
+			num, err := strconv.Atoi(weight)
+			if err == nil {
+				server.Weight = num
+			}
+		}
+		if maxFails, ok := parameters["max_fails"]; ok {
+			num, err := strconv.Atoi(maxFails)
+			if err == nil {
+				server.MaxFails = num
+			}
+		}
+		if failTimeout, ok := parameters["fail_timeout"]; ok {
+			server.FailTimeout, server.FailTimeoutUnit, _ = parseTimeString(failTimeout)
+		}
+		if maxConns, ok := parameters["max_conns"]; ok {
+			num, err := strconv.Atoi(maxConns)
+			if err == nil {
+				server.MaxConns = num
+			}
+		}
+		for _, flag := range ups.Flags {
+			server.Flag = flag
+		}
+		servers = append(servers, server)
+	}
+	return servers
 }
