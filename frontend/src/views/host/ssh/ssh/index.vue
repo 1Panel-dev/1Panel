@@ -118,6 +118,7 @@
                         :minHeight="350"
                         class="mt-5"
                         v-model="sshConf"
+                        mode="nginx"
                         placeholder="# The SSH configuration file does not exist or is empty (/etc/ssh/sshd_config)"
                     ></CodemirrorPro>
                     <el-button :disabled="loading" type="primary" @click="onSaveFile" class="mt-2.5">
