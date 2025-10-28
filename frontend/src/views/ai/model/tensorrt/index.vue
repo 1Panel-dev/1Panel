@@ -192,7 +192,7 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.start'),
         disabled: (row: AI.TensorRTLLM) => {
-            return row.status === 'running';
+            return row.status === 'Running';
         },
         click: (row: AI.TensorRTLLM) => {
             operate(row, 'start');
@@ -201,7 +201,7 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.stop'),
         disabled: (row: AI.TensorRTLLM) => {
-            return row.status !== 'running';
+            return row.status !== 'Running';
         },
         click: (row: AI.TensorRTLLM) => {
             operate(row, 'stop');
@@ -209,9 +209,6 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.restart'),
-        disabled: (row: AI.TensorRTLLM) => {
-            return row.status !== 'running';
-        },
         click: (row: AI.TensorRTLLM) => {
             operate(row, 'restart');
         },
