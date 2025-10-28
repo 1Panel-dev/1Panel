@@ -1,203 +1,156 @@
 <template>
     <DrawerPro v-model="visible" :header="$t('commons.button.view')" size="large" @close="handleClose">
         <el-tabs v-model="activeTab" type="border-card">
-            <!-- 概览 Overview -->
             <el-tab-pane :label="$t('menu.container')" name="overview">
-                <el-card shadow="never" class="mb-2.5">
-                    <el-descriptions :column="1" border>
-                        <el-descriptions-item :label="$t('commons.table.name')">
-                            <el-text>{{ inspectData?.Name?.substring(1) || '-' }}</el-text>
-                            <CopyButton :content="inspectData?.Name || ''" />
-                        </el-descriptions-item>
-                        <el-descriptions-item label="ID">
-                            <el-text class="text-xs">{{ inspectData?.Id?.substring(0, 12) }}</el-text>
-                            <CopyButton :content="inspectData?.Id || ''" />
-                        </el-descriptions-item>
-                        <el-descriptions-item label="PID">
-                            {{ inspectData?.State?.Pid }}
-                        </el-descriptions-item>
-                        <el-descriptions-item :label="$t('container.image')">
-                            {{ inspectData?.Config?.Image }}
-                        </el-descriptions-item>
-                        <el-descriptions-item :label="$t('commons.table.createdAt')">
-                            {{ formatDate(inspectData?.Created) }}
-                        </el-descriptions-item>
-                        <el-descriptions-item :label="$t('process.startTime')">
-                            {{ formatDate(inspectData?.State?.StartedAt) }}
-                        </el-descriptions-item>
-                        <el-descriptions-item :label="$t('container.finishTime')">
-                            {{ formatDate(inspectData?.State?.FinishedAt) }}
-                        </el-descriptions-item>
-                        <el-descriptions-item :label="$t('container.restartPolicy')">
-                            <el-tag>{{ inspectData?.HostConfig?.RestartPolicy?.Name }}</el-tag>
-                        </el-descriptions-item>
-                        <el-descriptions-item :label="$t('commons.table.status')">
-                            <el-tag :type="getStatusType(inspectData?.State?.Status)">
-                                {{ inspectData?.State?.Status }}
-                                {{
-                                    inspectData?.State?.Health?.Status
-                                        ? '(' + inspectData?.State?.Health?.Status + ')'
-                                        : ''
-                                }}
+                <el-descriptions :column="1" border :title="$t('home.baseInfo')">
+                    <el-descriptions-item :label="$t('commons.table.name')">
+                        <el-text>{{ inspectData?.Name?.substring(1) || '-' }}</el-text>
+                        <CopyButton :content="inspectData?.Name || ''" />
+                    </el-descriptions-item>
+                    <el-descriptions-item label="ID">
+                        <el-text class="text-xs">{{ inspectData?.Id?.substring(0, 12) }}</el-text>
+                        <CopyButton :content="inspectData?.Id || ''" />
+                    </el-descriptions-item>
+                    <el-descriptions-item label="PID">
+                        {{ inspectData?.State?.Pid }}
+                    </el-descriptions-item>
+                    <el-descriptions-item :label="$t('container.image')">
+                        {{ inspectData?.Config?.Image }}
+                    </el-descriptions-item>
+                    <el-descriptions-item :label="$t('commons.table.createdAt')">
+                        {{ formatDate(inspectData?.Created) }}
+                    </el-descriptions-item>
+                    <el-descriptions-item :label="$t('process.startTime')">
+                        {{ formatDate(inspectData?.State?.StartedAt) }}
+                    </el-descriptions-item>
+                    <el-descriptions-item :label="$t('container.finishTime')">
+                        {{ formatDate(inspectData?.State?.FinishedAt) }}
+                    </el-descriptions-item>
+                    <el-descriptions-item :label="$t('container.restartPolicy')">
+                        {{ getRestartPolicy() }}
+                    </el-descriptions-item>
+                    <el-descriptions-item :label="$t('commons.table.status')">
+                        <el-tag :type="getStatusType(inspectData?.State?.Status)">
+                            {{ inspectData?.State?.Status }}
+                            {{
+                                inspectData?.State?.Health?.Status ? '(' + inspectData?.State?.Health?.Status + ')' : ''
+                            }}
+                        </el-tag>
+                    </el-descriptions-item>
+                </el-descriptions>
+
+                <el-descriptions class="mt-4" :column="1" border :title="$t('container.command')">
+                    <el-descriptions-item :label="$t('container.command')">
+                        <div v-if="inspectData?.Config?.Cmd?.length">
+                            <el-tag type="info" v-for="(entry, index) in inspectData?.Config?.Cmd" :key="index">
+                                {{ entry }}
                             </el-tag>
-                        </el-descriptions-item>
-                    </el-descriptions>
-                </el-card>
-                <el-card shadow="never" class="mb-2.5">
-                    <template #header>
-                        <span class="font-semibold">{{ $t('container.command') }}</span>
-                    </template>
-                    <el-descriptions :column="1" border>
-                        <el-descriptions-item :label="$t('container.command')">
-                            <div v-if="inspectData?.Config?.Cmd?.length">
-                                {{ inspectData?.Config?.Cmd.join(' ') }}
-                            </div>
-                            <span v-else>-</span>
-                        </el-descriptions-item>
-                        <el-descriptions-item label="ENTRYPONT">
-                            <div v-if="inspectData?.Config?.Entrypoint?.length">
-                                <el-tag
-                                    v-for="(entry, index) in inspectData?.Config?.Entrypoint"
-                                    :key="index"
-                                    class="mr-1 mb-1"
-                                >
-                                    {{ entry }}
-                                </el-tag>
-                            </div>
-                            <span v-else>-</span>
-                        </el-descriptions-item>
-                        <el-descriptions-item :label="$t('container.workingDir')">
-                            {{ inspectData?.Config?.WorkingDir || '-' }}
-                        </el-descriptions-item>
-                    </el-descriptions>
-                </el-card>
+                        </div>
+                        <span v-else>-</span>
+                    </el-descriptions-item>
+                    <el-descriptions-item label="ENTRYPONT">
+                        <div v-if="inspectData?.Config?.Entrypoint?.length">
+                            <el-tag type="info" v-for="(entry, index) in inspectData?.Config?.Entrypoint" :key="index">
+                                {{ entry }}
+                            </el-tag>
+                        </div>
+                        <span v-else>-</span>
+                    </el-descriptions-item>
+                    <el-descriptions-item :label="$t('container.workingDir')">
+                        {{ inspectData?.Config?.WorkingDir || '-' }}
+                    </el-descriptions-item>
+                </el-descriptions>
 
-                <el-card shadow="never" class="mb-2.5">
-                    <template #header>
-                        <span class="font-semibold">{{ $t('container.env') }}</span>
-                    </template>
-                    <el-collapse accordion>
-                        <el-collapse-item v-for="(env, index) in inspectData?.Config?.Env" :key="index" :name="index">
-                            <template #title>
-                                <el-text class="text-sm">{{ getEnvKey(env) }}</el-text>
-                            </template>
-                            <el-text class="text-xs break-all">{{ getEnvValue(env) }}</el-text>
-                            <CopyButton :content="getEnvValue(env)" />
-                        </el-collapse-item>
-                    </el-collapse>
-                    <el-empty v-if="!inspectData?.Config?.Env?.length" :description="$t('commons.msg.noData')" />
-                </el-card>
+                <span class="envTitle">{{ $t('container.env') }}</span>
+                <el-collapse accordion :title="$t('container.env')">
+                    <el-collapse-item v-for="(env, index) in inspectData?.Config?.Env" :key="index" :name="index">
+                        <template #title>
+                            <el-text class="text-sm">{{ getEnvKey(env) }}</el-text>
+                        </template>
+                        <el-text class="text-xs break-all">{{ getEnvValue(env) }}</el-text>
+                        <CopyButton :content="getEnvValue(env)" />
+                    </el-collapse-item>
+                </el-collapse>
+                <el-empty v-if="!inspectData?.Config?.Env?.length" :description="$t('commons.msg.noData')" />
             </el-tab-pane>
 
-            <!-- 网络 Network -->
             <el-tab-pane :label="$t('container.network')" name="network">
-                <el-card shadow="never" class="mb-2.5">
-                    <template #header>
-                        <span class="font-semibold">{{ $t('container.network') }}</span>
-                    </template>
-                    <el-descriptions :column="1" border>
-                        <el-descriptions-item :label="$t('container.networkName')">
-                            <el-tag>{{ inspectData?.HostConfig?.NetworkMode }}</el-tag>
+                <el-descriptions :column="1" border :title="$t('home.baseInfo')">
+                    <el-descriptions-item :label="$t('container.networkName')">
+                        {{ inspectData?.HostConfig?.NetworkMode }}
+                    </el-descriptions-item>
+                    <el-descriptions-item :label="$t('home.hostname')">
+                        {{ inspectData?.Config?.Hostname }}
+                    </el-descriptions-item>
+                    <el-descriptions-item label="Domain">
+                        {{ inspectData?.Config?.Domainname || '-' }}
+                    </el-descriptions-item>
+                    <el-descriptions-item :label="$t('commons.table.port')">
+                        <div v-for="item of getPortBindings()" :key="item">
+                            <span>{{ item.hostIp }}:{{ item.hostPort }}</span>
+                            <span class="mx-2">→</span>
+                            <span>{{ item.containerPort }}</span>
+                        </div>
+                    </el-descriptions-item>
+                </el-descriptions>
+
+                <div v-for="(network, name) in inspectData?.NetworkSettings?.Networks" :key="name" class="mb-4 mt-4">
+                    <el-descriptions :column="2" border :title="name">
+                        <el-descriptions-item label="Network ID">
+                            <el-text class="text-xs">{{ network?.NetworkID?.substring(0, 12) }}</el-text>
                         </el-descriptions-item>
-                        <el-descriptions-item :label="$t('home.hostname')">
-                            {{ inspectData?.Config?.Hostname }}
+                        <el-descriptions-item label="Endpoint ID">
+                            <el-text class="text-xs">{{ network?.EndpointID?.substring(0, 12) }}</el-text>
                         </el-descriptions-item>
-                        <el-descriptions-item label="Domain">
-                            {{ inspectData?.Config?.Domainname || '-' }}
+                        <el-descriptions-item label="IPv4">
+                            {{ network?.IPAddress || '-' }}
+                        </el-descriptions-item>
+                        <el-descriptions-item label="IPv4 Gateway">
+                            {{ network?.Gateway || '-' }}
+                        </el-descriptions-item>
+                        <el-descriptions-item label="MAC">
+                            {{ network?.MacAddress || '-' }}
+                        </el-descriptions-item>
+                        <el-descriptions-item label="IPv6 Gateway">
+                            {{ network?.IPv6Gateway || '-' }}
                         </el-descriptions-item>
                     </el-descriptions>
-                    <el-table :data="getPortBindings()" border class="mt-2">
-                        <el-table-column :label="$t('commons.table.port')">
-                            <template #default="{ row }">
-                                <div class="flex items-center justify-between">
-                                    <span>{{ row.hostIp }}:{{ row.hostPort }}</span>
-                                    <span class="mx-2">→</span>
-                                    <span>{{ row.containerPort }}</span>
-                                </div>
-                            </template>
-                        </el-table-column>
-                    </el-table>
-                </el-card>
-
-                <el-card shadow="never" class="mb-2.5">
-                    <div v-for="(network, name) in inspectData?.NetworkSettings?.Networks" :key="name" class="mb-4">
-                        <div class="text-base font-semibold mb-2">{{ name }}</div>
-                        <el-descriptions :column="2" border>
-                            <el-descriptions-item label="Network ID">
-                                <el-text class="text-xs">{{ network?.NetworkID?.substring(0, 12) }}</el-text>
-                            </el-descriptions-item>
-                            <el-descriptions-item label="Endpoint ID">
-                                <el-text class="text-xs">{{ network?.EndpointID?.substring(0, 12) }}</el-text>
-                            </el-descriptions-item>
-                            <el-descriptions-item label="IPv4">
-                                {{ network?.IPAddress || '-' }}
-                            </el-descriptions-item>
-                            <el-descriptions-item label="IPv4 Gateway">
-                                {{ network?.Gateway || '-' }}
-                            </el-descriptions-item>
-                            <el-descriptions-item label="MAC">
-                                {{ network?.MacAddress || '-' }}
-                            </el-descriptions-item>
-                            <el-descriptions-item label="IPv6 Gateway">
-                                {{ network?.IPv6Gateway || '-' }}
-                            </el-descriptions-item>
-                        </el-descriptions>
-                    </div>
-                </el-card>
+                </div>
             </el-tab-pane>
 
-            <!-- 存储 Storage -->
             <el-tab-pane :label="$t('container.volume')" name="storage">
-                <el-card shadow="never" class="mb-2.5">
-                    <template #header>
-                        <span class="font-semibold">{{ $t('container.mountpoint') }}</span>
-                    </template>
-                    <el-table :data="inspectData?.Mounts" border>
-                        <el-table-column :label="$t('commons.table.type')" width="100">
-                            <template #default="{ row }">
-                                <el-tag size="small">{{ row.Type }}</el-tag>
-                            </template>
-                        </el-table-column>
-                        <el-table-column :label="$t('container.hostOption')" show-overflow-tooltip>
-                            <template #default="{ row }">
-                                <el-text
-                                    v-if="row.Source"
-                                    type="primary"
-                                    class="cursor-pointer"
-                                    @click="handleJumpToFile(row.Source)"
-                                >
-                                    {{ row.Source }}
-                                </el-text>
-                                <span v-else>-</span>
-                            </template>
-                        </el-table-column>
-                        <el-table-column
-                            :label="$t('container.volumeOption')"
-                            prop="Destination"
-                            show-overflow-tooltip
-                        />
-                        <el-table-column :label="$t('container.tag')" width="80" align="center">
-                            <template #default="{ row }">
-                                <el-tag :type="row.RW ? 'success' : 'warning'" size="small">
-                                    {{ row.RW ? $t('container.modeRW') : $t('container.modeR') }}
-                                </el-tag>
-                            </template>
-                        </el-table-column>
-                    </el-table>
-                </el-card>
+                <el-table :data="inspectData?.Mounts" border>
+                    <el-table-column :label="$t('commons.table.type')" width="100">
+                        <template #default="{ row }">
+                            <el-tag size="small">
+                                {{ row.Type === 'bind' ? $t('container.volumeOption') : $t('container.hostOption') }}
+                            </el-tag>
+                        </template>
+                    </el-table-column>
+                    <el-table-column :label="$t('container.hostOption')" show-overflow-tooltip>
+                        <template #default="{ row }">
+                            <el-text
+                                v-if="row.Source"
+                                type="primary"
+                                class="cursor-pointer"
+                                @click="handleJumpToFile(row.Source)"
+                            >
+                                {{ row.Source }}
+                            </el-text>
+                            <span v-else>-</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column :label="$t('container.volumeOption')" prop="Destination" show-overflow-tooltip />
+                    <el-table-column :label="$t('container.tag')" width="80" align="center">
+                        <template #default="{ row }">
+                            {{ row.RW ? $t('container.modeRW') : $t('container.modeR') }}
+                        </template>
+                    </el-table-column>
+                </el-table>
             </el-tab-pane>
 
             <el-tab-pane :label="$t('commons.button.view')" name="view">
-                <el-card shadow="never" class="mb-2.5">
-                    <template #header>
-                        <div class="flex items-center justify-between">
-                            <span class="font-semibold">{{ $t('commons.button.view') }}</span>
-                        </div>
-                    </template>
-                    <div>
-                        <CodemirrorPro v-model="rawJson" :height-diff="200" :disabled="true" mode="json" />
-                    </div>
-                </el-card>
+                <CodemirrorPro v-model="rawJson" :height-diff="240" :disabled="true" mode="json" />
             </el-tab-pane>
         </el-tabs>
 
@@ -213,6 +166,7 @@
 import { ref } from 'vue';
 import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 import { routerToFileWithPath } from '@/utils/router';
+import i18n from '@/lang';
 
 const visible = ref(false);
 const activeTab = ref('overview');
@@ -304,6 +258,21 @@ const getEnvValue = (env: string): string => {
     return index > 0 ? env.substring(index + 1) : '';
 };
 
+const getRestartPolicy = () => {
+    switch (inspectData.value?.HostConfig?.RestartPolicy?.Name) {
+        case 'no':
+            return i18n.global.t('container.no');
+        case 'always':
+            return i18n.global.t('container.always');
+        case 'on-failure':
+            return i18n.global.t('container.onFailure');
+        case 'unless-stopped':
+            return i18n.global.t('container.unlessStopped');
+        default:
+            return '-';
+    }
+};
+
 const handleJumpToFile = (path: string) => {
     if (path) {
         routerToFileWithPath(path);
@@ -320,16 +289,16 @@ defineExpose({
     word-break: break-all;
 }
 
-:deep(.el-card__header) {
-    padding: 12px 20px;
-}
-
 :deep(.el-descriptions__label) {
     width: 180px;
-    font-weight: 500;
+    background-color: transparent !important;
 }
 
-:deep(.el-table) {
-    font-size: 13px;
+.envTitle {
+    font-size: 16px;
+    color: var(--el-text-color-primary);
+    margin-top: 20px;
+    margin-bottom: 16px;
+    display: block;
 }
 </style>
