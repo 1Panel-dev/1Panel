@@ -1104,6 +1104,7 @@ const message = {
         errPath: 'バックアップパス[{0}]エラー、ダウンロードできません！',
         cutWebsiteLog: 'ウェブサイトのログローテーション',
         cutWebsiteLogHelper: '回転したログファイルは、1パネルのバックアップディレクトリにバックアップされます。',
+        syncIpGroup: 'WAF IP グループを同期',
 
         requestExpirationTime: 'リクエストの有効期限（時間）のアップロード',
         unitHours: 'ユニット:時間',

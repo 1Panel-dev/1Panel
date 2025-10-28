@@ -1098,6 +1098,8 @@ const message = {
         errPath: '백업 경로 [{0}] 오류, 다운로드할 수 없습니다!',
         cutWebsiteLog: '웹사이트 로그 회전',
         cutWebsiteLogHelper: '회전된 로그 파일은 1Panel 의 백업 디렉토리로 백업됩니다.',
+        syncIpGroup: 'WAF IP 그룹 동기화',
+
         requestExpirationTime: '업로드 요청 만료 시간(시간)',
         unitHours: '단위: 시간',
         alertTitle: '예정된 작업 - {0} 「{1}」 작업 실패 경고',

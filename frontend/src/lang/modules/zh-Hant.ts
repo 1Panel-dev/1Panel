@@ -1082,6 +1082,7 @@ const message = {
         errPath: '備份路徑 [{0}] 錯誤，無法下載！',
         cutWebsiteLog: '切割網站日誌',
         cutWebsiteLogHelper: '切割的日誌檔案會備份到 1Panel 的 backup 目錄下',
+        syncIpGroup: '同步 WAF IP 組',
 
         requestExpirationTime: '上傳請求過期時間（小時）',
         unitHours: '單位：小時',

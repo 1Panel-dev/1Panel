@@ -1144,6 +1144,8 @@ const message = {
         errPath: '¡Error en la ruta de respaldo [{0}], no se puede descargar!',
         cutWebsiteLog: 'Rotación de logs del sitio',
         cutWebsiteLogHelper: 'Los archivos de log rotados se respaldarán en el directorio de respaldos de 1Panel.',
+        syncIpGroup: 'Sincronizar grupos de IP de WAF',
+
         requestExpirationTime: 'Tiempo de expiración de solicitud de subida (Horas)',
         unitHours: 'Unidad: Horas',
         alertTitle: 'Tarea programada - {0} 「{1}」 Alerta de fallo',

@@ -1135,6 +1135,7 @@ const message = {
         errPath: 'Laluan sandaran [{0}] salah, tidak boleh dimuat turun!',
         cutWebsiteLog: 'Putaran log laman web',
         cutWebsiteLogHelper: 'Fail log yang diputar akan disandarkan ke direktori sandaran 1Panel.',
+        syncIpGroup: 'Segerakkan kumpulan IP WAF',
 
         requestExpirationTime: 'Waktu luput permintaan muat naik (Jam)',
         unitHours: 'Unit: Jam',

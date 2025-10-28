@@ -26,6 +26,7 @@
                                     <el-option value="clean" :label="$t('setting.diskClean')" />
                                     <el-option value="snapshot" :label="$t('cronjob.snapshot')" />
                                     <el-option value="ntp" :label="$t('cronjob.ntp')" />
+                                    <el-option value="syncIpGroup" :label="$t('cronjob.syncIpGroup')" />
                                 </el-select>
                                 <div v-else class="w-full">
                                     <el-tag>{{ $t('cronjob.' + form.type) }}</el-tag>

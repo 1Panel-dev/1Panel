@@ -1127,6 +1127,7 @@ const message = {
         errPath: 'Caminho de backup [{0}] com erro, não é possível fazer o download!',
         cutWebsiteLog: 'Rotação de log do site',
         cutWebsiteLogHelper: 'Os arquivos de log rotacionados serão salvos no diretório de backup do 1Panel.',
+        syncIpGroup: 'Sincronizar grupos de IP do WAF',
 
         requestExpirationTime: 'Tempo de expiração da solicitação de upload (Horas)',
         unitHours: 'Unidade: Horas',

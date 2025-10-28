@@ -1142,6 +1142,7 @@ const message = {
         errPath: 'Backup path [{0}] error, cannot download!',
         cutWebsiteLog: 'Website log rotation',
         cutWebsiteLogHelper: 'The rotated log files will be backed up to the backup directory of 1Panel.',
+        syncIpGroup: 'Sync WAF IP groups',
 
         requestExpirationTime: 'Upload request expiration time(Hours)',
         unitHours: 'Unit: Hours',

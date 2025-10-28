@@ -1154,6 +1154,7 @@ const message = {
         errPath: 'Yedek yolu [{0}] hatası, indirilemez!',
         cutWebsiteLog: 'Website log döndürme',
         cutWebsiteLogHelper: 'Döndürülen log dosyaları 1Panel yedek dizinine yedeklenecektir.',
+        syncIpGroup: 'WAF IP gruplarını senkronize et',
 
         requestExpirationTime: 'Yükleme isteği son kullanma süresi(Saat)',
         unitHours: 'Birim: Saat',

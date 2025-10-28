@@ -1,11 +1,15 @@
 package service
 
 import (
+	"bufio"
 	"context"
 	"fmt"
+	"io"
+	"net/http"
 	"os"
 	"path"
 	pathUtils "path"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -127,6 +131,8 @@ func (u *CronjobService) loadTask(cronjob *model.Cronjob, record *model.JobRecor
 		err = u.handleDirectory(*cronjob, record.StartTime, taskItem)
 	case "log":
 		err = u.handleSystemLog(*cronjob, record.StartTime, taskItem)
+	case "syncIpGroup":
+		u.handleSyncIpGroup(*cronjob, taskItem)
 	}
 	return err
 }
@@ -204,6 +210,74 @@ func (u *CronjobService) handleNtpSync(cronjob model.Cronjob, taskItem *task.Tas
 			return err
 		}
 		if err := ntp.UpdateSystemTime(ntime.Format(constant.DateTimeLayout)); err != nil {
+			return err
+		}
+		return nil
+	}, nil, int(cronjob.RetryTimes), time.Duration(cronjob.Timeout)*time.Second)
+}
+
+func (u *CronjobService) handleSyncIpGroup(cronjob model.Cronjob, taskItem *task.Task) {
+	taskItem.AddSubTaskWithOps(i18n.GetWithName("SyncIpGroup", cronjob.Name), func(t *task.Task) error {
+		appInstall, err := getAppInstallByKey(constant.AppOpenresty)
+		if err != nil {
+			return err
+		}
+		ipGroupDir := path.Join(appInstall.GetPath(), "1pwaf", "data", "rules", "ip_group")
+		urlDir := path.Join(ipGroupDir, "ip_group_url")
+
+		urlsFiles, err := os.ReadDir(urlDir)
+		if err != nil {
+			return err
+		}
+		for _, file := range urlsFiles {
+			if file.IsDir() || !strings.HasSuffix(file.Name(), "_url") {
+				continue
+			}
+			urlFilePath := filepath.Join(urlDir, file.Name())
+
+			urlContent, err := os.ReadFile(urlFilePath)
+			if err != nil {
+				continue
+			}
+			remoteURL := strings.TrimSpace(string(urlContent))
+			if remoteURL == "" {
+				continue
+			}
+			resp, err := http.Get(remoteURL)
+			if err != nil {
+				continue
+			}
+
+			ipGroupFile := strings.TrimSuffix(file.Name(), "_url")
+			ipGroupPath := filepath.Join(ipGroupDir, ipGroupFile)
+
+			if resp.StatusCode != http.StatusOK {
+				resp.Body.Close()
+				taskItem.Logf("get remote ip group %s failed %s status code %d", ipGroupFile, remoteURL, resp.StatusCode)
+				continue
+			}
+
+			outFile, err := os.OpenFile(ipGroupPath, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
+			if err != nil {
+				resp.Body.Close()
+				taskItem.Logf("sync %s failed %v", ipGroupFile, err)
+				continue
+			}
+
+			writer := bufio.NewWriter(outFile)
+			_, err = io.Copy(writer, resp.Body)
+			if err != nil {
+				outFile.Close()
+				resp.Body.Close()
+				taskItem.Logf("sync %s failed , write file failed %v", ipGroupFile, err)
+				continue
+			}
+			writer.Flush()
+			outFile.Close()
+			resp.Body.Close()
+			taskItem.LogSuccess(i18n.Get("TaskSync") + " " + ipGroupFile)
+		}
+		if err := opNginx(appInstall.ContainerName, constant.NginxReload); err != nil {
 			return err
 		}
 		return nil
