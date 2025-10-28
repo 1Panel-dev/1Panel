@@ -2894,7 +2894,7 @@
 				"output_value": "domain"
 			}
 		],
-		"formatZH": "修改网站[domain]重定向理配置",
+		"formatZH": "修改网站[domain]重定向配置",
 		"formatEN": "Updatedomain[domain]redirectconfig"
 	},
 	"/websites/rewrite/update": {

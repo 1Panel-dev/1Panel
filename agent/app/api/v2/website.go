@@ -672,7 +672,7 @@ func (b *BaseApi) UpdateAntiLeech(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /websites/redirect/update [post]
-// @x-panel-log {"bodyKeys":["websiteID"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"websiteID","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"修改网站 [domain] 重定向理配置 ","formatEN":"Update domain [domain] redirect config"}
+// @x-panel-log {"bodyKeys":["websiteID"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"websiteID","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"修改网站 [domain] 重定向配置 ","formatEN":"Update domain [domain] redirect config"}
 func (b *BaseApi) UpdateRedirectConfig(c *gin.Context) {
 	var req request.NginxRedirectReq
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {

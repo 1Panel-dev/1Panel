@@ -19963,7 +19963,7 @@ const docTemplate = `{
 						"websiteID"
 					],
 					"formatEN": "Update domain [domain] redirect config",
-					"formatZH": "修改网站 [domain] 重定向理配置 ",
+					"formatZH": "修改网站 [domain] 重定向配置 ",
 					"paramKeys": []
 				}
 			}
