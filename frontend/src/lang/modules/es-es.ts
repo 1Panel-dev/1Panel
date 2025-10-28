@@ -3593,6 +3593,12 @@ const message = {
             addNode: 'Añadir Nodo',
             connInfo: 'Información de Conexión',
             nodeInfo: 'Información del Nodo',
+            withProxy: 'Habilitar Acceso por Proxy',
+            withoutProxy: 'Deshabilitar Acceso por Proxy',
+            withProxyHelper:
+                'Utilizará el proxy del sistema {0} mantenido en la configuración del panel para acceder a los nodos secundarios. ¿Continuar?',
+            withoutProxyHelper:
+                'Dejará de usar el proxy del sistema mantenido en la configuración del panel para acceder a los nodos secundarios. ¿Continuar?',
             syncInfo: 'Sincronización',
             syncHelper:
                 'Cuando cambian los datos en el nodo principal, se sincronizan en tiempo real con este nodo secundario.',

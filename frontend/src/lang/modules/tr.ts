@@ -3684,6 +3684,12 @@ const message = {
             addNode: 'Düğüm Ekle',
             connInfo: 'Bağlantı Bilgileri',
             nodeInfo: 'Düğüm Bilgileri',
+            withProxy: 'Proxy Erişimini Etkinleştir',
+            withoutProxy: 'Proxy Erişimini Devre Dışı Bırak',
+            withProxyHelper:
+                'Alt düğümlere erişmek için panel ayarlarında tutulan sistem proxy {0} kullanılacak. Devam etmek istiyor musunuz?',
+            withoutProxyHelper:
+                'Alt düğümlere erişmek için panel ayarlarında tutulan sistem proxy kullanımı durdurulacak. Devam etmek istiyor musunuz?',
             syncInfo: 'Senkronizasyon',
             syncHelper: 'Ana düğüm verileri değiştiğinde, bu alt düğüme gerçek zamanlı olarak senkronize edilir',
             syncBackupAccount: 'Yedekleme hesabı ayarları',

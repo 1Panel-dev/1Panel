@@ -3529,6 +3529,12 @@ const message = {
             addNode: 'ノードを追加',
             connInfo: '接続情報',
             nodeInfo: 'ノード情報',
+            withProxy: 'プロキシアクセスを有効化',
+            withoutProxy: 'プロキシアクセスを無効化',
+            withProxyHelper:
+                'パネル設定で管理されているシステムプロキシ {0} を使用して子ノードにアクセスします。続行しますか？',
+            withoutProxyHelper:
+                'パネル設定で管理されているシステムプロキシを使用して子ノードにアクセスすることを停止します。続行しますか？',
             syncInfo: 'データ同期,',
             syncHelper: 'マスターノードのデータが変更されると、この子ノードにリアルタイムで同期されます,',
             syncBackupAccount: 'バックアップアカウント設定',

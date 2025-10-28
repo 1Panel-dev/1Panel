@@ -3463,6 +3463,12 @@ const message = {
             addNode: '노드 추가',
             connInfo: '연결 정보',
             nodeInfo: '노드 정보',
+            withProxy: '프록시 액세스 활성화',
+            withoutProxy: '프록시 액세스 비활성화',
+            withProxyHelper:
+                '패널 설정에서 유지 관리되는 시스템 프록시 {0}을(를) 사용하여 자식 노드에 액세스합니다. 계속하시겠습니까?',
+            withoutProxyHelper:
+                '패널 설정에서 유지 관리되는 시스템 프록시를 사용하여 자식 노드에 액세스하는 것을 중지합니다. 계속하시겠습니까?',
             syncInfo: '데이터 동기화,',
             syncHelper: '마스터 노드 데이터가 변경되면, 이 자식 노드에 실시간으로 동기화됩니다,',
             syncBackupAccount: '백업 계정 설정',

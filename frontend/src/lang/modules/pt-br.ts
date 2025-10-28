@@ -3619,6 +3619,12 @@ const message = {
             addNode: 'Adicionar Nó',
             connInfo: 'Informações de Conexão',
             nodeInfo: 'Informações do Nó',
+            withProxy: 'Включить Доступ через Прокси',
+            withoutProxy: 'Отключить Доступ через Прокси',
+            withProxyHelper:
+                'Будет использовать системный прокси {0}, поддерживаемый в настройках панели, для доступа к дочерним узлам. Продолжить?',
+            withoutProxyHelper:
+                'Прекратит использование системного прокси, поддерживаемого в настройках панели, для доступа к дочерним узлам. Продолжить?',
             syncInfo: 'Sincronização de dados,',
             syncHelper: 'Quando os dados do nó mestre mudam, são sincronizados em tempo real para este nó filho,',
             syncBackupAccount: 'Configurações de conta de backup',

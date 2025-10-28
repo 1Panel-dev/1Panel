@@ -3600,6 +3600,12 @@ const message = {
             addNode: 'Tambah Nod',
             connInfo: 'Maklumat Sambungan',
             nodeInfo: 'Maklumat Nod',
+            withProxy: 'Dayakan Akses Proksi',
+            withoutProxy: 'Lumpuhkan Akses Proksi',
+            withProxyHelper:
+                'Akan menggunakan proksi sistem {0} yang dikekalkan dalam tetapan panel untuk mengakses nod anak. Teruskan?',
+            withoutProxyHelper:
+                'Akan berhenti menggunakan proksi sistem yang dikekalkan dalam tetapan panel untuk mengakses nod anak. Teruskan?',
             syncInfo: 'Penyegerakan data,',
             syncHelper: 'Apabila data nod induk berubah, ia akan disegerakkan ke nod anak ini secara masa nyata,',
             syncBackupAccount: 'Tetapan akaun sandaran',

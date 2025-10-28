@@ -3642,6 +3642,12 @@ const message = {
             addNode: 'Add Node',
             connInfo: 'Connection Information',
             nodeInfo: 'Node Information',
+            withProxy: 'Enable Proxy Access',
+            withoutProxy: 'Disable Proxy Access',
+            withProxyHelper:
+                'Will use the system proxy {0} maintained in panel settings to access child nodes. Continue?',
+            withoutProxyHelper:
+                'Will stop using the system proxy maintained in panel settings to access child nodes. Continue?',
             syncInfo: 'Sync',
             syncHelper: 'When master node data changes, it synchronizes to this child node in real-time',
             syncBackupAccount: 'Backup account settings',

@@ -3608,6 +3608,12 @@ const message = {
             addNode: 'Добавить узел',
             connInfo: 'Информация о подключении',
             nodeInfo: 'Информация об узле',
+            withProxy: 'Proxy Erişimini Etkinleştir',
+            withoutProxy: 'Proxy Erişimini Devre Dışı Bırak',
+            withProxyHelper:
+                'Alt düğümlere erişmek için panel ayarlarında tutulan sistem proxy {0} kullanılacak. Devam etmek istiyor musunuz?',
+            withoutProxyHelper:
+                'Alt düğümlere erişmek için panel ayarlarında tutulan sistem proxy kullanımı durdurulacak. Devam etmek istiyor musunuz?',
             syncInfo: 'Синхронизация данных,',
             syncHelper:
                 'При изменении данных главного узла, происходит синхронизация с этим дочерним узлом в реальном времени,',
