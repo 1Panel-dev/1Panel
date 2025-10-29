@@ -816,7 +816,7 @@ const message = {
         privilegedHelper:
             'Permite que o contêiner execute determinadas operações privilegiadas no host, o que pode aumentar os riscos do contêiner. Use com cautela!',
         editComposeHelper:
-            'Nota: As variáveis de ambiente definidas serão gravadas no arquivo 1panel.env por padrão.\nSe você quiser usar esses parâmetros no contêiner, também precisará adicionar manualmente uma referência env_file no arquivo compose.',
+            'Nota: As variáveis de ambiente são salvas no arquivo 1panel.env e precisam ser referenciadas via env_file no compose.\nAs variáveis só têm efeito dentro do contêiner e não participam da substituição ${VAR} no arquivo compose.',
         upgradeHelper: 'Nome do Repositório/Nome da Imagem: Versão da Imagem',
         upgradeWarning2:
             'A operação de upgrade requer a reconstrução do contêiner, e qualquer dado não persistente será perdido. Deseja continuar?',

@@ -787,7 +787,7 @@ const message = {
         privileged: '特权模式',
         privilegedHelper: '允许容器在主机上执行某些特权操作，可能会增加容器风险，谨慎开启！',
         editComposeHelper:
-            '注意：设置的环境变量会默认写入 1panel.env 文件。\n如需在容器中使用这些参数，还需在 compose 文件中手动添加 env_file 引用。',
+            '注意：环境变量保存至 1panel.env 文件，需在 compose 中通过 env_file 引用。\n变量仅在容器内部生效，不参与 compose 文件的 ${VAR} 替换。',
 
         upgradeHelper: '仓库名称/镜像名称:镜像版本',
         upgradeWarning2: '升级操作需要重建容器，任何未持久化的数据将会丢失，是否继续？',

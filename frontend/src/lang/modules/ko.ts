@@ -798,7 +798,7 @@ const message = {
         privilegedHelper:
             '컨테이너가 호스트에서 특정 특권 작업을 수행할 수 있도록 허용합니다. 이는 보안 위험을 초래할 수 있으므로 주의해서 사용하십시오.',
         editComposeHelper:
-            '참고: 설정된 환경 변수는 기본적으로 1panel.env 파일에 작성됩니다. 컨테이너에서 이러한 매개변수를 사용하려면 compose 파일에 env_file 참조를 수동으로 추가해야 합니다.',
+            '참고: 환경 변수는 1panel.env 파일에 저장되며 compose에서 env_file을 통해 참조해야 합니다.\n변수는 컨테이너 내부에서만 유효하며 compose 파일의 ${VAR} 치환에 참여하지 않습니다.',
         upgradeHelper: '레포지토리 이름/이미지 이름: 이미지 버전',
         upgradeWarning2:
             '업그레이드 작업은 컨테이너를 재빌드해야 하며, 비지속적인 데이터가 손실됩니다. 계속하시겠습니까?',

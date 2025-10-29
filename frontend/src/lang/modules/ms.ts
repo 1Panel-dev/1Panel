@@ -819,7 +819,7 @@ const message = {
         privilegedHelper:
             'Benarkan kontena menjalankan operasi teristimewa tertentu pada hos, yang boleh meningkatkan risiko kontena. Gunakan dengan berhati-hati!',
         editComposeHelper:
-            'Nota: Pembolehubah persekitaran yang ditetapkan akan ditulis ke fail 1panel.env secara lalai. Jika anda mahu menggunakan parameter ini dalam kontena, anda juga perlu menambah rujukan env_file secara manual dalam fail compose.',
+            'Nota: Pembolehubah persekitaran disimpan ke fail 1panel.env dan perlu dirujuk melalui env_file dalam compose.\nPembolehubah hanya berkesan di dalam bekas dan tidak mengambil bahagian dalam penggantian ${VAR} dalam fail compose.',
 
         upgradeHelper: 'Nama Repository/Nama Imej: Versi Imej',
         upgradeWarning2:

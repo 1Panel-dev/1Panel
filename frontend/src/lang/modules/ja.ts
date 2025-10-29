@@ -804,7 +804,8 @@ const message = {
         privileged: '特権',
         privilegedHelper:
             'コンテナがホストに特定の特権操作を実行できるようにします。これにより、コンテナのリスクが増加する可能性があります。注意して使用してください！',
-        editComposeHelper: '注:環境変数セットは、デフォルトで1Panel.ENVファイルに書き込まれます。',
+        editComposeHelper:
+            '注意：環境変数は1panel.envファイルに保存され、composeでenv_fileを介して参照する必要があります。\n変数はコンテナ内部でのみ有効であり、composeファイルの${VAR}置換には参加しません。',
 
         upgradeHelper: 'リポジトリ名/画像名:画像バージョン',
         upgradeWarning2: 'アップグレード操作では、コンテナを再構築する必要があります。続けたいですか？',

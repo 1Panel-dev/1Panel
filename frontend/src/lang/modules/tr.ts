@@ -833,7 +833,7 @@ const message = {
         privilegedHelper:
             'Konteynerin ana bilgisayarda belirli ayrıcalıklı işlemler gerçekleştirmesine izin verir, bu da konteyner risklerini artırabilir. Dikkatli kullanın!',
         editComposeHelper:
-            'Not: Ayarlanan ortam değişkenleri varsayılan olarak 1panel.env dosyasına yazılacaktır.\nBu parametreleri konteynerde kullanmak istiyorsanız, compose dosyasına manuel olarak env_file referansı eklemeniz gerekir.',
+            'Not: Ortam değişkenleri 1panel.env dosyasına kaydedilir ve compose içinde env_file aracılığıyla referans alınmalıdır.\nDeğişkenler yalnızca konteyner içinde geçerlidir ve compose dosyasındaki ${VAR} değiştirmesine katılmaz.',
 
         upgradeHelper: 'Depo Adı/İmaj Adı: İmaj Sürümü',
         upgradeWarning2:

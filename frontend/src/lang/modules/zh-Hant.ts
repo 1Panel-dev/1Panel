@@ -787,7 +787,7 @@ const message = {
         privileged: '特權模式',
         privilegedHelper: '允許容器在主機上執行某些特權操作，可能會增加容器風險，請謹慎開啟！',
         editComposeHelper:
-            '注意：設置的環境變數會預設寫入 1panel.env 文件。\n若需在容器中使用這些參數，還需在 compose 文件中手動新增 env_file 引用。',
+            '注意：環境變數儲存至 1panel.env 檔案，需在 compose 中透過 env_file 引用。\n變數僅在容器內部生效，不參與 compose 檔案的 ${VAR} 替換。',
 
         upgradeHelper: '倉庫名稱/鏡像名稱:鏡像版本',
         upgradeWarning2: '升級操作需要重建容器，任何未持久化的資料將會遺失，是否繼續？',

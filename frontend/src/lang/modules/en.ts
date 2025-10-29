@@ -824,7 +824,7 @@ const message = {
         privilegedHelper:
             'Allow the container to perform certain privileged operations on the host, which may increase container risks. Use with caution!',
         editComposeHelper:
-            'Note: The environment variables set will be written to the 1panel.env file by default.\nIf you want to use these parameters in the container, you also need to manually add an env_file reference in the compose file.',
+            'Note: Environment variables are saved to the 1panel.env file and need to be referenced via env_file in compose.\nVariables only take effect inside the container and do not participate in ${VAR} substitution in the compose file.',
 
         upgradeHelper: 'Repository Name/Image Name: Image Version',
         upgradeWarning2:
