@@ -29,25 +29,25 @@
                             <Status :status="row.status" />
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('commons.table.protocol')" :min-width="70" prop="protocol" />
-                    <el-table-column :label="$t('commons.table.port')" :min-width="70" prop="port" />
-                    <el-table-column :label="$t('firewall.address')" :min-width="80">
-                        <template #default="{ row }">
-                            <span v-if="row.address && row.address !== 'Anywhere'">{{ row.address }}</span>
-                            <span v-else>{{ $t('firewall.allIP') }}</span>
-                        </template>
-                    </el-table-column>
-                    <el-table-column :label="$t('firewall.strategy')" :min-width="80" prop="strategy">
-                        <template #default="{ row }">
-                            {{ row.strategy === 'accept' ? $t('firewall.accept') : $t('firewall.drop') }}
-                        </template>
-                    </el-table-column>
+                    <el-table-column
+                        :label="$t('commons.table.name')"
+                        :min-width="70"
+                        show-overflow-tooltip
+                        prop="name"
+                    />
                     <el-table-column
                         :label="$t('commons.table.description')"
+                        show-overflow-tooltip
                         :min-width="120"
                         prop="description"
-                        show-overflow-tooltip
                     />
+                    <el-table-column :label="$t('container.content')" :min-width="70" prop="content">
+                        <template #default="{ row }">
+                            <el-button type="primary" link @click="onOpenDetail(row)">
+                                {{ $t('commons.button.view') }}
+                            </el-button>
+                        </template>
+                    </el-table-column>
                 </el-table>
             </el-card>
         </div>
@@ -62,15 +62,17 @@
             </span>
         </template>
     </DialogPro>
+    <DetailDialog ref="detailRef" />
 </template>
 
 <script lang="ts" setup>
 import { ref } from 'vue';
 import { genFileId, UploadFile, UploadFiles, UploadProps, UploadRawFile } from 'element-plus';
 import { MsgError, MsgSuccess } from '@/utils/message';
+import DetailDialog from '@/views/container/template/detail/index.vue';
 import i18n from '@/lang';
-import { operatePortRule, searchFireRule } from '@/api/modules/host';
-import { Host } from '@/api/interface/host';
+import { Container } from '@/api/interface/container';
+import { batchComposeTemplate, searchComposeTemplate } from '@/api/modules/container';
 
 const emit = defineEmits<{ (e: 'search'): void }>();
 
@@ -78,33 +80,34 @@ const visible = ref(false);
 const loading = ref(false);
 const selects = ref<any>([]);
 const displayData = ref<any>([]);
-const currentRules = ref<Host.RuleInfo[]>([]);
+const currentData = ref<Container.TemplateInfo[]>([]);
 
 const uploadRef = ref();
 const uploaderFiles = ref();
+const detailRef = ref();
 
 const acceptParams = async (): Promise<void> => {
     visible.value = true;
     displayData.value = [];
     selects.value = [];
-
-    loadCurrentData();
+    loadTemplates();
 };
 
-const loadCurrentData = async () => {
-    const res = await searchFireRule({
-        type: 'port',
-        status: '',
-        strategy: '',
+const loadTemplates = async () => {
+    const res = await searchComposeTemplate({
         info: '',
         page: 1,
         pageSize: 10000,
     });
-    currentRules.value = res.data.items || [];
+    currentData.value = res.data.items || [];
 };
 
 const handleSelectionChange = (val: any) => {
     selects.value = val;
+};
+
+const onOpenDetail = async (row: Container.TemplateInfo) => {
+    detailRef.value.acceptParams({ content: row.content });
 };
 
 const fileOnChange = (_uploadFile: UploadFile, uploadFiles: UploadFiles) => {
@@ -119,23 +122,22 @@ const fileOnChange = (_uploadFile: UploadFile, uploadFiles: UploadFiles) => {
             const parsed = JSON.parse(content);
 
             if (!Array.isArray(parsed)) {
-                MsgError(i18n.global.t('commons.msg.errImportFormat'));
+                MsgError(i18n.global.t('commons.msg.errJsonImportFormat'));
                 loading.value = false;
                 return;
             }
 
             for (const item of parsed) {
                 if (!checkDataFormat(item)) {
-                    MsgError(i18n.global.t('commons.msg.errImportFormat'));
+                    MsgError(i18n.global.t('commons.msg.errJsonImportFormat'));
                     loading.value = false;
                     return;
                 }
             }
 
-            compareRules(parsed);
+            compareData(parsed);
             loading.value = false;
         } catch (error) {
-            MsgError(i18n.global.t('commons.msg.errImport') + error.message);
             loading.value = false;
         }
     };
@@ -150,82 +152,54 @@ const handleExceed: UploadProps['onExceed'] = (files) => {
 };
 
 const checkDataFormat = (item: any): boolean => {
-    if (!item.port || !item.protocol || !item.strategy) {
-        return false;
-    }
-    if (!['tcp', 'udp', 'tcp/udp'].includes(item.protocol)) {
-        return false;
-    }
-    if (!['accept', 'drop'].includes(item.strategy)) {
-        return false;
-    }
-    return true;
+    return item.name && item.content;
 };
 
-const compareRules = (importedRules: any[]) => {
-    const newRules: any[] = [];
-    const conflictRules: any[] = [];
-    const duplicateRules: any[] = [];
+const compareData = (importLists: any[]) => {
+    const news: any[] = [];
+    const conflicts: any[] = [];
+    const duplicates: any[] = [];
 
-    for (const importedRule of importedRules) {
-        const key = `${importedRule.address || 'Anywhere'}:${importedRule.port}:${importedRule.protocol}`;
+    for (const importItem of importLists) {
+        const key = `${importItem.name}:${importItem.content}`;
 
-        const existingRule = currentRules.value.find((rule) => {
-            const existingKey = `${rule.address || 'Anywhere'}:${rule.port}:${rule.protocol}`;
+        const existing = currentData.value.find((item) => {
+            const existingKey = `${item.name}:${item.content}`;
             return existingKey === key;
         });
+        const conflict = currentData.value.find((item) => {
+            if (existing) {
+                return false;
+            }
+            return item.name === importItem.name && item.content !== importItem.content;
+        });
 
-        if (!existingRule) {
-            newRules.push({ ...importedRule, status: 'new' });
-        } else if (existingRule.strategy !== importedRule.strategy) {
-            conflictRules.push({
-                ...importedRule,
-                status: 'conflict',
-                existingStrategy: existingRule.strategy,
-            });
-        } else {
-            duplicateRules.push({ ...importedRule, status: 'duplicate' });
+        if (existing) {
+            duplicates.push({ ...importItem, status: 'duplicate' });
+            continue;
         }
+        if (conflict) {
+            conflicts.push({ ...importItem, status: 'conflict' });
+            continue;
+        }
+        news.push({ ...importItem, status: 'new' });
     }
 
-    displayData.value = [...newRules, ...conflictRules, ...duplicateRules];
+    displayData.value = [...news, ...conflicts, ...duplicates];
 };
 
 const onImport = async () => {
     loading.value = true;
-    let successCount = 0;
-    let errorCount = 0;
-
-    for (const rule of selects.value) {
-        try {
-            const params: Host.RulePort = {
-                operation: 'add',
-                address: rule.address || 'Anywhere',
-                port: rule.port,
-                source: '',
-                protocol: rule.protocol,
-                strategy: rule.strategy,
-                description: rule.description || '',
-            };
-
-            await operatePortRule(params);
-            successCount++;
-        } catch (error) {
-            errorCount++;
-            console.error('Failed to import rule:', rule, error);
-        }
-    }
-
-    loading.value = false;
-
-    if (errorCount === 0) {
-        MsgSuccess(i18n.global.t('firewall.importSuccess', [successCount]));
-        visible.value = false;
-        emit('search');
-    } else {
-        MsgError(i18n.global.t('firewall.importPartialSuccess', [successCount, errorCount]));
-        emit('search');
-    }
+    await batchComposeTemplate(selects.value)
+        .then(() => {
+            loading.value = false;
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            emit('search');
+            visible.value = false;
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
 defineExpose({

@@ -186,6 +186,10 @@ const message = {
             installSuccess: 'Yükleme başarılı',
             uninstallSuccess: 'Kaldırma başarılı',
             offlineTips: 'A versão offline não suporta esta operação',
+            errImportFormat: 'İçe aktarma verisi veya biçimi anormal, lütfen kontrol edip tekrar deneyin!',
+            importHelper:
+                'Çakışan veya yinelenen verileri içe aktarırken, içe aktarılan içerik orijinal veritabanı verilerini güncellemek için standart olarak kullanılacaktır.',
+            errImport: 'Dosya içeriği anormal:',
         },
         login: {
             username: 'Kullanıcı adı',
@@ -339,6 +343,9 @@ const message = {
             systemrestart: 'Kesintiye Uğradı',
             starterr: 'Başlatma başarısız',
             uperr: 'Başlatma başarısız',
+            new: 'Yeni',
+            conflict: 'Çakışma',
+            duplicate: 'Yinelenen',
         },
         units: {
             second: ' saniye | saniye | saniye',
@@ -1049,8 +1056,6 @@ const message = {
     cronjob: {
         create: 'Cron görevi oluştur',
         edit: 'Cron görevini düzenle',
-        errImport: 'Dosya içeriği anormal:',
-        errImportFormat: 'Zamanlanmış görev verileri veya biçimi anormal. Lütfen kontrol edip tekrar deneyin!',
         importHelper:
             'İçe aktarım sırasında aynı isimli zamanlanmış görevler otomatik olarak atlanacaktır. Görevler varsayılan olarak 【Devre Dışı】 durumuna ayarlanır ve veri ilişkilendirme anormalse 【Düzenleme Bekliyor】 durumuna ayarlanır.',
         changeStatus: 'Durumu değiştir',
@@ -2926,15 +2931,7 @@ const message = {
         forwardHelper2: 'Yerel porta yönlendirmek için hedef IP’yi boş bırakın.',
         forwardHelper3: 'Yalnızca IPv4 port yönlendirmesini destekler.',
         forwardInboundInterface: 'İletme Gelen Ağ Arayüzü',
-        importHelper:
-            'Çakışan veya yinelenen güvenlik duvarı kurallarını içe aktarırken, içe aktarılan içerik orijinal güvenlik duvarı kurallarını güncellemek için standart olarak kullanılacaktır.',
         exportHelper: '{0} güvenlik duvarı kuralını dışa aktarmak üzere. Devam etmek istiyor musunuz?',
-        new: 'Yeni',
-        conflict: 'Çakışma',
-        duplicate: 'Yinelenen',
-        errImportFormat: 'İçe aktarma dosya biçimi hatalı, lütfen JSON dosya biçimini kontrol edin',
-        errImport: 'İçe aktarma başarısız: ',
-        selectImportRules: 'Lütfen içe aktarılacak kuralları seçin',
         importSuccess: '{0} kural başarıyla içe aktarıldı',
         importPartialSuccess: 'İçe aktarma tamamlandı: {0} başarılı, {1} başarısız',
     },

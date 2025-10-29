@@ -175,6 +175,10 @@ const message = {
             resetSuccess: 'リセット成功',
             creatingInfo: '作成、この操作は必要ありません',
             offlineTips: 'オフライン版はこの操作をサポートしていません',
+            errImportFormat: 'インポートデータまたはフォーマットが異常です。確認して再試行してください！',
+            importHelper:
+                '競合または重複するデータをインポートする場合、インポートされた内容を基準として元のデータベースデータを更新します。',
+            errImport: 'ファイル内容が異常です：',
         },
         login: {
             username: 'ユーザー名',
@@ -324,6 +328,9 @@ const message = {
             systemrestart: '中断',
             starterr: '起動に失敗しました',
             uperr: '起動に失敗しました',
+            new: '新規',
+            conflict: '競合',
+            duplicate: '重複',
         },
         units: {
             second: '2番目|2番目|秒',
@@ -1008,8 +1015,6 @@ const message = {
     cronjob: {
         create: 'Cronジョブを作成します',
         edit: 'Cronジョブを編集します',
-        errImport: 'ファイル内容異常:',
-        errImportFormat: 'インポートしたスケジュールタスクのデータまたは形式が異常です。確認して再試行してください！',
         importHelper:
             'インポート時に同名のスケジュールタスクは自動的にスキップされます。タスクはデフォルトで【無効】状態に設定され、データ関連付け異常時には【編集待ち】状態に設定されます。',
         changeStatus: 'ステータスを変更します',
@@ -2801,15 +2806,7 @@ const message = {
         forwardHelper2: '宛先IPを空白のままにして、ローカルポートに転送します。',
         forwardHelper3: 'IPv4ポート転送のみをサポートします。',
         forwardInboundInterface: '転送入站ネットワークインターフェース',
-        importHelper:
-            '競合または重複するファイアウォールルールをインポートする場合、インポートされた内容を基準として元のファイアウォールルールを更新します。',
         exportHelper: '{0} 件のファイアウォールルールをエクスポートします。続行しますか？',
-        new: '新規',
-        conflict: '競合',
-        duplicate: '重複',
-        errImportFormat: 'インポートファイルの形式エラーです。JSON ファイルの形式を確認してください',
-        errImport: 'インポートに失敗しました: ',
-        selectImportRules: 'インポートするルールを選択してください',
         importSuccess: '{0} 件のルールを正常にインポートしました',
         importPartialSuccess: 'インポート完了: {0} 件成功、{1} 件失敗',
     },

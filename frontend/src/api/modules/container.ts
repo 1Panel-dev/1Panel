@@ -162,6 +162,9 @@ export const deleteComposeTemplate = (params: { ids: number[] }) => {
 export const createComposeTemplate = (params: Container.TemplateCreate) => {
     return http.post(`/containers/template`, params);
 };
+export const batchComposeTemplate = (templates: Array<Container.TemplateCreate>) => {
+    return http.post(`/containers/template/batch`, { templates: templates });
+};
 export const updateComposeTemplate = (params: Container.TemplateUpdate) => {
     return http.post(`/containers/template/update`, params);
 };

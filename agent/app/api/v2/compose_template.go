@@ -29,6 +29,28 @@ func (b *BaseApi) CreateComposeTemplate(c *gin.Context) {
 }
 
 // @Tags Container Compose-template
+// @Summary Bacth compose template
+// @Accept json
+// @Param request body dto.ComposeTemplateBatch true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /containers/template/batch [post]
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"批量导入编排模版","formatEN":"batch import compose templates"}
+func (b *BaseApi) BatchComposeTemplate(c *gin.Context) {
+	var req dto.ComposeTemplateBatch
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	if err := composeTemplateService.Batch(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags Container Compose-template
 // @Summary Page compose templates
 // @Accept json
 // @Param request body dto.SearchWithPage true "request"

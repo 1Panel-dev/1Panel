@@ -174,6 +174,10 @@ const message = {
             resetSuccess: '초기화 완료',
             creatingInfo: '생성 중입니다. 이 작업이 필요하지 않습니다',
             offlineTips: '오프라인 버전은 이 작업을 지원하지 않습니다',
+            errImportFormat: '가져오기 데이터 또는 형식이 비정상입니다. 확인 후 다시 시도하세요!',
+            importHelper:
+                '충돌하거나 중복되는 데이터를 가져올 때 가져온 내용을 기준으로 원래 데이터베이스 데이터를 업데이트합니다.',
+            errImport: '파일 내용이 비정상입니다:',
         },
         login: {
             username: '사용자 이름',
@@ -326,6 +330,9 @@ const message = {
             systemrestart: '중단됨',
             starterr: '시작 실패',
             uperr: '실행 실패',
+            new: '신규',
+            conflict: '충돌',
+            duplicate: '중복',
         },
         units: {
             second: '초 | 초 | 초',
@@ -998,8 +1005,6 @@ const message = {
     cronjob: {
         create: '크론 작업 생성',
         edit: '크론 작업 수정',
-        errImport: '파일 내용 이상:',
-        errImportFormat: '가져온 예약 작업 데이터 또는 형식이 이상합니다. 확인 후 다시 시도하십시오!',
         importHelper:
             '가져오기 시 동일한 이름의 예약 작업은 자동으로 건너뜁니다. 작업은 기본적으로 【비활성화】 상태로 설정되며, 데이터 연동 이상 시 【편집 대기】 상태로 설정됩니다.',
         changeStatus: '상태 변경',
@@ -2752,15 +2757,7 @@ const message = {
         forwardHelper2: '대상 IP 를 비워두면 로컬 포트로 전달됩니다.',
         forwardHelper3: 'IPv4 포트 전달만 지원됩니다.',
         forwardInboundInterface: '포워딩 인바운드 네트워크 인터페이스',
-        importHelper:
-            '충돌하거나 중복되는 방화벽 규칙을 가져올 때 가져온 내용을 기준으로 원래 방화벽 규칙을 업데이트합니다.',
         exportHelper: '{0}개의 방화벽 규칙을 내보내려고 합니다. 계속하시겠습니까?',
-        new: '신규',
-        conflict: '충돌',
-        duplicate: '중복',
-        errImportFormat: '가져오기 파일 형식 오류입니다. JSON 파일 형식을 확인하세요',
-        errImport: '가져오기에 실패했습니다: ',
-        selectImportRules: '가져올 규칙을 선택하세요',
         importSuccess: '{0}개의 규칙을 성공적으로 가져왔습니다',
         importPartialSuccess: '가져오기 완료: 성공 {0}건, 실패 {1}건',
     },

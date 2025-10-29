@@ -2,6 +2,7 @@ package service
 
 import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/jinzhu/copier"
@@ -12,8 +13,9 @@ type ComposeTemplateService struct{}
 type IComposeTemplateService interface {
 	List() ([]dto.ComposeTemplateInfo, error)
 	SearchWithPage(search dto.SearchWithPage) (int64, interface{}, error)
-	Create(composeDto dto.ComposeTemplateCreate) error
+	Create(req dto.ComposeTemplateCreate) error
 	Update(id uint, upMap map[string]interface{}) error
+	Batch(req dto.ComposeTemplateBatch) error
 	Delete(ids []uint) error
 }
 
@@ -60,6 +62,22 @@ func (u *ComposeTemplateService) Create(composeDto dto.ComposeTemplateCreate) er
 	}
 	if err := composeRepo.Create(&compose); err != nil {
 		return err
+	}
+	return nil
+}
+
+func (u *ComposeTemplateService) Batch(req dto.ComposeTemplateBatch) error {
+	for _, item := range req.Templates {
+		template, _ := composeRepo.Get(repo.WithByName(item.Name))
+		if template.ID == 0 {
+			if err := composeRepo.Create(&model.ComposeTemplate{Name: item.Name, Content: item.Content, Description: item.Description}); err != nil {
+				return err
+			}
+		} else {
+			if err := composeRepo.Update(template.ID, map[string]interface{}{"content": item.Content, "description": item.Description}); err != nil {
+				return err
+			}
+		}
 	}
 	return nil
 }

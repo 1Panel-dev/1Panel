@@ -63,6 +63,7 @@ const getType = (status: string) => {
         case 'healthy':
         case 'unused':
         case 'executing':
+        case 'new':
             return 'success';
         case 'stopped':
         case 'exceptional':
@@ -76,7 +77,10 @@ const getType = (status: string) => {
         case 'dead':
         case 'removing':
         case 'deleted':
+        case 'conflict':
             return 'warning';
+        case 'duplicate':
+            return 'info';
         default:
             return 'primary';
     }

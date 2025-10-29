@@ -185,6 +185,10 @@ const message = {
             installSuccess: 'Install successful',
             uninstallSuccess: 'Uninstall successful',
             offlineTips: 'Offline version does not support this operation',
+            errImportFormat: 'Import data or format is abnormal, please check and try again!',
+            importHelper:
+                'When importing conflicting or duplicate data, the imported content will be used as the standard to update the original database data.',
+            errImport: 'File content is abnormal:',
         },
         login: {
             username: 'Username',
@@ -335,6 +339,9 @@ const message = {
             systemrestart: 'Interrupted',
             starterr: 'Startup failed',
             uperr: 'Startup failed',
+            new: 'New',
+            conflict: 'Conflict',
+            duplicate: 'Duplicate',
         },
         units: {
             second: ' second | second | seconds',
@@ -1037,8 +1044,6 @@ const message = {
     cronjob: {
         create: 'Create cron job',
         edit: 'Edit cron job',
-        errImport: 'File content exception:',
-        errImportFormat: 'The scheduled task data or format is abnormal. Please check and try again!',
         importHelper:
             'Duplicate scheduled tasks will be automatically skipped during import. Tasks will be set to [Disabled] status by default, and set to [Pending Edit] status when data association is abnormal.',
         changeStatus: 'Change status',
@@ -2886,15 +2891,7 @@ const message = {
         forwardHelper2: 'Leave the destination IP blank to forward to the local port.',
         forwardHelper3: 'Only support IPv4 port forwarding.',
         forwardInboundInterface: 'Forward Inbound Network Interface',
-        importHelper:
-            'When importing conflicting or duplicate firewall rules, the imported content will be used as the standard to update the original firewall rules.',
         exportHelper: 'About to export {0} firewall rules. Continue?',
-        new: 'New',
-        conflict: 'Conflict',
-        duplicate: 'Duplicate',
-        errImportFormat: 'Import file format error, please check the JSON file format',
-        errImport: 'Import failed: ',
-        selectImportRules: 'Please select rules to import',
         importSuccess: 'Successfully imported {0} rules',
         importPartialSuccess: 'Import completed: {0} succeeded, {1} failed',
     },

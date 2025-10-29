@@ -15,6 +15,15 @@
                 <el-button type="primary" plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
                     {{ $t('commons.button.delete') }}
                 </el-button>
+
+                <el-button-group>
+                    <el-button @click="onImport">
+                        {{ $t('commons.button.import') }}
+                    </el-button>
+                    <el-button :disabled="selects.length === 0" @click="onExport">
+                        {{ $t('commons.button.export') }}
+                    </el-button>
+                </el-button-group>
             </template>
             <template #rightToolBar>
                 <TableSearch @search="search()" v-model:searchName="searchName" />
@@ -56,6 +65,8 @@
         </LayoutContent>
 
         <OpDialog ref="opRef" @search="search" />
+        <OpDialog ref="opRef" @search="search" />
+        <ImportDialog @search="search" ref="dialogImportRef" />
         <DetailDialog ref="detailRef" />
         <OperatorDialog @search="search" ref="dialogRef" />
     </div>
@@ -63,9 +74,10 @@
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
-import { dateFormat } from '@/utils/util';
+import { dateFormat, downloadWithContent, getCurrentDateFormatted } from '@/utils/util';
 import { Container } from '@/api/interface/container';
 import DetailDialog from '@/views/container/template/detail/index.vue';
+import ImportDialog from '@/views/container/template/import/index.vue';
 import OperatorDialog from '@/views/container/template/operator/index.vue';
 import { deleteComposeTemplate, searchComposeTemplate } from '@/api/modules/container';
 import DockerStatus from '@/views/container/docker-status/index.vue';
@@ -75,6 +87,13 @@ const loading = ref();
 const data = ref();
 const selects = ref<any>([]);
 
+const dialogImportRef = ref();
+const detailRef = ref();
+const dialogRef = ref();
+const opRef = ref();
+const isActive = ref(false);
+const isExist = ref(false);
+
 const paginationConfig = reactive({
     cacheSizeKey: 'compose-template-page-size',
     currentPage: 1,
@@ -82,11 +101,6 @@ const paginationConfig = reactive({
     total: 0,
 });
 const searchName = ref();
-
-const detailRef = ref();
-const opRef = ref();
-const isActive = ref(false);
-const isExist = ref(false);
 
 const search = async () => {
     if (!isActive.value || !isExist.value) {
@@ -113,13 +127,36 @@ const onOpenDetail = async (row: Container.TemplateInfo) => {
     detailRef.value.acceptParams({ content: row.content });
 };
 
-const dialogRef = ref();
+const onImport = () => {
+    dialogImportRef.value.acceptParams();
+};
+
+const onExport = () => {
+    ElMessageBox.confirm(
+        i18n.global.t('container.exportHelper', [selects.value.length]),
+        i18n.global.t('commons.button.export'),
+        {
+            confirmButtonText: i18n.global.t('commons.button.confirm'),
+            cancelButtonText: i18n.global.t('commons.button.cancel'),
+        },
+    ).then(async () => {
+        const exportData = data.value.map((item: Container.TemplateInfo) => ({
+            name: item.name,
+            description: item.description,
+            content: item.content,
+        }));
+        const content = JSON.stringify(exportData, null, 2);
+        const fileName = `1panel-docker-compose-template-${getCurrentDateFormatted()}.json`;
+        downloadWithContent(content, fileName);
+    });
+};
+
 const onOpenDialog = async (
     title: string,
     rowData: Partial<Container.TemplateInfo> = {
         name: '',
+        content: '',
         description: '',
-        path: '',
     },
 ) => {
     let params = {

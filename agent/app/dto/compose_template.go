@@ -8,6 +8,10 @@ type ComposeTemplateCreate struct {
 	Content     string `json:"content"`
 }
 
+type ComposeTemplateBatch struct {
+	Templates []ComposeTemplateCreate `json:"templates" validate:"required"`
+}
+
 type ComposeTemplateUpdate struct {
 	ID          uint   `json:"id"`
 	Description string `json:"description"`

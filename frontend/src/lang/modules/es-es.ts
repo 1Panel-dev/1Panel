@@ -184,6 +184,10 @@ const message = {
             installSuccess: 'Instalación completada correctamente',
             uninstallSuccess: 'Desinstalación completada correctamente',
             offlineTips: 'La versión offline no admite esta operación',
+            errImportFormat: 'Los datos de importación o el formato son anormales, ¡compruebe e inténtelo de nuevo!',
+            importHelper:
+                'Al importar datos conflictivos o duplicados, el contenido importado se utilizará como estándar para actualizar los datos originales de la base de datos.',
+            errImport: 'El contenido del archivo es anormal:',
         },
         login: {
             username: 'Usuario',
@@ -342,6 +346,9 @@ const message = {
             systemrestart: 'Interrumpido',
             starterr: 'Error al iniciar',
             uperr: 'Error al iniciar',
+            new: 'Nuevo',
+            conflict: 'Conflicto',
+            duplicate: 'Duplicado',
         },
         units: {
             second: ' segundo | segundo | segundos',
@@ -1036,9 +1043,6 @@ const message = {
     cronjob: {
         create: 'Crear tarea programada',
         edit: 'Editar tarea programada',
-        errImport: 'Excepción en el contenido del archivo:',
-        errImportFormat:
-            'Los datos o el formato de la tarea programada son anormales. ¡Por favor verifique e inténtelo de nuevo!',
         importHelper:
             'Las tareas programadas duplicadas se omitirán automáticamente durante la importación. Las tareas se establecerán en estado [Deshabilitado] por defecto, y en estado [Pendiente de edición] cuando la asociación de datos sea anormal.',
         changeStatus: 'Cambiar estado',
@@ -2859,15 +2863,7 @@ const message = {
         forwardHelper2: 'Deja en blanco la IP de destino para reenviar al puerto local.',
         forwardHelper3: 'Solo se admite redirección de puertos IPv4.',
         forwardInboundInterface: 'Interfaz de Red de Entrada para Reenvío',
-        importHelper:
-            'Al importar reglas de firewall conflictivas o duplicadas, el contenido importado se utilizará como estándar para actualizar las reglas de firewall originales.',
         exportHelper: 'A punto de exportar {0} reglas de firewall. ¿Continuar?',
-        new: 'Nueva',
-        conflict: 'Conflicto',
-        duplicate: 'Duplicada',
-        errImportFormat: 'Error en el formato del archivo importado, comprueba el formato del archivo JSON',
-        errImport: 'Error al importar: ',
-        selectImportRules: 'Selecciona las reglas que deseas importar',
         importSuccess: 'Se importaron correctamente {0} reglas',
         importPartialSuccess: 'Importación completada: {0} correctas, {1} fallidas',
     },

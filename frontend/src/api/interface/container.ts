@@ -318,25 +318,19 @@ export namespace Container {
 
     export interface TemplateCreate {
         name: string;
-        from: string;
         description: string;
-        path: string;
         content: string;
     }
     export interface TemplateUpdate {
         id: number;
-        from: string;
         description: string;
-        path: string;
         content: string;
     }
     export interface TemplateInfo {
         id: number;
         createdAt: Date;
         name: string;
-        from: string;
         description: string;
-        path: string;
         content: string;
     }
 

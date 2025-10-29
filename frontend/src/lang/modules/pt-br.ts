@@ -175,6 +175,10 @@ const message = {
             resetSuccess: 'Redefinido com sucesso',
             creatingInfo: 'Criando, não é necessário realizar esta operação',
             offlineTips: 'A versão offline não suporta esta operação',
+            errImportFormat: 'Dados de importação ou formato estão anormais, verifique e tente novamente!',
+            importHelper:
+                'Ao importar dados conflitantes ou duplicados, o conteúdo importado será usado como padrão para atualizar os dados originais do banco de dados.',
+            errImport: 'O conteúdo do arquivo está anormal:',
         },
         login: {
             username: 'Usuário',
@@ -330,6 +334,9 @@ const message = {
             systemrestart: 'Interrompido',
             starterr: 'Falha na inicialização',
             uperr: 'Falha na inicialização',
+            new: 'Novo',
+            conflict: 'Conflito',
+            duplicate: 'Duplicado',
         },
         units: {
             second: 'segundo | segundos | segundos',
@@ -1029,9 +1036,6 @@ const message = {
     cronjob: {
         create: 'Criar tarefa cron',
         edit: 'Editar tarefa cron',
-        errImport: 'Conteúdo do arquivo anormal:',
-        errImportFormat:
-            'Os dados ou formato da tarefa agendada estão anormais. Por favor, verifique e tente novamente!',
         importHelper:
             'Tarefas agendadas duplicadas serão automaticamente ignoradas durante a importação. As tarefas serão definidas como status 【Desativado】 por padrão, e como status 【Aguardando Edição】 quando a associação de dados for anormal.',
         changeStatus: 'Alterar status',
@@ -2872,15 +2876,7 @@ const message = {
         forwardHelper2: 'Deixe o IP de destino em branco para redirecionar para a porta local.',
         forwardHelper3: 'Somente suporta redirecionamento de porta IPv4.',
         forwardInboundInterface: 'Interface de Rede de Entrada para Encaminhamento',
-        importHelper:
-            'Ao importar regras de firewall conflitantes ou duplicadas, o conteúdo importado será usado como padrão para atualizar as regras de firewall originais.',
         exportHelper: 'Prestes a exportar {0} regras de firewall. Continuar?',
-        new: 'Nova',
-        conflict: 'Conflito',
-        duplicate: 'Duplicada',
-        errImportFormat: 'Erro no formato do arquivo de importação, verifique o formato do arquivo JSON',
-        errImport: 'Falha na importação: ',
-        selectImportRules: 'Selecione as regras que deseja importar',
         importSuccess: '{0} regras importadas com sucesso',
         importPartialSuccess: 'Importação concluída: {0} sucesso, {1} falha',
     },

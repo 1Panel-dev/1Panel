@@ -209,7 +209,7 @@ const privateOnChange = (_uploadFile: UploadFile) => {
         try {
             dialogData.value.rowData.privateKey = e.target.result as string;
         } catch (error) {
-            MsgError(i18n.global.t('cronjob.errImport') + error.message);
+            MsgError(i18n.global.t('commons.msg.errImport') + error.message);
         }
     };
     reader.readAsText(_uploadFile.raw);
@@ -226,7 +226,7 @@ const publicOnChange = (_uploadFile: UploadFile) => {
         try {
             dialogData.value.rowData.publicKey = e.target.result as string;
         } catch (error) {
-            MsgError(i18n.global.t('cronjob.errImport') + error.message);
+            MsgError(i18n.global.t('commons.msg.errImport') + error.message);
         }
     };
     reader.readAsText(_uploadFile.raw);

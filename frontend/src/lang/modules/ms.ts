@@ -177,6 +177,10 @@ const message = {
             resetSuccess: 'Berjaya ditetapkan semula',
             creatingInfo: 'Sedang mencipta, operasi ini tidak diperlukan',
             offlineTips: 'Versi luar talian tidak menyokong operasi ini',
+            errImportFormat: 'Data import atau format adalah tidak normal, sila periksa dan cuba lagi!',
+            importHelper:
+                'Apabila mengimport data yang bercanggah atau pendua, kandungan yang diimport akan digunakan sebagai piawai untuk mengemas kini data pangkalan data asal.',
+            errImport: 'Kandungan fail adalah tidak normal:',
         },
         login: {
             username: 'Nama Pengguna',
@@ -332,6 +336,9 @@ const message = {
             systemrestart: 'Dihentikan',
             starterr: 'Permulaan gagal',
             uperr: 'Permulaan gagal',
+            new: 'Baru',
+            conflict: 'Konflik',
+            duplicate: 'Pendua',
         },
         units: {
             second: 'saat | saat | saat',
@@ -1032,8 +1039,6 @@ const message = {
     cronjob: {
         create: 'Cipta tugas cron',
         edit: 'Edit tugas cron',
-        errImport: 'Kandungan fail tidak normal:',
-        errImportFormat: 'Data atau format tugas terjadual yang diimport tidak normal. Sila semak dan cuba lagi!',
         importHelper:
             'Tugas terjadual dengan nama sama akan dilangkau secara automatik semasa import. Tugas akan ditetapkan ke status 【Lumpuh】 secara lalai, dan ditetapkan ke status 【Menunggu Edit】 apabila perkaitan data tidak normal.',
         changeStatus: 'Tukar status',
@@ -2867,15 +2872,7 @@ const message = {
         forwardHelper2: 'Biarkan IP sasaran kosong untuk memajukan ke port tempatan.',
         forwardHelper3: 'Hanya menyokong pemajuan port IPv4.',
         forwardInboundInterface: 'Antara Muka Rangkaian Masukan Penerusan',
-        importHelper:
-            'Apabila mengimport peraturan firewall yang bercanggah atau pendua, kandungan yang diimport akan digunakan sebagai piawai untuk mengemas kini peraturan firewall asal.',
         exportHelper: 'Akan mengeksport {0} peraturan firewall. Teruskan?',
-        new: 'Baharu',
-        conflict: 'Konflik',
-        duplicate: 'Duplikat',
-        errImportFormat: 'Ralat format fail import, sila semak format fail JSON',
-        errImport: 'Import gagal: ',
-        selectImportRules: 'Sila pilih peraturan untuk diimport',
         importSuccess: '{0} peraturan berjaya diimport',
         importPartialSuccess: 'Import selesai: {0} berjaya, {1} gagal',
     },

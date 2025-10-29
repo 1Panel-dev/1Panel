@@ -183,6 +183,9 @@ const message = {
             installSuccess: '安裝成功',
             uninstallSuccess: '移除成功',
             offlineTips: '離線版本不支援此操作',
+            errImportFormat: '導入數據或格式異常，請檢查後重試！',
+            importHelper: '導入衝突或重複數據時，將以導入內容為標準，更新原數據庫數據。',
+            errImport: '文件內容異常：',
         },
         login: {
             username: '使用者名稱',
@@ -324,6 +327,9 @@ const message = {
             systemrestart: '中斷',
             starterr: '啟動失敗',
             uperr: '啟動失敗',
+            new: '新',
+            conflict: '衝突',
+            duplicate: '重複',
         },
         units: {
             second: '秒',
@@ -985,8 +991,6 @@ const message = {
     cronjob: {
         create: '建立計劃任務',
         edit: '編輯計劃任務',
-        errImport: '文件內容異常：',
-        errImportFormat: '匯入的計劃任務資料或格式異常，請檢查後重試！',
         importHelper:
             '匯入時將自動跳過重名計劃任務。任務預設設定為【停用】狀態，資料關聯異常時，設定為【待編輯】狀態。',
         changeStatus: '狀態修改',
@@ -2681,14 +2685,7 @@ const message = {
         forwardHelper2: '如果目標 IP 不填寫，預設為本機埠轉發',
         forwardHelper3: '目前僅支援 IPv4 的埠轉發',
         forwardInboundInterface: '轉發入站網路介面',
-        importHelper: '導入衝突或重複防火牆規則時，將以導入內容為標準，更新原防火牆規則。',
         exportHelper: '即將導出 {0} 條防火牆規則，是否繼續？',
-        new: '新增',
-        conflict: '衝突',
-        duplicate: '重複',
-        errImportFormat: '匯入檔案格式錯誤，請檢查 JSON 檔案格式',
-        errImport: '匯入失敗：',
-        selectImportRules: '請選擇要匯入的規則',
         importSuccess: '成功匯入 {0} 條規則',
         importPartialSuccess: '匯入完成：成功 {0} 條，失敗 {1} 條',
     },

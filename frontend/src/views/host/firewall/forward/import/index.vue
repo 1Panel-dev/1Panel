@@ -3,7 +3,7 @@
         <div>
             <el-alert :closable="false" show-icon type="info">
                 <template #default>
-                    <div>{{ $t('firewall.importHelper') }}</div>
+                    <div>{{ $t('commons.msg.importHelper') }}</div>
                 </template>
             </el-alert>
             <el-upload
@@ -26,11 +26,7 @@
                     <el-table-column type="selection" fix />
                     <el-table-column :label="$t('commons.table.status')" :min-width="80">
                         <template #default="{ row }">
-                            <el-tag v-if="row.status === 'new'" type="success">{{ $t('firewall.new') }}</el-tag>
-                            <el-tag v-else-if="row.status === 'conflict'" type="warning">
-                                {{ $t('firewall.conflict') }}
-                            </el-tag>
-                            <el-tag v-else type="info">{{ $t('firewall.duplicate') }}</el-tag>
+                            <Status :status="row.status" />
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.protocol')" :min-width="70" prop="protocol" />
@@ -90,47 +86,27 @@ const availableInterfaces = ref<string[]>([]);
 const uploadRef = ref();
 const uploaderFiles = ref();
 
-interface CompareResult {
-    new: any[];
-    conflict: any[];
-    duplicate: any[];
-}
-
-const compareResult = ref<CompareResult>({
-    new: [],
-    conflict: [],
-    duplicate: [],
-});
-
 const acceptParams = async (fireName: string): Promise<void> => {
     visible.value = true;
     displayData.value = [];
     selects.value = [];
-    compareResult.value = { new: [], conflict: [], duplicate: [] };
     currentFireName.value = fireName;
+    loadCurrentData(fireName);
+};
 
-    // Fetch all current rules for comparison
-    loading.value = true;
-    try {
-        const res = await searchFireRule({
-            type: 'forward',
-            status: '',
-            strategy: '',
-            info: '',
-            page: 1,
-            pageSize: 10000, // Fetch all rules
-        });
-        currentRules.value = res.data.items || [];
-
-        // Fetch available network interfaces (UFW only)
-        if (fireName === 'ufw') {
-            const networkRes = await getNetworkOptions();
-            availableInterfaces.value = networkRes.data || [];
-        }
-    } catch (error) {
-        MsgError(i18n.global.t('commons.msg.searchFailed'));
-    } finally {
-        loading.value = false;
+const loadCurrentData = async (fireName: string) => {
+    const res = await searchFireRule({
+        type: 'forward',
+        status: '',
+        strategy: '',
+        info: '',
+        page: 1,
+        pageSize: 10000,
+    });
+    currentRules.value = res.data.items || [];
+    if (fireName === 'ufw') {
+        const networkRes = await getNetworkOptions();
+        availableInterfaces.value = networkRes.data || [];
     }
 };
 
@@ -141,7 +117,6 @@ const handleSelectionChange = (val: any) => {
 const fileOnChange = (_uploadFile: UploadFile, uploadFiles: UploadFiles) => {
     loading.value = true;
     displayData.value = [];
-    compareResult.value = { new: [], conflict: [], duplicate: [] };
     uploaderFiles.value = uploadFiles;
 
     const reader = new FileReader();
@@ -151,14 +126,14 @@ const fileOnChange = (_uploadFile: UploadFile, uploadFiles: UploadFiles) => {
             const parsed = JSON.parse(content);
 
             if (!Array.isArray(parsed)) {
-                MsgError(i18n.global.t('firewall.errImportFormat'));
+                MsgError(i18n.global.t('commons.msg.errImportFormat'));
                 loading.value = false;
                 return;
             }
 
             for (const item of parsed) {
                 if (!checkDataFormat(item)) {
-                    MsgError(i18n.global.t('firewall.errImportFormat'));
+                    MsgError(i18n.global.t('commons.msg.errImportFormat'));
                     loading.value = false;
                     return;
                 }
@@ -167,7 +142,7 @@ const fileOnChange = (_uploadFile: UploadFile, uploadFiles: UploadFiles) => {
             compareRules(parsed);
             loading.value = false;
         } catch (error) {
-            MsgError(i18n.global.t('firewall.errImport') + error.message);
+            MsgError(i18n.global.t('commons.msg.errImport') + error.message);
             loading.value = false;
         }
     };
@@ -189,12 +164,9 @@ const checkDataFormat = (item: any): boolean => {
         return false;
     }
 
-    // Validate network interface (UFW only)
     if (currentFireName.value === 'ufw' && item.interface !== undefined && item.interface !== null) {
         const interfaceValue = item.interface;
-        // Allow empty string or 'all' (represents all interfaces)
         if (interfaceValue !== '' && interfaceValue !== 'all') {
-            // Must be in available interfaces list
             if (!availableInterfaces.value.includes(interfaceValue)) {
                 return false;
             }
@@ -224,25 +196,11 @@ const compareRules = (importedRules: any[]) => {
         }
     }
 
-    compareResult.value = {
-        new: newRules,
-        conflict: conflictRules,
-        duplicate: duplicateRules,
-    };
-
     displayData.value = [...newRules, ...conflictRules, ...duplicateRules];
 };
 
 const onImport = async () => {
-    if (selects.value.length === 0) {
-        MsgError(i18n.global.t('firewall.selectImportRules'));
-        return;
-    }
-
     loading.value = true;
-    let successCount = 0;
-    let errorCount = 0;
-
     const rules: Host.RuleForward[] = [];
     for (const rule of selects.value) {
         rules.push({
@@ -255,24 +213,16 @@ const onImport = async () => {
         });
     }
 
-    try {
-        await operateForwardRule({ rules });
-        successCount = rules.length;
-    } catch (error) {
-        errorCount = rules.length;
-        console.error('Failed to import rules:', error);
-    }
-
-    loading.value = false;
-
-    if (errorCount === 0) {
-        MsgSuccess(i18n.global.t('firewall.importSuccess', [successCount]));
-        visible.value = false;
-        emit('search');
-    } else {
-        MsgError(i18n.global.t('firewall.importPartialSuccess', [successCount, errorCount]));
-        emit('search');
-    }
+    await operateForwardRule({ rules })
+        .then(() => {
+            loading.value = false;
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            emit('search');
+            visible.value = false;
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
 defineExpose({

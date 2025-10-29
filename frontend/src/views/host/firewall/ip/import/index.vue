@@ -3,7 +3,7 @@
         <div>
             <el-alert :closable="false" show-icon type="info">
                 <template #default>
-                    <div>{{ $t('firewall.importHelper') }}</div>
+                    <div>{{ $t('commons.msg.importHelper') }}</div>
                 </template>
             </el-alert>
             <el-upload
@@ -26,11 +26,7 @@
                     <el-table-column type="selection" fix />
                     <el-table-column :label="$t('commons.table.status')" :min-width="80">
                         <template #default="{ row }">
-                            <el-tag v-if="row.status === 'new'" type="success">{{ $t('firewall.new') }}</el-tag>
-                            <el-tag v-else-if="row.status === 'conflict'" type="warning">
-                                {{ $t('firewall.conflict') }}
-                            </el-tag>
-                            <el-tag v-else type="info">{{ $t('firewall.duplicate') }}</el-tag>
+                            <Status :status="row.status" />
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('firewall.address')" :min-width="100">
@@ -85,40 +81,23 @@ const currentRules = ref<Host.RuleInfo[]>([]);
 const uploadRef = ref();
 const uploaderFiles = ref();
 
-interface CompareResult {
-    new: any[];
-    conflict: any[];
-    duplicate: any[];
-}
-
-const compareResult = ref<CompareResult>({
-    new: [],
-    conflict: [],
-    duplicate: [],
-});
-
 const acceptParams = async (): Promise<void> => {
     visible.value = true;
     displayData.value = [];
     selects.value = [];
-    compareResult.value = { new: [], conflict: [], duplicate: [] };
+    loadCurrentData();
+};
 
-    loading.value = true;
-    try {
-        const res = await searchFireRule({
-            type: 'address',
-            status: '',
-            strategy: '',
-            info: '',
-            page: 1,
-            pageSize: 10000,
-        });
-        currentRules.value = res.data.items || [];
-    } catch (error) {
-        MsgError(i18n.global.t('commons.msg.searchFailed'));
-    } finally {
-        loading.value = false;
-    }
+const loadCurrentData = async () => {
+    const res = await searchFireRule({
+        type: 'address',
+        status: '',
+        strategy: '',
+        info: '',
+        page: 1,
+        pageSize: 10000,
+    });
+    currentRules.value = res.data.items || [];
 };
 
 const handleSelectionChange = (val: any) => {
@@ -128,7 +107,6 @@ const handleSelectionChange = (val: any) => {
 const fileOnChange = (_uploadFile: UploadFile, uploadFiles: UploadFiles) => {
     loading.value = true;
     displayData.value = [];
-    compareResult.value = { new: [], conflict: [], duplicate: [] };
     uploaderFiles.value = uploadFiles;
 
     const reader = new FileReader();
@@ -138,14 +116,14 @@ const fileOnChange = (_uploadFile: UploadFile, uploadFiles: UploadFiles) => {
             const parsed = JSON.parse(content);
 
             if (!Array.isArray(parsed)) {
-                MsgError(i18n.global.t('firewall.errImportFormat'));
+                MsgError(i18n.global.t('commons.msg.errImportFormat'));
                 loading.value = false;
                 return;
             }
 
             for (const item of parsed) {
                 if (!checkDataFormat(item)) {
-                    MsgError(i18n.global.t('firewall.errImportFormat'));
+                    MsgError(i18n.global.t('commons.msg.errImportFormat'));
                     loading.value = false;
                     return;
                 }
@@ -154,7 +132,7 @@ const fileOnChange = (_uploadFile: UploadFile, uploadFiles: UploadFiles) => {
             compareRules(parsed);
             loading.value = false;
         } catch (error) {
-            MsgError(i18n.global.t('firewall.errImport') + error.message);
+            MsgError(i18n.global.t('commons.msg.errImport') + error.message);
             loading.value = false;
         }
     };
@@ -204,21 +182,10 @@ const compareRules = (importedRules: any[]) => {
         }
     }
 
-    compareResult.value = {
-        new: newRules,
-        conflict: conflictRules,
-        duplicate: duplicateRules,
-    };
-
     displayData.value = [...newRules, ...conflictRules, ...duplicateRules];
 };
 
 const onImport = async () => {
-    if (selects.value.length === 0) {
-        MsgError(i18n.global.t('firewall.selectImportRules'));
-        return;
-    }
-
     loading.value = true;
     let successCount = 0;
     let errorCount = 0;

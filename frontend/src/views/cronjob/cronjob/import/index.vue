@@ -113,13 +113,13 @@ const fileOnChange = (_uploadFile: UploadFile, uploadFiles: UploadFiles) => {
             const content = e.target.result as string;
             const parsed = JSON.parse(content) as Cronjob.CronjobTrans;
             if (!Array.isArray(parsed)) {
-                MsgError(i18n.global.t('cronjob.errImportFormat'));
+                MsgError(i18n.global.t('commons.msg.errImportFormat'));
                 loading.value = false;
                 return;
             }
             for (const item of parsed) {
                 if (!checkDataFormat(item)) {
-                    MsgError(i18n.global.t('cronjob.errImportFormat'));
+                    MsgError(i18n.global.t('commons.msg.errImportFormat'));
                     loading.value = false;
                     return;
                 }
@@ -127,7 +127,7 @@ const fileOnChange = (_uploadFile: UploadFile, uploadFiles: UploadFiles) => {
             data.value = parsed;
             loading.value = false;
         } catch (error) {
-            MsgError(i18n.global.t('cronjob.errImport') + error.message);
+            MsgError(i18n.global.t('commons.msg.errImport') + error.message);
             loading.value = false;
         }
     };
