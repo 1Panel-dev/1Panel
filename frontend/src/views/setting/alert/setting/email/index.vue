@@ -178,7 +178,6 @@ const onTest = async (formEl: FormInstance | undefined) => {
         if (!valid) return;
         loading.value = true;
         try {
-            debugger;
             await TestAlertConfig(form.config)
                 .then((res) => {
                     loading.value = false;

@@ -67,9 +67,10 @@ func CreateEmailAlertLog(create dto.AlertLogCreate, alert dto.AlertDTO, params [
 		smtpConfig := email.SMTPConfig{
 			Host:       emailInfo.Host,
 			Port:       emailInfo.Port,
+			Sender:     emailInfo.Sender,
 			Username:   username,
 			Password:   emailInfo.Password,
-			From:       fmt.Sprintf("%s <%s>", emailInfo.DisplayName, emailInfo.Sender),
+			From:       fmt.Sprintf(`"%s" <%s>`, emailInfo.DisplayName, emailInfo.Sender),
 			Encryption: emailInfo.Encryption,
 			Recipient:  emailInfo.Recipient,
 		}

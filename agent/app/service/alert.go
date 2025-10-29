@@ -486,9 +486,10 @@ func (a AlertService) TestAlertConfig(req dto.AlertConfigTest) (bool, error) {
 	cfg := email.SMTPConfig{
 		Host:       req.Host,
 		Port:       req.Port,
+		Sender:     req.Sender,
 		Username:   username,
 		Password:   req.Password,
-		From:       fmt.Sprintf("%s <%s>", req.DisplayName, req.Sender),
+		From:       fmt.Sprintf(`"%s" <%s>`, req.DisplayName, req.Sender),
 		Encryption: req.Encryption,
 		Recipient:  req.Recipient,
 	}

@@ -14,6 +14,7 @@ import (
 type SMTPConfig struct {
 	Host       string
 	Port       int
+	Sender     string
 	Username   string
 	Password   string
 	From       string
@@ -227,7 +228,7 @@ func sendPlaintext(config SMTPConfig, addr string, toList []string, msg string, 
 }
 
 func sendEmailWithClient(client *smtp.Client, config SMTPConfig, toList []string, msg string) error {
-	if err := client.Mail(config.Username); err != nil {
+	if err := client.Mail(config.Sender); err != nil {
 		return fmt.Errorf("setting sender failed: %w", err)
 	}
 	for _, addr := range toList {
