@@ -50,6 +50,7 @@ var AddTable = &gormigrate.Migration{
 			&model.Favorite{},
 			&model.Forward{},
 			&model.Firewall{},
+			&model.IptablesFilterRule{},
 			&model.Ftp{},
 			&model.ImageRepo{},
 			&model.ScriptLibrary{},

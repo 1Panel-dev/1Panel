@@ -81,6 +81,16 @@ const hostRouter = {
             },
         },
         {
+            path: '/hosts/filter',
+            name: 'Filter',
+            component: () => import('@/views/host/filter/index.vue'),
+            meta: {
+                icon: 'p-filter-menu',
+                title: 'menu.filter',
+                requiresAuth: false,
+            },
+        },
+        {
             path: '/hosts/disk',
             name: 'Disk',
             props: true,
