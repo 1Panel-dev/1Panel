@@ -145,6 +145,11 @@ ErrRuntimeNoPort: '运行环境未设置端口，请先编辑运行环境'
 Status: '状态'
 start: '开启'
 stop: '关闭'
+restart: '重启'
+kill: '强制停止'
+pause: '暂停'
+unpause: '恢复'
+remove: '删除'
 delete: '删除'
 ErrDefaultWebsite: "已经设置默认网站，请取消后再设置！"
 
@@ -343,6 +348,8 @@ TaskBuild: "构建"
 TaskPush: "推送"
 TaskClean: "清理"
 TaskHandle: "执行"
+TaskImport: "导入"
+TaskExport: "导出"
 Website: "网站"
 App: "应用"
 Runtime: "运行环境"

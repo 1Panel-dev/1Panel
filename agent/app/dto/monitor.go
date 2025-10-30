@@ -15,6 +15,15 @@ type MonitorData struct {
 	Value []interface{} `json:"value"`
 }
 
+type Process struct {
+	Name    string  `json:"name"`
+	Pid     int32   `json:"pid"`
+	Percent float64 `json:"percent"`
+	Memory  uint64 `json:"memory"`
+	Cmd     string  `json:"cmd"`
+	User    string  `json:"user"`
+}
+
 type MonitorSetting struct {
 	MonitorStatus    string `json:"monitorStatus"`
 	MonitorStoreDays string `json:"monitorStoreDays"`

@@ -145,6 +145,11 @@ ErrRuntimeNoPort: "執行環境未設定埠，請先編輯執行環境"
 Status: '狀態'
 start: '開啟'
 stop: '關閉'
+restart: '重啟'
+kill: '強制停止'
+pause: '暫停'
+unpause: '恢復'
+remove: '刪除'
 delete: '刪除'
 ErrDefaultWebsite: '已經設置默認網站，請取消後再設置！'
 
@@ -342,6 +347,8 @@ TaskBuild: '建置'
 TaskPush: '推送'
 TaskClean: "清理"
 TaskHandle: '執行'
+TaskImport: "導入"
+TaskExport: "導出"
 Website: '網站'
 App: '應用程式'
 Runtime: '運作環境'

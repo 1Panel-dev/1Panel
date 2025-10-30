@@ -101,6 +101,7 @@ const message = {
             timeRange: 'Hingga',
             dateStart: 'Tarikh mula',
             dateEnd: 'Tarikh tamat',
+            date: 'Tarikh',
         },
         table: {
             all: 'Semua',
@@ -1190,7 +1191,10 @@ const message = {
         today: 'Hari ini',
         yesterday: 'Semalam',
         lastNDay: '{0} hari terakhir',
+        lastNMonth: '{0} bulan terakhir',
+        lastHalfYear: 'Setengah tahun terakhir',
         memory: 'Memori',
+        percent: 'Peratusan',
         cache: 'Cache',
         disk: 'Cakera',
         network: 'Rangkaian',

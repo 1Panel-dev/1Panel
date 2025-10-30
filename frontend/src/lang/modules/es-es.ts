@@ -103,6 +103,7 @@ const message = {
             timeRange: 'Hasta',
             dateStart: 'Fecha de inicio',
             dateEnd: 'Fecha de fin',
+            date: 'Fecha',
         },
         table: {
             all: 'Todo',
@@ -1200,8 +1201,9 @@ const message = {
         yesterday: 'Ayer',
         lastNDay: 'Últimos {0} días',
         lastNMonth: 'Últimos {0} meses',
-        lastHalfYear: 'Últimos seis meses',
+        lastHalfYear: 'Último semestre',
         memory: 'Memoria',
+        percent: 'Porcentaje',
         cache: 'Caché',
         disk: 'Disco',
         network: 'Red',

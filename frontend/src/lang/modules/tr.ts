@@ -104,6 +104,7 @@ const message = {
             timeRange: 'İle',
             dateStart: 'Başlangıç tarihi',
             dateEnd: 'Bitiş tarihi',
+            date: 'Tarih',
         },
         table: {
             all: 'Tümü',
@@ -1209,8 +1210,9 @@ const message = {
         yesterday: 'Dün',
         lastNDay: 'Son {0} gün',
         lastNMonth: 'Son {0} ay',
-        lastHalfYear: 'Son yarı yıl',
+        lastHalfYear: 'Son yarım yıl',
         memory: 'Bellek',
+        percent: 'Yüzde',
         cache: 'Önbellek',
         disk: 'Disk',
         network: 'Ağ',

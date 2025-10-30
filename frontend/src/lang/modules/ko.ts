@@ -101,6 +101,7 @@ const message = {
             timeRange: '부터',
             dateStart: '시작 날짜',
             dateEnd: '종료 날짜',
+            date: '날짜',
         },
         table: {
             all: '전체',
@@ -1150,7 +1151,10 @@ const message = {
         today: '오늘',
         yesterday: '어제',
         lastNDay: '최근 {0}일',
+        lastNMonth: '최근 {0}개월',
+        lastHalfYear: '최근 반년',
         memory: '메모리',
+        percent: '비율',
         cache: '캐시',
         disk: '디스크',
         network: '네트워크',

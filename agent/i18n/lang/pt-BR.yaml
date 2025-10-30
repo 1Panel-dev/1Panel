@@ -149,6 +149,11 @@ ErrRuntimeNoPort: "O ambiente de tempo de execução não está configurado com 
 Status: 'Status'
 start: 'Iniciar'
 stop: 'Parar'
+restart: 'Reiniciar'
+kill: 'Parar Forçadamente'
+pause: 'Pausar'
+unpause: 'Retomar'
+remove: 'Excluir'
 delete: 'Excluir'
 ErrDefaultWebsite: 'O site padrão já foi definido, cancele-o antes de definir!'
 
@@ -343,6 +348,8 @@ TaskBuild: 'Construir'
 TaskPush: 'Empurrar'
 TaskClean: "Limpeza"
 TaskHandle: 'Executar'
+TaskImport: "Importar"
+TaskExport: "Exportar"
 Website: 'Site'
 App: 'Aplicativo'
 Runtime: 'Ambiente de tempo de execução'

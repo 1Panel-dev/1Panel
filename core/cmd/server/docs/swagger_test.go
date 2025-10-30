@@ -14,7 +14,7 @@ import (
 )
 
 func TestGenerateXlog(t *testing.T) {
-	workDir := "/usr/songliu/1Panel"
+	workDir := "/usr/songliu/dev-v2/1Panel"
 	fset := token.NewFileSet()
 
 	apiDirs := []string{workDir + "/agent/app/api/v2", workDir + "/core/app/api/v2", workDir + "/agent/xpack/app/api/v2", workDir + "/core/xpack/app/api/v2"}
@@ -67,7 +67,7 @@ func TestGenerateXlog(t *testing.T) {
 }
 
 func TestGenerateSwaggerDoc(t *testing.T) {
-	workDir := "/usr/songliu/1Panel"
+	workDir := "/usr/songliu/dev-v2/1Panel"
 	swagBin := "/root/go/bin/swag"
 
 	cmd1 := exec.Command(swagBin, "init", "-o", workDir+"/core/cmd/server/docs/docs_agent", "-d", workDir+"/agent", "-g", "../agent/cmd/server/main.go")
@@ -119,16 +119,14 @@ func TestGenerateSwaggerDoc(t *testing.T) {
 	}
 
 	for key, val := range coreSwagger.Paths {
-		if _, ok := newSwagger.Paths[key]; ok {
-			fmt.Printf("duplicate interfaces were found: %s \n", key)
+		if _, ok := newSwagger.Paths[key]; !ok {
+			newSwagger.Paths[key] = val
 		}
-		newSwagger.Paths[key] = val
 	}
 	for key, val := range coreSwagger.Definitions {
-		if _, ok := newSwagger.Definitions[key]; ok {
-			fmt.Printf("duplicate definitions were found: %s \n", key)
+		if _, ok := newSwagger.Definitions[key]; !ok {
+			newSwagger.Definitions[key] = val
 		}
-		newSwagger.Definitions[key] = val
 	}
 
 	newJson, err := json.MarshalIndent(newSwagger, "", "\t")

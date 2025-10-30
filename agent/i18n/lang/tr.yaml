@@ -150,7 +150,13 @@ ErrRuntimeNoPort: "Çalışma zamanı ortamı bir porta sahip değil, lütfen ö
 Status: 'Durum'
 start: 'Başlat'
 stop: 'Durdur'
+restart: 'Yeniden Başlat'
+kill: 'Zorla Durdur'
+pause: 'Duraklat'
+unpause: 'Devam Et'
+remove: 'Sil'
 delete: 'Sil'
+ErrDefaultWebsite: "Varsayılan bir web sitesi zaten ayarlanmış. Yeni bir tane ayarlamadan önce lütfen iptal edin!"
 
 #ssl
 ErrSSLCannotDelete: '{{ .name }} sertifikası bir web sitesi tarafından kullanılıyor ve silinemez'
@@ -343,6 +349,8 @@ TaskBuild: 'Yapı'
 TaskPush: 'Gönder'
 TaskClean: "Temizleme"
 TaskHandle: 'Yürüt'
+TaskImport: "İçe Aktar"
+TaskExport: "Dışa Aktar"
 Website: 'Web Sitesi'
 App: 'Uygulama'
 Runtime: 'Çalışma ortamı'

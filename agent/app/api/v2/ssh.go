@@ -53,7 +53,7 @@ func (b *BaseApi) OperateSSH(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /hosts/ssh/update [post]
-// @x-panel-log {"bodyKeys":["key","value"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"修改 SSH 配置 [key] => [value]","formatEN":"update SSH setting [key] => [value]"}
+// @x-panel-log {"bodyKeys":["key","newValue"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"修改 SSH 配置 [key] => [newValue]","formatEN":"update SSH setting [key] => [newValue]"}
 func (b *BaseApi) UpdateSSH(c *gin.Context) {
 	var req dto.SSHUpdate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {

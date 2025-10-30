@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"sort"
 	"strconv"
 	"time"
 
@@ -21,6 +22,7 @@ import (
 	"github.com/shirou/gopsutil/v4/load"
 	"github.com/shirou/gopsutil/v4/mem"
 	"github.com/shirou/gopsutil/v4/net"
+	"github.com/shirou/gopsutil/v4/process"
 )
 
 type MonitorService struct {
@@ -64,6 +66,18 @@ func (m *MonitorService) LoadMonitorData(req dto.MonitorSearch) ([]dto.MonitorDa
 		itemData.Param = "base"
 		for _, base := range bases {
 			itemData.Date = append(itemData.Date, base.CreatedAt)
+			if req.Param == "all" || req.Param == "cpu" {
+				var processes []dto.Process
+				_ = json.Unmarshal([]byte(base.TopCPU), &processes)
+				base.TopCPUItems = processes
+				base.TopCPU = ""
+			}
+			if req.Param == "all" || req.Param == "mem" {
+				var processes []dto.Process
+				_ = json.Unmarshal([]byte(base.TopMem), &processes)
+				base.TopMemItems = processes
+				base.TopMem = ""
+			}
 			itemData.Value = append(itemData.Value, base)
 		}
 		data = append(data, itemData)
@@ -169,8 +183,14 @@ func (m *MonitorService) Run() {
 	if len(totalPercent) == 1 {
 		itemModel.Cpu = totalPercent[0]
 	}
+	topCPU := m.loadTopCPU()
+	if len(topCPU) != 0 {
+		topItemCPU, err := json.Marshal(topCPU)
+		if err == nil {
+			itemModel.TopCPU = string(topItemCPU)
+		}
+	}
 	cpuCount, _ := cpu.Counts(false)
-
 	loadInfo, _ := load.Avg()
 	itemModel.CpuLoad1 = loadInfo.Load1
 	itemModel.CpuLoad5 = loadInfo.Load5
@@ -179,6 +199,13 @@ func (m *MonitorService) Run() {
 
 	memoryInfo, _ := mem.VirtualMemory()
 	itemModel.Memory = memoryInfo.UsedPercent
+	topMem := m.loadTopMem()
+	if len(topMem) != 0 {
+		topMemItem, err := json.Marshal(topMem)
+		if err == nil {
+			itemModel.TopMem = string(topMemItem)
+		}
+	}
 
 	if err := settingRepo.CreateMonitorBase(itemModel); err != nil {
 		global.LOG.Errorf("Insert basic monitoring data failed, err: %v", err)
@@ -321,6 +348,108 @@ func (m *MonitorService) saveNetDataToDB(ctx context.Context, interval float64) 
 			}
 		}
 	}
+}
+
+func (m *MonitorService) loadTopCPU() []dto.Process {
+	processes, err := process.Processes()
+	if err != nil {
+		return nil
+	}
+
+	top5 := make([]dto.Process, 0, 5)
+	for _, p := range processes {
+		percent, err := p.CPUPercent()
+		if err != nil {
+			continue
+		}
+		minIndex := 0
+		if len(top5) >= 5 {
+			minCPU := top5[0].Percent
+			for i := 1; i < len(top5); i++ {
+				if top5[i].Percent < minCPU {
+					minCPU = top5[i].Percent
+					minIndex = i
+				}
+			}
+			if percent < minCPU {
+				continue
+			}
+		}
+		name, err := p.Name()
+		if err != nil {
+			name = "undifine"
+		}
+		cmd, err := p.Cmdline()
+		if err != nil {
+			cmd = "undifine"
+		}
+		user, err := p.Username()
+		if err != nil {
+			user = "undifine"
+		}
+		if len(top5) == 5 {
+			top5[minIndex] = dto.Process{Percent: percent, Pid: p.Pid, User: user, Name: name, Cmd: cmd}
+		} else {
+			top5 = append(top5, dto.Process{Percent: percent, Pid: p.Pid, User: user, Name: name, Cmd: cmd})
+		}
+	}
+	sort.Slice(top5, func(i, j int) bool {
+		return top5[i].Percent > top5[j].Percent
+	})
+
+	return top5
+}
+
+func (m *MonitorService) loadTopMem() []dto.Process {
+	processes, err := process.Processes()
+	if err != nil {
+		return nil
+	}
+
+	top5 := make([]dto.Process, 0, 5)
+	for _, p := range processes {
+		stat, err := p.MemoryInfo()
+		if err != nil {
+			continue
+		}
+		memItem := stat.RSS
+		minIndex := 0
+		if len(top5) >= 5 {
+			min := top5[0].Memory
+			for i := 1; i < len(top5); i++ {
+				if top5[i].Memory < min {
+					min = top5[i].Memory
+					minIndex = i
+				}
+			}
+			if memItem < min {
+				continue
+			}
+		}
+		name, err := p.Name()
+		if err != nil {
+			name = "undifine"
+		}
+		cmd, err := p.Cmdline()
+		if err != nil {
+			cmd = "undifine"
+		}
+		user, err := p.Username()
+		if err != nil {
+			user = "undifine"
+		}
+		percent, _ := p.MemoryPercent()
+		if len(top5) == 5 {
+			top5[minIndex] = dto.Process{Percent: float64(percent), Pid: p.Pid, User: user, Name: name, Cmd: cmd, Memory: memItem}
+		} else {
+			top5 = append(top5, dto.Process{Percent: float64(percent), Pid: p.Pid, User: user, Name: name, Cmd: cmd, Memory: memItem})
+		}
+	}
+
+	sort.Slice(top5, func(i, j int) bool {
+		return top5[i].Memory > top5[j].Memory
+	})
+	return top5
 }
 
 func StartMonitor(removeBefore bool, interval string) error {

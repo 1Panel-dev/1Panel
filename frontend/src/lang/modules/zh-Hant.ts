@@ -104,6 +104,7 @@ const message = {
             timeRange: '至',
             dateStart: '開始日期',
             dateEnd: '結束日期',
+            date: '日期',
         },
         table: {
             all: '所有',
@@ -1134,6 +1135,7 @@ const message = {
         lastNMonth: '近 {0} 月',
         lastHalfYear: '近半年',
         memory: '記憶體',
+        percent: '佔比',
         cache: '快取',
         disk: '磁碟',
         network: '網路',

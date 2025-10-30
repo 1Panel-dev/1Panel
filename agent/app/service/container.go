@@ -895,25 +895,36 @@ func (u *ContainerService) ContainerOperation(req dto.ContainerOperation) error 
 		return err
 	}
 	defer client.Close()
-	for _, item := range req.Names {
-		global.LOG.Infof("start container %s operation %s", item, req.Operation)
-		switch req.Operation {
-		case constant.ContainerOpStart:
-			err = client.ContainerStart(ctx, item, container.StartOptions{})
-		case constant.ContainerOpStop:
-			err = client.ContainerStop(ctx, item, container.StopOptions{})
-		case constant.ContainerOpRestart:
-			err = client.ContainerRestart(ctx, item, container.StopOptions{})
-		case constant.ContainerOpKill:
-			err = client.ContainerKill(ctx, item, "SIGKILL")
-		case constant.ContainerOpPause:
-			err = client.ContainerPause(ctx, item)
-		case constant.ContainerOpUnpause:
-			err = client.ContainerUnpause(ctx, item)
-		case constant.ContainerOpRemove:
-			err = client.ContainerRemove(ctx, item, container.RemoveOptions{RemoveVolumes: true, Force: true})
-		}
+	taskItem, err := task.NewTaskWithOps(strings.Join(req.Names, " "), req.Operation, task.TaskScopeContainer, req.TaskID, 1)
+	if err != nil {
+		return fmt.Errorf("new task for container commit failed, err: %v", err)
 	}
+
+	for _, item := range req.Names {
+		taskItem.AddSubTask(item, func(t *task.Task) error {
+			switch req.Operation {
+			case constant.ContainerOpStart:
+				err = client.ContainerStart(ctx, item, container.StartOptions{})
+			case constant.ContainerOpStop:
+				err = client.ContainerStop(ctx, item, container.StopOptions{})
+			case constant.ContainerOpRestart:
+				err = client.ContainerRestart(ctx, item, container.StopOptions{})
+			case constant.ContainerOpKill:
+				err = client.ContainerKill(ctx, item, "SIGKILL")
+			case constant.ContainerOpPause:
+				err = client.ContainerPause(ctx, item)
+			case constant.ContainerOpUnpause:
+				err = client.ContainerUnpause(ctx, item)
+			case constant.ContainerOpRemove:
+				err = client.ContainerRemove(ctx, item, container.RemoveOptions{RemoveVolumes: true, Force: true})
+			}
+			return err
+		}, nil)
+	}
+
+	go func() {
+		_ = taskItem.Execute()
+	}()
 	return err
 }
 
