@@ -374,6 +374,7 @@ const message = {
         config: 'Configuration | Configurations',
         ssh: 'SSH Settings',
         firewall: 'Firewall',
+        filter: 'Filter',
         ssl: 'Certificate | Certificates',
         database: 'Database | Databases',
         aiTools: 'AI',

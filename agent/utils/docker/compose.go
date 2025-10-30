@@ -5,14 +5,15 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"path"
+	"regexp"
+	"strings"
+
 	"github.com/compose-spec/compose-go/v2/loader"
 	"github.com/compose-spec/compose-go/v2/types"
 	"github.com/docker/compose/v2/pkg/api"
 	"github.com/joho/godotenv"
 	"gopkg.in/yaml.v3"
-	"path"
-	"regexp"
-	"strings"
 )
 
 type ComposeService struct {
