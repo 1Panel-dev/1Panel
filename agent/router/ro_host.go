@@ -22,6 +22,11 @@ func (s *HostRouter) InitRouter(Router *gin.RouterGroup) {
 		hostRouter.POST("/firewall/update/addr", baseApi.UpdateAddrRule)
 		hostRouter.POST("/firewall/update/description", baseApi.UpdateFirewallDescription)
 
+		hostRouter.POST("/firewall/filter/rules", baseApi.GetFilterRules)
+		hostRouter.POST("/firewall/filter/rule", baseApi.OperateFilterRule)
+		hostRouter.POST("/firewall/filter/batch", baseApi.BatchOperateFilterRule)
+		hostRouter.POST("/firewall/filter/apply", baseApi.ApplyFilterFirewall)
+
 		hostRouter.POST("/monitor/search", baseApi.LoadMonitor)
 		hostRouter.POST("/monitor/clean", baseApi.CleanMonitor)
 		hostRouter.GET("/monitor/netoptions", baseApi.GetNetworkOptions)

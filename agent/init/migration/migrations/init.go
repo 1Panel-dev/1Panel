@@ -50,6 +50,7 @@ var AddTable = &gormigrate.Migration{
 			&model.Favorite{},
 			&model.Forward{},
 			&model.Firewall{},
+			&model.IptablesFilterRule{},
 			&model.Ftp{},
 			&model.ImageRepo{},
 			&model.ScriptLibrary{},
@@ -657,5 +658,12 @@ var UpdateMonitorInterval = &gormigrate.Migration{
 			return err
 		}
 		return nil
+	},
+}
+
+var AddIptablesFilterRuleTable = &gormigrate.Migration{
+	ID: "20251030-add-iptables-filter-rule-table",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(&model.IptablesFilterRule{})
 	},
 }
