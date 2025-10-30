@@ -2,7 +2,6 @@ package client
 
 import (
 	"fmt"
-	"os/exec"
 	"regexp"
 	"strings"
 	"time"
@@ -60,11 +59,6 @@ func (iptables *Iptables) run(tab, rule string) error {
 		return err
 	}
 	return nil
-}
-
-// Run 导出的 run 方法供外部调用
-func (iptables *Iptables) Run(tab, rule string) error {
-	return iptables.run(tab, rule)
 }
 
 func (iptables *Iptables) Check() error {
@@ -257,32 +251,6 @@ func (iptables *Iptables) NatRemove(num string, protocol, srcPort, dest, destPor
 	return nil
 }
 
-// test struct
-/*
-🧩 规则解释
-
--A INPUT / -A OUTPUT：追加规则到对应链。
-
--p tcp / -p udp：指定协议。
-
---dport / --sport：目标端口 / 源端口。
-
--d / -s：目标 IP / 源 IP。
-
--j DROP：丢弃数据包（不回应）。
-
-若改成 -j REJECT，则会主动返回一个拒绝报文（对调试有用）。*
-*/
-type IptablesPolicy struct {
-	Protocol string
-	SrcPort  uint16
-	DstPort  uint16
-	SourceIP string
-	DestIP   string
-	Action   string // ACCEPT, DROP, REJECT
-	Comment  string
-}
-
 func (iptables *Iptables) AddPolicy(chain string, policy IptablesPolicy) error {
 	iptablesArg := fmt.Sprintf("-A %s", chain)
 	if policy.Protocol != "" {
@@ -327,89 +295,6 @@ func (iptables *Iptables) Reload() error {
 	return nil
 }
 
-// IptablesChain
-type IptablesChain struct {
-	Name          string
-	DefaultPolicy string
-	FirstRule     *IptablesPolicyChainItem
-	LastRule      *IptablesPolicyChainItem
-}
-
-type IptablesPolicyChainItem struct {
-	next *IptablesPolicyChainItem
-	P    IptablesPolicy
-}
-
-func (item *IptablesPolicyChainItem) SetNext(next *IptablesPolicyChainItem) {
-	item.next = next
-}
-
-func (item *IptablesPolicyChainItem) Next() *IptablesPolicyChainItem {
-	return item.next
-}
-
-func (c *IptablesChain) ParseLine(line string) error {
-	cmd := strings.Split(line, " ")
-
-	if cmd[0] == "-P" {
-		c.Name = cmd[1]
-		c.DefaultPolicy = cmd[2]
-		return nil
-	}
-	if cmd[0] == "-A" {
-		if cmd[1] != c.Name {
-			return fmt.Errorf("invalid chain name in rule line: %s", line)
-		}
-		policy := IptablesPolicy{}
-		for i := 2; i < len(cmd); i++ {
-			switch cmd[i] {
-			case "-p":
-				i++
-				policy.Protocol = cmd[i]
-			case "--dport":
-				i++
-				// parse port
-				var port uint16
-				fmt.Sscanf(cmd[i], "%d", &port)
-				policy.DstPort = port
-			case "--sport":
-				i++
-				var port uint16
-				fmt.Sscanf(cmd[i], "%d", &port)
-				policy.SrcPort = port
-			case "-s":
-				i++
-				policy.SourceIP = cmd[i]
-			case "-d":
-				i++
-				policy.DestIP = cmd[i]
-			case "-j":
-				i++
-				policy.Action = cmd[i]
-			case "-m":
-				// skip
-				i++
-			case "--comment":
-				i++
-				policy.Comment = strings.Trim(cmd[i], "\"")
-			}
-		}
-		newItem := &IptablesPolicyChainItem{
-			P: policy,
-		}
-		if c.FirstRule == nil {
-			c.FirstRule = newItem
-			c.LastRule = newItem
-		} else {
-			current := c.LastRule
-			current.SetNext(newItem)
-			c.LastRule = newItem
-		}
-		return nil
-	}
-	return fmt.Errorf("invalid iptables rule line: %s", line)
-}
-
 // iptables filter 解析
 func (iptables *Iptables) ReadFilter(chainName []string) (map[string]IptablesChain, error) {
 	// iptables -S
@@ -450,33 +335,6 @@ func (iptables *Iptables) ReadFilter(chainName []string) (map[string]IptablesCha
 		}
 	}
 	return chains, nil
-}
-
-// 检查链中是否有无条件 DROP/REJECT 规则
-func checkChainSafety(chain IptablesChain) error {
-	item := chain.FirstRule
-	for item != nil {
-		policy := item.P
-		if policy.Action == "DROP" || policy.Action == "REJECT" {
-			// 检查是否为无条件规则(所有字段都为空)
-			if policy.Protocol == "" && policy.SrcPort == 0 && policy.DstPort == 0 &&
-				policy.SourceIP == "" && policy.DestIP == "" {
-				return fmt.Errorf("发现无条件 %s 规则,不允许应用", policy.Action)
-			}
-		}
-		item = item.Next()
-	}
-	return nil
-}
-
-// 执行 iptables 命令
-func runIptables(args ...string) error {
-	cmd := exec.Command("iptables", args...)
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		return fmt.Errorf("执行 iptables 失败: %v, 输出: %s", err, string(output))
-	}
-	return nil
 }
 
 // RemovePolicyByComment 按 comment 删除规则
