@@ -1145,7 +1145,7 @@ func (b *BaseApi) ExecComposer(c *gin.Context) {
 // @Tags Website
 // @Summary Batch operate websites
 // @Accept json
-// @Param request body request.BatchOpWebsite true "request"
+// @Param request body request.BatchWebsiteOp true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
@@ -1165,7 +1165,7 @@ func (b *BaseApi) BatchOpWebsites(c *gin.Context) {
 // @Tags Website
 // @Summary Batch set website group
 // @Accept json
-// @Param request body request.BatchSetGroupReq true "request"
+// @Param request body request.BatchWebsiteGroup true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp

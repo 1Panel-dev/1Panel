@@ -4601,6 +4601,48 @@ const docTemplate = `{
 				}
 			}
 		},
+		"/containers/template/batch": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.ComposeTemplateBatch"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Bacth compose template",
+				"tags": [
+					"Container Compose-template"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [],
+					"formatEN": "batch import compose templates",
+					"formatZH": "批量导入编排模版",
+					"paramKeys": []
+				}
+			}
+		},
 		"/containers/template/del": {
 			"post": {
 				"consumes": [
@@ -5535,6 +5577,68 @@ const docTemplate = `{
 					],
 					"formatEN": "delete quick command [names]",
 					"formatZH": "删除快捷命令 [names]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/core/commands/export": {
+			"post": {
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"type": "string"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Export command",
+				"tags": [
+					"Command"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [],
+					"formatEN": "export quick commands",
+					"formatZH": "导出快速命令",
+					"paramKeys": []
+				}
+			}
+		},
+		"/core/commands/import": {
+			"post": {
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"type": "string"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Import command",
+				"tags": [
+					"Command"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [],
+					"formatEN": "import quick commands",
+					"formatZH": "导入快速命令",
 					"paramKeys": []
 				}
 			}
@@ -6780,6 +6884,30 @@ const docTemplate = `{
 				}
 			}
 		},
+		"/core/settings/by": {
+			"post": {
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"type": "string"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Load system setting by key",
+				"tags": [
+					"System Setting"
+				]
+			}
+		},
 		"/core/settings/expired/handle": {
 			"post": {
 				"consumes": [
@@ -6850,6 +6978,37 @@ const docTemplate = `{
 				"tags": [
 					"System Setting"
 				]
+			}
+		},
+		"/core/settings/menu/default": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Default menu",
+				"tags": [
+					"Menu Setting"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [],
+					"formatEN": "Init menu.",
+					"formatZH": "初始化菜单",
+					"paramKeys": []
+				}
 			}
 		},
 		"/core/settings/menu/update": {
@@ -8124,6 +8283,41 @@ const docTemplate = `{
 					"formatZH": "修改计划任务 [name] 状态为 [status]",
 					"paramKeys": []
 				}
+			}
+		},
+		"/cronjobs/stop": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.OperateByID"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Handle stop job",
+				"tags": [
+					"Cronjob"
+				]
 			}
 		},
 		"/cronjobs/update": {
@@ -10646,6 +10840,76 @@ const docTemplate = `{
 				}
 			}
 		},
+		"/files/convert": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.FileConvert"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Convert file",
+				"tags": [
+					"File"
+				]
+			}
+		},
+		"/files/convert/log": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.PageInfo"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Convert file",
+				"tags": [
+					"File"
+				]
+			}
+		},
 		"/files/decompress": {
 			"post": {
 				"consumes": [
@@ -12581,7 +12845,7 @@ const docTemplate = `{
 						"name": "request",
 						"required": true,
 						"schema": {
-							"$ref": "#/definitions/dto.CreateRootCert"
+							"$ref": "#/definitions/dto.RootCertOperate"
 						}
 					}
 				],
@@ -12719,8 +12983,64 @@ const docTemplate = `{
 				}
 			}
 		},
-		"/hosts/ssh/conf": {
-			"get": {
+		"/hosts/ssh/cert/update": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.RootCertOperate"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update host SSH secret",
+				"tags": [
+					"SSH"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [],
+					"formatEN": "generate SSH secret",
+					"formatZH": "生成 SSH 密钥 ",
+					"paramKeys": []
+				}
+			}
+		},
+		"/hosts/ssh/file": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.OperationWithName"
+						}
+					}
+				],
 				"responses": {
 					"200": {
 						"description": "OK",
@@ -12743,7 +13063,7 @@ const docTemplate = `{
 				]
 			}
 		},
-		"/hosts/ssh/conffile/update": {
+		"/hosts/ssh/file/update": {
 			"post": {
 				"consumes": [
 					"application/json"
@@ -12778,9 +13098,11 @@ const docTemplate = `{
 				],
 				"x-panel-log": {
 					"BeforeFunctions": [],
-					"bodyKeys": [],
-					"formatEN": "update SSH conf",
-					"formatZH": "修改 SSH 配置文件",
+					"bodyKeys": [
+						"key"
+					],
+					"formatEN": "update SSH conf [key]",
+					"formatZH": "修改 SSH 配置文件 [key]",
 					"paramKeys": []
 				}
 			}
@@ -12966,10 +13288,10 @@ const docTemplate = `{
 					"BeforeFunctions": [],
 					"bodyKeys": [
 						"key",
-						"value"
+						"newValue"
 					],
-					"formatEN": "update SSH setting [key] =\u003e [value]",
-					"formatZH": "修改 SSH 配置 [key] =\u003e [value]",
+					"formatEN": "update SSH setting [key] =\u003e [newValue]",
+					"formatZH": "修改 SSH 配置 [key] =\u003e [newValue]",
 					"paramKeys": []
 				}
 			}
@@ -13101,44 +13423,6 @@ const docTemplate = `{
 					"formatZH": "创建 [type] 配置",
 					"paramKeys": []
 				}
-			}
-		},
-		"/hosts/tool/log": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/request.HostToolLogReq"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"type": "string"
-						}
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Get tool logs",
-				"tags": [
-					"Host tool"
-				]
 			}
 		},
 		"/hosts/tool/operate": {
@@ -13533,7 +13817,7 @@ const docTemplate = `{
 						"name": "request",
 						"required": true,
 						"schema": {
-							"$ref": "#/definitions/request.NginxOperateReq"
+							"$ref": "#/definitions/request.NginxDefaultHTTPSUpdate"
 						}
 					}
 				],
@@ -13794,10 +14078,7 @@ const docTemplate = `{
 				],
 				"responses": {
 					"200": {
-						"description": "OK",
-						"schema": {
-							"$ref": "#/definitions/websocket.PsProcessData"
-						}
+						"description": "OK"
 					}
 				},
 				"security": [
@@ -17676,6 +17957,76 @@ const docTemplate = `{
 				]
 			}
 		},
+		"/websites/batch/group": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.BatchWebsiteGroup"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Batch set website group",
+				"tags": [
+					"Website"
+				]
+			}
+		},
+		"/websites/batch/operate": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.BatchWebsiteOp"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Batch operate websites",
+				"tags": [
+					"Website"
+				]
+			}
+		},
 		"/websites/ca": {
 			"post": {
 				"consumes": [
@@ -18139,6 +18490,77 @@ const docTemplate = `{
 					"formatZH": "nginx 配置修改 [domain]",
 					"paramKeys": []
 				}
+			}
+		},
+		"/websites/cors/update": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.CorsConfigReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update CORS Config",
+				"tags": [
+					"Website"
+				]
+			}
+		},
+		"/websites/cors/{id}": {
+			"get": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "id",
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"type": "integer"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/request.CorsConfig"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get CORS Config",
+				"tags": [
+					"Website"
+				]
 			}
 		},
 		"/websites/crosssite": {
@@ -20617,6 +21039,74 @@ const docTemplate = `{
 				}
 			}
 		},
+		"/websites/ssl/upload/file": {
+			"post": {
+				"consumes": [
+					"multipart/form-data"
+				],
+				"parameters": [
+					{
+						"description": "type",
+						"in": "formData",
+						"name": "type",
+						"required": true,
+						"type": "string"
+					},
+					{
+						"description": "description",
+						"in": "formData",
+						"name": "description",
+						"type": "string"
+					},
+					{
+						"description": "sslID",
+						"in": "formData",
+						"name": "sslID",
+						"type": "string"
+					},
+					{
+						"description": "privateKeyFile",
+						"in": "formData",
+						"name": "privateKeyFile",
+						"required": true,
+						"type": "file"
+					},
+					{
+						"description": "certificateFile",
+						"in": "formData",
+						"name": "certificateFile",
+						"required": true,
+						"type": "file"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Upload SSL file",
+				"tags": [
+					"Website SSL"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"type"
+					],
+					"formatEN": "Upload ssl file [type]",
+					"formatZH": "上传 ssl 文件 [type]",
+					"paramKeys": []
+				}
+			}
+		},
 		"/websites/ssl/website/:websiteId": {
 			"get": {
 				"consumes": [
@@ -21312,6 +21802,9 @@ const docTemplate = `{
 				},
 				"status": {
 					"type": "string"
+				},
+				"timeout": {
+					"type": "integer"
 				}
 			},
 			"type": "object"
@@ -21405,6 +21898,9 @@ const docTemplate = `{
 				},
 				"spec": {
 					"type": "string"
+				},
+				"timeout": {
+					"type": "integer"
 				}
 			},
 			"type": "object"
@@ -21719,6 +22215,20 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
+		"dto.ComposeTemplateBatch": {
+			"properties": {
+				"templates": {
+					"items": {
+						"$ref": "#/definitions/dto.ComposeTemplateCreate"
+					},
+					"type": "array"
+				}
+			},
+			"required": [
+				"templates"
+			],
+			"type": "object"
+		},
 		"dto.ComposeTemplateCreate": {
 			"properties": {
 				"content": {
@@ -21877,9 +22387,6 @@ const docTemplate = `{
 						"type": "string"
 					},
 					"type": "array"
-				},
-				"containerID": {
-					"type": "string"
 				},
 				"cpuShares": {
 					"type": "integer"
@@ -22165,41 +22672,6 @@ const docTemplate = `{
 			"required": [
 				"image",
 				"names"
-			],
-			"type": "object"
-		},
-		"dto.CreateRootCert": {
-			"properties": {
-				"description": {
-					"type": "string"
-				},
-				"encryptionMode": {
-					"enum": [
-						"rsa",
-						"ed25519",
-						"ecdsa",
-						"dsa"
-					],
-					"type": "string"
-				},
-				"mode": {
-					"type": "string"
-				},
-				"name": {
-					"type": "string"
-				},
-				"passPhrase": {
-					"type": "string"
-				},
-				"privateKey": {
-					"type": "string"
-				},
-				"publicKey": {
-					"type": "string"
-				}
-			},
-			"required": [
-				"encryptionMode"
 			],
 			"type": "object"
 		},
@@ -23378,6 +23850,9 @@ const docTemplate = `{
 				"rules": {
 					"items": {
 						"properties": {
+							"interface": {
+								"type": "string"
+							},
 							"num": {
 								"type": "string"
 							},
@@ -23816,7 +24291,10 @@ const docTemplate = `{
 		"dto.ImagePull": {
 			"properties": {
 				"imageName": {
-					"type": "string"
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
 				},
 				"repoID": {
 					"type": "integer"
@@ -23927,13 +24405,16 @@ const docTemplate = `{
 				"sourceID": {
 					"type": "string"
 				},
-				"targetName": {
-					"type": "string"
+				"tags": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
 				}
 			},
 			"required": [
 				"sourceID",
-				"targetName"
+				"tags"
 			],
 			"type": "object"
 		},
@@ -23970,6 +24451,9 @@ const docTemplate = `{
 		"dto.Locale": {
 			"properties": {
 				"en": {
+					"type": "string"
+				},
+				"es-es": {
 					"type": "string"
 				},
 				"ja": {
@@ -24031,7 +24515,8 @@ const docTemplate = `{
 						"ru",
 						"ms",
 						"pt-BR",
-						"tr"
+						"tr",
+						"es-ES"
 					],
 					"type": "string"
 				},
@@ -24145,6 +24630,9 @@ const docTemplate = `{
 		},
 		"dto.MonitorSetting": {
 			"properties": {
+				"defaultIO": {
+					"type": "string"
+				},
 				"defaultNetwork": {
 					"type": "string"
 				},
@@ -24167,7 +24655,8 @@ const docTemplate = `{
 						"MonitorStatus",
 						"MonitorStoreDays",
 						"MonitorInterval",
-						"DefaultNetwork"
+						"DefaultNetwork",
+						"DefaultIO"
 					],
 					"type": "string"
 				},
@@ -24689,6 +25178,9 @@ const docTemplate = `{
 		"dto.NginxUpstreamServer": {
 			"properties": {
 				"failTimeout": {
+					"type": "integer"
+				},
+				"failTimeoutUnit": {
 					"type": "string"
 				},
 				"flag": {
@@ -24859,6 +25351,9 @@ const docTemplate = `{
 					"type": "integer"
 				}
 			},
+			"required": [
+				"id"
+			],
 			"type": "object"
 		},
 		"dto.OperateByIDs": {
@@ -25459,6 +25954,9 @@ const docTemplate = `{
 		},
 		"dto.QuickJump": {
 			"properties": {
+				"alias": {
+					"type": "string"
+				},
 				"detail": {
 					"type": "string"
 				},
@@ -25741,6 +26239,44 @@ const docTemplate = `{
 			},
 			"type": "object"
 		},
+		"dto.RootCertOperate": {
+			"properties": {
+				"description": {
+					"type": "string"
+				},
+				"encryptionMode": {
+					"enum": [
+						"rsa",
+						"ed25519",
+						"ecdsa",
+						"dsa"
+					],
+					"type": "string"
+				},
+				"id": {
+					"type": "integer"
+				},
+				"mode": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"passPhrase": {
+					"type": "string"
+				},
+				"privateKey": {
+					"type": "string"
+				},
+				"publicKey": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"encryptionMode"
+			],
+			"type": "object"
+		},
 		"dto.RuleSearch": {
 			"properties": {
 				"info": {
@@ -25787,6 +26323,9 @@ const docTemplate = `{
 						"password",
 						"key"
 					],
+					"type": "string"
+				},
+				"localSSHConnShow": {
 					"type": "string"
 				},
 				"passPhrase": {
@@ -26238,18 +26777,6 @@ const docTemplate = `{
 		},
 		"dto.SettingInfo": {
 			"properties": {
-				"allowIPs": {
-					"type": "string"
-				},
-				"apiInterfaceStatus": {
-					"type": "string"
-				},
-				"apiKey": {
-					"type": "string"
-				},
-				"apiKeyValidityTime": {
-					"type": "string"
-				},
 				"appStoreLastModified": {
 					"type": "string"
 				},
@@ -26259,97 +26786,49 @@ const docTemplate = `{
 				"appStoreVersion": {
 					"type": "string"
 				},
-				"bindAddress": {
+				"defaultIO": {
 					"type": "string"
 				},
-				"bindDomain": {
+				"defaultNetwork": {
 					"type": "string"
 				},
-				"complexityVerification": {
+				"dockerSockPath": {
 					"type": "string"
 				},
-				"developerMode": {
+				"fileRecycleBin": {
 					"type": "string"
 				},
-				"expirationDays": {
+				"lastCleanData": {
 					"type": "string"
 				},
-				"expirationTime": {
+				"lastCleanSize": {
 					"type": "string"
 				},
-				"hideMenu": {
+				"lastCleanTime": {
 					"type": "string"
 				},
-				"ipWhiteList": {
+				"localTime": {
 					"type": "string"
 				},
-				"ipv6": {
+				"monitorInterval": {
 					"type": "string"
 				},
-				"language": {
+				"monitorStatus": {
 					"type": "string"
 				},
-				"menuTabs": {
+				"monitorStoreDays": {
 					"type": "string"
 				},
-				"mfaInterval": {
+				"ntpSite": {
 					"type": "string"
 				},
-				"mfaSecret": {
-					"type": "string"
-				},
-				"mfaStatus": {
-					"type": "string"
-				},
-				"noAuthSetting": {
-					"type": "string"
-				},
-				"panelName": {
-					"type": "string"
-				},
-				"port": {
-					"type": "string"
-				},
-				"proxyPasswd": {
-					"type": "string"
-				},
-				"proxyPasswdKeep": {
-					"type": "string"
-				},
-				"proxyPort": {
-					"type": "string"
-				},
-				"proxyType": {
-					"type": "string"
-				},
-				"proxyUrl": {
-					"type": "string"
-				},
-				"proxyUser": {
-					"type": "string"
-				},
-				"securityEntrance": {
-					"type": "string"
-				},
-				"serverPort": {
-					"type": "string"
-				},
-				"sessionTimeout": {
-					"type": "string"
-				},
-				"ssl": {
-					"type": "string"
-				},
-				"sslType": {
+				"systemIP": {
 					"type": "string"
 				},
 				"systemVersion": {
 					"type": "string"
 				},
-				"theme": {
-					"type": "string"
-				},
-				"userName": {
+				"timeZone": {
 					"type": "string"
 				}
 			},
@@ -26592,6 +27071,9 @@ const docTemplate = `{
 				"size": {
 					"type": "integer"
 				},
+				"taskID": {
+					"type": "string"
+				},
 				"used": {
 					"type": "string"
 				}
@@ -26830,6 +27312,9 @@ const docTemplate = `{
 					"type": "string"
 				},
 				"mode": {
+					"type": "string"
+				},
+				"shared": {
 					"type": "string"
 				},
 				"sourceDir": {
@@ -27419,6 +27904,9 @@ const docTemplate = `{
 				"caId": {
 					"type": "integer"
 				},
+				"certPath": {
+					"type": "string"
+				},
 				"certURL": {
 					"type": "string"
 				},
@@ -27480,6 +27968,9 @@ const docTemplate = `{
 					"type": "string"
 				},
 				"privateKey": {
+					"type": "string"
+				},
+				"privateKeyPath": {
 					"type": "string"
 				},
 				"provider": {
@@ -27837,6 +28328,46 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
+		"request.BatchWebsiteGroup": {
+			"properties": {
+				"groupID": {
+					"type": "integer"
+				},
+				"ids": {
+					"items": {
+						"type": "integer"
+					},
+					"type": "array"
+				}
+			},
+			"required": [
+				"groupID",
+				"ids"
+			],
+			"type": "object"
+		},
+		"request.BatchWebsiteOp": {
+			"properties": {
+				"ids": {
+					"items": {
+						"type": "integer"
+					},
+					"type": "array"
+				},
+				"operate": {
+					"type": "string"
+				},
+				"taskID": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"ids",
+				"operate",
+				"taskID"
+			],
+			"type": "object"
+		},
 		"request.ChangeDatabase": {
 			"properties": {
 				"databaseID": {
@@ -27844,6 +28375,58 @@ const docTemplate = `{
 				},
 				"databaseType": {
 					"type": "string"
+				},
+				"websiteID": {
+					"type": "integer"
+				}
+			},
+			"required": [
+				"websiteID"
+			],
+			"type": "object"
+		},
+		"request.CorsConfig": {
+			"properties": {
+				"allowCredentials": {
+					"type": "boolean"
+				},
+				"allowHeaders": {
+					"type": "string"
+				},
+				"allowMethods": {
+					"type": "string"
+				},
+				"allowOrigins": {
+					"type": "string"
+				},
+				"cors": {
+					"type": "boolean"
+				},
+				"preflight": {
+					"type": "boolean"
+				}
+			},
+			"type": "object"
+		},
+		"request.CorsConfigReq": {
+			"properties": {
+				"allowCredentials": {
+					"type": "boolean"
+				},
+				"allowHeaders": {
+					"type": "string"
+				},
+				"allowMethods": {
+					"type": "string"
+				},
+				"allowOrigins": {
+					"type": "string"
+				},
+				"cors": {
+					"type": "boolean"
+				},
+				"preflight": {
+					"type": "boolean"
 				},
 				"websiteID": {
 					"type": "integer"
@@ -28030,6 +28613,17 @@ const docTemplate = `{
 			},
 			"type": "object"
 		},
+		"request.ExtraHost": {
+			"properties": {
+				"hostname": {
+					"type": "string"
+				},
+				"ip": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
 		"request.FPMConfig": {
 			"properties": {
 				"id": {
@@ -28128,6 +28722,36 @@ const docTemplate = `{
 			},
 			"required": [
 				"path"
+			],
+			"type": "object"
+		},
+		"request.FileConvert": {
+			"properties": {
+				"extension": {
+					"type": "string"
+				},
+				"inputFile": {
+					"type": "string"
+				},
+				"outputFormat": {
+					"type": "string"
+				},
+				"path": {
+					"type": "string"
+				},
+				"status": {
+					"type": "string"
+				},
+				"type": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"extension",
+				"inputFile",
+				"outputFormat",
+				"path",
+				"type"
 			],
 			"type": "object"
 		},
@@ -28502,20 +29126,6 @@ const docTemplate = `{
 					"type": "string"
 				},
 				"type": {
-					"type": "string"
-				}
-			},
-			"required": [
-				"type"
-			],
-			"type": "object"
-		},
-		"request.HostToolLogReq": {
-			"properties": {
-				"type": {
-					"enum": [
-						"supervisord"
-					],
 					"type": "string"
 				}
 			},
@@ -28948,6 +29558,24 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
+		"request.NginxDefaultHTTPSUpdate": {
+			"properties": {
+				"operate": {
+					"enum": [
+						"enable",
+						"disable"
+					],
+					"type": "string"
+				},
+				"sslRejectHandshake": {
+					"type": "boolean"
+				}
+			},
+			"required": [
+				"operate"
+			],
+			"type": "object"
+		},
 		"request.NginxModuleUpdate": {
 			"properties": {
 				"enable": {
@@ -28976,21 +29604,6 @@ const docTemplate = `{
 			},
 			"required": [
 				"name",
-				"operate"
-			],
-			"type": "object"
-		},
-		"request.NginxOperateReq": {
-			"properties": {
-				"operate": {
-					"enum": [
-						"enable",
-						"disable"
-					],
-					"type": "string"
-				}
-			},
-			"required": [
 				"operate"
 			],
 			"type": "object"
@@ -29227,6 +29840,9 @@ const docTemplate = `{
 				"id": {
 					"type": "integer"
 				},
+				"maxExecutionTime": {
+					"type": "string"
+				},
 				"params": {
 					"additionalProperties": {
 						"type": "string"
@@ -29260,6 +29876,12 @@ const docTemplate = `{
 				"exposedPorts": {
 					"items": {
 						"$ref": "#/definitions/request.ExposedPort"
+					},
+					"type": "array"
+				},
+				"extraHosts": {
+					"items": {
+						"$ref": "#/definitions/request.ExtraHost"
 					},
 					"type": "array"
 				},
@@ -29403,6 +30025,9 @@ const docTemplate = `{
 				"dir": {
 					"type": "string"
 				},
+				"environment": {
+					"type": "string"
+				},
 				"id": {
 					"type": "integer"
 				},
@@ -29537,6 +30162,12 @@ const docTemplate = `{
 					},
 					"type": "array"
 				},
+				"extraHosts": {
+					"items": {
+						"$ref": "#/definitions/request.ExtraHost"
+					},
+					"type": "array"
+				},
 				"image": {
 					"type": "string"
 				},
@@ -29654,6 +30285,12 @@ const docTemplate = `{
 					},
 					"type": "array"
 				},
+				"extraHosts": {
+					"items": {
+						"$ref": "#/definitions/request.ExtraHost"
+					},
+					"type": "array"
+				},
 				"id": {
 					"type": "integer"
 				},
@@ -29722,6 +30359,9 @@ const docTemplate = `{
 					"type": "string"
 				},
 				"dir": {
+					"type": "string"
+				},
+				"environment": {
 					"type": "string"
 				},
 				"name": {
@@ -30114,6 +30754,9 @@ const docTemplate = `{
 				"deleteBackup": {
 					"type": "boolean"
 				},
+				"deleteDB": {
+					"type": "boolean"
+				},
 				"forceDelete": {
 					"type": "boolean"
 				},
@@ -30484,6 +31127,18 @@ const docTemplate = `{
 		},
 		"request.WebsiteProxyConfig": {
 			"properties": {
+				"allowCredentials": {
+					"type": "boolean"
+				},
+				"allowHeaders": {
+					"type": "string"
+				},
+				"allowMethods": {
+					"type": "string"
+				},
+				"allowOrigins": {
+					"type": "string"
+				},
 				"cache": {
 					"type": "boolean"
 				},
@@ -30495,6 +31150,9 @@ const docTemplate = `{
 				},
 				"content": {
 					"type": "string"
+				},
+				"cors": {
+					"type": "boolean"
 				},
 				"enable": {
 					"type": "boolean"
@@ -30516,6 +31174,9 @@ const docTemplate = `{
 				},
 				"operate": {
 					"type": "string"
+				},
+				"preflight": {
+					"type": "boolean"
 				},
 				"proxyHost": {
 					"type": "string"
@@ -30698,6 +31359,20 @@ const docTemplate = `{
 				"domain": {
 					"type": "string"
 				},
+				"order": {
+					"enum": [
+						"null",
+						"ascending",
+						"descending"
+					],
+					"type": "string"
+				},
+				"orderBy": {
+					"enum": [
+						"expire_date"
+					],
+					"type": "string"
+				},
 				"page": {
 					"type": "integer"
 				},
@@ -30706,6 +31381,8 @@ const docTemplate = `{
 				}
 			},
 			"required": [
+				"order",
+				"orderBy",
 				"page",
 				"pageSize"
 			],
@@ -31890,6 +32567,9 @@ const docTemplate = `{
 			"properties": {
 				"https": {
 					"type": "boolean"
+				},
+				"sslRejectHandshake": {
+					"type": "boolean"
 				}
 			},
 			"type": "object"
@@ -32082,6 +32762,9 @@ const docTemplate = `{
 					},
 					"type": "array"
 				},
+				"maxExecutionTime": {
+					"type": "string"
+				},
 				"params": {
 					"additionalProperties": {
 						"type": "string"
@@ -32195,6 +32878,12 @@ const docTemplate = `{
 					},
 					"type": "array"
 				},
+				"extraHosts": {
+					"items": {
+						"$ref": "#/definitions/request.ExtraHost"
+					},
+					"type": "array"
+				},
 				"id": {
 					"type": "integer"
 				},
@@ -32256,6 +32945,9 @@ const docTemplate = `{
 					"type": "string"
 				},
 				"dir": {
+					"type": "string"
+				},
+				"environment": {
 					"type": "string"
 				},
 				"msg": {
@@ -32739,6 +33431,9 @@ const docTemplate = `{
 				"caId": {
 					"type": "integer"
 				},
+				"certPath": {
+					"type": "string"
+				},
 				"certURL": {
 					"type": "string"
 				},
@@ -32805,6 +33500,9 @@ const docTemplate = `{
 				"privateKey": {
 					"type": "string"
 				},
+				"privateKeyPath": {
+					"type": "string"
+				},
 				"provider": {
 					"type": "string"
 				},
@@ -32837,115 +33535,6 @@ const docTemplate = `{
 						"$ref": "#/definitions/model.Website"
 					},
 					"type": "array"
-				}
-			},
-			"type": "object"
-		},
-		"websocket.ProcessConnect": {
-			"properties": {
-				"PID": {
-					"type": "integer"
-				},
-				"localaddr": {
-					"type": "object"
-				},
-				"name": {
-					"type": "string"
-				},
-				"remoteaddr": {
-					"type": "object"
-				},
-				"status": {
-					"type": "string"
-				},
-				"type": {
-					"type": "string"
-				}
-			},
-			"type": "object"
-		},
-		"websocket.PsProcessData": {
-			"properties": {
-				"PID": {
-					"type": "integer"
-				},
-				"PPID": {
-					"type": "integer"
-				},
-				"cmdLine": {
-					"type": "string"
-				},
-				"connects": {
-					"items": {
-						"$ref": "#/definitions/websocket.ProcessConnect"
-					},
-					"type": "array"
-				},
-				"cpuPercent": {
-					"type": "string"
-				},
-				"cpuValue": {
-					"type": "number"
-				},
-				"data": {
-					"type": "string"
-				},
-				"diskRead": {
-					"type": "string"
-				},
-				"diskWrite": {
-					"type": "string"
-				},
-				"envs": {
-					"items": {
-						"type": "string"
-					},
-					"type": "array"
-				},
-				"hwm": {
-					"type": "string"
-				},
-				"locked": {
-					"type": "string"
-				},
-				"name": {
-					"type": "string"
-				},
-				"numConnections": {
-					"type": "integer"
-				},
-				"numThreads": {
-					"type": "integer"
-				},
-				"openFiles": {
-					"items": {
-						"type": "object"
-					},
-					"type": "array"
-				},
-				"rss": {
-					"type": "string"
-				},
-				"rssValue": {
-					"type": "integer"
-				},
-				"stack": {
-					"type": "string"
-				},
-				"startTime": {
-					"type": "string"
-				},
-				"status": {
-					"type": "string"
-				},
-				"swap": {
-					"type": "string"
-				},
-				"username": {
-					"type": "string"
-				},
-				"vms": {
-					"type": "string"
 				}
 			},
 			"type": "object"

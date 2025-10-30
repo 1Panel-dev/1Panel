@@ -40,7 +40,7 @@ func (b *BaseApi) StopProcess(c *gin.Context) {
 // @Tags Process
 // @Summary Get Process Info By PID
 // @Param pid path int true "PID"
-// @Success 200 {object} websocket.PsProcessData
+// @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /process/{pid} [get]
