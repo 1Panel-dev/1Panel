@@ -220,7 +220,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, computed } from 'vue';
 import { loadMonitor, getNetworkOptions, getIOOptions } from '@/api/modules/host';
-import { computeSizeFromKBs, dateFormatWithoutYear } from '@/utils/util';
+import { computeSize, computeSizeFromKBs, dateFormat } from '@/utils/util';
 import i18n from '@/lang';
 import MonitorRouter from '@/views/host/monitor/index.vue';
 import { GlobalStore } from '@/store';
@@ -233,7 +233,6 @@ const mobile = computed(() => {
     return globalStore.isMobile();
 });
 
-const zoomStart = ref();
 const monitorBase = ref();
 const timeRangeGlobal = ref<[Date, Date]>([new Date(new Date().setHours(0, 0, 0, 0)), new Date()]);
 const timeRangeLoad = ref<[Date, Date]>([new Date(new Date().setHours(0, 0, 0, 0)), new Date()]);
@@ -304,41 +303,13 @@ const search = async (param: string) => {
             case 'base':
                 let baseDate = item.date.length === 0 ? loadEmptyDate(timeRangeCpu.value) : item.date;
                 baseDate = baseDate.map(function (item: any) {
-                    return dateFormatWithoutYear(item);
+                    return dateFormat(null, null, item);
                 });
                 if (param === 'cpu' || param === 'all') {
-                    let cpuData = item.value.map(function (item: any) {
-                        return item.cpu.toFixed(2);
-                    });
-                    cpuData = cpuData.length === 0 ? loadEmptyData() : cpuData;
-                    chartsOption.value['loadCPUChart'] = {
-                        xData: baseDate,
-                        yData: [
-                            {
-                                name: 'CPU',
-                                data: cpuData,
-                            },
-                        ],
-
-                        formatStr: '%',
-                    };
+                    initCPUCharts(baseDate, item);
                 }
                 if (param === 'memory' || param === 'all') {
-                    let memoryData = item.value.map(function (item: any) {
-                        return item.memory.toFixed(2);
-                    });
-                    memoryData = memoryData.length === 0 ? loadEmptyData() : memoryData;
-                    chartsOption.value['loadMemoryChart'] = {
-                        xData: baseDate,
-                        yData: [
-                            {
-                                name: i18n.global.t('monitor.memory'),
-                                data: memoryData,
-                            },
-                        ],
-
-                        formatStr: '%',
-                    };
+                    initMemCharts(baseDate, item);
                 }
                 if (param === 'load' || param === 'all') {
                     initLoadCharts(item);
@@ -348,38 +319,8 @@ const search = async (param: string) => {
                 initIOCharts(item);
                 break;
             case 'network':
-                let networkDate = item.date.length === 0 ? loadEmptyDate(timeRangeNetwork.value) : item.date;
-                networkDate = networkDate.map(function (item: any) {
-                    return dateFormatWithoutYear(item);
-                });
-                let networkUp = item.value.map(function (item: any) {
-                    return item.up.toFixed(2);
-                });
-                networkUp = networkUp.length === 0 ? loadEmptyData() : networkUp;
-                let networkOut = item.value.map(function (item: any) {
-                    return item.down.toFixed(2);
-                });
-                networkOut = networkOut.length === 0 ? loadEmptyData() : networkOut;
-
-                chartsOption.value['loadNetworkChart'] = {
-                    xData: networkDate,
-                    yData: [
-                        {
-                            name: i18n.global.t('monitor.up'),
-                            data: networkUp,
-                        },
-                        {
-                            name: i18n.global.t('monitor.down'),
-                            data: networkOut,
-                        },
-                    ],
-                    grid: {
-                        left: getSideWidth(true),
-                        right: getSideWidth(true),
-                        bottom: '20%',
-                    },
-                    formatStr: 'KB/s',
-                };
+                initNetCharts(item);
+                break;
         }
     }
 };
@@ -413,7 +354,7 @@ const loadIOOptions = async () => {
 function initLoadCharts(item: Host.MonitorData) {
     let itemLoadDate = item.date.length === 0 ? loadEmptyDate(timeRangeLoad.value) : item.date;
     let loadDate = itemLoadDate.map(function (item: any) {
-        return dateFormatWithoutYear(item);
+        return dateFormat(null, null, item);
     });
     let load1Data = item.value.map(function (item: any) {
         return item.cpuLoad1.toFixed(2);
@@ -428,9 +369,9 @@ function initLoadCharts(item: Host.MonitorData) {
     });
     load15Data = load15Data.length === 0 ? loadEmptyData() : load15Data;
     let loadUsage = item.value.map(function (item: any) {
-        return item.loadUsage.toFixed(2);
+        return { value: item.loadUsage.toFixed(2), top: item.topCPUItems, unit: '%' };
     });
-    loadUsage = loadUsage.length === 0 ? loadEmptyData() : loadUsage;
+    loadUsage = loadUsage.length === 0 ? loadTopEmptyData() : loadUsage;
     chartsOption.value['loadLoadChart'] = {
         xData: loadDate,
         yData: [
@@ -465,26 +406,109 @@ function initLoadCharts(item: Host.MonitorData) {
         tooltip: {
             trigger: 'axis',
             formatter: function (datas: any) {
-                let res = datas[0].name + '<br/>';
+                return withCPUProcess(datas);
+            },
+        },
+    };
+}
+
+function initCPUCharts(baseDate: any, items: Host.MonitorData) {
+    let data = items.value.map(function (item: any) {
+        return { value: item.cpu.toFixed(2), top: item.topCPUItems, unit: '%' };
+    });
+    data = data.length === 0 ? loadTopEmptyData() : data;
+    chartsOption.value['loadCPUChart'] = {
+        xData: baseDate,
+        yData: [
+            {
+                name: 'CPU',
+                data: data,
+            },
+        ],
+        tooltip: {
+            trigger: 'axis',
+            formatter: function (datas: any) {
+                return withCPUProcess(datas);
+            },
+        },
+
+        formatStr: '%',
+    };
+}
+
+function initMemCharts(baseDate: any, items: Host.MonitorData) {
+    let data = items.value.map(function (item: any) {
+        return { value: item.memory.toFixed(2), top: item.topMemItems };
+    });
+    data = data.length === 0 ? loadTopEmptyData() : data;
+    chartsOption.value['loadMemoryChart'] = {
+        xData: baseDate,
+        yData: [
+            {
+                name: i18n.global.t('monitor.memory'),
+                data: data,
+            },
+        ],
+        tooltip: {
+            trigger: 'axis',
+            formatter: function (datas: any) {
+                return withMemProcess(datas);
+            },
+        },
+
+        formatStr: '%',
+    };
+}
+
+function initNetCharts(item: Host.MonitorData) {
+    let networkDate = item.date.length === 0 ? loadEmptyDate(timeRangeNetwork.value) : item.date;
+    let date = networkDate.map(function (item: any) {
+        return dateFormat(null, null, item);
+    });
+    let networkUp = item.value.map(function (item: any) {
+        return item.up.toFixed(2);
+    });
+    networkUp = networkUp.length === 0 ? loadEmptyData() : networkUp;
+    let networkOut = item.value.map(function (item: any) {
+        return item.down.toFixed(2);
+    });
+    networkOut = networkOut.length === 0 ? loadEmptyData() : networkOut;
+
+    chartsOption.value['loadNetworkChart'] = {
+        xData: date,
+        yData: [
+            {
+                name: i18n.global.t('monitor.up'),
+                data: networkUp,
+            },
+            {
+                name: i18n.global.t('monitor.down'),
+                data: networkOut,
+            },
+        ],
+        tooltip: {
+            trigger: 'axis',
+            formatter: function (datas: any) {
+                let res = loadDate(datas[0].name);
                 for (const item of datas) {
-                    if (item.seriesName === i18n.global.t('monitor.resourceUsage')) {
-                        res +=
-                            item.marker + ' ' + item.seriesName + i18n.global.t('commons.colon') + item.data + '%<br/>';
-                    } else {
-                        res +=
-                            item.marker + ' ' + item.seriesName + i18n.global.t('commons.colon') + item.data + '<br/>';
-                    }
+                    res += loadSeries(item, computeSizeFromKBs(item.data), '');
                 }
                 return res;
             },
         },
+        grid: {
+            left: getSideWidth(true),
+            right: getSideWidth(true),
+            bottom: '20%',
+        },
+        formatStr: 'KB/s',
     };
 }
 
 function initIOCharts(item: Host.MonitorData) {
     let itemIODate = item.date?.length === 0 ? loadEmptyDate(timeRangeIO.value) : item.date;
     let ioDate = itemIODate.map(function (item: any) {
-        return dateFormatWithoutYear(item);
+        return dateFormat(null, null, item);
     });
     let ioRead = item.value.map(function (item: any) {
         return Number((item.read / 1024).toFixed(2));
@@ -527,41 +551,19 @@ function initIOCharts(item: Host.MonitorData) {
         tooltip: {
             trigger: 'axis',
             formatter: function (datas: any) {
-                let res = datas[0].name + '<br/>';
+                let res = loadDate(datas[0].name);
                 for (const item of datas) {
                     if (
                         item.seriesName === i18n.global.t('monitor.read') ||
                         item.seriesName === i18n.global.t('monitor.write')
                     ) {
-                        res +=
-                            item.marker +
-                            ' ' +
-                            item.seriesName +
-                            i18n.global.t('commons.colon') +
-                            computeSizeFromKBs(item.data) +
-                            '<br/>';
+                        res += loadSeries(item, computeSizeFromKBs(item.data), '');
                     }
                     if (item.seriesName === i18n.global.t('monitor.readWriteCount')) {
-                        res +=
-                            item.marker +
-                            ' ' +
-                            item.seriesName +
-                            i18n.global.t('commons.colon') +
-                            item.data +
-                            ' ' +
-                            i18n.global.t('commons.units.time') +
-                            '/s' +
-                            '<br/>';
+                        res += loadSeries(item, item.data, i18n.global.t('commons.units.time') + '/s');
                     }
                     if (item.seriesName === i18n.global.t('monitor.readWriteTime')) {
-                        res +=
-                            item.marker +
-                            ' ' +
-                            item.seriesName +
-                            i18n.global.t('commons.colon') +
-                            item.data +
-                            ' ms' +
-                            '<br/>';
+                        res += loadSeries(item, item.data, ' ms');
                     }
                 }
                 return res;
@@ -593,13 +595,122 @@ function loadEmptyDate(timeRange: any) {
 function loadEmptyData() {
     return [0, 0];
 }
+function loadTopEmptyData() {
+    return [{ value: 0, top: 0, unit: '' }];
+}
+
+function withCPUProcess(datas: any) {
+    let tops;
+    let res = loadDate(datas[0].name);
+    for (const item of datas) {
+        if (item.data?.top) {
+            tops = item.data?.top;
+        }
+        res += loadSeries(item, item.data.value ? item.data.value : item.data, item.data.unit || '');
+    }
+    if (!tops) {
+        return '';
+    }
+    res += `
+        <div style="margin-top: 10px; border-bottom: 1px dashed black;"></div>
+        <table style="border-collapse: collapse; margin-top: 20px; font-size: 12px;">
+        <thead>
+            <tr>
+            <th style="padding: 6px 8px;">PID</th>
+            <th style="padding: 6px 8px;">${i18n.global.t('commons.table.user')}</th>
+            <th style="padding: 6px 8px;">${i18n.global.t('menu.process')}</th>
+            <th style="padding: 6px 8px;">${i18n.global.t('monitor.percent')}</th>
+            </tr>
+        </thead>
+        <tbody>
+    `;
+    for (const row of tops) {
+        res += `
+            <tr>
+                <td style="padding: 6px 8px; text-align: center;">
+                    ${row.pid}
+                </td>
+                <td style="padding: 6px 8px; text-align: center;">
+                    ${row.user}
+                </td>
+                <td style="padding: 6px 8px; text-align: center;">
+                    ${row.name}
+                </td>
+                <td style="padding: 6px 8px; text-align: center;">
+                    ${row.percent.toFixed(2)}%
+                </td>
+            </tr>
+        `;
+    }
+    return res;
+}
+
+function withMemProcess(datas: any) {
+    let res = loadDate(datas[0].name);
+    for (const item of datas) {
+        res += loadSeries(item, item.data.value ? item.data.value : item.data, ' %');
+    }
+    if (!datas[0].data.top) {
+        return res;
+    }
+    res += `
+        <div style="margin-top: 10px; border-bottom: 1px dashed black;"></div>
+        <table style="border-collapse: collapse; margin-top: 20px; font-size: 12px;">
+        <thead>
+            <tr>
+                <th style="padding: 6px 8px;">PID</th>
+                <th style="padding: 6px 8px;">${i18n.global.t('commons.table.user')}</th>
+                <th style="padding: 6px 8px;">${i18n.global.t('menu.process')}</th>
+                <th style="padding: 6px 8px;">${i18n.global.t('monitor.memory')}</th>
+                <th style="padding: 6px 8px;">${i18n.global.t('monitor.percent')}</th>
+            </tr>
+        </thead>
+        <tbody>
+    `;
+    for (const item of datas) {
+        for (const row of item.data.top) {
+            res += `
+                  <tr>
+                    <td style="padding: 6px 8px; text-align: center;">
+                      <span style="display: inline-block;"></span>
+                      ${row.pid}
+                    </td>
+                    <td style="padding: 6px 8px; text-align: center;">
+                      ${row.user}
+                    </td>
+                    <td style="padding: 6px 8px; text-align: center;">
+                      ${row.name}
+                    </td>
+                    <td style="padding: 6px 8px; text-align: center;">
+                      ${computeSize(row.memory)}
+                    </td>
+                    <td style="padding: 6px 8px; text-align: center;">
+                      ${row.percent.toFixed(2)}%
+                    </td>
+                  </tr>
+                `;
+        }
+    }
+    return res;
+}
+
+function loadDate(name: any) {
+    return ` <div style="display: inline-block; width: 100%; padding-bottom: 10px;">
+                ${i18n.global.t('commons.search.date')}: ${name}
+            </div>`;
+}
+
+function loadSeries(item: any, data: any, unit: any) {
+    return `<div style="width: 100%;">
+                ${item.marker} ${item.seriesName}: ${data} ${unit}
+            </div>`;
+}
 
 function getSideWidth(b: boolean) {
     return !b || document.body.clientWidth > 1600 ? '7%' : '10%';
 }
 
 onMounted(() => {
-    zoomStart.value = dateFormatWithoutYear(new Date(new Date().setHours(0, 0, 0, 0)));
     loadNetworkOptions();
     loadIOOptions();
 });

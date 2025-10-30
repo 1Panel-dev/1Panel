@@ -659,3 +659,10 @@ var UpdateMonitorInterval = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddMonitorProcess = &gormigrate.Migration{
+	ID: "20251030-add-monitor-process",
+	Migrate: func(tx *gorm.DB) error {
+		return global.MonitorDB.AutoMigrate(&model.MonitorBase{})
+	},
+}

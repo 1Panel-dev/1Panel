@@ -101,6 +101,7 @@ const message = {
             timeRange: 'До',
             dateStart: 'Дата начала',
             dateEnd: 'Дата окончания',
+            date: 'Дата',
         },
         table: {
             all: 'Все',
@@ -1186,7 +1187,10 @@ const message = {
         today: 'Сегодня',
         yesterday: 'Вчера',
         lastNDay: 'Последние {0} дней',
+        lastNMonth: 'Последние {0} месяцев',
+        lastHalfYear: 'Последние полгода',
         memory: 'Память',
+        percent: 'Процент',
         cache: 'Кэш',
         disk: 'Диск',
         network: 'Сеть',
