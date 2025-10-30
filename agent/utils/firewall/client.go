@@ -41,11 +41,5 @@ func NewFirewallClient() (FirewallClient, error) {
 	if ufw {
 		return client.NewUfw()
 	}
-
-	iptables := cmd.Which("iptables")
-	if iptables {
-		return client.NewIptablesFw()
-	}
-
 	return nil, errors.New("No system firewalld or ufw service detected, please check and try again!")
 }
