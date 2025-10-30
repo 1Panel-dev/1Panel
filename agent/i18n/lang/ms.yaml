@@ -149,6 +149,11 @@ ErrRuntimeNoPort: "Persekitaran runtime tidak diset dengan port, sila edit perse
 Status: 'Status'
 start: 'Mulakan'
 stop: 'Berhenti'
+restart: 'Mulakan Semula'
+kill: 'Hentikan Paksa'
+pause: 'Jeda'
+unpause: 'Sambung Semula'
+remove: 'Padam'
 delete: 'Padam'
 ErrDefaultWebsite: 'Laman web lalai telah ditetapkan, sila batalkan sebelum menetapkan!'
 
@@ -343,6 +348,8 @@ TaskBuild: 'Bina'
 TaskPush: 'Tolak'
 TaskClean: "Pembersihan"
 TaskHandle: 'Laksanakan'
+TaskImport: "Import"
+TaskExport: "Eksport"
 Website: 'Laman web'
 App: 'Aplikasi'
 Runtime: 'Persekitaran masa jalan'

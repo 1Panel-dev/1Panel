@@ -21,23 +21,28 @@
         </template>
     </DrawerPro>
     <FileList ref="fileRef" @choose="loadLoadDir" />
+    <TaskLog ref="taskLogRef" width="70%" />
 </template>
 
 <script lang="ts" setup>
 import FileList from '@/components/file-list/index.vue';
 import { reactive, ref } from 'vue';
 import { Rules } from '@/global/form-rules';
+import TaskLog from '@/components/log/task/index.vue';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { imageLoad } from '@/api/modules/container';
 import { MsgSuccess } from '@/utils/message';
+import { newUUID } from '@/utils/util';
 
 const loading = ref(false);
 const fileRef = ref();
+const taskLogRef = ref();
 
 const loadVisible = ref(false);
 const form = reactive({
     path: '',
+    taskID: '',
 });
 
 const acceptParams = () => {
@@ -58,10 +63,12 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     formEl.validate(async (valid) => {
         if (!valid) return;
         loading.value = true;
+        form.taskID = newUUID();
         await imageLoad(form)
             .then(() => {
                 loading.value = false;
                 loadVisible.value = false;
+                openTaskLog(form.taskID);
                 emit('search');
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             })
@@ -69,6 +76,10 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
                 loading.value = false;
             });
     });
+};
+
+const openTaskLog = (taskID: string) => {
+    taskLogRef.value.openWithTaskID(taskID);
 };
 
 const loadLoadDir = async (path: string) => {

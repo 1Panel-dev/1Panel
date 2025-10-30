@@ -145,6 +145,11 @@ ErrRuntimeNoPort: "ランタイム環境にポートが設定されていませ�
 Status: 'ステータス'
 start: '開始'
 stop: '停止'
+restart: '再起動'
+kill: '強制停止'
+pause: '一時停止'
+unpause: '再開'
+remove: '削除'
 delete: '削除'
 ErrDefaultWebsite: 'デフォルト Web サイトが既に設定されています。設定する前にキャンセルしてください！'
 
@@ -342,6 +347,8 @@ TaskBuild: 'ビルド'
 TaskPush: 'プッシュ'
 TaskClean: "クリーンアップ"
 TaskHandle: '実行'
+TaskImport: "インポート"
+TaskExport: "エクスポート"
 Website: 'ウェブサイト'
 App: 'アプリケーション'
 Runtime: 'ランタイム環境'

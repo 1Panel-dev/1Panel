@@ -149,6 +149,11 @@ ErrRuntimeNoPort: "Среда выполнения не настроена с п
 Status: 'Статус'
 start: 'Запустить'
 stop: 'Остановить'
+restart: 'Перезапустить'
+kill: 'Принудительно Остановить'
+pause: 'Приостановить'
+unpause: 'Возобновить'
+remove: 'Удалить'
 delete: 'Удалить'
 ErrDefaultWebsite: 'Веб-сайт по умолчанию уже установлен, отмените его перед настройкой!'
 
@@ -343,6 +348,8 @@ TaskCommit: 'Kоммит'
 TaskPush: 'Push'
 TaskClean: "Очистка"
 TaskHandle: 'Выполнить'
+TaskImport: "Импорт"
+TaskExport: "Экспорт"
 Website: 'Be6-сайт'
 App: 'Приложение'
 Runtime: 'Среда выполнения'

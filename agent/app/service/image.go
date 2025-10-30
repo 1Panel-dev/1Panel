@@ -308,51 +308,72 @@ func (u *ImageService) ImagePull(req dto.ImagePull) error {
 }
 
 func (u *ImageService) ImageLoad(req dto.ImageLoad) error {
-	file, err := os.Open(req.Path)
+	taskItem, err := task.NewTaskWithOps(req.Path, task.TaskImport, task.TaskScopeImage, req.TaskID, 1)
 	if err != nil {
-		return err
+		return fmt.Errorf("new task for image import failed, err: %v", err)
 	}
-	defer file.Close()
-	client, err := docker.NewDockerClient()
-	if err != nil {
-		return err
-	}
-	defer client.Close()
-	res, err := client.ImageLoad(context.TODO(), file)
-	if err != nil {
-		return err
-	}
-	defer res.Body.Close()
-	content, err := io.ReadAll(res.Body)
-	if err != nil {
-		return err
-	}
-	if strings.Contains(string(content), "Error") {
-		return errors.New(string(content))
-	}
+	taskItem.AddSubTask(i18n.GetWithName("TaskImport", req.Path), func(t *task.Task) error {
+		file, err := os.Open(req.Path)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+		client, err := docker.NewDockerClient()
+		if err != nil {
+			return err
+		}
+		defer client.Close()
+		res, err := client.ImageLoad(context.TODO(), file)
+		if err != nil {
+			return err
+		}
+		defer res.Body.Close()
+		content, err := io.ReadAll(res.Body)
+		if err != nil {
+			return err
+		}
+		if strings.Contains(string(content), "Error") {
+			return errors.New(string(content))
+		}
+		return nil
+	}, nil)
+	go func() {
+		_ = taskItem.Execute()
+	}()
 	return nil
 }
 
 func (u *ImageService) ImageSave(req dto.ImageSave) error {
-	client, err := docker.NewDockerClient()
+	taskItem, err := task.NewTaskWithOps(req.Name, task.TaskExport, task.TaskScopeImage, req.TaskID, 1)
 	if err != nil {
-		return err
+		return fmt.Errorf("new task for image export failed, err: %v", err)
 	}
-	defer client.Close()
+	taskItem.AddSubTask(i18n.GetWithName("TaskExport", req.Name), func(t *task.Task) error {
+		taskItem.Log(req.TagName)
+		client, err := docker.NewDockerClient()
+		if err != nil {
+			return err
+		}
+		defer client.Close()
 
-	out, err := client.ImageSave(context.TODO(), []string{req.TagName})
-	if err != nil {
-		return err
-	}
-	defer out.Close()
-	file, err := os.OpenFile(fmt.Sprintf("%s/%s.tar", req.Path, req.Name), os.O_WRONLY|os.O_CREATE|os.O_EXCL, constant.FilePerm)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-	if _, err = io.Copy(file, out); err != nil {
-		return err
-	}
+		out, err := client.ImageSave(context.TODO(), []string{req.TagName})
+		if err != nil {
+			return err
+		}
+		defer out.Close()
+		file, err := os.OpenFile(fmt.Sprintf("%s/%s.tar", req.Path, req.Name), os.O_WRONLY|os.O_CREATE|os.O_EXCL, constant.FilePerm)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+		if _, err = io.Copy(file, out); err != nil {
+			return err
+		}
+		return nil
+	}, nil)
+	go func() {
+		_ = taskItem.Execute()
+	}()
 	return nil
 }
 

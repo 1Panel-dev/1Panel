@@ -35,6 +35,7 @@
         </template>
     </DrawerPro>
     <FileList ref="fileRef" @choose="loadSaveDir" />
+    <TaskLog ref="taskLogRef" width="70%" />
 </template>
 
 <script lang="ts" setup>
@@ -45,13 +46,17 @@ import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { imageSave } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
+import TaskLog from '@/components/log/task/index.vue';
 import { MsgSuccess } from '@/utils/message';
+import { newUUID } from '@/utils/util';
 
 const loading = ref(false);
 const fileRef = ref();
+const taskLogRef = ref();
 
 const drawerVisible = ref(false);
 const form = reactive({
+    taskID: '',
     tags: [] as Array<string>,
     tagName: '',
     path: '',
@@ -89,17 +94,23 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     formEl.validate(async (valid) => {
         if (!valid) return;
         loading.value = true;
+        form.taskID = newUUID();
         await imageSave(form)
             .then(() => {
                 loading.value = false;
                 drawerVisible.value = false;
                 emit('search');
+                openTaskLog(form.taskID);
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             })
             .catch(() => {
                 loading.value = false;
             });
     });
+};
+
+const openTaskLog = (taskID: string) => {
+    taskLogRef.value.openWithTaskID(taskID);
 };
 
 const loadSaveDir = async (path: string) => {

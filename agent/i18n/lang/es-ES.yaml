@@ -145,6 +145,11 @@ ErrRuntimeNoPort: "El entorno de ejecución no tiene configurado un puerto, edí
 Status: 'Estado'
 start: 'Iniciar'
 stop: 'Detener'
+restart: 'Reiniciar'
+kill: 'Detener Forzosamente'
+pause: 'Pausar'
+unpause: 'Reanudar'
+remove: 'Eliminar'
 delete: 'Eliminar'
 ErrDefaultWebsite: 'El sitio web predeterminado ya está configurado, ¡cancélelo antes de configurar!'
 
@@ -341,6 +346,8 @@ TaskCommit: 'Commit'
 TaskBuild: 'Construir'
 TaskPush: 'Subir'
 TaskHandle: 'Ejecutar'
+TaskImport: "Importar"
+TaskExport: "Exportar"
 Website: 'Sitio web'
 App: 'Aplicación'
 Runtime: 'Entorno de ejecución'

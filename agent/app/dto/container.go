@@ -153,6 +153,7 @@ type PortHelper struct {
 }
 
 type ContainerOperation struct {
+	TaskID    string   `json:"taskID"`
 	Names     []string `json:"names" validate:"required"`
 	Operation string   `json:"operation" validate:"required,oneof=up start stop restart kill pause unpause remove"`
 }

@@ -146,6 +146,11 @@ ErrRuntimeNoPort: "The runtime environment is not set with a port, please edit t
 Status: 'Status'
 start: 'Start'
 stop: 'Stop'
+restart: 'Restart'
+kill: 'Force Stop'
+pause: 'Pause'
+unpause: 'Resume'
+remove: 'Delete'
 delete: 'Delete'
 ErrDefaultWebsite: 'Default website has been set, please cancel it before setting!'
 
@@ -343,6 +348,8 @@ TaskBuild: 'Build'
 TaskPush: 'Push'
 TaskClean: "Cleanup"
 TaskHandle: 'Execute'
+TaskImport: "Import"
+TaskExport: "Export"
 Website: 'Website'
 App: 'Application'
 Runtime: 'Runtime environment'

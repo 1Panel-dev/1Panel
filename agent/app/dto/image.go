@@ -18,7 +18,8 @@ type ImageInfo struct {
 }
 
 type ImageLoad struct {
-	Path string `json:"path" validate:"required"`
+	TaskID string `json:"taskID"`
+	Path   string `json:"path" validate:"required"`
 }
 
 type ImageBuild struct {
@@ -48,6 +49,7 @@ type ImagePush struct {
 }
 
 type ImageSave struct {
+	TaskID  string `json:"taskID"`
 	TagName string `json:"tagName" validate:"required"`
 	Path    string `json:"path" validate:"required"`
 	Name    string `json:"name" validate:"required"`

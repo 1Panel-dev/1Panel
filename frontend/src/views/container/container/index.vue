@@ -335,7 +335,7 @@
             </template>
         </LayoutContent>
 
-        <OpDialog ref="opRef" @search="search" />
+        <OpDialog ref="opRef" @search="search" @submit="onSubmitOperate" />
 
         <ContainerInspectDialog ref="containerInspectRef" />
         <PruneDialog @search="search" ref="dialogPruneRef" />
@@ -348,6 +348,7 @@
         <TerminalDialog ref="dialogTerminalRef" />
 
         <PortJumpDialog ref="dialogPortJumpRef" />
+        <TaskLog ref="taskLogRef" width="70%" />
     </div>
 </template>
 
@@ -360,6 +361,7 @@ import MonitorDialog from '@/views/container/container/monitor/index.vue';
 import TerminalDialog from '@/views/container/container/terminal/index.vue';
 import ContainerInspectDialog from '@/views/container/container/inspect/index.vue';
 import PortJumpDialog from '@/components/port-jump/index.vue';
+import TaskLog from '@/components/log/task/index.vue';
 import DockerStatus from '@/views/container/docker-status/index.vue';
 import ContainerLogDialog from '@/components/log/container-drawer/index.vue';
 import Status from '@/components/status/index.vue';
@@ -373,10 +375,11 @@ import {
 } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
 import i18n from '@/lang';
-import { MsgWarning } from '@/utils/message';
+import { MsgSuccess, MsgWarning } from '@/utils/message';
 import { GlobalStore } from '@/store';
 import { routerToName, routerToNameWithQuery } from '@/utils/router';
 import router from '@/routers';
+import { newUUID } from '@/utils/util';
 const globalStore = GlobalStore();
 
 const mobile = computed(() => {
@@ -404,6 +407,10 @@ const dialogPortJumpRef = ref();
 const opRef = ref();
 const includeAppStore = ref(true);
 const columns = ref([]);
+
+const batchNames = ref();
+const batchOp = ref();
+const taskLogRef = ref();
 
 const tags = ref([]);
 const activeTag = ref('all');
@@ -658,9 +665,10 @@ const checkStatus = (operation: string, row: Container.ContainerInfo | null) => 
 const onOperate = async (op: string, row: Container.ContainerInfo | null) => {
     let opList = row ? [row] : selects.value;
     let msg = i18n.global.t('container.operatorHelper', [i18n.global.t('container.' + op)]);
-    let names = [];
+    batchNames.value = [];
+    batchOp.value = op;
     for (const item of opList) {
-        names.push(item.name);
+        batchNames.value.push(item.name);
         if (item.isFromApp) {
             msg = i18n.global.t('container.operatorAppHelper', [i18n.global.t('container.' + op)]);
         }
@@ -668,12 +676,31 @@ const onOperate = async (op: string, row: Container.ContainerInfo | null) => {
     const successMsg = `${i18n.global.t('container.' + op)}${i18n.global.t('commons.status.success')}`;
     opRef.value.acceptParams({
         title: i18n.global.t('container.' + op),
-        names: names,
+        names: batchNames.value,
         msg: msg,
-        api: containerOperator,
-        params: { names: names, operation: op },
+        api: null,
+        params: null,
         successMsg,
     });
+};
+
+const onSubmitOperate = async () => {
+    loading.value = true;
+    let taskID = newUUID();
+    await containerOperator({ names: batchNames.value, operation: batchOp.value, taskID: taskID })
+        .then(() => {
+            loading.value = false;
+            search();
+            openTaskLog(taskID);
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+        })
+        .catch(() => {
+            loading.value = false;
+        });
+};
+
+const openTaskLog = (taskID: string) => {
+    taskLogRef.value.openWithTaskID(taskID);
 };
 
 const buttons = [

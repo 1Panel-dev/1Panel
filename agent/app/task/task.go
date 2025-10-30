@@ -65,6 +65,8 @@ const (
 	TaskSync      = "TaskSync"
 	TaskBuild     = "TaskBuild"
 	TaskPull      = "TaskPull"
+	TaskImport    = "TaskImport"
+	TaskExport    = "TaskExport"
 	TaskCommit    = "TaskCommit"
 	TaskPush      = "TaskPush"
 	TaskClean     = "TaskClean"

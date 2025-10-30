@@ -2,6 +2,7 @@ import { ReqPage } from '.';
 
 export namespace Container {
     export interface ContainerOperate {
+        taskID: string;
         names: Array<string>;
         operation: string;
     }
@@ -196,9 +197,11 @@ export namespace Container {
         tagName: string;
     }
     export interface ImageLoad {
+        taskID: string;
         path: string;
     }
     export interface ImageSave {
+        taskID: string;
         tagName: string;
         path: string;
         name: string;
