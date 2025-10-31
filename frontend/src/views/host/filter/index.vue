@@ -5,17 +5,14 @@
                 <div class="flex w-full flex-col gap-4 md:flex-row">
                     <div class="flex flex-wrap gap-4 ml-3">
                         <el-tag effect="dark" type="success">{{ 'iptables v' + iptablesVersion }}</el-tag>
+                        <el-tag :type="inputChainInfo?.isApplied ? 'success' : 'info'" size="small">
+                            {{ inputChainInfo?.isApplied ? $t('firewall.applied') : $t('firewall.notApplied') }}
+                        </el-tag>
                     </div>
                 </div>
             </el-card>
             <div>
                 <LayoutContent :title="$t('firewall.filterRule')">
-                    <template #prompt>
-                        <el-alert type="info" :closable="false">
-                            <span>{{ $t('firewall.filterHelper') }}</span>
-                        </el-alert>
-                    </template>
-
                     <template #leftToolBar>
                         <el-button type="primary" @click="onOpenDialog('create')" :disabled="!isCustomChain">
                             {{ $t('commons.button.create') }}{{ $t('firewall.filterRule') }}
@@ -37,10 +34,10 @@
                     <template #rightToolBar>
                         <el-select v-model="selectedChain" @change="search()" clearable class="p-w-200">
                             <template #prefix>{{ $t('firewall.chain') }}</template>
+                            <el-option :label="$t('firewall.inboundDirection')" value="1PANEL_INPUT"></el-option>
+                            <el-option :label="$t('firewall.outboundDirection')" value="1PANEL_OUTPUT"></el-option>
                             <el-option label="INPUT" value="INPUT"></el-option>
                             <el-option label="OUTPUT" value="OUTPUT"></el-option>
-                            <el-option label="1PANEL_INPUT" value="1PANEL_INPUT"></el-option>
-                            <el-option label="1PANEL_OUTPUT" value="1PANEL_OUTPUT"></el-option>
                         </el-select>
                         <TableRefresh @search="search()" />
                         <TableSetting title="firewall-filter-refresh" @search="search()" />
@@ -52,16 +49,7 @@
                             <el-col :span="12">
                                 <el-card>
                                     <div class="chain-card">
-                                        <div class="chain-title">
-                                            INPUT {{ $t('firewall.chain') }}
-                                            <el-tag :type="inputChainInfo?.isApplied ? 'success' : 'info'" size="small">
-                                                {{
-                                                    inputChainInfo?.isApplied
-                                                        ? $t('firewall.applied')
-                                                        : $t('firewall.notApplied')
-                                                }}
-                                            </el-tag>
-                                        </div>
+                                        <div class="chain-title">{{ $t('firewall.inboundDirection') }}</div>
                                         <div class="chain-policy">
                                             {{ $t('firewall.defaultPolicy') }}:
                                             {{ inputChainInfo?.defaultPolicy || 'ACCEPT' }}
@@ -72,19 +60,7 @@
                             <el-col :span="12">
                                 <el-card>
                                     <div class="chain-card">
-                                        <div class="chain-title">
-                                            OUTPUT {{ $t('firewall.chain') }}
-                                            <el-tag
-                                                :type="outputChainInfo?.isApplied ? 'success' : 'info'"
-                                                size="small"
-                                            >
-                                                {{
-                                                    outputChainInfo?.isApplied
-                                                        ? $t('firewall.applied')
-                                                        : $t('firewall.notApplied')
-                                                }}
-                                            </el-tag>
-                                        </div>
+                                        <div class="chain-title">{{ $t('firewall.outboundDirection') }}</div>
                                         <div class="chain-policy">
                                             {{ $t('firewall.defaultPolicy') }}:
                                             {{ outputChainInfo?.defaultPolicy || 'ACCEPT' }}
@@ -101,27 +77,31 @@
                             :data="data"
                             :heightDiff="520"
                         >
-                            <el-table-column v-if="isCustomChain" type="selection" fix />
+                            <el-table-column type="selection" fix />
                             <el-table-column :label="$t('firewall.ruleOrder')" :min-width="80" prop="ruleOrder" />
-                            <el-table-column :label="$t('commons.table.protocol')" :min-width="80" prop="protocol" />
+                            <el-table-column :label="$t('commons.table.protocol')" :min-width="80" prop="protocol">
+                                <template #default="{ row }">
+                                    <span>{{ row.protocol === '' ? 'ALL' : row.protocol.toUpperCase() }}</span>
+                                </template>
+                            </el-table-column>
                             <el-table-column :label="$t('firewall.sourceIP')" :min-width="120" prop="sourceIP">
                                 <template #default="{ row }">
-                                    <span>{{ row.sourceIP || '-' }}</span>
+                                    <span>{{ row.sourceIP || $t('firewall.anyWhere') }}</span>
                                 </template>
                             </el-table-column>
                             <el-table-column :label="$t('firewall.sourcePort')" :min-width="100" prop="sourcePort">
                                 <template #default="{ row }">
-                                    <span>{{ row.sourcePort || '-' }}</span>
+                                    <span>{{ formatPort(row.sourcePort) }}</span>
                                 </template>
                             </el-table-column>
                             <el-table-column :label="$t('firewall.destIP')" :min-width="120" prop="destIP">
                                 <template #default="{ row }">
-                                    <span>{{ row.destIP || '-' }}</span>
+                                    <span>{{ row.destIP || $t('firewall.anyWhere') }}</span>
                                 </template>
                             </el-table-column>
                             <el-table-column :label="$t('firewall.destPort')" :min-width="100" prop="destPort">
                                 <template #default="{ row }">
-                                    <span>{{ row.destPort || '-' }}</span>
+                                    <span>{{ formatPort(row.destPort) }}</span>
                                 </template>
                             </el-table-column>
                             <el-table-column :min-width="100" :label="$t('firewall.action')" prop="action">
@@ -178,6 +158,16 @@ const data = computed(() => {
     const chainInfo = chainInfoMap.value.get(selectedChain.value);
     return chainInfo?.rules || [];
 });
+
+const formatPort = (port?: number | null | string) => {
+    if (port === 0 || port === '0') {
+        return i18n.global.t('firewall.allPorts');
+    }
+    if (port === undefined || port === null || port === '') {
+        return '-';
+    }
+    return port;
+};
 
 const inputChainInfo = computed(() => chainInfoMap.value.get('INPUT'));
 const outputChainInfo = computed(() => chainInfoMap.value.get('OUTPUT'));

@@ -2875,6 +2875,9 @@ const message = {
         changeStrategyHelper:
             'Alterar a estratégia [{1}] {0} para [{2}]. Após a definição, {0} acessará {2} externamente. Deseja continuar?',
         portHelper: 'Várias portas podem ser inseridas, ex.: 80,81, ou faixas de portas, ex.: 80-88',
+        allPorts: 'Todas as portas',
+        ruleTemplate: 'Modelo de regra',
+
         strategy: 'Estratégia',
         accept: 'Aceitar',
         drop: 'Bloquear',
@@ -2895,6 +2898,8 @@ const message = {
         createIpRule: '@:commons.button.create @:firewall.ipRule',
         userAgent: 'Filtro User-Agent',
         sourcePort: 'Porta de origem',
+        inboundDirection: 'Entrada',
+        outboundDirection: 'Saída',
         targetIP: 'IP de destino',
         targetPort: 'Porta de destino',
         forwardHelper1:

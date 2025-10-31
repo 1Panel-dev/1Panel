@@ -2887,6 +2887,9 @@ const message = {
         changeStrategyHelper:
             'Change [{1}] {0} strategy to [{2}]. After setting, {0} will access {2} externally. Do you want to continue?',
         portHelper: 'Multiple ports can be entered, e.g. 80,81, or range ports, e.g. 80-88',
+        allPorts: 'All Ports',
+        ruleTemplate: 'Rule template',
+
         strategy: 'Strategy',
         accept: 'Accept',
         drop: 'Drop',
@@ -2907,6 +2910,8 @@ const message = {
         createIpRule: '@:commons.button.create @:firewall.ipRule',
         userAgent: 'User-Agent filter',
         sourcePort: 'Source port',
+        inboundDirection: 'Inbound',
+        outboundDirection: 'Outbound',
         targetIP: 'Destination IP',
         targetPort: 'Destination port',
         forwardHelper1: 'If you want to forward to the local port, the destination IP should be set to "127.0.0.1".',

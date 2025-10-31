@@ -2870,6 +2870,9 @@ const message = {
         changeStrategyHelper:
             'Tukar strategi {0} [{1}] kepada [{2}]. Selepas tetapan, {0} akan mengakses {2} secara luaran. Adakah anda mahu meneruskan?',
         portHelper: 'Pelbagai port boleh dimasukkan, contohnya 80,81, atau rentang port, contohnya 80-88',
+        allPorts: 'Semua port',
+        ruleTemplate: 'Templat peraturan',
+
         strategy: 'Strategi',
         accept: 'Terima',
         drop: 'Lumpuhkan',
@@ -2890,6 +2893,8 @@ const message = {
         createIpRule: '@:commons.button.create @:firewall.ipRule',
         userAgent: 'Penapis User-Agent',
         sourcePort: 'Port sumber',
+        inboundDirection: 'Masuk',
+        outboundDirection: 'Keluar',
         targetIP: 'IP sasaran',
         targetPort: 'Port sasaran',
         forwardHelper1: 'Jika anda ingin memajukan ke port tempatan, IP sasaran harus ditetapkan kepada "127.0.0.1".',

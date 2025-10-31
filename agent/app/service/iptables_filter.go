@@ -138,14 +138,14 @@ func (s *IptablesFilterService) GetFilterRules(chains []string) ([]dto.IptablesC
 
 func (s *IptablesFilterService) AddRule(req dto.IptablesFilterRuleOperate) error {
 	if req.Chain != Chain1PanelInput && req.Chain != Chain1PanelOutput {
-		return fmt.Errorf("只允许操作 %s 或 %s 链", Chain1PanelInput, Chain1PanelOutput)
+		return fmt.Errorf("Only %s or %s chains are allowed", Chain1PanelInput, Chain1PanelOutput)
 	}
 
 	// 安全检查：防止无条件 DROP/REJECT
 	if (req.Action == "DROP" || req.Action == "REJECT") &&
 		req.Protocol == "" && req.SourceIP == "" && req.DestIP == "" &&
 		req.SourcePort == 0 && req.DestPort == 0 {
-		return fmt.Errorf("不允许添加无条件 %s 规则，这会锁定系统", req.Action)
+		return fmt.Errorf("Iptables Rule Security Check: unconditional %s rules are not allowed, this may lock you out of the system", req.Action)
 	}
 
 	ctx := context.Background()
@@ -298,7 +298,7 @@ func (s *IptablesFilterService) ApplyFirewall() error {
 			if (p.Action == "DROP" || p.Action == "REJECT") &&
 				p.Protocol == "" && p.SourceIP == "" && p.DestIP == "" &&
 				p.SrcPort == 0 && p.DstPort == 0 {
-				return fmt.Errorf("链 %s 包含无条件 %s 规则，不允许应用", Chain1PanelInput, p.Action)
+				return fmt.Errorf("Chain %s includes unconditional %s rule, not allowed to apply", Chain1PanelInput, p.Action)
 			}
 			item = item.Next()
 		}
@@ -312,59 +312,21 @@ func (s *IptablesFilterService) ApplyFirewall() error {
 			if (p.Action == "DROP" || p.Action == "REJECT") &&
 				p.Protocol == "" && p.SourceIP == "" && p.DestIP == "" &&
 				p.SrcPort == 0 && p.DstPort == 0 {
-				return fmt.Errorf("链 %s 包含无条件 %s 规则，不允许应用", Chain1PanelOutput, p.Action)
+				return fmt.Errorf("Chain %s includes unconditional %s rule, not allowed to apply", Chain1PanelOutput, p.Action)
 			}
 			item = item.Next()
 		}
 	}
 
-	// 检查 INPUT 链是否已有跳转规则
-	inputChains, _ := s.iptablesClient.ReadFilter([]string{ChainInput})
-	hasInputRule := false
-	if inputChain, ok := inputChains[ChainInput]; ok {
-		item := inputChain.FirstRule
-		for item != nil {
-			if item.P.Action == Chain1PanelInput {
-				hasInputRule = true
-				break
-			}
-			item = item.Next()
-		}
+	if err := s.iptablesClient.Setup1PanelFirewallChains("input"); err != nil {
+		return fmt.Errorf("failed to apply %s to %s: %w", Chain1PanelInput, ChainInput, err)
 	}
+	global.LOG.Infof("Applied %s to %s chain", Chain1PanelInput, ChainInput)
 
-	// 应用到 INPUT 链
-	if !hasInputRule {
-		if err := s.iptablesClient.Run(client.FilterTab, fmt.Sprintf("-I %s 1 -j %s", ChainInput, Chain1PanelInput)); err != nil {
-			return fmt.Errorf("failed to apply %s to %s: %w", Chain1PanelInput, ChainInput, err)
-		}
-		global.LOG.Infof("Applied %s to %s chain", Chain1PanelInput, ChainInput)
-	} else {
-		global.LOG.Infof("%s already applied to %s chain", Chain1PanelInput, ChainInput)
+	if err := s.iptablesClient.Setup1PanelFirewallChains("output"); err != nil {
+		return fmt.Errorf("failed to apply %s to %s: %w", Chain1PanelInput, ChainInput, err)
 	}
-
-	// 检查 OUTPUT 链是否已有跳转规则
-	outputChains, _ := s.iptablesClient.ReadFilter([]string{ChainOutput})
-	hasOutputRule := false
-	if outputChain, ok := outputChains[ChainOutput]; ok {
-		item := outputChain.FirstRule
-		for item != nil {
-			if item.P.Action == Chain1PanelOutput {
-				hasOutputRule = true
-				break
-			}
-			item = item.Next()
-		}
-	}
-
-	// 应用到 OUTPUT 链
-	if !hasOutputRule {
-		if err := s.iptablesClient.Run(client.FilterTab, fmt.Sprintf("-I %s 1 -j %s", ChainOutput, Chain1PanelOutput)); err != nil {
-			return fmt.Errorf("failed to apply %s to %s: %w", Chain1PanelOutput, ChainOutput, err)
-		}
-		global.LOG.Infof("Applied %s to %s chain", Chain1PanelOutput, ChainOutput)
-	} else {
-		global.LOG.Infof("%s already applied to %s chain", Chain1PanelOutput, ChainOutput)
-	}
+	global.LOG.Infof("Applied %s to %s chain", Chain1PanelInput, ChainInput)
 
 	return nil
 }
