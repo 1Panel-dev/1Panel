@@ -414,7 +414,7 @@ const message = {
         ioDelay: 'I/Oレイテンシ',
         uptime: 'それ以来',
         runningTime: '稼働時間',
-        mem: 'システム',
+        mem: 'システムメモリ',
         swapMem: 'パーティションを交換します',
 
         runSmoothly: '低負荷',
@@ -424,6 +424,9 @@ const message = {
 
         core: '物理コア',
         logicCore: '論理コア',
+        corePercent: 'コア使用率',
+        cpuTop: 'CPU使用率トップ5のプロセス情報',
+        memTop: 'メモリ使用率トップ5のプロセス情報',
         loadAverage: '最後の1分で平均を積み込みます|最後の{n}分で平均を読み込みます',
         load: '負荷',
         mount: 'マウントポイント',
@@ -2906,6 +2909,9 @@ const message = {
         stopProcess: '終わり',
         viewDetails: '詳細',
         stopProcessWarn: 'このプロセスを終了したいですか（PID:{0}）？',
+        kill: 'プロセス終了',
+        killNow: '今すぐ終了',
+        killHelper: 'プロセス {0} を終了すると一部のプログラムが正常に動作しなくなる可能性があります。続行しますか？',
         processName: 'プロセス名',
     },
     tool: {

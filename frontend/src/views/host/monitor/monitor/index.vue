@@ -609,7 +609,7 @@ function withCPUProcess(datas: any) {
         res += loadSeries(item, item.data.value ? item.data.value : item.data, item.data.unit || '');
     }
     if (!tops) {
-        return '';
+        return res;
     }
     res += `
         <div style="margin-top: 10px; border-bottom: 1px dashed black;"></div>

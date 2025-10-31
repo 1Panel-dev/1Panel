@@ -1,5 +1,5 @@
 <template>
-    <div :key="$route.fullPath">
+    <div :key="$route.fullPath" id="dashboard">
         <RouterButton
             :buttons="[
                 {
@@ -424,6 +424,9 @@ const currentInfo = ref<Dashboard.CurrentInfo>({
 
     netBytesSent: 0,
     netBytesRecv: 0,
+
+    topCPUItems: [],
+    topMemItems: [],
 
     shotTime: new Date(),
 });

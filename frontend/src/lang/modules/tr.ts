@@ -429,7 +429,7 @@ const message = {
         ioDelay: 'G/Ç gecikmesi',
         uptime: 'Çalışma süresi',
         runningTime: 'Şu tarihten beri açık',
-        mem: 'Sistem',
+        mem: 'Sistem Belleği',
         swapMem: 'Swap Bölümü',
 
         runSmoothly: 'Düşük yük',
@@ -439,6 +439,9 @@ const message = {
 
         core: 'Fiziksel çekirdek',
         logicCore: 'Mantıksal çekirdek',
+        corePercent: 'Çekirdek Kullanımı',
+        cpuTop: 'CPU Kullanımına Göre İlk 5 İşlem',
+        memTop: 'Bellek Kullanımına Göre İlk 5 İşlem',
         loadAverage: 'Son 1 dakikadaki yük ortalaması | Son {n} dakikadaki yük ortalaması',
         load: 'Yük',
         mount: 'Bağlama noktası',
@@ -3050,6 +3053,10 @@ const message = {
         stopProcess: 'Sonlandır',
         viewDetails: 'Detayları görüntüle',
         stopProcessWarn: 'Bu işlemi (PID:{0}) sonlandırmak istediğinizden emin misiniz?',
+        kill: 'İşlemi Sonlandır',
+        killNow: 'Hemen Sonlandır',
+        killHelper:
+            '{0} işlemini sonlandırmak bazı programların düzgün çalışmamasına neden olabilir. Devam etmek istiyor musunuz?',
         processName: 'İşlem adı',
     },
     tool: {

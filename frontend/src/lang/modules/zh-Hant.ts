@@ -412,7 +412,7 @@ const message = {
         ioDelay: '讀寫延遲',
         uptime: '啟動時間',
         runningTime: '執行時間',
-        mem: '系統',
+        mem: '系統記憶體',
         swapMem: 'Swap 分區',
 
         runSmoothly: '執行流暢',
@@ -422,6 +422,9 @@ const message = {
 
         core: '物理核心',
         logicCore: '邏輯核心',
+        corePercent: '核心使用率',
+        cpuTop: 'CPU 佔用率 Top5 的行程資訊',
+        memTop: '記憶體佔用率 Top5 的行程資訊',
         loadAverage: '最近 {0} 分鐘平均負載',
         load: '負載',
         mount: '掛載點',
@@ -2795,6 +2798,9 @@ const message = {
         stopProcess: '結束',
         viewDetails: '查看詳情',
         stopProcessWarn: '是否確定結束此行程 (PID:{0})？',
+        kill: '結束行程',
+        killNow: '立即結束',
+        killHelper: '結束行程 {0} 可能導致部分程式無法正常運作，是否繼續？',
         processName: '行程名稱',
     },
     tool: {

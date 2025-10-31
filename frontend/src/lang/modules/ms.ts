@@ -423,7 +423,7 @@ const message = {
         ioDelay: 'I/O latency',
         uptime: 'Up since',
         runningTime: 'Uptime',
-        mem: 'System',
+        mem: 'Memori Sistem',
         swapMem: 'Swap partition',
 
         runSmoothly: 'Beban rendah',
@@ -432,6 +432,9 @@ const message = {
         runJam: 'Beban berat',
 
         core: 'Teras Fizikal',
+        corePercent: 'Penggunaan Teras',
+        cpuTop: 'Maklumat Proses 5 Teratas Mengikut Penggunaan CPU',
+        memTop: 'Maklumat Proses 5 Teratas Mengikut Penggunaan Memori',
         logicCore: 'Teras Logik',
         loadAverage: 'Purata beban dalam 1 minit terakhir | Purata beban dalam {n} minit terakhir',
         load: 'Beban',
@@ -2972,6 +2975,10 @@ const message = {
         stopProcess: 'End',
         viewDetails: 'Details',
         stopProcessWarn: 'Are you sure you want to end this process (PID:{0})?',
+        kill: 'Hentikan Proses',
+        killNow: 'Hentikan Sekarang',
+        killHelper:
+            'Menghentikan proses {0} mungkin menyebabkan beberapa program tidak berfungsi dengan normal. Teruskan?',
         processName: 'Process name',
     },
     tool: {

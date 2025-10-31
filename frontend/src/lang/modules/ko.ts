@@ -417,7 +417,7 @@ const message = {
         ioDelay: 'I/O 지연 시간',
         uptime: '작동 시간',
         runningTime: '가동 시간',
-        mem: '시스템',
+        mem: '시스템 메모리',
         swapMem: '스왑 파티션',
 
         runSmoothly: '낮은 부하',
@@ -427,6 +427,9 @@ const message = {
 
         core: '물리적 코어',
         logicCore: '논리 코어',
+        corePercent: '코어 사용률',
+        cpuTop: 'CPU 사용률 상위 5개 프로세스 정보',
+        memTop: '메모리 사용률 상위 5개 프로세스 정보',
         loadAverage: '지난 1분의 평균 부하 | 지난 {n} 분의 평균 부하',
         load: '부하',
         mount: '마운트 지점',
@@ -2855,6 +2858,10 @@ const message = {
         stopProcess: '종료',
         viewDetails: '세부 사항',
         stopProcessWarn: '이 프로세스(PID:{0})를 종료하시겠습니까?',
+        kill: '프로세스 종료',
+        killNow: '즉시 종료',
+        killHelper:
+            '프로세스 {0}을(를) 종료하면 일부 프로그램이 정상적으로 작동하지 않을 수 있습니다. 계속하시겠습니까?',
         processName: '프로세스 이름',
     },
     tool: {

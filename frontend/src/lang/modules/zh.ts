@@ -412,7 +412,7 @@ const message = {
         ioDelay: '读写延迟',
         uptime: '启动时间',
         runningTime: '运行时间',
-        mem: '系统',
+        mem: '系统内存',
         swapMem: 'Swap 分区',
 
         runSmoothly: '运行流畅',
@@ -422,6 +422,9 @@ const message = {
 
         core: '物理核心',
         logicCore: '逻辑核心',
+        corePercent: '核心使用率',
+        cpuTop: 'CPU 占用率 Top5 的进程信息',
+        memTop: '内存占用率 Top5 的进程信息',
         loadAverage: '最近 {0} 分钟平均负载',
         load: '负载',
         mount: '挂载点',
@@ -2789,6 +2792,9 @@ const message = {
         stopProcess: '结束',
         viewDetails: '查看详情',
         stopProcessWarn: '是否确定结束此进程 (PID:{0})？',
+        kill: '结束进程',
+        killNow: '立即结束',
+        killHelper: '结束进程 {0} 可能导致部分程序无法正常运行，是否继续？',
         processName: '进程名称',
     },
     tool: {
