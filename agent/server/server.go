@@ -4,10 +4,11 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"net"
 	"net/http"
 	"os"
+
+	"github.com/gin-gonic/gin"
 
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/constant"
@@ -40,6 +41,9 @@ func Start() {
 	app.Init()
 	lang.Init()
 	validator.Init()
+	if os.Getenv("GIN_MODE") == "" {
+		gin.SetMode(gin.ReleaseMode)
+	}
 	cron.Run()
 	hook.Init()
 	InitOthers()
