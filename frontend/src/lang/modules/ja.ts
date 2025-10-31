@@ -2785,6 +2785,9 @@ const message = {
         changeStrategyHelper:
             '[{1}] {0}戦略を[{2}]に変更します。設定後、{0}は外部から{2}にアクセスします。続けたいですか？',
         portHelper: '複数のポートを入力できます。80,81、または範囲ポート、例えば80-88',
+        allPorts: 'すべてのポート',
+        ruleTemplate: 'ルールテンプレート',
+
         strategy: '戦略',
         accept: '受け入れる',
         drop: '落とす',
@@ -2805,6 +2808,8 @@ const message = {
         createIpRule: '@:commons.button.create @:firewall.iprule',
         userAgent: 'ユーザーエージェントフィルター',
         sourcePort: 'ソースポート',
+        inboundDirection: '受信方向',
+        outboundDirection: '送信方向',
         targetIP: '宛先IP',
         targetPort: '宛先ポート',
         forwardHelper1: 'ローカルポートに転送する場合は、宛先IPを「127.0.0.1」に設定する必要があります。',

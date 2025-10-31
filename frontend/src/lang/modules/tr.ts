@@ -2907,6 +2907,8 @@ const message = {
         changeStrategyHelper:
             '[{1}] {0} stratejisini [{2}] olarak değiştirin. Ayar yapıldıktan sonra {0}, dışarıdan {2} erişimi sağlayacak. Devam etmek istiyor musunuz?',
         portHelper: 'Birden fazla port girilebilir, ör. 80,81 veya aralık portları, ör. 80-88',
+        allPorts: 'Tüm portlar',
+        ruleTemplate: 'Kural şablonu',
         strategy: 'Strateji',
         accept: 'Kabul Et',
         drop: 'Reddet',
@@ -2927,6 +2929,8 @@ const message = {
         createIpRule: '@:commons.button.create @:firewall.ipRule',
         userAgent: 'Kullanıcı-Aracısı filtresi',
         sourcePort: 'Kaynak port',
+        inboundDirection: 'Gelen',
+        outboundDirection: 'Giden',
         targetIP: 'Hedef IP',
         targetPort: 'Hedef port',
         forwardHelper1: 'Yerel porta yönlendirmek istiyorsanız, hedef IP "127.0.0.1" olarak ayarlanmalıdır.',

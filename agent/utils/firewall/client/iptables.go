@@ -12,9 +12,13 @@ import (
 )
 
 const (
-	PreRoutingChain  = "1PANEL_PREROUTING"
-	PostRoutingChain = "1PANEL_POSTROUTING"
-	ForwardChain     = "1PANEL_FORWARD"
+	PreRoutingChain   = "1PANEL_PREROUTING"
+	PostRoutingChain  = "1PANEL_POSTROUTING"
+	ForwardChain      = "1PANEL_FORWARD"
+	ChainInput        = "INPUT"
+	ChainOutput       = "OUTPUT"
+	Chain1PanelInput  = "1PANEL_INPUT"
+	Chain1PanelOutput = "1PANEL_OUTPUT"
 )
 
 const (
@@ -431,4 +435,58 @@ func (iptables *Iptables) DeletePolicy(chain string, policy IptablesPolicy) erro
 	}
 
 	return iptables.run(FilterTab, iptablesArg)
+}
+
+// CheckPolicyExists 检查策略是否存在
+func (iptables *Iptables) CheckPolicyExists(chain string, policyStr string) bool {
+	err := iptables.run(FilterTab, fmt.Sprintf("-C %s %s", chain, policyStr))
+	if err != nil {
+		return false
+	}
+	return true
+}
+
+const (
+	establishedRule = "-m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT"
+	ioRuleIn        = "-i lo -j ACCEPT"
+	ioRuleOut       = "-o lo -j ACCEPT"
+)
+
+func (iptables *Iptables) setupEstablishedRules(direction string) {
+	if direction == "input" {
+		if !iptables.CheckPolicyExists("INPUT", ioRuleIn) {
+			iptables.run(FilterTab, fmt.Sprintf("-I INPUT 1 %s", ioRuleIn))
+		}
+
+		if !iptables.CheckPolicyExists("INPUT", establishedRule) {
+			iptables.run(FilterTab, fmt.Sprintf("-I INPUT 2 %s", establishedRule))
+		}
+	}
+
+	if direction == "output" {
+		if !iptables.CheckPolicyExists("OUTPUT", ioRuleOut) {
+			iptables.run(FilterTab, fmt.Sprintf("-I OUTPUT 1 %s", ioRuleOut))
+		}
+		if !iptables.CheckPolicyExists("OUTPUT", establishedRule) {
+			iptables.run(FilterTab, fmt.Sprintf("-I OUTPUT 2 %s", establishedRule))
+		}
+	}
+}
+
+func (iptables *Iptables) Setup1PanelFirewallChains(direction string) error {
+	iptables.setupEstablishedRules(direction)
+	if direction == "input" {
+		if !iptables.CheckPolicyExists(ChainInput, fmt.Sprintf("-j %s", Chain1PanelInput)) {
+			if err := iptables.run(FilterTab, fmt.Sprintf("-I %s 3 -j %s", ChainInput, Chain1PanelInput)); err != nil {
+				return err
+			}
+		}
+	} else if direction == "output" {
+		if !iptables.CheckPolicyExists(ChainOutput, fmt.Sprintf("-j %s", Chain1PanelOutput)) {
+			if err := iptables.run(FilterTab, fmt.Sprintf("-I %s 3 -j %s", ChainOutput, Chain1PanelOutput)); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }
