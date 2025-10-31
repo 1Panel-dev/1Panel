@@ -15,7 +15,7 @@
                 <LayoutContent :title="$t('firewall.filterRule')">
                     <template #leftToolBar>
                         <el-button type="primary" @click="onOpenDialog('create')" :disabled="!isCustomChain">
-                            {{ $t('commons.button.create') }}{{ $t('firewall.filterRule') }}
+                            {{ $t('firewall.create') }}
                         </el-button>
                         <el-button @click="onDelete(null)" plain :disabled="selects.length === 0 || !isCustomChain">
                             {{ $t('commons.button.delete') }}
