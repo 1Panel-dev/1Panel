@@ -40,7 +40,9 @@ func Start() {
 	app.Init()
 	lang.Init()
 	validator.Init()
-	gin.SetMode("debug")
+	if os.Getenv("GIN_MODE") == "" {
+		gin.SetMode(gin.ReleaseMode)
+	}
 	cron.Run()
 	hook.Init()
 	InitOthers()
