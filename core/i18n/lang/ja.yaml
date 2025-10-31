@@ -36,6 +36,11 @@ ErrInternalServerKey: "サーバー内部エラー: "
 # app
 CustomAppStoreFileValid: "アプリストアパッケージは .tar.gz 形式である必要があります"
 ErrFileNotFound: "{{ .name }} ファイルが存在しません"
+AppBackup: 'アプリケーションバックアップ',
+AppBackupPush: 'アプリケーションバックアップファイル {{.file}} をノード {{ .name }} に転送',
+ErrSourceTargetSame: 'ソースノードとターゲットノードは同じにできません！',
+AppInstall: 'ノード {{ .targetNode }} にアプリケーション {{ .name }} をインストール',
+AppInstallCheck: 'アプリケーションインストール環境を確認',
 
 # backup
 ErrBackupInUsed: "このバックアップアカウントはスケジュールタスクで使用されており、削除できません"

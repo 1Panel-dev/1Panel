@@ -55,10 +55,11 @@ const (
 )
 
 const (
-	TaskScopeSystem   = "System"
-	TaskScopeScript   = "Script"
-	TaskScopeNodeFile = "NodeFile"
-	TaskScopeCluster  = "Cluster"
+	TaskScopeSystem    = "System"
+	TaskScopeScript    = "Script"
+	TaskScopeNodeFile  = "NodeFile"
+	TaskScopeAppBackup = "AppBackup"
+	TaskScopeCluster   = "Cluster"
 )
 
 func GetTaskName(resourceName, operate, scope string) string {

@@ -83,6 +83,7 @@ const message = {
             show: '보기',
             hide: '숨기기',
             visit: '방문',
+            migrate: '마이그레이션',
         },
         operate: {
             start: '시작',

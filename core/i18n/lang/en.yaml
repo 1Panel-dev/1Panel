@@ -36,6 +36,11 @@ ErrInternalServerKey: "Internal server error:"
 # app
 CustomAppStoreFileValid: "Application store package requires .tar.gz format"
 ErrFileNotFound: "{{ .name }} file does not exist"
+AppBackup: 'Application backup',
+AppBackupPush: 'Transfer application backup file {{.file}} to node {{ .name }}',
+ErrSourceTargetSame: 'Source node and target node cannot be the same!',
+AppInstall: 'Install application {{ .name }} on node {{ .targetNode }}',
+AppInstallCheck: 'Check application installation environment',
 
 # backup
 ErrBackupInUsed: "This backup account is used in scheduled tasks and cannot be deleted"

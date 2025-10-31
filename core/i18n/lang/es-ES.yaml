@@ -36,6 +36,11 @@ ErrInternalServerKey: "Error interno del servidor:"
 # app
 CustomAppStoreFileValid: "El paquete de la tienda de aplicaciones debe tener formato .tar.gz"
 ErrFileNotFound: "El archivo {{ .name }} no existe"
+AppBackup: 'Copia de seguridad de aplicación',
+AppBackupPush: 'Transferir archivo de copia de seguridad de aplicación {{.file}} al nodo {{ .name }}',
+ErrSourceTargetSame: '¡El nodo de origen y el nodo de destino no pueden ser el mismo!',
+AppInstall: 'Instalar aplicación {{ .name }} en nodo {{ .targetNode }}',
+AppInstallCheck: 'Verificar entorno de instalación de aplicación',
 
 # backup
 ErrBackupInUsed: "Esta cuenta de respaldo se utiliza en tareas programadas y no se puede eliminar"

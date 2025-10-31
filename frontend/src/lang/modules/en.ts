@@ -86,6 +86,7 @@ const message = {
             show: 'Show',
             hide: 'Hide',
             visit: 'Visit',
+            migrate: 'Migrate',
         },
         operate: {
             start: 'Start',

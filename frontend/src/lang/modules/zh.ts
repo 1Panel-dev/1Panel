@@ -86,6 +86,7 @@ const message = {
             show: '显示',
             hide: '隐藏',
             visit: '访问',
+            migrate: '迁移',
         },
         operate: {
             start: '启动',

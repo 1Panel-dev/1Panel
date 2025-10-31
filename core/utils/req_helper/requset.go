@@ -4,6 +4,10 @@ import (
 	"context"
 	"crypto/tls"
 	"errors"
+	"github.com/1Panel-dev/1Panel/core/utils/req_helper/proxy_local"
+	"github.com/1Panel-dev/1Panel/core/xpack/app/model"
+	"github.com/1Panel-dev/1Panel/core/xpack/utils/node_helper"
+	"github.com/gin-gonic/gin"
 	"io"
 	"net"
 	"net/http"
@@ -110,4 +114,12 @@ func handleGetWithTransport(url string, transport *http.Transport) (*http.Respon
 	}
 
 	return resp, nil
+}
+
+func RequestToNode(ctx *gin.Context, reqUrl, reqMethod string, body io.Reader, isLocal bool, timeout int, node model.Node) (res interface{}, resErr error) {
+	if isLocal {
+		return proxy_local.NewLocalClient(reqUrl, reqMethod, body, ctx)
+	} else {
+		return node_helper.NewRequestToAgent(reqUrl, reqMethod, body, timeout, node)
+	}
 }

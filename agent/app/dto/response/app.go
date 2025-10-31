@@ -139,6 +139,8 @@ type AppInstallInfo struct {
 	HttpPort    int    `json:"HttpPort"`
 	Container   string `json:"container"`
 	ComposePath string `json:"composePath"`
+	AppKey      string `json:"appKey"`
+	AppPorts    []int  `json:"appPorts"`
 
 	Env map[string]interface{} `json:"env"`
 }

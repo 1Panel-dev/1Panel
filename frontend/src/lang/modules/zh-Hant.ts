@@ -86,6 +86,7 @@ const message = {
             show: '顯示',
             hide: '隱藏',
             visit: '訪問',
+            migrate: '遷移',
         },
         operate: {
             start: '啟動',

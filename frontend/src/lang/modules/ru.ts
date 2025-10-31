@@ -83,6 +83,7 @@ const message = {
             show: 'Показать',
             hide: 'Скрыть',
             visit: 'Посетить',
+            migrate: 'Мигрировать',
         },
         operate: {
             start: 'Запустить',

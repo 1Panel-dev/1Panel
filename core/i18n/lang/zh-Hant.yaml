@@ -36,6 +36,11 @@ ErrInternalServerKey: "服務內部錯誤: "
 #app
 CustomAppStoreFileValid: "應用商店包需要 .tar.gz 格式"
 ErrFileNotFound: "{{ .name }} 檔案不存在"
+AppBackup: '應用備份',
+AppBackupPush: '傳輸應用備份文件 {{.file}} 到節點 {{ .name }}',
+ErrSourceTargetSame: '源節點和目標節點不能相同！',
+AppInstall: '在 {{ .targetNode }} 節點安裝應用 {{ .name }}',
+AppInstallCheck: '檢查應用安裝環境',
 
 #backup
 ErrBackupInUsed: "該備份帳號已在排程任務中使用，無法刪除"

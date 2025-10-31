@@ -86,6 +86,7 @@ const message = {
             show: 'Göster',
             hide: 'Gizle',
             visit: 'Visit',
+            migrate: 'Taşı',
         },
         operate: {
             start: 'Başlat',

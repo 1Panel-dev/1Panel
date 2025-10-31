@@ -150,6 +150,7 @@ export namespace App {
         favorite: boolean;
         app: App;
         webUI: string;
+        appKey?: string;
     }
 
     export interface AppInstalledInfo {

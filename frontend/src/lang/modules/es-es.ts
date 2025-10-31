@@ -85,6 +85,7 @@ const message = {
             sure: 'Confirmar',
             show: 'Mostrar',
             hide: 'Ocultar',
+            migrate: 'Migrar',
         },
         operate: {
             start: 'Iniciar',

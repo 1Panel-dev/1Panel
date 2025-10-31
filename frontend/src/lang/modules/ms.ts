@@ -83,6 +83,7 @@ const message = {
             show: 'Tunjukkan',
             hide: 'Sembunyikan',
             visit: 'Lawati',
+            migrate: 'Migrasi',
         },
         operate: {
             start: 'Mula',

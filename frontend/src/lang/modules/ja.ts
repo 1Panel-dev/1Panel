@@ -83,6 +83,7 @@ const message = {
             show: '表示する',
             hide: '隠す',
             visit: '訪問',
+            migrate: '移行',
         },
         operate: {
             start: '開始',

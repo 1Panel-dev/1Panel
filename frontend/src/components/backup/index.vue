@@ -128,6 +128,7 @@
 
     <OpDialog ref="opRef" @search="search" />
     <TaskLog ref="taskLogRef" @close="search" />
+    <PushApp ref="pushAppRef" v-if="isProductPro" />
 </template>
 
 <script lang="ts" setup>
@@ -147,14 +148,24 @@ import i18n from '@/lang';
 import { Backup } from '@/api/interface/backup';
 import { MsgSuccess } from '@/utils/message';
 import TaskLog from '@/components/log/task/index.vue';
-import { GlobalStore } from '@/store';
 import { routerToFileWithPath } from '@/utils/router';
-const globalStore = GlobalStore();
+import { useGlobalStore } from '@/composables/useGlobalStore';
+const { isProductPro, currentNode } = useGlobalStore();
+
+const PushApp = defineAsyncComponent(async () => {
+    const modules = import.meta.glob('@/xpack/views/appstore/push-app/index.vue');
+    const loader = modules['/src/xpack/views/appstore/push-app/index.vue'];
+    if (loader) {
+        return ((await loader()) as any).default;
+    }
+    return { template: '<div></div>' };
+});
 
 const selects = ref<any>([]);
 const loading = ref();
 const opRef = ref();
 const taskLogRef = ref();
+const pushAppRef = ref();
 
 const data = ref();
 const paginationConfig = reactive({
@@ -175,16 +186,19 @@ const description = ref();
 const open = ref();
 const isBackup = ref();
 const recordInfo = ref();
+const appInstallID = ref();
 
 interface DialogProps {
     type: string;
     name: string;
     detailName: string;
     status: string;
+    appInstallID?: number;
 }
 const acceptParams = (params: DialogProps): void => {
     type.value = params.type;
     if (type.value === 'app') {
+        appInstallID.value = params.appInstallID || 0;
         loadBackupDir();
     }
     name.value = params.name;
@@ -365,7 +379,7 @@ const onDownload = async (row: Backup.RecordInfo) => {
         fileName: row.fileName,
     };
     await downloadBackupRecord(params).then(async (res) => {
-        downloadFile(res.data, globalStore.currentNode);
+        downloadFile(res.data, currentNode.value);
     });
 };
 
@@ -410,6 +424,21 @@ const buttons = [
         },
         click: (row: Backup.RecordInfo) => {
             onRecover(row);
+        },
+    },
+    {
+        label: i18n.global.t('commons.button.migrate'),
+        disabled: (row: any) => {
+            return row.size === 0 || row.status === 'Failed' || row.accountType !== 'LOCAL';
+        },
+        show: () => {
+            return type.value === 'app';
+        },
+        click: (row: Backup.RecordInfo) => {
+            pushAppRef.value.acceptParams({
+                appInstallID: appInstallID.value,
+                appBackupID: row.id,
+            });
         },
     },
     {

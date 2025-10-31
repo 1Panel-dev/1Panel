@@ -940,8 +940,26 @@ func (a *AppInstallService) GetAppInstallInfo(installID uint) (*response.AppInst
 		HttpPort:    appInstall.HttpPort,
 		Status:      appInstall.Status,
 		Message:     appInstall.Message,
+		AppKey:      appInstall.App.Key,
 		Env:         envMap,
 		ComposePath: appInstall.GetComposePath(),
+	}
+	for k, v := range envMap {
+		if strings.Contains(strings.ToUpper(k), "PANEL_APP_PORT") {
+			var port int
+			switch val := v.(type) {
+			case int:
+				port = val
+			case string:
+				port, err = strconv.Atoi(val)
+				if err != nil {
+					continue
+				}
+			default:
+				continue
+			}
+			res.AppPorts = append(res.AppPorts, port)
+		}
 	}
 	return res, nil
 }
