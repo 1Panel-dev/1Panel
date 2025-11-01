@@ -16,6 +16,7 @@
                     </el-descriptions-item>
                     <el-descriptions-item :label="$t('container.image')">
                         {{ inspectData?.Config?.Image }}
+                        <CopyButton :content="inspectData?.Config?.Image || ''" />
                     </el-descriptions-item>
                     <el-descriptions-item :label="$t('commons.table.createdAt')">
                         {{ formatDate(inspectData?.Created) }}
