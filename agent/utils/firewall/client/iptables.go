@@ -52,7 +52,6 @@ func NewIptables() (*Iptables, error) {
 func (iptables *Iptables) out(tab, rule string) (string, error) {
 	cmdMgr := cmd.NewCommandMgr(cmd.WithIgnoreExist1(), cmd.WithTimeout(20*time.Second))
 	stdout, err := cmdMgr.RunWithStdoutBashCf("%s iptables -t %s %s", iptables.CmdStr, tab, rule)
-	global.LOG.Infof("iptables -t %s %s || output: %s", tab, rule, stdout)
 	if err != nil {
 		global.LOG.Errorf("iptables failed, %v", err)
 	}
@@ -440,37 +439,41 @@ func (iptables *Iptables) DeletePolicy(chain string, policy IptablesPolicy) erro
 
 // CheckPolicyExists 检查策略是否存在
 func (iptables *Iptables) CheckPolicyExists(chain string, policyStr string) bool {
-	err := iptables.run(FilterTab, fmt.Sprintf("-C %s %s", chain, policyStr))
+	line, err := iptables.FindRuleNum(chain, policyStr)
 	if err != nil {
-		global.LOG.Info("Rule Not Exist", err)
 		return false
 	}
-	global.LOG.Info("Rule  Exist", chain, policyStr)
-	return true
+	if line > 0 {
+		return true
+	}
+	return false
 }
 
 const (
-	establishedRule = "-m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT"
-	ioRuleIn        = "-i lo -j ACCEPT"
-	ioRuleOut       = "-o lo -j ACCEPT"
+	establishedRule        = "-m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT -m comment --comment \"ESTABLISHED Whitelist\""
+	ioRuleIn               = "-i lo -j ACCEPT -m comment --comment \"Loopback Whitelist\""
+	ioRuleOut              = "-o lo -j ACCEPT -m comment --comment \"Loopback Whitelist\""
+	establishedRuleComment = "ESTABLISHED Whitelist"
+	ioRuleInComment        = "Loopback Whitelist"
+	ioRuleOutComment       = "Loopback Whitelist"
 )
 
 func (iptables *Iptables) setupEstablishedRules(direction string) {
 	if direction == "input" {
-		if !iptables.CheckPolicyExists("INPUT", ioRuleIn) {
+		if !iptables.CheckPolicyExists("INPUT", ioRuleInComment) {
 			iptables.run(FilterTab, fmt.Sprintf("-I INPUT 1 %s", ioRuleIn))
 		}
 
-		if !iptables.CheckPolicyExists("INPUT", establishedRule) {
+		if !iptables.CheckPolicyExists("INPUT", establishedRuleComment) {
 			iptables.run(FilterTab, fmt.Sprintf("-I INPUT 2 %s", establishedRule))
 		}
 	}
 
 	if direction == "output" {
-		if !iptables.CheckPolicyExists("OUTPUT", ioRuleOut) {
+		if !iptables.CheckPolicyExists("OUTPUT", ioRuleOutComment) {
 			iptables.run(FilterTab, fmt.Sprintf("-I OUTPUT 1 %s", ioRuleOut))
 		}
-		if !iptables.CheckPolicyExists("OUTPUT", establishedRule) {
+		if !iptables.CheckPolicyExists("OUTPUT", establishedRuleComment) {
 			iptables.run(FilterTab, fmt.Sprintf("-I OUTPUT 2 %s", establishedRule))
 		}
 	}
