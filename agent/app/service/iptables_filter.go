@@ -35,16 +35,9 @@ func NewIIptablesFilterService() IIptablesFilterService {
 	}
 }
 
-const (
-	ChainInput        = "INPUT"
-	ChainOutput       = "OUTPUT"
-	Chain1PanelInput  = "1PANEL_INPUT"
-	Chain1PanelOutput = "1PANEL_OUTPUT"
-)
-
 func (s *IptablesFilterService) GetFilterRules(chains []string) ([]dto.IptablesChainInfo, error) {
 	if len(chains) == 0 {
-		chains = []string{ChainInput, ChainOutput, Chain1PanelInput, Chain1PanelOutput}
+		chains = []string{client.ChainInput, client.ChainOutput, client.Chain1PanelInput, client.Chain1PanelOutput}
 	}
 
 	// 获取 iptables 版本
@@ -62,7 +55,7 @@ func (s *IptablesFilterService) GetFilterRules(chains []string) ([]dto.IptablesC
 
 	// 从数据库读取规则描述
 	ctx := context.Background()
-	dbRules, _ := s.repo.List(ctx, []string{Chain1PanelInput, Chain1PanelOutput})
+	dbRules, _ := s.repo.List(ctx, []string{client.Chain1PanelInput, client.Chain1PanelOutput})
 	descMap := make(map[uint]string)
 	for _, rule := range dbRules {
 		descMap[rule.ID] = rule.Description
@@ -84,11 +77,11 @@ func (s *IptablesFilterService) GetFilterRules(chains []string) ([]dto.IptablesC
 		}
 
 		// 检查是否已应用（INPUT/OUTPUT 链包含跳转规则）
-		if chainName == ChainInput || chainName == ChainOutput {
+		if chainName == client.ChainInput || chainName == client.ChainOutput {
 			item := chain.FirstRule
-			targetChain := Chain1PanelInput
-			if chainName == ChainOutput {
-				targetChain = Chain1PanelOutput
+			targetChain := client.Chain1PanelInput
+			if chainName == client.ChainOutput {
+				targetChain = client.Chain1PanelOutput
 			}
 			for item != nil {
 				if item.P.Action == targetChain {
@@ -137,8 +130,8 @@ func (s *IptablesFilterService) GetFilterRules(chains []string) ([]dto.IptablesC
 }
 
 func (s *IptablesFilterService) AddRule(req dto.IptablesFilterRuleOperate) error {
-	if req.Chain != Chain1PanelInput && req.Chain != Chain1PanelOutput {
-		return fmt.Errorf("Only %s or %s chains are allowed", Chain1PanelInput, Chain1PanelOutput)
+	if req.Chain != client.Chain1PanelInput && req.Chain != client.Chain1PanelOutput {
+		return fmt.Errorf("Only %s or %s chains are allowed", client.Chain1PanelInput, client.Chain1PanelOutput)
 	}
 
 	// 安全检查：防止无条件 DROP/REJECT
@@ -248,34 +241,34 @@ func (s *IptablesFilterService) BatchOperate(req dto.IptablesFilterBatchOperate)
 
 func (s *IptablesFilterService) InitChains() error {
 	// 检查并创建 1PANEL_INPUT
-	exists, err := s.iptablesClient.ChainExists(client.FilterTab, Chain1PanelInput)
+	exists, err := s.iptablesClient.ChainExists(client.FilterTab, client.Chain1PanelInput)
 	if err != nil {
-		return fmt.Errorf("failed to check chain %s: %w", Chain1PanelInput, err)
+		return fmt.Errorf("failed to check chain %s: %w", client.Chain1PanelInput, err)
 	}
 
 	if !exists {
-		if err := s.iptablesClient.NewChain(client.FilterTab, Chain1PanelInput); err != nil {
-			return fmt.Errorf("failed to create chain %s: %w", Chain1PanelInput, err)
+		if err := s.iptablesClient.NewChain(client.FilterTab, client.Chain1PanelInput); err != nil {
+			return fmt.Errorf("failed to create chain %s: %w", client.Chain1PanelInput, err)
 		}
 	} else {
 		// 清空已存在的链
-		if err := s.iptablesClient.FlushChain(client.FilterTab, Chain1PanelInput); err != nil {
+		if err := s.iptablesClient.FlushChain(client.FilterTab, client.Chain1PanelInput); err != nil {
 			return err
 		}
 	}
 
 	// 检查并创建 1PANEL_OUTPUT
-	exists, err = s.iptablesClient.ChainExists(client.FilterTab, Chain1PanelOutput)
+	exists, err = s.iptablesClient.ChainExists(client.FilterTab, client.Chain1PanelOutput)
 	if err != nil {
-		return fmt.Errorf("failed to check chain %s: %w", Chain1PanelOutput, err)
+		return fmt.Errorf("failed to check chain %s: %w", client.Chain1PanelOutput, err)
 	}
 
 	if !exists {
-		if err := s.iptablesClient.NewChain(client.FilterTab, Chain1PanelOutput); err != nil {
-			return fmt.Errorf("failed to create chain %s: %w", Chain1PanelOutput, err)
+		if err := s.iptablesClient.NewChain(client.FilterTab, client.Chain1PanelOutput); err != nil {
+			return fmt.Errorf("failed to create chain %s: %w", client.Chain1PanelOutput, err)
 		}
 	} else {
-		if err := s.iptablesClient.FlushChain(client.FilterTab, Chain1PanelOutput); err != nil {
+		if err := s.iptablesClient.FlushChain(client.FilterTab, client.Chain1PanelOutput); err != nil {
 			return err
 		}
 	}
@@ -285,73 +278,73 @@ func (s *IptablesFilterService) InitChains() error {
 
 func (s *IptablesFilterService) ApplyFirewall() error {
 	// 安全检查
-	chains, err := s.iptablesClient.ReadFilter([]string{Chain1PanelInput, Chain1PanelOutput})
+	chains, err := s.iptablesClient.ReadFilter([]string{client.Chain1PanelInput, client.Chain1PanelOutput})
 	if err != nil {
 		return fmt.Errorf("failed to read filter chains: %w", err)
 	}
 
 	// 检查 1PANEL_INPUT 安全性
-	if inputChain, ok := chains[Chain1PanelInput]; ok {
+	if inputChain, ok := chains[client.Chain1PanelInput]; ok {
 		item := inputChain.FirstRule
 		for item != nil {
 			p := item.P
 			if (p.Action == "DROP" || p.Action == "REJECT") &&
 				p.Protocol == "" && p.SourceIP == "" && p.DestIP == "" &&
 				p.SrcPort == 0 && p.DstPort == 0 {
-				return fmt.Errorf("Chain %s includes unconditional %s rule, not allowed to apply", Chain1PanelInput, p.Action)
+				return fmt.Errorf("Chain %s includes unconditional %s rule, not allowed to apply", client.Chain1PanelInput, p.Action)
 			}
 			item = item.Next()
 		}
 	}
 
 	// 检查 1PANEL_OUTPUT 安全性
-	if outputChain, ok := chains[Chain1PanelOutput]; ok {
+	if outputChain, ok := chains[client.Chain1PanelOutput]; ok {
 		item := outputChain.FirstRule
 		for item != nil {
 			p := item.P
 			if (p.Action == "DROP" || p.Action == "REJECT") &&
 				p.Protocol == "" && p.SourceIP == "" && p.DestIP == "" &&
 				p.SrcPort == 0 && p.DstPort == 0 {
-				return fmt.Errorf("Chain %s includes unconditional %s rule, not allowed to apply", Chain1PanelOutput, p.Action)
+				return fmt.Errorf("Chain %s includes unconditional %s rule, not allowed to apply", client.Chain1PanelOutput, p.Action)
 			}
 			item = item.Next()
 		}
 	}
 
 	if err := s.iptablesClient.Setup1PanelFirewallChains("input"); err != nil {
-		return fmt.Errorf("failed to apply %s to %s: %w", Chain1PanelInput, ChainInput, err)
+		return fmt.Errorf("failed to apply %s to %s: %w", client.Chain1PanelInput, client.ChainInput, err)
 	}
-	global.LOG.Infof("Applied %s to %s chain", Chain1PanelInput, ChainInput)
+	global.LOG.Infof("Applied %s to %s chain", client.Chain1PanelInput, client.ChainInput)
 
 	if err := s.iptablesClient.Setup1PanelFirewallChains("output"); err != nil {
-		return fmt.Errorf("failed to apply %s to %s: %w", Chain1PanelInput, ChainInput, err)
+		return fmt.Errorf("failed to apply %s to %s: %w", client.Chain1PanelOutput, client.ChainOutput, err)
 	}
-	global.LOG.Infof("Applied %s to %s chain", Chain1PanelInput, ChainInput)
+	global.LOG.Infof("Applied %s to %s chain", client.Chain1PanelOutput, client.ChainOutput, err)
 
 	return nil
 }
 
 func (s *IptablesFilterService) UnloadFirewall() error {
 	// 从 INPUT 链删除跳转规则
-	ruleNum, err := s.iptablesClient.FindRuleNum(ChainInput, Chain1PanelInput)
+	ruleNum, err := s.iptablesClient.FindRuleNum(client.ChainInput, client.Chain1PanelInput)
 	if err == nil {
-		if err := s.iptablesClient.RemovePolicyByNum(ChainInput, ruleNum); err != nil {
-			return fmt.Errorf("failed to unload %s from %s: %w", Chain1PanelInput, ChainInput, err)
+		if err := s.iptablesClient.RemovePolicyByNum(client.ChainInput, ruleNum); err != nil {
+			return fmt.Errorf("failed to unload %s from %s: %w", client.Chain1PanelInput, client.ChainInput, err)
 		}
-		global.LOG.Infof("Unloaded %s from %s chain", Chain1PanelInput, ChainInput)
+		global.LOG.Infof("Unloaded %s from %s chain", client.Chain1PanelInput, client.ChainInput)
 	} else {
-		global.LOG.Warnf("%s not found in %s chain: %v", Chain1PanelInput, ChainInput, err)
+		global.LOG.Warnf("%s not found in %s chain: %v", client.Chain1PanelInput, client.ChainInput, err)
 	}
 
 	// 从 OUTPUT 链删除跳转规则
-	ruleNum, err = s.iptablesClient.FindRuleNum(ChainOutput, Chain1PanelOutput)
+	ruleNum, err = s.iptablesClient.FindRuleNum(client.ChainOutput, client.Chain1PanelOutput)
 	if err == nil {
-		if err := s.iptablesClient.RemovePolicyByNum(ChainOutput, ruleNum); err != nil {
-			return fmt.Errorf("failed to unload %s from %s: %w", Chain1PanelOutput, ChainOutput, err)
+		if err := s.iptablesClient.RemovePolicyByNum(client.ChainOutput, ruleNum); err != nil {
+			return fmt.Errorf("failed to unload %s from %s: %w", client.Chain1PanelOutput, client.ChainOutput, err)
 		}
-		global.LOG.Infof("Unloaded %s from %s chain", Chain1PanelOutput, ChainOutput)
+		global.LOG.Infof("Unloaded %s from %s chain", client.Chain1PanelOutput, client.ChainOutput)
 	} else {
-		global.LOG.Warnf("%s not found in %s chain: %v", Chain1PanelOutput, ChainOutput, err)
+		global.LOG.Warnf("%s not found in %s chain: %v", client.Chain1PanelOutput, client.ChainOutput, err)
 	}
 
 	return nil
@@ -359,16 +352,16 @@ func (s *IptablesFilterService) UnloadFirewall() error {
 
 func (s *IptablesFilterService) ReloadRules() error {
 	// 清空自定义链
-	if err := s.iptablesClient.FlushChain(client.FilterTab, Chain1PanelInput); err != nil {
-		return fmt.Errorf("failed to flush chain %s: %w", Chain1PanelInput, err)
+	if err := s.iptablesClient.FlushChain(client.FilterTab, client.Chain1PanelInput); err != nil {
+		return fmt.Errorf("failed to flush chain %s: %w", client.Chain1PanelInput, err)
 	}
-	if err := s.iptablesClient.FlushChain(client.FilterTab, Chain1PanelOutput); err != nil {
-		return fmt.Errorf("failed to flush chain %s: %w", Chain1PanelOutput, err)
+	if err := s.iptablesClient.FlushChain(client.FilterTab, client.Chain1PanelOutput); err != nil {
+		return fmt.Errorf("failed to flush chain %s: %w", client.Chain1PanelOutput, err)
 	}
 
 	// 从数据库读取规则
 	ctx := context.Background()
-	rules, err := s.repo.List(ctx, []string{Chain1PanelInput, Chain1PanelOutput})
+	rules, err := s.repo.List(ctx, []string{client.Chain1PanelInput, client.Chain1PanelOutput})
 	if err != nil {
 		return fmt.Errorf("failed to load rules from database: %w", err)
 	}
