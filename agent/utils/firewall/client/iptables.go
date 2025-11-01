@@ -53,7 +53,8 @@ func (iptables *Iptables) out(tab, rule string) (string, error) {
 	cmdMgr := cmd.NewCommandMgr(cmd.WithIgnoreExist1(), cmd.WithTimeout(20*time.Second))
 	stdout, err := cmdMgr.RunWithStdoutBashCf("%s iptables -t %s %s", iptables.CmdStr, tab, rule)
 	if err != nil {
-		global.LOG.Errorf("iptables failed, %v", err)
+		global.LOG.Errorf("iptables command failed [table=%s, rule=%s]: %v", tab, rule, err)
+		return stdout, err
 	}
 	return stdout, nil
 }
@@ -345,22 +346,27 @@ func (iptables *Iptables) ReadFilter(chainName []string) (map[string]IptablesCha
 func (iptables *Iptables) RemovePolicyByComment(chain, comment string) error {
 	stdout, err := iptables.out(FilterTab, fmt.Sprintf("-S %s", chain))
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to list rules in chain %s: %w", chain, err)
 	}
 
 	// 解析规则找到匹配 comment 的行
 	lines := strings.Split(stdout, "\n")
+	found := false
 	for _, line := range lines {
 		if strings.Contains(line, comment) && strings.HasPrefix(line, "-A") {
 			// 替换 -A 为 -D 执行删除
 			deleteRule := strings.Replace(line, "-A", "-D", 1)
 			if err := iptables.run(FilterTab, deleteRule); err != nil {
-				return err
+				return fmt.Errorf("failed to delete rule: %w", err)
 			}
-			return nil
+			found = true
+			break
 		}
 	}
-	return fmt.Errorf("rule with comment '%s' not found in chain %s", comment, chain)
+	if !found {
+		return fmt.Errorf("rule with comment '%s' not found in chain %s", comment, chain)
+	}
+	return nil
 }
 
 // RemovePolicyByNum 按规则编号删除
@@ -372,7 +378,7 @@ func (iptables *Iptables) RemovePolicyByNum(chain string, num int) error {
 func (iptables *Iptables) FindRuleNum(chain, matchStr string) (int, error) {
 	stdout, err := iptables.out(FilterTab, fmt.Sprintf("-L %s --line-numbers -n", chain))
 	if err != nil {
-		return 0, err
+		return 0, fmt.Errorf("failed to list rules in chain %s: %w", chain, err)
 	}
 
 	lines := strings.Split(stdout, "\n")
@@ -381,24 +387,24 @@ func (iptables *Iptables) FindRuleNum(chain, matchStr string) (int, error) {
 			// 提取行号（第一列）
 			fields := strings.Fields(line)
 			if len(fields) > 0 {
-				num, err := fmt.Sscanf(fields[0], "%d", new(int))
-				if err == nil && num == 1 {
-					var ruleNum int
-					fmt.Sscanf(fields[0], "%d", &ruleNum)
+				var ruleNum int
+				n, err := fmt.Sscanf(fields[0], "%d", &ruleNum)
+				if err == nil && n == 1 && ruleNum > 0 {
 					return ruleNum, nil
 				}
 			}
 		}
 	}
-	return 0, fmt.Errorf("rule not found in chain %s", chain)
+	return 0, fmt.Errorf("rule matching '%s' not found in chain %s", matchStr, chain)
 }
 
 // ChainExists 检查链是否存在
 func (iptables *Iptables) ChainExists(tab, chain string) (bool, error) {
 	// iptables -t filter -S | grep 'N 1PANEL'
-	stdout, err := iptables.out(tab, fmt.Sprintf("-S | grep 'N %s'", chain))
-	if err != nil {
-		return false, err
+	stdout, err := iptables.out(tab, fmt.Sprintf("-S | grep -w 'N %s'", chain))
+	// grep 未找到会返回错误，这是正常情况
+	if err != nil && strings.TrimSpace(stdout) == "" {
+		return false, nil
 	}
 	if strings.TrimSpace(stdout) == "" {
 		return false, nil
