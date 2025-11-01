@@ -52,6 +52,7 @@ func NewIptables() (*Iptables, error) {
 func (iptables *Iptables) out(tab, rule string) (string, error) {
 	cmdMgr := cmd.NewCommandMgr(cmd.WithIgnoreExist1(), cmd.WithTimeout(20*time.Second))
 	stdout, err := cmdMgr.RunWithStdoutBashCf("%s iptables -t %s %s", iptables.CmdStr, tab, rule)
+	global.LOG.Infof("iptables -t %s %s || output: %s", tab, rule, stdout)
 	if err != nil {
 		global.LOG.Errorf("iptables failed, %v", err)
 	}
@@ -441,8 +442,10 @@ func (iptables *Iptables) DeletePolicy(chain string, policy IptablesPolicy) erro
 func (iptables *Iptables) CheckPolicyExists(chain string, policyStr string) bool {
 	err := iptables.run(FilterTab, fmt.Sprintf("-C %s %s", chain, policyStr))
 	if err != nil {
+		global.LOG.Info("Rule Not Exist", err)
 		return false
 	}
+	global.LOG.Info("Rule  Exist", chain, policyStr)
 	return true
 }
 
