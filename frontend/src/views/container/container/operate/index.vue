@@ -159,6 +159,7 @@
                                             <el-form-item label="IPv4" prop="ipv4">
                                                 <el-input
                                                     v-model="form.ipv4"
+                                                    :disabled="isIpDisabled"
                                                     :placeholder="$t('container.inputIpv4')"
                                                 />
                                             </el-form-item>
@@ -167,6 +168,7 @@
                                             <el-form-item label="IPv6" prop="ipv6">
                                                 <el-input
                                                     v-model="form.ipv6"
+                                                    :disabled="isIpDisabled"
                                                     :placeholder="$t('container.inputIpv6')"
                                                 />
                                             </el-form-item>
@@ -366,7 +368,7 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref } from 'vue';
+import { reactive, ref, computed, watch } from 'vue';
 import { Rules, checkFloatNumberRange, checkNumberRange } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
@@ -489,6 +491,20 @@ const rules = reactive({
     nanoCPUs: [Rules.floatNumber],
     memory: [Rules.floatNumber],
 });
+
+const isIpDisabled = computed(() => {
+    return form.network === 'none' || form.network === 'host' || form.network === 'bridge';
+});
+
+watch(
+    () => form.network,
+    (newValue) => {
+        if (newValue === 'none' || newValue === 'host') {
+            form.ipv4 = '';
+            form.ipv6 = '';
+        }
+    },
+);
 
 type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
@@ -685,9 +701,6 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-.widthClass {
-    width: 100%;
-}
 .el-card {
     border: 1px solid var(--el-border-color-light) !important;
 }
