@@ -17,11 +17,11 @@ download_resources() {
   fi
 
   if [ ! -f "1panel-core.service" ]; then
-    wget https://github.com/1Panel-dev/installer/raw/v2/1panel-core.service
+    wget https://github.com/1Panel-dev/installer/raw/v2/initscript/1panel-core.service
   fi
 
   if [ ! -f "1panel-agent.service" ]; then
-    wget https://github.com/1Panel-dev/installer/raw/v2/1panel-agent.service
+    wget https://github.com/1Panel-dev/installer/raw/v2/initscript/1panel-agent.service
   fi
 
   if [ ! -d "lang" ]; then
