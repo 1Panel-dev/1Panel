@@ -2114,7 +2114,6 @@ const message = {
         restartOperatorHelper: 'アプリケーションが再起動されます。続けたいですか？',
         reloadOperatorHelper: 'アプリケーションはリロードされます。続けたいですか？',
         checkInstalledWarn: `「{0}」が検出されませんでした。「アプリストア」に移動してインストールしてください。`,
-        gotoInstalled: 'インストールに移動します',
         limitHelper: 'アプリケーションはすでにインストールされています。',
         deleteHelper: `「{0}」は、次のリソースに関連付けられています。チェックしてもう一度やり直してください！`,
         checkTitle: 'ヒント',
@@ -3631,6 +3630,8 @@ const message = {
             selectNode: 'ノードを選択',
             selectNodeError: 'ノードを選択してください',
             licenseHelper: 'プロバージョンはカスタムアプリケーションリポジトリ機能をサポートしています',
+            databaseHelper: 'アプリケーション関連データベース、ターゲットノードのデータベースを選択してください',
+            nodeHelper: '現在のノードは選択できません',
         },
         alert: {
             isAlert: 'アラート',

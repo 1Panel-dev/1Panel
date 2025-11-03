@@ -2079,7 +2079,6 @@ const message = {
         restartOperatorHelper: '애플리케이션이 재시작됩니다. 계속 하시겠습니까?',
         reloadOperatorHelper: '애플리케이션이 다시 로드됩니다. 계속 하시겠습니까?',
         checkInstalledWarn: '"{0}"이(가) 감지되지 않았습니다. "앱 스토어"로 가서 설치하세요.',
-        gotoInstalled: '설치하러 가기',
         limitHelper: '애플리케이션은 이미 설치되었습니다.',
         deleteHelper: '"{0}"은(는) 다음 리소스와 연결되어 있습니다. 확인 후 다시 시도하세요!',
         checkTitle: '힌트',
@@ -3567,6 +3566,8 @@ const message = {
             selectNode: '노드 선택',
             selectNodeError: '노드를 선택하세요',
             licenseHelper: '프로 버전은 사용자 정의 애플리케이션 저장소 기능을 지원합니다',
+            databaseHelper: '애플리케이션 관련 데이터베이스, 대상 노드 데이터베이스를 선택하세요',
+            nodeHelper: '현재 노드는 선택할 수 없습니다',
         },
         alert: {
             isAlert: '알림',

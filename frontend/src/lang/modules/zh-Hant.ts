@@ -2044,7 +2044,6 @@ const message = {
         versionSelect: '請選擇版本',
         operatorHelper: '將對選中應用進行 {0} 操作，是否繼續？',
         checkInstalledWarn: '未檢測到 {0} ,請進入應用商店點擊安裝！',
-        gotoInstalled: '去安裝',
         limitHelper: '該應用已安裝，不支援重複安裝',
         deleteHelper: '{0}已經關聯以下資源，請檢查後重試！',
         checkTitle: '提示',
@@ -3456,6 +3455,8 @@ const message = {
             selectNode: '選擇節點',
             selectNodeError: '請選擇節點',
             licenseHelper: '專業版支援自訂應用倉庫功能',
+            databaseHelper: '應用關聯數據庫，請選擇目標節點數據庫',
+            nodeHelper: '不能選擇當前節點',
         },
         alert: {
             isAlert: '是否告警',

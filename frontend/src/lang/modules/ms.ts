@@ -2177,7 +2177,6 @@ const message = {
         restartOperatorHelper: 'Aplikasi akan dimulakan semula. Adakah anda mahu meneruskan?',
         reloadOperatorHelper: 'Aplikasi akan dimuat semula. Adakah anda mahu meneruskan?',
         checkInstalledWarn: '"{0}" tidak dikesan. Pergi ke "Kedai Aplikasi" untuk memasang.',
-        gotoInstalled: 'Pergi ke pasang',
         limitHelper: 'Aplikasi ini telah dipasang.',
         deleteHelper: '"{0}" telah dikaitkan dengan sumber berikut. Sila semak dan cuba lagi!',
         checkTitle: 'Petunjuk',
@@ -3704,6 +3703,8 @@ const message = {
             selectNode: 'Pilih Node',
             selectNodeError: 'Sila pilih node',
             licenseHelper: 'Versi Pro menyokong fungsi gudang aplikasi tersuai',
+            databaseHelper: 'Pangkalan data berkaitan aplikasi, sila pilih pangkalan data nod sasaran',
+            nodeHelper: 'Tidak boleh memilih nod semasa',
         },
         alert: {
             isAlert: 'Amaran',

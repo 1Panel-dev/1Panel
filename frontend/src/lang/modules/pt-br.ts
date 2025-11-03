@@ -2170,7 +2170,6 @@ const message = {
         restartOperatorHelper: 'O aplicativo será reiniciado. Deseja continuar?',
         reloadOperatorHelper: 'O aplicativo será recarregado. Deseja continuar?',
         checkInstalledWarn: `"{0}" não foi detectado. Vá para "Loja de Aplicativos" para instalar.`,
-        gotoInstalled: 'Ir para instalar',
         limitHelper: 'O aplicativo já foi instalado.',
         deleteHelper: `"{0}" foi associado aos seguintes recursos. Por favor, verifique e tente novamente!`,
         checkTitle: 'Dica',
@@ -3720,6 +3719,8 @@ const message = {
             selectNode: 'Selecionar Node',
             selectNodeError: 'Por favor, selecione um nó',
             licenseHelper: 'A versão Pro suporta o recurso de repositório de aplicativos personalizados',
+            databaseHelper: 'Banco de dados associado ao aplicativo, selecione o banco de dados do nó de destino',
+            nodeHelper: 'Não é possível selecionar o nó atual',
         },
         alert: {
             isAlert: 'Alerta',

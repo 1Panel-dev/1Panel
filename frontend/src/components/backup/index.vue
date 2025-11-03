@@ -128,7 +128,7 @@
 
     <OpDialog ref="opRef" @search="search" />
     <TaskLog ref="taskLogRef" @close="search" />
-    <PushApp ref="pushAppRef" v-if="isProductPro" />
+    <PushApp ref="pushAppRef" />
 </template>
 
 <script lang="ts" setup>
@@ -150,7 +150,7 @@ import { MsgSuccess } from '@/utils/message';
 import TaskLog from '@/components/log/task/index.vue';
 import { routerToFileWithPath } from '@/utils/router';
 import { useGlobalStore } from '@/composables/useGlobalStore';
-const { isProductPro, currentNode } = useGlobalStore();
+const { currentNode } = useGlobalStore();
 
 const PushApp = defineAsyncComponent(async () => {
     const modules = import.meta.glob('@/xpack/views/appstore/push-app/index.vue');

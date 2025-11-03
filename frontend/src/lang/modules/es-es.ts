@@ -2200,7 +2200,6 @@ const message = {
         restartOperatorHelper: 'La aplicación se reiniciará. ¿Desea continuar?',
         reloadOperatorHelper: 'La aplicación se recargará. ¿Desea continuar?',
         checkInstalledWarn: 'No se detecta "{0}". Vaya a "Tienda de aplicaciones" para instalar.',
-        gotoInstalled: 'Ir a instalar',
         limitHelper: 'La aplicación ya está instalada.',
         deleteHelper: '"{0}" está asociada con los siguientes recursos y no puede eliminarse',
         checkTitle: 'Aviso',
@@ -3692,6 +3691,8 @@ const message = {
             selectNode: 'Seleccionar Nodo',
             selectNodeError: 'Por favor, selecciona un nodo',
             licenseHelper: 'La versión Pro admite la función de repositorio de aplicaciones personalizadas',
+            databaseHelper: 'Base de datos asociada a la aplicación, seleccione la base de datos del nodo destino',
+            nodeHelper: 'No se puede seleccionar el nodo actual',
         },
         alert: {
             isAlert: 'Alerta',

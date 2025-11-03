@@ -2198,7 +2198,6 @@ const message = {
         restartOperatorHelper: 'The application will be restarted. Do you want to continue?',
         reloadOperatorHelper: 'The application will be reloaded. Do you want to continue?',
         checkInstalledWarn: `"{0}" isn't detected. Go to "App Store" to install.`,
-        gotoInstalled: 'Go to install',
         limitHelper: 'The application has already been installed.',
         deleteHelper: `"{0}" has been associated with the following resource(s) and can't be deleted`,
         checkTitle: 'Hint',
@@ -3742,6 +3741,8 @@ const message = {
             selectNode: 'Select Node',
             selectNodeError: 'Please select a node',
             licenseHelper: 'The Pro version supports the custom application repository feature',
+            databaseHelper: 'Application associated database, please select target node database',
+            nodeHelper: 'Cannot select current node',
         },
         alert: {
             isAlert: 'Alert',

@@ -182,10 +182,12 @@ func (r *Local) Recover(info RecoverInfo) error {
 		cmd.Stdin = fi
 	}
 	stdout, err := cmd.CombinedOutput()
-	if err != nil || strings.HasPrefix(string(stdout), "ERROR ") {
-		return errors.New(string(stdout))
+	if err != nil {
+		if strings.HasPrefix(string(stdout), "ERROR ") {
+			return errors.New(string(stdout))
+		}
+		return err
 	}
-
 	return nil
 }
 

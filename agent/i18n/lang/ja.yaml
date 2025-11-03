@@ -77,7 +77,7 @@ ErrAppWarn: '異常な状態です。ログを確認してください'
 ErrAppParamKey: 'パラメータ {{ .name }} フィールドが異常です'
 ErrAppUpgrade: 'アプリケーション {{ .name }} のアップグレードに失敗しました {{ .err }}'
 AppRecover: 'アプリケーション {{ .name }} をロールバックします'
-PullImageStart: "イメージ {{ .name }} のプルを開始します"
+PullImageStart: "イメージ [{{ .name }}] のプルを開始します"
 PullImageSuccess: 'イメージのプルが成功しました'
 AppStoreIsLastVersion: 'App Store はすでに最新バージョンです'
 AppStoreSyncSuccess: 'App Store の同期が成功しました'

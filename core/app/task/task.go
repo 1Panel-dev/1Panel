@@ -126,6 +126,7 @@ func (s *SubTask) Execute() error {
 	if s.Name == "" {
 		subTaskName = i18n.GetMsgByKey("SubTask")
 	}
+	s.RootTask.LogStart(subTaskName)
 	var err error
 	for i := 0; i < s.Retry+1; i++ {
 		if i > 0 {

@@ -2223,7 +2223,6 @@ const message = {
         restartOperatorHelper: 'Uygulama yeniden başlatılacak. Devam etmek istiyor musunuz?',
         reloadOperatorHelper: 'Uygulama yeniden yüklenecek. Devam etmek istiyor musunuz?',
         checkInstalledWarn: '"{0}" tespit edilmedi. Kurulum için "Uygulama Mağazası"na gidin.',
-        gotoInstalled: 'Kurulum için git',
         limitHelper: 'Uygulama zaten kurulmuş.',
         deleteHelper: '"{0}" aşağıdaki kaynak(lar) ile ilişkilendirilmiş ve silinemez',
         checkTitle: 'İpucu',
@@ -3785,6 +3784,8 @@ const message = {
             selectNode: 'Düğüm Seç',
             selectNodeError: 'Lütfen bir düğüm seçin',
             licenseHelper: 'Pro sürümü, özel uygulama deposu özelliğini destekler',
+            databaseHelper: 'Uygulama ilişkili veritabanı, lütfen hedef düğüm veritabanını seçin',
+            nodeHelper: 'Geçerli düğüm seçilemez',
         },
         alert: {
             isAlert: 'Uyarı',

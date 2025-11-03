@@ -2036,7 +2036,6 @@ const message = {
         versionSelect: '请选择版本',
         operatorHelper: '将对选中应用进行 {0} 操作，是否继续？',
         checkInstalledWarn: '未检测到 {0} ,请进入应用商店点击安装！',
-        gotoInstalled: '去安装',
         limitHelper: '该应用已安装，不支持重复安装',
         deleteHelper: '{0}已经关联以下资源，请检查后重试！',
         checkTitle: '提示',
@@ -3443,6 +3442,8 @@ const message = {
             selectNode: '选择节点',
             selectNodeError: '请选择节点',
             licenseHelper: '专业版支持自定义应用仓库功能',
+            databaseHelper: '应用关联数据库，请选择目标节点数据库',
+            nodeHelper: '不能选择当前节点',
         },
         alert: {
             isAlert: '是否告警',
