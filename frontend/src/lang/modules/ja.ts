@@ -3632,6 +3632,8 @@ const message = {
             licenseHelper: 'プロバージョンはカスタムアプリケーションリポジトリ機能をサポートしています',
             databaseHelper: 'アプリケーション関連データベース、ターゲットノードのデータベースを選択してください',
             nodeHelper: '現在のノードは選択できません',
+            migrateHelper:
+                '現在、単体アプリケーションと MySQL、MariaDB、PostgreSQL データベースのみに関連するアプリケーションの移行のみをサポートしています',
         },
         alert: {
             isAlert: 'アラート',

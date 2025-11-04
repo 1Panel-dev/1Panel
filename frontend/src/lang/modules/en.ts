@@ -3743,6 +3743,8 @@ const message = {
             licenseHelper: 'The Pro version supports the custom application repository feature',
             databaseHelper: 'Application associated database, please select target node database',
             nodeHelper: 'Cannot select current node',
+            migrateHelper:
+                'Currently only supports migrating monolithic applications and applications associated only with MySQL, MariaDB, PostgreSQL databases',
         },
         alert: {
             isAlert: 'Alert',

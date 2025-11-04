@@ -3786,6 +3786,8 @@ const message = {
             licenseHelper: 'Pro sürümü, özel uygulama deposu özelliğini destekler',
             databaseHelper: 'Uygulama ilişkili veritabanı, lütfen hedef düğüm veritabanını seçin',
             nodeHelper: 'Geçerli düğüm seçilemez',
+            migrateHelper:
+                'Şu anda yalnızca tek parça uygulamaların ve yalnızca MySQL, MariaDB, PostgreSQL veritabanlarıyla ilişkili uygulamaların taşınmasını destekler',
         },
         alert: {
             isAlert: 'Uyarı',

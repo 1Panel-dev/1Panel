@@ -3568,6 +3568,8 @@ const message = {
             licenseHelper: '프로 버전은 사용자 정의 애플리케이션 저장소 기능을 지원합니다',
             databaseHelper: '애플리케이션 관련 데이터베이스, 대상 노드 데이터베이스를 선택하세요',
             nodeHelper: '현재 노드는 선택할 수 없습니다',
+            migrateHelper:
+                '현재 단일 애플리케이션과 MySQL, MariaDB, PostgreSQL 데이터베이스만 연결된 애플리케이션의 마이그레이션만 지원합니다',
         },
         alert: {
             isAlert: '알림',

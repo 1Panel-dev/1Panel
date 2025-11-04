@@ -3721,6 +3721,8 @@ const message = {
             licenseHelper: 'A versão Pro suporta o recurso de repositório de aplicativos personalizados',
             databaseHelper: 'Banco de dados associado ao aplicativo, selecione o banco de dados do nó de destino',
             nodeHelper: 'Não é possível selecionar o nó atual',
+            migrateHelper:
+                'Atualmente suporta apenas a migração de aplicações monolíticas e aplicações associadas apenas a bancos de dados MySQL, MariaDB, PostgreSQL',
         },
         alert: {
             isAlert: 'Alerta',

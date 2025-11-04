@@ -3693,6 +3693,8 @@ const message = {
             licenseHelper: 'La versión Pro admite la función de repositorio de aplicaciones personalizadas',
             databaseHelper: 'Base de datos asociada a la aplicación, seleccione la base de datos del nodo destino',
             nodeHelper: 'No se puede seleccionar el nodo actual',
+            migrateHelper:
+                'Actualmente solo admite la migración de aplicaciones monolíticas y aplicaciones asociadas únicamente con bases de datos MySQL, MariaDB, PostgreSQL',
         },
         alert: {
             isAlert: 'Alerta',

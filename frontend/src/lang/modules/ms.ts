@@ -3705,6 +3705,8 @@ const message = {
             licenseHelper: 'Versi Pro menyokong fungsi gudang aplikasi tersuai',
             databaseHelper: 'Pangkalan data berkaitan aplikasi, sila pilih pangkalan data nod sasaran',
             nodeHelper: 'Tidak boleh memilih nod semasa',
+            migrateHelper:
+                'Kini hanya menyokong penghijrahan aplikasi monolitik dan aplikasi yang hanya dikaitkan dengan pangkalan data MySQL, MariaDB, PostgreSQL',
         },
         alert: {
             isAlert: 'Amaran',

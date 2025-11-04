@@ -3457,6 +3457,7 @@ const message = {
             licenseHelper: '專業版支援自訂應用倉庫功能',
             databaseHelper: '應用關聯數據庫，請選擇目標節點數據庫',
             nodeHelper: '不能選擇當前節點',
+            migrateHelper: '目前僅支持遷移單體應用和只關聯 MySQL、MariaDB、PostgreSQL 數據庫的應用',
         },
         alert: {
             isAlert: '是否告警',

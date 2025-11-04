@@ -162,6 +162,7 @@ export namespace App {
         httpPort: number;
         container: string;
         env: { [key: string]: string };
+        appKey: string;
     }
 
     export interface AppInstallDto {
