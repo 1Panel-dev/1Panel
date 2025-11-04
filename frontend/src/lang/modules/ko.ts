@@ -2181,6 +2181,8 @@ const message = {
         uninstallDeleteBackup: '앱 제거 - 백업 삭제',
         uninstallDeleteImage: '앱 제거 - 이미지 삭제',
         upgradeBackup: '앱 업그레이드 전 앱 백업',
+        noAppHelper: '애플리케이션이 감지되지 않았습니다. 작업 센터에서 앱 스토어 동기화 로그를 확인해 주세요',
+        isEdirWarn: 'docker-compose.yml 파일이 수정된 것을 감지했습니다. 비교를 확인해 주세요',
     },
     website: {
         primaryDomain: '기본 도메인',

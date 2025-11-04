@@ -2302,6 +2302,8 @@ const message = {
         uninstallDeleteBackup: 'Uninstall App - Delete Backup',
         uninstallDeleteImage: 'Uninstall App - Delete Image',
         upgradeBackup: 'Backup App Before Upgrade',
+        noAppHelper: 'No application detected, please go to the task center to view the app store sync log',
+        isEdirWarn: 'Detected modification to docker-compose.yml file, please check the comparison',
     },
     website: {
         primaryDomain: 'Primary domain',

@@ -550,7 +550,7 @@ const openOperate = (row: any, op: string) => {
     operateReq.installId = row.id;
     operateReq.operate = op;
     if (op == 'upgrade') {
-        upgradeRef.value.acceptParams(row.id, row.name, row.dockerCompose, op, row.app);
+        upgradeRef.value.acceptParams(row, op);
     } else if (op == 'delete') {
         appInstalledDeleteCheck(row.id).then(async (res) => {
             const items = res.data;

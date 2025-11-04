@@ -2130,6 +2130,7 @@ const message = {
         uninstallDeleteImage: '卸载应用-删除镜像',
         upgradeBackup: '应用升级前备份应用',
         noAppHelper: '未检测到应用，请前往任务中心查看应用商店同步日志',
+        isEdirWarn: '检测到 docker-compose.yml 文件被修改，请查看对比',
     },
     website: {
         primaryDomain: '主域名',

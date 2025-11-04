@@ -128,6 +128,7 @@ type AppInstallDTO struct {
 	Favorite      bool      `json:"favorite"`
 	App           AppDetail `json:"app"`
 	Container     string    `json:"container"`
+	IsEdit        bool      `json:"isEdit"`
 }
 
 type AppInstallInfo struct {

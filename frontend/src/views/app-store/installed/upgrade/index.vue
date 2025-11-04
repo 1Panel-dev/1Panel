@@ -53,20 +53,19 @@
                     <span class="input-help">{{ $t('app.pullImageHelper') }}</span>
                 </el-form-item>
             </el-form>
-
             <div v-if="operateReq.operate === 'upgrade'">
-                <el-text type="warning">{{ $t('app.upgradeWarn') }}</el-text>
-                <br />
-                <el-button @click="openDiff()" type="primary" class="mt-2">
-                    {{ $t('app.showDiff') }}
-                </el-button>
+                <el-text type="danger" v-if="isEdit">{{ $t('app.isEdirWarn') }}</el-text>
+                <el-text type="warning" v-else>{{ $t('app.upgradeWarn') }}</el-text>
                 <div>
-                    <el-checkbox v-model="useNewCompose" :label="$t('app.useCustom')" size="large" />
+                    <el-button @click="openDiff()" :type="isEdit ? 'warning' : 'primary'">
+                        {{ $t('app.showDiff') }}
+                    </el-button>
                 </div>
+                <el-checkbox v-model="useNewCompose" :label="$t('app.useCustom')" size="large" />
                 <div v-if="useNewCompose">
-                    <el-text type="danger">{{ $t('app.useCustomHelper') }}</el-text>
+                    <el-text type="danger" v-if="!isEdit">{{ $t('app.useCustomHelper') }}</el-text>
+                    <CodemirrorPro v-model="newCompose" mode="yaml"></CodemirrorPro>
                 </div>
-                <CodemirrorPro v-if="useNewCompose" v-model="newCompose" mode="yaml"></CodemirrorPro>
             </div>
         </div>
         <template #footer>
@@ -131,6 +130,7 @@ const ignoreAppReq = reactive({
     appDetailID: 0,
     scope: 'app',
 });
+const isEdit = ref(false);
 
 const toLink = (link: string) => {
     window.open(link, '_blank');
@@ -162,16 +162,17 @@ const initData = async () => {
     operateReq.dockerCompose = '';
 };
 
-const acceptParams = (id: number, name: string, dockerCompose: string, op: string, appDetail: App.AppDetail) => {
+const acceptParams = (appInstall: App.AppInstallDto, op: string) => {
     initData();
-    operateReq.installId = id;
+    isEdit.value = appInstall.isEdit;
+    operateReq.installId = appInstall.id;
     operateReq.operate = op;
-    resourceName.value = name;
-    app.value = appDetail;
-    oldContent.value = dockerCompose;
-    appInstallID.value = id;
+    resourceName.value = appInstall.name;
+    app.value = appInstall.app;
+    oldContent.value = appInstall.dockerCompose;
+    appInstallID.value = appInstall.id;
     getVersions('');
-    ignoreAppReq.appID = appDetail.appId;
+    ignoreAppReq.appID = appInstall.app.id;
     if (op === 'ignore') {
         operateReq.detailId = -1;
     }

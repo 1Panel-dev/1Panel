@@ -184,6 +184,9 @@ export namespace App {
         appKey: string;
         appType: string;
         appStatus: string;
+        isEdit: boolean;
+        dockerCompose: string;
+        app: App.AppDetail;
     }
 
     export interface AppInstalledInfo {

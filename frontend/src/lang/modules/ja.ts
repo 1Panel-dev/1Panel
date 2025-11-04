@@ -2218,6 +2218,8 @@ const message = {
         uninstallDeleteBackup: 'アプリをアンインストール - バックアップを削除',
         uninstallDeleteImage: 'アプリをアンインストール - イメージを削除',
         upgradeBackup: 'アプリのアップグレード前にアプリをバックアップ',
+        noAppHelper: 'アプリケーションが検出されませんでした。タスクセンターでアプリストアの同期ログを確認してください',
+        isEdirWarn: 'docker-compose.yml ファイルが変更されたことを検出しました。比較を確認してください',
     },
     website: {
         primaryDomain: 'プライマリドメイン',

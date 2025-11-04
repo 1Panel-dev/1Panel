@@ -2137,6 +2137,8 @@ const message = {
         uninstallDeleteBackup: '移除應用-刪除備份',
         uninstallDeleteImage: '移除應用-刪除鏡像',
         upgradeBackup: '應用升級前備份應用',
+        noAppHelper: '未檢測到應用程式，請前往任務中心查看應用商店同步日誌',
+        isEdirWarn: '檢測到 docker-compose.yml 檔案被修改，請查看對比',
     },
     website: {
         primaryDomain: '主域名',
