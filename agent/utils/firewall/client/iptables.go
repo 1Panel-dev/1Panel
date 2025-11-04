@@ -19,6 +19,7 @@ const (
 	ChainOutput       = "OUTPUT"
 	Chain1PanelInput  = "1PANEL_INPUT"
 	Chain1PanelOutput = "1PANEL_OUTPUT"
+	Chain1PanelBasic  = "1PANEL_BASIC"
 )
 
 const (
@@ -412,6 +413,47 @@ func (iptables *Iptables) ChainExists(tab, chain string) (bool, error) {
 	return true, nil
 }
 
+// ensureChain creates a chain if it doesn't exist
+func (iptables *Iptables) ensureChain(tab, chain string) error {
+	exists, err := iptables.ChainExists(tab, chain)
+	if err != nil {
+		return fmt.Errorf("failed to check chain %s: %w", chain, err)
+	}
+	if !exists {
+		if err := iptables.NewChain(tab, chain); err != nil {
+			return fmt.Errorf("failed to create chain %s: %w", chain, err)
+		}
+	}
+	return nil
+}
+
+// ensureJumpRule adds a jump rule to targetChain at specified position if it doesn't exist
+func (iptables *Iptables) ensureJumpRule(chain, targetChain string, position int) error {
+	if !iptables.CheckPolicyExists(chain, fmt.Sprintf("-j %s", targetChain)) {
+		return iptables.run(FilterTab, fmt.Sprintf("-I %s %d -j %s", chain, position, targetChain))
+	}
+	return nil
+}
+
+// ensureChainWithJump creates a custom chain and adds jump rule from parent chain if not exists
+func (iptables *Iptables) ensureChainWithJump(tab, parentChain, customChain string) error {
+	// Ensure custom chain exists
+	exists, err := iptables.ChainExists(tab, customChain)
+	if err != nil {
+		return fmt.Errorf("failed to check chain %s: %w", customChain, err)
+	}
+	if !exists {
+		if err := iptables.NewChain(tab, customChain); err != nil {
+			return fmt.Errorf("failed to create chain %s: %w", customChain, err)
+		}
+		// Add jump rule from parent chain
+		if err := iptables.AppendChain(tab, parentChain, customChain); err != nil {
+			return fmt.Errorf("failed to append %s to %s: %w", customChain, parentChain, err)
+		}
+	}
+	return nil
+}
+
 // FlushChain 清空链（保留链结构）
 func (iptables *Iptables) FlushChain(tab, chain string) error {
 	return iptables.run(tab, fmt.Sprintf("-F %s", chain))
@@ -487,17 +529,32 @@ func (iptables *Iptables) setupEstablishedRules(direction string) {
 
 func (iptables *Iptables) Setup1PanelFirewallChains(direction string) error {
 	iptables.setupEstablishedRules(direction)
+
 	if direction == "input" {
-		if !iptables.CheckPolicyExists(ChainInput, fmt.Sprintf("-j %s", Chain1PanelInput)) {
-			if err := iptables.run(FilterTab, fmt.Sprintf("-I %s 3 -j %s", ChainInput, Chain1PanelInput)); err != nil {
-				return err
-			}
+		// Ensure custom chains exist
+		if err := iptables.ensureChain(FilterTab, Chain1PanelInput); err != nil {
+			return err
+		}
+		if err := iptables.ensureChain(FilterTab, Chain1PanelBasic); err != nil {
+			return err
+		}
+
+		// Add jump rules to INPUT chain
+		if err := iptables.ensureJumpRule(ChainInput, Chain1PanelInput, 3); err != nil {
+			return err
+		}
+		if err := iptables.ensureJumpRule(ChainInput, Chain1PanelBasic, 4); err != nil {
+			return err
 		}
 	} else if direction == "output" {
-		if !iptables.CheckPolicyExists(ChainOutput, fmt.Sprintf("-j %s", Chain1PanelOutput)) {
-			if err := iptables.run(FilterTab, fmt.Sprintf("-I %s 3 -j %s", ChainOutput, Chain1PanelOutput)); err != nil {
-				return err
-			}
+		// Ensure custom chain exists
+		if err := iptables.ensureChain(FilterTab, Chain1PanelOutput); err != nil {
+			return err
+		}
+
+		// Add jump rule to OUTPUT chain
+		if err := iptables.ensureJumpRule(ChainOutput, Chain1PanelOutput, 3); err != nil {
+			return err
 		}
 	}
 	return nil

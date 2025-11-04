@@ -2844,6 +2844,8 @@ const message = {
     firewall: {
         create: 'Create rule',
         edit: 'Edit rule',
+        advancedControl: 'Advanced Control',
+        advancedControlNotAvailable: 'Currently using {0} firewall, advanced rules only support iptables',
         ccDeny: 'CC Protection',
         ipWhiteList: 'IP allowlist',
         ipBlockList: 'IP blocklist',
