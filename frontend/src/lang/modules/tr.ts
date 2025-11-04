@@ -831,6 +831,20 @@ const message = {
         inputIpv4: 'Örnek: 192.168.1.1',
         inputIpv6: 'Örnek: 2001:0db8:85a3:0000:0000:8a2e:0370:7334',
 
+        diskUsage: 'Disk Kullanımı',
+        localVolume: 'Yerel Depolama Birimi',
+        buildCache: 'Derleme Önbelleği',
+        usage: 'Kullanılan: {0}, Serbest Bırakılabilir: {1}',
+        clean: 'Serbest Bırak',
+        imageClean:
+            'Görüntüleri temizlemek, kullanılmayan tüm görüntüleri silecektir. Bu işlem geri alınamaz. Devam etmek istiyor musunuz?',
+        containerClean:
+            'Konteynerleri temizlemek, durdurulmuş tüm konteynerleri (Uygulama Mağazası ndaki durdurulmuş uygulamalar dahil) silecektir. Bu işlem geri alınamaz. Devam etmek istiyor musunuz?',
+        sizeRw: 'Konteyner Katman Boyutu',
+        sizeRwHelper: 'Konteynere özel yazılabilir katman boyutu',
+        sizeRootFs: 'Sanal Boyut',
+        sizeRootFsHelper: 'Konteynerin bağımlı olduğu tüm görüntü katmanları + konteyner katmanının toplam boyutu',
+
         containerFromAppHelper:
             'Bu konteynerin uygulama mağazasından geldiği tespit edildi. Uygulama işlemleri mevcut düzenlemelerin geçersiz hale gelmesine neden olabilir.',
         containerFromAppHelper1:

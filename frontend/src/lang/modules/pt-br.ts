@@ -814,6 +814,21 @@ const message = {
         inputIpv4: 'Exemplo: 192.168.1.1',
         inputIpv6: 'Exemplo: 2001:0db8:85a3:0000:0000:8a2e:0370:7334',
 
+        diskUsage: 'Uso do Disco',
+        localVolume: 'Volume de Armazenamento Local',
+        buildCache: 'Cache de Build',
+        usage: 'Usado: {0}, Liberável: {1}',
+        clean: 'Liberar',
+        imageClean:
+            'Limpar imagens excluirá todas as imagens não utilizadas. Esta operação não pode ser desfeita. Continuar?',
+        containerClean:
+            'Limpar contêineres excluirá todos os contêineres parados (incluindo aplicativos parados da Loja de Aplicativos). Esta operação não pode ser desfeita. Continuar?',
+        sizeRw: 'Tamanho da Camada do Contêiner',
+        sizeRwHelper: 'Tamanho da camada gravável exclusiva do contêiner',
+        sizeRootFs: 'Tamanho Virtual',
+        sizeRootFsHelper:
+            'Tamanho total de todas as camadas de imagem das quais o contêiner depende + camada do contêiner',
+
         containerFromAppHelper:
             'Detectamos que este contêiner vem da loja de aplicativos. As operações no aplicativo podem fazer com que as edições atuais sejam invalidadas.',
         containerFromAppHelper1:

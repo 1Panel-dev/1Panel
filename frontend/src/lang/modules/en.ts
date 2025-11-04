@@ -822,6 +822,19 @@ const message = {
         inputIpv4: 'Example: 192.168.1.1',
         inputIpv6: 'Example: 2001:0db8:85a3:0000:0000:8a2e:0370:7334',
 
+        diskUsage: 'Disk Usage',
+        localVolume: 'Local Storage Volume',
+        buildCache: 'Build Cache',
+        usage: 'Used: {0}, Releasable: {1}',
+        clean: 'Release',
+        imageClean: 'Clean up images will delete all unused images. This operation cannot be rolled back. Continue?',
+        containerClean:
+            'Clean up containers will delete all stopped containers (including stopped apps from App Store). This operation cannot be rolled back. Continue?',
+        sizeRw: 'Layer Size',
+        sizeRwHelper: 'Size of the writable layer unique to the container',
+        sizeRootFs: 'Virtual Size',
+        sizeRootFsHelper: 'Total size of all image layers the container depends on + container layer',
+
         containerFromAppHelper:
             'Detected that this container originates from the app store. App operations may cause current edits to be invalidated.',
         containerFromAppHelper1:

@@ -135,7 +135,7 @@ func (b *BaseApi) GetWelcomePage(c *gin.Context) {
 	}
 	file, err := os.ReadFile(path.Join(global.CONF.Base.InstallDir, "1panel/welcome/index.html"))
 	if err != nil {
-		helper.InternalServer(c, err)
+		helper.Success(c)
 		return
 	}
 	helper.SuccessWithData(c, string(file))

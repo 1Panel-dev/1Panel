@@ -817,6 +817,20 @@ const message = {
         inputIpv4: 'Contoh: 192.168.1.1',
         inputIpv6: 'Contoh: 2001:0db8:85a3:0000:0000:8a2e:0370:7334',
 
+        diskUsage: 'Penggunaan Cakera',
+        localVolume: 'Isipadu Storan Tempatan',
+        buildCache: 'Cache Binaan',
+        usage: 'Digunakan: {0}, Boleh Dibebaskan: {1}',
+        clean: 'Bebaskan',
+        imageClean:
+            'Membersihkan imej akan memadam semua imej yang tidak digunakan. Operasi ini tidak boleh dikembalikan. Teruskan?',
+        containerClean:
+            'Membersihkan bekas akan memadam semua bekas yang dihentikan (termasuk aplikasi berhenti dari Kedai Apl). Operasi ini tidak boleh dikembalikan. Teruskan?',
+        sizeRw: 'Saiz Lapisan Bekas',
+        sizeRwHelper: 'Saiz lapisan boleh tulis yang unik untuk bekas',
+        sizeRootFs: 'Saiz Maya',
+        sizeRootFsHelper: 'Jumlah saiz semua lapisan imej yang disandarkan oleh bekas + lapisan bekas',
+
         containerFromAppHelper:
             'Dikesan bahawa kontena ini berasal dari gedung aplikasi. Operasi aplikasi boleh menyebabkan suntingan semasa menjadi tidak sah.',
         containerFromAppHelper1:

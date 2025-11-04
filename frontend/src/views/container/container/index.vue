@@ -173,59 +173,46 @@
                                         <svg-icon iconName="p-xiangqing" class="svg-icon"></svg-icon>
                                     </template>
                                     <template #default>
-                                        <el-row>
-                                            <el-col :span="8">
-                                                <el-statistic
-                                                    :title="$t('container.cpuUsage')"
-                                                    :value="loadCPUValue(row.cpuTotalUsage)"
-                                                    :precision="2"
-                                                >
-                                                    <template #suffix>{{ loadCPUUnit(row.cpuTotalUsage) }}</template>
-                                                </el-statistic>
-                                            </el-col>
-                                            <el-col :span="8">
-                                                <el-statistic
-                                                    :title="$t('container.cpuTotal')"
-                                                    :value="loadCPUValue(row.systemUsage)"
-                                                    :precision="2"
-                                                >
-                                                    <template #suffix>{{ loadCPUUnit(row.systemUsage) }}</template>
-                                                </el-statistic>
-                                            </el-col>
-                                            <el-col :span="8">
-                                                <el-statistic :title="$t('container.core')" :value="row.percpuUsage" />
-                                            </el-col>
-                                        </el-row>
+                                        <el-descriptions direction="vertical" border :column="3" size="small">
+                                            <el-descriptions-item :label="$t('container.cpuUsage')">
+                                                {{ computeCPU(row.cpuTotalUsage) }}
+                                            </el-descriptions-item>
+                                            <el-descriptions-item :label="$t('container.cpuTotal')">
+                                                {{ computeCPU(row.systemUsage) }}
+                                            </el-descriptions-item>
+                                            <el-descriptions-item :label="$t('container.core')">
+                                                {{ row.percpuUsage }}
+                                            </el-descriptions-item>
 
-                                        <el-row class="mt-4">
-                                            <el-col :span="8">
-                                                <el-statistic
-                                                    :title="$t('container.memUsage')"
-                                                    :value="loadMemValue(row.memoryUsage)"
-                                                    :precision="2"
-                                                >
-                                                    <template #suffix>{{ loadMemUnit(row.memoryUsage) }}</template>
-                                                </el-statistic>
-                                            </el-col>
-                                            <el-col :span="8">
-                                                <el-statistic
-                                                    :title="$t('container.memCache')"
-                                                    :value="loadMemValue(row.memoryCache)"
-                                                    :precision="2"
-                                                >
-                                                    <template #suffix>{{ loadMemUnit(row.memoryCache) }}</template>
-                                                </el-statistic>
-                                            </el-col>
-                                            <el-col :span="8">
-                                                <el-statistic
-                                                    :title="$t('container.memTotal')"
-                                                    :value="loadMemValue(row.memoryLimit)"
-                                                    :precision="2"
-                                                >
-                                                    <template #suffix>{{ loadMemUnit(row.memoryLimit) }}</template>
-                                                </el-statistic>
-                                            </el-col>
-                                        </el-row>
+                                            <el-descriptions-item :label="$t('container.memUsage')">
+                                                {{ computeSizeForDocker(row.memoryUsage) }}
+                                            </el-descriptions-item>
+                                            <el-descriptions-item :label="$t('container.memCache')">
+                                                {{ computeSizeForDocker(row.memoryCache) }}
+                                            </el-descriptions-item>
+                                            <el-descriptions-item :label="$t('container.memTotal')">
+                                                {{ computeSizeForDocker(row.memoryLimit) }}
+                                            </el-descriptions-item>
+
+                                            <el-descriptions-item>
+                                                <template #label>
+                                                    {{ $t('container.sizeRw') }}
+                                                    <el-tooltip :content="$t('container.sizeRwHelper')">
+                                                        <el-icon class="icon-item"><InfoFilled /></el-icon>
+                                                    </el-tooltip>
+                                                </template>
+                                                {{ computeSize2(row.sizeRw) }}
+                                            </el-descriptions-item>
+                                            <el-descriptions-item :label="$t('container.sizeRootFs')">
+                                                <template #label>
+                                                    {{ $t('container.sizeRootFs') }}
+                                                    <el-tooltip :content="$t('container.sizeRootFsHelper')">
+                                                        <el-icon class="icon-item"><InfoFilled /></el-icon>
+                                                    </el-tooltip>
+                                                </template>
+                                                {{ computeSize2(row.sizeRootFs) }}
+                                            </el-descriptions-item>
+                                        </el-descriptions>
                                     </template>
                                 </el-popover>
                             </div>
@@ -379,7 +366,7 @@ import { MsgSuccess, MsgWarning } from '@/utils/message';
 import { GlobalStore } from '@/store';
 import { routerToName, routerToNameWithQuery } from '@/utils/router';
 import router from '@/routers';
-import { newUUID } from '@/utils/util';
+import { computeSize2, computeSizeForDocker, computeCPU, newUUID } from '@/utils/util';
 const globalStore = GlobalStore();
 
 const mobile = computed(() => {
@@ -490,28 +477,28 @@ const searchWithAppShow = (item: any) => {
 const loadContainerCount = async () => {
     await loadContainerStatus().then((res) => {
         tags.value = [];
-        if (res.data.all) {
-            tags.value.push({ key: 'all', count: res.data.all });
+        if (res.data.containerCount) {
+            tags.value.push({ key: 'all', count: res.data.containerCount });
         }
-        if (res.data.all) {
+        if (res.data.running) {
             tags.value.push({ key: 'running', count: res.data.running });
         }
-        if (res.data.all) {
+        if (res.data.paused) {
             tags.value.push({ key: 'paused', count: res.data.paused });
         }
-        if (res.data.all) {
+        if (res.data.restarting) {
             tags.value.push({ key: 'restarting', count: res.data.restarting });
         }
-        if (res.data.all) {
+        if (res.data.removing) {
             tags.value.push({ key: 'removing', count: res.data.removing });
         }
-        if (res.data.all) {
+        if (res.data.created) {
             tags.value.push({ key: 'created', count: res.data.created });
         }
-        if (res.data.all) {
+        if (res.data.dead) {
             tags.value.push({ key: 'dead', count: res.data.dead });
         }
-        if (res.data.all) {
+        if (res.data.exited) {
             tags.value.push({ key: 'exited', count: res.data.exited });
         }
     });
@@ -568,38 +555,6 @@ const loadStats = async () => {
         }
     }
 };
-
-const loadCPUUnit = (t: number) => {
-    const num = 1000;
-    if (t < num) return ' ns';
-    if (t < Math.pow(num, 2)) return ' μs';
-    if (t < Math.pow(num, 3)) return ' ms';
-    return ' s';
-};
-function loadCPUValue(t: number) {
-    const num = 1000;
-    if (t < num) return t;
-    if (t < Math.pow(num, 2)) return Number((t / num).toFixed(2));
-    if (t < Math.pow(num, 3)) return Number((t / Math.pow(num, 2)).toFixed(2));
-    return Number((t / Math.pow(num, 3)).toFixed(2));
-}
-const loadMemUnit = (t: number) => {
-    if (t == 0) {
-        return '';
-    }
-    const num = 1024;
-    if (t < num) return ' B';
-    if (t < Math.pow(num, 2)) return ' KiB';
-    if (t < Math.pow(num, 3)) return ' MiB';
-    return ' GiB';
-};
-function loadMemValue(t: number) {
-    const num = 1024;
-    if (t < num) return t;
-    if (t < Math.pow(num, 2)) return Number((t / num).toFixed(2));
-    if (t < Math.pow(num, 3)) return Number((t / Math.pow(num, 2)).toFixed(2));
-    return Number((t / Math.pow(num, 3)).toFixed(2));
-}
 
 const onContainerOperate = async (container: string) => {
     routerToNameWithQuery('ContainerCreate', { name: container });

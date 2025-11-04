@@ -27,7 +27,6 @@ export namespace Container {
         order: string;
     }
     export interface ContainerStatus {
-        all: number;
         created: number;
         running: number;
         paused: number;
@@ -44,7 +43,14 @@ export namespace Container {
         volumeCount: number;
         repoCount: number;
 
-        imageSize: number;
+        containerUsage: number;
+        containerReclaimable: number;
+        imageUsage: number;
+        imageReclaimable: number;
+        volumeUsage: number;
+        volumeReclaimable: number;
+        buildCacheUsage: number;
+        buildCacheReclaimable: number;
     }
     export interface ContainerOption {
         name: string;

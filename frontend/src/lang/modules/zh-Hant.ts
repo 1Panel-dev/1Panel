@@ -787,6 +787,18 @@ const message = {
         inputIpv4: '請輸入 IPv4 位址',
         inputIpv6: '請輸入 IPv6 位址',
 
+        diskUsage: '磁碟佔用',
+        localVolume: '本機儲存卷',
+        buildCache: '建置快取',
+        usage: '已佔用：{0}, 可釋放：{1}',
+        clean: '釋放',
+        imageClean: '清理映像將刪除所有未被使用的映像，該操作無法復原，是否繼續？',
+        containerClean: '清理容器將刪除所有處於停止中狀態的容器（包括應用商店停止應用），該操作無法復原，是否繼續？',
+        sizeRw: '容器層大小',
+        sizeRwHelper: '容器獨有的可寫層大小',
+        sizeRootFs: '虛擬大小',
+        sizeRootFsHelper: '容器依賴的所有映像層 + 容器層的總大小',
+
         containerFromAppHelper: '檢測到該容器來源於應用商店，應用操作可能會導致目前編輯失效',
         containerFromAppHelper1: '在已安裝應用程式列表點擊 [參數] 按鈕，進入編輯頁面即可修改容器名稱。',
         command: '指令',

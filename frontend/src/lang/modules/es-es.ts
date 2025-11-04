@@ -824,6 +824,22 @@ const message = {
             'El motor de contenedores usa un valor base de 1024 para la proporción de CPU. Puede aumentarlo para darle al contenedor más tiempo de CPU.',
         inputIpv4: 'Ejemplo: 192.168.1.1',
         inputIpv6: 'Ejemplo: 2001:0db8:85a3:0000:0000:8a2e:0370:7334',
+
+        diskUsage: 'Uso del Disco',
+        localVolume: 'Volumen de Almacenamiento Local',
+        buildCache: 'Caché de Construcción',
+        usage: 'Usado: {0}, Liberable: {1}',
+        clean: 'Liberar',
+        imageClean:
+            'Limpiar imágenes eliminará todas las imágenes no utilizadas. Esta operación no se puede deshacer. ¿Continuar?',
+        containerClean:
+            'Limpiar contenedores eliminará todos los contenedores detenidos (incluidas las aplicaciones detenidas de la Tienda de Aplicaciones). Esta operación no se puede deshacer. ¿Continuar?',
+        sizeRw: 'Tamaño de Capa de Contenedor',
+        sizeRwHelper: 'Tamaño de la capa escribible exclusiva del contenedor',
+        sizeRootFs: 'Tamaño Virtual',
+        sizeRootFsHelper:
+            'Tamaño total de todas las capas de imagen de las que depende el contenedor + capa del contenedor',
+
         containerFromAppHelper:
             'Se detectó que este contenedor proviene de la tienda de aplicaciones. Las operaciones sobre la app pueden invalidar los cambios actuales.',
         containerFromAppHelper1:
