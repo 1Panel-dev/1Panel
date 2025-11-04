@@ -2,9 +2,14 @@ package manager
 
 import (
 	"strings"
+
+	"github.com/1Panel-dev/1Panel/core/utils/ssh"
 )
 
-type Systemd struct{ toolCmd string }
+type Systemd struct {
+	toolCmd string
+	Client  *ssh.SSHClient
+}
 
 func NewSystemd() *Systemd {
 	return &Systemd{toolCmd: "systemctl"}
@@ -14,7 +19,7 @@ func (s *Systemd) Name() string {
 	return "systemd"
 }
 func (s *Systemd) IsActive(serviceName string) (bool, error) {
-	out, err := run(s.toolCmd, "is-active", serviceName)
+	out, err := run(s.Client, s.toolCmd, "is-active", serviceName)
 	if err != nil && out != "inactive\n" {
 		if NewSnap().IsActive(serviceName) {
 			return true, nil
@@ -25,7 +30,7 @@ func (s *Systemd) IsActive(serviceName string) (bool, error) {
 }
 
 func (s *Systemd) IsEnable(serviceName string) (bool, error) {
-	out, err := run(s.toolCmd, "is-enabled", serviceName)
+	out, err := run(s.Client, s.toolCmd, "is-enabled", serviceName)
 	if err != nil && out != "disabled\n" {
 		if serviceName == "sshd" && out == "alias\n" {
 			return s.IsEnable("ssh")
@@ -39,7 +44,7 @@ func (s *Systemd) IsEnable(serviceName string) (bool, error) {
 }
 
 func (s *Systemd) IsExist(serviceName string) (bool, error) {
-	out, err := run(s.toolCmd, "is-enabled", serviceName)
+	out, err := run(s.Client, s.toolCmd, "is-enabled", serviceName)
 	if err != nil && out != "enabled\n" {
 		if strings.Contains(out, "disabled") {
 			return true, err
@@ -53,10 +58,10 @@ func (s *Systemd) IsExist(serviceName string) (bool, error) {
 }
 
 func (s *Systemd) Status(serviceName string) (string, error) {
-	return run(s.toolCmd, "status", serviceName)
+	return run(s.Client, s.toolCmd, "status", serviceName)
 }
 func (s *Systemd) Operate(operate, serviceName string) error {
-	out, err := run(s.toolCmd, operate, serviceName)
+	out, err := run(s.Client, s.toolCmd, operate, serviceName)
 	if err != nil {
 		if serviceName == "sshd" && strings.Contains(out, "alias name or linked unit file") {
 			return s.Operate(operate, "ssh")
@@ -64,12 +69,12 @@ func (s *Systemd) Operate(operate, serviceName string) error {
 		if err := NewSnap().Operate(operate, serviceName); err == nil {
 			return nil
 		}
-		return handlerErr(run(s.toolCmd, operate, serviceName))
+		return handlerErr(run(s.Client, s.toolCmd, operate, serviceName))
 	}
 	return nil
 }
 
 func (s *Systemd) Reload() error {
-	out, err := run(s.toolCmd, "daemon-reload")
+	out, err := run(s.Client, s.toolCmd, "daemon-reload")
 	return handlerErr(out, err)
 }

@@ -6,9 +6,13 @@ import (
 	"path/filepath"
 
 	"github.com/1Panel-dev/1Panel/core/utils/cmd"
+	"github.com/1Panel-dev/1Panel/core/utils/ssh"
 )
 
-type Openrc struct{ toolCmd string }
+type Openrc struct {
+	toolCmd string
+	Client  *ssh.SSHClient
+}
 
 func NewOpenrc() *Openrc {
 	return &Openrc{toolCmd: "rc-service"}
@@ -32,8 +36,7 @@ func (s *Openrc) IsEnable(serviceName string) (bool, error) {
 	return out == "enabled\n", nil
 }
 func (s *Openrc) IsExist(serviceName string) (bool, error) {
-	_, err := os.Stat(filepath.Join("/etc/init.d", serviceName))
-	if err != nil {
+	if _, err := os.Stat(filepath.Join("/etc/init.d", serviceName)); err != nil {
 		if os.IsNotExist(err) {
 			return false, nil
 		}
@@ -42,17 +45,17 @@ func (s *Openrc) IsExist(serviceName string) (bool, error) {
 	return true, nil
 }
 func (s *Openrc) Status(serviceName string) (string, error) {
-	return run(s.toolCmd, serviceName, "status")
+	return run(s.Client, s.toolCmd, serviceName, "status")
 }
 
 func (s *Openrc) Operate(operate, serviceName string) error {
 	switch operate {
 	case "enable":
-		return handlerErr(run("rc-update", "add", serviceName, "default"))
+		return handlerErr(run(s.Client, "rc-update", "add", serviceName, "default"))
 	case "disable":
-		return handlerErr(run("rc-update", "del", serviceName, "default"))
+		return handlerErr(run(s.Client, "rc-update", "del", serviceName, "default"))
 	default:
-		return handlerErr(run(s.toolCmd, serviceName, operate))
+		return handlerErr(run(s.Client, s.toolCmd, serviceName, operate))
 	}
 }
 
