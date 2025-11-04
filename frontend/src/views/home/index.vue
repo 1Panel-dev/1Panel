@@ -173,6 +173,12 @@
                     <el-carousel-item key="systemInfo">
                         <CardWithHeader :header="$t('home.systemInfo')">
                             <template #header-r>
+                                <el-button
+                                    class="h-button-setting"
+                                    @click="toggleSensitiveInfo"
+                                    link
+                                    :icon="showSensitiveInfo ? 'View' : 'Hide'"
+                                />
                                 <el-button class="h-button-setting" @click="handleCopy" link icon="CopyDocument" />
                             </template>
                             <template #body>
@@ -185,7 +191,7 @@
                                             <template #label>
                                                 <span class="system-label">{{ $t('home.hostname') }}</span>
                                             </template>
-                                            {{ baseInfo.hostname }}
+                                            {{ showSensitiveInfo ? baseInfo.hostname : '****' }}
                                         </el-descriptions-item>
                                         <el-descriptions-item
                                             class-name="system-content"
@@ -225,7 +231,7 @@
                                             <template #label>
                                                 <span class="system-label">{{ $t('home.ip') }}</span>
                                             </template>
-                                            {{ baseInfo.ipV4Addr }}
+                                            {{ showSensitiveInfo ? baseInfo.ipV4Addr : '****' }}
                                         </el-descriptions-item>
                                         <el-descriptions-item
                                             v-if="baseInfo.httpProxy && baseInfo.httpProxy !== 'noProxy'"
@@ -345,6 +351,8 @@ let isInit = ref<boolean>(true);
 let isStatusInit = ref<boolean>(true);
 let isActive = ref(true);
 let isCurrentActive = ref(true);
+
+const showSensitiveInfo = ref(true);
 
 const ioReadBytes = ref<Array<number>>([]);
 const ioWriteBytes = ref<Array<number>>([]);
@@ -505,6 +513,10 @@ const quickJump = (item: any) => {
 
 const showSimpleNode = () => {
     return globalStore.isMasterProductPro && simpleNodes.value?.length !== 0;
+};
+
+const toggleSensitiveInfo = () => {
+    showSensitiveInfo.value = !showSensitiveInfo.value;
 };
 
 const jumpPanel = (row: any) => {
