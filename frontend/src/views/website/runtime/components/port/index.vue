@@ -13,7 +13,7 @@
             </el-col>
             <el-col :span="7">
                 <el-text>{{ $t('app.allowPort') }}</el-text>
-                <el-switch class="ml-1" v-model="port.hostIP" :active-value="'0.0.0.0'" :inactive-value="'127.0.0.1'" />
+                <el-switch class="ml-1" v-model="port.hostIP" :active-value="''" :inactive-value="'127.0.0.1'" />
             </el-col>
             <el-col :span="2">
                 <el-form-item>
@@ -51,7 +51,7 @@ const addPort = () => {
     props.exposedPorts.push({
         hostPort: undefined,
         containerPort: undefined,
-        hostIP: '0.0.0.0',
+        hostIP: '',
     });
 };
 
