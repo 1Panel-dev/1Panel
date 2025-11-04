@@ -269,6 +269,7 @@ export namespace App {
 
     export interface AppConfig {
         params: InstallParams[];
+        rawCompose?: string;
         cpuQuota: number;
         memoryLimit: number;
         memoryUnit: string;

@@ -178,6 +178,7 @@ type AppParam struct {
 }
 
 type AppConfig struct {
-	Params []AppParam `json:"params"`
+	Params     []AppParam `json:"params"`
+	RawCompose string     `json:"rawCompose"`
 	request.AppContainerConfig
 }

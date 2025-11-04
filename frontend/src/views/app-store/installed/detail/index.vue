@@ -126,22 +126,26 @@
                         <span class="input-help">{{ $t('app.editComposeHelper') }}</span>
                     </el-form-item>
                     <div v-if="paramModel.editCompose">
+                        <el-button @click="openDiff()" type="primary" class="!mb-2">
+                            {{ $t('app.showDiff') }}
+                        </el-button>
                         <CodemirrorPro v-model="paramModel.dockerCompose" mode="yaml"></CodemirrorPro>
                     </div>
                 </div>
             </el-form>
         </div>
         <template #footer v-if="edit">
-            <span>
-                <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" :disabled="loading" @click="submit(paramForm)">
-                    {{ $t('commons.button.confirm') }}
-                </el-button>
-            </span>
+            <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
+            <el-button type="primary" :disabled="loading" @click="submit(paramForm)">
+                {{ $t('commons.button.confirm') }}
+            </el-button>
         </template>
+        <Diff ref="composeDiffRef" @confirm="getNewCompose" />
     </DrawerPro>
 </template>
 <script lang="ts" setup>
+import Diff from '@/views/app-store/installed/upgrade/diff/index.vue';
+
 import { App } from '@/api/interface/app';
 import { getAppInstallParams, updateAppInstallParams, updateInstallConfig } from '@/api/modules/app';
 import { reactive, ref } from 'vue';
@@ -200,6 +204,16 @@ const limits = ref<Container.ResourceLimit>({
     memory: null as number,
 });
 const oldMemory = ref<number>(0);
+const composeDiffRef = ref();
+const rawCompose = ref('');
+
+const getNewCompose = (compose: string) => {
+    paramModel.dockerCompose = compose;
+};
+
+const openDiff = () => {
+    composeDiffRef.value.acceptParams(rawCompose.value, paramModel.dockerCompose);
+};
 
 function checkWebUI() {
     if (webUI.domain !== '') {
@@ -266,6 +280,7 @@ const get = async () => {
     try {
         loading.value = true;
         const res = await getAppInstallParams(Number(paramData.value.id));
+        rawCompose.value = res.data.rawCompose;
         const configParams = res.data.params || [];
         if (configParams && configParams.length > 0) {
             configParams.forEach((d) => {

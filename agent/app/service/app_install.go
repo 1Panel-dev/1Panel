@@ -796,6 +796,9 @@ func (a *AppInstallService) GetParams(id uint) (*response.AppConfig, error) {
 	res.RestartPolicy = getRestartPolicy(install.DockerCompose)
 	res.WebUI = install.WebUI
 	res.Type = install.App.Type
+	if rawCompose, err := getUpgradeCompose(install, detail); err == nil {
+		res.RawCompose = rawCompose
+	}
 	return &res, nil
 }
 

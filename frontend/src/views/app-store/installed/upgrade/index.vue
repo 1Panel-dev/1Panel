@@ -70,12 +70,10 @@
             </div>
         </div>
         <template #footer>
-            <span class="dialog-footer">
-                <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="onOperate" :disabled="versions == null || loading">
-                    {{ $t('commons.button.confirm') }}
-                </el-button>
-            </span>
+            <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
+            <el-button type="primary" @click="onOperate" :disabled="versions == null || loading">
+                {{ $t('commons.button.confirm') }}
+            </el-button>
         </template>
         <Diff ref="composeDiffRef" @confirm="getNewCompose" />
     </DrawerPro>
