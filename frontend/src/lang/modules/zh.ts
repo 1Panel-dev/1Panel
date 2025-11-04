@@ -2622,6 +2622,8 @@ const message = {
     firewall: {
         create: '创建规则',
         edit: '编辑规则',
+        advancedControl: '高级控制',
+        advancedControlNotAvailable: '当前使用 {0} 防火墙，高级规则仅支持 iptables',
         ccDeny: 'CC 防护',
         ipWhiteList: 'IP 白名单',
         ipBlockList: 'IP 黑名单',

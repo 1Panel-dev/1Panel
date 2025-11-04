@@ -491,6 +491,22 @@ func (s *IptablesFilterService) InitChains() error {
 		}
 	}
 
+	// 检查并创建 1PANEL_BASIC
+	exists, err = s.iptablesClient.ChainExists(client.FilterTab, client.Chain1PanelBasic)
+	if err != nil {
+		return fmt.Errorf("failed to check chain %s: %w", client.Chain1PanelBasic, err)
+	}
+
+	if !exists {
+		if err := s.iptablesClient.NewChain(client.FilterTab, client.Chain1PanelBasic); err != nil {
+			return fmt.Errorf("failed to create chain %s: %w", client.Chain1PanelBasic, err)
+		}
+	} else {
+		if err := s.iptablesClient.FlushChain(client.FilterTab, client.Chain1PanelBasic); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -558,6 +574,17 @@ func (s *IptablesFilterService) UnloadFirewall() error {
 		global.LOG.Infof("Unloaded %s from %s chain", client.Chain1PanelInput, client.ChainInput)
 	} else {
 		global.LOG.Warnf("%s not found in %s chain: %v", client.Chain1PanelInput, client.ChainInput, err)
+	}
+
+	// 从 INPUT 链删除 1PANEL_BASIC 跳转规则
+	ruleNum, err = s.iptablesClient.FindRuleNum(client.ChainInput, client.Chain1PanelBasic)
+	if err == nil {
+		if err := s.iptablesClient.RemovePolicyByNum(client.ChainInput, ruleNum); err != nil {
+			return fmt.Errorf("failed to unload %s from %s: %w", client.Chain1PanelBasic, client.ChainInput, err)
+		}
+		global.LOG.Infof("Unloaded %s from %s chain", client.Chain1PanelBasic, client.ChainInput)
+	} else {
+		global.LOG.Warnf("%s not found in %s chain: %v", client.Chain1PanelBasic, client.ChainInput, err)
 	}
 
 	// 从 OUTPUT 链删除跳转规则

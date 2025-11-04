@@ -15,10 +15,12 @@
                         <el-button type="primary" v-if="!baseInfo.isActive" @click="onOperate('start')" link>
                             {{ $t('commons.button.start') }}
                         </el-button>
-                        <el-divider direction="vertical" />
-                        <el-button type="primary" @click="onOperate('restart')" link>
-                            {{ $t('commons.button.restart') }}
-                        </el-button>
+                        <template v-if="baseInfo.name !== 'iptables'">
+                            <el-divider direction="vertical" />
+                            <el-button type="primary" @click="onOperate('restart')" link>
+                                {{ $t('commons.button.restart') }}
+                            </el-button>
+                        </template>
                         <span v-if="onPing !== 'None'">
                             <el-divider direction="vertical" />
                             <el-button type="primary" link>{{ $t('firewall.noPing') }}</el-button>
@@ -94,7 +96,21 @@ const loadBaseInfo = async (search: boolean) => {
 
 const onOperate = async (op: string) => {
     operation.value = op;
-    dockerRef.value.acceptParams({ title: i18n.global.t('firewall.dockerRestart') });
+    // For iptables, skip docker restart warning and execute directly
+    if (baseInfo.value.name === 'iptables') {
+        emit('update:loading', true);
+        emit('update:maskShow', true);
+        await operateFire(operation.value, false)
+            .then(() => {
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                loadBaseInfo(true);
+            })
+            .catch(() => {
+                loadBaseInfo(true);
+            });
+    } else {
+        dockerRef.value.acceptParams({ title: i18n.global.t('firewall.dockerRestart') });
+    }
 };
 
 const onSubmit = async () => {

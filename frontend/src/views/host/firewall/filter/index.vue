@@ -1,6 +1,23 @@
 <template>
     <div>
-        <div v-loading="loading">
+        <FireRouter />
+
+        <div v-if="!isIptables">
+            <LayoutContent :divider="true">
+                <template #main>
+                    <div class="app-warn">
+                        <div class="flex flex-col gap-2 items-center justify-center w-full sm:flex-row">
+                            <span>{{ $t('firewall.advancedControlNotAvailable', [firewallName]) }}</span>
+                        </div>
+                        <div>
+                            <img src="@/assets/images/no_app.svg" />
+                        </div>
+                    </div>
+                </template>
+            </LayoutContent>
+        </div>
+
+        <div v-else v-loading="loading">
             <el-card>
                 <div class="flex w-full flex-col gap-4 md:flex-row">
                     <div class="flex flex-wrap gap-4 ml-3">
@@ -138,9 +155,10 @@
 </template>
 
 <script lang="ts" setup>
-import OperateDialog from '@/views/host/filter/operate/index.vue';
+import FireRouter from '@/views/host/firewall/index.vue';
+import OperateDialog from '@/views/host/firewall/filter/operate/index.vue';
 import { computed, onMounted, reactive, ref } from 'vue';
-import { getFilterRules, applyFilterFirewall, batchOperateFilterRule } from '@/api/modules/host';
+import { getFilterRules, applyFilterFirewall, batchOperateFilterRule, loadFireBaseInfo } from '@/api/modules/host';
 import { Host } from '@/api/interface/host';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
@@ -150,6 +168,8 @@ const loading = ref();
 const selects = ref<any>([]);
 const selectedChain = ref('1PANEL_INPUT');
 const iptablesVersion = ref('');
+const firewallName = ref('');
+const isIptables = ref(true);
 
 const opRef = ref();
 
@@ -325,8 +345,18 @@ const buttons = [
     },
 ];
 
-onMounted(() => {
-    search();
+onMounted(async () => {
+    await loadFireBaseInfo()
+        .then((res) => {
+            firewallName.value = res.data.name;
+            isIptables.value = res.data.name === 'iptables';
+            if (isIptables.value) {
+                search();
+            }
+        })
+        .catch(() => {
+            isIptables.value = false;
+        });
 });
 </script>
 
