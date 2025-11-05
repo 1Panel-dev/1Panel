@@ -6,14 +6,11 @@
             <FireStatus
                 ref="fireStatusRef"
                 @search="search"
-                @advanced-operate="onApplyFirewall"
                 v-model:loading="loading"
                 v-model:mask-show="maskShow"
                 v-model:is-active="isActive"
                 v-model:name="fireName"
                 :show-advanced-controls="true"
-                :can-apply="canApply"
-                :is-applied="isApplied"
             />
             <div v-if="fireName === '-'">
                 <LayoutContent :divider="true">
@@ -170,11 +167,9 @@ import FireRouter from '@/views/host/firewall/index.vue';
 import FireStatus from '@/views/host/firewall/status/index.vue';
 import OperateDialog from '@/views/host/firewall/filter/operate/index.vue';
 import { computed, onMounted, reactive, ref } from 'vue';
-import { getFilterRules, applyFilterFirewall, batchOperateFilterRule } from '@/api/modules/host';
+import { getFilterRules, batchOperateFilterRule } from '@/api/modules/host';
 import { Host } from '@/api/interface/host';
 import i18n from '@/lang';
-import { MsgSuccess } from '@/utils/message';
-import { ElMessageBox } from 'element-plus';
 
 const loading = ref();
 const selects = ref<any>([]);
@@ -211,18 +206,6 @@ const outputChainInfo = computed(() => chainInfoMap.value.get('OUTPUT'));
 
 const isCustomChain = computed(() => {
     return selectedChain.value === '1PANEL_INPUT' || selectedChain.value === '1PANEL_OUTPUT';
-});
-
-const canApply = computed(() => {
-    const inputInfo = chainInfoMap.value.get('1PANEL_INPUT');
-    const outputInfo = chainInfoMap.value.get('1PANEL_OUTPUT');
-    return (inputInfo && !inputInfo.isApplied) || (outputInfo && !outputInfo.isApplied);
-});
-
-const isApplied = computed(() => {
-    const inputInfo = chainInfoMap.value.get('INPUT');
-    const outputInfo = chainInfoMap.value.get('OUTPUT');
-    return inputInfo?.isApplied || outputInfo?.isApplied;
 });
 
 const paginationConfig = reactive({
@@ -275,38 +258,6 @@ const onOpenDialog = async (title: string, rowData?: Host.IptablesFilterRuleOper
         },
     };
     dialogRef.value!.acceptParams(params);
-};
-
-const onApplyFirewall = async (operation: string) => {
-    let confirmMsg = '';
-    let title = '';
-
-    if (operation === 'init') {
-        confirmMsg = i18n.global.t('firewall.initChainsConfirm');
-        title = i18n.global.t('firewall.initChains');
-    } else if (operation === 'apply') {
-        confirmMsg = i18n.global.t('firewall.applyConfirm');
-        title = i18n.global.t('firewall.applyFirewall');
-    } else {
-        confirmMsg = i18n.global.t('firewall.unloadConfirm');
-        title = i18n.global.t('firewall.unloadFirewall');
-    }
-
-    ElMessageBox.confirm(confirmMsg, title, {
-        confirmButtonText: i18n.global.t('commons.button.confirm'),
-        cancelButtonText: i18n.global.t('commons.button.cancel'),
-    }).then(async () => {
-        loading.value = true;
-        await applyFilterFirewall({ operation })
-            .then(() => {
-                loading.value = false;
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                search();
-            })
-            .catch(() => {
-                loading.value = false;
-            });
-    });
 };
 
 const onDelete = async (row: Host.IptablesFilterRuleInfo | null) => {
