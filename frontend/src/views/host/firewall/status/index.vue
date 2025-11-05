@@ -9,16 +9,30 @@
                         <el-tag>{{ $t('app.version') }}: {{ baseInfo.version }}</el-tag>
                     </div>
                     <div class="mt-0.5">
-                        <el-button type="primary" v-if="baseInfo.isActive" @click="onOperate('stop')" link>
-                            {{ $t('commons.button.stop') }}
-                        </el-button>
-                        <el-button type="primary" v-if="!baseInfo.isActive" @click="onOperate('start')" link>
-                            {{ $t('commons.button.start') }}
-                        </el-button>
                         <template v-if="baseInfo.name !== 'iptables'">
+                            <el-button type="primary" v-if="baseInfo.isActive" @click="onOperate('stop')" link>
+                                {{ $t('commons.button.stop') }}
+                            </el-button>
+                            <el-button type="primary" v-if="!baseInfo.isActive" @click="onOperate('start')" link>
+                                {{ $t('commons.button.start') }}
+                            </el-button>
                             <el-divider direction="vertical" />
                             <el-button type="primary" @click="onOperate('restart')" link>
                                 {{ $t('commons.button.restart') }}
+                            </el-button>
+                        </template>
+                        <template v-if="baseInfo.name === 'iptables' && showAdvancedControls">
+                            <el-divider direction="vertical" />
+                            <el-button type="primary" @click="onAdvancedOperate('init')" link>
+                                {{ $t('firewall.initChains') }}
+                            </el-button>
+                            <el-divider direction="vertical" />
+                            <el-button type="success" @click="onAdvancedOperate('apply')" link :disabled="!canApply">
+                                {{ $t('firewall.applyFirewall') }}
+                            </el-button>
+                            <el-divider direction="vertical" />
+                            <el-button type="warning" @click="onAdvancedOperate('unload')" link :disabled="!isApplied">
+                                {{ $t('firewall.unloadFirewall') }}
                             </el-button>
                         </template>
                         <span v-if="onPing !== 'None'">
@@ -61,6 +75,21 @@ import { MsgSuccess } from '@/utils/message';
 import { ElMessageBox } from 'element-plus';
 import { ref } from 'vue';
 
+defineProps({
+    showAdvancedControls: {
+        type: Boolean,
+        default: false,
+    },
+    canApply: {
+        type: Boolean,
+        default: false,
+    },
+    isApplied: {
+        type: Boolean,
+        default: false,
+    },
+});
+
 const baseInfo = ref<Host.FirewallBase>({ isActive: false, isExist: true, name: '', version: '', pingStatus: '' });
 const onPing = ref('Disable');
 const oldStatus = ref();
@@ -71,7 +100,14 @@ const withDockerRestart = ref(false);
 const acceptParams = (): void => {
     loadBaseInfo(true);
 };
-const emit = defineEmits(['search', 'update:is-active', 'update:loading', 'update:maskShow', 'update:name']);
+const emit = defineEmits([
+    'search',
+    'update:is-active',
+    'update:loading',
+    'update:maskShow',
+    'update:name',
+    'advanced-operate',
+]);
 
 const loadBaseInfo = async (search: boolean) => {
     await loadFireBaseInfo()
@@ -151,6 +187,10 @@ const onPingOperate = async (operation: string) => {
             emit('update:maskShow', true);
             onPing.value = oldStatus.value;
         });
+};
+
+const onAdvancedOperate = (operation: string) => {
+    emit('advanced-operate', operation);
 };
 
 defineExpose({
