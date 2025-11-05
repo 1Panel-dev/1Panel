@@ -78,24 +78,16 @@
 
 <script lang="ts" setup>
 import { Host } from '@/api/interface/host';
-import { loadFireBaseInfo, operateFire } from '@/api/modules/host';
+import { loadFireBaseInfo, operateFire, getFilterRules, applyFilterFirewall } from '@/api/modules/host';
 import i18n from '@/lang';
 import NoSuchService from '@/components/layout-content/no-such-service.vue';
 import DockerRestart from '@/components/docker-proxy/docker-restart.vue';
 import { MsgSuccess } from '@/utils/message';
 import { ElMessageBox } from 'element-plus';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 
 defineProps({
     showAdvancedControls: {
-        type: Boolean,
-        default: false,
-    },
-    canApply: {
-        type: Boolean,
-        default: false,
-    },
-    isApplied: {
         type: Boolean,
         default: false,
     },
@@ -108,26 +100,37 @@ const dockerRef = ref();
 const operation = ref('restart');
 const withDockerRestart = ref(false);
 
+// Iptables specific state
+const chainInfoMap = ref<Map<string, Host.IptablesChainInfo>>(new Map());
+
+const isApplied = computed(() => {
+    if (baseInfo.value.name !== 'iptables') return false;
+    const inputInfo = chainInfoMap.value.get('INPUT');
+    const outputInfo = chainInfoMap.value.get('OUTPUT');
+    return inputInfo?.isApplied || outputInfo?.isApplied;
+});
+
 const acceptParams = (): void => {
     loadBaseInfo(true);
 };
-const emit = defineEmits([
-    'search',
-    'update:is-active',
-    'update:loading',
-    'update:maskShow',
-    'update:name',
-    'advanced-operate',
-]);
+const emit = defineEmits(['search', 'update:is-active', 'update:loading', 'update:maskShow', 'update:name']);
 
 const loadBaseInfo = async (search: boolean) => {
     await loadFireBaseInfo()
-        .then((res) => {
+        .then(async (res) => {
             baseInfo.value = res.data;
             onPing.value = baseInfo.value.pingStatus;
             oldStatus.value = onPing.value;
             emit('update:name', baseInfo.value.name);
             emit('update:is-active', baseInfo.value.isActive);
+
+            // Load iptables chain info if firewall is iptables
+            if (baseInfo.value.name === 'iptables' && baseInfo.value.isActive) {
+                await loadIptablesChainInfo();
+            } else {
+                chainInfoMap.value.clear();
+            }
+
             if (search) {
                 emit('search');
             } else {
@@ -138,6 +141,22 @@ const loadBaseInfo = async (search: boolean) => {
             emit('update:loading', false);
             emit('update:maskShow', true);
             emit('update:name', '-');
+        });
+};
+
+const loadIptablesChainInfo = async () => {
+    const params: Host.IptablesFilterRuleSearch = {
+        chains: ['INPUT', 'OUTPUT', '1PANEL_INPUT', '1PANEL_OUTPUT'],
+    };
+    await getFilterRules(params)
+        .then((res) => {
+            chainInfoMap.value.clear();
+            res.data.forEach((chainInfo: Host.IptablesChainInfo) => {
+                chainInfoMap.value.set(chainInfo.name, chainInfo);
+            });
+        })
+        .catch(() => {
+            chainInfoMap.value.clear();
         });
 };
 
@@ -200,8 +219,36 @@ const onPingOperate = async (operation: string) => {
         });
 };
 
-const onAdvancedOperate = (operation: string) => {
-    emit('advanced-operate', operation);
+const onAdvancedOperate = async (op: string) => {
+    let confirmMsg = '';
+    let title = '';
+
+    if (op === 'init') {
+        confirmMsg = i18n.global.t('firewall.initChainsConfirm');
+        title = i18n.global.t('firewall.initChains');
+    } else if (op === 'apply') {
+        confirmMsg = i18n.global.t('firewall.applyConfirm');
+        title = i18n.global.t('firewall.applyFirewall');
+    } else {
+        confirmMsg = i18n.global.t('firewall.unloadConfirm');
+        title = i18n.global.t('firewall.unloadFirewall');
+    }
+
+    ElMessageBox.confirm(confirmMsg, title, {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+    }).then(async () => {
+        emit('update:loading', true);
+        emit('update:maskShow', true);
+        await applyFilterFirewall({ operation: op })
+            .then(() => {
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                loadBaseInfo(true);
+            })
+            .catch(() => {
+                loadBaseInfo(true);
+            });
+    });
 };
 
 defineExpose({
