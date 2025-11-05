@@ -248,6 +248,8 @@ Upload: "Subir"
 LoadBackupFailed: "Error al obtener la conexión de la cuenta de respaldo, error: {{ .detail }}"
 InExecuting: "La tarea actual se está ejecutando, por favor no la repita"
 NoSuchResource: "No se encontraron contenidos de respaldo en la base de datos, omitiendo..."
+CleanLog: "Limpiar registro"
+CleanLogByName: "Limpiar registro de {{.name}}"
 
 #toolbox
 ErrNotExistUser: 'El usuario actual no existe, modifíquelo e intente de nuevo'

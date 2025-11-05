@@ -249,6 +249,8 @@ IgnoreUploadErr: "上传失败，错误：{{ .detail }}，忽略本次错误..."
 LoadBackupFailed: "获取备份账号连接失败，错误：{{ .detail }}"
 InExecuting: "当前任务正在执行中，请勿重复执行！"
 NoSuchResource: "数据库中未能查询到备份内容，跳过..."
+CleanLog: "清理日志"
+CleanLogByName: "清理 {{.name}} 日志"
 
 #toolbox
 ErrNotExistUser: "当前用户不存在，请修改后重试！"

@@ -15,18 +15,12 @@
                                     @change="changeType"
                                     v-model="form.type"
                                 >
-                                    <el-option value="shell" :label="$t('cronjob.shell')" />
-                                    <el-option value="app" :label="$t('cronjob.app')" />
-                                    <el-option value="website" :label="$t('cronjob.website')" />
-                                    <el-option value="database" :label="$t('cronjob.database')" />
-                                    <el-option value="directory" :label="$t('cronjob.directory')" />
-                                    <el-option value="log" :label="$t('cronjob.log')" />
-                                    <el-option value="curl" :label="$t('cronjob.curl')" />
-                                    <el-option value="cutWebsiteLog" :label="$t('cronjob.cutWebsiteLog')" />
-                                    <el-option value="clean" :label="$t('setting.diskClean')" />
-                                    <el-option value="snapshot" :label="$t('cronjob.snapshot')" />
-                                    <el-option value="ntp" :label="$t('cronjob.ntp')" />
-                                    <el-option value="syncIpGroup" :label="$t('cronjob.syncIpGroup')" />
+                                    <el-option
+                                        v-for="item in cronjobTypes"
+                                        :key="item.value"
+                                        :value="item.value"
+                                        :label="item.label"
+                                    />
                                 </el-select>
                                 <div v-else class="w-full">
                                     <el-tag>{{ $t('cronjob.' + form.type) }}</el-tag>
@@ -93,6 +87,12 @@
                                 </LayoutCol>
                             </el-row>
                         </el-card>
+
+                        <CleanLogConfig
+                            v-if="form.type == 'cleanLog'"
+                            class="mt-5"
+                            v-model="form.scopes"
+                        ></CleanLogConfig>
 
                         <el-card class="mt-5">
                             <el-form-item :label="$t('cronjob.cronSpec')" prop="specCustom">
@@ -756,17 +756,19 @@
 </template>
 
 <script lang="ts" setup>
+import FileList from '@/components/file-list/index.vue';
+import CodemirrorPro from '@/components/codemirror-pro/index.vue';
+import InputTag from '@/components/input-tag/index.vue';
+import LayoutCol from '@/components/layout-col/form.vue';
+import CleanLogConfig from '@/views/cronjob/cronjob/config/clean-log.vue';
+
 import { reactive, ref } from 'vue';
 import { Rules } from '@/global/form-rules';
-import FileList from '@/components/file-list/index.vue';
 import { listBackupOptions } from '@/api/modules/backup';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { Cronjob } from '@/api/interface/cronjob';
 import { addCronjob, editCronjob, loadCronjobInfo, loadNextHandle, loadScriptOptions } from '@/api/modules/cronjob';
-import CodemirrorPro from '@/components/codemirror-pro/index.vue';
-import InputTag from '@/components/input-tag/index.vue';
-import LayoutCol from '@/components/layout-col/form.vue';
 import { listDbItems } from '@/api/modules/database';
 import { getWebsiteOptions } from '@/api/modules/website';
 import { MsgError, MsgSuccess } from '@/utils/message';
@@ -781,6 +783,7 @@ import {
     transObjToSpec,
     transSpecToObj,
     weekOptions,
+    cronjobTypes,
 } from '../helper';
 import { loadUsers } from '@/api/modules/toolbox';
 import { loadContainerUsers } from '@/api/modules/container';
@@ -864,6 +867,8 @@ const form = reactive<Cronjob.CronjobInfo>({
     alertTitle: '',
     alertMethod: '',
     alertMethodItems: [],
+
+    scopes: [],
 });
 
 const search = async () => {
@@ -961,6 +966,7 @@ const search = async () => {
                 } else {
                     form.alertMethodItems = [];
                 }
+                form.scopes = res.data.scopes;
             })
             .catch(() => {
                 loading.value = false;
@@ -1156,6 +1162,7 @@ const rules = reactive({
     timeoutUnit: [Rules.requiredSelect],
     alertCount: [Rules.integerNumber, { validator: checkSendCount, trigger: 'blur' }],
     alertMethodItems: [Rules.requiredSelect],
+    scopes: [Rules.requiredSelect],
 });
 
 type FormInstance = InstanceType<typeof ElForm>;
@@ -1257,6 +1264,9 @@ const loadDatabases = async (dbType: string) => {
 const changeType = () => {
     form.specObjs = [loadDefaultSpec(form.type)];
     form.specs = [loadDefaultSpecCustom(form.type)];
+    if (form.type === 'cleanLog') {
+        form.name = i18n.global.t('cronjob.cleanLog');
+    }
 };
 
 const changeSpecType = (index: number) => {

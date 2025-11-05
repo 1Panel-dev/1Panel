@@ -2421,7 +2421,6 @@ const message = {
         qiteSite: 'Enterprise',
         videoSite: 'Video',
         errLog: 'Error log',
-        accessLog: 'Website log',
         stopHelper:
             'After stopping the site, it will not be able to access normally, and the user will display the stop page of the current site when visiting. Do you want to continue? ',
         startHelper:
@@ -2432,7 +2431,6 @@ const message = {
         folderTitle: 'The website mainly contains the following folders',
         wafFolder: 'Firewall rules',
         indexFolder: 'Website root directory',
-        logFolder: 'Website log',
         sslFolder: 'Website Certificate',
         enableOrNot: 'Enable',
         oldSSL: 'Existing certificate',

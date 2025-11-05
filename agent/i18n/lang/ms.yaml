@@ -249,6 +249,8 @@ IgnoreUploadErr: "Muat naik gagal, ralat: {{ .detail }}, abaikan ralat ini..."
 LoadBackupFailed: "Gagal mendapatkan sambungan akaun sandaran, ralat: {{ .detail }}"
 InExecuting: "Tugas semasa sedang dilaksanakan, jangan ulangi pelaksanaan!"
 NoSuchResource: "Tiada kandungan sandaran ditemui dalam pangkalan data, dilangkau..."
+CleanLog: "Bersihkan log"
+CleanLogByName: "Bersihkan log {{.name}}"
 
 #kotak alat
 ErrNotExistUser: 'Pengguna semasa tidak wujud, sila ubah suai dan cuba lagi!'

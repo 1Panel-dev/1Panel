@@ -201,3 +201,19 @@ export function hasBackup(type: string) {
         type === 'cutWebsiteLog'
     );
 }
+
+export const cronjobTypes = [
+    { value: 'shell', label: i18n.global.t('cronjob.shell') },
+    { value: 'app', label: i18n.global.t('cronjob.app') },
+    { value: 'website', label: i18n.global.t('cronjob.website') },
+    { value: 'database', label: i18n.global.t('cronjob.database') },
+    { value: 'directory', label: i18n.global.t('cronjob.directory') },
+    { value: 'log', label: i18n.global.t('cronjob.log') },
+    { value: 'curl', label: i18n.global.t('cronjob.curl') },
+    { value: 'cutWebsiteLog', label: i18n.global.t('cronjob.cutWebsiteLog') },
+    { value: 'clean', label: i18n.global.t('setting.diskClean') },
+    { value: 'snapshot', label: i18n.global.t('cronjob.snapshot') },
+    { value: 'ntp', label: i18n.global.t('cronjob.ntp') },
+    { value: 'syncIpGroup', label: i18n.global.t('cronjob.syncIpGroup') },
+    { value: 'cleanLog', label: i18n.global.t('cronjob.cleanLog') },
+];

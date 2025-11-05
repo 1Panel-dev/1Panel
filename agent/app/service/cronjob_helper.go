@@ -3,6 +3,7 @@ package service
 import (
 	"bufio"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -133,6 +134,8 @@ func (u *CronjobService) loadTask(cronjob *model.Cronjob, record *model.JobRecor
 		err = u.handleSystemLog(*cronjob, record.StartTime, taskItem)
 	case "syncIpGroup":
 		u.handleSyncIpGroup(*cronjob, taskItem)
+	case "cleanLog":
+		u.handleCleanLog(*cronjob, taskItem)
 	}
 	return err
 }
@@ -211,6 +214,48 @@ func (u *CronjobService) handleNtpSync(cronjob model.Cronjob, taskItem *task.Tas
 		}
 		if err := ntp.UpdateSystemTime(ntime.Format(constant.DateTimeLayout)); err != nil {
 			return err
+		}
+		return nil
+	}, nil, int(cronjob.RetryTimes), time.Duration(cronjob.Timeout)*time.Second)
+}
+
+func (u *CronjobService) handleCleanLog(cronjob model.Cronjob, taskItem *task.Task) {
+	taskItem.AddSubTaskWithOps(i18n.GetWithName("CleanLog", cronjob.Name), func(t *task.Task) error {
+		config := GetCleanLogConfig(cronjob)
+		for _, scope := range config.Scopes {
+			switch scope {
+			case "website":
+				websites, _ := websiteRepo.List()
+				for _, website := range websites {
+					curStr := i18n.GetWithName("CleanLogByName", website.PrimaryDomain)
+					t.LogStart(curStr)
+					accessLogPath := GetSitePath(website, SiteAccessLog)
+					if err := os.Truncate(accessLogPath, 0); err != nil {
+						t.LogFailedWithErr(curStr, err)
+						continue
+					}
+					errLogPath := GetSitePath(website, SiteErrorLog)
+					if err := os.Truncate(errLogPath, 0); err != nil {
+						t.LogFailedWithErr(curStr, err)
+						continue
+					}
+					t.LogSuccess(curStr)
+				}
+				appInstall, _ := getAppInstallByKey(constant.AppOpenresty)
+				if appInstall.ID > 0 {
+					curStr := i18n.GetWithName("CleanLogByName", "Openresty")
+					t.LogStart(curStr)
+					accessLogPath := path.Join(appInstall.GetPath(), "log", "access.log")
+					if err := os.Truncate(accessLogPath, 0); err != nil {
+						t.LogFailedWithErr(curStr, err)
+					}
+					errLogPath := path.Join(appInstall.GetPath(), "log", "error.log")
+					if err := os.Truncate(errLogPath, 0); err != nil {
+						t.LogFailedWithErr(curStr, err)
+					}
+					t.LogSuccess(curStr)
+				}
+			}
 		}
 		return nil
 	}, nil, int(cronjob.RetryTimes), time.Duration(cronjob.Timeout)*time.Second)
@@ -417,7 +462,7 @@ func (u *CronjobService) removeExpiredLog(cronjob model.Cronjob) {
 				_ = os.Remove(file)
 			}
 		}
-		_ = cronjobRepo.DeleteRecord(repo.WithByID(uint(records[i].ID)))
+		_ = cronjobRepo.DeleteRecord(repo.WithByID(records[i].ID))
 		_ = taskRepo.Delete(taskRepo.WithByID(records[i].TaskID))
 		_ = os.Remove(path.Join(global.CONF.Base.InstallDir, "1panel/log/task/Cronjob", records[i].TaskID+".log"))
 	}
@@ -435,4 +480,10 @@ func handleCronJobAlert(cronjob *model.Cronjob) {
 		Param:     cronjob.Type,
 	}
 	_ = alert_push.PushAlert(pushAlert)
+}
+
+func GetCleanLogConfig(cronJob model.Cronjob) dto.CleanLogConfig {
+	config := &dto.CleanLogConfig{}
+	_ = json.Unmarshal([]byte(cronJob.Config), config)
+	return *config
 }

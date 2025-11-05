@@ -1,6 +1,6 @@
 <template>
     <el-tabs tab-position="left" v-model="index">
-        <el-tab-pane :label="$t('website.accessLog')" name="0">
+        <el-tab-pane :label="$t('logs.websiteLog')" name="0">
             <LogFile :id="id" :log-type="'access.log'" v-if="index == '0'"></LogFile>
         </el-tab-pane>
         <el-tab-pane :label="$t('website.errLog')" name="1">

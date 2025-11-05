@@ -69,7 +69,7 @@ const clearLog = () => {
 };
 
 const cleanLog = async () => {
-    let log = props.logType === 'access.log' ? i18n.global.t('website.accessLog') : i18n.global.t('website.errLog');
+    let log = props.logType === 'access.log' ? i18n.global.t('logs.websiteLog') : i18n.global.t('website.errLog');
     opRef.value.acceptParams({
         title: i18n.global.t('commons.button.clean'),
         names: [],

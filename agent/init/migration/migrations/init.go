@@ -666,3 +666,10 @@ var AddMonitorProcess = &gormigrate.Migration{
 		return global.MonitorDB.AutoMigrate(&model.MonitorBase{})
 	},
 }
+
+var UpdateCronJob = &gormigrate.Migration{
+	ID: "20251105-update-cronjob",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(&model.Cronjob{})
+	},
+}

@@ -2398,7 +2398,6 @@ const message = {
         qiteSite: 'Syarikat',
         videoSite: 'Video',
         errLog: 'Log Ralat',
-        accessLog: 'Log Laman Web',
         stopHelper:
             'Selepas menghentikan laman web, ia tidak akan dapat diakses dengan normal, dan pengguna akan melihat halaman berhenti laman web semasa apabila mengunjunginya. Adakah anda mahu meneruskan?',
         startHelper:
@@ -2409,7 +2408,6 @@ const message = {
         folderTitle: 'Laman web ini terutamanya mengandungi folder berikut',
         wafFolder: 'Peraturan firewall',
         indexFolder: 'Direktori akar laman web',
-        logFolder: 'Log laman web',
         sslFolder: 'Sijil laman web',
         enableOrNot: 'Aktifkan',
         oldSSL: 'Sijil sedia ada',

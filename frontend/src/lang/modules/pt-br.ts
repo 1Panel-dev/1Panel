@@ -2400,7 +2400,6 @@ const message = {
         qiteSite: 'Empresarial',
         videoSite: 'Site de Vídeo',
         errLog: 'Erro de log',
-        accessLog: 'Log do site',
         stopHelper:
             'Após parar o site, ele não poderá ser acessado normalmente, e o usuário verá a página de parada do site atual ao visitar. Deseja continuar?',
         startHelper: 'Após ativar o site, os usuários podem acessar o conteúdo do site normalmente, deseja continuar?',
@@ -2410,7 +2409,6 @@ const message = {
         folderTitle: 'O site contém principalmente as seguintes pastas',
         wafFolder: 'Regras de firewall',
         indexFolder: 'Diretório raiz do site',
-        logFolder: 'Log do site',
         sslFolder: 'Certificado do site',
         enableOrNot: 'Habilitar',
         oldSSL: 'Certificado existente',
