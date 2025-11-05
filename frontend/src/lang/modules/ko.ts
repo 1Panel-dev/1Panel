@@ -335,6 +335,7 @@ const message = {
             new: '신규',
             conflict: '충돌',
             duplicate: '중복',
+            unexecuted: '실행되지 않음',
         },
         units: {
             second: '초 | 초 | 초',

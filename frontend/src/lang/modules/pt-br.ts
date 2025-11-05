@@ -339,6 +339,7 @@ const message = {
             new: 'Novo',
             conflict: 'Conflito',
             duplicate: 'Duplicado',
+            unexecuted: 'Não Executado',
         },
         units: {
             second: 'segundo | segundos | segundos',

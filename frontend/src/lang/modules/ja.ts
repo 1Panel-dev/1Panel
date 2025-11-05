@@ -333,6 +333,7 @@ const message = {
             new: '新規',
             conflict: '競合',
             duplicate: '重複',
+            unexecuted: '未実行',
         },
         units: {
             second: '2番目|2番目|秒',

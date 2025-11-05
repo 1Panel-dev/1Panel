@@ -81,6 +81,7 @@
                     <el-option :label="$t('commons.table.all')" value="" />
                     <el-option :label="$t('commons.status.success')" value="Success" />
                     <el-option :label="$t('commons.status.waiting')" value="Waiting" />
+                    <el-option :label="$t('commons.status.unexecuted')" value="Unexecuted" />
                     <el-option :label="$t('commons.status.failed')" value="Failed" />
                 </el-select>
                 <TableRefresh @search="search(false)" />
@@ -100,7 +101,7 @@
                                         <el-table-column min-width="230px">
                                             <template #default="{ row }">
                                                 <span v-if="row.id === currentRecord.id" class="select-sign"></span>
-                                                <Status class="mr-2 ml-1 float-left" :status="row.status" />
+                                                <Status class="mr-2 ml-1 float-left w-20" :status="row.status" />
                                                 <div class="mt-0.5">
                                                     <span>
                                                         {{ row.startTime }}
@@ -182,7 +183,10 @@
                                                 <el-button
                                                     class="mt-0.5"
                                                     type="danger"
-                                                    v-if="currentRecord?.status === 'Failed'"
+                                                    v-if="
+                                                        currentRecord?.status === 'Failed' ||
+                                                        currentRecord?.status === 'Unexecuted'
+                                                    "
                                                     icon="Warning"
                                                     link
                                                 />

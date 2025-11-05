@@ -336,6 +336,7 @@ const message = {
             new: 'Новый',
             conflict: 'Конфликт',
             duplicate: 'Дубликат',
+            unexecuted: 'Не Выполнено',
         },
         units: {
             second: ' секунда | секунда | секунд',

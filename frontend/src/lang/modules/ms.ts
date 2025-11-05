@@ -341,6 +341,7 @@ const message = {
             new: 'Baru',
             conflict: 'Konflik',
             duplicate: 'Pendua',
+            unexecuted: 'Tidak Dilaksanakan',
         },
         units: {
             second: 'saat | saat | saat',

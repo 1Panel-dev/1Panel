@@ -348,6 +348,7 @@ const message = {
             new: 'Yeni',
             conflict: 'Çakışma',
             duplicate: 'Yinelenen',
+            unexecuted: 'Yürütülmedi',
         },
         units: {
             second: ' saniye | saniye | saniye',

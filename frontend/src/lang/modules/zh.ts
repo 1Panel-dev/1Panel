@@ -332,6 +332,7 @@ const message = {
             new: '新',
             conflict: '冲突',
             duplicate: '重复',
+            unexecuted: '未执行',
         },
         units: {
             second: '秒',
