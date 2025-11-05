@@ -84,8 +84,9 @@ export const syncInstalledApp = () => {
     return http.post<any>('apps/installed/sync', {});
 };
 
-export const getAppService = (key: string | undefined) => {
-    return http.get<App.AppService[]>(`apps/services/${key}`);
+export const getAppService = (key: string | undefined, node?: string) => {
+    const params = node ? `?operateNode=${node}` : '';
+    return http.get<App.AppService[]>(`apps/services/${key}${params}`);
 };
 
 export const getAppUpdateVersions = (req: App.AppUpdateVersionReq) => {

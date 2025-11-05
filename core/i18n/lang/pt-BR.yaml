@@ -36,6 +36,11 @@ ErrInternalServerKey: "Erro interno do servidor:"
 # app
 CustomAppStoreFileValid: "O pacote da loja de aplicativos deve estar no formato .tar.gz"
 ErrFileNotFound: "Arquivo {{ .name }} não encontrado"
+AppBackup: 'Backup de aplicação',
+AppBackupPush: 'Transferir arquivo de backup de aplicação {{.file}} para o nó {{ .name }}',
+ErrSourceTargetSame: 'O nó de origem e o nó de destino não podem ser os mesmos!',
+AppInstall: 'Instalar aplicação {{ .name }} no nó {{ .targetNode }}',
+AppInstallCheck: 'Verificar ambiente de instalação da aplicação',
 
 # backup
 ErrBackupInUsed: "Esta conta de backup está em uso em tarefas agendadas e não pode ser excluída"

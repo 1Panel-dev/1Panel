@@ -1,16 +1,37 @@
 <template>
-    <el-row :gutter="10">
-        <el-col :xs="12" :sm="12" :md="6" :lg="6" :xl="6" align="center">
-            <el-popover placement="bottom" :width="200" trigger="hover" v-if="chartsOption['load']">
-                <el-tag class="tagClass">
-                    {{ $t('home.loadAverage', [1]) }}: {{ formatNumber(currentInfo.load1) }}
-                </el-tag>
-                <el-tag class="tagClass">
-                    {{ $t('home.loadAverage', [5]) }}: {{ formatNumber(currentInfo.load5) }}
-                </el-tag>
-                <el-tag class="tagClass">
-                    {{ $t('home.loadAverage', [15]) }}: {{ formatNumber(currentInfo.load15) }}
-                </el-tag>
+    <div class="custom-row">
+        <el-col :xs="6" :sm="6" :md="3" :lg="3" :xl="3" align="center">
+            <el-popover :hide-after="20" :teleported="false" :width="320" v-if="chartsOption['load']">
+                <el-descriptions :column="1" size="small">
+                    <el-descriptions-item :label="$t('home.loadAverage', [1])">
+                        {{ formatNumber(currentInfo.load1) }}
+                    </el-descriptions-item>
+                    <el-descriptions-item :label="$t('home.loadAverage', [5])">
+                        {{ formatNumber(currentInfo.load5) }}
+                    </el-descriptions-item>
+                    <el-descriptions-item :label="$t('home.loadAverage', [15])">
+                        {{ formatNumber(currentInfo.load15) }}
+                    </el-descriptions-item>
+                </el-descriptions>
+
+                <el-button link size="small" type="primary" class="float-left mb-2" @click="showTop = !showTop">
+                    {{ $t('home.cpuTop') }}
+                    <el-icon v-if="!showTop"><ArrowRight /></el-icon>
+                    <el-icon v-if="showTop"><ArrowDown /></el-icon>
+                </el-button>
+                <ComplexTable v-if="showTop" :data="currentInfo.topCPUItems">
+                    <el-table-column :min-width="120" show-overflow-tooltip :label="$t('menu.process')" prop="name" />
+                    <el-table-column :min-width="60" :label="$t('monitor.percent')" prop="percent">
+                        <template #default="{ row }">{{ row.percent.toFixed(2) }}%</template>
+                    </el-table-column>
+                    <el-table-column :width="80" :label="$t('commons.table.operate')">
+                        <template #default="{ row }">
+                            <el-button type="primary" link @click="onKill(row)">
+                                {{ $t('process.stopProcess') }}
+                            </el-button>
+                        </template>
+                    </el-table-column>
+                </ComplexTable>
                 <template #reference>
                     <v-charts
                         height="160px"
@@ -23,42 +44,50 @@
             </el-popover>
             <span class="input-help">{{ loadStatus(currentInfo.loadUsagePercent) }}</span>
         </el-col>
-        <el-col :xs="12" :sm="12" :md="6" :lg="6" :xl="6" align="center">
-            <el-popover placement="bottom" :width="loadWidth()" trigger="hover" v-if="chartsOption['cpu']">
-                <div>
-                    <el-tooltip
-                        effect="dark"
-                        :content="baseInfo.cpuModelName"
-                        v-if="baseInfo.cpuModelName.length > 40"
-                        placement="top"
-                    >
-                        <el-tag class="cpuModeTag">
-                            {{ baseInfo.cpuModelName.substring(0, 40) + '...' }}
-                        </el-tag>
-                    </el-tooltip>
-                    <el-tag v-else>
-                        {{ baseInfo.cpuModelName }}
-                    </el-tag>
-                </div>
-                <el-tag class="cpuDetailTag">{{ $t('home.core') }} *{{ baseInfo.cpuCores }}</el-tag>
-                <el-tag class="cpuDetailTag">{{ $t('home.logicCore') }} *{{ baseInfo.cpuLogicalCores }}</el-tag>
-                <br />
-                <div v-for="(item, index) of currentInfo.cpuPercent" :key="index">
-                    <el-tag v-if="cpuShowAll || (!cpuShowAll && index < 32)" class="tagCPUClass">
-                        CPU-{{ index }}: {{ formatNumber(item) }}%
-                    </el-tag>
+        <el-col :xs="6" :sm="6" :md="3" :lg="3" :xl="3">
+            <el-popover :hide-after="20" :teleported="false" :width="430" v-if="chartsOption['cpu']">
+                <el-descriptions :title="baseInfo.cpuModelName" :column="2" size="small">
+                    <el-descriptions-item :label="$t('home.core')">
+                        {{ baseInfo.cpuCores }}
+                    </el-descriptions-item>
+                    <el-descriptions-item :label="$t('home.logicCore')">
+                        {{ baseInfo.cpuLogicalCores }}
+                    </el-descriptions-item>
+                </el-descriptions>
+
+                <el-button size="small" link type="primary" class="mb-2">
+                    {{ $t('home.corePercent') }}
+                </el-button>
+                <el-space wrap :size="5" class="ml-1">
+                    <template v-for="(item, index) of currentInfo.cpuPercent" :key="index">
+                        <div class="cpu-detail" v-if="cpuShowAll || (!cpuShowAll && index < 8)">
+                            CPU-{{ index }}: {{ formatNumber(item) }}%
+                        </div>
+                    </template>
+                </el-space>
+                <div v-if="currentInfo.cpuPercent.length > 8">
+                    <el-button v-if="!cpuShowAll" @click="cpuShowAll = true" icon="More" link size="small" />
+                    <el-button v-if="cpuShowAll" @click="cpuShowAll = false" icon="ArrowUp" link size="small" />
                 </div>
 
-                <div v-if="currentInfo.cpuPercent.length > 32" class="mt-1 float-right">
-                    <el-button v-if="!cpuShowAll" @click="cpuShowAll = true" link type="primary" size="small">
-                        {{ $t('commons.button.showAll') }}
-                        <el-icon><DArrowRight /></el-icon>
-                    </el-button>
-                    <el-button v-if="cpuShowAll" @click="cpuShowAll = false" link type="primary" size="small">
-                        {{ $t('commons.button.hideSome') }}
-                        <el-icon><DArrowLeft /></el-icon>
-                    </el-button>
-                </div>
+                <el-button link size="small" type="primary" class="mt-2 mb-2" @click="showTop = !showTop">
+                    {{ $t('home.cpuTop') }}
+                    <el-icon v-if="!showTop"><ArrowRight /></el-icon>
+                    <el-icon v-if="showTop"><ArrowDown /></el-icon>
+                </el-button>
+                <ComplexTable v-if="showTop" :data="currentInfo.topCPUItems">
+                    <el-table-column :min-width="120" show-overflow-tooltip :label="$t('menu.process')" prop="name" />
+                    <el-table-column :min-width="60" :label="$t('monitor.percent')" prop="percent">
+                        <template #default="{ row }">{{ row.percent.toFixed(2) }}%</template>
+                    </el-table-column>
+                    <el-table-column :width="80" :label="$t('commons.table.operate')">
+                        <template #default="{ row }">
+                            <el-button type="primary" link @click="onKill(row)">
+                                {{ $t('process.stopProcess') }}
+                            </el-button>
+                        </template>
+                    </el-table-column>
+                </ComplexTable>
                 <template #reference>
                     <v-charts
                         height="160px"
@@ -69,63 +98,84 @@
                     />
                 </template>
             </el-popover>
-            <span class="input-help">
-                ( {{ formatNumber(currentInfo.cpuUsed) }} / {{ currentInfo.cpuTotal }} )
-                {{ $t('commons.units.core', currentInfo.cpuTotal) }}
-            </span>
+            <div class="text-center">
+                <span class="input-help">
+                    ( {{ formatNumber(currentInfo.cpuUsed) }} / {{ currentInfo.cpuTotal }} )
+                    {{ $t('commons.units.core', currentInfo.cpuTotal) }}
+                </span>
+            </div>
         </el-col>
-        <el-col :xs="12" :sm="12" :md="6" :lg="6" :xl="6" align="center">
-            <el-popover
-                placement="bottom"
-                :width="currentInfo.swapMemoryTotal ? 320 : 160"
-                trigger="hover"
-                v-if="chartsOption['memory']"
-            >
-                <el-row :gutter="5">
-                    <el-col :span="currentInfo.swapMemoryTotal ? 12 : 24">
-                        <el-row>
-                            <el-tag style="font-weight: 500">{{ $t('home.mem') }}:</el-tag>
-                        </el-row>
-                        <el-tag class="tagClass">
-                            {{ $t('home.total') }}: {{ computeSize(currentInfo.memoryTotal) }}
-                        </el-tag>
-                        <el-tag class="tagClass">
-                            {{ $t('home.used') }}: {{ computeSize(currentInfo.memoryUsed) }}
-                        </el-tag>
-                        <el-tag class="tagClass">
-                            {{ $t('home.free') }}: {{ computeSize(currentInfo.memoryFree) }}
-                        </el-tag>
-                        <el-tag class="tagClass">
-                            {{ $t('home.shard') }}: {{ computeSize(currentInfo.memoryShard) }}
-                        </el-tag>
-                        <el-tag class="tagClass">
-                            {{ $t('home.cache') }}: {{ computeSize(currentInfo.memoryCache) }}
-                        </el-tag>
-                        <el-tag class="tagClass">
-                            {{ $t('home.available') }}: {{ computeSize(currentInfo.memoryAvailable) }}
-                        </el-tag>
-                        <el-tag class="tagClass">
-                            {{ $t('home.percent') }}: {{ formatNumber(currentInfo.memoryUsedPercent) }}%
-                        </el-tag>
-                    </el-col>
-                    <el-col :span="12" v-if="currentInfo.swapMemoryTotal" class="mt-20">
-                        <el-row>
-                            <el-tag style="font-weight: 500">{{ $t('home.swapMem') }}:</el-tag>
-                        </el-row>
-                        <el-tag class="tagClass">
-                            {{ $t('home.total') }}: {{ computeSize(currentInfo.swapMemoryTotal) }}
-                        </el-tag>
-                        <el-tag class="tagClass">
-                            {{ $t('home.used') }}: {{ computeSize(currentInfo.swapMemoryUsed) }}
-                        </el-tag>
-                        <el-tag class="tagClass">
-                            {{ $t('home.free') }}: {{ computeSize(currentInfo.swapMemoryAvailable) }}
-                        </el-tag>
-                        <el-tag class="tagClass">
-                            {{ $t('home.percent') }}: {{ formatNumber(currentInfo.swapMemoryUsedPercent) }}%
-                        </el-tag>
-                    </el-col>
-                </el-row>
+        <el-col :xs="6" :sm="6" :md="3" :lg="3" :xl="3" align="center">
+            <el-popover :hide-after="20" :teleported="false" :width="480" v-if="chartsOption['memory']">
+                <el-descriptions direction="vertical" :title="$t('home.mem')" class="ml-1" :column="4" size="small">
+                    <el-descriptions-item :label-width="60" :label="$t('home.total')">
+                        {{ computeSize(currentInfo.memoryTotal) }}
+                    </el-descriptions-item>
+                    <el-descriptions-item :label="$t('home.used')">
+                        {{ computeSize(currentInfo.memoryUsed) }}
+                    </el-descriptions-item>
+                    <el-descriptions-item :label="$t('home.free')">
+                        {{ computeSize(currentInfo.memoryFree) }}
+                    </el-descriptions-item>
+                    <el-descriptions-item :label="$t('home.available')">
+                        {{ computeSize(currentInfo.memoryAvailable) }}
+                    </el-descriptions-item>
+                    <el-descriptions-item :label="$t('home.shard')">
+                        {{ computeSize(currentInfo.memoryShard) }}
+                    </el-descriptions-item>
+                    <el-descriptions-item :label="$t('home.cache')">
+                        {{ computeSize(currentInfo.memoryCache) }}
+                    </el-descriptions-item>
+                    <el-descriptions-item :label="$t('home.percent')">
+                        {{ formatNumber(currentInfo.memoryUsedPercent) }}%
+                    </el-descriptions-item>
+                </el-descriptions>
+
+                <el-descriptions
+                    v-if="currentInfo.swapMemoryTotal"
+                    direction="vertical"
+                    :title="$t('home.swapMem')"
+                    :column="4"
+                    size="small"
+                    class="ml-1"
+                >
+                    <el-descriptions-item :label-width="60" :label="$t('home.total')">
+                        {{ computeSize(currentInfo.swapMemoryTotal) }}
+                    </el-descriptions-item>
+                    <el-descriptions-item :label-width="60" :label="$t('home.used')">
+                        {{ computeSize(currentInfo.swapMemoryUsed) }}
+                    </el-descriptions-item>
+                    <el-descriptions-item :label-width="60" :label="$t('home.free')">
+                        {{ computeSize(currentInfo.swapMemoryAvailable) }}
+                    </el-descriptions-item>
+                    <el-descriptions-item :label-width="60" :label="$t('home.percent')">
+                        {{ formatNumber(currentInfo.swapMemoryUsedPercent) }}%
+                    </el-descriptions-item>
+                </el-descriptions>
+
+                <el-button link size="small" type="primary" class="float-left mb-2" @click="showTop = !showTop">
+                    {{ $t('home.memTop') }}
+                    <el-icon v-if="!showTop"><ArrowRight /></el-icon>
+                    <el-icon v-if="showTop"><ArrowDown /></el-icon>
+                </el-button>
+                <ComplexTable v-if="showTop" :data="currentInfo.topMemItems">
+                    <el-table-column :min-width="120" show-overflow-tooltip :label="$t('menu.process')" prop="name" />
+                    <el-table-column :min-width="100" :label="$t('monitor.memory')" prop="memory">
+                        <template #default="{ row }">
+                            {{ computeSize(row.memory) }}
+                        </template>
+                    </el-table-column>
+                    <el-table-column :min-width="80" :label="$t('monitor.percent')" prop="percent">
+                        <template #default="{ row }">{{ row.percent.toFixed(2) }}%</template>
+                    </el-table-column>
+                    <el-table-column :width="80" :label="$t('commons.table.operate')">
+                        <template #default="{ row }">
+                            <el-button type="primary" link @click="onKill(row)">
+                                {{ $t('process.stopProcess') }}
+                            </el-button>
+                        </template>
+                    </el-table-column>
+                </ComplexTable>
                 <template #reference>
                     <v-charts
                         height="160px"
@@ -141,48 +191,42 @@
             </span>
         </el-col>
         <template v-for="(item, index) of currentInfo.diskData" :key="index">
-            <el-col :xs="12" :sm="12" :md="6" :lg="6" :xl="6" align="center" v-if="isShow('disk', index)">
-                <el-popover placement="bottom" :width="300" trigger="hover" v-if="chartsOption[`disk${index}`]">
-                    <el-row :gutter="5">
-                        <el-tag style="font-weight: 500">{{ $t('home.baseInfo') }}:</el-tag>
-                    </el-row>
-                    <el-row :gutter="5">
-                        <el-tag class="nameTag">{{ $t('home.mount') }}: {{ item.path }}</el-tag>
-                    </el-row>
-                    <el-row :gutter="5">
-                        <el-tag class="nameTag">{{ $t('commons.table.type') }}: {{ item.type }}</el-tag>
-                    </el-row>
-                    <el-row :gutter="5">
-                        <el-tooltip :content="item.device" v-if="item.device.length > 30">
-                            <el-tag class="nameTag">
-                                {{ $t('home.fileSystem') }}: {{ item.device.substring(0, 30) + '...' }}
-                            </el-tag>
-                        </el-tooltip>
-                        <el-tag v-else class="nameTag">{{ $t('home.fileSystem') }}: {{ item.device }}</el-tag>
-                    </el-row>
-                    <el-row :gutter="5">
-                        <el-col :span="12">
-                            <div><el-tag class="nameTag" style="font-weight: 500">Inode:</el-tag></div>
-                            <el-tag class="tagClass">{{ $t('home.total') }}: {{ item.inodesTotal }}</el-tag>
-                            <el-tag class="tagClass">{{ $t('home.used') }}: {{ item.inodesUsed }}</el-tag>
-                            <el-tag class="tagClass">{{ $t('home.free') }}: {{ item.inodesFree }}</el-tag>
-                            <el-tag class="tagClass">
-                                {{ $t('home.percent') }}: {{ formatNumber(item.inodesUsedPercent) }}%
-                            </el-tag>
-                        </el-col>
+            <el-col :xs="6" :sm="6" :md="3" :lg="3" :xl="3" align="center" v-if="isShow('disk', index)">
+                <el-popover :hide-after="20" :teleported="false" :width="450" v-if="chartsOption[`disk${index}`]">
+                    <el-descriptions :column="1" size="small">
+                        <el-descriptions-item :label="$t('home.mount')">
+                            {{ item.path }}
+                        </el-descriptions-item>
+                        <el-descriptions-item :label="$t('commons.table.type')">
+                            {{ item.type }}
+                        </el-descriptions-item>
+                        <el-descriptions-item :label="$t('home.fileSystem')">
+                            {{ item.device }}
+                        </el-descriptions-item>
+                    </el-descriptions>
+                    <el-descriptions title="Inode" direction="vertical" :column="4" size="small">
+                        <el-descriptions-item :label="$t('home.total')">{{ item.inodesTotal }}</el-descriptions-item>
+                        <el-descriptions-item :label="$t('home.used')">{{ item.inodesUsed }}</el-descriptions-item>
+                        <el-descriptions-item :label="$t('home.free')">{{ item.inodesFree }}</el-descriptions-item>
+                        <el-descriptions-item :label="$t('home.percent')">
+                            {{ formatNumber(item.inodesUsedPercent) }}%
+                        </el-descriptions-item>
+                    </el-descriptions>
 
-                        <el-col :span="12">
-                            <div>
-                                <el-tag style="margin-top: 3px; font-weight: 500">{{ $t('monitor.disk') }}:</el-tag>
-                            </div>
-                            <el-tag class="tagClass">{{ $t('home.total') }}: {{ computeSize(item.total) }}</el-tag>
-                            <el-tag class="tagClass">{{ $t('home.used') }}: {{ computeSize(item.used) }}</el-tag>
-                            <el-tag class="tagClass">{{ $t('home.free') }}: {{ computeSize(item.free) }}</el-tag>
-                            <el-tag class="tagClass">
-                                {{ $t('home.percent') }}: {{ formatNumber(item.usedPercent) }}%
-                            </el-tag>
-                        </el-col>
-                    </el-row>
+                    <el-descriptions :title="$t('monitor.disk')" direction="vertical" :column="4" size="small">
+                        <el-descriptions-item :label="$t('home.total')">
+                            {{ computeSize(item.total) }}
+                        </el-descriptions-item>
+                        <el-descriptions-item :label="$t('home.used')">
+                            {{ computeSize(item.used) }}
+                        </el-descriptions-item>
+                        <el-descriptions-item :label="$t('home.free')">
+                            {{ computeSize(item.free) }}
+                        </el-descriptions-item>
+                        <el-descriptions-item :label="$t('home.percent')">
+                            {{ formatNumber(item.usedPercent) }}%
+                        </el-descriptions-item>
+                    </el-descriptions>
                     <template #reference>
                         <v-charts
                             @click="routerToFileWithPath(item.path)"
@@ -198,19 +242,28 @@
             </el-col>
         </template>
         <template v-for="(item, index) of currentInfo.gpuData" :key="index">
-            <el-col :xs="12" :sm="12" :md="6" :lg="6" :xl="6" align="center" v-if="isShow('gpu', index)">
-                <el-popover placement="bottom" :width="250" trigger="hover" v-if="chartsOption[`gpu${index}`]">
-                    <el-row :gutter="5">
-                        <el-tag class="nameTag" style="font-weight: 500">{{ $t('home.baseInfo') }}:</el-tag>
-                    </el-row>
-                    <el-tag class="tagClass">{{ $t('monitor.gpuUtil') }}: {{ item.gpuUtil }}</el-tag>
-                    <el-tag class="tagClass">
-                        {{ $t('monitor.temperature') }}: {{ item.temperature.replaceAll('C', '°C') }}
-                    </el-tag>
-                    <el-tag class="tagClass">{{ $t('monitor.performanceState') }}: {{ item.performanceState }}</el-tag>
-                    <el-tag class="tagClass">{{ $t('monitor.powerUsage') }}: {{ item.powerUsage }}</el-tag>
-                    <el-tag class="tagClass">{{ $t('monitor.memoryUsage') }}: {{ item.memoryUsage }}</el-tag>
-                    <el-tag class="tagClass">{{ $t('monitor.fanSpeed') }}: {{ item.fanSpeed }}</el-tag>
+            <el-col :xs="6" :sm="6" :md="3" :lg="3" :xl="3" align="center" v-if="isShow('gpu', index)">
+                <el-popover :hide-after="20" :teleported="false" :width="450" v-if="chartsOption[`gpu${index}`]">
+                    <el-descriptions :title="item.productName" direction="vertical" :column="3" size="small">
+                        <el-descriptions-item :label="$t('monitor.gpuUtil')">
+                            {{ item.gpuUtil }}
+                        </el-descriptions-item>
+                        <el-descriptions-item :label="$t('monitor.temperature')">
+                            {{ item.temperature.replaceAll('C', '°C') }}
+                        </el-descriptions-item>
+                        <el-descriptions-item :label="$t('monitor.performanceState')">
+                            {{ item.performanceState }}
+                        </el-descriptions-item>
+                        <el-descriptions-item :label="$t('monitor.powerUsage')">
+                            {{ item.powerUsage }}
+                        </el-descriptions-item>
+                        <el-descriptions-item :label="$t('monitor.memoryUsage')">
+                            {{ item.memoryUsage }}
+                        </el-descriptions-item>
+                        <el-descriptions-item :label="$t('monitor.fanSpeed')">
+                            {{ item.fanSpeed }}
+                        </el-descriptions-item>
+                    </el-descriptions>
                     <template #reference>
                         <v-charts
                             @click="goGPU()"
@@ -229,17 +282,22 @@
             </el-col>
         </template>
         <template v-for="(item, index) of currentInfo.xpuData" :key="index">
-            <el-col :xs="12" :sm="12" :md="6" :lg="6" :xl="6" align="center" v-if="isShow('xpu', index)">
-                <el-popover placement="bottom" :width="250" trigger="hover" v-if="chartsOption[`xpu${index}`]">
-                    <el-row :gutter="5">
-                        <el-tag class="nameTag">{{ $t('home.baseInfo') }}:</el-tag>
-                    </el-row>
-                    <el-tag class="tagClass">{{ $t('monitor.gpuUtil') }}: {{ item.memoryUtil }}</el-tag>
-                    <el-tag class="tagClass">{{ $t('monitor.temperature') }}: {{ item.temperature }}</el-tag>
-                    <el-tag class="tagClass">{{ $t('monitor.powerUsage') }}: {{ item.power }}</el-tag>
-                    <el-tag class="tagClass">
-                        {{ $t('monitor.memoryUsage') }}: {{ item.memoryUsed }}/{{ item.memory }}
-                    </el-tag>
+            <el-col :xs="6" :sm="6" :md="3" :lg="3" :xl="3" align="center" v-if="isShow('xpu', index)">
+                <el-popover :hide-after="20" :teleported="false" :width="400" v-if="chartsOption[`xpu${index}`]">
+                    <el-descriptions :title="item.deviceName" direction="vertical" :column="4" size="small">
+                        <el-descriptions-item :label="$t('monitor.gpuUtil')">
+                            {{ item.memoryUtil }}
+                        </el-descriptions-item>
+                        <el-descriptions-item :label="$t('monitor.temperature')">
+                            {{ item.temperature }}
+                        </el-descriptions-item>
+                        <el-descriptions-item :label="$t('monitor.powerUsage')">
+                            {{ item.power }}
+                        </el-descriptions-item>
+                        <el-descriptions-item :label="$t('monitor.memoryUsage')">
+                            {{ item.memoryUsed }}/{{ item.memory }}
+                        </el-descriptions-item>
+                    </el-descriptions>
                     <template #reference>
                         <v-charts
                             @click="goGPU()"
@@ -257,7 +315,7 @@
                 <span class="input-help" v-else>{{ item.deviceName }}</span>
             </el-col>
         </template>
-        <el-col :xs="12" :sm="12" :md="6" :lg="6" :xl="6" align="center" v-if="totalCount > 5">
+        <el-col :xs="6" :sm="6" :md="6" :lg="6" :xl="6" align="center" v-if="totalCount > 5">
             <el-button v-if="!showMore" link type="primary" @click="changeShowMore(true)" class="buttonClass">
                 {{ $t('tabs.more') }}
                 <el-icon><Bottom /></el-icon>
@@ -267,7 +325,8 @@
                 <el-icon><Top /></el-icon>
             </el-button>
         </el-col>
-    </el-row>
+        <ConfirmDialog ref="confirmConfRef" @confirm="submitKill" />
+    </div>
 </template>
 
 <script setup lang="ts">
@@ -276,6 +335,8 @@ import { computeSize } from '@/utils/util';
 import i18n from '@/lang';
 import { nextTick, ref } from 'vue';
 import { routerToFileWithPath, routerToName } from '@/utils/router';
+import { stopProcess } from '@/api/modules/process';
+import { MsgSuccess } from '@/utils/message';
 const showMore = ref(false);
 const totalCount = ref();
 
@@ -334,12 +395,18 @@ const currentInfo = ref<Dashboard.CurrentInfo>({
     gpuData: [],
     xpuData: [],
 
+    topCPUItems: [],
+    topMemItems: [],
+
     netBytesSent: 0,
     netBytesRecv: 0,
     shotTime: new Date(),
 });
 
 const cpuShowAll = ref();
+const showTop = ref();
+const killProcessID = ref();
+const confirmConfRef = ref();
 
 const chartsOption = ref({
     cpu: { title: 'CPU', data: 0 },
@@ -411,6 +478,21 @@ const changeShowMore = (show: boolean) => {
     localStorage.setItem('dashboard_show', show ? 'more' : 'hide');
 };
 
+const onKill = async (row: any) => {
+    let params = {
+        header: i18n.global.t('process.kill'),
+        operationInfo: i18n.global.t('process.killHelper'),
+        submitInputInfo: i18n.global.t('process.killNow'),
+    };
+    killProcessID.value = row.pid;
+    confirmConfRef.value!.acceptParams(params);
+};
+const submitKill = async () => {
+    await stopProcess({ PID: killProcessID.value }).then(() => {
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+    });
+};
+
 function loadStatus(val: number) {
     if (val < 30) {
         return i18n.global.t('home.runSmoothly');
@@ -428,14 +510,6 @@ const goGPU = () => {
     routerToName('GPU');
 };
 
-const loadWidth = () => {
-    if (!cpuShowAll.value || currentInfo.value.cpuPercent.length < 32) {
-        return 310;
-    }
-    let line = Math.floor(currentInfo.value.cpuPercent.length / 16);
-    return line * 141 + 28;
-};
-
 function formatNumber(val: number) {
     return Number(val.toFixed(2));
 }
@@ -446,44 +520,52 @@ defineExpose({
 </script>
 
 <style scoped lang="scss">
-.cpuModeTag {
-    justify-content: flex-start !important;
-    text-align: left !important;
-    width: 280px;
-}
-.cpuDetailTag {
-    justify-content: flex-start !important;
-    text-align: left !important;
-    width: 140px;
-    margin-top: 3px;
-    margin-left: 1px;
-}
-.tagClass {
-    justify-content: flex-start !important;
-    text-align: left !important;
-    float: left;
-    margin-top: 3px;
-    width: 100%;
-}
-
-.tagCPUClass {
-    justify-content: flex-start !important;
-    text-align: left !important;
-    float: left;
-    margin-top: 3px;
-    margin-left: 1px;
-    width: 140px;
-}
-
 .buttonClass {
     margin-top: 28%;
     font-size: 14px;
 }
-.nameTag {
-    margin-top: 3px;
-    height: auto;
-    display: inline-block;
-    white-space: normal;
-    line-height: 1.8;
+.cpu-detail {
+    font-size: 12px;
+    width: 95px;
+}
+:deep(.el-descriptions__label) {
+    width: 80px;
+    background-color: transparent !important;
+}
+.custom-row {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 10px;
+    width: 100%;
+}
+.custom-row .el-col {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: none !important;
+    float: none !important;
+    display: block !important;
+}
+.custom-row .el-col.el-col-xs-6 {
+    grid-column: span 6;
+}
+@media (min-width: 768px) {
+    .custom-row .el-col.el-col-sm-6 {
+        grid-column: span 6;
+    }
+}
+@media (min-width: 992px) {
+    .custom-row .el-col.el-col-md-3 {
+        grid-column: span 3;
+    }
+}
+@media (min-width: 1200px) {
+    .custom-row .el-col.el-col-lg-3 {
+        grid-column: span 3;
+    }
+}
+@media (min-width: 1920px) {
+    .custom-row .el-col.el-col-xl-3 {
+        grid-column: span 3;
+    }
 }
 </style>

@@ -86,6 +86,7 @@ const message = {
             show: '显示',
             hide: '隐藏',
             visit: '访问',
+            migrate: '迁移',
         },
         operate: {
             start: '启动',
@@ -413,7 +414,7 @@ const message = {
         ioDelay: '读写延迟',
         uptime: '启动时间',
         runningTime: '运行时间',
-        mem: '系统',
+        mem: '系统内存',
         swapMem: 'Swap 分区',
 
         runSmoothly: '运行流畅',
@@ -423,6 +424,9 @@ const message = {
 
         core: '物理核心',
         logicCore: '逻辑核心',
+        corePercent: '核心使用率',
+        cpuTop: 'CPU 占用率 Top5 的进程信息',
+        memTop: '内存占用率 Top5 的进程信息',
         loadAverage: '最近 {0} 分钟平均负载',
         load: '负载',
         mount: '挂载点',
@@ -783,6 +787,18 @@ const message = {
         cpuShareHelper: '容器默认份额为 1024 个 CPU，增大可使当前容器获得更多的 CPU 时间',
         inputIpv4: '请输入 IPv4 地址',
         inputIpv6: '请输入 IPv6 地址',
+
+        diskUsage: '磁盘占用',
+        localVolume: '本地存储卷',
+        buildCache: '构建缓存',
+        usage: '已占用：{0}, 可释放：{1}',
+        clean: '释放',
+        imageClean: '清理镜像 将删除所有未被使用的镜像，该操作无法回滚，是否继续？',
+        containerClean: '清理容器 将删除所有处于停止中状态的容器（包括应用商店停止应用），该操作无法回滚，是否继续？',
+        sizeRw: '容器层大小',
+        sizeRwHelper: '容器独有的可写层大小',
+        sizeRootFs: '虚拟大小',
+        sizeRootFsHelper: ' 容器依赖的所有镜像层 + 容器层的总大小',
 
         containerFromAppHelper: '检测到该容器来源于应用商店，应用操作可能会导致当前编辑失效',
         containerFromAppHelper1: '在应用商店的已安装页面，点击 [参数] 按钮，进入编辑页面修改容器名称。',
@@ -2033,7 +2049,6 @@ const message = {
         versionSelect: '请选择版本',
         operatorHelper: '将对选中应用进行 {0} 操作，是否继续？',
         checkInstalledWarn: '未检测到 {0} ,请进入应用商店点击安装！',
-        gotoInstalled: '去安装',
         limitHelper: '该应用已安装，不支持重复安装',
         deleteHelper: '{0}已经关联以下资源，请检查后重试！',
         checkTitle: '提示',
@@ -2128,6 +2143,7 @@ const message = {
         uninstallDeleteImage: '卸载应用-删除镜像',
         upgradeBackup: '应用升级前备份应用',
         noAppHelper: '未检测到应用，请前往任务中心查看应用商店同步日志',
+        isEdirWarn: '检测到 docker-compose.yml 文件被修改，请查看对比',
     },
     website: {
         primaryDomain: '主域名',
@@ -2820,6 +2836,9 @@ const message = {
         stopProcess: '结束',
         viewDetails: '查看详情',
         stopProcessWarn: '是否确定结束此进程 (PID:{0})？',
+        kill: '结束进程',
+        killNow: '立即结束',
+        killHelper: '结束进程 {0} 可能导致部分程序无法正常运行，是否继续？',
         processName: '进程名称',
     },
     tool: {
@@ -3467,6 +3486,9 @@ const message = {
             selectNode: '选择节点',
             selectNodeError: '请选择节点',
             licenseHelper: '专业版支持自定义应用仓库功能',
+            databaseHelper: '应用关联数据库，请选择目标节点数据库',
+            nodeHelper: '不能选择当前节点',
+            migrateHelper: '当前仅支持迁移单体应用和只关联 MySQL、MariaDB、PostgreSQL 数据库的应用',
         },
         alert: {
             isAlert: '是否告警',

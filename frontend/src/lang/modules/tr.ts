@@ -86,6 +86,7 @@ const message = {
             show: 'Göster',
             hide: 'Gizle',
             visit: 'Visit',
+            migrate: 'Taşı',
         },
         operate: {
             start: 'Başlat',
@@ -429,7 +430,7 @@ const message = {
         ioDelay: 'G/Ç gecikmesi',
         uptime: 'Çalışma süresi',
         runningTime: 'Şu tarihten beri açık',
-        mem: 'Sistem',
+        mem: 'Sistem Belleği',
         swapMem: 'Swap Bölümü',
 
         runSmoothly: 'Düşük yük',
@@ -439,6 +440,9 @@ const message = {
 
         core: 'Fiziksel çekirdek',
         logicCore: 'Mantıksal çekirdek',
+        corePercent: 'Çekirdek Kullanımı',
+        cpuTop: 'CPU Kullanımına Göre İlk 5 İşlem',
+        memTop: 'Bellek Kullanımına Göre İlk 5 İşlem',
         loadAverage: 'Son 1 dakikadaki yük ortalaması | Son {n} dakikadaki yük ortalaması',
         load: 'Yük',
         mount: 'Bağlama noktası',
@@ -826,6 +830,20 @@ const message = {
             'Konteyner motoru CPU paylaşımları için 1024 temel değerini kullanır. Konteynere daha fazla CPU zamanı vermek için bunu artırabilirsiniz.',
         inputIpv4: 'Örnek: 192.168.1.1',
         inputIpv6: 'Örnek: 2001:0db8:85a3:0000:0000:8a2e:0370:7334',
+
+        diskUsage: 'Disk Kullanımı',
+        localVolume: 'Yerel Depolama Birimi',
+        buildCache: 'Derleme Önbelleği',
+        usage: 'Kullanılan: {0}, Serbest Bırakılabilir: {1}',
+        clean: 'Serbest Bırak',
+        imageClean:
+            'Görüntüleri temizlemek, kullanılmayan tüm görüntüleri silecektir. Bu işlem geri alınamaz. Devam etmek istiyor musunuz?',
+        containerClean:
+            'Konteynerleri temizlemek, durdurulmuş tüm konteynerleri (Uygulama Mağazası ndaki durdurulmuş uygulamalar dahil) silecektir. Bu işlem geri alınamaz. Devam etmek istiyor musunuz?',
+        sizeRw: 'Konteyner Katman Boyutu',
+        sizeRwHelper: 'Konteynere özel yazılabilir katman boyutu',
+        sizeRootFs: 'Sanal Boyut',
+        sizeRootFsHelper: 'Konteynerin bağımlı olduğu tüm görüntü katmanları + konteyner katmanının toplam boyutu',
 
         containerFromAppHelper:
             'Bu konteynerin uygulama mağazasından geldiği tespit edildi. Uygulama işlemleri mevcut düzenlemelerin geçersiz hale gelmesine neden olabilir.',
@@ -2219,7 +2237,6 @@ const message = {
         restartOperatorHelper: 'Uygulama yeniden başlatılacak. Devam etmek istiyor musunuz?',
         reloadOperatorHelper: 'Uygulama yeniden yüklenecek. Devam etmek istiyor musunuz?',
         checkInstalledWarn: '"{0}" tespit edilmedi. Kurulum için "Uygulama Mağazası"na gidin.',
-        gotoInstalled: 'Kurulum için git',
         limitHelper: 'Uygulama zaten kurulmuş.',
         deleteHelper: '"{0}" aşağıdaki kaynak(lar) ile ilişkilendirilmiş ve silinemez',
         checkTitle: 'İpucu',
@@ -2329,6 +2346,9 @@ const message = {
         uninstallDeleteBackup: 'Uygulamayı Kaldır - Yedeği Sil',
         uninstallDeleteImage: 'Uygulamayı Kaldır - Görüntüyü Sil',
         upgradeBackup: 'Yükseltmeden Önce Uygulamayı Yedekle',
+        noAppHelper:
+            'Uygulama tespit edilmedi, lütfen uygulama mağazası senkronizasyon günlüğünü görüntülemek için görev merkezine gidin',
+        isEdirWarn: 'docker-compose.yml dosyasında değişiklik tespit edildi, lütfen karşılaştırmayı kontrol edin',
     },
     website: {
         primaryDomain: 'Birincil alan adı',
@@ -3054,6 +3074,10 @@ const message = {
         stopProcess: 'Sonlandır',
         viewDetails: 'Detayları görüntüle',
         stopProcessWarn: 'Bu işlemi (PID:{0}) sonlandırmak istediğinizden emin misiniz?',
+        kill: 'İşlemi Sonlandır',
+        killNow: 'Hemen Sonlandır',
+        killHelper:
+            '{0} işlemini sonlandırmak bazı programların düzgün çalışmamasına neden olabilir. Devam etmek istiyor musunuz?',
         processName: 'İşlem adı',
     },
     tool: {
@@ -3781,6 +3805,10 @@ const message = {
             selectNode: 'Düğüm Seç',
             selectNodeError: 'Lütfen bir düğüm seçin',
             licenseHelper: 'Pro sürümü, özel uygulama deposu özelliğini destekler',
+            databaseHelper: 'Uygulama ilişkili veritabanı, lütfen hedef düğüm veritabanını seçin',
+            nodeHelper: 'Geçerli düğüm seçilemez',
+            migrateHelper:
+                'Şu anda yalnızca tek parça uygulamaların ve yalnızca MySQL, MariaDB, PostgreSQL veritabanlarıyla ilişkili uygulamaların taşınmasını destekler',
         },
         alert: {
             isAlert: 'Uyarı',

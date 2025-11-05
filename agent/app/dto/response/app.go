@@ -128,6 +128,7 @@ type AppInstallDTO struct {
 	Favorite      bool      `json:"favorite"`
 	App           AppDetail `json:"app"`
 	Container     string    `json:"container"`
+	IsEdit        bool      `json:"isEdit"`
 }
 
 type AppInstallInfo struct {
@@ -139,6 +140,8 @@ type AppInstallInfo struct {
 	HttpPort    int    `json:"HttpPort"`
 	Container   string `json:"container"`
 	ComposePath string `json:"composePath"`
+	AppKey      string `json:"appKey"`
+	AppPorts    []int  `json:"appPorts"`
 
 	Env map[string]interface{} `json:"env"`
 }
@@ -176,6 +179,7 @@ type AppParam struct {
 }
 
 type AppConfig struct {
-	Params []AppParam `json:"params"`
+	Params     []AppParam `json:"params"`
+	RawCompose string     `json:"rawCompose"`
 	request.AppContainerConfig
 }

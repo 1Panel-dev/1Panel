@@ -990,9 +990,6 @@ func handleRuntimeDTO(res *response.RuntimeDTO, runtime model.Runtime) error {
 					return err
 				}
 				hostIP := envs[fmt.Sprintf("HOST_IP_%s", matches[1])]
-				if hostIP == "" {
-					hostIP = "0.0.0.0"
-				}
 				res.ExposedPorts = append(res.ExposedPorts, request.ExposedPort{
 					ContainerPort: containerPort,
 					HostPort:      hostPort,

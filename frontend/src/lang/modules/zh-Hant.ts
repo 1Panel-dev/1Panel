@@ -86,6 +86,7 @@ const message = {
             show: '顯示',
             hide: '隱藏',
             visit: '訪問',
+            migrate: '遷移',
         },
         operate: {
             start: '啟動',
@@ -412,7 +413,7 @@ const message = {
         ioDelay: '讀寫延遲',
         uptime: '啟動時間',
         runningTime: '執行時間',
-        mem: '系統',
+        mem: '系統記憶體',
         swapMem: 'Swap 分區',
 
         runSmoothly: '執行流暢',
@@ -422,6 +423,9 @@ const message = {
 
         core: '物理核心',
         logicCore: '邏輯核心',
+        corePercent: '核心使用率',
+        cpuTop: 'CPU 佔用率 Top5 的行程資訊',
+        memTop: '記憶體佔用率 Top5 的行程資訊',
         loadAverage: '最近 {0} 分鐘平均負載',
         load: '負載',
         mount: '掛載點',
@@ -782,6 +786,18 @@ const message = {
         cpuShareHelper: '容器預設份額為 1024 個 CPU，增大可使目前容器獲得更多的 CPU 時間',
         inputIpv4: '請輸入 IPv4 位址',
         inputIpv6: '請輸入 IPv6 位址',
+
+        diskUsage: '磁碟佔用',
+        localVolume: '本機儲存卷',
+        buildCache: '建置快取',
+        usage: '已佔用：{0}, 可釋放：{1}',
+        clean: '釋放',
+        imageClean: '清理映像將刪除所有未被使用的映像，該操作無法復原，是否繼續？',
+        containerClean: '清理容器將刪除所有處於停止中狀態的容器（包括應用商店停止應用），該操作無法復原，是否繼續？',
+        sizeRw: '容器層大小',
+        sizeRwHelper: '容器獨有的可寫層大小',
+        sizeRootFs: '虛擬大小',
+        sizeRootFsHelper: '容器依賴的所有映像層 + 容器層的總大小',
 
         containerFromAppHelper: '檢測到該容器來源於應用商店，應用操作可能會導致目前編輯失效',
         containerFromAppHelper1: '在已安裝應用程式列表點擊 [參數] 按鈕，進入編輯頁面即可修改容器名稱。',
@@ -2040,7 +2056,6 @@ const message = {
         versionSelect: '請選擇版本',
         operatorHelper: '將對選中應用進行 {0} 操作，是否繼續？',
         checkInstalledWarn: '未檢測到 {0} ,請進入應用商店點擊安裝！',
-        gotoInstalled: '去安裝',
         limitHelper: '該應用已安裝，不支援重複安裝',
         deleteHelper: '{0}已經關聯以下資源，請檢查後重試！',
         checkTitle: '提示',
@@ -2134,6 +2149,8 @@ const message = {
         uninstallDeleteBackup: '移除應用-刪除備份',
         uninstallDeleteImage: '移除應用-刪除鏡像',
         upgradeBackup: '應用升級前備份應用',
+        noAppHelper: '未檢測到應用程式，請前往任務中心查看應用商店同步日誌',
+        isEdirWarn: '檢測到 docker-compose.yml 檔案被修改，請查看對比',
     },
     website: {
         primaryDomain: '主域名',
@@ -2799,6 +2816,9 @@ const message = {
         stopProcess: '結束',
         viewDetails: '查看詳情',
         stopProcessWarn: '是否確定結束此行程 (PID:{0})？',
+        kill: '結束行程',
+        killNow: '立即結束',
+        killHelper: '結束行程 {0} 可能導致部分程式無法正常運作，是否繼續？',
         processName: '行程名稱',
     },
     tool: {
@@ -3453,6 +3473,9 @@ const message = {
             selectNode: '選擇節點',
             selectNodeError: '請選擇節點',
             licenseHelper: '專業版支援自訂應用倉庫功能',
+            databaseHelper: '應用關聯數據庫，請選擇目標節點數據庫',
+            nodeHelper: '不能選擇當前節點',
+            migrateHelper: '目前僅支持遷移單體應用和只關聯 MySQL、MariaDB、PostgreSQL 數據庫的應用',
         },
         alert: {
             isAlert: '是否告警',

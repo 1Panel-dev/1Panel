@@ -36,6 +36,11 @@ ErrInternalServerKey: "서버 내부 오류:"
 # app
 CustomAppStoreFileValid: "앱 스토어 패키지는 .tar.gz 형식이어야 합니다"
 ErrFileNotFound: "{{ .name }} 파일이 존재하지 않습니다"
+AppBackup: '애플리케이션 백업',
+AppBackupPush: '애플리케이션 백업 파일 {{.file}}을(를) 노드 {{ .name }}(으)로 전송',
+ErrSourceTargetSame: '소스 노드와 대상 노드는 동일할 수 없습니다!',
+AppInstall: '노드 {{ .targetNode }}에 애플리케이션 {{ .name }} 설치',
+AppInstallCheck: '애플리케이션 설치 환경 확인',
 
 # backup
 ErrBackupInUsed: "이 백업 계정은 예약된 작업에 사용 중이며 삭제할 수 없습니다"

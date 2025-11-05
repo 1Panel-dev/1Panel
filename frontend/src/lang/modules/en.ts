@@ -86,6 +86,7 @@ const message = {
             show: 'Show',
             hide: 'Hide',
             visit: 'Visit',
+            migrate: 'Migrate',
         },
         operate: {
             start: 'Start',
@@ -426,7 +427,7 @@ const message = {
         ioDelay: 'I/O latency',
         uptime: 'Uptime',
         runningTime: 'Up since',
-        mem: 'System',
+        mem: 'System Memory',
         swapMem: 'Swap Partition',
 
         runSmoothly: 'Low load',
@@ -436,6 +437,9 @@ const message = {
 
         core: 'Physical core',
         logicCore: 'Logical core',
+        corePercent: 'Core Usage',
+        cpuTop: 'Top 5 Processes by CPU Usage',
+        memTop: 'Top 5 Processes by Memory Usage',
         loadAverage: 'Load average in the last 1 minute | Load average in the last {n} minutes',
         load: 'Load',
         mount: 'Mount point',
@@ -818,6 +822,19 @@ const message = {
             'Container engine uses a base value of 1024 for CPU shares. You can increase it to give the container more CPU time.',
         inputIpv4: 'Example: 192.168.1.1',
         inputIpv6: 'Example: 2001:0db8:85a3:0000:0000:8a2e:0370:7334',
+
+        diskUsage: 'Disk Usage',
+        localVolume: 'Local Storage Volume',
+        buildCache: 'Build Cache',
+        usage: 'Used: {0}, Releasable: {1}',
+        clean: 'Release',
+        imageClean: 'Clean up images will delete all unused images. This operation cannot be rolled back. Continue?',
+        containerClean:
+            'Clean up containers will delete all stopped containers (including stopped apps from App Store). This operation cannot be rolled back. Continue?',
+        sizeRw: 'Layer Size',
+        sizeRwHelper: 'Size of the writable layer unique to the container',
+        sizeRootFs: 'Virtual Size',
+        sizeRootFsHelper: 'Total size of all image layers the container depends on + container layer',
 
         containerFromAppHelper:
             'Detected that this container originates from the app store. App operations may cause current edits to be invalidated.',
@@ -2195,7 +2212,6 @@ const message = {
         restartOperatorHelper: 'The application will be restarted. Do you want to continue?',
         reloadOperatorHelper: 'The application will be reloaded. Do you want to continue?',
         checkInstalledWarn: `"{0}" isn't detected. Go to "App Store" to install.`,
-        gotoInstalled: 'Go to install',
         limitHelper: 'The application has already been installed.',
         deleteHelper: `"{0}" has been associated with the following resource(s) and can't be deleted`,
         checkTitle: 'Hint',
@@ -2300,6 +2316,8 @@ const message = {
         uninstallDeleteBackup: 'Uninstall App - Delete Backup',
         uninstallDeleteImage: 'Uninstall App - Delete Image',
         upgradeBackup: 'Backup App Before Upgrade',
+        noAppHelper: 'No application detected, please go to the task center to view the app store sync log',
+        isEdirWarn: 'Detected modification to docker-compose.yml file, please check the comparison',
     },
     website: {
         primaryDomain: 'Primary domain',
@@ -3016,6 +3034,9 @@ const message = {
         stopProcess: 'End',
         viewDetails: 'View details',
         stopProcessWarn: 'Are you sure you want to end this process (PID:{0})?',
+        kill: 'Kill Process',
+        killNow: 'Kill Now',
+        killHelper: 'Killing process {0} may cause some programs to malfunction. Continue?',
         processName: 'Process name',
     },
     tool: {
@@ -3743,6 +3764,10 @@ const message = {
             selectNode: 'Select Node',
             selectNodeError: 'Please select a node',
             licenseHelper: 'The Pro version supports the custom application repository feature',
+            databaseHelper: 'Application associated database, please select target node database',
+            nodeHelper: 'Cannot select current node',
+            migrateHelper:
+                'Currently only supports migrating monolithic applications and applications associated only with MySQL, MariaDB, PostgreSQL databases',
         },
         alert: {
             isAlert: 'Alert',

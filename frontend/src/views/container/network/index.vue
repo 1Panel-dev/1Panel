@@ -86,7 +86,7 @@
         </LayoutContent>
 
         <OpDialog ref="opRef" @search="search" />
-        <CodemirrorDrawer ref="myDetail" />
+        <DetailDrawer ref="detailDrawerRef" />
         <CreateDialog @search="search" ref="dialogCreateRef" />
         <TaskLog ref="taskLogRef" width="70%" @close="search" />
     </div>
@@ -94,7 +94,7 @@
 
 <script lang="ts" setup>
 import CreateDialog from '@/views/container/network/create/index.vue';
-import CodemirrorDrawer from '@/components/codemirror-pro/drawer.vue';
+import DetailDrawer from '@/views/container/network/detail/index.vue';
 import { reactive, ref } from 'vue';
 import { dateFormat, newUUID } from '@/utils/util';
 import { deleteNetwork, searchNetwork, inspect, containerPrune } from '@/api/modules/container';
@@ -105,7 +105,7 @@ import { ElMessageBox } from 'element-plus';
 import DockerStatus from '@/views/container/docker-status/index.vue';
 
 const loading = ref();
-const myDetail = ref();
+const detailDrawerRef = ref();
 const taskLogRef = ref();
 
 const data = ref();
@@ -216,13 +216,8 @@ const batchDelete = async (row: Container.NetworkInfo | null) => {
 
 const onInspect = async (id: string) => {
     const res = await inspect({ id: id, type: 'network' });
-    let detailInfo = JSON.stringify(JSON.parse(res.data), null, 2);
-    let param = {
-        header: i18n.global.t('commons.button.view'),
-        detailInfo: detailInfo,
-        mode: 'json',
-    };
-    myDetail.value!.acceptParams(param);
+    let networkData = JSON.parse(res.data);
+    detailDrawerRef.value!.acceptParams({ data: networkData });
 };
 
 function isSystem(val: string) {

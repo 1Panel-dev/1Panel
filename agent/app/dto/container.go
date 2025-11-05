@@ -31,6 +31,9 @@ type ContainerInfo struct {
 	Network []string `json:"network"`
 	Ports   []string `json:"ports"`
 
+	SizeRw     int64 `json:"sizeRw"`
+	SizeRootFs int64 `json:"sizeRootFs"`
+
 	IsFromApp     bool `json:"isFromApp"`
 	IsFromCompose bool `json:"isFromCompose"`
 
@@ -45,14 +48,13 @@ type ContainerOptions struct {
 }
 
 type ContainerStatus struct {
-	All        uint `json:"all"`
-	Created    uint `json:"created"`
-	Running    uint `json:"running"`
-	Paused     uint `json:"paused"`
-	Restarting uint `json:"restarting"`
-	Removing   uint `json:"removing"`
-	Exited     uint `json:"exited"`
-	Dead       uint `json:"dead"`
+	Created    int `json:"created"`
+	Running    int `json:"running"`
+	Paused     int `json:"paused"`
+	Restarting int `json:"restarting"`
+	Removing   int `json:"removing"`
+	Exited     int `json:"exited"`
+	Dead       int `json:"dead"`
 
 	ContainerCount       int `json:"containerCount"`
 	ComposeCount         int `json:"composeCount"`
@@ -62,7 +64,14 @@ type ContainerStatus struct {
 	VolumeCount          int `json:"volumeCount"`
 	RepoCount            int `json:"repoCount"`
 
-	ImageSize uint64 `json:"imageSize"`
+	ContainerUsage        int64 `json:"containerUsage"`
+	ContainerReclaimable  int64 `json:"containerReclaimable"`
+	ImageUsage            int64 `json:"imageUsage"`
+	ImageReclaimable      int64 `json:"imageReclaimable"`
+	VolumeUsage           int64 `json:"volumeUsage"`
+	VolumeReclaimable     int64 `json:"volumeReclaimable"`
+	BuildCacheUsage       int64 `json:"buildCacheUsage"`
+	BuildCacheReclaimable int64 `json:"buildCacheReclaimable"`
 }
 type ResourceLimit struct {
 	CPU    int    `json:"cpu"`

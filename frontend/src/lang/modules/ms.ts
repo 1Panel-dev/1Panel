@@ -83,6 +83,7 @@ const message = {
             show: 'Tunjukkan',
             hide: 'Sembunyikan',
             visit: 'Lawati',
+            migrate: 'Migrasi',
         },
         operate: {
             start: 'Mula',
@@ -423,7 +424,7 @@ const message = {
         ioDelay: 'I/O latency',
         uptime: 'Up since',
         runningTime: 'Uptime',
-        mem: 'System',
+        mem: 'Memori Sistem',
         swapMem: 'Swap partition',
 
         runSmoothly: 'Beban rendah',
@@ -432,6 +433,9 @@ const message = {
         runJam: 'Beban berat',
 
         core: 'Teras Fizikal',
+        corePercent: 'Penggunaan Teras',
+        cpuTop: 'Maklumat Proses 5 Teratas Mengikut Penggunaan CPU',
+        memTop: 'Maklumat Proses 5 Teratas Mengikut Penggunaan Memori',
         logicCore: 'Teras Logik',
         loadAverage: 'Purata beban dalam 1 minit terakhir | Purata beban dalam {n} minit terakhir',
         load: 'Beban',
@@ -812,6 +816,20 @@ const message = {
             'Enjin kontena menggunakan nilai asas 1024 untuk bahagian CPU. Anda boleh meningkatkannya untuk memberikan lebih masa CPU kepada kontena.',
         inputIpv4: 'Contoh: 192.168.1.1',
         inputIpv6: 'Contoh: 2001:0db8:85a3:0000:0000:8a2e:0370:7334',
+
+        diskUsage: 'Penggunaan Cakera',
+        localVolume: 'Isipadu Storan Tempatan',
+        buildCache: 'Cache Binaan',
+        usage: 'Digunakan: {0}, Boleh Dibebaskan: {1}',
+        clean: 'Bebaskan',
+        imageClean:
+            'Membersihkan imej akan memadam semua imej yang tidak digunakan. Operasi ini tidak boleh dikembalikan. Teruskan?',
+        containerClean:
+            'Membersihkan bekas akan memadam semua bekas yang dihentikan (termasuk aplikasi berhenti dari Kedai Apl). Operasi ini tidak boleh dikembalikan. Teruskan?',
+        sizeRw: 'Saiz Lapisan Bekas',
+        sizeRwHelper: 'Saiz lapisan boleh tulis yang unik untuk bekas',
+        sizeRootFs: 'Saiz Maya',
+        sizeRootFsHelper: 'Jumlah saiz semua lapisan imej yang disandarkan oleh bekas + lapisan bekas',
 
         containerFromAppHelper:
             'Dikesan bahawa kontena ini berasal dari gedung aplikasi. Operasi aplikasi boleh menyebabkan suntingan semasa menjadi tidak sah.',
@@ -2173,7 +2191,6 @@ const message = {
         restartOperatorHelper: 'Aplikasi akan dimulakan semula. Adakah anda mahu meneruskan?',
         reloadOperatorHelper: 'Aplikasi akan dimuat semula. Adakah anda mahu meneruskan?',
         checkInstalledWarn: '"{0}" tidak dikesan. Pergi ke "Kedai Aplikasi" untuk memasang.',
-        gotoInstalled: 'Pergi ke pasang',
         limitHelper: 'Aplikasi ini telah dipasang.',
         deleteHelper: '"{0}" telah dikaitkan dengan sumber berikut. Sila semak dan cuba lagi!',
         checkTitle: 'Petunjuk',
@@ -2274,6 +2291,8 @@ const message = {
         uninstallDeleteBackup: 'Cop Terhapus Semasa Nyahpasang Aplikasi',
         uninstallDeleteImage: 'Imej Terhapus Semasa Nyahpasang Aplikasi',
         upgradeBackup: 'Sandaran Aplikasi Sebelum Naik Taraf',
+        noAppHelper: 'Tiada aplikasi dikesan, sila pergi ke pusat tugas untuk melihat log penyegerakan kedai aplikasi',
+        isEdirWarn: 'Mengesan pengubahsuaian pada fail docker-compose.yml, sila semak perbandingan',
     },
     website: {
         primaryDomain: 'Domain Utama',
@@ -2977,6 +2996,10 @@ const message = {
         stopProcess: 'End',
         viewDetails: 'Details',
         stopProcessWarn: 'Are you sure you want to end this process (PID:{0})?',
+        kill: 'Hentikan Proses',
+        killNow: 'Hentikan Sekarang',
+        killHelper:
+            'Menghentikan proses {0} mungkin menyebabkan beberapa program tidak berfungsi dengan normal. Teruskan?',
         processName: 'Process name',
     },
     tool: {
@@ -3701,6 +3724,10 @@ const message = {
             selectNode: 'Pilih Node',
             selectNodeError: 'Sila pilih node',
             licenseHelper: 'Versi Pro menyokong fungsi gudang aplikasi tersuai',
+            databaseHelper: 'Pangkalan data berkaitan aplikasi, sila pilih pangkalan data nod sasaran',
+            nodeHelper: 'Tidak boleh memilih nod semasa',
+            migrateHelper:
+                'Kini hanya menyokong penghijrahan aplikasi monolitik dan aplikasi yang hanya dikaitkan dengan pangkalan data MySQL, MariaDB, PostgreSQL',
         },
         alert: {
             isAlert: 'Amaran',

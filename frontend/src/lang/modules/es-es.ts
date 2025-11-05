@@ -85,6 +85,7 @@ const message = {
             sure: 'Confirmar',
             show: 'Mostrar',
             hide: 'Ocultar',
+            migrate: 'Migrar',
         },
         operate: {
             start: 'Iniciar',
@@ -433,7 +434,7 @@ const message = {
         ioDelay: 'Latencia de E/S',
         uptime: 'Tiempo en funcionamiento',
         runningTime: 'Desde',
-        mem: 'Sistema',
+        mem: 'Memoria del Sistema',
         swapMem: 'Partición swap',
         runSmoothly: 'Carga baja',
         runNormal: 'Carga moderada',
@@ -441,6 +442,9 @@ const message = {
         runJam: 'Carga pesada',
         core: 'Núcleo físico',
         logicCore: 'Núcleo lógico',
+        corePercent: 'Uso del Núcleo',
+        cpuTop: 'Top 5 de Procesos por Uso de CPU',
+        memTop: 'Top 5 de Procesos por Uso de Memoria',
         loadAverage: 'Promedio de carga en el último minuto | Promedio de carga en los últimos {n} minutos',
         load: 'Carga',
         mount: 'Punto de montaje',
@@ -820,6 +824,22 @@ const message = {
             'El motor de contenedores usa un valor base de 1024 para la proporción de CPU. Puede aumentarlo para darle al contenedor más tiempo de CPU.',
         inputIpv4: 'Ejemplo: 192.168.1.1',
         inputIpv6: 'Ejemplo: 2001:0db8:85a3:0000:0000:8a2e:0370:7334',
+
+        diskUsage: 'Uso del Disco',
+        localVolume: 'Volumen de Almacenamiento Local',
+        buildCache: 'Caché de Construcción',
+        usage: 'Usado: {0}, Liberable: {1}',
+        clean: 'Liberar',
+        imageClean:
+            'Limpiar imágenes eliminará todas las imágenes no utilizadas. Esta operación no se puede deshacer. ¿Continuar?',
+        containerClean:
+            'Limpiar contenedores eliminará todos los contenedores detenidos (incluidas las aplicaciones detenidas de la Tienda de Aplicaciones). Esta operación no se puede deshacer. ¿Continuar?',
+        sizeRw: 'Tamaño de Capa de Contenedor',
+        sizeRwHelper: 'Tamaño de la capa escribible exclusiva del contenedor',
+        sizeRootFs: 'Tamaño Virtual',
+        sizeRootFsHelper:
+            'Tamaño total de todas las capas de imagen de las que depende el contenedor + capa del contenedor',
+
         containerFromAppHelper:
             'Se detectó que este contenedor proviene de la tienda de aplicaciones. Las operaciones sobre la app pueden invalidar los cambios actuales.',
         containerFromAppHelper1:
@@ -2196,7 +2216,6 @@ const message = {
         restartOperatorHelper: 'La aplicación se reiniciará. ¿Desea continuar?',
         reloadOperatorHelper: 'La aplicación se recargará. ¿Desea continuar?',
         checkInstalledWarn: 'No se detecta "{0}". Vaya a "Tienda de aplicaciones" para instalar.',
-        gotoInstalled: 'Ir a instalar',
         limitHelper: 'La aplicación ya está instalada.',
         deleteHelper: '"{0}" está asociada con los siguientes recursos y no puede eliminarse',
         checkTitle: 'Aviso',
@@ -2294,6 +2313,9 @@ const message = {
         uninstallDeleteBackup: 'Desinstalar - Eliminar respaldo',
         uninstallDeleteImage: 'Desinstalar - Eliminar imagen',
         upgradeBackup: 'Respaldar app antes de actualizar',
+        noAppHelper:
+            'No se detectó ninguna aplicación, por favor vaya al centro de tareas para ver el registro de sincronización de la tienda de aplicaciones',
+        isEdirWarn: 'Se detectó modificación en el archivo docker-compose.yml, por favor revise la comparación',
     },
     website: {
         primaryDomain: 'Dominio principal',
@@ -2986,6 +3008,9 @@ const message = {
         stopProcess: 'Finalizar',
         viewDetails: 'Ver detalles',
         stopProcessWarn: '¿Seguro que deseas finalizar este proceso (PID:{0})?',
+        kill: 'Terminar Proceso',
+        killNow: 'Terminar Ahora',
+        killHelper: 'Terminar el proceso {0} puede hacer que algunos programas funcionen incorrectamente. ¿Continuar?',
         processName: 'Nombre del proceso',
     },
     tool: {
@@ -3690,6 +3715,10 @@ const message = {
             selectNode: 'Seleccionar Nodo',
             selectNodeError: 'Por favor, selecciona un nodo',
             licenseHelper: 'La versión Pro admite la función de repositorio de aplicaciones personalizadas',
+            databaseHelper: 'Base de datos asociada a la aplicación, seleccione la base de datos del nodo destino',
+            nodeHelper: 'No se puede seleccionar el nodo actual',
+            migrateHelper:
+                'Actualmente solo admite la migración de aplicaciones monolíticas y aplicaciones asociadas únicamente con bases de datos MySQL, MariaDB, PostgreSQL',
         },
         alert: {
             isAlert: 'Alerta',

@@ -74,7 +74,7 @@
                     </el-table-column>
                     <el-table-column :label="$t('container.size')" prop="size" min-width="60" fix sortable>
                         <template #default="{ row }">
-                            {{ computeSize(row.size) }}
+                            {{ computeSize2(row.size) }}
                         </template>
                     </el-table-column>
                     <el-table-column
@@ -111,7 +111,7 @@
 
 <script lang="ts" setup>
 import { reactive, ref, computed } from 'vue';
-import { dateFormat, newUUID } from '@/utils/util';
+import { dateFormat, newUUID, computeSize2 } from '@/utils/util';
 import { Container } from '@/api/interface/container';
 import Pull from '@/views/container/image/pull/index.vue';
 import Tag from '@/views/container/image/tag/index.vue';
@@ -126,7 +126,6 @@ import CodemirrorDrawer from '@/components/codemirror-pro/drawer.vue';
 import TaskLog from '@/components/log/task/index.vue';
 import { searchImage, listImageRepo, imageRemove, inspect, containerPrune } from '@/api/modules/container';
 import i18n from '@/lang';
-import { computeSize } from '@/utils/util';
 import { GlobalStore } from '@/store';
 import { ElMessageBox } from 'element-plus';
 const globalStore = GlobalStore();

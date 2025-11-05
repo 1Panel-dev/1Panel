@@ -8,6 +8,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/utils/controller/manager"
+	"github.com/1Panel-dev/1Panel/core/utils/ssh"
 )
 
 type Controller interface {
@@ -23,18 +24,43 @@ type Controller interface {
 }
 
 func New() (Controller, error) {
-	managerOptions := []string{"systemd", "openrc", "sysvinit"}
+	managerOptions := []string{"systemctl", "rc-service", "service"}
 	for _, item := range managerOptions {
 		if _, err := exec.LookPath(item); err != nil {
 			continue
 		}
 		switch item {
-		case "systemd":
+		case "systemctl":
 			return manager.NewSystemd(), nil
-		case "openrc":
+		case "rc-service":
 			return manager.NewOpenrc(), nil
-		case "sysvinit":
+		case "service":
 			return manager.NewSysvinit(), nil
+		}
+	}
+	return nil, errors.New("not support such manager initializatio")
+}
+
+func NewWithClient(client *ssh.SSHClient) (Controller, error) {
+	managerOptions := []string{"systemctl", "rc-service", "service"}
+	for _, item := range managerOptions {
+		stdout, err := client.Runf("which %s", item)
+		if err != nil || (len(strings.ReplaceAll(stdout, "\n", "")) == 0) {
+			continue
+		}
+		switch item {
+		case "systemctl":
+			mgr := manager.NewSystemd()
+			mgr.Client = client
+			return mgr, nil
+		case "rc-service":
+			mgr := manager.NewOpenrc()
+			mgr.Client = client
+			return mgr, nil
+		case "service":
+			mgr := manager.NewSysvinit()
+			mgr.Client = client
+			return mgr, nil
 		}
 	}
 	return nil, errors.New("not support such manager initializatio")
@@ -149,7 +175,7 @@ func LoadServiceName(keyword string) (string, error) {
 	}
 
 	processedName := loadProcessedName(client.Name(), keyword)
-	exist, err := client.IsExist(processedName)
+	exist, _ := client.IsExist(processedName)
 	if exist {
 		return processedName, nil
 	}
@@ -182,8 +208,8 @@ func loadFromPredefined(mgr Controller, keyword string) string {
 		"fail2ban":     {"fail2ban.service", "fail2ban"},
 		"supervisor":   {"supervisord.service", "supervisor.service", "supervisord", "supervisor"},
 		"ssh":          {"sshd.service", "ssh.service", "sshd", "ssh"},
-		"1panel-core":  {"1panel-core.service", "1panel-cored"},
-		"1panel-agent": {"1panel-agent.service", "1panel-agentd"},
+		"1panel-core":  {"1panel-core.service"},
+		"1panel-agent": {"1panel-agent.service"},
 		"docker":       {"docker.service", "dockerd"},
 	}
 	if val, ok := predefinedMap[keyword]; ok {

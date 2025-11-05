@@ -55,10 +55,11 @@ const (
 )
 
 const (
-	TaskScopeSystem   = "System"
-	TaskScopeScript   = "Script"
-	TaskScopeNodeFile = "NodeFile"
-	TaskScopeCluster  = "Cluster"
+	TaskScopeSystem    = "System"
+	TaskScopeScript    = "Script"
+	TaskScopeNodeFile  = "NodeFile"
+	TaskScopeAppBackup = "AppBackup"
+	TaskScopeCluster   = "Cluster"
 )
 
 func GetTaskName(resourceName, operate, scope string) string {
@@ -125,6 +126,7 @@ func (s *SubTask) Execute() error {
 	if s.Name == "" {
 		subTaskName = i18n.GetMsgByKey("SubTask")
 	}
+	s.RootTask.LogStart(subTaskName)
 	var err error
 	for i := 0; i < s.Retry+1; i++ {
 		if i > 0 {

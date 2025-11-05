@@ -36,6 +36,11 @@ ErrInternalServerKey: "İç sunucu hatası:"
 # app
 CustomAppStoreFileValid: "Uygulama mağazası paketi .tar.gz formatında olmalıdır"
 ErrFileNotFound: "{{ .name }} dosyası mevcut değil"
+AppBackup: 'Uygulama yedekleme',
+AppBackupPush: 'Uygulama yedek dosyası {{.file}} düğüm {{ .name }} a aktar',
+ErrSourceTargetSame: 'Kaynak düğüm ve hedef düğüm aynı olamaz!',
+AppInstall: 'Düğüm {{ .targetNode }} üzerine {{ .name }} uygulamasını yükle',
+AppInstallCheck: 'Uygulama kurulum ortamını kontrol et',
 
 # backup
 ErrBackupInUsed: "Bu yedekleme hesabı zamanlanmış görevlerde kullanılıyor ve silinemez"

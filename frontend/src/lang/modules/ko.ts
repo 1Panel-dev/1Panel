@@ -83,6 +83,7 @@ const message = {
             show: '보기',
             hide: '숨기기',
             visit: '방문',
+            migrate: '마이그레이션',
         },
         operate: {
             start: '시작',
@@ -417,7 +418,7 @@ const message = {
         ioDelay: 'I/O 지연 시간',
         uptime: '작동 시간',
         runningTime: '가동 시간',
-        mem: '시스템',
+        mem: '시스템 메모리',
         swapMem: '스왑 파티션',
 
         runSmoothly: '낮은 부하',
@@ -427,6 +428,9 @@ const message = {
 
         core: '물리적 코어',
         logicCore: '논리 코어',
+        corePercent: '코어 사용률',
+        cpuTop: 'CPU 사용률 상위 5개 프로세스 정보',
+        memTop: '메모리 사용률 상위 5개 프로세스 정보',
         loadAverage: '지난 1분의 평균 부하 | 지난 {n} 분의 평균 부하',
         load: '부하',
         mount: '마운트 지점',
@@ -792,6 +796,21 @@ const message = {
             '컨테이너 엔진은 기본값으로 1024를 사용합니다. 이를 늘리면 컨테이너에 더 많은 CPU 시간을 할당할 수 있습니다.',
         inputIpv4: '예시: 192.168.1.1',
         inputIpv6: '예시: 2001:0db8:85a3:0000:0000:8a2e:0370:7334',
+
+        diskUsage: '디스크 사용량',
+        localVolume: '로컬 스토리지 볼륨',
+        buildCache: '빌드 캐시',
+        usage: '사용됨: {0}, 해제 가능: {1}',
+        clean: '해제',
+        imageClean:
+            '이미지 정리를 수행하면 사용되지 않은 모든 이미지가 삭제됩니다. 이 작업은 되돌릴 수 없습니다. 계속하시겠습니까?',
+        containerClean:
+            '컨테이너 정리를 수행하면 중지된 모든 컨테이너(앱 스토어의 중지된 앱 포함)가 삭제됩니다. 이 작업은 되돌릴 수 없습니다. 계속하시겠습니까?',
+        sizeRw: '컨테이너 레이어 크기',
+        sizeRwHelper: '컨테이너에 고유한 쓰기 가능 레이어 크기',
+        sizeRootFs: '가상 크기',
+        sizeRootFsHelper: '컨테이너가 의존하는 모든 이미지 레이어 + 컨테이너 레이어의 총 크기',
+
         containerFromAppHelper:
             '이 컨테이너가 앱 스토어에서 왔음을 감지했습니다. 앱 작업으로 현재 편집이 무효화될 수 있습니다.',
         containerFromAppHelper1:
@@ -2075,7 +2094,6 @@ const message = {
         restartOperatorHelper: '애플리케이션이 재시작됩니다. 계속 하시겠습니까?',
         reloadOperatorHelper: '애플리케이션이 다시 로드됩니다. 계속 하시겠습니까?',
         checkInstalledWarn: '"{0}"이(가) 감지되지 않았습니다. "앱 스토어"로 가서 설치하세요.',
-        gotoInstalled: '설치하러 가기',
         limitHelper: '애플리케이션은 이미 설치되었습니다.',
         deleteHelper: '"{0}"은(는) 다음 리소스와 연결되어 있습니다. 확인 후 다시 시도하세요!',
         checkTitle: '힌트',
@@ -2178,6 +2196,8 @@ const message = {
         uninstallDeleteBackup: '앱 제거 - 백업 삭제',
         uninstallDeleteImage: '앱 제거 - 이미지 삭제',
         upgradeBackup: '앱 업그레이드 전 앱 백업',
+        noAppHelper: '애플리케이션이 감지되지 않았습니다. 작업 센터에서 앱 스토어 동기화 로그를 확인해 주세요',
+        isEdirWarn: 'docker-compose.yml 파일이 수정된 것을 감지했습니다. 비교를 확인해 주세요',
     },
     website: {
         primaryDomain: '기본 도메인',
@@ -2860,6 +2880,10 @@ const message = {
         stopProcess: '종료',
         viewDetails: '세부 사항',
         stopProcessWarn: '이 프로세스(PID:{0})를 종료하시겠습니까?',
+        kill: '프로세스 종료',
+        killNow: '즉시 종료',
+        killHelper:
+            '프로세스 {0}을(를) 종료하면 일부 프로그램이 정상적으로 작동하지 않을 수 있습니다. 계속하시겠습니까?',
         processName: '프로세스 이름',
     },
     tool: {
@@ -3564,6 +3588,10 @@ const message = {
             selectNode: '노드 선택',
             selectNodeError: '노드를 선택하세요',
             licenseHelper: '프로 버전은 사용자 정의 애플리케이션 저장소 기능을 지원합니다',
+            databaseHelper: '애플리케이션 관련 데이터베이스, 대상 노드 데이터베이스를 선택하세요',
+            nodeHelper: '현재 노드는 선택할 수 없습니다',
+            migrateHelper:
+                '현재 단일 애플리케이션과 MySQL, MariaDB, PostgreSQL 데이터베이스만 연결된 애플리케이션의 마이그레이션만 지원합니다',
         },
         alert: {
             isAlert: '알림',

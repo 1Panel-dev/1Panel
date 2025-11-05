@@ -6,9 +6,13 @@ import (
 	"path/filepath"
 
 	"github.com/1Panel-dev/1Panel/core/utils/cmd"
+	"github.com/1Panel-dev/1Panel/core/utils/ssh"
 )
 
-type Sysvinit struct{ toolCmd string }
+type Sysvinit struct {
+	toolCmd string
+	Client  *ssh.SSHClient
+}
 
 func NewSysvinit() *Sysvinit {
 	return &Sysvinit{toolCmd: "service"}
@@ -32,8 +36,7 @@ func (s *Sysvinit) IsEnable(serviceName string) (bool, error) {
 	return out == "enabled\n", nil
 }
 func (s *Sysvinit) IsExist(serviceName string) (bool, error) {
-	_, err := os.Stat(filepath.Join("/etc/init.d", serviceName))
-	if err != nil {
+	if _, err := os.Stat(filepath.Join("/etc/init.d", serviceName)); err != nil {
 		if os.IsNotExist(err) {
 			return false, nil
 		}
@@ -42,11 +45,11 @@ func (s *Sysvinit) IsExist(serviceName string) (bool, error) {
 	return true, nil
 }
 func (s *Sysvinit) Status(serviceName string) (string, error) {
-	return run(s.toolCmd, serviceName, "status")
+	return run(s.Client, s.toolCmd, serviceName, "status")
 }
 
 func (s *Sysvinit) Operate(operate, serviceName string) error {
-	return handlerErr(run(s.toolCmd, serviceName, operate))
+	return handlerErr(run(s.Client, s.toolCmd, serviceName, operate))
 }
 
 func (s *Sysvinit) Reload() error {
