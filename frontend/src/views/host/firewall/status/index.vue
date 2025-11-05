@@ -21,7 +21,7 @@
                                 {{ $t('commons.button.restart') }}
                             </el-button>
                         </template>
-                        <template v-if="baseInfo.name === 'iptables' && showAdvancedControls">
+                        <template v-if="baseInfo.name === 'iptables'">
                             <el-divider direction="vertical" />
                             <el-button type="primary" @click="onAdvancedOperate('init')" link>
                                 {{ $t('firewall.initChains') }}
