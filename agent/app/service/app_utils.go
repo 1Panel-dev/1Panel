@@ -1567,43 +1567,37 @@ func handleInstalled(appInstallList []model.AppInstall, updated bool, sync bool)
 			Favorite:  installed.Favorite,
 			Container: installed.ContainerName,
 		}
-		if updated {
-			detail, _ := appDetailRepo.GetFirst(repo.WithByID(installed.AppDetailId))
-			installDTO.DockerCompose = installed.DockerCompose
-			rawCompose, _ := getUpgradeCompose(installed, detail)
-			if rawCompose != installed.DockerCompose {
-				installDTO.IsEdit = true
-			}
+		if !updated {
+			installDTO.LinkDB = hasLinkDB(installed.ID)
+			res = append(res, installDTO)
+			continue
 		}
-		app, err := appRepo.GetFirst(repo.WithByID(installed.AppId))
-		if err != nil {
-			return nil, err
+		if installed.Version == "latest" {
+			continue
 		}
-		details, err := appDetailRepo.GetBy(appDetailRepo.WithAppId(app.ID))
+		installDTO.DockerCompose = installed.DockerCompose
+		installDTO.IsEdit = isEditCompose(installed)
+		details, err := appDetailRepo.GetBy(appDetailRepo.WithAppId(installed.App.ID))
 		if err != nil {
 			return nil, err
 		}
 		var versions []string
-		for _, detail := range details {
-			ignores, _ := appIgnoreUpgradeRepo.List(runtimeRepo.WithDetailId(detail.ID), appIgnoreUpgradeRepo.WithScope("version"))
-			if len(ignores) > 0 || installed.Version == "latest" {
+		for _, appDetail := range details {
+			ignores, _ := appIgnoreUpgradeRepo.List(runtimeRepo.WithDetailId(appDetail.ID), appIgnoreUpgradeRepo.WithScope("version"))
+			if len(ignores) > 0 {
 				continue
 			}
-			if common.IsCrossVersion(installed.Version, detail.Version) && !app.CrossVersionUpdate {
+			if common.IsCrossVersion(installed.Version, appDetail.Version) && !installed.App.CrossVersionUpdate {
 				continue
 			}
-			versions = append(versions, detail.Version)
+			versions = append(versions, appDetail.Version)
 		}
-		versions = common.GetSortedVersions(versions)
 		if len(versions) == 0 {
-			if !updated {
-				installDTO.CanUpdate = false
-				res = append(res, installDTO)
-			}
 			continue
 		}
+		versions = common.GetSortedVersions(versions)
 		lastVersion := versions[0]
-		if app.Key == constant.AppMysql || app.Key == constant.AppMysqlCluster {
+		if installed.App.Key == constant.AppMysql || installed.App.Key == constant.AppMysqlCluster {
 			for _, version := range versions {
 				majorVersion := getMajorVersion(installed.Version)
 				if !strings.HasPrefix(version, majorVersion) {
@@ -1615,15 +1609,11 @@ func handleInstalled(appInstallList []model.AppInstall, updated bool, sync bool)
 			}
 		}
 		if common.IsCrossVersion(installed.Version, lastVersion) {
-			installDTO.CanUpdate = app.CrossVersionUpdate
+			installDTO.CanUpdate = installed.App.CrossVersionUpdate
 		} else {
 			installDTO.CanUpdate = common.CompareVersion(lastVersion, installed.Version)
 		}
-		if updated {
-			if installDTO.CanUpdate {
-				res = append(res, installDTO)
-			}
-		} else {
+		if installDTO.CanUpdate {
 			res = append(res, installDTO)
 		}
 	}
@@ -2141,4 +2131,27 @@ func needsUpdate(localTag *model.Tag, remoteTag dto.Tag, translations string) bo
 	return localTag.Name != remoteTag.Name ||
 		localTag.Sort != remoteTag.Sort ||
 		localTag.Translations != translations
+}
+
+func hasLinkDB(installID uint) bool {
+	resources, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithAppInstallId(installID))
+	if len(resources) > 0 {
+		for _, resource := range resources {
+			if resource.Key == constant.AppPostgres || resource.Key == constant.AppMysql ||
+				resource.Key == constant.AppMariaDB || resource.Key == constant.AppMysqlCluster ||
+				resource.Key == constant.AppPostgresql || resource.Key == constant.AppPostgresqlCluster {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func isEditCompose(installed model.AppInstall) bool {
+	detail, _ := appDetailRepo.GetFirst(repo.WithByID(installed.AppDetailId))
+	rawCompose, _ := getUpgradeCompose(installed, detail)
+	if rawCompose != installed.DockerCompose {
+		return true
+	}
+	return false
 }
