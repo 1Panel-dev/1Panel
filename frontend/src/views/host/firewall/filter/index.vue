@@ -2,49 +2,60 @@
     <div>
         <FireRouter />
 
-        <div v-if="!isIptables">
-            <LayoutContent :divider="true">
-                <template #main>
-                    <div class="app-warn">
-                        <div class="flex flex-col gap-2 items-center justify-center w-full sm:flex-row">
-                            <span>{{ $t('firewall.advancedControlNotAvailable', [firewallName]) }}</span>
+        <div v-loading="loading">
+            <FireStatus
+                ref="fireStatusRef"
+                @search="search"
+                @advanced-operate="onApplyFirewall"
+                v-model:loading="loading"
+                v-model:mask-show="maskShow"
+                v-model:is-active="isActive"
+                v-model:name="fireName"
+                :show-advanced-controls="true"
+                :can-apply="canApply"
+                :is-applied="isApplied"
+            />
+            <div v-if="fireName === '-'">
+                <LayoutContent :divider="true">
+                    <template #main>
+                        <div class="app-warn">
+                            <div class="flex flex-col gap-2 items-center justify-center w-full sm:flex-row">
+                                <span>{{ $t('firewall.advancedControlNotAvailable', [firewallName]) }}</span>
+                            </div>
+                            <div>
+                                <img src="@/assets/images/no_app.svg" />
+                            </div>
                         </div>
-                        <div>
-                            <img src="@/assets/images/no_app.svg" />
-                        </div>
-                    </div>
-                </template>
-            </LayoutContent>
-        </div>
+                    </template>
+                </LayoutContent>
+            </div>
 
-        <div v-else v-loading="loading">
-            <el-card>
-                <div class="flex w-full flex-col gap-4 md:flex-row">
-                    <div class="flex flex-wrap gap-4 ml-3">
-                        <el-tag effect="dark" type="success">{{ 'iptables v' + iptablesVersion }}</el-tag>
-                        <el-tag :type="inputChainInfo?.isApplied ? 'success' : 'info'" size="small">
-                            {{ inputChainInfo?.isApplied ? $t('firewall.applied') : $t('firewall.notApplied') }}
-                        </el-tag>
-                    </div>
-                </div>
-            </el-card>
-            <div>
-                <LayoutContent :title="$t('firewall.filterRule')">
+            <div v-else-if="!isIptablesComputed">
+                <LayoutContent :divider="true">
+                    <template #main>
+                        <div class="app-warn">
+                            <div class="flex flex-col gap-2 items-center justify-center w-full sm:flex-row">
+                                <span>{{ $t('firewall.advancedControlNotAvailable', [fireName]) }}</span>
+                            </div>
+                            <div>
+                                <img src="@/assets/images/no_app.svg" />
+                            </div>
+                        </div>
+                    </template>
+                </LayoutContent>
+            </div>
+
+            <div v-else>
+                <el-card v-if="!isActive && maskShow" class="mask-prompt">
+                    <span>{{ $t('firewall.firewallNotStart') }}</span>
+                </el-card>
+                <LayoutContent :title="$t('firewall.filterRule')" :class="{ mask: !isActive }">
                     <template #leftToolBar>
                         <el-button type="primary" @click="onOpenDialog('create')" :disabled="!isCustomChain">
                             {{ $t('firewall.create') }}
                         </el-button>
                         <el-button @click="onDelete(null)" plain :disabled="selects.length === 0 || !isCustomChain">
                             {{ $t('commons.button.delete') }}
-                        </el-button>
-                        <el-button @click="onInitChains" plain>
-                            {{ $t('firewall.initChains') }}
-                        </el-button>
-                        <el-button @click="onApplyFirewall('apply')" plain type="success" :disabled="!canApply">
-                            {{ $t('firewall.applyFirewall') }}
-                        </el-button>
-                        <el-button @click="onApplyFirewall('unload')" plain type="warning" :disabled="!isApplied">
-                            {{ $t('firewall.unloadFirewall') }}
                         </el-button>
                     </template>
 
@@ -156,9 +167,10 @@
 
 <script lang="ts" setup>
 import FireRouter from '@/views/host/firewall/index.vue';
+import FireStatus from '@/views/host/firewall/status/index.vue';
 import OperateDialog from '@/views/host/firewall/filter/operate/index.vue';
 import { computed, onMounted, reactive, ref } from 'vue';
-import { getFilterRules, applyFilterFirewall, batchOperateFilterRule, loadFireBaseInfo } from '@/api/modules/host';
+import { getFilterRules, applyFilterFirewall, batchOperateFilterRule } from '@/api/modules/host';
 import { Host } from '@/api/interface/host';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
@@ -169,7 +181,11 @@ const selects = ref<any>([]);
 const selectedChain = ref('1PANEL_INPUT');
 const iptablesVersion = ref('');
 const firewallName = ref('');
-const isIptables = ref(true);
+
+const maskShow = ref(true);
+const isActive = ref(false);
+const fireName = ref();
+const fireStatusRef = ref();
 
 const opRef = ref();
 
@@ -189,6 +205,7 @@ const formatPort = (port?: number | null | string) => {
     return port;
 };
 
+const isIptablesComputed = computed(() => fireName.value === 'iptables');
 const inputChainInfo = computed(() => chainInfoMap.value.get('INPUT'));
 const outputChainInfo = computed(() => chainInfoMap.value.get('OUTPUT'));
 
@@ -216,6 +233,12 @@ const paginationConfig = reactive({
 });
 
 const search = async () => {
+    if (!isActive.value) {
+        loading.value = false;
+        chainInfoMap.value.clear();
+        paginationConfig.total = 0;
+        return;
+    }
     const params: Host.IptablesFilterRuleSearch = {
         chains: ['INPUT', 'OUTPUT', '1PANEL_INPUT', '1PANEL_OUTPUT'],
     };
@@ -254,29 +277,20 @@ const onOpenDialog = async (title: string, rowData?: Host.IptablesFilterRuleOper
     dialogRef.value!.acceptParams(params);
 };
 
-const onInitChains = async () => {
-    ElMessageBox.confirm(i18n.global.t('firewall.initChainsConfirm'), i18n.global.t('firewall.initChains'), {
-        confirmButtonText: i18n.global.t('commons.button.confirm'),
-        cancelButtonText: i18n.global.t('commons.button.cancel'),
-    }).then(async () => {
-        loading.value = true;
-        await applyFilterFirewall({ operation: 'init' })
-            .then(() => {
-                loading.value = false;
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                search();
-            })
-            .catch(() => {
-                loading.value = false;
-            });
-    });
-};
-
 const onApplyFirewall = async (operation: string) => {
-    const confirmMsg =
-        operation === 'apply' ? i18n.global.t('firewall.applyConfirm') : i18n.global.t('firewall.unloadConfirm');
-    const title =
-        operation === 'apply' ? i18n.global.t('firewall.applyFirewall') : i18n.global.t('firewall.unloadFirewall');
+    let confirmMsg = '';
+    let title = '';
+
+    if (operation === 'init') {
+        confirmMsg = i18n.global.t('firewall.initChainsConfirm');
+        title = i18n.global.t('firewall.initChains');
+    } else if (operation === 'apply') {
+        confirmMsg = i18n.global.t('firewall.applyConfirm');
+        title = i18n.global.t('firewall.applyFirewall');
+    } else {
+        confirmMsg = i18n.global.t('firewall.unloadConfirm');
+        title = i18n.global.t('firewall.unloadFirewall');
+    }
 
     ElMessageBox.confirm(confirmMsg, title, {
         confirmButtonText: i18n.global.t('commons.button.confirm'),
@@ -345,18 +359,11 @@ const buttons = [
     },
 ];
 
-onMounted(async () => {
-    await loadFireBaseInfo()
-        .then((res) => {
-            firewallName.value = res.data.name;
-            isIptables.value = res.data.name === 'iptables';
-            if (isIptables.value) {
-                search();
-            }
-        })
-        .catch(() => {
-            isIptables.value = false;
-        });
+onMounted(() => {
+    if (fireName.value !== '-') {
+        loading.value = true;
+        fireStatusRef.value.acceptParams();
+    }
 });
 </script>
 
