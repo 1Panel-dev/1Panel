@@ -31,7 +31,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
-	cmd2 "github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/compose"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
 	"github.com/1Panel-dev/1Panel/agent/utils/env"
@@ -718,9 +717,9 @@ func (r *RuntimeService) InstallPHPExtension(req request.PHPExtensionInstallReq)
 	if err != nil {
 		return err
 	}
-	cmdMgr := cmd2.NewCommandMgr(cmd.WithTask(*installTask), cmd.WithTimeout(15*time.Minute))
 	installTask.AddSubTask("", func(t *task.Task) error {
-		err = cmdMgr.RunBashCf("docker exec -i %s install-ext %s", runtime.ContainerName, req.Name)
+		err = cmd.NewCommandMgr(cmd.WithTask(*installTask), cmd.WithTimeout(20*time.Minute)).
+			RunBashCf("docker exec -i %s install-ext %s", runtime.ContainerName, req.Name)
 		if err != nil {
 			return err
 		}
@@ -733,21 +732,22 @@ func (r *RuntimeService) InstallPHPExtension(req request.PHPExtensionInstallReq)
 		if err != nil {
 			return err
 		}
-		err = cmdMgr.RunBashCf("docker commit %s %s", runtime.ContainerName, runtime.Image)
+		err = cmd.NewCommandMgr(cmd.WithTask(*installTask), cmd.WithTimeout(15*time.Minute)).
+			RunBashCf("docker commit %s %s", runtime.ContainerName, runtime.Image)
 		if err != nil {
+			return err
+		}
+		handlePHPDir(*runtime)
+		if err = restartRuntime(runtime); err != nil {
 			return err
 		}
 		newImageID, err := client.GetImageIDByName(runtime.Image)
 		if err == nil && newImageID != oldImageID {
 			if err := client.DeleteImage(oldImageID); err != nil {
-				t.Log(fmt.Sprintf("delete old image error %v", err))
+				t.Log(fmt.Sprintf("delete old image %s failed %v", oldImageID, err))
 			} else {
 				t.Log("delete old image success")
 			}
-		}
-		handlePHPDir(*runtime)
-		if err = restartRuntime(runtime); err != nil {
-			return err
 		}
 		return nil
 	}, nil)
