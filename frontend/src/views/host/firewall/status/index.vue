@@ -5,7 +5,18 @@
                 <div class="flex w-full flex-col gap-4 md:flex-row">
                     <div class="flex flex-wrap gap-4 ml-3">
                         <el-tag effect="dark" type="success">{{ baseInfo.name }}</el-tag>
-                        <Status class="mt-0.5" :status="baseInfo.isActive ? 'enable' : 'disable'" />
+                        <Status
+                            class="mt-0.5"
+                            :status="
+                                baseInfo.name === 'iptables'
+                                    ? isApplied
+                                        ? 'enable'
+                                        : 'disable'
+                                    : baseInfo.isActive
+                                    ? 'enable'
+                                    : 'disable'
+                            "
+                        />
                         <el-tag>{{ $t('app.version') }}: {{ baseInfo.version }}</el-tag>
                     </div>
                     <div class="mt-0.5">
@@ -23,11 +34,11 @@
                         </template>
                         <template v-if="baseInfo.name === 'iptables'">
                             <el-divider direction="vertical" />
-                            <el-button type="primary" @click="onAdvancedOperate('init')" link>
+                            <el-button type="primary" @click="onAdvancedOperate('init')" link :disabled="isApplied">
                                 {{ $t('firewall.initChains') }}
                             </el-button>
                             <el-divider direction="vertical" />
-                            <el-button type="success" @click="onAdvancedOperate('apply')" link :disabled="!canApply">
+                            <el-button type="success" @click="onAdvancedOperate('apply')" link :disabled="isApplied">
                                 {{ $t('firewall.applyFirewall') }}
                             </el-button>
                             <el-divider direction="vertical" />

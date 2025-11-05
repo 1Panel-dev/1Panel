@@ -2705,7 +2705,7 @@ const message = {
         notApplied: '未应用',
         initChains: '初始化链',
         applyFirewall: '应用防火墙',
-        unloadFirewall: '卸载防火墙',
+        unloadFirewall: '禁用防火墙',
         sourceIPHelper: 'CIDR 格式，如 192.168.1.0/24，留空表所有地址',
         destIPHelper: 'CIDR 格式，如 10.0.0.0/留空表所有地址',
         portHelper: '0 表示任意端口',
