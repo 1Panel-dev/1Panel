@@ -54,9 +54,6 @@ export const operateFilterRule = (params: Host.IptablesFilterRuleOperate) => {
 export const batchOperateFilterRule = (params: { rules: Host.IptablesFilterRuleOperate[] }) => {
     return http.post(`/hosts/firewall/filter/batch`, params, TimeoutEnum.T_40S);
 };
-export const applyFilterFirewall = (params: Host.IptablesFilterApply) => {
-    return http.post(`/hosts/firewall/filter/apply`, params, TimeoutEnum.T_60S);
-};
 
 // monitors
 export const loadMonitor = (param: Host.MonitorSearch) => {

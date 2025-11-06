@@ -193,7 +193,9 @@ func (u *FirewallService) OperateFirewall(req dto.FirewallOperation) error {
 			_ = client.Stop()
 			return err
 		}
-		needRestartDocker = true
+		if client.Name() != "iptables" {
+			needRestartDocker = true
+		}
 	case "stop":
 		if err := client.Stop(); err != nil {
 			return err

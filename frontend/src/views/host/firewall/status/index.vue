@@ -5,18 +5,7 @@
                 <div class="flex w-full flex-col gap-4 md:flex-row">
                     <div class="flex flex-wrap gap-4 ml-3">
                         <el-tag effect="dark" type="success">{{ baseInfo.name }}</el-tag>
-                        <Status
-                            class="mt-0.5"
-                            :status="
-                                baseInfo.name === 'iptables'
-                                    ? isApplied
-                                        ? 'enable'
-                                        : 'disable'
-                                    : baseInfo.isActive
-                                    ? 'enable'
-                                    : 'disable'
-                            "
-                        />
+                        <Status class="mt-0.5" :status="baseInfo.isActive ? 'enable' : 'disable'" />
                         <el-tag>{{ $t('app.version') }}: {{ baseInfo.version }}</el-tag>
                     </div>
                     <div class="mt-0.5">
@@ -30,20 +19,6 @@
                             <el-divider direction="vertical" />
                             <el-button type="primary" @click="onOperate('restart')" link>
                                 {{ $t('commons.button.restart') }}
-                            </el-button>
-                        </template>
-                        <template v-if="baseInfo.name === 'iptables'">
-                            <el-divider direction="vertical" />
-                            <el-button type="primary" @click="onAdvancedOperate('init')" link :disabled="isApplied">
-                                {{ $t('firewall.initChains') }}
-                            </el-button>
-                            <el-divider direction="vertical" />
-                            <el-button type="success" @click="onAdvancedOperate('apply')" link :disabled="isApplied">
-                                {{ $t('firewall.applyFirewall') }}
-                            </el-button>
-                            <el-divider direction="vertical" />
-                            <el-button type="warning" @click="onAdvancedOperate('unload')" link :disabled="!isApplied">
-                                {{ $t('firewall.unloadFirewall') }}
                             </el-button>
                         </template>
                         <span v-if="onPing !== 'None'">
@@ -78,13 +53,13 @@
 
 <script lang="ts" setup>
 import { Host } from '@/api/interface/host';
-import { loadFireBaseInfo, operateFire, getFilterRules, applyFilterFirewall } from '@/api/modules/host';
+import { loadFireBaseInfo, operateFire, getFilterRules } from '@/api/modules/host';
 import i18n from '@/lang';
 import NoSuchService from '@/components/layout-content/no-such-service.vue';
 import DockerRestart from '@/components/docker-proxy/docker-restart.vue';
 import { MsgSuccess } from '@/utils/message';
 import { ElMessageBox } from 'element-plus';
-import { ref, computed } from 'vue';
+import { ref } from 'vue';
 
 defineProps({
     showAdvancedControls: {
@@ -102,13 +77,6 @@ const withDockerRestart = ref(false);
 
 // Iptables specific state
 const chainInfoMap = ref<Map<string, Host.IptablesChainInfo>>(new Map());
-
-const isApplied = computed(() => {
-    if (baseInfo.value.name !== 'iptables') return false;
-    const inputInfo = chainInfoMap.value.get('INPUT');
-    const outputInfo = chainInfoMap.value.get('OUTPUT');
-    return inputInfo?.isApplied || outputInfo?.isApplied;
-});
 
 const acceptParams = (): void => {
     loadBaseInfo(true);
@@ -217,38 +185,6 @@ const onPingOperate = async (operation: string) => {
             emit('update:maskShow', true);
             onPing.value = oldStatus.value;
         });
-};
-
-const onAdvancedOperate = async (op: string) => {
-    let confirmMsg = '';
-    let title = '';
-
-    if (op === 'init') {
-        confirmMsg = i18n.global.t('firewall.initChainsConfirm');
-        title = i18n.global.t('firewall.initChains');
-    } else if (op === 'apply') {
-        confirmMsg = i18n.global.t('firewall.applyConfirm');
-        title = i18n.global.t('firewall.applyFirewall');
-    } else {
-        confirmMsg = i18n.global.t('firewall.unloadConfirm');
-        title = i18n.global.t('firewall.unloadFirewall');
-    }
-
-    ElMessageBox.confirm(confirmMsg, title, {
-        confirmButtonText: i18n.global.t('commons.button.confirm'),
-        cancelButtonText: i18n.global.t('commons.button.cancel'),
-    }).then(async () => {
-        emit('update:loading', true);
-        emit('update:maskShow', true);
-        await applyFilterFirewall({ operation: op })
-            .then(() => {
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                loadBaseInfo(true);
-            })
-            .catch(() => {
-                loadBaseInfo(true);
-            });
-    });
 };
 
 defineExpose({

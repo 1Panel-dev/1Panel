@@ -3,7 +3,6 @@ package client
 import (
 	"fmt"
 	"regexp"
-	"strconv"
 	"strings"
 	"time"
 
@@ -531,61 +530,6 @@ func (iptables *Iptables) setupEstablishedRules(direction string) {
 	}
 }
 
-// Init1PanelBasicChains 初始化 1PANEL_BASIC 链 加入放行 22 端口
-
-func (iptables *Iptables) Init1PanelBasicChains() error {
-	// Ensure 1PANEL_BASIC chain exists
-	if err := iptables.ensureChain(FilterTab, Chain1PanelBasic); err != nil {
-		return err
-	}
-
-	// 检查是否已经存在 22 端口放行规则
-	chains, err := iptables.ReadFilter([]string{Chain1PanelBasic})
-	if err != nil {
-		global.LOG.Warnf("failed to read 1PANEL_BASIC chain: %v, will attempt to add SSH rule", err)
-	} else {
-		basicChain, exists := chains[Chain1PanelBasic]
-		if exists {
-			// 遍历规则检查是否已有 22 端口的 ACCEPT 规则
-			for rule := basicChain.FirstRule; rule != nil; rule = rule.Next() {
-				policy := rule.P
-				if policy.Protocol == "tcp" && policy.DstPort == 22 && policy.Action == ACCEPT {
-					global.LOG.Infof("SSH port 22 rule already exists in %s chain", Chain1PanelBasic)
-					return nil
-				}
-			}
-		}
-	}
-
-	// Allow SSH (port 22) in 1PANEL_BASIC chain
-	sshPolicy := IptablesPolicy{
-		Protocol: "tcp",
-		DstPort:  22,
-		Action:   ACCEPT,
-		Comment:  "Allow SSH",
-	}
-	panelPort, err := strconv.Atoi(global.CONF.Base.Port)
-	if err != nil {
-		return fmt.Errorf("invalid 1Panel port: %w", err)
-	}
-
-	PanelPolicy := IptablesPolicy{
-		Protocol: "tcp",
-		DstPort:  uint16(panelPort),
-		Action:   ACCEPT,
-		Comment:  "Allow 1Panel",
-	}
-	if err := iptables.AddPolicy(Chain1PanelBasic, sshPolicy); err != nil {
-		return fmt.Errorf("failed to add SSH allow rule to %s: %w", Chain1PanelBasic, err)
-	}
-	if err := iptables.AddPolicy(Chain1PanelBasic, PanelPolicy); err != nil {
-		return fmt.Errorf("failed to add 1Panel allow rule to %s: %w", Chain1PanelBasic, err)
-	}
-	global.LOG.Infof("SSH port 22/1Paenl rule added to %s chain", Chain1PanelBasic)
-
-	return nil
-}
-
 func (iptables *Iptables) Setup1PanelFirewallChains(direction string) error {
 	iptables.setupEstablishedRules(direction)
 
@@ -634,6 +578,11 @@ func (iptables *Iptables) Teardown1PanelFirewallChains(direction string) error {
 		err = iptables.run(FilterTab, fmt.Sprintf("-D %s -j %s", ChainInput, Chain1PanelInput))
 		if err != nil {
 			global.LOG.Warnf("failed to remove jump rule from INPUT to 1PANEL_INPUT: %v", err)
+		}
+
+		// Optionally flush the custom chains
+		if err := iptables.FlushChain(FilterTab, Chain1PanelBasic); err != nil {
+			global.LOG.Warnf("failed to flush chain %s: %v", Chain1PanelBasic, err)
 		}
 
 	} else if direction == "output" {
@@ -700,54 +649,4 @@ func (iptables *Iptables) Check1PanelInputChainsApplied() (bool, error) {
 
 	return true, nil
 
-}
-
-func (iptables *Iptables) SaftyCheck(ports []int) bool {
-	chains, err := iptables.ReadFilter([]string{ChainInput, Chain1PanelInput, Chain1PanelBasic})
-	if err != nil {
-		global.LOG.Errorf("failed to read filter chains: %v", err)
-		return false
-	}
-
-	inputChain, exists := chains[ChainInput]
-	if !exists {
-		global.LOG.Errorf("INPUT chain not found")
-		return false
-	}
-
-	inputDefaultAccept := inputChain.DefaultPolicy == ACCEPT
-
-	for _, port := range ports {
-		// 检查所有相关链中是否有规则会阻止该端口
-		if iptables.isPortBlocked(port, chains, inputDefaultAccept) {
-			global.LOG.Warnf("port %d is blocked by firewall rules", port)
-			return false
-		}
-	}
-
-	return true
-}
-
-// isPortBlocked 检查指定端口是否被防火墙规则阻止
-func (iptables *Iptables) isPortBlocked(port int, chains map[string]IptablesChain, inputDefaultAccept bool) bool {
-	chainOrder := []string{ChainInput, Chain1PanelInput, Chain1PanelBasic}
-	for _, chainName := range chainOrder {
-		chain, exists := chains[chainName]
-		if !exists {
-			continue
-		}
-		for rule := chain.FirstRule; rule != nil; rule = rule.Next() {
-			policy := rule.P
-			portMatches := policy.DstPort == 0 || policy.DstPort == uint16(port)
-			if portMatches {
-				if policy.Action == DROP || policy.Action == REJECT {
-					return true
-				}
-				if policy.Action == ACCEPT {
-					return false
-				}
-			}
-		}
-	}
-	return !inputDefaultAccept
 }

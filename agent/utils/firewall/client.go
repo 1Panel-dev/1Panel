@@ -31,6 +31,10 @@ func NewFirewallClient() (FirewallClient, error) {
 	firewalld := cmd.Which("firewalld")
 	ufw := cmd.Which("ufw")
 
+	if firewalld && ufw {
+		return nil, errors.New("Both firewalld and ufw detected, please uninstall one of them and try again!")
+	}
+
 	if firewalld {
 		return client.NewFirewalld()
 	}

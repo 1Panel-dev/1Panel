@@ -45,14 +45,6 @@ func (ifw *IptablesFirewall) Status() (bool, error) {
 }
 
 func (ifw *IptablesFirewall) Start() error {
-	panelPort, err := strconv.Atoi(global.CONF.Base.Port)
-	if err != nil {
-		return fmt.Errorf("invalid 1Panel port: %w", err)
-	}
-	if ifw.iptables.SaftyCheck([]int{22, panelPort}) {
-		return fmt.Errorf("iptables safety check failed - critical port may be blocked")
-	}
-
 	// Use unified chain setup method
 	if err := ifw.iptables.Setup1PanelFirewallChains("input"); err != nil {
 		return fmt.Errorf("failed to setup 1Panel firewall chains: %w", err)
@@ -70,20 +62,16 @@ func (ifw *IptablesFirewall) Stop() error {
 	global.LOG.Info("Stopping 1Panel firewall - removing chains from INPUT")
 
 	// Remove jump rule from INPUT to 1PANEL_INPUT
-	err := ifw.iptables.run(FilterTab, fmt.Sprintf("-D INPUT -j %s", Chain1PanelInput))
+	err := ifw.iptables.Teardown1PanelFirewallChains("input")
 	if err != nil {
-		global.LOG.Warnf("failed to detach 1PANEL_INPUT from INPUT: %v", err)
+		return fmt.Errorf("failed to remove 1Panel firewall chains from INPUT: %w", err)
 	}
 
-	// Remove jump rule from INPUT to 1PANEL_BASIC
-	err = ifw.iptables.run(FilterTab, fmt.Sprintf("-D INPUT -j %s", Chain1PanelBasic))
+	// Remove jump rule from OUTPUT to 1PANEL_OUTPUT
+	err = ifw.iptables.Teardown1PanelFirewallChains("output")
 	if err != nil {
-		global.LOG.Warnf("failed to detach 1PANEL_BASIC from INPUT: %v", err)
+		return fmt.Errorf("failed to remove 1Panel firewall chains from OUTPUT: %w", err)
 	}
-
-	// Keep chains (do not delete) so data can still be read from them
-	global.LOG.Info("1Panel firewall chains flushed and detached")
-
 	return nil
 }
 
