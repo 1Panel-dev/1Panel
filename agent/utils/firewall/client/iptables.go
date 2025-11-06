@@ -515,6 +515,9 @@ func (iptables *Iptables) setupEstablishedRules(direction string) {
 		if !iptables.CheckPolicyExists("INPUT", establishedRuleComment) {
 			iptables.run(FilterTab, fmt.Sprintf("-I INPUT 2 %s", establishedRule))
 		}
+
+		// 末尾加上 DROP
+		iptables.run(FilterTab, fmt.Sprintf("-A INPUT -j DROP -m comment --comment \"Default DROP\""))
 	}
 
 	if direction == "output" {
@@ -558,4 +561,137 @@ func (iptables *Iptables) Setup1PanelFirewallChains(direction string) error {
 		}
 	}
 	return nil
+}
+
+// Teardown1PanelFirewallChains 撤销防火墙链设置
+func (iptables *Iptables) Teardown1PanelFirewallChains(direction string) error {
+	if direction == "input" {
+		if err := iptables.RemovePolicyByComment(ChainInput, "Default DROP"); err != nil {
+			global.LOG.Warnf("failed to remove default DROP rule from INPUT: %v", err)
+		}
+
+		err := iptables.run(FilterTab, fmt.Sprintf("-D %s -j %s", ChainInput, Chain1PanelBasic))
+		if err != nil {
+			global.LOG.Warnf("failed to remove jump rule from INPUT to 1PANEL_BASIC: %v", err)
+		}
+
+		err = iptables.run(FilterTab, fmt.Sprintf("-D %s -j %s", ChainInput, Chain1PanelInput))
+		if err != nil {
+			global.LOG.Warnf("failed to remove jump rule from INPUT to 1PANEL_INPUT: %v", err)
+		}
+
+	} else if direction == "output" {
+		err := iptables.run(FilterTab, fmt.Sprintf("-D %s -j %s", ChainOutput, Chain1PanelOutput))
+		if err != nil {
+			global.LOG.Warnf("failed to remove jump rule from OUTPUT to 1PANEL_OUTPUT: %v", err)
+		}
+	}
+
+	global.LOG.Infof("1Panel firewall chains teardown completed for %s direction", direction)
+	return nil
+}
+
+// Check1PanelChainsApplied 检查自定义链是否已按正确顺序应用到主链
+func (iptables *Iptables) Check1PanelInputChainsApplied() (bool, error) {
+	chains, err := iptables.ReadFilter([]string{ChainInput})
+	if err != nil {
+		return false, err
+	}
+
+	inputChain, exists := chains[ChainInput]
+	if !exists {
+		return false, fmt.Errorf("INPUT chain not found")
+	}
+
+	// 需要找到跳转到 1PANEL_INPUT 和 1PANEL_BASIC 的规则
+	// 并且 1PANEL_INPUT 应该在 1PANEL_BASIC 之前
+	found1PanelInput := false
+	found1PanelBasic := false
+	position1PanelInput := -1
+	position1PanelBasic := -1
+	currentPosition := 0
+
+	for rule := inputChain.FirstRule; rule != nil; rule = rule.Next() {
+		policy := rule.P
+
+		// 检查是否是跳转到 1PANEL_INPUT 的规则
+		if policy.Action == Chain1PanelInput {
+			found1PanelInput = true
+			position1PanelInput = currentPosition
+		}
+
+		// 检查是否是跳转到 1PANEL_BASIC 的规则
+		if policy.Action == Chain1PanelBasic {
+			found1PanelBasic = true
+			position1PanelBasic = currentPosition
+		}
+
+		currentPosition++
+	}
+
+	// 检查两个跳转规则是否都存在，且 1PANEL_INPUT 在 1PANEL_BASIC 之前
+	if !found1PanelInput || !found1PanelBasic {
+		global.LOG.Debugf("1Panel chains not fully applied: 1PANEL_INPUT=%v, 1PANEL_BASIC=%v",
+			found1PanelInput, found1PanelBasic)
+		return false, fmt.Errorf("1Panel chains not fully applied")
+	}
+
+	if position1PanelInput >= position1PanelBasic {
+		global.LOG.Debugf("1Panel chains order incorrect: 1PANEL_INPUT at %d, 1PANEL_BASIC at %d",
+			position1PanelInput, position1PanelBasic)
+		return false, fmt.Errorf("1Panel chains order incorrect")
+	}
+
+	return true, nil
+
+}
+
+func (iptables *Iptables) SaftyCheck(ports []int) bool {
+	chains, err := iptables.ReadFilter([]string{ChainInput, Chain1PanelInput, Chain1PanelBasic})
+	if err != nil {
+		global.LOG.Errorf("failed to read filter chains: %v", err)
+		return false
+	}
+
+	inputChain, exists := chains[ChainInput]
+	if !exists {
+		global.LOG.Errorf("INPUT chain not found")
+		return false
+	}
+
+	inputDefaultAccept := inputChain.DefaultPolicy == ACCEPT
+
+	for _, port := range ports {
+		// 检查所有相关链中是否有规则会阻止该端口
+		if iptables.isPortBlocked(port, chains, inputDefaultAccept) {
+			global.LOG.Warnf("port %d is blocked by firewall rules", port)
+			return false
+		}
+	}
+
+	return true
+}
+
+// isPortBlocked 检查指定端口是否被防火墙规则阻止
+func (iptables *Iptables) isPortBlocked(port int, chains map[string]IptablesChain, inputDefaultAccept bool) bool {
+	chainOrder := []string{ChainInput, Chain1PanelInput, Chain1PanelBasic}
+	for _, chainName := range chainOrder {
+		chain, exists := chains[chainName]
+		if !exists {
+			continue
+		}
+		for rule := chain.FirstRule; rule != nil; rule = rule.Next() {
+			policy := rule.P
+			portMatches := policy.DstPort == 0 || policy.DstPort == uint16(port)
+			if portMatches {
+				if policy.Action == DROP || policy.Action == REJECT {
+					return true
+				}
+				if policy.Action == ACCEPT {
+					return false
+				}
+			}
+		}
+	}
+	return !inputDefaultAccept
 }

@@ -9,7 +9,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
-	"github.com/1Panel-dev/1Panel/agent/utils/controller"
 )
 
 var portRuleRegex = regexp.MustCompile(`-A\s+INPUT\s+-p\s+(\w+)(?:\s+-m\s+\w+)*\s+--dport\s+(\d+(?::\d+)?)\s+-j\s+(\w+)`)
@@ -37,39 +36,26 @@ func (ifw *IptablesFirewall) Name() string {
 
 func (ifw *IptablesFirewall) Status() (bool, error) {
 	// Check if iptables has any rules (indicates it's running)
-	stdout, err := cmd.RunDefaultWithStdoutBashC("iptables -L -n | head -1")
+	_, err := cmd.RunDefaultWithStdoutBashC("iptables -L -n | head -1")
 	if err != nil {
 		return false, err
 	}
 	// If we can list rules, iptables is functional
-	return strings.Contains(stdout, "Chain"), nil
+	return ifw.iptables.Check1PanelInputChainsApplied()
 }
 
 func (ifw *IptablesFirewall) Start() error {
-	// Try different service names
-	services := []string{"iptables", "iptables-services"}
-	var lastErr error
-
-	for _, svc := range services {
-		if err := controller.HandleStart(svc); err == nil {
-			break
-		} else {
-			lastErr = err
-		}
-	}
-
-	// If systemd service doesn't work, try loading kernel modules
-	if err := cmd.RunDefaultBashC("modprobe ip_tables"); err != nil {
-		global.LOG.Warnf("failed to load ip_tables module: %v", err)
-	}
-
-	if lastErr != nil {
-		global.LOG.Warnf("iptables service management not available: %v", lastErr)
+	if ifw.iptables.SaftyCheck([]int{22}) {
+		return fmt.Errorf("iptables safety check failed - port 22 may be blocked")
 	}
 
 	// Use unified chain setup method
 	if err := ifw.iptables.Setup1PanelFirewallChains("input"); err != nil {
 		return fmt.Errorf("failed to setup 1Panel firewall chains: %w", err)
+	}
+
+	if err := ifw.iptables.Setup1PanelFirewallChains("output"); err != nil {
+		return fmt.Errorf("failed to setup 1Panel firewall chains for output: %w", err)
 	}
 
 	global.LOG.Infof("1Panel firewall chains setup completed")
@@ -89,18 +75,6 @@ func (ifw *IptablesFirewall) Stop() error {
 	err = ifw.iptables.run(FilterTab, fmt.Sprintf("-D INPUT -j %s", Chain1PanelBasic))
 	if err != nil {
 		global.LOG.Warnf("failed to detach 1PANEL_BASIC from INPUT: %v", err)
-	}
-
-	// Flush the 1PANEL_INPUT chain (clear all rules but keep chain)
-	err = ifw.iptables.run(FilterTab, fmt.Sprintf("-F %s", Chain1PanelInput))
-	if err != nil {
-		global.LOG.Warnf("failed to flush 1PANEL_INPUT chain: %v", err)
-	}
-
-	// Flush the 1PANEL_BASIC chain (clear all rules but keep chain)
-	err = ifw.iptables.run(FilterTab, fmt.Sprintf("-F %s", Chain1PanelBasic))
-	if err != nil {
-		global.LOG.Warnf("failed to flush 1PANEL_BASIC chain: %v", err)
 	}
 
 	// Keep chains (do not delete) so data can still be read from them
