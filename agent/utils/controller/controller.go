@@ -195,3 +195,53 @@ func loadFromPredefined(mgr Controller, keyword string) string {
 	}
 	return ""
 }
+
+// GetServicePath returns the configuration file path for the specified service.
+// If serviceName is empty, it returns the default directory path based on the system's service manager.
+// For non-empty serviceName, it retrieves the exact service file path.
+// Parameters:
+//   - serviceName: Name of the service. If empty, returns the default directory.
+//
+// Returns:
+//   - string: The service configuration file path.
+//   - error: Error if the service manager is unsupported or command execution fails.
+func GetServicePath(serviceName string) (string, error) {
+	if serviceName == "" {
+		client, err := New()
+		if err != nil {
+			return "", err
+		}
+		switch client.Name() {
+		case "systemd":
+			return "/etc/systemd/system/", nil
+		case "openrc", "sysvinit":
+			return "/etc/init.d/", nil
+		default:
+			return "", fmt.Errorf("unsupported manager: %s", client.Name())
+		}
+	}
+	service, err := LoadServiceName(serviceName)
+	if err != nil {
+		return "", err
+	}
+	client, err := New()
+	if err != nil {
+		return "", err
+	}
+	switch client.Name() {
+	case "systemd":
+		stdout, err := exec.Command("systemctl", "show", "-p", "FragmentPath", service).Output()
+		if err != nil {
+			return "", err
+		}
+		parts := strings.SplitN(string(stdout), "=", 2)
+		if len(parts) != 2 {
+			return "", fmt.Errorf("unexpected output: %s", string(stdout))
+		}
+		return strings.TrimSpace(parts[1]), nil
+	case "openrc", "sysvinit":
+		return fmt.Sprintf("/etc/init.d/%s", service), nil
+	default:
+		return "", fmt.Errorf("unsupported manager: %s", client.Name())
+	}
+}
