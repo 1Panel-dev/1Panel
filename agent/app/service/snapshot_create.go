@@ -21,6 +21,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
+	"github.com/1Panel-dev/1Panel/agent/utils/controller"
 	"github.com/1Panel-dev/1Panel/agent/utils/copier"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"gorm.io/gorm"
@@ -306,15 +307,16 @@ func snapBaseData(snap snapHelper, targetDir string, withDockerConf bool) error 
 	}
 
 	if global.IsMaster {
-		err = snap.FileOp.CopyFile("/etc/systemd/system/1panel-core.service", targetDir)
-		snap.Task.LogWithStatus(i18n.GetWithName("SnapCopy", "/etc/systemd/system/1panel-core.service"), err)
+		corepath, _ := controller.GetServicePath("1panel-core")
+		err = snap.FileOp.CopyFile(corepath, targetDir)
+		snap.Task.LogWithStatus(i18n.GetWithName("SnapCopy", corepath), err)
 		if err != nil {
 			return err
 		}
 	}
-
-	err = snap.FileOp.CopyFile("/etc/systemd/system/1panel-agent.service", targetDir)
-	snap.Task.LogWithStatus(i18n.GetWithName("SnapCopy", "/etc/systemd/system/1panel-agent.service"), err)
+	agentpath, _ := controller.GetServicePath("1panel-agent")
+	err = snap.FileOp.CopyFile(agentpath, targetDir)
+	snap.Task.LogWithStatus(i18n.GetWithName("SnapCopy", agentpath), err)
 	if err != nil {
 		return err
 	}
