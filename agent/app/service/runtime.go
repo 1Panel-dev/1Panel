@@ -256,9 +256,6 @@ func (r *RuntimeService) Page(req request.RuntimeSearch) (int64, []response.Runt
 						continue
 					}
 					hostIP := envs[fmt.Sprintf("HOST_IP_%s", matches[1])]
-					if hostIP == "" {
-						hostIP = "0.0.0.0"
-					}
 					runtimeDTO.ExposedPorts = append(runtimeDTO.ExposedPorts, request.ExposedPort{
 						ContainerPort: containerPort,
 						HostPort:      hostPort,

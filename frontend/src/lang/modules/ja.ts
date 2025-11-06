@@ -83,6 +83,7 @@ const message = {
             show: '表示する',
             hide: '隠す',
             visit: '訪問',
+            migrate: '移行',
         },
         operate: {
             start: '開始',
@@ -414,7 +415,7 @@ const message = {
         ioDelay: 'I/Oレイテンシ',
         uptime: 'それ以来',
         runningTime: '稼働時間',
-        mem: 'システム',
+        mem: 'システムメモリ',
         swapMem: 'パーティションを交換します',
 
         runSmoothly: '低負荷',
@@ -424,6 +425,9 @@ const message = {
 
         core: '物理コア',
         logicCore: '論理コア',
+        corePercent: 'コア使用率',
+        cpuTop: 'CPU使用率トップ5のプロセス情報',
+        memTop: 'メモリ使用率トップ5のプロセス情報',
         loadAverage: '最後の1分で平均を積み込みます|最後の{n}分で平均を読み込みます',
         load: '負荷',
         mount: 'マウントポイント',
@@ -798,6 +802,20 @@ const message = {
             'コンテナエンジンは、CPU株に1024の基本値を使用します。それを増やして、コンテナにCPU時間を増やすことができます。',
         inputIpv4: '例:192.168.1.1',
         inputIpv6: '例:2001:0DB8:85A3:0000:0000:8A2E:0370:7334',
+
+        diskUsage: 'ディスク使用量',
+        localVolume: 'ローカルストレージボリューム',
+        buildCache: 'ビルドキャッシュ',
+        usage: '使用済み: {0}, 解放可能: {1}',
+        clean: '解放',
+        imageClean:
+            'イメージをクリーンアップすると、すべての未使用イメージが削除されます。この操作は元に戻せません。続行しますか？',
+        containerClean:
+            'コンテナをクリーンアップすると、停止中のすべてのコンテナ（アプリストアの停止アプリを含む）が削除されます。この操作は元に戻せません。続行しますか？',
+        sizeRw: 'コンテナレイヤーサイズ',
+        sizeRwHelper: 'コンテナ固有の書き込み可能レイヤーのサイズ',
+        sizeRootFs: '仮想サイズ',
+        sizeRootFsHelper: 'コンテナが依存するすべてのイメージレイヤー + コンテナレイヤーの合計サイズ',
 
         containerFromAppHelper:
             'このコンテナがアプリストアから取得されたことが検出されました。アプリの操作により、現在の編集が無効になる可能性があります。',
@@ -2110,7 +2128,6 @@ const message = {
         restartOperatorHelper: 'アプリケーションが再起動されます。続けたいですか？',
         reloadOperatorHelper: 'アプリケーションはリロードされます。続けたいですか？',
         checkInstalledWarn: `「{0}」が検出されませんでした。「アプリストア」に移動してインストールしてください。`,
-        gotoInstalled: 'インストールに移動します',
         limitHelper: 'アプリケーションはすでにインストールされています。',
         deleteHelper: `「{0}」は、次のリソースに関連付けられています。チェックしてもう一度やり直してください！`,
         checkTitle: 'ヒント',
@@ -2215,6 +2232,8 @@ const message = {
         uninstallDeleteBackup: 'アプリをアンインストール - バックアップを削除',
         uninstallDeleteImage: 'アプリをアンインストール - イメージを削除',
         upgradeBackup: 'アプリのアップグレード前にアプリをバックアップ',
+        noAppHelper: 'アプリケーションが検出されませんでした。タスクセンターでアプリストアの同期ログを確認してください',
+        isEdirWarn: 'docker-compose.yml ファイルが変更されたことを検出しました。比較を確認してください',
     },
     website: {
         primaryDomain: 'プライマリドメイン',
@@ -2911,6 +2930,9 @@ const message = {
         stopProcess: '終わり',
         viewDetails: '詳細',
         stopProcessWarn: 'このプロセスを終了したいですか（PID:{0}）？',
+        kill: 'プロセス終了',
+        killNow: '今すぐ終了',
+        killHelper: 'プロセス {0} を終了すると一部のプログラムが正常に動作しなくなる可能性があります。続行しますか？',
         processName: 'プロセス名',
     },
     tool: {
@@ -3629,6 +3651,10 @@ const message = {
             selectNode: 'ノードを選択',
             selectNodeError: 'ノードを選択してください',
             licenseHelper: 'プロバージョンはカスタムアプリケーションリポジトリ機能をサポートしています',
+            databaseHelper: 'アプリケーション関連データベース、ターゲットノードのデータベースを選択してください',
+            nodeHelper: '現在のノードは選択できません',
+            migrateHelper:
+                '現在、単体アプリケーションと MySQL、MariaDB、PostgreSQL データベースのみに関連するアプリケーションの移行のみをサポートしています',
         },
         alert: {
             isAlert: 'アラート',

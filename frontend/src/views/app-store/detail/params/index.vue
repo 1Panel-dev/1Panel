@@ -79,7 +79,7 @@
                             v-model="form[p.child.envKey]"
                             v-if="p.child.type == 'service'"
                             @change="changeService(form[p.child.envKey], p.services)"
-                            class="p-w-400"
+                            class="p-w-300"
                         >
                             <el-option
                                 v-for="service in p.services"
@@ -89,7 +89,7 @@
                                 :disabled="service.status != 'Running'"
                             >
                                 <el-row :gutter="5">
-                                    <el-col :span="18">
+                                    <el-col :span="14">
                                         <span>{{ service.label }}</span>
                                     </el-col>
                                     <el-col :span="6">

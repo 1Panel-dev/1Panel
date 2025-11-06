@@ -120,7 +120,7 @@ func (u *DashboardService) LoadCurrentInfoForNode() *dto.NodeCurrent {
 	memoryInfo, _ := mem.VirtualMemory()
 	currentInfo.MemoryTotal = memoryInfo.Total
 	currentInfo.MemoryAvailable = memoryInfo.Available
-	currentInfo.MemoryUsed = memoryInfo.Used + memoryInfo.Shared
+	currentInfo.MemoryUsed = memoryInfo.Used
 	currentInfo.MemoryUsedPercent = memoryInfo.UsedPercent
 
 	swapInfo, _ := mem.SwapMemory()
@@ -194,7 +194,7 @@ func (u *DashboardService) LoadCurrentInfo(ioOption string, netOption string) *d
 
 	memoryInfo, _ := mem.VirtualMemory()
 	currentInfo.MemoryTotal = memoryInfo.Total
-	currentInfo.MemoryUsed = memoryInfo.Used + memoryInfo.Shared
+	currentInfo.MemoryUsed = memoryInfo.Used
 	currentInfo.MemoryFree = memoryInfo.Free
 	currentInfo.MemoryCache = memoryInfo.Cached + memoryInfo.Buffers
 	currentInfo.MemoryShard = memoryInfo.Shared
@@ -210,6 +210,9 @@ func (u *DashboardService) LoadCurrentInfo(ioOption string, netOption string) *d
 	currentInfo.DiskData = loadDiskInfo()
 	currentInfo.GPUData = loadGPUInfo()
 	currentInfo.XPUData = loadXpuInfo()
+
+	currentInfo.TopCPUItems = loadTopCPU()
+	currentInfo.TopMemItems = loadTopMem()
 
 	if ioOption == "all" {
 		diskInfo, _ := disk.IOCounters()

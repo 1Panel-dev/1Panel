@@ -15,6 +15,7 @@ import (
 	"path"
 	"reflect"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"syscall"
@@ -539,6 +540,15 @@ func (w WebsiteService) BatchOpWebsite(req request.BatchWebsiteOp) error {
 	if err != nil {
 		return err
 	}
+	sort.SliceStable(websites, func(i, j int) bool {
+		if websites[i].Type == constant.Subsite && websites[j].Type != constant.Subsite {
+			return true
+		}
+		if websites[i].Type != constant.Subsite && websites[j].Type == constant.Subsite {
+			return false
+		}
+		return false
+	})
 	opWebsiteTask := func(t *task.Task) error {
 		for _, web := range websites {
 			msg := fmt.Sprintf("%s %s", i18n.GetMsgByKey(req.Operate), web.PrimaryDomain)

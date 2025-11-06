@@ -1568,7 +1568,12 @@ func handleInstalled(appInstallList []model.AppInstall, updated bool, sync bool)
 			Container: installed.ContainerName,
 		}
 		if updated {
+			detail, _ := appDetailRepo.GetFirst(repo.WithByID(installed.AppDetailId))
 			installDTO.DockerCompose = installed.DockerCompose
+			rawCompose, _ := getUpgradeCompose(installed, detail)
+			if rawCompose != installed.DockerCompose {
+				installDTO.IsEdit = true
+			}
 		}
 		app, err := appRepo.GetFirst(repo.WithByID(installed.AppId))
 		if err != nil {

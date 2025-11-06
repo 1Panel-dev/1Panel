@@ -20,6 +20,7 @@ type IBackupRepo interface {
 	WithByPublic(isPublic bool) DBOption
 
 	ListRecord(opts ...DBOption) ([]model.BackupRecord, error)
+	GetRecord(opts ...DBOption) (*model.BackupRecord, error)
 	PageRecord(page, size int, opts ...DBOption) (int64, []model.BackupRecord, error)
 	CreateRecord(record *model.BackupRecord) error
 	DeleteRecord(ctx context.Context, opts ...DBOption) error
@@ -160,7 +161,7 @@ func (u *BackupRepo) WithByCronID(cronjobID uint) DBOption {
 }
 
 func (u *BackupRepo) GetRecord(opts ...DBOption) (*model.BackupRecord, error) {
-	var record *model.BackupRecord
+	record := &model.BackupRecord{}
 	db := global.DB.Model(&model.BackupRecord{})
 	for _, opt := range opts {
 		db = opt(db)

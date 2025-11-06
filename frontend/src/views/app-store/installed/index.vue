@@ -211,13 +211,7 @@
                                                                 plain
                                                                 round
                                                                 size="small"
-                                                                @click="
-                                                                    openBackups(
-                                                                        installed.appKey,
-                                                                        installed.name,
-                                                                        installed.status,
-                                                                    )
-                                                                "
+                                                                @click="openBackups(installed)"
                                                                 v-if="mode === 'installed'"
                                                             >
                                                                 {{ $t('commons.button.backup') }}
@@ -556,7 +550,7 @@ const openOperate = (row: any, op: string) => {
     operateReq.installId = row.id;
     operateReq.operate = op;
     if (op == 'upgrade') {
-        upgradeRef.value.acceptParams(row.id, row.name, row.dockerCompose, op, row.app);
+        upgradeRef.value.acceptParams(row, op);
     } else if (op == 'delete') {
         appInstalledDeleteCheck(row.id).then(async (res) => {
             const items = res.data;
@@ -709,12 +703,13 @@ const toContainer = async (row: App.AppInstalled) => {
     routerToNameWithQuery('ContainerItem', { filters: 'com.docker.compose.project=' + row.name, uncached: true });
 };
 
-const openBackups = (key: string, name: string, status: string) => {
+const openBackups = (row: App.AppInstalled) => {
     let params = {
         type: 'app',
-        name: key,
-        detailName: name,
-        status: status,
+        name: row.appKey,
+        detailName: row.name,
+        status: row.status,
+        appInstallID: row.id,
     };
     backupRef.value.acceptParams(params);
 };

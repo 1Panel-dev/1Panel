@@ -150,6 +150,7 @@ export namespace App {
         favorite: boolean;
         app: App;
         webUI: string;
+        appKey?: string;
     }
 
     export interface AppInstalledInfo {
@@ -161,6 +162,7 @@ export namespace App {
         httpPort: number;
         container: string;
         env: { [key: string]: string };
+        appKey: string;
     }
 
     export interface AppInstallDto {
@@ -182,6 +184,9 @@ export namespace App {
         appKey: string;
         appType: string;
         appStatus: string;
+        isEdit: boolean;
+        dockerCompose: string;
+        app: App.AppDetail;
     }
 
     export interface AppInstalledInfo {
@@ -268,6 +273,7 @@ export namespace App {
 
     export interface AppConfig {
         params: InstallParams[];
+        rawCompose?: string;
         cpuQuota: number;
         memoryLimit: number;
         memoryUnit: string;

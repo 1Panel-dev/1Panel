@@ -34,6 +34,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
+	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/build"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
@@ -105,7 +106,8 @@ func (u *ContainerService) Page(req dto.PageContainer) (int64, interface{}, erro
 	}
 	defer client.Close()
 	options := container.ListOptions{
-		All: true,
+		All:  true,
+		Size: true,
 	}
 	if len(req.Filters) != 0 {
 		options.Filters = filters.NewArgs()
@@ -199,6 +201,8 @@ func (u *ContainerService) Page(req dto.PageContainer) (int64, interface{}, erro
 			Ports:         exposePorts,
 			IsFromApp:     IsFromApp,
 			IsFromCompose: IsFromCompose,
+			SizeRw:        item.SizeRw,
+			SizeRootFs:    item.SizeRootFs,
 		}
 		install, _ := appInstallRepo.GetFirst(appInstallRepo.WithContainerName(info.Name))
 		if install.ID > 0 {
@@ -282,11 +286,35 @@ func (u *ContainerService) LoadStatus() (dto.ContainerStatus, error) {
 	}
 	defer client.Close()
 	c := context.Background()
-	images, _ := client.ImageList(c, image.ListOptions{})
-	for _, image := range images {
-		data.ImageSize += uint64(image.Size)
+
+	usage, err := client.DiskUsage(c, types.DiskUsageOptions{})
+	if err != nil {
+		return data, err
 	}
-	data.ImageCount = len(images)
+
+	data.ImageCount = len(usage.Images)
+	data.VolumeCount = len(usage.Volumes)
+	for _, item := range usage.Images {
+		data.ImageUsage += item.Size
+		if item.Containers < 1 {
+			data.ImageReclaimable += item.Size
+		}
+	}
+	for _, item := range usage.Containers {
+		data.ContainerUsage += item.SizeRw
+		if item.State != "running" {
+			data.ContainerReclaimable += item.SizeRw
+		}
+	}
+	for _, item := range usage.Volumes {
+		data.VolumeUsage += item.UsageData.Size
+		if item.UsageData.RefCount == 0 {
+			data.VolumeReclaimable += item.UsageData.Size
+		}
+	}
+	for _, item := range usage.BuildCache {
+		data.BuildCacheUsage += item.Size
+	}
 	repo, _ := imageRepoRepo.List()
 	data.RepoCount = len(repo)
 	templates, _ := composeRepo.List()
@@ -296,12 +324,8 @@ func (u *ContainerService) LoadStatus() (dto.ContainerStatus, error) {
 	volumes, _ := client.VolumeList(c, volume.ListOptions{})
 	data.VolumeCount = len(volumes.Volumes)
 	data.ComposeCount = loadComposeCount(client)
-	containers, err := client.ContainerList(c, container.ListOptions{All: true})
-	if err != nil {
-		return data, err
-	}
-	data.All = uint(len(containers))
-	for _, item := range containers {
+	data.ContainerCount = len(usage.Containers)
+	for _, item := range usage.Containers {
 		switch item.State {
 		case "created":
 			data.Created++
@@ -319,7 +343,6 @@ func (u *ContainerService) LoadStatus() (dto.ContainerStatus, error) {
 			data.Removing++
 		}
 	}
-	data.ContainerCount = int(data.All)
 	return data, nil
 }
 func (u *ContainerService) ContainerListStats() ([]dto.ContainerListStats, error) {

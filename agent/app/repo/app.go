@@ -27,7 +27,6 @@ type IAppRepo interface {
 	GetFirst(opts ...DBOption) (model.App, error)
 	GetBy(opts ...DBOption) ([]model.App, error)
 	BatchCreate(ctx context.Context, apps []model.App) error
-	GetByKey(ctx context.Context, key string) (model.App, error)
 	Create(ctx context.Context, app *model.App) error
 	Save(ctx context.Context, app *model.App) error
 	BatchDelete(ctx context.Context, apps []model.App) error
@@ -142,14 +141,6 @@ func (a AppRepo) GetTopRecomment() ([]string, error) {
 
 func (a AppRepo) BatchCreate(ctx context.Context, apps []model.App) error {
 	return getTx(ctx).Omit(clause.Associations).Create(&apps).Error
-}
-
-func (a AppRepo) GetByKey(ctx context.Context, key string) (model.App, error) {
-	var app model.App
-	if err := getTx(ctx).Where("key = ?", key).First(&app).Error; err != nil {
-		return app, err
-	}
-	return app, nil
 }
 
 func (a AppRepo) Create(ctx context.Context, app *model.App) error {

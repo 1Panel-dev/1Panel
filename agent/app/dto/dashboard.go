@@ -116,6 +116,9 @@ type DashboardCurrent struct {
 	GPUData []GPUInfo `json:"gpuData"`
 	XPUData []XPUInfo `json:"xpuData"`
 
+	TopCPUItems []Process `json:"topCPUItems"`
+	TopMemItems []Process `json:"topMemItems"`
+
 	ShotTime time.Time `json:"shotTime"`
 }
 

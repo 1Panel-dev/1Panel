@@ -23,17 +23,17 @@ type Controller interface {
 }
 
 func New() (Controller, error) {
-	managerOptions := []string{"systemd", "openrc", "sysvinit"}
+	managerOptions := []string{"systemctl", "rc-service", "service"}
 	for _, item := range managerOptions {
 		if _, err := exec.LookPath(item); err != nil {
 			continue
 		}
 		switch item {
-		case "systemd":
+		case "systemctl":
 			return manager.NewSystemd(), nil
-		case "openrc":
+		case "rc-service":
 			return manager.NewOpenrc(), nil
-		case "sysvinit":
+		case "service":
 			return manager.NewSysvinit(), nil
 		}
 	}
@@ -182,8 +182,8 @@ func loadFromPredefined(mgr Controller, keyword string) string {
 		"fail2ban":     {"fail2ban.service", "fail2ban"},
 		"supervisor":   {"supervisord.service", "supervisor.service", "supervisord", "supervisor"},
 		"ssh":          {"sshd.service", "ssh.service", "sshd", "ssh"},
-		"1panel-core":  {"1panel-core.service", "1panel-cored"},
-		"1panel-agent": {"1panel-agent.service", "1panel-agentd"},
+		"1panel-core":  {"1panel-core.service"},
+		"1panel-agent": {"1panel-agent.service"},
 		"docker":       {"docker.service", "dockerd"},
 	}
 	if val, ok := predefinedMap[keyword]; ok {

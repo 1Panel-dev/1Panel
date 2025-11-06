@@ -11,7 +11,7 @@ func NewSnap() *Snap {
 }
 
 func (s *Snap) IsExist(serviceName string) bool {
-	out, err := run(s.toolCmd, "services")
+	out, err := run(nil, s.toolCmd, "services")
 	if err != nil {
 		return false
 	}
@@ -19,7 +19,7 @@ func (s *Snap) IsExist(serviceName string) bool {
 }
 
 func (s *Snap) IsActive(serviceName string) bool {
-	out, err := run(s.toolCmd, "services")
+	out, err := run(nil, s.toolCmd, "services")
 	if err != nil {
 		return false
 	}
@@ -33,7 +33,7 @@ func (s *Snap) IsActive(serviceName string) bool {
 }
 
 func (s *Snap) IsEnable(serviceName string) bool {
-	out, err := run(s.toolCmd, "services")
+	out, err := run(nil, s.toolCmd, "services")
 	if err != nil {
 		return false
 	}
@@ -48,7 +48,7 @@ func (s *Snap) IsEnable(serviceName string) bool {
 
 func (s *Snap) Operate(operate, serviceName string) error {
 	if s.IsExist(serviceName) {
-		return handlerErr(run(s.toolCmd, operate, serviceName))
+		return handlerErr(run(nil, s.toolCmd, operate, serviceName))
 	}
 	return nil
 }

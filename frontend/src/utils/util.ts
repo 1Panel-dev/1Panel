@@ -217,6 +217,32 @@ export function computeSize(size: number): string {
     return formattedNumber((size / Math.pow(num, 4)).toFixed(2)) + ' TB';
 }
 
+export function computeSizeForDocker(size: number): string {
+    const num = 1024.0;
+    if (size < num) return size + ' B';
+    if (size < Math.pow(num, 2)) return formattedNumber((size / num).toFixed(2)) + ' KiB';
+    if (size < Math.pow(num, 3)) return formattedNumber((size / Math.pow(num, 2)).toFixed(2)) + ' MiB';
+    if (size < Math.pow(num, 4)) return formattedNumber((size / Math.pow(num, 3)).toFixed(2)) + ' GiB';
+    return formattedNumber((size / Math.pow(num, 4)).toFixed(2)) + ' TiB';
+}
+
+export function computeSize2(size: number): string {
+    const num = 1000.0;
+    if (size < num) return size + ' B';
+    if (size < Math.pow(num, 2)) return formattedNumber((size / num).toFixed(2)) + ' KB';
+    if (size < Math.pow(num, 3)) return formattedNumber((size / Math.pow(num, 2)).toFixed(2)) + ' MB';
+    if (size < Math.pow(num, 4)) return formattedNumber((size / Math.pow(num, 3)).toFixed(2)) + ' GB';
+    return formattedNumber((size / Math.pow(num, 4)).toFixed(2)) + ' TB';
+}
+
+export function computeCPU(size: number): string {
+    const num = 1000;
+    if (size < num) return size + ' ns';
+    if (size < Math.pow(num, 2)) return formattedNumber((size / num).toFixed(2)) + ' μs';
+    if (size < Math.pow(num, 3)) return formattedNumber((size / Math.pow(num, 2)).toFixed(2)) + ' ms';
+    return formattedNumber((size / Math.pow(num, 3)).toFixed(2)) + ' s';
+}
+
 export function splitSize(size: number): any {
     const num = 1024.0;
     if (size < num) return { size: Number(size), unit: 'B' };

@@ -78,7 +78,7 @@ ErrAppWarn: "状态异常，请查看日志"
 ErrAppParamKey: "参数 {{ .name }} 字段异常"
 ErrAppUpgrade: "应用 {{ .name }} 升级失败 {{ .err }}"
 AppRecover: "应用  {{ .name }} 回滚 "
-PullImageStart: "开始拉取镜像 {{ .name }}"
+PullImageStart: "开始拉取镜像 [{{ .name }}]"
 PullImageSuccess: "镜像拉取成功"
 AppStoreSyncSuccess: "应用商店同步成功"
 SyncAppDetail: "同步应用配置"
@@ -95,6 +95,7 @@ ErrAppVersionDeprecated: " {{ .name }} 应用不适配当前 1Panel 版本，跳
 ErrDockerFailed: "Docker 状态异常，请检查服务状态"
 ErrDockerComposeCmdNotFound: "Docker Compose 命令不存在，请先在宿主机安装此命令"
 UseExistImage: "拉取镜像失败，使用存量镜像"
+ErrDatabaseNotFound: "数据库 {{ .name }} 不存在"
 
 #ssh
 ExportIP: "登录 IP"

@@ -103,10 +103,21 @@ export namespace Dashboard {
         gpuData: Array<GPUInfo>;
         xpuData: Array<XPUInfo>;
 
+        topCPUItems: Array<Process>;
+        topMemItems: Array<Process>;
+
         netBytesSent: number;
         netBytesRecv: number;
 
         shotTime: Date;
+    }
+    export interface Process {
+        name: string;
+        pid: number;
+        percent: number;
+        memory: number;
+        cmd: string;
+        user: string;
     }
     export interface DiskInfo {
         path: string;

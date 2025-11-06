@@ -183,7 +183,7 @@ func (m *MonitorService) Run() {
 	if len(totalPercent) == 1 {
 		itemModel.Cpu = totalPercent[0]
 	}
-	topCPU := m.loadTopCPU()
+	topCPU := loadTopCPU()
 	if len(topCPU) != 0 {
 		topItemCPU, err := json.Marshal(topCPU)
 		if err == nil {
@@ -199,7 +199,7 @@ func (m *MonitorService) Run() {
 
 	memoryInfo, _ := mem.VirtualMemory()
 	itemModel.Memory = memoryInfo.UsedPercent
-	topMem := m.loadTopMem()
+	topMem := loadTopMem()
 	if len(topMem) != 0 {
 		topMemItem, err := json.Marshal(topMem)
 		if err == nil {
@@ -350,7 +350,7 @@ func (m *MonitorService) saveNetDataToDB(ctx context.Context, interval float64) 
 	}
 }
 
-func (m *MonitorService) loadTopCPU() []dto.Process {
+func loadTopCPU() []dto.Process {
 	processes, err := process.Processes()
 	if err != nil {
 		return nil
@@ -400,7 +400,7 @@ func (m *MonitorService) loadTopCPU() []dto.Process {
 	return top5
 }
 
-func (m *MonitorService) loadTopMem() []dto.Process {
+func loadTopMem() []dto.Process {
 	processes, err := process.Processes()
 	if err != nil {
 		return nil

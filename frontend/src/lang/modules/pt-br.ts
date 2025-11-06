@@ -83,6 +83,7 @@ const message = {
             show: 'Exibir',
             hide: 'Ocultar',
             visit: 'Visitar',
+            migrate: 'Migrar',
         },
         operate: {
             start: 'Iniciar',
@@ -421,7 +422,7 @@ const message = {
         ioDelay: 'Latência de I/O',
         uptime: 'Tempo de atividade',
         runningTime: 'Tempo de execução',
-        mem: 'Memória',
+        mem: 'Memória do Sistema',
         swapMem: 'Partição Swap',
 
         runSmoothly: 'Baixo carregamento',
@@ -431,6 +432,9 @@ const message = {
 
         core: 'Núcleo físico',
         logicCore: 'Núcleo lógico',
+        corePercent: 'Uso do Núcleo',
+        cpuTop: 'Top 5 Processos por Uso de CPU',
+        memTop: 'Top 5 Processos por Uso de Memória',
         loadAverage: 'Média de carga nos últimos 1 minuto | Média de carga nos últimos {n} minutos',
         load: 'Carga',
         mount: 'Ponto de montagem',
@@ -809,6 +813,21 @@ const message = {
             'O mecanismo de contêiner usa um valor base de 1024 para a atribuição de CPU. Você pode aumentá-lo para dar mais tempo de CPU ao contêiner.',
         inputIpv4: 'Exemplo: 192.168.1.1',
         inputIpv6: 'Exemplo: 2001:0db8:85a3:0000:0000:8a2e:0370:7334',
+
+        diskUsage: 'Uso do Disco',
+        localVolume: 'Volume de Armazenamento Local',
+        buildCache: 'Cache de Build',
+        usage: 'Usado: {0}, Liberável: {1}',
+        clean: 'Liberar',
+        imageClean:
+            'Limpar imagens excluirá todas as imagens não utilizadas. Esta operação não pode ser desfeita. Continuar?',
+        containerClean:
+            'Limpar contêineres excluirá todos os contêineres parados (incluindo aplicativos parados da Loja de Aplicativos). Esta operação não pode ser desfeita. Continuar?',
+        sizeRw: 'Tamanho da Camada do Contêiner',
+        sizeRwHelper: 'Tamanho da camada gravável exclusiva do contêiner',
+        sizeRootFs: 'Tamanho Virtual',
+        sizeRootFsHelper:
+            'Tamanho total de todas as camadas de imagem das quais o contêiner depende + camada do contêiner',
 
         containerFromAppHelper:
             'Detectamos que este contêiner vem da loja de aplicativos. As operações no aplicativo podem fazer com que as edições atuais sejam invalidadas.',
@@ -2166,7 +2185,6 @@ const message = {
         restartOperatorHelper: 'O aplicativo será reiniciado. Deseja continuar?',
         reloadOperatorHelper: 'O aplicativo será recarregado. Deseja continuar?',
         checkInstalledWarn: `"{0}" não foi detectado. Vá para "Loja de Aplicativos" para instalar.`,
-        gotoInstalled: 'Ir para instalar',
         limitHelper: 'O aplicativo já foi instalado.',
         deleteHelper: `"{0}" foi associado aos seguintes recursos. Por favor, verifique e tente novamente!`,
         checkTitle: 'Dica',
@@ -2273,6 +2291,9 @@ const message = {
         uninstallDeleteBackup: 'Desinstalar Aplicativo - Excluir Backup',
         uninstallDeleteImage: 'Desinstalar Aplicativo - Excluir Imagem',
         upgradeBackup: 'Fazer Backup do Aplicativo Antes de Atualizar',
+        noAppHelper:
+            'Nenhuma aplicação detectada, por favor vá ao centro de tarefas para visualizar o log de sincronização da loja de aplicativos',
+        isEdirWarn: 'Detectada modificação no arquivo docker-compose.yml, por favor verifique a comparação',
     },
     website: {
         primaryDomain: 'Domínio principal',
@@ -2982,6 +3003,9 @@ const message = {
         stopProcess: 'Encerrar',
         viewDetails: 'Detalhes',
         stopProcessWarn: 'Tem certeza de que deseja encerrar este processo (PID:{0})?',
+        kill: 'Encerrar Processo',
+        killNow: 'Encerrar Agora',
+        killHelper: 'Encerrar o processo {0} pode fazer com que alguns programas funcionem incorretamente. Continuar?',
         processName: 'Nome do Processo',
     },
     tool: {
@@ -3718,6 +3742,10 @@ const message = {
             selectNode: 'Selecionar Node',
             selectNodeError: 'Por favor, selecione um nó',
             licenseHelper: 'A versão Pro suporta o recurso de repositório de aplicativos personalizados',
+            databaseHelper: 'Banco de dados associado ao aplicativo, selecione o banco de dados do nó de destino',
+            nodeHelper: 'Não é possível selecionar o nó atual',
+            migrateHelper:
+                'Atualmente suporta apenas a migração de aplicações monolíticas e aplicações associadas apenas a bancos de dados MySQL, MariaDB, PostgreSQL',
         },
         alert: {
             isAlert: 'Alerta',
