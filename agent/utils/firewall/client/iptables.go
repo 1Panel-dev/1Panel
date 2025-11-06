@@ -3,6 +3,7 @@ package client
 import (
 	"fmt"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -528,6 +529,61 @@ func (iptables *Iptables) setupEstablishedRules(direction string) {
 			iptables.run(FilterTab, fmt.Sprintf("-I OUTPUT 2 %s", establishedRule))
 		}
 	}
+}
+
+// Init1PanelBasicChains 初始化 1PANEL_BASIC 链 加入放行 22 端口
+
+func (iptables *Iptables) Init1PanelBasicChains() error {
+	// Ensure 1PANEL_BASIC chain exists
+	if err := iptables.ensureChain(FilterTab, Chain1PanelBasic); err != nil {
+		return err
+	}
+
+	// 检查是否已经存在 22 端口放行规则
+	chains, err := iptables.ReadFilter([]string{Chain1PanelBasic})
+	if err != nil {
+		global.LOG.Warnf("failed to read 1PANEL_BASIC chain: %v, will attempt to add SSH rule", err)
+	} else {
+		basicChain, exists := chains[Chain1PanelBasic]
+		if exists {
+			// 遍历规则检查是否已有 22 端口的 ACCEPT 规则
+			for rule := basicChain.FirstRule; rule != nil; rule = rule.Next() {
+				policy := rule.P
+				if policy.Protocol == "tcp" && policy.DstPort == 22 && policy.Action == ACCEPT {
+					global.LOG.Infof("SSH port 22 rule already exists in %s chain", Chain1PanelBasic)
+					return nil
+				}
+			}
+		}
+	}
+
+	// Allow SSH (port 22) in 1PANEL_BASIC chain
+	sshPolicy := IptablesPolicy{
+		Protocol: "tcp",
+		DstPort:  22,
+		Action:   ACCEPT,
+		Comment:  "Allow SSH",
+	}
+	panelPort, err := strconv.Atoi(global.CONF.Base.Port)
+	if err != nil {
+		return fmt.Errorf("invalid 1Panel port: %w", err)
+	}
+
+	PanelPolicy := IptablesPolicy{
+		Protocol: "tcp",
+		DstPort:  uint16(panelPort),
+		Action:   ACCEPT,
+		Comment:  "Allow 1Panel",
+	}
+	if err := iptables.AddPolicy(Chain1PanelBasic, sshPolicy); err != nil {
+		return fmt.Errorf("failed to add SSH allow rule to %s: %w", Chain1PanelBasic, err)
+	}
+	if err := iptables.AddPolicy(Chain1PanelBasic, PanelPolicy); err != nil {
+		return fmt.Errorf("failed to add 1Panel allow rule to %s: %w", Chain1PanelBasic, err)
+	}
+	global.LOG.Infof("SSH port 22/1Paenl rule added to %s chain", Chain1PanelBasic)
+
+	return nil
 }
 
 func (iptables *Iptables) Setup1PanelFirewallChains(direction string) error {

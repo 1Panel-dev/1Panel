@@ -45,8 +45,12 @@ func (ifw *IptablesFirewall) Status() (bool, error) {
 }
 
 func (ifw *IptablesFirewall) Start() error {
-	if ifw.iptables.SaftyCheck([]int{22}) {
-		return fmt.Errorf("iptables safety check failed - port 22 may be blocked")
+	panelPort, err := strconv.Atoi(global.CONF.Base.Port)
+	if err != nil {
+		return fmt.Errorf("invalid 1Panel port: %w", err)
+	}
+	if ifw.iptables.SaftyCheck([]int{22, panelPort}) {
+		return fmt.Errorf("iptables safety check failed - critical port may be blocked")
 	}
 
 	// Use unified chain setup method

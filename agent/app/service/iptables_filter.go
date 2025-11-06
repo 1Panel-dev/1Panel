@@ -507,6 +507,10 @@ func (s *IptablesFilterService) InitChains() error {
 		}
 	}
 
+	// 初始化 1PANEL_BASIC 规则（放行 22 端口等基础规则）
+	if err := s.iptablesClient.Init1PanelBasicChains(); err != nil {
+		return fmt.Errorf("failed to initialize %s chain: %w", client.Chain1PanelBasic, err)
+	}
 	return nil
 }
 

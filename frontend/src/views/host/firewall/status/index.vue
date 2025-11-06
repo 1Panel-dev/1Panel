@@ -20,13 +20,13 @@
                         <el-tag>{{ $t('app.version') }}: {{ baseInfo.version }}</el-tag>
                     </div>
                     <div class="mt-0.5">
+                        <el-button type="primary" v-if="baseInfo.isActive" @click="onOperate('stop')" link>
+                            {{ $t('commons.button.stop') }}
+                        </el-button>
+                        <el-button type="primary" v-if="!baseInfo.isActive" @click="onOperate('start')" link>
+                            {{ $t('commons.button.start') }}
+                        </el-button>
                         <template v-if="baseInfo.name !== 'iptables'">
-                            <el-button type="primary" v-if="baseInfo.isActive" @click="onOperate('stop')" link>
-                                {{ $t('commons.button.stop') }}
-                            </el-button>
-                            <el-button type="primary" v-if="!baseInfo.isActive" @click="onOperate('start')" link>
-                                {{ $t('commons.button.start') }}
-                            </el-button>
                             <el-divider direction="vertical" />
                             <el-button type="primary" @click="onOperate('restart')" link>
                                 {{ $t('commons.button.restart') }}
