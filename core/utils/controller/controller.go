@@ -3,6 +3,7 @@ package controller
 import (
 	"errors"
 	"fmt"
+	"os"
 	"os/exec"
 	"strings"
 
@@ -270,4 +271,45 @@ func GetServicePath(serviceName string) (string, error) {
 	default:
 		return "", fmt.Errorf("unsupported manager: %s", client.Name())
 	}
+}
+
+func SelectInitScript(keyword string) (string, error) {
+	client, err := New()
+	if err != nil {
+		return "", err
+	}
+	switch client.Name() {
+	case "systemd":
+		keyword = strings.TrimSuffix(keyword, ".service") + ".service"
+	case "openrc":
+		keyword = strings.TrimSuffix(keyword, ".service") + ".openrc"
+	case "sysvinit":
+		if _, err := os.Stat("/etc/rc.common"); err == nil {
+			keyword = strings.TrimSuffix(keyword, ".service") + ".prod"
+		} else {
+			keyword = strings.TrimSuffix(keyword, ".service") + ".init"
+		}
+	default:
+		return "", fmt.Errorf("unsupported manager: %s", client.Name())
+	}
+	return keyword, nil
+}
+
+func GetScriptName(keyword string) (string, error) {
+	client, err := New()
+	if err != nil {
+		return "", err
+	}
+	switch client.Name() {
+	case "systemd":
+		keyword = strings.TrimSuffix(keyword, ".service") + ".service"
+	case "openrc", "sysvinit":
+		lastDotIdx := strings.LastIndex(keyword, ".")
+		if lastDotIdx != -1 {
+			keyword = keyword[:lastDotIdx]
+		}
+	default:
+		return "", fmt.Errorf("unsupported manager: %s", client.Name())
+	}
+	return keyword, nil
 }
