@@ -286,6 +286,10 @@ func loadDbConn(snap *snapHelper, targetDir string, req dto.SnapshotCreate) erro
 func snapBaseData(snap snapHelper, targetDir string, withDockerConf bool) error {
 	snap.Task.Log("---------------------- 2 / 8 ----------------------")
 	snap.Task.LogStart(i18n.GetMsgByKey("SnapBaseInfo"))
+	svcScriptBakPath := path.Join(targetDir, "scriptbak")
+	if _, err := os.Stat(svcScriptBakPath); err != nil {
+		_ = os.MkdirAll(svcScriptBakPath, os.ModePerm)
+	}
 
 	if global.IsMaster {
 		err := snap.FileOp.CopyFile("/usr/local/bin/1panel-core", targetDir)
@@ -307,20 +311,27 @@ func snapBaseData(snap snapHelper, targetDir string, withDockerConf bool) error 
 	}
 
 	if global.IsMaster {
-		corepath, _ := controller.GetServicePath("1panel-core")
-		err = snap.FileOp.CopyFile(corepath, targetDir)
-		snap.Task.LogWithStatus(i18n.GetWithName("SnapCopy", corepath), err)
+		svcCorePath, _ := controller.GetServicePath("1panel-core")
+		err = snap.FileOp.CopyFile(svcCorePath, svcScriptBakPath)
+		snap.Task.LogWithStatus(i18n.GetWithName("SnapCopy", svcCorePath), err)
 		if err != nil {
 			return err
 		}
 	}
-	agentpath, _ := controller.GetServicePath("1panel-agent")
-	err = snap.FileOp.CopyFile(agentpath, targetDir)
-	snap.Task.LogWithStatus(i18n.GetWithName("SnapCopy", agentpath), err)
+	svcAgentName, _ := controller.GetServicePath("1panel-agent")
+	err = snap.FileOp.CopyFile(svcAgentName, svcScriptBakPath)
+	snap.Task.LogWithStatus(i18n.GetWithName("SnapCopy", svcAgentName), err)
 	if err != nil {
 		return err
 	}
-
+	initScriptPath := path.Join(global.Dir.ResourceDir, "initscript")
+	if _, err := os.Stat(initScriptPath); err == nil {
+		err = snap.FileOp.CopyDirWithNewName(initScriptPath, svcScriptBakPath, ".")
+		snap.Task.LogWithStatus(i18n.GetWithName("SnapCopy", initScriptPath), err)
+		if err != nil {
+			return err
+		}
+	}
 	if withDockerConf {
 		if snap.FileOp.Stat(constant.DaemonJsonPath) {
 			err = snap.FileOp.CopyFile(constant.DaemonJsonPath, targetDir)

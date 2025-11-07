@@ -34,6 +34,7 @@ func (u *SnapshotService) SnapshotRollback(req dto.SnapshotRecover) error {
 	go func() {
 		rootDir := fmt.Sprintf("%s/1panel_original/original_%s", global.Dir.BaseDir, snap.Name)
 		baseDir := path.Join(rootDir, "base")
+		svcScriptBakPath := path.Join(baseDir, "scriptbak")
 
 		FileOp := files.NewFileOp()
 		taskItem.AddSubTask(
@@ -61,17 +62,17 @@ func (u *SnapshotService) SnapshotRollback(req dto.SnapshotRecover) error {
 		)
 		if global.IsMaster {
 			taskItem.AddSubTask(
-				i18n.GetWithName("SnapCopy", "/etc/systemd/system/1panel-core.service"),
+				i18n.GetWithName("SnapCopy", path.Join(svcBasePath, svcCoreName)),
 				func(t *task.Task) error {
-					return FileOp.CopyFile(path.Join(baseDir, "1panel-core.service"), "/etc/systemd/system")
+					return FileOp.CopyFile(path.Join(svcScriptBakPath, svcCoreName), svcBasePath)
 				},
 				nil,
 			)
 		}
 		taskItem.AddSubTask(
-			i18n.GetWithName("SnapCopy", "/etc/systemd/system/1panel-agent.service"),
+			i18n.GetWithName("SnapCopy", path.Join(svcBasePath, svcAgentName)),
 			func(t *task.Task) error {
-				return FileOp.CopyFile(path.Join(baseDir, "1panel-agent.service"), "/etc/systemd/system")
+				return FileOp.CopyFile(path.Join(svcScriptBakPath, svcAgentName), svcBasePath)
 			},
 			nil,
 		)

@@ -22,6 +22,16 @@ import (
 	"github.com/pkg/errors"
 )
 
+var (
+	svcBasePath, _     = controller.GetServicePath("")
+	svcCoreName, _     = controller.LoadServiceName("1panel-core")
+	selCoreName, _     = controller.SelectInitScript("1panel-core")
+	scriptCoreName, _  = controller.GetScriptName("1panel-core")
+	svcAgentName, _    = controller.LoadServiceName("1panel-agent")
+	selAgentName, _    = controller.SelectInitScript("1panel-agent")
+	scriptAgentName, _ = controller.GetScriptName("1panel-agent")
+)
+
 type snapRecoverHelper struct {
 	FileOp files.FileOp
 	Task   *task.Task
@@ -259,7 +269,15 @@ func backupBeforeRecover(name string, itemHelper *snapRecoverHelper) error {
 	if _, err := os.Stat(baseDir); err != nil {
 		_ = os.MkdirAll(baseDir, os.ModePerm)
 	}
-
+	svcScriptBakPath := path.Join(baseDir, "scriptbak")
+	initScriptPath := path.Join(global.Dir.ResourceDir, "initscript")
+	if _, err := os.Stat(initScriptPath); err == nil {
+		err = itemHelper.FileOp.CopyDirWithNewName(initScriptPath, svcScriptBakPath, ".")
+		itemHelper.Task.LogWithStatus(i18n.GetWithName("SnapCopy", initScriptPath), err)
+		if err != nil {
+			return err
+		}
+	}
 	err := itemHelper.FileOp.CopyDirWithExclude(global.Dir.DataDir, rootDir, []string{"cache", "tmp"})
 	itemHelper.Task.LogWithStatus(i18n.GetWithName("SnapCopy", global.Dir.DataDir), err)
 	if err != nil {
@@ -294,8 +312,9 @@ func backupBeforeRecover(name string, itemHelper *snapRecoverHelper) error {
 		if err != nil {
 			return err
 		}
-		err = itemHelper.FileOp.CopyFile("/etc/systemd/system/1panel-core.service", baseDir)
-		itemHelper.Task.LogWithStatus(i18n.GetWithName("SnapCopy", "/etc/systemd/system/1panel-core.service"), err)
+		svcCorePath, _ := controller.GetServicePath("1panel-core")
+		err = itemHelper.FileOp.CopyFile(svcCorePath, svcScriptBakPath)
+		itemHelper.Task.LogWithStatus(i18n.GetWithName("SnapCopy", svcCorePath), err)
 		if err != nil {
 			return err
 		}
@@ -305,8 +324,9 @@ func backupBeforeRecover(name string, itemHelper *snapRecoverHelper) error {
 	if err != nil {
 		return err
 	}
-	err = itemHelper.FileOp.CopyFile("/etc/systemd/system/1panel-agent.service", baseDir)
-	itemHelper.Task.LogWithStatus(i18n.GetWithName("SnapCopy", "/etc/systemd/system/1panel-agent.service"), err)
+	svcAgentPath, _ := controller.GetServicePath("1panel-agent")
+	err = itemHelper.FileOp.CopyFile(svcAgentPath, svcScriptBakPath)
+	itemHelper.Task.LogWithStatus(i18n.GetWithName("SnapCopy", svcAgentPath), err)
 	if err != nil {
 		return err
 	}
@@ -363,7 +383,7 @@ func recoverAppData(src string, itemHelper *snapRecoverHelper) error {
 func recoverBaseData(src string, itemHelper *snapRecoverHelper) error {
 	itemHelper.Task.Log("---------------------- 6 / 11 ----------------------")
 	itemHelper.Task.LogStart(i18n.GetMsgByKey("SnapBaseInfo"))
-
+	svcScriptBakPath := path.Join(src, "scriptbak")
 	if global.IsMaster {
 		err := itemHelper.FileOp.CopyFile(path.Join(src, "1pctl"), "/usr/local/bin")
 		itemHelper.Task.LogWithStatus(i18n.GetWithName("SnapCopy", "/usr/local/bin/1pctl"), err)
@@ -375,10 +395,15 @@ func recoverBaseData(src string, itemHelper *snapRecoverHelper) error {
 		if err != nil {
 			return err
 		}
-		err = itemHelper.FileOp.CopyFile(path.Join(src, "1panel-core.service"), "/etc/systemd/system")
-		itemHelper.Task.LogWithStatus(i18n.GetWithName("SnapCopy", "/etc/systemd/system/1panel-core.service"), err)
+		svcCoreName, _ := controller.LoadServiceName("1panel-core")
+		err = itemHelper.FileOp.CopyFile(path.Join(svcScriptBakPath, svcCoreName), svcBasePath)
+		itemHelper.Task.LogWithStatus(i18n.GetWithName("SnapCopy", path.Join(svcBasePath, svcCoreName)), err)
 		if err != nil {
-			return err
+			err = itemHelper.FileOp.CopyFile(path.Join(svcScriptBakPath, selCoreName), path.Join(svcBasePath, scriptCoreName))
+			itemHelper.Task.LogWithStatus(i18n.GetWithName("SnapCopy", path.Join(svcBasePath, scriptCoreName)), err)
+			if err != nil {
+				return err
+			}
 		}
 	}
 	err := itemHelper.FileOp.CopyFile(path.Join(src, "1panel-agent"), "/usr/local/bin")
@@ -386,10 +411,15 @@ func recoverBaseData(src string, itemHelper *snapRecoverHelper) error {
 	if err != nil {
 		return err
 	}
-	err = itemHelper.FileOp.CopyFile(path.Join(src, "1panel-agent.service"), "/etc/systemd/system")
-	itemHelper.Task.LogWithStatus(i18n.GetWithName("SnapCopy", "/etc/systemd/system/1panel-agent.service"), err)
+	svcAgentName, _ := controller.LoadServiceName("1panel-agent")
+	err = itemHelper.FileOp.CopyFile(path.Join(svcScriptBakPath, svcAgentName), svcBasePath)
+	itemHelper.Task.LogWithStatus(i18n.GetWithName("SnapCopy", path.Join(svcBasePath, svcAgentName)), err)
 	if err != nil {
-		return err
+		err = itemHelper.FileOp.CopyFile(path.Join(svcScriptBakPath, selAgentName), path.Join(svcBasePath, scriptAgentName))
+		itemHelper.Task.LogWithStatus(i18n.GetWithName("SnapCopy", path.Join(svcBasePath, scriptAgentName)), err)
+		if err != nil {
+			return err
+		}
 	}
 
 	if !itemHelper.FileOp.Stat(path.Join(src, "daemon.json")) {
