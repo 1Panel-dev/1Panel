@@ -3076,6 +3076,7 @@ const message = {
             'Aviso: Tu licencia Pro expirará en {0} días y todas las funciones Pro dejarán de estar disponibles. Renueva pronto para asegurar el uso continuo.',
         menu: 'Pro',
         upage: 'Constructor Web con IA',
+        proAlert: 'Actualiza a Pro para usar esta función',
         app: {
             app: 'APP',
             title: 'Alias del Panel',
