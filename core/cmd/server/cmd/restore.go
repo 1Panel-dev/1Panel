@@ -72,11 +72,23 @@ var restoreCmd = &cobra.Command{
 		_, _ = cmdUtils.RunDefaultWithStdoutBashCf("mkdir %s && cp %s %s/", geoPath, path.Join(tmpPath, "GeoIP.mmdb"), geoPath)
 
 		fmt.Println(i18n.GetMsgByKeyForCmd("RestoreStep3"))
-		if err := files.CopyItem(false, true, path.Join(tmpPath, "1panel-core.service"), "/etc/systemd/system"); err != nil {
-			return err
+		svcBasePath, _ := controller.GetServicePath("")
+		svcCoreName, _ := controller.LoadServiceName("1panel-core")
+		selCoreName, _ := controller.SelectInitScript("1panel-core")
+		scriptCoreName, _ := controller.GetScriptName("1panel-core")
+		svcAgentName, _ := controller.LoadServiceName("1panel-agent")
+		selAgentName, _ := controller.SelectInitScript("1panel-agent")
+		scriptAgentName, _ := controller.GetScriptName("1panel-agent")
+		svcScriptBakPath := path.Join(tmpPath, "scriptbak")
+		if err := files.CopyItem(false, true, path.Join(svcScriptBakPath, svcCoreName), svcBasePath); err != nil {
+			if err := files.CopyItem(false, true, path.Join(svcScriptBakPath, selCoreName), path.Join(svcBasePath, scriptCoreName)); err != nil {
+				return err
+			}
 		}
-		if err := files.CopyItem(false, true, path.Join(tmpPath, "1panel-agent.service"), "/etc/systemd/system"); err != nil {
-			return err
+		if err := files.CopyItem(false, true, path.Join(svcScriptBakPath, svcAgentName), svcBasePath); err != nil {
+			if err := files.CopyItem(false, true, path.Join(svcScriptBakPath, selAgentName), path.Join(svcBasePath, scriptAgentName)); err != nil {
+				return err
+			}
 		}
 		fmt.Println(i18n.GetMsgByKeyForCmd("RestoreStep4"))
 		if _, err := os.Stat(path.Join(tmpPath, "db")); err == nil {
