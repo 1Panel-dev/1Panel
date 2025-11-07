@@ -263,47 +263,4 @@ export namespace Host {
         path: string;
         error: string;
     }
-
-    // Iptables Filter
-    export interface IptablesFilterRuleSearch {
-        chains?: string[];
-    }
-
-    export interface IptablesChainInfo {
-        version: string;
-        name: string;
-        defaultPolicy: string;
-        rules: IptablesFilterRuleInfo[];
-        isApplied: boolean;
-    }
-
-    export interface IptablesFilterRuleInfo {
-        id: number;
-        protocol: string;
-        sourceIP: string;
-        sourcePort: number;
-        destIP: string;
-        destPort: number;
-        action: string;
-        comment: string;
-        description: string;
-        ruleOrder: number;
-    }
-
-    export interface IptablesFilterRuleOperate {
-        operation: string;
-        id?: number;
-        chain: string;
-        protocol: string;
-        sourceIP?: string;
-        sourcePort?: number;
-        destIP?: string;
-        destPort?: number;
-        action: string;
-        description?: string;
-    }
-
-    export interface IptablesFilterApply {
-        operation: string;
-    }
 }

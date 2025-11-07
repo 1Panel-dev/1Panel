@@ -48,7 +48,6 @@ func InitAgentDB() {
 		migrations.UpdateWebsiteSSLAddColumn,
 		migrations.AddTensorRTLLMModel,
 		migrations.UpdateMonitorInterval,
-		migrations.AddIptablesFilterRuleTable,
 		migrations.AddMonitorProcess,
 	})
 	if err := m.Migrate(); err != nil {

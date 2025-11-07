@@ -53,7 +53,7 @@
 
 <script lang="ts" setup>
 import { Host } from '@/api/interface/host';
-import { loadFireBaseInfo, operateFire, getFilterRules } from '@/api/modules/host';
+import { loadFireBaseInfo, operateFire } from '@/api/modules/host';
 import i18n from '@/lang';
 import NoSuchService from '@/components/layout-content/no-such-service.vue';
 import DockerRestart from '@/components/docker-proxy/docker-restart.vue';
@@ -61,22 +61,12 @@ import { MsgSuccess } from '@/utils/message';
 import { ElMessageBox } from 'element-plus';
 import { ref } from 'vue';
 
-defineProps({
-    showAdvancedControls: {
-        type: Boolean,
-        default: false,
-    },
-});
-
 const baseInfo = ref<Host.FirewallBase>({ isActive: false, isExist: true, name: '', version: '', pingStatus: '' });
 const onPing = ref('Disable');
 const oldStatus = ref();
 const dockerRef = ref();
 const operation = ref('restart');
 const withDockerRestart = ref(false);
-
-// Iptables specific state
-const chainInfoMap = ref<Map<string, Host.IptablesChainInfo>>(new Map());
 
 const acceptParams = (): void => {
     loadBaseInfo(true);
@@ -92,13 +82,6 @@ const loadBaseInfo = async (search: boolean) => {
             emit('update:name', baseInfo.value.name);
             emit('update:is-active', baseInfo.value.isActive);
 
-            // Load iptables chain info if firewall is iptables
-            if (baseInfo.value.name === 'iptables' && baseInfo.value.isActive) {
-                await loadIptablesChainInfo();
-            } else {
-                chainInfoMap.value.clear();
-            }
-
             if (search) {
                 emit('search');
             } else {
@@ -109,22 +92,6 @@ const loadBaseInfo = async (search: boolean) => {
             emit('update:loading', false);
             emit('update:maskShow', true);
             emit('update:name', '-');
-        });
-};
-
-const loadIptablesChainInfo = async () => {
-    const params: Host.IptablesFilterRuleSearch = {
-        chains: ['INPUT', 'OUTPUT', '1PANEL_INPUT', '1PANEL_OUTPUT'],
-    };
-    await getFilterRules(params)
-        .then((res) => {
-            chainInfoMap.value.clear();
-            res.data.forEach((chainInfo: Host.IptablesChainInfo) => {
-                chainInfoMap.value.set(chainInfo.name, chainInfo);
-            });
-        })
-        .catch(() => {
-            chainInfoMap.value.clear();
         });
 };
 

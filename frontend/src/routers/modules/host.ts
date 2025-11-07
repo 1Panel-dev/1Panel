@@ -81,18 +81,6 @@ const hostRouter = {
             },
         },
         {
-            path: '/hosts/firewall/filter',
-            name: 'FirewallFilter',
-            component: () => import('@/views/host/firewall/filter/index.vue'),
-            hidden: true,
-            meta: {
-                activeMenu: '/hosts/firewall/port',
-                parent: 'menu.firewall',
-                title: 'firewall.advancedControl',
-                requiresAuth: false,
-            },
-        },
-        {
             path: '/hosts/disk',
             name: 'Disk',
             props: true,

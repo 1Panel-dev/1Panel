@@ -23,9 +23,5 @@ const buttons = [
         label: i18n.global.t('firewall.ipRule', 2),
         path: '/hosts/firewall/ip',
     },
-    {
-        label: i18n.global.t('firewall.advancedControl'),
-        path: '/hosts/firewall/filter',
-    },
 ];
 </script>

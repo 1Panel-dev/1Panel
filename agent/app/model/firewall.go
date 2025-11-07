@@ -21,21 +21,6 @@ type Forward struct {
 	Interface  string `json:"interface"`
 }
 
-type IptablesFilterRule struct {
-	BaseModel
-
-	Chain       string `gorm:"not null;index:idx_chain" json:"chain"`
-	Protocol    string `json:"protocol"`
-	SourceIP    string `json:"sourceIP"`
-	SourcePort  uint16 `json:"sourcePort"`
-	DestIP      string `json:"destIP"`
-	DestPort    uint16 `json:"destPort"`
-	Action      string `gorm:"not null" json:"action"`
-	Comment     string `json:"comment"`
-	Description string `json:"description"`
-	RuleOrder   int    `gorm:"default:0;index:idx_chain_order" json:"ruleOrder"`
-}
-
 type IptablesRule struct {
 	BaseModel
 
