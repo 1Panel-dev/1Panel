@@ -32,6 +32,7 @@ ErrGroupIsInUse: "그룹이 사용 중이므로 삭제할 수 없습니다."
 ErrLocalDelete: "로컬 노드는 삭제할 수 없습니다!"
 ErrPortInUsed: "{{ .name }} 포트가 이미 사용 중입니다!"
 ErrInternalServerKey: "서버 내부 오류:"
+MasterNode: "마스터 노드"
 
 # app
 CustomAppStoreFileValid: "앱 스토어 패키지는 .tar.gz 형식이어야 합니다"
