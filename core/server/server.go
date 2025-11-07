@@ -5,6 +5,7 @@ import (
 	"encoding/gob"
 	"fmt"
 	"github.com/1Panel-dev/1Panel/core/init/proxy"
+	"github.com/gin-gonic/gin"
 	"net"
 	"net/http"
 	"os"
@@ -26,8 +27,6 @@ import (
 	"github.com/1Panel-dev/1Panel/core/init/session/psession"
 	"github.com/1Panel-dev/1Panel/core/init/validator"
 	"github.com/1Panel-dev/1Panel/core/init/viper"
-
-	"github.com/gin-gonic/gin"
 )
 
 func Start() {
@@ -41,7 +40,6 @@ func Start() {
 	gob.Register(psession.SessionUser{})
 	cron.Init()
 	session.Init()
-	gin.SetMode("debug")
 	hook.Init()
 	InitOthers()
 
@@ -49,6 +47,12 @@ func Start() {
 	proxy.Init()
 
 	rootRouter := router.Routers()
+
+	if global.CONF.Base.Mode != "stable" {
+		gin.SetMode(gin.DebugMode)
+	} else {
+		gin.SetMode(gin.ReleaseMode)
+	}
 
 	tcpItem := "tcp4"
 	if global.CONF.Conn.Ipv6 == constant.StatusEnable {
