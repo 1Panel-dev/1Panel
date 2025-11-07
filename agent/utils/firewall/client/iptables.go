@@ -33,6 +33,15 @@ const (
 	NatTab    = "nat"
 )
 
+const (
+	establishedRule        = "-m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT -m comment --comment \"ESTABLISHED Whitelist\""
+	ioRuleIn               = "-i lo -j ACCEPT -m comment --comment \"Loopback Whitelist\""
+	ioRuleOut              = "-o lo -j ACCEPT -m comment --comment \"Loopback Whitelist\""
+	establishedRuleComment = "ESTABLISHED Whitelist"
+	ioRuleInComment        = "Loopback Whitelist"
+	ioRuleOutComment       = "Loopback Whitelist"
+)
+
 const NatChain = "1PANEL"
 
 var (
@@ -65,6 +74,23 @@ func (iptables *Iptables) run(tab, rule string) error {
 		return err
 	}
 	return nil
+}
+
+// CheckRuleExists uses iptables -C to check if a rule exists in the specified chain
+// Parameters:
+//   - tab: table name (filter, nat, etc.)
+//   - chain: chain name
+//   - ruleSpec: rule specification without -A/-D prefix (e.g., "-p tcp --dport 80 -j ACCEPT")
+//
+// Returns true if the rule exists, false otherwise
+func (iptables *Iptables) CheckRuleExists(tab, chain, ruleSpec string) bool {
+	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(10 * time.Second))
+	checkCmd := fmt.Sprintf("%s iptables -t %s -C %s %s", iptables.CmdStr, tab, chain, ruleSpec)
+	std, err := cmdMgr.RunWithStdoutBashCf(checkCmd)
+
+	global.LOG.Debugf("CheckRuleExists command: %s, output: %s, error: %v", checkCmd, std, err)
+	// iptables -C returns exit code 0 if rule exists, 1 if not
+	return err == nil
 }
 
 func (iptables *Iptables) Check() error {
@@ -400,17 +426,12 @@ func (iptables *Iptables) FindRuleNum(chain, matchStr string) (int, error) {
 }
 
 // ChainExists 检查链是否存在
+// 使用 iptables -L <chain> 直接查询链，避免列出所有规则后 grep
 func (iptables *Iptables) ChainExists(tab, chain string) (bool, error) {
-	// iptables -t filter -S | grep 'N 1PANEL'
-	stdout, err := iptables.out(tab, fmt.Sprintf("-S | grep -w 'N %s'", chain))
-	// grep 未找到会返回错误，这是正常情况
-	if err != nil && strings.TrimSpace(stdout) == "" {
-		return false, nil
-	}
-	if strings.TrimSpace(stdout) == "" {
-		return false, nil
-	}
-	return true, nil
+	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(10 * time.Second))
+	_, err := cmdMgr.RunWithStdoutBashCf("%s iptables -t %s -L %s -n", iptables.CmdStr, tab, chain)
+	// iptables -L <chain> 如果链存在返回 0，不存在返回错误
+	return err == nil, nil
 }
 
 // ensureChain creates a chain if it doesn't exist
@@ -429,7 +450,8 @@ func (iptables *Iptables) ensureChain(tab, chain string) error {
 
 // ensureJumpRule adds a jump rule to targetChain at specified position if it doesn't exist
 func (iptables *Iptables) ensureJumpRule(chain, targetChain string, position int) error {
-	if !iptables.CheckPolicyExists(chain, fmt.Sprintf("-j %s", targetChain)) {
+	ruleSpec := fmt.Sprintf("-j %s", targetChain)
+	if !iptables.CheckRuleExists(FilterTab, chain, ruleSpec) {
 		return iptables.run(FilterTab, fmt.Sprintf("-I %s %d -j %s", chain, position, targetChain))
 	}
 	return nil
@@ -485,34 +507,13 @@ func (iptables *Iptables) DeletePolicy(chain string, policy IptablesPolicy) erro
 	return iptables.run(FilterTab, iptablesArg)
 }
 
-// CheckPolicyExists 检查策略是否存在
-func (iptables *Iptables) CheckPolicyExists(chain string, policyStr string) bool {
-	line, err := iptables.FindRuleNum(chain, policyStr)
-	if err != nil {
-		return false
-	}
-	if line > 0 {
-		return true
-	}
-	return false
-}
-
-const (
-	establishedRule        = "-m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT -m comment --comment \"ESTABLISHED Whitelist\""
-	ioRuleIn               = "-i lo -j ACCEPT -m comment --comment \"Loopback Whitelist\""
-	ioRuleOut              = "-o lo -j ACCEPT -m comment --comment \"Loopback Whitelist\""
-	establishedRuleComment = "ESTABLISHED Whitelist"
-	ioRuleInComment        = "Loopback Whitelist"
-	ioRuleOutComment       = "Loopback Whitelist"
-)
-
-func (iptables *Iptables) setupEstablishedRules(direction string) {
+func (iptables *Iptables) setupSystemWhiteListRules(direction string) {
 	if direction == "input" {
-		if !iptables.CheckPolicyExists("INPUT", ioRuleInComment) {
+		if !iptables.CheckRuleExists(FilterTab, "INPUT", ioRuleIn) {
 			iptables.run(FilterTab, fmt.Sprintf("-I INPUT 1 %s", ioRuleIn))
 		}
 
-		if !iptables.CheckPolicyExists("INPUT", establishedRuleComment) {
+		if !iptables.CheckRuleExists(FilterTab, "INPUT", establishedRule) {
 			iptables.run(FilterTab, fmt.Sprintf("-I INPUT 2 %s", establishedRule))
 		}
 
@@ -521,20 +522,19 @@ func (iptables *Iptables) setupEstablishedRules(direction string) {
 	}
 
 	if direction == "output" {
-		if !iptables.CheckPolicyExists("OUTPUT", ioRuleOutComment) {
+		if !iptables.CheckRuleExists(FilterTab, "OUTPUT", ioRuleOut) {
 			iptables.run(FilterTab, fmt.Sprintf("-I OUTPUT 1 %s", ioRuleOut))
 		}
-		if !iptables.CheckPolicyExists("OUTPUT", establishedRuleComment) {
+		if !iptables.CheckRuleExists(FilterTab, "OUTPUT", establishedRule) {
 			iptables.run(FilterTab, fmt.Sprintf("-I OUTPUT 2 %s", establishedRule))
 		}
 	}
 }
 
 func (iptables *Iptables) Setup1PanelFirewallChains(direction string) error {
-	iptables.setupEstablishedRules(direction)
+	iptables.setupSystemWhiteListRules(direction)
 
 	if direction == "input" {
-		// Ensure custom chains exist
 		if err := iptables.ensureChain(FilterTab, Chain1PanelInput); err != nil {
 			return err
 		}
@@ -550,7 +550,6 @@ func (iptables *Iptables) Setup1PanelFirewallChains(direction string) error {
 			return err
 		}
 	} else if direction == "output" {
-		// Ensure custom chain exists
 		if err := iptables.ensureChain(FilterTab, Chain1PanelOutput); err != nil {
 			return err
 		}

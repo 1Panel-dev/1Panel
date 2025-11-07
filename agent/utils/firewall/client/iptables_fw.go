@@ -54,6 +54,12 @@ func (ifw *IptablesFirewall) Start() error {
 		return fmt.Errorf("failed to setup 1Panel firewall chains for output: %w", err)
 	}
 
+	// Load persisted rules from file (complete override strategy)
+	if err := ifw.iptables.LoadRulesFromFile(); err != nil {
+		global.LOG.Errorf("Failed to load persisted firewall rules: %v", err)
+		// Don't fail the start operation if rules can't be loaded
+	}
+
 	global.LOG.Infof("1Panel firewall chains setup completed")
 	return nil
 }
@@ -230,18 +236,51 @@ func (ifw *IptablesFirewall) Port(port FireInfo, operation string) error {
 		action = "DROP"
 	}
 
-	opFlag := "-A"
-	if operation == "remove" {
-		opFlag = "-D"
-	}
-
-	args := []string{fmt.Sprintf("%s %s", opFlag, Chain1PanelBasic), fmt.Sprintf("-p %s", protocol)}
+	// Build rule specification (without -A/-D prefix) for checking
+	ruleArgs := []string{fmt.Sprintf("-p %s", protocol)}
 	if protocol == "tcp" || protocol == "udp" {
-		args = append(args, fmt.Sprintf("-m %s", protocol))
+		ruleArgs = append(ruleArgs, fmt.Sprintf("-m %s", protocol))
 	}
-	args = append(args, fmt.Sprintf("--dport %s", portSpec), fmt.Sprintf("-j %s", action))
+	ruleArgs = append(ruleArgs, fmt.Sprintf("--dport %s", portSpec), fmt.Sprintf("-j %s", action))
 
-	return ifw.iptables.run(FilterTab, strings.Join(args, " "))
+	if port.Description != "" {
+		ruleArgs = append(ruleArgs, fmt.Sprintf("-m comment --comment \"%s\"", port.Description))
+	}
+
+	ruleSpec := strings.Join(ruleArgs, " ")
+
+	// Check if rule exists using iptables -C
+	ruleExists := ifw.iptables.CheckRuleExists(FilterTab, Chain1PanelBasic, ruleSpec)
+
+	if operation == "add" {
+		if ruleExists {
+			// Rule already exists, silently skip (not an error)
+			global.LOG.Debugf("Port rule already exists, skipping: %s %s", Chain1PanelBasic, ruleSpec)
+			return nil
+		}
+		// Add the rule
+		if err := ifw.iptables.run(FilterTab, fmt.Sprintf("-A %s %s", Chain1PanelBasic, ruleSpec)); err != nil {
+			return err
+		}
+	} else {
+		// operation == "remove"
+		if !ruleExists {
+			// Rule doesn't exist, silently skip (not an error)
+			global.LOG.Debugf("Port rule does not exist, skipping removal: %s %s", Chain1PanelBasic, ruleSpec)
+			return nil
+		}
+		// Remove the rule
+		if err := ifw.iptables.run(FilterTab, fmt.Sprintf("-D %s %s", Chain1PanelBasic, ruleSpec)); err != nil {
+			return err
+		}
+	}
+
+	// Auto-save rules after modification
+	if err := ifw.iptables.SaveRulesToFile(); err != nil {
+		global.LOG.Warnf("Failed to save firewall rules to file: %v", err)
+	}
+
+	return nil
 }
 
 func (ifw *IptablesFirewall) RichRules(rule FireInfo, operation string) error {
@@ -259,15 +298,10 @@ func (ifw *IptablesFirewall) RichRules(rule FireInfo, operation string) error {
 		action = "DROP"
 	}
 
-	var ruleStr string
-	opFlag := "-A"
-	if operation == "remove" {
-		opFlag = "-D"
-	}
-
-	args := []string{fmt.Sprintf("%s %s", opFlag, Chain1PanelBasic)}
+	// Build rule specification (without -A/-D prefix) for checking
+	var ruleArgs []string
 	if address != "" {
-		args = append(args, fmt.Sprintf("-s %s", address))
+		ruleArgs = append(ruleArgs, fmt.Sprintf("-s %s", address))
 	}
 
 	protocol := strings.TrimSpace(rule.Protocol)
@@ -276,7 +310,7 @@ func (ifw *IptablesFirewall) RichRules(rule FireInfo, operation string) error {
 	}
 
 	if protocol != "" {
-		args = append(args, fmt.Sprintf("-p %s", protocol))
+		ruleArgs = append(ruleArgs, fmt.Sprintf("-p %s", protocol))
 	}
 
 	if rule.Port != "" {
@@ -288,14 +322,46 @@ func (ifw *IptablesFirewall) RichRules(rule FireInfo, operation string) error {
 			return fmt.Errorf("protocol is required when specifying a port")
 		}
 		if protocol == "tcp" || protocol == "udp" {
-			args = append(args, fmt.Sprintf("-m %s", protocol))
+			ruleArgs = append(ruleArgs, fmt.Sprintf("-m %s", protocol))
 		}
-		args = append(args, fmt.Sprintf("--dport %s", portSegment))
+		ruleArgs = append(ruleArgs, fmt.Sprintf("--dport %s", portSegment))
 	}
 
-	args = append(args, fmt.Sprintf("-j %s", action))
-	ruleStr = strings.Join(args, " ")
-	return ifw.iptables.run(FilterTab, ruleStr)
+	ruleArgs = append(ruleArgs, fmt.Sprintf("-j %s", action))
+	ruleSpec := strings.Join(ruleArgs, " ")
+
+	// Check if rule exists using iptables -C
+	ruleExists := ifw.iptables.CheckRuleExists(FilterTab, Chain1PanelBasic, ruleSpec)
+
+	if operation == "add" {
+		if ruleExists {
+			// Rule already exists, silently skip (not an error)
+			global.LOG.Debugf("Rich rule already exists, skipping: %s %s", Chain1PanelBasic, ruleSpec)
+			return nil
+		}
+		// Add the rule
+		if err := ifw.iptables.run(FilterTab, fmt.Sprintf("-A %s %s", Chain1PanelBasic, ruleSpec)); err != nil {
+			return err
+		}
+	} else {
+		// operation == "remove"
+		if !ruleExists {
+			// Rule doesn't exist, silently skip (not an error)
+			global.LOG.Debugf("Rich rule does not exist, skipping removal: %s %s", Chain1PanelBasic, ruleSpec)
+			return nil
+		}
+		// Remove the rule
+		if err := ifw.iptables.run(FilterTab, fmt.Sprintf("-D %s %s", Chain1PanelBasic, ruleSpec)); err != nil {
+			return err
+		}
+	}
+
+	// Auto-save rules after modification
+	if err := ifw.iptables.SaveRulesToFile(); err != nil {
+		global.LOG.Warnf("Failed to save firewall rules to file: %v", err)
+	}
+
+	return nil
 }
 
 func (ifw *IptablesFirewall) PortForward(info Forward, operation string) error {
