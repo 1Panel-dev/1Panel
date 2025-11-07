@@ -20,14 +20,3 @@ type Forward struct {
 	TargetPort string `gorm:"not null" json:"targetPort"`
 	Interface  string `json:"interface"`
 }
-
-type IptablesRule struct {
-	BaseModel
-
-	RuleType string `gorm:"not null" json:"ruleType"` // port, address
-	Protocol string `json:"protocol"`
-	Port     string `json:"port"`
-	Strategy string `gorm:"not null" json:"strategy"` // accept, drop, reject
-	Address  string `json:"address"`
-	Family   string `json:"family"` // ipv4, ipv6
-}

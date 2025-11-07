@@ -2755,9 +2755,6 @@ const message = {
         changeStrategyHelper:
             '[{1}] {0} 전략을 [{2}]로 변경합니다. 설정 후 {0}은(는) {2}로 외부 접근을 허용합니다. 계속하시겠습니까?',
         portHelper: '여러 포트를 입력할 수 있습니다. 예: 80, 81 또는 포트 범위, 예: 80-88',
-        allPorts: '모든 포트',
-        ruleTemplate: '규칙 템플릿',
-
         strategy: '전략',
         accept: '허용',
         drop: '차단',
@@ -2778,8 +2775,6 @@ const message = {
         createIpRule: '@:commons.button.create @:firewall.ipRule',
         userAgent: 'User-Agent 필터',
         sourcePort: '소스 포트',
-        inboundDirection: '인바운드',
-        outboundDirection: '아웃바운드',
         targetIP: '대상 IP',
         targetPort: '대상 포트',
         forwardHelper1: "로컬 포트로 전달하려면, 대상 IP 를 '127.0.0.1'로 설정해야 합니다.",

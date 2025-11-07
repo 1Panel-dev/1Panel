@@ -2868,9 +2868,6 @@ const message = {
         changeStrategyHelper:
             'Изменить стратегию {0} [{1}] на [{2}]. После установки {0} будет иметь внешний доступ {2}. Хотите продолжить?',
         portHelper: 'Можно ввести несколько портов, например 80,81, или диапазон портов, например 80-88',
-        allPorts: 'Все порты',
-        ruleTemplate: 'Шаблон правила',
-
         strategy: 'Стратегия',
         accept: 'Принять',
         drop: 'Отбросить',
@@ -2891,8 +2888,6 @@ const message = {
         createIpRule: '@:commons.button.create @:firewall.ipRule',
         userAgent: 'Фильтр User-Agent',
         sourcePort: 'Исходный порт',
-        inboundDirection: 'Входящий',
-        outboundDirection: 'Исходящий',
         targetIP: 'Целевой IP',
         targetPort: 'Целевой порт',
         forwardHelper1:
