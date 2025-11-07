@@ -208,7 +208,9 @@ const composeDiffRef = ref();
 const rawCompose = ref('');
 
 const getNewCompose = (compose: string) => {
-    paramModel.dockerCompose = compose;
+    if (compose != '') {
+        paramModel.dockerCompose = compose;
+    }
 };
 
 const openDiff = () => {

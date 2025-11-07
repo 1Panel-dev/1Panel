@@ -243,7 +243,7 @@ func (u *CronjobService) handleCleanLog(cronjob model.Cronjob, taskItem *task.Ta
 				}
 				appInstall, _ := getAppInstallByKey(constant.AppOpenresty)
 				if appInstall.ID > 0 {
-					curStr := i18n.GetWithName("CleanLogByName", "Openresty")
+					curStr := i18n.GetWithName("CleanLogByName", "OpenResty")
 					t.LogStart(curStr)
 					accessLogPath := path.Join(appInstall.GetPath(), "log", "access.log")
 					if err := os.Truncate(accessLogPath, 0); err != nil {
