@@ -32,6 +32,7 @@ ErrGroupIsInUse: "El grupo está en uso y no se puede eliminar."
 ErrLocalDelete: "¡No se puede eliminar el nodo local!"
 ErrPortInUsed: "¡El puerto {{ .name }} ya está en uso!"
 ErrInternalServerKey: "Error interno del servidor:"
+MasterNode: "Nodo Maestro"
 
 # app
 CustomAppStoreFileValid: "El paquete de la tienda de aplicaciones debe tener formato .tar.gz"

@@ -105,6 +105,7 @@ html.dark {
     --el-menu-text-color: var(--panel-main-bg-color-2);
     --el-fill-color-blank: var(--panel-main-bg-color-10);
     --el-fill-color-light: var(--panel-main-bg-color-10);
+    --el-fill-color-lighter: var(--panel-main-bg-color-9);
     --el-border-color: var(--panel-main-bg-color-8);
     --el-border-color-light: var(--panel-main-bg-color-8);
     --el-border-color-lighter: var(--panel-main-bg-color-8);
@@ -120,7 +121,6 @@ html.dark {
     --el-bg-color-overlay: var(--panel-main-bg-color-9);
     --el-dialog-bg-color: var(--panel-main-bg-color-9);
     --panel-code-header-footer-color: var(--panel-main-bg-color-12);
-
 
     --el-text-color-placeholder: var(--panel-main-bg-color-4);
 
@@ -417,6 +417,7 @@ html.dark {
         --el-table-bg-color: var(--el-bg-color);
         --el-table-tr-bg-color: var(--el-bg-color);
         --el-table-header-bg-color: var(--el-bg-color);
+        --el-table-row-hover-bg-color: var(--panel-main-bg-color-8);
         --el-table-border: 1px solid var(--panel-main-bg-color-8);
         --el-table-border-color: var(--panel-main-bg-color-8);
     }

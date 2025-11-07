@@ -32,6 +32,7 @@ ErrGroupIsInUse: "O grupo está em uso e não pode ser excluído."
 ErrLocalDelete: "O nó local não pode ser excluído!"
 ErrPortInUsed: "A porta {{ .name }} já está em uso!"
 ErrInternalServerKey: "Erro interno do servidor:"
+MasterNode: "Nó Mestre"
 
 # app
 CustomAppStoreFileValid: "O pacote da loja de aplicativos deve estar no formato .tar.gz"

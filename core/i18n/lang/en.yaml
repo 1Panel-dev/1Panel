@@ -32,6 +32,7 @@ ErrGroupIsInUse: "The group is in use and cannot be deleted."
 ErrLocalDelete: "Cannot delete the local node!"
 ErrPortInUsed: "The {{ .name }} port is already in use!"
 ErrInternalServerKey: "Internal server error:"
+MasterNode: "Master Node"
 
 # app
 CustomAppStoreFileValid: "Application store package requires .tar.gz format"

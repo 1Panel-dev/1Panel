@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"net"
 	"net/http"
 	"os"
@@ -26,7 +27,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/init/validator"
 	"github.com/1Panel-dev/1Panel/agent/init/viper"
 	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
-	"github.com/gin-gonic/gin"
 )
 
 func Start() {
@@ -40,7 +40,6 @@ func Start() {
 	app.Init()
 	lang.Init()
 	validator.Init()
-	gin.SetMode("debug")
 	cron.Run()
 	hook.Init()
 	InitOthers()
@@ -49,6 +48,12 @@ func Start() {
 
 	server := &http.Server{
 		Handler: rootRouter,
+	}
+
+	if global.CONF.Base.Mode != "stable" {
+		gin.SetMode(gin.DebugMode)
+	} else {
+		gin.SetMode(gin.ReleaseMode)
 	}
 
 	if global.IsMaster {

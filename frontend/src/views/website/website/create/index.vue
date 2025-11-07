@@ -591,9 +591,7 @@ const changeType = (type: string) => {
     switch (type) {
         case 'deployment':
             website.value.appType = 'installed';
-            if (appInstalls.value && appInstalls.value.length > 0 && appInstalls.value[0].status === 'Running') {
-                website.value.appInstallId = appInstalls.value[0].id;
-            }
+            searchAppInstalled('website');
             break;
         case 'runtime':
             getRuntimes();
@@ -715,11 +713,10 @@ const acceptParams = async () => {
     website.value.type = websiteType;
     const dirRes = await getPathByType('websiteDir');
     staticPath.value = dirRes.data + '/sites/';
+    changeType(websiteType);
 
     runtimeResource.value = 'appstore';
     runtimeReq.value = initRuntimeReq();
-    changeType(websiteType);
-
     listAcmeAccount();
 
     open.value = true;

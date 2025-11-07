@@ -57,6 +57,7 @@ export function loadDefaultSpec(type: string) {
             break;
         case 'directory':
         case 'cutWebsiteLog':
+        case 'cleanLog':
         case 'ntp':
             item.specType = 'perDay';
             item.hour = 1;

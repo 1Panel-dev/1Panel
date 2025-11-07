@@ -3058,6 +3058,7 @@ const message = {
             'Peringatan mesra: Lesen Pro anda akan tamat dalam {0} hari, dan semua ciri Pro tidak lagi dapat diakses. Sila perbaharui segera untuk memastikan penggunaan berterusan.',
         menu: 'Pro',
         upage: 'Pembina Laman Web AI',
+        proAlert: 'Tingkatkan ke Pro untuk menggunakan ciri ini',
         app: {
             app: 'APP',
             title: 'Nama Panel',

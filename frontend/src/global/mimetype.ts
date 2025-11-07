@@ -442,7 +442,6 @@ export const getWebsiteTypes = () => [
         label: i18n.global.t('runtime.runtime'),
         value: 'runtime',
     },
-
     {
         label: i18n.global.t('website.proxy'),
         value: 'proxy',

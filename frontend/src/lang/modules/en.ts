@@ -3097,6 +3097,7 @@ const message = {
             'Friendly reminder: Your Pro license will expire in {0} days, and all Pro features will no longer be accessible. Please renew promptly to ensure continued usage.',
         menu: 'Pro',
         upage: 'AI Website Builder',
+        proAlert: 'Upgrade to Pro to use this feature',
         app: {
             app: 'APP',
             title: 'Panel Alias',

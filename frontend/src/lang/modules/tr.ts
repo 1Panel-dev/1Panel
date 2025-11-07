@@ -3143,6 +3143,7 @@ const message = {
             'Nazik hatırlatma: Pro lisansınız {0} gün içinde sona erecek ve tüm Pro özellikleri kullanılamaz hale gelecektir. Lütfen devam eden kullanım için zamanında yenileyin.',
         menu: 'Pro',
         upage: 'AI Web Sitesi Oluşturucu',
+        proAlert: 'Bu özelliği kullanmak için Proya yükseltin',
         app: {
             app: 'Uygulama',
             title: 'Panel Takma Adı',

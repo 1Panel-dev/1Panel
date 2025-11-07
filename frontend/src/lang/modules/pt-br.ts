@@ -3071,6 +3071,7 @@ const message = {
             'Lembrete: Sua licença profissional expirará em {0} dias. Após isso, todas as funcionalidades da versão profissional não estarão mais disponíveis. Por favor, renove sua licença para garantir o uso contínuo.',
         menu: 'Pro',
         upage: 'Construtor de Sites com IA',
+        proAlert: 'Atualize para Pro para usar este recurso',
         app: {
             app: 'APP',
             title: 'Apelido do Painel',

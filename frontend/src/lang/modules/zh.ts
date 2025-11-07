@@ -2874,6 +2874,7 @@ const message = {
         name: '专业版',
         menu: '高级功能',
         upage: 'AI 建站',
+        proAlert: '升级专业版使用此功能',
         waf: {
             name: 'WAF',
             blackWhite: '黑白名单',
