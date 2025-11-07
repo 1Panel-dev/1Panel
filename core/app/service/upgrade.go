@@ -25,6 +25,16 @@ import (
 	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 )
 
+var (
+	svcBasePath, _     = controller.GetServicePath("")
+	svcCoreName, _     = controller.LoadServiceName("1panel-core")
+	selCoreName, _     = controller.SelectInitScript("1panel-core")
+	scriptCoreName, _  = controller.GetScriptName("1panel-core")
+	svcAgentName, _    = controller.LoadServiceName("1panel-agent")
+	selAgentName, _    = controller.SelectInitScript("1panel-agent")
+	scriptAgentName, _ = controller.GetScriptName("1panel-agent")
+)
+
 type UpgradeService struct{}
 
 type IUpgradeService interface {
@@ -175,15 +185,16 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 			u.handleRollback(originalDir, 2)
 			return
 		}
+		initScriptPath := path.Join(tmpDir, "initscript")
 
-		if err := files.CopyItem(false, true, path.Join(tmpDir, "1panel-core.service"), "/etc/systemd/system"); err != nil {
-			global.LOG.Errorf("upgrade 1panel.service failed, err: %v", err)
+		if err := files.CopyItem(false, true, path.Join(initScriptPath, selCoreName), path.Join(svcCoreName, scriptCoreName)); err != nil {
+			global.LOG.Errorf("upgrade %s failed, err: %v", svcCoreName, err)
 			_ = settingRepo.Update("SystemStatus", "Free")
 			u.handleRollback(originalDir, 3)
 			return
 		}
-		if err := files.CopyItem(false, true, path.Join(tmpDir, "1panel-agent.service"), "/etc/systemd/system"); err != nil {
-			global.LOG.Errorf("upgrade 1panel.service failed, err: %v", err)
+		if err := files.CopyItem(false, true, path.Join(initScriptPath, selAgentName), path.Join(svcAgentName, scriptAgentName)); err != nil {
+			global.LOG.Errorf("upgrade %s failed, err: %v", svcAgentName, err)
 			_ = settingRepo.Update("SystemStatus", "Free")
 			u.handleRollback(originalDir, 3)
 			return
@@ -284,6 +295,10 @@ func analyzeDoc(version, content string) dto.ReleasesNotes {
 }
 
 func (u *UpgradeService) handleBackup(originalDir string) error {
+	svcScriptBakPath := path.Join(originalDir, "scriptbak")
+	if _, err := os.Stat(svcScriptBakPath); err != nil {
+		_ = os.MkdirAll(svcScriptBakPath, os.ModePerm)
+	}
 	if err := files.CopyItem(false, true, "/usr/local/bin/1panel-core", originalDir); err != nil {
 		return err
 	}
@@ -296,10 +311,10 @@ func (u *UpgradeService) handleBackup(originalDir string) error {
 	if err := files.CopyItem(true, true, "/usr/local/bin/lang", originalDir); err != nil {
 		return err
 	}
-	if err := files.CopyItem(false, true, "/etc/systemd/system/1panel-core.service", originalDir); err != nil {
+	if err := files.CopyItem(false, true, path.Join(svcBasePath, svcCoreName), svcScriptBakPath); err != nil {
 		return err
 	}
-	if err := files.CopyItem(false, true, "/etc/systemd/system/1panel-agent.service", originalDir); err != nil {
+	if err := files.CopyItem(false, true, path.Join(svcBasePath, svcAgentName), svcScriptBakPath); err != nil {
 		return err
 	}
 	if err := files.CopyItem(true, true, path.Join(global.CONF.Base.InstallDir, "1panel/db"), originalDir); err != nil {
@@ -313,7 +328,10 @@ func (u *UpgradeService) handleBackup(originalDir string) error {
 
 func (u *UpgradeService) handleRollback(originalDir string, errStep int) {
 	_ = settingRepo.Update("SystemStatus", "Free")
-
+	svcScriptBakPath := path.Join(originalDir, "scriptbak")
+	if _, err := os.Stat(svcScriptBakPath); err != nil {
+		_ = os.MkdirAll(svcScriptBakPath, os.ModePerm)
+	}
 	dbPath := path.Join(global.CONF.Base.InstallDir, "1panel")
 	if _, err := os.Stat(path.Join(originalDir, "db")); err == nil {
 		if err := files.CopyItem(true, true, path.Join(originalDir, "db"), dbPath); err != nil {
@@ -335,11 +353,11 @@ func (u *UpgradeService) handleRollback(originalDir string, errStep int) {
 	if errStep == 2 {
 		return
 	}
-	if err := files.CopyItem(false, true, path.Join(originalDir, "1panel-core.service"), "/etc/systemd/system"); err != nil {
-		global.LOG.Errorf("rollback 1panel-core.service failed, err: %v", err)
+	if err := files.CopyItem(false, true, path.Join(svcScriptBakPath, svcCoreName), svcBasePath); err != nil {
+		global.LOG.Errorf("rollback %s failed, err: %v", svcCoreName, err)
 	}
-	if err := files.CopyItem(false, true, path.Join(originalDir, "1panel-agent.service"), "/etc/systemd/system"); err != nil {
-		global.LOG.Errorf("rollback 1panel-agent.service failed, err: %v", err)
+	if err := files.CopyItem(false, true, path.Join(svcScriptBakPath, svcAgentName), svcBasePath); err != nil {
+		global.LOG.Errorf("rollback %s failed, err: %v", svcAgentName, err)
 	}
 	if errStep == 3 {
 		return
