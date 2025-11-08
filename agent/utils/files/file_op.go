@@ -416,6 +416,9 @@ func (f FileOp) CopyAndReName(src, dst, name string, cover bool) error {
 }
 
 func (f FileOp) CopyDirWithNewName(src, dst, newName string) error {
+	if newName == "." || newName == "" {
+		return cmd.RunDefaultBashCf(`cp -rf '%s'/. '%s'`, src, dst)
+	}
 	dstDir := filepath.Join(dst, newName)
 	return cmd.RunDefaultBashCf(`cp -rf '%s' '%s'`, src, dstDir)
 }
