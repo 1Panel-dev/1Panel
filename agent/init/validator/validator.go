@@ -1,10 +1,10 @@
 package validator
 
 import (
-	"regexp"
 	"unicode"
 
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/utils/re"
 
 	"github.com/go-playground/validator/v10"
 )
@@ -25,20 +25,12 @@ func Init() {
 
 func checkNamePattern(fl validator.FieldLevel) bool {
 	value := fl.Field().String()
-	result, err := regexp.MatchString("^[a-zA-Z\u4e00-\u9fa5]{1}[a-zA-Z0-9_\u4e00-\u9fa5]{0,30}$", value)
-	if err != nil {
-		global.LOG.Errorf("regexp matchString failed, %v", err)
-	}
-	return result
+	return re.GetRegex(re.ValidatorNamePattern).MatchString(value)
 }
 
 func checkIpPattern(fl validator.FieldLevel) bool {
 	value := fl.Field().String()
-	result, err := regexp.MatchString(`^((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})(\.((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})){3}$`, value)
-	if err != nil {
-		global.LOG.Errorf("regexp check ip matchString failed, %v", err)
-	}
-	return result
+	return re.GetRegex(re.ValidatorIPPattern).MatchString(value)
 }
 
 func checkPasswordPattern(fl validator.FieldLevel) bool {

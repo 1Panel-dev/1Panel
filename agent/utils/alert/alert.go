@@ -4,6 +4,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
+	"os"
+	"os/exec"
+	"strings"
+	"sync"
+	"time"
+
+	"github.com/jinzhu/copier"
+
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
@@ -12,14 +21,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/utils/email"
-	"github.com/jinzhu/copier"
-	"net/http"
-	"os"
-	"os/exec"
-	"regexp"
-	"strings"
-	"sync"
-	"time"
+	"github.com/1Panel-dev/1Panel/agent/utils/re"
 )
 
 var cronJobAlertTypes = []string{"shell", "app", "website", "database", "directory", "log", "snapshot", "curl", "cutWebsiteLog", "clean", "ntp"}
@@ -424,7 +426,7 @@ func FindRecentSuccessLoginNotInWhitelist(minutes int, whitelist []string) ([]st
 		whitelistMap[ip] = struct{}{}
 	}
 
-	ipRegex := regexp.MustCompile(`from\s+([0-9.]+)\s+port\s+(\d+)`)
+	ipRegex := re.GetRegex(re.AlertIPPattern)
 
 	for _, line := range lines {
 		line = strings.TrimSpace(line)

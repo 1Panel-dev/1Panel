@@ -2,7 +2,6 @@ package client
 
 import (
 	"fmt"
-	"regexp"
 	"strings"
 	"sync"
 
@@ -10,9 +9,8 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/controller"
+	"github.com/1Panel-dev/1Panel/agent/utils/re"
 )
-
-var ForwardListRegex = regexp.MustCompile(`^port=(\d{1,5}):proto=(.+?):toport=(\d{1,5}):toaddr=(.*)$`)
 
 type Firewall struct{}
 
@@ -124,8 +122,8 @@ func (f *Firewall) ListForward() ([]FireInfo, error) {
 		line = strings.TrimFunc(line, func(r rune) bool {
 			return r <= 32
 		})
-		if ForwardListRegex.MatchString(line) {
-			match := ForwardListRegex.FindStringSubmatch(line)
+		if re.GetRegex(re.FirewalldForwardPattern).MatchString(line) {
+			match := re.GetRegex(re.FirewalldForwardPattern).FindStringSubmatch(line)
 			if len(match) < 4 {
 				continue
 			}

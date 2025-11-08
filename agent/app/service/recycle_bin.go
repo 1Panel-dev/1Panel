@@ -5,7 +5,6 @@ import (
 	"math"
 	"os"
 	"path"
-	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -17,6 +16,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
+	"github.com/1Panel-dev/1Panel/agent/utils/re"
 	"github.com/shirou/gopsutil/v4/disk"
 )
 
@@ -184,8 +184,7 @@ func createClashDir(clashDir string) error {
 }
 
 func getRecycleBinDTOFromName(filename string) (*response.RecycleBinDTO, error) {
-	r := regexp.MustCompile(`_1p_file_1p_(.+)_p_(\d+)_(\d+)`)
-	matches := r.FindStringSubmatch(filename)
+	matches := re.GetRegex(re.RecycleBinFilePattern).FindStringSubmatch(filename)
 	if len(matches) != 4 {
 		return nil, fmt.Errorf("invalid filename format")
 	}

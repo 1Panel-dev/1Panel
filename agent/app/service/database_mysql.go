@@ -7,7 +7,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -24,6 +23,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/compose"
 	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
 	"github.com/1Panel-dev/1Panel/agent/utils/mysql"
+	"github.com/1Panel-dev/1Panel/agent/utils/re"
 	"github.com/1Panel-dev/1Panel/agent/utils/mysql/client"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/copier"
@@ -623,7 +623,7 @@ func updateMyCnf(oldFiles []string, group string, param string, value interface{
 	isOn := false
 	hasGroup := false
 	hasKey := false
-	regItem, _ := regexp.Compile(`\[*\]`)
+	regItem := re.GetRegex(re.MysqlGroupPattern)
 	var newFiles []string
 	i := 0
 	for _, line := range oldFiles {

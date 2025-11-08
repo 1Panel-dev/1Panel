@@ -2,9 +2,10 @@ package components
 
 import (
 	"fmt"
-	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/1Panel-dev/1Panel/agent/utils/re"
 )
 
 type Location struct {
@@ -60,8 +61,7 @@ func NewLocation(directive IDirective) *Location {
 				dirs := dir.GetBlock().GetDirectives()
 				for _, di := range dirs {
 					if di.GetName() == "expires" {
-						re := regexp.MustCompile(`^(\d+)(\w+)$`)
-						matches := re.FindStringSubmatch(di.GetParameters()[0])
+						matches := re.GetRegex(re.NumberWordPattern).FindStringSubmatch(di.GetParameters()[0])
 						if matches == nil {
 							continue
 						}
@@ -80,8 +80,7 @@ func NewLocation(directive IDirective) *Location {
 			}
 		case "proxy_cache_valid":
 			timeParam := params[len(params)-1]
-			re := regexp.MustCompile(`^(\d+)(\w+)$`)
-			matches := re.FindStringSubmatch(timeParam)
+			matches := re.GetRegex(re.NumberWordPattern).FindStringSubmatch(timeParam)
 			if matches == nil {
 				continue
 			}

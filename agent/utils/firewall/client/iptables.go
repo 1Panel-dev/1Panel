@@ -2,13 +2,13 @@ package client
 
 import (
 	"fmt"
-	"regexp"
 	"strings"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
+	"github.com/1Panel-dev/1Panel/agent/utils/re"
 )
 
 const (
@@ -23,10 +23,6 @@ const (
 )
 
 const NatChain = "1PANEL"
-
-var (
-	natListRegex = regexp.MustCompile(`^(\d+)\s+(.+?)\s+(.+?)\s+(.+?)\s+(.+?)\s+(.+?)\s+(.+?)\s+(.+?)\s+(.+?)\s+(.+?)(?:\s+(.+?) .+?:(\d{1,5}(?::\d+)?).+?[ :](.+-.+|(?:.+:)?\d{1,5}(?:-\d{1,5})?))?$`)
-)
 
 type Iptables struct {
 	CmdStr string
@@ -97,8 +93,8 @@ func (iptables *Iptables) NatList(chain ...string) ([]IptablesNatInfo, error) {
 		line = strings.TrimFunc(line, func(r rune) bool {
 			return r <= 32
 		})
-		if natListRegex.MatchString(line) {
-			match := natListRegex.FindStringSubmatch(line)
+		if re.GetRegex(re.IptablesNatListPattern).MatchString(line) {
+			match := re.GetRegex(re.IptablesNatListPattern).FindStringSubmatch(line)
 			if !strings.Contains(match[13], ":") {
 				match[13] = fmt.Sprintf(":%s", match[13])
 			}

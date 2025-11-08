@@ -12,7 +12,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"regexp"
 	"sort"
 	"strconv"
 	"strings"
@@ -34,6 +33,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
+	"github.com/1Panel-dev/1Panel/agent/utils/re"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/build"
 	"github.com/docker/docker/api/types/container"
@@ -1166,7 +1166,7 @@ func (u *ContainerService) DownloadContainerLogs(containerType, container, since
 	errCh := make(chan error)
 	go func() {
 		scanner := bufio.NewScanner(stdout)
-		var ansiRegex = regexp.MustCompile(`\x1b\[[0-9;?]*[A-Za-z]|\x1b=|\x1b>`)
+		var ansiRegex = re.GetRegex(re.AnsiEscapePattern)
 		for scanner.Scan() {
 			line := scanner.Text()
 			cleanLine := ansiRegex.ReplaceAllString(line, "")

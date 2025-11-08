@@ -12,7 +12,6 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
-	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -34,6 +33,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/compose"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
+	"github.com/1Panel-dev/1Panel/agent/utils/re"
 	"github.com/pkg/errors"
 	"github.com/subosito/gotenv"
 	"gopkg.in/yaml.v3"
@@ -979,8 +979,10 @@ func handleRuntimeDTO(res *response.RuntimeDTO, runtime model.Runtime) error {
 	for k, v := range envs {
 		if strings.Contains(k, "CONTAINER_PORT") || strings.Contains(k, "HOST_PORT") {
 			if strings.Contains(k, "CONTAINER_PORT") {
-				r := regexp.MustCompile(`_(\d+)$`)
-				matches := r.FindStringSubmatch(k)
+				matches := re.GetRegex(re.TrailingDigitsPattern).FindStringSubmatch(k)
+				if len(matches) < 2 {
+					return fmt.Errorf("invalid container port key: %s", k)
+				}
 				containerPort, err := strconv.Atoi(v)
 				if err != nil {
 					return err

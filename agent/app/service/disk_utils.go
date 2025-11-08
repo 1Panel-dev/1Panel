@@ -3,15 +3,16 @@ package service
 import (
 	"bufio"
 	"fmt"
+	"os"
+	"os/exec"
+	"strconv"
+	"strings"
+
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/response"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
-	"os"
-	"os/exec"
-	"regexp"
-	"strconv"
-	"strings"
+	"github.com/1Panel-dev/1Panel/agent/utils/re"
 )
 
 func organizeDiskInfo(diskInfos []response.DiskBasicInfo) response.CompleteDiskInfo {
@@ -205,12 +206,10 @@ func getDiskType(rota string) string {
 	return "Unknown"
 }
 
-var kvRe = regexp.MustCompile(`([A-Za-z0-9_]+)=("([^"\\]|\\.)*"|[^ \t]+)`)
-
 func parseKeyValuePairs(line string) map[string]string {
 	fields := make(map[string]string)
 
-	matches := kvRe.FindAllStringSubmatch(line, -1)
+	matches := re.GetRegex(re.DiskKeyValuePattern).FindAllStringSubmatch(line, -1)
 	for _, m := range matches {
 		key := m[1]
 		raw := m[2]

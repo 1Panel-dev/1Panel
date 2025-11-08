@@ -8,7 +8,6 @@ import (
 	"net"
 	"os/exec"
 	"reflect"
-	"regexp"
 	"sort"
 	"strconv"
 	"strings"
@@ -19,6 +18,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
+	"github.com/1Panel-dev/1Panel/agent/utils/re"
 	"golang.org/x/net/idna"
 )
 
@@ -303,12 +303,7 @@ func LoadTimeZoneByCmd() string {
 }
 
 func IsValidDomain(domain string) bool {
-	pattern := `^([\w\p{Han}\-\*]{1,100}\.){1,10}([\w\p{Han}\-]{1,24}|[\w\p{Han}\-]{1,24}\.[\w\p{Han}\-]{1,24})(:\d{1,5})?$`
-	match, err := regexp.MatchString(pattern, domain)
-	if err != nil {
-		return false
-	}
-	return match
+	return re.GetRegex(re.DomainPattern).MatchString(domain)
 }
 
 func ContainsChinese(text string) bool {
@@ -398,8 +393,7 @@ func HandleIPList(content string) ([]string, error) {
 }
 
 func GetSystemVersion(versionString string) string {
-	re := regexp.MustCompile(`v(\d+\.\d+\.\d+)`)
-	match := re.FindStringSubmatch(versionString)
+	match := re.GetRegex(re.VersionPattern).FindStringSubmatch(versionString)
 	if len(match) > 1 {
 		return match[1]
 	}

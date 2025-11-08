@@ -6,9 +6,10 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"regexp"
 
 	cosSDK "github.com/tencentyun/cos-go-sdk-v5"
+
+	"github.com/1Panel-dev/1Panel/agent/utils/re"
 )
 
 type cosClient struct {
@@ -30,8 +31,7 @@ func NewCosClient(vars map[string]interface{}) (*cosClient, error) {
 
 	endpointType := "cos"
 	if len(endpoint) != 0 {
-		re := regexp.MustCompile(`.*cos-dualstack\..*`)
-		if re.MatchString(endpoint) {
+		if re.GetRegex(re.CosDualStackPattern).MatchString(endpoint) {
 			endpointType = "cos-dualstack"
 		}
 	}

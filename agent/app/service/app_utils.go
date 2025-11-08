@@ -15,7 +15,6 @@ import (
 	"path"
 	"path/filepath"
 	"reflect"
-	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -40,6 +39,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/1Panel-dev/1Panel/agent/utils/nginx"
 	"github.com/1Panel-dev/1Panel/agent/utils/nginx/parser"
+	"github.com/1Panel-dev/1Panel/agent/utils/re"
 	"github.com/1Panel-dev/1Panel/agent/utils/req_helper"
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 	"github.com/compose-spec/compose-go/v2/types"
@@ -1827,8 +1827,7 @@ func getAppCommonConfig(envs map[string]interface{}) request.AppContainerConfig 
 		config.CpuQuota = 0
 	}
 	if memLimit, ok := envs[constant.MemoryLimit]; ok {
-		re := regexp.MustCompile(`(\d+)([A-Za-z]+)`)
-		matches := re.FindStringSubmatch(memLimit.(string))
+		matches := re.GetRegex(re.NumberAlphaPattern).FindStringSubmatch(memLimit.(string))
 		if len(matches) == 3 {
 			num, err := strconv.ParseFloat(matches[1], 64)
 			if err == nil {

@@ -36,6 +36,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
 	"github.com/1Panel-dev/1Panel/agent/utils/env"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
+	"github.com/1Panel-dev/1Panel/agent/utils/re"
 	"github.com/pkg/errors"
 	"github.com/subosito/gotenv"
 )
@@ -245,8 +246,10 @@ func (r *RuntimeService) Page(req request.RuntimeSearch) (int64, []response.Runt
 			runtimeDTO.Params[k] = v
 			if strings.Contains(k, "CONTAINER_PORT") || strings.Contains(k, "HOST_PORT") {
 				if strings.Contains(k, "CONTAINER_PORT") {
-					r := regexp.MustCompile(`_(\d+)$`)
-					matches := r.FindStringSubmatch(k)
+					matches := re.GetRegex(re.TrailingDigitsPattern).FindStringSubmatch(k)
+					if len(matches) < 2 {
+						continue
+					}
 					containerPort, err := strconv.Atoi(v)
 					if err != nil {
 						continue
@@ -828,7 +831,7 @@ func (r *RuntimeService) GetPHPConfig(id uint) (*response.PHPConfig, error) {
 		if strings.HasPrefix(line, ";") {
 			continue
 		}
-		matches := regexp.MustCompile(`^\s*([a-z_]+)\s*=\s*(.*)$`).FindStringSubmatch(line)
+		matches := re.GetRegex(re.PhpAssignmentPattern).FindStringSubmatch(line)
 		if len(matches) == 3 {
 			params[matches[1]] = matches[2]
 		}

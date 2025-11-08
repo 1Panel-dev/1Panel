@@ -9,7 +9,6 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"regexp"
 	"strconv"
 	"strings"
 	"syscall"
@@ -34,6 +33,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/1Panel-dev/1Panel/agent/utils/nginx"
 	"github.com/1Panel-dev/1Panel/agent/utils/nginx/parser"
+	"github.com/1Panel-dev/1Panel/agent/utils/re"
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
 )
@@ -1538,8 +1538,7 @@ func getServer(website model.Website) (*components.Server, error) {
 func parseTimeString(input string) (int, string, error) {
 	input = strings.TrimSpace(input)
 
-	re := regexp.MustCompile(`^(\d+)([smhdw]?)$`)
-	matches := re.FindStringSubmatch(input)
+	matches := re.GetRegex(re.DurationWithOptionalUnitPattern).FindStringSubmatch(input)
 
 	if len(matches) < 2 {
 		return 0, "", fmt.Errorf("invalid time format: %s", input)

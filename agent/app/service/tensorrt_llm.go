@@ -2,6 +2,13 @@ package service
 
 import (
 	"fmt"
+	"path"
+	"strconv"
+	"strings"
+
+	"github.com/subosito/gotenv"
+	"gopkg.in/yaml.v3"
+
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/response"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
@@ -13,12 +20,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/compose"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
-	"github.com/subosito/gotenv"
-	"gopkg.in/yaml.v3"
-	"path"
-	"regexp"
-	"strconv"
-	"strings"
+	"github.com/1Panel-dev/1Panel/agent/utils/re"
 )
 
 type TensorRTLLMService struct{}
@@ -57,8 +59,10 @@ func (t TensorRTLLMService) Page(req request.TensorRTLLMSearch) response.TensorR
 		for k, v := range envs {
 			if strings.Contains(k, "CONTAINER_PORT") || strings.Contains(k, "HOST_PORT") {
 				if strings.Contains(k, "CONTAINER_PORT") {
-					r := regexp.MustCompile(`_(\d+)$`)
-					matches := r.FindStringSubmatch(k)
+					matches := re.GetRegex(re.TrailingDigitsPattern).FindStringSubmatch(k)
+					if len(matches) < 2 {
+						continue
+					}
 					containerPort, err := strconv.Atoi(v)
 					if err != nil {
 						continue
