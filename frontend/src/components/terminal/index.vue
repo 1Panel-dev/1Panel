@@ -248,6 +248,21 @@ function sendMsg(data: string) {
 
 // websocket 相关代码 end
 
+const resizeObserver = ref<ResizeObserver>();
+
+onMounted(() => {
+    // 使用 ResizeObserver 监听容器大小变化
+    resizeObserver.value = new ResizeObserver(() => {
+        if (termReady.value && webSocketReady.value) {
+            changeTerminalSize();
+        }
+    });
+
+    if (terminalElement.value) {
+        resizeObserver.value.observe(terminalElement.value);
+    }
+});
+
 defineExpose({
     acceptParams,
     onClose,
@@ -258,6 +273,7 @@ defineExpose({
 
 onBeforeUnmount(() => {
     onClose();
+    resizeObserver.value?.disconnect();
 });
 </script>
 
