@@ -20,6 +20,8 @@ func handlerErr(out string, err error) error {
 }
 
 func run(name string, args ...string) (string, error) {
-	global.LOG.Debugf("handle with controller `%s %s`", name, strings.Join(args, " "))
+	if global.LOG != nil {
+		global.LOG.Debugf("handle with controller `%s %s`", name, strings.Join(args, " "))
+	}
 	return cmd.NewCommandMgr(cmd.WithTimeout(10*time.Second)).RunWithStdoutBashCf("LANGUAGE=en_US:en %s %s", name, strings.Join(args, " "))
 }
