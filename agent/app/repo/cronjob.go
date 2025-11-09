@@ -173,7 +173,7 @@ func (u *CronjobRepo) AddFailedRecord(cronjobID uint, message string) {
 	var record model.JobRecords
 	record.StartTime = time.Now()
 	record.CronjobID = cronjobID
-	record.Status = constant.StatusFailed
+	record.Status = constant.StatusUnexecuted
 	record.Message = message
 	if err := global.DB.Create(&record).Error; err != nil {
 		global.LOG.Errorf("create record status failed, err: %v", err)

@@ -351,6 +351,7 @@ const message = {
             new: 'Nuevo',
             conflict: 'Conflicto',
             duplicate: 'Duplicado',
+            unexecuted: 'No Ejecutado',
         },
         units: {
             second: ' segundo | segundo | segundos',
@@ -2419,7 +2420,6 @@ const message = {
         qiteSite: 'Empresa',
         videoSite: 'Video',
         errLog: 'Log de errores',
-        accessLog: 'Log de accesos',
         stopHelper: 'Al detener el sitio, no será accesible y mostrará una página de parada. ¿Deseas continuar?',
         startHelper: 'Al habilitar el sitio, los usuarios podrán acceder normalmente. ¿Deseas continuar?',
         sitePath: 'Directorio',
@@ -2428,7 +2428,6 @@ const message = {
         folderTitle: 'El sitio contiene principalmente las siguientes carpetas',
         wafFolder: 'Reglas del firewall',
         indexFolder: 'Directorio raíz del sitio',
-        logFolder: 'Logs del sitio',
         sslFolder: 'Certificados del sitio',
         enableOrNot: 'Habilitar',
         oldSSL: 'Certificado existente',
@@ -3077,6 +3076,7 @@ const message = {
             'Aviso: Tu licencia Pro expirará en {0} días y todas las funciones Pro dejarán de estar disponibles. Renueva pronto para asegurar el uso continuo.',
         menu: 'Pro',
         upage: 'Constructor Web con IA',
+        proAlert: 'Actualiza a Pro para usar esta función',
         app: {
             app: 'APP',
             title: 'Alias del Panel',

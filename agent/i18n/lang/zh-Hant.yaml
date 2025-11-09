@@ -248,6 +248,8 @@ IgnoreUploadErr: "上傳失敗，錯誤：{{ .detail }}，忽略本次錯誤..."
 LoadBackupFailed: "取得備份帳號連線失敗，錯誤：{{ .detail }}"
 InExecuting: "目前任務正在執行中，請勿重複執行！"
 NoSuchResource: "資料庫中未能查詢到備份內容，跳過..."
+CleanLog: "清理日誌"
+CleanLogByName: "清理 {{.name}} 日誌"
 
 #toolbox
 ErrNotExistUser: '目前使用者不存在，請修改後重試！'

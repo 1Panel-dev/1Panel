@@ -32,6 +32,7 @@ ErrGroupIsInUse: "Grup kullanımda ve silinemez."
 ErrLocalDelete: "Yerel düğüm silinemez!"
 ErrPortInUsed: "{{ .name }} portu zaten kullanımda!"
 ErrInternalServerKey: "İç sunucu hatası:"
+MasterNode: "Ana Düğüm"
 
 # app
 CustomAppStoreFileValid: "Uygulama mağazası paketi .tar.gz formatında olmalıdır"

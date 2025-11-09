@@ -112,8 +112,8 @@
                                                 class="!w-24"
                                             >
                                                 <el-option
-                                                    v-for="(unit, index) in Units"
-                                                    :key="index"
+                                                    v-for="(unit, indexKey) in Units"
+                                                    :key="indexKey"
                                                     :label="unit.label"
                                                     :value="unit.value"
                                                 />

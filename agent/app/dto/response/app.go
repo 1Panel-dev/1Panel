@@ -129,6 +129,7 @@ type AppInstallDTO struct {
 	App           AppDetail `json:"app"`
 	Container     string    `json:"container"`
 	IsEdit        bool      `json:"isEdit"`
+	LinkDB        bool      `json:"linkDB"`
 }
 
 type AppInstallInfo struct {

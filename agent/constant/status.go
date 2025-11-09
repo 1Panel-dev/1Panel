@@ -36,6 +36,7 @@ const (
 	StatusInstallErr     = "InstallErr"
 	StatusUninstalling   = "Uninstalling"
 	StatusWaitingRestart = "WaitingRestart"
+	StatusUnexecuted     = "Unexecuted"
 
 	OrderDesc = "descending"
 	OrderAsc  = "ascending"

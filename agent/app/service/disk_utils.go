@@ -393,7 +393,7 @@ func isSystemDisk(mountPoint string) bool {
 		"/boot/efi",
 		"/usr",
 		"/var",
-		"/home",
+		"/etc",
 	}
 
 	for _, sysMount := range systemMountPoints {

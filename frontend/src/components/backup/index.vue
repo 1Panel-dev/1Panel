@@ -409,15 +409,6 @@ const onBatchDelete = async (row: Backup.RecordInfo | null) => {
 
 const buttons = [
     {
-        label: i18n.global.t('commons.button.delete'),
-        disabled: (row: any) => {
-            return row.status === 'Waiting';
-        },
-        click: (row: Backup.RecordInfo) => {
-            onBatchDelete(row);
-        },
-    },
-    {
         label: i18n.global.t('commons.button.recover'),
         disabled: (row: any) => {
             return row.size === 0 || row.status === 'Failed';
@@ -448,6 +439,15 @@ const buttons = [
         },
         click: (row: Backup.RecordInfo) => {
             onDownload(row);
+        },
+    },
+    {
+        label: i18n.global.t('commons.button.delete'),
+        disabled: (row: any) => {
+            return row.status === 'Waiting';
+        },
+        click: (row: Backup.RecordInfo) => {
+            onBatchDelete(row);
         },
     },
 ];

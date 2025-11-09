@@ -53,6 +53,12 @@ type CronjobOperate struct {
 	AlertCount  uint   `json:"alertCount"`
 	AlertTitle  string `json:"alertTitle"`
 	AlertMethod string `json:"alertMethod"`
+
+	CleanLogConfig
+}
+
+type CleanLogConfig struct {
+	Scopes []string `json:"scopes"`
 }
 
 type SnapshotRule struct {

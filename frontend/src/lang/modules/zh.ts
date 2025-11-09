@@ -332,6 +332,7 @@ const message = {
             new: '新',
             conflict: '冲突',
             duplicate: '重复',
+            unexecuted: '未执行',
         },
         units: {
             second: '秒',
@@ -1128,6 +1129,9 @@ const message = {
             noSuchApp: '未检测到 {0} 服务，请前往脚本库页面手动安装！',
             syncHelper: '即将同步系统脚本库，该操作仅针对系统脚本，是否继续？',
         },
+
+        cleanLog: '清理日志',
+        cleanLogscope: '清理类型',
     },
     monitor: {
         globalFilter: '全局过滤',
@@ -2244,7 +2248,6 @@ const message = {
         qiteSite: '企业',
         videoSite: '视频',
         errLog: '错误日志',
-        accessLog: '网站日志',
         stopHelper: '停止站点后将无法正常访问，用户访问会显示当前站点停止页面，是否继续操作？',
         startHelper: '启用站点后，用户可以正常访问网站内容，是否继续操作？',
         sitePath: '网站目录',
@@ -2253,7 +2256,6 @@ const message = {
         folderTitle: '网站主要包含以下文件夹',
         wafFolder: '防火墙规则',
         indexFolder: '网站 root 目录（PHP 运行环境 静态网站代码存放目录）',
-        logFolder: '网站日志',
         sslFolder: '网站证书',
         enableOrNot: '是否启用',
         oldSSL: '选择已有证书',
@@ -2872,6 +2874,7 @@ const message = {
         name: '专业版',
         menu: '高级功能',
         upage: 'AI 建站',
+        proAlert: '升级专业版使用此功能',
         waf: {
             name: 'WAF',
             blackWhite: '黑白名单',

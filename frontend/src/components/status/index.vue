@@ -80,6 +80,7 @@ const getType = (status: string) => {
         case 'conflict':
             return 'warning';
         case 'duplicate':
+        case 'unexecuted':
             return 'info';
         default:
             return 'primary';

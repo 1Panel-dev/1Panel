@@ -249,6 +249,8 @@ IgnoreUploadErr: "업로드 실패, 오류: {{ .detail }}, 이 오류를 무시�
 LoadBackupFailed: "백업 계정 연결 획득 실패, 오류: {{ .detail }}"
 InExecuting: "현재 작업이 실행 중입니다. 중복 실행하지 마세요!"
 NoSuchResource: "데이터베이스에서 백업 내용을 찾을 수 없어 건너뜁니다..."
+CleanLog: "로그 정리"
+CleanLogByName: "{{.name}} 로그 정리"
 
 #도구상자
 ErrNotExistUser: '현재 사용자가 존재하지 않습니다. 수정한 후 다시 시도하세요!'

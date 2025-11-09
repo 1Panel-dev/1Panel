@@ -332,6 +332,7 @@ const message = {
             new: '新',
             conflict: '衝突',
             duplicate: '重複',
+            unexecuted: '未執行',
         },
         units: {
             second: '秒',
@@ -2252,7 +2253,6 @@ const message = {
         qiteSite: '企業',
         videoSite: '影片',
         errLog: '錯誤日誌',
-        accessLog: '網站日誌',
         stopHelper: '停止站點後將無法正常訪問，使用者瀏覽會顯示目前站點停止頁面，是否繼續操作？',
         startHelper: '啟用站點後，使用者可以正常瀏覽網站內容，是否繼續操作？',
         sitePath: '網站目錄',
@@ -2261,7 +2261,6 @@ const message = {
         folderTitle: '網站主要包含以下資料夾',
         wafFolder: '防火牆規則',
         indexFolder: '網站root目錄',
-        logFolder: '網站日誌',
         sslFolder: '網站證書',
         enableOrNot: '是否啟用',
         oldSSL: '選擇已有證書',
@@ -2879,6 +2878,7 @@ const message = {
         name: '專業版',
         menu: '進階功能',
         upage: 'AI 建站',
+        proAlert: '升級專業版以使用此功能',
         waf: {
             name: 'WAF',
             blackWhite: '黑白名單',

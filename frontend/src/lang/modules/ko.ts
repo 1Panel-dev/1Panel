@@ -335,6 +335,7 @@ const message = {
             new: '신규',
             conflict: '충돌',
             duplicate: '중복',
+            unexecuted: '실행되지 않음',
         },
         units: {
             second: '초 | 초 | 초',
@@ -2302,7 +2303,6 @@ const message = {
         qiteSite: '기업',
         videoSite: '비디오',
         errLog: '오류 로그',
-        accessLog: '웹사이트 로그',
         stopHelper:
             '사이트를 중지하면 정상적으로 액세스할 수 없으며, 사용자가 해당 사이트의 중지 페이지를 보게 됩니다. 계속하시겠습니까?',
         startHelper: '사이트를 활성화하면 사용자가 정상적으로 사이트 내용을 액세스할 수 있습니다. 계속하시겠습니까?',
@@ -2312,7 +2312,6 @@ const message = {
         folderTitle: '웹사이트는 다음과 같은 폴더를 포함합니다.',
         wafFolder: '방화벽 규칙',
         indexFolder: '웹사이트 루트 디렉터리',
-        logFolder: '웹사이트 로그',
         sslFolder: '웹사이트 인증서',
         enableOrNot: '활성화 여부',
         oldSSL: '기존 인증서',
@@ -2948,6 +2947,7 @@ const message = {
             '친절한 알림: 귀하의 Pro 라이선스가 {0}일 후 만료되며, 모든 Pro 기능에 더 이상 접근할 수 없습니다. 지속적인 사용을 위해 신속하게 갱신하시기 바랍니다.',
         menu: 'Pro',
         upage: 'AI 웹사이트 빌더',
+        proAlert: '이 기능을 사용하려면 Pro로 업그레이드하세요',
         app: {
             app: 'APP',
             title: '패널 별칭',

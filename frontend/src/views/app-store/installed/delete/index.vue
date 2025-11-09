@@ -25,7 +25,7 @@
                     {{ $t('app.deleteImageHelper') }}
                 </span>
             </el-form-item>
-            <el-form-item v-if="appType === 'website'">
+            <el-form-item v-if="appType === 'website' && linkDB">
                 <el-checkbox v-model="deleteReq.deleteDB" :label="$t('app.deleteDB')" />
                 <span class="input-help">
                     {{ $t('app.deleteDBHelper') }}
@@ -76,6 +76,7 @@ const deleteInfo = ref('');
 const appInstallName = ref('');
 const appType = ref('');
 const taskLogRef = ref();
+const linkDB = ref(false);
 
 const deleteForm = ref<FormInstance>();
 const em = defineEmits(['close']);
@@ -107,6 +108,7 @@ const acceptParams = async (app: App.AppInstallDto) => {
     appType.value = app.appType;
     deleteHelper.value = i18n.global.t('website.deleteConfirmHelper', [app.name]);
     appInstallName.value = app.name;
+    linkDB.value = app.linkDB;
     open.value = true;
 };
 

@@ -187,6 +187,7 @@ export namespace App {
         isEdit: boolean;
         dockerCompose: string;
         app: App.AppDetail;
+        linkDB: boolean;
     }
 
     export interface AppInstalledInfo {

@@ -32,6 +32,7 @@ ErrGroupIsInUse: "グループは使用中のため、削除できません。"
 ErrLocalDelete: "ローカルノードは削除できません！"
 ErrPortInUsed: "{{ .name }} ポートはすでに使用されています！"
 ErrInternalServerKey: "サーバー内部エラー: "
+MasterNode: "マスターノード"
 
 # app
 CustomAppStoreFileValid: "アプリストアパッケージは .tar.gz 形式である必要があります"

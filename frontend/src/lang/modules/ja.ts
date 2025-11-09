@@ -333,6 +333,7 @@ const message = {
             new: '新規',
             conflict: '競合',
             duplicate: '重複',
+            unexecuted: '未実行',
         },
         units: {
             second: '2番目|2番目|秒',
@@ -2341,7 +2342,6 @@ const message = {
         qiteSite: '企業',
         videoSite: 'ビデオ',
         errLog: 'エラーログ',
-        accessLog: 'ウェブサイトログ',
         stopHelper:
             'サイトを停止した後、正常にアクセスできなくなり、ユーザーは訪問時に現在のサイトの停止ページを表示します。続けたいですか？',
         startHelper: 'サイトを有効にした後、ユーザーは通常、サイトのコンテンツにアクセスできますが、続行しますか？',
@@ -2351,7 +2351,6 @@ const message = {
         folderTitle: 'ウェブサイトには主に次のフォルダーが含まれています',
         wafFolder: 'ファイアウォールルール',
         indexFolder: 'ウェブサイトルートディレクトリ',
-        logFolder: 'ウェブサイトログ',
         sslFolder: 'ウェブサイト証明書',
         enableOrNot: '有効にする',
         oldSSL: '既存の証明書',
@@ -2998,6 +2997,7 @@ const message = {
             'ご注意: あなたのProライセンスは{0}日後に終了し、すべてのPro機能が使用できなくなります。継続的な使用のために速やかに更新してください。',
         menu: 'Рro',
         upage: 'AIウェブサイトビルダー',
+        proAlert: 'この機能を使用するにはProにアップグレードしてください',
         app: {
             app: 'APP',
             title: 'パネルの別名',

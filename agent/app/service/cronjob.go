@@ -108,6 +108,9 @@ func (u *CronjobService) LoadInfo(req dto.OperateByID) (*dto.CronjobOperate, err
 	if cronjob.Type == "snapshot" && len(cronjob.SnapshotRule) != 0 {
 		_ = json.Unmarshal([]byte(cronjob.SnapshotRule), &item.SnapshotRule)
 	}
+	if cronjob.Type == "cleanLog" {
+		_ = json.Unmarshal([]byte(cronjob.Config), &item.CleanLogConfig)
+	}
 	return &item, err
 }
 
@@ -577,6 +580,10 @@ func (u *CronjobService) Create(req dto.CronjobOperate) error {
 	}
 	cronjob.Spec = spec
 	cronjob.EntryIDs = entryIDs
+	if req.Type == "cleanLog" {
+		config, _ := json.Marshal(req.CleanLogConfig)
+		cronjob.Config = string(config)
+	}
 	if err := cronjobRepo.Create(&cronjob); err != nil {
 		return err
 	}

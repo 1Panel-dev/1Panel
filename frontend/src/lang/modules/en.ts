@@ -344,6 +344,7 @@ const message = {
             new: 'New',
             conflict: 'Conflict',
             duplicate: 'Duplicate',
+            unexecuted: 'Unexecuted',
         },
         units: {
             second: ' second | second | seconds',
@@ -2421,7 +2422,6 @@ const message = {
         qiteSite: 'Enterprise',
         videoSite: 'Video',
         errLog: 'Error log',
-        accessLog: 'Website log',
         stopHelper:
             'After stopping the site, it will not be able to access normally, and the user will display the stop page of the current site when visiting. Do you want to continue? ',
         startHelper:
@@ -2432,7 +2432,6 @@ const message = {
         folderTitle: 'The website mainly contains the following folders',
         wafFolder: 'Firewall rules',
         indexFolder: 'Website root directory',
-        logFolder: 'Website log',
         sslFolder: 'Website Certificate',
         enableOrNot: 'Enable',
         oldSSL: 'Existing certificate',
@@ -3098,6 +3097,7 @@ const message = {
             'Friendly reminder: Your Pro license will expire in {0} days, and all Pro features will no longer be accessible. Please renew promptly to ensure continued usage.',
         menu: 'Pro',
         upage: 'AI Website Builder',
+        proAlert: 'Upgrade to Pro to use this feature',
         app: {
             app: 'APP',
             title: 'Panel Alias',

@@ -64,6 +64,8 @@ export namespace Cronjob {
         alertTitle: string;
         alertMethod: string;
         alertMethodItems: Array<string>;
+
+        scopes?: string[];
     }
     export interface Item {
         val: string;

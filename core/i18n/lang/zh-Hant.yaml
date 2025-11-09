@@ -32,6 +32,7 @@ ErrGroupIsInUse: "分組正被使用，無法刪除。"
 ErrLocalDelete: "無法刪除本機節點！"
 ErrPortInUsed: "{{ .name }} 埠已被佔用！"
 ErrInternalServerKey: "服務內部錯誤: "
+MasterNode: "主節點"
 
 #app
 CustomAppStoreFileValid: "應用商店包需要 .tar.gz 格式"

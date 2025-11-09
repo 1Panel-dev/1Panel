@@ -341,6 +341,7 @@ const message = {
             new: 'Baru',
             conflict: 'Konflik',
             duplicate: 'Pendua',
+            unexecuted: 'Tidak Dilaksanakan',
         },
         units: {
             second: 'saat | saat | saat',
@@ -2398,7 +2399,6 @@ const message = {
         qiteSite: 'Syarikat',
         videoSite: 'Video',
         errLog: 'Log Ralat',
-        accessLog: 'Log Laman Web',
         stopHelper:
             'Selepas menghentikan laman web, ia tidak akan dapat diakses dengan normal, dan pengguna akan melihat halaman berhenti laman web semasa apabila mengunjunginya. Adakah anda mahu meneruskan?',
         startHelper:
@@ -2409,7 +2409,6 @@ const message = {
         folderTitle: 'Laman web ini terutamanya mengandungi folder berikut',
         wafFolder: 'Peraturan firewall',
         indexFolder: 'Direktori akar laman web',
-        logFolder: 'Log laman web',
         sslFolder: 'Sijil laman web',
         enableOrNot: 'Aktifkan',
         oldSSL: 'Sijil sedia ada',
@@ -3059,6 +3058,7 @@ const message = {
             'Peringatan mesra: Lesen Pro anda akan tamat dalam {0} hari, dan semua ciri Pro tidak lagi dapat diakses. Sila perbaharui segera untuk memastikan penggunaan berterusan.',
         menu: 'Pro',
         upage: 'Pembina Laman Web AI',
+        proAlert: 'Tingkatkan ke Pro untuk menggunakan ciri ini',
         app: {
             app: 'APP',
             title: 'Nama Panel',
