@@ -35,7 +35,7 @@ var regexMap = make(map[string]*regexp.Regexp)
 
 // InitRegex compiles all regex patterns and stores them in the map.
 // This function should be called once at program startup.
-func InitRegex() {
+func Init() {
 	patterns := []string{
 		NumberAlphaPattern,
 		ComposeDisallowedCharsPattern,

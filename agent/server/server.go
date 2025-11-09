@@ -4,10 +4,11 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"net"
 	"net/http"
 	"os"
+
+	"github.com/gin-gonic/gin"
 
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/constant"
@@ -31,7 +32,7 @@ import (
 )
 
 func Start() {
-	re.InitRegex()
+	re.Init()
 	viper.Init()
 	dir.Init()
 	log.Init()
