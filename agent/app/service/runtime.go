@@ -480,6 +480,7 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 			ExposedPorts: req.ExposedPorts,
 			Environments: req.Environments,
 			Volumes:      req.Volumes,
+			ExtraHosts:   req.ExtraHosts,
 		},
 	}
 	composeContent, envContent, _, err := handleParams(create, projectDir)
