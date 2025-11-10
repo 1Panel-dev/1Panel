@@ -747,6 +747,8 @@ const message = {
                 'Selepas /models dalam arahan permulaan, nama model perlu dilengkapkan; jika akses luar diperlukan, tetapkan port dalam arahan sama dengan port aplikasi',
             imageAlert:
                 'Disebabkan saiz imej yang besar, disyorkan untuk memuat turun imej secara manual ke pelayan sebelum pemasangan',
+            modelSpeedup: 'Dayakan pecutan model',
+            modelType: 'Jenis model',
         },
     },
     container: {

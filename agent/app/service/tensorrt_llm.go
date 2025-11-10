@@ -1,8 +1,11 @@
 package service
 
 import (
+	"errors"
 	"fmt"
+	"os"
 	"path"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -54,7 +57,7 @@ func (t TensorRTLLMService) Page(req request.TensorRTLLMSearch) response.TensorR
 		serverDTO.ModelDir = envs["MODEL_PATH"]
 		serverDTO.Dir = path.Join(global.Dir.TensorRTLLMDir, item.Name)
 		serverDTO.Image = envs["IMAGE"]
-		serverDTO.Command = envs["COMMAND"]
+		serverDTO.Command = getCommand(item.Env)
 
 		for k, v := range envs {
 			if strings.Contains(k, "CONTAINER_PORT") || strings.Contains(k, "HOST_PORT") {
@@ -98,7 +101,7 @@ func (t TensorRTLLMService) Page(req request.TensorRTLLMSearch) response.TensorR
 		}
 
 		var defaultVolumes = map[string]string{
-			"${MODEL_PATH}": "/models",
+			"${MODEL_PATH}": "${MODEL_PATH}",
 		}
 		for _, volume := range volumes {
 			exist := false
@@ -231,14 +234,21 @@ func (t TensorRTLLMService) Create(create request.TensorRTLLMCreate) error {
 	}
 
 	tensorrtLLMDir := path.Join(global.Dir.TensorRTLLMDir, create.Name)
-	filesOP := files.NewFileOp()
-	if !filesOP.Stat(tensorrtLLMDir) {
-		_ = filesOP.CreateDir(tensorrtLLMDir, 0644)
+	filesOp := files.NewFileOp()
+	if !filesOp.Stat(tensorrtLLMDir) {
+		_ = filesOp.CreateDir(tensorrtLLMDir, 0644)
+	}
+	if create.ModelSpeedup {
+		if err := handleModelArchive(create.ModelType, create.ModelDir); err != nil {
+			return err
+		}
 	}
 	tensorrtLLM := &model.TensorRTLLM{
 		Name:          create.Name,
 		ContainerName: create.ContainerName,
 		Status:        constant.StatusStarting,
+		ModelType:     create.ModelType,
+		ModelSpeedup:  create.ModelSpeedup,
 	}
 
 	if err := handleLLMParams(tensorrtLLM, create); err != nil {
@@ -251,7 +261,7 @@ func (t TensorRTLLMService) Create(create request.TensorRTLLMCreate) error {
 		return err
 	}
 	dockerComposePath := path.Join(llmDir, "docker-compose.yml")
-	if err := filesOP.SaveFile(dockerComposePath, tensorrtLLM.DockerCompose, 0644); err != nil {
+	if err := filesOp.SaveFile(dockerComposePath, tensorrtLLM.DockerCompose, 0644); err != nil {
 		return err
 	}
 	tensorrtLLM.Status = constant.StatusStarting
@@ -273,8 +283,10 @@ func (t TensorRTLLMService) Update(req request.TensorRTLLMUpdate) error {
 			return err
 		}
 	}
-
+	tensorrtLLM.ModelType = req.ModelType
+	tensorrtLLM.ModelSpeedup = req.ModelSpeedup
 	tensorrtLLM.ContainerName = req.ContainerName
+
 	if err := handleLLMParams(tensorrtLLM, req.TensorRTLLMCreate); err != nil {
 		return err
 	}
@@ -384,4 +396,52 @@ func syncTensorRTLLMContainerStatus(tensorrtLLM *model.TensorRTLLM) error {
 		}
 	}
 	return tensorrtLLMRepo.Save(tensorrtLLM)
+}
+
+func findModelArchive(modelType string) (string, error) {
+	const baseDir = "/home/models"
+	prefix := fmt.Sprintf("FusionXplay_%s_Accelerator", modelType)
+
+	entries, err := os.ReadDir(baseDir)
+	if err != nil {
+		return "", fmt.Errorf("failed to read %s: %w", baseDir, err)
+	}
+
+	for _, entry := range entries {
+		if entry.IsDir() {
+			continue
+		}
+		name := entry.Name()
+		if strings.HasPrefix(name, prefix) && strings.HasSuffix(name, ".tar.gz") {
+			return filepath.Join(baseDir, name), nil
+		}
+	}
+
+	return "", errors.New(fmt.Sprintf("no FusionXplay_%s_Accelerator*.tar.gz found in /home/models", modelType))
+}
+
+func handleModelArchive(modelType string, modelDir string) error {
+	filePath, err := findModelArchive(modelType)
+	if err != nil {
+		return err
+	}
+	fileOp := files.NewFileOp()
+	if err = fileOp.TarGzExtractPro(filePath, modelDir, ""); err != nil {
+		return err
+	}
+	if err = fileOp.ChmodR(path.Join(modelDir, "fusionxpark_accelerator"), 0755, false); err != nil {
+		return err
+	}
+	return nil
+}
+
+func getCommand(envStr string) string {
+	lines := strings.Split(envStr, "\n")
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if strings.HasPrefix(line, "COMMAND=") {
+			return strings.TrimPrefix(line, "COMMAND=")
+		}
+	}
+	return ""
 }

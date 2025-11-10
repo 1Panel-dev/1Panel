@@ -743,6 +743,8 @@ const message = {
                 'Após /models no comando de inicialização, o nome do modelo precisa ser completado; se for necessário acesso externo, defina a porta no comando para ser a mesma que a porta do aplicativo',
             imageAlert:
                 'Devido ao grande tamanho da imagem, recomenda-se baixar manualmente a imagem para o servidor antes da instalação',
+            modelSpeedup: 'Ativar aceleração de modelo',
+            modelType: 'Tipo de modelo',
         },
     },
     container: {
