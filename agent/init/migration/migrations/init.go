@@ -673,3 +673,10 @@ var UpdateCronJob = &gormigrate.Migration{
 		return tx.AutoMigrate(&model.Cronjob{})
 	},
 }
+
+var UpdateTensorrtLLM = &gormigrate.Migration{
+	ID: "20251110-update-tensorrt-llm",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(&model.TensorRTLLM{})
+	},
+}

@@ -14,6 +14,20 @@
             <el-form-item :label="$t('app.version')" prop="version">
                 <el-input v-model.trim="tensorRTLLM.version" />
             </el-form-item>
+            <div v-if="isFxplay">
+                <el-form-item :label="$t('aiTools.tensorRT.modelSpeedup')" prop="modelSpeedup">
+                    <el-switch v-model="tensorRTLLM.modelSpeedup" @change="changeModelSpeedup"></el-switch>
+                </el-form-item>
+                <el-form-item
+                    :label="$t('aiTools.tensorRT.modelType')"
+                    prop="modelType"
+                    v-if="tensorRTLLM.modelSpeedup"
+                >
+                    <el-select v-model="tensorRTLLM.modelType">
+                        <el-option label="Qwen3" value="Qwen3" />
+                    </el-select>
+                </el-form-item>
+            </div>
             <el-form-item :label="$t('aiTools.tensorRT.modelDir')" prop="modelDir">
                 <el-input v-model="tensorRTLLM.modelDir">
                     <template #prepend>
@@ -52,6 +66,8 @@ import i18n from '@/lang';
 import { ElForm, FormInstance } from 'element-plus';
 import { createTensorRTLLM, updateTensorRTLLM } from '@/api/modules/ai';
 import { MsgSuccess } from '@/utils/message';
+import { useGlobalStore } from '@/composables/useGlobalStore';
+const { isFxplay } = useGlobalStore();
 
 const loading = ref(false);
 const mode = ref('create');
@@ -63,11 +79,13 @@ const newTensorRTLLM = () => {
         version: '1.2.0rc0',
         modelDir: '',
         image: 'nvcr.io/nvidia/tensorrt-llm/release',
-        command: 'bash -c "trtllm-serve /models/ --host 0.0.0.0 --port 8000"',
+        command: 'bash -c "trtllm-serve ${MODEL_PATH} --host 0.0.0.0 --port 8000"',
         exposedPorts: [],
         environments: [],
         extraHosts: [],
         volumes: [],
+        modelSpeedup: false,
+        modelType: 'Qwen3',
     };
 };
 const modelDirRef = ref();
@@ -106,6 +124,15 @@ const getModelDir = (path: string) => {
     tensorRTLLM.value.modelDir = path;
 };
 
+const changeModelSpeedup = () => {
+    if (tensorRTLLM.value.modelSpeedup) {
+        tensorRTLLM.value.command =
+            'bash -c "${MODEL_PATH}/fusionxpark_accelerator --model_path ${MODEL_PATH} --host 0.0.0.0 --port 8000"';
+    } else {
+        tensorRTLLM.value.command = 'bash -c "trtllm-serve ${MODEL_PATH} --host 0.0.0.0 --port 8000"';
+    }
+};
+
 const rules = reactive({
     name: [Rules.requiredInput],
     version: [Rules.requiredInput],
@@ -113,6 +140,7 @@ const rules = reactive({
     containerName: [Rules.requiredInput],
     image: [Rules.requiredInput],
     command: [Rules.requiredInput],
+    modelType: [Rules.requiredSelect],
 });
 
 const formRef = ref<FormInstance>();
