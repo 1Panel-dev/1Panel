@@ -2149,7 +2149,10 @@ func hasLinkDB(installID uint) bool {
 
 func isEditCompose(installed model.AppInstall) bool {
 	detail, _ := appDetailRepo.GetFirst(repo.WithByID(installed.AppDetailId))
-	rawCompose, _ := getUpgradeCompose(installed, detail)
+	rawCompose, err := getUpgradeCompose(installed, detail)
+	if rawCompose == "" || err != nil {
+		return false
+	}
 	if rawCompose != installed.DockerCompose {
 		return true
 	}
