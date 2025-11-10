@@ -96,6 +96,7 @@ const groupList = ref();
 
 const acceptParams = (): void => {
     visible.value = true;
+    selects.value = [];
     loadGroups();
     currentGroup.value = '';
     data.value = [];
