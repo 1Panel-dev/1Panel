@@ -6,8 +6,8 @@ import { deepCopy } from '@/utils/util';
 import { Base64 } from 'js-base64';
 
 // firewall
-export const loadFireBaseInfo = () => {
-    return http.get<Host.FirewallBase>(`/hosts/firewall/base`);
+export const loadFireBaseInfo = (tab: string) => {
+    return http.post<Host.FirewallBase>(`/hosts/firewall/base`, { name: tab }, TimeoutEnum.T_40S);
 };
 export const searchFireRule = (params: Host.RuleSearch) => {
     return http.post<ResPage<Host.RuleInfo>>(`/hosts/firewall/search`, params, TimeoutEnum.T_40S);
@@ -45,17 +45,20 @@ export const batchOperateRule = (params: Host.BatchRule) => {
 };
 
 // Iptables Filter
-export const getFilterRules = (params: Host.IptablesFilterRuleSearch) => {
-    return http.post<Host.IptablesChainInfo[]>(`/hosts/firewall/filter/rules`, params);
+export const searchFilterRules = (params: Host.IptablesFilterRuleSearch) => {
+    return http.post<Host.IptablesData>(`/hosts/firewall/filter/rule/search`, params);
 };
-export const operateFilterRule = (params: Host.IptablesFilterRuleOperate) => {
-    return http.post(`/hosts/firewall/filter/rule`, params, TimeoutEnum.T_40S);
+export const loadChainStatus = (name: string) => {
+    return http.post<Host.ChainStatus>(`/hosts/firewall/filter/chain/status`, { name: name }, TimeoutEnum.T_60S);
 };
-export const batchOperateFilterRule = (params: { rules: Host.IptablesFilterRuleOperate[] }) => {
-    return http.post(`/hosts/firewall/filter/batch`, params, TimeoutEnum.T_40S);
+export const operateFilterRule = (params: Host.IptablesFilterRuleOp) => {
+    return http.post(`/hosts/firewall/filter/rule/operate`, params, TimeoutEnum.T_40S);
 };
-export const applyFilterFirewall = (params: Host.IptablesFilterApply) => {
-    return http.post(`/hosts/firewall/filter/apply`, params, TimeoutEnum.T_60S);
+export const batchOperateFilterRule = (params: { rules: Host.IptablesFilterRuleOp[] }) => {
+    return http.post(`/hosts/firewall/filter/rule/batch`, params, TimeoutEnum.T_40S);
+};
+export const operateFilterChain = (name: string, op: string) => {
+    return http.post(`/hosts/firewall/filter/operate`, { name: name, operate: op }, TimeoutEnum.T_60S);
 };
 
 // monitors

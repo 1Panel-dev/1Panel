@@ -81,9 +81,9 @@ const hostRouter = {
             },
         },
         {
-            path: '/hosts/firewall/filter',
-            name: 'FirewallFilter',
-            component: () => import('@/views/host/firewall/filter/index.vue'),
+            path: '/hosts/firewall/advance',
+            name: 'FirewallAdvance',
+            component: () => import('@/views/host/firewall/advance/index.vue'),
             hidden: true,
             meta: {
                 activeMenu: '/hosts/firewall/port',

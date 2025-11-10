@@ -11,7 +11,7 @@ func (s *HostRouter) InitRouter(Router *gin.RouterGroup) {
 	hostRouter := Router.Group("hosts")
 	baseApi := v2.ApiGroupApp.BaseApi
 	{
-		hostRouter.GET("/firewall/base", baseApi.LoadFirewallBaseInfo)
+		hostRouter.POST("/firewall/base", baseApi.LoadFirewallBaseInfo)
 		hostRouter.POST("/firewall/search", baseApi.SearchFirewallRule)
 		hostRouter.POST("/firewall/operate", baseApi.OperateFirewall)
 		hostRouter.POST("/firewall/port", baseApi.OperatePortRule)
@@ -22,10 +22,11 @@ func (s *HostRouter) InitRouter(Router *gin.RouterGroup) {
 		hostRouter.POST("/firewall/update/addr", baseApi.UpdateAddrRule)
 		hostRouter.POST("/firewall/update/description", baseApi.UpdateFirewallDescription)
 
-		hostRouter.POST("/firewall/filter/rules", baseApi.GetFilterRules)
-		hostRouter.POST("/firewall/filter/rule", baseApi.OperateFilterRule)
-		hostRouter.POST("/firewall/filter/batch", baseApi.BatchOperateFilterRule)
-		hostRouter.POST("/firewall/filter/apply", baseApi.ApplyFilterFirewall)
+		hostRouter.POST("/firewall/filter/rule/search", baseApi.SearchFilterRules)
+		hostRouter.POST("/firewall/filter/rule/operate", baseApi.OperateFilterRule)
+		hostRouter.POST("/firewall/filter/rule/batch", baseApi.BatchOperateFilterRule)
+		hostRouter.POST("/firewall/filter/operate", baseApi.OperateFilterChain)
+		hostRouter.POST("/firewall/filter/chain/status", baseApi.LoadChainStatus)
 
 		hostRouter.POST("/monitor/search", baseApi.LoadMonitor)
 		hostRouter.POST("/monitor/clean", baseApi.CleanMonitor)

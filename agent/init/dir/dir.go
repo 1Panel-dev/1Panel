@@ -34,4 +34,5 @@ func Init() {
 	global.Dir.McpDir, _ = fileOp.CreateDirWithPath(true, path.Join(baseDir, "1panel/mcp"))
 	global.Dir.ConvertLogDir, _ = fileOp.CreateDirWithPath(true, path.Join(baseDir, "1panel/log/convert"))
 	global.Dir.TensorRTLLMDir, _ = fileOp.CreateDirWithPath(true, path.Join(baseDir, "1panel/ai/tensorrt_llm"))
+	global.Dir.FirewallDir, _ = fileOp.CreateDirWithPath(true, path.Join(baseDir, "1panel/firewall"))
 }

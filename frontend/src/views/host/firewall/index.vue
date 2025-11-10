@@ -25,7 +25,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('firewall.advancedControl'),
-        path: '/hosts/firewall/filter',
+        path: '/hosts/firewall/advance',
     },
 ];
 </script>

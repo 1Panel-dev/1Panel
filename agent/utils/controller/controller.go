@@ -185,6 +185,7 @@ func loadFromPredefined(mgr Controller, keyword string) string {
 		"1panel-core":  {"1panel-core.service"},
 		"1panel-agent": {"1panel-agent.service"},
 		"docker":       {"docker.service", "dockerd"},
+		"iptables":     {"iptables", "iptables-services"},
 	}
 	if val, ok := predefinedMap[keyword]; ok {
 		for _, item := range val {
