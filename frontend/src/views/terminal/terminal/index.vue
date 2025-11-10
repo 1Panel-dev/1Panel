@@ -139,52 +139,108 @@
             <el-tab-pane :closable="false" name="newTabs">
                 <template #label>
                     <el-button v-popover="popoverRef" class="tagButton" icon="Plus"></el-button>
-                    <el-popover ref="popoverRef" width="250px" trigger="hover" virtual-triggering persistent>
-                        <div class="ml-2.5">
-                            <el-button link type="primary" @click="onNewSsh">{{ $t('terminal.createConn') }}</el-button>
-                        </div>
-                        <div class="ml-2.5">
-                            <el-button link type="primary" @click="onNewLocal">
-                                {{ $t('terminal.localhost') }}
-                            </el-button>
-                        </div>
-                        <div class="search-button">
-                            <el-input
-                                v-model="hostFilterInfo"
-                                class="mt-1.5 w-[90%]"
-                                clearable
-                                suffix-icon="Search"
-                                :placeholder="$t('commons.button.search')"
-                            ></el-input>
-                        </div>
-                        <el-tree
-                            ref="treeRef"
-                            :expand-on-click-node="false"
-                            node-key="id"
-                            :default-expand-all="true"
-                            :data="hostTree"
-                            :props="defaultProps"
-                            :filter-node-method="filterHost"
-                            :empty-text="$t('terminal.noHost')"
-                        >
-                            <template #default="{ node, data }">
-                                <span class="custom-tree-node">
-                                    <span v-if="node.label === 'Default'">{{ $t('commons.table.default') }}</span>
-                                    <div v-else>
-                                        <span v-if="node.label.length <= 25">
-                                            <a @click="onClickConn(node, data)">{{ node.label }}</a>
+                    <el-popover
+                        ref="popoverRef"
+                        width="320px"
+                        trigger="hover"
+                        virtual-triggering
+                        persistent
+                        :offset="-4"
+                    >
+                        <div class="p-2 space-y-2">
+                            <div class="flex gap-2">
+                                <button
+                                    @click="onNewSsh"
+                                    class="flex-1 flex flex-col items-center justify-center px-3 py-2.5 bg-[var(--el-fill-color-light)] hover:bg-[var(--panel-main-bg-color-9)] rounded transition-colors duration-200 cursor-pointer group border-0 outline-none"
+                                >
+                                    <el-icon
+                                        class="text-xl mb-1 text-[var(--el-text-color-primary)] group-hover:text-[var(--el-color-primary)] transition-colors"
+                                    >
+                                        <Plus />
+                                    </el-icon>
+                                    <span
+                                        class="text-xs text-[var(--el-text-color-primary)] group-hover:text-[var(--el-color-primary)] font-medium truncate w-full text-center transition-colors"
+                                    >
+                                        {{ $t('terminal.createConn') }}
+                                    </span>
+                                </button>
+                                <button
+                                    @click="onNewLocal"
+                                    class="flex-1 flex flex-col items-center justify-center px-3 py-2.5 bg-[var(--el-fill-color-light)] hover:bg-[var(--panel-main-bg-color-9)] rounded transition-colors duration-200 cursor-pointer group border-0 outline-none"
+                                >
+                                    <el-icon
+                                        class="text-xl mb-1 text-[var(--el-text-color-primary)] group-hover:text-[var(--el-color-primary)] transition-colors"
+                                    >
+                                        <House />
+                                    </el-icon>
+                                    <span
+                                        class="text-xs text-[var(--el-text-color-primary)] group-hover:text-[var(--el-color-primary)] font-medium truncate w-full text-center transition-colors"
+                                    >
+                                        {{ $t('terminal.localhost') }}
+                                    </span>
+                                </button>
+                            </div>
+
+                            <el-divider class="my-0" />
+
+                            <div class="search-container px-1 py-1 bg-[var(--el-fill-color-light)] rounded">
+                                <el-input
+                                    v-model="hostFilterInfo"
+                                    class="w-full"
+                                    clearable
+                                    suffix-icon="Search"
+                                    :placeholder="$t('commons.button.search')"
+                                    size="small"
+                                >
+                                    <template #prefix>
+                                        <el-icon class="el-input__icon"><Search /></el-icon>
+                                    </template>
+                                </el-input>
+                            </div>
+                            <el-tree
+                                ref="treeRef"
+                                :expand-on-click-node="false"
+                                node-key="id"
+                                :default-expand-all="true"
+                                :data="hostTree"
+                                :props="defaultProps"
+                                :filter-node-method="filterHost"
+                                :empty-text="$t('terminal.noHost')"
+                                class="host-tree compact"
+                                :style="{ 'max-height': '200px' }"
+                            >
+                                <template #default="{ node, data }">
+                                    <span class="custom-tree-node w-full">
+                                        <span
+                                            v-if="node.label === 'Default'"
+                                            class="text-xs font-medium text-[var(--el-text-color-primary)]"
+                                        >
+                                            {{ $t('commons.table.default') }}
                                         </span>
-                                        <el-tooltip v-else :content="node.label" placement="right">
-                                            <span>
-                                                <a @click="onClickConn(node, data)">
-                                                    {{ node.label.substring(0, 22) }}...
+                                        <div v-else class="w-full min-w-0">
+                                            <span v-if="node.label.length <= 22">
+                                                <a
+                                                    @click="onClickConn(node, data)"
+                                                    class="text-xs text-[var(--el-text-color-primary)] hover:text-[var(--el-color-primary)] transition-colors cursor-pointer block truncate"
+                                                >
+                                                    {{ node.label }}
                                                 </a>
                                             </span>
-                                        </el-tooltip>
-                                    </div>
-                                </span>
-                            </template>
-                        </el-tree>
+                                            <el-tooltip v-else :content="node.label" placement="right">
+                                                <span>
+                                                    <a
+                                                        @click="onClickConn(node, data)"
+                                                        class="text-xs text-[var(--el-text-color-primary)] hover:text-[var(--el-color-primary)] transition-colors cursor-pointer block truncate"
+                                                    >
+                                                        {{ node.label.substring(0, 30) }}...
+                                                    </a>
+                                                </span>
+                                            </el-tooltip>
+                                        </div>
+                                    </span>
+                                </template>
+                            </el-tree>
+                        </div>
                     </el-popover>
                 </template>
             </el-tab-pane>
@@ -245,7 +301,7 @@ const loadTooltip = () => {
     return i18n.global.t('commons.button.' + (globalStore.isFullScreen ? 'quitFullscreen' : 'fullscreen'));
 };
 
-let timer: NodeJS.Timer | null = null;
+let timer: ReturnType<typeof setInterval> | null = null;
 const terminalValue = ref();
 const terminalTabs = ref([]) as any;
 let tabIndex = 0;
@@ -554,6 +610,77 @@ onMounted(() => {
 .tagButton {
     border: 0;
     background-color: var(--el-tabs__item);
+}
+
+.host-tree {
+    :deep(.el-tree-node) {
+        .el-tree-node__content {
+            height: 36px;
+            padding: 0 12px;
+
+            &:hover {
+                background-color: var(--el-fill-color-light);
+            }
+        }
+
+        .el-tree-node__label {
+            flex: 1;
+            padding-left: 8px;
+        }
+
+        .el-tree-node__expand-icon {
+            margin-right: 8px;
+        }
+    }
+
+    :deep(.el-tree__empty-block) {
+        padding: 24px 0;
+        min-height: auto;
+    }
+
+    :deep(.el-tree__empty-text) {
+        color: var(--el-text-color-secondary);
+        font-size: 13px;
+    }
+
+    &.compact {
+        :deep(.el-tree-node) {
+            .el-tree-node__content {
+                height: 28px;
+                padding: 0 8px;
+            }
+
+            .el-tree-node__label {
+                padding-left: 4px;
+            }
+
+            .el-tree-node__expand-icon {
+                margin-right: 4px;
+                font-size: 12px;
+            }
+        }
+
+        :deep(.el-tree-node__children) {
+            .el-tree-node__content {
+                padding-left: 20px;
+            }
+        }
+    }
+}
+
+.search-container {
+    :deep(.el-input__wrapper) {
+        border-radius: 6px;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+
+        &:hover {
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        &.is-focus {
+            box-shadow: 0 0 0 2px var(--el-color-primary-light-3);
+        }
+    }
 }
 
 .vertical-tabs > .el-tabs__content {
