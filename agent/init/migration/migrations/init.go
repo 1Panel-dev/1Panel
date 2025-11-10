@@ -676,6 +676,7 @@ var AddIptablesFilterRuleTable = &gormigrate.Migration{
 		}
 		for _, item := range firewalls {
 			if err := tx.Model(&model.Firewall{}).
+				Where("id = ?", item.ID).
 				Updates(map[string]interface{}{"dst_port": item.Port, "src_ip": item.Address, "firewall_type": firewallType}); err != nil {
 				global.LOG.Errorf("update firewall failed, err: %v", err)
 			}

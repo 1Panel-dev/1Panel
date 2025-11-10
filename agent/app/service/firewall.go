@@ -231,6 +231,10 @@ func (u *FirewallService) OperatePortRule(req dto.PortRuleOperate, reload bool) 
 	if err != nil {
 		return err
 	}
+	chain := ""
+	if client.Name() == "iptables" {
+		chain = iptables.Chain1PanelBasic
+	}
 	protos := strings.Split(req.Protocol, "/")
 	itemAddress := strings.Split(strings.TrimSuffix(req.Address, ","), ",")
 
@@ -248,7 +252,7 @@ func (u *FirewallService) OperatePortRule(req dto.PortRuleOperate, reload bool) 
 						return err
 					}
 					req.Port = strings.ReplaceAll(req.Port, ":", "-")
-					if err := u.addPortRecord(req); err != nil {
+					if err := u.addPortRecord(chain, req); err != nil {
 						return err
 					}
 				}
@@ -269,7 +273,7 @@ func (u *FirewallService) OperatePortRule(req dto.PortRuleOperate, reload bool) 
 			if len(req.Protocol) == 0 {
 				req.Protocol = "tcp/udp"
 			}
-			if err := u.addPortRecord(req); err != nil {
+			if err := u.addPortRecord(chain, req); err != nil {
 				return err
 			}
 		}
@@ -285,7 +289,7 @@ func (u *FirewallService) OperatePortRule(req dto.PortRuleOperate, reload bool) 
 				if err := u.operatePort(client, req); err != nil {
 					return err
 				}
-				if err := u.addPortRecord(req); err != nil {
+				if err := u.addPortRecord(chain, req); err != nil {
 					return err
 				}
 			}
@@ -302,7 +306,7 @@ func (u *FirewallService) OperatePortRule(req dto.PortRuleOperate, reload bool) 
 					if err := u.operatePort(client, req); err != nil {
 						return err
 					}
-					if err := u.addPortRecord(req); err != nil {
+					if err := u.addPortRecord(chain, req); err != nil {
 						return err
 					}
 				}
@@ -411,7 +415,10 @@ func (u *FirewallService) OperateAddressRule(req dto.AddrRuleOperate, reload boo
 	if err != nil {
 		return err
 	}
-
+	chain := ""
+	if client.Name() == "iptables" {
+		chain = iptables.Chain1PanelBasic
+	}
 	var fireInfo fireClient.FireInfo
 	if err := copier.Copy(&fireInfo, &req); err != nil {
 		return err
@@ -427,7 +434,7 @@ func (u *FirewallService) OperateAddressRule(req dto.AddrRuleOperate, reload boo
 			return err
 		}
 		req.Address = addressList[i]
-		if err := u.addAddressRecord(req); err != nil {
+		if err := u.addAddressRecord(chain, req); err != nil {
 			return err
 		}
 	}
@@ -672,7 +679,7 @@ func (u *FirewallService) addPortsBeforeStart(client firewall.FirewallClient) er
 	return client.Reload()
 }
 
-func (u *FirewallService) addPortRecord(req dto.PortRuleOperate) error {
+func (u *FirewallService) addPortRecord(chain string, req dto.PortRuleOperate) error {
 	if req.Operation == "remove" {
 		if req.ID != 0 {
 			return hostRepo.DeleteFirewallRecordByID(req.ID)
@@ -681,6 +688,7 @@ func (u *FirewallService) addPortRecord(req dto.PortRuleOperate) error {
 
 	if err := hostRepo.SaveFirewallRecord(&model.Firewall{
 		Type:        "port",
+		Chain:       chain,
 		DstPort:     req.Port,
 		Protocol:    req.Protocol,
 		SrcIP:       req.Address,
@@ -693,14 +701,16 @@ func (u *FirewallService) addPortRecord(req dto.PortRuleOperate) error {
 	return nil
 }
 
-func (u *FirewallService) addAddressRecord(req dto.AddrRuleOperate) error {
+func (u *FirewallService) addAddressRecord(chain string, req dto.AddrRuleOperate) error {
 	if req.Operation == "remove" {
 		if req.ID != 0 {
 			return hostRepo.DeleteFirewallRecordByID(req.ID)
 		}
 	}
+
 	if err := hostRepo.SaveFirewallRecord(&model.Firewall{
 		Type:        "address",
+		Chain:       chain,
 		SrcIP:       req.Address,
 		Strategy:    req.Strategy,
 		Description: req.Description,

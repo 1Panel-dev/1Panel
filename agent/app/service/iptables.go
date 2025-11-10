@@ -45,7 +45,7 @@ func (s *IptablesService) Search(req dto.SearchPageWithType) (int64, interface{}
 		records = rules[start:end]
 	}
 
-	rulesInDB, _ := hostRepo.ListFirewallRecord(hostRepo.WithByFirewallType("iptables"), hostRepo.WithByChain(req.Type))
+	rulesInDB, _ := hostRepo.ListFirewallRecord(hostRepo.WithByChain(req.Type))
 
 	for i := 0; i < len(records); i++ {
 		for _, item := range rulesInDB {
@@ -73,7 +73,12 @@ func (s *IptablesService) OperateRule(req dto.IptablesRuleOp) error {
 		Strategy: req.Strategy,
 	}
 
-	if req.Operation == "add" {
+	name := iptables.InputFileName
+	if req.Chain == iptables.Chain1PanelOutput {
+		name = iptables.OutputFileName
+	}
+	switch req.Operation {
+	case "add":
 		if err := s.validateRuleInput(&req); err != nil {
 			return err
 		}
@@ -96,24 +101,19 @@ func (s *IptablesService) OperateRule(req dto.IptablesRuleOp) error {
 		if err := hostRepo.SaveFirewallRecord(rule); err != nil {
 			return fmt.Errorf("failed to save rule to database: %w", err)
 		}
-		return nil
-	} else if req.Operation == "remove" {
+	case "remove":
 		if err := iptables.DeleteFilterRule(req.Chain, policy); err != nil {
 			return fmt.Errorf("failed to remove iptables rule: %w", err)
-		}
-		name := iptables.InputFileName
-		if req.Chain == iptables.Chain1PanelOutput {
-			name = iptables.OutputFileName
-		}
-		if err := iptables.SaveRulesToFile(iptables.FilterTab, req.Chain, name); err != nil {
-			global.LOG.Errorf("persistence for %s failed, err: %v", iptables.Chain1PanelBasic, err)
 		}
 		if req.ID != 0 {
 			if err := hostRepo.DeleteFirewallRecordByID(req.ID); err != nil {
 				return fmt.Errorf("failed to delete rule from database: %w", err)
 			}
 		}
-		return nil
+	}
+
+	if err := iptables.SaveRulesToFile(iptables.FilterTab, req.Chain, name); err != nil {
+		global.LOG.Errorf("persistence for %s failed, err: %v", iptables.Chain1PanelBasic, err)
 	}
 	return nil
 }
@@ -285,9 +285,6 @@ func loadBindNumber() int {
 		number++
 	}
 	if exist, _ := iptables.CheckChainExist(iptables.FilterTab, iptables.Chain1PanelBasic); exist {
-		number++
-	}
-	if exist, _ := iptables.CheckChainExist(iptables.FilterTab, iptables.Chain1PanelBasicAfter); exist {
 		number++
 	}
 	return number

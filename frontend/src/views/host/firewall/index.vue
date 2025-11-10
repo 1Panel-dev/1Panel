@@ -24,7 +24,7 @@ const buttons = [
         path: '/hosts/firewall/ip',
     },
     {
-        label: i18n.global.t('firewall.advancedControl'),
+        label: 'iptables ' + i18n.global.t('firewall.advancedControl'),
         path: '/hosts/firewall/advance',
     },
 ];

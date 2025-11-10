@@ -139,14 +139,12 @@ func validateRuleSafety(rule FilterRules, chain string) error {
 		return nil
 	}
 
-	// 入方向检查是否存在无条件 DROP
 	if chain == ChainInput || chain == Chain1PanelInput || chain == Chain1PanelBasic {
 		if rule.SrcIP == "0.0.0.0/0" && rule.SrcPort == 0 && rule.DstPort == 0 {
 			return fmt.Errorf("unsafe DROP is not allowed")
 		}
 	}
 
-	// 出方向检查是否存在无条件 DROP
 	if chain == ChainOutput || chain == Chain1PanelOutput || chain == Chain1PanelBasicAfter {
 		if rule.DstIP == "0.0.0.0/0" && rule.DstPort == 0 && rule.SrcPort == 0 {
 			return fmt.Errorf("unsafe DROP is not allowed")

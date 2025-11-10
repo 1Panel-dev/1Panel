@@ -24,7 +24,6 @@ type IHostRepo interface {
 	DeleteCert(opts ...DBOption) error
 
 	WithByChain(chain string) DBOption
-	WithByFirewallType(fireType string) DBOption
 }
 
 func NewIHostRepo() IHostRepo {
@@ -155,11 +154,6 @@ func (u *HostRepo) SyncCert(data []model.RootCert) error {
 	return nil
 }
 
-func (u *HostRepo) WithByFirewallType(fireType string) DBOption {
-	return func(g *gorm.DB) *gorm.DB {
-		return g.Where("firewall_type = ?", fireType)
-	}
-}
 func (u *HostRepo) WithByChain(chain string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("chain = ?", chain)

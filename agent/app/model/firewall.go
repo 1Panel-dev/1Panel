@@ -3,10 +3,9 @@ package model
 type Firewall struct {
 	BaseModel
 
-	Type         string `json:"type"`
-	FirewallType string `json:"firewallType"`
-	Port         string `json:"port"`    // Deprecated
-	Address      string `json:"address"` // Deprecated
+	Type    string `json:"type"`
+	Port    string `json:"port"`    // Deprecated
+	Address string `json:"address"` // Deprecated
 
 	Chain       string `json:"chain"`
 	Protocol    string `json:"protocol"`
