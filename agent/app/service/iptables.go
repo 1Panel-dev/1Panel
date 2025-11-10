@@ -132,8 +132,8 @@ func (s *IptablesService) Operate(req dto.IptablesOp) error {
 	}
 	switch req.Operate {
 	case "init-base":
-		if err := cmd.RunDefaultBashC("modprobe ip_tables"); err != nil {
-			return fmt.Errorf("failed to load ip_tables module: %v", err)
+		if ok := cmd.Which("iptables"); !ok {
+			return fmt.Errorf("failed to find iptables")
 		}
 		if err := iptables.AddChain(iptables.FilterTab, iptables.Chain1PanelBasicBefore); err != nil {
 			return err
