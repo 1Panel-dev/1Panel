@@ -14,7 +14,7 @@ services:
     networks:
       - 1panel-network
     volumes:
-      - ${MODEL_PATH}:/models
+      - ${MODEL_PATH}:${MODEL_PATH}
     ipc: host
     ulimits:
       memlock:

@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/user"
 	"path"
+	"strconv"
 	"strings"
 	"time"
 
@@ -630,6 +631,51 @@ var UpdateWebsiteSSLAddColumn = &gormigrate.Migration{
 
 var AddTensorRTLLMModel = &gormigrate.Migration{
 	ID: "20251018-add-tensorrt-llm-model",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(&model.TensorRTLLM{})
+	},
+}
+
+var UpdateMonitorInterval = &gormigrate.Migration{
+	ID: "20251026-update-monitor-interval",
+	Migrate: func(tx *gorm.DB) error {
+		var monitorInterval model.Setting
+		if err := tx.Where("key = ?", "MonitorInterval").First(&monitorInterval).Error; err != nil {
+			return err
+		}
+		interval, _ := strconv.Atoi(monitorInterval.Value)
+		if interval == 0 {
+			interval = 300
+		}
+		if err := tx.Model(&model.Setting{}).
+			Where("key = ?", "MonitorInterval").
+			Updates(map[string]interface{}{"value": fmt.Sprintf("%v", interval*60)}).
+			Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "DefaultIO", Value: "all"}).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}
+
+var AddMonitorProcess = &gormigrate.Migration{
+	ID: "20251030-add-monitor-process",
+	Migrate: func(tx *gorm.DB) error {
+		return global.MonitorDB.AutoMigrate(&model.MonitorBase{})
+	},
+}
+
+var UpdateCronJob = &gormigrate.Migration{
+	ID: "20251105-update-cronjob",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(&model.Cronjob{})
+	},
+}
+
+var UpdateTensorrtLLM = &gormigrate.Migration{
+	ID: "20251110-update-tensorrt-llm",
 	Migrate: func(tx *gorm.DB) error {
 		return tx.AutoMigrate(&model.TensorRTLLM{})
 	},
