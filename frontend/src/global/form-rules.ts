@@ -279,11 +279,11 @@ const checkVolumeName = (rule: any, value: any, callback: any) => {
 
 const checkLinuxName = (rule: any, value: any, callback: any) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
-        callback(new Error(i18n.global.t('commons.rule.linuxName', ['/\\:*?\'"<>|'])));
+        callback(new Error(i18n.global.t('commons.rule.linuxName', ['/\\:*?\'"()<>|'])));
     } else {
-        const reg = /^[^/\\\"'|<>?*]{1,128}$/;
+        const reg = /^[^/\\\"'|<>()?*]{1,128}$/;
         if (!reg.test(value) && value !== '') {
-            callback(new Error(i18n.global.t('commons.rule.linuxName', ['/\\:*?\'"<>|'])));
+            callback(new Error(i18n.global.t('commons.rule.linuxName', ['/\\:*?\'"()<>|'])));
         } else {
             callback();
         }
