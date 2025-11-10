@@ -134,6 +134,76 @@ var ToolKeys = map[string]uint{
 	"minio": 9001,
 }
 
+func CreateDB(ctx context.Context, app model.App, appInstall *model.AppInstall, params map[string]interface{}) error {
+	database := &model.Database{
+		AppInstallID: appInstall.ID,
+		Name:         appInstall.Name,
+		Type:         app.Key,
+		Version:      appInstall.Version,
+		From:         "local",
+		Address:      appInstall.ServiceName,
+		Port:         DatabaseKeys[app.Key],
+	}
+	detail, err := appDetailRepo.GetFirst(repo.WithByID(appInstall.AppDetailId))
+	if err != nil {
+		return err
+	}
+	formFields := &dto.AppForm{}
+	if err := json.Unmarshal([]byte(detail.Params), formFields); err != nil {
+		return err
+	}
+	for _, form := range formFields.FormFields {
+		if form.EnvKey == "PANEL_APP_PORT_HTTP" {
+			portFloat, ok := form.Default.(float64)
+			if ok {
+				database.Port = uint(int(portFloat))
+			}
+			break
+		}
+	}
+
+	switch app.Key {
+	case constant.AppMysql, constant.AppMariaDB, constant.AppPostgresql, constant.AppMongodb, constant.AppMysqlCluster, constant.AppPostgresqlCluster:
+		if password, ok := params["PANEL_DB_ROOT_PASSWORD"]; ok {
+			if password != "" {
+				database.Password = password.(string)
+				if app.Key == "mysql" || app.Key == "mariadb" || app.Key == constant.AppMysqlCluster {
+					database.Username = "root"
+				}
+				if rootUser, ok := params["PANEL_DB_ROOT_USER"]; ok {
+					database.Username = rootUser.(string)
+				}
+				authParam := dto.AuthParam{
+					RootPassword: password.(string),
+					RootUser:     database.Username,
+				}
+				authByte, err := json.Marshal(authParam)
+				if err != nil {
+					return err
+				}
+				appInstall.Param = string(authByte)
+
+			}
+		}
+	case constant.AppRedis, constant.AppRedisCluster:
+		if password, ok := params["PANEL_REDIS_ROOT_PASSWORD"]; ok {
+			authParam := dto.RedisAuthParam{
+				RootPassword: "",
+			}
+			if password != "" {
+				authParam.RootPassword = password.(string)
+				database.Password = password.(string)
+			}
+			authByte, err := json.Marshal(authParam)
+			if err != nil {
+				return err
+			}
+			appInstall.Param = string(authByte)
+		}
+	}
+	return databaseRepo.Create(ctx, database)
+}
+
 func createLink(ctx context.Context, installTask *task.Task, app model.App, appInstall *model.AppInstall, params map[string]interface{}) error {
 	deleteAppLink := func(t *task.Task) {
 		del := dto.DelAppLink{
@@ -145,74 +215,7 @@ func createLink(ctx context.Context, installTask *task.Task, app model.App, appI
 	}
 	if DatabaseKeys[app.Key] > 0 {
 		handleDataBaseApp := func(task *task.Task) error {
-			database := &model.Database{
-				AppInstallID: appInstall.ID,
-				Name:         appInstall.Name,
-				Type:         app.Key,
-				Version:      appInstall.Version,
-				From:         "local",
-				Address:      appInstall.ServiceName,
-				Port:         DatabaseKeys[app.Key],
-			}
-			detail, err := appDetailRepo.GetFirst(repo.WithByID(appInstall.AppDetailId))
-			if err != nil {
-				return err
-			}
-
-			formFields := &dto.AppForm{}
-			if err := json.Unmarshal([]byte(detail.Params), formFields); err != nil {
-				return err
-			}
-			for _, form := range formFields.FormFields {
-				if form.EnvKey == "PANEL_APP_PORT_HTTP" {
-					portFloat, ok := form.Default.(float64)
-					if ok {
-						database.Port = uint(int(portFloat))
-					}
-					break
-				}
-			}
-
-			switch app.Key {
-			case constant.AppMysql, constant.AppMariaDB, constant.AppPostgresql, constant.AppMongodb, constant.AppMysqlCluster, constant.AppPostgresqlCluster:
-				if password, ok := params["PANEL_DB_ROOT_PASSWORD"]; ok {
-					if password != "" {
-						database.Password = password.(string)
-						if app.Key == "mysql" || app.Key == "mariadb" || app.Key == constant.AppMysqlCluster {
-							database.Username = "root"
-						}
-						if rootUser, ok := params["PANEL_DB_ROOT_USER"]; ok {
-							database.Username = rootUser.(string)
-						}
-						authParam := dto.AuthParam{
-							RootPassword: password.(string),
-							RootUser:     database.Username,
-						}
-						authByte, err := json.Marshal(authParam)
-						if err != nil {
-							return err
-						}
-						appInstall.Param = string(authByte)
-
-					}
-				}
-			case constant.AppRedis, constant.AppRedisCluster:
-				if password, ok := params["PANEL_REDIS_ROOT_PASSWORD"]; ok {
-					authParam := dto.RedisAuthParam{
-						RootPassword: "",
-					}
-					if password != "" {
-						authParam.RootPassword = password.(string)
-						database.Password = password.(string)
-					}
-					authByte, err := json.Marshal(authParam)
-					if err != nil {
-						return err
-					}
-					appInstall.Param = string(authByte)
-				}
-			}
-			return databaseRepo.Create(ctx, database)
+			return CreateDB(ctx, app, appInstall, params)
 		}
 		installTask.AddSubTask(i18n.GetMsgByKey("HandleDatabaseApp"), handleDataBaseApp, deleteAppLink)
 	}
@@ -2135,16 +2138,18 @@ func needsUpdate(localTag *model.Tag, remoteTag dto.Tag, translations string) bo
 
 func hasLinkDB(installID uint) bool {
 	resources, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithAppInstallId(installID))
+	hasDB := false
 	if len(resources) > 0 {
 		for _, resource := range resources {
 			if resource.Key == constant.AppPostgres || resource.Key == constant.AppMysql ||
 				resource.Key == constant.AppMariaDB || resource.Key == constant.AppMysqlCluster ||
 				resource.Key == constant.AppPostgresql || resource.Key == constant.AppPostgresqlCluster {
-				return true
+				hasDB = true
+				break
 			}
 		}
 	}
-	return false
+	return hasDB
 }
 
 func isEditCompose(installed model.AppInstall) bool {
