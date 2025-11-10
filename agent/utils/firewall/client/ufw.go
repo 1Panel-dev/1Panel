@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/agent/buserr"
-	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 )
 
@@ -95,40 +94,6 @@ func (f *Ufw) ListPort() ([]FireInfo, error) {
 		}
 	}
 	return datas, nil
-}
-
-func (f *Ufw) ListForward() ([]FireInfo, error) {
-	if err := f.EnableForward(); err != nil {
-		global.LOG.Errorf("init port forward failed, err: %v", err)
-	}
-	iptables, err := NewIptables()
-	if err != nil {
-		return nil, err
-	}
-	rules, err := iptables.NatList()
-	if err != nil {
-		return nil, err
-	}
-
-	var list []FireInfo
-	for _, rule := range rules {
-		dest := strings.Split(rule.DestPort, ":")
-		if len(dest) < 2 {
-			continue
-		}
-		if len(dest[0]) == 0 {
-			dest[0] = "127.0.0.1"
-		}
-		list = append(list, FireInfo{
-			Num:        rule.Num,
-			Protocol:   rule.Protocol,
-			Interface:  rule.InIface,
-			Port:       rule.SrcPort,
-			TargetIP:   dest[0],
-			TargetPort: dest[1],
-		})
-	}
-	return list, nil
 }
 
 func (f *Ufw) ListAddress() ([]FireInfo, error) {
@@ -232,20 +197,15 @@ func (f *Ufw) RichRules(rule FireInfo, operation string) error {
 }
 
 func (f *Ufw) PortForward(info Forward, operation string) error {
-	iptables, err := NewIptables()
-	if err != nil {
-		return err
-	}
+	return iptablesPortForward(info, operation)
+}
 
-	if operation == "add" {
-		err = iptables.NatAdd(info.Protocol, info.Port, info.TargetIP, info.TargetPort, info.Interface, true)
-	} else {
-		err = iptables.NatRemove(info.Num, info.Protocol, info.Port, info.TargetIP, info.TargetPort, info.Interface)
-	}
-	if err != nil {
-		return fmt.Errorf("%s port forward failed, err: %s", operation, err)
-	}
-	return nil
+func (f *Ufw) EnableForward() error {
+	return EnableIptablesForward()
+}
+
+func (f *Ufw) ListForward() ([]FireInfo, error) {
+	return iptablesListForward()
 }
 
 func (f *Ufw) loadInfo(line string, fireType string) FireInfo {
@@ -291,40 +251,4 @@ func (f *Ufw) loadInfo(line string, fireType string) FireInfo {
 	itemInfo.Address = fields[3]
 
 	return itemInfo
-}
-
-func (f *Ufw) EnableForward() error {
-	iptables, err := NewIptables()
-	if err != nil {
-		return err
-	}
-	if err = iptables.Check(); err != nil {
-		return err
-	}
-
-	_ = iptables.NewChain(NatTab, PreRoutingChain)
-	_ = iptables.NewChain(NatTab, PostRoutingChain)
-	_ = iptables.NewChain(FilterTab, ForwardChain)
-
-	if err = f.enableChain(iptables); err != nil {
-		return err
-	}
-	return iptables.Reload()
-}
-
-func (f *Ufw) enableChain(iptables *Iptables) error {
-	rules, err := iptables.NatList("PREROUTING")
-	if err != nil {
-		return err
-	}
-	for _, rule := range rules {
-		if rule.Target == PreRoutingChain {
-			return nil
-		}
-	}
-
-	_ = iptables.AppendChain(NatTab, "PREROUTING", PreRoutingChain)
-	_ = iptables.AppendChain(NatTab, "POSTROUTING", PostRoutingChain)
-	_ = iptables.AppendChain(FilterTab, "FORWARD", ForwardChain)
-	return nil
 }

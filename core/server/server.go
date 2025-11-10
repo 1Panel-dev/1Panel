@@ -9,16 +9,13 @@ import (
 	"os"
 	"path"
 
-	"github.com/1Panel-dev/1Panel/core/init/proxy"
-	"github.com/gin-gonic/gin"
-
-	"github.com/1Panel-dev/1Panel/core/init/proxy"
-
 	"github.com/1Panel-dev/1Panel/core/init/db"
 	"github.com/1Panel-dev/1Panel/core/init/geo"
 	"github.com/1Panel-dev/1Panel/core/init/log"
 	"github.com/1Panel-dev/1Panel/core/init/migration"
+	"github.com/1Panel-dev/1Panel/core/init/proxy"
 	"github.com/1Panel-dev/1Panel/core/init/run"
+	"github.com/gin-gonic/gin"
 
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"

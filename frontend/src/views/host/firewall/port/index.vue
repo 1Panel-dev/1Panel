@@ -10,6 +10,7 @@
                 v-model:mask-show="maskShow"
                 v-model:is-active="isActive"
                 v-model:name="fireName"
+                current-tab="base"
             />
             <div v-if="fireName !== '-'">
                 <el-card v-if="!isActive && maskShow" class="mask-prompt">
@@ -33,6 +34,14 @@
                                 </span>
                             </template>
                         </el-alert>
+
+                        <div v-if="!isBind" class="mt-2">
+                            <el-alert
+                                type="info"
+                                :closable="false"
+                                :title="$t('firewall.basicStatus', ['1PANEL_BASIC'])"
+                            />
+                        </div>
                     </template>
                     <template #leftToolBar>
                         <el-button type="primary" @click="onOpenDialog('create')">
@@ -160,7 +169,13 @@ import OperateDialog from '@/views/host/firewall/port/operate/index.vue';
 import ImportDialog from '@/views/host/firewall/port/import/index.vue';
 import FireStatus from '@/views/host/firewall/status/index.vue';
 import { onMounted, reactive, ref } from 'vue';
-import { batchOperateRule, searchFireRule, updateFirewallDescription, updatePortRule } from '@/api/modules/host';
+import {
+    batchOperateRule,
+    loadChainStatus,
+    searchFireRule,
+    updateFirewallDescription,
+    updatePortRule,
+} from '@/api/modules/host';
 import { Host } from '@/api/interface/host';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
@@ -177,6 +192,7 @@ const searchStrategy = ref('');
 
 const maskShow = ref(true);
 const isActive = ref(false);
+const isBind = ref(false);
 const fireName = ref();
 const fireStatusRef = ref();
 
@@ -207,6 +223,7 @@ const search = async () => {
         pageSize: paginationConfig.pageSize,
     };
     loading.value = true;
+    loadStatus();
     await searchFireRule(params)
         .then((res) => {
             loading.value = false;
@@ -287,6 +304,12 @@ const onChange = async (info: any) => {
     info.type = 'port';
     await updateFirewallDescription(info);
     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+};
+
+const loadStatus = async () => {
+    await loadChainStatus('1PANEL_BASIC').then((res) => {
+        isBind.value = res.data.isBind;
+    });
 };
 
 const onDelete = async (row: Host.RuleInfo | null) => {

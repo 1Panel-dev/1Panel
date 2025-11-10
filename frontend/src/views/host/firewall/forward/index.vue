@@ -10,6 +10,7 @@
                 v-model:mask-show="maskShow"
                 v-model:is-active="isActive"
                 v-model:name="fireName"
+                current-tab="forward"
             />
             <div v-if="fireName !== '-'">
                 <el-card v-if="!isActive && maskShow" class="mask-prompt">

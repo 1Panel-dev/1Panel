@@ -31,6 +31,9 @@ func NewFirewallClient() (FirewallClient, error) {
 	firewalld := cmd.Which("firewalld")
 	ufw := cmd.Which("ufw")
 
+	if firewalld && ufw {
+		return nil, errors.New("It is detected that the system has both firewalld and ufw services. To avoid conflicts, please uninstall and try again!")
+	}
 	if firewalld {
 		return client.NewFirewalld()
 	}
@@ -40,7 +43,7 @@ func NewFirewallClient() (FirewallClient, error) {
 
 	iptables := cmd.Which("iptables")
 	if iptables {
-		return client.NewIptablesFirewall()
+		return client.NewIptables()
 	}
 	return nil, errors.New("No system firewall service detected (firewalld/ufw/iptables), please check and try again!")
 }

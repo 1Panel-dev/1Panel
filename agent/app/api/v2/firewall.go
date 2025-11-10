@@ -8,12 +8,19 @@ import (
 
 // @Tags Firewall
 // @Summary Load firewall base info
+// @Accept json
+// @Param request body dto.OperationWithName true "request"
 // @Success 200 {object} dto.FirewallBaseInfo
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /hosts/firewall/base [get]
+// @Router /hosts/firewall/base [post]
 func (b *BaseApi) LoadFirewallBaseInfo(c *gin.Context) {
-	data, err := firewallService.LoadBaseInfo()
+	var req dto.OperationWithName
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	data, err := firewallService.LoadBaseInfo(req.Name)
 	if err != nil {
 		helper.InternalServer(c, err)
 		return
@@ -223,53 +230,48 @@ func (b *BaseApi) UpdateAddrRule(c *gin.Context) {
 }
 
 // @Tags Firewall
-// @Summary Get iptables filter rules
+// @Summary search iptables filter rules
 // @Accept json
-// @Param request body dto.IptablesFilterRuleSearch true "request"
-// @Success 200 {object} []dto.IptablesChainInfo
+// @Param request body dto.SearchPageWithType true "request"
+// @Success 200 {object} dto.PageResult
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /hosts/firewall/filter/rules [post]
-func (b *BaseApi) GetFilterRules(c *gin.Context) {
-	var req dto.IptablesFilterRuleSearch
+// @Router /hosts/firewall/filter/search [post]
+func (b *BaseApi) SearchFilterRules(c *gin.Context) {
+	var req dto.SearchPageWithType
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
 
-	data, err := iptablesFilterService.GetFilterRules(req.Chains)
+	total, list, err := iptablesService.Search(req)
 	if err != nil {
 		helper.InternalServer(c, err)
 		return
 	}
 
-	helper.SuccessWithData(c, data)
+	helper.SuccessWithData(c, dto.PageResult{
+		Items: list,
+		Total: total,
+	})
 }
 
 // @Tags Firewall
 // @Summary Operate iptables filter rule
 // @Accept json
-// @Param request body dto.IptablesFilterRuleOperate true "request"
+// @Param request body dto.IptablesRuleOp true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /hosts/firewall/filter/rule [post]
+// @Router /hosts/firewall/filter/rule/operate [post]
 // @x-panel-log {"bodyKeys":["operation","chain"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"[operation] filter规则到 [chain]","formatEN":"[operation] filter rule to [chain]"}
 func (b *BaseApi) OperateFilterRule(c *gin.Context) {
-	var req dto.IptablesFilterRuleOperate
+	var req dto.IptablesRuleOp
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-
-	if req.Operation == "add" {
-		if err := iptablesFilterService.AddRule(req); err != nil {
-			helper.InternalServer(c, err)
-			return
-		}
-	} else if req.Operation == "remove" {
-		if err := iptablesFilterService.RemoveRule(req.ID); err != nil {
-			helper.InternalServer(c, err)
-			return
-		}
+	if err := iptablesService.OperateRule(req); err != nil {
+		helper.InternalServer(c, err)
+		return
 	}
 
 	helper.Success(c)
@@ -278,18 +280,18 @@ func (b *BaseApi) OperateFilterRule(c *gin.Context) {
 // @Tags Firewall
 // @Summary Batch operate iptables filter rules
 // @Accept json
-// @Param request body dto.IptablesFilterBatchOperate true "request"
+// @Param request body dto.IptablesBatchOperate true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /hosts/firewall/filter/batch [post]
+// @Router /hosts/firewall/filter/rule/batch [post]
 func (b *BaseApi) BatchOperateFilterRule(c *gin.Context) {
-	var req dto.IptablesFilterBatchOperate
+	var req dto.IptablesBatchOperate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
 
-	if err := iptablesFilterService.BatchOperate(req); err != nil {
+	if err := iptablesService.BatchOperate(req); err != nil {
 		helper.InternalServer(c, err)
 		return
 	}
@@ -300,35 +302,38 @@ func (b *BaseApi) BatchOperateFilterRule(c *gin.Context) {
 // @Tags Firewall
 // @Summary Apply/Unload/Init iptables filter
 // @Accept json
-// @Param request body dto.IptablesFilterApply true "request"
+// @Param request body dto.IptablesOp true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /hosts/firewall/filter/apply [post]
-// @x-panel-log {"bodyKeys":["operation"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"[operation] iptables filter防火墙","formatEN":"[operation] iptables filter firewall"}
-func (b *BaseApi) ApplyFilterFirewall(c *gin.Context) {
-	var req dto.IptablesFilterApply
+// @Router /hosts/firewall/filter/operate [post]
+// @x-panel-log {"bodyKeys":["operate"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"[operate] iptables filter 防火墙","formatEN":"[operate] iptables filter firewall"}
+func (b *BaseApi) OperateFilterChain(c *gin.Context) {
+	var req dto.IptablesOp
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := iptablesService.Operate(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+
+	helper.Success(c)
+}
+
+// @Tags Firewall
+// @Summary load chain status with name
+// @Accept json
+// @Param request body dto.OperationWithName true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /hosts/firewall/filter/chain/status [post]
+func (b *BaseApi) LoadChainStatus(c *gin.Context) {
+	var req dto.OperationWithName
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
 
-	switch req.Operation {
-	case "init":
-		if err := iptablesFilterService.InitChains(); err != nil {
-			helper.InternalServer(c, err)
-			return
-		}
-	case "apply":
-		if err := iptablesFilterService.ApplyFirewall(); err != nil {
-			helper.InternalServer(c, err)
-			return
-		}
-	case "unload":
-		if err := iptablesFilterService.UnloadFirewall(); err != nil {
-			helper.InternalServer(c, err)
-			return
-		}
-	}
-
-	helper.Success(c)
+	helper.SuccessWithData(c, iptablesService.LoadChainStatus(req))
 }
