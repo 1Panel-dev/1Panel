@@ -3,10 +3,10 @@ package model
 type Firewall struct {
 	BaseModel
 
-	Type         string `gorm:"not null" json:"type"`
-	FirewallType string `gorm:"not null" json:"firewallType"`
-	Port         string `gorm:"not null" json:"port"`    // Deprecated
-	Address      string `gorm:"not null" json:"address"` // Deprecated
+	Type         string `json:"type"`
+	FirewallType string `json:"firewallType"`
+	Port         string `json:"port"`    // Deprecated
+	Address      string `json:"address"` // Deprecated
 
 	Chain       string `json:"chain"`
 	Protocol    string `json:"protocol"`
