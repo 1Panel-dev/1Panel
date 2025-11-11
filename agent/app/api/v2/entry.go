@@ -38,6 +38,7 @@ var (
 	fileService     = service.NewIFileService()
 	sshService      = service.NewISSHService()
 	firewallService = service.NewIFirewallService()
+	iptablesService = service.NewIIptablesService()
 	monitorService  = service.NewIMonitorService()
 	systemService   = service.NewISystemService()
 

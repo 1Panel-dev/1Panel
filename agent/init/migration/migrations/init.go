@@ -19,6 +19,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/copier"
 	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
 	"github.com/1Panel-dev/1Panel/agent/utils/ssh"
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 
@@ -48,7 +49,6 @@ var AddTable = &gormigrate.Migration{
 			&model.DatabaseMysql{},
 			&model.DatabasePostgresql{},
 			&model.Favorite{},
-			&model.Forward{},
 			&model.Firewall{},
 			&model.Ftp{},
 			&model.ImageRepo{},
@@ -660,6 +660,31 @@ var UpdateMonitorInterval = &gormigrate.Migration{
 	},
 }
 
+var AddIptablesFilterRuleTable = &gormigrate.Migration{
+	ID: "20251106-add-iptables-filter-rule-table",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.Firewall{}); err != nil {
+			return err
+		}
+		var firewalls []model.Firewall
+		_ = tx.Where("1 = 1").Find(&firewalls).Error
+
+		firewallType := ""
+		client, err := firewall.NewFirewallClient()
+		if err == nil {
+			firewallType = client.Name()
+		}
+		for _, item := range firewalls {
+			if err := tx.Model(&model.Firewall{}).
+				Where("id = ?", item.ID).
+				Updates(map[string]interface{}{"dst_port": item.Port, "src_ip": item.Address, "firewall_type": firewallType}); err != nil {
+				global.LOG.Errorf("update firewall failed, err: %v", err)
+			}
+		}
+		return nil
+	},
+}
+
 var AddMonitorProcess = &gormigrate.Migration{
 	ID: "20251030-add-monitor-process",
 	Migrate: func(tx *gorm.DB) error {
@@ -671,5 +696,12 @@ var UpdateCronJob = &gormigrate.Migration{
 	ID: "20251105-update-cronjob",
 	Migrate: func(tx *gorm.DB) error {
 		return tx.AutoMigrate(&model.Cronjob{})
+	},
+}
+
+var UpdateTensorrtLLM = &gormigrate.Migration{
+	ID: "20251110-update-tensorrt-llm",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(&model.TensorRTLLM{})
 	},
 }

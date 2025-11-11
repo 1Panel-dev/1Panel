@@ -4,10 +4,11 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"net"
 	"net/http"
 	"os"
+
+	"github.com/gin-gonic/gin"
 
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/constant"
@@ -19,6 +20,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/init/cache"
 	"github.com/1Panel-dev/1Panel/agent/init/db"
 	"github.com/1Panel-dev/1Panel/agent/init/dir"
+	"github.com/1Panel-dev/1Panel/agent/init/firewall"
 	"github.com/1Panel-dev/1Panel/agent/init/hook"
 	"github.com/1Panel-dev/1Panel/agent/init/lang"
 	"github.com/1Panel-dev/1Panel/agent/init/log"
@@ -38,8 +40,12 @@ func Start() {
 	i18n.Init()
 	cache.Init()
 	app.Init()
+	firewall.Init()
 	lang.Init()
 	validator.Init()
+	if os.Getenv("GIN_MODE") == "" {
+		gin.SetMode(gin.ReleaseMode)
+	}
 	cron.Run()
 	hook.Init()
 	InitOthers()

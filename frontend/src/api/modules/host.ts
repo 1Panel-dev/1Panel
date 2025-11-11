@@ -6,8 +6,8 @@ import { deepCopy } from '@/utils/util';
 import { Base64 } from 'js-base64';
 
 // firewall
-export const loadFireBaseInfo = () => {
-    return http.get<Host.FirewallBase>(`/hosts/firewall/base`);
+export const loadFireBaseInfo = (tab: string) => {
+    return http.post<Host.FirewallBase>(`/hosts/firewall/base`, { name: tab }, TimeoutEnum.T_40S);
 };
 export const searchFireRule = (params: Host.RuleSearch) => {
     return http.post<ResPage<Host.RuleInfo>>(`/hosts/firewall/search`, params, TimeoutEnum.T_40S);
@@ -42,6 +42,23 @@ export const updateFirewallDescription = (params: Host.UpdateDescription) => {
 };
 export const batchOperateRule = (params: Host.BatchRule) => {
     return http.post(`/hosts/firewall/batch`, params, TimeoutEnum.T_60S);
+};
+
+// Iptables Filter
+export const searchFilterRules = (params: Host.IptablesFilterRuleSearch) => {
+    return http.post<Host.IptablesData>(`/hosts/firewall/filter/rule/search`, params);
+};
+export const loadChainStatus = (name: string) => {
+    return http.post<Host.ChainStatus>(`/hosts/firewall/filter/chain/status`, { name: name }, TimeoutEnum.T_60S);
+};
+export const operateFilterRule = (params: Host.IptablesFilterRuleOp) => {
+    return http.post(`/hosts/firewall/filter/rule/operate`, params, TimeoutEnum.T_40S);
+};
+export const batchOperateFilterRule = (params: { rules: Host.IptablesFilterRuleOp[] }) => {
+    return http.post(`/hosts/firewall/filter/rule/batch`, params, TimeoutEnum.T_40S);
+};
+export const operateFilterChain = (name: string, op: string) => {
+    return http.post(`/hosts/firewall/filter/operate`, { name: name, operate: op }, TimeoutEnum.T_60S);
 };
 
 // monitors

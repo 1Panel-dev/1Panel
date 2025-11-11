@@ -140,7 +140,7 @@ const onExport = () => {
             cancelButtonText: i18n.global.t('commons.button.cancel'),
         },
     ).then(async () => {
-        const exportData = data.value.map((item: Container.TemplateInfo) => ({
+        const exportData = selects.value.map((item: Container.TemplateInfo) => ({
             name: item.name,
             description: item.description,
             content: item.content,

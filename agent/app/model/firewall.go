@@ -3,20 +3,16 @@ package model
 type Firewall struct {
 	BaseModel
 
-	Type        string `gorm:"not null" json:"type"`
-	Port        string `gorm:"not null" json:"port"`
-	Protocol    string `gorm:"not null" json:"protocol"`
-	Address     string `gorm:"not null" json:"address"`
+	Type    string `json:"type"`
+	Port    string `json:"port"`    // Deprecated
+	Address string `json:"address"` // Deprecated
+
+	Chain       string `json:"chain"`
+	Protocol    string `json:"protocol"`
+	SrcIP       string `json:"srcIP"`
+	SrcPort     string `json:"srcPort"`
+	DstIP       string `json:"dstIP"`
+	DstPort     string `json:"dstPort"`
 	Strategy    string `gorm:"not null" json:"strategy"`
-	Description string `gorm:"not null" json:"description"`
-}
-
-type Forward struct {
-	BaseModel
-
-	Protocol   string `gorm:"not null" json:"protocol"`
-	Port       string `gorm:"not null" json:"port"`
-	TargetIP   string `gorm:"not null" json:"targetIP"`
-	TargetPort string `gorm:"not null" json:"targetPort"`
-	Interface  string `json:"interface"`
+	Description string `json:"description"`
 }

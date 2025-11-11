@@ -19,6 +19,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/controller"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
 	fireClient "github.com/1Panel-dev/1Panel/agent/utils/firewall/client"
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall/client/iptables"
 	"github.com/jinzhu/copier"
 )
 
@@ -27,7 +28,7 @@ const confPath = "/etc/sysctl.conf"
 type FirewallService struct{}
 
 type IFirewallService interface {
-	LoadBaseInfo() (dto.FirewallBaseInfo, error)
+	LoadBaseInfo(tab string) (dto.FirewallBaseInfo, error)
 	SearchWithPage(search dto.RuleSearch) (int64, interface{}, error)
 	OperateFirewall(req dto.FirewallOperation) error
 	OperatePortRule(req dto.PortRuleOperate, reload bool) error
@@ -43,7 +44,7 @@ func NewIFirewallService() IFirewallService {
 	return &FirewallService{}
 }
 
-func (u *FirewallService) LoadBaseInfo() (dto.FirewallBaseInfo, error) {
+func (u *FirewallService) LoadBaseInfo(tab string) (dto.FirewallBaseInfo, error) {
 	var baseInfo dto.FirewallBaseInfo
 	baseInfo.Version = "-"
 	baseInfo.Name = "-"
@@ -57,7 +58,7 @@ func (u *FirewallService) LoadBaseInfo() (dto.FirewallBaseInfo, error) {
 	baseInfo.Name = client.Name()
 
 	var wg sync.WaitGroup
-	wg.Add(3)
+	wg.Add(4)
 	go func() {
 		defer wg.Done()
 		baseInfo.PingStatus = u.pingStatus()
@@ -69,6 +70,10 @@ func (u *FirewallService) LoadBaseInfo() (dto.FirewallBaseInfo, error) {
 	go func() {
 		defer wg.Done()
 		baseInfo.Version, _ = client.Version()
+	}()
+	go func() {
+		defer wg.Done()
+		baseInfo.IsInit, baseInfo.IsBind = loadInitStatus(baseInfo.Name, tab)
 	}()
 	wg.Wait()
 	return baseInfo, nil
@@ -158,15 +163,17 @@ func (u *FirewallService) SearchWithPage(req dto.RuleSearch) (int64, interface{}
 			if req.Type != des.Type {
 				continue
 			}
-			if backDatas[i].Port == des.Port &&
+			if backDatas[i].Port == des.DstPort &&
 				req.Type == "port" &&
 				backDatas[i].Protocol == des.Protocol &&
 				backDatas[i].Strategy == des.Strategy &&
-				backDatas[i].Address == des.Address {
+				backDatas[i].Address == des.SrcIP {
+				backDatas[i].ID = des.ID
 				backDatas[i].Description = des.Description
 				break
 			}
-			if req.Type == "address" && backDatas[i].Strategy == des.Strategy && backDatas[i].Address == des.Address {
+			if req.Type == "address" && backDatas[i].Strategy == des.Strategy && backDatas[i].Address == des.SrcIP {
+				backDatas[i].ID = des.ID
 				backDatas[i].Description = des.Description
 				break
 			}
@@ -224,6 +231,10 @@ func (u *FirewallService) OperatePortRule(req dto.PortRuleOperate, reload bool) 
 	if err != nil {
 		return err
 	}
+	chain := ""
+	if client.Name() == "iptables" {
+		chain = iptables.Chain1PanelBasic
+	}
 	protos := strings.Split(req.Protocol, "/")
 	itemAddress := strings.Split(strings.TrimSuffix(req.Address, ","), ",")
 
@@ -241,7 +252,7 @@ func (u *FirewallService) OperatePortRule(req dto.PortRuleOperate, reload bool) 
 						return err
 					}
 					req.Port = strings.ReplaceAll(req.Port, ":", "-")
-					if err := u.addPortRecord(req); err != nil {
+					if err := u.addPortRecord(chain, req); err != nil {
 						return err
 					}
 				}
@@ -262,7 +273,7 @@ func (u *FirewallService) OperatePortRule(req dto.PortRuleOperate, reload bool) 
 			if len(req.Protocol) == 0 {
 				req.Protocol = "tcp/udp"
 			}
-			if err := u.addPortRecord(req); err != nil {
+			if err := u.addPortRecord(chain, req); err != nil {
 				return err
 			}
 		}
@@ -278,7 +289,7 @@ func (u *FirewallService) OperatePortRule(req dto.PortRuleOperate, reload bool) 
 				if err := u.operatePort(client, req); err != nil {
 					return err
 				}
-				if err := u.addPortRecord(req); err != nil {
+				if err := u.addPortRecord(chain, req); err != nil {
 					return err
 				}
 			}
@@ -295,7 +306,7 @@ func (u *FirewallService) OperatePortRule(req dto.PortRuleOperate, reload bool) 
 					if err := u.operatePort(client, req); err != nil {
 						return err
 					}
-					if err := u.addPortRecord(req); err != nil {
+					if err := u.addPortRecord(chain, req); err != nil {
 						return err
 					}
 				}
@@ -404,7 +415,10 @@ func (u *FirewallService) OperateAddressRule(req dto.AddrRuleOperate, reload boo
 	if err != nil {
 		return err
 	}
-
+	chain := ""
+	if client.Name() == "iptables" {
+		chain = iptables.Chain1PanelBasic
+	}
 	var fireInfo fireClient.FireInfo
 	if err := copier.Copy(&fireInfo, &req); err != nil {
 		return err
@@ -420,7 +434,7 @@ func (u *FirewallService) OperateAddressRule(req dto.AddrRuleOperate, reload boo
 			return err
 		}
 		req.Address = addressList[i]
-		if err := u.addAddressRecord(req); err != nil {
+		if err := u.addAddressRecord(chain, req); err != nil {
 			return err
 		}
 	}
@@ -459,10 +473,16 @@ func (u *FirewallService) UpdateAddrRule(req dto.AddrRuleUpdate) error {
 }
 
 func (u *FirewallService) UpdateDescription(req dto.UpdateFirewallDescription) error {
-	var firewall model.Firewall
-	if err := copier.Copy(&firewall, &req); err != nil {
-		return buserr.WithDetail("ErrStructTransform", err.Error(), nil)
+	firewall := model.Firewall{
+		Type:        req.Type,
+		Chain:       iptables.Chain1PanelBasic,
+		SrcIP:       req.Address,
+		DstPort:     req.Port,
+		Protocol:    req.Protocol,
+		Strategy:    req.Strategy,
+		Description: req.Description,
 	}
+
 	return hostRepo.SaveFirewallRecord(&firewall)
 }
 
@@ -562,7 +582,7 @@ func (u *FirewallService) cleanUnUsedData(client firewall.FirewallClient) {
 	}
 	for _, item := range list {
 		for i := 0; i < len(records); i++ {
-			if records[i].Port == item.Port && records[i].Protocol == item.Protocol && records[i].Strategy == item.Strategy && records[i].Address == item.Address {
+			if records[i].DstPort == item.Port && records[i].Protocol == item.Protocol && records[i].Strategy == item.Strategy && records[i].SrcIP == item.Address {
 				records = append(records[:i], records[i+1:]...)
 			}
 		}
@@ -659,16 +679,19 @@ func (u *FirewallService) addPortsBeforeStart(client firewall.FirewallClient) er
 	return client.Reload()
 }
 
-func (u *FirewallService) addPortRecord(req dto.PortRuleOperate) error {
+func (u *FirewallService) addPortRecord(chain string, req dto.PortRuleOperate) error {
 	if req.Operation == "remove" {
-		return hostRepo.DeleteFirewallRecord("port", req.Port, req.Protocol, req.Address, req.Strategy)
+		if req.ID != 0 {
+			return hostRepo.DeleteFirewallRecordByID(req.ID)
+		}
 	}
 
 	if err := hostRepo.SaveFirewallRecord(&model.Firewall{
 		Type:        "port",
-		Port:        req.Port,
+		Chain:       chain,
+		DstPort:     req.Port,
 		Protocol:    req.Protocol,
-		Address:     req.Address,
+		SrcIP:       req.Address,
 		Strategy:    req.Strategy,
 		Description: req.Description,
 	}); err != nil {
@@ -678,13 +701,17 @@ func (u *FirewallService) addPortRecord(req dto.PortRuleOperate) error {
 	return nil
 }
 
-func (u *FirewallService) addAddressRecord(req dto.AddrRuleOperate) error {
+func (u *FirewallService) addAddressRecord(chain string, req dto.AddrRuleOperate) error {
 	if req.Operation == "remove" {
-		return hostRepo.DeleteFirewallRecord("address", "", "", req.Address, req.Strategy)
+		if req.ID != 0 {
+			return hostRepo.DeleteFirewallRecordByID(req.ID)
+		}
 	}
+
 	if err := hostRepo.SaveFirewallRecord(&model.Firewall{
 		Type:        "address",
-		Address:     req.Address,
+		Chain:       chain,
+		SrcIP:       req.Address,
 		Strategy:    req.Strategy,
 		Description: req.Description,
 	}); err != nil {
@@ -750,4 +777,91 @@ func checkPortUsed(ports, proto string, apps []portOfApp) string {
 		return "inUsed"
 	}
 	return ""
+}
+
+func loadInitStatus(clientName, tab string) (bool, bool) {
+	if clientName != "iptables" && tab != "forward" {
+		return true, true
+	}
+	switch tab {
+	case "base":
+		if isExist, _ := iptables.CheckChainExist(iptables.FilterTab, iptables.Chain1PanelBasicBefore); !isExist {
+			return false, false
+		}
+		if exist := iptables.CheckRuleExist(iptables.FilterTab, iptables.Chain1PanelBasicBefore, iptables.IoRuleIn); !exist {
+			return false, false
+		}
+		if exist := iptables.CheckRuleExist(iptables.FilterTab, iptables.Chain1PanelBasicBefore, iptables.EstablishedRule); !exist {
+			return false, false
+		}
+		if exist, _ := iptables.CheckChainExist(iptables.FilterTab, iptables.Chain1PanelBasic); !exist {
+			return false, false
+		}
+		if exist, _ := iptables.CheckChainExist(iptables.FilterTab, iptables.Chain1PanelBasicAfter); !exist {
+			return false, false
+		}
+		if exist := iptables.CheckRuleExist(iptables.FilterTab, iptables.Chain1PanelBasicAfter, iptables.DropAll); !exist {
+			return false, false
+		}
+		if bind, _ := iptables.CheckChainBind(iptables.FilterTab, iptables.ChainInput, iptables.Chain1PanelBasicBefore); !bind {
+			return true, false
+		}
+		if bind, _ := iptables.CheckChainBind(iptables.FilterTab, iptables.ChainInput, iptables.Chain1PanelBasic); !bind {
+			return true, false
+		}
+		if bind, _ := iptables.CheckChainBind(iptables.FilterTab, iptables.ChainInput, iptables.Chain1PanelBasicAfter); !bind {
+			return true, false
+		}
+		return true, true
+	case "advance":
+		isExist, _ := iptables.CheckChainExist(iptables.FilterTab, iptables.Chain1PanelInput)
+		if !isExist {
+			return false, false
+		}
+		isExist, _ = iptables.CheckChainExist(iptables.FilterTab, iptables.Chain1PanelOutput)
+		if !isExist {
+			return false, false
+		}
+
+		isBind, _ := iptables.CheckChainBind(iptables.FilterTab, iptables.ChainInput, iptables.Chain1PanelInput)
+		if !isBind {
+			return true, false
+		}
+		isBind, _ = iptables.CheckChainBind(iptables.FilterTab, iptables.ChainOutput, iptables.Chain1PanelOutput)
+		return true, isBind
+	case "forward":
+		stdout, err := cmd.RunDefaultWithStdoutBashC("cat /proc/sys/net/ipv4/ip_forward")
+		if err != nil {
+			global.LOG.Errorf("check /proc/sys/net/ipv4/ip_forward failed, err: %v", err)
+			return false, false
+		}
+		if strings.TrimSpace(stdout) == "0" {
+			return false, false
+		}
+
+		exist, _ := iptables.CheckChainExist(iptables.NatTab, iptables.Chain1PanelPreRouting)
+		if !exist {
+			return false, false
+		}
+		exist, _ = iptables.CheckChainExist(iptables.NatTab, iptables.Chain1PanelPostRouting)
+		if !exist {
+			return false, false
+		}
+		exist, _ = iptables.CheckChainExist(iptables.FilterTab, iptables.Chain1PanelForward)
+		if !exist {
+			return false, false
+		}
+		isBind, _ := iptables.CheckChainBind(iptables.NatTab, "PREROUTING", iptables.Chain1PanelPreRouting)
+		if !isBind {
+			return false, false
+		}
+		isBind, _ = iptables.CheckChainBind(iptables.NatTab, "POSTROUTING", iptables.Chain1PanelPostRouting)
+		if !isBind {
+			return false, false
+		}
+		isBind, _ = iptables.CheckChainBind(iptables.FilterTab, "FORWARD", iptables.Chain1PanelForward)
+		return true, isBind
+	default:
+		return false, false
+	}
 }

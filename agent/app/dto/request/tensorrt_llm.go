@@ -14,6 +14,8 @@ type TensorRTLLMCreate struct {
 	ModelDir      string `json:"modelDir" validate:"required"`
 	Image         string `json:"image"  validate:"required"`
 	Command       string `json:"command" validate:"required"`
+	ModelType     string `json:"modelType"`
+	ModelSpeedup  bool   `json:"modelSpeedup"`
 	DockerConfig
 }
 

@@ -4,6 +4,8 @@ type FirewallBaseInfo struct {
 	Name       string `json:"name"`
 	IsExist    bool   `json:"isExist"`
 	IsActive   bool   `json:"isActive"`
+	IsInit     bool   `json:"isInit"`
+	IsBind     bool   `json:"isBind"`
 	Version    string `json:"version"`
 	PingStatus string `json:"pingStatus"`
 }
@@ -22,6 +24,7 @@ type FirewallOperation struct {
 }
 
 type PortRuleOperate struct {
+	ID        uint   `json:"id"`
 	Operation string `json:"operation" validate:"required,oneof=add remove"`
 	Address   string `json:"address"`
 	Port      string `json:"port" validate:"required"`
@@ -55,6 +58,7 @@ type UpdateFirewallDescription struct {
 }
 
 type AddrRuleOperate struct {
+	ID        uint   `json:"id"`
 	Operation string `json:"operation" validate:"required,oneof=add remove"`
 	Address   string `json:"address"  validate:"required"`
 	Strategy  string `json:"strategy" validate:"required,oneof=accept drop"`
@@ -75,4 +79,31 @@ type AddrRuleUpdate struct {
 type BatchRuleOperate struct {
 	Type  string            `json:"type" validate:"required"`
 	Rules []PortRuleOperate `json:"rules"`
+}
+
+type IptablesOp struct {
+	Name    string `json:"name" validate:"required,oneof=1PANEL_INPUT 1PANEL_OUTPUT 1PANEL_BASIC"`
+	Operate string `json:"operate" validate:"required,oneof=init-base init-forward init-advance bind-base unbind-base bind unbind"`
+}
+
+type IptablesRuleOp struct {
+	Operation   string `json:"operation" validate:"required,oneof=add remove"`
+	ID          uint   `json:"id"`
+	Chain       string `json:"chain" validate:"required,oneof=1PANEL_INPUT 1PANEL_OUTPUT"`
+	Protocol    string `json:"protocol"`
+	SrcIP       string `json:"srcIP"`
+	SrcPort     uint   `json:"srcPort"`
+	DstIP       string `json:"dstIP"`
+	DstPort     uint   `json:"dstPort"`
+	Strategy    string `json:"strategy" validate:"required,oneof=ACCEPT DROP REJECT"`
+	Description string `json:"description"`
+}
+
+type IptablesBatchOperate struct {
+	Rules []IptablesRuleOp `json:"rules"`
+}
+
+type IptablesChainStatus struct {
+	IsBind          bool   `json:"isBind"`
+	DefaultStrategy string `json:"defaultStrategy"`
 }

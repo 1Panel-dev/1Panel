@@ -4,8 +4,6 @@ import (
 	"crypto/tls"
 	"encoding/gob"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/core/init/proxy"
-	"github.com/gin-gonic/gin"
 	"net"
 	"net/http"
 	"os"
@@ -15,7 +13,9 @@ import (
 	"github.com/1Panel-dev/1Panel/core/init/geo"
 	"github.com/1Panel-dev/1Panel/core/init/log"
 	"github.com/1Panel-dev/1Panel/core/init/migration"
+	"github.com/1Panel-dev/1Panel/core/init/proxy"
 	"github.com/1Panel-dev/1Panel/core/init/run"
+	"github.com/gin-gonic/gin"
 
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
@@ -40,6 +40,9 @@ func Start() {
 	gob.Register(psession.SessionUser{})
 	cron.Init()
 	session.Init()
+	if os.Getenv("GIN_MODE") == "" {
+		gin.SetMode(gin.ReleaseMode)
+	}
 	hook.Init()
 	InitOthers()
 
