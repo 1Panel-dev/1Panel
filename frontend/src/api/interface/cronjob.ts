@@ -111,7 +111,7 @@ export namespace Cronjob {
         alertTitle: string;
         alertMethod: string;
 
-        scopes: string[];
+        scopes?: string[];
     }
     export interface CronjobTrans {
         name: string;
