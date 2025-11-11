@@ -40,6 +40,23 @@ func Marshal(envMap map[string]string) (string, error) {
 	return strings.Join(lines, "\n"), nil
 }
 
+func WriteWithOrder(envMap map[string]string, filename string, orders []string) error {
+	content, err := MarshalWithOrder(envMap, orders)
+	if err != nil {
+		return err
+	}
+	file, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	_, err = file.WriteString(content + "\n")
+	if err != nil {
+		return err
+	}
+	return file.Sync()
+}
+
 func MarshalWithOrder(envMap map[string]string, orders []string) (string, error) {
 	lines := make([]string, 0, len(envMap))
 	for _, k := range orders {
