@@ -102,14 +102,14 @@ func (b *BaseApi) OperatePortRule(c *gin.Context) {
 
 // OperateForwardRule
 // @Tags Firewall
-// @Summary Create group
+// @Summary Operate forward rule
 // @Accept json
 // @Param request body dto.ForwardRuleOperate true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /hosts/firewall/forward [post]
-// @x-panel-log {"bodyKeys":["source_port"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新端口转发规则 [source_port]","formatEN":"update port forward rules [source_port]"}
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新端口转发规则","formatEN":"update port forward rules"}
 func (b *BaseApi) OperateForwardRule(c *gin.Context) {
 	var req dto.ForwardRuleOperate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -124,7 +124,7 @@ func (b *BaseApi) OperateForwardRule(c *gin.Context) {
 }
 
 // @Tags Firewall
-// @Summary Create group
+// @Summary Operate Ip rule
 // @Accept json
 // @Param request body dto.AddrRuleOperate true "request"
 // @Success 200
@@ -146,7 +146,7 @@ func (b *BaseApi) OperateIPRule(c *gin.Context) {
 }
 
 // @Tags Firewall
-// @Summary Create group
+// @Summary Batch operate rule
 // @Accept json
 // @Param request body dto.BatchRuleOperate true "request"
 // @Success 200
@@ -188,7 +188,7 @@ func (b *BaseApi) UpdateFirewallDescription(c *gin.Context) {
 }
 
 // @Tags Firewall
-// @Summary Create group
+// @Summary Update port rule
 // @Accept json
 // @Param request body dto.PortRuleUpdate true "request"
 // @Success 200
@@ -209,7 +209,7 @@ func (b *BaseApi) UpdatePortRule(c *gin.Context) {
 }
 
 // @Tags Firewall
-// @Summary Create group
+// @Summary Update Ip rule
 // @Accept json
 // @Param request body dto.AddrRuleUpdate true "request"
 // @Success 200

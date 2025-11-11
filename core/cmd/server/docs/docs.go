@@ -4871,11 +4871,11 @@ const docTemplate = `{
 				"x-panel-log": {
 					"BeforeFunctions": [],
 					"bodyKeys": [
-						"name",
+						"names",
 						"image"
 					],
-					"formatEN": "upgrade container image [name][image]",
-					"formatZH": "更新容器镜像 [name][image]",
+					"formatEN": "upgrade container image [names][image]",
+					"formatZH": "更新容器镜像 [names][image]",
 					"paramKeys": []
 				}
 			}
@@ -8075,14 +8075,14 @@ const docTemplate = `{
 						{
 							"db": "cronjobs",
 							"input_column": "id",
-							"input_value": "id",
+							"input_value": "cronjobID",
 							"isList": false,
 							"output_column": "name",
 							"output_value": "name"
 						}
 					],
 					"bodyKeys": [
-						"id"
+						"cronjobID"
 					],
 					"formatEN": "clean cronjob [name] records",
 					"formatZH": "清空计划任务记录 [name]",
@@ -12322,7 +12322,21 @@ const docTemplate = `{
 			}
 		},
 		"/hosts/firewall/base": {
-			"get": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.OperationWithName"
+						}
+					}
+				],
 				"responses": {
 					"200": {
 						"description": "OK",
@@ -12374,7 +12388,204 @@ const docTemplate = `{
 						"Timestamp": []
 					}
 				],
-				"summary": "Create group",
+				"summary": "Batch operate rule",
+				"tags": [
+					"Firewall"
+				]
+			}
+		},
+		"/hosts/firewall/filter/chain/status": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.OperationWithName"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "load chain status with name",
+				"tags": [
+					"Firewall"
+				]
+			}
+		},
+		"/hosts/firewall/filter/operate": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.IptablesOp"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Apply/Unload/Init iptables filter",
+				"tags": [
+					"Firewall"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"operate"
+					],
+					"formatEN": "[operate] iptables filter firewall",
+					"formatZH": "[operate] iptables filter 防火墙",
+					"paramKeys": []
+				}
+			}
+		},
+		"/hosts/firewall/filter/rule/batch": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.IptablesBatchOperate"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Batch operate iptables filter rules",
+				"tags": [
+					"Firewall"
+				]
+			}
+		},
+		"/hosts/firewall/filter/rule/operate": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.IptablesRuleOp"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Operate iptables filter rule",
+				"tags": [
+					"Firewall"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"operation",
+						"chain"
+					],
+					"formatEN": "[operation] filter rule to [chain]",
+					"formatZH": "[operation] filter规则到 [chain]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/hosts/firewall/filter/search": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.SearchPageWithType"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.PageResult"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "search iptables filter rules",
 				"tags": [
 					"Firewall"
 				]
@@ -12409,17 +12620,15 @@ const docTemplate = `{
 						"Timestamp": []
 					}
 				],
-				"summary": "Create group",
+				"summary": "Operate forward rule",
 				"tags": [
 					"Firewall"
 				],
 				"x-panel-log": {
 					"BeforeFunctions": [],
-					"bodyKeys": [
-						"source_port"
-					],
-					"formatEN": "update port forward rules [source_port]",
-					"formatZH": "更新端口转发规则 [source_port]",
+					"bodyKeys": [],
+					"formatEN": "update port forward rules",
+					"formatZH": "更新端口转发规则",
 					"paramKeys": []
 				}
 			}
@@ -12453,7 +12662,7 @@ const docTemplate = `{
 						"Timestamp": []
 					}
 				],
-				"summary": "Create group",
+				"summary": "Operate Ip rule",
 				"tags": [
 					"Firewall"
 				],
@@ -12625,7 +12834,7 @@ const docTemplate = `{
 						"Timestamp": []
 					}
 				],
-				"summary": "Create group",
+				"summary": "Update Ip rule",
 				"tags": [
 					"Firewall"
 				]
@@ -12695,7 +12904,7 @@ const docTemplate = `{
 						"Timestamp": []
 					}
 				],
-				"summary": "Create group",
+				"summary": "Update port rule",
 				"tags": [
 					"Firewall"
 				]
@@ -21197,6 +21406,9 @@ const docTemplate = `{
 				"description": {
 					"type": "string"
 				},
+				"id": {
+					"type": "integer"
+				},
 				"operation": {
 					"enum": [
 						"add",
@@ -22511,6 +22723,9 @@ const docTemplate = `{
 						"remove"
 					],
 					"type": "string"
+				},
+				"taskID": {
+					"type": "string"
 				}
 			},
 			"required": [
@@ -22600,7 +22815,10 @@ const docTemplate = `{
 		},
 		"dto.ContainerStatus": {
 			"properties": {
-				"all": {
+				"buildCacheReclaimable": {
+					"type": "integer"
+				},
+				"buildCacheUsage": {
 					"type": "integer"
 				},
 				"composeCount": {
@@ -22610,6 +22828,12 @@ const docTemplate = `{
 					"type": "integer"
 				},
 				"containerCount": {
+					"type": "integer"
+				},
+				"containerReclaimable": {
+					"type": "integer"
+				},
+				"containerUsage": {
 					"type": "integer"
 				},
 				"created": {
@@ -22624,7 +22848,10 @@ const docTemplate = `{
 				"imageCount": {
 					"type": "integer"
 				},
-				"imageSize": {
+				"imageReclaimable": {
+					"type": "integer"
+				},
+				"imageUsage": {
 					"type": "integer"
 				},
 				"networkCount": {
@@ -22646,6 +22873,12 @@ const docTemplate = `{
 					"type": "integer"
 				},
 				"volumeCount": {
+					"type": "integer"
+				},
+				"volumeReclaimable": {
+					"type": "integer"
+				},
+				"volumeUsage": {
 					"type": "integer"
 				}
 			},
@@ -22783,6 +23016,12 @@ const docTemplate = `{
 				"retryTimes": {
 					"minimum": 0,
 					"type": "integer"
+				},
+				"scopes": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
 				},
 				"script": {
 					"type": "string"
@@ -23238,6 +23477,18 @@ const docTemplate = `{
 				},
 				"timeSinceUptime": {
 					"type": "string"
+				},
+				"topCPUItems": {
+					"items": {
+						"$ref": "#/definitions/dto.Process"
+					},
+					"type": "array"
+				},
+				"topMemItems": {
+					"items": {
+						"$ref": "#/definitions/dto.Process"
+					},
+					"type": "array"
 				},
 				"uptime": {
 					"type": "integer"
@@ -23770,7 +24021,13 @@ const docTemplate = `{
 				"isActive": {
 					"type": "boolean"
 				},
+				"isBind": {
+					"type": "boolean"
+				},
 				"isExist": {
+					"type": "boolean"
+				},
+				"isInit": {
 					"type": "boolean"
 				},
 				"name": {
@@ -24281,6 +24538,9 @@ const docTemplate = `{
 			"properties": {
 				"path": {
 					"type": "string"
+				},
+				"taskID": {
+					"type": "string"
 				}
 			},
 			"required": [
@@ -24391,6 +24651,9 @@ const docTemplate = `{
 				},
 				"tagName": {
 					"type": "string"
+				},
+				"taskID": {
+					"type": "string"
 				}
 			},
 			"required": [
@@ -24430,6 +24693,99 @@ const docTemplate = `{
 			"required": [
 				"id",
 				"type"
+			],
+			"type": "object"
+		},
+		"dto.IptablesBatchOperate": {
+			"properties": {
+				"rules": {
+					"items": {
+						"$ref": "#/definitions/dto.IptablesRuleOp"
+					},
+					"type": "array"
+				}
+			},
+			"type": "object"
+		},
+		"dto.IptablesOp": {
+			"properties": {
+				"name": {
+					"enum": [
+						"1PANEL_INPUT",
+						"1PANEL_OUTPUT",
+						"1PANEL_BASIC"
+					],
+					"type": "string"
+				},
+				"operate": {
+					"enum": [
+						"init-base",
+						"init-forward",
+						"init-advance",
+						"bind-base",
+						"unbind-base",
+						"bind",
+						"unbind"
+					],
+					"type": "string"
+				}
+			},
+			"required": [
+				"name",
+				"operate"
+			],
+			"type": "object"
+		},
+		"dto.IptablesRuleOp": {
+			"properties": {
+				"chain": {
+					"enum": [
+						"1PANEL_INPUT",
+						"1PANEL_OUTPUT"
+					],
+					"type": "string"
+				},
+				"description": {
+					"type": "string"
+				},
+				"dstIP": {
+					"type": "string"
+				},
+				"dstPort": {
+					"type": "integer"
+				},
+				"id": {
+					"type": "integer"
+				},
+				"operation": {
+					"enum": [
+						"add",
+						"remove"
+					],
+					"type": "string"
+				},
+				"protocol": {
+					"type": "string"
+				},
+				"srcIP": {
+					"type": "string"
+				},
+				"srcPort": {
+					"type": "integer"
+				},
+				"strategy": {
+					"enum": [
+						"ACCEPT",
+						"DROP",
+						"REJECT"
+					],
+					"type": "string"
+				}
+			},
+			"required": [
+				"chain",
+				"operation",
+				"strategy"
 			],
 			"type": "object"
 		},
@@ -24605,7 +24961,10 @@ const docTemplate = `{
 				"endTime": {
 					"type": "string"
 				},
-				"info": {
+				"io": {
+					"type": "string"
+				},
+				"network": {
 					"type": "string"
 				},
 				"param": {
@@ -25681,6 +26040,9 @@ const docTemplate = `{
 				"description": {
 					"type": "string"
 				},
+				"id": {
+					"type": "integer"
+				},
 				"operation": {
 					"enum": [
 						"add",
@@ -25921,6 +26283,29 @@ const docTemplate = `{
 				"from",
 				"type"
 			],
+			"type": "object"
+		},
+		"dto.Process": {
+			"properties": {
+				"cmd": {
+					"type": "string"
+				},
+				"memory": {
+					"type": "integer"
+				},
+				"name": {
+					"type": "string"
+				},
+				"percent": {
+					"type": "number"
+				},
+				"pid": {
+					"type": "integer"
+				},
+				"user": {
+					"type": "string"
+				}
+			},
 			"type": "object"
 		},
 		"dto.ProxyUpdate": {
@@ -31641,6 +32026,9 @@ const docTemplate = `{
 				},
 				"pullImage": {
 					"type": "boolean"
+				},
+				"rawCompose": {
+					"type": "string"
 				},
 				"restartPolicy": {
 					"enum": [
