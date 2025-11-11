@@ -374,6 +374,7 @@ const message = {
         config: 'Configuration | Configurations',
         ssh: 'SSH Settings',
         firewall: 'Firewall',
+        filter: 'Filter',
         ssl: 'Certificate | Certificates',
         database: 'Database | Databases',
         aiTools: 'AI',
@@ -2845,6 +2846,8 @@ const message = {
     firewall: {
         create: 'Create rule',
         edit: 'Edit rule',
+        advancedControl: 'Advanced Control',
+        advancedControlNotAvailable: 'Currently using {0} firewall, advanced rules only support iptables',
         ccDeny: 'CC Protection',
         ipWhiteList: 'IP allowlist',
         ipBlockList: 'IP blocklist',
@@ -2885,7 +2888,7 @@ const message = {
         portHelper2: 'Range port, e.g. 8080-8089',
         changeStrategyHelper:
             'Change [{1}] {0} strategy to [{2}]. After setting, {0} will access {2} externally. Do you want to continue?',
-        portHelper: 'Multiple ports can be entered, e.g. 80,81, or range ports, e.g. 80-88',
+
         strategy: 'Strategy',
         accept: 'Accept',
         drop: 'Drop',
@@ -2915,6 +2918,37 @@ const message = {
         exportHelper: 'About to export {0} firewall rules. Continue?',
         importSuccess: 'Successfully imported {0} rules',
         importPartialSuccess: 'Import completed: {0} succeeded, {1} failed',
+
+        basicStatus: 'Current chain {0} status is unbound. Added firewall rules will take effect after binding!',
+        baseIptables: 'Iptables Service',
+        forwardIptables: 'Iptables Port Forwarding Service',
+        advanceIptables: 'Iptables Advanced Configuration Service',
+        initMsg: 'About to initialize {0}, continue?',
+        initHelper:
+            'Detected that {0} is not initialized. Please click the initialization button in the top status bar to configure!',
+        bindHelper: 'Bind - Firewall rules will only take effect when the status is bound. Confirm?',
+        unbindHelper:
+            'Unbind - When unbound, all added firewall rules will become invalid. Proceed with caution. Confirm?',
+        defaultStrategy: 'Default policy for current chain {0} is {1}',
+        defaultStrategy2:
+            'Default policy for current chain {0} is {1}, current status is unbound. Added firewall rules will take effect after binding!',
+        filterRule: 'Filter Rule',
+        filterHelper:
+            'Filter rules allow you to control network traffic at the INPUT/OUTPUT level. Configure carefully to avoid locking the system.',
+        chain: 'Chain',
+        targetChain: 'Target Chain',
+        sourceIP: 'Source IP',
+        destIP: 'Destination IP',
+        inboundDirection: 'Inbound Direction',
+        outboundDirection: 'Outbound Direction',
+        destPort: 'Destination Port',
+        action: 'Action',
+        reject: 'Reject',
+        sourceIPHelper: 'CIDR format, e.g., 192.168.1.0/24. Leave empty for all addresses',
+        destIPHelper: 'CIDR format, e.g., 10.0.0.0/8. Leave empty for all addresses',
+        portHelper: '0 means any port',
+        allPorts: 'All Ports',
+        deleteRuleConfirm: 'Will delete {0} rules. Continue?',
     },
     runtime: {
         runtime: 'Runtime',

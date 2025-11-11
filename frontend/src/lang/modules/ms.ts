@@ -2869,7 +2869,7 @@ const message = {
         portHelper2: 'Port rentang, contohnya 8080-8089',
         changeStrategyHelper:
             'Tukar strategi {0} [{1}] kepada [{2}]. Selepas tetapan, {0} akan mengakses {2} secara luaran. Adakah anda mahu meneruskan?',
-        portHelper: 'Pelbagai port boleh dimasukkan, contohnya 80,81, atau rentang port, contohnya 80-88',
+
         strategy: 'Strategi',
         accept: 'Terima',
         drop: 'Lumpuhkan',
@@ -2899,6 +2899,37 @@ const message = {
         exportHelper: 'Akan mengeksport {0} peraturan firewall. Teruskan?',
         importSuccess: '{0} peraturan berjaya diimport',
         importPartialSuccess: 'Import selesai: {0} berjaya, {1} gagal',
+
+        basicStatus:
+            'Status rantaian semasa {0} adalah tidak terikat. Peraturan firewall yang ditambah akan berkuat kuasa selepas pengikatan!',
+        baseIptables: 'Perkhidmatan Iptables',
+        forwardIptables: 'Perkhidmatan Penerusan Port Iptables',
+        advanceIptables: 'Perkhidmatan Konfigurasi Lanjutan Iptables',
+        initMsg: 'Akan memulakan {0}, teruskan?',
+        initHelper: 'Mengesan {0} tidak dimulakan. Sila klik butang pemulaan di bar status atas untuk mengkonfigurasi!',
+        bindHelper: 'Ikat - Peraturan firewall hanya akan berkuat kuasa apabila status terikat. Sahkan?',
+        unbindHelper:
+            'Nyahikat - Apabila tidak terikat, semua peraturan firewall yang ditambah akan menjadi tidak sah. Teruskan dengan berhati-hati. Sahkan?',
+        defaultStrategy: 'Dasar lalai untuk rantaian semasa {0} adalah {1}',
+        defaultStrategy2:
+            'Dasar lalai untuk rantaian semasa {0} adalah {1}, status semasa adalah tidak terikat. Peraturan firewall yang ditambah akan berkuat kuasa selepas pengikatan!',
+        filterRule: 'Peraturan Penapis',
+        filterHelper:
+            'Peraturan penapis membolehkan anda mengawal trafik rangkaian pada tahap INPUT/OUTPUT. Konfigurasikan dengan berhati-hati untuk mengelakkan mengunci sistem.',
+        chain: 'Rantai',
+        targetChain: 'Rantai Sasaran',
+        sourceIP: 'IP Sumber',
+        destIP: 'IP Destinasi',
+        inboundDirection: 'Arah Masuk',
+        outboundDirection: 'Arah Keluar',
+        destPort: 'Port Destinasi',
+        action: 'Tindakan',
+        reject: 'Tolak',
+        sourceIPHelper: 'Format CIDR, cth. 192.168.1.0/24. Biarkan kosong untuk semua alamat',
+        destIPHelper: 'Format CIDR, cth. 10.0.0.0/8. Biarkan kosong untuk semua alamat',
+        portHelper: '0 bermaksud mana-mana port',
+        allPorts: 'Semua Port',
+        deleteRuleConfirm: 'Akan memadam {0} peraturan. Teruskan?',
     },
     runtime: {
         runtime: 'Runtime',

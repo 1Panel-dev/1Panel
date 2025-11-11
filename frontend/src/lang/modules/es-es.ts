@@ -2861,7 +2861,7 @@ const message = {
         portHelper2: 'Rango de puertos, ej. 8080-8089',
         changeStrategyHelper:
             'Cambiar estrategia de {0} [{1}] a [{2}]. Después de configurarla, {0} tendrá acceso externo como {2}. ¿Deseas continuar?',
-        portHelper: 'Se pueden ingresar múltiples puertos, ej. 80,81, o rangos, ej. 80-88',
+
         strategy: 'Estrategia',
         accept: 'Aceptar',
         drop: 'Rechazar',
@@ -2891,6 +2891,39 @@ const message = {
         exportHelper: 'A punto de exportar {0} reglas de firewall. ¿Continuar?',
         importSuccess: 'Se importaron correctamente {0} reglas',
         importPartialSuccess: 'Importación completada: {0} correctas, {1} fallidas',
+
+        basicStatus:
+            'El estado actual de la cadena {0} es no vinculado. ¡Las reglas de firewall agregadas surtirán efecto después de la vinculación!',
+        baseIptables: 'Servicio Iptables',
+        forwardIptables: 'Servicio de Reenvío de Puertos Iptables',
+        advanceIptables: 'Servicio de Configuración Avanzada de Iptables',
+        initMsg: 'A punto de inicializar {0}, ¿continuar?',
+        initHelper:
+            'Se detectó que {0} no está inicializado. ¡Haga clic en el botón de inicialización en la barra de estado superior para configurar!',
+        bindHelper:
+            'Vincular: las reglas de firewall solo surtirán efecto cuando el estado esté vinculado. ¿Confirmar?',
+        unbindHelper:
+            'Desvincular: al desvincular, todas las reglas de firewall agregadas se volverán inválidas. Proceda con precaución. ¿Confirmar?',
+        defaultStrategy: 'La política predeterminada para la cadena actual {0} es {1}',
+        defaultStrategy2:
+            'La política predeterminada para la cadena actual {0} es {1}, el estado actual es no vinculado. ¡Las reglas de firewall agregadas surtirán efecto después de la vinculación!',
+        filterRule: 'Regla de Filtro',
+        filterHelper:
+            'Las reglas de filtro le permiten controlar el tráfico de red a nivel INPUT/OUTPUT. Configure con cuidado para evitar bloquear el sistema.',
+        chain: 'Cadena',
+        targetChain: 'Cadena de Destino',
+        sourceIP: 'IP de Origen',
+        destIP: 'IP de Destino',
+        inboundDirection: 'Dirección de Entrada',
+        outboundDirection: 'Dirección de Salida',
+        destPort: 'Puerto de Destino',
+        action: 'Acción',
+        reject: 'Rechazar',
+        sourceIPHelper: 'Formato CIDR, ej. 192.168.1.0/24. Dejar vacío para todas las direcciones',
+        destIPHelper: 'Formato CIDR, ej. 10.0.0.0/8. Dejar vacío para todas las direcciones',
+        portHelper: '0 significa cualquier puerto',
+        allPorts: 'Todos los Puertos',
+        deleteRuleConfirm: 'Se eliminarán {0} reglas. ¿Continuar?',
     },
     runtime: {
         runtime: 'Runtime',

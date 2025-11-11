@@ -1,6 +1,7 @@
 package client
 
 type FireInfo struct {
+	ID       uint   `json:"uint"`
 	Family   string `json:"family"`  // ipv4 ipv6
 	Address  string `json:"address"` // Anywhere
 	Port     string `json:"port"`
@@ -23,26 +24,4 @@ type Forward struct {
 	TargetIP   string `json:"targetIP"`
 	TargetPort string `json:"targetPort"`
 	Interface  string `json:"interface"`
-}
-
-type IptablesNatInfo struct {
-	Num         string `json:"num"`
-	Target      string `json:"target"`
-	Protocol    string `json:"protocol"`
-	InIface     string `json:"inIface"`
-	OutIface    string `json:"outIface"`
-	Opt         string `json:"opt"`
-	Source      string `json:"source"`
-	Destination string `json:"destination"`
-	SrcPort     string `json:"srcPort"`
-	DestPort    string `json:"destPort"`
-}
-
-type IptablesFilterInfo struct {
-	Num         string `json:"num"`
-	Target      string `json:"target"`
-	Protocol    string `json:"protocol"`
-	Opt         string `json:"opt"`
-	Source      string `json:"source"`
-	Destination string `json:"destination"`
 }

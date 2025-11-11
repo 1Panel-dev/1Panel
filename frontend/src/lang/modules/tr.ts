@@ -2927,7 +2927,6 @@ const message = {
         portHelper2: 'Aralık portu, ör. 8080-8089',
         changeStrategyHelper:
             '[{1}] {0} stratejisini [{2}] olarak değiştirin. Ayar yapıldıktan sonra {0}, dışarıdan {2} erişimi sağlayacak. Devam etmek istiyor musunuz?',
-        portHelper: 'Birden fazla port girilebilir, ör. 80,81 veya aralık portları, ör. 80-88',
         strategy: 'Strateji',
         accept: 'Kabul Et',
         drop: 'Reddet',
@@ -2957,6 +2956,38 @@ const message = {
         exportHelper: '{0} güvenlik duvarı kuralını dışa aktarmak üzere. Devam etmek istiyor musunuz?',
         importSuccess: '{0} kural başarıyla içe aktarıldı',
         importPartialSuccess: 'İçe aktarma tamamlandı: {0} başarılı, {1} başarısız',
+
+        basicStatus:
+            'Mevcut zincir {0} durumu bağlı değil. Eklenen güvenlik duvarı kuralları bağlandıktan sonra etkili olacak!',
+        baseIptables: 'Iptables Servisi',
+        forwardIptables: 'Iptables Port Yönlendirme Servisi',
+        advanceIptables: 'Iptables Gelişmiş Yapılandırma Servisi',
+        initMsg: '{0} başlatılmak üzere, devam etmek istiyor musunuz?',
+        initHelper:
+            '{0} başlatılmadığı tespit edildi. Lütfen üst durum çubuğundaki başlatma düğmesine tıklayarak yapılandırın!',
+        bindHelper: 'Bağla - Güvenlik duvarı kuralları yalnızca durum bağlı olduğunda etkili olur. Onaylıyor musunuz?',
+        unbindHelper:
+            'Bağlantıyı Kaldır - Bağlantı kaldırıldığında, eklenen tüm güvenlik duvarı kuralları geçersiz olacaktır. Dikkatli ilerleyin. Onaylıyor musunuz?',
+        defaultStrategy: 'Mevcut zincir {0} için varsayılan politika {1}',
+        defaultStrategy2:
+            'Mevcut zincir {0} için varsayılan politika {1}, mevcut durum bağlı değil. Eklenen güvenlik duvarı kuralları bağlandıktan sonra etkili olacak!',
+        filterRule: 'Filtre Kuralı',
+        filterHelper:
+            'Filtre kuralları, INPUT/OUTPUT seviyesinde ağ trafiğini kontrol etmenize izin verir. Sistemi kilitlememek için dikkatli yapılandırın.',
+        chain: 'Zincir',
+        targetChain: 'Hedef Zincir',
+        sourceIP: 'Kaynak IP',
+        destIP: 'Hedef IP',
+        inboundDirection: 'Gelen Yön',
+        outboundDirection: 'Giden Yön',
+        destPort: 'Hedef Port',
+        action: 'Eylem',
+        reject: 'Reddet',
+        sourceIPHelper: 'CIDR formatı, örn. 192.168.1.0/24. Tüm adresler için boş bırakın',
+        destIPHelper: 'CIDR formatı, örn. 10.0.0.0/8. Tüm adresler için boş bırakın',
+        portHelper: '0 herhangi bir port anlamına gelir',
+        allPorts: 'Tüm Portlar',
+        deleteRuleConfirm: '{0} kural silinecek. Devam etmek istiyor musunuz?',
     },
     runtime: {
         runtime: 'Çalışma Zamanı',

@@ -4,16 +4,16 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
+	"gorm.io/gorm"
 )
 
 type HostRepo struct{}
 
 type IHostRepo interface {
 	GetFirewallRecord(opts ...DBOption) (model.Firewall, error)
-	ListFirewallRecord() ([]model.Firewall, error)
+	ListFirewallRecord(opts ...DBOption) ([]model.Firewall, error)
 	SaveFirewallRecord(firewall *model.Firewall) error
 	DeleteFirewallRecordByID(id uint) error
-	DeleteFirewallRecord(fType, port, protocol, address, strategy string) error
 
 	SyncCert(data []model.RootCert) error
 	GetCert(opts ...DBOption) (model.RootCert, error)
@@ -22,6 +22,8 @@ type IHostRepo interface {
 	SaveCert(cert *model.RootCert) error
 	UpdateCert(id uint, vars map[string]interface{}) error
 	DeleteCert(opts ...DBOption) error
+
+	WithByChain(chain string) DBOption
 }
 
 func NewIHostRepo() IHostRepo {
@@ -38,12 +40,16 @@ func (h *HostRepo) GetFirewallRecord(opts ...DBOption) (model.Firewall, error) {
 	return firewall, err
 }
 
-func (h *HostRepo) ListFirewallRecord() ([]model.Firewall, error) {
-	var datas []model.Firewall
-	if err := global.DB.Find(&datas).Error; err != nil {
-		return datas, nil
+func (h *HostRepo) ListFirewallRecord(opts ...DBOption) ([]model.Firewall, error) {
+	var firewalls []model.Firewall
+	db := global.DB
+	for _, opt := range opts {
+		db = opt(db)
 	}
-	return datas, nil
+	if err := global.DB.Find(&firewalls).Error; err != nil {
+		return firewalls, nil
+	}
+	return firewalls, nil
 }
 
 func (h *HostRepo) SaveFirewallRecord(firewall *model.Firewall) error {
@@ -52,12 +58,12 @@ func (h *HostRepo) SaveFirewallRecord(firewall *model.Firewall) error {
 	}
 	var data model.Firewall
 	if firewall.Type == "port" {
-		_ = global.DB.Where("type = ? AND port = ? AND protocol = ? AND address = ? AND strategy = ?", "port", firewall.Port, firewall.Protocol, firewall.Address, firewall.Strategy).First(&data)
+		_ = global.DB.Where("type = ? AND dst_port = ? AND protocol = ? AND src_ip = ? AND strategy = ?", "port", firewall.DstPort, firewall.Protocol, firewall.SrcIP, firewall.Strategy).First(&data)
 		if data.ID != 0 {
 			firewall.ID = data.ID
 		}
 	} else {
-		_ = global.DB.Where("type = ? AND address = ? AND strategy = ?", "address", firewall.Address, firewall.Strategy).First(&data)
+		_ = global.DB.Where("type = ? AND src_ip = ? AND strategy = ?", "address", firewall.SrcIP, firewall.Strategy).First(&data)
 		if data.ID != 0 {
 			firewall.ID = data.ID
 		}
@@ -67,10 +73,6 @@ func (h *HostRepo) SaveFirewallRecord(firewall *model.Firewall) error {
 
 func (h *HostRepo) DeleteFirewallRecordByID(id uint) error {
 	return global.DB.Where("id = ?", id).Delete(&model.Firewall{}).Error
-}
-
-func (h *HostRepo) DeleteFirewallRecord(fType, port, protocol, address, strategy string) error {
-	return global.DB.Where("type = ? AND port = ? AND protocol = ? AND address = ? AND strategy = ?", fType, port, protocol, address, strategy).Delete(&model.Firewall{}).Error
 }
 
 func (u *HostRepo) GetCert(opts ...DBOption) (model.RootCert, error) {
@@ -150,4 +152,10 @@ func (u *HostRepo) SyncCert(data []model.RootCert) error {
 	}
 	tx.Commit()
 	return nil
+}
+
+func (u *HostRepo) WithByChain(chain string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("chain = ?", chain)
+	}
 }

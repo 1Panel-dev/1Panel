@@ -41,11 +41,11 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
     let protocol = params.protocol === 'https' ? 'https' : 'http';
     const res = await getAgentSettingInfo();
     if (!res.data.systemIP) {
-        if (!globalStore.currentNodeAddr) {
+        if (!globalStore.isMaster || globalStore.currentNodeAddr != '127.0.0.1') {
+            res.data.systemIP = globalStore.currentNodeAddr;
+        } else {
             open.value = true;
             return;
-        } else {
-            res.data.systemIP = globalStore.currentNodeAddr;
         }
     }
     if (res.data.systemIP.indexOf(':') === -1) {

@@ -68,6 +68,8 @@ export namespace Host {
         name: string;
         isExist: boolean;
         isActive: boolean;
+        isInit: boolean;
+        isBind: boolean;
         version: string;
         pingStatus: string;
     }
@@ -262,5 +264,42 @@ export namespace Host {
         version: string;
         path: string;
         error: string;
+    }
+
+    // Iptables Filter
+    export interface IptablesFilterRuleSearch extends ReqPage {
+        info: string;
+        type: string;
+    }
+    export interface IptablesData {
+        items: IptablesRules[];
+        total: number;
+        defaultStrategy: string;
+    }
+    export interface IptablesRules {
+        id: number;
+        protocol: string;
+        srcPort: number;
+        dstPort: number;
+        srcIP: string;
+        dstIP: string;
+        strategy: string;
+        description: string;
+    }
+    export interface ChainStatus {
+        isBind: boolean;
+        defaultStrategy: string;
+    }
+    export interface IptablesFilterRuleOp {
+        operation: string;
+        id?: number;
+        chain: string;
+        protocol: string;
+        srcIP?: string;
+        srcPort?: number;
+        dstIP?: string;
+        dstPort?: number;
+        strategy: string;
+        description?: string;
     }
 }

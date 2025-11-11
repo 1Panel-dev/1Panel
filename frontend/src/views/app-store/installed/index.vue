@@ -444,6 +444,8 @@ import Tags from '@/views/app-store/components/tag.vue';
 import SvgIcon from '@/components/svg-icon/svg-icon.vue';
 import MainDiv from '@/components/main-div/index.vue';
 import { routerToFileWithPath, routerToNameWithQuery } from '@/utils/router';
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
 
 const data = ref<any>();
 const loading = ref(false);
@@ -755,6 +757,10 @@ const getConfig = async () => {
         const res = await getAgentSettingByKey('SystemIP');
         if (res.data != '') {
             defaultLink.value = res.data;
+            return;
+        }
+        if (!globalStore.isMaster || globalStore.currentNodeAddr != '127.0.0.1') {
+            defaultLink.value = globalStore.currentNodeAddr;
         }
     } catch (error) {}
 };

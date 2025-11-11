@@ -2804,7 +2804,7 @@ const message = {
         portHelper2: '範囲ポート、例えば8080-8089',
         changeStrategyHelper:
             '[{1}] {0}戦略を[{2}]に変更します。設定後、{0}は外部から{2}にアクセスします。続けたいですか？',
-        portHelper: '複数のポートを入力できます。80,81、または範囲ポート、例えば80-88',
+
         strategy: '戦略',
         accept: '受け入れる',
         drop: '落とす',
@@ -2834,6 +2834,38 @@ const message = {
         exportHelper: '{0} 件のファイアウォールルールをエクスポートします。続行しますか？',
         importSuccess: '{0} 件のルールを正常にインポートしました',
         importPartialSuccess: 'インポート完了: {0} 件成功、{1} 件失敗',
+
+        basicStatus:
+            '現在のチェーン {0} の状態は未バインドです。追加されたファイアウォールルールはバインド後に有効になります！',
+        baseIptables: 'Iptables サービス',
+        forwardIptables: 'Iptables ポート転送サービス',
+        advanceIptables: 'Iptables 高度な設定サービス',
+        initMsg: '{0} を初期化します。続行しますか？',
+        initHelper:
+            '{0} が初期化されていないことを検出しました。上部ステータスバーの初期化ボタンをクリックして設定してください！',
+        bindHelper: 'バインド - ファイアウォールルールは状態がバインドされている場合のみ有効になります。確認しますか？',
+        unbindHelper:
+            'アンバインド - アンバインドすると、追加されたすべてのファイアウォールルールが無効になります。注意して操作してください。確認しますか？',
+        defaultStrategy: '現在のチェーン {0} のデフォルトポリシーは {1} です',
+        defaultStrategy2:
+            '現在のチェーン {0} のデフォルトポリシーは {1} です。現在の状態は未バインドです。追加されたファイアウォールルールはバインド後に有効になります！',
+        filterRule: 'フィルタールール',
+        filterHelper:
+            'フィルタールールを使用すると、INPUT/OUTPUT レベルでネットワークトラフィックを制御できます。システムをロックしないように注意して設定してください。',
+        chain: 'チェーン',
+        targetChain: 'ターゲットチェーン',
+        sourceIP: '送信元 IP',
+        destIP: '宛先 IP',
+        inboundDirection: 'インバウンド方向',
+        outboundDirection: 'アウトバウンド方向',
+        destPort: '宛先ポート',
+        action: 'アクション',
+        reject: '拒否',
+        sourceIPHelper: 'CIDR 形式、例: 192.168.1.0/24。すべてのアドレスの場合は空のまま',
+        destIPHelper: 'CIDR 形式、例: 10.0.0.0/8。すべてのアドレスの場合は空のまま',
+        portHelper: '0 は任意のポートを意味します',
+        allPorts: 'すべてのポート',
+        deleteRuleConfirm: '{0} 個のルールを削除します。続行しますか？',
     },
     runtime: {
         runtime: 'ランタイム',

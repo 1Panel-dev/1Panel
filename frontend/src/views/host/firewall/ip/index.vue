@@ -10,6 +10,7 @@
                 v-model:name="fireName"
                 v-model:mask-show="maskShow"
                 v-model:is-active="isActive"
+                current-tab="base"
             />
 
             <div v-if="fireName !== '-'">

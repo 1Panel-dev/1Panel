@@ -2755,7 +2755,7 @@ const message = {
         portHelper2: '포트 범위, 예: 8080-8089',
         changeStrategyHelper:
             '[{1}] {0} 전략을 [{2}]로 변경합니다. 설정 후 {0}은(는) {2}로 외부 접근을 허용합니다. 계속하시겠습니까?',
-        portHelper: '여러 포트를 입력할 수 있습니다. 예: 80, 81 또는 포트 범위, 예: 80-88',
+
         strategy: '전략',
         accept: '허용',
         drop: '차단',
@@ -2785,6 +2785,36 @@ const message = {
         exportHelper: '{0}개의 방화벽 규칙을 내보내려고 합니다. 계속하시겠습니까?',
         importSuccess: '{0}개의 규칙을 성공적으로 가져왔습니다',
         importPartialSuccess: '가져오기 완료: 성공 {0}건, 실패 {1}건',
+
+        basicStatus: '현재 체인 {0} 상태가 바인딩되지 않았습니다. 추가된 방화벽 규칙은 바인딩 후에 효과가 발생합니다!',
+        baseIptables: 'Iptables 서비스',
+        forwardIptables: 'Iptables 포트 포워딩 서비스',
+        advanceIptables: 'Iptables 고급 구성 서비스',
+        initMsg: '{0}을(를) 초기화하려고 합니다. 계속하시겠습니까?',
+        initHelper: '{0}이(가) 초기화되지 않았습니다. 상단 상태 표시줄의 초기화 버튼을 클릭하여 구성하세요!',
+        bindHelper: '바인딩 - 방화벽 규칙은 상태가 바인딩된 경우에만 효과가 있습니다. 확인하시겠습니까?',
+        unbindHelper:
+            '바인딩 해제 - 바인딩 해제 시 추가된 모든 방화벽 규칙이 무효화됩니다. 주의하여 진행하세요. 확인하시겠습니까?',
+        defaultStrategy: '현재 체인 {0}의 기본 정책은 {1}입니다',
+        defaultStrategy2:
+            '현재 체인 {0}의 기본 정책은 {1}입니다. 현재 상태는 바인딩되지 않았습니다. 추가된 방화벽 규칙은 바인딩 후에 효과가 발생합니다!',
+        filterRule: '필터 규칙',
+        filterHelper:
+            '필터 규칙을 사용하면 INPUT/OUTPUT 수준에서 네트워크 트래픽을 제어할 수 있습니다. 시스템 잠금을 방지하기 위해 주의하여 구성하세요.',
+        chain: '체인',
+        targetChain: '대상 체인',
+        sourceIP: '소스 IP',
+        destIP: '대상 IP',
+        inboundDirection: '인바운드 방향',
+        outboundDirection: '아웃바운드 방향',
+        destPort: '대상 포트',
+        action: '동작',
+        reject: '거부',
+        sourceIPHelper: 'CIDR 형식, 예: 192.168.1.0/24. 모든 주소의 경우 비워 둠',
+        destIPHelper: 'CIDR 형식, 예: 10.0.0.0/8. 모든 주소의 경우 비워 둠',
+        portHelper: '0은 모든 포트를 의미합니다',
+        allPorts: '모든 포트',
+        deleteRuleConfirm: '{0}개의 규칙을 삭제합니다. 계속하시겠습니까?',
     },
     runtime: {
         runtime: '실행 환경',

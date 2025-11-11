@@ -2874,7 +2874,7 @@ const message = {
         portHelper2: 'Faixa de portas, ex.: 8080-8089',
         changeStrategyHelper:
             'Alterar a estratégia [{1}] {0} para [{2}]. Após a definição, {0} acessará {2} externamente. Deseja continuar?',
-        portHelper: 'Várias portas podem ser inseridas, ex.: 80,81, ou faixas de portas, ex.: 80-88',
+
         strategy: 'Estratégia',
         accept: 'Aceitar',
         drop: 'Bloquear',
@@ -2905,6 +2905,39 @@ const message = {
         exportHelper: 'Prestes a exportar {0} regras de firewall. Continuar?',
         importSuccess: '{0} regras importadas com sucesso',
         importPartialSuccess: 'Importação concluída: {0} sucesso, {1} falha',
+
+        basicStatus:
+            'O status atual da cadeia {0} é não vinculado. As regras de firewall adicionadas entrarão em vigor após a vinculação!',
+        baseIptables: 'Serviço Iptables',
+        forwardIptables: 'Serviço de Encaminhamento de Porta Iptables',
+        advanceIptables: 'Serviço de Configuração Avançada do Iptables',
+        initMsg: 'Prestes a inicializar {0}, continuar?',
+        initHelper:
+            'Detectado que {0} não está inicializado. Clique no botão de inicialização na barra de status superior para configurar!',
+        bindHelper:
+            'Vincular - As regras de firewall só entrarão em vigor quando o status estiver vinculado. Confirmar?',
+        unbindHelper:
+            'Desvincular - Quando desvinculado, todas as regras de firewall adicionadas se tornarão inválidas. Prossiga com cautela. Confirmar?',
+        defaultStrategy: 'A política padrão para a cadeia atual {0} é {1}',
+        defaultStrategy2:
+            'A política padrão para a cadeia atual {0} é {1}, o status atual é não vinculado. As regras de firewall adicionadas entrarão em vigor após a vinculação!',
+        filterRule: 'Regra de Filtro',
+        filterHelper:
+            'As regras de filtro permitem controlar o tráfego de rede no nível INPUT/OUTPUT. Configure com cuidado para evitar bloquear o sistema.',
+        chain: 'Cadeia',
+        targetChain: 'Cadeia de Destino',
+        sourceIP: 'IP de Origem',
+        destIP: 'IP de Destino',
+        inboundDirection: 'Direção de Entrada',
+        outboundDirection: 'Direção de Saída',
+        destPort: 'Porta de Destino',
+        action: 'Ação',
+        reject: 'Rejeitar',
+        sourceIPHelper: 'Formato CIDR, ex. 192.168.1.0/24. Deixe vazio para todos os endereços',
+        destIPHelper: 'Formato CIDR, ex. 10.0.0.0/8. Deixe vazio para todos os endereços',
+        portHelper: '0 significa qualquer porta',
+        allPorts: 'Todas as Portas',
+        deleteRuleConfirm: 'Excluirá {0} regras. Continuar?',
     },
     runtime: {
         runtime: 'Runtime',
