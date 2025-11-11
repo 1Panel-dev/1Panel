@@ -3,6 +3,8 @@ package iptables
 import (
 	"fmt"
 	"strings"
+
+	"github.com/1Panel-dev/1Panel/agent/utils/re"
 )
 
 func AddForward(protocol, srcPort, dest, destPort, iface string, save bool) error {
@@ -69,7 +71,7 @@ func ListForward(chain ...string) ([]IptablesNatInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-
+	natListRegex := re.GetRegex(re.IptablesNatListPattern)
 	var forwardList []IptablesNatInfo
 	for _, line := range strings.Split(stdout, "\n") {
 		line = strings.TrimFunc(line, func(r rune) bool {

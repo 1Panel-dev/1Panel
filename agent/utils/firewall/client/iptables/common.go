@@ -2,7 +2,6 @@ package iptables
 
 import (
 	"fmt"
-	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -29,10 +28,6 @@ const (
 	IoRuleIn        = "-i lo -j ACCEPT -m comment --comment 'Loopback Whitelist'"
 	DropAll         = "-j DROP"
 	AllowSSH        = "-p tcp --dport ssh -j ACCEPT"
-)
-
-var (
-	natListRegex = regexp.MustCompile(`^(\d+)\s+(.+?)\s+(.+?)\s+(.+?)\s+(.+?)\s+(.+?)\s+(.+?)\s+(.+?)\s+(.+?)\s+(.+?)(?:\s+(.+?) .+?:(\d{1,5}(?::\d+)?).+?[ :](.+-.+|(?:.+:)?\d{1,5}(?:-\d{1,5})?))?$`)
 )
 
 const (
