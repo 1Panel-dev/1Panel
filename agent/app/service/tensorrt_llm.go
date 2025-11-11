@@ -163,12 +163,11 @@ func handleLLMParams(llm *model.TensorRTLLM, create request.TensorRTLLMCreate) e
 
 	delete(serviceValue, "environment")
 	var environments []interface{}
+	environments = append(environments, fmt.Sprintf("MODEL_PATH=%s", create.ModelDir))
 	for _, e := range create.Environments {
 		environments = append(environments, fmt.Sprintf("%s=%s", e.Key, e.Value))
 	}
-	if len(environments) > 0 {
-		serviceValue["environment"] = environments
-	}
+	serviceValue["environment"] = environments
 
 	var volumes []interface{}
 	var defaultVolumes = map[string]string{
@@ -255,7 +254,7 @@ func (t TensorRTLLMService) Create(create request.TensorRTLLMCreate) error {
 	envMap := handleLLMEnv(tensorrtLLM, create)
 	llmDir := path.Join(global.Dir.TensorRTLLMDir, create.Name)
 	envPath := path.Join(llmDir, ".env")
-	if err := env.Write(envMap, envPath); err != nil {
+	if err := env.WriteWithOrder(envMap, envPath, []string{"MODEL_PATH", "COMMAND"}); err != nil {
 		return err
 	}
 	dockerComposePath := path.Join(llmDir, "docker-compose.yml")
@@ -294,7 +293,7 @@ func (t TensorRTLLMService) Update(req request.TensorRTLLMUpdate) error {
 	tensorrtLLM.Env = envStr
 	llmDir := path.Join(global.Dir.TensorRTLLMDir, tensorrtLLM.Name)
 	envPath := path.Join(llmDir, ".env")
-	if err := env.Write(envMap, envPath); err != nil {
+	if err := env.WriteWithOrder(envMap, envPath, []string{"MODEL_PATH", "COMMAND"}); err != nil {
 		return err
 	}
 	dockerComposePath := path.Join(llmDir, "docker-compose.yml")
