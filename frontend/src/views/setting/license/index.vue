@@ -170,7 +170,7 @@ const loadBindNode = (row: any) => {
     if (row.freeNodes) {
         for (const item of row.freeNodes) {
             if (item.addr === row.bindNode) {
-                return item.name === 'local' ? globalStore.getMasterAlias() : item.addr;
+                return item.name === 'local' ? globalStore.getMasterAlias() : item.name;
             }
         }
     }
