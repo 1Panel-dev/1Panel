@@ -239,7 +239,7 @@ const onExport = () => {
             cancelButtonText: i18n.global.t('commons.button.cancel'),
         },
     ).then(async () => {
-        const exportData = data.value.map((item: Host.RuleInfo) => ({
+        const exportData = selects.value.map((item: Host.RuleInfo) => ({
             family: item.family,
             protocol: item.protocol,
             port: item.port,

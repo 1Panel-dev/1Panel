@@ -34,7 +34,13 @@
             </el-select>
 
             <el-card class="mt-2 w-full" v-loading="loading">
-                <el-table :data="data" @selection-change="handleSelectionChange">
+                <ComplexTable
+                    :pagination-config="paginationConfig"
+                    @search="search"
+                    v-model:selects="selects"
+                    :data="pageData"
+                    :height="440"
+                >
                     <el-table-column type="selection" fix />
                     <el-table-column
                         :label="$t('commons.table.name')"
@@ -60,7 +66,7 @@
                         prop="command"
                         show-overflow-tooltip
                     />
-                </el-table>
+                </ComplexTable>
             </el-card>
         </div>
         <template #footer>
@@ -90,6 +96,12 @@ const data = ref([]);
 
 const uploadRef = ref();
 const uploaderFiles = ref();
+const pageData = ref([]);
+const paginationConfig = reactive({
+    currentPage: 1,
+    pageSize: 10,
+    total: 0,
+});
 
 const currentGroup = ref();
 const groupList = ref();
@@ -100,6 +112,13 @@ const acceptParams = (): void => {
     loadGroups();
     currentGroup.value = '';
     data.value = [];
+    pageData.value = [];
+};
+
+const search = () => {
+    const startIndex = (paginationConfig.currentPage - 1) * paginationConfig.pageSize;
+    const endIndex = startIndex + paginationConfig.pageSize;
+    pageData.value = data.value.slice(startIndex, endIndex);
 };
 
 const loadGroups = async () => {
@@ -120,10 +139,6 @@ const changeGroup = () => {
     }
 };
 
-const handleSelectionChange = (val: any) => {
-    selects.value = val;
-};
-
 const fileOnChange = async (_uploadFile: UploadFile, uploadFiles: UploadFiles) => {
     uploaderFiles.value = uploadFiles;
     if (uploaderFiles.value.length !== 1) {
@@ -142,6 +157,8 @@ const fileOnChange = async (_uploadFile: UploadFile, uploadFiles: UploadFiles) =
             if (data.value.length === 0) {
                 MsgError(i18n.global.t('terminal.noSuchCommand'));
             }
+            paginationConfig.total = data.value.length;
+            search();
         })
         .catch(() => {
             loading.value = false;

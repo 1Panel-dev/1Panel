@@ -22,7 +22,13 @@
             </el-button>
 
             <el-card class="mt-2 w-full" v-loading="loading">
-                <el-table :data="data" @selection-change="handleSelectionChange">
+                <ComplexTable
+                    :pagination-config="paginationConfig"
+                    @search="search"
+                    v-model:selects="selects"
+                    :data="pageData"
+                    :height="440"
+                >
                     <el-table-column type="selection" fix />
                     <el-table-column
                         :label="$t('cronjob.taskName')"
@@ -62,7 +68,7 @@
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('cronjob.retainCopies')" :min-width="120" prop="retainCopies" />
-                </el-table>
+                </ComplexTable>
             </el-card>
         </div>
         <template #footer>
@@ -93,14 +99,22 @@ const data = ref();
 
 const uploadRef = ref();
 const uploaderFiles = ref();
+const pageData = ref([]);
+const paginationConfig = reactive({
+    currentPage: 1,
+    pageSize: 10,
+    total: 0,
+});
 
 const acceptParams = (): void => {
     visible.value = true;
     data.value = [];
 };
 
-const handleSelectionChange = (val: any) => {
-    selects.value = val;
+const search = () => {
+    const startIndex = (paginationConfig.currentPage - 1) * paginationConfig.pageSize;
+    const endIndex = startIndex + paginationConfig.pageSize;
+    pageData.value = data.value.slice(startIndex, endIndex);
 };
 
 const fileOnChange = (_uploadFile: UploadFile, uploadFiles: UploadFiles) => {
@@ -125,6 +139,8 @@ const fileOnChange = (_uploadFile: UploadFile, uploadFiles: UploadFiles) => {
                 }
             }
             data.value = parsed;
+            paginationConfig.total = data.value.length;
+            search();
             loading.value = false;
         } catch (error) {
             MsgError(i18n.global.t('commons.msg.errImport') + error.message);
