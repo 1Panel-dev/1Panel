@@ -2,7 +2,6 @@ package client
 
 import (
 	"fmt"
-	"regexp"
 	"strconv"
 	"strings"
 
@@ -10,10 +9,8 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/client/iptables"
+	"github.com/1Panel-dev/1Panel/agent/utils/re"
 )
-
-var portRuleRegex = regexp.MustCompile(`-A\s+INPUT\s+-p\s+(\w+)(?:\s+-m\s+\w+)*\s+--dport\s+(\d+(?::\d+)?)\s+-j\s+(\w+)`)
-var addressRuleRegex = regexp.MustCompile(`-A\s+(INPUT|OUTPUT)\s+-s\s+(\S+)\s+-j\s+(\w+)`)
 
 type Iptables struct{}
 
@@ -70,7 +67,7 @@ func (i *Iptables) ListPort() ([]FireInfo, error) {
 	var datas []FireInfo
 	lines := strings.Split(stdout, "\n")
 
-	chainPortRegex := regexp.MustCompile(fmt.Sprintf(`-A\s+%s\s+(?:-s\s+(\S+)\s+)?-p\s+(\w+)(?:\s+-m\s+\w+)*\s+--dport\s+(\d+(?::\d+)?)\s+-j\s+(\w+)`, iptables.Chain1PanelBasic))
+	chainPortRegex := re.GetRegex(iptables.Chian1PanelBasicPortPattern)
 	for _, line := range lines {
 		line = strings.TrimSpace(line)
 		if !strings.HasPrefix(line, fmt.Sprintf("-A %s", iptables.Chain1PanelBasic)) {
@@ -111,8 +108,7 @@ func (i *Iptables) ListAddress() ([]FireInfo, error) {
 	lines := strings.Split(stdout, "\n")
 	addressMap := make(map[string]FireInfo)
 
-	chainAddressRegex := regexp.MustCompile(fmt.Sprintf(`-A\s+%s\s+(?:-s\s+(\S+)|(?:-d\s+(\S+)))?\s+-j\s+(\w+)`, iptables.Chain1PanelBasic))
-
+	chainAddressRegex := re.GetRegex(iptables.Chain1PanelBasicAddressPattern)
 	for _, line := range lines {
 		line = strings.TrimSpace(line)
 		if !strings.HasPrefix(line, fmt.Sprintf("-A %s", iptables.Chain1PanelBasic)) {

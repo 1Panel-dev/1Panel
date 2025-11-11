@@ -76,3 +76,9 @@ func GetRegex(pattern string) *regexp.Regexp {
 	}
 	return regex
 }
+
+// RegisterRegex registers a regex pattern and stores it in the map.
+// This function should be called once at program startup.
+func RegisterRegex(pattern string) {
+	regexMap[pattern] = regexp.MustCompile(pattern)
+}
