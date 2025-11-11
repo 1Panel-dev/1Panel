@@ -211,7 +211,7 @@ func (b *BaseApi) LoadRecordLog(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /cronjobs/records/clean [post]
-// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"cronjobs","output_column":"name","output_value":"name"}],"formatZH":"清空计划任务记录 [name]","formatEN":"clean cronjob [name] records"}
+// @x-panel-log {"bodyKeys":["cronjobID"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"cronjobID","isList":false,"db":"cronjobs","output_column":"name","output_value":"name"}],"formatZH":"清空计划任务记录 [name]","formatEN":"clean cronjob [name] records"}
 func (b *BaseApi) CleanRecord(c *gin.Context) {
 	var req dto.CronjobClean
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {

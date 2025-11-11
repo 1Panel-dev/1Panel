@@ -744,7 +744,7 @@ const message = {
             llm: 'TensorRT LLM',
             modelDir: 'Model Directory',
             commandHelper:
-                'After /models in the startup command, the model name needs to be completed; if external access is required, set the port in the command to be the same as the application port',
+                'If external access is needed, set the port in the command to be the same as the application port',
             imageAlert:
                 'Due to the large image size, it is recommended to manually download the image to the server before installation',
             modelSpeedup: 'Enable model acceleration',

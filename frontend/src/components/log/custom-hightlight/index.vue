@@ -119,7 +119,7 @@ const defaultRules: TokenRule[] = [
     },
     {
         type: 'ip',
-        pattern: /\b(?<!\[)\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b(?!\])/g,
+        pattern: /(?<=^|\s|")\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(?=\s|"|$)/g,
         color: '#4A90E2',
     },
     {

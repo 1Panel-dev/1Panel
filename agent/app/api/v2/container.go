@@ -314,7 +314,7 @@ func (b *BaseApi) ContainerCreateByCommand(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /containers/upgrade [post]
-// @x-panel-log {"bodyKeys":["name","image"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新容器镜像 [name][image]","formatEN":"upgrade container image [name][image]"}
+// @x-panel-log {"bodyKeys":["names","image"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新容器镜像 [names][image]","formatEN":"upgrade container image [names][image]"}
 func (b *BaseApi) ContainerUpgrade(c *gin.Context) {
 	var req dto.ContainerUpgrade
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {

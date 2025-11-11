@@ -616,13 +616,13 @@
 	},
 	"/containers/upgrade": {
 		"bodyKeys": [
-			"name",
+			"names",
 			"image"
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "更新容器镜像[name][image]",
-		"formatEN": "upgradecontainerimage[name][image]"
+		"formatZH": "更新容器镜像[names][image]",
+		"formatEN": "upgradecontainerimage[names][image]"
 	},
 	"/containers/volume": {
 		"bodyKeys": [
@@ -1326,13 +1326,13 @@
 	},
 	"/cronjobs/records/clean": {
 		"bodyKeys": [
-			"id"
+			"cronjobID"
 		],
 		"paramKeys": [],
 		"beforeFunctions": [
 			{
 				"input_column": "id",
-				"input_value": "id",
+				"input_value": "cronjobID",
 				"isList": false,
 				"db": "cronjobs",
 				"output_column": "name",
@@ -1941,14 +1941,31 @@
 		"formatZH": "卸载磁盘[device]从[mountPoint]",
 		"formatEN": "Unmountdisk[device]from[mountPoint]"
 	},
-	"/hosts/firewall/forward": {
+	"/hosts/firewall/filter/operate": {
 		"bodyKeys": [
-			"source_port"
+			"operate"
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "更新端口转发规则[source_port]",
-		"formatEN": "updateportforwardrules[source_port]"
+		"formatZH": "[operate]iptablesfilter防火墙",
+		"formatEN": "[operate]iptablesfilterfirewall"
+	},
+	"/hosts/firewall/filter/rule/operate": {
+		"bodyKeys": [
+			"operation",
+			"chain"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "[operation]filter规则到[chain]",
+		"formatEN": "[operation]filterruleto[chain]"
+	},
+	"/hosts/firewall/forward": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新端口转发规则",
+		"formatEN": "updateportforwardrules"
 	},
 	"/hosts/firewall/ip": {
 		"bodyKeys": [

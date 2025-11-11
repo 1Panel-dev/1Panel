@@ -10,7 +10,7 @@ import (
 )
 
 func Write(envMap map[string]string, filename string) error {
-	content, err := marshal(envMap)
+	content, err := Marshal(envMap)
 	if err != nil {
 		return err
 	}
@@ -26,7 +26,7 @@ func Write(envMap map[string]string, filename string) error {
 	return file.Sync()
 }
 
-func marshal(envMap map[string]string) (string, error) {
+func Marshal(envMap map[string]string) (string, error) {
 	lines := make([]string, 0, len(envMap))
 	for k, v := range envMap {
 		if d, err := strconv.Atoi(v); err == nil && !isStartWithZero(v) {
@@ -37,8 +37,45 @@ func marshal(envMap map[string]string) (string, error) {
 			lines = append(lines, fmt.Sprintf(`%s="%s"`, k, v))
 		}
 	}
-	sort.Strings(lines)
 	return strings.Join(lines, "\n"), nil
+}
+
+func MarshalWithOrder(envMap map[string]string, orders []string) (string, error) {
+	lines := make([]string, 0, len(envMap))
+	for _, k := range orders {
+		if v, ok := envMap[k]; ok {
+			lines = append(lines, formatEnvLine(k, v))
+		}
+	}
+
+	extraKeys := make([]string, 0)
+	for k := range envMap {
+		found := false
+		for _, okk := range orders {
+			if k == okk {
+				found = true
+				break
+			}
+		}
+		if !found {
+			extraKeys = append(extraKeys, k)
+		}
+	}
+	sort.Strings(extraKeys)
+	for _, k := range extraKeys {
+		lines = append(lines, formatEnvLine(k, envMap[k]))
+	}
+	return strings.Join(lines, "\n"), nil
+}
+
+func formatEnvLine(k, v string) string {
+	if d, err := strconv.Atoi(v); err == nil && !isStartWithZero(v) {
+		return fmt.Sprintf(`%s=%d`, k, d)
+	} else if hasEvenDoubleQuotes(v) {
+		return fmt.Sprintf(`%s='%s'`, k, v)
+	} else {
+		return fmt.Sprintf(`%s="%s"`, k, v)
+	}
 }
 
 func GetEnvValueByKey(envPath, key string) (string, error) {
