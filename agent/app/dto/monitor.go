@@ -4,7 +4,8 @@ import "time"
 
 type MonitorSearch struct {
 	Param     string    `json:"param" validate:"required,oneof=all cpu memory load io network"`
-	Info      string    `json:"info"`
+	IO        string    `json:"io"`
+	Network   string    `json:"network"`
 	StartTime time.Time `json:"startTime"`
 	EndTime   time.Time `json:"endTime"`
 }
@@ -19,7 +20,7 @@ type Process struct {
 	Name    string  `json:"name"`
 	Pid     int32   `json:"pid"`
 	Percent float64 `json:"percent"`
-	Memory  uint64 `json:"memory"`
+	Memory  uint64  `json:"memory"`
 	Cmd     string  `json:"cmd"`
 	User    string  `json:"user"`
 }

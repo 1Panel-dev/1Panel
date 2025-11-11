@@ -249,7 +249,8 @@ const chartsOption = ref({ loadLoadChart: null, loadCPUChart: null, loadMemoryCh
 const searchTime = ref();
 const searchInfo = reactive<Host.MonitorSearch>({
     param: '',
-    info: '',
+    io: '',
+    network: '',
     startTime: new Date(new Date().setHours(0, 0, 0, 0)),
     endTime: new Date(),
 });
@@ -281,11 +282,16 @@ const search = async (param: string) => {
             break;
         case 'io':
             searchTime.value = timeRangeIO.value;
-            searchInfo.info = ioChoose.value;
+            searchInfo.io = ioChoose.value || 'all';
             break;
         case 'network':
             searchTime.value = timeRangeNetwork.value;
-            searchInfo.info = networkChoose.value;
+            searchInfo.network = networkChoose.value || 'all';
+            break;
+        case 'all':
+            searchTime.value = timeRangeNetwork.value;
+            searchInfo.io = ioChoose.value || 'all';
+            searchInfo.network = networkChoose.value || 'all';
             break;
     }
     if (searchTime.value && searchTime.value.length === 2) {
@@ -335,19 +341,17 @@ const changeIO = (item: string) => {
     search('io');
 };
 
-const loadNetworkOptions = async () => {
+const loadOptions = async () => {
     const res = await getNetworkOptions();
     netOptions.value = res.data;
-    searchInfo.info = globalStore.defaultNetwork || (netOptions.value && netOptions.value[0]);
-    networkChoose.value = searchInfo.info;
-    search('all');
-};
+    searchInfo.network = globalStore.defaultNetwork || (netOptions.value && netOptions.value[0]);
+    networkChoose.value = searchInfo.network;
 
-const loadIOOptions = async () => {
-    const res = await getIOOptions();
-    ioOptions.value = res.data;
-    searchInfo.info = globalStore.defaultIO || (ioOptions.value && ioOptions.value[0]);
-    ioChoose.value = searchInfo.info;
+    const res1 = await getIOOptions();
+    ioOptions.value = res1.data;
+    searchInfo.io = globalStore.defaultIO || (ioOptions.value && ioOptions.value[0]);
+    ioChoose.value = searchInfo.io;
+
     search('all');
 };
 
@@ -711,8 +715,7 @@ function getSideWidth(b: boolean) {
 }
 
 onMounted(() => {
-    loadNetworkOptions();
-    loadIOOptions();
+    loadOptions();
 });
 </script>
 

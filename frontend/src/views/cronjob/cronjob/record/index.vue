@@ -382,7 +382,7 @@ const search = async (changeToLatest: boolean) => {
     if (!hasRecords.value) {
         return;
     }
-    if (changeToLatest) {
+    if (changeToLatest || !currentRecord.value) {
         currentRecord.value = records.value[0];
         return;
     }

@@ -83,7 +83,7 @@ func (m *MonitorService) LoadMonitorData(req dto.MonitorSearch) ([]dto.MonitorDa
 		data = append(data, itemData)
 	}
 	if req.Param == "all" || req.Param == "io" {
-		bases, err := monitorRepo.GetIO(repo.WithByName(req.Info), repo.WithByCreatedAt(req.StartTime, req.EndTime))
+		bases, err := monitorRepo.GetIO(repo.WithByName(req.IO), repo.WithByCreatedAt(req.StartTime, req.EndTime))
 		if err != nil {
 			return nil, err
 		}
@@ -97,7 +97,7 @@ func (m *MonitorService) LoadMonitorData(req dto.MonitorSearch) ([]dto.MonitorDa
 		data = append(data, itemData)
 	}
 	if req.Param == "all" || req.Param == "network" {
-		bases, err := monitorRepo.GetNetwork(repo.WithByName(req.Info), repo.WithByCreatedAt(req.StartTime, req.EndTime))
+		bases, err := monitorRepo.GetNetwork(repo.WithByName(req.Network), repo.WithByCreatedAt(req.StartTime, req.EndTime))
 		if err != nil {
 			return nil, err
 		}

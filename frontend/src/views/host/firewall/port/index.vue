@@ -307,6 +307,10 @@ const onChange = async (info: any) => {
 };
 
 const loadStatus = async () => {
+    if (fireName.value !== 'iptables') {
+        isBind.value = true;
+        return;
+    }
     await loadChainStatus('1PANEL_BASIC').then((res) => {
         isBind.value = res.data.isBind;
     });

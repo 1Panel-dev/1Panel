@@ -151,7 +151,8 @@ export namespace Host {
     }
     export interface MonitorSearch {
         param: string;
-        info: string;
+        io: string;
+        network: string;
         startTime: Date;
         endTime: Date;
     }

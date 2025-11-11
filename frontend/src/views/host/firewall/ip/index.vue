@@ -19,6 +19,15 @@
                 </el-card>
 
                 <LayoutContent :title="$t('firewall.ipRule', 2)" :class="{ mask: !isActive }">
+                    <template #prompt>
+                        <div v-if="!isBind">
+                            <el-alert
+                                type="info"
+                                :closable="false"
+                                :title="$t('firewall.basicStatus', ['1PANEL_BASIC'])"
+                            />
+                        </div>
+                    </template>
                     <template #leftToolBar>
                         <el-button type="primary" @click="onOpenDialog('create')">
                             {{ $t('firewall.createIpRule') }}
@@ -111,7 +120,13 @@ import ImportDialog from '@/views/host/firewall/ip/import/index.vue';
 import FireRouter from '@/views/host/firewall/index.vue';
 import FireStatus from '@/views/host/firewall/status/index.vue';
 import { onMounted, reactive, ref } from 'vue';
-import { batchOperateRule, searchFireRule, updateAddrRule, updateFirewallDescription } from '@/api/modules/host';
+import {
+    batchOperateRule,
+    loadChainStatus,
+    searchFireRule,
+    updateAddrRule,
+    updateFirewallDescription,
+} from '@/api/modules/host';
 import { Host } from '@/api/interface/host';
 import { ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
@@ -127,6 +142,7 @@ const fireName = ref();
 
 const maskShow = ref(true);
 const isActive = ref(false);
+const isBind = ref(false);
 const fireStatusRef = ref();
 
 const opRef = ref();
@@ -156,6 +172,7 @@ const search = async () => {
         pageSize: paginationConfig.pageSize,
     };
     loading.value = true;
+    loadStatus();
     await searchFireRule(params)
         .then((res) => {
             loading.value = false;
@@ -165,6 +182,16 @@ const search = async () => {
         .catch(() => {
             loading.value = false;
         });
+};
+
+const loadStatus = async () => {
+    if (fireName.value !== 'iptables') {
+        isBind.value = true;
+        return;
+    }
+    await loadChainStatus('1PANEL_BASIC').then((res) => {
+        isBind.value = res.data.isBind;
+    });
 };
 
 const dialogRef = ref();
