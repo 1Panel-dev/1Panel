@@ -13,6 +13,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/compose"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
+	"github.com/1Panel-dev/1Panel/agent/utils/env"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/subosito/gotenv"
 	"gopkg.in/yaml.v3"
@@ -171,7 +172,7 @@ func handleLLMParams(llm *model.TensorRTLLM, create request.TensorRTLLMCreate) e
 
 	var volumes []interface{}
 	var defaultVolumes = map[string]string{
-		"${MODEL_PATH}": "/models",
+		"${MODEL_PATH}": "${MODEL_PATH}",
 	}
 	for k, v := range defaultVolumes {
 		volumes = append(volumes, fmt.Sprintf("%s:%s", k, v))
@@ -191,23 +192,24 @@ func handleLLMParams(llm *model.TensorRTLLM, create request.TensorRTLLMCreate) e
 }
 
 func handleLLMEnv(llm *model.TensorRTLLM, create request.TensorRTLLMCreate) gotenv.Env {
-	env := make(gotenv.Env)
-	env["CONTAINER_NAME"] = create.ContainerName
-	env["MODEL_PATH"] = create.ModelDir
-	env["VERSION"] = create.Version
-	env["IMAGE"] = create.Image
-	env["COMMAND"] = create.Command
+	envMap := make(gotenv.Env)
+	envMap["CONTAINER_NAME"] = create.ContainerName
+	envMap["MODEL_PATH"] = create.ModelDir
+	envMap["VERSION"] = create.Version
+	envMap["IMAGE"] = create.Image
+	envMap["COMMAND"] = create.Command
 	for i, port := range create.ExposedPorts {
 		containerPortStr := fmt.Sprintf("CONTAINER_PORT_%d", i)
 		hostPortStr := fmt.Sprintf("HOST_PORT_%d", i)
 		hostIPStr := fmt.Sprintf("HOST_IP_%d", i)
-		env[containerPortStr] = strconv.Itoa(port.ContainerPort)
-		env[hostPortStr] = strconv.Itoa(port.HostPort)
-		env[hostIPStr] = port.HostIP
+		envMap[containerPortStr] = strconv.Itoa(port.ContainerPort)
+		envMap[hostPortStr] = strconv.Itoa(port.HostPort)
+		envMap[hostIPStr] = port.HostIP
 	}
-	envStr, _ := gotenv.Marshal(env)
+	orders := []string{"MODEL_PATH", "COMMAND"}
+	envStr, _ := env.MarshalWithOrder(envMap, orders)
 	llm.Env = envStr
-	return env
+	return envMap
 }
 
 func (t TensorRTLLMService) Create(create request.TensorRTLLMCreate) error {
@@ -250,10 +252,10 @@ func (t TensorRTLLMService) Create(create request.TensorRTLLMCreate) error {
 	if err := handleLLMParams(tensorrtLLM, create); err != nil {
 		return err
 	}
-	env := handleLLMEnv(tensorrtLLM, create)
+	envMap := handleLLMEnv(tensorrtLLM, create)
 	llmDir := path.Join(global.Dir.TensorRTLLMDir, create.Name)
 	envPath := path.Join(llmDir, ".env")
-	if err := gotenv.Write(env, envPath); err != nil {
+	if err := env.Write(envMap, envPath); err != nil {
 		return err
 	}
 	dockerComposePath := path.Join(llmDir, "docker-compose.yml")
@@ -287,12 +289,12 @@ func (t TensorRTLLMService) Update(req request.TensorRTLLMUpdate) error {
 		return err
 	}
 
-	env := handleLLMEnv(tensorrtLLM, req.TensorRTLLMCreate)
-	envStr, _ := gotenv.Marshal(env)
+	envMap := handleLLMEnv(tensorrtLLM, req.TensorRTLLMCreate)
+	envStr, _ := gotenv.Marshal(envMap)
 	tensorrtLLM.Env = envStr
 	llmDir := path.Join(global.Dir.TensorRTLLMDir, tensorrtLLM.Name)
 	envPath := path.Join(llmDir, ".env")
-	if err := gotenv.Write(env, envPath); err != nil {
+	if err := env.Write(envMap, envPath); err != nil {
 		return err
 	}
 	dockerComposePath := path.Join(llmDir, "docker-compose.yml")
