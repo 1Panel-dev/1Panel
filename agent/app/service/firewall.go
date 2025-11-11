@@ -592,12 +592,15 @@ func (u *FirewallService) cleanUnUsedData(client firewall.FirewallClient) {
 		_ = hostRepo.DeleteFirewallRecordByID(record.ID)
 	}
 }
+
 func (u *FirewallService) pingStatus() string {
-	if _, err := os.Stat("/etc/sysctl.conf"); err != nil {
+	data, err := os.ReadFile("/proc/sys/net/ipv4/icmp_echo_ignore_all")
+	if err != nil {
 		return constant.StatusNone
 	}
-	stdout, _ := cmd.RunDefaultWithStdoutBashCf("%s sysctl -a 2>/dev/null | grep 'net.ipv4.icmp.echo_ignore_all'", cmd.SudoHandleCmd())
-	if stdout == "net.ipv4.icmp_echo_ignore_all = 1\n" {
+
+	val := strings.TrimSpace(string(data))
+	if val == "1" {
 		return constant.StatusEnable
 	}
 	return constant.StatusDisable
