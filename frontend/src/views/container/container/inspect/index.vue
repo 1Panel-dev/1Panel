@@ -87,10 +87,8 @@
                         {{ inspectData?.Config?.Domainname || '-' }}
                     </el-descriptions-item>
                     <el-descriptions-item :label="$t('commons.table.port')">
-                        <div v-for="item of getPortBindings()" :key="item">
-                            <span>{{ item.hostIp }}:{{ item.hostPort }}</span>
-                            <span class="mx-2">→</span>
-                            <span>{{ item.containerPort }}</span>
+                        <div v-for="item of ports" :key="item">
+                            <span>{{ item }}</span>
                         </div>
                     </el-descriptions-item>
                 </el-descriptions>
@@ -175,14 +173,17 @@ const inspectData = ref<any>(null);
 const rawJson = ref('');
 const showRawJson = ref(false);
 
+const ports = ref([]);
 interface DialogProps {
     data: any;
+    ports: string[];
 }
 
 const acceptParams = (props: DialogProps): void => {
     visible.value = true;
     activeTab.value = 'overview';
     showRawJson.value = false;
+    ports.value = props.ports || [];
 
     try {
         if (typeof props.data === 'string') {
@@ -229,24 +230,6 @@ const formatDate = (dateStr: string): string => {
     } catch {
         return dateStr;
     }
-};
-
-const getPortBindings = (): any[] => {
-    const ports: any[] = [];
-    const portBindings = inspectData.value?.HostConfig?.PortBindings || {};
-
-    for (const [containerPort, bindings] of Object.entries(portBindings)) {
-        if (Array.isArray(bindings)) {
-            for (const binding of bindings) {
-                ports.push({
-                    containerPort,
-                    hostIp: (binding as any).HostIp || '0.0.0.0',
-                    hostPort: (binding as any).HostPort,
-                });
-            }
-        }
-    }
-    return ports;
 };
 
 const getEnvKey = (env: string): string => {

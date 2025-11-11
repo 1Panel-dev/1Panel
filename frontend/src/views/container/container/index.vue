@@ -98,7 +98,7 @@
                         show-overflow-tooltip
                     >
                         <template #default="{ row }">
-                            <el-text type="primary" class="cursor-pointer" @click="onInspect(row.containerID)">
+                            <el-text type="primary" class="cursor-pointer" @click="onInspect(row)">
                                 {{ row.name }}
                             </el-text>
                         </template>
@@ -571,9 +571,9 @@ const onTerminal = (row: any) => {
     dialogTerminalRef.value!.acceptParams({ containerID: row.containerID, title: title });
 };
 
-const onInspect = async (id: string) => {
-    const res = await inspect({ id: id, type: 'container' });
-    containerInspectRef.value!.acceptParams({ data: res.data });
+const onInspect = async (row: any) => {
+    const res = await inspect({ id: row.containerID, type: 'container' });
+    containerInspectRef.value!.acceptParams({ data: res.data, ports: row.ports });
 };
 
 const onClean = () => {
