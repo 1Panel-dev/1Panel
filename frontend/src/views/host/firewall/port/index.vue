@@ -5,7 +5,7 @@
         <div v-loading="loading">
             <FireStatus
                 ref="fireStatusRef"
-                @search="search"
+                @search="search(true)"
                 v-model:loading="loading"
                 v-model:mask-show="maskShow"
                 v-model:is-active="isActive"
@@ -207,7 +207,7 @@ const paginationConfig = reactive({
     total: 0,
 });
 
-const search = async () => {
+const search = async (init?: boolean) => {
     if (!isActive.value) {
         loading.value = false;
         data.value = [];
@@ -223,7 +223,9 @@ const search = async () => {
         pageSize: paginationConfig.pageSize,
     };
     loading.value = true;
-    loadStatus();
+    if (init) {
+        loadStatus();
+    }
     await searchFireRule(params)
         .then((res) => {
             loading.value = false;
@@ -322,6 +324,7 @@ const onDelete = async (row: Host.RuleInfo | null) => {
     if (row) {
         rules.push({
             operation: 'remove',
+            chain: row.chain,
             address: row.address,
             port: row.port,
             source: '',
@@ -334,6 +337,7 @@ const onDelete = async (row: Host.RuleInfo | null) => {
             names.push(item.port + ' (' + item.protocol + ')');
             rules.push({
                 operation: 'remove',
+                chain: item.chain,
                 address: item.address,
                 port: item.port,
                 source: '',

@@ -90,7 +90,7 @@ const acceptParams = (params: DialogProps) => {
     uploaderFiles.value = [];
     uploadRef.value?.clearFiles();
     isImport.value = params?.isImport;
-    withoutReload.value = params.withoutReload;
+    withoutReload.value = params?.withoutReload;
 
     open.value = true;
 };

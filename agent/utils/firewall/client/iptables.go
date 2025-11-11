@@ -9,7 +9,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/client/iptables"
-	"github.com/1Panel-dev/1Panel/agent/utils/re"
 )
 
 type Iptables struct{}
@@ -59,97 +58,61 @@ func (i *Iptables) Version() (string, error) {
 }
 
 func (i *Iptables) ListPort() ([]FireInfo, error) {
-	stdout, err := iptables.RunWithStd(iptables.FilterTab, fmt.Sprintf("-S %s", iptables.Chain1PanelBasic))
-	if err != nil {
-		return nil, fmt.Errorf("failed to list 1PANEL_BASIC rules: %w", err)
-	}
-
 	var datas []FireInfo
-	lines := strings.Split(stdout, "\n")
-
-	chainPortRegex := re.GetRegex(iptables.Chian1PanelBasicPortPattern)
-	for _, line := range lines {
-		line = strings.TrimSpace(line)
-		if !strings.HasPrefix(line, fmt.Sprintf("-A %s", iptables.Chain1PanelBasic)) {
+	basicRules, err := iptables.ReadFilterRulesByChain(iptables.Chain1PanelBasic)
+	if err != nil {
+		return nil, err
+	}
+	beforeRules, _ := iptables.ReadFilterRulesByChain(iptables.Chain1PanelBasicBefore)
+	basicRules = append(basicRules, beforeRules...)
+	for _, item := range basicRules {
+		if item.DstPort == 0 {
 			continue
 		}
-
-		if matches := chainPortRegex.FindStringSubmatch(line); len(matches) == 5 {
-			address := matches[1]
-			protocol := matches[2]
-			port := strings.ReplaceAll(matches[3], ":", "-")
-			action := strings.ToLower(matches[4])
-
-			strategy := "accept"
-			if action == "drop" || action == "reject" {
-				strategy = "drop"
-			}
-
-			datas = append(datas, FireInfo{
-				Address:  address,
-				Protocol: protocol,
-				Port:     port,
-				Strategy: strategy,
-				Family:   "ipv4",
-			})
+		if item.Strategy == "drop" || item.Strategy == "reject" {
+			item.Strategy = "drop"
 		}
+		datas = append(datas, FireInfo{
+			Chain:    item.Chain,
+			Address:  item.SrcIP,
+			Protocol: item.Protocol,
+			Port:     fmt.Sprintf("%v", item.DstPort),
+			Strategy: item.Strategy,
+			Family:   "ipv4",
+		})
 	}
 
 	return datas, nil
 }
 
 func (i *Iptables) ListAddress() ([]FireInfo, error) {
-	stdout, err := iptables.RunWithStd(iptables.FilterTab, fmt.Sprintf("-S %s", iptables.Chain1PanelBasic))
-	if err != nil {
-		return nil, fmt.Errorf("failed to list 1PANEL_BASIC address rules: %w", err)
-	}
-
 	var datas []FireInfo
-	lines := strings.Split(stdout, "\n")
-	addressMap := make(map[string]FireInfo)
-
-	chainAddressRegex := re.GetRegex(iptables.Chain1PanelBasicAddressPattern)
-	for _, line := range lines {
-		line = strings.TrimSpace(line)
-		if !strings.HasPrefix(line, fmt.Sprintf("-A %s", iptables.Chain1PanelBasic)) {
+	basicRules, err := iptables.ReadFilterRulesByChain(iptables.Chain1PanelBasic)
+	if err != nil {
+		return nil, err
+	}
+	for _, item := range basicRules {
+		if item.DstPort != 0 || item.SrcPort != 0 {
 			continue
 		}
-
-		if matches := chainAddressRegex.FindStringSubmatch(line); len(matches) >= 4 {
-			address := matches[1]
-			if address == "" {
-				address = matches[2]
-			}
-			if address == "" {
-				continue
-			}
-			action := strings.ToLower(matches[3])
-
-			strategy := "accept"
-			if action == "drop" || action == "reject" {
-				strategy = "drop"
-			}
-
-			if _, exists := addressMap[address]; !exists {
-				addressMap[address] = FireInfo{
-					Address:  address,
-					Strategy: strategy,
-					Family:   "ipv4",
-				}
-			}
+		if item.Strategy == "drop" || item.Strategy == "reject" {
+			item.Strategy = "drop"
 		}
+		datas = append(datas, FireInfo{
+			Address:  item.SrcIP,
+			Strategy: item.Strategy,
+			Family:   "ipv4",
+		})
 	}
-
-	for _, info := range addressMap {
-		datas = append(datas, info)
-	}
-
 	return datas, nil
 }
 
 func (i *Iptables) Port(port FireInfo, operation string) error {
 	if operation != "add" && operation != "remove" {
 		return buserr.New("ErrCmdIllegal")
+	}
+	if len(port.Chain) == 0 {
+		port.Chain = iptables.Chain1PanelBasic
 	}
 
 	portSpec, err := normalizePortSpec(port.Port)
@@ -174,17 +137,19 @@ func (i *Iptables) Port(port FireInfo, operation string) error {
 	ruleArgs = append(ruleArgs, fmt.Sprintf("--dport %s", portSpec), fmt.Sprintf("-j %s", action))
 	ruleSpec := strings.Join(ruleArgs, " ")
 	if operation == "add" {
-		if err := iptables.AddRule(iptables.FilterTab, iptables.Chain1PanelBasic, ruleSpec); err != nil {
+		if err := iptables.AddRule(iptables.FilterTab, port.Chain, ruleSpec); err != nil {
 			return err
 		}
 	} else {
-		if err := iptables.DeleteRule(iptables.FilterTab, iptables.Chain1PanelBasic, ruleSpec); err != nil {
+		if err := iptables.DeleteRule(iptables.FilterTab, port.Chain, ruleSpec); err != nil {
 			return err
 		}
 	}
 
-	if err := iptables.SaveRulesToFile(iptables.FilterTab, iptables.Chain1PanelBasic, iptables.BasicFileName); err != nil {
-		global.LOG.Errorf("persistence for %s failed, err: %v", iptables.Chain1PanelBasic, err)
+	if port.Chain == iptables.Chain1PanelBasic {
+		if err := iptables.SaveRulesToFile(iptables.FilterTab, iptables.Chain1PanelBasic, iptables.BasicFileName); err != nil {
+			global.LOG.Errorf("persistence for %s failed, err: %v", iptables.Chain1PanelBasic, err)
+		}
 	}
 	return nil
 }
@@ -192,6 +157,9 @@ func (i *Iptables) Port(port FireInfo, operation string) error {
 func (i *Iptables) RichRules(rule FireInfo, operation string) error {
 	if operation != "add" && operation != "remove" {
 		return buserr.New("ErrCmdIllegal")
+	}
+	if len(rule.Chain) == 0 {
+		rule.Chain = iptables.Chain1PanelBasic
 	}
 
 	address := strings.TrimSpace(rule.Address)
@@ -235,17 +203,19 @@ func (i *Iptables) RichRules(rule FireInfo, operation string) error {
 	ruleArgs = append(ruleArgs, fmt.Sprintf("-j %s", action))
 	ruleSpec := strings.Join(ruleArgs, " ")
 	if operation == "add" {
-		if err := iptables.AddRule(iptables.FilterTab, iptables.Chain1PanelBasic, ruleSpec); err != nil {
+		if err := iptables.AddRule(iptables.FilterTab, rule.Chain, ruleSpec); err != nil {
 			return err
 		}
 	} else {
-		if err := iptables.DeleteRule(iptables.FilterTab, iptables.Chain1PanelBasic, ruleSpec); err != nil {
+		if err := iptables.DeleteRule(iptables.FilterTab, rule.Chain, ruleSpec); err != nil {
 			return err
 		}
 	}
 
-	if err := iptables.SaveRulesToFile(iptables.FilterTab, iptables.Chain1PanelBasic, iptables.BasicFileName); err != nil {
-		global.LOG.Errorf("persistence for %s failed, err: %v", iptables.Chain1PanelBasic, err)
+	if rule.Chain == iptables.Chain1PanelBasic {
+		if err := iptables.SaveRulesToFile(iptables.FilterTab, iptables.Chain1PanelBasic, iptables.BasicFileName); err != nil {
+			global.LOG.Errorf("persistence for %s failed, err: %v", iptables.Chain1PanelBasic, err)
+		}
 	}
 	return nil
 }

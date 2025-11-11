@@ -11,6 +11,7 @@ import (
 
 type FilterRules struct {
 	ID          uint   `json:"id"`
+	Chain       string `json:"chain"`
 	Protocol    string `json:"protocol"`
 	SrcPort     uint   `json:"srcPort"`
 	DstPort     uint   `json:"dstPort"`
@@ -70,23 +71,28 @@ func DeleteFilterRule(chain string, policy FilterRules) error {
 func ReadFilterRulesByChain(chain string) ([]FilterRules, error) {
 	var rules []FilterRules
 	cmdMgr := cmd.NewCommandMgr(cmd.WithIgnoreExist1(), cmd.WithTimeout(20*time.Second))
-	stdout, err := cmdMgr.RunWithStdoutBashCf("%s iptables -t %s -L %s", cmd.SudoHandleCmd(), FilterTab, chain)
+	stdout, err := cmdMgr.RunWithStdoutBashCf("%s iptables -w -t %s -nL %s", cmd.SudoHandleCmd(), FilterTab, chain)
 	if err != nil {
 		return rules, fmt.Errorf("load filter fules by chain %s failed, %v", chain, err)
 	}
 	lines := strings.Split(stdout, "\n")
 	for i := 0; i < len(lines); i++ {
 		fields := strings.Fields(lines[i])
-		if len(fields) < 7 {
+		if len(fields) < 5 {
+			continue
+		}
+		strategy := strings.ToLower(fields[0])
+		if strategy != "accept" && strategy != "drop" && strategy != "reject" {
 			continue
 		}
 		itemRule := FilterRules{
+			Chain:    chain,
 			Protocol: fields[1],
-			SrcPort:  loadPort("src", fields[6]),
-			DstPort:  loadPort("dst", fields[6]),
+			SrcPort:  loadPort("src", fields),
+			DstPort:  loadPort("dst", fields),
 			SrcIP:    loadIP(fields[3]),
 			DstIP:    loadIP(fields[4]),
-			Strategy: fields[0],
+			Strategy: strategy,
 		}
 		rules = append(rules, itemRule)
 	}
@@ -95,7 +101,7 @@ func ReadFilterRulesByChain(chain string) ([]FilterRules, error) {
 
 func LoadDefaultStrategy(chain string) (string, error) {
 	cmdMgr := cmd.NewCommandMgr(cmd.WithIgnoreExist1(), cmd.WithTimeout(20*time.Second))
-	stdout, err := cmdMgr.RunWithStdoutBashCf("%s iptables -t %s -L %s", cmd.SudoHandleCmd(), FilterTab, chain)
+	stdout, err := cmdMgr.RunWithStdoutBashCf("%s iptables -w -t %s -L %s", cmd.SudoHandleCmd(), FilterTab, chain)
 	if err != nil {
 		return "", fmt.Errorf("load filter fules by chain %s failed, %v", chain, err)
 	}
@@ -112,13 +118,17 @@ func LoadDefaultStrategy(chain string) (string, error) {
 	return ACCEPT, nil
 }
 
-func loadPort(position, portStr string) uint {
-	var portItem string
-	if strings.Contains(portStr, "spt:") && position == "src" {
-		portItem = strings.ReplaceAll(portStr, "spt:", "")
+func loadPort(position string, portStr []string) uint {
+	if len(portStr) < 7 {
+		return 0
 	}
-	if strings.Contains(portStr, "dpt:") && position == "dst" {
-		portItem = strings.ReplaceAll(portStr, "dpt:", "")
+
+	var portItem string
+	if strings.Contains(portStr[6], "spt:") && position == "src" {
+		portItem = strings.ReplaceAll(portStr[6], "spt:", "")
+	}
+	if strings.Contains(portStr[6], "dpt:") && position == "dst" {
+		portItem = strings.ReplaceAll(portStr[6], "dpt:", "")
 	}
 	if len(portItem) == 0 {
 		return 0

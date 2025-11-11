@@ -310,11 +310,11 @@ func initPreRules() error {
 	if len(panelPort) == 0 {
 		return errors.New("find 1panel service port failed")
 	}
-	if err := iptables.AddRule(iptables.FilterTab, iptables.Chain1PanelBasicBefore, iptables.AllowSSH); err != nil {
-		return err
-	}
-	if err := iptables.AddRule(iptables.FilterTab, iptables.Chain1PanelBasicBefore, fmt.Sprintf("-p tcp -m tcp --dport %s -j ACCEPT", panelPort)); err != nil {
-		return err
+	ports := []string{"80", "443", panelPort, loadSSHPort()}
+	for _, item := range ports {
+		if err := iptables.AddRule(iptables.FilterTab, iptables.Chain1PanelBasicBefore, fmt.Sprintf("-p tcp -m tcp --dport %v -j ACCEPT", item)); err != nil {
+			return err
+		}
 	}
 	if err := iptables.AddRule(iptables.FilterTab, iptables.Chain1PanelBasicAfter, iptables.DropAll); err != nil {
 		return err

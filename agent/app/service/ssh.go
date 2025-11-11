@@ -887,3 +887,22 @@ func updateSSHSocketFile(newPort string) error {
 	_ = controller.HandleRestart("ssh.socket")
 	return nil
 }
+
+func loadSSHPort() string {
+	port := "22"
+	sshConf, err := os.ReadFile(sshPath)
+	if err != nil {
+		return port
+	}
+	lines := strings.Split(string(sshConf), "\n")
+	for _, line := range lines {
+		if strings.HasPrefix(line, "Port ") {
+			portStr := strings.ReplaceAll(line, "Port ", "")
+			portItem, _ := strconv.Atoi(portStr)
+			if portItem > 0 && portItem < 65535 {
+				return portStr
+			}
+		}
+	}
+	return port
+}

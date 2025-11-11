@@ -1,7 +1,8 @@
 package client
 
 type FireInfo struct {
-	ID       uint   `json:"uint"`
+	ID       uint   `json:"id"`
+	Chain    string `json:"chain"`
 	Family   string `json:"family"`  // ipv4 ipv6
 	Address  string `json:"address"` // Anywhere
 	Port     string `json:"port"`

@@ -42,11 +42,6 @@ const (
 	NatTab    = "nat"
 )
 
-var (
-	Chain1PanelBasicAddressPattern = fmt.Sprintf(`-A\s+%s\s+(?:-s\s+(\S+)|(?:-d\s+(\S+)))?\s+-j\s+(\w+)`, Chain1PanelBasic)
-	Chian1PanelBasicPortPattern    = fmt.Sprintf(`-A\s+%s\s+(?:-s\s+(\S+)\s+)?-p\s+(\w+)(?:\s+-m\s+\w+)*\s+--dport\s+(\d+(?::\d+)?)\s+-j\s+(\w+)`, Chain1PanelBasic)
-)
-
 func RunWithStd(tab, rule string) (string, error) {
 	cmdMgr := cmd.NewCommandMgr(cmd.WithIgnoreExist1(), cmd.WithTimeout(20*time.Second))
 	stdout, err := cmdMgr.RunWithStdoutBashCf("%s iptables -t %s %s", cmd.SudoHandleCmd(), tab, rule)
@@ -56,7 +51,7 @@ func RunWithStd(tab, rule string) (string, error) {
 	}
 	return stdout, nil
 }
-func RunWithoutIgnrore(tab, rule string) (string, error) {
+func RunWithoutIgnore(tab, rule string) (string, error) {
 	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(20 * time.Second))
 	stdout, err := cmdMgr.RunWithStdoutBashCf("%s iptables -t %s %s", cmd.SudoHandleCmd(), tab, rule)
 	if err != nil {
@@ -112,7 +107,7 @@ func CheckChainBind(tab, parentChain, chain string) (bool, error) {
 	return true, nil
 }
 func CheckRuleExist(tab, chain, rule string) bool {
-	_, err := RunWithoutIgnrore(tab, fmt.Sprintf("-C %s %s", chain, rule))
+	_, err := RunWithoutIgnore(tab, fmt.Sprintf("-C %s %s", chain, rule))
 	return err == nil
 }
 

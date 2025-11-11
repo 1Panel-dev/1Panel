@@ -27,7 +27,7 @@
                                 {{ $t('commons.button.init') }}
                             </el-button>
                         </template>
-                        <template v-if="baseInfo.isInit && props.currentTab == 'base'">
+                        <template v-if="baseInfo.name === 'iptables' && baseInfo.isInit && props.currentTab == 'base'">
                             <el-divider direction="vertical" />
                             <el-button v-if="baseInfo.isBind" type="primary" link @click="onUnBind">
                                 {{ $t('commons.button.unbind') }}

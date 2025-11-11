@@ -5,7 +5,7 @@
         <div v-loading="loading">
             <FireStatus
                 ref="fireStatusRef"
-                @search="search"
+                @search="search(true)"
                 v-model:loading="loading"
                 v-model:name="fireName"
                 v-model:mask-show="maskShow"
@@ -64,7 +64,7 @@
                             :heightDiff="370"
                         >
                             <el-table-column type="selection" fix />
-                            <el-table-column :min-width="80" :label="$t('firewall.address')" prop="address">
+                            <el-table-column :min-width="120" :label="$t('firewall.address')" prop="address">
                                 <template #default="{ row }">
                                     <span v-if="row.address && row.address !== 'Anywhere'">{{ row.address }}</span>
                                     <span v-else>{{ $t('firewall.allIP') }}</span>
@@ -86,7 +86,7 @@
                                 </template>
                             </el-table-column>
                             <el-table-column
-                                :min-width="150"
+                                :min-width="120"
                                 :label="$t('commons.table.description')"
                                 prop="description"
                                 show-overflow-tooltip
@@ -156,7 +156,7 @@ const paginationConfig = reactive({
     total: 0,
 });
 
-const search = async () => {
+const search = async (init?: boolean) => {
     if (!isActive.value) {
         loading.value = false;
         data.value = [];
@@ -172,7 +172,9 @@ const search = async () => {
         pageSize: paginationConfig.pageSize,
     };
     loading.value = true;
-    loadStatus();
+    if (init) {
+        loadStatus();
+    }
     await searchFireRule(params)
         .then((res) => {
             loading.value = false;

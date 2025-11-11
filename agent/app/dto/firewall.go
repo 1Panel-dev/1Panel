@@ -26,6 +26,7 @@ type FirewallOperation struct {
 type PortRuleOperate struct {
 	ID        uint   `json:"id"`
 	Operation string `json:"operation" validate:"required,oneof=add remove"`
+	Chain     string `json:"chain"`
 	Address   string `json:"address"`
 	Port      string `json:"port" validate:"required"`
 	Protocol  string `json:"protocol" validate:"required,oneof=tcp udp tcp/udp"`
@@ -89,7 +90,7 @@ type IptablesOp struct {
 type IptablesRuleOp struct {
 	Operation   string `json:"operation" validate:"required,oneof=add remove"`
 	ID          uint   `json:"id"`
-	Chain       string `json:"chain" validate:"required,oneof=1PANEL_INPUT 1PANEL_OUTPUT"`
+	Chain       string `json:"chain" validate:"required,oneof=1PANEL_BASIC 1PANEL_BASIC_BEFORE 1PANEL_INPUT 1PANEL_OUTPUT"`
 	Protocol    string `json:"protocol"`
 	SrcIP       string `json:"srcIP"`
 	SrcPort     uint   `json:"srcPort"`

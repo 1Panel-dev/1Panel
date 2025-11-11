@@ -3,7 +3,6 @@ package firewall
 import (
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/client/iptables"
-	"github.com/1Panel-dev/1Panel/agent/utils/re"
 )
 
 func Init() {
@@ -11,8 +10,6 @@ func Init() {
 	if err != nil {
 		return
 	}
-	re.RegisterRegex(iptables.Chian1PanelBasicPortPattern)
-	re.RegisterRegex(iptables.Chain1PanelBasicAddressPattern)
 	clientName := client.Name()
 	if clientName == "ufw" || clientName == "iptables" {
 		_ = iptables.LoadRulesFromFile(iptables.FilterTab, iptables.Chain1PanelForward, iptables.ForwardFileName)
