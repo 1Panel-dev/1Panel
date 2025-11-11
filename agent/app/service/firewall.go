@@ -24,6 +24,7 @@ import (
 )
 
 const confPath = "/etc/sysctl.conf"
+const panelSysctlPath = "/etc/sysctl.d/98-onepanel.conf"
 
 type FirewallService struct{}
 
@@ -598,58 +599,95 @@ func (u *FirewallService) pingStatus() string {
 	if err != nil {
 		return constant.StatusNone
 	}
-
-	val := strings.TrimSpace(string(data))
-	if val == "1" {
-		return constant.StatusEnable
+	v6Data, v6err := os.ReadFile("/proc/sys/net/ipv6/icmp/echo_ignore_all")
+	if v6err != nil {
+		if strings.TrimSpace(string(data)) == "1" {
+			return constant.StatusEnable
+		}
+		return constant.StatusDisable
+	} else {
+		if strings.TrimSpace(string(data)) == "1" && strings.TrimSpace(string(v6Data)) == "1" {
+			return constant.StatusEnable
+		}
+		return constant.StatusDisable
 	}
-	return constant.StatusDisable
+
 }
 
 func (u *FirewallService) updatePingStatus(enable string) error {
-	lineBytes, err := os.ReadFile(confPath)
-	if err != nil {
-		return err
+	var targetPath string
+	var applyCmd string
+
+	if _, err := os.Stat(confPath); os.IsNotExist(err) {
+		// Debian 13
+		targetPath = panelSysctlPath
+		applyCmd = fmt.Sprintf("%s sysctl --system", cmd.SudoHandleCmd())
+		if err := cmd.RunDefaultBashCf("%s mkdir -p /etc/sysctl.d", cmd.SudoHandleCmd()); err != nil {
+			return fmt.Errorf("failed to create directory /etc/sysctl.d: %v", err)
+		}
+	} else {
+		targetPath = confPath
+		applyCmd = fmt.Sprintf("%s sysctl -p", cmd.SudoHandleCmd())
 	}
-	files := strings.Split(string(lineBytes), "\n")
-	var newFiles []string
+
+	lineBytes, err := os.ReadFile(targetPath)
+	if err != nil && !os.IsNotExist(err) {
+		return fmt.Errorf("failed to read %s: %v", targetPath, err)
+	}
+
+	if err := cmd.RunDefaultBashCf("echo %s | %s tee /proc/sys/net/ipv4/icmp_echo_ignore_all > /dev/null", enable, cmd.SudoHandleCmd()); err != nil {
+		return fmt.Errorf("failed to apply ipv4 ping status temporarily: %v", err)
+	}
+
 	var hasIpv6 bool
-	ipv6Status, _ := cmd.RunDefaultWithStdoutBashC("sysctl -a 2>/dev/null | grep 'net.ipv6.icmp.echo_ignore_all'")
-	if len(strings.ReplaceAll(ipv6Status, "\n", "")) != 0 {
+	if _, err := os.Stat("/proc/sys/net/ipv6/icmp/echo_ignore_all"); err == nil {
 		hasIpv6 = true
+		if err := cmd.RunDefaultBashCf("echo %s | %s tee /proc/sys/net/ipv6/icmp/echo_ignore_all > /dev/null", enable, cmd.SudoHandleCmd()); err != nil {
+			global.LOG.Warnf("failed to apply ipv6 ping status temporarily: %v", err)
+		}
 	}
+
+	var files []string
+	if err == nil {
+		files = strings.Split(string(lineBytes), "\n")
+	}
+
+	var newFiles []string
 	hasIPv4Line, hasIPv6Line := false, false
+
 	for _, line := range files {
-		if strings.Contains(line, "net/ipv4/icmp_echo_ignore_all") || strings.Contains(line, "net.ipv4.icmp_echo_ignore_all") {
+		if strings.HasPrefix(strings.TrimSpace(line), "net.ipv4.icmp_echo_ignore_all") {
 			newFiles = append(newFiles, "net.ipv4.icmp_echo_ignore_all="+enable)
 			hasIPv4Line = true
 			continue
 		}
-		if hasIpv6 && strings.Contains(line, "net/ipv6/icmp/echo_ignore_all") || strings.Contains(line, "net.ipv6.icmp.echo_ignore_all") {
+		if strings.HasPrefix(strings.TrimSpace(line), "net.ipv6.icmp.echo_ignore_all") {
 			newFiles = append(newFiles, "net.ipv6.icmp.echo_ignore_all="+enable)
 			hasIPv6Line = true
 			continue
 		}
 		newFiles = append(newFiles, line)
 	}
+
 	if !hasIPv4Line {
 		newFiles = append(newFiles, "net.ipv4.icmp_echo_ignore_all="+enable)
 	}
-	if !hasIPv6Line {
+	if hasIpv6 && !hasIPv6Line {
 		newFiles = append(newFiles, "net.ipv6.icmp.echo_ignore_all="+enable)
 	}
-	file, err := os.OpenFile(confPath, os.O_WRONLY|os.O_TRUNC, constant.FilePerm)
+
+	file, err := os.OpenFile(targetPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, constant.FilePerm)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to open %s: %v", targetPath, err)
 	}
 	defer file.Close()
-	_, err = file.WriteString(strings.Join(newFiles, "\n"))
-	if err != nil {
-		return err
+
+	if _, err = file.WriteString(strings.Join(newFiles, "\n")); err != nil {
+		return fmt.Errorf("failed to write to %s: %v", targetPath, err)
 	}
 
-	if err := cmd.RunDefaultBashCf("%s sysctl -p", cmd.SudoHandleCmd()); err != nil {
-		return fmt.Errorf("update ping status failed, %v", err)
+	if err := cmd.RunDefaultBashCf(applyCmd); err != nil {
+		global.LOG.Warnf("failed to apply persistent config with '%s': %v", applyCmd, err)
 	}
 
 	return nil
