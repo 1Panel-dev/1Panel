@@ -110,7 +110,7 @@ func CheckChainBind(tab, parentChain, chain string) (bool, error) {
 }
 func CheckRuleExist(tab, chain, rule string) bool {
 	_, err := RunWithoutIgnore(tab, fmt.Sprintf("-C %s %s", chain, rule))
-	global.Log.Debugf("check rule %s from chain %s in tab %s exist, err: %v", rule, chain, tab, err)
+	global.LOG.Debugf("check rule %s from chain %s in tab %s exist, err: %v", rule, chain, tab, err)
 	return err == nil
 }
 
