@@ -316,7 +316,10 @@ func initPreRules() error {
 			return err
 		}
 	}
-	if err := iptables.AddRule(iptables.FilterTab, iptables.Chain1PanelBasicAfter, iptables.DropAll); err != nil {
+	if err := iptables.AddRule(iptables.FilterTab, iptables.Chain1PanelBasicAfter, iptables.DropAllTcp); err != nil {
+		return err
+	}
+	if err := iptables.AddRule(iptables.FilterTab, iptables.Chain1PanelBasicAfter, iptables.DropAllUdp); err != nil {
 		return err
 	}
 	return nil

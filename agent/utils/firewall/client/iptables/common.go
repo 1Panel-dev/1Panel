@@ -26,7 +26,8 @@ const (
 const (
 	EstablishedRule = "-m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT -m comment --comment 'ESTABLISHED Whitelist'"
 	IoRuleIn        = "-i lo -j ACCEPT -m comment --comment 'Loopback Whitelist'"
-	DropAll         = "-j DROP"
+	DropAllTcp      = "-p tcp -j DROP"
+	DropAllUdp      = "-p udp -j DROP"
 	AllowSSH        = "-p tcp --dport ssh -j ACCEPT"
 )
 
