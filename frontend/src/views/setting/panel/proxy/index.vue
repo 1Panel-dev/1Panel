@@ -78,6 +78,7 @@ import { GlobalStore } from '@/store';
 import { storeToRefs } from 'pinia';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import DockerProxyDialog from '@/components/docker-proxy/dialog.vue';
+import { loadDockerStatus } from '@/api/modules/container';
 
 const globalStore = GlobalStore();
 const emit = defineEmits<{ (e: 'search'): void }>();
@@ -105,6 +106,7 @@ const form = reactive({
     proxyPasswdKeepItem: false,
     proxyDocker: false,
 });
+const dockerStatus = ref();
 const withDockerRestart = ref(false);
 const dockerProxyRef = ref();
 
@@ -135,6 +137,12 @@ const acceptParams = (params: DialogProps): void => {
     proxyDockerVisible.value = params.proxyDocker !== '';
     proxyVisible.value = true;
     form.proxyPasswdKeepItem = params.passwdKeep === 'Enable';
+    loadDocker();
+};
+
+const loadDocker = async () => {
+    const res = await loadDockerStatus();
+    dockerStatus.value = res.data.isExist;
 };
 
 const submitChangePassword = async (formEl: FormInstance | undefined) => {
@@ -158,7 +166,7 @@ const submitChangePassword = async (formEl: FormInstance | undefined) => {
         if (form.proxyType === 'http' || form.proxyType === 'https') {
             params.proxyUrl = form.proxyUrl;
         }
-        if (isMasterProductPro.value && (params.proxyDocker || proxyDockerVisible.value)) {
+        if (dockerStatus.value && isMasterProductPro.value && (params.proxyDocker || proxyDockerVisible.value)) {
             dockerProxyRef.value.acceptParams({
                 syncList: 'SyncSystemProxy',
                 open: true,

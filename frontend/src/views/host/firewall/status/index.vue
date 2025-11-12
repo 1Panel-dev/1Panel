@@ -89,6 +89,7 @@ import DockerRestart from '@/components/docker-proxy/docker-restart.vue';
 import { MsgSuccess } from '@/utils/message';
 import { ElMessageBox } from 'element-plus';
 import { ref } from 'vue';
+import { loadDockerStatus } from '@/api/modules/container';
 
 const props = defineProps({
     currentTab: String,
@@ -107,10 +108,12 @@ const onPing = ref('Disable');
 const oldStatus = ref();
 const dockerRef = ref();
 const operation = ref('restart');
+const dockerStatus = ref();
 const withDockerRestart = ref(false);
 
 const acceptParams = (): void => {
     loadBaseInfo(true);
+    loadDocker();
 };
 const emit = defineEmits(['search', 'update:is-active', 'update:loading', 'update:maskShow', 'update:name']);
 
@@ -138,6 +141,11 @@ const loadBaseInfo = async (search: boolean) => {
             emit('update:maskShow', true);
             emit('update:name', '-');
         });
+};
+
+const loadDocker = async () => {
+    const res = await loadDockerStatus();
+    dockerStatus.value = res.data.isExist;
 };
 
 const loadInitMsg = () => {
@@ -201,7 +209,7 @@ const onUnBind = async () => {
 
 const onOperate = async (op: string) => {
     operation.value = op;
-    if (baseInfo.value.name === 'iptables') {
+    if (baseInfo.value.name === 'iptables' || !dockerStatus.value) {
         emit('update:loading', true);
         emit('update:maskShow', true);
         await operateFire(operation.value, false)
