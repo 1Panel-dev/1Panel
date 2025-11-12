@@ -1,7 +1,6 @@
 package service
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"path"
@@ -418,7 +417,7 @@ func findModelArchive(modelType string) (string, error) {
 		}
 	}
 
-	return "", errors.New(fmt.Sprintf("no FusionXplay_%s_Accelerator*.tar.gz found in /home/models", modelType))
+	return "", fmt.Errorf("no FusionXplay_%s_Accelerator*.tar.gz found in /home/models", modelType)
 }
 
 func handleModelArchive(modelType string, modelDir string) error {

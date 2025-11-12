@@ -79,14 +79,13 @@ var restoreCmd = &cobra.Command{
 		svcAgentName, _ := controller.LoadServiceName("1panel-agent")
 		selAgentName, _ := controller.SelectInitScript("1panel-agent")
 		scriptAgentName, _ := controller.GetScriptName("1panel-agent")
-		svcScriptBakPath := path.Join(tmpPath, "scriptbak")
-		if err := files.CopyItem(false, true, path.Join(svcScriptBakPath, svcCoreName), svcBasePath); err != nil {
-			if err := files.CopyItem(false, true, path.Join(svcScriptBakPath, selCoreName), path.Join(svcBasePath, scriptCoreName)); err != nil {
+		if err := files.CopyItem(false, true, path.Join(tmpPath, svcCoreName), svcBasePath); err != nil {
+			if err := files.CopyItem(false, true, path.Join(tmpPath, selCoreName), path.Join(svcBasePath, scriptCoreName)); err != nil {
 				return err
 			}
 		}
-		if err := files.CopyItem(false, true, path.Join(svcScriptBakPath, svcAgentName), svcBasePath); err != nil {
-			if err := files.CopyItem(false, true, path.Join(svcScriptBakPath, selAgentName), path.Join(svcBasePath, scriptAgentName)); err != nil {
+		if err := files.CopyItem(false, true, path.Join(tmpPath, svcAgentName), svcBasePath); err != nil {
+			if err := files.CopyItem(false, true, path.Join(tmpPath, selAgentName), path.Join(svcBasePath, scriptAgentName)); err != nil {
 				return err
 			}
 		}

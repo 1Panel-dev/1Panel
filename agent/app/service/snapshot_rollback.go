@@ -34,7 +34,6 @@ func (u *SnapshotService) SnapshotRollback(req dto.SnapshotRecover) error {
 	go func() {
 		rootDir := fmt.Sprintf("%s/1panel_original/original_%s", global.Dir.BaseDir, snap.Name)
 		baseDir := path.Join(rootDir, "base")
-		svcScriptBakPath := path.Join(baseDir, "scriptbak")
 
 		FileOp := files.NewFileOp()
 		taskItem.AddSubTask(
@@ -64,7 +63,7 @@ func (u *SnapshotService) SnapshotRollback(req dto.SnapshotRecover) error {
 			taskItem.AddSubTask(
 				i18n.GetWithName("SnapCopy", path.Join(svcBasePath, svcCoreName)),
 				func(t *task.Task) error {
-					return FileOp.CopyFile(path.Join(svcScriptBakPath, svcCoreName), svcBasePath)
+					return FileOp.CopyFile(path.Join(baseDir, svcCoreName), svcBasePath)
 				},
 				nil,
 			)
@@ -72,7 +71,7 @@ func (u *SnapshotService) SnapshotRollback(req dto.SnapshotRecover) error {
 		taskItem.AddSubTask(
 			i18n.GetWithName("SnapCopy", path.Join(svcBasePath, svcAgentName)),
 			func(t *task.Task) error {
-				return FileOp.CopyFile(path.Join(svcScriptBakPath, svcAgentName), svcBasePath)
+				return FileOp.CopyFile(path.Join(baseDir, svcAgentName), svcBasePath)
 			},
 			nil,
 		)

@@ -1,25 +1,17 @@
 <template>
     <DrawerPro v-model="drawerVisible" :header="$t('setting.snapshot')" @close="handleClose" size="large">
         <fu-steps
-            v-loading="loading"
             class="steps"
             :space="50"
             ref="stepsRef"
             direction="vertical"
-            :isLoading="stepLoading"
+            :isLoading="loading"
             :finishButtonText="$t('commons.button.create')"
             @change="changeStep"
             :beforeLeave="beforeLeave"
         >
             <fu-step id="baseData" :title="$t('setting.stepBaseData')">
-                <el-form
-                    v-loading="loading"
-                    class="mt-5"
-                    label-position="top"
-                    ref="formRef"
-                    :model="form"
-                    :rules="rules"
-                >
+                <el-form class="mt-5" label-position="top" ref="formRef" :model="form" :rules="rules">
                     <el-form-item :label="$t('setting.backupAccount')" prop="fromAccounts">
                         <el-select multiple @change="changeAccount(false)" v-model="form.fromAccounts" clearable>
                             <div v-for="item in backupOptions" :key="item.id">
@@ -191,7 +183,6 @@ import { ElForm } from 'element-plus';
 import { MsgSuccess } from '@/utils/message';
 
 const loading = ref();
-const stepLoading = ref(false);
 const stepsRef = ref();
 const nowIndex = ref(0);
 

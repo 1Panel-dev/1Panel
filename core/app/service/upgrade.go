@@ -295,10 +295,6 @@ func analyzeDoc(version, content string) dto.ReleasesNotes {
 }
 
 func (u *UpgradeService) handleBackup(originalDir string) error {
-	svcScriptBakPath := path.Join(originalDir, "scriptbak")
-	if _, err := os.Stat(svcScriptBakPath); err != nil {
-		_ = os.MkdirAll(svcScriptBakPath, os.ModePerm)
-	}
 	if err := files.CopyItem(false, true, "/usr/local/bin/1panel-core", originalDir); err != nil {
 		return err
 	}
@@ -311,10 +307,10 @@ func (u *UpgradeService) handleBackup(originalDir string) error {
 	if err := files.CopyItem(true, true, "/usr/local/bin/lang", originalDir); err != nil {
 		return err
 	}
-	if err := files.CopyItem(false, true, path.Join(svcBasePath, svcCoreName), svcScriptBakPath); err != nil {
+	if err := files.CopyItem(false, true, path.Join(svcBasePath, svcCoreName), originalDir); err != nil {
 		return err
 	}
-	if err := files.CopyItem(false, true, path.Join(svcBasePath, svcAgentName), svcScriptBakPath); err != nil {
+	if err := files.CopyItem(false, true, path.Join(svcBasePath, svcAgentName), originalDir); err != nil {
 		return err
 	}
 	if err := files.CopyItem(true, true, path.Join(global.CONF.Base.InstallDir, "1panel/db"), originalDir); err != nil {
@@ -328,10 +324,6 @@ func (u *UpgradeService) handleBackup(originalDir string) error {
 
 func (u *UpgradeService) handleRollback(originalDir string, errStep int) {
 	_ = settingRepo.Update("SystemStatus", "Free")
-	svcScriptBakPath := path.Join(originalDir, "scriptbak")
-	if _, err := os.Stat(svcScriptBakPath); err != nil {
-		_ = os.MkdirAll(svcScriptBakPath, os.ModePerm)
-	}
 	dbPath := path.Join(global.CONF.Base.InstallDir, "1panel")
 	if _, err := os.Stat(path.Join(originalDir, "db")); err == nil {
 		if err := files.CopyItem(true, true, path.Join(originalDir, "db"), dbPath); err != nil {
@@ -353,10 +345,10 @@ func (u *UpgradeService) handleRollback(originalDir string, errStep int) {
 	if errStep == 2 {
 		return
 	}
-	if err := files.CopyItem(false, true, path.Join(svcScriptBakPath, svcCoreName), svcBasePath); err != nil {
+	if err := files.CopyItem(false, true, path.Join(originalDir, svcCoreName), svcBasePath); err != nil {
 		global.LOG.Errorf("rollback %s failed, err: %v", svcCoreName, err)
 	}
-	if err := files.CopyItem(false, true, path.Join(svcScriptBakPath, svcAgentName), svcBasePath); err != nil {
+	if err := files.CopyItem(false, true, path.Join(originalDir, svcAgentName), svcBasePath); err != nil {
 		global.LOG.Errorf("rollback %s failed, err: %v", svcAgentName, err)
 	}
 	if errStep == 3 {
