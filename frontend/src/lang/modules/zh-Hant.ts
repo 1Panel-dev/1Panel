@@ -2656,7 +2656,8 @@ const message = {
         postCheck: 'POST 參數校驗',
         cookieBlockList: 'Cookie 黑名單',
 
-        dockerHelper: 'Linux 防火牆 {0} 無法停用 Docker 埠映射，應用可以在 [已安裝] 頁面編輯參數來控制埠是否放開',
+        dockerHelper: '目前防火牆無法停用容器端口映射，已安裝應用可前往【已安裝】頁面編輯應用參數，設定端口放行規則。',
+        iptablesHelper: '偵測到系統正在使用 {0} 防火牆，如需切換至 iptables，請先手動解除安裝！',
         quickJump: '快速跳轉',
         used: '已使用',
         unUsed: '未使用',
@@ -2709,7 +2710,7 @@ const message = {
         importSuccess: '成功匯入 {0} 條規則',
         importPartialSuccess: '匯入完成：成功 {0} 條，失敗 {1} 條',
 
-        basicStatus: '目前鏈 {0} 狀態為未綁定，已新增的防火牆規則需要綁定後生效！',
+        basicStatus: '目前未綁定鏈 {0} ，請先綁定！',
         baseIptables: 'Iptables 服務',
         forwardIptables: 'Iptables 端口轉發服務',
         advanceIptables: 'Iptables 進階設定服務',

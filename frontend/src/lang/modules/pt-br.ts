@@ -2844,7 +2844,9 @@ const message = {
         cookieBlockList: 'Lista de cookies bloqueados',
 
         dockerHelper:
-            'O firewall do Linux "{0}" não pode desativar o mapeamento de portas do Docker. O aplicativo pode editar os parâmetros na página "App Store -> Instalados" para controlar se a porta será liberada.',
+            'O firewall atual não pode desativar o mapeamento de porta de contêiner. Aplicativos instalados podem ir para a página [Instalados] para editar parâmetros do aplicativo e configurar regras de liberação de porta.',
+        iptablesHelper:
+            'Detectado que o sistema está usando o firewall {0}. Para mudar para iptables, desinstale-o manualmente primeiro!',
         quickJump: 'Acesso rápido',
         used: 'Usado',
         unUsed: 'Não usado',
@@ -2906,8 +2908,7 @@ const message = {
         importSuccess: '{0} regras importadas com sucesso',
         importPartialSuccess: 'Importação concluída: {0} sucesso, {1} falha',
 
-        basicStatus:
-            'O status atual da cadeia {0} é não vinculado. As regras de firewall adicionadas entrarão em vigor após a vinculação!',
+        basicStatus: 'A cadeia atual {0} não está vinculada, vincule primeiro!',
         baseIptables: 'Serviço Iptables',
         forwardIptables: 'Serviço de Encaminhamento de Porta Iptables',
         advanceIptables: 'Serviço de Configuração Avançada do Iptables',

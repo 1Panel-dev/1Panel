@@ -2774,7 +2774,10 @@ const message = {
         postCheck: 'パラメーターの検証を投稿します',
         cookieBlockList: 'クッキーブロックリスト',
 
-        dockerHelper: `Linuxファイアウォール「{0}」ではDockerポートマッピングを無効にできません。アプリケーションは「アプリストア -> インストール済み」ページでパラメータを編集することにより、ポートの解放を制御できます。`,
+        dockerHelper:
+            '現在のファイアウォールではコンテナのポートマッピングを無効にできません。インストール済みアプリケーションは【インストール済み】ページでアプリケーションパラメータを編集し、ポート開放ルールを設定できます。',
+        iptablesHelper:
+            'システムが {0} ファイアウォールを使用していることを検出しました。iptables に切り替えるには、まず手動でアンインストールしてください！',
         quickJump: 'クイックアクセス',
         used: '使用済み',
         unUsed: '未使用',
@@ -2835,8 +2838,7 @@ const message = {
         importSuccess: '{0} 件のルールを正常にインポートしました',
         importPartialSuccess: 'インポート完了: {0} 件成功、{1} 件失敗',
 
-        basicStatus:
-            '現在のチェーン {0} の状態は未バインドです。追加されたファイアウォールルールはバインド後に有効になります！',
+        basicStatus: '現在のチェーン {0} は未バインドです。まずバインドしてください！',
         baseIptables: 'Iptables サービス',
         forwardIptables: 'Iptables ポート転送サービス',
         advanceIptables: 'Iptables 高度な設定サービス',

@@ -2725,8 +2725,9 @@ const message = {
         postCheck: 'POST 파라미터 검사',
         cookieBlockList: '쿠키 차단 목록',
         dockerHelper:
-            '리눅스 방화벽 "{0}"은(는) Docker 포트 매핑을 비활성화할 수 없습니다. 애플리케이션은 "앱 스토어 -> 설치됨" 페이지에서 매핑 포트를 해제할 수 있는 파라미터를 수정해야 합니다.',
-        quickJump: '빠른 접근',
+            '현재 방화벽은 컨테이너 포트 매핑을 비활성화할 수 없습니다. 설치된 애플리케이션은 [설치됨] 페이지에서 애플리케이션 매개변수를 편집하고 포트 해제 규칙을 구성할 수 있습니다.',
+        iptablesHelper:
+            '시스템이 {0} 방화벽을 사용 중인 것으로 감지되었습니다. iptables로 전환하려면 먼저 수동으로 제거하세요!',
         used: '사용됨',
         unUsed: '사용 안 함',
         dockerRestart: '방화벽 작업에는 Docker 서비스 재시작이 필요합니다',
@@ -2785,7 +2786,7 @@ const message = {
         importSuccess: '{0}개의 규칙을 성공적으로 가져왔습니다',
         importPartialSuccess: '가져오기 완료: 성공 {0}건, 실패 {1}건',
 
-        basicStatus: '현재 체인 {0} 상태가 바인딩되지 않았습니다. 추가된 방화벽 규칙은 바인딩 후에 효과가 발생합니다!',
+        basicStatus: '현재 체인 {0}이(가) 바인딩되지 않았습니다. 먼저 바인딩하세요!',
         baseIptables: 'Iptables 서비스',
         forwardIptables: 'Iptables 포트 포워딩 서비스',
         advanceIptables: 'Iptables 고급 구성 서비스',

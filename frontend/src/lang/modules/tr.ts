@@ -2896,7 +2896,9 @@ const message = {
         cookieBlockList: 'Çerez engelleme listesi',
 
         dockerHelper:
-            'Linux güvenlik duvarı "{0}", Docker bağlantı noktası eşlemesini devre dışı bırakamaz. Uygulama, bağlantı noktasının serbest bırakılıp bırakılmayacağını kontrol etmek için "Uygulama Mağazası -> Kurulu" sayfasında parametreleri düzenleyebilir.',
+            'Mevcut güvenlik duvarı konteyner port eşlemesini devre dışı bırakamaz. Yüklü uygulamalar, uygulama parametrelerini düzenlemek ve port serbest bırakma kurallarını yapılandırmak için [Yüklü] sayfasına gidebilir.',
+        iptablesHelper:
+            "Sistemin {0} güvenlik duvarını kullandığı tespit edildi. iptables'a geçmek için lütfen önce manuel olarak kaldırın!",
         quickJump: 'Hızlı erişim',
         used: 'Kullanıldı',
         unUsed: 'Kullanılmadı',
@@ -2957,8 +2959,7 @@ const message = {
         importSuccess: '{0} kural başarıyla içe aktarıldı',
         importPartialSuccess: 'İçe aktarma tamamlandı: {0} başarılı, {1} başarısız',
 
-        basicStatus:
-            'Mevcut zincir {0} durumu bağlı değil. Eklenen güvenlik duvarı kuralları bağlandıktan sonra etkili olacak!',
+        basicStatus: 'Mevcut zincir {0} bağlı değil, lütfen önce bağlayın!',
         baseIptables: 'Iptables Servisi',
         forwardIptables: 'Iptables Port Yönlendirme Servisi',
         advanceIptables: 'Iptables Gelişmiş Yapılandırma Servisi',

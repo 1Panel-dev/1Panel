@@ -2654,7 +2654,8 @@ const message = {
         postCheck: 'POST 参数校验',
         cookieBlockList: 'Cookie 黑名单',
 
-        dockerHelper: 'Linux 防火墙 {0} 无法禁用 Docker 端口映射，应用可以在 [已安装] 页面编辑参数来控制端口是否放开',
+        dockerHelper: '当前防火墙无法禁用容器端口映射，已安装应用可前往【已安装】页面编辑应用参数，配置端口放行规则。',
+        iptablesHelper: '检测到系统正在使用 {0} 防火墙，如需切换至 iptables，请先手动卸载！',
         quickJump: '快速跳转',
         used: '已使用',
         unUsed: '未使用',
@@ -2708,7 +2709,7 @@ const message = {
         importSuccess: '成功导入 {0} 条规则',
         importPartialSuccess: '导入完成：成功 {0} 条，失败 {1} 条',
 
-        basicStatus: '当前链 {0} 状态为未绑定，已添加的防火墙规则需要绑定后生效！',
+        basicStatus: '当前未绑定链 {0} ，请先绑定！',
         baseIptables: 'Iptables 服务',
         forwardIptables: 'Iptables 端口转发服务',
         advanceIptables: 'Iptables 高级配置服务',

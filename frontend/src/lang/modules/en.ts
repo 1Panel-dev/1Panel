@@ -2858,7 +2858,10 @@ const message = {
         postCheck: 'POST parameter verification',
         cookieBlockList: 'Cookie blocklist',
 
-        dockerHelper: `Linux firewall "{0}" can't disable Docker port mapping. The application can edit the parameters on the "App Store -> Installed" page to control whether the port is released.`,
+        dockerHelper:
+            'The current firewall cannot disable container port mapping. Installed applications can go to the [Installed] page to edit application parameters and configure port release rules.',
+        iptablesHelper:
+            'Detected that the system is using {0} firewall. To switch to iptables, please uninstall it manually first!',
         quickJump: 'Quick access',
         used: 'Used',
         unUsed: 'Unused',
@@ -2919,7 +2922,7 @@ const message = {
         importSuccess: 'Successfully imported {0} rules',
         importPartialSuccess: 'Import completed: {0} succeeded, {1} failed',
 
-        basicStatus: 'Current chain {0} status is unbound. Added firewall rules will take effect after binding!',
+        basicStatus: 'Current chain {0} is unbound, please bind first!',
         baseIptables: 'Iptables Service',
         forwardIptables: 'Iptables Port Forwarding Service',
         advanceIptables: 'Iptables Advanced Configuration Service',

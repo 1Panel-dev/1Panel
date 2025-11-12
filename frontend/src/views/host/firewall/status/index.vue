@@ -52,7 +52,7 @@
                 </div>
             </el-card>
         </div>
-        <NoSuchService v-else name="Firewalld / Ufw" />
+        <NoSuchService v-else name="Firewalld / Ufw / iptables" />
 
         <LayoutContent :divider="true" v-if="!baseInfo.isInit">
             <template #main>
@@ -115,7 +115,14 @@ const acceptParams = (): void => {
     loadBaseInfo(true);
     loadDocker();
 };
-const emit = defineEmits(['search', 'update:is-active', 'update:loading', 'update:maskShow', 'update:name']);
+const emit = defineEmits([
+    'search',
+    'update:is-active',
+    'update:is-bind',
+    'update:loading',
+    'update:maskShow',
+    'update:name',
+]);
 
 const loadBaseInfo = async (search: boolean) => {
     await loadFireBaseInfo(props.currentTab)
@@ -129,6 +136,7 @@ const loadBaseInfo = async (search: boolean) => {
                 emit('update:name', '-');
             }
             emit('update:is-active', baseInfo.value.isActive);
+            emit('update:is-bind', baseInfo.value.isBind);
 
             if (search) {
                 emit('search');

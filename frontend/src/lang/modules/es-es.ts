@@ -2831,7 +2831,10 @@ const message = {
         argsCheck: 'Verificación de parámetros GET',
         postCheck: 'Verificación de parámetros POST',
         cookieBlockList: 'Lista negra de cookies',
-        dockerHelper: `El firewall de Linux "{0}" no puede deshabilitar el mapeo de puertos de Docker. La aplicación puede editar los parámetros en la página "App Store -> Instaladas" para controlar si el puerto se libera.`,
+        dockerHelper:
+            'El firewall actual no puede deshabilitar el mapeo de puertos de contenedores. Las aplicaciones instaladas pueden ir a la página [Instaladas] para editar los parámetros de la aplicación y configurar reglas de liberación de puertos.',
+        iptablesHelper:
+            'Se detectó que el sistema está usando el firewall {0}. Para cambiar a iptables, ¡desinstálelo manualmente primero!',
         quickJump: 'Acceso rápido',
         used: 'En uso',
         unUsed: 'No usado',
@@ -2892,8 +2895,7 @@ const message = {
         importSuccess: 'Se importaron correctamente {0} reglas',
         importPartialSuccess: 'Importación completada: {0} correctas, {1} fallidas',
 
-        basicStatus:
-            'El estado actual de la cadena {0} es no vinculado. ¡Las reglas de firewall agregadas surtirán efecto después de la vinculación!',
+        basicStatus: 'La cadena actual {0} no está vinculada, ¡vincule primero!',
         baseIptables: 'Servicio Iptables',
         forwardIptables: 'Servicio de Reenvío de Puertos Iptables',
         advanceIptables: 'Servicio de Configuración Avanzada de Iptables',

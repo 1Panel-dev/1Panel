@@ -5,10 +5,11 @@
         <div v-loading="loading">
             <FireStatus
                 ref="fireStatusRef"
-                @search="search(true)"
+                @search="search"
                 v-model:loading="loading"
                 v-model:mask-show="maskShow"
                 v-model:is-active="isActive"
+                v-model:is-bind="isBind"
                 v-model:name="fireName"
                 current-tab="base"
             />
@@ -16,9 +17,15 @@
                 <el-card v-if="!isActive && maskShow" class="mask-prompt">
                     <span>{{ $t('firewall.firewallNotStart') }}</span>
                 </el-card>
+                <el-card v-if="!isBind && maskShow" class="mask-prompt">
+                    <span>{{ $t('firewall.basicStatus', ['1PANEL_BASIC']) }}</span>
+                </el-card>
 
-                <LayoutContent :title="$t('firewall.portRule', 2)" :class="{ mask: !isActive }">
+                <LayoutContent :title="$t('firewall.portRule', 2)" :class="{ mask: !isActive || !isBind }">
                     <template #prompt>
+                        <div class="mb-2" v-if="fireName !== 'iptables'">
+                            <el-alert :closable="false" :title="$t('firewall.iptablesHelper', [fireName])" />
+                        </div>
                         <el-alert type="info" :closable="false">
                             <template #default>
                                 <span class="flx-align-center">
@@ -34,14 +41,6 @@
                                 </span>
                             </template>
                         </el-alert>
-
-                        <div v-if="!isBind" class="mt-2">
-                            <el-alert
-                                type="info"
-                                :closable="false"
-                                :title="$t('firewall.basicStatus', ['1PANEL_BASIC'])"
-                            />
-                        </div>
                     </template>
                     <template #leftToolBar>
                         <el-button type="primary" @click="onOpenDialog('create')">
@@ -169,13 +168,7 @@ import OperateDialog from '@/views/host/firewall/port/operate/index.vue';
 import ImportDialog from '@/views/host/firewall/port/import/index.vue';
 import FireStatus from '@/views/host/firewall/status/index.vue';
 import { onMounted, reactive, ref } from 'vue';
-import {
-    batchOperateRule,
-    loadChainStatus,
-    searchFireRule,
-    updateFirewallDescription,
-    updatePortRule,
-} from '@/api/modules/host';
+import { batchOperateRule, searchFireRule, updateFirewallDescription, updatePortRule } from '@/api/modules/host';
 import { Host } from '@/api/interface/host';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
@@ -207,7 +200,7 @@ const paginationConfig = reactive({
     total: 0,
 });
 
-const search = async (init?: boolean) => {
+const search = async () => {
     if (!isActive.value) {
         loading.value = false;
         data.value = [];
@@ -223,9 +216,6 @@ const search = async (init?: boolean) => {
         pageSize: paginationConfig.pageSize,
     };
     loading.value = true;
-    if (init) {
-        loadStatus();
-    }
     await searchFireRule(params)
         .then((res) => {
             loading.value = false;
@@ -306,16 +296,6 @@ const onChange = async (info: any) => {
     info.type = 'port';
     await updateFirewallDescription(info);
     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-};
-
-const loadStatus = async () => {
-    if (fireName.value !== 'iptables') {
-        isBind.value = true;
-        return;
-    }
-    await loadChainStatus('1PANEL_BASIC').then((res) => {
-        isBind.value = res.data.isBind;
-    });
 };
 
 const onDelete = async (row: Host.RuleInfo | null) => {

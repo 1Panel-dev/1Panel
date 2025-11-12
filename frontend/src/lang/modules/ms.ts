@@ -2836,7 +2836,10 @@ const message = {
         postCheck: 'Pengesahan parameter POST',
         cookieBlockList: 'Senarai blok Cookie',
 
-        dockerHelper: `Firewall Linux "{0}" tidak boleh melumpuhkan pemetaan port Docker. Aplikasi boleh mengedit parameter pada halaman "App Store -> Installed" untuk mengawal sama ada port dilepaskan.`,
+        dockerHelper:
+            'Firewall semasa tidak boleh melumpuhkan pemetaan port bekas. Aplikasi yang dipasang boleh pergi ke halaman [Dipasang] untuk mengedit parameter aplikasi dan mengkonfigurasi peraturan pelepasan port.',
+        iptablesHelper:
+            'Dikesan sistem menggunakan firewall {0}. Untuk beralih ke iptables, sila nyahpasang secara manual dahulu!',
         quickJump: 'Akses pantas',
         used: 'Digunakan',
         unUsed: 'Tidak Digunakan',
@@ -2899,8 +2902,7 @@ const message = {
         importSuccess: '{0} peraturan berjaya diimport',
         importPartialSuccess: 'Import selesai: {0} berjaya, {1} gagal',
 
-        basicStatus:
-            'Status rantaian semasa {0} adalah tidak terikat. Peraturan firewall yang ditambah akan berkuat kuasa selepas pengikatan!',
+        basicStatus: 'Rantaian semasa {0} tidak terikat, sila ikat dahulu!',
         baseIptables: 'Perkhidmatan Iptables',
         forwardIptables: 'Perkhidmatan Penerusan Port Iptables',
         advanceIptables: 'Perkhidmatan Konfigurasi Lanjutan Iptables',

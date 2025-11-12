@@ -5,11 +5,12 @@
         <div v-loading="loading">
             <FireStatus
                 ref="fireStatusRef"
-                @search="search(true)"
+                @search="search"
                 v-model:loading="loading"
                 v-model:name="fireName"
                 v-model:mask-show="maskShow"
                 v-model:is-active="isActive"
+                v-model:is-bind="isBind"
                 current-tab="base"
             />
 
@@ -17,15 +18,14 @@
                 <el-card v-if="!isActive && maskShow" class="mask-prompt">
                     <span>{{ $t('firewall.firewallNotStart') }}</span>
                 </el-card>
+                <el-card v-if="!isBind && maskShow" class="mask-prompt">
+                    <span>{{ $t('firewall.basicStatus', ['1PANEL_BASIC']) }}</span>
+                </el-card>
 
-                <LayoutContent :title="$t('firewall.ipRule', 2)" :class="{ mask: !isActive }">
+                <LayoutContent :title="$t('firewall.ipRule', 2)" :class="{ mask: !isActive || !isBind }">
                     <template #prompt>
-                        <div v-if="!isBind">
-                            <el-alert
-                                type="info"
-                                :closable="false"
-                                :title="$t('firewall.basicStatus', ['1PANEL_BASIC'])"
-                            />
+                        <div v-if="fireName !== 'iptables'">
+                            <el-alert :closable="false" :title="$t('firewall.iptablesHelper', [fireName])" />
                         </div>
                     </template>
                     <template #leftToolBar>
@@ -120,13 +120,7 @@ import ImportDialog from '@/views/host/firewall/ip/import/index.vue';
 import FireRouter from '@/views/host/firewall/index.vue';
 import FireStatus from '@/views/host/firewall/status/index.vue';
 import { onMounted, reactive, ref } from 'vue';
-import {
-    batchOperateRule,
-    loadChainStatus,
-    searchFireRule,
-    updateAddrRule,
-    updateFirewallDescription,
-} from '@/api/modules/host';
+import { batchOperateRule, searchFireRule, updateAddrRule, updateFirewallDescription } from '@/api/modules/host';
 import { Host } from '@/api/interface/host';
 import { ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
@@ -156,7 +150,7 @@ const paginationConfig = reactive({
     total: 0,
 });
 
-const search = async (init?: boolean) => {
+const search = async () => {
     if (!isActive.value) {
         loading.value = false;
         data.value = [];
@@ -172,9 +166,6 @@ const search = async (init?: boolean) => {
         pageSize: paginationConfig.pageSize,
     };
     loading.value = true;
-    if (init) {
-        loadStatus();
-    }
     await searchFireRule(params)
         .then((res) => {
             loading.value = false;
@@ -184,16 +175,6 @@ const search = async (init?: boolean) => {
         .catch(() => {
             loading.value = false;
         });
-};
-
-const loadStatus = async () => {
-    if (fireName.value !== 'iptables') {
-        isBind.value = true;
-        return;
-    }
-    await loadChainStatus('1PANEL_BASIC').then((res) => {
-        isBind.value = res.data.isBind;
-    });
 };
 
 const dialogRef = ref();
