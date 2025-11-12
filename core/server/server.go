@@ -40,9 +40,6 @@ func Start() {
 	gob.Register(psession.SessionUser{})
 	cron.Init()
 	session.Init()
-	if os.Getenv("GIN_MODE") == "" {
-		gin.SetMode(gin.ReleaseMode)
-	}
 	hook.Init()
 	InitOthers()
 
