@@ -468,7 +468,7 @@
                                 @cell-mouse-enter="showFavorite"
                                 @cell-mouse-leave="hideFavorite"
                                 :heightDiff="heightDiff"
-                                :right-buttons="buttons"
+                                :right-buttons="rightButtons"
                             >
                                 <el-table-column type="selection" width="30" />
                                 <el-table-column
@@ -590,7 +590,7 @@
                                 ></el-table-column>
                                 <fu-table-operations
                                     :ellipsis="mobile ? 0 : 2"
-                                    :buttons="buttons"
+                                    :buttons="tableMoreButtons"
                                     :label="$t('commons.table.operate')"
                                     :min-width="mobile ? 'auto' : 200"
                                     :fixed="mobile ? false : 'right'"
@@ -1360,15 +1360,19 @@ const getWgetProcess = async () => {
     } catch (error) {}
 };
 
-const openRename = (item: File.File) => {
+const openRename = (item: File.File, source: String) => {
     fileRename.path = req.path;
     fileRename.oldName = item.name;
-    fileRename.newName = item.name;
-    isEdit.value = true;
-    nextTick(() => {
-        getCurrentRename().focus();
-    });
-    hideRightMenu();
+    if (source === 'right') {
+        fileRename.newName = item.name;
+        isEdit.value = true;
+        nextTick(() => {
+            getCurrentRename().focus();
+        });
+        hideRightMenu();
+    } else {
+        renameRef.value.acceptParams(fileRename);
+    }
 };
 
 const onRenameBlur = (e: FocusEvent, row: File.File) => {
@@ -1549,7 +1553,7 @@ const openWithVSCode = (row: File.File) => {
     dialogVscodeOpenRef.value.acceptParams({ path: row.path + (row.isDir ? '' : ':1:1') });
 };
 
-const buttons = [
+const beforeButtons = [
     {
         label: i18n.global.t('commons.button.open'),
         click: open,
@@ -1597,10 +1601,8 @@ const buttons = [
             openBatchRole([row]);
         },
     },
-    {
-        label: i18n.global.t('file.rename'),
-        click: openRename,
-    },
+];
+const afterButtons = [
     {
         label: i18n.global.t('commons.button.delete'),
         disabled: (row: File.File) => {
@@ -1643,6 +1645,25 @@ const buttons = [
     },
 ];
 
+const rightBtnRename = [
+    {
+        label: i18n.global.t('file.rename'),
+        click: (row: File.File) => {
+            openRename(row, 'right');
+        },
+    },
+];
+const moreBtnRename = [
+    {
+        label: i18n.global.t('file.rename'),
+        click: (row: File.File) => {
+            openRename(row, 'more');
+        },
+    },
+];
+
+const rightButtons = [...beforeButtons, ...rightBtnRename, ...afterButtons];
+const tableMoreButtons = [...beforeButtons, ...moreBtnRename, ...afterButtons];
 const openConvert = (item: File.File) => {
     if (!ffmpegExist.value) {
         ElMessageBox.confirm(i18n.global.t('cronjob.library.noSuchApp', ['FFmpeg']), i18n.global.t('file.convert'), {
