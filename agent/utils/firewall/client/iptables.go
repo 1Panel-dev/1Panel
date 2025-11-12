@@ -72,6 +72,12 @@ func (i *Iptables) ListPort() ([]FireInfo, error) {
 		if item.Strategy == "drop" || item.Strategy == "reject" {
 			item.Strategy = "drop"
 		}
+		if item.Protocol == "6" {
+			item.Protocol = "tcp"
+		} else if item.Protocol == "17" {
+			item.Protocol = "udp"
+		}
+
 		datas = append(datas, FireInfo{
 			Chain:    item.Chain,
 			Address:  item.SrcIP,
