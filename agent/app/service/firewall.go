@@ -820,7 +820,10 @@ func checkPortUsed(ports, proto string, apps []portOfApp) string {
 }
 
 func loadInitStatus(clientName, tab string) (bool, bool) {
-	if clientName != "firewalld" || (clientName != "iptables" && tab != "forward") {
+	if clientName == "firewalld" {
+		return true, true
+	}
+	if clientName == "ufw" && tab == "forward" {
 		return true, true
 	}
 	switch tab {
