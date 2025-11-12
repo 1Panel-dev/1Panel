@@ -90,7 +90,7 @@ const acceptParams = (params: DialogProps) => {
     uploaderFiles.value = [];
     uploadRef.value?.clearFiles();
     isImport.value = params?.isImport;
-    withoutReload.value = params?.withoutReload;
+    withoutReload.value = params?.withoutReload || false;
 
     open.value = true;
 };
@@ -142,6 +142,10 @@ const submit = async () => {
             uploaderFiles.value = [];
             open.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            if (!isImport.value) {
+                globalStore.isProductPro = true;
+                globalStore.isMasterProductPro = true;
+            }
             if (!withoutReload.value) {
                 loadMasterProductProFromDB();
                 loadProductProFromDB();

@@ -823,7 +823,7 @@ func loadInitStatus(clientName, tab string) (bool, bool) {
 	if clientName == "firewalld" {
 		return true, true
 	}
-	if clientName == "ufw" && tab == "forward" {
+	if clientName == "ufw" && tab != "forward" {
 		return true, true
 	}
 	switch tab {
