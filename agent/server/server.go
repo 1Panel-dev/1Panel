@@ -45,9 +45,6 @@ func Start() {
 	firewall.Init()
 	lang.Init()
 	validator.Init()
-	if os.Getenv("GIN_MODE") == "" {
-		gin.SetMode(gin.ReleaseMode)
-	}
 	cron.Run()
 	hook.Init()
 	InitOthers()
