@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -212,7 +213,10 @@ func CheckSMSSendLimit(method string) bool {
 	if err != nil {
 		return false
 	}
-	limitCount := cfg.AlertDailyNum
+	limitCount, err := strconv.ParseUint(cfg.AlertDailyNum, 10, 64)
+	if err != nil {
+		return false
+	}
 	checkTaskMutex.Lock()
 	defer checkTaskMutex.Unlock()
 	todayCount, err := alertRepo.GetLicensePushCount(method)
@@ -220,7 +224,7 @@ func CheckSMSSendLimit(method string) bool {
 		global.LOG.Errorf("error getting license push count info, err: %v", err)
 		return false
 	}
-	if todayCount >= limitCount {
+	if todayCount >= uint(limitCount) {
 		return false
 	}
 

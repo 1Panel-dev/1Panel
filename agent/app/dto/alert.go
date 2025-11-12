@@ -317,7 +317,7 @@ type AlertCommonConfig struct {
 
 type AlertSmsConfig struct {
 	Phone         string `json:"phone"`
-	AlertDailyNum uint   `json:"alertDailyNum"`
+	AlertDailyNum string `json:"alertDailyNum"`
 }
 
 type AlertEmailConfig struct {
