@@ -81,7 +81,7 @@
                             v-model:selects="selects"
                             @search="search"
                             :data="data"
-                            :heightDiff="420"
+                            :heightDiff="400"
                         >
                             <el-table-column type="selection" fix />
                             <el-table-column :label="$t('commons.table.protocol')" :min-width="70" prop="protocol" />
@@ -241,6 +241,7 @@ const onOpenDialog = async (
 ) => {
     let params = {
         title,
+        fireName: fireName.value,
         rowData: { ...rowData },
     };
     dialogRef.value!.acceptParams(params);

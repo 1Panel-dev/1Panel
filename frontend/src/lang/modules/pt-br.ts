@@ -2902,16 +2902,16 @@ const message = {
         forwardHelper1:
             'Se você deseja redirecionar para a porta local, o IP de destino deve ser definido como "127.0.0.1".',
         forwardHelper2: 'Deixe o IP de destino em branco para redirecionar para a porta local.',
-        forwardHelper3: 'Somente suporta redirecionamento de porta IPv4.',
         forwardInboundInterface: 'Interface de Rede de Entrada para Encaminhamento',
         exportHelper: 'Prestes a exportar {0} regras de firewall. Continuar?',
         importSuccess: '{0} regras importadas com sucesso',
         importPartialSuccess: 'Importação concluída: {0} sucesso, {1} falha',
 
+        ipv4Limit: 'A operação atual suporta apenas endereços IPv4',
         basicStatus: 'A cadeia atual {0} não está vinculada, vincule primeiro!',
-        baseIptables: 'Serviço Iptables',
-        forwardIptables: 'Serviço de Encaminhamento de Porta Iptables',
-        advanceIptables: 'Serviço de Configuração Avançada do Iptables',
+        baseIptables: 'Serviço iptables',
+        forwardIptables: 'Serviço de Encaminhamento de Porta iptables',
+        advanceIptables: 'Serviço de Configuração Avançada do iptables',
         initMsg: 'Prestes a inicializar {0}, continuar?',
         initHelper:
             'Detectado que {0} não está inicializado. Clique no botão de inicialização na barra de status superior para configurar!',

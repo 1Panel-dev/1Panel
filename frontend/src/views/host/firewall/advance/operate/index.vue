@@ -1,5 +1,8 @@
 <template>
     <DrawerPro v-model="drawerVisible" :header="title" @close="handleClose" size="large">
+        <div class="mb-2">
+            <el-alert :closable="false" :title="$t('firewall.ipv4Limit')" />
+        </div>
         <el-form ref="formRef" label-position="top" :model="dialogData.rowData" :rules="rules" v-loading="loading">
             <el-form-item :label="$t('commons.table.protocol')" prop="protocol">
                 <el-select class="w-full" v-model="dialogData.rowData!.protocol" @change="changeProtocol">

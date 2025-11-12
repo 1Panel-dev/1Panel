@@ -66,7 +66,7 @@ func (i *Iptables) ListPort() ([]FireInfo, error) {
 	beforeRules, _ := iptables.ReadFilterRulesByChain(iptables.Chain1PanelBasicBefore)
 	basicRules = append(basicRules, beforeRules...)
 	for _, item := range basicRules {
-		if item.DstPort == 0 {
+		if len(item.DstPort) == 0 {
 			continue
 		}
 		if item.Strategy == "drop" || item.Strategy == "reject" {
@@ -82,7 +82,7 @@ func (i *Iptables) ListPort() ([]FireInfo, error) {
 			Chain:    item.Chain,
 			Address:  item.SrcIP,
 			Protocol: item.Protocol,
-			Port:     fmt.Sprintf("%v", item.DstPort),
+			Port:     item.DstPort,
 			Strategy: item.Strategy,
 			Family:   "ipv4",
 		})
@@ -98,7 +98,7 @@ func (i *Iptables) ListAddress() ([]FireInfo, error) {
 		return nil, err
 	}
 	for _, item := range basicRules {
-		if item.DstPort != 0 || item.SrcPort != 0 {
+		if len(item.DstPort) != 0 || len(item.SrcPort) != 0 {
 			continue
 		}
 		if item.Strategy == "drop" || item.Strategy == "reject" {
@@ -137,9 +137,6 @@ func (i *Iptables) Port(port FireInfo, operation string) error {
 	}
 
 	ruleArgs := []string{fmt.Sprintf("-p %s", protocol)}
-	if protocol == "tcp" || protocol == "udp" {
-		ruleArgs = append(ruleArgs, fmt.Sprintf("-m %s", protocol))
-	}
 	ruleArgs = append(ruleArgs, fmt.Sprintf("--dport %s", portSpec), fmt.Sprintf("-j %s", action))
 	ruleSpec := strings.Join(ruleArgs, " ")
 	if operation == "add" {
@@ -199,9 +196,6 @@ func (i *Iptables) RichRules(rule FireInfo, operation string) error {
 		}
 		if protocol == "" {
 			return fmt.Errorf("protocol is required when specifying a port")
-		}
-		if protocol == "tcp" || protocol == "udp" {
-			ruleArgs = append(ruleArgs, fmt.Sprintf("-m %s", protocol))
 		}
 		ruleArgs = append(ruleArgs, fmt.Sprintf("--dport %s", portSegment))
 	}
@@ -270,6 +264,7 @@ func iptablesPortForward(info Forward, operation string) error {
 			return err
 		}
 		forwardPersistence()
+		return nil
 	}
 	natList, err := iptables.ListForward(iptables.Chain1PanelPreRouting)
 	if err != nil {

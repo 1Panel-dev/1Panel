@@ -2,7 +2,6 @@ package iptables
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 	"time"
 
@@ -13,8 +12,8 @@ type FilterRules struct {
 	ID          uint   `json:"id"`
 	Chain       string `json:"chain"`
 	Protocol    string `json:"protocol"`
-	SrcPort     uint   `json:"srcPort"`
-	DstPort     uint   `json:"dstPort"`
+	SrcPort     string `json:"srcPort"`
+	DstPort     string `json:"dstPort"`
 	SrcIP       string `json:"srcIP"`
 	DstIP       string `json:"dstIP"`
 	Strategy    string `json:"strategy"`
@@ -29,11 +28,11 @@ func AddFilterRule(chain string, policy FilterRules) error {
 	if policy.Protocol != "" {
 		iptablesArg += fmt.Sprintf(" -p %s", policy.Protocol)
 	}
-	if policy.SrcPort != 0 {
-		iptablesArg += fmt.Sprintf(" --sport %d", policy.SrcPort)
+	if len(policy.SrcPort) != 0 {
+		iptablesArg += fmt.Sprintf(" --sport %s", policy.SrcPort)
 	}
-	if policy.DstPort != 0 {
-		iptablesArg += fmt.Sprintf(" --dport %d", policy.DstPort)
+	if len(policy.DstPort) != 0 {
+		iptablesArg += fmt.Sprintf(" --dport %s", policy.DstPort)
 	}
 	if policy.SrcIP != "" {
 		iptablesArg += fmt.Sprintf(" -s %s", policy.SrcIP)
@@ -51,11 +50,11 @@ func DeleteFilterRule(chain string, policy FilterRules) error {
 	if policy.Protocol != "" {
 		iptablesArg += fmt.Sprintf(" -p %s", policy.Protocol)
 	}
-	if policy.SrcPort != 0 {
-		iptablesArg += fmt.Sprintf(" --sport %d", policy.SrcPort)
+	if len(policy.SrcPort) != 0 {
+		iptablesArg += fmt.Sprintf(" --sport %s", policy.SrcPort)
 	}
-	if policy.DstPort != 0 {
-		iptablesArg += fmt.Sprintf(" --dport %d", policy.DstPort)
+	if len(policy.DstPort) != 0 {
+		iptablesArg += fmt.Sprintf(" --dport %s", policy.DstPort)
 	}
 	if policy.SrcIP != "" {
 		iptablesArg += fmt.Sprintf(" -s %s", policy.SrcIP)
@@ -118,9 +117,9 @@ func LoadDefaultStrategy(chain string) (string, error) {
 	return ACCEPT, nil
 }
 
-func loadPort(position string, portStr []string) uint {
+func loadPort(position string, portStr []string) string {
 	if len(portStr) < 7 {
-		return 0
+		return ""
 	}
 
 	var portItem string
@@ -130,15 +129,17 @@ func loadPort(position string, portStr []string) uint {
 	if strings.Contains(portStr[6], "dpt:") && position == "dst" {
 		portItem = strings.ReplaceAll(portStr[6], "dpt:", "")
 	}
-	if len(portItem) == 0 {
-		return 0
+	if strings.Contains(portStr[6], "spts:") && position == "src" {
+		portItem = strings.ReplaceAll(portStr[6], "spts:", "")
 	}
-	port, _ := strconv.Atoi(portItem)
-	return uint(port)
+	if strings.Contains(portStr[6], "dpts:") && position == "dst" {
+		portItem = strings.ReplaceAll(portStr[6], "dpts:", "")
+	}
+	return portItem
 }
 
 func loadIP(ipStr string) string {
-	if ipStr == ANYWHERE {
+	if ipStr == ANYWHERE || ipStr == "0.0.0.0/0" {
 		return ""
 	}
 	return ipStr
@@ -150,13 +151,13 @@ func validateRuleSafety(rule FilterRules, chain string) error {
 	}
 
 	if chain == ChainInput || chain == Chain1PanelInput || chain == Chain1PanelBasic {
-		if rule.SrcIP == "0.0.0.0/0" && rule.SrcPort == 0 && rule.DstPort == 0 {
+		if rule.SrcIP == "0.0.0.0/0" && len(rule.SrcPort) == 0 && len(rule.DstPort) == 0 {
 			return fmt.Errorf("unsafe DROP is not allowed")
 		}
 	}
 
 	if chain == ChainOutput || chain == Chain1PanelOutput || chain == Chain1PanelBasicAfter {
-		if rule.DstIP == "0.0.0.0/0" && rule.DstPort == 0 && rule.SrcPort == 0 {
+		if rule.DstIP == "0.0.0.0/0" && len(rule.DstPort) == 0 && len(rule.SrcPort) == 0 {
 			return fmt.Errorf("unsafe DROP is not allowed")
 		}
 	}

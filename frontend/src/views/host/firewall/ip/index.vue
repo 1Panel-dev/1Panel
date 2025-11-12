@@ -61,7 +61,7 @@
                             v-model:selects="selects"
                             @search="search"
                             :data="data"
-                            :heightDiff="370"
+                            :heightDiff="400"
                         >
                             <el-table-column type="selection" fix />
                             <el-table-column :min-width="120" :label="$t('firewall.address')" prop="address">
@@ -186,6 +186,7 @@ const onOpenDialog = async (
 ) => {
     let params = {
         title,
+        fireName: fireName.value,
         rowData: { ...rowData },
     };
     dialogRef.value!.acceptParams(params);

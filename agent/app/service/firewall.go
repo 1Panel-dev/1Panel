@@ -724,6 +724,7 @@ func (u *FirewallService) addPortRecord(req dto.PortRuleOperate) error {
 		if req.ID != 0 {
 			return hostRepo.DeleteFirewallRecordByID(req.ID)
 		}
+		return nil
 	}
 
 	if err := hostRepo.SaveFirewallRecord(&model.Firewall{
@@ -746,6 +747,7 @@ func (u *FirewallService) addAddressRecord(chain string, req dto.AddrRuleOperate
 		if req.ID != 0 {
 			return hostRepo.DeleteFirewallRecordByID(req.ID)
 		}
+		return nil
 	}
 
 	if err := hostRepo.SaveFirewallRecord(&model.Firewall{
@@ -762,29 +764,36 @@ func (u *FirewallService) addAddressRecord(chain string, req dto.AddrRuleOperate
 
 func checkPortUsed(ports, proto string, apps []portOfApp) string {
 	var portList []int
-	if strings.Contains(ports, "-") || strings.Contains(ports, ",") {
-		if strings.Contains(ports, "-") {
-			port1, err := strconv.Atoi(strings.Split(ports, "-")[0])
-			if err != nil {
-				global.LOG.Errorf(" convert string %s to int failed, err: %v", strings.Split(ports, "-")[0], err)
-				return ""
-			}
-			port2, err := strconv.Atoi(strings.Split(ports, "-")[1])
-			if err != nil {
-				global.LOG.Errorf(" convert string %s to int failed, err: %v", strings.Split(ports, "-")[1], err)
-				return ""
-			}
-			for i := port1; i <= port2; i++ {
-				portList = append(portList, i)
-			}
-		} else {
-			portLists := strings.Split(ports, ",")
-			for _, item := range portLists {
-				portItem, _ := strconv.Atoi(item)
-				portList = append(portList, portItem)
-			}
+	rangeSplit := ""
+	if strings.Contains(ports, "-") {
+		rangeSplit = "-"
+	}
+	if strings.Contains(ports, ":") {
+		rangeSplit = ":"
+	}
+	if len(rangeSplit) != 0 {
+		port1, err := strconv.Atoi(strings.Split(ports, rangeSplit)[0])
+		if err != nil {
+			global.LOG.Errorf(" convert string %s to int failed, err: %v", strings.Split(ports, rangeSplit)[0], err)
+			return ""
 		}
-
+		port2, err := strconv.Atoi(strings.Split(ports, rangeSplit)[1])
+		if err != nil {
+			global.LOG.Errorf(" convert string %s to int failed, err: %v", strings.Split(ports, rangeSplit)[1], err)
+			return ""
+		}
+		for i := port1; i <= port2; i++ {
+			portList = append(portList, i)
+		}
+	}
+	if strings.Contains(ports, ",") {
+		portLists := strings.Split(ports, ",")
+		for _, item := range portLists {
+			portItem, _ := strconv.Atoi(item)
+			portList = append(portList, portItem)
+		}
+	}
+	if len(portList) != 0 {
 		var usedPorts []string
 		for _, port := range portList {
 			portItem := fmt.Sprintf("%v", port)

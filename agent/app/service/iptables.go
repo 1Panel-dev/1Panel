@@ -67,10 +67,14 @@ func (s *IptablesService) OperateRule(req dto.IptablesRuleOp) error {
 	policy := iptables.FilterRules{
 		Protocol: req.Protocol,
 		SrcIP:    req.SrcIP,
-		SrcPort:  req.SrcPort,
 		DstIP:    req.DstIP,
-		DstPort:  req.DstPort,
 		Strategy: req.Strategy,
+	}
+	if req.SrcPort != 0 {
+		policy.SrcPort = fmt.Sprintf("%v", req.SrcPort)
+	}
+	if req.DstPort != 0 {
+		policy.DstPort = fmt.Sprintf("%v", req.DstPort)
 	}
 
 	name := iptables.InputFileName

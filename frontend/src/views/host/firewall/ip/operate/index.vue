@@ -1,5 +1,8 @@
 <template>
     <DrawerPro v-model="drawerVisible" :header="title" @close="handleClose" size="large">
+        <div v-if="dialogData.fireName === 'iptables'" class="mb-2">
+            <el-alert :closable="false" :title="$t('firewall.ipv4Limit')" />
+        </div>
         <el-form
             ref="formRef"
             label-position="top"
@@ -54,6 +57,7 @@ const oldRule = ref<Host.RuleIP>();
 
 interface DialogProps {
     title: string;
+    fireName: string;
     rowData?: Host.RuleIP;
     getTableList?: () => Promise<any>;
 }
@@ -61,6 +65,7 @@ const title = ref<string>('');
 const drawerVisible = ref(false);
 const dialogData = ref<DialogProps>({
     title: '',
+    fireName: '',
 });
 const acceptParams = (params: DialogProps): void => {
     dialogData.value = params;
