@@ -72,11 +72,6 @@ func (i *Iptables) ListPort() ([]FireInfo, error) {
 		if item.Strategy == "drop" || item.Strategy == "reject" {
 			item.Strategy = "drop"
 		}
-		if item.Protocol == "6" {
-			item.Protocol = "tcp"
-		} else if item.Protocol == "17" {
-			item.Protocol = "udp"
-		}
 
 		datas = append(datas, FireInfo{
 			Chain:    item.Chain,
@@ -263,30 +258,13 @@ func iptablesPortForward(info Forward, operation string) error {
 		if err := iptables.AddForward(info.Protocol, info.Port, info.TargetIP, info.TargetPort, info.Interface, true); err != nil {
 			return err
 		}
-		forwardPersistence()
-		return nil
-	}
-	natList, err := iptables.ListForward(iptables.Chain1PanelPreRouting)
-	if err != nil {
-		return fmt.Errorf("failed to list NAT rules: %w", err)
-	}
-
-	for _, nat := range natList {
-		if nat.Protocol == info.Protocol &&
-			strings.TrimPrefix(nat.SrcPort, ":") == info.Port &&
-			strings.TrimPrefix(nat.DestPort, ":") == info.TargetPort {
-			targetIP := info.TargetIP
-			if targetIP == "" {
-				targetIP = "127.0.0.1"
-			}
-
-			if err := iptables.DeleteForward(nat.Num, info.Protocol, info.Port, targetIP, info.TargetPort, info.Interface); err != nil {
-				return err
-			}
-			forwardPersistence()
+	} else {
+		if err := iptables.DeleteForward(info.Num, info.Protocol, info.Port, info.TargetIP, info.TargetPort, info.Interface); err != nil {
+			return err
 		}
 	}
-	return fmt.Errorf("forward rule not found")
+	forwardPersistence()
+	return nil
 }
 
 func forwardPersistence() {

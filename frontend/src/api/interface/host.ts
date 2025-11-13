@@ -280,8 +280,8 @@ export namespace Host {
     export interface IptablesRules {
         id: number;
         protocol: string;
-        srcPort: number;
-        dstPort: number;
+        srcPort: string;
+        dstPort: string;
         srcIP: string;
         dstIP: string;
         strategy: string;

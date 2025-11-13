@@ -95,6 +95,7 @@ var WebUrlMap = map[string]struct{}{
 	"/hosts/firewall/port":    {},
 	"/hosts/firewall/forward": {},
 	"/hosts/firewall/ip":      {},
+	"/hosts/firewall/advance": {},
 	"/hosts/process/process":  {},
 	"/hosts/process/network":  {},
 	"/hosts/ssh/ssh":          {},

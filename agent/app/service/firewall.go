@@ -727,6 +727,9 @@ func (u *FirewallService) addPortRecord(req dto.PortRuleOperate) error {
 		return nil
 	}
 
+	if len(req.Description) == 0 {
+		return nil
+	}
 	if err := hostRepo.SaveFirewallRecord(&model.Firewall{
 		Type:        "port",
 		Chain:       req.Chain,

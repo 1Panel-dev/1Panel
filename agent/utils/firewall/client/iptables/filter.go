@@ -86,7 +86,7 @@ func ReadFilterRulesByChain(chain string) ([]FilterRules, error) {
 		}
 		itemRule := FilterRules{
 			Chain:    chain,
-			Protocol: fields[1],
+			Protocol: loadProtocol(fields[1]),
 			SrcPort:  loadPort("src", fields),
 			DstPort:  loadPort("dst", fields),
 			SrcIP:    loadIP(fields[3]),
@@ -135,6 +135,7 @@ func loadPort(position string, portStr []string) string {
 	if strings.Contains(portStr[6], "dpts:") && position == "dst" {
 		portItem = strings.ReplaceAll(portStr[6], "dpts:", "")
 	}
+	portItem = strings.ReplaceAll(portItem, ":", "-")
 	return portItem
 }
 
@@ -143,6 +144,21 @@ func loadIP(ipStr string) string {
 		return ""
 	}
 	return ipStr
+}
+
+func loadProtocol(protocol string) string {
+	switch protocol {
+	case "0":
+		return "all"
+	case "1":
+		return "icmp"
+	case "6":
+		return "tcp"
+	case "17":
+		return "udp"
+	default:
+		return protocol
+	}
 }
 
 func validateRuleSafety(rule FilterRules, chain string) error {

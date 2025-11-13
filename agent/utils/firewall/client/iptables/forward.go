@@ -3,8 +3,6 @@ package iptables
 import (
 	"fmt"
 	"strings"
-
-	"github.com/1Panel-dev/1Panel/agent/utils/re"
 )
 
 func AddForward(protocol, srcPort, dest, destPort, iface string, save bool) error {
@@ -71,42 +69,57 @@ func ListForward(chain ...string) ([]IptablesNatInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-	natListRegex := re.GetRegex(re.IptablesNatListPattern)
 	var forwardList []IptablesNatInfo
-	for _, line := range strings.Split(stdout, "\n") {
-		line = strings.TrimFunc(line, func(r rune) bool {
-			return r <= 32
-		})
-		if natListRegex.MatchString(line) {
-			match := natListRegex.FindStringSubmatch(line)
-			if !strings.Contains(match[13], ":") {
-				match[13] = fmt.Sprintf(":%s", match[13])
-			}
-			forwardList = append(forwardList, IptablesNatInfo{
-				Num:         match[1],
-				Target:      match[4],
-				Protocol:    match[11],
-				InIface:     match[7],
-				OutIface:    match[8],
-				Opt:         match[6],
-				Source:      match[9],
-				Destination: match[10],
-				SrcPort:     match[12],
-				DestPort:    match[13],
-			})
+	lines := strings.Split(stdout, "\n")
+	for i := 0; i < len(lines); i++ {
+		fields := strings.Fields(lines[i])
+		if len(fields) < 13 {
+			continue
 		}
+		item := IptablesNatInfo{
+			Num:      fields[0],
+			Protocol: loadProtocol(fields[4]),
+			InIface:  fields[6],
+			OutIface: fields[7],
+			Source:   fields[8],
+			SrcPort:  loadNatSrcPort(fields[11]),
+		}
+		if len(fields) == 15 && fields[13] == "ports" {
+			item.DestPort = fields[14]
+		}
+		if len(fields) == 13 && strings.HasPrefix(fields[12], "to:") {
+			parts := strings.Split(fields[12], ":")
+			if len(parts) > 2 {
+				item.DestPort = parts[2]
+				item.Destination = parts[1]
+			}
+		}
+		if len(item.Destination) == 0 {
+			item.Destination = "127.0.0.1"
+		}
+		forwardList = append(forwardList, item)
 	}
 
 	return forwardList, nil
 }
 
+func loadNatSrcPort(portStr string) string {
+	var portItem string
+	if strings.Contains(portStr, "dpt:") {
+		portItem = strings.ReplaceAll(portStr, "dpt:", "")
+	}
+	if strings.Contains(portStr, "dpts:") {
+		portItem = strings.ReplaceAll(portStr, "dpts:", "")
+	}
+	portItem = strings.ReplaceAll(portItem, ":", "-")
+	return portItem
+}
+
 type IptablesNatInfo struct {
 	Num         string `json:"num"`
-	Target      string `json:"target"`
 	Protocol    string `json:"protocol"`
 	InIface     string `json:"inIface"`
 	OutIface    string `json:"outIface"`
-	Opt         string `json:"opt"`
 	Source      string `json:"source"`
 	Destination string `json:"destination"`
 	SrcPort     string `json:"srcPort"`

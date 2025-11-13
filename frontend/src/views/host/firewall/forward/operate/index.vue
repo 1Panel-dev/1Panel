@@ -26,18 +26,16 @@
                 <el-input clearable v-model.trim="dialogData.rowData!.targetPort" />
             </el-form-item>
 
-            <template v-if="dialogData.fireName === 'ufw'">
-                <el-form-item :label="$t('firewall.forwardInboundInterface')" prop="interface">
-                    <el-select class="w-full" v-model="dialogData.rowData!.interface">
-                        <el-option
-                            v-for="item in interfaceOptions"
-                            :key="item.value"
-                            :label="item.label === 'all' ? $t('commons.table.all') : item.label"
-                            :value="item.value"
-                        />
-                    </el-select>
-                </el-form-item>
-            </template>
+            <el-form-item :label="$t('firewall.forwardInboundInterface')" prop="interface">
+                <el-select class="w-full" v-model="dialogData.rowData!.interface">
+                    <el-option
+                        v-for="item in interfaceOptions"
+                        :key="item.value"
+                        :label="item.label === 'all' ? $t('commons.table.all') : item.label"
+                        :value="item.value"
+                    />
+                </el-select>
+            </el-form-item>
         </el-form>
         <template #footer>
             <span class="dialog-footer">
@@ -81,12 +79,10 @@ const acceptParams = (params: DialogProps): void => {
     if (dialogData.value.title === 'edit') {
         oldRule.value = deepCopy(params.rowData);
     }
-    if (dialogData.value.fireName === 'ufw') {
-        getNetworkOptions().then((res) => {
-            interfaceOptions.value = res.data.map((item) => ({ label: item, value: item }));
-            dialogData.value.rowData!.interface = dialogData.value.rowData!.interface || 'all';
-        });
-    }
+    getNetworkOptions().then((res) => {
+        interfaceOptions.value = res.data.map((item) => ({ label: item, value: item }));
+        dialogData.value.rowData!.interface = dialogData.value.rowData!.interface || 'all';
+    });
     title.value = i18n.global.t('firewall.' + dialogData.value.title);
     drawerVisible.value = true;
 };

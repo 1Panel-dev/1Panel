@@ -11,7 +11,6 @@ const (
 	ComposeEnvVarPattern               = `\$\{([^}]+)\}`
 	DiskKeyValuePattern                = `([A-Za-z0-9_]+)=("([^"\\]|\\.)*"|[^ \t]+)`
 	FirewalldForwardPattern            = `^port=(\d{1,5}):proto=(.+?):toport=(\d{1,5}):toaddr=(.*)$`
-	IptablesNatListPattern             = `^(\d+)\s+(.+?)\s+(.+?)\s+(.+?)\s+(.+?)\s+(.+?)\s+(.+?)\s+(.+?)\s+(.+?)\s+(.+?)(?:\s+(.+?) .+?:(\d{1,5}(?::\d+)?).+?[ :](.+-.+|(?:.+:)?\d{1,5}(?:-\d{1,5})?))?$`
 	ValidatorNamePattern               = `^[a-zA-Z\p{Han}]{1}[a-zA-Z0-9_\p{Han}]{0,30}$`
 	ValidatorIPPattern                 = `^((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})(\.((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})){3}$`
 	DomainPattern                      = `^([\w\p{Han}\-\*]{1,100}\.){1,10}([\w\p{Han}\-]{1,24}|[\w\p{Han}\-]{1,24}\.[\w\p{Han}\-]{1,24})(:\d{1,5})?$`
@@ -42,7 +41,6 @@ func Init() {
 		ComposeEnvVarPattern,
 		DiskKeyValuePattern,
 		FirewalldForwardPattern,
-		IptablesNatListPattern,
 		ValidatorNamePattern,
 		ValidatorIPPattern,
 		DomainPattern,

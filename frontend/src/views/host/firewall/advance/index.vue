@@ -157,10 +157,10 @@ const opRef = ref();
 const data = ref();
 
 const formatPort = (port?: number | null | string) => {
-    if (port === 0 || port === '0') {
+    if (port === '' || port === 0 || port === '0') {
         return i18n.global.t('firewall.allPorts');
     }
-    if (port === undefined || port === null || port === '') {
+    if (port === undefined || port === null) {
         return '-';
     }
     return port;
@@ -255,7 +255,7 @@ const onOpenDialog = async (title: string, rowData?: Host.IptablesFilterRuleOp) 
     dialogRef.value!.acceptParams(params);
 };
 
-const onDelete = async (row: Host.IptablesFilterRuleOp | null) => {
+const onDelete = async (row: Host.IptablesRules | null) => {
     let names = [];
     let rules = [];
     if (row) {
@@ -263,8 +263,8 @@ const onDelete = async (row: Host.IptablesFilterRuleOp | null) => {
             operation: 'remove',
             id: row.id,
             chain: selectedChain.value,
-            srcPort: row.srcPort,
-            dstPort: row.dstPort,
+            srcPort: Number(row.srcPort),
+            dstPort: Number(row.dstPort),
             srcIP: row.srcIP === 'anywhere' ? '' : row.srcIP,
             dstIP: row.dstIP === 'anywhere' ? '' : row.dstIP,
             protocol: row.protocol,
@@ -284,8 +284,8 @@ const onDelete = async (row: Host.IptablesFilterRuleOp | null) => {
                 operation: 'remove',
                 id: item.id,
                 chain: selectedChain.value,
-                srcPort: item.srcPort,
-                dstPort: item.dstPort,
+                srcPort: Number(item.srcPort),
+                dstPort: Number(item.dstPort),
                 srcIP: item.srcIP === 'anywhere' ? '' : item.srcIP,
                 dstIP: item.dstIP === 'anywhere' ? '' : item.dstIP,
                 protocol: item.protocol,
@@ -305,7 +305,7 @@ const onDelete = async (row: Host.IptablesFilterRuleOp | null) => {
 const buttons = [
     {
         label: i18n.global.t('commons.button.delete'),
-        click: (row: Host.IptablesFilterRuleOp) => {
+        click: (row: Host.IptablesRules) => {
             onDelete(row);
         },
     },

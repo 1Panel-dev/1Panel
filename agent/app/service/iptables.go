@@ -64,11 +64,15 @@ func (s *IptablesService) Search(req dto.SearchPageWithType) (int64, interface{}
 }
 
 func (s *IptablesService) OperateRule(req dto.IptablesRuleOp) error {
+	action := "ACCEPT"
+	if req.Strategy == "drop" {
+		action = "DROP"
+	}
 	policy := iptables.FilterRules{
 		Protocol: req.Protocol,
 		SrcIP:    req.SrcIP,
 		DstIP:    req.DstIP,
-		Strategy: req.Strategy,
+		Strategy: action,
 	}
 	if req.SrcPort != 0 {
 		policy.SrcPort = fmt.Sprintf("%v", req.SrcPort)
@@ -91,19 +95,21 @@ func (s *IptablesService) OperateRule(req dto.IptablesRuleOp) error {
 			return fmt.Errorf("failed to add iptables rule: %w", err)
 		}
 
-		rule := &model.Firewall{
-			Chain:       req.Chain,
-			Protocol:    req.Protocol,
-			SrcIP:       req.SrcIP,
-			SrcPort:     fmt.Sprintf("%v", req.SrcPort),
-			DstIP:       req.DstIP,
-			DstPort:     fmt.Sprintf("%v", req.DstPort),
-			Strategy:    req.Strategy,
-			Description: req.Description,
-		}
+		if len(req.Description) != 0 {
+			rule := &model.Firewall{
+				Chain:       req.Chain,
+				Protocol:    req.Protocol,
+				SrcIP:       req.SrcIP,
+				SrcPort:     fmt.Sprintf("%v", req.SrcPort),
+				DstIP:       req.DstIP,
+				DstPort:     fmt.Sprintf("%v", req.DstPort),
+				Strategy:    req.Strategy,
+				Description: req.Description,
+			}
 
-		if err := hostRepo.SaveFirewallRecord(rule); err != nil {
-			return fmt.Errorf("failed to save rule to database: %w", err)
+			if err := hostRepo.SaveFirewallRecord(rule); err != nil {
+				return fmt.Errorf("failed to save rule to database: %w", err)
+			}
 		}
 	case "remove":
 		if err := iptables.DeleteFilterRule(req.Chain, policy); err != nil {
