@@ -343,6 +343,7 @@ const updateDesc = (row: Website.SSLDTO, bulr: Function) => {
 
 const updateConfig = (row: Website.SSLDTO) => {
     loading.value = true;
+    row.otherDomains = row.domains?.replace(/,/g, '\n');
     updateSSL(row)
         .then(() => {
             MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
