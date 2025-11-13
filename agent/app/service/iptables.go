@@ -178,10 +178,10 @@ func (s *IptablesService) Operate(req dto.IptablesOp) error {
 		if err := iptables.AddChain(iptables.FilterTab, iptables.Chain1PanelOutput); err != nil {
 			return err
 		}
-		number := loadBindNumber()
-		if err := iptables.BindChain(iptables.FilterTab, iptables.ChainOutput, iptables.Chain1PanelOutput, number); err != nil {
+		if err := iptables.BindChain(iptables.FilterTab, iptables.ChainOutput, iptables.Chain1PanelOutput, 1); err != nil {
 			return err
 		}
+		number := loadBindNumber(iptables.Chain1PanelInput)
 		if err := iptables.BindChain(iptables.FilterTab, iptables.ChainInput, iptables.Chain1PanelInput, number); err != nil {
 			return err
 		}
@@ -212,7 +212,7 @@ func (s *IptablesService) Operate(req dto.IptablesOp) error {
 		}
 		return nil
 	case "bind":
-		if err := iptables.BindChain(iptables.FilterTab, targetChain, req.Name, loadBindNumber()); err != nil {
+		if err := iptables.BindChain(iptables.FilterTab, targetChain, req.Name, loadBindNumber(req.Name)); err != nil {
 			return err
 		}
 		return nil
@@ -289,7 +289,10 @@ func (s *IptablesService) validateIPOrCIDR(ipStr string) error {
 	return nil
 }
 
-func loadBindNumber() int {
+func loadBindNumber(chain string) int {
+	if chain == iptables.Chain1PanelOutput {
+		return 1
+	}
 	number := 1
 	if exist, _ := iptables.CheckChainExist(iptables.FilterTab, iptables.Chain1PanelBasicBefore); exist {
 		number++
