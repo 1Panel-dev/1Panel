@@ -97,7 +97,7 @@ func CheckChainExist(tab, chain string) (bool, error) {
 	return true, nil
 }
 func CheckChainBind(tab, parentChain, chain string) (bool, error) {
-	stdout, err := RunWithStd(tab, fmt.Sprintf("-L %s | grep -w %s", parentChain, chain))
+	stdout, err := RunWithStd(tab, fmt.Sprintf("-S %s | grep -- '-j %s'", parentChain, chain))
 	if err != nil {
 		global.LOG.Errorf("check chain %s from tab %s is bind to %s failed, err: %v", chain, tab, parentChain, err)
 		return false, fmt.Errorf("check chain %s from tab %s is bind to %s failed, err: %v", chain, tab, parentChain, err)

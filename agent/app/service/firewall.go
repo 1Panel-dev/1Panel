@@ -59,21 +59,15 @@ func (u *FirewallService) LoadBaseInfo(tab string) (dto.FirewallBaseInfo, error)
 	baseInfo.Name = client.Name()
 
 	var wg sync.WaitGroup
-	wg.Add(4)
+	wg.Add(2)
 	go func() {
 		defer wg.Done()
 		baseInfo.PingStatus = u.pingStatus()
-	}()
-	go func() {
-		defer wg.Done()
-		baseInfo.IsActive, _ = client.Status()
-	}()
-	go func() {
-		defer wg.Done()
 		baseInfo.Version, _ = client.Version()
 	}()
 	go func() {
 		defer wg.Done()
+		baseInfo.IsActive, _ = client.Status()
 		baseInfo.IsInit, baseInfo.IsBind = loadInitStatus(baseInfo.Name, tab)
 	}()
 	wg.Wait()
