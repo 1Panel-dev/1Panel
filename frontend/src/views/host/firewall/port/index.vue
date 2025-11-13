@@ -293,9 +293,20 @@ const onChangeStatus = async (row: Host.RuleInfo, status: string) => {
     });
 };
 
-const onChange = async (info: any) => {
-    info.type = 'port';
-    await updateFirewallDescription(info);
+const onChange = async (row: any) => {
+    let params = {
+        type: 'port',
+        chain: fireName.value === 'iptables' ? '1PANEL_BASIC' : '',
+        srcIP: row.address,
+        dstIP: '',
+        srcPort: '',
+        dstPort: row.port,
+        protocol: row.protocol,
+        strategy: row.strategy,
+
+        description: row.description,
+    };
+    await updateFirewallDescription(params);
     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
 };
 

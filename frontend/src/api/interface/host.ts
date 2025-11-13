@@ -95,8 +95,12 @@ export namespace Host {
         [key: string]: any;
     }
     export interface UpdateDescription {
-        address: string;
-        port: string;
+        type: string;
+        chain: string;
+        srcIP: string;
+        dstIP: string;
+        srcPort: string;
+        dstPort: string;
         protocol: string;
         strategy: string;
         description: string;

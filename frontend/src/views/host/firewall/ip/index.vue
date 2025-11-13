@@ -192,9 +192,20 @@ const onOpenDialog = async (
     dialogRef.value!.acceptParams(params);
 };
 
-const onChange = async (info: any) => {
-    info.type = 'address';
-    await updateFirewallDescription(info);
+const onChange = async (row: any) => {
+    let params = {
+        type: 'address',
+        chain: fireName.value === 'iptables' ? '1PANEL_BASIC' : '',
+        srcIP: row.address,
+        dstIP: '',
+        srcPort: '',
+        dstPort: '',
+        protocol: '',
+        strategy: row.strategy,
+
+        description: row.description,
+    };
+    await updateFirewallDescription(params);
     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
 };
 

@@ -96,11 +96,13 @@
                             </el-table-column>
                             <el-table-column :min-width="100" :label="$t('firewall.action')" prop="strategy">
                                 <template #default="{ row }">
-                                    <el-tag v-if="row.strategy === 'ACCEPT'" type="success">{{ row.strategy }}</el-tag>
-                                    <el-tag v-else-if="row.strategy === 'DROP'" type="danger">
-                                        {{ row.strategy }}
+                                    <el-tag v-if="row.strategy === 'accept'" type="success">
+                                        {{ $t('firewall.accept') }}
                                     </el-tag>
-                                    <el-tag v-else-if="row.strategy === 'REJECT'" type="warning">
+                                    <el-tag v-else-if="row.strategy === 'drop'" type="danger">
+                                        {{ $t('firewall.drop') }}
+                                    </el-tag>
+                                    <el-tag v-else-if="row.strategy === 'reject'" type="warning">
                                         {{ row.strategy }}
                                     </el-tag>
                                     <el-tag v-else type="info">{{ row.strategy }}</el-tag>
@@ -111,7 +113,11 @@
                                 :label="$t('commons.table.description')"
                                 prop="description"
                                 show-overflow-tooltip
-                            />
+                            >
+                                <template #default="{ row }">
+                                    <fu-input-rw-switch v-model="row.description" @blur="onChange(row)" />
+                                </template>
+                            </el-table-column>
                             <fu-table-operations
                                 width="120px"
                                 :buttons="buttons"
@@ -135,7 +141,13 @@ import FireRouter from '@/views/host/firewall/index.vue';
 import FireStatus from '@/views/host/firewall/status/index.vue';
 import OperateDialog from '@/views/host/firewall/advance/operate/index.vue';
 import { onMounted, reactive, ref } from 'vue';
-import { searchFilterRules, batchOperateFilterRule, loadChainStatus, operateFilterChain } from '@/api/modules/host';
+import {
+    searchFilterRules,
+    batchOperateFilterRule,
+    loadChainStatus,
+    operateFilterChain,
+    updateFirewallDescription,
+} from '@/api/modules/host';
 import { Host } from '@/api/interface/host';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
@@ -247,7 +259,7 @@ const onOpenDialog = async (title: string, rowData?: Host.IptablesFilterRuleOp) 
         rowData: rowData || {
             chain: selectedChain.value,
             protocol: 'tcp',
-            strategy: 'ACCEPT',
+            strategy: 'accept',
             srcPort: 0,
             dstPort: 0,
         },
@@ -300,6 +312,23 @@ const onDelete = async (row: Host.IptablesRules | null) => {
         api: batchOperateFilterRule,
         params: { rules: rules },
     });
+};
+
+const onChange = async (row: any) => {
+    let params = {
+        type: 'advance',
+        chain: selectedChain.value,
+        srcIP: row.srcIP,
+        dstIP: row.dstIP,
+        srcPort: row.srcPort,
+        dstPort: row.dstPort,
+        protocol: row.protocol,
+        strategy: row.strategy,
+
+        description: row.description,
+    };
+    await updateFirewallDescription(params);
+    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
 };
 
 const buttons = [

@@ -475,9 +475,11 @@ func (u *FirewallService) UpdateAddrRule(req dto.AddrRuleUpdate) error {
 func (u *FirewallService) UpdateDescription(req dto.UpdateFirewallDescription) error {
 	firewall := model.Firewall{
 		Type:        req.Type,
-		Chain:       iptables.Chain1PanelBasic,
-		SrcIP:       req.Address,
-		DstPort:     req.Port,
+		Chain:       req.Chain,
+		SrcIP:       req.SrcIP,
+		DstIP:       req.DstIP,
+		SrcPort:     req.SrcPort,
+		DstPort:     req.DstPort,
 		Protocol:    req.Protocol,
 		Strategy:    req.Strategy,
 		Description: req.Description,

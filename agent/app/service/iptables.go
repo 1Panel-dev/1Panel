@@ -100,9 +100,9 @@ func (s *IptablesService) OperateRule(req dto.IptablesRuleOp) error {
 				Chain:       req.Chain,
 				Protocol:    req.Protocol,
 				SrcIP:       req.SrcIP,
-				SrcPort:     fmt.Sprintf("%v", req.SrcPort),
+				SrcPort:     policy.SrcPort,
 				DstIP:       req.DstIP,
-				DstPort:     fmt.Sprintf("%v", req.DstPort),
+				DstPort:     policy.DstPort,
 				Strategy:    req.Strategy,
 				Description: req.Description,
 			}

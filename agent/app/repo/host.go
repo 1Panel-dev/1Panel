@@ -57,16 +57,27 @@ func (h *HostRepo) SaveFirewallRecord(firewall *model.Firewall) error {
 		return global.DB.Save(firewall).Error
 	}
 	var data model.Firewall
-	if firewall.Type == "port" {
-		_ = global.DB.Where("type = ? AND dst_port = ? AND protocol = ? AND src_ip = ? AND strategy = ?", "port", firewall.DstPort, firewall.Protocol, firewall.SrcIP, firewall.Strategy).First(&data)
-		if data.ID != 0 {
-			firewall.ID = data.ID
-		}
-	} else {
+	switch firewall.Type {
+	case "port":
+		_ = global.DB.Where("type = ? AND dst_port = ? AND protocol = ? AND src_ip = ? AND strategy = ?", "port",
+			firewall.DstPort,
+			firewall.Protocol,
+			firewall.SrcIP,
+			firewall.Strategy,
+		).First(&data).Error
+	case "ip":
 		_ = global.DB.Where("type = ? AND src_ip = ? AND strategy = ?", "address", firewall.SrcIP, firewall.Strategy).First(&data)
-		if data.ID != 0 {
-			firewall.ID = data.ID
-		}
+	default:
+		_ = global.DB.Where("type = ? AND chain = ? AND src_port = ? AND dst_port = ? AND protocol = ? AND src_ip = ? AND dst_ip = ? AND strategy = ?",
+			firewall.Type,
+			firewall.Chain,
+			firewall.SrcPort,
+			firewall.DstPort,
+			firewall.Protocol,
+			firewall.SrcIP,
+			firewall.DstIP,
+			firewall.Strategy,
+		).First(&data).Error
 	}
 	return global.DB.Save(firewall).Error
 }

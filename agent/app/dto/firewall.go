@@ -50,8 +50,11 @@ type ForwardRuleOperate struct {
 
 type UpdateFirewallDescription struct {
 	Type     string `json:"type"`
-	Address  string `json:"address"`
-	Port     string `json:"port"`
+	Chain    string `json:"chain"`
+	SrcIP    string `json:"srcIP"`
+	DstIP    string `json:"dstIP"`
+	SrcPort  string `json:"srcPort"`
+	DstPort  string `json:"dstPort"`
 	Protocol string `json:"protocol"`
 	Strategy string `json:"strategy" validate:"required,oneof=accept drop"`
 
@@ -96,7 +99,7 @@ type IptablesRuleOp struct {
 	SrcPort     uint   `json:"srcPort"`
 	DstIP       string `json:"dstIP"`
 	DstPort     uint   `json:"dstPort"`
-	Strategy    string `json:"strategy" validate:"required,oneof=ACCEPT DROP REJECT"`
+	Strategy    string `json:"strategy" validate:"required,oneof=accept drop reject"`
 	Description string `json:"description"`
 }
 
