@@ -281,7 +281,7 @@ const message = {
             authBasicPassword: 'Admite letras, números y caracteres especiales comunes, longitud de 1 a 72',
             length128Err: 'La longitud no puede exceder los 128 caracteres',
             maxLength: 'La longitud no puede exceder los {0} caracteres',
-            alias: 'Soporta A->Z, números, - and _, largo 1-30 carácteres, no puede empezar ni terminar con -_.',
+            alias: 'Soporta A->Z, números, - and _, largo 1-128 carácteres, no puede empezar ni terminar con -_.',
         },
         res: {
             paramError: 'La solicitud falló, por favor intente de nuevo más tarde.',

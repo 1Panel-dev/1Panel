@@ -268,7 +268,7 @@ const message = {
             authBasicPassword: 'Suporta letras, números e caracteres especiais comuns, comprimento 1-72',
             length128Err: 'O comprimento não pode exceder 128 caracteres',
             maxLength: 'O comprimento não pode exceder {0} caracteres',
-            alias: 'Suporta letras, números, - e _, comprimento de 1 a 30, e não pode começar ou terminar com -_.',
+            alias: 'Suporta letras, números, - e _, comprimento de 1 a 128, e não pode começar ou terminar com -_.',
         },
         res: {
             paramError: 'A solicitação falhou, por favor, tente novamente mais tarde!',
