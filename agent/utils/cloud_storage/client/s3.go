@@ -1,20 +1,25 @@
 package client
 
 import (
+	"context"
+	"errors"
 	"os"
+	"strings"
+	"time"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/awserr"
-	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/aws/aws-sdk-go/service/s3/s3manager"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/credentials"
+	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/aws-sdk-go-v2/service/s3/types"
+	"github.com/aws/smithy-go"
 )
 
 type s3Client struct {
 	scType string
 	bucket string
-	Sess   session.Session
+	client *s3.Client
 }
 
 func NewS3Client(vars map[string]interface{}) (*s3Client, error) {
@@ -31,22 +36,27 @@ func NewS3Client(vars map[string]interface{}) (*s3Client, error) {
 	if len(mode) == 0 {
 		mode = "virtual hosted"
 	}
-	sess, err := session.NewSession(&aws.Config{
-		Credentials: credentials.NewStaticCredentials(accessKey, secretKey, ""),
-		Endpoint:    aws.String(endpoint),
-		Region:      aws.String(region),
-		DisableSSL:  aws.Bool(true), S3ForcePathStyle: aws.Bool(mode == "path"),
-	})
+	cfg, err := config.LoadDefaultConfig(context.Background(),
+		config.WithRegion(region),
+		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(accessKey, secretKey, "")),
+	)
 	if err != nil {
 		return nil, err
 	}
-	return &s3Client{scType: scType, bucket: bucket, Sess: *sess}, nil
+	client := s3.NewFromConfig(cfg, func(o *s3.Options) {
+		o.UsePathStyle = mode == "path"
+		if endpoint != "" {
+			base := normalizeEndpoint(endpoint)
+			o.BaseEndpoint = aws.String(base)
+		}
+	})
+	
+	return &s3Client{scType: scType, bucket: bucket, client: client}, nil
 }
 
 func (s s3Client) ListBuckets() ([]interface{}, error) {
 	var result []interface{}
-	svc := s3.New(&s.Sess)
-	res, err := svc.ListBuckets(nil)
+	res, err := s.client.ListBuckets(context.Background(), &s3.ListBucketsInput{})
 	if err != nil {
 		return nil, err
 	}
@@ -57,43 +67,47 @@ func (s s3Client) ListBuckets() ([]interface{}, error) {
 }
 
 func (s s3Client) Exist(path string) (bool, error) {
-	svc := s3.New(&s.Sess)
-	if _, err := svc.HeadObject(&s3.HeadObjectInput{
-		Bucket: &s.bucket,
-		Key:    &path,
-	}); err != nil {
-		if aerr, ok := err.(awserr.RequestFailure); ok {
-			if aerr.StatusCode() == 404 {
+	_, err := s.client.HeadObject(context.Background(), &s3.HeadObjectInput{
+		Bucket: aws.String(s.bucket),
+		Key:    aws.String(path),
+	})
+	if err != nil {
+		var apiErr smithy.APIError
+		if errors.As(err, &apiErr) {
+			switch apiErr.ErrorCode() {
+			case "NotFound", "NoSuchKey":
 				return false, nil
 			}
-		} else {
-			return false, aerr
 		}
+		return false, err
 	}
 	return true, nil
 }
 
 func (s *s3Client) Size(path string) (int64, error) {
-	svc := s3.New(&s.Sess)
-	file, err := svc.GetObject(&s3.GetObjectInput{
-		Bucket: &s.bucket,
-		Key:    &path,
+	file, err := s.client.GetObject(context.Background(), &s3.GetObjectInput{
+		Bucket: aws.String(s.bucket),
+		Key:    aws.String(path),
 	})
 	if err != nil {
 		return 0, err
 	}
-	return *file.ContentLength, nil
+	defer file.Body.Close()
+	return aws.ToInt64(file.ContentLength), nil
 }
 
 func (s s3Client) Delete(path string) (bool, error) {
-	svc := s3.New(&s.Sess)
-	if _, err := svc.DeleteObject(&s3.DeleteObjectInput{Bucket: aws.String(s.bucket), Key: aws.String(path)}); err != nil {
-		return false, err
-	}
-	if err := svc.WaitUntilObjectNotExists(&s3.HeadObjectInput{
+	if _, err := s.client.DeleteObject(context.Background(), &s3.DeleteObjectInput{
 		Bucket: aws.String(s.bucket),
 		Key:    aws.String(path),
 	}); err != nil {
+		return false, err
+	}
+	waiter := s3.NewObjectNotExistsWaiter(s.client)
+	if err := waiter.Wait(context.Background(), &s3.HeadObjectInput{
+		Bucket: aws.String(s.bucket),
+		Key:    aws.String(path),
+	}, 30*time.Second); err != nil {
 		return false, err
 	}
 	return true, nil
@@ -110,15 +124,16 @@ func (s s3Client) Upload(src, target string) (bool, error) {
 	}
 	defer file.Close()
 
-	uploader := s3manager.NewUploader(&s.Sess)
-	if fileInfo.Size() > s3manager.MaxUploadParts*s3manager.DefaultUploadPartSize {
-		uploader.PartSize = fileInfo.Size() / (s3manager.MaxUploadParts - 1)
+	uploader := manager.NewUploader(s.client)
+	maxUploadSize := int64(manager.MaxUploadParts) * manager.DefaultUploadPartSize
+	if fileInfo.Size() > maxUploadSize {
+		uploader.PartSize = fileInfo.Size() / (int64(manager.MaxUploadParts) - 1)
 	}
-	if _, err := uploader.Upload(&s3manager.UploadInput{
+	if _, err := uploader.Upload(context.Background(), &s3.PutObjectInput{
 		Bucket:       aws.String(s.bucket),
 		Key:          aws.String(target),
 		Body:         file,
-		StorageClass: &s.scType,
+		StorageClass: types.StorageClass(s.scType),
 	}); err != nil {
 		return false, err
 	}
@@ -134,8 +149,8 @@ func (s s3Client) Download(src, target string) (bool, error) {
 		return false, err
 	}
 	defer file.Close()
-	downloader := s3manager.NewDownloader(&s.Sess)
-	if _, err = downloader.Download(file, &s3.GetObjectInput{
+	downloader := manager.NewDownloader(s.client)
+	if _, err = downloader.Download(context.Background(), file, &s3.GetObjectInput{
 		Bucket: aws.String(s.bucket),
 		Key:    aws.String(src),
 	}); err != nil {
@@ -146,17 +161,23 @@ func (s s3Client) Download(src, target string) (bool, error) {
 }
 
 func (s *s3Client) ListObjects(prefix string) ([]string, error) {
-	svc := s3.New(&s.Sess)
 	var result []string
-	outputs, err := svc.ListObjects(&s3.ListObjectsInput{
-		Bucket: &s.bucket,
-		Prefix: &prefix,
+	outputs, err := s.client.ListObjectsV2(context.Background(), &s3.ListObjectsV2Input{
+		Bucket: aws.String(s.bucket),
+		Prefix: aws.String(prefix),
 	})
 	if err != nil {
 		return result, err
 	}
 	for _, item := range outputs.Contents {
-		result = append(result, *item.Key)
+		result = append(result, aws.ToString(item.Key))
 	}
 	return result, nil
+}
+
+func normalizeEndpoint(endpoint string) string {
+	if strings.HasPrefix(endpoint, "http://") || strings.HasPrefix(endpoint, "https://") {
+		return endpoint
+	}
+	return "http://" + endpoint
 }
