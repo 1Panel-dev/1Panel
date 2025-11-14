@@ -3494,6 +3494,7 @@ const message = {
             databaseHelper: '应用关联数据库，请选择目标节点数据库',
             nodeHelper: '不能选择当前节点',
             migrateHelper: '当前仅支持迁移单体应用和只关联 MySQL、MariaDB、PostgreSQL 数据库的应用',
+            opensslHelper: '如果使用加密备份，两个节点之间的 openssl 版本必须保持一致，不然会导致迁移失败',
         },
         alert: {
             isAlert: '是否告警',

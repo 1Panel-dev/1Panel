@@ -3686,6 +3686,8 @@ const message = {
             nodeHelper: '現在のノードは選択できません',
             migrateHelper:
                 '現在、単体アプリケーションと MySQL、MariaDB、PostgreSQL データベースのみに関連するアプリケーションの移行のみをサポートしています',
+            opensslHelper:
+                '暗号化バックアップを使用する場合、2つのノード間のOpenSSLバージョンは一致している必要があります。そうしないと、移行が失敗する可能性があります。',
         },
         alert: {
             isAlert: 'アラート',

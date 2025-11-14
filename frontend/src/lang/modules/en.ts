@@ -3799,6 +3799,8 @@ const message = {
             nodeHelper: 'Cannot select current node',
             migrateHelper:
                 'Currently only supports migrating monolithic applications and applications associated only with MySQL, MariaDB, PostgreSQL databases',
+            opensslHelper:
+                'If using encrypted backup, the OpenSSL versions between the two nodes must be consistent, otherwise migration may fail.',
         },
         alert: {
             isAlert: 'Alert',

@@ -3619,6 +3619,8 @@ const message = {
             nodeHelper: '현재 노드는 선택할 수 없습니다',
             migrateHelper:
                 '현재 단일 애플리케이션과 MySQL, MariaDB, PostgreSQL 데이터베이스만 연결된 애플리케이션의 마이그레이션만 지원합니다',
+            opensslHelper:
+                '암호화된 백업을 사용하는 경우 두 노드 간의 OpenSSL 버전이 일치해야 합니다. 그렇지 않으면 마이그레이션이 실패할 수 있습니다.',
         },
         alert: {
             isAlert: '알림',

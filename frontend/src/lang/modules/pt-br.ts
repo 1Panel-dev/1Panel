@@ -3777,6 +3777,8 @@ const message = {
             nodeHelper: 'Não é possível selecionar o nó atual',
             migrateHelper:
                 'Atualmente suporta apenas a migração de aplicações monolíticas e aplicações associadas apenas a bancos de dados MySQL, MariaDB, PostgreSQL',
+            opensslHelper:
+                'Se usar backup criptografado, as versões do OpenSSL entre os dois nós devem ser consistentes, caso contrário a migração pode falhar.',
         },
         alert: {
             isAlert: 'Alerta',

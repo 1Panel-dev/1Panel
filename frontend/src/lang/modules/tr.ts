@@ -3839,6 +3839,8 @@ const message = {
             nodeHelper: 'Geçerli düğüm seçilemez',
             migrateHelper:
                 'Şu anda yalnızca tek parça uygulamaların ve yalnızca MySQL, MariaDB, PostgreSQL veritabanlarıyla ilişkili uygulamaların taşınmasını destekler',
+            opensslHelper:
+                'Şifreli yedekleme kullanılıyorsa, iki düğüm arasındaki OpenSSL sürümleri tutarlı olmalıdır, aksi takdirde geçiş başarısız olabilir.',
         },
         alert: {
             isAlert: 'Uyarı',

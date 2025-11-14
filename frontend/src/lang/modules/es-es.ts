@@ -3751,6 +3751,8 @@ const message = {
             nodeHelper: 'No se puede seleccionar el nodo actual',
             migrateHelper:
                 'Actualmente solo admite la migración de aplicaciones monolíticas y aplicaciones asociadas únicamente con bases de datos MySQL, MariaDB, PostgreSQL',
+            opensslHelper:
+                'Si se utiliza copia de seguridad cifrada, las versiones de OpenSSL entre los dos nodos deben ser consistentes, de lo contrario la migración puede fallar.',
         },
         alert: {
             isAlert: 'Alerta',

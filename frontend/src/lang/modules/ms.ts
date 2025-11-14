@@ -3757,6 +3757,8 @@ const message = {
             nodeHelper: 'Tidak boleh memilih nod semasa',
             migrateHelper:
                 'Kini hanya menyokong penghijrahan aplikasi monolitik dan aplikasi yang hanya dikaitkan dengan pangkalan data MySQL, MariaDB, PostgreSQL',
+            opensslHelper:
+                'Jika menggunakan sandaran terenkripsi, versi OpenSSL antara dua nod mesti konsisten, jika tidak penghijrahan mungkin gagal.',
         },
         alert: {
             isAlert: 'Amaran',
