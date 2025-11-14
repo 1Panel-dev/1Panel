@@ -76,45 +76,30 @@ const allowDrag = (draggingNode: Node) => {
 };
 
 const allowDrop = (draggingNode: Node, dropNode: Node, type: AllowDropType) => {
+    const restricted = ['App-Menu', 'Setting-Menu'];
+    const isDraggingFirstLevel = draggingNode.level === 1;
+    const isDraggingSecondLevel = draggingNode.level === 2;
+    const isDropFirstLevel = dropNode.level === 1;
+    const isDropSecondLevel = dropNode.level === 2;
+    if (restricted.includes(draggingNode.data.label) && isDropSecondLevel) {
+        return false;
+    }
     if (dropNode.data.label === 'Home-Menu') {
         return type !== 'prev' && type !== 'inner';
     }
-    const label = draggingNode.data.label;
-    const restricted = ['App-Menu', 'Setting-Menu'];
-    const draggingHasChildren = draggingNode.childNodes?.length > 0;
-    const isDraggingTooDeep = draggingNode.level > 2;
-    const isDraggingFirstLevel = draggingNode.level === 1;
-
-    const isDropFirstLevel = dropNode.level === 1;
-    const isDropSecondLevel = dropNode.level === 2;
-    const dropHasChildren = dropNode.childNodes?.length > 0;
 
     if (draggingNode.parent && draggingNode.parent.childNodes.length === 1) {
         return false;
     }
 
-    if (isDropFirstLevel && dropHasChildren && !restricted.includes(label)) {
-        return type === 'inner' || type === 'prev' || type === 'next';
-    }
-
-    if (isDraggingFirstLevel && draggingNode.childNodes?.length === 0 && dropNode.level !== 2) {
+    if (
+        (isDraggingSecondLevel && isDropFirstLevel) ||
+        (isDraggingFirstLevel && isDropSecondLevel && draggingNode.childNodes?.length === 0)
+    ) {
         return type === 'prev' || type === 'next';
     }
 
-    if (
-        isDraggingFirstLevel &&
-        draggingNode.childNodes?.length > 0 &&
-        dropNode.level !== 2 &&
-        !restricted.includes(label)
-    ) {
-        return type === 'inner' || type === 'prev' || type === 'next';
-    }
-
-    if (draggingHasChildren || isDraggingTooDeep) {
-        return false;
-    }
-
-    if (isDropSecondLevel && draggingNode.level === 2) {
+    if ((isDropFirstLevel && isDraggingFirstLevel) || (isDropSecondLevel && isDraggingSecondLevel)) {
         return type === 'prev' || type === 'next';
     }
 
