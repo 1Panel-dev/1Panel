@@ -10,7 +10,6 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
-	"regexp"
 	"sort"
 	"strconv"
 	"strings"
@@ -894,33 +893,27 @@ func (r *RuntimeService) UpdatePHPConfig(req request.PHPConfigUpdate) (err error
 		switch req.Scope {
 		case "params":
 			for key, value := range req.Params {
-				pattern := "^" + regexp.QuoteMeta(key) + "\\s*=\\s*.*$"
-				if matched, _ := regexp.MatchString(pattern, line); matched {
-					lines[i] = key + " = " + value
+				if phpConfigLineMatchesKey(line, key) {
+					lines[i] = fmt.Sprintf("%s = %s", key, value)
 				}
 			}
 		case "disable_functions":
-			pattern := "^" + regexp.QuoteMeta("disable_functions") + "\\s*=\\s*.*$"
-			if matched, _ := regexp.MatchString(pattern, line); matched {
-				lines[i] = "disable_functions" + " = " + strings.Join(req.DisableFunctions, ",")
+			if phpConfigLineMatchesKey(line, "disable_functions") {
+				lines[i] = fmt.Sprintf("disable_functions = %s", strings.Join(req.DisableFunctions, ","))
 			}
 		case "upload_max_filesize":
-			pattern := "^" + regexp.QuoteMeta("post_max_size") + "\\s*=\\s*.*$"
-			if matched, _ := regexp.MatchString(pattern, line); matched {
-				lines[i] = "post_max_size" + " = " + req.UploadMaxSize
+			if phpConfigLineMatchesKey(line, "post_max_size") {
+				lines[i] = fmt.Sprintf("post_max_size = %s", req.UploadMaxSize)
 			}
-			patternUpload := "^" + regexp.QuoteMeta("upload_max_filesize") + "\\s*=\\s*.*$"
-			if matched, _ := regexp.MatchString(patternUpload, line); matched {
-				lines[i] = "upload_max_filesize" + " = " + req.UploadMaxSize
+			if phpConfigLineMatchesKey(line, "upload_max_filesize") {
+				lines[i] = fmt.Sprintf("upload_max_filesize = %s", req.UploadMaxSize)
 			}
 		case "max_execution_time":
-			pattern := "^" + regexp.QuoteMeta("max_execution_time") + "\\s*=\\s*.*$"
-			if matched, _ := regexp.MatchString(pattern, line); matched {
-				lines[i] = "max_execution_time" + " = " + req.MaxExecutionTime
+			if phpConfigLineMatchesKey(line, "max_execution_time") {
+				lines[i] = fmt.Sprintf("max_execution_time = %s", req.MaxExecutionTime)
 			}
-			patternInput := "^" + regexp.QuoteMeta("max_input_time") + "\\s*=\\s*.*$"
-			if matched, _ := regexp.MatchString(patternInput, line); matched {
-				lines[i] = "max_input_time" + " = " + req.MaxExecutionTime
+			if phpConfigLineMatchesKey(line, "max_input_time") {
+				lines[i] = fmt.Sprintf("max_input_time = %s", req.MaxExecutionTime)
 			}
 		}
 	}
@@ -957,6 +950,17 @@ func (r *RuntimeService) GetPHPConfigFile(req request.PHPFileReq) (*response.Fil
 		return nil, err
 	}
 	return &response.FileInfo{FileInfo: *info}, nil
+}
+
+func phpConfigLineMatchesKey(line, key string) bool {
+	trim := strings.TrimSpace(line)
+
+	idx := strings.Index(trim, "=")
+	if idx == -1 {
+		return false
+	}
+	currentKey := strings.TrimSpace(trim[:idx])
+	return currentKey == key
 }
 
 func (r *RuntimeService) UpdatePHPConfigFile(req request.PHPFileUpdate) error {
