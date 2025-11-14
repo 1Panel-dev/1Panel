@@ -88,13 +88,10 @@
             v-model="recoverDialog"
             :title="$t('commons.button.recover') + ' - ' + name"
             @close="handleRecoverClose"
+            size="small"
         >
-            <el-form ref="backupForm" label-position="left" v-loading="loading">
-                <el-form-item
-                    :label="$t('setting.compressPassword')"
-                    class="mt-5"
-                    v-if="type === 'app' || type === 'website'"
-                >
+            <el-form ref="backupForm" @submit.prevent label-position="top" v-loading="loading">
+                <el-form-item :label="$t('setting.compressPassword')">
                     <el-input v-model="secret" :placeholder="$t('setting.backupRecoverMessage')" />
                 </el-form-item>
             </el-form>
@@ -282,19 +279,7 @@ const onHandleRecover = async () => {
 
 const onRecover = async (row: File.File) => {
     currentRow.value = row;
-    if (type.value !== 'app' && type.value !== 'website') {
-        ElMessageBox.confirm(
-            i18n.global.t('commons.msg.recoverHelper', [row.name]),
-            i18n.global.t('commons.button.recover'),
-            {
-                confirmButtonText: i18n.global.t('commons.button.confirm'),
-                cancelButtonText: i18n.global.t('commons.button.cancel'),
-            },
-        ).then(async () => {
-            onHandleRecover();
-        });
-        return;
-    }
+    secret.value = '';
     recoverDialog.value = true;
 };
 

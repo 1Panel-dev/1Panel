@@ -36,6 +36,7 @@ Failed: '실패했습니다'
 SystemRestart: '시스템 재시작으로 인해 작업이 중단되었습니다'
 ErrGroupIsDefault: '기본 그룹, 삭제할 수 없습니다'
 ErrGroupIsInWebsiteUse: '그룹이 다른 웹사이트에서 사용 중이므로 삭제할 수 없습니다.'
+Decrypt: "복호화"
 
 #지원
 Localhost: '로컬 머신'

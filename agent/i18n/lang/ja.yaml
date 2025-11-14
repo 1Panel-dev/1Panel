@@ -35,6 +35,7 @@ Failed: '失敗'
 SystemRestart: 'システムの再起動によりタスクが中断されました'
 ErrGroupIsDefault: 'デフォルト グループ、削除できません'
 ErrGroupIsInWebsiteUse: 'グループは別の Web サイトで使用されているため、削除できません。'
+Decrypt: "復号化"
 
 #backup
 Localhost: 'ローカルマシン'

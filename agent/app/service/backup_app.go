@@ -102,7 +102,7 @@ func backupDatabaseWithTask(parentTask *task.Task, resourceKey, tmpDir, name str
 		}
 		parentTask.LogStart(task.GetTaskName(db.Name, task.TaskBackup, task.TaskScopeDatabase))
 		databaseHelper := DatabaseHelper{Database: db.MysqlName, DBType: resourceKey, Name: db.Name}
-		if err := handleMysqlBackup(databaseHelper, parentTask, 0, tmpDir, fmt.Sprintf("%s.sql.gz", name), ""); err != nil {
+		if err := handleMysqlBackup(databaseHelper, parentTask, 0, tmpDir, fmt.Sprintf("%s.sql.gz", name), "", ""); err != nil {
 			return err
 		}
 		parentTask.LogSuccess(task.GetTaskName(db.Name, task.TaskBackup, task.TaskScopeDatabase))
@@ -113,7 +113,7 @@ func backupDatabaseWithTask(parentTask *task.Task, resourceKey, tmpDir, name str
 		}
 		parentTask.LogStart(task.GetTaskName(db.Name, task.TaskBackup, task.TaskScopeDatabase))
 		databaseHelper := DatabaseHelper{Database: db.PostgresqlName, DBType: resourceKey, Name: db.Name}
-		if err := handlePostgresqlBackup(databaseHelper, parentTask, 0, tmpDir, fmt.Sprintf("%s.sql.gz", name), ""); err != nil {
+		if err := handlePostgresqlBackup(databaseHelper, parentTask, 0, tmpDir, fmt.Sprintf("%s.sql.gz", name), "", ""); err != nil {
 			return err
 		}
 		parentTask.LogSuccess(task.GetTaskName(db.Name, task.TaskBackup, task.TaskScopeDatabase))
@@ -260,7 +260,7 @@ func handleAppRecover(install *model.AppInstall, parentTask *task.Task, recoverF
 					Name:       newDB.MysqlName,
 					DetailName: newDB.Name,
 					File:       fmt.Sprintf("%s/%s.sql.gz", tmpPath, install.Name),
-				}, parentTask, true, ""); err != nil {
+				}, parentTask, true); err != nil {
 					t.LogFailedWithErr(taskName, err)
 					return err
 				}

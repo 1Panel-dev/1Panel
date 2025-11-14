@@ -6,21 +6,18 @@ import (
 	"path"
 	"time"
 
-	"github.com/1Panel-dev/1Panel/agent/app/repo"
-
-	"github.com/1Panel-dev/1Panel/agent/constant"
-	"github.com/1Panel-dev/1Panel/agent/i18n"
-
-	"github.com/1Panel-dev/1Panel/agent/buserr"
-	"github.com/1Panel-dev/1Panel/agent/utils/common"
-	pgclient "github.com/1Panel-dev/1Panel/agent/utils/postgresql/client"
-
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/app/task"
+	"github.com/1Panel-dev/1Panel/agent/buserr"
+	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/i18n"
+	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/1Panel-dev/1Panel/agent/utils/postgresql/client"
+	pgclient "github.com/1Panel-dev/1Panel/agent/utils/postgresql/client"
 )
 
 func (u *BackupService) PostgresqlBackup(req dto.CommonBackup) error {
@@ -46,7 +43,7 @@ func (u *BackupService) PostgresqlBackup(req dto.CommonBackup) error {
 	}
 
 	databaseHelper := DatabaseHelper{Database: req.Name, DBType: req.Type, Name: req.DetailName}
-	if err := handlePostgresqlBackup(databaseHelper, nil, record.ID, targetDir, fileName, req.TaskID); err != nil {
+	if err := handlePostgresqlBackup(databaseHelper, nil, record.ID, targetDir, fileName, req.TaskID, req.Secret); err != nil {
 		return err
 	}
 	return nil
@@ -71,7 +68,7 @@ func (u *BackupService) PostgresqlRecoverByUpload(req dto.CommonRecover) error {
 	return nil
 }
 
-func handlePostgresqlBackup(db DatabaseHelper, parentTask *task.Task, recordID uint, targetDir, fileName, taskID string) error {
+func handlePostgresqlBackup(db DatabaseHelper, parentTask *task.Task, recordID uint, targetDir, fileName, taskID, secret string) error {
 	var (
 		err        error
 		backupTask *task.Task
@@ -85,7 +82,7 @@ func handlePostgresqlBackup(db DatabaseHelper, parentTask *task.Task, recordID u
 		}
 	}
 
-	itemHandler := func() error { return doPostgresqlgBackup(db, targetDir, fileName) }
+	itemHandler := func() error { return doPostgresqlgBackup(db, targetDir, fileName, secret) }
 	if parentTask != nil {
 		return itemHandler()
 	}
@@ -160,6 +157,15 @@ func handlePostgresqlRecover(req dto.CommonRecover, parentTask *task.Task, isRol
 				}
 			}()
 		}
+		if len(req.Secret) != 0 {
+			err = files.OpensslDecrypt(req.File, req.Secret)
+			if err != nil {
+				return err
+			}
+			req.File = path.Join(path.Dir(req.File), "tmp_"+path.Base(req.File))
+			defer os.Remove(req.File)
+			t.LogWithStatus(i18n.GetMsgByKey("Decrypt"), err)
+		}
 		if err := cli.Recover(client.RecoverInfo{
 			Name:       req.DetailName,
 			SourceFile: req.File,
@@ -183,7 +189,7 @@ func handlePostgresqlRecover(req dto.CommonRecover, parentTask *task.Task, isRol
 	return nil
 }
 
-func doPostgresqlgBackup(db DatabaseHelper, targetDir, fileName string) error {
+func doPostgresqlgBackup(db DatabaseHelper, targetDir, fileName, secret string) error {
 	cli, err := LoadPostgresqlClientByFrom(db.Database)
 	if err != nil {
 		return err
@@ -196,5 +202,11 @@ func doPostgresqlgBackup(db DatabaseHelper, targetDir, fileName string) error {
 
 		Timeout: 300,
 	}
-	return cli.Backup(backupInfo)
+	if err := cli.Backup(backupInfo); err != nil {
+		return err
+	}
+	if len(secret) != 0 {
+		return files.OpensslEncrypt(path.Join(targetDir, fileName), secret)
+	}
+	return nil
 }

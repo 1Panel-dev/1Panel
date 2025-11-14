@@ -957,3 +957,23 @@ func CopyCustomAppFile(srcPath, dstPath string) error {
 	}
 	return nil
 }
+
+func OpensslEncrypt(filePath, secret string) error {
+	tmpName := path.Join(path.Dir(filePath), "tmp_"+path.Base(filePath))
+	if err := cmd.RunDefaultBashCf("MY_PASS='%s' openssl enc -aes-256-cbc -salt -pass env:MY_PASS -in %s -out %s", secret, filePath, tmpName); err != nil {
+		_ = os.Remove(tmpName)
+		return err
+	}
+	return os.Rename(tmpName, filePath)
+}
+
+func OpensslDecrypt(filePath, secret string) error {
+	tmpName := path.Join(path.Dir(filePath), "tmp_"+path.Base(filePath))
+	if err := cmd.RunDefaultBashCf("MY_PASS='%s' openssl enc -aes-256-cbc -d -salt -pass env:MY_PASS -in %s -out %s", secret, filePath, tmpName); err != nil {
+		if strings.Contains(err.Error(), "bad decrypt") || strings.Contains(err.Error(), "bad magic number") {
+			return buserr.New("ErrBadDecrypt")
+		}
+		return err
+	}
+	return nil
+}

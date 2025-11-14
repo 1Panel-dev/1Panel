@@ -39,6 +39,7 @@ Failed: 'Falhou'
 SystemRestart: 'Tarefa interrompida devido à reinicialização do sistema'
 ErrGroupIsDefault: 'Grupo padrão, não pode ser excluído'
 ErrGroupIsInWebsiteUse: 'O grupo está sendo usado por outro site e não pode ser excluído.'
+Decrypt: "Descriptografar"
 
 #backup
 Localhost: 'Máquina Local'

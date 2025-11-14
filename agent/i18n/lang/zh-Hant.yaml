@@ -36,6 +36,7 @@ Failed: '失敗'
 SystemRestart: '系統重新啟動導致任務中斷'
 ErrGroupIsDefault: '預設分組，無法刪除'
 ErrGroupIsInWebsiteUse: '分組正在被其他網站使用，無法刪除'
+Decrypt: "解密"
 
 #backup
 Localhost: '本機'

@@ -36,6 +36,7 @@ Failed: 'Failed'
 SystemRestart: 'Task interrupted due to system restart'
 ErrGroupIsDefault: 'Default group, cannot be deleted'
 ErrGroupIsInWebsiteUse: 'The group is being used by another website and cannot be deleted.'
+Decrypt: "Decrypt"
 
 #backup
 Localhost: 'Local Machine'

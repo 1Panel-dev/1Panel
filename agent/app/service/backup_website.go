@@ -363,7 +363,7 @@ func recoverWebsiteDatabase(t *task.Task, dbID uint, dbType, tmpPath, websiteKey
 			Name:       db.MysqlName,
 			DetailName: db.Name,
 			File:       fmt.Sprintf("%s/%s.sql.gz", tmpPath, websiteKey),
-		}, t, true, ""); err != nil {
+		}, t, true); err != nil {
 			t.LogFailedWithErr(taskName, err)
 			return err
 		}

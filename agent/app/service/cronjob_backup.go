@@ -167,7 +167,7 @@ func (u *CronjobService) handleDatabase(cronjob model.Cronjob, startTime time.Ti
 			backupDir := path.Join(global.Dir.LocalBackupDir, fmt.Sprintf("tmp/database/%s/%s/%s", dbInfo.DBType, record.Name, dbInfo.Name))
 			record.FileName = simplifiedFileName(fmt.Sprintf("db_%s_%s.sql.gz", dbInfo.Name, startTime.Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(5)))
 			if cronjob.DBType == "mysql" || cronjob.DBType == "mariadb" || cronjob.DBType == "mysql-cluster" {
-				if err := doMysqlBackup(dbInfo, backupDir, record.FileName); err != nil {
+				if err := doMysqlBackup(dbInfo, backupDir, record.FileName, cronjob.Secret); err != nil {
 					if retry < int(cronjob.RetryTimes) || !cronjob.IgnoreErr {
 						retry++
 						return err
@@ -178,7 +178,7 @@ func (u *CronjobService) handleDatabase(cronjob model.Cronjob, startTime time.Ti
 					}
 				}
 			} else {
-				if err := doPostgresqlgBackup(dbInfo, backupDir, record.FileName); err != nil {
+				if err := doPostgresqlgBackup(dbInfo, backupDir, record.FileName, cronjob.Secret); err != nil {
 					if retry < int(cronjob.RetryTimes) || !cronjob.IgnoreErr {
 						retry++
 						return err

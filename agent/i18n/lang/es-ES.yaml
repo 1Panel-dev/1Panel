@@ -36,6 +36,7 @@ Failed: 'Error'
 SystemRestart: 'La tarea fue interrumpida debido a un reinicio del sistema'
 ErrGroupIsDefault: 'Grupo predeterminado, no se puede eliminar'
 ErrGroupIsInWebsiteUse: 'El grupo está siendo usado por otro sitio web y no se puede eliminar.'
+Decrypt: "Descifrar"
 
 #backup
 ErrBackupInUsed: 'La cuenta de respaldo está siendo utilizada en una tarea programada y no se puede eliminar.'

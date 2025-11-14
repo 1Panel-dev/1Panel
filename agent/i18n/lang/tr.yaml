@@ -39,6 +39,7 @@ Failed: 'Başarısız'
 SystemRestart: 'Sistem yeniden başlatması nedeniyle görev kesildi'
 ErrGroupIsDefault: 'Varsayılan grup, silinemez'
 ErrGroupIsInWebsiteUse: 'Grup başka bir web sitesi tarafından kullanılıyor ve silinemez.'
+Decrypt: "Şifre Çöz"
 
 #backup
 Localhost: 'Yerel Makine'

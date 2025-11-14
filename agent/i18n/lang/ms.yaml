@@ -39,6 +39,7 @@ Failed: 'Gagal'
 SystemRestart: 'Tugas terganggu kerana sistem mula semula'
 ErrGroupIsDefault: 'Kumpulan lalai, tidak boleh dipadamkan'
 ErrGroupIsInWebsiteUse: 'Kumpulan sedang digunakan oleh tapak web lain dan tidak boleh dipadamkan.'
+Decrypt: "Dekripsi"
 
 #sandaran
 Localhost: 'Mesin Tempatan'

@@ -107,7 +107,7 @@
             {{ $t('commons.msg.' + (isBackup ? 'backupHelper' : 'recoverHelper'), [name + '( ' + detailName + ' )']) }}
         </el-alert>
         <el-form class="mt-5" ref="backupForm" @submit.prevent label-position="top" v-loading="loading">
-            <el-form-item :label="$t('setting.compressPassword')" v-if="type === 'app' || type === 'website'">
+            <el-form-item :label="$t('setting.compressPassword')">
                 <el-input v-model="secret" :placeholder="$t('setting.backupRecoverMessage')" />
             </el-form-item>
             <el-form-item v-if="isBackup" :label="$t('commons.table.description')">
@@ -281,7 +281,7 @@ function selectable(row) {
     return row.status !== 'Waiting';
 }
 
-const backup = async (close: boolean) => {
+const backup = async () => {
     const taskID = newUUID();
     let params = {
         type: type.value,
@@ -292,23 +292,18 @@ const backup = async (close: boolean) => {
         description: description.value,
     };
     loading.value = true;
-    try {
-        await handleBackup(params);
-        loading.value = false;
-        if (close) {
-            handleClose();
-            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            search();
-        } else {
+    await handleBackup(params)
+        .then(() => {
+            loading.value = false;
             openTaskLog(taskID);
-        }
-        handleBackupClose();
-    } catch (error) {
-        loading.value = false;
-    }
+            handleBackupClose();
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
-const recover = async (close: boolean, row?: any) => {
+const recover = async (row?: any) => {
     const taskID = newUUID();
     let params = {
         downloadAccountID: row.downloadAccountID,
@@ -324,14 +319,8 @@ const recover = async (close: boolean, row?: any) => {
     await handleRecover(params)
         .then(() => {
             loading.value = false;
+            openTaskLog(taskID);
             handleBackupClose();
-            if (close) {
-                handleClose();
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                search();
-            } else {
-                openTaskLog(taskID);
-            }
         })
         .catch(() => {
             loading.value = false;
@@ -340,6 +329,7 @@ const recover = async (close: boolean, row?: any) => {
 
 const onBackup = async () => {
     description.value = '';
+    secret.value = '';
     isBackup.value = true;
     open.value = true;
 };
@@ -347,28 +337,15 @@ const onBackup = async () => {
 const onRecover = async (row: Backup.RecordInfo) => {
     secret.value = '';
     isBackup.value = false;
-    if (type.value !== 'app' && type.value !== 'website') {
-        ElMessageBox.confirm(
-            i18n.global.t('commons.msg.recoverHelper', [name.value + '( ' + detailName.value + ' )']),
-            i18n.global.t('commons.button.recover'),
-            {
-                confirmButtonText: i18n.global.t('commons.button.confirm'),
-                cancelButtonText: i18n.global.t('commons.button.cancel'),
-            },
-        ).then(async () => {
-            recover(true, row);
-        });
-        return;
-    }
     recordInfo.value = row;
     open.value = true;
 };
 
 const onSubmit = () => {
     if (isBackup.value) {
-        backup(false);
+        backup();
     } else {
-        recover(false, recordInfo.value);
+        recover(recordInfo.value);
     }
 };
 
