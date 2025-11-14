@@ -893,7 +893,7 @@ const message = {
         pull: '풀',
         path: '경로',
         importImage: '가져오기',
-        build: '빌드',
+        buildArgs: '빌드 인수',
         imageBuild: '이미지 빌드',
         pathSelect: '경로',
         label: '레이블',

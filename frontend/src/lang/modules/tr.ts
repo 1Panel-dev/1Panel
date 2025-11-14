@@ -934,7 +934,7 @@ const message = {
         pull: 'Çek',
         path: 'Yol',
         importImage: 'İçe aktar',
-        build: 'Oluştur',
+        buildArgs: 'Derleme Argümanları',
         imageBuild: 'Oluştur',
         pathSelect: 'Yol',
         label: 'Etiket',

@@ -918,7 +918,7 @@ const message = {
         pull: 'Tarik',
         path: 'Laluan',
         importImage: 'Import',
-        build: 'Bina',
+        buildArgs: 'Argumen Binaan',
         imageBuild: 'Bina',
         pathSelect: 'Laluan',
         label: 'Label',

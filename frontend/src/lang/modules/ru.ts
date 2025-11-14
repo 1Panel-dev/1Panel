@@ -915,7 +915,7 @@ const message = {
         pull: 'Загрузить',
         path: 'Путь',
         importImage: 'Импорт',
-        build: 'Сборка',
+        buildArgs: 'Аргументы Сборки',
         imageBuild: 'Сборка',
         pathSelect: 'Путь',
         label: 'Метка',

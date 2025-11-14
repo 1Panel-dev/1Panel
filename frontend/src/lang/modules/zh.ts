@@ -887,7 +887,7 @@ const message = {
         path: '路径',
         importImage: '导入镜像',
         imageBuild: '构建镜像',
-        build: '构建镜像',
+        buildArgs: '构建参数',
         pathSelect: '路径选择',
         label: '标签',
         imageTag: '镜像标签',

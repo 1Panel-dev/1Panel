@@ -31,6 +31,9 @@
                     </template>
                 </el-input>
             </el-form-item>
+            <el-form-item :label="$t('container.buildArgs')">
+                <el-input :placeholder="$t('container.tagHelper')" type="textarea" :rows="3" v-model="form.argStr" />
+            </el-form-item>
             <el-form-item :label="$t('container.tag')">
                 <el-input :placeholder="$t('container.tagHelper')" type="textarea" :rows="3" v-model="form.tagStr" />
             </el-form-item>
@@ -71,6 +74,8 @@ const form = reactive({
     name: '',
     tagStr: '',
     tags: [] as Array<string>,
+    argStr: '',
+    args: [] as Array<string>,
 });
 
 const rules = reactive({
@@ -83,6 +88,7 @@ const acceptParams = async () => {
     form.from = 'path';
     form.dockerfile = '';
     form.tagStr = '';
+    form.argStr = '';
     form.name = '';
 };
 const emit = defineEmits<{ (e: 'search'): void }>();
@@ -101,6 +107,9 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         if (!valid) return;
         if (form.tagStr !== '') {
             form.tags = form.tagStr.split('\n');
+        }
+        if (form.argStr !== '') {
+            form.args = form.argStr.split('\n');
         }
         form.taskID = newUUID();
         await imageBuild(form);

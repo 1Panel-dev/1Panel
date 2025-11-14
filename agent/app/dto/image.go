@@ -28,6 +28,7 @@ type ImageBuild struct {
 	Name       string   `json:"name" validate:"required"`
 	Dockerfile string   `json:"dockerfile" validate:"required"`
 	Tags       []string `json:"tags"`
+	Args       []string `json:"args"`
 }
 
 type ImagePull struct {

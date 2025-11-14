@@ -930,7 +930,7 @@ const message = {
         pull: 'Descargar',
         path: 'Ruta',
         importImage: 'Importar',
-        build: 'Construir',
+        buildArgs: 'Argumentos de Construcción',
         imageBuild: 'Construir',
         pathSelect: 'Ruta',
         label: 'Etiqueta',

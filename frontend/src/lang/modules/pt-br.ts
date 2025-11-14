@@ -915,7 +915,7 @@ const message = {
         pull: 'Puxar',
         path: 'Caminho',
         importImage: 'Importar',
-        build: 'Construir',
+        buildArgs: 'Argumentos de Build',
         imageBuild: 'Construção de imagem',
         pathSelect: 'Caminho',
         label: 'Etiqueta',

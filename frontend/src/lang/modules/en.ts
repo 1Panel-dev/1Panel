@@ -925,7 +925,7 @@ const message = {
         pull: 'Pull',
         path: 'Path',
         importImage: 'Import',
-        build: 'Build',
+        buildArgs: 'Build Arguments',
         imageBuild: 'Build',
         pathSelect: 'Path',
         label: 'Label',

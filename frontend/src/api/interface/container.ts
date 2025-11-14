@@ -187,6 +187,7 @@ export namespace Container {
         name: string;
         dockerfile: string;
         tags: Array<string>;
+        args: Array<string>;
     }
     export interface ImagePull {
         taskID: string;

@@ -902,7 +902,7 @@ const message = {
         pull: '引く',
         path: 'パス',
         importImage: '輸入',
-        build: '建てる',
+        buildArgs: 'ビルド引数',
         imageBuild: '建てる',
         pathSelect: 'パス',
         label: 'ラベル',

@@ -1256,6 +1256,16 @@ func stringsToMap(list []string) map[string]string {
 	}
 	return labelMap
 }
+func stringsToMap2(list []string) map[string]*string {
+	var labelMap = make(map[string]*string)
+	for _, label := range list {
+		if strings.Contains(label, "=") {
+			sps := strings.SplitN(label, "=", 2)
+			labelMap[sps[0]] = &sps[1]
+		}
+	}
+	return labelMap
+}
 
 func calculateCPUPercentUnix(stats *container.StatsResponse) float64 {
 	cpuPercent := 0.0

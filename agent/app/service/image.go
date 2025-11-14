@@ -228,6 +228,7 @@ func (u *ImageService) ImageBuild(req dto.ImageBuild) error {
 		Tags:       []string{req.Name},
 		Remove:     true,
 		Labels:     stringsToMap(req.Tags),
+		BuildArgs:  stringsToMap2(req.Args),
 	}
 	taskItem, err := task.NewTaskWithOps(req.Name, task.TaskBuild, task.TaskScopeImage, req.TaskID, 1)
 	if err != nil {
