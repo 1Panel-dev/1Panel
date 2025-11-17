@@ -1,7 +1,6 @@
 package client
 
 import (
-	"fmt"
 	"path"
 
 	"github.com/upyun/go-sdk/upyun"
@@ -34,7 +33,7 @@ func (o upClient) ListBuckets() ([]interface{}, error) {
 func (s upClient) Upload(src, target string) (bool, error) {
 	if _, err := s.client.GetInfo(path.Dir(target)); err != nil {
 		if err := s.client.Mkdir(path.Dir(target)); err != nil {
-			fmt.Println(err)
+			return false, err
 		}
 	}
 	if err := s.client.Put(&upyun.PutObjectConfig{

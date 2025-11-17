@@ -80,11 +80,9 @@ func (g *googleDriveClient) Delete(pathItem string) (bool, error) {
 	if len(fileInfo.ID) == 0 {
 		return false, fmt.Errorf("no such file %s", pathItem)
 	}
-	res, err := g.googleRequest("https://www.googleapis.com/drive/v3/files/"+fileInfo.ID, http.MethodDelete, nil, nil)
-	if err != nil {
+	if _, err := g.googleRequest("https://www.googleapis.com/drive/v3/files/"+fileInfo.ID, http.MethodDelete, nil, nil); err != nil {
 		return false, err
 	}
-	fmt.Println(string(res))
 	return true, nil
 }
 

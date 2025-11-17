@@ -126,12 +126,8 @@ func (s s3Client) Upload(src, target string) (bool, error) {
 }
 
 func (s s3Client) Download(src, target string) (bool, error) {
-	if _, err := os.Stat(target); err != nil {
-		if os.IsNotExist(err) {
-			os.Remove(target)
-		} else {
-			return false, err
-		}
+	if _, err := os.Stat(target); err == nil {
+		_ = os.Remove(target)
 	}
 	file, err := os.Create(target)
 	if err != nil {
