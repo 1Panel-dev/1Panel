@@ -167,34 +167,22 @@
                 prop="varsJson.region"
                 :rules="Rules.requiredInput"
             >
-                <div class="flex flex-col gap-2">
-                    <div class="flex items-center gap-2">
-                        <el-select
-                            v-model="selectedS3Region"
-                            class="flex-1"
-                            clearable
-                            filterable
-                            placeholder="Amazon S3 Region"
-                            :disabled="s3RegionCustom"
-                            @change="handleS3RegionQuickSelect"
-                            @clear="clearS3RegionSelection"
-                        >
-                            <el-option
-                                v-for="item in s3Regions"
-                                :key="item.value"
-                                :label="item.label"
-                                :value="item.value"
-                            >
-                                <span class="float-left">{{ item.label }}</span>
-                                <span class="option-help">
-                                    {{ item.value }}
-                                </span>
-                            </el-option>
-                        </el-select>
-                        <el-checkbox v-model="s3RegionCustom" label="Custom" />
-                    </div>
-                    <el-input :disabled="!s3RegionCustom" v-model.trim="dialogData.rowData!.varsJson['region']" />
-                </div>
+                <el-select
+                    v-model="dialogData.rowData!.varsJson['region']"
+                    clearable
+                    filterable
+                    allow-create
+                    default-first-option
+                    placeholder="Amazon S3 Region"
+                    @change="handleS3RegionChange"
+                >
+                    <el-option v-for="item in s3Regions" :key="item.value" :label="item.label" :value="item.value">
+                        <span class="float-left">{{ item.label }}</span>
+                        <span class="option-help">
+                            {{ item.value }}
+                        </span>
+                    </el-option>
+                </el-select>
             </el-form-item>
             <el-form-item
                 v-if="hasAccessKey()"
@@ -202,9 +190,9 @@
                 prop="varsJson.endpointItem"
                 :rules="Rules.requiredInput"
             >
-                <el-input :disabled="isS3EndpointReadOnly" v-model.trim="dialogData.rowData!.varsJson['endpointItem']">
+                <el-input v-model.trim="dialogData.rowData!.varsJson['endpointItem']">
                     <template #prepend>
-                        <el-select v-model.trim="domainProto" class="p-w-100" :disabled="isS3EndpointReadOnly">
+                        <el-select v-model.trim="domainProto" class="p-w-100">
                             <el-option label="http" value="http" />
                             <el-option label="https" value="https" />
                         </el-select>
@@ -426,7 +414,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, reactive, ref, watch } from 'vue';
+import { reactive, ref } from 'vue';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
@@ -487,8 +475,6 @@ const s3Regions: Array<{ label: string; value: string }> = [
     { label: 'AWS GovCloud (US-East)', value: 'us-gov-east-1' },
     { label: 'AWS GovCloud (US-West)', value: 'us-gov-west-1' },
 ];
-const selectedS3Region = ref('');
-const s3RegionCustom = ref(false);
 
 const domainProto = ref('http');
 const emit = defineEmits(['search']);
@@ -515,40 +501,12 @@ const drawerVisible = ref(false);
 const dialogData = ref<DialogProps>({
     title: '',
 });
-const isS3EndpointReadOnly = computed(() => dialogData.value.rowData?.type === 'S3' && !s3RegionCustom.value);
-const resetS3RegionState = () => {
-    selectedS3Region.value = '';
-    s3RegionCustom.value = false;
-};
-const syncS3RegionState = () => {
-    if (!dialogData.value.rowData || dialogData.value.rowData.type !== 'S3') {
-        resetS3RegionState();
-        return;
-    }
-    const region = dialogData.value.rowData!.varsJson['region'];
-    const endpoint = dialogData.value.rowData!.varsJson['endpointItem'];
-    if (!region) {
-        selectedS3Region.value = '';
-        s3RegionCustom.value = false;
-        return;
-    }
-    const matchRegion = s3Regions.some((item) => item.value === region);
-    if (!matchRegion) {
-        selectedS3Region.value = '';
-        s3RegionCustom.value = true;
-        return;
-    }
-    const expectedEndpoint = `s3.${region}.amazonaws.com`;
-    selectedS3Region.value = region;
-    s3RegionCustom.value = endpoint !== expectedEndpoint;
-};
 const acceptParams = (params: DialogProps): void => {
     dialogData.value = params;
     dialogData.value.rowData.varsJson = dialogData.value.rowData!.vars
         ? JSON.parse(dialogData.value.rowData!.vars)
         : {};
     title.value = i18n.global.t('commons.button.' + dialogData.value.title);
-    resetS3RegionState();
     if (dialogData.value.title === 'create') {
         dialogData.value.rowData!.type = 'OSS';
         changeType();
@@ -572,22 +530,8 @@ const acceptParams = (params: DialogProps): void => {
     if (dialogData.value.rowData!.varsJson['timeout'] === undefined) {
         dialogData.value.rowData!.varsJson['timeout'] = 1;
     }
-    syncS3RegionState();
     drawerVisible.value = true;
 };
-watch(s3RegionCustom, (custom) => {
-    if (!dialogData.value.rowData || dialogData.value.rowData.type !== 'S3') {
-        return;
-    }
-    if (!custom) {
-        if (selectedS3Region.value) {
-            handleS3RegionQuickSelect(selectedS3Region.value);
-        } else {
-            dialogData.value.rowData!.varsJson['region'] = '';
-            dialogData.value.rowData!.varsJson['endpointItem'] = '';
-        }
-    }
-});
 const toDoc = (type: string) => {
     let uri = '';
     switch (type) {
@@ -689,30 +633,24 @@ const loadDir = async (path: string) => {
     dialogData.value.rowData!.backupPath = path;
 };
 
-const handleS3RegionQuickSelect = (code?: string) => {
-    if (!code) {
+const handleS3RegionChange = (region?: string) => {
+    if (!region || !dialogData.value.rowData || dialogData.value.rowData!.type !== 'S3') {
         return;
     }
-    if (!dialogData.value.rowData || dialogData.value.rowData!.type !== 'S3') {
-        return;
+    // 检查是否是 AWS S3 标准区域
+    const isStandardRegion = s3Regions.some((item) => item.value === region);
+    if (isStandardRegion) {
+        // 自动设置 endpoint 为 AWS S3 标准 endpoint
+        dialogData.value.rowData!.varsJson['endpointItem'] = `s3.${region}.amazonaws.com`;
+        domainProto.value = 'https';
     }
-    dialogData.value.rowData!.varsJson['region'] = code;
-    dialogData.value.rowData!.varsJson['endpointItem'] = `s3.${code}.amazonaws.com`;
-};
-const clearS3RegionSelection = () => {
-    selectedS3Region.value = '';
-    if (!dialogData.value.rowData || dialogData.value.rowData.type !== 'S3') {
-        return;
-    }
-    dialogData.value.rowData!.varsJson['region'] = '';
-    dialogData.value.rowData!.varsJson['endpointItem'] = '';
+    // 如果是自定义区域，endpoint 保持用户设置的值
 };
 
 const changeType = async () => {
     buckets.value = [];
     dialogData.value.rowData!.varsJson = {};
     dialogData.value.rowData!.rememberAuth = false;
-    resetS3RegionState();
     switch (dialogData.value.rowData!.type) {
         case 'COS':
         case 'OSS':
