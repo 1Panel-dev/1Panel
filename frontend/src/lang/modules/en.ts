@@ -537,6 +537,7 @@ const message = {
         caCert: 'CA certificate',
         hasCA: 'Has CA certificate',
         skipVerify: 'Ignore certificate validity check',
+        initialDB: 'Initial Database',
 
         formatHelper:
             'The current database character set is {0}, the character set inconsistency may cause recovery failure',

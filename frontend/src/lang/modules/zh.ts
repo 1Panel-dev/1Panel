@@ -517,6 +517,7 @@ const message = {
         hasCA: '拥有 CA 证书',
         caCert: 'CA 证书',
         skipVerify: '忽略校验证书可用性检测',
+        initialDB: '初始数据库',
 
         formatHelper: '当前数据库字符集为 {0}，字符集不一致可能导致恢复失败',
         dropHelper: '将上传文件拖拽到此处，或者',

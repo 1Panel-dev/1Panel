@@ -534,6 +534,7 @@ const message = {
         caCert: 'Certificado CA',
         hasCA: 'Possui certificado CA',
         skipVerify: 'Ignorar verificação de validade do certificado',
+        initialDB: 'Banco de Dados Inicial',
 
         formatHelper:
             'O conjunto de caracteres atual do banco de dados é {0}, a inconsistência no conjunto de caracteres pode causar falha na recuperação',

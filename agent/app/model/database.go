@@ -9,6 +9,7 @@ type Database struct {
 	From         string `json:"from" gorm:"not null"`
 	Address      string `json:"address" gorm:"not null"`
 	Port         uint   `json:"port" gorm:"not null"`
+	InitialDB    string `json:"initialDB"`
 	Username     string `json:"username"`
 	Password     string `json:"password"`
 

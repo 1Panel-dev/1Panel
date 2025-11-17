@@ -5,13 +5,14 @@ import (
 )
 
 type DBInfo struct {
-	From     string `json:"from"`
-	Database string `json:"database"`
-	Address  string `json:"address"`
-	Port     uint   `json:"port"`
-	Username string `json:"userName"`
-	Password string `json:"password"`
-	AppKey   string `json:"appKey"`
+	From      string `json:"from"`
+	Database  string `json:"database"`
+	Address   string `json:"address"`
+	Port      uint   `json:"port"`
+	InitialDB string `json:"initialDB"`
+	Username  string `json:"userName"`
+	Password  string `json:"password"`
+	AppKey    string `json:"appKey"`
 
 	Timeout uint `json:"timeout"` // second
 }

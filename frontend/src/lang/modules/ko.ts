@@ -523,6 +523,7 @@ const message = {
         caCert: 'CA 인증서',
         hasCA: 'CA 인증서 있음',
         skipVerify: '인증서 유효성 검사 무시',
+        initialDB: '초기 데이터베이스',
 
         formatHelper: '현재 데이터베이스 문자셋은 {0} 입니다. 문자셋 불일치로 인해 복구에 실패할 수 있습니다.',
         dropHelper: '여기에 업로드한 파일을 드래그 앤 드롭하거나',

@@ -274,6 +274,7 @@ export namespace Database {
         from: string;
         address: string;
         port: number;
+        initialDB: string;
         username: string;
         password: string;
 

@@ -705,3 +705,10 @@ var UpdateTensorrtLLM = &gormigrate.Migration{
 		return tx.AutoMigrate(&model.TensorRTLLM{})
 	},
 }
+
+var UpdateDatabase = &gormigrate.Migration{
+	ID: "20251117-update-database",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(&model.Database{})
+	},
+}

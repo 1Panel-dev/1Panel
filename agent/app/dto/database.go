@@ -281,14 +281,15 @@ type DatabaseItem struct {
 }
 
 type DatabaseCreate struct {
-	Name     string `json:"name" validate:"required,max=256"`
-	Type     string `json:"type" validate:"required"`
-	From     string `json:"from" validate:"required,oneof=local remote"`
-	Version  string `json:"version" validate:"required"`
-	Address  string `json:"address"`
-	Port     uint   `json:"port"`
-	Username string `json:"username" validate:"required"`
-	Password string `json:"password"`
+	Name      string `json:"name" validate:"required,max=256"`
+	Type      string `json:"type" validate:"required"`
+	From      string `json:"from" validate:"required,oneof=local remote"`
+	Version   string `json:"version" validate:"required"`
+	Address   string `json:"address"`
+	Port      uint   `json:"port"`
+	InitialDB string `json:"initialDB"`
+	Username  string `json:"username" validate:"required"`
+	Password  string `json:"password"`
 
 	SSL        bool   `json:"ssl"`
 	RootCert   string `json:"rootCert"`

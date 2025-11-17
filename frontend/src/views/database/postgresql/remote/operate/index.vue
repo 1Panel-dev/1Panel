@@ -25,6 +25,9 @@
             <el-form-item :label="$t('commons.table.port')" prop="port">
                 <el-input @change="isOK = false" clearable v-model.number="dialogData.rowData!.port" />
             </el-form-item>
+            <el-form-item :label="$t('database.initialDB')" prop="initialDB">
+                <el-input @change="isOK = false" clearable v-model.trim="dialogData.rowData!.initialDB" />
+            </el-form-item>
             <el-form-item :label="$t('commons.login.username')" prop="username">
                 <el-input @change="isOK = false" clearable v-model.trim="dialogData.rowData!.username" />
                 <span class="input-help">{{ $t('database.pgUserHelper') }}</span>

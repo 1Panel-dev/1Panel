@@ -543,6 +543,8 @@ const message = {
         caCert: 'CA sertifikası',
         hasCA: 'CA sertifikası var',
         skipVerify: 'Sertifika geçerlilik kontrolünü yoksay',
+        initialDB: 'Başlangıç Veritabanı',
+
         formatHelper:
             'Mevcut veritabanı karakter seti {0}, karakter seti tutarsızlığı kurtarma işleminin başarısız olmasına neden olabilir',
         dropHelper: 'Yüklenen dosyayı buraya sürükleyip bırakabilir veya',

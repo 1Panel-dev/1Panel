@@ -536,6 +536,7 @@ const message = {
         caCert: 'Sijil CA',
         hasCA: 'Mempunyai sijil CA',
         skipVerify: 'Abaikan pemeriksaan kesahihan sijil',
+        initialDB: 'Pangkalan Data Awal',
 
         formatHelper:
             'Set aksara pangkalan data semasa adalah {0}, ketidakkonsistenan set aksara mungkin menyebabkan kegagalan pemulihan.',

@@ -516,6 +516,7 @@ const message = {
         hasCA: '擁有 CA 證書',
         caCert: 'CA 證書',
         skipVerify: '忽略校驗證書可用性檢測',
+        initialDB: '初始資料庫',
 
         formatHelper: '目前資料庫字元集為 {0}，字元集不一致可能導致復原失敗',
         dropHelper: '將上傳文件拖曳到此處，或者',

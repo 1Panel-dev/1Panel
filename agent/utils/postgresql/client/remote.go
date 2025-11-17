@@ -215,7 +215,7 @@ func (r *Remote) SyncDB() ([]SyncDBInfo, error) {
 		if err := rows.Scan(&dbName); err != nil {
 			continue
 		}
-		if len(dbName) == 0 || dbName == "postgres" || dbName == "template1" || dbName == "template0" || dbName == r.User {
+		if len(dbName) == 0 || dbName == "template1" || dbName == "template0" || dbName == r.User {
 			continue
 		}
 		datas = append(datas, SyncDBInfo{Name: dbName, From: r.From, PostgresqlName: r.Database})
