@@ -501,6 +501,7 @@ func (u *ContainerService) Prune(req dto.ContainerPrune) error {
 				pruneFilters.Add("until", "24h")
 			}
 		}
+		taskItem.Log(i18n.GetMsgByKey("PruneStart"))
 		DeletedNumber := 0
 		SpaceReclaimed := 0
 		switch req.PruneType {

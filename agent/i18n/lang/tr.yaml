@@ -213,6 +213,7 @@ ImageRemoveHelper: "{{ .name }} imajı silindi, {{ .size }} disk alanı boşaltt
 BuildCache: "Derleme önbelleği"
 Volume: "Depolama hacmi"
 Network: "Ağ"
+PruneStart: "Temizlik devam ediyor, lütfen bekleyin..."
 
 #runtime
 ErrFileNotExist: '{{ .detail }} dosyası mevcut değil! Lütfen kaynak dosyanın bütünlüğünü kontrol edin!'

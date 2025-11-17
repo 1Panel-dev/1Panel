@@ -211,6 +211,7 @@ ImageRemoveHelper: "刪除鏡像 {{ .name }} ，釋放磁碟空間 {{ .size }}"
 BuildCache: "構建快取"
 Volume: "磁碟區"
 Network: "網路"
+PruneStart: "清理中，請稍候..."
 
 #runtime
 ErrFileNotExist: '{{ .detail }} 檔案不存在！請檢查來源檔案完整性！'

@@ -212,6 +212,7 @@ ImageRemoveHelper: "Deleted image {{ .name }}, freeing {{ .size }} disk space"
 BuildCache: "Build cache"
 Volume: "Storage volume"
 Network: "Network"
+PruneStart: "Cleaning in progress, please wait..."
 
 #runtime
 ErrFileNotExist: '{{ .detail }} file does not exist! Please check the integrity of the source file!'

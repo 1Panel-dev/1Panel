@@ -212,6 +212,7 @@ ImageRemoveHelper: "Padam imej {{ .name }}, membebaskan {{ .size }} ruang cakera
 BuildCache: "Cache binaan"
 Volume: "Jilid storan"
 Network: "Rangkaian"
+PruneStart: "Pembersihan sedang dijalankan, sila tunggu..."
 
 #masa berjalan
 ErrFileNotExist: 'Fail {{ .detail }} tidak wujud! Sila semak integriti fail sumber!'

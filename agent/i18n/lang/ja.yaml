@@ -211,6 +211,7 @@ ImageRemoveHelper: "イメージ{{ .name }}を削除し、{{ .size }}のディ�
 BuildCache: "ビルドキャッシュ"
 Volume: "ストレージボリューム"
 Network: "ネットワーク"
+PruneStart: "クリーンアップ中、しばらくお待ちください..."
 
 #runtime
 ErrFileNotExist: '{{ .detail }} ファイルが存在しません。ソース ファイルの整合性を確認してください。'

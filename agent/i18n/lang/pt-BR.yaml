@@ -212,6 +212,7 @@ ImageRemoveHelper: "Excluída a imagem {{ .name }}, liberando {{ .size }} de esp
 BuildCache: "Cache de construção"
 Volume: "Volume de armazenamento"
 Network: "Rede"
+PruneStart: "Limpando em andamento, por favor aguarde..."
 
 #tempo de execução
 ErrFileNotExist: 'O arquivo {{ .detail }} não existe! Verifique a integridade do arquivo de origem!'

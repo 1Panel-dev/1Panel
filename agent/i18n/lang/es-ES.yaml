@@ -211,6 +211,7 @@ ImageRemoveHelper: "Imagen {{ .name }} eliminada, liberando {{ .size }} de espac
 BuildCache: "Caché de compilación"
 Volume: "Volumen de almacenamiento"
 Network: "Red"
+PruneStart: "Limpiando en progreso, por favor espere..."
 
 #runtime
 ErrFileNotExist: 'El archivo {{ .detail }} no existe, ¡verifique la integridad!'

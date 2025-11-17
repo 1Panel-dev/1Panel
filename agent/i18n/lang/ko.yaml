@@ -212,6 +212,7 @@ ImageRemoveHelper: "이미지 {{ .name }} 삭제, {{ .size }} 디스크 공간 �
 BuildCache: "빌드 캐시"
 Volume: "스토리지 볼륨"
 Network: "네트워크"
+PruneStart: "정리 중입니다. 잠시만 기다려주세요..."
 
 #실행 시간
 ErrFileNotExist: '{{ .detail }} 파일이 존재하지 않습니다! 소스 파일의 무결성을 확인하세요!'
