@@ -198,15 +198,13 @@ func (u *SettingService) UpdateBindInfo(req dto.BindInfo) error {
 }
 
 func (u *SettingService) UpdateProxy(req dto.ProxyUpdate) error {
-	proxyUrl := req.ProxyUrl
 	if req.ProxyType == "https" || req.ProxyType == "http" {
-		proxyUrl = req.ProxyType + "://" + req.ProxyUrl
-		req.ProxyUrl = proxyUrl
+		req.ProxyUrl = req.ProxyType + "://" + req.ProxyUrl
 	}
 	if err := checkProxy(req); err != nil {
 		return err
 	}
-	if err := settingRepo.Update("ProxyUrl", proxyUrl); err != nil {
+	if err := settingRepo.Update("ProxyUrl", req.ProxyUrl); err != nil {
 		return err
 	}
 	if err := settingRepo.Update("ProxyType", req.ProxyType); err != nil {
@@ -699,7 +697,7 @@ func loadDockerProxy(req dto.ProxyUpdate) string {
 
 func checkProxy(req dto.ProxyUpdate) error {
 	var transport http.Transport
-	proxyItem := net.JoinHostPort(req.ProxyUrl, req.ProxyPort)
+	proxyItem := fmt.Sprintf("%s:%s", req.ProxyUrl, req.ProxyPort)
 	switch req.ProxyType {
 	case "http", "https":
 		proxyURL, err := url.Parse(proxyItem)
