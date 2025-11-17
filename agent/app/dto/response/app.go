@@ -130,6 +130,7 @@ type AppInstallDTO struct {
 	Container     string    `json:"container"`
 	IsEdit        bool      `json:"isEdit"`
 	LinkDB        bool      `json:"linkDB"`
+	ServiceName   string    `json:"serviceName"`
 }
 
 type AppInstallInfo struct {

@@ -702,7 +702,10 @@ const buttons = [
 ];
 
 const toContainer = async (row: App.AppInstalled) => {
-    routerToNameWithQuery('ContainerItem', { filters: 'com.docker.compose.project=' + row.name, uncached: true });
+    routerToNameWithQuery('ContainerItem', {
+        filters: 'com.docker.compose.project=' + row.serviceName,
+        uncached: true,
+    });
 };
 
 const openBackups = (row: App.AppInstalled) => {

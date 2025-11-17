@@ -1567,8 +1567,9 @@ func handleInstalled(appInstallList []model.AppInstall, updated bool, sync bool)
 				Website:  installed.App.Website,
 				Document: installed.App.Document,
 			},
-			Favorite:  installed.Favorite,
-			Container: installed.ContainerName,
+			Favorite:    installed.Favorite,
+			Container:   installed.ContainerName,
+			ServiceName: strings.ToLower(installed.ServiceName),
 		}
 		if !updated {
 			installDTO.LinkDB = hasLinkDB(installed.ID)

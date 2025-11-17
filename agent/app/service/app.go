@@ -450,10 +450,11 @@ func (a AppService) Install(req request.AppInstallCreate) (appInstall *model.App
 		}
 		index++
 	}
-	if app.Limit == 0 && appInstall.Name != serviceName && len(servicesMap) == 1 {
-		servicesMap[appInstall.Name] = servicesMap[serviceName]
+	newServiceName := strings.ToLower(appInstall.Name)
+	if app.Limit == 0 && newServiceName != serviceName && len(servicesMap) == 1 {
+		servicesMap[newServiceName] = servicesMap[serviceName]
 		delete(servicesMap, serviceName)
-		serviceName = appInstall.Name
+		serviceName = newServiceName
 	}
 	appInstall.ServiceName = serviceName
 
