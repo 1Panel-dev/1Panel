@@ -92,7 +92,11 @@
                                 show-overflow-tooltip
                             >
                                 <template #default="{ row }">
-                                    <fu-input-rw-switch v-model="row.description" @blur="onChange(row)" />
+                                    <fu-input-rw-switch
+                                        v-model="row.description"
+                                        @enter="onChange(row)"
+                                        @blur="onChange(row)"
+                                    />
                                 </template>
                             </el-table-column>
                             <fu-table-operations
