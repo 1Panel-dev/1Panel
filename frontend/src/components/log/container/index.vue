@@ -41,7 +41,7 @@
 import { cleanContainerLog, DownloadFile } from '@/api/modules/container';
 import i18n from '@/lang';
 import { dateFormatForName } from '@/utils/util';
-import { onUnmounted, reactive, ref } from 'vue';
+import { computed, nextTick, onMounted, onUnmounted, reactive, ref } from 'vue';
 import { ElMessageBox } from 'element-plus';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import hightlight from '@/components/log/custom-hightlight/index.vue';

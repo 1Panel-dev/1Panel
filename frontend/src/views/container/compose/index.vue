@@ -155,7 +155,7 @@ const search = async () => {
 };
 
 const loadDetail = async (row: Container.ComposeInfo) => {
-    routerToNameWithQuery('ContainerItem', { filters: 'com.docker.compose.project=' + row.name });
+    routerToNameWithQuery('ComposeDetail', { name: row.name, path: row.path });
 };
 
 const dialogRef = ref();
