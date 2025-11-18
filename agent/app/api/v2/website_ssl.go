@@ -235,7 +235,6 @@ func (b *BaseApi) UploadWebsiteSSL(c *gin.Context) {
 func (b *BaseApi) UploadSSLFile(c *gin.Context) {
 	var req request.WebsiteSSLFileUpload
 
-	req.Type = c.PostForm("type")
 	req.Description = c.PostForm("description")
 	sslID := c.PostForm("sslID")
 	if sslID != "" {
@@ -279,7 +278,7 @@ func (b *BaseApi) UploadSSLFile(c *gin.Context) {
 		return
 	}
 
-	helper.SuccessWithData(c, nil)
+	helper.Success(c)
 }
 
 func readUploadedFile(fileHeader *multipart.FileHeader) ([]byte, error) {
