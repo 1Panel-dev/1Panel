@@ -63,90 +63,77 @@
                     <div v-if="selectedCompose" class="flex-1 min-w-0">
                         <div v-loading="detailLoading" class="h-full flex flex-col gap-4">
                             <el-card shadow="never">
-                                <div class="mb-3">
-                                    <div class="flex items-center gap-4 mb-2">
-                                        <div class="text-sm">
-                                            <span class="text-gray-500">{{ $t('app.source') }}:</span>
-                                            <el-tag v-if="composeInfo?.createdBy === ''" size="small">
-                                                {{ $t('commons.table.local') }}
-                                            </el-tag>
-                                            <el-tag
-                                                v-else-if="composeInfo?.createdBy === 'Apps'"
-                                                type="success"
-                                                size="small"
-                                            >
-                                                {{ $t('menu.apps') }}
-                                            </el-tag>
-                                            <el-tag
-                                                v-else-if="composeInfo?.createdBy === '1Panel'"
-                                                type="primary"
-                                                size="small"
-                                            >
-                                                1Panel
-                                            </el-tag>
-                                        </div>
-                                        <div class="text-sm text-gray-500">
-                                            {{ $t('commons.table.createdAt') }}: {{ composeInfo?.createdAt }}
-                                        </div>
+                                <template #header>
+                                    <div class="flex items-center justify-between">
+                                        <span class="font-medium">{{ composeInfo?.name }}</span>
+                                        <span class="text-sm text-gray-500 truncate max-w-[50%]">
+                                            <div class="text-sm">
+                                                <span class="text-gray-500">{{ $t('app.source') }}:</span>
+                                                <el-text v-if="composeInfo?.createdBy === ''" size="small">
+                                                    {{ $t('commons.table.local') }}
+                                                </el-text>
+                                                <el-text
+                                                    v-else-if="composeInfo?.createdBy === 'Apps'"
+                                                    type="success"
+                                                    size="small"
+                                                >
+                                                    {{ $t('menu.apps') }}
+                                                </el-text>
+                                                <el-text
+                                                    v-else-if="composeInfo?.createdBy === '1Panel'"
+                                                    type="primary"
+                                                    size="small"
+                                                >
+                                                    1Panel
+                                                </el-text>
+                                                <el-divider direction="vertical" />
+                                                {{ $t('commons.table.createdAt') }}: {{ composeInfo?.createdAt }}
+                                            </div>
+                                        </span>
                                     </div>
-                                </div>
-                                <div class="flex items-center justify-between gap-2 flex-wrap">
-                                    <div class="flex items-center gap-2">
+                                </template>
+                                <div class="flex items-center gap-3">
+                                    <el-button-group>
                                         <el-button
                                             type="success"
-                                            plain
-                                            size="small"
                                             :loading="operateLoading && currentOperation === 'up'"
                                             :disabled="disableOperate"
                                             @click="handleComposeOperate('up')"
                                         >
+                                            <el-icon><VideoPlay /></el-icon>
                                             {{ $t('commons.operate.start') }}
                                         </el-button>
                                         <el-button
-                                            type="danger"
-                                            plain
-                                            size="small"
-                                            :loading="operateLoading && currentOperation === 'stop'"
-                                            :disabled="disableOperate"
-                                            @click="handleComposeOperate('stop')"
-                                        >
-                                            {{ $t('commons.operate.stop') }}
-                                        </el-button>
-                                        <el-button
                                             type="warning"
-                                            plain
-                                            size="small"
                                             :loading="operateLoading && currentOperation === 'restart'"
                                             :disabled="disableOperate"
                                             @click="handleComposeOperate('restart')"
                                         >
+                                            <el-icon><RefreshRight /></el-icon>
                                             {{ $t('commons.operate.restart') }}
                                         </el-button>
-                                        <el-divider direction="vertical" />
                                         <el-button
-                                            type="primary"
-                                            link
-                                            size="small"
-                                            :loading="detailLoading"
-                                            @click="refreshDetail"
+                                            type="danger"
+                                            :loading="operateLoading && currentOperation === 'stop'"
+                                            :disabled="disableOperate"
+                                            @click="handleComposeOperate('stop')"
                                         >
-                                            {{ $t('commons.button.refresh') }}
+                                            <el-icon><VideoPause /></el-icon>
+                                            {{ $t('commons.operate.stop') }}
                                         </el-button>
-                                        <el-divider direction="vertical" />
-                                        <el-button
-                                            type="primary"
-                                            link
-                                            size="small"
-                                            :disabled="!composeInfo?.workdir"
-                                            @click="openComposeFolder"
-                                        >
-                                            {{ $t('container.composeDirectory') }}
-                                        </el-button>
-                                        <el-divider direction="vertical" />
-                                        <el-button type="danger" link size="small" @click="onDeleteCompose">
-                                            {{ $t('commons.button.delete') }}
-                                        </el-button>
-                                    </div>
+                                    </el-button-group>
+                                    <el-button :loading="detailLoading" @click="refreshDetail">
+                                        <el-icon><Refresh /></el-icon>
+                                        {{ $t('commons.button.refresh') }}
+                                    </el-button>
+                                    <el-button :disabled="!composeInfo?.workdir" @click="openComposeFolder">
+                                        <el-icon><Folder /></el-icon>
+                                        {{ $t('container.composeDirectory') }}
+                                    </el-button>
+                                    <el-button type="danger" plain @click="onDeleteCompose">
+                                        <el-icon><Delete /></el-icon>
+                                        {{ $t('commons.button.delete') }}
+                                    </el-button>
                                 </div>
                             </el-card>
 
@@ -381,7 +368,16 @@ import { Container } from '@/api/interface/container';
 import { routerToFileWithPath } from '@/utils/router';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { computeCPU, computeSize2, computeSizeForDocker } from '@/utils/util';
-import { Histogram, Search } from '@element-plus/icons-vue';
+import {
+    Delete,
+    Folder,
+    Histogram,
+    Refresh,
+    RefreshRight,
+    Search,
+    VideoPause,
+    VideoPlay,
+} from '@element-plus/icons-vue';
 
 const data = ref<any[]>([]);
 const loading = ref(false);
@@ -625,7 +621,11 @@ const onInspectContainer = async (item: any) => {
 };
 
 const onOpenTerminal = (row: any) => {
-    terminalDialogRef.value?.acceptParams({ container: row.name });
+    if (!row.containerID) {
+        return;
+    }
+    const title = i18n.global.t('menu.container') + ' ' + row.name;
+    terminalDialogRef.value?.acceptParams({ containerID: row.containerID, title });
 };
 
 const onOpenLog = (row: any) => {
