@@ -50,7 +50,7 @@ func NewS3Client(vars map[string]interface{}) (*s3Client, error) {
 	return &s3Client{scType: scType, bucket: bucket, client: client}, nil
 }
 
-func (s s3Client) ListBuckets() ([]interface{}, error) {
+func (s *s3Client) ListBuckets() ([]interface{}, error) {
 	var result []interface{}
 	res, err := s.client.ListBuckets(context.Background(), &s3.ListBucketsInput{})
 	if err != nil {
@@ -62,7 +62,7 @@ func (s s3Client) ListBuckets() ([]interface{}, error) {
 	return result, nil
 }
 
-func (s s3Client) Upload(src, target string) (bool, error) {
+func (s *s3Client) Upload(src, target string) (bool, error) {
 	fileInfo, err := os.Stat(src)
 	if err != nil {
 		return false, err
@@ -89,7 +89,7 @@ func (s s3Client) Upload(src, target string) (bool, error) {
 	return true, nil
 }
 
-func (s s3Client) Delete(path string) (bool, error) {
+func (s *s3Client) Delete(path string) (bool, error) {
 	if _, err := s.client.DeleteObject(context.Background(), &s3.DeleteObjectInput{
 		Bucket: aws.String(s.bucket),
 		Key:    aws.String(path),

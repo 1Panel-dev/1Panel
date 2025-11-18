@@ -46,14 +46,14 @@ func NewS3Client(vars map[string]interface{}) (*s3Client, error) {
 	client := s3.NewFromConfig(cfg, func(o *s3.Options) {
 		o.UsePathStyle = mode == "path"
 		if endpoint != "" {
-						o.BaseEndpoint = aws.String(normalizeEndpoint(endpoint))
+			o.BaseEndpoint = aws.String(normalizeEndpoint(endpoint))
 		}
 	})
-	
+
 	return &s3Client{scType: scType, bucket: bucket, client: client}, nil
 }
 
-func (s s3Client) ListBuckets() ([]interface{}, error) {
+func (s *s3Client) ListBuckets() ([]interface{}, error) {
 	var result []interface{}
 	res, err := s.client.ListBuckets(context.Background(), &s3.ListBucketsInput{})
 	if err != nil {
@@ -65,7 +65,7 @@ func (s s3Client) ListBuckets() ([]interface{}, error) {
 	return result, nil
 }
 
-func (s s3Client) Exist(path string) (bool, error) {
+func (s *s3Client) Exist(path string) (bool, error) {
 	_, err := s.client.HeadObject(context.Background(), &s3.HeadObjectInput{
 		Bucket: aws.String(s.bucket),
 		Key:    aws.String(path),
@@ -95,7 +95,7 @@ func (s *s3Client) Size(path string) (int64, error) {
 	return aws.ToInt64(file.ContentLength), nil
 }
 
-func (s s3Client) Delete(path string) (bool, error) {
+func (s *s3Client) Delete(path string) (bool, error) {
 	if _, err := s.client.DeleteObject(context.Background(), &s3.DeleteObjectInput{
 		Bucket: aws.String(s.bucket),
 		Key:    aws.String(path),
@@ -112,7 +112,7 @@ func (s s3Client) Delete(path string) (bool, error) {
 	return true, nil
 }
 
-func (s s3Client) Upload(src, target string) (bool, error) {
+func (s *s3Client) Upload(src, target string) (bool, error) {
 	fileInfo, err := os.Stat(src)
 	if err != nil {
 		return false, err
@@ -139,7 +139,7 @@ func (s s3Client) Upload(src, target string) (bool, error) {
 	return true, nil
 }
 
-func (s s3Client) Download(src, target string) (bool, error) {
+func (s *s3Client) Download(src, target string) (bool, error) {
 	if _, err := os.Stat(target); err == nil {
 		_ = os.Remove(target)
 	}
