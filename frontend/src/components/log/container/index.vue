@@ -82,7 +82,7 @@ let eventSource: EventSource | null = null;
 const logSearch = reactive({
     isWatch: true,
     container: '',
-    mode: '10m',
+    mode: 'all',
     tail: 100,
     compose: '',
 });
@@ -235,7 +235,7 @@ onMounted(() => {
 
     logVisible.value = true;
     logSearch.tail = 100;
-    logSearch.mode = '10m';
+    logSearch.mode = 'all';
     logSearch.isWatch = true;
 
     nextTick(() => {
