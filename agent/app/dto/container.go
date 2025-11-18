@@ -40,6 +40,9 @@ type ContainerInfo struct {
 	AppName        string   `json:"appName"`
 	AppInstallName string   `json:"appInstallName"`
 	Websites       []string `json:"websites"`
+
+	IsPinned    bool   `json:"isPinned"`
+	Description string `json:"description"`
 }
 
 type ContainerOptions struct {

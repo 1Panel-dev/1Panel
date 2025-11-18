@@ -77,6 +77,11 @@ func WithByType(tp string) DBOption {
 		return g.Where("`type` = ?", tp)
 	}
 }
+func WithByDetailType(tp string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("`detail_type` = ?", tp)
+	}
+}
 
 func WithTypes(types []string) DBOption {
 	return func(db *gorm.DB) *gorm.DB {

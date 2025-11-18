@@ -26,6 +26,13 @@ type ISettingRepo interface {
 	DelMonitorIO(timeForDelete time.Time) error
 	DelMonitorNet(timeForDelete time.Time) error
 	UpdateOrCreate(key, value string) error
+
+	GetDescription(opts ...DBOption) (model.CommonDescription, error)
+	GetDescriptionList(opts ...DBOption) ([]model.CommonDescription, error)
+	CreateDescription(data *model.CommonDescription) error
+	UpdateDescription(id string, val map[string]interface{}) error
+	DelDescription(id string) error
+	WithByDescriptionID(id string) DBOption
 }
 
 func NewISettingRepo() ISettingRepo {
@@ -107,4 +114,37 @@ func (s *SettingRepo) UpdateOrCreate(key, value string) error {
 		return result.Error
 	}
 	return global.DB.Model(&setting).UpdateColumn("value", value).Error
+}
+
+func (s *SettingRepo) GetDescriptionList(opts ...DBOption) ([]model.CommonDescription, error) {
+	var lists []model.CommonDescription
+	db := global.DB.Model(&model.CommonDescription{})
+	for _, opt := range opts {
+		db = opt(db)
+	}
+	err := db.Find(&lists).Error
+	return lists, err
+}
+func (s *SettingRepo) GetDescription(opts ...DBOption) (model.CommonDescription, error) {
+	var data model.CommonDescription
+	db := global.DB.Model(&model.CommonDescription{})
+	for _, opt := range opts {
+		db = opt(db)
+	}
+	err := db.First(&data).Error
+	return data, err
+}
+func (s *SettingRepo) CreateDescription(data *model.CommonDescription) error {
+	return global.DB.Create(data).Error
+}
+func (s *SettingRepo) UpdateDescription(id string, val map[string]interface{}) error {
+	return global.DB.Model(&model.CommonDescription{}).Where("id = ?", id).Updates(val).Error
+}
+func (s *SettingRepo) DelDescription(id string) error {
+	return global.DB.Where("id = ?", id).Delete(&model.CommonDescription{}).Error
+}
+func (s *SettingRepo) WithByDescriptionID(id string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("id = ?", id)
+	}
 }

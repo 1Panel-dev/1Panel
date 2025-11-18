@@ -15,6 +15,9 @@ type ImageInfo struct {
 	IsUsed    bool      `json:"isUsed"`
 	Tags      []string  `json:"tags"`
 	Size      int64     `json:"size"`
+
+	IsPinned    bool   `json:"isPinned"`
+	Description string `json:"description"`
 }
 
 type ImageLoad struct {

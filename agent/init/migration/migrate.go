@@ -52,6 +52,7 @@ func InitAgentDB() {
 		migrations.UpdateCronJob,
 		migrations.UpdateTensorrtLLM,
 		migrations.AddIptablesFilterRuleTable,
+		migrations.AddCommonDescription,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

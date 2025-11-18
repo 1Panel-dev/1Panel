@@ -71,6 +71,9 @@ export const getAgentSettingInfo = () => {
 export const getAgentSettingByKey = (key: string) => {
     return http.get<string>(`/settings/get/${key}`);
 };
+export const updateCommonDescription = (param: Setting.CommonDescription) => {
+    return http.post(`/settings/description/save`, param);
+};
 
 // core
 export const getSettingInfo = () => {

@@ -155,3 +155,24 @@ func (b *BaseApi) GetSettingByKey(c *gin.Context) {
 	value := settingService.GetSettingByKey(key)
 	helper.SuccessWithData(c, value)
 }
+
+// @Tags System Setting
+// @Summary Save common description
+// @Accept json
+// @Param request body dto.CommonDescription true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /settings/description/save [post]
+func (b *BaseApi) SaveDescription(c *gin.Context) {
+	var req dto.CommonDescription
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	if err := settingService.SaveDescription(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}

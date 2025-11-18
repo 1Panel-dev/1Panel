@@ -36,15 +36,31 @@
                     :pagination-config="paginationConfig"
                     :data="data"
                     @sort-change="search"
+                    @cell-mouse-enter="showFavorite"
+                    @cell-mouse-leave="hideFavorite"
                     :columns="columns"
                     @search="search"
                     :heightDiff="300"
                 >
-                    <el-table-column label="ID" prop="id" width="140">
-                        <template #default="{ row }">
+                    <el-table-column label="ID" prop="id" width="180">
+                        <template #default="{ row, $index }">
                             <el-text type="primary" class="cursor-pointer" @click="onInspect(row.id)">
                                 {{ row.id.replaceAll('sha256:', '').substring(0, 12) }}
                             </el-text>
+                            <div class="float-right">
+                                <el-tooltip
+                                    :content="row.isPinned ? $t('website.cancelFavorite') : $t('website.favorite')"
+                                    v-if="row.isPinned || hoveredRowIndex === $index"
+                                >
+                                    <el-button
+                                        link
+                                        size="large"
+                                        :icon="row.isPinned ? 'StarFilled' : 'Star'"
+                                        type="warning"
+                                        @click="changePinned(row, true)"
+                                    />
+                                </el-tooltip>
+                            </div>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.status')" prop="isUsed" width="100" sortable>
@@ -128,6 +144,8 @@ import { searchImage, listImageRepo, imageRemove, inspect, containerPrune } from
 import i18n from '@/lang';
 import { GlobalStore } from '@/store';
 import { ElMessageBox } from 'element-plus';
+import { updateCommonDescription } from '@/api/modules/setting';
+import { MsgSuccess } from '@/utils/message';
 const globalStore = GlobalStore();
 
 const taskLogRef = ref();
@@ -154,6 +172,8 @@ const columns = ref([]);
 
 const isActive = ref(false);
 const isExist = ref(false);
+
+const hoveredRowIndex = ref(-1);
 
 const myDetail = ref();
 const dialogPullRef = ref();
@@ -205,6 +225,29 @@ const onDelete = (row: Container.ImageInfo) => {
         ]),
         api: imageRemove,
         params: { names: names },
+    });
+};
+
+const showFavorite = (row: any) => {
+    hoveredRowIndex.value = data.value.findIndex((item) => item === row);
+};
+const hideFavorite = () => {
+    hoveredRowIndex.value = -1;
+};
+const changePinned = (row: any, isPinned: boolean) => {
+    let params = {
+        id: row.id.replaceAll('sha256:', ''),
+        type: 'image',
+        detailType: '',
+        isPinned: !row.isPinned,
+        description: row.description || '',
+    };
+    if (isPinned) {
+        params.isPinned = !row.isPinned;
+    }
+    updateCommonDescription(params).then(() => {
+        search();
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
     });
 };
 

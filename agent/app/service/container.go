@@ -96,10 +96,6 @@ func NewIContainerService() IContainerService {
 }
 
 func (u *ContainerService) Page(req dto.PageContainer) (int64, interface{}, error) {
-	var (
-		records []container.Summary
-		list    []container.Summary
-	)
 	client, err := docker.NewDockerClient()
 	if err != nil {
 		return 0, nil, err
@@ -117,114 +113,32 @@ func (u *ContainerService) Page(req dto.PageContainer) (int64, interface{}, erro
 	if err != nil {
 		return 0, nil, err
 	}
-	if req.ExcludeAppStore {
-		for _, item := range containers {
-			if created, ok := item.Labels[composeCreatedBy]; ok && created == "Apps" {
-				continue
-			}
-			list = append(list, item)
-		}
-	} else {
-		list = containers
-	}
+	records := searchWithFilter(req, containers)
 
-	if len(req.Name) != 0 {
-		length, count := len(list), 0
-		for count < length {
-			if !strings.Contains(list[count].Names[0][1:], req.Name) && !strings.Contains(list[count].Image, req.Name) {
-				list = append(list[:count], list[(count+1):]...)
-				length--
-			} else {
-				count++
-			}
-		}
-	}
-	if req.State != "all" {
-		length, count := len(list), 0
-		for count < length {
-			if list[count].State != req.State {
-				list = append(list[:count], list[(count+1):]...)
-				length--
-			} else {
-				count++
-			}
-		}
-	}
-	switch req.OrderBy {
-	case "name":
-		sort.Slice(list, func(i, j int) bool {
-			if req.Order == constant.OrderAsc {
-				return list[i].Names[0][1:] < list[j].Names[0][1:]
-			}
-			return list[i].Names[0][1:] > list[j].Names[0][1:]
-		})
-	default:
-		sort.Slice(list, func(i, j int) bool {
-			if req.Order == constant.OrderAsc {
-				return list[i].Created < list[j].Created
-			}
-			return list[i].Created > list[j].Created
-		})
-	}
-
-	total, start, end := len(list), (req.Page-1)*req.PageSize, req.Page*req.PageSize
+	var backData []dto.ContainerInfo
+	total, start, end := len(records), (req.Page-1)*req.PageSize, req.Page*req.PageSize
 	if start > total {
-		records = make([]container.Summary, 0)
+		backData = make([]dto.ContainerInfo, 0)
 	} else {
 		if end >= total {
 			end = total
 		}
-		records = list[start:end]
+		backData = records[start:end]
 	}
 
-	backDatas := make([]dto.ContainerInfo, len(records))
-	for i := 0; i < len(records); i++ {
-		item := records[i]
-		IsFromCompose := false
-		if _, ok := item.Labels[composeProjectLabel]; ok {
-			IsFromCompose = true
-		}
-		IsFromApp := false
-		if created, ok := item.Labels[composeCreatedBy]; ok && created == "Apps" {
-			IsFromApp = true
-		}
-
-		exposePorts := transPortToStr(records[i].Ports)
-		info := dto.ContainerInfo{
-			ContainerID:   item.ID,
-			CreateTime:    time.Unix(item.Created, 0).Format(constant.DateTimeLayout),
-			Name:          item.Names[0][1:],
-			ImageId:       strings.Split(item.ImageID, ":")[1],
-			ImageName:     item.Image,
-			State:         item.State,
-			RunTime:       item.Status,
-			Ports:         exposePorts,
-			IsFromApp:     IsFromApp,
-			IsFromCompose: IsFromCompose,
-			SizeRw:        item.SizeRw,
-			SizeRootFs:    item.SizeRootFs,
-		}
-		install, _ := appInstallRepo.GetFirst(appInstallRepo.WithContainerName(info.Name))
+	for i := 0; i < len(backData); i++ {
+		install, _ := appInstallRepo.GetFirst(appInstallRepo.WithContainerName(backData[i].Name))
 		if install.ID > 0 {
-			info.AppInstallName = install.Name
-			info.AppName = install.App.Name
+			backData[i].AppInstallName = install.Name
+			backData[i].AppName = install.App.Name
 			websites, _ := websiteRepo.GetBy(websiteRepo.WithAppInstallId(install.ID))
 			for _, website := range websites {
-				info.Websites = append(info.Websites, website.PrimaryDomain)
+				backData[i].Websites = append(backData[i].Websites, website.PrimaryDomain)
 			}
-		}
-		backDatas[i] = info
-		if item.NetworkSettings != nil && len(item.NetworkSettings.Networks) > 0 {
-			networks := make([]string, 0, len(item.NetworkSettings.Networks))
-			for key := range item.NetworkSettings.Networks {
-				networks = append(networks, item.NetworkSettings.Networks[key].IPAddress)
-			}
-			sort.Strings(networks)
-			backDatas[i].Network = networks
 		}
 	}
 
-	return int64(total), backDatas, nil
+	return int64(total), backData, nil
 }
 
 func (u *ContainerService) List() []dto.ContainerOptions {
@@ -1770,4 +1684,111 @@ func loadContainerPortForInfo(itemPorts []container.Port) []dto.PortHelper {
 		exposedPorts = append(exposedPorts, val)
 	}
 	return exposedPorts
+}
+
+func searchWithFilter(req dto.PageContainer, containers []container.Summary) []dto.ContainerInfo {
+	var (
+		records []dto.ContainerInfo
+		list    []container.Summary
+	)
+
+	if req.ExcludeAppStore {
+		for _, item := range containers {
+			if created, ok := item.Labels[composeCreatedBy]; ok && created == "Apps" {
+				continue
+			}
+			list = append(list, item)
+		}
+	} else {
+		list = containers
+	}
+
+	if len(req.Name) != 0 {
+		length, count := len(list), 0
+		for count < length {
+			if !strings.Contains(list[count].Names[0][1:], req.Name) && !strings.Contains(list[count].Image, req.Name) {
+				list = append(list[:count], list[(count+1):]...)
+				length--
+			} else {
+				count++
+			}
+		}
+	}
+	if req.State != "all" {
+		length, count := len(list), 0
+		for count < length {
+			if list[count].State != req.State {
+				list = append(list[:count], list[(count+1):]...)
+				length--
+			} else {
+				count++
+			}
+		}
+	}
+	switch req.OrderBy {
+	case "name":
+		sort.Slice(list, func(i, j int) bool {
+			if req.Order == constant.OrderAsc {
+				return list[i].Names[0][1:] < list[j].Names[0][1:]
+			}
+			return list[i].Names[0][1:] > list[j].Names[0][1:]
+		})
+	default:
+		sort.Slice(list, func(i, j int) bool {
+			if req.Order == constant.OrderAsc {
+				return list[i].Created < list[j].Created
+			}
+			return list[i].Created > list[j].Created
+		})
+	}
+	for _, item := range list {
+		IsFromCompose := false
+		if _, ok := item.Labels[composeProjectLabel]; ok {
+			IsFromCompose = true
+		}
+		IsFromApp := false
+		if created, ok := item.Labels[composeCreatedBy]; ok && created == "Apps" {
+			IsFromApp = true
+		}
+		exposePorts := transPortToStr(item.Ports)
+		info := dto.ContainerInfo{
+			ContainerID:   item.ID,
+			CreateTime:    time.Unix(item.Created, 0).Format(constant.DateTimeLayout),
+			Name:          item.Names[0][1:],
+			Ports:         exposePorts,
+			ImageId:       strings.Split(item.ImageID, ":")[1],
+			ImageName:     item.Image,
+			State:         item.State,
+			RunTime:       item.Status,
+			SizeRw:        item.SizeRw,
+			SizeRootFs:    item.SizeRootFs,
+			IsFromApp:     IsFromApp,
+			IsFromCompose: IsFromCompose,
+		}
+		if item.NetworkSettings != nil && len(item.NetworkSettings.Networks) > 0 {
+			networks := make([]string, 0, len(item.NetworkSettings.Networks))
+			for key := range item.NetworkSettings.Networks {
+				networks = append(networks, item.NetworkSettings.Networks[key].IPAddress)
+			}
+			sort.Strings(networks)
+			info.Network = networks
+		}
+		records = append(records, info)
+	}
+	dscriptions, _ := settingRepo.GetDescriptionList(repo.WithByType("container"))
+	for i := 0; i < len(records); i++ {
+		for _, desc := range dscriptions {
+			if desc.ID == records[i].ContainerID {
+				records[i].Description = desc.Description
+				records[i].IsPinned = desc.IsPinned
+			}
+		}
+	}
+	sort.Slice(records, func(i, j int) bool {
+		if records[i].IsPinned == records[j].IsPinned {
+			return list[i].Created > list[j].Created
+		}
+		return records[i].IsPinned
+	})
+	return records
 }

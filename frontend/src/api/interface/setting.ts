@@ -128,6 +128,13 @@ export namespace Setting {
         code: string;
         interval: string;
     }
+    export interface CommonDescription {
+        id: string;
+        type: string;
+        detailType: string;
+        isPinned: boolean;
+        description: string;
+    }
 
     export interface SnapshotCreate {
         id: number;
