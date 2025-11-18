@@ -10,7 +10,6 @@
             <template #main>
                 <el-empty v-if="!composeName" :description="$t('commons.msg.noneData')" />
                 <div v-else class="w-full">
-                    <!-- Status Bar - Firewall Style -->
                     <div class="app-status mb-4">
                         <el-card>
                             <div class="flex w-full flex-col gap-4 md:flex-row">
@@ -69,7 +68,6 @@
                         </el-card>
                     </div>
 
-                    <!-- Container Table -->
                     <el-card v-if="composeInfo && composeContainers.length > 0" class="mb-4" shadow="never">
                         <template #header>
                             <div class="flex flex-wrap items-center justify-between gap-3">
@@ -235,7 +233,6 @@
                             </div>
                         </el-card>
 
-                        <!-- Log Card -->
                         <el-card class="h-full compose-detail-log" shadow="never">
                             <template #header>
                                 <div class="flex items-center justify-between gap-3">
@@ -375,22 +372,17 @@ const loadInitialDetail = async () => {
     detailLoading.value = true;
     shouldLoadLog.value = false;
     try {
-        // Step 1: 先加载编排文件内容
         await loadComposeContent();
 
-        // Step 2: 加载编排信息
         await new Promise((resolve) => setTimeout(resolve, 100));
         await loadComposeInfo();
 
-        // Step 3: 主要内容已加载完成，取消 loading 状态
         detailLoading.value = false;
 
-        // Step 4: 延迟后加载日志
         await new Promise((resolve) => setTimeout(resolve, 100));
         shouldLoadLog.value = true;
         logKey.value++;
 
-        // Step 5: 加载容器统计数据
         await new Promise((resolve) => setTimeout(resolve, 100));
         await loadContainerStats();
     } catch (error) {
@@ -405,13 +397,10 @@ const refreshDetail = async () => {
     }
     detailLoading.value = true;
     try {
-        // 只刷新容器信息，不重新加载编排文件和日志
         await loadComposeInfo();
 
-        // 主要内容已加载完成，取消 loading 状态
         detailLoading.value = false;
 
-        // 最后加载容器统计数据（最耗时的操作）
         await new Promise((resolve) => setTimeout(resolve, 300));
         await loadContainerStats();
     } catch (error) {
@@ -468,7 +457,6 @@ const onSubmitEdit = async () => {
     await composeUpdate(param)
         .then(async () => {
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            // 保存后重新加载编排文件内容
             await loadComposeContent();
             refreshDetail();
         })
