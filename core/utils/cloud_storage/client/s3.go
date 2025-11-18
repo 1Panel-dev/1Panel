@@ -44,7 +44,7 @@ func NewS3Client(vars map[string]interface{}) (*s3Client, error) {
 	client := s3.NewFromConfig(cfg, func(o *s3.Options) {
 		o.UsePathStyle = mode == "path"
 		if endpoint != "" {
-			o.EndpointResolver = s3.EndpointResolverFromURL(normalizeEndpoint(endpoint))
+			o.BaseEndpoint = aws.String(normalizeEndpoint(endpoint))
 		}
 	})
 	return &s3Client{scType: scType, bucket: bucket, client: client}, nil
