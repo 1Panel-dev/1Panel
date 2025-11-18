@@ -33,11 +33,11 @@
                             <div
                                 v-for="item in data"
                                 :key="item.name"
-                                class="compose-list-item p-3 mb-2 rounded cursor-pointer border"
+                                class="p-3 mb-2 rounded cursor-pointer border transition-colors duration-200"
                                 :class="[
                                     selectedCompose?.name === item.name
-                                        ? 'border-primary compose-list-item--selected'
-                                        : 'border-transparent compose-list-item--default',
+                                        ? 'bg-blue-50 border-blue-500 dark:bg-blue-500/30 dark:border-blue-500/80'
+                                        : 'border-transparent hover:bg-slate-50 dark:hover:bg-white/[0.08]',
                                 ]"
                                 @click="loadDetail(item)"
                             >
@@ -642,26 +642,3 @@ const openComposeLogDrawer = () => {
     });
 };
 </script>
-
-<style scoped lang="scss">
-.compose-list-item {
-    transition: background-color 0.2s ease;
-}
-
-.compose-list-item--selected {
-    background-color: #eff6ff;
-}
-
-:global(.dark) .compose-list-item--selected {
-    background-color: rgba(59, 130, 246, 0.3);
-    border-color: rgba(59, 130, 246, 0.8);
-}
-
-.compose-list-item--default:hover {
-    background-color: #f8fafc;
-}
-
-:global(.dark) .compose-list-item--default:hover {
-    background-color: rgba(255, 255, 255, 0.08);
-}
-</style>
