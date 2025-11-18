@@ -239,6 +239,7 @@ ErrUserFindErr: 'Поиск пользователя {{ .name }} не удалс
 #cronjob
 CutWebsiteLogSuccess: 'Журнал веб-сайта {{ .name }} успешно вырезан, путь к резервной копии {{ .path }}'
 HandleShell: 'Выполнить скрипт {{ .name }}'
+HandleCurl: "Доступ к URL {{ .name }}"
 HandleNtpSync: 'Синхронизация системного времени'
 HandleSystemClean: 'Очистка системного кэша'
 SystemLog: 'Системный лог'

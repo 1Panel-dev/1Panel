@@ -1057,6 +1057,7 @@ const message = {
         default_download_path: '預設下載網址',
         saveLocal: '同時保留本機備份（和雲端儲存保留份數一致）',
         url: 'URL 地址',
+        urlHelper: '請輸入正確的 URL 地址',
         targetHelper: '備份帳號可在面板設定中維護',
         ignoreApp: '排除應用',
         withImage: '備份所有應用鏡像',

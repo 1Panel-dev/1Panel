@@ -239,6 +239,7 @@ ErrUserFindErr: '사용자 {{ .name }} 검색에 실패했습니다 {{ .err }}'
 #크론잡
 CutWebsiteLogSuccess: '{{ .name }} 웹사이트 로그가 성공적으로 잘렸습니다. 백업 경로 {{ .path }}'
 HandleShell: '스크립트 {{ .name }} 실행'
+HandleCurl: "URL {{ .name }} 접근"
 HandleNtpSync: '시스템 시간 동기화'
 HandleSystemClean: '시스템 캐시 정리'
 SystemLog: '시스템 로그'

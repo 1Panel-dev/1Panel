@@ -239,6 +239,7 @@ ErrUserFindErr: 'Falha na pesquisa do usuário {{ .name }} {{ .err }}'
 #cronjob
 CutWebsiteLogSuccess: '{{ .name }} registro do site cortado com sucesso, caminho de backup {{ .path }}'
 HandleShell: 'Executar script {{ .name }}'
+HandleCurl: "Acessar URL {{ .name }}"
 HandleNtpSync: 'Sincronização de hora do sistema'
 HandleSystemClean: 'Limpeza de cache do sistema'
 SystemLog: 'Log do Sistema'

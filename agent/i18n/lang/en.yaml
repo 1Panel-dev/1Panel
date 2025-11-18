@@ -239,6 +239,7 @@ ErrUserFindErr: 'User {{ .name }} search failed {{ .err }}'
 #cronjob
 CutWebsiteLogSuccess: '{{ .name }} website log cut successfully, backup path {{ .path }}'
 HandleShell: 'Execute script {{ .name }}'
+HandleCurl: "Access URL {{ .name }}"
 HandleNtpSync: 'System time synchronization'
 HandleSystemClean: 'System cache cleanup'
 SystemLog: 'System Log'

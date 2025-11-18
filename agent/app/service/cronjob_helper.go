@@ -195,10 +195,17 @@ func (u *CronjobService) handleShell(cronjob model.Cronjob, taskItem *task.Task)
 }
 
 func (u *CronjobService) handleCurl(cronjob model.Cronjob, taskItem *task.Task) {
-	taskItem.AddSubTaskWithOps(i18n.GetWithName("HandleShell", cronjob.Name), func(t *task.Task) error {
-		cmdMgr := cmd.NewCommandMgr(cmd.WithTask(*taskItem))
-		return cmdMgr.Run("curl", cronjob.URL)
-	}, nil, int(cronjob.RetryTimes), time.Duration(cronjob.Timeout)*time.Second)
+	urls := strings.Split(cronjob.URL, ",")
+	for _, url := range urls {
+		if len(strings.TrimSpace(url)) == 0 {
+			continue
+		}
+		taskItem.AddSubTaskWithOps(i18n.GetWithName("HandleCurl", url), func(t *task.Task) error {
+			taskItem.LogStart(i18n.GetWithName("HandleCurl", url))
+			cmdMgr := cmd.NewCommandMgr(cmd.WithTask(*taskItem))
+			return cmdMgr.Run("curl", url)
+		}, nil, int(cronjob.RetryTimes), time.Duration(cronjob.Timeout)*time.Second)
+	}
 }
 
 func (u *CronjobService) handleNtpSync(cronjob model.Cronjob, taskItem *task.Task) {

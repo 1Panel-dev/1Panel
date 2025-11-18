@@ -1121,6 +1121,7 @@ const message = {
         default_download_path: 'Enlace de descarga predeterminado',
         saveLocal: 'Retener respaldos locales (igual al número de copias en la nube)',
         url: 'Dirección URL',
+        urlHelper: 'Por favor ingrese una dirección URL válida',
         targetHelper: 'Las cuentas de respaldo se gestionan en los ajustes del panel.',
         withImageHelper:
             'Respalda imágenes de la tienda de aplicaciones, pero esto aumentará el tamaño del archivo de la instantánea.',

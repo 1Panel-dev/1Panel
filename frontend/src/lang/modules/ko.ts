@@ -1076,6 +1076,7 @@ const message = {
         default_download_path: '기본 다운로드 링크',
         saveLocal: '로컬 백업 보관 (클라우드 저장소 복사본 수와 동일)',
         url: 'URL 주소',
+        urlHelper: '올바른 URL 주소를 입력해 주세요',
         targetHelper: '백업 계정은 패널 설정에서 관리됩니다.',
         withImageHelper: '앱 스토어 이미지를 백업하지만 스냅샷 파일 크기가 증가합니다.',
         ignoreApp: '앱 제외',

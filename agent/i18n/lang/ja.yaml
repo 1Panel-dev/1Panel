@@ -238,6 +238,7 @@ ErrUserFindErr: 'ユーザー {{ .name }} の検索に失敗しました {{ .err
 #cronjob
 CutWebsiteLogSuccess: '{{ .name }} ウェブサイトのログが正常にカットされました。バックアップ パス {{ .path }}'
 HandleShell: 'スクリプト {{ .name }} を実行します'
+HandleCurl: "URL {{ .name }} にアクセス"
 HandleNtpSync: 'システム時刻の同期'
 HandleSystemClean: 'システム キャッシュのクリーンアップ'
 SystemLog: 'システムログ'

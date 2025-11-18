@@ -238,6 +238,7 @@ ErrUserFindErr: '使用者{{ .name }} 尋找失敗{{ .err }}'
 #cronjob
 CutWebsiteLogSuccess: '{{ .name }} 網站日誌切割成功，備份路徑{{ .path }}'
 HandleShell: '執行腳本{{ .name }}'
+HandleCurl: "存取 URL {{ .name }}"
 HandleNtpSync: '系統時間同步'
 HandleSystemClean: '系統快取清理'
 SystemLog: '系統日誌'

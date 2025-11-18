@@ -1134,6 +1134,7 @@ const message = {
         default_download_path: 'Varsayılan indirme bağlantısı',
         saveLocal: 'Yerel yedeklemeleri sakla (bulut depolama kopyalarının sayısı ile aynı)',
         url: 'URL Adresi',
+        urlHelper: 'Lütfen geçerli bir URL adresi girin',
         targetHelper: 'Yedekleme hesapları panel ayarlarında sürdürülür.',
         withImageHelper: 'Uygulama mağazası imajlarını yedekle, ancak bu anlık görüntü dosya boyutunu artıracaktır.',
         ignoreApp: 'Uygulamaları hariç tut',

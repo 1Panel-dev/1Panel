@@ -239,6 +239,7 @@ ErrUserFindErr: 'Pengguna {{ .name }} carian gagal {{ .err }}'
 #cronjob
 CutWebsiteLogSuccess: '{{ .name }} log tapak web berjaya dipotong, laluan sandaran {{ .path }}'
 HandleShell: 'Laksanakan skrip {{ .name }}'
+HandleCurl: "Akses URL {{ .name }}"
 HandleNtpSync: 'Penyegerakan masa sistem'
 HandleSystemClean: 'Pembersihan cache sistem'
 SystemLog: 'Log Sistem'

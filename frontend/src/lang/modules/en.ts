@@ -1119,6 +1119,7 @@ const message = {
         default_download_path: 'Default download link',
         saveLocal: 'Retain local backups (the same as the number of cloud storage copies)',
         url: 'URL Address',
+        urlHelper: 'Please enter a valid URL address',
         targetHelper: 'Backup accounts are maintained in panel settings.',
         withImageHelper: 'Backup app store images, but this will increase the snapshot file size.',
         ignoreApp: 'Exclude apps',
