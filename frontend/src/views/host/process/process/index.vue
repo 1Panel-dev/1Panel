@@ -168,6 +168,7 @@ const columns = ref([
         title: i18n.global.t('process.numConnections'),
         dataKey: 'numConnections',
         width: 100,
+        sortable: true,
     },
     {
         key: 'status',

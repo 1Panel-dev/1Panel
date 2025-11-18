@@ -206,6 +206,10 @@ func getProcessData(processConfig PsProcessConfig) (res []byte, err error) {
 			procData.RssValue = 0
 		}
 
+		if connections, err := proc.Connections(); err == nil {
+			procData.NumConnections = len(connections)
+		}
+
 		resultMutex.Lock()
 		result = append(result, procData)
 		resultMutex.Unlock()
