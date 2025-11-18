@@ -82,7 +82,7 @@ func handlePostgresqlBackup(db DatabaseHelper, parentTask *task.Task, recordID u
 		}
 	}
 
-	itemHandler := func() error { return doPostgresqlgBackup(db, targetDir, fileName, secret) }
+	itemHandler := func() error { return doPostgresqlgBackup(db, targetDir, fileName, secret, backupTask) }
 	if parentTask != nil {
 		return itemHandler()
 	}
@@ -189,17 +189,19 @@ func handlePostgresqlRecover(req dto.CommonRecover, parentTask *task.Task, isRol
 	return nil
 }
 
-func doPostgresqlgBackup(db DatabaseHelper, targetDir, fileName, secret string) error {
+func doPostgresqlgBackup(db DatabaseHelper, targetDir, fileName, secret string, task *task.Task) error {
 	cli, err := LoadPostgresqlClientByFrom(db.Database)
 	if err != nil {
 		return err
 	}
 	defer cli.Close()
 	backupInfo := pgclient.BackupInfo{
+		Database:  db.Database,
 		Name:      db.Name,
 		TargetDir: targetDir,
 		FileName:  fileName,
 
+		Task:    task,
 		Timeout: 300,
 	}
 	if err := cli.Backup(backupInfo); err != nil {

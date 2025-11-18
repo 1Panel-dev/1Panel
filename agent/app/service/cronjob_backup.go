@@ -178,7 +178,7 @@ func (u *CronjobService) handleDatabase(cronjob model.Cronjob, startTime time.Ti
 					}
 				}
 			} else {
-				if err := doPostgresqlgBackup(dbInfo, backupDir, record.FileName, cronjob.Secret); err != nil {
+				if err := doPostgresqlgBackup(dbInfo, backupDir, record.FileName, cronjob.Secret, taskItem); err != nil {
 					if retry < int(cronjob.RetryTimes) || !cronjob.IgnoreErr {
 						retry++
 						return err

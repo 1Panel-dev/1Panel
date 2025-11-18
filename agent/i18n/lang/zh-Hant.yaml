@@ -196,6 +196,8 @@ ErrDatabaseIsExist: '目前資料庫已存在，請重新輸入'
 ErrExecTimeOut: 'SQL 執行逾時，請檢查資料庫'
 ErrRemoteExist: '遠端資料庫已存在該名稱，請修改後重試'
 ErrLocalExist: '本機資料庫已存在該名稱，請修改後重試'
+RemoteBackup: "備份遠端資料庫需要先使用映像 {{ .name }} 啟動本機容器資料庫服務，請稍候..."
+RemoteRecover: "恢復遠端資料庫需要先使用映像 {{ .name }} 啟動本機容器資料庫服務，請稍候..."
 
 #redis
 ErrTypeOfRedis: '復原檔案類型與目前持久化方式不符，請修改後重試'
