@@ -9,7 +9,7 @@
         <LayoutContent v-if="isExist" backName="Compose" :title="composeTitle" :class="{ mask: !isActive }">
             <template #main>
                 <el-empty v-if="!composeName" :description="$t('commons.msg.noneData')" />
-                <div v-else class="compose-detail-container">
+                <div v-else class="w-full">
                     <!-- Status Bar - Firewall Style -->
                     <div class="app-status mb-4">
                         <el-card>
@@ -69,7 +69,7 @@
                         </el-card>
                     </div>
 
-                    <!-- Container Status List -->
+                    <!-- Container Table -->
                     <el-card v-if="composeInfo && composeContainers.length > 0" class="mb-4" shadow="never">
                         <template #header>
                             <div class="flex flex-wrap items-center justify-between gap-3">
@@ -79,30 +79,118 @@
                                 </span>
                             </div>
                         </template>
-                        <div class="compose-container-list-horizontal">
-                            <div
-                                v-for="item in composeContainers"
-                                :key="item.containerID || item.name"
-                                class="compose-container-item-horizontal"
-                                @click="onInspectContainer(item)"
-                                :title="$t('commons.button.view')"
+                        <ComplexTable :data="tableData" :heightDiff="400">
+                            <el-table-column
+                                :label="$t('commons.table.name')"
+                                min-width="150"
+                                prop="name"
+                                show-overflow-tooltip
                             >
-                                <div class="container-name">
-                                    {{ item.name }}
-                                </div>
-                                <Status :status="item.state" />
-                            </div>
-                        </div>
+                                <template #default="{ row }">
+                                    <el-text type="primary" class="cursor-pointer" @click="onInspectContainer(row)">
+                                        {{ row.name }}
+                                    </el-text>
+                                </template>
+                            </el-table-column>
+                            <el-table-column :label="$t('commons.table.status')" min-width="100" prop="state">
+                                <template #default="{ row }">
+                                    <Status :key="row.state" :status="row.state"></Status>
+                                </template>
+                            </el-table-column>
+                            <el-table-column
+                                :label="$t('container.source')"
+                                show-overflow-tooltip
+                                prop="resource"
+                                min-width="120"
+                            >
+                                <template #default="{ row }">
+                                    <div v-if="row.hasLoad" class="flex items-center">
+                                        <div class="text-xs">
+                                            <div>CPU: {{ row.cpuPercent.toFixed(2) }}%</div>
+                                            <div class="text-xs">
+                                                {{ $t('monitor.memory') }}: {{ row.memoryPercent.toFixed(2) }}%
+                                            </div>
+                                        </div>
+                                        <el-popover placement="right" width="500px" trigger="hover">
+                                            <template #reference>
+                                                <el-icon
+                                                    class="cursor-pointer text-gray-500 hover:text-primary ml-1"
+                                                    :size="16"
+                                                >
+                                                    <Histogram />
+                                                </el-icon>
+                                            </template>
+                                            <template #default>
+                                                <el-descriptions direction="vertical" border :column="3" size="small">
+                                                    <el-descriptions-item :label="$t('container.cpuUsage')">
+                                                        {{ computeCPU(row.cpuTotalUsage) }}
+                                                    </el-descriptions-item>
+                                                    <el-descriptions-item :label="$t('container.cpuTotal')">
+                                                        {{ computeCPU(row.systemUsage) }}
+                                                    </el-descriptions-item>
+                                                    <el-descriptions-item :label="$t('container.core')">
+                                                        {{ row.percpuUsage }}
+                                                    </el-descriptions-item>
+
+                                                    <el-descriptions-item :label="$t('container.memUsage')">
+                                                        {{ computeSizeForDocker(row.memoryUsage) }}
+                                                    </el-descriptions-item>
+                                                    <el-descriptions-item :label="$t('container.memCache')">
+                                                        {{ computeSizeForDocker(row.memoryCache) }}
+                                                    </el-descriptions-item>
+                                                    <el-descriptions-item :label="$t('container.memTotal')">
+                                                        {{ computeSizeForDocker(row.memoryLimit) }}
+                                                    </el-descriptions-item>
+
+                                                    <el-descriptions-item>
+                                                        <template #label>
+                                                            {{ $t('container.sizeRw') }}
+                                                            <el-tooltip :content="$t('container.sizeRwHelper')">
+                                                                <el-icon class="icon-item"><InfoFilled /></el-icon>
+                                                            </el-tooltip>
+                                                        </template>
+                                                        {{ computeSize2(row.sizeRw) }}
+                                                    </el-descriptions-item>
+                                                    <el-descriptions-item :label="$t('container.sizeRootFs')">
+                                                        <template #label>
+                                                            {{ $t('container.sizeRootFs') }}
+                                                            <el-tooltip :content="$t('container.sizeRootFsHelper')">
+                                                                <el-icon class="icon-item"><InfoFilled /></el-icon>
+                                                            </el-tooltip>
+                                                        </template>
+                                                        {{ computeSize2(row.sizeRootFs) }}
+                                                    </el-descriptions-item>
+                                                </el-descriptions>
+                                            </template>
+                                        </el-popover>
+                                    </div>
+                                    <div v-if="!row.hasLoad">
+                                        <el-button link loading></el-button>
+                                    </div>
+                                </template>
+                            </el-table-column>
+                            <el-table-column :label="$t('commons.table.operate')" width="200px" fixed="right">
+                                <template #default="{ row }">
+                                    <el-button type="primary" link @click="onOpenTerminal(row)">
+                                        {{ $t('menu.terminal') }}
+                                    </el-button>
+                                    <el-divider direction="vertical" />
+                                    <el-button type="primary" link @click="onOpenLog(row)">
+                                        {{ $t('commons.button.log') }}
+                                    </el-button>
+                                </template>
+                            </el-table-column>
+                        </ComplexTable>
                     </el-card>
 
-                    <div class="compose-detail-grid">
-                        <el-card class="compose-detail-card compose-detail-editor" shadow="never">
+                    <div class="grid min-h-[600px] grid-cols-1 gap-4 xl:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
+                        <el-card class="h-full flex flex-col compose-detail-editor" shadow="never">
                             <template #header>
                                 <div class="font-medium">
                                     {{ $t('container.composeTemplate') }}
                                 </div>
                             </template>
-                            <div class="compose-editor-body">
+                            <div class="flex-1">
                                 <el-form label-position="top" class="flex h-full flex-col" @submit.prevent>
                                     <el-form-item>
                                         <CodemirrorPro
@@ -148,15 +236,15 @@
                         </el-card>
 
                         <!-- Log Card -->
-                        <el-card class="compose-detail-card compose-detail-log" shadow="never">
+                        <el-card class="h-full compose-detail-log" shadow="never">
                             <template #header>
                                 <div class="flex items-center justify-between gap-3">
                                     <span>{{ $t('commons.button.log') }}</span>
                                 </div>
                             </template>
-                            <div class="compose-log-body">
+                            <div class="flex flex-1 flex-col">
                                 <ContainerLog
-                                    v-if="composePath"
+                                    v-if="composePath && shouldLoadLog"
                                     :key="logKey"
                                     :compose="composePath"
                                     :resource="composeName"
@@ -171,6 +259,8 @@
         </LayoutContent>
 
         <ContainerInspectDialog ref="containerInspectRef" />
+        <TerminalDialog ref="terminalDialogRef" />
+        <ContainerLogDialog ref="containerLogDialogRef" :highlightDiff="210" />
     </div>
 </template>
 
@@ -181,11 +271,24 @@ import NoSuchService from '@/components/layout-content/no-such-service.vue';
 import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 import ContainerLog from '@/components/log/container/index.vue';
 import ContainerInspectDialog from '@/views/container/container/inspect/index.vue';
-import { composeOperator, composeUpdate, inspect, loadDockerStatus, searchCompose } from '@/api/modules/container';
+import ComplexTable from '@/components/complex-table/index.vue';
+import Status from '@/components/status/index.vue';
+import TerminalDialog from '@/views/container/container/terminal/index.vue';
+import ContainerLogDialog from '@/components/log/container-drawer/index.vue';
+import {
+    composeOperator,
+    composeUpdate,
+    containerListStats,
+    inspect,
+    loadDockerStatus,
+    searchCompose,
+} from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
 import { routerToFileWithPath, routerToName } from '@/utils/router';
 import { MsgError, MsgSuccess } from '@/utils/message';
+import { computeCPU, computeSize2, computeSizeForDocker } from '@/utils/util';
 import i18n from '@/lang';
+import { Histogram } from '@element-plus/icons-vue';
 
 const route = useRoute();
 
@@ -204,6 +307,10 @@ const currentOperation = ref('');
 const logKey = ref(0);
 const logHeightDiff = 220;
 const containerInspectRef = ref();
+const containerStats = ref<any[]>([]);
+const terminalDialogRef = ref();
+const containerLogDialogRef = ref();
+const shouldLoadLog = ref(false);
 
 const pageLoading = computed(() => dockerLoading.value || detailLoading.value);
 const composeTitle = computed(() => {
@@ -221,6 +328,26 @@ const disableOperate = computed(
     () => !composeInfo.value || !composePath.value || !isActive.value || !isExist.value || operateLoading.value,
 );
 
+const tableData = computed(() => {
+    return composeContainers.value.map((container) => {
+        const stats = containerStats.value.find((s) => s.containerID === container.containerID);
+        return {
+            ...container,
+            hasLoad: !!stats,
+            cpuPercent: stats?.cpuPercent || 0,
+            memoryPercent: stats?.memoryPercent || 0,
+            cpuTotalUsage: stats?.cpuTotalUsage || 0,
+            systemUsage: stats?.systemUsage || 0,
+            percpuUsage: stats?.percpuUsage || 0,
+            memoryCache: stats?.memoryCache || 0,
+            memoryUsage: stats?.memoryUsage || 0,
+            memoryLimit: stats?.memoryLimit || 0,
+            sizeRw: stats?.sizeRw || 0,
+            sizeRootFs: stats?.sizeRootFs || 0,
+        };
+    });
+});
+
 const syncRouteParams = () => {
     composeName.value = (route.query.name as string) || (route.params.name as string) || '';
 };
@@ -232,7 +359,7 @@ const loadStatus = async () => {
             isActive.value = res.data.isActive;
             isExist.value = res.data.isExist;
             dockerLoading.value = false;
-            refreshDetail();
+            loadInitialDetail();
         })
         .catch(() => {
             dockerLoading.value = false;
@@ -241,17 +368,55 @@ const loadStatus = async () => {
         });
 };
 
+const loadInitialDetail = async () => {
+    if (!composeName.value || !isActive.value || !isExist.value) {
+        return;
+    }
+    detailLoading.value = true;
+    shouldLoadLog.value = false;
+    try {
+        // Step 1: 先加载编排文件内容
+        await loadComposeContent();
+
+        // Step 2: 加载编排信息
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        await loadComposeInfo();
+
+        // Step 3: 主要内容已加载完成，取消 loading 状态
+        detailLoading.value = false;
+
+        // Step 4: 延迟后加载日志
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        shouldLoadLog.value = true;
+        logKey.value++;
+
+        // Step 5: 加载容器统计数据
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        await loadContainerStats();
+    } catch (error) {
+        detailLoading.value = false;
+        throw error;
+    }
+};
+
 const refreshDetail = async () => {
     if (!composeName.value || !isActive.value || !isExist.value) {
         return;
     }
     detailLoading.value = true;
     try {
+        // 只刷新容器信息，不重新加载编排文件和日志
         await loadComposeInfo();
-        await loadComposeContent();
-        logKey.value++;
-    } finally {
+
+        // 主要内容已加载完成，取消 loading 状态
         detailLoading.value = false;
+
+        // 最后加载容器统计数据（最耗时的操作）
+        await new Promise((resolve) => setTimeout(resolve, 300));
+        await loadContainerStats();
+    } catch (error) {
+        detailLoading.value = false;
+        throw error;
     }
 };
 
@@ -279,6 +444,15 @@ const loadComposeContent = async () => {
     composeContent.value = res.data;
 };
 
+const loadContainerStats = async () => {
+    try {
+        const res = await containerListStats();
+        containerStats.value = res.data || [];
+    } catch (error) {
+        containerStats.value = [];
+    }
+};
+
 const onSubmitEdit = async () => {
     if (!composeInfo.value || !composePath.value || disableEdit.value) {
         return;
@@ -292,8 +466,10 @@ const onSubmitEdit = async () => {
     };
     saving.value = true;
     await composeUpdate(param)
-        .then(() => {
+        .then(async () => {
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            // 保存后重新加载编排文件内容
+            await loadComposeContent();
             refreshDetail();
         })
         .finally(() => {
@@ -353,6 +529,14 @@ const onInspectContainer = async (item: any) => {
     containerInspectRef.value!.acceptParams({ data: res.data, ports: item.ports || [] });
 };
 
+const onOpenTerminal = (row: any) => {
+    terminalDialogRef.value?.acceptParams({ container: row.name });
+};
+
+const onOpenLog = (row: any) => {
+    containerLogDialogRef.value?.acceptParams({ container: row.name });
+};
+
 onMounted(() => {
     syncRouteParams();
     loadStatus();
@@ -362,41 +546,19 @@ watch(
     () => route.fullPath,
     () => {
         syncRouteParams();
-        refreshDetail();
+        loadInitialDetail();
     },
 );
-
-watch([isActive, isExist], () => {
-    refreshDetail();
-});
 </script>
 
 <style scoped lang="scss">
-.compose-detail-container {
-    width: 100%;
-}
-
 .app-status {
     :deep(.el-card__body) {
         padding: 16px 20px;
     }
 }
 
-.compose-detail-grid {
-    display: grid;
-    gap: 16px;
-    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-    min-height: 600px;
-}
-
-.compose-detail-card {
-    height: 100%;
-}
-
 .compose-detail-editor {
-    display: flex;
-    flex-direction: column;
-
     :deep(.el-card__body) {
         flex: 1;
         display: flex;
@@ -409,116 +571,6 @@ watch([isActive, isExist], () => {
         height: 100%;
         display: flex;
         flex-direction: column;
-    }
-}
-
-.compose-editor-body {
-    flex: 1;
-}
-
-.compose-container-summary {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 12px;
-    padding: 0 12px 12px;
-}
-
-.summary-card {
-    border: 1px solid var(--el-border-color-lighter);
-    border-radius: 8px;
-    padding: 12px;
-    background: var(--el-fill-color-light);
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
-.summary-label {
-    font-size: 12px;
-    color: var(--el-text-color-secondary);
-}
-
-.summary-value {
-    font-size: 20px;
-    font-weight: 600;
-    color: var(--el-text-color-primary);
-}
-
-.compose-container-list-horizontal {
-    display: flex;
-    gap: 12px;
-    overflow-x: auto;
-    padding: 12px;
-
-    &::-webkit-scrollbar {
-        height: 6px;
-    }
-
-    &::-webkit-scrollbar-thumb {
-        background-color: var(--el-border-color);
-        border-radius: 3px;
-
-        &:hover {
-            background-color: var(--el-border-color-dark);
-        }
-    }
-
-    &::-webkit-scrollbar-track {
-        background-color: var(--el-fill-color-lighter);
-        border-radius: 3px;
-    }
-}
-
-.compose-container-item-horizontal {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 14px;
-    background-color: var(--el-fill-color-light);
-    border-radius: 6px;
-    border: 1px solid var(--el-border-color-lighter);
-    min-width: 140px;
-    flex-shrink: 0;
-    transition: all 0.2s ease;
-    cursor: pointer;
-
-    &:hover {
-        border-color: var(--el-color-primary-light-5);
-        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
-        transform: translateY(-2px);
-        background-color: var(--el-color-primary-light-9);
-    }
-
-    &:active {
-        transform: translateY(0);
-    }
-
-    .container-name {
-        font-size: 13px;
-        font-weight: 500;
-        color: var(--el-text-color-primary);
-        text-align: center;
-        word-break: break-word;
-        max-width: 120px;
-        transition: color 0.2s ease;
-    }
-
-    &:hover .container-name {
-        color: var(--el-color-primary);
-    }
-}
-
-.compose-log-body {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-@media (max-width: 1280px) {
-    .compose-detail-grid {
-        grid-template-columns: 1fr;
-        min-height: auto;
     }
 }
 </style>
