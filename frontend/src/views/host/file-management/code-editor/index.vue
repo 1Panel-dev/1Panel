@@ -31,9 +31,11 @@
             <div ref="dialogForm" class="px-4 py-2 code-action">
                 <div class="flex justify-start items-center gap-x-4 card-action">
                     <el-text class="cursor-pointer" @click="handleReset">{{ $t('commons.button.reset') }}</el-text>
+                    <el-divider direction="vertical" class="!mx-0" />
                     <el-text class="cursor-pointer ml-0" @click="saveContent()">
                         {{ $t('commons.button.save') }}
                     </el-text>
+                    <el-divider direction="vertical" class="!mx-0" />
                     <el-dropdown trigger="click" max-height="300" placement="bottom-start" @command="changeTheme">
                         <span class="el-dropdown-link cursor-pointer">{{ $t('file.theme') }}</span>
                         <template #dropdown>
@@ -47,6 +49,7 @@
                             </el-dropdown-menu>
                         </template>
                     </el-dropdown>
+                    <el-divider direction="vertical" class="!mx-0" />
                     <el-dropdown trigger="click" max-height="300" placement="bottom-start" @command="changeLanguage">
                         <span class="el-dropdown-link cursor-pointer">{{ $t('file.language') }}</span>
                         <template #dropdown>
@@ -60,6 +63,7 @@
                             </el-dropdown-menu>
                         </template>
                     </el-dropdown>
+                    <el-divider direction="vertical" class="!mx-0" />
                     <el-dropdown trigger="click" max-height="300" placement="bottom-start" @command="changeEOL">
                         <span class="el-dropdown-link cursor-pointer">{{ $t('file.eol') }}</span>
                         <template #dropdown>
@@ -73,6 +77,7 @@
                             </el-dropdown-menu>
                         </template>
                     </el-dropdown>
+                    <el-divider direction="vertical" class="!mx-0" />
                     <el-dropdown trigger="click" max-height="300" placement="bottom-start">
                         <span class="el-dropdown-link cursor-pointer">{{ $t('file.setting') }}</span>
                         <template #dropdown>
@@ -100,7 +105,7 @@
                         class="monaco-editor sm:w-48 w-1/3 monaco-editor-background border-0 tree-container"
                         v-if="isShow"
                     >
-                        <div class="flex items-center justify-between pl-1 sm:pr-4 pr-1 py-0.5 h-6">
+                        <div class="flex items-center justify-between pl-1 pr-1 py-0.5 h-6">
                             <el-tooltip :content="$t('file.top')" placement="top">
                                 <el-text size="small" @click="getUpData()" class="cursor-pointer">
                                     <el-icon>
@@ -109,7 +114,7 @@
                                     <span class="sm:inline hidden pl-1">{{ $t('file.up') }}</span>
                                 </el-text>
                             </el-tooltip>
-
+                            <el-divider direction="vertical" class="!mx-0" />
                             <el-tooltip :content="$t('commons.button.refresh')" placement="top">
                                 <el-text size="small" @click="getRefresh(directoryPath)" class="cursor-pointer">
                                     <el-icon>
@@ -118,6 +123,25 @@
                                     <span class="sm:inline hidden pl-1">{{ $t('commons.button.refresh') }}</span>
                                 </el-text>
                             </el-tooltip>
+                            <el-divider direction="vertical" v-if="!mobile" class="!mx-0" />
+                            <el-dropdown @command="handleCreate" v-if="!mobile" trigger="click">
+                                <el-text size="small">
+                                    {{ $t('commons.button.create') }}
+                                    <el-icon><arrow-down /></el-icon>
+                                </el-text>
+                                <template #dropdown>
+                                    <el-dropdown-menu>
+                                        <el-dropdown-item command="dir" class="!px-2">
+                                            <svg-icon class="!w-5 !h-5" iconName="p-file-folder"></svg-icon>
+                                            {{ $t('file.dir') }}
+                                        </el-dropdown-item>
+                                        <el-dropdown-item command="file" class="!px-2">
+                                            <svg-icon class="!w-5 !h-5" iconName="p-file-normal"></svg-icon>
+                                            {{ $t('menu.files') }}
+                                        </el-dropdown-item>
+                                    </el-dropdown-menu>
+                                </template>
+                            </el-dropdown>
                         </div>
                         <el-divider class="!my-0" />
                         <el-tree-v2
@@ -125,24 +149,82 @@
                             :data="treeData"
                             :props="treeProps"
                             @node-expand="handleNodeExpand"
-                            class="monaco-editor-tree monaco-editor-background"
+                            @node-collapse="handleNodeCollapse"
+                            class="monaco-editor-tree monaco-editor-background pt-2"
                             :height="treeHeight"
                             :indent="6"
-                            :item-size="24"
+                            :item-size="26"
                             highlight-current
                         >
                             <template #default="{ node, data }">
-                                <span v-if="data.isDir" style="display: inline-flex; align-items: center">
-                                    <svg-icon className="table-icon" iconName="p-file-folder"></svg-icon>
-                                    <small :title="node.label">{{ node.label }}</small>
+                                <span v-if="data.isDir" style="align-items: center">
+                                    <template v-if="isCreate == 'dir' && data.id == 'new-dir'">
+                                        <div class="flex justify-between items-center gap-0.5 pr-2">
+                                            <svg-icon class="table-icon" iconName="p-file-folder"></svg-icon>
+                                            <el-input
+                                                size="small"
+                                                class="!flex-1 !min-w-16"
+                                                ref="rowRefs"
+                                                v-model="newFolder"
+                                            ></el-input>
+                                            <el-icon
+                                                class="cursor-pointer w-4 pl-1"
+                                                size="small"
+                                                @click.stop="createFolder(true)"
+                                            >
+                                                <Check />
+                                            </el-icon>
+                                            <el-icon
+                                                class="cursor-pointer w-4"
+                                                size="small"
+                                                @click.stop="cancelFolder()"
+                                            >
+                                                <Close />
+                                            </el-icon>
+                                        </div>
+                                    </template>
+                                    <template v-else>
+                                        <svg-icon class="table-icon" iconName="p-file-folder"></svg-icon>
+                                        <small :title="node.label" class="min-w-32">{{ node.label }}</small>
+                                    </template>
                                 </span>
                                 <span
                                     v-else
                                     style="display: inline-flex; align-items: center"
                                     @click="getContent(data.path, data.extension)"
                                 >
-                                    <svg-icon className="table-icon" :iconName="getIconName(data.extension)"></svg-icon>
-                                    <small :title="node.label" class="min-w-32">{{ node.label }}</small>
+                                    <template v-if="isCreate == 'file' && data.id == 'new-file'">
+                                        <div class="flex justify-between items-center gap-0.5 pr-2">
+                                            <svg-icon
+                                                class="table-icon w-4"
+                                                :iconName="getIconName(data.extension)"
+                                            ></svg-icon>
+                                            <el-input
+                                                size="small"
+                                                ref="rowRefs"
+                                                class="!flex-1 !min-w-16"
+                                                v-model="newFolder"
+                                            ></el-input>
+                                            <el-icon
+                                                class="cursor-pointer w-4 pl-1"
+                                                size="small"
+                                                @click.stop="createFolder(false)"
+                                            >
+                                                <Check />
+                                            </el-icon>
+                                            <el-icon
+                                                class="cursor-pointer w-4"
+                                                size="small"
+                                                @click.stop="cancelFolder()"
+                                            >
+                                                <Close />
+                                            </el-icon>
+                                        </div>
+                                    </template>
+                                    <template v-else>
+                                        <svg-icon class="table-icon" :iconName="getIconName(data.extension)"></svg-icon>
+                                        <small :title="node.label" class="min-w-32">{{ node.label }}</small>
+                                    </template>
                                 </span>
                             </template>
                         </el-tree-v2>
@@ -190,7 +272,10 @@
                         </div>
                     </div>
                 </div>
-                <div class="code-footer pl-4 h-6 flex justify-end items-center gap-4 rounded-b" ref="dialogFooter">
+                <div
+                    class="hidden code-footer pl-4 h-6 sm:flex justify-end items-center gap-4 rounded-b"
+                    ref="dialogFooter"
+                >
                     <el-divider direction="vertical" class="!h-6" v-if="config.theme" />
                     <el-dropdown trigger="click" max-height="300" placement="top" @command="changeTheme">
                         <span class="el-dropdown-link">
@@ -306,11 +391,11 @@
 </template>
 
 <script lang="ts" setup>
-import { getFileContent, getFilesTree, saveFileContent } from '@/api/modules/files';
+import { createFile, getFileContent, getFilesTree, saveFileContent } from '@/api/modules/files';
 import i18n from '@/lang';
-import { MsgError, MsgSuccess, MsgWarning } from '@/utils/message';
+import { MsgSuccess, MsgWarning } from '@/utils/message';
 import * as monaco from 'monaco-editor';
-import { nextTick, onBeforeUnmount, reactive, ref, onMounted, computed } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
 import { Languages } from '@/global/mimetype';
 import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
 import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker';
@@ -318,16 +403,16 @@ import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
 import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
 import EditorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
 
+import type { TabPaneName } from 'element-plus';
 import { ElMessageBox, ElTreeV2 } from 'element-plus';
 import { ResultData } from '@/api/interface';
 import { File } from '@/api/interface/file';
-import { getIcon } from '@/utils/util';
+import { getIcon, newUUID } from '@/utils/util';
 import { TreeKey, TreeNodeData } from 'element-plus/es/components/tree-v2/src/types';
-import { Top, Refresh, DArrowLeft, DArrowRight } from '@element-plus/icons-vue';
+import { DArrowLeft, DArrowRight, Refresh, Top } from '@element-plus/icons-vue';
 import { loadBaseDir } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
 import CodeTabs from './tabs/index.vue';
-import type { TabPaneName } from 'element-plus';
 import noUpdateImage from '@/assets/images/no_update_app.svg';
 
 const codeTabsRef = ref();
@@ -399,6 +484,12 @@ const oldFileContent = ref('');
 const dialogHeader = ref(null);
 const dialogForm = ref(null);
 const dialogFooter = ref(null);
+const currentPath = ref();
+const rowRefs = ref();
+const isCreate = ref('none');
+const newFolder = ref();
+const selectedParentNode = ref(null);
+const expandedNodeIds = ref(new Set());
 
 const toggleShow = () => {
     isShow.value = !isShow.value;
@@ -515,6 +606,7 @@ const removeAllTab = (targetPath: string, type: 'left' | 'right' | 'all') => {
             editor.setValue(oldFileContent.value);
         }
         isEdit.value = false;
+        isCreate.value = 'none';
         updateTabs();
     };
 
@@ -656,6 +748,7 @@ const loadTooltip = () => {
 };
 
 onMounted(() => {
+    isCreate.value = 'none';
     loadPath();
     updateHeights();
     window.addEventListener('resize', updateHeights);
@@ -796,6 +889,7 @@ const acceptParams = (props: EditProps) => {
     form.value.content = props.content;
     oldFileContent.value = props.content;
     form.value.path = props.path;
+    currentPath.value = getDirectoryPath(props.path);
     directoryPath.value = getDirectoryPath(props.path);
     fileExtension.value = props.extension;
     fileName.value = props.name;
@@ -872,10 +966,9 @@ const getRefresh = (path: string) => {
 };
 
 const getContent = (path: string, extension: string) => {
-    if (form.value.path === path) {
+    if (form.value.path === path || isCreate.value == 'file') {
         return;
     }
-
     const fetchFileContent = () => {
         codeReq.path = path;
         codeReq.expand = true;
@@ -976,7 +1069,6 @@ const getUpData = async () => {
         treeData.value = response.data[0]?.children || [];
         loadedNodes.value = new Set();
     } catch (error) {
-        MsgError(i18n.global.t('commons.msg.notRecords'));
     } finally {
         directoryPath.value = newPath;
     }
@@ -990,27 +1082,51 @@ const treeProps = {
     children: 'children',
 };
 
-const handleNodeExpand = async (node: any, data: TreeNode) => {
-    if (!data.data.isDir || loadedNodes.value.has(data.data.path)) {
+const handleNodeCollapse = (data: TreeNodeData, node: TreeNode) => {
+    isCreate.value = 'none';
+    expandedNodeIds.value.delete(data.id);
+
+    const parentNode = node.parent;
+    if (!parentNode) {
+        selectedParentNode.value = null;
         return;
     }
-    try {
-        const response = await search(node.path);
-        const newTreeData = JSON.parse(JSON.stringify(treeData.value));
-        if (response.data.length > 0 && response.data[0].children) {
-            data.children = response.data[0].children;
-            loadedNodes.value.add(data.data.path);
-            updateNodeChildren(newTreeData, data.data.path, response.data[0].children);
-        } else {
-            data.children = [];
-        }
-        treeData.value = newTreeData;
-    } catch (error) {
-        MsgError(i18n.global.t('commons.msg.notRecords'));
+
+    const hasExpandedChildren = parentNode.data.children?.some((child) => expandedNodeIds.value.has(child.id));
+
+    if (hasExpandedChildren) {
+        selectedParentNode.value = parentNode;
+    } else {
+        selectedParentNode.value = null;
     }
 };
 
-// 更新指定节点的 children 数据
+const handleNodeExpand = async (data: TreeNodeData, node: TreeNode) => {
+    if (node.data.isDir) {
+        currentPath.value = node.data.path;
+        selectedParentNode.value = node;
+        expandedNodeIds.value.add(node.data.id);
+    }
+    if (node.data.id == 'new-dir' || node.data.id == 'new-file') {
+        return;
+    }
+    if (!node.data.isDir || loadedNodes.value.has(node.data.path)) {
+        return;
+    }
+    try {
+        const response = await search(data.path);
+        const newTreeData = JSON.parse(JSON.stringify(treeData.value));
+        if (response.data.length > 0 && response.data[0].children) {
+            node.children = response.data[0].children;
+            loadedNodes.value.add(node.data.path);
+            updateNodeChildren(newTreeData, node.data.path, response.data[0].children);
+        } else {
+            node.children = [];
+        }
+        treeData.value = newTreeData;
+    } catch (error) {}
+};
+
 const updateNodeChildren = (nodes: any[], path: any, newChildren: File.FileTree[]) => {
     const updateNode = (nodes: string | any[]) => {
         for (const element of nodes) {
@@ -1026,10 +1142,125 @@ const updateNodeChildren = (nodes: any[], path: any, newChildren: File.FileTree[
     updateNode(nodes);
 };
 
+const currentEditingNode = ref<any>(null);
+
+const createNewNode = (command: string) => {
+    const isDir = command === 'dir';
+    const fileName = isDir ? 'dir' : 'file';
+    return {
+        id: isDir ? 'new-dir' : 'new-file',
+        name: fileName,
+        path: `${currentPath.value}/${fileName}`,
+        isDir,
+        extension: '',
+        children: [],
+    };
+};
+
+const removeExistingNode = (data: any[], command: string) => {
+    const targetId = command == 'dir' ? 'new-dir' : 'new-file';
+    data = filterNodes(data, targetId);
+    treeData.value = [...data];
+    return data;
+};
+
+const handleCreate = (command: string) => {
+    removeExistingNode(treeData.value, command);
+    if ((command === 'dir' && isCreate.value === 'file') || (command === 'file' && isCreate.value === 'dir')) {
+        cancelFolder();
+        isCreate.value = 'none';
+    }
+
+    if (isCreate.value !== 'none') return;
+
+    const newFileNode = createNewNode(command);
+    newFolder.value = newFileNode.name;
+    currentEditingNode.value = newFileNode;
+    if (selectedParentNode.value) {
+        if (!selectedParentNode.value.children) {
+            selectedParentNode.value.children = [];
+        }
+        selectedParentNode.value.children.unshift(newFileNode);
+        updateNodeChildren(treeData.value, selectedParentNode.value.data.path, selectedParentNode.value.children);
+        treeData.value = [...treeData.value];
+    } else {
+        treeData.value = [newFileNode, ...treeData.value];
+    }
+
+    nextTick(() => {
+        rowRefs.value?.focus();
+    });
+
+    isCreate.value = command;
+};
+
+const filterNodes = (nodes, targetId) => {
+    const filtered = nodes.filter((node) => node.id !== targetId);
+
+    filtered.forEach((node) => {
+        if (node.children && node.children.length > 0) {
+            node.children = filterNodes(node.children, targetId);
+        }
+        if (node.data && node.data.children && node.data.children.length > 0) {
+            node.data.children = filterNodes(node.data.children, targetId);
+        }
+    });
+
+    return filtered;
+};
+
+const cancelFolder = () => {
+    const targetId = isCreate.value == 'dir' ? 'new-dir' : 'new-file';
+    isCreate.value = 'none';
+    newFolder.value = '';
+    if (selectedParentNode.value && selectedParentNode.value.children.length > 0) {
+        selectedParentNode.value.children = selectedParentNode.value.children.filter((node) => node.id !== targetId);
+        if (selectedParentNode.value.data?.children?.length > 0) {
+            selectedParentNode.value.data.children = selectedParentNode.value.data.children.filter(
+                (node) => node.id !== targetId,
+            );
+        }
+    }
+    treeData.value = filterNodes(treeData.value, targetId);
+    loadedNodes.value.delete(currentPath.value);
+};
+
+let addForm = reactive({ path: '', name: '', isDir: true, mode: 0o755, isLink: false, isSymlink: true, linkPath: '' });
+
+const createFolder = async (isDir: boolean) => {
+    addForm.path = `${currentPath.value}/${newFolder.value}`;
+    const editingNode = currentEditingNode.value;
+    if (!editingNode) return;
+    if (addForm.path.indexOf('.1panel_clash') > -1) {
+        MsgWarning(i18n.global.t('file.clashDitNotSupport'));
+        return;
+    }
+    addForm.isDir = isDir;
+    addForm.name = newFolder.value;
+    let addItem = {};
+    Object.assign(addItem, addForm);
+    loading.value = true;
+    createFile(addItem as File.FileCreate)
+        .then(() => {
+            MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
+            editingNode.id = newUUID();
+            editingNode.name = addForm.name;
+            editingNode.path = addForm.path;
+            treeData.value = [...treeData.value];
+            isCreate.value = 'none';
+            currentEditingNode.value = null;
+            newFolder.value = '';
+        })
+        .finally(() => {
+            loading.value = false;
+        });
+};
+
 onBeforeUnmount(() => {
     if (editor) {
         editor.dispose();
     }
+    isCreate.value = 'none';
     window.removeEventListener('resize', updateHeights);
 });
 
@@ -1088,15 +1319,23 @@ defineExpose({ acceptParams });
     border-bottom: 1px solid var(--el-border-color-light) !important;
 }
 
+.table-icon {
+    width: 1.35em;
+    height: 1.35em;
+    position: relative;
+    fill: currentColor;
+    vertical-align: middle;
+}
+
 :deep(.el-tabs) {
-    --el-tabs-header-height: 28px;
+    --el-tabs-header-height: 29px;
     .el-tabs__header {
-        height: 28px;
+        height: 29px;
         margin: 0;
     }
     .el-tabs__nav-wrap {
-        height: 27px;
-        line-height: 27px;
+        height: 28px;
+        line-height: 28px;
     }
     .el-tabs__nav {
         border-right: 1px solid var(--el-border-color-light) !important;
@@ -1124,5 +1363,13 @@ defineExpose({ acceptParams });
             color: var(--el-color-primary) !important;
         }
     }
+}
+
+:deep(.el-dropdown .el-text:focus) {
+    outline: none !important;
+}
+
+:deep(.el-input__inner:focus) {
+    outline: none !important;
 }
 </style>

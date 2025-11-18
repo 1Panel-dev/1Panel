@@ -1997,7 +1997,7 @@ onBeforeUnmount(() => {
 .table-input {
     --el-input-inner-height: 22px !important;
 }
-:deep(.el-tabs__nav .el-tabs__item:last-child) {
+:deep(.file-tabs .el-tabs__nav .el-tabs__item:last-child) {
     border-bottom: 1px solid var(--el-border-color-light) !important;
 }
 
