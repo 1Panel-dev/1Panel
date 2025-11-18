@@ -34,10 +34,11 @@
                                 v-for="item in data"
                                 :key="item.name"
                                 class="compose-list-item p-3 mb-2 rounded cursor-pointer border"
-                                :class="{
-                                    'border-primary bg-blue-50': selectedCompose?.name === item.name,
-                                    'border-transparent hover:bg-gray-50': selectedCompose?.name !== item.name,
-                                }"
+                                :class="[
+                                    selectedCompose?.name === item.name
+                                        ? 'border-primary compose-list-item--selected'
+                                        : 'border-transparent compose-list-item--default',
+                                ]"
                                 @click="loadDetail(item)"
                             >
                                 <div class="min-w-0">
@@ -100,7 +101,7 @@
                                             :disabled="disableOperate"
                                             @click="handleComposeOperate('up')"
                                         >
-                                            <el-icon><VideoPlay /></el-icon>
+                                            <el-icon class="mr-1"><VideoPlay /></el-icon>
                                             {{ $t('commons.operate.start') }}
                                         </el-button>
                                         <el-button
@@ -109,7 +110,7 @@
                                             :disabled="disableOperate"
                                             @click="handleComposeOperate('restart')"
                                         >
-                                            <el-icon><RefreshRight /></el-icon>
+                                            <el-icon class="mr-1"><RefreshRight /></el-icon>
                                             {{ $t('commons.operate.restart') }}
                                         </el-button>
                                         <el-button
@@ -118,20 +119,20 @@
                                             :disabled="disableOperate"
                                             @click="handleComposeOperate('stop')"
                                         >
-                                            <el-icon><VideoPause /></el-icon>
+                                            <el-icon class="mr-1"><VideoPause /></el-icon>
                                             {{ $t('commons.operate.stop') }}
                                         </el-button>
                                     </el-button-group>
                                     <el-button :loading="detailLoading" @click="refreshDetail">
-                                        <el-icon><Refresh /></el-icon>
+                                        <el-icon class="mr-1"><Refresh /></el-icon>
                                         {{ $t('commons.button.refresh') }}
                                     </el-button>
                                     <el-button :disabled="!composeInfo?.workdir" @click="openComposeFolder">
-                                        <el-icon><Folder /></el-icon>
+                                        <el-icon class="mr-1"><Folder /></el-icon>
                                         {{ $t('container.composeDirectory') }}
                                     </el-button>
                                     <el-button type="danger" plain @click="onDeleteCompose">
-                                        <el-icon><Delete /></el-icon>
+                                        <el-icon class="mr-1"><Delete /></el-icon>
                                         {{ $t('commons.button.delete') }}
                                     </el-button>
                                 </div>
@@ -641,3 +642,26 @@ const openComposeLogDrawer = () => {
     });
 };
 </script>
+
+<style scoped lang="scss">
+.compose-list-item {
+    transition: background-color 0.2s ease;
+}
+
+.compose-list-item--selected {
+    background-color: #eff6ff;
+}
+
+:global(.dark) .compose-list-item--selected {
+    background-color: rgba(59, 130, 246, 0.3);
+    border-color: rgba(59, 130, 246, 0.8);
+}
+
+.compose-list-item--default:hover {
+    background-color: #f8fafc;
+}
+
+:global(.dark) .compose-list-item--default:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+}
+</style>
