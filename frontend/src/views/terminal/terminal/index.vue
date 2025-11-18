@@ -123,7 +123,7 @@
                     </el-button>
                     <el-input
                         v-model="batchVal"
-                        @keyup.enter.exact="batchInput"
+                        @keydown.enter.exact.prevent="batchInput"
                         type="textarea"
                         :autosize="{ minRows: 1, maxRows: 3 }"
                         class="flex-1 basis-[300px] min-w-[200px]"
