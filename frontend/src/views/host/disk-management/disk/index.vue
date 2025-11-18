@@ -2,8 +2,14 @@
     <div>
         <DiskRouter />
         <MainDiv class="mt-2" :height-diff="140" v-loading="loading">
-            <div v-if="diskInfo?.systemDisk">
-                <DiskCard class="mt-2" :diskInfo="diskInfo.systemDisk" scope="system" />
+            <div v-if="diskInfo?.systemDisks">
+                <DiskCard
+                    class="mt-2"
+                    v-for="(disk, index) in diskInfo.systemDisks"
+                    :diskInfo="disk"
+                    scope="system"
+                    :key="index"
+                />
             </div>
             <div v-if="diskInfo?.unpartitionedDisks">
                 <DiskCard

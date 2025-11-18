@@ -241,7 +241,7 @@ export namespace Host {
     export interface CompleteDiskInfo {
         disks: DiskInfo[];
         unpartitionedDisks: DiskBasicInfo[];
-        systemDisk?: DiskInfo;
+        systemDisks?: DiskInfo[];
         totalDisks: number;
         totalCapacity: number;
     }
