@@ -958,6 +958,9 @@ const getRefresh = (path: string) => {
         search(path).then((res) => {
             treeData.value = res.data[0].children;
             loadedNodes.value = new Set();
+            isCreate.value = 'none';
+            currentPath.value = path;
+            selectedParentNode.value = null;
         });
     } finally {
         loading.value = false;
@@ -1068,6 +1071,9 @@ const getUpData = async () => {
         const response = await search(newPath);
         treeData.value = response.data[0]?.children || [];
         loadedNodes.value = new Set();
+        isCreate.value = 'none';
+        currentPath.value = newPath;
+        selectedParentNode.value = null;
     } catch (error) {
     } finally {
         directoryPath.value = newPath;
@@ -1102,16 +1108,16 @@ const handleNodeCollapse = (data: TreeNodeData, node: TreeNode) => {
 };
 
 const handleNodeExpand = async (data: TreeNodeData, node: TreeNode) => {
-    if (node.data.isDir) {
-        currentPath.value = node.data.path;
-        selectedParentNode.value = node;
-        expandedNodeIds.value.add(node.data.id);
-    }
     if (node.data.id == 'new-dir' || node.data.id == 'new-file') {
         return;
     }
     if (!node.data.isDir || loadedNodes.value.has(node.data.path)) {
         return;
+    }
+    if (node.data.isDir && isCreate.value == 'none') {
+        currentPath.value = node.data.path;
+        selectedParentNode.value = node;
+        expandedNodeIds.value.add(node.data.id);
     }
     try {
         const response = await search(data.path);
@@ -1261,6 +1267,8 @@ onBeforeUnmount(() => {
         editor.dispose();
     }
     isCreate.value = 'none';
+    currentPath.value = '';
+    selectedParentNode.value = null;
     window.removeEventListener('resize', updateHeights);
 });
 
