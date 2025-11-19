@@ -284,8 +284,8 @@
                                                 v-model="composeContent"
                                                 mode="yaml"
                                                 :disabled="disableEdit"
-                                                :heightDiff="100"
-                                                placeholder="#Define or paste the content of your docker-compose file here"
+                                                :heightDiff="190"
+                                                placeholder="docker-compose.yml"
                                             />
                                         </div>
                                     </el-card>
