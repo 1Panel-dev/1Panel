@@ -293,7 +293,7 @@
                                     <el-card v-if="showEnvSetting" shadow="never">
                                         <template #header>
                                             <div class="flex items-center justify-between">
-                                                <span class="font-medium">.env</span>
+                                                <span class="font-medium">{{ $t('container.env') }}</span>
                                                 <el-button
                                                     type="primary"
                                                     size="small"
@@ -305,7 +305,7 @@
                                                 </el-button>
                                             </div>
                                         </template>
-                                        <el-form-item :label="$t('container.env')">
+                                        <el-form-item>
                                             <el-input
                                                 v-model="envStr"
                                                 type="textarea"
