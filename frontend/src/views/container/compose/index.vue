@@ -66,7 +66,9 @@
                             <el-card shadow="never">
                                 <template #header>
                                     <div class="flex items-center justify-between">
-                                        <span class="font-medium">{{ composeInfo?.name }}</span>
+                                        <span class="font-medium">
+                                            {{ composeInfo?.name }} - {{ $t('container.compose') }}
+                                        </span>
                                         <span class="text-sm text-gray-500 truncate max-w-[50%]">
                                             <div class="text-sm">
                                                 <span class="text-gray-500">{{ $t('app.source') }}:</span>
