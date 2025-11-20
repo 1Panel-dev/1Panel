@@ -161,6 +161,38 @@ export namespace Host {
         endTime: Date;
     }
 
+    export interface MonitorGPUSearch {
+        productName: string;
+        startTime: Date;
+        endTime: Date;
+    }
+    export interface MonitorGPUData {
+        productNames: Array<string>;
+        date: Array<Date>;
+        gpuValue: Array<number>;
+        temperatureValue: Array<number>;
+        powerValue: Array<GPUPowerUsageHelper>;
+        memoryValue: Array<GPUMemoryUsageHelper>;
+        speedValue: Array<number>;
+    }
+    export interface GPUPowerUsageHelper {
+        total: number;
+        used: number;
+        percent: number;
+    }
+    export interface GPUMemoryUsageHelper {
+        total: number;
+        used: number;
+        percent: number;
+        gpuProcesses: Array<GPUProcess>;
+    }
+    export interface GPUProcess {
+        pid: string;
+        type: string;
+        processName: string;
+        usedMemory: string;
+    }
+
     export interface SSHInfo {
         autoStart: boolean;
         isActive: boolean;

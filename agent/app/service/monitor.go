@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"sort"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
@@ -15,6 +16,8 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/utils/ai_tools/gpu"
+	"github.com/1Panel-dev/1Panel/agent/utils/ai_tools/xpu"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/robfig/cron/v3"
 	"github.com/shirou/gopsutil/v4/cpu"
@@ -35,6 +38,7 @@ var monitorCancel context.CancelFunc
 type IMonitorService interface {
 	Run()
 	LoadMonitorData(req dto.MonitorSearch) ([]dto.MonitorData, error)
+	LoadGPUMonitorData(req dto.MonitorGPUSearch) (dto.MonitorGPUData, error)
 	LoadSetting() (*dto.MonitorSetting, error)
 	UpdateSetting(key, value string) error
 	CleanData() error
@@ -113,6 +117,67 @@ func (m *MonitorService) LoadMonitorData(req dto.MonitorSearch) ([]dto.MonitorDa
 	return data, nil
 }
 
+func (m *MonitorService) LoadGPUMonitorData(req dto.MonitorGPUSearch) (dto.MonitorGPUData, error) {
+	loc, _ := time.LoadLocation(common.LoadTimeZoneByCmd())
+	req.StartTime = req.StartTime.In(loc)
+	req.EndTime = req.EndTime.In(loc)
+
+	var data dto.MonitorGPUData
+	gpuExist, gpuclient := gpu.New()
+	xpuExist, xpuClient := xpu.New()
+	if !gpuExist && !xpuExist {
+		return data, nil
+	}
+	if len(req.ProductName) == 0 {
+		if gpuExist {
+			gpuInfo, err := gpuclient.LoadGpuInfo()
+			if err != nil || len(gpuInfo.GPUs) == 0 {
+				return data, buserr.New("ErrRecordNotFound")
+			}
+			req.ProductName = gpuInfo.GPUs[0].ProductName
+			for _, item := range gpuInfo.GPUs {
+				data.ProductNames = append(data.ProductNames, item.ProductName)
+			}
+		} else {
+			xpuInfo, err := xpuClient.LoadGpuInfo()
+			if err != nil || len(xpuInfo.Xpu) == 0 {
+				return data, buserr.New("ErrRecordNotFound")
+			}
+			req.ProductName = xpuInfo.Xpu[0].Basic.DeviceName
+			for _, item := range xpuInfo.Xpu {
+				data.ProductNames = append(data.ProductNames, item.Basic.DeviceName)
+			}
+		}
+	}
+	gpuList, err := monitorRepo.GetGPU(repo.WithByCreatedAt(req.StartTime, req.EndTime), monitorRepo.WithByProductName(req.ProductName))
+	if err != nil {
+		return data, err
+	}
+
+	for _, gpu := range gpuList {
+		data.Date = append(data.Date, gpu.CreatedAt)
+		data.GPUValue = append(data.GPUValue, gpu.GPUUtil)
+		data.TemperatureValue = append(data.TemperatureValue, gpu.Temperature)
+		data.PowerValue = append(data.PowerValue, dto.GPUPowerUsageHelper{
+			Total:   gpu.MaxPowerLimit,
+			Used:    gpu.PowerDraw,
+			Percent: gpu.PowerDraw / gpu.MaxPowerLimit * 100,
+		})
+		memItem := dto.GPUMemoryUsageHelper{
+			Total:   gpu.MemTotal,
+			Used:    gpu.MemUsed,
+			Percent: float64(gpu.MemUsed) / float64(gpu.MemTotal) * 100,
+		}
+		var process []dto.GPUProcess
+		if err := json.Unmarshal([]byte(gpu.Processes), &process); err == nil {
+			memItem.GPUProcesses = process
+		}
+		data.MemoryValue = append(data.MemoryValue, memItem)
+		data.SpeedValue = append(data.SpeedValue, gpu.FanSpeed)
+	}
+	return data, nil
+}
+
 func (m *MonitorService) LoadSetting() (*dto.MonitorSetting, error) {
 	setting, err := settingRepo.GetList()
 	if err != nil {
@@ -174,10 +239,13 @@ func (m *MonitorService) CleanData() error {
 	if err := global.MonitorDB.Exec("DELETE FROM monitor_networks").Error; err != nil {
 		return err
 	}
+	_ = global.GPUMonitorDB.Exec("DELETE FROM monitor_gpus").Error
 	return nil
 }
 
 func (m *MonitorService) Run() {
+	saveGPUDataToDB()
+	saveXPUDataToDB()
 	var itemModel model.MonitorBase
 	totalPercent, _ := cpu.Percent(3*time.Second, false)
 	if len(totalPercent) == 1 {
@@ -207,7 +275,7 @@ func (m *MonitorService) Run() {
 		}
 	}
 
-	if err := settingRepo.CreateMonitorBase(itemModel); err != nil {
+	if err := monitorRepo.CreateMonitorBase(itemModel); err != nil {
 		global.LOG.Errorf("Insert basic monitoring data failed, err: %v", err)
 	}
 
@@ -220,9 +288,9 @@ func (m *MonitorService) Run() {
 	}
 	storeDays, _ := strconv.Atoi(MonitorStoreDays.Value)
 	timeForDelete := time.Now().AddDate(0, 0, -storeDays)
-	_ = settingRepo.DelMonitorBase(timeForDelete)
-	_ = settingRepo.DelMonitorIO(timeForDelete)
-	_ = settingRepo.DelMonitorNet(timeForDelete)
+	_ = monitorRepo.DelMonitorBase(timeForDelete)
+	_ = monitorRepo.DelMonitorIO(timeForDelete)
+	_ = monitorRepo.DelMonitorNet(timeForDelete)
 }
 
 func (m *MonitorService) loadDiskIO() {
@@ -302,7 +370,7 @@ func (m *MonitorService) saveIODataToDB(ctx context.Context, interval float64) {
 						}
 					}
 				}
-				if err := settingRepo.BatchCreateMonitorIO(ioList); err != nil {
+				if err := monitorRepo.BatchCreateMonitorIO(ioList); err != nil {
 					global.LOG.Errorf("Insert io monitoring data failed, err: %v", err)
 				}
 				m.DiskIO <- ioStat2
@@ -341,7 +409,7 @@ func (m *MonitorService) saveNetDataToDB(ctx context.Context, interval float64) 
 					}
 				}
 
-				if err := settingRepo.BatchCreateMonitorNet(netList); err != nil {
+				if err := monitorRepo.BatchCreateMonitorNet(netList); err != nil {
 					global.LOG.Errorf("Insert network monitoring data failed, err: %v", err)
 				}
 				m.NetIO <- netStat2
@@ -481,4 +549,91 @@ func StartMonitor(removeBefore bool, interval string) error {
 	go service.saveNetDataToDB(ctx, float64(intervalItem))
 
 	return nil
+}
+
+func saveGPUDataToDB() {
+	exist, client := gpu.New()
+	if !exist {
+		return
+	}
+	gpuInfo, err := client.LoadGpuInfo()
+	if err != nil {
+		return
+	}
+	var list []model.MonitorGPU
+	for _, gpuItem := range gpuInfo.GPUs {
+		item := model.MonitorGPU{
+			ProductName:   gpuItem.ProductName,
+			GPUUtil:       loadGPUInfoFloat(gpuItem.GPUUtil),
+			Temperature:   loadGPUInfoInt(gpuItem.Temperature),
+			PowerDraw:     loadGPUInfoFloat(gpuItem.PowerDraw),
+			MaxPowerLimit: loadGPUInfoFloat(gpuItem.MaxPowerLimit),
+			MemUsed:       loadGPUInfoInt(gpuItem.MemUsed),
+			MemTotal:      loadGPUInfoInt(gpuItem.MemTotal),
+			FanSpeed:      loadGPUInfoInt(gpuItem.FanSpeed),
+		}
+		process, _ := json.Marshal(gpuItem.Processes)
+		if len(process) != 0 {
+			item.Processes = string(process)
+		}
+		list = append(list, item)
+	}
+	if err := repo.NewIMonitorRepo().BatchCreateMonitorGPU(list); err != nil {
+		global.LOG.Errorf("batch create gpu monitor data failed, err: %v", err)
+		return
+	}
+}
+func saveXPUDataToDB() {
+	exist, client := xpu.New()
+	if !exist {
+		return
+	}
+	xpuInfo, err := client.LoadGpuInfo()
+	if err != nil {
+		return
+	}
+	var list []model.MonitorGPU
+	for _, xpuItem := range xpuInfo.Xpu {
+		item := model.MonitorGPU{
+			ProductName: xpuItem.Basic.DeviceName,
+			GPUUtil:     loadGPUInfoFloat(xpuItem.Stats.MemoryUtil),
+			Temperature: loadGPUInfoInt(xpuItem.Stats.Temperature),
+			PowerDraw:   loadGPUInfoFloat(xpuItem.Stats.Power),
+			MemUsed:     loadGPUInfoInt(xpuItem.Stats.MemoryUsed),
+			MemTotal:    loadGPUInfoInt(xpuItem.Basic.Memory),
+		}
+		var processItem []dto.GPUProcess
+		for _, ps := range xpuItem.Processes {
+			processItem = append(processItem, dto.GPUProcess{
+				Pid:         fmt.Sprintf("%v", ps.PID),
+				Type:        ps.SHR,
+				ProcessName: ps.Command,
+				UsedMemory:  ps.Memory,
+			})
+		}
+		process, _ := json.Marshal(processItem)
+		if len(process) != 0 {
+			item.Processes = string(process)
+		}
+		list = append(list, item)
+	}
+	if err := repo.NewIMonitorRepo().BatchCreateMonitorGPU(list); err != nil {
+		global.LOG.Errorf("batch create gpu monitor data failed, err: %v", err)
+		return
+	}
+}
+func loadGPUInfoInt(val string) int {
+	valItem := strings.ReplaceAll(val, "MiB", "")
+	valItem = strings.ReplaceAll(valItem, "C", "")
+	valItem = strings.ReplaceAll(valItem, "%", "")
+	valItem = strings.TrimSpace(valItem)
+	data, _ := strconv.Atoi(valItem)
+	return data
+}
+func loadGPUInfoFloat(val string) float64 {
+	valItem := strings.ReplaceAll(val, "W", "")
+	valItem = strings.ReplaceAll(valItem, "%", "")
+	valItem = strings.TrimSpace(valItem)
+	data, _ := strconv.ParseFloat(valItem, 64)
+	return data
 }

@@ -2,7 +2,6 @@ package repo
 
 import (
 	"errors"
-	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/global"
@@ -19,12 +18,6 @@ type ISettingRepo interface {
 	Update(key, value string) error
 	WithByKey(key string) DBOption
 
-	CreateMonitorBase(model model.MonitorBase) error
-	BatchCreateMonitorIO(ioList []model.MonitorIO) error
-	BatchCreateMonitorNet(ioList []model.MonitorNetwork) error
-	DelMonitorBase(timeForDelete time.Time) error
-	DelMonitorIO(timeForDelete time.Time) error
-	DelMonitorNet(timeForDelete time.Time) error
 	UpdateOrCreate(key, value string) error
 }
 
@@ -76,25 +69,6 @@ func (s *SettingRepo) WithByKey(key string) DBOption {
 
 func (s *SettingRepo) Update(key, value string) error {
 	return global.DB.Model(&model.Setting{}).Where("key = ?", key).Updates(map[string]interface{}{"value": value}).Error
-}
-
-func (s *SettingRepo) CreateMonitorBase(model model.MonitorBase) error {
-	return global.MonitorDB.Create(&model).Error
-}
-func (s *SettingRepo) BatchCreateMonitorIO(ioList []model.MonitorIO) error {
-	return global.MonitorDB.CreateInBatches(ioList, len(ioList)).Error
-}
-func (s *SettingRepo) BatchCreateMonitorNet(ioList []model.MonitorNetwork) error {
-	return global.MonitorDB.CreateInBatches(ioList, len(ioList)).Error
-}
-func (s *SettingRepo) DelMonitorBase(timeForDelete time.Time) error {
-	return global.MonitorDB.Where("created_at < ?", timeForDelete).Delete(&model.MonitorBase{}).Error
-}
-func (s *SettingRepo) DelMonitorIO(timeForDelete time.Time) error {
-	return global.MonitorDB.Where("created_at < ?", timeForDelete).Delete(&model.MonitorIO{}).Error
-}
-func (s *SettingRepo) DelMonitorNet(timeForDelete time.Time) error {
-	return global.MonitorDB.Where("created_at < ?", timeForDelete).Delete(&model.MonitorNetwork{}).Error
 }
 
 func (s *SettingRepo) UpdateOrCreate(key, value string) error {

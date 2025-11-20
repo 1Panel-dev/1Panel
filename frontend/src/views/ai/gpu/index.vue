@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-loading="loading">
         <RouterButton
             :buttons="[
                 {
@@ -9,242 +9,129 @@
             ]"
         />
 
-        <div v-if="gpuType == 'nvidia'">
-            <LayoutContent
-                v-loading="loading"
-                :title="$t('aiTools.gpu.gpu')"
-                :divider="true"
-                v-if="gpuInfo.driverVersion.length !== 0 && !loading"
-            >
-                <template #toolbar>
-                    <el-row>
-                        <el-col :xs="24" :sm="16" :md="16" :lg="16" :xl="16" />
-                        <el-col :xs="24" :sm="8" :md="8" :lg="8" :xl="8">
-                            <TableSetting title="gpu-refresh" @search="refresh()" />
-                        </el-col>
-                    </el-row>
-                </template>
-                <template #main>
-                    <el-descriptions direction="vertical" :column="14" border>
-                        <el-descriptions-item :label="$t('aiTools.gpu.driverVersion')" width="50%" :span="7">
-                            {{ gpuInfo.driverVersion }}
-                        </el-descriptions-item>
-                        <el-descriptions-item :label="$t('aiTools.gpu.cudaVersion')" :span="7">
-                            {{ gpuInfo.cudaVersion }}
-                        </el-descriptions-item>
-                    </el-descriptions>
-                    <el-collapse v-model="activeNames" class="card-interval">
-                        <el-collapse-item v-for="item in gpuInfo.gpu" :key="item.index" :name="item.index">
-                            <template #title>
-                                <span class="name-class">{{ item.index + '. ' + item.productName }}</span>
-                            </template>
-                            <span class="title-class">{{ $t('aiTools.gpu.base') }}</span>
-                            <el-descriptions direction="vertical" :column="6" border size="small" class="mt-2">
-                                <el-descriptions-item :label="$t('monitor.gpuUtil')">
-                                    {{ item.gpuUtil }}
-                                </el-descriptions-item>
-                                <el-descriptions-item>
-                                    <template #label>
-                                        <div class="cell-item">
-                                            {{ $t('monitor.temperature') }}
-                                            <el-tooltip placement="top" :content="$t('aiTools.gpu.temperatureHelper')">
-                                                <el-icon class="icon-item"><InfoFilled /></el-icon>
-                                            </el-tooltip>
-                                        </div>
-                                    </template>
-                                    {{ item.temperature.replaceAll('C', '°C') }}
-                                </el-descriptions-item>
-                                <el-descriptions-item>
-                                    <template #label>
-                                        <div class="cell-item">
-                                            {{ $t('monitor.performanceState') }}
-                                            <el-tooltip
-                                                placement="top"
-                                                :content="$t('aiTools.gpu.performanceStateHelper')"
-                                            >
-                                                <el-icon class="icon-item"><InfoFilled /></el-icon>
-                                            </el-tooltip>
-                                        </div>
-                                    </template>
-                                    {{ item.performanceState }}
-                                </el-descriptions-item>
-                                <el-descriptions-item :label="$t('monitor.powerUsage')">
-                                    {{ item.powerDraw }} / {{ item.maxPowerLimit }}
-                                </el-descriptions-item>
-                                <el-descriptions-item :label="$t('monitor.memoryUsage')">
-                                    {{ item.memUsed }} / {{ item.memTotal }}
-                                </el-descriptions-item>
-                                <el-descriptions-item :label="$t('monitor.fanSpeed')">
-                                    {{ item.fanSpeed }}
-                                </el-descriptions-item>
+        <div class="content-container__search" v-if="options.length !== 0">
+            <el-card>
+                <div>
+                    <el-date-picker
+                        @change="search()"
+                        v-model="timeRangeGlobal"
+                        type="datetimerange"
+                        range-separator="-"
+                        :start-placeholder="$t('commons.search.timeStart')"
+                        :end-placeholder="$t('commons.search.timeEnd')"
+                        :shortcuts="shortcuts"
+                        style="max-width: 360px; width: 100%"
+                        :size="mobile ? 'small' : 'default'"
+                    ></el-date-picker>
+                    <el-select class="p-w-300 ml-2" v-model="searchInfo.productName" @change="search()">
+                        <el-option v-for="item in options" :key="item" :label="item" :value="item" />
+                    </el-select>
+                    <TableRefresh class="float-right" @search="search()" />
+                </div>
+            </el-card>
+        </div>
+        <el-row :gutter="7" class="card-interval" v-if="options.length !== 0">
+            <el-col :span="24">
+                <el-card style="overflow: inherit">
+                    <template #header>
+                        <div :class="mobile ? 'flx-wrap' : 'flex justify-between'">
+                            <span class="title">{{ $t('monitor.gpuUtil') }}</span>
+                        </div>
+                    </template>
+                    <div class="chart">
+                        <v-charts
+                            height="400px"
+                            id="loadGPUChart"
+                            type="line"
+                            :option="chartsOption['loadGPUChart']"
+                            v-if="chartsOption['loadGPUChart']"
+                            :dataZoom="true"
+                        />
+                    </div>
+                </el-card>
+            </el-col>
+            <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
+                <el-card style="overflow: inherit">
+                    <template #header>
+                        <div :class="mobile ? 'flx-wrap' : 'flex justify-between'">
+                            <span class="title">{{ $t('monitor.memoryUsage') }}</span>
+                        </div>
+                    </template>
+                    <div class="chart">
+                        <v-charts
+                            height="400px"
+                            id="loadMemoryChart"
+                            type="line"
+                            :option="chartsOption['loadMemoryChart']"
+                            v-if="chartsOption['loadMemoryChart']"
+                            :dataZoom="true"
+                        />
+                    </div>
+                </el-card>
+            </el-col>
+            <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
+                <el-card style="overflow: inherit">
+                    <template #header>
+                        <div :class="mobile ? 'flx-wrap' : 'flex justify-between'">
+                            <span class="title">{{ $t('monitor.powerUsage') }}</span>
+                        </div>
+                    </template>
+                    <div class="chart">
+                        <v-charts
+                            height="400px"
+                            id="loadPowerChart"
+                            type="line"
+                            :option="chartsOption['loadPowerChart']"
+                            v-if="chartsOption['loadPowerChart']"
+                            :dataZoom="true"
+                        />
+                    </div>
+                </el-card>
+            </el-col>
+            <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
+                <el-card style="overflow: inherit">
+                    <template #header>
+                        <div>
+                            {{ $t('monitor.temperature') }}
+                            <el-tooltip placement="top" :content="$t('aiTools.gpu.temperatureHelper')">
+                                <el-icon size="15"><InfoFilled /></el-icon>
+                            </el-tooltip>
+                        </div>
+                    </template>
+                    <div class="chart">
+                        <v-charts
+                            height="400px"
+                            id="loadTemperatureChart"
+                            type="line"
+                            :option="chartsOption['loadTemperatureChart']"
+                            v-if="chartsOption['loadTemperatureChart']"
+                            :dataZoom="true"
+                        />
+                    </div>
+                </el-card>
+            </el-col>
+            <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
+                <el-card style="overflow: inherit">
+                    <template #header>
+                        <div :class="mobile ? 'flx-wrap' : 'flex justify-between'">
+                            <span class="title">{{ $t('monitor.fanSpeed') }}</span>
+                        </div>
+                    </template>
+                    <div class="chart">
+                        <v-charts
+                            height="400px"
+                            id="loadSpeedChart"
+                            type="line"
+                            :option="chartsOption['loadSpeedChart']"
+                            v-if="chartsOption['loadSpeedChart']"
+                            :dataZoom="true"
+                        />
+                    </div>
+                </el-card>
+            </el-col>
+        </el-row>
 
-                                <el-descriptions-item :label="$t('aiTools.gpu.busID')">
-                                    {{ item.busID }}
-                                </el-descriptions-item>
-                                <el-descriptions-item>
-                                    <template #label>
-                                        <div class="cell-item">
-                                            {{ $t('aiTools.gpu.persistenceMode') }}
-                                            <el-tooltip
-                                                placement="top"
-                                                :content="$t('aiTools.gpu.persistenceModeHelper')"
-                                            >
-                                                <el-icon class="icon-item"><InfoFilled /></el-icon>
-                                            </el-tooltip>
-                                        </div>
-                                    </template>
-                                    {{ $t('aiTools.gpu.' + item.persistenceMode.toLowerCase()) }}
-                                </el-descriptions-item>
-                                <el-descriptions-item :label="$t('aiTools.gpu.displayActive')">
-                                    {{
-                                        lowerCase(item.displayActive) === 'disabled'
-                                            ? $t('aiTools.gpu.displayActiveF')
-                                            : $t('aiTools.gpu.displayActiveT')
-                                    }}
-                                </el-descriptions-item>
-                                <el-descriptions-item>
-                                    <template #label>
-                                        <div class="cell-item">
-                                            Uncorr. ECC
-                                            <el-tooltip placement="top" :content="$t('aiTools.gpu.ecc')">
-                                                <el-icon class="icon-item"><InfoFilled /></el-icon>
-                                            </el-tooltip>
-                                        </div>
-                                    </template>
-                                    {{ loadEcc(item.ecc) }}
-                                </el-descriptions-item>
-                                <el-descriptions-item :label="$t('aiTools.gpu.computeMode')">
-                                    <template #label>
-                                        <div class="cell-item">
-                                            {{ $t('aiTools.gpu.computeMode') }}
-                                            <el-tooltip placement="top">
-                                                <template #content>
-                                                    {{ $t('aiTools.gpu.defaultHelper') }}
-                                                    <br />
-                                                    {{ $t('aiTools.gpu.exclusiveProcessHelper') }}
-                                                    <br />
-                                                    {{ $t('aiTools.gpu.exclusiveThreadHelper') }}
-                                                    <br />
-                                                    {{ $t('aiTools.gpu.prohibitedHelper') }}
-                                                </template>
-                                                <el-icon class="icon-item"><InfoFilled /></el-icon>
-                                            </el-tooltip>
-                                        </div>
-                                    </template>
-                                    {{ loadComputeMode(item.computeMode) }}
-                                </el-descriptions-item>
-                                <el-descriptions-item label="MIG.M">
-                                    <template #label>
-                                        <div class="cell-item">
-                                            MIG M.
-                                            <el-tooltip placement="top">
-                                                <template #content>
-                                                    {{ $t('aiTools.gpu.migModeHelper') }}
-                                                </template>
-                                                <el-icon class="icon-item"><InfoFilled /></el-icon>
-                                            </el-tooltip>
-                                        </div>
-                                    </template>
-                                    {{
-                                        item.migMode === 'N/A'
-                                            ? $t('aiTools.gpu.migModeNA')
-                                            : $t('aiTools.gpu.' + lowerCase(item.migMode))
-                                    }}
-                                </el-descriptions-item>
-                            </el-descriptions>
-                            <div class="card-interval">
-                                <span class="title-class">{{ $t('aiTools.gpu.process') }}</span>
-                            </div>
-                            <el-table :data="item.processes" v-if="item.processes?.length !== 0">
-                                <el-table-column label="PID" prop="pid" />
-                                <el-table-column :label="$t('aiTools.gpu.type')" prop="type">
-                                    <template #default="{ row }">
-                                        {{ loadProcessType(row.type) }}
-                                    </template>
-                                </el-table-column>
-                                <el-table-column :label="$t('aiTools.gpu.processName')" prop="processName" />
-                                <el-table-column :label="$t('aiTools.gpu.processMemoryUsage')" prop="usedMemory" />
-                            </el-table>
-                        </el-collapse-item>
-                    </el-collapse>
-                </template>
-            </LayoutContent>
-        </div>
-        <div v-else>
-            <LayoutContent
-                v-loading="loading"
-                :title="$t('aiTools.gpu.gpu')"
-                :divider="true"
-                v-if="xpuInfo.driverVersion.length !== 0 && !loading"
-            >
-                <template #toolbar>
-                    <el-row>
-                        <el-col :xs="24" :sm="16" :md="16" :lg="16" :xl="16" />
-                        <el-col :xs="24" :sm="8" :md="8" :lg="8" :xl="8">
-                            <TableSetting title="xpu-refresh" @search="refresh()" />
-                        </el-col>
-                    </el-row>
-                </template>
-                <template #main>
-                    <el-descriptions direction="vertical" :column="14" border>
-                        <el-descriptions-item :label="$t('aiTools.gpu.driverVersion')" width="50%" :span="7">
-                            {{ xpuInfo.driverVersion }}
-                        </el-descriptions-item>
-                    </el-descriptions>
-                    <el-collapse v-model="activeNames" class="card-interval">
-                        <el-collapse-item
-                            v-for="item in xpuInfo.xpu"
-                            :key="item.basic.deviceID"
-                            :name="item.basic.deviceID"
-                        >
-                            <template #title>
-                                <span class="name-class">{{ item.basic.deviceID + '. ' + item.basic.deviceName }}</span>
-                            </template>
-                            <span class="title-class">{{ $t('aiTools.gpu.base') }}</span>
-                            <el-descriptions direction="vertical" :column="6" border size="small" class="mt-2">
-                                <el-descriptions-item :label="$t('monitor.gpuUtil')">
-                                    {{ item.stats.memoryUtil }}
-                                </el-descriptions-item>
-                                <el-descriptions-item>
-                                    <template #label>
-                                        <div class="cell-item">
-                                            {{ $t('monitor.temperature') }}
-                                            <el-tooltip placement="top" :content="$t('aiTools.gpu.temperatureHelper')">
-                                                <el-icon class="icon-item"><InfoFilled /></el-icon>
-                                            </el-tooltip>
-                                        </div>
-                                    </template>
-                                    {{ item.stats.temperature }}
-                                </el-descriptions-item>
-                                <el-descriptions-item :label="$t('monitor.powerUsage')">
-                                    {{ item.stats.power }}
-                                </el-descriptions-item>
-                                <el-descriptions-item :label="$t('monitor.memoryUsage')">
-                                    {{ item.stats.memoryUsed }} / {{ item.basic.memory }}
-                                </el-descriptions-item>
-                                <el-descriptions-item :label="$t('aiTools.gpu.busID')">
-                                    {{ item.basic.pciBdfAddress }}
-                                </el-descriptions-item>
-                            </el-descriptions>
-                            <div class="card-interval">
-                                <span class="title-class">{{ $t('aiTools.gpu.process') }}</span>
-                            </div>
-                            <el-table :data="item.processes" v-if="item.processes?.length !== 0">
-                                <el-table-column label="PID" prop="pid" />
-                                <el-table-column :label="$t('aiTools.gpu.processName')" prop="command" />
-                                <el-table-column :label="$t('aiTools.gpu.shr')" prop="shr" />
-                                <el-table-column :label="$t('aiTools.gpu.processMemoryUsage')" prop="memory" />
-                            </el-table>
-                        </el-collapse-item>
-                    </el-collapse>
-                </template>
-            </LayoutContent>
-        </div>
-        <LayoutContent
-            :title="$t('aiTools.gpu.gpu')"
-            :divider="true"
-            v-if="gpuInfo.driverVersion.length === 0 && xpuInfo.driverVersion.length == 0 && !loading"
-        >
+        <LayoutContent :title="$t('aiTools.gpu.gpu')" :divider="true" v-else>
             <template #main>
                 <div class="app-warn">
                     <div class="flx-center">
@@ -259,79 +146,237 @@
     </div>
 </template>
 
-<script lang="ts" setup>
-import { onMounted, ref } from 'vue';
-import { loadGPUInfo } from '@/api/modules/ai';
-import { AI } from '@/api/interface/ai';
+<script setup lang="ts">
+import { ref, reactive, onMounted, computed } from 'vue';
+import { loadGPUMonitor } from '@/api/modules/host';
+import { dateFormatWithoutYear } from '@/utils/util';
+import { GlobalStore } from '@/store';
+import { shortcuts } from '@/utils/shortcuts';
+import { Host } from '@/api/interface/host';
 import i18n from '@/lang';
 
-const loading = ref();
-const activeNames = ref(0);
-const gpuInfo = ref<AI.Info>({
-    cudaVersion: '',
-    driverVersion: '',
-    type: 'nvidia',
-    gpu: [],
+const globalStore = GlobalStore();
+
+const mobile = computed(() => {
+    return globalStore.isMobile();
 });
-const xpuInfo = ref<AI.XpuInfo>({
-    driverVersion: '',
-    type: 'xpu',
-    xpu: [],
+
+const loading = ref(false);
+const options = ref([]);
+const timeRangeGlobal = ref<[Date, Date]>([new Date(new Date().setHours(0, 0, 0, 0)), new Date()]);
+const chartsOption = ref({
+    loadPowerChart: null,
+    loadGPUChart: null,
+    loadMemoryChart: null,
+    loadTemperatureChart: null,
+    loadSpeedChart: null,
 });
-const gpuType = ref('nvidia');
+
+const searchTime = ref();
+const searchInfo = reactive<Host.MonitorGPUSearch>({
+    productName: '',
+    startTime: new Date(new Date().setHours(0, 0, 0, 0)),
+    endTime: new Date(),
+});
 
 const search = async () => {
+    if (searchTime.value && searchTime.value.length === 2) {
+        searchInfo.startTime = searchTime.value[0];
+        searchInfo.endTime = searchTime.value[1];
+    }
     loading.value = true;
-    await loadGPUInfo()
+    await loadGPUMonitor(searchInfo)
         .then((res) => {
             loading.value = false;
-            gpuType.value = res.data.type;
-            if (res.data.type == 'nvidia') {
-                gpuInfo.value = res.data;
-            } else {
-                xpuInfo.value = res.data;
-            }
+            options.value = res.data.productNames || [];
+            searchInfo.productName = searchInfo.productName || (options.value.length > 0 ? options.value[0] : '');
+            let baseDate = res.data.date.length === 0 ? loadEmptyDate(timeRangeGlobal.value) : res.data.date;
+            let date = baseDate.map(function (item: any) {
+                return dateFormatWithoutYear(item);
+            });
+            initCPUCharts(date, res.data.gpuValue);
+            initMemoryCharts(date, res.data.memoryValue);
+            initPowerCharts(date, res.data.powerValue);
+            initSpeedCharts(date, res.data.speedValue);
+            initTemperatureCharts(date, res.data.temperatureValue);
         })
         .catch(() => {
             loading.value = false;
         });
 };
 
-const refresh = async () => {
-    const res = await loadGPUInfo();
-    gpuInfo.value = res.data;
-};
+function initCPUCharts(baseDate: any, items: any) {
+    let percents = items.map(function (item: any) {
+        return Number(item.toFixed(2));
+    });
+    let data = percents.length === 0 ? loadEmptyData() : percents;
+    chartsOption.value['loadGPUChart'] = {
+        xData: baseDate,
+        yData: [
+            {
+                name: i18n.global.t('monitor.gpuUtil'),
+                data: data,
+            },
+        ],
+        formatStr: '%',
+    };
+}
+function initMemoryCharts(baseDate: any, items: any) {
+    let lists = items.map(function (item: any) {
+        return { value: Number(item.percent.toFixed(2)), data: item };
+    });
+    lists = lists.length === 0 ? loadEmptyData2() : lists;
+    chartsOption.value['loadMemoryChart'] = {
+        xData: baseDate,
+        yData: [
+            {
+                name: i18n.global.t('monitor.memoryUsage'),
+                data: lists,
+            },
+        ],
+        tooltip: {
+            trigger: 'axis',
+            formatter: function (list: any) {
+                return withMemoryProcess(list);
+            },
+        },
+        formatStr: '%',
+    };
+}
+function initPowerCharts(baseDate: any, items: any) {
+    let list = items.map(function (item: any) {
+        return { value: Number(item.percent.toFixed(2)), data: item };
+    });
+    list = list.length === 0 ? loadEmptyData2() : list;
+    chartsOption.value['loadPowerChart'] = {
+        xData: baseDate,
+        yData: [
+            {
+                name: i18n.global.t('monitor.powerUsage'),
+                data: list,
+            },
+        ],
+        tooltip: {
+            trigger: 'axis',
+            formatter: function (list: any) {
+                let res = loadDate(list[0].name);
+                for (const item of list) {
+                    res += loadSeries(item, item.data.value ? item.data.value : item.data, '%');
+                    res += `( ${item.data?.data.used}  W / ${item.data?.data.total}  W)<br/>`;
+                }
+                return res;
+            },
+        },
+        formatStr: '%',
+    };
+}
+function initTemperatureCharts(baseDate: any, items: any) {
+    let temperatures = items.map(function (item: any) {
+        return Number(item);
+    });
+    temperatures = temperatures.length === 0 ? loadEmptyData() : temperatures;
+    chartsOption.value['loadTemperatureChart'] = {
+        xData: baseDate,
+        yData: [
+            {
+                name: i18n.global.t('monitor.temperature'),
+                data: temperatures,
+            },
+        ],
+        formatStr: '°C',
+    };
+}
+function initSpeedCharts(baseDate: any, items: any) {
+    let speeds = items.map(function (item: any) {
+        return Number(item);
+    });
+    speeds = speeds.length === 0 ? loadEmptyData() : speeds;
+    chartsOption.value['loadSpeedChart'] = {
+        xData: baseDate,
+        yData: [
+            {
+                name: i18n.global.t('monitor.fanSpeed'),
+                data: speeds,
+            },
+        ],
+        formatStr: '%',
+    };
+}
 
-const lowerCase = (val: string) => {
-    return val.toLowerCase();
-};
+function loadEmptyDate(timeRange: any) {
+    if (timeRange.length != 2) {
+        return;
+    }
+    let date1 = new Date(timeRange[0]);
+    let date2 = new Date(timeRange[1]);
+    return [date1, date2];
+}
+function loadEmptyData() {
+    return [0, 0];
+}
+function loadEmptyData2() {
+    return [
+        { value: 0, data: {} },
+        { value: 0, data: {} },
+    ];
+}
 
-const loadComputeMode = (val: string) => {
-    switch (val) {
-        case 'Default':
-            return i18n.global.t('aiTools.gpu.default');
-        case 'Exclusive Process':
-            return i18n.global.t('aiTools.gpu.exclusiveProcess');
-        case 'Exclusive Thread':
-            return i18n.global.t('aiTools.gpu.exclusiveThread');
-        case 'Prohibited':
-            return i18n.global.t('aiTools.gpu.prohibited');
+function withMemoryProcess(list: any) {
+    let process;
+    let res = loadDate(list[0].name);
+    for (const item of list) {
+        if (item.data?.data) {
+            process = item.data?.data.gpuProcesses || [];
+        }
+        res += loadSeries(item, item.data.value ? item.data.value : item.data, '%');
+        res += `( ${item.data?.data.used}  MiB / ${item.data?.data.total}  MiB)<br/>`;
     }
-};
-
-const loadEcc = (val: string) => {
-    if (val === 'N/A') {
-        return i18n.global.t('aiTools.gpu.migModeNA');
+    if (!process) {
+        return res;
     }
-    if (val === 'Disabled') {
-        return i18n.global.t('aiTools.gpu.disabled');
+    res += `
+        <div style="margin-top: 10px; border-bottom: 1px dashed black;"></div>
+        <table style="border-collapse: collapse; margin-top: 20px; font-size: 12px;">
+        <thead>
+            <tr>
+            <th style="padding: 6px 8px;">PID</th>
+            <th style="padding: 6px 8px;">${i18n.global.t('aiTools.gpu.type')}</th>
+            <th style="padding: 6px 8px;">${i18n.global.t('aiTools.gpu.processName')}</th>
+            <th style="padding: 6px 8px;">${i18n.global.t('aiTools.gpu.processMemoryUsage')}</th>
+            </tr>
+        </thead>
+        <tbody>
+    `;
+    for (const row of process) {
+        res += `
+            <tr>
+                <td style="padding: 6px 8px; text-align: center;">
+                    ${row.pid}
+                </td>
+                <td style="padding: 6px 8px; text-align: center;">
+                    ${loadProcessType(row.type)}
+                </td>
+                <td style="padding: 6px 8px; text-align: center;">
+                    ${row.processName}
+                </td>
+                <td style="padding: 6px 8px; text-align: center;">
+                    ${row.usedMemory}
+                </td>
+            </tr>
+        `;
     }
-    if (val === 'Enabled') {
-        return i18n.global.t('aiTools.gpu.enabled');
-    }
-    return val || 0;
-};
-
+    return res;
+}
+function loadDate(name: any) {
+    return ` <div style="display: inline-block; width: 100%; padding-bottom: 10px;">
+                ${i18n.global.t('commons.search.date')}: ${name.replaceAll('\n', ' ')}
+            </div>`;
+}
+function loadSeries(item: any, data: any, unit: any) {
+    return `<div style="width: 100%;">
+                ${item.marker} ${item.seriesName}: ${data} ${unit}
+            </div>`;
+}
 const loadProcessType = (val: string) => {
     if (val === 'C' || val === 'G') {
         return i18n.global.t('aiTools.gpu.type' + val);
@@ -347,21 +392,19 @@ onMounted(() => {
 });
 </script>
 
-<style lang="scss" scoped>
-.name-class {
-    font-size: 18px;
-    font-weight: 500;
-}
-.title-class {
-    font-size: 14px;
-    font-weight: 500;
-}
-.cell-item {
-    display: flex;
-    align-items: center;
-    .icon-item {
-        margin-left: 4px;
-        margin-top: -1px;
+<style scoped lang="scss">
+.content-container__search {
+    margin-top: 7px;
+    .el-card {
+        --el-card-padding: 12px;
     }
+}
+.title {
+    font-size: 16px;
+    font-weight: 500;
+}
+.chart {
+    width: 100%;
+    height: 400px;
 }
 </style>
