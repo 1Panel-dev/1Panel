@@ -887,6 +887,7 @@ const message = {
         serverPath: 'Server path',
         containerDir: 'Container path',
         volumeHelper: 'Ensure that the content of the storage volume is correct',
+        networkEmptyHelper: 'Please confirm the container network selection is correct',
         modeRW: 'RW',
         modeR: 'R',
         sharedLabel: 'Propagation Mode',

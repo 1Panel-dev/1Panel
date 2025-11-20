@@ -79,17 +79,16 @@ type ResourceLimit struct {
 }
 
 type ContainerOperate struct {
-	TaskID          string         `json:"taskID"`
-	ForcePull       bool           `json:"forcePull"`
-	Name            string         `json:"name" validate:"required"`
-	Image           string         `json:"image" validate:"required"`
-	Network         string         `json:"network"`
-	Hostname        string         `json:"hostname"`
-	DomainName      string         `json:"domainName"`
-	MacAddr         string         `json:"macAddr"`
-	DNS             []string       `json:"dns"`
-	Ipv4            string         `json:"ipv4"`
-	Ipv6            string         `json:"ipv6"`
+	TaskID    string `json:"taskID"`
+	ForcePull bool   `json:"forcePull"`
+	Name      string `json:"name" validate:"required"`
+	Image     string `json:"image" validate:"required"`
+
+	Hostname   string             `json:"hostname"`
+	DomainName string             `json:"domainName"`
+	DNS        []string           `json:"dns"`
+	Networks   []ContainerNetwork `json:"networks"`
+
 	PublishAllPorts bool           `json:"publishAllPorts"`
 	ExposedPorts    []PortHelper   `json:"exposedPorts"`
 	Tty             bool           `json:"tty"`
@@ -107,6 +106,12 @@ type ContainerOperate struct {
 	Labels          []string       `json:"labels"`
 	Env             []string       `json:"env"`
 	RestartPolicy   string         `json:"restartPolicy"`
+}
+type ContainerNetwork struct {
+	Network string `json:"network"`
+	Ipv4    string `json:"ipv4"`
+	Ipv6    string `json:"ipv6"`
+	MacAddr string `json:"macAddr"`
 }
 
 type ContainerCreateByCommand struct {

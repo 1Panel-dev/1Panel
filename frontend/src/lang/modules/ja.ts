@@ -865,6 +865,7 @@ const message = {
         serverPath: 'サーバーパス',
         containerDir: 'コンテナパス',
         volumeHelper: 'ストレージボリュームのコンテンツが正しいことを確認してください',
+        networkEmptyHelper: 'コンテナネットワークの選択が正しいことを確認してください',
         modeRW: 'rw',
         modeR: 'r',
         sharedLabel: '伝播モード',

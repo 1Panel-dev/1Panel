@@ -846,6 +846,7 @@ const message = {
         serverPath: '伺服器目錄',
         containerDir: '容器目錄',
         volumeHelper: '請確認磁碟區內容輸入正確',
+        networkEmptyHelper: '請確認容器網路選擇正確',
         modeRW: '讀寫',
         modeR: '唯讀',
         sharedLabel: '傳播模式',

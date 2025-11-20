@@ -66,12 +66,9 @@ export namespace Container {
         image: string;
         imageInput: boolean;
         forcePull: boolean;
-        network: string;
+        networks: Array<ContainerNetwork>;
         hostname: string;
         domainName: string;
-        macAddr: string;
-        ipv4: string;
-        ipv6: string;
         dns: Array<string>;
         memoryItem: number;
         cmd: Array<string>;
@@ -118,7 +115,7 @@ export namespace Container {
         createTime: string;
         state: string;
         runTime: string;
-        network: Array<string>;
+        network: Array<ContainerNetwork>;
         ports: Array<string>;
         isFromApp: boolean;
         isFromCompose: boolean;
@@ -126,6 +123,12 @@ export namespace Container {
         hasLoad: boolean;
         cpuPercent: number;
         memoryPercent: number;
+    }
+    export interface ContainerNetwork {
+        network: string;
+        ipv4: string;
+        ipv6: string;
+        macAddr: string;
     }
     export interface ContainerInfo {
         name: string;

@@ -667,27 +667,27 @@ func (u *ContainerService) ContainerInfo(req dto.OperationWithName) (*dto.Contai
 	data.Name = strings.ReplaceAll(oldContainer.Name, "/", "")
 	data.Image = oldContainer.Config.Image
 	if oldContainer.NetworkSettings != nil {
-		for network := range oldContainer.NetworkSettings.Networks {
-			data.Network = network
-			break
+		for net, val := range oldContainer.NetworkSettings.Networks {
+			netItem := dto.ContainerNetwork{
+				Network: net,
+				MacAddr: val.MacAddress,
+			}
+			if val.IPAMConfig != nil {
+				if netItem.Network != "bridge" {
+					netItem.Ipv4 = val.IPAMConfig.IPv4Address
+					netItem.Ipv6 = val.IPAMConfig.IPv6Address
+				}
+			} else {
+				if netItem.Network != "bridge" {
+					netItem.Ipv4 = val.IPAddress
+				}
+			}
+			data.Networks = append(data.Networks, netItem)
 		}
 	}
 
 	exposePorts, _ := loadPortByInspect(oldContainer.ID, client)
 	data.ExposedPorts = loadContainerPortForInfo(exposePorts)
-	networkSettings := oldContainer.NetworkSettings
-	bridgeNetworkSettings := networkSettings.Networks[data.Network]
-	if bridgeNetworkSettings.IPAMConfig != nil {
-		data.MacAddr = bridgeNetworkSettings.MacAddress
-		if data.Network != "bridge" {
-			data.Ipv4 = bridgeNetworkSettings.IPAMConfig.IPv4Address
-			data.Ipv6 = bridgeNetworkSettings.IPAMConfig.IPv6Address
-		}
-	} else {
-		if data.Network != "bridge" {
-			data.Ipv4 = bridgeNetworkSettings.IPAddress
-		}
-	}
 	data.Hostname = oldContainer.Config.Hostname
 	data.DNS = oldContainer.HostConfig.DNS
 	data.DomainName = oldContainer.Config.Domainname
@@ -1505,25 +1505,25 @@ func loadConfigInfo(isCreate bool, req dto.ContainerOperate, oldContainer *conta
 	config.User = req.User
 	config.WorkingDir = req.WorkingDir
 
-	if len(req.Network) != 0 {
-		switch req.Network {
-		case "host", "none", "bridge":
-			hostConf.NetworkMode = container.NetworkMode(req.Network)
-		}
-		if req.Ipv4 != "" || req.Ipv6 != "" {
-			networkConf.EndpointsConfig = map[string]*network.EndpointSettings{req.Network: {
-				IPAMConfig: &network.EndpointIPAMConfig{
-					IPv4Address: req.Ipv4,
-					IPv6Address: req.Ipv6,
-				}, MacAddress: req.MacAddr}}
-		} else {
-			networkConf.EndpointsConfig = map[string]*network.EndpointSettings{req.Network: {}}
+	if len(req.Networks) != 0 {
+		networkConf.EndpointsConfig = make(map[string]*network.EndpointSettings)
+		for _, item := range req.Networks {
+			switch item.Network {
+			case "host", "none", "bridge":
+				hostConf.NetworkMode = container.NetworkMode(item.Network)
+			}
+			if item.Ipv4 != "" || item.Ipv6 != "" {
+				networkConf.EndpointsConfig[item.Network] = &network.EndpointSettings{
+					IPAMConfig: &network.EndpointIPAMConfig{
+						IPv4Address: item.Ipv4,
+						IPv6Address: item.Ipv6,
+					}, MacAddress: item.MacAddr}
+			} else {
+				networkConf.EndpointsConfig[item.Network] = &network.EndpointSettings{}
+			}
 		}
 	} else {
-		if req.Ipv4 != "" || req.Ipv6 != "" {
-			return nil, nil, nil, fmt.Errorf("please set up the network")
-		}
-		networkConf = network.NetworkingConfig{}
+		return nil, nil, nil, fmt.Errorf("please set up the network")
 	}
 
 	hostConf.Privileged = req.Privileged

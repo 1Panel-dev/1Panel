@@ -897,6 +897,7 @@ const message = {
         serverPath: 'Sunucu yolu',
         containerDir: 'Konteyner yolu',
         volumeHelper: 'Depolama biriminin içeriğinin doğru olduğundan emin olun',
+        networkEmptyHelper: 'Lütfen konteyner ağ seçiminin doğru olduğunu onaylayın',
         modeRW: 'RW',
         modeR: 'R',
         sharedLabel: 'Yayılma Modu',

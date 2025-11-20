@@ -858,6 +858,7 @@ const message = {
         serverPath: '서버 경로',
         containerDir: '컨테이너 경로',
         volumeHelper: '저장소 볼륨의 내용이 올바른지 확인하십시오.',
+        networkEmptyHelper: '컨테이너 네트워크 선택이 올바른지 확인해 주세요',
         modeRW: '읽기/쓰기',
         modeR: '읽기 전용',
         sharedLabel: '전파 모드',

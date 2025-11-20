@@ -894,6 +894,7 @@ const message = {
         serverPath: 'Ruta en el servidor',
         containerDir: 'Ruta en el contenedor',
         volumeHelper: 'Asegúrese de que el contenido del volumen de almacenamiento sea correcto',
+        networkEmptyHelper: 'Por favor confirme que la selección de red del contenedor es correcta',
         modeRW: 'RW',
         modeR: 'R',
         sharedLabel: 'Modo de Propagación',

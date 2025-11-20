@@ -879,7 +879,7 @@ const message = {
         hostOption: 'Hos',
         serverPath: 'Laluan pelayan',
         containerDir: 'Laluan kontena',
-        volumeHelper: 'Pastikan kandungan volum storan adalah betul',
+        networkEmptyHelper: 'Sila pastikan pemilihan rangkaian bekas adalah betul',
         modeRW: 'RW',
         modeR: 'R',
         sharedLabel: 'Mod Penyebaran',
