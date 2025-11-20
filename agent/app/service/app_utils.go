@@ -1555,7 +1555,6 @@ func handleInstalled(appInstallList []model.AppInstall, updated bool, sync bool)
 			Message:     installed.Message,
 			HttpPort:    installed.HttpPort,
 			HttpsPort:   installed.HttpsPort,
-			Icon:        installed.App.Icon,
 			AppName:     installed.App.Name,
 			AppKey:      installed.App.Key,
 			AppType:     installed.App.Type,

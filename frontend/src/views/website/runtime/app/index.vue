@@ -51,7 +51,7 @@ const props = defineProps({
         required: true,
     },
 });
-const apps = ref<App.App[]>([]);
+const apps = ref<App.AppItem[]>([]);
 const appVersions = ref<string[]>([]);
 const emit = defineEmits(['update:modelValue']);
 const runtime = useVModel(props, 'modelValue', emit);

@@ -548,7 +548,7 @@ const appReq = reactive({
     page: 1,
     pageSize: 100,
 });
-const apps = ref<App.App[]>([]);
+const apps = ref<App.AppItem[]>([]);
 const preCheckRef = ref();
 const staticPath = ref('');
 const runtimeResource = ref('appstore');

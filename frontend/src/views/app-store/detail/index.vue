@@ -3,7 +3,12 @@
         <div class="brief" v-loading="loadingApp">
             <div class="detail flex">
                 <div class="w-12 h-12 rounded p-1 shadow-md icon">
-                    <img :src="app.icon" alt="App Icon" class="w-full h-full rounded" style="object-fit: contain" />
+                    <img
+                        :src="getAppIconUrl(app.id, currentNode)"
+                        alt="App Icon"
+                        class="w-full h-full rounded"
+                        style="object-fit: contain"
+                    />
                 </div>
                 <div class="ml-4">
                     <div class="name mb-2">
@@ -66,17 +71,15 @@
 </template>
 
 <script lang="ts" setup>
-import { getAppByKey, getAppDetail } from '@/api/modules/app';
+import { getAppByKey, getAppDetail, getAppIconUrl } from '@/api/modules/app';
 import MdEditor from 'md-editor-v3';
 import { ref } from 'vue';
 import Install from './install/index.vue';
-import { GlobalStore } from '@/store';
 import { computeSizeFromMB } from '@/utils/util';
-import { storeToRefs } from 'pinia';
 import { jumpToInstall } from '@/utils/app';
 
-const globalStore = GlobalStore();
-const { isDarkTheme } = storeToRefs(globalStore);
+import { useGlobalStore } from '@/composables/useGlobalStore';
+const { currentNode, isDarkTheme } = useGlobalStore();
 
 const app = ref<any>({});
 const appDetail = ref<any>({});

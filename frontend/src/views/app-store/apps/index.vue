@@ -107,7 +107,7 @@ const req = reactive({
     showCurrentArch: false,
 });
 
-const apps = ref<App.AppDTO[]>([]);
+const apps = ref<App.AppItem[]>([]);
 const loading = ref(false);
 const canUpdate = ref(false);
 const syncing = ref(false);

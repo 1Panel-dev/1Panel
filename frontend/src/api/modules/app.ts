@@ -128,3 +128,9 @@ export const syncCutomAppStore = (req: App.AppStoreSync) => {
 export const getCurrentNodeCustomAppConfig = () => {
     return http.get<App.CustomAppStoreConfig>(`/custom/app/config`);
 };
+
+export function getAppIconUrl(appId: number, node?: string): string {
+    const baseURL = import.meta.env.VITE_API_URL as string;
+    const params = node ? `?operateNode=${node}` : '';
+    return `${baseURL}/apps/icon/${appId}${params}`;
+}

@@ -222,7 +222,7 @@ interface OperateRrops {
 }
 
 const open = ref(false);
-const apps = ref<App.App[]>([]);
+const apps = ref<App.AppItem[]>([]);
 const runtimeForm = ref<FormInstance>();
 const loading = ref(false);
 const initParam = ref(false);

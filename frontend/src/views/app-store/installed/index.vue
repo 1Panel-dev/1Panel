@@ -58,7 +58,7 @@
                                                     @click="openDetail(installed.appKey)"
                                                     shape="square"
                                                     :size="66"
-                                                    :src="'data:image/png;base64,' + installed.icon"
+                                                    :src="getAppIconUrl(installed.appID, currentNode)"
                                                 />
                                             </div>
                                         </el-col>
@@ -417,7 +417,7 @@
 </template>
 
 <script lang="ts" setup>
-import { searchAppInstalled, installedOp, appInstalledDeleteCheck } from '@/api/modules/app';
+import { searchAppInstalled, installedOp, appInstalledDeleteCheck, getAppIconUrl } from '@/api/modules/app';
 import { onMounted, onUnmounted, reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { ElMessageBox } from 'element-plus';
@@ -444,8 +444,8 @@ import Tags from '@/views/app-store/components/tag.vue';
 import SvgIcon from '@/components/svg-icon/svg-icon.vue';
 import MainDiv from '@/components/main-div/index.vue';
 import { routerToFileWithPath, routerToNameWithQuery } from '@/utils/router';
-import { GlobalStore } from '@/store';
-const globalStore = GlobalStore();
+import { useGlobalStore } from '@/composables/useGlobalStore';
+const { currentNode, isMaster, currentNodeAddr } = useGlobalStore();
 
 const data = ref<any>();
 const loading = ref(false);
@@ -762,8 +762,8 @@ const getConfig = async () => {
             defaultLink.value = res.data;
             return;
         }
-        if (!globalStore.isMaster || globalStore.currentNodeAddr != '127.0.0.1') {
-            defaultLink.value = globalStore.currentNodeAddr;
+        if (!isMaster.value || currentNodeAddr.value != '127.0.0.1') {
+            defaultLink.value = currentNodeAddr.value;
         }
     } catch (error) {}
 };

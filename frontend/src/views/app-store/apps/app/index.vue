@@ -3,7 +3,7 @@
         <el-card>
             <div class="app-wrapper" @click="openDetail(app.key)">
                 <div class="app-image">
-                    <el-avatar shape="square" :size="60" :src="'data:image/png;base64,' + app.icon" />
+                    <el-avatar shape="square" :size="60" :src="getAppIconUrl(app.id, currentNode)" />
                 </div>
                 <div class="app-content">
                     <div class="content-top">
@@ -23,7 +23,7 @@
                         <div class="app-tags">
                             <el-tag v-for="(tag, ind) in app.tags" :key="ind" type="info">
                                 <span>
-                                    {{ tag.name }}
+                                    {{ tag }}
                                 </span>
                             </el-tag>
                             <el-tag v-if="app.status === 'TakeDown'" class="p-mr-5">
@@ -48,6 +48,10 @@
 </template>
 
 <script lang="ts" setup>
+import { getAppIconUrl } from '@/api/modules/app';
+import { useGlobalStore } from '@/composables/useGlobalStore';
+const { currentNode } = useGlobalStore();
+
 defineProps({
     app: {
         type: Object,

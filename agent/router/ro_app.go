@@ -22,6 +22,7 @@ func (a *AppRouter) InitRouter(Router *gin.RouterGroup) {
 		appRouter.GET("/details/:id", baseApi.GetAppDetailByID)
 		appRouter.POST("/install", baseApi.InstallApp)
 		appRouter.GET("/tags", baseApi.GetAppTags)
+		appRouter.GET("/icon/:appID", baseApi.GetAppIcon)
 
 		appRouter.POST("/installed/check", baseApi.CheckAppInstalled)
 		appRouter.POST("/installed/loadport", baseApi.LoadPort)
