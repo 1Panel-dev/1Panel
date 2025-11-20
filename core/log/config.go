@@ -15,7 +15,7 @@ var (
 	DefaultFileFlag    = os.O_RDWR | os.O_CREATE | os.O_APPEND
 	ErrInvalidArgument = errors.New("error argument invalid")
 	QueueSize          = 1024
-	LogQueueSize       = 2048
+	LogQueueSize       = 1024
 	ErrClosed          = errors.New("error write on close")
 )
 
