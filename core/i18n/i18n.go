@@ -131,7 +131,11 @@ var bundle *i18n.Bundle
 
 func UseI18n() gin.HandlerFunc {
 	return func(context *gin.Context) {
-		global.I18n = i18n.NewLocalizer(bundle, GetLanguage())
+		lang := context.GetHeader("Accept-Language")
+		if lang == "" {
+			lang = GetLanguage()
+		}
+		global.I18n = i18n.NewLocalizer(bundle, lang)
 	}
 }
 
