@@ -61,7 +61,6 @@ func setWebStatic(rootRouter *gin.RouterGroup) {
 			entranceValue := base64.StdEncoding.EncodeToString([]byte(entrance))
 			c.SetCookie("SecurityEntrance", entranceValue, 0, "", "", false, true)
 		}
-		c.Writer.Header().Set("Cache-Control", "private, max-age=0, must-revalidate")
 		staticServer := http.FileServer(http.FS(web.IndexHtml))
 		staticServer.ServeHTTP(c.Writer, c.Request)
 	})
