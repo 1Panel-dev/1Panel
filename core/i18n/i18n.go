@@ -2,8 +2,10 @@ package i18n
 
 import (
 	"embed"
-	"github.com/1Panel-dev/1Panel/core/app/repo"
 	"strings"
+	"sync/atomic"
+
+	"github.com/1Panel-dev/1Panel/core/app/repo"
 
 	"github.com/1Panel-dev/1Panel/core/global"
 
@@ -12,6 +14,23 @@ import (
 	"golang.org/x/text/language"
 	"gopkg.in/yaml.v3"
 )
+
+const defaultLang = "en"
+
+var langFiles = map[string]string{
+	"zh":      "lang/zh.yaml",
+	"en":      "lang/en.yaml",
+	"zh-Hant": "lang/zh-Hant.yaml",
+	"fa":      "lang/fa.yaml",
+	"pt":      "lang/pt.yaml",
+	"pt-BR":   "lang/pt-BR.yaml",
+	"ja":      "lang/ja.yaml",
+	"ru":      "lang/ru.yaml",
+	"ms":      "lang/ms.yaml",
+	"ko":      "lang/ko.yaml",
+	"tr":      "lang/tr.yaml",
+	"es-ES":   "lang/es-ES.yaml",
+}
 
 func GetMsgWithMap(key string, maps map[string]interface{}) string {
 	var content string
@@ -112,43 +131,35 @@ var bundle *i18n.Bundle
 
 func UseI18n() gin.HandlerFunc {
 	return func(context *gin.Context) {
-		lang := context.GetHeader("Accept-Language")
-		if lang == "" {
-			lang = GetLanguageFromDB()
-		}
-		global.I18n = i18n.NewLocalizer(bundle, lang)
+		global.I18n = i18n.NewLocalizer(bundle, GetLanguage())
 	}
 }
 
 func Init() {
 	bundle = i18n.NewBundle(language.Chinese)
 	bundle.RegisterUnmarshalFunc("yaml", yaml.Unmarshal)
-	_, _ = bundle.LoadMessageFileFS(fs, "lang/zh.yaml")
-	_, _ = bundle.LoadMessageFileFS(fs, "lang/en.yaml")
-	_, _ = bundle.LoadMessageFileFS(fs, "lang/zh-Hant.yaml")
-	_, _ = bundle.LoadMessageFileFS(fs, "lang/fa.yaml")
-	_, _ = bundle.LoadMessageFileFS(fs, "lang/pt.yaml")
-	_, _ = bundle.LoadMessageFileFS(fs, "lang/pt-BR.yaml")
-	_, _ = bundle.LoadMessageFileFS(fs, "lang/ja.yaml")
-	_, _ = bundle.LoadMessageFileFS(fs, "lang/ru.yaml")
-	_, _ = bundle.LoadMessageFileFS(fs, "lang/ms.yaml")
-	_, _ = bundle.LoadMessageFileFS(fs, "lang/ko.yaml")
-	_, _ = bundle.LoadMessageFileFS(fs, "lang/tr.yaml")
-	_, _ = bundle.LoadMessageFileFS(fs, "lang/es-ES.yaml")
-	lang := GetLanguageFromDB()
-	global.I18n = i18n.NewLocalizer(bundle, lang)
+
+	for _, file := range langFiles {
+		if _, err := bundle.LoadMessageFileFS(fs, file); err != nil {
+			global.LOG.Warnf("failed to load language file %s: %v", file, err)
+		}
+	}
+
+	dbLang := getLanguageFromDBInternal()
+	SetCachedDBLanguage(dbLang)
+	if dbLang == "" {
+		dbLang = defaultLang
+	}
+	global.I18n = i18n.NewLocalizer(bundle, dbLang)
 }
 
 func UseI18nForCmd(lang string) {
 	if lang == "" {
-		lang = "en"
-	}
-
-	if bundle == nil {
-		Init()
+		lang = defaultLang
 	}
 	global.I18nForCmd = i18n.NewLocalizer(bundle, lang)
 }
+
 func GetMsgByKeyForCmd(key string) string {
 	if global.I18nForCmd == nil {
 		UseI18nForCmd("")
@@ -158,6 +169,7 @@ func GetMsgByKeyForCmd(key string) string {
 	})
 	return content
 }
+
 func GetMsgWithMapForCmd(key string, maps map[string]interface{}) string {
 	if global.I18nForCmd == nil {
 		UseI18nForCmd("")
@@ -181,13 +193,29 @@ func GetMsgWithMapForCmd(key string, maps map[string]interface{}) string {
 	}
 }
 
-func GetLanguageFromDB() string {
+func getLanguageFromDBInternal() string {
 	if global.DB == nil {
-		return "en"
+		return defaultLang
 	}
 	lang, _ := repo.NewISettingRepo().GetValueByKey("Language")
 	if lang == "" {
-		return "en"
+		return defaultLang
 	}
 	return lang
+}
+
+var cachedDBLang atomic.Value
+
+func GetLanguage() string {
+	if v := cachedDBLang.Load(); v != nil {
+		return v.(string)
+	}
+	return defaultLang
+}
+
+func SetCachedDBLanguage(lang string) {
+	if lang == "" {
+		lang = defaultLang
+	}
+	cachedDBLang.Store(lang)
 }

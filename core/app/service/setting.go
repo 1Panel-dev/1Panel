@@ -26,6 +26,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/buserr"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
+	"github.com/1Panel-dev/1Panel/core/i18n"
 	"github.com/1Panel-dev/1Panel/core/utils/common"
 	"github.com/1Panel-dev/1Panel/core/utils/controller"
 	"github.com/1Panel-dev/1Panel/core/utils/encrypt"
@@ -148,6 +149,7 @@ func (u *SettingService) Update(key, value string) error {
 	case "UserName", "Password":
 		_ = global.SESSION.Clean()
 	case "Language":
+		i18n.SetCachedDBLanguage(value)
 		if err := xpack.Sync(constant.SyncLanguage); err != nil {
 			global.LOG.Errorf("sync language to node failed, err: %v", err)
 		}
