@@ -91,13 +91,13 @@ type AppProperty struct {
 	Key                string   `json:"key"`
 	Required           []string `json:"Required"`
 	CrossVersionUpdate bool     `json:"crossVersionUpdate"`
-	Limit              int      `json:"limit"`
-	Recommend          int      `json:"recommend"`
+	Limit              int      `json:"limit" yaml:"memoryRequired"`
+	Recommend          int      `json:"recommend" yaml:"memoryRequired"`
 	Website            string   `json:"website"`
 	Github             string   `json:"github"`
 	Document           string   `json:"document"`
 	Architectures      []string `json:"architectures"`
-	MemoryRequired     int      `json:"memoryRequired"`
+	MemoryRequired     int      `json:"memoryRequired" yaml:"memoryRequired"`
 	GpuSupport         bool     `json:"gpuSupport"`
 	Version            float64  `json:"version"`
 	Deprecated         float64  `json:"deprecated"`

@@ -1414,6 +1414,7 @@ func handleLocalApp(appDir string) (app *model.App, err error) {
 	app.Key = "local" + appDefine.Key
 	app.Architectures = strings.Join(appDefine.Architectures, ",")
 	app.GpuSupport = appDefine.GpuSupport
+	app.MemoryRequired = appDefine.MemoryRequired
 
 	app.Resource = constant.AppResourceLocal
 	app.Status = constant.AppNormal
