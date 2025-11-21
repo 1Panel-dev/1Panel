@@ -23,12 +23,10 @@ var langFiles = map[string]string{
 	"zh":      "lang/zh.yaml",
 	"en":      "lang/en.yaml",
 	"zh-Hant": "lang/zh-Hant.yaml",
-	"fa":      "lang/fa.yaml",
-	"pt":      "lang/pt.yaml",
 	"pt-BR":   "lang/pt-BR.yaml",
 	"ja":      "lang/ja.yaml",
 	"ru":      "lang/ru.yaml",
-	"ms":      "lang/ms.yaml",
+	"ms":      "lang/ms.yml",
 	"ko":      "lang/ko.yaml",
 	"tr":      "lang/tr.yaml",
 	"es-ES":   "lang/es-ES.yaml",
@@ -142,10 +140,16 @@ func Init() {
 		bundle = i18n.NewBundle(language.Chinese)
 		bundle.RegisterUnmarshalFunc("yaml", yaml.Unmarshal)
 
+		isSuccess := true
 		for _, file := range langFiles {
 			if _, err := bundle.LoadMessageFileFS(fs, file); err != nil {
 				fmt.Printf("failed to load language file %s: %v\n", file, err)
+				isSuccess = false
 			}
+		}
+
+		if !isSuccess {
+			panic("failed to load language files, See log above for details")
 		}
 
 		dbLang := getLanguageFromDBInternal()
