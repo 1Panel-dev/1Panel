@@ -153,10 +153,11 @@ func Init() {
 		}
 
 		dbLang := getLanguageFromDBInternal()
-		SetCachedDBLanguage(dbLang)
 		if dbLang == "" {
 			dbLang = defaultLang
 		}
+		SetCachedDBLanguage(dbLang)
+
 		global.I18n = i18n.NewLocalizer(bundle, dbLang)
 	})
 }
