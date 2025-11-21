@@ -143,13 +143,13 @@ func Init() {
 		isSuccess := true
 		for _, file := range langFiles {
 			if _, err := bundle.LoadMessageFileFS(fs, file); err != nil {
-				fmt.Printf("failed to load language file %s: %v\n", file, err)
+				fmt.Printf("[i18n] load language file %s failed: %v\n", file, err)
 				isSuccess = false
 			}
 		}
 
 		if !isSuccess {
-			panic("failed to load language files, See log above for details")
+			panic("[i18n] failed to init language files, See log above for details")
 		}
 
 		dbLang := getLanguageFromDBInternal()
