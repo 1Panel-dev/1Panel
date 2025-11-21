@@ -3,6 +3,7 @@ package i18n
 import (
 	"embed"
 	"strings"
+	"sync"
 	"sync/atomic"
 
 	"github.com/1Panel-dev/1Panel/core/app/repo"
@@ -136,24 +137,29 @@ func UseI18n() gin.HandlerFunc {
 }
 
 func Init() {
-	bundle = i18n.NewBundle(language.Chinese)
-	bundle.RegisterUnmarshalFunc("yaml", yaml.Unmarshal)
+	initOnce.Do(func() {
+		bundle = i18n.NewBundle(language.Chinese)
+		bundle.RegisterUnmarshalFunc("yaml", yaml.Unmarshal)
 
-	for _, file := range langFiles {
-		if _, err := bundle.LoadMessageFileFS(fs, file); err != nil {
-			global.LOG.Warnf("failed to load language file %s: %v", file, err)
+		for _, file := range langFiles {
+			if _, err := bundle.LoadMessageFileFS(fs, file); err != nil {
+				global.LOG.Warnf("failed to load language file %s: %v", file, err)
+			}
 		}
-	}
 
-	dbLang := getLanguageFromDBInternal()
-	SetCachedDBLanguage(dbLang)
-	if dbLang == "" {
-		dbLang = defaultLang
-	}
-	global.I18n = i18n.NewLocalizer(bundle, dbLang)
+		dbLang := getLanguageFromDBInternal()
+		SetCachedDBLanguage(dbLang)
+		if dbLang == "" {
+			dbLang = defaultLang
+		}
+		global.I18n = i18n.NewLocalizer(bundle, dbLang)
+	})
 }
 
 func UseI18nForCmd(lang string) {
+	if bundle == nil {
+		Init()
+	}
 	if lang == "" {
 		lang = defaultLang
 	}
@@ -205,6 +211,7 @@ func getLanguageFromDBInternal() string {
 }
 
 var cachedDBLang atomic.Value
+var initOnce sync.Once
 
 func GetLanguage() string {
 	if v := cachedDBLang.Load(); v != nil {
