@@ -144,7 +144,7 @@ func Init() {
 
 		for _, file := range langFiles {
 			if _, err := bundle.LoadMessageFileFS(fs, file); err != nil {
-				fmt.Println("failed to load language file %s: %v", file, err)
+				fmt.Printf("failed to load language file %s: %v\n", file, err)
 			}
 		}
 
