@@ -26,10 +26,10 @@ func (s *Systemd) IsActive(serviceName string) (bool, error) {
 
 func (s *Systemd) IsEnable(serviceName string) (bool, error) {
 	out, err := run(s.toolCmd, "is-enabled", serviceName)
+	if out == "alias\n" && serviceName == "sshd.service" {
+		return s.IsEnable("ssh")
+	}
 	if err != nil && out != "disabled\n" {
-		if serviceName == "sshd" && out == "alias\n" {
-			return s.IsEnable("ssh")
-		}
 		if NewSnap().IsEnable(serviceName) {
 			return true, nil
 		}
