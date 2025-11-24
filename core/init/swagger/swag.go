@@ -40,7 +40,7 @@ func SwaggerHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		path := c.Request.URL.Path
 		path = strings.TrimPrefix(path, "/1panel/swagger")
-		if !matcher.MatchString(path) {
+		if !matcher.MatchString(path) && path != "/" {
 			// 404
 			c.AbortWithStatus(http.StatusNotFound)
 			return
