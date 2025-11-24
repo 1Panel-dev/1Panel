@@ -12,8 +12,9 @@ import (
 
 var matcher = regexp.MustCompile(fileMatchPattern)
 
+const swaggerDocFile = "doc.json"
+
 const fileMatchPattern = `(.*)(index\.html|index\.css|swagger-initializer\.js|doc\.json|favicon-16x16\.png|favicon-32x32\.png|/oauth2-redirect\.html|swagger-ui\.css|swagger-ui\.css\.map|swagger-ui\.js|swagger-ui\.js\.map|swagger-ui-bundle\.js|swagger-ui-bundle\.js\.map|swagger-ui-standalone-preset\.js|swagger-ui-standalone-preset\.js\.map)[?|.]*`
-const SwaggerDocFile = "doc.json"
 const CustomSwaggerInitializerJS = `window.onload = function() {
   //<editor-fold desc="Changeable Configuration Block">
   window.ui = SwaggerUIBundle({
@@ -53,7 +54,7 @@ func SwaggerHandler() gin.HandlerFunc {
 		case "/swagger-initializer.js":
 			c.Header("Content-Type", "application/javascript; charset=utf-8")
 			c.Header("Cache-Control", "private, max-age=600")
-			c.String(http.StatusOK, strings.ReplaceAll(CustomSwaggerInitializerJS, "{{.URL}}", "/api/v2/"+SwaggerDocFile))
+			c.String(http.StatusOK, strings.ReplaceAll(CustomSwaggerInitializerJS, "{{.URL}}", swaggerDocFile))
 		default:
 
 			c.Header("Cache-Control", "private, max-age=600")
