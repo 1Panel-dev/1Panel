@@ -90,11 +90,10 @@ func Routers() *gin.Engine {
 	Router.Use(middleware.WhiteAllow())
 	Router.Use(middleware.BindDomain())
 
-	if false { // test
-		swaggerRouter := Router.Group("1panel")
-		docs.SwaggerInfo.BasePath = "/api/v2"
-		swaggerRouter.Use(middleware.SessionAuth()).GET("/swagger/*any", swaggerHandler())
-	}
+	swaggerRouter := Router.Group("1panel")
+	docs.SwaggerInfo.BasePath = "/api/v2"
+	swaggerRouter.Use(middleware.SessionAuth()).GET("/swagger/*any", swaggerHandler())
+
 	PublicGroup := Router.Group("")
 	{
 		PublicGroup.Use(gzip.Gzip(gzip.DefaultCompression))
