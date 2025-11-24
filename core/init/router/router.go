@@ -31,10 +31,9 @@ func swaggerHandler() gin.HandlerFunc {
 	fileServer := http.StripPrefix("/1panel/swagger/", http.FileServer(http.FS(subFS)))
 
 	return func(c *gin.Context) {
-		path := c.Param("any")
+		path := c.Request.URL.Path
+		path = strings.TrimPrefix(path, "/1panel/swagger")
 		switch path {
-		case "/", "/index.html", "":
-			c.Redirect(http.StatusMovedPermanently, "/1panel/swagger/index.html")
 		case "/doc.json":
 			c.Header("Content-Type", "application/json; charset=utf-8")
 			c.String(http.StatusOK, docs.SwaggerInfo.ReadDoc())
