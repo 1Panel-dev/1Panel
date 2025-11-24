@@ -28,14 +28,22 @@ func NewIDiskService() IDiskService {
 }
 
 func (s *DiskService) GetCompleteDiskInfo() (*response.CompleteDiskInfo, error) {
-	output, err := cmd.RunDefaultWithStdoutBashC("lsblk -P -o NAME,SIZE,TYPE,MOUNTPOINT,FSTYPE,MODEL,SERIAL,TRAN,ROTA")
-	if err != nil {
-		return nil, fmt.Errorf("failed to execute lsblk command: %v", err)
-	}
-
-	diskInfos, err := parseLsblkOutput(output)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse lsblk output: %v", err)
+	var diskInfos []response.DiskBasicInfo
+	output, err := cmd.RunDefaultWithStdoutBashC("lsblk -J -o NAME,SIZE,TYPE,MOUNTPOINT,FSTYPE,MODEL,SERIAL,TRAN,ROTA")
+	if err == nil {
+		diskInfos, err = parseLsblkJsonOutput(output)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse lsblk output: %v", err)
+		}
+	} else {
+		output, err = cmd.RunDefaultWithStdoutBashC("lsblk -P -o NAME,SIZE,TYPE,MOUNTPOINT,FSTYPE,MODEL,SERIAL,TRAN,ROTA")
+		if err != nil {
+			return nil, fmt.Errorf("failed to run lsblk command: %v", err)
+		}
+		diskInfos, err = parseLsblkOutput(output)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse lsblk output: %v", err)
+		}
 	}
 
 	result := organizeDiskInfo(diskInfos)

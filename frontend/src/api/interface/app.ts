@@ -3,7 +3,7 @@ import { ReqPage, CommonModel } from '.';
 export namespace App {
     export interface App extends CommonModel {
         name: string;
-        icon: string;
+        icon?: string;
         key: string;
         tags: Tag[];
         shortDescZh: string;
@@ -14,8 +14,8 @@ export namespace App {
         type: string;
         status: string;
         limit: number;
-        website: string;
-        github: string;
+        website?: string;
+        github?: string;
         readme: string;
     }
 
@@ -44,9 +44,22 @@ export namespace App {
         sort: number;
     }
 
+    export interface AppItem {
+        name: string;
+        key: string;
+        id: number;
+        description: string;
+        status: string;
+        installed: boolean;
+        limit: number;
+        tags: string[];
+        gpuSupport: boolean;
+        recommend: number;
+    }
+
     export interface AppResPage {
         total: number;
-        items: App.AppDTO[];
+        items: AppItem[];
     }
 
     export interface AppUpdateRes {

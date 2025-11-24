@@ -1,7 +1,6 @@
 package log
 
 import (
-	"github.com/1Panel-dev/1Panel/core/constant"
 	"log"
 	"os"
 	"path"
@@ -10,6 +9,8 @@ import (
 	"sync"
 	"sync/atomic"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/core/constant"
 
 	"github.com/1Panel-dev/1Panel/core/global"
 )
@@ -98,7 +99,7 @@ func NewWriterFromConfig(c *Config) (RollingWriter, error) {
 
 	var rollingWriter RollingWriter
 	writer := Writer{
-		queue:   make(chan []byte, BufferSize),
+		queue:   make(chan []byte, LogQueueSize),
 		m:       mng,
 		file:    file,
 		absPath: filepath,

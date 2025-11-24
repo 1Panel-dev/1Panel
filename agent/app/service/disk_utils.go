@@ -2,7 +2,9 @@ package service
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/utils/re"
 	"os"
 	"os/exec"
 	"strconv"
@@ -12,12 +14,134 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto/response"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
-	"github.com/1Panel-dev/1Panel/agent/utils/re"
 )
+
+type LsblkRaw struct {
+	Blockdevices []LsblkDevice `json:"blockdevices"`
+}
+
+type LsblkDevice struct {
+	Name       string        `json:"name"`
+	Size       string        `json:"size"`
+	Type       string        `json:"type"`
+	Mountpoint string        `json:"mountpoint"`
+	Fstype     string        `json:"fstype"`
+	Model      string        `json:"model"`
+	Serial     string        `json:"serial"`
+	Tran       string        `json:"tran"`
+	Rota       bool          `json:"rota"`
+	Children   []LsblkDevice `json:"children"`
+}
+
+func parseDevice(dev LsblkDevice) []response.DiskBasicInfo {
+	var list []response.DiskBasicInfo
+
+	if strings.HasPrefix(dev.Name, "loop") || strings.HasPrefix(dev.Name, "dm-") || dev.Type == "rom" {
+		return list
+	}
+
+	if dev.Type == "lvm" {
+		return list
+	}
+
+	diskType := "Unknown"
+	if dev.Type == "disk" || dev.Type == "part" {
+		if dev.Rota {
+			diskType = "HDD"
+		} else {
+			diskType = "SSD"
+		}
+	}
+
+	mountPoint := dev.Mountpoint
+	filesystem := dev.Fstype
+	size := dev.Size
+
+	var used, avail, totalSize string
+	var usePercent int
+	isMounted := mountPoint != ""
+	isSystem := false
+
+	if dev.Fstype == "LVM2_member" && len(dev.Children) > 0 {
+		for _, child := range dev.Children {
+			if child.Type == "lvm" && child.Mountpoint != "" {
+				devicePath := "/dev/mapper/" + child.Name
+				totalSize, used, avail, usePercent, _ := getDiskUsageInfo(devicePath)
+
+				childInfo := response.DiskBasicInfo{
+					Device:      dev.Name,
+					Size:        totalSize,
+					Model:       dev.Model,
+					DiskType:    diskType,
+					Filesystem:  child.Fstype,
+					MountPoint:  child.Mountpoint,
+					IsMounted:   true,
+					UsePercent:  usePercent,
+					Used:        used,
+					Avail:       avail,
+					Serial:      dev.Serial,
+					IsRemovable: dev.Tran == "usb",
+					IsSystem:    isSystemDisk(child.Mountpoint),
+				}
+				list = append(list, childInfo)
+			}
+		}
+		return list
+	} else if isMounted {
+		isSystem = isSystemDisk(mountPoint)
+		devicePath := "/dev/" + dev.Name
+		totalSize, used, avail, usePercent, _ = getDiskUsageInfo(devicePath)
+		if totalSize != "" {
+			size = totalSize
+		}
+	}
+
+	info := response.DiskBasicInfo{
+		Device:      dev.Name,
+		Size:        size,
+		Model:       dev.Model,
+		DiskType:    diskType,
+		Filesystem:  filesystem,
+		MountPoint:  mountPoint,
+		IsMounted:   isMounted,
+		UsePercent:  usePercent,
+		Used:        used,
+		Avail:       avail,
+		Serial:      dev.Serial,
+		IsRemovable: dev.Tran == "usb",
+		IsSystem:    isSystem,
+	}
+
+	list = append(list, info)
+
+	for _, child := range dev.Children {
+		childList := parseDevice(child)
+		list = append(list, childList...)
+	}
+
+	return list
+}
+
+func parseLsblkJsonOutput(output string) ([]response.DiskBasicInfo, error) {
+	raw := &LsblkRaw{}
+	if err := json.Unmarshal([]byte(output), raw); err != nil {
+		return nil, fmt.Errorf("failed to parse lsblk json output: %v", err)
+	}
+	var disks []response.DiskBasicInfo
+
+	for _, dev := range raw.Blockdevices {
+		if strings.HasPrefix(dev.Name, "loop") ||
+			strings.HasPrefix(dev.Name, "dm-") {
+			continue
+		}
+		devList := parseDevice(dev)
+		disks = append(disks, devList...)
+	}
+	return disks, nil
+}
 
 func organizeDiskInfo(diskInfos []response.DiskBasicInfo) response.CompleteDiskInfo {
 	var result response.CompleteDiskInfo
-	var systemDisk *response.DiskInfo
 	diskMap := make(map[string]*response.DiskInfo)
 	partitions := make(map[string][]response.DiskBasicInfo)
 
@@ -55,7 +179,7 @@ func organizeDiskInfo(diskInfos []response.DiskBasicInfo) response.CompleteDiskI
 		totalCapacity += capacity
 
 		if disk.IsSystem {
-			systemDisk = disk
+			result.SystemDisks = append(result.SystemDisks, *disk)
 		} else if len(disk.Partitions) == 0 {
 			result.UnpartitionedDisks = append(result.UnpartitionedDisks, disk.DiskBasicInfo)
 		} else {
@@ -63,7 +187,6 @@ func organizeDiskInfo(diskInfos []response.DiskBasicInfo) response.CompleteDiskI
 		}
 	}
 
-	result.SystemDisk = systemDisk
 	result.TotalDisks = len(diskMap)
 	result.TotalCapacity = totalCapacity
 
@@ -162,17 +285,25 @@ func parseLsblkOutput(output string) ([]response.DiskBasicInfo, error) {
 		if fsType == "LVM2_member" {
 			for _, lvmInfo := range lvmMap {
 				if lvmInfo.IsMounted {
-					actualMountPoint = lvmInfo.MountPoint
-					actualFsType = lvmInfo.Filesystem
-					actualUsed = lvmInfo.Used
-					size = lvmInfo.Size
-					actualAvail = lvmInfo.Avail
-					actualUsePercent = lvmInfo.UsePercent
-					isMounted = true
-					isSystemPartition = lvmInfo.IsSystem
-					break
+					lvmDiskInfo := response.DiskBasicInfo{
+						Device:      name,
+						Size:        lvmInfo.Size,
+						Model:       model,
+						DiskType:    "LVM",
+						IsRemovable: tran == "usb",
+						IsSystem:    lvmInfo.IsSystem,
+						Filesystem:  lvmInfo.Filesystem,
+						Used:        lvmInfo.Used,
+						Avail:       lvmInfo.Avail,
+						UsePercent:  lvmInfo.UsePercent,
+						MountPoint:  lvmInfo.MountPoint,
+						IsMounted:   true,
+						Serial:      serial,
+					}
+					diskInfos = append(diskInfos, lvmDiskInfo)
 				}
 			}
+			continue
 		}
 
 		info := response.DiskBasicInfo{

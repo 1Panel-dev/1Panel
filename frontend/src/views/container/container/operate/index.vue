@@ -127,19 +127,9 @@
 
                             <el-tabs type="border-card" class="mt-5">
                                 <el-tab-pane :label="$t('container.network')">
+                                    <Network ref="networkRef" :networks="form.networks" />
+                                    <el-divider border-style="dashed" />
                                     <el-row :gutter="20">
-                                        <el-col :xs="24" :sm="10" :md="10" :lg="10" :xl="10">
-                                            <el-form-item :label="$t('container.network')" prop="network">
-                                                <el-select v-model="form.network">
-                                                    <el-option
-                                                        v-for="(item, indexV) of networks"
-                                                        :key="indexV"
-                                                        :value="item.option"
-                                                        :label="item.option"
-                                                    />
-                                                </el-select>
-                                            </el-form-item>
-                                        </el-col>
                                         <el-col :xs="24" :sm="10" :md="10" :lg="10" :xl="10">
                                             <el-form-item :label="$t('toolbox.device.hostname')" prop="hostname">
                                                 <el-input v-model="form.hostname" />
@@ -148,29 +138,6 @@
                                         <el-col :xs="24" :sm="10" :md="10" :lg="10" :xl="10">
                                             <el-form-item label="Domain" prop="domainName">
                                                 <el-input v-model="form.domainName" />
-                                            </el-form-item>
-                                        </el-col>
-                                        <el-col :xs="24" :sm="10" :md="10" :lg="10" :xl="10">
-                                            <el-form-item :label="$t('container.macAddr')" prop="macAddr">
-                                                <el-input v-model="form.macAddr" />
-                                            </el-form-item>
-                                        </el-col>
-                                        <el-col :xs="24" :sm="10" :md="10" :lg="10" :xl="10">
-                                            <el-form-item label="IPv4" prop="ipv4">
-                                                <el-input
-                                                    v-model="form.ipv4"
-                                                    :disabled="isIpDisabled"
-                                                    :placeholder="$t('container.inputIpv4')"
-                                                />
-                                            </el-form-item>
-                                        </el-col>
-                                        <el-col :xs="24" :sm="10" :md="10" :lg="10" :xl="10">
-                                            <el-form-item label="IPv6" prop="ipv6">
-                                                <el-input
-                                                    v-model="form.ipv6"
-                                                    :disabled="isIpDisabled"
-                                                    :placeholder="$t('container.inputIpv6')"
-                                                />
                                             </el-form-item>
                                         </el-col>
                                         <el-col :xs="24" :sm="10" :md="10" :lg="10" :xl="10">
@@ -195,7 +162,7 @@
                                 </el-tab-pane>
 
                                 <el-tab-pane :label="$t('container.mount')">
-                                    <Volume ref="volumeRef" :volumes="form.volumes"></Volume>
+                                    <Volume ref="volumeRef" :volumes="form.volumes" />
                                 </el-tab-pane>
 
                                 <el-tab-pane :label="$t('terminal.command')">
@@ -368,18 +335,18 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref, computed, watch } from 'vue';
+import { reactive, ref } from 'vue';
 import { Rules, checkFloatNumberRange, checkNumberRange } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import Confirm from '@/views/container/container/operate/confirm.vue';
 import Volume from '@/views/container/container/operate/volume.vue';
+import Network from '@/views/container/container/operate/network.vue';
 import {
     listImage,
     createContainer,
     updateContainer,
     loadResourceLimit,
-    listNetwork,
     loadContainerInfo,
     searchContainer,
 } from '@/api/modules/container';
@@ -395,18 +362,16 @@ const loading = ref(false);
 const isCreate = ref();
 const confirmRef = ref();
 const volumeRef = ref();
+const networkRef = ref();
 const form = reactive<Container.ContainerHelper>({
     taskID: '',
     name: '',
     image: '',
     imageInput: false,
     forcePull: false,
-    network: 'bridge',
+    networks: [{ network: 'bridge', ipv4: '', ipv6: '', macAddr: '' }],
     hostname: '',
     domainName: '',
-    macAddr: '',
-    ipv4: '',
-    ipv6: '',
     dns: [],
     memoryItem: 0,
     cmd: [],
@@ -435,12 +400,10 @@ const search = async () => {
                 loading.value = false;
                 form.name = res.data.name;
                 form.image = res.data.image;
-                form.network = res.data.network;
+                form.networks = res.data.networks;
                 form.hostname = res.data.hostname;
                 form.domainName = res.data.domainName;
                 form.dns = res.data.dns || [];
-                form.ipv4 = res.data.ipv4;
-                form.ipv6 = res.data.ipv6;
                 form.openStdin = res.data.openStdin;
                 form.tty = res.data.tty;
                 form.publishAllPorts = res.data.publishAllPorts;
@@ -473,12 +436,10 @@ const search = async () => {
     }
     loadLimit();
     loadImageOptions();
-    loadNetworkOptions();
 };
 
 const taskLogRef = ref();
 const images = ref();
-const networks = ref();
 const limits = ref<Container.ResourceLimit>({
     cpu: null as number,
     memory: null as number,
@@ -491,20 +452,6 @@ const rules = reactive({
     nanoCPUs: [Rules.floatNumber],
     memory: [Rules.floatNumber],
 });
-
-const isIpDisabled = computed(() => {
-    return form.network === 'none' || form.network === 'host' || form.network === 'bridge';
-});
-
-watch(
-    () => form.network,
-    (newValue) => {
-        if (newValue === 'none' || newValue === 'host') {
-            form.ipv4 = '';
-            form.ipv6 = '';
-        }
-    },
-);
 
 type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
@@ -549,15 +496,20 @@ const loadImageOptions = async () => {
     const res = await listImage();
     images.value = res.data;
 };
-const loadNetworkOptions = async () => {
-    const res = await listNetwork();
-    networks.value = res.data;
-};
 const onSubmit = async (formEl: FormInstance | undefined) => {
     form.volumes = volumeRef.value.loadVolumes();
     if (form.volumes.length !== 0) {
         for (const item of form.volumes) {
             if (!item.containerDir || !item.sourceDir) {
+                MsgError(i18n.global.t('container.volumeHelper'));
+                return;
+            }
+        }
+    }
+    form.networks = networkRef.value.loadNetworks();
+    if (form.volumes.length !== 0) {
+        for (const item of form.networks) {
+            if (!item.network) {
                 MsgError(i18n.global.t('container.volumeHelper'));
                 return;
             }

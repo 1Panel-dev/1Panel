@@ -722,7 +722,7 @@ func unInstallPHPExtension(runtime *model.Runtime, delExtensions []string) error
 			if ext.Name == del {
 				exist = true
 				delMap[ext.Check] = struct{}{}
-				delPHPExtensions(dir, phpExtensionDir, ext.Check, ext.Name)
+				delPHPExtensions(dir, phpExtensionDir, ext.File, ext.Name)
 				break
 			}
 		}

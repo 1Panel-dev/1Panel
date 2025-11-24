@@ -24,7 +24,7 @@ type DiskBasicInfo struct {
 type CompleteDiskInfo struct {
 	Disks              []DiskInfo      `json:"disks"`
 	UnpartitionedDisks []DiskBasicInfo `json:"unpartitionedDisks"`
-	SystemDisk         *DiskInfo       `json:"systemDisk"`
+	SystemDisks        []DiskInfo      `json:"systemDisks"`
 	TotalDisks         int             `json:"totalDisks"`
 	TotalCapacity      int64           `json:"totalCapacity"`
 }

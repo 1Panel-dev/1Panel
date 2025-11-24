@@ -541,6 +541,8 @@ const message = {
         caCert: 'Certificado CA',
         hasCA: 'Posee certificado CA',
         skipVerify: 'Omitir la verificación de validez del certificado',
+        initialDB: 'Base de Datos Inicial',
+
         formatHelper:
             'El conjunto de caracteres actual de la base de datos es {0}, la inconsistencia de conjuntos puede causar errores al recuperar',
         dropHelper: 'Puede arrastrar y soltar el archivo aquí o',
@@ -892,6 +894,7 @@ const message = {
         serverPath: 'Ruta en el servidor',
         containerDir: 'Ruta en el contenedor',
         volumeHelper: 'Asegúrese de que el contenido del volumen de almacenamiento sea correcto',
+        networkEmptyHelper: 'Por favor confirme que la selección de red del contenedor es correcta',
         modeRW: 'RW',
         modeR: 'R',
         sharedLabel: 'Modo de Propagación',

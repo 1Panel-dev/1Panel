@@ -199,7 +199,7 @@ func (r *Local) SyncDB() ([]SyncDBInfo, error) {
 	}
 	for _, line := range lines {
 		itemLine := strings.TrimLeft(line, " ")
-		if len(itemLine) == 0 || itemLine == "postgres" || itemLine == "template1" || itemLine == "template0" || itemLine == r.Username {
+		if len(itemLine) == 0 || itemLine == "template1" || itemLine == "template0" || itemLine == r.Username {
 			continue
 		}
 		datas = append(datas, SyncDBInfo{Name: itemLine, From: "local", PostgresqlName: r.Database})

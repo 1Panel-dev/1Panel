@@ -2,7 +2,6 @@ package router
 
 import (
 	"encoding/base64"
-	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -33,7 +32,7 @@ func setWebStatic(rootRouter *gin.RouterGroup) {
 	RegisterImages(rootRouter)
 	setStaticResource(rootRouter)
 	rootRouter.GET("/assets/*filepath", func(c *gin.Context) {
-		c.Writer.Header().Set("Cache-Control", fmt.Sprintf("private, max-age=%d", 2628000))
+		c.Writer.Header().Set("Cache-Control", "private, max-age=2628000, immutable")
 		if c.Request.URL.Path[len(c.Request.URL.Path)-1] == '/' {
 			c.AbortWithStatus(http.StatusForbidden)
 			return
@@ -137,7 +136,7 @@ func RegisterImages(rootRouter *gin.RouterGroup) {
 
 func setStaticResource(rootRouter *gin.RouterGroup) {
 	rootRouter.GET("/api/v2/static/*filename", func(c *gin.Context) {
-		c.Writer.Header().Set("Cache-Control", fmt.Sprintf("private, max-age=%d", 2628000))
+		c.Writer.Header().Set("Cache-Control", "private, max-age=2628000")
 		filename := c.Param("filename")
 		filePath := "static" + filename
 		data, err := web.Static.ReadFile(filePath)

@@ -2,10 +2,11 @@ package log
 
 import (
 	"errors"
-	"github.com/1Panel-dev/1Panel/core/constant"
 	"io"
 	"os"
 	"path"
+
+	"github.com/1Panel-dev/1Panel/core/constant"
 )
 
 var (
@@ -14,6 +15,7 @@ var (
 	DefaultFileFlag    = os.O_RDWR | os.O_CREATE | os.O_APPEND
 	ErrInvalidArgument = errors.New("error argument invalid")
 	QueueSize          = 1024
+	LogQueueSize       = 1024
 	ErrClosed          = errors.New("error write on close")
 )
 

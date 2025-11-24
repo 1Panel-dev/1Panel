@@ -537,6 +537,7 @@ const message = {
         caCert: 'CA certificate',
         hasCA: 'Has CA certificate',
         skipVerify: 'Ignore certificate validity check',
+        initialDB: 'Initial Database',
 
         formatHelper:
             'The current database character set is {0}, the character set inconsistency may cause recovery failure',
@@ -886,6 +887,7 @@ const message = {
         serverPath: 'Server path',
         containerDir: 'Container path',
         volumeHelper: 'Ensure that the content of the storage volume is correct',
+        networkEmptyHelper: 'Please confirm the container network selection is correct',
         modeRW: 'RW',
         modeR: 'R',
         sharedLabel: 'Propagation Mode',

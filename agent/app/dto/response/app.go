@@ -33,16 +33,10 @@ type AppItem struct {
 	Key         string   `json:"key"`
 	ID          uint     `json:"id"`
 	Description string   `json:"description"`
-	Icon        string   `json:"icon"`
-	Type        string   `json:"type"`
 	Status      string   `json:"status"`
-	Resource    string   `json:"resource"`
 	Installed   bool     `json:"installed"`
-	Versions    []string `json:"versions"`
 	Limit       int      `json:"limit"`
-	Tags        []TagDTO `json:"tags"`
-	Github      string   `json:"github"`
-	Website     string   `json:"website"`
+	Tags        []string `json:"tags"`
 	GpuSupport  bool     `json:"gpuSupport"`
 	Recommend   int      `json:"recommend"`
 }

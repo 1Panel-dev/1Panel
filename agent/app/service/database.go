@@ -122,12 +122,13 @@ func (u *DatabaseService) CheckDatabase(req dto.DatabaseCreate) bool {
 	switch req.Type {
 	case constant.AppPostgresql:
 		_, err := postgresql.NewPostgresqlClient(pgclient.DBInfo{
-			From:     "remote",
-			Address:  req.Address,
-			Port:     req.Port,
-			Username: req.Username,
-			Password: req.Password,
-			Timeout:  req.Timeout,
+			From:      "remote",
+			Address:   req.Address,
+			Port:      req.Port,
+			InitialDB: req.InitialDB,
+			Username:  req.Username,
+			Password:  req.Password,
+			Timeout:   req.Timeout,
 		})
 		return err == nil
 	case constant.AppRedis:

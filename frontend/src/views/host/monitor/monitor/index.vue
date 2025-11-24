@@ -220,7 +220,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, computed } from 'vue';
 import { loadMonitor, getNetworkOptions, getIOOptions } from '@/api/modules/host';
-import { computeSize, computeSizeFromKBs, dateFormat } from '@/utils/util';
+import { computeSize, computeSizeFromKBs, dateFormatWithoutYear } from '@/utils/util';
 import i18n from '@/lang';
 import MonitorRouter from '@/views/host/monitor/index.vue';
 import { GlobalStore } from '@/store';
@@ -309,7 +309,7 @@ const search = async (param: string) => {
             case 'base':
                 let baseDate = item.date.length === 0 ? loadEmptyDate(timeRangeCpu.value) : item.date;
                 baseDate = baseDate.map(function (item: any) {
-                    return dateFormat(null, null, item);
+                    return dateFormatWithoutYear(item);
                 });
                 if (param === 'cpu' || param === 'all') {
                     initCPUCharts(baseDate, item);
@@ -358,7 +358,7 @@ const loadOptions = async () => {
 function initLoadCharts(item: Host.MonitorData) {
     let itemLoadDate = item.date.length === 0 ? loadEmptyDate(timeRangeLoad.value) : item.date;
     let loadDate = itemLoadDate.map(function (item: any) {
-        return dateFormat(null, null, item);
+        return dateFormatWithoutYear(item);
     });
     let load1Data = item.value.map(function (item: any) {
         return item.cpuLoad1.toFixed(2);
@@ -467,7 +467,7 @@ function initMemCharts(baseDate: any, items: Host.MonitorData) {
 function initNetCharts(item: Host.MonitorData) {
     let networkDate = item.date.length === 0 ? loadEmptyDate(timeRangeNetwork.value) : item.date;
     let date = networkDate.map(function (item: any) {
-        return dateFormat(null, null, item);
+        return dateFormatWithoutYear(item);
     });
     let networkUp = item.value.map(function (item: any) {
         return item.up.toFixed(2);
@@ -512,7 +512,7 @@ function initNetCharts(item: Host.MonitorData) {
 function initIOCharts(item: Host.MonitorData) {
     let itemIODate = item.date?.length === 0 ? loadEmptyDate(timeRangeIO.value) : item.date;
     let ioDate = itemIODate.map(function (item: any) {
-        return dateFormat(null, null, item);
+        return dateFormatWithoutYear(item);
     });
     let ioRead = item.value.map(function (item: any) {
         return Number((item.read / 1024).toFixed(2));
@@ -700,7 +700,7 @@ function withMemProcess(datas: any) {
 
 function loadDate(name: any) {
     return ` <div style="display: inline-block; width: 100%; padding-bottom: 10px;">
-                ${i18n.global.t('commons.search.date')}: ${name}
+                ${i18n.global.t('commons.search.date')}: ${name.replaceAll('\n', ' ')}
             </div>`;
 }
 

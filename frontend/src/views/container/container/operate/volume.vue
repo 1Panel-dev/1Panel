@@ -1,6 +1,6 @@
 <template>
     <div>
-        <ComplexTable stripe v-if="tmpVolumes" style="width: 100%" :data="tmpVolumes">
+        <ComplexTable v-if="tmpVolumes" style="width: 100%" :data="tmpVolumes">
             <el-table-column :label="$t('container.server')" min-width="200">
                 <template #default="{ row }">
                     <el-radio-group v-model="row.type">

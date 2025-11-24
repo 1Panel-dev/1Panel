@@ -1,17 +1,19 @@
 package client
 
 import (
+	"github.com/1Panel-dev/1Panel/agent/app/task"
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
 type DBInfo struct {
-	From     string `json:"from"`
-	Database string `json:"database"`
-	Address  string `json:"address"`
-	Port     uint   `json:"port"`
-	Username string `json:"userName"`
-	Password string `json:"password"`
-	AppKey   string `json:"appKey"`
+	From      string `json:"from"`
+	Database  string `json:"database"`
+	Address   string `json:"address"`
+	Port      uint   `json:"port"`
+	InitialDB string `json:"initialDB"`
+	Username  string `json:"userName"`
+	Password  string `json:"password"`
+	AppKey    string `json:"appKey"`
 
 	Timeout uint `json:"timeout"` // second
 }
@@ -48,19 +50,23 @@ type PasswordChangeInfo struct {
 }
 
 type BackupInfo struct {
+	Database  string `json:"database"`
 	Name      string `json:"name"`
 	TargetDir string `json:"targetDir"`
 	FileName  string `json:"fileName"`
 
-	Timeout uint `json:"timeout"` // second
+	Task    *task.Task `json:"-"`
+	Timeout uint       `json:"timeout"` // second
 }
 
 type RecoverInfo struct {
+	Database   string `json:"database"`
 	Name       string `json:"name"`
 	SourceFile string `json:"sourceFile"`
 	Username   string `json:"username"`
 
-	Timeout uint `json:"timeout"` // second
+	Task    *task.Task `json:"-"`
+	Timeout uint       `json:"timeout"` // second
 }
 
 type SyncDBInfo struct {

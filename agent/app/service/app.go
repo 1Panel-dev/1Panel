@@ -37,7 +37,7 @@ type AppService struct {
 }
 
 type IAppService interface {
-	PageApp(ctx *gin.Context, req request.AppSearch) (interface{}, error)
+	PageApp(ctx *gin.Context, req request.AppSearch) (*response.AppRes, error)
 	GetAppTags(ctx *gin.Context) ([]response.TagDTO, error)
 	GetApp(ctx *gin.Context, key string) (*response.AppDTO, error)
 	GetAppDetail(appId uint, version, appType string) (response.AppDetailDTO, error)
@@ -46,13 +46,14 @@ type IAppService interface {
 	GetAppUpdate() (*response.AppUpdateRes, error)
 	GetAppDetailByID(id uint) (*response.AppDetailDTO, error)
 	SyncAppListFromLocal(taskID string)
+	GetAppIcon(appID uint) ([]byte, error)
 }
 
 func NewIAppService() IAppService {
 	return &AppService{}
 }
 
-func (a AppService) PageApp(ctx *gin.Context, req request.AppSearch) (interface{}, error) {
+func (a AppService) PageApp(ctx *gin.Context, req request.AppSearch) (*response.AppRes, error) {
 	var opts []repo.DBOption
 	opts = append(opts, appRepo.OrderByRecommend())
 	if req.Name != "" {
@@ -98,7 +99,7 @@ func (a AppService) PageApp(ctx *gin.Context, req request.AppSearch) (interface{
 		}
 		opts = append(opts, repo.WithByIDs(appIds))
 	}
-	var res response.AppRes
+	res := &response.AppRes{}
 
 	total, apps, err := appRepo.Page(req.Page, req.PageSize, opts...)
 	if err != nil {
@@ -120,12 +121,7 @@ func (a AppService) PageApp(ctx *gin.Context, req request.AppSearch) (interface{
 			ID:          ap.ID,
 			Name:        ap.Name,
 			Key:         ap.Key,
-			Type:        ap.Type,
-			Icon:        ap.Icon,
-			Resource:    ap.Resource,
 			Limit:       ap.Limit,
-			Website:     ap.Website,
-			Github:      ap.Github,
 			GpuSupport:  ap.GpuSupport,
 			Recommend:   ap.Recommend,
 			Description: ap.GetDescription(ctx),
@@ -135,7 +131,9 @@ func (a AppService) PageApp(ctx *gin.Context, req request.AppSearch) (interface{
 		if err != nil {
 			continue
 		}
-		appDTO.Tags = tags
+		for _, tag := range tags {
+			appDTO.Tags = append(appDTO.Tags, tag.Name)
+		}
 		if ap.Type == constant.RuntimePHP || ap.Type == constant.RuntimeGo || ap.Type == constant.RuntimeNode || ap.Type == constant.RuntimePython || ap.Type == constant.RuntimeJava || ap.Type == constant.RuntimeDotNet {
 			details, _ := appDetailRepo.GetBy(appDetailRepo.WithAppId(ap.ID))
 			var ids []uint
@@ -1160,4 +1158,16 @@ func (a AppService) SyncAppListFromRemote(taskID string) (err error) {
 	}()
 
 	return nil
+}
+
+func (a AppService) GetAppIcon(appID uint) ([]byte, error) {
+	app, err := appRepo.GetFirst(repo.WithByID(appID))
+	if err != nil {
+		return nil, err
+	}
+	iconBytes, err := base64.StdEncoding.DecodeString(app.Icon)
+	if err != nil {
+		return nil, err
+	}
+	return iconBytes, nil
 }

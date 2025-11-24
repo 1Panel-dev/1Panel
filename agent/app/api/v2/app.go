@@ -6,6 +6,8 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/gin-gonic/gin"
+	"net/http"
+	"time"
 )
 
 // @Tags App
@@ -191,4 +193,29 @@ func (b *BaseApi) GetAppListUpdate(c *gin.Context) {
 		return
 	}
 	helper.SuccessWithData(c, res)
+}
+
+// @Tags App
+// @Summary Get app icon by app_id
+// @Accept json
+// @Param appId path integer true "app id"
+// @Success 200 {file} file "app icon"
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /apps/icon/:appId [get]
+func (b *BaseApi) GetAppIcon(c *gin.Context) {
+	appID, err := helper.GetIntParamByKey(c, "appID")
+	if err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	iconBytes, err := appService.GetAppIcon(appID)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	c.Header("Content-Type", "image/png")
+	c.Header("Cache-Control", "public, max-age=31536000, immutable")
+	c.Header("Last-Modified", time.Now().UTC().Format(http.TimeFormat))
+	c.Data(http.StatusOK, "image/png", iconBytes)
 }

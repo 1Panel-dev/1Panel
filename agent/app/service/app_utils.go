@@ -1414,6 +1414,7 @@ func handleLocalApp(appDir string) (app *model.App, err error) {
 	app.Key = "local" + appDefine.Key
 	app.Architectures = strings.Join(appDefine.Architectures, ",")
 	app.GpuSupport = appDefine.GpuSupport
+	app.MemoryRequired = appDefine.MemoryRequired
 
 	app.Resource = constant.AppResourceLocal
 	app.Status = constant.AppNormal
@@ -1555,7 +1556,6 @@ func handleInstalled(appInstallList []model.AppInstall, updated bool, sync bool)
 			Message:     installed.Message,
 			HttpPort:    installed.HttpPort,
 			HttpsPort:   installed.HttpsPort,
-			Icon:        installed.App.Icon,
 			AppName:     installed.App.Name,
 			AppKey:      installed.App.Key,
 			AppType:     installed.App.Type,

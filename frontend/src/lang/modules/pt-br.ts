@@ -534,6 +534,7 @@ const message = {
         caCert: 'Certificado CA',
         hasCA: 'Possui certificado CA',
         skipVerify: 'Ignorar verificação de validade do certificado',
+        initialDB: 'Banco de Dados Inicial',
 
         formatHelper:
             'O conjunto de caracteres atual do banco de dados é {0}, a inconsistência no conjunto de caracteres pode causar falha na recuperação',
@@ -876,7 +877,7 @@ const message = {
         hostOption: 'Host',
         serverPath: 'Caminho do servidor',
         containerDir: 'Caminho do contêiner',
-        volumeHelper: 'Certifique-se de que o conteúdo do volume de armazenamento está correto',
+        networkEmptyHelper: 'Por favor confirme que a seleção de rede do contêiner está correta',
         modeRW: 'RW',
         modeR: 'R',
         sharedLabel: 'Modo de Propagação',

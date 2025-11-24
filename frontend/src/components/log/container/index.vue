@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-if="showControl">
         <el-select @change="searchLogs" class="fetchClass" v-model="logSearch.mode">
             <template #prefix>{{ $t('container.fetch') }}</template>
             <el-option v-for="item in timeOptions" :key="item.label" :value="item.value" :label="item.label" />
@@ -41,7 +41,7 @@
 import { cleanContainerLog, DownloadFile } from '@/api/modules/container';
 import i18n from '@/lang';
 import { dateFormatForName } from '@/utils/util';
-import { onUnmounted, reactive, ref } from 'vue';
+import { computed, nextTick, onMounted, onUnmounted, reactive, ref } from 'vue';
 import { ElMessageBox } from 'element-plus';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import hightlight from '@/components/log/custom-hightlight/index.vue';
@@ -69,6 +69,14 @@ const props = defineProps({
         type: String,
         default: '',
     },
+    showControl: {
+        type: Boolean,
+        default: true,
+    },
+    defaultFollow: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const styleVars = computed(() => ({
@@ -80,10 +88,10 @@ const logContainer = ref<HTMLElement | null>(null);
 const logs = ref<string[]>([]);
 let eventSource: EventSource | null = null;
 const logSearch = reactive({
-    isWatch: true,
+    isWatch: props.defaultFollow ? true : true,
     container: '',
     mode: 'all',
-    tail: 100,
+    tail: props.defaultFollow ? 0 : 100,
     compose: '',
 });
 const logHeight = 20;

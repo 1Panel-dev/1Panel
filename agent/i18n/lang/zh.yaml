@@ -197,6 +197,8 @@ ErrDatabaseIsExist: "当前数据库已存在，请重新输入"
 ErrExecTimeOut: "SQL 执行超时，请检查数据库"
 ErrRemoteExist: "远程数据库已存在该名称，请修改后重试"
 ErrLocalExist: "本地数据库已存在该名称，请修改后重试"
+RemoteBackup: "备份远程数据库需要先使用镜像 {{ .name }} 启动本地容器数据库服务，请稍候..."
+RemoteRecover: "恢复远程数据库需要先使用镜像 {{ .name }} 启动本地容器数据库服务，请稍候..."
 
 #redis
 ErrTypeOfRedis: "恢复文件类型与当前持久化方式不符，请修改后重试"

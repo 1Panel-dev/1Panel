@@ -407,10 +407,11 @@ type diskInfo struct {
 func loadDiskInfo() []dto.DiskInfo {
 	var datas []dto.DiskInfo
 	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(2 * time.Second))
-	stdout, err := cmdMgr.RunWithStdoutBashC("timeout 2 df -hT -P | awk 'NR>1 && !/tmpfs|snap\\/core|udev/ {print}'")
+	format := `awk 'NR>1 && !/tmpfs|snap\/core|udev/ {printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\n", $1, $2, $3, $4, $5, $6, $7}'`
+	stdout, err := cmdMgr.RunWithStdout("bash", "-c", `timeout 2 df -hT -P | `+format)
 	if err != nil {
 		cmdMgr2 := cmd.NewCommandMgr(cmd.WithTimeout(1 * time.Second))
-		stdout, err = cmdMgr2.RunWithStdoutBashC("timeout 1 df -lhT -P | awk 'NR>1 && !/tmpfs|snap\\/core|udev/ {print}'")
+		stdout, err = cmdMgr2.RunWithStdout("bash", "-c", `timeout 1 df -lhT -P | `+format)
 		if err != nil {
 			return datas
 		}
@@ -420,7 +421,7 @@ func loadDiskInfo() []dto.DiskInfo {
 	var mounts []diskInfo
 	var excludes = []string{"/mnt/cdrom", "/boot", "/boot/efi", "/dev", "/dev/shm", "/run/lock", "/run", "/run/shm", "/run/user"}
 	for _, line := range lines {
-		fields := strings.Fields(line)
+		fields := strings.Split(line, "\t")
 		if len(fields) < 7 {
 			continue
 		}

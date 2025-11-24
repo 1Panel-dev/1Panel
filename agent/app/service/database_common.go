@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"strings"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
@@ -51,7 +53,14 @@ func (u *DBCommonService) LoadDatabaseFile(req dto.OperationWithNameAndType) (st
 	case "mariadb-conf":
 		filePath = path.Join(global.Dir.DataDir, fmt.Sprintf("apps/mariadb/%s/conf/my.cnf", req.Name))
 	case "postgresql-conf":
+		database, err := databaseRepo.Get(repo.WithByName(req.Name))
+		if err != nil {
+			return "", err
+		}
 		filePath = path.Join(global.Dir.DataDir, fmt.Sprintf("apps/postgresql/%s/data/postgresql.conf", req.Name))
+		if strings.HasPrefix(database.Version, "18.") {
+			filePath = path.Join(global.Dir.DataDir, fmt.Sprintf("apps/postgresql/%s/data/18/docker/postgresql.conf", req.Name))
+		}
 	case "redis-conf":
 		filePath = path.Join(global.Dir.DataDir, fmt.Sprintf("apps/redis/%s/conf/redis.conf", req.Name))
 	case "redis-cluster-conf":
@@ -76,8 +85,13 @@ func (u *DBCommonService) UpdateConfByFile(req dto.DBConfUpdateByFile) error {
 	switch req.Type {
 	case constant.AppMariaDB, constant.AppMysql, constant.AppMysqlCluster:
 		path = fmt.Sprintf("%s/%s/%s/conf/my.cnf", global.Dir.AppInstallDir, req.Type, app.Name)
-	case constant.AppPostgresql, constant.AppPostgresqlCluster:
+	case constant.AppPostgresqlCluster:
 		path = fmt.Sprintf("%s/%s/%s/data/postgresql.conf", global.Dir.AppInstallDir, req.Type, app.Name)
+	case constant.AppPostgresql:
+		path = fmt.Sprintf("%s/%s/%s/data/postgresql.conf", global.Dir.AppInstallDir, req.Type, app.Name)
+		if strings.HasPrefix(app.Version, "18.") {
+			path = fmt.Sprintf("%s/%s/%s/data/18/docker/postgresql.conf", global.Dir.AppInstallDir, req.Type, app.Name)
+		}
 	case constant.AppRedis, constant.AppRedisCluster:
 		path = fmt.Sprintf("%s/%s/%s/conf/redis.conf", global.Dir.AppInstallDir, req.Type, app.Name)
 	}
