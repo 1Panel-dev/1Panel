@@ -106,6 +106,9 @@ export const loadMysqlStatus = (type: string, database: string) => {
 export const loadRemoteAccess = (type: string, database: string) => {
     return http.post<boolean>(`/databases/remote`, { type: type, name: database });
 };
+export const loadFormatCollations = (database: string) => {
+    return http.post<Array<Database.FormatCollationOption>>(`/databases/format/options`, { name: database });
+};
 
 // redis
 export const loadRedisStatus = (type: string, database: string) => {

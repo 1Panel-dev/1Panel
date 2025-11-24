@@ -128,6 +128,21 @@ func (u *ImageService) Page(req dto.PageImage) (int64, interface{}, error) {
 		})
 	}
 
+	imageDescriptions, _ := settingRepo.GetDescriptionList(repo.WithByType("image"))
+	for i := 0; i < len(list); i++ {
+		for _, desc := range imageDescriptions {
+			if "sha256:"+desc.ID == records[i].ID {
+				records[i].Description = desc.Description
+				records[i].IsPinned = desc.IsPinned
+			}
+		}
+	}
+	sort.Slice(records, func(i, j int) bool {
+		if records[i].IsPinned == records[j].IsPinned {
+			return records[i].IsUsed
+		}
+		return records[i].IsPinned
+	})
 	total, start, end := len(records), (req.Page-1)*req.PageSize, req.Page*req.PageSize
 	if start > total {
 		backDatas = make([]dto.ImageInfo, 0)

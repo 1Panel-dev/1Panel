@@ -472,6 +472,9 @@ const message = {
         goInstall: '설치로 이동',
         isDelete: '삭제됨',
         permission: '권한',
+        format: '문자 집합',
+        collation: '콜레이션',
+        collationHelper: '비어 있으면 {0} 문자 집합의 기본 콜레이션을 사용합니다',
         permissionForIP: 'IP',
         permissionAll: '모두(%)',
         localhostHelper:
@@ -1077,6 +1080,7 @@ const message = {
         default_download_path: '기본 다운로드 링크',
         saveLocal: '로컬 백업 보관 (클라우드 저장소 복사본 수와 동일)',
         url: 'URL 주소',
+        urlHelper: '올바른 URL 주소를 입력해 주세요',
         targetHelper: '백업 계정은 패널 설정에서 관리됩니다.',
         withImageHelper: '앱 스토어 이미지를 백업하지만 스냅샷 파일 크기가 증가합니다.',
         ignoreApp: '앱 제외',

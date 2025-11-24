@@ -7,6 +7,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
 	"github.com/1Panel-dev/1Panel/agent/utils/ssh"
@@ -24,6 +25,8 @@ type ISettingService interface {
 	GetSystemProxy() (*dto.SystemProxy, error)
 	GetLocalConn() dto.SSHConnData
 	GetSettingByKey(key string) string
+
+	SaveDescription(req dto.CommonDescription) error
 }
 
 func NewISettingService() ISettingService {
@@ -169,4 +172,25 @@ func (u *SettingService) GetSettingByKey(key string) string {
 		value, _ := settingRepo.GetValueByKey(key)
 		return value
 	}
+}
+
+func (u *SettingService) SaveDescription(req dto.CommonDescription) error {
+	if len(req.Description) == 0 && !req.IsPinned {
+		_ = settingRepo.DelDescription(req.ID)
+		return nil
+	}
+	data, _ := settingRepo.GetDescription(settingRepo.WithByDescriptionID(req.ID), repo.WithByType(req.Type), repo.WithByDetailType(req.DetailType))
+	if data.ID == "" {
+		if err := copier.Copy(&data, &req); err != nil {
+			return err
+		}
+		return settingRepo.CreateDescription(&data)
+	}
+	valMap := make(map[string]interface{})
+	valMap["type"] = req.Type
+	valMap["detail_type"] = req.DetailType
+	valMap["is_pinned"] = req.IsPinned
+	valMap["description"] = req.Description
+
+	return settingRepo.UpdateDescription(data.ID, valMap)
 }

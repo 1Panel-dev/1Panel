@@ -16,6 +16,8 @@ func (s *SettingRouter) InitRouter(Router *gin.RouterGroup) {
 		settingRouter.POST("/update", baseApi.UpdateSetting)
 		settingRouter.GET("/get/:key", baseApi.GetSettingByKey)
 
+		settingRouter.POST("/description/save", baseApi.SaveDescription)
+
 		settingRouter.GET("/snapshot/load", baseApi.LoadSnapshotData)
 		settingRouter.POST("/snapshot", baseApi.CreateSnapshot)
 		settingRouter.POST("/snapshot/recreate", baseApi.RecreateSnapshot)

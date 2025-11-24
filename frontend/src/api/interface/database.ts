@@ -142,6 +142,10 @@ export namespace Database {
         File: string;
         Position: number;
     }
+    export interface FormatCollationOption {
+        format: string;
+        collations: Array<string>;
+    }
     export interface PgLoadDB {
         from: string;
         type: string;

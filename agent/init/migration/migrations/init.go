@@ -706,8 +706,29 @@ var UpdateTensorrtLLM = &gormigrate.Migration{
 	},
 }
 
+var AddCommonDescription = &gormigrate.Migration{
+	ID: "20251117-add-common-description",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(&model.CommonDescription{})
+	},
+}
+
 var UpdateDatabase = &gormigrate.Migration{
 	ID: "20251117-update-database",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(&model.Database{})
+	},
+}
+
+var AddGPUMonitor = &gormigrate.Migration{
+	ID: "20251119-add-gpu-monitor",
+	Migrate: func(tx *gorm.DB) error {
+		return global.GPUMonitorDB.AutoMigrate(&model.MonitorGPU{})
+	},
+}
+
+var UpdateDatabaseMysql = &gormigrate.Migration{
+	ID: "20251124-update-database-mysql",
 	Migrate: func(tx *gorm.DB) error {
 		return tx.AutoMigrate(&model.Database{})
 	},

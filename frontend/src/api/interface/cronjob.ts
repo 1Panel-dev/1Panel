@@ -34,6 +34,7 @@ export namespace Cronjob {
         dbType: string;
         dbName: string;
         url: string;
+        urlItems: Array<string>;
         isDir: boolean;
         files: Array<Item>;
         sourceDir: string;

@@ -80,6 +80,8 @@
                     :data="data"
                     @sort-change="search"
                     @search="search"
+                    @cell-mouse-enter="showFavorite"
+                    @cell-mouse-leave="hideFavorite"
                     :row-style="{ height: '65px' }"
                     style="width: 100%"
                     :columns="columns"
@@ -89,27 +91,41 @@
                     <el-table-column type="selection" />
                     <el-table-column
                         :label="$t('commons.table.name')"
-                        :width="mobile ? 300 : 200"
-                        min-width="100"
+                        min-width="250"
                         prop="name"
                         sortable
                         fix
                         :fixed="mobile ? false : 'left'"
                         show-overflow-tooltip
                     >
-                        <template #default="{ row }">
+                        <template #default="{ row, $index }">
                             <el-text type="primary" class="cursor-pointer" @click="onInspect(row)">
                                 {{ row.name }}
                             </el-text>
+
+                            <div class="float-right">
+                                <el-tooltip
+                                    :content="row.isPinned ? $t('website.cancelFavorite') : $t('website.favorite')"
+                                    v-if="row.isPinned || hoveredRowIndex === $index"
+                                >
+                                    <el-button
+                                        link
+                                        size="large"
+                                        :icon="row.isPinned ? 'StarFilled' : 'Star'"
+                                        type="warning"
+                                        @click="changePinned(row, true)"
+                                    />
+                                </el-tooltip>
+                            </div>
                         </template>
                     </el-table-column>
                     <el-table-column
                         :label="$t('container.image')"
                         show-overflow-tooltip
-                        min-width="150"
+                        min-width="180"
                         prop="imageName"
                     />
-                    <el-table-column :label="$t('commons.table.status')" min-width="100" prop="state" sortable>
+                    <el-table-column :label="$t('commons.table.status')" min-width="150" prop="state" sortable>
                         <template #default="{ row }">
                             <el-dropdown placement="bottom">
                                 <Status :key="row.state" :status="row.state" :operate="true"></Status>
@@ -304,6 +320,20 @@
                         </template>
                     </el-table-column>
                     <el-table-column
+                        min-width="200"
+                        :label="$t('commons.table.description')"
+                        prop="description"
+                        show-overflow-tooltip
+                    >
+                        <template #default="{ row }">
+                            <fu-input-rw-switch
+                                v-model="row.description"
+                                @enter="changePinned(row, false)"
+                                @blur="changePinned(row, false)"
+                            />
+                        </template>
+                    </el-table-column>
+                    <el-table-column
                         :label="$t('container.upTime')"
                         min-width="200"
                         show-overflow-tooltip
@@ -367,6 +397,7 @@ import { GlobalStore } from '@/store';
 import { routerToName, routerToNameWithQuery } from '@/utils/router';
 import router from '@/routers';
 import { computeSize2, computeSizeForDocker, computeCPU, newUUID } from '@/utils/util';
+import { updateCommonDescription } from '@/api/modules/setting';
 const globalStore = GlobalStore();
 
 const mobile = computed(() => {
@@ -401,6 +432,8 @@ const taskLogRef = ref();
 
 const tags = ref([]);
 const activeTag = ref('all');
+
+const hoveredRowIndex = ref(-1);
 
 const goDashboard = async (port: any) => {
     if (port.indexOf('127.0.0.1') !== -1) {
@@ -472,6 +505,29 @@ const searchWithStatus = (item: string) => {
 const searchWithAppShow = (item: any) => {
     includeAppStore.value = item;
     search();
+};
+
+const showFavorite = (row: any) => {
+    hoveredRowIndex.value = data.value.findIndex((item) => item === row);
+};
+const hideFavorite = () => {
+    hoveredRowIndex.value = -1;
+};
+const changePinned = (row: any, isPinned: boolean) => {
+    let params = {
+        id: row.containerID,
+        type: 'container',
+        detailType: '',
+        isPinned: !row.isPinned,
+        description: row.description || '',
+    };
+    if (isPinned) {
+        params.isPinned = !row.isPinned;
+    }
+    updateCommonDescription(params).then(() => {
+        search();
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+    });
 };
 
 const loadContainerCount = async () => {

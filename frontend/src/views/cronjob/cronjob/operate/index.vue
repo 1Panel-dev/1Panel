@@ -344,8 +344,21 @@
                                     </el-form-item>
                                 </LayoutCol>
                                 <LayoutCol v-if="form.type === 'curl'">
-                                    <el-form-item :label="$t('cronjob.url')" prop="url">
-                                        <el-input clearable v-model.trim="form.url" />
+                                    <el-form-item :label="$t('cronjob.url')" prop="urlItems">
+                                        <div v-for="(_, index) of form.urlItems" :key="index" class="w-full">
+                                            <el-input class="mt-2" v-model="form.urlItems[index]">
+                                                <template #append>
+                                                    <el-button
+                                                        link
+                                                        icon="Delete"
+                                                        @click="form.urlItems.splice(index, 1)"
+                                                    />
+                                                </template>
+                                            </el-input>
+                                        </div>
+                                        <el-button class="mt-2" @click="form.urlItems.push('')">
+                                            {{ $t('commons.button.add') }}
+                                        </el-button>
                                     </el-form-item>
                                 </LayoutCol>
                             </el-row>
@@ -837,6 +850,7 @@ const form = reactive<Cronjob.CronjobInfo>({
     dbType: 'mysql',
     dbName: '',
     url: '',
+    urlItems: [],
     isDir: true,
     files: [],
     sourceDir: '',
@@ -896,6 +910,7 @@ const search = async () => {
 
                 form.script = res.data.script;
                 form.scriptMode = res.data.scriptMode;
+                form.urlItems = res.data.url.split(',') || [];
 
                 form.containerName = res.data.containerName;
                 form.user = res.data.user;
@@ -1009,6 +1024,19 @@ const verifyScript = (rule: any, value: any, callback: any) => {
     if (!form.script || form.script.length === 0) {
         callback(new Error(i18n.global.t('commons.rule.requiredInput')));
         return;
+    }
+    callback();
+};
+const verifyUrlItems = (rule: any, value: any, callback: any) => {
+    if (!form.urlItems || form.urlItems.length === 0) {
+        callback(new Error(i18n.global.t('commons.rule.requiredInput')));
+        return;
+    }
+    for (const item of form.urlItems) {
+        if (!item) {
+            callback(new Error(i18n.global.t('cronjob.urlHelper')));
+            return;
+        }
     }
     callback();
 };
@@ -1151,7 +1179,7 @@ const rules = reactive({
     websiteList: [Rules.requiredSelect],
     appIdList: [Rules.requiredSelect],
     dbNameList: [Rules.requiredSelect],
-    url: [Rules.requiredInput],
+    urlItems: [{ validator: verifyUrlItems, trigger: 'blur', required: true }],
     files: [{ validator: verifyFiles, trigger: 'blur', required: true }],
     sourceDir: [Rules.requiredInput],
     sourceAccountItems: [Rules.requiredSelect],
@@ -1449,6 +1477,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         }
         form.sourceDir = files.join(',');
     }
+    form.url = form.urlItems.join(',');
     form.sourceAccountIDs = form.sourceAccountItems.join(',');
     form.spec = specs.join('&&');
     if (!formEl) return;

@@ -5,21 +5,27 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"gorm.io/gorm"
 )
 
 type MonitorRepo struct{}
 
 type IMonitorRepo interface {
 	GetBase(opts ...DBOption) ([]model.MonitorBase, error)
+	GetGPU(opts ...DBOption) ([]model.MonitorGPU, error)
 	GetIO(opts ...DBOption) ([]model.MonitorIO, error)
 	GetNetwork(opts ...DBOption) ([]model.MonitorNetwork, error)
 
 	CreateMonitorBase(model model.MonitorBase) error
+	BatchCreateMonitorGPU(list []model.MonitorGPU) error
 	BatchCreateMonitorIO(ioList []model.MonitorIO) error
 	BatchCreateMonitorNet(ioList []model.MonitorNetwork) error
 	DelMonitorBase(timeForDelete time.Time) error
+	DelMonitorGPU(timeForDelete time.Time) error
 	DelMonitorIO(timeForDelete time.Time) error
 	DelMonitorNet(timeForDelete time.Time) error
+
+	WithByProductName(name string) DBOption
 }
 
 func NewIMonitorRepo() IMonitorRepo {
@@ -53,9 +59,21 @@ func (u *MonitorRepo) GetNetwork(opts ...DBOption) ([]model.MonitorNetwork, erro
 	err := db.Find(&data).Error
 	return data, err
 }
+func (u *MonitorRepo) GetGPU(opts ...DBOption) ([]model.MonitorGPU, error) {
+	var data []model.MonitorGPU
+	db := global.GPUMonitorDB
+	for _, opt := range opts {
+		db = opt(db)
+	}
+	err := db.Find(&data).Error
+	return data, err
+}
 
 func (u *MonitorRepo) CreateMonitorBase(model model.MonitorBase) error {
 	return global.MonitorDB.Create(&model).Error
+}
+func (s *MonitorRepo) BatchCreateMonitorGPU(list []model.MonitorGPU) error {
+	return global.GPUMonitorDB.CreateInBatches(&list, len(list)).Error
 }
 func (u *MonitorRepo) BatchCreateMonitorIO(ioList []model.MonitorIO) error {
 	return global.MonitorDB.CreateInBatches(ioList, len(ioList)).Error
@@ -71,4 +89,13 @@ func (u *MonitorRepo) DelMonitorIO(timeForDelete time.Time) error {
 }
 func (u *MonitorRepo) DelMonitorNet(timeForDelete time.Time) error {
 	return global.MonitorDB.Where("created_at < ?", timeForDelete).Delete(&model.MonitorNetwork{}).Error
+}
+func (s *MonitorRepo) DelMonitorGPU(timeForDelete time.Time) error {
+	return global.GPUMonitorDB.Where("created_at < ?", timeForDelete).Delete(&model.MonitorGPU{}).Error
+}
+
+func (s *MonitorRepo) WithByProductName(name string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("product_name = ?", name)
+	}
 }

@@ -485,6 +485,9 @@ const message = {
         goInstall: 'Ir a instalar',
         isDelete: 'Eliminada',
         permission: 'Cambiar permisos',
+        format: 'Juego de Caracteres',
+        collation: 'Intercalación',
+        collationHelper: 'Si está vacío, use la intercalación predeterminada del juego de caracteres {0}',
         permissionForIP: 'IP',
         permissionAll: 'Todos (%)',
         localhostHelper:
@@ -1122,6 +1125,7 @@ const message = {
         default_download_path: 'Enlace de descarga predeterminado',
         saveLocal: 'Retener respaldos locales (igual al número de copias en la nube)',
         url: 'Dirección URL',
+        urlHelper: 'Por favor ingrese una dirección URL válida',
         targetHelper: 'Las cuentas de respaldo se gestionan en los ajustes del panel.',
         withImageHelper:
             'Respalda imágenes de la tienda de aplicaciones, pero esto aumentará el tamaño del archivo de la instantánea.',

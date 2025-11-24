@@ -198,6 +198,8 @@ ErrDatabaseIsExist: 'Mevcut veritabanı zaten mevcut, lütfen yeniden girin'
 ErrExecTimeOut: 'SQL yürütme zaman aşımı, lütfen veritabanını kontrol edin'
 ErrRemoteExist: 'Uzak veritabanında bu adla zaten mevcut, lütfen değiştirin ve tekrar deneyin'
 ErrLocalExist: 'Yerel veritabanında bu ad zaten mevcut, lütfen değiştirin ve tekrar deneyin'
+RemoteBackup: "Uzak veritabanını yedeklemek için önce {{ .name }} görüntüsü kullanılarak yerel konteyner veritabanı hizmetinin başlatılması gerekiyor, lütfen bekleyin..."
+RemoteRecover: "Uzak veritabanını geri yüklemek için önce {{ .name }} görüntüsü kullanılarak yerel konteyner veritabanı hizmetinin başlatılması gerekiyor, lütfen bekleyin..."
 
 #redis
 ErrTypeOfRedis: 'Kurtarma dosyası türü mevcut kalıcılık yöntemiyle eşleşmiyor, lütfen değiştirin ve tekrar deneyin'
@@ -240,6 +242,7 @@ ErrUserFindErr: 'Kullanıcı {{ .name }} arama başarısız {{ .err }}'
 #cronjob
 CutWebsiteLogSuccess: '{{ .name }} web sitesi günlüğü başarıyla kesildi, yedekleme yolu {{ .path }}'
 HandleShell: 'Betik {{ .name }} yürüt'
+HandleCurl: "URL'ye Eriş {{ .name }}"
 HandleNtpSync: 'Sistem zaman senkronizasyonu'
 HandleSystemClean: 'Sistem önbellek temizliği'
 SystemLog: 'Sistem Günlüğü'

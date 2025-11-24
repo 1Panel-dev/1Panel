@@ -476,6 +476,9 @@ const message = {
         goInstall: 'Ir para instalação',
         isDelete: 'Excluído',
         permission: 'Permissões',
+        format: 'Conjunto de Caracteres',
+        collation: 'Collation',
+        collationHelper: 'Se vazio, use a collation padrão do conjunto de caracteres {0}',
         permissionForIP: 'IP',
         permissionAll: 'Todos (% de)',
         localhostHelper:
@@ -1110,6 +1113,7 @@ const message = {
         default_download_path: 'Link de download padrão',
         saveLocal: 'Manter backups locais (o mesmo número de cópias na nuvem)',
         url: 'Endereço URL',
+        urlHelper: 'Por favor insira um endereço URL válido',
         targetHelper: 'As contas de backup são mantidas nas configurações do painel.',
         withImageHelper:
             'Fazer backup das imagens da loja de aplicativos, mas isso aumentará o tamanho do arquivo de snapshot.',

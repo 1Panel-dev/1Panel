@@ -7,6 +7,14 @@ type Setting struct {
 	About string `json:"about"`
 }
 
+type CommonDescription struct {
+	ID          string `json:"id"`
+	Type        string `json:"type"`
+	DetailType  string `json:"detailType"`
+	IsPinned    bool   `json:"isPinned"`
+	Description string `json:"description"`
+}
+
 type NodeInfo struct {
 	Scope     string `json:"scope"`
 	BaseDir   string `json:"baseDir"`

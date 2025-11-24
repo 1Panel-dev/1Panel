@@ -29,6 +29,7 @@ func (s *HostRouter) InitRouter(Router *gin.RouterGroup) {
 		hostRouter.POST("/firewall/filter/chain/status", baseApi.LoadChainStatus)
 
 		hostRouter.POST("/monitor/search", baseApi.LoadMonitor)
+		hostRouter.POST("/monitor/gpu/search", baseApi.LoadGPUMonitor)
 		hostRouter.POST("/monitor/clean", baseApi.CleanMonitor)
 		hostRouter.GET("/monitor/netoptions", baseApi.GetNetworkOptions)
 		hostRouter.GET("/monitor/iooptions", baseApi.GetIOOptions)

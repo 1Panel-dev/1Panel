@@ -481,6 +481,9 @@ const message = {
         goInstall: 'Go to install',
         isDelete: 'Deleted',
         permission: 'Change permissions',
+        format: 'Character Set',
+        collation: 'Collation',
+        collationHelper: 'If empty, use the default collation of the {0} character set',
         permissionForIP: 'IP',
         permissionAll: 'All of them(%)',
         localhostHelper:
@@ -1120,6 +1123,7 @@ const message = {
         default_download_path: 'Default download link',
         saveLocal: 'Retain local backups (the same as the number of cloud storage copies)',
         url: 'URL Address',
+        urlHelper: 'Please enter a valid URL address',
         targetHelper: 'Backup accounts are maintained in panel settings.',
         withImageHelper: 'Backup app store images, but this will increase the snapshot file size.',
         ignoreApp: 'Exclude apps',

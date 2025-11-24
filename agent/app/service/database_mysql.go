@@ -23,8 +23,8 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/compose"
 	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
 	"github.com/1Panel-dev/1Panel/agent/utils/mysql"
-	"github.com/1Panel-dev/1Panel/agent/utils/re"
 	"github.com/1Panel-dev/1Panel/agent/utils/mysql/client"
+	"github.com/1Panel-dev/1Panel/agent/utils/re"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
@@ -45,6 +45,7 @@ type IMysqlService interface {
 	DeleteCheck(req dto.MysqlDBDeleteCheck) ([]dto.DBResource, error)
 	Delete(ctx context.Context, req dto.MysqlDBDelete) error
 
+	LoadFormatOption(req dto.OperationWithName) []dto.MysqlFormatCollationOption
 	LoadStatus(req dto.OperationWithNameAndType) (*dto.MysqlStatus, error)
 	LoadVariables(req dto.OperationWithNameAndType) (*dto.MysqlVariables, error)
 	LoadRemoteAccess(req dto.OperationWithNameAndType) (bool, error)
@@ -126,6 +127,7 @@ func (u *MysqlService) Create(ctx context.Context, req dto.MysqlDBCreate) (*mode
 	if err := cli.Create(client.CreateInfo{
 		Name:       req.Name,
 		Format:     req.Format,
+		Collation:  req.Collation,
 		Username:   req.Username,
 		Password:   req.Password,
 		Permission: req.Permission,
@@ -582,6 +584,19 @@ func (u *MysqlService) LoadStatus(req dto.OperationWithNameAndType) (*dto.MysqlS
 	}
 
 	return &info, nil
+}
+
+func (u *MysqlService) LoadFormatOption(req dto.OperationWithName) []dto.MysqlFormatCollationOption {
+	defaultList := []dto.MysqlFormatCollationOption{{Format: "utf8mb4"}, {Format: "utf8mb3"}, {Format: "gbk"}, {Format: "big5"}}
+	client, _, err := LoadMysqlClientByFrom(req.Name)
+	if err != nil {
+		return defaultList
+	}
+	options, err := client.LoadFormatCollation(3)
+	if err != nil {
+		return defaultList
+	}
+	return options
 }
 
 func executeSqlForMaps(containerName, dbType, password, command string) (map[string]string, error) {

@@ -81,3 +81,11 @@ type SystemProxy struct {
 	User     string `json:"user"`
 	Password string `json:"password"`
 }
+
+type CommonDescription struct {
+	ID          string `json:"id" validate:"required"`
+	Type        string `json:"type" validate:"required"`
+	DetailType  string `json:"detailType"`
+	IsPinned    bool   `json:"isPinned"`
+	Description string `json:"description"`
+}

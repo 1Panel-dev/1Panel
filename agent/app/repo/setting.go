@@ -2,7 +2,6 @@ package repo
 
 import (
 	"errors"
-	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/global"
@@ -19,13 +18,14 @@ type ISettingRepo interface {
 	Update(key, value string) error
 	WithByKey(key string) DBOption
 
-	CreateMonitorBase(model model.MonitorBase) error
-	BatchCreateMonitorIO(ioList []model.MonitorIO) error
-	BatchCreateMonitorNet(ioList []model.MonitorNetwork) error
-	DelMonitorBase(timeForDelete time.Time) error
-	DelMonitorIO(timeForDelete time.Time) error
-	DelMonitorNet(timeForDelete time.Time) error
 	UpdateOrCreate(key, value string) error
+
+	GetDescription(opts ...DBOption) (model.CommonDescription, error)
+	GetDescriptionList(opts ...DBOption) ([]model.CommonDescription, error)
+	CreateDescription(data *model.CommonDescription) error
+	UpdateDescription(id string, val map[string]interface{}) error
+	DelDescription(id string) error
+	WithByDescriptionID(id string) DBOption
 }
 
 func NewISettingRepo() ISettingRepo {
@@ -78,25 +78,6 @@ func (s *SettingRepo) Update(key, value string) error {
 	return global.DB.Model(&model.Setting{}).Where("key = ?", key).Updates(map[string]interface{}{"value": value}).Error
 }
 
-func (s *SettingRepo) CreateMonitorBase(model model.MonitorBase) error {
-	return global.MonitorDB.Create(&model).Error
-}
-func (s *SettingRepo) BatchCreateMonitorIO(ioList []model.MonitorIO) error {
-	return global.MonitorDB.CreateInBatches(ioList, len(ioList)).Error
-}
-func (s *SettingRepo) BatchCreateMonitorNet(ioList []model.MonitorNetwork) error {
-	return global.MonitorDB.CreateInBatches(ioList, len(ioList)).Error
-}
-func (s *SettingRepo) DelMonitorBase(timeForDelete time.Time) error {
-	return global.MonitorDB.Where("created_at < ?", timeForDelete).Delete(&model.MonitorBase{}).Error
-}
-func (s *SettingRepo) DelMonitorIO(timeForDelete time.Time) error {
-	return global.MonitorDB.Where("created_at < ?", timeForDelete).Delete(&model.MonitorIO{}).Error
-}
-func (s *SettingRepo) DelMonitorNet(timeForDelete time.Time) error {
-	return global.MonitorDB.Where("created_at < ?", timeForDelete).Delete(&model.MonitorNetwork{}).Error
-}
-
 func (s *SettingRepo) UpdateOrCreate(key, value string) error {
 	var setting model.Setting
 	result := global.DB.Where("key = ?", key).First(&setting)
@@ -107,4 +88,37 @@ func (s *SettingRepo) UpdateOrCreate(key, value string) error {
 		return result.Error
 	}
 	return global.DB.Model(&setting).UpdateColumn("value", value).Error
+}
+
+func (s *SettingRepo) GetDescriptionList(opts ...DBOption) ([]model.CommonDescription, error) {
+	var lists []model.CommonDescription
+	db := global.DB.Model(&model.CommonDescription{})
+	for _, opt := range opts {
+		db = opt(db)
+	}
+	err := db.Find(&lists).Error
+	return lists, err
+}
+func (s *SettingRepo) GetDescription(opts ...DBOption) (model.CommonDescription, error) {
+	var data model.CommonDescription
+	db := global.DB.Model(&model.CommonDescription{})
+	for _, opt := range opts {
+		db = opt(db)
+	}
+	err := db.First(&data).Error
+	return data, err
+}
+func (s *SettingRepo) CreateDescription(data *model.CommonDescription) error {
+	return global.DB.Create(data).Error
+}
+func (s *SettingRepo) UpdateDescription(id string, val map[string]interface{}) error {
+	return global.DB.Model(&model.CommonDescription{}).Where("id = ?", id).Updates(val).Error
+}
+func (s *SettingRepo) DelDescription(id string) error {
+	return global.DB.Where("id = ?", id).Delete(&model.CommonDescription{}).Error
+}
+func (s *SettingRepo) WithByDescriptionID(id string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("id = ?", id)
+	}
 }

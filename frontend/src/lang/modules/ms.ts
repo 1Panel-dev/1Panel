@@ -478,6 +478,9 @@ const message = {
         goInstall: 'Pergi pasang',
         isDelete: 'Dihapuskan',
         permission: 'Kebenaran',
+        format: 'Set Aksara',
+        collation: 'Kolasi',
+        collationHelper: 'Jika kosong, gunakan kolasi lalai set aksara {0}',
         permissionForIP: 'IP',
         permissionAll: 'Kesemuanya(%)',
         localhostHelper:
@@ -1112,6 +1115,7 @@ const message = {
         default_download_path: 'Pautan muat turun lalai',
         saveLocal: 'Simpan sandaran tempatan (sama seperti bilangan salinan storan awan)',
         url: 'Alamat URL',
+        urlHelper: 'Sila masukkan alamat URL yang sah',
         targetHelper: 'Akaun sandaran diselenggara dalam tetapan panel.',
         withImageHelper: 'Sandarkan imej kedai aplikasi, tetapi ini akan meningkatkan saiz fail snapshot.',
         ignoreApp: 'Kecualikan aplikasi',
