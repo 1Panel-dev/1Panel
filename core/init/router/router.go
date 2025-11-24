@@ -3,7 +3,6 @@ package router
 import (
 	"encoding/base64"
 	"io"
-	"io/fs"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -27,8 +26,7 @@ var (
 )
 
 func swaggerHandler() gin.HandlerFunc {
-	subFS, _ := fs.Sub(swaggerfiles.FS, "dist")
-	fileServer := http.StripPrefix("/1panel/swagger/", http.FileServer(http.FS(subFS)))
+	fileServer := http.StripPrefix("/1panel/swagger/", http.FileServer(http.FS(swaggerfiles.FS)))
 
 	return func(c *gin.Context) {
 		path := c.Request.URL.Path
@@ -36,8 +34,10 @@ func swaggerHandler() gin.HandlerFunc {
 		switch path {
 		case "/doc.json":
 			c.Header("Content-Type", "application/json; charset=utf-8")
+			c.Header("Cache-Control", "private, max-age=600")
 			c.String(http.StatusOK, docs.SwaggerInfo.ReadDoc())
 		default:
+			c.Header("Cache-Control", "private, max-age=600")
 			fileServer.ServeHTTP(c.Writer, c.Request)
 		}
 	}
