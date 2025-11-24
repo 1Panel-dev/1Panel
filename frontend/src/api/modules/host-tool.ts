@@ -31,7 +31,7 @@ export const operateSupervisorProcess = (req: HostTool.ProcessReq) => {
 };
 
 export const getSupervisorProcess = () => {
-    return http.get<HostTool.SupersivorProcess[]>(`/hosts/tool/supervisor/process`);
+    return http.get<HostTool.SupersivorProcess[]>(`/hosts/tool/supervisor/process`, {}, { timeout: TimeoutEnum.T_3M });
 };
 
 export const operateSupervisorProcessFile = (req: HostTool.ProcessFileReq) => {
