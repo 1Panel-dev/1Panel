@@ -27,6 +27,7 @@ require (
 	github.com/minio/minio-go/v7 v7.0.74
 	github.com/nicksnyder/go-i18n/v2 v2.4.0
 	github.com/oschwald/maxminddb-golang v1.13.1
+	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/pkg/errors v0.9.1
 	github.com/pkg/sftp v1.13.6
 	github.com/qiniu/go-sdk/v7 v7.21.1
