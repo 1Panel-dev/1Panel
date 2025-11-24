@@ -13,35 +13,17 @@ import (
 	"github.com/1Panel-dev/1Panel/core/cmd/server/web"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/i18n"
+	"github.com/1Panel-dev/1Panel/core/init/swagger"
 	"github.com/1Panel-dev/1Panel/core/middleware"
 	rou "github.com/1Panel-dev/1Panel/core/router"
 	"github.com/1Panel-dev/1Panel/core/utils/security"
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
-	swaggerfiles "github.com/swaggo/files/v2"
 )
 
 var (
 	Router *gin.Engine
 )
-
-func swaggerHandler() gin.HandlerFunc {
-	fileServer := http.StripPrefix("/1panel/swagger/", http.FileServer(http.FS(swaggerfiles.FS)))
-
-	return func(c *gin.Context) {
-		path := c.Request.URL.Path
-		path = strings.TrimPrefix(path, "/1panel/swagger")
-		switch path {
-		case "/doc.json":
-			c.Header("Content-Type", "application/json; charset=utf-8")
-			c.Header("Cache-Control", "private, max-age=600")
-			c.String(http.StatusOK, docs.SwaggerInfo.ReadDoc())
-		default:
-			c.Header("Cache-Control", "private, max-age=600")
-			fileServer.ServeHTTP(c.Writer, c.Request)
-		}
-	}
-}
 
 func setWebStatic(rootRouter *gin.RouterGroup) {
 	rootRouter.StaticFS("/public", http.FS(web.Favicon))
@@ -91,7 +73,7 @@ func Routers() *gin.Engine {
 
 	swaggerRouter := Router.Group("1panel")
 	docs.SwaggerInfo.BasePath = "/api/v2"
-	swaggerRouter.Use(middleware.SessionAuth()).GET("/swagger/*any", swaggerHandler())
+	swaggerRouter.Use(middleware.SessionAuth()).GET("/swagger/*any", swagger.SwaggerHandler())
 
 	PublicGroup := Router.Group("")
 	{
