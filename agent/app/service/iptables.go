@@ -16,7 +16,7 @@ import (
 
 type IIptablesService interface {
 	Search(req dto.SearchPageWithType) (int64, interface{}, error)
-	OperateRule(req dto.IptablesRuleOp) error
+	OperateRule(req dto.IptablesRuleOp, withSave bool) error
 	BatchOperate(req dto.IptablesBatchOperate) error
 	LoadChainStatus(req dto.OperationWithName) dto.IptablesChainStatus
 
@@ -63,7 +63,7 @@ func (s *IptablesService) Search(req dto.SearchPageWithType) (int64, interface{}
 	return int64(total), records, nil
 }
 
-func (s *IptablesService) OperateRule(req dto.IptablesRuleOp) error {
+func (s *IptablesService) OperateRule(req dto.IptablesRuleOp, withSave bool) error {
 	action := "ACCEPT"
 	if req.Strategy == "drop" {
 		action = "DROP"
@@ -122,6 +122,9 @@ func (s *IptablesService) OperateRule(req dto.IptablesRuleOp) error {
 		}
 	}
 
+	if !withSave {
+		return nil
+	}
 	if err := iptables.SaveRulesToFile(iptables.FilterTab, req.Chain, name); err != nil {
 		global.LOG.Errorf("persistence for %s failed, err: %v", iptables.Chain1PanelBasic, err)
 	}
@@ -129,10 +132,22 @@ func (s *IptablesService) OperateRule(req dto.IptablesRuleOp) error {
 }
 
 func (s *IptablesService) BatchOperate(req dto.IptablesBatchOperate) error {
+	if len(req.Rules) == 0 {
+		return errors.New("no rules to operate")
+	}
 	for _, rule := range req.Rules {
-		if err := s.OperateRule(rule); err != nil {
+		if err := s.OperateRule(rule, false); err != nil {
 			return err
 		}
+	}
+	chain := iptables.Chain1PanelInput
+	fileName := iptables.InputFileName
+	if req.Rules[0].Chain == iptables.Chain1PanelOutput {
+		chain = iptables.Chain1PanelOutput
+		fileName = iptables.OutputFileName
+	}
+	if err := iptables.SaveRulesToFile(iptables.FilterTab, chain, fileName); err != nil {
+		global.LOG.Errorf("persistence for %s failed, err: %v", iptables.Chain1PanelBasic, err)
 	}
 	return nil
 }
@@ -166,6 +181,12 @@ func (s *IptablesService) Operate(req dto.IptablesOp) error {
 			return err
 		}
 		if err := iptables.BindChain(iptables.FilterTab, iptables.ChainInput, iptables.Chain1PanelBasicAfter, 3); err != nil {
+			return err
+		}
+		if err := iptables.SaveRulesToFile(iptables.FilterTab, iptables.Chain1PanelBasicBefore, iptables.BasicBeforeFileName); err != nil {
+			return err
+		}
+		if err := iptables.SaveRulesToFile(iptables.FilterTab, iptables.Chain1PanelBasicAfter, iptables.BasicAfterFileName); err != nil {
 			return err
 		}
 		return nil
@@ -310,16 +331,7 @@ func initPreRules() error {
 	if err := iptables.AddRule(iptables.FilterTab, iptables.Chain1PanelBasicBefore, iptables.EstablishedRule); err != nil {
 		return err
 	}
-	panelPort := ""
-	if !global.IsMaster {
-		panelPort = global.CONF.Base.Port
-	} else {
-		var portSetting model.Setting
-		_ = global.CoreDB.Where("key = ?", "ServerPort").First(&portSetting).Error
-		if len(portSetting.Value) != 0 {
-			panelPort = portSetting.Value
-		}
-	}
+	panelPort := LoadPanelPort()
 	if len(panelPort) == 0 {
 		return errors.New("find 1panel service port failed")
 	}
@@ -336,4 +348,17 @@ func initPreRules() error {
 		return err
 	}
 	return nil
+}
+
+func LoadPanelPort() string {
+	if !global.IsMaster {
+		return global.CONF.Base.Port
+	} else {
+		var portSetting model.Setting
+		_ = global.CoreDB.Where("key = ?", "ServerPort").First(&portSetting).Error
+		if len(portSetting.Value) != 0 {
+			return portSetting.Value
+		}
+	}
+	return ""
 }

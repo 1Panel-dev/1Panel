@@ -269,7 +269,7 @@ func (b *BaseApi) OperateFilterRule(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	if err := iptablesService.OperateRule(req); err != nil {
+	if err := iptablesService.OperateRule(req, true); err != nil {
 		helper.InternalServer(c, err)
 		return
 	}
