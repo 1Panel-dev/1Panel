@@ -6,7 +6,7 @@ type DatabaseMysql struct {
 	From        string `json:"from" gorm:"not null;default:local"`
 	MysqlName   string `json:"mysqlName" gorm:"not null"`
 	Format      string `json:"format" gorm:"not null"`
-	Collation   string `json:"collation" gorm:"not null"`
+	Collation   string `json:"collation"`
 	Username    string `json:"username" gorm:"not null"`
 	Password    string `json:"password" gorm:"not null"`
 	Permission  string `json:"permission" gorm:"not null"`

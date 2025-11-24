@@ -117,10 +117,8 @@ func (u *ContainerService) CreateNetwork(req dto.NetworkCreate) error {
 		return err
 	}
 	defer client.Close()
-	var (
-		ipams    []network.IPAMConfig
-		enableV6 bool
-	)
+	var ipams []network.IPAMConfig
+
 	if req.Ipv4 {
 		var itemIpam network.IPAMConfig
 		if len(req.AuxAddress) != 0 {
@@ -141,7 +139,6 @@ func (u *ContainerService) CreateNetwork(req dto.NetworkCreate) error {
 		ipams = append(ipams, itemIpam)
 	}
 	if req.Ipv6 {
-		enableV6 = true
 		var itemIpam network.IPAMConfig
 		if len(req.AuxAddress) != 0 {
 			itemIpam.AuxAddress = make(map[string]string)
@@ -162,7 +159,7 @@ func (u *ContainerService) CreateNetwork(req dto.NetworkCreate) error {
 	}
 
 	options := network.CreateOptions{
-		EnableIPv6: &enableV6,
+		EnableIPv6: &req.Ipv6,
 		Driver:     req.Driver,
 		Options:    stringsToMap(req.Options),
 		Labels:     stringsToMap(req.Labels),

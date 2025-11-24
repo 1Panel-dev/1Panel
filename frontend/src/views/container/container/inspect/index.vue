@@ -192,10 +192,6 @@ const acceptParams = (props: DialogProps): void => {
             inspectData.value = props.data;
         }
         rawJson.value = JSON.stringify(inspectData.value, null, 2);
-
-        if (!ports.value.length) {
-            ports.value = Object.keys(inspectData.value?.Config?.ExposedPorts || {});
-        }
     } catch (e) {
         console.error('Failed to parse inspect data:', e);
     }
