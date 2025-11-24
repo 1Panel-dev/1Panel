@@ -1,10 +1,9 @@
 module github.com/1Panel-dev/1Panel/core
 
-go 1.24.0
-
-toolchain go1.24.9
+go 1.24.9
 
 require (
+	github.com/1panel-dev/base64Captcha v1.3.8
 	github.com/aliyun/aliyun-oss-go-sdk v3.0.2+incompatible
 	github.com/aws/aws-sdk-go-v2 v1.39.6
 	github.com/aws/aws-sdk-go-v2/config v1.31.20
@@ -26,7 +25,6 @@ require (
 	github.com/gorilla/websocket v1.5.3
 	github.com/jinzhu/copier v0.4.0
 	github.com/minio/minio-go/v7 v7.0.74
-	github.com/mojocn/base64Captcha v1.3.6
 	github.com/nicksnyder/go-i18n/v2 v2.4.0
 	github.com/oschwald/maxminddb-golang v1.13.1
 	github.com/patrickmn/go-cache v2.1.0+incompatible

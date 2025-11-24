@@ -91,8 +91,8 @@ type AppProperty struct {
 	Key                string   `json:"key"`
 	Required           []string `json:"Required"`
 	CrossVersionUpdate bool     `json:"crossVersionUpdate"`
-	Limit              int      `json:"limit" yaml:"memoryRequired"`
-	Recommend          int      `json:"recommend" yaml:"memoryRequired"`
+	Limit              int      `json:"limit" yaml:"limit"`
+	Recommend          int      `json:"recommend" yaml:"recommend"`
 	Website            string   `json:"website"`
 	Github             string   `json:"github"`
 	Document           string   `json:"document"`
