@@ -484,6 +484,9 @@ const message = {
         goInstall: 'Yüklemeye git',
         isDelete: 'Silindi',
         permission: 'İzinleri değiştir',
+        format: 'Karakter Seti',
+        collation: 'Karşılaştırma',
+        collationHelper: 'Boşsa, {0} karakter setinin varsayılan karşılaştırmasını kullanın',
         permissionForIP: 'IP',
         permissionAll: 'Tümü(%)',
         localhostHelper:

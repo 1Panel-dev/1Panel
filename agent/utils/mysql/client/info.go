@@ -30,6 +30,7 @@ type DBInfo struct {
 type CreateInfo struct {
 	Name       string `json:"name"`
 	Format     string `json:"format"`
+	Collation  string `json:"collation"`
 	Version    string `json:"version"`
 	Username   string `json:"userName"`
 	Password   string `json:"password"`
@@ -80,6 +81,11 @@ type BackupInfo struct {
 	Timeout uint `json:"timeout"` // second
 }
 
+type FormatCollation struct {
+	Format    string `json:"format" gorm:"column:CHARACTER_SET_NAME"`
+	Collation string `json:"collation" gorm:"column:COLLATION_NAME"`
+}
+
 type RecoverInfo struct {
 	Name       string `json:"name"`
 	Type       string `json:"type"`
@@ -98,13 +104,6 @@ type SyncDBInfo struct {
 	Username   string `json:"username"`
 	Password   string `json:"password"`
 	Permission string `json:"permission"`
-}
-
-var formatMap = map[string]string{
-	"utf8":    "utf8_general_ci",
-	"utf8mb4": "utf8mb4_general_ci",
-	"gbk":     "gbk_chinese_ci",
-	"big5":    "big5_chinese_ci",
 }
 
 func ConnWithSSL(ssl, skipVerify bool, clientKey, clientCert, rootCert string) (string, error) {

@@ -213,6 +213,22 @@ func (b *BaseApi) ListDBName(c *gin.Context) {
 }
 
 // @Tags Database Mysql
+// @Summary List mysql database format collation options
+// @Accept json
+// @Param request body dto.OperationWithName true "request"
+// @Success 200 {array} dto.MysqlFormatCollationOption
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /databases/format/options [post]
+func (b *BaseApi) ListDBFormatCollationOptions(c *gin.Context) {
+	var req dto.OperationWithName
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	helper.SuccessWithData(c, mysqlService.LoadFormatOption(req))
+}
+
+// @Tags Database Mysql
 // @Summary Load mysql database from remote
 // @Accept json
 // @Param request body dto.MysqlLoadDB true "request"

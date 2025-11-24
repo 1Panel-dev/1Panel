@@ -469,6 +469,9 @@ const message = {
         goInstall: 'インストールに移動します',
         isDelete: '削除されました',
         permission: '権限',
+        format: '文字セット',
+        collation: '照合順序',
+        collationHelper: '空の場合は {0} 文字セットのデフォルトの照合順序を使用します',
         permissionForIP: 'ip',
         permissionAll: 'それらすべて（％）',
         localhostHelper:

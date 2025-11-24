@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
@@ -31,7 +32,7 @@ func NewLocal(command []string, dbType, containerName, password, database string
 }
 
 func (r *Local) Create(info CreateInfo) error {
-	createSql := fmt.Sprintf("create database `%s` default character set %s collate %s", info.Name, info.Format, formatMap[info.Format])
+	createSql := fmt.Sprintf("create database `%s` default character set %s collate %s", info.Name, info.Format, info.Collation)
 	if err := r.ExecSQL(createSql, info.Timeout); err != nil {
 		if strings.Contains(strings.ToLower(err.Error()), "error 1007") {
 			return buserr.New("ErrDatabaseIsExist")
@@ -384,4 +385,34 @@ func (r *Local) ExecSQLForRows(command string, timeout uint) ([]string, error) {
 		return nil, errors.New(stdStr)
 	}
 	return strings.Split(stdStr, "\n"), nil
+}
+
+func (r *Local) LoadFormatCollation(timeout uint) ([]dto.MysqlFormatCollationOption, error) {
+	std, err := r.ExecSQLForRows("SELECT CHARACTER_SET_NAME, COLLATION_NAME FROM INFORMATION_SCHEMA.COLLATIONS ORDER BY CHARACTER_SET_NAME, COLLATION_NAME;", timeout)
+	if err != nil {
+		return nil, err
+	}
+	formatMap := make(map[string][]string)
+	for _, item := range std {
+		if strings.ToLower(item) == "character_set_name\tcollation_name" {
+			continue
+		}
+		parts := strings.Split(item, "\t")
+		if len(parts) != 2 {
+			continue
+		}
+		if _, ok := formatMap[parts[0]]; !ok {
+			formatMap[parts[0]] = []string{parts[1]}
+		} else {
+			formatMap[parts[0]] = append(formatMap[parts[0]], parts[1])
+		}
+	}
+	options := []dto.MysqlFormatCollationOption{}
+	for key, val := range formatMap {
+		options = append(options, dto.MysqlFormatCollationOption{
+			Format:     key,
+			Collations: val,
+		})
+	}
+	return options, nil
 }

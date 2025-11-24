@@ -2,16 +2,23 @@
     <DrawerPro v-model="createVisible" :header="$t('database.create')" @close="handleClose" size="normal">
         <el-form ref="formRef" label-position="top" :model="form" :rules="rules" v-loading="loading">
             <el-form-item :label="$t('commons.table.name')" prop="name">
-                <el-input clearable v-model.trim="form.name" @input="form.username = form.name">
-                    <template #append>
-                        <el-select v-model="form.format" class="p-w-100">
-                            <el-option label="utf8mb4" value="utf8mb4" />
-                            <el-option label="utf-8" value="utf8" />
-                            <el-option label="gbk" value="gbk" />
-                            <el-option label="big5" value="big5" />
-                        </el-select>
-                    </template>
-                </el-input>
+                <el-input clearable v-model.trim="form.name" @input="form.username = form.name" />
+            </el-form-item>
+            <el-form-item :label="$t('database.format')" prop="format">
+                <el-select filterable v-model="form.format" @change="loadCollations()">
+                    <el-option
+                        v-for="item of formatOptions"
+                        :key="item.format"
+                        :label="item.format"
+                        :value="item.format"
+                    />
+                </el-select>
+            </el-form-item>
+            <el-form-item :label="$t('database.collation')" prop="collation">
+                <el-select filterable v-model="form.collation">
+                    <el-option v-for="item of collationOptions" :key="item" :label="item" :value="item" />
+                </el-select>
+                <span class="input-help">{{ $t('database.collationHelper', [form.format]) }}</span>
             </el-form-item>
             <el-form-item :label="$t('commons.login.username')" prop="username">
                 <el-input clearable v-model.trim="form.username" />
@@ -67,18 +74,21 @@ import { reactive, ref } from 'vue';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
-import { addMysqlDB } from '@/api/modules/database';
+import { addMysqlDB, loadFormatCollations } from '@/api/modules/database';
 import { MsgSuccess } from '@/utils/message';
 import { getRandomStr } from '@/utils/util';
 
 const loading = ref();
 const createVisible = ref(false);
+const formatOptions = ref();
+const collationOptions = ref();
 const form = reactive({
     name: '',
     from: 'local',
     type: '',
     database: '',
     format: '',
+    collation: '',
     username: '',
     password: '',
     permission: '',
@@ -87,6 +97,7 @@ const form = reactive({
 });
 const rules = reactive({
     name: [Rules.requiredInput, Rules.dbName],
+    format: [Rules.requiredSelect],
     username: [Rules.requiredInput, Rules.name],
     password: [Rules.requiredInput, Rules.noSpace, Rules.illegal],
     permission: [Rules.requiredSelect],
@@ -107,15 +118,29 @@ const acceptParams = (params: DialogProps): void => {
     form.type = params.type;
     form.database = params.database;
     form.format = 'utf8mb4';
+    form.collation = '';
     form.username = '';
     form.permission = '%';
     form.permissionIPs = '';
     form.description = '';
     random();
+    loadOptions();
     createVisible.value = true;
 };
 const handleClose = () => {
     createVisible.value = false;
+};
+
+const loadOptions = async () => {
+    const defaultOptions = [{ format: 'utf8mb4' }, { format: 'utf8mb3' }, { format: 'gbk' }, { format: 'big5' }];
+    await loadFormatCollations(form.database).then((res) => {
+        formatOptions.value = res.data || defaultOptions;
+        loadCollations();
+    });
+};
+
+const loadCollations = async () => {
+    collationOptions.value = formatOptions.value?.find((item) => item.format === form.format)?.collations || [];
 };
 
 const random = async () => {

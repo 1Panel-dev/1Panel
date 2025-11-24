@@ -478,6 +478,9 @@ const message = {
         goInstall: 'Pergi pasang',
         isDelete: 'Dihapuskan',
         permission: 'Kebenaran',
+        format: 'Set Aksara',
+        collation: 'Kolasi',
+        collationHelper: 'Jika kosong, gunakan kolasi lalai set aksara {0}',
         permissionForIP: 'IP',
         permissionAll: 'Kesemuanya(%)',
         localhostHelper:

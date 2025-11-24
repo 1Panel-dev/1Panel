@@ -485,6 +485,9 @@ const message = {
         goInstall: 'Ir a instalar',
         isDelete: 'Eliminada',
         permission: 'Cambiar permisos',
+        format: 'Juego de Caracteres',
+        collation: 'Intercalación',
+        collationHelper: 'Si está vacío, use la intercalación predeterminada del juego de caracteres {0}',
         permissionForIP: 'IP',
         permissionAll: 'Todos (%)',
         localhostHelper:

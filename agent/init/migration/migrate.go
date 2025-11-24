@@ -55,6 +55,7 @@ func InitAgentDB() {
 		migrations.AddCommonDescription,
 		migrations.UpdateDatabase,
 		migrations.AddGPUMonitor,
+		migrations.UpdateDatabaseMysql,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

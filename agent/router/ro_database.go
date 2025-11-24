@@ -28,7 +28,7 @@ func (s *DatabaseRouter) InitRouter(Router *gin.RouterGroup) {
 		cmdRouter.POST("/variables", baseApi.LoadVariables)
 		cmdRouter.POST("/status", baseApi.LoadStatus)
 		cmdRouter.POST("/remote", baseApi.LoadRemoteAccess)
-		cmdRouter.GET("/options", baseApi.ListDBName)
+		cmdRouter.POST("/format/options", baseApi.ListDBFormatCollationOptions)
 
 		cmdRouter.POST("/redis/persistence/conf", baseApi.LoadPersistenceConf)
 		cmdRouter.POST("/redis/status", baseApi.LoadRedisStatus)

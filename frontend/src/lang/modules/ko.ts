@@ -472,6 +472,9 @@ const message = {
         goInstall: '설치로 이동',
         isDelete: '삭제됨',
         permission: '권한',
+        format: '문자 집합',
+        collation: '콜레이션',
+        collationHelper: '비어 있으면 {0} 문자 집합의 기본 콜레이션을 사용합니다',
         permissionForIP: 'IP',
         permissionAll: '모두(%)',
         localhostHelper:

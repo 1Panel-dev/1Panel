@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/mysql/client"
@@ -24,6 +25,7 @@ type MysqlClient interface {
 	Backup(info client.BackupInfo) error
 	Recover(info client.RecoverInfo) error
 
+	LoadFormatCollation(timeout uint) ([]dto.MysqlFormatCollationOption, error)
 	SyncDB(version string) ([]client.SyncDBInfo, error)
 	Close()
 }

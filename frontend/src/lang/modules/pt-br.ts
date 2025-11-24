@@ -476,6 +476,9 @@ const message = {
         goInstall: 'Ir para instalação',
         isDelete: 'Excluído',
         permission: 'Permissões',
+        format: 'Conjunto de Caracteres',
+        collation: 'Collation',
+        collationHelper: 'Se vazio, use a collation padrão do conjunto de caracteres {0}',
         permissionForIP: 'IP',
         permissionAll: 'Todos (% de)',
         localhostHelper:

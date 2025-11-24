@@ -13,6 +13,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
@@ -42,7 +43,7 @@ func NewRemote(db Remote) *Remote {
 }
 
 func (r *Remote) Create(info CreateInfo) error {
-	createSql := fmt.Sprintf("create database `%s` default character set %s collate %s", info.Name, info.Format, formatMap[info.Format])
+	createSql := fmt.Sprintf("create database `%s` default character set %s collate %s", info.Name, info.Format, info.Collation)
 	if err := r.ExecSQL(createSql, info.Timeout); err != nil {
 		if strings.Contains(strings.ToLower(err.Error()), "error 1007") {
 			return buserr.New("ErrDatabaseIsExist")
@@ -395,6 +396,42 @@ func (r *Remote) ExecSQL(command string, timeout uint) error {
 	}
 
 	return nil
+}
+
+func (r *Remote) LoadFormatCollation(timeout uint) ([]dto.MysqlFormatCollationOption, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeout)*time.Second)
+	defer cancel()
+
+	rows, err := r.Client.QueryContext(ctx, "SELECT CHARACTER_SET_NAME, COLLATION_NAME FROM INFORMATION_SCHEMA.COLLATIONS ORDER BY CHARACTER_SET_NAME, COLLATION_NAME;")
+	if errors.Is(ctx.Err(), context.DeadlineExceeded) {
+		return nil, buserr.New("ErrExecTimeOut")
+	}
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	formatMap := make(map[string][]string)
+	for rows.Next() {
+		var item FormatCollation
+		if err := rows.Scan(&item.Format, &item.Collation); err != nil {
+			return nil, err
+		}
+		if _, ok := formatMap[item.Format]; !ok {
+			formatMap[item.Format] = []string{item.Collation}
+		} else {
+			formatMap[item.Format] = append(formatMap[item.Format], item.Collation)
+		}
+	}
+	options := []dto.MysqlFormatCollationOption{}
+	for key, val := range formatMap {
+		options = append(options, dto.MysqlFormatCollationOption{
+			Format:     key,
+			Collations: val,
+		})
+	}
+
+	return options, nil
 }
 
 func (r *Remote) ExecSQLForHosts(timeout uint) ([]string, error) {

@@ -481,6 +481,9 @@ const message = {
         goInstall: 'Go to install',
         isDelete: 'Deleted',
         permission: 'Change permissions',
+        format: 'Character Set',
+        collation: 'Collation',
+        collationHelper: 'If empty, use the default collation of the {0} character set',
         permissionForIP: 'IP',
         permissionAll: 'All of them(%)',
         localhostHelper:
