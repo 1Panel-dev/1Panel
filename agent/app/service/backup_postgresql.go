@@ -86,7 +86,7 @@ func handlePostgresqlBackup(db DatabaseHelper, parentTask *task.Task, recordID u
 	if parentTask != nil {
 		return itemHandler()
 	}
-	backupTask.AddSubTaskWithOps(task.GetTaskName(itemName, task.TaskBackup, task.TaskScopeBackup), func(t *task.Task) error { return itemHandler() }, nil, 3, time.Hour)
+	backupTask.AddSubTaskWithOps(task.GetTaskName(itemName, task.TaskBackup, task.TaskScopeBackup), func(t *task.Task) error { return itemHandler() }, nil, 0, 3*time.Hour)
 	go func() {
 		if err := backupTask.Execute(); err != nil {
 			backupRepo.UpdateRecordByMap(recordID, map[string]interface{}{"status": constant.StatusFailed, "message": err.Error()})
@@ -130,10 +130,12 @@ func handlePostgresqlRecover(req dto.CommonRecover, parentTask *task.Task, isRol
 		if !isRollback {
 			rollbackFile := path.Join(global.Dir.TmpDir, fmt.Sprintf("database/%s/%s_%s.sql.gz", req.Type, req.DetailName, time.Now().Format(constant.DateTimeSlimLayout)))
 			if err := cli.Backup(client.BackupInfo{
+				Database:  req.Name,
 				Name:      req.DetailName,
 				TargetDir: path.Dir(rollbackFile),
 				FileName:  path.Base(rollbackFile),
 
+				Task:    t,
 				Timeout: 300,
 			}); err != nil {
 				return fmt.Errorf("backup postgresql db %s for rollback before recover failed, err: %v", req.DetailName, err)
@@ -142,9 +144,11 @@ func handlePostgresqlRecover(req dto.CommonRecover, parentTask *task.Task, isRol
 				if !isOk {
 					global.LOG.Info("recover failed, start to rollback now")
 					if err := cli.Recover(client.RecoverInfo{
+						Database:   req.Name,
 						Name:       req.DetailName,
 						SourceFile: rollbackFile,
 
+						Task:    t,
 						Timeout: 300,
 					}); err != nil {
 						global.LOG.Errorf("rollback postgresql db %s from %s failed, err: %v", req.DetailName, rollbackFile, err)
@@ -167,9 +171,11 @@ func handlePostgresqlRecover(req dto.CommonRecover, parentTask *task.Task, isRol
 			t.LogWithStatus(i18n.GetMsgByKey("Decrypt"), err)
 		}
 		if err := cli.Recover(client.RecoverInfo{
+			Database:   req.Name,
 			Name:       req.DetailName,
 			SourceFile: req.File,
 			Username:   dbInfo.Username,
+			Task:       t,
 			Timeout:    300,
 		}); err != nil {
 			global.LOG.Errorf("recover postgresql db %s from %s failed, err: %v", req.DetailName, req.File, err)
@@ -182,7 +188,7 @@ func handlePostgresqlRecover(req dto.CommonRecover, parentTask *task.Task, isRol
 		return recoverDatabase(parentTask)
 	}
 
-	itemTask.AddSubTaskWithOps(i18n.GetMsgByKey("TaskRecover"), recoverDatabase, nil, 3, time.Hour)
+	itemTask.AddSubTaskWithOps(i18n.GetMsgByKey("TaskRecover"), recoverDatabase, nil, 0, 3*time.Hour)
 	go func() {
 		_ = itemTask.Execute()
 	}()

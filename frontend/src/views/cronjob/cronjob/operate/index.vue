@@ -1027,18 +1027,16 @@ const verifyScript = (rule: any, value: any, callback: any) => {
     }
     callback();
 };
-const verifyUrlItems = (rule: any, value: any, callback: any) => {
+const verifyUrlItems = () => {
     if (!form.urlItems || form.urlItems.length === 0) {
-        callback(new Error(i18n.global.t('commons.rule.requiredInput')));
-        return;
+        return false;
     }
     for (const item of form.urlItems) {
         if (!item) {
-            callback(new Error(i18n.global.t('cronjob.urlHelper')));
-            return;
+            return false;
         }
     }
-    callback();
+    return true;
 };
 
 const verifySpec = (rule: any, value: any, callback: any) => {
@@ -1179,7 +1177,6 @@ const rules = reactive({
     websiteList: [Rules.requiredSelect],
     appIdList: [Rules.requiredSelect],
     dbNameList: [Rules.requiredSelect],
-    urlItems: [{ validator: verifyUrlItems, trigger: 'blur', required: true }],
     files: [{ validator: verifyFiles, trigger: 'blur', required: true }],
     sourceDir: [Rules.requiredInput],
     sourceAccountItems: [Rules.requiredSelect],
@@ -1458,6 +1455,10 @@ function hasScript() {
 
 const onSubmit = async (formEl: FormInstance | undefined) => {
     let specs = [];
+    if (form.type === 'curl' && (form.urlItems.length === 0 || !verifyUrlItems())) {
+        MsgError(i18n.global.t('cronjob.urlHelper'));
+        return;
+    }
     if (!form.specCustom) {
         for (const item of form.specObjs) {
             const itemSpec = transObjToSpec(item.specType, item.week, item.day, item.hour, item.minute, item.second);

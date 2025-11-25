@@ -8,17 +8,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/1Panel-dev/1Panel/agent/app/repo"
-
-	"github.com/1Panel-dev/1Panel/agent/constant"
-	"github.com/1Panel-dev/1Panel/agent/i18n"
-
-	"github.com/1Panel-dev/1Panel/agent/buserr"
-
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/app/task"
+	"github.com/1Panel-dev/1Panel/agent/buserr"
+	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/1Panel-dev/1Panel/agent/utils/mysql/client"
@@ -94,7 +91,7 @@ func handleMysqlBackup(db DatabaseHelper, parentTask *task.Task, recordID uint, 
 	if parentTask != nil {
 		return itemHandler()
 	}
-	backupTask.AddSubTaskWithOps(task.GetTaskName(itemName, task.TaskBackup, task.TaskScopeBackup), func(t *task.Task) error { return itemHandler() }, nil, 3, time.Hour)
+	backupTask.AddSubTaskWithOps(task.GetTaskName(itemName, task.TaskBackup, task.TaskScopeBackup), func(t *task.Task) error { return itemHandler() }, nil, 0, 3*time.Hour)
 	go func() {
 		if err := backupTask.Execute(); err != nil {
 			backupRepo.UpdateRecordByMap(recordID, map[string]interface{}{"status": constant.StatusFailed, "message": err.Error()})
@@ -196,7 +193,7 @@ func handleMysqlRecover(req dto.CommonRecover, parentTask *task.Task, isRollback
 		return recoverDatabase(parentTask)
 	}
 
-	itemTask.AddSubTaskWithOps(i18n.GetMsgByKey("TaskRecover"), recoverDatabase, nil, 3, time.Hour)
+	itemTask.AddSubTaskWithOps(i18n.GetMsgByKey("TaskRecover"), recoverDatabase, nil, 0, 3*time.Hour)
 	go func() {
 		_ = itemTask.Execute()
 	}()
