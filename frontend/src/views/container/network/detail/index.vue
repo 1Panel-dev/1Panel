@@ -14,6 +14,12 @@
                     <el-descriptions-item :label="$t('container.driver')">
                         {{ networkData?.Driver || '-' }}
                     </el-descriptions-item>
+                    <el-descriptions-item
+                        v-if="networkData?.Options?.parent"
+                        :label="$t('container.parentNetworkCard')"
+                    >
+                        {{ networkData?.Options?.parent }}
+                    </el-descriptions-item>
                     <el-descriptions-item :label="$t('commons.table.createdAt')">
                         {{ formatDate(networkData?.Created) }}
                     </el-descriptions-item>
@@ -39,18 +45,15 @@
                         :label="$t('container.subnet') + (index > 0 ? ' ' + (index + 1) : '')"
                     >
                         <div v-if="config">
-                            <div v-if="config.Subnet">
-                                <el-text class="mr-2">{{ $t('container.subnet') }}:</el-text>
-                                <el-tag>{{ config.Subnet }}</el-tag>
-                            </div>
-                            <div v-if="config.Gateway" class="mt-1">
-                                <el-text class="mr-2">{{ $t('container.gateway') }}:</el-text>
-                                <el-tag>{{ config.Gateway }}</el-tag>
-                            </div>
-                            <div v-if="config.IPRange" class="mt-1">
-                                <el-text class="mr-2">{{ $t('container.scope') }}:</el-text>
-                                <el-tag>{{ config.IPRange }}</el-tag>
-                            </div>
+                            <el-tag v-if="config.Subnet" type="info" :label="$t('container.subnet')">
+                                {{ $t('container.subnet') }}: {{ config.Subnet }}
+                            </el-tag>
+                            <el-tag class="ml-2" v-if="config.Gateway" type="info" :label="$t('container.gateway')">
+                                {{ $t('container.gateway') }}: {{ config.Gateway }}
+                            </el-tag>
+                            <el-tag class="ml-2" v-if="config.IPRange" type="info" :label="$t('container.scope')">
+                                {{ $t('container.scope') }}: {{ config.IPRange }}
+                            </el-tag>
                         </div>
                         <span v-else>-</span>
                     </el-descriptions-item>

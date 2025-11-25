@@ -42,7 +42,7 @@
 
                 <el-descriptions class="mt-4" :column="1" border :title="$t('container.command')">
                     <el-descriptions-item :label="$t('container.command')">
-                        <div v-if="inspectData?.Config?.Cmd?.length">
+                        <div v-if="inspectData?.Config?.Cmd?.length" class="tag-list">
                             <el-tag type="info" v-for="(entry, index) in inspectData?.Config?.Cmd" :key="index">
                                 {{ entry }}
                             </el-tag>
@@ -50,7 +50,7 @@
                         <span v-else>-</span>
                     </el-descriptions-item>
                     <el-descriptions-item label="ENTRYPONT">
-                        <div v-if="inspectData?.Config?.Entrypoint?.length">
+                        <div v-if="inspectData?.Config?.Entrypoint?.length" class="tag-list">
                             <el-tag type="info" v-for="(entry, index) in inspectData?.Config?.Entrypoint" :key="index">
                                 {{ entry }}
                             </el-tag>
@@ -284,5 +284,13 @@ defineExpose({
     margin-top: 20px;
     margin-bottom: 16px;
     display: block;
+}
+
+.tag-list {
+    .el-tag {
+        & ~ .el-tag {
+            margin-left: 5px;
+        }
+    }
 }
 </style>
