@@ -26,7 +26,7 @@ import (
 )
 
 const (
-	MaxReadFileSize = 800 * 1024 * 1024
+	MaxReadFileSize = 512 * 1024 * 1024
 	tailBufSize     = int64(32768)
 )
 
@@ -96,6 +96,22 @@ var tailBufPool = sync.Pool{
 		buf := make([]byte, tailBufSize)
 		return &buf
 	},
+}
+
+func readLineTrimmed(reader *bufio.Reader) (string, error) {
+	line, err := reader.ReadString('\n')
+	if err == io.EOF {
+		if len(line) == 0 {
+			return "", io.EOF
+		}
+		err = nil
+	}
+	if err != nil {
+		return "", err
+	}
+	line = strings.TrimSuffix(line, "\n")
+	line = strings.TrimSuffix(line, "\r")
+	return line, nil
 }
 
 func TailFromEnd(filename string, lines int) ([]string, error) {
@@ -172,6 +188,10 @@ func ReadFileByLine(filename string, page, pageSize int, latest bool) (res *dto.
 	if !NewFileOp().Stat(filename) {
 		return
 	}
+	if pageSize <= 0 {
+		err = fmt.Errorf("pageSize must be positive")
+		return
+	}
 	file, err := os.Open(filename)
 	if err != nil {
 		return
@@ -199,7 +219,7 @@ func ReadFileByLine(filename string, page, pageSize int, latest bool) (res *dto.
 		totalLines := 0
 
 		for {
-			line, _, readErr := reader.ReadLine()
+			line, readErr := readLineTrimmed(reader)
 			if readErr == io.EOF {
 				break
 			}
@@ -207,7 +227,7 @@ func ReadFileByLine(filename string, page, pageSize int, latest bool) (res *dto.
 				err = readErr
 				return
 			}
-			ringBuf[writeIdx%pageSize] = string(line)
+			ringBuf[writeIdx%pageSize] = line
 			writeIdx++
 			totalLines++
 		}
@@ -247,7 +267,7 @@ func ReadFileByLine(filename string, page, pageSize int, latest bool) (res *dto.
 		lines := make([]string, 0, pageSize)
 
 		for {
-			line, _, readErr := reader.ReadLine()
+			line, readErr := readLineTrimmed(reader)
 			if readErr == io.EOF {
 				break
 			}
@@ -257,7 +277,7 @@ func ReadFileByLine(filename string, page, pageSize int, latest bool) (res *dto.
 			}
 
 			if currentLine >= startLine && currentLine < endLine {
-				lines = append(lines, string(line))
+				lines = append(lines, line)
 			}
 			currentLine++
 		}
