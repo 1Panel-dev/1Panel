@@ -138,10 +138,7 @@ func (u *ImageService) Page(req dto.PageImage) (int64, interface{}, error) {
 		}
 	}
 	sort.Slice(records, func(i, j int) bool {
-		if records[i].IsPinned == records[j].IsPinned {
-			return records[i].IsUsed
-		}
-		return records[i].IsPinned
+		return records[i].IsPinned && !records[j].IsPinned
 	})
 	total, start, end := len(records), (req.Page-1)*req.PageSize, req.Page*req.PageSize
 	if start > total {

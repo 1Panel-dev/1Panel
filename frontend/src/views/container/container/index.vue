@@ -93,7 +93,7 @@
                         :label="$t('commons.table.name')"
                         min-width="250"
                         prop="name"
-                        sortable
+                        sortable="custom"
                         fix
                         :fixed="mobile ? false : 'left'"
                         show-overflow-tooltip
@@ -125,7 +125,7 @@
                         min-width="180"
                         prop="imageName"
                     />
-                    <el-table-column :label="$t('commons.table.status')" min-width="150" prop="state" sortable>
+                    <el-table-column :label="$t('commons.table.status')" min-width="150" prop="state">
                         <template #default="{ row }">
                             <el-dropdown placement="bottom">
                                 <Status :key="row.state" :status="row.state" :operate="true"></Status>
@@ -518,7 +518,7 @@ const changePinned = (row: any, isPinned: boolean) => {
         id: row.containerID,
         type: 'container',
         detailType: '',
-        isPinned: !row.isPinned,
+        isPinned: row.isPinned,
         description: row.description || '',
     };
     if (isPinned) {

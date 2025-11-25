@@ -63,7 +63,7 @@
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('commons.table.status')" prop="isUsed" width="100" sortable>
+                    <el-table-column :label="$t('commons.table.status')" prop="isUsed" width="100" sortable="custom">
                         <template #default="{ row }">
                             <Status :status="row.isUsed ? 'used' : 'unused'" />
                         </template>
@@ -71,7 +71,7 @@
                     <el-table-column
                         :label="$t('container.tag')"
                         prop="tags"
-                        sortable
+                        sortable="custom"
                         min-width="160"
                         :width="mobile ? 400 : 'auto'"
                         fix
@@ -88,13 +88,13 @@
                             </el-tag>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('container.size')" prop="size" min-width="60" fix sortable>
+                    <el-table-column :label="$t('container.size')" prop="size" min-width="60" fix sortable="custom">
                         <template #default="{ row }">
                             {{ computeSize2(row.size) }}
                         </template>
                     </el-table-column>
                     <el-table-column
-                        sortable
+                        sortable="custom"
                         prop="createdAt"
                         min-width="80"
                         :label="$t('commons.table.date')"

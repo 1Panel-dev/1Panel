@@ -1785,10 +1785,7 @@ func searchWithFilter(req dto.PageContainer, containers []container.Summary) []d
 		}
 	}
 	sort.Slice(records, func(i, j int) bool {
-		if records[i].IsPinned == records[j].IsPinned {
-			return list[i].Created > list[j].Created
-		}
-		return records[i].IsPinned
+		return records[i].IsPinned && !records[j].IsPinned
 	})
 	return records
 }
