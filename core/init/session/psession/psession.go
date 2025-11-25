@@ -44,6 +44,14 @@ func NewPSession(dbPath string) *PSession {
 	if err != nil {
 		panic(err)
 	}
+	sqlDB, dbError := db.DB()
+	if dbError != nil {
+		panic(err)
+	}
+	sqlDB.SetMaxOpenConns(1)
+	sqlDB.SetMaxIdleConns(1)
+	sqlDB.SetConnMaxLifetime(time.Hour)
+
 	store := gormstore.New(db, securecookie.GenerateRandomKey(32))
 	return &PSession{
 		Store: store,
