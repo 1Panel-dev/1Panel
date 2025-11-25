@@ -33,6 +33,9 @@ func NewLocal(command []string, dbType, containerName, password, database string
 
 func (r *Local) Create(info CreateInfo) error {
 	createSql := fmt.Sprintf("create database `%s` default character set %s collate %s", info.Name, info.Format, info.Collation)
+	if len(info.Collation) == 0 {
+		createSql = fmt.Sprintf("create database `%s` default character set %s", info.Name, info.Format)
+	}
 	if err := r.ExecSQL(createSql, info.Timeout); err != nil {
 		if strings.Contains(strings.ToLower(err.Error()), "error 1007") {
 			return buserr.New("ErrDatabaseIsExist")
@@ -287,13 +290,13 @@ func (r *Local) Recover(info RecoverInfo) error {
 
 func (r *Local) SyncDB(version string) ([]SyncDBInfo, error) {
 	var datas []SyncDBInfo
-	lines, err := r.ExecSQLForRows("SELECT SCHEMA_NAME, DEFAULT_CHARACTER_SET_NAME FROM information_schema.SCHEMATA", 300)
+	lines, err := r.ExecSQLForRows("SELECT SCHEMA_NAME, DEFAULT_CHARACTER_SET_NAME, DEFAULT_COLLATION_NAME FROM information_schema.SCHEMATA", 300)
 	if err != nil {
 		return datas, err
 	}
 	for _, line := range lines {
 		parts := strings.Fields(line)
-		if len(parts) != 2 {
+		if len(parts) != 3 {
 			continue
 		}
 		if parts[0] == "SCHEMA_NAME" || parts[0] == "information_schema" || parts[0] == "mysql" || parts[0] == "performance_schema" || parts[0] == "sys" || parts[0] == "__recycle_bin__" || parts[0] == "recycle_bin" {
@@ -304,6 +307,7 @@ func (r *Local) SyncDB(version string) ([]SyncDBInfo, error) {
 			From:      "local",
 			MysqlName: r.Database,
 			Format:    parts[1],
+			Collation: parts[2],
 		}
 		userLines, err := r.ExecSQLForRows(fmt.Sprintf("select user,host from mysql.db where db = '%s'", parts[0]), 300)
 		if err != nil {

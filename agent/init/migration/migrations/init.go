@@ -728,8 +728,31 @@ var AddGPUMonitor = &gormigrate.Migration{
 }
 
 var UpdateDatabaseMysql = &gormigrate.Migration{
-	ID: "20251125-update-database-mysql",
+	ID: "20251126-update-database-mysql",
 	Migrate: func(tx *gorm.DB) error {
-		return tx.AutoMigrate(&model.DatabaseMysql{})
+		if err := tx.AutoMigrate(&model.DatabaseMysql{}); err != nil {
+			return err
+		}
+		var data []model.DatabaseMysql
+		_ = tx.Where("1 = 1").Find(&data).Error
+		for _, item := range data {
+			if len(item.Collation) == 0 {
+				collation := ""
+				switch item.Format {
+				case "utf8":
+					collation = "utf8_general_ci"
+				case "utf8mb4":
+					collation = "utf8mb4_general_ci"
+				case "gbk":
+					collation = "gbk_chinese_ci"
+				case "big5":
+					collation = "big5_chinese_ci"
+				default:
+					collation = "utf8mb4_general_ci"
+				}
+				_ = tx.Model(&model.DatabaseMysql{}).Where("id = ?", item.ID).Updates(map[string]interface{}{"collation": collation}).Error
+			}
+		}
+		return nil
 	},
 }

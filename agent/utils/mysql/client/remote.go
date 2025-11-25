@@ -44,6 +44,9 @@ func NewRemote(db Remote) *Remote {
 
 func (r *Remote) Create(info CreateInfo) error {
 	createSql := fmt.Sprintf("create database `%s` default character set %s collate %s", info.Name, info.Format, info.Collation)
+	if len(info.Collation) == 0 {
+		createSql = fmt.Sprintf("create database `%s` default character set %s", info.Name, info.Format)
+	}
 	if err := r.ExecSQL(createSql, info.Timeout); err != nil {
 		if strings.Contains(strings.ToLower(err.Error()), "error 1007") {
 			return buserr.New("ErrDatabaseIsExist")
@@ -311,15 +314,15 @@ func (r *Remote) Recover(info RecoverInfo) error {
 
 func (r *Remote) SyncDB(version string) ([]SyncDBInfo, error) {
 	var datas []SyncDBInfo
-	rows, err := r.Client.Query("select schema_name, default_character_set_name from information_schema.SCHEMATA")
+	rows, err := r.Client.Query("select schema_name, default_character_set_name, default_collation_name from information_schema.SCHEMATA")
 	if err != nil {
 		return datas, err
 	}
 	defer rows.Close()
 
 	for rows.Next() {
-		var dbName, charsetName string
-		if err = rows.Scan(&dbName, &charsetName); err != nil {
+		var dbName, charsetName, collation string
+		if err = rows.Scan(&dbName, &charsetName, &collation); err != nil {
 			return datas, err
 		}
 		if dbName == "information_schema" || dbName == "mysql" || dbName == "performance_schema" || dbName == "sys" || dbName == "__recycle_bin__" || dbName == "recycle_bin" {
@@ -330,6 +333,7 @@ func (r *Remote) SyncDB(version string) ([]SyncDBInfo, error) {
 			From:      "remote",
 			MysqlName: r.Database,
 			Format:    charsetName,
+			Collation: collation,
 		}
 		userRows, err := r.Client.Query("select user,host from mysql.db where db = ?", dbName)
 		if err != nil {

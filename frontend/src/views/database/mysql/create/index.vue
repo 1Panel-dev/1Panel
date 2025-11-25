@@ -15,7 +15,7 @@
                 </el-select>
             </el-form-item>
             <el-form-item :label="$t('database.collation')" prop="collation">
-                <el-select filterable v-model="form.collation">
+                <el-select filterable v-model="form.collation" clearable>
                     <el-option v-for="item of collationOptions" :key="item" :label="item" :value="item" />
                 </el-select>
                 <span class="input-help">{{ $t('database.collationHelper', [form.format]) }}</span>

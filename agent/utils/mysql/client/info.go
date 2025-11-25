@@ -101,6 +101,7 @@ type SyncDBInfo struct {
 	From       string `json:"from"`
 	MysqlName  string `json:"mysqlName"`
 	Format     string `json:"format"`
+	Collation  string `json:"collation"`
 	Username   string `json:"username"`
 	Password   string `json:"password"`
 	Permission string `json:"permission"`
