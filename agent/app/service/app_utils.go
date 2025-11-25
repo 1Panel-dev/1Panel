@@ -541,8 +541,18 @@ func handleUpgradeCompose(install model.AppInstall, detail model.AppDetail) (map
 	if !ok || oldValue == nil {
 		return nil, buserr.New("ErrFileParse")
 	}
-	oldValueMap := oldValue.(map[string]interface{})
-	oldServiceValue := oldValueMap[install.ServiceName].(map[string]interface{})
+	oldValueMap, ok := oldValue.(map[string]interface{})
+	if !ok {
+		return nil, buserr.New("ErrFileParse")
+	}
+	oldServiceValueInterface, ok := oldValueMap[install.ServiceName]
+	if !ok || oldServiceValueInterface == nil {
+		return nil, buserr.New("ErrFileParse")
+	}
+	oldServiceValue, ok := oldServiceValueInterface.(map[string]interface{})
+	if !ok {
+		return nil, buserr.New("ErrFileParse")
+	}
 	if oldServiceValue["deploy"] != nil {
 		serviceValue["deploy"] = oldServiceValue["deploy"]
 	}
