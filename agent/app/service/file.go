@@ -5,10 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/app/task"
-	"github.com/1Panel-dev/1Panel/agent/i18n"
-	"github.com/1Panel-dev/1Panel/agent/utils/convert"
-	"github.com/1Panel-dev/1Panel/agent/utils/ini_conf"
 	"io"
 	"io/fs"
 	"os"
@@ -20,6 +16,11 @@ import (
 	"strings"
 	"time"
 	"unicode/utf8"
+
+	"github.com/1Panel-dev/1Panel/agent/app/task"
+	"github.com/1Panel-dev/1Panel/agent/i18n"
+	"github.com/1Panel-dev/1Panel/agent/utils/convert"
+	"github.com/1Panel-dev/1Panel/agent/utils/ini_conf"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/jinzhu/copier"
@@ -591,7 +592,7 @@ func (f *FileService) ReadLogByLine(req request.FileReadByLineReq) (*response.Fi
 		scope       string
 		logFileRes  *dto.LogFileRes
 	)
-	if stat.Size() > 500*1024*1024 {
+	if stat.Size() > files.MaxReadFileSize {
 		lines, err = files.TailFromEnd(logFilePath, req.PageSize)
 		isEndOfFile = true
 		scope = "tail"

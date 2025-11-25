@@ -26,7 +26,8 @@ import (
 )
 
 const (
-	maxReadFileSize = 800 * 1024 * 1024
+	MaxReadFileSize = 800 * 1024 * 1024
+	tailBufSize     = int64(32768)
 )
 
 func IsSymlink(mode os.FileMode) bool {
@@ -90,6 +91,13 @@ var readerPool = sync.Pool{
 	},
 }
 
+var tailBufPool = sync.Pool{
+	New: func() interface{} {
+		buf := make([]byte, tailBufSize)
+		return &buf
+	},
+}
+
 func TailFromEnd(filename string, lines int) ([]string, error) {
 	file, err := os.Open(filename)
 	if err != nil {
@@ -103,24 +111,26 @@ func TailFromEnd(filename string, lines int) ([]string, error) {
 	}
 	fileSize := stat.Size()
 
-	bufSize := int64(4096)
+	bufPtr := tailBufPool.Get().(*[]byte)
+	buf := *bufPtr
+	defer tailBufPool.Put(bufPtr)
+
 	var result []string
 	var leftover string
 
 	for offset := fileSize; offset > 0 && len(result) < lines; {
-		readSize := bufSize
-		if offset < bufSize {
+		readSize := tailBufSize
+		if offset < tailBufSize {
 			readSize = offset
 		}
 		offset -= readSize
 
-		buf := make([]byte, readSize)
-		_, err := file.ReadAt(buf, offset)
+		_, err := file.ReadAt(buf[:readSize], offset)
 		if err != nil && err != io.EOF {
 			return nil, err
 		}
 
-		data := string(buf) + leftover
+		data := string(buf[:readSize]) + leftover
 		linesInChunk := strings.Split(data, "\n")
 
 		if offset > 0 {
@@ -131,20 +141,28 @@ func TailFromEnd(filename string, lines int) ([]string, error) {
 		}
 
 		for i := len(linesInChunk) - 1; i >= 0; i-- {
-			if len(result) < lines {
-				if !(i == len(linesInChunk)-1 && linesInChunk[i] == "" && len(result) == 0) {
-					result = append([]string{linesInChunk[i]}, result...)
-				}
+			if len(result) >= lines {
+				break
 			}
+			if i == len(linesInChunk)-1 && linesInChunk[i] == "" && len(result) == 0 {
+				continue
+			}
+			// 反插数据
+			result = append(result, linesInChunk[i])
 		}
 	}
 
 	if leftover != "" && len(result) < lines {
-		result = append([]string{leftover}, result...)
+		result = append(result, leftover)
 	}
 
 	if len(result) > lines {
-		result = result[len(result)-lines:]
+		result = result[:lines]
+	}
+
+	// 反转数据
+	for i, j := 0, len(result)-1; i < j; i, j = i+1, j-1 {
+		result[i], result[j] = result[j], result[i]
 	}
 
 	return result, nil
@@ -165,7 +183,7 @@ func ReadFileByLine(filename string, page, pageSize int, latest bool) (res *dto.
 		return
 	}
 
-	if fi.Size() > maxReadFileSize {
+	if fi.Size() > MaxReadFileSize {
 		err = buserr.New("ErrLogFileToLarge")
 		return
 	}
