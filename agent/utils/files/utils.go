@@ -3,6 +3,15 @@ package files
 import (
 	"bufio"
 	"fmt"
+	"io"
+	"net/http"
+	"os"
+	"os/user"
+	"path/filepath"
+	"strconv"
+	"strings"
+	"sync"
+
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
@@ -14,13 +23,10 @@ import (
 	"golang.org/x/text/encoding/simplifiedchinese"
 	"golang.org/x/text/encoding/traditionalchinese"
 	"golang.org/x/text/encoding/unicode"
-	"io"
-	"net/http"
-	"os"
-	"os/user"
-	"path/filepath"
-	"strconv"
-	"strings"
+)
+
+const (
+	maxReadFileSize = 800 * 1024 * 1024
 )
 
 func IsSymlink(mode os.FileMode) bool {
@@ -78,27 +84,10 @@ func IsHidden(path string) bool {
 	return len(base) > 1 && base[0] == dotCharacter
 }
 
-func countLines(path string) (int, error) {
-	file, err := os.Open(path)
-	if err != nil {
-		return 0, err
-	}
-	defer file.Close()
-	reader := bufio.NewReader(file)
-	count := 0
-	for {
-		_, err := reader.ReadString('\n')
-		if err != nil {
-			if err == io.EOF {
-				if count > 0 {
-					count++
-				}
-				return count, nil
-			}
-			return count, err
-		}
-		count++
-	}
+var readerPool = sync.Pool{
+	New: func() interface{} {
+		return bufio.NewReaderSize(nil, 8192)
+	},
 }
 
 func TailFromEnd(filename string, lines int) ([]string, error) {
@@ -176,43 +165,92 @@ func ReadFileByLine(filename string, page, pageSize int, latest bool) (res *dto.
 		return
 	}
 
-	if fi.Size() > 500*1024*1024 {
+	if fi.Size() > maxReadFileSize {
 		err = buserr.New("ErrLogFileToLarge")
 		return
 	}
 
-	totalLines, err := countLines(filename)
-	if err != nil {
-		return
-	}
 	res = &dto.LogFileRes{}
-	total := (totalLines + pageSize - 1) / pageSize
-	res.TotalPages = total
-	res.TotalLines = totalLines
-	reader := bufio.NewReaderSize(file, 8192)
+	reader := readerPool.Get().(*bufio.Reader)
+	reader.Reset(file)
+	defer readerPool.Put(reader)
 
 	if latest {
-		page = total
+		ringBuf := make([]string, pageSize)
+		writeIdx := 0
+		totalLines := 0
+
+		for {
+			line, _, readErr := reader.ReadLine()
+			if readErr == io.EOF {
+				break
+			}
+			if readErr != nil {
+				err = readErr
+				return
+			}
+			ringBuf[writeIdx%pageSize] = string(line)
+			writeIdx++
+			totalLines++
+		}
+
+		if totalLines == 0 {
+			res.Lines = []string{}
+			res.TotalLines = 0
+			res.TotalPages = 0
+			res.IsEndOfFile = true
+			return
+		}
+
+		total := (totalLines + pageSize - 1) / pageSize
+		res.TotalPages = total
+		res.TotalLines = totalLines
+
+		lastPageSize := totalLines % pageSize
+		if lastPageSize == 0 {
+			lastPageSize = pageSize
+		}
+		if lastPageSize > totalLines {
+			lastPageSize = totalLines
+		}
+
+		result := make([]string, 0, lastPageSize)
+		startIdx := writeIdx - lastPageSize
+		for i := 0; i < lastPageSize; i++ {
+			idx := (startIdx + i) % pageSize
+			result = append(result, ringBuf[idx])
+		}
+		res.Lines = result
+		res.IsEndOfFile = true
+	} else {
+		startLine := (page - 1) * pageSize
+		endLine := startLine + pageSize
+		currentLine := 0
+		lines := make([]string, 0, pageSize)
+
+		for {
+			line, _, readErr := reader.ReadLine()
+			if readErr == io.EOF {
+				break
+			}
+			if readErr != nil {
+				err = readErr
+				return
+			}
+
+			if currentLine >= startLine && currentLine < endLine {
+				lines = append(lines, string(line))
+			}
+			currentLine++
+		}
+
+		res.Lines = lines
+		res.TotalLines = currentLine
+		total := (currentLine + pageSize - 1) / pageSize
+		res.TotalPages = total
+		res.IsEndOfFile = page >= total
 	}
-	currentLine := 0
-	startLine := (page - 1) * pageSize
-	endLine := startLine + pageSize
-	lines := make([]string, 0, pageSize)
-	for {
-		line, _, err := reader.ReadLine()
-		if err == io.EOF {
-			break
-		}
-		if currentLine >= startLine && currentLine < endLine {
-			lines = append(lines, string(line))
-		}
-		currentLine++
-		if currentLine >= endLine {
-			break
-		}
-	}
-	res.Lines = lines
-	res.IsEndOfFile = currentLine < endLine
+
 	return
 }
 
