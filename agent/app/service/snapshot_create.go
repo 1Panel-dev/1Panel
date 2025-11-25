@@ -259,11 +259,12 @@ func loadDbConn(snap *snapHelper, targetDir string, req dto.SnapshotCreate) erro
 			return err
 		}
 	} else {
-		taskDB, err := common.LoadDBConnByPathWithErr(path.Join(targetDir, "db/task.db"), "core.db")
+		taskDB, err := common.LoadDBConnByPathWithErr(path.Join(targetDir, "db/task.db"), "task.db")
 		snap.Task.LogWithStatus(i18n.GetWithName("SnapNewDB", "task"), err)
 		if err != nil {
 			return err
 		}
+		defer common.CloseDB(taskDB)
 		_ = taskDB.Where("id = ?", req.TaskID).Delete(&model.Task{}).Error
 	}
 	if !req.WithOperationLog && global.IsMaster {

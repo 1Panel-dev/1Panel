@@ -647,11 +647,13 @@ func dropTaskLog(logDir string) {
 		if err == nil {
 			_ = xpackDB.Table("tampers").Where("task_id != ?", "").Select("task_id").Find(&usedTasks).Error
 		}
+		defer common.CloseDB(xpackDB)
 	case "System":
 		xpackDB, err := common.LoadDBConnByPathWithErr(path.Join(global.CONF.Base.InstallDir, "1panel/db/xpack.db"), "xpack.db")
 		if err == nil {
 			_ = xpackDB.Model("nodes").Where("task_id != ?", "").Select("task_id").Find(&usedTasks).Error
 		}
+		defer common.CloseDB(xpackDB)
 	default:
 		dropFileOrDir(logDir)
 		_ = taskRepo.Delete(repo.WithByType(taskType))
