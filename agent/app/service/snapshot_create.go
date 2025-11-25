@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
+	"github.com/docker/docker/api/types/image"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
@@ -23,6 +24,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/controller"
 	"github.com/1Panel-dev/1Panel/agent/utils/copier"
+	"github.com/1Panel-dev/1Panel/agent/utils/docker"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"gorm.io/gorm"
 )
@@ -369,9 +371,21 @@ func snapAppImage(snap snapHelper, req dto.SnapshotCreate, targetDir string) err
 		}
 	}
 
+	client, err := docker.NewDockerClient()
+	if err != nil {
+		snap.Task.Log("load docker client failed, skip save app images")
+		return nil
+	}
+	images, err := client.ImageList(context.Background(), image.ListOptions{})
+	if err != nil {
+		snap.Task.Log("list docker images failed, skip save app images")
+		return nil
+	}
+	var existImages []string
+	for _, img := range images {
+		existImages = append(existImages, img.RepoTags...)
+	}
 	var imageList []string
-	existStr, _ := cmd.RunDefaultWithStdoutBashC("docker images | awk '{print $1\":\"$2}' | grep -v REPOSITORY:TAG")
-	existImages := strings.Split(existStr, "\n")
 	for _, app := range req.AppData {
 		for _, item := range app.Children {
 			if item.Label == "appImage" && item.IsCheck {
