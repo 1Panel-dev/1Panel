@@ -365,7 +365,7 @@
         <TerminalDialog ref="dialogTerminalRef" />
 
         <PortJumpDialog ref="dialogPortJumpRef" />
-        <TaskLog ref="taskLogRef" width="70%" />
+        <TaskLog ref="taskLogRef" width="70%" @close="search" />
     </div>
 </template>
 

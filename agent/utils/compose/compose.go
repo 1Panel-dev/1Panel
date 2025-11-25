@@ -1,11 +1,21 @@
 package compose
 
 import (
+	"errors"
+	"fmt"
+	"os"
+	"path"
+	"strings"
+	"time"
+
+	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
-	"time"
+	"github.com/1Panel-dev/1Panel/agent/utils/docker"
+	"github.com/goccy/go-yaml"
 )
 
 func checkCmd() error {
@@ -25,6 +35,58 @@ func Up(filePath string) (string, error) {
 	}
 	stdout, err := cmd.RunDefaultWithStdoutBashCfAndTimeOut(global.CONF.DockerConfig.Command+" -f %s up -d", 20*time.Minute, filePath)
 	return stdout, err
+}
+
+func UpWithTask(filePath string, task *task.Task) error {
+	content, err := os.ReadFile(filePath)
+	if err != nil {
+		return err
+	}
+	env, _ := os.ReadFile(path.Join(path.Dir(filePath), ".env"))
+	var compose docker.ComposeProject
+	if err := yaml.Unmarshal(content, &compose); err != nil {
+		return fmt.Errorf("parse docker-compose file failed: %v", err)
+	}
+	images, err := docker.GetImagesFromDockerCompose(env, content)
+	if err != nil {
+		return err
+	}
+	dockerCLi, err := docker.NewClient()
+	if err != nil {
+		return err
+	}
+	errMsg := ""
+	for _, image := range images {
+		task.Log(i18n.GetWithName("PullImageStart", image))
+		if err = dockerCLi.PullImageWithProcess(task, image); err != nil {
+			errOur := err.Error()
+			if errOur != "" {
+				if strings.Contains(errOur, "no such host") {
+					errMsg = i18n.GetMsgByKey("ErrNoSuchHost") + ":"
+				}
+				if strings.Contains(errOur, "Error response from daemon") {
+					errMsg = i18n.GetMsgByKey("PullImageTimeout") + ":"
+				}
+			}
+			message := errMsg + errOur
+			installErr := errors.New(message)
+			task.LogFailedWithErr(i18n.GetMsgByKey("PullImage"), installErr)
+			if exist, _ := dockerCLi.ImageExists(image); !exist {
+				return installErr
+			} else {
+				task.Log(i18n.GetMsgByKey("UseExistImage"))
+			}
+		} else {
+			task.Log(i18n.GetMsgByKey("PullImageSuccess"))
+		}
+	}
+
+	dockerCommand := global.CONF.DockerConfig.Command
+	if dockerCommand == "docker-compose" {
+		return cmd.NewCommandMgr(cmd.WithTask(*task)).Run("docker-compose", "-f", filePath, "up", "-d")
+	} else {
+		return cmd.NewCommandMgr(cmd.WithTask(*task)).Run("docker", "compose", "-f", filePath, "up", "-d")
+	}
 }
 
 func Down(filePath string) (string, error) {

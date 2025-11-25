@@ -13,14 +13,19 @@
                     {{ $t('container.createCompose') }}
                 </el-button>
             </template>
+            <template #rightToolBar>
+                <TableRefresh @search="search()" />
+                <TableSetting title="container-refresh" @search="search()" />
+            </template>
             <template #main>
                 <el-row v-if="data.length > 0" :gutter="20" class="row-box">
-                    <el-col :span="6">
+                    <el-col :span="7">
                         <el-card>
                             <el-input
                                 v-model="searchName"
                                 :placeholder="$t('commons.button.search')"
                                 clearable
+                                class="w-4/5"
                                 @clear="search"
                                 @keyup.enter="search"
                             >
@@ -29,17 +34,32 @@
                                 </template>
                             </el-input>
 
-                            <ComplexTable :show-header="false" @row-click="loadDetail" :data="data">
+                            <el-table class="mt-2" :show-header="false" @row-click="loadDetail" :data="data">
                                 <el-table-column prop="name">
                                     <template #default="{ row }">
                                         <div class="cursor-pointer">
-                                            <div class="font-medium truncate">
+                                            <div class="font-medium text-base">
                                                 {{ row.name }}
+                                            </div>
+                                            <div class="mb-1">
+                                                <el-text class="w-12" link size="small" type="info">
+                                                    {{ loadFrom(row) }}
+                                                </el-text>
                                                 <el-divider direction="vertical" />
-                                                <el-text v-if="row.containerCount === 0" type="danger" size="small">
+                                                <el-text link size="small" type="info" class="ml-2">
+                                                    {{ row.createdAt }}
+                                                </el-text>
+                                                <el-divider direction="vertical" />
+                                                <el-text
+                                                    link
+                                                    v-if="row.containerCount === 0"
+                                                    type="danger"
+                                                    size="small"
+                                                >
                                                     {{ $t('container.exited') }}
                                                 </el-text>
                                                 <el-text
+                                                    link
                                                     v-else
                                                     :type="
                                                         row.containerCount === row.runningCount ? 'success' : 'warning'
@@ -50,21 +70,16 @@
                                                         $t('container.running', [row.runningCount, row.containerCount])
                                                     }}
                                                 </el-text>
-                                                <el-divider direction="vertical" />
-                                                <el-button
-                                                    link
-                                                    type="primary"
-                                                    icon="Folder"
-                                                    :disabled="!currentCompose?.workdir"
-                                                    @click="openComposeFolder"
-                                                />
                                             </div>
-                                            <div class="mt-1 mb-2">
-                                                <el-tag size="small" type="info">{{ loadFrom(row) }}</el-tag>
-                                                <el-tag size="small" type="info" class="ml-2">
-                                                    {{ row.createdAt }}
-                                                </el-tag>
-                                            </div>
+                                            <el-button
+                                                plain
+                                                round
+                                                size="small"
+                                                :disabled="!currentCompose?.workdir"
+                                                @click="openComposeFolder"
+                                            >
+                                                {{ $t('home.dir') }}
+                                            </el-button>
                                             <el-button
                                                 plain
                                                 round
@@ -101,10 +116,10 @@
                                         </div>
                                     </template>
                                 </el-table-column>
-                            </ComplexTable>
+                            </el-table>
                         </el-card>
                     </el-col>
-                    <el-col :span="18">
+                    <el-col :span="17">
                         <el-card v-if="currentCompose" v-loading="detailLoading">
                             <el-table
                                 v-if="composeContainers.length > 0"

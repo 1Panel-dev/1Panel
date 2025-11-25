@@ -69,7 +69,12 @@
             </span>
         </template>
     </DrawerPro>
-    <TaskLog ref="taskLogRef" width="70%" />
+    <TaskLog ref="taskLogRef" width="70%">
+        <template #task-footer>
+            <el-button @click="handleClose">{{ $t('commons.table.backToList') }}</el-button>
+            <el-button type="primary" @click="closeTask">{{ $t('commons.table.keepEdit') }}</el-button>
+        </template>
+    </TaskLog>
     <FileList ref="fileRef" @choose="loadDir" />
 </template>
 
@@ -167,7 +172,11 @@ const changeFrom = () => {
 
 const handleClose = () => {
     emit('search');
+    taskLogRef.value?.handleClose();
     drawerVisible.value = false;
+};
+const closeTask = () => {
+    taskLogRef.value?.handleClose();
 };
 
 const loadPath = async () => {

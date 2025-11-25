@@ -203,9 +203,8 @@ func (u *ContainerService) CreateCompose(req dto.ComposeCreate) error {
 	}
 	go func() {
 		taskItem.AddSubTask(i18n.GetMsgByKey("ComposeCreate"), func(t *task.Task) error {
-			cmd := getComposeCmd(req.Path, "up")
-			out, err := cmd.CombinedOutput()
-			taskItem.Log(i18n.GetWithName("ComposeCreateRes", string(out)))
+			err := compose.UpWithTask(req.Path, t)
+			t.LogWithStatus(i18n.GetMsgByKey("ComposeCreate"), err)
 			if err != nil {
 				_, _ = compose.Down(req.Path)
 				return err
