@@ -841,7 +841,11 @@ func (b *BaseApi) ReadFileByLine(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithData(c, res)
+	if res.TotalLines > 100 {
+		helper.SuccessWithDataGzipped(c, res)
+	} else {
+		helper.SuccessWithData(c, res)
+	}
 }
 
 // @Tags File
