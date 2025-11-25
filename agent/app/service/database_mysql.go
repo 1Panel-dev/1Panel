@@ -100,7 +100,7 @@ func (u *MysqlService) ListDBOption() ([]dto.MysqlOption, error) {
 }
 
 func (u *MysqlService) Create(ctx context.Context, req dto.MysqlDBCreate) (*model.DatabaseMysql, error) {
-	if cmd.CheckIllegal(req.Name, req.Username, req.Password, req.Format, req.Permission) {
+	if cmd.CheckIllegal(req.Name, req.Username, req.Password, req.Format, req.Collation, req.Permission) {
 		return nil, buserr.New("ErrCmdIllegal")
 	}
 

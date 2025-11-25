@@ -58,7 +58,7 @@ type MysqlDBCreate struct {
 	Name        string `json:"name" validate:"required"`
 	From        string `json:"from" validate:"required,oneof=local remote"`
 	Database    string `json:"database" validate:"required"`
-	Format      string `json:"format" validate:"required,oneof=utf8mb4 utf8 gbk big5"`
+	Format      string `json:"format" validate:"required"`
 	Collation   string `json:"collation"`
 	Username    string `json:"username" validate:"required"`
 	Password    string `json:"password" validate:"required"`

@@ -850,7 +850,7 @@ const form = reactive<Cronjob.CronjobInfo>({
     dbType: 'mysql',
     dbName: '',
     url: '',
-    urlItems: [],
+    urlItems: [''],
     isDir: true,
     files: [],
     sourceDir: '',
