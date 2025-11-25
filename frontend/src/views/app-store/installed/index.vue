@@ -417,10 +417,6 @@
 </template>
 
 <script lang="ts" setup>
-import { searchAppInstalled, installedOp, appInstalledDeleteCheck, getAppIconUrl } from '@/api/modules/app';
-import { onMounted, onUnmounted, reactive, ref } from 'vue';
-import i18n from '@/lang';
-import { ElMessageBox } from 'element-plus';
 import Backups from '@/components/backup/index.vue';
 import Uploads from '@/components/upload/index.vue';
 import PortJumpDialog from '@/components/port-jump/index.vue';
@@ -429,20 +425,25 @@ import AppDelete from './delete/index.vue';
 import AppParams from './detail/index.vue';
 import AppUpgrade from './upgrade/index.vue';
 import AppIgnore from './ignore/index.vue';
-import ComposeLogs from '@/components/log/compose/index.vue';
-import TerminalDialog from '@/views/container/container/terminal/index.vue';
-import { App } from '@/api/interface/app';
 import Status from '@/components/status/index.vue';
-import { getAge, jumpToPath, toLink } from '@/utils/util';
-import { useRouter } from 'vue-router';
-import { MsgSuccess } from '@/utils/message';
 import TaskLog from '@/components/log/task/index.vue';
 import Detail from '@/views/app-store/detail/index.vue';
-import IgnoreApp from '@/views/app-store/installed/ignore/create/index.vue';
-import { getAgentSettingByKey } from '@/api/modules/setting';
 import Tags from '@/views/app-store/components/tag.vue';
 import SvgIcon from '@/components/svg-icon/svg-icon.vue';
 import MainDiv from '@/components/main-div/index.vue';
+import ComposeLogs from '@/components/log/compose/index.vue';
+import IgnoreApp from '@/views/app-store/installed/ignore/create/index.vue';
+import TerminalDialog from '@/views/container/container/terminal/index.vue';
+
+import { searchAppInstalled, installedOp, appInstalledDeleteCheck, getAppIconUrl } from '@/api/modules/app';
+import { onMounted, onUnmounted, reactive, ref } from 'vue';
+import i18n from '@/lang';
+import { ElMessageBox } from 'element-plus';
+import { App } from '@/api/interface/app';
+import { getAge, jumpToPath, toLink } from '@/utils/util';
+import { useRouter } from 'vue-router';
+import { MsgSuccess } from '@/utils/message';
+import { getAgentSettingByKey } from '@/api/modules/setting';
 import { routerToFileWithPath, routerToNameWithQuery } from '@/utils/router';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 const { currentNode, isMaster, currentNodeAddr } = useGlobalStore();

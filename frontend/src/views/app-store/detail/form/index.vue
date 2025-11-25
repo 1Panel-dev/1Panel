@@ -201,6 +201,7 @@ const formRules = ref<FormRules>({
     memoryLimit: [Rules.requiredInput, checkNumberRange(0, 9999999999)],
     specifyIP: [Rules.ipv4orV6],
     restartPolicy: [Rules.requiredSelect],
+    format: [Rules.requiredInput],
 });
 
 const initFormData = () => ({

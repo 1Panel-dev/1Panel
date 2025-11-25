@@ -300,10 +300,11 @@ func createLink(ctx context.Context, installTask *task.Task, app model.App, appI
 						createMysql.Name = dbConfig.DbName
 						createMysql.Username = dbConfig.DbUser
 						createMysql.Database = database.Name
-						createMysql.Format = "utf8mb4"
+						createMysql.Format = dbConfig.Format
 						createMysql.Permission = "%"
 						createMysql.Password = dbConfig.Password
 						createMysql.From = database.From
+						createMysql.Collation = dbConfig.Collation
 						mysqldb, err := NewIMysqlService().Create(ctx, createMysql)
 						if err != nil {
 							return err

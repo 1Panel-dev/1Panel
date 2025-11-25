@@ -16,7 +16,7 @@ import Components from 'unplugin-vue-components/vite';
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers';
 import svgLoader from 'vite-svg-loader';
 
-const prefix = `monaco-editor/esm/vs`;
+import monacoEditorPlugin from 'vite-plugin-monaco-editor';
 
 const { dependencies, devDependencies, name, version } = pkg;
 const __APP_INFO__ = {
@@ -44,7 +44,6 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
                 scss: {
                     additionalData: `@use "@/styles/var.scss" as *;`,
                     silenceDeprecations: ['legacy-js-api'],
-                    api: 'modern',
                 },
             },
         },
@@ -52,6 +51,9 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
             port: viteEnv.VITE_PORT,
             open: viteEnv.VITE_OPEN,
             host: '0.0.0.0',
+            sourcemapIgnoreList: (sourcePath) => {
+                return sourcePath.includes('node_modules');
+            },
             proxy: {
                 '/api/v2': {
                     target: 'http://localhost:9999/',
@@ -95,12 +97,16 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
             svgLoader({
                 defaultImport: 'url',
             }),
+            monacoEditorPlugin({
+                languageWorkers: ['editorWorkerService', 'typescript', 'json', 'html', 'css'],
+            }),
         ],
         esbuild: {
             pure: viteEnv.VITE_DROP_CONSOLE ? ['console.log'] : [],
             drop: viteEnv.VITE_DROP_CONSOLE && process.env.NODE_ENV === 'production' ? ['debugger'] : [],
         },
         build: {
+            sourcemap: false,
             outDir: '../core/cmd/server/web',
             minify: 'esbuild',
             target: 'esnext',
@@ -110,15 +116,12 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
                     chunkFileNames: 'assets/js/[name]-[hash].js',
                     entryFileNames: 'assets/js/[name]-[hash].js',
                     assetFileNames: 'assets/[ext]/[name]-[hash].[ext]',
-                    manualChunks: {
-                        jsonWorker: [`${prefix}/language/json/json.worker`],
-                        cssWorker: [`${prefix}/language/css/css.worker`],
-                        htmlWorker: [`${prefix}/language/html/html.worker`],
-                        tsWorker: [`${prefix}/language/typescript/ts.worker`],
-                        editorWorker: [`${prefix}/editor/editor.worker`],
-                    },
                 },
             },
+        },
+        optimizeDeps: {
+            include: ['monaco-editor/esm/vs/editor/editor.api'],
+            exclude: ['monaco-editor'],
         },
     };
 });

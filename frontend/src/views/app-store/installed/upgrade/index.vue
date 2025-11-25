@@ -79,6 +79,10 @@
     <TaskLog ref="taskLogRef" />
 </template>
 <script lang="ts" setup>
+import Diff from './diff/index.vue';
+import TaskLog from '@/components/log/task/index.vue';
+import CodemirrorPro from '@/components/codemirror-pro/index.vue';
+
 import { App } from '@/api/interface/app';
 import { getAppUpdateVersions, ignoreUpgrade, installedOp } from '@/api/modules/app';
 import { getAppStoreConfig } from '@/api/modules/setting';
@@ -87,10 +91,7 @@ import { ElMessageBox, FormInstance } from 'element-plus';
 import { reactive, ref, onBeforeUnmount } from 'vue';
 import { MsgSuccess } from '@/utils/message';
 import { Rules } from '@/global/form-rules';
-import Diff from './diff/index.vue';
 import bus from '@/global/bus';
-import CodemirrorPro from '@/components/codemirror-pro/index.vue';
-import TaskLog from '@/components/log/task/index.vue';
 import { v4 as uuidv4 } from 'uuid';
 
 const composeDiffRef = ref();

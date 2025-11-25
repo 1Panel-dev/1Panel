@@ -118,6 +118,17 @@
             </div>
             <span class="input-help" v-if="p.description">{{ getDescription(p) }}</span>
         </el-form-item>
+        <el-form-item v-if="form[p.envKey] == 'mysql'" :label="$t('database.format')" prop="format">
+            <el-select filterable v-model="form.format" @change="loadCollations()">
+                <el-option v-for="item of formatOptions" :key="item.format" :label="item.format" :value="item.format" />
+            </el-select>
+        </el-form-item>
+        <el-form-item v-if="form[p.envKey] == 'mysql'" :label="$t('database.collation')" prop="collation">
+            <el-select filterable v-model="form.collation">
+                <el-option v-for="item of collationOptions" :key="item" :label="item" :value="item" />
+            </el-select>
+            <span class="input-help">{{ $t('database.collationHelper', [form.format]) }}</span>
+        </el-form-item>
     </div>
 </template>
 <script lang="ts" setup>
@@ -128,6 +139,7 @@ import { Rules } from '@/global/form-rules';
 import { App } from '@/api/interface/app';
 import { getDBName, getLabel, getDescription } from '@/utils/util';
 import { getPathByType } from '@/api/modules/files';
+import { loadFormatCollations } from '@/api/modules/database';
 
 interface ParamObj extends App.FromField {
     services: App.AppService[];
@@ -163,7 +175,9 @@ const props = defineProps({
     },
 });
 
-const form = reactive({});
+const form = reactive({
+    format: '',
+});
 let rules = reactive({});
 const params = computed({
     get() {
@@ -241,6 +255,10 @@ const handleParams = () => {
 
 const getServices = async (childKey: string, key: string | undefined, pObj: ParamObj | undefined) => {
     pObj.services = [];
+    appKey.value = key || '';
+    if (appKey.value == 'mysql') {
+        form.format = 'utf8mb4';
+    }
     await getAppService(key).then((res) => {
         pObj.services = res.data || [];
         form[childKey] = '';
@@ -268,11 +286,30 @@ const changeService = (value: string, services: App.AppService[]) => {
             });
         }
     });
+    if (appKey.value == 'mysql') {
+        loadOptions(value);
+    }
     updateParam();
 };
 
 const toPage = (key: string) => {
     window.location.href = '/apps/all?install=' + key;
+};
+
+const formatOptions = ref();
+const collationOptions = ref();
+const appKey = ref('');
+
+const loadOptions = async (database: string) => {
+    const defaultOptions = [{ format: 'utf8mb4' }, { format: 'utf8mb3' }, { format: 'gbk' }, { format: 'big5' }];
+    await loadFormatCollations(database).then((res) => {
+        formatOptions.value = res.data || defaultOptions;
+        loadCollations();
+    });
+};
+
+const loadCollations = async () => {
+    collationOptions.value = formatOptions.value?.find((item) => item.format === form.format)?.collations || [];
 };
 
 onMounted(() => {

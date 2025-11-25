@@ -728,8 +728,8 @@ var AddGPUMonitor = &gormigrate.Migration{
 }
 
 var UpdateDatabaseMysql = &gormigrate.Migration{
-	ID: "20251124-update-database-mysql",
+	ID: "20251125-update-database-mysql",
 	Migrate: func(tx *gorm.DB) error {
-		return tx.AutoMigrate(&model.Database{})
+		return tx.AutoMigrate(&model.DatabaseMysql{})
 	},
 }

@@ -49,6 +49,8 @@ const formData = ref({
     taskID: '',
     gpuConfig: false,
     specifyIP: '',
+    format: 'utf8mb4',
+    collation: '',
 });
 
 const handleClose = () => {

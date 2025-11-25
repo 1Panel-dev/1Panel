@@ -12,6 +12,8 @@ type AppDatabase struct {
 	DbUser       string `json:"PANEL_DB_USER"`
 	Password     string `json:"PANEL_DB_USER_PASSWORD"`
 	DatabaseName string `json:"DATABASE_NAME"`
+	Format       string `json:"format"`
+	Collation    string `json:"collation"`
 }
 
 type AuthParam struct {
