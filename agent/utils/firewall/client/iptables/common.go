@@ -45,7 +45,7 @@ const (
 
 func RunWithStd(tab, rule string) (string, error) {
 	cmdMgr := cmd.NewCommandMgr(cmd.WithIgnoreExist1(), cmd.WithTimeout(20*time.Second))
-	stdout, err := cmdMgr.RunWithStdoutBashCf("%s iptables -t %s %s", cmd.SudoHandleCmd(), tab, rule)
+	stdout, err := cmdMgr.RunWithStdoutBashCf("%s iptables -w -t %s %s", cmd.SudoHandleCmd(), tab, rule)
 	if err != nil {
 		global.LOG.Errorf("iptables command failed [table=%s, rule=%s]: %v", tab, rule, err)
 		return stdout, err

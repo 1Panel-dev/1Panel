@@ -7,6 +7,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/service"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
+	firewallClient "github.com/1Panel-dev/1Panel/agent/utils/firewall/client"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/client/iptables"
 )
 
@@ -27,6 +28,10 @@ func Init() {
 		}
 		if err := iptables.LoadRulesFromFile(iptables.NatTab, iptables.Chain1PanelPostRouting, iptables.ForwardFileName2); err != nil {
 			global.LOG.Errorf("load postrouting rules from file failed, err: %v", err)
+			return
+		}
+		if err := firewallClient.EnableIptablesForward(); err != nil {
+			global.LOG.Errorf("enable iptables forward failed, err: %v", err)
 			return
 		}
 		global.LOG.Infof("loaded iptables rules for forward from file successfully")

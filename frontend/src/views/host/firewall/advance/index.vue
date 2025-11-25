@@ -17,7 +17,7 @@
                     <template #main>
                         <div class="app-warn">
                             <div class="flex flex-col gap-2 items-center justify-center w-full sm:flex-row">
-                                <span>{{ $t('firewall.advancedControlNotAvailable', [firewallName]) }}</span>
+                                <span>{{ $t('firewall.advancedControlNotAvailable', [fireName]) }}</span>
                             </div>
                             <div>
                                 <img src="@/assets/images/no_app.svg" />
@@ -160,7 +160,6 @@ const loading = ref();
 const selects = ref<any>([]);
 const selectedChain = ref('1PANEL_INPUT');
 const defaultStrategy = ref('ACCEPT');
-const firewallName = ref('');
 
 const maskShow = ref(true);
 const isActive = ref(false);

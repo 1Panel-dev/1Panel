@@ -60,14 +60,13 @@ func SaveRulesToFile(tab, chain, fileName string) error {
 }
 
 func LoadRulesFromFile(tab, chain, fileName string) error {
-	rulesFile := path.Join(global.Dir.FirewallDir, fileName)
-	if _, err := os.Stat(rulesFile); os.IsNotExist(err) {
-		return nil
-	}
-
 	if err := AddChain(tab, chain); err != nil {
 		global.LOG.Errorf("create chain %s failed: %v", chain, err)
 		return err
+	}
+	rulesFile := path.Join(global.Dir.FirewallDir, fileName)
+	if _, err := os.Stat(rulesFile); os.IsNotExist(err) {
+		return nil
 	}
 	data, err := os.ReadFile(rulesFile)
 	if err != nil {
