@@ -209,7 +209,7 @@ func (u *ContainerService) CreateCompose(req dto.ComposeCreate) error {
 				_, _ = compose.Down(req.Path)
 				return err
 			}
-			_ = composeRepo.CreateRecord(&model.Compose{Name: req.Name, Path: req.Path})
+			_ = composeRepo.CreateRecord(&model.Compose{Name: strings.ToLower(req.Name), Path: req.Path})
 			return nil
 		}, nil)
 		_ = taskItem.Execute()
