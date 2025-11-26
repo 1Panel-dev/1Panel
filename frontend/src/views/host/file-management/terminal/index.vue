@@ -8,20 +8,22 @@
         :fullScreen="true"
     >
         <template #content>
-            <el-alert :closable="false" :title="$t('terminal.localConnJump')" type="info" />
-            <Terminal class="mt-2" style="height: calc(100vh - 170px)" ref="terminalRef"></Terminal>
-            <div>
-                <el-cascader
-                    v-model="quickCmd"
-                    :options="commandTree"
-                    @change="quickInput"
-                    :show-all-levels="false"
-                    class="w-full -mt-6"
-                    placeholder=" "
-                    filterable
-                >
-                    <template #prefix>{{ $t('terminal.quickCommand') }}</template>
-                </el-cascader>
+            <div class="terminal-container">
+                <el-alert :closable="false" :title="$t('terminal.localConnJump')" type="info" />
+                <Terminal class="terminal-content" ref="terminalRef"></Terminal>
+                <div class="quick-command">
+                    <el-cascader
+                        v-model="quickCmd"
+                        :options="commandTree"
+                        @change="quickInput"
+                        :show-all-levels="false"
+                        class="w-full"
+                        placeholder=" "
+                        filterable
+                    >
+                        <template #prefix>{{ $t('terminal.quickCommand') }}</template>
+                    </el-cascader>
+                </div>
             </div>
         </template>
     </DrawerPro>
@@ -91,3 +93,22 @@ defineExpose({
     acceptParams,
 });
 </script>
+
+<style scoped>
+.terminal-container {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 140px);
+}
+
+.terminal-content {
+    flex: 1;
+    overflow: hidden;
+    margin-top: 8px;
+}
+
+.quick-command {
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+</style>
