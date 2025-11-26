@@ -68,7 +68,7 @@ func (u *FirewallService) LoadBaseInfo(tab string) (dto.FirewallBaseInfo, error)
 	go func() {
 		defer wg.Done()
 		baseInfo.IsActive, _ = client.Status()
-		baseInfo.IsInit, baseInfo.IsBind = loadInitStatus(baseInfo.Name, tab)
+		baseInfo.IsInit, baseInfo.IsBind = iptables.LoadInitStatus(baseInfo.Name, tab)
 	}()
 	wg.Wait()
 	return baseInfo, nil
@@ -825,97 +825,4 @@ func checkPortUsed(ports, proto string, apps []portOfApp) string {
 		return "inUsed"
 	}
 	return ""
-}
-
-func loadInitStatus(clientName, tab string) (bool, bool) {
-	if clientName == "firewalld" {
-		return true, true
-	}
-	if clientName == "ufw" && tab != "forward" {
-		return true, true
-	}
-	switch tab {
-	case "base":
-		if isExist, _ := iptables.CheckChainExist(iptables.FilterTab, iptables.Chain1PanelBasicBefore); !isExist {
-			return false, false
-		}
-		if exist := iptables.CheckRuleExist(iptables.FilterTab, iptables.Chain1PanelBasicBefore, iptables.IoRuleIn); !exist {
-			return false, false
-		}
-		if exist := iptables.CheckRuleExist(iptables.FilterTab, iptables.Chain1PanelBasicBefore, iptables.EstablishedRule); !exist {
-			return false, false
-		}
-		if exist, _ := iptables.CheckChainExist(iptables.FilterTab, iptables.Chain1PanelBasic); !exist {
-			return false, false
-		}
-		if exist, _ := iptables.CheckChainExist(iptables.FilterTab, iptables.Chain1PanelBasicAfter); !exist {
-			return false, false
-		}
-		if exist := iptables.CheckRuleExist(iptables.FilterTab, iptables.Chain1PanelBasicAfter, iptables.DropAllTcp); !exist {
-			return false, false
-		}
-		if exist := iptables.CheckRuleExist(iptables.FilterTab, iptables.Chain1PanelBasicAfter, iptables.DropAllUdp); !exist {
-			return false, false
-		}
-		if bind, _ := iptables.CheckChainBind(iptables.FilterTab, iptables.ChainInput, iptables.Chain1PanelBasicBefore); !bind {
-			return true, false
-		}
-		if bind, _ := iptables.CheckChainBind(iptables.FilterTab, iptables.ChainInput, iptables.Chain1PanelBasic); !bind {
-			return true, false
-		}
-		if bind, _ := iptables.CheckChainBind(iptables.FilterTab, iptables.ChainInput, iptables.Chain1PanelBasicAfter); !bind {
-			return true, false
-		}
-		return true, true
-	case "advance":
-		isExist, _ := iptables.CheckChainExist(iptables.FilterTab, iptables.Chain1PanelInput)
-		if !isExist {
-			return false, false
-		}
-		isExist, _ = iptables.CheckChainExist(iptables.FilterTab, iptables.Chain1PanelOutput)
-		if !isExist {
-			return false, false
-		}
-
-		isBind, _ := iptables.CheckChainBind(iptables.FilterTab, iptables.ChainInput, iptables.Chain1PanelInput)
-		if !isBind {
-			return true, false
-		}
-		isBind, _ = iptables.CheckChainBind(iptables.FilterTab, iptables.ChainOutput, iptables.Chain1PanelOutput)
-		return true, isBind
-	case "forward":
-		stdout, err := cmd.RunDefaultWithStdoutBashC("cat /proc/sys/net/ipv4/ip_forward")
-		if err != nil {
-			global.LOG.Errorf("check /proc/sys/net/ipv4/ip_forward failed, err: %v", err)
-			return false, false
-		}
-		if strings.TrimSpace(stdout) == "0" {
-			return false, false
-		}
-
-		exist, _ := iptables.CheckChainExist(iptables.NatTab, iptables.Chain1PanelPreRouting)
-		if !exist {
-			return false, false
-		}
-		exist, _ = iptables.CheckChainExist(iptables.NatTab, iptables.Chain1PanelPostRouting)
-		if !exist {
-			return false, false
-		}
-		exist, _ = iptables.CheckChainExist(iptables.FilterTab, iptables.Chain1PanelForward)
-		if !exist {
-			return false, false
-		}
-		isBind, _ := iptables.CheckChainBind(iptables.NatTab, "PREROUTING", iptables.Chain1PanelPreRouting)
-		if !isBind {
-			return false, false
-		}
-		isBind, _ = iptables.CheckChainBind(iptables.NatTab, "POSTROUTING", iptables.Chain1PanelPostRouting)
-		if !isBind {
-			return false, false
-		}
-		isBind, _ = iptables.CheckChainBind(iptables.FilterTab, "FORWARD", iptables.Chain1PanelForward)
-		return true, isBind
-	default:
-		return false, false
-	}
 }

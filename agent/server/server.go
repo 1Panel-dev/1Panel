@@ -42,11 +42,11 @@ func Start() {
 	i18n.Init()
 	cache.Init()
 	app.Init()
-	firewall.Init()
 	lang.Init()
 	validator.Init()
 	cron.Run()
 	hook.Init()
+	go firewall.Init()
 	InitOthers()
 
 	rootRouter := router.Routers()
