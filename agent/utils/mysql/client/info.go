@@ -3,6 +3,7 @@ package client
 import (
 	"crypto/tls"
 	"crypto/x509"
+	"database/sql"
 	"errors"
 
 	"github.com/1Panel-dev/1Panel/agent/global"
@@ -82,8 +83,8 @@ type BackupInfo struct {
 }
 
 type FormatCollation struct {
-	Format    string `json:"format" gorm:"column:CHARACTER_SET_NAME"`
-	Collation string `json:"collation" gorm:"column:COLLATION_NAME"`
+	Format    sql.NullString `json:"format" gorm:"column:CHARACTER_SET_NAME"`
+	Collation sql.NullString `json:"collation" gorm:"column:COLLATION_NAME"`
 }
 
 type RecoverInfo struct {

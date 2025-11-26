@@ -405,6 +405,9 @@ func (r *Local) LoadFormatCollation(timeout uint) ([]dto.MysqlFormatCollationOpt
 		if len(parts) != 2 {
 			continue
 		}
+		if parts[0] == "NULL" {
+			continue
+		}
 		if _, ok := formatMap[parts[0]]; !ok {
 			formatMap[parts[0]] = []string{parts[1]}
 		} else {
