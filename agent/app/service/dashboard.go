@@ -1,6 +1,7 @@
 package service
 
 import (
+	"cmp"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -23,10 +24,9 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/controller"
 	"github.com/1Panel-dev/1Panel/agent/utils/copier"
+	"github.com/1Panel-dev/1Panel/agent/utils/psutil"
 	"github.com/gin-gonic/gin"
-	"github.com/shirou/gopsutil/v4/cpu"
 	"github.com/shirou/gopsutil/v4/disk"
-	"github.com/shirou/gopsutil/v4/host"
 	"github.com/shirou/gopsutil/v4/load"
 	"github.com/shirou/gopsutil/v4/mem"
 	"github.com/shirou/gopsutil/v4/net"
@@ -77,7 +77,7 @@ func (u *DashboardService) Restart(operation string) error {
 
 func (u *DashboardService) LoadOsInfo() (*dto.OsInfo, error) {
 	var baseInfo dto.OsInfo
-	hostInfo, err := host.Info()
+	hostInfo, err := psutil.HOST.GetHostInfo(false)
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +87,7 @@ func (u *DashboardService) LoadOsInfo() (*dto.OsInfo, error) {
 	baseInfo.KernelArch = hostInfo.KernelArch
 	baseInfo.KernelVersion = hostInfo.KernelVersion
 
-	diskInfo, err := disk.Usage(global.Dir.BaseDir)
+	diskInfo, err := psutil.DISK.GetUsage(global.Dir.BaseDir, false)
 	if err == nil {
 		baseInfo.DiskSize = int64(diskInfo.Free)
 	}
@@ -104,12 +104,16 @@ func (u *DashboardService) LoadOsInfo() (*dto.OsInfo, error) {
 func (u *DashboardService) LoadCurrentInfoForNode() *dto.NodeCurrent {
 	var currentInfo dto.NodeCurrent
 
-	currentInfo.CPUTotal, _ = cpu.Counts(true)
-	totalPercent, _ := cpu.Percent(100*time.Millisecond, false)
-	if len(totalPercent) == 1 {
-		currentInfo.CPUUsedPercent = totalPercent[0]
-		currentInfo.CPUUsed = currentInfo.CPUUsedPercent * 0.01 * float64(currentInfo.CPUTotal)
+	currentInfo.CPUTotal, _ = psutil.CPUInfo.GetLogicalCores(false)
+
+	cpuUsedPercent, perCore := psutil.CPU.GetCPUUsage()
+	if len(perCore) == 0 {
+		currentInfo.CPUTotal = psutil.CPU.NumCPU()
+	} else {
+		currentInfo.CPUTotal = len(perCore)
 	}
+	currentInfo.CPUUsedPercent = cpuUsedPercent
+	currentInfo.CPUUsed = cpuUsedPercent * 0.01 * float64(currentInfo.CPUTotal)
 
 	loadInfo, _ := load.Avg()
 	currentInfo.Load1 = loadInfo.Load1
@@ -134,38 +138,37 @@ func (u *DashboardService) LoadCurrentInfoForNode() *dto.NodeCurrent {
 
 func (u *DashboardService) LoadBaseInfo(ioOption string, netOption string) (*dto.DashboardBase, error) {
 	var baseInfo dto.DashboardBase
-	hostInfo, err := host.Info()
+	hostInfo, err := psutil.HOST.GetHostInfo(false)
 	if err != nil {
 		return nil, err
 	}
-	baseInfo.Hostname = hostInfo.Hostname
-	baseInfo.OS = hostInfo.OS
-	baseInfo.Platform = hostInfo.Platform
-	baseInfo.PlatformFamily = hostInfo.PlatformFamily
-	baseInfo.PlatformVersion = hostInfo.PlatformVersion
-	baseInfo.KernelArch = hostInfo.KernelArch
-	baseInfo.KernelVersion = hostInfo.KernelVersion
 	ss, _ := json.Marshal(hostInfo)
-	baseInfo.VirtualizationSystem = string(ss)
-	baseInfo.IpV4Addr = loadOutboundIP()
-	httpProxy := os.Getenv("http_proxy")
-	if httpProxy == "" {
-		httpProxy = os.Getenv("HTTP_PROXY")
+	baseInfo = dto.DashboardBase{
+		Hostname:             hostInfo.Hostname,
+		OS:                   hostInfo.OS,
+		Platform:             hostInfo.Platform,
+		PlatformFamily:       hostInfo.PlatformFamily,
+		PlatformVersion:      hostInfo.PlatformVersion,
+		KernelArch:           hostInfo.KernelArch,
+		KernelVersion:        hostInfo.KernelVersion,
+		VirtualizationSystem: string(ss),
+		IpV4Addr:             loadOutboundIP(),
+		SystemProxy:          "noProxy",
 	}
-	if httpProxy != "" {
-		baseInfo.SystemProxy = httpProxy
+
+	if proxy := cmp.Or(os.Getenv("http_proxy"), os.Getenv("HTTP_PROXY")); proxy != "" {
+		baseInfo.SystemProxy = proxy
 	}
-	baseInfo.SystemProxy = "noProxy"
 
 	loadQuickJump(&baseInfo)
 
-	cpuInfo, err := cpu.Info()
-	if err == nil {
+	cpuInfo, err := psutil.CPUInfo.GetCPUInfo(false)
+	if err == nil && len(cpuInfo) > 0 {
 		baseInfo.CPUModelName = cpuInfo[0].ModelName
 	}
 
-	baseInfo.CPUCores, _ = cpu.Counts(false)
-	baseInfo.CPULogicalCores, _ = cpu.Counts(true)
+	baseInfo.CPUCores, _ = psutil.CPUInfo.GetPhysicalCores(false)
+	baseInfo.CPULogicalCores, _ = psutil.CPUInfo.GetLogicalCores(false)
 
 	baseInfo.CurrentInfo = *u.LoadCurrentInfo(ioOption, netOption)
 	return &baseInfo, nil
@@ -173,18 +176,21 @@ func (u *DashboardService) LoadBaseInfo(ioOption string, netOption string) (*dto
 
 func (u *DashboardService) LoadCurrentInfo(ioOption string, netOption string) *dto.DashboardCurrent {
 	var currentInfo dto.DashboardCurrent
-	hostInfo, _ := host.Info()
+	hostInfo, _ := psutil.HOST.GetHostInfo(false)
 	currentInfo.Uptime = hostInfo.Uptime
 	currentInfo.TimeSinceUptime = time.Now().Add(-time.Duration(hostInfo.Uptime) * time.Second).Format(constant.DateTimeLayout)
 	currentInfo.Procs = hostInfo.Procs
+	currentInfo.CPUTotal, _ = psutil.CPUInfo.GetLogicalCores(false)
 
-	currentInfo.CPUTotal, _ = cpu.Counts(true)
-	totalPercent, _ := cpu.Percent(100*time.Millisecond, false)
-	if len(totalPercent) == 1 {
-		currentInfo.CPUUsedPercent = totalPercent[0]
-		currentInfo.CPUUsed = currentInfo.CPUUsedPercent * 0.01 * float64(currentInfo.CPUTotal)
+	cpuUsedPercent, perCore := psutil.CPU.GetCPUUsage()
+	if len(perCore) == 0 {
+		currentInfo.CPUTotal = psutil.CPU.NumCPU()
+	} else {
+		currentInfo.CPUTotal = len(perCore)
 	}
-	currentInfo.CPUPercent, _ = cpu.Percent(100*time.Millisecond, true)
+	currentInfo.CPUPercent = perCore
+	currentInfo.CPUUsedPercent = cpuUsedPercent
+	currentInfo.CPUUsed = cpuUsedPercent * 0.01 * float64(currentInfo.CPUTotal)
 
 	loadInfo, _ := load.Avg()
 	currentInfo.Load1 = loadInfo.Load1
@@ -246,6 +252,7 @@ func (u *DashboardService) LoadCurrentInfo(ioOption string, netOption string) *d
 			if state.Name == netOption {
 				currentInfo.NetBytesSent = state.BytesSent
 				currentInfo.NetBytesRecv = state.BytesRecv
+				break
 			}
 		}
 	}
@@ -455,41 +462,52 @@ func loadDiskInfo() []dto.DiskInfo {
 	)
 	wg.Add(len(mounts))
 	for i := 0; i < len(mounts); i++ {
-		go func(timeoutCh <-chan time.Time, mount diskInfo) {
+		go func(mount diskInfo) {
 			defer wg.Done()
 
 			var itemData dto.DiskInfo
 			itemData.Path = mount.Mount
 			itemData.Type = mount.Type
 			itemData.Device = mount.Device
+
+			type diskResult struct {
+				state *disk.UsageStat
+				err   error
+			}
+			resultCh := make(chan diskResult, 1)
+
+			go func() {
+				state, err := psutil.DISK.GetUsage(mount.Mount, false)
+				resultCh <- diskResult{state: state, err: err}
+			}()
+
 			select {
-			case <-timeoutCh:
+			case <-time.After(5 * time.Second):
 				mu.Lock()
 				datas = append(datas, itemData)
 				mu.Unlock()
 				global.LOG.Errorf("load disk info from %s failed, err: timeout", mount.Mount)
-			default:
-				state, err := disk.Usage(mount.Mount)
-				if err != nil {
+			case result := <-resultCh:
+				if result.err != nil {
 					mu.Lock()
 					datas = append(datas, itemData)
 					mu.Unlock()
-					global.LOG.Errorf("load disk info from %s failed, err: %v", mount.Mount, err)
+					global.LOG.Errorf("load disk info from %s failed, err: %v", mount.Mount, result.err)
 					return
 				}
-				itemData.Total = state.Total
-				itemData.Free = state.Free
-				itemData.Used = state.Used
-				itemData.UsedPercent = state.UsedPercent
-				itemData.InodesTotal = state.InodesTotal
-				itemData.InodesUsed = state.InodesUsed
-				itemData.InodesFree = state.InodesFree
-				itemData.InodesUsedPercent = state.InodesUsedPercent
+				itemData.Total = result.state.Total
+				itemData.Free = result.state.Free
+				itemData.Used = result.state.Used
+				itemData.UsedPercent = result.state.UsedPercent
+				itemData.InodesTotal = result.state.InodesTotal
+				itemData.InodesUsed = result.state.InodesUsed
+				itemData.InodesFree = result.state.InodesFree
+				itemData.InodesUsedPercent = result.state.InodesUsedPercent
 				mu.Lock()
 				datas = append(datas, itemData)
 				mu.Unlock()
 			}
-		}(time.After(5*time.Second), mounts[i])
+		}(mounts[i])
 	}
 	wg.Wait()
 

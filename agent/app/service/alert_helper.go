@@ -9,6 +9,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/global"
 	alertUtil "github.com/1Panel-dev/1Panel/agent/utils/alert"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
+	"github.com/1Panel-dev/1Panel/agent/utils/psutil"
 	versionUtil "github.com/1Panel-dev/1Panel/agent/utils/version"
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 	"github.com/shirou/gopsutil/v4/cpu"
@@ -352,7 +353,7 @@ func loadLoadInfo(alert dto.AlertDTO) {
 		return
 	}
 	var loadValue float64
-	CPUTotal, _ := cpu.Counts(true)
+	CPUTotal, _ := psutil.CPUInfo.GetLogicalCores(false)
 	switch alert.Cycle {
 	case 1:
 		loadValue = avgStat.Load1 / (float64(CPUTotal*2) * 0.75) * 100
@@ -839,7 +840,7 @@ func processSingleDisk(alert dto.AlertDTO) error {
 }
 
 func checkAndCreateDiskAlert(alert dto.AlertDTO, path string) (bool, error) {
-	usageStat, err := disk.Usage(path)
+	usageStat, err := psutil.DISK.GetUsage(path, false)
 	if err != nil {
 		global.LOG.Errorf("error getting disk usage for %s, err: %v", path, err)
 		return false, err

@@ -19,6 +19,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/ai_tools/gpu"
 	"github.com/1Panel-dev/1Panel/agent/utils/ai_tools/xpu"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
+	"github.com/1Panel-dev/1Panel/agent/utils/psutil"
 	"github.com/robfig/cron/v3"
 	"github.com/shirou/gopsutil/v4/cpu"
 	"github.com/shirou/gopsutil/v4/disk"
@@ -258,7 +259,7 @@ func (m *MonitorService) Run() {
 			itemModel.TopCPU = string(topItemCPU)
 		}
 	}
-	cpuCount, _ := cpu.Counts(false)
+	cpuCount, _ := psutil.CPUInfo.GetPhysicalCores(false)
 	loadInfo, _ := load.Avg()
 	itemModel.CpuLoad1 = loadInfo.Load1
 	itemModel.CpuLoad5 = loadInfo.Load5
