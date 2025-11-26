@@ -89,7 +89,6 @@ func (c *CPUUsageState) readPerCPUStat() ([]CPUStat, error) {
 	return stats, nil
 }
 
-// readPerCPUStatCopy 读取每个 CPU 核心的统计信息，返回一个新的 slice（不复用）
 func readPerCPUStatCopy() []CPUStat {
 	data, err := os.ReadFile("/proc/stat")
 	if err != nil {
@@ -151,7 +150,6 @@ func (c *CPUUsageState) GetCPUUsage() (float64, []float64) {
 	c.mu.Unlock()
 
 	if needReset {
-		// 在锁外进行采样，避免阻塞其他调用者
 		firstTotal, _ := readCPUStat()
 		firstPer := readPerCPUStatCopy()
 		time.Sleep(100 * time.Millisecond)
@@ -176,7 +174,6 @@ func (c *CPUUsageState) GetCPUUsage() (float64, []float64) {
 		return totalUsage, perCore
 	}
 
-	// 差值采样
 	curTotal, _ := readCPUStat()
 	curPer := readPerCPUStatCopy()
 
