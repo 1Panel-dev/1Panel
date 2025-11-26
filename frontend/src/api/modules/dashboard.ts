@@ -29,6 +29,14 @@ export const loadCurrentInfo = (ioOption: string, netOption: string) => {
     return http.get<Dashboard.CurrentInfo>(`/dashboard/current/${ioOption}/${netOption}`);
 };
 
+export const loadTopCPU = () => {
+    return http.get<Array<Dashboard.Process>>(`/dashboard/current/top/cpu`);
+};
+
+export const loadTopMem = () => {
+    return http.get<Array<Dashboard.Process>>(`/dashboard/current/top/mem`);
+};
+
 export const systemRestart = (operation: string) => {
     return http.post(`/dashboard/system/restart/${operation}`);
 };

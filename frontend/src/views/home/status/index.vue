@@ -1,7 +1,14 @@
 <template>
     <div class="custom-row">
         <el-col :xs="6" :sm="6" :md="3" :lg="3" :xl="3" align="center">
-            <el-popover :hide-after="20" :teleported="false" :width="320" v-if="chartsOption['load']">
+            <el-popover
+                :hide-after="20"
+                :teleported="false"
+                :width="320"
+                v-if="chartsOption['load']"
+                @show="onCpuPopoverShow"
+                @hide="onCpuPopoverHide"
+            >
                 <el-descriptions :column="1" size="small">
                     <el-descriptions-item :label="$t('home.loadAverage', [1])">
                         {{ formatNumber(currentInfo.load1) }}
@@ -45,7 +52,14 @@
             <span class="input-help">{{ loadStatus(currentInfo.loadUsagePercent) }}</span>
         </el-col>
         <el-col :xs="6" :sm="6" :md="3" :lg="3" :xl="3">
-            <el-popover :hide-after="20" :teleported="false" :width="430" v-if="chartsOption['cpu']">
+            <el-popover
+                :hide-after="20"
+                :teleported="false"
+                :width="430"
+                v-if="chartsOption['cpu']"
+                @show="onCpuPopoverShow"
+                @hide="onCpuPopoverHide"
+            >
                 <el-descriptions :title="baseInfo.cpuModelName" :column="2" size="small">
                     <el-descriptions-item :label="$t('home.core')">
                         {{ baseInfo.cpuCores }}
@@ -106,7 +120,14 @@
             </div>
         </el-col>
         <el-col :xs="6" :sm="6" :md="3" :lg="3" :xl="3" align="center">
-            <el-popover :hide-after="20" :teleported="false" :width="480" v-if="chartsOption['memory']">
+            <el-popover
+                :hide-after="20"
+                :teleported="false"
+                :width="480"
+                v-if="chartsOption['memory']"
+                @show="onMemPopoverShow"
+                @hide="onMemPopoverHide"
+            >
                 <el-descriptions direction="vertical" :title="$t('home.mem')" class="ml-1" :column="4" size="small">
                     <el-descriptions-item :label-width="60" :label="$t('home.total')">
                         {{ computeSize(currentInfo.memoryTotal) }}
@@ -333,12 +354,18 @@
 import { Dashboard } from '@/api/interface/dashboard';
 import { computeSize } from '@/utils/util';
 import i18n from '@/lang';
-import { nextTick, ref } from 'vue';
+import { nextTick, onBeforeUnmount, ref } from 'vue';
 import { routerToFileWithPath, routerToName } from '@/utils/router';
 import { stopProcess } from '@/api/modules/process';
+import { loadTopCPU, loadTopMem } from '@/api/modules/dashboard';
 import { MsgSuccess } from '@/utils/message';
 const showMore = ref(false);
 const totalCount = ref();
+
+let cpuPopoverTimer: ReturnType<typeof setTimeout> | null = null;
+let memPopoverTimer: ReturnType<typeof setTimeout> | null = null;
+let cpuLoading = false;
+let memLoading = false;
 
 const baseInfo = ref<Dashboard.BaseInfo>({
     hostname: '',
@@ -513,6 +540,73 @@ const goGPU = () => {
 function formatNumber(val: number) {
     return Number(val.toFixed(2));
 }
+
+const onCpuPopoverShow = async () => {
+    await loadTopCPUData();
+    if (cpuPopoverTimer) {
+        clearInterval(Number(cpuPopoverTimer));
+    }
+    cpuPopoverTimer = setInterval(loadTopCPUData, 5000);
+};
+
+const onCpuPopoverHide = () => {
+    if (cpuPopoverTimer) {
+        clearInterval(Number(cpuPopoverTimer));
+        cpuPopoverTimer = null;
+    }
+};
+
+const onMemPopoverShow = async () => {
+    await loadTopMemData();
+    if (memPopoverTimer) {
+        clearInterval(Number(memPopoverTimer));
+    }
+    memPopoverTimer = setInterval(loadTopMemData, 5000);
+};
+
+const onMemPopoverHide = () => {
+    if (memPopoverTimer) {
+        clearInterval(Number(memPopoverTimer));
+        memPopoverTimer = null;
+    }
+};
+
+const loadTopCPUData = async () => {
+    if (cpuLoading) return;
+    cpuLoading = true;
+    try {
+        const res = await loadTopCPU();
+        currentInfo.value.topCPUItems = res.data || [];
+    } catch (_error) {
+        // ignore load errors
+    } finally {
+        cpuLoading = false;
+    }
+};
+
+const loadTopMemData = async () => {
+    if (memLoading) return;
+    memLoading = true;
+    try {
+        const res = await loadTopMem();
+        currentInfo.value.topMemItems = res.data || [];
+    } catch (_error) {
+        // ignore load errors
+    } finally {
+        memLoading = false;
+    }
+};
+
+onBeforeUnmount(() => {
+    if (cpuPopoverTimer) {
+        clearInterval(Number(cpuPopoverTimer));
+        cpuPopoverTimer = null;
+    }
+    if (memPopoverTimer) {
+        clearInterval(Number(memPopoverTimer));
+        memPopoverTimer = null;
+    }
+});
 
 defineExpose({
     acceptParams,

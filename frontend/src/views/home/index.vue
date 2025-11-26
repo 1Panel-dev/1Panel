@@ -450,6 +450,14 @@ const currentChartInfo = reactive({
 
 const chartsOption = ref({ ioChart1: null, networkChart: null });
 
+const updateCurrentInfo = (data: Dashboard.CurrentInfo) => {
+    currentInfo.value = {
+        ...data,
+        topCPUItems: currentInfo.value.topCPUItems || [],
+        topMemItems: currentInfo.value.topMemItems || [],
+    };
+};
+
 const changeOption = async () => {
     isInit.value = true;
     loadData();
@@ -484,7 +492,7 @@ const onLoadBaseInfo = async (isInit: boolean, range: string) => {
     }
     const res = await loadBaseInfo(searchInfo.ioOption, searchInfo.netOption);
     baseInfo.value = res.data;
-    currentInfo.value = baseInfo.value.currentInfo;
+    updateCurrentInfo(baseInfo.value.currentInfo);
     onLoadCurrentInfo();
     isStatusInit.value = false;
     statusRef.value?.acceptParams(currentInfo.value, baseInfo.value);
@@ -584,7 +592,7 @@ const onLoadCurrentInfo = async () => {
         timeNetDatas.value.splice(0, 1);
     }
     loadData();
-    currentInfo.value = res.data;
+    updateCurrentInfo(res.data);
     statusRef.value?.acceptParams(currentInfo.value, baseInfo.value);
 };
 

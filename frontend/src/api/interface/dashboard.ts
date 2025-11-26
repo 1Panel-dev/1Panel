@@ -103,8 +103,8 @@ export namespace Dashboard {
         gpuData: Array<GPUInfo>;
         xpuData: Array<XPUInfo>;
 
-        topCPUItems: Array<Process>;
-        topMemItems: Array<Process>;
+        topCPUItems?: Array<Process>;
+        topMemItems?: Array<Process>;
 
         netBytesSent: number;
         netBytesRecv: number;

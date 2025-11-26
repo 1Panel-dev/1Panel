@@ -39,6 +39,8 @@ type IDashboardService interface {
 	LoadBaseInfo(ioOption string, netOption string) (*dto.DashboardBase, error)
 	LoadCurrentInfoForNode() *dto.NodeCurrent
 	LoadCurrentInfo(ioOption string, netOption string) *dto.DashboardCurrent
+	LoadTopCPU() []dto.Process
+	LoadTopMem() []dto.Process
 
 	LoadQuickOptions() []dto.QuickJump
 	ChangeQuick(req dto.ChangeQuicks) error
@@ -217,9 +219,6 @@ func (u *DashboardService) LoadCurrentInfo(ioOption string, netOption string) *d
 	currentInfo.GPUData = loadGPUInfo()
 	currentInfo.XPUData = loadXpuInfo()
 
-	currentInfo.TopCPUItems = loadTopCPU()
-	currentInfo.TopMemItems = loadTopMem()
-
 	if ioOption == "all" {
 		diskInfo, _ := disk.IOCounters()
 		for _, state := range diskInfo {
@@ -259,6 +258,14 @@ func (u *DashboardService) LoadCurrentInfo(ioOption string, netOption string) *d
 
 	currentInfo.ShotTime = time.Now()
 	return &currentInfo
+}
+
+func (u *DashboardService) LoadTopCPU() []dto.Process {
+	return loadTopCPU()
+}
+
+func (u *DashboardService) LoadTopMem() []dto.Process {
+	return loadTopMem()
 }
 
 func (u *DashboardService) LoadAppLauncher(ctx *gin.Context) ([]dto.AppLauncher, error) {

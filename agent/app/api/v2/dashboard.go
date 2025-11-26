@@ -180,6 +180,28 @@ func (b *BaseApi) LoadDashboardCurrentInfo(c *gin.Context) {
 }
 
 // @Tags Dashboard
+// @Summary Load top cpu processes
+// @Success 200 {Array} dto.Process
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /dashboard/current/top/cpu [get]
+func (b *BaseApi) LoadDashboardTopCPU(c *gin.Context) {
+	data := dashboardService.LoadTopCPU()
+	helper.SuccessWithData(c, data)
+}
+
+// @Tags Dashboard
+// @Summary Load top memory processes
+// @Success 200 {Array} dto.Process
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /dashboard/current/top/mem [get]
+func (b *BaseApi) LoadDashboardTopMem(c *gin.Context) {
+	data := dashboardService.LoadTopMem()
+	helper.SuccessWithData(c, data)
+}
+
+// @Tags Dashboard
 // @Summary System restart
 // @Accept json
 // @Param operation path string true "request"
