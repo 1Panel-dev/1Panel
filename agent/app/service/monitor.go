@@ -131,8 +131,10 @@ func (m *MonitorService) LoadGPUMonitorData(req dto.MonitorGPUSearch) (dto.Monit
 	}
 	if len(req.ProductName) == 0 {
 		if gpuExist {
+			data.GPUType = "gpu"
 			gpuInfo, err := gpuclient.LoadGpuInfo()
 			if err != nil || len(gpuInfo.GPUs) == 0 {
+				global.LOG.Error("Load GPU info failed or no GPU found, err: ", err)
 				return data, buserr.New("ErrRecordNotFound")
 			}
 			req.ProductName = gpuInfo.GPUs[0].ProductName
@@ -140,8 +142,10 @@ func (m *MonitorService) LoadGPUMonitorData(req dto.MonitorGPUSearch) (dto.Monit
 				data.ProductNames = append(data.ProductNames, item.ProductName)
 			}
 		} else {
+			data.GPUType = "xpu"
 			xpuInfo, err := xpuClient.LoadGpuInfo()
 			if err != nil || len(xpuInfo.Xpu) == 0 {
+				global.LOG.Error("Load XPU info failed or no XPU found, err: ", err)
 				return data, buserr.New("ErrRecordNotFound")
 			}
 			req.ProductName = xpuInfo.Xpu[0].Basic.DeviceName
@@ -159,15 +163,18 @@ func (m *MonitorService) LoadGPUMonitorData(req dto.MonitorGPUSearch) (dto.Monit
 		data.Date = append(data.Date, gpu.CreatedAt)
 		data.GPUValue = append(data.GPUValue, gpu.GPUUtil)
 		data.TemperatureValue = append(data.TemperatureValue, gpu.Temperature)
-		data.PowerValue = append(data.PowerValue, dto.GPUPowerUsageHelper{
-			Total:   gpu.MaxPowerLimit,
-			Used:    gpu.PowerDraw,
-			Percent: gpu.PowerDraw / gpu.MaxPowerLimit * 100,
-		})
+		powerItem := dto.GPUPowerUsageHelper{
+			Total: gpu.MaxPowerLimit,
+			Used:  gpu.PowerDraw,
+		}
+		if powerItem.Total != 0 {
+			powerItem.Percent = powerItem.Used / powerItem.Total
+		}
+		data.PowerValue = append(data.PowerValue, powerItem)
 		memItem := dto.GPUMemoryUsageHelper{
 			Total:   gpu.MemTotal,
 			Used:    gpu.MemUsed,
-			Percent: float64(gpu.MemUsed) / float64(gpu.MemTotal) * 100,
+			Percent: gpu.MemUsed / gpu.MemTotal * 100,
 		}
 		var process []dto.GPUProcess
 		if err := json.Unmarshal([]byte(gpu.Processes), &process); err == nil {
@@ -564,14 +571,13 @@ func saveGPUDataToDB() {
 	var list []model.MonitorGPU
 	for _, gpuItem := range gpuInfo.GPUs {
 		item := model.MonitorGPU{
-			ProductName:   gpuItem.ProductName,
-			GPUUtil:       loadGPUInfoFloat(gpuItem.GPUUtil),
-			Temperature:   loadGPUInfoInt(gpuItem.Temperature),
-			PowerDraw:     loadGPUInfoFloat(gpuItem.PowerDraw),
-			MaxPowerLimit: loadGPUInfoFloat(gpuItem.MaxPowerLimit),
-			MemUsed:       loadGPUInfoInt(gpuItem.MemUsed),
-			MemTotal:      loadGPUInfoInt(gpuItem.MemTotal),
-			FanSpeed:      loadGPUInfoInt(gpuItem.FanSpeed),
+			ProductName: gpuItem.ProductName,
+			GPUUtil:     loadGPUInfoFloat(gpuItem.GPUUtil),
+			Temperature: loadGPUInfoInt(gpuItem.Temperature),
+			PowerDraw:   loadGPUInfoFloat(gpuItem.PowerDraw),
+			MemUsed:     loadGPUInfoFloat(gpuItem.MemUsed),
+			MemTotal:    loadGPUInfoFloat(gpuItem.MemTotal),
+			FanSpeed:    loadGPUInfoInt(gpuItem.FanSpeed),
 		}
 		process, _ := json.Marshal(gpuItem.Processes)
 		if len(process) != 0 {
@@ -596,25 +602,28 @@ func saveXPUDataToDB() {
 	var list []model.MonitorGPU
 	for _, xpuItem := range xpuInfo.Xpu {
 		item := model.MonitorGPU{
-			ProductName: xpuItem.Basic.DeviceName,
-			GPUUtil:     loadGPUInfoFloat(xpuItem.Stats.MemoryUtil),
-			Temperature: loadGPUInfoInt(xpuItem.Stats.Temperature),
-			PowerDraw:   loadGPUInfoFloat(xpuItem.Stats.Power),
-			MemUsed:     loadGPUInfoInt(xpuItem.Stats.MemoryUsed),
-			MemTotal:    loadGPUInfoInt(xpuItem.Basic.Memory),
+			ProductName:   xpuItem.Basic.DeviceName,
+			GPUUtil:       loadGPUInfoFloat(xpuItem.Stats.MemoryUtil),
+			Temperature:   loadGPUInfoInt(xpuItem.Stats.Temperature),
+			PowerDraw:     loadGPUInfoFloat(xpuItem.Stats.Power),
+			MaxPowerLimit: float64(xpuItem.Config.PowerLimit),
+			MemUsed:       loadGPUInfoFloat(xpuItem.Stats.MemoryUsed),
+			MemTotal:      loadGPUInfoFloat(xpuItem.Basic.Memory),
 		}
-		var processItem []dto.GPUProcess
-		for _, ps := range xpuItem.Processes {
-			processItem = append(processItem, dto.GPUProcess{
-				Pid:         fmt.Sprintf("%v", ps.PID),
-				Type:        ps.SHR,
-				ProcessName: ps.Command,
-				UsedMemory:  ps.Memory,
-			})
-		}
-		process, _ := json.Marshal(processItem)
-		if len(process) != 0 {
-			item.Processes = string(process)
+		if len(xpuItem.Processes) != 0 {
+			var processItem []dto.GPUProcess
+			for _, ps := range xpuItem.Processes {
+				processItem = append(processItem, dto.GPUProcess{
+					Pid:         fmt.Sprintf("%v", ps.PID),
+					Type:        ps.SHR,
+					ProcessName: ps.Command,
+					UsedMemory:  ps.Memory,
+				})
+			}
+			process, _ := json.Marshal(processItem)
+			if len(process) != 0 {
+				item.Processes = string(process)
+			}
 		}
 		list = append(list, item)
 	}
@@ -633,6 +642,7 @@ func loadGPUInfoInt(val string) int {
 }
 func loadGPUInfoFloat(val string) float64 {
 	valItem := strings.ReplaceAll(val, "W", "")
+	valItem = strings.ReplaceAll(valItem, "MB", "")
 	valItem = strings.ReplaceAll(valItem, "%", "")
 	valItem = strings.TrimSpace(valItem)
 	data, _ := strconv.ParseFloat(valItem, 64)

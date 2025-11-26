@@ -656,7 +656,7 @@ const message = {
         gpu: {
             gpu: 'GPU 监控',
             base: '基础信息',
-            gpuHelper: '当前系统未检测到 NVIDIA-SMI或者XPU-SMI 指令，请检查后重试！',
+            gpuHelper: '当前系统未检测到 NVIDIA-SMI 或者 XPU-SMI 指令，请检查后重试！',
             driverVersion: '驱动版本',
             cudaVersion: 'CUDA 版本',
             process: '进程信息',

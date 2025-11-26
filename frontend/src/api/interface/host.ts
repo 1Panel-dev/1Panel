@@ -167,6 +167,7 @@ export namespace Host {
         endTime: Date;
     }
     export interface MonitorGPUData {
+        gpuType: string;
         productNames: Array<string>;
         date: Array<Date>;
         gpuValue: Array<number>;

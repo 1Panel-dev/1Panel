@@ -44,6 +44,7 @@ type MonitorGPUSearch struct {
 	EndTime     time.Time `json:"endTime"`
 }
 type MonitorGPUData struct {
+	GPUType          string                 `json:"gpuType"`
 	ProductNames     []string               `json:"productNames"`
 	Date             []time.Time            `json:"date"`
 	GPUValue         []float64              `json:"gpuValue"`
@@ -58,8 +59,8 @@ type GPUPowerUsageHelper struct {
 	Percent float64 `json:"percent"`
 }
 type GPUMemoryUsageHelper struct {
-	Total   int     `json:"total"`
-	Used    int     `json:"used"`
+	Total   float64 `json:"total"`
+	Used    float64 `json:"used"`
 	Percent float64 `json:"percent"`
 
 	GPUProcesses []GPUProcess `json:"gpuProcesses"`
