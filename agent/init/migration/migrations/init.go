@@ -721,7 +721,7 @@ var UpdateDatabase = &gormigrate.Migration{
 }
 
 var AddGPUMonitor = &gormigrate.Migration{
-	ID: "20251119-add-gpu-monitor",
+	ID: "20251127-add-gpu-monitor",
 	Migrate: func(tx *gorm.DB) error {
 		return global.GPUMonitorDB.AutoMigrate(&model.MonitorGPU{})
 	},

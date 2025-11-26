@@ -421,10 +421,13 @@ func (r *Remote) LoadFormatCollation(timeout uint) ([]dto.MysqlFormatCollationOp
 		if err := rows.Scan(&item.Format, &item.Collation); err != nil {
 			return nil, err
 		}
-		if _, ok := formatMap[item.Format]; !ok {
-			formatMap[item.Format] = []string{item.Collation}
+		if !item.Format.Valid {
+			continue
+		}
+		if _, ok := formatMap[item.Format.String]; !ok {
+			formatMap[item.Format.String] = []string{item.Collation.String}
 		} else {
-			formatMap[item.Format] = append(formatMap[item.Format], item.Collation)
+			formatMap[item.Format.String] = append(formatMap[item.Format.String], item.Collation.String)
 		}
 	}
 	options := []dto.MysqlFormatCollationOption{}

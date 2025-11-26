@@ -81,6 +81,7 @@
                     <el-button v-if="!cpuShowAll" @click="cpuShowAll = true" icon="More" link size="small" />
                     <el-button v-if="cpuShowAll" @click="cpuShowAll = false" icon="ArrowUp" link size="small" />
                 </div>
+                <br />
 
                 <el-button link size="small" type="primary" class="mt-2 mb-2" @click="toggleCpuTop">
                     {{ $t('home.cpuTop') }}
@@ -333,7 +334,7 @@
                 <span class="input-help" v-else>{{ item.deviceName }}</span>
             </el-col>
         </template>
-        <el-col :xs="6" :sm="6" :md="6" :lg="6" :xl="6" align="center" v-if="totalCount > 5">
+        <el-col :xs="6" :sm="6" :md="3" :lg="3" :xl="3" align="center" v-if="totalCount > 5">
             <el-button v-if="!showMore" link type="primary" @click="changeShowMore(true)" class="buttonClass">
                 {{ $t('tabs.more') }}
                 <el-icon><Bottom /></el-icon>

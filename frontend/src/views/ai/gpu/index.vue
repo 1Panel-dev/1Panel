@@ -30,9 +30,9 @@
                 </div>
             </el-card>
         </div>
-        <el-row :gutter="7" class="card-interval" v-if="options.length !== 0">
-            <el-col :span="24">
-                <el-card style="overflow: inherit">
+        <el-row :gutter="7" v-if="options.length !== 0">
+            <el-col v-bind="gpuType === 'gpu' ? fullWidthProps : halfWidthProps">
+                <el-card class="card-interval" style="overflow: inherit">
                     <template #header>
                         <div :class="mobile ? 'flx-wrap' : 'flex justify-between'">
                             <span class="title">{{ $t('monitor.gpuUtil') }}</span>
@@ -51,7 +51,7 @@
                 </el-card>
             </el-col>
             <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-                <el-card style="overflow: inherit">
+                <el-card class="card-interval" style="overflow: inherit">
                     <template #header>
                         <div :class="mobile ? 'flx-wrap' : 'flex justify-between'">
                             <span class="title">{{ $t('monitor.memoryUsage') }}</span>
@@ -70,7 +70,7 @@
                 </el-card>
             </el-col>
             <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-                <el-card style="overflow: inherit">
+                <el-card class="card-interval" style="overflow: inherit">
                     <template #header>
                         <div :class="mobile ? 'flx-wrap' : 'flex justify-between'">
                             <span class="title">{{ $t('monitor.powerUsage') }}</span>
@@ -89,7 +89,7 @@
                 </el-card>
             </el-col>
             <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-                <el-card style="overflow: inherit">
+                <el-card class="card-interval" style="overflow: inherit">
                     <template #header>
                         <div>
                             {{ $t('monitor.temperature') }}
@@ -110,8 +110,8 @@
                     </div>
                 </el-card>
             </el-col>
-            <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-                <el-card style="overflow: inherit">
+            <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12" v-if="gpuType === 'gpu'">
+                <el-card class="card-interval" style="overflow: inherit">
                     <template #header>
                         <div :class="mobile ? 'flx-wrap' : 'flex justify-between'">
                             <span class="title">{{ $t('monitor.fanSpeed') }}</span>
@@ -161,8 +161,12 @@ const mobile = computed(() => {
     return globalStore.isMobile();
 });
 
+const fullWidthProps = { span: 24 };
+const halfWidthProps = { xs: 24, sm: 24, md: 12, lg: 12, xl: 12 };
+
 const loading = ref(false);
 const options = ref([]);
+const gpuType = ref('gpu');
 const timeRangeGlobal = ref<[Date, Date]>([new Date(new Date().setHours(0, 0, 0, 0)), new Date()]);
 const chartsOption = ref({
     loadPowerChart: null,
@@ -189,6 +193,7 @@ const search = async () => {
         .then((res) => {
             loading.value = false;
             options.value = res.data.productNames || [];
+            gpuType.value = res.data.gpuType || 'gpu';
             searchInfo.productName = searchInfo.productName || (options.value.length > 0 ? options.value[0] : '');
             let baseDate = res.data.date.length === 0 ? loadEmptyDate(timeRangeGlobal.value) : res.data.date;
             let date = baseDate.map(function (item: any) {
@@ -196,7 +201,11 @@ const search = async () => {
             });
             initCPUCharts(date, res.data.gpuValue);
             initMemoryCharts(date, res.data.memoryValue);
-            initPowerCharts(date, res.data.powerValue);
+            if (gpuType.value === 'gpu') {
+                initPowerCharts(date, res.data.powerValue);
+            } else {
+                initXpuPowerCharts(date, res.data.powerValue);
+            }
             initSpeedCharts(date, res.data.speedValue);
             initTemperatureCharts(date, res.data.temperatureValue);
         })
@@ -270,6 +279,33 @@ function initPowerCharts(baseDate: any, items: any) {
         formatStr: '%',
     };
 }
+
+function initXpuPowerCharts(baseDate: any, items: any) {
+    let list = items.map(function (item: any) {
+        return { value: Number(item.used.toFixed(2)), data: item };
+    });
+    list = list.length === 0 ? loadEmptyData2() : list;
+    chartsOption.value['loadPowerChart'] = {
+        xData: baseDate,
+        yData: [
+            {
+                name: i18n.global.t('monitor.powerUsage'),
+                data: list,
+            },
+        ],
+        tooltip: {
+            trigger: 'axis',
+            formatter: function (list: any) {
+                let res = loadDate(list[0].name);
+                for (const item of list) {
+                    res += loadSeries(item, item.data.value ? item.data.value : item.data, 'W');
+                }
+                return res;
+            },
+        },
+        formatStr: 'W',
+    };
+}
 function initTemperatureCharts(baseDate: any, items: any) {
     let temperatures = items.map(function (item: any) {
         return Number(item);
@@ -334,14 +370,15 @@ function withMemoryProcess(list: any) {
     if (!process) {
         return res;
     }
+    let title = gpuType.value === 'gpu' ? i18n.global.t('aiTools.gpu.type') : i18n.global.t('aiTools.gpu.shr');
     res += `
         <div style="margin-top: 10px; border-bottom: 1px dashed black;"></div>
         <table style="border-collapse: collapse; margin-top: 20px; font-size: 12px;">
         <thead>
             <tr>
             <th style="padding: 6px 8px;">PID</th>
-            <th style="padding: 6px 8px;">${i18n.global.t('aiTools.gpu.type')}</th>
             <th style="padding: 6px 8px;">${i18n.global.t('aiTools.gpu.processName')}</th>
+            <th style="padding: 6px 8px;">${title}</th>
             <th style="padding: 6px 8px;">${i18n.global.t('aiTools.gpu.processMemoryUsage')}</th>
             </tr>
         </thead>
@@ -354,10 +391,10 @@ function withMemoryProcess(list: any) {
                     ${row.pid}
                 </td>
                 <td style="padding: 6px 8px; text-align: center;">
-                    ${loadProcessType(row.type)}
+                    ${row.processName}
                 </td>
                 <td style="padding: 6px 8px; text-align: center;">
-                    ${row.processName}
+                    ${loadProcessType(row.type)}
                 </td>
                 <td style="padding: 6px 8px; text-align: center;">
                     ${row.usedMemory}

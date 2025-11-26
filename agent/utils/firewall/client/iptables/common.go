@@ -24,7 +24,7 @@ const (
 )
 
 const (
-	EstablishedRule = "-m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT -m comment --comment 'ESTABLISHED Whitelist'"
+	EstablishedRule = "-m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT -m comment --comment 'ESTABLISHED Whitelist'"
 	IoRuleIn        = "-i lo -j ACCEPT -m comment --comment 'Loopback Whitelist'"
 	DropAllTcp      = "-p tcp -j DROP"
 	DropAllUdp      = "-p udp -j DROP"

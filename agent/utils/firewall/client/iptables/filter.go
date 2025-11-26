@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 )
 
@@ -115,6 +116,120 @@ func LoadDefaultStrategy(chain string) (string, error) {
 		}
 	}
 	return ACCEPT, nil
+}
+
+func LoadInitStatus(clientName, tab string) (bool, bool) {
+	if clientName == "firewalld" {
+		return true, true
+	}
+	if clientName == "ufw" && tab != "forward" {
+		return true, true
+	}
+	switch tab {
+	case "base":
+		filterRules, err := RunWithStd(FilterTab, "-S")
+		if err != nil {
+			return false, false
+		}
+		lines := strings.Split(filterRules, "\n")
+		initRules := []string{
+			"-N " + Chain1PanelBasicBefore,
+			"-N " + Chain1PanelBasic,
+			"-N " + Chain1PanelBasicAfter,
+			fmt.Sprintf("-A %s %s -j ACCEPT", Chain1PanelBasicBefore, strings.ReplaceAll(strings.ReplaceAll(IoRuleIn, "'", "\""), " -j ACCEPT", "")),
+			fmt.Sprintf("-A %s %s -j ACCEPT", Chain1PanelBasicBefore, strings.ReplaceAll(strings.ReplaceAll(EstablishedRule, "'", "\""), " -j ACCEPT", "")),
+			fmt.Sprintf("-A %s %s", Chain1PanelBasicAfter, DropAllTcp),
+			fmt.Sprintf("-A %s %s", Chain1PanelBasicAfter, DropAllUdp),
+		}
+		bindRules := []string{
+			fmt.Sprintf("-A %s -j %s", ChainInput, Chain1PanelBasicBefore),
+			fmt.Sprintf("-A %s -j %s", ChainInput, Chain1PanelBasic),
+			fmt.Sprintf("-A %s -j %s", ChainInput, Chain1PanelBasicAfter),
+		}
+		return checkWithInitAndBind(initRules, bindRules, lines)
+	case "advance":
+		filterRules, err := RunWithStd(FilterTab, "-S")
+		if err != nil {
+			return false, false
+		}
+		lines := strings.Split(filterRules, "\n")
+		initRules := []string{
+			"-N " + Chain1PanelInput,
+			"-N " + Chain1PanelOutput,
+		}
+		bindRules := []string{
+			fmt.Sprintf("-A %s -j %s", ChainInput, Chain1PanelInput),
+			fmt.Sprintf("-A %s -j %s", ChainOutput, Chain1PanelOutput),
+		}
+		return checkWithInitAndBind(initRules, bindRules, lines)
+	case "forward":
+		stdout, err := cmd.RunDefaultWithStdoutBashC("cat /proc/sys/net/ipv4/ip_forward")
+		if err != nil {
+			global.LOG.Errorf("check /proc/sys/net/ipv4/ip_forward failed, err: %v", err)
+			return false, false
+		}
+		if strings.TrimSpace(stdout) == "0" {
+			return false, false
+		}
+		natRules, err := RunWithStd(NatTab, "-S")
+		if err != nil {
+			return false, false
+		}
+		lines := strings.Split(natRules, "\n")
+		initRules := []string{
+			"-N " + Chain1PanelPreRouting,
+			"-N " + Chain1PanelPostRouting,
+		}
+		bindRules := []string{
+			fmt.Sprintf("-A PREROUTING -j %s", Chain1PanelPreRouting),
+			fmt.Sprintf("-A POSTROUTING -j %s", Chain1PanelPostRouting),
+		}
+		isNatInit, isNatBind := checkWithInitAndBind(initRules, bindRules, lines)
+		if !isNatInit {
+			return false, false
+		}
+		filterRules, err := RunWithStd(FilterTab, "-S")
+		if err != nil {
+			return false, false
+		}
+		filterLines := strings.Split(filterRules, "\n")
+		filterInitRules := []string{"-N " + Chain1PanelForward}
+		filterBindRules := []string{fmt.Sprintf("-A FORWARD -j %s", Chain1PanelForward)}
+		isFilterInit, isFilterBind := checkWithInitAndBind(filterInitRules, filterBindRules, filterLines)
+		return isNatInit && isFilterInit, isNatBind && isFilterBind
+	default:
+		return false, false
+	}
+}
+
+func checkWithInitAndBind(initRules, bindRules []string, lines []string) (bool, bool) {
+	for _, rule := range initRules {
+		found := false
+		for _, line := range lines {
+			if strings.TrimSpace(line) == strings.TrimSpace(rule) {
+				found = true
+				break
+			}
+		}
+		if !found {
+			global.LOG.Debugf("not found init rule: %s", rule)
+			return false, false
+		}
+	}
+	for _, rule := range bindRules {
+		found := false
+		for _, line := range lines {
+			if strings.TrimSpace(line) == strings.TrimSpace(rule) {
+				found = true
+				break
+			}
+		}
+		if !found {
+			global.LOG.Debugf("not found bind rule: %s", rule)
+			return true, false
+		}
+	}
+	return true, true
 }
 
 func loadPort(position string, portStr []string) string {
