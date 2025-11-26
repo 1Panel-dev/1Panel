@@ -129,15 +129,15 @@ func RestartPanel(core, agent, reload bool) {
 			return
 		}
 	}
-	if agent {
-		if err := client.Operate("restart", "1panel-agent"); err != nil {
-			global.LOG.Errorf("restart 1panel agent service failed, err: %v", err)
-			return
-		}
-	}
 	if core {
 		if err := client.Operate("restart", "1panel-core"); err != nil {
 			global.LOG.Errorf("restart 1panel core service failed, err: %v", err)
+			return
+		}
+	}
+	if agent {
+		if err := client.Operate("restart", "1panel-agent"); err != nil {
+			global.LOG.Errorf("restart 1panel agent service failed, err: %v", err)
 			return
 		}
 	}
