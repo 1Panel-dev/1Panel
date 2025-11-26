@@ -71,8 +71,9 @@ func GetDBWithPath(dbPath string) (*gorm.DB, error) {
 	if dbError != nil {
 		return nil, dbError
 	}
-	sqlDB.SetMaxOpenConns(1)
+	sqlDB.SetMaxOpenConns(4)
 	sqlDB.SetMaxIdleConns(1)
+	sqlDB.SetConnMaxIdleTime(15 * time.Minute)
 	sqlDB.SetConnMaxLifetime(time.Hour)
 	return db, nil
 }

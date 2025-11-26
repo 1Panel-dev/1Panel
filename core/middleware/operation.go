@@ -233,8 +233,9 @@ func newDB(pathItem string) (*gorm.DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	sqlDB.SetMaxOpenConns(1)
+	sqlDB.SetMaxOpenConns(4)
 	sqlDB.SetMaxIdleConns(1)
+	sqlDB.SetConnMaxIdleTime(15 * time.Minute)
 	sqlDB.SetConnMaxLifetime(time.Hour)
 	return db, nil
 }
