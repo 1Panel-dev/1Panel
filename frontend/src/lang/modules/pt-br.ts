@@ -1118,7 +1118,7 @@ const message = {
         withImageHelper:
             'Fazer backup das imagens da loja de aplicativos, mas isso aumentará o tamanho do arquivo de snapshot.',
         ignoreApp: 'Excluir aplicativos',
-        withImage: 'Fazer backup de todas as imagens de aplicativos',
+        withImage: 'Backup da Imagem do Aplicativo',
         retainCopies: 'Manter cópias',
         retryTimes: 'Tentativas de Repetição',
         timeout: 'Tempo Limite',

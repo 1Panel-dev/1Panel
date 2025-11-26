@@ -14,6 +14,7 @@
                 </el-button>
             </template>
             <template #rightToolBar>
+                <TableSearch @search="search()" v-model:searchName="searchName" />
                 <TableRefresh @search="search()" />
                 <TableSetting title="container-refresh" @search="search()" />
             </template>
@@ -21,20 +22,12 @@
                 <el-row v-if="data.length > 0" :gutter="20" class="row-box">
                     <el-col :span="7">
                         <el-card>
-                            <el-input
-                                v-model="searchName"
-                                :placeholder="$t('commons.button.search')"
-                                clearable
-                                class="w-4/5"
-                                @clear="search"
-                                @keyup.enter="search"
+                            <el-table
+                                :max-height="loadTableHeight()"
+                                :show-header="false"
+                                @row-click="loadDetail"
+                                :data="data"
                             >
-                                <template #prefix>
-                                    <el-icon><Search /></el-icon>
-                                </template>
-                            </el-input>
-
-                            <el-table class="mt-2" :show-header="false" @row-click="loadDetail" :data="data">
                                 <el-table-column prop="name">
                                     <template #default="{ row }">
                                         <div class="cursor-pointer">
@@ -296,7 +289,6 @@ import { Container } from '@/api/interface/container';
 import { routerToFileWithPath } from '@/utils/router';
 import { MsgSuccess } from '@/utils/message';
 import { computeCPU, computeSize2, computeSizeForDocker } from '@/utils/util';
-import { Search } from '@element-plus/icons-vue';
 
 const data = ref<any[]>([]);
 const loading = ref(false);
@@ -348,6 +340,14 @@ const loadFrom = (row: any) => {
             return i18n.global.t('menu.apps');
         default:
             return i18n.global.t('commons.table.local');
+    }
+};
+
+const loadTableHeight = () => {
+    if (currentCompose.value.createdBy === '1Panel') {
+        return `calc(100vh - 120px)`;
+    } else {
+        return `calc(100vh - 240px)`;
     }
 };
 

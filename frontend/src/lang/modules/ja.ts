@@ -1098,7 +1098,7 @@ const message = {
         withImageHelper:
             'アプリストアのイメージをバックアップしますが、スナップショットファイルのサイズが大きくなります。',
         ignoreApp: 'アプリを除外',
-        withImage: 'すべてのアプリイメージをバックアップ',
+        withImage: 'アプリケーションイメージのバックアップ',
         retainCopies: '記録を保持します',
         retryTimes: 'リトライ回数',
         timeout: 'タイムアウト',

@@ -1127,7 +1127,7 @@ const message = {
         targetHelper: 'Backup accounts are maintained in panel settings.',
         withImageHelper: 'Backup app store images, but this will increase the snapshot file size.',
         ignoreApp: 'Exclude apps',
-        withImage: 'Backup all app images',
+        withImage: 'Backup Application Image',
         retainCopies: 'Retain records',
         retryTimes: 'Retry Attempts',
         timeout: 'Timeout',

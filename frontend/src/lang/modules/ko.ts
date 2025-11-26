@@ -1084,7 +1084,7 @@ const message = {
         targetHelper: '백업 계정은 패널 설정에서 관리됩니다.',
         withImageHelper: '앱 스토어 이미지를 백업하지만 스냅샷 파일 크기가 증가합니다.',
         ignoreApp: '앱 제외',
-        withImage: '모든 앱 이미지 백업',
+        withImage: '애플리케이션 이미지 백업',
         retainCopies: '기록 보관',
         retryTimes: '재시도 횟수',
         timeout: '타임아웃',

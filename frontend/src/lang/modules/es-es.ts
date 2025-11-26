@@ -1130,7 +1130,7 @@ const message = {
         withImageHelper:
             'Respalda imágenes de la tienda de aplicaciones, pero esto aumentará el tamaño del archivo de la instantánea.',
         ignoreApp: 'Excluir aplicaciones',
-        withImage: 'Respaldar todas las imágenes de aplicaciones',
+        withImage: 'Copia de Seguridad de la Imagen de la Aplicación',
         retainCopies: 'Retener registros',
         retryTimes: 'Intentos de reintento',
         timeout: 'Tiempo de espera',

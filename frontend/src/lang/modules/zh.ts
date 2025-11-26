@@ -1067,7 +1067,7 @@ const message = {
         targetHelper: '备份账号可在面板设置中维护',
         withImageHelper: '备份应用商店镜像，但是会增大快照文件体积。',
         ignoreApp: '排除应用',
-        withImage: '备份所有应用镜像',
+        withImage: '备份应用镜像',
         retainCopies: '保留份数',
         retryTimes: '失败重试次数',
         timeout: '超时时间',

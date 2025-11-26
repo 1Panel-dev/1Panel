@@ -1142,7 +1142,7 @@ const message = {
         targetHelper: 'Yedekleme hesapları panel ayarlarında sürdürülür.',
         withImageHelper: 'Uygulama mağazası imajlarını yedekle, ancak bu anlık görüntü dosya boyutunu artıracaktır.',
         ignoreApp: 'Uygulamaları hariç tut',
-        withImage: 'Tüm uygulama imajlarını yedekle',
+        withImage: 'Uygulama Görüntüsünü Yedekle',
         retainCopies: 'Kayıtları sakla',
         retryTimes: 'Yeniden Deneme Girişimleri',
         timeout: 'Zaman aşımı',

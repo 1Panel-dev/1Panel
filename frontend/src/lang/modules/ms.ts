@@ -1119,7 +1119,7 @@ const message = {
         targetHelper: 'Akaun sandaran diselenggara dalam tetapan panel.',
         withImageHelper: 'Sandarkan imej kedai aplikasi, tetapi ini akan meningkatkan saiz fail snapshot.',
         ignoreApp: 'Kecualikan aplikasi',
-        withImage: 'Sandarkan semua imej aplikasi',
+        withImage: 'Sandarkan Imej Aplikasi',
         retainCopies: 'Simpan salinan',
         retryTimes: 'Bilangan Cubaan Semula',
         timeout: 'Masa Tamat',

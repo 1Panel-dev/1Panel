@@ -1064,7 +1064,7 @@ const message = {
         urlHelper: '請輸入正確的 URL 地址',
         targetHelper: '備份帳號可在面板設定中維護',
         ignoreApp: '排除應用',
-        withImage: '備份所有應用鏡像',
+        withImage: '備份應用映像',
         retainCopies: '保留份數',
         retryTimes: '失敗重試次數',
         timeout: '逾時時間',
