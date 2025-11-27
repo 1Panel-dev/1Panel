@@ -1,7 +1,6 @@
 package webdav
 
 import (
-	"bytes"
 	"encoding/xml"
 	"io"
 	"net/url"
@@ -61,13 +60,6 @@ func FixSlashes(s string) string {
 
 func Join(path0 string, path1 string) string {
 	return strings.TrimSuffix(path0, "/") + "/" + strings.TrimPrefix(path1, "/")
-}
-
-func String(r io.Reader) string {
-	buf := new(bytes.Buffer)
-	// TODO - make String return an error as well
-	_, _ = buf.ReadFrom(r)
-	return buf.String()
 }
 
 func parseInt64(s *string) int64 {

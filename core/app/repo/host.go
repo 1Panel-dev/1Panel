@@ -20,7 +20,6 @@ type IHostRepo interface {
 	WithByInfo(info string) global.DBOption
 	WithByPort(port uint) global.DBOption
 	WithByUser(user string) global.DBOption
-	WithByAddr(addr string) global.DBOption
 }
 
 func NewIHostRepo() IHostRepo {
@@ -77,11 +76,6 @@ func (h *HostRepo) WithByPort(port uint) global.DBOption {
 func (h *HostRepo) WithByUser(user string) global.DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("user = ?", user)
-	}
-}
-func (h *HostRepo) WithByAddr(addr string) global.DBOption {
-	return func(g *gorm.DB) *gorm.DB {
-		return g.Where("addr = ?", addr)
 	}
 }
 

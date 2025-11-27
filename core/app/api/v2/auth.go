@@ -118,15 +118,6 @@ func (b *BaseApi) Captcha(c *gin.Context) {
 	helper.SuccessWithData(c, captcha)
 }
 
-func (b *BaseApi) GetResponsePage(c *gin.Context) {
-	pageCode, err := authService.GetResponsePage()
-	if err != nil {
-		helper.InternalServer(c, err)
-		return
-	}
-	helper.SuccessWithData(c, pageCode)
-}
-
 func (b *BaseApi) GetWelcomePage(c *gin.Context) {
 	count, _, _ := logService.PageLoginLog(c, dto.SearchLgLogWithPage{PageInfo: dto.PageInfo{Page: 1, PageSize: 10}})
 	if count != 1 {

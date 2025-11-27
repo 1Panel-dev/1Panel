@@ -31,25 +31,6 @@ func LoadDBConnByPath(fullPath, dbName string) *gorm.DB {
 	return db
 }
 
-func LoadDBConnByPathWithErr(fullPath, dbName string) (*gorm.DB, error) {
-	if _, err := CreateDirWhenNotExist(true, path.Dir(fullPath)); err != nil {
-		return nil, fmt.Errorf("init db dir failed, err: %v", err)
-	}
-	if _, err := os.Stat(fullPath); err != nil {
-		f, err := os.Create(fullPath)
-		if err != nil {
-			return nil, fmt.Errorf("init %s db file failed, err: %v", dbName, err)
-		}
-		_ = f.Close()
-	}
-
-	db, err := GetDBWithPath(fullPath)
-	if err != nil {
-		return nil, fmt.Errorf("init %s db failed, err: %v", dbName, err)
-	}
-	return db, nil
-}
-
 func CloseDB(db *gorm.DB) {
 	sqlDB, err := db.DB()
 	if err != nil {

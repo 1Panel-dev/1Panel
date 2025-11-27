@@ -72,16 +72,6 @@ func NewAutoAuth(login string, secret string) Authorizer {
 	return az
 }
 
-func NewEmptyAuth() Authorizer {
-	fmap := make([]authfactory, 0)
-	az := &authorizer{factories: fmap, defAuthMux: sync.Mutex{}, defAuth: &nullAuth{}}
-	return az
-}
-
-func NewPreemptiveAuth(auth Authenticator) Authorizer {
-	return &preemptiveAuthorizer{auth: auth}
-}
-
 func (a *authorizer) NewAuthenticator(body io.Reader) (Authenticator, io.Reader) {
 	var retryBuf io.Reader = body
 	if body != nil {
@@ -295,12 +285,4 @@ func (n *nullAuth) Clone() Authenticator {
 
 func (n *nullAuth) String() string {
 	return "NullAuth"
-}
-
-func (b *preemptiveAuthorizer) NewAuthenticator(body io.Reader) (Authenticator, io.Reader) {
-	return b.auth.Clone(), body
-}
-
-func (b *preemptiveAuthorizer) AddAuthenticator(key string, fn AuthFactory) {
-	panic("You're funny! A preemptive authorizer may only have a single authentication method")
 }

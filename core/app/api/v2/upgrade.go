@@ -79,25 +79,3 @@ func (b *BaseApi) Upgrade(c *gin.Context) {
 	}
 	helper.Success(c)
 }
-
-// @Tags System Setting
-// @Summary Upgrade
-// @Accept json
-// @Param request body dto.OperateByID true "request"
-// @Success 200
-// @Security ApiKeyAuth
-// @Security Timestamp
-// @Router /core/settings/rollback [post]
-// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"upgrade_logs","output_column":"old_version","output_value":"version"}],"formatZH":"回滚系统 => [version]","formatEN":"rollback system => [version]"}
-func (b *BaseApi) Rollback(c *gin.Context) {
-	var req dto.OperateByID
-	if err := helper.CheckBindAndValidate(&req, c); err != nil {
-		return
-	}
-
-	if err := upgradeService.Rollback(req); err != nil {
-		helper.InternalServer(c, err)
-		return
-	}
-	helper.Success(c)
-}

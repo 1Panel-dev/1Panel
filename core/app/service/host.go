@@ -50,7 +50,7 @@ func (u *HostService) TestByInfo(req dto.HostConnTest) bool {
 		req.PrivateKey = string(privateKey)
 	}
 	if len(req.Password) == 0 && len(req.PrivateKey) == 0 {
-		host, err := hostRepo.Get(hostRepo.WithByAddr(req.Addr), hostRepo.WithByPort(req.Port))
+		host, err := hostRepo.Get(repo.WithByAddr(req.Addr), hostRepo.WithByPort(req.Port))
 		if err != nil {
 			return false
 		}
@@ -235,7 +235,7 @@ func (u *HostService) GetHostByID(id uint) (*dto.HostInfo, error) {
 }
 
 func (u *HostService) Create(req dto.HostOperate) (*dto.HostInfo, error) {
-	hostItem, _ := hostRepo.Get(hostRepo.WithByAddr(req.Addr), hostRepo.WithByUser(req.User), hostRepo.WithByPort(req.Port))
+	hostItem, _ := hostRepo.Get(repo.WithByAddr(req.Addr), hostRepo.WithByUser(req.User), hostRepo.WithByPort(req.Port))
 	if hostItem.ID != 0 {
 		return nil, buserr.New("ErrRecordExist")
 	}

@@ -195,24 +195,6 @@ func (b *BaseApi) SearchMysql(c *gin.Context) {
 }
 
 // @Tags Database Mysql
-// @Summary List mysql database names
-// @Accept json
-// @Param request body dto.PageInfo true "request"
-// @Success 200 {array} dto.MysqlOption
-// @Security ApiKeyAuth
-// @Security Timestamp
-// @Router /databases/options [get]
-func (b *BaseApi) ListDBName(c *gin.Context) {
-	list, err := mysqlService.ListDBOption()
-	if err != nil {
-		helper.InternalServer(c, err)
-		return
-	}
-
-	helper.SuccessWithData(c, list)
-}
-
-// @Tags Database Mysql
 // @Summary List mysql database format collation options
 // @Accept json
 // @Param request body dto.OperationWithName true "request"
