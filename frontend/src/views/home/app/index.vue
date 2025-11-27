@@ -2,6 +2,7 @@
     <div>
         <CardWithHeader :header="$t('app.app')" class="card-interval" v-loading="loading">
             <template #header-r>
+                <el-button class="h-button-setting" link icon="Refresh" @click="refreshLauncher" />
                 <el-popover placement="left" :width="226" trigger="click">
                     <el-input size="small" v-model="filter" clearable @input="loadOption()" />
                     <el-table :show-header="false" :data="options" max-height="150px">
@@ -185,7 +186,7 @@ import { changeLauncherStatus, loadAppLauncher, loadAppLauncherOption } from '@/
 import i18n from '@/lang';
 import { GlobalStore } from '@/store';
 import { MsgSuccess } from '@/utils/message';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { jumpToPath } from '@/utils/util';
 import { jumpToInstall } from '@/utils/app';
@@ -193,6 +194,60 @@ import { routerToFileWithPath, routerToNameWithQuery } from '@/utils/router';
 
 const router = useRouter();
 const globalStore = GlobalStore();
+
+const DASHBOARD_CACHE_KEY = 'dashboardCache';
+const DASHBOARD_CACHE_TTL = {
+    launcherOption: 5 * 60 * 1000,
+    launcher: 10 * 60 * 1000,
+    systemIP: 10 * 60 * 1000,
+};
+
+const getDashboardCache = (key: string) => {
+    try {
+        const cacheRaw = localStorage.getItem(DASHBOARD_CACHE_KEY);
+        if (!cacheRaw) return null;
+        const cache = JSON.parse(cacheRaw);
+        const entry = cache[key];
+        if (entry && entry.expireAt > Date.now()) {
+            return entry.value;
+        }
+    } catch {}
+    return null;
+};
+
+const setDashboardCache = (key: string, value: any, ttl: number) => {
+    try {
+        const cacheRaw = localStorage.getItem(DASHBOARD_CACHE_KEY);
+        const cache = cacheRaw ? JSON.parse(cacheRaw) : {};
+        cache[key] = {
+            value,
+            expireAt: Date.now() + ttl,
+        };
+        localStorage.setItem(DASHBOARD_CACHE_KEY, JSON.stringify(cache));
+    } catch {}
+};
+
+const clearLauncherCache = () => {
+    try {
+        const cacheRaw = localStorage.getItem(DASHBOARD_CACHE_KEY);
+        if (!cacheRaw) return;
+        const cache = JSON.parse(cacheRaw);
+        Object.keys(cache).forEach((key: string) => {
+            if (key.startsWith('appLauncherOption-')) {
+                delete cache[key];
+            }
+            if (key === 'appLauncher') {
+                delete cache[key];
+            }
+            if (key === 'systemIP') {
+                delete cache[key];
+            }
+        });
+        localStorage.setItem(DASHBOARD_CACHE_KEY, JSON.stringify(cache));
+    } catch {
+        localStorage.removeItem(DASHBOARD_CACHE_KEY);
+    }
+};
 
 let loading = ref(false);
 let apps = ref([]);
@@ -217,6 +272,17 @@ const goInstall = (key: string, type: string) => {
 
 const search = async () => {
     loading.value = true;
+    const cache = getDashboardCache('appLauncher');
+    if (cache !== null) {
+        apps.value = cache;
+        for (const item of apps.value) {
+            if (item.detail && item.detail.length !== 0) {
+                item.currentRow = item.detail[0];
+            }
+        }
+        loading.value = false;
+        return;
+    }
     await loadAppLauncher()
         .then((res) => {
             loading.value = false;
@@ -226,6 +292,7 @@ const search = async () => {
                     item.currentRow = item.detail[0];
                 }
             }
+            setDashboardCache('appLauncher', apps.value, DASHBOARD_CACHE_TTL.launcher);
         })
         .finally(() => {
             loading.value = false;
@@ -238,7 +305,9 @@ const onChangeStatus = async (row: any) => {
         .then(() => {
             loading.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            clearLauncherCache();
             search();
+            loadOption();
         })
         .catch(() => {
             loading.value = false;
@@ -251,9 +320,15 @@ const toLink = (link: string) => {
 
 const getConfig = async () => {
     try {
+        const cache = getDashboardCache('systemIP');
+        if (cache !== null) {
+            defaultLink.value = cache;
+            return;
+        }
         const res = await getAgentSettingByKey('SystemIP');
         if (res.data != '') {
             defaultLink.value = res.data;
+            setDashboardCache('systemIP', res.data, DASHBOARD_CACHE_TTL.systemIP);
         }
     } catch (error) {}
 };
@@ -287,8 +362,20 @@ const onOperate = async (operation: string, row: any) => {
 };
 
 const loadOption = async () => {
+    const cacheKey = `appLauncherOption-${filter.value || ''}`;
+    const cache = getDashboardCache(cacheKey);
+    if (cache !== null) {
+        options.value = cache;
+        return;
+    }
     const res = await loadAppLauncherOption(filter.value || '');
     options.value = res.data || [];
+    setDashboardCache(cacheKey, options.value, DASHBOARD_CACHE_TTL.launcherOption);
+};
+
+const refreshLauncher = async () => {
+    clearLauncherCache();
+    await Promise.allSettled([loadOption(), search()]);
 };
 
 defineExpose({

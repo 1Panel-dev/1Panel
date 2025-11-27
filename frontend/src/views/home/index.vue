@@ -173,6 +173,7 @@
                     <el-carousel-item key="systemInfo">
                         <CardWithHeader :header="$t('home.systemInfo')">
                             <template #header-r>
+                                <el-button class="h-button-setting" @click="refreshDashboard" link icon="Refresh" />
                                 <el-button
                                     class="h-button-setting"
                                     @click="toggleSensitiveInfo"
@@ -337,6 +338,17 @@ import { getWelcomePage } from '@/api/modules/auth';
 const router = useRouter();
 const globalStore = GlobalStore();
 
+const DASHBOARD_CACHE_KEY = 'dashboardCache';
+const DASHBOARD_CACHE_TTL = {
+    baseInfo: 90 * 1000,
+    simpleNodes: 60 * 1000,
+    safeStatus: 90 * 1000,
+    netOptions: 10 * 60 * 1000,
+    ioOptions: 10 * 60 * 1000,
+};
+const UPGRADE_CHECK_KEY = 'upgradeChecked';
+const UPGRADE_CHECK_EXPIRE = 24 * 60 * 60 * 1000;
+
 const statusRef = ref();
 const appRef = ref();
 
@@ -450,6 +462,35 @@ const currentChartInfo = reactive({
 
 const chartsOption = ref({ ioChart1: null, networkChart: null });
 
+const getDashboardCache = (key: string) => {
+    try {
+        const cacheRaw = localStorage.getItem(DASHBOARD_CACHE_KEY);
+        if (!cacheRaw) return null;
+        const cache = JSON.parse(cacheRaw);
+        const entry = cache[key];
+        if (entry && entry.expireAt > Date.now()) {
+            return entry.value;
+        }
+    } catch {}
+    return null;
+};
+
+const setDashboardCache = (key: string, value: any, ttl: number) => {
+    try {
+        const cacheRaw = localStorage.getItem(DASHBOARD_CACHE_KEY);
+        const cache = cacheRaw ? JSON.parse(cacheRaw) : {};
+        cache[key] = {
+            value,
+            expireAt: Date.now() + ttl,
+        };
+        localStorage.setItem(DASHBOARD_CACHE_KEY, JSON.stringify(cache));
+    } catch {}
+};
+
+const clearDashboardCache = () => {
+    localStorage.removeItem(DASHBOARD_CACHE_KEY);
+};
+
 const updateCurrentInfo = (data: Dashboard.CurrentInfo) => {
     currentInfo.value = {
         ...data,
@@ -463,21 +504,63 @@ const changeOption = async () => {
     loadData();
 };
 
+const applyDefaultNetOption = () => {
+    if (!netOptions.value || netOptions.value.length === 0) return;
+    const defaultNet = globalStore.defaultNetwork || netOptions.value[0];
+    if (defaultNet && searchInfo.netOption !== defaultNet) {
+        searchInfo.netOption = defaultNet;
+        if (!isStatusInit.value) {
+            onLoadBaseInfo(false, 'network');
+        }
+    }
+};
+
 const onLoadNetworkOptions = async () => {
+    const cache = getDashboardCache('netOptions');
+    if (cache !== null) {
+        netOptions.value = cache;
+        applyDefaultNetOption();
+        return;
+    }
     const res = await getNetworkOptions();
     netOptions.value = res.data;
-    searchInfo.netOption = globalStore.defaultNetwork || (netOptions.value && netOptions.value[0]);
+    setDashboardCache('netOptions', res.data, DASHBOARD_CACHE_TTL.netOptions);
+    applyDefaultNetOption();
 };
 
 const onLoadSimpleNode = async () => {
+    const cache = getDashboardCache('simpleNodes');
+    if (cache !== null) {
+        simpleNodes.value = cache;
+        return;
+    }
     const res = await listAllSimpleNodes();
     simpleNodes.value = res.data || [];
+    setDashboardCache('simpleNodes', simpleNodes.value, DASHBOARD_CACHE_TTL.simpleNodes);
+};
+
+const applyDefaultIOOption = () => {
+    if (!ioOptions.value || ioOptions.value.length === 0) return;
+    const defaultIO = globalStore.defaultIO || ioOptions.value[0];
+    if (defaultIO && searchInfo.ioOption !== defaultIO) {
+        searchInfo.ioOption = defaultIO;
+        if (!isStatusInit.value) {
+            onLoadBaseInfo(false, 'io');
+        }
+    }
 };
 
 const onLoadIOOptions = async () => {
+    const cache = getDashboardCache('ioOptions');
+    if (cache !== null) {
+        ioOptions.value = cache;
+        applyDefaultIOOption();
+        return;
+    }
     const res = await getIOOptions();
     ioOptions.value = res.data;
-    searchInfo.ioOption = globalStore.defaultIO || (ioOptions.value && ioOptions.value[0]);
+    setDashboardCache('ioOptions', ioOptions.value, DASHBOARD_CACHE_TTL.ioOptions);
+    applyDefaultIOOption();
 };
 
 const onLoadBaseInfo = async (isInit: boolean, range: string) => {
@@ -490,8 +573,14 @@ const onLoadBaseInfo = async (isInit: boolean, range: string) => {
         netBytesRecvs.value = [];
         timeNetDatas.value = [];
     }
-    const res = await loadBaseInfo(searchInfo.ioOption, searchInfo.netOption);
-    baseInfo.value = res.data;
+    const cacheKey = `baseInfo-${searchInfo.ioOption}-${searchInfo.netOption}`;
+    let baseData = getDashboardCache(cacheKey);
+    if (!baseData) {
+        const res = await loadBaseInfo(searchInfo.ioOption, searchInfo.netOption);
+        baseData = res.data;
+        setDashboardCache(cacheKey, baseData, DASHBOARD_CACHE_TTL.baseInfo);
+    }
+    baseInfo.value = baseData;
     updateCurrentInfo(baseInfo.value.currentInfo);
     onLoadCurrentInfo();
     isStatusInit.value = false;
@@ -528,6 +617,14 @@ const showSimpleNode = () => {
 
 const toggleSensitiveInfo = () => {
     showSensitiveInfo.value = !showSensitiveInfo.value;
+};
+
+const refreshDashboard = async () => {
+    clearDashboardCache();
+    localStorage.removeItem(UPGRADE_CHECK_KEY);
+    await onLoadBaseInfo(false, 'all');
+    await Promise.allSettled([onLoadSimpleNode(), onLoadNetworkOptions(), onLoadIOOptions(), loadSafeStatus()]);
+    loadUpgradeStatus();
 };
 
 const jumpPanel = (row: any) => {
@@ -670,17 +767,26 @@ const hideEntrance = () => {
 };
 
 const loadUpgradeStatus = async () => {
+    const checkedAt = Number(localStorage.getItem(UPGRADE_CHECK_KEY));
+    if (checkedAt && Date.now() - checkedAt < UPGRADE_CHECK_EXPIRE) return;
     const res = await loadUpgradeInfo();
     if (res && (res.data.testVersion || res.data.newVersion || res.data.latestVersion)) {
         globalStore.hasNewVersion = true;
     } else {
         globalStore.hasNewVersion = false;
     }
+    localStorage.setItem(UPGRADE_CHECK_KEY, Date.now().toString());
 };
 
 const loadSafeStatus = async () => {
+    const cache = getDashboardCache('safeStatus');
+    if (cache !== null) {
+        isSafety.value = cache;
+        return;
+    }
     const res = await getSettingInfo();
     isSafety.value = res.data.securityEntrance;
+    setDashboardCache('safeStatus', isSafety.value, DASHBOARD_CACHE_TTL.safeStatus);
 };
 
 const loadSource = (row: any) => {
@@ -712,15 +818,27 @@ const toUpload = () => {
     licenseRef.value.acceptParams();
 };
 
-const fetchData = () => {
+const scheduleDeferredFetch = () => {
+    setTimeout(() => {
+        onLoadSimpleNode();
+    }, 200);
+    setTimeout(() => {
+        onLoadNetworkOptions();
+    }, 400);
+    setTimeout(() => {
+        onLoadIOOptions();
+    }, 600);
+    setTimeout(() => {
+        loadUpgradeStatus();
+    }, 800);
+};
+
+const fetchData = async () => {
     window.addEventListener('focus', onFocus);
     window.addEventListener('blur', onBlur);
-    loadSafeStatus();
-    loadUpgradeStatus();
-    onLoadNetworkOptions();
-    onLoadIOOptions();
-    onLoadBaseInfo(true, 'all');
-    onLoadSimpleNode();
+    await loadSafeStatus();
+    await onLoadBaseInfo(true, 'all');
+    scheduleDeferredFetch();
 };
 
 const loadWelcome = async () => {

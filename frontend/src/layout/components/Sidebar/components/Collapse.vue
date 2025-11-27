@@ -238,6 +238,10 @@ const logout = () => {
     })
         .then(async () => {
             await logOutApi();
+            sessionStorage.removeItem('dashboardCache');
+            localStorage.removeItem('dashboardCache');
+            sessionStorage.removeItem('upgradeChecked');
+            localStorage.removeItem('upgradeChecked');
             router.push({ name: 'entrance', params: { code: globalStore.entrance } });
             globalStore.setLogStatus(false);
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
