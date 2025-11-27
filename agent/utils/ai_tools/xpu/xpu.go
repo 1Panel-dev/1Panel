@@ -120,6 +120,23 @@ func (x XpuSMI) LoadDashData() ([]XPUSimpleInfo, error) {
 	return res, nil
 }
 
+func (x XpuSMI) LoadDeviceList() ([]string, error) {
+	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(5 * time.Second))
+	data, err := cmdMgr.RunWithStdoutBashC("xpu-smi discovery -j")
+	if err != nil {
+		return nil, fmt.Errorf("calling xpu-smi  failed, %v", err)
+	}
+	var deviceInfo DeviceInfo
+	if err := json.Unmarshal([]byte(data), &deviceInfo); err != nil {
+		return nil, fmt.Errorf("deviceInfo json unmarshal failed, err: %w", err)
+	}
+	var deviceNames []string
+	for _, device := range deviceInfo.DeviceList {
+		deviceNames = append(deviceNames, fmt.Sprintf("%d - %s", device.DeviceID, device.DeviceName))
+	}
+	return deviceNames, nil
+}
+
 func (x XpuSMI) LoadGpuInfo() (*XpuInfo, error) {
 	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(5 * time.Second))
 	data, err := cmdMgr.RunWithStdoutBashC("xpu-smi discovery -j")

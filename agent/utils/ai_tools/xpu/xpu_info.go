@@ -10,7 +10,6 @@ type XpuInfo struct {
 type Xpu struct {
 	Basic     Basic     `json:"basic"`
 	Stats     Stats     `json:"stats"`
-	Config    Config    `json:"config"`
 	Processes []Process `json:"processes"`
 }
 
@@ -22,11 +21,6 @@ type Basic struct {
 	Memory        string `json:"memory"`
 	FreeMemory    string `json:"freeMemory"`
 	PciBdfAddress string `json:"pciBdfAddress"`
-}
-
-type Config struct {
-	PowerLimit      int    `json:"power_limit"`
-	PowerValidRange string `json:"power_vaild_range"`
 }
 
 type Stats struct {

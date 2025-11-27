@@ -39,6 +39,7 @@ var monitorCancel context.CancelFunc
 type IMonitorService interface {
 	Run()
 	LoadMonitorData(req dto.MonitorSearch) ([]dto.MonitorData, error)
+	LoadGPUOptions() dto.MonitorGPUOptions
 	LoadGPUMonitorData(req dto.MonitorGPUSearch) (dto.MonitorGPUData, error)
 	LoadSetting() (*dto.MonitorSetting, error)
 	UpdateSetting(key, value string) error
@@ -118,42 +119,43 @@ func (m *MonitorService) LoadMonitorData(req dto.MonitorSearch) ([]dto.MonitorDa
 	return data, nil
 }
 
+func (m *MonitorService) LoadGPUOptions() dto.MonitorGPUOptions {
+	var data dto.MonitorGPUOptions
+	gpuExist, gpuClient := gpu.New()
+	xpuExist, xpuClient := xpu.New()
+	if !gpuExist && !xpuExist {
+		return data
+	}
+	if gpuExist {
+		data.GPUType = "gpu"
+		gpuInfo, err := gpuClient.LoadGpuInfo()
+		if err != nil || len(gpuInfo.GPUs) == 0 {
+			global.LOG.Error("Load GPU info failed or no GPU found, err: ", err)
+			return data
+		}
+		sort.Slice(gpuInfo.GPUs, func(i, j int) bool {
+			return gpuInfo.GPUs[i].Index < gpuInfo.GPUs[j].Index
+		})
+		for _, item := range gpuInfo.GPUs {
+			data.Options = append(data.Options, fmt.Sprintf("%d - %s", item.Index, item.ProductName))
+		}
+		return data
+	} else {
+		data.GPUType = "xpu"
+		var err error
+		data.Options, err = xpuClient.LoadDeviceList()
+		if err != nil || len(data.Options) == 0 {
+			global.LOG.Error("Load XPU info failed or no XPU found, err: ", err)
+		}
+		return data
+	}
+}
+
 func (m *MonitorService) LoadGPUMonitorData(req dto.MonitorGPUSearch) (dto.MonitorGPUData, error) {
 	loc, _ := time.LoadLocation(common.LoadTimeZoneByCmd())
 	req.StartTime = req.StartTime.In(loc)
 	req.EndTime = req.EndTime.In(loc)
-
 	var data dto.MonitorGPUData
-	gpuExist, gpuclient := gpu.New()
-	xpuExist, xpuClient := xpu.New()
-	if !gpuExist && !xpuExist {
-		return data, nil
-	}
-	if len(req.ProductName) == 0 {
-		if gpuExist {
-			data.GPUType = "gpu"
-			gpuInfo, err := gpuclient.LoadGpuInfo()
-			if err != nil || len(gpuInfo.GPUs) == 0 {
-				global.LOG.Error("Load GPU info failed or no GPU found, err: ", err)
-				return data, buserr.New("ErrRecordNotFound")
-			}
-			req.ProductName = gpuInfo.GPUs[0].ProductName
-			for _, item := range gpuInfo.GPUs {
-				data.ProductNames = append(data.ProductNames, item.ProductName)
-			}
-		} else {
-			data.GPUType = "xpu"
-			xpuInfo, err := xpuClient.LoadGpuInfo()
-			if err != nil || len(xpuInfo.Xpu) == 0 {
-				global.LOG.Error("Load XPU info failed or no XPU found, err: ", err)
-				return data, buserr.New("ErrRecordNotFound")
-			}
-			req.ProductName = xpuInfo.Xpu[0].Basic.DeviceName
-			for _, item := range xpuInfo.Xpu {
-				data.ProductNames = append(data.ProductNames, item.Basic.DeviceName)
-			}
-		}
-	}
 	gpuList, err := monitorRepo.GetGPU(repo.WithByCreatedAt(req.StartTime, req.EndTime), monitorRepo.WithByProductName(req.ProductName))
 	if err != nil {
 		return data, err
@@ -571,13 +573,14 @@ func saveGPUDataToDB() {
 	var list []model.MonitorGPU
 	for _, gpuItem := range gpuInfo.GPUs {
 		item := model.MonitorGPU{
-			ProductName: gpuItem.ProductName,
-			GPUUtil:     loadGPUInfoFloat(gpuItem.GPUUtil),
-			Temperature: loadGPUInfoInt(gpuItem.Temperature),
-			PowerDraw:   loadGPUInfoFloat(gpuItem.PowerDraw),
-			MemUsed:     loadGPUInfoFloat(gpuItem.MemUsed),
-			MemTotal:    loadGPUInfoFloat(gpuItem.MemTotal),
-			FanSpeed:    loadGPUInfoInt(gpuItem.FanSpeed),
+			ProductName:   fmt.Sprintf("%d - %s", gpuItem.Index, gpuItem.ProductName),
+			GPUUtil:       loadGPUInfoFloat(gpuItem.GPUUtil),
+			Temperature:   loadGPUInfoFloat(gpuItem.Temperature),
+			PowerDraw:     loadGPUInfoFloat(gpuItem.PowerDraw),
+			MaxPowerLimit: loadGPUInfoFloat(gpuItem.MaxPowerLimit),
+			MemUsed:       loadGPUInfoFloat(gpuItem.MemUsed),
+			MemTotal:      loadGPUInfoFloat(gpuItem.MemTotal),
+			FanSpeed:      loadGPUInfoInt(gpuItem.FanSpeed),
 		}
 		process, _ := json.Marshal(gpuItem.Processes)
 		if len(process) != 0 {
@@ -602,13 +605,12 @@ func saveXPUDataToDB() {
 	var list []model.MonitorGPU
 	for _, xpuItem := range xpuInfo.Xpu {
 		item := model.MonitorGPU{
-			ProductName:   xpuItem.Basic.DeviceName,
-			GPUUtil:       loadGPUInfoFloat(xpuItem.Stats.MemoryUtil),
-			Temperature:   loadGPUInfoInt(xpuItem.Stats.Temperature),
-			PowerDraw:     loadGPUInfoFloat(xpuItem.Stats.Power),
-			MaxPowerLimit: float64(xpuItem.Config.PowerLimit),
-			MemUsed:       loadGPUInfoFloat(xpuItem.Stats.MemoryUsed),
-			MemTotal:      loadGPUInfoFloat(xpuItem.Basic.Memory),
+			ProductName: fmt.Sprintf("%d - %s", xpuItem.Basic.DeviceID, xpuItem.Basic.DeviceName),
+			GPUUtil:     loadGPUInfoFloat(xpuItem.Stats.MemoryUtil),
+			Temperature: loadGPUInfoFloat(xpuItem.Stats.Temperature),
+			PowerDraw:   loadGPUInfoFloat(xpuItem.Stats.Power),
+			MemUsed:     loadGPUInfoFloat(xpuItem.Stats.MemoryUsed),
+			MemTotal:    loadGPUInfoFloat(xpuItem.Basic.Memory),
 		}
 		if len(xpuItem.Processes) != 0 {
 			var processItem []dto.GPUProcess
@@ -643,6 +645,9 @@ func loadGPUInfoInt(val string) int {
 func loadGPUInfoFloat(val string) float64 {
 	valItem := strings.ReplaceAll(val, "W", "")
 	valItem = strings.ReplaceAll(valItem, "MB", "")
+	valItem = strings.ReplaceAll(valItem, "MiB", "")
+	valItem = strings.ReplaceAll(valItem, "C", "")
+	valItem = strings.ReplaceAll(valItem, "°C", "")
 	valItem = strings.ReplaceAll(valItem, "%", "")
 	valItem = strings.TrimSpace(valItem)
 	data, _ := strconv.ParseFloat(valItem, 64)

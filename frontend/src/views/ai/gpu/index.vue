@@ -35,25 +35,6 @@
                 <el-card class="card-interval" style="overflow: inherit">
                     <template #header>
                         <div :class="mobile ? 'flx-wrap' : 'flex justify-between'">
-                            <span class="title">{{ $t('monitor.gpuUtil') }}</span>
-                        </div>
-                    </template>
-                    <div class="chart">
-                        <v-charts
-                            height="400px"
-                            id="loadGPUChart"
-                            type="line"
-                            :option="chartsOption['loadGPUChart']"
-                            v-if="chartsOption['loadGPUChart']"
-                            :dataZoom="true"
-                        />
-                    </div>
-                </el-card>
-            </el-col>
-            <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-                <el-card class="card-interval" style="overflow: inherit">
-                    <template #header>
-                        <div :class="mobile ? 'flx-wrap' : 'flex justify-between'">
                             <span class="title">{{ $t('monitor.memoryUsage') }}</span>
                         </div>
                     </template>
@@ -64,6 +45,25 @@
                             type="line"
                             :option="chartsOption['loadMemoryChart']"
                             v-if="chartsOption['loadMemoryChart']"
+                            :dataZoom="true"
+                        />
+                    </div>
+                </el-card>
+            </el-col>
+            <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
+                <el-card class="card-interval" style="overflow: inherit">
+                    <template #header>
+                        <div :class="mobile ? 'flx-wrap' : 'flex justify-between'">
+                            <span class="title">{{ $t('monitor.gpuUtil') }}</span>
+                        </div>
+                    </template>
+                    <div class="chart">
+                        <v-charts
+                            height="400px"
+                            id="loadGPUChart"
+                            type="line"
+                            :option="chartsOption['loadGPUChart']"
+                            v-if="chartsOption['loadGPUChart']"
                             :dataZoom="true"
                         />
                     </div>
@@ -148,7 +148,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted, computed } from 'vue';
-import { loadGPUMonitor } from '@/api/modules/host';
+import { loadGPUMonitor, getGPUOptions } from '@/api/modules/host';
 import { dateFormatWithoutYear } from '@/utils/util';
 import { GlobalStore } from '@/store';
 import { shortcuts } from '@/utils/shortcuts';
@@ -183,6 +183,21 @@ const searchInfo = reactive<Host.MonitorGPUSearch>({
     endTime: new Date(),
 });
 
+const loadOptions = async () => {
+    loading.value = true;
+    await getGPUOptions()
+        .then((res) => {
+            gpuType.value = res.data.gpuType || 'gpu';
+            options.value = res.data.options || [];
+            searchInfo.productName = options.value.length > 0 ? options.value[0] : '';
+            search();
+        })
+        .catch(() => {
+            loading.value = false;
+            options.value = [];
+        });
+};
+
 const search = async () => {
     if (searchTime.value && searchTime.value.length === 2) {
         searchInfo.startTime = searchTime.value[0];
@@ -192,9 +207,6 @@ const search = async () => {
     await loadGPUMonitor(searchInfo)
         .then((res) => {
             loading.value = false;
-            options.value = res.data.productNames || [];
-            gpuType.value = res.data.gpuType || 'gpu';
-            searchInfo.productName = searchInfo.productName || (options.value.length > 0 ? options.value[0] : '');
             let baseDate = res.data.date.length === 0 ? loadEmptyDate(timeRangeGlobal.value) : res.data.date;
             let date = baseDate.map(function (item: any) {
                 return dateFormatWithoutYear(item);
@@ -270,7 +282,7 @@ function initPowerCharts(baseDate: any, items: any) {
             formatter: function (list: any) {
                 let res = loadDate(list[0].name);
                 for (const item of list) {
-                    res += loadSeries(item, item.data.value ? item.data.value : item.data, '%');
+                    res += loadSeries(item, item.data.value, '%');
                     res += `( ${item.data?.data.used}  W / ${item.data?.data.total}  W)<br/>`;
                 }
                 return res;
@@ -298,7 +310,7 @@ function initXpuPowerCharts(baseDate: any, items: any) {
             formatter: function (list: any) {
                 let res = loadDate(list[0].name);
                 for (const item of list) {
-                    res += loadSeries(item, item.data.value ? item.data.value : item.data, 'W');
+                    res += loadSeries(item, item.data.value, 'W');
                 }
                 return res;
             },
@@ -364,7 +376,7 @@ function withMemoryProcess(list: any) {
         if (item.data?.data) {
             process = item.data?.data.gpuProcesses || [];
         }
-        res += loadSeries(item, item.data.value ? item.data.value : item.data, '%');
+        res += loadSeries(item, item.data.value, '%');
         res += `( ${item.data?.data.used}  MiB / ${item.data?.data.total}  MiB)<br/>`;
     }
     if (!process) {
@@ -425,7 +437,7 @@ const loadProcessType = (val: string) => {
 };
 
 onMounted(() => {
-    search();
+    loadOptions();
 });
 </script>
 

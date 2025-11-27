@@ -36,7 +36,7 @@ type MonitorGPU struct {
 	BaseModel
 	ProductName   string  `json:"productName"`
 	GPUUtil       float64 `json:"gpuUtil"`
-	Temperature   int     `json:"temperature"`
+	Temperature   float64 `json:"temperature"`
 	PowerDraw     float64 `json:"powerDraw"`
 	MaxPowerLimit float64 `json:"maxPowerLimit"`
 	MemUsed       float64 `json:"memUsed"`

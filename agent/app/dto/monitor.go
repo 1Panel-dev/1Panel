@@ -38,17 +38,19 @@ type MonitorSettingUpdate struct {
 	Value string `json:"value"`
 }
 
+type MonitorGPUOptions struct {
+	GPUType string   `json:"gpuType"`
+	Options []string `json:"options"`
+}
 type MonitorGPUSearch struct {
 	ProductName string    `json:"productName"`
 	StartTime   time.Time `json:"startTime"`
 	EndTime     time.Time `json:"endTime"`
 }
 type MonitorGPUData struct {
-	GPUType          string                 `json:"gpuType"`
-	ProductNames     []string               `json:"productNames"`
 	Date             []time.Time            `json:"date"`
 	GPUValue         []float64              `json:"gpuValue"`
-	TemperatureValue []int                  `json:"temperatureValue"`
+	TemperatureValue []float64              `json:"temperatureValue"`
 	PowerValue       []GPUPowerUsageHelper  `json:"powerValue"`
 	MemoryValue      []GPUMemoryUsageHelper `json:"memoryValue"`
 	SpeedValue       []int                  `json:"speedValue"`

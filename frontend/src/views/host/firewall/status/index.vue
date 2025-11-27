@@ -54,7 +54,7 @@
         </div>
         <NoSuchService v-else name="Firewalld / Ufw / iptables" />
 
-        <LayoutContent :divider="true" v-if="!baseInfo.isInit">
+        <LayoutContent :divider="true" v-if="baseInfo.isExist && !baseInfo.isInit">
             <template #main>
                 <div class="app-warn">
                     <div class="flex flex-col gap-2 items-center justify-center w-full sm:flex-row">

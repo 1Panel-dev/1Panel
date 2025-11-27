@@ -126,3 +126,7 @@ func (b *BaseApi) GetIOOptions(c *gin.Context) {
 	sort.Strings(options)
 	helper.SuccessWithData(c, options)
 }
+
+func (b *BaseApi) GetCPUOptions(c *gin.Context) {
+	helper.SuccessWithData(c, monitorService.LoadGPUOptions())
+}

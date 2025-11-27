@@ -20,7 +20,7 @@
             </template>
             <template #main>
                 <el-row v-if="data.length > 0" :gutter="20" class="row-box">
-                    <el-col :span="7">
+                    <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="6">
                         <el-card>
                             <el-table
                                 :max-height="loadTableHeight()"
@@ -112,7 +112,7 @@
                             </el-table>
                         </el-card>
                     </el-col>
-                    <el-col :span="17">
+                    <el-col :xs="24" :sm="24" :md="16" :lg="16" :xl="18">
                         <el-card v-if="currentCompose" v-loading="detailLoading">
                             <el-table
                                 v-if="composeContainers.length > 0"
@@ -120,24 +120,24 @@
                                 size="small"
                                 max-height="250"
                             >
-                                <el-table-column :label="$t('commons.table.name')" prop="name" show-overflow-tooltip>
+                                <el-table-column
+                                    :label="$t('commons.table.name')"
+                                    prop="name"
+                                    show-overflow-tooltip
+                                    fixed="left"
+                                >
                                     <template #default="{ row }">
                                         <el-text type="primary" class="cursor-pointer" @click="onInspectContainer(row)">
                                             {{ row.name }}
                                         </el-text>
                                     </template>
                                 </el-table-column>
-                                <el-table-column :label="$t('commons.table.status')" prop="state" width="150">
+                                <el-table-column :label="$t('commons.table.status')" prop="state">
                                     <template #default="{ row }">
                                         <Status :key="row.state" :status="row.state"></Status>
                                     </template>
                                 </el-table-column>
-                                <el-table-column
-                                    :label="$t('container.source')"
-                                    show-overflow-tooltip
-                                    prop="resource"
-                                    min-width="150"
-                                >
+                                <el-table-column :label="$t('container.source')" show-overflow-tooltip prop="resource">
                                     <template #default="{ row }">
                                         <div v-if="row.hasLoad">
                                             <div class="source-font">CPU: {{ row.cpuPercent.toFixed(2) }}%</div>
@@ -202,7 +202,7 @@
                                         </div>
                                     </template>
                                 </el-table-column>
-                                <el-table-column :label="$t('commons.table.operate')" width="180" fixed="right">
+                                <el-table-column :label="$t('commons.table.operate')">
                                     <template #default="{ row }">
                                         <el-button type="primary" link @click="onOpenTerminal(row)">
                                             {{ $t('menu.terminal') }}
