@@ -1204,6 +1204,7 @@ const message = {
         defaultIO: 'Cakera Lalai',
         defaultIOHelper: 'Pilihan cakera lalai yang dipaparkan dalam antara muka pemantauan dan gambaran keseluruhan',
         cleanMonitor: 'Kosongkan Rekod Pemantauan',
+        cleanHelper: 'Operasi ini akan membersihkan semua rekod pemantauan termasuk GPU. Teruskan?',
 
         avgLoad: 'Purata beban',
         loadDetail: 'Butiran beban',

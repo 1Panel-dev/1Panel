@@ -635,21 +635,18 @@ func saveXPUDataToDB() {
 	}
 }
 func loadGPUInfoInt(val string) int {
-	valItem := strings.ReplaceAll(val, "MiB", "")
-	valItem = strings.ReplaceAll(valItem, "C", "")
-	valItem = strings.ReplaceAll(valItem, "%", "")
-	valItem = strings.TrimSpace(valItem)
-	data, _ := strconv.Atoi(valItem)
+	val = strings.TrimSuffix(val, "%")
+	val = strings.TrimSpace(val)
+	data, _ := strconv.Atoi(val)
 	return data
 }
 func loadGPUInfoFloat(val string) float64 {
-	valItem := strings.ReplaceAll(val, "W", "")
-	valItem = strings.ReplaceAll(valItem, "MB", "")
-	valItem = strings.ReplaceAll(valItem, "MiB", "")
-	valItem = strings.ReplaceAll(valItem, "C", "")
-	valItem = strings.ReplaceAll(valItem, "°C", "")
-	valItem = strings.ReplaceAll(valItem, "%", "")
-	valItem = strings.TrimSpace(valItem)
-	data, _ := strconv.ParseFloat(valItem, 64)
+	val = strings.TrimSpace(val)
+	suffixes := []string{"W", "MB", "MiB", "°C", "C", "%"}
+	for _, suffix := range suffixes {
+		val = strings.TrimSuffix(val, suffix)
+	}
+	val = strings.TrimSpace(val)
+	data, _ := strconv.ParseFloat(val, 64)
 	return data
 }

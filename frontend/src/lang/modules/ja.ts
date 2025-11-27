@@ -1174,6 +1174,7 @@ const message = {
         defaultIO: 'デフォルトディスク',
         defaultIOHelper: '監視および概要インターフェースに表示されるデフォルトのディスクオプション',
         cleanMonitor: '監視記録をクリア',
+        cleanHelper: 'この操作により、GPUを含むすべての監視記録がクリアされます。続行しますか？',
 
         avgLoad: 'ロード平均',
         loadDetail: '詳細を読み込みます',

@@ -1225,6 +1225,7 @@ const message = {
         defaultIO: 'Varsayılan Disk',
         defaultIOHelper: 'İzleme ve genel bakış arayüzlerinde görüntülenen varsayılan disk seçeneği',
         cleanMonitor: 'İzleme Kayıtlarını Temizle',
+        cleanHelper: 'Bu işlem GPU dahil tüm izleme kayıtlarını temizleyecektir. Devam etmek istiyor musunuz?',
 
         avgLoad: 'Ortalama yük',
         loadDetail: 'Yük detayı',

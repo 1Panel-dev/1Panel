@@ -142,7 +142,7 @@ const onChangeIO = () => {
 };
 
 const onClean = async () => {
-    ElMessageBox.confirm(i18n.global.t('commons.msg.clean'), i18n.global.t('monitor.cleanMonitor'), {
+    ElMessageBox.confirm(i18n.global.t('monitor.cleanHelper'), i18n.global.t('monitor.cleanMonitor'), {
         confirmButtonText: i18n.global.t('commons.button.confirm'),
         cancelButtonText: i18n.global.t('commons.button.cancel'),
         type: 'info',

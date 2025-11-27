@@ -1166,6 +1166,7 @@ const message = {
         defaultIO: '기본 디스크',
         defaultIOHelper: '모니터링 및 개요 인터페이스에 표시되는 기본 디스크 옵션',
         cleanMonitor: '모니터링 기록 지우기',
+        cleanHelper: '이 작업은 GPU를 포함한 모든 모니터링 기록을 지웁니다. 계속하시겠습니까?',
 
         avgLoad: '평균 부하',
         loadDetail: '부하 세부사항',

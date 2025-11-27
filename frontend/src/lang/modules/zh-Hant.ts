@@ -1145,6 +1145,7 @@ const message = {
         defaultIO: '預設磁碟',
         defaultIOHelper: '預設監控和概覽介面顯示的磁碟選項',
         cleanMonitor: '清空監控記錄',
+        cleanHelper: '該操作將清空包括 GPU 在內的所有監控記錄，是否繼續？',
 
         avgLoad: '平均負載',
         loadDetail: '負載詳情',

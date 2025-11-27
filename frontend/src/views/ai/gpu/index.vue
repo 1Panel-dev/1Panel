@@ -27,6 +27,7 @@
                         <el-option v-for="item in options" :key="item" :label="item" :value="item" />
                     </el-select>
                     <TableRefresh class="float-right" @search="search()" />
+                    <el-button icon="Setting" class="float-right mr-2" @click="quickJump()" />
                 </div>
             </el-card>
         </div>
@@ -154,6 +155,7 @@ import { GlobalStore } from '@/store';
 import { shortcuts } from '@/utils/shortcuts';
 import { Host } from '@/api/interface/host';
 import i18n from '@/lang';
+import { routerToName } from '@/utils/router';
 
 const globalStore = GlobalStore();
 
@@ -291,6 +293,10 @@ function initPowerCharts(baseDate: any, items: any) {
         formatStr: '%',
     };
 }
+
+const quickJump = () => {
+    routerToName('HostMonitorSetting');
+};
 
 function initXpuPowerCharts(baseDate: any, items: any) {
     let list = items.map(function (item: any) {

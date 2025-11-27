@@ -1218,6 +1218,7 @@ const message = {
         defaultIO: 'Disco Predeterminado',
         defaultIOHelper: 'Opción de disco predeterminada mostrada en las interfaces de monitoreo y resumen',
         cleanMonitor: 'Limpiar Registros de Monitoreo',
+        cleanHelper: 'Esta operación borrará todos los registros de monitoreo, incluidos los de GPU. ¿Continuar?',
 
         avgLoad: 'Carga promedio',
         loadDetail: 'Detalle de carga',

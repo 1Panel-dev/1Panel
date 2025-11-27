@@ -1210,6 +1210,7 @@ const message = {
         defaultIO: 'Default Disk',
         defaultIOHelper: 'Default disk option displayed in monitoring and overview interfaces',
         cleanMonitor: 'Clear Monitoring Records',
+        cleanHelper: 'This operation will clear all monitoring records including GPU. Continue?',
 
         avgLoad: 'Load average',
         loadDetail: 'Load detail',
