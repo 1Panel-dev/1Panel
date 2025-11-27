@@ -196,62 +196,19 @@ import { useRouter } from 'vue-router';
 import { jumpToPath } from '@/utils/util';
 import { jumpToInstall } from '@/utils/app';
 import { routerToFileWithPath, routerToNameWithQuery } from '@/utils/router';
+import { clearDashboardCacheByPrefix, getDashboardCache, setDashboardCache } from '@/utils/dashboardCache';
 
 const router = useRouter();
 const globalStore = GlobalStore();
 
-const DASHBOARD_CACHE_KEY = 'dashboardCache';
 const DASHBOARD_CACHE_TTL = {
-    launcherOption: 60 * 60 * 1000,
-    launcher: 60 * 60 * 1000,
-    systemIP: 60 * 60 * 1000,
-};
-
-const getDashboardCache = (key: string) => {
-    try {
-        const cacheRaw = localStorage.getItem(DASHBOARD_CACHE_KEY);
-        if (!cacheRaw) return null;
-        const cache = JSON.parse(cacheRaw);
-        const entry = cache[key];
-        if (entry && entry.expireAt > Date.now()) {
-            return entry.value;
-        }
-    } catch {}
-    return null;
-};
-
-const setDashboardCache = (key: string, value: any, ttl: number) => {
-    try {
-        const cacheRaw = localStorage.getItem(DASHBOARD_CACHE_KEY);
-        const cache = cacheRaw ? JSON.parse(cacheRaw) : {};
-        cache[key] = {
-            value,
-            expireAt: Date.now() + ttl,
-        };
-        localStorage.setItem(DASHBOARD_CACHE_KEY, JSON.stringify(cache));
-    } catch {}
+    launcherOption: 5 * 60 * 1000,
+    launcher: 10 * 60 * 1000,
+    systemIP: 10 * 60 * 1000,
 };
 
 const clearLauncherCache = () => {
-    try {
-        const cacheRaw = localStorage.getItem(DASHBOARD_CACHE_KEY);
-        if (!cacheRaw) return;
-        const cache = JSON.parse(cacheRaw);
-        Object.keys(cache).forEach((key: string) => {
-            if (key.startsWith('appLauncherOption-')) {
-                delete cache[key];
-            }
-            if (key === 'appLauncher') {
-                delete cache[key];
-            }
-            if (key === 'systemIP') {
-                delete cache[key];
-            }
-        });
-        localStorage.setItem(DASHBOARD_CACHE_KEY, JSON.stringify(cache));
-    } catch {
-        localStorage.removeItem(DASHBOARD_CACHE_KEY);
-    }
+    clearDashboardCacheByPrefix(['appLauncherOption-', 'appLauncher', 'systemIP']);
 };
 
 let loading = ref(false);

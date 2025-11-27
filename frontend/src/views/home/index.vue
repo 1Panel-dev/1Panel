@@ -336,10 +336,10 @@ import { GlobalStore } from '@/store';
 import { storeToRefs } from 'pinia';
 import { routerToFileWithPath, routerToPath } from '@/utils/router';
 import { getWelcomePage } from '@/api/modules/auth';
+import { clearDashboardCache, getDashboardCache, setDashboardCache } from '@/utils/dashboardCache';
 const router = useRouter();
 const globalStore = GlobalStore();
 
-const DASHBOARD_CACHE_KEY = 'dashboardCache';
 const DASHBOARD_CACHE_TTL = {
     safeStatus: 10 * 60 * 1000,
     netOptions: 60 * 60 * 1000,
@@ -463,35 +463,6 @@ const currentChartInfo = reactive({
 });
 
 const chartsOption = ref({ ioChart1: null, networkChart: null });
-
-const getDashboardCache = (key: string) => {
-    try {
-        const cacheRaw = localStorage.getItem(DASHBOARD_CACHE_KEY);
-        if (!cacheRaw) return null;
-        const cache = JSON.parse(cacheRaw);
-        const entry = cache[key];
-        if (entry && entry.expireAt > Date.now()) {
-            return entry.value;
-        }
-    } catch {}
-    return null;
-};
-
-const setDashboardCache = (key: string, value: any, ttl: number) => {
-    try {
-        const cacheRaw = localStorage.getItem(DASHBOARD_CACHE_KEY);
-        const cache = cacheRaw ? JSON.parse(cacheRaw) : {};
-        cache[key] = {
-            value,
-            expireAt: Date.now() + ttl,
-        };
-        localStorage.setItem(DASHBOARD_CACHE_KEY, JSON.stringify(cache));
-    } catch {}
-};
-
-const clearDashboardCache = () => {
-    localStorage.removeItem(DASHBOARD_CACHE_KEY);
-};
 
 const updateCurrentInfo = (data: Dashboard.CurrentInfo) => {
     currentInfo.value = {
