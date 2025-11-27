@@ -67,6 +67,11 @@ type PsProcessData struct {
 	Stack  string `json:"stack"`
 	Locked string `json:"locked"`
 	Swap   string `json:"swap"`
+	Dirty  string `json:"dirty"`
+	PSS    string `json:"pss"`
+	USS    string `json:"uss"`
+	Shared string `json:"shared"`
+	Text   string `json:"text"`
 
 	CpuValue float64 `json:"cpuValue"`
 	RssValue uint64  `json:"rssValue"`

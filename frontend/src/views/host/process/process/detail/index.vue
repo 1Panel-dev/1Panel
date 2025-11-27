@@ -38,12 +38,17 @@
                 <el-tab-pane :label="$t('process.mem')" name="mem">
                     <el-descriptions :column="2" border>
                         <el-descriptions-item :label="'rss'">{{ data.rss }}</el-descriptions-item>
+                        <el-descriptions-item :label="'pss'">{{ data.pss }}</el-descriptions-item>
+                        <el-descriptions-item :label="'uss'">{{ data.uss }}</el-descriptions-item>
                         <el-descriptions-item :label="'swap'">{{ data.swap }}</el-descriptions-item>
+                        <el-descriptions-item :label="'shared'">{{ data.shared }}</el-descriptions-item>
                         <el-descriptions-item :label="'vms'">{{ data.vms }}</el-descriptions-item>
                         <el-descriptions-item :label="'hwm'">{{ data.hwm }}</el-descriptions-item>
                         <el-descriptions-item :label="'data'">{{ data.data }}</el-descriptions-item>
                         <el-descriptions-item :label="'stack'">{{ data.stack }}</el-descriptions-item>
                         <el-descriptions-item :label="'locked'">{{ data.locked }}</el-descriptions-item>
+                        <el-descriptions-item :label="'text'">{{ data.text }}</el-descriptions-item>
+                        <el-descriptions-item :label="'dirty'">{{ data.dirty }}</el-descriptions-item>
                     </el-descriptions>
                 </el-tab-pane>
                 <el-tab-pane :label="$t('process.openFiles')" name="openFiles">

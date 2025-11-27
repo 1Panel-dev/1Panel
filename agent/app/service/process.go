@@ -1,11 +1,15 @@
 package service
 
 import (
+	"bufio"
 	"fmt"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/websocket"
 	"github.com/shirou/gopsutil/v4/process"
+	"os"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -103,24 +107,20 @@ func (ps *ProcessService) GetProcessInfoByPID(pid int32) (*websocket.PsProcessDa
 		data.CmdLine = cmdline
 	}
 
-	if memInfo, err := p.MemoryInfo(); err == nil {
-		data.Rss = common.FormatBytes(memInfo.RSS)
-		data.VMS = common.FormatBytes(memInfo.VMS)
-		data.HWM = common.FormatBytes(memInfo.HWM)
-		data.Data = common.FormatBytes(memInfo.Data)
-		data.Stack = common.FormatBytes(memInfo.Stack)
-		data.Locked = common.FormatBytes(memInfo.Locked)
-		data.Swap = common.FormatBytes(memInfo.Swap)
-		data.RssValue = memInfo.RSS
-	} else {
-		data.Rss = "--"
-		data.Data = "--"
-		data.VMS = "--"
-		data.HWM = "--"
-		data.Stack = "--"
-		data.Locked = "--"
-		data.Swap = "--"
-		data.RssValue = 0
+	if memDetail, err := getMemoryDetail(p.Pid); err == nil {
+		data.Rss = common.FormatBytes(memDetail.RSS)
+		data.VMS = common.FormatBytes(memDetail.VMS)
+		data.HWM = common.FormatBytes(memDetail.HWM)
+		data.Data = common.FormatBytes(memDetail.Data)
+		data.Stack = common.FormatBytes(memDetail.Stack)
+		data.Locked = common.FormatBytes(memDetail.Locked)
+		data.Swap = common.FormatBytes(memDetail.Swap)
+		data.Dirty = common.FormatBytes(memDetail.Dirty)
+		data.RssValue = memDetail.RSS
+		data.PSS = common.FormatBytes(memDetail.PSS)
+		data.USS = common.FormatBytes(memDetail.USS)
+		data.Shared = common.FormatBytes(memDetail.Shared)
+		data.Text = common.FormatBytes(memDetail.Text)
 	}
 
 	if envs, err := p.Environ(); err == nil {
@@ -132,4 +132,153 @@ func (ps *ProcessService) GetProcessInfoByPID(pid int32) (*websocket.PsProcessDa
 	}
 
 	return data, nil
+}
+
+type MemoryDetail struct {
+	RSS    uint64
+	VMS    uint64
+	HWM    uint64
+	Data   uint64
+	Stack  uint64
+	Locked uint64
+	Swap   uint64
+
+	PSS    uint64
+	USS    uint64
+	Shared uint64
+	Text   uint64
+	Dirty  uint64
+}
+
+func getMemoryDetail(pid int32) (*MemoryDetail, error) {
+	mem := &MemoryDetail{}
+
+	if err := readStatus(pid, mem); err != nil {
+		return nil, err
+	}
+
+	if err := readSmapsRollup(pid, mem); err != nil {
+		if err := readSmaps(pid, mem); err != nil {
+			return nil, err
+		}
+	}
+	return mem, nil
+}
+
+func readStatus(pid int32, mem *MemoryDetail) error {
+	filePath := fmt.Sprintf("/proc/%d/status", pid)
+	file, err := os.Open(filePath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+
+	for scanner.Scan() {
+		line := scanner.Text()
+		fields := strings.Fields(line)
+		if len(fields) < 2 {
+			continue
+		}
+
+		key := strings.TrimSuffix(fields[0], ":")
+		value, _ := strconv.ParseUint(fields[1], 10, 64)
+		value *= 1024
+
+		switch key {
+		case "VmRSS":
+			mem.RSS = value
+		case "VmSize":
+			mem.VMS = value
+		case "VmData":
+			mem.Data = value
+		case "VmSwap":
+			mem.Swap = value
+		case "VmExe":
+			mem.Text = value
+		case "RssShmem":
+			mem.Shared = value
+		case "VmHWM":
+			mem.HWM = value
+		case "VmStk":
+			mem.Stack = value
+		case "VmLck":
+			mem.Locked = value
+		}
+	}
+
+	return scanner.Err()
+}
+
+func readSmapsRollup(pid int32, mem *MemoryDetail) error {
+	filePath := fmt.Sprintf("/proc/%d/smaps_rollup", pid)
+	file, err := os.Open(filePath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+
+	for scanner.Scan() {
+		line := scanner.Text()
+		fields := strings.Fields(line)
+		if len(fields) < 2 {
+			continue
+		}
+
+		key := strings.TrimSuffix(fields[0], ":")
+		value, _ := strconv.ParseUint(fields[1], 10, 64)
+		value *= 1024
+
+		switch key {
+		case "Pss":
+			mem.PSS = value
+		case "Private_Clean", "Private_Dirty":
+			mem.USS += value
+		case "Shared_Clean", "Shared_Dirty":
+			if mem.Shared == 0 {
+				mem.Shared = value
+			}
+		}
+	}
+
+	return scanner.Err()
+}
+
+func readSmaps(pid int32, mem *MemoryDetail) error {
+	filePath := fmt.Sprintf("/proc/%d/smaps", pid)
+	file, err := os.Open(filePath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+
+	for scanner.Scan() {
+		line := scanner.Text()
+		fields := strings.Fields(line)
+		if len(fields) < 2 {
+			continue
+		}
+
+		key := strings.TrimSuffix(fields[0], ":")
+		value, _ := strconv.ParseUint(fields[1], 10, 64)
+		value *= 1024
+
+		switch key {
+		case "Pss":
+			mem.PSS += value
+		case "Private_Clean", "Private_Dirty":
+			mem.USS += value
+		case "Shared_Clean", "Shared_Dirty":
+			if mem.Shared == 0 {
+				mem.Shared += value
+			}
+		}
+	}
+
+	return scanner.Err()
 }

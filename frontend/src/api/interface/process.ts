@@ -25,6 +25,11 @@ export namespace Process {
         stack: string;
         locked: string;
         swap: string;
+        dirty: string;
+        pss: string;
+        uss: string;
+        shared: string;
+        text: string;
 
         cpuValue: number;
         rssValue: number;
