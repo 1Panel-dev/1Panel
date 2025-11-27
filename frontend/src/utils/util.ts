@@ -56,14 +56,17 @@ export function getBrowserLang() {
     return defaultBrowserLang;
 }
 
-export function loadUpTime(uptime: number) {
+export function loadUpTime(timeSince: string) {
+    const targetTime = new Date(timeSince);
+    const currentTime = new Date();
+    const uptime = (currentTime.getTime() - targetTime.getTime()) / 1000;
     if (uptime <= 0) {
         return '-';
     }
     let days = Math.floor(uptime / 86400);
     let hours = Math.floor((uptime % 86400) / 3600);
     let minutes = Math.floor((uptime % 3600) / 60);
-    let seconds = uptime % 60;
+    let seconds = Math.floor(uptime % 60);
     if (days !== 0) {
         return (
             days +

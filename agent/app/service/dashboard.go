@@ -180,7 +180,7 @@ func (u *DashboardService) LoadCurrentInfo(ioOption string, netOption string) *d
 	var currentInfo dto.DashboardCurrent
 	hostInfo, _ := psutil.HOST.GetHostInfo(false)
 	currentInfo.Uptime = hostInfo.Uptime
-	currentInfo.TimeSinceUptime = time.Now().Add(-time.Duration(hostInfo.Uptime) * time.Second).Format(constant.DateTimeLayout)
+	currentInfo.TimeSinceUptime = time.Unix(int64(hostInfo.BootTime), 0).Format(constant.DateTimeLayout)
 	currentInfo.Procs = hostInfo.Procs
 	currentInfo.CPUTotal, _ = psutil.CPUInfo.GetLogicalCores(false)
 

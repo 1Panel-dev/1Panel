@@ -261,7 +261,7 @@
                                             <template #label>
                                                 <span class="system-label">{{ $t('home.runningTime') }}</span>
                                             </template>
-                                            {{ loadUpTime(currentInfo.uptime) }}
+                                            {{ loadUpTime(currentInfo.timeSinceUptime) }}
                                         </el-descriptions-item>
                                     </el-descriptions>
                                 </el-scrollbar>
@@ -689,7 +689,7 @@ const handleCopy = () => {
         '\n' +
         i18n.global.t('home.runningTime') +
         ': ' +
-        loadUpTime(currentInfo.value.uptime) +
+        loadUpTime(currentInfo.value.timeSinceUptime) +
         '\n';
     copyText(content);
 };
