@@ -77,6 +77,7 @@
                     :header="$t('menu.monitor')"
                     class="card-interval chart-card"
                     v-loading="!chartsOption['networkChart']"
+                    @mouseenter="refreshOptionsOnHover"
                 >
                     <template #header-r>
                         <el-radio-group
@@ -340,11 +341,9 @@ const globalStore = GlobalStore();
 
 const DASHBOARD_CACHE_KEY = 'dashboardCache';
 const DASHBOARD_CACHE_TTL = {
-    baseInfo: 90 * 1000,
-    simpleNodes: 60 * 1000,
-    safeStatus: 90 * 1000,
-    netOptions: 10 * 60 * 1000,
-    ioOptions: 10 * 60 * 1000,
+    safeStatus: 10 * 60 * 1000,
+    netOptions: 60 * 60 * 1000,
+    ioOptions: 60 * 60 * 1000,
 };
 const UPGRADE_CHECK_KEY = 'upgradeChecked';
 const UPGRADE_CHECK_EXPIRE = 24 * 60 * 60 * 1000;
@@ -376,6 +375,9 @@ const timeNetDatas = ref<Array<string>>([]);
 const simpleNodes = ref([]);
 const ioOptions = ref();
 const netOptions = ref();
+const netOptionsFromCache = ref(false);
+const ioOptionsFromCache = ref(false);
+const hasRefreshedOptionsOnHover = ref(false);
 
 const licenseRef = ref();
 const quickJumpRef = ref();
@@ -515,28 +517,24 @@ const applyDefaultNetOption = () => {
     }
 };
 
-const onLoadNetworkOptions = async () => {
-    const cache = getDashboardCache('netOptions');
+const onLoadNetworkOptions = async (force?: boolean) => {
+    const cache = force ? null : getDashboardCache('netOptions');
     if (cache !== null) {
         netOptions.value = cache;
+        netOptionsFromCache.value = true;
         applyDefaultNetOption();
         return;
     }
     const res = await getNetworkOptions();
     netOptions.value = res.data;
+    netOptionsFromCache.value = false;
     setDashboardCache('netOptions', res.data, DASHBOARD_CACHE_TTL.netOptions);
     applyDefaultNetOption();
 };
 
 const onLoadSimpleNode = async () => {
-    const cache = getDashboardCache('simpleNodes');
-    if (cache !== null) {
-        simpleNodes.value = cache;
-        return;
-    }
     const res = await listAllSimpleNodes();
     simpleNodes.value = res.data || [];
-    setDashboardCache('simpleNodes', simpleNodes.value, DASHBOARD_CACHE_TTL.simpleNodes);
 };
 
 const applyDefaultIOOption = () => {
@@ -550,15 +548,17 @@ const applyDefaultIOOption = () => {
     }
 };
 
-const onLoadIOOptions = async () => {
-    const cache = getDashboardCache('ioOptions');
+const onLoadIOOptions = async (force?: boolean) => {
+    const cache = force ? null : getDashboardCache('ioOptions');
     if (cache !== null) {
         ioOptions.value = cache;
+        ioOptionsFromCache.value = true;
         applyDefaultIOOption();
         return;
     }
     const res = await getIOOptions();
     ioOptions.value = res.data;
+    ioOptionsFromCache.value = false;
     setDashboardCache('ioOptions', ioOptions.value, DASHBOARD_CACHE_TTL.ioOptions);
     applyDefaultIOOption();
 };
@@ -573,14 +573,8 @@ const onLoadBaseInfo = async (isInit: boolean, range: string) => {
         netBytesRecvs.value = [];
         timeNetDatas.value = [];
     }
-    const cacheKey = `baseInfo-${searchInfo.ioOption}-${searchInfo.netOption}`;
-    let baseData = getDashboardCache(cacheKey);
-    if (!baseData) {
-        const res = await loadBaseInfo(searchInfo.ioOption, searchInfo.netOption);
-        baseData = res.data;
-        setDashboardCache(cacheKey, baseData, DASHBOARD_CACHE_TTL.baseInfo);
-    }
-    baseInfo.value = baseData;
+    const res = await loadBaseInfo(searchInfo.ioOption, searchInfo.netOption);
+    baseInfo.value = res.data;
     updateCurrentInfo(baseInfo.value.currentInfo);
     onLoadCurrentInfo();
     isStatusInit.value = false;
@@ -622,9 +616,10 @@ const toggleSensitiveInfo = () => {
 const refreshDashboard = async () => {
     clearDashboardCache();
     localStorage.removeItem(UPGRADE_CHECK_KEY);
+    hasRefreshedOptionsOnHover.value = false;
     await onLoadBaseInfo(false, 'all');
-    await Promise.allSettled([onLoadSimpleNode(), onLoadNetworkOptions(), onLoadIOOptions(), loadSafeStatus()]);
-    loadUpgradeStatus();
+    await Promise.allSettled([onLoadSimpleNode(), onLoadNetworkOptions(true), onLoadIOOptions(true), loadSafeStatus()]);
+    await loadUpgradeStatus();
 };
 
 const jumpPanel = (row: any) => {
@@ -818,6 +813,18 @@ const toUpload = () => {
     licenseRef.value.acceptParams();
 };
 
+const refreshOptionsOnHover = async () => {
+    if (hasRefreshedOptionsOnHover.value) return;
+    if (!netOptionsFromCache.value && !ioOptionsFromCache.value) return;
+    hasRefreshedOptionsOnHover.value = true;
+    if (netOptionsFromCache.value) {
+        await onLoadNetworkOptions(true);
+    }
+    if (ioOptionsFromCache.value) {
+        await onLoadIOOptions(true);
+    }
+};
+
 const scheduleDeferredFetch = () => {
     setTimeout(() => {
         onLoadSimpleNode();
@@ -836,6 +843,7 @@ const scheduleDeferredFetch = () => {
 const fetchData = async () => {
     window.addEventListener('focus', onFocus);
     window.addEventListener('blur', onBlur);
+    hasRefreshedOptionsOnHover.value = false;
     await loadSafeStatus();
     await onLoadBaseInfo(true, 'all');
     scheduleDeferredFetch();
