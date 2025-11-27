@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"encoding/gob"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/core/init/auth"
 	"net"
 	"net/http"
 	"os"
@@ -53,6 +54,8 @@ func Start() {
 	} else {
 		gin.SetMode(gin.ReleaseMode)
 	}
+
+	global.IPTracker = auth.NewIPTracker()
 
 	tcpItem := "tcp4"
 	if global.CONF.Conn.Ipv6 == constant.StatusEnable {

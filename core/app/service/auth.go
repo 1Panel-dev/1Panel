@@ -3,8 +3,6 @@ package service
 import (
 	"crypto/hmac"
 	"encoding/base64"
-	"strconv"
-
 	"github.com/1Panel-dev/1Panel/core/app/dto"
 	"github.com/1Panel-dev/1Panel/core/app/repo"
 	"github.com/1Panel-dev/1Panel/core/buserr"
@@ -13,6 +11,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/utils/encrypt"
 	"github.com/1Panel-dev/1Panel/core/utils/mfa"
 	"github.com/gin-gonic/gin"
+	"strconv"
 )
 
 type AuthService struct{}

@@ -2,7 +2,6 @@ export namespace Login {
     export interface ReqLoginForm {
         name: string;
         password: string;
-        ignoreCaptcha: boolean;
         captcha: string;
         captchaID: string;
         authMethod: string;
@@ -36,5 +35,6 @@ export namespace Login {
         panelName: string;
         theme: string;
         isOffLine: boolean;
+        needCaptcha: boolean;
     }
 }

@@ -1,6 +1,7 @@
 package global
 
 import (
+	"github.com/1Panel-dev/1Panel/core/init/auth"
 	"github.com/1Panel-dev/1Panel/core/init/session/psession"
 	"github.com/go-playground/validator/v10"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
@@ -28,6 +29,8 @@ var (
 	Cron *cron.Cron
 
 	ScriptSyncJobID cron.EntryID
+
+	IPTracker *auth.IPTracker
 )
 
 type DBOption func(*gorm.DB) *gorm.DB

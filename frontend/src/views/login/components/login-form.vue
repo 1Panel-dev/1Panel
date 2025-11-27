@@ -220,7 +220,6 @@ const loginFormRef = ref<FormInstance>();
 const loginForm = reactive({
     name: '',
     password: '',
-    ignoreCaptcha: true,
     captcha: '',
     captchaID: '',
     authMethod: 'session',
@@ -318,7 +317,6 @@ const login = (formEl: FormInstance | undefined) => {
         let requestLoginForm = {
             name: loginForm.name,
             password: encryptPassword(loginForm.password),
-            ignoreCaptcha: globalStore.ignoreCaptcha,
             captcha: loginForm.captcha,
             captchaID: captcha.captchaID,
             authMethod: 'session',
@@ -418,6 +416,7 @@ const getSetting = async () => {
         isFxplay.value = res.data.isFxplay;
         globalStore.isFxplay = isFxplay.value;
         globalStore.isOffLine = res.data.isOffLine;
+        globalStore.ignoreCaptcha = !res.data.needCaptcha;
 
         document.title = res.data.panelName;
         i18n.warnHtmlMessage = false;

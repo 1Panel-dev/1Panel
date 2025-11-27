@@ -2,6 +2,7 @@ package v2
 
 import (
 	"encoding/base64"
+	"github.com/1Panel-dev/1Panel/core/utils/common"
 	"os"
 	"path"
 
@@ -29,12 +30,15 @@ func (b *BaseApi) Login(c *gin.Context) {
 		return
 	}
 
-	if !req.IgnoreCaptcha {
+	ip := common.GetRealClientIP(c)
+	needCaptcha := global.IPTracker.NeedCaptcha(ip)
+	if needCaptcha {
 		if errMsg := captcha.VerifyCode(req.CaptchaID, req.Captcha); errMsg != "" {
 			helper.BadAuth(c, errMsg, nil)
 			return
 		}
 	}
+
 	entranceItem := c.Request.Header.Get("EntranceCode")
 	var entrance []byte
 	if len(entranceItem) != 0 {
@@ -50,13 +54,18 @@ func (b *BaseApi) Login(c *gin.Context) {
 	user, msgKey, err := authService.Login(c, req, string(entrance))
 	go saveLoginLogs(c, err)
 	if msgKey == "ErrAuth" || msgKey == "ErrEntrance" {
+		if msgKey == "ErrAuth" {
+			global.IPTracker.SetNeedCaptcha(ip)
+		}
 		helper.BadAuth(c, msgKey, err)
 		return
 	}
 	if err != nil {
+		global.IPTracker.SetNeedCaptcha(ip)
 		helper.InternalServer(c, err)
 		return
 	}
+	global.IPTracker.Clear(ip)
 	helper.SuccessWithData(c, user)
 }
 
@@ -151,15 +160,18 @@ func (b *BaseApi) GetLoginSetting(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
+	ip := common.GetRealClientIP(c)
+	needCaptcha := global.IPTracker.NeedCaptcha(ip)
 	res := &dto.LoginSetting{
-		IsDemo:    global.CONF.Base.IsDemo,
-		IsIntl:    global.CONF.Base.IsIntl,
-		IsFxplay:  global.CONF.Base.IsFxplay,
-		IsOffLine: global.CONF.Base.IsOffLine,
-		Language:  settingInfo.Language,
-		MenuTabs:  settingInfo.MenuTabs,
-		PanelName: settingInfo.PanelName,
-		Theme:     settingInfo.Theme,
+		IsDemo:      global.CONF.Base.IsDemo,
+		IsIntl:      global.CONF.Base.IsIntl,
+		IsFxplay:    global.CONF.Base.IsFxplay,
+		IsOffLine:   global.CONF.Base.IsOffLine,
+		Language:    settingInfo.Language,
+		MenuTabs:    settingInfo.MenuTabs,
+		PanelName:   settingInfo.PanelName,
+		Theme:       settingInfo.Theme,
+		NeedCaptcha: needCaptcha,
 	}
 	helper.SuccessWithData(c, res)
 }

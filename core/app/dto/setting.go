@@ -241,12 +241,13 @@ type AppstoreConfig struct {
 }
 
 type LoginSetting struct {
-	IsDemo    bool   `json:"isDemo"`
-	IsIntl    bool   `json:"isIntl"`
-	IsOffLine bool   `json:"isOffLine"`
-	IsFxplay  bool   `json:"isFxplay"`
-	Language  string `json:"language"`
-	MenuTabs  string `json:"menuTabs"`
-	PanelName string `json:"panelName"`
-	Theme     string `json:"theme"`
+	IsDemo      bool   `json:"isDemo"`
+	IsIntl      bool   `json:"isIntl"`
+	IsOffLine   bool   `json:"isOffLine"`
+	IsFxplay    bool   `json:"isFxplay"`
+	Language    string `json:"language"`
+	MenuTabs    string `json:"menuTabs"`
+	PanelName   string `json:"panelName"`
+	Theme       string `json:"theme"`
+	NeedCaptcha bool   `json:"needCaptcha"`
 }
