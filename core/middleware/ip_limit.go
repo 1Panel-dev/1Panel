@@ -12,9 +12,13 @@ import (
 func WhiteAllow() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenString := c.GetHeader("X-Panel-Local-Token")
-		clientIP := c.ClientIP()
+		clientIP := common.GetRealClientIP(c)
 		if clientIP == "127.0.0.1" && tokenString != "" && c.Request.URL.Path == "/api/v2/core/xpack/sync/ssl" {
 			c.Set("LOCAL_REQUEST", true)
+			c.Next()
+			return
+		}
+		if common.IsPrivateIP(clientIP) {
 			c.Next()
 			return
 		}

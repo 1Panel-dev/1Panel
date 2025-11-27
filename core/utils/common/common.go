@@ -245,3 +245,19 @@ func LoadParams(param string) string {
 	}
 	return info
 }
+
+func GetRealClientIP(c *gin.Context) string {
+	addr := c.Request.RemoteAddr
+	if ip, _, err := net.SplitHostPort(addr); err == nil {
+		return ip
+	}
+	return addr
+}
+
+func IsPrivateIP(ipStr string) bool {
+	ip := net.ParseIP(ipStr)
+	if ip == nil {
+		return false
+	}
+	return ip.IsPrivate() || ip.IsLoopback()
+}

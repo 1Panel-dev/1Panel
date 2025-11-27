@@ -66,7 +66,7 @@ func setWebStatic(rootRouter *gin.RouterGroup) {
 }
 
 func Routers() *gin.Engine {
-	Router = gin.Default()
+	Router = gin.New()
 	Router.Use(i18n.UseI18n())
 	Router.Use(middleware.WhiteAllow())
 	Router.Use(middleware.BindDomain())

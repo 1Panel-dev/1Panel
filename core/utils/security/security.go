@@ -163,7 +163,11 @@ func checkIPLimit(c *gin.Context) bool {
 	if len(status.Value) == 0 {
 		return true
 	}
-	clientIP := c.ClientIP()
+	clientIP := common.GetRealClientIP(c)
+	if common.IsPrivateIP(clientIP) {
+		return true
+	}
+
 	for _, ip := range strings.Split(status.Value, ",") {
 		if len(ip) == 0 {
 			continue
