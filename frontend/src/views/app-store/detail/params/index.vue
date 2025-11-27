@@ -118,12 +118,20 @@
             </div>
             <span class="input-help" v-if="p.description">{{ getDescription(p) }}</span>
         </el-form-item>
-        <el-form-item v-if="form[p.envKey] == 'mysql'" :label="$t('database.format')" prop="format">
+        <el-form-item
+            v-if="form[p.envKey] == 'mysql' || form[p.envKey] == 'mariadb'"
+            :label="$t('database.format')"
+            prop="format"
+        >
             <el-select filterable v-model="form.format" @change="loadCollations()">
                 <el-option v-for="item of formatOptions" :key="item.format" :label="item.format" :value="item.format" />
             </el-select>
         </el-form-item>
-        <el-form-item v-if="form[p.envKey] == 'mysql'" :label="$t('database.collation')" prop="collation">
+        <el-form-item
+            v-if="form[p.envKey] == 'mysql' || form[p.envKey] == 'mariadb'"
+            :label="$t('database.collation')"
+            prop="collation"
+        >
             <el-select filterable v-model="form.collation">
                 <el-option v-for="item of collationOptions" :key="item" :label="item" :value="item" />
             </el-select>
@@ -256,7 +264,7 @@ const handleParams = () => {
 const getServices = async (childKey: string, key: string | undefined, pObj: ParamObj | undefined) => {
     pObj.services = [];
     appKey.value = key || '';
-    if (appKey.value == 'mysql') {
+    if (appKey.value == 'mysql' || appKey.value == 'mariadb') {
         form.format = 'utf8mb4';
     }
     await getAppService(key).then((res) => {
@@ -286,7 +294,7 @@ const changeService = (value: string, services: App.AppService[]) => {
             });
         }
     });
-    if (appKey.value == 'mysql') {
+    if (appKey.value == 'mysql' || appKey.value == 'mariadb') {
         loadOptions(value);
     }
     updateParam();
