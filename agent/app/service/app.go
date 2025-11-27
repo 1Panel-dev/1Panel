@@ -862,13 +862,15 @@ func getAppList() (*dto.AppList, error) {
 		return nil, err
 	}
 	listFile := filepath.Join(global.Dir.ResourceDir, "1panel.json")
-	content, err := os.ReadFile(listFile)
+	file, err := os.Open(listFile)
 	if err != nil {
 		return nil, err
 	}
-	if err = json.Unmarshal(content, list); err != nil {
+	defer file.Close()
+	if err = json.NewDecoder(file).Decode(list); err != nil {
 		return nil, err
 	}
+
 	return list, nil
 }
 
