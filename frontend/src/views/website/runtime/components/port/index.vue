@@ -13,7 +13,11 @@
             </el-col>
             <el-col :span="7">
                 <el-text>{{ $t('app.allowPort') }}</el-text>
-                <el-switch class="ml-1" v-model="port.hostIP" :active-value="''" :inactive-value="'127.0.0.1'" />
+                <el-switch
+                    class="ml-1"
+                    :model-value="port.hostIP === ''"
+                    @update:model-value="handleSwitchChange($event, index)"
+                />
             </el-col>
             <el-col :span="2">
                 <el-form-item>
@@ -46,6 +50,10 @@ const props = defineProps({
 const rules = reactive<FormRules>({
     port: [Rules.requiredInput, Rules.paramPort, checkNumberRange(1, 65535)],
 });
+
+const handleSwitchChange = (value: boolean, index: number) => {
+    props.exposedPorts[index].hostIP = value ? '' : '127.0.0.1';
+};
 
 const addPort = () => {
     props.exposedPorts.push({
