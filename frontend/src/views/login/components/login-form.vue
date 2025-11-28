@@ -192,7 +192,7 @@ import { useI18n } from 'vue-i18n';
 import { encryptPassword } from '@/utils/util';
 import { getXpackSettingForTheme } from '@/utils/xpack';
 import { routerToName } from '@/utils/router';
-import { changeToLocal } from '@/utils/node';
+import { changeToLocal, setDefaultNodeInfo } from '@/utils/node';
 
 const i18n = useI18n();
 const themeConfig = computed(() => globalStore.themeConfig);
@@ -345,6 +345,9 @@ const login = (formEl: FormInstance | undefined) => {
             tabsStore.removeAllTabs();
             changeToLocal();
             MsgSuccess(i18n.t('commons.msg.loginSuccess'));
+            setDefaultNodeInfo();
+            localStorage.removeItem('dashboardCache');
+            localStorage.removeItem('upgradeChecked');
             routerToName('home');
             document.onkeydown = null;
         } catch (res) {
@@ -386,6 +389,9 @@ const mfaLogin = async (auto: boolean) => {
             tabsStore.removeAllTabs();
             MsgSuccess(i18n.t('commons.msg.loginSuccess'));
             changeToLocal();
+            setDefaultNodeInfo();
+            localStorage.removeItem('dashboardCache');
+            localStorage.removeItem('upgradeChecked');
             routerToName('home');
             document.onkeydown = null;
         } catch (res) {

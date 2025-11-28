@@ -303,10 +303,7 @@
         <template v-for="(item, index) of currentInfo.xpuData" :key="index">
             <el-col :xs="6" :sm="6" :md="3" :lg="3" :xl="3" align="center" v-if="isShow('xpu', index)">
                 <el-popover :hide-after="20" :teleported="false" :width="400" v-if="chartsOption[`xpu${index}`]">
-                    <el-descriptions :title="item.deviceName" direction="vertical" :column="4" size="small">
-                        <el-descriptions-item :label="$t('monitor.gpuUtil')">
-                            {{ item.memoryUtil }}
-                        </el-descriptions-item>
+                    <el-descriptions :title="item.deviceName" direction="vertical" :column="3" size="small">
                         <el-descriptions-item :label="$t('monitor.temperature')">
                             {{ item.temperature }}
                         </el-descriptions-item>

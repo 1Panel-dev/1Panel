@@ -183,6 +183,8 @@ const changeNode = (command: string) => {
                 globalStore.currentNode = 'local';
                 globalStore.currentNodeAddr = item.addr;
                 loadGlobalSetting();
+                localStorage.removeItem('dashboardCache');
+                localStorage.removeItem('upgradeChecked');
                 loadProductProFromDB();
                 routerToNameWithQuery('home', { t: Date.now() });
                 return;
@@ -200,6 +202,8 @@ const changeNode = (command: string) => {
                 return;
             }
             loadGlobalSetting();
+            localStorage.removeItem('dashboardCache');
+            localStorage.removeItem('upgradeChecked');
             globalStore.currentNode = command || 'local';
             globalStore.currentNodeAddr = item.addr;
             loadProductProFromDB();
@@ -238,10 +242,6 @@ const logout = () => {
     })
         .then(async () => {
             await logOutApi();
-            sessionStorage.removeItem('dashboardCache');
-            localStorage.removeItem('dashboardCache');
-            sessionStorage.removeItem('upgradeChecked');
-            localStorage.removeItem('upgradeChecked');
             router.push({ name: 'entrance', params: { code: globalStore.entrance } });
             globalStore.setLogStatus(false);
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));

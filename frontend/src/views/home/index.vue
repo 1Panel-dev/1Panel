@@ -345,8 +345,6 @@ const DASHBOARD_CACHE_TTL = {
     netOptions: 60 * 60 * 1000,
     ioOptions: 60 * 60 * 1000,
 };
-const UPGRADE_CHECK_KEY = 'upgradeChecked';
-const UPGRADE_CHECK_EXPIRE = 24 * 60 * 60 * 1000;
 
 const statusRef = ref();
 const appRef = ref();
@@ -586,11 +584,9 @@ const toggleSensitiveInfo = () => {
 
 const refreshDashboard = async () => {
     clearDashboardCache();
-    localStorage.removeItem(UPGRADE_CHECK_KEY);
     hasRefreshedOptionsOnHover.value = false;
     await onLoadBaseInfo(false, 'all');
     await Promise.allSettled([onLoadSimpleNode(), onLoadNetworkOptions(true), onLoadIOOptions(true), loadSafeStatus()]);
-    await loadUpgradeStatus();
 };
 
 const jumpPanel = (row: any) => {
@@ -733,15 +729,12 @@ const hideEntrance = () => {
 };
 
 const loadUpgradeStatus = async () => {
-    const checkedAt = Number(localStorage.getItem(UPGRADE_CHECK_KEY));
-    if (checkedAt && Date.now() - checkedAt < UPGRADE_CHECK_EXPIRE) return;
     const res = await loadUpgradeInfo();
     if (res && (res.data.testVersion || res.data.newVersion || res.data.latestVersion)) {
         globalStore.hasNewVersion = true;
     } else {
         globalStore.hasNewVersion = false;
     }
-    localStorage.setItem(UPGRADE_CHECK_KEY, Date.now().toString());
 };
 
 const loadSafeStatus = async () => {
@@ -799,25 +792,21 @@ const refreshOptionsOnHover = async () => {
 const scheduleDeferredFetch = () => {
     setTimeout(() => {
         onLoadSimpleNode();
-    }, 200);
-    setTimeout(() => {
         onLoadNetworkOptions();
-    }, 400);
-    setTimeout(() => {
         onLoadIOOptions();
     }, 600);
-    setTimeout(() => {
-        loadUpgradeStatus();
-    }, 800);
 };
 
 const fetchData = async () => {
     window.addEventListener('focus', onFocus);
     window.addEventListener('blur', onBlur);
     hasRefreshedOptionsOnHover.value = false;
-    await loadSafeStatus();
-    await onLoadBaseInfo(true, 'all');
+    loadSafeStatus();
+    onLoadBaseInfo(true, 'all');
     scheduleDeferredFetch();
+    setTimeout(() => {
+        loadUpgradeStatus();
+    }, 2000);
 };
 
 const loadWelcome = async () => {
