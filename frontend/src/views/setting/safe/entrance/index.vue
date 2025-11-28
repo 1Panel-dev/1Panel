@@ -31,6 +31,7 @@ import { updateSetting } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
 import { getRandomStr } from '@/utils/util';
 import { FormInstance } from 'element-plus';
+import { clearDashboardCacheByPrefix } from '@/utils/dashboardCache';
 const globalStore = GlobalStore();
 
 const emit = defineEmits<{ (e: 'search'): void }>();
@@ -82,6 +83,7 @@ const submitEntrance = async (formEl: FormInstance | undefined) => {
         loading.value = true;
         await updateSetting(param)
             .then(() => {
+                clearDashboardCacheByPrefix(['safeStatus']);
                 globalStore.setShowEntranceWarn(show.value);
                 globalStore.entrance = form.securityEntrance;
                 loading.value = false;

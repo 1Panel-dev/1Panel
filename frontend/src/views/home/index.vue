@@ -337,6 +337,7 @@ import { storeToRefs } from 'pinia';
 import { routerToFileWithPath, routerToPath } from '@/utils/router';
 import { getWelcomePage } from '@/api/modules/auth';
 import { clearDashboardCache, getDashboardCache, setDashboardCache } from '@/utils/dashboardCache';
+import { MsgSuccess } from '@/utils/message';
 const router = useRouter();
 const globalStore = GlobalStore();
 
@@ -480,9 +481,6 @@ const applyDefaultNetOption = () => {
     const defaultNet = globalStore.defaultNetwork || netOptions.value[0];
     if (defaultNet && searchInfo.netOption !== defaultNet) {
         searchInfo.netOption = defaultNet;
-        if (!isStatusInit.value) {
-            onLoadBaseInfo(false, 'network');
-        }
     }
 };
 
@@ -511,9 +509,6 @@ const applyDefaultIOOption = () => {
     const defaultIO = globalStore.defaultIO || ioOptions.value[0];
     if (defaultIO && searchInfo.ioOption !== defaultIO) {
         searchInfo.ioOption = defaultIO;
-        if (!isStatusInit.value) {
-            onLoadBaseInfo(false, 'io');
-        }
     }
 };
 
@@ -585,8 +580,8 @@ const toggleSensitiveInfo = () => {
 const refreshDashboard = async () => {
     clearDashboardCache();
     hasRefreshedOptionsOnHover.value = false;
-    await onLoadBaseInfo(false, 'all');
-    await Promise.allSettled([onLoadSimpleNode(), onLoadNetworkOptions(true), onLoadIOOptions(true), loadSafeStatus()]);
+    await Promise.allSettled([onLoadNetworkOptions(true), onLoadIOOptions(true), loadSafeStatus()]);
+    MsgSuccess(i18n.global.t('commons.msg.refreshSuccess'));
 };
 
 const jumpPanel = (row: any) => {
