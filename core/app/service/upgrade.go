@@ -187,13 +187,13 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 		}
 		initScriptPath := path.Join(tmpDir, "initscript")
 
-		if err := files.CopyItem(false, true, path.Join(initScriptPath, selCoreName), path.Join(svcCoreName, scriptCoreName)); err != nil {
+		if err := files.CopyItem(false, true, path.Join(initScriptPath, selCoreName), svcBasePath); err != nil {
 			global.LOG.Errorf("upgrade %s failed, err: %v", svcCoreName, err)
 			_ = settingRepo.Update("SystemStatus", "Free")
 			u.handleRollback(originalDir, 3)
 			return
 		}
-		if err := files.CopyItem(false, true, path.Join(initScriptPath, selAgentName), path.Join(svcAgentName, scriptAgentName)); err != nil {
+		if err := files.CopyItem(false, true, path.Join(initScriptPath, selAgentName), svcBasePath); err != nil {
 			global.LOG.Errorf("upgrade %s failed, err: %v", svcAgentName, err)
 			_ = settingRepo.Update("SystemStatus", "Free")
 			u.handleRollback(originalDir, 3)
