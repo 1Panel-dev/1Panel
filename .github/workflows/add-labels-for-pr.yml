@@ -6,6 +6,7 @@ permissions:
 jobs:
   generic_handler:
     name: Add Labels to PR
+    if: github.repository == '1Panel-dev/1Panel'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
