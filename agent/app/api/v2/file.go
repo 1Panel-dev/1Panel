@@ -521,9 +521,14 @@ func (b *BaseApi) Download(c *gin.Context) {
 	file, err := os.Open(filePath)
 	if err != nil {
 		helper.InternalServer(c, err)
+		return
 	}
 	defer file.Close()
-	info, _ := file.Stat()
+	info, err := file.Stat()
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
 	c.Header("Content-Length", strconv.FormatInt(info.Size(), 10))
 	c.Header("Content-Disposition", "attachment; filename*=utf-8''"+url.PathEscape(info.Name()))
 	http.ServeContent(c.Writer, c.Request, info.Name(), info.ModTime(), file)
