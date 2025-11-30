@@ -76,6 +76,9 @@ func (r RecycleBinService) Page(search dto.PageInfo) (int64, []response.RecycleB
 }
 
 func (r RecycleBinService) Create(create request.RecycleBinCreate) error {
+	if files.IsProtected(create.SourcePath) {
+		return buserr.New("ErrPathNotDelete")
+	}
 	op := files.NewFileOp()
 	if !op.Stat(create.SourcePath) {
 		return buserr.New("ErrLinkPathNotFound")
