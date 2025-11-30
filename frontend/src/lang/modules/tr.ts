@@ -2403,6 +2403,7 @@ const message = {
         SSLList: 'Sertifika Listesi',
         createDnsAccount: 'DNS hesabı',
         aliyun: 'Aliyun DNS',
+        aliEsa: 'Aliyun ESA',
         manual: 'Manuel çözümleme',
         key: 'Anahtar',
         check: 'Görüntüle',

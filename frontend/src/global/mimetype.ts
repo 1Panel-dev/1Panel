@@ -177,6 +177,10 @@ export const DNSTypes = [
         value: 'AliYun',
     },
     {
+        label: i18n.global.t('website.aliEsa'),
+        value: 'AliESA',
+    },
+    {
         label: i18n.global.t('website.tencentCloud'),
         value: 'TencentCloud',
     },

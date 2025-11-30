@@ -2344,6 +2344,7 @@ const message = {
         SSLList: 'Senarai Sijil',
         createDnsAccount: 'Akaun DNS',
         aliyun: 'Aliyun',
+        aliEsa: 'Aliyun ESA',
         manual: 'Penyelesaian Manual',
         key: 'Kunci',
         check: 'Lihat',

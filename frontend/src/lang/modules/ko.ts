@@ -2249,6 +2249,7 @@ const message = {
         SSLList: '인증서 목록',
         createDnsAccount: 'DNS 계정 생성',
         aliyun: '알리윤',
+        aliEsa: '알리윤 ESA',
         manual: '수동 설정',
         key: '키',
         check: '보기',

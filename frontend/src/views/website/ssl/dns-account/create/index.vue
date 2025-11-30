@@ -21,7 +21,10 @@
                     </el-form-item>
                     <div
                         v-if="
-                            account.type === 'AliYun' || account.type === 'HuaweiCloud' || account.type === 'BaiduCloud'
+                            account.type === 'AliYun' ||
+                            account.type === 'AliESA' ||
+                            account.type === 'HuaweiCloud' ||
+                            account.type === 'BaiduCloud'
                         "
                     >
                         <el-form-item label="Access key" prop="authorization.accessKey">

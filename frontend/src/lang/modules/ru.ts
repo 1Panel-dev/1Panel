@@ -2342,6 +2342,7 @@ const message = {
         SSLList: 'Список сертификатов',
         createDnsAccount: 'DNS аккаунт',
         aliyun: 'Aliyun',
+        aliEsa: 'Aliyun ESA',
         manual: 'Ручная настройка',
         key: 'Ключ',
         check: 'Просмотр',

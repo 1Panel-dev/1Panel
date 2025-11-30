@@ -5,6 +5,7 @@ import (
 	"github.com/go-acme/lego/v4/challenge"
 	"github.com/go-acme/lego/v4/providers/dns/acmedns"
 	"github.com/go-acme/lego/v4/providers/dns/alidns"
+	"github.com/go-acme/lego/v4/providers/dns/aliesa"
 	"github.com/go-acme/lego/v4/providers/dns/baiducloud"
 	"github.com/go-acme/lego/v4/providers/dns/clouddns"
 	"github.com/go-acme/lego/v4/providers/dns/cloudflare"
@@ -33,6 +34,7 @@ type DnsType string
 const (
 	DnsPod       DnsType = "DnsPod"
 	AliYun       DnsType = "AliYun"
+	AliESA       DnsType = "AliESA"
 	CloudFlare   DnsType = "CloudFlare"
 	CloudDns     DnsType = "CloudDns"
 	NameSilo     DnsType = "NameSilo"
@@ -110,6 +112,14 @@ func getDNSProviderConfig(dnsType DnsType, params string) (challenge.Provider, e
 		config.PollingInterval = pollingInterval
 		config.TTL = ttl
 		p, err = alidns.NewDNSProviderConfig(config)
+	case AliESA:
+		config := aliesa.NewDefaultConfig()
+		config.SecretKey = param.SecretKey
+		config.APIKey = param.AccessKey
+		config.PropagationTimeout = propagationTimeout
+		config.PollingInterval = pollingInterval
+		config.TTL = ttl
+		p, err = aliesa.NewDNSProviderConfig(config)
 	case CloudFlare:
 		config := cloudflare.NewDefaultConfig()
 		config.AuthEmail = param.Email

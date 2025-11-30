@@ -2370,6 +2370,7 @@ const message = {
         SSLList: 'Certificate List',
         createDnsAccount: 'DNS account',
         aliyun: 'Aliyun DNS',
+        aliEsa: 'Aliyun ESA',
         manual: 'Manual parsing',
         key: 'Key',
         check: 'View',

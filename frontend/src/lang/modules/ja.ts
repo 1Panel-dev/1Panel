@@ -2289,6 +2289,7 @@ const message = {
         SSLList: '証明書リスト',
         createDnsAccount: 'DNSアカウント',
         aliyun: 'エイリアン',
+        aliEsa: 'エイリアン ESA',
         manual: '手動解析',
         key: '鍵',
         check: 'ビュー',

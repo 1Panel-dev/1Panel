@@ -2202,6 +2202,7 @@ const message = {
         SSLList: '證書列表',
         createDnsAccount: 'DNS帳戶',
         aliyun: '阿里雲DNS',
+        aliEsa: '阿里雲ESA',
         manual: '手動解析',
         key: '金鑰',
         check: '查看',
