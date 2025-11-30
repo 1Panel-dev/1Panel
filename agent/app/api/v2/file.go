@@ -265,7 +265,7 @@ func (b *BaseApi) GetContent(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	if info.Size > 10*1024 {
+	if info.Size > 2*1024 && info.Size < 5*1024*1024 {
 		helper.SuccessWithDataGzipped(c, info)
 	} else {
 		helper.SuccessWithData(c, info)
