@@ -90,7 +90,7 @@ func (b *BaseApi) GetFileTree(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithData(c, tree)
+	helper.SuccessWithDataGzipped(c, tree)
 }
 
 // @Tags File
