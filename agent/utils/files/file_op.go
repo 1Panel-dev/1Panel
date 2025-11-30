@@ -33,6 +33,40 @@ import (
 	"github.com/spf13/afero"
 )
 
+var protectedPaths = []string{
+	"/",
+	"/bin",
+	"/sbin",
+	"/etc",
+	"/boot",
+	"/usr",
+	"/lib",
+	"/lib64",
+	"/dev",
+	"/proc",
+	"/sys",
+	"/root",
+}
+
+func isProtected(path string) bool {
+	real, err := filepath.EvalSymlinks(path)
+	if err == nil {
+		path = real
+	}
+
+	abs, err := filepath.Abs(path)
+	if err == nil {
+		path = abs
+	}
+
+	for _, p := range protectedPaths {
+		if path == p || strings.HasPrefix(path, p+"/") {
+			return true
+		}
+	}
+	return false
+}
+
 type FileOp struct {
 	Fs afero.Fs
 }
@@ -104,6 +138,9 @@ func (f FileOp) LinkFile(source string, dst string, isSymlink bool) error {
 }
 
 func (f FileOp) DeleteDir(dst string) error {
+	if isProtected(dst) {
+		return buserr.New("ErrPathNotDelete")
+	}
 	return f.Fs.RemoveAll(dst)
 }
 
@@ -113,14 +150,23 @@ func (f FileOp) Stat(dst string) bool {
 }
 
 func (f FileOp) DeleteFile(dst string) error {
+	if isProtected(dst) {
+		return buserr.New("ErrPathNotDelete")
+	}
 	return f.Fs.Remove(dst)
 }
 
 func (f FileOp) CleanDir(dst string) error {
+	if isProtected(dst) {
+		return buserr.New("ErrPathNotDelete")
+	}
 	return cmd.RunDefaultBashCf("rm -rf %s/*", dst)
 }
 
 func (f FileOp) RmRf(dst string) error {
+	if isProtected(dst) {
+		return buserr.New("ErrPathNotDelete")
+	}
 	return cmd.RunDefaultBashCf("rm -rf %s", dst)
 }
 
