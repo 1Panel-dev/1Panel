@@ -1,13 +1,14 @@
 package v2
 
 import (
-	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"io"
 	"mime/multipart"
 	"net/http"
 	"net/url"
 	"reflect"
 	"strconv"
+
+	"github.com/1Panel-dev/1Panel/agent/app/model"
 
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
@@ -34,7 +35,7 @@ func (b *BaseApi) PageWebsiteSSL(c *gin.Context) {
 			helper.InternalServer(c, err)
 			return
 		}
-		helper.SuccessWithData(c, dto.PageResult{
+		helper.SuccessWithDataGzipped(c, dto.PageResult{
 			Total: total,
 			Items: accounts,
 		})
@@ -44,7 +45,7 @@ func (b *BaseApi) PageWebsiteSSL(c *gin.Context) {
 			helper.InternalServer(c, err)
 			return
 		}
-		helper.SuccessWithData(c, list)
+		helper.SuccessWithDataGzipped(c, list)
 	}
 }
 

@@ -265,7 +265,11 @@ func (b *BaseApi) GetContent(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithData(c, info)
+	if info.Size > 10*1024 {
+		helper.SuccessWithDataGzipped(c, info)
+	} else {
+		helper.SuccessWithData(c, info)
+	}
 }
 
 // @Tags File

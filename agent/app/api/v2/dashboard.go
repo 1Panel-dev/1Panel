@@ -37,7 +37,7 @@ func (b *BaseApi) LoadAppLauncher(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithData(c, data)
+	helper.SuccessWithDataGzipped(c, data)
 }
 
 // @Tags Dashboard
