@@ -1,13 +1,14 @@
 package v2
 
 import (
+	"net/http"
+	"time"
+
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/gin-gonic/gin"
-	"net/http"
-	"time"
 )
 
 // @Tags App
@@ -28,7 +29,7 @@ func (b *BaseApi) SearchApp(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithData(c, list)
+	helper.SuccessWithDataGzipped(c, list)
 }
 
 // @Tags App
