@@ -20,6 +20,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/controller"
 	"github.com/1Panel-dev/1Panel/agent/utils/ntp"
+	"github.com/1Panel-dev/1Panel/agent/utils/psutil"
 	"github.com/shirou/gopsutil/v4/mem"
 )
 
@@ -134,6 +135,7 @@ func (u *DeviceService) Update(key, value string) error {
 		if err := cmd.RunDefaultBashCf("%s hostnamectl set-hostname %s", cmd.SudoHandleCmd(), value); err != nil {
 			return err
 		}
+		_, _ = psutil.HOST.GetHostInfo(true)
 	case "Ntp", "LocalTime":
 		if cmd.CheckIllegal(value) {
 			return buserr.New("ErrCmdIllegal")

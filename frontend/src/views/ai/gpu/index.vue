@@ -178,7 +178,6 @@ const chartsOption = ref({
     loadSpeedChart: null,
 });
 
-const searchTime = ref();
 const searchInfo = reactive<Host.MonitorGPUSearch>({
     productName: '',
     startTime: new Date(new Date().setHours(0, 0, 0, 0)),
@@ -201,27 +200,30 @@ const loadOptions = async () => {
 };
 
 const search = async () => {
-    if (searchTime.value && searchTime.value.length === 2) {
-        searchInfo.startTime = searchTime.value[0];
-        searchInfo.endTime = searchTime.value[1];
+    if (timeRangeGlobal.value && timeRangeGlobal.value.length === 2) {
+        searchInfo.startTime = timeRangeGlobal.value[0];
+        searchInfo.endTime = timeRangeGlobal.value[1];
     }
     loading.value = true;
     await loadGPUMonitor(searchInfo)
         .then((res) => {
             loading.value = false;
-            let baseDate = res.data.date.length === 0 ? loadEmptyDate(timeRangeGlobal.value) : res.data.date;
+            let baseDate = res.data.date || [];
+            if (baseDate.length === 0) {
+                baseDate = loadEmptyDate(timeRangeGlobal.value);
+            }
             let date = baseDate.map(function (item: any) {
                 return dateFormatWithoutYear(item);
             });
-            initCPUCharts(date, res.data.gpuValue);
-            initMemoryCharts(date, res.data.memoryValue);
+            initCPUCharts(date, res.data.gpuValue || []);
+            initMemoryCharts(date, res.data.memoryValue || []);
             if (gpuType.value === 'gpu') {
-                initPowerCharts(date, res.data.powerValue);
+                initPowerCharts(date, res.data.powerValue || []);
             } else {
-                initXpuPowerCharts(date, res.data.powerValue);
+                initXpuPowerCharts(date, res.data.powerValue || []);
             }
-            initSpeedCharts(date, res.data.speedValue);
-            initTemperatureCharts(date, res.data.temperatureValue);
+            initSpeedCharts(date, res.data.speedValue || []);
+            initTemperatureCharts(date, res.data.temperatureValue || []);
         })
         .catch(() => {
             loading.value = false;
@@ -370,8 +372,8 @@ function loadEmptyData() {
 }
 function loadEmptyData2() {
     return [
-        { value: 0, data: {} },
-        { value: 0, data: {} },
+        { value: 0, data: { total: 0, used: 0 } },
+        { value: 0, data: { total: 0, used: 0 } },
     ];
 }
 
