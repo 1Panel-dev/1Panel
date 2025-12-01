@@ -13,6 +13,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/app/task"
+	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
@@ -21,7 +22,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
-	"github.com/pkg/errors"
 )
 
 func (u *CronjobService) handleApp(cronjob model.Cronjob, startTime time.Time, taskItem *task.Task) error {
@@ -32,7 +32,7 @@ func (u *CronjobService) handleApp(cronjob model.Cronjob, startTime time.Time, t
 	}
 	accountMap := NewBackupClientMap(strings.Split(cronjob.SourceAccountIDs, ","))
 	if !accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].isOk {
-		return errors.New(i18n.GetMsgWithDetail("LoadBackupFailed", accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].message))
+		return buserr.New(i18n.GetMsgWithDetail("LoadBackupFailed", accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].message))
 	}
 	for _, app := range apps {
 		retry := 0
@@ -90,7 +90,7 @@ func (u *CronjobService) handleWebsite(cronjob model.Cronjob, startTime time.Tim
 	}
 	accountMap := NewBackupClientMap(strings.Split(cronjob.SourceAccountIDs, ","))
 	if !accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].isOk {
-		return errors.New(i18n.GetMsgWithDetail("LoadBackupFailed", accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].message))
+		return buserr.New(i18n.GetMsgWithDetail("LoadBackupFailed", accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].message))
 	}
 	for _, web := range webs {
 		retry := 0
@@ -149,7 +149,7 @@ func (u *CronjobService) handleDatabase(cronjob model.Cronjob, startTime time.Ti
 	}
 	accountMap := NewBackupClientMap(strings.Split(cronjob.SourceAccountIDs, ","))
 	if !accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].isOk {
-		return errors.New(i18n.GetMsgWithDetail("LoadBackupFailed", accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].message))
+		return buserr.New(i18n.GetMsgWithDetail("LoadBackupFailed", accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].message))
 	}
 	for _, dbInfo := range dbs {
 		retry := 0
@@ -217,7 +217,7 @@ func (u *CronjobService) handleDatabase(cronjob model.Cronjob, startTime time.Ti
 func (u *CronjobService) handleDirectory(cronjob model.Cronjob, startTime time.Time, taskItem *task.Task) error {
 	accountMap := NewBackupClientMap(strings.Split(cronjob.SourceAccountIDs, ","))
 	if !accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].isOk {
-		return errors.New(i18n.GetMsgWithDetail("LoadBackupFailed", accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].message))
+		return buserr.New(i18n.GetMsgWithDetail("LoadBackupFailed", accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].message))
 	}
 	taskItem.AddSubTaskWithOps(task.GetTaskName(cronjob.SourceDir, task.TaskBackup, task.TaskScopeCronjob), func(task *task.Task) error {
 		fileName := fmt.Sprintf("%s.tar.gz", startTime.Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(2))
@@ -267,7 +267,7 @@ func (u *CronjobService) handleDirectory(cronjob model.Cronjob, startTime time.T
 func (u *CronjobService) handleSystemLog(cronjob model.Cronjob, startTime time.Time, taskItem *task.Task) error {
 	accountMap := NewBackupClientMap(strings.Split(cronjob.SourceAccountIDs, ","))
 	if !accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].isOk {
-		return errors.New(i18n.GetMsgWithDetail("LoadBackupFailed", accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].message))
+		return buserr.New(i18n.GetMsgWithDetail("LoadBackupFailed", accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].message))
 	}
 	taskItem.AddSubTaskWithOps(task.GetTaskName(i18n.GetMsgByKey("SystemLog"), task.TaskBackup, task.TaskScopeCronjob), func(task *task.Task) error {
 		nameItem := startTime.Format(constant.DateTimeSlimLayout) + common.RandStrAndNum(5)
@@ -303,7 +303,7 @@ func (u *CronjobService) handleSystemLog(cronjob model.Cronjob, startTime time.T
 func (u *CronjobService) handleSnapshot(cronjob model.Cronjob, jobRecord model.JobRecords, taskItem *task.Task) error {
 	accountMap := NewBackupClientMap(strings.Split(cronjob.SourceAccountIDs, ","))
 	if !accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].isOk {
-		return errors.New(i18n.GetMsgWithDetail("LoadBackupFailed", accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].message))
+		return buserr.New(i18n.GetMsgWithDetail("LoadBackupFailed", accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].message))
 	}
 	var record model.BackupRecord
 	record.Status = constant.StatusSuccess

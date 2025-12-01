@@ -14,8 +14,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/utils/alert_push"
-	"github.com/pkg/errors"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
@@ -339,7 +339,7 @@ func (u *CronjobService) handleSyncIpGroup(cronjob model.Cronjob, taskItem *task
 func (u *CronjobService) handleCutWebsiteLog(cronjob *model.Cronjob, startTime time.Time, taskItem *task.Task) error {
 	clientMap := NewBackupClientMap([]string{fmt.Sprintf("%v", cronjob.DownloadAccountID)})
 	if !clientMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].isOk {
-		return errors.New(i18n.GetMsgWithDetail("LoadBackupFailed", clientMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].message))
+		return buserr.New(i18n.GetMsgWithDetail("LoadBackupFailed", clientMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].message))
 	}
 	taskItem.AddSubTaskWithOps(i18n.GetWithName("CutWebsiteLog", cronjob.Name), func(t *task.Task) error {
 		websites := loadWebsForJob(*cronjob)
