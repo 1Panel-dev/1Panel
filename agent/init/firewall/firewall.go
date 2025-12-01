@@ -50,14 +50,9 @@ func Init() {
 		}
 	}
 
-	if clientName == "ufw" {
-		_ = iptables.UnbindChain(iptables.FilterTab, iptables.ChainInput, iptables.Chain1PanelBasicAfter)
-		_ = iptables.UnbindChain(iptables.FilterTab, iptables.ChainInput, iptables.Chain1PanelBasicBefore)
-		_ = iptables.UnbindChain(iptables.FilterTab, iptables.ChainInput, iptables.Chain1PanelBasic)
-		_ = iptables.UnbindChain(iptables.FilterTab, iptables.ChainInput, iptables.Chain1PanelInput)
-		_ = iptables.UnbindChain(iptables.FilterTab, iptables.ChainOutput, iptables.Chain1PanelOutput)
+	if clientName != "iptables" {
+		return
 	}
-
 	if err := iptables.LoadRulesFromFile(iptables.FilterTab, iptables.Chain1PanelBasicBefore, iptables.BasicBeforeFileName); err != nil {
 		global.LOG.Errorf("load basic before rules from file failed, err: %v", err)
 		return
