@@ -803,6 +803,7 @@ const message = {
         memUsage: 'メモリの使用',
         memTotal: 'メモリ制限',
         memCache: 'メモリキャッシュ',
+        loadSize: 'コンテナサイズを取得',
         ip: 'IPアドレス',
         cpuShare: 'CPU共有',
         cpuShareHelper:

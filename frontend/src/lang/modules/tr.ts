@@ -832,6 +832,7 @@ const message = {
         memUsage: 'Bellek kullanımı',
         memTotal: 'Bellek sınırı',
         memCache: 'Bellek önbelleği',
+        loadSize: 'Konteyner Boyutunu Al',
         ip: 'IP adresi',
         cpuShare: 'CPU paylaşımları',
         cpuShareHelper:

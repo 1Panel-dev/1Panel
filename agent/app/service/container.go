@@ -70,6 +70,7 @@ type IContainerService interface {
 	ContainerUpgrade(req dto.ContainerUpgrade) error
 	ContainerInfo(req dto.OperationWithName) (*dto.ContainerOperate, error)
 	ContainerListStats() ([]dto.ContainerListStats, error)
+	ContainerItemStats(containerID string) (dto.ContainerItemStats, error)
 	LoadResourceLimit() (*dto.ResourceLimit, error)
 	ContainerRename(req dto.ContainerRename) error
 	ContainerCommit(req dto.ContainerCommit) error
@@ -101,10 +102,7 @@ func (u *ContainerService) Page(req dto.PageContainer) (int64, interface{}, erro
 		return 0, nil, err
 	}
 	defer client.Close()
-	options := container.ListOptions{
-		All:  true,
-		Size: true,
-	}
+	options := container.ListOptions{All: true}
 	if len(req.Filters) != 0 {
 		options.Filters = filters.NewArgs()
 		options.Filters.Add("label", req.Filters)
@@ -257,6 +255,21 @@ func (u *ContainerService) LoadStatus() (dto.ContainerStatus, error) {
 			data.Removing++
 		}
 	}
+	return data, nil
+}
+func (u *ContainerService) ContainerItemStats(containerID string) (dto.ContainerItemStats, error) {
+	var data dto.ContainerItemStats
+	client, err := docker.NewDockerClient()
+	if err != nil {
+		return data, err
+	}
+	defer client.Close()
+	containerInfo, _, err := client.ContainerInspectWithRaw(context.Background(), containerID, true)
+	if err != nil {
+		return data, err
+	}
+	data.SizeRw = *containerInfo.SizeRw
+	data.SizeRootFs = *containerInfo.SizeRootFs
 	return data, nil
 }
 func (u *ContainerService) ContainerListStats() ([]dto.ContainerListStats, error) {
@@ -1760,8 +1773,6 @@ func searchWithFilter(req dto.PageContainer, containers []container.Summary) []d
 			ImageName:     item.Image,
 			State:         item.State,
 			RunTime:       item.Status,
-			SizeRw:        item.SizeRw,
-			SizeRootFs:    item.SizeRootFs,
 			IsFromApp:     IsFromApp,
 			IsFromCompose: IsFromCompose,
 		}

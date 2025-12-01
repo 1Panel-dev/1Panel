@@ -24,6 +24,7 @@ func (s *ContainerRouter) InitRouter(Router *gin.RouterGroup) {
 		baRouter.POST("/list/byimage", baseApi.ListContainerByImage)
 		baRouter.GET("/status", baseApi.LoadContainerStatus)
 		baRouter.GET("/list/stats", baseApi.ContainerListStats)
+		baRouter.GET("/item/stats/:id", baseApi.ContainerItemStats)
 		baRouter.GET("/search/log", baseApi.ContainerStreamLogs)
 		baRouter.POST("/download/log", baseApi.DownloadContainerLogs)
 		baRouter.GET("/limit", baseApi.LoadResourceLimit)

@@ -134,6 +134,10 @@ export namespace Container {
         name: string;
         state: string;
     }
+    export interface ContainerItemStats {
+        sizeRw: number;
+        sizeRootFs: number;
+    }
     export interface ContainerListStats {
         containerID: string;
         cpuTotalUsage: number;

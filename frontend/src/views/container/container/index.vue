@@ -209,8 +209,7 @@
                                             <el-descriptions-item :label="$t('container.memTotal')">
                                                 {{ computeSizeForDocker(row.memoryLimit) }}
                                             </el-descriptions-item>
-
-                                            <el-descriptions-item>
+                                            <el-descriptions-item v-if="row.hasLoadSize">
                                                 <template #label>
                                                     {{ $t('container.sizeRw') }}
                                                     <el-tooltip :content="$t('container.sizeRwHelper')">
@@ -219,7 +218,10 @@
                                                 </template>
                                                 {{ computeSize2(row.sizeRw) }}
                                             </el-descriptions-item>
-                                            <el-descriptions-item :label="$t('container.sizeRootFs')">
+                                            <el-descriptions-item
+                                                :label="$t('container.sizeRootFs')"
+                                                v-if="row.hasLoadSize"
+                                            >
                                                 <template #label>
                                                     {{ $t('container.sizeRootFs') }}
                                                     <el-tooltip :content="$t('container.sizeRootFsHelper')">
@@ -229,6 +231,17 @@
                                                 {{ computeSize2(row.sizeRootFs) }}
                                             </el-descriptions-item>
                                         </el-descriptions>
+
+                                        <el-button
+                                            class="mt-2"
+                                            v-if="!row.hasLoadSize"
+                                            size="small"
+                                            link
+                                            type="primary"
+                                            @click="loadSize(row)"
+                                        >
+                                            {{ $t('container.loadSize') }}
+                                        </el-button>
                                     </template>
                                 </el-popover>
                             </div>
@@ -384,6 +397,7 @@ import ContainerLogDialog from '@/components/log/container-drawer/index.vue';
 import Status from '@/components/status/index.vue';
 import { reactive, onMounted, ref, computed } from 'vue';
 import {
+    containerItemStats,
     containerListStats,
     containerOperator,
     inspect,
@@ -586,6 +600,14 @@ const refresh = async () => {
             }
         }
     }
+};
+
+const loadSize = async (row: any) => {
+    containerItemStats(row.containerID).then((res) => {
+        row.sizeRw = res.data.sizeRw || 0;
+        row.sizeRootFs = res.data.sizeRootFs || 0;
+        row.hasLoadSize = true;
+    });
 };
 
 const loadStats = async () => {

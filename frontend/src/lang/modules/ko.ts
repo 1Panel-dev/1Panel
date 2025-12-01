@@ -796,6 +796,7 @@ const message = {
         memUsage: '메모리 사용',
         memTotal: '메모리 한도',
         memCache: '메모리 캐시',
+        loadSize: '컨테이너 크기 가져오기',
         ip: 'IP 주소',
         cpuShare: 'CPU 공유',
         cpuShareHelper:

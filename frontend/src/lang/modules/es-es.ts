@@ -826,6 +826,7 @@ const message = {
         memUsage: 'Uso de memoria',
         memTotal: 'Límite de memoria',
         memCache: 'Caché de memoria',
+        loadSize: 'Obtener Tamaño del Contenedor',
         ip: 'Dirección IP',
         cpuShare: 'Proporción de CPU',
         cpuShareHelper:

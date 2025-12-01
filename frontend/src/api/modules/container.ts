@@ -43,6 +43,9 @@ export const cleanContainerLog = (containerName: string, operateNode?: string) =
     const params = operateNode ? `?operateNode=${operateNode}` : '';
     return http.post(`/containers/clean/log${params}`, { name: containerName });
 };
+export const containerItemStats = (containerID: string) => {
+    return http.get<Container.ContainerItemStats>(`/containers/item/stats/${containerID}`);
+};
 export const containerListStats = () => {
     return http.get<Array<Container.ContainerListStats>>(`/containers/list/stats`);
 };

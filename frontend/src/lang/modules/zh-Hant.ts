@@ -788,6 +788,7 @@ const message = {
         memUsage: '記憶體使用',
         memTotal: '記憶體限額',
         memCache: '快取使用',
+        loadSize: '取得容器大小',
         ip: 'IP 位址',
         cpuShare: 'CPU 權重',
         cpuShareHelper: '容器預設份額為 1024 個 CPU，增大可使目前容器獲得更多的 CPU 時間',

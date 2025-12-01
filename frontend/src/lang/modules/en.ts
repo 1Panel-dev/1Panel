@@ -823,6 +823,7 @@ const message = {
         memUsage: 'Memory usage',
         memTotal: 'Memory limit',
         memCache: 'Memory cache',
+        loadSize: 'Get Container Size',
         ip: 'IP address',
         cpuShare: 'CPU shares',
         cpuShareHelper:

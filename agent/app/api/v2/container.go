@@ -263,6 +263,21 @@ func (b *BaseApi) ContainerListStats(c *gin.Context) {
 	helper.SuccessWithData(c, data)
 }
 
+// @Summary Load container stats size
+// @Success 200 {object} dto.ContainerItemStats
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /containers/item/stats/:id [get]
+func (b *BaseApi) ContainerItemStats(c *gin.Context) {
+	containerID := c.Param("id")
+	data, err := containerService.ContainerItemStats(containerID)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, data)
+}
+
 // @Tags Container
 // @Summary Create container
 // @Accept json

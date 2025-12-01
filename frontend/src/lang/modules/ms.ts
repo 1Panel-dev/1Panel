@@ -816,6 +816,7 @@ const message = {
         memUsage: 'Penggunaan memori',
         memTotal: 'Had memori',
         memCache: 'Cache memori',
+        loadSize: 'Dapatkan Saiz Bekas',
         ip: 'Alamat IP',
         cpuShare: 'Bahagian CPU',
         cpuShareHelper:

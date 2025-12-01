@@ -812,6 +812,7 @@ const message = {
         memUsage: 'Использование памяти',
         memTotal: 'Лимит памяти',
         memCache: 'Кэш памяти',
+        loadSize: 'Получить Размер Контейнера',
         ip: 'IP-адрес',
         cpuShare: 'Доли CPU',
         cpuShareHelper:

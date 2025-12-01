@@ -31,9 +31,6 @@ type ContainerInfo struct {
 	Network []string `json:"network"`
 	Ports   []string `json:"ports"`
 
-	SizeRw     int64 `json:"sizeRw"`
-	SizeRootFs int64 `json:"sizeRootFs"`
-
 	IsFromApp     bool `json:"isFromApp"`
 	IsFromCompose bool `json:"isFromCompose"`
 
@@ -129,6 +126,10 @@ type ContainerUpgrade struct {
 	ForcePull bool     `json:"forcePull"`
 }
 
+type ContainerItemStats struct {
+	SizeRw     int64 `json:"sizeRw"`
+	SizeRootFs int64 `json:"sizeRootFs"`
+}
 type ContainerListStats struct {
 	ContainerID string `json:"containerID"`
 
