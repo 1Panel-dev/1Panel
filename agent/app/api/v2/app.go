@@ -1,8 +1,10 @@
 package v2
 
 import (
+	"crypto/md5"
+	"encoding/hex"
+	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
@@ -210,13 +212,24 @@ func (b *BaseApi) GetAppIcon(c *gin.Context) {
 		helper.BadRequest(c, err)
 		return
 	}
+
 	iconBytes, err := appService.GetAppIcon(appID)
 	if err != nil {
 		helper.InternalServer(c, err)
 		return
 	}
+
+	sum := md5.Sum(iconBytes)
+	etagStr := hex.EncodeToString(sum[:])
+	etagHeader := fmt.Sprintf(`"%s"`, etagStr)
+
+	if c.GetHeader("If-None-Match") == etagHeader {
+		c.Status(http.StatusNotModified)
+		return
+	}
+
+	c.Header("ETag", etagHeader)
 	c.Header("Content-Type", "image/png")
-	c.Header("Cache-Control", "public, max-age=31536000, immutable")
-	c.Header("Last-Modified", time.Now().UTC().Format(http.TimeFormat))
+	c.Header("Cache-Control", "public, max-age=86400, must-revalidate")
 	c.Data(http.StatusOK, "image/png", iconBytes)
 }
