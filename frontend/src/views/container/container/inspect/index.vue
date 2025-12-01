@@ -154,7 +154,7 @@
                         {{ $t('commons.button.copy') }}
                     </el-button>
                 </div>
-                <CodemirrorPro v-model="rawJson" :height-diff="240" :readonly="true" mode="json" />
+                <CodemirrorPro v-model="rawJson" :height-diff="270" :readonly="true" mode="json" />
             </el-tab-pane>
         </el-tabs>
 

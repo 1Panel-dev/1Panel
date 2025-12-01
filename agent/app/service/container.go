@@ -1786,9 +1786,9 @@ func searchWithFilter(req dto.PageContainer, containers []container.Summary) []d
 		}
 		records = append(records, info)
 	}
-	dscriptions, _ := settingRepo.GetDescriptionList(repo.WithByType("container"))
+	descriptions, _ := settingRepo.GetDescriptionList(repo.WithByType("container"))
 	for i := 0; i < len(records); i++ {
-		for _, desc := range dscriptions {
+		for _, desc := range descriptions {
 			if desc.ID == records[i].ContainerID {
 				records[i].Description = desc.Description
 				records[i].IsPinned = desc.IsPinned

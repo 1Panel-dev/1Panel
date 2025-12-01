@@ -5,7 +5,6 @@ import (
 	"sort"
 	"strings"
 	"time"
-	"unicode"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
@@ -57,7 +56,7 @@ func (u *ContainerService) PageVolume(req dto.SearchWithPage) (int64, interface{
 		var volume dto.Volume
 		volume.Driver = item.Driver
 		volume.Mountpoint = item.Mountpoint
-		volume.Name = simplifyVolumeName(item.Name)
+		volume.Name = item.Name
 		for key, val := range item.Labels {
 			volume.Labels = append(volume.Labels, dto.VolumeOption{Key: key, Value: val})
 		}
@@ -142,17 +141,4 @@ func (u *ContainerService) CreateVolume(req dto.VolumeCreate) error {
 		return err
 	}
 	return nil
-}
-
-func simplifyVolumeName(name string) string {
-	if len(name) != 64 {
-		return name
-	}
-
-	for _, char := range name {
-		if !unicode.Is(unicode.ASCII_Hex_Digit, char) {
-			return name
-		}
-	}
-	return name[:12]
 }

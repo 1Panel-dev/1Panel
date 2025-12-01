@@ -8,7 +8,6 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"path"
 	pathUtils "path"
 	"path/filepath"
 	"strings"
@@ -147,7 +146,7 @@ func (u *CronjobService) handleShell(cronjob model.Cronjob, taskItem *task.Task)
 		if len(cronjob.ContainerName) != 0 {
 			scriptItem := cronjob.Script
 			if cronjob.ScriptMode == "select" {
-				scriptItem = path.Join("/tmp", path.Base(cronjob.Script))
+				scriptItem = pathUtils.Join("/tmp", pathUtils.Base(cronjob.Script))
 				if err := cmdMgr.Run("docker", "cp", cronjob.Script, cronjob.ContainerName+":"+scriptItem); err != nil {
 					return err
 				}
@@ -252,11 +251,11 @@ func (u *CronjobService) handleCleanLog(cronjob model.Cronjob, taskItem *task.Ta
 				if appInstall.ID > 0 {
 					curStr := i18n.GetWithName("CleanLogByName", "OpenResty")
 					t.LogStart(curStr)
-					accessLogPath := path.Join(appInstall.GetPath(), "log", "access.log")
+					accessLogPath := pathUtils.Join(appInstall.GetPath(), "log", "access.log")
 					if err := os.Truncate(accessLogPath, 0); err != nil {
 						t.LogFailedWithErr(curStr, err)
 					}
-					errLogPath := path.Join(appInstall.GetPath(), "log", "error.log")
+					errLogPath := pathUtils.Join(appInstall.GetPath(), "log", "error.log")
 					if err := os.Truncate(errLogPath, 0); err != nil {
 						t.LogFailedWithErr(curStr, err)
 					}
@@ -274,8 +273,8 @@ func (u *CronjobService) handleSyncIpGroup(cronjob model.Cronjob, taskItem *task
 		if err != nil {
 			return err
 		}
-		ipGroupDir := path.Join(appInstall.GetPath(), "1pwaf", "data", "rules", "ip_group")
-		urlDir := path.Join(ipGroupDir, "ip_group_url")
+		ipGroupDir := pathUtils.Join(appInstall.GetPath(), "1pwaf", "data", "rules", "ip_group")
+		urlDir := pathUtils.Join(ipGroupDir, "ip_group_url")
 
 		urlsFiles, err := os.ReadDir(urlDir)
 		if err != nil {
@@ -471,7 +470,7 @@ func (u *CronjobService) removeExpiredLog(cronjob model.Cronjob) {
 		}
 		_ = cronjobRepo.DeleteRecord(repo.WithByID(records[i].ID))
 		_ = taskRepo.Delete(taskRepo.WithByID(records[i].TaskID))
-		_ = os.Remove(path.Join(global.CONF.Base.InstallDir, "1panel/log/task/Cronjob", records[i].TaskID+".log"))
+		_ = os.Remove(pathUtils.Join(global.CONF.Base.InstallDir, "1panel/log/task/Cronjob", records[i].TaskID+".log"))
 	}
 }
 
