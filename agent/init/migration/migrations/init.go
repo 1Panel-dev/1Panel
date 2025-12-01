@@ -756,3 +756,22 @@ var UpdateDatabaseMysql = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var InitIptablesStatus = &gormigrate.Migration{
+	ID: "20251201-init-iptables-status",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.Create(&model.Setting{Key: "IptablesStatus", Value: constant.StatusDisable}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "IptablesForwardStatus", Value: constant.StatusDisable}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "IptablesInputStatus", Value: constant.StatusDisable}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "IptablesOutputStatus", Value: constant.StatusDisable}).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}

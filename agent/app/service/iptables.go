@@ -8,6 +8,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
+	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/client"
@@ -189,9 +190,14 @@ func (s *IptablesService) Operate(req dto.IptablesOp) error {
 		if err := iptables.SaveRulesToFile(iptables.FilterTab, iptables.Chain1PanelBasicAfter, iptables.BasicAfterFileName); err != nil {
 			return err
 		}
+		_ = settingRepo.Update("IptablesStatus", constant.StatusEnable)
 		return nil
 	case "init-forward":
-		return client.EnableIptablesForward()
+		if err := client.EnableIptablesForward(); err != nil {
+			return err
+		}
+		_ = settingRepo.Update("IptablesForwardStatus", constant.StatusEnable)
+		return nil
 	case "init-advance":
 		if err := iptables.AddChain(iptables.FilterTab, iptables.Chain1PanelInput); err != nil {
 			return err
@@ -206,6 +212,8 @@ func (s *IptablesService) Operate(req dto.IptablesOp) error {
 		if err := iptables.BindChain(iptables.FilterTab, iptables.ChainInput, iptables.Chain1PanelInput, number); err != nil {
 			return err
 		}
+		_ = settingRepo.Update("IptablesInputStatus", constant.StatusEnable)
+		_ = settingRepo.Update("IptablesOutputStatus", constant.StatusEnable)
 		return nil
 	case "bind-base":
 		if err := initPreRules(); err != nil {
@@ -220,6 +228,7 @@ func (s *IptablesService) Operate(req dto.IptablesOp) error {
 		if err := iptables.BindChain(iptables.FilterTab, iptables.ChainInput, iptables.Chain1PanelBasicAfter, 3); err != nil {
 			return err
 		}
+		_ = settingRepo.Update("IptablesStatus", constant.StatusEnable)
 		return nil
 	case "unbind-base":
 		if err := iptables.UnbindChain(iptables.FilterTab, iptables.ChainInput, iptables.Chain1PanelBasicAfter); err != nil {
@@ -231,15 +240,28 @@ func (s *IptablesService) Operate(req dto.IptablesOp) error {
 		if err := iptables.UnbindChain(iptables.FilterTab, iptables.ChainInput, iptables.Chain1PanelBasic); err != nil {
 			return err
 		}
+		_ = settingRepo.Update("IptablesStatus", constant.StatusDisable)
 		return nil
 	case "bind":
 		if err := iptables.BindChain(iptables.FilterTab, targetChain, req.Name, loadBindNumber(req.Name)); err != nil {
 			return err
 		}
+		if req.Name == iptables.Chain1PanelInput {
+			_ = settingRepo.Update("IptablesInputStatus", constant.StatusEnable)
+		}
+		if req.Name == iptables.Chain1PanelOutput {
+			_ = settingRepo.Update("IptablesOutputStatus", constant.StatusEnable)
+		}
 		return nil
 	case "unbind":
 		if err := iptables.UnbindChain(iptables.FilterTab, targetChain, req.Name); err != nil {
 			return err
+		}
+		if req.Name == iptables.Chain1PanelInput {
+			_ = settingRepo.Update("IptablesInputStatus", constant.StatusDisable)
+		}
+		if req.Name == iptables.Chain1PanelOutput {
+			_ = settingRepo.Update("IptablesOutputStatus", constant.StatusDisable)
 		}
 		return nil
 	}

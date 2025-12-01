@@ -56,6 +56,7 @@ func InitAgentDB() {
 		migrations.UpdateDatabase,
 		migrations.AddGPUMonitor,
 		migrations.UpdateDatabaseMysql,
+		migrations.InitIptablesStatus,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)
