@@ -149,6 +149,11 @@
             </el-tab-pane>
 
             <el-tab-pane :label="$t('commons.button.view')" name="view">
+                <div class="mb-2 flex justify-start">
+                    <el-button type="primary" @click="handleCopyRawJson" icon="DocumentCopy" size="default">
+                        {{ $t('commons.button.copy') }}
+                    </el-button>
+                </div>
                 <CodemirrorPro v-model="rawJson" :height-diff="240" :disabled="true" mode="json" />
             </el-tab-pane>
         </el-tabs>
@@ -165,6 +170,7 @@
 import { ref } from 'vue';
 import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 import { routerToFileWithPath } from '@/utils/router';
+import { copyText } from '@/utils/util';
 import i18n from '@/lang';
 
 const visible = ref(false);
@@ -261,6 +267,10 @@ const handleJumpToFile = (path: string) => {
     if (path) {
         routerToFileWithPath(path);
     }
+};
+
+const handleCopyRawJson = () => {
+    copyText(rawJson.value);
 };
 
 defineExpose({
