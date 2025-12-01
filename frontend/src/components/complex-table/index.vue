@@ -109,7 +109,7 @@ const mobile = computed(() => {
     return globalStore.isMobile();
 });
 const tableRef = ref();
-const tableHeight = ref(0);
+const tableHeight = ref<number | string>('');
 const menuRef = ref<HTMLElement | null>(null);
 const leftSelect = ref(false);
 
