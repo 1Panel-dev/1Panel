@@ -877,7 +877,7 @@ const saveContent = async () => {
                 oldFileContent.value = form.value.content;
                 MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
             } else {
-                MsgError(i18n.global.t('common.status.failed'));
+                MsgError(i18n.global.t('commons.status.failed'));
                 isEdit.value = false;
             }
         } finally {
