@@ -242,6 +242,8 @@ func (f *FileService) Create(op request.FileCreate) error {
 		if err := fo.LinkFile(op.LinkPath, op.Path, op.IsSymlink); err != nil {
 			return err
 		}
+		handleDefaultOwn(op.Path)
+		return nil
 	}
 	if err := fo.CreateFileWithMode(op.Path, fs.FileMode(mode)); err != nil {
 		return err
