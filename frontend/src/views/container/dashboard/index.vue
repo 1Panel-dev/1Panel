@@ -189,7 +189,7 @@
                 </template>
             </CardWithHeader>
         </div>
-        <TaskLog ref="taskLogRef" width="70%" />
+        <TaskLog ref="taskLogRef" width="70%" @close="loadUsage" />
     </div>
 </template>
 
@@ -265,15 +265,6 @@ const loadContainerCount = async () => {
         countItem.networkCount = res.data.networkCount;
         countItem.volumeCount = res.data.volumeCount;
         countItem.repoCount = res.data.repoCount;
-
-        countItem.containerUsage = res.data.containerUsage;
-        countItem.containerReclaimable = res.data.containerReclaimable;
-        countItem.imageUsage = res.data.imageUsage;
-        countItem.imageReclaimable = res.data.imageReclaimable;
-        countItem.volumeUsage = res.data.volumeUsage;
-        countItem.volumeReclaimable = res.data.volumeReclaimable;
-        countItem.buildCacheUsage = res.data.buildCacheUsage;
-        countItem.buildCacheReclaimable = res.data.buildCacheReclaimable;
     });
 };
 
