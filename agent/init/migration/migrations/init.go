@@ -661,14 +661,14 @@ var UpdateMonitorInterval = &gormigrate.Migration{
 }
 
 var AddMonitorProcess = &gormigrate.Migration{
-	ID: "20251030-add-monitor-process",
+	ID: "20251202-add-monitor-process",
 	Migrate: func(tx *gorm.DB) error {
 		return global.MonitorDB.AutoMigrate(&model.MonitorBase{})
 	},
 }
 
 var UpdateCronJob = &gormigrate.Migration{
-	ID: "20251105-update-cronjob",
+	ID: "20251202-update-cronjob",
 	Migrate: func(tx *gorm.DB) error {
 		return tx.AutoMigrate(&model.Cronjob{})
 	},
