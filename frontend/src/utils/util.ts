@@ -57,11 +57,14 @@ export function getBrowserLang() {
 }
 
 export function loadUpTime(timeSince: string) {
+    if (!timeSince) {
+        return '';
+    }
     const targetTime = new Date(timeSince);
     const currentTime = new Date();
     const uptime = (currentTime.getTime() - targetTime.getTime()) / 1000;
     if (uptime <= 0) {
-        return '-';
+        return '';
     }
     let days = Math.floor(uptime / 86400);
     let hours = Math.floor((uptime % 86400) / 3600);
