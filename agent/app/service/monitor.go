@@ -165,24 +165,27 @@ func (m *MonitorService) LoadGPUMonitorData(req dto.MonitorGPUSearch) (dto.Monit
 		data.Date = append(data.Date, gpu.CreatedAt)
 		data.GPUValue = append(data.GPUValue, gpu.GPUUtil)
 		data.TemperatureValue = append(data.TemperatureValue, gpu.Temperature)
-		powerItem := dto.GPUPowerUsageHelper{
-			Total: gpu.MaxPowerLimit,
-			Used:  gpu.PowerDraw,
+		data.PowerUsed = append(data.PowerUsed, gpu.PowerDraw)
+		data.PowerTotal = append(data.PowerTotal, gpu.MaxPowerLimit)
+		if gpu.MaxPowerLimit != 0 {
+			data.PowerPercent = append(data.PowerPercent, gpu.PowerDraw/gpu.MaxPowerLimit*100)
+		} else {
+			data.PowerPercent = append(data.PowerPercent, float64(0))
 		}
-		if powerItem.Total != 0 {
-			powerItem.Percent = powerItem.Used / powerItem.Total
-		}
-		data.PowerValue = append(data.PowerValue, powerItem)
-		memItem := dto.GPUMemoryUsageHelper{
-			Total:   gpu.MemTotal,
-			Used:    gpu.MemUsed,
-			Percent: gpu.MemUsed / gpu.MemTotal * 100,
+
+		data.MemoryTotal = append(data.MemoryTotal, gpu.MemTotal)
+		data.MemoryUsed = append(data.MemoryUsed, gpu.MemUsed)
+		if gpu.MemTotal != 0 {
+			data.MemoryPercent = append(data.MemoryPercent, gpu.MemUsed/gpu.MemTotal*100)
+		} else {
+			data.MemoryPercent = append(data.MemoryPercent, float64(0))
 		}
 		var process []dto.GPUProcess
 		if err := json.Unmarshal([]byte(gpu.Processes), &process); err == nil {
-			memItem.GPUProcesses = process
+			data.GPUProcesses = append(data.GPUProcesses, process)
+		} else {
+			data.GPUProcesses = append(data.GPUProcesses, []dto.GPUProcess{})
 		}
-		data.MemoryValue = append(data.MemoryValue, memItem)
 		data.SpeedValue = append(data.SpeedValue, gpu.FanSpeed)
 	}
 	return data, nil
@@ -606,7 +609,6 @@ func saveXPUDataToDB() {
 	for _, xpuItem := range xpuInfo.Xpu {
 		item := model.MonitorGPU{
 			ProductName: fmt.Sprintf("%d - %s", xpuItem.Basic.DeviceID, xpuItem.Basic.DeviceName),
-			GPUUtil:     loadGPUInfoFloat(xpuItem.Stats.MemoryUtil),
 			Temperature: loadGPUInfoFloat(xpuItem.Stats.Temperature),
 			PowerDraw:   loadGPUInfoFloat(xpuItem.Stats.Power),
 			MemUsed:     loadGPUInfoFloat(xpuItem.Stats.MemoryUsed),

@@ -48,25 +48,20 @@ type MonitorGPUSearch struct {
 	EndTime     time.Time `json:"endTime"`
 }
 type MonitorGPUData struct {
-	Date             []time.Time            `json:"date"`
-	GPUValue         []float64              `json:"gpuValue"`
-	TemperatureValue []float64              `json:"temperatureValue"`
-	PowerValue       []GPUPowerUsageHelper  `json:"powerValue"`
-	MemoryValue      []GPUMemoryUsageHelper `json:"memoryValue"`
-	SpeedValue       []int                  `json:"speedValue"`
-}
-type GPUPowerUsageHelper struct {
-	Total   float64 `json:"total"`
-	Used    float64 `json:"used"`
-	Percent float64 `json:"percent"`
-}
-type GPUMemoryUsageHelper struct {
-	Total   float64 `json:"total"`
-	Used    float64 `json:"used"`
-	Percent float64 `json:"percent"`
+	Date             []time.Time `json:"date"`
+	GPUValue         []float64   `json:"gpuValue"`
+	TemperatureValue []float64   `json:"temperatureValue"`
+	PowerTotal       []float64   `json:"powerTotal"`
+	PowerUsed        []float64   `json:"powerUsed"`
+	PowerPercent     []float64   `json:"powerPercent"`
+	MemoryTotal      []float64   `json:"memoryTotal"`
+	MemoryUsed       []float64   `json:"memoryUsed"`
+	MemoryPercent    []float64   `json:"memoryPercent"`
+	SpeedValue       []int       `json:"speedValue"`
 
-	GPUProcesses []GPUProcess `json:"gpuProcesses"`
+	GPUProcesses [][]GPUProcess `json:"gpuProcesses"`
 }
+
 type GPUProcess struct {
 	Pid         string `json:"pid"`
 	Type        string `json:"type"`

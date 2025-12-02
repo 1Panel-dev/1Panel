@@ -32,11 +32,11 @@
             </el-card>
         </div>
         <el-row :gutter="7" v-if="options.length !== 0">
-            <el-col v-bind="gpuType === 'gpu' ? fullWidthProps : halfWidthProps">
+            <el-col :span="24">
                 <el-card class="card-interval" style="overflow: inherit">
                     <template #header>
                         <div :class="mobile ? 'flx-wrap' : 'flex justify-between'">
-                            <span class="title">{{ $t('monitor.memoryUsage') }}</span>
+                            <span class="title">{{ $t('aiTools.gpu.memoryUsage') }}</span>
                         </div>
                     </template>
                     <div class="chart">
@@ -55,7 +55,7 @@
                 <el-card class="card-interval" style="overflow: inherit">
                     <template #header>
                         <div :class="mobile ? 'flx-wrap' : 'flex justify-between'">
-                            <span class="title">{{ $t('monitor.gpuUtil') }}</span>
+                            <span class="title">{{ $t('aiTools.gpu.gpuUtil') }}</span>
                         </div>
                     </template>
                     <div class="chart">
@@ -74,7 +74,7 @@
                 <el-card class="card-interval" style="overflow: inherit">
                     <template #header>
                         <div :class="mobile ? 'flx-wrap' : 'flex justify-between'">
-                            <span class="title">{{ $t('monitor.powerUsage') }}</span>
+                            <span class="title">{{ $t('aiTools.gpu.powerUsage') }}</span>
                         </div>
                     </template>
                     <div class="chart">
@@ -93,7 +93,7 @@
                 <el-card class="card-interval" style="overflow: inherit">
                     <template #header>
                         <div>
-                            {{ $t('monitor.temperature') }}
+                            {{ $t('aiTools.gpu.temperature') }}
                             <el-tooltip placement="top" :content="$t('aiTools.gpu.temperatureHelper')">
                                 <el-icon size="15"><InfoFilled /></el-icon>
                             </el-tooltip>
@@ -111,11 +111,11 @@
                     </div>
                 </el-card>
             </el-col>
-            <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12" v-if="gpuType === 'gpu'">
+            <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
                 <el-card class="card-interval" style="overflow: inherit">
                     <template #header>
                         <div :class="mobile ? 'flx-wrap' : 'flex justify-between'">
-                            <span class="title">{{ $t('monitor.fanSpeed') }}</span>
+                            <span class="title">{{ $t('aiTools.gpu.fanSpeed') }}</span>
                         </div>
                     </template>
                     <div class="chart">
@@ -162,9 +162,6 @@ const globalStore = GlobalStore();
 const mobile = computed(() => {
     return globalStore.isMobile();
 });
-
-const fullWidthProps = { span: 24 };
-const halfWidthProps = { xs: 24, sm: 24, md: 12, lg: 12, xl: 12 };
 
 const loading = ref(false);
 const options = ref([]);
@@ -216,12 +213,8 @@ const search = async () => {
                 return dateFormatWithoutYear(item);
             });
             initCPUCharts(date, res.data.gpuValue || []);
-            initMemoryCharts(date, res.data.memoryValue || []);
-            if (gpuType.value === 'gpu') {
-                initPowerCharts(date, res.data.powerValue || []);
-            } else {
-                initXpuPowerCharts(date, res.data.powerValue || []);
-            }
+            initMemoryCharts(date, res.data);
+            initPowerCharts(date, res.data);
             initSpeedCharts(date, res.data.speedValue || []);
             initTemperatureCharts(date, res.data.temperatureValue || []);
         })
@@ -239,55 +232,94 @@ function initCPUCharts(baseDate: any, items: any) {
         xData: baseDate,
         yData: [
             {
-                name: i18n.global.t('monitor.gpuUtil'),
+                name: i18n.global.t('aiTools.gpu.gpuUtil'),
                 data: data,
             },
         ],
         formatStr: '%',
     };
 }
-function initMemoryCharts(baseDate: any, items: any) {
-    let lists = items.map(function (item: any) {
-        return { value: Number(item.percent.toFixed(2)), data: item };
-    });
-    lists = lists.length === 0 ? loadEmptyData2() : lists;
+function initMemoryCharts(baseDate: any, data: any) {
     chartsOption.value['loadMemoryChart'] = {
         xData: baseDate,
         yData: [
             {
-                name: i18n.global.t('monitor.memoryUsage'),
-                data: lists,
+                name: i18n.global.t('aiTools.gpu.memoryUsed'),
+                data: data.memoryUsed,
+            },
+            {
+                name: i18n.global.t('aiTools.gpu.memoryTotal'),
+                data: data.memoryTotal,
+            },
+            {
+                name: i18n.global.t('aiTools.gpu.percent'),
+                data: data.memoryPercent,
+                yAxisIndex: 1,
             },
         ],
+        yAxis: [
+            { type: 'value', name: i18n.global.t('aiTools.gpu.memory') },
+            {
+                type: 'value',
+                name: i18n.global.t('aiTools.gpu.percent') + ' ( % )',
+                position: 'right',
+                alignTicks: true,
+            },
+        ],
+        grid: mobile.value ? { left: '15%', right: '15%', bottom: '20%' } : null,
         tooltip: {
             trigger: 'axis',
             formatter: function (list: any) {
-                return withMemoryProcess(list);
+                const param = list[0];
+                const index = param.dataIndex;
+                let process = data.gpuProcesses?.length > index ? data.gpuProcesses[index] : [];
+                return withMemoryProcess(list, process);
             },
         },
         formatStr: '%',
     };
 }
-function initPowerCharts(baseDate: any, items: any) {
-    let list = items.map(function (item: any) {
-        return { value: Number(item.percent.toFixed(2)), data: item };
-    });
-    list = list.length === 0 ? loadEmptyData2() : list;
+function initPowerCharts(baseDate: any, data: any) {
     chartsOption.value['loadPowerChart'] = {
         xData: baseDate,
         yData: [
             {
-                name: i18n.global.t('monitor.powerUsage'),
-                data: list,
+                name: i18n.global.t('aiTools.gpu.powerCurrent'),
+                data: data.powerUsed,
+            },
+            {
+                name: i18n.global.t('aiTools.gpu.powerLimit'),
+                data: data.powerTotal,
+            },
+            {
+                name: i18n.global.t('aiTools.gpu.percent'),
+                data: data.powerPercent,
+                yAxisIndex: 1,
             },
         ],
+        yAxis: [
+            { type: 'value', name: i18n.global.t('aiTools.gpu.power') },
+            {
+                type: 'value',
+                name: i18n.global.t('aiTools.gpu.percent') + ' ( % )',
+                position: 'right',
+                alignTicks: true,
+            },
+        ],
+        grid: mobile.value ? { left: '15%', right: '15%', bottom: '20%' } : null,
         tooltip: {
             trigger: 'axis',
             formatter: function (list: any) {
                 let res = loadDate(list[0].name);
                 for (const item of list) {
-                    res += loadSeries(item, item.data.value, '%');
-                    res += `( ${item.data?.data.used}  W / ${item.data?.data.total}  W)<br/>`;
+                    if (
+                        item.seriesName === i18n.global.t('aiTools.gpu.powerCurrent') ||
+                        item.seriesName === i18n.global.t('aiTools.gpu.powerLimit')
+                    ) {
+                        res += loadSeries(item, item.data, 'W');
+                    } else {
+                        res += loadSeries(item, Number(item.data.toFixed(2)), '%');
+                    }
                 }
                 return res;
             },
@@ -300,32 +332,6 @@ const quickJump = () => {
     routerToName('HostMonitorSetting');
 };
 
-function initXpuPowerCharts(baseDate: any, items: any) {
-    let list = items.map(function (item: any) {
-        return { value: Number(item.used.toFixed(2)), data: item };
-    });
-    list = list.length === 0 ? loadEmptyData2() : list;
-    chartsOption.value['loadPowerChart'] = {
-        xData: baseDate,
-        yData: [
-            {
-                name: i18n.global.t('monitor.powerUsage'),
-                data: list,
-            },
-        ],
-        tooltip: {
-            trigger: 'axis',
-            formatter: function (list: any) {
-                let res = loadDate(list[0].name);
-                for (const item of list) {
-                    res += loadSeries(item, item.data.value, 'W');
-                }
-                return res;
-            },
-        },
-        formatStr: 'W',
-    };
-}
 function initTemperatureCharts(baseDate: any, items: any) {
     let temperatures = items.map(function (item: any) {
         return Number(item);
@@ -335,7 +341,7 @@ function initTemperatureCharts(baseDate: any, items: any) {
         xData: baseDate,
         yData: [
             {
-                name: i18n.global.t('monitor.temperature'),
+                name: i18n.global.t('aiTools.gpu.temperature'),
                 data: temperatures,
             },
         ],
@@ -351,7 +357,7 @@ function initSpeedCharts(baseDate: any, items: any) {
         xData: baseDate,
         yData: [
             {
-                name: i18n.global.t('monitor.fanSpeed'),
+                name: i18n.global.t('aiTools.gpu.fanSpeed'),
                 data: speeds,
             },
         ],
@@ -370,25 +376,18 @@ function loadEmptyDate(timeRange: any) {
 function loadEmptyData() {
     return [0, 0];
 }
-function loadEmptyData2() {
-    return [
-        { value: 0, data: { total: 0, used: 0 } },
-        { value: 0, data: { total: 0, used: 0 } },
-    ];
-}
 
-function withMemoryProcess(list: any) {
-    let process;
+function withMemoryProcess(list: any, process: any) {
     let res = loadDate(list[0].name);
     for (const item of list) {
-        if (item.data?.data) {
-            process = item.data?.data.gpuProcesses || [];
+        if (
+            item.seriesName === i18n.global.t('aiTools.gpu.memoryUsed') ||
+            item.seriesName === i18n.global.t('aiTools.gpu.memoryTotal')
+        ) {
+            res += loadSeries(item, item.data, 'MiB');
+        } else {
+            res += loadSeries(item, Number(item.data.toFixed(2)), '%');
         }
-        res += loadSeries(item, item.data.value, '%');
-        res += `( ${item.data?.data.used}  MiB / ${item.data?.data.total}  MiB)<br/>`;
-    }
-    if (!process) {
-        return res;
     }
     let title = gpuType.value === 'gpu' ? i18n.global.t('aiTools.gpu.type') : i18n.global.t('aiTools.gpu.shr');
     res += `
@@ -399,11 +398,14 @@ function withMemoryProcess(list: any) {
             <th style="padding: 6px 8px;">PID</th>
             <th style="padding: 6px 8px;">${i18n.global.t('aiTools.gpu.processName')}</th>
             <th style="padding: 6px 8px;">${title}</th>
-            <th style="padding: 6px 8px;">${i18n.global.t('aiTools.gpu.processMemoryUsage')}</th>
+            <th style="padding: 6px 8px;">${i18n.global.t('aiTools.gpu.memoryUsed')}</th>
             </tr>
         </thead>
         <tbody>
     `;
+    if (!process) {
+        return res;
+    }
     for (const row of process) {
         res += `
             <tr>
@@ -417,7 +419,7 @@ function withMemoryProcess(list: any) {
                     ${loadProcessType(row.type)}
                 </td>
                 <td style="padding: 6px 8px; text-align: center;">
-                    ${row.usedMemory}
+                    ${row.usedMemory.replaceAll('MB', 'MiB')}
                 </td>
             </tr>
         `;

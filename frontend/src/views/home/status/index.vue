@@ -264,22 +264,22 @@
             <el-col :xs="6" :sm="6" :md="3" :lg="3" :xl="3" align="center" v-if="isShow('gpu', index)">
                 <el-popover :hide-after="20" :teleported="false" :width="450" v-if="chartsOption[`gpu${index}`]">
                     <el-descriptions :title="item.productName" direction="vertical" :column="3" size="small">
-                        <el-descriptions-item :label="$t('monitor.gpuUtil')">
+                        <el-descriptions-item :label="$t('aiTools.gpu.gpuUtil')">
                             {{ item.gpuUtil }}
                         </el-descriptions-item>
-                        <el-descriptions-item :label="$t('monitor.temperature')">
+                        <el-descriptions-item :label="$t('aiTools.gpu.temperature')">
                             {{ item.temperature.replaceAll('C', '°C') }}
                         </el-descriptions-item>
-                        <el-descriptions-item :label="$t('monitor.performanceState')">
+                        <el-descriptions-item :label="$t('aiTools.gpu.performanceState')">
                             {{ item.performanceState }}
                         </el-descriptions-item>
-                        <el-descriptions-item :label="$t('monitor.powerUsage')">
+                        <el-descriptions-item :label="$t('aiTools.gpu.powerUsage')">
                             {{ item.powerUsage }}
                         </el-descriptions-item>
-                        <el-descriptions-item :label="$t('monitor.memoryUsage')">
+                        <el-descriptions-item :label="$t('aiTools.gpu.memoryUsage')">
                             {{ item.memoryUsage }}
                         </el-descriptions-item>
-                        <el-descriptions-item :label="$t('monitor.fanSpeed')">
+                        <el-descriptions-item :label="$t('aiTools.gpu.fanSpeed')">
                             {{ item.fanSpeed }}
                         </el-descriptions-item>
                     </el-descriptions>
@@ -304,13 +304,13 @@
             <el-col :xs="6" :sm="6" :md="3" :lg="3" :xl="3" align="center" v-if="isShow('xpu', index)">
                 <el-popover :hide-after="20" :teleported="false" :width="400" v-if="chartsOption[`xpu${index}`]">
                     <el-descriptions :title="item.deviceName" direction="vertical" :column="3" size="small">
-                        <el-descriptions-item :label="$t('monitor.temperature')">
+                        <el-descriptions-item :label="$t('aiTools.gpu.temperature')">
                             {{ item.temperature }}
                         </el-descriptions-item>
-                        <el-descriptions-item :label="$t('monitor.powerUsage')">
+                        <el-descriptions-item :label="$t('aiTools.gpu.powerUsage')">
                             {{ item.power }}
                         </el-descriptions-item>
-                        <el-descriptions-item :label="$t('monitor.memoryUsage')">
+                        <el-descriptions-item :label="$t('aiTools.gpu.memoryUsage')">
                             {{ item.memoryUsed }}/{{ item.memory }}
                         </el-descriptions-item>
                     </el-descriptions>

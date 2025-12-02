@@ -174,20 +174,14 @@ export namespace Host {
         date: Array<Date>;
         gpuValue: Array<number>;
         temperatureValue: Array<number>;
-        powerValue: Array<GPUPowerUsageHelper>;
-        memoryValue: Array<GPUMemoryUsageHelper>;
+        powerTotal: Array<number>;
+        powerUsed: Array<number>;
+        powerPercent: Array<number>;
+        memoryTotal: Array<number>;
+        memoryUsed: Array<number>;
+        memoryPercent: Array<number>;
         speedValue: Array<number>;
-    }
-    export interface GPUPowerUsageHelper {
-        total: number;
-        used: number;
-        percent: number;
-    }
-    export interface GPUMemoryUsageHelper {
-        total: number;
-        used: number;
-        percent: number;
-        gpuProcesses: Array<GPUProcess>;
+        gpuProcesses: Array<Array<GPUProcess>>;
     }
     export interface GPUProcess {
         pid: string;
