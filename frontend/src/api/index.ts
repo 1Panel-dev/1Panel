@@ -103,6 +103,8 @@ class RequestHttp {
                             router.push({ name: 'Expired' });
                             return;
                         case 500:
+                        case 502:
+                        case 524:
                         case 407:
                             checkStatus(
                                 response.status,
