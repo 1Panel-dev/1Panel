@@ -63,15 +63,6 @@ type ContainerStatus struct {
 	NetworkCount         int `json:"networkCount"`
 	VolumeCount          int `json:"volumeCount"`
 	RepoCount            int `json:"repoCount"`
-
-	ContainerUsage        int64 `json:"containerUsage"`
-	ContainerReclaimable  int64 `json:"containerReclaimable"`
-	ImageUsage            int64 `json:"imageUsage"`
-	ImageReclaimable      int64 `json:"imageReclaimable"`
-	VolumeUsage           int64 `json:"volumeUsage"`
-	VolumeReclaimable     int64 `json:"volumeReclaimable"`
-	BuildCacheUsage       int64 `json:"buildCacheUsage"`
-	BuildCacheReclaimable int64 `json:"buildCacheReclaimable"`
 }
 type ResourceLimit struct {
 	CPU    int    `json:"cpu"`
@@ -129,6 +120,15 @@ type ContainerUpgrade struct {
 type ContainerItemStats struct {
 	SizeRw     int64 `json:"sizeRw"`
 	SizeRootFs int64 `json:"sizeRootFs"`
+
+	ContainerUsage        int64 `json:"containerUsage"`
+	ContainerReclaimable  int64 `json:"containerReclaimable"`
+	ImageUsage            int64 `json:"imageUsage"`
+	ImageReclaimable      int64 `json:"imageReclaimable"`
+	VolumeUsage           int64 `json:"volumeUsage"`
+	VolumeReclaimable     int64 `json:"volumeReclaimable"`
+	BuildCacheUsage       int64 `json:"buildCacheUsage"`
+	BuildCacheReclaimable int64 `json:"buildCacheReclaimable"`
 }
 type ContainerListStats struct {
 	ContainerID string `json:"containerID"`

@@ -264,13 +264,19 @@ func (b *BaseApi) ContainerListStats(c *gin.Context) {
 }
 
 // @Summary Load container stats size
+// @Accept json
+// @Param request body dto.OperationWithName true "request"
 // @Success 200 {object} dto.ContainerItemStats
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /containers/item/stats/:id [get]
+// @Router /containers/item/stats [post]
 func (b *BaseApi) ContainerItemStats(c *gin.Context) {
-	containerID := c.Param("id")
-	data, err := containerService.ContainerItemStats(containerID)
+	var req dto.OperationWithName
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	data, err := containerService.ContainerItemStats(req)
 	if err != nil {
 		helper.InternalServer(c, err)
 		return

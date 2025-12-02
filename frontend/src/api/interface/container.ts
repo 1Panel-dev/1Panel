@@ -137,6 +137,15 @@ export namespace Container {
     export interface ContainerItemStats {
         sizeRw: number;
         sizeRootFs: number;
+
+        containerUsage: number;
+        containerReclaimable: number;
+        imageUsage: number;
+        imageReclaimable: number;
+        volumeUsage: number;
+        volumeReclaimable: number;
+        buildCacheUsage: number;
+        buildCacheReclaimable: number;
     }
     export interface ContainerListStats {
         containerID: string;

@@ -70,7 +70,7 @@ type IContainerService interface {
 	ContainerUpgrade(req dto.ContainerUpgrade) error
 	ContainerInfo(req dto.OperationWithName) (*dto.ContainerOperate, error)
 	ContainerListStats() ([]dto.ContainerListStats, error)
-	ContainerItemStats(containerID string) (dto.ContainerItemStats, error)
+	ContainerItemStats(req dto.OperationWithName) (dto.ContainerItemStats, error)
 	LoadResourceLimit() (*dto.ResourceLimit, error)
 	ContainerRename(req dto.ContainerRename) error
 	ContainerCommit(req dto.ContainerCommit) error
@@ -199,13 +199,60 @@ func (u *ContainerService) LoadStatus() (dto.ContainerStatus, error) {
 	defer client.Close()
 	c := context.Background()
 
-	usage, err := client.DiskUsage(c, types.DiskUsageOptions{})
+	images, _ := client.ImageList(c, image.ListOptions{All: true})
+	data.ImageCount = len(images)
+	repo, _ := imageRepoRepo.List()
+	data.RepoCount = len(repo)
+	templates, _ := composeRepo.List()
+	data.ComposeTemplateCount = len(templates)
+	networks, _ := client.NetworkList(c, network.ListOptions{})
+	data.NetworkCount = len(networks)
+	volumes, _ := client.VolumeList(c, volume.ListOptions{})
+	data.VolumeCount = len(volumes.Volumes)
+	data.ComposeCount = loadComposeCount(client)
+	containers, _ := client.ContainerList(c, container.ListOptions{All: true})
+	data.ContainerCount = len(containers)
+	for _, item := range containers {
+		switch item.State {
+		case "created":
+			data.Created++
+		case "running":
+			data.Running++
+		case "paused":
+			data.Paused++
+		case "restarting":
+			data.Restarting++
+		case "dead":
+			data.Dead++
+		case "exited":
+			data.Exited++
+		case "removing":
+			data.Removing++
+		}
+	}
+	return data, nil
+}
+func (u *ContainerService) ContainerItemStats(req dto.OperationWithName) (dto.ContainerItemStats, error) {
+	var data dto.ContainerItemStats
+	client, err := docker.NewDockerClient()
 	if err != nil {
 		return data, err
 	}
+	if req.Name != "system" {
+		defer client.Close()
+		containerInfo, _, err := client.ContainerInspectWithRaw(context.Background(), req.Name, true)
+		if err != nil {
+			return data, err
+		}
+		data.SizeRw = *containerInfo.SizeRw
+		data.SizeRootFs = *containerInfo.SizeRootFs
+		return data, nil
+	}
 
-	data.ImageCount = len(usage.Images)
-	data.VolumeCount = len(usage.Volumes)
+	usage, err := client.DiskUsage(context.Background(), types.DiskUsageOptions{})
+	if err != nil {
+		return data, err
+	}
 	for _, item := range usage.Images {
 		data.ImageUsage += item.Size
 		if item.Containers < 1 {
@@ -227,49 +274,6 @@ func (u *ContainerService) LoadStatus() (dto.ContainerStatus, error) {
 	for _, item := range usage.BuildCache {
 		data.BuildCacheUsage += item.Size
 	}
-	repo, _ := imageRepoRepo.List()
-	data.RepoCount = len(repo)
-	templates, _ := composeRepo.List()
-	data.ComposeTemplateCount = len(templates)
-	networks, _ := client.NetworkList(c, network.ListOptions{})
-	data.NetworkCount = len(networks)
-	volumes, _ := client.VolumeList(c, volume.ListOptions{})
-	data.VolumeCount = len(volumes.Volumes)
-	data.ComposeCount = loadComposeCount(client)
-	data.ContainerCount = len(usage.Containers)
-	for _, item := range usage.Containers {
-		switch item.State {
-		case "created":
-			data.Created++
-		case "running":
-			data.Running++
-		case "paused":
-			data.Paused++
-		case "restarting":
-			data.Restarting++
-		case "dead":
-			data.Dead++
-		case "exited":
-			data.Exited++
-		case "removing":
-			data.Removing++
-		}
-	}
-	return data, nil
-}
-func (u *ContainerService) ContainerItemStats(containerID string) (dto.ContainerItemStats, error) {
-	var data dto.ContainerItemStats
-	client, err := docker.NewDockerClient()
-	if err != nil {
-		return data, err
-	}
-	defer client.Close()
-	containerInfo, _, err := client.ContainerInspectWithRaw(context.Background(), containerID, true)
-	if err != nil {
-		return data, err
-	}
-	data.SizeRw = *containerInfo.SizeRw
-	data.SizeRootFs = *containerInfo.SizeRootFs
 	return data, nil
 }
 func (u *ContainerService) ContainerListStats() ([]dto.ContainerListStats, error) {

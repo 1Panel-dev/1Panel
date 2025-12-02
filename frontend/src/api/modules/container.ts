@@ -44,7 +44,7 @@ export const cleanContainerLog = (containerName: string, operateNode?: string) =
     return http.post(`/containers/clean/log${params}`, { name: containerName });
 };
 export const containerItemStats = (containerID: string) => {
-    return http.get<Container.ContainerItemStats>(`/containers/item/stats/${containerID}`);
+    return http.post<Container.ContainerItemStats>(`/containers/item/stats`, { name: containerID }, TimeoutEnum.T_60S);
 };
 export const containerListStats = () => {
     return http.get<Array<Container.ContainerListStats>>(`/containers/list/stats`);

@@ -5,7 +5,7 @@
             v-model="detailInfo"
             mode="yaml"
             :heightDiff="160"
-            :disabled="true"
+            :readonly="true"
         ></CodemirrorPro>
         <template #footer>
             <span class="dialog-footer">
