@@ -2,14 +2,18 @@ package model
 
 type MonitorBase struct {
 	BaseModel
-	Cpu float64 `json:"cpu"`
+	Cpu         float64     `json:"cpu"`
+	TopCPU      string      `json:"topCPU"`
+	TopCPUItems interface{} `gorm:"-" json:"topCPUItems"`
+
+	Memory      float64     `json:"memory"`
+	TopMem      string      `json:"topMem"`
+	TopMemItems interface{} `gorm:"-" json:"topMemItems"`
 
 	LoadUsage float64 `json:"loadUsage"`
 	CpuLoad1  float64 `json:"cpuLoad1"`
 	CpuLoad5  float64 `json:"cpuLoad5"`
 	CpuLoad15 float64 `json:"cpuLoad15"`
-
-	Memory float64 `json:"memory"`
 }
 
 type MonitorIO struct {

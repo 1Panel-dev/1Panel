@@ -43,6 +43,8 @@ type Cronjob struct {
 	EntryIDs    string       `json:"entryIDs"`
 	Records     []JobRecords `json:"records"`
 	Secret      string       `json:"secret"`
+
+	Config string `json:"config"`
 }
 
 type JobRecords struct {
