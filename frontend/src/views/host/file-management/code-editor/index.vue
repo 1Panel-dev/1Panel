@@ -393,7 +393,7 @@
 <script lang="ts" setup>
 import { createFile, getFileContent, getFilesTree, saveFileContent } from '@/api/modules/files';
 import i18n from '@/lang';
-import { MsgSuccess, MsgWarning } from '@/utils/message';
+import { MsgError, MsgSuccess, MsgWarning } from '@/utils/message';
 import * as monaco from 'monaco-editor';
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
 import { Languages } from '@/global/mimetype';
@@ -867,19 +867,23 @@ const quickSave = () => {
     saveContent();
 };
 
-const saveContent = () => {
+const saveContent = async () => {
     if (isEdit.value) {
         loading.value = true;
-        saveFileContent(form.value)
-            .then(() => {
-                loading.value = false;
+        try {
+            const res = await saveFileContent(form.value);
+            if (res) {
                 isEdit.value = false;
                 oldFileContent.value = form.value.content;
                 MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
-            })
-            .catch(() => {
-                loading.value = false;
-            });
+            }else{
+                MsgError(i18n.global.t('common.status.failed'));
+                isEdit.value = false;
+                
+            }
+        } finally {
+            loading.value = false;
+        }
     } else {
         MsgWarning(i18n.global.t('file.noEdit'));
     }
