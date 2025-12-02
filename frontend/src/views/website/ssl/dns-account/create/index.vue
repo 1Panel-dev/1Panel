@@ -24,7 +24,8 @@
                             account.type === 'AliYun' ||
                             account.type === 'AliESA' ||
                             account.type === 'HuaweiCloud' ||
-                            account.type === 'BaiduCloud'
+                            account.type === 'BaiduCloud' ||
+                            account.type === 'AWSRoute53'
                         "
                     >
                         <el-form-item label="Access key" prop="authorization.accessKey">
@@ -157,6 +158,21 @@
                         </el-form-item>
                         <el-form-item label="BASE URL" prop="authorization.baseURL" :rules="[Rules.requiredInput]">
                             <el-input v-model.trim="account.authorization['baseURL']"></el-input>
+                        </el-form-item>
+                    </div>
+                    <div v-if="account.type === 'AWSRoute53'">
+                        <el-form-item label="Region" prop="authorization.region">
+                            <el-input
+                                v-model.trim="account.authorization['region']"
+                                :placeholder="'us-east-1'"
+                            ></el-input>
+                        </el-form-item>
+                        <el-form-item
+                            :label="$t('ssl.hostedZoneID')"
+                            prop="authorization.endpoint"
+                            :rules="[Rules.requiredInput]"
+                        >
+                            <el-input v-model.trim="account.authorization['endpoint']"></el-input>
                         </el-form-item>
                     </div>
                 </el-form>

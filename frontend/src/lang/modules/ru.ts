@@ -2322,6 +2322,7 @@ const message = {
         createDnsAccount: 'DNS аккаунт',
         aliyun: 'Aliyun',
         aliEsa: 'Aliyun ESA',
+        awsRoute53: 'AWS Route 53',
         manual: 'Ручная настройка',
         key: 'Ключ',
         check: 'Просмотр',
@@ -2810,6 +2811,7 @@ const message = {
         pushNode: 'Синхронизация с другими узлами',
         pushNodeHelper: 'Отправить на выбранные узлы после заявки/продления',
         fromMaster: 'Отправка с главного узла',
+        hostedZoneID: 'Hosted Zone ID',
     },
     firewall: {
         create: 'Создать правило',

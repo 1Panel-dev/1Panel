@@ -2184,6 +2184,7 @@ const message = {
         createDnsAccount: 'DNS 帳戶',
         aliyun: '阿里雲 DNS',
         aliEsa: '阿里雲 ESA',
+        awsRoute53: 'AWS Route 53（亞馬遜）',
         manual: '手動解析',
         key: '金鑰',
         check: '查看',
@@ -2632,6 +2633,7 @@ const message = {
         pushNode: '同步到其他節點',
         pushNodeHelper: '申請/續期之後推送到選擇的節點',
         fromMaster: '主節點推送',
+        hostedZoneID: '託管區域 ID',
     },
     firewall: {
         create: '建立規則',

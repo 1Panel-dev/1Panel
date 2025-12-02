@@ -2351,6 +2351,7 @@ const message = {
         createDnsAccount: 'DNS account',
         aliyun: 'Aliyun DNS',
         aliEsa: 'Aliyun ESA',
+        awsRoute53: 'AWS Route 53',
         manual: 'Manual parsing',
         key: 'Key',
         check: 'View',
@@ -2831,6 +2832,7 @@ const message = {
         pushNode: 'Sync to Other Nodes',
         pushNodeHelper: 'Push to selected nodes after application/renewal',
         fromMaster: 'Master Node Push',
+        hostedZoneID: 'Hosted Zone ID',
     },
     firewall: {
         create: 'Create rule',

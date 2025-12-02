@@ -2180,6 +2180,7 @@ const message = {
         createDnsAccount: 'DNS 账户',
         aliyun: '阿里云',
         aliEsa: '阿里云 ESA',
+        awsRoute53: 'AWS Route 53（亚马逊）',
         manual: '手动解析',
         key: '密钥',
         check: '查看',
@@ -2628,6 +2629,7 @@ const message = {
         pushNode: '同步到其他节点',
         pushNodeHelper: '申请/续期之后推送到选择的节点',
         fromMaster: '主节点推送',
+        hostedZoneID: '托管区域 ID',
     },
     firewall: {
         create: '创建规则',

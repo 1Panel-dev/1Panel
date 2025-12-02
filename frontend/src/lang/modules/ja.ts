@@ -2271,6 +2271,7 @@ const message = {
         createDnsAccount: 'DNSアカウント',
         aliyun: 'エイリアン',
         aliEsa: 'エイリアン ESA',
+        awsRoute53: 'AWS Route 53',
         manual: '手動解析',
         key: '鍵',
         check: 'ビュー',
@@ -2750,6 +2751,7 @@ const message = {
         pushNode: '他のノードに同期',
         pushNodeHelper: '申請/更新後に選択したノードにプッシュ',
         fromMaster: 'マスターノードからのプッシュ',
+        hostedZoneID: 'Hosted Zone ID',
     },
     firewall: {
         create: 'ルールを作成します',

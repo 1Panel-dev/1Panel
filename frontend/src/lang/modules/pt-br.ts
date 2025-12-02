@@ -2327,6 +2327,7 @@ const message = {
         createDnsAccount: 'Conta DNS',
         aliyun: 'Aliyun',
         aliEsa: 'Aliyun ESA',
+        awsRoute53: 'AWS Route 53',
         manual: 'Análise manual',
         key: 'Chave',
         check: 'Ver',
@@ -2816,6 +2817,7 @@ const message = {
         pushNode: 'Sincronizar com Outros Nós',
         pushNodeHelper: 'Enviar para os nós selecionados após a aplicação/renovação',
         fromMaster: 'Envio do Nó Mestre',
+        hostedZoneID: 'Hosted Zone ID',
     },
     firewall: {
         create: 'Criar regra',

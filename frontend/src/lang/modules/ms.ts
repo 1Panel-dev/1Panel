@@ -2325,6 +2325,7 @@ const message = {
         createDnsAccount: 'Akaun DNS',
         aliyun: 'Aliyun',
         aliEsa: 'Aliyun ESA',
+        awsRoute53: 'AWS Route 53',
         manual: 'Penyelesaian Manual',
         key: 'Kunci',
         check: 'Lihat',
@@ -2810,6 +2811,7 @@ const message = {
         pushNode: 'Segerakan ke Nod Lain',
         pushNodeHelper: 'Tolak ke nod terpilih selepas permohonan/pembaharuan',
         fromMaster: 'Tolak dari Nod Utama',
+        hostedZoneID: 'Hosted Zone ID',
     },
     firewall: {
         create: 'Buat peraturan',

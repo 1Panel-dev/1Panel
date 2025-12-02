@@ -21,6 +21,7 @@ import (
 	"github.com/go-acme/lego/v4/providers/dns/ovh"
 	"github.com/go-acme/lego/v4/providers/dns/rainyun"
 	"github.com/go-acme/lego/v4/providers/dns/regru"
+	"github.com/go-acme/lego/v4/providers/dns/route53"
 	"github.com/go-acme/lego/v4/providers/dns/spaceship"
 	"github.com/go-acme/lego/v4/providers/dns/tencentcloud"
 	"github.com/go-acme/lego/v4/providers/dns/vercel"
@@ -35,6 +36,7 @@ const (
 	DnsPod       DnsType = "DnsPod"
 	AliYun       DnsType = "AliYun"
 	AliESA       DnsType = "AliESA"
+	AWSRoute53   DnsType = "AWSRoute53"
 	CloudFlare   DnsType = "CloudFlare"
 	CloudDns     DnsType = "CloudDns"
 	NameSilo     DnsType = "NameSilo"
@@ -120,6 +122,19 @@ func getDNSProviderConfig(dnsType DnsType, params string) (challenge.Provider, e
 		config.PollingInterval = pollingInterval
 		config.TTL = ttl
 		p, err = aliesa.NewDNSProviderConfig(config)
+	case AWSRoute53:
+		config := route53.NewDefaultConfig()
+		config.AccessKeyID = param.AccessKey
+		config.SecretAccessKey = param.SecretKey
+		config.Region = param.Region
+		if config.Region == "" {
+			config.Region = "us-east-1"
+		}
+		config.HostedZoneID = param.Endpoint
+		config.PropagationTimeout = propagationTimeout
+		config.PollingInterval = pollingInterval
+		config.TTL = ttl
+		p, err = route53.NewDNSProviderConfig(config)
 	case CloudFlare:
 		config := cloudflare.NewDefaultConfig()
 		config.AuthEmail = param.Email

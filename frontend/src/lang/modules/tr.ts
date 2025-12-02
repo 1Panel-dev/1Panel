@@ -2382,6 +2382,7 @@ const message = {
         createDnsAccount: 'DNS hesabı',
         aliyun: 'Aliyun DNS',
         aliEsa: 'Aliyun ESA',
+        awsRoute53: 'AWS Route 53',
         manual: 'Manuel çözümleme',
         key: 'Anahtar',
         check: 'Görüntüle',
@@ -2869,6 +2870,7 @@ const message = {
         pushNode: 'Diğer Düğümlere Senkronize Et',
         pushNodeHelper: 'Başvuru/yenilemeden sonra seçilen düğümlere gönder',
         fromMaster: 'Ana Düğümden Gönder',
+        hostedZoneID: 'Hosted Zone ID',
     },
     firewall: {
         create: 'Kural oluştur',

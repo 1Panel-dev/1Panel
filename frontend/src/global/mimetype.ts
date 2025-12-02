@@ -181,6 +181,10 @@ export const DNSTypes = [
         value: 'AliESA',
     },
     {
+        label: i18n.global.t('website.awsRoute53'),
+        value: 'AWSRoute53',
+    },
+    {
         label: i18n.global.t('website.tencentCloud'),
         value: 'TencentCloud',
     },
