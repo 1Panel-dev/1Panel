@@ -876,10 +876,9 @@ const saveContent = async () => {
                 isEdit.value = false;
                 oldFileContent.value = form.value.content;
                 MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
-            }else{
+            } else {
                 MsgError(i18n.global.t('common.status.failed'));
                 isEdit.value = false;
-                
             }
         } finally {
             loading.value = false;
