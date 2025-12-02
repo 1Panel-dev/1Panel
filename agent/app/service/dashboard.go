@@ -108,7 +108,7 @@ func (u *DashboardService) LoadCurrentInfoForNode() *dto.NodeCurrent {
 
 	currentInfo.CPUTotal, _ = psutil.CPUInfo.GetLogicalCores(false)
 
-	cpuUsedPercent, perCore := psutil.CPU.GetCPUUsage()
+	cpuUsedPercent, perCore, _ := psutil.CPU.GetCPUUsage()
 	if len(perCore) == 0 {
 		currentInfo.CPUTotal = psutil.CPU.NumCPU()
 	} else {
@@ -184,7 +184,7 @@ func (u *DashboardService) LoadCurrentInfo(ioOption string, netOption string) *d
 	currentInfo.Procs = hostInfo.Procs
 	currentInfo.CPUTotal, _ = psutil.CPUInfo.GetLogicalCores(false)
 
-	cpuUsedPercent, perCore := psutil.CPU.GetCPUUsage()
+	cpuUsedPercent, perCore, _ := psutil.CPU.GetCPUUsage()
 	if len(perCore) == 0 {
 		currentInfo.CPUTotal = psutil.CPU.NumCPU()
 	} else {
