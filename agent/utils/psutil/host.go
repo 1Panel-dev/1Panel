@@ -43,8 +43,8 @@ func (h *HostInfoState) GetHostInfo(forceRefresh bool) (*host.InfoStat, error) {
 func (h *HostInfoState) GetDistro() string {
 	if h.cachedDistro == "" {
 		d := detectLinuxDistro()
-		if strings.HasSuffix(d, "(") {
-			d = d[:strings.Index(d, "(")]
+		if strings.Contains(d, "(") && strings.Contains(d, ")") {
+			d = d[:strings.LastIndex(d, "(")]
 		}
 		h.cachedDistro = strings.TrimSpace(d)
 	}
