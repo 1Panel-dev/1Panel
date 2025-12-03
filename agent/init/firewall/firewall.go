@@ -27,6 +27,19 @@ func Init() {
 
 	settingRepo := repo.NewISettingRepo()
 	if clientName == "ufw" || clientName == "iptables" {
+		if err := iptables.AddChain(iptables.FilterTab, iptables.Chain1PanelForward); err != nil {
+			global.LOG.Errorf("add forward chain failed, err: %v", err)
+			return
+		}
+		if err := iptables.AddChain(iptables.NatTab, iptables.Chain1PanelPreRouting); err != nil {
+			global.LOG.Errorf("add prerouting chain failed, err: %v", err)
+			return
+		}
+		if err := iptables.AddChain(iptables.NatTab, iptables.Chain1PanelPostRouting); err != nil {
+			global.LOG.Errorf("add postrouting chain failed, err: %v", err)
+			return
+		}
+		global.LOG.Infof("init iptables chains for forward successfully")
 		if err := iptables.LoadRulesFromFile(iptables.FilterTab, iptables.Chain1PanelForward, iptables.ForwardFileName); err != nil {
 			global.LOG.Errorf("load forward rules from file failed, err: %v", err)
 			return
