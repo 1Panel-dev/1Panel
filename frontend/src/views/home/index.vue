@@ -420,6 +420,7 @@ const currentInfo = ref<Dashboard.CurrentInfo>({
     cpuUsedPercent: 0,
     cpuUsed: 0,
     cpuTotal: 0,
+    cpuDetailedPercent: [] as Array<number>,
 
     memoryTotal: 0,
     memoryAvailable: 0,

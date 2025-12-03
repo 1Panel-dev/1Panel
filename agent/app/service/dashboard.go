@@ -108,7 +108,7 @@ func (u *DashboardService) LoadCurrentInfoForNode() *dto.NodeCurrent {
 
 	currentInfo.CPUTotal, _ = psutil.CPUInfo.GetLogicalCores(false)
 
-	cpuUsedPercent, perCore, _ := psutil.CPU.GetCPUUsage()
+	cpuUsedPercent, perCore, cpuDetailedPercent := psutil.CPU.GetCPUUsage()
 	if len(perCore) == 0 {
 		currentInfo.CPUTotal = psutil.CPU.NumCPU()
 	} else {
@@ -116,6 +116,7 @@ func (u *DashboardService) LoadCurrentInfoForNode() *dto.NodeCurrent {
 	}
 	currentInfo.CPUUsedPercent = cpuUsedPercent
 	currentInfo.CPUUsed = cpuUsedPercent * 0.01 * float64(currentInfo.CPUTotal)
+	currentInfo.CPUDetailedPercent = cpuDetailedPercent
 
 	loadInfo, _ := load.Avg()
 	currentInfo.Load1 = loadInfo.Load1
@@ -171,6 +172,7 @@ func (u *DashboardService) LoadBaseInfo(ioOption string, netOption string) (*dto
 
 	baseInfo.CPUCores, _ = psutil.CPUInfo.GetPhysicalCores(false)
 	baseInfo.CPULogicalCores, _ = psutil.CPUInfo.GetLogicalCores(false)
+	baseInfo.CPUMhz = cpuInfo[0].Mhz
 
 	baseInfo.CurrentInfo = *u.LoadCurrentInfo(ioOption, netOption)
 	return &baseInfo, nil
@@ -184,7 +186,7 @@ func (u *DashboardService) LoadCurrentInfo(ioOption string, netOption string) *d
 	currentInfo.Procs = hostInfo.Procs
 	currentInfo.CPUTotal, _ = psutil.CPUInfo.GetLogicalCores(false)
 
-	cpuUsedPercent, perCore, _ := psutil.CPU.GetCPUUsage()
+	cpuUsedPercent, perCore, cpuDetailedPercent := psutil.CPU.GetCPUUsage()
 	if len(perCore) == 0 {
 		currentInfo.CPUTotal = psutil.CPU.NumCPU()
 	} else {
@@ -193,6 +195,7 @@ func (u *DashboardService) LoadCurrentInfo(ioOption string, netOption string) *d
 	currentInfo.CPUPercent = perCore
 	currentInfo.CPUUsedPercent = cpuUsedPercent
 	currentInfo.CPUUsed = cpuUsedPercent * 0.01 * float64(currentInfo.CPUTotal)
+	currentInfo.CPUDetailedPercent = cpuDetailedPercent
 
 	loadInfo, _ := load.Avg()
 	currentInfo.Load1 = loadInfo.Load1

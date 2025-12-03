@@ -58,12 +58,15 @@
                 v-if="chartsOption['cpu']"
                 @hide="onCpuPopoverHide"
             >
-                <el-descriptions :title="baseInfo.cpuModelName" :column="2" size="small">
+                <el-descriptions :title="baseInfo.cpuModelName" class="ml-1" :column="3" size="small">
                     <el-descriptions-item :label="$t('home.core')">
                         {{ baseInfo.cpuCores }}
                     </el-descriptions-item>
                     <el-descriptions-item :label="$t('home.logicCore')">
                         {{ baseInfo.cpuLogicalCores }}
+                    </el-descriptions-item>
+                    <el-descriptions-item v-if="baseInfo.cpuMhz > 0" :label="$t('home.cpuFrequency')">
+                        {{ formatNumber(baseInfo.cpuMhz) }} MHz
                     </el-descriptions-item>
                 </el-descriptions>
 
@@ -81,7 +84,42 @@
                     <el-button v-if="!cpuShowAll" @click="cpuShowAll = true" icon="More" link size="small" />
                     <el-button v-if="cpuShowAll" @click="cpuShowAll = false" icon="ArrowUp" link size="small" />
                 </div>
-                <br />
+
+                <div v-if="currentInfo.cpuDetailedPercent?.length >= 8" class="mt-2">
+                    <el-button
+                        link
+                        size="small"
+                        type="primary"
+                        class="mb-2"
+                        @click="showCpuDetailedPercent = !showCpuDetailedPercent"
+                    >
+                        {{ $t('home.cpuDetailedPercent') }}
+                        <el-icon v-if="!showCpuDetailedPercent"><ArrowRight /></el-icon>
+                        <el-icon v-if="showCpuDetailedPercent"><ArrowDown /></el-icon>
+                    </el-button>
+                    <el-space wrap :size="5" class="ml-1 mb-2" v-if="showCpuDetailedPercent">
+                        <div class="cpu-detail">
+                            {{ $t('home.cpuUser') }}: {{ formatNumber(currentInfo.cpuDetailedPercent[0]) }}%
+                        </div>
+                        <div class="cpu-detail">
+                            {{ $t('home.cpuSystem') }}: {{ formatNumber(currentInfo.cpuDetailedPercent[1]) }}%
+                        </div>
+                        <div class="cpu-detail">Nice: {{ formatNumber(currentInfo.cpuDetailedPercent[2]) }}%</div>
+                        <div class="cpu-detail">
+                            {{ $t('home.cpuIdle') }}: {{ formatNumber(currentInfo.cpuDetailedPercent[3]) }}%
+                        </div>
+                        <div class="cpu-detail">I/O: {{ formatNumber(currentInfo.cpuDetailedPercent[4]) }}%</div>
+                        <div class="cpu-detail">
+                            {{ $t('home.cpuIrq') }}: {{ formatNumber(currentInfo.cpuDetailedPercent[5]) }}%
+                        </div>
+                        <div class="cpu-detail">
+                            {{ $t('home.cpuSoftirq') }}: {{ formatNumber(currentInfo.cpuDetailedPercent[6]) }}%
+                        </div>
+                        <div class="cpu-detail">
+                            {{ $t('home.cpuSteal') }}: {{ formatNumber(currentInfo.cpuDetailedPercent[7]) }}%
+                        </div>
+                    </el-space>
+                </div>
 
                 <el-button link size="small" type="primary" class="mt-2 mb-2" @click="toggleCpuTop">
                     {{ $t('home.cpuTop') }}
@@ -377,6 +415,7 @@ const baseInfo = ref<Dashboard.BaseInfo>({
     cpuCores: 0,
     cpuLogicalCores: 0,
     cpuModelName: '',
+    cpuMhz: 0,
     currentInfo: null,
     quickJump: [],
 });
@@ -394,6 +433,7 @@ const currentInfo = ref<Dashboard.CurrentInfo>({
     cpuUsedPercent: 0,
     cpuUsed: 0,
     cpuTotal: 0,
+    cpuDetailedPercent: [] as Array<number>,
 
     memoryTotal: 0,
     memoryAvailable: 0,
@@ -426,6 +466,7 @@ const currentInfo = ref<Dashboard.CurrentInfo>({
 });
 
 const cpuShowAll = ref();
+const showCpuDetailedPercent = ref(false);
 const showCpuTop = ref(false);
 const showMemTop = ref(false);
 const killProcessID = ref();

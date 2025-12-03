@@ -15,41 +15,38 @@ const (
 	fastInterval  = 3 * time.Second
 )
 
-// ============================================================================
-// 结构体定义
-// ============================================================================
-
 type CPUStat struct {
 	Idle  uint64
 	Total uint64
 }
 
-// CPUDetailedStat 存储 /proc/stat 中的详细 CPU 时间数据
-// 字段顺序: user, nice, system, idle, iowait, irq, softirq, steal, guest, guest_nice
 type CPUDetailedStat struct {
-	User      uint64 // 用户态时间
-	Nice      uint64 // 低优先级用户态时间
-	System    uint64 // 内核态时间
-	Idle      uint64 // 空闲时间
-	Iowait    uint64 // I/O 等待时间
-	Irq       uint64 // 硬中断时间
-	Softirq   uint64 // 软中断时间
-	Steal     uint64 // 虚拟化环境中被其他 OS 占用的时间
-	Guest     uint64 // 运行虚拟 CPU 的时间
-	GuestNice uint64 // 运行低优先级虚拟 CPU 的时间
-	Total     uint64 // 总时间
+	User      uint64
+	Nice      uint64
+	System    uint64
+	Idle      uint64
+	Iowait    uint64
+	Irq       uint64
+	Softirq   uint64
+	Steal     uint64
+	Guest     uint64
+	GuestNice uint64
+	Total     uint64
 }
 
-// CPUDetailedPercent 存储类似 top 命令的 CPU 百分比信息
 type CPUDetailedPercent struct {
-	User    float64 `json:"user"`    // %us - 用户空间占用
-	System  float64 `json:"system"`  // %sy - 内核空间占用
-	Nice    float64 `json:"nice"`    // %ni - 改变过优先级的进程占用
-	Idle    float64 `json:"idle"`    // %id - 空闲
-	Iowait  float64 `json:"iowait"`  // %wa - I/O 等待
-	Irq     float64 `json:"irq"`     // %hi - 硬中断
-	Softirq float64 `json:"softirq"` // %si - 软中断
-	Steal   float64 `json:"steal"`   // %st - 虚拟机偷取
+	User    float64 `json:"user"`
+	System  float64 `json:"system"`
+	Nice    float64 `json:"nice"`
+	Idle    float64 `json:"idle"`
+	Iowait  float64 `json:"iowait"`
+	Irq     float64 `json:"irq"`
+	Softirq float64 `json:"softirq"`
+	Steal   float64 `json:"steal"`
+}
+
+func (c *CPUDetailedPercent) GetCPUDetailedPercent() []float64 {
+	return []float64{c.User, c.System, c.Nice, c.Idle, c.Iowait, c.Irq, c.Softirq, c.Steal}
 }
 
 type CPUUsageState struct {
@@ -72,13 +69,7 @@ type CPUInfoState struct {
 	cachedLogicCores int
 }
 
-// ============================================================================
-// CPUUsageState 公有方法
-// ============================================================================
-
-// GetCPUUsage 返回 CPU 使用率、每核使用率和详细百分比信息
-// 返回: totalUsage, perCoreUsage, detailedPercent (类似 top 命令的 %us, %sy, %ni, %id, %wa, %hi, %si, %st)
-func (c *CPUUsageState) GetCPUUsage() (float64, []float64, CPUDetailedPercent) {
+func (c *CPUUsageState) GetCPUUsage() (float64, []float64, []float64) {
 	c.mu.Lock()
 
 	now := time.Now()
@@ -88,7 +79,7 @@ func (c *CPUUsageState) GetCPUUsage() (float64, []float64, CPUDetailedPercent) {
 		perCore := c.cachedPerCore
 		detailed := c.cachedDetailedPercent
 		c.mu.Unlock()
-		return result, perCore, detailed
+		return result, perCore, detailed.GetCPUDetailedPercent()
 	}
 
 	needReset := c.lastSampleTime.IsZero() || now.Sub(c.lastSampleTime) >= resetInterval
@@ -117,7 +108,7 @@ func (c *CPUUsageState) GetCPUUsage() (float64, []float64, CPUDetailedPercent) {
 		c.lastSampleTime = time.Now()
 		c.mu.Unlock()
 
-		return totalUsage, perCore, detailedPercent
+		return totalUsage, perCore, detailedPercent.GetCPUDetailedPercent()
 	}
 
 	curTotal, curDetail, curPer := readAllCPUStat()
@@ -143,7 +134,7 @@ func (c *CPUUsageState) GetCPUUsage() (float64, []float64, CPUDetailedPercent) {
 	c.lastPerCPUStat = curPer
 	c.lastSampleTime = time.Now()
 
-	return totalUsage, c.cachedPerCore, detailedPercent
+	return totalUsage, c.cachedPerCore, detailedPercent.GetCPUDetailedPercent()
 }
 
 func (c *CPUUsageState) NumCPU() int {
@@ -152,10 +143,6 @@ func (c *CPUUsageState) NumCPU() int {
 
 	return len(c.cachedPerCore)
 }
-
-// ============================================================================
-// CPUInfoState 公有方法
-// ============================================================================
 
 func (c *CPUInfoState) GetCPUInfo(forceRefresh bool) ([]cpu.InfoStat, error) {
 	c.mu.RLock()
@@ -220,22 +207,16 @@ func (c *CPUInfoState) GetLogicalCores(forceRefresh bool) (int, error) {
 	return cores, nil
 }
 
-// ============================================================================
-// 私有函数
-// ============================================================================
-
-// readProcStat 读取 /proc/stat 文件内容
 func readProcStat() ([]byte, error) {
 	return os.ReadFile("/proc/stat")
 }
 
-// parseCPUFields 解析 CPU 行的数值字段
 func parseCPUFields(line string) []uint64 {
 	fields := strings.Fields(line)
 	if len(fields) <= 1 {
 		return nil
 	}
-	fields = fields[1:] // 跳过 "cpu" 或 "cpuN" 前缀
+	fields = fields[1:]
 
 	nums := make([]uint64, len(fields))
 	for i, f := range fields {
@@ -245,7 +226,6 @@ func parseCPUFields(line string) []uint64 {
 	return nums
 }
 
-// calcIdleAndTotal 计算空闲时间和总时间
 func calcIdleAndTotal(nums []uint64) (idle, total uint64) {
 	if len(nums) < 5 {
 		return 0, 0
@@ -257,8 +237,6 @@ func calcIdleAndTotal(nums []uint64) (idle, total uint64) {
 	return
 }
 
-// readAllCPUStat 一次性读取所有 CPU 统计数据，避免多次读取 /proc/stat
-// 返回: 总CPU统计、详细CPU统计、每核CPU统计
 func readAllCPUStat() (CPUStat, CPUDetailedStat, []CPUStat) {
 	data, err := readProcStat()
 	if err != nil {
@@ -270,15 +248,12 @@ func readAllCPUStat() (CPUStat, CPUDetailedStat, []CPUStat) {
 		return CPUStat{}, CPUDetailedStat{}, nil
 	}
 
-	// 解析第一行 (总 CPU)
 	firstLine := lines[0]
 	nums := parseCPUFields(firstLine)
 
-	// CPUStat
 	idle, total := calcIdleAndTotal(nums)
 	cpuStat := CPUStat{Idle: idle, Total: total}
 
-	// CPUDetailedStat - 确保至少有 10 个元素
 	if len(nums) < 10 {
 		padded := make([]uint64, 10)
 		copy(padded, nums)
@@ -296,11 +271,9 @@ func readAllCPUStat() (CPUStat, CPUDetailedStat, []CPUStat) {
 		Guest:     nums[8],
 		GuestNice: nums[9],
 	}
-	// 计算总时间 (不包括 guest 和 guest_nice，因为它们已经包含在 user 和 nice 中)
 	detailedStat.Total = detailedStat.User + detailedStat.Nice + detailedStat.System +
 		detailedStat.Idle + detailedStat.Iowait + detailedStat.Irq + detailedStat.Softirq + detailedStat.Steal
 
-	// 解析每核 CPU
 	var perCPUStats []CPUStat
 	for _, line := range lines[1:] {
 		if !strings.HasPrefix(line, "cpu") {
@@ -318,7 +291,6 @@ func readAllCPUStat() (CPUStat, CPUDetailedStat, []CPUStat) {
 	return cpuStat, detailedStat, perCPUStats
 }
 
-// calcCPUPercent 计算两次采样之间的 CPU 使用率百分比
 func calcCPUPercent(prev, cur CPUStat) float64 {
 	deltaIdle := float64(cur.Idle - prev.Idle)
 	deltaTotal := float64(cur.Total - prev.Total)
@@ -328,7 +300,6 @@ func calcCPUPercent(prev, cur CPUStat) float64 {
 	return (1 - deltaIdle/deltaTotal) * 100
 }
 
-// calcCPUDetailedPercent 根据两次采样计算各项 CPU 百分比
 func calcCPUDetailedPercent(prev, cur CPUDetailedStat) CPUDetailedPercent {
 	deltaTotal := float64(cur.Total - prev.Total)
 	if deltaTotal <= 0 {
