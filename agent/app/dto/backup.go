@@ -33,6 +33,12 @@ type BackupInfo struct {
 	RememberAuth bool `json:"rememberAuth"`
 }
 
+type BackupCheckRes struct {
+	IsOk  bool   `json:"isOk"`
+	Msg   string `json:"msg"`
+	Token string `json:"token"`
+}
+
 type ForBuckets struct {
 	Type       string `json:"type" validate:"required"`
 	AccessKey  string `json:"accessKey"`

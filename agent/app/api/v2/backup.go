@@ -26,6 +26,23 @@ func (b *BaseApi) CheckBackupUsed(c *gin.Context) {
 }
 
 // @Tags Backup Account
+// @Summary Check backup account
+// @Accept json
+// @Param request body dto.BackupOperate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /backups/check [post]
+func (b *BaseApi) CheckBackup(c *gin.Context) {
+	var req dto.BackupOperate
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	helper.SuccessWithData(c, backupService.CheckConn(req))
+}
+
+// @Tags Backup Account
 // @Summary Create backup account
 // @Accept json
 // @Param request body dto.BackupOperate true "request"

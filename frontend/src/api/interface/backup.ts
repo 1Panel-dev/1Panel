@@ -25,6 +25,11 @@ export namespace Backup {
         varsJson: object;
         createdAt: Date;
     }
+    export interface CheckResult {
+        isOk: boolean;
+        msg: string;
+        token: string;
+    }
     export interface ClientInfo {
         client_id: string;
         client_secret: string;

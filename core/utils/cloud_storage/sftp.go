@@ -1,4 +1,4 @@
-package client
+package cloud_storage
 
 import (
 	"io"
@@ -12,13 +12,12 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-type sftpClient struct {
-	bucket   string
+type SftpClient struct {
 	connInfo string
 	config   *ssh.ClientConfig
 }
 
-func NewSftpClient(vars map[string]interface{}) (*sftpClient, error) {
+func NewSftpClient(vars map[string]interface{}) (*SftpClient, error) {
 	address := loadParamFromVars("address", vars)
 	port := loadParamFromVars("port", vars)
 	if len(port) == 0 {
@@ -26,8 +25,8 @@ func NewSftpClient(vars map[string]interface{}) (*sftpClient, error) {
 	}
 	authMode := loadParamFromVars("authMode", vars)
 	passPhrase := loadParamFromVars("passPhrase", vars)
+	username := loadParamFromVars("username", vars)
 	password := loadParamFromVars("password", vars)
-	bucket := loadParamFromVars("bucket", vars)
 
 	var auth []ssh.AuthMethod
 	if authMode == "key" {
@@ -45,8 +44,6 @@ func NewSftpClient(vars map[string]interface{}) (*sftpClient, error) {
 	} else {
 		auth = []ssh.AuthMethod{ssh.Password(password)}
 	}
-	username := loadParamFromVars("username", vars)
-
 	clientConfig := &ssh.ClientConfig{
 		User:    username,
 		Auth:    auth,
@@ -60,10 +57,10 @@ func NewSftpClient(vars map[string]interface{}) (*sftpClient, error) {
 		return nil, err
 	}
 
-	return &sftpClient{connInfo: addr, config: clientConfig, bucket: bucket}, nil
+	return &SftpClient{connInfo: addr, config: clientConfig}, nil
 }
 
-func (s sftpClient) Upload(src, target string) (bool, error) {
+func (s SftpClient) Upload(src, target string) (bool, error) {
 	sshClient, err := ssh.Dial("tcp", s.connInfo, s.config)
 	if err != nil {
 		return false, err
@@ -81,8 +78,7 @@ func (s sftpClient) Upload(src, target string) (bool, error) {
 	}
 	defer srcFile.Close()
 
-	targetFilePath := path.Join(s.bucket, target)
-	targetDir, _ := path.Split(targetFilePath)
+	targetDir, _ := path.Split(target)
 	if len(targetDir) != 0 {
 		if _, err = client.Stat(targetDir); err != nil {
 			if os.IsNotExist(err) {
@@ -94,36 +90,13 @@ func (s sftpClient) Upload(src, target string) (bool, error) {
 			}
 		}
 	}
-	dstFile, err := client.Create(path.Join(s.bucket, target))
+	dstFile, err := client.Create(target)
 	if err != nil {
 		return false, err
 	}
 	defer dstFile.Close()
 
 	if _, err := io.Copy(dstFile, srcFile); err != nil {
-		return false, err
-	}
-	return true, nil
-}
-
-func (s sftpClient) ListBuckets() ([]interface{}, error) {
-	var result []interface{}
-	return result, nil
-}
-
-func (s sftpClient) Delete(filePath string) (bool, error) {
-	sshClient, err := ssh.Dial("tcp", s.connInfo, s.config)
-	if err != nil {
-		return false, err
-	}
-	client, err := sftp.NewClient(sshClient)
-	if err != nil {
-		return false, err
-	}
-	defer client.Close()
-	defer sshClient.Close()
-
-	if err := client.Remove(filePath); err != nil {
 		return false, err
 	}
 	return true, nil

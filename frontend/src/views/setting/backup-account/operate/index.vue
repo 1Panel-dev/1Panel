@@ -405,7 +405,10 @@
             <el-button :disabled="loading" @click="handleClose">
                 {{ $t('commons.button.cancel') }}
             </el-button>
-            <el-button :disabled="loading" type="primary" @click="onSubmit(formRef)">
+            <el-button :disabled="loading" @click="onCheck(formRef)">
+                {{ $t('terminal.testConn') }}
+            </el-button>
+            <el-button type="primary" :disabled="!isOK || loading" @click="onSubmit()">
                 {{ $t('commons.button.confirm') }}
             </el-button>
         </template>
@@ -414,16 +417,16 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref } from 'vue';
+import { reactive, ref, watch, computed, onUnmounted } from 'vue';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { Backup } from '@/api/interface/backup';
 import FileList from '@/components/file-list/index.vue';
-import { addBackup, editBackup, getClientInfo, listBucket } from '@/api/modules/backup';
+import { addBackup, checkBackup, editBackup, getClientInfo, listBucket } from '@/api/modules/backup';
 import { cities } from './../helper';
-import { deepCopy, spliceHttp, splitHttp } from '@/utils/util';
-import { MsgSuccess } from '@/utils/message';
+import { dateFormat, deepCopy, spliceHttp, splitHttp } from '@/utils/util';
+import { MsgError, MsgSuccess } from '@/utils/message';
 import { Base64 } from 'js-base64';
 import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();
@@ -434,6 +437,9 @@ const formRef = ref<FormInstance>();
 const buckets = ref();
 const clientInfo = ref();
 const fileRef = ref();
+
+const isOK = ref();
+const stopWatch = ref();
 
 const regionInput = ref();
 
@@ -501,6 +507,32 @@ const drawerVisible = ref(false);
 const dialogData = ref<DialogProps>({
     title: '',
 });
+
+const formWatcher = computed(() => {
+    const { type, isPublic, accessKey, bucket, credential, backupPath, bucketInput, varsJson } =
+        dialogData.value.rowData || {};
+    return { type, isPublic, accessKey, bucket, credential, backupPath, bucketInput, varsJson };
+});
+const startWatcher = () => {
+    if (stopWatch.value) {
+        stopWatcher();
+    }
+    stopWatch.value = watch(
+        () => formWatcher.value,
+        () => {
+            stopWatcher();
+            isOK.value = false;
+        },
+        { deep: true },
+    );
+};
+const stopWatcher = () => {
+    if (stopWatch.value) {
+        stopWatch.value();
+        stopWatch.value = null;
+    }
+};
+
 const acceptParams = (params: DialogProps): void => {
     dialogData.value = params;
     dialogData.value.rowData.varsJson = dialogData.value.rowData!.vars
@@ -637,14 +669,11 @@ const handleS3RegionChange = (region?: string) => {
     if (!region || !dialogData.value.rowData || dialogData.value.rowData!.type !== 'S3') {
         return;
     }
-    // 检查是否是 AWS S3 标准区域
     const isStandardRegion = s3Regions.some((item) => item.value === region);
     if (isStandardRegion) {
-        // 自动设置 endpoint 为 AWS S3 标准 endpoint
         dialogData.value.rowData!.varsJson['endpointItem'] = `s3.${region}.amazonaws.com`;
         domainProto.value = 'https';
     }
-    // 如果是自定义区域，endpoint 保持用户设置的值
 };
 
 const changeType = async () => {
@@ -739,7 +768,7 @@ const getBuckets = async (formEl: FormInstance | undefined) => {
         });
 };
 
-const onSubmit = async (formEl: FormInstance | undefined) => {
+const onCheck = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
@@ -758,19 +787,39 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         }
         dialogData.value.rowData.vars = JSON.stringify(dialogData.value.rowData!.varsJson);
         loading.value = true;
-        if (dialogData.value.title === 'create') {
-            await addBackup(dialogData.value.rowData)
-                .then(() => {
-                    loading.value = false;
-                    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                    drawerVisible.value = false;
-                })
-                .catch(() => {
-                    loading.value = false;
-                });
-            return;
-        }
-        await editBackup(dialogData.value.rowData)
+        await checkBackup(dialogData.value.rowData)
+            .then((res) => {
+                loading.value = false;
+                if (res.data.isOk) {
+                    isOK.value = true;
+                    MsgSuccess(i18n.global.t('terminal.connTestOk'));
+                    if (hasClient()) {
+                        dialogData.value.rowData!.varsJson['refresh_token'] = Base64.decode(res.data.token);
+                        dialogData.value.rowData!.varsJson['refresh_status'] = 'Success';
+                        dialogData.value.rowData!.varsJson['refresh_time'] = dateFormat(null, null, new Date());
+                    }
+                    if (isALIYUNYUN()) {
+                        dialogData.value.rowData!.varsJson['refresh_status'] = 'Success';
+                        dialogData.value.rowData!.varsJson['refresh_time'] = dateFormat(null, null, new Date());
+                    }
+                    startWatcher();
+                    return;
+                }
+                isOK.value = false;
+                MsgError(i18n.global.t('terminal.connTestFailed') + ':' + res.data.msg);
+            })
+            .catch(() => {
+                loading.value = false;
+                isOK.value = false;
+            });
+    });
+};
+
+const onSubmit = async () => {
+    dialogData.value.rowData.vars = JSON.stringify(dialogData.value.rowData!.varsJson);
+    loading.value = true;
+    if (dialogData.value.title === 'create') {
+        await addBackup(dialogData.value.rowData)
             .then(() => {
                 loading.value = false;
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
@@ -779,8 +828,22 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
             .catch(() => {
                 loading.value = false;
             });
-    });
+        return;
+    }
+    await editBackup(dialogData.value.rowData)
+        .then(() => {
+            loading.value = false;
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            drawerVisible.value = false;
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
+
+onUnmounted(() => {
+    if (stopWatch.value) stopWatcher();
+});
 
 defineExpose({
     acceptParams,
