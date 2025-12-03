@@ -65,12 +65,12 @@ func AnalysisFromLog(pathItem string, record *model.ClamRecord) {
 
 func StopAllClamJob(withCheck bool, clamRepo repo.IClamRepo) bool {
 	if withCheck {
-		isActive := false
-		isexist, _ := controller.CheckExist("clam")
-		if isexist {
-			isActive, _ = controller.CheckActive("clam")
+		isExist, _ := controller.CheckExist("clam")
+		if !isExist {
+			return false
 		}
-		if isActive {
+		isActive, _ := controller.CheckActive("clam")
+		if !isActive {
 			return false
 		}
 	}
