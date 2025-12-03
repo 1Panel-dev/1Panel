@@ -88,6 +88,7 @@ func (u *DashboardService) LoadOsInfo() (*dto.OsInfo, error) {
 	baseInfo.PlatformFamily = hostInfo.PlatformFamily
 	baseInfo.KernelArch = hostInfo.KernelArch
 	baseInfo.KernelVersion = hostInfo.KernelVersion
+	baseInfo.PrettyDistro = psutil.HOST.GetDistro()
 
 	diskInfo, err := psutil.DISK.GetUsage(global.Dir.BaseDir, false)
 	if err == nil {
@@ -152,6 +153,7 @@ func (u *DashboardService) LoadBaseInfo(ioOption string, netOption string) (*dto
 		Platform:             hostInfo.Platform,
 		PlatformFamily:       hostInfo.PlatformFamily,
 		PlatformVersion:      hostInfo.PlatformVersion,
+		PrettyDistro:         psutil.HOST.GetDistro(),
 		KernelArch:           hostInfo.KernelArch,
 		KernelVersion:        hostInfo.KernelVersion,
 		VirtualizationSystem: string(ss),

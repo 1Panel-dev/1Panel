@@ -13,6 +13,7 @@ type DashboardBase struct {
 	Platform             string `json:"platform"`
 	PlatformFamily       string `json:"platformFamily"`
 	PlatformVersion      string `json:"platformVersion"`
+	PrettyDistro         string `json:"prettyDistro"`
 	KernelArch           string `json:"kernelArch"`
 	KernelVersion        string `json:"kernelVersion"`
 	VirtualizationSystem string `json:"virtualizationSystem"`
@@ -49,6 +50,7 @@ type OsInfo struct {
 	PlatformFamily string `json:"platformFamily"`
 	KernelArch     string `json:"kernelArch"`
 	KernelVersion  string `json:"kernelVersion"`
+	PrettyDistro   string `json:"prettyDistro"`
 
 	DiskSize int64 `json:"diskSize"`
 }

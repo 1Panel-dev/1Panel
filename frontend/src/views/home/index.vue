@@ -203,7 +203,9 @@
                                                 <span class="system-label">{{ $t('home.platformVersion') }}</span>
                                             </template>
                                             {{
-                                                baseInfo.platformVersion
+                                                baseInfo.prettyDistro
+                                                    ? baseInfo.prettyDistro
+                                                    : baseInfo.platformVersion
                                                     ? baseInfo.platform + '-' + baseInfo.platformVersion
                                                     : baseInfo.platform
                                             }}
@@ -393,6 +395,7 @@ const baseInfo = ref<Dashboard.BaseInfo>({
     platform: '',
     platformFamily: '',
     platformVersion: '',
+    prettyDistro: '',
     kernelArch: '',
     kernelVersion: '',
     virtualizationSystem: '',
@@ -660,7 +663,9 @@ const handleCopy = () => {
         '\n' +
         i18n.global.t('home.platformVersion') +
         ': ' +
-        (baseInfo.value.platformVersion
+        (baseInfo.value.prettyDistro
+            ? baseInfo.value.prettyDistro
+            : baseInfo.value.platformVersion
             ? baseInfo.value.platform + '-' + baseInfo.value.platformVersion
             : baseInfo.value.platform) +
         '\n' +

@@ -52,6 +52,7 @@ export namespace Dashboard {
         platform: string;
         platformFamily: string;
         platformVersion: string;
+        prettyDistro: string;
         kernelArch: string;
         kernelVersion: string;
         virtualizationSystem: string;
