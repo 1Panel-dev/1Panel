@@ -1153,7 +1153,7 @@ func (a AppService) SyncAppListFromRemote(taskID string) (err error) {
 	}, nil)
 
 	go func() {
-		if err = syncTask.Execute(); err != nil {
+		if err := syncTask.Execute(); err != nil {
 			_ = NewISettingService().Update("AppStoreLastModified", "0")
 			_ = NewISettingService().Update("AppStoreSyncStatus", constant.StatusError)
 		}
