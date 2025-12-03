@@ -193,24 +193,7 @@ func (a AppService) GetApp(ctx *gin.Context, key string) (*response.AppDTO, erro
 	if err != nil {
 		return nil, err
 	}
-	var versionsRaw []string
-	hasLatest := false
-	latestVersion := ""
-	for _, detail := range details {
-		if strings.Contains(detail.Version, "latest") {
-			hasLatest = true
-			latestVersion = detail.Version
-			continue
-		}
-		if key == "openresty" && !common.CompareAppVersion(detail.Version, "1.27") {
-			continue
-		}
-		versionsRaw = append(versionsRaw, detail.Version)
-	}
-	appDTO.Versions = common.GetSortedVersions(versionsRaw)
-	if hasLatest {
-		appDTO.Versions = append([]string{latestVersion}, appDTO.Versions...)
-	}
+	appDTO.Versions = getAppVersions(key, details)
 	tags, err := getAppTags(app.ID, strings.ToLower(common.GetLang(ctx)))
 	if err != nil {
 		return nil, err

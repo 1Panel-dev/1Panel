@@ -353,6 +353,7 @@ const login = (formEl: FormInstance | undefined) => {
         } catch (res) {
             if (res.code === 401) {
                 if (res.message === 'ErrCaptchaCode') {
+                    globalStore.ignoreCaptcha = false;
                     loginForm.captcha = '';
                     errCaptcha.value = true;
                     errAuthInfo.value = false;

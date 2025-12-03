@@ -2174,3 +2174,28 @@ func isEditCompose(installed model.AppInstall) bool {
 	}
 	return false
 }
+
+func getAppVersions(key string, details []model.AppDetail) []string {
+	var (
+		versionsRaw []string
+		versions    []string
+	)
+	hasLatest := false
+	latestVersion := ""
+	for _, detail := range details {
+		if key != "mssql" && strings.Contains(detail.Version, "latest") {
+			hasLatest = true
+			latestVersion = detail.Version
+			continue
+		}
+		if key == "openresty" && !common.CompareAppVersion(detail.Version, "1.27") {
+			continue
+		}
+		versionsRaw = append(versionsRaw, detail.Version)
+	}
+	versions = common.GetSortedVersions(versionsRaw)
+	if hasLatest {
+		versions = append([]string{latestVersion}, versions...)
+	}
+	return versions
+}
