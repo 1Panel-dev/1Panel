@@ -402,6 +402,7 @@ const baseInfo = ref<Dashboard.BaseInfo>({
     cpuCores: 0,
     cpuLogicalCores: 0,
     cpuModelName: '',
+    cpuMhz: 0,
     currentInfo: null,
 
     quickJump: [],
