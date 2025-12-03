@@ -2180,7 +2180,7 @@ const message = {
         createDnsAccount: 'DNS 账户',
         aliyun: '阿里云',
         aliEsa: '阿里云 ESA',
-        awsRoute53: 'AWS Route 53（亚马逊）',
+        awsRoute53: 'Amazon Route 53',
         manual: '手动解析',
         key: '密钥',
         check: '查看',

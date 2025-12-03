@@ -2322,7 +2322,7 @@ const message = {
         createDnsAccount: 'DNS аккаунт',
         aliyun: 'Aliyun',
         aliEsa: 'Aliyun ESA',
-        awsRoute53: 'AWS Route 53',
+        awsRoute53: 'Amazon Route 53',
         manual: 'Ручная настройка',
         key: 'Ключ',
         check: 'Просмотр',

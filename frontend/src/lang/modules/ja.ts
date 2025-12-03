@@ -2271,7 +2271,7 @@ const message = {
         createDnsAccount: 'DNSアカウント',
         aliyun: 'エイリアン',
         aliEsa: 'エイリアン ESA',
-        awsRoute53: 'AWS Route 53',
+        awsRoute53: 'Amazon Route 53',
         manual: '手動解析',
         key: '鍵',
         check: 'ビュー',

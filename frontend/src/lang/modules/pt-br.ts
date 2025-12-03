@@ -2327,7 +2327,7 @@ const message = {
         createDnsAccount: 'Conta DNS',
         aliyun: 'Aliyun',
         aliEsa: 'Aliyun ESA',
-        awsRoute53: 'AWS Route 53',
+        awsRoute53: 'Amazon Route 53',
         manual: 'Análise manual',
         key: 'Chave',
         check: 'Ver',
