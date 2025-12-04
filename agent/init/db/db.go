@@ -1,6 +1,7 @@
 package db
 
 import (
+	"os"
 	"path"
 
 	"github.com/1Panel-dev/1Panel/agent/global"
@@ -14,7 +15,7 @@ func Init() {
 	global.GPUMonitorDB = common.LoadDBConnByPath(path.Join(global.Dir.DbDir, "gpu_monitor.db"), "gpu_monitor")
 	global.AlertDB = common.LoadDBConnByPath(path.Join(global.Dir.DbDir, "alert.db"), "alert")
 
-	if global.IsMaster {
+	if _, err := os.Stat("/usr/bin/1panel-core"); err == nil {
 		global.CoreDB = common.LoadDBConnByPath(path.Join(global.Dir.DbDir, "core.db"), "core")
 	}
 }
