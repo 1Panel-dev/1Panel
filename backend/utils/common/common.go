@@ -426,3 +426,11 @@ func HandleIPList(content string) ([]string, error) {
 	}
 	return res, nil
 }
+
+func GetRealClientIP(c *gin.Context) string {
+	addr := c.Request.RemoteAddr
+	if ip, _, err := net.SplitHostPort(addr); err == nil {
+		return ip
+	}
+	return addr
+}

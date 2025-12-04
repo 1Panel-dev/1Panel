@@ -11,13 +11,13 @@ import (
 var store = base64Captcha.DefaultMemStore
 
 func VerifyCode(codeID string, code string) error {
-	if codeID == "" {
-		return constant.ErrCaptchaCode
-	}
 	vv := store.Get(codeID, true)
 	vv = strings.TrimSpace(vv)
 	code = strings.TrimSpace(code)
 
+	if codeID == "" || code == "" {
+		return constant.ErrCaptchaCode
+	}
 	if strings.EqualFold(vv, code) {
 		return nil
 	}

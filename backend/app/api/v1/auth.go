@@ -2,12 +2,14 @@ package v1
 
 import (
 	"encoding/base64"
+
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/captcha"
+	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/gin-gonic/gin"
 )
 
@@ -26,7 +28,9 @@ func (b *BaseApi) Login(c *gin.Context) {
 		return
 	}
 
-	if req.AuthMethod != "jwt" && !req.IgnoreCaptcha {
+	ip := common.GetRealClientIP(c)
+	needCaptcha := global.IPTracker.NeedCaptcha(ip)
+	if needCaptcha {
 		if err := captcha.VerifyCode(req.CaptchaID, req.Captcha); err != nil {
 			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 			return
@@ -48,9 +52,11 @@ func (b *BaseApi) Login(c *gin.Context) {
 	user, err := authService.Login(c, req, string(entrance))
 	go saveLoginLogs(c, err)
 	if err != nil {
+		global.IPTracker.SetNeedCaptcha(ip)
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
+	global.IPTracker.Clear(ip)
 	helper.SuccessWithData(c, user)
 }
 
@@ -134,16 +140,21 @@ func (b *BaseApi) CheckIsIntl(c *gin.Context) {
 }
 
 // @Tags Auth
-// @Summary Load System Language
-// @Success 200 {string} language
-// @Router /auth/language [get]
-func (b *BaseApi) GetLanguage(c *gin.Context) {
+// @Summary Load System Setting for login
+// @Success 200 {object} dto.LoginSetting
+// @Router /auth/setting [get]
+func (b *BaseApi) GetAuthSetting(c *gin.Context) {
 	settingInfo, err := settingService.GetSettingInfo()
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
-	helper.SuccessWithData(c, settingInfo.Language)
+	ip := common.GetRealClientIP(c)
+	needCaptcha := global.IPTracker.NeedCaptcha(ip)
+	helper.SuccessWithData(c, dto.LoginSetting{
+		NeedCaptcha: needCaptcha,
+		Language:    settingInfo.Language,
+	})
 }
 
 func saveLoginLogs(c *gin.Context, err error) {

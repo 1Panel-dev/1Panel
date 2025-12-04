@@ -2,7 +2,6 @@ export namespace Login {
     export interface ReqLoginForm {
         name: string;
         password: string;
-        ignoreCaptcha: boolean;
         captcha: string;
         captchaID: string;
         authMethod: string;
@@ -25,5 +24,9 @@ export namespace Login {
     }
     export interface ResAuthButtons {
         [propName: string]: any;
+    }
+    export interface LoginSetting {
+        language: string;
+        needCaptcha: boolean;
     }
 }

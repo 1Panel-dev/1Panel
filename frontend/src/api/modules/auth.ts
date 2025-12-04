@@ -21,8 +21,8 @@ export const checkIsDemo = () => {
     return http.get<boolean>('/auth/demo');
 };
 
-export const getLanguage = () => {
-    return http.get<string>(`/auth/language`);
+export const getAuthSetting = () => {
+    return http.get<Login.LoginSetting>(`/auth/setting`);
 };
 
 export const checkIsIntl = () => {

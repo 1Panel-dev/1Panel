@@ -13,6 +13,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/i18n"
 
 	"github.com/1Panel-dev/1Panel/backend/init/app"
+	"github.com/1Panel-dev/1Panel/backend/init/auth"
 	"github.com/1Panel-dev/1Panel/backend/init/business"
 	"github.com/1Panel-dev/1Panel/backend/init/lang"
 
@@ -52,6 +53,7 @@ func Start() {
 	business.Init()
 
 	rootRouter := router.Routers()
+	global.IPTracker = auth.NewIPTracker()
 
 	tcpItem := "tcp4"
 	if global.CONF.System.Ipv6 == "enable" {
