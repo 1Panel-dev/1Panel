@@ -119,9 +119,10 @@ func (u *DatabaseService) CheckDatabase(req dto.DatabaseCreate) bool {
 	if req.Timeout == 0 {
 		req.Timeout = 30
 	}
+	var err error
 	switch req.Type {
 	case constant.AppPostgresql:
-		_, err := postgresql.NewPostgresqlClient(pgclient.DBInfo{
+		_, err = postgresql.NewPostgresqlClient(pgclient.DBInfo{
 			From:      "remote",
 			Address:   req.Address,
 			Port:      req.Port,
@@ -130,17 +131,15 @@ func (u *DatabaseService) CheckDatabase(req dto.DatabaseCreate) bool {
 			Password:  req.Password,
 			Timeout:   req.Timeout,
 		})
-		return err == nil
 	case constant.AppRedis:
-		_, err := redisclient.NewRedisClient(redisclient.DBInfo{
+		_, err = redisclient.NewRedisClient(redisclient.DBInfo{
 			Address:  req.Address,
 			Port:     req.Port,
 			Password: req.Password,
 			Timeout:  req.Timeout,
 		})
-		return err == nil
 	case "mysql", "mariadb":
-		_, err := mysql.NewMysqlClient(client.DBInfo{
+		_, err = mysql.NewMysqlClient(client.DBInfo{
 			From:     "remote",
 			Address:  req.Address,
 			Port:     req.Port,
@@ -154,10 +153,13 @@ func (u *DatabaseService) CheckDatabase(req dto.DatabaseCreate) bool {
 			SkipVerify: req.SkipVerify,
 			Timeout:    req.Timeout,
 		})
-		return err == nil
+	}
+	if err != nil {
+		global.LOG.Errorf("check database connection failed, err: %v", err)
+		return false
 	}
 
-	return false
+	return true
 }
 
 func (u *DatabaseService) Create(req dto.DatabaseCreate) error {
@@ -174,12 +176,13 @@ func (u *DatabaseService) Create(req dto.DatabaseCreate) error {
 	switch req.Type {
 	case constant.AppPostgresql:
 		if _, err := postgresql.NewPostgresqlClient(pgclient.DBInfo{
-			From:     "remote",
-			Address:  req.Address,
-			Port:     req.Port,
-			Username: req.Username,
-			Password: req.Password,
-			Timeout:  req.Timeout,
+			From:      "remote",
+			Address:   req.Address,
+			Port:      req.Port,
+			InitialDB: req.InitialDB,
+			Username:  req.Username,
+			Password:  req.Password,
+			Timeout:   req.Timeout,
 		}); err != nil {
 			return err
 		}
@@ -275,12 +278,13 @@ func (u *DatabaseService) Update(req dto.DatabaseUpdate) error {
 	switch req.Type {
 	case constant.AppPostgresql:
 		if _, err := postgresql.NewPostgresqlClient(pgclient.DBInfo{
-			From:     "remote",
-			Address:  req.Address,
-			Port:     req.Port,
-			Username: req.Username,
-			Password: req.Password,
-			Timeout:  req.Timeout,
+			From:      "remote",
+			Address:   req.Address,
+			Port:      req.Port,
+			InitialDB: req.InitialDB,
+			Username:  req.Username,
+			Password:  req.Password,
+			Timeout:   req.Timeout,
 		}); err != nil {
 			return err
 		}
@@ -326,6 +330,7 @@ func (u *DatabaseService) Update(req dto.DatabaseUpdate) error {
 	upMap["port"] = req.Port
 	upMap["username"] = req.Username
 	upMap["password"] = pass
+	upMap["initial_db"] = req.InitialDB
 	upMap["timeout"] = req.Timeout
 	upMap["description"] = req.Description
 	upMap["ssl"] = req.SSL

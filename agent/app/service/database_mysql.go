@@ -115,7 +115,7 @@ func (u *MysqlService) Create(ctx context.Context, req dto.MysqlDBCreate) (*mode
 	}
 
 	if req.From == "local" && req.Username == "root" {
-		return nil, errors.New("Cannot set root as user name")
+		return nil, errors.New("cannot set root as user name")
 	}
 
 	cli, version, err := LoadMysqlClientByFrom(req.Database)

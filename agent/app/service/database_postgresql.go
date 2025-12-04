@@ -21,7 +21,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/postgresql/client"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/jinzhu/copier"
-	"github.com/pkg/errors"
 )
 
 type PostgresqlService struct{}
@@ -138,10 +137,6 @@ func (u *PostgresqlService) Create(ctx context.Context, req dto.PostgresqlDBCrea
 		return nil, buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 	}
 
-	if req.From == "local" && req.Username == "root" {
-		return nil, errors.New("Cannot set root as user name")
-	}
-
 	cli, err := LoadPostgresqlClientByFrom(req.Database)
 	if err != nil {
 		return nil, err
@@ -185,6 +180,7 @@ func LoadPostgresqlClientByFrom(database string) (postgresql.PostgresqlClient, e
 		dbInfo.Port = databaseItem.Port
 		dbInfo.Username = databaseItem.Username
 		dbInfo.Password = databaseItem.Password
+		dbInfo.InitialDB = databaseItem.InitialDB
 	} else {
 		app, err := appInstallRepo.LoadBaseInfo(databaseItem.Type, database)
 		if err != nil {

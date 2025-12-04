@@ -258,6 +258,7 @@ type DatabaseInfo struct {
 	Version   string    `json:"version"`
 	Address   string    `json:"address"`
 	Port      uint      `json:"port"`
+	InitialDB string    `json:"initialDB"`
 	Username  string    `json:"username"`
 	Password  string    `json:"password"`
 
@@ -309,13 +310,14 @@ type DatabaseCreate struct {
 }
 
 type DatabaseUpdate struct {
-	ID       uint   `json:"id"`
-	Type     string `json:"type" validate:"required"`
-	Version  string `json:"version" validate:"required"`
-	Address  string `json:"address"`
-	Port     uint   `json:"port"`
-	Username string `json:"username" validate:"required"`
-	Password string `json:"password"`
+	ID        uint   `json:"id"`
+	Type      string `json:"type" validate:"required"`
+	Version   string `json:"version" validate:"required"`
+	Address   string `json:"address"`
+	Port      uint   `json:"port"`
+	InitialDB string `json:"initialDB"`
+	Username  string `json:"username" validate:"required"`
+	Password  string `json:"password"`
 
 	SSL        bool   `json:"ssl"`
 	RootCert   string `json:"rootCert"`
