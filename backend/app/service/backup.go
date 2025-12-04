@@ -413,9 +413,9 @@ func (u *BackupService) Update(req dto.BackupOperate) error {
 				if strings.HasSuffix(dirStr, "/") && dirStr != "/" {
 					dirStr = dirStr[:strings.LastIndex(dirStr, "/")]
 				}
-				if err := copyDir(oldDir, dirStr); err != nil {
+				if err := changeLocalBackup(oldDir, dirStr); err != nil {
 					_ = backupRepo.Update(req.ID, map[string]interface{}{"vars": oldVars})
-					return err
+					return fmt.Errorf("copy dir from %s to %s failed, err: %v", oldDir, dirStr, err)
 				}
 				global.CONF.System.Backup = dirStr
 			}
@@ -676,4 +676,45 @@ func (u *BackupService) Run() {
 			"vars": varsItem,
 		}).Error
 	global.LOG.Info("Successfully refreshed OneDrive token.")
+}
+
+func changeLocalBackup(oldPath, newPath string) error {
+	fileOp := fileUtils.NewFileOp()
+	if fileOp.Stat(path.Join(oldPath, "app")) {
+		if err := fileOp.CopyDir(path.Join(oldPath, "app"), newPath); err != nil {
+			return err
+		}
+	}
+	if fileOp.Stat(path.Join(oldPath, "database")) {
+		if err := fileOp.CopyDir(path.Join(oldPath, "database"), newPath); err != nil {
+			return err
+		}
+	}
+	if fileOp.Stat(path.Join(oldPath, "directory")) {
+		if err := fileOp.CopyDir(path.Join(oldPath, "directory"), newPath); err != nil {
+			return err
+		}
+	}
+	if fileOp.Stat(path.Join(oldPath, "system_snapshot")) {
+		if err := fileOp.CopyDir(path.Join(oldPath, "system_snapshot"), newPath); err != nil {
+			return err
+		}
+	}
+	if fileOp.Stat(path.Join(oldPath, "website")) {
+		if err := fileOp.CopyDir(path.Join(oldPath, "website"), newPath); err != nil {
+			return err
+		}
+	}
+	if fileOp.Stat(path.Join(oldPath, "log")) {
+		if err := fileOp.CopyDir(path.Join(oldPath, "log"), newPath); err != nil {
+			return err
+		}
+	}
+	_ = fileOp.RmRf(path.Join(oldPath, "app"))
+	_ = fileOp.RmRf(path.Join(oldPath, "database"))
+	_ = fileOp.RmRf(path.Join(oldPath, "directory"))
+	_ = fileOp.RmRf(path.Join(oldPath, "system_snapshot"))
+	_ = fileOp.RmRf(path.Join(oldPath, "website"))
+	_ = fileOp.RmRf(path.Join(oldPath, "log"))
+	return nil
 }
