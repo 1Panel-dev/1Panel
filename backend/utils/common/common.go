@@ -434,3 +434,11 @@ func GetRealClientIP(c *gin.Context) string {
 	}
 	return addr
 }
+
+func IsPrivateIP(ipStr string) bool {
+	ip := net.ParseIP(ipStr)
+	if ip == nil {
+		return false
+	}
+	return ip.IsPrivate() || ip.IsLoopback()
+}

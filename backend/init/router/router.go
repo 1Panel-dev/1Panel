@@ -3,13 +3,14 @@ package router
 import (
 	"encoding/base64"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/app/service"
-	"github.com/1Panel-dev/1Panel/backend/constant"
-	"github.com/1Panel-dev/1Panel/cmd/server/res"
 	"net/http"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/1Panel-dev/1Panel/backend/app/service"
+	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/cmd/server/res"
 
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/i18n"
@@ -160,7 +161,7 @@ func setWebStatic(rootRouter *gin.RouterGroup) {
 }
 
 func Routers() *gin.Engine {
-	Router = gin.Default()
+	Router = gin.New()
 	Router.Use(middleware.OperationLog())
 	// Router.Use(middleware.CSRF())
 	// Router.Use(middleware.LoadCsrfToken())
