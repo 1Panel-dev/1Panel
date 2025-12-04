@@ -424,6 +424,9 @@ const getSetting = async () => {
         globalStore.isFxplay = isFxplay.value;
         globalStore.isOffLine = res.data.isOffLine;
         globalStore.ignoreCaptcha = !res.data.needCaptcha;
+        if (!globalStore.ignoreCaptcha) {
+            loginVerify();
+        }
 
         document.title = res.data.panelName;
         i18n.warnHtmlMessage = false;
