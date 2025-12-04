@@ -23,13 +23,12 @@ type MfaCredential struct {
 }
 
 type Login struct {
-	Name          string `json:"name" validate:"required"`
-	Password      string `json:"password" validate:"required"`
-	IgnoreCaptcha bool   `json:"ignoreCaptcha"`
-	Captcha       string `json:"captcha"`
-	CaptchaID     string `json:"captchaID"`
-	AuthMethod    string `json:"authMethod" validate:"required,oneof=jwt session"`
-	Language      string `json:"language" validate:"required,oneof=zh en tw ja ko ru ms 'pt-BR'"`
+	Name       string `json:"name" validate:"required"`
+	Password   string `json:"password" validate:"required"`
+	Captcha    string `json:"captcha"`
+	CaptchaID  string `json:"captchaID"`
+	AuthMethod string `json:"authMethod" validate:"required,oneof=jwt session"`
+	Language   string `json:"language" validate:"required,oneof=zh en tw ja ko ru ms 'pt-BR'"`
 }
 
 type MFALogin struct {
@@ -37,4 +36,9 @@ type MFALogin struct {
 	Password   string `json:"password" validate:"required"`
 	Code       string `json:"code" validate:"required"`
 	AuthMethod string `json:"authMethod"`
+}
+
+type LoginSetting struct {
+	NeedCaptcha bool   `json:"needCaptcha"`
+	Language    string `json:"language"`
 }

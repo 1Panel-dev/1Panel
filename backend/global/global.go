@@ -2,6 +2,7 @@ package global
 
 import (
 	"github.com/1Panel-dev/1Panel/backend/configs"
+	"github.com/1Panel-dev/1Panel/backend/init/auth"
 	"github.com/1Panel-dev/1Panel/backend/init/cache/badger_db"
 	"github.com/1Panel-dev/1Panel/backend/init/session/psession"
 	"github.com/dgraph-io/badger/v4"
@@ -27,6 +28,8 @@ var (
 	Cron           *cron.Cron
 	MonitorCronID  cron.EntryID
 	OneDriveCronID cron.EntryID
+
+	IPTracker *auth.IPTracker
 
 	I18n       *i18n.Localizer
 	I18nForCmd *i18n.Localizer

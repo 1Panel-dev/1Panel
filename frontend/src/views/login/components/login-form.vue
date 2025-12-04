@@ -176,7 +176,7 @@
 import { ref, reactive, onMounted, computed, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 import type { ElForm } from 'element-plus';
-import { loginApi, getCaptcha, mfaLoginApi, checkIsDemo, getLanguage, checkIsIntl } from '@/api/modules/auth';
+import { loginApi, getCaptcha, mfaLoginApi, checkIsDemo, getAuthSetting, checkIsIntl } from '@/api/modules/auth';
 import { GlobalStore, MenuStore, TabsStore } from '@/store';
 import { MsgSuccess } from '@/utils/message';
 import { useI18n } from 'vue-i18n';
@@ -318,7 +318,6 @@ const login = (formEl: FormInstance | undefined) => {
         let requestLoginForm = {
             name: loginForm.name,
             password: encryptPassword(loginForm.password),
-            ignoreCaptcha: globalStore.ignoreCaptcha,
             captcha: loginForm.captcha,
             captchaID: captcha.captchaID,
             authMethod: 'session',
@@ -400,11 +399,12 @@ const checkIsSystemDemo = async () => {
     isDemo.value = res.data;
 };
 
-const loadLanguage = async () => {
+const loadLoginSetting = async () => {
     try {
-        const res = await getLanguage();
-        loginForm.language = res.data;
-        handleCommand(res.data);
+        const res = await getAuthSetting();
+        loginForm.language = res.data.language;
+        globalStore.ignoreCaptcha = !res.data.needCaptcha;
+        handleCommand(loginForm.language);
     } catch (error) {}
 };
 
@@ -426,7 +426,7 @@ onMounted(() => {
     globalStore.isOnRestart = false;
     checkIsSystemIntl();
     loginVerify();
-    loadLanguage();
+    loadLoginSetting();
     document.title = globalStore.themeConfig.panelName;
     loginForm.agreeLicense = globalStore.agreeLicense;
     checkIsSystemDemo();
