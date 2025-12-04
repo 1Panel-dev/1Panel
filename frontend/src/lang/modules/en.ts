@@ -2915,6 +2915,7 @@ const message = {
         targetPort: 'Destination port',
         forwardHelper1: 'If you want to forward to the local port, the destination IP should be set to "127.0.0.1".',
         forwardHelper2: 'Leave the destination IP blank to forward to the local port.',
+        forwardPortHelper: 'Support port range, e.g. 80:90',
         forwardInboundInterface: 'Forward Inbound Network Interface',
         exportHelper: 'About to export {0} firewall rules. Continue?',
         importSuccess: 'Successfully imported {0} rules',

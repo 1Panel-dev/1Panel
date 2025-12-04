@@ -2703,6 +2703,7 @@ const message = {
         targetPort: '目标端口',
         forwardHelper1: '如果是本机端口转发，目标IP为：127.0.0.1',
         forwardHelper2: '如果目标IP不填写，则默认为本机端口转发',
+        forwardPortHelper: '支持端口范围，如：80:90',
         forwardInboundInterface: '转发入站网卡',
         exportHelper: '即将导出 {0} 条防火墙规则，是否继续？',
         importSuccess: '成功导入 {0} 条规则',

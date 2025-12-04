@@ -6,6 +6,8 @@ import (
 )
 
 func AddForward(protocol, srcPort, dest, destPort, iface string, save bool) error {
+	// iptabels destPort 范围端口规则为：%d-%d
+	destPort = strings.ReplaceAll(destPort, ":", "-")
 	if dest != "" && dest != "127.0.0.1" && dest != "localhost" {
 		iptablesArg := fmt.Sprintf("-A %s", Chain1PanelPreRouting)
 		if iface != "" {
