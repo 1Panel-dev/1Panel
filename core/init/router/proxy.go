@@ -3,7 +3,6 @@ package router
 import (
 	"net/http"
 	"net/url"
-	"os"
 	"strconv"
 	"strings"
 
@@ -52,11 +51,6 @@ func Proxy() gin.HandlerFunc {
 		}
 
 		if !strings.HasPrefix(c.Request.URL.Path, "/api/v2/core") && (currentNode == "local" || len(currentNode) == 0) {
-			sockPath := "/etc/1panel/agent.sock"
-			if _, err := os.Stat(sockPath); err != nil {
-				helper.ErrorWithDetail(c, http.StatusBadRequest, "ErrProxy", err)
-				return
-			}
 			defer func() {
 				if err := recover(); err != nil && err != http.ErrAbortHandler {
 					global.LOG.Debug(err)

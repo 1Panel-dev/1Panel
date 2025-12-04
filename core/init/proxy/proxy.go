@@ -15,8 +15,11 @@ var (
 )
 
 func Init() {
+	dialer := &net.Dialer{
+		Timeout: 5 * time.Second,
+	}
 	dialUnix := func(ctx context.Context, network, addr string) (net.Conn, error) {
-		return net.Dial("unix", sockPath)
+		return dialer.DialContext(ctx, "unix", sockPath)
 	}
 	transport := &http.Transport{
 		DialContext:         dialUnix,
@@ -33,7 +36,7 @@ func Init() {
 		Transport: transport,
 		ErrorHandler: func(rw http.ResponseWriter, req *http.Request, err error) {
 			rw.WriteHeader(http.StatusBadGateway)
-			rw.Write([]byte("Bad Gateway"))
+			_, _ = rw.Write([]byte("Bad Gateway: " + err.Error()))
 		},
 	}
 }
