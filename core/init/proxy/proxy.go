@@ -8,9 +8,9 @@ import (
 	"time"
 )
 
-var (
-	sockPath = "/etc/1panel/agent.sock"
+const SockPath = "/etc/1panel/agent.sock"
 
+var (
 	LocalAgentProxy *httputil.ReverseProxy
 )
 
@@ -19,7 +19,7 @@ func Init() {
 		Timeout: 5 * time.Second,
 	}
 	dialUnix := func(ctx context.Context, network, addr string) (net.Conn, error) {
-		return dialer.DialContext(ctx, "unix", sockPath)
+		return dialer.DialContext(ctx, "unix", SockPath)
 	}
 	transport := &http.Transport{
 		DialContext:         dialUnix,
