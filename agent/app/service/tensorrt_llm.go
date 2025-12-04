@@ -88,31 +88,25 @@ func (t TensorRTLLMService) Page(req request.TensorRTLLMSearch) response.TensorR
 		}
 
 		composeByte, err := files.NewFileOp().GetContent(path.Join(global.Dir.TensorRTLLMDir, item.Name, "docker-compose.yml"))
-		if err != nil {
-			continue
-		}
-		serverDTO.Environments, err = getDockerComposeEnvironments(composeByte)
-		if err != nil {
-			continue
+		if err == nil {
+			serverDTO.Environments, _ = getDockerComposeEnvironments(composeByte)
 		}
 		volumes, err := getDockerComposeVolumes(composeByte)
-		if err != nil {
-			continue
-		}
-
-		var defaultVolumes = map[string]string{
-			"${MODEL_PATH}": "${MODEL_PATH}",
-		}
-		for _, volume := range volumes {
-			exist := false
-			for key, value := range defaultVolumes {
-				if key == volume.Source && value == volume.Target {
-					exist = true
-					break
-				}
+		if err == nil {
+			var defaultVolumes = map[string]string{
+				"${MODEL_PATH}": "${MODEL_PATH}",
 			}
-			if !exist {
-				serverDTO.Volumes = append(serverDTO.Volumes, volume)
+			for _, volume := range volumes {
+				exist := false
+				for key, value := range defaultVolumes {
+					if key == volume.Source && value == volume.Target {
+						exist = true
+						break
+					}
+				}
+				if !exist {
+					serverDTO.Volumes = append(serverDTO.Volumes, volume)
+				}
 			}
 		}
 		items = append(items, serverDTO)
