@@ -6,18 +6,18 @@ command -v wget >/dev/null || {
 }
 
 if [ ! -f "1pctl" ]; then 
-  wget https://github.com/1Panel-dev/installer/raw/main/1pctl
+  wget https://github.com/1Panel-dev/installer/raw/v1/1pctl
 fi
 
 if [ ! -f "install.sh" ]; then 
-  wget https://github.com/1Panel-dev/installer/raw/main/install.sh
+  wget https://github.com/1Panel-dev/installer/raw/v1/install.sh
 fi
 
 if [ ! -d "initscript" ]; then
-  wget https://github.com/1Panel-dev/installer/raw/main/initscript/1panel.service
+  wget https://github.com/1Panel-dev/installer/raw/v1/initscript/1panel.service
   mkdir -p initscript && cd initscript
   for file in 1panel.service 1paneld.init 1paneld.openrc 1paneld.procd; do
-    wget -q https://github.com/1Panel-dev/installer/raw/main/initscript/$file
+    wget -q https://github.com/1Panel-dev/installer/raw/v1/initscript/$file
   done
   cd ..
 fi
@@ -25,7 +25,7 @@ fi
 if [ ! -d "lang" ]; then
   mkdir -p lang && cd lang
   for lang in en fa pt-BR ru zh; do
-    wget -q https://github.com/1Panel-dev/installer/raw/main/lang/$lang.sh
+    wget -q https://github.com/1Panel-dev/installer/raw/v1/lang/$lang.sh
   done
   cd ..
 fi
