@@ -19,6 +19,7 @@ func (u *ContainerService) PageVolume(req dto.SearchWithPage) (int64, interface{
 	if err != nil {
 		return 0, nil, err
 	}
+	defer client.Close()
 	list, err := client.VolumeList(context.TODO(), volume.ListOptions{})
 	if err != nil {
 		return 0, nil, err
