@@ -46,6 +46,7 @@ type FileInfo struct {
 	ItemTotal  int         `json:"itemTotal"`
 	FavoriteID uint        `json:"favoriteID"`
 	IsDetail   bool        `json:"isDetail"`
+	
 }
 
 type FileOption struct {

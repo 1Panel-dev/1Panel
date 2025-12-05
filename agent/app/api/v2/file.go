@@ -273,6 +273,29 @@ func (b *BaseApi) GetContent(c *gin.Context) {
 }
 
 // @Tags File
+// @Summary Preview file content
+// @Accept json
+// @Param request body request.FileContentReq true "request"
+// @Success 200 {object} response.FileInfo
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /files/preview [post]
+// @x-panel-log {"bodyKeys":["path"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"预览文件内容 [path]","formatEN":"Preview file content [path]"}
+func (b *BaseApi) PreviewContent(c *gin.Context) {
+	var req request.FileContentReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	info, err := fileService.GetPreviewContent(req)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+
+	helper.SuccessWithData(c, info)
+}
+
+// @Tags File
 // @Summary Update file content
 // @Accept json
 // @Param request body request.FileEdit true "request"
