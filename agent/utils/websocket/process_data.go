@@ -3,11 +3,13 @@ package websocket
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"sort"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
+	"github.com/1Panel-dev/1Panel/agent/utils/common"
 
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
@@ -258,8 +260,11 @@ func getSSHSessions(config SSHSessionConfig) (res []byte, err error) {
 	}
 	users, err = host.Users()
 	if err != nil {
-		res, err = json.Marshal(result)
-		return
+		users, err = fallbackUserInfo()
+		if err != nil {
+			res, err = json.Marshal(nil)
+			return
+		}
 	}
 	for _, proc := range processes {
 		name, _ := proc.Name()
@@ -298,6 +303,47 @@ func getSSHSessions(config SSHSessionConfig) (res []byte, err error) {
 	}
 	res, err = json.Marshal(result)
 	return
+}
+
+func fallbackUserInfo() ([]host.UserStat, error) {
+	whoCmd, err := cmd.RunDefaultWithStdoutBashC("who")
+	if err != nil {
+		return nil, err
+	}
+
+	var users []host.UserStat
+	lines := strings.Split(whoCmd, "\n")
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if line == "" {
+			continue
+		}
+		fields := strings.Fields(line)
+		if len(fields) < 4 {
+			continue
+		}
+
+		user := host.UserStat{
+			User:     fields[0],
+			Terminal: fields[1],
+		}
+
+		dateTimeStr := fields[2] + " " + fields[3]
+		if t, err := time.Parse("2006-01-02 15:04", dateTimeStr); err == nil {
+			user.Started = int(t.Unix())
+		}
+
+		if len(fields) >= 5 {
+			hostStr := fields[4]
+			hostStr = strings.TrimPrefix(hostStr, "(")
+			hostStr = strings.TrimSuffix(hostStr, ")")
+			user.Host = hostStr
+		}
+
+		users = append(users, user)
+	}
+
+	return users, nil
 }
 
 var netTypes = [...]string{"tcp", "udp"}
