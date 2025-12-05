@@ -104,11 +104,10 @@ const acceptParams = async (props: PreviewProps) => {
     loading.value = true;
 
     try {
-        const res = await getPreviewContent({ path: props.path, expand: false });
+        const res = await getPreviewContent({ path: props.path });
         if (res.data.content) {
             lines.value = res.data.content.split('\n');
             hasContent.value = true;
-            // 如果文件大于 10MB，内容是截断的末尾部分
             if (res.data.size > 10 * 1024 * 1024) {
                 isTruncated.value = true;
             }

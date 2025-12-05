@@ -41,6 +41,11 @@ export namespace File {
         node: string;
     }
 
+    export interface PreviewContentReq {
+        path: string;
+        isDetail?: boolean;
+    }
+
     export interface SearchUploadInfo extends ReqPage {
         path: string;
     }
