@@ -338,6 +338,8 @@ func fallbackUserInfo() ([]host.UserStat, error) {
 			hostStr = strings.TrimPrefix(hostStr, "(")
 			hostStr = strings.TrimSuffix(hostStr, ")")
 			user.Host = hostStr
+		} else {
+			user.Host = "local"
 		}
 
 		users = append(users, user)
