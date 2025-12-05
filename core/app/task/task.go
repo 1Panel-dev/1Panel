@@ -11,6 +11,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/core/app/model"
 	"github.com/1Panel-dev/1Panel/core/app/repo"
+	"github.com/1Panel-dev/1Panel/core/buserr"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/i18n"
@@ -21,27 +22,29 @@ type ActionFunc func(*Task) error
 type RollbackFunc func(*Task)
 
 type Task struct {
-	Name      string
-	TaskID    string
-	Logger    *log.Logger
-	SubTasks  []*SubTask
-	Rollbacks []RollbackFunc
-	logFile   *os.File
-	taskRepo  repo.ITaskRepo
-	Task      *model.Task
-	ParentID  string
+	Name              string
+	TaskID            string
+	Logger            *log.Logger
+	SubTasks          []*SubTask
+	Rollbacks         []RollbackFunc
+	logFile           *os.File
+	taskRepo          repo.ITaskRepo
+	Task              *model.Task
+	ParentID          string
+	CancleWhenTimeout bool
 }
 
 type SubTask struct {
-	RootTask  *Task
-	Name      string
-	StepAlias string
-	Retry     int
-	Timeout   time.Duration
-	Action    ActionFunc
-	Rollback  RollbackFunc
-	Error     error
-	IgnoreErr bool
+	RootTask          *Task
+	Name              string
+	StepAlias         string
+	Retry             int
+	Timeout           time.Duration
+	Action            ActionFunc
+	Rollback          RollbackFunc
+	Error             error
+	IgnoreErr         bool
+	CancleWhenTimeout bool
 }
 
 const (
@@ -143,6 +146,9 @@ func (s *SubTask) Execute() error {
 		select {
 		case <-ctx.Done():
 			s.RootTask.Log(i18n.GetWithName("TaskTimeout", subTaskName))
+			if s.CancleWhenTimeout {
+				return buserr.New(i18n.GetWithName("TaskTimeout", subTaskName))
+			}
 		case err = <-done:
 			if err != nil {
 				s.RootTask.Log(i18n.GetWithNameAndErr("SubTaskFailed", subTaskName, err))
@@ -173,6 +179,7 @@ func (t *Task) Execute() error {
 	var err error
 	t.Log(i18n.GetWithName("TaskStart", t.Name))
 	for _, subTask := range t.SubTasks {
+		subTask.CancleWhenTimeout = t.CancleWhenTimeout
 		t.Task.CurrentStep = subTask.StepAlias
 		t.updateTask(t.Task)
 		if err = subTask.Execute(); err == nil {
