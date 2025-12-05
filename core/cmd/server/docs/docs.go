@@ -831,6 +831,42 @@ const docTemplate = `{
 				]
 			}
 		},
+		"/apps/icon/:appId": {
+			"get": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "app id",
+						"in": "path",
+						"name": "appId",
+						"required": true,
+						"type": "integer"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "app icon",
+						"schema": {
+							"type": "string"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get app icon by app_id",
+				"tags": [
+					"App"
+				]
+			}
+		},
 		"/apps/ignored/cancel": {
 			"post": {
 				"consumes": [
@@ -3101,11 +3137,6 @@ const docTemplate = `{
 				]
 			}
 		},
-		"/containers/download/log": {
-			"post": {
-				"responses": {}
-			}
-		},
 		"/containers/image": {
 			"get": {
 				"produces": [
@@ -3667,6 +3698,41 @@ const docTemplate = `{
 					"formatZH": "更新 ipv6 配置",
 					"paramKeys": []
 				}
+			}
+		},
+		"/containers/item/stats": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.OperationWithName"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.ContainerItemStats"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Load container stats size"
 			}
 		},
 		"/containers/limit": {
@@ -4451,7 +4517,11 @@ const docTemplate = `{
 						"type": "string"
 					}
 				],
-				"responses": {},
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
 				"security": [
 					{
 						"ApiKeyAuth": []
@@ -5701,7 +5771,10 @@ const docTemplate = `{
 					"200": {
 						"description": "OK",
 						"schema": {
-							"type": "Array"
+							"items": {
+								"$ref": "#/definitions/dto.CommandTree"
+							},
+							"type": "array"
 						}
 					}
 				},
@@ -7264,59 +7337,6 @@ const docTemplate = `{
 				}
 			}
 		},
-		"/core/settings/rollback": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/dto.OperateByID"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK"
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Upgrade",
-				"tags": [
-					"System Setting"
-				],
-				"x-panel-log": {
-					"BeforeFunctions": [
-						{
-							"db": "upgrade_logs",
-							"input_column": "id",
-							"input_value": "id",
-							"isList": false,
-							"output_column": "old_version",
-							"output_value": "version"
-						}
-					],
-					"bodyKeys": [
-						"id"
-					],
-					"formatEN": "rollback system =\u003e [version]",
-					"formatZH": "回滚系统 =\u003e [version]",
-					"paramKeys": []
-				}
-			}
-		},
 		"/core/settings/search": {
 			"post": {
 				"responses": {
@@ -8382,7 +8402,10 @@ const docTemplate = `{
 					"200": {
 						"description": "OK",
 						"schema": {
-							"type": "Array"
+							"items": {
+								"$ref": "#/definitions/dto.AppLauncher"
+							},
+							"type": "array"
 						}
 					}
 				},
@@ -8420,7 +8443,10 @@ const docTemplate = `{
 					"200": {
 						"description": "OK",
 						"schema": {
-							"type": "Array"
+							"items": {
+								"$ref": "#/definitions/dto.LauncherOption"
+							},
+							"type": "array"
 						}
 					}
 				},
@@ -8620,6 +8646,60 @@ const docTemplate = `{
 				]
 			}
 		},
+		"/dashboard/current/top/cpu": {
+			"get": {
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/dto.Process"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Load top cpu processes",
+				"tags": [
+					"Dashboard"
+				]
+			}
+		},
+		"/dashboard/current/top/mem": {
+			"get": {
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/dto.Process"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Load top memory processes",
+				"tags": [
+					"Dashboard"
+				]
+			}
+		},
 		"/dashboard/quick/change": {
 			"post": {
 				"consumes": [
@@ -8668,7 +8748,10 @@ const docTemplate = `{
 					"200": {
 						"description": "OK",
 						"schema": {
-							"type": "Array"
+							"items": {
+								"$ref": "#/definitions/dto.QuickJump"
+							},
+							"type": "array"
 						}
 					}
 				},
@@ -9530,6 +9613,47 @@ const docTemplate = `{
 				}
 			}
 		},
+		"/databases/format/options": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.OperationWithName"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/dto.MysqlFormatCollationOption"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "List mysql database format collation options",
+				"tags": [
+					"Database Mysql"
+				]
+			}
+		},
 		"/databases/load": {
 			"post": {
 				"consumes": [
@@ -9546,46 +9670,9 @@ const docTemplate = `{
 						}
 					}
 				],
-				"responses": {},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Load mysql database from remote",
-				"tags": [
-					"Database Mysql"
-				]
-			}
-		},
-		"/databases/options": {
-			"get": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/dto.PageInfo"
-						}
-					}
-				],
 				"responses": {
 					"200": {
-						"description": "OK",
-						"schema": {
-							"items": {
-								"$ref": "#/definitions/dto.MysqlOption"
-							},
-							"type": "array"
-						}
+						"description": "OK"
 					}
 				},
 				"security": [
@@ -9596,7 +9683,7 @@ const docTemplate = `{
 						"Timestamp": []
 					}
 				],
-				"summary": "List mysql database names",
+				"summary": "Load mysql database from remote",
 				"tags": [
 					"Database Mysql"
 				]
@@ -9662,7 +9749,11 @@ const docTemplate = `{
 						}
 					}
 				],
-				"responses": {},
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
 				"security": [
 					{
 						"ApiKeyAuth": []
@@ -12117,7 +12208,7 @@ const docTemplate = `{
 				"parameters": [
 					{
 						"description": "Component name to check (e.g., rsync, docker)",
-						"in": "query",
+						"in": "path",
 						"name": "name",
 						"required": true,
 						"type": "string"
@@ -12936,6 +13027,41 @@ const docTemplate = `{
 					"formatZH": "清空监控数据",
 					"paramKeys": []
 				}
+			}
+		},
+		"/hosts/monitor/gpu/search": {
+			"post": {
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.MonitorGPUSearch"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.MonitorGPUData"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Load monitor data",
+				"tags": [
+					"Monitor"
+				]
 			}
 		},
 		"/hosts/monitor/search": {
@@ -15504,6 +15630,41 @@ const docTemplate = `{
 				]
 			}
 		},
+		"/settings/description/save": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.CommonDescription"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Save common description",
+				"tags": [
+					"System Setting"
+				]
+			}
+		},
 		"/settings/get/{key}": {
 			"get": {
 				"parameters": [
@@ -16027,7 +16188,7 @@ const docTemplate = `{
 					"200": {
 						"description": "OK",
 						"schema": {
-							"type": "bool"
+							"type": "boolean"
 						}
 					}
 				},
@@ -17006,7 +17167,10 @@ const docTemplate = `{
 					"200": {
 						"description": "OK",
 						"schema": {
-							"type": "Array"
+							"items": {
+								"type": "string"
+							},
+							"type": "array"
 						}
 					}
 				},
@@ -17091,7 +17255,11 @@ const docTemplate = `{
 						}
 					}
 				],
-				"responses": {},
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
 				"security": [
 					{
 						"ApiKeyAuth": []
@@ -17127,11 +17295,15 @@ const docTemplate = `{
 						"name": "request",
 						"required": true,
 						"schema": {
-							"$ref": "#/definitions/dto.Operate"
+							"$ref": "#/definitions/dto.Fail2BanSet"
 						}
 					}
 				],
-				"responses": {},
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
 				"security": [
 					{
 						"ApiKeyAuth": []
@@ -17166,7 +17338,10 @@ const docTemplate = `{
 					"200": {
 						"description": "OK",
 						"schema": {
-							"type": "Array"
+							"items": {
+								"type": "string"
+							},
+							"type": "array"
 						}
 					}
 				},
@@ -17440,7 +17615,11 @@ const docTemplate = `{
 						}
 					}
 				],
-				"responses": {},
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
 				"security": [
 					{
 						"ApiKeyAuth": []
@@ -21517,6 +21696,44 @@ const docTemplate = `{
 			},
 			"type": "object"
 		},
+		"dto.AppLauncher": {
+			"properties": {
+				"description": {
+					"type": "string"
+				},
+				"detail": {
+					"items": {
+						"$ref": "#/definitions/dto.InstallDetail"
+					},
+					"type": "array"
+				},
+				"icon": {
+					"type": "string"
+				},
+				"isInstall": {
+					"type": "boolean"
+				},
+				"isRecommend": {
+					"type": "boolean"
+				},
+				"key": {
+					"type": "string"
+				},
+				"limit": {
+					"type": "integer"
+				},
+				"name": {
+					"type": "string"
+				},
+				"recommend": {
+					"type": "integer"
+				},
+				"type": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
 		"dto.AppList": {
 			"properties": {
 				"additionalProperties": {
@@ -22274,6 +22491,23 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
+		"dto.CommandTree": {
+			"properties": {
+				"children": {
+					"items": {
+						"$ref": "#/definitions/dto.CommandTree"
+					},
+					"type": "array"
+				},
+				"label": {
+					"type": "string"
+				},
+				"value": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
 		"dto.CommonBackup": {
 			"properties": {
 				"description": {
@@ -22310,6 +22544,30 @@ const docTemplate = `{
 				}
 			},
 			"required": [
+				"type"
+			],
+			"type": "object"
+		},
+		"dto.CommonDescription": {
+			"properties": {
+				"description": {
+					"type": "string"
+				},
+				"detailType": {
+					"type": "string"
+				},
+				"id": {
+					"type": "string"
+				},
+				"isPinned": {
+					"type": "boolean"
+				},
+				"type": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"id",
 				"type"
 			],
 			"type": "object"
@@ -22557,6 +22815,41 @@ const docTemplate = `{
 			},
 			"type": "object"
 		},
+		"dto.ContainerItemStats": {
+			"properties": {
+				"buildCacheReclaimable": {
+					"type": "integer"
+				},
+				"buildCacheUsage": {
+					"type": "integer"
+				},
+				"containerReclaimable": {
+					"type": "integer"
+				},
+				"containerUsage": {
+					"type": "integer"
+				},
+				"imageReclaimable": {
+					"type": "integer"
+				},
+				"imageUsage": {
+					"type": "integer"
+				},
+				"sizeRootFs": {
+					"type": "integer"
+				},
+				"sizeRw": {
+					"type": "integer"
+				},
+				"volumeReclaimable": {
+					"type": "integer"
+				},
+				"volumeUsage": {
+					"type": "integer"
+				}
+			},
+			"type": "object"
+		},
 		"dto.ContainerListStats": {
 			"properties": {
 				"containerID": {
@@ -22585,6 +22878,23 @@ const docTemplate = `{
 				},
 				"systemUsage": {
 					"type": "integer"
+				}
+			},
+			"type": "object"
+		},
+		"dto.ContainerNetwork": {
+			"properties": {
+				"ipv4": {
+					"type": "string"
+				},
+				"ipv6": {
+					"type": "string"
+				},
+				"macAddr": {
+					"type": "string"
+				},
+				"network": {
+					"type": "string"
 				}
 			},
 			"type": "object"
@@ -22639,20 +22949,11 @@ const docTemplate = `{
 				"image": {
 					"type": "string"
 				},
-				"ipv4": {
-					"type": "string"
-				},
-				"ipv6": {
-					"type": "string"
-				},
 				"labels": {
 					"items": {
 						"type": "string"
 					},
 					"type": "array"
-				},
-				"macAddr": {
-					"type": "string"
 				},
 				"memory": {
 					"type": "number"
@@ -22663,8 +22964,11 @@ const docTemplate = `{
 				"nanoCPUs": {
 					"type": "number"
 				},
-				"network": {
-					"type": "string"
+				"networks": {
+					"items": {
+						"$ref": "#/definitions/dto.ContainerNetwork"
+					},
+					"type": "array"
 				},
 				"openStdin": {
 					"type": "boolean"
@@ -22815,12 +23119,6 @@ const docTemplate = `{
 		},
 		"dto.ContainerStatus": {
 			"properties": {
-				"buildCacheReclaimable": {
-					"type": "integer"
-				},
-				"buildCacheUsage": {
-					"type": "integer"
-				},
 				"composeCount": {
 					"type": "integer"
 				},
@@ -22828,12 +23126,6 @@ const docTemplate = `{
 					"type": "integer"
 				},
 				"containerCount": {
-					"type": "integer"
-				},
-				"containerReclaimable": {
-					"type": "integer"
-				},
-				"containerUsage": {
 					"type": "integer"
 				},
 				"created": {
@@ -22846,12 +23138,6 @@ const docTemplate = `{
 					"type": "integer"
 				},
 				"imageCount": {
-					"type": "integer"
-				},
-				"imageReclaimable": {
-					"type": "integer"
-				},
-				"imageUsage": {
 					"type": "integer"
 				},
 				"networkCount": {
@@ -22873,12 +23159,6 @@ const docTemplate = `{
 					"type": "integer"
 				},
 				"volumeCount": {
-					"type": "integer"
-				},
-				"volumeReclaimable": {
-					"type": "integer"
-				},
-				"volumeUsage": {
 					"type": "integer"
 				}
 			},
@@ -23561,6 +23841,9 @@ const docTemplate = `{
 					],
 					"type": "string"
 				},
+				"initialDB": {
+					"type": "string"
+				},
 				"name": {
 					"maxLength": 256,
 					"type": "string"
@@ -23993,6 +24276,27 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
+		"dto.Fail2BanSet": {
+			"properties": {
+				"ips": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"operate": {
+					"enum": [
+						"banned",
+						"ignore"
+					],
+					"type": "string"
+				}
+			},
+			"required": [
+				"operate"
+			],
+			"type": "object"
+		},
 		"dto.Fail2BanUpdate": {
 			"properties": {
 				"key": {
@@ -24270,6 +24574,57 @@ const docTemplate = `{
 			},
 			"type": "object"
 		},
+		"dto.GPUMemoryUsageHelper": {
+			"properties": {
+				"gpuProcesses": {
+					"items": {
+						"$ref": "#/definitions/dto.GPUProcess"
+					},
+					"type": "array"
+				},
+				"percent": {
+					"type": "number"
+				},
+				"total": {
+					"type": "number"
+				},
+				"used": {
+					"type": "number"
+				}
+			},
+			"type": "object"
+		},
+		"dto.GPUPowerUsageHelper": {
+			"properties": {
+				"percent": {
+					"type": "number"
+				},
+				"total": {
+					"type": "number"
+				},
+				"used": {
+					"type": "number"
+				}
+			},
+			"type": "object"
+		},
+		"dto.GPUProcess": {
+			"properties": {
+				"pid": {
+					"type": "string"
+				},
+				"processName": {
+					"type": "string"
+				},
+				"type": {
+					"type": "string"
+				},
+				"usedMemory": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
 		"dto.GroupCreate": {
 			"properties": {
 				"id": {
@@ -24485,6 +24840,12 @@ const docTemplate = `{
 		},
 		"dto.ImageBuild": {
 			"properties": {
+				"args": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
 				"dockerfile": {
 					"type": "string"
 				},
@@ -24516,8 +24877,14 @@ const docTemplate = `{
 				"createdAt": {
 					"type": "string"
 				},
+				"description": {
+					"type": "string"
+				},
 				"id": {
 					"type": "string"
+				},
+				"isPinned": {
+					"type": "boolean"
 				},
 				"isUsed": {
 					"type": "boolean"
@@ -24696,6 +25063,38 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
+		"dto.InstallDetail": {
+			"properties": {
+				"detailID": {
+					"type": "integer"
+				},
+				"httpPort": {
+					"type": "integer"
+				},
+				"httpsPort": {
+					"type": "integer"
+				},
+				"installID": {
+					"type": "integer"
+				},
+				"name": {
+					"type": "string"
+				},
+				"path": {
+					"type": "string"
+				},
+				"status": {
+					"type": "string"
+				},
+				"version": {
+					"type": "string"
+				},
+				"webUI": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
 		"dto.IptablesBatchOperate": {
 			"properties": {
 				"rules": {
@@ -24740,6 +25139,8 @@ const docTemplate = `{
 			"properties": {
 				"chain": {
 					"enum": [
+						"1PANEL_BASIC",
+						"1PANEL_BASIC_BEFORE",
 						"1PANEL_INPUT",
 						"1PANEL_OUTPUT"
 					],
@@ -24775,9 +25176,9 @@ const docTemplate = `{
 				},
 				"strategy": {
 					"enum": [
-						"ACCEPT",
-						"DROP",
-						"REJECT"
+						"accept",
+						"drop",
+						"reject"
 					],
 					"type": "string"
 				}
@@ -24787,6 +25188,17 @@ const docTemplate = `{
 				"operation",
 				"strategy"
 			],
+			"type": "object"
+		},
+		"dto.LauncherOption": {
+			"properties": {
+				"isShow": {
+					"type": "boolean"
+				},
+				"key": {
+					"type": "string"
+				}
+			},
 			"type": "object"
 		},
 		"dto.LoadRedisStatus": {
@@ -24857,9 +25269,6 @@ const docTemplate = `{
 				},
 				"captchaID": {
 					"type": "string"
-				},
-				"ignoreCaptcha": {
-					"type": "boolean"
 				},
 				"language": {
 					"enum": [
@@ -24937,13 +25346,6 @@ const docTemplate = `{
 					"type": "array"
 				},
 				"param": {
-					"enum": [
-						"cpu",
-						"memory",
-						"load",
-						"io",
-						"network"
-					],
 					"type": "string"
 				},
 				"value": {
@@ -24951,9 +25353,61 @@ const docTemplate = `{
 					"type": "array"
 				}
 			},
-			"required": [
-				"param"
-			],
+			"type": "object"
+		},
+		"dto.MonitorGPUData": {
+			"properties": {
+				"date": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"gpuValue": {
+					"items": {
+						"type": "number"
+					},
+					"type": "array"
+				},
+				"memoryValue": {
+					"items": {
+						"$ref": "#/definitions/dto.GPUMemoryUsageHelper"
+					},
+					"type": "array"
+				},
+				"powerValue": {
+					"items": {
+						"$ref": "#/definitions/dto.GPUPowerUsageHelper"
+					},
+					"type": "array"
+				},
+				"speedValue": {
+					"items": {
+						"type": "integer"
+					},
+					"type": "array"
+				},
+				"temperatureValue": {
+					"items": {
+						"type": "number"
+					},
+					"type": "array"
+				}
+			},
+			"type": "object"
+		},
+		"dto.MonitorGPUSearch": {
+			"properties": {
+				"endTime": {
+					"type": "string"
+				},
+				"productName": {
+					"type": "string"
+				},
+				"startTime": {
+					"type": "string"
+				}
+			},
 			"type": "object"
 		},
 		"dto.MonitorSearch": {
@@ -25030,6 +25484,9 @@ const docTemplate = `{
 		},
 		"dto.MysqlDBCreate": {
 			"properties": {
+				"collation": {
+					"type": "string"
+				},
 				"database": {
 					"type": "string"
 				},
@@ -25037,12 +25494,6 @@ const docTemplate = `{
 					"type": "string"
 				},
 				"format": {
-					"enum": [
-						"utf8mb4",
-						"utf8",
-						"gbk",
-						"big5"
-					],
 					"type": "string"
 				},
 				"from": {
@@ -25169,6 +25620,20 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
+		"dto.MysqlFormatCollationOption": {
+			"properties": {
+				"collations": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"format": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
 		"dto.MysqlLoadDB": {
 			"properties": {
 				"database": {
@@ -25195,26 +25660,6 @@ const docTemplate = `{
 				"from",
 				"type"
 			],
-			"type": "object"
-		},
-		"dto.MysqlOption": {
-			"properties": {
-				"database": {
-					"type": "string"
-				},
-				"from": {
-					"type": "string"
-				},
-				"id": {
-					"type": "integer"
-				},
-				"name": {
-					"type": "string"
-				},
-				"type": {
-					"type": "string"
-				}
-			},
 			"type": "object"
 		},
 		"dto.MysqlStatus": {
@@ -26035,6 +26480,9 @@ const docTemplate = `{
 		"dto.PortRuleOperate": {
 			"properties": {
 				"address": {
+					"type": "string"
+				},
+				"chain": {
 					"type": "string"
 				},
 				"description": {
@@ -27583,16 +28031,25 @@ const docTemplate = `{
 		},
 		"dto.UpdateFirewallDescription": {
 			"properties": {
-				"address": {
+				"chain": {
 					"type": "string"
 				},
 				"description": {
 					"type": "string"
 				},
-				"port": {
+				"dstIP": {
+					"type": "string"
+				},
+				"dstPort": {
 					"type": "string"
 				},
 				"protocol": {
+					"type": "string"
+				},
+				"srcIP": {
+					"type": "string"
+				},
+				"srcPort": {
 					"type": "string"
 				},
 				"strategy": {
@@ -32255,14 +32712,8 @@ const docTemplate = `{
 				"description": {
 					"type": "string"
 				},
-				"github": {
-					"type": "string"
-				},
 				"gpuSupport": {
 					"type": "boolean"
-				},
-				"icon": {
-					"type": "string"
 				},
 				"id": {
 					"type": "integer"
@@ -32282,29 +32733,14 @@ const docTemplate = `{
 				"recommend": {
 					"type": "integer"
 				},
-				"resource": {
-					"type": "string"
-				},
 				"status": {
 					"type": "string"
 				},
 				"tags": {
 					"items": {
-						"$ref": "#/definitions/response.TagDTO"
-					},
-					"type": "array"
-				},
-				"type": {
-					"type": "string"
-				},
-				"versions": {
-					"items": {
 						"type": "string"
 					},
 					"type": "array"
-				},
-				"website": {
-					"type": "string"
 				}
 			},
 			"type": "object"
@@ -32403,8 +32839,11 @@ const docTemplate = `{
 					},
 					"type": "array"
 				},
-				"systemDisk": {
-					"$ref": "#/definitions/response.DiskInfo"
+				"systemDisks": {
+					"items": {
+						"$ref": "#/definitions/response.DiskInfo"
+					},
+					"type": "array"
 				},
 				"totalCapacity": {
 					"type": "integer"

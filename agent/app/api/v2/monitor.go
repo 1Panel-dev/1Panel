@@ -34,7 +34,7 @@ func (b *BaseApi) LoadMonitor(c *gin.Context) {
 // @Tags Monitor
 // @Summary Load monitor data
 // @Param request body dto.MonitorGPUSearch true "request"
-// @Success 200 {object} dto.dto.MonitorGPUData
+// @Success 200 {object} dto.MonitorGPUData
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /hosts/monitor/gpu/search [post]

@@ -154,7 +154,7 @@ func (b *BaseApi) SearchCommand(c *gin.Context) {
 // @Summary Tree commands
 // @Accept json
 // @Param request body dto.OperateByType true "request"
-// @Success 200 {Array} dto.CommandTree
+// @Success 200 {array} dto.CommandTree
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /core/commands/tree [get]

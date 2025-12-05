@@ -27,7 +27,7 @@ func (b *BaseApi) LoadDashboardOsInfo(c *gin.Context) {
 // @Tags Dashboard
 // @Summary Load app launcher
 // @Accept json
-// @Success 200 {Array} dto.AppLauncher
+// @Success 200 {array} dto.AppLauncher
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /dashboard/app/launcher [get]
@@ -44,7 +44,7 @@ func (b *BaseApi) LoadAppLauncher(c *gin.Context) {
 // @Summary Load app launcher options
 // @Accept json
 // @Param request body dto.SearchByFilter true "request"
-// @Success 200 {Array} dto.LauncherOption
+// @Success 200 {array} dto.LauncherOption
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /dashboard/app/launcher/option [post]
@@ -85,7 +85,7 @@ func (b *BaseApi) UpdateAppLauncher(c *gin.Context) {
 
 // @Tags Dashboard
 // @Summary Load quick jump options
-// @Success 200 {Array} dto.QuickJump
+// @Success 200 {array} dto.QuickJump
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /dashboard/quick/option [get]
@@ -181,7 +181,7 @@ func (b *BaseApi) LoadDashboardCurrentInfo(c *gin.Context) {
 
 // @Tags Dashboard
 // @Summary Load top cpu processes
-// @Success 200 {Array} dto.Process
+// @Success 200 {array} dto.Process
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /dashboard/current/top/cpu [get]
@@ -192,7 +192,7 @@ func (b *BaseApi) LoadDashboardTopCPU(c *gin.Context) {
 
 // @Tags Dashboard
 // @Summary Load top memory processes
-// @Success 200 {Array} dto.Process
+// @Success 200 {array} dto.Process
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /dashboard/current/top/mem [get]

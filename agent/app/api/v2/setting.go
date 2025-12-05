@@ -86,7 +86,7 @@ func (b *BaseApi) CheckLocalConn(c *gin.Context) {
 
 // @Tags System Setting
 // @Summary Check local conn info
-// @Success 200 {bool} isOk
+// @Success 200 {boolean} isOk
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /settings/ssh/check/info [post]

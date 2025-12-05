@@ -502,7 +502,6 @@ func (b *BaseApi) Inspect(c *gin.Context) {
 	helper.SuccessWithData(c, result)
 }
 
-// @Router /containers/download/log [post]
 func (b *BaseApi) DownloadContainerLogs(c *gin.Context) {
 	var req dto.ContainerLog
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -716,6 +715,7 @@ func (b *BaseApi) ComposeUpdate(c *gin.Context) {
 // @Param since query string false "时间筛选"
 // @Param follow query string false "是否追踪"
 // @Param tail query string false "显示行号"
+// @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /containers/search/log [get]

@@ -54,6 +54,7 @@ func (b *BaseApi) LoadFtpLogInfo(c *gin.Context) {
 // @Summary Operate FTP
 // @Accept json
 // @Param request body dto.Operate true "request"
+// @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /toolbox/ftp/operate [post]
