@@ -245,7 +245,7 @@
                                         mode="yaml"
                                     ></CodemirrorPro>
                                 </div>
-                                <el-button type="primary" class="float-right" @click="onSubmitEdit">
+                                <el-button type="primary" class="float-right mt-2" @click="onSubmitEdit">
                                     {{ $t('commons.button.save') }}
                                 </el-button>
                             </el-form>
