@@ -68,8 +68,8 @@
                                                 plain
                                                 round
                                                 size="small"
-                                                :disabled="!currentCompose?.workdir"
-                                                @click="openComposeFolder"
+                                                :disabled="!row?.workdir"
+                                                @click="openComposeFolder(row)"
                                             >
                                                 {{ $t('home.dir') }}
                                             </el-button>
@@ -459,9 +459,9 @@ const onSubmitEdit = async () => {
         });
 };
 
-const openComposeFolder = () => {
-    if (currentCompose.value?.workdir) {
-        routerToFileWithPath(currentCompose.value.workdir);
+const openComposeFolder = (row: any) => {
+    if (row?.workdir) {
+        routerToFileWithPath(row.workdir);
     }
 };
 const onInspectContainer = async (item: any) => {
