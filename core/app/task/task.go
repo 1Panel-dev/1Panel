@@ -31,7 +31,7 @@ type Task struct {
 	taskRepo          repo.ITaskRepo
 	Task              *model.Task
 	ParentID          string
-	CancleWhenTimeout bool
+	CancelWhenTimeout bool
 }
 
 type SubTask struct {
@@ -44,7 +44,7 @@ type SubTask struct {
 	Rollback          RollbackFunc
 	Error             error
 	IgnoreErr         bool
-	CancleWhenTimeout bool
+	CancelWhenTimeout bool
 }
 
 const (
@@ -146,7 +146,7 @@ func (s *SubTask) Execute() error {
 		select {
 		case <-ctx.Done():
 			s.RootTask.Log(i18n.GetWithName("TaskTimeout", subTaskName))
-			if s.CancleWhenTimeout {
+			if s.CancelWhenTimeout {
 				return buserr.New(i18n.GetWithName("TaskTimeout", subTaskName))
 			}
 		case err = <-done:
@@ -179,7 +179,7 @@ func (t *Task) Execute() error {
 	var err error
 	t.Log(i18n.GetWithName("TaskStart", t.Name))
 	for _, subTask := range t.SubTasks {
-		subTask.CancleWhenTimeout = t.CancleWhenTimeout
+		subTask.CancelWhenTimeout = t.CancelWhenTimeout
 		t.Task.CurrentStep = subTask.StepAlias
 		t.updateTask(t.Task)
 		if err = subTask.Execute(); err == nil {
