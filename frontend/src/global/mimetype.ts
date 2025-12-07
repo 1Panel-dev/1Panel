@@ -213,6 +213,10 @@ export const DNSTypes = [
         value: 'WestCN',
     },
     {
+        label: 'PorkBun',
+        value: 'PorkBun',
+    },
+    {
         label: i18n.global.t('website.volcengine'),
         value: 'Volcengine',
     },

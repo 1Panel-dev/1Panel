@@ -3,13 +3,9 @@ package ssl
 import (
 	"crypto"
 	"encoding/json"
-	"github.com/go-acme/lego/v4/providers/dns/westcn"
 	"os"
 	"strings"
 	"time"
-
-	"github.com/go-acme/lego/v4/providers/dns/freemyip"
-	"github.com/go-acme/lego/v4/providers/dns/rainyun"
 
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/go-acme/lego/v4/acme"
@@ -23,13 +19,17 @@ import (
 	"github.com/go-acme/lego/v4/providers/dns/cloudflare"
 	"github.com/go-acme/lego/v4/providers/dns/cloudns"
 	"github.com/go-acme/lego/v4/providers/dns/dnspod"
+	"github.com/go-acme/lego/v4/providers/dns/freemyip"
 	"github.com/go-acme/lego/v4/providers/dns/godaddy"
 	"github.com/go-acme/lego/v4/providers/dns/huaweicloud"
 	"github.com/go-acme/lego/v4/providers/dns/namecheap"
 	"github.com/go-acme/lego/v4/providers/dns/namedotcom"
 	"github.com/go-acme/lego/v4/providers/dns/namesilo"
+	"github.com/go-acme/lego/v4/providers/dns/porkbun"
+	"github.com/go-acme/lego/v4/providers/dns/rainyun"
 	"github.com/go-acme/lego/v4/providers/dns/tencentcloud"
 	"github.com/go-acme/lego/v4/providers/dns/volcengine"
+	"github.com/go-acme/lego/v4/providers/dns/westcn"
 	"github.com/go-acme/lego/v4/providers/http/webroot"
 	"github.com/go-acme/lego/v4/registration"
 	"github.com/pkg/errors"
@@ -87,6 +87,7 @@ const (
 	HuaweiCloud  DnsType = "HuaweiCloud"
 	RainYun      DnsType = "RainYun"
 	WestCN       DnsType = "WestCN"
+	PorkBun      DnsType = "PorkBun"
 )
 
 type DNSParam struct {
@@ -244,6 +245,14 @@ func (c *AcmeClient) UseDns(dnsType DnsType, params string, websiteSSL model.Web
 		westcnConfig.PollingInterval = pollingInterval
 		westcnConfig.TTL = ttl
 		p, err = westcn.NewDNSProviderConfig(westcnConfig)
+	case PorkBun:
+		porkbunConfig := porkbun.NewDefaultConfig()
+		porkbunConfig.APIKey = param.APIkey
+		porkbunConfig.SecretAPIKey = param.SecretKey
+		porkbunConfig.PropagationTimeout = propagationTimeout
+		porkbunConfig.PollingInterval = pollingInterval
+		porkbunConfig.TTL = ttl
+		p, err = porkbun.NewDNSProviderConfig(porkbunConfig)
 	}
 	if err != nil {
 		return err
