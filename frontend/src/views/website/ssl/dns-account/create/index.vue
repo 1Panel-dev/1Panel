@@ -142,8 +142,8 @@
                         <el-form-item label="API Key" prop="authorization.apiKey">
                             <el-input v-model.trim="account.authorization['apiKey']"></el-input>
                         </el-form-item>
-                        <el-form-item label="Secret Key" prop="authorization.SecretKey">
-                            <el-input v-model.trim="account.authorization['SecretKey']"></el-input>
+                        <el-form-item label="Secret Key" prop="authorization.secretKey">
+                            <el-input v-model.trim="account.authorization['secretKey']"></el-input>
                         </el-form-item>
                     </div>
                 </el-form>
