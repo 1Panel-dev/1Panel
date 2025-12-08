@@ -16,7 +16,7 @@ import Components from 'unplugin-vue-components/vite';
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers';
 import svgLoader from 'vite-svg-loader';
 
-import monacoEditorPlugin from 'vite-plugin-monaco-editor';
+const prefix = `monaco-editor/esm/vs`;
 
 const { dependencies, devDependencies, name, version } = pkg;
 const __APP_INFO__ = {
@@ -97,9 +97,6 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
             svgLoader({
                 defaultImport: 'url',
             }),
-            monacoEditorPlugin({
-                languageWorkers: ['editorWorkerService', 'typescript', 'json', 'html', 'css'],
-            }),
         ],
         esbuild: {
             pure: viteEnv.VITE_DROP_CONSOLE ? ['console.log'] : [],
@@ -116,12 +113,15 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
                     chunkFileNames: 'assets/js/[name]-[hash].js',
                     entryFileNames: 'assets/js/[name]-[hash].js',
                     assetFileNames: 'assets/[ext]/[name]-[hash].[ext]',
+                    manualChunks: {
+                        jsonWorker: [`${prefix}/language/json/json.worker`],
+                        cssWorker: [`${prefix}/language/css/css.worker`],
+                        htmlWorker: [`${prefix}/language/html/html.worker`],
+                        tsWorker: [`${prefix}/language/typescript/ts.worker`],
+                        editorWorker: [`${prefix}/editor/editor.worker`],
+                    },
                 },
             },
-        },
-        optimizeDeps: {
-            include: ['monaco-editor/esm/vs/editor/editor.api'],
-            exclude: ['monaco-editor'],
         },
     };
 });

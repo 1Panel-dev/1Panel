@@ -125,6 +125,7 @@ func (a AppService) PageApp(ctx *gin.Context, req request.AppSearch) (*response.
 			GpuSupport:  ap.GpuSupport,
 			Recommend:   ap.Recommend,
 			Description: ap.GetDescription(ctx),
+			Type:        ap.Type,
 		}
 		appDTOs = append(appDTOs, appDTO)
 		tags, err := getAppTags(ap.ID, lang)

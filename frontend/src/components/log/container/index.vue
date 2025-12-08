@@ -38,7 +38,7 @@
 </template>
 
 <script lang="ts" setup>
-import { cleanContainerLog, DownloadFile } from '@/api/modules/container';
+import { cleanComposeLog, cleanContainerLog, DownloadFile } from '@/api/modules/container';
 import i18n from '@/lang';
 import { dateFormatForName } from '@/utils/util';
 import { computed, nextTick, onMounted, onUnmounted, reactive, ref } from 'vue';
@@ -47,6 +47,8 @@ import { MsgError, MsgSuccess } from '@/utils/message';
 import hightlight from '@/components/log/custom-hightlight/index.vue';
 import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();
+
+const em = defineEmits(['update:loading']);
 
 const props = defineProps({
     container: {
@@ -93,6 +95,7 @@ const logSearch = reactive({
     mode: 'all',
     tail: props.defaultFollow ? 0 : 100,
     compose: '',
+    resource: '',
 });
 const logHeight = 20;
 const logCount = computed(() => logs.value.length);
@@ -215,6 +218,19 @@ const onClean = async () => {
         if (props.node && props.node !== '') {
             currentNode = props.node;
         }
+        if (logSearch.compose !== '') {
+            em('update:loading', true);
+            await cleanComposeLog(logSearch.resource, logSearch.compose, currentNode)
+                .then(() => {
+                    em('update:loading', false);
+                    searchLogs();
+                    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                })
+                .finally(() => {
+                    em('update:loading', false);
+                });
+            return;
+        }
         await cleanContainerLog(logSearch.container, currentNode);
         searchLogs();
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
@@ -240,6 +256,7 @@ const resizeObserver = ref<ResizeObserver | null>(null);
 onMounted(() => {
     logSearch.container = props.container;
     logSearch.compose = props.compose;
+    logSearch.resource = props.resource;
 
     logVisible.value = true;
     logSearch.tail = 100;

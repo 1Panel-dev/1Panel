@@ -515,6 +515,7 @@ func (a *AppInstallService) GetServices(key string) ([]response.AppService, erro
 			} else {
 				service.From = constant.AppResourceRemote
 				service.Status = constant.StatusRunning
+				service.Config = map[string]string{"PANEL_DB_ROOT_PASSWORD": db.Password, "PANEL_DB_ROOT_USER": db.Username}
 			}
 			res = append(res, service)
 		}
