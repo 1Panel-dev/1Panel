@@ -269,6 +269,9 @@ const onMessage = (message: any) => {
     isGetData.value = false;
     oldData.value = JSON.parse(message.data);
     data.value = filterByStatus();
+    if (data.value == null) {
+        data.value = [];
+    }
     loading.value = false;
 };
 
