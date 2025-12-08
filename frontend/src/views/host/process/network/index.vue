@@ -206,6 +206,9 @@ const onOpenProcess = () => {
 const onMessage = (message: any) => {
     oldData.value = JSON.parse(message.data);
     data.value = filterByStatus();
+    if (data.value == null) {
+        data.value = [];
+    }
     loading.value = false;
 };
 const onerror = () => {};
