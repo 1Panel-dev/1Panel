@@ -20,7 +20,7 @@
         <el-button class="margin-button" @click="onDownload" icon="Download">
             {{ $t('commons.button.download') }}
         </el-button>
-        <el-button class="margin-button" @click="onClean" icon="Delete">
+        <el-button class="margin-button" @click="onClean" icon="Delete" v-if="logSearch.container !== ''">
             {{ $t('commons.button.clean') }}
         </el-button>
     </div>
