@@ -441,17 +441,20 @@ const handleComposeOperate = async (operation: 'up' | 'stop' | 'restart', row: a
         loading.value = true;
         const params = {
             name: row.name,
-            path: currentCompose.value.path,
+            path: row.path,
             operation: operation,
             withFile: false,
             force: false,
         };
         await composeOperator(params)
-            .then(() => {
+            .then(async () => {
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                search();
-                if (row.name === currentCompose.value?.name) {
-                    loadDetail(currentCompose.value, true);
+                await search();
+                if (currentCompose.value) {
+                    const updated = data.value.find((item) => item.name === currentCompose.value.name);
+                    if (updated) {
+                        await loadDetail(updated, true);
+                    }
                 }
             })
             .finally(() => {
@@ -480,7 +483,13 @@ const onSubmitEdit = async () => {
     await composeUpdate(param)
         .then(async () => {
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            await loadDetail(currentCompose.value, true);
+            await search();
+            if (currentCompose.value) {
+                const updated = data.value.find((item) => item.name === currentCompose.value.name);
+                if (updated) {
+                    await loadDetail(updated, true);
+                }
+            }
         })
         .finally(() => {
             loading.value = false;
