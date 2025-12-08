@@ -394,6 +394,28 @@ func (b *BaseApi) CleanContainerLog(c *gin.Context) {
 }
 
 // @Tags Container
+// @Summary Clean compose log
+// @Accept json
+// @Param request body dto.ComposeLogClean true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /containers/compose/clean/log [post]
+// @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"清理容器编排 [name] 日志","formatEN":"clean compose [name] logs"}
+func (b *BaseApi) CleanComposeLog(c *gin.Context) {
+	var req dto.ComposeLogClean
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	if err := containerService.ComposeLogClean(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags Container
 // @Summary Rename Container
 // @Accept json
 // @Param request body dto.ContainerRename true "request"

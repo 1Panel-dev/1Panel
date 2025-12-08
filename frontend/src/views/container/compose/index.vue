@@ -97,13 +97,7 @@
                                             >
                                                 {{ $t('commons.operate.restart') }}
                                             </el-button>
-                                            <el-button
-                                                :disabled="row.createdBy !== '1Panel'"
-                                                plain
-                                                round
-                                                size="small"
-                                                @click="onDelete(row)"
-                                            >
+                                            <el-button plain round size="small" @click="onDelete(row)">
                                                 {{ $t('commons.operate.delete') }}
                                             </el-button>
                                         </div>
@@ -174,8 +168,7 @@
                                                         <el-descriptions-item :label="$t('container.memTotal')">
                                                             {{ computeSizeForDocker(row.memoryLimit) }}
                                                         </el-descriptions-item>
-
-                                                        <el-descriptions-item>
+                                                        <el-descriptions-item v-if="row.hasLoadSize">
                                                             <template #label>
                                                                 {{ $t('container.sizeRw') }}
                                                                 <el-tooltip :content="$t('container.sizeRwHelper')">
@@ -184,7 +177,10 @@
                                                             </template>
                                                             {{ computeSize2(row.sizeRw) }}
                                                         </el-descriptions-item>
-                                                        <el-descriptions-item :label="$t('container.sizeRootFs')">
+                                                        <el-descriptions-item
+                                                            :label="$t('container.sizeRootFs')"
+                                                            v-if="row.hasLoadSize"
+                                                        >
                                                             <template #label>
                                                                 {{ $t('container.sizeRootFs') }}
                                                                 <el-tooltip :content="$t('container.sizeRootFsHelper')">
@@ -194,6 +190,17 @@
                                                             {{ computeSize2(row.sizeRootFs) }}
                                                         </el-descriptions-item>
                                                     </el-descriptions>
+
+                                                    <el-button
+                                                        class="mt-2"
+                                                        v-if="!row.hasLoadSize"
+                                                        size="small"
+                                                        link
+                                                        type="primary"
+                                                        @click="loadSize(row)"
+                                                    >
+                                                        {{ $t('container.loadSize') }}
+                                                    </el-button>
                                                 </template>
                                             </el-popover>
                                         </div>
@@ -252,8 +259,10 @@
 
                             <div v-show="showType === 'log'">
                                 <ContainerLog
+                                    v-model:loading="detailLoading"
                                     :key="currentCompose.path"
                                     :compose="currentCompose.path"
+                                    :resource="currentCompose.name"
                                     :highlightDiff="450"
                                     :defaultFollow="true"
                                 />
@@ -282,7 +291,14 @@ import TerminalDialog from '@/views/container/container/terminal/index.vue';
 import ContainerLogDialog from '@/components/log/container-drawer/index.vue';
 import CreateDialog from '@/views/container/compose/create/index.vue';
 import DeleteDialog from '@/views/container/compose/delete/index.vue';
-import { composeOperator, composeUpdate, containerListStats, inspect, searchCompose } from '@/api/modules/container';
+import {
+    composeOperator,
+    composeUpdate,
+    containerItemStats,
+    containerListStats,
+    inspect,
+    searchCompose,
+} from '@/api/modules/container';
 import DockerStatus from '@/views/container/docker-status/index.vue';
 import i18n from '@/lang';
 import { Container } from '@/api/interface/container';
@@ -381,11 +397,15 @@ const loadDetail = async (row: Container.ComposeInfo, withRefresh: boolean) => {
     detailLoading.value = true;
     currentCompose.value = row;
     composeContainers.value = row.containers || [];
-    await inspect({ id: currentCompose.value.name, type: 'compose' }).then((res) => {
-        composeContent.value = res.data;
-        detailLoading.value = false;
-    });
-    loadContainerStats();
+    await inspect({ id: currentCompose.value.name, type: 'compose' })
+        .then((res) => {
+            composeContent.value = res.data;
+            detailLoading.value = false;
+        })
+        .finally(() => {
+            loadContainerStats();
+            detailLoading.value = false;
+        });
 };
 
 const loadContainerStats = async () => {
@@ -437,6 +457,14 @@ const handleComposeOperate = async (operation: 'up' | 'stop' | 'restart', row: a
             .finally(() => {
                 loading.value = false;
             });
+    });
+};
+
+const loadSize = async (row: any) => {
+    containerItemStats(row.containerID).then((res) => {
+        row.sizeRw = res.data.sizeRw || 0;
+        row.sizeRootFs = res.data.sizeRootFs || 0;
+        row.hasLoadSize = true;
     });
 };
 
