@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"path/filepath"
 	"sort"
 	"strings"
 	"time"
@@ -282,6 +283,57 @@ func (u *ContainerService) ComposeUpdate(req dto.ComposeUpdate) error {
 	}
 
 	return nil
+}
+
+func (u *ContainerService) ComposeLogClean(req dto.ComposeLogClean) error {
+	client, err := docker.NewDockerClient()
+	if err != nil {
+		return err
+	}
+	defer client.Close()
+
+	options := container.ListOptions{All: true}
+	options.Filters = filters.NewArgs()
+	options.Filters.Add("label", composeProjectLabel)
+
+	list, err := client.ContainerList(context.Background(), options)
+	if err != nil {
+		return err
+	}
+	ctx := context.Background()
+	for _, item := range list {
+		if name, ok := item.Labels[composeProjectLabel]; ok {
+			if name != req.Name {
+				continue
+			}
+			containerItem, err := client.ContainerInspect(ctx, item.ID)
+			if err != nil {
+				return err
+			}
+			if err := client.ContainerStop(ctx, containerItem.ID, container.StopOptions{}); err != nil {
+				return err
+			}
+			file, err := os.OpenFile(containerItem.LogPath, os.O_RDWR|os.O_CREATE, constant.FilePerm)
+			if err != nil {
+				return err
+			}
+			defer file.Close()
+			if err = file.Truncate(0); err != nil {
+				return err
+			}
+			_, _ = file.Seek(0, 0)
+
+			files, _ := filepath.Glob(fmt.Sprintf("%s.*", containerItem.LogPath))
+			for _, file := range files {
+				_ = os.Remove(file)
+			}
+		}
+	}
+	return u.ComposeOperation(dto.ComposeOperation{
+		Name:      req.Name,
+		Path:      req.Path,
+		Operation: "restart",
+	})
 }
 
 func (u *ContainerService) loadPath(req *dto.ComposeCreate) error {

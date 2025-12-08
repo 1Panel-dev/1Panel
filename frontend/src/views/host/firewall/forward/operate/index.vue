@@ -14,6 +14,7 @@
 
             <el-form-item :label="$t('firewall.sourcePort')" prop="port">
                 <el-input clearable v-model.trim="dialogData.rowData!.port" />
+                <span class="input-help">{{ $t('firewall.forwardPortHelper') }}</span>
             </el-form-item>
 
             <el-form-item :label="$t('firewall.targetIP')" prop="targetIP">
@@ -24,6 +25,7 @@
 
             <el-form-item :label="$t('firewall.targetPort')" prop="targetPort">
                 <el-input clearable v-model.trim="dialogData.rowData!.targetPort" />
+                <span class="input-help">{{ $t('firewall.forwardPortHelper') }}</span>
             </el-form-item>
 
             <el-form-item :label="$t('firewall.forwardInboundInterface')" prop="interface">
@@ -103,8 +105,21 @@ function checkPortRule(rule: any, value: string, callback: any) {
     if (!value) {
         return callback(new Error(i18n.global.t('firewall.portFormatError')));
     }
-    if (checkPort(value)) {
-        return callback(new Error(i18n.global.t('firewall.portFormatError')));
+    if (value.indexOf(':') !== -1) {
+        const ports = value.split(':');
+        if (ports.length !== 2) {
+            return callback(new Error(i18n.global.t('firewall.portFormatError')));
+        }
+        if (checkPort(ports[0]) || checkPort(ports[1])) {
+            return callback(new Error(i18n.global.t('firewall.portFormatError')));
+        }
+        if (Number(ports[0]) > Number(ports[1])) {
+            return callback(new Error(i18n.global.t('firewall.portFormatError')));
+        }
+    } else {
+        if (checkPort(value)) {
+            return callback(new Error(i18n.global.t('firewall.portFormatError')));
+        }
     }
     callback();
 }

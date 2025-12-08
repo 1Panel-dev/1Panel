@@ -54,6 +54,10 @@ export const getFileContent = (params: File.ReqFile) => {
     return http.post<File.File>('files/content', params);
 };
 
+export const getPreviewContent = (params: File.PreviewContentReq) => {
+    return http.post<File.File>('files/preview', params, TimeoutEnum.T_5M);
+};
+
 export const saveFileContent = (params: File.FileEdit) => {
     return http.post<File.File>('files/save', params);
 };

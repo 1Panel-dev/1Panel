@@ -56,6 +56,7 @@ type IFileService interface {
 	Compress(c request.FileCompress) error
 	DeCompress(c request.FileDeCompress) error
 	GetContent(op request.FileContentReq) (response.FileInfo, error)
+	GetPreviewContent(op request.FileContentReq) (response.FileInfo, error)
 	SaveContent(edit request.FileEdit) error
 	FileDownload(d request.FileDownload) (string, error)
 	DirSize(req request.DirSizeReq) (response.DirSizeRes, error)
@@ -371,6 +372,82 @@ func (f *FileService) GetContent(op request.FileContentReq) (response.FileInfo, 
 			info.Content = string(contents)
 		}
 	}
+	return response.FileInfo{FileInfo: *info}, nil
+}
+
+func (f *FileService) GetPreviewContent(op request.FileContentReq) (response.FileInfo, error) {
+	info, err := files.NewFileInfo(files.FileOption{
+		Path:     op.Path,
+		Expand:   false,
+		IsDetail: op.IsDetail,
+	})
+	if err != nil {
+		return response.FileInfo{}, err
+	}
+
+	if files.IsBlockDevice(info.FileMode) {
+		return response.FileInfo{FileInfo: *info}, nil
+	}
+
+	file, err := os.Open(op.Path)
+	if err != nil {
+		return response.FileInfo{}, err
+	}
+	defer file.Close()
+
+	headBuf := make([]byte, 1024)
+	n, err := file.Read(headBuf)
+	if err != nil && err != io.EOF {
+		return response.FileInfo{}, err
+	}
+	headBuf = headBuf[:n]
+
+	if len(headBuf) > 0 && files.DetectBinary(headBuf) {
+		return response.FileInfo{FileInfo: *info}, nil
+	}
+
+	const maxSize = 10 * 1024 * 1024
+	if info.Size <= maxSize {
+		if _, err := file.Seek(0, 0); err != nil {
+			return response.FileInfo{}, err
+		}
+		content, err := io.ReadAll(file)
+		if err != nil {
+			return response.FileInfo{}, err
+		}
+		info.Content = string(content)
+	} else {
+		lines, err := files.TailFromEnd(op.Path, 300)
+		if err != nil {
+			return response.FileInfo{}, err
+		}
+		info.Content = strings.Join(lines, "\n")
+	}
+
+	content := []byte(info.Content)
+	if len(content) > 1024 {
+		content = content[:1024]
+	}
+	if !utf8.Valid(content) {
+		_, decodeName, _ := charset.DetermineEncoding(content, "")
+		decoder := files.GetDecoderByName(decodeName)
+		if decoder != nil {
+			reader := strings.NewReader(info.Content)
+			var dec *encoding.Decoder
+			if decodeName == "windows-1252" {
+				dec = simplifiedchinese.GBK.NewDecoder()
+			} else {
+				dec = decoder.NewDecoder()
+			}
+			decodedReader := transform.NewReader(reader, dec)
+			contents, err := io.ReadAll(decodedReader)
+			if err != nil {
+				return response.FileInfo{}, err
+			}
+			info.Content = string(contents)
+		}
+	}
+
 	return response.FileInfo{FileInfo: *info}, nil
 }
 

@@ -39,9 +39,17 @@ export const commitContainer = (params: Container.ContainerCommit) => {
 export const loadContainerInfo = (name: string) => {
     return http.post<Container.ContainerHelper>(`/containers/info`, { name: name });
 };
+export const cleanComposeLog = (composeName: string, composePath: string, operateNode?: string) => {
+    const params = operateNode ? `?operateNode=${operateNode}` : '';
+    return http.post(
+        `/containers/compose/clean/log${params}`,
+        { name: composeName, path: composePath },
+        TimeoutEnum.T_60S,
+    );
+};
 export const cleanContainerLog = (containerName: string, operateNode?: string) => {
     const params = operateNode ? `?operateNode=${operateNode}` : '';
-    return http.post(`/containers/clean/log${params}`, { name: containerName });
+    return http.post(`/containers/clean/log${params}`, { name: containerName }, TimeoutEnum.T_60S);
 };
 export const containerItemStats = (containerID: string) => {
     return http.post<Container.ContainerItemStats>(`/containers/item/stats`, { name: containerID }, TimeoutEnum.T_60S);

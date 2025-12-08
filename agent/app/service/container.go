@@ -85,6 +85,7 @@ type IContainerService interface {
 	CreateVolume(req dto.VolumeCreate) error
 	TestCompose(req dto.ComposeCreate) (bool, error)
 	ComposeUpdate(req dto.ComposeUpdate) error
+	ComposeLogClean(req dto.ComposeLogClean) error
 	Prune(req dto.ContainerPrune) error
 
 	LoadUsers(req dto.OperationWithName) []string

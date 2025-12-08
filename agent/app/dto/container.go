@@ -291,6 +291,10 @@ type ComposeUpdate struct {
 	Content string   `json:"content" validate:"required"`
 	Env     []string `json:"env"`
 }
+type ComposeLogClean struct {
+	Name string `json:"name" validate:"required"`
+	Path string `json:"path" validate:"required"`
+}
 
 type ContainerLog struct {
 	Container     string `json:"container" validate:"required"`

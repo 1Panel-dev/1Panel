@@ -39,6 +39,7 @@ type AppItem struct {
 	Tags        []string `json:"tags"`
 	GpuSupport  bool     `json:"gpuSupport"`
 	Recommend   int      `json:"recommend"`
+	Type        string   `json:"type"`
 }
 
 type TagDTO struct {

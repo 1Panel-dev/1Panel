@@ -627,6 +627,7 @@
         <BatchRole ref="batchRoleRef" @close="search" />
         <VscodeOpenDialog ref="dialogVscodeOpenRef" />
         <Preview ref="previewRef" />
+        <TextPreview ref="textPreviewRef" />
         <TerminalDialog ref="dialogTerminalRef" />
         <Convert ref="convertRef" @close="search" />
     </div>
@@ -684,6 +685,7 @@ import RecycleBin from './recycle-bin/index.vue';
 import Favorite from './favorite/index.vue';
 import BatchRole from './batch-role/index.vue';
 import Preview from './preview/index.vue';
+import TextPreview from './text-preview/index.vue';
 import VscodeOpenDialog from '@/components/vscode-open/index.vue';
 import Convert from './convert/index.vue';
 import { debounce } from 'lodash-es';
@@ -786,7 +788,10 @@ const favorites = ref([]);
 const batchRoleRef = ref();
 const dialogVscodeOpenRef = ref();
 const previewRef = ref();
+const textPreviewRef = ref();
 const processRef = ref();
+
+const MAX_OPEN_SIZE = 10 * 1024 * 1024;
 const hostMount = ref<Dashboard.DiskInfo[]>([]);
 let resizeObserver: ResizeObserver;
 const dirTotalSize = ref(-1);
@@ -1247,12 +1252,16 @@ const openView = (item: File.File) => {
         return openPreview(item, fileType);
     }
 
+    const path = item.isSymlink ? item.linkPath : item.path;
+    if (item.size > MAX_OPEN_SIZE) {
+        return openTextPreview(path, item.name);
+    }
+
     const actionMap = {
         compress: openDeCompress,
         text: () => openCodeEditor(item.path, item.extension),
     };
 
-    const path = item.isSymlink ? item.linkPath : item.path;
     return actionMap[fileType] ? actionMap[fileType](item) : openCodeEditor(path, item.extension);
 };
 
@@ -1294,6 +1303,10 @@ const openCodeEditor = (path: string, extension: string) => {
             codeEditorRef.value.acceptParams(fileEdit);
         })
         .catch(() => {});
+};
+
+const openTextPreview = (path: string, name: string) => {
+    textPreviewRef.value.acceptParams({ path, name });
 };
 
 const openUpload = () => {
@@ -1544,6 +1557,19 @@ const beforeButtons = [
     {
         label: i18n.global.t('commons.button.open'),
         click: open,
+        show: (row: File.File) => {
+            return row?.isDir || row?.size <= MAX_OPEN_SIZE;
+        },
+    },
+    {
+        label: i18n.global.t('file.previewLargeFile'),
+        click: (row: File.File) => {
+            const path = row.isSymlink ? row.linkPath : row.path;
+            openTextPreview(path, row.name);
+        },
+        show: (row: File.File) => {
+            return !row?.isDir && row?.size > MAX_OPEN_SIZE;
+        },
     },
     {
         label: i18n.global.t('commons.button.download'),

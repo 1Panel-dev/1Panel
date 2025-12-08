@@ -13,7 +13,6 @@ type FileContentReq struct {
 	Path     string `json:"path" validate:"required"`
 	IsDetail bool   `json:"isDetail"`
 }
-
 type SearchUploadWithPage struct {
 	dto.PageInfo
 	Path string `json:"path" validate:"required"`

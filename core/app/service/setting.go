@@ -694,7 +694,7 @@ func loadDockerProxy(req dto.ProxyUpdate) string {
 		account += "@"
 	}
 
-	return fmt.Sprintf("%s://%s%s:%s", req.ProxyType, account, req.ProxyUrl, req.ProxyPort)
+	return fmt.Sprintf("%s://%s%s:%s", req.ProxyType, account, strings.ReplaceAll(req.ProxyUrl, req.ProxyType+"://", ""), req.ProxyPort)
 }
 
 func checkProxy(req dto.ProxyUpdate) error {
