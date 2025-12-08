@@ -849,7 +849,7 @@ const docTemplate = `{
 					"200": {
 						"description": "app icon",
 						"schema": {
-							"type": "string"
+							"type": "file"
 						}
 					}
 				},
@@ -23600,6 +23600,9 @@ const docTemplate = `{
 				"cpuLogicalCores": {
 					"type": "integer"
 				},
+				"cpuMhz": {
+					"type": "number"
+				},
 				"cpuModelName": {
 					"type": "string"
 				},
@@ -23636,6 +23639,9 @@ const docTemplate = `{
 				"platformVersion": {
 					"type": "string"
 				},
+				"prettyDistro": {
+					"type": "string"
+				},
 				"quickJump": {
 					"items": {
 						"$ref": "#/definitions/dto.QuickJump"
@@ -23656,6 +23662,12 @@ const docTemplate = `{
 		},
 		"dto.DashboardCurrent": {
 			"properties": {
+				"cpuDetailedPercent": {
+					"items": {
+						"type": "number"
+					},
+					"type": "array"
+				},
 				"cpuPercent": {
 					"items": {
 						"type": "number"
@@ -23925,6 +23937,9 @@ const docTemplate = `{
 				"id": {
 					"type": "integer"
 				},
+				"initialDB": {
+					"type": "string"
+				},
 				"name": {
 					"maxLength": 256,
 					"type": "string"
@@ -24053,6 +24068,9 @@ const docTemplate = `{
 				},
 				"id": {
 					"type": "integer"
+				},
+				"initialDB": {
+					"type": "string"
 				},
 				"password": {
 					"type": "string"
@@ -24570,40 +24588,6 @@ const docTemplate = `{
 				},
 				"temperature": {
 					"type": "string"
-				}
-			},
-			"type": "object"
-		},
-		"dto.GPUMemoryUsageHelper": {
-			"properties": {
-				"gpuProcesses": {
-					"items": {
-						"$ref": "#/definitions/dto.GPUProcess"
-					},
-					"type": "array"
-				},
-				"percent": {
-					"type": "number"
-				},
-				"total": {
-					"type": "number"
-				},
-				"used": {
-					"type": "number"
-				}
-			},
-			"type": "object"
-		},
-		"dto.GPUPowerUsageHelper": {
-			"properties": {
-				"percent": {
-					"type": "number"
-				},
-				"total": {
-					"type": "number"
-				},
-				"used": {
-					"type": "number"
 				}
 			},
 			"type": "object"
@@ -25363,21 +25347,54 @@ const docTemplate = `{
 					},
 					"type": "array"
 				},
+				"gpuProcesses": {
+					"items": {
+						"items": {
+							"$ref": "#/definitions/dto.GPUProcess"
+						},
+						"type": "array"
+					},
+					"type": "array"
+				},
 				"gpuValue": {
 					"items": {
 						"type": "number"
 					},
 					"type": "array"
 				},
-				"memoryValue": {
+				"memoryPercent": {
 					"items": {
-						"$ref": "#/definitions/dto.GPUMemoryUsageHelper"
+						"type": "number"
 					},
 					"type": "array"
 				},
-				"powerValue": {
+				"memoryTotal": {
 					"items": {
-						"$ref": "#/definitions/dto.GPUPowerUsageHelper"
+						"type": "number"
+					},
+					"type": "array"
+				},
+				"memoryUsed": {
+					"items": {
+						"type": "number"
+					},
+					"type": "array"
+				},
+				"powerPercent": {
+					"items": {
+						"type": "number"
+					},
+					"type": "array"
+				},
+				"powerTotal": {
+					"items": {
+						"type": "number"
+					},
+					"type": "array"
+				},
+				"powerUsed": {
+					"items": {
+						"type": "number"
 					},
 					"type": "array"
 				},
@@ -26007,6 +26024,12 @@ const docTemplate = `{
 		},
 		"dto.NodeCurrent": {
 			"properties": {
+				"cpuDetailedPercent": {
+					"items": {
+						"type": "number"
+					},
+					"type": "array"
+				},
 				"cpuTotal": {
 					"type": "integer"
 				},
@@ -26246,6 +26269,9 @@ const docTemplate = `{
 					"type": "string"
 				},
 				"platformFamily": {
+					"type": "string"
+				},
+				"prettyDistro": {
 					"type": "string"
 				}
 			},

@@ -200,7 +200,7 @@ func (b *BaseApi) GetAppListUpdate(c *gin.Context) {
 // @Summary Get app icon by app_id
 // @Accept json
 // @Param appId path integer true "app id"
-// @Success 200 {string} file "app icon"
+// @Success 200 {file} file "app icon"
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /apps/icon/:appId [get]
