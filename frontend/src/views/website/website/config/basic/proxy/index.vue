@@ -12,11 +12,11 @@
         <el-table-column :label="$t('website.proxyPass')" prop="proxyPass"></el-table-column>
         <el-table-column :label="$t('website.cache')" prop="cache">
             <template #default="{ row }">
-                <el-tag :type="row.cacheTime > 0 ? 'success' : 'info'">
+                <el-tag class="mr-2" :type="row.cacheTime > 0 ? 'success' : 'info'" v-if="row.cacheTime != 0">
                     {{ $t('website.browserCache') + ':' }}
                     {{ row.cacheTime > 0 ? row.cacheTime + row.cacheUnit : $t('setting.sslDisable') }}
                 </el-tag>
-                <el-tag class="ml-2" :type="row.serverCacheTime > 0 ? 'success' : 'info'">
+                <el-tag :type="row.serverCacheTime > 0 ? 'success' : 'info'">
                     {{ $t('website.serverCache') + ':' }}
                     {{ row.serverCacheTime > 0 ? row.serverCacheTime + row.serverCacheUnit : $t('setting.sslDisable') }}
                 </el-tag>
