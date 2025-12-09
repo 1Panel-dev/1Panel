@@ -21,7 +21,7 @@
                                 {{ $t('commons.button.restart') }}
                             </el-button>
                         </template>
-                        <template v-if="!baseInfo.isInit">
+                        <template v-if="!baseInfo.isInit || (props.currentTab === 'forward' && !baseInfo.isBind)">
                             <el-divider direction="vertical" />
                             <el-button type="primary" link @click="onInit">
                                 {{ $t('commons.button.init') }}
@@ -71,7 +71,7 @@
             ref="dockerRef"
             v-model:withDockerRestart="withDockerRestart"
             @submit="onSubmit"
-            :title="$t('firewall.firewallHelper', [i18n.global.t('commons.button.' + operation)])"
+            :title="$t('firewall.firewallHelper', [$t('commons.button.' + operation)])"
         >
             <template #helper>
                 <span>{{ $t('firewall.' + operation + 'FirewallHelper') }}</span>
