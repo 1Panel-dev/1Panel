@@ -337,7 +337,12 @@
             </template>
         </LayoutContent>
 
-        <TaskLog ref="taskLogRef" width="70%" @close="search(true)" />
+        <TaskLog ref="taskLogRef" width="70%">
+            <template #task-footer>
+                <el-button @click="handleClose">{{ $t('commons.table.backToList') }}</el-button>
+                <el-button type="primary" @click="closeTask">{{ $t('commons.table.keepEdit') }}</el-button>
+            </template>
+        </TaskLog>
         <FileList ref="fileRef" @choose="loadDir" />
         <DeleteDialog @search="search(true)" ref="dialogDelRef" />
         <ContainerInspectDialog ref="containerInspectRef" />
@@ -580,6 +585,13 @@ const changePath = async () => {
 };
 const loadDir = async (path: string) => {
     form.path = path;
+};
+const handleClose = () => {
+    search(true);
+    taskLogRef.value?.handleClose();
+};
+const closeTask = () => {
+    taskLogRef.value?.handleClose();
 };
 
 const onDelete = (row: any) => {

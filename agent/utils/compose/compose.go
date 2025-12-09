@@ -15,7 +15,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
-	"github.com/goccy/go-yaml"
+	"gopkg.in/yaml.v3"
 )
 
 func checkCmd() error {

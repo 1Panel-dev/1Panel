@@ -24,7 +24,6 @@ require (
 	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/go-resty/resty/v2 v2.16.5
 	github.com/go-sql-driver/mysql v1.8.1
-	github.com/goccy/go-yaml v1.9.8
 	github.com/goh-chunlin/go-onedrive v1.1.1
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/websocket v1.5.4-0.20250319132907-e064f32e3674
@@ -141,6 +140,7 @@ require (
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-viper/mapstructure/v2 v2.4.0 // indirect
 	github.com/goccy/go-json v0.10.5 // indirect
+	github.com/goccy/go-yaml v1.9.8 // indirect
 	github.com/gofrs/flock v0.13.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
