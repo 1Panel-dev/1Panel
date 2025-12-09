@@ -2507,6 +2507,7 @@ const message = {
         antiLeech: 'Anti-leech',
         extends: 'Extensão',
         browserCache: 'Cache',
+        noModify: 'Não Modificar',
         serverCache: 'Cache do servidor',
         leechLog: 'Registrar log anti-leech',
         accessDomain: 'Domínios permitidos',

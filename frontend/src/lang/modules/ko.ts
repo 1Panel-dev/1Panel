@@ -2407,6 +2407,7 @@ const message = {
         antiLeech: '링크 차단',
         extends: '확장',
         browserCache: '캐시',
+        noModify: '수정 안 함',
         serverCache: '서버 캐시',
         leechLog: '링크 차단 로그 기록',
         accessDomain: '허용된 도메인',

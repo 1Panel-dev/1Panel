@@ -2504,6 +2504,7 @@ const message = {
         antiLeech: 'Anti-leech',
         extends: 'Pelanjutan',
         browserCache: 'Cache',
+        noModify: 'Tidak Ubah',
         serverCache: 'Cache Pelayan',
         leechLog: 'Rekod log anti-leech',
         accessDomain: 'Domain yang dibenarkan',

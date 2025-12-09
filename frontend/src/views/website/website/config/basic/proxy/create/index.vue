@@ -124,24 +124,31 @@
                         </div>
                         <el-button-group>
                             <el-button
-                                :type="proxy.browserCache ? 'primary' : 'default'"
-                                @click="changeBrowserCache(true)"
+                                :type="proxy.browserCache === 'enable' ? 'primary' : 'default'"
+                                @click="changeBrowserCache('enable')"
                                 size="small"
                             >
                                 {{ $t('commons.button.enable') }}
                             </el-button>
                             <el-button
-                                :type="!proxy.browserCache ? 'primary' : 'default'"
-                                @click="changeBrowserCache(false)"
+                                :type="proxy.browserCache === 'disable' ? 'primary' : 'default'"
+                                @click="changeBrowserCache('disable')"
                                 size="small"
                             >
                                 {{ $t('commons.button.disable') }}
+                            </el-button>
+                            <el-button
+                                :type="proxy.browserCache === 'noModify' ? 'primary' : 'default'"
+                                @click="changeBrowserCache('noModify')"
+                                size="small"
+                            >
+                                {{ $t('website.noModify') }}
                             </el-button>
                         </el-button-group>
                     </div>
 
                     <el-collapse-transition>
-                        <div v-if="proxy.browserCache" class="mt-4 mb-6">
+                        <div v-if="proxy.browserCache === 'enable'" class="mt-4 mb-6">
                             <el-form-item :label="$t('website.browserCacheTime')" prop="cacheTime">
                                 <el-input v-model.number="proxy.cacheTime" maxlength="15" class="!w-64">
                                     <template #append>
@@ -257,8 +264,8 @@ const initData = (): Website.ProxyConfig => ({
     operate: 'create',
     enable: true,
     cache: false,
-    cacheTime: 4,
-    cacheUnit: 'h',
+    cacheTime: 0,
+    cacheUnit: '',
     name: '',
     modifier: '',
     match: '/',
@@ -272,7 +279,7 @@ const initData = (): Website.ProxyConfig => ({
     proxySSLName: '',
     serverCacheTime: 10,
     serverCacheUnit: 'm',
-    browserCache: false,
+    browserCache: 'noModify',
     cors: false,
     allowOrigins: '*',
     allowMethods: 'GET,POST,OPTIONS,PUT,DELETE',
@@ -295,8 +302,12 @@ const acceptParams = (proxyParam: Website.ProxyConfig) => {
     activeTab.value = 'basic';
 
     // Initialize browserCache based on cacheTime value
-    if (proxy.value.browserCache === undefined) {
-        proxy.value.browserCache = proxy.value.cacheTime > 0;
+    if (proxy.value.cacheTime > 0) {
+        proxy.value.browserCache = 'enable';
+    } else if (proxy.value.cacheTime === 0) {
+        proxy.value.browserCache = 'noModify';
+    } else {
+        proxy.value.browserCache = 'disable';
     }
 
     const res = getProtocolAndHost(proxyParam.proxyPass);
@@ -326,11 +337,14 @@ const changeServerCache = (cache: boolean) => {
     }
 };
 
-const changeBrowserCache = (cache: boolean) => {
-    proxy.value.browserCache = cache;
-    if (cache) {
+const changeBrowserCache = (mode: 'enable' | 'disable' | 'noModify') => {
+    proxy.value.browserCache = mode;
+    if (mode === 'enable') {
         proxy.value.cacheTime = 4;
         proxy.value.cacheUnit = 'h';
+    } else if (mode === 'disable') {
+        proxy.value.cacheTime = -1;
+        proxy.value.cacheUnit = '';
     } else {
         proxy.value.cacheTime = 0;
         proxy.value.cacheUnit = '';

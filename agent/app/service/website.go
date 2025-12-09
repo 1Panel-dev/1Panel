@@ -1759,10 +1759,12 @@ func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error)
 		location.RemoveServerCache(fmt.Sprintf("proxy_cache_zone_of_%s", website.Alias))
 	}
 	// Browser Cache Settings
-	if req.CacheTime != 0 {
+	if req.CacheTime > 0 {
 		location.AddBrowserCache(req.CacheTime, req.CacheUnit)
-	} else {
+	} else if req.CacheTime == 0 {
 		location.RemoveBrowserCache()
+	} else {
+		location.AddBroswerNoCache()
 	}
 	// Content Replace Settings
 	if len(req.Replaces) > 0 {
@@ -1945,10 +1947,8 @@ func (w WebsiteService) GetProxies(id uint) (res []request.WebsiteProxyConfig, e
 		}
 		proxyConfig.ProxyPass = location.ProxyPass
 		proxyConfig.Cache = location.Cache
-		if location.CacheTime > 0 {
-			proxyConfig.CacheTime = location.CacheTime
-			proxyConfig.CacheUnit = location.CacheUint
-		}
+		proxyConfig.CacheTime = location.CacheTime
+		proxyConfig.CacheUnit = location.CacheUint
 		if location.ServerCacheTime > 0 {
 			proxyConfig.ServerCacheTime = location.ServerCacheTime
 			proxyConfig.ServerCacheUnit = location.ServerCacheUint

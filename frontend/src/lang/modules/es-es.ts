@@ -2523,6 +2523,7 @@ const message = {
         antiLeech: 'Anti-hotlink',
         extends: 'Extensiones',
         browserCache: 'Caché de navegador',
+        noModify: 'No Modificar',
         serverCache: 'Caché del servidor',
         leechLog: 'Registrar logs anti-hotlink',
         accessDomain: 'Dominios permitidos',

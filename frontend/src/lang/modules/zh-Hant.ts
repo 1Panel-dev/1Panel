@@ -2354,6 +2354,7 @@ const message = {
         antiLeech: '防盜鏈',
         extends: '副檔名',
         browserCache: '瀏覽器快取',
+        noModify: '不修改',
         serverCache: '伺服器快取',
         leechLog: '記錄防盜鏈日誌',
         accessDomain: '允許的域名',
