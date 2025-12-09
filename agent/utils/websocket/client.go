@@ -54,7 +54,7 @@ func (c *Client) Write() {
 	}
 }
 
-func (c *Client) SendPayload(res []byte) {
+func (c *Client) Send(res []byte) {
 	if c.closed.Load() {
 		return
 	}
