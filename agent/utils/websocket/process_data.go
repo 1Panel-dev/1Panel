@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
 	"strings"
 	"time"
 
@@ -320,30 +321,9 @@ func getSSHSessions(config SSHSessionConfig) (res []byte, err error) {
 }
 
 func getNetConnections(config NetConfig) (res []byte, err error) {
-	result := make([]ProcessConnect, 0)
+	result := make([]ProcessConnect, 0, 1024)
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)
 	defer cancel()
-
-	processes, err := process.ProcessesWithContext(ctx)
-	if err != nil {
-		res, _ = json.Marshal(result)
-		return
-	}
-
-	procPidMap := make(map[int32]string, len(processes))
-	for _, proc := range processes {
-		name, _ := proc.Name()
-		if name == "" {
-			continue
-		}
-		if config.ProcessName != "" && !strings.Contains(name, config.ProcessName) {
-			continue
-		}
-		if config.ProcessID > 0 && config.ProcessID != proc.Pid {
-			continue
-		}
-		procPidMap[proc.Pid] = name
-	}
 
 	connections, err := net.ConnectionsMaxWithContext(ctx, "all", 32768)
 	if err != nil {
@@ -351,27 +331,68 @@ func getNetConnections(config NetConfig) (res []byte, err error) {
 		return
 	}
 
+	pidConnectionsMap := make(map[int32][]net.ConnectionStat, 256)
+	pidNameMap := make(map[int32]string, 256)
+
 	for _, conn := range connections {
 		if conn.Family != 2 && conn.Family != 10 {
 			continue
 		}
-		if name, ok := procPidMap[conn.Pid]; ok {
-			connType := getConnectionType(conn.Type, conn.Family)
-			if config.Port > 0 && conn.Laddr.Port != config.Port {
+
+		if conn.Pid == 0 {
+			continue
+		}
+
+		if config.ProcessID > 0 && conn.Pid != config.ProcessID {
+			continue
+		}
+
+		if config.Port > 0 && conn.Laddr.Port != config.Port && conn.Raddr.Port != config.Port {
+			continue
+		}
+
+		if _, exists := pidNameMap[conn.Pid]; !exists {
+			pName, _ := getProcessNameWithContext(ctx, conn.Pid)
+			if pName == "" {
 				continue
 			}
+			if config.ProcessName != "" && !strings.Contains(pName, config.ProcessName) {
+				continue
+			}
+			pidNameMap[conn.Pid] = pName
+		}
+
+		pidConnectionsMap[conn.Pid] = append(pidConnectionsMap[conn.Pid], conn)
+	}
+
+	for pid, connections := range pidConnectionsMap {
+		for _, conn := range connections {
 			result = append(result, ProcessConnect{
-				Type:   connType,
+				Type:   getConnectionType(conn.Type, conn.Family),
 				Status: conn.Status,
 				Laddr:  conn.Laddr,
 				Raddr:  conn.Raddr,
 				PID:    conn.Pid,
-				Name:   name,
+				Name:   pidNameMap[pid],
 			})
 		}
 	}
-	res, _ = json.Marshal(result)
+
+	res, err = json.Marshal(result)
 	return
+}
+
+func getProcessNameWithContext(ctx context.Context, pid int32) (string, error) {
+	data, err := os.ReadFile(fmt.Sprintf("/proc/%d/comm", pid))
+	if err != nil || len(data) == 0 {
+		p, err := process.NewProcessWithContext(ctx, pid)
+		if err != nil {
+			return "", err
+		}
+		return p.Name()
+	}
+	return strings.TrimSpace(string(data)), nil
+
 }
 
 func getConnectionType(connType uint32, family uint32) string {
