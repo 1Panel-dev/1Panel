@@ -1,6 +1,7 @@
 package websocket
 
 import (
+	"sync"
 	"sync/atomic"
 
 	"github.com/gorilla/websocket"
@@ -9,25 +10,31 @@ import (
 const MaxMessageQuenue = 32
 
 type Client struct {
-	ID     string
-	Socket *websocket.Conn
-	Msg    chan []byte
-	closed atomic.Bool
+	ID        string
+	Socket    *websocket.Conn
+	Msg       chan []byte
+	closed    atomic.Bool
+	closeOnce sync.Once
 }
 
 func NewWsClient(ID string, socket *websocket.Conn) *Client {
 	return &Client{
 		ID:     ID,
 		Socket: socket,
-		Msg:    make(chan []byte, 32),
-		closed: atomic.Bool{},
+		Msg:    make(chan []byte, MaxMessageQuenue),
 	}
 }
 
+func (c *Client) Close() {
+	c.closeOnce.Do(func() {
+		c.closed.Store(true)
+		close(c.Msg)
+		c.Socket.Close()
+	})
+}
+
 func (c *Client) Read() {
-	defer func() {
-		c.Close()
-	}()
+	defer c.Close()
 	for {
 		_, message, err := c.Socket.ReadMessage()
 		if err != nil {
@@ -38,9 +45,6 @@ func (c *Client) Read() {
 }
 
 func (c *Client) Write() {
-	defer func() {
-		c.Socket.Close()
-	}()
 	for {
 		message, ok := <-c.Msg
 		if !ok {
@@ -56,12 +60,6 @@ func (c *Client) SendPayload(res []byte) {
 	}
 	select {
 	case c.Msg <- res:
-		return
 	default:
-		select {
-		case <-c.Msg:
-		default:
-		}
-		c.Msg <- res
 	}
 }

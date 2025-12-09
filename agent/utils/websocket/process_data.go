@@ -15,6 +15,8 @@ import (
 	"github.com/shirou/gopsutil/v4/process"
 )
 
+const defaultTimeout = 10 * time.Second
+
 type WsInput struct {
 	Type string `json:"type"`
 	DownloadProgress
@@ -204,7 +206,8 @@ func handleProcessData(proc *process.Process, processConfig *PsProcessConfig, pi
 }
 
 func getProcessData(processConfig PsProcessConfig) (res []byte, err error) {
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)
+	defer cancel()
 
 	processes, err := process.ProcessesWithContext(ctx)
 	if err != nil {
@@ -243,7 +246,10 @@ func getSSHSessions(config SSHSessionConfig) (res []byte, err error) {
 		users     []host.UserStat
 		processes []*process.Process
 	)
-	users, err = host.Users()
+	ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)
+	defer cancel()
+
+	users, err = host.UsersWithContext(ctx)
 	if err != nil {
 		res, err = json.Marshal(result)
 		return
@@ -268,8 +274,9 @@ func getSSHSessions(config SSHSessionConfig) (res []byte, err error) {
 		return
 	}
 
-	processes, err = process.Processes()
+	processes, err = process.ProcessesWithContext(ctx)
 	if err != nil {
+		res, err = json.Marshal(result)
 		return
 	}
 
@@ -312,12 +319,14 @@ func getSSHSessions(config SSHSessionConfig) (res []byte, err error) {
 	return
 }
 
-var netTypes = [...]string{"tcp", "udp", "tcp6", "udp6"}
-
 func getNetConnections(config NetConfig) (res []byte, err error) {
-	ctx := context.Background()
+	result := make([]ProcessConnect, 0)
+	ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)
+	defer cancel()
+
 	processes, err := process.ProcessesWithContext(ctx)
 	if err != nil {
+		res, _ = json.Marshal(result)
 		return
 	}
 
@@ -336,24 +345,46 @@ func getNetConnections(config NetConfig) (res []byte, err error) {
 		procPidMap[proc.Pid] = name
 	}
 
-	result := make([]ProcessConnect, 0, len(processes))
-	for _, netType := range netTypes {
-		connections, err := net.ConnectionsWithContext(ctx, netType)
-		if err == nil {
-			for _, conn := range connections {
-				if name, ok := procPidMap[conn.Pid]; ok {
-					result = append(result, ProcessConnect{
-						Type:   netType,
-						Status: conn.Status,
-						Laddr:  conn.Laddr,
-						Raddr:  conn.Raddr,
-						PID:    conn.Pid,
-						Name:   name,
-					})
-				}
+	connections, err := net.ConnectionsMaxWithContext(ctx, "all", 32768)
+	if err != nil {
+		res, _ = json.Marshal(result)
+		return
+	}
+
+	for _, conn := range connections {
+		if conn.Family != 2 && conn.Family != 10 {
+			continue
+		}
+		if name, ok := procPidMap[conn.Pid]; ok {
+			connType := getConnectionType(conn.Type, conn.Family)
+			if config.Port > 0 && conn.Laddr.Port != config.Port {
+				continue
 			}
+			result = append(result, ProcessConnect{
+				Type:   connType,
+				Status: conn.Status,
+				Laddr:  conn.Laddr,
+				Raddr:  conn.Raddr,
+				PID:    conn.Pid,
+				Name:   name,
+			})
 		}
 	}
 	res, _ = json.Marshal(result)
 	return
+}
+
+func getConnectionType(connType uint32, family uint32) string {
+	switch {
+	case connType == 1 && family == 2:
+		return "tcp"
+	case connType == 1 && family == 10:
+		return "tcp6"
+	case connType == 2 && family == 2:
+		return "udp"
+	case connType == 2 && family == 10:
+		return "udp6"
+	default:
+		return "unknown"
+	}
 }
