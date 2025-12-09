@@ -860,8 +860,6 @@ const message = {
         privileged: 'Ayrıcalıklı',
         privilegedHelper:
             'Konteynerin ana bilgisayarda belirli ayrıcalıklı işlemler gerçekleştirmesine izin verir, bu da konteyner risklerini artırabilir. Dikkatli kullanın!',
-        editComposeHelper:
-            'Not: Ortam değişkenleri 1panel.env dosyasına kaydedilir ve compose içinde env_file aracılığıyla referans alınmalıdır.\nDeğişkenler yalnızca konteyner içinde geçerlidir ve compose dosyasındaki ${VAR} değiştirmesine katılmaz.',
 
         upgradeHelper: 'Depo Adı/İmaj Adı: İmaj Sürümü',
         upgradeWarning2:
@@ -1019,6 +1017,9 @@ const message = {
         composeOperatorHelper: '{0} üzerinde {1} işlemi gerçekleştirilecek. Devam etmek istiyor musunuz?',
         composeDownHelper:
             'Bu, {0} compose altındaki tüm konteynerleri ve ağları durduracak ve kaldıracaktır. Devam etmek istiyor musunuz?',
+        composeEnvHelper1: 'Mevcut ortam değişkenlerini düzenlemek için çift tıklayın.',
+        composeEnvHelper2:
+            'Bu düzenleme 1Panel Uygulama Mağazası tarafından oluşturuldu. Lütfen ortam değişkenlerini yüklü uygulamalarda değiştirin.',
 
         setting: 'Ayar | Ayarlar',
         goSetting: 'Düzenlemeye git',

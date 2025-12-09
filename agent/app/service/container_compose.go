@@ -404,7 +404,7 @@ func recreateCompose(content, path string) error {
 
 func loadEnv(list []dto.ComposeInfo) []dto.ComposeInfo {
 	for i := 0; i < len(list); i++ {
-		envFilePath := path.Join(path.Dir(list[i].Path), "1panel.env")
+		envFilePath := path.Join(path.Dir(list[i].Path), ".env")
 		file, err := os.ReadFile(envFilePath)
 		if err != nil {
 			continue
@@ -424,7 +424,7 @@ func newComposeEnv(pathItem string, env []string) error {
 	if len(env) == 0 {
 		return nil
 	}
-	envFilePath := path.Join(path.Dir(pathItem), "1panel.env")
+	envFilePath := path.Join(path.Dir(pathItem), ".env")
 	file, err := os.OpenFile(envFilePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, constant.FilePerm)
 	if err != nil {
 		global.LOG.Errorf("failed to create env file: %v", err)
@@ -438,6 +438,6 @@ func newComposeEnv(pathItem string, env []string) error {
 			return err
 		}
 	}
-	global.LOG.Infof("1panel.env file successfully created or updated with env variables in %s", envFilePath)
+	global.LOG.Infof(".env file successfully created or updated with env variables in %s", envFilePath)
 	return nil
 }

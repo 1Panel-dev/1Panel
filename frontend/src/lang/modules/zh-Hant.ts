@@ -813,8 +813,6 @@ const message = {
         emptyUser: '為空時，將使用容器預設的使用者登入',
         privileged: '特權模式',
         privilegedHelper: '允許容器在主機上執行某些特權操作，可能會增加容器風險，請謹慎開啟！',
-        editComposeHelper:
-            '注意：環境變數儲存至 1panel.env 檔案，需在 compose 中透過 env_file 引用。\n變數僅在容器內部生效，不參與 compose 檔案的 ${VAR} 替換。',
 
         upgradeHelper: '倉庫名稱/鏡像名稱:鏡像版本',
         upgradeWarning2: '升級操作需要重建容器，任何未持久化的資料將會遺失，是否繼續？',
@@ -959,6 +957,8 @@ const message = {
         composeDetailHelper: '該 compose 為 1Panel 編排外部建立。暫不支援啟停操作。',
         composeOperatorHelper: '將對 {0} 進行 {1} 操作，是否繼續？',
         composeDownHelper: '將停止並刪除 {0} 編排下所有容器及網路，是否繼續？',
+        composeEnvHelper1: '雙擊以編輯現有環境變數。',
+        composeEnvHelper2: '該編排為 1Panel 應用商店建立，請在已安裝應用中修改環境變數。',
 
         setting: '配置',
         goSetting: '去修改',

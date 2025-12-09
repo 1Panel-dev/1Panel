@@ -984,6 +984,9 @@ const message = {
         composeOperatorHelper: '{1}操作は{0}で実行されます。続けたいですか？',
         composeDownHelper:
             'これにより、{0}構成の下のすべてのコンテナとネットワークが停止して削除されます。続けたいですか？',
+        composeEnvHelper1: '既存の環境変数を編集するにはダブルクリックしてください。',
+        composeEnvHelper2:
+            'このオーケストレーションは1Panelアプリストアで作成されました。インストール済みアプリケーションで環境変数を変更してください。',
 
         setting: '設定|設定',
         operatorStatusHelper: 'これは「{0}」Dockerサービスになります。続けたいですか？',

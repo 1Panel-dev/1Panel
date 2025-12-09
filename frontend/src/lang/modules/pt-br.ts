@@ -844,8 +844,6 @@ const message = {
         privileged: 'Privilegiado',
         privilegedHelper:
             'Permite que o contêiner execute determinadas operações privilegiadas no host, o que pode aumentar os riscos do contêiner. Use com cautela!',
-        editComposeHelper:
-            'Nota: As variáveis de ambiente são salvas no arquivo 1panel.env e precisam ser referenciadas via env_file no compose.\nAs variáveis só têm efeito dentro do contêiner e não participam da substituição ${VAR} no arquivo compose.',
         upgradeHelper: 'Nome do Repositório/Nome da Imagem: Versão da Imagem',
         upgradeWarning2:
             'A operação de upgrade requer a reconstrução do contêiner, e qualquer dado não persistente será perdido. Deseja continuar?',
@@ -999,6 +997,9 @@ const message = {
         composeOperatorHelper: 'A operação {1} será realizada no {0}. Deseja continuar?',
         composeDownHelper:
             'Isso irá parar e remover todos os containers e redes sob a composição {0}. Deseja continuar?',
+        composeEnvHelper1: 'Clique duas vezes para editar variáveis de ambiente existentes.',
+        composeEnvHelper2:
+            'Esta orquestração foi criada pela Loja de Aplicativos 1Panel. Modifique as variáveis de ambiente nos aplicativos instalados.',
 
         setting: 'Configuração | Configurações',
         operatorStatusHelper: 'Isso irá "{0}" o serviço Docker. Deseja continuar?',

@@ -846,8 +846,6 @@ const message = {
         privileged: 'Privileged',
         privilegedHelper:
             'Benarkan kontena menjalankan operasi teristimewa tertentu pada hos, yang boleh meningkatkan risiko kontena. Gunakan dengan berhati-hati!',
-        editComposeHelper:
-            'Nota: Pembolehubah persekitaran disimpan ke fail 1panel.env dan perlu dirujuk melalui env_file dalam compose.\nPembolehubah hanya berkesan di dalam bekas dan tidak mengambil bahagian dalam penggantian ${VAR} dalam fail compose.',
 
         upgradeHelper: 'Nama Repository/Nama Imej: Versi Imej',
         upgradeWarning2:
@@ -1002,6 +1000,9 @@ const message = {
         composeOperatorHelper: 'Operasi {1} akan dilakukan pada {0}. Adakah anda mahu meneruskan?',
         composeDownHelper:
             'Ini akan menghentikan dan menghapuskan semua kontena dan rangkaian di bawah komposisi {0}. Adakah anda mahu meneruskan?',
+        composeEnvHelper1: 'Klik dua kali untuk mengedit pembolehubah persekitaran sedia ada.',
+        composeEnvHelper2:
+            'Penyelarasan ini dibuat oleh Kedai Apl 1Panel. Sila ubah pembolehubah persekitaran dalam aplikasi yang dipasang.',
 
         setting: 'Tetapan | Tetapan',
         operatorStatusHelper: 'Ini akan "{0}" perkhidmatan Docker. Adakah anda mahu meneruskan?',

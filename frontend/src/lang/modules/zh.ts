@@ -814,8 +814,6 @@ const message = {
         emptyUser: '为空时，将使用容器默认的用户登录',
         privileged: '特权模式',
         privilegedHelper: '允许容器在主机上执行某些特权操作，可能会增加容器风险，谨慎开启！',
-        editComposeHelper:
-            '注意：环境变量保存至 1panel.env 文件，需在 compose 中通过 env_file 引用。\n变量仅在容器内部生效，不参与 compose 文件的 ${VAR} 替换。',
 
         upgradeHelper: '仓库名称/镜像名称:镜像版本',
         upgradeWarning2: '升级操作需要重建容器，任何未持久化的数据将会丢失，是否继续？',
@@ -961,6 +959,8 @@ const message = {
         composeDetailHelper: '该 compose 为 1Panel 编排外部创建。暂不支持启停操作。',
         composeOperatorHelper: '将对 {0} 进行 {1} 操作，是否继续？',
         composeDownHelper: '将停止并删除 {0} 编排下所有容器及网络，是否继续？',
+        composeEnvHelper1: '双击以编辑已有环境变量。',
+        composeEnvHelper2: '该编排为 1Panel 应用商店创建，请在已安装应用中修改环境变量。',
 
         setting: '配置',
         goSetting: '去修改',

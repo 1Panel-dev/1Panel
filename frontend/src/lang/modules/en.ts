@@ -852,8 +852,6 @@ const message = {
         privileged: 'Privileged',
         privilegedHelper:
             'Allow the container to perform certain privileged operations on the host, which may increase container risks. Use with caution!',
-        editComposeHelper:
-            'Note: Environment variables are saved to the 1panel.env file and need to be referenced via env_file in compose.\nVariables only take effect inside the container and do not participate in ${VAR} substitution in the compose file.',
 
         upgradeHelper: 'Repository Name/Image Name: Image Version',
         upgradeWarning2:
@@ -1008,6 +1006,9 @@ const message = {
         composeOperatorHelper: '{1} operation will be performed on {0}. Do you want to continue?',
         composeDownHelper:
             'This will stop and remove all containers and networks under the {0} compose. Do you want to continue?',
+        composeEnvHelper1: 'Double-click to edit existing environment variables.',
+        composeEnvHelper2:
+            'This orchestration was created by the 1Panel App Store. Please modify environment variables in the installed applications.',
 
         setting: 'Setting | Settings',
         goSetting: 'Go to edit',
