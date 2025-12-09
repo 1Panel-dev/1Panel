@@ -1,7 +1,7 @@
 <template>
     <div>
         <FireRouter />
-        <LayoutContent :title="$t('menu.network', 2)" v-loading="loading">
+        <LayoutContent :title="$t('menu.network', 2)" v-loading="processStore.netLoading">
             <template #rightToolBar>
                 <div class="w-full flex justify-end items-center gap-5">
                     <el-select
@@ -25,17 +25,17 @@
                     <TableSearch
                         @search="search()"
                         :placeholder="$t('process.pid')"
-                        v-model:searchName="netSearch.processID"
+                        v-model:searchName="processStore.netSearch.processID"
                     />
                     <TableSearch
                         @search="search()"
                         :placeholder="$t('process.processName')"
-                        v-model:searchName="netSearch.processName"
+                        v-model:searchName="processStore.netSearch.processName"
                     />
                     <TableSearch
                         @search="search()"
                         :placeholder="$t('commons.table.port')"
-                        v-model:searchName="netSearch.port"
+                        v-model:searchName="processStore.netSearch.port"
                     />
                 </div>
             </template>
@@ -62,9 +62,10 @@
 
 <script setup lang="ts">
 import FireRouter from '@/views/host/process/index.vue';
-import { ref, onMounted, onUnmounted, reactive, watch } from 'vue';
-import { GlobalStore } from '@/store';
-import { SortBy, TableV2SortOrder } from 'element-plus';
+import { ref, onMounted, onUnmounted, watch, h } from 'vue';
+import { GlobalStore, ProcessStore } from '@/store';
+import { SortBy, TableV2SortOrder, ElIcon } from 'element-plus';
+import { Filter } from '@element-plus/icons-vue';
 import i18n from '@/lang';
 
 const statusOptions = [
@@ -76,24 +77,29 @@ const statusOptions = [
 ];
 
 const globalStore = GlobalStore();
+const processStore = ProcessStore();
 
-const netSearch = reactive({
-    type: 'net',
-    processID: undefined,
-    processName: '',
-    port: undefined,
-});
+const quickSearchName = (name: string) => {
+    processStore.netSearch.processID = undefined;
+    processStore.netSearch.processName = name;
+    processStore.netSearch.port = undefined;
+    search();
+};
 
-let processSocket = ref(null) as unknown as WebSocket;
+const quickSearchPort = (port: number) => {
+    processStore.netSearch.processID = undefined;
+    processStore.netSearch.processName = '';
+    processStore.netSearch.port = port;
+    search();
+};
+
 const data = ref<any[]>([]);
-const oldData = ref<any[]>([]);
-const loading = ref(false);
 
 const sortState = ref<SortBy>({
     key: 'PID',
     order: TableV2SortOrder.ASC,
 });
-const filters = ref<string[]>([]);
+const filters = ref<string[]>(['LISTEN', 'ESTABLISHED']);
 
 const sortByNum = (a: any, b: any, prop: string): number => {
     const aVal = parseFloat(a[prop]) || 0;
@@ -121,6 +127,23 @@ const columns = ref([
         title: i18n.global.t('process.processName'),
         dataKey: 'name',
         width: 300,
+        cellRenderer: ({ rowData }) => {
+            return h('div', { class: 'flex items-center gap-1' }, [
+                h('span', { class: 'truncate', title: rowData.name }, rowData.name),
+                h(
+                    ElIcon,
+                    {
+                        class: 'cursor-pointer hover:text-primary ml-1 flex-shrink-0',
+                        size: 14,
+                        onClick: (e: Event) => {
+                            e.stopPropagation();
+                            quickSearchName(rowData.name);
+                        },
+                    },
+                    () => h(Filter),
+                ),
+            ]);
+        },
     },
     {
         key: 'localaddr',
@@ -129,7 +152,25 @@ const columns = ref([
         width: 350,
         cellRenderer: ({ rowData }) => {
             const addr = rowData.localaddr;
-            return addr?.ip ? `${addr.ip}${addr.port > 0 ? ':' + addr.port : ''}` : '';
+            const addrStr = addr?.ip ? `${addr.ip}${addr.port > 0 ? ':' + addr.port : ''}` : '';
+            const hasPort = addr?.port > 0;
+            return h('div', { class: 'flex items-center gap-1' }, [
+                h('span', {}, addrStr),
+                hasPort
+                    ? h(
+                          ElIcon,
+                          {
+                              class: 'cursor-pointer hover:text-primary ml-1',
+                              size: 12,
+                              onClick: (e: Event) => {
+                                  e.stopPropagation();
+                                  quickSearchPort(addr.port);
+                              },
+                          },
+                          () => h(Filter),
+                      )
+                    : null,
+            ]);
         },
     },
     {
@@ -152,9 +193,12 @@ const columns = ref([
 ]);
 
 watch(
-    [sortState, oldData, filters],
+    [sortState, () => processStore.netData, filters],
     ([newState, newData, newFilters]) => {
-        if (!newData?.length) return;
+        if (!newData?.length) {
+            data.value = [];
+            return;
+        }
 
         let filtered = newData;
         if (newFilters.length > 0) {
@@ -187,70 +231,18 @@ const changeSort = ({ key, order }) => {
     sortState.value = { key, order };
 };
 
-const filterByStatus = () => {
-    if (filters.value.length > 0) {
-        return oldData.value.filter((row) => filters.value.includes(row.status));
-    }
-    return oldData.value;
-};
-
-const isWsOpen = () => processSocket && processSocket.readyState === 1;
-const closeSocket = () => {
-    if (isWsOpen()) processSocket.close();
-};
-
-const onOpenProcess = () => {
-    loading.value = true;
-    processSocket.send(JSON.stringify(netSearch));
-};
-const onMessage = (message: any) => {
-    oldData.value = JSON.parse(message.data);
-    data.value = filterByStatus();
-    if (data.value == null) {
-        data.value = [];
-    }
-    loading.value = false;
-};
-const onerror = () => {};
-const onClose = () => {};
-
-const initProcess = () => {
-    let href = window.location.href;
-    let protocol = href.split('//')[0] === 'http:' ? 'ws' : 'wss';
-    let ipLocal = href.split('//')[1].split('/')[0];
-    let currentNode = globalStore.currentNode;
-    processSocket = new WebSocket(`${protocol}://${ipLocal}/api/v2/process/ws?operateNode=${currentNode}`);
-    processSocket.onopen = onOpenProcess;
-    processSocket.onmessage = onMessage;
-    processSocket.onerror = onerror;
-    processSocket.onclose = onClose;
-
-    search();
-    sendMsg();
-};
-
-const sendMsg = () => {
-    setInterval(() => {
-        search();
-    }, 3000);
-};
-
 const search = () => {
-    if (isWsOpen()) {
-        if (typeof netSearch.processID === 'string') {
-            netSearch.processID = Number(netSearch.processID);
-        }
-        if (typeof netSearch.port === 'string') {
-            netSearch.port = Number(netSearch.port);
-        }
-        processSocket.send(JSON.stringify(netSearch));
-    }
+    processStore.sendNetMessage();
 };
 
 onMounted(() => {
-    initProcess();
+    processStore.connect(globalStore.currentNode);
+    const initialDelay = processStore.netData.length > 0 ? 500 : 0;
+    processStore.startPolling('net', 3000, initialDelay);
 });
+
 onUnmounted(() => {
-    closeSocket();
+    processStore.stopPolling();
+    processStore.disconnect();
 });
 </script>

@@ -1,7 +1,7 @@
 <template>
     <div>
         <FireRouter />
-        <LayoutContent :title="$t('menu.process', 2)" v-loading="loading">
+        <LayoutContent :title="$t('menu.process', 2)" v-loading="processStore.psLoading">
             <template #rightToolBar>
                 <div class="w-full flex justify-end items-center gap-5">
                     <el-select
@@ -25,17 +25,17 @@
                     <TableSearch
                         @search="search()"
                         :placeholder="$t('process.pid')"
-                        v-model:searchName="processSearch.pid"
+                        v-model:searchName="processStore.psSearch.pid"
                     />
                     <TableSearch
                         @search="search()"
                         :placeholder="$t('commons.table.name')"
-                        v-model:searchName="processSearch.name"
+                        v-model:searchName="processStore.psSearch.name"
                     />
                     <TableSearch
                         @search="search()"
                         :placeholder="$t('commons.table.user')"
-                        v-model:searchName="processSearch.username"
+                        v-model:searchName="processStore.psSearch.username"
                     />
                 </div>
             </template>
@@ -64,13 +64,15 @@
 
 <script setup lang="ts">
 import FireRouter from '@/views/host/process/index.vue';
-import { ref, onMounted, onUnmounted, reactive } from 'vue';
+import { ref, onMounted, onUnmounted, computed, watch, h } from 'vue';
 import ProcessDetail from './detail/index.vue';
 import i18n from '@/lang';
 import { stopProcess } from '@/api/modules/process';
-import { GlobalStore } from '@/store';
+import { GlobalStore, ProcessStore } from '@/store';
 import { SortBy, TableV2SortOrder, ElButton } from 'element-plus';
+
 const globalStore = GlobalStore();
+const processStore = ProcessStore();
 
 const statusOptions = computed(() => [
     { text: i18n.global.t('process.running'), value: 'running' },
@@ -82,25 +84,15 @@ const statusOptions = computed(() => [
     { text: i18n.global.t('process.zombie'), value: 'zombie' },
 ]);
 
-const processSearch = reactive({
-    type: 'ps',
-    pid: undefined,
-    username: '',
-    name: '',
-});
 const opRef = ref();
 const sortState = ref<SortBy>({
     key: 'PID',
     order: TableV2SortOrder.ASC,
 });
 
-let processSocket = ref(null) as unknown as WebSocket;
-const data = ref([]);
-const loading = ref(false);
-const oldData = ref([]);
+const data = ref<any[]>([]);
 const detailRef = ref();
-const isGetData = ref(true);
-const filters = ref([]);
+const filters = ref<string[]>([]);
 
 const sortByNum = (a: any, b: any, prop: string): number => {
     const aVal = parseFloat(a[prop]) || 0;
@@ -217,23 +209,32 @@ const columns = ref([
 ]);
 
 watch(
-    [sortState, oldData],
-    ([newState, newData]) => {
-        if (!newData?.length) return;
+    [sortState, () => processStore.psData, filters],
+    ([newState, newData, newFilters]) => {
+        if (!newData?.length) {
+            data.value = [];
+            return;
+        }
+
+        let filtered = newData;
+        if (newFilters.length > 0) {
+            filtered = filtered.filter((re: any) => newFilters.includes(re.status));
+        }
 
         const { key, order } = newState ?? {};
         if (!key || !order) {
-            data.value = filterByStatus();
+            data.value = filtered;
             return;
         }
 
         const currCol = columns.value.find((c) => c.key === key);
-        if (!currCol) return;
+        if (!currCol) {
+            data.value = filtered;
+            return;
+        }
 
         const currSortMethod = currCol.sortMethod ?? sortByNum;
-        const filteredData = filterByStatus();
-
-        data.value = filteredData.slice(0).sort((a, b) => {
+        data.value = filtered.slice(0).sort((a, b) => {
             const res = (currSortMethod as any)(a, b, currCol.dataKey);
             return order === TableV2SortOrder.ASC ? res : 0 - res;
         });
@@ -250,72 +251,8 @@ const changeSort = ({ key, order }) => {
     sortState.value = { key, order };
 };
 
-const isWsOpen = () => {
-    const readyState = processSocket && processSocket.readyState;
-    return readyState === 1;
-};
-const closeSocket = () => {
-    if (isWsOpen()) {
-        processSocket && processSocket.close();
-    }
-};
-
-const onOpenProcess = () => {
-    loading.value = true;
-    isGetData.value = true;
-    processSocket.send(JSON.stringify(processSearch));
-};
-const onMessage = (message: any) => {
-    isGetData.value = false;
-    oldData.value = JSON.parse(message.data);
-    data.value = filterByStatus();
-    if (data.value == null) {
-        data.value = [];
-    }
-    loading.value = false;
-};
-
-const filterByStatus = () => {
-    if (filters.value.length > 0) {
-        const newData = oldData.value.filter((re: any) => {
-            return (filters.value as string[]).indexOf(re.status) > -1;
-        });
-        return newData;
-    } else {
-        return oldData.value;
-    }
-};
-
-const onerror = () => {};
-const onClose = () => {};
-
-const initProcess = () => {
-    let href = window.location.href;
-    let protocol = href.split('//')[0] === 'http:' ? 'ws' : 'wss';
-    let ipLocal = href.split('//')[1].split('/')[0];
-    let currentNode = globalStore.currentNode;
-    processSocket = new WebSocket(`${protocol}://${ipLocal}/api/v2/process/ws?operateNode=${currentNode}`);
-    processSocket.onopen = onOpenProcess;
-    processSocket.onmessage = onMessage;
-    processSocket.onerror = onerror;
-    processSocket.onclose = onClose;
-    sendMsg();
-};
-
-const sendMsg = () => {
-    setInterval(() => {
-        search();
-    }, 3000);
-};
-
 const search = () => {
-    if (isWsOpen() && !isGetData.value) {
-        isGetData.value = true;
-        if (typeof processSearch.pid === 'string') {
-            processSearch.pid = Number(processSearch.pid);
-        }
-        processSocket.send(JSON.stringify(processSearch));
-    }
+    processStore.sendPsMessage();
 };
 
 const stop = async (row: any) => {
@@ -333,10 +270,13 @@ const stop = async (row: any) => {
 };
 
 onMounted(() => {
-    initProcess();
+    processStore.connect(globalStore.currentNode);
+    const initialDelay = processStore.psData.length > 0 ? 500 : 0;
+    processStore.startPolling('ps', 3000, initialDelay);
 });
 
 onUnmounted(() => {
-    closeSocket();
+    processStore.stopPolling();
+    processStore.disconnect();
 });
 </script>
