@@ -262,34 +262,33 @@
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('container.related')" min-width="210" prop="appName">
+                    <el-table-column
+                        :label="$t('container.related')"
+                        show-overflow-tooltip
+                        min-width="210"
+                        prop="appName"
+                    >
                         <template #default="{ row }">
-                            <div>
-                                <el-tooltip
-                                    v-if="row.appName != ''"
-                                    :hide-after="20"
-                                    :content="$t('app.app') + ': ' + row.appName + '[' + row.appInstallName + ']'"
-                                    placement="top"
-                                >
-                                    <el-button icon="Position" plain size="small" @click="routerToName('AppInstalled')">
-                                        {{ $t('app.app') }}: {{ row.appName }} [{{ row.appInstallName }}]
-                                    </el-button>
-                                </el-tooltip>
-                            </div>
-                            <div>
-                                <el-tooltip
-                                    v-if="row.websites != null"
-                                    :hide-after="20"
-                                    :content="row.websites.join(',')"
-                                    placement="top"
-                                    class="mt-1"
-                                >
-                                    <el-button icon="Position" plain size="small" @click="routerToName('Website')">
-                                        {{ $t('menu.website') }}:
-                                        {{ row.websites.join(',') }}
-                                    </el-button>
-                                </el-tooltip>
-                            </div>
+                            <el-button v-if="row.appName != '' || row.websites != null" link icon="Position" />
+                            <el-text
+                                v-if="row.appName != ''"
+                                link
+                                class="cursor-pointer"
+                                size="small"
+                                @click="routerToName('AppInstalled')"
+                            >
+                                {{ $t('app.app') }}: {{ row.appName }} [{{ row.appInstallName }}]
+                            </el-text>
+                            <el-text
+                                v-if="row.websites != null"
+                                link
+                                class="cursor-pointer"
+                                size="small"
+                                @click="routerToName('Website')"
+                            >
+                                {{ $t('menu.website') }}:
+                                {{ row.websites.join(',') }}
+                            </el-text>
                         </template>
                     </el-table-column>
                     <el-table-column
@@ -832,5 +831,12 @@ onMounted(() => {
         background: none;
         border: none;
     }
+}
+.button-cell {
+    width: 100%;
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 </style>
