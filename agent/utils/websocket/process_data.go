@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/shirou/gopsutil/v4/host"
 	"github.com/shirou/gopsutil/v4/net"
@@ -113,25 +113,25 @@ func ProcessData(c *Client, inputMsg []byte) {
 		if err != nil {
 			return
 		}
-		c.Msg <- res
+		c.SendPayload(res)
 	case "ps":
 		res, err := getProcessData(wsInput.PsProcessConfig)
 		if err != nil {
 			return
 		}
-		c.Msg <- res
+		c.SendPayload(res)
 	case "ssh":
 		res, err := getSSHSessions(wsInput.SSHSessionConfig)
 		if err != nil {
 			return
 		}
-		c.Msg <- res
+		c.SendPayload(res)
 	case "net":
 		res, err := getNetConnections(wsInput.NetConfig)
 		if err != nil {
 			return
 		}
-		c.Msg <- res
+		c.SendPayload(res)
 	}
 
 }
@@ -312,29 +312,36 @@ func getSSHSessions(config SSHSessionConfig) (res []byte, err error) {
 	return
 }
 
-var netTypes = [...]string{"tcp", "udp"}
+var netTypes = [...]string{"tcp", "udp", "tcp6", "udp6"}
 
 func getNetConnections(config NetConfig) (res []byte, err error) {
-	var (
-		result []ProcessConnect
-		proc   *process.Process
-	)
+	ctx := context.Background()
+	processes, err := process.ProcessesWithContext(ctx)
+	if err != nil {
+		return
+	}
+
+	procPidMap := make(map[int32]string, len(processes))
+	for _, proc := range processes {
+		name, _ := proc.Name()
+		if name == "" {
+			continue
+		}
+		if config.ProcessName != "" && !strings.Contains(name, config.ProcessName) {
+			continue
+		}
+		if config.ProcessID > 0 && config.ProcessID != proc.Pid {
+			continue
+		}
+		procPidMap[proc.Pid] = name
+	}
+
+	result := make([]ProcessConnect, 0, len(processes))
 	for _, netType := range netTypes {
-		connections, _ := net.Connections(netType)
+		connections, err := net.ConnectionsWithContext(ctx, netType)
 		if err == nil {
 			for _, conn := range connections {
-				if config.ProcessID > 0 && config.ProcessID != conn.Pid {
-					continue
-				}
-				proc, err = process.NewProcess(conn.Pid)
-				if err == nil {
-					name, _ := proc.Name()
-					if name != "" && config.ProcessName != "" && !strings.Contains(name, config.ProcessName) {
-						continue
-					}
-					if config.Port > 0 && config.Port != conn.Laddr.Port && config.Port != conn.Raddr.Port {
-						continue
-					}
+				if name, ok := procPidMap[conn.Pid]; ok {
 					result = append(result, ProcessConnect{
 						Type:   netType,
 						Status: conn.Status,
@@ -344,10 +351,9 @@ func getNetConnections(config NetConfig) (res []byte, err error) {
 						Name:   name,
 					})
 				}
-
 			}
 		}
 	}
-	res, err = json.Marshal(result)
+	res, _ = json.Marshal(result)
 	return
 }
