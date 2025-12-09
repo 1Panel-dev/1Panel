@@ -116,25 +116,25 @@ func ProcessData(c *Client, inputMsg []byte) {
 		if err != nil {
 			return
 		}
-		c.SendPayload(res)
+		c.Send(res)
 	case "ps":
 		res, err := getProcessData(wsInput.PsProcessConfig)
 		if err != nil {
 			return
 		}
-		c.SendPayload(res)
+		c.Send(res)
 	case "ssh":
 		res, err := getSSHSessions(wsInput.SSHSessionConfig)
 		if err != nil {
 			return
 		}
-		c.SendPayload(res)
+		c.Send(res)
 	case "net":
 		res, err := getNetConnections(wsInput.NetConfig)
 		if err != nil {
 			return
 		}
-		c.SendPayload(res)
+		c.Send(res)
 	}
 
 }
@@ -354,10 +354,7 @@ func getNetConnections(config NetConfig) (res []byte, err error) {
 		if _, exists := pidNameMap[conn.Pid]; !exists {
 			pName, _ := getProcessNameWithContext(ctx, conn.Pid)
 			if pName == "" {
-				continue
-			}
-			if config.ProcessName != "" && !strings.Contains(pName, config.ProcessName) {
-				continue
+				pName = "<UNKNOWN>"
 			}
 			pidNameMap[conn.Pid] = pName
 		}
@@ -366,6 +363,10 @@ func getNetConnections(config NetConfig) (res []byte, err error) {
 	}
 
 	for pid, connections := range pidConnectionsMap {
+		pName := pidNameMap[pid]
+		if config.ProcessName != "" && !strings.Contains(pName, config.ProcessName) {
+			continue
+		}
 		for _, conn := range connections {
 			result = append(result, ProcessConnect{
 				Type:   getConnectionType(conn.Type, conn.Family),
@@ -373,7 +374,7 @@ func getNetConnections(config NetConfig) (res []byte, err error) {
 				Laddr:  conn.Laddr,
 				Raddr:  conn.Raddr,
 				PID:    conn.Pid,
-				Name:   pidNameMap[pid],
+				Name:   pName,
 			})
 		}
 	}
@@ -384,15 +385,14 @@ func getNetConnections(config NetConfig) (res []byte, err error) {
 
 func getProcessNameWithContext(ctx context.Context, pid int32) (string, error) {
 	data, err := os.ReadFile(fmt.Sprintf("/proc/%d/comm", pid))
-	if err != nil || len(data) == 0 {
-		p, err := process.NewProcessWithContext(ctx, pid)
-		if err != nil {
-			return "", err
-		}
-		return p.Name()
+	if err == nil && len(data) > 0 {
+		return strings.TrimSpace(string(data)), nil
 	}
-	return strings.TrimSpace(string(data)), nil
-
+	p, err := process.NewProcessWithContext(ctx, pid)
+	if err != nil {
+		return "", err
+	}
+	return p.Name()
 }
 
 func getConnectionType(connType uint32, family uint32) string {
