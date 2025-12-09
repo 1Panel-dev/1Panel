@@ -227,7 +227,10 @@ const openDir = async (row: File.File, column: any, event: any) => {
     }
     selectRow.value.path = '';
 };
-const handleRowClick = (row: File.File, column: any, event: any) => {
+const handleRowClick = (row: any, column: any, event: any) => {
+    if (row.isCreate) {
+        return;
+    }
     debouncedOpenDir(row, column, event);
 };
 const debouncedOpenDir = debounce(openDir, 300);
