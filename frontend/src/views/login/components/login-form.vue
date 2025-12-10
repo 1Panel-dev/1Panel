@@ -16,6 +16,7 @@
                                 size="large"
                                 :placeholder="$t('commons.login.mfaCode')"
                                 v-model.trim="mfaLoginForm.code"
+                                autocomplete="one-time-code"
                                 @input="mfaLogin(true)"
                             ></el-input>
                             <div class="h-1">
