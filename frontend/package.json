@@ -92,6 +92,10 @@
         "vite-svg-loader": "^5.1.0",
         "vue-tsc": "^0.29.8"
     },
+    "trustedDependencies": [
+        "@vue-office/docx",
+        "@vue-office/excel"
+    ],
     "overrides": {
         "esbuild": "npm:esbuild-wasm@latest"
     },
