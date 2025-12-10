@@ -17,7 +17,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/1Panel-dev/1Panel/agent/utils/postgresql/client"
-	pgclient "github.com/1Panel-dev/1Panel/agent/utils/postgresql/client"
 )
 
 func (u *BackupService) PostgresqlBackup(req dto.CommonBackup) error {
@@ -82,7 +81,7 @@ func handlePostgresqlBackup(db DatabaseHelper, parentTask *task.Task, recordID u
 		}
 	}
 
-	itemHandler := func() error { return doPostgresqlgBackup(db, targetDir, fileName, secret, backupTask) }
+	itemHandler := func() error { return doPostgresqlBackup(db, targetDir, fileName, secret, backupTask) }
 	if parentTask != nil {
 		return itemHandler()
 	}
@@ -195,13 +194,13 @@ func handlePostgresqlRecover(req dto.CommonRecover, parentTask *task.Task, isRol
 	return nil
 }
 
-func doPostgresqlgBackup(db DatabaseHelper, targetDir, fileName, secret string, task *task.Task) error {
+func doPostgresqlBackup(db DatabaseHelper, targetDir, fileName, secret string, task *task.Task) error {
 	cli, err := LoadPostgresqlClientByFrom(db.Database)
 	if err != nil {
 		return err
 	}
 	defer cli.Close()
-	backupInfo := pgclient.BackupInfo{
+	backupInfo := client.BackupInfo{
 		Database:  db.Database,
 		Name:      db.Name,
 		TargetDir: targetDir,

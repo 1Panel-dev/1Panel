@@ -1144,10 +1144,8 @@ func (u *ContainerService) ContainerStats(id string) (*dto.ContainerStats, error
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		res.Body.Close()
 		return nil, err
 	}
-	res.Body.Close()
 	var stats *container.StatsResponse
 	if err := json.Unmarshal(body, &stats); err != nil {
 		return nil, err

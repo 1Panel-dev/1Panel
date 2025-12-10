@@ -33,7 +33,7 @@ type IAppRepo interface {
 	DeleteByIDs(ctx context.Context, ids []uint) error
 	DeleteBy(opts ...DBOption) error
 
-	GetTopRecomment() ([]string, error)
+	GetTopRecommend() ([]string, error)
 }
 
 func NewIAppRepo() IAppRepo {
@@ -124,7 +124,7 @@ func (a AppRepo) GetBy(opts ...DBOption) ([]model.App, error) {
 	return apps, nil
 }
 
-func (a AppRepo) GetTopRecomment() ([]string, error) {
+func (a AppRepo) GetTopRecommend() ([]string, error) {
 	var (
 		apps  []model.App
 		names []string
