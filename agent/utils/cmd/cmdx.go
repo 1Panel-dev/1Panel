@@ -108,11 +108,15 @@ func (c *CommandHelper) run(name string, arg ...string) (string, error) {
 		cmd = exec.CommandContext(newContext, name, arg...)
 	} else {
 		if c.context == nil {
+			newContext = context.Background()
 			cmd = exec.Command(name, arg...)
 		} else {
 			newContext = c.context
 			cmd = exec.CommandContext(c.context, name, arg...)
 		}
+	}
+	cmd.SysProcAttr = &syscall.SysProcAttr{
+		Setpgid: true,
 	}
 
 	customWriter := &CustomWriter{taskItem: c.taskItem}
@@ -145,22 +149,39 @@ func (c *CommandHelper) run(name string, arg ...string) (string, error) {
 		cmd.Dir = c.workDir
 	}
 
-	err := cmd.Run()
+	if err := cmd.Start(); err != nil {
+		return "", fmt.Errorf("cmd.Start() failed with '%s'\n", err)
+	}
 	if c.taskItem != nil {
 		customWriter.Flush()
 	}
-	if c.timeout != 0 {
-		if newContext != nil && errors.Is(newContext.Err(), context.DeadlineExceeded) {
-			return "", buserr.New("ErrCmdTimeout")
+
+	done := make(chan error, 1)
+	go func() {
+		done <- cmd.Wait()
+	}()
+	select {
+	case err := <-done:
+		if err != nil {
+			return handleErr(stdout, stderr, c.IgnoreExist1, err)
 		}
-	}
-	if err != nil {
-		if err.Error() == "signal: killed" {
-			return "", buserr.New("ErrShutDown")
+		return stdout.String(), nil
+	case <-newContext.Done():
+		if cmd.Process != nil && cmd.Process.Pid > 0 {
+			syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
 		}
-		return handleErr(stdout, stderr, c.IgnoreExist1, err)
+		var err error
+		switch newContext.Err() {
+		case context.DeadlineExceeded:
+			err = buserr.New("ErrCmdTimeout")
+		case context.Canceled:
+			err = buserr.New("ErrShutDown")
+		default:
+			err = newContext.Err()
+		}
+		<-done
+		return "", err
 	}
-	return stdout.String(), nil
 }
 
 func WithContext(ctx context.Context) Option {
