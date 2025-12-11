@@ -169,6 +169,16 @@ export namespace Host {
     export interface MonitorGPUOptions {
         gpuType: string;
         options: Array<string>;
+        chartHide: Array<ChartHide>;
+    }
+    export interface ChartHide {
+        productName: string;
+        process: boolean;
+        gpu: boolean;
+        memory: boolean;
+        power: boolean;
+        temperature: boolean;
+        speed: boolean;
     }
     export interface MonitorGPUData {
         date: Array<Date>;

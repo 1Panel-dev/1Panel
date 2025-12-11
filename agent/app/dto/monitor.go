@@ -39,8 +39,18 @@ type MonitorSettingUpdate struct {
 }
 
 type MonitorGPUOptions struct {
-	GPUType string   `json:"gpuType"`
-	Options []string `json:"options"`
+	GPUType   string         `json:"gpuType"`
+	ChartHide []GPUChartHide `json:"chartHide"`
+	Options   []string       `json:"options"`
+}
+type GPUChartHide struct {
+	ProductName string `json:"productName"`
+	Process     bool   `json:"process"`
+	GPU         bool   `json:"gpu"`
+	Memory      bool   `json:"memory"`
+	Power       bool   `json:"power"`
+	Temperature bool   `json:"temperature"`
+	Speed       bool   `json:"speed"`
 }
 type MonitorGPUSearch struct {
 	ProductName string    `json:"productName"`
@@ -59,6 +69,7 @@ type MonitorGPUData struct {
 	MemoryPercent    []float64   `json:"memoryPercent"`
 	SpeedValue       []int       `json:"speedValue"`
 
+	ProcessCount []int          `json:"processCount"`
 	GPUProcesses [][]GPUProcess `json:"gpuProcesses"`
 }
 

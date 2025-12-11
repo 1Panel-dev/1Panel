@@ -417,6 +417,7 @@ const baseInfo = ref<Dashboard.BaseInfo>({
     cpuModelName: '',
     cpuMhz: 0,
     currentInfo: null,
+    prettyDistro: '',
     quickJump: [],
 });
 const currentInfo = ref<Dashboard.CurrentInfo>({

@@ -137,15 +137,44 @@ func (m *MonitorService) LoadGPUOptions() dto.MonitorGPUOptions {
 			return gpuInfo.GPUs[i].Index < gpuInfo.GPUs[j].Index
 		})
 		for _, item := range gpuInfo.GPUs {
+			var chartHide dto.GPUChartHide
+			chartHide.ProductName = fmt.Sprintf("%d - %s", item.Index, item.ProductName)
+			chartHide.GPU = item.GPUUtil == "" || item.GPUUtil == "N/A"
+			if (item.MemTotal == "" || item.MemTotal == "N/A") && (item.MemUsed == "" || item.MemUsed == "N/A") {
+				chartHide.Memory = true
+			}
+			if (item.MaxPowerLimit == "" || item.MaxPowerLimit == "N/A") && (item.PowerDraw == "" || item.PowerDraw == "N/A") {
+				chartHide.Power = true
+			}
+			chartHide.Temperature = item.Temperature == "" || item.Temperature == "N/A"
+			chartHide.Speed = item.FanSpeed == "" || item.FanSpeed == "N/A"
+			data.ChartHide = append(data.ChartHide, chartHide)
 			data.Options = append(data.Options, fmt.Sprintf("%d - %s", item.Index, item.ProductName))
 		}
 		return data
 	} else {
 		data.GPUType = "xpu"
-		var err error
-		data.Options, err = xpuClient.LoadDeviceList()
-		if err != nil || len(data.Options) == 0 {
+		xpu, err := xpuClient.LoadGpuInfo()
+		if err != nil || len(xpu.Xpu) == 0 {
 			global.LOG.Error("Load XPU info failed or no XPU found, err: ", err)
+		}
+		sort.Slice(xpu.Xpu, func(i, j int) bool {
+			return xpu.Xpu[i].Basic.DeviceID < xpu.Xpu[j].Basic.DeviceID
+		})
+		for _, item := range xpu.Xpu {
+			var chartHide dto.GPUChartHide
+			chartHide.GPU = true
+			chartHide.Speed = true
+			chartHide.ProductName = fmt.Sprintf("%d - %s", item.Basic.DeviceID, item.Basic.DeviceName)
+			if (item.Stats.MemoryUsed == "" || item.Stats.MemoryUsed == "N/A") && (item.Basic.Memory == "" || item.Basic.FreeMemory == "N/A") {
+				chartHide.Memory = true
+			}
+			if item.Stats.Power == "" || item.Stats.Power == "N/A" {
+				chartHide.Power = true
+			}
+			chartHide.Temperature = item.Stats.Temperature == "" || item.Stats.Temperature == "N/A"
+			data.ChartHide = append(data.ChartHide, chartHide)
+			data.Options = append(data.Options, fmt.Sprintf("%d - %s", item.Basic.DeviceID, item.Basic.DeviceName))
 		}
 		return data
 	}
@@ -182,8 +211,10 @@ func (m *MonitorService) LoadGPUMonitorData(req dto.MonitorGPUSearch) (dto.Monit
 		}
 		var process []dto.GPUProcess
 		if err := json.Unmarshal([]byte(gpu.Processes), &process); err == nil {
+			data.ProcessCount = append(data.ProcessCount, len(process))
 			data.GPUProcesses = append(data.GPUProcesses, process)
 		} else {
+			data.ProcessCount = append(data.ProcessCount, 0)
 			data.GPUProcesses = append(data.GPUProcesses, []dto.GPUProcess{})
 		}
 		data.SpeedValue = append(data.SpeedValue, gpu.FanSpeed)

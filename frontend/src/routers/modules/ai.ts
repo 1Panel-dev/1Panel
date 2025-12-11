@@ -32,16 +32,6 @@ const databaseRouter = {
             },
         },
         {
-            path: '/ai/gpu',
-            name: 'GPU',
-            component: () => import('@/views/ai/gpu/index.vue'),
-            meta: {
-                icon: 'p-gpu-menu',
-                title: 'aiTools.gpu.gpu',
-                requiresAuth: true,
-            },
-        },
-        {
             path: '/ai/model/tensorrt',
             hidden: true,
             name: 'TensorRTLLm',
@@ -49,6 +39,27 @@ const databaseRouter = {
             meta: {
                 title: 'aiTools.tensorRT.llm',
                 activeMenu: '/ai/model/ollama',
+                requiresAuth: true,
+            },
+        },
+        {
+            path: '/ai/gpu/current',
+            name: 'GPU',
+            component: () => import('@/views/ai/gpu/current/index.vue'),
+            meta: {
+                icon: 'p-gpu-menu',
+                title: 'aiTools.gpu.gpu',
+                activeMenu: '/ai/gpu',
+                requiresAuth: true,
+            },
+        },
+        {
+            path: '/ai/gpu/history',
+            name: 'GPUHistory',
+            component: () => import('@/views/ai/gpu/history/index.vue'),
+            meta: {
+                title: 'aiTools.gpu.history',
+                activeMenu: '/ai/gpu',
                 requiresAuth: true,
             },
         },
