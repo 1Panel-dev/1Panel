@@ -482,6 +482,9 @@ const initData = () => ({
         memoryUnit: 'MB',
         containerName: '',
         allowPort: false,
+
+        format: 'utf8mb4',
+        collation: '',
     },
     IPV6: false,
     enableFtp: false,
