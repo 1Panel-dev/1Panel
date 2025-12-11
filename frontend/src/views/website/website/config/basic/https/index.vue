@@ -133,32 +133,7 @@
                             </div>
                         </div>
                         <el-form-item :label="' '" v-if="websiteSSL && websiteSSL.id > 0">
-                            <el-descriptions :column="7" border direction="vertical">
-                                <el-descriptions-item :label="$t('website.primaryDomain')">
-                                    {{ websiteSSL.primaryDomain }}
-                                </el-descriptions-item>
-                                <el-descriptions-item :label="$t('website.otherDomains')">
-                                    {{ websiteSSL.domains }}
-                                </el-descriptions-item>
-                                <el-descriptions-item :label="$t('website.brand')">
-                                    {{ websiteSSL.organization }}
-                                </el-descriptions-item>
-                                <el-descriptions-item :label="$t('ssl.provider')">
-                                    {{ getProvider(websiteSSL.provider) }}
-                                </el-descriptions-item>
-                                <el-descriptions-item
-                                    :label="$t('ssl.acmeAccount')"
-                                    v-if="websiteSSL.acmeAccount && websiteSSL.provider !== 'manual'"
-                                >
-                                    {{ websiteSSL.acmeAccount.email }}
-                                </el-descriptions-item>
-                                <el-descriptions-item :label="$t('website.expireDate')">
-                                    {{ dateFormatSimple(websiteSSL.expireDate) }}
-                                </el-descriptions-item>
-                                <el-descriptions-item :label="$t('website.remark')">
-                                    {{ websiteSSL.description }}
-                                </el-descriptions-item>
-                            </el-descriptions>
+                            <WebsiteSSL :websiteSSL="websiteSSL" />
                         </el-form-item>
                         <el-divider content-position="left">{{ $t('website.SSLProConfig') }}</el-divider>
                         <el-form-item :label="$t('website.supportProtocol')" prop="SSLProtocol">
@@ -191,15 +166,17 @@
     <FileList ref="certFileRef" @choose="getCertificatePath" />
 </template>
 <script lang="ts" setup>
+import FileList from '@/components/file-list/index.vue';
+import WebsiteSSL from '@/views/website/website/components/website-ssl/index.vue';
+
 import { Website } from '@/api/interface/website';
 import { getHTTPSConfig, listSSL, searchAcmeAccount, updateHTTPSConfig } from '@/api/modules/website';
 import { ElMessageBox, FormInstance } from 'element-plus';
 import { computed, onMounted, reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { Rules } from '@/global/form-rules';
-import { dateFormatSimple, getProvider, getAccountName } from '@/utils/util';
+import { getAccountName } from '@/utils/util';
 import { MsgSuccess } from '@/utils/message';
-import FileList from '@/components/file-list/index.vue';
 
 const keyFileRef = ref();
 const certFileRef = ref();

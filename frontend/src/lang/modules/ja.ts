@@ -2622,6 +2622,9 @@ const message = {
 
         batchOpreate: 'バッチ操作',
         batchOpreateHelper: 'ウェブサイトをバッチ{0}しますか？',
+        stream: 'TCP/UDP プロキシ',
+        streamPorts: '待ち受けポート',
+        streamPortsHelper: 'カンマで区切ってください（例：3306, 3307）',
     },
     php: {
         short_open_tag: '短いタグサポート',

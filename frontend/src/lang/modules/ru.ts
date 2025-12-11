@@ -2678,6 +2678,9 @@ const message = {
 
         batchOpreate: 'Пакетная операция',
         batchOpreateHelper: 'Пакетное {0} веб-сайтов, продолжить операцию?',
+        stream: 'Прокси TCP/UDP',
+        streamPorts: 'Порты прослушивания',
+        streamPortsHelper: 'Разделяйте запятыми, например: 3306, 3307',
     },
     php: {
         short_open_tag: 'Поддержка коротких тегов',

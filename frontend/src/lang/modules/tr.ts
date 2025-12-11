@@ -2735,6 +2735,9 @@ const message = {
 
         batchOpreate: 'Toplu İşlem',
         batchOpreateHelper: 'Toplu {0} web siteleri, işlemi devam ettir?',
+        stream: 'TCP/UDP Proxy',
+        streamPorts: 'Dinleme Portları',
+        streamPortsHelper: 'Virgülle ayırın, örneğin: 3306, 3307',
     },
     php: {
         short_open_tag: 'Kısa etiket desteği',

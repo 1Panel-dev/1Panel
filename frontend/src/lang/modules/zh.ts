@@ -2506,6 +2506,9 @@ const message = {
 
         batchOpreate: '批量操作',
         batchOpreateHelper: '批量{0}网站，是否继续操作？',
+        stream: 'TCP/UDP 代理',
+        streamPorts: '监听端口',
+        streamPortsHelper: '请按逗号分割，例如：3306，3307',
     },
     php: {
         short_open_tag: '短标签支持',

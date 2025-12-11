@@ -2699,6 +2699,9 @@ const message = {
 
         batchOpreate: 'Batch Operation',
         batchOpreateHelper: 'Batch {0} websites, continue operation?',
+        stream: 'TCP/UDP Proxy',
+        streamPorts: 'Listening Ports',
+        streamPortsHelper: 'Separate with commas, e.g., 3306, 3307',
     },
     php: {
         short_open_tag: 'Short tag support',

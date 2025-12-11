@@ -128,14 +128,9 @@
                                 v-if="row.status === 'Running'"
                                 :operate="true"
                                 :status="row.status"
-                                @click="operateWebsite('stop', row.id)"
+                                @click="operateWebsite('stop', row)"
                             />
-                            <Status
-                                v-else
-                                :status="row.status"
-                                :operate="true"
-                                @click="operateWebsite('start', row.id)"
-                            />
+                            <Status v-else :status="row.status" :operate="true" @click="operateWebsite('start', row)" />
                         </template>
                     </el-table-column>
 
@@ -466,6 +461,9 @@ const refreshData = () => {
 };
 
 const openDatePicker = (row: any) => {
+    if (row.type === 'stream') {
+        return;
+    }
     refreshData();
     row.showdate = true;
 };
@@ -590,12 +588,15 @@ const checkDate = (date: Date) => {
     return date.getTime() < now.getTime();
 };
 
-const operateWebsite = (op: string, id: number) => {
+const operateWebsite = (op: string, row: Website.Website) => {
+    if (row.type === 'stream') {
+        return;
+    }
     ElMessageBox.confirm(i18n.global.t('website.' + op + 'Helper'), i18n.global.t('cronjob.changeStatus'), {
         confirmButtonText: i18n.global.t('commons.button.confirm'),
         cancelButtonText: i18n.global.t('commons.button.cancel'),
     }).then(async () => {
-        await opWebsite({ id: id, operate: op });
+        await opWebsite({ id: row.id, operate: op });
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         search();
     });

@@ -2683,6 +2683,9 @@ const message = {
 
         batchOpreate: 'Operación en Lote',
         batchOpreateHelper: 'Lote {0} sitios web, ¿continuar operación?',
+        stream: 'Proxy TCP/UDP',
+        streamPorts: 'Puertos de escucha',
+        streamPortsHelper: 'Separe con comas, por ejemplo: 3306, 3307',
     },
     php: {
         short_open_tag: 'Soporte de etiquetas cortas',

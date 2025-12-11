@@ -13,7 +13,13 @@
             <el-text v-else type="primary" class="cursor-pointer" @click="openConfig(row.id)">
                 {{ row.primaryDomain }}
             </el-text>
-            <el-popover placement="right" trigger="hover" :width="300" @before-enter="searchDomains(row.id)">
+            <el-popover
+                placement="right"
+                trigger="hover"
+                :width="300"
+                @before-enter="searchDomains(row.id)"
+                v-if="row.type != 'stream'"
+            >
                 <template #reference>
                     <el-button link icon="Promotion" class="ml-2.5"></el-button>
                 </template>
@@ -32,7 +38,7 @@
                     </tbody>
                 </table>
             </el-popover>
-            <el-button link icon="edit" @click="startEdit" v-if="!isEditing"></el-button>
+            <el-button link icon="edit" class="ml-2.5" @click="startEdit" v-if="!isEditing"></el-button>
         </div>
         <div>
             <el-tooltip effect="dark" :content="$t('website.cancelFavorite')" placement="top-start" v-if="row.favorite">

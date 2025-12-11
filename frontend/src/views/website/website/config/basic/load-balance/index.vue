@@ -90,7 +90,7 @@ const loading = ref(false);
 const operateRef = ref();
 const delRef = ref();
 const fileRef = ref();
-const Algorithms = getAlgorithms();
+const Algorithms = getAlgorithms('');
 
 const buttons = [
     {

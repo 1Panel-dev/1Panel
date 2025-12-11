@@ -371,3 +371,7 @@ export const updateCorsConfig = (req: Website.CorsConfigReq) => {
 export const batchSetGroup = (req: Website.BatchSetGroup) => {
     return http.post(`/websites/batch/group`, req);
 };
+
+export const updateWebsiteStream = (req: Website.WebsiteStreamUpdate) => {
+    return http.post(`/websites/stream/update`, req);
+};

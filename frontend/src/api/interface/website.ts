@@ -27,6 +27,7 @@ export namespace Website {
         dbID: number;
         dbType: string;
         favorite: boolean;
+        streamPorts: string;
     }
 
     export interface WebsiteDTO extends Website {
@@ -37,7 +38,17 @@ export namespace Website {
         runtimeName: string;
         runtimeType: string;
         openBaseDir: boolean;
+        algorithm: string;
+        servers: NginxUpstreamServer[];
     }
+
+    export interface WebsiteStreamUpdate {
+        websiteID: number;
+        algorithm: string;
+        streamPorts?: string;
+        servers: NginxUpstreamServer[];
+    }
+
     export interface WebsiteRes extends CommonModel {
         protocol: string;
         primaryDomain: string;
@@ -93,6 +104,10 @@ export namespace Website {
         dbUser?: string;
         dbHost?: string;
         domains: SubDomain[];
+        streamPorts?: string;
+        name: string;
+        algorithm: string;
+        servers: NginxUpstreamServer[];
     }
 
     export interface WebSiteUpdateReq {

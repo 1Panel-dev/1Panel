@@ -38,6 +38,21 @@ type WebsiteCreate struct {
 	FtpConfig
 	DataBaseConfig
 	SSLConfig
+	StreamConfig
+}
+
+type StreamConfig struct {
+	StreamPorts string `json:"streamPorts" validate:"required"`
+	Name        string `json:"name"`
+	Algorithm   string `json:"algorithm"`
+
+	Servers []dto.NginxUpstreamServer `json:"servers"`
+}
+
+type StreamUpdate struct {
+	WebsiteID uint `json:"websiteID" validate:"required"`
+
+	StreamConfig
 }
 
 type WebsiteOptionReq struct {

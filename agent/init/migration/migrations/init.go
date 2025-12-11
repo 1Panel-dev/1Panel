@@ -775,3 +775,10 @@ var InitIptablesStatus = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var UpdateWebsite = &gormigrate.Migration{
+	ID: "20251203-update-website",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(&model.Website{})
+	},
+}

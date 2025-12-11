@@ -2510,6 +2510,9 @@ const message = {
 
         batchOpreate: '批次操作',
         batchOpreateHelper: '批次{0}網站，是否繼續操作？',
+        stream: 'TCP/UDP 代理',
+        streamPorts: '監聽端口',
+        streamPortsHelper: '請用逗號分隔，例如：3306，3307',
     },
     php: {
         short_open_tag: '短標籤支援',

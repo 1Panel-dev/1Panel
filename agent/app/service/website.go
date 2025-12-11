@@ -1,12 +1,10 @@
 package service
 
 import (
-	"bufio"
 	"bytes"
 	"context"
 	"crypto/x509"
 	"encoding/base64"
-	"encoding/json"
 	"encoding/pem"
 	"errors"
 	"fmt"
@@ -46,7 +44,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/nginx/components"
 	"github.com/1Panel-dev/1Panel/agent/utils/nginx/parser"
 	"github.com/1Panel-dev/1Panel/agent/utils/re"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type WebsiteService struct {
@@ -62,41 +59,28 @@ type IWebsiteService interface {
 	DeleteWebsite(req request.WebsiteDelete) error
 	GetWebsite(id uint) (response.WebsiteDTO, error)
 	BatchOpWebsite(req request.BatchWebsiteOp) error
-	BatchSetGroup(req request.BatchWebsiteGroup) error
 
-	CreateWebsiteDomain(create request.WebsiteDomainCreate) ([]model.WebsiteDomain, error)
-	GetWebsiteDomain(websiteId uint) ([]model.WebsiteDomain, error)
-	DeleteWebsiteDomain(domainId uint) error
-	UpdateWebsiteDomain(req request.WebsiteDomainUpdate) error
+	BatchSetGroup(req request.BatchWebsiteGroup) error
+	ChangePHPVersion(req request.WebsitePHPVersionReq) error
+	OperateCrossSiteAccess(req request.CrossSiteAccessOp) error
+	ExecComposer(req request.ExecComposerReq) error
+	ChangeGroup(group, newGroup uint) error
+	ChangeDefaultServer(id uint) error
+	PreInstallCheck(req request.WebsiteInstallCheckReq) ([]response.WebsitePreInstallCheck, error)
+	OpWebsiteLog(req request.WebsiteLogReq) (*response.WebsiteLog, error)
+	UpdateStream(req request.StreamUpdate) error
 
 	GetNginxConfigByScope(req request.NginxScopeReq) (*response.WebsiteNginxConfig, error)
 	UpdateNginxConfigByScope(req request.NginxConfigUpdate) error
 	GetWebsiteNginxConfig(websiteId uint, configType string) (*response.FileInfo, error)
 	UpdateNginxConfigFile(req request.WebsiteNginxUpdate) error
+
 	GetWebsiteHTTPS(websiteId uint) (response.WebsiteHTTPS, error)
 	OpWebsiteHTTPS(ctx context.Context, req request.WebsiteHTTPSOp) (*response.WebsiteHTTPS, error)
-	OpWebsiteLog(req request.WebsiteLogReq) (*response.WebsiteLog, error)
-	ChangeDefaultServer(id uint) error
-	PreInstallCheck(req request.WebsiteInstallCheckReq) ([]response.WebsitePreInstallCheck, error)
-
-	ChangePHPVersion(req request.WebsitePHPVersionReq) error
-
-	GetRewriteConfig(req request.NginxRewriteReq) (*response.NginxRewriteRes, error)
-	UpdateRewriteConfig(req request.NginxRewriteUpdate) error
-	OperateCustomRewrite(req request.CustomRewriteOperate) error
-	ListCustomRewrite() ([]string, error)
 
 	LoadWebsiteDirConfig(req request.WebsiteCommonReq) (*response.WebsiteDirConfig, error)
 	UpdateSiteDir(req request.WebsiteUpdateDir) error
 	UpdateSitePermission(req request.WebsiteUpdateDirPermission) error
-
-	OperateProxy(req request.WebsiteProxyConfig) (err error)
-	GetProxies(id uint) (res []request.WebsiteProxyConfig, err error)
-	UpdateProxyFile(req request.NginxProxyUpdate) (err error)
-	UpdateProxyCache(req request.NginxProxyCacheUpdate) (err error)
-	GetProxyCache(id uint) (res response.NginxProxyCache, err error)
-	ClearProxyCache(req request.NginxCommonReq) error
-	DeleteProxy(req request.WebsiteProxyDel) (err error)
 
 	UpdateCors(req request.CorsConfigReq) error
 	GetCors(websiteID uint) (*request.CorsConfig, error)
@@ -108,13 +92,15 @@ type IWebsiteService interface {
 	GetRedirect(id uint) (res []response.NginxRedirectConfig, err error)
 	UpdateRedirectFile(req request.NginxRedirectUpdate) (err error)
 
-	GetAuthBasics(req request.NginxAuthReq) (res response.NginxAuthRes, err error)
-	UpdateAuthBasic(req request.NginxAuthUpdate) (err error)
-	GetPathAuthBasics(req request.NginxAuthReq) (res []response.NginxPathAuthRes, err error)
-	UpdatePathAuthBasic(req request.NginxPathAuthUpdate) error
-
 	UpdateDefaultHtml(req request.WebsiteHtmlUpdate) error
 	GetDefaultHtml(resourceType string) (*response.WebsiteHtmlRes, error)
+
+	SetRealIPConfig(req request.WebsiteRealIP) error
+	GetRealIPConfig(websiteID uint) (*response.WebsiteRealIP, error)
+
+	GetWebsiteResource(websiteID uint) ([]response.Resource, error)
+	ListDatabases() ([]response.Database, error)
+	ChangeDatabase(req request.ChangeDatabase) error
 
 	GetLoadBalances(id uint) ([]dto.NginxUpstream, error)
 	CreateLoadBalance(req request.WebsiteLBCreate) error
@@ -122,18 +108,28 @@ type IWebsiteService interface {
 	UpdateLoadBalance(req request.WebsiteLBUpdate) error
 	UpdateLoadBalanceFile(req request.WebsiteLBUpdateFile) error
 
-	SetRealIPConfig(req request.WebsiteRealIP) error
-	GetRealIPConfig(websiteID uint) (*response.WebsiteRealIP, error)
+	OperateProxy(req request.WebsiteProxyConfig) (err error)
+	GetProxies(id uint) (res []request.WebsiteProxyConfig, err error)
+	UpdateProxyFile(req request.NginxProxyUpdate) (err error)
+	UpdateProxyCache(req request.NginxProxyCacheUpdate) (err error)
+	GetProxyCache(id uint) (res response.NginxProxyCache, err error)
+	ClearProxyCache(req request.NginxCommonReq) error
+	DeleteProxy(req request.WebsiteProxyDel) (err error)
 
-	ChangeGroup(group, newGroup uint) error
+	CreateWebsiteDomain(create request.WebsiteDomainCreate) ([]model.WebsiteDomain, error)
+	GetWebsiteDomain(websiteId uint) ([]model.WebsiteDomain, error)
+	DeleteWebsiteDomain(domainId uint) error
+	UpdateWebsiteDomain(req request.WebsiteDomainUpdate) error
 
-	GetWebsiteResource(websiteID uint) ([]response.Resource, error)
-	ListDatabases() ([]response.Database, error)
-	ChangeDatabase(req request.ChangeDatabase) error
+	GetRewriteConfig(req request.NginxRewriteReq) (*response.NginxRewriteRes, error)
+	UpdateRewriteConfig(req request.NginxRewriteUpdate) error
+	OperateCustomRewrite(req request.CustomRewriteOperate) error
+	ListCustomRewrite() ([]string, error)
 
-	OperateCrossSiteAccess(req request.CrossSiteAccessOp) error
-
-	ExecComposer(req request.ExecComposerReq) error
+	GetAuthBasics(req request.NginxAuthReq) (res response.NginxAuthRes, err error)
+	UpdateAuthBasic(req request.NginxAuthUpdate) (err error)
+	GetPathAuthBasics(req request.NginxAuthReq) (res []response.NginxPathAuthRes, err error)
+	UpdatePathAuthBasic(req request.NginxPathAuthUpdate) error
 }
 
 func NewIWebsiteService() IWebsiteService {
@@ -263,28 +259,15 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 		return err
 	}
 	defaultHttpPort := nginxInstall.HttpPort
-	var (
-		domains []model.WebsiteDomain
-	)
-	domains, _, _, err = getWebsiteDomains(create.Domains, defaultHttpPort, nginxInstall.HttpsPort, 0)
-	if err != nil {
-		return err
-	}
-	primaryDomain := domains[0].Domain
-	if domains[0].Port != defaultHttpPort {
-		primaryDomain = fmt.Sprintf("%s:%v", domains[0].Domain, domains[0].Port)
-	}
-
 	defaultDate, _ := time.Parse(constant.DateLayout, constant.WebsiteDefaultExpireDate)
+
 	website := &model.Website{
-		PrimaryDomain:  primaryDomain,
 		Type:           create.Type,
 		Alias:          alias,
 		Remark:         create.Remark,
 		Status:         constant.WebRunning,
 		ExpireDate:     defaultDate,
 		WebsiteGroupID: create.WebsiteGroupID,
-		Protocol:       constant.ProtocolHTTP,
 		Proxy:          create.Proxy,
 		SiteDir:        "/",
 		AccessLog:      true,
@@ -293,9 +276,34 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 	}
 
 	var (
-		appInstall *model.AppInstall
-		runtime    *model.Runtime
+		domains       []model.WebsiteDomain
+		appInstall    *model.AppInstall
+		runtime       *model.Runtime
+		primaryDomain string
 	)
+	if website.Type == constant.Stream {
+		website.PrimaryDomain = create.Name
+		website.Protocol = constant.ProtocolStream
+		website.StreamPorts = create.StreamConfig.StreamPorts
+		ports := strings.Split(create.StreamConfig.StreamPorts, ",")
+		for _, port := range ports {
+			portNum, _ := strconv.Atoi(port)
+			if err = checkWebsitePort(nginxInstall.HttpsPort, portNum, website.Type); err != nil {
+				return err
+			}
+		}
+	} else {
+		domains, _, _, err = getWebsiteDomains(create.Domains, defaultHttpPort, nginxInstall.HttpsPort, 0)
+		if err != nil {
+			return err
+		}
+		primaryDomain = domains[0].Domain
+		if domains[0].Port != defaultHttpPort {
+			primaryDomain = fmt.Sprintf("%s:%v", domains[0].Domain, domains[0].Port)
+		}
+		website.PrimaryDomain = primaryDomain
+		website.Protocol = constant.ProtocolHTTP
+	}
 
 	createTask, err := task.NewTaskWithOps(primaryDomain, task.TaskCreate, task.TaskScopeWebsite, create.TaskID, 0)
 	if err != nil {
@@ -429,33 +437,39 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 	}
 
 	configNginx := func(t *task.Task) error {
-		if err = configDefaultNginx(website, domains, appInstall, runtime); err != nil {
+		if err = configDefaultNginx(website, domains, appInstall, runtime, create.StreamConfig); err != nil {
 			return err
 		}
-		if err = createWafConfig(website, domains); err != nil {
-			return err
-		}
-		if create.Type == constant.Runtime {
-			runtime, err = runtimeRepo.GetFirst(context.Background(), repo.WithByID(create.RuntimeID))
-			if err != nil {
+		if website.Type != constant.Stream {
+			if err = createWafConfig(website, domains); err != nil {
 				return err
 			}
-			if runtime.Type == constant.RuntimePHP && runtime.Resource == constant.ResourceAppstore {
-				createOpenBasedirConfig(website)
+			if create.Type == constant.Runtime {
+				runtime, err = runtimeRepo.GetFirst(context.Background(), repo.WithByID(create.RuntimeID))
+				if err != nil {
+					return err
+				}
+				if runtime.Type == constant.RuntimePHP && runtime.Resource == constant.ResourceAppstore {
+					createOpenBasedirConfig(website)
+				}
 			}
 		}
+
 		tx, ctx := helper.GetTxAndContext()
 		defer tx.Rollback()
 		if err = websiteRepo.Create(ctx, website); err != nil {
 			return err
 		}
 		t.Task.ResourceID = website.ID
-		for i := range domains {
-			domains[i].WebsiteID = website.ID
+		if len(domains) > 0 {
+			for i := range domains {
+				domains[i].WebsiteID = website.ID
+			}
+			if err = websiteDomainRepo.BatchCreate(ctx, domains); err != nil {
+				return err
+			}
 		}
-		if err = websiteDomainRepo.BatchCreate(ctx, domains); err != nil {
-			return err
-		}
+
 		tx.Commit()
 		return nil
 	}
@@ -637,7 +651,9 @@ func (w WebsiteService) GetWebsite(id uint) (response.WebsiteDTO, error) {
 	res.AccessLogPath = GetSitePath(website, SiteAccessLog)
 	res.SitePath = GetSitePath(website, SiteDir)
 	res.SiteDir = website.SiteDir
-	if website.Type == constant.Runtime {
+	fileOp := files.NewFileOp()
+	switch website.Type {
+	case constant.Runtime:
 		runtime, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(website.RuntimeID))
 		if err != nil {
 			return res, err
@@ -645,7 +661,28 @@ func (w WebsiteService) GetWebsite(id uint) (response.WebsiteDTO, error) {
 		res.RuntimeType = runtime.Type
 		res.RuntimeName = runtime.Name
 		if runtime.Type == constant.RuntimePHP {
-			res.OpenBaseDir = files.NewFileOp().Stat(path.Join(GetSitePath(website, SiteIndexDir), ".user.ini"))
+			res.OpenBaseDir = fileOp.Stat(path.Join(GetSitePath(website, SiteIndexDir), ".user.ini"))
+		}
+	case constant.Stream:
+		nginxParser, err := parser.NewParser(GetSitePath(website, StreamConf))
+		if err != nil {
+			return res, err
+		}
+		config, err := nginxParser.Parse()
+		if err != nil {
+			return res, err
+		}
+		upstreams := config.FindUpstreams()
+		for _, up := range upstreams {
+			directives := up.GetDirectives()
+			for _, d := range directives {
+				dName := d.GetName()
+				if _, ok := dto.LBAlgorithms[dName]; ok {
+					res.Algorithm = dName
+				}
+			}
+			res.Servers = getNginxUpstreamServers(up.UpstreamServers)
+			break
 		}
 	}
 	return res, nil
@@ -700,8 +737,10 @@ func (w WebsiteService) DeleteWebsite(req request.WebsiteDelete) error {
 		return err
 	}
 
-	if err = delWafConfig(website, req.ForceDelete); err != nil {
-		return err
+	if website.Type != constant.Stream {
+		if err = delWafConfig(website, req.ForceDelete); err != nil {
+			return err
+		}
 	}
 
 	if checkIsLinkApp(website) && req.DeleteApp {
@@ -773,177 +812,6 @@ func (w WebsiteService) UpdateWebsiteDomain(req request.WebsiteDomainUpdate) err
 	return websiteDomainRepo.Save(context.TODO(), &domain)
 }
 
-func (w WebsiteService) CreateWebsiteDomain(create request.WebsiteDomainCreate) ([]model.WebsiteDomain, error) {
-	var (
-		domainModels []model.WebsiteDomain
-		addPorts     []int
-	)
-	httpPort, httpsPort, err := getAppInstallPort(constant.AppOpenresty)
-	if err != nil {
-		return nil, err
-	}
-	website, err := websiteRepo.GetFirst(repo.WithByID(create.WebsiteID))
-	if err != nil {
-		return nil, err
-	}
-
-	domainModels, addPorts, _, err = getWebsiteDomains(create.Domains, httpPort, httpsPort, create.WebsiteID)
-	if err != nil {
-		return nil, err
-	}
-	go func() {
-		_ = OperateFirewallPort(nil, addPorts)
-	}()
-
-	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
-	if err != nil {
-		return nil, err
-	}
-	wafDataPath := path.Join(nginxInstall.GetPath(), "1pwaf", "data")
-	fileOp := files.NewFileOp()
-	if fileOp.Stat(wafDataPath) {
-		websitesConfigPath := path.Join(wafDataPath, "conf", "sites.json")
-		content, err := fileOp.GetContent(websitesConfigPath)
-		if err != nil {
-			return nil, err
-		}
-		var websitesArray []request.WafWebsite
-		if content != nil {
-			if err := json.Unmarshal(content, &websitesArray); err != nil {
-				return nil, err
-			}
-		}
-		for index, wafWebsite := range websitesArray {
-			if wafWebsite.Key == website.Alias {
-				wafSite := request.WafWebsite{
-					Key:     website.Alias,
-					Domains: wafWebsite.Domains,
-					Host:    wafWebsite.Host,
-				}
-				for _, domain := range domainModels {
-					wafSite.Domains = append(wafSite.Domains, domain.Domain)
-					wafSite.Host = append(wafSite.Host, domain.Domain+":"+strconv.Itoa(domain.Port))
-				}
-				if len(wafSite.Host) == 0 {
-					wafSite.Host = []string{}
-				}
-				websitesArray[index] = wafSite
-				break
-			}
-		}
-		websitesContent, err := json.Marshal(websitesArray)
-		if err != nil {
-			return nil, err
-		}
-		if err := fileOp.SaveFileWithByte(websitesConfigPath, websitesContent, constant.DirPerm); err != nil {
-			return nil, err
-		}
-	}
-
-	if err = addListenAndServerName(website, domainModels); err != nil {
-		return nil, err
-	}
-
-	return domainModels, websiteDomainRepo.BatchCreate(context.TODO(), domainModels)
-}
-
-func (w WebsiteService) GetWebsiteDomain(websiteId uint) ([]model.WebsiteDomain, error) {
-	return websiteDomainRepo.GetBy(websiteDomainRepo.WithWebsiteId(websiteId))
-}
-
-func (w WebsiteService) DeleteWebsiteDomain(domainId uint) error {
-	webSiteDomain, err := websiteDomainRepo.GetFirst(repo.WithByID(domainId))
-	if err != nil {
-		return err
-	}
-
-	if websiteDomains, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithWebsiteId(webSiteDomain.WebsiteID)); len(websiteDomains) == 1 {
-		return fmt.Errorf("can not delete last domain")
-	}
-	website, err := websiteRepo.GetFirst(repo.WithByID(webSiteDomain.WebsiteID))
-	if err != nil {
-		return err
-	}
-	var ports []int
-	if oldDomains, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithWebsiteId(webSiteDomain.WebsiteID), websiteDomainRepo.WithPort(webSiteDomain.Port)); len(oldDomains) == 1 {
-		ports = append(ports, webSiteDomain.Port)
-	}
-
-	var domains []string
-	if oldDomains, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithWebsiteId(webSiteDomain.WebsiteID), websiteDomainRepo.WithDomain(webSiteDomain.Domain)); len(oldDomains) == 1 {
-		domains = append(domains, webSiteDomain.Domain)
-	}
-
-	if len(ports) > 0 || len(domains) > 0 {
-		stringBinds := make([]string, len(ports))
-		for i := 0; i < len(ports); i++ {
-			stringBinds[i] = strconv.Itoa(ports[i])
-		}
-		if err := deleteListenAndServerName(website, stringBinds, domains); err != nil {
-			return err
-		}
-	}
-
-	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
-	if err != nil {
-		return err
-	}
-	wafDataPath := path.Join(nginxInstall.GetPath(), "1pwaf", "data")
-	fileOp := files.NewFileOp()
-	if fileOp.Stat(wafDataPath) {
-		websitesConfigPath := path.Join(wafDataPath, "conf", "sites.json")
-		content, err := fileOp.GetContent(websitesConfigPath)
-		if err != nil {
-			return err
-		}
-		var websitesArray []request.WafWebsite
-		var newWebsitesArray []request.WafWebsite
-		if content != nil {
-			if err := json.Unmarshal(content, &websitesArray); err != nil {
-				return err
-			}
-		}
-		for _, wafWebsite := range websitesArray {
-			if wafWebsite.Key == website.Alias {
-				wafSite := wafWebsite
-				oldDomains := wafSite.Domains
-				var newDomains []string
-				for _, domain := range oldDomains {
-					if domain == webSiteDomain.Domain {
-						continue
-					}
-					newDomains = append(newDomains, domain)
-				}
-				wafSite.Domains = newDomains
-				oldHostArray := wafSite.Host
-				var newHostArray []string
-				for _, host := range oldHostArray {
-					if host == webSiteDomain.Domain+":"+strconv.Itoa(webSiteDomain.Port) {
-						continue
-					}
-					newHostArray = append(newHostArray, host)
-				}
-				wafSite.Host = newHostArray
-				if len(wafSite.Host) == 0 {
-					wafSite.Host = []string{}
-				}
-				newWebsitesArray = append(newWebsitesArray, wafSite)
-			} else {
-				newWebsitesArray = append(newWebsitesArray, wafWebsite)
-			}
-		}
-		websitesContent, err := json.Marshal(newWebsitesArray)
-		if err != nil {
-			return err
-		}
-		if err = fileOp.SaveFileWithByte(websitesConfigPath, websitesContent, constant.DirPerm); err != nil {
-			return err
-		}
-	}
-
-	return websiteDomainRepo.DeleteBy(context.TODO(), repo.WithByID(domainId))
-}
-
 func (w WebsiteService) GetNginxConfigByScope(req request.NginxScopeReq) (*response.WebsiteNginxConfig, error) {
 	keys, ok := dto.ScopeKeyMap[req.Scope]
 	if !ok || len(keys) == 0 {
@@ -1000,7 +868,7 @@ func (w WebsiteService) GetWebsiteNginxConfig(websiteID uint, configType string)
 	configPath := ""
 	switch configType {
 	case constant.AppOpenresty:
-		configPath = GetSitePath(website, SiteConf)
+		configPath = GetWebsiteConfigPath(website)
 	}
 	info, err := files.NewFileInfo(files.FileOption{
 		Path:   configPath,
@@ -1524,112 +1392,6 @@ func (w WebsiteService) ChangePHPVersion(req request.WebsitePHPVersionReq) error
 	return websiteRepo.Save(context.Background(), &website)
 }
 
-func (w WebsiteService) UpdateRewriteConfig(req request.NginxRewriteUpdate) error {
-	website, err := websiteRepo.GetFirst(repo.WithByID(req.WebsiteID))
-	if err != nil {
-		return err
-	}
-	includePath := fmt.Sprintf("/www/sites/%s/rewrite/%s.conf", website.Alias, website.Alias)
-	absolutePath := GetSitePath(website, SiteReWritePath)
-	fileOp := files.NewFileOp()
-	var oldRewriteContent []byte
-	if !fileOp.Stat(path.Dir(absolutePath)) {
-		if err := fileOp.CreateDir(path.Dir(absolutePath), constant.DirPerm); err != nil {
-			return err
-		}
-	}
-	if !fileOp.Stat(absolutePath) {
-		if err := fileOp.CreateFile(absolutePath); err != nil {
-			return err
-		}
-	} else {
-		oldRewriteContent, err = fileOp.GetContent(absolutePath)
-		if err != nil {
-			return err
-		}
-	}
-	if err := fileOp.WriteFile(absolutePath, strings.NewReader(req.Content), constant.DirPerm); err != nil {
-		return err
-	}
-
-	if err := updateNginxConfig(constant.NginxScopeServer, []dto.NginxParam{{Name: "include", Params: []string{includePath}}}, &website); err != nil {
-		_ = fileOp.WriteFile(absolutePath, bytes.NewReader(oldRewriteContent), constant.DirPerm)
-		return err
-	}
-	website.Rewrite = req.Name
-	return websiteRepo.Save(context.Background(), &website)
-}
-
-func (w WebsiteService) GetRewriteConfig(req request.NginxRewriteReq) (*response.NginxRewriteRes, error) {
-	website, err := websiteRepo.GetFirst(repo.WithByID(req.WebsiteID))
-	if err != nil {
-		return nil, err
-	}
-	var contentByte []byte
-	if req.Name == "current" {
-		rewriteConfPath := GetSitePath(website, SiteReWritePath)
-		fileOp := files.NewFileOp()
-		if fileOp.Stat(rewriteConfPath) {
-			contentByte, err = fileOp.GetContent(rewriteConfPath)
-			if err != nil {
-				return nil, err
-			}
-		}
-	} else {
-		rewriteFile := fmt.Sprintf("rewrite/%s.conf", strings.ToLower(req.Name))
-		contentByte, _ = nginx_conf.Rewrites.ReadFile(rewriteFile)
-		if contentByte == nil {
-			customRewriteDir := GetOpenrestyDir(DefaultRewriteDir)
-			customRewriteFile := path.Join(customRewriteDir, fmt.Sprintf("%s.conf", strings.ToLower(req.Name)))
-			contentByte, err = files.NewFileOp().GetContent(customRewriteFile)
-		}
-	}
-	return &response.NginxRewriteRes{
-		Content: string(contentByte),
-	}, err
-}
-
-func (w WebsiteService) OperateCustomRewrite(req request.CustomRewriteOperate) error {
-	rewriteDir := GetOpenrestyDir(DefaultRewriteDir)
-	fileOp := files.NewFileOp()
-	if !fileOp.Stat(rewriteDir) {
-		if err := fileOp.CreateDir(rewriteDir, constant.DirPerm); err != nil {
-			return err
-		}
-	}
-	rewriteFile := path.Join(rewriteDir, fmt.Sprintf("%s.conf", req.Name))
-	switch req.Operate {
-	case "create":
-		if fileOp.Stat(rewriteFile) {
-			return buserr.New("ErrNameIsExist")
-		}
-		return fileOp.WriteFile(rewriteFile, strings.NewReader(req.Content), constant.DirPerm)
-	case "delete":
-		return fileOp.DeleteFile(rewriteFile)
-	}
-	return nil
-}
-
-func (w WebsiteService) ListCustomRewrite() ([]string, error) {
-	rewriteDir := GetOpenrestyDir(DefaultRewriteDir)
-	fileOp := files.NewFileOp()
-	if !fileOp.Stat(rewriteDir) {
-		return nil, nil
-	}
-	entries, err := os.ReadDir(rewriteDir)
-	if err != nil {
-		return nil, err
-	}
-	var res []string
-	for _, entry := range entries {
-		if entry.IsDir() {
-			continue
-		}
-		res = append(res, strings.TrimSuffix(entry.Name(), ".conf"))
-	}
-	return res, nil
-}
-
 func (w WebsiteService) UpdateSiteDir(req request.WebsiteUpdateDir) error {
 	website, err := websiteRepo.GetFirst(repo.WithByID(req.ID))
 	if err != nil {
@@ -1660,391 +1422,6 @@ func (w WebsiteService) UpdateSitePermission(req request.WebsiteUpdateDirPermiss
 	website.User = req.User
 	website.Group = req.Group
 	return websiteRepo.Save(context.Background(), &website)
-}
-
-func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error) {
-	var (
-		website    model.Website
-		par        *parser.Parser
-		oldContent []byte
-	)
-
-	website, err = websiteRepo.GetFirst(repo.WithByID(req.ID))
-	if err != nil {
-		return
-	}
-	fileOp := files.NewFileOp()
-	includeDir := GetSitePath(website, SiteProxyDir)
-	if !fileOp.Stat(includeDir) {
-		_ = fileOp.CreateDir(includeDir, constant.DirPerm)
-	}
-	fileName := fmt.Sprintf("%s.conf", req.Name)
-	includePath := path.Join(includeDir, fileName)
-	backName := fmt.Sprintf("%s.bak", req.Name)
-	backPath := path.Join(includeDir, backName)
-
-	if req.Operate == "create" && (fileOp.Stat(includePath) || fileOp.Stat(backPath)) {
-		err = buserr.New("ErrNameIsExist")
-		return
-	}
-
-	defer func() {
-		if err != nil {
-			switch req.Operate {
-			case "create":
-				_ = fileOp.DeleteFile(includePath)
-			case "edit":
-				_ = fileOp.WriteFile(includePath, bytes.NewReader(oldContent), constant.DirPerm)
-			}
-		}
-	}()
-
-	var config *components.Config
-
-	switch req.Operate {
-	case "create":
-		config, err = parser.NewStringParser(string(nginx_conf.GetWebsiteFile("proxy.conf"))).Parse()
-		if err != nil {
-			return
-		}
-	case "edit":
-		par, err = parser.NewParser(includePath)
-		if err != nil {
-			return
-		}
-		config, err = par.Parse()
-		if err != nil {
-			return
-		}
-		oldContent, err = fileOp.GetContent(includePath)
-		if err != nil {
-			return
-		}
-	case "delete":
-		_ = fileOp.DeleteFile(includePath)
-		_ = fileOp.DeleteFile(backPath)
-		return updateNginxConfig(constant.NginxScopeServer, nil, &website)
-	case "disable":
-		_ = fileOp.Rename(includePath, backPath)
-		return updateNginxConfig(constant.NginxScopeServer, nil, &website)
-	case "enable":
-		_ = fileOp.Rename(backPath, includePath)
-		return updateNginxConfig(constant.NginxScopeServer, nil, &website)
-	}
-
-	config.FilePath = includePath
-	directives := config.Directives
-
-	var location *components.Location
-	for _, directive := range directives {
-		if loc, ok := directive.(*components.Location); ok {
-			location = loc
-			break
-		}
-	}
-	if location == nil {
-		err = errors.New("invalid proxy config, no location found")
-		return
-	}
-	location.UpdateDirective("proxy_pass", []string{req.ProxyPass})
-	location.UpdateDirective("proxy_set_header", []string{"Host", req.ProxyHost})
-	location.ChangePath(req.Modifier, req.Match)
-	// Server Cache Settings
-	if req.Cache {
-		if err = openProxyCache(website); err != nil {
-			return
-		}
-		location.AddServerCache(fmt.Sprintf("proxy_cache_zone_of_%s", website.Alias), req.ServerCacheTime, req.ServerCacheUnit)
-	} else {
-		location.RemoveServerCache(fmt.Sprintf("proxy_cache_zone_of_%s", website.Alias))
-	}
-	// Browser Cache Settings
-	if req.CacheTime > 0 {
-		location.AddBrowserCache(req.CacheTime, req.CacheUnit)
-	} else if req.CacheTime == 0 {
-		location.RemoveBrowserCache()
-	} else {
-		location.AddBroswerNoCache()
-	}
-	// Content Replace Settings
-	if len(req.Replaces) > 0 {
-		location.AddSubFilter(req.Replaces)
-	} else {
-		location.RemoveSubFilter()
-	}
-	// SSL Settings
-	if req.SNI {
-		location.UpdateDirective("proxy_ssl_server_name", []string{"on"})
-		if req.ProxySSLName != "" {
-			location.UpdateDirective("proxy_ssl_name", []string{req.ProxySSLName})
-		}
-	} else {
-		location.UpdateDirective("proxy_ssl_server_name", []string{"off"})
-	}
-	// CORS Settings
-	if req.Cors {
-		location.UpdateDirective("add_header", []string{"Access-Control-Allow-Origin", req.AllowOrigins, "always"})
-		if req.AllowMethods != "" {
-			location.UpdateDirective("add_header", []string{"Access-Control-Allow-Methods", req.AllowMethods, "always"})
-		} else {
-			location.RemoveDirective("add_header", []string{"Access-Control-Allow-Methods"})
-		}
-		if req.AllowHeaders != "" {
-			location.UpdateDirective("add_header", []string{"Access-Control-Allow-Headers", req.AllowHeaders, "always"})
-		} else {
-			location.RemoveDirective("add_header", []string{"Access-Control-Allow-Headers"})
-		}
-		if req.AllowCredentials {
-			location.UpdateDirective("add_header", []string{"Access-Control-Allow-Credentials", "true", "always"})
-		} else {
-			location.RemoveDirective("add_header", []string{"Access-Control-Allow-Credentials"})
-		}
-		if req.Preflight {
-			location.AddCorsOption()
-		} else {
-			location.RemoveCorsOption()
-		}
-	} else {
-		location.RemoveDirective("add_header", []string{"Access-Control-Allow-Origin"})
-		location.RemoveDirective("add_header", []string{"Access-Control-Allow-Methods"})
-		location.RemoveDirective("add_header", []string{"Access-Control-Allow-Headers"})
-		location.RemoveDirective("add_header", []string{"Access-Control-Allow-Credentials"})
-		location.RemoveDirectiveByFullParams("if", []string{"(", "$request_method", "=", "'OPTIONS'", ")"})
-	}
-	if err = nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
-		return buserr.WithErr("ErrUpdateBuWebsite", err)
-	}
-	nginxInclude := fmt.Sprintf("/www/sites/%s/proxy/*.conf", website.Alias)
-	return updateNginxConfig(constant.NginxScopeServer, []dto.NginxParam{{Name: "include", Params: []string{nginxInclude}}}, &website)
-}
-
-func (w WebsiteService) UpdateProxyCache(req request.NginxProxyCacheUpdate) (err error) {
-	website, err := websiteRepo.GetFirst(repo.WithByID(req.WebsiteID))
-	if err != nil {
-		return
-	}
-	cacheDir := GetSitePath(website, SiteCacheDir)
-	fileOp := files.NewFileOp()
-	if !fileOp.Stat(cacheDir) {
-		_ = fileOp.CreateDir(cacheDir, constant.DirPerm)
-	}
-	if req.Open {
-		proxyCachePath := fmt.Sprintf("/www/sites/%s/cache levels=1:2 keys_zone=proxy_cache_zone_of_%s:%d%s max_size=%d%s inactive=%d%s", website.Alias, website.Alias, req.ShareCache, req.ShareCacheUnit, req.CacheLimit, req.CacheLimitUnit, req.CacheExpire, req.CacheExpireUnit)
-		return updateNginxConfig("", []dto.NginxParam{{Name: "proxy_cache_path", Params: []string{proxyCachePath}}}, &website)
-	}
-	return deleteNginxConfig("", []dto.NginxParam{{Name: "proxy_cache_path"}}, &website)
-}
-
-func (w WebsiteService) GetProxyCache(id uint) (res response.NginxProxyCache, err error) {
-	var (
-		website model.Website
-	)
-	website, err = websiteRepo.GetFirst(repo.WithByID(id))
-	if err != nil {
-		return
-	}
-
-	parser, err := parser.NewParser(GetSitePath(website, SiteConf))
-	if err != nil {
-		return
-	}
-	config, err := parser.Parse()
-	if err != nil {
-		return
-	}
-	var params []string
-	for _, d := range config.GetDirectives() {
-		if d.GetName() == "proxy_cache_path" {
-			params = d.GetParameters()
-		}
-	}
-	if len(params) == 0 {
-		return
-	}
-	for _, param := range params {
-		if re.GetRegex(re.ProxyCacheZonePattern).MatchString(param) {
-			matches := re.GetRegex(re.ProxyCacheZonePattern).FindStringSubmatch(param)
-			if len(matches) > 0 {
-				res.ShareCache, _ = strconv.Atoi(matches[1])
-				res.ShareCacheUnit = matches[2]
-			}
-		}
-
-		if re.GetRegex(re.ProxyCacheMaxSizeValidationPattern).MatchString(param) {
-			matches := re.GetRegex(re.ProxyCacheMaxSizePattern).FindStringSubmatch(param)
-			if len(matches) > 0 {
-				res.CacheLimit, _ = strconv.ParseFloat(matches[1], 64)
-				res.CacheLimitUnit = matches[2]
-			}
-		}
-		if re.GetRegex(re.ProxyCacheInactivePattern).MatchString(param) {
-			matches := re.GetRegex(re.ProxyCacheInactivePattern).FindStringSubmatch(param)
-			if len(matches) > 0 {
-				res.CacheExpire, _ = strconv.Atoi(matches[1])
-				res.CacheExpireUnit = matches[2]
-			}
-		}
-	}
-	res.Open = true
-	return
-}
-
-func (w WebsiteService) GetProxies(id uint) (res []request.WebsiteProxyConfig, err error) {
-	var (
-		website  model.Website
-		fileList response.FileInfo
-	)
-	website, err = websiteRepo.GetFirst(repo.WithByID(id))
-	if err != nil {
-		return
-	}
-	includeDir := GetSitePath(website, SiteProxyDir)
-	fileOp := files.NewFileOp()
-	if !fileOp.Stat(includeDir) {
-		return
-	}
-	fileList, err = NewIFileService().GetFileList(request.FileOption{FileOption: files.FileOption{Path: includeDir, Expand: true, Page: 1, PageSize: 100}})
-	if len(fileList.Items) == 0 {
-		return
-	}
-	var (
-		content []byte
-		config  *components.Config
-	)
-	for _, configFile := range fileList.Items {
-		proxyConfig := request.WebsiteProxyConfig{
-			ID: website.ID,
-		}
-		parts := strings.Split(configFile.Name, ".")
-		proxyConfig.Name = parts[0]
-		if parts[1] == "conf" {
-			proxyConfig.Enable = true
-		} else {
-			proxyConfig.Enable = false
-		}
-		proxyConfig.FilePath = configFile.Path
-		content, err = fileOp.GetContent(configFile.Path)
-		if err != nil {
-			return
-		}
-		proxyConfig.Content = string(content)
-		config, err = parser.NewStringParser(string(content)).Parse()
-		if err != nil {
-			return nil, err
-		}
-		directives := config.GetDirectives()
-
-		var location *components.Location
-		for _, directive := range directives {
-			if loc, ok := directive.(*components.Location); ok {
-				location = loc
-				break
-			}
-		}
-		if location == nil {
-			err = errors.New("invalid proxy config, no location found")
-			return
-		}
-		proxyConfig.ProxyPass = location.ProxyPass
-		proxyConfig.Cache = location.Cache
-		proxyConfig.CacheTime = location.CacheTime
-		proxyConfig.CacheUnit = location.CacheUint
-		if location.ServerCacheTime > 0 {
-			proxyConfig.ServerCacheTime = location.ServerCacheTime
-			proxyConfig.ServerCacheUnit = location.ServerCacheUint
-		}
-		proxyConfig.Match = location.Match
-		proxyConfig.Modifier = location.Modifier
-		proxyConfig.ProxyHost = location.Host
-		proxyConfig.Replaces = location.Replaces
-		for _, directive := range location.Directives {
-			if directive.GetName() == "proxy_ssl_server_name" {
-				proxyConfig.SNI = directive.GetParameters()[0] == "on"
-			}
-			if directive.GetName() == "proxy_ssl_name" && len(directive.GetParameters()) > 0 {
-				proxyConfig.ProxySSLName = directive.GetParameters()[0]
-			}
-		}
-		proxyConfig.Cors = location.Cors
-		proxyConfig.AllowCredentials = location.AllowCredentials
-		proxyConfig.AllowHeaders = location.AllowHeaders
-		proxyConfig.AllowOrigins = location.AllowOrigins
-		proxyConfig.AllowMethods = location.AllowMethods
-		proxyConfig.Preflight = location.Preflight
-		res = append(res, proxyConfig)
-	}
-	return
-}
-
-func (w WebsiteService) UpdateProxyFile(req request.NginxProxyUpdate) (err error) {
-	var (
-		website           model.Website
-		oldRewriteContent []byte
-	)
-	website, err = websiteRepo.GetFirst(repo.WithByID(req.WebsiteID))
-	if err != nil {
-		return err
-	}
-	absolutePath := fmt.Sprintf("%s/%s.conf", GetSitePath(website, SiteProxyDir), req.Name)
-	fileOp := files.NewFileOp()
-	oldRewriteContent, err = fileOp.GetContent(absolutePath)
-	if err != nil {
-		return err
-	}
-	if err = fileOp.WriteFile(absolutePath, strings.NewReader(req.Content), constant.DirPerm); err != nil {
-		return err
-	}
-	defer func() {
-		if err != nil {
-			_ = fileOp.WriteFile(absolutePath, bytes.NewReader(oldRewriteContent), constant.DirPerm)
-		}
-	}()
-	return updateNginxConfig(constant.NginxScopeServer, nil, &website)
-}
-
-func (w WebsiteService) ClearProxyCache(req request.NginxCommonReq) error {
-	website, err := websiteRepo.GetFirst(repo.WithByID(req.WebsiteID))
-	if err != nil {
-		return err
-	}
-	cacheDir := GetSitePath(website, SiteCacheDir)
-	fileOp := files.NewFileOp()
-	if fileOp.Stat(cacheDir) {
-		if err = fileOp.CleanDir(cacheDir); err != nil {
-			return err
-		}
-	}
-	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
-	if err != nil {
-		return err
-	}
-	if err = opNginx(nginxInstall.ContainerName, constant.NginxReload); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (w WebsiteService) DeleteProxy(req request.WebsiteProxyDel) (err error) {
-	fileOp := files.NewFileOp()
-	website, err := websiteRepo.GetFirst(repo.WithByID(req.ID))
-	if err != nil {
-		return
-	}
-	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
-	if err != nil {
-		return
-	}
-	includeDir := path.Join(nginxInstall.GetPath(), "www", "sites", website.Alias, "proxy")
-	if !fileOp.Stat(includeDir) {
-		_ = fileOp.CreateDir(includeDir, 0755)
-	}
-	fileName := fmt.Sprintf("%s.conf", req.Name)
-	includePath := path.Join(includeDir, fileName)
-	backName := fmt.Sprintf("%s.bak", req.Name)
-	backPath := path.Join(includeDir, backName)
-	_ = fileOp.DeleteFile(includePath)
-	_ = fileOp.DeleteFile(backPath)
-	return updateNginxConfig(constant.NginxScopeServer, nil, &website)
 }
 
 func (w WebsiteService) UpdateCors(req request.CorsConfigReq) error {
@@ -2104,296 +1481,6 @@ func (w WebsiteService) GetCors(websiteID uint) (*request.CorsConfig, error) {
 		Preflight:        server.Preflight,
 	}
 	return cors, nil
-}
-
-func (w WebsiteService) GetAuthBasics(req request.NginxAuthReq) (res response.NginxAuthRes, err error) {
-	var (
-		website     model.Website
-		authContent []byte
-		nginxParams []response.NginxParam
-	)
-	website, err = websiteRepo.GetFirst(repo.WithByID(req.WebsiteID))
-	if err != nil {
-		return
-	}
-	absoluteAuthPath := GetSitePath(website, SiteRootAuthBasicPath)
-	fileOp := files.NewFileOp()
-	if !fileOp.Stat(absoluteAuthPath) {
-		return
-	}
-	nginxParams, err = getNginxParamsByKeys(constant.NginxScopeServer, []string{"auth_basic"}, &website)
-	if err != nil {
-		return
-	}
-	res.Enable = len(nginxParams[0].Params) > 0
-	authContent, err = fileOp.GetContent(absoluteAuthPath)
-	authArray := strings.Split(string(authContent), "\n")
-	for _, line := range authArray {
-		if line == "" {
-			continue
-		}
-		params := strings.Split(line, ":")
-		auth := dto.NginxAuth{
-			Username: params[0],
-		}
-		if len(params) == 3 {
-			auth.Remark = params[2]
-		}
-		res.Items = append(res.Items, auth)
-	}
-	return
-}
-
-func (w WebsiteService) UpdateAuthBasic(req request.NginxAuthUpdate) (err error) {
-	var (
-		website     model.Website
-		params      []dto.NginxParam
-		authContent []byte
-		authArray   []string
-	)
-	website, err = websiteRepo.GetFirst(repo.WithByID(req.WebsiteID))
-	if err != nil {
-		return err
-	}
-	authPath := fmt.Sprintf("/www/sites/%s/auth_basic/auth.pass", website.Alias)
-	absoluteAuthPath := GetSitePath(website, SiteRootAuthBasicPath)
-	fileOp := files.NewFileOp()
-	if !fileOp.Stat(path.Dir(absoluteAuthPath)) {
-		_ = fileOp.CreateDir(path.Dir(absoluteAuthPath), constant.DirPerm)
-	}
-	if !fileOp.Stat(absoluteAuthPath) {
-		_ = fileOp.CreateFile(absoluteAuthPath)
-	}
-
-	params = append(params, dto.NginxParam{Name: "auth_basic", Params: []string{`"Authentication"`}})
-	params = append(params, dto.NginxParam{Name: "auth_basic_user_file", Params: []string{authPath}})
-	authContent, err = fileOp.GetContent(absoluteAuthPath)
-	if err != nil {
-		return
-	}
-	if len(authContent) > 0 {
-		authArray = strings.Split(string(authContent), "\n")
-	}
-	switch req.Operate {
-	case "disable":
-		return deleteNginxConfig(constant.NginxScopeServer, params, &website)
-	case "enable":
-		return updateNginxConfig(constant.NginxScopeServer, params, &website)
-	case "create":
-		for _, line := range authArray {
-			authParams := strings.Split(line, ":")
-			username := authParams[0]
-			if username == req.Username {
-				err = buserr.New("ErrUsernameIsExist")
-				return
-			}
-		}
-		var passwdHash []byte
-		passwdHash, err = bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
-		if err != nil {
-			return
-		}
-		line := fmt.Sprintf("%s:%s\n", req.Username, passwdHash)
-		if req.Remark != "" {
-			line = fmt.Sprintf("%s:%s:%s\n", req.Username, passwdHash, req.Remark)
-		}
-		authArray = append(authArray, line)
-	case "edit":
-		userExist := false
-		for index, line := range authArray {
-			authParams := strings.Split(line, ":")
-			username := authParams[0]
-			if username == req.Username {
-				userExist = true
-				var passwdHash []byte
-				passwdHash, err = bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
-				if err != nil {
-					return
-				}
-				userPasswd := fmt.Sprintf("%s:%s\n", req.Username, passwdHash)
-				if req.Remark != "" {
-					userPasswd = fmt.Sprintf("%s:%s:%s\n", req.Username, passwdHash, req.Remark)
-				}
-				authArray[index] = userPasswd
-			}
-		}
-		if !userExist {
-			err = buserr.New("ErrUsernameIsNotExist")
-			return
-		}
-	case "delete":
-		deleteIndex := -1
-		for index, line := range authArray {
-			authParams := strings.Split(line, ":")
-			username := authParams[0]
-			if username == req.Username {
-				deleteIndex = index
-			}
-		}
-		if deleteIndex < 0 {
-			return
-		}
-		authArray = append(authArray[:deleteIndex], authArray[deleteIndex+1:]...)
-	}
-
-	var passFile *os.File
-	passFile, err = os.Create(absoluteAuthPath)
-	if err != nil {
-		return
-	}
-	defer passFile.Close()
-	writer := bufio.NewWriter(passFile)
-	for _, line := range authArray {
-		if line == "" {
-			continue
-		}
-		_, err = writer.WriteString(line + "\n")
-		if err != nil {
-			return
-		}
-	}
-	err = writer.Flush()
-	if err != nil {
-		return
-	}
-	authContent, err = fileOp.GetContent(absoluteAuthPath)
-	if err != nil {
-		return
-	}
-	if len(authContent) == 0 {
-		if err = deleteNginxConfig(constant.NginxScopeServer, params, &website); err != nil {
-			return
-		}
-	}
-	return
-}
-
-func (w WebsiteService) GetPathAuthBasics(req request.NginxAuthReq) (res []response.NginxPathAuthRes, err error) {
-	var (
-		website     model.Website
-		authContent []byte
-	)
-	website, err = websiteRepo.GetFirst(repo.WithByID(req.WebsiteID))
-	if err != nil {
-		return
-	}
-	fileOp := files.NewFileOp()
-	absoluteAuthDir := GetSitePath(website, SitePathAuthBasicDir)
-	passDir := path.Join(absoluteAuthDir, "pass")
-	if !fileOp.Stat(absoluteAuthDir) || !fileOp.Stat(passDir) {
-		return
-	}
-
-	entries, err := os.ReadDir(absoluteAuthDir)
-	if err != nil {
-		return nil, err
-	}
-
-	for _, entry := range entries {
-		if !entry.IsDir() {
-			name := strings.TrimSuffix(entry.Name(), ".conf")
-			pathAuth := dto.NginxPathAuth{
-				Name: name,
-			}
-			configPath := path.Join(absoluteAuthDir, entry.Name())
-			content, err := fileOp.GetContent(configPath)
-			if err != nil {
-				return nil, err
-			}
-			config, err := parser.NewStringParser(string(content)).Parse()
-			if err != nil {
-				return nil, err
-			}
-			directives := config.Directives
-			location, _ := directives[0].(*components.Location)
-			pathAuth.Path = strings.TrimPrefix(location.Match, "^")
-			passPath := path.Join(passDir, fmt.Sprintf("%s.pass", name))
-			authContent, err = fileOp.GetContent(passPath)
-			if err != nil {
-				return nil, err
-			}
-			authArray := strings.Split(string(authContent), "\n")
-			for _, line := range authArray {
-				if line == "" {
-					continue
-				}
-				params := strings.Split(line, ":")
-				pathAuth.Username = params[0]
-				if len(params) == 3 {
-					pathAuth.Remark = params[2]
-				}
-			}
-			res = append(res, response.NginxPathAuthRes{
-				NginxPathAuth: pathAuth,
-			})
-		}
-	}
-	return
-}
-
-func (w WebsiteService) UpdatePathAuthBasic(req request.NginxPathAuthUpdate) error {
-	website, err := websiteRepo.GetFirst(repo.WithByID(req.WebsiteID))
-	if err != nil {
-		return err
-	}
-	fileOp := files.NewFileOp()
-	authDir := GetSitePath(website, SitePathAuthBasicDir)
-	if !fileOp.Stat(authDir) {
-		_ = fileOp.CreateDir(authDir, constant.DirPerm)
-	}
-	passDir := path.Join(authDir, "pass")
-	if !fileOp.Stat(passDir) {
-		_ = fileOp.CreateDir(passDir, constant.DirPerm)
-	}
-	confPath := path.Join(authDir, fmt.Sprintf("%s.conf", req.Name))
-	passPath := path.Join(passDir, fmt.Sprintf("%s.pass", req.Name))
-	var config *components.Config
-	switch req.Operate {
-	case "delete":
-		_ = fileOp.DeleteFile(confPath)
-		_ = fileOp.DeleteFile(passPath)
-		return updateNginxConfig(constant.NginxScopeServer, nil, &website)
-	case "create":
-		config, err = parser.NewStringParser(string(nginx_conf.PathAuth)).Parse()
-		if err != nil {
-			return err
-		}
-		if fileOp.Stat(confPath) || fileOp.Stat(passPath) {
-			return buserr.New("ErrNameIsExist")
-		}
-	case "edit":
-		par, err := parser.NewParser(confPath)
-		if err != nil {
-			return err
-		}
-		config, err = par.Parse()
-		if err != nil {
-			return err
-		}
-	}
-	config.FilePath = confPath
-	directives := config.Directives
-	location, _ := directives[0].(*components.Location)
-	location.UpdateDirective("auth_basic_user_file", []string{fmt.Sprintf("/www/sites/%s/path_auth/pass/%s", website.Alias, fmt.Sprintf("%s.pass", req.Name))})
-	location.ChangePath("~*", fmt.Sprintf("^%s", req.Path))
-	var passwdHash []byte
-	passwdHash, err = bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
-	if err != nil {
-		return err
-	}
-	line := fmt.Sprintf("%s:%s\n", req.Username, passwdHash)
-	if req.Remark != "" {
-		line = fmt.Sprintf("%s:%s:%s\n", req.Username, passwdHash, req.Remark)
-	}
-	_ = fileOp.SaveFile(passPath, line, constant.DirPerm)
-	if err = nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
-		return buserr.WithErr("ErrUpdateBuWebsite", err)
-	}
-	nginxInclude := fmt.Sprintf("/www/sites/%s/path_auth/*.conf", website.Alias)
-	if err = updateNginxConfig(constant.NginxScopeServer, []dto.NginxParam{{Name: "include", Params: []string{nginxInclude}}}, &website); err != nil {
-		return nil
-	}
-	return nil
 }
 
 func (w WebsiteService) UpdateAntiLeech(req request.NginxAntiLeechUpdate) (err error) {
@@ -3049,216 +2136,6 @@ func (w WebsiteService) UpdateDefaultHtml(req request.WebsiteHtmlUpdate) error {
 	return fileOp.SaveFile(resourcePath, req.Content, constant.DirPerm)
 }
 
-func (w WebsiteService) GetLoadBalances(id uint) ([]dto.NginxUpstream, error) {
-	website, err := websiteRepo.GetFirst(repo.WithByID(id))
-	if err != nil {
-		return nil, err
-	}
-	includeDir := GetSitePath(website, SiteUpstreamDir)
-	fileOp := files.NewFileOp()
-	if !fileOp.Stat(includeDir) {
-		return nil, nil
-	}
-	entries, err := os.ReadDir(includeDir)
-	if err != nil {
-		return nil, err
-	}
-	var res []dto.NginxUpstream
-	for _, entry := range entries {
-		if entry.IsDir() {
-			continue
-		}
-		name := entry.Name()
-		if !strings.HasSuffix(name, ".conf") {
-			continue
-		}
-		upstreamName := strings.TrimSuffix(name, ".conf")
-		upstream := dto.NginxUpstream{
-			Name: upstreamName,
-		}
-		upstreamPath := path.Join(includeDir, name)
-		content, err := fileOp.GetContent(upstreamPath)
-		if err != nil {
-			return nil, err
-		}
-		upstream.Content = string(content)
-		nginxParser, err := parser.NewParser(upstreamPath)
-		if err != nil {
-			return nil, err
-		}
-		config, err := nginxParser.Parse()
-		if err != nil {
-			return nil, err
-		}
-		upstreams := config.FindUpstreams()
-		for _, up := range upstreams {
-			if up.UpstreamName == upstreamName {
-				directives := up.GetDirectives()
-				for _, d := range directives {
-					dName := d.GetName()
-					if _, ok := dto.LBAlgorithms[dName]; ok {
-						upstream.Algorithm = dName
-					}
-				}
-				upstream.Servers = getNginxUpstreamServers(up.UpstreamServers)
-			}
-		}
-		res = append(res, upstream)
-	}
-	return res, nil
-}
-
-func (w WebsiteService) CreateLoadBalance(req request.WebsiteLBCreate) error {
-	website, err := websiteRepo.GetFirst(repo.WithByID(req.WebsiteID))
-	if err != nil {
-		return err
-	}
-	includeDir := GetSitePath(website, SiteUpstreamDir)
-	fileOp := files.NewFileOp()
-	if !fileOp.Stat(includeDir) {
-		_ = fileOp.CreateDir(includeDir, constant.DirPerm)
-	}
-	filePath := path.Join(includeDir, fmt.Sprintf("%s.conf", req.Name))
-	if fileOp.Stat(filePath) {
-		return buserr.New("ErrNameIsExist")
-	}
-	config, err := parser.NewStringParser(string(nginx_conf.Upstream)).Parse()
-	if err != nil {
-		return err
-	}
-	config.Block = &components.Block{}
-	config.FilePath = filePath
-	upstream := components.Upstream{
-		UpstreamName: req.Name,
-	}
-	if req.Algorithm != "default" {
-		upstream.UpdateDirective(req.Algorithm, []string{})
-	}
-	upstream.UpstreamServers = parseUpstreamServers(req.Servers)
-	config.Block.Directives = append(config.Block.Directives, &upstream)
-
-	defer func() {
-		if err != nil {
-			_ = fileOp.DeleteFile(filePath)
-		}
-	}()
-
-	if err = nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
-		return buserr.WithErr("ErrUpdateBuWebsite", err)
-	}
-	nginxInclude := fmt.Sprintf("/www/sites/%s/upstream/*.conf", website.Alias)
-	if err = updateNginxConfig("", []dto.NginxParam{{Name: "include", Params: []string{nginxInclude}}}, &website); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (w WebsiteService) UpdateLoadBalance(req request.WebsiteLBUpdate) error {
-	website, err := websiteRepo.GetFirst(repo.WithByID(req.WebsiteID))
-	if err != nil {
-		return err
-	}
-	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
-	if err != nil {
-		return err
-	}
-	includeDir := GetSitePath(website, SiteUpstreamDir)
-	fileOp := files.NewFileOp()
-	filePath := path.Join(includeDir, fmt.Sprintf("%s.conf", req.Name))
-	if !fileOp.Stat(filePath) {
-		return nil
-	}
-	oldContent, err := fileOp.GetContent(filePath)
-	if err != nil {
-		return err
-	}
-	parser, err := parser.NewParser(filePath)
-	if err != nil {
-		return err
-	}
-	config, err := parser.Parse()
-	if err != nil {
-		return err
-	}
-	upstreams := config.FindUpstreams()
-	for _, up := range upstreams {
-		if up.UpstreamName == req.Name {
-			directives := up.GetDirectives()
-			for _, d := range directives {
-				dName := d.GetName()
-				if _, ok := dto.LBAlgorithms[dName]; ok {
-					up.RemoveDirective(dName, nil)
-				}
-			}
-			if req.Algorithm != "default" {
-				up.UpdateDirective(req.Algorithm, []string{})
-			}
-			up.UpstreamServers = parseUpstreamServers(req.Servers)
-		}
-	}
-	if err = nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
-		return buserr.WithErr("ErrUpdateBuWebsite", err)
-	}
-	return nginxCheckAndReload(string(oldContent), filePath, nginxInstall.ContainerName)
-}
-
-func (w WebsiteService) DeleteLoadBalance(req request.WebsiteLBDelete) error {
-	website, err := websiteRepo.GetFirst(repo.WithByID(req.WebsiteID))
-	if err != nil {
-		return err
-	}
-	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
-	if err != nil {
-		return err
-	}
-	proxies, _ := w.GetProxies(website.ID)
-	if len(proxies) > 0 {
-		for _, proxy := range proxies {
-			if strings.HasSuffix(proxy.ProxyPass, fmt.Sprintf("://%s", req.Name)) {
-				return buserr.New("ErrProxyIsUsed")
-			}
-		}
-	}
-
-	includeDir := GetSitePath(website, SiteUpstreamDir)
-	fileOp := files.NewFileOp()
-	filePath := path.Join(includeDir, fmt.Sprintf("%s.conf", req.Name))
-	if !fileOp.Stat(filePath) {
-		return nil
-	}
-	if err = fileOp.DeleteFile(filePath); err != nil {
-		return err
-	}
-	return opNginx(nginxInstall.ContainerName, constant.NginxReload)
-}
-
-func (w WebsiteService) UpdateLoadBalanceFile(req request.WebsiteLBUpdateFile) error {
-	website, err := websiteRepo.GetFirst(repo.WithByID(req.WebsiteID))
-	if err != nil {
-		return err
-	}
-	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
-	if err != nil {
-		return err
-	}
-	includeDir := GetSitePath(website, SiteUpstreamDir)
-	filePath := path.Join(includeDir, fmt.Sprintf("%s.conf", req.Name))
-	fileOp := files.NewFileOp()
-	oldContent, err := fileOp.GetContent(filePath)
-	if err != nil {
-		return err
-	}
-	if err = fileOp.WriteFile(filePath, strings.NewReader(req.Content), constant.DirPerm); err != nil {
-		return err
-	}
-	defer func() {
-		if err != nil {
-			_ = fileOp.WriteFile(filePath, bytes.NewReader(oldContent), constant.DirPerm)
-		}
-	}()
-	return opNginx(nginxInstall.ContainerName, constant.NginxReload)
-}
-
 func (w WebsiteService) ChangeGroup(group, newGroup uint) error {
 	return websiteRepo.UpdateGroup(group, newGroup)
 }
@@ -3520,4 +2397,58 @@ func (w WebsiteService) ExecComposer(req request.ExecComposerReq) error {
 		_ = composerTask.Execute()
 	}()
 	return nil
+}
+
+func (w WebsiteService) UpdateStream(req request.StreamUpdate) error {
+	website, err := websiteRepo.GetFirst(repo.WithByID(req.WebsiteID))
+	if err != nil {
+		return err
+	}
+	nginxFull, err := getNginxFull(&website)
+	if err != nil {
+		return nil
+	}
+	website.StreamPorts = req.StreamConfig.StreamPorts
+	ports := strings.Split(req.StreamConfig.StreamPorts, ",")
+	for _, port := range ports {
+		portNum, _ := strconv.Atoi(port)
+		if err = checkWebsitePort(nginxFull.Install.HttpsPort, portNum, website.Type); err != nil {
+			return err
+		}
+	}
+
+	config := nginxFull.SiteConfig.Config
+	servers := config.FindServers()
+	if len(servers) == 0 {
+		return errors.New("nginx config is not valid")
+	}
+	server := servers[0]
+	server.Listens = []*components.ServerListen{}
+	for _, port := range ports {
+		server.UpdateListen(port, false)
+		if website.IPV6 {
+			server.UpdateListen("[::]:"+port, false)
+		}
+	}
+	upstream := components.Upstream{
+		UpstreamName: website.Alias,
+	}
+	if req.Algorithm != "default" {
+		upstream.UpdateDirective(req.Algorithm, []string{})
+	}
+	upstream.UpstreamServers = parseUpstreamServers(req.Servers)
+	for i, dir := range config.Block.Directives {
+		if dir.GetName() == "upstream" && dir.GetParameters()[0] == website.Alias {
+			config.Block.Directives[i] = &upstream
+		}
+	}
+
+	if err := nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
+		return err
+	}
+	if err = nginxCheckAndReload(nginxFull.SiteConfig.OldContent, config.FilePath, nginxFull.Install.ContainerName); err != nil {
+		return err
+	}
+	website.StreamPorts = req.StreamConfig.StreamPorts
+	return websiteRepo.Save(context.Background(), &website)
 }

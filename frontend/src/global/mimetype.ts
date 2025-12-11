@@ -412,23 +412,31 @@ export const Actions = [
     },
 ];
 
-export const getAlgorithms = () => [
-    {
-        label: i18n.global.t('commons.table.default'),
-        value: 'default',
-        placeHolder: i18n.global.t('website.defaultHelper'),
-    },
-    {
-        label: i18n.global.t('website.ipHash'),
-        value: 'ip_hash',
-        placeHolder: i18n.global.t('website.ipHashHelper'),
-    },
-    {
-        label: i18n.global.t('website.leastConn'),
-        value: 'least_conn',
-        placeHolder: i18n.global.t('website.leastConnHelper'),
-    },
-];
+export const getAlgorithms = (type: string) => {
+    const baseAlgorithms = [
+        {
+            label: i18n.global.t('commons.table.default'),
+            value: 'default',
+            placeHolder: i18n.global.t('website.defaultHelper'),
+        },
+        {
+            label: i18n.global.t('website.ipHash'),
+            value: 'ip_hash',
+            placeHolder: i18n.global.t('website.ipHashHelper'),
+        },
+        {
+            label: i18n.global.t('website.leastConn'),
+            value: 'least_conn',
+            placeHolder: i18n.global.t('website.leastConnHelper'),
+        },
+    ];
+
+    if (type === 'stream') {
+        return baseAlgorithms.filter((algo) => algo.value !== 'ip_hash');
+    }
+
+    return baseAlgorithms;
+};
 
 export const getStatusStrategy = () => [
     {
@@ -461,5 +469,9 @@ export const getWebsiteTypes = () => [
     {
         label: i18n.global.t('website.subsite'),
         value: 'subsite',
+    },
+    {
+        label: i18n.global.t('website.stream'),
+        value: 'stream',
     },
 ];

@@ -2677,6 +2677,9 @@ const message = {
 
         batchOpreate: 'Operasi Pukal',
         batchOpreateHelper: 'Pukal {0} laman web, teruskan operasi?',
+        stream: 'Proksi TCP/UDP',
+        streamPorts: 'Port Mendengar',
+        streamPortsHelper: 'Sila asingkan dengan koma, contoh: 3306, 3307',
     },
     php: {
         short_open_tag: 'Sokongan tag pendek',

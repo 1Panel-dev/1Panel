@@ -1223,3 +1223,23 @@ func (b *BaseApi) UpdateCORSConfig(c *gin.Context) {
 	}
 	helper.Success(c)
 }
+
+// @Tags Website
+// @Summary Update Stream Config
+// @Accept json
+// @Param request body request.StreamUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /websites/stream/update [post]
+func (b *BaseApi) UpdateStreamConfig(c *gin.Context) {
+	var req request.StreamUpdate
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := websiteService.UpdateStream(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}

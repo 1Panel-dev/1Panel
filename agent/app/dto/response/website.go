@@ -3,6 +3,7 @@ package response
 import (
 	"time"
 
+	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 )
 
@@ -16,6 +17,9 @@ type WebsiteDTO struct {
 	RuntimeType   string `json:"runtimeType"`
 	SiteDir       string `json:"siteDir"`
 	OpenBaseDir   bool   `json:"openBaseDir"`
+	Algorithm     string `json:"algorithm"`
+
+	Servers []dto.NginxUpstreamServer `json:"servers"`
 }
 
 type WebsiteRes struct {

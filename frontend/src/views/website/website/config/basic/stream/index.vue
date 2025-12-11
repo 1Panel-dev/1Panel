@@ -1,0 +1,73 @@
+<template>
+    <div>
+        <el-form ref="streamFormRef" :model="form" label-width="120px" label-position="top">
+            <el-row v-loading="loading">
+                <el-col :span="12" :offset="1">
+                    <el-form-item :label="$t('website.streamPorts')" :rules="Rules.requiredInput">
+                        <el-input v-model="form.streamPorts" />
+                    </el-form-item>
+                    <LoadBalanceForm ref="lbFormRef" v-model="form" :disabled="true" />
+                    <el-form-item>
+                        <el-button type="primary" @click="submit()" class="mt-2">
+                            {{ $t('commons.button.save') }}
+                        </el-button>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+        </el-form>
+    </div>
+</template>
+
+<script lang="ts" setup>
+import LoadBalanceForm from '@/views/website/website/config/basic/load-balance/form/index.vue';
+
+import { getWebsite, updateWebsiteStream } from '@/api/modules/website';
+import { ref, onMounted } from 'vue';
+import { Rules } from '@/global/form-rules';
+import { MsgError, MsgSuccess } from '@/utils/message';
+import i18n from '@/lang';
+
+const props = defineProps({
+    id: {
+        type: Number,
+        default: 0,
+    },
+});
+const form = ref({
+    streamPorts: '',
+    servers: [],
+    name: '',
+    algorithm: '',
+    websiteID: props.id,
+});
+const streamFormRef = ref();
+const lbFormRef = ref();
+const loading = ref(false);
+
+const submit = async () => {
+    try {
+        loading.value = true;
+        const formValid = await streamFormRef.value?.validate();
+        if (!formValid) return;
+        const lbValid = await lbFormRef.value?.validate();
+        if (!lbValid) return;
+        await updateWebsiteStream(form.value);
+        MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
+    } catch (error) {
+        if (error.message != '') {
+            MsgError(error.message);
+        }
+    } finally {
+        loading.value = false;
+    }
+};
+
+onMounted(async () => {
+    const res = await getWebsite(props.id);
+    form.value.streamPorts = res.data.streamPorts;
+    form.value.servers = res.data.servers;
+    form.value.name = res.data.primaryDomain;
+    form.value.algorithm = res.data.algorithm == '' ? 'default' : res.data.algorithm;
+    form.value.streamPorts = res.data.streamPorts;
+});
+</script>

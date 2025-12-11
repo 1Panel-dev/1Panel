@@ -37,6 +37,8 @@ type Website struct {
 
 	Favorite bool `json:"favorite"`
 
+	StreamPorts string `json:"streamPorts"`
+
 	Domains    []WebsiteDomain `json:"domains" gorm:"-:migration"`
 	WebsiteSSL WebsiteSSL      `json:"webSiteSSL" gorm:"-:migration"`
 }
