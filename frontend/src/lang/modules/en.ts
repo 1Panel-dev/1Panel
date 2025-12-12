@@ -3817,6 +3817,9 @@ const message = {
             offline: 'Offline mode',
             freeCount: 'Free quota [{0}]',
             offlineHelper: 'Used when the node is in an offline environment',
+
+            appUpgrade: 'App Upgrade',
+            appUpgradeHelper: 'There are {0} apps that need to be upgraded',
         },
         customApp: {
             name: 'Custom App Repository',

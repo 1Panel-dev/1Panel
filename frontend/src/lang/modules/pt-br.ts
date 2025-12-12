@@ -3793,6 +3793,9 @@ const message = {
             offline: 'Modo offline',
             freeCount: 'Cota gratuita [{0}]',
             offlineHelper: 'Usado quando o nó está em ambiente offline',
+
+            appUpgrade: 'Atualização do Aplicativo',
+            appUpgradeHelper: 'Existem {0} aplicativos que precisam ser atualizados',
         },
         customApp: {
             name: 'Repositório de Aplicativos Personalizados',

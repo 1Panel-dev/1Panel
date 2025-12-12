@@ -3519,6 +3519,9 @@ const message = {
             offline: '離線模式',
             freeCount: '免費額度 [{0}]',
             offlineHelper: '當節點處於離線環境時使用',
+
+            appUpgrade: '應用程式升級',
+            appUpgradeHelper: '有 {0} 個應用程式需要升級',
         },
         customApp: {
             name: '自訂應用倉庫',

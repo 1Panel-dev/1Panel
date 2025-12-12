@@ -41,8 +41,9 @@ export const changePort = (params: App.ChangePort) => {
     return http.post<any>('apps/installed/port/change', params);
 };
 
-export const searchAppInstalled = (search: App.AppInstallSearch) => {
-    return http.post<ResPage<App.AppInstallDto>>('apps/installed/search', search);
+export const searchAppInstalled = (search: App.AppInstallSearch, node?: string) => {
+    const params = node ? `?operateNode=${node}` : '';
+    return http.post<ResPage<App.AppInstallDto>>(`apps/installed/search${params}`, search);
 };
 
 export const listAppInstalled = () => {
@@ -89,8 +90,9 @@ export const getAppService = (key: string | undefined, node?: string) => {
     return http.get<App.AppService[]>(`apps/services/${key}${params}`);
 };
 
-export const getAppUpdateVersions = (req: App.AppUpdateVersionReq) => {
-    return http.post<any>(`apps/installed/update/versions`, req);
+export const getAppUpdateVersions = (req: App.AppUpdateVersionReq, node?: string) => {
+    const params = node ? `?operateNode=${node}` : '';
+    return http.post<any>(`apps/installed/update/versions${params}`, req);
 };
 
 export const getAppDefaultConfig = (key: string, name: string) => {

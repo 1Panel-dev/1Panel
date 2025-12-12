@@ -3636,6 +3636,9 @@ const message = {
             offline: '오프라인 모드',
             freeCount: '무료 할당량 [{0}]',
             offlineHelper: '노드가 오프라인 환경일 때 사용',
+
+            appUpgrade: '앱 업그레이드',
+            appUpgradeHelper: '업그레이드가 필요한 앱이 {0}개 있습니다',
         },
         customApp: {
             name: '사용자 정의 앱 저장소',

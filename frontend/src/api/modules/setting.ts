@@ -55,6 +55,10 @@ export const getLicenseSmsInfo = () => {
     return http.get<Setting.SmsInfo>(`/core/licenses/sms/info`);
 };
 
+export const listAppNodes = () => {
+    return http.get<Array<Setting.NodeAppItem>>(`/core/xpack/nodes/apps/update`);
+};
+
 // agent
 export const loadBaseDir = () => {
     return http.get<string>(`/settings/basedir`);

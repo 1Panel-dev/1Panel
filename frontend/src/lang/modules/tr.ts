@@ -3856,6 +3856,9 @@ const message = {
             offline: 'Çevrimdışı mod',
             freeCount: 'Ücretsiz kota [{0}]',
             offlineHelper: 'Düğüm çevrimdışı bir ortamda olduğunda kullanılır',
+
+            appUpgrade: 'Uygulama Yükseltme',
+            appUpgradeHelper: 'Yükseltilmesi gereken {0} uygulama var',
         },
         customApp: {
             name: 'Özel Uygulama Deposu',

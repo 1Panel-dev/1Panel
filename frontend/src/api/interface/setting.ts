@@ -287,4 +287,9 @@ export namespace Setting {
         smsUsed: number;
         smsTotal: number;
     }
+
+    export interface NodeAppItem {
+        name: string;
+        updateCount: number;
+    }
 }

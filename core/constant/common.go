@@ -169,6 +169,7 @@ var WebUrlMap = map[string]struct{}{
 	"/xpack/simple-node":     {},
 	"/xpack/exchange/file":   {},
 	"/xpack/app":             {},
+	"/xpack/app-upgrade":     {},
 
 	"/xpack/cluster/mysql":    {},
 	"/xpack/cluster/postgres": {},

@@ -3774,6 +3774,9 @@ const message = {
             offline: 'Mod luar talian',
             freeCount: 'Had percuma [{0}]',
             offlineHelper: 'Digunakan apabila nod berada dalam persekitaran luar talian',
+
+            appUpgrade: 'Naik Taraf Apl',
+            appUpgradeHelper: 'Terdapat {0} apl yang perlu dinaik taraf',
         },
         customApp: {
             name: 'Repositori Aplikasi Khusus',

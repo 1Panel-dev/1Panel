@@ -3705,6 +3705,9 @@ const message = {
             offline: 'オフラインモード',
             freeCount: '無料枠 [{0}]',
             offlineHelper: 'ノードがオフライン環境にある場合に使用',
+
+            appUpgrade: 'アプリのアップグレード',
+            appUpgradeHelper: 'アップグレードが必要なアプリが {0} 個あります',
         },
         customApp: {
             name: 'カスタムアプリリポジトリ',

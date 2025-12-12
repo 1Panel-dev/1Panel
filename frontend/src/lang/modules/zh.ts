@@ -3513,6 +3513,9 @@ const message = {
             offline: '离线模式',
             freeCount: '免费额度 [{0}] ',
             offlineHelper: '节点为离线环境时使用',
+
+            appUpgrade: '应用升级',
+            appUpgradeHelper: '有 {0} 个应用需要升级',
         },
         customApp: {
             name: '自定义仓库',
