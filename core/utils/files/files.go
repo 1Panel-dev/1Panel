@@ -73,6 +73,25 @@ func CopyItem(isDir, withName bool, src, dst string) error {
 	return nil
 }
 
+func CopyFileWithRename(src, dst string) error {
+	srcInfo, err := os.Stat(path.Dir(src))
+	if err != nil {
+		return err
+	}
+	if _, err := os.Stat(path.Dir(dst)); err != nil {
+		if os.IsNotExist(err) {
+			_ = os.MkdirAll(path.Dir(dst), srcInfo.Mode())
+		}
+	}
+	if err := cmd.RunDefaultBashCf("cp -f %s %s.tmp", src, dst); err != nil {
+		return fmt.Errorf("handle cp file failed, err: %v", err)
+	}
+	if err = cmd.RunDefaultBashCf("mv %s.tmp %s", dst, dst); err != nil {
+		return err
+	}
+	return nil
+}
+
 func HandleTar(sourceDir, targetDir, name, exclusionRules string, secret string) error {
 	if _, err := os.Stat(targetDir); err != nil && os.IsNotExist(err) {
 		if err = os.MkdirAll(targetDir, os.ModePerm); err != nil {
