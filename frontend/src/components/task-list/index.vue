@@ -1,13 +1,10 @@
 <template>
-    <DrawerPro
-        v-model="open"
-        size="large"
-        :header="$t('menu.msgCenter')"
-        :resource="globalStore.currentNode"
-        @close="handleClose"
-    >
+    <DrawerPro v-model="open" size="large" :header="$t('menu.msgCenter')" @close="handleClose">
         <template #content>
             <LayoutContent v-loading="loading" :title="$t('logs.task')">
+                <template #leftToolBar>
+                    <NodeSelect v-model="targeNode" @change="search()" />
+                </template>
                 <template #rightToolBar>
                     <el-select v-model="req.status" @change="search()" clearable class="p-w-200">
                         <template #prefix>{{ $t('commons.table.status') }}</template>
@@ -50,11 +47,13 @@
 </template>
 
 <script setup lang="ts">
+import TaskLog from '@/components/log/task/index.vue';
+import NodeSelect from '@/components/node-select/index.vue';
+
 import { dateFormat } from '@/utils/util';
 import { searchTasks } from '@/api/modules/log';
 import { reactive, ref } from 'vue';
 import { Log } from '@/api/interface/log';
-import TaskLog from '@/components/log/task/index.vue';
 import bus from '@/global/bus';
 import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();
@@ -79,6 +78,7 @@ const req = reactive({
     page: 1,
     pageSize: 10,
 });
+const targeNode = ref('local');
 
 const search = async () => {
     bus.emit('refreshTask', true);
@@ -86,7 +86,7 @@ const search = async () => {
     req.pageSize = paginationConfig.pageSize;
     loading.value = true;
     try {
-        const res = await searchTasks(req);
+        const res = await searchTasks(req, targeNode.value);
         loading.value = false;
         data.value = res.data.items;
         paginationConfig.total = res.data.total;
@@ -101,6 +101,7 @@ const openTaskLog = (row: Log.Task) => {
 };
 
 const acceptParams = () => {
+    targeNode.value = globalStore.currentNode;
     search();
     open.value = true;
 };

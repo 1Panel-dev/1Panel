@@ -18,8 +18,9 @@ export const cleanLogs = (param: Log.CleanLog) => {
     return http.post(`/core/logs/clean`, param);
 };
 
-export const searchTasks = (req: Log.SearchTaskReq) => {
-    return http.post<ResPage<Log.Task>>(`/logs/tasks/search`, req);
+export const searchTasks = (req: Log.SearchTaskReq, node?: string) => {
+    const params = node ? `?operateNode=${node}` : '';
+    return http.post<ResPage<Log.Task>>(`/logs/tasks/search${params}`, req);
 };
 
 export const countExecutingTask = () => {
