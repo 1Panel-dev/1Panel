@@ -256,6 +256,7 @@ InExecuting: "A tarefa atual está sendo executada, não repita a execução!"
 NoSuchResource: "Nenhum conteúdo de backup encontrado no banco de dados, ignorando..."
 CleanLog: "Limpar log"
 CleanLogByName: "Limpar log de {{.name}}"
+WafIpGroupNotFound: "Grupo de IP do WAF não encontrado, por favor, adicione-o primeiro!"
 
 #caixa de ferramentas
 ErrNotExistUser: 'O usuário atual não existe, modifique e tente novamente!'

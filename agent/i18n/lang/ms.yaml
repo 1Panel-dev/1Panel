@@ -256,6 +256,7 @@ InExecuting: "Tugas semasa sedang dilaksanakan, jangan ulangi pelaksanaan!"
 NoSuchResource: "Tiada kandungan sandaran ditemui dalam pangkalan data, dilangkau..."
 CleanLog: "Bersihkan log"
 CleanLogByName: "Bersihkan log {{.name}}"
+WafIpGroupNotFound: "Kumpulan IP WAF tidak dijumpai, sila tambahkannya dahulu!"
 
 #kotak alat
 ErrNotExistUser: 'Pengguna semasa tidak wujud, sila ubah suai dan cuba lagi!'

@@ -275,6 +275,10 @@ func (u *CronjobService) handleSyncIpGroup(cronjob model.Cronjob, taskItem *task
 		}
 		ipGroupDir := pathUtils.Join(appInstall.GetPath(), "1pwaf", "data", "rules", "ip_group")
 		urlDir := pathUtils.Join(ipGroupDir, "ip_group_url")
+		_, err = os.Stat(urlDir)
+		if err != nil && os.IsNotExist(err) {
+			return buserr.New("WafIpGroupNotFound")
+		}
 
 		urlsFiles, err := os.ReadDir(urlDir)
 		if err != nil {
