@@ -414,9 +414,7 @@ func (m *MonitorService) saveIODataToDB(ctx context.Context, interval float64) {
 						}
 					}
 				}
-				if err := monitorRepo.BatchCreateMonitorIO(ioList); err != nil {
-					global.LOG.Errorf("Insert io monitoring data failed, err: %v", err)
-				}
+				_ = monitorRepo.BatchCreateMonitorIO(ioList)
 				m.DiskIO <- ioStat2
 			}
 		}
@@ -453,9 +451,7 @@ func (m *MonitorService) saveNetDataToDB(ctx context.Context, interval float64) 
 					}
 				}
 
-				if err := monitorRepo.BatchCreateMonitorNet(netList); err != nil {
-					global.LOG.Errorf("Insert network monitoring data failed, err: %v", err)
-				}
+				_ = monitorRepo.BatchCreateMonitorNet(netList)
 				m.NetIO <- netStat2
 			}
 		}
