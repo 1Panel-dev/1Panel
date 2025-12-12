@@ -775,6 +775,8 @@ const message = {
         operatorHelper: 'Aşağıdaki konteynerde {0} işlemi gerçekleştirilecek, devam etmek istiyor musunuz?',
         operatorAppHelper:
             'Aşağıdaki konteyner(ler)de "{0}" işlemi gerçekleştirilecek ve çalışan hizmetleri etkileyebilir. Devam etmek istiyor musunuz?',
+        containerDeleteHelper:
+            "Kapsayıcının Uygulama Mağazası'ndan geldiği tespit edildi. Kapsayıcıyı silmek, onu 1Panel'den tamamen kaldırmaz. Tamamen silmek için lütfen Uygulama Mağazası -> 'Yüklü' veya 'Çalışma Ortamı' menülerine gidin. Devam edilsin mi?",
         start: 'Başlat',
         stop: 'Durdur',
         restart: 'Yeniden başlat',

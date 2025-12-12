@@ -759,6 +759,8 @@ const message = {
         operatorHelper: '{0} será realizado no seguinte contêiner. Deseja continuar?',
         operatorAppHelper:
             'A operação "{0}" será realizada no(s) seguinte(s) contêiner(es) e pode afetar os serviços em execução. Deseja continuar?',
+        containerDeleteHelper:
+            "Detectado que o contêiner é da App Store. Excluir o contêiner não o removerá completamente do 1Panel. Para excluí-lo completamente, vá para a App Store -> menus 'Instalado' ou 'Ambiente de Execução'. Continuar?",
         start: 'Iniciar',
         stop: 'Parar',
         restart: 'Reiniciar',

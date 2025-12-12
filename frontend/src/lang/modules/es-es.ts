@@ -769,6 +769,8 @@ const message = {
         operatorHelper: 'Se realizará {0} en el siguiente contenedor, ¿desea continuar?',
         operatorAppHelper:
             'La operación "{0}" se realizará en los siguientes contenedores y puede afectar los servicios en ejecución. ¿Desea continuar?',
+        containerDeleteHelper:
+            "Se detectó que el contenedor proviene de la Tienda de Aplicaciones. Eliminar el contenedor no lo eliminará completamente de 1Panel. Para eliminarlo por completo, vaya a la Tienda de Aplicaciones -> menús 'Instalado' o 'Entorno de Ejecución'. ¿Continuar?",
         start: 'Iniciar',
         stop: 'Detener',
         restart: 'Reiniciar',

@@ -768,6 +768,8 @@ const message = {
         operatorHelper: '{0} will be performed on the following container, Do you want to continue?',
         operatorAppHelper:
             'The "{0}" operation will be performed on the following container(s) and may affect the running services. Do you want to continue?',
+        containerDeleteHelper:
+            "Detected that the container is from the App Store. Deleting the container will not completely remove it from 1Panel. To delete it completely, please go to the App Store -> 'Installed' or 'Runtime Environment' menus. Continue?",
         start: 'Start',
         stop: 'Stop',
         restart: 'Restart',

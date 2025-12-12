@@ -736,6 +736,8 @@ const message = {
         operatorHelper: '将对以下容器进行 {0} 操作，是否继续？',
         operatorAppHelper:
             '将对以下容器进行 {0} 操作，\n其中部分来源于应用商店，该操作可能会影响到该服务的正常使用。\n是否继续？',
+        containerDeleteHelper:
+            '检测到容器来源于应用商店，删除容器不会将其从 1Panel 中完全移除。如需彻底删除，请前往应用商店-『已安装』或『运行环境』等菜单中操作。是否继续？',
         start: '启动',
         stop: '停止',
         restart: '重启',

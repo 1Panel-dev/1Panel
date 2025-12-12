@@ -702,7 +702,10 @@ const onOperate = async (op: string, row: Container.ContainerInfo | null) => {
     for (const item of opList) {
         batchNames.value.push(item.name);
         if (item.isFromApp) {
-            msg = i18n.global.t('container.operatorAppHelper', [i18n.global.t('container.' + op)]);
+            msg =
+                op == 'remove'
+                    ? i18n.global.t('container.containerDeleteHelper', [i18n.global.t('container.' + op)])
+                    : i18n.global.t('container.operatorAppHelper', [i18n.global.t('container.' + op)]);
         }
     }
     const successMsg = `${i18n.global.t('container.' + op)}${i18n.global.t('commons.status.success')}`;

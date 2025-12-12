@@ -762,6 +762,8 @@ const message = {
         operatorHelper: '{0} akan dilakukan pada kontena berikut. Adakah anda mahu meneruskan?',
         operatorAppHelper:
             'Operasi "{0}" akan dilakukan pada kontena berikut dan mungkin mempengaruhi perkhidmatan yang sedang berjalan. Adakah anda mahu meneruskan?',
+        containerDeleteHelper:
+            "Dikesan bahawa bekas ini berasal dari Kedai Apl. Memadam bekas tidak akan mengalihnya sepenuhnya dari 1Panel. Untuk memadam sepenuhnya, sila pergi ke Kedai Apl -> menu 'Dipasang' atau 'Persekitaran Runtime'. Teruskan?",
         start: 'Mulakan',
         stop: 'Hentikan',
         restart: 'Mulakan semula',
