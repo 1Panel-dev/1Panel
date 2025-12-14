@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 	"log"
 	"net"
 	"os"
@@ -14,6 +13,8 @@ import (
 	"strings"
 	"syscall"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 
@@ -1103,7 +1104,7 @@ func getWebsiteDomains(domains []request.WebsiteDomain, defaultHTTPPort, default
 		if domain.Domain == "" {
 			continue
 		}
-		if !common.IsValidDomain(domain.Domain) {
+		if !common.IsValidNginxServerName(domain.Domain) {
 			err = buserr.WithName("ErrDomainFormat", domain.Domain)
 			return
 		}

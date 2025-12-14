@@ -306,6 +306,10 @@ func IsValidDomain(domain string) bool {
 	return re.GetRegex(re.DomainPattern).MatchString(domain)
 }
 
+func IsValidNginxServerName(serverName string) bool {
+	return re.GetRegex(re.NginxServerNamePattern).MatchString(serverName)
+}
+
 func ContainsChinese(text string) bool {
 	for _, char := range text {
 		if unicode.Is(unicode.Han, char) {

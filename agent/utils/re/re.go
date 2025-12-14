@@ -14,6 +14,7 @@ const (
 	ValidatorNamePattern               = `^[a-zA-Z\p{Han}]{1}[a-zA-Z0-9_\p{Han}]{0,30}$`
 	ValidatorIPPattern                 = `^((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})(\.((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})){3}$`
 	DomainPattern                      = `^([\w\p{Han}\-\*]{1,100}\.){1,10}([\w\p{Han}\-]{1,24}|[\w\p{Han}\-]{1,24}\.[\w\p{Han}\-]{1,24})(:\d{1,5})?$`
+	NginxServerNamePattern             = `^(?:\*|[\w\p{Han}-]{1,63})(?:\.(?:\*|[\w\p{Han}-]{1,63}))*$`
 	ProxyCacheZonePattern              = `keys_zone=proxy_cache_zone_of_[\w.]+:(\d+)([kmgt]?)`
 	ProxyCacheMaxSizePattern           = `max_size=([0-9.]+)([kmgt]?)`
 	ProxyCacheMaxSizeValidationPattern = `max_size=\d+(\.\d+)?[kmgt]?`
@@ -44,6 +45,7 @@ func Init() {
 		ValidatorNamePattern,
 		ValidatorIPPattern,
 		DomainPattern,
+		NginxServerNamePattern,
 		ProxyCacheZonePattern,
 		ProxyCacheMaxSizePattern,
 		ProxyCacheMaxSizeValidationPattern,
