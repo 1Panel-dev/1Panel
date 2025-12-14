@@ -3,7 +3,7 @@
         <el-row :gutter="22" v-for="(domain, index) of create.domains" :key="index">
             <el-col :span="6">
                 <el-form-item
-                    :label="index == 0 ? $t('website.domain') : ''"
+                    :label="index == 0 ? $t('toolbox.device.hostname') : ''"
                     :prop="`domains.${index}.domain`"
                     :rules="rules.domain"
                 >
@@ -23,7 +23,7 @@
                 </el-form-item>
             </el-col>
             <el-col :span="6">
-                <el-form-item :label="index == 0 ? 'Host' : ''">
+                <el-form-item :label="index == 0 ? $t('website.domain') : ''">
                     <el-input
                         type="string"
                         :model-value="create.domains[index].host"
@@ -42,7 +42,7 @@
                 </el-form-item>
             </el-col>
             <el-col :span="2">
-                <el-form-item :label="index == 0 ? 'SSL' : ''" prop="ssl">
+                <el-form-item :label="index == 0 ? 'SSL' : ''" :prop="`domains.${index}.ssl`">
                     <el-checkbox
                         v-model="create.domains[index].ssl"
                         :disabled="create.domains[index].port == 80"
@@ -91,7 +91,7 @@
 import { checkAppInstalled } from '@/api/modules/app';
 import { Rules, checkNumberRange } from '@/global/form-rules';
 import { MsgError } from '@/utils/message';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, nextTick } from 'vue';
 
 const props = defineProps({
     form: {
@@ -101,6 +101,8 @@ const props = defineProps({
         },
     },
 });
+
+const emit = defineEmits(['gengerate']);
 const singleDomainRegex = /^(?:\*|[\w\u4e00-\u9fa5-]{1,63})(?:\.(?:\*|[\w\u4e00-\u9fa5-]{1,63}))*$/;
 const FQDNDomainRegex =
     /^(?:\*\.)?(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,63}(?::(6553[0-5]|655[0-2]\d|65[0-4]\d{2}|6[0-4]\d{3}|[1-5]?\d{1,4}))?$/;
@@ -275,6 +277,9 @@ const saveBatchInput = () => {
     } else {
         create.value.domains = [initDomain()];
     }
+
+    handleParams();
+    nextTick(() => emit('gengerate'));
 
     batchDialogVisible.value = false;
     return true;

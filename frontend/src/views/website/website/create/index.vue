@@ -192,7 +192,7 @@
                     <DomainCreate v-model:form="website" @gengerate="websiteForm.clearValidate()"></DomainCreate>
                 </div>
                 <el-divider content-position="left">
-                    <el-text type="info" size="small">{{ $t('website.websiteSetting') }}</el-text>
+                    <el-text type="info" size="small">{{ $t('website.advancedSettings') }}</el-text>
                 </el-divider>
                 <el-form-item :label="$t('website.alias')" prop="alias" class="mt-2">
                     <el-input v-model.trim="website.alias" :placeholder="$t('website.aliasHelper')"></el-input>
