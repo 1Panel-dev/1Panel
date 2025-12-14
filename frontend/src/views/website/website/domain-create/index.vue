@@ -3,7 +3,7 @@
         <el-row :gutter="22" v-for="(domain, index) of create.domains" :key="index">
             <el-col :span="6">
                 <el-form-item
-                    :label="index == 0 ? $t('toolbox.device.hostname') : ''"
+                    :label="index == 0 ? $t('website.domain') : ''"
                     :prop="`domains.${index}.domain`"
                     :rules="rules.domain"
                 >
@@ -23,11 +23,11 @@
                 </el-form-item>
             </el-col>
             <el-col :span="6">
-                <el-form-item :label="index == 0 ? $t('website.domain') : ''">
+                <el-form-item :label="index == 0 ? $t('toolbox.device.hostname') : ''">
                     <el-input
                         type="string"
                         :model-value="create.domains[index].host"
-                        :placeholder="index > 0 ? 'Host' : ''"
+                        :placeholder="index > 0 ? $t('toolbox.device.hostname') : ''"
                         disabled
                     ></el-input>
                 </el-form-item>
