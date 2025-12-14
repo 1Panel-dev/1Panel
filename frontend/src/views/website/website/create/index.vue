@@ -1,21 +1,5 @@
 <template>
     <DrawerPro v-model="open" :header="$t('website.create')" size="60%" @close="handleClose">
-        <template #buttons>
-            <span class="drawer-header-button">
-                <template v-for="item in WebsiteTypes" :key="item.value">
-                    <el-button
-                        :class="website.type === item.value ? 'active-button' : ''"
-                        @click="changeType(item.value)"
-                        :type="website.type === item.value ? '' : 'info'"
-                        :plain="website.type === item.value"
-                        :text="website.type !== item.value"
-                        :bg="website.type !== item.value"
-                    >
-                        {{ item.label }}
-                    </el-button>
-                </template>
-            </span>
-        </template>
         <div v-loading="loading" :class="{ mask: !versionExist }">
             <SSLAlert :websiteType="website.type" />
             <br />
@@ -28,6 +12,13 @@
                 :validate-on-rule-change="false"
                 v-loading="loading"
             >
+                <el-form-item :label="$t('commons.table.type')">
+                    <el-radio-group v-model="website.type" @change="changeType">
+                        <el-radio-button v-for="item in WebsiteTypes" :key="item.value" :value="item.value">
+                            {{ item.label }}
+                        </el-radio-button>
+                    </el-radio-group>
+                </el-form-item>
                 <GroupSelect
                     v-model="website.webSiteGroupId"
                     :prop="'webSiteGroupId'"
@@ -185,6 +176,10 @@
                         {{ $t('website.runtimePortWarn') }}
                     </el-text>
                 </div>
+
+                <el-divider content-position="left">
+                    <el-text type="info" size="small">{{ $t('website.domain') }}</el-text>
+                </el-divider>
                 <div v-if="website.type === 'stream'">
                     <el-form-item :label="$t('website.streamPorts')" prop="streamPorts">
                         <el-input
@@ -196,10 +191,10 @@
                 <div v-else>
                     <DomainCreate v-model:form="website" @gengerate="websiteForm.clearValidate()"></DomainCreate>
                 </div>
-                <el-form-item prop="IPV6">
-                    <el-checkbox v-model="website.IPV6" :label="$t('website.ipv6')" size="large" />
-                </el-form-item>
-                <el-form-item :label="$t('website.alias')" prop="alias">
+                <el-divider content-position="left">
+                    <el-text type="info" size="small">{{ $t('website.websiteSetting') }}</el-text>
+                </el-divider>
+                <el-form-item :label="$t('website.alias')" prop="alias" class="mt-2">
                     <el-input v-model.trim="website.alias" :placeholder="$t('website.aliasHelper')"></el-input>
                     <div>
                         <span class="input-help">
@@ -208,7 +203,58 @@
                         </span>
                     </div>
                 </el-form-item>
-
+                <el-form-item prop="IPV6">
+                    <el-checkbox v-model="website.IPV6" :label="$t('website.ipv6')" size="large" />
+                </el-form-item>
+                <div v-if="website.type == 'stream'">
+                    <LoadBalanceForm ref="lbFormRef" v-model="steamConfig" :disabled="true" />
+                </div>
+                <div v-else>
+                    <el-form-item prop="enableSSL">
+                        <el-checkbox v-model="website.enableSSL" :label="$t('website.enableHTTPS')" size="large" />
+                        <span class="input-help">{{ $t('website.enableSSLHelper') }}</span>
+                    </el-form-item>
+                    <div v-if="website.enableSSL">
+                        <el-form-item :label="$t('website.acmeAccountManage')" prop="acmeAccountID">
+                            <el-select
+                                v-model="website.acmeAccountID"
+                                :placeholder="$t('website.selectAcme')"
+                                @change="listSSLs"
+                            >
+                                <el-option :key="0" :label="$t('website.imported')" :value="0"></el-option>
+                                <el-option
+                                    v-for="(acme, index) in acmeAccounts"
+                                    :key="index"
+                                    :label="acme.email"
+                                    :value="acme.id"
+                                >
+                                    <span>
+                                        {{ acme.email }}
+                                        <el-tag class="ml-5">{{ getAccountName(acme.type) }}</el-tag>
+                                    </span>
+                                </el-option>
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item :label="$t('website.ssl')" prop="websiteSSLID" :hide-required-asterisk="true">
+                            <el-select
+                                v-model="website.websiteSSLID"
+                                :placeholder="$t('website.selectSSL')"
+                                @change="handleSSLSelectChange"
+                            >
+                                <el-option
+                                    v-for="(ssl, index) in ssls"
+                                    :key="index"
+                                    :label="ssl.primaryDomain"
+                                    :value="ssl.id"
+                                    :disabled="ssl.pem == ''"
+                                ></el-option>
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item :label="' '" v-if="websiteSSL && websiteSSL.id > 0">
+                            <WebsiteSSL :websiteSSL="websiteSSL" />
+                        </el-form-item>
+                    </div>
+                </div>
                 <el-form-item prop="enableFtp" v-if="website.type === 'static' || website.type === 'runtime'">
                     <el-checkbox
                         @change="random"
@@ -333,55 +379,10 @@
                         </el-form-item>
                     </el-col>
                 </el-row>
-                <div v-if="website.type == 'stream'">
-                    <LoadBalanceForm ref="lbFormRef" v-model="steamConfig" :disabled="true" />
-                </div>
-                <div v-else>
-                    <el-form-item prop="enableSSL">
-                        <el-checkbox v-model="website.enableSSL" :label="$t('website.enableHTTPS')" size="large" />
-                        <span class="input-help">{{ $t('website.enableSSLHelper') }}</span>
-                    </el-form-item>
-                    <div v-if="website.enableSSL">
-                        <el-form-item :label="$t('website.acmeAccountManage')" prop="acmeAccountID">
-                            <el-select
-                                v-model="website.acmeAccountID"
-                                :placeholder="$t('website.selectAcme')"
-                                @change="listSSLs"
-                            >
-                                <el-option :key="0" :label="$t('website.imported')" :value="0"></el-option>
-                                <el-option
-                                    v-for="(acme, index) in acmeAccounts"
-                                    :key="index"
-                                    :label="acme.email"
-                                    :value="acme.id"
-                                >
-                                    <span>
-                                        {{ acme.email }}
-                                        <el-tag class="ml-5">{{ getAccountName(acme.type) }}</el-tag>
-                                    </span>
-                                </el-option>
-                            </el-select>
-                        </el-form-item>
-                        <el-form-item :label="$t('website.ssl')" prop="websiteSSLID" :hide-required-asterisk="true">
-                            <el-select
-                                v-model="website.websiteSSLID"
-                                :placeholder="$t('website.selectSSL')"
-                                @change="handleSSLSelectChange"
-                            >
-                                <el-option
-                                    v-for="(ssl, index) in ssls"
-                                    :key="index"
-                                    :label="ssl.primaryDomain"
-                                    :value="ssl.id"
-                                    :disabled="ssl.pem == ''"
-                                ></el-option>
-                            </el-select>
-                        </el-form-item>
-                        <el-form-item :label="' '" v-if="websiteSSL && websiteSSL.id > 0">
-                            <WebsiteSSL :websiteSSL="websiteSSL" />
-                        </el-form-item>
-                    </div>
-                </div>
+
+                <el-divider content-position="left">
+                    <el-text type="info" size="small">{{ $t('commons.table.description') }}</el-text>
+                </el-divider>
                 <el-form-item :label="$t('website.remark')" prop="remark">
                     <el-input type="textarea" :rows="3" clearable v-model="website.remark" />
                 </el-form-item>

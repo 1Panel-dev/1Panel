@@ -1,25 +1,7 @@
 <template>
     <div>
-        <el-form-item :label="$t('website.batchAdd')">
-            <el-row :gutter="20">
-                <el-col :span="20">
-                    <el-input
-                        class="p-w-400"
-                        type="textarea"
-                        :rows="3"
-                        v-model="create.domainStr"
-                        :placeholder="$t('website.domainHelper')"
-                    ></el-input>
-                </el-col>
-                <el-col :span="4">
-                    <el-button @click="gengerateDomains" :disabled="create.domainStr == ''">
-                        {{ $t('website.generateDomain') }}
-                    </el-button>
-                </el-col>
-            </el-row>
-        </el-form-item>
-        <el-row :gutter="20" v-for="(domain, index) of create.domains" :key="index">
-            <el-col :span="8">
+        <el-row :gutter="22" v-for="(domain, index) of create.domains" :key="index">
+            <el-col :span="6">
                 <el-form-item
                     :label="index == 0 ? $t('website.domain') : ''"
                     :prop="`domains.${index}.domain`"
@@ -29,10 +11,28 @@
                         type="string"
                         v-model="create.domains[index].domain"
                         :placeholder="index > 0 ? $t('website.domain') : ''"
+                        @blur="handleDomainBlur(index)"
+                    ></el-input>
+                    <div
+                        v-if="domainWarnings[index]"
+                        class="el-form-item__error"
+                        style="position: relative; color: #e6a23c"
+                    >
+                        {{ $t('website.domainNotFQDN') }}
+                    </div>
+                </el-form-item>
+            </el-col>
+            <el-col :span="6">
+                <el-form-item :label="index == 0 ? 'Host' : ''">
+                    <el-input
+                        type="string"
+                        :model-value="create.domains[index].host"
+                        :placeholder="index > 0 ? 'Host' : ''"
+                        disabled
                     ></el-input>
                 </el-form-item>
             </el-col>
-            <el-col :span="8">
+            <el-col :span="4">
                 <el-form-item
                     :label="index == 0 ? $t('commons.table.port') : ''"
                     :prop="`domains.${index}.port`"
@@ -41,7 +41,7 @@
                     <el-input type="number" v-model.number="create.domains[index].port"></el-input>
                 </el-form-item>
             </el-col>
-            <el-col :span="4">
+            <el-col :span="2">
                 <el-form-item :label="index == 0 ? 'SSL' : ''" prop="ssl">
                     <el-checkbox
                         v-model="create.domains[index].ssl"
@@ -58,23 +58,41 @@
             </el-col>
             <el-col :span="4" v-else>
                 <el-form-item>
-                    <el-button @click="removeDomain(index)" link type="primary">
+                    <el-button @click="removeDomain(index)">
                         <el-icon><Delete /></el-icon>
                     </el-button>
                 </el-form-item>
             </el-col>
         </el-row>
+        <div class="mt-1">
+            <el-button @click="openBatchDialog" type="primary" plain>
+                {{ $t('website.batchInput') }}
+            </el-button>
+        </div>
+
+        <el-dialog v-model="batchDialogVisible" :title="$t('website.batchAdd')" width="600px">
+            <el-input
+                type="textarea"
+                :rows="8"
+                v-model="create.domainStr"
+                :placeholder="$t('website.domainBatchHelper')"
+            ></el-input>
+            <template #footer>
+                <el-button @click="batchDialogVisible = false">{{ $t('commons.button.cancel') }}</el-button>
+                <el-button type="primary" @click="saveBatchInput" :disabled="create.domainStr == ''">
+                    {{ $t('commons.button.confirm') }}
+                </el-button>
+            </template>
+        </el-dialog>
     </div>
 </template>
 
 <script lang="ts" setup>
 import { checkAppInstalled } from '@/api/modules/app';
 import { Rules, checkNumberRange } from '@/global/form-rules';
-import i18n from '@/lang';
 import { MsgError } from '@/utils/message';
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 
-const emit = defineEmits(['gengerate']);
 const props = defineProps({
     form: {
         type: Object,
@@ -83,16 +101,84 @@ const props = defineProps({
         },
     },
 });
+const singleDomainRegex = /^(?:\*|[\w\u4e00-\u9fa5-]{1,63})(?:\.(?:\*|[\w\u4e00-\u9fa5-]{1,63}))*$/;
+const FQDNDomainRegex =
+    /^(?:\*\.)?(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,63}(?::(6553[0-5]|655[0-2]\d|65[0-4]\d{2}|6[0-4]\d{3}|[1-5]?\d{1,4}))?$/;
+
+const isFQDN = (domain: string): boolean => {
+    if (!domain) return true;
+    return FQDNDomainRegex.test(domain);
+};
+
+function toPunycode(hostname: string): string {
+    try {
+        if (hostname.startsWith('*.')) {
+            const domainPart = hostname.substring(2);
+            const convertedDomain = new URL(`http://${domainPart}`).hostname;
+            return `*.${convertedDomain}`;
+        }
+        if (hostname.endsWith('.*')) {
+            const domainPart = hostname.slice(0, -2);
+            const convertedDomain = new URL(`http://${domainPart}`).hostname;
+            return `${convertedDomain}.*`;
+        }
+        return new URL(`http://${hostname}`).hostname;
+    } catch {
+        return hostname;
+    }
+}
+
+const handleDomainBlur = (index: number) => {
+    let singleRegexChecked = singleDomainRegex.test(create.value.domains[index].domain);
+    if (!singleRegexChecked) {
+        domainWarnings.value[index] = false;
+        return;
+    }
+    const originalDomain = create.value.domains[index].domain;
+    if (!originalDomain) {
+        create.value.domains[index].host = '';
+        domainWarnings.value[index] = false;
+        return;
+    }
+    const punycoded = toPunycode(originalDomain);
+    if (punycoded !== originalDomain) {
+        create.value.domains[index].host = originalDomain;
+        create.value.domains[index].domain = punycoded;
+    } else {
+        create.value.domains[index].host = originalDomain;
+    }
+
+    if (singleRegexChecked) {
+        domainWarnings.value[index] = !isFQDN(create.value.domains[index].domain);
+    } else {
+        domainWarnings.value[index] = false;
+    }
+};
+
+const validateSingleDomain = (_rule: any, value: string, callback: (error?: Error) => void) => {
+    if (!value) {
+        return callback();
+    }
+    if (singleDomainRegex.test(value)) {
+        return callback();
+    }
+    callback(new Error('域名格式不正确'));
+};
+
 const rules = ref({
     port: [Rules.requiredInput, Rules.paramPort, checkNumberRange(1, 65535)],
-    domain: [Rules.requiredInput, Rules.domain],
+    domain: [Rules.requiredInput, { validator: validateSingleDomain, trigger: 'blur' }],
     domains: {
         type: Array,
     },
 });
 const defaultPort = ref(80);
+const batchDialogVisible = ref(false);
+const domainWarnings = ref<{ [key: number]: boolean }>({});
+
 const initDomain = () => ({
     domain: '',
+    host: '',
     port: defaultPort.value,
     ssl: false,
 });
@@ -102,6 +188,44 @@ const create = ref({
     domainStr: '',
 });
 
+const domainToString = (domain: { domain: string; port: number; ssl: boolean }): string => {
+    if (!domain.domain) return '';
+    let str = domain.domain;
+    if (domain.port && domain.port !== 80) {
+        str += `:${domain.port}`;
+    }
+    return str;
+};
+
+const stringToDomain = (line: string): { domain: string; host: string; port: number; ssl: boolean } | null => {
+    if (!line.trim()) return null;
+
+    let ssl = false;
+    let str = line.trim();
+
+    const [domainRaw, portStr] = str.split(':');
+    if (!domainRaw) return null;
+
+    const domain = toPunycode(domainRaw);
+    const host = domain !== domainRaw ? domainRaw : domain;
+
+    const port = portStr ? Number(portStr) : defaultPort.value;
+
+    if (port === 443) {
+        ssl = true;
+    } else if (port === 80) {
+        ssl = false;
+    }
+
+    return { domain, host, port, ssl };
+};
+
+const openBatchDialog = () => {
+    const lines = create.value.domains.map(domainToString).filter((line) => line !== '');
+    create.value.domainStr = lines.join('\n');
+    batchDialogVisible.value = true;
+};
+
 const addDomain = () => {
     create.value.domains.push(initDomain());
 };
@@ -110,41 +234,50 @@ const removeDomain = (index: number) => {
     create.value.domains.splice(index, 1);
 };
 
-const checkDomain = (domain: string) => {
-    const reg =
-        /^([\w\u4e00-\u9fa5\-\*]{1,100}\.){1,10}([\w\u4e00-\u9fa5\-]{1,24}|[\w\u4e00-\u9fa5\-]{1,24}\.[\w\u4e00-\u9fa5\-]{1,24})(:\d{1,5})?$/;
-    return reg.test(domain);
-};
-
-const gengerateDomains = () => {
+const saveBatchInput = () => {
+    if (create.value.domainStr.trim() === '') {
+        return true;
+    }
     const lines = create.value.domainStr.split(/\r?\n/);
-    lines.forEach((line) => {
-        const [domain, port] = line.split(':');
-        if (domain == '') {
+    const newDomains: { domain: string; host: string; port: number; ssl: boolean }[] = [];
+    let hasError = false;
+
+    const isFirstBatchInput = create.value.domains.length === 1 && !create.value.domains[0].domain;
+
+    lines.forEach((line, index) => {
+        const parsed = stringToDomain(line);
+        if (!parsed) return;
+
+        const { domain, host, port, ssl } = parsed;
+
+        if (!domain.trim() || !singleDomainRegex.test(domain)) {
+            MsgError(line + ' 域名格式不正确');
+            hasError = true;
             return;
         }
-        if (!checkDomain(domain)) {
-            MsgError(line + i18n.global.t('commons.rule.domain'));
-            return;
+
+        if (!newDomains.some((d) => d.domain === domain && d.port === port)) {
+            newDomains.push({ domain, host, port, ssl });
         }
-        const exists = (domain: string, port: number): boolean => {
-            return create.value.domains.some((info) => info.domain === domain && info.port === port);
-        };
-        if (exists(domain, port ? Number(port) : defaultPort.value)) {
-            return;
-        }
-        if (create.value.domains[0].domain == '') {
-            create.value.domains[0].domain = domain;
-            create.value.domains[0].port = port ? Number(port) : defaultPort.value;
-        } else {
-            create.value.domains.push({
-                domain,
-                port: port ? Number(port) : defaultPort.value,
-                ssl: false,
-            });
+
+        if (isFirstBatchInput && index === 0) {
+            const alias = domain.split(':')[0];
+            if (props.form.alias !== undefined) {
+                props.form.alias = alias;
+            }
         }
     });
-    emit('gengerate');
+
+    if (hasError) return false;
+
+    if (newDomains.length > 0) {
+        create.value.domains = newDomains;
+    } else {
+        create.value.domains = [initDomain()];
+    }
+
+    batchDialogVisible.value = false;
+    return true;
 };
 
 const handleParams = () => {
