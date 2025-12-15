@@ -2728,6 +2728,7 @@ const message = {
         stream: 'Proxy TCP/UDP',
         streamPorts: 'Puertos de escucha',
         streamPortsHelper: 'Separe con comas, por ejemplo: 3306, 3307',
+        streamHelper: 'Reenvío de Puertos y Balanceo de Carga TCP/UDP',
     },
     php: {
         short_open_tag: 'Soporte de etiquetas cortas',

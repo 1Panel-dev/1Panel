@@ -2721,6 +2721,7 @@ const message = {
         stream: 'Прокси TCP/UDP',
         streamPorts: 'Порты прослушивания',
         streamPortsHelper: 'Разделяйте запятыми, например: 3306, 3307',
+        streamHelper: 'Перенаправление портов и балансировка нагрузки TCP/UDP',
     },
     php: {
         short_open_tag: 'Поддержка коротких тегов',

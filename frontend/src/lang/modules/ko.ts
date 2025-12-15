@@ -2617,6 +2617,7 @@ const message = {
         stream: 'TCP/UDP 프록시',
         streamPorts: '수신 포트',
         streamPortsHelper: '쉼표로 구분하세요. 예: 3306, 3307',
+        streamHelper: 'TCP/UDP 포트 포워딩 및 로드 밸런싱',
     },
     php: {
         short_open_tag: '짧은 태그 지원',

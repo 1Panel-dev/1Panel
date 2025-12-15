@@ -2779,6 +2779,7 @@ const message = {
         stream: 'TCP/UDP Proxy',
         streamPorts: 'Dinleme Portları',
         streamPortsHelper: 'Virgülle ayırın, örneğin: 3306, 3307',
+        streamHelper: 'TCP/UDP Port Yönlendirme ve Yük Dengeleme',
     },
     php: {
         short_open_tag: 'Kısa etiket desteği',

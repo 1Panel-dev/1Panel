@@ -2547,6 +2547,7 @@ const message = {
         stream: 'TCP/UDP 代理',
         streamPorts: '监听端口',
         streamPortsHelper: '请按逗号分割，例如：3306，3307',
+        streamHelper: 'TCP/UDP 端口转发与负载均衡',
     },
     php: {
         short_open_tag: '短标签支持',

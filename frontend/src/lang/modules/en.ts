@@ -2741,6 +2741,7 @@ const message = {
         stream: 'TCP/UDP Proxy',
         streamPorts: 'Listening Ports',
         streamPortsHelper: 'Separate with commas, e.g., 3306, 3307',
+        streamHelper: 'TCP/UDP Port Forwarding and Load Balancing',
     },
     php: {
         short_open_tag: 'Short tag support',

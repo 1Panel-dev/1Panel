@@ -2721,6 +2721,7 @@ const message = {
         stream: 'Proksi TCP/UDP',
         streamPorts: 'Port Mendengar',
         streamPortsHelper: 'Sila asingkan dengan koma, contoh: 3306, 3307',
+        streamHelper: 'Penerusan Port dan Pengimbangan Beban TCP/UDP',
     },
     php: {
         short_open_tag: 'Sokongan tag pendek',

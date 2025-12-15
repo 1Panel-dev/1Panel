@@ -2726,6 +2726,7 @@ const message = {
         stream: 'Proxy TCP/UDP',
         streamPorts: 'Portas de escuta',
         streamPortsHelper: 'Separe por vírgulas, por exemplo: 3306, 3307',
+        streamHelper: 'Encaminhamento de Portas e Balanceamento de Carga TCP/UDP',
     },
     php: {
         short_open_tag: 'Suporte para short tags',

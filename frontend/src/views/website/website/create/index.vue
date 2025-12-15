@@ -1,8 +1,6 @@
 <template>
     <DrawerPro v-model="open" :header="$t('website.create')" size="60%" @close="handleClose">
         <div v-loading="loading" :class="{ mask: !versionExist }">
-            <SSLAlert :websiteType="website.type" />
-            <br />
             <el-form
                 ref="websiteForm"
                 label-position="top"
@@ -19,6 +17,7 @@
                         </el-radio-button>
                     </el-radio-group>
                 </el-form-item>
+                <SSLAlert :websiteType="website.type" class="mb-2" />
                 <GroupSelect
                     v-model="website.webSiteGroupId"
                     :prop="'webSiteGroupId'"

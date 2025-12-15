@@ -25,6 +25,7 @@
             :closable="false"
         />
         <el-alert v-if="websiteType == 'subsite'" :title="$t('website.subsiteHelper')" type="info" :closable="false" />
+        <el-alert v-if="websiteType == 'stream'" :title="$t('website.streamHelper')" type="info" :closable="false" />
     </div>
 </template>
 
