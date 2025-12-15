@@ -342,6 +342,20 @@ export namespace Website {
         http3: boolean;
     }
 
+    export interface BatchSetHttps {
+        ids: number[];
+        taskID: string;
+        enable: boolean;
+        websiteSSLId?: number;
+        type: string;
+        certificate?: string;
+        privateKey?: string;
+        httpConfig: string;
+        SSLProtocol: string[];
+        algorithm: string;
+        http3: boolean;
+    }
+
     export interface CheckReq {
         installIds?: number[];
     }

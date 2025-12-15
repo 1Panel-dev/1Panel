@@ -158,6 +158,8 @@ unpause: 'Devam Et'
 remove: 'Sil'
 delete: 'Sil'
 ErrDefaultWebsite: "Varsayılan bir web sitesi zaten ayarlanmış. Yeni bir tane ayarlamadan önce lütfen iptal edin!"
+SSL: 'Sertifika'
+Set: 'Ayarlar'
 
 #ssl
 ErrSSLCannotDelete: '{{ .name }} sertifikası bir web sitesi tarafından kullanılıyor ve silinemez'

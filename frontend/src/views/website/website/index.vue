@@ -221,6 +221,10 @@
                                     :label="$t('commons.button.set') + $t('commons.table.group')"
                                     value="group"
                                 ></el-option>
+                                <el-option
+                                    :label="$t('commons.button.set') + $t('website.ssl')"
+                                    value="setHttps"
+                                ></el-option>
                             </el-select>
                             <el-button
                                 class="ml-2"
@@ -261,6 +265,7 @@
         <TaskLog ref="taskLogRef" @close="search" />
         <OpDialog ref="opRef" @search="openTaskLog" />
         <BatchSetGroup ref="batchSetGroupRef" @close="search" />
+        <BatchSetHttps ref="batchSetHttpsRef" @openTask="openTaskLog" />
     </div>
 </template>
 
@@ -277,6 +282,7 @@ import AppStatus from '@/components/app-status/index.vue';
 import TaskLog from '@/components/log/task/index.vue';
 import Domain from '@/views/website/website/domain/index.vue';
 import BatchSetGroup from '@/views/website/website/batch-op/group.vue';
+import BatchSetHttps from '@/views/website/website/batch-op/https.vue';
 
 import i18n from '@/lang';
 import { onMounted, reactive, ref, computed } from 'vue';
@@ -339,6 +345,7 @@ const batchReq = reactive({
 const taskLogRef = ref();
 const opRef = ref();
 const batchSetGroupRef = ref();
+const batchSetHttpsRef = ref();
 
 const paginationConfig = reactive({
     cacheSizeKey: 'website-page-size',
@@ -618,21 +625,32 @@ const openTaskLog = () => {
 };
 
 const batchOp = () => {
-    if (batchReq.operate == 'group') {
-        batchSetGroupRef.value.acceptParams(selects.value.map((item) => item.id));
-    } else {
-        const names = selects.value.map((item) => item.primaryDomain);
-        batchReq.ids = selects.value.map((item) => item.id);
-        const taskID = newUUID();
-        batchReq.taskID = taskID;
-        opRef.value.acceptParams({
-            names: names,
-            title: i18n.global.t('website.batchOpreate'),
-            api: batchOpreate,
-            msg: i18n.global.t('website.batchOpreateHelper', [i18n.global.t('commons.button.' + batchReq.operate)]),
-            params: batchReq,
-            noMsg: true,
-        });
+    switch (batchReq.operate) {
+        case 'setHttps':
+            const tID = newUUID();
+            batchReq.taskID = tID;
+            batchSetHttpsRef.value.acceptParams(
+                selects.value.map((item) => item.id),
+                tID,
+            );
+            break;
+        case 'group':
+            batchSetGroupRef.value.acceptParams(selects.value.map((item) => item.id));
+            break;
+        default:
+            const names = selects.value.map((item) => item.primaryDomain);
+            batchReq.ids = selects.value.map((item) => item.id);
+            const taskID = newUUID();
+            batchReq.taskID = taskID;
+            opRef.value.acceptParams({
+                names: names,
+                title: i18n.global.t('website.batchOpreate'),
+                api: batchOpreate,
+                msg: i18n.global.t('website.batchOpreateHelper', [i18n.global.t('commons.button.' + batchReq.operate)]),
+                params: batchReq,
+                noMsg: true,
+            });
+            return;
     }
 };
 

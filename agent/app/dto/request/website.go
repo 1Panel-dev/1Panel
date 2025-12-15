@@ -129,6 +129,25 @@ type BatchWebsiteGroup struct {
 	GroupID uint   `json:"groupID" validate:"required"`
 }
 
+type BatchWebsiteHttps struct {
+	IDs                   []uint   `json:"ids" validate:"required"`
+	TaskID                string   `json:"taskID" validate:"required"`
+	WebsiteSSLID          uint     `json:"websiteSSLId"`
+	Type                  string   `json:"type"  validate:"oneof=existed auto manual"`
+	PrivateKey            string   `json:"privateKey"`
+	Certificate           string   `json:"certificate"`
+	PrivateKeyPath        string   `json:"privateKeyPath"`
+	CertificatePath       string   `json:"certificatePath"`
+	ImportType            string   `json:"importType"`
+	HttpConfig            string   `json:"httpConfig"  validate:"oneof=HTTPSOnly HTTPAlso HTTPToHTTPS"`
+	SSLProtocol           []string `json:"SSLProtocol"`
+	Algorithm             string   `json:"algorithm"`
+	Hsts                  bool     `json:"hsts"`
+	HstsIncludeSubDomains bool     `json:"hstsIncludeSubDomains"`
+	HttpsPorts            []int    `json:"httpsPorts"`
+	Http3                 bool     `json:"http3"`
+}
+
 type WebsiteRedirectUpdate struct {
 	WebsiteID uint   `json:"websiteId" validate:"required"`
 	Key       string `json:"key" validate:"required"`

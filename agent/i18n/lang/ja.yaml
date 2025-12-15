@@ -153,6 +153,8 @@ unpause: '再開'
 remove: '削除'
 delete: '削除'
 ErrDefaultWebsite: 'デフォルト Web サイトが既に設定されています。設定する前にキャンセルしてください！'
+SSL: '証明書'
+Set: '設定'
 
 #ssl
 ErrSSLCannotDelete: '{{ .name }} 証明書は Web サイトで使用されているため、削除できません'

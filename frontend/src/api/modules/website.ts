@@ -375,3 +375,7 @@ export const batchSetGroup = (req: Website.BatchSetGroup) => {
 export const updateWebsiteStream = (req: Website.WebsiteStreamUpdate) => {
     return http.post(`/websites/stream/update`, req);
 };
+
+export const batchSetHttps = (req: Website.BatchSetHttps) => {
+    return http.post(`/websites/batch/ssl`, req);
+};

@@ -1243,3 +1243,23 @@ func (b *BaseApi) UpdateStreamConfig(c *gin.Context) {
 	}
 	helper.Success(c)
 }
+
+// @Tags Website
+// @Summary Batch set HTTPS for websites
+// @Accept json
+// @Param request body request.BatchWebsiteHttps true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /websites/batch/https [post]
+func (b *BaseApi) BatchSetHttps(c *gin.Context) {
+	var req request.BatchWebsiteHttps
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := websiteService.BatchSetHttps(c, req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}

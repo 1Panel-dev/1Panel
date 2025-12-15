@@ -31,6 +31,7 @@ const (
 
 	StartWeb = "start"
 	StopWeb  = "stop"
+	SetHttps = "setHttps"
 
 	HTTPSOnly   = "HTTPSOnly"
 	HTTPAlso    = "HTTPAlso"

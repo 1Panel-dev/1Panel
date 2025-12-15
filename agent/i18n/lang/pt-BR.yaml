@@ -157,6 +157,8 @@ unpause: 'Retomar'
 remove: 'Excluir'
 delete: 'Excluir'
 ErrDefaultWebsite: 'O site padrão já foi definido, cancele-o antes de definir!'
+SSL: 'Certificado'
+Set: 'Configurações'
 
 #ssl
 ErrSSLCannotDelete: 'O certificado {{ .name }} está sendo usado por um site e não pode ser excluído'

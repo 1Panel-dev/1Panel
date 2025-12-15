@@ -12,7 +12,6 @@ import (
 	"os"
 	"path"
 	"reflect"
-	"sort"
 	"strconv"
 	"strings"
 	"syscall"
@@ -58,9 +57,7 @@ type IWebsiteService interface {
 	UpdateWebsite(req request.WebsiteUpdate) error
 	DeleteWebsite(req request.WebsiteDelete) error
 	GetWebsite(id uint) (response.WebsiteDTO, error)
-	BatchOpWebsite(req request.BatchWebsiteOp) error
 
-	BatchSetGroup(req request.BatchWebsiteGroup) error
 	ChangePHPVersion(req request.WebsitePHPVersionReq) error
 	OperateCrossSiteAccess(req request.CrossSiteAccessOp) error
 	ExecComposer(req request.ExecComposerReq) error
@@ -130,6 +127,10 @@ type IWebsiteService interface {
 	UpdateAuthBasic(req request.NginxAuthUpdate) (err error)
 	GetPathAuthBasics(req request.NginxAuthReq) (res []response.NginxPathAuthRes, err error)
 	UpdatePathAuthBasic(req request.NginxPathAuthUpdate) error
+
+	BatchOpWebsite(req request.BatchWebsiteOp) error
+	BatchSetGroup(req request.BatchWebsiteGroup) error
+	BatchSetHttps(ctx context.Context, req request.BatchWebsiteHttps) error
 }
 
 func NewIWebsiteService() IWebsiteService {
@@ -538,63 +539,6 @@ func (w WebsiteService) OpWebsite(req request.WebsiteOp) error {
 		return err
 	}
 	return websiteRepo.Save(context.Background(), &website)
-}
-
-func (w WebsiteService) BatchSetGroup(req request.BatchWebsiteGroup) error {
-	websites, _ := websiteRepo.List(repo.WithByIDs(req.IDs))
-	for _, web := range websites {
-		web.WebsiteGroupID = req.GroupID
-		if err := websiteRepo.Save(context.Background(), &web); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (w WebsiteService) BatchOpWebsite(req request.BatchWebsiteOp) error {
-	websites, _ := websiteRepo.List(repo.WithByIDs(req.IDs))
-	opTask, err := task.NewTaskWithOps(i18n.GetMsgByKey("Status"), task.TaskBatch, task.TaskScopeWebsite, req.TaskID, 0)
-	if err != nil {
-		return err
-	}
-	sort.SliceStable(websites, func(i, j int) bool {
-		if websites[i].Type == constant.Subsite && websites[j].Type != constant.Subsite {
-			return true
-		}
-		if websites[i].Type != constant.Subsite && websites[j].Type == constant.Subsite {
-			return false
-		}
-		return false
-	})
-	opWebsiteTask := func(t *task.Task) error {
-		for _, web := range websites {
-			msg := fmt.Sprintf("%s %s", i18n.GetMsgByKey(req.Operate), web.PrimaryDomain)
-			switch req.Operate {
-			case constant.StopWeb, constant.StartWeb:
-				if err := opWebsite(&web, req.Operate); err != nil {
-					t.LogFailedWithErr(msg, err)
-					continue
-				}
-				_ = websiteRepo.Save(context.Background(), &web)
-			case "delete":
-				if err := w.DeleteWebsite(request.WebsiteDelete{
-					ID: web.ID,
-				}); err != nil {
-					t.LogFailedWithErr(msg, err)
-					continue
-				}
-			}
-
-			t.LogSuccess(msg)
-		}
-		return nil
-	}
-	opTask.AddSubTask("", opWebsiteTask, nil)
-
-	go func() {
-		_ = opTask.Execute()
-	}()
-	return nil
 }
 
 func (w WebsiteService) GetWebsiteOptions(req request.WebsiteOptionReq) ([]response.WebsiteOption, error) {
@@ -2403,7 +2347,7 @@ func (w WebsiteService) ExecComposer(req request.ExecComposerReq) error {
 }
 
 func (w WebsiteService) UpdateStream(req request.StreamUpdate) error {
-	if req.StreamConfig.StreamPorts == ""{
+	if req.StreamConfig.StreamPorts == "" {
 		return buserr.New("ErrTypePortRange")
 	}
 	website, err := websiteRepo.GetFirst(repo.WithByID(req.WebsiteID))

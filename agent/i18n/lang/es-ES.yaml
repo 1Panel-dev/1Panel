@@ -153,6 +153,8 @@ unpause: 'Reanudar'
 remove: 'Eliminar'
 delete: 'Eliminar'
 ErrDefaultWebsite: 'El sitio web predeterminado ya está configurado, ¡cancélelo antes de configurar!'
+SSL: 'Certificado'
+Set: 'Configuración'
 
 #ssl
 ErrSSLCannotDelete: 'El certificado {{ .name }} está siendo utilizado por un sitio web y no puede eliminarse'
