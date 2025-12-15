@@ -517,6 +517,8 @@ const message = {
         changeConnHelper: 'Esta operación modificará la base de datos actual {0}. ¿Desea continuar?',
         changePasswordHelper:
             'La base de datos ha sido asociada a una aplicación. Cambiar la contraseña también cambiará la contraseña de la base de datos en la aplicación. El cambio se aplica después de reiniciar la aplicación.',
+        recoverTimeoutHelper: '-1 significa sin límite de tiempo de espera',
+
         confChange: 'Configuración',
         confNotFound:
             'No se pudo encontrar el archivo de configuración. Por favor actualice la aplicación a la última versión en la tienda y vuelva a intentarlo.',

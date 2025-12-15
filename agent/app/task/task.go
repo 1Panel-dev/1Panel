@@ -226,6 +226,9 @@ func (s *SubTask) Execute() error {
 			s.RootTask.Log(i18n.GetWithName("TaskRetry", strconv.Itoa(i)))
 		}
 		ctx, cancel := context.WithTimeout(context.Background(), s.Timeout)
+		if s.Timeout == 0 {
+			ctx, cancel = context.WithCancel(context.Background())
+		}
 		defer cancel()
 
 		done := make(chan error)

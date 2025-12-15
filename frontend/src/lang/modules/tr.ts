@@ -516,6 +516,7 @@ const message = {
         changeConnHelper: 'Bu işlem mevcut {0} veritabanını değiştirecek. Devam etmek istiyor musunuz?',
         changePasswordHelper:
             'Veritabanı bir uygulamayla ilişkilendirildi. Şifre değiştirmek aynı zamanda uygulamanın veritabanı şifresini de değiştirecek. Değişiklik uygulama yeniden başlatıldıktan sonra etkili olur.',
+        recoverTimeoutHelper: '-1, zaman aşımı sınırı olmadığı anlamına gelir',
 
         confChange: 'Yapılandırma',
         confNotFound:

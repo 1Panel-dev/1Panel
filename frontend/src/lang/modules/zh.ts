@@ -497,6 +497,7 @@ const message = {
         changePassword: '改密',
         changeConnHelper: '此操作将修改当前数据库 {0}，是否继续？',
         changePasswordHelper: '当前数据库已经关联应用，修改密码将同步修改应用中数据库密码，修改后重启生效。',
+        recoverTimeoutHelper: '为 -1 表示不限制超时时间',
 
         portHelper: '该端口为容器对外暴露端口，修改需要单独保存并且重启容器！',
 

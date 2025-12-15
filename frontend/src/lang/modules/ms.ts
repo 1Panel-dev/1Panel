@@ -510,6 +510,7 @@ const message = {
         changeConnHelper: 'Operasi ini akan mengubah pangkalan data semasa {0}. Adakah anda ingin meneruskan?',
         changePasswordHelper:
             'Pangkalan data telah dikaitkan dengan aplikasi. Menukar kata laluan akan menukar kata laluan pangkalan data aplikasi pada masa yang sama. Perubahan ini akan berkuat kuasa selepas aplikasi dimulakan semula.',
+        recoverTimeoutHelper: '-1 bermaksud tiada had masa tamat',
 
         confChange: 'Konfigurasi',
         confNotFound:

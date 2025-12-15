@@ -187,7 +187,16 @@ func handlePostgresqlRecover(req dto.CommonRecover, parentTask *task.Task, isRol
 		return recoverDatabase(parentTask)
 	}
 
-	itemTask.AddSubTaskWithOps(i18n.GetMsgByKey("TaskRecover"), recoverDatabase, nil, 0, 3*time.Hour)
+	var timeout time.Duration
+	switch req.Timeout {
+	case -1:
+		timeout = 0
+	case 0:
+		timeout = 3 * time.Hour
+	default:
+		timeout = time.Duration(req.Timeout) * time.Second
+	}
+	itemTask.AddSubTaskWithOps(i18n.GetMsgByKey("TaskRecover"), recoverDatabase, nil, 0, timeout)
 	go func() {
 		_ = itemTask.Execute()
 	}()

@@ -508,6 +508,7 @@ const message = {
         changeConnHelper: 'Esta operação modificará o banco de dados atual {0}. Deseja continuar?',
         changePasswordHelper:
             'O banco de dados está associado a um aplicativo. Alterar a senha alterará a senha do banco de dados do aplicativo ao mesmo tempo. A mudança surtirá efeito após a reinicialização do aplicativo.',
+        recoverTimeoutHelper: '-1 significa sem limite de tempo limite',
 
         confChange: 'Configuração',
         confNotFound:

@@ -83,6 +83,7 @@ type CommonRecover struct {
 	Secret            string `json:"secret"`
 	TaskID            string `json:"taskID"`
 	BackupRecordID    uint   `json:"backupRecordID"`
+	Timeout           int    `json:"timeout"`
 }
 
 type RecordSearch struct {

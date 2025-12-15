@@ -513,6 +513,7 @@ const message = {
         changeConnHelper: 'This operation will modify the current database {0}. Do you want to continue?',
         changePasswordHelper:
             'The database has been associated with an application. Changing the password will change the database password of the application at the same time. The change takes effect after the application restarts.',
+        recoverTimeoutHelper: '-1 means no timeout limit',
 
         confChange: 'Configuration',
         confNotFound:

@@ -94,6 +94,22 @@
                 <el-form-item :label="$t('setting.compressPassword')">
                     <el-input v-model="secret" :placeholder="$t('setting.backupRecoverMessage')" />
                 </el-form-item>
+                <el-form-item
+                    v-if="type !== 'app' && type !== 'website'"
+                    :label="$t('cronjob.timeout')"
+                    prop="timeoutItem"
+                >
+                    <el-input type="number" class="selectClass" v-model.number="timeoutItem">
+                        <template #append>
+                            <el-select v-model="timeoutUnit" style="width: 80px">
+                                <el-option :label="$t('commons.units.second')" value="s" />
+                                <el-option :label="$t('commons.units.minute')" value="m" />
+                                <el-option :label="$t('commons.units.hour')" value="h" />
+                            </el-select>
+                        </template>
+                    </el-input>
+                    <span class="input-help">{{ $t('database.recoverTimeoutHelper') }}</span>
+                </el-form-item>
             </el-form>
             <template #footer>
                 <span class="dialog-footer">
@@ -115,7 +131,7 @@
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
-import { computeSize, newUUID } from '@/utils/util';
+import { computeSize, newUUID, transferTimeToSecond } from '@/utils/util';
 import i18n from '@/lang';
 import { UploadFile, UploadFiles, UploadInstance, UploadProps, UploadRawFile, genFileId } from 'element-plus';
 import { File } from '@/api/interface/file';
@@ -152,6 +168,8 @@ const name = ref();
 const detailName = ref();
 const remark = ref();
 const secret = ref();
+const timeoutItem = ref(30);
+const timeoutUnit = ref('m');
 const taskLogRef = ref();
 
 const recoverDialog = ref();
@@ -261,6 +279,7 @@ const onHandleRecover = async () => {
         file: baseDir.value + currentRow.value.name,
         secret: secret.value,
         taskID: newUUID(),
+        timeout: timeoutItem.value === -1 ? -1 : transferTimeToSecond(timeoutItem.value + timeoutUnit.value),
     };
     loading.value = true;
     await handleRecoverByUpload(params)

@@ -501,6 +501,7 @@ const message = {
         changeConnHelper: 'この操作は現在のデータベース {0} を変更します。続行しますか？',
         changePasswordHelper:
             'データベースはアプリケーションに関連付けられています。パスワードを変更すると、アプリケーションのデータベースパスワードが同時に変更されます。アプリケーションが再起動した後、変更は有効になります。',
+        recoverTimeoutHelper: '-1 はタイムアウト制限なしを意味します',
 
         confChange: '構成',
         confNotFound:
