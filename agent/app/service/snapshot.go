@@ -224,12 +224,16 @@ func loadApps(fileOp fileUtils.FileOp) ([]dto.DataTree, error) {
 	appTreeMap := make(map[string]dto.DataTree)
 	for _, app := range apps {
 		itemApp := dto.DataTree{
-			ID:    uuid.NewString(),
-			Label: fmt.Sprintf("%s - %s", app.App.Name, app.Name),
-			Key:   app.App.Key,
-			Name:  app.Name,
+			ID:      uuid.NewString(),
+			Label:   fmt.Sprintf("%s - %s", app.App.Name, app.Name),
+			Key:     app.App.Key,
+			Name:    app.Name,
+			IsLocal: app.App.Resource == "local",
 		}
 		appPath := path.Join(global.Dir.DataDir, "apps", app.App.Key, app.Name)
+		if itemApp.IsLocal {
+			appPath = path.Join(global.Dir.AppDir, "local", strings.TrimPrefix(app.App.Key, "local"), app.Name)
+		}
 		itemAppData := dto.DataTree{ID: uuid.NewString(), Label: "appData", Key: app.App.Key, Name: app.Name, IsCheck: true, Path: appPath}
 		if app.App.Key == constant.AppOpenresty && len(websites) != 0 {
 			itemAppData.IsDisable = true
@@ -295,7 +299,7 @@ func loadAppImage(list []dto.DataTree) []dto.DataTree {
 
 	for i := 0; i < len(list); i++ {
 		itemAppImage := dto.DataTree{ID: uuid.NewString(), Label: "appImage"}
-		stdout, err := cmd.RunDefaultWithStdoutBashCf("cat %s | grep image: ", path.Join(global.Dir.AppDir, list[i].Key, list[i].Name, "docker-compose.yml"))
+		stdout, err := cmd.RunDefaultWithStdoutBashCf("cat %s | grep image: ", list[i].Path)
 		if err != nil {
 			list[i].Children = append(list[i].Children, itemAppImage)
 			continue

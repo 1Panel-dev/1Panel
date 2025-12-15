@@ -52,6 +52,7 @@ type DataTree struct {
 	Label     string `json:"label"`
 	Key       string `json:"key"`
 	Name      string `json:"name"`
+	IsLocal   bool   `json:"isLocal"`
 	Size      uint64 `json:"size"`
 	IsCheck   bool   `json:"isCheck"`
 	IsDisable bool   `json:"isDisable"`
