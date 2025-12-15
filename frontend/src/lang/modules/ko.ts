@@ -2517,6 +2517,7 @@ const message = {
         batchAdd: '도메인 일괄 추가',
         batchInput: '일괄 입력',
         domainNotFQDN: '이 도메인은 공용 네트워크에서 액세스할 수 없을 수 있습니다',
+        domainInvalid: '도메인 형식이 올바르지 않습니다',
         domainBatchHelper: '한 줄에 하나의 도메인, 형식: domain:port@ssl\n예: example.com:443@ssl 또는 example.com',
         generateDomain: '생성',
         global: '글로벌',

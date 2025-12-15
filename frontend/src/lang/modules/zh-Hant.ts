@@ -2455,6 +2455,7 @@ const message = {
         batchAdd: '批次新增域名',
         batchInput: '批次輸入',
         domainNotFQDN: '此域名可能無法在公網訪問',
+        domainInvalid: '域名格式不正確',
         domainBatchHelper: '一行一個域名，格式：域名:端口@ssl\n範例：example.com:443@ssl 或 example.com',
         generateDomain: '生成',
         global: '全域',

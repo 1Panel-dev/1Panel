@@ -2641,6 +2641,7 @@ const message = {
         batchAdd: 'Batch Add Domains',
         batchInput: 'Batch Input',
         domainNotFQDN: 'This domain may not be accessible on the public network',
+        domainInvalid: 'Invalid domain format',
         domainBatchHelper: 'One domain per line, format: domain:port@ssl\nExample: example.com:443@ssl or example.com',
         generateDomain: 'Generate',
         global: 'Global',

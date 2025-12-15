@@ -2618,6 +2618,7 @@ const message = {
         batchAdd: 'Пакетное Добавление Доменов',
         batchInput: 'Пакетный ввод',
         domainNotFQDN: 'Этот домен может быть недоступен в публичной сети',
+        domainInvalid: 'Неверный формат домена',
         domainBatchHelper: 'Один домен на строку, формат: domain:port@ssl\nПример: example.com:443@ssl или example.com',
         generateDomain: 'Сгенерировать',
         global: 'Глобальный',

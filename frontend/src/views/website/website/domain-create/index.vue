@@ -92,6 +92,9 @@ import { checkAppInstalled } from '@/api/modules/app';
 import { Rules, checkNumberRange } from '@/global/form-rules';
 import { MsgError } from '@/utils/message';
 import { ref, onMounted, nextTick } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const i18n = useI18n();
 
 const props = defineProps({
     form: {
@@ -164,7 +167,7 @@ const validateSingleDomain = (_rule: any, value: string, callback: (error?: Erro
     if (singleDomainRegex.test(value)) {
         return callback();
     }
-    callback(new Error('域名格式不正确'));
+    callback(new Error(i18n.t('website.domainInvalid')));
 };
 
 const rules = ref({
@@ -253,7 +256,7 @@ const saveBatchInput = () => {
         const { domain, host, port, ssl } = parsed;
 
         if (!domain.trim() || !singleDomainRegex.test(domain)) {
-            MsgError(line + ' 域名格式不正确');
+            MsgError(line + ' ' + i18n.t('website.domainInvalid'));
             hasError = true;
             return;
         }

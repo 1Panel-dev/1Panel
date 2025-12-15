@@ -2676,7 +2676,9 @@ const message = {
         batchAdd: 'Toplu Alan Adı Ekle',
         batchInput: 'Toplu Giriş',
         domainNotFQDN: 'Bu alan adı genel ağda erişilebilir olmayabilir',
-        domainBatchHelper: 'Bir satırda bir alan adı, format: domain:port@ssl\nÖrnek: example.com:443@ssl veya example.com',
+        domainInvalid: 'Geçersiz alan adı biçimi',
+        domainBatchHelper:
+            'Bir satırda bir alan adı, format: domain:port@ssl\nÖrnek: example.com:443@ssl veya example.com',
         generateDomain: 'Oluştur',
         global: 'Küresel',
         subsite: 'Alt site',

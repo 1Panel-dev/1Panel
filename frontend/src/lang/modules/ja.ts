@@ -2562,6 +2562,7 @@ const message = {
         batchAdd: 'ドメインを一括追加',
         batchInput: 'バッチ入力',
         domainNotFQDN: 'このドメインはパブリックネットワークからアクセスできない可能性があります',
+        domainInvalid: 'ドメイン形式が正しくありません',
         domainBatchHelper: '1行に1ドメイン、形式: domain:port@ssl\n例: example.com:443@ssl または example.com',
         generateDomain: '生成',
         global: 'グローバル',

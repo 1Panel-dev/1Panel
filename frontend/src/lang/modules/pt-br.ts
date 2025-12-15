@@ -2623,7 +2623,9 @@ const message = {
         batchAdd: 'Adicionar Domínios em Lote',
         batchInput: 'Entrada em Lote',
         domainNotFQDN: 'Este domínio pode não estar acessível na rede pública',
-        domainBatchHelper: 'Um domínio por linha, formato: domínio:porta@ssl\nExemplo: example.com:443@ssl ou example.com',
+        domainInvalid: 'Formato de domínio inválido',
+        domainBatchHelper:
+            'Um domínio por linha, formato: domínio:porta@ssl\nExemplo: example.com:443@ssl ou example.com',
         generateDomain: 'Gerar',
         global: 'Global',
         subsite: 'Subsite',
