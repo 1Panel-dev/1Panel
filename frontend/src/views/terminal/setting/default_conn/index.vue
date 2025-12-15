@@ -72,6 +72,7 @@ const form = reactive({
     groupID: 0,
     description: '',
     rememberPassword: false,
+    localSSHConnShow: '',
 });
 const rules = reactive({
     addr: [Rules.ipV4V6OrDomain],
@@ -90,9 +91,9 @@ const acceptParams = (): void => {
 const search = async () => {
     await loadLocalConn().then((res) => {
         if (res.data) {
-            form.addr = res.data.addr;
-            form.port = res.data.port;
-            form.authMode = res.data.authMode;
+            form.addr = res.data.addr || '127.0.0.1';
+            form.port = res.data.port || 22;
+            form.authMode = res.data.authMode || 'password';
             form.password = Base64.decode(res.data.password);
             form.privateKey = Base64.decode(res.data.privateKey);
             form.passPhrase = Base64.decode(res.data.passPhrase);

@@ -1270,6 +1270,7 @@ const message = {
         defaultConn: 'Default Connection',
         defaultConnHelper:
             'This operation will automatically connect to the node terminal after opening the terminal for 【{0}】. Continue?',
+        withReset: 'Reset Connection Information',
         localConnJump:
             'Default connection information is maintained in [Terminal - Settings]. If connection fails, please edit there!',
         localHelper: 'The `local` name is used only for system local identification',

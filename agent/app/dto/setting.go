@@ -62,6 +62,10 @@ type Clean struct {
 	Size     uint64 `json:"size"`
 }
 
+type SSHDefaultConn struct {
+	WithReset   bool   `json:"withReset"`
+	DefaultConn string `json:"defaultConn"`
+}
 type SSHConnData struct {
 	Addr       string `json:"addr" validate:"required"`
 	Port       uint   `json:"port" validate:"required,number,max=65535,min=1"`

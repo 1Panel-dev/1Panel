@@ -13,6 +13,9 @@ export const getHostByID = (id: number) => {
 export const getHostTree = (params: Host.ReqSearch) => {
     return http.post<Array<Host.HostTree>>(`/core/hosts/tree`, params);
 };
+export const updateLocalConn = (param: { withReset: boolean; defaultConn: string }) => {
+    return http.post(`/settings/ssh/default`, param);
+};
 export const addHost = (params: Host.HostOperate) => {
     let request = deepCopy(params) as Host.HostOperate;
     if (request.password) {

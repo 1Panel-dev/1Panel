@@ -32,6 +32,7 @@ func (s *SettingRouter) InitRouter(Router *gin.RouterGroup) {
 
 		settingRouter.POST("/ssh/check", baseApi.CheckLocalConn)
 		settingRouter.GET("/ssh/conn", baseApi.LoadLocalConn)
+		settingRouter.POST("/ssh/default", baseApi.SetDefaultIsConn)
 		settingRouter.POST("/ssh", baseApi.SaveLocalConn)
 		settingRouter.POST("/ssh/check/info", baseApi.CheckLocalConnByInfo)
 	}

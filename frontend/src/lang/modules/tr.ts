@@ -1284,6 +1284,7 @@ const message = {
         defaultConn: 'Varsayılan Bağlantı',
         defaultConnHelper:
             'Bu işlem, 【{0}】 için terminal açıldıktan sonra otomatik olarak düğüm terminaline bağlanacaktır. Devam etmek istiyor musunuz?',
+        withReset: 'Bağlantı Bilgilerini Sıfırla',
         localConnJump:
             'Varsayılan bağlantı bilgileri [Terminal - Ayarlar] bölümünde yönetilir. Bağlantı başarısız olursa lütfen oradan düzenleyin!',
         localHelper: '`local` adı sadece sistem yerel tanımlaması için kullanılır',

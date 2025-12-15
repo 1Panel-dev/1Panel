@@ -9,6 +9,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
+	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
 	"github.com/1Panel-dev/1Panel/agent/utils/ssh"
 	"github.com/jinzhu/copier"
@@ -22,6 +23,7 @@ type ISettingService interface {
 
 	TestConnByInfo(req dto.SSHConnData) bool
 	SaveConnInfo(req dto.SSHConnData) error
+	SetDefaultIsConn(req dto.SSHDefaultConn) error
 	GetSystemProxy() (*dto.SystemProxy, error)
 	GetLocalConn() dto.SSHConnData
 	GetSettingByKey(key string) string
@@ -125,6 +127,15 @@ func (u *SettingService) SaveConnInfo(req dto.SSHConnData) error {
 	return nil
 }
 
+func (u *SettingService) SetDefaultIsConn(req dto.SSHDefaultConn) error {
+	if req.DefaultConn == constant.StatusDisable && req.WithReset {
+		if err := settingRepo.Update("LocalSSHConn", ""); err != nil {
+			return err
+		}
+	}
+	return settingRepo.Update("LocalSSHConnShow", req.DefaultConn)
+}
+
 func (u *SettingService) GetSystemProxy() (*dto.SystemProxy, error) {
 	systemProxy := dto.SystemProxy{}
 	systemProxy.Type, _ = settingRepo.GetValueByKey("ProxyType")
@@ -138,6 +149,7 @@ func (u *SettingService) GetSystemProxy() (*dto.SystemProxy, error) {
 
 func (u *SettingService) GetLocalConn() dto.SSHConnData {
 	var data dto.SSHConnData
+	data.LocalSSHConnShow, _ = settingRepo.GetValueByKey("LocalSSHConnShow")
 	connItem, _ := settingRepo.GetValueByKey("LocalSSHConn")
 	if len(connItem) == 0 {
 		return data

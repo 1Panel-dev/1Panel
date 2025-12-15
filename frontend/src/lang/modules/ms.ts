@@ -1265,6 +1265,7 @@ const message = {
         defaultConn: 'Sambungan Lalai',
         defaultConnHelper:
             'Operasi ini akan menyambung secara automatik ke terminal nod selepas membuka terminal untuk 【{0}】. Teruskan?',
+        withReset: 'Tetapkan Semula Maklumat Sambungan',
         localConnJump:
             'Maklumat sambungan lalai dikekalkan dalam [Terminal - Tetapan]. Jika sambungan gagal, sila edit di sana!',
         localHelper: 'Nama tempatan hanya digunakan untuk pengenalan sistem tempatan.',

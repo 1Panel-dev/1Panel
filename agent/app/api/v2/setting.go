@@ -85,6 +85,28 @@ func (b *BaseApi) CheckLocalConn(c *gin.Context) {
 }
 
 // @Tags System Setting
+// @Summary Update local is conn
+// @Accept json
+// @Param request body dto.SSHDefaultConn true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /settings/ssh/conn/default [post]
+// @x-panel-log {"bodyKeys":["defaultConn"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"本地终端默认连接 [defaultConn]","formatEN":"update system default conn [defaultConn]"}
+func (b *BaseApi) SetDefaultIsConn(c *gin.Context) {
+	var req dto.SSHDefaultConn
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	if err := settingService.SetDefaultIsConn(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags System Setting
 // @Summary Check local conn info
 // @Success 200 {boolean} isOk
 // @Security ApiKeyAuth

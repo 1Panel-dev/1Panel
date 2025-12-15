@@ -104,13 +104,23 @@
             </template>
         </LayoutContent>
         <OperateDialog @search="loadConnShow" ref="dialogRef" />
+
+        <OpDialog ref="opRef" @search="search" @cancel="loadConnShow">
+            <template #content>
+                <el-form class="mt-4 mb-1" ref="deleteForm" v-if="!form.showDefaultConn" label-position="left">
+                    <el-form-item>
+                        <el-checkbox v-model="resetConn" :label="$t('terminal.withReset')" />
+                    </el-form-item>
+                </el-form>
+            </template>
+        </OpDialog>
     </div>
 </template>
 
 <script lang="ts" setup>
 import { ref, reactive } from 'vue';
 import { ElForm } from 'element-plus';
-import { getTerminalInfo, updateAgentSetting, UpdateTerminalInfo } from '@/api/modules/setting';
+import { getTerminalInfo, UpdateTerminalInfo } from '@/api/modules/setting';
 import { Terminal } from '@xterm/xterm';
 import OperateDialog from '@/views/terminal/setting/default_conn/index.vue';
 import '@xterm/xterm/css/xterm.css';
@@ -118,7 +128,7 @@ import { FitAddon } from '@xterm/addon-fit';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { TerminalStore } from '@/store';
-import { loadLocalConn } from '@/api/modules/terminal';
+import { loadLocalConn, updateLocalConn } from '@/api/modules/terminal';
 
 const loading = ref(false);
 const terminalStore = TerminalStore();
@@ -140,6 +150,9 @@ const form = reactive({
     showDefaultConn: false,
     defaultConn: '',
 });
+
+const resetConn = ref(false);
+const opRef = ref();
 
 const acceptParams = () => {
     search(true);
@@ -181,17 +194,16 @@ const loadConnShow = async () => {
 };
 
 const changeShow = async () => {
+    resetConn.value = false;
     let op = form.showDefaultConn ? i18n.global.t('xpack.waf.allow') : i18n.global.t('xpack.waf.deny');
-    ElMessageBox.confirm(i18n.global.t('terminal.defaultConnHelper', [op]), i18n.global.t('terminal.defaultConn'), {
-        confirmButtonText: i18n.global.t('commons.button.confirm'),
-        cancelButtonText: i18n.global.t('commons.button.cancel'),
-        type: 'info',
-    }).then(async () => {
-        await updateAgentSetting({ key: 'LocalSSHConnShow', value: form.showDefaultConn ? 'Enable' : 'Disable' }).then(
-            () => {
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            },
-        );
+    opRef.value.acceptParams({
+        title: i18n.global.t('terminal.defaultConn'),
+        names: [],
+        msg: i18n.global.t('terminal.defaultConnHelper', [op]),
+        noMsg: false,
+        successMsg: i18n.global.t('commons.msg.operationSuccess'),
+        api: updateLocalConn,
+        params: { withReset: resetConn.value, defaultConn: form.showDefaultConn ? 'Enable' : 'Disable' },
     });
 };
 

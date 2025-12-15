@@ -22,7 +22,7 @@
             </div>
             <template #footer>
                 <span class="dialog-footer">
-                    <el-button @click="open = false" :disabled="loading">
+                    <el-button @click="handleClose" :disabled="loading">
                         {{ $t('commons.button.cancel') }}
                     </el-button>
                     <el-button type="primary" @click="onConfirm" :disabled="loading">
@@ -88,7 +88,6 @@ const onConfirm = async () => {
     await form
         .api(form.params)
         .then(() => {
-            emit('cancel');
             emit('search');
             if (!noMsg.value) {
                 MsgSuccess(successMsg.value ?? i18n.global.t('commons.msg.deleteSuccess'));
