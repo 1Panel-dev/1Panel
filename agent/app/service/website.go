@@ -282,6 +282,9 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 		primaryDomain string
 	)
 	if website.Type == constant.Stream {
+		if create.StreamConfig.StreamPorts == "" {
+			return buserr.New("ErrTypePortRange")
+		}
 		website.PrimaryDomain = create.Name
 		website.Protocol = constant.ProtocolStream
 		website.StreamPorts = create.StreamConfig.StreamPorts
@@ -2400,6 +2403,9 @@ func (w WebsiteService) ExecComposer(req request.ExecComposerReq) error {
 }
 
 func (w WebsiteService) UpdateStream(req request.StreamUpdate) error {
+	if req.StreamConfig.StreamPorts == ""{
+		return buserr.New("ErrTypePortRange")
+	}
 	website, err := websiteRepo.GetFirst(repo.WithByID(req.WebsiteID))
 	if err != nil {
 		return err

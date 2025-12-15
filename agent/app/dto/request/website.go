@@ -42,7 +42,7 @@ type WebsiteCreate struct {
 }
 
 type StreamConfig struct {
-	StreamPorts string `json:"streamPorts" validate:"required"`
+	StreamPorts string `json:"streamPorts"`
 	Name        string `json:"name"`
 	Algorithm   string `json:"algorithm"`
 

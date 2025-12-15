@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 	"log"
 	"net"
 	"os"
@@ -14,6 +13,8 @@ import (
 	"strings"
 	"syscall"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 
@@ -189,6 +190,9 @@ func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, a
 		config     *components.Config
 	)
 	if website.Type == constant.Stream {
+		if streamConfig.StreamPorts == "" {
+			return buserr.New("ErrTypePortRange")
+		}
 		nginxContent := nginx_conf.GetWebsiteFile("stream_default.conf")
 		config, err = parser.NewStringParser(string(nginxContent)).Parse()
 		if err != nil {
