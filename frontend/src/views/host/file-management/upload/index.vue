@@ -7,8 +7,8 @@
         :confirmBeforeClose="true"
     >
         <template #content>
-            <div class="button-container">
-                <div>
+            <div class="upload-button flex flex-wrap justify-between items-center gap-4 pb-4 md:flex-nowrap">
+                <div class="flex flex-wrap gap-4">
                     <el-button type="primary" @click="upload('file')">
                         {{ $t('commons.button.upload') }}{{ $t('menu.files') }}
                     </el-button>
@@ -464,10 +464,10 @@ defineExpose({ acceptParams, handleDrop, open });
 </script>
 
 <style lang="scss" scoped>
-.button-container {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 10px;
+.upload-button {
+    .el-button + .el-button {
+        margin-left: 0;
+    }
 }
 
 .file-item {
