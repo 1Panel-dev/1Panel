@@ -346,6 +346,7 @@ const taskLogRef = ref();
 const opRef = ref();
 const batchSetGroupRef = ref();
 const batchSetHttpsRef = ref();
+const nginxVersion = ref();
 
 const paginationConfig = reactive({
     cacheSizeKey: 'website-page-size',
@@ -568,7 +569,7 @@ const openDelete = (website: Website.Website) => {
 };
 
 const openCreate = () => {
-    createRef.value.acceptParams();
+    createRef.value.acceptParams(nginxVersion.value);
 };
 
 const openGroup = () => {
@@ -588,6 +589,7 @@ const checkExist = (data: App.CheckInstalled) => {
     containerName.value = data.containerName;
     nginxStatus.value = data.status;
     websiteDir.value = data.websiteDir;
+    nginxVersion.value = data.version;
 };
 
 const checkDate = (date: Date) => {

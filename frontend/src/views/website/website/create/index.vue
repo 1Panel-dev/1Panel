@@ -17,7 +17,8 @@
                         </el-radio-button>
                     </el-radio-group>
                 </el-form-item>
-                <SSLAlert :websiteType="website.type" class="mb-2" />
+                <SSLAlert :websiteType="website.type" class="mb-2" :versionNotMatch="versionNotMatch" />
+
                 <GroupSelect
                     v-model="website.webSiteGroupId"
                     :prop="'webSiteGroupId'"
@@ -389,7 +390,11 @@
         </div>
         <template #footer>
             <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
-            <el-button type="primary" @click="submit(websiteForm)" :disabled="loading">
+            <el-button
+                type="primary"
+                @click="submit(websiteForm)"
+                :disabled="loading || (website.type == 'stream' && versionNotMatch)"
+            >
                 {{ $t('commons.button.confirm') }}
             </el-button>
         </template>
@@ -437,6 +442,7 @@ import { getAccountName } from '@/utils/util';
 import { Website } from '@/api/interface/website';
 import { getPathByType } from '@/api/modules/files';
 import { getWebsiteTypes } from '@/global/mimetype';
+import { compareVersion } from '@/utils/version';
 
 type SSLItem = Website.SSLDTO & {
     organization?: string;
@@ -572,6 +578,7 @@ const runtimePorts = ref([]);
 const WebsiteTypes = getWebsiteTypes();
 const installFormRef = ref();
 const lbFormRef = ref();
+const versionNotMatch = ref();
 const steamConfig = ref({
     name: '',
     algorithm: 'default',
@@ -719,7 +726,11 @@ const getRuntimes = async () => {
     } catch (error) {}
 };
 
-const acceptParams = async () => {
+const acceptParams = async (openrestyVersion: string) => {
+    versionNotMatch.value = false;
+    if (!compareVersion(openrestyVersion, '1.27.1.2-3-3-focal')) {
+        versionNotMatch.value = true;
+    }
     website.value = initData();
     if (websiteForm.value) {
         websiteForm.value.resetFields();
