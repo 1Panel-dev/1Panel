@@ -41,16 +41,16 @@ export const listBucket = (params: Backup.ForBucket) => {
     return http.post('/backups/buckets', request, TimeoutEnum.T_40S);
 };
 export const handleBackup = (params: Backup.Backup) => {
-    return http.post(`/backups/backup`, params, TimeoutEnum.T_1H);
+    return http.post(`/backups/backup`, params, TimeoutEnum.T_10M);
 };
 export const listBackupOptions = () => {
     return http.get<Array<Backup.BackupOption>>(`/backups/options`);
 };
 export const handleRecover = (params: Backup.Recover) => {
-    return http.post(`/backups/recover`, params, TimeoutEnum.T_1D);
+    return http.post(`/backups/recover`, params, TimeoutEnum.T_10M);
 };
 export const handleRecoverByUpload = (params: Backup.Recover) => {
-    return http.post(`/backups/recover/byupload`, params, TimeoutEnum.T_1D);
+    return http.post(`/backups/recover/byupload`, params, TimeoutEnum.T_10M);
 };
 export const downloadBackupRecord = (params: Backup.RecordDownload) => {
     return http.post<string>(`/backups/record/download`, params, TimeoutEnum.T_10M);

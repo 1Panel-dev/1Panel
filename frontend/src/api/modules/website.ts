@@ -155,7 +155,7 @@ export const preCheck = (req: Website.CheckReq) => {
 };
 
 export const updateNginxFile = (req: Website.NginxUpdate) => {
-    return http.post<any>(`/websites/nginx/update`, req);
+    return http.post<any>(`/websites/nginx/update`, req, TimeoutEnum.T_3M);
 };
 
 export const changeDefaultServer = (req: Website.DefaultServerUpdate) => {
