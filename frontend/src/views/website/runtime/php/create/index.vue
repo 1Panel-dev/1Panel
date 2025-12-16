@@ -122,6 +122,26 @@
                     <el-form-item :label="$t('website.remark')" prop="remark">
                         <el-input type="textarea" :rows="1" clearable v-model="runtime.remark" />
                     </el-form-item>
+                    <el-form-item :label="$t('php.extensions')">
+                        <el-select v-model="extensions" @change="changePHPExtension()" clearable>
+                            <el-option
+                                v-for="(extension, index) in phpExtensions"
+                                :key="index"
+                                :label="extension.name"
+                                :value="extension.extensions"
+                            ></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item :label="getLabel(formFields['PHP_EXTENSIONS'])" v-if="formFields['PHP_EXTENSIONS']">
+                        <el-select v-model="runtime.params['PHP_EXTENSIONS']" multiple allowCreate filterable>
+                            <el-option
+                                v-for="service in formFields['PHP_EXTENSIONS'].values"
+                                :key="service.label"
+                                :value="service.value"
+                                :label="service.label"
+                            ></el-option>
+                        </el-select>
+                    </el-form-item>
                     <el-form-item>
                         <el-alert :title="$t('php.containerConfigHelper')" type="info" :closable="false" />
                     </el-form-item>
@@ -143,26 +163,6 @@
                                 </div>
                             </template>
                         </el-alert>
-                    </el-form-item>
-                    <el-form-item :label="$t('php.extensions')">
-                        <el-select v-model="extensions" @change="changePHPExtension()" clearable>
-                            <el-option
-                                v-for="(extension, index) in phpExtensions"
-                                :key="index"
-                                :label="extension.name"
-                                :value="extension.extensions"
-                            ></el-option>
-                        </el-select>
-                    </el-form-item>
-                    <el-form-item :label="getLabel(formFields['PHP_EXTENSIONS'])" v-if="formFields['PHP_EXTENSIONS']">
-                        <el-select v-model="runtime.params['PHP_EXTENSIONS']" multiple allowCreate filterable>
-                            <el-option
-                                v-for="service in formFields['PHP_EXTENSIONS'].values"
-                                :key="service.label"
-                                :value="service.value"
-                                :label="service.label"
-                            ></el-option>
-                        </el-select>
                     </el-form-item>
                 </div>
             </div>
