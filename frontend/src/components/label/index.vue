@@ -18,11 +18,17 @@
                         </el-button>
                     </template>
                     <template #default="{ read }">
-                        <el-input class="p-w-300" v-model="tmpLabels[index]" @blur="read" />
+                        <el-input
+                            clearable
+                            placeholder="key=value"
+                            class="p-w-300"
+                            v-model="tmpLabels[index]"
+                            @blur="read"
+                        />
                     </template>
                 </fu-read-write-switch>
             </div>
-            <el-input v-if="showAdd" v-model="labelItem">
+            <el-input v-if="showAdd" clearable placeholder="key=value" v-model="labelItem">
                 <template #append>
                     <el-button icon="Check" @click="save()" />
                     <el-button icon="Close" @click="cancel()" />

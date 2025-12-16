@@ -299,7 +299,11 @@ func loadAppImage(list []dto.DataTree) []dto.DataTree {
 
 	for i := 0; i < len(list); i++ {
 		itemAppImage := dto.DataTree{ID: uuid.NewString(), Label: "appImage"}
-		stdout, err := cmd.RunDefaultWithStdoutBashCf("cat %s | grep image: ", list[i].Path)
+		appPath := path.Join(global.Dir.DataDir, "apps", list[i].Key, list[i].Name)
+		if list[i].IsLocal {
+			appPath = path.Join(global.Dir.AppDir, "local", strings.TrimPrefix(list[i].Key, "local"), list[i].Name)
+		}
+		stdout, err := cmd.RunDefaultWithStdoutBashCf("cat %s | grep image: ", path.Join(appPath, "docker-compose.yml"))
 		if err != nil {
 			list[i].Children = append(list[i].Children, itemAppImage)
 			continue
