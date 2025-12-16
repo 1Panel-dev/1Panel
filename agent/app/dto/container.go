@@ -264,10 +264,11 @@ type ComposeInfo struct {
 	Env            []string           `json:"env"`
 }
 type ComposeContainer struct {
-	ContainerID string `json:"containerID"`
-	Name        string `json:"name"`
-	CreateTime  string `json:"createTime"`
-	State       string `json:"state"`
+	ContainerID string   `json:"containerID"`
+	Name        string   `json:"name"`
+	CreateTime  string   `json:"createTime"`
+	State       string   `json:"state"`
+	Ports       []string `json:"ports"`
 }
 type ComposeCreate struct {
 	TaskID   string   `json:"taskID"`

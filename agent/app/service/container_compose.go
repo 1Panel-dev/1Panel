@@ -74,6 +74,7 @@ func (u *ContainerService) PageCompose(req dto.SearchWithPage) (int64, interface
 				Name:        container.Names[0][1:],
 				State:       container.State,
 				CreateTime:  time.Unix(container.Created, 0).Format(constant.DateTimeLayout),
+				Ports:       transPortToStr(container.Ports),
 			}
 			if compose, has := composeMap[name]; has {
 				compose.ContainerCount++
@@ -180,7 +181,7 @@ func (u *ContainerService) TestCompose(req dto.ComposeCreate) (bool, error) {
 	cmd := getComposeCmd(req.Path, "config")
 	stdout, err := cmd.CombinedOutput()
 	if err != nil {
-		return false, errors.New(string(stdout))
+		return false, fmt.Errorf("docker-compose config failed, std: %s, err: %v", string(stdout), err)
 	}
 	return true, nil
 }
@@ -242,14 +243,13 @@ func (u *ContainerService) ComposeOperation(req dto.ComposeOperation) error {
 	}
 	if req.Operation == "up" {
 		if stdout, err := compose.Up(req.Path); err != nil {
-			return errors.New(string(stdout))
+			return fmt.Errorf("docker-compose up failed, std: %s, err: %v", stdout, err)
 		}
 	} else {
 		if stdout, err := compose.Operate(req.Path, req.Operation); err != nil {
-			return errors.New(string(stdout))
+			return fmt.Errorf("docker-compose %s failed, std: %s, err: %v", req.Operation, stdout, err)
 		}
 	}
-	global.LOG.Infof("docker-compose %s %s successful", req.Operation, req.Name)
 	return nil
 }
 
@@ -276,10 +276,11 @@ func (u *ContainerService) ComposeUpdate(req dto.ComposeUpdate) error {
 	}
 
 	if stdout, err := compose.Up(req.Path); err != nil {
+		global.LOG.Errorf("update failed when handle compose up, std: %s, err: %s, now try to recreate the old compose file", stdout, err)
 		if err := recreateCompose(string(oldFile), req.Path); err != nil {
-			return fmt.Errorf("update failed when handle compose up, err: %s, recreate failed: %v", string(stdout), err)
+			return fmt.Errorf("update failed and recreate old compose file also failed, err: %v", err)
 		}
-		return fmt.Errorf("update failed when handle compose up, err: %s", string(stdout))
+		return fmt.Errorf("update failed when handle compose up, std: %v, err: %s", stdout, err)
 	}
 
 	return nil
@@ -438,6 +439,5 @@ func newComposeEnv(pathItem string, env []string) error {
 			return err
 		}
 	}
-	global.LOG.Infof(".env file successfully created or updated with env variables in %s", envFilePath)
 	return nil
 }
