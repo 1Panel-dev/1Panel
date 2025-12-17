@@ -91,6 +91,17 @@ func (w WebsiteService) BatchSetHttps(ctx context.Context, req request.BatchWebs
 		HttpsPorts:            req.HttpsPorts,
 		Http3:                 req.Http3,
 	}
+	if req.Type == constant.SSLManual {
+		websiteSSL, err := getManualWebsiteSSL(websiteHttpsOp)
+		if err != nil {
+			return err
+		}
+		if err = websiteSSLRepo.Create(ctx, &websiteSSL); err != nil {
+			return err
+		}
+		websiteHttpsOp.Type = constant.SSLExisted
+		websiteHttpsOp.WebsiteSSLID = websiteSSL.ID
+	}
 	opWebsiteTask := func(t *task.Task) error {
 		for _, web := range websites {
 			if web.Type == constant.Stream {

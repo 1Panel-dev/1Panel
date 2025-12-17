@@ -3,9 +3,7 @@ package service
 import (
 	"bytes"
 	"context"
-	"crypto/x509"
 	"encoding/base64"
-	"encoding/pem"
 	"errors"
 	"fmt"
 	"net"
@@ -975,64 +973,10 @@ func (w WebsiteService) OpWebsiteHTTPS(ctx context.Context, req request.WebsiteH
 		websiteSSL = *websiteModel
 	}
 	if req.Type == constant.SSLManual {
-		var (
-			certificate string
-			privateKey  string
-		)
-		switch req.ImportType {
-		case "paste":
-			certificate = req.Certificate
-			privateKey = req.PrivateKey
-		case "local":
-			fileOp := files.NewFileOp()
-			if !fileOp.Stat(req.PrivateKeyPath) {
-				return nil, buserr.New("ErrSSLKeyNotFound")
-			}
-			if !fileOp.Stat(req.CertificatePath) {
-				return nil, buserr.New("ErrSSLCertificateNotFound")
-			}
-			if content, err := fileOp.GetContent(req.PrivateKeyPath); err != nil {
-				return nil, err
-			} else {
-				privateKey = string(content)
-			}
-			if content, err := fileOp.GetContent(req.CertificatePath); err != nil {
-				return nil, err
-			} else {
-				certificate = string(content)
-			}
-		}
-
-		privateKeyCertBlock, _ := pem.Decode([]byte(privateKey))
-		if privateKeyCertBlock == nil {
-			return nil, buserr.New("ErrSSLKeyFormat")
-		}
-
-		certBlock, _ := pem.Decode([]byte(certificate))
-		if certBlock == nil {
-			return nil, buserr.New("ErrSSLCertificateFormat")
-		}
-		cert, err := x509.ParseCertificate(certBlock.Bytes)
+		websiteSSL, err = getManualWebsiteSSL(req)
 		if err != nil {
 			return nil, err
 		}
-		websiteSSL.ExpireDate = cert.NotAfter
-		websiteSSL.StartDate = cert.NotBefore
-		websiteSSL.Type = cert.Issuer.CommonName
-		if len(cert.Issuer.Organization) > 0 {
-			websiteSSL.Organization = cert.Issuer.Organization[0]
-		} else {
-			websiteSSL.Organization = cert.Issuer.CommonName
-		}
-		if len(cert.DNSNames) > 0 {
-			websiteSSL.PrimaryDomain = cert.DNSNames[0]
-			websiteSSL.Domains = strings.Join(cert.DNSNames, ",")
-		}
-		websiteSSL.Provider = constant.Manual
-		websiteSSL.PrivateKey = privateKey
-		websiteSSL.Pem = certificate
-		websiteSSL.Status = constant.SSLReady
-
 		res.SSL = websiteSSL
 	}
 
