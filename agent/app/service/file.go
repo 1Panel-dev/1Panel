@@ -172,7 +172,6 @@ func shouldFilterPath(path string) bool {
 	return false
 }
 
-// 递归构建文件树(只取当前目录以及当前目录下的第一层子节点)
 func (f *FileService) buildFileTree(node *response.FileTree, items []*files.FileInfo, op request.FileOption, level int) error {
 	for _, v := range items {
 		if shouldFilterPath(v.Path) {
@@ -272,6 +271,11 @@ func (f *FileService) Delete(op request.FileDelete) error {
 			return fo.DeleteFile(op.Path)
 		}
 	}
+	info, _ := fo.Fs.Stat(op.Path)
+	if info == nil || files.IsSymlink(info.Mode()) {
+		return os.Remove(op.Path)
+	}
+
 	if err := NewIRecycleBinService().Create(request.RecycleBinCreate{SourcePath: op.Path}); err != nil {
 		return err
 	}
