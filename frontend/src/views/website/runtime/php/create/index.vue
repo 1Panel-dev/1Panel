@@ -119,9 +119,6 @@
                     <el-form-item :label="$t('app.containerName')" prop="params.CONTAINER_NAME">
                         <el-input v-model.trim="runtime.params['CONTAINER_NAME']"></el-input>
                     </el-form-item>
-                    <el-form-item :label="$t('website.remark')" prop="remark">
-                        <el-input type="textarea" :rows="1" clearable v-model="runtime.remark" />
-                    </el-form-item>
                     <el-form-item :label="$t('php.extensions')">
                         <el-select v-model="extensions" @change="changePHPExtension()" clearable>
                             <el-option
@@ -142,9 +139,7 @@
                             ></el-option>
                         </el-select>
                     </el-form-item>
-                    <el-form-item>
-                        <el-alert :title="$t('php.containerConfigHelper')" type="info" :closable="false" />
-                    </el-form-item>
+
                     <el-form-item>
                         <el-alert type="warning" :closable="false">
                             <template #default>
@@ -153,16 +148,24 @@
                                     <span>
                                         {{ $t('runtime.extendHelper') }}
                                     </span>
-                                    <span
-                                        v-if="!globalStore.isFxplay"
-                                        class="custom-link"
-                                        @click="openLink(globalStore.docsUrl + '/user_manual/websites/php/#php_1')"
-                                    >
-                                        {{ $t('php.toExtensionsList') }}
-                                    </span>
+                                    <div>
+                                        <span
+                                            v-if="!globalStore.isFxplay"
+                                            class="custom-link"
+                                            @click="openLink(globalStore.docsUrl + '/user_manual/websites/php/#php_1')"
+                                        >
+                                            {{ $t('php.toExtensionsList') }}
+                                        </span>
+                                    </div>
                                 </div>
                             </template>
                         </el-alert>
+                    </el-form-item>
+                    <el-form-item :label="$t('website.remark')" prop="remark">
+                        <el-input type="textarea" :rows="1" clearable v-model="runtime.remark" />
+                    </el-form-item>
+                    <el-form-item>
+                        <el-alert :title="$t('php.containerConfigHelper')" type="info" :closable="false" />
                     </el-form-item>
                 </div>
             </div>
