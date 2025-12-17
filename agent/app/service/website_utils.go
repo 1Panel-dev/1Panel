@@ -1428,6 +1428,13 @@ func GetSitePath(website model.Website, confType string) string {
 	return ""
 }
 
+func GetConfDir(website model.Website) string {
+	if website.Type != constant.Stream {
+		return GetOpenrestyDir(SiteConf)
+	}
+	return GetOpenrestyDir(StreamDir)
+}
+
 func GetOpenrestyDir(confType string) string {
 	switch confType {
 	case WebsiteRootDir:
@@ -1435,7 +1442,7 @@ func GetOpenrestyDir(confType string) string {
 	case SiteConfDir:
 		return path.Join(GetWebSiteRootDir(), "conf.d")
 	case StreamDir:
-		return path.Join(GetWebSiteRootDir(), "steam.d")
+		return path.Join(GetWebSiteRootDir(), "stream.d")
 	case SitesRootDir:
 		return path.Join(GetWebSiteRootDir(), "sites")
 	case DefaultDir:

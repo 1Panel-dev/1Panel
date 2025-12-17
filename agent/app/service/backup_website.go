@@ -131,7 +131,7 @@ func handleWebsiteRecover(website *model.Website, parentTask *task.Task, recover
 		if err != nil {
 			return err
 		}
-		if err = fileOp.CopyFile(fmt.Sprintf("%s/%s.conf", tmpPath, website.Alias), GetOpenrestyDir(SiteConfDir)); err != nil {
+		if err = fileOp.CopyFile(fmt.Sprintf("%s/%s.conf", tmpPath, website.Alias), GetConfDir(*website)); err != nil {
 			return err
 		}
 
@@ -259,7 +259,7 @@ func doWebsiteBackup(website *model.Website, parentTask *task.Task, backupDir, f
 	if err := fileOp.SaveFile(tmpDir+"/website.json", string(remarkInfo), fs.ModePerm); err != nil {
 		return err
 	}
-	nginxConfFile := GetSitePath(*website, SiteConf)
+	nginxConfFile := GetWebsiteConfigPath(*website)
 	if err := fileOp.CopyFile(nginxConfFile, tmpDir); err != nil {
 		return err
 	}
