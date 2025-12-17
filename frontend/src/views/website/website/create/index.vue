@@ -10,7 +10,7 @@
                 :validate-on-rule-change="false"
                 v-loading="loading"
             >
-                <el-form-item :label="$t('commons.table.type')">
+                <el-form-item>
                     <el-radio-group v-model="website.type" @change="changeType">
                         <el-radio-button v-for="item in WebsiteTypes" :key="item.value" :value="item.value">
                             {{ item.label }}

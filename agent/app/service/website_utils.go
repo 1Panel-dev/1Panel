@@ -742,6 +742,7 @@ func applySSL(website *model.Website, websiteSSL model.WebsiteSSL, req request.W
 	}
 	httpPorts := make(map[int]struct{})
 	httpsPorts := make(map[int]struct{})
+	sslPort := 0
 
 	hasDefaultPort := false
 	for _, domain := range domains {
@@ -769,6 +770,7 @@ func applySSL(website *model.Website, websiteSSL model.WebsiteSSL, req request.W
 	defaultHttpPortIPV6 := "[::]:" + defaultHttpPort
 
 	for port := range httpsPorts {
+		sslPort = port
 		portStr := strconv.Itoa(port)
 		server.RemoveListenByBind(portStr)
 		server.RemoveListenByBind("[::]:" + portStr)
@@ -789,7 +791,7 @@ func applySSL(website *model.Website, websiteSSL model.WebsiteSSL, req request.W
 				server.UpdateListen(defaultHttpPortIPV6, website.DefaultServer)
 			}
 		}
-		server.AddHTTP2HTTPS()
+		server.AddHTTP2HTTPS(sslPort)
 	case constant.HTTPAlso:
 		if hasDefaultPort {
 			server.UpdateListen(defaultHttpPort, website.DefaultServer)

@@ -2,6 +2,7 @@ package components
 
 import (
 	"errors"
+	"fmt"
 )
 
 type Server struct {
@@ -466,19 +467,27 @@ func (s *Server) RemoveListenByBind(bind string) {
 	s.Listens = listens
 }
 
-func (s *Server) AddHTTP2HTTPS() {
+func (s *Server) AddHTTP2HTTPS(httpsPort int) {
 	newDir := Directive{
 		Name:       "if",
 		Parameters: []string{"($scheme = http)"},
 		Block:      &Block{},
 	}
 	block := &Block{}
-	block.AppendDirectives(&Directive{
-		Name:       "return",
-		Parameters: []string{"301", "https://$host$request_uri"},
-	})
+	if httpsPort == 443 {
+		block.AppendDirectives(&Directive{
+			Name:       "return",
+			Parameters: []string{"301", "https://$host$request_uri"},
+		})
+	} else {
+		block.AppendDirectives(&Directive{
+			Name:       "return",
+			Parameters: []string{"301", fmt.Sprintf("https://$host$request_uri:%d", httpsPort)},
+		})
+	}
+
 	newDir.Block = block
-	s.UpdateDirectiveBySecondKey("if", "($scheme", newDir)
+	s.UpdateDirectiveBySecondKey("if", " ($scheme", newDir)
 }
 
 func (s *Server) UpdateAllowIPs(ips []string) {

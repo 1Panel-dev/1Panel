@@ -13,13 +13,7 @@
                         :placeholder="index > 0 ? $t('website.domain') : ''"
                         @blur="handleDomainBlur(index)"
                     ></el-input>
-                    <div
-                        v-if="domainWarnings[index]"
-                        class="el-form-item__error"
-                        style="position: relative; color: #e6a23c"
-                    >
-                        {{ $t('website.domainNotFQDN') }}
-                    </div>
+                    <span class="input-help" v-if="domainWarnings[index]">{{ $t('website.domainNotFQDN') }}</span>
                 </el-form-item>
             </el-col>
             <el-col :span="6">
@@ -64,11 +58,9 @@
                 </el-form-item>
             </el-col>
         </el-row>
-        <div class="mt-1">
-            <el-button @click="openBatchDialog" type="primary" plain>
-                {{ $t('website.batchInput') }}
-            </el-button>
-        </div>
+        <el-button @click="openBatchDialog" type="primary" plain>
+            {{ $t('website.batchInput') }}
+        </el-button>
 
         <el-dialog v-model="batchDialogVisible" :title="$t('website.batchAdd')" width="600px">
             <el-input
