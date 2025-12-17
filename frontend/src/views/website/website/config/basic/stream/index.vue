@@ -65,9 +65,27 @@ const submit = async () => {
 onMounted(async () => {
     const res = await getWebsite(props.id);
     form.value.streamPorts = res.data.streamPorts;
-    form.value.servers = res.data.servers;
     form.value.name = res.data.primaryDomain;
     form.value.algorithm = res.data.algorithm == '' ? 'default' : res.data.algorithm;
     form.value.streamPorts = res.data.streamPorts;
+
+    let servers = [];
+    res.data?.servers?.forEach((server) => {
+        const weight = server.weight == 0 ? undefined : server.weight;
+        const maxFails = server.maxFails == 0 ? undefined : server.maxFails;
+        const maxConns = server.maxConns == 0 ? undefined : server.maxConns;
+        const failTimeout = server.failTimeout == 0 ? undefined : server.failTimeout;
+        const failTimeoutUnit = server.failTimeoutUnit || 's';
+        servers.push({
+            server: server.server,
+            weight: weight,
+            maxFails: maxFails,
+            maxConns: maxConns,
+            failTimeout: failTimeout,
+            failTimeoutUnit: failTimeoutUnit,
+            flag: server.flag,
+        });
+    });
+    form.value.servers = servers;
 });
 </script>
