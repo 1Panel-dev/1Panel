@@ -98,7 +98,8 @@ var restoreCmd = &cobra.Command{
 		}
 
 		fmt.Println(i18n.GetMsgByKeyForCmd("RestoreStep5"))
-		fmt.Println(i18n.GetMsgByKeyForCmd("RestoreSuccessful"))
+		version := loadRollbackVersion(tmpPath)
+		fmt.Println(i18n.GetMsgWithMapForCmd("RestoreSuccessful", map[string]interface{}{"version": version}))
 
 		controller.RestartPanel(true, true, true)
 		return nil
@@ -126,4 +127,16 @@ func loadRestorePath(upgradeDir string) (string, error) {
 		return common.ComparePanelVersion(folders[i], folders[j])
 	})
 	return folders[0], nil
+}
+
+func loadRollbackVersion(upgradeDir string) string {
+	stdout, err := cmdUtils.RunDefaultWithStdoutBashCf("grep '^ORIGINAL_VERSION=' %s/1pctl | cut -d'=' -f2", upgradeDir)
+	if err != nil {
+		return "-"
+	}
+	info := strings.ReplaceAll(stdout, "\n", "")
+	if len(info) == 0 || info == `""` {
+		return "-"
+	}
+	return info
 }
