@@ -329,7 +329,7 @@ func (t *Task) LogFailed(msg string) {
 }
 
 func (t *Task) LogFailedWithErr(msg string, err error) {
-	t.Logger.Printf("%s %s : %s\n", msg, i18n.GetMsgByKey("Failed"), err.Error())
+	t.Logger.Printf("%s %s : %s", msg, i18n.GetMsgByKey("Failed"), err.Error())
 }
 
 func (t *Task) LogSuccess(msg string) {
@@ -340,7 +340,7 @@ func (t *Task) LogSuccessF(format string, v ...any) {
 }
 
 func (t *Task) LogStart(msg string) {
-	t.Logger.Printf("%s%s\n", i18n.GetMsgByKey("Start"), msg)
+	t.Logger.Printf("%s%s", i18n.GetMsgByKey("Start"), msg)
 }
 
 func (t *Task) LogWithOps(operate, msg string) {
