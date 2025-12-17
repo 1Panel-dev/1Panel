@@ -1120,7 +1120,11 @@ func (w WebsiteService) OpWebsiteLog(req request.WebsiteLogReq) (*response.Websi
 		params := []string{logPath}
 		switch req.LogType {
 		case constant.AccessLog:
-			params = append(params, "main")
+			if website.Type != constant.Stream {
+				params = append(params, "main")
+			} else {
+				params = append(params, "streamlog")
+			}
 			website.AccessLog = true
 		case constant.ErrorLog:
 			key = "error_log"
