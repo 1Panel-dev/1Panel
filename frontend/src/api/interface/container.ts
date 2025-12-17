@@ -310,8 +310,7 @@ export namespace Container {
         path: string;
         containers: Array<ComposeContainer>;
         expand: boolean;
-        envStr: string;
-        env: Array<string>;
+        env: string;
     }
     export interface ComposeContainer {
         name: string;
@@ -338,7 +337,7 @@ export namespace Container {
         name: string;
         path: string;
         content: string;
-        env: Array<string>;
+        env: string;
         createdBy: string;
     }
 

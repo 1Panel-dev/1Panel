@@ -88,6 +88,7 @@ const acceptParams = (params: DialogProps): void => {
             dialogData.value.rowData.source = 'address';
         } else {
             dialogData.value.rowData.source = 'anyWhere';
+            dialogData.value.rowData.address = '';
         }
         oldRule.value = deepCopy(params.rowData);
     }

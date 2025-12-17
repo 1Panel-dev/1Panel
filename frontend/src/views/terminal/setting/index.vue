@@ -190,11 +190,11 @@ const loadConnShow = async () => {
         } else {
             form.defaultConn = '-';
         }
+        resetConn.value = false;
     });
 };
 
 const changeShow = async () => {
-    resetConn.value = false;
     let op = form.showDefaultConn ? i18n.global.t('xpack.waf.allow') : i18n.global.t('xpack.waf.deny');
     opRef.value.acceptParams({
         title: i18n.global.t('terminal.defaultConn'),

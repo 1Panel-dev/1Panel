@@ -410,21 +410,12 @@ func loadEnv(list []dto.ComposeInfo) []dto.ComposeInfo {
 		if err != nil {
 			continue
 		}
-		lines := strings.Split(string(file), "\n")
-		for _, line := range lines {
-			lineItem := strings.TrimSpace(line)
-			if len(lineItem) != 0 && !strings.HasPrefix(lineItem, "#") {
-				list[i].Env = append(list[i].Env, lineItem)
-			}
-		}
+		list[i].Env = string(file)
 	}
 	return list
 }
 
-func newComposeEnv(pathItem string, env []string) error {
-	if len(env) == 0 {
-		return nil
-	}
+func newComposeEnv(pathItem string, env string) error {
 	envFilePath := path.Join(path.Dir(pathItem), ".env")
 	file, err := os.OpenFile(envFilePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, constant.FilePerm)
 	if err != nil {
@@ -432,12 +423,9 @@ func newComposeEnv(pathItem string, env []string) error {
 		return err
 	}
 	defer file.Close()
-	for _, env := range env {
-		envItem := strings.TrimSpace(env)
-		if _, err := file.WriteString(fmt.Sprintf("%s\n", envItem)); err != nil {
-			global.LOG.Errorf("failed to write env to file: %v", err)
-			return err
-		}
+	if _, err := file.WriteString(env); err != nil {
+		global.LOG.Errorf("failed to write env to file: %v", err)
+		return err
 	}
 	return nil
 }

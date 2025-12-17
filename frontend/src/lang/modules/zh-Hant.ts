@@ -989,7 +989,6 @@ const message = {
         composeDetailHelper: '該 compose 為 1Panel 編排外部建立。暫不支援啟停操作。',
         composeOperatorHelper: '將對 {0} 進行 {1} 操作，是否繼續？',
         composeDownHelper: '將停止並刪除 {0} 編排下所有容器及網路，是否繼續？',
-        composeEnvHelper1: '雙擊以編輯現有環境變數。',
         composeEnvHelper2: '該編排為 1Panel 應用商店建立，請在已安裝應用中修改環境變數。',
 
         setting: '配置',

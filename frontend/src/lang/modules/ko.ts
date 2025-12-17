@@ -1005,7 +1005,6 @@ const message = {
         composeOperatorHelper: '{1} 작업이 {0}에서 수행됩니다. 계속 하시겠습니까?',
         composeDownHelper:
             '이 작업은 {0} 컴포즈 아래의 모든 컨테이너와 네트워크를 중지하고 제거합니다. 계속 하시겠습니까?',
-        composeEnvHelper1: '기존 환경 변수를 편집하려면 더블 클릭하세요.',
         composeEnvHelper2:
             '이 오케스트레이션은 1Panel 앱 스토어에서 생성되었습니다. 설치된 애플리케이션에서 환경 변수를 수정하세요.',
 

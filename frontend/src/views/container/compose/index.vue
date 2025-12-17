@@ -233,15 +233,13 @@
                                     placeholder="#Define or paste the content of your docker-compose file here"
                                 />
                                 <span class="envTitle">{{ $t('container.env') }}</span>
-                                <Label v-if="currentCompose.createdBy !== 'Apps'" v-model:labels="envs" />
-                                <el-space wrap v-else>
-                                    <el-button v-for="(env, index) in envs" :key="index" plain>
-                                        {{ env }}
-                                    </el-button>
-                                </el-space>
-                                <span v-if="currentCompose.createdBy !== 'Apps'" class="input-help">
-                                    {{ $t('container.composeEnvHelper1') }}
-                                </span>
+                                <el-input
+                                    placeholder="key=value"
+                                    type="textarea"
+                                    :rows="3"
+                                    :disabled="currentCompose.createdBy === 'Apps'"
+                                    v-model="env"
+                                />
                                 <span v-if="currentCompose.createdBy === 'Apps'" class="input-help">
                                     {{ $t('container.composeEnvHelper2') }}
                                 </span>
@@ -321,10 +319,7 @@
                                     </div>
                                 </el-form-item>
                                 <span class="envTitle">{{ $t('container.env') }}</span>
-                                <Label v-model:labels="form.env" />
-                                <span v-if="currentCompose.createdBy !== 'Apps'" class="input-help">
-                                    {{ $t('container.composeEnvHelper1') }}
-                                </span>
+                                <el-input placeholder="key=value" type="textarea" :rows="3" v-model="form.env" />
                             </el-form>
 
                             <el-button type="primary" class="mt-2" @click="onSubmit(formRef)">
@@ -357,7 +352,6 @@ import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 import ContainerLog from '@/components/log/container/index.vue';
 import TaskLog from '@/components/log/task/index.vue';
 import FileList from '@/components/file-list/index.vue';
-import Label from '@/components/label/index.vue';
 import ContainerInspectDialog from '@/views/container/container/inspect/index.vue';
 import TerminalDialog from '@/views/container/container/terminal/index.vue';
 import ContainerLogDialog from '@/components/log/container-drawer/index.vue';
@@ -398,7 +392,7 @@ const containerLogDialogRef = ref();
 const searchName = ref('');
 const showType = ref('compose');
 const containerStats = ref<any[]>([]);
-const envs = ref([]);
+const env = ref();
 
 const isOnCreate = ref();
 const oldFrom = ref('edit');
@@ -497,7 +491,7 @@ const loadDetail = async (row: Container.ComposeInfo, withRefresh: boolean) => {
     isOnCreate.value = false;
     detailLoading.value = true;
     currentCompose.value = row;
-    envs.value = row.env || [];
+    env.value = row.env || '';
     composeContainers.value = row.containers || [];
     await inspect({ id: currentCompose.value.name, type: 'compose' })
         .then((res) => {
@@ -650,7 +644,7 @@ const onSubmitEdit = async () => {
         path: currentCompose.value.path,
         content: composeContent.value,
         createdBy: currentCompose.value.createdBy,
-        env: envs.value || [],
+        env: env.value || '',
     };
     loading.value = true;
     await composeUpdate(param)

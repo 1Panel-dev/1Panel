@@ -261,7 +261,7 @@ type ComposeInfo struct {
 	Workdir        string             `json:"workdir"`
 	Path           string             `json:"path"`
 	Containers     []ComposeContainer `json:"containers"`
-	Env            []string           `json:"env"`
+	Env            string             `json:"env"`
 }
 type ComposeContainer struct {
 	ContainerID string   `json:"containerID"`
@@ -271,13 +271,13 @@ type ComposeContainer struct {
 	Ports       []string `json:"ports"`
 }
 type ComposeCreate struct {
-	TaskID   string   `json:"taskID"`
-	Name     string   `json:"name"`
-	From     string   `json:"from" validate:"required,oneof=edit path template"`
-	File     string   `json:"file"`
-	Path     string   `json:"path"`
-	Template uint     `json:"template"`
-	Env      []string `json:"env"`
+	TaskID   string `json:"taskID"`
+	Name     string `json:"name"`
+	From     string `json:"from" validate:"required,oneof=edit path template"`
+	File     string `json:"file"`
+	Path     string `json:"path"`
+	Template uint   `json:"template"`
+	Env      string `json:"env"`
 }
 type ComposeOperation struct {
 	Name      string `json:"name" validate:"required"`
@@ -287,10 +287,10 @@ type ComposeOperation struct {
 	Force     bool   `josn:"force"`
 }
 type ComposeUpdate struct {
-	Name    string   `json:"name" validate:"required"`
-	Path    string   `json:"path" validate:"required"`
-	Content string   `json:"content" validate:"required"`
-	Env     []string `json:"env"`
+	Name    string `json:"name" validate:"required"`
+	Path    string `json:"path" validate:"required"`
+	Content string `json:"content" validate:"required"`
+	Env     string `json:"env"`
 }
 type ComposeLogClean struct {
 	Name string `json:"name" validate:"required"`

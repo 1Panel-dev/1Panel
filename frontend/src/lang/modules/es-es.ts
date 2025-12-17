@@ -1046,7 +1046,6 @@ const message = {
         composeOperatorHelper: 'La operación {1} se realizará en {0}. ¿Desea continuar?',
         composeDownHelper:
             'Esto detendrá y eliminará todos los contenedores y redes bajo la composición {0}. ¿Desea continuar?',
-        composeEnvHelper1: 'Haga doble clic para editar las variables de entorno existentes.',
         composeEnvHelper2:
             'Esta orquestación fue creada por la Tienda de Aplicaciones 1Panel. Modifique las variables de entorno en las aplicaciones instaladas.',
 

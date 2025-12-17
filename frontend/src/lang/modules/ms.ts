@@ -1035,7 +1035,6 @@ const message = {
         composeOperatorHelper: 'Operasi {1} akan dilakukan pada {0}. Adakah anda mahu meneruskan?',
         composeDownHelper:
             'Ini akan menghentikan dan menghapuskan semua kontena dan rangkaian di bawah komposisi {0}. Adakah anda mahu meneruskan?',
-        composeEnvHelper1: 'Klik dua kali untuk mengedit pembolehubah persekitaran sedia ada.',
         composeEnvHelper2:
             'Penyelarasan ini dibuat oleh Kedai Apl 1Panel. Sila ubah pembolehubah persekitaran dalam aplikasi yang dipasang.',
 

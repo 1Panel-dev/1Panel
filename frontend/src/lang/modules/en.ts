@@ -1040,7 +1040,6 @@ const message = {
         composeOperatorHelper: '{1} operation will be performed on {0}. Do you want to continue?',
         composeDownHelper:
             'This will stop and remove all containers and networks under the {0} compose. Do you want to continue?',
-        composeEnvHelper1: 'Double-click to edit existing environment variables.',
         composeEnvHelper2:
             'This orchestration was created by the 1Panel App Store. Please modify environment variables in the installed applications.',
 
