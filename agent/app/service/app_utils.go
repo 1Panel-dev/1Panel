@@ -6,7 +6,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"log"
 	"maps"
 	"math"
 	"net/http"
@@ -45,6 +44,7 @@ import (
 	"github.com/compose-spec/compose-go/v2/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"github.com/subosito/gotenv"
 	"gopkg.in/yaml.v3"
 )
@@ -959,7 +959,7 @@ func handleMap(params map[string]interface{}, envParams map[string]string) {
 	}
 }
 
-func downloadApp(app model.App, appDetail model.AppDetail, appInstall *model.AppInstall, logger *log.Logger) (err error) {
+func downloadApp(app model.App, appDetail model.AppDetail, appInstall *model.AppInstall, logger *logrus.Logger) (err error) {
 	if app.IsLocalApp() || app.IsCustomApp() {
 		return nil
 	}

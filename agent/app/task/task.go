@@ -1,11 +1,9 @@
 package task
 
 import (
-	"bufio"
 	"context"
 	"errors"
 	"fmt"
-	"log"
 	"os"
 	"path"
 	"strconv"
@@ -13,6 +11,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/sirupsen/logrus"
 
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
@@ -29,8 +28,7 @@ type Task struct {
 
 	Name      string
 	TaskID    string
-	Logger    *log.Logger
-	Writer    *bufio.Writer
+	Logger    *logrus.Logger
 	SubTasks  []*SubTask
 	Rollbacks []RollbackFunc
 	logFile   *os.File
@@ -138,12 +136,13 @@ func NewTask(name, operate, taskScope, taskID string, resourceID uint) (*Task, e
 		}
 	}
 	logPath := path.Join(global.Dir.TaskDir, taskScope, taskID+".log")
-	file, err := os.OpenFile(logPath, os.O_TRUNC|os.O_CREATE|os.O_WRONLY, constant.FilePerm)
+	logger := logrus.New()
+	logger.SetFormatter(&SimpleFormatter{})
+	logFile, err := os.OpenFile(logPath, os.O_TRUNC|os.O_CREATE|os.O_WRONLY, constant.FilePerm)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open log file: %w", err)
 	}
-	writer := bufio.NewWriter(file)
-	logger := log.New(file, "", log.LstdFlags)
+	logger.SetOutput(logFile)
 	taskModel := &model.Task{
 		ID:         taskID,
 		Name:       name,
@@ -156,7 +155,7 @@ func NewTask(name, operate, taskScope, taskID string, resourceID uint) (*Task, e
 	taskRepo := repo.NewITaskRepo()
 	ctx, cancle := context.WithCancel(context.Background())
 	global.TaskCtxMap[taskID] = cancle
-	task := &Task{TaskCtx: ctx, Name: name, logFile: file, Logger: logger, taskRepo: taskRepo, Task: taskModel, Writer: writer}
+	task := &Task{TaskCtx: ctx, Name: name, logFile: logFile, Logger: logger, taskRepo: taskRepo, Task: taskModel}
 	return task, nil
 }
 
@@ -175,16 +174,18 @@ func ReNewTask(name, operate, taskScope, taskID string, resourceID uint) (*Task,
 			return nil, fmt.Errorf("failed to create log directory: %w", err)
 		}
 	}
+
 	logPath := path.Join(global.Dir.TaskDir, taskScope, taskID+".log")
-	file, err := os.OpenFile(logPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, constant.FilePerm)
+	logger := logrus.New()
+	logger.SetFormatter(&SimpleFormatter{})
+	logFile, err := os.OpenFile(logPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, constant.FilePerm)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open log file: %w", err)
 	}
-	writer := bufio.NewWriter(file)
-	logger := log.New(file, "", log.LstdFlags)
+	logger.SetOutput(logFile)
 	logger.Print("\n --------------------------------------------------- \n")
 	taskItem.Status = constant.StatusExecuting
-	task := &Task{Name: name, logFile: file, Logger: logger, taskRepo: taskRepo, Task: &taskItem, Writer: writer}
+	task := &Task{Name: name, logFile: logFile, Logger: logger, taskRepo: taskRepo, Task: &taskItem}
 	task.updateTask(&taskItem)
 	return task, nil
 }
@@ -352,4 +353,12 @@ func (t *Task) LogSuccessWithOps(operate, msg string) {
 
 func (t *Task) LogFailedWithOps(operate, msg string, err error) {
 	t.Logger.Printf("%s%s%s : %s ", i18n.GetMsgByKey(operate), msg, i18n.GetMsgByKey("Failed"), err.Error())
+}
+
+type SimpleFormatter struct{}
+
+func (f *SimpleFormatter) Format(entry *logrus.Entry) ([]byte, error) {
+	timestamp := entry.Time.Format("2006/01/02 15:04:05")
+	message := fmt.Sprintf("%s %s\n", timestamp, entry.Message)
+	return []byte(message), nil
 }

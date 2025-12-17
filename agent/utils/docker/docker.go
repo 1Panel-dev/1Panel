@@ -243,18 +243,7 @@ func (c Client) PushImageWithProcessAndOptions(task *task.Task, imageName string
 		status, _ := progress["status"].(string)
 		switch status {
 		case "Pushing":
-			id, _ := progress["id"].(string)
-			progressDetail, _ := progress["progressDetail"].(map[string]interface{})
-			current, _ := progressDetail["current"].(float64)
-			progressStr := ""
-			total, ok := progressDetail["total"].(float64)
-			if ok {
-				progressStr = fmt.Sprintf("%s [%s] --- %.2f%%", status, id, (current/total)*100)
-			} else {
-				progressStr = fmt.Sprintf("%s [%s] --- %.2f%%", status, id, current)
-			}
-
-			_ = setLog(id, progressStr, task)
+			logProcess(progress, task)
 		case "Pushed":
 			id, _ := progress["id"].(string)
 			progressStr := fmt.Sprintf("%s [%s] --- %.2f%%", status, id, 100.0)
@@ -298,17 +287,7 @@ func (c Client) BuildImageWithProcessAndOptions(task *task.Task, tar io.ReadClos
 		}
 		switch status {
 		case "Downloading", "Extracting":
-			id, _ := progress["id"].(string)
-			progressDetail, _ := progress["progressDetail"].(map[string]interface{})
-			current, _ := progressDetail["current"].(float64)
-			progressStr := ""
-			total, ok := progressDetail["total"].(float64)
-			if ok {
-				progressStr = fmt.Sprintf("%s [%s] --- %.2f%%", status, id, (current/total)*100)
-			} else {
-				progressStr = fmt.Sprintf("%s [%s] --- %.2f%%", status, id, current)
-			}
-			_ = setLog(id, progressStr, task)
+			logProcess(progress, task)
 		case "Pull complete", "Download complete", "Verifying Checksum":
 			id, _ := progress["id"].(string)
 			progressStr := fmt.Sprintf("%s [%s] --- %.2f%%", status, id, 100.0)
