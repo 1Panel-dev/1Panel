@@ -626,10 +626,10 @@ func (w WebsiteService) GetWebsite(id uint) (response.WebsiteDTO, error) {
 				dName := d.GetName()
 				if _, ok := dto.LBAlgorithms[dName]; ok {
 					res.Algorithm = dName
+					break
 				}
 			}
 			res.Servers = getNginxUpstreamServers(up.UpstreamServers)
-			break
 		}
 	}
 	return res, nil

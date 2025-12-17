@@ -28,8 +28,8 @@ export interface SearchWithPage {
 }
 export interface CommonModel {
     id: number;
-    CreatedAt?: string;
-    UpdatedAt?: string;
+    createdAt?: string;
+    updatedAt?: string;
 }
 export interface DescriptionUpdate {
     id: number;

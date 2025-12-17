@@ -165,6 +165,9 @@ export namespace App {
         webUI: string;
         appKey?: string;
         serviceName: string;
+        appStatus?: string;
+        appType?: string;
+        version?: string;
     }
 
     export interface AppInstalledInfo {

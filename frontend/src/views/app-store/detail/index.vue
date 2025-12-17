@@ -110,7 +110,6 @@ const getApp = async () => {
     try {
         const res = await getAppByKey(appKey.value);
         app.value = res.data;
-        app.value.icon = 'data:image/png;base64,' + res.data.icon;
         version.value = app.value.versions[0];
         getDetail(app.value.id, version.value);
     } finally {
