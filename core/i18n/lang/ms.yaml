@@ -98,6 +98,7 @@ SubTaskFailed: "{{ .name }} gagal: {{ .err }}"
 TaskInstall: "Pasang"
 TaskUpgrade: "Kemas kini"
 TaskSync: 'Selaraskan'
+TaskSyncForNode: "Segerakan Data Nod"
 TaskBackup: "Sandaran"
 SuccessStatus: "{{ .name }} berjaya"
 FailedStatus: "{{ .name }} gagal {{ .err }}"
@@ -107,6 +108,7 @@ Skip: "Abaikan ralat dan teruskan..."
 
 #script 
 ScriptLibrary: "Pustaka Skrip"
+RemoteScriptLibrary: "Pustaka Skrip Jauh"
 ScriptSyncSkip: "Pustaka skrip semasa sudah versi terkini!"
 DownloadData: "Muat turun fail pustaka skrip data.yaml"
 DownloadPackage: "Muat turun pakej pustaka skrip"

@@ -103,6 +103,7 @@ SubTaskFailed: "{{ .name }} не удалось: {{ .err }}"
 TaskInstall: "Установить"
 TaskUpgrade: "Обновить"
 TaskSync: 'Синхронизация'
+TaskSyncForNode: "Синхронизировать Данные Узла"
 TaskBackup: "Резервная копия"
 SuccessStatus: "{{ .name }} успешно"
 FailedStatus: "{{ .name }} не удалось {{ .err }}"
@@ -112,6 +113,7 @@ Skip: "Пропустить ошибки и продолжить..."
 
 #script
 ScriptLibrary: "Библиотека скриптов"
+RemoteScriptLibrary: "Удаленная Библиотека Скриптов"
 ScriptSyncSkip: "Текущая библиотека скриптов уже является последней версией!"
 DownloadData: "Загрузка файла библиотеки скриптов data.yaml"
 DownloadPackage: "Загрузка архива библиотеки скриптов"

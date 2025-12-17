@@ -103,6 +103,7 @@ SubTaskFailed: "{{ .name }} failed: {{ .err }}"
 TaskInstall: "Install"
 TaskUpgrade: "Upgrade"
 TaskSync: 'Synchronize'
+TaskSyncForNode: "Sync Node Data"
 TaskBackup: "Backup"
 SuccessStatus: "{{ .name }} succeeded"
 FailedStatus: "{{ .name }} failed {{ .err }}"
@@ -112,6 +113,7 @@ Skip: "Skip errors and continue..."
 
 #script
 ScriptLibrary: "Script Library"
+RemoteScriptLibrary: "Remote Script Library"
 ScriptSyncSkip: "Current script library is already the latest version!"
 DownloadData: "Downloading script library file data.yaml"
 DownloadPackage: "Downloading script library package"

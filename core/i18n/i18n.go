@@ -3,14 +3,12 @@ package i18n
 import (
 	"embed"
 	"fmt"
+	"os/exec"
 	"strings"
-	"sync"
 	"sync/atomic"
 
 	"github.com/1Panel-dev/1Panel/core/app/repo"
-
 	"github.com/1Panel-dev/1Panel/core/global"
-
 	"github.com/gin-gonic/gin"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"golang.org/x/text/language"
@@ -140,38 +138,29 @@ func UseI18n() gin.HandlerFunc {
 }
 
 func Init() {
-	initOnce.Do(func() {
-		bundle = i18n.NewBundle(language.Chinese)
-		bundle.RegisterUnmarshalFunc("yaml", yaml.Unmarshal)
+	if bundle == nil {
+		initBundle()
+	}
+	dbLang := getLanguageFromDBInternal()
+	if dbLang == "" {
+		dbLang = defaultLang
+	}
+	SetCachedDBLanguage(dbLang)
 
-		isSuccess := true
-		for _, file := range langFiles {
-			if _, err := bundle.LoadMessageFileFS(fs, file); err != nil {
-				fmt.Printf("[i18n] load language file %s failed: %v\n", file, err)
-				isSuccess = false
-			}
-		}
-
-		if !isSuccess {
-			panic("[i18n] failed to init language files, See log above for details")
-		}
-
-		dbLang := getLanguageFromDBInternal()
-		if dbLang == "" {
-			dbLang = defaultLang
-		}
-		SetCachedDBLanguage(dbLang)
-
-		global.I18n = i18n.NewLocalizer(bundle, dbLang)
-	})
+	global.I18n = i18n.NewLocalizer(bundle, dbLang)
 }
 
 func UseI18nForCmd(lang string) {
 	if bundle == nil {
-		Init()
+		initBundle()
 	}
 	if lang == "" {
-		lang = defaultLang
+		langFrom1pctl := getLanguageFrom1pctl()
+		if langFrom1pctl == "" {
+			lang = defaultLang
+		} else {
+			lang = langFrom1pctl
+		}
 	}
 	global.I18nForCmd = i18n.NewLocalizer(bundle, lang)
 }
@@ -219,9 +208,20 @@ func getLanguageFromDBInternal() string {
 	}
 	return lang
 }
+func getLanguageFrom1pctl() string {
+	cmd := exec.Command("bash", "-c", "grep '^LANGUAGE=' /usr/local/bin/1pctl | cut -d'=' -f2")
+	stdout, err := cmd.CombinedOutput()
+	if err != nil {
+		panic(err)
+	}
+	info := strings.ReplaceAll(string(stdout), "\n", "")
+	if len(info) == 0 || info == `""` {
+		panic("error `LANGUAGE` find in /usr/local/bin/1pctl")
+	}
+	return info
+}
 
 var cachedDBLang atomic.Value
-var initOnce sync.Once
 
 func GetLanguage() string {
 	if v := cachedDBLang.Load(); v != nil {
@@ -235,4 +235,21 @@ func SetCachedDBLanguage(lang string) {
 		lang = defaultLang
 	}
 	cachedDBLang.Store(lang)
+}
+
+func initBundle() {
+	bundle = i18n.NewBundle(language.Chinese)
+	bundle.RegisterUnmarshalFunc("yaml", yaml.Unmarshal)
+
+	isSuccess := true
+	for _, file := range langFiles {
+		if _, err := bundle.LoadMessageFileFS(fs, file); err != nil {
+			fmt.Printf("[i18n] load language file %s failed: %v\n", file, err)
+			isSuccess = false
+		}
+	}
+
+	if !isSuccess {
+		panic("[i18n] failed to init language files, See log above for details")
+	}
 }

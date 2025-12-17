@@ -103,6 +103,7 @@ SubTaskFailed: "{{ .name }} 실패: {{ .err }}"
 TaskInstall: "설치"
 TaskUpgrade: "업그레이드"
 TaskSync: '동기화'
+TaskSyncForNode: "노드 데이터 동기화"
 TaskBackup: "백업"
 SuccessStatus: "{{ .name }} 성공"
 FailedStatus: "{{ .name }} 실패 {{ .err }}"
@@ -112,6 +113,7 @@ Skip: "오류 무시하고 계속..."
 
 #script
 ScriptLibrary: "스크립트 라이브러리"
+RemoteScriptLibrary: "원격 스크립트 라이브러리"
 ScriptSyncSkip: "현재 스크립트 라이브러리가 이미 최신 버전입니다!"
 DownloadData: "스크립트 라이브러리 파일 data.yaml 다운로드 중"
 DownloadPackage: "스크립트 라이브러리 패키지 다운로드 중"

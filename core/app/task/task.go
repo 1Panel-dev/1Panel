@@ -51,6 +51,7 @@ const (
 	TaskUpgrade        = "TaskUpgrade"
 	TaskAddNode        = "TaskAddNode"
 	TaskSync           = "TaskSync"
+	TaskSyncForNode    = "TaskSyncForNode"
 	TaskRsync          = "TaskRsync"
 	TaskInstallCluster = "TaskInstallCluster"
 	TaskCreateCluster  = "TaskCreateCluster"

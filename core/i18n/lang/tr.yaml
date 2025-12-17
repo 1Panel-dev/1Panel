@@ -102,6 +102,7 @@ SubTaskFailed: "{{ .name }} başarısız: {{ .err }}"
 TaskInstall: "Kurulum"
 TaskUpgrade: "Yükseltme"
 TaskSync: 'Senkronize'
+TaskSyncForNode: "Düğüm Verilerini Senkronize Et"
 TaskBackup: "Yedekleme"
 SuccessStatus: "{{ .name }} başarılı"
 FailedStatus: "{{ .name }} başarısız {{ .err }}"
@@ -111,6 +112,7 @@ Skip: "Hataları atla ve devam et..."
 
 #script
 ScriptLibrary: "Betik Kütüphanesi"
+RemoteScriptLibrary: "Uzak Komut Dosyası Kütüphanesi"
 ScriptSyncSkip: "Mevcut betik kütüphanesi zaten en son sürüm!"
 DownloadData: "Betik kütüphanesi dosyası data.yaml indiriliyor"
 DownloadPackage: "Betik kütüphanesi paketi indiriliyor"
