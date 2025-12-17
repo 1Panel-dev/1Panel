@@ -1895,6 +1895,41 @@ const docTemplate = `{
 				]
 			}
 		},
+		"/backups/check": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.BackupOperate"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Check backup account",
+				"tags": [
+					"Backup Account"
+				]
+			}
+		},
 		"/backups/del": {
 			"post": {
 				"consumes": [
@@ -2747,6 +2782,50 @@ const docTemplate = `{
 					],
 					"formatEN": "create compose [name]",
 					"formatZH": "创建 compose [name]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/containers/compose/clean/log": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.ComposeLogClean"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Clean compose log",
+				"tags": [
+					"Container"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"name"
+					],
+					"formatEN": "clean compose [name] logs",
+					"formatZH": "清理容器编排 [name] 日志",
 					"paramKeys": []
 				}
 			}
@@ -5322,47 +5401,6 @@ const docTemplate = `{
 					"formatZH": "创建备份账号 [type]",
 					"paramKeys": []
 				}
-			}
-		},
-		"/core/backups/buckets": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/dto.ForBuckets"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"items": {
-								"type": "string"
-							},
-							"type": "array"
-						}
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "List buckets",
-				"tags": [
-					"Backup Account"
-				]
 			}
 		},
 		"/core/backups/client/:clientType": {
@@ -11464,6 +11502,53 @@ const docTemplate = `{
 				}
 			}
 		},
+		"/files/preview": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.FileContentReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/response.FileInfo"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Preview file content",
+				"tags": [
+					"File"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"path"
+					],
+					"formatEN": "Preview file content [path]",
+					"formatZH": "预览文件内容 [path]",
+					"paramKeys": []
+				}
+			}
+		},
 		"/files/read": {
 			"post": {
 				"parameters": [
@@ -16230,6 +16315,50 @@ const docTemplate = `{
 				]
 			}
 		},
+		"/settings/ssh/conn/default": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.SSHDefaultConn"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update local is conn",
+				"tags": [
+					"System Setting"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"defaultConn"
+					],
+					"formatEN": "update system default conn [defaultConn]",
+					"formatZH": "本地终端默认连接 [defaultConn]",
+					"paramKeys": []
+				}
+			}
+		},
 		"/settings/update": {
 			"post": {
 				"consumes": [
@@ -17835,10 +17964,10 @@ const docTemplate = `{
 				"x-panel-log": {
 					"BeforeFunctions": [],
 					"bodyKeys": [
-						"primaryDomain"
+						"alias"
 					],
-					"formatEN": "Create website [primaryDomain]",
-					"formatZH": "创建网站 [primaryDomain]",
+					"formatEN": "Create website [alias]",
+					"formatZH": "创建网站 [alias]",
 					"paramKeys": []
 				}
 			}
@@ -18375,6 +18504,41 @@ const docTemplate = `{
 					}
 				],
 				"summary": "Batch set website group",
+				"tags": [
+					"Website"
+				]
+			}
+		},
+		"/websites/batch/https": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.BatchWebsiteHttps"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Batch set HTTPS for websites",
 				"tags": [
 					"Website"
 				]
@@ -21531,6 +21695,41 @@ const docTemplate = `{
 				]
 			}
 		},
+		"/websites/stream/update": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.StreamUpdate"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update Stream Config",
+				"tags": [
+					"Website"
+				]
+			}
+		},
 		"/websites/update": {
 			"post": {
 				"consumes": [
@@ -22595,6 +22794,9 @@ const docTemplate = `{
 				"taskID": {
 					"type": "string"
 				},
+				"timeout": {
+					"type": "integer"
+				},
 				"type": {
 					"enum": [
 						"app",
@@ -22650,6 +22852,21 @@ const docTemplate = `{
 			},
 			"required": [
 				"from"
+			],
+			"type": "object"
+		},
+		"dto.ComposeLogClean": {
+			"properties": {
+				"name": {
+					"type": "string"
+				},
+				"path": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"name",
+				"path"
 			],
 			"type": "object"
 		},
@@ -23809,6 +24026,9 @@ const docTemplate = `{
 					"type": "boolean"
 				},
 				"isDisable": {
+					"type": "boolean"
+				},
+				"isLocal": {
 					"type": "boolean"
 				},
 				"key": {
@@ -25395,6 +25615,12 @@ const docTemplate = `{
 				"powerUsed": {
 					"items": {
 						"type": "number"
+					},
+					"type": "array"
+				},
+				"processCount": {
+					"items": {
+						"type": "integer"
 					},
 					"type": "array"
 				},
@@ -27212,6 +27438,17 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
+		"dto.SSHDefaultConn": {
+			"properties": {
+				"defaultConn": {
+					"type": "string"
+				},
+				"withReset": {
+					"type": "boolean"
+				}
+			},
+			"type": "object"
+		},
 		"dto.SSHInfo": {
 			"properties": {
 				"autoStart": {
@@ -28653,6 +28890,9 @@ const docTemplate = `{
 				"status": {
 					"type": "string"
 				},
+				"streamPorts": {
+					"type": "string"
+				},
 				"type": {
 					"type": "string"
 				},
@@ -29211,6 +29451,82 @@ const docTemplate = `{
 			"required": [
 				"groupID",
 				"ids"
+			],
+			"type": "object"
+		},
+		"request.BatchWebsiteHttps": {
+			"properties": {
+				"SSLProtocol": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"algorithm": {
+					"type": "string"
+				},
+				"certificate": {
+					"type": "string"
+				},
+				"certificatePath": {
+					"type": "string"
+				},
+				"hsts": {
+					"type": "boolean"
+				},
+				"hstsIncludeSubDomains": {
+					"type": "boolean"
+				},
+				"http3": {
+					"type": "boolean"
+				},
+				"httpConfig": {
+					"enum": [
+						"HTTPSOnly",
+						"HTTPAlso",
+						"HTTPToHTTPS"
+					],
+					"type": "string"
+				},
+				"httpsPorts": {
+					"items": {
+						"type": "integer"
+					},
+					"type": "array"
+				},
+				"ids": {
+					"items": {
+						"type": "integer"
+					},
+					"type": "array"
+				},
+				"importType": {
+					"type": "string"
+				},
+				"privateKey": {
+					"type": "string"
+				},
+				"privateKeyPath": {
+					"type": "string"
+				},
+				"taskID": {
+					"type": "string"
+				},
+				"type": {
+					"enum": [
+						"existed",
+						"auto",
+						"manual"
+					],
+					"type": "string"
+				},
+				"websiteSSLId": {
+					"type": "integer"
+				}
+			},
+			"required": [
+				"ids",
+				"taskID"
 			],
 			"type": "object"
 		},
@@ -31215,6 +31531,32 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
+		"request.StreamUpdate": {
+			"properties": {
+				"algorithm": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"servers": {
+					"items": {
+						"$ref": "#/definitions/dto.NginxUpstreamServer"
+					},
+					"type": "array"
+				},
+				"streamPorts": {
+					"type": "string"
+				},
+				"websiteID": {
+					"type": "integer"
+				}
+			},
+			"required": [
+				"websiteID"
+			],
+			"type": "object"
+		},
 		"request.SupervisorProcessConfig": {
 			"properties": {
 				"autoRestart": {
@@ -31498,6 +31840,9 @@ const docTemplate = `{
 				"IPV6": {
 					"type": "boolean"
 				},
+				"algorithm": {
+					"type": "string"
+				},
 				"alias": {
 					"type": "string"
 				},
@@ -31550,6 +31895,9 @@ const docTemplate = `{
 				"ftpUser": {
 					"type": "string"
 				},
+				"name": {
+					"type": "string"
+				},
 				"parentWebsiteID": {
 					"type": "integer"
 				},
@@ -31568,7 +31916,16 @@ const docTemplate = `{
 				"runtimeID": {
 					"type": "integer"
 				},
+				"servers": {
+					"items": {
+						"$ref": "#/definitions/dto.NginxUpstreamServer"
+					},
+					"type": "array"
+				},
 				"siteDir": {
+					"type": "string"
+				},
+				"streamPorts": {
 					"type": "string"
 				},
 				"taskID": {
@@ -32767,6 +33124,9 @@ const docTemplate = `{
 						"type": "string"
 					},
 					"type": "array"
+				},
+				"type": {
+					"type": "string"
 				}
 			},
 			"type": "object"
@@ -34002,6 +34362,9 @@ const docTemplate = `{
 				"accessLogPath": {
 					"type": "string"
 				},
+				"algorithm": {
+					"type": "string"
+				},
 				"alias": {
 					"type": "string"
 				},
@@ -34086,6 +34449,12 @@ const docTemplate = `{
 				"runtimeType": {
 					"type": "string"
 				},
+				"servers": {
+					"items": {
+						"$ref": "#/definitions/dto.NginxUpstreamServer"
+					},
+					"type": "array"
+				},
 				"siteDir": {
 					"type": "string"
 				},
@@ -34093,6 +34462,9 @@ const docTemplate = `{
 					"type": "string"
 				},
 				"status": {
+					"type": "string"
+				},
+				"streamPorts": {
 					"type": "string"
 				},
 				"type": {

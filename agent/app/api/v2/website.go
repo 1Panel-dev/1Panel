@@ -73,7 +73,7 @@ func (b *BaseApi) GetWebsiteOptions(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /websites [post]
-// @x-panel-log {"bodyKeys":["primaryDomain"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"创建网站 [primaryDomain]","formatEN":"Create website [primaryDomain]"}
+// @x-panel-log {"bodyKeys":["alias"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"创建网站 [alias]","formatEN":"Create website [alias]"}
 func (b *BaseApi) CreateWebsite(c *gin.Context) {
 	var req request.WebsiteCreate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {

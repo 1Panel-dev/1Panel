@@ -307,7 +307,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 		website.Protocol = constant.ProtocolHTTP
 	}
 
-	createTask, err := task.NewTaskWithOps(primaryDomain, task.TaskCreate, task.TaskScopeWebsite, create.TaskID, 0)
+	createTask, err := task.NewTaskWithOps(website.PrimaryDomain, task.TaskCreate, task.TaskScopeWebsite, create.TaskID, 0)
 	if err != nil {
 		return err
 	}

@@ -296,6 +296,15 @@
 		"formatZH": "创建compose[name]",
 		"formatEN": "createcompose[name]"
 	},
+	"/containers/compose/clean/log": {
+		"bodyKeys": [
+			"name"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "清理容器编排[name]日志",
+		"formatEN": "cleancompose[name]logs"
+	},
 	"/containers/compose/operate": {
 		"bodyKeys": [
 			"name",
@@ -1012,24 +1021,6 @@
 		"beforeFunctions": [],
 		"formatZH": "服务器代理配置[proxyPort]:[proxyPort]",
 		"formatEN": "setproxy[proxyPort]:[proxyPort]."
-	},
-	"/core/settings/rollback": {
-		"bodyKeys": [
-			"id"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [
-			{
-				"input_column": "id",
-				"input_value": "id",
-				"isList": false,
-				"db": "upgrade_logs",
-				"output_column": "old_version",
-				"output_value": "version"
-			}
-		],
-		"formatZH": "回滚系统=\u003e[version]",
-		"formatEN": "rollbacksystem=\u003e[version]"
 	},
 	"/core/settings/ssl/update": {
 		"bodyKeys": [
@@ -1799,6 +1790,15 @@
 		"formatZH": "修改用户/组[paths]=\u003e[user]/[group]",
 		"formatEN": "Changeowner[paths]=\u003e[user]/[group]"
 	},
+	"/files/preview": {
+		"bodyKeys": [
+			"path"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "预览文件内容[path]",
+		"formatEN": "Previewfilecontent[path]"
+	},
 	"/files/recycle/clear": {
 		"bodyKeys": [],
 		"paramKeys": [],
@@ -2346,6 +2346,15 @@
 		"formatZH": "从系统快照[name]回滚",
 		"formatEN": "Rollbackfromsystembackup[name]"
 	},
+	"/settings/ssh/conn/default": {
+		"bodyKeys": [
+			"defaultConn"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "本地终端默认连接[defaultConn]",
+		"formatEN": "updatesystemdefaultconn[defaultConn]"
+	},
 	"/settings/update": {
 		"bodyKeys": [
 			"key",
@@ -2577,12 +2586,12 @@
 	},
 	"/websites": {
 		"bodyKeys": [
-			"primaryDomain"
+			"alias"
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "创建网站[primaryDomain]",
-		"formatEN": "Createwebsite[primaryDomain]"
+		"formatZH": "创建网站[alias]",
+		"formatEN": "Createwebsite[alias]"
 	},
 	"/websites/:id/https": {
 		"bodyKeys": [
