@@ -153,7 +153,7 @@ func (c *CommandHelper) run(name string, arg ...string) (string, error) {
 		return "", fmt.Errorf("cmd.Start() failed with '%s'\n", err)
 	}
 	if c.taskItem != nil {
-		customWriter.Flush()
+		defer customWriter.Flush()
 	}
 
 	done := make(chan error, 1)
