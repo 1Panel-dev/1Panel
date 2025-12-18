@@ -336,11 +336,26 @@ func loadPanelFile(fileOp fileUtils.FileOp) ([]dto.DataTree, error) {
 			Path:    path.Join(global.Dir.DataDir, fileItem.Name()),
 		}
 		switch itemData.Label {
-		case "agent", "runtime", "docker", "task", "geo", "secret", "uploads":
+		case "runtime", "docker", "task", "geo", "secret", "uploads":
 			itemData.IsDisable = true
 		case "clamav", "download":
 			panelPath := path.Join(global.Dir.DataDir, itemData.Label)
 			itemData.Children, _ = loadFile(panelPath, 3, fileOp)
+		case "agent":
+			panelPath := path.Join(global.Dir.DataDir, itemData.Label)
+			itemData.Children, _ = loadFile(panelPath, 3, fileOp)
+			itemData.IsCheck = false
+			for i := 0; i < len(itemData.Children); i++ {
+				if itemData.Children[i].Label != "package" {
+					itemData.Children[i].IsDisable = true
+				} else {
+					itemData.Size = -itemData.Children[i].Size
+					itemData.Children[i].IsCheck = false
+					for j := 0; j < len(itemData.Children[i].Children); j++ {
+						itemData.Children[i].Children[j].IsCheck = false
+					}
+				}
+			}
 		case "apps", "backup", "log", "db", "tmp":
 			continue
 		}
@@ -349,7 +364,7 @@ func loadPanelFile(fileOp fileUtils.FileOp) ([]dto.DataTree, error) {
 			if err != nil {
 				continue
 			}
-			itemData.Size = uint64(sizeItem)
+			itemData.Size = uint64(int64(sizeItem) + int64(itemData.Size))
 		} else {
 			fileInfo, err := fileItem.Info()
 			if err != nil {

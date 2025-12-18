@@ -105,7 +105,7 @@
         </LayoutContent>
         <OperateDialog @search="loadConnShow" ref="dialogRef" />
 
-        <OpDialog ref="opRef" @search="search" @cancel="loadConnShow">
+        <OpDialog ref="opRef" @search="search" @cancel="loadConnShow" @submit="submitChangeShow">
             <template #content>
                 <el-form class="mt-4 mb-1" ref="deleteForm" v-if="!form.showDefaultConn" label-position="left">
                     <el-form-item>
@@ -200,11 +200,24 @@ const changeShow = async () => {
         title: i18n.global.t('terminal.defaultConn'),
         names: [],
         msg: i18n.global.t('terminal.defaultConnHelper', [op]),
-        noMsg: false,
-        successMsg: i18n.global.t('commons.msg.operationSuccess'),
-        api: updateLocalConn,
-        params: { withReset: resetConn.value, defaultConn: form.showDefaultConn ? 'Enable' : 'Disable' },
+        api: null,
+        params: {},
     });
+};
+const submitChangeShow = async () => {
+    loading.value = true;
+    await updateLocalConn({
+        withReset: resetConn.value,
+        defaultConn: form.showDefaultConn ? 'Enable' : 'Disable',
+    })
+        .then(() => {
+            loading.value = false;
+            loadConnShow();
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+        })
+        .finally(() => {
+            loading.value = false;
+        });
 };
 
 const iniTerm = () => {

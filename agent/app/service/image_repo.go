@@ -263,7 +263,15 @@ func stopBeforeUpdateRepo() error {
 	if err := validateDockerConfig(); err != nil {
 		return err
 	}
-	if err := controller.HandleRestart("docker"); err != nil {
+	dockerService, _ := controller.LoadServiceName("docker")
+	if len(dockerService) == 0 {
+		return errors.New("docker service not found")
+	}
+	client, err := controller.New()
+	if err != nil {
+		return err
+	}
+	if err := client.Operate("restart", dockerService); err != nil {
 		return fmt.Errorf("failed to restart Docker: %v", err)
 	}
 	ticker := time.NewTicker(3 * time.Second)
@@ -276,8 +284,8 @@ func stopBeforeUpdateRepo() error {
 				cancel()
 				return errors.New("the docker service cannot be restarted")
 			default:
-				active, err := controller.CheckActive("docker")
-				if active && err != nil {
+				active, _ := client.IsActive(dockerService)
+				if active {
 					global.LOG.Info("docker restart with new conf successful!")
 					return nil
 				}
