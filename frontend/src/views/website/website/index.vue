@@ -124,13 +124,25 @@
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.status')" prop="status" width="120px" sortable>
                         <template #default="{ row }">
-                            <Status
-                                v-if="row.status === 'Running'"
-                                :operate="true"
-                                :status="row.status"
-                                @click="operateWebsite('stop', row)"
-                            />
-                            <Status v-else :status="row.status" :operate="true" @click="operateWebsite('start', row)" />
+                            <span v-if="row.type === 'stream'">
+                                <el-text type="success">
+                                    {{ $t('commons.status.' + row.status.toLocaleLowerCase()) }}
+                                </el-text>
+                            </span>
+                            <span v-else>
+                                <Status
+                                    v-if="row.status === 'Running'"
+                                    :operate="true"
+                                    :status="row.status"
+                                    @click="operateWebsite('stop', row)"
+                                />
+                                <Status
+                                    v-else
+                                    :status="row.status"
+                                    :operate="true"
+                                    @click="operateWebsite('start', row)"
+                                />
+                            </span>
                         </template>
                     </el-table-column>
 
@@ -265,7 +277,7 @@
         <TaskLog ref="taskLogRef" @close="search" />
         <OpDialog ref="opRef" @search="openTaskLog" />
         <BatchSetGroup ref="batchSetGroupRef" @close="search" />
-        <BatchSetHttps ref="batchSetHttpsRef" @openTask="openTaskLog" />
+        <BatchSetHttps ref="batchSetHttpsRef" @open-task="openTaskLog" />
     </div>
 </template>
 

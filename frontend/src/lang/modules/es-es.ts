@@ -2726,7 +2726,8 @@ const message = {
         batchOpreateHelper: 'Lote {0} sitios web, ¿continuar operación?',
         stream: 'Proxy TCP/UDP',
         streamPorts: 'Puertos de escucha',
-        streamPortsHelper: 'Separe con comas, por ejemplo: 3306, 3307',
+        streamPortsHelper:
+            'Configura el número de puerto de escucha externo, los clientes accederán al servicio a través de este puerto, separado por comas, p. ej., 5222,5223',
         streamHelper: 'Reenvío de Puertos y Balanceo de Carga TCP/UDP',
     },
     php: {

@@ -2739,7 +2739,8 @@ const message = {
         batchOpreateHelper: 'Batch {0} websites, continue operation?',
         stream: 'TCP/UDP Proxy',
         streamPorts: 'Listening Ports',
-        streamPortsHelper: 'Separate with commas, e.g., 3306, 3307',
+        streamPortsHelper:
+            'Set the external listening port number, clients will access the service through this port, separated by commas, e.g., 5222,5223',
         streamHelper: 'TCP/UDP Port Forwarding and Load Balancing',
     },
     php: {

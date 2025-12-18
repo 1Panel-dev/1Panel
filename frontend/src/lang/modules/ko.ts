@@ -2615,7 +2615,8 @@ const message = {
         batchOpreateHelper: '웹사이트를 일괄 {0}, 계속 작업하시겠습니까?',
         stream: 'TCP/UDP 프록시',
         streamPorts: '수신 포트',
-        streamPortsHelper: '쉼표로 구분하세요. 예: 3306, 3307',
+        streamPortsHelper:
+            '외부 수신 포트 번호를 설정합니다. 클라이언트는 이 포트를 통해 서비스에 액세스합니다. 쉼표로 구분하세요. 예: 5222,5223',
         streamHelper: 'TCP/UDP 포트 포워딩 및 로드 밸런싱',
     },
     php: {

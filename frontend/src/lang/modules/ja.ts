@@ -2661,7 +2661,8 @@ const message = {
         batchOpreateHelper: 'ウェブサイトをバッチ{0}しますか？',
         stream: 'TCP/UDP プロキシ',
         streamPorts: '待ち受けポート',
-        streamPortsHelper: 'カンマで区切ってください（例：3306, 3307）',
+        streamPortsHelper:
+            '外部リスニングポート番号を設定します。クライアントはこのポートを通じてサービスにアクセスします。カンマで区切ってください。例：5222,5223',
         streamHelper: 'TCP/UDP ポート転送とロードバランシング',
     },
     php: {

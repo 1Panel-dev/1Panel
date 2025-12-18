@@ -2548,7 +2548,7 @@ const message = {
         batchOpreateHelper: '批次{0}網站，是否繼續操作？',
         stream: 'TCP/UDP 代理',
         streamPorts: '監聽端口',
-        streamPortsHelper: '請用逗號分隔，例如：3306，3307',
+        streamPortsHelper: '設定對外監聽的埠號，客戶端將透過此埠存取服務，按逗號分割，例如：5222,5223',
         streamHelper: 'TCP/UDP 端口轉發與負載均衡',
     },
     php: {

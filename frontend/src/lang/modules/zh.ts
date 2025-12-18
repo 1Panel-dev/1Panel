@@ -2545,7 +2545,7 @@ const message = {
         batchOpreateHelper: '批量{0}网站，是否继续操作？',
         stream: 'TCP/UDP 代理',
         streamPorts: '监听端口',
-        streamPortsHelper: '请按逗号分割，例如：3306，3307',
+        streamPortsHelper: '设置对外监听的端口号，客户端将通过此端口访问服务，按逗号分割，例如：5222,5223',
         streamHelper: 'TCP/UDP 端口转发与负载均衡',
     },
     php: {

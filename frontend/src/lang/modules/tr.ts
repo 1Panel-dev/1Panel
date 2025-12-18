@@ -2777,7 +2777,8 @@ const message = {
         batchOpreateHelper: 'Toplu {0} web siteleri, işlemi devam ettir?',
         stream: 'TCP/UDP Proxy',
         streamPorts: 'Dinleme Portları',
-        streamPortsHelper: 'Virgülle ayırın, örneğin: 3306, 3307',
+        streamPortsHelper:
+            'Harici dinleme bağlantı noktası numarasını ayarlayın, istemciler bu bağlantı noktası üzerinden hizmete erişecektir, virgülle ayırın, örn.: 5222,5223',
         streamHelper: 'TCP/UDP Port Yönlendirme ve Yük Dengeleme',
     },
     php: {

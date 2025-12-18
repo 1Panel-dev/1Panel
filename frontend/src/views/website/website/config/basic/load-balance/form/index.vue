@@ -44,7 +44,7 @@
                             >
                                 <el-input
                                     v-model="formData.servers[index].server"
-                                    :placeholder="'example.com:8080'"
+                                    :placeholder="type === 'stream' ? '127.0.0.1:3306' : '127.0.0.1:8080'"
                                     @input="handleChange"
                                 ></el-input>
                             </el-form-item>
@@ -181,10 +181,12 @@ interface LoadBalanceFormData {
 interface Props {
     modelValue: LoadBalanceFormData;
     disabled?: boolean;
+    type?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     disabled: false,
+    type: 'loadbanlance',
 });
 
 const emit = defineEmits<{
@@ -211,7 +213,7 @@ const rules = ref<any>({
     failTimeout: [checkNumberRange(0, 300)],
 });
 
-const Algorithms = getAlgorithms('stream');
+const Algorithms = getAlgorithms(props.type);
 
 const helper = ref();
 const getHelper = (key: string) => {

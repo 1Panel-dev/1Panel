@@ -177,7 +177,7 @@
                     </el-text>
                 </div>
 
-                <el-divider content-position="left">
+                <el-divider content-position="left" v-if="website.type !== 'stream'">
                     <el-text type="info" size="small">{{ $t('website.domain') }}</el-text>
                 </el-divider>
                 <div v-if="website.type === 'stream'">
@@ -207,7 +207,7 @@
                     <el-checkbox v-model="website.IPV6" :label="$t('website.ipv6')" size="large" />
                 </el-form-item>
                 <div v-if="website.type == 'stream'">
-                    <LoadBalanceForm ref="lbFormRef" v-model="steamConfig" :disabled="true" />
+                    <LoadBalanceForm ref="lbFormRef" v-model="steamConfig" :disabled="true" type="stream" />
                 </div>
                 <div v-else>
                     <el-form-item prop="enableSSL">

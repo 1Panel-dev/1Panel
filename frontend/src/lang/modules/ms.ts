@@ -2719,7 +2719,8 @@ const message = {
         batchOpreateHelper: 'Pukal {0} laman web, teruskan operasi?',
         stream: 'Proksi TCP/UDP',
         streamPorts: 'Port Mendengar',
-        streamPortsHelper: 'Sila asingkan dengan koma, contoh: 3306, 3307',
+        streamPortsHelper:
+            'Tetapkan nombor port pendengaran luaran, pelanggan akan mengakses perkhidmatan melalui port ini, dipisahkan dengan koma, cth., 5222,5223',
         streamHelper: 'Penerusan Port dan Pengimbangan Beban TCP/UDP',
     },
     php: {
