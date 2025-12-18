@@ -900,8 +900,8 @@ const message = {
         containerExample: '80 atau 80-88',
         exposePort: 'Dedahkan port',
         exposeAll: 'Dedahkan semua',
-        cmdHelper:
-            'Masukkan satu arahan dan tekan Enter untuk terus memasukkan. Arahan boleh disusun semula dengan menyeret.',
+        cmdHelper: 'Contoh: nginx -g "daemon off;"',
+        entrypointHelper: 'Contoh: docker-entrypoint.sh',
         autoRemove: 'Buang automatik',
         cpuQuota: 'Bilangan teras CPU',
         memoryLimit: 'Memori',

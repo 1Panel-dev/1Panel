@@ -70,6 +70,8 @@ export namespace Container {
         hostname: string;
         domainName: string;
         dns: Array<string>;
+        cmdStr: string;
+        entrypointStr: string;
         memoryItem: number;
         cmd: Array<string>;
         workingDir: string;

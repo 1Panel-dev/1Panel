@@ -897,8 +897,8 @@ const message = {
         containerExample: '80 ou 80-88',
         exposePort: 'Expor porta',
         exposeAll: 'Expor todas',
-        cmdHelper:
-            'Digite um comando e pressione Enter para continuar a inserção. Os comandos podem ser arrastados para reordenar.',
+        cmdHelper: 'Exemplo: nginx -g "daemon off;"',
+        entrypointHelper: 'Exemplo: docker-entrypoint.sh',
         autoRemove: 'Remover automaticamente',
         cpuQuota: 'Número de núcleos de CPU',
         memoryLimit: 'Memória',

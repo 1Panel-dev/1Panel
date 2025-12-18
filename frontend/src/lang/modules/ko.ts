@@ -877,8 +877,8 @@ const message = {
         containerExample: '80 또는 80-88',
         exposePort: '포트 노출',
         exposeAll: '모든 포트 노출',
-        cmdHelper:
-            '명령어를 입력한 후 Enter 키를 눌러 입력을 계속합니다. 명령어는 드래그하여 순서를 변경할 수 있습니다.',
+        cmdHelper: '예시: nginx -g "daemon off;"',
+        entrypointHelper: '예시: docker-entrypoint.sh',
         autoRemove: '자동 제거',
         cpuQuota: 'CPU 코어 수',
         memoryLimit: '메모리',
