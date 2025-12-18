@@ -106,23 +106,19 @@
                         v-if="isShow"
                     >
                         <div class="flex items-center justify-between pl-1 pr-1 py-0.5 h-6">
-                            <el-tooltip :content="$t('file.top')" placement="top">
-                                <el-text size="small" @click="getUpData()" class="cursor-pointer">
-                                    <el-icon>
-                                        <Top />
-                                    </el-icon>
-                                    <span class="sm:inline hidden pl-1">{{ $t('file.up') }}</span>
-                                </el-text>
-                            </el-tooltip>
+                            <el-text size="small" @click="getUpData()" class="cursor-pointer">
+                                <el-icon>
+                                    <Top />
+                                </el-icon>
+                                <span class="sm:inline hidden pl-1">{{ $t('file.up') }}</span>
+                            </el-text>
                             <el-divider direction="vertical" class="!mx-0" />
-                            <el-tooltip :content="$t('commons.button.refresh')" placement="top">
-                                <el-text size="small" @click="getRefresh(directoryPath)" class="cursor-pointer">
-                                    <el-icon>
-                                        <Refresh />
-                                    </el-icon>
-                                    <span class="sm:inline hidden pl-1">{{ $t('commons.button.refresh') }}</span>
-                                </el-text>
-                            </el-tooltip>
+                            <el-text size="small" @click="getRefresh(directoryPath)" class="cursor-pointer">
+                                <el-icon>
+                                    <Refresh />
+                                </el-icon>
+                                <span class="sm:inline hidden pl-1">{{ $t('commons.button.refresh') }}</span>
+                            </el-text>
                             <el-divider direction="vertical" v-if="!mobile" class="!mx-0" />
                             <el-dropdown @command="handleCreate" v-if="!mobile" trigger="click">
                                 <el-text size="small">
@@ -241,7 +237,6 @@
                     <div class="flex-1 sm:w-4/5 w-2/3 relative">
                         <CodeTabs
                             class="monaco-editor monaco-editor-background"
-                            ref="codeTabsRef"
                             :select-tab="selectTab"
                             :file-tabs="fileTabs"
                             :on-remove-tab="removeTab"
@@ -415,7 +410,6 @@ import { GlobalStore } from '@/store';
 import CodeTabs from './tabs/index.vue';
 import noUpdateImage from '@/assets/images/no_update_app.svg';
 
-const codeTabsRef = ref();
 let editor: monaco.editor.IStandaloneCodeEditor | undefined;
 
 self.MonacoEnvironment = {
