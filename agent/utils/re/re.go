@@ -10,7 +10,6 @@ const (
 	ComposeDisallowedCharsPattern      = `[^a-z0-9_-]+`
 	ComposeEnvVarPattern               = `\$\{([^}]+)\}`
 	DiskKeyValuePattern                = `([A-Za-z0-9_]+)=("([^"\\]|\\.)*"|[^ \t]+)`
-	FirewalldForwardPattern            = `^port=(\d{1,5}):proto=(.+?):toport=(\d{1,5}):toaddr=(.*)$`
 	ValidatorNamePattern               = `^[a-zA-Z\p{Han}]{1}[a-zA-Z0-9_\p{Han}]{0,30}$`
 	ValidatorIPPattern                 = `^((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})(\.((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})){3}$`
 	DomainPattern                      = `^([\w\p{Han}\-\*]{1,100}\.){1,10}([\w\p{Han}\-]{1,24}|[\w\p{Han}\-]{1,24}\.[\w\p{Han}\-]{1,24})(:\d{1,5})?$`
@@ -41,7 +40,6 @@ func Init() {
 		ComposeDisallowedCharsPattern,
 		ComposeEnvVarPattern,
 		DiskKeyValuePattern,
-		FirewalldForwardPattern,
 		ValidatorNamePattern,
 		ValidatorIPPattern,
 		DomainPattern,

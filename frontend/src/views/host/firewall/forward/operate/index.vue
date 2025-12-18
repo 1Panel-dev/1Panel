@@ -28,7 +28,11 @@
                 <span class="input-help">{{ $t('firewall.forwardPortHelper') }}</span>
             </el-form-item>
 
-            <el-form-item :label="$t('firewall.forwardInboundInterface')" prop="interface">
+            <el-form-item
+                v-if="dialogData.fireName !== 'firewalld'"
+                :label="$t('firewall.forwardInboundInterface')"
+                prop="interface"
+            >
                 <el-select class="w-full" v-model="dialogData.rowData!.interface">
                     <el-option
                         v-for="item in interfaceOptions"
@@ -105,8 +109,8 @@ function checkPortRule(rule: any, value: string, callback: any) {
     if (!value) {
         return callback(new Error(i18n.global.t('firewall.portFormatError')));
     }
-    if (value.indexOf(':') !== -1) {
-        const ports = value.split(':');
+    if (value.indexOf('-') !== -1) {
+        const ports = value.split('-');
         if (ports.length !== 2) {
             return callback(new Error(i18n.global.t('firewall.portFormatError')));
         }

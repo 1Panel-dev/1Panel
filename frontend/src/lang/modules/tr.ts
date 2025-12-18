@@ -3001,6 +3001,7 @@ const message = {
         targetPort: 'Hedef port',
         forwardHelper1: 'Yerel porta yönlendirmek istiyorsanız, hedef IP "127.0.0.1" olarak ayarlanmalıdır.',
         forwardHelper2: 'Yerel porta yönlendirmek için hedef IP’yi boş bırakın.',
+        forwardPortHelper: 'Port aralıklarını destekler, örn.: 8080-8089',
         forwardInboundInterface: 'İletme Gelen Ağ Arayüzü',
         exportHelper: '{0} güvenlik duvarı kuralını dışa aktarmak üzere. Devam etmek istiyor musunuz?',
         importSuccess: '{0} kural başarıyla içe aktarıldı',

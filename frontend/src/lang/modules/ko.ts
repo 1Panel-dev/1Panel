@@ -2827,6 +2827,7 @@ const message = {
         targetPort: '대상 포트',
         forwardHelper1: "로컬 포트로 전달하려면, 대상 IP 를 '127.0.0.1'로 설정해야 합니다.",
         forwardHelper2: '대상 IP 를 비워두면 로컬 포트로 전달됩니다.',
+        forwardPortHelper: '포트 범위를 지원합니다, 예: 8080-8089',
         forwardInboundInterface: '포워딩 인바운드 네트워크 인터페이스',
         exportHelper: '{0}개의 방화벽 규칙을 내보내려고 합니다. 계속하시겠습니까?',
         importSuccess: '{0}개의 규칙을 성공적으로 가져왔습니다',

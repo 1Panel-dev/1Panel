@@ -2941,6 +2941,7 @@ const message = {
         targetPort: 'Puerto de destino',
         forwardHelper1: 'Si quieres reenviar al puerto local, la IP de destino debe ser "127.0.0.1".',
         forwardHelper2: 'Deja en blanco la IP de destino para reenviar al puerto local.',
+        forwardPortHelper: 'Admite rangos de puertos, ej.: 8080-8089',
         forwardInboundInterface: 'Interfaz de Red de Entrada para Reenvío',
         exportHelper: 'A punto de exportar {0} reglas de firewall. ¿Continuar?',
         importSuccess: 'Se importaron correctamente {0} reglas',

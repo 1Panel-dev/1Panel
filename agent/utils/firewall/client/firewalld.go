@@ -9,7 +9,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/controller"
-	"github.com/1Panel-dev/1Panel/agent/utils/re"
 )
 
 type Firewall struct{}
@@ -119,24 +118,20 @@ func (f *Firewall) ListForward() ([]FireInfo, error) {
 	}
 	var datas []FireInfo
 	for _, line := range strings.Split(stdout, "\n") {
-		line = strings.TrimFunc(line, func(r rune) bool {
-			return r <= 32
-		})
-		if re.GetRegex(re.FirewalldForwardPattern).MatchString(line) {
-			match := re.GetRegex(re.FirewalldForwardPattern).FindStringSubmatch(line)
-			if len(match) < 4 {
-				continue
-			}
-			if len(match[4]) == 0 {
-				match[4] = "127.0.0.1"
-			}
-			datas = append(datas, FireInfo{
-				Port:       match[1],
-				Protocol:   match[2],
-				TargetIP:   match[4],
-				TargetPort: match[3],
-			})
+		line = strings.TrimSpace(line)
+		parts := strings.Split(line, ":")
+		if len(parts) < 4 {
+			continue
 		}
+		if parts[3] == "toaddr=" {
+			parts[3] = "127.0.0.1"
+		}
+		datas = append(datas, FireInfo{
+			Port:       strings.TrimPrefix(parts[0], "port="),
+			Protocol:   strings.TrimPrefix(parts[1], "proto="),
+			TargetIP:   strings.TrimPrefix(parts[3], "toaddr="),
+			TargetPort: strings.TrimPrefix(parts[2], "toport="),
+		})
 	}
 	return datas, nil
 }

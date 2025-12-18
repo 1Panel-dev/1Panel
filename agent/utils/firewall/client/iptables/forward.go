@@ -6,8 +6,8 @@ import (
 )
 
 func AddForward(protocol, srcPort, dest, destPort, iface string, save bool) error {
-	// iptabels destPort 范围端口规则为：%d-%d
-	destPort = strings.ReplaceAll(destPort, ":", "-")
+	srcPort = strings.ReplaceAll(srcPort, "-", ":")
+	itemDstPort := strings.ReplaceAll(destPort, "-", ":")
 	if dest != "" && dest != "127.0.0.1" && dest != "localhost" {
 		iptablesArg := fmt.Sprintf("-A %s", Chain1PanelPreRouting)
 		if iface != "" {
@@ -18,15 +18,15 @@ func AddForward(protocol, srcPort, dest, destPort, iface string, save bool) erro
 			return err
 		}
 
-		if err := Run(NatTab, fmt.Sprintf("-A %s -d %s -p %s --dport %s -j MASQUERADE", Chain1PanelPostRouting, dest, protocol, destPort)); err != nil {
+		if err := Run(NatTab, fmt.Sprintf("-A %s -d %s -p %s --dport %s -j MASQUERADE", Chain1PanelPostRouting, dest, protocol, itemDstPort)); err != nil {
 			return err
 		}
 
-		if err := Run(FilterTab, fmt.Sprintf("-A %s -d %s -p %s --dport %s -j ACCEPT", Chain1PanelForward, dest, protocol, destPort)); err != nil {
+		if err := Run(FilterTab, fmt.Sprintf("-A %s -d %s -p %s --dport %s -j ACCEPT", Chain1PanelForward, dest, protocol, itemDstPort)); err != nil {
 			return err
 		}
 
-		if err := Run(FilterTab, fmt.Sprintf("-A %s -s %s -p %s --sport %s -j ACCEPT", Chain1PanelForward, dest, protocol, destPort)); err != nil {
+		if err := Run(FilterTab, fmt.Sprintf("-A %s -s %s -p %s --sport %s -j ACCEPT", Chain1PanelForward, dest, protocol, itemDstPort)); err != nil {
 			return err
 		}
 	} else {
@@ -43,20 +43,21 @@ func AddForward(protocol, srcPort, dest, destPort, iface string, save bool) erro
 }
 
 func DeleteForward(num string, protocol, srcPort, dest, destPort, iface string) error {
+	itemDstPort := strings.ReplaceAll(destPort, "-", ":")
 	if err := Run(NatTab, fmt.Sprintf("-D %s %s", Chain1PanelPreRouting, num)); err != nil {
 		return err
 	}
 
 	if dest != "" && dest != "127.0.0.1" && dest != "localhost" {
-		if err := Run(NatTab, fmt.Sprintf("-D %s -d %s -p %s --dport %s -j MASQUERADE", Chain1PanelPostRouting, dest, protocol, destPort)); err != nil {
+		if err := Run(NatTab, fmt.Sprintf("-D %s -d %s -p %s --dport %s -j MASQUERADE", Chain1PanelPostRouting, dest, protocol, itemDstPort)); err != nil {
 			return err
 		}
 
-		if err := Run(FilterTab, fmt.Sprintf("-D %s -d %s -p %s --dport %s -j ACCEPT", Chain1PanelForward, dest, protocol, destPort)); err != nil {
+		if err := Run(FilterTab, fmt.Sprintf("-D %s -d %s -p %s --dport %s -j ACCEPT", Chain1PanelForward, dest, protocol, itemDstPort)); err != nil {
 			return err
 		}
 
-		if err := Run(FilterTab, fmt.Sprintf("-D %s -s %s -p %s --sport %s -j ACCEPT", Chain1PanelForward, dest, protocol, destPort)); err != nil {
+		if err := Run(FilterTab, fmt.Sprintf("-D %s -s %s -p %s --sport %s -j ACCEPT", Chain1PanelForward, dest, protocol, itemDstPort)); err != nil {
 			return err
 		}
 	}

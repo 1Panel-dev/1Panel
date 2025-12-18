@@ -2944,6 +2944,7 @@ const message = {
         targetPort: 'Port sasaran',
         forwardHelper1: 'Jika anda ingin memajukan ke port tempatan, IP sasaran harus ditetapkan kepada "127.0.0.1".',
         forwardHelper2: 'Biarkan IP sasaran kosong untuk memajukan ke port tempatan.',
+        forwardPortHelper: 'Menyokong julat port, cth: 8080-8089',
         forwardInboundInterface: 'Antara Muka Rangkaian Masukan Penerusan',
         exportHelper: 'Akan mengeksport {0} peraturan firewall. Teruskan?',
         importSuccess: '{0} peraturan berjaya diimport',

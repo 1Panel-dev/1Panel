@@ -2748,6 +2748,7 @@ const message = {
         targetPort: '目標埠',
         forwardHelper1: '如果是本機埠轉發，目標 IP 為：127.0.0.1',
         forwardHelper2: '如果目標 IP 不填寫，預設為本機埠轉發',
+        forwardPortHelper: '支援端口範圍，如：8080-8089',
         forwardInboundInterface: '轉發入站網路介面',
         exportHelper: '即將導出 {0} 條防火牆規則，是否繼續？',
         importSuccess: '成功匯入 {0} 條規則',

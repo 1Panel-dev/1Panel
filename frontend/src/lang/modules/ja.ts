@@ -2881,6 +2881,7 @@ const message = {
         targetPort: '宛先ポート',
         forwardHelper1: 'ローカルポートに転送する場合は、宛先IPを「127.0.0.1」に設定する必要があります。',
         forwardHelper2: '宛先IPを空白のままにして、ローカルポートに転送します。',
+        forwardPortHelper: 'ポート範囲をサポートします。例: 8080-8089',
         forwardInboundInterface: '転送入站ネットワークインターフェース',
         exportHelper: '{0} 件のファイアウォールルールをエクスポートします。続行しますか？',
         importSuccess: '{0} 件のルールを正常にインポートしました',

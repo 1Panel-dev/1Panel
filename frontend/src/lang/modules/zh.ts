@@ -497,7 +497,7 @@ const message = {
         changePassword: '改密',
         changeConnHelper: '此操作将修改当前数据库 {0}，是否继续？',
         changePasswordHelper: '当前数据库已经关联应用，修改密码将同步修改应用中数据库密码，修改后重启生效。',
-        recoverTimeoutHelper: '为 -1 表示不限制超时时间',
+        recoverTimeoutHelper: '-1 表示不限制超时时间',
 
         portHelper: '该端口为容器对外暴露端口，修改需要单独保存并且重启容器！',
 
@@ -2748,7 +2748,7 @@ const message = {
         targetPort: '目标端口',
         forwardHelper1: '如果是本机端口转发，目标IP为：127.0.0.1',
         forwardHelper2: '如果目标IP不填写，则默认为本机端口转发',
-        forwardPortHelper: '支持端口范围，如：80:90',
+        forwardPortHelper: '支持端口范围，如：8080-8089',
         forwardInboundInterface: '转发入站网卡',
         exportHelper: '即将导出 {0} 条防火墙规则，是否继续？',
         importSuccess: '成功导入 {0} 条规则',

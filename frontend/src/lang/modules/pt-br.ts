@@ -2949,6 +2949,7 @@ const message = {
         forwardHelper1:
             'Se você deseja redirecionar para a porta local, o IP de destino deve ser definido como "127.0.0.1".',
         forwardHelper2: 'Deixe o IP de destino em branco para redirecionar para a porta local.',
+        forwardPortHelper: 'Suporta intervalos de portas, ex. 8080-8089',
         forwardInboundInterface: 'Interface de Rede de Entrada para Encaminhamento',
         exportHelper: 'Prestes a exportar {0} regras de firewall. Continuar?',
         importSuccess: '{0} regras importadas com sucesso',
