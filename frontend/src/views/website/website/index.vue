@@ -78,6 +78,9 @@
                     @cell-mouse-leave="hideFavorite"
                     localKey="websiteColumn"
                     v-model:selects="selects"
+                    :tooltip-options="{
+                        placement: 'bottom-start',
+                    }"
                 >
                     <el-table-column type="selection" width="30" />
                     <el-table-column

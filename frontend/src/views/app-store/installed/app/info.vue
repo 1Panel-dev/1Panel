@@ -11,7 +11,7 @@
                 {{ $t('commons.table.port') }}：{{ installed.httpsPort }}
             </el-button>
 
-            <el-popover placement="top-start" trigger="hover" v-if="hasLinkButton(installed)" :width="400">
+            <el-popover placement="right" trigger="hover" v-if="hasLinkButton(installed)" :width="400">
                 <template #reference>
                     <el-button plain icon="Promotion" size="small" @click="$emit('openLink')">
                         {{ $t('app.toLink') }}
