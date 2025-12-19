@@ -257,7 +257,7 @@ InExecuting: "目前任務正在執行中，請勿重複執行！"
 NoSuchResource: "資料庫中未能查詢到備份內容，跳過..."
 CleanLog: "清理日誌"
 CleanLogByName: "清理 {{.name}} 日誌"
-WafIpGroupNotFound: "WAF IP 群組未找到，請先新增！"
+WafIpGroupNotFound: "WAF IP 群組未找到，請先到【進階功能-WAF-黑白名單-IP群組】添加遠端下載方式的IP群組"
 
 #toolbox
 ErrNotExistUser: '目前使用者不存在，請修改後重試！'

@@ -259,7 +259,7 @@ InExecuting: "Mevcut görev yürütülüyor, lütfen tekrar yürütmeyin!"
 NoSuchResource: "Veritabanında yedek içeriği bulunamadı, atlanıyor..."
 CleanLog: "Günlüğü temizle"
 CleanLogByName: "{{.name}} günlüğünü temizle"
-WafIpGroupNotFound: "WAF IP grubu bulunamadı, lütfen önce ekleyin!"
+WafIpGroupNotFound: "WAF IP grubu bulunamadı. Lütfen [Gelişmiş Özellikler - WAF - Kara/Beyaz Liste - IP Grubu] bölümüne giderek uzaktan indirme yöntemiyle bir IP grubu ekleyin."
 
 #toolbox
 ErrNotExistUser: 'Mevcut kullanıcı mevcut değil, lütfen değiştirin ve tekrar deneyin!'

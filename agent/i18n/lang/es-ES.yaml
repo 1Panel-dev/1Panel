@@ -257,7 +257,7 @@ InExecuting: "La tarea actual se está ejecutando, por favor no la repita"
 NoSuchResource: "No se encontraron contenidos de respaldo en la base de datos, omitiendo..."
 CleanLog: "Limpiar registro"
 CleanLogByName: "Limpiar registro de {{.name}}"
-WafIpGroupNotFound: "¡Grupo de IP de WAF no encontrado, por favor añádalo primero!"
+WafIpGroupNotFound: "Grupo de IP de WAF no encontrado. Por favor, vaya a [Funciones Avanzadas - WAF - Lista Blanca/Negra - Grupo de IP] para agregar un grupo de IP mediante el método de descarga remota."
 
 #toolbox
 ErrNotExistUser: 'El usuario actual no existe, modifíquelo e intente de nuevo'
