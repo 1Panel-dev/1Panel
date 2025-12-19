@@ -125,7 +125,13 @@
                             </el-button>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('commons.table.status')" prop="status" width="120px" sortable>
+                    <el-table-column
+                        :label="$t('commons.table.status')"
+                        prop="status"
+                        width="120px"
+                        sortable
+                        align="center"
+                    >
                         <template #default="{ row }">
                             <span v-if="row.type === 'stream'">
                                 <el-text type="success">
