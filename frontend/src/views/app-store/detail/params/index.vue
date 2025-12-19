@@ -199,7 +199,7 @@ const updateParam = () => {
 };
 
 const isMysql = (form: Object, envKey: string) => {
-    return envKey === 'PANEL_DB_TYPE' && (form[envKey] == 'mysql' || form[envKey] == 'mariadb');
+    return form['PANEL_DB_HOST'] != undefined && (form[envKey] == 'mysql' || form[envKey] == 'mariadb');
 };
 
 const handleParams = () => {
