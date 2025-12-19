@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"strings"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/global"
@@ -66,6 +67,9 @@ func GetDBWithPath(dbPath string) (*gorm.DB, error) {
 	})
 	if err != nil {
 		return nil, err
+	}
+	if strings.HasSuffix(dbPath, "core.db") || strings.HasSuffix(dbPath, "agent.db") {
+		initializeTxWatch(db)
 	}
 	sqlDB, dbError := db.DB()
 	if dbError != nil {
