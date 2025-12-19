@@ -579,8 +579,9 @@ const WebsiteTypes = getWebsiteTypes();
 const installFormRef = ref();
 const lbFormRef = ref();
 const versionNotMatch = ref();
-const steamConfig = ref({
+const initLbForm = () => ({
     name: '',
+    type: 'stream',
     algorithm: 'default',
     servers: [
         {
@@ -594,6 +595,7 @@ const steamConfig = ref({
         },
     ],
 });
+const steamConfig = ref(initLbForm());
 
 const handleClose = () => {
     open.value = false;
@@ -744,6 +746,8 @@ const acceptParams = async (openrestyVersion: string) => {
     runtimeResource.value = 'appstore';
     runtimeReq.value = initRuntimeReq();
     listAcmeAccount();
+
+    steamConfig.value = initLbForm();
 
     open.value = true;
 };
