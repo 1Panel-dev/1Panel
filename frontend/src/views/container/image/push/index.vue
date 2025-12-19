@@ -80,7 +80,7 @@ const formRef = ref<FormInstance>();
 
 const handleChange = () => {
     let repoURL = loadDetailInfo(form.repoID);
-    form.name = form.tagName.indexOf(repoURL) !== -1 ? form.tagName.replaceAll(repoURL, '') : form.tagName;
+    form.name = form.tagName.indexOf(repoURL) !== -1 ? form.tagName.replaceAll(repoURL + '/', '') : form.tagName;
 };
 
 const onSubmit = async (formEl: FormInstance | undefined) => {
