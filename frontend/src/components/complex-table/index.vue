@@ -15,6 +15,9 @@
                 :max-height="tableHeight"
                 @row-contextmenu="handleRightClick"
                 @row-click="handleRowClick"
+                :tooltip-options="{
+                    placement: 'bottom-start',
+                }"
             >
                 <slot></slot>
                 <template #empty>
