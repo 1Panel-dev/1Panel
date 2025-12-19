@@ -71,7 +71,7 @@
                         node-key="id"
                         :data="form.appData"
                         :props="defaultProps"
-                        @check-change="onChangeAppData"
+                        @check="onChangeAppData"
                         show-checkbox
                     >
                         <template #default="{ data }">
@@ -92,6 +92,7 @@
                     node-key="id"
                     :data="form.panelData"
                     :props="defaultProps"
+                    @check="onChangePanelData"
                     show-checkbox
                 >
                     <template #default="{ data }">
@@ -485,39 +486,67 @@ const search = async () => {
         });
 };
 
-function onChangeAppData(data: any, isCheck: boolean) {
-    if (data.label !== 'appData' || !data.relationItemID) {
-        return;
-    }
-    data.isCheck = isCheck;
-    let isDisable = false;
-    for (const item of form.appData) {
-        if (!item.children) {
-            return;
+function onChangeAppData(data: any, checked: any) {
+    let isChecked = false;
+    let keys = checked.checkedKeys || [];
+    for (const item of keys) {
+        if (data.id === item) {
+            isChecked = true;
         }
-        for (const itemData of item.children) {
-            if (itemData.label === 'appData' && itemData.relationItemID === data.relationItemID && itemData.isCheck) {
-                isDisable = true;
+    }
+    let relationID = data.relationItemID;
+    if (!relationID) {
+        let list = data.children || [];
+        for (const item of list) {
+            if (item.label === 'appData' && item.relationItemID && !item.isDisable) {
+                relationID = item.relationItemID;
                 break;
             }
         }
     }
+    if (!relationID) {
+        return;
+    }
+    changeRelation(relationID, isChecked);
+}
+const changeRelation = (relationID: string, isChecked: boolean) => {
     for (const item of form.appData) {
         if (!item.children) {
             return;
         }
         for (const relationItem of item.children) {
-            if (relationItem.id !== data.relationItemID) {
+            if (relationItem.id !== relationID) {
                 continue;
             }
-            relationItem.isDisable = isDisable;
-            if (isDisable) {
-                appRef.value.setChecked(relationItem.id, isDisable, isDisable);
+            relationItem.isDisable = isChecked;
+            if (isChecked) {
+                appRef.value.setChecked(relationItem.id, isChecked, isChecked);
+            }
+            if (relationItem.relationID) {
+                changeRelation(relationItem.relationID, isChecked);
             }
             break;
         }
     }
-}
+};
+
+const onChangePanelData = (data: any, checked: any) => {
+    let isChecked = false;
+    let keys = checked.checkedKeys || [];
+    for (const item of keys) {
+        if (data.id === item) {
+            isChecked = true;
+        }
+    }
+    if (!isChecked && data.label === 'agent' && data.path.indexOf('1panel/agent') !== -1) {
+        for (const item of data.children) {
+            if (item.label !== 'package') {
+                item.isCheck = true;
+                panelRef.value.setChecked(item.id, true, true);
+            }
+        }
+    }
+};
 const setAppDefaultCheck = async (list: any) => {
     for (const item of list) {
         if (item.isCheck) {

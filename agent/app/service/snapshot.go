@@ -343,7 +343,7 @@ func loadPanelFile(fileOp fileUtils.FileOp) ([]dto.DataTree, error) {
 			itemData.Children, _ = loadFile(panelPath, 3, fileOp)
 		case "agent":
 			panelPath := path.Join(global.Dir.DataDir, itemData.Label)
-			itemData.Children, _ = loadFile(panelPath, 3, fileOp)
+			itemData.Children, _ = loadFile(panelPath, 2, fileOp)
 			itemData.IsCheck = false
 			for i := 0; i < len(itemData.Children); i++ {
 				if itemData.Children[i].Label != "package" {
