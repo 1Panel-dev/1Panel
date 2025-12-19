@@ -206,9 +206,9 @@ RemoteRecover: "To restore the remote database, the local container database ser
 ErrTypeOfRedis: 'The recovery file type does not match the current persistence method, please modify it and try again'
 
 #container
-ErrInUsed: '{{ .detail }} is in use and cannot be deleted'
-ErrObjectInUsed: 'The object is in use and cannot be deleted'
-ErrObjectBeDependent: 'This image depends on other images and cannot be deleted'
+ErrInUsed: "{{ .detail }} is in use and cannot be deleted!"
+ErrObjectInUsed: "This object is in use and cannot be deleted!"
+ErrObjectBeDependent: "This image is depended on by other images and cannot be deleted!"
 ErrPortRules: 'Port number does not match, please re-enter!'
 ErrPgImagePull: 'Image pull timed out, please configure image acceleration or manually pull the {{ .name }} image and try again'
 PruneHelper: "This cleanup removed {{ .name }} {{ .count }} items, freeing {{ .size }} disk space"

@@ -206,9 +206,9 @@ RemoteRecover: "Para restaurar o banco de dados remoto, o serviço de banco de d
 ErrTypeOfRedis: 'O tipo de arquivo de recuperação não corresponde ao método de persistência atual, modifique-o e tente novamente'
 
 #recipiente
-ErrInUsed: '{{ .detail }} está em uso e não pode ser excluído'
-ErrObjectInUsed: 'O objeto está em uso e não pode ser excluído'
-ErrObjectBeDependent: 'Esta imagem depende de outras imagens e não pode ser excluída'
+ErrInUsed: "{{ .detail }} está em uso e não pode ser excluído!"
+ErrObjectInUsed: "Este objeto está em uso e não pode ser excluído!"
+ErrObjectBeDependent: "Esta imagem é dependida por outras imagens e não pode ser excluída!"
 ErrPortRules: 'O número da porta não corresponde, digite novamente!'
 ErrPgImagePull: 'Tempo limite para extração de imagem. Configure a aceleração de imagem ou extraia manualmente a imagem {{ .name }} e tente novamente'
 PruneHelper: "Esta limpeza removeu {{ .name }} {{ .count }} itens, liberando {{ .size }} de espaço em disco"

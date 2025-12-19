@@ -205,9 +205,9 @@ RemoteRecover: "Para restaurar la base de datos remota, primero debe iniciarse e
 ErrTypeOfRedis: 'El tipo de archivo de recuperación no coincide con el método de persistencia actual, modifíquelo e intente'
 
 #container
-ErrInUsed: '{{ .detail }} está en uso y no puede eliminarse'
-ErrObjectInUsed: 'El objeto está en uso y no puede eliminarse'
-ErrObjectBeDependent: 'Esta imagen depende de otras imágenes y no puede eliminarse'
+ErrInUsed: "{{ .detail }} está en uso y no se puede eliminar!"
+ErrObjectInUsed: "Este objeto está en uso y no se puede eliminar!"
+ErrObjectBeDependent: "Esta imagen es dependida por otras imágenes y no se puede eliminar!"
 ErrPortRules: 'El número de puerto no coincide, ingrese de nuevo'
 ErrPgImagePull: 'Tiempo de espera al descargar la imagen, configure la aceleración o descárguela manualmente ({{ .name }}) e intente de nuevo'
 PruneHelper: "Esta limpieza eliminó {{ .name }} {{ .count }} elementos, liberando {{ .size }} de espacio en disco"

@@ -205,9 +205,9 @@ RemoteRecover: "恢復遠端資料庫需要先使用映像 {{ .name }} 啟動本
 ErrTypeOfRedis: '復原檔案類型與目前持久化方式不符，請修改後重試'
 
 #container
-ErrInUsed: '{{ .detail }} 正被使用，無法刪除'
-ErrObjectInUsed: '該物件正被使用，無法刪除'
-ErrObjectBeDependent: '此鏡像依賴其他鏡像，無法刪除'
+ErrInUsed: "{{ .detail }} 正被使用，無法刪除！"
+ErrObjectInUsed: "該對象正被使用，無法刪除！"
+ErrObjectBeDependent: "該映像正被其他映像所依賴，無法刪除！"
 ErrPortRules: '連接埠數目不匹配，請重新輸入！'
 ErrPgImagePull: '鏡像拉取逾時，請配置鏡像加速或手動拉取{{ .name }} 鏡像後重試'
 PruneHelper: "本次清理 {{ .name }} {{ .count }} 個，釋放磁碟空間 {{ .size }}"
