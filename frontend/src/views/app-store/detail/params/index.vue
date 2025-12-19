@@ -118,20 +118,12 @@
             </div>
             <span class="input-help" v-if="p.description">{{ getDescription(p) }}</span>
         </el-form-item>
-        <el-form-item
-            v-if="form[p.envKey] == 'mysql' || form[p.envKey] == 'mariadb'"
-            :label="$t('database.format')"
-            prop="format"
-        >
+        <el-form-item v-if="isMysql(form, p.envKey)" :label="$t('database.format')" prop="format">
             <el-select filterable v-model="form.format" @change="loadCollations()">
                 <el-option v-for="item of formatOptions" :key="item.format" :label="item.format" :value="item.format" />
             </el-select>
         </el-form-item>
-        <el-form-item
-            v-if="form[p.envKey] == 'mysql' || form[p.envKey] == 'mariadb'"
-            :label="$t('database.collation')"
-            prop="collation"
-        >
+        <el-form-item v-if="isMysql(form, p.envKey)" :label="$t('database.collation')" prop="collation">
             <el-select filterable v-model="form.collation">
                 <el-option v-for="item of collationOptions" :key="item" :label="item" :value="item" />
             </el-select>
@@ -185,6 +177,7 @@ const props = defineProps({
 
 const form = reactive({
     format: '',
+    collation: '',
 });
 let rules = reactive({});
 const params = computed({
@@ -203,6 +196,10 @@ const paramObjs = ref<ParamObj[]>([]);
 
 const updateParam = () => {
     emit('update:form', form);
+};
+
+const isMysql = (form: Object, envKey: string) => {
+    return envKey === 'PANEL_DB_TYPE' && (form[envKey] == 'mysql' || form[envKey] == 'mariadb');
 };
 
 const handleParams = () => {
