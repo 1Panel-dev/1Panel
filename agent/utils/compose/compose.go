@@ -80,7 +80,7 @@ func UpWithTask(filePath string, task *task.Task) error {
 		}
 	}
 
-	return cmd.NewCommandMgr(cmd.WithTask(*task)).Run("%s %s up -d", global.CONF.DockerConfig.Command, loadFiles(filePath))
+	return cmd.NewCommandMgr(cmd.WithTask(*task)).RunBashCf("%s %s up -d", global.CONF.DockerConfig.Command, loadFiles(filePath))
 }
 
 func Down(filePath string) (string, error) {
