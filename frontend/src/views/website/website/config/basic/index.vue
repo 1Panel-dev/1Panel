@@ -135,6 +135,11 @@ const handleScroll = (event: WheelEvent) => {
     const tabContainer = tabsRef.value.$el.querySelector('.el-tabs__nav-scroll');
     if (!tabContainer) return;
 
+    const currentScrollTop = tabContainer.scrollTop;
+    if (currentScrollTop == 0) {
+        return;
+    }
+
     const target = event.target as HTMLElement;
     if (!target.classList.contains('el-tabs__item')) {
         return;
