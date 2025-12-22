@@ -13,9 +13,7 @@
 
             <el-popover placement="right" trigger="hover" v-if="hasLinkButton(installed)" :width="400">
                 <template #reference>
-                    <el-button plain icon="Promotion" size="small" @click="$emit('openLink')">
-                        {{ $t('app.toLink') }}
-                    </el-button>
+                    <el-button plain icon="Promotion" size="small">{{ $t('app.toLink') }}</el-button>
                 </template>
                 <table>
                     <tbody>
@@ -24,7 +22,7 @@
                                 <el-button
                                     type="primary"
                                     link
-                                    @click="$emit('toLink', 'http://' + defaultLink + ':' + installed.httpPort)"
+                                    @click="toLink('http://' + defaultLink + ':' + installed.httpPort)"
                                 >
                                     {{ 'http://' + defaultLink + ':' + installed.httpPort }}
                                 </el-button>
@@ -35,7 +33,7 @@
                                 <el-button
                                     type="primary"
                                     link
-                                    @click="$emit('toLink', 'https://' + defaultLink + ':' + installed.httpsPort)"
+                                    @click="toLink('https://' + defaultLink + ':' + installed.httpsPort)"
                                 >
                                     {{ 'https://' + defaultLink + ':' + installed.httpsPort }}
                                 </el-button>
@@ -43,7 +41,7 @@
                         </tr>
                         <tr v-if="installed.webUI != ''">
                             <td>
-                                <el-button type="primary" link @click="$emit('toLink')">
+                                <el-button type="primary" link @click="toLink(installed.webUI)">
                                     {{ installed.webUI }}
                                 </el-button>
                             </td>
@@ -69,7 +67,7 @@
 
 <script lang="ts" setup>
 import { App } from '@/api/interface/app';
-import { getAge } from '@/utils/util';
+import { getAge, toLink } from '@/utils/util';
 
 interface Props {
     installed: App.AppInstalled;
@@ -77,7 +75,7 @@ interface Props {
 }
 defineProps<Props>();
 
-defineEmits(['openLink', 'toLink', 'jumpToPath']);
+defineEmits(['jumpToPath']);
 
 const hasLinkButton = (installed: any) => {
     return (

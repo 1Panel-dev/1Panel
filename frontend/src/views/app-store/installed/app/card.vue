@@ -28,8 +28,6 @@
                         <AppInfo
                             :installed="installed"
                             :defaultLink="defaultLink"
-                            @open-link="$emit('openLink')"
-                            @to-link="$emit('toLink')"
                             @jump-to-path="$emit('jumpToPath', '/settings/panel')"
                         ></AppInfo>
                         <div class="app-divider" />
@@ -65,8 +63,6 @@ defineEmits([
     'openTerminal',
     'openOperate',
     'favoriteInstall',
-    'openLink',
-    'toLink',
     'jumpToPath',
     'ignoreApp',
     'toContainer',

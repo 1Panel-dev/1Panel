@@ -61,8 +61,6 @@
                                 @favorite-install="favoriteInstall(installed)"
                                 @to-folder="routerToFileWithPath(installed.path)"
                                 @open-uploads="openUploads(installed.appKey, installed.name)"
-                                @open-link="openLink(defaultLink, installed)"
-                                @to-link="toLink(installed.webUI)"
                                 @jump-to-path="jumpToPath(router, '/settings/panel')"
                                 @to-container="toContainer(installed)"
                                 @ignore-app="ignoreApp(installed)"
@@ -139,7 +137,7 @@ import { onMounted, onUnmounted, reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { ElMessageBox } from 'element-plus';
 import { App } from '@/api/interface/app';
-import { jumpToPath, toLink } from '@/utils/util';
+import { jumpToPath } from '@/utils/util';
 import { useRouter } from 'vue-router';
 import { MsgSuccess } from '@/utils/message';
 import { getAgentSettingByKey } from '@/api/modules/setting';
@@ -442,27 +440,6 @@ const getConfig = async () => {
             defaultLink.value = currentNodeAddr.value;
         }
     } catch (error) {}
-};
-
-const openLink = (defaultLink: string, installed: App.AppInstalled) => {
-    if (defaultLink != '' && installed.webUI != '') {
-        return;
-    }
-    if (defaultLink == '' && installed.webUI == '') {
-        return;
-    }
-    if (installed.webUI != '') {
-        toLink(installed.webUI);
-        return;
-    }
-    if (installed.httpsPort > 0) {
-        toLink('https://' + defaultLink + ':' + installed.httpsPort);
-        return;
-    }
-    if (installed.httpPort > 0) {
-        toLink('http://' + defaultLink + ':' + installed.httpPort);
-        return;
-    }
 };
 
 onMounted(() => {
