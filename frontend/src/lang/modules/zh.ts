@@ -972,6 +972,7 @@ const message = {
         registrieHelper: '当存在多个私有仓库时，需要换行显示，例：\n172.16.10.111:8081 \n172.16.10.112:8081',
 
         compose: '编排',
+        composeFile: '编排文件',
         fromChangeHelper: '切换来源将清空当前已编辑内容，是否继续？',
         composePathHelper: '配置文件保存路径: {0}',
         composeHelper: '通过 1Panel 编辑或者模版创建的编排，将保存在 {0}/docker/compose 路径下',

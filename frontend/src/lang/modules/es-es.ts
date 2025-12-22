@@ -1021,7 +1021,9 @@ const message = {
             'Si hay varios mirrors, deben estar en líneas separadas. Ejemplo:\nhttp://xxxxxx.m.daocloud.io\nhttps://xxxxxx.mirror.aliyuncs.com',
         registrieHelper:
             'Si existen varios repositorios privados, deben estar en líneas separadas. Ejemplo:\n172.16.10.111:8081\n172.16.10.112:8081',
+
         compose: 'Compose | Composes',
+        composeFile: 'Archivo de Orquestación',
         fromChangeHelper: 'Cambiar la fuente limpiará el contenido actualmente editado. ¿Desea continuar?',
         composePathHelper: 'Ruta de guardado del archivo de configuración: {0}',
         composeHelper:

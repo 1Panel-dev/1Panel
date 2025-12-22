@@ -1012,6 +1012,7 @@ const message = {
             'Jika terdapat banyak repositori persendirian, baris baru mesti dipaparkan, contohnya:\n172.16.10.111:8081 \n172.16.10.112:8081',
 
         compose: 'Compose | Compose-compose',
+        composeFile: 'Fail Susunan',
         fromChangeHelper: 'Menukar sumber akan membersihkan kandungan yang sedang diedit. Adakah anda mahu meneruskan?',
         composePathHelper: 'Laluan simpan fail konfigurasi: {0}',
         composeHelper:

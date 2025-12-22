@@ -1008,6 +1008,7 @@ const message = {
             'Se houver múltiplos repositórios privados, eles devem ser exibidos em novas linhas, por exemplo:\n172.16.10.111:8081 \n172.16.10.112:8081',
 
         compose: 'Compose | Composições',
+        composeFile: 'Arquivo de Orquestração',
         fromChangeHelper: 'Trocar a origem limpará o conteúdo editado atual. Deseja continuar?',
         composePathHelper: 'Caminho de salvamento do arquivo de configuração: {0}',
         composeHelper:

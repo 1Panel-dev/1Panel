@@ -970,6 +970,7 @@ const message = {
         registrieHelper: '當存在多個私有倉庫時，需要換行顯示，例：\n172.16.10.111:8081 \n172.16.10.112:8081',
 
         compose: '編排',
+        composeFile: '編排檔案',
         fromChangeHelper: '切換來源將清空檔前已編輯內容，是否繼續？',
         composePathHelper: '設定檔儲存路徑: {0}',
         composeHelper: '通過 1Panel 編輯或者模版建立的編排，將儲存在 {0}/docker/compose 路徑下',

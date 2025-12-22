@@ -190,7 +190,7 @@ export const upCompose = (params: Container.ComposeCreate) => {
 export const testCompose = (params: Container.ComposeCreate) => {
     return http.post<boolean>(`/containers/compose/test`, params);
 };
-export const composeOperator = (params: Container.ComposeOperation) => {
+export const composeOperate = (params: Container.ComposeOperation) => {
     return http.post(`/containers/compose/operate`, params);
 };
 export const composeUpdate = (params: Container.ComposeUpdate) => {

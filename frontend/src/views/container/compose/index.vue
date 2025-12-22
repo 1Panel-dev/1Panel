@@ -221,10 +221,24 @@
                                 </el-table-column>
                             </el-table>
 
-                            <el-radio-group size="small" class="mt-1 mb-1" v-model="showType">
+                            <el-radio-group class="mt-1 mb-1" v-model="showType">
                                 <el-radio-button value="compose">{{ $t('container.compose') }}</el-radio-button>
                                 <el-radio-button value="log">{{ $t('commons.button.log') }}</el-radio-button>
                             </el-radio-group>
+                            <el-select
+                                class="p-w-300 mt-2 ml-2"
+                                v-model="currentYamlPath"
+                                @change="inspectCompose(currentCompose.name, currentYamlPath)"
+                                v-if="currentCompose.path.indexOf(',') !== -1"
+                            >
+                                <template #prefix>{{ $t('container.composeFile') }}</template>
+                                <el-option
+                                    v-for="item in currentCompose.path.split(',')"
+                                    :key="item"
+                                    :value="item"
+                                    :label="item.split('/').pop()"
+                                />
+                            </el-select>
                             <div v-show="showType === 'compose'">
                                 <CodemirrorPro
                                     v-model="composeContent"
@@ -357,7 +371,7 @@ import TerminalDialog from '@/views/container/container/terminal/index.vue';
 import ContainerLogDialog from '@/components/log/container-drawer/index.vue';
 import DeleteDialog from '@/views/container/compose/delete/index.vue';
 import {
-    composeOperator,
+    composeOperate,
     composeUpdate,
     containerItemStats,
     containerListStats,
@@ -381,6 +395,7 @@ const data = ref<any[]>([]);
 const loading = ref(false);
 const detailLoading = ref(false);
 const currentCompose = ref<Container.ComposeInfo | null>(null);
+const currentYamlPath = ref('');
 const composeContainers = ref([]);
 const composeContent = ref('');
 
@@ -410,7 +425,7 @@ const form = reactive({
     path: '',
     file: '',
     template: null as number,
-    env: [],
+    env: '',
 });
 const rules = reactive({
     name: [Rules.requiredInput, Rules.composeName],
@@ -491,9 +506,14 @@ const loadDetail = async (row: Container.ComposeInfo, withRefresh: boolean) => {
     isOnCreate.value = false;
     detailLoading.value = true;
     currentCompose.value = row;
+    currentYamlPath.value = row.path.indexOf(',') !== -1 ? row.path.split(',')[0] : row.path;
     env.value = row.env || '';
     composeContainers.value = row.containers || [];
-    await inspect({ id: currentCompose.value.name, type: 'compose' })
+    inspectCompose(row.name, currentYamlPath.value);
+};
+
+const inspectCompose = async (name: string, detailPath: string) => {
+    await inspect({ id: name, type: 'compose', detail: detailPath })
         .then((res) => {
             composeContent.value = res.data;
             detailLoading.value = false;
@@ -521,7 +541,7 @@ const onOpenDialog = async () => {
     form.path = '';
     form.file = '';
     form.template = null;
-    form.env = [];
+    form.env = '';
     loadPath();
     loadTemplates();
 };
@@ -613,7 +633,7 @@ const handleComposeOperate = async (operation: 'up' | 'stop' | 'restart', row: a
             withFile: false,
             force: false,
         };
-        await composeOperator(params)
+        await composeOperate(params)
             .then(async () => {
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 await search();
@@ -642,6 +662,7 @@ const onSubmitEdit = async () => {
     const param = {
         name: currentCompose.value.name,
         path: currentCompose.value.path,
+        detailPath: currentYamlPath.value,
         content: composeContent.value,
         createdBy: currentCompose.value.createdBy,
         env: env.value || '',
@@ -700,7 +721,7 @@ const onInspectContainer = async (item: any) => {
     if (!item.containerID) {
         return;
     }
-    const res = await inspect({ id: item.containerID, type: 'container' });
+    const res = await inspect({ id: item.containerID, type: 'container', detail: '' });
     containerInspectRef.value!.acceptParams({ data: res.data, ports: item.ports || [] });
 };
 const onOpenTerminal = (row: any) => {

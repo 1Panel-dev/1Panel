@@ -1017,6 +1017,7 @@ const message = {
             'If multiple private repositories exist, newlines must be displayed, for example:\n172.16.10.111:8081 \n172.16.10.112:8081',
 
         compose: 'Compose | Composes',
+        composeFile: 'Compose File',
         fromChangeHelper: 'Switching the source will clean the current edited content. Do you want to continue?',
         composePathHelper: 'Configuration file save path: {0}',
         composeHelper:

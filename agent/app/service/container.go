@@ -19,12 +19,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/1Panel-dev/1Panel/agent/app/repo"
-	"github.com/gin-gonic/gin"
-
-	"github.com/pkg/errors"
-
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
@@ -45,7 +41,9 @@ import (
 	"github.com/docker/docker/api/types/volume"
 	"github.com/docker/docker/client"
 	"github.com/docker/go-connections/nat"
+	"github.com/gin-gonic/gin"
 	v1 "github.com/opencontainers/image-spec/specs-go/v1"
+	"github.com/pkg/errors"
 	"github.com/shirou/gopsutil/v4/cpu"
 	"github.com/shirou/gopsutil/v4/mem"
 )
@@ -362,6 +360,9 @@ func (u *ContainerService) Inspect(req dto.InspectReq) (string, error) {
 		}
 		for _, container := range containers {
 			config := container.Labels[composeConfigLabel]
+			if len(req.Detail) != 0 && strings.Contains(config, req.Detail) {
+				config = req.Detail
+			}
 			workdir := container.Labels[composeWorkdirLabel]
 			if len(config) != 0 && len(workdir) != 0 && strings.Contains(config, workdir) {
 				filePath = config
@@ -970,13 +971,20 @@ func collectLogs(done <-chan struct{}, params dto.StreamLog, messageChan chan<- 
 	var dockerCmd *exec.Cmd
 	if params.Type == "compose" {
 		dockerComposCmd := common.GetDockerComposeCommand()
+		var yamlFiles []string
+		for _, item := range strings.Split(params.Compose, ",") {
+			if len(item) != 0 {
+				yamlFiles = append(yamlFiles, "-f", item)
+			}
+		}
 		if dockerComposCmd == "docker-compose" {
-			newCmdArgs := append([]string{"-f", params.Compose}, cmdArgs...)
+			newCmdArgs := append(yamlFiles, cmdArgs...)
 			dockerCmd = exec.Command(dockerComposCmd, newCmdArgs...)
 		} else {
-			newCmdArgs := append([]string{"compose", "-f", params.Compose}, cmdArgs...)
+			newCmdArgs := append(append([]string{"compose"}, yamlFiles...), cmdArgs...)
 			dockerCmd = exec.Command("docker", newCmdArgs...)
 		}
+		global.LOG.Debug("Docker command:", dockerCmd.Args)
 	} else {
 		dockerCmd = exec.Command("docker", cmdArgs...)
 	}
