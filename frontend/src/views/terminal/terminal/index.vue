@@ -206,8 +206,7 @@
                                 :props="defaultProps"
                                 :filter-node-method="filterHost"
                                 :empty-text="$t('terminal.noHost')"
-                                class="host-tree compact"
-                                :style="{ 'max-height': '200px' }"
+                                class="host-tree"
                             >
                                 <template #default="{ node, data }">
                                     <span class="custom-tree-node w-full">
@@ -613,59 +612,8 @@ onMounted(() => {
 }
 
 .host-tree {
-    :deep(.el-tree-node) {
-        .el-tree-node__content {
-            height: 36px;
-            padding: 0 12px;
-
-            &:hover {
-                background-color: var(--el-fill-color-light);
-            }
-        }
-
-        .el-tree-node__label {
-            flex: 1;
-            padding-left: 8px;
-        }
-
-        .el-tree-node__expand-icon {
-            margin-right: 8px;
-        }
-    }
-
-    :deep(.el-tree__empty-block) {
-        padding: 24px 0;
-        min-height: auto;
-    }
-
-    :deep(.el-tree__empty-text) {
-        color: var(--el-text-color-secondary);
-        font-size: 13px;
-    }
-
-    &.compact {
-        :deep(.el-tree-node) {
-            .el-tree-node__content {
-                height: 28px;
-                padding: 0 8px;
-            }
-
-            .el-tree-node__label {
-                padding-left: 4px;
-            }
-
-            .el-tree-node__expand-icon {
-                margin-right: 4px;
-                font-size: 12px;
-            }
-        }
-
-        :deep(.el-tree-node__children) {
-            .el-tree-node__content {
-                padding-left: 20px;
-            }
-        }
-    }
+    max-height: 300px;
+    overflow-y: auto;
 }
 
 .search-container {
