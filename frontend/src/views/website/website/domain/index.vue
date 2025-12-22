@@ -12,6 +12,9 @@
             />
             <el-text v-else type="primary" class="cursor-pointer" @click="openConfig(row.id)">
                 {{ row.primaryDomain }}
+                <span class="text-gray-400" v-if="isPunycoded(row.primaryDomain)">
+                    ({{ GetPunyCodeDomain(row.primaryDomain) }})
+                </span>
             </el-text>
             <el-popover
                 placement="right"
@@ -58,10 +61,11 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { ref, nextTick } from 'vue';
 import { listDomains } from '@/api/modules/website';
 import { Website } from '@/api/interface/website';
 import { routerToNameWithParams } from '@/utils/router';
+import { GetPunyCodeDomain, isPunycoded } from '@/utils/util';
 
 interface Props {
     row: Website.Website;

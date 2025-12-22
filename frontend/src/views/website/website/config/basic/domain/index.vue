@@ -8,7 +8,12 @@
                 <el-button link :icon="Promotion" @click="openUrl(row)"></el-button>
             </template>
         </el-table-column>
-        <el-table-column :label="$t('website.domain')" prop="domain"></el-table-column>
+        <el-table-column :label="$t('website.domain')" prop="domain">
+            <template #default="{ row }">
+                {{ row.domain }}
+                <span class="text-gray-400" v-if="isPunycoded(row.domain)">({{ GetPunyCodeDomain(row.domain) }})</span>
+            </template>
+        </el-table-column>
         <el-table-column :label="$t('commons.table.port')" prop="port"></el-table-column>
         <el-table-column :label="'SSL'" prop="ssl">
             <template #default="{ row }">
@@ -37,6 +42,7 @@ import { Promotion } from '@element-plus/icons-vue';
 import { GlobalStore } from '@/store';
 import { checkAppInstalled } from '@/api/modules/app';
 import { MsgSuccess } from '@/utils/message';
+import { GetPunyCodeDomain, isPunycoded } from '@/utils/util';
 const globalStore = GlobalStore();
 
 const props = defineProps({

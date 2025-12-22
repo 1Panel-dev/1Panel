@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import JSEncrypt from 'jsencrypt';
 import CryptoJS from 'crypto-js';
 import { routerToPathWithQuery } from './router';
+import { toUnicode } from './punycode';
 
 export function deepCopy<T>(obj: any): T {
     let newObj: any;
@@ -918,4 +919,31 @@ export function sortMenu(arr) {
     });
 
     arr.sort(compareById);
+}
+
+export function isPunycoded(domain: string): boolean {
+    return domain.includes('xn--');
+}
+
+export function GetPunyCodeDomain(domain: string): string {
+    if (!domain || typeof domain !== 'string') {
+        return '';
+    }
+
+    const lowerDomain = domain.toLowerCase();
+    if (!lowerDomain.includes('xn--')) {
+        return '';
+    }
+
+    try {
+        const decoded = toUnicode(domain);
+
+        if (decoded === domain) {
+            return '';
+        }
+
+        return decoded;
+    } catch (error) {
+        return '';
+    }
 }
