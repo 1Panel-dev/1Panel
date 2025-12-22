@@ -1745,8 +1745,7 @@ func (w WebsiteService) OperateRedirect(req request.NginxRedirectReq) (err error
 
 func (w WebsiteService) GetRedirect(id uint) (res []response.NginxRedirectConfig, err error) {
 	var (
-		website  model.Website
-		fileList response.FileInfo
+		website model.Website
 	)
 	website, err = websiteRepo.GetFirst(repo.WithByID(id))
 	if err != nil {
@@ -1757,27 +1756,39 @@ func (w WebsiteService) GetRedirect(id uint) (res []response.NginxRedirectConfig
 	if !fileOp.Stat(includeDir) {
 		return
 	}
-	fileList, err = NewIFileService().GetFileList(request.FileOption{FileOption: files.FileOption{Path: includeDir, Expand: true, Page: 1, PageSize: 100}})
-	if len(fileList.Items) == 0 {
+	entries, err := os.ReadDir(includeDir)
+	if err != nil {
 		return
 	}
+	if len(entries) == 0 {
+		return
+	}
+
 	var (
 		content []byte
 		config  *components.Config
 	)
-	for _, configFile := range fileList.Items {
+	for _, entry := range entries {
+		if entry.IsDir() {
+			continue
+		}
+		fileName := entry.Name()
+		if !strings.HasSuffix(fileName, ".conf") && !strings.HasSuffix(fileName, ".conf.bak") {
+			continue
+		}
 		redirectConfig := response.NginxRedirectConfig{
 			WebsiteID: website.ID,
 		}
-		parts := strings.Split(configFile.Name, ".")
+		parts := strings.Split(fileName, ".")
 		redirectConfig.Name = parts[0]
 		if parts[1] == "conf" {
 			redirectConfig.Enable = true
 		} else {
 			redirectConfig.Enable = false
 		}
-		redirectConfig.FilePath = configFile.Path
-		content, err = fileOp.GetContent(configFile.Path)
+		filePath := path.Join(includeDir, fileName)
+		redirectConfig.FilePath = filePath
+		content, err = fileOp.GetContent(filePath)
 		if err != nil {
 			return
 		}

@@ -39,7 +39,7 @@ import { FormInstance } from 'element-plus';
 import { ref } from 'vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import { composeOperator } from '@/api/modules/container';
+import { composeOperate } from '@/api/modules/container';
 
 let open = ref(false);
 let loading = ref(false);
@@ -76,7 +76,7 @@ const submit = async () => {
         withFile: deleteFile.value,
         force: force.value,
     };
-    await composeOperator(params)
+    await composeOperate(params)
         .then(() => {
             loading.value = false;
             emit('search');

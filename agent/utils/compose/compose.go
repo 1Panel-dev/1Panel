@@ -33,8 +33,7 @@ func Up(filePath string) (string, error) {
 	if err := checkCmd(); err != nil {
 		return "", err
 	}
-	stdout, err := cmd.RunDefaultWithStdoutBashCfAndTimeOut(global.CONF.DockerConfig.Command+" -f %s up -d", 20*time.Minute, filePath)
-	return stdout, err
+	return cmd.NewCommandMgr(cmd.WithTimeout(20*time.Minute)).RunWithStdoutBashCf("%s %s up -d", global.CONF.DockerConfig.Command, loadFiles(filePath))
 }
 
 func UpWithTask(filePath string, task *task.Task) error {
@@ -81,54 +80,56 @@ func UpWithTask(filePath string, task *task.Task) error {
 		}
 	}
 
-	dockerCommand := global.CONF.DockerConfig.Command
-	if dockerCommand == "docker-compose" {
-		return cmd.NewCommandMgr(cmd.WithTask(*task)).Run("docker-compose", "-f", filePath, "up", "-d")
-	} else {
-		return cmd.NewCommandMgr(cmd.WithTask(*task)).Run("docker", "compose", "-f", filePath, "up", "-d")
-	}
+	return cmd.NewCommandMgr(cmd.WithTask(*task)).Run("%s %s up -d", global.CONF.DockerConfig.Command, loadFiles(filePath))
 }
 
 func Down(filePath string) (string, error) {
 	if err := checkCmd(); err != nil {
 		return "", err
 	}
-	stdout, err := cmd.RunDefaultWithStdoutBashCfAndTimeOut(global.CONF.DockerConfig.Command+" -f %s down --remove-orphans", 20*time.Minute, filePath)
-	return stdout, err
+	return cmd.NewCommandMgr(cmd.WithTimeout(20*time.Minute)).RunWithStdoutBashCf("%s %s down --remove-orphans", global.CONF.DockerConfig.Command, loadFiles(filePath))
 }
 
 func Stop(filePath string) (string, error) {
 	if err := checkCmd(); err != nil {
 		return "", err
 	}
-	stdout, err := cmd.RunDefaultWithStdoutBashCf(global.CONF.DockerConfig.Command+" -f %s stop", filePath)
-	return stdout, err
+	return cmd.NewCommandMgr(cmd.WithTimeout(20*time.Minute)).RunWithStdoutBashCf("%s %s stop", global.CONF.DockerConfig.Command, loadFiles(filePath))
 }
 
 func Restart(filePath string) (string, error) {
 	if err := checkCmd(); err != nil {
 		return "", err
 	}
-	stdout, err := cmd.RunDefaultWithStdoutBashCf(global.CONF.DockerConfig.Command+" -f %s restart", filePath)
-	return stdout, err
+	return cmd.NewCommandMgr(cmd.WithTimeout(20*time.Minute)).RunWithStdoutBashCf("%s %s restart", global.CONF.DockerConfig.Command, loadFiles(filePath))
 }
 
 func Operate(filePath, operation string) (string, error) {
 	if err := checkCmd(); err != nil {
 		return "", err
 	}
-	stdout, err := cmd.RunDefaultWithStdoutBashCf(global.CONF.DockerConfig.Command+" -f %s %s", filePath, operation)
-	return stdout, err
+	return cmd.NewCommandMgr(cmd.WithTimeout(20*time.Minute)).RunWithStdoutBashCf("%s %s %s", global.CONF.DockerConfig.Command, loadFiles(filePath), operation)
 }
 
 func DownAndUp(filePath string) (string, error) {
 	if err := checkCmd(); err != nil {
 		return "", err
 	}
-	stdout, err := cmd.RunDefaultWithStdoutBashCf(global.CONF.DockerConfig.Command+" -f %s down", filePath)
+	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(20 * time.Minute))
+	stdout, err := cmdMgr.RunWithStdoutBashCf("%s %s down", global.CONF.DockerConfig.Command, loadFiles(filePath))
 	if err != nil {
 		return stdout, err
 	}
-	stdout, err = cmd.RunDefaultWithStdoutBashCf(global.CONF.DockerConfig.Command+" -f %s up -d", filePath)
+	stdout, err = cmdMgr.RunWithStdoutBashCf("%s %s up -d", global.CONF.DockerConfig.Command, loadFiles(filePath))
 	return stdout, err
+}
+
+func loadFiles(filePath string) string {
+	var fileItem []string
+	for _, item := range strings.Split(filePath, ",") {
+		if len(item) != 0 {
+			fileItem = append(fileItem, fmt.Sprintf("-f %s", item))
+		}
+	}
+	return strings.Join(fileItem, " ")
 }

@@ -1029,6 +1029,7 @@ const message = {
             'Birden fazla özel depo varsa, yeni satırlar gösterilmelidir, örneğin:\n172.16.10.111:8081 \n172.16.10.112:8081',
 
         compose: 'Compose | Composelar',
+        composeFile: 'Düzenleme Dosyası',
         fromChangeHelper:
             'Kaynağın değiştirilmesi mevcut düzenlenen içeriği temizleyecektir. Devam etmek istiyor musunuz?',
         composePathHelper: 'Yapılandırma dosyası kaydetme yolu: {0}',

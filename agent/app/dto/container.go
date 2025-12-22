@@ -15,8 +15,9 @@ type PageContainer struct {
 }
 
 type InspectReq struct {
-	ID   string `json:"id" validate:"required"`
-	Type string `json:"type" validate:"required"`
+	ID     string `json:"id" validate:"required"`
+	Type   string `json:"type" validate:"required"`
+	Detail string `json:"detail"`
 }
 
 type ContainerInfo struct {
@@ -284,17 +285,19 @@ type ComposeOperation struct {
 	Path      string `json:"path"`
 	Operation string `json:"operation" validate:"required,oneof=up start restart stop down delete"`
 	WithFile  bool   `json:"withFile"`
-	Force     bool   `josn:"force"`
+	Force     bool   `json:"force"`
 }
 type ComposeUpdate struct {
-	Name    string `json:"name" validate:"required"`
-	Path    string `json:"path" validate:"required"`
-	Content string `json:"content" validate:"required"`
-	Env     string `json:"env"`
+	Name       string `json:"name" validate:"required"`
+	Path       string `json:"path" validate:"required"`
+	DetailPath string `json:"detailPath"`
+	Content    string `json:"content" validate:"required"`
+	Env        string `json:"env"`
 }
 type ComposeLogClean struct {
-	Name string `json:"name" validate:"required"`
-	Path string `json:"path" validate:"required"`
+	Name       string `json:"name" validate:"required"`
+	Path       string `json:"path" validate:"required"`
+	DetailPath string `json:"detailPath"`
 }
 
 type ContainerLog struct {

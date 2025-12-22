@@ -173,6 +173,7 @@ export namespace Container {
     export interface ContainerInspect {
         id: string;
         type: string;
+        detail: string;
     }
     export interface ContainerPrune {
         pruneType: string;

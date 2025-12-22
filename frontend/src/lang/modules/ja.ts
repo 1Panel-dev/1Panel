@@ -995,6 +995,7 @@ const message = {
         registrieHelper: '複数のプライベートリポジトリが存在する場合、たとえばnewlinesを表示する必要があります。',
 
         compose: '構成|作曲',
+        composeFile: 'オーケストレーションファイル',
         fromChangeHelper: 'ソースを切り替えると、現在の編集されたコンテンツがきれいになります。続けたいですか？',
         composePathHelper: '構成ファイル保存パス:{0}',
         composeHelper:

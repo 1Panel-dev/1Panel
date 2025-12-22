@@ -2,6 +2,7 @@ package service
 
 import (
 	"bufio"
+	"context"
 	"errors"
 	"fmt"
 	"os"
@@ -24,7 +25,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
-	"golang.org/x/net/context"
 )
 
 const composeProjectLabel = "com.docker.compose.project"
@@ -233,13 +233,14 @@ func (u *ContainerService) ComposeOperation(req dto.ComposeOperation) error {
 			return err
 		}
 		if req.WithFile {
-			_ = os.RemoveAll(path.Dir(req.Path))
+			for _, item := range strings.Split(req.Path, ",") {
+				if len(item) != 0 {
+					_ = os.RemoveAll(path.Dir(item))
+				}
+			}
 		}
 		_ = composeRepo.DeleteRecord(repo.WithByName(req.Name))
 		return nil
-	}
-	if _, err := os.Stat(req.Path); err != nil {
-		return fmt.Errorf("load file with path %s failed, %v", req.Path, err)
 	}
 	if req.Operation == "up" {
 		if stdout, err := compose.Up(req.Path); err != nil {
@@ -257,11 +258,11 @@ func (u *ContainerService) ComposeUpdate(req dto.ComposeUpdate) error {
 	if cmd.CheckIllegal(req.Name, req.Path) {
 		return buserr.New("ErrCmdIllegal")
 	}
-	oldFile, err := os.ReadFile(req.Path)
+	oldFile, err := os.ReadFile(req.DetailPath)
 	if err != nil {
-		return fmt.Errorf("load file with path %s failed, %v", req.Path, err)
+		return fmt.Errorf("load file with path %s failed, %v", req.DetailPath, err)
 	}
-	file, err := os.OpenFile(req.Path, os.O_WRONLY|os.O_TRUNC, 0640)
+	file, err := os.OpenFile(req.DetailPath, os.O_WRONLY|os.O_TRUNC, 0640)
 	if err != nil {
 		return err
 	}
@@ -270,8 +271,8 @@ func (u *ContainerService) ComposeUpdate(req dto.ComposeUpdate) error {
 	_, _ = write.WriteString(req.Content)
 	write.Flush()
 
-	global.LOG.Infof("docker-compose.yml %s has been replaced, now start to docker-compose restart", req.Path)
-	if err := newComposeEnv(req.Path, req.Env); err != nil {
+	global.LOG.Infof("docker-compose.yml %s has been replaced, now start to docker-compose restart", req.DetailPath)
+	if err := newComposeEnv(req.DetailPath, req.Env); err != nil {
 		return err
 	}
 
@@ -361,11 +362,8 @@ func (u *ContainerService) loadPath(req *dto.ComposeCreate) error {
 }
 
 func removeContainerForCompose(composeName, composePath string) error {
-	if _, err := os.Stat(composePath); err == nil {
-		if stdout, err := compose.Operate(composePath, "down"); err != nil {
-			return errors.New(stdout)
-		}
-		return nil
+	if stdout, err := compose.Operate(composePath, "down"); err != nil {
+		return errors.New(stdout)
 	}
 	var options container.ListOptions
 	options.All = true
@@ -405,7 +403,11 @@ func recreateCompose(content, path string) error {
 
 func loadEnv(list []dto.ComposeInfo) []dto.ComposeInfo {
 	for i := 0; i < len(list); i++ {
-		envFilePath := path.Join(path.Dir(list[i].Path), ".env")
+		tmpPath := list[i].Path
+		if strings.Contains(list[i].Path, ",") {
+			tmpPath = strings.Split(list[i].Path, ",")[0]
+		}
+		envFilePath := path.Join(path.Dir(tmpPath), ".env")
 		file, err := os.ReadFile(envFilePath)
 		if err != nil {
 			continue

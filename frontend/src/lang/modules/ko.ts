@@ -983,6 +983,7 @@ const message = {
             '개인 레지스트리가 여러 개 있을 경우 각 줄에 하나씩 표시해야 합니다. 예시:\n172.16.10.111:8081 \n172.16.10.112:8081',
 
         compose: '컴포즈 | 컴포즈들',
+        composeFile: '컴포즈 파일',
         fromChangeHelper: '소스를 변경하면 현재 편집한 내용이 삭제됩니다. 계속 하시겠습니까?',
         composePathHelper: '구성 파일 저장 경로: {0}',
         composeHelper: '1Panel 에디터나 템플릿을 통해 생성된 컴포지션은 {0}/docker/compose 디렉토리에 저장됩니다.',
