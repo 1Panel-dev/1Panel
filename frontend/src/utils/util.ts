@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import JSEncrypt from 'jsencrypt';
 import CryptoJS from 'crypto-js';
 import { routerToPathWithQuery } from './router';
-import { toUnicode } from './punycode';
+import { toUnicode } from 'punycode';
 
 export function deepCopy<T>(obj: any): T {
     let newObj: any;
