@@ -1,15 +1,18 @@
 <template>
     <div class="name-row">
         <div>
-            <el-input
-                v-if="isEditing"
-                v-model="editValue"
-                @keyup.enter="saveEdit"
-                @blur="saveEdit"
-                @keyup.esc="cancelEdit"
-                class="domain-input"
-                ref="inputRef"
-            />
+            <el-form :model="formData" :rules="rules" ref="formRef" v-if="isEditing" @submit.prevent>
+                <el-form-item prop="domainName" class="inline-form-item">
+                    <el-input
+                        v-model="formData.domainName"
+                        @keyup.enter.prevent="saveEdit"
+                        @blur="saveEdit"
+                        @keyup.esc="cancelEdit"
+                        class="domain-input"
+                        ref="inputRef"
+                    />
+                </el-form-item>
+            </el-form>
             <el-text v-else type="primary" class="cursor-pointer" @click="openConfig(row.id)">
                 {{ row.primaryDomain }}
             </el-text>
@@ -62,6 +65,7 @@ import { ref } from 'vue';
 import { listDomains } from '@/api/modules/website';
 import { Website } from '@/api/interface/website';
 import { routerToNameWithParams } from '@/utils/router';
+import { Rules } from '@/global/form-rules';
 
 interface Props {
     row: Website.Website;
@@ -71,11 +75,17 @@ const props = defineProps<Props>();
 const emit = defineEmits(['favoriteChange', 'domainEdit']);
 const inputRef = ref();
 const isEditing = ref(false);
-const editValue = ref('');
 const domains = ref<Website.Domain[]>([]);
+const formData = reactive({
+    domainName: '',
+});
+const rules = ref({
+    domainName: [Rules.requiredInput, Rules.linuxName],
+});
+const formRef = ref();
 
 const startEdit = () => {
-    editValue.value = props.row.primaryDomain;
+    formData.domainName = props.row.primaryDomain;
     isEditing.value = true;
     nextTick(() => {
         inputRef.value?.focus();
@@ -83,15 +93,20 @@ const startEdit = () => {
     });
 };
 
-const saveEdit = () => {
-    if (editValue.value.trim() && editValue.value !== props.row.primaryDomain) {
-        emit('domainEdit', props.row, editValue.value.trim());
-    }
-    isEditing.value = false;
+const saveEdit = async () => {
+    await formRef.value.validate((valid) => {
+        if (valid) {
+            const editValue = formData.domainName.trim();
+            if (editValue && editValue !== props.row.primaryDomain) {
+                emit('domainEdit', props.row, editValue);
+            }
+            isEditing.value = false;
+        }
+    });
 };
 
 const cancelEdit = () => {
-    editValue.value = props.row.primaryDomain;
+    formData.domainName = props.row.primaryDomain;
     isEditing.value = false;
 };
 
@@ -132,5 +147,22 @@ const favoriteWebsite = (row: Website.Website) => {
     align-items: center;
     justify-content: space-between;
     width: 100%;
+}
+:deep(.el-form) {
+    margin: 0;
+    line-height: 1;
+}
+:deep(.el-form-item) {
+    margin-bottom: 0;
+}
+:deep(.el-form-item__error) {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    padding-top: 2px;
+}
+
+.domain-input {
+    width: 200px;
 }
 </style>

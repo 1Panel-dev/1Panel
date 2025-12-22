@@ -5,7 +5,7 @@
                 <el-form-item :label="$t('commons.table.name')" prop="primaryDomain">
                     <el-input v-model="form.primaryDomain"></el-input>
                 </el-form-item>
-                <el-form-item :label="$t('website.alias')" prop="primaryDomain">
+                <el-form-item :label="$t('website.alias')" prop="alias">
                     <el-input v-model="form.alias" disabled></el-input>
                 </el-form-item>
                 <GroupSelect
@@ -60,7 +60,7 @@ const form = reactive({
     favorite: false,
 });
 const rules = ref({
-    primaryDomain: [Rules.requiredInput],
+    primaryDomain: [Rules.requiredInput, Rules.linuxName],
     webSiteGroupId: [Rules.requiredSelect],
 });
 
