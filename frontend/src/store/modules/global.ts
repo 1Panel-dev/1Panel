@@ -28,6 +28,7 @@ const GlobalStore = defineStore({
             loginBtnLinkColor: '',
         },
         watermark: null,
+        watermarkShow: false,
         openMenuTabs: false,
         isFullScreen: false,
         isOnRestart: false,

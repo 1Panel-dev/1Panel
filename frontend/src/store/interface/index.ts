@@ -36,6 +36,7 @@ export interface GlobalState {
     isFullScreen: boolean;
     openMenuTabs: boolean;
     watermark: Watermark;
+    watermarkShow: boolean;
     isOnRestart: boolean;
     agreeLicense: boolean;
     hasNewVersion: boolean;

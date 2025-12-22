@@ -11,6 +11,7 @@ export function resetXSetting() {
     globalStore.themeConfig.logoWithText = '';
     globalStore.themeConfig.favicon = '';
     globalStore.watermark = null;
+    globalStore.watermarkShow = false;
     globalStore.masterAlias = '';
 }
 
@@ -116,6 +117,7 @@ export async function getXpackSettingForTheme() {
             if (res2.data?.theme) {
                 globalStore.themeConfig.theme = res2.data.theme;
             }
+            globalStore.watermarkShow = res2.data.watermarkShow === 'Enable';
             try {
                 globalStore.watermark = JSON.parse(res2.data.watermark);
             } catch {

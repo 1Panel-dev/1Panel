@@ -79,7 +79,7 @@
                             </el-form-item>
 
                             <el-form-item :label="$t('setting.watermark')" v-if="isMasterProductPro" prop="watermark">
-                                <el-radio-group class="w-full" @change="onChangeWatermark" v-model="form.watermarkItem">
+                                <el-radio-group class="w-full" @change="onChangeWatermark" v-model="form.watermarkShow">
                                     <el-radio-button value="Enable">
                                         <span>{{ $t('commons.button.enable') }}</span>
                                     </el-radio-button>
@@ -87,7 +87,7 @@
                                         <span>{{ $t('commons.button.disable') }}</span>
                                     </el-radio-button>
                                 </el-radio-group>
-                                <div v-if="form.watermarkItem === 'Enable'">
+                                <div v-if="form.watermarkShow === 'Enable'">
                                     <div>
                                         <el-button link type="primary" @click="onChangeWatermark">
                                             {{ $t('commons.button.view') }}
@@ -274,7 +274,7 @@ const form = reactive({
     panelName: '',
     theme: '',
     watermark: '',
-    watermarkItem: '',
+    watermarkShow: '',
     themeColor: {} as ThemeColor,
     menuTabs: '',
     language: '',
@@ -372,12 +372,12 @@ const search = async () => {
             globalStore.themeConfig.theme = form.theme;
             form.proxyDocker = xpackRes.data.proxyDocker;
             form.watermark = xpackRes.data.watermark;
+            form.watermarkShow = xpackRes.data.watermarkShow;
             try {
                 globalStore.watermark = JSON.parse(xpackRes.data.watermark);
             } catch {
                 globalStore.watermark = null;
             }
-            form.watermarkItem = xpackRes.data.watermark ? 'Enable' : 'Disable';
         }
     } else {
         globalStore.themeConfig.theme = form.theme;
@@ -421,7 +421,7 @@ const onChangeThemeColor = () => {
 };
 
 const onChangeWatermark = async () => {
-    if (form.watermarkItem === 'Enable') {
+    if (form.watermarkShow === 'Enable') {
         watermarkRef.value.acceptParams(form.watermark);
         return;
     }
@@ -431,10 +431,11 @@ const onChangeWatermark = async () => {
     })
         .then(async () => {
             loading.value = true;
-            await updateXpackSettingByKey('Watermark', '')
+            await updateXpackSettingByKey('WatermarkShow', 'Disable')
                 .then(() => {
                     loading.value = false;
                     globalStore.watermark = null;
+                    globalStore.watermarkShow = false;
                     search();
                     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 })
@@ -443,7 +444,7 @@ const onChangeWatermark = async () => {
                 });
         })
         .catch(() => {
-            form.watermarkItem = 'Enable';
+            form.watermarkShow = 'Enable';
         });
 };
 
