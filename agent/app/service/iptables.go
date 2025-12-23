@@ -363,7 +363,7 @@ func initPreRules() error {
 			return err
 		}
 	}
-	if err := iptables.AddRule(iptables.FilterTab, iptables.Chain1PanelBasicAfter, fmt.Sprintf("-p udp -m udp --dport 443 -j ACCEPT")); err != nil {
+	if err := iptables.AddRule(iptables.FilterTab, iptables.Chain1PanelBasicAfter, "-p udp -m udp --dport 443 -j ACCEPT"); err != nil {
 		return err
 	}
 	if err := iptables.AddRule(iptables.FilterTab, iptables.Chain1PanelBasicAfter, iptables.DropAllTcp); err != nil {

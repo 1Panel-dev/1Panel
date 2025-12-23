@@ -485,15 +485,15 @@ func loadTopCPU() []dto.Process {
 		}
 		name, err := p.Name()
 		if err != nil {
-			name = "undifine"
+			name = "undefined"
 		}
 		cmd, err := p.Cmdline()
 		if err != nil {
-			cmd = "undifine"
+			cmd = "undefined"
 		}
 		user, err := p.Username()
 		if err != nil {
-			user = "undifine"
+			user = "undefined"
 		}
 		if len(top5) == 5 {
 			top5[minIndex] = dto.Process{Percent: percent, Pid: p.Pid, User: user, Name: name, Cmd: cmd}
@@ -536,15 +536,15 @@ func loadTopMem() []dto.Process {
 		}
 		name, err := p.Name()
 		if err != nil {
-			name = "undifine"
+			name = "undefined"
 		}
 		cmd, err := p.Cmdline()
 		if err != nil {
-			cmd = "undifine"
+			cmd = "undefined"
 		}
 		user, err := p.Username()
 		if err != nil {
-			user = "undifine"
+			user = "undefined"
 		}
 		percent, _ := p.MemoryPercent()
 		if len(top5) == 5 {

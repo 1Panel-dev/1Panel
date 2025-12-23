@@ -64,7 +64,7 @@ func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
 		return
 	}
 	if err = u.loadTask(cronjob, &record, taskItem); err != nil {
-		global.LOG.Debugf("preper to handle cron job [%s] %s failed, err: %v", cronjob.Type, cronjob.Name, err)
+		global.LOG.Debugf("prepare to handle cron job [%s] %s failed, err: %v", cronjob.Type, cronjob.Name, err)
 		item, _ := taskRepo.GetFirst(taskRepo.WithByID(record.TaskID))
 		if len(item.ID) == 0 {
 			record.TaskID = ""

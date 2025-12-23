@@ -447,7 +447,7 @@ func (u *CronjobService) SearchRecords(search dto.SearchRecord) (int64, interfac
 func (u *CronjobService) LoadNextHandle(specStr string) ([]string, error) {
 	spec := cron.NewParser(cron.Minute | cron.Hour | cron.Dom | cron.Month | cron.Dow)
 	now := time.Now()
-	var nexts [5]string
+	var next [5]string
 	if strings.HasPrefix(specStr, "@every ") {
 		duration := time.Minute
 		if strings.HasSuffix(specStr, "s") {
@@ -462,10 +462,10 @@ func (u *CronjobService) LoadNextHandle(specStr string) ([]string, error) {
 		}
 		for i := 0; i < 5; i++ {
 			nextTime := now.Add(time.Duration(durationItem) * duration)
-			nexts[i] = nextTime.Format(constant.DateTimeLayout)
+			next[i] = nextTime.Format(constant.DateTimeLayout)
 			now = nextTime
 		}
-		return nexts[:], nil
+		return next[:], nil
 	}
 	sched, err := spec.Parse(specStr)
 	if err != nil {
@@ -473,10 +473,10 @@ func (u *CronjobService) LoadNextHandle(specStr string) ([]string, error) {
 	}
 	for i := 0; i < 5; i++ {
 		nextTime := sched.Next(now)
-		nexts[i] = nextTime.Format(constant.DateTimeLayout)
+		next[i] = nextTime.Format(constant.DateTimeLayout)
 		now = nextTime
 	}
-	return nexts[:], nil
+	return next[:], nil
 }
 
 func (u *CronjobService) LoadRecordLog(req dto.OperateByID) string {
@@ -633,8 +633,8 @@ func (u *CronjobService) HandleStop(id uint) error {
 	if len(record.TaskID) == 0 {
 		return nil
 	}
-	if cancle, ok := global.TaskCtxMap[record.TaskID]; ok {
-		cancle()
+	if cancel, ok := global.TaskCtxMap[record.TaskID]; ok {
+		cancel()
 	}
 	return nil
 }

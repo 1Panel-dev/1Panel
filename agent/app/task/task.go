@@ -153,8 +153,8 @@ func NewTask(name, operate, taskScope, taskID string, resourceID uint) (*Task, e
 		Operate:    operate,
 	}
 	taskRepo := repo.NewITaskRepo()
-	ctx, cancle := context.WithCancel(context.Background())
-	global.TaskCtxMap[taskID] = cancle
+	ctx, cancel := context.WithCancel(context.Background())
+	global.TaskCtxMap[taskID] = cancel
 	task := &Task{TaskCtx: ctx, Name: name, logFile: logFile, Logger: logger, taskRepo: taskRepo, Task: taskModel}
 	return task, nil
 }

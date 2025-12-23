@@ -440,10 +440,10 @@ func loadDbsForJob(cronjob model.Cronjob) []DatabaseHelper {
 }
 
 func loadWebsForJob(cronjob model.Cronjob) []model.Website {
-	var weblist []model.Website
+	var list []model.Website
 	if cronjob.Website == "all" {
-		weblist, _ = websiteRepo.List()
-		return weblist
+		list, _ = websiteRepo.List()
+		return list
 	}
 	websites := strings.Split(cronjob.Website, ",")
 	var idItems []uint
@@ -451,8 +451,8 @@ func loadWebsForJob(cronjob model.Cronjob) []model.Website {
 		itemID, _ := strconv.Atoi(websites[i])
 		idItems = append(idItems, uint(itemID))
 	}
-	weblist, _ = websiteRepo.GetBy(repo.WithByIDs(idItems))
-	return weblist
+	list, _ = websiteRepo.GetBy(repo.WithByIDs(idItems))
+	return list
 }
 
 func handleBackupLogs(taskItem *task.Task, targetDir, fileName string, secret string) error {

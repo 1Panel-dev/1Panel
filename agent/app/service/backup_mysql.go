@@ -57,11 +57,11 @@ func (u *BackupService) MysqlRecover(req dto.CommonRecover) error {
 }
 
 func (u *BackupService) MysqlRecoverByUpload(req dto.CommonRecover) error {
-	recoveFile, err := loadSqlFile(req.File)
+	recoverFile, err := loadSqlFile(req.File)
 	if err != nil {
 		return err
 	}
-	req.File = recoveFile
+	req.File = recoverFile
 
 	if err := handleMysqlRecover(req, nil, false); err != nil {
 		return err

@@ -78,9 +78,9 @@ func (u *DeviceService) Scan() dto.CleanData {
 			return common.CompareVersion(upgradeTree.Children[i].Label, upgradeTree.Children[j].Label)
 		})
 		if global.IsMaster {
-			var copiesSeeting model.Setting
-			_ = global.CoreDB.Where("key = ?", "UpgradeBackupCopies").First(&copiesSeeting).Error
-			copies, _ := strconv.Atoi(copiesSeeting.Value)
+			var copiesSetting model.Setting
+			_ = global.CoreDB.Where("key = ?", "UpgradeBackupCopies").First(&copiesSetting).Error
+			copies, _ := strconv.Atoi(copiesSetting.Value)
 			if copies == 0 || copies > len(upgradeTree.Children) {
 				copies = len(upgradeTree.Children)
 			}
