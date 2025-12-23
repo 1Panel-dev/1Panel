@@ -2891,6 +2891,7 @@ const message = {
         pushNodeHelper: 'Push to selected nodes after application/renewal',
         fromMaster: 'Master Node Push',
         hostedZoneID: 'Hosted Zone ID',
+        isIP: 'IP Certificate',
     },
     firewall: {
         create: 'Create rule',

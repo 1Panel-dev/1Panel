@@ -2872,6 +2872,7 @@ const message = {
         pushNodeHelper: 'Enviar a los nodos seleccionados después de la aplicación/renovación',
         fromMaster: 'Envío desde el nodo maestro',
         hostedZoneID: 'Hosted Zone ID',
+        isIP: 'Certificado IP',
     },
     firewall: {
         create: 'Crear regla',

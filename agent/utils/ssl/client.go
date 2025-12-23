@@ -2,6 +2,9 @@ package ssl
 
 import (
 	"crypto"
+	"crypto/rand"
+	"crypto/x509"
+	"crypto/x509/pkix"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/go-acme/lego/v4/certificate"
@@ -9,6 +12,7 @@ import (
 	"github.com/go-acme/lego/v4/lego"
 	"github.com/go-acme/lego/v4/providers/http/webroot"
 	"github.com/pkg/errors"
+	"net"
 	"os"
 )
 
@@ -85,6 +89,40 @@ func (c *AcmeClient) ObtainSSL(domains []string, privateKey crypto.PrivateKey) (
 	}
 
 	certificates, err := c.Client.Certificate.Obtain(request)
+	if err != nil {
+		return certificate.Resource{}, err
+	}
+
+	return *certificates, nil
+}
+
+func (c *AcmeClient) ObtainIPSSL(ipAddress string, privKey crypto.PrivateKey) (certificate.Resource, error) {
+	csrTemplate := &x509.CertificateRequest{
+		Subject: pkix.Name{
+			CommonName: "",
+		},
+		IPAddresses: []net.IP{
+			net.ParseIP(ipAddress),
+		},
+	}
+	csrDER, err := x509.CreateCertificateRequest(
+		rand.Reader,
+		csrTemplate,
+		privKey,
+	)
+	if err != nil {
+		return certificate.Resource{}, err
+	}
+	csr, err := x509.ParseCertificateRequest(csrDER)
+	if err != nil {
+		return certificate.Resource{}, err
+	}
+	req := certificate.ObtainForCSRRequest{
+		CSR:        csr,
+		PrivateKey: privKey,
+		Profile:    "shortlived",
+	}
+	certificates, err := c.Client.Certificate.ObtainForCSR(req)
 	if err != nil {
 		return certificate.Resource{}, err
 	}

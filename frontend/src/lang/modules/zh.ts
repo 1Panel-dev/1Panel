@@ -2685,6 +2685,7 @@ const message = {
         pushNodeHelper: '申请/续期之后推送到选择的节点',
         fromMaster: '主节点推送',
         hostedZoneID: '托管区域 ID',
+        isIP: 'IP 证书',
     },
     firewall: {
         create: '创建规则',

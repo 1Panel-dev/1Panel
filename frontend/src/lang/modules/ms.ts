@@ -2871,6 +2871,7 @@ const message = {
         pushNodeHelper: 'Tolak ke nod terpilih selepas permohonan/pembaharuan',
         fromMaster: 'Tolak dari Nod Utama',
         hostedZoneID: 'Hosted Zone ID',
+        isIP: 'Sijil IP',
     },
     firewall: {
         create: 'Buat peraturan',

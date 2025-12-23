@@ -2811,6 +2811,7 @@ const message = {
         pushNodeHelper: '申請/更新後に選択したノードにプッシュ',
         fromMaster: 'マスターノードからのプッシュ',
         hostedZoneID: 'Hosted Zone ID',
+        isIP: 'IP証明書',
     },
     firewall: {
         create: 'ルールを作成します',

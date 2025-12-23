@@ -244,6 +244,7 @@ export namespace Website {
         nodes: string;
         privateKeyPath: string;
         certPath: string;
+        isIP: boolean;
     }
 
     export interface SSLDTO extends SSL {
@@ -258,6 +259,7 @@ export namespace Website {
         dnsAccountId: number;
         id?: number;
         description: string;
+        isIP: boolean;
     }
 
     export interface SSLApply {

@@ -141,6 +141,7 @@ func (w WebsiteSSLService) Create(create request.WebsiteSSLCreate) (request.Webs
 		SkipDNS:       create.SkipDNS,
 		DisableCNAME:  create.DisableCNAME,
 		ExecShell:     create.ExecShell,
+		IsIp:          create.IsIp,
 	}
 	if create.ExecShell {
 		websiteSSL.Shell = create.Shell
@@ -322,7 +323,11 @@ func (w WebsiteSSLService) ObtainSSL(apply request.WebsiteSSLApply) error {
 				handleError(websiteSSL, err)
 				return
 			}
-			resource, err = client.ObtainSSL(domains, privateKey)
+			if websiteSSL.IsIp {
+				resource, err = client.ObtainIPSSL(domains[0], privateKey)
+			} else {
+				resource, err = client.ObtainSSL(domains, privateKey)
+			}
 			if err != nil {
 				handleError(websiteSSL, err)
 				return

@@ -2759,6 +2759,7 @@ const message = {
         pushNodeHelper: '신청/갱신 후 선택한 노드로 푸시',
         fromMaster: '마스터 노드에서 푸시',
         hostedZoneID: 'Hosted Zone ID',
+        isIP: 'IP 인증서',
     },
     firewall: {
         create: '규칙 만들기',

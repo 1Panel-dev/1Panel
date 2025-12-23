@@ -782,3 +782,10 @@ var UpdateWebsite = &gormigrate.Migration{
 		return tx.AutoMigrate(&model.Website{})
 	},
 }
+
+var AddisIPtoWebsiteSSL = &gormigrate.Migration{
+	ID: "20251223-update-website-ssl",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(&model.WebsiteSSL{})
+	},
+}

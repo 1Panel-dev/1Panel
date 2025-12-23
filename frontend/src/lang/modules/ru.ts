@@ -2870,6 +2870,7 @@ const message = {
         pushNodeHelper: 'Отправить на выбранные узлы после заявки/продления',
         fromMaster: 'Отправка с главного узла',
         hostedZoneID: 'Hosted Zone ID',
+        isIP: 'IP-сертификат',
     },
     firewall: {
         create: 'Создать правило',

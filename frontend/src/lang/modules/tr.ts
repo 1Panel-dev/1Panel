@@ -2931,6 +2931,7 @@ const message = {
         pushNodeHelper: 'Başvuru/yenilemeden sonra seçilen düğümlere gönder',
         fromMaster: 'Ana Düğümden Gönder',
         hostedZoneID: 'Hosted Zone ID',
+        isIP: 'IP Sertifikası',
     },
     firewall: {
         create: 'Kural oluştur',

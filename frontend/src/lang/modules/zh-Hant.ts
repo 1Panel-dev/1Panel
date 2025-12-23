@@ -2688,6 +2688,7 @@ const message = {
         pushNodeHelper: '申請/續期之後推送到選擇的節點',
         fromMaster: '主節點推送',
         hostedZoneID: '託管區域 ID',
+        isIP: 'IP 憑證',
     },
     firewall: {
         create: '建立規則',

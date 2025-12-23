@@ -31,7 +31,7 @@ func (ssl *ssl) Run() {
 		}
 		expireDate := s.ExpireDate.In(nyc)
 		sub := expireDate.Sub(now)
-		if sub.Hours() < 720 {
+		if s.IsIp && sub.Hours() < 72 || !s.IsIp && sub.Hours() < 720 {
 			global.LOG.Infof("Update the SSL certificate for the [%s] domain", s.PrimaryDomain)
 			if s.Provider == constant.SelfSigned {
 				caService := service.NewIWebsiteCAService()

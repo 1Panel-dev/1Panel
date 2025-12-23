@@ -31,6 +31,7 @@ type WebsiteSSLCreate struct {
 	Shell         string `json:"shell"`
 	PushNode      bool   `json:"pushNode"`
 	Nodes         string `json:"nodes"`
+	IsIp          bool   `json:"isIp"`
 }
 
 type WebsiteDNSReq struct {
