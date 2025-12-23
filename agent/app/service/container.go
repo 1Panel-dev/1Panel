@@ -970,21 +970,20 @@ func collectLogs(done <-chan struct{}, params dto.StreamLog, messageChan chan<- 
 
 	var dockerCmd *exec.Cmd
 	if params.Type == "compose" {
-		dockerComposCmd := common.GetDockerComposeCommand()
+		dockerComposeCmd := common.GetDockerComposeCommand()
 		var yamlFiles []string
 		for _, item := range strings.Split(params.Compose, ",") {
 			if len(item) != 0 {
 				yamlFiles = append(yamlFiles, "-f", item)
 			}
 		}
-		if dockerComposCmd == "docker-compose" {
+		if dockerComposeCmd == "docker-compose" {
 			newCmdArgs := append(yamlFiles, cmdArgs...)
-			dockerCmd = exec.Command(dockerComposCmd, newCmdArgs...)
+			dockerCmd = exec.Command(dockerComposeCmd, newCmdArgs...)
 		} else {
 			newCmdArgs := append(append([]string{"compose"}, yamlFiles...), cmdArgs...)
 			dockerCmd = exec.Command("docker", newCmdArgs...)
 		}
-		global.LOG.Debug("Docker command:", dockerCmd.Args)
 	} else {
 		dockerCmd = exec.Command("docker", cmdArgs...)
 	}
@@ -1062,10 +1061,16 @@ func (u *ContainerService) DownloadContainerLogs(containerType, container, since
 	commandArg := []string{"logs", container}
 	dockerCommand := global.CONF.DockerConfig.Command
 	if containerType == "compose" {
+		var yamlFiles []string
+		for _, item := range strings.Split(container, ",") {
+			if len(item) != 0 {
+				yamlFiles = append(yamlFiles, "-f", item)
+			}
+		}
 		if dockerCommand == "docker-compose" {
-			commandArg = []string{"-f", container, "logs"}
+			commandArg = append(yamlFiles, "logs")
 		} else {
-			commandArg = []string{"compose", "-f", container, "logs"}
+			commandArg = append(append([]string{"compose"}, yamlFiles...), "logs")
 		}
 	}
 

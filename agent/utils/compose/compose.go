@@ -20,11 +20,11 @@ import (
 
 func checkCmd() error {
 	if global.CONF.DockerConfig.Command == "" {
-		dockerComposCmd := common.GetDockerComposeCommand()
-		if dockerComposCmd == "" {
+		dockerComposeCmd := common.GetDockerComposeCommand()
+		if dockerComposeCmd == "" {
 			return buserr.New("ErrDockerComposeCmdNotFound")
 		}
-		global.CONF.DockerConfig.Command = dockerComposCmd
+		global.CONF.DockerConfig.Command = dockerComposeCmd
 	}
 	return nil
 }
