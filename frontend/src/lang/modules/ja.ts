@@ -2141,8 +2141,8 @@ const message = {
         downloadHelper: 'システムによってサードパーティのバックアップアカウントからダウンロードされた一時ファイル',
         directory: 'ディレクトリ',
 
-        systemLog: 'システムログファイル',
-        systemLogHelper: 'システムログ、タスクログファイル',
+        systemLog: 'ログファイル',
+        systemLogHelper: 'システムログ、タスクログ、ウェブサイトログファイル',
         dockerLog: 'コンテナ操作ログファイル',
         taskLog: 'スケジュールタスク実行ログファイル',
         shell: 'シェルスクリプトスケジュールタスク',

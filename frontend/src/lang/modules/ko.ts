@@ -2105,8 +2105,8 @@ const message = {
         downloadHelper: '시스템에서 제3자 백업 계정으로 다운로드된 임시 파일',
         directory: '디렉터리',
 
-        systemLog: '시스템 로그 파일',
-        systemLogHelper: '시스템 로그, 작업 로그 파일',
+        systemLog: '로그 파일',
+        systemLogHelper: '시스템 로그, 작업 로그, 웹사이트 로그 파일',
         dockerLog: '컨테이너 작업 로그 파일',
         taskLog: '예약 작업 실행 로그 파일',
         shell: '셸 스크립트 예약 작업',

@@ -2200,8 +2200,8 @@ const message = {
         downloadHelper: 'Fail sementara dimuat turun dari akaun sandaran pihak ketiga oleh sistem',
         directory: 'Direktori',
 
-        systemLog: 'Fail Log Sistem',
-        systemLogHelper: 'Fail log sistem dan log tugas',
+        systemLog: 'Fail log',
+        systemLogHelper: 'Log sistem, log tugas, fail log laman web',
         dockerLog: 'Fail log operasi bekas',
         taskLog: 'Fail log pelaksanaan tugas berjadual',
         shell: 'Tugas berjadual skrip Shell',

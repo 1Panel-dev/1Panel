@@ -630,6 +630,8 @@ function load18n(label: string) {
             return i18n.global.t('clean.volumes');
         case 'build_cache':
             return i18n.global.t('clean.buildCache');
+        case 'website_log':
+            return i18n.global.t('logs.websiteLog');
         default:
             return label;
     }

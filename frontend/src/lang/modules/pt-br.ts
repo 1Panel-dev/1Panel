@@ -2194,8 +2194,8 @@ const message = {
         downloadHelper: 'Arquivos temporários baixados de contas de backup de terceiros pelo sistema',
         directory: 'Diretório',
 
-        systemLog: 'Arquivos de log do sistema',
-        systemLogHelper: 'Arquivos de log do sistema e de tarefas',
+        systemLog: 'Arquivo de log',
+        systemLogHelper: 'Logs do sistema, logs de tarefas, arquivos de log do site',
         dockerLog: 'Arquivos de log de operação de contêineres',
         taskLog: 'Arquivos de log de execução de tarefas agendadas',
         shell: 'Tarefas agendadas de script de shell',

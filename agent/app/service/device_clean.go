@@ -182,6 +182,8 @@ func (u *DeviceService) Clean(req []dto.Clean) {
 			} else {
 				dropTaskLog(path.Join(global.Dir.TaskDir, item.Name))
 			}
+		case "website_log":
+			dropWebsiteLog(item.Name)
 		case "script":
 			dropFileOrDir(path.Join(global.Dir.TmpDir, "script", item.Name))
 		case "images":
@@ -621,7 +623,7 @@ func loadLogTree(fileOp fileUtils.FileOp) []dto.CleanTree {
 	for _, file := range list1 {
 		size += file.Size
 	}
-	treeData = append(treeData, dto.CleanTree{ID: uuid.NewString(), Label: "system_log", Size: uint64(size), Children: list1, Type: "system_log", IsRecommend: true})
+	treeData = append(treeData, dto.CleanTree{ID: uuid.NewString(), Label: "system_log", Size: size, Children: list1, Type: "system_log", IsRecommend: true})
 
 	path2 := path.Join(global.Dir.TaskDir)
 	list2 := loadTreeWithDir(false, "task_log", path2, fileOp)
@@ -632,7 +634,35 @@ func loadLogTree(fileOp fileUtils.FileOp) []dto.CleanTree {
 	list3 := loadTreeWithAllFile(true, path3, "script", path3, fileOp)
 	size3, _ := fileOp.GetDirSize(path3)
 	treeData = append(treeData, dto.CleanTree{ID: uuid.NewString(), Label: "script", Size: uint64(size3), Children: list3, Type: "script", IsRecommend: true})
+
+	websiteLogList := loadWebsiteLogTree(fileOp)
+	logTotalSize := uint64(0)
+	for _, websiteLog := range websiteLogList {
+		logTotalSize += websiteLog.Size
+	}
+	treeData = append(treeData, dto.CleanTree{ID: uuid.NewString(), Label: "website_log", Size: logTotalSize, Children: websiteLogList, Type: "website_log", IsRecommend: false})
+
 	return treeData
+}
+
+func loadWebsiteLogTree(fileOp fileUtils.FileOp) []dto.CleanTree {
+	websites, _ := websiteRepo.List()
+	if len(websites) == 0 {
+		return nil
+	}
+	var res []dto.CleanTree
+	for _, website := range websites {
+		size3, _ := fileOp.GetDirSize(path.Join(GetSiteDir(website.Alias), "log"))
+		res = append(res, dto.CleanTree{
+			ID:      uuid.NewString(),
+			Label:   website.PrimaryDomain,
+			Size:    uint64(size3),
+			IsCheck: size3 > 5*1024,
+			Type:    "website_log",
+			Name:    website.Alias,
+		})
+	}
+	return res
 }
 
 func loadContainerTree() []dto.CleanTree {
@@ -847,6 +877,18 @@ func dropVolumes() (int, int) {
 		return 0, 0
 	}
 	return len(res.VolumesDeleted), int(res.SpaceReclaimed)
+}
+
+func dropWebsiteLog(alias string) {
+	accessLogPath := path.Join(GetSiteDir(alias), "log", "access.log")
+	errorLogPath := path.Join(GetSiteDir(alias), "log", "error.log")
+	if err := os.Truncate(accessLogPath, 0); err != nil {
+		global.LOG.Errorf("truncate access log %s failed, err %v", accessLogPath, err)
+	}
+
+	if err := os.Truncate(errorLogPath, 0); err != nil {
+		global.LOG.Errorf("truncate error log %s failed, err %v", errorLogPath, err)
+	}
 }
 
 func dropTaskLog(logDir string) {

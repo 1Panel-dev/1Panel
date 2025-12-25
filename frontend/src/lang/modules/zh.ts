@@ -2067,8 +2067,8 @@ const message = {
         downloadHelper: '系统从第三方备份账号下载的临时文件',
         directory: '文件夹',
 
-        systemLog: '系统日志文件',
-        systemLogHelper: '系统日志、任务日志文件',
+        systemLog: '日志文件',
+        systemLogHelper: '系统日志、任务日志、网站日志文件',
         dockerLog: '容器操作日志文件',
         taskLog: '计划任务执行日志文件',
         shell: 'Shell 脚本计划任务',

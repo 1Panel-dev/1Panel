@@ -131,7 +131,7 @@ func createProxyFile(website *model.Website) error {
 }
 
 func createWebsiteFolder(website *model.Website, runtime *model.Runtime) error {
-	siteFolder := GteSiteDir(website.Alias)
+	siteFolder := GetSiteDir(website.Alias)
 	fileOp := files.NewFileOp()
 	if !fileOp.Stat(siteFolder) {
 		if err := fileOp.CreateDir(siteFolder, constant.DirPerm); err != nil {
@@ -491,7 +491,7 @@ func delNginxConfig(website model.Website, force bool) error {
 			return err
 		}
 	}
-	sitePath := GteSiteDir(website.Alias)
+	sitePath := GetSiteDir(website.Alias)
 	if fileOp.Stat(sitePath) {
 		xpack.RemoveTamper(website.Alias)
 		_ = fileOp.DeleteDir(sitePath)
@@ -1357,7 +1357,7 @@ func GetWebSiteRootDir() string {
 	return dir
 }
 
-func GteSiteDir(alias string) string {
+func GetSiteDir(alias string) string {
 	return path.Join(GetWebSiteRootDir(), "sites", alias)
 }
 
@@ -1399,31 +1399,31 @@ func GetSitePath(website model.Website, confType string) string {
 	case StreamConf:
 		return path.Join(GetWebSiteRootDir(), "stream.d", website.Alias+".conf")
 	case SiteAccessLog:
-		return path.Join(GteSiteDir(website.Alias), "log", "access.log")
+		return path.Join(GetSiteDir(website.Alias), "log", "access.log")
 	case SiteErrorLog:
-		return path.Join(GteSiteDir(website.Alias), "log", "error.log")
+		return path.Join(GetSiteDir(website.Alias), "log", "error.log")
 	case SiteDir:
-		return GteSiteDir(website.Alias)
+		return GetSiteDir(website.Alias)
 	case SiteIndexDir:
-		return path.Join(GteSiteDir(website.Alias), "index")
+		return path.Join(GetSiteDir(website.Alias), "index")
 	case SiteCacheDir:
-		return path.Join(GteSiteDir(website.Alias), "cache")
+		return path.Join(GetSiteDir(website.Alias), "cache")
 	case SiteProxyDir:
-		return path.Join(GteSiteDir(website.Alias), "proxy")
+		return path.Join(GetSiteDir(website.Alias), "proxy")
 	case SiteSSLDir:
-		return path.Join(GteSiteDir(website.Alias), "ssl")
+		return path.Join(GetSiteDir(website.Alias), "ssl")
 	case SiteReWritePath:
-		return path.Join(GteSiteDir(website.Alias), "rewrite", website.Alias+".conf")
+		return path.Join(GetSiteDir(website.Alias), "rewrite", website.Alias+".conf")
 	case SiteRedirectDir:
-		return path.Join(GteSiteDir(website.Alias), "redirect")
+		return path.Join(GetSiteDir(website.Alias), "redirect")
 	case SiteRootAuthBasicPath:
-		return path.Join(GteSiteDir(website.Alias), "auth_basic", "auth.pass")
+		return path.Join(GetSiteDir(website.Alias), "auth_basic", "auth.pass")
 	case SitePathAuthBasicDir:
-		return path.Join(GteSiteDir(website.Alias), "path_auth")
+		return path.Join(GetSiteDir(website.Alias), "path_auth")
 	case SiteUpstreamDir:
-		return path.Join(GteSiteDir(website.Alias), "upstream")
+		return path.Join(GetSiteDir(website.Alias), "upstream")
 	case SiteCorsPath:
-		return path.Join(GteSiteDir(website.Alias), "cors", "cors.conf")
+		return path.Join(GetSiteDir(website.Alias), "cors", "cors.conf")
 	}
 	return ""
 }

@@ -2246,8 +2246,8 @@ const message = {
         downloadHelper: 'Sistem tarafından üçüncü taraf yedek hesaplarından indirilen geçici dosyalar',
         directory: 'Dizin',
 
-        systemLog: 'Sistem Günlük Dosyaları',
-        systemLogHelper: 'Sistem günlüğü ve görev günlüğü dosyaları',
+        systemLog: 'Günlük dosyası',
+        systemLogHelper: 'Sistem günlükleri, görev günlükleri, web sitesi günlük dosyaları',
         dockerLog: 'Konteyner işlem günlüğü dosyaları',
         taskLog: 'Zamanlanmış görev yürütme günlüğü dosyaları',
         shell: 'Shell script zamanlanmış görevler',

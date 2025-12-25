@@ -2233,8 +2233,9 @@ const message = {
         download: 'Archivos temporales de descarga',
         downloadHelper: 'Archivos temporales descargados desde respaldos externos',
         directory: 'Directorio',
-        systemLog: 'Archivos de log del sistema',
-        systemLogHelper: 'Archivos de registro del sistema y de tareas',
+
+        systemLog: 'Archivo de registro',
+        systemLogHelper: 'Registros del sistema, registros de tareas, archivos de registro del sitio web',
         dockerLog: 'Archivos de registro de operaciones de contenedores',
         taskLog: 'Archivos de registro de ejecución de tareas programadas',
         shell: 'Tareas programadas de script de shell',

@@ -2070,8 +2070,8 @@ const message = {
         downloadHelper: '系統從第三方備份帳號下載的暫存檔',
         directory: '資料夾',
 
-        systemLog: '系統日誌檔案',
-        systemLogHelper: '系統日誌、任務日誌檔案',
+        systemLog: '日誌檔案',
+        systemLogHelper: '系統日誌、任務日誌、網站日誌檔案',
         dockerLog: '容器操作日誌檔案',
         taskLog: '計劃任務執行日誌檔案',
         shell: 'Shell 腳本計劃任務',

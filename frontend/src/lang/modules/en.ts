@@ -2221,8 +2221,8 @@ const message = {
         downloadHelper: 'Temporary files downloaded from third-party backup accounts by the system',
         directory: 'Directory',
 
-        systemLog: 'System Log Files',
-        systemLogHelper: 'System log and task log files',
+        systemLog: 'Log file',
+        systemLogHelper: 'System logs, task logs, website log files',
         dockerLog: 'Container operation log files',
         taskLog: 'Scheduled task execution log files',
         shell: 'Shell script scheduled tasks',
