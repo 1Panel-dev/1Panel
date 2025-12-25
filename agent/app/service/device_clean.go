@@ -11,36 +11,29 @@ import (
 	"strings"
 	"time"
 
-	"github.com/1Panel-dev/1Panel/agent/constant"
-	"github.com/1Panel-dev/1Panel/agent/i18n"
-	"github.com/1Panel-dev/1Panel/agent/utils/controller"
-	"github.com/1Panel-dev/1Panel/agent/utils/docker"
-	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/api/types/build"
-	"github.com/docker/docker/api/types/filters"
-
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/app/task"
+	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
+	"github.com/1Panel-dev/1Panel/agent/utils/controller"
+	"github.com/1Panel-dev/1Panel/agent/utils/docker"
 	fileUtils "github.com/1Panel-dev/1Panel/agent/utils/files"
+	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/build"
+	"github.com/docker/docker/api/types/filters"
 	"github.com/google/uuid"
 )
 
 const (
-	upgradePath      = "1panel/tmp/upgrade"
-	snapshotTmpPath  = "1panel/tmp/system"
-	rollbackPath     = "1panel/tmp"
-	cachePath        = "1panel/cache"
-	oldOriginalPath  = "original"
-	oldAppBackupPath = "1panel/resource/apps_bak"
-	oldDownloadPath  = "1panel/tmp/download"
-	oldUpgradePath   = "1panel/tmp"
-	tmpUploadPath    = "1panel/tmp/upload"
-	uploadPath       = "1panel/uploads"
-	downloadPath     = "1panel/download"
+	rollbackPath = "1panel/tmp"
+	cachePath    = "1panel/cache"
+	upgradePath  = "1panel/tmp/upgrade"
+	uploadPath   = "1panel/uploads"
+	downloadPath = "1panel/download"
 )
 
 func (u *DeviceService) Scan() dto.CleanData {
@@ -61,54 +54,20 @@ func (u *DeviceService) Scan() dto.CleanData {
 		Type:        "1panel_original",
 		Children:    loadTreeWithDir(true, "1panel_original", originalPath, fileOp),
 	})
-
-	upgradePath := path.Join(global.Dir.BaseDir, upgradePath)
-	upgradeSize, _ := fileOp.GetDirSize(upgradePath)
-	upgradeTree := dto.CleanTree{
-		ID:          uuid.NewString(),
-		Label:       "upgrade",
-		Size:        uint64(upgradeSize),
-		IsCheck:     false,
-		IsRecommend: true,
-		Type:        "upgrade",
-		Children:    loadTreeWithDir(true, "upgrade", upgradePath, fileOp),
-	}
-	if len(upgradeTree.Children) != 0 {
-		sort.Slice(upgradeTree.Children, func(i, j int) bool {
-			return common.CompareVersion(upgradeTree.Children[i].Label, upgradeTree.Children[j].Label)
-		})
-		if global.IsMaster {
-			var copiesSetting model.Setting
-			_ = global.CoreDB.Where("key = ?", "UpgradeBackupCopies").First(&copiesSetting).Error
-			copies, _ := strconv.Atoi(copiesSetting.Value)
-			if copies == 0 || copies > len(upgradeTree.Children) {
-				copies = len(upgradeTree.Children)
-			}
-			for i := 0; i < copies; i++ {
-				upgradeTree.Children[i].IsCheck = false
-				upgradeTree.Children[i].IsRecommend = false
-			}
-		} else {
-			upgradeTree.Children[0].IsCheck = false
-			upgradeTree.Children[0].IsRecommend = false
-		}
-	}
-	treeData = append(treeData, upgradeTree)
-
-	tmpBackupTree := loadTmpBackupTree(fileOp)
-	tmpBackupSize := uint64(0)
-	for _, tmp := range tmpBackupTree {
-		tmpBackupSize += tmp.Size
-	}
+	treeData = append(treeData, loadUpgradeTree(fileOp))
+	treeData = append(treeData, loadAgentPackage(fileOp))
+	cachePath := path.Join(global.Dir.BaseDir, cachePath)
+	cacheSize, _ := fileOp.GetDirSize(cachePath)
 	treeData = append(treeData, dto.CleanTree{
 		ID:          uuid.NewString(),
-		Label:       "backup",
-		Size:        tmpBackupSize,
-		IsCheck:     tmpBackupSize > 0,
-		IsRecommend: true,
-		Type:        "backup",
-		Children:    tmpBackupTree,
+		Label:       "cache",
+		Size:        uint64(cacheSize),
+		IsCheck:     false,
+		IsRecommend: false,
+		Type:        "cache",
 	})
+
+	SystemClean.BackupClean = loadBackupTree(fileOp)
 
 	rollBackTree := loadRollBackTree(fileOp)
 	rollbackSize := uint64(0)
@@ -123,17 +82,6 @@ func (u *DeviceService) Scan() dto.CleanData {
 		IsRecommend: true,
 		Type:        "rollback",
 		Children:    rollBackTree,
-	})
-
-	cachePath := path.Join(global.Dir.BaseDir, cachePath)
-	cacheSize, _ := fileOp.GetDirSize(cachePath)
-	treeData = append(treeData, dto.CleanTree{
-		ID:          uuid.NewString(),
-		Label:       "cache",
-		Size:        uint64(cacheSize),
-		IsCheck:     false,
-		IsRecommend: false,
-		Type:        "cache",
 	})
 	SystemClean.SystemClean = treeData
 
@@ -164,13 +112,13 @@ func (u *DeviceService) Clean(req []dto.Clean) {
 		case "upgrade":
 			dropFileOrDir(path.Join(global.Dir.BaseDir, upgradePath, item.Name))
 
-		case "backup":
-			dropFileOrDir(path.Join(global.Dir.LocalBackupDir, "tmp/app"))
-			dropFileOrDir(path.Join(global.Dir.LocalBackupDir, "tmp/database"))
-			dropFileOrDir(path.Join(global.Dir.LocalBackupDir, "tmp/website"))
-			dropFileOrDir(path.Join(global.Dir.LocalBackupDir, "tmp/directory"))
-			dropFileOrDir(path.Join(global.Dir.LocalBackupDir, "tmp/log"))
-			dropFileOrDir(path.Join(global.Dir.LocalBackupDir, "tmp/system"))
+		case "agent":
+			dropFileOrDir(path.Join(global.Dir.BaseDir, "1panel/agent/package", item.Name))
+
+		case "tmp_backup":
+			dropFileOrDir(path.Join(global.Dir.LocalBackupDir, "tmp"))
+		case "unknown_backup":
+			dropFileOrDir(item.Name)
 
 		case "rollback":
 			dropFileOrDir(path.Join(global.Dir.BaseDir, rollbackPath, "app"))
@@ -189,19 +137,12 @@ func (u *DeviceService) Clean(req []dto.Clean) {
 
 		case "upload":
 			dropFileOrDir(path.Join(global.Dir.BaseDir, uploadPath, item.Name))
-			if len(item.Name) == 0 {
-				dropFileOrDir(path.Join(global.Dir.BaseDir, tmpUploadPath))
-			}
-		case "upload_tmp":
-			dropFileOrDir(path.Join(global.Dir.BaseDir, tmpUploadPath, item.Name))
 		case "upload_app":
 			dropFileOrDir(path.Join(global.Dir.BaseDir, uploadPath, "app", item.Name))
 		case "upload_database":
 			dropFileOrDir(path.Join(global.Dir.BaseDir, uploadPath, "database", item.Name))
 		case "upload_website":
 			dropFileOrDir(path.Join(global.Dir.BaseDir, uploadPath, "website", item.Name))
-		case "upload_directory":
-			dropFileOrDir(path.Join(global.Dir.BaseDir, uploadPath, "directory", item.Name))
 		case "download":
 			dropFileOrDir(path.Join(global.Dir.BaseDir, downloadPath, item.Name))
 		case "download_app":
@@ -210,8 +151,6 @@ func (u *DeviceService) Clean(req []dto.Clean) {
 			dropFileOrDir(path.Join(global.Dir.BaseDir, downloadPath, "database", item.Name))
 		case "download_website":
 			dropFileOrDir(path.Join(global.Dir.BaseDir, downloadPath, "website", item.Name))
-		case "download_directory":
-			dropFileOrDir(path.Join(global.Dir.BaseDir, downloadPath, "directory", item.Name))
 
 		case "system_log":
 			if len(item.Name) == 0 {
@@ -284,25 +223,20 @@ func doSystemClean(taskItem *task.Task) func(t *task.Task) error {
 			}
 		}
 
-		dropWithTask(path.Join(global.Dir.BaseDir, snapshotTmpPath), taskItem, &size, &fileCount)
 		dropWithTask(path.Join(global.Dir.LocalBackupDir, "tmp/system"), taskItem, &size, &fileCount)
 
 		dropWithTask(path.Join(global.Dir.BaseDir, rollbackPath, "app"), taskItem, &size, &fileCount)
 		dropWithTask(path.Join(global.Dir.BaseDir, rollbackPath, "website"), taskItem, &size, &fileCount)
 		dropWithTask(path.Join(global.Dir.BaseDir, rollbackPath, "database"), taskItem, &size, &fileCount)
 
-		dropWithTask(path.Join(global.Dir.BaseDir, oldOriginalPath), taskItem, &size, &fileCount)
-		dropWithTask(path.Join(global.Dir.BaseDir, oldAppBackupPath), taskItem, &size, &fileCount)
-		dropWithTask(path.Join(global.Dir.BaseDir, oldDownloadPath), taskItem, &size, &fileCount)
-		oldUpgradePath := path.Join(global.Dir.BaseDir, oldUpgradePath)
-		oldUpgradeFiles, _ := os.ReadDir(oldUpgradePath)
+		upgrades := path.Join(global.Dir.BaseDir, upgradePath)
+		oldUpgradeFiles, _ := os.ReadDir(upgrades)
 		if len(oldUpgradeFiles) != 0 {
 			for i := 0; i < len(oldUpgradeFiles); i++ {
-				dropWithTask(path.Join(oldUpgradePath, oldUpgradeFiles[i].Name()), taskItem, &size, &fileCount)
+				dropWithTask(path.Join(upgrades, oldUpgradeFiles[i].Name()), taskItem, &size, &fileCount)
 			}
 		}
 
-		dropWithTask(path.Join(global.Dir.BaseDir, tmpUploadPath), taskItem, &size, &fileCount)
 		dropWithExclude(path.Join(global.Dir.BaseDir, uploadPath), []string{"theme"}, taskItem, &size, &fileCount)
 		dropWithTask(path.Join(global.Dir.BaseDir, downloadPath), taskItem, &size, &fileCount)
 
@@ -338,15 +272,310 @@ func doSystemClean(taskItem *task.Task) func(t *task.Task) error {
 	}
 }
 
-func loadTmpBackupTree(fileOp fileUtils.FileOp) []dto.CleanTree {
+func loadUpgradeTree(fileOp fileUtils.FileOp) dto.CleanTree {
+	upgradePath := path.Join(global.Dir.BaseDir, upgradePath)
+	upgradeSize, _ := fileOp.GetDirSize(upgradePath)
+	upgradeTree := dto.CleanTree{
+		ID:          uuid.NewString(),
+		Label:       "upgrade",
+		Size:        uint64(upgradeSize),
+		IsCheck:     false,
+		IsRecommend: true,
+		Type:        "upgrade",
+		Children:    loadTreeWithDir(true, "upgrade", upgradePath, fileOp),
+	}
+	if len(upgradeTree.Children) != 0 {
+		sort.Slice(upgradeTree.Children, func(i, j int) bool {
+			return common.CompareVersion(upgradeTree.Children[i].Label, upgradeTree.Children[j].Label)
+		})
+		if global.IsMaster {
+			var copiesSetting model.Setting
+			_ = global.CoreDB.Where("key = ?", "UpgradeBackupCopies").First(&copiesSetting).Error
+			copies, _ := strconv.Atoi(copiesSetting.Value)
+			if copies == 0 || copies > len(upgradeTree.Children) {
+				copies = len(upgradeTree.Children)
+			}
+			for i := 0; i < copies; i++ {
+				upgradeTree.Children[i].IsCheck = false
+				upgradeTree.Children[i].IsRecommend = false
+			}
+		} else {
+			upgradeTree.Children[0].IsCheck = false
+			upgradeTree.Children[0].IsRecommend = false
+		}
+	}
+	return upgradeTree
+}
+
+func loadAgentPackage(fileOp fileUtils.FileOp) dto.CleanTree {
+	pathItem := path.Join(global.Dir.BaseDir, "1panel/agent/package")
+	itemTree := dto.CleanTree{
+		ID:          uuid.NewString(),
+		Label:       "agent_packages",
+		IsCheck:     true,
+		IsRecommend: true,
+		Type:        "agent",
+	}
+	files, _ := os.ReadDir(pathItem)
+	for _, file := range files {
+		if file.IsDir() {
+			itemSize, _ := fileOp.GetDirSize(path.Join(pathItem, file.Name()))
+			itemTree.Size += uint64(itemSize)
+			itemTree.Children = append(itemTree.Children, dto.CleanTree{
+				ID:          uuid.NewString(),
+				Name:        file.Name(),
+				Size:        uint64(itemSize),
+				IsCheck:     true,
+				IsRecommend: true,
+				Type:        "agent",
+			})
+		} else {
+			if strings.HasPrefix(file.Name(), fmt.Sprintf("1panel-agent_%s_a", global.CONF.Base.Version)) {
+				continue
+			}
+			itemSize, _ := file.Info()
+			itemTree.Size += uint64(itemSize.Size())
+			itemTree.Children = append(itemTree.Children, dto.CleanTree{
+				ID:          uuid.NewString(),
+				Label:       file.Name(),
+				Size:        uint64(itemSize.Size()),
+				IsCheck:     true,
+				IsRecommend: true,
+				Type:        "agent",
+			})
+		}
+	}
+	if itemTree.Size == 0 {
+		itemTree.IsCheck = false
+	}
+	return itemTree
+}
+
+func loadBackupTree(fileOp fileUtils.FileOp) []dto.CleanTree {
 	var treeData []dto.CleanTree
-	treeData = loadTreeWithCheck(treeData, path.Join(global.Dir.LocalBackupDir, "tmp/app"), "tmp_backup_app", fileOp)
-	treeData = loadTreeWithCheck(treeData, path.Join(global.Dir.LocalBackupDir, "tmp/website"), "tmp_backup_website", fileOp)
-	treeData = loadTreeWithCheck(treeData, path.Join(global.Dir.LocalBackupDir, "tmp/database"), "tmp_backup_database", fileOp)
-	treeData = loadTreeWithCheck(treeData, path.Join(global.Dir.LocalBackupDir, "tmp/system"), "tmp_backup_snapshot", fileOp)
-	treeData = loadTreeWithCheck(treeData, path.Join(global.Dir.LocalBackupDir, "tmp/directory"), "tmp_backup_directory", fileOp)
-	treeData = loadTreeWithCheck(treeData, path.Join(global.Dir.LocalBackupDir, "tmp/log"), "tmp_backup_log", fileOp)
+
+	tmpSize, _ := fileOp.GetDirSize(path.Join(global.Dir.LocalBackupDir, "tmp"))
+	treeData = append(treeData, dto.CleanTree{
+		ID:          uuid.NewString(),
+		Label:       "tmp_backup",
+		Size:        uint64(tmpSize),
+		IsCheck:     tmpSize != 0,
+		IsRecommend: true,
+		Type:        "tmp_backup",
+	})
+	backupRecords, _ := backupRepo.ListRecord()
+	var recordMap = make(map[string][]string)
+	for _, record := range backupRecords {
+		if val, ok := recordMap[record.FileDir]; ok {
+			val = append(val, record.FileName)
+			recordMap[record.FileDir] = val
+		} else {
+			recordMap[record.FileDir] = []string{record.FileName}
+		}
+	}
+
+	treeData = append(treeData, loadUnknownApps(fileOp, recordMap))
+	treeData = append(treeData, loadUnknownDbs(fileOp, recordMap))
+	treeData = append(treeData, loadUnknownWebsites(fileOp, recordMap))
+	treeData = append(treeData, loadUnknownSnapshot(fileOp))
 	return treeData
+}
+
+func loadUnknownApps(fileOp fileUtils.FileOp, recordMap map[string][]string) dto.CleanTree {
+	apps, _ := appInstallRepo.ListBy(context.Background())
+	var excludePaths []string
+	for _, app := range apps {
+		itemName := fmt.Sprintf("app/%s/%s", app.App.Key, app.Name)
+		if val, ok := recordMap[itemName]; ok {
+			for _, item := range val {
+				excludePaths = append(excludePaths, path.Join(global.Dir.LocalBackupDir, itemName, item))
+			}
+		} else {
+			excludePaths = append(excludePaths, path.Join(global.Dir.LocalBackupDir, itemName))
+		}
+	}
+	treeData := dto.CleanTree{
+		ID:          uuid.NewString(),
+		Label:       "unknown_app",
+		IsCheck:     false,
+		IsRecommend: false,
+		Type:        "unknown_backup",
+	}
+	_ = loadFileOrDirWithExclude(fileOp, 0, path.Join(global.Dir.LocalBackupDir, "app"), &treeData, excludePaths)
+	loadBackupIsCheck(&treeData)
+	return treeData
+}
+func loadUnknownDbs(fileOp fileUtils.FileOp, recordMap map[string][]string) dto.CleanTree {
+	apps, _ := appInstallRepo.ListBy(context.Background())
+	var excludePaths []string
+	appMap := make(map[string]struct{})
+	for _, app := range apps {
+		appMap[fmt.Sprintf("database/%s/%s", app.App.Key, app.Name)] = struct{}{}
+	}
+	for key, val := range recordMap {
+		itemName := path.Dir(key)
+		if _, ok := appMap[itemName]; ok {
+			for _, item := range val {
+				excludePaths = append(excludePaths, path.Join(global.Dir.LocalBackupDir, key, item))
+			}
+		}
+	}
+	treeData := dto.CleanTree{
+		ID:          uuid.NewString(),
+		Label:       "unknown_database",
+		IsCheck:     false,
+		IsRecommend: false,
+		Type:        "unknown_backup",
+	}
+	_ = loadFileOrDirWithExclude(fileOp, 0, path.Join(global.Dir.LocalBackupDir, "database"), &treeData, excludePaths)
+
+	loadBackupIsCheck(&treeData)
+	return treeData
+}
+func loadUnknownWebsites(fileOp fileUtils.FileOp, recordMap map[string][]string) dto.CleanTree {
+	websites, _ := websiteRepo.List()
+	var excludePaths []string
+	for _, website := range websites {
+		itemName := fmt.Sprintf("website/%s", website.PrimaryDomain)
+		if val, ok := recordMap[itemName]; ok {
+			for _, item := range val {
+				excludePaths = append(excludePaths, path.Join(global.Dir.LocalBackupDir, itemName, item))
+			}
+		} else {
+			excludePaths = append(excludePaths, path.Join(global.Dir.LocalBackupDir, itemName))
+		}
+	}
+	treeData := dto.CleanTree{
+		ID:          uuid.NewString(),
+		Label:       "unknown_website",
+		IsCheck:     false,
+		IsRecommend: false,
+		Type:        "unknown_backup",
+	}
+	_ = loadFileOrDirWithExclude(fileOp, 0, path.Join(global.Dir.LocalBackupDir, "website"), &treeData, excludePaths)
+	loadBackupIsCheck(&treeData)
+	return treeData
+}
+func loadUnknownSnapshot(fileOp fileUtils.FileOp) dto.CleanTree {
+	snaps, _ := snapshotRepo.GetList()
+	var excludePaths []string
+	for _, item := range snaps {
+		excludePaths = append(excludePaths, path.Join(global.Dir.LocalBackupDir, "system_snapshot", item.Name+".tar.gz"))
+	}
+	treeData := dto.CleanTree{
+		ID:          uuid.NewString(),
+		Label:       "unknown_snapshot",
+		IsCheck:     false,
+		IsRecommend: false,
+		Type:        "unknown_backup",
+	}
+	dir := path.Join(global.Dir.LocalBackupDir, "system_snapshot")
+	entries, _ := os.ReadDir(dir)
+	for _, entry := range entries {
+		childPath := filepath.Join(dir, entry.Name())
+		if isExactPathMatch(childPath, excludePaths) {
+			continue
+		}
+
+		childNode := dto.CleanTree{
+			ID:          uuid.NewString(),
+			Label:       entry.Name(),
+			IsCheck:     false,
+			IsRecommend: false,
+			Name:        childPath,
+			Type:        "unknown_backup",
+		}
+		if entry.IsDir() {
+			itemSize, _ := fileOp.GetDirSize(childPath)
+			childNode.Size = uint64(itemSize)
+			childNode.IsCheck = true
+			childNode.IsRecommend = true
+			treeData.Size += childNode.Size
+		} else {
+			info, _ := entry.Info()
+			childNode.Size = uint64(info.Size())
+			treeData.Size += childNode.Size
+		}
+
+		treeData.Children = append(treeData.Children, childNode)
+	}
+	return treeData
+}
+
+func loadFileOrDirWithExclude(fileOp fileUtils.FileOp, index uint, dir string, rootTree *dto.CleanTree, excludes []string) error {
+	index++
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		return err
+	}
+	for _, entry := range entries {
+		childPath := filepath.Join(dir, entry.Name())
+		if isExactPathMatch(childPath, excludes) {
+			continue
+		}
+
+		childNode := dto.CleanTree{
+			ID:          uuid.NewString(),
+			Label:       entry.Name(),
+			IsCheck:     false,
+			IsRecommend: false,
+			Name:        childPath,
+			Type:        "unknown_backup",
+		}
+		if entry.IsDir() {
+			if index < 4 {
+				if err = loadFileOrDirWithExclude(fileOp, index, childPath, &childNode, excludes); err != nil {
+					return err
+				}
+				childNode.Size = 0
+				for _, child := range childNode.Children {
+					childNode.Size += child.Size
+				}
+				rootTree.Size += childNode.Size
+			} else {
+				itemSize, _ := fileOp.GetDirSize(childPath)
+				childNode.Size = uint64(itemSize)
+				rootTree.Size += childNode.Size
+			}
+		} else {
+			info, _ := entry.Info()
+			childNode.Size = uint64(info.Size())
+			rootTree.Size += childNode.Size
+		}
+
+		rootTree.Children = append(rootTree.Children, childNode)
+	}
+	return nil
+}
+
+func loadBackupIsCheck(treeData *dto.CleanTree) {
+	for i := 0; i < len(treeData.Children); i++ {
+		if len(treeData.Children[i].Children) == 0 {
+			treeData.Children[i].IsCheck = true
+			treeData.Children[i].IsRecommend = true
+			continue
+		}
+		for j := 0; j < len(treeData.Children[i].Children); j++ {
+			if len(treeData.Children[i].Children[j].Children) == 0 {
+				treeData.Children[i].Children[j].IsCheck = true
+				treeData.Children[i].Children[j].IsRecommend = true
+				continue
+			}
+		}
+	}
+}
+
+func isExactPathMatch(path string, excludePaths []string) bool {
+	cleanPath := filepath.Clean(path)
+
+	for _, excludePath := range excludePaths {
+		cleanExclude := filepath.Clean(excludePath)
+		if cleanPath == cleanExclude {
+			return true
+		}
+	}
+
+	return false
 }
 
 func loadRollBackTree(fileOp fileUtils.FileOp) []dto.CleanTree {
@@ -360,7 +589,6 @@ func loadRollBackTree(fileOp fileUtils.FileOp) []dto.CleanTree {
 
 func loadUploadTree(fileOp fileUtils.FileOp) []dto.CleanTree {
 	var treeData []dto.CleanTree
-	treeData = loadTreeWithCheck(treeData, path.Join(global.Dir.BaseDir, tmpUploadPath), "upload_tmp", fileOp)
 	treeData = loadTreeWithCheck(treeData, path.Join(global.Dir.BaseDir, uploadPath, "app"), "upload_app", fileOp)
 	treeData = loadTreeWithCheck(treeData, path.Join(global.Dir.BaseDir, uploadPath, "website"), "upload_website", fileOp)
 	treeData = loadTreeWithCheck(treeData, path.Join(global.Dir.BaseDir, uploadPath, "database"), "upload_database", fileOp)

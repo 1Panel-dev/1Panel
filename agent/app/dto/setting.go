@@ -37,6 +37,7 @@ type SyncTime struct {
 
 type CleanData struct {
 	SystemClean    []CleanTree `json:"systemClean"`
+	BackupClean    []CleanTree `json:"backupClean"`
 	UploadClean    []CleanTree `json:"uploadClean"`
 	DownloadClean  []CleanTree `json:"downloadClean"`
 	SystemLogClean []CleanTree `json:"systemLogClean"`

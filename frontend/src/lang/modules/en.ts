@@ -2196,16 +2196,24 @@ const message = {
         selectScan: 'Total selected junk files: ',
 
         system: 'System Junk Files',
-        systemHelper:
-            'Temporary files generated during snapshots, upgrades, and obsolete file contents during version iterations',
-        panelOriginal: 'System snapshot recovery backup files',
-        backup: 'Temporary backup directory',
+        systemHelper: 'Temporary files generated during snapshot, upgrade, and other processes',
+        panelOriginal: 'Backup files before system snapshot restore',
         upgrade: 'System upgrade backup files',
+        agentPackages: 'Historical version child node upgrade/installation packages',
         upgradeHelper: '(Recommend keeping the latest upgrade backup for system rollback)',
         cache: 'System cache files',
         cacheHelper: '(Proceed with caution, cleaning requires a service restart)',
         snapshot: 'System snapshot temporary files',
         rollback: 'Backup files before recover',
+
+        backup: 'System Backup',
+        backupHelper: 'Backup files not associated with local backup accounts',
+        unknownBackup: 'System Backup',
+        tmpBackup: 'Temporary Backup',
+        unknownApp: 'Unassociated App Backup',
+        unknownDatabase: 'Unassociated Database Backup',
+        unknownWebsite: 'Unassociated Website Backup',
+        unknownSnapshot: 'Unassociated Snapshot Backup',
 
         upload: 'Temporary Upload Files',
         uploadHelper: 'Temporary files uploaded from the system backup list',
@@ -2214,15 +2222,15 @@ const message = {
         directory: 'Directory',
 
         systemLog: 'System Log Files',
-        systemLogHelper:
-            'System log information, container build or image pull log information, and log files generated in scheduled tasks',
+        systemLogHelper: 'System log and task log files',
         dockerLog: 'Container operation log files',
         taskLog: 'Scheduled task execution log files',
         shell: 'Shell script scheduled tasks',
-        containerShell: 'Container internal Shell script scheduled tasks',
+        containerShell: 'Shell script scheduled tasks executed inside containers',
         curl: 'CURL scheduled tasks',
 
-        containerTrash: 'Container Trash',
+        docker: 'Container garbage',
+        dockerHelper: 'Files such as containers, images, volumes, build cache, etc.',
         volumes: 'Volumes',
         buildCache: 'Container Build Cache',
     },
