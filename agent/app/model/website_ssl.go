@@ -41,7 +41,7 @@ type WebsiteSSL struct {
 	PushNode       bool      `json:"pushNode"`
 	PrivateKeyPath string    `json:"privateKeyPath"`
 	CertPath       string    `json:"certPath"`
-	IsIp           bool      `json:"isIp"`
+	IsIp           bool      `json:"isIP"`
 
 	AcmeAccount WebsiteAcmeAccount `json:"acmeAccount" gorm:"-:migration"`
 	DnsAccount  WebsiteDnsAccount  `json:"dnsAccount" gorm:"-:migration"`
