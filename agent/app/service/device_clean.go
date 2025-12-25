@@ -194,6 +194,8 @@ func (u *DeviceService) Clean(req []dto.Clean) {
 			_, _ = dropVolumes()
 		case "build_cache":
 			_, _ = dropBuildCache()
+		case "app_tmp_download_version":
+			dropFileOrDir(path.Join(global.Dir.RemoteAppResourceDir, item.Name))
 		}
 	}
 
@@ -612,6 +614,22 @@ func loadDownloadTree(fileOp fileUtils.FileOp) []dto.CleanTree {
 	uploadTreeData := loadTreeWithAllFile(true, path5, "download", path5, fileOp)
 	treeData = append(treeData, uploadTreeData...)
 
+	appTmpDownloadTree := loadAppTmpDownloadTree(fileOp)
+	if len(appTmpDownloadTree) > 0 {
+		parentTree := dto.CleanTree{
+			ID:          uuid.NewString(),
+			Label:       "app_tmp_download",
+			IsCheck:     true,
+			IsRecommend: true,
+			Type:        "app_tmp_download",
+			Name:        "apps",
+		}
+		for _, child := range appTmpDownloadTree {
+			parentTree.Size += child.Size
+		}
+		parentTree.Children = appTmpDownloadTree
+		treeData = append(treeData, parentTree)
+	}
 	return treeData
 }
 
@@ -661,6 +679,70 @@ func loadWebsiteLogTree(fileOp fileUtils.FileOp) []dto.CleanTree {
 			Type:    "website_log",
 			Name:    website.Alias,
 		})
+	}
+	return res
+}
+
+func loadAppTmpDownloadTree(fileOp fileUtils.FileOp) []dto.CleanTree {
+	appDirs, err := os.ReadDir(global.Dir.RemoteAppResourceDir)
+	if err != nil {
+		return nil
+	}
+	var res []dto.CleanTree
+	for _, appDir := range appDirs {
+		if !appDir.IsDir() {
+			continue
+		}
+		appKey := appDir.Name()
+		app, _ := appRepo.GetFirst(appRepo.WithKey(appKey))
+		if app.ID == 0 {
+			continue
+		}
+		appPath := filepath.Join(global.Dir.RemoteAppResourceDir, appKey)
+		versionDirs, err := os.ReadDir(appPath)
+		if err != nil {
+			continue
+		}
+		appDetails, _ := appDetailRepo.GetBy(appDetailRepo.WithAppId(app.ID))
+		existingVersions := make(map[string]bool)
+		for _, appDetail := range appDetails {
+			existingVersions[appDetail.Version] = true
+		}
+		var missingVersions []string
+		for _, versionDir := range versionDirs {
+			if !versionDir.IsDir() {
+				continue
+			}
+
+			version := versionDir.Name()
+			if !existingVersions[version] {
+				missingVersions = append(missingVersions, version)
+			}
+		}
+		if len(missingVersions) > 0 {
+			var appTree dto.CleanTree
+			appTree.ID = uuid.NewString()
+			appTree.Label = app.Name
+			appTree.Type = "app_tmp_download"
+			appTree.Name = appKey
+			appTree.IsRecommend = true
+			appTree.IsCheck = true
+			for _, version := range missingVersions {
+				versionPath := filepath.Join(appPath, version)
+				size, _ := fileOp.GetDirSize(versionPath)
+				appTree.Size += uint64(size)
+				appTree.Children = append(appTree.Children, dto.CleanTree{
+					ID:          uuid.NewString(),
+					Label:       version,
+					Size:        uint64(size),
+					IsCheck:     true,
+					IsRecommend: true,
+					Type:        "app_tmp_download_version",
+					Name:        path.Join(appKey, version),
+				})
+			}
+			res = append(res, appTree)
+		}
 	}
 	return res
 }
@@ -786,7 +868,7 @@ func loadTreeWithAllFile(isCheck bool, originalPath, treeType, pathItem string, 
 			ID:          uuid.NewString(),
 			Label:       file.Name(),
 			Type:        treeType,
-			Size:        uint64(size),
+			Size:        size,
 			Name:        name,
 			IsCheck:     isCheck,
 			IsRecommend: isCheck,

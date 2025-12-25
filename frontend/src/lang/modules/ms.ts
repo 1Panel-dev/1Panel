@@ -2212,6 +2212,8 @@ const message = {
         dockerHelper: 'Fail seperti bekas, imej, isipadu, cache binaan, dsb.',
         volumes: 'Isipadu',
         buildCache: 'Cache Pembinaan Kontena',
+
+        appTmpDownload: 'Fail muat turun sementara aplikasi',
     },
     app: {
         app: 'Aplikasi | Aplikasi',

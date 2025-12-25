@@ -2117,6 +2117,8 @@ const message = {
         dockerHelper: '컨테이너, 이미지, 볼륨, 빌드 캐시 등의 파일',
         volumes: '볼륨',
         buildCache: '컨테이너 빌드 캐시',
+
+        appTmpDownload: '앱 임시 다운로드 파일',
     },
     app: {
         app: '애플리케이션 | 애플리케이션들',

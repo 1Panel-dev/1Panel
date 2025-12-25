@@ -2246,6 +2246,8 @@ const message = {
         dockerHelper: 'Archivos como contenedores, imágenes, volúmenes, caché de construcción, etc.',
         volumes: 'Volúmenes',
         buildCache: 'Caché de build de contenedores',
+
+        appTmpDownload: 'Archivo de descarga temporal de la aplicación',
     },
     app: {
         app: 'Aplicación | Aplicaciones',

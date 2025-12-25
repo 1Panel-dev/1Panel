@@ -2153,6 +2153,8 @@ const message = {
         dockerHelper: 'コンテナ、イメージ、ボリューム、ビルドキャッシュなどのファイル',
         volumes: 'ボリューム',
         buildCache: 'コンテナビルドキャッシュ',
+
+        appTmpDownload: 'Archivo de descarga temporal de la aplicación',
     },
     app: {
         app: 'アプリケーション|アプリケーション',

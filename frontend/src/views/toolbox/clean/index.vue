@@ -422,13 +422,15 @@ const loadSubmitCheck = (data: any) => {
         }
         return;
     }
+
     for (const item of data) {
         if (
             item.isCheck &&
             item.label !== 'unknown_app' &&
             item.label !== 'unknown_database' &&
             item.label !== 'unknown_website' &&
-            item.label !== 'unknown_snapshot'
+            item.label !== 'unknown_snapshot' &&
+            item.type !== 'app_tmp_download'
         ) {
             submitCleans.value.push({ treeType: item.type, name: item.name, size: item.size });
             continue;
@@ -632,6 +634,8 @@ function load18n(label: string) {
             return i18n.global.t('clean.buildCache');
         case 'website_log':
             return i18n.global.t('logs.websiteLog');
+        case 'app_tmp_download':
+            return i18n.global.t('clean.appTmpDownload');
         default:
             return label;
     }

@@ -2258,6 +2258,8 @@ const message = {
         dockerHelper: 'Konteynerler, görüntüler, hacimler, derleme önbelleği vb. dosyalar',
         volumes: 'Birimler',
         buildCache: 'Konteyner Oluşturma Önbelleği',
+
+        appTmpDownload: 'Uygulama geçici indirme dosyası',
     },
     app: {
         app: 'Uygulama | Uygulamalar',

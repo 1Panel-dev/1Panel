@@ -2079,6 +2079,8 @@ const message = {
         dockerHelper: '容器、镜像、存储卷、构建缓存等文件',
         volumes: '存储卷',
         buildCache: '构建缓存',
+
+        appTmpDownload: '应用临时下载文件',
     },
     app: {
         app: '应用',
