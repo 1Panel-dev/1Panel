@@ -19,7 +19,7 @@
                 <TableSetting title="container-refresh" @search="search()" />
             </template>
             <template #main>
-                <el-row v-if="data.length > 0" :gutter="20" class="row-box">
+                <el-row v-if="data.length > 0 || isOnCreate" :gutter="20" class="row-box">
                     <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="6">
                         <el-card>
                             <el-table
@@ -468,7 +468,7 @@ const loadFrom = (row: any) => {
 };
 
 const loadTableHeight = () => {
-    if (currentCompose.value.createdBy === '1Panel') {
+    if (currentCompose.value?.createdBy === '1Panel') {
         return `calc(100vh - 120px)`;
     } else {
         return `calc(100vh - 240px)`;
