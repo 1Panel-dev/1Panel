@@ -8,8 +8,9 @@ import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();
 
 // backup-agent
-export const getLocalBackupDir = () => {
-    return http.get<string>(`/backups/local`);
+export const getLocalBackupDir = (node?: string) => {
+    const params = node ? `?operateNode=${node}` : '';
+    return http.get<string>(`/backups/local${params}`);
 };
 export const searchBackup = (params: Backup.SearchWithType) => {
     return http.post<ResPage<Backup.BackupInfo>>(`/backups/search`, params);
@@ -40,35 +41,42 @@ export const listBucket = (params: Backup.ForBucket) => {
     }
     return http.post('/backups/buckets', request, TimeoutEnum.T_40S);
 };
-export const handleBackup = (params: Backup.Backup) => {
-    return http.post(`/backups/backup`, params, TimeoutEnum.T_10M);
+export const handleBackup = (params: Backup.Backup, node?: string) => {
+    const query = node ? `?operateNode=${node}` : '';
+    return http.post(`/backups/backup${query}`, params, TimeoutEnum.T_10M);
 };
 export const listBackupOptions = () => {
     return http.get<Array<Backup.BackupOption>>(`/backups/options`);
 };
-export const handleRecover = (params: Backup.Recover) => {
-    return http.post(`/backups/recover`, params, TimeoutEnum.T_10M);
+export const handleRecover = (params: Backup.Recover, node?: string) => {
+    const query = node ? `?operateNode=${node}` : '';
+    return http.post(`/backups/recover${query}`, params, TimeoutEnum.T_10M);
 };
 export const handleRecoverByUpload = (params: Backup.Recover) => {
     return http.post(`/backups/recover/byupload`, params, TimeoutEnum.T_10M);
 };
-export const downloadBackupRecord = (params: Backup.RecordDownload) => {
-    return http.post<string>(`/backups/record/download`, params, TimeoutEnum.T_10M);
+export const downloadBackupRecord = (params: Backup.RecordDownload, node?: string) => {
+    const query = node ? `?operateNode=${node}` : '';
+    return http.post<string>(`/backups/record/download${query}`, params, TimeoutEnum.T_10M);
 };
-export const deleteBackupRecord = (params: { ids: number[] }) => {
-    return http.post(`/backups/record/del`, params);
+export const deleteBackupRecord = (params: { ids: number[] }, node?: string) => {
+    const query = node ? `?operateNode=${node}` : '';
+    return http.post(`/backups/record/del${query}`, params);
 };
-export const updateRecordDescription = (id: Number, description: String) => {
-    return http.post(`/backups/record/description/update`, { id: id, description: description });
+export const updateRecordDescription = (id: Number, description: String, node?: string) => {
+    const query = node ? `?operateNode=${node}` : '';
+    return http.post(`/backups/record/description/update${query}`, { id: id, description: description });
 };
 export const uploadByRecover = (filePath: string, targetDir: String) => {
     return http.post(`/backups/upload`, { filePath: filePath, targetDir: targetDir });
 };
-export const searchBackupRecords = (params: Backup.SearchBackupRecord) => {
-    return http.post<ResPage<Backup.RecordInfo>>(`/backups/record/search`, params, TimeoutEnum.T_5M);
+export const searchBackupRecords = (params: Backup.SearchBackupRecord, node?: string) => {
+    const query = node ? `?operateNode=${node}` : '';
+    return http.post<ResPage<Backup.RecordInfo>>(`/backups/record/search${query}`, params, TimeoutEnum.T_5M);
 };
-export const loadRecordSize = (param: Backup.SearchForSize) => {
-    return http.post<Array<Backup.RecordFileSize>>(`/backups/record/size`, param);
+export const loadRecordSize = (param: Backup.SearchForSize, node?: string) => {
+    const query = node ? `?operateNode=${node}` : '';
+    return http.post<Array<Backup.RecordFileSize>>(`/backups/record/size${query}`, param);
 };
 export const searchBackupRecordsByCronjob = (params: Backup.SearchBackupRecordByCronjob) => {
     return http.post<ResPage<Backup.RecordInfo>>(`/backups/record/search/bycronjob`, params, TimeoutEnum.T_5M);

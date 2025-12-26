@@ -126,7 +126,7 @@ html {
 }
 
 .search-button {
-    width: 250px;
+    width: 200px;
 }
 
 .drawer-header-button {
@@ -349,5 +349,44 @@ html {
 .code-dialog {
     .el-dialog__header {
         --el-dialog-padding-primary: 0px !important;
+    }
+}
+
+.node-dashboard-card {
+   .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+
+            .header-span {
+                position: relative;
+                font-size: 16px;
+                font-weight: 500;
+                margin-left: 18px;
+                display: flex;
+                align-items: center;
+
+                &::before {
+                    position: absolute;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    left: -13px;
+                    width: 4px;
+                    height: 14px;
+                    content: '';
+                    background: $primary-color;
+                    border-radius: 10px;
+                }
+            }
+        }
+        .header-right {
+            display: flex;
+            align-items: center;
+        }
     }
 }

@@ -30,8 +30,9 @@ export const bindPostgresqlUser = (params: Database.PgBind) => {
 export const changePrivileges = (params: Database.PgChangePrivileges) => {
     return http.post(`/databases/pg/privileges`, params, TimeoutEnum.T_40S);
 };
-export const searchPostgresqlDBs = (params: Database.SearchDBWithPage) => {
-    return http.post<ResPage<Database.PostgresqlDBInfo>>(`/databases/pg/search`, params);
+export const searchPostgresqlDBs = (params: Database.SearchDBWithPage, node?: string) => {
+    const query = node ? `?operateNode=${node}` : '';
+    return http.post<ResPage<Database.PostgresqlDBInfo>>(`/databases/pg/search${query}`, params);
 };
 export const updatePostgresqlDescription = (params: DescriptionUpdate) => {
     return http.post(`/databases/pg/description`, params);
@@ -54,8 +55,9 @@ export const deletePostgresqlDB = (params: Database.PostgresqlDBDelete) => {
 };
 
 // mysql
-export const searchMysqlDBs = (params: Database.SearchDBWithPage) => {
-    return http.post<ResPage<Database.MysqlDBInfo>>(`/databases/search`, params);
+export const searchMysqlDBs = (params: Database.SearchDBWithPage, node?: string) => {
+    const query = node ? `?operateNode=${node}` : '';
+    return http.post<ResPage<Database.MysqlDBInfo>>(`/databases/search${query}`, params);
 };
 export const addMysqlDB = (params: Database.MysqlDBCreate) => {
     let request = deepCopy(params) as Database.MysqlDBCreate;
@@ -152,8 +154,9 @@ export const getDatabase = (name: string) => {
 export const searchDatabases = (params: Database.SearchDatabasePage) => {
     return http.post<ResPage<Database.DatabaseInfo>>(`/databases/db/search`, params);
 };
-export const listDatabases = (type: string) => {
-    return http.get<Array<Database.DatabaseOption>>(`/databases/db/list/${type}`);
+export const listDatabases = (type: string, node?: string) => {
+    const query = node ? `?operateNode=${node}` : '';
+    return http.get<Array<Database.DatabaseOption>>(`/databases/db/list/${type}${query}`);
 };
 export const listDbItems = (type: string) => {
     return http.get<Array<Database.DbItem>>(`/databases/db/item/${type}`);

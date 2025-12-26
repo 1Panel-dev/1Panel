@@ -6,8 +6,9 @@ import { TimeoutEnum } from '@/enums/http-enum';
 import { deepCopy } from '@/utils/util';
 import { Base64 } from 'js-base64';
 
-export const searchWebsites = (req: Website.WebSiteSearch) => {
-    return http.post<ResPage<Website.WebsiteRes>>(`/websites/search`, req);
+export const searchWebsites = (req: Website.WebSiteSearch, node?: string) => {
+    const params = node ? `?operateNode=${node}` : '';
+    return http.post<ResPage<Website.WebsiteRes>>(`/websites/search${params}`, req);
 };
 
 export const listWebsites = () => {
@@ -22,8 +23,9 @@ export const createWebsite = (req: Website.WebSiteCreateReq) => {
     return http.post<any>(`/websites`, request, TimeoutEnum.T_10M);
 };
 
-export const opWebsite = (req: Website.WebSiteOp) => {
-    return http.post<any>(`/websites/operate`, req);
+export const opWebsite = (req: Website.WebSiteOp, node?: string) => {
+    const query = node ? `?operateNode=${node}` : '';
+    return http.post<any>(`/websites/operate${query}`, req);
 };
 
 export const opWebsiteLog = (req: Website.WebSiteOpLog) => {

@@ -3,8 +3,9 @@ import { ResPage, SearchWithPage } from '../interface';
 import { Cronjob } from '../interface/cronjob';
 import { TimeoutEnum } from '@/enums/http-enum';
 
-export const searchCronjobPage = (params: Cronjob.Search) => {
-    return http.post<ResPage<Cronjob.CronjobInfo>>(`/cronjobs/search`, params);
+export const searchCronjobPage = (params: Cronjob.Search, node?: string) => {
+    const query = node ? `?operateNode=${node}` : '';
+    return http.post<ResPage<Cronjob.CronjobInfo>>(`/cronjobs/search${query}`, params);
 };
 
 export const loadNextHandle = (spec: string) => {
@@ -58,12 +59,14 @@ export const cleanRecords = (id: number, cleanData: boolean, cleanRemoteData: bo
     return http.post(`cronjobs/records/clean`, { cronjobID: id, cleanData: cleanData, cleanRemoteData });
 };
 
-export const updateStatus = (params: Cronjob.UpdateStatus) => {
-    return http.post(`cronjobs/status`, params);
+export const updateStatus = (params: Cronjob.UpdateStatus, node?: string) => {
+    const query = node ? `?operateNode=${node}` : '';
+    return http.post(`cronjobs/status${query}`, params);
 };
 
-export const handleOnce = (id: number) => {
-    return http.post(`cronjobs/handle`, { id: id });
+export const handleOnce = (id: number, node?: string) => {
+    const query = node ? `?operateNode=${node}` : '';
+    return http.post(`cronjobs/handle${query}`, { id: id });
 };
 
 export const searchScript = (params: SearchWithPage) => {

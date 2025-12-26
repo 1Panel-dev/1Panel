@@ -200,6 +200,7 @@ const secret = ref();
 const description = ref();
 const timeoutItem = ref(30);
 const timeoutUnit = ref('m');
+const node = ref();
 
 const open = ref();
 const isBackup = ref();
@@ -212,9 +213,11 @@ interface DialogProps {
     detailName: string;
     status: string;
     appInstallID?: number;
+    node?: string;
 }
 const acceptParams = (params: DialogProps): void => {
     type.value = params.type;
+    node.value = params.node || currentNode.value;
     if (type.value === 'app') {
         appInstallID.value = params.appInstallID || 0;
         loadBackupDir();
@@ -235,7 +238,7 @@ const handleBackupClose = () => {
 };
 
 const loadBackupDir = async () => {
-    const res = await getLocalBackupDir();
+    const res = await getLocalBackupDir(node.value);
     backupPath.value = res.data;
 };
 
@@ -244,7 +247,7 @@ const goFile = async () => {
 };
 
 const onChange = async (info: any) => {
-    await updateRecordDescription(info.id, info.description);
+    await updateRecordDescription(info.id, info.description, node.value);
     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
 };
 
@@ -257,7 +260,7 @@ const search = async () => {
         detailName: detailName.value,
     };
     loading.value = true;
-    await searchBackupRecords(params)
+    await searchBackupRecords(params, node.value)
         .then((res) => {
             loading.value = false;
             loadSize(params);
@@ -270,7 +273,7 @@ const search = async () => {
 };
 
 const loadSize = async (params: any) => {
-    await loadRecordSize(params)
+    await loadRecordSize(params, node.value)
         .then((res) => {
             let stats = res.data || [];
             if (stats.length === 0) {
@@ -310,7 +313,7 @@ const backup = async () => {
         description: description.value,
     };
     loading.value = true;
-    await handleBackup(params)
+    await handleBackup(params, node.value)
         .then(() => {
             loading.value = false;
             openTaskLog(taskID);
@@ -335,7 +338,7 @@ const recover = async (row?: any) => {
         timeout: timeoutItem.value === -1 ? -1 : transferTimeToSecond(timeoutItem.value + timeoutUnit.value),
     };
     loading.value = true;
-    await handleRecover(params)
+    await handleRecover(params, node.value)
         .then(() => {
             loading.value = false;
             openTaskLog(taskID);
@@ -374,8 +377,8 @@ const onDownload = async (row: Backup.RecordInfo) => {
         fileDir: row.fileDir,
         fileName: row.fileName,
     };
-    await downloadBackupRecord(params).then(async (res) => {
-        downloadFile(res.data, currentNode.value);
+    await downloadBackupRecord(params, node.value).then(async (res) => {
+        downloadFile(res.data, node.value);
     });
 };
 
@@ -399,7 +402,7 @@ const onBatchDelete = async (row: Backup.RecordInfo | null) => {
             i18n.global.t('commons.button.backup'),
             i18n.global.t('commons.button.delete'),
         ]),
-        params: { ids: ids },
+        params: { ids: ids, node: node.value },
     });
 };
 
