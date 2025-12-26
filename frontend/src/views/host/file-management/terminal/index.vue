@@ -55,7 +55,7 @@ const initTerm = async (cwd: string) => {
     await nextTick();
     terminalRef.value!.acceptParams({
         endpoint: '/api/v2/hosts/terminal',
-        args: `command=${encodeURIComponent(`clear && cd ${cwd}`)}`,
+        args: `command=${encodeURIComponent(`clear && cd "${cwd}"`)}`,
         error: '',
         initCmd: '',
     });
