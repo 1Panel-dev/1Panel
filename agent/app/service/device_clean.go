@@ -382,6 +382,7 @@ func loadBackupTree(fileOp fileUtils.FileOp) []dto.CleanTree {
 	treeData = append(treeData, loadUnknownDbs(fileOp, recordMap))
 	treeData = append(treeData, loadUnknownWebsites(fileOp, recordMap))
 	treeData = append(treeData, loadUnknownSnapshot(fileOp))
+	treeData = append(treeData, loadUnknownWebsiteLog(fileOp, recordMap))
 	return treeData
 }
 
@@ -502,6 +503,44 @@ func loadUnknownSnapshot(fileOp fileUtils.FileOp) dto.CleanTree {
 		}
 
 		treeData.Children = append(treeData.Children, childNode)
+	}
+	return treeData
+}
+
+func loadUnknownWebsiteLog(fileOp fileUtils.FileOp, recordMap map[string][]string) dto.CleanTree {
+	treeData := dto.CleanTree{
+		ID:          uuid.NewString(),
+		Label:       "unknown_website_log",
+		IsCheck:     false,
+		IsRecommend: true,
+		Type:        "unknown_backup",
+	}
+	dir := path.Join(global.Dir.LocalBackupDir, "log/website")
+	entries, _ := os.ReadDir(dir)
+	for _, entry := range entries {
+		if !entry.IsDir() {
+			continue
+		}
+		dirName := entry.Name()
+		itemName := fmt.Sprintf("log/website/%s", dirName)
+		if _, ok := recordMap[itemName]; !ok {
+			dirPath := path.Join(dir, dirName)
+			itemSize, _ := fileOp.GetDirSize(dirPath)
+			childData := dto.CleanTree{
+				ID:          uuid.NewString(),
+				Label:       dirName,
+				IsCheck:     true,
+				IsRecommend: true,
+				Name:        dirPath,
+				Type:        "unknown_backup",
+				Size:        uint64(itemSize),
+			}
+			treeData.Size += uint64(itemSize)
+			treeData.Children = append(treeData.Children, childData)
+		}
+	}
+	if treeData.Size > 0 {
+		treeData.IsCheck = true
 	}
 	return treeData
 }

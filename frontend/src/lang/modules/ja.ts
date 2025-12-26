@@ -2155,6 +2155,7 @@ const message = {
         buildCache: 'コンテナビルドキャッシュ',
 
         appTmpDownload: 'Archivo de descarga temporal de la aplicación',
+        unknownWebsiteLog: '未関連ウェブサイトログバックアップファイル',
     },
     app: {
         app: 'アプリケーション|アプリケーション',

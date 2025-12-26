@@ -2081,6 +2081,7 @@ const message = {
         buildCache: '构建缓存',
 
         appTmpDownload: '应用临时下载文件',
+        unknownWebsiteLog: '未关联网站日志备份文件',
     },
     app: {
         app: '应用',

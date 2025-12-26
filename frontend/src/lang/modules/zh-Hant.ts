@@ -2084,6 +2084,7 @@ const message = {
         buildCache: '容器建置快取',
 
         appTmpDownload: '應用程式暫存下載檔案',
+        unknownWebsiteLog: '未關聯網站日誌備份檔案',
     },
     app: {
         app: '應用',

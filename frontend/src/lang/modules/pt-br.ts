@@ -2208,6 +2208,7 @@ const message = {
         buildCache: 'Cache de construção do container',
 
         appTmpDownload: 'Arquivo de download temporário do aplicativo',
+        unknownWebsiteLog: 'Fail sandaran log laman web tidak dikaitkan',
     },
     app: {
         app: 'Aplicativo | Aplicativos',

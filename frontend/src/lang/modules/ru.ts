@@ -2203,6 +2203,7 @@ const message = {
         buildCache: 'Кэш сборки контейнеров',
 
         appTmpDownload: 'Временный файл загрузки приложения',
+        unknownWebsiteLog: 'Arquivo de backup de log de site não vinculado',
     },
     app: {
         app: 'Приложение | Приложения',

@@ -2260,6 +2260,7 @@ const message = {
         buildCache: 'Konteyner Oluşturma Önbelleği',
 
         appTmpDownload: 'Uygulama geçici indirme dosyası',
+        unknownWebsiteLog: 'Bağlantısız web sitesi günlük yedekleme dosyası',
     },
     app: {
         app: 'Uygulama | Uygulamalar',

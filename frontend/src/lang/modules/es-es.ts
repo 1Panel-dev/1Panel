@@ -2248,6 +2248,7 @@ const message = {
         buildCache: 'Caché de build de contenedores',
 
         appTmpDownload: 'Archivo de descarga temporal de la aplicación',
+        unknownWebsiteLog: 'Archivo de respaldo de registro de sitio web no vinculado',
     },
     app: {
         app: 'Aplicación | Aplicaciones',

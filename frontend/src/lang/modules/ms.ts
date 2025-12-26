@@ -2214,6 +2214,7 @@ const message = {
         buildCache: 'Cache Pembinaan Kontena',
 
         appTmpDownload: 'Fail muat turun sementara aplikasi',
+        unknownWebsiteLog: 'Fail sandaran log laman web tidak dikaitkan',
     },
     app: {
         app: 'Aplikasi | Aplikasi',

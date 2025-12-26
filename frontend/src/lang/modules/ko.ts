@@ -2119,6 +2119,7 @@ const message = {
         buildCache: '컨테이너 빌드 캐시',
 
         appTmpDownload: '앱 임시 다운로드 파일',
+        unknownWebsiteLog: '연결되지 않은 웹사이트 로그 백업 파일',
     },
     app: {
         app: '애플리케이션 | 애플리케이션들',
