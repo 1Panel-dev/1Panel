@@ -190,7 +190,7 @@ const search = async () => {
 };
 
 const onInspect = async (id: string) => {
-    const res = await inspect({ id: id, type: 'volume' });
+    const res = await inspect({ id: id, type: 'volume', detail: '' });
     let detailInfo = JSON.stringify(JSON.parse(res.data), null, 2);
     let param = {
         header: i18n.global.t('commons.button.view'),

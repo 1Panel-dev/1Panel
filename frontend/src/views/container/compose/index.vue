@@ -16,7 +16,7 @@
             <template #rightToolBar>
                 <TableSearch @search="search()" v-model:searchName="searchName" />
                 <TableRefresh @search="search()" />
-                <TableSetting title="container-refresh" @search="search()" />
+                <TableSetting title="container-refresh" @search="refresh()" />
             </template>
             <template #main>
                 <el-row v-if="data.length > 0 || isOnCreate" :gutter="20" class="row-box">
@@ -475,6 +475,20 @@ const loadTableHeight = () => {
     }
 };
 
+const refresh = async () => {
+    if (!isActive.value || !isExist.value) {
+        return;
+    }
+    let params = {
+        info: searchName.value,
+        page: 1,
+        pageSize: 100,
+    };
+    await searchCompose(params).then((res) => {
+        data.value = res.data.items || [];
+    });
+};
+
 const search = async (withRefreshDetail?: boolean) => {
     if (!isActive.value || !isExist.value) {
         return;
@@ -484,7 +498,6 @@ const search = async (withRefreshDetail?: boolean) => {
         page: 1,
         pageSize: 100,
     };
-    isOnCreate.value = false;
     loading.value = true;
     await searchCompose(params)
         .then((res) => {

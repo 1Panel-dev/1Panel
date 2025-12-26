@@ -215,7 +215,7 @@ const batchDelete = async (row: Container.NetworkInfo | null) => {
 };
 
 const onInspect = async (id: string) => {
-    const res = await inspect({ id: id, type: 'network' });
+    const res = await inspect({ id: id, type: 'network', detail: '' });
     let networkData = JSON.parse(res.data);
     detailDrawerRef.value!.acceptParams({ data: networkData });
 };

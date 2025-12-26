@@ -252,7 +252,7 @@ const changePinned = (row: any, isPinned: boolean) => {
 };
 
 const onInspect = async (id: string) => {
-    const res = await inspect({ id: id, type: 'image' });
+    const res = await inspect({ id: id, type: 'image', detail: '' });
     let detailInfo = JSON.stringify(JSON.parse(res.data), null, 2);
     let param = {
         header: i18n.global.t('commons.button.view'),

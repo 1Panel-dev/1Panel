@@ -649,7 +649,7 @@ const onTerminal = (row: any) => {
 };
 
 const onInspect = async (row: any) => {
-    const res = await inspect({ id: row.containerID, type: 'container' });
+    const res = await inspect({ id: row.containerID, type: 'container', detail: '' });
     containerInspectRef.value!.acceptParams({ data: res.data, ports: row.ports });
 };
 
