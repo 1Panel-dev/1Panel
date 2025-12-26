@@ -121,6 +121,7 @@ func (c *AcmeClient) ObtainIPSSL(ipAddress string, privKey crypto.PrivateKey) (c
 		CSR:        csr,
 		PrivateKey: privKey,
 		Profile:    "shortlived",
+		Bundle:     true,
 	}
 	certificates, err := c.Client.Certificate.ObtainForCSR(req)
 	if err != nil {
