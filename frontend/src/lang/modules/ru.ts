@@ -3150,6 +3150,7 @@ const message = {
         model: 'Модель устройства',
         diskType: 'Тип диска',
         serial: 'Серийный номер',
+        noFail: 'Сбой монтирования не влияет на запуск системы',
     },
     xpack: {
         expiresTrialAlert:

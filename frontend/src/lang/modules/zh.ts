@@ -2962,6 +2962,7 @@ const message = {
         model: '设备型号',
         diskType: '磁盘类型',
         serial: '序列号',
+        noFail: '挂载失败不影响系统启动',
     },
     xpack: {
         expiresAlert: '温馨提醒：专业版试用将于 [{0}] 天后到期，届时将停止使用所有专业版功能。',

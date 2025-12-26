@@ -3161,6 +3161,7 @@ const message = {
         model: 'Modelo do Dispositivo',
         diskType: 'Tipo de Disco',
         serial: 'Número de Série',
+        noFail: 'Falha na montagem não afeta a inicialização do sistema',
     },
     xpack: {
         expiresTrialAlert:

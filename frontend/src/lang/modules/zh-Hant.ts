@@ -2962,6 +2962,7 @@ const message = {
         model: '裝置型號',
         diskType: '磁碟類型',
         serial: '序號',
+        noFail: '掛載失敗不影響系統啟動',
     },
     xpack: {
         expiresAlert: '溫馨提醒：您的專業版許可證將在 {0} 天後到期，屆時所有專業版功能將無法繼續使用。',

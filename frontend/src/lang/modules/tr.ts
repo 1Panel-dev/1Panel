@@ -3231,6 +3231,7 @@ const message = {
         model: 'Cihaz Modeli',
         diskType: 'Disk Türü',
         serial: 'Seri Numarası',
+        noFail: 'Bağlama hatası sistem başlangıcını etkilemez',
     },
     xpack: {
         expiresTrialAlert:

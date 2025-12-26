@@ -3090,6 +3090,7 @@ const message = {
         model: 'デバイスモデル',
         diskType: 'ディスクタイプ',
         serial: 'シリアルナンバー',
+        noFail: 'マウント失敗はシステム起動に影響しません',
     },
     xpack: {
         expiresTrialAlert:

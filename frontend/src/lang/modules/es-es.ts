@@ -3176,6 +3176,7 @@ const message = {
         model: 'Modelo del dispositivo',
         diskType: 'Tipo de disco',
         serial: 'Núm. de serie',
+        noFail: 'El fallo de montaje no afecta al inicio del sistema',
     },
     xpack: {
         expiresTrialAlert:

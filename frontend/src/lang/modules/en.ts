@@ -3189,6 +3189,7 @@ const message = {
         model: 'Device Model',
         diskType: 'Disk Type',
         serial: 'Serial Number',
+        noFail: 'Mount failure does not affect system startup',
     },
     xpack: {
         expiresTrialAlert:

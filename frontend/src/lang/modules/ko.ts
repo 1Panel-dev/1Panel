@@ -3035,6 +3035,7 @@ const message = {
         model: '장치 모델',
         diskType: '디스크 유형',
         serial: '시리얼 번호',
+        noFail: '마운트 실패는 시스템 시작에 영향을 미치지 않습니다',
     },
     xpack: {
         expiresTrialAlert:

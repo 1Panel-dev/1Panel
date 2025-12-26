@@ -291,6 +291,7 @@ export namespace Host {
         label: string;
         autoMount: boolean;
         mountPoint: string;
+        noFail: boolean;
     }
 
     export interface DiskMount {

@@ -131,7 +131,11 @@ func (s *DiskService) MountDisk(req request.DiskMountRequest) error {
 		return buserr.WithErr("MountDiskErr", err)
 	}
 	if req.AutoMount {
-		if err := addToFstabWithOptions(req.Device, req.MountPoint, req.Filesystem, ""); err != nil {
+		options := ""
+		if req.NoFail {
+			options = "defaults,nofail"
+		}
+		if err := addToFstabWithOptions(req.Device, req.MountPoint, req.Filesystem, options); err != nil {
 			return buserr.WithErr("MountDiskErr", err)
 		}
 	}

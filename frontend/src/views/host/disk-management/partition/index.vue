@@ -14,7 +14,7 @@
         />
         <el-form
             @submit.prevent
-            ref="partitionRef"
+            ref="formRef"
             :rules="rules"
             label-position="top"
             :model="form"
@@ -36,6 +36,9 @@
             </el-form-item>
             <el-form-item :label="$t('disk.autoMount')" prop="autoMount">
                 <el-switch v-model="form.autoMount" />
+            </el-form-item>
+            <el-form-item :label="$t('disk.noFail')" prop="noFail" v-if="form.autoMount">
+                <el-switch v-model="form.noFail" />
             </el-form-item>
         </el-form>
         <template #footer>
@@ -66,6 +69,7 @@ const form = reactive({
     autoMount: true,
     mountPoint: '',
     label: '',
+    noFail: true,
 });
 const open = ref(false);
 const loading = ref(false);
@@ -73,6 +77,7 @@ const operate = ref('mount');
 const fileRef = ref();
 const emit = defineEmits(['search']);
 const filesystem = ref('');
+const formRef = ref();
 
 const loadBuildDir = async (path: string) => {
     form.mountPoint = path;
@@ -91,6 +96,11 @@ const acceptParams = (diskInfo: Host.DiskInfo, operateType: string) => {
 
 const submit = async () => {
     try {
+        const isValid = await formRef.value.validate();
+        if (!isValid) {
+            loading.value = false;
+            return;
+        }
         loading.value = true;
         if (operate.value == 'mount') {
             await mountDisk(form);

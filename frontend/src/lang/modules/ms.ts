@@ -3147,6 +3147,7 @@ const message = {
         model: 'Model Peranti',
         diskType: 'Jenis Cakera',
         serial: 'Nombor Siri',
+        noFail: 'Kegagalan pemasangan tidak menjejaskan permulaan sistem',
     },
     xpack: {
         expiresTrialAlert:
