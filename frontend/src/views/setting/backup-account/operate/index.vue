@@ -745,10 +745,11 @@ const getBuckets = async (formEl: FormInstance | undefined) => {
     }
     loading.value = true;
     let item = deepCopy(dialogData.value.rowData!.varsJson);
+    let itemEndpoint = loadEndpoint();
     if (dialogData.value.rowData!.type === 'KODO') {
-        item['domain'] = spliceHttp(domainProto.value, dialogData.value.rowData!.varsJson['endpointItem']);
+        item['domain'] = itemEndpoint;
     } else {
-        item['endpoint'] = spliceHttp(domainProto.value, dialogData.value.rowData!.varsJson['endpointItem']);
+        item['endpoint'] = itemEndpoint;
     }
     item['endpointItem'] = undefined;
     listBucket({
@@ -768,19 +769,27 @@ const getBuckets = async (formEl: FormInstance | undefined) => {
         });
 };
 
+const loadEndpoint = () => {
+    let item = splitHttp(dialogData.value.rowData!.varsJson['endpointItem']);
+    if (item.proto) {
+        domainProto.value = item.proto;
+        dialogData.value.rowData!.varsJson['endpointItem'] = item.url;
+    }
+    return spliceHttp(domainProto.value, dialogData.value.rowData!.varsJson['endpointItem']);
+};
+
 const onCheck = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
         if (!dialogData.value.rowData) return;
         if (hasAccessKey()) {
-            let itemEndpoint = spliceHttp(domainProto.value, dialogData.value.rowData!.varsJson['endpointItem']);
+            let itemEndpoint = loadEndpoint();
             if (dialogData.value.rowData!.type === 'KODO') {
                 dialogData.value.rowData!.varsJson['domain'] = itemEndpoint;
             } else {
                 dialogData.value.rowData!.varsJson['endpoint'] = itemEndpoint;
             }
-            dialogData.value.rowData!.varsJson['endpointItem'] = itemEndpoint;
         }
         if (isALIYUNYUN()) {
             dialogData.value.rowData!.varsJson['token'] = undefined;
