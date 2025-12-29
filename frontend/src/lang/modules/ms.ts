@@ -1977,7 +1977,7 @@ const message = {
         error444: 'Sambungan ditutup',
         error500: 'Ralat Pelayan',
 
-        https: 'Menetapkan protokol akses HTTPS untuk panel boleh meningkatkan keselamatan akses panel.',
+        https: 'Menetapkan HTTPS untuk panel meningkatkan keselamatan.\nMod Strict menyekat akses bukan HTTPS.\nMux mengalih hala HTTP ke HTTPS tetapi mungkin mengurangkan sedikit prestasi.',
         certType: 'Jenis sijil',
         selfSigned: 'Diterbitkan sendiri',
         selfSignedHelper:

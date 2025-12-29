@@ -4,6 +4,11 @@ import (
 	"crypto/tls"
 	"encoding/gob"
 	"fmt"
+	"net"
+	"net/http"
+	"os"
+	"path"
+
 	"github.com/1Panel-dev/1Panel/core/init/auth"
 	"github.com/1Panel-dev/1Panel/core/init/db"
 	"github.com/1Panel-dev/1Panel/core/init/geo"
@@ -12,10 +17,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/init/proxy"
 	"github.com/1Panel-dev/1Panel/core/init/run"
 	"github.com/gin-gonic/gin"
-	"net"
-	"net/http"
-	"os"
-	"path"
+	"github.com/soheilhy/cmux"
 
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
@@ -99,10 +101,64 @@ func Start() {
 		if err := server.ServeTLS(tcpKeepAliveListener{ln.(*net.TCPListener)}, "", ""); err != nil {
 			panic(err)
 		}
+		return
+	} else if global.CONF.Conn.SSL == constant.StatusMux {
+		certPath := path.Join(global.CONF.Base.InstallDir, "1panel/secret/server.crt")
+		keyPath := path.Join(global.CONF.Base.InstallDir, "1panel/secret/server.key")
+		certificate, err := os.ReadFile(certPath)
+		if err != nil {
+			panic(err)
+		}
+		key, err := os.ReadFile(keyPath)
+		if err != nil {
+			panic(err)
+		}
+		cert, err := tls.X509KeyPair(certificate, key)
+		if err != nil {
+			panic(err)
+		}
+		constant.CertStore.Store(&cert)
+
+		server.TLSConfig = &tls.Config{
+			GetCertificate: func(info *tls.ClientHelloInfo) (*tls.Certificate, error) {
+				return constant.CertStore.Load().(*tls.Certificate), nil
+			},
+		}
+
+		global.LOG.Infof("listen at mux (http/https)://%s:%s [%s]", global.CONF.Conn.BindAddress, global.CONF.Conn.Port, tcpItem)
+
+		m := cmux.New(ln)
+
+		httpsL := m.Match(cmux.TLS())
+		httpL := m.Match(cmux.Any())
+
+		go func() {
+			if err := server.Serve(tls.NewListener(httpsL, server.TLSConfig)); err != nil {
+				global.LOG.Errorf("HTTPS Serve Error: %v", err)
+			}
+		}()
+
+		go func() {
+			redirectServer := &http.Server{
+				Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					target := "https://" + r.Host + r.RequestURI
+					http.Redirect(w, r, target, http.StatusTemporaryRedirect)
+				}),
+			}
+			if err := redirectServer.Serve(httpL); err != nil {
+				global.LOG.Errorf("HTTP Redirect Serve Error: %v", err)
+			}
+		}()
+
+		if err := m.Serve(); err != nil {
+			panic(err)
+		}
+		return
 	} else {
 		global.LOG.Infof("listen at http://%s:%s [%s]", global.CONF.Conn.BindAddress, global.CONF.Conn.Port, tcpItem)
 		if err := server.Serve(tcpKeepAliveListener{ln.(*net.TCPListener)}); err != nil {
 			panic(err)
 		}
+		return
 	}
 }

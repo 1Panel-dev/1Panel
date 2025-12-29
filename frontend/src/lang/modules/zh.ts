@@ -1943,7 +1943,7 @@ const message = {
         error444: '连接被关闭',
         error500: '内部错误',
 
-        https: '为面板设置 https 协议访问，提升面板访问安全性',
+        https: '为面板设置https协议访问可提升面板访问安全性 \n Strict模式下非HTTPS流量无法连接面板\nMux模式会将 HTTP重定向到 HTTPS, 但可能会降低少许性能',
         certType: '证书类型',
         selfSigned: '自签名',
         selfSignedHelper: '自签证书，不被浏览器信任，显示不安全是正常现象',

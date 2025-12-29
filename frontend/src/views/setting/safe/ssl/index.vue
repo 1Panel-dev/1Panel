@@ -158,10 +158,12 @@ const sslList = ref();
 const itemSSL = ref();
 
 interface DialogProps {
+    ssl: string;
     sslType: string;
     sslInfo?: Setting.SSLInfo;
 }
 const acceptParams = async (params: DialogProps): Promise<void> => {
+    form.ssl = params.ssl;
     if (params.sslType.indexOf('-') !== -1) {
         form.sslType = 'import';
         form.itemSSLType = params.sslType.split('-')[1];
@@ -232,7 +234,7 @@ const onSaveSSL = async (formEl: FormInstance | undefined) => {
                 itemType = form.itemSSLType === 'paste' ? 'import-paste' : 'import-local';
             }
             let param = {
-                ssl: 'Enable',
+                ssl: form.ssl,
                 sslType: itemType,
                 domain: '',
                 sslID: form.sslID,

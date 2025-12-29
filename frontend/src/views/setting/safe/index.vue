@@ -104,14 +104,13 @@
                             </el-form-item>
 
                             <el-form-item :label="$t('setting.panelSSL')" prop="ssl">
-                                <el-switch
-                                    @change="handleSSL"
-                                    v-model="form.ssl"
-                                    active-value="Enable"
-                                    inactive-value="Disable"
-                                />
+                                <el-radio-group v-model="form.ssl" @change="handleSSL">
+                                    <el-radio value="Disable">{{ $t('setting.sslDisable') }}</el-radio>
+                                    <el-radio value="Enable">{{ $t('commons.button.enable') }} (Strict)</el-radio>
+                                    <el-radio value="Mux">{{ $t('commons.button.enable') }} (Mux)</el-radio>
+                                </el-radio-group>
                                 <span class="input-help">{{ $t('setting.https') }}</span>
-                                <div v-if="form.ssl === 'Enable' && sslInfo">
+                                <div v-if="form.ssl !== 'Disable' && sslInfo">
                                     <el-tag>{{ $t('setting.domainOrIP') }} {{ sslInfo.domain }}</el-tag>
                                     <el-tag style="margin-left: 5px">
                                         {{ $t('setting.timeOut') }} {{ sslInfo.timeout }}
@@ -210,6 +209,7 @@ const mfaRef = ref();
 const responseRef = ref();
 
 const sslRef = ref();
+const lastSSL = ref('Disable');
 const sslInfo = ref<Setting.SSLInfo>();
 const domainRef = ref();
 const allowIPsRef = ref();
@@ -243,8 +243,9 @@ const search = async () => {
     form.ipv6 = res.data.ipv6;
     form.bindAddress = res.data.bindAddress;
     form.ssl = res.data.ssl;
+    lastSSL.value = form.ssl;
     form.sslType = res.data.sslType;
-    if (form.ssl === 'Enable') {
+    if (form.ssl !== 'Disable') {
         loadInfo();
     }
     form.securityEntrance = res.data.securityEntrance;
@@ -326,7 +327,7 @@ const onChangeAllowIPs = () => {
     allowIPsRef.value.acceptParams({ allowIPs: form.allowIPs });
 };
 const handleSSL = async () => {
-    if (form.ssl === 'Enable') {
+    if (form.ssl !== 'Disable') {
         let params = {
             ssl: form.ssl,
             sslType: form.sslType,
@@ -343,6 +344,7 @@ const handleSSL = async () => {
         .then(async () => {
             await updateSSL({ ssl: 'Disable', domain: '', sslType: form.sslType, key: '', cert: '', sslID: 0 });
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            lastSSL.value = 'Disable';
             let href = window.location.href;
             globalStore.isLogin = false;
             let address = href.split('://')[1];
@@ -356,7 +358,7 @@ const handleSSL = async () => {
             }, 1000);
         })
         .catch(() => {
-            form.ssl = 'Enable';
+            form.ssl = lastSSL.value;
         });
 };
 

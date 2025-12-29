@@ -1944,7 +1944,7 @@ const message = {
         error444: '連線已關閉',
         error500: '內部伺服器錯誤',
 
-        https: '為面板設定 https 協議訪問，提升面板訪問安全性',
+        https: '為面板設定 HTTPS 可提升安全性。\nStrict 模式會阻擋非 HTTPS 連線。\nMux 會將 HTTP 重新導向到 HTTPS，但可能稍微降低效能。',
         certType: '證書類型',
         selfSigned: '自簽名',
         selfSignedHelper: '自簽證書，不被瀏覽器信任，顯示不安全是正常現象',
