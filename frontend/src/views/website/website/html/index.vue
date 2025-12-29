@@ -1,6 +1,6 @@
 <template>
     <DrawerPro v-model="open" :header="$t('website.defaultHtml')" @close="handleClose" size="normal">
-        <el-select v-model="type" class="w-full" @change="get()" v-loading="loading">
+        <el-select v-model="req.type" class="w-full" @change="get()" v-loading="loading">
             <el-option :value="'404'" :label="$t('website.website404')"></el-option>
             <el-option :value="'domain404'" :label="$t('website.domain404')"></el-option>
             <el-option :value="'index'" :label="$t('website.indexHtml')"></el-option>
@@ -8,11 +8,15 @@
             <el-option :value="'stop'" :label="$t('website.stopHtml')"></el-option>
         </el-select>
         <div class="mt-1.5">
-            <el-text v-if="type == '404'" type="info">
+            <el-text v-if="req.type == '404'" type="info">
                 {{ $t('website.website404Helper') }}
             </el-text>
         </div>
+        <div class="mt-1.5">
+            <el-checkbox v-model="req.sync">{{ $t('同步到 PHP 和静态网站') }}</el-checkbox>
+        </div>
         <div ref="htmlRef" class="default-html"></div>
+
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
@@ -37,12 +41,15 @@ import { oneDark } from '@codemirror/theme-one-dark';
 let open = ref(false);
 let loading = ref(false);
 const content = ref('');
-const type = ref('404');
 const view = ref();
 const htmlRef = ref();
+const req = reactive({
+    type: '404',
+    sync: false,
+});
 
 const acceptParams = () => {
-    type.value = '404';
+    req.type = '404';
     get();
     open.value = true;
 };
@@ -52,7 +59,7 @@ const handleClose = () => {
 };
 
 const get = async () => {
-    const res = await getDefaultHtml(type.value);
+    const res = await getDefaultHtml(req.type);
     content.value = res.data.content;
     initEditor();
 };
@@ -62,7 +69,7 @@ const initEditor = () => {
         view.value.destroy();
     }
     let extensions = [basicSetup, oneDark];
-    if (type.value === 'php') {
+    if (req.type === 'php') {
         extensions.push(php());
     } else {
         extensions.push(html());
@@ -83,7 +90,7 @@ const submit = async () => {
     loading.value = true;
     try {
         const content = view.value.state.doc.toString();
-        await updateDefaultHtml({ type: type.value, content: content });
+        await updateDefaultHtml({ type: req.type, content: content, sync: req.sync });
         MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
     } catch (error) {
     } finally {
@@ -97,6 +104,5 @@ defineExpose({ acceptParams });
 .default-html {
     width: 100%;
     min-height: 300px;
-    margin-top: 10px;
 }
 </style>

@@ -310,6 +310,7 @@ type WebsiteHtmlReq struct {
 type WebsiteHtmlUpdate struct {
 	Type    string `json:"type" validate:"required"`
 	Content string `json:"content" validate:"required"`
+	Sync    bool   `json:"sync"`
 }
 
 type WebsiteLBCreate struct {

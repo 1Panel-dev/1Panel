@@ -2028,6 +2028,15 @@ func (w WebsiteService) UpdateDefaultHtml(req request.WebsiteHtmlUpdate) error {
 	switch req.Type {
 	case "404":
 		resourcePath = path.Join(defaultPath, "404.html")
+		if req.Sync {
+			websites, _ := websiteRepo.GetBy(repo.WithTypes([]string{constant.Static, constant.Runtime}))
+			for _, website := range websites {
+				filePath := path.Join(GetSitePath(website, SiteIndexDir), "404.html")
+				if fileOp.Stat(filePath) {
+					_ = fileOp.SaveFile(filePath, req.Content, constant.DirPerm)
+				}
+			}
+		}
 	case "php":
 		resourcePath = path.Join(defaultPath, "index.php")
 	case "index":

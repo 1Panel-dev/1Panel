@@ -612,6 +612,7 @@ export namespace Website {
     export interface WebsiteHtmlUpdate {
         type: string;
         content: string;
+        sync: boolean;
     }
 
     export interface NginxUpstream {
