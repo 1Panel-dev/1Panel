@@ -487,7 +487,7 @@ func (s *Server) AddHTTP2HTTPS(httpsPort int) {
 	}
 
 	newDir.Block = block
-	s.UpdateDirectiveBySecondKey("if", " ($scheme", newDir)
+	s.UpdateDirectiveBySecondKey("if", "($scheme", newDir)
 }
 
 func (s *Server) UpdateAllowIPs(ips []string) {
