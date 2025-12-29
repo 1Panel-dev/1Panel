@@ -10,8 +10,9 @@ export const getLoginLogs = (info: Log.SearchLgLog) => {
     return http.post<ResPage<Log.OperationLog>>(`/core/logs/login`, info);
 };
 
-export const getSystemFiles = () => {
-    return http.get<Array<string>>(`/logs/system/files`);
+export const getSystemFiles = (node?: string) => {
+    const params = node ? `?operateNode=${node}` : '';
+    return http.get<Array<string>>(`/logs/system/files${params}`);
 };
 
 export const cleanLogs = (param: Log.CleanLog) => {
