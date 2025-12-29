@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"mime"
 	"net"
 	"net/http"
 	"net/smtp"
@@ -119,9 +120,11 @@ func parseRecipients(recipient string) []string {
 
 func buildMessage(config SMTPConfig, message EmailMessage, toList []string) (string, error) {
 	headers := make(map[string]string)
-	headers["From"] = config.From
+	encodedFrom := mime.BEncoding.Encode("UTF-8", config.From)
+	headers["From"] = encodedFrom
+	encodedSubject := mime.BEncoding.Encode("UTF-8", message.Subject)
+	headers["Subject"] = encodedSubject
 	headers["To"] = strings.Join(toList, ",")
-	headers["Subject"] = message.Subject
 	headers["Date"] = time.Now().UTC().Format(time.RFC1123Z)
 
 	if message.IsHTML {
