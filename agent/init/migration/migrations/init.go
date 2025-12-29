@@ -789,3 +789,14 @@ var AddisIPtoWebsiteSSL = &gormigrate.Migration{
 		return tx.AutoMigrate(&model.WebsiteSSL{})
 	},
 }
+
+var InitPingStatus = &gormigrate.Migration{
+	ID: "20251201-init-ping-status",
+	Migrate: func(tx *gorm.DB) error {
+		status := firewall.LoadPingStatus()
+		if err := tx.Create(&model.Setting{Key: "BanPing", Value: status}).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}

@@ -59,6 +59,7 @@ func InitAgentDB() {
 		migrations.InitIptablesStatus,
 		migrations.UpdateWebsite,
 		migrations.AddisIPtoWebsiteSSL,
+		migrations.InitPingStatus,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

@@ -18,6 +18,7 @@ func Init() {
 	if !needInit() {
 		return
 	}
+	InitPingStatus()
 	global.LOG.Info("initializing firewall settings...")
 	client, err := firewall.NewFirewallClient()
 	if err != nil {
@@ -121,4 +122,21 @@ func needInit() bool {
 	defer file.Close()
 	fmt.Fprintf(file, "Boot Mark for 1panel\n")
 	return true
+}
+
+func InitPingStatus() {
+	global.LOG.Info("initializing ban ping status from settings...")
+	status := firewall.LoadPingStatus()
+	statusInDB, _ := repo.NewISettingRepo().GetValueByKey("BanPing")
+	if statusInDB == status {
+		return
+	}
+
+	enable := "1"
+	if statusInDB == constant.StatusDisable {
+		enable = "0"
+	}
+	if err := firewall.UpdatePingStatus(enable); err != nil {
+		global.LOG.Errorf("initialize ping status failed: %v", err)
+	}
 }
