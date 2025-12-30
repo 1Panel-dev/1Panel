@@ -2741,6 +2741,8 @@ const message = {
         streamPortsHelper:
             'Defina o número da porta de escuta externa, os clientes acessarão o serviço através desta porta, separados por vírgulas, por exemplo: 5222,5223',
         streamHelper: 'Encaminhamento de Portas e Balanceamento de Carga TCP/UDP',
+
+        syncHtmlHelper: 'Sincronizar com PHP e sites estáticos',
     },
     php: {
         short_open_tag: 'Suporte para short tags',

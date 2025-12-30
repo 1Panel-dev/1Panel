@@ -2793,6 +2793,8 @@ const message = {
         streamPortsHelper:
             'Harici dinleme bağlantı noktası numarasını ayarlayın, istemciler bu bağlantı noktası üzerinden hizmete erişecektir, virgülle ayırın, örn.: 5222,5223',
         streamHelper: 'TCP/UDP Port Yönlendirme ve Yük Dengeleme',
+
+        syncHtmlHelper: 'PHP ve statik web siteleriyle senkronize et',
     },
     php: {
         short_open_tag: 'Kısa etiket desteği',

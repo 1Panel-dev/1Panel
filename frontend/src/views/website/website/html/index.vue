@@ -13,7 +13,7 @@
             </el-text>
         </div>
         <div class="mt-1.5">
-            <el-checkbox v-model="req.sync">{{ $t('同步到 PHP 和静态网站') }}</el-checkbox>
+            <el-checkbox v-model="req.sync">{{ $t('website.syncHtmlHelper') }}</el-checkbox>
         </div>
         <div ref="htmlRef" class="default-html"></div>
 

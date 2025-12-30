@@ -2755,6 +2755,8 @@ const message = {
         streamPortsHelper:
             'Set the external listening port number, clients will access the service through this port, separated by commas, e.g., 5222,5223',
         streamHelper: 'TCP/UDP Port Forwarding and Load Balancing',
+
+        syncHtmlHelper: 'Sync to PHP and static websites',
     },
     php: {
         short_open_tag: 'Short tag support',

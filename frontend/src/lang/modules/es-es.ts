@@ -2747,6 +2747,8 @@ const message = {
         streamPortsHelper:
             'Configura el número de puerto de escucha externo, los clientes accederán al servicio a través de este puerto, separado por comas, p. ej., 5222,5223',
         streamHelper: 'Reenvío de Puertos y Balanceo de Carga TCP/UDP',
+
+        syncHtmlHelper: 'Sincronizar con PHP y sitios web estáticos',
     },
     php: {
         short_open_tag: 'Soporte de etiquetas cortas',

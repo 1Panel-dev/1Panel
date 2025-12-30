@@ -463,6 +463,11 @@ func isPointMounted(mountPoint string) bool {
 }
 
 func addToFstabWithOptions(device, mountPoint, filesystem, options string) error {
+	uuid, err := getDeviceUUID(device)
+	if err != nil {
+		return fmt.Errorf("failed to get UUID for device %s: %v", device, err)
+	}
+
 	if filesystem == "" {
 		fsType, err := getFilesystemType(device)
 		if err != nil {
@@ -476,7 +481,7 @@ func addToFstabWithOptions(device, mountPoint, filesystem, options string) error
 		options = "defaults"
 	}
 
-	entry := fmt.Sprintf("%s %s %s %s 0 2\n", device, mountPoint, filesystem, options)
+	entry := fmt.Sprintf("UUID=%s %s %s %s 0 2\n", uuid, mountPoint, filesystem, options)
 
 	file, err := os.OpenFile("/etc/fstab", os.O_APPEND|os.O_WRONLY, 0644)
 	if err != nil {
@@ -567,4 +572,16 @@ func parseSizeToBytes(sizeStr string) int64 {
 		val, _ := strconv.ParseInt(sizeStr, 10, 64)
 		return val
 	}
+}
+
+func getDeviceUUID(device string) (string, error) {
+	output, err := cmd.RunDefaultWithStdoutBashC(fmt.Sprintf("blkid -s UUID -o value %s", device))
+	if err != nil {
+		return "", err
+	}
+	uuid := strings.TrimSpace(output)
+	if uuid == "" {
+		return "", fmt.Errorf("no UUID found for device %s", device)
+	}
+	return uuid, nil
 }

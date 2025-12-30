@@ -2736,6 +2736,8 @@ const message = {
         streamPortsHelper:
             'Tetapkan nombor port pendengaran luaran, pelanggan akan mengakses perkhidmatan melalui port ini, dipisahkan dengan koma, cth., 5222,5223',
         streamHelper: 'Penerusan Port dan Pengimbangan Beban TCP/UDP',
+
+        syncHtmlHelper: 'Segerakkan ke PHP dan laman web statik',
     },
     php: {
         short_open_tag: 'Sokongan tag pendek',

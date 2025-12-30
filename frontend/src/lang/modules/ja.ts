@@ -2679,6 +2679,8 @@ const message = {
         streamPortsHelper:
             '外部リスニングポート番号を設定します。クライアントはこのポートを通じてサービスにアクセスします。カンマで区切ってください。例：5222,5223',
         streamHelper: 'TCP/UDP ポート転送とロードバランシング',
+
+        syncHtmlHelper: 'PHP と静的ウェブサイトに同期',
     },
     php: {
         short_open_tag: '短いタグサポート',
