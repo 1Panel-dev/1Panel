@@ -482,7 +482,7 @@ func (s *Server) AddHTTP2HTTPS(httpsPort int) {
 	} else {
 		block.AppendDirectives(&Directive{
 			Name:       "return",
-			Parameters: []string{"301", fmt.Sprintf("https://$host$request_uri:%d", httpsPort)},
+			Parameters: []string{"301", fmt.Sprintf("https://$host:%d$request_uri", httpsPort)},
 		})
 	}
 
