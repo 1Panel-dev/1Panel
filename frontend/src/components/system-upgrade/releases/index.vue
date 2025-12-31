@@ -32,7 +32,7 @@
                             <span class="icon-span">{{ item.fixCount }}</span>
                         </template>
                         <div class="panel-MdEditor">
-                            <MdEditor v-model="item.content" previewOnly :theme="isDarkTheme ? 'dark' : 'light'" />
+                            <MarkDownEditor :content="item.content" />
                         </div>
                     </el-collapse-item>
                 </div>
@@ -57,12 +57,11 @@
 </template>
 
 <script setup lang="ts">
+import MarkDownEditor from '@/components/mkdown-editor/index.vue';
+
 import { getSettingInfo, listReleases, updateSetting } from '@/api/modules/setting';
-import MdEditor from 'md-editor-v3';
-import 'md-editor-v3/lib/style.css';
 import { ref } from 'vue';
 import { GlobalStore } from '@/store';
-import { storeToRefs } from 'pinia';
 import { FormInstance } from 'element-plus';
 import { MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
@@ -72,8 +71,6 @@ const globalStore = GlobalStore();
 const mobile = computed(() => {
     return globalStore.isMobile();
 });
-
-const { isDarkTheme } = storeToRefs(globalStore);
 
 const drawerVisible = ref(false);
 const currentVersion = ref(0);

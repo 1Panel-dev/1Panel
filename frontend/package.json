@@ -36,6 +36,7 @@
         "axios": "^1.7.2",
         "codemirror": "^6.0.2",
         "crypto-js": "^4.2.0",
+        "dompurify": "^3.3.1",
         "echarts": "^5.5.0",
         "element-plus": "2.11.9",
         "fit2cloud-ui-plus": "^1.2.3",
