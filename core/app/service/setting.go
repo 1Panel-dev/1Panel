@@ -709,7 +709,7 @@ func checkProxy(req dto.ProxyUpdate) error {
 		if len(req.ProxyUser) != 0 {
 			proxyURL.User = url.UserPassword(req.ProxyUser, req.ProxyPasswd)
 		}
-		transport = http.Transport{Proxy: http.ProxyURL(proxyURL)}
+		transport = http.Transport{Proxy: http.ProxyURL(proxyURL), TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
 	case "socks5":
 		var auth *proxy.Auth
 		if len(req.ProxyUser) == 0 {
