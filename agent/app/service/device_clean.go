@@ -687,11 +687,6 @@ func loadLogTree(fileOp fileUtils.FileOp) []dto.CleanTree {
 	size2, _ := fileOp.GetDirSize(path2)
 	treeData = append(treeData, dto.CleanTree{ID: uuid.NewString(), Label: "task_log", Size: uint64(size2), Children: list2, Type: "task_log"})
 
-	path3 := path.Join(global.Dir.TmpDir, "script")
-	list3 := loadTreeWithAllFile(true, path3, "script", path3, fileOp)
-	size3, _ := fileOp.GetDirSize(path3)
-	treeData = append(treeData, dto.CleanTree{ID: uuid.NewString(), Label: "script", Size: uint64(size3), Children: list3, Type: "script", IsRecommend: true})
-
 	websiteLogList := loadWebsiteLogTree(fileOp)
 	logTotalSize := uint64(0)
 	for _, websiteLog := range websiteLogList {

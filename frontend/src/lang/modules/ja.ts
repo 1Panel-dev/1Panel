@@ -2856,6 +2856,8 @@ const message = {
         startFirewallHelper:
             'ファイアウォールが有効になった後、サーバーのセキュリティをよりよく保護できます。続けたいですか？',
         noPing: 'pingを無効にします',
+        enableBanPing: 'Ping禁止',
+        disableBanPing: 'Ping禁止解除',
         noPingTitle: 'pingを無効にします',
         noPingHelper: `これによりPingが無効になり、サーバーはICMP応答をエコーし​​ません。続けたいですか？`,
         onPingHelper: 'これによりPingが可能になり、ハッカーはサーバーを発見する場合があります。続けたいですか？',

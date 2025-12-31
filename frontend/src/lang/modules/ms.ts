@@ -1216,6 +1216,7 @@ const message = {
             interactiveHelper:
                 'Memerlukan input pengguna semasa pelaksanaan dan tidak boleh digunakan dalam tugas terjadual.',
             library: 'Perpustakaan Skrip',
+            remoteLibrary: 'Pustaka Skrip Jauh',
             create: 'Tambah Skrip',
             edit: 'Sunting Skrip',
             groupHelper:
@@ -2917,6 +2918,8 @@ const message = {
         startFirewallHelper:
             'Selepas firewall diaktifkan, keselamatan pelayan boleh dilindungi dengan lebih baik. Adakah anda mahu meneruskan?',
         noPing: 'Lumpuhkan ping',
+        enableBanPing: 'Sekat Ping',
+        disableBanPing: 'Nyahsekat Ping',
         noPingTitle: 'Lumpuhkan ping',
         noPingHelper: `Ini akan melumpuhkan ping, dan pelayan tidak akan memberikan tindak balas ICMP. Adakah anda mahu meneruskan?`,
         onPingHelper:

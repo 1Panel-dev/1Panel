@@ -1231,6 +1231,7 @@ const message = {
             interactive: 'Script interactivo',
             interactiveHelper:
                 'Requiere introducir datos durante la ejecución y no puede ser usada en tareas programadas.',
+            remoteLibrary: 'Biblioteca de Scripts Remota',
             library: 'Librería de scripts',
             create: 'Agregar script',
             edit: 'Editar script',
@@ -2919,6 +2920,8 @@ const message = {
         startFirewallHelper:
             'Tras habilitar el firewall, la seguridad del servidor podrá protegerse mejor. ¿Deseas continuar?',
         noPing: 'Deshabilitar ping',
+        enableBanPing: 'Bloquear Ping',
+        disableBanPing: 'Desbloquear Ping',
         noPingTitle: 'Deshabilitar ping',
         noPingHelper: `Esto deshabilitará el ping, y el servidor no responderá con eco ICMP. ¿Deseas continuar?`,
         onPingHelper: 'Esto habilitará el ping, y los atacantes podrían descubrir tu servidor. ¿Deseas continuar?',

@@ -1224,6 +1224,7 @@ const message = {
             interactive: 'Interactive script',
             interactiveHelper: 'Requires user input during execution and cannot be used in scheduled tasks.',
             library: 'Script Library',
+            remoteLibrary: 'Remote Script Library',
             create: 'Add Script',
             edit: 'Edit Script',
             groupHelper:
@@ -2936,6 +2937,8 @@ const message = {
         startFirewallHelper:
             'After the firewall is enabled, the server security can be better protected. Do you want to continue?',
         noPing: 'Disable ping',
+        enableBanPing: 'Block Ping',
+        disableBanPing: 'Unblock Ping',
         noPingTitle: 'Disable ping',
         noPingHelper: `This will disable ping, and the server won't echo ICMP response. Do you want to continue?`,
         onPingHelper: 'This will enable ping, and hackers may discover your server. Do you want to continue?',

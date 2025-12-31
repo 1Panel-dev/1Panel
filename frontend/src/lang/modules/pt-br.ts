@@ -1209,6 +1209,7 @@ const message = {
             interactiveHelper:
                 'Requer entrada do usuário durante a execução e não pode ser usado em tarefas agendadas.',
             library: 'Biblioteca de Scripts',
+            remoteLibrary: 'Biblioteca de Scripts Remota',
             create: 'Adicionar Script',
             edit: 'Editar Script',
             groupHelper:
@@ -2922,6 +2923,8 @@ const message = {
         startFirewallHelper:
             'Depois que o firewall for habilitado, a segurança do servidor será melhor protegida. Deseja continuar?',
         noPing: 'Desativar ping',
+        enableBanPing: 'Bloquear Ping',
+        disableBanPing: 'Desbloquear Ping',
         noPingTitle: 'Desativar ping',
         noPingHelper: 'Isso desativará o ping, e o servidor não responderá ao ICMP. Deseja continuar?',
         onPingHelper: 'Isso ativará o ping, permitindo que hackers descubram seu servidor. Deseja continuar?',

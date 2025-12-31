@@ -201,13 +201,13 @@ func (u *FirewallService) OperateFirewall(req dto.FirewallOperation) error {
 			return err
 		}
 		needRestartDocker = true
-	case "disablePing":
+	case "disableBanPing":
 		if err := firewall.UpdatePingStatus("0"); err != nil {
 			_ = settingRepo.Update("BanPing", constant.StatusDisable)
 			return err
 		}
 		return nil
-	case "enablePing":
+	case "enableBanPing":
 		if err := firewall.UpdatePingStatus("1"); err != nil {
 			_ = settingRepo.Update("BanPing", constant.StatusEnable)
 			return err

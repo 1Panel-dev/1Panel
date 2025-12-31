@@ -1237,6 +1237,7 @@ const message = {
             interactive: 'Etkileşimli script',
             interactiveHelper: 'Yürütme sırasında kullanıcı girişi gerektirir ve zamanlanmış görevlerde kullanılamaz.',
             library: 'Script Kütüphanesi',
+            remoteLibrary: 'Uzak Komut Dosyası Kütüphanesi',
             create: 'Script Ekle',
             edit: 'Script Düzenle',
             groupHelper:
@@ -2018,7 +2019,7 @@ const message = {
         error416: 'Aralık Karşılanamadı',
         error444: 'Bağlantı Kapalı',
         error500: 'Dahili Sunucu Hatası',
-        https: 'Panel için HTTPS ayarlamak erişim güvenliğini artırır.\nStrict modda HTTPS olmayan trafik panele bağlanamaz.\nMux modu HTTP\'yi HTTPS\'e yönlendirir, ancak güvenliği biraz azaltabilir.',
+        https: "Panel için HTTPS ayarlamak erişim güvenliğini artırır.\nStrict modda HTTPS olmayan trafik panele bağlanamaz.\nMux modu HTTP'yi HTTPS'e yönlendirir, ancak güvenliği biraz azaltabilir.",
         certType: 'Sertifika türü',
         selfSigned: 'Kendi kendine imzalı',
         selfSignedHelper:
@@ -2974,6 +2975,8 @@ const message = {
         startFirewallHelper:
             'Güvenlik duvarı etkinleştirildiğinde, sunucu güvenliği daha iyi korunabilir. Devam etmek istiyor musunuz?',
         noPing: 'Ping’i devre dışı bırak',
+        enableBanPing: 'Ping Engelle',
+        disableBanPing: 'Ping Engellemeyi Kaldır',
         noPingTitle: 'Ping’i devre dışı bırak',
         noPingHelper:
             'Bu, ping’i devre dışı bırakacak ve sunucu ICMP yanıtını geri göndermeyecek. Devam etmek istiyor musunuz?',

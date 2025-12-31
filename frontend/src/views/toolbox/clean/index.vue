@@ -600,8 +600,16 @@ function load18n(label: string) {
         case 'System':
         case 'Website':
             return i18n.global.t('menu.' + label.toLowerCase());
+        case 'Backup':
+            return i18n.global.t('logs.detail.backups');
+        case 'Tamper':
+            return i18n.global.t('xpack.tamper.tamper');
+        case 'TaskRollback':
+            return i18n.global.t('setting.rollback');
         case 'Script':
             return i18n.global.t('cronjob.library.library');
+        case 'ScriptLibrary':
+            return i18n.global.t('cronjob.library.remoteLibrary');
         case 'Compose':
             return i18n.global.t('container.compose');
         case 'CustomAppstore':

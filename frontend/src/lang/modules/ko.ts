@@ -1178,6 +1178,7 @@ const message = {
             interactive: '대화형 스크립트',
             interactiveHelper: '실행 중 사용자 입력이 필요하며 예약 작업에서는 사용할 수 없습니다.',
             library: '스크립트 라이브러리',
+            remoteLibrary: 'リモートスクリプトライブラリ',
             create: '스크립트 추가',
             edit: '스크립트 수정',
             groupHelper:
@@ -2803,6 +2804,8 @@ const message = {
         stopFirewallHelper: '이 작업은 서버 보안을 잃게 만듭니다. 계속하시겠습니까?',
         startFirewallHelper: '방화벽이 활성화되면 서버 보안이 강화됩니다. 계속하시겠습니까?',
         noPing: 'Ping 비활성화',
+        enableBanPing: 'Ping 차단',
+        disableBanPing: 'Ping 차단 해제',
         noPingTitle: 'Ping 비활성화',
         noPingHelper: '이 작업은 Ping 을 비활성화하며 서버는 ICMP 응답을 보내지 않게 됩니다. 계속하시겠습니까?',
         onPingHelper: '이 작업은 Ping 을 활성화하여 해커가 서버를 발견할 수 있습니다. 계속하시겠습니까?',

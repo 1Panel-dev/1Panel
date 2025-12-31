@@ -22560,6 +22560,12 @@ const docTemplate = `{
 		},
 		"dto.CleanData": {
 			"properties": {
+				"backupClean": {
+					"items": {
+						"$ref": "#/definitions/dto.CleanTree"
+					},
+					"type": "array"
+				},
 				"containerClean": {
 					"items": {
 						"$ref": "#/definitions/dto.CleanTree"
@@ -22821,10 +22827,7 @@ const docTemplate = `{
 		"dto.ComposeCreate": {
 			"properties": {
 				"env": {
-					"items": {
-						"type": "string"
-					},
-					"type": "array"
+					"type": "string"
 				},
 				"file": {
 					"type": "string"
@@ -22857,6 +22860,9 @@ const docTemplate = `{
 		},
 		"dto.ComposeLogClean": {
 			"properties": {
+				"detailPath": {
+					"type": "string"
+				},
 				"name": {
 					"type": "string"
 				},
@@ -22972,11 +22978,11 @@ const docTemplate = `{
 				"content": {
 					"type": "string"
 				},
+				"detailPath": {
+					"type": "string"
+				},
 				"env": {
-					"items": {
-						"type": "string"
-					},
-					"type": "array"
+					"type": "string"
 				},
 				"name": {
 					"type": "string"
@@ -24591,8 +24597,8 @@ const docTemplate = `{
 						"start",
 						"stop",
 						"restart",
-						"disablePing",
-						"enablePing"
+						"disableBanPing",
+						"enableBanPing"
 					],
 					"type": "string"
 				},
@@ -25254,6 +25260,9 @@ const docTemplate = `{
 		},
 		"dto.InspectReq": {
 			"properties": {
+				"detail": {
+					"type": "string"
+				},
 				"id": {
 					"type": "string"
 				},
@@ -27541,7 +27550,8 @@ const docTemplate = `{
 				"ssl": {
 					"enum": [
 						"Enable",
-						"Disable"
+						"Disable",
+						"Mux"
 					],
 					"type": "string"
 				},
@@ -29048,6 +29058,9 @@ const docTemplate = `{
 				"id": {
 					"type": "integer"
 				},
+				"isIP": {
+					"type": "boolean"
+				},
 				"keyType": {
 					"type": "string"
 				},
@@ -29689,6 +29702,9 @@ const docTemplate = `{
 				},
 				"mountPoint": {
 					"type": "string"
+				},
+				"noFail": {
+					"type": "boolean"
 				}
 			},
 			"required": [
@@ -32179,6 +32195,9 @@ const docTemplate = `{
 				"content": {
 					"type": "string"
 				},
+				"sync": {
+					"type": "boolean"
+				},
 				"type": {
 					"type": "string"
 				}
@@ -32534,6 +32553,9 @@ const docTemplate = `{
 				},
 				"id": {
 					"type": "integer"
+				},
+				"isIp": {
+					"type": "boolean"
 				},
 				"keyType": {
 					"type": "string"
@@ -34691,6 +34713,9 @@ const docTemplate = `{
 				},
 				"id": {
 					"type": "integer"
+				},
+				"isIP": {
+					"type": "boolean"
 				},
 				"keyType": {
 					"type": "string"

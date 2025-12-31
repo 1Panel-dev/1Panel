@@ -22556,6 +22556,12 @@
 		},
 		"dto.CleanData": {
 			"properties": {
+				"backupClean": {
+					"items": {
+						"$ref": "#/definitions/dto.CleanTree"
+					},
+					"type": "array"
+				},
 				"containerClean": {
 					"items": {
 						"$ref": "#/definitions/dto.CleanTree"
@@ -22817,10 +22823,7 @@
 		"dto.ComposeCreate": {
 			"properties": {
 				"env": {
-					"items": {
-						"type": "string"
-					},
-					"type": "array"
+					"type": "string"
 				},
 				"file": {
 					"type": "string"
@@ -22853,6 +22856,9 @@
 		},
 		"dto.ComposeLogClean": {
 			"properties": {
+				"detailPath": {
+					"type": "string"
+				},
 				"name": {
 					"type": "string"
 				},
@@ -22968,11 +22974,11 @@
 				"content": {
 					"type": "string"
 				},
+				"detailPath": {
+					"type": "string"
+				},
 				"env": {
-					"items": {
-						"type": "string"
-					},
-					"type": "array"
+					"type": "string"
 				},
 				"name": {
 					"type": "string"
@@ -24587,8 +24593,8 @@
 						"start",
 						"stop",
 						"restart",
-						"disablePing",
-						"enablePing"
+						"disableBanPing",
+						"enableBanPing"
 					],
 					"type": "string"
 				},
@@ -25250,6 +25256,9 @@
 		},
 		"dto.InspectReq": {
 			"properties": {
+				"detail": {
+					"type": "string"
+				},
 				"id": {
 					"type": "string"
 				},
@@ -27537,7 +27546,8 @@
 				"ssl": {
 					"enum": [
 						"Enable",
-						"Disable"
+						"Disable",
+						"Mux"
 					],
 					"type": "string"
 				},
@@ -29044,6 +29054,9 @@
 				"id": {
 					"type": "integer"
 				},
+				"isIP": {
+					"type": "boolean"
+				},
 				"keyType": {
 					"type": "string"
 				},
@@ -29685,6 +29698,9 @@
 				},
 				"mountPoint": {
 					"type": "string"
+				},
+				"noFail": {
+					"type": "boolean"
 				}
 			},
 			"required": [
@@ -32175,6 +32191,9 @@
 				"content": {
 					"type": "string"
 				},
+				"sync": {
+					"type": "boolean"
+				},
 				"type": {
 					"type": "string"
 				}
@@ -32530,6 +32549,9 @@
 				},
 				"id": {
 					"type": "integer"
+				},
+				"isIp": {
+					"type": "boolean"
 				},
 				"keyType": {
 					"type": "string"
@@ -34687,6 +34709,9 @@
 				},
 				"id": {
 					"type": "integer"
+				},
+				"isIP": {
+					"type": "boolean"
 				},
 				"keyType": {
 					"type": "string"

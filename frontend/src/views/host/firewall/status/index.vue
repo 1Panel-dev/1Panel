@@ -256,7 +256,7 @@ const onPingOperate = async (operation: string) => {
     })
         .then(async () => {
             emit('update:loading', true);
-            operation = operation === 'Disable' ? 'disablePing' : 'enablePing';
+            operation = operation === 'Disable' ? 'disableBanPing' : 'enableBanPing';
             emit('update:maskShow', true);
             await operateFire(operation, false)
                 .then(() => {

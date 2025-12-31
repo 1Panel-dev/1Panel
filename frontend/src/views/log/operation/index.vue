@@ -183,6 +183,8 @@ const replacements = {
     '[Enable]': 'commons.button.enable',
     '[disable]': 'commons.button.disable',
     '[Disable]': 'commons.button.disable',
+    '[disableBanPing]': 'firewall.disableBanPing',
+    '[enableBanPing]': 'firewall.enableBanPing',
     '[light]': 'setting.light',
     '[dark]': 'setting.dark',
     '[delete]': 'commons.button.delete',
