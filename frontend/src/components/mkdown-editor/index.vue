@@ -8,6 +8,7 @@ import 'md-editor-v3/lib/style.css';
 import DOMPurify from 'dompurify';
 import { GlobalStore } from '@/store';
 import { storeToRefs } from 'pinia';
+import { computed } from 'vue';
 
 const globalStore = GlobalStore();
 const { isDarkTheme } = storeToRefs(globalStore);
