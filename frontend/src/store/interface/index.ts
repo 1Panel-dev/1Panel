@@ -44,6 +44,7 @@ export interface GlobalState {
     device: DeviceType;
     lastFilePath: string;
     currentDB: string;
+    currentPgDB: string;
     currentRedisDB: string;
     showEntranceWarn: boolean;
     defaultNetwork: string;

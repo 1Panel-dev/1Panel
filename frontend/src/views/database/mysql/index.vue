@@ -398,6 +398,7 @@ const changeDatabase = async () => {
     for (const item of dbOptionsLocal.value) {
         if (item.database == currentDBName.value) {
             currentDB.value = item;
+            globalStore.setCurrentDB(currentDB.value.database);
             appKey.value = item.type;
             appName.value = item.database;
             search();
@@ -409,6 +410,7 @@ const changeDatabase = async () => {
         if (item.database == currentDBName.value) {
             maskShow.value = false;
             currentDB.value = item;
+            globalStore.setCurrentDB(currentDB.value.database);
             break;
         }
     }
@@ -532,7 +534,6 @@ const loadDBOptions = async () => {
             if (currentDB.value?.from === 'remote') {
                 maskShow.value = false;
             }
-            globalStore.setCurrentDB('');
             search();
             return;
         }
