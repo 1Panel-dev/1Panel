@@ -3762,6 +3762,8 @@ const message = {
                 '現在、単体アプリケーションと MySQL、MariaDB、PostgreSQL データベースのみに関連するアプリケーションの移行のみをサポートしています',
             opensslHelper:
                 '暗号化バックアップを使用する場合、2つのノード間のOpenSSLバージョンは一致している必要があります。そうしないと、移行が失敗する可能性があります。',
+            installApp: '一括インストール',
+            installAppHelper: '選択したノードにアプリを一括インストール',
         },
         alert: {
             isAlert: 'アラート',

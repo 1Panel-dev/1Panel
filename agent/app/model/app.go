@@ -34,6 +34,7 @@ type App struct {
 	MemoryRequired       int     `json:"memoryRequired"`
 	GpuSupport           bool    `json:"gpuSupport"`
 	RequiredPanelVersion float64 `json:"requiredPanelVersion"`
+	BatchInstallSupport  bool    `json:"batchInstallSupport" yaml:"batchInstallSupport"`
 
 	Details []AppDetail `json:"-" gorm:"-:migration"`
 	TagsKey []string    `json:"tags" yaml:"tags" gorm:"-"`

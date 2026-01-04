@@ -3872,6 +3872,8 @@ const message = {
                 'Currently only supports migrating monolithic applications and applications associated only with MySQL, MariaDB, PostgreSQL databases',
             opensslHelper:
                 'If using encrypted backup, the OpenSSL versions between the two nodes must be consistent, otherwise migration may fail.',
+            installApp: 'Batch install',
+            installAppHelper: 'Batch install apps to selected nodes',
         },
         alert: {
             isAlert: 'Alert',

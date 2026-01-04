@@ -111,6 +111,11 @@ FailedStatus: "{{ .name }} 失敗 {{ .err }}"
 Start: "開始"
 SubTask: "サブタスク"
 Skip: "エラーを無視して続行..."
+PushAppInstallTaskToNode: "アプリインストールタスクをノード [{{ .name }}] にプッシュ"
+TaskPush: "プッシュ"
+AppInstallTask: "アプリインストールタスク"
+PushAppFailed: "アプリインストールタスクのプッシュに失敗しました"
+Success: "成功"
 
 #script
 ScriptLibrary: "スクリプトライブラリ"

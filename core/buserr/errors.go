@@ -30,12 +30,16 @@ func (e BusinessError) Error() string {
 	return content
 }
 
-func New(Key string) BusinessError {
-	return BusinessError{
-		Msg:    Key,
-		Detail: nil,
-		Err:    nil,
+func New(key string, opts ...Option) BusinessError {
+	be := BusinessError{
+		Msg: key,
 	}
+
+	for _, opt := range opts {
+		opt(&be)
+	}
+
+	return be
 }
 
 func WithErr(Key string, err error) BusinessError {
@@ -74,5 +78,30 @@ func WithName(Key string, name string) BusinessError {
 	return BusinessError{
 		Msg: Key,
 		Map: paramMap,
+	}
+}
+
+type Option func(*BusinessError)
+
+func WithNameOption(name string) Option {
+	return func(be *BusinessError) {
+		if name != "" {
+			if be.Map == nil {
+				be.Map = make(map[string]interface{})
+			}
+			be.Map["name"] = name
+		}
+	}
+}
+
+func WithErrOption(err error) Option {
+	return func(be *BusinessError) {
+		be.Err = err
+		if err != nil {
+			if be.Map == nil {
+				be.Map = make(map[string]interface{})
+			}
+			be.Map["err"] = err
+		}
 	}
 }

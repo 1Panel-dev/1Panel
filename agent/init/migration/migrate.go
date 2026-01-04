@@ -60,6 +60,7 @@ func InitAgentDB() {
 		migrations.UpdateWebsite,
 		migrations.AddisIPtoWebsiteSSL,
 		migrations.InitPingStatus,
+		migrations.UpdateApp,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

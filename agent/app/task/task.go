@@ -96,6 +96,7 @@ const (
 	TaskScopeCustomAppstore   = "CustomAppstore"
 	TaskScopeTamper           = "Tamper"
 	TaskScopeFileConvert      = "Convert"
+	TaskScopeTask             = "Task"
 )
 
 func GetTaskName(resourceName, operate, scope string) string {

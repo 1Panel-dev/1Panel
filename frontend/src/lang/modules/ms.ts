@@ -3832,6 +3832,8 @@ const message = {
                 'Kini hanya menyokong penghijrahan aplikasi monolitik dan aplikasi yang hanya dikaitkan dengan pangkalan data MySQL, MariaDB, PostgreSQL',
             opensslHelper:
                 'Jika menggunakan sandaran terenkripsi, versi OpenSSL antara dua nod mesti konsisten, jika tidak penghijrahan mungkin gagal.',
+            installApp: 'Pemasangan kelompok',
+            installAppHelper: 'Pasang aplikasi secara kelompok ke nod yang dipilih',
         },
         alert: {
             isAlert: 'Amaran',

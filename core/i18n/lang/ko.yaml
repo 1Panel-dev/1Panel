@@ -110,6 +110,11 @@ FailedStatus: "{{ .name }} 실패 {{ .err }}"
 Start: "시작"
 SubTask: "서브 작업"
 Skip: "오류 무시하고 계속..."
+PushAppInstallTaskToNode: "노드 [{{ .name }}]에 앱 설치 작업 푸시"
+TaskPush: "푸시"
+AppInstallTask: "앱 설치 작업"
+PushAppFailed: "앱 설치 작업 푸시 실패"
+Success: "성공"
 
 #script
 ScriptLibrary: "스크립트 라이브러리"

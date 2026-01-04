@@ -109,6 +109,11 @@ FailedStatus: "{{ .name }} başarısız {{ .err }}"
 Start: "Başla"
 SubTask: "Alt görev"
 Skip: "Hataları atla ve devam et..."
+PushAppInstallTaskToNode: "Uygulama kurulum görevini düğüme [{{ .name }}] gönder"
+TaskPush: "Gönder"
+AppInstallTask: "Uygulama kurulum görevi"
+PushAppFailed: "Uygulama kurulum görevi gönderilemedi"
+Success: "Başarılı"
 
 #script
 ScriptLibrary: "Betik Kütüphanesi"

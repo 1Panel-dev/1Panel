@@ -29,17 +29,18 @@ type AppDTO struct {
 }
 
 type AppItem struct {
-	Name        string   `json:"name"`
-	Key         string   `json:"key"`
-	ID          uint     `json:"id"`
-	Description string   `json:"description"`
-	Status      string   `json:"status"`
-	Installed   bool     `json:"installed"`
-	Limit       int      `json:"limit"`
-	Tags        []string `json:"tags"`
-	GpuSupport  bool     `json:"gpuSupport"`
-	Recommend   int      `json:"recommend"`
-	Type        string   `json:"type"`
+	Name                string   `json:"name"`
+	Key                 string   `json:"key"`
+	ID                  uint     `json:"id"`
+	Description         string   `json:"description"`
+	Status              string   `json:"status"`
+	Installed           bool     `json:"installed"`
+	Limit               int      `json:"limit"`
+	Tags                []string `json:"tags"`
+	GpuSupport          bool     `json:"gpuSupport"`
+	Recommend           int      `json:"recommend"`
+	Type                string   `json:"type"`
+	BatchInstallSupport bool     `json:"batchInstallSupport"`
 }
 
 type TagDTO struct {
@@ -73,6 +74,10 @@ type AppDetailDTO struct {
 	Architectures  string      `json:"architectures"`
 	MemoryRequired int         `json:"memoryRequired"`
 	GpuSupport     bool        `json:"gpuSupport"`
+}
+
+type AppDetailSimpleDTO struct {
+	ID uint `json:"id"`
 }
 
 type IgnoredApp struct {

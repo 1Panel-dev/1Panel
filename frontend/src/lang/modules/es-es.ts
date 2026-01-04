@@ -3834,6 +3834,8 @@ const message = {
                 'Actualmente solo admite la migración de aplicaciones monolíticas y aplicaciones asociadas únicamente con bases de datos MySQL, MariaDB, PostgreSQL',
             opensslHelper:
                 'Si se utiliza copia de seguridad cifrada, las versiones de OpenSSL entre los dos nodos deben ser consistentes, de lo contrario la migración puede fallar.',
+            installApp: 'Instalación por lotes',
+            installAppHelper: 'Instalar aplicaciones por lotes en los nodos seleccionados',
         },
         alert: {
             isAlert: 'Alerta',

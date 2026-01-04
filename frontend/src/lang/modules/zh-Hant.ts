@@ -3573,6 +3573,8 @@ const message = {
             nodeHelper: '不能選擇當前節點',
             migrateHelper: '目前僅支持遷移單體應用和只關聯 MySQL、MariaDB、PostgreSQL 數據庫的應用',
             opensslHelper: '如果使用加密備份，兩個節點之間的 OpenSSL 版本必須保持一致，否則可能導致遷移失敗。',
+            installApp: '批量安裝',
+            installAppHelper: '批量安裝應用到選擇的節點中',
         },
         alert: {
             isAlert: '是否告警',

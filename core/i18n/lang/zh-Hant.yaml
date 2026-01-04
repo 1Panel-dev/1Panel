@@ -110,6 +110,11 @@ FailedStatus: "{{ .name }} 失敗 {{ .err }}"
 Start: "開始"
 SubTask: "子任務"
 Skip: "忽略錯誤並繼續..."
+PushAppInstallTaskToNode: "推送應用安裝任務到節點 [{{ .name }}]"
+TaskPush: "推送"
+AppInstallTask: "應用安裝任務"
+PushAppFailed: "推送應用安裝任務失敗"
+Success: "成功"
 
 #script
 ScriptLibrary: "腳本庫"

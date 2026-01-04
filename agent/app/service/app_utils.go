@@ -1312,6 +1312,7 @@ func getApps(oldApps []model.App, items []dto.AppDefine, systemVersion string, t
 		app.MemoryRequired = config.MemoryRequired
 		app.Architectures = strings.Join(config.Architectures, ",")
 		app.GpuSupport = config.GpuSupport
+		app.BatchInstallSupport = config.BatchInstallSupport
 		apps[key] = app
 	}
 	return apps

@@ -84,25 +84,26 @@ type ExtraProperties struct {
 }
 
 type AppProperty struct {
-	Name               string   `json:"name"`
-	Type               string   `json:"type"`
-	Tags               []string `json:"tags"`
-	ShortDescZh        string   `json:"shortDescZh" yaml:"shortDescZh"`
-	ShortDescEn        string   `json:"shortDescEn" yaml:"shortDescEn"`
-	Description        Locale   `json:"description"`
-	Key                string   `json:"key"`
-	Required           []string `json:"Required"`
-	CrossVersionUpdate bool     `json:"crossVersionUpdate" yaml:"crossVersionUpdate"`
-	Limit              int      `json:"limit" yaml:"limit"`
-	Recommend          int      `json:"recommend" yaml:"recommend"`
-	Website            string   `json:"website"`
-	Github             string   `json:"github"`
-	Document           string   `json:"document"`
-	Architectures      []string `json:"architectures"`
-	MemoryRequired     int      `json:"memoryRequired" yaml:"memoryRequired"`
-	GpuSupport         bool     `json:"gpuSupport" yaml:"gpuSupport"`
-	Version            float64  `json:"version"`
-	Deprecated         float64  `json:"deprecated"`
+	Name                string   `json:"name"`
+	Type                string   `json:"type"`
+	Tags                []string `json:"tags"`
+	ShortDescZh         string   `json:"shortDescZh" yaml:"shortDescZh"`
+	ShortDescEn         string   `json:"shortDescEn" yaml:"shortDescEn"`
+	Description         Locale   `json:"description"`
+	Key                 string   `json:"key"`
+	Required            []string `json:"Required"`
+	CrossVersionUpdate  bool     `json:"crossVersionUpdate" yaml:"crossVersionUpdate"`
+	Limit               int      `json:"limit" yaml:"limit"`
+	Recommend           int      `json:"recommend" yaml:"recommend"`
+	Website             string   `json:"website"`
+	Github              string   `json:"github"`
+	Document            string   `json:"document"`
+	Architectures       []string `json:"architectures"`
+	MemoryRequired      int      `json:"memoryRequired" yaml:"memoryRequired"`
+	GpuSupport          bool     `json:"gpuSupport" yaml:"gpuSupport"`
+	Version             float64  `json:"version"`
+	Deprecated          float64  `json:"deprecated"`
+	BatchInstallSupport bool     `json:"batchInstallSupport"`
 }
 
 type AppConfigVersion struct {

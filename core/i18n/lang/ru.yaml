@@ -110,6 +110,10 @@ FailedStatus: "{{ .name }} не удалось {{ .err }}"
 Start: "Начать"
 SubTask: "Подзадача"
 Skip: "Пропустить ошибки и продолжить..."
+TaskPush: "Отправить"
+AppInstallTask: "Задача установки приложения"
+PushAppFailed: "Не удалось отправить задачу установки приложения"
+Success: "Успешно"
 
 #script
 ScriptLibrary: "Библиотека скриптов"

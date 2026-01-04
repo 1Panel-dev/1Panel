@@ -110,6 +110,11 @@ FailedStatus: "{{ .name }} falhou {{ .err }}"
 Start: "Iniciar"
 SubTask: "Subtarefa"
 Skip: "Ignorar erros e continuar..."
+PushAppInstallTaskToNode: "Enviar tarefa de instalação de aplicativo para o nó [{{ .name }}]"
+TaskPush: "Enviar"
+AppInstallTask: "Tarefa de instalação de aplicativo"
+PushAppFailed: "Falha ao enviar tarefa de instalação de aplicativo"
+Success: "Sucesso"
 
 #script
 ScriptLibrary: "Biblioteca de Scripts"

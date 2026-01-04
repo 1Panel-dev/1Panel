@@ -14,6 +14,11 @@ ErrApiConfigKeyInvalid: "Error de clave API: {{ .detail }}"
 ErrApiConfigIPInvalid: "La IP de la solicitud API no está en la lista blanca: {{ .detail }}"
 ErrApiConfigDisable: "Esta interfaz prohíbe llamadas a la API: {{ .detail }}"
 ErrApiConfigKeyTimeInvalid: "Error de marca de tiempo de API: {{ .detail }}"
+PushAppInstallTaskToNode: "Enviar tarea de instalación de aplicación al nodo [{{ .name }}]"
+TaskPush: "Enviar"
+AppInstallTask: "Tarea de instalación de aplicación"
+PushAppFailed: "Error al enviar tarea de instalación de aplicación"
+Success: "Éxito"
 
 # request
 ErrNoSuchHost: "No se pudo encontrar el servidor solicitado {{ .err }}"

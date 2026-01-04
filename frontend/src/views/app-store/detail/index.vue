@@ -66,22 +66,22 @@
                     </el-descriptions>
                 </div>
             </div>
-            <MdEditor previewOnly v-model="app.readMe" :theme="isDarkTheme ? 'dark' : 'light'" />
+            <MarkDownEditor :content="app.readMe" />
         </template>
     </DrawerPro>
     <Install ref="installRef" />
 </template>
 
 <script lang="ts" setup>
+import MarkDownEditor from '@/components/mkdown-editor/index.vue';
+
 import { getAppByKey, getAppDetail, getAppIconUrl } from '@/api/modules/app';
-import MdEditor from 'md-editor-v3';
 import { ref } from 'vue';
 import Install from './install/index.vue';
 import { computeSizeFromMB } from '@/utils/util';
 import { jumpToInstall } from '@/utils/app';
-
 import { useGlobalStore } from '@/composables/useGlobalStore';
-const { currentNode, isDarkTheme } = useGlobalStore();
+const { currentNode } = useGlobalStore();
 
 const app = ref<any>({});
 const appDetail = ref<any>({});

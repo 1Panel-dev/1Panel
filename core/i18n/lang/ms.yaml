@@ -105,6 +105,11 @@ FailedStatus: "{{ .name }} gagal {{ .err }}"
 Start: "Mula"
 SubTask: "Tugas Sub"
 Skip: "Abaikan ralat dan teruskan..."
+PushAppInstallTaskToNode: "Tolak tugas pemasangan aplikasi ke nod [{{ .name }}]"
+TaskPush: "Tolak"
+AppInstallTask: "Tugas pemasangan aplikasi"
+PushAppFailed: "Gagal menolak tugas pemasangan aplikasi"
+Success: "Berjaya"
 
 #script 
 ScriptLibrary: "Pustaka Skrip"

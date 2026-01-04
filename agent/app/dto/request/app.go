@@ -22,7 +22,16 @@ type AppInstallCreate struct {
 	Name        string                 `json:"name" validate:"required"`
 	Services    map[string]string      `json:"services"`
 	TaskID      string                 `json:"taskID"`
+
 	AppContainerConfig
+	NodePushConfig
+}
+
+type NodePushConfig struct {
+	Nodes    []string `json:"nodes"`
+	PushNode bool     `json:"pushNode"`
+	AppKey   string   `json:"appKey"`
+	Version  string   `json:"version"`
 }
 
 type AppContainerConfig struct {

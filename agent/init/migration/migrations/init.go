@@ -800,3 +800,10 @@ var InitPingStatus = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var UpdateApp = &gormigrate.Migration{
+	ID: "20251228-update-app",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(&model.App{})
+	},
+}

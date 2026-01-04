@@ -3913,6 +3913,8 @@ const message = {
                 'Şu anda yalnızca tek parça uygulamaların ve yalnızca MySQL, MariaDB, PostgreSQL veritabanlarıyla ilişkili uygulamaların taşınmasını destekler',
             opensslHelper:
                 'Şifreli yedekleme kullanılıyorsa, iki düğüm arasındaki OpenSSL sürümleri tutarlı olmalıdır, aksi takdirde geçiş başarısız olabilir.',
+            installApp: 'Toplu kurulum',
+            installAppHelper: 'Seçilen düğümlere uygulamaları toplu kur',
         },
         alert: {
             isAlert: 'Uyarı',

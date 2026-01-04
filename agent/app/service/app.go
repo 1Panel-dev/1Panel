@@ -47,6 +47,7 @@ type IAppService interface {
 	GetAppDetailByID(id uint) (*response.AppDetailDTO, error)
 	SyncAppListFromLocal(taskID string)
 	GetAppIcon(appID uint) ([]byte, error)
+	GetAppDetailByKey(appKey, version string) (response.AppDetailSimpleDTO, error)
 }
 
 func NewIAppService() IAppService {
@@ -118,14 +119,15 @@ func (a AppService) PageApp(ctx *gin.Context, req request.AppSearch) (*response.
 			}
 		}
 		appDTO := &response.AppItem{
-			ID:          ap.ID,
-			Name:        ap.Name,
-			Key:         ap.Key,
-			Limit:       ap.Limit,
-			GpuSupport:  ap.GpuSupport,
-			Recommend:   ap.Recommend,
-			Description: ap.GetDescription(ctx),
-			Type:        ap.Type,
+			ID:                  ap.ID,
+			Name:                ap.Name,
+			Key:                 ap.Key,
+			Limit:               ap.Limit,
+			GpuSupport:          ap.GpuSupport,
+			Recommend:           ap.Recommend,
+			Description:         ap.GetDescription(ctx),
+			Type:                ap.Type,
+			BatchInstallSupport: ap.BatchInstallSupport,
 		}
 		appDTOs = append(appDTOs, appDTO)
 		tags, err := getAppTags(ap.ID, lang)
@@ -201,6 +203,20 @@ func (a AppService) GetApp(ctx *gin.Context, key string) (*response.AppDTO, erro
 	}
 	appDTO.Tags = tags
 	return &appDTO, nil
+}
+
+func (a AppService) GetAppDetailByKey(appKey, version string) (response.AppDetailSimpleDTO, error) {
+	var appDetailDTO response.AppDetailSimpleDTO
+	app, err := appRepo.GetFirst(appRepo.WithKey(appKey))
+	if err != nil {
+		return appDetailDTO, err
+	}
+	appDetail, err := appDetailRepo.GetFirst(appDetailRepo.WithAppId(app.ID), appDetailRepo.WithVersion(version))
+	if err != nil {
+		return appDetailDTO, err
+	}
+	appDetailDTO.ID = appDetail.ID
+	return appDetailDTO, nil
 }
 
 func (a AppService) GetAppDetail(appID uint, version, appType string) (response.AppDetailDTO, error) {
@@ -386,11 +402,21 @@ func (a AppService) Install(req request.AppInstallCreate) (appInstall *model.App
 		App:         app,
 	}
 	composeMap := make(map[string]interface{})
+	var composeRes []byte
 	if req.EditCompose {
 		if err = yaml.Unmarshal([]byte(req.DockerCompose), &composeMap); err != nil {
 			return
 		}
 	} else {
+		if appDetail.DockerCompose == "" {
+			dockerComposeUrl := fmt.Sprintf("%s/%s/1panel/%s/%s/docker-compose.yml", global.CONF.RemoteURL.AppRepo, global.CONF.Base.Mode, app.Key, appDetail.Version)
+			_, composeRes, err = req_helper.HandleRequest(dockerComposeUrl, http.MethodGet, constant.TimeOut20s)
+			if err != nil {
+				return
+			}
+			appDetail.DockerCompose = string(composeRes)
+			_ = appDetailRepo.Update(context.Background(), appDetail)
+		}
 		if err = yaml.Unmarshal([]byte(appDetail.DockerCompose), &composeMap); err != nil {
 			return
 		}

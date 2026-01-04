@@ -17,6 +17,7 @@ export namespace App {
         website?: string;
         github?: string;
         readme: string;
+        batchInstallSupport: boolean;
     }
 
     interface Locale {
@@ -55,6 +56,7 @@ export namespace App {
         tags: string[];
         gpuSupport: boolean;
         recommend: number;
+        batchInstallSupport: boolean;
     }
 
     export interface AppResPage {
@@ -132,6 +134,7 @@ export namespace App {
         appDetailId: number;
         params: any;
         taskID: string;
+        name: string;
     }
 
     export interface AppInstallSearch extends ReqPage {

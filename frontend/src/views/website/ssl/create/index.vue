@@ -149,6 +149,7 @@
                     v-if="isMaster && isMasterProductPro"
                     :push-node="ssl.pushNode"
                     :nodes="ssl.pushNodes"
+                    type="ssl"
                     @update:push-node="ssl.pushNode = $event"
                     @update:nodes="ssl.pushNodes = $event"
                 />

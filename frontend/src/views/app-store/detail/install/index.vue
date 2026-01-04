@@ -1,6 +1,11 @@
 <template>
     <DrawerPro v-model="open" :header="$t('commons.button.install')" @close="handleClose" size="large">
-        <AppInstallForm ref="installFormRef" v-model="formData" :loading="loading" />
+        <AppInstallForm
+            ref="installFormRef"
+            v-model="formData"
+            :loading="loading"
+            :batch-install-support="batchInstallSupport"
+        />
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose" :disabled="loading">
@@ -24,12 +29,15 @@ import { newUUID } from '@/utils/util';
 import { routerToName } from '@/utils/router';
 import TaskLog from '@/components/log/task/index.vue';
 import i18n from '@/lang';
+import { installAppToNodes } from '@/xpack/api/modules/appstore';
 
 const router = useRouter();
 const open = ref(false);
 const loading = ref(false);
 const installFormRef = ref<InstanceType<typeof AppInstallForm>>();
 const taskLogRef = ref();
+const appKey = ref('');
+const batchInstallSupport = ref(false);
 
 const formData = ref({
     appDetailId: 0,
@@ -98,7 +106,12 @@ const install = async (submitData: any) => {
     submitData.taskID = taskID;
 
     try {
-        await installApp(submitData);
+        if (submitData.pushNode) {
+            submitData.appKey = appKey.value;
+            await installAppToNodes(submitData);
+        } else {
+            await installApp(submitData);
+        }
         handleClose();
         openTaskLog(taskID);
     } catch (error) {
@@ -112,6 +125,8 @@ const openTaskLog = (taskID: string) => {
 };
 
 const acceptParams = async (props: { app: any; params?: any }) => {
+    appKey.value = props.app.key;
+    batchInstallSupport.value = props.app.batchInstallSupport;
     open.value = true;
     await nextTick();
     installFormRef.value?.resetForm();

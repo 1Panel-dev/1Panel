@@ -56,14 +56,16 @@ const (
 	TaskInstallCluster = "TaskInstallCluster"
 	TaskCreateCluster  = "TaskCreateCluster"
 	TaskBackup         = "TaskBackup"
+	TaskPush           = "TaskPush"
 )
 
 const (
-	TaskScopeSystem    = "System"
-	TaskScopeScript    = "ScriptLibrary"
-	TaskScopeNodeFile  = "NodeFile"
-	TaskScopeAppBackup = "AppBackup"
-	TaskScopeCluster   = "Cluster"
+	TaskScopeSystem     = "System"
+	TaskScopeScript     = "ScriptLibrary"
+	TaskScopeNodeFile   = "NodeFile"
+	TaskScopeAppBackup  = "AppBackup"
+	TaskScopeCluster    = "Cluster"
+	TaskScopeAppInstall = "AppInstallTask"
 )
 
 func GetTaskName(resourceName, operate, scope string) string {

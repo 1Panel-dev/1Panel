@@ -3566,6 +3566,8 @@ const message = {
             nodeHelper: '不能选择当前节点',
             migrateHelper: '当前仅支持迁移单体应用和只关联 MySQL、MariaDB、PostgreSQL 数据库的应用',
             opensslHelper: '如果使用加密备份，两个节点之间的 openssl 版本必须保持一致，不然会导致迁移失败',
+            installApp: '批量安装',
+            installAppHelper: '批量安装应用到选择的节点中',
         },
         alert: {
             isAlert: '是否告警',

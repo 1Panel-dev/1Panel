@@ -220,3 +220,23 @@ func (b *BaseApi) GetAppIcon(c *gin.Context) {
 	c.Header("Last-Modified", time.Now().UTC().Format(http.TimeFormat))
 	c.Data(http.StatusOK, "image/png", iconBytes)
 }
+
+// @Tags App
+// @Summary Search app detail by appkey and version
+// @Accept json
+// @Param appId path integer true "app key"
+// @Param version path string true "app version"
+// @Success 200 {object} response.AppDetailSimpleDTO
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /apps/detail/node/:appKey/:version [get]
+func (b *BaseApi) GetAppDetailForNode(c *gin.Context) {
+	appKey := c.Param("appKey")
+	version := c.Param("version")
+	appDetailDTO, err := appService.GetAppDetailByKey(appKey, version)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, appDetailDTO)
+}

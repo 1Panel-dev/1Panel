@@ -110,6 +110,11 @@ FailedStatus: "{{ .name }} failed {{ .err }}"
 Start: "Start"
 SubTask: "Subtask"
 Skip: "Skip errors and continue..."
+PushAppInstallTaskToNode: "Push app installation task to node [{{ .name }}]"
+TaskPush: "Push"
+AppInstallTask: "App installation task"
+PushAppFailed: "Failed to push app installation task"
+Success: "Success"
 
 #script
 ScriptLibrary: "Script Library"
