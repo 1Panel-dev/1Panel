@@ -72,21 +72,18 @@
                 </div>
             </div>
         </div>
-        <MdEditor previewOnly v-model="app.readMe" :theme="isDarkTheme ? 'dark' : 'light'" />
+        <MarkDownEditor :content="app.readMe" />
     </el-drawer>
     <Install ref="installRef"></Install>
 </template>
 
 <script lang="ts" setup>
+import MarkDownEditor from '@/components/mkdown-editor/index.vue';
+
 import { GetApp, GetAppDetail } from '@/api/modules/app';
-import MdEditor from 'md-editor-v3';
 import { ref } from 'vue';
 import Install from './install/index.vue';
 import router from '@/routers';
-import { GlobalStore } from '@/store';
-import { storeToRefs } from 'pinia';
-const globalStore = GlobalStore();
-const { isDarkTheme } = storeToRefs(globalStore);
 
 const app = ref<any>({});
 const appDetail = ref<any>({});

@@ -69,7 +69,7 @@
                     {{ upgradeInfo.testVersion }}
                 </el-radio>
             </el-radio-group>
-            <MdEditor v-model="upgradeInfo.releaseNote" previewOnly :theme="isDarkTheme ? 'dark' : 'light'" />
+            <MarkDownEditor :content="upgradeInfo.releaseNote" />
         </div>
         <template #footer>
             <span class="dialog-footer">
@@ -81,10 +81,10 @@
 </template>
 <script setup lang="ts">
 import DrawerHeader from '@/components/drawer-header/index.vue';
+import MarkDownEditor from '@/components/mkdown-editor/index.vue';
+
 import { getSettingInfo, loadReleaseNotes, loadUpgradeInfo, upgrade } from '@/api/modules/setting';
-import MdEditor from 'md-editor-v3';
 import i18n from '@/lang';
-import 'md-editor-v3/lib/style.css';
 import { MsgSuccess } from '@/utils/message';
 import { copyText } from '@/utils/util';
 import { onMounted, ref, computed } from 'vue';
@@ -93,7 +93,7 @@ import { ElMessageBox } from 'element-plus';
 import { storeToRefs } from 'pinia';
 
 const globalStore = GlobalStore();
-const { isDarkTheme, docsUrl } = storeToRefs(globalStore);
+const { docsUrl } = storeToRefs(globalStore);
 
 const mobile = computed(() => {
     return globalStore.isMobile();
