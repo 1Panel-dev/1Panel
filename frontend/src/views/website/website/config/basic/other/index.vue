@@ -60,7 +60,7 @@ const form = reactive({
     favorite: false,
 });
 const rules = ref({
-    primaryDomain: [Rules.requiredInput, Rules.linuxName],
+    primaryDomain: [Rules.requiredInput, Rules.dbName],
     webSiteGroupId: [Rules.requiredSelect],
 });
 
