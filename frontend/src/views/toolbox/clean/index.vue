@@ -559,6 +559,7 @@ function load18n(label: string) {
         case 'download_directory':
             return i18n.global.t('clean.directory');
         case 'system_log':
+            return i18n.global.t('logs.system');
         case 'tmp_backup_log':
             return i18n.global.t('clean.systemLog');
         case 'script':
