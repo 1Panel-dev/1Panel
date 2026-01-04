@@ -3,7 +3,7 @@
         <el-card v-if="showStopped" class="mask-prompt">
             <span>{{ $t('tool.supervisor.notStartWarn') }}</span>
         </el-card>
-        <LayoutContent :title="$t('tool.supervisor.list', 2)" v-loading="loading">
+        <LayoutContent :title="$t(' tool.supervisor.list', 2)" v-loading="loading">
             <template #prompt v-if="!globalStore.isFxplay">
                 <el-alert type="info" :closable="false">
                     <template #title>
@@ -157,11 +157,14 @@
         </LayoutContent>
         <Create ref="createRef" @close="search"></Create>
         <File ref="fileRef" @search="search"></File>
+        <Log ref="logRef" @close="search" />
         <ProcessDetail ref="processDetailRef" />
     </div>
 </template>
 
 <script setup lang="ts">
+import Log from './log/index.vue';
+
 import SuperVisorStatus from './status/index.vue';
 import { ref } from 'vue';
 import ConfigSuperVisor from './config/index.vue';
@@ -181,6 +184,7 @@ const loading = ref(false);
 const setSuperVisor = ref(false);
 const createRef = ref();
 const fileRef = ref();
+const logRef = ref();
 const processDetailRef = ref();
 const data = ref();
 const maskShow = ref(true);
@@ -324,6 +328,10 @@ const getFile = (name: string, file: string) => {
     fileRef.value.acceptParams(name, file, 'get');
 };
 
+const openLog = (name: string) => {
+    logRef.value.acceptParams(name);
+};
+
 const edit = (row: HostTool.SupersivorProcess) => {
     createRef.value.acceptParams('update', row);
 };
@@ -344,7 +352,7 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.log'),
         click: function (row: HostTool.SupersivorProcess) {
-            getFile(row.name, 'out.log');
+            openLog(row.name);
         },
     },
     {

@@ -658,6 +658,9 @@ func (f *FileService) ReadLogByLine(req request.FileReadByLineReq) (*response.Fi
 			configPath = pathSet.Value
 		}
 		logFilePath, _ = ini_conf.GetIniValue(configPath, "supervisord", "logfile")
+	case constant.Supervisor:
+		logDir := path.Join(global.Dir.DataDir, "tools", "supervisord", "log")
+		logFilePath = path.Join(logDir, req.Name)
 	}
 
 	file, err := os.Open(logFilePath)
