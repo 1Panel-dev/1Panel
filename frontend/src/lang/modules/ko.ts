@@ -2635,6 +2635,7 @@ const message = {
         streamPortsHelper:
             '외부 수신 포트 번호를 설정합니다. 클라이언트는 이 포트를 통해 서비스에 액세스합니다. 쉼표로 구분하세요. 예: 5222,5223',
         streamHelper: 'TCP/UDP 포트 포워딩 및 로드 밸런싱',
+        udp: 'UDP 활성화',
 
         syncHtmlHelper: 'PHP 및 정적 웹사이트에 동기화',
     },

@@ -187,6 +187,9 @@
                             :placeholder="$t('website.streamPortsHelper')"
                         ></el-input>
                     </el-form-item>
+                    <el-form-item prop="udp">
+                        <el-checkbox v-model="website.udp" :label="$t('website.udp')" size="large" />
+                    </el-form-item>
                 </div>
                 <div v-else>
                     <DomainCreate v-model:form="website" @gengerate="websiteForm.clearValidate()"></DomainCreate>
@@ -507,6 +510,7 @@ const initData = () => ({
     siteDir: '',
 
     streamPorts: '',
+    udp: false,
     name: '',
     algorithm: '',
     servers: [],

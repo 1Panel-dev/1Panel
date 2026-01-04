@@ -206,10 +206,14 @@ func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, a
 		}
 		server := servers[0]
 		ports := strings.Split(streamConfig.StreamPorts, ",")
+		var params []string
+		if streamConfig.UDP {
+			params = []string{"udp"}
+		}
 		for _, port := range ports {
-			server.UpdateListen(port, false)
+			server.UpdateListen(port, false, params...)
 			if website.IPV6 {
-				server.UpdateListen("[::]:"+port, false)
+				server.UpdateListen("[::]:"+port, false, params...)
 			}
 		}
 		siteFolder := path.Join("/www", "sites", website.Alias)

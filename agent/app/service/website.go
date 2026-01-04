@@ -617,6 +617,13 @@ func (w WebsiteService) GetWebsite(id uint) (response.WebsiteDTO, error) {
 		if err != nil {
 			return res, err
 		}
+		listens := config.FindDirectives("listen")
+		for _, listen := range listens {
+			params := listen.GetParameters()
+			if len(params) > 1 && params[1] == "udp" {
+				res.UDP = true
+			}
+		}
 		upstreams := config.FindUpstreams()
 		for _, up := range upstreams {
 			directives := up.GetDirectives()
@@ -2342,10 +2349,14 @@ func (w WebsiteService) UpdateStream(req request.StreamUpdate) error {
 	}
 	server := servers[0]
 	server.Listens = []*components.ServerListen{}
+	var params []string
+	if req.UDP {
+		params = []string{"udp"}
+	}
 	for _, port := range ports {
-		server.UpdateListen(port, false)
+		server.UpdateListen(port, false, params...)
 		if website.IPV6 {
-			server.UpdateListen("[::]:"+port, false)
+			server.UpdateListen("[::]:"+port, false, params...)
 		}
 	}
 	upstream := components.Upstream{

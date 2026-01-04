@@ -6,6 +6,9 @@
                     <el-form-item :label="$t('website.streamPorts')" :rules="Rules.requiredInput">
                         <el-input v-model="form.streamPorts" />
                     </el-form-item>
+                    <el-form-item prop="udp">
+                        <el-checkbox v-model="form.udp" :label="$t('website.udp')" size="large" />
+                    </el-form-item>
                     <LoadBalanceForm ref="lbFormRef" v-model="form" :disabled="true" />
                     <el-form-item>
                         <el-button type="primary" @click="submit()" class="mt-2">
@@ -39,6 +42,7 @@ const form = ref({
     name: '',
     algorithm: '',
     websiteID: props.id,
+    udp: false,
 });
 const streamFormRef = ref();
 const lbFormRef = ref();
@@ -68,6 +72,7 @@ onMounted(async () => {
     form.value.name = res.data.primaryDomain;
     form.value.algorithm = res.data.algorithm == '' ? 'default' : res.data.algorithm;
     form.value.streamPorts = res.data.streamPorts;
+    form.value.udp = res.data.udp;
 
     let servers = [];
     res.data?.servers?.forEach((server) => {

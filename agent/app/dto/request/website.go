@@ -45,6 +45,7 @@ type StreamConfig struct {
 	StreamPorts string `json:"streamPorts"`
 	Name        string `json:"name"`
 	Algorithm   string `json:"algorithm"`
+	UDP         bool   `json:"udp"`
 
 	Servers []dto.NginxUpstreamServer `json:"servers"`
 }

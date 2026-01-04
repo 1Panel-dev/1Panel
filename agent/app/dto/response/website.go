@@ -18,6 +18,7 @@ type WebsiteDTO struct {
 	SiteDir       string `json:"siteDir"`
 	OpenBaseDir   bool   `json:"openBaseDir"`
 	Algorithm     string `json:"algorithm"`
+	UDP           bool   `json:"udp"`
 
 	Servers []dto.NginxUpstreamServer `json:"servers"`
 }

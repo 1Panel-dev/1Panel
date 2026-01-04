@@ -28,6 +28,7 @@ export namespace Website {
         dbType: string;
         favorite: boolean;
         streamPorts: string;
+        udp: boolean;
     }
 
     export interface WebsiteDTO extends Website {

@@ -2566,6 +2566,7 @@ const message = {
         streamPorts: '監聽端口',
         streamPortsHelper: '設定對外監聽的埠號，客戶端將透過此埠存取服務，按逗號分割，例如：5222,5223',
         streamHelper: 'TCP/UDP 端口轉發與負載均衡',
+        udp: '啟用 UDP',
 
         syncHtmlHelper: '同步到 PHP 和靜態網站',
     },
