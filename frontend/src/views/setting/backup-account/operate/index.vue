@@ -167,22 +167,7 @@
                 prop="varsJson.region"
                 :rules="Rules.requiredInput"
             >
-                <el-select
-                    v-model="dialogData.rowData!.varsJson['region']"
-                    clearable
-                    filterable
-                    allow-create
-                    default-first-option
-                    placeholder="Amazon S3 Region"
-                    @change="handleS3RegionChange"
-                >
-                    <el-option v-for="item in s3Regions" :key="item.value" :label="item.label" :value="item.value">
-                        <span class="float-left">{{ item.label }}</span>
-                        <span class="option-help">
-                            {{ item.value }}
-                        </span>
-                    </el-option>
-                </el-select>
+                <el-input v-model.trim="dialogData.rowData!.varsJson['region']" />
             </el-form-item>
             <el-form-item
                 v-if="hasAccessKey()"
@@ -417,7 +402,7 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref, watch, computed, onUnmounted } from 'vue';
+import { ref, watch, computed, onUnmounted } from 'vue';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
@@ -442,45 +427,6 @@ const isOK = ref();
 const stopWatch = ref();
 
 const regionInput = ref();
-
-const s3Regions: Array<{ label: string; value: string }> = [
-    { label: 'US East (Ohio)', value: 'us-east-2' },
-    { label: 'US East (N. Virginia)', value: 'us-east-1' },
-    { label: 'US West (N. California)', value: 'us-west-1' },
-    { label: 'US West (Oregon)', value: 'us-west-2' },
-    { label: 'Africa (Cape Town)', value: 'af-south-1' },
-    { label: 'Asia Pacific (Hong Kong)', value: 'ap-east-1' },
-    { label: 'Asia Pacific (Hyderabad)', value: 'ap-south-2' },
-    { label: 'Asia Pacific (Jakarta)', value: 'ap-southeast-3' },
-    { label: 'Asia Pacific (Malaysia)', value: 'ap-southeast-5' },
-    { label: 'Asia Pacific (Melbourne)', value: 'ap-southeast-4' },
-    { label: 'Asia Pacific (Mumbai)', value: 'ap-south-1' },
-    { label: 'Asia Pacific (New Zealand)', value: 'ap-southeast-6' },
-    { label: 'Asia Pacific (Osaka)', value: 'ap-northeast-3' },
-    { label: 'Asia Pacific (Seoul)', value: 'ap-northeast-2' },
-    { label: 'Asia Pacific (Singapore)', value: 'ap-southeast-1' },
-    { label: 'Asia Pacific (Sydney)', value: 'ap-southeast-2' },
-    { label: 'Asia Pacific (Taipei)', value: 'ap-east-2' },
-    { label: 'Asia Pacific (Thailand)', value: 'ap-southeast-7' },
-    { label: 'Asia Pacific (Tokyo)', value: 'ap-northeast-1' },
-    { label: 'Canada (Central)', value: 'ca-central-1' },
-    { label: 'Canada West (Calgary)', value: 'ca-west-1' },
-    { label: 'Europe (Frankfurt)', value: 'eu-central-1' },
-    { label: 'Europe (Ireland)', value: 'eu-west-1' },
-    { label: 'Europe (London)', value: 'eu-west-2' },
-    { label: 'Europe (Milan)', value: 'eu-south-1' },
-    { label: 'Europe (Paris)', value: 'eu-west-3' },
-    { label: 'Europe (Spain)', value: 'eu-south-2' },
-    { label: 'Europe (Stockholm)', value: 'eu-north-1' },
-    { label: 'Europe (Zurich)', value: 'eu-central-2' },
-    { label: 'Israel (Tel Aviv)', value: 'il-central-1' },
-    { label: 'Mexico (Central)', value: 'mx-central-1' },
-    { label: 'Middle East (Bahrain)', value: 'me-south-1' },
-    { label: 'Middle East (UAE)', value: 'me-central-1' },
-    { label: 'South America (São Paulo)', value: 'sa-east-1' },
-    { label: 'AWS GovCloud (US-East)', value: 'us-gov-east-1' },
-    { label: 'AWS GovCloud (US-West)', value: 'us-gov-west-1' },
-];
 
 const domainProto = ref('http');
 const emit = defineEmits(['search']);
@@ -663,17 +609,6 @@ const hasBackDir = () => {
 
 const loadDir = async (path: string) => {
     dialogData.value.rowData!.backupPath = path;
-};
-
-const handleS3RegionChange = (region?: string) => {
-    if (!region || !dialogData.value.rowData || dialogData.value.rowData!.type !== 'S3') {
-        return;
-    }
-    const isStandardRegion = s3Regions.some((item) => item.value === region);
-    if (isStandardRegion) {
-        dialogData.value.rowData!.varsJson['endpointItem'] = `s3.${region}.amazonaws.com`;
-        domainProto.value = 'https';
-    }
 };
 
 const changeType = async () => {

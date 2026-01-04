@@ -1,25 +1,20 @@
 package client
 
 import (
-	"context"
-	"errors"
 	"os"
-	"strings"
-	"time"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/credentials"
-	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
-	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/aws/aws-sdk-go-v2/service/s3/types"
-	"github.com/aws/smithy-go"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/awserr"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 )
 
 type s3Client struct {
 	scType string
 	bucket string
-	client *s3.Client
+	Sess   session.Session
 }
 
 func NewS3Client(vars map[string]interface{}) (*s3Client, error) {
@@ -36,26 +31,22 @@ func NewS3Client(vars map[string]interface{}) (*s3Client, error) {
 	if len(mode) == 0 {
 		mode = "virtual hosted"
 	}
-	cfg, err := config.LoadDefaultConfig(context.Background(),
-		config.WithRegion(region),
-		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(accessKey, secretKey, "")),
-	)
+	sess, err := session.NewSession(&aws.Config{
+		Credentials: credentials.NewStaticCredentials(accessKey, secretKey, ""),
+		Endpoint:    aws.String(endpoint),
+		Region:      aws.String(region),
+		DisableSSL:  aws.Bool(true), S3ForcePathStyle: aws.Bool(mode == "path"),
+	})
 	if err != nil {
 		return nil, err
 	}
-	client := s3.NewFromConfig(cfg, func(o *s3.Options) {
-		o.UsePathStyle = mode == "path"
-		if endpoint != "" {
-			o.BaseEndpoint = aws.String(normalizeEndpoint(endpoint))
-		}
-	})
-
-	return &s3Client{scType: scType, bucket: bucket, client: client}, nil
+	return &s3Client{scType: scType, bucket: bucket, Sess: *sess}, nil
 }
 
-func (s *s3Client) ListBuckets() ([]interface{}, error) {
+func (s s3Client) ListBuckets() ([]interface{}, error) {
 	var result []interface{}
-	res, err := s.client.ListBuckets(context.Background(), &s3.ListBucketsInput{})
+	svc := s3.New(&s.Sess)
+	res, err := svc.ListBuckets(nil)
 	if err != nil {
 		return nil, err
 	}
@@ -65,54 +56,50 @@ func (s *s3Client) ListBuckets() ([]interface{}, error) {
 	return result, nil
 }
 
-func (s *s3Client) Exist(path string) (bool, error) {
-	_, err := s.client.HeadObject(context.Background(), &s3.HeadObjectInput{
-		Bucket: aws.String(s.bucket),
-		Key:    aws.String(path),
-	})
-	if err != nil {
-		var apiErr smithy.APIError
-		if errors.As(err, &apiErr) {
-			switch apiErr.ErrorCode() {
-			case "NotFound", "NoSuchKey":
+func (s s3Client) Exist(path string) (bool, error) {
+	svc := s3.New(&s.Sess)
+	if _, err := svc.HeadObject(&s3.HeadObjectInput{
+		Bucket: &s.bucket,
+		Key:    &path,
+	}); err != nil {
+		if aerr, ok := err.(awserr.RequestFailure); ok {
+			if aerr.StatusCode() == 404 {
 				return false, nil
 			}
+		} else {
+			return false, aerr
 		}
-		return false, err
 	}
 	return true, nil
 }
 
 func (s *s3Client) Size(path string) (int64, error) {
-	file, err := s.client.GetObject(context.Background(), &s3.GetObjectInput{
-		Bucket: aws.String(s.bucket),
-		Key:    aws.String(path),
+	svc := s3.New(&s.Sess)
+	file, err := svc.GetObject(&s3.GetObjectInput{
+		Bucket: &s.bucket,
+		Key:    &path,
 	})
 	if err != nil {
 		return 0, err
 	}
-	defer file.Body.Close()
-	return aws.ToInt64(file.ContentLength), nil
+	return *file.ContentLength, nil
 }
 
-func (s *s3Client) Delete(path string) (bool, error) {
-	if _, err := s.client.DeleteObject(context.Background(), &s3.DeleteObjectInput{
+func (s s3Client) Delete(path string) (bool, error) {
+	svc := s3.New(&s.Sess)
+	if _, err := svc.DeleteObject(&s3.DeleteObjectInput{Bucket: aws.String(s.bucket), Key: aws.String(path)}); err != nil {
+		return false, err
+	}
+	if err := svc.WaitUntilObjectNotExists(&s3.HeadObjectInput{
 		Bucket: aws.String(s.bucket),
 		Key:    aws.String(path),
 	}); err != nil {
 		return false, err
 	}
-	waiter := s3.NewObjectNotExistsWaiter(s.client)
-	if err := waiter.Wait(context.Background(), &s3.HeadObjectInput{
-		Bucket: aws.String(s.bucket),
-		Key:    aws.String(path),
-	}, 30*time.Second); err != nil {
-		return false, err
-	}
 	return true, nil
 }
 
-func (s *s3Client) Upload(src, target string) (bool, error) {
+func (s s3Client) Upload(src, target string) (bool, error) {
 	fileInfo, err := os.Stat(src)
 	if err != nil {
 		return false, err
@@ -123,23 +110,22 @@ func (s *s3Client) Upload(src, target string) (bool, error) {
 	}
 	defer file.Close()
 
-	uploader := manager.NewUploader(s.client)
-	maxUploadSize := int64(manager.MaxUploadParts) * manager.DefaultUploadPartSize
-	if fileInfo.Size() > maxUploadSize {
-		uploader.PartSize = fileInfo.Size() / (int64(manager.MaxUploadParts) - 1)
+	uploader := s3manager.NewUploader(&s.Sess)
+	if fileInfo.Size() > s3manager.MaxUploadParts*s3manager.DefaultUploadPartSize {
+		uploader.PartSize = fileInfo.Size() / (s3manager.MaxUploadParts - 1)
 	}
-	if _, err := uploader.Upload(context.Background(), &s3.PutObjectInput{
+	if _, err := uploader.Upload(&s3manager.UploadInput{
 		Bucket:       aws.String(s.bucket),
 		Key:          aws.String(target),
 		Body:         file,
-		StorageClass: types.StorageClass(s.scType),
+		StorageClass: &s.scType,
 	}); err != nil {
 		return false, err
 	}
 	return true, nil
 }
 
-func (s *s3Client) Download(src, target string) (bool, error) {
+func (s s3Client) Download(src, target string) (bool, error) {
 	if _, err := os.Stat(target); err == nil {
 		_ = os.Remove(target)
 	}
@@ -148,8 +134,8 @@ func (s *s3Client) Download(src, target string) (bool, error) {
 		return false, err
 	}
 	defer file.Close()
-	downloader := manager.NewDownloader(s.client)
-	if _, err = downloader.Download(context.Background(), file, &s3.GetObjectInput{
+	downloader := s3manager.NewDownloader(&s.Sess)
+	if _, err = downloader.Download(file, &s3.GetObjectInput{
 		Bucket: aws.String(s.bucket),
 		Key:    aws.String(src),
 	}); err != nil {
@@ -160,23 +146,17 @@ func (s *s3Client) Download(src, target string) (bool, error) {
 }
 
 func (s *s3Client) ListObjects(prefix string) ([]string, error) {
+	svc := s3.New(&s.Sess)
 	var result []string
-	outputs, err := s.client.ListObjectsV2(context.Background(), &s3.ListObjectsV2Input{
-		Bucket: aws.String(s.bucket),
-		Prefix: aws.String(prefix),
+	outputs, err := svc.ListObjects(&s3.ListObjectsInput{
+		Bucket: &s.bucket,
+		Prefix: &prefix,
 	})
 	if err != nil {
 		return result, err
 	}
 	for _, item := range outputs.Contents {
-		result = append(result, aws.ToString(item.Key))
+		result = append(result, *item.Key)
 	}
 	return result, nil
-}
-
-func normalizeEndpoint(endpoint string) string {
-	if strings.HasPrefix(endpoint, "http://") || strings.HasPrefix(endpoint, "https://") {
-		return endpoint
-	}
-	return "http://" + endpoint
 }
