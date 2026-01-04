@@ -2048,8 +2048,6 @@ const message = {
         upgrade: '系统升级备份文件',
         agentPackages: '历史版本子节点升级 / 安装包',
         upgradeHelper: '( 建议保留最新的升级备份用于系统回滚 )',
-        cache: '系统缓存文件',
-        cacheHelper: '( 谨慎操作，清理需要重启服务 )',
         snapshot: '系统快照临时文件',
         rollback: '恢复前备份目录',
 

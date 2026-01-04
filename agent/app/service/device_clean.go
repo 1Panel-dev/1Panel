@@ -19,7 +19,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
-	"github.com/1Panel-dev/1Panel/agent/utils/controller"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
 	fileUtils "github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/docker/docker/api/types"
@@ -30,7 +29,6 @@ import (
 
 const (
 	rollbackPath = "1panel/tmp"
-	cachePath    = "1panel/cache"
 	upgradePath  = "1panel/tmp/upgrade"
 	uploadPath   = "1panel/uploads"
 	downloadPath = "1panel/download"
@@ -56,16 +54,6 @@ func (u *DeviceService) Scan() dto.CleanData {
 	})
 	treeData = append(treeData, loadUpgradeTree(fileOp))
 	treeData = append(treeData, loadAgentPackage(fileOp))
-	cachePath := path.Join(global.Dir.BaseDir, cachePath)
-	cacheSize, _ := fileOp.GetDirSize(cachePath)
-	treeData = append(treeData, dto.CleanTree{
-		ID:          uuid.NewString(),
-		Label:       "cache",
-		Size:        uint64(cacheSize),
-		IsCheck:     false,
-		IsRecommend: false,
-		Type:        "cache",
-	})
 
 	SystemClean.BackupClean = loadBackupTree(fileOp)
 
@@ -102,7 +90,6 @@ func (u *DeviceService) Scan() dto.CleanData {
 
 func (u *DeviceService) Clean(req []dto.Clean) {
 	size := uint64(0)
-	restart := false
 	for _, item := range req {
 		size += item.Size
 		switch item.TreeType {
@@ -130,10 +117,6 @@ func (u *DeviceService) Clean(req []dto.Clean) {
 			dropFileOrDir(path.Join(global.Dir.BaseDir, rollbackPath, "database", item.Name))
 		case "rollback_website":
 			dropFileOrDir(path.Join(global.Dir.BaseDir, rollbackPath, "website", item.Name))
-
-		case "cache":
-			dropFileOrDir(path.Join(global.Dir.BaseDir, cachePath, item.Name))
-			restart = true
 
 		case "upload":
 			dropFileOrDir(path.Join(global.Dir.BaseDir, uploadPath, item.Name))
@@ -202,10 +185,6 @@ func (u *DeviceService) Clean(req []dto.Clean) {
 	_ = settingRepo.Update("LastCleanTime", time.Now().Format(constant.DateTimeLayout))
 	_ = settingRepo.Update("LastCleanSize", fmt.Sprintf("%v", size))
 	_ = settingRepo.Update("LastCleanData", fmt.Sprintf("%v", len(req)))
-
-	if restart {
-		go controller.RestartPanel(false, true, false)
-	}
 }
 
 func doSystemClean(taskItem *task.Task) func(t *task.Task) error {
@@ -327,6 +306,7 @@ func loadAgentPackage(fileOp fileUtils.FileOp) dto.CleanTree {
 			itemTree.Size += uint64(itemSize)
 			itemTree.Children = append(itemTree.Children, dto.CleanTree{
 				ID:          uuid.NewString(),
+				Label:       file.Name(),
 				Name:        file.Name(),
 				Size:        uint64(itemSize),
 				IsCheck:     true,
@@ -342,6 +322,7 @@ func loadAgentPackage(fileOp fileUtils.FileOp) dto.CleanTree {
 			itemTree.Children = append(itemTree.Children, dto.CleanTree{
 				ID:          uuid.NewString(),
 				Label:       file.Name(),
+				Name:        file.Name(),
 				Size:        uint64(itemSize.Size()),
 				IsCheck:     true,
 				IsRecommend: true,
@@ -596,6 +577,9 @@ func loadBackupIsCheck(treeData *dto.CleanTree) {
 		if len(treeData.Children[i].Children) == 0 {
 			treeData.Children[i].IsCheck = true
 			treeData.Children[i].IsRecommend = true
+			continue
+		}
+		if treeData.Label != "unknown_database" && treeData.Label != "unknown_app" {
 			continue
 		}
 		for j := 0; j < len(treeData.Children[i].Children); j++ {

@@ -261,9 +261,6 @@ import { getSettingInfo } from '@/api/modules/setting';
 import { clean, scan } from '@/api/modules/toolbox';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import { GlobalStore } from '@/store';
-
-const globalStore = GlobalStore();
 
 const loading = ref();
 const totalSize = ref<number>(0);
@@ -370,19 +367,12 @@ const onSubmitClean = async () => {
     }).then(async () => {
         loading.value = true;
         submitCleans.value = [];
-        let restart = false;
         loadSubmitCheck(cleanData.systemClean);
         loadSubmitCheck(cleanData.backupClean);
         loadSubmitCheck(cleanData.uploadClean);
         loadSubmitCheck(cleanData.downloadClean);
         loadSubmitCheck(cleanData.systemLogClean);
         loadSubmitCheck(cleanData.containerClean);
-        for (const item of submitCleans.value) {
-            if (item.treeType === 'cache') {
-                restart = true;
-                break;
-            }
-        }
         await clean(submitCleans.value)
             .then(() => {
                 form.lastCleanSize = selectSize.value + '';
@@ -390,17 +380,6 @@ const onSubmitClean = async () => {
                 scanStatus.value = 'afterScan';
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 loading.value = false;
-                if (restart) {
-                    let href = window.location.href;
-                    globalStore.isLogin = false;
-                    let address = href.split('://')[1];
-                    if (globalStore.entrance) {
-                        address = address.replaceAll('settings/panel', globalStore.entrance);
-                    } else {
-                        address = address.replaceAll('settings/panel', 'login');
-                    }
-                    window.open(`http://${address}`, '_self');
-                }
             })
             .catch(() => {
                 loading.value = false;
@@ -530,9 +509,6 @@ function loadTag(node: any, data: any) {
     if (data.label === 'upgrade') {
         return i18n.global.t('clean.upgradeHelper');
     }
-    if (data.label === 'cache') {
-        return i18n.global.t('clean.cacheHelper');
-    }
     return data.isRecommend ? i18n.global.t('clean.statusSuggest') : i18n.global.t('clean.statusWarning');
 }
 
@@ -544,8 +520,6 @@ function load18n(label: string) {
             return i18n.global.t('clean.upgrade');
         case 'agent_packages':
             return i18n.global.t('clean.agentPackages');
-        case 'cache':
-            return i18n.global.t('clean.cache');
         case 'snapshot':
             return i18n.global.t('clean.snapshot');
         case 'rollback':

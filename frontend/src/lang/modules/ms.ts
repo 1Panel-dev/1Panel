@@ -2182,8 +2182,6 @@ const message = {
         upgrade: 'Fail sandaran naik taraf sistem',
         agentPackages: 'Pakej naik taraf/pemasangan nod anak versi sejarah',
         upgradeHelper: '(Disarankan untuk mengekalkan sandaran peningkatan terbaru untuk pemulihan sistem)',
-        cache: 'Fail cache sistem',
-        cacheHelper: '(Berhati-hati, pembersihan memerlukan permulaan semula perkhidmatan)',
         rollback: 'Fail sandaran sebelum pemulihan',
 
         backup: 'Sandaran Sistem',

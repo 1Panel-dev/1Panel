@@ -2051,8 +2051,6 @@ const message = {
         upgrade: '系統升級備份檔案',
         agentPackages: '歷史版本子節點升級/安裝套件',
         upgradeHelper: '( 建議保留最新的升級備份用於系統回滾 )',
-        cache: '系統快取文件',
-        cacheHelper: '( 謹慎操作，清理需要重啟服務 )',
         snapshot: '系統快照暫存檔',
         rollback: '復原前備份目錄',
 

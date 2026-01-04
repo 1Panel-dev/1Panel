@@ -2087,8 +2087,6 @@ const message = {
         upgrade: '시스템 업그레이드 백업 파일',
         agentPackages: '이전 버전 자식 노드 업그레이드/설치 패키지',
         upgradeHelper: '(시스템 롤백을 위해 최신 업그레이드 백업을 유지하는 것이 좋습니다)',
-        cache: '시스템 캐시 파일',
-        cacheHelper: '(주의하여 진행, 정리 후 서비스 재시작 필요)',
         rollback: '복구 전 백업 파일',
 
         backup: '시스템 백업',

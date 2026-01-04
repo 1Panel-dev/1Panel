@@ -2215,8 +2215,6 @@ const message = {
         upgrade: 'Archivos de copia de seguridad de actualización del sistema',
         agentPackages: 'Paquetes de actualización/instalación de nodos secundarios de versiones históricas',
         upgradeHelper: '(Mantenga el último respaldo para restaurar el sistema)',
-        cache: 'Archivos de caché',
-        cacheHelper: '(Precaución, limpiar requiere reiniciar servicios)',
         snapshot: 'Archivos temporales de instantáneas',
         rollback: 'Archivos de respaldo antes de recuperación',
 

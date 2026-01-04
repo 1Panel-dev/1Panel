@@ -73,28 +73,13 @@ func (u *MonitorRepo) CreateMonitorBase(model model.MonitorBase) error {
 	return global.MonitorDB.Create(&model).Error
 }
 func (s *MonitorRepo) BatchCreateMonitorGPU(list []model.MonitorGPU) error {
-	for _, item := range list {
-		if err := global.GPUMonitorDB.Create(&item).Error; err != nil {
-			global.LOG.Errorf("create Monitor GPU record failed, err: %v", err)
-		}
-	}
-	return nil
+	return global.GPUMonitorDB.CreateInBatches(&list, len(list)).Error
 }
-func (u *MonitorRepo) BatchCreateMonitorIO(list []model.MonitorIO) error {
-	for _, item := range list {
-		if err := global.MonitorDB.Create(&item).Error; err != nil {
-			global.LOG.Errorf("create Monitor IO record failed, err: %v", err)
-		}
-	}
-	return nil
+func (u *MonitorRepo) BatchCreateMonitorIO(ioList []model.MonitorIO) error {
+	return global.MonitorDB.CreateInBatches(ioList, len(ioList)).Error
 }
-func (u *MonitorRepo) BatchCreateMonitorNet(list []model.MonitorNetwork) error {
-	for _, item := range list {
-		if err := global.MonitorDB.Create(&item).Error; err != nil {
-			global.LOG.Errorf("create Monitor Network record failed, err: %v", err)
-		}
-	}
-	return nil
+func (u *MonitorRepo) BatchCreateMonitorNet(ioList []model.MonitorNetwork) error {
+	return global.MonitorDB.CreateInBatches(ioList, len(ioList)).Error
 }
 func (u *MonitorRepo) DelMonitorBase(timeForDelete time.Time) error {
 	return global.MonitorDB.Where("created_at < ?", timeForDelete).Delete(&model.MonitorBase{}).Error

@@ -2176,8 +2176,6 @@ const message = {
         upgrade: 'Arquivos de backup de atualização do sistema.',
         agentPackages: 'Pacotes de atualização/instalação de nós filhos de versões históricas.',
         upgradeHelper: '(Recomenda-se manter o backup de atualização mais recente para rollback do sistema)',
-        cache: 'Arquivos de cache do sistema',
-        cacheHelper: '(Prossiga com cautela, a limpeza exige reinício do serviço)',
         rollback: 'Arquivos de backup antes da recuperação',
 
         backup: 'Backup do Sistema',

@@ -2227,8 +2227,6 @@ const message = {
         upgrade: 'Sistem yükseltme yedekleme dosyaları',
         agentPackages: 'Geçmiş sürüm alt düğüm yükseltme/kurulum paketleri',
         upgradeHelper: '(Sistem geri alımı için en son yükseltme yedeğini tutmanız önerilir)',
-        cache: 'Sistem önbellek dosyaları',
-        cacheHelper: '(Dikkatli ilerleyin, temizleme servis yeniden başlatılmasını gerektirir)',
         snapshot: 'Sistem anlık görüntü geçici dosyaları',
         rollback: 'Kurtarma öncesi yedek dosyaları',
 

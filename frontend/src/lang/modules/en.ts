@@ -2202,8 +2202,6 @@ const message = {
         upgrade: 'System upgrade backup files',
         agentPackages: 'Historical version child node upgrade/installation packages',
         upgradeHelper: '(Recommend keeping the latest upgrade backup for system rollback)',
-        cache: 'System cache files',
-        cacheHelper: '(Proceed with caution, cleaning requires a service restart)',
         snapshot: 'System snapshot temporary files',
         rollback: 'Backup files before recover',
 
