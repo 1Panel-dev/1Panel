@@ -690,12 +690,11 @@ func loadWebsiteLogTree(fileOp fileUtils.FileOp) []dto.CleanTree {
 	for _, website := range websites {
 		size3, _ := fileOp.GetDirSize(path.Join(GetSiteDir(website.Alias), "log"))
 		res = append(res, dto.CleanTree{
-			ID:      uuid.NewString(),
-			Label:   website.PrimaryDomain,
-			Size:    uint64(size3),
-			IsCheck: size3 > 5*1024,
-			Type:    "website_log",
-			Name:    website.Alias,
+			ID:    uuid.NewString(),
+			Label: website.PrimaryDomain,
+			Size:  uint64(size3),
+			Type:  "website_log",
+			Name:  website.Alias,
 		})
 	}
 	return res
