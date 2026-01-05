@@ -52,6 +52,11 @@ const nginxRules: TokenRule[] = [
         color: '#27AE60',
     },
     {
+        type: 'status-info',
+        pattern: /(?<=")\s(1\d{2})\b/g,
+        color: '#268785',
+    },
+    {
         type: 'status-success',
         pattern: /(?<=")\s(2\d{2})\b/g,
         color: '#2ECC71',
