@@ -79,7 +79,7 @@ func Init() {
 	iptablesService := service.IptablesService{}
 	iptablesStatus, _ := settingRepo.GetValueByKey("IptablesStatus")
 	if iptablesStatus == constant.StatusEnable {
-		if err := iptablesService.Operate(dto.IptablesOp{Operate: "bind-base"}); err != nil {
+		if err := iptablesService.Operate(dto.IptablesOp{Operate: "bind-base-without-init"}); err != nil {
 			global.LOG.Errorf("bind base chains failed, err: %v", err)
 			return
 		}

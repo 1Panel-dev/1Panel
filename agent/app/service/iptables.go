@@ -230,6 +230,18 @@ func (s *IptablesService) Operate(req dto.IptablesOp) error {
 		}
 		_ = settingRepo.Update("IptablesStatus", constant.StatusEnable)
 		return nil
+	case "bind-base-without-init":
+		if err := iptables.BindChain(iptables.FilterTab, iptables.ChainInput, iptables.Chain1PanelBasicBefore, 1); err != nil {
+			return err
+		}
+		if err := iptables.BindChain(iptables.FilterTab, iptables.ChainInput, iptables.Chain1PanelBasic, 2); err != nil {
+			return err
+		}
+		if err := iptables.BindChain(iptables.FilterTab, iptables.ChainInput, iptables.Chain1PanelBasicAfter, 3); err != nil {
+			return err
+		}
+		_ = settingRepo.Update("IptablesStatus", constant.StatusEnable)
+		return nil
 	case "unbind-base":
 		if err := iptables.UnbindChain(iptables.FilterTab, iptables.ChainInput, iptables.Chain1PanelBasicAfter); err != nil {
 			return err
