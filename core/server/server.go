@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/core/init/auth"
 	"github.com/1Panel-dev/1Panel/core/init/db"
@@ -64,8 +65,12 @@ func Start() {
 		global.CONF.Conn.BindAddress = fmt.Sprintf("[%s]", global.CONF.Conn.BindAddress)
 	}
 	server := &http.Server{
-		Addr:    global.CONF.Conn.BindAddress + ":" + global.CONF.Conn.Port,
-		Handler: rootRouter,
+		Addr:              global.CONF.Conn.BindAddress + ":" + global.CONF.Conn.Port,
+		Handler:           rootRouter,
+		ReadHeaderTimeout: 5 * time.Second,
+		ReadTimeout:       600 * time.Second,
+		WriteTimeout:      600 * time.Second,
+		IdleTimeout:       240 * time.Second,
 	}
 	ln, err := net.Listen(tcpItem, server.Addr)
 	if err != nil {
