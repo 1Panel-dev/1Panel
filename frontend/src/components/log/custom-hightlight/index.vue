@@ -52,14 +52,14 @@ const nginxRules: TokenRule[] = [
         color: '#27AE60',
     },
     {
-        type: 'status-info',
-        pattern: /(?<=")\s(1\d{2})\b/g,
-        color: '#268785',
-    },
-    {
         type: 'status-success',
         pattern: /(?<=")\s(2\d{2})\b/g,
         color: '#2ECC71',
+    },
+    {
+        type: 'status-error',
+        pattern: /(?<=")\s([45]\d{2})\b/g,
+        color: '#E74C3C',
     },
     {
         type: 'status-redirect',
@@ -67,9 +67,9 @@ const nginxRules: TokenRule[] = [
         color: '#F39C12',
     },
     {
-        type: 'status-error',
-        pattern: /(?<=")\s([45]\d{2})\b/g,
-        color: '#E74C3C',
+        type: 'status-info',
+        pattern: /(?<=")\s(1\d{2})\b/g,
+        color: '#268785',
     },
     {
         type: 'process-info',
