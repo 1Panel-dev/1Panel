@@ -330,3 +330,8 @@ type AlertEmailConfig struct {
 	Encryption  string `json:"encryption"` // "ssl" / "tls" / "none"
 	Recipient   string `json:"recipient"`
 }
+
+type AgentInfo struct {
+	NodeName string `json:"nodeName"`
+	NodeAddr string `json:"nodeAddr"`
+}

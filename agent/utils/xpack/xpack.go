@@ -89,3 +89,7 @@ func ValidateCertificate(c *gin.Context) bool {
 func PushSSLToNode(websiteSSL *model.WebsiteSSL) error {
 	return nil
 }
+
+func GetAgentInfo() (*dto.AgentInfo, error) {
+	return nil, nil
+}

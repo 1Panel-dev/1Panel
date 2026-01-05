@@ -495,10 +495,6 @@ ErrAlertPush: 'Error al enviar la alerta, ¡revise e intente de nuevo!'
 ErrAlertSave: 'Error al guardar la alerta, ¡revise e intente de nuevo!'
 ErrAlertSync: 'Error en la sincronización de la alerta, ¡revise e intente de nuevo!'
 ErrAlertRemote: 'Error remoto de alerta, ¡revise e intente de nuevo!'
-CommonAlert: "Su 1Panel: {{ .msg }}, por favor inicie sesión en el panel para más detalles."
-NodeExceptionAlert: "Su 1Panel tiene {{ .num }} nodos anómalos, inicie sesión para más detalles."
-LicenseExceptionAlert: "Su 1Panel tiene {{ .num }} licencias anómalas, inicie sesión para más detalles."
-SSHAndPanelLoginAlert: "Su 1Panel detectó un inicio de sesión anómalo en el panel {{ .name }} desde {{ .ip }}, revise en el panel para más detalles."
 
 #task - runtime
 ErrInstallExtension: "Ya hay una tarea de instalación en curso, espere a que termine"
@@ -507,15 +503,19 @@ ErrInstallExtension: "Ya hay una tarea de instalación en curso, espere a que te
 PanelAlertTitle: "Notificación de alerta del panel"
 TestAlertTitle: "Correo de prueba - Verificar conectividad de correo"
 TestAlert: "Este es un correo de prueba para verificar que la configuración de envío de correos es correcta."
-LicenseExpirationAlert: "Su licencia de 1Panel expirará en {{ .day }} días. Inicie sesión para más detalles."
-CronJobFailedAlert: "Su tarea programada '{{ .name }}' ha fallado. Inicie sesión en el panel para más detalles."
-ClamAlert: "La tarea de escaneo de virus detectó {{ .num }} archivos infectados. Inicie sesión para detalles."
-WebSiteAlert: "Hay {{ .num }} sitios web en su 1Panel que expirarán en {{ .day }} días. Inicie sesión para más detalles."
-SSLAlert: "Hay {{ .num }} certificados SSL en su 1Panel que expirarán en {{ .day }} días. Inicie sesión para detalles."
-DiskUsedAlert: "El disco '{{ .name }}' de su 1Panel ha utilizado {{ .used }}. Inicie sesión para más detalles."
-ResourceAlert: "El uso promedio de {{ .name }} en {{ .time }} minutos es de {{ .used }}. Inicie sesión para más detalles."
-PanelVersionAlert: "Hay una nueva versión de 1Panel disponible. Inicie sesión para actualizar."
-PanelPwdExpirationAlert: "Su contraseña de 1Panel expirará en {{ .day }} días. Inicie sesión para más detalles."
+LicenseExpirationAlert: "Su Panel {{ .node }}{{ .ip }}, la licencia expirará en {{ .day }} días. Inicie sesión en el panel para ver los detalles."
+CronJobFailedAlert: "Su Panel {{ .node }}{{ .ip }}, la ejecución de la tarea programada {{ .name }} falló. Inicie sesión en el panel para ver los detalles."
+ClamAlert: "Su Panel {{ .node }}{{ .ip }}, la tarea de escaneo antivirus detectó {{ .num }} archivos infectados. Inicie sesión en el panel para ver los detalles."
+WebSiteAlert: "Su Panel {{ .node }}{{ .ip }}, {{ .num }} sitios web expirarán en {{ .day }} días. Inicie sesión en el panel para ver los detalles."
+SSLAlert: "Su Panel {{ .node }}{{ .ip }}, {{ .num }} certificados SSL expirarán en {{ .day }} días. Inicie sesión en el panel para ver los detalles."
+DiskUsedAlert: "Su Panel {{ .node }}{{ .ip }}, el uso del disco {{ .name }} ha alcanzado {{ .used }}. Inicie sesión en el panel para ver los detalles."
+ResourceAlert: "Su Panel {{ .node }}{{ .ip }}, la tasa de uso promedio de {{ .name }} en {{ .time }} minutos es {{ .used }}. Inicie sesión en el panel para ver los detalles."
+PanelVersionAlert: "Su Panel {{ .node }}{{ .ip }}, está disponible la última versión del panel para actualizar. Inicie sesión en el panel para ver los detalles."
+PanelPwdExpirationAlert: "Su Panel {{ .node }}{{ .ip }}, la contraseña del panel expirará en {{ .day }} días. Inicie sesión en el panel para ver los detalles."
+CommonAlert: "Su Panel {{ .node }}{{ .ip }}, {{ .msg }}. Inicie sesión en el panel para ver los detalles."
+NodeExceptionAlert: "Su Panel {{ .node }}{{ .ip }}, {{ .num }} nodos son anómalos. Inicie sesión en el panel para ver los detalles."
+LicenseExceptionAlert: "Su Panel {{ .node }}{{ .ip }}, {{ .num }} licencias son anómalas. Inicie sesión en el panel para ver los detalles."
+SSHAndPanelLoginAlert: "Su Panel {{ .node }}{{ .ip }}, el inicio de sesión {{ .name }} desde {{ .loginIp }} es anómalo. Inicie sesión en el panel para ver los detalles."
 
 #disk
 DeviceNotFound: "Dispositivo {{ .name }} no encontrado"

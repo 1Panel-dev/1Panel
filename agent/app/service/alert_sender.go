@@ -85,7 +85,8 @@ func (s *AlertSender) sendEmail(quota string, params []dto.Param) {
 	}
 
 	transport := xpack.LoadRequestTransport()
-	_ = alertUtil.CreateEmailAlertLog(create, s.alert, params, transport)
+	agentInfo, _ := xpack.GetAgentInfo()
+	_ = alertUtil.CreateEmailAlertLog(create, s.alert, params, transport, agentInfo)
 	alertUtil.CreateNewAlertTask(quota, s.alert.Type, s.quotaType, constant.Email)
 	global.LOG.Infof("%s alert email push successful", s.alert.Type)
 }
@@ -131,7 +132,8 @@ func (s *AlertSender) sendResourceEmail(quota string, params []dto.Param) {
 	}
 
 	transport := xpack.LoadRequestTransport()
-	if err := alertUtil.CreateEmailAlertLog(create, s.alert, params, transport); err != nil {
+	agentInfo, _ := xpack.GetAgentInfo()
+	if err := alertUtil.CreateEmailAlertLog(create, s.alert, params, transport, agentInfo); err != nil {
 		global.LOG.Errorf("failed to send Email alert: %v", err)
 		return
 	}

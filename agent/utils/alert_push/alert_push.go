@@ -25,7 +25,6 @@ func PushAlert(pushAlert dto.PushAlert) error {
 	var alert dto.AlertDTO
 	_ = copier.Copy(&alert, &alertInfo)
 
-	// 根据发送方式推送不同的日志记录
 	methods := strings.Split(alert.Method, ",")
 	for _, m := range methods {
 		m = strings.TrimSpace(m)
@@ -56,7 +55,8 @@ func PushAlert(pushAlert dto.PushAlert) error {
 				Count:   todayCount + 1,
 			}
 			transport := xpack.LoadRequestTransport()
-			err = alertUtil.CreateTaskScanEmailAlertLog(alert, create, pushAlert, constant.Email, transport)
+			agentInfo, _ := xpack.GetAgentInfo()
+			err = alertUtil.CreateTaskScanEmailAlertLog(alert, create, pushAlert, constant.Email, transport, agentInfo)
 			if err != nil {
 				return err
 			}

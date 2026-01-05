@@ -4,16 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"net/http"
-	"os"
-	"os/exec"
-	"strconv"
-	"strings"
-	"sync"
-	"time"
-
-	"github.com/jinzhu/copier"
-
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
@@ -22,21 +12,31 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/utils/email"
+	"github.com/1Panel-dev/1Panel/agent/utils/psutil"
 	"github.com/1Panel-dev/1Panel/agent/utils/re"
+	"github.com/jinzhu/copier"
+	network "net"
+	"net/http"
+	"os"
+	"os/exec"
+	"strconv"
+	"strings"
+	"sync"
+	"time"
 )
 
 var cronJobAlertTypes = []string{"shell", "app", "website", "database", "directory", "log", "snapshot", "curl", "cutWebsiteLog", "clean", "ntp"}
 
-func CreateTaskScanEmailAlertLog(alert dto.AlertDTO, create dto.AlertLogCreate, pushAlert dto.PushAlert, method string, transport *http.Transport) error {
+func CreateTaskScanEmailAlertLog(alert dto.AlertDTO, create dto.AlertLogCreate, pushAlert dto.PushAlert, method string, transport *http.Transport, agentInfo *dto.AgentInfo) error {
 	params := CreateAlertParams(GetCronJobTypeName(pushAlert.Param))
 	alertDetail := ProcessAlertDetail(alert, pushAlert.TaskName, params, method)
 	alertRule := ProcessAlertRule(alert)
 	create.AlertRule = alertRule
 	create.AlertDetail = alertDetail
-	return CreateEmailAlertLog(create, alert, params, transport)
+	return CreateEmailAlertLog(create, alert, params, transport, agentInfo)
 }
 
-func CreateEmailAlertLog(create dto.AlertLogCreate, alert dto.AlertDTO, params []dto.Param, transport *http.Transport) error {
+func CreateEmailAlertLog(create dto.AlertLogCreate, alert dto.AlertDTO, params []dto.Param, transport *http.Transport, agentInfo *dto.AgentInfo) error {
 	var alertLog model.AlertLog
 	alertRepo := repo.NewIAlertRepo()
 	config, err := alertRepo.GetConfig(alertRepo.WithByType(constant.CommonConfig))
@@ -49,7 +49,6 @@ func CreateEmailAlertLog(create dto.AlertLogCreate, alert dto.AlertDTO, params [
 		return err
 	}
 	create.Method = constant.Email
-	// 获取远端推送信息
 	if !global.IsMaster && cfg.IsOffline == constant.StatusEnable {
 		create.Status = constant.AlertPushing
 		return SaveAlertLog(create, &alertLog)
@@ -77,9 +76,9 @@ func CreateEmailAlertLog(create dto.AlertLogCreate, alert dto.AlertDTO, params [
 			Encryption: emailInfo.Encryption,
 			Recipient:  emailInfo.Recipient,
 		}
-		content := i18n.GetMsgWithMap("CommonAlert", map[string]interface{}{"msg": alert.Title})
-		if GetEmailContent(alert.Type, params) != "" {
-			content = GetEmailContent(alert.Type, params)
+		content := GetEmailContent(alert.Type, params, agentInfo)
+		if content == "" {
+			content = i18n.GetMsgWithMap("CommonAlert", map[string]interface{}{"msg": alert.Title})
 		}
 		msg := email.EmailMessage{
 			Subject: i18n.GetMsgByKey("PanelAlertTitle"),
@@ -241,7 +240,6 @@ type Category struct {
 	Type          []string `json:"type"`
 }
 
-// CheckSendTimeRange 是否在时间范围内
 func CheckSendTimeRange(alertType string) bool {
 	alertRepo := repo.NewIAlertRepo()
 	config, err := alertRepo.GetConfig(alertRepo.WithByType(constant.CommonConfig))
@@ -302,42 +300,42 @@ func isWithinTimeRange(savedTimeString string) bool {
 	return now.After(skipTime) && now.Before(endSkipTime)
 }
 
-func GetEmailContent(alertType string, params []dto.Param) string {
+func GetEmailContent(alertType string, params []dto.Param, agentInfo *dto.AgentInfo) string {
 	switch GetCronJobType(alertType) {
 	case "ssl":
-		return i18n.GetMsgWithMap("SSLAlert", map[string]interface{}{"num": getValueByIndex(params, "1"), "day": getValueByIndex(params, "2")})
+		return i18n.GetMsgWithMap("SSLAlert", map[string]interface{}{"num": getValueByIndex(params, "1"), "day": getValueByIndex(params, "2"), "node": getNodeName(agentInfo), "ip": getNodeIp(agentInfo)})
 	case "siteEndTime":
-		return i18n.GetMsgWithMap("WebSiteAlert", map[string]interface{}{"num": getValueByIndex(params, "1"), "day": getValueByIndex(params, "2")})
+		return i18n.GetMsgWithMap("WebSiteAlert", map[string]interface{}{"num": getValueByIndex(params, "1"), "day": getValueByIndex(params, "2"), "node": getNodeName(agentInfo), "ip": getNodeIp(agentInfo)})
 	case "panelPwdEndTime":
-		return i18n.GetMsgWithMap("PanelPwdExpirationAlert", map[string]interface{}{"day": getValueByIndex(params, "1")})
+		return i18n.GetMsgWithMap("PanelPwdExpirationAlert", map[string]interface{}{"day": getValueByIndex(params, "1"), "node": getNodeName(agentInfo), "ip": getNodeIp(agentInfo)})
 	case "licenseTime":
-		return i18n.GetMsgWithMap("LicenseExpirationAlert", map[string]interface{}{"day": getValueByIndex(params, "1")})
+		return i18n.GetMsgWithMap("LicenseExpirationAlert", map[string]interface{}{"day": getValueByIndex(params, "1"), "node": getNodeName(agentInfo), "ip": getNodeIp(agentInfo)})
 	case "panelUpdate":
-		return i18n.GetMsgByKey("PanelVersionAlert")
+		return i18n.GetMsgWithMap("PanelVersionAlert", map[string]interface{}{"node": getNodeName(agentInfo), "ip": getNodeIp(agentInfo)})
 	case "cpu":
-		return i18n.GetMsgWithMap("ResourceAlert", map[string]interface{}{"time": getValueByIndex(params, "1"), "name": getValueByIndex(params, "2"), "used": getValueByIndex(params, "3")})
+		return i18n.GetMsgWithMap("ResourceAlert", map[string]interface{}{"time": getValueByIndex(params, "1"), "name": getValueByIndex(params, "2"), "used": getValueByIndex(params, "3"), "node": getNodeName(agentInfo), "ip": getNodeIp(agentInfo)})
 	case "memory":
-		return i18n.GetMsgWithMap("ResourceAlert", map[string]interface{}{"time": getValueByIndex(params, "1"), "name": getValueByIndex(params, "2"), "used": getValueByIndex(params, "3")})
+		return i18n.GetMsgWithMap("ResourceAlert", map[string]interface{}{"time": getValueByIndex(params, "1"), "name": getValueByIndex(params, "2"), "used": getValueByIndex(params, "3"), "node": getNodeName(agentInfo), "ip": getNodeIp(agentInfo)})
 	case "load":
-		return i18n.GetMsgWithMap("ResourceAlert", map[string]interface{}{"time": getValueByIndex(params, "1"), "name": getValueByIndex(params, "2"), "used": getValueByIndex(params, "3")})
+		return i18n.GetMsgWithMap("ResourceAlert", map[string]interface{}{"time": getValueByIndex(params, "1"), "name": getValueByIndex(params, "2"), "used": getValueByIndex(params, "3"), "node": getNodeName(agentInfo), "ip": getNodeIp(agentInfo)})
 	case "disk":
-		return i18n.GetMsgWithMap("DiskUsedAlert", map[string]interface{}{"name": getValueByIndex(params, "1"), "used": getValueByIndex(params, "2")})
+		return i18n.GetMsgWithMap("DiskUsedAlert", map[string]interface{}{"name": getValueByIndex(params, "1"), "used": getValueByIndex(params, "2"), "node": getNodeName(agentInfo), "ip": getNodeIp(agentInfo)})
 	case "cronJob":
-		return i18n.GetMsgWithMap("CronJobFailedAlert", map[string]interface{}{"name": getValueByIndex(params, "1")})
+		return i18n.GetMsgWithMap("CronJobFailedAlert", map[string]interface{}{"name": getValueByIndex(params, "1"), "node": getNodeName(agentInfo), "ip": getNodeIp(agentInfo)})
 	case "clams":
-		return i18n.GetMsgWithMap("ClamAlert", map[string]interface{}{"num": getValueByIndex(params, "1")})
+		return i18n.GetMsgWithMap("ClamAlert", map[string]interface{}{"num": getValueByIndex(params, "1"), "node": getNodeName(agentInfo), "ip": getNodeIp(agentInfo)})
 	case "panelLogin":
-		return i18n.GetMsgWithMap("SSHAndPanelLoginAlert", map[string]interface{}{"name": getValueByIndex(params, "1"), "ip": getValueByIndex(params, "2")})
+		return i18n.GetMsgWithMap("SSHAndPanelLoginAlert", map[string]interface{}{"name": getValueByIndex(params, "1"), "loginIp": getValueByIndex(params, "2"), "node": getNodeName(agentInfo), "ip": getNodeIp(agentInfo)})
 	case "sshLogin":
-		return i18n.GetMsgWithMap("SSHAndPanelLoginAlert", map[string]interface{}{"name": getValueByIndex(params, "1"), "ip": getValueByIndex(params, "2")})
+		return i18n.GetMsgWithMap("SSHAndPanelLoginAlert", map[string]interface{}{"name": getValueByIndex(params, "1"), "loginIp": getValueByIndex(params, "2"), "node": getNodeName(agentInfo), "ip": getNodeIp(agentInfo)})
 	case "panelIpLogin":
-		return i18n.GetMsgWithMap("SSHAndPanelLoginAlert", map[string]interface{}{"name": getValueByIndex(params, "1"), "ip": getValueByIndex(params, "2")})
+		return i18n.GetMsgWithMap("SSHAndPanelLoginAlert", map[string]interface{}{"name": getValueByIndex(params, "1"), "loginIp": getValueByIndex(params, "2"), "node": getNodeName(agentInfo), "ip": getNodeIp(agentInfo)})
 	case "sshIpLogin":
-		return i18n.GetMsgWithMap("SSHAndPanelLoginAlert", map[string]interface{}{"name": getValueByIndex(params, "1"), "ip": getValueByIndex(params, "2")})
+		return i18n.GetMsgWithMap("SSHAndPanelLoginAlert", map[string]interface{}{"name": getValueByIndex(params, "1"), "loginIp": getValueByIndex(params, "2"), "node": getNodeName(agentInfo), "ip": getNodeIp(agentInfo)})
 	case "nodeException":
-		return i18n.GetMsgWithMap("NodeExceptionAlert", map[string]interface{}{"num": getValueByIndex(params, "1")})
+		return i18n.GetMsgWithMap("NodeExceptionAlert", map[string]interface{}{"num": getValueByIndex(params, "1"), "node": getNodeName(agentInfo), "ip": getNodeIp(agentInfo)})
 	case "licenseException":
-		return i18n.GetMsgWithMap("LicenseExceptionAlert", map[string]interface{}{"num": getValueByIndex(params, "1")})
+		return i18n.GetMsgWithMap("LicenseExceptionAlert", map[string]interface{}{"num": getValueByIndex(params, "1"), "node": getNodeName(agentInfo), "ip": getNodeIp(agentInfo)})
 	default:
 		return ""
 	}
@@ -516,4 +514,61 @@ func parseLogTime(line string) (time.Time, error) {
 		return time.Time{}, nil
 	}
 	return parsedTime.AddDate(time.Now().Year(), 0, 0), nil
+}
+
+func getNodeName(agentInfo *dto.AgentInfo) string {
+	var nodeName string
+	if agentInfo != nil && agentInfo.NodeName != "" {
+		nodeName = agentInfo.NodeName
+	}
+
+	return formatWithFallback(nodeName, getFallbackHostname)
+}
+
+func getNodeIp(agentInfo *dto.AgentInfo) string {
+	var nodeIP string
+	if agentInfo != nil && agentInfo.NodeAddr != "" && agentInfo.NodeAddr != "127.0.0.1" {
+		nodeIP = agentInfo.NodeAddr
+	}
+
+	return formatWithFallback(nodeIP, getFallbackIP)
+}
+
+func formatWithFallback(value string, fallback func() string) string {
+	value = strings.TrimSpace(value)
+	if value == "" {
+		value = strings.TrimSpace(fallback())
+	}
+
+	if value == "" {
+		return ""
+	}
+
+	return fmt.Sprintf("「%s」", value)
+}
+
+func getFallbackHostname() string {
+	hostInfo, err := psutil.HOST.GetHostInfo(false)
+	if err != nil {
+		return ""
+	}
+	return hostInfo.Hostname
+}
+
+func getFallbackIP() string {
+	if systemIP, err := repo.NewISettingRepo().GetValueByKey("SystemIP"); err == nil && systemIP != "" {
+		return systemIP
+	}
+	return loadOutboundIP()
+}
+
+func loadOutboundIP() string {
+	conn, err := network.Dial("udp", "8.8.8.8:80")
+
+	if err != nil {
+		return ""
+	}
+	defer conn.Close()
+	localAddr := conn.LocalAddr().(*network.UDPAddr)
+	return localAddr.IP.String()
 }

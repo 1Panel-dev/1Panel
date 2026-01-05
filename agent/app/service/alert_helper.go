@@ -599,7 +599,8 @@ func sendAlerts(alert dto.AlertDTO, alertType, quota, quotaType string, params [
 				create.AlertRule = alertUtil.ProcessAlertRule(alert)
 				create.AlertDetail = alertUtil.ProcessAlertDetail(alertInfo, quotaType, params, constant.Email)
 				transport := xpack.LoadRequestTransport()
-				_ = alertUtil.CreateEmailAlertLog(create, alertInfo, params, transport)
+				agentInfo, _ := xpack.GetAgentInfo()
+				_ = alertUtil.CreateEmailAlertLog(create, alertInfo, params, transport, agentInfo)
 				alertUtil.CreateNewAlertTask(quota, alertType, quotaType, constant.Email)
 				global.LOG.Infof("%s alert email push successful", alertType)
 			}
