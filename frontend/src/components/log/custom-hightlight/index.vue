@@ -41,25 +41,29 @@ const nginxRules: TokenRule[] = [
         pattern: /\[(crit|error)\]/g,
         color: '#E74C3C',
     },
-
     {
         type: 'path',
-        pattern: /(?<=[\s"])\/[^"\s]+(?:\.\w+)?(?:\?\w+=\w+)?/g,
+        pattern: /(?<=[\s"])\/[^\s"]*/g,
         color: '#B87A2B',
     },
     {
         type: 'http-method',
-        pattern: /(?<=)(?:GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS)(?=\s)/g,
+        pattern: /\b(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS)\b/g,
         color: '#27AE60',
     },
     {
         type: 'status-success',
-        pattern: /\s(2\d{2})\s/g,
+        pattern: /(?<=")\s(2\d{2})\b/g,
         color: '#2ECC71',
     },
     {
+        type: 'status-redirect',
+        pattern: /(?<=")\s(3\d{2})\b/g,
+        color: '#F39C12',
+    },
+    {
         type: 'status-error',
-        pattern: /\s([45]\d{2})\s/g,
+        pattern: /(?<=")\s([45]\d{2})\b/g,
         color: '#E74C3C',
     },
     {
