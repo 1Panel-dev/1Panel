@@ -29,7 +29,7 @@ import { newUUID } from '@/utils/util';
 import { routerToName } from '@/utils/router';
 import TaskLog from '@/components/log/task/index.vue';
 import i18n from '@/lang';
-import { installAppToNodes } from '@/xpack/api/modules/appstore';
+import { installAppToNodes } from '@/api/modules/app';
 
 const router = useRouter();
 const open = ref(false);

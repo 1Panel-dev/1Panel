@@ -354,4 +354,10 @@ export namespace App {
         status: string;
         imagePrefix: string;
     }
+
+    export interface InstallAppToNodes extends AppInstall {
+        nodes: string[];
+        appKey: string;
+        version: string;
+    }
 }
