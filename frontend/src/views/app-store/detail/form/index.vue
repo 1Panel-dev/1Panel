@@ -222,6 +222,7 @@ const formRules = ref<FormRules>({
     specifyIP: [Rules.ipv4orV6],
     restartPolicy: [Rules.requiredSelect],
     format: [Rules.requiredInput],
+    pushNodes: [Rules.requiredSelect],
 });
 
 const initFormData = () => ({
