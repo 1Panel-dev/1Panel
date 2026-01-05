@@ -2152,6 +2152,11 @@ const message = {
         monitor:
             'Tingkatkan ke versi profesional untuk melihat status masa nyata laman web, tren pelawat, sumber pelawat, log permintaan dan maklumat lain.',
         alert: 'Tingkatkan ke versi profesional untuk menerima maklumat amaran melalui SMS dan melihat log amaran, mengawal sepenuhnya pelbagai acara utama, dan memastikan operasi sistem bebas kerisauan.',
+        node: 'Menaik taraf ke Edisi Profesional membolehkan anda menguruskan berbilang pelayan Linux dengan 1Panel.',
+        nodeApp:
+            'Menaik taraf ke Edisi Profesional membolehkan peningkatan bersatu versi aplikasi berbilang nod tanpa menukar nod secara manual.',
+        nodeDashboard:
+            'Menaik taraf ke Edisi Profesional membolehkan pengurusan berpusat aplikasi, laman web, pangkalan data dan tugas berjadual berbilang nod.',
         fileExchange: 'Naik taraf ke Edisi Professional untuk menghantar fail dengan cepat antara pelbagai pelayan.',
         app: 'Tingkatkan ke versi profesional untuk melihat maklumat perkhidmatan, pemantauan abnormal, dll melalui aplikasi mudah alih.',
         cluster:
@@ -3662,6 +3667,19 @@ const message = {
             alertContent3:
                 'Memberikan pengguna konfigurasi nombor telefon tersuai, kekerapan push harian, dan masa push harian, memudahkan pengguna untuk menetapkan amaran push yang lebih munasabah.',
 
+            nodeDashTitle1: 'Pengurusan Aplikasi',
+            nodeDashContent1:
+                'Pengurusan bersatu aplikasi berbilang nod, menyokong pemantauan status, mula/henti pantas, sambungan terminal dan sandaran',
+            nodeDashTitle2: 'Pengurusan Laman Web',
+            nodeDashContent2:
+                'Pengurusan bersatu laman web berbilang nod, pemantauan status masa nyata, menyokong mula/henti kelompok dan sandaran pantas',
+            nodeDashTitle3: 'Pengurusan Pangkalan Data',
+            nodeDashContent3:
+                'Pengurusan bersatu pangkalan data berbilang nod, status utama sekilas, menyokong sandaran satu klik',
+            nodeDashTitle4: 'Pengurusan Tugas Berjadual',
+            nodeDashContent4:
+                'Pengurusan bersatu tugas berjadual berbilang nod, menyokong pemantauan status, mula/henti pantas dan pelaksanaan pencetus manual',
+
             nodeTitle1: 'Satu Klik Tambah Node',
             nodeContent1: 'Mengintegrasikan pelbagai nod pelayan dengan cepat',
             nodeTitle2: 'Kelompok Naik Taraf',
@@ -3679,6 +3697,9 @@ const message = {
             fileExchangeTitle3: 'Sokongan Pertukaran Inter-Node',
             fileExchangeContent3:
                 'Mudah memindahkan fail projek antara nod yang berbeza, mengurus pelbagai pelayan dengan fleksibiliti.',
+
+            nodeAppTitle1: 'Pengurusan Naik Taraf Aplikasi',
+            nodeAppContent1: 'Pemantauan bersatu kemas kini aplikasi berbilang nod, menyokong naik taraf satu klik',
 
             appTitle1: 'Pengurusan Panel yang Fleksibel',
             appContent1: 'Uruskan pelayan 1Panel anda dengan mudah pada bila-bila masa dan di mana sahaja.',

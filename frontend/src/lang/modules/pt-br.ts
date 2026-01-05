@@ -2146,6 +2146,11 @@ const message = {
         monitor:
             'Upgrade para a versão profissional para visualizar o status em tempo real do site, tendências de visitantes, fontes de visitantes, logs de solicitações e outras informações.',
         alert: 'Upgrade para a versão profissional para receber informações de alarme via SMS e visualizar logs de alarmes, controlar completamente vários eventos chave e garantir a operação sem preocupações do sistema',
+        node: 'Atualizar para a Edição Profissional permite gerenciar vários servidores Linux com o 1Panel.',
+        nodeApp:
+            'Atualizar para a Edição Profissional permite a atualização unificada de versões de aplicativos multi-nó sem a necessidade de alternar manualmente entre nós.',
+        nodeDashboard:
+            'Atualizar para a Edição Profissional permite o gerenciamento centralizado de aplicativos, sites, bancos de dados e tarefas agendadas multi-nó.',
         fileExchange:
             'Atualize para a Edição Profissional para transferir arquivos rapidamente entre vários servidores.',
         app: 'Upgrade para a versão profissional para visualizar informações do serviço, monitoramento anômalo, etc., através do aplicativo móvel.',
@@ -3680,6 +3685,19 @@ const message = {
             alertContent3:
                 'Permite que os usuários configurem números de telefone personalizados, frequência de envio diário e horários de envio, facilitando a criação de alertas mais adequados.',
 
+            nodeDashTitle1: 'Gerenciamento de Aplicativos',
+            nodeDashContent1:
+                'Gerenciamento unificado de aplicativos multi-nó, suporta monitoramento de status, início/parada rápida, conexão de terminal e backup',
+            nodeDashTitle2: 'Gerenciamento de Sites',
+            nodeDashContent2:
+                'Gerenciamento unificado de sites multi-nó, monitoramento de status em tempo real, suporta início/parada em lote e backup rápido',
+            nodeDashTitle3: 'Gerenciamento de Bancos de Dados',
+            nodeDashContent3:
+                'Gerenciamento unificado de bancos de dados multi-nó, status chave de relance, suporta backup com um clique',
+            nodeDashTitle4: 'Gerenciamento de Tarefas Agendadas',
+            nodeDashContent4:
+                'Gerenciamento unificado de tarefas agendadas multi-nó, suporta monitoramento de status, início/parada rápida e execução manual por acionamento',
+
             nodeTitle1: 'Adição de Nó com Um Clique',
             nodeContent1: 'Integre rapidamente vários nós de servidor',
             nodeTitle2: 'Atualização em Lote',
@@ -3697,6 +3715,10 @@ const message = {
             fileExchangeTitle3: 'Suporte a Troca Entre Múltiplos Nós',
             fileExchangeContent3:
                 'Transfira facilmente arquivos de projeto entre diferentes nós, gerencie vários servidores de forma flexível.',
+
+            nodeAppTitle1: 'Gerenciamento de Atualização de Aplicativos',
+            nodeAppContent1:
+                'Monitoramento unificado de atualizações de aplicativos multi-nó, suporta atualização com um clique',
 
             appTitle1: 'Gerenciamento Flexível do Painel',
             appContent1: 'Gerencie facilmente seu servidor 1Panel a qualquer hora e em qualquer lugar.',

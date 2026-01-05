@@ -2186,7 +2186,11 @@ const message = {
         setting: 'Actualizar a Pro permite personalizar logo, mensaje de bienvenida y más.',
         monitor: 'Pro permite ver estado web en tiempo real, tendencias, logs, etc.',
         alert: 'Pro permite recibir alertas SMS y ver logs, control total de eventos clave.',
-        node: 'Pro permite gestionar múltiples servidores Linux con 1Panel.',
+        node: 'Actualizar a la Edición Profesional le permite administrar múltiples servidores Linux con 1Panel.',
+        nodeApp:
+            'Actualizar a la Edición Profesional permite actualizar de forma unificada las versiones de aplicaciones multi-nodo sin cambiar manualmente entre nodos.',
+        nodeDashboard:
+            'Actualizar a la Edición Profesional permite la gestión centralizada de aplicaciones, sitios web, bases de datos y tareas programadas multi-nodo.',
         fileExchange: 'Pro permite transferir archivos entre varios servidores.',
         app: 'Pro permite ver información de servicio, monitoreo, etc. vía app móvil.',
         cluster:
@@ -3673,6 +3677,20 @@ const message = {
             alertTitle3: 'Configuración de Alertas',
             alertContent3:
                 'Permite configurar números de teléfono, frecuencia y horarios de notificación para alertas más personalizadas.',
+
+            nodeDashTitle1: 'Gestión de Aplicaciones',
+            nodeDashContent1:
+                'Gestión unificada de aplicaciones multi-nodo, admite monitoreo de estado, inicio/parada rápida, conexión de terminal y copia de seguridad',
+            nodeDashTitle2: 'Gestión de Sitios Web',
+            nodeDashContent2:
+                'Gestión unificada de sitios web multi-nodo, monitoreo de estado en tiempo real, admite inicio/parada por lotes y copia de seguridad rápida',
+            nodeDashTitle3: 'Gestión de Bases de Datos',
+            nodeDashContent3:
+                'Gestión unificada de bases de datos multi-nodo, estado clave de un vistazo, admite copia de seguridad con un clic',
+            nodeDashTitle4: 'Gestión de Tareas Programadas',
+            nodeDashContent4:
+                'Gestión unificada de tareas programadas multi-nodo, admite monitoreo de estado, inicio/parada rápida y ejecución manual por activación',
+
             nodeTitle1: 'Adición de Nodo en un Clic',
             nodeContent1: 'Integra rápidamente múltiples nodos de servidor',
             nodeTitle2: 'Actualización en Lote',
@@ -3689,6 +3707,11 @@ const message = {
             fileExchangeTitle3: 'Intercomunicación Multi-Nodo',
             fileExchangeContent3:
                 'Permite transferir fácilmente archivos entre diferentes nodos y gestionar múltiples servidores de forma flexible.',
+
+            nodeAppTitle1: 'Gestión de Actualización de Aplicaciones',
+            nodeAppContent1:
+                'Monitoreo unificado de actualizaciones de aplicaciones multi-nodo, admite actualización con un clic',
+
             appTitle1: 'Gestión Flexible del Panel',
             appContent1: 'Gestiona tu servidor 1Panel en cualquier momento y lugar.',
             appTitle2: 'Información Completa de Servicios',

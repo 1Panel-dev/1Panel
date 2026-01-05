@@ -2197,7 +2197,11 @@ const message = {
         monitor:
             'Profesyonel sürüme yükseltme, web sitesinin gerçek zamanlı durumunu, ziyaretçi trendlerini, ziyaretçi kaynaklarını, istek günlüklerini ve diğer bilgileri görüntülemenize olanak tanır. ',
         alert: 'Profesyonel sürüme yükseltme, SMS yoluyla alarm bilgisi almanızı, alarm günlüklerini görüntülemenizi, çeşitli önemli olayları tamamen kontrol etmenizi ve sistemin sorunsuz çalışmasını sağlar.',
-        node: 'Profesyonel sürüme yükseltme, birden fazla Linux sunucusunu 1Panel ile yönetmenize olanak tanır.',
+        node: 'Profesyonel Sürüme yükseltme, 1Panel ile birden fazla Linux sunucusunu yönetmenize olanak tanır.',
+        nodeApp:
+            'Profesyonel Sürüme yükseltme, düğümleri manuel olarak değiştirmeye gerek kalmadan çoklu düğüm uygulama sürümlerini birleşik olarak yükseltmenize olanak tanır.',
+        nodeDashboard:
+            'Profesyonel Sürüme yükseltme, çoklu düğüm uygulamaları, web siteleri, veritabanları ve zamanlanmış görevleri merkezi olarak yönetmenizi sağlar.',
         fileExchange: 'Profesyonel Sürüme yükseltme, birden fazla sunucu arasında hızlı dosya aktarımı sağlar.',
         app: 'Profesyonel sürüme yükseltme, mobil uygulama üzerinden hizmet bilgilerini, anormal izlemeyi vb. görüntülemenize olanak tanır. ',
         cluster: 'Profesyonel Sürüme Yükseltme, MySQL/Postgers/Redis ana-çalışan kümelerini yönetmenizi sağlar.',
@@ -3743,6 +3747,19 @@ const message = {
             alertContent3:
                 'Kullanıcılara özel telefon numaraları, günlük gönderim sıklığı ve günlük gönderim zamanı yapılandırmaları sağlar, kullanıcıların daha makul gönderim uyarıları ayarlamasını kolaylaştırır.',
 
+            nodeDashTitle1: 'Uygulama Yönetimi',
+            nodeDashContent1:
+                'Çoklu düğüm uygulamalarının birleşik yönetimi, durum izleme, hızlı başlatma/durdurma, terminal bağlantısı ve yedekleme desteği',
+            nodeDashTitle2: 'Web Sitesi Yönetimi',
+            nodeDashContent2:
+                'Çoklu düğüm web sitelerinin birleşik yönetimi, gerçek zamanlı durum izleme, toplu başlatma/durdurma ve hızlı yedekleme desteği',
+            nodeDashTitle3: 'Veritabanı Yönetimi',
+            nodeDashContent3:
+                'Çoklu düğüm veritabanlarının birleşik yönetimi, önemli durumlar tek bakışta, tek tıklamayla yedekleme desteği',
+            nodeDashTitle4: 'Zamanlanmış Görev Yönetimi',
+            nodeDashContent4:
+                'Çoklu düğüm zamanlanmış görevlerinin birleşik yönetimi, durum izleme, hızlı başlatma/durdurma ve manuel tetikleme çalıştırma desteği',
+
             nodeTitle1: 'Tek Tıkla Düğüm Ekleme',
             nodeContent1: 'Birden fazla sunucu düğümünü hızlıca entegre eder',
             nodeTitle2: 'Toplu Yükseltme',
@@ -3760,6 +3777,10 @@ const message = {
             fileExchangeTitle3: 'Çoklu Düğüm İletişimini Destekler',
             fileExchangeContent3:
                 'Farklı düğümler arasında proje dosyalarını kolayca aktarır, birden fazla sunucuyu esnek bir şekilde yönetir.',
+
+            nodeAppTitle1: 'Uygulama Yükseltme Yönetimi',
+            nodeAppContent1:
+                'Çoklu düğüm uygulama güncellemelerinin birleşik izlenmesi, tek tıklamayla yükseltme desteği',
 
             appTitle1: 'Esnek Panel Yönetimi',
             appContent1: '1Panel sunucunuzu her zaman, her yerde kolayca yönetin.',

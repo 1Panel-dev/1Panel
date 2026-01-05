@@ -2022,7 +2022,9 @@ const message = {
         setting: '升級專業版可以自訂面板 Logo、歡迎簡介等資訊。',
         monitor: '升級專業版可以查看網站的即時狀態、訪客趨勢、訪客來源、請求日誌等資訊。',
         alert: '升級專業版可透過簡訊接收告警資訊，並查看告警日誌，全面掌控各類關鍵事件，確保系統執行無憂。',
-        node: '升級專業版可以使用 1Panel 管理多台 linux 伺服器。',
+        node: '升級專業版可以使用 1Panel 管理多台 Linux 伺服器。',
+        nodeApp: '升級專業版可以統一升級多節點應用版本，無需手動切換節點。',
+        nodeDashboard: '升級專業版可以集中管理多節點應用、網站、資料庫和計劃任務。',
         fileExchange: '升級專業版可以在多台伺服器之間快速傳輸文件。',
         app: '升級專業版可透過手機APP，查看服務資訊、異常監控等。',
         cluster: '升級專業版可以管理 MySQL/Postgres/Redis 主從叢集。',
@@ -3428,6 +3430,15 @@ const message = {
             alertContent3:
                 '為使用者提供自訂手機號碼、每日推送次數、每日推送時間的配寘，方便使用者的設定來更加合理的進行推送告警。',
 
+            nodeDashTitle1: '應用管理',
+            nodeDashContent1: '統一管理多節點應用，支援狀態監控、快速起停、終端連線及備份',
+            nodeDashTitle2: '網站管理',
+            nodeDashContent2: '統一管理多節點網站，即時監控狀態，支援批次起停與快速備份',
+            nodeDashTitle3: '資料庫管理',
+            nodeDashContent3: '統一管理多節點資料庫，關鍵狀態一目了然，支援一鍵備份',
+            nodeDashTitle4: '計劃任務管理',
+            nodeDashContent4: '統一管理多節點計劃任務，支援狀態監控、快速啟停與手動觸發執行',
+
             nodeTitle1: '一鍵新增節點',
             nodeContent1: '快速接入多台伺服器節點',
             nodeTitle2: '批次升級',
@@ -3443,6 +3454,9 @@ const message = {
             fileExchangeContent2: '僅同步變化內容，大幅提高傳輸速度與穩定性。',
             fileExchangeTitle3: '支援多節點互傳',
             fileExchangeContent3: '可在不同節點間便捷傳送項目文件，靈活管理多台伺服器。',
+
+            nodeAppTitle1: '應用升級管理',
+            nodeAppContent1: '統一監控多節點應用更新情況，支援一鍵升級',
 
             appTitle1: '靈活管理面板',
             appContent1: '隨時隨地輕鬆管理你的 1Panel 伺服器。',

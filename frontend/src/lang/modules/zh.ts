@@ -2021,6 +2021,8 @@ const message = {
         monitor: '升级专业版可以查看网站的实时状态、访客趋势、访客来源、请求日志等信息。',
         alert: '升级专业版可通过短信接收告警信息，并查看告警日志，全面掌控各类关键事件，确保系统运行无忧。',
         node: '升级专业版可以使用 1Panel 管理多台 linux 服务器。',
+        nodeApp: '升级专业版可以统一升级多节点应用版本，无需手动切换节点。',
+        nodeDashboard: '升级专业版可以集中管理多节点应用、网站、数据库和计划任务。',
         fileExchange: '升级专业版可以在多台服务器之间快速传输文件。',
         app: '升级专业版可通过手机 APP，查看服务信息、异常监控等。',
         cluster: '升级专业版可以管理 MySQL/Postgres/Redis 主从集群。',
@@ -3421,6 +3423,15 @@ const message = {
             alertContent3:
                 '为用户提供自定义手机号、每日推送次数、每日推送时间的配置，方便用户的设置来更加合理的进行推送告警。',
 
+            nodeDashTitle1: '应用管理',
+            nodeDashContent1: '统一管理多节点应用，支持状态监控、快速起停、终端连接及备份',
+            nodeDashTitle2: '网站管理',
+            nodeDashContent2: '统一管理多节点网站，实时监控状态，支持批量起停与快速备份',
+            nodeDashTitle3: '数据库管理',
+            nodeDashContent3: '统一管理多节点数据库，关键状态一目了然，支持一键备份',
+            nodeDashTitle4: '计划任务管理',
+            nodeDashContent4: '统一管理多节点计划任务，支持状态监控、快速启停与手动触发执行',
+
             nodeTitle1: '一键添加节点',
             nodeContent1: '快速接入多台服务器节点',
             nodeTitle2: '批量升级',
@@ -3436,6 +3447,9 @@ const message = {
             fileExchangeContent2: '仅同步变化内容，大幅提高传输速度与稳定性。',
             fileExchangeTitle3: '支持多节点互传',
             fileExchangeContent3: '可在不同节点间便捷传送项目文件，灵活管理多台服务器。',
+
+            nodeAppTitle1: '应用升级管理',
+            nodeAppContent1: '统一监控多节点应用更新情况，支持一键升级',
 
             appTitle1: '灵活管理面板',
             appContent1: '随时随地轻松管理你的 1Panel 服务器。',

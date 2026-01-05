@@ -2172,7 +2172,11 @@ const message = {
         monitor:
             'Upgrade to the professional version to view the real-time status of the website, visitor trends, visitor sources, request logs and other information. ',
         alert: 'Upgrade to the professional version to receive alarm information via SMS and view alarm logs, fully control various key events, and ensure worry-free system operation',
-        node: 'Upgrading to the professional version allows you to manage multiple Linux servers with 1Panel.',
+        node: 'Upgrading to the Professional Edition allows you to manage multiple Linux servers with 1Panel.',
+        nodeApp:
+            'Upgrading to the Professional Edition allows unified upgrading of multi-node application versions without manually switching nodes.',
+        nodeDashboard:
+            'Upgrading to the Professional Edition enables centralized management of multi-node applications, websites, databases, and scheduled tasks.',
         fileExchange: 'Upgrade to the Professional Edition to quickly transfer files between multiple servers.',
         app: 'Upgrade to the professional version to view service information, abnormal monitoring, etc. through the mobile APP. ',
         cluster:
@@ -3703,6 +3707,19 @@ const message = {
             alertContent3:
                 'Provide users with custom phone numbers, daily push frequency, and daily push time configurations, making it easier for users to set up more reasonable push alerts.',
 
+            nodeDashTitle1: 'Application Management',
+            nodeDashContent1:
+                'Unified management of multi-node applications, supports status monitoring, quick start/stop, terminal connection, and backup',
+            nodeDashTitle2: 'Website Management',
+            nodeDashContent2:
+                'Unified management of multi-node websites, real-time status monitoring, supports batch start/stop and quick backup',
+            nodeDashTitle3: 'Database Management',
+            nodeDashContent3:
+                'Unified management of multi-node databases, key status at a glance, supports one-click backup',
+            nodeDashTitle4: 'Scheduled Task Management',
+            nodeDashContent4:
+                'Unified management of multi-node scheduled tasks, supports status monitoring, quick start/stop, and manual trigger execution',
+
             nodeTitle1: 'One-Click Node Addition',
             nodeContent1: 'Quickly integrate multiple server nodes',
             nodeTitle2: 'Batch Upgrade',
@@ -3720,6 +3737,9 @@ const message = {
             fileExchangeTitle3: 'Support Multi-Node Intercommunication',
             fileExchangeContent3:
                 'Easily transfer project files between different nodes, flexible management of multiple servers.',
+
+            nodeAppTitle1: 'Application Upgrade Management',
+            nodeAppContent1: 'Unified monitoring of multi-node application updates, supports one-click upgrade',
 
             appTitle1: 'Flexible Panel Management',
             appContent1: 'Easily manage your 1Panel server anytime, anywhere.',
