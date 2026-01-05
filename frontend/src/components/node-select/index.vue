@@ -5,6 +5,7 @@
         class="p-w-200"
         :placeholder="$t('setting.selectNode')"
     >
+        <template #prefix>{{ $t('xpack.node.node') }}</template>
         <el-option
             v-for="item in nodes"
             :key="item.id"
