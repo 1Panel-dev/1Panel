@@ -203,15 +203,15 @@ func (u *FirewallService) OperateFirewall(req dto.FirewallOperation) error {
 		needRestartDocker = true
 	case "disableBanPing":
 		if err := firewall.UpdatePingStatus("0"); err != nil {
-			_ = settingRepo.Update("BanPing", constant.StatusDisable)
 			return err
 		}
+		_ = settingRepo.Update("BanPing", constant.StatusDisable)
 		return nil
 	case "enableBanPing":
 		if err := firewall.UpdatePingStatus("1"); err != nil {
-			_ = settingRepo.Update("BanPing", constant.StatusEnable)
 			return err
 		}
+		_ = settingRepo.Update("BanPing", constant.StatusEnable)
 		return nil
 	default:
 		return fmt.Errorf("not supported operation: %s", req.Operation)
