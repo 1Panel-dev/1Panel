@@ -99,7 +99,7 @@ func HandleNotSecurity(c *gin.Context, resType string) {
 		return
 	}
 	if resPage == "444" {
-		closeConn(c)
+		CloseDirectly(c)
 		return
 	}
 
@@ -185,7 +185,7 @@ func checkSession(c *gin.Context) bool {
 	return err == nil
 }
 
-func closeConn(c *gin.Context) {
+func CloseDirectly(c *gin.Context) {
 	hijacker, ok := c.Writer.(http.Hijacker)
 	if !ok {
 		c.AbortWithStatus(http.StatusForbidden)
