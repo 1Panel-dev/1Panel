@@ -3,6 +3,11 @@ package security
 import (
 	"encoding/base64"
 	"fmt"
+	"net/http"
+	"regexp"
+	"strconv"
+	"strings"
+
 	"github.com/1Panel-dev/1Panel/core/app/repo"
 	"github.com/1Panel-dev/1Panel/core/app/service"
 	"github.com/1Panel-dev/1Panel/core/cmd/server/res"
@@ -11,10 +16,6 @@ import (
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/utils/common"
 	"github.com/gin-gonic/gin"
-	"net/http"
-	"regexp"
-	"strconv"
-	"strings"
 )
 
 func HandleNotRoute(c *gin.Context) bool {
@@ -98,7 +99,7 @@ func HandleNotSecurity(c *gin.Context, resType string) {
 		return
 	}
 	if resPage == "444" {
-		c.String(444, "")
+		closeConn(c)
 		return
 	}
 
@@ -182,4 +183,20 @@ func checkIPLimit(c *gin.Context) bool {
 func checkSession(c *gin.Context) bool {
 	_, err := global.SESSION.Get(c)
 	return err == nil
+}
+
+func closeConn(c *gin.Context) {
+	hijacker, ok := c.Writer.(http.Hijacker)
+	if !ok {
+		c.AbortWithStatus(http.StatusForbidden)
+		return
+	}
+	conn, _, err := hijacker.Hijack()
+	if err != nil {
+		c.AbortWithStatus(http.StatusForbidden)
+		return
+	}
+
+	conn.Close()
+	c.Abort()
 }
