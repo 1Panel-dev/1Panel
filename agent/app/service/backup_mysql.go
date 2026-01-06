@@ -89,7 +89,7 @@ func handleMysqlBackup(db DatabaseHelper, parentTask *task.Task, recordID uint, 
 
 	itemHandler := func() error {
 		if len(db.Args) != 0 {
-			backupTask.Logf("args: %v", db.Args)
+			backupTask.Logf("%s: %v", i18n.GetMsgByKey("Arg"), db.Args)
 		}
 		return doMysqlBackup(db, targetDir, fileName, secret)
 	}

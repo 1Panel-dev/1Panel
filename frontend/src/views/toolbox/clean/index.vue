@@ -271,6 +271,7 @@ const scanStatus = ref<string>('beforeScan');
 const defaultProps = {
     children: 'children',
     label: 'label',
+    disabled: 'isDisabled',
 };
 const cleanData = reactive({
     systemClean: [],
@@ -403,15 +404,7 @@ const loadSubmitCheck = (data: any) => {
     }
 
     for (const item of data) {
-        if (
-            item.isCheck &&
-            item.label !== 'unknown_app' &&
-            item.label !== 'unknown_database' &&
-            item.label !== 'unknown_website' &&
-            item.label !== 'unknown_snapshot' &&
-            item.label !== 'unknown_website_log' &&
-            item.type !== 'app_tmp_download'
-        ) {
+        if (item.isCheck && item.type !== 'app_tmp_download') {
             submitCleans.value.push({ treeType: item.type, name: item.name, size: item.size });
             continue;
         }

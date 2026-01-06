@@ -202,6 +202,7 @@ ErrRemoteExist: 'Uzak veritabanında bu adla zaten mevcut, lütfen değiştirin 
 ErrLocalExist: 'Yerel veritabanında bu ad zaten mevcut, lütfen değiştirin ve tekrar deneyin'
 RemoteBackup: "Uzak veritabanını yedeklemek için önce {{ .name }} görüntüsü kullanılarak yerel konteyner veritabanı hizmetinin başlatılması gerekiyor, lütfen bekleyin..."
 RemoteRecover: "Uzak veritabanını geri yüklemek için önce {{ .name }} görüntüsü kullanılarak yerel konteyner veritabanı hizmetinin başlatılması gerekiyor, lütfen bekleyin..."
+Arg: "Argüman"
 
 #redis
 ErrTypeOfRedis: 'Kurtarma dosyası türü mevcut kalıcılık yöntemiyle eşleşmiyor, lütfen değiştirin ve tekrar deneyin'

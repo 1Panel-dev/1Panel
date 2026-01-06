@@ -201,6 +201,7 @@ ErrRemoteExist: 'Pangkalan data jauh sudah wujud dengan nama ini, sila ubah suai
 ErrLocalExist: 'Nama sudah wujud dalam pangkalan data tempatan, sila ubah suai dan cuba lagi'
 RemoteBackup: "Untuk menyandarkan pangkalan data jauh, perkhidmatan pangkalan data bekas tempatan perlu dimulakan terlebih dahulu menggunakan imej {{ .name }}, sila tunggu..."
 RemoteRecover: "Untuk memulihkan pangkalan data jauh, perkhidmatan pangkalan data bekas tempatan perlu dimulakan terlebih dahulu menggunakan imej {{ .name }}, sila tunggu..."
+Arg: "Hujah"
 
 #redis
 ErrTypeOfRedis: 'Jenis fail pemulihan tidak sepadan dengan kaedah kegigihan semasa, sila ubah suai dan cuba lagi'

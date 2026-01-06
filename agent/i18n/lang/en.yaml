@@ -201,6 +201,7 @@ ErrRemoteExist: 'The remote database already exists with this name, please modif
 ErrLocalExist: 'The name already exists in the local database, please modify it and try again'
 RemoteBackup: "To back up the remote database, the local container database service needs to be started first using the image {{ .name }}, please wait..."
 RemoteRecover: "To restore the remote database, the local container database service needs to be started first using the image {{ .name }}, please wait..."
+Arg: "Argument"
 
 #redis
 ErrTypeOfRedis: 'The recovery file type does not match the current persistence method, please modify it and try again'

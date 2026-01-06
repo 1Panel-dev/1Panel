@@ -200,6 +200,7 @@ ErrRemoteExist: 'La base de datos remota ya existe con ese nombre, modifíquelo 
 ErrLocalExist: 'El nombre ya existe en la base de datos local, modifíquelo e intente de nuevo'
 RemoteBackup: "Para hacer una copia de seguridad de la base de datos remota, primero debe iniciarse el servicio de base de datos del contenedor local utilizando la imagen {{ .name }}, espere por favor..."
 RemoteRecover: "Para restaurar la base de datos remota, primero debe iniciarse el servicio de base de datos del contenedor local utilizando la imagen {{ .name }}, espere por favor..."
+Arg: "Argumento"
 
 #redis
 ErrTypeOfRedis: 'El tipo de archivo de recuperación no coincide con el método de persistencia actual, modifíquelo e intente'

@@ -295,7 +295,7 @@ func loadAgentPackage(fileOp fileUtils.FileOp) dto.CleanTree {
 	itemTree := dto.CleanTree{
 		ID:          uuid.NewString(),
 		Label:       "agent_packages",
-		IsCheck:     true,
+		IsCheck:     false,
 		IsRecommend: true,
 		Type:        "agent",
 	}
@@ -314,19 +314,19 @@ func loadAgentPackage(fileOp fileUtils.FileOp) dto.CleanTree {
 				Type:        "agent",
 			})
 		} else {
-			if strings.HasPrefix(file.Name(), fmt.Sprintf("1panel-agent_%s_a", global.CONF.Base.Version)) {
-				continue
-			}
 			itemSize, _ := file.Info()
+			itemName := file.Name()
+			isCurrentVersion := strings.HasPrefix(itemName, fmt.Sprintf("1panel-agent_%s_", global.CONF.Base.Version))
 			itemTree.Size += uint64(itemSize.Size())
 			itemTree.Children = append(itemTree.Children, dto.CleanTree{
 				ID:          uuid.NewString(),
-				Label:       file.Name(),
-				Name:        file.Name(),
+				Label:       itemName,
+				Name:        itemName,
 				Size:        uint64(itemSize.Size()),
-				IsCheck:     true,
+				IsCheck:     !isCurrentVersion,
 				IsRecommend: true,
 				Type:        "agent",
+				IsDisabled:  isCurrentVersion,
 			})
 		}
 	}
@@ -534,10 +534,6 @@ func loadFileOrDirWithExclude(fileOp fileUtils.FileOp, index uint, dir string, r
 	}
 	for _, entry := range entries {
 		childPath := filepath.Join(dir, entry.Name())
-		if isExactPathMatch(childPath, excludes) {
-			continue
-		}
-
 		childNode := dto.CleanTree{
 			ID:          uuid.NewString(),
 			Label:       entry.Name(),
@@ -545,6 +541,7 @@ func loadFileOrDirWithExclude(fileOp fileUtils.FileOp, index uint, dir string, r
 			IsRecommend: false,
 			Name:        childPath,
 			Type:        "unknown_backup",
+			IsDisabled:  isExactPathMatch(childPath, excludes),
 		}
 		if entry.IsDir() {
 			if index < 4 {
