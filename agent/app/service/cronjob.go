@@ -143,6 +143,7 @@ func (u *CronjobService) Export(req dto.OperateByIDs) (string, error) {
 			Timeout:        cronjob.Timeout,
 			IgnoreErr:      cronjob.IgnoreErr,
 			Secret:         cronjob.Secret,
+			Args:           cronjob.Args,
 		}
 		switch cronjob.Type {
 		case "app":
@@ -237,6 +238,7 @@ func (u *CronjobService) Import(req []dto.CronjobTrans) error {
 			Timeout:        item.Timeout,
 			IgnoreErr:      item.IgnoreErr,
 			Secret:         item.Secret,
+			Args:           item.Args,
 		}
 		hasNotFound := false
 		switch item.Type {
@@ -733,6 +735,7 @@ func (u *CronjobService) Update(id uint, req dto.CronjobOperate) error {
 	upMap["timeout"] = req.Timeout
 	upMap["ignore_err"] = req.IgnoreErr
 	upMap["secret"] = req.Secret
+	upMap["args"] = req.Args
 	err = cronjobRepo.Update(id, upMap)
 	if err != nil {
 		return err

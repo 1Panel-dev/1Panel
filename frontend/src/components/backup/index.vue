@@ -100,7 +100,6 @@
     <DialogPro
         v-model="open"
         :title="isBackup ? $t('commons.button.backup') : $t('commons.button.recover') + ' - ' + name"
-        size="small"
         @close="handleBackupClose"
     >
         <el-alert :closable="false">
@@ -109,6 +108,17 @@
         <el-form class="mt-5" ref="backupForm" @submit.prevent label-position="top" v-loading="loading">
             <el-form-item :label="$t('setting.compressPassword')">
                 <el-input v-model="secret" :placeholder="$t('setting.backupRecoverMessage')" />
+            </el-form-item>
+            <el-form-item v-if="type === 'mysql' || type === 'mysql-cluster'" :label="$t('cronjob.backupArgs')">
+                <el-select v-model="args" filterable allow-create multiple>
+                    <el-option v-for="item in mysqlArgs" :key="item.arg" :value="item.arg" :label="item.arg">
+                        {{ item.arg }}
+                        <span class="ml-2">{{ item.description }}</span>
+                    </el-option>
+                </el-select>
+                <span class="input-help">
+                    {{ $t('cronjob.backupArgsHelper') }}
+                </span>
             </el-form-item>
             <el-form-item
                 v-if="!isBackup && type !== 'app' && type !== 'website'"
@@ -166,6 +176,7 @@ import { MsgSuccess } from '@/utils/message';
 import TaskLog from '@/components/log/task/index.vue';
 import { routerToFileWithPath } from '@/utils/router';
 import { useGlobalStore } from '@/composables/useGlobalStore';
+import { mysqlArgs } from '@/views/cronjob/cronjob/helper';
 const { currentNode } = useGlobalStore();
 
 const PushApp = defineAsyncComponent(async () => {
@@ -178,6 +189,7 @@ const PushApp = defineAsyncComponent(async () => {
 });
 
 const selects = ref<any>([]);
+const args = ref([]);
 const loading = ref();
 const opRef = ref();
 const taskLogRef = ref();
@@ -311,6 +323,7 @@ const backup = async () => {
         secret: secret.value,
         taskID: taskID,
         description: description.value,
+        args: args.value,
     };
     loading.value = true;
     await handleBackup(params, node.value)
@@ -352,6 +365,7 @@ const recover = async (row?: any) => {
 const onBackup = async () => {
     description.value = '';
     secret.value = '';
+    args.value = [];
     isBackup.value = true;
     open.value = true;
 };

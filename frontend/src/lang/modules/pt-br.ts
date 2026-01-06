@@ -1122,6 +1122,13 @@ const message = {
         failedRecord: 'Registros de falha',
         successRecord: 'Registros de sucesso',
         database: 'Backup de banco de dados',
+        backupArgs: 'Argumentos de Backup',
+        backupArgsHelper:
+            'Argumentos de backup não listados podem ser inseridos e selecionados manualmente. Por exemplo: Digite --no-data e selecione a primeira opção da lista suspensa.',
+        singleTransaction:
+            'Faz backup de tabelas InnoDB usando uma única transação, adequado para backups de dados de grande volume',
+        quick: 'Lê dados linha por linha em vez de carregar toda a tabela na memória, adequado para backups de dados de grande volume e máquinas com pouca memória',
+        skipLockTables: 'Backup sem bloquear todas as tabelas, adequado para bancos de dados altamente concorrentes',
         missBackupAccount: 'A conta de backup não foi encontrada',
         syncDate: 'Data de sincronização',
         clean: 'Limpeza de cache',

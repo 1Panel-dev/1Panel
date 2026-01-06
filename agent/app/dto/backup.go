@@ -65,12 +65,13 @@ type UploadForRecover struct {
 }
 
 type CommonBackup struct {
-	Type       string `json:"type" validate:"required,oneof=app mysql mariadb redis website postgresql mysql-cluster postgresql-cluster redis-cluster"`
-	Name       string `json:"name"`
-	DetailName string `json:"detailName"`
-	Secret     string `json:"secret"`
-	TaskID     string `json:"taskID"`
-	FileName   string `json:"fileName"`
+	Type       string   `json:"type" validate:"required,oneof=app mysql mariadb redis website postgresql mysql-cluster postgresql-cluster redis-cluster"`
+	Name       string   `json:"name"`
+	DetailName string   `json:"detailName"`
+	Secret     string   `json:"secret"`
+	TaskID     string   `json:"taskID"`
+	FileName   string   `json:"fileName"`
+	Args       []string `json:"args"`
 
 	Description string `json:"description"`
 }

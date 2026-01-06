@@ -335,6 +335,30 @@
                                         </el-select>
                                     </el-form-item>
                                 </LayoutCol>
+                                <LayoutCol
+                                    :span="20"
+                                    v-if="
+                                        form.type === 'database' &&
+                                        (form.dbType === 'mysql' || form.dbType === 'mysql-cluster')
+                                    "
+                                >
+                                    <el-form-item :label="$t('cronjob.backupArgs')">
+                                        <el-select v-model="form.argItems" filterable allow-create multiple>
+                                            <el-option
+                                                v-for="item in mysqlArgs"
+                                                :key="item.arg"
+                                                :value="item.arg"
+                                                :label="item.arg"
+                                            >
+                                                {{ item.arg }}
+                                                <span class="ml-2">{{ item.description }}</span>
+                                            </el-option>
+                                        </el-select>
+                                        <span class="input-help">
+                                            {{ $t('cronjob.backupArgsHelper') }}
+                                        </span>
+                                    </el-form-item>
+                                </LayoutCol>
                                 <LayoutCol v-if="form.type === 'directory'">
                                     <el-form-item :label="$t('commons.button.backup')">
                                         <el-radio-group v-model="form.isDir" class="w-full">
@@ -774,7 +798,6 @@ import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 import InputTag from '@/components/input-tag/index.vue';
 import LayoutCol from '@/components/layout-col/form.vue';
 import CleanLogConfig from '@/views/cronjob/cronjob/config/clean-log.vue';
-
 import { reactive, ref } from 'vue';
 import { Rules } from '@/global/form-rules';
 import { listBackupOptions } from '@/api/modules/backup';
@@ -797,6 +820,7 @@ import {
     transSpecToObj,
     weekOptions,
     cronjobTypes,
+    mysqlArgs,
 } from '../helper';
 import { loadUsers } from '@/api/modules/toolbox';
 import { loadContainerUsers } from '@/api/modules/container';
@@ -883,6 +907,8 @@ const form = reactive<Cronjob.CronjobInfo>({
     alertMethodItems: [],
 
     scopes: [],
+    args: '',
+    argItems: [],
 });
 
 const search = async () => {
@@ -982,6 +1008,7 @@ const search = async () => {
                     form.alertMethodItems = [];
                 }
                 form.scopes = res.data.scopes;
+                form.argItems = res.data.args ? res.data.args.split(',') : [];
             })
             .catch(() => {
                 loading.value = false;
@@ -1481,6 +1508,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     form.url = form.urlItems.join(',');
     form.sourceAccountIDs = form.sourceAccountItems.join(',');
     form.spec = specs.join('&&');
+    form.args = form.argItems.join(',');
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;

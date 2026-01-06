@@ -1137,6 +1137,14 @@ const message = {
         failedRecord: 'Registros fallidos',
         successRecord: 'Registros completados correctamente',
         database: 'Respaldo de base de datos',
+        backupArgs: 'Argumentos de Copia de Seguridad',
+        backupArgsHelper:
+            'Los argumentos de copia de seguridad no listados pueden ser ingresados y seleccionados manualmente. Por ejemplo: Ingrese --no-data y seleccione la primera opción de la lista desplegable.',
+        singleTransaction:
+            'Copia de seguridad de tablas InnoDB utilizando una única transacción, adecuada para copias de seguridad de datos de gran volumen',
+        quick: 'Lee datos fila por fila en lugar de cargar la tabla completa en memoria, adecuado para copias de seguridad de datos de gran volumen y máquinas con poca memoria',
+        skipLockTables:
+            'Copia de seguridad sin bloquear todas las tablas, adecuada para bases de datos altamente concurrentes',
         missBackupAccount: 'No se pudo encontrar la cuenta de respaldo',
         syncDate: 'Hora de sincronización',
         clean: 'Limpiar caché',

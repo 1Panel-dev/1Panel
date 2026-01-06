@@ -44,7 +44,7 @@ func (u *BackupService) MysqlBackup(req dto.CommonBackup) error {
 		return err
 	}
 
-	databaseHelper := DatabaseHelper{Database: req.Name, DBType: req.Type, Name: req.DetailName}
+	databaseHelper := DatabaseHelper{Database: req.Name, DBType: req.Type, Name: req.DetailName, Args: req.Args}
 	if err := handleMysqlBackup(databaseHelper, nil, record.ID, targetDir, fileName, req.TaskID, req.Secret); err != nil {
 		backupRepo.UpdateRecordByMap(record.ID, map[string]interface{}{"status": constant.StatusFailed, "message": err.Error()})
 		return err
@@ -87,7 +87,12 @@ func handleMysqlBackup(db DatabaseHelper, parentTask *task.Task, recordID uint, 
 		}
 	}
 
-	itemHandler := func() error { return doMysqlBackup(db, targetDir, fileName, secret) }
+	itemHandler := func() error {
+		if len(db.Args) != 0 {
+			backupTask.Logf("args: %v", db.Args)
+		}
+		return doMysqlBackup(db, targetDir, fileName, secret)
+	}
 	if parentTask != nil {
 		return itemHandler()
 	}
@@ -225,6 +230,7 @@ func doMysqlBackup(db DatabaseHelper, targetDir, fileName, secret string) error 
 		Format:    dbInfo.Format,
 		TargetDir: targetDir,
 		FileName:  fileName,
+		Args:      db.Args,
 	}
 	if err := cli.Backup(backupInfo); err != nil {
 		return err

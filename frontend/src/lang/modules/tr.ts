@@ -1146,6 +1146,13 @@ const message = {
         failedRecord: 'Başarısız kayıtlar',
         successRecord: 'Başarılı kayıtlar',
         database: 'Veritabanını yedekle',
+        backupArgs: 'Yedekleme Argümanları',
+        backupArgsHelper:
+            'Listelenmemiş yedekleme argümanları manuel olarak girilip seçilebilir. Örneğin: --no-data yazın ve açılır listeden ilk seçeneği seçin.',
+        singleTransaction:
+            'InnoDB tablolarını tek bir işlem kullanarak yedekler, büyük hacimli veri yedeklemeleri için uygundur',
+        quick: 'Tüm tabloyu belleğe yüklemek yerine verileri satır satır okur, büyük hacimli veri ve düşük bellekli makine yedeklemeleri için uygundur',
+        skipLockTables: 'Tüm tabloları kilitlemeden yedekleme, yüksek eşzamanlılığa sahip veritabanları için uygundur',
         missBackupAccount: 'Yedekleme hesabı bulunamadı',
         syncDate: 'Senkronizasyon zamanı ',
         clean: 'Önbellek temizleme',

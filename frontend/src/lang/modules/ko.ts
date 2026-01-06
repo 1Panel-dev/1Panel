@@ -1091,6 +1091,12 @@ const message = {
         failedRecord: '실패한 레코드',
         successRecord: '성공한 레코드',
         database: '백업 데이터베이스',
+        backupArgs: '백업 인수',
+        backupArgsHelper:
+            '목록에 없는 백업 인수는 수동으로 입력하여 선택할 수 있습니다. 예: --no-data를 입력하고 드롭다운 목록의 첫 번째 옵션을 선택하세요.',
+        singleTransaction: '단일 트랜잭션을 사용하여 InnoDB 테이블을 백업하며, 대용량 데이터 백업에 적합합니다',
+        quick: '전체 테이블을 메모리에 로드하는 대신 데이터를 행별로 읽습니다. 대용량 데이터 및 저메모리 시스템 백업에 적합합니다',
+        skipLockTables: '모든 테이블을 잠그지 않고 백업합니다. 높은 동시성 데이터베이스에 적합합니다',
         missBackupAccount: '백업 계정을 찾을 수 없습니다',
         syncDate: '동기화 시간',
         clean: '캐시 정리',

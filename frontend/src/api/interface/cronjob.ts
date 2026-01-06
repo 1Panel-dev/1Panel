@@ -67,6 +67,8 @@ export namespace Cronjob {
         alertMethodItems: Array<string>;
 
         scopes: string[];
+        args: string;
+        argItems: Array<string>;
     }
     export interface Item {
         val: string;
@@ -113,6 +115,7 @@ export namespace Cronjob {
         alertMethod: string;
 
         scopes?: string[];
+        args: string;
     }
     export interface CronjobTrans {
         name: string;

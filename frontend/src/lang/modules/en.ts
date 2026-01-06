@@ -1133,6 +1133,12 @@ const message = {
         failedRecord: 'Failure records',
         successRecord: 'Successful records',
         database: 'Backup database',
+        backupArgs: 'Backup Arguments',
+        backupArgsHelper:
+            'Unlisted backup arguments can be manually entered and selected. For example: Enter --no-data and select the first option from the dropdown list.',
+        singleTransaction: 'Backup InnoDB tables using a single transaction, suitable for large-volume data backups',
+        quick: 'Read data row by row instead of loading the entire table into memory, suitable for large-volume data and low-memory machine backups',
+        skipLockTables: 'Backup without locking all tables, suitable for highly concurrent databases',
         missBackupAccount: 'The backup account could not be found',
         syncDate: 'Synchronization time ',
         clean: 'Cache clean',

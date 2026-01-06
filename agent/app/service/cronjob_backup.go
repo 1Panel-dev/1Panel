@@ -379,6 +379,7 @@ type DatabaseHelper struct {
 	DBType   string
 	Database string
 	Name     string
+	Args     []string
 }
 
 func addSkipTask(source string, taskItem *task.Task) {
@@ -400,6 +401,7 @@ func loadDbsForJob(cronjob model.Cronjob) []DatabaseHelper {
 					DBType:   cronjob.DBType,
 					Database: mysql.Database,
 					Name:     mysql.Name,
+					Args:     strings.Split(cronjob.Args, ","),
 				})
 			}
 		} else {
@@ -410,6 +412,7 @@ func loadDbsForJob(cronjob model.Cronjob) []DatabaseHelper {
 					DBType:   cronjob.DBType,
 					Database: pg.PostgresqlName,
 					Name:     pg.Name,
+					Args:     strings.Split(cronjob.Args, ","),
 				})
 			}
 		}
@@ -425,6 +428,7 @@ func loadDbsForJob(cronjob model.Cronjob) []DatabaseHelper {
 				DBType:   cronjob.DBType,
 				Database: mysqlItem.MysqlName,
 				Name:     mysqlItem.Name,
+				Args:     strings.Split(cronjob.Args, ","),
 			})
 		} else {
 			pgItem, _ := postgresqlRepo.Get(repo.WithByID(uint(itemID)))
@@ -433,6 +437,7 @@ func loadDbsForJob(cronjob model.Cronjob) []DatabaseHelper {
 				DBType:   cronjob.DBType,
 				Database: pgItem.PostgresqlName,
 				Name:     pgItem.Name,
+				Args:     strings.Split(cronjob.Args, ","),
 			})
 		}
 	}

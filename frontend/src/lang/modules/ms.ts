@@ -1125,6 +1125,13 @@ const message = {
         failedRecord: 'Rekod kegagalan',
         successRecord: 'Rekod berjaya',
         database: 'Pangkalan data sandaran',
+        backupArgs: 'Argumen Sandaran',
+        backupArgsHelper:
+            'Argumen sandaran yang tidak disenaraikan boleh dimasukkan dan dipilih secara manual. Contoh: Masukkan --no-data dan pilih pilihan pertama dari senarai juntai bawah.',
+        singleTransaction:
+            'Sandaran jadual InnoDB menggunakan transaksi tunggal, sesuai untuk sandaran data isipadu besar',
+        quick: 'Baca data baris demi baris daripada memuatkan keseluruhan jadual ke dalam ingatan, sesuai untuk sandaran data isipadu besar dan mesin ingatan rendah',
+        skipLockTables: 'Sandaran tanpa mengunci semua jadual, sesuai untuk pangkalan data konkuren tinggi',
         missBackupAccount: 'Akaun sandaran tidak dijumpai',
         syncDate: 'Waktu penyelarasan',
         clean: 'Bersihkan cache',

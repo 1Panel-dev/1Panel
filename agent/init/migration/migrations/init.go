@@ -807,3 +807,10 @@ var UpdateApp = &gormigrate.Migration{
 		return tx.AutoMigrate(&model.App{})
 	},
 }
+
+var AddCronjobArgs = &gormigrate.Migration{
+	ID: "20260106-add-cronjob-args",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(&model.Cronjob{})
+	},
+}

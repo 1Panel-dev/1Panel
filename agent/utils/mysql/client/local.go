@@ -237,9 +237,17 @@ func (r *Local) Backup(info BackupInfo) error {
 	if r.Type == constant.AppMariaDB {
 		dumpCmd = "mariadb-dump"
 	}
-	global.LOG.Infof("start to %s | gzip > %s.gzip", dumpCmd, info.TargetDir+"/"+info.FileName)
+	global.LOG.Infof("start to %s | gzip > %s.gzip, args: %v", dumpCmd, info.TargetDir+"/"+info.FileName, info.Args)
 
-	cmd := exec.Command("docker", "exec", r.ContainerName, dumpCmd, "--routines", "-uroot", "-p"+r.Password, "--default-character-set="+info.Format, info.Name)
+	args := []string{"exec", r.ContainerName, dumpCmd, "--routines", "-uroot", "-p" + r.Password, "--default-character-set=" + info.Format}
+	for _, arg := range info.Args {
+		if len(arg) == 0 {
+			continue
+		}
+		args = append(args, arg)
+	}
+	args = append(args, info.Name)
+	cmd := exec.Command("docker", args...)
 	var stderr bytes.Buffer
 	cmd.Stderr = &stderr
 
