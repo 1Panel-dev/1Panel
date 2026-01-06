@@ -1,5 +1,5 @@
 <template>
-    <div class="h-full" @dragover="handleDragover" @drop="handleDrop" @dragleave="handleDragleave">
+    <div class="h-full" ref="fileTableRef" @dragover="handleDragover" @drop="handleDrop" @dragleave="handleDragleave">
         <el-tabs
             type="card"
             class="file-tabs"
@@ -574,6 +574,7 @@
                                 :sortable="'custom'"
                             ></el-table-column>
                             <fu-table-operations
+                                :max-height="dropdownMaxHeight"
                                 :ellipsis="mobile ? 0 : 2"
                                 :buttons="tableMoreButtons"
                                 :label="$t('commons.table.operate')"
@@ -711,6 +712,8 @@ const router = useRouter();
 const data = ref();
 const tableRefs = ref<Record<string, any>>({});
 const heightDiff = ref(365);
+const fileTableRef = ref<HTMLElement | null>(null);
+const dropdownMaxHeight = ref(450);
 
 const setTableRef = (key: string, el: any) => {
     if (el) {
@@ -997,6 +1000,7 @@ const observeResize = () => {
 
         if (isElChanged) resizeHandler();
         if (isEleChanged) btnResizeHandler();
+        updateHeight();
     });
 
     observe.observe(el);
@@ -1012,10 +1016,6 @@ function watchTitleHeight() {
         heightDiff.value = 325 + titleHeight;
     }
 }
-
-watchTitleHeight();
-
-window.addEventListener('resize', watchTitleHeight);
 
 const resetPaths = () => {
     paths.value = [...hidePaths.value, ...paths.value];
@@ -1089,24 +1089,23 @@ const backForwardJump = async (url: string) => {
     });
 };
 
-const getPaths = (reqPath: string) => {
-    const pathArray = reqPath.split('/');
-    paths.value = [];
-    hidePaths.value = [];
-    let base = '/';
+const getPaths = (reqPath: string | undefined | null) => {
+    const pathString = reqPath || '';
+    const pathArray = pathString.split('/').filter((p) => p !== '');
+
+    const breadcrumbs = [];
+    let base = '';
+
     for (const p of pathArray) {
-        if (p != '') {
-            if (base.endsWith('/')) {
-                base = base + p;
-            } else {
-                base = base + '/' + p;
-            }
-            paths.value.push({
-                url: base,
-                name: p,
-            });
-        }
+        base = `${base}/${p}`;
+        breadcrumbs.push({
+            url: base,
+            name: p,
+        });
     }
+
+    paths.value = breadcrumbs;
+    hidePaths.value = [];
 };
 
 const handleCreate = (command: string) => {
@@ -1775,12 +1774,19 @@ function initTabsAndPaths() {
 }
 
 function buildPaths(path: string) {
-    const segments = path.split('/').filter(Boolean);
-    let url = '';
-    return segments.map((segment) => {
-        url += '/' + segment;
-        return { url, name: segment };
-    });
+    return path
+        .split('/')
+        .filter(Boolean)
+        .reduce((accumulator, segment) => {
+            const lastPath = accumulator[accumulator.length - 1];
+            const currentUrl = lastPath ? `${lastPath.url}/${segment}` : `/${segment}`;
+            accumulator.push({
+                url: currentUrl,
+                name: segment,
+            });
+
+            return accumulator;
+        }, []);
 }
 
 function initHistory() {
@@ -1790,23 +1796,24 @@ function initHistory() {
 }
 
 function getInitialPath(): string {
-    const routePath = router.currentRoute.value.query.path;
-    if (routePath != undefined) {
-        const p = String(routePath);
-        globalStore.setLastFilePath(p);
-        return p;
-    } else if (
-        typeof globalStore.lastFilePath === 'string' &&
-        globalStore.lastFilePath.trim() !== '' &&
-        globalStore.lastFilePath !== 'undefined'
-    ) {
+    if (typeof globalStore.lastFilePath === 'string' && globalStore.lastFilePath.trim() !== '') {
         return globalStore.lastFilePath;
     }
-    const tab = editableTabs.value.find((t) => t.id === editableTabsKey.value);
-    if (tab) {
-        globalStore.setLastFilePath(tab.path);
-        return tab.path;
+    const routePath = router.currentRoute.value.query.path;
+    if (routePath && typeof routePath === 'string') {
+        const p = routePath.trim();
+        if (p !== '') {
+            globalStore.setLastFilePath(p);
+            return p;
+        }
     }
+    const tab = editableTabs.value.find((t) => t.id === editableTabsKey.value);
+    if (tab && typeof tab.path === 'string' && tab.path.trim() !== '') {
+        const p = tab.path.trim();
+        globalStore.setLastFilePath(p);
+        return p;
+    }
+
     return '/';
 }
 
@@ -1931,14 +1938,27 @@ const checkFFmpeg = () => {
     });
 };
 
-onMounted(() => {
-    loadPath();
+const updateHeight = () => {
+    const el = fileTableRef.value;
+    if (!el) return;
+    let tabHeight = globalStore.openMenuTabs ? 40 : 0;
+    const half = (el.offsetHeight + tabHeight) / 2;
+    dropdownMaxHeight.value = Math.max(half, 300);
+};
+
+onMounted(async () => {
+    await nextTick();
+    watchTitleHeight();
+    window.addEventListener('resize', watchTitleHeight);
+    updateHeight();
+    window.addEventListener('resize', updateHeight);
+    await loadPath();
     initShowHidden();
     initTabsAndPaths();
-    getHostMount();
+    await getHostMount();
     initHistory();
     checkFFmpeg();
-    nextTick(function () {
+    await nextTick(function () {
         handlePath();
         observeResize();
     });
@@ -1947,6 +1967,7 @@ onMounted(() => {
 onBeforeUnmount(() => {
     if (resizeObserver) resizeObserver.disconnect();
     window.removeEventListener('resize', watchTitleHeight);
+    window.removeEventListener('resize', updateHeight);
 });
 </script>
 
