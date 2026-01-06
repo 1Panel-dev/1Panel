@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div ref="fileTableRef">
         <div class="flex items-center">
             <div class="flex-shrink-0 flex items-center mr-4">
                 <el-tooltip :content="$t('file.back')" placement="top">
@@ -433,6 +433,7 @@
                         sortable
                     ></el-table-column>
                     <fu-table-operations
+                        :max-height="dropdownMaxHeight"
                         :ellipsis="mobile ? 0 : 3"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
@@ -468,7 +469,7 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, onMounted, reactive, ref, computed } from 'vue';
+import { nextTick, onMounted, reactive, ref, computed, onBeforeUnmount } from 'vue';
 import {
     GetFilesList,
     GetFileContent,
@@ -519,6 +520,8 @@ const router = useRouter();
 const data = ref();
 const tableRef = ref();
 let selects = ref<any>([]);
+const fileTableRef = ref<HTMLElement | null>(null);
+const dropdownMaxHeight = ref(450);
 
 // origin data
 const initData = () => ({
@@ -1148,7 +1151,18 @@ const isDecompressFile = (row: File.File) => {
     }
 };
 
-onMounted(() => {
+const updateHeight = () => {
+    const el = fileTableRef.value;
+    if (!el) return;
+    let tabHeight = globalStore.openMenuTabs ? 40 : 0;
+    const half = (el.offsetHeight + tabHeight) / 2;
+    dropdownMaxHeight.value = Math.max(half, 300);
+};
+
+onMounted(async () => {
+    await nextTick();
+    updateHeight();
+    window.addEventListener('resize', updateHeight);
     if (router.currentRoute.value.query.path) {
         req.path = String(router.currentRoute.value.query.path);
         getPaths(req.path);
@@ -1160,12 +1174,15 @@ onMounted(() => {
         }
     }
     pathWidth.value = pathRef.value.offsetWidth;
-    search();
+    await search();
     history.push(req.path);
     pointer = history.length - 1;
-    nextTick(function () {
+    await nextTick(function () {
         handlePath();
     });
+});
+onBeforeUnmount(() => {
+    window.removeEventListener('resize', updateHeight);
 });
 </script>
 

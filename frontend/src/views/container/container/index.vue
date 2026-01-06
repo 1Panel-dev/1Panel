@@ -1,5 +1,5 @@
 <template>
-    <div v-loading="loading">
+    <div v-loading="loading" ref="tableRef">
         <el-card v-if="dockerStatus != 'Running'" class="mask-prompt">
             <span>{{ $t('container.serviceUnavailable') }}</span>
             <el-button type="primary" class="bt" link @click="goSetting">【 {{ $t('container.setting') }} 】</el-button>
@@ -292,6 +292,7 @@
                     />
                     <fu-table-operations
                         fix
+                        :max-height="dropdownMaxHeight"
                         width="200px"
                         :ellipsis="2"
                         :buttons="buttons"
@@ -332,7 +333,7 @@ import TerminalDialog from '@/views/container/container/terminal/index.vue';
 import CodemirrorDialog from '@/components/codemirror-dialog/index.vue';
 import PortJumpDialog from '@/components/port-jump/index.vue';
 import Status from '@/components/status/index.vue';
-import { reactive, onMounted, ref, computed } from 'vue';
+import { reactive, onMounted, ref, computed, onBeforeUnmount, nextTick } from 'vue';
 import {
     containerListStats,
     containerOperator,
@@ -351,6 +352,9 @@ const globalStore = GlobalStore();
 const mobile = computed(() => {
     return globalStore.isMobile();
 });
+
+const tableRef = ref<HTMLElement | null>(null);
+const dropdownMaxHeight = ref(450);
 
 const loading = ref(false);
 const data = ref();
@@ -768,10 +772,25 @@ const buttons = [
     },
 ];
 
-onMounted(() => {
+const updateHeight = () => {
+    const el = tableRef.value;
+    if (!el) return;
+    let tabHeight = globalStore.openMenuTabs ? 40 : 0;
+    const half = (el.offsetHeight + tabHeight) / 2;
+    dropdownMaxHeight.value = Math.max(half, 300);
+};
+
+onMounted(async () => {
+    await nextTick();
+    updateHeight();
+    window.addEventListener('resize', updateHeight);
     let includeItem = localStorage.getItem('includeAppStore');
     includeAppStore.value = !includeItem || includeItem === 'true';
-    loadStatus();
+    await loadStatus();
+});
+
+onBeforeUnmount(() => {
+    window.removeEventListener('resize', updateHeight);
 });
 </script>
 
