@@ -104,11 +104,12 @@
                             </el-form-item>
 
                             <el-form-item :label="$t('setting.panelSSL')" prop="ssl">
-                                <el-radio-group v-model="form.ssl" @change="handleSSL">
-                                    <el-radio value="Disable">{{ $t('setting.sslDisable') }}</el-radio>
-                                    <el-radio value="Enable">{{ $t('commons.button.enable') }} (Strict)</el-radio>
-                                    <el-radio value="Mux">{{ $t('commons.button.enable') }} (Mux)</el-radio>
-                                </el-radio-group>
+                                <el-switch
+                                    @change="handleSSL"
+                                    v-model="form.sslItem"
+                                    active-value="Enable"
+                                    inactive-value="Disable"
+                                />
                                 <span class="input-help">{{ $t('setting.https') }}</span>
                                 <div v-if="form.ssl !== 'Disable' && sslInfo">
                                     <el-tag>{{ $t('setting.domainOrIP') }} {{ sslInfo.domain }}</el-tag>
@@ -222,6 +223,7 @@ const form = reactive({
     ipv6: 'Disable',
     bindAddress: '',
     ssl: 'Disable',
+    sslItem: 'Disable',
     sslType: 'self',
     securityEntrance: '',
     expirationDays: 0,
@@ -243,6 +245,7 @@ const search = async () => {
     form.ipv6 = res.data.ipv6;
     form.bindAddress = res.data.bindAddress;
     form.ssl = res.data.ssl;
+    form.sslItem = res.data.ssl === 'Disable' ? 'Disable' : 'Enable';
     lastSSL.value = form.ssl;
     form.sslType = res.data.sslType;
     if (form.ssl !== 'Disable') {
@@ -327,7 +330,7 @@ const onChangeAllowIPs = () => {
     allowIPsRef.value.acceptParams({ allowIPs: form.allowIPs });
 };
 const handleSSL = async () => {
-    if (form.ssl !== 'Disable') {
+    if (form.sslItem !== 'Disable') {
         let params = {
             ssl: form.ssl,
             sslType: form.sslType,
@@ -359,6 +362,7 @@ const handleSSL = async () => {
         })
         .catch(() => {
             form.ssl = lastSSL.value;
+            form.sslItem = lastSSL.value === 'Disable' ? 'Disable' : 'Enable';
         });
 };
 

@@ -1928,7 +1928,10 @@ const message = {
         error444: '接続が閉じた',
         error500: 'サーバーエラー',
 
-        https: 'パネルに HTTPS を設定するとアクセスの安全性が向上します。\nStrict モードでは HTTPS 以外の通信はパネルに接続できません。\nMux モードは HTTP を HTTPS にリダイレクトしますが、安全性が低下する可能性があります。',
+        https: 'パネルにHTTPSを設定するとアクセスセキュリティが向上します',
+        strictHelper: 'HTTPS以外のトラフィックはパネルに接続できません',
+        muxHelper:
+            'パネルはHTTPポートとHTTPSポートの両方を監視し、HTTPをHTTPSにリダイレクトしますが、セキュリティが低下する可能性があります',
         certType: '証明書の種類',
         selfSigned: '自己署名',
         selfSignedHelper: `ブラウザは、自己署名の証明書を信頼していない場合があり、セキュリティ警告を表示する場合があります。`,

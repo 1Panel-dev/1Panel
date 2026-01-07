@@ -2026,7 +2026,10 @@ const message = {
         error416: 'Aralık Karşılanamadı',
         error444: 'Bağlantı Kapalı',
         error500: 'Dahili Sunucu Hatası',
-        https: "Panel için HTTPS ayarlamak erişim güvenliğini artırır.\nStrict modda HTTPS olmayan trafik panele bağlanamaz.\nMux modu HTTP'yi HTTPS'e yönlendirir, ancak güvenliği biraz azaltabilir.",
+        https: 'Panel için HTTPS ayarlamak erişim güvenliğini artırır',
+        strictHelper: 'HTTPS olmayan trafik panele bağlanamaz',
+        muxHelper:
+            "Panel hem HTTP hem de HTTPS portlarını dinleyecek ve HTTP'yi HTTPS'ye yönlendirecektir, ancak bu güvenliği azaltabilir",
         certType: 'Sertifika türü',
         selfSigned: 'Kendi kendine imzalı',
         selfSignedHelper:
