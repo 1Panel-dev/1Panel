@@ -255,10 +255,20 @@
                                                 :value="item.id + ''"
                                                 :label="item.primaryDomain"
                                             >
-                                                <span>{{ item.primaryDomain }}</span>
-                                                <el-tag class="tagClass">
-                                                    {{ item.alias }}
-                                                </el-tag>
+                                                <div class="option-content">
+                                                    <el-tooltip
+                                                        :content="item.primaryDomain"
+                                                        placement="top"
+                                                        :open-delay="500"
+                                                        effect="dark"
+                                                    >
+                                                        <span class="domain-text">{{ item.primaryDomain }}</span>
+                                                    </el-tooltip>
+
+                                                    <el-tag class="tagClass">
+                                                        {{ item.alias }}
+                                                    </el-tag>
+                                                </div>
                                             </el-option>
                                         </el-select>
                                         <span class="input-help" v-if="form.type === 'cutWebsiteLog'">
@@ -1623,5 +1633,23 @@ onMounted(() => {
     width: 100%;
     margin: 3px 0;
     border-top: 1px var(--el-border-color) var(--el-border-style);
+}
+
+.option-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.domain-text {
+    max-width: 200px;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    display: inline-block;
+    vertical-align: middle;
 }
 </style>
