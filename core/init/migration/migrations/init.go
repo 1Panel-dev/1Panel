@@ -602,3 +602,44 @@ var UpdateXpackHideMenuSort = &gormigrate.Migration{
 		return tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Update("value", string(updatedJSON)).Error
 	},
 }
+
+var AdjustXpackNode = &gormigrate.Migration{
+	ID: "20260108-adjust-xpack-node",
+	Migrate: func(tx *gorm.DB) error {
+		var menuJSON string
+		if err := tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Pluck("value", &menuJSON).Error; err != nil {
+			return err
+		}
+		if menuJSON == "" {
+			menuJSON = helper.LoadMenus()
+		}
+		var menus []dto.ShowMenu
+		if err := json.Unmarshal([]byte(menuJSON), &menus); err != nil {
+			return tx.Model(&model.Setting{}).
+				Where("key = ?", "HideMenu").
+				Update("value", helper.LoadMenus()).Error
+		}
+
+		for i := 0; i < len(menus); i++ {
+			if menus[i].Label != "Xpack-Menu" {
+				continue
+			}
+			for j := 0; j < len(menus[i].Children); j++ {
+				if menus[i].Children[j].Label == "Node" {
+					menus[i].Children[j].Label = "NodeDashboard"
+					menus[i].Children[j].Path = "/xpack/node/dashboard"
+					break
+				}
+			}
+		}
+
+		updatedJSON, err := json.Marshal(menus)
+		if err != nil {
+			return tx.Model(&model.Setting{}).
+				Where("key = ?", "HideMenu").
+				Update("value", helper.LoadMenus()).Error
+		}
+
+		return tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Update("value", string(updatedJSON)).Error
+	},
+}

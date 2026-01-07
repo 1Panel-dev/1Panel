@@ -3,10 +3,11 @@ package helper
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
+
 	"github.com/1Panel-dev/1Panel/core/app/dto"
 	"github.com/1Panel-dev/1Panel/core/app/model"
 	"gorm.io/gorm"
-	"strings"
 )
 
 func LoadMenus() string {
@@ -43,7 +44,7 @@ func LoadMenus() string {
 			Children: []dto.ShowMenu{
 				{ID: "118", Disabled: false, Title: "xpack.app.app", IsShow: true, Label: "XApp", Path: "/xpack/app", Sort: 100},
 				{ID: "112", Disabled: false, Title: "xpack.waf.name", IsShow: true, Label: "Dashboard", Path: "/xpack/waf/dashboard", Sort: 200},
-				{ID: "111", Disabled: false, Title: "xpack.node.nodeManagement", IsShow: true, Label: "Node", Path: "/xpack/node", Sort: 300},
+				{ID: "111", Disabled: false, Title: "xpack.node.nodeManagement", IsShow: true, Label: "NodeDashboard", Path: "/xpack/node/dashboard", Sort: 300},
 				{ID: "119", Disabled: false, Title: "xpack.upage", IsShow: true, Label: "Upage", Path: "/xpack/upage", Sort: 400},
 				{ID: "113", Disabled: false, Title: "xpack.monitor.name", IsShow: true, Label: "MonitorDashboard", Path: "/xpack/monitor/dashboard", Sort: 500},
 				{ID: "114", Disabled: false, Title: "xpack.tamper.tamper", IsShow: true, Label: "Tamper", Path: "/xpack/tamper", Sort: 600},
