@@ -16,6 +16,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 )
 
@@ -239,8 +240,10 @@ func (r *Local) Backup(info BackupInfo) error {
 	}
 	global.LOG.Infof("start to %s | gzip > %s.gzip, args: %v", dumpCmd, info.TargetDir+"/"+info.FileName, info.Args)
 
-	args := []string{"exec", r.ContainerName, dumpCmd, "--routines", "-uroot", "-p" + r.Password, "--default-character-set=" + info.Format}
-	for _, arg := range info.Args {
+	info.Args = append(info.Args, "--routines")
+	itemArgs := common.RemoveRepeatStr(info.Args)
+	args := []string{"exec", r.ContainerName, dumpCmd, "-uroot", "-p" + r.Password, "--default-character-set=" + info.Format}
+	for _, arg := range itemArgs {
 		if len(arg) == 0 {
 			continue
 		}

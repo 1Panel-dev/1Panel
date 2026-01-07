@@ -17,6 +17,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/client"
@@ -253,8 +254,18 @@ func (r *Remote) Backup(info BackupInfo) error {
 	if err != nil {
 		return err
 	}
-	backupCmd := fmt.Sprintf("docker run --rm --net=host -i %s /bin/bash -c '%s --routines -h %s -P %d -u%s -p%s %s --default-character-set=%s %s'",
-		image, dumpCmd, r.Address, r.Port, r.User, r.Password, sslSkip(info.Version, r.Type), info.Format, info.Name)
+	info.Args = append(info.Args, "--routines")
+	itemArgs := common.RemoveRepeatStr(info.Args)
+	var args []string
+	for _, arg := range itemArgs {
+		if len(arg) == 0 {
+			continue
+		}
+		args = append(args, arg)
+	}
+
+	backupCmd := fmt.Sprintf("docker run --rm --net=host -i %s /bin/bash -c '%s %s -h %s -P %d -u%s -p%s %s --default-character-set=%s %s'",
+		image, dumpCmd, strings.Join(args, " "), r.Address, r.Port, r.User, r.Password, sslSkip(info.Version, r.Type), info.Format, info.Name)
 
 	global.LOG.Debug(strings.ReplaceAll(backupCmd, r.Password, "******"))
 	cmd := exec.Command("bash", "-c", backupCmd)
