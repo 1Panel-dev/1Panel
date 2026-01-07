@@ -2002,7 +2002,10 @@ const message = {
         error444: 'Connection Closed',
         error500: 'Internal Server Error',
 
-        https: 'Setting up HTTPS for the panel improves access security.\nStrict mode blocks non-HTTPS traffic from reaching the panel.\nMux mode redirects HTTP to HTTPS, but may reduce security.',
+        https: 'Setting HTTPS for the panel improves access security',
+        strictHelper: 'Non-HTTPS traffic cannot connect to the panel',
+        muxHelper:
+            'The panel will listen on both HTTP and HTTPS ports and redirect HTTP to HTTPS, but this may reduce security',
         certType: 'Certificate type',
         selfSigned: 'Self signed',
         selfSignedHelper: `Browsers may not trust self-signed certificates and may display security warnings.`,

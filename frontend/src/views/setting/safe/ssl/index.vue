@@ -8,6 +8,14 @@
             </template>
         </el-alert>
         <el-form ref="formRef" label-position="top" :model="form" :rules="rules" v-loading="loading">
+            <el-form-item :label="$t('setting.mode')" prop="ssl">
+                <el-radio-group v-model="form.ssl">
+                    <el-radio-button value="Enable">Strict</el-radio-button>
+                    <el-radio-button value="Mux">Mux</el-radio-button>
+                </el-radio-group>
+                <span v-if="form.ssl === 'Enable'" class="input-help">{{ $t('setting.strictHelper') }}</span>
+                <span v-if="form.ssl === 'Mux'" class="input-help">{{ $t('setting.muxHelper') }}</span>
+            </el-form-item>
             <el-form-item :label="$t('setting.certType')">
                 <el-radio-group v-model="form.sslType">
                     <el-radio value="self">{{ $t('setting.selfSigned') }}</el-radio>
