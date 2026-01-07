@@ -307,7 +307,7 @@ const loadSize = async (params: any) => {
 };
 
 const openTaskLog = (taskID: string) => {
-    taskLogRef.value.openWithTaskID(taskID);
+    taskLogRef.value.openWithTaskID(taskID, true, node.value);
 };
 
 function selectable(row) {

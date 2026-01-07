@@ -392,15 +392,15 @@ func loadUnknownApps(fileOp fileUtils.FileOp, recordMap map[string][]string) dto
 	return treeData
 }
 func loadUnknownDbs(fileOp fileUtils.FileOp, recordMap map[string][]string) dto.CleanTree {
-	apps, _ := appInstallRepo.ListBy(context.Background())
+	dbs, _ := databaseRepo.GetList()
 	var excludePaths []string
-	appMap := make(map[string]struct{})
-	for _, app := range apps {
-		appMap[fmt.Sprintf("database/%s/%s", app.App.Key, app.Name)] = struct{}{}
+	dbMap := make(map[string]struct{})
+	for _, db := range dbs {
+		dbMap[fmt.Sprintf("database/%s/%s", db.Type, db.Name)] = struct{}{}
 	}
 	for key, val := range recordMap {
 		itemName := path.Dir(key)
-		if _, ok := appMap[itemName]; ok {
+		if _, ok := dbMap[itemName]; ok {
 			for _, item := range val {
 				excludePaths = append(excludePaths, path.Join(global.Dir.LocalBackupDir, key, item))
 			}

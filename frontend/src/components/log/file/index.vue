@@ -227,7 +227,7 @@ const changeLoading = () => {
 
 const onDownload = async () => {
     changeLoading();
-    downloadFile(logPath.value, globalStore.currentNode);
+    downloadFile(logPath.value, props.config.operateNode || globalStore.currentNode);
     changeLoading();
 };
 
@@ -263,7 +263,7 @@ const getContent = async (pre: boolean) => {
 
     let res;
     try {
-        res = await readByLine(readReq, props.config.operateNode || '');
+        res = await readByLine(readReq, props.config.operateNode || globalStore.currentNode);
     } catch (error) {
         isLoading.value = false;
         firstLoading.value = false;
