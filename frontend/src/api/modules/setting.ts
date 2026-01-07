@@ -56,7 +56,7 @@ export const getLicenseSmsInfo = () => {
 };
 
 export const listAppNodes = () => {
-    return http.get<Array<Setting.NodeAppItem>>(`/core/xpack/nodes/apps/update`);
+    return http.get<Array<Setting.NodeAppItem>>(`/core/xpack/nodes/apps/update`, {}, { timeout: TimeoutEnum.T_60S });
 };
 
 // agent
