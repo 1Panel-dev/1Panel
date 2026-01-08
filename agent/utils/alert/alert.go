@@ -208,7 +208,7 @@ func CheckSMSSendLimit(method string) bool {
 		return false
 	}
 	var cfg dto.AlertSmsConfig
-	err = json.Unmarshal([]byte(config.Config), &cfg)
+	cfg, err = ParseAlertSmsConfig(config.Config)
 	if err != nil {
 		return false
 	}
@@ -571,4 +571,28 @@ func loadOutboundIP() string {
 	defer conn.Close()
 	localAddr := conn.LocalAddr().(*network.UDPAddr)
 	return localAddr.IP.String()
+}
+
+func ParseAlertSmsConfig(configJSON string) (dto.AlertSmsConfig, error) {
+	var tempMap map[string]interface{}
+	err := json.Unmarshal([]byte(configJSON), &tempMap)
+	if err != nil {
+		return dto.AlertSmsConfig{}, err
+	}
+
+	var cfg dto.AlertSmsConfig
+	if phone, ok := tempMap["phone"].(string); ok {
+		cfg.Phone = phone
+	}
+
+	switch v := tempMap["alertDailyNum"].(type) {
+	case float64:
+		cfg.AlertDailyNum = strconv.FormatFloat(v, 'f', 0, 64)
+	case string:
+		cfg.AlertDailyNum = v
+	default:
+		cfg.AlertDailyNum = "50"
+	}
+
+	return cfg, nil
 }
