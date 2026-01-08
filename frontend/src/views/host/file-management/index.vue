@@ -714,6 +714,12 @@ const tableRefs = ref<Record<string, any>>({});
 const heightDiff = ref(365);
 const fileTableRef = ref<HTMLElement | null>(null);
 const dropdownMaxHeight = ref(450);
+const baseDir = ref();
+const editableTabsKey = ref('');
+const editableTabs = ref([
+    { id: '1', name: getLastPath(baseDir.value), path: baseDir.value },
+    { id: '2', name: 'home', path: '/home' },
+]);
 
 const setTableRef = (key: string, el: any) => {
     if (el) {
@@ -737,7 +743,6 @@ const initData = () => ({
 });
 let req = reactive(initData());
 let loading = ref(false);
-const baseDir = ref();
 const paths = ref<FilePaths[]>([]);
 const hidePaths = ref<FilePaths[]>([]);
 let pathWidth = ref(0);
@@ -1796,9 +1801,6 @@ function initHistory() {
 }
 
 function getInitialPath(): string {
-    if (typeof globalStore.lastFilePath === 'string' && globalStore.lastFilePath.trim() !== '') {
-        return globalStore.lastFilePath;
-    }
     const routePath = router.currentRoute.value.query.path;
     if (routePath && typeof routePath === 'string') {
         const p = routePath.trim();
@@ -1813,15 +1815,12 @@ function getInitialPath(): string {
         globalStore.setLastFilePath(p);
         return p;
     }
+    if (typeof globalStore.lastFilePath === 'string' && globalStore.lastFilePath.trim() !== '') {
+        return globalStore.lastFilePath;
+    }
 
     return '/';
 }
-
-const editableTabsKey = ref('');
-const editableTabs = ref([
-    { id: '1', name: getLastPath(baseDir.value), path: baseDir.value },
-    { id: '2', name: 'home', path: '/home' },
-]);
 
 function initTabs() {
     const savedTabs = localStorage.getItem('editableTabs');
