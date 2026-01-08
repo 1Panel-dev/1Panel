@@ -17,6 +17,10 @@ export namespace Login {
         token: string;
         mfaStatus: string;
     }
+    export interface PasskeyBeginResponse {
+        sessionId: string;
+        publicKey: Record<string, any>;
+    }
     export interface ResCaptcha {
         imagePath: string;
         captchaID: string;
@@ -36,5 +40,7 @@ export namespace Login {
         theme: string;
         isOffLine: boolean;
         needCaptcha: boolean;
+        passkeyEnabled: boolean;
+        passkeyConfigured: boolean;
     }
 }

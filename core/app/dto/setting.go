@@ -250,4 +250,17 @@ type LoginSetting struct {
 	PanelName   string `json:"panelName"`
 	Theme       string `json:"theme"`
 	NeedCaptcha bool   `json:"needCaptcha"`
+	PasskeyEnabled    bool `json:"passkeyEnabled"`
+	PasskeyConfigured bool `json:"passkeyConfigured"`
+}
+
+type PasskeyRegisterRequest struct {
+	Name string `json:"name" validate:"required"`
+}
+
+type PasskeyInfo struct {
+	ID         string `json:"id"`
+	Name       string `json:"name"`
+	CreatedAt  string `json:"createdAt"`
+	LastUsedAt string `json:"lastUsedAt"`
 }

@@ -947,3 +947,27 @@ export function GetPunyCodeDomain(domain: string): string {
         return '';
     }
 }
+
+export function base64UrlToBuffer(base64url: string): ArrayBuffer {
+    let base64 = base64url.replace(/-/g, '+').replace(/_/g, '/');
+    const pad = base64.length % 4;
+    if (pad) {
+        base64 += '='.repeat(4 - pad);
+    }
+    const binary = window.atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+        bytes[i] = binary.charCodeAt(i);
+    }
+    return bytes.buffer;
+}
+
+export function bufferToBase64Url(buffer: ArrayBuffer): string {
+    const bytes = new Uint8Array(buffer);
+    let binary = '';
+    bytes.forEach((byte) => {
+        binary += String.fromCharCode(byte);
+    });
+    const base64 = window.btoa(binary);
+    return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}

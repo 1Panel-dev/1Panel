@@ -136,6 +136,11 @@
                                 {{ $t('commons.button.login') }}
                             </el-button>
                         </el-form-item>
+                        <el-form-item v-if="passkeyEnabled && passkeyConfigured">
+                            <el-button class="w-full" size="default" @click="passkeyLogin">
+                                {{ $t('commons.login.passkey') }}
+                            </el-button>
+                        </el-form-item>
                         <el-text v-if="isDemo" type="danger" class="demo">
                             {{ $t('commons.login.username') }}:demo {{ $t('commons.login.password') }}:1panel
                         </el-text>
@@ -186,11 +191,11 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, computed, nextTick } from 'vue';
 import type { ElForm } from 'element-plus';
-import { loginApi, getCaptcha, mfaLoginApi, getLoginSetting } from '@/api/modules/auth';
+import { loginApi, getCaptcha, mfaLoginApi, getLoginSetting, passkeyBeginApi, passkeyFinishApi } from '@/api/modules/auth';
 import { GlobalStore, MenuStore, TabsStore } from '@/store';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { useI18n } from 'vue-i18n';
-import { encryptPassword } from '@/utils/util';
+import { encryptPassword, base64UrlToBuffer, bufferToBase64Url } from '@/utils/util';
 import { getXpackSettingForTheme } from '@/utils/xpack';
 import { routerToName } from '@/utils/router';
 import { changeToLocal, setDefaultNodeInfo } from '@/utils/node';
@@ -204,6 +209,9 @@ const tabsStore = TabsStore();
 const errAuthInfo = ref(false);
 const errCaptcha = ref(false);
 const errMfaInfo = ref(false);
+const passkeyEnabled = ref(false);
+const passkeyConfigured = ref(false);
+const passkeySupported = ref(false);
 const isDemo = ref(false);
 const isIntl = ref(true);
 const isFxplay = ref(false);
@@ -407,6 +415,88 @@ const mfaLogin = async (auto: boolean) => {
         }
     }
 };
+
+const passkeyLogin = async () => {
+    if (isLoggingIn || !passkeyEnabled.value || !passkeyConfigured.value) return;
+    if (!passkeySupported.value) {
+        MsgError(i18n.t('commons.login.passkeyNotSupported'));
+        return;
+    }
+    if (!isIntl.value && !isFxplay.value && !loginForm.agreeLicense) {
+        if (_isMobile()) {
+            open.value = true;
+        } else {
+            MsgError(i18n.t('commons.login.errorAgree'));
+        }
+        return;
+    }
+    try {
+        isLoggingIn = true;
+        loading.value = true;
+        const res = await passkeyBeginApi();
+        const publicKey = normalizePasskeyRequest(res.data.publicKey);
+        const credential = (await navigator.credentials.get({ publicKey })) as PublicKeyCredential | null;
+        if (!credential) {
+            MsgError(i18n.t('commons.login.passkeyFailed'));
+            return;
+        }
+        const payload = buildPasskeyAssertion(credential);
+        await passkeyFinishApi(payload, res.data.sessionId);
+        globalStore.ignoreCaptcha = true;
+        globalStore.setLogStatus(true);
+        globalStore.setAgreeLicense(true);
+        menuStore.setMenuList([]);
+        tabsStore.removeAllTabs();
+        changeToLocal();
+        MsgSuccess(i18n.t('commons.msg.loginSuccess'));
+        setDefaultNodeInfo();
+        localStorage.removeItem('dashboardCache');
+        localStorage.removeItem('upgradeChecked');
+        routerToName('home');
+        document.onkeydown = null;
+    } catch (res: any) {
+        if (res?.message) {
+            MsgError(res.message);
+        } else {
+            MsgError(i18n.t('commons.login.passkeyFailed'));
+        }
+    } finally {
+        isLoggingIn = false;
+        loading.value = false;
+    }
+};
+
+const normalizePasskeyRequest = (publicKey: Record<string, any>) => {
+    const request = { ...publicKey };
+    request.challenge = base64UrlToBuffer(request.challenge);
+    if (request.allowCredentials && Array.isArray(request.allowCredentials)) {
+        request.allowCredentials = request.allowCredentials.map((item) => {
+            return { ...item, id: base64UrlToBuffer(item.id) };
+        });
+    }
+    return request;
+};
+
+const buildPasskeyAssertion = (credential: PublicKeyCredential) => {
+    const response = credential.response as AuthenticatorAssertionResponse;
+    const payload: Record<string, any> = {
+        id: credential.id,
+        rawId: bufferToBase64Url(credential.rawId),
+        type: credential.type,
+        response: {
+            clientDataJSON: bufferToBase64Url(response.clientDataJSON),
+            authenticatorData: bufferToBase64Url(response.authenticatorData),
+            signature: bufferToBase64Url(response.signature),
+        },
+        clientExtensionResults: credential.getClientExtensionResults(),
+        authenticatorAttachment: credential.authenticatorAttachment,
+    };
+    if (response.userHandle) {
+        payload.response.userHandle = bufferToBase64Url(response.userHandle);
+    }
+    return payload;
+};
+
 const loginVerify = async () => {
     const res = await getCaptcha();
     captcha.imagePath = res.data.imagePath ? res.data.imagePath : '';
@@ -425,6 +515,8 @@ const getSetting = async () => {
         globalStore.isFxplay = isFxplay.value;
         globalStore.isOffLine = res.data.isOffLine;
         globalStore.ignoreCaptcha = !res.data.needCaptcha;
+        passkeyEnabled.value = res.data.passkeyEnabled;
+        passkeyConfigured.value = res.data.passkeyConfigured;
         if (!globalStore.ignoreCaptcha) {
             loginVerify();
         }
@@ -479,6 +571,7 @@ function adjustColorToRGBA(color: string, percent: number, opacity: number): str
 
 onMounted(() => {
     globalStore.isOnRestart = false;
+    passkeySupported.value = !!window.PublicKeyCredential && window.isSecureContext;
     getSetting();
     getXpackSettingForTheme();
     if (!globalStore.ignoreCaptcha) {

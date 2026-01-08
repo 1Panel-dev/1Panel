@@ -2,16 +2,27 @@ package service
 
 import (
 	"crypto/hmac"
+	"crypto/rand"
 	"encoding/base64"
+	"encoding/json"
+	"fmt"
+	"net"
+	"strconv"
+	"strings"
+	"sync"
+	"time"
+
 	"github.com/1Panel-dev/1Panel/core/app/dto"
 	"github.com/1Panel-dev/1Panel/core/app/repo"
 	"github.com/1Panel-dev/1Panel/core/buserr"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
+	"github.com/1Panel-dev/1Panel/core/utils/common"
 	"github.com/1Panel-dev/1Panel/core/utils/encrypt"
 	"github.com/1Panel-dev/1Panel/core/utils/mfa"
 	"github.com/gin-gonic/gin"
-	"strconv"
+	"github.com/go-webauthn/webauthn"
+	"github.com/go-webauthn/webauthn/protocol"
 )
 
 type AuthService struct{}
@@ -22,8 +33,110 @@ type IAuthService interface {
 	Login(c *gin.Context, info dto.Login, entrance string) (*dto.UserLoginInfo, string, error)
 	LogOut(c *gin.Context) error
 	MFALogin(c *gin.Context, info dto.MFALogin, entrance string) (*dto.UserLoginInfo, string, error)
+	PasskeyBeginLogin(c *gin.Context, entrance string) (*dto.PasskeyBeginResponse, string, error)
+	PasskeyFinishLogin(c *gin.Context, sessionID, entrance string) (*dto.UserLoginInfo, string, error)
+	PasskeyBeginRegister(c *gin.Context, name string) (*dto.PasskeyBeginResponse, string, error)
+	PasskeyFinishRegister(c *gin.Context, sessionID string) (string, error)
+	PasskeyList() ([]dto.PasskeyInfo, error)
+	PasskeyDelete(id string) error
+	PasskeyStatus(c *gin.Context) (bool, bool)
 	GetSecurityEntrance() string
 	IsLogin(c *gin.Context) bool
+}
+
+const (
+	passkeyUserIDSettingKey      = "PasskeyUserID"
+	passkeyCredentialSettingKey  = "PasskeyCredentials"
+	passkeyMaxCredentials        = 5
+	passkeySessionTTL            = 5 * time.Minute
+	passkeySessionKindLogin      = "login"
+	passkeySessionKindRegister   = "register"
+	passkeyCredentialNameDefault = "Passkey"
+)
+
+var passkeySessions = newPasskeySessionStore()
+
+type passkeySession struct {
+	Kind      string
+	Name      string
+	Session   webauthn.SessionData
+	ExpiresAt time.Time
+}
+
+type passkeySessionStore struct {
+	mu    sync.Mutex
+	items map[string]passkeySession
+}
+
+func newPasskeySessionStore() *passkeySessionStore {
+	return &passkeySessionStore{items: make(map[string]passkeySession)}
+}
+
+func (s *passkeySessionStore) set(kind, name string, session webauthn.SessionData) string {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	sessionID := generatePasskeySessionID()
+	s.items[sessionID] = passkeySession{
+		Kind:      kind,
+		Name:      name,
+		Session:   session,
+		ExpiresAt: time.Now().Add(passkeySessionTTL),
+	}
+	return sessionID
+}
+
+func (s *passkeySessionStore) get(sessionID string) (passkeySession, bool) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	item, ok := s.items[sessionID]
+	if !ok {
+		return passkeySession{}, false
+	}
+	if time.Now().After(item.ExpiresAt) {
+		delete(s.items, sessionID)
+		return passkeySession{}, false
+	}
+	return item, true
+}
+
+func (s *passkeySessionStore) delete(sessionID string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	delete(s.items, sessionID)
+}
+
+type passkeyCredentialRecord struct {
+	ID          string              `json:"id"`
+	Name        string              `json:"name"`
+	CreatedAt   string              `json:"createdAt"`
+	LastUsedAt  string              `json:"lastUsedAt"`
+	FlagsValue  uint8               `json:"flagsValue"`
+	Credential  webauthn.Credential `json:"credential"`
+}
+
+type passkeyUser struct {
+	id          []byte
+	name        string
+	displayName string
+	credentials []webauthn.Credential
+}
+
+func (u passkeyUser) WebAuthnID() []byte {
+	return u.id
+}
+
+func (u passkeyUser) WebAuthnName() string {
+	return u.name
+}
+
+func (u passkeyUser) WebAuthnDisplayName() string {
+	return u.displayName
+}
+
+func (u passkeyUser) WebAuthnCredentials() []webauthn.Credential {
+	return u.credentials
 }
 
 func NewIAuthService() IAuthService {
@@ -185,6 +298,500 @@ func (u *AuthService) GetSecurityEntrance() string {
 func (u *AuthService) IsLogin(c *gin.Context) bool {
 	_, err := global.SESSION.Get(c)
 	return err == nil
+}
+
+func (u *AuthService) PasskeyStatus(c *gin.Context) (bool, bool) {
+	enabled, err := u.passkeyEnabled(c)
+	if err != nil {
+		global.LOG.Errorf("passkey enabled check failed, err: %v", err)
+		enabled = false
+	}
+	configured, err := u.passkeyConfigured()
+	if err != nil {
+		global.LOG.Errorf("passkey config check failed, err: %v", err)
+		configured = false
+	}
+	return enabled, configured
+}
+
+func (u *AuthService) PasskeyBeginLogin(c *gin.Context, entrance string) (*dto.PasskeyBeginResponse, string, error) {
+	if err := u.checkEntrance(entrance); err != nil {
+		return nil, "ErrEntrance", err
+	}
+
+	config, msgKey, err := u.passkeyConfig(c)
+	if err != nil {
+		return nil, msgKey, err
+	}
+
+	records, err := loadPasskeyCredentialRecords()
+	if err != nil {
+		return nil, "", err
+	}
+	if len(records) == 0 {
+		return nil, "ErrPasskeyNotConfigured", buserr.New("ErrPasskeyNotConfigured")
+	}
+
+	user, err := u.passkeyUser(records, true)
+	if err != nil {
+		return nil, "", err
+	}
+
+	wa, err := webauthn.New(config)
+	if err != nil {
+		return nil, "", err
+	}
+	assertion, sessionData, err := wa.BeginLogin(user)
+	if err != nil {
+		return nil, "", err
+	}
+
+	sessionID := passkeySessions.set(passkeySessionKindLogin, "", *sessionData)
+	return &dto.PasskeyBeginResponse{SessionID: sessionID, PublicKey: assertion.Response}, "", nil
+}
+
+func (u *AuthService) PasskeyFinishLogin(c *gin.Context, sessionID, entrance string) (*dto.UserLoginInfo, string, error) {
+	if err := u.checkEntrance(entrance); err != nil {
+		return nil, "ErrEntrance", err
+	}
+	if sessionID == "" {
+		return nil, "ErrPasskeySession", buserr.New("ErrPasskeySession")
+	}
+
+	config, msgKey, err := u.passkeyConfig(c)
+	if err != nil {
+		return nil, msgKey, err
+	}
+
+	session, ok := passkeySessions.get(sessionID)
+	if !ok || session.Kind != passkeySessionKindLogin {
+		return nil, "ErrPasskeySession", buserr.New("ErrPasskeySession")
+	}
+	passkeySessions.delete(sessionID)
+
+	records, err := loadPasskeyCredentialRecords()
+	if err != nil {
+		return nil, "", err
+	}
+	if len(records) == 0 {
+		return nil, "ErrPasskeyNotConfigured", buserr.New("ErrPasskeyNotConfigured")
+	}
+
+	user, err := u.passkeyUser(records, true)
+	if err != nil {
+		return nil, "", err
+	}
+
+	wa, err := webauthn.New(config)
+	if err != nil {
+		return nil, "", err
+	}
+	credential, err := wa.FinishLogin(user, session.Session, c.Request)
+	if err != nil {
+		return nil, "ErrAuth", err
+	}
+
+	if err := updatePasskeyCredentialRecord(records, credential); err != nil {
+		return nil, "ErrAuth", err
+	}
+	if err := savePasskeyCredentialRecords(records); err != nil {
+		return nil, "", err
+	}
+
+	userSetting, err := settingRepo.Get(repo.WithByKey("UserName"))
+	if err != nil {
+		return nil, "", err
+	}
+	res, err := u.generateSession(c, userSetting.Value)
+	if err != nil {
+		return nil, "", err
+	}
+	if entrance != "" {
+		entranceValue := base64.StdEncoding.EncodeToString([]byte(entrance))
+		c.SetCookie("SecurityEntrance", entranceValue, 0, "", "", false, true)
+	}
+	return res, "", nil
+}
+
+func (u *AuthService) PasskeyBeginRegister(c *gin.Context, name string) (*dto.PasskeyBeginResponse, string, error) {
+	config, msgKey, err := u.passkeyConfig(c)
+	if err != nil {
+		return nil, msgKey, err
+	}
+	records, err := loadPasskeyCredentialRecords()
+	if err != nil {
+		return nil, "", err
+	}
+	if len(records) >= passkeyMaxCredentials {
+		return nil, "ErrPasskeyLimit", buserr.New("ErrPasskeyLimit")
+	}
+	user, err := u.passkeyUser(records, true)
+	if err != nil {
+		return nil, "", err
+	}
+
+	wa, err := webauthn.New(config)
+	if err != nil {
+		return nil, "", err
+	}
+	exclusions := make([]protocol.CredentialDescriptor, len(user.credentials))
+	for i, credential := range user.credentials {
+		exclusions[i] = credential.Descriptor()
+	}
+	creation, sessionData, err := wa.BeginRegistration(user, webauthn.WithExclusions(exclusions))
+	if err != nil {
+		return nil, "", err
+	}
+
+	sessionID := passkeySessions.set(passkeySessionKindRegister, strings.TrimSpace(name), *sessionData)
+	return &dto.PasskeyBeginResponse{SessionID: sessionID, PublicKey: creation.Response}, "", nil
+}
+
+func (u *AuthService) PasskeyFinishRegister(c *gin.Context, sessionID string) (string, error) {
+	if sessionID == "" {
+		return "ErrPasskeySession", buserr.New("ErrPasskeySession")
+	}
+	config, msgKey, err := u.passkeyConfig(c)
+	if err != nil {
+		return msgKey, err
+	}
+
+	session, ok := passkeySessions.get(sessionID)
+	if !ok || session.Kind != passkeySessionKindRegister {
+		return "ErrPasskeySession", buserr.New("ErrPasskeySession")
+	}
+	passkeySessions.delete(sessionID)
+
+	records, err := loadPasskeyCredentialRecords()
+	if err != nil {
+		return "", err
+	}
+	if len(records) >= passkeyMaxCredentials {
+		return "ErrPasskeyLimit", buserr.New("ErrPasskeyLimit")
+	}
+
+	user, err := u.passkeyUser(records, true)
+	if err != nil {
+		return "", err
+	}
+
+	wa, err := webauthn.New(config)
+	if err != nil {
+		return "", err
+	}
+	credential, err := wa.FinishRegistration(user, session.Session, c.Request)
+	if err != nil {
+		return "ErrPasskeyVerify", err
+	}
+
+	if passkeyCredentialExists(records, credential.ID) {
+		return "ErrPasskeyDuplicate", buserr.New("ErrPasskeyDuplicate")
+	}
+
+	displayName := strings.TrimSpace(session.Name)
+	if displayName == "" {
+		displayName = fmt.Sprintf("%s-%s", passkeyCredentialNameDefault, time.Now().Format("20060102150405"))
+	}
+
+	records = append(records, passkeyCredentialRecord{
+		ID:         base64.RawURLEncoding.EncodeToString(credential.ID),
+		Name:       displayName,
+		CreatedAt:  time.Now().Format(constant.DateTimeLayout),
+		LastUsedAt: "",
+		FlagsValue: credentialFlagsValue(credential.Flags),
+		Credential: *credential,
+	})
+
+	if err := savePasskeyCredentialRecords(records); err != nil {
+		return "", err
+	}
+	return "", nil
+}
+
+func (u *AuthService) PasskeyList() ([]dto.PasskeyInfo, error) {
+	records, err := loadPasskeyCredentialRecords()
+	if err != nil {
+		return nil, err
+	}
+	list := make([]dto.PasskeyInfo, 0, len(records))
+	for _, record := range records {
+		list = append(list, dto.PasskeyInfo{
+			ID:         record.ID,
+			Name:       record.Name,
+			CreatedAt:  record.CreatedAt,
+			LastUsedAt: record.LastUsedAt,
+		})
+	}
+	return list, nil
+}
+
+func (u *AuthService) PasskeyDelete(id string) error {
+	records, err := loadPasskeyCredentialRecords()
+	if err != nil {
+		return err
+	}
+	index := -1
+	for i, record := range records {
+		if record.ID == id {
+			index = i
+			break
+		}
+	}
+	if index == -1 {
+		return buserr.New("ErrRecordNotFound")
+	}
+	records = append(records[:index], records[index+1:]...)
+	return savePasskeyCredentialRecords(records)
+}
+
+func (u *AuthService) passkeyEnabled(c *gin.Context) (bool, error) {
+	sslSetting, err := settingRepo.Get(repo.WithByKey("SSL"))
+	if err != nil {
+		return false, err
+	}
+	if sslSetting.Value == constant.StatusDisable {
+		return false, nil
+	}
+	return strings.EqualFold(passkeyRequestScheme(c), "https"), nil
+}
+
+func (u *AuthService) passkeyConfigured() (bool, error) {
+	records, err := loadPasskeyCredentialRecords()
+	if err != nil {
+		return false, err
+	}
+	return len(records) > 0, nil
+}
+
+func (u *AuthService) passkeyUser(records []passkeyCredentialRecord, allowCreate bool) (*passkeyUser, error) {
+	userID, err := u.passkeyUserID(allowCreate)
+	if err != nil {
+		return nil, err
+	}
+	nameSetting, err := settingRepo.Get(repo.WithByKey("UserName"))
+	if err != nil {
+		return nil, err
+	}
+	credentials := make([]webauthn.Credential, len(records))
+	for i, record := range records {
+		credentials[i] = record.Credential
+	}
+	return &passkeyUser{
+		id:          userID,
+		name:        nameSetting.Value,
+		displayName: nameSetting.Value,
+		credentials: credentials,
+	}, nil
+}
+
+func (u *AuthService) passkeyUserID(allowCreate bool) ([]byte, error) {
+	setting, err := settingRepo.Get(repo.WithByKey(passkeyUserIDSettingKey))
+	if err != nil {
+		return nil, err
+	}
+	if setting.Value == "" {
+		if !allowCreate {
+			return nil, buserr.New("ErrPasskeyNotConfigured")
+		}
+		raw := make([]byte, 32)
+		if _, err := rand.Read(raw); err != nil {
+			return nil, err
+		}
+		encoded := base64.RawURLEncoding.EncodeToString(raw)
+		if err := settingRepo.Update(passkeyUserIDSettingKey, encoded); err != nil {
+			return nil, err
+		}
+		return raw, nil
+	}
+	raw, err := base64.RawURLEncoding.DecodeString(setting.Value)
+	if err != nil {
+		return nil, err
+	}
+	return raw, nil
+}
+
+func (u *AuthService) passkeyConfig(c *gin.Context) (*webauthn.Config, string, error) {
+	enabled, err := u.passkeyEnabled(c)
+	if err != nil {
+		return nil, "", err
+	}
+	if !enabled {
+		return nil, "ErrPasskeyDisabled", buserr.New("ErrPasskeyDisabled")
+	}
+	origin, rpID, err := passkeyOriginAndRPID(c)
+	if err != nil {
+		return nil, "", err
+	}
+	panelName, err := settingRepo.Get(repo.WithByKey("PanelName"))
+	if err != nil {
+		return nil, "", err
+	}
+	return &webauthn.Config{
+		RPID:          rpID,
+		RPDisplayName: panelName.Value,
+		RPOrigins:     []string{origin},
+		AuthenticatorSelection: protocol.AuthenticatorSelection{
+			UserVerification: protocol.VerificationRequired,
+		},
+	}, "", nil
+}
+
+func (u *AuthService) checkEntrance(entrance string) error {
+	entranceSetting, err := settingRepo.Get(repo.WithByKey("SecurityEntrance"))
+	if err != nil {
+		return err
+	}
+	if len(entranceSetting.Value) != 0 && entranceSetting.Value != entrance {
+		return buserr.New("ErrEntrance")
+	}
+	return nil
+}
+
+func loadPasskeyCredentialRecords() ([]passkeyCredentialRecord, error) {
+	setting, err := settingRepo.Get(repo.WithByKey(passkeyCredentialSettingKey))
+	if err != nil {
+		return nil, err
+	}
+	if setting.Value == "" {
+		return []passkeyCredentialRecord{}, nil
+	}
+	decrypted, err := encrypt.StringDecrypt(setting.Value)
+	if err != nil {
+		return nil, err
+	}
+	var records []passkeyCredentialRecord
+	if err := json.Unmarshal([]byte(decrypted), &records); err != nil {
+		return nil, err
+	}
+	for i := range records {
+		records[i].Credential.Flags = webauthn.NewCredentialFlags(protocol.AuthenticatorFlags(records[i].FlagsValue))
+	}
+	return records, nil
+}
+
+func savePasskeyCredentialRecords(records []passkeyCredentialRecord) error {
+	if len(records) == 0 {
+		return settingRepo.Update(passkeyCredentialSettingKey, "")
+	}
+	for i := range records {
+		records[i].FlagsValue = credentialFlagsValue(records[i].Credential.Flags)
+	}
+	raw, err := json.Marshal(records)
+	if err != nil {
+		return err
+	}
+	encrypted, err := encrypt.StringEncrypt(string(raw))
+	if err != nil {
+		return err
+	}
+	return settingRepo.Update(passkeyCredentialSettingKey, encrypted)
+}
+
+func passkeyCredentialExists(records []passkeyCredentialRecord, credentialID []byte) bool {
+	encoded := base64.RawURLEncoding.EncodeToString(credentialID)
+	for _, record := range records {
+		if record.ID == encoded {
+			return true
+		}
+	}
+	return false
+}
+
+func updatePasskeyCredentialRecord(records []passkeyCredentialRecord, credential *webauthn.Credential) error {
+	encoded := base64.RawURLEncoding.EncodeToString(credential.ID)
+	for i := range records {
+		if records[i].ID == encoded {
+			records[i].Credential = *credential
+			records[i].FlagsValue = credentialFlagsValue(credential.Flags)
+			records[i].LastUsedAt = time.Now().Format(constant.DateTimeLayout)
+			return nil
+		}
+	}
+	return buserr.New("ErrPasskeyNotConfigured")
+}
+
+func credentialFlagsValue(flags webauthn.CredentialFlags) uint8 {
+	var value protocol.AuthenticatorFlags
+	if flags.UserPresent {
+		value |= protocol.FlagUserPresent
+	}
+	if flags.UserVerified {
+		value |= protocol.FlagUserVerified
+	}
+	if flags.BackupEligible {
+		value |= protocol.FlagBackupEligible
+	}
+	if flags.BackupState {
+		value |= protocol.FlagBackupState
+	}
+	return uint8(value)
+}
+
+func passkeyOriginAndRPID(c *gin.Context) (string, string, error) {
+	host := passkeyRequestHost(c)
+	if host == "" {
+		return "", "", fmt.Errorf("missing request host")
+	}
+	scheme := passkeyRequestScheme(c)
+	origin := fmt.Sprintf("%s://%s", scheme, host)
+
+	bindDomain, err := settingRepo.Get(repo.WithByKey("BindDomain"))
+	if err != nil {
+		return "", "", err
+	}
+	if bindDomain.Value != "" {
+		return origin, bindDomain.Value, nil
+	}
+
+	rpID := stripHostPort(host)
+	if rpID == "" {
+		return "", "", fmt.Errorf("invalid relying party id")
+	}
+	return origin, rpID, nil
+}
+
+func passkeyRequestHost(c *gin.Context) string {
+	host := c.GetHeader("X-Forwarded-Host")
+	if host == "" {
+		host = c.Request.Host
+	}
+	if strings.Contains(host, ",") {
+		host = strings.TrimSpace(strings.Split(host, ",")[0])
+	}
+	return strings.TrimSpace(host)
+}
+
+func passkeyRequestScheme(c *gin.Context) string {
+	proto := c.GetHeader("X-Forwarded-Proto")
+	if proto == "" {
+		if c.Request.TLS != nil {
+			return "https"
+		}
+		return "http"
+	}
+	if strings.Contains(proto, ",") {
+		proto = strings.TrimSpace(strings.Split(proto, ",")[0])
+	}
+	return strings.ToLower(strings.TrimSpace(proto))
+}
+
+func stripHostPort(hostport string) string {
+	if hostport == "" {
+		return hostport
+	}
+	hostport = strings.TrimSpace(hostport)
+	if host, _, err := net.SplitHostPort(hostport); err == nil {
+		return strings.Trim(host, "[]")
+	}
+	return strings.Trim(hostport, "[]")
+}
+
+func generatePasskeySessionID() string {
+	raw := make([]byte, 32)
+	if _, err := rand.Read(raw); err != nil {
+		return common.RandStr(32)
+	}
+	return base64.RawURLEncoding.EncodeToString(raw)
 }
 
 func checkPassword(password string) error {

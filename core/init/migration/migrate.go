@@ -15,6 +15,7 @@ func Init() {
 		migrations.InitHost,
 		migrations.InitTerminalSetting,
 		migrations.AddTaskDB,
+		migrations.AddPasskeySetting,
 		migrations.AddXpackHideMenu,
 		migrations.UpdateXpackHideMenu,
 		migrations.UpdateOnedrive,

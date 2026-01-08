@@ -146,6 +146,9 @@ func (u *SettingService) Update(key, value string) error {
 		if len(value) != 0 {
 			_ = global.SESSION.Clean()
 		}
+		if err := u.clearPasskeySettings(); err != nil {
+			return err
+		}
 	case "UserName", "Password":
 		_ = global.SESSION.Clean()
 	case "Language":
@@ -256,6 +259,9 @@ func (u *SettingService) UpdatePort(port uint) error {
 	if err := settingRepo.Update("ServerPort", strconv.Itoa(int(port))); err != nil {
 		return err
 	}
+	if err := u.clearPasskeySettings(); err != nil {
+		return err
+	}
 	go func() {
 		time.Sleep(1 * time.Second)
 		controller.RestartPanel(true, false, false)
@@ -271,6 +277,9 @@ func (u *SettingService) UpdateSSL(c *gin.Context, req dto.SSLUpdate) error {
 			return err
 		}
 		if err := settingRepo.Update("SSLType", "self"); err != nil {
+			return err
+		}
+		if err := u.clearPasskeySettings(); err != nil {
 			return err
 		}
 		_ = os.Remove(path.Join(secretDir, "server.crt"))
@@ -376,6 +385,9 @@ func (u *SettingService) UpdateSSL(c *gin.Context, req dto.SSLUpdate) error {
 		}()
 	}
 	if err := settingRepo.Update("SSL", req.SSL); err != nil {
+		return err
+	}
+	if err := u.clearPasskeySettings(); err != nil {
 		return err
 	}
 	return u.UpdateSystemSSL()
@@ -513,6 +525,16 @@ func (u *SettingService) UpdatePassword(c *gin.Context, old, new string) error {
 		return err
 	}
 	_ = global.SESSION.Clean()
+	return nil
+}
+
+func (u *SettingService) clearPasskeySettings() error {
+	if err := settingRepo.Update(passkeyUserIDSettingKey, ""); err != nil {
+		return err
+	}
+	if err := settingRepo.Update(passkeyCredentialSettingKey, ""); err != nil {
+		return err
+	}
 	return nil
 }
 

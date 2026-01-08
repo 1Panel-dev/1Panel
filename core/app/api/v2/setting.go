@@ -419,6 +419,86 @@ func (b *BaseApi) MFABind(c *gin.Context) {
 	helper.Success(c)
 }
 
+// @Tags System Setting
+// @Summary Begin passkey registration
+// @Accept json
+// @Param request body dto.PasskeyRegisterRequest true "request"
+// @Success 200 {object} dto.PasskeyBeginResponse
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /core/settings/passkey/register/begin [post]
+func (b *BaseApi) PasskeyRegisterBegin(c *gin.Context) {
+	var req dto.PasskeyRegisterRequest
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	res, msgKey, err := authService.PasskeyBeginRegister(c, req.Name)
+	if msgKey != "" {
+		helper.ErrorWithDetail(c, http.StatusBadRequest, msgKey, err)
+		return
+	}
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, res)
+}
+
+// @Tags System Setting
+// @Summary Finish passkey registration
+// @Accept json
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /core/settings/passkey/register/finish [post]
+func (b *BaseApi) PasskeyRegisterFinish(c *gin.Context) {
+	sessionID := c.GetHeader("Passkey-Session")
+	msgKey, err := authService.PasskeyFinishRegister(c, sessionID)
+	if msgKey != "" {
+		helper.ErrorWithDetail(c, http.StatusBadRequest, msgKey, err)
+		return
+	}
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags System Setting
+// @Summary List passkeys
+// @Success 200 {array} dto.PasskeyInfo
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /core/settings/passkey/list [get]
+func (b *BaseApi) PasskeyList(c *gin.Context) {
+	list, err := authService.PasskeyList()
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, list)
+}
+
+// @Tags System Setting
+// @Summary Delete passkey
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /core/settings/passkey/{id} [delete]
+func (b *BaseApi) PasskeyDelete(c *gin.Context) {
+	id := c.Param("id")
+	if id == "" {
+		helper.BadRequest(c, errors.New("passkey id is required"))
+		return
+	}
+	if err := authService.PasskeyDelete(id); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
 func (b *BaseApi) ReloadSSL(c *gin.Context) {
 	clientIP := c.ClientIP()
 	if clientIP != "127.0.0.1" {

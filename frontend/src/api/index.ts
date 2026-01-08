@@ -33,7 +33,12 @@ class RequestHttp {
                 } else {
                     config.headers.CurrentNode = encodeURIComponent(String(config.headers.CurrentNode));
                 }
-                if (config.url === '/core/auth/login' || config.url === '/core/auth/mfalogin') {
+                if (
+                    config.url === '/core/auth/login' ||
+                    config.url === '/core/auth/mfalogin' ||
+                    config.url === '/core/auth/passkey/begin' ||
+                    config.url === '/core/auth/passkey/finish'
+                ) {
                     let entrance = Base64.encode(globalStore.entrance);
                     config.headers.EntranceCode = entrance;
                 }

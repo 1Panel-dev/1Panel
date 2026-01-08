@@ -9,6 +9,14 @@ export const mfaLoginApi = (params: Login.MFALoginForm) => {
     return http.post<Login.ResLogin>(`/core/auth/mfalogin`, params);
 };
 
+export const passkeyBeginApi = () => {
+    return http.post<Login.PasskeyBeginResponse>(`/core/auth/passkey/begin`);
+};
+
+export const passkeyFinishApi = (params: Record<string, any>, sessionId: string) => {
+    return http.post<Login.ResLogin>(`/core/auth/passkey/finish`, params, undefined, { 'Passkey-Session': sessionId });
+};
+
 export const getCaptcha = () => {
     return http.get<Login.ResCaptcha>(`/core/auth/captcha`);
 };

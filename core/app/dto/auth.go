@@ -11,6 +11,11 @@ type UserLoginInfo struct {
 	MfaStatus string `json:"mfaStatus"`
 }
 
+type PasskeyBeginResponse struct {
+	SessionID string      `json:"sessionId"`
+	PublicKey interface{} `json:"publicKey"`
+}
+
 type MfaRequest struct {
 	Title    string `json:"title" validate:"required"`
 	Interval int    `json:"interval" validate:"required"`

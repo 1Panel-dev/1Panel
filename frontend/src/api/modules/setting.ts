@@ -142,6 +142,18 @@ export const loadMFA = (param: Setting.MFARequest) => {
 export const bindMFA = (param: Setting.MFABind) => {
     return http.post(`/core/settings/mfa/bind`, param);
 };
+export const passkeyRegisterBegin = (param: Setting.PasskeyRegisterRequest) => {
+    return http.post<Setting.PasskeyBeginResponse>(`/core/settings/passkey/register/begin`, param);
+};
+export const passkeyRegisterFinish = (param: Record<string, any>, sessionId: string) => {
+    return http.post(`/core/settings/passkey/register/finish`, param, undefined, { 'Passkey-Session': sessionId });
+};
+export const passkeyList = () => {
+    return http.get<Array<Setting.PasskeyInfo>>(`/core/settings/passkey/list`);
+};
+export const passkeyDelete = (id: string) => {
+    return http.delete(`/core/settings/passkey/${id}`);
+};
 export const getAppStoreConfig = (node?: string) => {
     const params = node ? `?operateNode=${node}` : '';
     return http.get<App.AppStoreConfig>(`/core/settings/apps/store/config${params}`);

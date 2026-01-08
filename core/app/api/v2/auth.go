@@ -2,7 +2,7 @@ package v2
 
 import (
 	"encoding/base64"
-	"github.com/1Panel-dev/1Panel/core/utils/common"
+	"net/http"
 	"os"
 	"path"
 
@@ -12,6 +12,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/utils/captcha"
+	"github.com/1Panel-dev/1Panel/core/utils/common"
 	"github.com/gin-gonic/gin"
 )
 
@@ -101,6 +102,57 @@ func (b *BaseApi) MFALogin(c *gin.Context) {
 }
 
 // @Tags Auth
+// @Summary User login with passkey
+// @Success 200 {object} dto.PasskeyBeginResponse
+// @Router /core/auth/passkey/begin [post]
+func (b *BaseApi) PasskeyBeginLogin(c *gin.Context) {
+	entrance := loadEntranceFromRequest(c)
+	res, msgKey, err := authService.PasskeyBeginLogin(c, entrance)
+	if msgKey != "" {
+		if msgKey == "ErrEntrance" {
+			helper.BadAuth(c, msgKey, err)
+			return
+		}
+		helper.ErrorWithDetail(c, http.StatusBadRequest, msgKey, err)
+		return
+	}
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, res)
+}
+
+// @Tags Auth
+// @Summary User login with passkey
+// @Success 200 {object} dto.UserLoginInfo
+// @Router /core/auth/passkey/finish [post]
+func (b *BaseApi) PasskeyFinishLogin(c *gin.Context) {
+	sessionID := c.GetHeader("Passkey-Session")
+	entrance := loadEntranceFromRequest(c)
+	user, msgKey, err := authService.PasskeyFinishLogin(c, sessionID, entrance)
+	go saveLoginLogs(c, err)
+	if msgKey == "ErrAuth" || msgKey == "ErrEntrance" {
+		if msgKey == "ErrAuth" {
+			global.IPTracker.SetNeedCaptcha(common.GetRealClientIP(c))
+		}
+		helper.BadAuth(c, msgKey, err)
+		return
+	}
+	if msgKey != "" {
+		helper.ErrorWithDetail(c, http.StatusBadRequest, msgKey, err)
+		return
+	}
+	if err != nil {
+		global.IPTracker.SetNeedCaptcha(common.GetRealClientIP(c))
+		helper.InternalServer(c, err)
+		return
+	}
+	global.IPTracker.Clear(common.GetRealClientIP(c))
+	helper.SuccessWithData(c, user)
+}
+
+// @Tags Auth
 // @Summary User logout
 // @Success 200
 // @Security ApiKeyAuth
@@ -164,6 +216,9 @@ func (b *BaseApi) GetLoginSetting(c *gin.Context) {
 		Theme:       settingInfo.Theme,
 		NeedCaptcha: needCaptcha,
 	}
+	passkeyEnabled, passkeyConfigured := authService.PasskeyStatus(c)
+	res.PasskeyEnabled = passkeyEnabled
+	res.PasskeyConfigured = passkeyConfigured
 	helper.SuccessWithData(c, res)
 }
 
@@ -178,4 +233,19 @@ func saveLoginLogs(c *gin.Context, err error) {
 	logs.IP = c.ClientIP()
 	logs.Agent = c.GetHeader("User-Agent")
 	_ = logService.CreateLoginLog(logs)
+}
+
+func loadEntranceFromRequest(c *gin.Context) string {
+	entranceItem := c.Request.Header.Get("EntranceCode")
+	var entrance []byte
+	if len(entranceItem) != 0 {
+		entrance, _ = base64.StdEncoding.DecodeString(entranceItem)
+	}
+	if len(entrance) == 0 {
+		cookieValue, err := c.Cookie("SecurityEntrance")
+		if err == nil {
+			entrance, _ = base64.StdEncoding.DecodeString(cookieValue)
+		}
+	}
+	return string(entrance)
 }

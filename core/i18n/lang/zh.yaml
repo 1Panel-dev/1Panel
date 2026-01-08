@@ -14,6 +14,12 @@ ErrApiConfigKeyInvalid: "API 接口密钥错误: {{ .detail }}"
 ErrApiConfigIPInvalid: "调用 API 接口 IP 不在白名单: {{ .detail }}"
 ErrApiConfigDisable: "此接口禁止使用 API 接口调用: {{ .detail }}"
 ErrApiConfigKeyTimeInvalid: "API 接口时间戳错误: {{ .detail }}"
+ErrPasskeyDisabled: "需开启 HTTPS 才能使用 Passkey"
+ErrPasskeyNotConfigured: "尚未配置 Passkey"
+ErrPasskeyLimit: "Passkey 数量已达上限（最多 5 个）"
+ErrPasskeySession: "Passkey 会话已过期或无效"
+ErrPasskeyDuplicate: "Passkey 已存在"
+ErrPasskeyVerify: "Passkey 验证失败"
 
 #request
 ErrNoSuchHost: "无法找到请求的服务器 {{ .err }}"

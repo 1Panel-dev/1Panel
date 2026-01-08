@@ -128,6 +128,19 @@ export namespace Setting {
         code: string;
         interval: string;
     }
+    export interface PasskeyRegisterRequest {
+        name: string;
+    }
+    export interface PasskeyBeginResponse {
+        sessionId: string;
+        publicKey: Record<string, any>;
+    }
+    export interface PasskeyInfo {
+        id: string;
+        name: string;
+        createdAt: string;
+        lastUsedAt: string;
+    }
     export interface CommonDescription {
         id: string;
         type: string;

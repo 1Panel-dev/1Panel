@@ -14,6 +14,12 @@ ErrApiConfigKeyInvalid: "API key error: {{ .detail }}"
 ErrApiConfigIPInvalid: "The API request IP is not on the whitelist: {{ .detail }}"
 ErrApiConfigDisable: "This interface prohibits API calls: {{ .detail }}"
 ErrApiConfigKeyTimeInvalid: "API timestamp error: {{ .detail }}"
+ErrPasskeyDisabled: "Passkey requires HTTPS to be enabled"
+ErrPasskeyNotConfigured: "No passkey configured"
+ErrPasskeyLimit: "Passkey limit reached (max 5)"
+ErrPasskeySession: "Passkey session expired or invalid"
+ErrPasskeyDuplicate: "Passkey already exists"
+ErrPasskeyVerify: "Passkey verification failed"
 
 # request
 ErrNoSuchHost: "Unable to find the requested server {{ .err }}"
