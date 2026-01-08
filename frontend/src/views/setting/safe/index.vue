@@ -166,7 +166,10 @@
                             </el-form-item>
 
                             <el-form-item :label="$t('setting.passkey')">
-                                <el-button @click="openPasskeyDialog" :disabled="!passkeySupported || form.ssl === 'Disable'">
+                                <el-button
+                                    @click="openPasskeyDialog"
+                                    :disabled="!passkeySupported || form.ssl === 'Disable'"
+                                >
                                     {{ $t('setting.passkeyManage') }}
                                 </el-button>
                                 <span class="input-help">

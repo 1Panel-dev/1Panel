@@ -191,7 +191,14 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, computed, nextTick } from 'vue';
 import type { ElForm } from 'element-plus';
-import { loginApi, getCaptcha, mfaLoginApi, getLoginSetting, passkeyBeginApi, passkeyFinishApi } from '@/api/modules/auth';
+import {
+    loginApi,
+    getCaptcha,
+    mfaLoginApi,
+    getLoginSetting,
+    passkeyBeginApi,
+    passkeyFinishApi,
+} from '@/api/modules/auth';
 import { GlobalStore, MenuStore, TabsStore } from '@/store';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { useI18n } from 'vue-i18n';
