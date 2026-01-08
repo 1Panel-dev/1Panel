@@ -168,9 +168,11 @@ const initWebSocket = (endpoint_: string, args: string = '') => {
     const protocol = href.split('//')[0] === 'http:' ? 'ws' : 'wss';
     const host = href.split('//')[1].split('/')[0];
     const endpoint = endpoint_.replace(/^\/+/, '');
-    terminalSocket.value = new WebSocket(
-        `${protocol}://${host}/${endpoint}?cols=${term.value.cols}&rows=${term.value.rows}&${args}&operateNode=${globalStore.currentNode}`,
-    );
+    let conn = `${protocol}://${host}/${endpoint}?cols=${term.value.cols}&rows=${term.value.rows}&${args}&operateNode=${globalStore.currentNode}`;
+    if (args.indexOf('&operateNode=') !== -1) {
+        conn = `${protocol}://${host}/${endpoint}?cols=${term.value.cols}&rows=${term.value.rows}&${args}`;
+    }
+    terminalSocket.value = new WebSocket(conn);
     terminalSocket.value.onopen = runRealTerminal;
     terminalSocket.value.onmessage = onWSReceive;
     terminalSocket.value.onclose = closeRealTerminal;
