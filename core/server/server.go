@@ -1,6 +1,7 @@
 package server
 
 import (
+	"bufio"
 	"crypto/tls"
 	"encoding/gob"
 	"fmt"
@@ -8,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"strings"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/core/init/auth"
@@ -80,21 +82,7 @@ func Start() {
 		*net.TCPListener
 	}
 	if global.CONF.Conn.SSL == constant.StatusEnable {
-		certPath := path.Join(global.CONF.Base.InstallDir, "1panel/secret/server.crt")
-		keyPath := path.Join(global.CONF.Base.InstallDir, "1panel/secret/server.key")
-		certificate, err := os.ReadFile(certPath)
-		if err != nil {
-			panic(err)
-		}
-		key, err := os.ReadFile(keyPath)
-		if err != nil {
-			panic(err)
-		}
-		cert, err := tls.X509KeyPair(certificate, key)
-		if err != nil {
-			panic(err)
-		}
-		constant.CertStore.Store(&cert)
+		constant.CertStore.Store(loadCert())
 
 		server.TLSConfig = &tls.Config{
 			GetCertificate: func(info *tls.ClientHelloInfo) (*tls.Certificate, error) {
@@ -108,21 +96,7 @@ func Start() {
 		}
 		return
 	} else if global.CONF.Conn.SSL == constant.StatusMux {
-		certPath := path.Join(global.CONF.Base.InstallDir, "1panel/secret/server.crt")
-		keyPath := path.Join(global.CONF.Base.InstallDir, "1panel/secret/server.key")
-		certificate, err := os.ReadFile(certPath)
-		if err != nil {
-			panic(err)
-		}
-		key, err := os.ReadFile(keyPath)
-		if err != nil {
-			panic(err)
-		}
-		cert, err := tls.X509KeyPair(certificate, key)
-		if err != nil {
-			panic(err)
-		}
-		constant.CertStore.Store(&cert)
+		constant.CertStore.Store(loadCert())
 
 		server.TLSConfig = &tls.Config{
 			GetCertificate: func(info *tls.ClientHelloInfo) (*tls.Certificate, error) {
@@ -130,12 +104,11 @@ func Start() {
 			},
 		}
 
-		global.LOG.Infof("listen at mux (http/https)://%s:%s [%s]", global.CONF.Conn.BindAddress, global.CONF.Conn.Port, tcpItem)
-
 		m := cmux.New(ln)
 
 		httpsL := m.Match(cmux.TLS())
-		httpL := m.Match(cmux.Any())
+		httpL := m.Match(cmux.HTTP1Fast())
+		anyL := m.Match(cmux.Any())
 
 		go func() {
 			if err := server.Serve(tls.NewListener(httpsL, server.TLSConfig)); err != nil {
@@ -144,16 +117,26 @@ func Start() {
 		}()
 
 		go func() {
-			redirectServer := &http.Server{
-				Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					target := "https://" + r.Host + r.RequestURI
-					http.Redirect(w, r, target, http.StatusTemporaryRedirect)
-				}),
-			}
-			if err := redirectServer.Serve(httpL); err != nil {
-				global.LOG.Errorf("HTTP Redirect Serve Error: %v", err)
+			for {
+				conn, err := httpL.Accept()
+				if err != nil {
+					return
+				}
+				go handleMuxHttpConn(conn)
 			}
 		}()
+
+		go func() {
+			for {
+				conn, err := anyL.Accept()
+				if err != nil {
+					return
+				}
+				conn.Close()
+			}
+		}()
+
+		global.LOG.Infof("listen at mux (http/https)://%s:%s [%s]", global.CONF.Conn.BindAddress, global.CONF.Conn.Port, tcpItem)
 
 		if err := m.Serve(); err != nil {
 			panic(err)
@@ -166,4 +149,69 @@ func Start() {
 		}
 		return
 	}
+}
+
+func loadCert() *tls.Certificate {
+	certPath := path.Join(global.CONF.Base.InstallDir, "1panel/secret/server.crt")
+	keyPath := path.Join(global.CONF.Base.InstallDir, "1panel/secret/server.key")
+	certificate, err := os.ReadFile(certPath)
+	if err != nil {
+		panic(err)
+	}
+	key, err := os.ReadFile(keyPath)
+	if err != nil {
+		panic(err)
+	}
+	cert, err := tls.X509KeyPair(certificate, key)
+	if err != nil {
+		panic(err)
+	}
+	return &cert
+}
+
+func handleMuxHttpConn(conn net.Conn) {
+	defer conn.Close()
+
+	req, err := http.ReadRequest(bufio.NewReader(conn))
+	if err != nil {
+		return
+	}
+
+	if req.Host == "" {
+		return
+	}
+
+	ua := req.Header.Get("User-Agent")
+	if ua == "" {
+		return
+	}
+
+	switch req.Method {
+	case http.MethodGet, http.MethodHead, http.MethodPost:
+	default:
+		return
+	}
+
+	if len(req.RequestURI) > 256 {
+		return
+	}
+
+	if !strings.HasPrefix(req.URL.Path, "/") {
+		return
+	}
+
+	target := "https://" + req.Host + req.URL.RequestURI()
+
+	resp := &http.Response{
+		StatusCode: http.StatusTemporaryRedirect, // 307
+		Proto:      "HTTP/1.1",
+		ProtoMajor: 1,
+		ProtoMinor: 1,
+		Header:     make(http.Header),
+	}
+	resp.Header.Set("Location", target)
+	resp.Header.Set("Connection", "close")
+
+	_ = resp.Write(conn)
+	return
 }
