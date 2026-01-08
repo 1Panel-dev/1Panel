@@ -21,7 +21,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/utils/encrypt"
 	"github.com/1Panel-dev/1Panel/core/utils/mfa"
 	"github.com/gin-gonic/gin"
-	"github.com/go-webauthn/webauthn"
+	"github.com/go-webauthn/webauthn/webauthn"
 	"github.com/go-webauthn/webauthn/protocol"
 )
 
