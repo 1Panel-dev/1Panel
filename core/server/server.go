@@ -192,7 +192,7 @@ func handleMuxHttpConn(conn net.Conn) {
 		return
 	}
 
-	if len(req.RequestURI) > 256 {
+	if len(req.RequestURI) > 4096 {
 		return
 	}
 
