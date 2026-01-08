@@ -99,6 +99,7 @@ func Start() {
 		constant.CertStore.Store(loadCert())
 
 		server.TLSConfig = &tls.Config{
+			NextProtos: []string{"h2", "http/1.1"},
 			GetCertificate: func(info *tls.ClientHelloInfo) (*tls.Certificate, error) {
 				return constant.CertStore.Load().(*tls.Certificate), nil
 			},
@@ -203,7 +204,7 @@ func handleMuxHttpConn(conn net.Conn) {
 	target := "https://" + req.Host + req.URL.RequestURI()
 
 	resp := &http.Response{
-		StatusCode: http.StatusTemporaryRedirect, // 307
+		StatusCode: http.StatusTemporaryRedirect,
 		Proto:      "HTTP/1.1",
 		ProtoMajor: 1,
 		ProtoMinor: 1,
