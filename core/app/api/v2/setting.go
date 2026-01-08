@@ -8,6 +8,7 @@ import (
 	"os"
 	"path"
 	"regexp"
+	"strings"
 
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/core/app/dto"
@@ -522,5 +523,30 @@ func checkEntrancePattern(val string) bool {
 		return true
 	}
 	result, _ := regexp.MatchString("^[a-zA-Z0-9]{5,116}$", val)
-	return result
+	if !result {
+		return false
+	}
+	lowerVal := strings.ToLower(val)
+	for key := range constant.WebUrlMap {
+		if key == "/" || !strings.HasPrefix(key, "/") {
+			continue
+		}
+		if strings.Count(key, "/") != 1 {
+			continue
+		}
+		segment := strings.ToLower(strings.TrimPrefix(key, "/"))
+		if len(segment) < 5 {
+			continue
+		}
+		if lowerVal == segment {
+			return false
+		}
+	}
+	assetsList := [2]string{"public", "assets"}
+	for _, item := range assetsList {
+		if lowerVal == item {
+			return false
+		}
+	}
+	return true
 }
