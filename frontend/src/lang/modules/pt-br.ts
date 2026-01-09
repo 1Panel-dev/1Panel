@@ -185,6 +185,7 @@ const message = {
         login: {
             username: 'Usuário',
             password: 'Senha',
+            passkey: 'Login com Passkey',
             welcome: 'Bem-vindo de volta, insira seu usuário e senha para acessar!',
             errorAuthInfo: 'O nome de usuário ou senha que você inseriu está incorreto, tente novamente!',
             errorMfaInfo: 'Informações de autenticação incorretas, tente novamente!',
@@ -207,6 +208,8 @@ const message = {
             agreeTitle: 'Termo de Aceite',
             agreeContent:
                 'Para proteger melhor seus direitos e interesses legítimos, leia e concorde com o seguinte termo &laquo; <a href="https://www.fit2cloud.com/legal/licenses.html" target="_blank">Acordo de Licença Comunitária</a> &raquo;',
+            passkeyFailed: 'Falha no login com Passkey, tente novamente',
+            passkeyNotSupported: 'O navegador ou ambiente atual não suporta passkeys',
         },
         rule: {
             username: 'Insira um nome de usuário',
@@ -1893,6 +1896,20 @@ const message = {
         path: 'Caminho',
 
         safe: 'Segurança',
+        passkey: 'Passkey',
+        passkeyManage: 'Gerenciar',
+        passkeyHelper: 'Para login rápido, é possível vincular até 5 passkeys',
+        passkeyRequireSSL: 'Ative o HTTPS para usar passkeys',
+        passkeyNotSupported: 'O navegador ou ambiente atual não suporta passkeys',
+        passkeyCount: 'Vinculadas {0}/{1}',
+        passkeyName: 'Nome',
+        passkeyNameHelper: 'Digite um nome para distinguir dispositivos',
+        passkeyAdd: 'Adicionar Passkey',
+        passkeyCreatedAt: 'Criado em',
+        passkeyLastUsedAt: 'Último uso',
+        passkeyDeleteConfirm: 'Após excluir, esta passkey não poderá ser usada para login. Continuar?',
+        passkeyLimit: 'É possível vincular até 5 passkeys',
+        passkeyFailed: 'Falha no cadastro da passkey, tente novamente',
         bindInfo: 'Informações de Vinculação',
         bindAll: 'Ouvir Todos',
         bindInfoHelper:

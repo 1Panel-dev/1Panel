@@ -194,6 +194,7 @@ const message = {
         login: {
             username: 'Usuario',
             password: 'Contraseña',
+            passkey: 'Inicio de sesión con Passkey',
             welcome: '¡Bienvenido de nuevo! Por favor, ingrese su nombre de usuario y contraseña para iniciar sesión.',
             errorAuthInfo: 'El nombre de usuario o la contraseña que ingresó son incorrectos, ¡inténtelo de nuevo!',
             errorMfaInfo: 'Información de autenticación incorrecta, ¡por favor intente nuevamente!',
@@ -217,6 +218,8 @@ const message = {
             agreeTitle: 'Acuerdo',
             agreeContent:
                 'Para proteger mejor sus derechos e intereses legítimos, por favor lea y acepte el siguiente acuerdo &laquo; <a href = "https://www.fit2cloud.com/legal/licenses.html" target = "_blank" > Acuerdo de Licencia Comunitaria </a> &raquo;',
+            passkeyFailed: 'El inicio de sesión con Passkey falló, inténtalo de nuevo',
+            passkeyNotSupported: 'El navegador o entorno actual no admite Passkey',
         },
         rule: {
             username: 'Introduzca un nombre de usuario',
@@ -1939,6 +1942,20 @@ const message = {
         address: 'Dirección',
         path: 'Ruta',
         safe: 'Seguridad',
+        passkey: 'Passkey',
+        passkeyManage: 'Administrar',
+        passkeyHelper: 'Para inicio rápido, se pueden vincular hasta 5 passkeys',
+        passkeyRequireSSL: 'Habilita HTTPS para usar passkeys',
+        passkeyNotSupported: 'El navegador o entorno actual no admite Passkey',
+        passkeyCount: 'Vinculadas {0}/{1}',
+        passkeyName: 'Nombre',
+        passkeyNameHelper: 'Introduce un nombre para distinguir dispositivos',
+        passkeyAdd: 'Agregar Passkey',
+        passkeyCreatedAt: 'Creado',
+        passkeyLastUsedAt: 'Último uso',
+        passkeyDeleteConfirm: 'Después de eliminar, no podrás iniciar sesión con esta passkey. ¿Continuar?',
+        passkeyLimit: 'Se pueden vincular hasta 5 passkeys',
+        passkeyFailed: 'El registro de passkey falló, inténtalo de nuevo',
         bindInfo: 'Información de enlace',
         bindAll: 'Escuchar en todas',
         bindInfoHelper:

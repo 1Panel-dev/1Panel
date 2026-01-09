@@ -187,6 +187,7 @@ const message = {
         login: {
             username: 'Nama Pengguna',
             password: 'Kata Laluan',
+            passkey: 'Log masuk Passkey',
             welcome: 'Selamat datang kembali, sila masukkan nama pengguna dan kata laluan anda untuk log masuk!',
             errorAuthInfo: 'Nama pengguna atau kata laluan yang anda masukkan tidak betul, sila cuba lagi!',
             errorMfaInfo: 'Maklumat pengesahan tidak betul, sila cuba lagi!',
@@ -208,6 +209,8 @@ const message = {
             agreeTitle: 'Agreement',
             agreeContent:
                 'Untuk melindungi hak dan kepentingan sah anda dengan lebih baik, sila baca dan setuju dengan perjanjian berikut &laquo; <a href = "https://www.fit2cloud.com/legal/licenses.html" target = "_blank" > Perjanjian Lesen Komuniti </a> &raquo;',
+            passkeyFailed: 'Log masuk Passkey gagal, sila cuba lagi',
+            passkeyNotSupported: 'Pelayar atau persekitaran semasa tidak menyokong passkey',
         },
         rule: {
             username: 'Masukkan nama pengguna',
@@ -1905,6 +1908,20 @@ const message = {
         path: 'Laluan',
 
         safe: 'Keselamatan',
+        passkey: 'Passkey',
+        passkeyManage: 'Urus',
+        passkeyHelper: 'Untuk log masuk pantas, maksimum 5 passkey boleh dipautkan',
+        passkeyRequireSSL: 'Aktifkan HTTPS untuk menggunakan passkey',
+        passkeyNotSupported: 'Pelayar atau persekitaran semasa tidak menyokong passkey',
+        passkeyCount: 'Dipaut {0}/{1}',
+        passkeyName: 'Nama',
+        passkeyNameHelper: 'Masukkan nama untuk membezakan peranti',
+        passkeyAdd: 'Tambah Passkey',
+        passkeyCreatedAt: 'Dicipta',
+        passkeyLastUsedAt: 'Terakhir digunakan',
+        passkeyDeleteConfirm: 'Selepas dipadam, passkey ini tidak boleh digunakan untuk log masuk. Teruskan?',
+        passkeyLimit: 'Maksimum 5 passkey boleh dipautkan',
+        passkeyFailed: 'Pendaftaran passkey gagal, sila cuba lagi',
         bindInfo: 'Maklumat ikatan',
         bindAll: 'Dengar Semua',
         bindInfoHelper:

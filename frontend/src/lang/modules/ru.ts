@@ -185,6 +185,7 @@ const message = {
         login: {
             username: 'Имя пользователя',
             password: 'Пароль',
+            passkey: 'Вход по passkey',
             welcome: 'Добро пожаловать, введите имя пользователя и пароль для входа!',
             errorAuthInfo: 'Введенное имя пользователя или пароль неверны, пожалуйста, введите заново!',
             errorMfaInfo: 'Неверная информация аутентификации, попробуйте еще раз!',
@@ -206,6 +207,8 @@ const message = {
             agreeTitle: 'Соглашение',
             agreeContent:
                 'Для лучшей защиты ваших законных прав и интересов, пожалуйста, прочитайте и согласитесь со следующим соглашением &laquo; <a href = "https://www.fit2cloud.com/legal/licenses.html" target = "_blank" > Лицензионное соглашение сообщества </a> &raquo;',
+            passkeyFailed: 'Вход по passkey не удался, попробуйте снова',
+            passkeyNotSupported: 'Текущий браузер или среда не поддерживает passkey',
         },
         rule: {
             username: 'Введите имя пользователя',
@@ -1894,6 +1897,20 @@ const message = {
         path: 'Путь',
 
         safe: 'Безопасность',
+        passkey: 'Passkey',
+        passkeyManage: 'Управление',
+        passkeyHelper: 'Для быстрого входа можно привязать до 5 passkey',
+        passkeyRequireSSL: 'Включите HTTPS, чтобы использовать passkey',
+        passkeyNotSupported: 'Текущий браузер или среда не поддерживает passkey',
+        passkeyCount: 'Привязано {0}/{1}',
+        passkeyName: 'Название',
+        passkeyNameHelper: 'Введите название для различения устройств',
+        passkeyAdd: 'Добавить passkey',
+        passkeyCreatedAt: 'Создано',
+        passkeyLastUsedAt: 'Последнее использование',
+        passkeyDeleteConfirm: 'После удаления эту passkey нельзя использовать для входа. Продолжить?',
+        passkeyLimit: 'Можно привязать до 5 passkey',
+        passkeyFailed: 'Не удалось зарегистрировать passkey, попробуйте снова',
         bindInfo: 'IP-адрес',
         bindAll: 'Прослушивать все',
         bindInfoHelper:

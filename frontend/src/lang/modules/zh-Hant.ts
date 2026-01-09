@@ -192,6 +192,7 @@ const message = {
         login: {
             username: '使用者名稱',
             password: '密碼',
+            passkey: '通行密鑰登入',
             welcome: '歡迎回來，請輸入使用者名稱和密碼登入！',
             errorAuthInfo: '您輸入的使用者名稱或密碼不正確，請重新輸入！',
             errorMfaInfo: '錯誤的驗證資訊，請重試！',
@@ -213,6 +214,8 @@ const message = {
             agreeContent:
                 '為了更好的保障您的合法權益，請您閱讀並同意以下協議 &laquo; <a href="https://www.fit2cloud.com/legal/licenses.html" target="_blank"> 飛致雲社區軟體許可協議 </a> &raquo;',
             logout: '退出登入',
+            passkeyFailed: '通行密鑰登入失敗，請重試',
+            passkeyNotSupported: '目前瀏覽器或環境不支援通行密鑰',
         },
         rule: {
             username: '請輸入使用者名稱',
@@ -1887,6 +1890,20 @@ const message = {
         versionCompare: '檢測到節點 {0} 版本已是目前可升級最新版本，請檢查主節點版本後重試！',
 
         safe: '安全',
+        passkey: '通行密鑰',
+        passkeyManage: '管理',
+        passkeyHelper: '用於快速登入，最多可綁定 5 個通行密鑰',
+        passkeyRequireSSL: '啟用 HTTPS 後可使用通行密鑰',
+        passkeyNotSupported: '目前瀏覽器或環境不支援通行密鑰',
+        passkeyCount: '已綁定 {0}/{1}',
+        passkeyName: '名稱',
+        passkeyNameHelper: '請輸入用於區分裝置的名稱',
+        passkeyAdd: '新增通行密鑰',
+        passkeyCreatedAt: '建立時間',
+        passkeyLastUsedAt: '最近使用',
+        passkeyDeleteConfirm: '刪除後將無法使用此通行密鑰登入，是否繼續？',
+        passkeyLimit: '最多可綁定 5 個通行密鑰',
+        passkeyFailed: '通行密鑰註冊失敗，請重試',
         bindInfo: '監聽地址',
         bindAll: '監聽所有',
         bindInfoHelper: '修改服務監聽地址或協議可能導致服務不可用，是否繼續？',

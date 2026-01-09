@@ -184,6 +184,7 @@ const message = {
         login: {
             username: '사용자 이름',
             password: '비밀번호',
+            passkey: '패스키 로그인',
             welcome: '다시 오신 것을 환영합니다. 사용자 이름과 비밀번호를 입력하여 로그인하세요!',
             errorAuthInfo: '입력한 사용자 이름 또는 비밀번호가 잘못되었습니다. 다시 입력해주세요!',
             errorMfaInfo: '인증 정보가 잘못되었습니다. 다시 시도해주세요!',
@@ -205,6 +206,8 @@ const message = {
             agreeTitle: '동의',
             agreeContent:
                 '귀하의 합법적인 권리와 이익을 보다 잘 보호하기 위해, 다음 &laquo; <a href = "https://www.fit2cloud.com/legal/licenses.html" target = "_blank" >커뮤니티 라이선스 계약</a> &raquo;을 읽고 동의해주세요.',
+            passkeyFailed: '패스키 로그인에 실패했습니다. 다시 시도하세요',
+            passkeyNotSupported: '현재 브라우저 또는 환경에서 패스키를 지원하지 않습니다',
         },
         rule: {
             username: '사용자 이름을 입력하세요',
@@ -1827,6 +1830,20 @@ const message = {
         path: '경로',
 
         safe: '보안',
+        passkey: '패스키',
+        passkeyManage: '관리',
+        passkeyHelper: '빠른 로그인을 위해 최대 5개의 패스키를 등록할 수 있습니다',
+        passkeyRequireSSL: 'HTTPS를 활성화하면 패스키를 사용할 수 있습니다',
+        passkeyNotSupported: '현재 브라우저 또는 환경에서 패스키를 지원하지 않습니다',
+        passkeyCount: '등록됨 {0}/{1}',
+        passkeyName: '이름',
+        passkeyNameHelper: '기기를 구분할 이름을 입력하세요',
+        passkeyAdd: '패스키 추가',
+        passkeyCreatedAt: '생성 시간',
+        passkeyLastUsedAt: '최근 사용',
+        passkeyDeleteConfirm: '삭제하면 이 패스키로 로그인할 수 없습니다. 계속하시겠습니까?',
+        passkeyLimit: '최대 5개의 패스키를 등록할 수 있습니다',
+        passkeyFailed: '패스키 등록에 실패했습니다. 다시 시도하세요',
         bindInfo: '바인딩 정보',
         bindAll: '모두 수신',
         bindInfoHelper: '서비스 수신 주소나 프로토콜 변경은 서비스 불가 상태를 초래할 수 있습니다. 계속하시겠습니까?',

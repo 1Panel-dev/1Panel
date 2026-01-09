@@ -196,6 +196,7 @@ const message = {
         login: {
             username: 'Kullanıcı adı',
             password: 'Şifre',
+            passkey: 'Passkey ile giriş',
             welcome: 'Tekrar hoş geldiniz, giriş yapmak için kullanıcı adınızı ve şifrenizi girin!',
             errorAuthInfo: 'Girdiğiniz kullanıcı adı veya şifre yanlış, lütfen tekrar girin!',
             errorMfaInfo: 'Yanlış kimlik doğrulama bilgisi, lütfen tekrar deneyin!',
@@ -217,6 +218,8 @@ const message = {
             agreeTitle: 'Sözleşme',
             agreeContent:
                 'Meşru hak ve çıkarlarınızı daha iyi korumak için lütfen aşağıdaki sözleşmeyi okuyun ve kabul edin &laquo; <a href = "https://www.fit2cloud.com/legal/licenses.html" target = "_blank" > Topluluk Lisans Sözleşmesi </a> &raquo;',
+            passkeyFailed: 'Passkey ile giriş başarısız oldu, lütfen tekrar deneyin',
+            passkeyNotSupported: 'Mevcut tarayıcı veya ortam passkey desteklemiyor',
         },
         rule: {
             username: 'Kullanıcı adı girin',
@@ -1946,6 +1949,20 @@ const message = {
         address: 'Adres',
         path: 'Yol',
         safe: 'Güvenlik',
+        passkey: 'Passkey',
+        passkeyManage: 'Yönet',
+        passkeyHelper: 'Hızlı giriş için en fazla 5 passkey bağlanabilir',
+        passkeyRequireSSL: 'Passkey kullanmak için HTTPS’i etkinleştirin',
+        passkeyNotSupported: 'Mevcut tarayıcı veya ortam passkey desteklemiyor',
+        passkeyCount: 'Bağlı {0}/{1}',
+        passkeyName: 'Ad',
+        passkeyNameHelper: 'Cihazları ayırt etmek için bir ad girin',
+        passkeyAdd: 'Passkey ekle',
+        passkeyCreatedAt: 'Oluşturulma',
+        passkeyLastUsedAt: 'Son kullanım',
+        passkeyDeleteConfirm: 'Silindikten sonra bu passkey ile giriş yapılamaz. Devam edilsin mi?',
+        passkeyLimit: 'En fazla 5 passkey bağlanabilir',
+        passkeyFailed: 'Passkey kaydı başarısız oldu, lütfen tekrar deneyin',
         bindInfo: 'Bağlama bilgisi',
         bindAll: 'Tümünü Dinle',
         bindInfoHelper:

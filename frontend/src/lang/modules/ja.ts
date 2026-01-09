@@ -185,6 +185,7 @@ const message = {
         login: {
             username: 'ユーザー名',
             password: 'パスワード',
+            passkey: 'パスキーでログイン',
             welcome: 'ようこそ、ユーザー名とパスワードを入力してログインしてください！',
             errorAuthInfo: '入力したユーザー名またはパスワードは間違っています。再入力してください！',
             errorMfaInfo: '認証情報が誤っていない、もう一度やり直してください！',
@@ -206,6 +207,8 @@ const message = {
             agreeTitle: '合意',
             agreeContent:
                 'あなたの正当な権利と利益をよりよく保護するために、次の契約とラコを読んで同意してください。<a href = "https://www.fit2cloud.com/legal/licenses.html" target="_blank">コミュニティライセンス契約</a>＆raquo;',
+            passkeyFailed: 'パスキーでのログインに失敗しました。再試行してください',
+            passkeyNotSupported: '現在のブラウザまたは環境はパスキーに対応していません',
         },
         rule: {
             username: 'ユーザー名を入力します',
@@ -1851,6 +1854,20 @@ const message = {
         path: 'パス',
 
         safe: '安全',
+        passkey: 'パスキー',
+        passkeyManage: '管理',
+        passkeyHelper: '素早くログインするため、最大 5 個のパスキーを登録できます',
+        passkeyRequireSSL: 'HTTPS を有効にするとパスキーを使用できます',
+        passkeyNotSupported: '現在のブラウザまたは環境はパスキーに対応していません',
+        passkeyCount: '登録済み {0}/{1}',
+        passkeyName: '名称',
+        passkeyNameHelper: 'デバイスを区別する名称を入力してください',
+        passkeyAdd: 'パスキーを追加',
+        passkeyCreatedAt: '作成時間',
+        passkeyLastUsedAt: '最終使用',
+        passkeyDeleteConfirm: '削除するとこのパスキーでログインできなくなります。続行しますか？',
+        passkeyLimit: '最大 5 個のパスキーを登録できます',
+        passkeyFailed: 'パスキーの登録に失敗しました。再試行してください',
         bindInfo: 'バインド情報',
         bindAll: 'すべてを聞いてください',
         bindInfoHelper:
