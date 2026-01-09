@@ -216,6 +216,7 @@ const message = {
             logout: '退出登入',
             passkeyFailed: '通行密鑰登入失敗，請重試',
             passkeyNotSupported: '目前瀏覽器或環境不支援通行密鑰',
+            passkeyToPassword: '無法使用通行密鑰? 使用帳號密碼登入',
         },
         rule: {
             username: '請輸入使用者名稱',

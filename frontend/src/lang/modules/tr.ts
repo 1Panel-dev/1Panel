@@ -220,6 +220,7 @@ const message = {
                 'Meşru hak ve çıkarlarınızı daha iyi korumak için lütfen aşağıdaki sözleşmeyi okuyun ve kabul edin &laquo; <a href = "https://www.fit2cloud.com/legal/licenses.html" target = "_blank" > Topluluk Lisans Sözleşmesi </a> &raquo;',
             passkeyFailed: 'Passkey ile giriş başarısız oldu, lütfen tekrar deneyin',
             passkeyNotSupported: 'Mevcut tarayıcı veya ortam passkey desteklemiyor',
+            passkeyToPassword: 'Passkey kullanırken sorun mu yaşıyorsunuz? Şifreyi kullanın',
         },
         rule: {
             username: 'Kullanıcı adı girin',

@@ -208,6 +208,7 @@ const message = {
                 '귀하의 합법적인 권리와 이익을 보다 잘 보호하기 위해, 다음 &laquo; <a href = "https://www.fit2cloud.com/legal/licenses.html" target = "_blank" >커뮤니티 라이선스 계약</a> &raquo;을 읽고 동의해주세요.',
             passkeyFailed: '패스키 로그인에 실패했습니다. 다시 시도하세요',
             passkeyNotSupported: '현재 브라우저 또는 환경에서 패스키를 지원하지 않습니다',
+            passkeyToPassword: '패스키 사용에 문제가 있나요? 비밀번호로 로그인하세요',
         },
         rule: {
             username: '사용자 이름을 입력하세요',

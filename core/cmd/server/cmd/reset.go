@@ -5,6 +5,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/i18n"
+	"github.com/1Panel-dev/1Panel/core/utils/passkey"
 	"github.com/spf13/cobra"
 )
 
@@ -20,6 +21,7 @@ func init() {
 	resetCmd.AddCommand(resetEntranceCmd)
 	resetCmd.AddCommand(resetBindIpsCmd)
 	resetCmd.AddCommand(resetDomainCmd)
+	resetCmd.AddCommand(resetPasskeyCmd)
 }
 
 var resetCmd = &cobra.Command{
@@ -112,6 +114,25 @@ var resetDomainCmd = &cobra.Command{
 	},
 }
 
+var resetPasskeyCmd = &cobra.Command{
+	Use: "passkey",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		i18n.UseI18nForCmd(language)
+		if !isRoot() {
+			fmt.Println(i18n.GetMsgWithMapForCmd("SudoHelper", map[string]interface{}{"cmd": "sudo 1pctl reset passkey"}))
+			return nil
+		}
+		db, err := loadDBConn("core.db")
+		if err != nil {
+			return err
+		}
+		if err := setSettingByKey(db, passkey.PasskeyUserIDSettingKey, ""); err != nil {
+			return err
+		}
+		return setSettingByKey(db, passkey.PasskeyCredentialSettingKey, "")
+	},
+}
+
 func loadResetHelper() {
 	fmt.Println(i18n.GetMsgByKeyForCmd("ResetCommands"))
 	fmt.Println("\nUsage:\n  1panel reset [command]\n\nAvailable Commands:")
@@ -120,6 +141,7 @@ func loadResetHelper() {
 	fmt.Println("  https       " + i18n.GetMsgByKeyForCmd("ResetHttps"))
 	fmt.Println("  ips         " + i18n.GetMsgByKeyForCmd("ResetIPs"))
 	fmt.Println("  mfa         " + i18n.GetMsgByKeyForCmd("ResetMFA"))
+	fmt.Println("  passkey     " + i18n.GetMsgByKeyForCmd("ResetPasskey"))
 	fmt.Println("\nFlags:\n  -h, --help   help for reset")
 	fmt.Println("\nUse \"1panel reset [command] --help\" for more information about a command.")
 }

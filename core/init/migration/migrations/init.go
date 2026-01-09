@@ -192,25 +192,24 @@ var InitSetting = &gormigrate.Migration{
 var AddPasskeySetting = &gormigrate.Migration{
 	ID: "20250910-add-passkey-setting",
 	Migrate: func(tx *gorm.DB) error {
-		if err := addSettingIfMissing(tx, "PasskeyUserID", ""); err != nil {
+		var addSettingsIfMissing = func(tx *gorm.DB, key, value string) error {
+			var setting model.Setting
+			if err := tx.Where("key = ?", key).First(&setting).Error; err != nil {
+				if errors.Is(err, gorm.ErrRecordNotFound) {
+					return tx.Create(&model.Setting{Key: key, Value: value}).Error
+				}
+				return err
+			}
+			return nil
+		}
+		if err := addSettingsIfMissing(tx, "PasskeyUserID", ""); err != nil {
 			return err
 		}
-		if err := addSettingIfMissing(tx, "PasskeyCredentials", ""); err != nil {
+		if err := addSettingsIfMissing(tx, "PasskeyCredentials", ""); err != nil {
 			return err
 		}
 		return nil
 	},
-}
-
-func addSettingIfMissing(tx *gorm.DB, key, value string) error {
-	var setting model.Setting
-	if err := tx.Where("key = ?", key).First(&setting).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return tx.Create(&model.Setting{Key: key, Value: value}).Error
-		}
-		return err
-	}
-	return nil
 }
 
 var InitTerminalSetting = &gormigrate.Migration{

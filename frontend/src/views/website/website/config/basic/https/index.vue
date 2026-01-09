@@ -27,7 +27,12 @@
                         <el-text type="warning" class="!ml-2">{{ $t('website.ipWebsiteWarn') }}</el-text>
 
                         <el-divider content-position="left">{{ $t('website.SSLConfig') }}</el-divider>
-                        <HttpsConfig v-model="form" :website-ssl="websiteSSL" @ssl-change="handleSSLChange" />
+                        <HttpsConfig
+                            :model-value="form"
+                            @update:modelValue="handleFormUpdate"
+                            :website-ssl="websiteSSL"
+                            @ssl-change="handleSSLChange"
+                        />
                         <el-form-item>
                             <el-button type="primary" @click="submit(httpsForm)">
                                 {{ $t('commons.button.save') }}
@@ -98,6 +103,10 @@ const resData = ref();
 
 const handleSSLChange = (ssl: Website.SSL) => {
     websiteSSL.value = ssl;
+};
+
+const handleFormUpdate = (payload: typeof form) => {
+    Object.assign(form, payload);
 };
 
 const get = () => {

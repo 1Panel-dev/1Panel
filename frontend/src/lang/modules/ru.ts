@@ -209,6 +209,7 @@ const message = {
                 'Для лучшей защиты ваших законных прав и интересов, пожалуйста, прочитайте и согласитесь со следующим соглашением &laquo; <a href = "https://www.fit2cloud.com/legal/licenses.html" target = "_blank" > Лицензионное соглашение сообщества </a> &raquo;',
             passkeyFailed: 'Вход по passkey не удался, попробуйте снова',
             passkeyNotSupported: 'Текущий браузер или среда не поддерживает passkey',
+            passkeyToPassword: 'Не получается использовать passkey? Войдите по паролю',
         },
         rule: {
             username: 'Введите имя пользователя',

@@ -211,6 +211,7 @@ const message = {
                 'Untuk melindungi hak dan kepentingan sah anda dengan lebih baik, sila baca dan setuju dengan perjanjian berikut &laquo; <a href = "https://www.fit2cloud.com/legal/licenses.html" target = "_blank" > Perjanjian Lesen Komuniti </a> &raquo;',
             passkeyFailed: 'Log masuk Passkey gagal, sila cuba lagi',
             passkeyNotSupported: 'Pelayar atau persekitaran semasa tidak menyokong passkey',
+            passkeyToPassword: 'Ada masalah menggunakan passkey? Gunakan kata laluan sahaja',
         },
         rule: {
             username: 'Masukkan nama pengguna',

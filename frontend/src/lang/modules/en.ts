@@ -219,6 +219,7 @@ const message = {
                 'In order to better protect your legitimate rights and interests, please read and agree to the following agreement &laquo; <a href = "https://www.fit2cloud.com/legal/licenses.html" target = "_blank" > Community License Agreement </a> &raquo;',
             passkeyFailed: 'Passkey login failed, please try again',
             passkeyNotSupported: 'Current browser or environment does not support passkeys',
+            passkeyToPassword: 'Have trouble using a passkey? Use password instead',
         },
         rule: {
             username: 'Enter a username',

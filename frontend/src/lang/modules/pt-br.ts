@@ -210,6 +210,7 @@ const message = {
                 'Para proteger melhor seus direitos e interesses legítimos, leia e concorde com o seguinte termo &laquo; <a href="https://www.fit2cloud.com/legal/licenses.html" target="_blank">Acordo de Licença Comunitária</a> &raquo;',
             passkeyFailed: 'Falha no login com Passkey, tente novamente',
             passkeyNotSupported: 'O navegador ou ambiente atual não suporta passkeys',
+            passkeyToPassword: 'Está com problemas para usar uma passkey? Use a senha',
         },
         rule: {
             username: 'Insira um nome de usuário',

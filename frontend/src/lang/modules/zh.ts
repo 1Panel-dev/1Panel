@@ -209,6 +209,7 @@ const message = {
             passkey: '使用通行密钥',
             passkeyFailed: '通行密钥登录失败，请重试',
             passkeyNotSupported: '当前浏览器或环境不支持通行密钥',
+            passkeyToPassword: '无法使用通行密钥? 使用账号密码登录',
             title: 'Linux 服务器运维管理面板',
             licenseHelper: '《飞致云社区软件许可协议》',
             errorAgree: '请点击同意社区软件许可协议',
