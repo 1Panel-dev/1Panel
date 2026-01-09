@@ -550,7 +550,7 @@ func loadFileOrDirWithExclude(fileOp fileUtils.FileOp, index uint, dir string, r
 			IsRecommend: false,
 			Name:        childPath,
 			Type:        "unknown_backup",
-			IsDisabled:  isExactPathMatch(childPath, excludes),
+			IsDisabled:  !entry.IsDir() && isExactPathMatch(childPath, excludes),
 		}
 		if entry.IsDir() {
 			if index < 4 {

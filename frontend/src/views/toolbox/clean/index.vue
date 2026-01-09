@@ -101,7 +101,7 @@
                                             :default-checked-keys="systemDefaultCheck"
                                             show-checkbox
                                             :props="defaultProps"
-                                            @check-change="onChange"
+                                            @check="onChange"
                                             class="responsive-tree"
                                             :empty-text="$t('clean.statusEmpty')"
                                         >
@@ -127,7 +127,7 @@
                                             :default-checked-keys="backupDefaultCheck"
                                             show-checkbox
                                             :props="defaultProps"
-                                            @check-change="onChange"
+                                            @check="onChange"
                                             class="responsive-tree"
                                             :empty-text="$t('clean.statusEmpty')"
                                         >
@@ -153,7 +153,7 @@
                                             :default-checked-keys="containerDefaultCheck"
                                             show-checkbox
                                             :props="defaultProps"
-                                            @check-change="onChange"
+                                            @check="onChange"
                                             class="responsive-tree"
                                             :empty-text="$t('clean.statusEmpty')"
                                         >
@@ -178,7 +178,7 @@
                                             :default-checked-keys="uploadDefaultCheck"
                                             show-checkbox
                                             :props="defaultProps"
-                                            @check-change="onChange"
+                                            @check="onChange"
                                             class="responsive-tree"
                                             :empty-text="$t('clean.statusEmpty')"
                                         >
@@ -203,7 +203,7 @@
                                             :default-checked-keys="downloadDefaultCheck"
                                             show-checkbox
                                             :props="defaultProps"
-                                            @check-change="onChange"
+                                            @check="onChange"
                                             class="responsive-tree"
                                             :empty-text="$t('clean.statusEmpty')"
                                         >
@@ -228,7 +228,7 @@
                                             :default-checked-keys="systemLogDefaultCheck"
                                             show-checkbox
                                             :props="defaultProps"
-                                            @check-change="onChange"
+                                            @check="onChange"
                                             class="responsive-tree"
                                             :empty-text="$t('clean.statusEmpty')"
                                         >
@@ -417,17 +417,18 @@ const loadSubmitCheck = (data: any) => {
     }
 };
 
-const changeCheckStatus = (data: any, isCheck: boolean) => {
-    data.isCheck = isCheck;
+const changeCheckStatus = (data: any, checked: Array<string>) => {
+    data.isCheck = checked.indexOf(data.id) !== -1;
     if (data.children) {
         for (const item of data.children) {
-            changeCheckStatus(item, isCheck);
+            changeCheckStatus(item, checked);
         }
     }
 };
 
-function onChange(data: any, isCheck: boolean) {
-    changeCheckStatus(data, isCheck);
+function onChange(data: any, checked: any) {
+    let keys = checked.checkedKeys || [];
+    changeCheckStatus(data, keys);
     selectSize.value = 0;
     let systemSelects = systemRef.value.getCheckedNodes(false, true);
     for (const item of systemSelects) {
