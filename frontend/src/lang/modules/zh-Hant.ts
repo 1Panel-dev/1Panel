@@ -1895,7 +1895,8 @@ const message = {
         passkeyManage: '管理',
         passkeyHelper: '用於快速登入，最多可綁定 5 個通行密鑰',
         passkeyRequireSSL: '啟用 HTTPS 後可使用通行密鑰',
-        passkeyNotSupported: '目前瀏覽器或環境不支援通行密鑰',
+        passkeyNotSupported:
+            '目前瀏覽器或環境不支援通行密鑰 \n 請確認您已綁定域名並啟用面板 SSL, 並且訪問時使用了可信的證書',
         passkeyCount: '已綁定 {0}/{1}',
         passkeyName: '名稱',
         passkeyNameHelper: '請輸入用於區分裝置的名稱',
@@ -1904,7 +1905,7 @@ const message = {
         passkeyLastUsedAt: '最近使用',
         passkeyDeleteConfirm: '刪除後將無法使用此通行密鑰登入，是否繼續？',
         passkeyLimit: '最多可綁定 5 個通行密鑰',
-        passkeyFailed: '通行密鑰註冊失敗，請重試',
+        passkeyFailed: '通行密鑰註冊失敗，請確認面板SSL證書是否為可信證書',
         bindInfo: '監聽地址',
         bindAll: '監聽所有',
         bindInfoHelper: '修改服務監聽地址或協議可能導致服務不可用，是否繼續？',

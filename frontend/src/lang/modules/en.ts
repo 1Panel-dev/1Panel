@@ -218,7 +218,8 @@ const message = {
             agreeContent:
                 'In order to better protect your legitimate rights and interests, please read and agree to the following agreement &laquo; <a href = "https://www.fit2cloud.com/legal/licenses.html" target = "_blank" > Community License Agreement </a> &raquo;',
             passkeyFailed: 'Passkey login failed, please try again',
-            passkeyNotSupported: 'Current browser or environment does not support passkeys',
+            passkeyNotSupported:
+                'Current browser or environment does not support passkeys, please confirm you have bound the domain name and enabled the panel SSL, and used a trusted certificate when accessing',
             passkeyToPassword: 'Have trouble using a passkey? Use password instead',
         },
         rule: {
@@ -1941,7 +1942,7 @@ const message = {
         passkeyLastUsedAt: 'Last Used',
         passkeyDeleteConfirm: 'After deletion, this passkey cannot be used to log in. Continue?',
         passkeyLimit: 'Up to 5 passkeys can be bound',
-        passkeyFailed: 'Passkey registration failed, please try again',
+        passkeyFailed: 'Passkey registration failed, please confirm that the panel SSL certificate is a trusted certificate',
         bindInfo: 'Bind info',
         bindAll: 'Listen All',
         bindInfoHelper:

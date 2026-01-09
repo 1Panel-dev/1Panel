@@ -1844,7 +1844,7 @@ const message = {
         passkeyLastUsedAt: '최근 사용',
         passkeyDeleteConfirm: '삭제하면 이 패스키로 로그인할 수 없습니다. 계속하시겠습니까?',
         passkeyLimit: '최대 5개의 패스키를 등록할 수 있습니다',
-        passkeyFailed: '패스키 등록에 실패했습니다. 다시 시도하세요',
+        passkeyFailed: '패스키 등록에 실패했습니다. 패널 SSL 인증서가 신뢰할 수 있는지 확인하세요',
         bindInfo: '바인딩 정보',
         bindAll: '모두 수신',
         bindInfoHelper: '서비스 수신 주소나 프로토콜 변경은 서비스 불가 상태를 초래할 수 있습니다. 계속하시겠습니까?',

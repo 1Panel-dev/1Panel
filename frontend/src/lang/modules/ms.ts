@@ -1922,7 +1922,7 @@ const message = {
         passkeyLastUsedAt: 'Terakhir digunakan',
         passkeyDeleteConfirm: 'Selepas dipadam, passkey ini tidak boleh digunakan untuk log masuk. Teruskan?',
         passkeyLimit: 'Maksimum 5 passkey boleh dipautkan',
-        passkeyFailed: 'Pendaftaran passkey gagal, sila cuba lagi',
+        passkeyFailed: 'Pendaftaran passkey gagal, sila pastikan sertifikat SSL panel adalah sertifikat yang dipercayai',
         bindInfo: 'Maklumat ikatan',
         bindAll: 'Dengar Semua',
         bindInfoHelper:

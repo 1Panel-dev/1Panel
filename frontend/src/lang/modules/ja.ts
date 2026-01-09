@@ -1868,7 +1868,7 @@ const message = {
         passkeyLastUsedAt: '最終使用',
         passkeyDeleteConfirm: '削除するとこのパスキーでログインできなくなります。続行しますか？',
         passkeyLimit: '最大 5 個のパスキーを登録できます',
-        passkeyFailed: 'パスキーの登録に失敗しました。再試行してください',
+        passkeyFailed: 'パスキーの登録に失敗しました。パネルSSL証明書が信頼できる証明書であることを確認してください',
         bindInfo: 'バインド情報',
         bindAll: 'すべてを聞いてください',
         bindInfoHelper:

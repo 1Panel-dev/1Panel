@@ -341,6 +341,9 @@ const search = async () => {
     form.mfaInterval = Number(res.data.mfaInterval);
     form.allowIPs = res.data.allowIPs.replaceAll(',', '\n');
     form.bindDomain = res.data.bindDomain;
+    if (res.data.bindDomain === '') {
+        passkeySupported.value = false;
+    }
     form.noAuthSettingValue = res.data.noAuthSetting;
     if (res.data.noAuthSetting !== '200') {
         form.noAuthSetting = res.data.noAuthSetting + ' - ' + i18n.global.t('setting.error' + res.data.noAuthSetting);
@@ -443,8 +446,7 @@ const registerPasskey = async () => {
         await loadPasskeys();
     } catch (res: any) {
         if (res?.message) {
-            MsgError(res.message);
-        } else {
+            console.log(res.message);
             MsgError(i18n.global.t('setting.passkeyFailed'));
         }
     } finally {
@@ -469,7 +471,7 @@ const removePasskey = async (id: string) => {
         });
 };
 
-const normalizePasskeyCreation = (publicKey: Record<string, any>) => {
+const normalizePasskeyCreation = (publicKey: Record<string, any>): PublicKeyCredentialCreationOptions => {
     const request = { ...publicKey };
     request.challenge = base64UrlToBuffer(request.challenge);
     request.user = { ...request.user, id: base64UrlToBuffer(request.user.id) };
@@ -478,7 +480,7 @@ const normalizePasskeyCreation = (publicKey: Record<string, any>) => {
             return { ...item, id: base64UrlToBuffer(item.id) };
         });
     }
-    return request;
+    return request as PublicKeyCredentialCreationOptions;
 };
 
 const buildPasskeyAttestation = (credential: PublicKeyCredential) => {

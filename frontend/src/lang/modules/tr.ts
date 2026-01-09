@@ -1963,7 +1963,7 @@ const message = {
         passkeyLastUsedAt: 'Son kullanım',
         passkeyDeleteConfirm: 'Silindikten sonra bu passkey ile giriş yapılamaz. Devam edilsin mi?',
         passkeyLimit: 'En fazla 5 passkey bağlanabilir',
-        passkeyFailed: 'Passkey kaydı başarısız oldu, lütfen tekrar deneyin',
+        passkeyFailed: 'Passkey kaydı başarısız oldu, lütfen panel SSL sertifikasının güvenilir olduğundan emin olun',
         bindInfo: 'Bağlama bilgisi',
         bindAll: 'Tümünü Dinle',
         bindInfoHelper:
