@@ -31,6 +31,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/utils/controller"
 	"github.com/1Panel-dev/1Panel/core/utils/encrypt"
 	"github.com/1Panel-dev/1Panel/core/utils/firewall"
+	"github.com/1Panel-dev/1Panel/core/utils/passkey"
 	"github.com/1Panel-dev/1Panel/core/utils/req_helper/proxy_local"
 	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 	"github.com/gin-gonic/gin"
@@ -529,10 +530,10 @@ func (u *SettingService) UpdatePassword(c *gin.Context, old, new string) error {
 }
 
 func (u *SettingService) clearPasskeySettings() error {
-	if err := settingRepo.Update(passkeyUserIDSettingKey, ""); err != nil {
+	if err := settingRepo.Update(passkey.PasskeyUserIDSettingKey, ""); err != nil {
 		return err
 	}
-	if err := settingRepo.Update(passkeyCredentialSettingKey, ""); err != nil {
+	if err := settingRepo.Update(passkey.PasskeyCredentialSettingKey, ""); err != nil {
 		return err
 	}
 	return nil
