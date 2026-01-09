@@ -1940,18 +1940,18 @@ const checkFFmpeg = () => {
 const updateHeight = () => {
     const el = fileTableRef.value;
     if (!el) return;
-    let tabHeight = globalStore.openMenuTabs ? 40 : 0;
+    let tabHeight = globalStore.openMenuTabs ? 40 : -4;
     const half = (el.offsetHeight + tabHeight) / 2;
     dropdownMaxHeight.value = Math.max(half, 300);
 };
 
 onMounted(async () => {
+    await loadPath();
     await nextTick();
     watchTitleHeight();
     window.addEventListener('resize', watchTitleHeight);
     updateHeight();
     window.addEventListener('resize', updateHeight);
-    await loadPath();
     initShowHidden();
     initTabsAndPaths();
     await getHostMount();
