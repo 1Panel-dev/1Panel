@@ -402,8 +402,11 @@ const loadSubmitCheck = (data: any) => {
         }
         return;
     }
-
     for (const item of data) {
+        if (item.label === 'unknown_website_log' && item.isCheck && item.children) {
+            loadSubmitCheck(item.children);
+            continue;
+        }
         if (item.isCheck && item.type !== 'app_tmp_download') {
             submitCleans.value.push({ treeType: item.type, name: item.name, size: item.size });
             continue;

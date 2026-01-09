@@ -497,14 +497,19 @@ func loadUnknownWebsiteLog(fileOp fileUtils.FileOp, recordMap map[string][]strin
 		Type:        "unknown_backup",
 	}
 	dir := path.Join(global.Dir.LocalBackupDir, "log/website")
+	websites, _ := websiteRepo.List()
+	websiteMap := make(map[string]struct{})
+	for _, website := range websites {
+		websiteMap[website.Alias] = struct{}{}
+	}
+
 	entries, _ := os.ReadDir(dir)
 	for _, entry := range entries {
 		if !entry.IsDir() {
 			continue
 		}
 		dirName := entry.Name()
-		itemName := fmt.Sprintf("log/website/%s", dirName)
-		if _, ok := recordMap[itemName]; !ok {
+		if _, ok := websiteMap[dirName]; !ok {
 			dirPath := path.Join(dir, dirName)
 			itemSize, _ := fileOp.GetDirSize(dirPath)
 			childData := dto.CleanTree{
