@@ -12,9 +12,10 @@
                 </el-select>
             </el-form-item>
             <el-form-item :label="$t('container.imageName')" prop="imageName">
-                <el-input-tag v-model="form.imageName">
-                    <template v-if="form.fromRepo" #prefix>{{ loadDetailInfo(form.repoID) }}/</template>
+                <el-input-tag v-if="form.fromRepo" v-model="form.imageName">
+                    <template #prefix>{{ loadDetailInfo(form.repoID) }}/</template>
                 </el-input-tag>
+                <el-input-tag v-else v-model="form.imageName" />
                 <span class="input-help">{{ $t('container.imagePullHelper') }}</span>
             </el-form-item>
         </el-form>
