@@ -1,7 +1,6 @@
 <template>
     <div v-loading="loading" class="w-full h-full flex items-center justify-center px-8">
         <div class="w-full flex-grow flex flex-col login-form">
-            <!-- MFA 验证界面 -->
             <div v-if="mfaShow">
                 <el-form @submit.prevent>
                     <div class="flex flex-col justify-center items-center mb-6">
@@ -40,7 +39,6 @@
                     </div>
                 </el-form>
             </div>
-            <!-- 通行密钥登录界面 -->
             <div v-else-if="showPasskeyOnly">
                 <div class="flex justify-between items-center mb-6">
                     <div class="text-2xl font-medium text-gray-900">{{ $t('commons.button.login') }}</div>
@@ -99,7 +97,6 @@
                     </el-form-item>
                 </div>
             </div>
-            <!-- 账号密码登录界面 -->
             <div v-else>
                 <div class="flex justify-between items-center mb-6">
                     <div class="text-2xl font-medium text-gray-900">{{ $t('commons.button.login') }}</div>
@@ -191,16 +188,6 @@
                                 size="default"
                             >
                                 {{ $t('commons.button.login') }}
-                            </el-button>
-                        </el-form-item>
-                        <el-form-item v-if="passkeyEnabled && passkeyConfigured && passkeySupported">
-                            <el-button
-                                class="w-full login-button"
-                                type="primary"
-                                size="default"
-                                @click="switchToPasskeyLogin"
-                            >
-                                {{ $t('commons.login.passkey') }}
                             </el-button>
                         </el-form-item>
                         <el-text v-if="isDemo" type="danger" class="demo">
@@ -395,10 +382,6 @@ const switchToPasswordLogin = () => {
     });
 };
 
-const switchToPasskeyLogin = () => {
-    showPasswordLogin.value = false;
-};
-
 const login = (formEl: FormInstance | undefined) => {
     if (!formEl || isLoggingIn) return;
     errAuthInfo.value = false;
@@ -549,9 +532,8 @@ const passkeyLogin = async () => {
         document.onkeydown = null;
     } catch (res: any) {
         if (res?.message) {
-            MsgError(res.message);
-        } else {
             MsgError(i18n.t('commons.login.passkeyFailed'));
+            console.log(res.message);
         }
     } finally {
         isLoggingIn = false;
