@@ -802,6 +802,11 @@ func (a AppService) GetAppUpdate() (*response.AppUpdateRes, error) {
 	res := &response.AppUpdateRes{
 		CanUpdate: false,
 	}
+	mysql, _ := appRepo.GetFirst(appRepo.WithKey("mysql"))
+	if !mysql.BatchInstallSupport {
+		res.CanUpdate = true
+		return res, nil
+	}
 
 	versionUrl := fmt.Sprintf("%s/%s/1panel.json.version.txt", global.CONF.RemoteURL.AppRepo, global.CONF.Base.Mode)
 	_, versionRes, err := req_helper.HandleRequest(versionUrl, http.MethodGet, constant.TimeOut20s)
