@@ -5,7 +5,7 @@
                 <div class="detail flex">
                     <div class="w-12 h-12 rounded p-1 shadow-md icon">
                         <img
-                            :src="getAppIconUrl(app.id, currentNode)"
+                            :src="getAppIconUrl(app.key, currentNode)"
                             alt="App Icon"
                             class="w-full h-full rounded"
                             style="object-fit: contain"

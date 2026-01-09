@@ -131,10 +131,10 @@ export const getCurrentNodeCustomAppConfig = () => {
     return http.get<App.CustomAppStoreConfig>(`/custom/app/config`);
 };
 
-export function getAppIconUrl(appId: number, node?: string): string {
+export function getAppIconUrl(appKey: string, node?: string): string {
     const baseURL = import.meta.env.VITE_API_URL as string;
     const params = node ? `?operateNode=${node}` : '';
-    return `${baseURL}/apps/icon/${appId}${params}`;
+    return `${baseURL}/apps/icon/${appKey}${params}`;
 }
 
 export const installAppToNodes = (param: App.InstallAppToNodes) => {

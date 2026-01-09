@@ -203,14 +203,14 @@ func (b *BaseApi) GetAppListUpdate(c *gin.Context) {
 // @Success 200 {file} file "app icon"
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /apps/icon/:appId [get]
+// @Router /apps/icon/:key [get]
 func (b *BaseApi) GetAppIcon(c *gin.Context) {
-	appID, err := helper.GetIntParamByKey(c, "appID")
+	appKey, err := helper.GetStrParamByKey(c, "key")
 	if err != nil {
 		helper.BadRequest(c, err)
 		return
 	}
-	iconBytes, err := appService.GetAppIcon(appID)
+	iconBytes, err := appService.GetAppIcon(appKey)
 	if err != nil {
 		helper.InternalServer(c, err)
 		return

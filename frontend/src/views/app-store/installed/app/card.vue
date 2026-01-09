@@ -5,7 +5,7 @@
                 <el-col :xs="3" :sm="3" :md="3" :lg="4" :xl="3">
                     <AppIcon
                         @open-detail="$emit('openDetail')"
-                        :appID="installed.appID"
+                        :appKey="installed.appKey"
                         :currentNode="currentNode"
                     ></AppIcon>
                 </el-col>

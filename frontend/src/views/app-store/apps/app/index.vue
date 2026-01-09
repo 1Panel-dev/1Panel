@@ -3,7 +3,7 @@
         <el-card>
             <div class="app-wrapper" @click="openDetail(app.key)">
                 <div class="app-image">
-                    <el-avatar shape="square" :size="60" :src="getAppIconUrl(app.id, currentNode)" />
+                    <el-avatar shape="square" :size="60" :src="getAppIconUrl(app.key, currentNode)" />
                 </div>
                 <div class="app-content">
                     <div class="content-top">

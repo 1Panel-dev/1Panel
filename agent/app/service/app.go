@@ -46,7 +46,7 @@ type IAppService interface {
 	GetAppUpdate() (*response.AppUpdateRes, error)
 	GetAppDetailByID(id uint) (*response.AppDetailDTO, error)
 	SyncAppListFromLocal(taskID string)
-	GetAppIcon(appID uint) ([]byte, error)
+	GetAppIcon(key string) ([]byte, error)
 	GetAppDetailByKey(appKey, version string) (response.AppDetailSimpleDTO, error)
 }
 
@@ -1177,8 +1177,8 @@ func (a AppService) SyncAppListFromRemote(taskID string) (err error) {
 	return nil
 }
 
-func (a AppService) GetAppIcon(appID uint) ([]byte, error) {
-	app, err := appRepo.GetFirst(repo.WithByID(appID))
+func (a AppService) GetAppIcon(key string) ([]byte, error) {
+	app, err := appRepo.GetFirst(appRepo.WithKey(key))
 	if err != nil {
 		return nil, err
 	}
