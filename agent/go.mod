@@ -195,6 +195,7 @@ require (
 	github.com/nrdcg/freemyip v0.3.0 // indirect
 	github.com/nrdcg/goacmedns v0.2.0 // indirect
 	github.com/nrdcg/namesilo v0.5.0 // indirect
+	github.com/nrdcg/porkbun v0.4.0 // indirect
 	github.com/nwaples/rardecode/v2 v2.2.0 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/ovh/go-ovh v1.9.0 // indirect

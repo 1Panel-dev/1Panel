@@ -19,6 +19,7 @@ import (
 	"github.com/go-acme/lego/v4/providers/dns/namedotcom"
 	"github.com/go-acme/lego/v4/providers/dns/namesilo"
 	"github.com/go-acme/lego/v4/providers/dns/ovh"
+	"github.com/go-acme/lego/v4/providers/dns/porkbun"
 	"github.com/go-acme/lego/v4/providers/dns/rainyun"
 	"github.com/go-acme/lego/v4/providers/dns/regru"
 	"github.com/go-acme/lego/v4/providers/dns/route53"
@@ -57,6 +58,7 @@ const (
 	BaiduCloud   DnsType = "BaiduCloud"
 	Ovh          DnsType = "Ovh"
 	AcmeDNS      DnsType = "AcmeDNS"
+	PorkBun      DnsType = "PorkBun"
 )
 
 type DNSParam struct {
@@ -291,6 +293,14 @@ func getDNSProviderConfig(dnsType DnsType, params string) (challenge.Provider, e
 		config.APIBase = param.Endpoint
 		config.StorageBaseURL = param.BaseURL
 		p, err = acmedns.NewDNSProviderConfig(config)
+	case PorkBun:
+		config := porkbun.NewDefaultConfig()
+		config.APIKey = param.APIkey
+		config.SecretAPIKey = param.SecretKey
+		config.PropagationTimeout = propagationTimeout
+		config.PollingInterval = pollingInterval
+		config.TTL = ttl
+		p, err = porkbun.NewDNSProviderConfig(config)
 	}
 
 	if err != nil {

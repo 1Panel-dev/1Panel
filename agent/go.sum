@@ -764,6 +764,8 @@ github.com/nrdcg/goacmedns v0.2.0 h1:ADMbThobzEMnr6kg2ohs4KGa3LFqmgiBA22/6jUWJR0
 github.com/nrdcg/goacmedns v0.2.0/go.mod h1:T5o6+xvSLrQpugmwHvrSNkzWht0UGAwj2ACBMhh73Cg=
 github.com/nrdcg/namesilo v0.5.0 h1:6QNxT/XxE+f5B+7QlfWorthNzOzcGlBLRQxqi6YeBrE=
 github.com/nrdcg/namesilo v0.5.0/go.mod h1:4UkwlwQfDt74kSGmhLaDylnBrD94IfflnpoEaj6T2qw=
+github.com/nrdcg/porkbun v0.4.0 h1:rWweKlwo1PToQ3H+tEO9gPRW0wzzgmI/Ob3n2Guticw=
+github.com/nrdcg/porkbun v0.4.0/go.mod h1:/QMskrHEIM0IhC/wY7iTCUgINsxdT2WcOphktJ9+Q54=
 github.com/nwaples/rardecode/v2 v2.2.0 h1:4ufPGHiNe1rYJxYfehALLjup4Ls3ck42CWwjKiOqu0A=
 github.com/nwaples/rardecode/v2 v2.2.0/go.mod h1:7uz379lSxPe6j9nvzxUZ+n7mnJNgjsRNb6IbvGVHRmw=
 github.com/nxadm/tail v1.4.4/go.mod h1:kenIhsEOeOJmVchQTgglprH7qJGnHDVpk1VPCcaMI8A=

@@ -265,6 +265,10 @@ export const DNSTypes = [
         value: 'Volcengine',
     },
     {
+        label: 'PorkBun',
+        value: 'PorkBun',
+    },
+    {
         label: 'DNSPod (' + i18n.global.t('ssl.deprecated') + ')',
         value: 'DnsPod',
     },
