@@ -151,7 +151,6 @@ const containerHeight = ref(500);
 const scrollTop = ref(0);
 const lastScrollTop = ref(0);
 const totalLines = ref(0);
-const stopReading = ref(false);
 const totalPages = ref(0);
 let resizeObserver: ResizeObserver | null = null;
 const isEndOfFile = ref(false);
@@ -387,10 +386,6 @@ const getContent = async (pre: boolean) => {
 };
 
 const onCloseLog = async () => {
-    if (stopReading.value) {
-        return;
-    }
-    stopReading.value = true;
     tailLog.value = false;
     if (timer) {
         clearInterval(Number(timer));
