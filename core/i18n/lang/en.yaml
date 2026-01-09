@@ -22,6 +22,7 @@ ErrHttpReqFailed: "Request failed {{ .err }}"
 ErrHttpReqTimeOut: "Request timed out {{ .err }}"
 ErrCreateHttpClient: "Failed to create request {{ .err }}"
 ErrProxySetting: "Proxy server information unavailable {{ .err }}, please check and try again!"
+ErrEntranceFormat: "Security entrance {{ .name }} is not currently supported. Please check and try again!"
 
 # common
 ErrDemoEnvironment: "Demo server, this operation is prohibited!"

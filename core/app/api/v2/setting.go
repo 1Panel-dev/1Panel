@@ -3,7 +3,6 @@ package v2
 import (
 	"encoding/base64"
 	"errors"
-	"fmt"
 	"net/http"
 	"os"
 	"path"
@@ -13,6 +12,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/core/app/dto"
 	"github.com/1Panel-dev/1Panel/core/app/repo"
+	"github.com/1Panel-dev/1Panel/core/buserr"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/utils/mfa"
@@ -94,7 +94,7 @@ func (b *BaseApi) UpdateSetting(c *gin.Context) {
 	}
 	if req.Key == "SecurityEntrance" {
 		if !checkEntrancePattern(req.Value) {
-			helper.ErrorWithDetail(c, http.StatusBadRequest, "ErrInvalidParams", fmt.Errorf("the format of the security entrance %s is incorrect.", req.Value))
+			helper.ErrorWithDetail(c, http.StatusBadRequest, "ErrInvalidParams", buserr.WithName("ErrEntranceFormat", req.Value))
 			return
 		}
 	}

@@ -22,6 +22,7 @@ ErrHttpReqFailed: "Permintaan gagal {{ .err }}"
 ErrHttpReqTimeOut: "Permintaan telah tamat masa {{ .err }}"
 ErrCreateHttpClient: "Gagal mencipta permintaan {{ .err }}"
 ErrProxySetting: "Maklumat pelayan proksi tidak tersedia {{ .err }}, sila periksa dan cuba lagi!"
+ErrEntranceFormat: "Pintu masuk keselamatan {{ .name }} tidak disokong buat masa ini. Sila periksa dan cuba lagi!"
 
 # common
 ErrDemoEnvironment: "Pelayan demo, operasi ini dilarang!"
