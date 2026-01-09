@@ -2177,8 +2177,7 @@ const message = {
         scanHelper: 'Bersihkan fail sampah dengan mudah yang dihasilkan semasa operasi 1Panel',
         clean: 'Bersihkan sekarang',
         reScan: 'Imbas semula',
-        cleanHelper:
-            'Ini akan membersihkan fail sampah sistem yang dipilih dan tidak boleh dipulihkan. Adakah anda mahu meneruskan?',
+        cleanHelper: 'Fail dan direktori terpilih tidak boleh dipulihkan selepas pembersihan. Teruskan?',
         statusSuggest: '(Disyorkan untuk Pembersihan)',
         statusClean: '(Sangat bersih)',
         statusEmpty: 'Sangat bersih, tiada pembersihan diperlukan!',

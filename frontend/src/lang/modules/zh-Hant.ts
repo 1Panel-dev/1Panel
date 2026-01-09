@@ -2041,7 +2041,7 @@ const message = {
         scanHelper: '輕鬆梳理 1Panel 執行期間積累的垃圾文件',
         clean: '立即清理',
         reScan: '重新掃描',
-        cleanHelper: '已勾選文件及目錄清理後無法回滾（系統快取文件清理需要重啟服務），是否繼續？',
+        cleanHelper: '已勾選文件及目錄清理後無法回滾，是否繼續？',
         statusSuggest: '( 建議清理 )',
         statusClean: '( 很乾淨 )',
         statusEmpty: '非常乾淨，無需清理！',

@@ -2081,7 +2081,7 @@ const message = {
         scanHelper: '1Panel 실행 중에 생성된 불필요한 파일을 쉽게 정리합니다.',
         clean: '지금 정리',
         reScan: '다시 스캔',
-        cleanHelper: '선택한 시스템 불필요 파일을 정리합니다. 이 작업은 되돌릴 수 없습니다. 계속 하시겠습니까?',
+        cleanHelper: '선택된 파일 및 디렉터리는 정리 후 롤백할 수 없습니다. 계속하시겠습니까?',
         statusSuggest: '(권장 정리)',
         statusClean: '(매우 깨끗함)',
         statusEmpty: '매우 깨끗합니다. 정리가 필요하지 않습니다!',

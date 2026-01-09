@@ -380,14 +380,16 @@ func loadUnknownApps(fileOp fileUtils.FileOp, recordMap map[string][]string) dto
 			excludePaths = append(excludePaths, path.Join(global.Dir.LocalBackupDir, itemName))
 		}
 	}
+	backupPath := path.Join(global.Dir.LocalBackupDir, "app")
 	treeData := dto.CleanTree{
 		ID:          uuid.NewString(),
 		Label:       "unknown_app",
 		IsCheck:     false,
 		IsRecommend: false,
+		Name:        backupPath,
 		Type:        "unknown_backup",
 	}
-	_ = loadFileOrDirWithExclude(fileOp, 0, path.Join(global.Dir.LocalBackupDir, "app"), &treeData, excludePaths)
+	_ = loadFileOrDirWithExclude(fileOp, 0, backupPath, &treeData, excludePaths)
 	loadBackupIsCheck(&treeData)
 	return treeData
 }
@@ -406,14 +408,16 @@ func loadUnknownDbs(fileOp fileUtils.FileOp, recordMap map[string][]string) dto.
 			}
 		}
 	}
+	backupPath := path.Join(global.Dir.LocalBackupDir, "database")
 	treeData := dto.CleanTree{
 		ID:          uuid.NewString(),
 		Label:       "unknown_database",
+		Name:        backupPath,
 		IsCheck:     false,
 		IsRecommend: false,
 		Type:        "unknown_backup",
 	}
-	_ = loadFileOrDirWithExclude(fileOp, 0, path.Join(global.Dir.LocalBackupDir, "database"), &treeData, excludePaths)
+	_ = loadFileOrDirWithExclude(fileOp, 0, backupPath, &treeData, excludePaths)
 
 	loadBackupIsCheck(&treeData)
 	return treeData
@@ -431,14 +435,16 @@ func loadUnknownWebsites(fileOp fileUtils.FileOp, recordMap map[string][]string)
 			excludePaths = append(excludePaths, path.Join(global.Dir.LocalBackupDir, itemName))
 		}
 	}
+	backupPath := path.Join(global.Dir.LocalBackupDir, "website")
 	treeData := dto.CleanTree{
 		ID:          uuid.NewString(),
 		Label:       "unknown_website",
+		Name:        backupPath,
 		IsCheck:     false,
 		IsRecommend: false,
 		Type:        "unknown_backup",
 	}
-	_ = loadFileOrDirWithExclude(fileOp, 0, path.Join(global.Dir.LocalBackupDir, "website"), &treeData, excludePaths)
+	_ = loadFileOrDirWithExclude(fileOp, 0, backupPath, &treeData, excludePaths)
 	loadBackupIsCheck(&treeData)
 	return treeData
 }
@@ -448,21 +454,18 @@ func loadUnknownSnapshot(fileOp fileUtils.FileOp) dto.CleanTree {
 	for _, item := range snaps {
 		excludePaths = append(excludePaths, path.Join(global.Dir.LocalBackupDir, "system_snapshot", item.Name+".tar.gz"))
 	}
+	backupPath := path.Join(global.Dir.LocalBackupDir, "system_snapshot")
 	treeData := dto.CleanTree{
 		ID:          uuid.NewString(),
 		Label:       "unknown_snapshot",
+		Name:        backupPath,
 		IsCheck:     false,
 		IsRecommend: false,
 		Type:        "unknown_backup",
 	}
-	dir := path.Join(global.Dir.LocalBackupDir, "system_snapshot")
-	entries, _ := os.ReadDir(dir)
+	entries, _ := os.ReadDir(backupPath)
 	for _, entry := range entries {
-		childPath := filepath.Join(dir, entry.Name())
-		if isExactPathMatch(childPath, excludePaths) {
-			continue
-		}
-
+		childPath := filepath.Join(backupPath, entry.Name())
 		childNode := dto.CleanTree{
 			ID:          uuid.NewString(),
 			Label:       entry.Name(),
@@ -470,6 +473,7 @@ func loadUnknownSnapshot(fileOp fileUtils.FileOp) dto.CleanTree {
 			IsRecommend: false,
 			Name:        childPath,
 			Type:        "unknown_backup",
+			IsDisabled:  isExactPathMatch(childPath, excludePaths),
 		}
 		if entry.IsDir() {
 			itemSize, _ := fileOp.GetDirSize(childPath)

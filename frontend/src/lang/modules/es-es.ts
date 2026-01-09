@@ -2212,7 +2212,8 @@ const message = {
         scanHelper: 'Limpie fácilmente archivos basura generados por 1Panel',
         clean: 'Limpiar ahora',
         reScan: 'Volver a escanear',
-        cleanHelper: 'Esto eliminará los archivos seleccionados y no se puede deshacer. ¿Desea continuar?',
+        cleanHelper:
+            'Los archivos y directorios seleccionados no se pueden revertir después de la limpieza. ¿Continuar?',
         statusSuggest: '(Limpieza recomendada)',
         statusClean: '(Muy limpio)',
         statusEmpty: 'Muy limpio, ¡no necesita limpieza!',

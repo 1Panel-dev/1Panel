@@ -2039,7 +2039,7 @@ const message = {
         scanHelper: '轻松梳理 1Panel 运行期间积累的垃圾文件',
         clean: '立即清理',
         reScan: '重新扫描',
-        cleanHelper: '已勾选文件及目录清理后无法回滚（系统缓存文件清理需要重启服务），是否继续？',
+        cleanHelper: '已勾选文件及目录清理后无法回滚，是否继续？',
         statusSuggest: '( 建议清理 )',
         statusClean: '( 很干净 )',
         statusEmpty: '非常干净，无需清理！',

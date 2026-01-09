@@ -2196,7 +2196,7 @@ const message = {
         scanHelper: 'Easily clean up junk files produced during 1Panel runtime',
         clean: 'Clean now',
         reScan: 'Rescan',
-        cleanHelper: `This will clean up the selected system junk files and can't be undone. Do you want to continue?`,
+        cleanHelper: 'Selected files and directories cannot be rolled back after cleanup. Continue?',
         statusSuggest: '(Recommended Cleaning)',
         statusClean: '(Very clean)',
         statusEmpty: 'Very clean, no cleaning needed!',

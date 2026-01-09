@@ -2221,8 +2221,7 @@ const message = {
         scanHelper: '1Panel çalışma zamanında üretilen gereksiz dosyaları kolayca temizleyin',
         clean: 'Şimdi temizle',
         reScan: 'Yeniden tara',
-        cleanHelper:
-            'Bu, seçilen sistem gereksiz dosyalarını temizleyecek ve geri alınamaz. Devam etmek istiyor musunuz?',
+        cleanHelper: 'Seçilen dosya ve dizinler temizlendikten sonra geri alınamaz. Devam etmek istiyor musunuz?',
         statusStatusSuggest: '(Temizlik Önerilir)',
         statusClean: '(Çok temiz)',
         statusEmpty: 'Çok temiz, temizlik gerekmiyor!',

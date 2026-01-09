@@ -2172,7 +2172,7 @@ const message = {
         scanHelper: 'Limpeza fácil de arquivos inúteis gerados durante a execução do 1Panel',
         clean: 'Limpar agora',
         reScan: 'Repetir escaneamento',
-        cleanHelper: 'Isso limpará os arquivos inúteis selecionados e não poderá ser desfeito. Você deseja continuar?',
+        cleanHelper: 'Arquivos e diretórios selecionados não podem ser revertidos após a limpeza. Continuar?',
         statusSuggest: '(Limpeza recomendada)',
         statusClean: '(Muito limpo)',
         statusEmpty: 'Muito limpo, nenhuma limpeza necessária!',
