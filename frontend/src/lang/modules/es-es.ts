@@ -1956,7 +1956,8 @@ const message = {
         passkeyLastUsedAt: 'Último uso',
         passkeyDeleteConfirm: 'Después de eliminar, no podrás iniciar sesión con esta passkey. ¿Continuar?',
         passkeyLimit: 'Se pueden vincular hasta 5 passkeys',
-        passkeyFailed: 'El registro de passkey falló, por favor, asegúrate de que el certificado SSL del panel es confiable',
+        passkeyFailed:
+            'El registro de passkey falló, por favor, asegúrate de que el certificado SSL del panel es confiable',
         bindInfo: 'Información de enlace',
         bindAll: 'Escuchar en todas',
         bindInfoHelper:

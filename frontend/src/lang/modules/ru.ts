@@ -1911,7 +1911,8 @@ const message = {
         passkeyLastUsedAt: 'Последнее использование',
         passkeyDeleteConfirm: 'После удаления эту passkey нельзя использовать для входа. Продолжить?',
         passkeyLimit: 'Можно привязать до 5 passkey',
-        passkeyFailed: 'Не удалось зарегистрировать passkey, пожалуйста, убедитесь, что сертификат SSL панели является доверенным',
+        passkeyFailed:
+            'Не удалось зарегистрировать passkey, пожалуйста, убедитесь, что сертификат SSL панели является доверенным',
         bindInfo: 'IP-адрес',
         bindAll: 'Прослушивать все',
         bindInfoHelper:

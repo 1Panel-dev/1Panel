@@ -1910,7 +1910,8 @@ const message = {
         passkeyLastUsedAt: 'Último uso',
         passkeyDeleteConfirm: 'Após excluir, esta passkey não poderá ser usada para login. Continuar?',
         passkeyLimit: 'É possível vincular até 5 passkeys',
-        passkeyFailed: 'Falha no cadastro da passkey, por favor, certifique-se de que o certificado SSL do painel é confiável',
+        passkeyFailed:
+            'Falha no cadastro da passkey, por favor, certifique-se de que o certificado SSL do painel é confiável',
         bindInfo: 'Informações de Vinculação',
         bindAll: 'Ouvir Todos',
         bindInfoHelper:

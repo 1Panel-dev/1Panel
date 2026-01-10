@@ -1942,7 +1942,8 @@ const message = {
         passkeyLastUsedAt: 'Last Used',
         passkeyDeleteConfirm: 'After deletion, this passkey cannot be used to log in. Continue?',
         passkeyLimit: 'Up to 5 passkeys can be bound',
-        passkeyFailed: 'Passkey registration failed, please confirm that the panel SSL certificate is a trusted certificate',
+        passkeyFailed:
+            'Passkey registration failed, please confirm that the panel SSL certificate is a trusted certificate',
         bindInfo: 'Bind info',
         bindAll: 'Listen All',
         bindInfoHelper:
