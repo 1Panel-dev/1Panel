@@ -38,7 +38,7 @@ type IAuthService interface {
 	PasskeyFinishRegister(c *gin.Context, sessionID string) (string, error)
 	PasskeyList() ([]dto.PasskeyInfo, error)
 	PasskeyDelete(id string) error
-	PasskeyStatus(c *gin.Context) (bool, bool)
+	PasskeyStatus(c *gin.Context) bool
 	GetSecurityEntrance() string
 	IsLogin(c *gin.Context) bool
 }
@@ -204,7 +204,7 @@ func (u *AuthService) IsLogin(c *gin.Context) bool {
 	return err == nil
 }
 
-func (u *AuthService) PasskeyStatus(c *gin.Context) (bool, bool) {
+func (u *AuthService) PasskeyStatus(c *gin.Context) bool {
 	enabled, err := u.passkeyEnabled(c)
 	if err != nil {
 		global.LOG.Errorf("passkey enabled check failed, err: %v", err)
@@ -215,7 +215,7 @@ func (u *AuthService) PasskeyStatus(c *gin.Context) (bool, bool) {
 		global.LOG.Errorf("passkey config check failed, err: %v", err)
 		configured = false
 	}
-	return enabled, configured
+	return enabled && configured
 }
 
 func (u *AuthService) PasskeyBeginLogin(c *gin.Context, entrance string) (*dto.PasskeyBeginResponse, string, error) {
@@ -255,11 +255,12 @@ func (u *AuthService) PasskeyBeginLogin(c *gin.Context, entrance string) (*dto.P
 }
 
 func (u *AuthService) PasskeyFinishLogin(c *gin.Context, sessionID, entrance string) (*dto.UserLoginInfo, string, error) {
-	if err := u.checkEntrance(entrance); err != nil {
-		return nil, "ErrEntrance", err
-	}
 	if sessionID == "" {
 		return nil, "ErrPasskeySession", buserr.New("ErrPasskeySession")
+	}
+
+	if err := u.checkEntrance(entrance); err != nil {
+		return nil, "ErrEntrance", err
 	}
 
 	config, msgKey, err := u.passkeyConfig(c)

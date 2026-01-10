@@ -40,7 +40,6 @@ export namespace Login {
         theme: string;
         isOffLine: boolean;
         needCaptcha: boolean;
-        passkeyEnabled: boolean;
-        passkeyConfigured: boolean;
+        passkeySetting: boolean;
     }
 }

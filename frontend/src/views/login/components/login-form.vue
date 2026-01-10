@@ -266,8 +266,7 @@ const tabsStore = TabsStore();
 const errAuthInfo = ref(false);
 const errCaptcha = ref(false);
 const errMfaInfo = ref(false);
-const passkeyEnabled = ref(false);
-const passkeyConfigured = ref(false);
+const passkeySetting = ref(false);
 const passkeySupported = ref(false);
 const showPasswordLogin = ref(false);
 const isDemo = ref(false);
@@ -372,7 +371,7 @@ const agreeWithLogin = () => {
 };
 
 const showPasskeyOnly = computed(() => {
-    return passkeyEnabled.value && passkeyConfigured.value && passkeySupported.value && !showPasswordLogin.value;
+    return passkeySetting.value && passkeySupported.value && !showPasswordLogin.value;
 });
 
 const switchToPasswordLogin = () => {
@@ -492,7 +491,7 @@ const mfaLogin = async (auto: boolean) => {
 };
 
 const passkeyLogin = async () => {
-    if (isLoggingIn || !passkeyEnabled.value || !passkeyConfigured.value) return;
+    if (isLoggingIn || !passkeySetting.value) return;
     if (!passkeySupported.value) {
         MsgError(i18n.t('commons.login.passkeyNotSupported'));
         return;
@@ -590,8 +589,7 @@ const getSetting = async () => {
         globalStore.isFxplay = isFxplay.value;
         globalStore.isOffLine = res.data.isOffLine;
         globalStore.ignoreCaptcha = !res.data.needCaptcha;
-        passkeyEnabled.value = res.data.passkeyEnabled;
-        passkeyConfigured.value = res.data.passkeyConfigured;
+        passkeySetting.value = res.data.passkeySetting;
         if (!globalStore.ignoreCaptcha) {
             loginVerify();
         }
@@ -601,8 +599,7 @@ const getSetting = async () => {
         globalStore.setOpenMenuTabs(res.data.menuTabs === 'Enable');
         globalStore.setThemeConfig({ ...themeConfig.value, theme: res.data.theme, panelName: res.data.panelName });
 
-        // 如果启用了通行密钥且已配置，默认勾选许可协议
-        if (res.data.passkeyEnabled && res.data.passkeyConfigured && !isIntl.value && !isFxplay.value) {
+        if (res.data.passkeySetting && !isIntl.value && !isFxplay.value) {
             loginForm.agreeLicense = true;
         }
     } catch (error) {}

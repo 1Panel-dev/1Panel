@@ -113,6 +113,10 @@ func (b *BaseApi) PasskeyBeginLogin(c *gin.Context) {
 			helper.BadAuth(c, msgKey, err)
 			return
 		}
+		if msgKey == "ErrPasskeyNotConfigured" {
+			helper.ErrorWithDetail(c, http.StatusNotFound, msgKey, err)
+			return
+		}
 		helper.ErrorWithDetail(c, http.StatusBadRequest, msgKey, err)
 		return
 	}
@@ -216,9 +220,7 @@ func (b *BaseApi) GetLoginSetting(c *gin.Context) {
 		Theme:       settingInfo.Theme,
 		NeedCaptcha: needCaptcha,
 	}
-	passkeyEnabled, passkeyConfigured := authService.PasskeyStatus(c)
-	res.PasskeyEnabled = passkeyEnabled
-	res.PasskeyConfigured = passkeyConfigured
+	res.PasskeySetting = authService.PasskeyStatus(c)
 	helper.SuccessWithData(c, res)
 }
 

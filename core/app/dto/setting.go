@@ -250,8 +250,7 @@ type LoginSetting struct {
 	PanelName   string `json:"panelName"`
 	Theme       string `json:"theme"`
 	NeedCaptcha bool   `json:"needCaptcha"`
-	PasskeyEnabled    bool `json:"passkeyEnabled"`
-	PasskeyConfigured bool `json:"passkeyConfigured"`
+	PasskeySetting bool `json:"passkeySetting"`
 }
 
 type PasskeyRegisterRequest struct {
