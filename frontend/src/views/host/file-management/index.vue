@@ -315,12 +315,6 @@
                                 <el-button class="btn" @click="calculateSize(req.path)" :loading="disableBtn">
                                     {{ $t('file.calculate') }}
                                 </el-button>
-                                <div class="flex items-center gap-1">
-                                    <el-tooltip :content="$t('file.remarkToggleTip')" placement="bottom">
-                                        <el-switch v-model="remarkEnabled" size="small" @change="handleRemarkToggle" />
-                                    </el-tooltip>
-                                    <el-text size="small">{{ $t('file.remarkToggle') }}</el-text>
-                                </div>
                                 <template v-if="hostMount.length == 1">
                                     <el-button class="btn" @click.stop="jump(hostMount[0]?.path)">
                                         {{ hostMount[0]?.path }} ({{ $t('file.root') }})
@@ -714,7 +708,6 @@ import { routerToNameWithQuery } from '@/utils/router';
 import { loadBaseDir } from '@/api/modules/setting';
 
 const globalStore = GlobalStore();
-const remarkToggleKey = 'file-remark-enabled';
 
 interface FilePaths {
     url: string;
@@ -728,8 +721,8 @@ const heightDiff = ref(365);
 const fileTableRef = ref<HTMLElement | null>(null);
 const dropdownMaxHeight = ref(450);
 const baseDir = ref();
-const remarkEnabled = ref(true);
 const remarkRequestId = ref(0);
+const remarkLoadTimer = ref<number | null>(null);
 const editableTabsKey = ref('');
 const editableTabs = ref([
     { id: '1', name: getLastPath(baseDir.value), path: baseDir.value },
@@ -896,9 +889,7 @@ const handleSearchResult = (res: ResultData<File.File>) => {
     dirNum.value = data.value.filter((item) => item.isDir).length;
     fileNum.value = data.value.filter((item) => !item.isDir).length;
     req.path = res.data.path;
-    if (remarkEnabled.value) {
-        void loadRemarksForCurrentPage();
-    }
+    scheduleRemarkLoad();
 };
 
 const viewHideFile = async () => {
@@ -1809,34 +1800,16 @@ function initShowHidden() {
     }
 }
 
-function initRemarkToggle() {
-    const stored = localStorage.getItem(remarkToggleKey);
-    if (stored === null) {
-        localStorage.setItem(remarkToggleKey, 'true');
-        remarkEnabled.value = true;
-        return;
+const scheduleRemarkLoad = () => {
+    if (remarkLoadTimer.value) {
+        window.clearTimeout(remarkLoadTimer.value);
     }
-    remarkEnabled.value = stored === 'true';
-}
-
-const handleRemarkToggle = (value: boolean) => {
-    localStorage.setItem(remarkToggleKey, value ? 'true' : 'false');
-    if (!value) {
-        clearRemarks();
-        return;
-    }
-    void loadRemarksForCurrentPage();
-};
-
-const clearRemarks = () => {
-    if (!Array.isArray(data.value)) return;
-    data.value.forEach((item) => {
-        item.remark = '';
-    });
+    remarkLoadTimer.value = window.setTimeout(() => {
+        void loadRemarksForCurrentPage();
+    }, 1000);
 };
 
 const loadRemarksForCurrentPage = async () => {
-    if (!remarkEnabled.value) return;
     if (!Array.isArray(data.value) || data.value.length === 0) return;
     const paths = data.value.map((item) => item.path).filter(Boolean);
     if (paths.length === 0) return;
@@ -2041,7 +2014,6 @@ onMounted(async () => {
     updateHeight();
     window.addEventListener('resize', updateHeight);
     initShowHidden();
-    initRemarkToggle();
     initTabsAndPaths();
     await getHostMount();
     initHistory();
@@ -2056,6 +2028,9 @@ onBeforeUnmount(() => {
     if (resizeObserver) resizeObserver.disconnect();
     window.removeEventListener('resize', watchTitleHeight);
     window.removeEventListener('resize', updateHeight);
+    if (remarkLoadTimer.value) {
+        window.clearTimeout(remarkLoadTimer.value);
+    }
 });
 </script>
 

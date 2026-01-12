@@ -776,7 +776,9 @@ func (f *FileService) BatchGetRemarks(req request.FileRemarkBatch) map[string]st
 			if isXattrNotSupported(err) {
 				return map[string]string{}
 			}
-			remarks[filePath] = ""
+			continue
+		}
+		if remark == "" {
 			continue
 		}
 		remarks[filePath] = remark
