@@ -673,9 +673,7 @@ onMounted(() => {
         e = window.event || e;
         if (e.keyCode === 13) {
             if (!mfaShow.value) {
-                if (showPasskeyOnly.value) {
-                    passkeyLogin();
-                } else if (!loginButtonFocused.value) {
+                if (!loginButtonFocused.value) {
                     login(loginFormRef.value);
                 }
             }

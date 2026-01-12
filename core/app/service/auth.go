@@ -465,6 +465,13 @@ func (u *AuthService) passkeyEnabled(c *gin.Context) (bool, error) {
 }
 
 func (u *AuthService) passkeyConfigured() (bool, error) {
+	bindDomain, err := settingRepo.Get(repo.WithByKey("BindDomain"))
+	if err != nil {
+		return false, err
+	}
+	if strings.TrimSpace(bindDomain.Value) == "" {
+		return false, nil
+	}
 	records, err := loadPasskeyCredentialRecords()
 	if err != nil {
 		return false, err
@@ -648,22 +655,20 @@ func passkeyOriginAndRPID(c *gin.Context) (string, string, error) {
 	if err != nil {
 		return "", "", err
 	}
-	if bindDomain.Value != "" {
-		return origin, bindDomain.Value, nil
+	bindDomainValue := strings.TrimSpace(bindDomain.Value)
+	if bindDomainValue == "" {
+		return "", "", buserr.New("ErrPasskeyNotConfigured")
 	}
-
-	rpID := stripHostPort(host)
-	if rpID == "" {
-		return "", "", fmt.Errorf("invalid relying party id")
+	hostDomain := stripHostPort(host)
+	bindDomainValue = stripHostPort(bindDomainValue)
+	if hostDomain == "" || !strings.EqualFold(hostDomain, bindDomainValue) {
+		return "", "", buserr.New("ErrPasskeyDisabled")
 	}
-	return origin, rpID, nil
+	return origin, bindDomainValue, nil
 }
 
 func passkeyRequestHost(c *gin.Context) string {
-	host := c.GetHeader("X-Forwarded-Host")
-	if host == "" {
-		host = c.Request.Host
-	}
+	host := c.Request.Host
 	if strings.Contains(host, ",") {
 		host = strings.TrimSpace(strings.Split(host, ",")[0])
 	}
@@ -671,17 +676,10 @@ func passkeyRequestHost(c *gin.Context) string {
 }
 
 func passkeyRequestScheme(c *gin.Context) string {
-	proto := c.GetHeader("X-Forwarded-Proto")
-	if proto == "" {
-		if c.Request.TLS != nil {
-			return "https"
-		}
-		return "http"
+	if c.Request.TLS != nil {
+		return "https"
 	}
-	if strings.Contains(proto, ",") {
-		proto = strings.TrimSpace(strings.Split(proto, ",")[0])
-	}
-	return strings.ToLower(strings.TrimSpace(proto))
+	return "http"
 }
 
 func stripHostPort(hostport string) string {
