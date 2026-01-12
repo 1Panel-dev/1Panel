@@ -1649,6 +1649,7 @@ const beforeButtons = [
     },
     {
         label: i18n.global.t('file.setRemark'),
+        hideOnRemarkBlackList: true,
         click: (row: File.File) => {
             openRemark(row);
         },
@@ -1714,8 +1715,15 @@ const moreBtnRename = [
     },
 ];
 
-const rightButtons = [...beforeButtons, ...rightBtnRename, ...afterButtons];
-const tableMoreButtons = [...beforeButtons, ...moreBtnRename, ...afterButtons];
+const filterRemarkButtons = (buttons: any[]) => {
+    if (!isInRemarkBlackList(req.path)) {
+        return buttons;
+    }
+    return buttons.filter((btn) => !btn.hideOnRemarkBlackList);
+};
+
+const rightButtons = computed(() => filterRemarkButtons([...beforeButtons, ...rightBtnRename, ...afterButtons]));
+const tableMoreButtons = computed(() => filterRemarkButtons([...beforeButtons, ...moreBtnRename, ...afterButtons]));
 const openConvert = (item: File.File) => {
     if (!ffmpegExist.value) {
         ElMessageBox.confirm(i18n.global.t('cronjob.library.noSuchApp', ['FFmpeg']), i18n.global.t('file.convert'), {
@@ -1800,13 +1808,22 @@ function initShowHidden() {
     }
 }
 
+const remarkBlackList = ['/proc', '/sys', '/dev', '/run'];
+
 const scheduleRemarkLoad = () => {
     if (remarkLoadTimer.value) {
         window.clearTimeout(remarkLoadTimer.value);
     }
+    if (isInRemarkBlackList(req.path)) {
+        return;
+    }
     remarkLoadTimer.value = window.setTimeout(() => {
         void loadRemarksForCurrentPage();
     }, 1000);
+};
+
+const isInRemarkBlackList = (path: string) => {
+    return remarkBlackList.some((prefix) => path === prefix || path.startsWith(`${prefix}/`));
 };
 
 const loadRemarksForCurrentPage = async () => {
