@@ -81,3 +81,7 @@ type FileConvertLog struct {
 	Status  string `json:"status"`
 	Message string `json:"message"`
 }
+
+type FileRemarksRes struct {
+	Remarks map[string]string `json:"remarks"`
+}

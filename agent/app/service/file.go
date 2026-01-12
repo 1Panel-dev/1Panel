@@ -3,6 +3,7 @@ package service
 import (
 	"bufio"
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -75,11 +76,18 @@ type IFileService interface {
 	GetUsersAndGroups() (*response.UserGroupResponse, error)
 	Convert(req request.FileConvertRequest)
 	ConvertLog(req dto.PageInfo) (int64, []response.FileConvertLog, error)
+	BatchGetRemarks(req request.FileRemarkBatch) map[string]string
+	SetRemark(req request.FileRemarkUpdate) error
 }
 
 var filteredPaths = []string{
 	"/.1panel_clash",
 }
+
+const (
+	fileRemarkXattr         = "user.1panel.remark"
+	fileRemarkEncodedMaxLen = 256
+)
 
 func NewIFileService() IFileService {
 	return &FileService{}
@@ -760,6 +768,50 @@ func (f *FileService) GetUsersAndGroups() (*response.UserGroupResponse, error) {
 	}, nil
 }
 
+func (f *FileService) BatchGetRemarks(req request.FileRemarkBatch) map[string]string {
+	remarks := make(map[string]string)
+	for _, filePath := range req.Paths {
+		remark, err := getFileRemark(filePath)
+		if err != nil {
+			if isXattrNotSupported(err) {
+				return map[string]string{}
+			}
+			remarks[filePath] = ""
+			continue
+		}
+		remarks[filePath] = remark
+	}
+
+	return remarks
+}
+
+func (f *FileService) SetRemark(req request.FileRemarkUpdate) error {
+	if req.Remark == "" {
+		if err := unix.Lremovexattr(req.Path, fileRemarkXattr); err != nil {
+			if isXattrNotFound(err) {
+				return nil
+			}
+			if isXattrNotSupported(err) {
+				return buserr.WithDetail("ErrInvalidParams", "xattr not supported", err)
+			}
+			return err
+		}
+		return nil
+	}
+
+	encoded := base64.StdEncoding.EncodeToString([]byte(req.Remark))
+	if len(encoded) >= fileRemarkEncodedMaxLen {
+		return buserr.WithDetail("ErrInvalidParams", "remark length must be less than 256", nil)
+	}
+	if err := unix.Lsetxattr(req.Path, fileRemarkXattr, []byte(encoded), 0); err != nil {
+		if isXattrNotSupported(err) {
+			return buserr.WithDetail("ErrInvalidParams", "xattr not supported", err)
+		}
+		return err
+	}
+	return nil
+}
+
 func getValidGroups() (map[string]bool, error) {
 	groupFile, err := os.Open("/etc/group")
 	if err != nil {
@@ -784,6 +836,37 @@ func getValidGroups() (map[string]bool, error) {
 		return nil, fmt.Errorf("failed to scan /etc/group: %w", err)
 	}
 	return groupMap, nil
+}
+
+func getFileRemark(filePath string) (string, error) {
+	size, err := unix.Lgetxattr(filePath, fileRemarkXattr, nil)
+	if err != nil {
+		if isXattrNotFound(err) {
+			return "", nil
+		}
+		return "", err
+	}
+	if size == 0 {
+		return "", nil
+	}
+	buf := make([]byte, size)
+	n, err := unix.Lgetxattr(filePath, fileRemarkXattr, buf)
+	if err != nil {
+		return "", err
+	}
+	decoded, err := base64.StdEncoding.DecodeString(string(buf[:n]))
+	if err != nil {
+		return "", err
+	}
+	return string(decoded), nil
+}
+
+func isXattrNotSupported(err error) bool {
+	return errors.Is(err, unix.ENOTSUP) || errors.Is(err, unix.EOPNOTSUPP)
+}
+
+func isXattrNotFound(err error) bool {
+	return errors.Is(err, unix.ENODATA)
 }
 
 func getValidUsers(validGroups map[string]bool) ([]response.UserInfo, map[string]struct{}, error) {

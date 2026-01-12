@@ -163,3 +163,12 @@ type FileConvertRequest struct {
 	DeleteSource bool          `json:"deleteSource"`
 	TaskID       string        `json:"taskID"`
 }
+
+type FileRemarkBatch struct {
+	Paths []string `json:"paths" validate:"required"`
+}
+
+type FileRemarkUpdate struct {
+	Path   string `json:"path" validate:"required"`
+	Remark string `json:"remark"`
+}

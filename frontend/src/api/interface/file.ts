@@ -23,6 +23,7 @@ export namespace File {
         extension: string;
         itemTotal: number;
         favoriteID: number;
+        remark?: string;
     }
 
     export interface ReqFile extends ReqPage {
@@ -217,6 +218,15 @@ export namespace File {
         user: string;
         group: string;
         sub: boolean;
+    }
+
+    export interface FileRemarkUpdate {
+        path: string;
+        remark: string;
+    }
+
+    export interface FileRemarksRes {
+        remarks: Record<string, string>;
     }
 
     export interface UserGroupResponse {

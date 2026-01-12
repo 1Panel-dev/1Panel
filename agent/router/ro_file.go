@@ -25,6 +25,8 @@ func (f *FileRouter) InitRouter(Router *gin.RouterGroup) {
 		fileRouter.POST("/content", baseApi.GetContent)
 		fileRouter.POST("/preview", baseApi.PreviewContent)
 		fileRouter.POST("/save", baseApi.SaveContent)
+		fileRouter.POST("/remarks", baseApi.BatchGetFileRemarks)
+		fileRouter.POST("/remark", baseApi.SetFileRemark)
 		fileRouter.POST("/check", baseApi.CheckFile)
 		fileRouter.POST("/batch/check", baseApi.BatchCheckFiles)
 		fileRouter.POST("/upload", baseApi.UploadFiles)

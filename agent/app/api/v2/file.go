@@ -978,3 +978,40 @@ func (b *BaseApi) ConvertLog(c *gin.Context) {
 		Total: total,
 	})
 }
+
+// @Tags File
+// @Summary Batch get file remarks
+// @Accept json
+// @Param request body request.FileRemarkBatch true "request"
+// @Success 200 {object} response.FileRemarksRes
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /files/remarks [post]
+func (b *BaseApi) BatchGetFileRemarks(c *gin.Context) {
+	var req request.FileRemarkBatch
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	remarks := fileService.BatchGetRemarks(req)
+	helper.SuccessWithData(c, response.FileRemarksRes{Remarks: remarks})
+}
+
+// @Tags File
+// @Summary Set file remark
+// @Accept json
+// @Param request body request.FileRemarkUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /files/remark [post]
+func (b *BaseApi) SetFileRemark(c *gin.Context) {
+	var req request.FileRemarkUpdate
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := fileService.SetRemark(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}

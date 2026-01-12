@@ -74,6 +74,14 @@ export const batchCheckFiles = (paths: string[]) => {
     return http.post<File.ExistFileInfo[]>('files/batch/check', { paths: paths }, TimeoutEnum.T_5M);
 };
 
+export const batchGetFileRemarks = (paths: string[]) => {
+    return http.post<File.FileRemarksRes>('files/remarks', { paths: paths }, TimeoutEnum.T_5M);
+};
+
+export const setFileRemark = (params: File.FileRemarkUpdate) => {
+    return http.post('files/remark', params);
+};
+
 export const chunkUploadFileData = (params: FormData, config: AxiosRequestConfig) => {
     return http.upload<File.File>('files/chunkupload', params, config);
 };
