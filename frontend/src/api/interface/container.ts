@@ -224,7 +224,7 @@ export namespace Container {
     }
     export interface ImageLoad {
         taskID: string;
-        path: string;
+        paths: Array<string>;
     }
     export interface ImageSave {
         taskID: string;

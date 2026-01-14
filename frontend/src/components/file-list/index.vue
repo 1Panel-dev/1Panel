@@ -105,7 +105,8 @@
             </el-table>
         </div>
         <div class="file-list-bottom">
-            <div v-if="selectRow?.path">
+            <!-- Single select mode -->
+            <div v-if="!isMultiple && selectRow?.path">
                 {{ $t('file.currentSelect') }}
                 <el-tooltip :content="selectRow.path" placement="top">
                     <el-tag type="success">
@@ -114,6 +115,24 @@
                         </div>
                     </el-tag>
                 </el-tooltip>
+            </div>
+            <!-- Multiple select mode -->
+            <div v-if="isMultiple && selectRows.length > 0">
+                {{ $t('file.currentSelect') }}
+                <el-tag
+                    v-for="(item, index) in selectRows"
+                    :key="item.path"
+                    type="success"
+                    closable
+                    class="mr-1 mb-1"
+                    @close="removeSelected(index)"
+                >
+                    <el-tooltip :content="item.path" placement="top">
+                        <div class="path">
+                            <span>{{ item.path }}</span>
+                        </div>
+                    </el-tooltip>
+                </el-tag>
             </div>
         </div>
 
@@ -142,6 +161,8 @@ const loading = ref(false);
 const paths = ref<string[]>([]);
 const req = reactive({ path: '/', expand: true, page: 1, pageSize: 300, showHidden: true });
 const selectRow = ref({ path: '', name: '' });
+const selectRows = ref<Array<{ path: string; name: string }>>([]);
+const isMultiple = ref(false);
 const rowRefs = ref();
 const open = ref(false);
 const newFolder = ref();
@@ -160,16 +181,20 @@ const form = reactive({
 });
 
 interface DialogProps {
-    path: string;
+    path?: string;
     dir: boolean;
-    isAll: boolean;
-    disabled: boolean;
+    isAll?: boolean;
+    disabled?: boolean;
+    multiple?: boolean;
 }
 const acceptParams = (props: DialogProps): void => {
     form.path = props.path || '/';
     form.dir = props.dir;
-    form.isAll = props.isAll;
-    form.disabled = props.disabled;
+    form.isAll = props.isAll || false;
+    form.disabled = props.disabled || false;
+    isMultiple.value = props.multiple || false;
+    selectRows.value = [];
+    selectRow.value = { path: '', name: '' };
     openPage();
     req.path = form.path;
     oldUrl.value = form.path;
@@ -178,8 +203,15 @@ const acceptParams = (props: DialogProps): void => {
 };
 
 const selectFile = () => {
-    if (selectRow.value) {
-        em('choose', selectRow.value.path);
+    if (isMultiple.value) {
+        em(
+            'choose',
+            selectRows.value.map((r) => r.path),
+        );
+    } else {
+        if (selectRow.value) {
+            em('choose', selectRow.value.path);
+        }
     }
     handleClose();
 };
@@ -187,6 +219,7 @@ const selectFile = () => {
 const handleClose = () => {
     open.value = false;
     selectRow.value = { path: '', name: '' };
+    selectRows.value = [];
 };
 
 const openPage = () => {
@@ -221,8 +254,21 @@ const openDir = async (row: File.File, column: any, event: any) => {
             });
         return;
     }
+    // Handle file click
+    const fullPath = (req.path === '/' ? req.path : req.path + '/') + row.name;
+    if (isMultiple.value) {
+        // Multiple mode: toggle selection
+        const index = selectRows.value.findIndex((r) => r.path === fullPath);
+        if (index > -1) {
+            selectRows.value.splice(index, 1);
+        } else {
+            selectRows.value.push({ path: fullPath, name: row.name });
+        }
+        return;
+    }
+    // Single mode: original behavior
     if (form.isAll || !form.dir) {
-        selectRow.value.path = (req.path === '/' ? req.path : req.path + '/') + row.name;
+        selectRow.value.path = fullPath;
         return;
     }
     selectRow.value.path = '';
@@ -418,6 +464,10 @@ onUpdated(() => {
     }
     search(req);
 });
+
+const removeSelected = (index: number) => {
+    selectRows.value.splice(index, 1);
+};
 
 defineExpose({
     acceptParams,
