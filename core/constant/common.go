@@ -60,6 +60,7 @@ var WebUrlMap = map[string]struct{}{
 	"/ai/model":          {},
 	"/ai/gpu":            {},
 	"/ai/gpu/current":    {},
+	"/ai/gpu/history":    {},
 	"/ai/mcp":            {},
 	"/ai/model/tensorrt": {},
 	"/ai/model/ollama":   {},
