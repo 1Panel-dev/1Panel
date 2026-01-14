@@ -580,7 +580,11 @@ func sendAlerts(alert dto.AlertDTO, alertType, quota, quotaType string, params [
 					AlertId: alert.ID,
 					Count:   todayCount + 1,
 				}
-				_ = xpack.CreateSMSAlertLog(alertType, alert, create, quotaType, params, constant.SMS)
+				alertErr := xpack.CreateSMSAlertLog(alertType, alert, create, quotaType, params, constant.SMS)
+				if alertErr != nil {
+					global.LOG.Infof("%s alert sms push faild, err: %v", alertType, alertErr.Error())
+					continue
+				}
 				alertUtil.CreateNewAlertTask(quota, alertType, quotaType, constant.SMS)
 				global.LOG.Infof("%s alert sms push successful", alertType)
 
@@ -600,7 +604,11 @@ func sendAlerts(alert dto.AlertDTO, alertType, quota, quotaType string, params [
 				create.AlertDetail = alertUtil.ProcessAlertDetail(alertInfo, quotaType, params, constant.Email)
 				transport := xpack.LoadRequestTransport()
 				agentInfo, _ := xpack.GetAgentInfo()
-				_ = alertUtil.CreateEmailAlertLog(create, alertInfo, params, transport, agentInfo)
+				alertErr := alertUtil.CreateEmailAlertLog(create, alertInfo, params, transport, agentInfo)
+				if alertErr != nil {
+					global.LOG.Infof("%s alert email push faild, err: %v", alertType, alertErr.Error())
+					continue
+				}
 				alertUtil.CreateNewAlertTask(quota, alertType, quotaType, constant.Email)
 				global.LOG.Infof("%s alert email push successful", alertType)
 			}

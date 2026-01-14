@@ -44,6 +44,7 @@ func PushAlert(pushAlert dto.PushAlert) error {
 			}
 			_ = xpack.CreateTaskScanSMSAlertLog(alert, alert.Type, create, pushAlert, constant.SMS)
 			alertUtil.CreateNewAlertTask(strconv.Itoa(int(pushAlert.EntryID)), alertUtil.GetCronJobType(alert.Type), strconv.Itoa(int(pushAlert.EntryID)), constant.SMS)
+			global.LOG.Infof("%s %s alert push successful", alert.Type, constant.SMS)
 		case constant.Email:
 			todayCount, _, err := alertRepo.LoadTaskCount(alertUtil.GetCronJobType(alert.Type), strconv.Itoa(int(pushAlert.EntryID)), constant.Email)
 			if err != nil || alert.SendCount <= todayCount {
@@ -61,9 +62,9 @@ func PushAlert(pushAlert dto.PushAlert) error {
 				return err
 			}
 			alertUtil.CreateNewAlertTask(strconv.Itoa(int(pushAlert.EntryID)), alertUtil.GetCronJobType(alert.Type), strconv.Itoa(int(pushAlert.EntryID)), constant.Email)
+			global.LOG.Infof("%s %s alert push successful", alert.Type, constant.Email)
 		default:
 		}
 	}
-	global.LOG.Infof("%s alert push successful", alert.Type)
 	return nil
 }
