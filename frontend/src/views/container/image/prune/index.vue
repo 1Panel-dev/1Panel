@@ -89,14 +89,14 @@ const changeScope = () => {
     if (scope.value === 'untag') {
         data.value = unTagList.value || [];
         showMsg.value =
-            data.value.length === 0
+            data.value.length !== 0
                 ? i18n.global.t('container.imagePruneSomeHelper')
                 : i18n.global.t('container.imagePruneSomeEmpty');
         return;
     }
     data.value = unUsedList.value || [];
     showMsg.value =
-        data.value.length === 0
+        data.value.length !== 0
             ? i18n.global.t('container.imagePruneAllHelper')
             : i18n.global.t('container.imagePruneAllEmpty');
     return;

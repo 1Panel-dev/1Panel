@@ -211,7 +211,7 @@ ErrObjectInUsed: "該對象正被使用，無法刪除！"
 ErrObjectBeDependent: "該映像正被其他映像所依賴，無法刪除！"
 ErrPortRules: '連接埠數目不匹配，請重新輸入！'
 ErrPgImagePull: '鏡像拉取逾時，請配置鏡像加速或手動拉取{{ .name }} 鏡像後重試'
-PruneHelper: "本次清理 {{ .name }} {{ .count }} 個，釋放磁碟空間 {{ .size }}"
+PruneHelper: "本次清理 {{ .name }} 釋放磁碟空間 {{ .size }}"
 ImageRemoveHelper: "刪除鏡像 {{ .name }} ，釋放磁碟空間 {{ .size }}"
 BuildCache: "構建快取"
 Volume: "磁碟區"

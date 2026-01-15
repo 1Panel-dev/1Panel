@@ -213,7 +213,7 @@ ErrObjectInUsed: "Bu nesne kullanımda ve silinemez!"
 ErrObjectBeDependent: "Bu görüntü diğer görüntüler tarafından bağımlıdır ve silinemez!"
 ErrPortRules: 'Port numarası eşleşmiyor, lütfen yeniden girin!'
 ErrPgImagePull: 'Image çekme zaman aşımı, lütfen image hızlandırma yapılandırın veya manuel olarak {{ .name }} imageını çekin ve tekrar deneyin'
-PruneHelper: "Bu temizleme {{ .name }} {{ .count }} öğe kaldırdı, {{ .size }} disk alanı boşalttı"
+PruneHelper: "Bu temizlik {{ .name }} disk alanı {{ .size }} boşalttı"
 ImageRemoveHelper: "{{ .name }} imajı silindi, {{ .size }} disk alanı boşalttı"
 BuildCache: "Derleme önbelleği"
 Volume: "Depolama hacmi"

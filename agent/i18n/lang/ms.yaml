@@ -212,7 +212,7 @@ ErrObjectInUsed: "Objek ini sedang digunakan dan tidak boleh dipadam!"
 ErrObjectBeDependent: "Imej ini digantungkan oleh imej lain dan tidak boleh dipadam!"
 ErrPortRules: 'Nombor port tidak sepadan, sila masukkan semula!'
 ErrPgImagePull: 'Tarikh imej tamat masa, sila konfigurasikan pecutan imej atau tarik imej {{ .name }} secara manual dan cuba lagi'
-PruneHelper: "Pembersihan ini membuang {{ .name }} {{ .count }} item, membebaskan {{ .size }} ruang cakera"
+PruneHelper: "Pembersihan ini {{ .name }} membebaskan ruang cakera {{ .size }}"
 ImageRemoveHelper: "Padam imej {{ .name }}, membebaskan {{ .size }} ruang cakera"
 BuildCache: "Cache binaan"
 Volume: "Jilid storan"

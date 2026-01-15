@@ -435,7 +435,6 @@ func (u *ContainerService) Prune(req dto.ContainerPrune) error {
 			}
 		}
 		taskItem.Log(i18n.GetMsgByKey("PruneStart"))
-		DeletedNumber := 0
 		SpaceReclaimed := 0
 		switch req.PruneType {
 		case "container":
@@ -443,21 +442,18 @@ func (u *ContainerService) Prune(req dto.ContainerPrune) error {
 			if err != nil {
 				return err
 			}
-			DeletedNumber = len(rep.ContainersDeleted)
 			SpaceReclaimed = int(rep.SpaceReclaimed)
 		case "image":
 			rep, err := client.ImagesPrune(context.Background(), pruneFilters)
 			if err != nil {
 				return err
 			}
-			DeletedNumber = len(rep.ImagesDeleted)
 			SpaceReclaimed = int(rep.SpaceReclaimed)
 		case "network":
-			rep, err := client.NetworksPrune(context.Background(), pruneFilters)
+			_, err := client.NetworksPrune(context.Background(), pruneFilters)
 			if err != nil {
 				return err
 			}
-			DeletedNumber = len(rep.NetworksDeleted)
 		case "volume":
 			versions, err := client.ServerVersion(context.Background())
 			if err != nil {
@@ -470,7 +466,6 @@ func (u *ContainerService) Prune(req dto.ContainerPrune) error {
 			if err != nil {
 				return err
 			}
-			DeletedNumber = len(rep.VolumesDeleted)
 			SpaceReclaimed = int(rep.SpaceReclaimed)
 		case "buildcache":
 			opts := build.CachePruneOptions{}
@@ -479,10 +474,9 @@ func (u *ContainerService) Prune(req dto.ContainerPrune) error {
 			if err != nil {
 				return err
 			}
-			DeletedNumber = len(rep.CachesDeleted)
 			SpaceReclaimed = int(rep.SpaceReclaimed)
 		}
-		taskItem.Log(i18n.GetMsgWithMap("PruneHelper", map[string]interface{}{"name": i18n.GetMsgByKey(name), "count": DeletedNumber, "size": common.LoadSizeUnit2F(float64(SpaceReclaimed))}))
+		taskItem.Log(i18n.GetMsgWithMap("PruneHelper", map[string]interface{}{"name": i18n.GetMsgByKey(name), "size": common.LoadSizeUnit2F(float64(SpaceReclaimed))}))
 		return nil
 	}, nil)
 	go func() {

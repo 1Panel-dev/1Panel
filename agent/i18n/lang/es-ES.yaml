@@ -211,7 +211,7 @@ ErrObjectInUsed: "Este objeto está en uso y no se puede eliminar!"
 ErrObjectBeDependent: "Esta imagen es dependida por otras imágenes y no se puede eliminar!"
 ErrPortRules: 'El número de puerto no coincide, ingrese de nuevo'
 ErrPgImagePull: 'Tiempo de espera al descargar la imagen, configure la aceleración o descárguela manualmente ({{ .name }}) e intente de nuevo'
-PruneHelper: "Esta limpieza eliminó {{ .name }} {{ .count }} elementos, liberando {{ .size }} de espacio en disco"
+PruneHelper: "Esta limpieza {{ .name }} liberó espacio en disco {{ .size }}"
 ImageRemoveHelper: "Imagen {{ .name }} eliminada, liberando {{ .size }} de espacio en disco"
 BuildCache: "Caché de compilación"
 Volume: "Volumen de almacenamiento"

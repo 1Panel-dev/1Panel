@@ -212,7 +212,7 @@ ErrObjectInUsed: "이 객체는 사용 중이어서 삭제할 수 없습니다!"
 ErrObjectBeDependent: "이 이미지는 다른 이미지에 의존되어 있어 삭제할 수 없습니다!"
 ErrPortRules: '포트 번호가 일치하지 않습니다. 다시 입력하세요!'
 ErrPgImagePull: '이미지 풀링 시간이 초과되었습니다. 이미지 가속을 구성하거나 {{ .name }} 이미지를 수동으로 풀링한 다음 다시 시도하세요.'
-PruneHelper: "이번 정리에서 {{ .name }} {{ .count }}개를 제거하여 {{ .size }} 디스크 공간을 확보했습니다"
+PruneHelper: "이번 정리 {{ .name }}가 디스크 공간 {{ .size }}을(를) 확보했습니다"
 ImageRemoveHelper: "이미지 {{ .name }} 삭제, {{ .size }} 디스크 공간 확보"
 BuildCache: "빌드 캐시"
 Volume: "스토리지 볼륨"
