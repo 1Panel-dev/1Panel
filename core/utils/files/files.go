@@ -66,7 +66,7 @@ func CopyItem(isDir, withName bool, src, dst string) error {
 	if !isDir {
 		cmdStr = fmt.Sprintf(`cp -f %s %s`, src, dst+"/")
 	}
-	stdout, err := cmd.RunDefaultWithStdoutBashC(cmdStr)
+	stdout, err := cmd.NewCommandMgr(cmd.WithTimeout(60 * time.Second)).RunWithStdoutBashC(cmdStr)
 	if err != nil {
 		return fmt.Errorf("handle %s failed, stdout: %s, err: %v", cmdStr, stdout, err)
 	}
