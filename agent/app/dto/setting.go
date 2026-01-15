@@ -55,7 +55,6 @@ type CleanTree struct {
 	Size        uint64 `json:"size"`
 	IsCheck     bool   `json:"isCheck"`
 	IsRecommend bool   `json:"isRecommend"`
-	IsDisabled  bool   `json:"isDisabled"`
 }
 
 type Clean struct {

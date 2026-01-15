@@ -271,7 +271,6 @@ const scanStatus = ref<string>('beforeScan');
 const defaultProps = {
     children: 'children',
     label: 'label',
-    disabled: 'isDisabled',
 };
 const cleanData = reactive({
     systemClean: [],
@@ -403,7 +402,7 @@ const loadSubmitCheck = (data: any) => {
         return;
     }
     for (const item of data) {
-        if (item.label === 'unknown_website_log' && item.isCheck && item.children) {
+        if (item.type === 'unknown_backup' && item.isCheck && item.children) {
             loadSubmitCheck(item.children);
             continue;
         }

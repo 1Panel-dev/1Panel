@@ -105,7 +105,11 @@ func (u *DeviceService) Clean(req []dto.Clean) {
 		case "tmp_backup":
 			dropFileOrDir(path.Join(global.Dir.LocalBackupDir, "tmp"))
 		case "unknown_backup":
-			dropFileOrDir(item.Name)
+			if strings.HasPrefix(item.Name, path.Join(global.Dir.LocalBackupDir, "log/website")) {
+				dropFileOrDir(item.Name)
+			} else {
+				dropFile(item.Name)
+			}
 
 		case "rollback":
 			dropFileOrDir(path.Join(global.Dir.BaseDir, rollbackPath, "app"))
@@ -182,6 +186,7 @@ func (u *DeviceService) Clean(req []dto.Clean) {
 		}
 	}
 
+	_ = cleanEmptyDirs(global.Dir.LocalBackupDir)
 	_ = settingRepo.Update("LastCleanTime", time.Now().Format(constant.DateTimeLayout))
 	_ = settingRepo.Update("LastCleanSize", fmt.Sprintf("%v", size))
 	_ = settingRepo.Update("LastCleanData", fmt.Sprintf("%v", len(req)))
@@ -317,6 +322,9 @@ func loadAgentPackage(fileOp fileUtils.FileOp) dto.CleanTree {
 			itemSize, _ := file.Info()
 			itemName := file.Name()
 			isCurrentVersion := strings.HasPrefix(itemName, fmt.Sprintf("1panel-agent_%s_", global.CONF.Base.Version))
+			if isCurrentVersion {
+				continue
+			}
 			itemTree.Size += uint64(itemSize.Size())
 			itemTree.Children = append(itemTree.Children, dto.CleanTree{
 				ID:          uuid.NewString(),
@@ -326,7 +334,6 @@ func loadAgentPackage(fileOp fileUtils.FileOp) dto.CleanTree {
 				IsCheck:     !isCurrentVersion,
 				IsRecommend: true,
 				Type:        "agent",
-				IsDisabled:  isCurrentVersion,
 			})
 		}
 	}
@@ -363,7 +370,7 @@ func loadBackupTree(fileOp fileUtils.FileOp) []dto.CleanTree {
 	treeData = append(treeData, loadUnknownDbs(fileOp, recordMap))
 	treeData = append(treeData, loadUnknownWebsites(fileOp, recordMap))
 	treeData = append(treeData, loadUnknownSnapshot(fileOp))
-	treeData = append(treeData, loadUnknownWebsiteLog(fileOp, recordMap))
+	treeData = append(treeData, loadUnknownWebsiteLog(fileOp))
 	return treeData
 }
 
@@ -390,7 +397,6 @@ func loadUnknownApps(fileOp fileUtils.FileOp, recordMap map[string][]string) dto
 		Type:        "unknown_backup",
 	}
 	_ = loadFileOrDirWithExclude(fileOp, 0, backupPath, &treeData, excludePaths)
-	loadBackupIsCheck(&treeData)
 	return treeData
 }
 func loadUnknownDbs(fileOp fileUtils.FileOp, recordMap map[string][]string) dto.CleanTree {
@@ -418,15 +424,13 @@ func loadUnknownDbs(fileOp fileUtils.FileOp, recordMap map[string][]string) dto.
 		Type:        "unknown_backup",
 	}
 	_ = loadFileOrDirWithExclude(fileOp, 0, backupPath, &treeData, excludePaths)
-
-	loadBackupIsCheck(&treeData)
 	return treeData
 }
 func loadUnknownWebsites(fileOp fileUtils.FileOp, recordMap map[string][]string) dto.CleanTree {
 	websites, _ := websiteRepo.List()
 	var excludePaths []string
 	for _, website := range websites {
-		itemName := fmt.Sprintf("website/%s", website.PrimaryDomain)
+		itemName := fmt.Sprintf("website/%s", website.Alias)
 		if val, ok := recordMap[itemName]; ok {
 			for _, item := range val {
 				excludePaths = append(excludePaths, path.Join(global.Dir.LocalBackupDir, itemName, item))
@@ -445,7 +449,6 @@ func loadUnknownWebsites(fileOp fileUtils.FileOp, recordMap map[string][]string)
 		Type:        "unknown_backup",
 	}
 	_ = loadFileOrDirWithExclude(fileOp, 0, backupPath, &treeData, excludePaths)
-	loadBackupIsCheck(&treeData)
 	return treeData
 }
 func loadUnknownSnapshot(fileOp fileUtils.FileOp) dto.CleanTree {
@@ -466,6 +469,9 @@ func loadUnknownSnapshot(fileOp fileUtils.FileOp) dto.CleanTree {
 	entries, _ := os.ReadDir(backupPath)
 	for _, entry := range entries {
 		childPath := filepath.Join(backupPath, entry.Name())
+		if isExactPathMatch(childPath, excludePaths) {
+			continue
+		}
 		childNode := dto.CleanTree{
 			ID:          uuid.NewString(),
 			Label:       entry.Name(),
@@ -473,7 +479,6 @@ func loadUnknownSnapshot(fileOp fileUtils.FileOp) dto.CleanTree {
 			IsRecommend: false,
 			Name:        childPath,
 			Type:        "unknown_backup",
-			IsDisabled:  isExactPathMatch(childPath, excludePaths),
 		}
 		if entry.IsDir() {
 			itemSize, _ := fileOp.GetDirSize(childPath)
@@ -492,7 +497,7 @@ func loadUnknownSnapshot(fileOp fileUtils.FileOp) dto.CleanTree {
 	return treeData
 }
 
-func loadUnknownWebsiteLog(fileOp fileUtils.FileOp, recordMap map[string][]string) dto.CleanTree {
+func loadUnknownWebsiteLog(fileOp fileUtils.FileOp) dto.CleanTree {
 	treeData := dto.CleanTree{
 		ID:          uuid.NewString(),
 		Label:       "unknown_website_log",
@@ -543,6 +548,9 @@ func loadFileOrDirWithExclude(fileOp fileUtils.FileOp, index uint, dir string, r
 	}
 	for _, entry := range entries {
 		childPath := filepath.Join(dir, entry.Name())
+		if isExactPathMatch(childPath, excludes) {
+			continue
+		}
 		childNode := dto.CleanTree{
 			ID:          uuid.NewString(),
 			Label:       entry.Name(),
@@ -550,7 +558,6 @@ func loadFileOrDirWithExclude(fileOp fileUtils.FileOp, index uint, dir string, r
 			IsRecommend: false,
 			Name:        childPath,
 			Type:        "unknown_backup",
-			IsDisabled:  !entry.IsDir() && isExactPathMatch(childPath, excludes),
 		}
 		if entry.IsDir() {
 			if index < 4 {
@@ -576,26 +583,6 @@ func loadFileOrDirWithExclude(fileOp fileUtils.FileOp, index uint, dir string, r
 		rootTree.Children = append(rootTree.Children, childNode)
 	}
 	return nil
-}
-
-func loadBackupIsCheck(treeData *dto.CleanTree) {
-	for i := 0; i < len(treeData.Children); i++ {
-		if len(treeData.Children[i].Children) == 0 {
-			treeData.Children[i].IsCheck = true
-			treeData.Children[i].IsRecommend = true
-			continue
-		}
-		if treeData.Label != "unknown_database" && treeData.Label != "unknown_app" {
-			continue
-		}
-		for j := 0; j < len(treeData.Children[i].Children); j++ {
-			if len(treeData.Children[i].Children[j].Children) == 0 {
-				treeData.Children[i].Children[j].IsCheck = true
-				treeData.Children[i].Children[j].IsRecommend = true
-				continue
-			}
-		}
-	}
 }
 
 func isExactPathMatch(path string, excludePaths []string) bool {
@@ -909,6 +896,18 @@ func dropFileOrDir(itemPath string) {
 		global.LOG.Errorf("drop file %s failed, err %v", itemPath, err)
 	}
 }
+func dropFile(itemPath string) {
+	info, err := os.Stat(itemPath)
+	if err != nil {
+		return
+	}
+	if info.IsDir() {
+		return
+	}
+	if err := os.Remove(itemPath); err != nil {
+		global.LOG.Errorf("drop file %s failed, err %v", itemPath, err)
+	}
+}
 
 func dropBuildCache() (int, int) {
 	client, err := docker.NewDockerClient()
@@ -1106,4 +1105,37 @@ func scanFile(pathItem string, size *int64, count *int) {
 			*size += fileInfo.Size()
 		}
 	}
+}
+
+func cleanEmptyDirs(root string) error {
+	dirsToCheck := make([]string, 0)
+	err := filepath.WalkDir(root, func(path string, d os.DirEntry, err error) error {
+		if err != nil {
+			return nil
+		}
+		if d.IsDir() {
+			dirsToCheck = append(dirsToCheck, path)
+		}
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+
+	for i := len(dirsToCheck) - 1; i >= 0; i-- {
+		dir := dirsToCheck[i]
+		if dir == root {
+			continue
+		}
+
+		entries, err := os.ReadDir(dir)
+		if err != nil {
+			continue
+		}
+
+		if len(entries) == 0 {
+			_ = os.Remove(dir)
+		}
+	}
+	return nil
 }
