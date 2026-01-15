@@ -383,8 +383,6 @@ func loadUnknownApps(fileOp fileUtils.FileOp, recordMap map[string][]string) dto
 			for _, item := range val {
 				excludePaths = append(excludePaths, path.Join(global.Dir.LocalBackupDir, itemName, item))
 			}
-		} else {
-			excludePaths = append(excludePaths, path.Join(global.Dir.LocalBackupDir, itemName))
 		}
 	}
 	backupPath := path.Join(global.Dir.LocalBackupDir, "app")
@@ -435,8 +433,6 @@ func loadUnknownWebsites(fileOp fileUtils.FileOp, recordMap map[string][]string)
 			for _, item := range val {
 				excludePaths = append(excludePaths, path.Join(global.Dir.LocalBackupDir, itemName, item))
 			}
-		} else {
-			excludePaths = append(excludePaths, path.Join(global.Dir.LocalBackupDir, itemName))
 		}
 	}
 	backupPath := path.Join(global.Dir.LocalBackupDir, "website")
