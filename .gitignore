@@ -63,3 +63,9 @@ cmd/server/fileList.txt
 
 core/.golangci.yml
 agent/.golangci.yml
+
+.opencode
+openspec
+CLAUDE.md
+AGENTS.md
+opencode.json
