@@ -78,6 +78,9 @@ const acceptParams = async (): Promise<void> => {
             unUsedList.value.push(item);
         }
     }
+    checkedLists.value = [];
+    checkAll.value = false;
+    isIndeterminate.value = false;
     dialogVisible.value = true;
     scope.value = 'untag';
     changeScope();
