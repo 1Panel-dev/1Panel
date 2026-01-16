@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"strings"
 
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 
@@ -88,7 +89,7 @@ func (u *SnapshotService) SnapshotRollback(req dto.SnapshotRecover) error {
 		taskItem.AddSubTask(
 			i18n.GetWithName("SnapCopy", global.Dir.LocalBackupDir),
 			func(t *task.Task) error {
-				return FileOp.CopyDir(path.Join(rootDir, "backup"), global.Dir.LocalBackupDir)
+				return FileOp.CopyDir(path.Join(rootDir, "backup"), strings.TrimSuffix(global.Dir.LocalBackupDir, "/backup"))
 			},
 			nil,
 		)
@@ -97,7 +98,7 @@ func (u *SnapshotService) SnapshotRollback(req dto.SnapshotRecover) error {
 			taskItem.AddSubTask(
 				i18n.GetWithName("SnapCopy", openrestyDir),
 				func(t *task.Task) error {
-					return FileOp.CopyDir(path.Join(rootDir, "www"), openrestyDir)
+					return FileOp.CopyDir(path.Join(rootDir, "www"), strings.TrimSuffix(openrestyDir, "/www"))
 				},
 				nil,
 			)
