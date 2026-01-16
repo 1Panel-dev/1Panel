@@ -272,13 +272,14 @@ type ComposeContainer struct {
 	Ports       []string `json:"ports"`
 }
 type ComposeCreate struct {
-	TaskID   string `json:"taskID"`
-	Name     string `json:"name"`
-	From     string `json:"from" validate:"required,oneof=edit path template"`
-	File     string `json:"file"`
-	Path     string `json:"path"`
-	Template uint   `json:"template"`
-	Env      string `json:"env"`
+	TaskID    string `json:"taskID"`
+	Name      string `json:"name"`
+	From      string `json:"from" validate:"required,oneof=edit path template"`
+	File      string `json:"file"`
+	Path      string `json:"path"`
+	Template  uint   `json:"template"`
+	Env       string `json:"env"`
+	PullImage *bool  `json:"pullImage,omitempty"`
 }
 type ComposeOperation struct {
 	Name      string `json:"name" validate:"required"`

@@ -36,7 +36,10 @@ func Up(filePath string) (string, error) {
 	return cmd.NewCommandMgr(cmd.WithTimeout(20*time.Minute)).RunWithStdoutBashCf("%s %s up -d", global.CONF.DockerConfig.Command, loadFiles(filePath))
 }
 
-func UpWithTask(filePath string, task *task.Task) error {
+func UpWithTask(filePath string, task *task.Task, pullImages bool) error {
+	if !pullImages {
+		return cmd.NewCommandMgr(cmd.WithTask(*task)).RunBashCf("%s %s up -d", global.CONF.DockerConfig.Command, loadFiles(filePath))
+	}
 	content, err := os.ReadFile(filePath)
 	if err != nil {
 		return err

@@ -203,9 +203,13 @@ func (u *ContainerService) CreateCompose(req dto.ComposeCreate) error {
 	if err := newComposeEnv(req.Path, req.Env); err != nil {
 		return err
 	}
+	pullImages := true
+	if req.PullImage != nil {
+		pullImages = *req.PullImage
+	}
 	go func() {
 		taskItem.AddSubTask(i18n.GetMsgByKey("ComposeCreate"), func(t *task.Task) error {
-			err := compose.UpWithTask(req.Path, t)
+			err := compose.UpWithTask(req.Path, t, pullImages)
 			t.LogWithStatus(i18n.GetMsgByKey("ComposeCreate"), err)
 			if err != nil {
 				_, _ = compose.Down(req.Path)

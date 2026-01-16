@@ -334,6 +334,10 @@
                                 </el-form-item>
                                 <span class="envTitle">{{ $t('container.env') }}</span>
                                 <el-input placeholder="key=value" type="textarea" :rows="3" v-model="form.env" />
+                                <el-form-item>
+                                    <el-checkbox v-model="form.pullImage" :label="$t('app.pullImage')" />
+                                    <span class="input-help">{{ $t('app.pullImageHelper') }}</span>
+                                </el-form-item>
                             </el-form>
 
                             <el-button type="primary" class="mt-2" @click="onSubmit(formRef)">
@@ -426,6 +430,7 @@ const form = reactive({
     file: '',
     template: null as number,
     env: '',
+    pullImage: true,
 });
 const rules = reactive({
     name: [Rules.requiredInput, Rules.composeName],
@@ -555,6 +560,7 @@ const onOpenDialog = async () => {
     form.file = '';
     form.template = null;
     form.env = '';
+    form.pullImage = true;
     loadPath();
     loadTemplates();
 };

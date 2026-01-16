@@ -328,6 +328,8 @@ export namespace Container {
         file: string;
         path: string;
         template: number;
+        env: string;
+        pullImage?: boolean;
     }
     export interface ComposeOperation {
         name: string;
