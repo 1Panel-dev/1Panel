@@ -334,6 +334,7 @@
                                 </el-form-item>
                                 <span class="envTitle">{{ $t('container.env') }}</span>
                                 <el-input placeholder="key=value" type="textarea" :rows="3" v-model="form.env" />
+                                <span class="envTitle">{{ $t('commons.button.set') }}</span>
                                 <el-form-item>
                                     <el-checkbox v-model="form.pullImage" :label="$t('app.pullImage')" />
                                     <span class="input-help">{{ $t('app.pullImageHelper') }}</span>
