@@ -22,7 +22,7 @@ type ProcessService struct{}
 type IProcessService interface {
 	StopProcess(req request.ProcessReq) error
 	GetProcessInfoByPID(pid int32) (*websocket.PsProcessData, error)
-	GetListeningProcess() ([]ListeningProcess, error)
+	GetListeningProcess(c context.Context) ([]ListeningProcess, error)
 }
 
 func NewIProcessService() IProcessService {
@@ -47,8 +47,8 @@ type ListeningProcess struct {
 	Name     string
 }
 
-func (ps *ProcessService) GetListeningProcess() ([]ListeningProcess, error) {
-	conn, err := net.ConnectionsMaxWithContext(context.Background(), "inet", 32768)
+func (ps *ProcessService) GetListeningProcess(c context.Context) ([]ListeningProcess, error) {
+	conn, err := net.ConnectionsMaxWithContext(c, "inet", 32768)
 	if err != nil {
 		return nil, err
 	}

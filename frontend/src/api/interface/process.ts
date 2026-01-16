@@ -61,6 +61,5 @@ export namespace Process {
         Port: { [key: string]: {} };
         Protocol: number;
         Name: string;
-        CmdLine?: string;
     }
 }

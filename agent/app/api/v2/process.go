@@ -65,7 +65,7 @@ func (b *BaseApi) GetProcessInfoByPID(c *gin.Context) {
 // @Security Timestamp
 // @Router /process/listening [post]
 func (b *BaseApi) GetListeningProcess(c *gin.Context) {
-	procs, err := processService.GetListeningProcess()
+	procs, err := processService.GetListeningProcess(c)
 	if err != nil {
 		helper.BadRequest(c, err)
 		return
