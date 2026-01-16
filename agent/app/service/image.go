@@ -326,37 +326,39 @@ func (u *ImageService) ImageLoad(req dto.ImageLoad) error {
 		return fmt.Errorf("new task for image import failed, err: %v", err)
 	}
 
-	for _, itemPath := range req.Paths {
-		currentPath := itemPath
-		itemName := path.Base(currentPath)
-		taskItem.AddSubTask(i18n.GetWithName("TaskImport", itemName), func(t *task.Task) error {
-			taskItem.Logf("----------------- %s -----------------", itemName)
-			file, err := os.Open(currentPath)
-			if err != nil {
-				return err
-			}
-			defer file.Close()
-			client, err := docker.NewDockerClient()
-			if err != nil {
-				return err
-			}
-			defer client.Close()
-			res, err := client.ImageLoad(context.TODO(), file)
-			if err != nil {
-				return err
-			}
-			defer res.Body.Close()
-			content, err := io.ReadAll(res.Body)
-			if err != nil {
-				return err
-			}
-			if strings.Contains(string(content), "Error") {
-				return errors.New(string(content))
-			}
-			return nil
-		}, nil)
-	}
 	go func() {
+		client, err := docker.NewDockerClient()
+		if err != nil {
+			taskItem.Log("Failed to create Docker client: " + err.Error())
+			return
+		}
+		defer client.Close()
+
+		for _, itemPath := range req.Paths {
+			currentPath := itemPath
+			itemName := path.Base(currentPath)
+			taskItem.AddSubTask(i18n.GetWithName("TaskImport", itemName), func(t *task.Task) error {
+				taskItem.Logf("----------------- %s -----------------", itemName)
+				file, err := os.Open(currentPath)
+				if err != nil {
+					return err
+				}
+				defer file.Close()
+				res, err := client.ImageLoad(context.TODO(), file)
+				if err != nil {
+					return err
+				}
+				defer res.Body.Close()
+				content, err := io.ReadAll(res.Body)
+				if err != nil {
+					return err
+				}
+				if strings.Contains(string(content), "Error") {
+					return errors.New(string(content))
+				}
+				return nil
+			}, nil)
+		}
 		_ = taskItem.Execute()
 	}()
 	return nil
