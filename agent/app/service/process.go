@@ -7,6 +7,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
@@ -58,7 +59,7 @@ func (ps *ProcessService) GetListeningProcess() ([]ListeningProcess, error) {
 			continue
 		}
 
-		if conn.Status == "LISTEN" {
+		if (conn.Status == "LISTEN" && conn.Type == syscall.SOCK_STREAM) || (conn.Type == syscall.SOCK_DGRAM && conn.Raddr.Port == 0) {
 			if _, exists := procCache[conn.Pid]; !exists {
 				proc, err := process.NewProcess(conn.Pid)
 				if err != nil {
