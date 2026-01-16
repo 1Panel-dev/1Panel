@@ -105,7 +105,6 @@
             </el-table>
         </div>
         <div class="file-list-bottom">
-            <!-- Single select mode -->
             <div v-if="!isMultiple && selectRow?.path">
                 {{ $t('file.currentSelect') }}
                 <el-tooltip :content="selectRow.path" placement="top">
@@ -116,7 +115,6 @@
                     </el-tag>
                 </el-tooltip>
             </div>
-            <!-- Multiple select mode -->
             <div v-if="isMultiple && selectRows.length > 0">
                 {{ $t('file.currentSelect') }}
                 <el-tag
