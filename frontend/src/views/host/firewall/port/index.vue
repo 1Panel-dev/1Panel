@@ -88,28 +88,20 @@
                             <el-table-column :label="$t('commons.table.port')" :min-width="70" prop="port" />
                             <el-table-column :label="$t('commons.table.status')" :min-width="120">
                                 <template #default="{ row }">
-                                    <div v-if="row.port.indexOf('-') !== -1 && row.usedStatus">
-                                        <el-tag type="info" class="mt-1">
-                                            {{ $t('firewall.used') + ' * ' + row.usedPorts.length }}
+                                    <div v-if="isSinglePort(row.port)">
+                                        <el-tag type="success" v-if="row.usedStatus">
+                                            {{ $t('firewall.used') + ' (' + row.usedStatus + ')' }}
+                                            <el-icon
+                                                v-if="row.processInfo"
+                                                @click="showProcessDetail(row.processInfo.PID)"
+                                                style="margin-left: 4px; cursor: pointer; vertical-align: middle"
+                                            >
+                                                <Expand />
+                                            </el-icon>
                                         </el-tag>
-                                        <el-popover placement="right" popper-class="limit-height-popover" :width="250">
-                                            <template #default>
-                                                <ul v-for="(item, index) in row.usedPorts" :key="index">
-                                                    <li>{{ item }}</li>
-                                                </ul>
-                                            </template>
-                                            <template #reference>
-                                                <svg-icon iconName="p-xiangqing" class="svg-icon"></svg-icon>
-                                            </template>
-                                        </el-popover>
+                                        <el-tag type="info" v-else>{{ $t('firewall.unUsed') }}</el-tag>
                                     </div>
-                                    <div v-else>
-                                        <el-tag type="info" v-if="row.usedStatus">
-                                            <span v-if="row.usedStatus === 'inUsed'">{{ $t('firewall.used') }}</span>
-                                            <span v-else>{{ $t('firewall.used') + ' ' + row.usedStatus }}</span>
-                                        </el-tag>
-                                        <el-tag type="success" v-else>{{ $t('firewall.unUsed') }}</el-tag>
-                                    </div>
+                                    <span v-else>-</span>
                                 </template>
                             </el-table-column>
                             <el-table-column :min-width="80" :label="$t('firewall.strategy')" prop="strategy">
@@ -163,6 +155,7 @@
         <OpDialog ref="opRef" @search="search" />
         <OperateDialog @search="search" ref="dialogRef" />
         <ImportDialog @search="search" ref="dialogImportRef" />
+        <ProcessDetail ref="processDetailRef" />
     </div>
 </template>
 
@@ -171,12 +164,16 @@ import FireRouter from '@/views/host/firewall/index.vue';
 import OperateDialog from '@/views/host/firewall/port/operate/index.vue';
 import ImportDialog from '@/views/host/firewall/port/import/index.vue';
 import FireStatus from '@/views/host/firewall/status/index.vue';
+import ProcessDetail from '@/views/host/process/process/detail/index.vue';
 import { onMounted, reactive, ref } from 'vue';
 import { batchOperateRule, searchFireRule, updateFirewallDescription, updatePortRule } from '@/api/modules/host';
+import { getListeningProcess } from '@/api/modules/process';
 import { Host } from '@/api/interface/host';
+import { Process } from '@/api/interface/process';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { ElMessageBox } from 'element-plus';
+import { Expand } from '@element-plus/icons-vue';
 import { routerToName } from '@/utils/router';
 import { downloadWithContent, getCurrentDateFormatted } from '@/utils/util';
 
@@ -195,6 +192,9 @@ const fireStatusRef = ref();
 
 const opRef = ref();
 const dialogImportRef = ref();
+const processDetailRef = ref();
+
+const listeningProcesses = ref<Process.ListeningProcess[]>([]);
 
 const data = ref();
 const paginationConfig = reactive({
@@ -203,6 +203,46 @@ const paginationConfig = reactive({
     pageSize: Number(localStorage.getItem('firewall-port-page-size')) || 20,
     total: 0,
 });
+
+const extractPortsFromObject = (portObj: { [key: string]: {} }): number[] => {
+    return Object.keys(portObj)
+        .map((portStr) => parseInt(portStr))
+        .filter((port) => !isNaN(port));
+};
+
+const isSinglePort = (portStr: string): boolean => {
+    return portStr.indexOf('-') === -1 && portStr.indexOf(':') === -1 && portStr.indexOf(',') === -1;
+};
+
+const loadListeningProcesses = async () => {
+    try {
+        const res = await getListeningProcess();
+        listeningProcesses.value = res.data || [];
+
+        for (const item of data.value) {
+            if (!item.usedStatus && isSinglePort(item.port)) {
+                const portNum = parseInt(item.port.trim());
+                if (!isNaN(portNum)) {
+                    const protocolNum =
+                        item.protocol.toLowerCase() === 'tcp' ? 1 : item.protocol.toLowerCase() === 'udp' ? 2 : 0;
+
+                    for (const proc of listeningProcesses.value) {
+                        if (proc.Protocol === protocolNum) {
+                            const procPorts = extractPortsFromObject(proc.Port);
+                            if (procPorts.includes(portNum)) {
+                                item.usedStatus = proc.Name;
+                                item.processInfo = proc;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    } catch (error) {
+        console.error('Failed to load listening processes:', error);
+    }
+};
 
 const search = async () => {
     if (!isActive.value) {
@@ -221,12 +261,12 @@ const search = async () => {
     };
     loading.value = true;
     await searchFireRule(params)
-        .then((res) => {
+        .then(async (res) => {
             loading.value = false;
             data.value = res.data.items || [];
-            for (const item of data.value) {
-                item.usedPorts = item.usedStatus ? item.usedStatus.split(',') : [];
-            }
+
+            await loadListeningProcesses();
+
             paginationConfig.total = res.data.total;
         })
         .catch(() => {
@@ -379,6 +419,10 @@ const onExport = () => {
         const fileName = `1panel-firewall-port-${getCurrentDateFormatted()}.json`;
         downloadWithContent(content, fileName);
     });
+};
+
+const showProcessDetail = (pid: number) => {
+    processDetailRef.value?.acceptParams(pid);
 };
 
 const buttons = [

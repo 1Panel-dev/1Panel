@@ -720,16 +720,9 @@ func checkPortUsed(ports, proto string, apps []portOfApp) string {
 
 	for _, app := range apps {
 		if app.HttpPort == ports || app.HttpsPort == ports {
-			return fmt.Sprintf("(%s)", app.AppName)
+			return app.AppName
 		}
 	}
-	port, err := strconv.Atoi(ports)
-	if err != nil {
-		global.LOG.Errorf(" convert string %v to int failed, err: %v", port, err)
-		return ""
-	}
-	if common.ScanPortWithProto(port, proto) {
-		return "inUsed"
-	}
+
 	return ""
 }

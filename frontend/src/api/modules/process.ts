@@ -8,3 +8,7 @@ export const stopProcess = (req: Process.StopReq) => {
 export const getProcessByID = (pid: number) => {
     return http.get<Process.PsProcessData>(`/process/${pid}`);
 };
+
+export const getListeningProcess = () => {
+    return http.post<Process.ListeningProcess[]>(`/process/listening`);
+};
