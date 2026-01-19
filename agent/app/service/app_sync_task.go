@@ -5,7 +5,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"strconv"
 	"time"
@@ -17,6 +16,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
+	"github.com/1Panel-dev/1Panel/agent/utils/req_helper"
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 )
 
@@ -109,7 +109,6 @@ func (c *appSyncContext) syncAppIconsAndDetails() error {
 	c.task.LogStart(i18n.GetMsgByKey("SyncAppDetail"))
 	global.LOG.Infof("[AppStore] sync app detail start, total: %d", len(c.list.Apps))
 
-	downloadIconUpdate := 0
 	downloadIconNum := 0
 	total := len(c.list.Apps)
 
@@ -127,8 +126,6 @@ func (c *appSyncContext) syncAppIconsAndDetails() error {
 		iconStr := c.downloadAppIcon(l.Icon)
 		if iconStr == "" {
 			global.LOG.Infof("[AppStore] save failed url=%s", l.Icon)
-		} else {
-			downloadIconUpdate++
 		}
 		app.Icon = iconStr
 
@@ -159,16 +156,9 @@ func (c *appSyncContext) syncAppIconsAndDetails() error {
 
 			if _, ok := InitTypes[app.Type]; ok {
 				dockerComposeUrl := fmt.Sprintf("%s/%s", versionUrl, "docker-compose.yml")
-				if req, err := http.NewRequest(http.MethodGet, dockerComposeUrl, nil); err == nil {
-					resp, err := c.httpClient.Do(req)
-					if err == nil {
-						if resp.StatusCode == http.StatusOK {
-							if composeRes, err := io.ReadAll(resp.Body); err == nil {
-								detail.DockerCompose = string(composeRes)
-							}
-						}
-						_ = resp.Body.Close()
-					}
+				_, composeRes, err := req_helper.HandleRequestWithClient(&c.httpClient, dockerComposeUrl, http.MethodGet, constant.TimeOut20s)
+				if err == nil {
+					detail.DockerCompose = string(composeRes)
 				}
 			} else {
 				detail.DockerCompose = ""
@@ -190,8 +180,8 @@ func (c *appSyncContext) syncAppIconsAndDetails() error {
 		c.appsMap[l.AppProperty.Key] = app
 	}
 
-	global.LOG.Infof("[AppStore] download icon update=%d, success=%d, total=%d",
-		downloadIconUpdate, downloadIconUpdate, downloadIconNum)
+	global.LOG.Infof("[AppStore] download icon success: %d, total: %d",
+		downloadIconNum, total)
 
 	c.task.LogSuccess(i18n.GetMsgByKey("SyncAppDetail"))
 	return nil
@@ -200,20 +190,16 @@ func (c *appSyncContext) syncAppIconsAndDetails() error {
 func (c *appSyncContext) downloadAppIcon(iconUrl string) string {
 	iconStr := ""
 
-	if req, err := http.NewRequest(http.MethodGet, iconUrl, nil); err == nil {
-		req.Header.Set("Accept", "image/*")
-		resp, err := c.httpClient.Do(req)
-		if err == nil {
-			if resp.StatusCode == http.StatusOK {
-				if iconRes, err := io.ReadAll(resp.Body); err == nil && len(iconRes) > 0 {
-					if iconRes[0] != '<' {
-						iconStr = base64.StdEncoding.EncodeToString(iconRes)
-					}
+	code, iconRes, err := req_helper.HandleRequestWithClient(&c.httpClient, iconUrl, http.MethodGet, constant.TimeOut20s)
+	if err == nil {
+		if code == http.StatusOK {
+			if len(iconRes) > 0 {
+				if iconRes[0] != '<' {
+					iconStr = base64.StdEncoding.EncodeToString(iconRes)
 				}
-			} else {
-				global.LOG.Infof("[AppStore] download failed status=%d", resp.StatusCode)
 			}
-			_ = resp.Body.Close()
+		} else {
+			global.LOG.Infof("[AppStore] download failed status=%d", code)
 		}
 	}
 	return iconStr
