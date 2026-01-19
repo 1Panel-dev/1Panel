@@ -7,6 +7,7 @@ import (
 	"os"
 	"path"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/buserr"
@@ -353,7 +354,20 @@ func (t *Task) LogSuccessWithOps(operate, msg string) {
 }
 
 func (t *Task) LogFailedWithOps(operate, msg string, err error) {
-	t.Logger.Printf("%s%s%s : %s ", i18n.GetMsgByKey(operate), msg, i18n.GetMsgByKey("Failed"), err.Error())
+	t.Logger.Printf("%s%s : %s ", msg, i18n.GetMsgByKey("Failed"), err.Error())
+}
+
+func (t *Task) LogWithProgress(msg string, current int, total int) {
+	const barWidth = 10
+	filled := int(float64(current) / float64(total) * 100 / 10)
+	if filled > barWidth {
+		filled = barWidth
+	}
+	if filled < 0 {
+		filled = 0
+	}
+	bar := strings.Repeat("=", filled) + strings.Repeat("-", barWidth-filled)
+	t.Logger.Printf("%s [%s] %.2f%%", msg, bar, float64(current)/float64(total)*100)
 }
 
 type SimpleFormatter struct{}
