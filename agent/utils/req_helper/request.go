@@ -4,12 +4,13 @@ import (
 	"context"
 	"crypto/tls"
 	"errors"
-	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 	"io"
 	"net"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/global"
@@ -46,6 +47,12 @@ func HandleGet(url string) (*http.Response, error) {
 }
 
 func HandleRequest(url, method string, timeout int) (int, []byte, error) {
+	transport := xpack.LoadRequestTransport()
+	client := http.Client{Timeout: time.Duration(timeout) * time.Second, Transport: transport}
+	return HandleRequestWithClient(&client, url, method, timeout)
+}
+
+func HandleRequestWithClient(client *http.Client, url, method string, timeout int) (int, []byte, error) {
 	defer func() {
 		if r := recover(); r != nil {
 			global.LOG.Errorf("handle request failed, error message: %v", r)
@@ -53,8 +60,6 @@ func HandleRequest(url, method string, timeout int) (int, []byte, error) {
 		}
 	}()
 
-	transport := xpack.LoadRequestTransport()
-	client := http.Client{Timeout: time.Duration(timeout) * time.Second, Transport: transport}
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeout)*time.Second)
 	defer cancel()
 	request, err := http.NewRequestWithContext(ctx, method, url, nil)
