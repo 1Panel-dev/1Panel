@@ -966,6 +966,8 @@ func opWebsite(website *model.Website, operate string) error {
 		server.RemoveDirective("include", []string{proxyInclude})
 		rewriteInclude := fmt.Sprintf("/www/sites/%s/rewrite/%s.conf", website.Alias, website.Alias)
 		server.RemoveDirective("include", []string{rewriteInclude})
+		redirectInclude := fmt.Sprintf("/www/sites/%s/redirect/%s.conf", website.Alias, website.Alias)
+		server.RemoveDirective("include", []string{redirectInclude})
 
 		switch website.Type {
 		case constant.Deployment:
@@ -995,6 +997,11 @@ func opWebsite(website *model.Website, operate string) error {
 		absoluteRewritePath := GetSitePath(*website, SiteReWritePath)
 		if fileOp.Stat(absoluteRewritePath) {
 			server.UpdateDirective("include", []string{rewriteInclude})
+		}
+		redirectInclude := fmt.Sprintf("/www/sites/%s/redirect/%s.conf", website.Alias, website.Alias)
+		absoluteRedirectPath := GetSitePath(*website, SiteRedirectDir)
+		if fileOp.Stat(absoluteRedirectPath) {
+			server.UpdateDirective("include", []string{redirectInclude})
 		}
 		rootIndex := path.Join("/www/sites", website.Alias, "index")
 		if website.SiteDir != "/" {
