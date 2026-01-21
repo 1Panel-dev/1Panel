@@ -2944,6 +2944,7 @@ const message = {
         fromMaster: 'Master Node Push',
         hostedZoneID: 'Hosted Zone ID',
         isIP: 'IP Certificate',
+        useEAB: 'Use EAB authentication',
     },
     firewall: {
         create: 'Create rule',

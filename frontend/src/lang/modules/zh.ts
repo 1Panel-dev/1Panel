@@ -2735,6 +2735,7 @@ const message = {
         fromMaster: '主节点推送',
         hostedZoneID: '托管区域 ID',
         isIP: 'IP 证书',
+        useEAB: '使用 EAB 认证',
     },
     firewall: {
         create: '创建规则',

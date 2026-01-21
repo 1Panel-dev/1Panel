@@ -2933,6 +2933,7 @@ const message = {
         fromMaster: 'Envio do Nó Mestre',
         hostedZoneID: 'Hosted Zone ID',
         isIP: 'Certificado de IP',
+        useEAB: 'Usar autenticação EAB',
     },
     firewall: {
         create: 'Criar regra',

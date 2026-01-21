@@ -136,7 +136,7 @@ func NewRegisterClient(acmeAccount *model.WebsiteAcmeAccount, proxy *dto.SystemP
 		return nil, err
 	}
 	var reg *registration.Resource
-	if acmeAccount.Type == "zerossl" || acmeAccount.Type == "google" || acmeAccount.Type == "freessl" {
+	if acmeAccount.Type == "zerossl" || acmeAccount.Type == "google" || acmeAccount.Type == "freessl" || (acmeAccount.Type == "custom" && acmeAccount.UseEAB) {
 		if acmeAccount.Type == "zerossl" {
 			var res *zeroSSLRes
 			res, err = getZeroSSLEabCredentials(acmeAccount.Email)
@@ -182,6 +182,7 @@ func getCaDirURL(accountType, customCaURL string) string {
 	switch accountType {
 	case "letsencrypt":
 		caDirURL = "https://acme-v02.api.letsencrypt.org/directory"
+		caDirURL = "https://acme-staging-v02.api.letsencrypt.org/directory"
 	case "zerossl":
 		caDirURL = "https://acme.zerossl.com/v2/DV90"
 	case "buypass":

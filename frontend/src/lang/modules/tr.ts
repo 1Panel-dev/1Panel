@@ -2982,6 +2982,7 @@ const message = {
         fromMaster: 'Ana Düğümden Gönder',
         hostedZoneID: 'Hosted Zone ID',
         isIP: 'IP Sertifikası',
+        useEAB: 'EAB kimlik doğrulamasını kullan',
     },
     firewall: {
         create: 'Kural oluştur',

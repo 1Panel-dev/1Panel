@@ -2926,6 +2926,7 @@ const message = {
         fromMaster: 'Отправка с главного узла',
         hostedZoneID: 'Hosted Zone ID',
         isIP: 'IP-сертификат',
+        useEAB: 'Использовать аутентификацию EAB',
     },
     firewall: {
         create: 'Создать правило',

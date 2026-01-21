@@ -2932,6 +2932,7 @@ const message = {
         fromMaster: 'Envío desde el nodo maestro',
         hostedZoneID: 'Hosted Zone ID',
         isIP: 'Certificado IP',
+        useEAB: 'Usar autenticación EAB',
     },
     firewall: {
         create: 'Crear regla',

@@ -11,6 +11,7 @@ type WebsiteAcmeAccount struct {
 	KeyType    string `gorm:"not null;default:2048" json:"keyType"`
 	UseProxy   bool   `gorm:"default:false" json:"useProxy"`
 	CaDirURL   string `json:"caDirURL"`
+	UseEAB     bool   `json:"useEAB"`
 }
 
 func (w WebsiteAcmeAccount) TableName() string {

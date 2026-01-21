@@ -63,6 +63,7 @@ type WebsiteAcmeAccountCreate struct {
 	EabHmacKey string `json:"eabHmacKey"`
 	UseProxy   bool   `json:"useProxy"`
 	CaDirURL   string `json:"caDirURL"`
+	UseEAB     bool   `json:"useEAB"`
 }
 
 type WebsiteAcmeAccountUpdate struct {

@@ -45,9 +45,10 @@ func (w WebsiteAcmeAccountService) Create(create request.WebsiteAcmeAccountCreat
 		Type:     create.Type,
 		KeyType:  create.KeyType,
 		UseProxy: create.UseProxy,
+		UseEAB:   create.UseEAB,
 	}
 
-	if create.Type == "google" || create.Type == "freessl" {
+	if create.Type == "google" || create.Type == "freessl" || (create.Type == "custom" && create.UseEAB) {
 		if create.EabKid == "" || create.EabHmacKey == "" {
 			return nil, buserr.New("ErrEabKidOrEabHmacKeyCannotBlank")
 		}

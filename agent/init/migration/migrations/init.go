@@ -814,3 +814,10 @@ var AddCronjobArgs = &gormigrate.Migration{
 		return tx.AutoMigrate(&model.Cronjob{})
 	},
 }
+
+var AddWebsiteAcmeAccountColumn = &gormigrate.Migration{
+	ID: "20260110-add-website-acme-account",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(&model.WebsiteAcmeAccount{})
+	},
+}

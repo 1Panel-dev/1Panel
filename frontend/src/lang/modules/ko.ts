@@ -2814,6 +2814,7 @@ const message = {
         fromMaster: '마스터 노드에서 푸시',
         hostedZoneID: 'Hosted Zone ID',
         isIP: 'IP 인증서',
+        useEAB: 'EAB 인증 사용',
     },
     firewall: {
         create: '규칙 만들기',

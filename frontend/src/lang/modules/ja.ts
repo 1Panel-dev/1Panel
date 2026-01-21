@@ -2865,6 +2865,7 @@ const message = {
         fromMaster: 'マスターノードからのプッシュ',
         hostedZoneID: 'Hosted Zone ID',
         isIP: 'IP証明書',
+        useEAB: 'EAB認証を使用',
     },
     firewall: {
         create: 'ルールを作成します',

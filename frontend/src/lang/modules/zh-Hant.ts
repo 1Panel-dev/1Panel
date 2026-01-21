@@ -2738,6 +2738,7 @@ const message = {
         fromMaster: '主節點推送',
         hostedZoneID: '託管區域 ID',
         isIP: 'IP 憑證',
+        useEAB: '使用 EAB 認證',
     },
     firewall: {
         create: '建立規則',

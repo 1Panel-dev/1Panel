@@ -2926,6 +2926,7 @@ const message = {
         fromMaster: 'Tolak dari Nod Utama',
         hostedZoneID: 'Hosted Zone ID',
         isIP: 'Sijil IP',
+        useEAB: 'Gunakan pengesahan EAB',
     },
     firewall: {
         create: 'Buat peraturan',
