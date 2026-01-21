@@ -208,6 +208,13 @@ func (w WebsiteService) PageWebsite(req request.WebsiteSearch) (int64, []respons
 			IPV6:          web.IPV6,
 		}
 
+		if siteDTO.Type == constant.Subsite {
+			parentWeb, _ := websiteRepo.GetFirst(repo.WithByID(web.ParentWebsiteID))
+			if parentWeb.ID != 0 {
+				siteDTO.ParentSite = parentWeb.PrimaryDomain
+			}
+		}
+
 		sites, _ := websiteRepo.List(websiteRepo.WithParentID(web.ID))
 		if len(sites) > 0 {
 			for _, site := range sites {

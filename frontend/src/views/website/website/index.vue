@@ -113,6 +113,7 @@
                                 {{ $t('website.' + row.type) }}
                                 <span v-if="row.type === 'deployment'">[{{ row.appName }}]</span>
                                 <span v-if="row.type === 'runtime'">[{{ row.runtimeName }}]</span>
+                                <span v-if="row.type === 'subsite'">[{{ row.parentSite }}]</span>
                             </div>
                         </template>
                     </el-table-column>

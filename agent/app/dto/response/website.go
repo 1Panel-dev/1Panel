@@ -40,6 +40,7 @@ type WebsiteRes struct {
 	SSLStatus     string    `json:"sslStatus"`
 	AppInstallID  uint      `json:"appInstallId"`
 	ChildSites    []string  `json:"childSites"`
+	ParentSite    string    `json:"parentSite"`
 	RuntimeType   string    `json:"runtimeType"`
 	Favorite      bool      `json:"favorite"`
 	IPV6          bool      `json:"IPV6"`
