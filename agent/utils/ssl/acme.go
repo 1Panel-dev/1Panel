@@ -8,6 +8,7 @@ import (
 	"crypto/x509"
 	"encoding/json"
 	"encoding/pem"
+	"errors"
 	"fmt"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
@@ -357,4 +358,27 @@ func getWebsiteSSLDomains(websiteSSL *model.WebsiteSSL) []string {
 		domains = append(domains, strings.Split(websiteSSL.Domains, ",")...)
 	}
 	return domains
+}
+
+const (
+	maxRetryAttempts = 3
+	retryDelayOn503  = 30 * time.Second
+)
+
+// isHTTP503Error checks if an error is an HTTP 503 Service Unavailable error
+func isHTTP503Error(err error) bool {
+	if err == nil {
+		return false
+	}
+
+	// Check for golang.org/x/crypto/acme.Error (used in manual_client.go)
+	var acmeErr *acme.Error
+	if errors.As(err, &acmeErr) {
+		return acmeErr.StatusCode == http.StatusServiceUnavailable
+	}
+
+	// Check error message for 503 (fallback for lego library errors)
+	errMsg := err.Error()
+	return strings.Contains(errMsg, "503") ||
+		strings.Contains(errMsg, "Service busy")
 }
