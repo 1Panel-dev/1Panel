@@ -218,7 +218,7 @@ const acmeAccounts = ref<Website.AcmeAccount[]>();
 const sslForm = ref<FormInstance>();
 const websites = ref();
 const rules = ref({
-    primaryDomain: [Rules.requiredInput, Rules.domain],
+    primaryDomain: [Rules.requiredInput, Rules.domainOrIP],
     acmeAccountId: [Rules.requiredSelectBusiness],
     dnsAccountId: [Rules.requiredSelectBusiness],
     provider: [Rules.requiredInput],

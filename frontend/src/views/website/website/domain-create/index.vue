@@ -98,9 +98,24 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['gengerate']);
+
+const ipv4Regex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+
+const ipv6Regex =
+    /^(?:(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}|(?:[0-9a-fA-F]{1,4}:){1,7}:|(?:[0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|(?:[0-9a-fA-F]{1,4}:){1,5}(?::[0-9a-fA-F]{1,4}){1,2}|(?:[0-9a-fA-F]{1,4}:){1,4}(?::[0-9a-fA-F]{1,4}){1,3}|(?:[0-9a-fA-F]{1,4}:){1,3}(?::[0-9a-fA-F]{1,4}){1,4}|(?:[0-9a-fA-F]{1,4}:){1,2}(?::[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:(?:(?::[0-9a-fA-F]{1,4}){1,6})|:(?:(?::[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(?::[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(?:ffff(?::0{1,4}){0,1}:){0,1}(?:(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3}(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9])|(?:[0-9a-fA-F]{1,4}:){1,4}:(?:(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3}(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9]))$/;
+
 const singleDomainRegex = /^(?:\*|[\w\u4e00-\u9fa5-]{1,63})(?:\.(?:\*|[\w\u4e00-\u9fa5-]{1,63}))*$/;
 const FQDNDomainRegex =
     /^(?:\*\.)?(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,63}(?::(6553[0-5]|655[0-2]\d|65[0-4]\d{2}|6[0-4]\d{3}|[1-5]?\d{1,4}))?$/;
+
+const isIPv4 = (str: string): boolean => {
+    return ipv4Regex.test(str);
+};
+
+const isIPv6 = (str: string): boolean => {
+    const cleanStr = str.replace(/^\[|\]$/g, '');
+    return ipv6Regex.test(cleanStr);
+};
 
 const isFQDN = (domain: string): boolean => {
     if (!domain) return true;
@@ -109,6 +124,10 @@ const isFQDN = (domain: string): boolean => {
 
 function toPunycode(hostname: string): string {
     try {
+        if (isIPv4(hostname) || isIPv6(hostname.replace(/^\[|\]$/g, ''))) {
+            return hostname;
+        }
+
         if (hostname.startsWith('*.')) {
             const domainPart = hostname.substring(2);
             const convertedDomain = new URL(`http://${domainPart}`).hostname;
@@ -126,17 +145,27 @@ function toPunycode(hostname: string): string {
 }
 
 const handleDomainBlur = (index: number) => {
-    let singleRegexChecked = singleDomainRegex.test(create.value.domains[index].domain);
-    if (!singleRegexChecked) {
-        domainWarnings.value[index] = false;
-        return;
-    }
     const originalDomain = create.value.domains[index].domain;
     if (!originalDomain) {
         create.value.domains[index].host = '';
         domainWarnings.value[index] = false;
         return;
     }
+
+    const cleanDomain = originalDomain.replace(/^\[|\]$/g, '');
+    if (isIPv4(cleanDomain) || isIPv6(cleanDomain)) {
+        create.value.domains[index].host = originalDomain;
+        create.value.domains[index].domain = originalDomain;
+        domainWarnings.value[index] = false;
+        return;
+    }
+
+    let singleRegexChecked = singleDomainRegex.test(originalDomain);
+    if (!singleRegexChecked) {
+        domainWarnings.value[index] = false;
+        return;
+    }
+
     const punycoded = toPunycode(originalDomain);
     if (punycoded !== originalDomain) {
         create.value.domains[index].host = originalDomain;
@@ -156,9 +185,13 @@ const validateSingleDomain = (_rule: any, value: string, callback: (error?: Erro
     if (!value) {
         return callback();
     }
-    if (singleDomainRegex.test(value)) {
+
+    const cleanValue = value.replace(/^\[|\]$/g, '');
+
+    if (isIPv4(cleanValue) || isIPv6(cleanValue) || singleDomainRegex.test(value)) {
         return callback();
     }
+
     callback(new Error(i18n.t('website.domainInvalid')));
 };
 
@@ -188,6 +221,13 @@ const create = ref({
 const domainToString = (domain: { domain: string; port: number; ssl: boolean }): string => {
     if (!domain.domain) return '';
     let str = domain.domain;
+
+    if (domain.port && domain.port !== 80 && isIPv6(str.replace(/^\[|\]$/g, ''))) {
+        if (!str.startsWith('[')) {
+            str = `[${str}]`;
+        }
+    }
+
     if (domain.port && domain.port !== 80) {
         str += `:${domain.port}`;
     }
@@ -199,12 +239,42 @@ const stringToDomain = (line: string): { domain: string; host: string; port: num
 
     let ssl = false;
     let str = line.trim();
+    let domainRaw = '';
+    let portStr = '';
 
-    const [domainRaw, portStr] = str.split(':');
+    const ipv6Match = str.match(/^\[([^\]]+)\](?::(\d+))?$/);
+    if (ipv6Match) {
+        domainRaw = ipv6Match[1];
+        portStr = ipv6Match[2] || '';
+    } else {
+        const parts = str.split(':');
+        if (parts.length === 2) {
+            domainRaw = parts[0];
+            portStr = parts[1];
+        } else if (parts.length === 1) {
+            domainRaw = parts[0];
+        } else {
+            if (isIPv6(str)) {
+                domainRaw = str;
+            } else {
+                return null;
+            }
+        }
+    }
+
     if (!domainRaw) return null;
 
-    const domain = toPunycode(domainRaw);
-    const host = domain !== domainRaw ? domainRaw : domain;
+    const cleanDomain = domainRaw.replace(/^\[|\]$/g, '');
+    let domain: string;
+    let host: string;
+
+    if (isIPv4(cleanDomain) || isIPv6(cleanDomain)) {
+        domain = domainRaw;
+        host = domainRaw;
+    } else {
+        domain = toPunycode(domainRaw);
+        host = domain !== domainRaw ? domainRaw : domain;
+    }
 
     const port = portStr ? Number(portStr) : defaultPort.value;
 
@@ -246,8 +316,9 @@ const saveBatchInput = () => {
         if (!parsed) return;
 
         const { domain, host, port, ssl } = parsed;
+        const cleanDomain = domain.replace(/^\[|\]$/g, '');
 
-        if (!domain.trim() || !singleDomainRegex.test(domain)) {
+        if (!domain.trim() || (!isIPv4(cleanDomain) && !isIPv6(cleanDomain) && !singleDomainRegex.test(domain))) {
             MsgError(line + ' ' + i18n.t('website.domainInvalid'));
             hasError = true;
             return;
@@ -258,7 +329,7 @@ const saveBatchInput = () => {
         }
 
         if (isFirstBatchInput && index === 0) {
-            const alias = domain.split(':')[0];
+            const alias = domain.split(':')[0].replace(/^\[|\]$/g, '');
             if (props.form.alias !== undefined) {
                 props.form.alias = alias;
             }

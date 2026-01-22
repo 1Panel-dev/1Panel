@@ -22,7 +22,7 @@
             <el-popover
                 placement="right"
                 trigger="hover"
-                :width="300"
+                :width="popoverWidth"
                 @before-enter="searchDomains(row.id)"
                 v-if="row.type != 'stream'"
             >
@@ -64,7 +64,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, nextTick } from 'vue';
+import { ref, nextTick, computed } from 'vue';
 import { listDomains } from '@/api/modules/website';
 import { Website } from '@/api/interface/website';
 import { routerToNameWithParams } from '@/utils/router';
@@ -87,6 +87,28 @@ const rules = ref({
     domainName: [Rules.requiredInput, Rules.linuxName],
 });
 const formRef = ref();
+
+const ipv6Regex =
+    /^(?:(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}|(?:[0-9a-fA-F]{1,4}:){1,7}:|(?:[0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|(?:[0-9a-fA-F]{1,4}:){1,5}(?::[0-9a-fA-F]{1,4}){1,2}|(?:[0-9a-fA-F]{1,4}:){1,4}(?::[0-9a-fA-F]{1,4}){1,3}|(?:[0-9a-fA-F]{1,4}:){1,3}(?::[0-9a-fA-F]{1,4}){1,4}|(?:[0-9a-fA-F]{1,4}:){1,2}(?::[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:(?:(?::[0-9a-fA-F]{1,4}){1,6})|:(?:(?::[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(?::[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(?:ffff(?::0{1,4}){0,1}:){0,1}(?:(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3}(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9])|(?:[0-9a-fA-F]{1,4}:){1,4}:(?:(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3}(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9]))$/;
+
+const isIPv6 = (domain: string): boolean => {
+    const cleanDomain = domain.replace(/^\[|\]$/g, '');
+    return ipv6Regex.test(cleanDomain);
+};
+
+const popoverWidth = computed(() => {
+    if (domains.value.length === 0) return 300;
+
+    let maxLength = 0;
+    domains.value.forEach((domain) => {
+        const url = getUrl(domain, props.row);
+        maxLength = Math.max(maxLength, url.length);
+    });
+
+    const calculatedWidth = 200 + maxLength * 8 + 60 + 40;
+
+    return Math.min(Math.max(calculatedWidth, 300), 800);
+});
 
 const startEdit = () => {
     formData.domainName = props.row.primaryDomain;
@@ -130,13 +152,22 @@ const openUrl = (url: string) => {
 
 const getUrl = (domain: Website.Domain, website: Website.Website): string => {
     const protocol = website.protocol.toLowerCase();
-    let url = protocol + '://' + domain.domain;
-    if (protocol == 'http' && domain.port != 80) {
-        url = url + ':' + domain.port;
+    let domainStr = domain.domain;
+
+    const cleanDomain = domainStr.replace(/^\[|\]$/g, '');
+
+    if (isIPv6(cleanDomain)) {
+        domainStr = `[${cleanDomain}]`;
     }
-    if (protocol == 'https' && domain.ssl) {
-        url = url + ':' + domain.port;
+
+    let url = `${protocol}://${domainStr}`;
+
+    if (protocol === 'http' && domain.port && domain.port !== 80) {
+        url = `${url}:${domain.port}`;
+    } else if (protocol === 'https' && domain.port && domain.port !== 443) {
+        url = `${url}:${domain.port}`;
     }
+
     return url;
 };
 
