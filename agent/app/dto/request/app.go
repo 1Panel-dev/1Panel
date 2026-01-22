@@ -54,13 +54,14 @@ type AppContainerConfig struct {
 
 type AppInstalledSearch struct {
 	dto.PageInfo
-	Type   string   `json:"type"`
-	Name   string   `json:"name"`
-	Tags   []string `json:"tags"`
-	Update bool     `json:"update"`
-	Unused bool     `json:"unused"`
-	All    bool     `json:"all"`
-	Sync   bool     `json:"sync"`
+	Type        string   `json:"type"`
+	Name        string   `json:"name"`
+	Tags        []string `json:"tags"`
+	Update      bool     `json:"update"`
+	Unused      bool     `json:"unused"`
+	All         bool     `json:"all"`
+	Sync        bool     `json:"sync"`
+	CheckUpdate bool     `json:"checkUpdate"`
 }
 
 type AppInstalledInfo struct {

@@ -121,7 +121,7 @@ func (a *AppInstallService) Page(req request.AppInstalledSearch) (int64, []respo
 		}
 	}
 
-	installDTOs, _ := handleInstalled(installs, req.Update, req.Sync)
+	installDTOs, _ := handleInstalled(installs, req.Update, req.Sync, req.CheckUpdate)
 	if req.Update {
 		total = int64(len(installDTOs))
 	}
@@ -238,7 +238,7 @@ func (a *AppInstallService) SearchForWebsite(req request.AppInstalledSearch) ([]
 		}
 	}
 
-	return handleInstalled(installs, false, true)
+	return handleInstalled(installs, false, true, false)
 }
 
 func (a *AppInstallService) Operate(req request.AppInstalledOperate) error {

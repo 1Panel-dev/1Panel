@@ -1531,7 +1531,7 @@ func synAppInstall(containers map[string]container.Summary, appInstall *model.Ap
 	_ = appInstallRepo.Save(context.Background(), appInstall)
 }
 
-func handleInstalled(appInstallList []model.AppInstall, updated bool, sync bool) ([]response.AppInstallDTO, error) {
+func handleInstalled(appInstallList []model.AppInstall, updated, sync, checkUpdate bool) ([]response.AppInstallDTO, error) {
 	var (
 		res           []response.AppInstallDTO
 		containersMap map[string]container.Summary
@@ -1554,6 +1554,7 @@ func handleInstalled(appInstallList []model.AppInstall, updated bool, sync bool)
 		if updated && ignoreUpdate(installed) {
 			continue
 		}
+
 		if sync && !doNotNeedSync(installed) {
 			synAppInstall(containersMap, &installed, false)
 		}
@@ -1583,20 +1584,30 @@ func handleInstalled(appInstallList []model.AppInstall, updated bool, sync bool)
 			Container:   installed.ContainerName,
 			ServiceName: strings.ToLower(installed.ServiceName),
 		}
-		if !updated {
+
+		if !updated && !checkUpdate {
 			installDTO.LinkDB = hasLinkDB(installed.ID)
 			res = append(res, installDTO)
 			continue
 		}
+
 		if installed.Version == "latest" {
+			if checkUpdate {
+				installDTO.CanUpdate = false
+				installDTO.LinkDB = hasLinkDB(installed.ID)
+				res = append(res, installDTO)
+			}
 			continue
 		}
+
 		installDTO.DockerCompose = installed.DockerCompose
 		installDTO.IsEdit = isEditCompose(installed)
+
 		details, err := appDetailRepo.GetBy(appDetailRepo.WithAppId(installed.App.ID))
 		if err != nil {
 			return nil, err
 		}
+
 		var versions []string
 		for _, appDetail := range details {
 			ignores, _ := appIgnoreUpgradeRepo.List(runtimeRepo.WithDetailId(appDetail.ID), appIgnoreUpgradeRepo.WithScope("version"))
@@ -1608,11 +1619,19 @@ func handleInstalled(appInstallList []model.AppInstall, updated bool, sync bool)
 			}
 			versions = append(versions, appDetail.Version)
 		}
+
 		if len(versions) == 0 {
+			if checkUpdate {
+				installDTO.CanUpdate = false
+				installDTO.LinkDB = hasLinkDB(installed.ID)
+				res = append(res, installDTO)
+			}
 			continue
 		}
+
 		versions = common.GetSortedVersions(versions)
 		lastVersion := versions[0]
+
 		if installed.App.Key == constant.AppMysql || installed.App.Key == constant.AppMysqlCluster {
 			for _, version := range versions {
 				majorVersion := getMajorVersion(installed.Version)
@@ -1624,15 +1643,23 @@ func handleInstalled(appInstallList []model.AppInstall, updated bool, sync bool)
 				}
 			}
 		}
+
 		if common.IsCrossVersion(installed.Version, lastVersion) {
 			installDTO.CanUpdate = installed.App.CrossVersionUpdate
 		} else {
 			installDTO.CanUpdate = common.CompareVersion(lastVersion, installed.Version)
 		}
-		if installDTO.CanUpdate {
+
+		if updated {
+			if installDTO.CanUpdate {
+				res = append(res, installDTO)
+			}
+		} else if checkUpdate {
+			installDTO.LinkDB = hasLinkDB(installed.ID)
 			res = append(res, installDTO)
 		}
 	}
+
 	return res, nil
 }
 
