@@ -1787,7 +1787,7 @@ func (w WebsiteService) GetRedirect(id uint) (res []response.NginxRedirectConfig
 			continue
 		}
 		fileName := entry.Name()
-		if !strings.HasSuffix(fileName, ".conf") && !strings.HasSuffix(fileName, ".conf.bak") {
+		if !strings.HasSuffix(fileName, ".conf") && !strings.HasSuffix(fileName, ".bak") {
 			continue
 		}
 		redirectConfig := response.NginxRedirectConfig{
