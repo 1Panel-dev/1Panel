@@ -764,6 +764,30 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 
 		command := exec.Command("/bin/bash", "-c", fmt.Sprintf("cp -rn %s/* %s || true", detailDir, install.GetPath()))
 		_, _ = command.CombinedOutput()
+		if install.App.Key == constant.AppOpenresty {
+			installBuildDir := path.Join(install.GetPath(), "build")
+			detailBuildDir := path.Join(detailDir, "build")
+			if !fileOp.Stat(installBuildDir) {
+				if err := fileOp.CreateDir(installBuildDir, constant.DirPerm); err != nil {
+					return err
+				}
+			}
+			if err := fileOp.DeleteDir(path.Join(installBuildDir, "tmp")); err != nil {
+				return err
+			}
+			if err := fileOp.CopyDir(path.Join(detailBuildDir, "tmp"), installBuildDir); err != nil {
+				return err
+			}
+			if err := fileOp.CopyFile(path.Join(detailBuildDir, "Dockerfile"), installBuildDir); err != nil {
+				return err
+			}
+			if err := fileOp.CopyFile(path.Join(detailBuildDir, "nginx.conf"), installBuildDir); err != nil {
+				return err
+			}
+			if err := fileOp.CopyFile(path.Join(detailBuildDir, "nginx.vh.default.conf"), installBuildDir); err != nil {
+				return err
+			}
+		}
 		sourceScripts := path.Join(detailDir, "scripts")
 		if fileOp.Stat(sourceScripts) {
 			dstScripts := path.Join(install.GetPath(), "scripts")
