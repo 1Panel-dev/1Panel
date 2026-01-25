@@ -34,6 +34,7 @@ type SystemDir struct {
 
 	AppDir                string
 	ResourceDir           string
+	IconCacheDir          string
 	AppResourceDir        string
 	AppInstallDir         string
 	LocalAppResourceDir   string

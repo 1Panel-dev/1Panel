@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -15,6 +14,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
+	"github.com/1Panel-dev/1Panel/agent/utils/appicon"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/req_helper"
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
@@ -107,10 +107,15 @@ func (a AppService) syncAppStoreTask(t *task.Task) (err error) {
 
 func (c *appSyncContext) syncAppIconsAndDetails() error {
 	c.task.LogStart(i18n.GetMsgByKey("SyncAppDetail"))
-	global.LOG.Infof("[AppStore] sync app detail start, total: %d", len(c.list.Apps))
-
-	downloadIconNum := 0
 	total := len(c.list.Apps)
+	global.LOG.Infof("[AppStore] sync app detail start, total apps: %d, icons to process: %d", total, total)
+
+	var (
+		downloadIconNum = 0
+		icon200Count    = 0
+		icon304Count    = 0
+		iconFailCount   = 0
+	)
 
 	for _, l := range c.list.Apps {
 		downloadIconNum++
@@ -123,11 +128,17 @@ func (c *appSyncContext) syncAppIconsAndDetails() error {
 			continue
 		}
 
-		iconStr := c.downloadAppIcon(l.Icon)
-		if iconStr == "" {
-			global.LOG.Infof("[AppStore] save failed url=%s", l.Icon)
+		status, iconField := c.downloadAppIcon(l.Icon, l.AppProperty.Key, app.Icon)
+		switch status {
+		case http.StatusOK:
+			app.Icon = iconField
+			icon200Count++
+		case http.StatusNotModified:
+			icon304Count++
+		default:
+			global.LOG.Warnf("[AppStore] download icon failed url=%s, appKey=%s", l.Icon, l.AppProperty.Key)
+			iconFailCount++
 		}
-		app.Icon = iconStr
 
 		app.TagsKey = l.AppProperty.Tags
 		if l.AppProperty.Recommend > 0 {
@@ -180,29 +191,63 @@ func (c *appSyncContext) syncAppIconsAndDetails() error {
 		c.appsMap[l.AppProperty.Key] = app
 	}
 
-	global.LOG.Infof("[AppStore] download icon success: %d, total: %d",
-		downloadIconNum, total)
+	global.LOG.Infof("[AppStore] icon download completed - total: %d, success(200): %d, cached(304): %d, failed: %d",
+		total, icon200Count, icon304Count, iconFailCount)
 
 	c.task.LogSuccess(i18n.GetMsgByKey("SyncAppDetail"))
 	return nil
 }
 
-func (c *appSyncContext) downloadAppIcon(iconUrl string) string {
-	iconStr := ""
+func (c *appSyncContext) downloadAppIcon(iconUrl, appKey, oldIcon string) (status int, iconField string) {
+	existingEtag := appicon.GetETagFromIconField(oldIcon)
 
-	code, iconRes, err := req_helper.HandleRequestWithClient(&c.httpClient, iconUrl, http.MethodGet, constant.TimeOut20s)
-	if err == nil {
-		if code == http.StatusOK {
-			if len(iconRes) > 0 {
-				if iconRes[0] != '<' {
-					iconStr = base64.StdEncoding.EncodeToString(iconRes)
-				}
-			}
-		} else {
-			global.LOG.Infof("[AppStore] download failed status=%d", code)
-		}
+	reqHeaders := make(map[string]string)
+	if existingEtag != "" {
+		reqHeaders["If-None-Match"] = existingEtag
 	}
-	return iconStr
+
+	resp, err := req_helper.HandleRequestWithHeaders(&c.httpClient, iconUrl, http.MethodGet, constant.TimeOut20s, reqHeaders)
+	if err != nil {
+		global.LOG.Warnf("[AppStore] request icon failed url=%s, err=%v", iconUrl, err)
+		return 0, ""
+	}
+
+	if resp.StatusCode == http.StatusNotModified {
+		return http.StatusNotModified, ""
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		global.LOG.Warnf("[AppStore] download icon failed url=%s, status=%d", iconUrl, resp.StatusCode)
+		return 0, ""
+	}
+
+	if len(resp.Body) == 0 {
+		global.LOG.Warnf("[AppStore] download icon empty body url=%s", iconUrl)
+		return 0, ""
+	}
+
+	if resp.Body[0] == '<' {
+		global.LOG.Warnf("[AppStore] download icon got HTML response url=%s", iconUrl)
+		return 0, ""
+	}
+
+	contentType := resp.Header.Get("Content-Type")
+	ext := appicon.DetectExtFromContentType(contentType)
+	if ext == "" {
+		global.LOG.Warnf("[AppStore] unsupported icon content-type url=%s, content-type=%s", iconUrl, contentType)
+		return 0, ""
+	}
+
+	fileName, err := appicon.WriteIconFile(appKey, ext, resp.Body)
+	if err != nil {
+		global.LOG.Warnf("[AppStore] write icon file failed appKey=%s, err=%v", appKey, err)
+		return 0, ""
+	}
+
+	newEtag := resp.Header.Get("ETag")
+	iconField = appicon.BuildIconField(fileName, newEtag)
+
+	return http.StatusOK, iconField
 }
 
 func (c *appSyncContext) classifyAndPersistApps() (err error) {

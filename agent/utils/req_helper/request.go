@@ -83,6 +83,46 @@ func HandleRequestWithClient(client *http.Client, url, method string, timeout in
 	return resp.StatusCode, body, nil
 }
 
+type RequestResponse struct {
+	StatusCode int
+	Body       []byte
+	Header     http.Header
+}
+
+func HandleRequestWithHeaders(client *http.Client, url, method string, timeout int, reqHeaders map[string]string) (*RequestResponse, error) {
+	defer func() {
+		if r := recover(); r != nil {
+			global.LOG.Errorf("handle request failed, error message: %v", r)
+		}
+	}()
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeout)*time.Second)
+	defer cancel()
+	request, err := http.NewRequestWithContext(ctx, method, url, nil)
+	if err != nil {
+		return nil, err
+	}
+	for k, v := range reqHeaders {
+		request.Header.Set(k, v)
+	}
+	resp, err := client.Do(request)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	return &RequestResponse{
+		StatusCode: resp.StatusCode,
+		Body:       body,
+		Header:     resp.Header,
+	}, nil
+}
+
 func RequestFile(url, method string, timeout int) (io.ReadCloser, context.CancelFunc, error) {
 	defer func() {
 		if r := recover(); r != nil {

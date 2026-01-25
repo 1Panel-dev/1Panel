@@ -21,6 +21,7 @@ func Init() {
 
 	global.Dir.AppDir, _ = fileOp.CreateDirWithPath(true, path.Join(baseDir, "1panel/apps"))
 	global.Dir.ResourceDir, _ = fileOp.CreateDirWithPath(true, path.Join(baseDir, "1panel/resource"))
+	global.Dir.IconCacheDir, _ = fileOp.CreateDirWithPath(true, path.Join(baseDir, "1panel/resource/icon"))
 	global.Dir.AppResourceDir, _ = fileOp.CreateDirWithPath(true, path.Join(baseDir, "1panel/resource/apps"))
 	global.Dir.AppInstallDir, _ = fileOp.CreateDirWithPath(true, path.Join(baseDir, "1panel/apps"))
 	global.Dir.LocalAppResourceDir, _ = fileOp.CreateDirWithPath(true, path.Join(baseDir, "1panel/resource/apps/local"))

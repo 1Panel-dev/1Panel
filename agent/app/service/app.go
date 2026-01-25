@@ -25,6 +25,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
+	"github.com/1Panel-dev/1Panel/agent/utils/appicon"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
@@ -46,7 +47,7 @@ type IAppService interface {
 	GetAppUpdate() (*response.AppUpdateRes, error)
 	GetAppDetailByID(id uint) (*response.AppDetailDTO, error)
 	SyncAppListFromLocal(taskID string)
-	GetAppIcon(key string) ([]byte, error)
+	GetAppIcon(key string) ([]byte, string, string, error)
 	GetAppDetailByKey(appKey, version string) (response.AppDetailSimpleDTO, error)
 }
 
@@ -937,14 +938,26 @@ func (a AppService) SyncAppListFromRemote(taskID string) (err error) {
 	return nil
 }
 
-func (a AppService) GetAppIcon(key string) ([]byte, error) {
+func (a AppService) GetAppIcon(key string) ([]byte, string, string, error) {
 	app, err := appRepo.GetFirst(appRepo.WithKey(key))
 	if err != nil {
-		return nil, err
+		return nil, "", "", err
 	}
+
+	if appicon.IsIconFile(app.Icon) {
+		fileName, etag := appicon.ParseIconField(app.Icon)
+		iconBytes, err := appicon.ReadIconFile(fileName)
+		if err != nil {
+			global.LOG.Warnf("[AppIcon] read icon file failed key=%s, file=%s, err=%v", key, fileName, err)
+			return nil, "", "", nil
+		}
+		return iconBytes, fileName, etag, nil
+	}
+
 	iconBytes, err := base64.StdEncoding.DecodeString(app.Icon)
 	if err != nil {
-		return nil, err
+		global.LOG.Warnf("[AppIcon] decode base64 icon failed key=%s, err=%v", key, err)
+		return nil, "", "", nil
 	}
-	return iconBytes, nil
+	return iconBytes, "", "", nil
 }

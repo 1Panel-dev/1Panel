@@ -2,12 +2,12 @@ package v2
 
 import (
 	"net/http"
-	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
+	"github.com/1Panel-dev/1Panel/agent/utils/appicon"
 	"github.com/gin-gonic/gin"
 )
 
@@ -210,15 +210,33 @@ func (b *BaseApi) GetAppIcon(c *gin.Context) {
 		helper.BadRequest(c, err)
 		return
 	}
-	iconBytes, err := appService.GetAppIcon(appKey)
+	iconBytes, fileName, etag, err := appService.GetAppIcon(appKey)
 	if err != nil {
 		helper.InternalServer(c, err)
 		return
 	}
-	c.Header("Content-Type", "image/png")
-	c.Header("Cache-Control", "public, max-age=31536000, immutable")
-	c.Header("Last-Modified", time.Now().UTC().Format(http.TimeFormat))
-	c.Data(http.StatusOK, "image/png", iconBytes)
+
+	if len(iconBytes) == 0 {
+		c.Status(http.StatusNoContent)
+		return
+	}
+
+	contentType := "image/png"
+	if fileName != "" {
+		contentType = appicon.GetContentTypeFromExt(fileName)
+
+		if etag != "" {
+			c.Header("ETag", etag)
+			if c.GetHeader("If-None-Match") == etag {
+				c.Status(http.StatusNotModified)
+				return
+			}
+		}
+	}
+
+	c.Header("Content-Type", contentType)
+	c.Header("Cache-Control", "public, max-age=604800")
+	c.Data(http.StatusOK, contentType, iconBytes)
 }
 
 // @Tags App
