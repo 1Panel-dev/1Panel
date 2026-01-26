@@ -731,6 +731,26 @@ func (b *BaseApi) ComposeUpdate(c *gin.Context) {
 	helper.Success(c)
 }
 
+// @Tags Container Compose
+// @Summary Load compose environment variables
+// @Accept json
+// @Param request body dto.FilePath true "request"
+// @Success 200 {array} string
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /containers/compose/env [post]
+func (b *BaseApi) LoadComposeEnv(c *gin.Context) {
+	var req dto.FilePath
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	data, err := containerService.LoadComposeEnv(req.Path)
+	if err != nil {
+		helper.InternalServer(c, err)
+	}
+	helper.SuccessWithData(c, data)
+}
+
 // @Tags Container
 // @Summary Container logs
 // @Param container query string false "容器名称"

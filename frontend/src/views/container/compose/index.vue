@@ -25,7 +25,7 @@
                             <el-table
                                 :max-height="loadTableHeight()"
                                 :show-header="false"
-                                @row-click="loadDetail"
+                                @row-click="(row, column, event) => loadDetail(row, true)"
                                 :data="data"
                             >
                                 <el-table-column prop="name">
@@ -281,7 +281,7 @@
                                 label-position="top"
                                 :model="form"
                                 :rules="rules"
-                                v-loading="loading"
+                                v-loading="detailLoading"
                             >
                                 <el-form-item :label="$t('app.source')">
                                     <el-radio-group v-model="form.from" @change="onEdit('form')">
@@ -382,6 +382,7 @@ import {
     containerListStats,
     inspect,
     listComposeTemplate,
+    loadComposeEnv,
     searchCompose,
     testCompose,
     upCompose,
@@ -619,6 +620,9 @@ const changePath = async () => {
 };
 const loadDir = async (path: string) => {
     form.path = path;
+    await loadComposeEnv(path).then((res) => {
+        form.env = res.data || '';
+    });
 };
 const handleClose = () => {
     search(true);

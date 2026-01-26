@@ -59,9 +59,15 @@ type IContainerService interface {
 	ListNetwork() ([]dto.Options, error)
 	PageVolume(req dto.SearchWithPage) (int64, interface{}, error)
 	ListVolume() ([]dto.Options, error)
+
 	PageCompose(req dto.SearchWithPage) (int64, interface{}, error)
+	LoadComposeEnv(name string) (string, error)
 	CreateCompose(req dto.ComposeCreate) error
 	ComposeOperation(req dto.ComposeOperation) error
+	TestCompose(req dto.ComposeCreate) (bool, error)
+	ComposeUpdate(req dto.ComposeUpdate) error
+	ComposeLogClean(req dto.ComposeLogClean) error
+
 	ContainerCreate(req dto.ContainerOperate, inThread bool) error
 	ContainerCreateByCommand(req dto.ContainerCreateByCommand) error
 	ContainerUpdate(req dto.ContainerOperate) error
@@ -76,14 +82,12 @@ type IContainerService interface {
 	ContainerOperation(req dto.ContainerOperation) error
 	DownloadContainerLogs(containerType, container, since, tail string, c *gin.Context) error
 	ContainerStats(id string) (*dto.ContainerStats, error)
+
 	Inspect(req dto.InspectReq) (string, error)
 	DeleteNetwork(req dto.BatchDelete) error
 	CreateNetwork(req dto.NetworkCreate) error
 	DeleteVolume(req dto.BatchDelete) error
 	CreateVolume(req dto.VolumeCreate) error
-	TestCompose(req dto.ComposeCreate) (bool, error)
-	ComposeUpdate(req dto.ComposeUpdate) error
-	ComposeLogClean(req dto.ComposeLogClean) error
 	Prune(req dto.ContainerPrune) error
 
 	LoadUsers(req dto.OperationWithName) []string

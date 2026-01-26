@@ -201,6 +201,9 @@ export const composeUpdate = (params: Container.ComposeUpdate) => {
 export const dockerOperate = (operation: string) => {
     return http.post(`/containers/docker/operate`, { operation: operation }, TimeoutEnum.T_3M);
 };
+export const loadComposeEnv = (path: string) => {
+    return http.post<string>(`/containers/compose/env`, { path: path });
+};
 export const loadDaemonJson = () => {
     return http.get<Container.DaemonJsonConf>(`/containers/daemonjson`);
 };

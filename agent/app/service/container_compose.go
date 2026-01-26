@@ -342,6 +342,15 @@ func (u *ContainerService) ComposeLogClean(req dto.ComposeLogClean) error {
 	})
 }
 
+func (u *ContainerService) LoadComposeEnv(name string) (string, error) {
+	envFilePath := path.Join(path.Dir(name), ".env")
+	file, err := os.ReadFile(envFilePath)
+	if err != nil {
+		return "", err
+	}
+	return string(file), nil
+}
+
 func (u *ContainerService) loadPath(req *dto.ComposeCreate) error {
 	if req.From == "template" || req.From == "edit" {
 		dir := fmt.Sprintf("%s/docker/compose/%s", global.Dir.DataDir, req.Name)
