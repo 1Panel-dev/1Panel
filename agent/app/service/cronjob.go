@@ -765,7 +765,7 @@ func (u *CronjobService) UpdateStatus(id uint, status string) error {
 	)
 
 	if status == constant.StatusEnable {
-		entryIDs, err = u.StartJob(&cronjob, false)
+		entryIDs, err = u.StartJob(&cronjob, true)
 		if err != nil {
 			return err
 		}
