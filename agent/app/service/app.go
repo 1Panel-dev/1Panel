@@ -926,12 +926,17 @@ func (a AppService) SyncAppListFromRemote(taskID string) (err error) {
 	if err != nil {
 		return err
 	}
-	syncTask.AddSubTask(task.GetTaskName(i18n.GetMsgByKey("App"), task.TaskSync, task.TaskScopeAppStore), a.syncAppStoreTask, nil)
+
+	var sharedCtx *appSyncContext
+
+	syncTask.AddSubTask(task.GetTaskName(i18n.GetMsgByKey("App"), task.TaskSync, task.TaskScopeAppStore), a.createSyncAppStoreTask(&sharedCtx), nil)
+	syncTask.AddSubTask(i18n.GetMsgByKey("SyncAppDetail"), a.createSyncAppStoreMetaTask(&sharedCtx), nil)
 
 	go func() {
 		if err := syncTask.Execute(); err != nil {
 			_ = NewISettingService().Update("AppStoreLastModified", "0")
 			_ = NewISettingService().Update("AppStoreSyncStatus", constant.StatusError)
+			return
 		}
 	}()
 
@@ -942,6 +947,10 @@ func (a AppService) GetAppIcon(key string) ([]byte, string, string, error) {
 	app, err := appRepo.GetFirst(appRepo.WithKey(key))
 	if err != nil {
 		return nil, "", "", err
+	}
+
+	if strings.HasPrefix(app.Icon, "http") {
+		return nil, "", "", nil
 	}
 
 	if appicon.IsIconFile(app.Icon) {

@@ -13,25 +13,6 @@ import (
 
 const IconPrefix = "app_"
 
-var SupportedContentTypes = map[string]string{
-	"image/png":                "png",
-	"image/jpeg":               "jpg",
-	"image/jpg":                "jpg",
-	"image/svg+xml":            "svg",
-	"image/x-icon":             "ico",
-	"image/vnd.microsoft.icon": "ico",
-	"image/webp":               "webp",
-}
-
-var ExtToContentType = map[string]string{
-	"png":  "image/png",
-	"jpg":  "image/jpeg",
-	"jpeg": "image/jpeg",
-	"svg":  "image/svg+xml",
-	"ico":  "image/x-icon",
-	"webp": "image/webp",
-}
-
 func IsIconFile(icon string) bool {
 	return strings.HasPrefix(icon, IconPrefix)
 }
@@ -66,40 +47,25 @@ func BuildIconFileName(appKey, ext string) string {
 	return fmt.Sprintf("%s%s.%s", IconPrefix, appKey, ext)
 }
 
-func DetectExtFromContentType(contentType string) string {
-	ct := strings.TrimSpace(strings.Split(contentType, ";")[0])
-	ct = strings.ToLower(ct)
-	if ext, ok := SupportedContentTypes[ct]; ok {
-		return ext
-	}
-	return ""
-}
+const ContentTypePNG = "image/png"
 
-func GetContentTypeFromExt(fileName string) string {
-	ext := strings.ToLower(strings.TrimPrefix(filepath.Ext(fileName), "."))
-	if ct, ok := ExtToContentType[ext]; ok {
-		return ct
-	}
-	return "image/png"
-}
-
-func WriteIconFile(appKey, ext string, data []byte) (fileName string, err error) {
-	fileName = BuildIconFileName(appKey, ext)
+func WriteIconFile(appKey string, data []byte) (fileName string, err error) {
+	fileName = BuildIconFileName(appKey, "png")
 	filePath := GetIconFilePath(fileName)
 
-	_ = CleanOldIconFiles(appKey, ext)
+	_ = CleanOldIconFiles(appKey)
 
 	err = os.WriteFile(filePath, data, 0644)
 	return
 }
 
-func CleanOldIconFiles(appKey, keepExt string) error {
+func CleanOldIconFiles(appKey string) error {
 	pattern := path.Join(global.Dir.IconCacheDir, fmt.Sprintf("%s%s.*", IconPrefix, appKey))
 	matches, err := filepath.Glob(pattern)
 	if err != nil {
 		return err
 	}
-	keepFileName := BuildIconFileName(appKey, keepExt)
+	keepFileName := BuildIconFileName(appKey, "png")
 	for _, match := range matches {
 		baseName := filepath.Base(match)
 		if baseName == keepFileName {

@@ -221,10 +221,7 @@ func (b *BaseApi) GetAppIcon(c *gin.Context) {
 		return
 	}
 
-	contentType := "image/png"
 	if fileName != "" {
-		contentType = appicon.GetContentTypeFromExt(fileName)
-
 		if etag != "" {
 			c.Header("ETag", etag)
 			if c.GetHeader("If-None-Match") == etag {
@@ -234,9 +231,8 @@ func (b *BaseApi) GetAppIcon(c *gin.Context) {
 		}
 	}
 
-	c.Header("Content-Type", contentType)
-	c.Header("Cache-Control", "public, max-age=604800")
-	c.Data(http.StatusOK, contentType, iconBytes)
+	c.Header("Cache-Control", "public, max-age=2592000")
+	c.Data(http.StatusOK, appicon.ContentTypePNG, iconBytes)
 }
 
 // @Tags App

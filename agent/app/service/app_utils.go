@@ -1295,8 +1295,9 @@ func getAppDetails(details []model.AppDetail, versions []dto.AppConfigVersion) m
 	return appDetails
 }
 
-func getApps(oldApps []model.App, items []dto.AppDefine, systemVersion string, task *task.Task) map[string]model.App {
+func getApps(oldApps []model.App, items []dto.AppDefine, systemVersion string, task *task.Task) (map[string]model.App, map[string]string) {
 	apps := make(map[string]model.App, len(oldApps))
+	pendingIcons := make(map[string]string, len(items))
 	for _, old := range oldApps {
 		old.Status = constant.AppTakeDown
 		apps[old.Key] = old
@@ -1337,9 +1338,12 @@ func getApps(oldApps []model.App, items []dto.AppDefine, systemVersion string, t
 		app.Architectures = strings.Join(config.Architectures, ",")
 		app.GpuSupport = config.GpuSupport
 		app.BatchInstallSupport = config.BatchInstallSupport
+		if item.Icon != "" {
+			pendingIcons[key] = item.Icon
+		}
 		apps[key] = app
 	}
-	return apps
+	return apps, pendingIcons
 }
 
 func handleLocalAppDetail(versionDir string, appDetail *model.AppDetail) error {
