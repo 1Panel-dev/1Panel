@@ -49,6 +49,10 @@ core/xpack
 core/router/entry_xpack.go
 core/server/init_xpack.go
 core/utils/xpack/xpack_xpack.go
+core/xpack-ee
+core/router/entry_xpack_ee.go
+core/server/init_xpack_ee.go
+core/utils/xpack/xpack_xpack_ee.go
 xpack
 
 .history/
