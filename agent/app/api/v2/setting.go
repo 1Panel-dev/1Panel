@@ -80,7 +80,10 @@ func (b *BaseApi) LoadLocalConn(c *gin.Context) {
 }
 
 func (b *BaseApi) CheckLocalConn(c *gin.Context) {
-	_, err := loadLocalConn()
+	client, err := loadLocalConn()
+	if err == nil && client != nil {
+		client.Close()
+	}
 	helper.SuccessWithData(c, err == nil)
 }
 
