@@ -949,10 +949,6 @@ func (a AppService) GetAppIcon(key string) ([]byte, string, string, error) {
 		return nil, "", "", err
 	}
 
-	if strings.HasPrefix(app.Icon, "http") {
-		return nil, "", "", nil
-	}
-
 	if appicon.IsIconFile(app.Icon) {
 		fileName, etag := appicon.ParseIconField(app.Icon)
 		iconBytes, err := appicon.ReadIconFile(fileName)
