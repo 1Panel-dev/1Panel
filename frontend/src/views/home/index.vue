@@ -168,7 +168,7 @@
                     class="my-carousel"
                     :key="simpleNodes.length"
                     height="368px"
-                    :indicator-position="showSimpleNode() ? '' : 'none'"
+                    indicator-position=""
                     arrow="never"
                 >
                     <el-carousel-item key="systemInfo">
@@ -270,6 +270,55 @@
                             </template>
                         </CardWithHeader>
                     </el-carousel-item>
+                    <el-carousel-item key="memo">
+                        <CardWithHeader :header="$t('home.memo')">
+                            <template #header-r>
+                                <el-button
+                                    v-if="!memoEditing"
+                                    class="h-button-setting"
+                                    @click="startMemoEdit"
+                                    link
+                                    icon="Edit"
+                                />
+                                <el-button
+                                    v-if="memoEditing"
+                                    class="h-button-setting"
+                                    @click="saveMemo"
+                                    link
+                                    icon="Check"
+                                    :loading="memoSaving"
+                                />
+                                <el-button
+                                    v-if="memoEditing"
+                                    class="h-button-setting"
+                                    @click="cancelMemoEdit"
+                                    link
+                                    icon="Close"
+                                />
+                            </template>
+                            <template #body>
+                                <el-scrollbar height="286px">
+                                    <div class="memo-container ml-5 mr-5">
+                                        <el-input
+                                            v-if="memoEditing"
+                                            v-model="memoEditContent"
+                                            type="textarea"
+                                            :rows="10"
+                                            :maxlength="500"
+                                            show-word-limit
+                                            :placeholder="$t('home.memoPlaceholder')"
+                                        />
+                                        <div v-else class="memo-content" @click="startMemoEdit">
+                                            <pre v-if="memoContent">{{ memoContent }}</pre>
+                                            <span v-else class="memo-placeholder">
+                                                {{ $t('home.memoPlaceholder') }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </el-scrollbar>
+                            </template>
+                        </CardWithHeader>
+                    </el-carousel-item>
                     <el-carousel-item key="simpleNode" v-if="showSimpleNode()">
                         <CardWithHeader :header="$t('setting.panel')">
                             <template #body>
@@ -333,7 +382,7 @@ import { dateFormatForSecond, computeSize, computeSizeFromKBs, loadUpTime, jumpT
 import { useRouter } from 'vue-router';
 import { loadBaseInfo, loadCurrentInfo } from '@/api/modules/dashboard';
 import { getIOOptions, getNetworkOptions } from '@/api/modules/host';
-import { getSettingInfo, listAllSimpleNodes, loadUpgradeInfo } from '@/api/modules/setting';
+import { getSettingInfo, listAllSimpleNodes, loadUpgradeInfo, getMemo, updateMemo } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
 import { storeToRefs } from 'pinia';
 import { routerToFileWithPath, routerToPath } from '@/utils/router';
@@ -388,6 +437,11 @@ const searchInfo = reactive({
     ioOption: 'all',
     netOption: 'all',
 });
+
+const memoContent = ref('');
+const memoEditContent = ref('');
+const memoEditing = ref(false);
+const memoSaving = ref(false);
 
 const baseInfo = ref<Dashboard.BaseInfo>({
     hostname: '',
@@ -692,6 +746,39 @@ const handleCopy = () => {
     copyText(content);
 };
 
+const loadMemo = async () => {
+    try {
+        const res = await getMemo();
+        memoContent.value = res.data || '';
+    } catch (error) {
+        // ignore error
+    }
+};
+
+const startMemoEdit = () => {
+    memoEditContent.value = memoContent.value;
+    memoEditing.value = true;
+};
+
+const cancelMemoEdit = () => {
+    memoEditing.value = false;
+    memoEditContent.value = '';
+};
+
+const saveMemo = async () => {
+    memoSaving.value = true;
+    try {
+        await updateMemo(memoEditContent.value);
+        memoContent.value = memoEditContent.value;
+        memoEditing.value = false;
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+    } catch (error) {
+        // error handled by http interceptor
+    } finally {
+        memoSaving.value = false;
+    }
+};
+
 const loadData = async () => {
     if (chartOption.value === 'io') {
         chartsOption.value['ioChart'] = {
@@ -841,6 +928,7 @@ const clearTimer = () => {
 
 onMounted(() => {
     fetchData();
+    loadMemo();
     if (localStorage.getItem('welcomeShow') !== 'false') {
         loadWelcome();
     }
@@ -977,5 +1065,35 @@ onBeforeUnmount(() => {
 
 .chart-card {
     min-height: 383px;
+}
+
+.memo-container {
+    height: 270px;
+}
+
+.memo-content {
+    cursor: pointer;
+    min-height: 100px;
+    padding: 10px;
+    border-radius: 4px;
+    background-color: var(--el-fill-color-light);
+    word-wrap: break-word;
+    white-space: pre-wrap;
+
+    pre {
+        margin: 0;
+        font-family: inherit;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
+
+    &:hover {
+        background-color: var(--el-fill-color);
+    }
+}
+
+.memo-placeholder {
+    color: var(--el-text-color-placeholder);
+    font-style: italic;
 }
 </style>

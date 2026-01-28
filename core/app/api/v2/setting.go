@@ -598,6 +598,42 @@ func (b *BaseApi) GetAppstoreConfig(c *gin.Context) {
 	helper.SuccessWithData(c, res)
 }
 
+// @Tags System Setting
+// @Summary Load dashboard memo
+// @Success 200 {string} memo
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /core/settings/memo [get]
+func (b *BaseApi) GetMemo(c *gin.Context) {
+	memo, err := settingService.GetMemo()
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, memo)
+}
+
+// @Tags System Setting
+// @Summary Update dashboard memo
+// @Accept json
+// @Param request body dto.MemoUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /core/settings/memo [post]
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新仪表盘备忘录","formatEN":"update dashboard memo"}
+func (b *BaseApi) UpdateMemo(c *gin.Context) {
+	var req dto.MemoUpdate
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := settingService.UpdateMemo(req.Content); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
 func checkEntrancePattern(val string) bool {
 	if len(val) == 0 {
 		return true

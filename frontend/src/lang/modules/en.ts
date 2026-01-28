@@ -469,6 +469,10 @@ const message = {
 
         networkCard: 'Network card',
         disk: 'Disk',
+
+        memo: 'Memo',
+        memoPlaceholder: 'Click to edit memo...',
+        memoHelper: 'Memo content supports up to 500 characters',
     },
     tabs: {
         more: 'More',

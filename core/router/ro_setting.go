@@ -53,5 +53,8 @@ func (s *SettingRouter) InitRouter(Router *gin.RouterGroup) {
 
 		settingRouter.POST("/apps/store/update", baseApi.UpdateAppstoreConfig)
 		settingRouter.GET("/apps/store/config", baseApi.GetAppstoreConfig)
+
+		settingRouter.GET("/memo", baseApi.GetMemo)
+		settingRouter.POST("/memo", baseApi.UpdateMemo)
 	}
 }
