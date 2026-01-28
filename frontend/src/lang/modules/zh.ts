@@ -458,7 +458,6 @@ const message = {
 
         memo: '备忘录',
         memoPlaceholder: '点击编辑备忘录内容...',
-        memoHelper: '备忘录内容最多支持 500 个字符',
     },
     tabs: {
         more: '更多',

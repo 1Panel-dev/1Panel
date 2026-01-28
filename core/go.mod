@@ -20,9 +20,7 @@ require (
 	github.com/jinzhu/copier v0.4.0
 	github.com/nicksnyder/go-i18n/v2 v2.4.0
 	github.com/oschwald/maxminddb-golang v1.13.1
-	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/pkg/errors v0.9.1
-	github.com/pkg/sftp v1.13.6
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/sirupsen/logrus v1.9.3
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
@@ -75,7 +73,6 @@ require (
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.8 // indirect
-	github.com/kr/fs v0.1.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mailru/easyjson v0.7.6 // indirect

@@ -218,5 +218,5 @@ export const getMemo = () => {
     return http.get<string>(`/core/settings/memo`);
 };
 export const updateMemo = (content: string) => {
-    return http.post(`/core/settings/memo`, { content: content });
+    return http.post(`/core/settings/memo`, { content });
 };
