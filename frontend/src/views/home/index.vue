@@ -388,7 +388,7 @@ import { storeToRefs } from 'pinia';
 import { routerToFileWithPath, routerToPath } from '@/utils/router';
 import { getWelcomePage } from '@/api/modules/auth';
 import { clearDashboardCache, getDashboardCache, setDashboardCache } from '@/utils/dashboardCache';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
 const router = useRouter();
 const globalStore = GlobalStore();
 
@@ -751,7 +751,8 @@ const loadMemo = async () => {
         const res = await getMemo();
         memoContent.value = res.data || '';
     } catch (error) {
-        // ignore error
+        MsgError(error.message);
+        memoContent.value = '';
     }
 };
 
@@ -773,7 +774,7 @@ const saveMemo = async () => {
         memoEditing.value = false;
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
     } catch (error) {
-        // error handled by http interceptor
+        MsgError(error.message);
     } finally {
         memoSaving.value = false;
     }
