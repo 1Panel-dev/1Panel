@@ -459,6 +459,9 @@ const message = {
 
         networkCard: '네트워크 카드',
         disk: '디스크',
+        memo: '메모',
+        memoPlaceholder: '클릭하여 메모를 편집...',
+        tooltipSensitiveInfo: '민감한 정보 표시/숨기기',
     },
     tabs: {
         more: '더 보기',

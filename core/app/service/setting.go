@@ -66,6 +66,9 @@ type ISettingService interface {
 	UpdateAppstoreConfig(req dto.AppstoreUpdate) error
 	GetAppstoreConfig() (*dto.AppstoreConfig, error)
 	DefaultMenu() error
+
+	GetMemo() (string, error)
+	UpdateMemo(content string) error
 }
 
 func NewISettingService() ISettingService {
@@ -780,4 +783,16 @@ func checkProxy(req dto.ProxyUpdate) error {
 
 func (u *SettingService) DefaultMenu() error {
 	return settingRepo.DefaultMenu()
+}
+
+func (u *SettingService) GetMemo() (string, error) {
+	memo, err := settingRepo.GetValueByKey("DashboardMemo")
+	if err != nil {
+		return "", nil
+	}
+	return memo, nil
+}
+
+func (u *SettingService) UpdateMemo(content string) error {
+	return settingRepo.UpdateOrCreate("DashboardMemo", content)
 }

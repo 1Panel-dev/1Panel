@@ -212,3 +212,11 @@ export const generateApiKey = () => {
 export const updateApiConfig = (param: Setting.ApiConfig) => {
     return http.post(`/core/settings/api/config/update`, param);
 };
+
+// memo
+export const getMemo = () => {
+    return http.get<string>(`/core/settings/memo`);
+};
+export const updateMemo = (content: string) => {
+    return http.post(`/core/settings/memo`, { content });
+};

@@ -469,6 +469,10 @@ const message = {
 
         networkCard: 'Network card',
         disk: 'Disk',
+
+        memo: 'Memo',
+        memoPlaceholder: 'Click to edit memo...',
+        tooltipSensitiveInfo: 'Show/Hide sensitive info',
     },
     tabs: {
         more: 'More',

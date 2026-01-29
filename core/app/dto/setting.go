@@ -263,3 +263,7 @@ type PasskeyInfo struct {
 	CreatedAt  string `json:"createdAt"`
 	LastUsedAt string `json:"lastUsedAt"`
 }
+
+type MemoUpdate struct {
+	Content string `json:"content" validate:"max=500"`
+}

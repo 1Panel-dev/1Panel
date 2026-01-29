@@ -165,23 +165,33 @@
             </el-col>
             <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
                 <el-carousel
+                    v-if="rightCard === 'server'"
                     class="my-carousel"
                     :key="simpleNodes.length"
                     height="368px"
-                    :indicator-position="showSimpleNode() ? '' : 'none'"
+                    indicator-position=""
                     arrow="never"
                 >
                     <el-carousel-item key="systemInfo">
                         <CardWithHeader :header="$t('home.systemInfo')">
                             <template #header-r>
-                                <el-button class="h-button-setting" @click="refreshDashboard" link icon="Refresh" />
-                                <el-button
-                                    class="h-button-setting"
-                                    @click="toggleSensitiveInfo"
-                                    link
-                                    :icon="showSensitiveInfo ? 'View' : 'Hide'"
-                                />
-                                <el-button class="h-button-setting" @click="handleCopy" link icon="CopyDocument" />
+                                <el-tooltip :content="$t('home.memo')" placement="top">
+                                    <el-button class="h-button-setting" @click="showMemoCard" link icon="Management" />
+                                </el-tooltip>
+                                <el-tooltip :content="$t('commons.button.refresh')" placement="top">
+                                    <el-button class="h-button-setting" @click="refreshDashboard" link icon="Refresh" />
+                                </el-tooltip>
+                                <el-tooltip :content="$t('home.tooltipSensitiveInfo')" placement="top">
+                                    <el-button
+                                        class="h-button-setting"
+                                        @click="toggleSensitiveInfo"
+                                        link
+                                        :icon="showSensitiveInfo ? 'View' : 'Hide'"
+                                    />
+                                </el-tooltip>
+                                <el-tooltip :content="$t('commons.button.copy')" placement="top">
+                                    <el-button class="h-button-setting" @click="handleCopy" link icon="CopyDocument" />
+                                </el-tooltip>
                             </template>
                             <template #body>
                                 <el-scrollbar>
@@ -272,6 +282,11 @@
                     </el-carousel-item>
                     <el-carousel-item key="simpleNode" v-if="showSimpleNode()">
                         <CardWithHeader :header="$t('setting.panel')">
+                            <template #header-r>
+                                <el-button class="h-button-setting" @click="showMemoCard" link>
+                                    {{ $t('home.memo') }}
+                                </el-button>
+                            </template>
                             <template #body>
                                 <el-scrollbar height="286px">
                                     <div class="simple-node cursor-pointer" v-for="row in simpleNodes" :key="row.id">
@@ -305,6 +320,49 @@
                         </CardWithHeader>
                     </el-carousel-item>
                 </el-carousel>
+                <CardWithHeader v-else :header="$t('home.memo')" class="memo-card">
+                    <template #header-r>
+                        <el-tooltip v-if="!memoEditing" :content="$t('commons.button.edit')" placement="top">
+                            <el-button class="h-button-setting" @click="startMemoEdit" link icon="Edit" />
+                        </el-tooltip>
+                        <el-tooltip v-if="memoEditing" :content="$t('commons.button.save')" placement="top">
+                            <el-button
+                                class="h-button-setting"
+                                @click="saveMemo"
+                                link
+                                icon="Check"
+                                :loading="memoSaving"
+                            />
+                        </el-tooltip>
+                        <el-tooltip v-if="memoEditing" :content="$t('commons.button.cancel')" placement="top">
+                            <el-button class="h-button-setting" @click="cancelMemoEdit" link icon="Close" />
+                        </el-tooltip>
+                        <el-tooltip :content="$t('commons.button.back')" placement="top">
+                            <el-button class="h-button-setting" @click="showServerCard" link icon="Back" />
+                        </el-tooltip>
+                    </template>
+                    <template #body>
+                        <el-scrollbar height="286px">
+                            <div class="memo-container ml-5 mr-5">
+                                <el-input
+                                    v-if="memoEditing"
+                                    v-model="memoEditContent"
+                                    type="textarea"
+                                    :rows="10"
+                                    :maxlength="500"
+                                    show-word-limit
+                                    :placeholder="$t('home.memoPlaceholder')"
+                                />
+                                <div v-else class="memo-content">
+                                    <MarkDownEditor v-if="memoContent" :content="memoContent" />
+                                    <span v-else class="memo-placeholder">
+                                        {{ $t('home.memoPlaceholder') }}
+                                    </span>
+                                </div>
+                            </div>
+                        </el-scrollbar>
+                    </template>
+                </CardWithHeader>
 
                 <AppLauncher ref="appRef" class="card-interval" />
             </el-col>
@@ -327,19 +385,20 @@ import VCharts from '@/components/v-charts/index.vue';
 import LicenseImport from '@/components/license-import/index.vue';
 import QuickJump from '@/views/home/quick/index.vue';
 import CardWithHeader from '@/components/card-with-header/index.vue';
+import MarkDownEditor from '@/components/mkdown-editor/index.vue';
 import i18n from '@/lang';
 import { Dashboard } from '@/api/interface/dashboard';
 import { dateFormatForSecond, computeSize, computeSizeFromKBs, loadUpTime, jumpToPath, copyText } from '@/utils/util';
 import { useRouter } from 'vue-router';
 import { loadBaseInfo, loadCurrentInfo } from '@/api/modules/dashboard';
 import { getIOOptions, getNetworkOptions } from '@/api/modules/host';
-import { getSettingInfo, listAllSimpleNodes, loadUpgradeInfo } from '@/api/modules/setting';
+import { getSettingInfo, listAllSimpleNodes, loadUpgradeInfo, getMemo, updateMemo } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
 import { storeToRefs } from 'pinia';
 import { routerToFileWithPath, routerToPath } from '@/utils/router';
 import { getWelcomePage } from '@/api/modules/auth';
 import { clearDashboardCache, getDashboardCache, setDashboardCache } from '@/utils/dashboardCache';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
 const router = useRouter();
 const globalStore = GlobalStore();
 
@@ -388,6 +447,13 @@ const searchInfo = reactive({
     ioOption: 'all',
     netOption: 'all',
 });
+
+const memoContent = ref('');
+const memoEditContent = ref('');
+const memoEditing = ref(false);
+const memoSaving = ref(false);
+const rightCard = ref<'server' | 'memo'>('server');
+const RIGHT_CARD_STORAGE_KEY = 'homeRightCardPreference';
 
 const baseInfo = ref<Dashboard.BaseInfo>({
     hostname: '',
@@ -692,6 +758,50 @@ const handleCopy = () => {
     copyText(content);
 };
 
+const loadMemo = async () => {
+    try {
+        const res = await getMemo();
+        memoContent.value = res.data || '';
+    } catch (error) {
+        MsgError(error.message);
+        memoContent.value = '';
+    }
+};
+
+const startMemoEdit = () => {
+    memoEditContent.value = memoContent.value;
+    memoEditing.value = true;
+};
+
+const cancelMemoEdit = () => {
+    memoEditing.value = false;
+    memoEditContent.value = '';
+};
+
+const saveMemo = async () => {
+    memoSaving.value = true;
+    try {
+        await updateMemo(memoEditContent.value);
+        memoContent.value = memoEditContent.value;
+        memoEditing.value = false;
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+    } catch (error) {
+        MsgError(error.message);
+    } finally {
+        memoSaving.value = false;
+    }
+};
+
+const showMemoCard = () => {
+    rightCard.value = 'memo';
+    localStorage.setItem(RIGHT_CARD_STORAGE_KEY, rightCard.value);
+};
+
+const showServerCard = () => {
+    rightCard.value = 'server';
+    localStorage.setItem(RIGHT_CARD_STORAGE_KEY, rightCard.value);
+};
+
 const loadData = async () => {
     if (chartOption.value === 'io') {
         chartsOption.value['ioChart'] = {
@@ -841,6 +951,11 @@ const clearTimer = () => {
 
 onMounted(() => {
     fetchData();
+    loadMemo();
+    const savedRightCard = localStorage.getItem(RIGHT_CARD_STORAGE_KEY);
+    if (savedRightCard === 'memo' || savedRightCard === 'server') {
+        rightCard.value = savedRightCard;
+    }
     if (localStorage.getItem('welcomeShow') !== 'false') {
         loadWelcome();
     }
@@ -872,6 +987,7 @@ onBeforeUnmount(() => {
 
     .count {
         margin-top: 10px;
+
         span {
             font-size: 18px;
             color: $primary-color;
@@ -885,6 +1001,7 @@ onBeforeUnmount(() => {
     margin-left: 18px;
     height: 306px;
 }
+
 @-moz-document url-prefix() {
     .h-systemInfo {
         height: auto;
@@ -912,29 +1029,36 @@ onBeforeUnmount(() => {
         margin-bottom: -4px;
         background-color: var(--el-text-color-regular);
     }
+
     .el-carousel__indicator.is-active .el-carousel__button {
         background-color: var(--panel-color-primary);
     }
+
     .el-descriptions .el-descriptions__body .el-descriptions__table {
-        border-spacing: 0 5px !important; /* 垂直间距15px */
+        border-spacing: 0 5px !important;
+        /* 垂直间距15px */
     }
 }
 
 .simple-node {
     padding: 10px 15px 10px 0px;
     margin: -8px 10px 3px 20px;
+
     &:hover {
         background-color: rgba(0, 94, 235, 0.03);
     }
+
     .name {
         font-weight: 500 !important;
         font-size: 16px !important;
         line-height: 30px;
         color: var(--panel-text-color);
     }
+
     .detail {
         font-size: 12px !important;
     }
+
     .visit {
         margin-bottom: -25px;
     }
@@ -970,6 +1094,7 @@ onBeforeUnmount(() => {
     .svg-icon {
         font-size: 7px;
     }
+
     span {
         line-height: 20px;
     }
@@ -977,5 +1102,31 @@ onBeforeUnmount(() => {
 
 .chart-card {
     min-height: 383px;
+}
+
+.memo-container {
+    height: 270px;
+}
+
+.memo-card {
+    height: 368px;
+}
+
+.memo-content {
+    min-height: 100px;
+    padding: 10px;
+    border-radius: 4px;
+    background-color: var(--el-fill-color-light);
+    word-wrap: break-word;
+    white-space: pre-wrap;
+
+    .md-editor {
+        background-color: transparent;
+    }
+}
+
+.memo-placeholder {
+    color: var(--el-text-color-placeholder);
+    font-style: italic;
 }
 </style>

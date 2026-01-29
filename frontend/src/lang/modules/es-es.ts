@@ -472,6 +472,9 @@ const message = {
         goInstall: 'Ir a instalar',
         networkCard: 'Tarjeta de red',
         disk: 'Disco',
+        memo: 'Memo',
+        memoPlaceholder: 'Haga clic para editar el memo...',
+        tooltipSensitiveInfo: 'Mostrar/Ocultar información sensible',
     },
     tabs: {
         more: 'Más',

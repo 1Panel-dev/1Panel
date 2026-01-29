@@ -460,6 +460,9 @@ const message = {
 
         networkCard: 'Интерфейс',
         disk: 'Диск',
+        memo: 'Заметка',
+        memoPlaceholder: 'Нажмите, чтобы редактировать заметку...',
+        tooltipSensitiveInfo: 'Показать/скрыть конфиденциальную информацию',
     },
     tabs: {
         more: 'Больше',
