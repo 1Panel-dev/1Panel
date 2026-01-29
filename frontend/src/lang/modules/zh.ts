@@ -458,6 +458,7 @@ const message = {
 
         memo: '备忘录',
         memoPlaceholder: '点击编辑备忘录内容...',
+        tooltipSensitiveInfo: '显示/隐藏敏感信息',
     },
     tabs: {
         more: '更多',

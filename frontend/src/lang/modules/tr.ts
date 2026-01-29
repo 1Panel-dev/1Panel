@@ -471,6 +471,9 @@ const message = {
 
         networkCard: 'Ağ kartı',
         disk: 'Disk',
+        memo: 'Not',
+        memoPlaceholder: 'Notu düzenlemek için tıklayın...',
+        tooltipSensitiveInfo: 'Hassas bilgileri göster/gizle',
     },
     tabs: {
         more: 'Daha Fazla',

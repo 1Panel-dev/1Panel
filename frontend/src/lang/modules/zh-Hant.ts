@@ -454,6 +454,9 @@ const message = {
 
         networkCard: '網卡',
         disk: '磁碟',
+        memo: '備忘錄',
+        memoPlaceholder: '點擊編輯備忘錄內容...',
+        tooltipSensitiveInfo: '顯示/隱藏敏感資訊',
     },
     tabs: {
         more: '更多',

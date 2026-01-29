@@ -472,6 +472,7 @@ const message = {
 
         memo: 'Memo',
         memoPlaceholder: 'Click to edit memo...',
+        tooltipSensitiveInfo: 'Show/Hide sensitive info',
     },
     tabs: {
         more: 'More',

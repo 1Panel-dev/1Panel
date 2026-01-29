@@ -463,6 +463,9 @@ const message = {
 
         networkCard: 'Placa de rede',
         disk: 'Disco',
+        memo: 'Memo',
+        memoPlaceholder: 'Clique para editar o memo...',
+        tooltipSensitiveInfo: 'Mostrar/Ocultar informações sensíveis',
     },
     tabs: {
         more: 'Mais',
