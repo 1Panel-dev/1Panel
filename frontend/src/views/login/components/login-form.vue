@@ -268,6 +268,8 @@ const errCaptcha = ref(false);
 const errMfaInfo = ref(false);
 const passkeySetting = ref(false);
 const passkeySupported = ref(false);
+const autoPasskeyTried = ref(false);
+const autoPasskeyTriedKey = '1panel-passkey-auto-tried';
 const showPasswordLogin = ref(false);
 const isDemo = ref(false);
 const isIntl = ref(true);
@@ -340,6 +342,17 @@ const captcha = reactive({
 const loading = ref<boolean>(false);
 const mfaShow = ref<boolean>(false);
 const dropdownText = ref('中文(简体)');
+const initAutoPasskeyTried = () => {
+    try {
+        autoPasskeyTried.value = sessionStorage.getItem(autoPasskeyTriedKey) === '1';
+    } catch (error) {}
+};
+const markAutoPasskeyTried = () => {
+    autoPasskeyTried.value = true;
+    try {
+        sessionStorage.setItem(autoPasskeyTriedKey, '1');
+    } catch (error) {}
+};
 
 const languageLabelMap: Record<string, string> = {
     zh: '中文(简体)',
@@ -602,6 +615,10 @@ const getSetting = async () => {
         if (res.data.passkeySetting && !isIntl.value && !isFxplay.value) {
             loginForm.agreeLicense = true;
         }
+        if (passkeySetting.value && passkeySupported.value && !autoPasskeyTried.value) {
+            markAutoPasskeyTried();
+            passkeyLogin();
+        }
     } catch (error) {}
 };
 
@@ -649,6 +666,7 @@ function adjustColorToRGBA(color: string, percent: number, opacity: number): str
 onMounted(() => {
     globalStore.isOnRestart = false;
     passkeySupported.value = !!window.PublicKeyCredential && window.isSecureContext;
+    initAutoPasskeyTried();
     getSetting();
     getXpackSettingForTheme();
     if (!globalStore.ignoreCaptcha) {
