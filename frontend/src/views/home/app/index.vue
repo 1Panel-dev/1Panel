@@ -27,7 +27,7 @@
                     <div class="h-app-card" v-for="(app, index) in apps" :key="index">
                         <el-row :gutter="5">
                             <el-col :span="5">
-                                <el-avatar shape="square" :size="55" :src="'data:image/png;base64,' + app.icon" />
+                                <el-avatar shape="square" :size="55" :src="getAppIconSrc(app)" />
                             </el-col>
                             <el-col :span="16">
                                 <div class="h-app-content" v-if="!app.currentRow">
@@ -179,7 +179,7 @@
 </template>
 
 <script lang="ts" setup>
-import { installedOp } from '@/api/modules/app';
+import { getAppIconUrl, installedOp } from '@/api/modules/app';
 import { getAgentSettingByKey } from '@/api/modules/setting';
 import { changeLauncherStatus, loadAppLauncher, loadAppLauncherOption } from '@/api/modules/dashboard';
 import i18n from '@/lang';
@@ -289,6 +289,14 @@ const onOperate = async (operation: string, row: any) => {
 const loadOption = async () => {
     const res = await loadAppLauncherOption(filter.value || '');
     options.value = res.data || [];
+};
+
+const getAppIconSrc = (app: any) => {
+    const icon = app?.icon || '';
+    if (icon.startsWith('app_') || icon === '') {
+        return getAppIconUrl(app.key);
+    }
+    return `data:image/png;base64,${icon}`;
 };
 
 defineExpose({
