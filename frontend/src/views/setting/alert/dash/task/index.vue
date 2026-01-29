@@ -328,6 +328,24 @@
                                 :disabled="!globalStore.isProductPro"
                                 :label="$t('xpack.alert.sms')"
                             />
+                            <el-option
+                                value="weCom"
+                                v-if="!globalStore.isIntl"
+                                :disabled="!globalStore.isProductPro"
+                                :label="$t('xpack.alert.weCom')"
+                            />
+                            <el-option
+                                value="dingTalk"
+                                v-if="!globalStore.isIntl"
+                                :disabled="!globalStore.isProductPro"
+                                :label="$t('xpack.alert.dingTalk')"
+                            />
+                            <el-option
+                                value="feiShu"
+                                v-if="!globalStore.isIntl"
+                                :disabled="!globalStore.isProductPro"
+                                :label="$t('xpack.alert.feiShu')"
+                            />
                         </el-select>
                     </el-form-item>
                     <span class="input-help">

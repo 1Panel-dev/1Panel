@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
@@ -586,8 +587,6 @@ func sendAlerts(alert dto.AlertDTO, alertType, quota, quotaType string, params [
 					continue
 				}
 				alertUtil.CreateNewAlertTask(quota, alertType, quotaType, constant.SMS)
-				global.LOG.Infof("%s alert sms push successful", alertType)
-
 			case constant.Email:
 				todayCount, isValid := canSendAlertToday(alertType, quotaType, alert.SendCount, constant.Email)
 				if !isValid {
@@ -610,7 +609,25 @@ func sendAlerts(alert dto.AlertDTO, alertType, quota, quotaType string, params [
 					continue
 				}
 				alertUtil.CreateNewAlertTask(quota, alertType, quotaType, constant.Email)
-				global.LOG.Infof("%s alert email push successful", alertType)
+			case constant.WeCom, constant.DingTalk, constant.FeiShu:
+				todayCount, isValid := canSendAlertToday(alertType, quotaType, alert.SendCount, m)
+				if !isValid {
+					continue
+				}
+				var create = dto.AlertLogCreate{
+					Type:    alertUtil.GetCronJobType(alert.Type),
+					AlertId: alert.ID,
+					Count:   todayCount + 1,
+				}
+				transport := xpack.LoadRequestTransport()
+				agentInfo, _ := xpack.GetAgentInfo()
+				err := xpack.CreateWebhookAlertLog(alertType, alert, create, quotaType, params, m, transport, agentInfo)
+				if err != nil {
+					global.LOG.Infof("%s alert webhook %s push faild, err: %v", alertType, m, err)
+					continue
+				}
+				alertUtil.CreateNewAlertTask(quota, alertUtil.GetCronJobType(alert.Type), quotaType, m)
+			default:
 			}
 		}
 	}
@@ -829,30 +846,36 @@ func processAllDisks(alert dto.AlertDTO) error {
 		global.LOG.Errorf("error getting disk list, err: %v", err)
 		return err
 	}
+	var errMsgs []string
 	for _, item := range diskList {
-		if success, err := checkAndCreateDiskAlert(alert, item.Path); err == nil && success {
-			global.LOG.Infof("disk alert pushed successfully for %s", item.Path)
+		err := checkAndCreateDiskAlert(alert, item.Path)
+		if err != nil {
+			errMsg := fmt.Sprintf("disk path %s process failed: %v", item.Path, err)
+			errMsgs = append(errMsgs, errMsg)
+			global.LOG.Errorf(errMsg)
+			continue
 		}
+	}
+	if len(errMsgs) > 0 {
+		return fmt.Errorf("batch process disks failed, error count: %d, details: %s", len(errMsgs), strings.Join(errMsgs, "; "))
 	}
 	return nil
 }
 
 func processSingleDisk(alert dto.AlertDTO) error {
-	success, err := checkAndCreateDiskAlert(alert, alert.Project)
+	err := checkAndCreateDiskAlert(alert, alert.Project)
 	if err != nil {
+		global.LOG.Errorf(err.Error())
 		return err
-	}
-	if success {
-		global.LOG.Infof("disk alert pushed successfully for %s", alert.Project)
 	}
 	return nil
 }
 
-func checkAndCreateDiskAlert(alert dto.AlertDTO, path string) (bool, error) {
+func checkAndCreateDiskAlert(alert dto.AlertDTO, path string) error {
 	usageStat, err := psutil.DISK.GetUsage(path, false)
 	if err != nil {
 		global.LOG.Errorf("error getting disk usage for %s, err: %v", path, err)
-		return false, err
+		return err
 	}
 
 	usedTotal, usedStr := calculateUsedTotal(alert.Cycle, usageStat)
@@ -861,13 +884,12 @@ func checkAndCreateDiskAlert(alert dto.AlertDTO, path string) (bool, error) {
 		commonTotal *= 1024 * 1024 * 1024
 	}
 	if usedTotal < commonTotal {
-		return false, nil
+		return nil
 	}
-	global.LOG.Infof("disk「 %s 」usage: %s", path, usedStr)
 	params := createAlertDiskParams(path, usedStr)
 	sender := NewAlertSender(alert, alert.Project)
 	sender.ResourceSend(path, params)
-	return true, nil
+	return nil
 }
 
 func calculateUsedTotal(cycle uint, usageStat *disk.UsageStat) (float64, string) {

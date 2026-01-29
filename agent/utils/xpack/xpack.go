@@ -61,6 +61,14 @@ func CreateSMSAlertLog(alertType string, info dto.AlertDTO, create dto.AlertLogC
 	return nil
 }
 
+func CreateTaskScanWebhookAlertLog(alert dto.AlertDTO, alertType string, create dto.AlertLogCreate, pushAlert dto.PushAlert, method string, transport *http.Transport, agentInfo *dto.AgentInfo) error {
+	return nil
+}
+
+func CreateWebhookAlertLog(alertType string, info dto.AlertDTO, create dto.AlertLogCreate, project string, params []dto.Param, method string, transport *http.Transport, agentInfo *dto.AgentInfo) error {
+	return nil
+}
+
 func GetLicenseErrorAlert() (uint, error) {
 	return 0, nil
 }

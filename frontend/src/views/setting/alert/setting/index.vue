@@ -40,7 +40,22 @@
         <LayoutContent :title="$t('commons.button.set')" v-loading="loading" :divider="true">
             <template #title>{{ $t('xpack.alert.methodConfig') }}</template>
             <template #main>
-                <div class="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
+                <el-alert type="info" :closable="false">
+                    <template #title>
+                        <div class="flex items-center justify-start">
+                            {{ $t('xpack.alert.alertConfigHelper') }}
+                            <el-link
+                                class="ml-1 text-xs"
+                                type="primary"
+                                target="_blank"
+                                :href="globalStore.docsUrl + '/user_manual/settings/#3'"
+                            >
+                                {{ $t('commons.button.helpDoc') }}
+                            </el-link>
+                        </div>
+                    </template>
+                </el-alert>
+                <div class="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3 mt-3">
                     <el-card class="rounded-2xl shadow hover:shadow-md transition-all">
                         <div class="flex items-center justify-between mb-2">
                             <div class="text-lg font-semibold">{{ $t('xpack.alert.emailConfig') }}</div>
@@ -67,7 +82,7 @@
                         </div>
                         <div class="text-sm mb-2">{{ $t('xpack.alert.emailConfigHelper') }}</div>
                         <el-divider class="!mb-2 !mt-3" />
-                        <div class="text-sm email-form" v-if="emailConfig.id">
+                        <div class="text-sm config-form" v-if="emailConfig.id">
                             <el-form
                                 @submit.prevent
                                 ref="alertFormRef"
@@ -117,14 +132,14 @@
                                 </el-button>
                             </div>
                         </div>
-                        <div class="text-sm mb-2">
+                        <div class="text-sm mb-2 flex items-center justify-start">
                             {{ $t('xpack.alert.alertSmsHelper', [totalSms, usedSms]) }}
                             <el-link class="ml-1 text-xs" @click="goBuy" type="primary" icon="Position">
                                 <span class="ml-0.5">{{ $t('xpack.alert.goBuy') }}</span>
                             </el-link>
                         </div>
                         <el-divider class="!mb-2 !mt-3" />
-                        <div class="text-sm email-form">
+                        <div class="text-sm config-form">
                             <el-form
                                 @submit.prevent
                                 ref="alertFormRef"
@@ -141,6 +156,156 @@
                             </el-form>
                         </div>
                     </el-card>
+                    <el-card
+                        class="rounded-2xl shadow hover:shadow-md transition-all"
+                        v-if="globalStore.isProductPro && !globalStore.isIntl"
+                    >
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="text-lg font-semibold">{{ $t('xpack.alert.weCom') }}</div>
+                            <div>
+                                <el-button
+                                    plain
+                                    round
+                                    size="default"
+                                    :disabled="!weComConfig.id"
+                                    @click="onChangeWeCom(weComConfig.id)"
+                                >
+                                    {{ $t('commons.button.edit') }}
+                                </el-button>
+                                <el-button
+                                    size="default"
+                                    plain
+                                    round
+                                    :disabled="!weComConfig.id"
+                                    @click="onDelete(weComConfig.id)"
+                                >
+                                    {{ $t('commons.button.delete') }}
+                                </el-button>
+                            </div>
+                        </div>
+                        <div class="text-sm mb-2">{{ $t('xpack.alert.weComConfigHelper') }}</div>
+                        <el-divider class="!mb-2 !mt-3" />
+                        <div class="text-sm config-form" v-if="weComConfig.id">
+                            <el-form
+                                @submit.prevent
+                                ref="alertFormRef"
+                                :label-position="mobile ? 'top' : 'left'"
+                                label-width="110px"
+                            >
+                                <el-form-item :label="$t('xpack.alert.webhookName')" prop="displayName">
+                                    {{ weComConfig.config.displayName }}
+                                </el-form-item>
+                                <el-form-item :label="$t('xpack.alert.webhookUrl')" prop="url">
+                                    {{ weComConfig.config.url }}
+                                </el-form-item>
+                            </el-form>
+                        </div>
+                        <el-alert v-else center class="alert" style="height: 257px" :closable="false">
+                            <el-button size="large" round plain type="primary" @click="onChangeWeCom(0)">
+                                {{ $t('commons.button.create') }}{{ $t('xpack.alert.weCom') }}
+                            </el-button>
+                        </el-alert>
+                    </el-card>
+                    <el-card
+                        class="rounded-2xl shadow hover:shadow-md transition-all"
+                        v-if="globalStore.isProductPro && !globalStore.isIntl"
+                    >
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="text-lg font-semibold">{{ $t('xpack.alert.dingTalk') }}</div>
+                            <div>
+                                <el-button
+                                    plain
+                                    round
+                                    size="default"
+                                    :disabled="!dingTalkConfig.id"
+                                    @click="onChangeDingTalk(dingTalkConfig.id)"
+                                >
+                                    {{ $t('commons.button.edit') }}
+                                </el-button>
+                                <el-button
+                                    size="default"
+                                    plain
+                                    round
+                                    :disabled="!dingTalkConfig.id"
+                                    @click="onDelete(dingTalkConfig.id)"
+                                >
+                                    {{ $t('commons.button.delete') }}
+                                </el-button>
+                            </div>
+                        </div>
+                        <div class="text-sm mb-2">{{ $t('xpack.alert.dingTalkConfigHelper') }}</div>
+                        <el-divider class="!mb-2 !mt-3" />
+                        <div class="text-sm config-form" v-if="dingTalkConfig.id">
+                            <el-form
+                                @submit.prevent
+                                ref="alertFormRef"
+                                :label-position="mobile ? 'top' : 'left'"
+                                label-width="110px"
+                            >
+                                <el-form-item :label="$t('xpack.alert.webhookName')" prop="displayName">
+                                    {{ dingTalkConfig.config.displayName }}
+                                </el-form-item>
+                                <el-form-item :label="$t('xpack.alert.webhookUrl')" prop="url">
+                                    {{ dingTalkConfig.config.url }}
+                                </el-form-item>
+                            </el-form>
+                        </div>
+                        <el-alert v-else center class="alert" style="height: 257px" :closable="false">
+                            <el-button size="large" round plain type="primary" @click="onChangeDingTalk(0)">
+                                {{ $t('commons.button.create') }}{{ $t('xpack.alert.dingTalk') }}
+                            </el-button>
+                        </el-alert>
+                    </el-card>
+                    <el-card
+                        class="rounded-2xl shadow hover:shadow-md transition-all"
+                        v-if="globalStore.isProductPro && !globalStore.isIntl"
+                    >
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="text-lg font-semibold">{{ $t('xpack.alert.feiShu') }}</div>
+                            <div>
+                                <el-button
+                                    plain
+                                    round
+                                    size="default"
+                                    :disabled="!feiShuConfig.id"
+                                    @click="onChangeDingTalk(feiShuConfig.id)"
+                                >
+                                    {{ $t('commons.button.edit') }}
+                                </el-button>
+                                <el-button
+                                    size="default"
+                                    plain
+                                    round
+                                    :disabled="!feiShuConfig.id"
+                                    @click="onDelete(feiShuConfig.id)"
+                                >
+                                    {{ $t('commons.button.delete') }}
+                                </el-button>
+                            </div>
+                        </div>
+                        <div class="text-sm mb-2">{{ $t('xpack.alert.feiShuConfigHelper') }}</div>
+                        <el-divider class="!mb-2 !mt-3" />
+                        <div class="text-sm config-form" v-if="feiShuConfig.id">
+                            <el-form
+                                @submit.prevent
+                                ref="alertFormRef"
+                                :label-position="mobile ? 'top' : 'left'"
+                                label-width="110px"
+                            >
+                                <el-form-item :label="$t('xpack.alert.webhookName')" prop="displayName">
+                                    {{ feiShuConfig.config.displayName }}
+                                </el-form-item>
+                                <el-form-item :label="$t('xpack.alert.webhookUrl')" prop="url">
+                                    {{ feiShuConfig.config.url }}
+                                </el-form-item>
+                            </el-form>
+                        </div>
+                        <el-alert v-else center class="alert" style="height: 257px" :closable="false">
+                            <el-button size="large" round plain type="primary" @click="onChangeFeiShu(0)">
+                                {{ $t('commons.button.create') }}{{ $t('xpack.alert.feiShu') }}
+                            </el-button>
+                        </el-alert>
+                    </el-card>
                 </div>
             </template>
         </LayoutContent>
@@ -148,6 +313,7 @@
         <EmailDrawer ref="emailRef" @search="search" />
         <Phone ref="phoneRef" @search="search" />
         <SendTimeRange ref="sendTimeRangeRef" @search="search" />
+        <WebhookDrawer ref="webHookRef" @search="search" />
     </div>
 </template>
 
@@ -162,6 +328,7 @@ import i18n from '@/lang';
 import { storeToRefs } from 'pinia';
 import { MsgSuccess } from '@/utils/message';
 import EmailDrawer from '@/views/setting/alert/setting/email/index.vue';
+import WebhookDrawer from '@/views/setting/alert/setting/webhook/index.vue';
 import { Alert } from '@/api/interface/alert';
 import { getLicenseSmsInfo } from '@/api/modules/setting';
 
@@ -172,29 +339,13 @@ const loading = ref(false);
 const alertFormRef = ref<FormInstance>();
 const phoneRef = ref();
 const emailRef = ref();
+const webHookRef = ref();
 const sendTimeRangeRef = ref();
 const sendTimeRangeValue = ref();
 const sendTimeRange = ref();
 
 const isInitialized = ref(false);
-export interface EmailConfig {
-    id?: number;
-    type: string;
-    title: string;
-    status: string;
-    config: {
-        status?: string;
-        sender?: string;
-        userName?: string;
-        password?: string;
-        displayName?: string;
-        host?: string;
-        port?: number;
-        encryption?: string;
-        recipient?: string;
-    };
-}
-const defaultEmailConfig: EmailConfig = {
+const defaultEmailConfig: Alert.EmailConfig = {
     id: undefined,
     type: 'email',
     title: 'xpack.alert.emailConfig',
@@ -211,19 +362,9 @@ const defaultEmailConfig: EmailConfig = {
         recipient: '',
     },
 };
-const emailConfig = ref<EmailConfig>({ ...defaultEmailConfig });
+const emailConfig = ref<Alert.EmailConfig>({ ...defaultEmailConfig });
 
-export interface CommonConfig {
-    id?: number;
-    type: string;
-    title: string;
-    status: string;
-    config: {
-        isOffline?: string;
-        alertSendTimeRange?: string;
-    };
-}
-const defaultCommonConfig: CommonConfig = {
+const defaultCommonConfig: Alert.CommonConfig = {
     id: undefined,
     type: 'common',
     title: 'xpack.alert.commonConfig',
@@ -241,19 +382,9 @@ const defaultCommonConfig: CommonConfig = {
     },
 };
 
-const commonConfig = ref<CommonConfig>({ ...defaultCommonConfig });
+const commonConfig = ref<Alert.CommonConfig>({ ...defaultCommonConfig });
 
-export interface SmsConfig {
-    id?: number;
-    type: string;
-    title: string;
-    status: string;
-    config: {
-        phone?: string;
-        alertDailyNum?: number;
-    };
-}
-const defaultSmsConfig: SmsConfig = {
+const defaultSmsConfig: Alert.SmsConfig = {
     id: undefined,
     type: 'sms',
     title: 'xpack.alert.smsConfig',
@@ -263,7 +394,43 @@ const defaultSmsConfig: SmsConfig = {
         alertDailyNum: 50,
     },
 };
-const smsConfig = ref<SmsConfig>({ ...defaultSmsConfig });
+const smsConfig = ref<Alert.SmsConfig>({ ...defaultSmsConfig });
+
+const defaultWeComConfig: Alert.WebhookConfig = {
+    id: undefined,
+    type: 'weCom',
+    title: 'xpack.alert.weCom',
+    status: 'Enable',
+    config: {
+        displayName: '',
+        url: '',
+    },
+};
+const weComConfig = ref<Alert.WebhookConfig>({ ...defaultWeComConfig });
+
+const defaultDingTalkConfig: Alert.WebhookConfig = {
+    id: undefined,
+    type: 'dingTalk',
+    title: 'xpack.alert.dingTalk',
+    status: 'Enable',
+    config: {
+        displayName: '',
+        url: '',
+    },
+};
+const dingTalkConfig = ref<Alert.WebhookConfig>({ ...defaultDingTalkConfig });
+
+const defaultFeiShuConfig: Alert.WebhookConfig = {
+    id: undefined,
+    type: 'feiShu',
+    title: 'xpack.alert.feiShu',
+    status: 'Enable',
+    config: {
+        displayName: '',
+        url: '',
+    },
+};
+const feiShuConfig = ref<Alert.WebhookConfig>({ ...defaultFeiShuConfig });
 
 const config = ref<Alert.AlertConfigInfo>({
     id: 0,
@@ -329,6 +496,15 @@ const search = async () => {
             i18n.global.t('xpack.alert.resourceAlert') +
             ': ' +
             resourceTimeRange;
+
+        const weComFound = res.data.find((s: any) => s.type === 'weCom');
+        assignConfig(weComFound, weComConfig, defaultWeComConfig);
+
+        const dingTalkFound = res.data.find((s: any) => s.type === 'dingTalk');
+        assignConfig(dingTalkFound, dingTalkConfig, defaultDingTalkConfig);
+
+        const feiShuFound = res.data.find((s: any) => s.type === 'feiShu');
+        assignConfig(feiShuFound, feiShuConfig, defaultFeiShuConfig);
         isInitialized.value = true;
     } finally {
         loading.value = false;
@@ -416,6 +592,33 @@ const goBuy = async () => {
     window.open('https://www.lxware.cn/uc/cloud/licenses/' + uri, '_blank', 'noopener,noreferrer');
 };
 
+const onChangeWeCom = (id: number) => {
+    webHookRef.value.acceptParams({
+        id: id,
+        config: weComConfig.value.config,
+        type: 'weCom',
+        title: weComConfig.value.title,
+    });
+};
+
+const onChangeDingTalk = (id: number) => {
+    webHookRef.value.acceptParams({
+        id: id,
+        config: dingTalkConfig.value.config,
+        type: 'dingTalk',
+        title: dingTalkConfig.value.title,
+    });
+};
+
+const onChangeFeiShu = (id: number) => {
+    webHookRef.value.acceptParams({
+        id: id,
+        config: feiShuConfig.value.config,
+        type: 'feiShu',
+        title: feiShuConfig.value.title,
+    });
+};
+
 onMounted(async () => {
     await search();
     if (globalStore.isProductPro && !globalStore.isIntl) {
@@ -427,7 +630,7 @@ onMounted(async () => {
 .label {
     color: var(--el-text-color-placeholder);
 }
-.email-form {
+.config-form {
     .el-form-item {
         margin-bottom: 0 !important;
     }

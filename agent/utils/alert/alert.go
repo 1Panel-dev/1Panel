@@ -49,19 +49,24 @@ func CreateEmailAlertLog(create dto.AlertLogCreate, alert dto.AlertDTO, params [
 		return err
 	}
 	create.Method = constant.Email
+	emailConfig, err := alertRepo.GetConfig(alertRepo.WithByType(constant.EmailConfig))
+	if err != nil {
+		return err
+	}
+	var emailInfo dto.AlertEmailConfig
+	err = json.Unmarshal([]byte(emailConfig.Config), &emailInfo)
+	if err != nil {
+		return err
+	}
+	if emailInfo.Host == "" {
+		create.Message = "email config is required"
+		create.Status = constant.AlertError
+		return SaveAlertLog(create, &alertLog)
+	}
 	if !global.IsMaster && cfg.IsOffline == constant.StatusEnable {
 		create.Status = constant.AlertPushing
 		return SaveAlertLog(create, &alertLog)
 	} else {
-		emailConfig, err := alertRepo.GetConfig(alertRepo.WithByType(constant.EmailConfig))
-		if err != nil {
-			return err
-		}
-		var emailInfo dto.AlertEmailConfig
-		err = json.Unmarshal([]byte(emailConfig.Config), &emailInfo)
-		if err != nil {
-			return err
-		}
 		username := emailInfo.UserName
 		if username == "" {
 			username = emailInfo.Sender
@@ -76,7 +81,7 @@ func CreateEmailAlertLog(create dto.AlertLogCreate, alert dto.AlertDTO, params [
 			Encryption: emailInfo.Encryption,
 			Recipient:  emailInfo.Recipient,
 		}
-		content := GetEmailContent(alert.Type, params, agentInfo)
+		content := GetSendContent(alert.Type, params, agentInfo)
 		if content == "" {
 			content = i18n.GetMsgWithMap("CommonAlert", map[string]interface{}{"msg": alert.Title})
 		}
@@ -122,6 +127,7 @@ func CreateNewAlertTask(quota, alertType, quotaType, method string) {
 	if err != nil {
 		global.LOG.Errorf("error creating alert tasks, err: %v", err)
 	}
+	global.LOG.Infof("%s alert %s push completed", alertType, method)
 }
 
 func ProcessAlertDetail(alert dto.AlertDTO, project string, params []dto.Param, method string) string {
@@ -300,7 +306,7 @@ func isWithinTimeRange(savedTimeString string) bool {
 	return now.After(skipTime) && now.Before(endSkipTime)
 }
 
-func GetEmailContent(alertType string, params []dto.Param, agentInfo *dto.AgentInfo) string {
+func GetSendContent(alertType string, params []dto.Param, agentInfo *dto.AgentInfo) string {
 	switch GetCronJobType(alertType) {
 	case "ssl":
 		return i18n.GetMsgWithMap("SSLAlert", map[string]interface{}{"num": getValueByIndex(params, "1"), "day": getValueByIndex(params, "2"), "node": getNodeName(agentInfo), "ip": getNodeIp(agentInfo)})

@@ -214,7 +214,24 @@ const formatMessage = (row: Alert.AlertInfo) => {
 };
 
 const formatMethod = (row: Alert.AlertLog) => {
-    return row.method === 'mail' ? t('xpack.alert.mail') : t('xpack.alert.sms');
+    switch (row.method) {
+        case 'mail':
+            return t('xpack.alert.mail');
+        case 'sms':
+            return t('xpack.alert.sms');
+        case 'dingTalk':
+            return t('xpack.alert.dingTalk');
+        case 'weCom':
+            return t('xpack.alert.weCom');
+        case 'feiShu':
+            return t('xpack.alert.feiShu');
+        case 'wechat':
+            return t('xpack.alert.wechat');
+        case 'webhook':
+            return t('xpack.alert.webhook');
+        default:
+            return t('xpack.alert.unknown');
+    }
 };
 
 const formatCount = (row: Alert.AlertInfo) => {

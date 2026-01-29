@@ -335,3 +335,8 @@ type AgentInfo struct {
 	NodeName string `json:"nodeName"`
 	NodeAddr string `json:"nodeAddr"`
 }
+
+type AlertWebhookConfig struct {
+	DisplayName string `json:"displayName"`
+	Url         string `json:"url"`
+}
