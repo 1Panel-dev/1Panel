@@ -2013,7 +2013,7 @@ const message = {
         https: 'Mengatur HTTPS untuk panel meningkatkan keselamatan akses',
         strictHelper: 'Trafik bukan HTTPS tidak boleh menyambung ke panel',
         muxHelper:
-            'Panel akan mendengar pada kedua-dua port HTTP dan HTTPS dan mengarahkan HTTP ke HTTPS, tetapi ini mungkin mengurangkan keselamatan',
+            'Panel akan mendengar pada kedua-dua protokol HTTP dan HTTPS dan mengarahkan HTTP ke HTTPS, tetapi ini mungkin mengurangkan keselamatan panel',
         certType: 'Jenis sijil',
         selfSigned: 'Diterbitkan sendiri',
         selfSignedHelper:

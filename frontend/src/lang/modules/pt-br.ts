@@ -2001,7 +2001,7 @@ const message = {
         https: 'Configurar HTTPS para o painel melhora a segurança de acesso',
         strictHelper: 'Tráfego não HTTPS não pode se conectar ao painel',
         muxHelper:
-            'O painel ouvirá nas portas HTTP e HTTPS e redirecionará HTTP para HTTPS, mas isso pode reduzir a segurança',
+            'O painel ouvirá nas protocolos HTTP e HTTPS e redirecionará HTTP para HTTPS, mas isso pode reduzir a segurança do painel',
         certType: 'Tipo de certificado',
         selfSigned: 'Autoassinado',
         selfSignedHelper:

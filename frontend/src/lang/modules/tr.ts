@@ -2053,7 +2053,7 @@ const message = {
         https: 'Panel için HTTPS ayarlamak erişim güvenliğini artırır',
         strictHelper: 'HTTPS olmayan trafik panele bağlanamaz',
         muxHelper:
-            "Panel hem HTTP hem de HTTPS portlarını dinleyecek ve HTTP'yi HTTPS'ye yönlendirecektir, ancak bu güvenliği azaltabilir",
+            "Panel hem HTTP hem de HTTPS protokollarını dinleyecek ve HTTP'yi HTTPS'ye yönlendirecektir, bu modda panel güvenliğini azaltabilir",
         certType: 'Sertifika türü',
         selfSigned: 'Kendi kendine imzalı',
         selfSignedHelper:

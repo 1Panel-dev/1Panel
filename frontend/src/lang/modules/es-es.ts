@@ -2046,7 +2046,7 @@ const message = {
         https: 'Configurar HTTPS para el panel mejora la seguridad de acceso',
         strictHelper: 'El tráfico no HTTPS no puede conectarse al panel',
         muxHelper:
-            'El panel escuchará en los puertos HTTP y HTTPS y redirigirá HTTP a HTTPS, pero esto puede reducir la seguridad',
+            'El panel escuchará en los protocolos HTTP y HTTPS y redirigirá HTTP a HTTPS, pero esto puede reducir la seguridad del panel',
         certType: 'Tipo de certificado',
         selfSigned: 'Autofirmado',
         selfSignedHelper:

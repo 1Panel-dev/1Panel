@@ -1923,7 +1923,8 @@ const message = {
 
         https: '패널에 HTTPS를 설정하면 액세스 보안이 향상됩니다',
         strictHelper: '비 HTTPS 트래픽은 패널에 연결할 수 없습니다',
-        muxHelper: '패널은 HTTP 및 HTTPS 포트 모두를 수신하고 HTTP를 HTTPS로 리디렉션하지만 보안이 저하될 수 있습니다',
+        muxHelper:
+            '패널은 HTTP 및 HTTPS 프로토콜 모두를 수신하고 HTTP를 HTTPS로 리디렉션하지만 보안이 저하될 수 있습니다',
         certType: '인증서 유형',
         selfSigned: '자가 서명',
         selfSignedHelper: '자가 서명 인증서는 브라우저에서 신뢰하지 않을 수 있으며 보안 경고가 표시될 수 있습니다.',

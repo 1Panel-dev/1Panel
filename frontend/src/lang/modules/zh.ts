@@ -1976,7 +1976,7 @@ const message = {
 
         https: '为面板设置HTTPS可提升访问安全性',
         strictHelper: '非 HTTPS 流量无法连接面板',
-        muxHelper: '面板将同时监听 HTTP 和 HTTPS 端口，并将 HTTP 重定向到 HTTPS，但可能会降低安全性',
+        muxHelper: '面板将同时监听 HTTP 和 HTTPS 协议，并将 HTTP 重定向到 HTTPS，此模式下可能会降低面板安全性',
         certType: '证书类型',
         selfSigned: '自签名',
         selfSignedHelper: '自签证书，不被浏览器信任，显示不安全是正常现象',
