@@ -347,7 +347,7 @@
                 >
                     <el-input v-model.trim="dialogData.rowData!.varsJson['redirect_uri']" />
                 </el-form-item>
-                <el-form-item :label="$t('setting.code')" prop="varsJson.code" :rules="rules.driveCode">
+                <el-form-item :label="$t('setting.code')" prop="varsJson.code">
                     <div class="!w-full">
                         <el-input
                             style="width: calc(100% - 80px)"
@@ -430,19 +430,6 @@ const regionInput = ref();
 
 const domainProto = ref('http');
 const emit = defineEmits(['search']);
-const rules = reactive({
-    driveCode: [{ validator: checkDriveCode, required: true, trigger: 'blur' }],
-});
-function checkDriveCode(rule: any, value: any, callback: any) {
-    if (!value) {
-        return callback(new Error(i18n.global.t('setting.codeWarning')));
-    }
-    const reg = /^[A-Za-z0-9/_.-]+$/;
-    if (!reg.test(value)) {
-        return callback(new Error(i18n.global.t('setting.codeWarning')));
-    }
-    callback();
-}
 
 interface DialogProps {
     title: string;
@@ -725,6 +712,11 @@ const onCheck = async (formEl: FormInstance | undefined) => {
             } else {
                 dialogData.value.rowData!.varsJson['endpoint'] = itemEndpoint;
             }
+        }
+        if (isOneDrive()) {
+            dialogData.value.rowData!.varsJson['code'] = decodeURIComponent(
+                dialogData.value.rowData!.varsJson['code'] || '',
+            );
         }
         if (isALIYUNYUN()) {
             dialogData.value.rowData!.varsJson['token'] = undefined;

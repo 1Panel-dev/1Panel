@@ -535,7 +535,7 @@ func loadRefreshTokenByCode(backup *model.BackupAccount) (string, error) {
 	if err := json.Unmarshal([]byte(backup.Vars), &varMap); err != nil {
 		return "", fmt.Errorf("unmarshal backup vars failed, err: %v", err)
 	}
-	if _, ok := varMap["refresh_token"]; ok {
+	if token, ok := varMap["refresh_token"]; ok && len(token.(string)) != 0 {
 		return "", nil
 	}
 	refreshToken := ""
