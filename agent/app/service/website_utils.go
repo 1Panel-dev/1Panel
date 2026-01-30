@@ -1233,7 +1233,7 @@ func saveCertificateFile(websiteSSL *model.WebsiteSSL, logger *log.Logger) {
 func GetSystemSSL() (bool, uint) {
 	var sslSetting model.Setting
 	_ = global.CoreDB.Model(&model.Setting{}).Where("key = ?", "SSL").First(&sslSetting).Error
-	if sslSetting.Value == "Enable" {
+	if sslSetting.Value == "Enable" || sslSetting.Value == "Mux" {
 		var sslIDSetting model.Setting
 		_ = global.CoreDB.Model(&model.Setting{}).Where("key = ?", "SSLID").First(&sslIDSetting).Error
 		idValue, _ := strconv.Atoi(sslIDSetting.Value)
