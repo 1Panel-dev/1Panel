@@ -849,6 +849,17 @@ func applySSL(website *model.Website, websiteSSL model.WebsiteSSL, req request.W
 				nginxParams[i].Params = []string{"ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256:!aNULL:!eNULL:!EXPORT:!DSS:!DES:!RC4:!3DES:!MD5:!PSK:!KRB5:!SRP:!CAMELLIA:!SEED"}
 			}
 		}
+		if param.Name == "error_page" {
+			if len(param.Params) < 2 {
+				continue
+			}
+			code := param.Params[0]
+			if code == "497" {
+				if sslPort != 443 && param.Params[1] == "https://$host$request_uri" {
+					param.Params[1] = fmt.Sprintf("https://$host:%d$request_uri", sslPort)
+				}
+			}
+		}
 	}
 	if req.Hsts {
 		var hstsValue string
