@@ -651,7 +651,7 @@
                             <el-row :gutter="20">
                                 <LayoutCol v-if="isBackup() && !isDatabase()">
                                     <el-form-item :label="$t('setting.compressPassword')" prop="secret">
-                                        <el-input v-model="form.secret" />
+                                        <el-input type="password" show-password v-model="form.secret" />
                                     </el-form-item>
                                 </LayoutCol>
                                 <LayoutCol>

@@ -290,6 +290,7 @@ export namespace App {
         required?: boolean;
         multiple?: boolean;
         label: Locale;
+        showPassword: boolean;
     }
 
     export interface AppConfig {
