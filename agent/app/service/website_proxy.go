@@ -4,6 +4,10 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"path"
+	"strconv"
+	"strings"
+
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/response"
@@ -17,9 +21,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/nginx/components"
 	"github.com/1Panel-dev/1Panel/agent/utils/nginx/parser"
 	"github.com/1Panel-dev/1Panel/agent/utils/re"
-	"path"
-	"strconv"
-	"strings"
 )
 
 func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error) {
@@ -119,6 +120,9 @@ func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error)
 		location.RemoveServerCache(fmt.Sprintf("proxy_cache_zone_of_%s", website.Alias))
 	}
 	// Browser Cache Settings
+	// cacheTime > 0: enable expires;
+	// cacheTime == 0: use upstream cache-control, remove self-set;
+	// cacheTime < 0: force no-cache
 	if req.CacheTime > 0 {
 		location.AddBrowserCache(req.CacheTime, req.CacheUnit)
 	} else if req.CacheTime < 0 {
