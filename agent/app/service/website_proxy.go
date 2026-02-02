@@ -119,8 +119,10 @@ func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error)
 		location.RemoveServerCache(fmt.Sprintf("proxy_cache_zone_of_%s", website.Alias))
 	}
 	// Browser Cache Settings
-	if req.CacheTime != 0 {
+	if req.CacheTime > 0 {
 		location.AddBrowserCache(req.CacheTime, req.CacheUnit)
+	} else if req.CacheTime < 0 {
+		location.AddBroswerNoCache()
 	} else {
 		location.RemoveBrowserCache()
 	}

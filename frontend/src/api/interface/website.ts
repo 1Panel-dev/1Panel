@@ -445,7 +445,7 @@ export namespace Website {
         allowHeaders: string;
         allowCredentials: boolean;
         preflight: boolean;
-        browserCache?: boolean;
+        browserCache?: 'enable' | 'disable' | 'noModify';
     }
 
     export interface ProxReplace {
