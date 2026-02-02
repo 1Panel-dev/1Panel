@@ -2016,23 +2016,26 @@ func handleSiteDir(app model.App, appDetail model.AppDetail, req request.AppInst
 			req.Params["WEBSITE_DIR"] = siteDir
 			oldWebStePath, _ := settingRepo.GetValueByKey("WEBSITE_DIR")
 			fileOp := files.NewFileOp()
+			movePath := func(src, dst string) error {
+				return cmd.NewCommandMgr().Run("mv", src, dst)
+			}
 			if oldWebStePath != "" && oldWebStePath != siteDir && fileOp.Stat(oldWebStePath) {
 				t.Log(i18n.GetWithName("MoveSiteDir", siteDir))
 				if fileOp.Stat(siteDir) {
 					if fileOp.Stat(path.Join(siteDir, "conf.d")) {
-						_ = fileOp.Rename(path.Join(siteDir, "conf.d"), path.Join(siteDir, "conf.d.bak"))
+						_ = movePath(path.Join(siteDir, "conf.d"), path.Join(siteDir, "conf.d.bak"))
 					}
 					if fileOp.Stat(path.Join(siteDir, "sites")) {
-						_ = fileOp.Rename(path.Join(siteDir, "sites"), path.Join(siteDir, "sites.bak"))
+						_ = movePath(path.Join(siteDir, "sites"), path.Join(siteDir, "sites.bak"))
 					}
-					if err := fileOp.Rename(path.Join(oldWebStePath, "sites"), path.Join(siteDir, "sites")); err != nil {
+					if err := movePath(path.Join(oldWebStePath, "sites"), path.Join(siteDir, "sites")); err != nil {
 						return err
 					}
-					if err := fileOp.Rename(path.Join(oldWebStePath, "conf.d"), path.Join(siteDir, "conf.d")); err != nil {
+					if err := movePath(path.Join(oldWebStePath, "conf.d"), path.Join(siteDir, "conf.d")); err != nil {
 						return err
 					}
 				} else {
-					err := fileOp.Rename(oldWebStePath, siteDir)
+					err := movePath(oldWebStePath, siteDir)
 					if err != nil {
 						return err
 					}
