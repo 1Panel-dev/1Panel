@@ -39,7 +39,7 @@ export const batchDeleteFile = (form: File.FileBatchDelete) => {
 };
 
 export const changeFileMode = (form: File.FileCreate) => {
-    return http.post<File.File>('files/mode', form);
+    return http.post<File.File>('files/mode', form, TimeoutEnum.T_5M);
 };
 
 export const compressFile = (form: File.FileCompress) => {
@@ -148,7 +148,7 @@ export const removeFavorite = (id: number) => {
 };
 
 export const batchChangeRole = (params: File.FileRole) => {
-    return http.post<any>('files/batch/role', params);
+    return http.post<any>('files/batch/role', params, TimeoutEnum.T_5M);
 };
 
 export const getRecycleStatus = () => {

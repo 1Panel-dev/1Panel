@@ -33,6 +33,11 @@ import (
 	"github.com/spf13/afero"
 )
 
+const (
+	cmdDefaultTimeout   = 10 * time.Second
+	cmdRecursiveTimeout = 5 * time.Minute
+)
+
 var protectedPaths = []string{
 	"/",
 	"/bin",
@@ -222,7 +227,11 @@ func (f FileOp) ChownR(dst string, uid string, gid string, sub bool) error {
 	if sub {
 		cmdStr = fmt.Sprintf(`chown -R %s:%s "%s"`, uid, gid, dst)
 	}
-	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(10 * time.Second))
+	timeout := cmdDefaultTimeout
+	if sub {
+		timeout = cmdRecursiveTimeout
+	}
+	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(timeout))
 	if err := cmdMgr.RunBashC(cmdStr); err != nil {
 		return err
 	}
@@ -234,7 +243,11 @@ func (f FileOp) ChmodR(dst string, mode int64, sub bool) error {
 	if sub {
 		cmdStr = fmt.Sprintf(`%s chmod -R %v "%s"`, cmd.SudoHandleCmd(), fmt.Sprintf("%04o", mode), dst)
 	}
-	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(10 * time.Second))
+	timeout := cmdDefaultTimeout
+	if sub {
+		timeout = cmdRecursiveTimeout
+	}
+	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(timeout))
 	if err := cmdMgr.RunBashC(cmdStr); err != nil {
 		return err
 	}
@@ -246,7 +259,70 @@ func (f FileOp) ChmodRWithMode(dst string, mode fs.FileMode, sub bool) error {
 	if sub {
 		cmdStr = fmt.Sprintf(`%s chmod -R %v "%s"`, cmd.SudoHandleCmd(), fmt.Sprintf("%o", mode.Perm()), dst)
 	}
-	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(10 * time.Second))
+	timeout := cmdDefaultTimeout
+	if sub {
+		timeout = cmdRecursiveTimeout
+	}
+	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(timeout))
+	if err := cmdMgr.RunBashC(cmdStr); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (f FileOp) ChownRPaths(paths []string, uid string, gid string, sub bool) error {
+	if len(paths) == 0 {
+		return nil
+	}
+	if len(paths) == 1 {
+		return f.ChownR(paths[0], uid, gid, sub)
+	}
+	quoted := make([]string, len(paths))
+	for i, p := range paths {
+		quoted[i] = fmt.Sprintf(`"%s"`, p)
+	}
+	args := strings.Join(quoted, " ")
+	var cmdStr string
+	if sub {
+		cmdStr = fmt.Sprintf(`chown -R %s:%s %s`, uid, gid, args)
+	} else {
+		cmdStr = fmt.Sprintf(`%s chown %s:%s %s`, cmd.SudoHandleCmd(), uid, gid, args)
+	}
+	timeout := cmdDefaultTimeout
+	if sub {
+		timeout = cmdRecursiveTimeout
+	}
+	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(timeout))
+	if err := cmdMgr.RunBashC(cmdStr); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (f FileOp) ChmodRPaths(paths []string, mode int64, sub bool) error {
+	if len(paths) == 0 {
+		return nil
+	}
+	if len(paths) == 1 {
+		return f.ChmodR(paths[0], mode, sub)
+	}
+	quoted := make([]string, len(paths))
+	for i, p := range paths {
+		quoted[i] = fmt.Sprintf(`"%s"`, p)
+	}
+	args := strings.Join(quoted, " ")
+	modeStr := fmt.Sprintf("%04o", mode)
+	var cmdStr string
+	if sub {
+		cmdStr = fmt.Sprintf(`%s chmod -R %s %s`, cmd.SudoHandleCmd(), modeStr, args)
+	} else {
+		cmdStr = fmt.Sprintf(`%s chmod %s %s`, cmd.SudoHandleCmd(), modeStr, args)
+	}
+	timeout := cmdDefaultTimeout
+	if sub {
+		timeout = cmdRecursiveTimeout
+	}
+	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(timeout))
 	if err := cmdMgr.RunBashC(cmdStr); err != nil {
 		return err
 	}

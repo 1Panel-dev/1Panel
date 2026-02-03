@@ -315,19 +315,18 @@ func (f *FileService) ChangeMode(op request.FileCreate) error {
 
 func (f *FileService) BatchChangeModeAndOwner(op request.FileRoleReq) error {
 	fo := files.NewFileOp()
-	for _, path := range op.Paths {
-		if !fo.Stat(path) {
+	for _, p := range op.Paths {
+		if !fo.Stat(p) {
 			return buserr.New("ErrPathNotFound")
 		}
-		if err := fo.ChownR(path, op.User, op.Group, op.Sub); err != nil {
-			return err
-		}
-		if err := fo.ChmodR(path, op.Mode, op.Sub); err != nil {
-			return err
-		}
+	}
+	if err := fo.ChownRPaths(op.Paths, op.User, op.Group, op.Sub); err != nil {
+		return err
+	}
+	if err := fo.ChmodRPaths(op.Paths, op.Mode, op.Sub); err != nil {
+		return err
 	}
 	return nil
-
 }
 
 func (f *FileService) ChangeOwner(req request.FileRoleUpdate) error {
