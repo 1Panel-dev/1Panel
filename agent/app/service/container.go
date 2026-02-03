@@ -74,7 +74,7 @@ type IContainerService interface {
 	ContainerCommit(req dto.ContainerCommit) error
 	ContainerLogClean(req dto.OperationWithName) error
 	ContainerOperation(req dto.ContainerOperation) error
-	DownloadContainerLogs(containerType, container, since, tail string, c *gin.Context) error
+	DownloadContainerLogs(containerType, container, since, tail string, timestamp bool, c *gin.Context) error
 	ContainerStats(id string) (*dto.ContainerStats, error)
 	Inspect(req dto.InspectReq) (string, error)
 	DeleteNetwork(req dto.BatchDelete) error
@@ -952,6 +952,9 @@ func collectLogs(done <-chan struct{}, params dto.StreamLog, messageChan chan<- 
 	if params.Follow {
 		cmdArgs = append(cmdArgs, "-f")
 	}
+	if params.Timestamp {
+		cmdArgs = append(cmdArgs, "-t")
+	}
 	if params.Tail != "0" {
 		cmdArgs = append(cmdArgs, "--tail", params.Tail)
 	}
@@ -1048,7 +1051,7 @@ func collectLogs(done <-chan struct{}, params dto.StreamLog, messageChan chan<- 
 	_ = dockerCmd.Wait()
 }
 
-func (u *ContainerService) DownloadContainerLogs(containerType, container, since, tail string, c *gin.Context) error {
+func (u *ContainerService) DownloadContainerLogs(containerType, container, since, tail string, timestamp bool, c *gin.Context) error {
 	if cmd.CheckIllegal(container, since, tail) {
 		return buserr.New("ErrCmdIllegal")
 	}
@@ -1075,6 +1078,9 @@ func (u *ContainerService) DownloadContainerLogs(containerType, container, since
 	if since != "all" {
 		commandArg = append(commandArg, "--since")
 		commandArg = append(commandArg, since)
+	}
+	if timestamp {
+		commandArg = append(commandArg, "-t")
 	}
 	var dockerCmd *exec.Cmd
 	if containerType == "compose" && dockerCommand == "docker-compose" {

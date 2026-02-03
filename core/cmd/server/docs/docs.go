@@ -4594,6 +4594,12 @@ const docTemplate = `{
 						"in": "query",
 						"name": "tail",
 						"type": "string"
+					},
+					{
+						"description": "是否显示时间",
+						"in": "query",
+						"name": "timestamp",
+						"type": "string"
 					}
 				],
 				"responses": {
