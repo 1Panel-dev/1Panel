@@ -16,6 +16,7 @@
                     v-model:mask-show="maskShow"
                     v-model:loading="loading"
                     @is-exist="checkExist"
+                    ref="appStatusRef"
                 ></AppStatus>
             </template>
             <template v-if="!openNginxConfig && nginxIsExist" #leftToolBar>
@@ -95,6 +96,8 @@
                             <Domain
                                 :row="row"
                                 :is-hovered="hoveredRowIndex === $index"
+                                :defaultHttpPort="appStatusRef?.getHttpPort?.() || 0"
+                                :defaultHttpsPort="appStatusRef?.getHttpsPort?.() || 0"
                                 @favorite-change="favoriteWebsite"
                                 @domain-edit="handleDomainEdit"
                             />
@@ -369,6 +372,7 @@ const opRef = ref();
 const batchSetGroupRef = ref();
 const batchSetHttpsRef = ref();
 const nginxVersion = ref();
+const appStatusRef = ref();
 
 const paginationConfig = reactive({
     cacheSizeKey: 'website-page-size',

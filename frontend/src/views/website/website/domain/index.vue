@@ -74,6 +74,8 @@ import { GetPunyCodeDomain, isPunycoded } from '@/utils/util';
 interface Props {
     row: Website.Website;
     isHovered: boolean;
+    defaultHttpPort: number;
+    defaultHttpsPort: number;
 }
 const props = defineProps<Props>();
 const emit = defineEmits(['favoriteChange', 'domainEdit']);
@@ -164,8 +166,14 @@ const getUrl = (domain: Website.Domain, website: Website.Website): string => {
 
     if (protocol === 'http' && domain.port && domain.port !== 80) {
         url = `${url}:${domain.port}`;
-    } else if (protocol === 'https' && domain.port && domain.port !== 443) {
-        url = `${url}:${domain.port}`;
+    } else if (protocol === 'https') {
+        let port = domain.port;
+        if (!domain.ssl) {
+            port = props.defaultHttpsPort || 443;
+        }
+        if (port && port !== 443) {
+            url = `${url}:${port}`;
+        }
     }
 
     return url;
