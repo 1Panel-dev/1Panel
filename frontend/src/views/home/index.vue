@@ -650,6 +650,7 @@ const toggleSensitiveInfo = () => {
 
 const refreshDashboard = async () => {
     clearDashboardCache();
+    onLoadBaseInfo(false, '');
     hasRefreshedOptionsOnHover.value = false;
     await Promise.allSettled([onLoadNetworkOptions(true), onLoadIOOptions(true), loadSafeStatus()]);
     MsgSuccess(i18n.global.t('commons.msg.refreshSuccess'));
@@ -739,7 +740,7 @@ const handleCopy = () => {
         ': ' +
         baseInfo.value.kernelVersion +
         '\n' +
-        i18n.global.t('home.kernelVersion') +
+        i18n.global.t('home.kernelArch') +
         ': ' +
         baseInfo.value.kernelArch +
         '\n' +
