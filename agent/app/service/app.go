@@ -949,8 +949,9 @@ func (a AppService) SyncAppListFromRemote(taskID string) (err error) {
 	if xpack.IsUseCustomApp() {
 		return nil
 	}
-	global.LOG.Info("[AppStore] sync app list from remote: start")
+
 	appStoreSyncMu.Lock()
+	global.LOG.Info("[AppStore] sync app from remote task create start")
 	if appStoreSyncing {
 		appStoreSyncMu.Unlock()
 		global.LOG.Info("[AppStore] sync already in progress, skipping")
@@ -959,7 +960,6 @@ func (a AppService) SyncAppListFromRemote(taskID string) (err error) {
 	appStoreSyncing = true
 	appStoreSyncMu.Unlock()
 
-	global.LOG.Info("[AppStore] sync app list from remote: main sync task")
 	syncTask, err := task.NewTaskWithOps(i18n.GetMsgByKey("App"), task.TaskSync, task.TaskScopeAppStore, taskID, 0)
 	if err != nil {
 		appStoreSyncMu.Lock()
@@ -967,8 +967,6 @@ func (a AppService) SyncAppListFromRemote(taskID string) (err error) {
 		appStoreSyncMu.Unlock()
 		return err
 	}
-
-	global.LOG.Info("[AppStore] sync app list from remote:  resource info sync task")
 
 	var sharedCtx *appSyncContext
 
@@ -998,7 +996,7 @@ func (a AppService) SyncAppListFromRemote(taskID string) (err error) {
 		}
 	}()
 
-	global.LOG.Info("[AppStore] sync app list from remote: end")
+	global.LOG.Info("[AppStore] sync app from remote task create ok")
 	return nil
 }
 
