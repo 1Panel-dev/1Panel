@@ -2,6 +2,7 @@ package migrations
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"os/user"
@@ -820,4 +821,136 @@ var AddWebsiteAcmeAccountColumn = &gormigrate.Migration{
 	Migrate: func(tx *gorm.DB) error {
 		return tx.AutoMigrate(&model.WebsiteAcmeAccount{})
 	},
+}
+
+var AddAgentTables = &gormigrate.Migration{
+	ID: "20260205-add-agent-tables",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(
+			&model.Agent{},
+			&model.AgentAccount{},
+		)
+	},
+}
+
+var MigrateOpenclawAgents = &gormigrate.Migration{
+	ID: "20260207-migrate-openclaw-agents",
+	Migrate: func(tx *gorm.DB) error {
+		var installs []model.AppInstall
+		if err := tx.Preload("App").Find(&installs).Error; err != nil {
+			return err
+		}
+		for _, install := range installs {
+			appKey := install.App.Key
+			if appKey == "" || install.App.Resource == "" {
+				var app model.App
+				if err := tx.First(&app, install.AppId).Error; err == nil {
+					install.App = app
+					appKey = app.Key
+				}
+			}
+			if appKey != constant.AppOpenclaw {
+				continue
+			}
+			var count int64
+			if err := tx.Model(&model.Agent{}).Where("app_install_id = ?", install.ID).Count(&count).Error; err != nil {
+				return err
+			}
+			if count > 0 {
+				continue
+			}
+			envMap := map[string]interface{}{}
+			if strings.TrimSpace(install.Env) != "" {
+				_ = json.Unmarshal([]byte(install.Env), &envMap)
+			}
+			provider := strings.ToLower(getEnvStr(envMap, "PROVIDER"))
+			if provider == "" {
+				continue
+			}
+			modelName := getEnvStr(envMap, "MODEL")
+			baseURL := getEnvStr(envMap, "BASE_URL")
+			apiKey := getEnvStr(envMap, "API_KEY")
+			token := getEnvStr(envMap, "OPENCLAW_GATEWAY_TOKEN")
+			if provider != "ollama" {
+				if baseURL == "" {
+					if defaultURL, ok := defaultBaseURL(provider); ok {
+						baseURL = defaultURL
+					}
+				}
+			}
+			if provider == "ollama" && baseURL == "" {
+				continue
+			}
+			var account model.AgentAccount
+			err := tx.Where("provider = ? AND api_key = ? AND base_url = ?", provider, apiKey, baseURL).First(&account).Error
+			if err != nil {
+				if errors.Is(err, gorm.ErrRecordNotFound) {
+					account = model.AgentAccount{
+						Provider: provider,
+						Name:     install.Name,
+						APIKey:   apiKey,
+						BaseURL:  baseURL,
+						Verified: apiKey != "" || provider == "ollama",
+					}
+					if err := tx.Create(&account).Error; err != nil {
+						return err
+					}
+				} else {
+					return err
+				}
+			}
+			configPath := path.Join(install.GetPath(), "data", "conf", "openclaw.json")
+			agent := model.Agent{
+				Name:         install.Name,
+				Provider:     provider,
+				Model:        modelName,
+				BaseURL:      baseURL,
+				APIKey:       apiKey,
+				Token:        token,
+				Status:       install.Status,
+				Message:      install.Message,
+				AppInstallID: install.ID,
+				AccountID:    account.ID,
+				ConfigPath:   configPath,
+			}
+			if err := tx.Create(&agent).Error; err != nil {
+				return err
+			}
+		}
+		return nil
+	},
+}
+
+func getEnvStr(envMap map[string]interface{}, key string) string {
+	if envMap == nil {
+		return ""
+	}
+	if value, ok := envMap[key]; ok {
+		switch v := value.(type) {
+		case string:
+			return strings.TrimSpace(v)
+		default:
+			return strings.TrimSpace(fmt.Sprintf("%v", v))
+		}
+	}
+	return ""
+}
+
+func defaultBaseURL(provider string) (string, bool) {
+	switch provider {
+	case "openai":
+		return "https://api.openai.com/v1", true
+	case "anthropic":
+		return "https://api.anthropic.com", true
+	case "gemini":
+		return "https://generativelanguage.googleapis.com", true
+	case "minimax":
+		return "https://api.minimax.chat/v1", true
+	case "deepseek":
+		return "https://api.deepseek.com/v1", true
+	case "qwen":
+		return "https://dashscope.aliyuncs.com/compatible-mode/v1", true
+	default:
+		return "", false
+	}
 }

@@ -383,7 +383,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 			req.AppDetailId = create.AppInstall.AppDetailId
 			req.Params = create.AppInstall.Params
 			req.AppContainerConfig = create.AppInstall.AppContainerConfig
-			install, err = NewIAppService().Install(req)
+			install, err = NewIAppService().Install(req, true)
 			if err != nil {
 				return err
 			}

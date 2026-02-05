@@ -556,6 +556,20 @@ var AddDiskMenu = &gormigrate.Migration{
 	},
 }
 
+var AddAgentsMenu = &gormigrate.Migration{
+	ID: "20260204-add-agents-menu",
+	Migrate: func(tx *gorm.DB) error {
+		return helper.AddMenu(dto.ShowMenu{
+			ID:       "44",
+			Disabled: false,
+			Title:    "aiTools.agents.agents",
+			IsShow:   true,
+			Label:    "Agents",
+			Path:     "/ai/agents/agent",
+		}, "4", tx)
+	},
+}
+
 var AddSimpleNodeGroup = &gormigrate.Migration{
 	ID: "20250916-add-simple-node-group",
 	Migrate: func(tx *gorm.DB) error {

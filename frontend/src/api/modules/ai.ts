@@ -1,6 +1,6 @@
 import { AI } from '@/api/interface/ai';
 import http from '@/api';
-import { ResPage } from '../interface';
+import { ResPage, SearchWithPage } from '../interface';
 
 export const createOllamaModel = (name: string, taskID: string) => {
     return http.post(`/ai/ollama/model`, { name: name, taskID: taskID });
@@ -90,4 +90,40 @@ export const deleteTensorRTLLM = (req: AI.TensorRTLLMDelete) => {
 
 export const operateTensorRTLLM = (req: AI.TensorRTLLMOperate) => {
     return http.post(`/ai/tensorrt/operate`, req);
+};
+
+export const createAgent = (req: AI.AgentCreateReq) => {
+    return http.post<AI.AgentItem>(`/ai/agents`, req);
+};
+
+export const pageAgents = (req: SearchWithPage) => {
+    return http.post<ResPage<AI.AgentItem>>(`/ai/agents/search`, req);
+};
+
+export const deleteAgent = (req: AI.AgentDeleteReq) => {
+    return http.post(`/ai/agents/delete`, req);
+};
+
+export const getAgentProviders = () => {
+    return http.get<AI.ProviderInfo[]>(`/ai/agents/providers`);
+};
+
+export const createAgentAccount = (req: AI.AgentAccountCreateReq) => {
+    return http.post(`/ai/agents/accounts`, req);
+};
+
+export const updateAgentAccount = (req: AI.AgentAccountUpdateReq) => {
+    return http.post(`/ai/agents/accounts/update`, req);
+};
+
+export const pageAgentAccounts = (req: AI.AgentAccountSearch) => {
+    return http.post<ResPage<AI.AgentAccountItem>>(`/ai/agents/accounts/search`, req);
+};
+
+export const verifyAgentAccount = (req: AI.AgentAccountVerifyReq) => {
+    return http.post(`/ai/agents/accounts/verify`, req);
+};
+
+export const deleteAgentAccount = (req: AI.AgentAccountDeleteReq) => {
+    return http.post(`/ai/agents/accounts/delete`, req);
 };

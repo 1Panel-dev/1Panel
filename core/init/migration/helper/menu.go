@@ -22,6 +22,7 @@ func LoadMenus() string {
 			}},
 		{ID: "4", Disabled: false, Title: "menu.aiTools", IsShow: true, Label: "AI-Menu", Path: "/ai/model", Sort: 400,
 			Children: []dto.ShowMenu{
+				{ID: "44", Disabled: false, Title: "aiTools.agents.agents", IsShow: true, Label: "Agents", Path: "/ai/agents/agent", Sort: 50},
 				{ID: "41", Disabled: false, Title: "aiTools.model.model", IsShow: true, Label: "OllamaModel", Path: "/ai/model", Sort: 100},
 				{ID: "42", Disabled: false, Title: "menu.mcp", IsShow: true, Label: "MCPServer", Path: "/ai/mcp", Sort: 200},
 				{ID: "43", Disabled: false, Title: "aiTools.gpu.gpu", IsShow: true, Label: "GPU", Path: "/ai/gpu", Sort: 300},
@@ -68,6 +69,7 @@ func MenuSort() []dto.MenuLabelSort {
 		{Label: "SSL", Sort: 200},
 		{Label: "PHP", Sort: 300},
 		{Label: "AI-Menu", Sort: 400},
+		{Label: "Agents", Sort: 50},
 		{Label: "OllamaModel", Sort: 100},
 		{Label: "MCPServer", Sort: 200},
 		{Label: "GPU", Sort: 300},

@@ -164,7 +164,7 @@ func (b *BaseApi) InstallApp(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	install, err := appService.Install(req)
+	install, err := appService.Install(req, true)
 	if err != nil {
 		helper.InternalServer(c, err)
 		return

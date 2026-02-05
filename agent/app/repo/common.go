@@ -72,6 +72,33 @@ func WithByDetailName(detailName string) DBOption {
 	}
 }
 
+func WithByProvider(provider string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		if len(provider) == 0 {
+			return g
+		}
+		return g.Where("provider = ?", provider)
+	}
+}
+
+func WithByModel(model string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		if len(model) == 0 {
+			return g
+		}
+		return g.Where("model = ?", model)
+	}
+}
+
+func WithByAccountID(accountID uint) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		if accountID == 0 {
+			return g
+		}
+		return g.Where("account_id = ?", accountID)
+	}
+}
+
 func WithByType(tp string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("`type` = ?", tp)

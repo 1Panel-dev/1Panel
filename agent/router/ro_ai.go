@@ -39,5 +39,15 @@ func (a *AIToolsRouter) InitRouter(Router *gin.RouterGroup) {
 		aiToolsRouter.POST("/tensorrt/update", baseApi.UpdateTensorRTLLM)
 		aiToolsRouter.POST("/tensorrt/delete", baseApi.DeleteTensorRTLLM)
 		aiToolsRouter.POST("/tensorrt/operate", baseApi.OperateTensorRTLLM)
+
+		aiToolsRouter.POST("/agents", baseApi.CreateAgent)
+		aiToolsRouter.POST("/agents/search", baseApi.PageAgents)
+		aiToolsRouter.POST("/agents/delete", baseApi.DeleteAgent)
+		aiToolsRouter.GET("/agents/providers", baseApi.GetAgentProviders)
+		aiToolsRouter.POST("/agents/accounts", baseApi.CreateAgentAccount)
+		aiToolsRouter.POST("/agents/accounts/update", baseApi.UpdateAgentAccount)
+		aiToolsRouter.POST("/agents/accounts/search", baseApi.PageAgentAccounts)
+		aiToolsRouter.POST("/agents/accounts/verify", baseApi.VerifyAgentAccount)
+		aiToolsRouter.POST("/agents/accounts/delete", baseApi.DeleteAgentAccount)
 	}
 }

@@ -1,0 +1,109 @@
+package dto
+
+import "time"
+
+type AgentCreateReq struct {
+	Name          string  `json:"name" validate:"required"`
+	AppVersion    string  `json:"appVersion" validate:"required"`
+	WebUIPort     int     `json:"webUIPort" validate:"required"`
+	BridgePort    int     `json:"bridgePort" validate:"required"`
+	Provider      string  `json:"provider" validate:"required"`
+	Model         string  `json:"model" validate:"required"`
+	AccountID     uint    `json:"accountId"`
+	APIKey        string  `json:"apiKey"`
+	BaseURL       string  `json:"baseURL"`
+	Token         string  `json:"token"`
+	TaskID        string  `json:"taskID"`
+	Advanced      bool    `json:"advanced"`
+	ContainerName string  `json:"containerName"`
+	AllowPort     bool    `json:"allowPort"`
+	SpecifyIP     string  `json:"specifyIP"`
+	RestartPolicy string  `json:"restartPolicy"`
+	CpuQuota      float64 `json:"cpuQuota"`
+	MemoryLimit   float64 `json:"memoryLimit"`
+	MemoryUnit    string  `json:"memoryUnit"`
+	PullImage     bool    `json:"pullImage"`
+	EditCompose   bool    `json:"editCompose"`
+	DockerCompose string  `json:"dockerCompose"`
+}
+
+type AgentItem struct {
+	ID           uint      `json:"id"`
+	Name         string    `json:"name"`
+	Provider     string    `json:"provider"`
+	Model        string    `json:"model"`
+	BaseURL      string    `json:"baseUrl"`
+	APIKey       string    `json:"apiKey"`
+	Token        string    `json:"token"`
+	Status       string    `json:"status"`
+	Message      string    `json:"message"`
+	AppInstallID uint      `json:"appInstallId"`
+	AppVersion   string    `json:"appVersion"`
+	Container    string    `json:"containerName"`
+	WebUIPort    int       `json:"webUIPort"`
+	BridgePort   int       `json:"bridgePort"`
+	Path         string    `json:"path"`
+	ConfigPath   string    `json:"configPath"`
+	CreatedAt    time.Time `json:"createdAt"`
+}
+
+type AgentDeleteReq struct {
+	ID          uint   `json:"id" validate:"required"`
+	TaskID      string `json:"taskID"`
+	ForceDelete bool   `json:"forceDelete"`
+}
+
+type AgentAccountCreateReq struct {
+	Provider string `json:"provider" validate:"required"`
+	Name     string `json:"name" validate:"required"`
+	APIKey   string `json:"apiKey" validate:"required"`
+	BaseURL  string `json:"baseURL"`
+	Remark   string `json:"remark"`
+}
+
+type AgentAccountUpdateReq struct {
+	ID         uint   `json:"id" validate:"required"`
+	Name       string `json:"name" validate:"required"`
+	APIKey     string `json:"apiKey" validate:"required"`
+	BaseURL    string `json:"baseURL"`
+	Remark     string `json:"remark"`
+	SyncAgents bool   `json:"syncAgents"`
+}
+
+type AgentAccountVerifyReq struct {
+	Provider string `json:"provider" validate:"required"`
+	APIKey   string `json:"apiKey" validate:"required"`
+	BaseURL  string `json:"baseURL"`
+}
+
+type AgentAccountDeleteReq struct {
+	ID uint `json:"id" validate:"required"`
+}
+
+type AgentAccountSearch struct {
+	PageInfo
+	Provider string `json:"provider"`
+	Name     string `json:"name"`
+}
+
+type AgentAccountInfo struct {
+	ID        uint      `json:"id"`
+	Provider  string    `json:"provider"`
+	Name      string    `json:"name"`
+	APIKey    string    `json:"apiKey"`
+	BaseURL   string    `json:"baseUrl"`
+	Verified  bool      `json:"verified"`
+	Remark    string    `json:"remark"`
+	CreatedAt time.Time `json:"createdAt"`
+}
+
+type ProviderModelInfo struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
+type ProviderInfo struct {
+	Provider string              `json:"provider"`
+	BaseURL  string              `json:"baseUrl"`
+	Models   []ProviderModelInfo `json:"models"`
+}

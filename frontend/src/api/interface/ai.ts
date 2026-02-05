@@ -235,4 +235,112 @@ export namespace AI {
         id: number;
         operate: string;
     }
+
+    export interface AgentCreateReq {
+        name: string;
+        appVersion: string;
+        webUIPort: number;
+        bridgePort: number;
+        provider: string;
+        model: string;
+        accountId: number;
+        apiKey: string;
+        baseURL: string;
+        token: string;
+        taskID: string;
+        advanced: boolean;
+        containerName: string;
+        allowPort: boolean;
+        specifyIP: string;
+        restartPolicy: string;
+        cpuQuota: number;
+        memoryLimit: number;
+        memoryUnit: string;
+        pullImage: boolean;
+        editCompose: boolean;
+        dockerCompose: string;
+    }
+
+    export interface AgentItem {
+        id: number;
+        name: string;
+        provider: string;
+        model: string;
+        baseUrl: string;
+        apiKey: string;
+        token: string;
+        status: string;
+        message: string;
+        appInstallId: number;
+        appVersion: string;
+        containerName: string;
+        webUIPort: number;
+        bridgePort: number;
+        path: string;
+        configPath: string;
+        createdAt: string;
+    }
+
+
+    export interface AgentDeleteReq {
+        id: number;
+        taskID: string;
+        forceDelete: boolean;
+    }
+
+    export interface ProviderModelInfo {
+        id: string;
+        name: string;
+    }
+
+    export interface ProviderInfo {
+        provider: string;
+        baseUrl: string;
+        models: ProviderModelInfo[];
+    }
+
+    export interface AgentAccountCreateReq {
+        provider: string;
+        name: string;
+        apiKey: string;
+        baseURL: string;
+        remark: string;
+    }
+
+    export interface AgentAccountUpdateReq {
+        id: number;
+        name: string;
+        apiKey: string;
+        baseURL: string;
+        remark: string;
+        syncAgents: boolean;
+    }
+
+    export interface AgentAccountSearch {
+        page: number;
+        pageSize: number;
+        provider: string;
+        name: string;
+    }
+
+    export interface AgentAccountItem {
+        id: number;
+        provider: string;
+        name: string;
+        apiKey: string;
+        baseUrl: string;
+        verified: boolean;
+        remark: string;
+        createdAt: string;
+    }
+
+    export interface AgentAccountVerifyReq {
+        provider: string;
+        apiKey: string;
+        baseURL: string;
+    }
+
+    export interface AgentAccountDeleteReq {
+        id: number;
+    }
 }

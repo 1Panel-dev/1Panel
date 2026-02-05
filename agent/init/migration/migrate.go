@@ -63,6 +63,8 @@ func InitAgentDB() {
 		migrations.UpdateApp,
 		migrations.AddCronjobArgs,
 		migrations.AddWebsiteAcmeAccountColumn,
+		migrations.AddAgentTables,
+		migrations.MigrateOpenclawAgents,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

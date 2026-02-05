@@ -13,6 +13,9 @@ export const jumpToInstall = (type: string, key: string) => {
             return true;
     }
     switch (key) {
+        case 'openclaw':
+            jumpToPath(router, '/ai/agents/agent');
+            return true;
         case 'mysql-cluster':
             jumpToPath(router, '/xpack/cluster/mysql');
             return true;

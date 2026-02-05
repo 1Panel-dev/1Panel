@@ -7,6 +7,7 @@ const (
 	AppTakeDown = "TakeDown"
 
 	AppOpenresty         = "openresty"
+	AppOpenclaw          = "openclaw"
 	AppMysql             = "mysql"
 	AppMariaDB           = "mariadb"
 	AppPostgresql        = "postgresql"

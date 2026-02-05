@@ -392,6 +392,10 @@ func deleteAppInstall(deleteReq request.AppInstallDelete) error {
 		if err = appInstallRepo.Delete(ctx, install); err != nil {
 			return err
 		}
+		appKey := install.App.Key
+		if appKey == constant.AppOpenclaw {
+			_ = agentRepo.DeleteByAppInstallIDWithCtx(ctx, install.ID)
+		}
 
 		resources, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithAppInstallId(install.ID))
 		if len(resources) > 0 {

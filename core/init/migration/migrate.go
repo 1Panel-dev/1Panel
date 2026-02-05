@@ -23,6 +23,7 @@ func Init() {
 		migrations.DeleteXpackHideMenu,
 		migrations.AddCronjobGroup,
 		migrations.AddDiskMenu,
+		migrations.AddAgentsMenu,
 		migrations.AddSimpleNodeGroup,
 		migrations.AddUpgradeBackupCopies,
 		migrations.AddScriptSync,

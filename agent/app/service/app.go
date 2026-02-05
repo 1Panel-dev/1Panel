@@ -42,7 +42,7 @@ type IAppService interface {
 	GetAppTags(ctx *gin.Context) ([]response.TagDTO, error)
 	GetApp(ctx *gin.Context, key string) (*response.AppDTO, error)
 	GetAppDetail(appId uint, version, appType string) (response.AppDetailDTO, error)
-	Install(req request.AppInstallCreate) (*model.AppInstall, error)
+	Install(req request.AppInstallCreate, executeScript bool) (*model.AppInstall, error)
 	SyncAppListFromRemote(taskID string) error
 	GetAppUpdate() (*response.AppUpdateRes, error)
 	GetAppDetailByID(id uint) (*response.AppDetailDTO, error)
@@ -333,7 +333,7 @@ func (a AppService) GetAppDetailByID(id uint) (*response.AppDetailDTO, error) {
 	return res, nil
 }
 
-func (a AppService) Install(req request.AppInstallCreate) (appInstall *model.AppInstall, err error) {
+func (a AppService) Install(req request.AppInstallCreate, executeScript bool) (appInstall *model.AppInstall, err error) {
 	if err = docker.CreateDefaultDockerNetwork(); err != nil {
 		err = buserr.WithDetail("Err1PanelNetworkFailed", err.Error(), nil)
 		return
@@ -527,8 +527,10 @@ func (a AppService) Install(req request.AppInstallCreate) (appInstall *model.App
 		if err = copyData(t, app, appDetail, appInstall, req); err != nil {
 			return err
 		}
-		if err = runScript(t, appInstall, "init"); err != nil {
-			return err
+		if executeScript {
+			if err = runScript(t, appInstall, "init"); err != nil {
+				return err
+			}
 		}
 		if app.Key == "openresty" {
 			if err = handleSiteDir(app, appDetail, req, t); err != nil {

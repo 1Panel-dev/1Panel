@@ -12,6 +12,26 @@ const databaseRouter = {
     },
     children: [
         {
+            path: '/ai/agents/agent',
+            name: 'Agents',
+            component: () => import('@/views/ai/agents/agent/index.vue'),
+            meta: {
+                icon: 'p-jiqiren2',
+                title: 'aiTools.agents.agents',
+                requiresAuth: true,
+            },
+        },
+        {
+            path: '/ai/agents/model',
+            name: 'AgentsModel',
+            component: () => import('@/views/ai/agents/model/index.vue'),
+            meta: {
+                title: 'aiTools.agents.account',
+                activeMenu: '/ai/agents/agent',
+                requiresAuth: true,
+            },
+        },
+        {
             path: '/ai/model/ollama',
             name: 'OllamaModel',
             component: () => import('@/views/ai/model/ollama/index.vue'),

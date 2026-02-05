@@ -31,6 +31,8 @@ interface DialogProps {
     port: any;
     ip: string;
     protocol: string;
+    path?: string;
+    query?: string;
 }
 
 const acceptParams = async (params: DialogProps): Promise<void> => {
@@ -48,18 +50,28 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
             return;
         }
     }
+    const buildUrl = (host: string) => {
+        let url = `${protocol}://${host}:${params.port}`;
+        if (params.path) {
+            url += params.path.startsWith('/') ? params.path : `/${params.path}`;
+        }
+        if (params.query) {
+            url += params.query.startsWith('?') ? params.query : `?${params.query}`;
+        }
+        return url;
+    };
     if (res.data.systemIP.indexOf(':') === -1) {
         if (params.ip && params.ip === 'ipv6') {
             MsgWarning(i18n.global.t('setting.systemIPWarning1', ['IPv4']));
             return;
         }
-        window.open(`${protocol}://${res.data.systemIP}:${params.port}`, '_blank');
+        window.open(buildUrl(res.data.systemIP), '_blank');
     } else {
         if (params.ip && params.ip === 'ipv4') {
             MsgWarning(i18n.global.t('setting.systemIPWarning1', ['IPv6']));
             return;
         }
-        window.open(`${protocol}://[${res.data.systemIP}]:${params.port}`, '_blank');
+        window.open(buildUrl(`[${res.data.systemIP}]`), '_blank');
     }
 };
 
