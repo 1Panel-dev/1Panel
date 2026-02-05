@@ -320,6 +320,16 @@
                     </el-carousel-item>
                     <el-carousel-item key="simpleNode" v-if="showSimpleNode()">
                         <CardWithHeader :header="$t('setting.panel')">
+                            <template #header-r>
+                                <el-tooltip :content="$t('xpack.node.panelItem')" placement="top">
+                                    <el-button
+                                        class="h-button-setting"
+                                        @click="routerToNameWithQuery('SimpleNode', { uncached: 'true' })"
+                                        link
+                                        icon="Setting"
+                                    />
+                                </el-tooltip>
+                            </template>
                             <template #body>
                                 <el-scrollbar height="286px">
                                     <div class="simple-node cursor-pointer" v-for="row in simpleNodes" :key="row.id">
@@ -327,6 +337,7 @@
                                             <el-col :span="21">
                                                 <div class="name">
                                                     {{ row.name }}
+                                                    <Status :status="row.status" :msg="row.message" />
                                                 </div>
                                                 <div class="detail">
                                                     {{ loadSource(row) }}
@@ -337,6 +348,7 @@
                                                 <el-button
                                                     @click="jumpPanel(row)"
                                                     size="small"
+                                                    :disabled="row.status !== 'Healthy'"
                                                     class="visit"
                                                     round
                                                     plain
@@ -385,7 +397,7 @@ import { getIOOptions, getNetworkOptions } from '@/api/modules/host';
 import { getSettingInfo, listAllSimpleNodes, loadUpgradeInfo, getMemo, updateMemo } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
 import { storeToRefs } from 'pinia';
-import { routerToFileWithPath, routerToPath } from '@/utils/router';
+import { routerToFileWithPath, routerToNameWithQuery, routerToPath } from '@/utils/router';
 import { getWelcomePage } from '@/api/modules/auth';
 import { clearDashboardCache, getDashboardCache, setDashboardCache } from '@/utils/dashboardCache';
 import { MsgError, MsgSuccess } from '@/utils/message';
@@ -840,7 +852,7 @@ const loadSafeStatus = async () => {
 
 const loadSource = (row: any) => {
     if (row.status !== 'Healthy') {
-        return '-';
+        return `- ${i18n.global.t('commons.units.core')} (-%) / - GB (-%)`;
     }
     return (
         row.cpuTotal +
@@ -1010,7 +1022,6 @@ onBeforeUnmount(() => {
 
     .el-descriptions .el-descriptions__body .el-descriptions__table {
         border-spacing: 0 5px !important;
-        /* 垂直间距15px */
     }
 }
 
@@ -1024,7 +1035,7 @@ onBeforeUnmount(() => {
 
     .name {
         font-weight: 500 !important;
-        font-size: 16px !important;
+        font-size: 18px !important;
         line-height: 30px;
         color: var(--panel-text-color);
     }
