@@ -158,7 +158,22 @@
                                     {{ weComConfig.config.displayName }}
                                 </el-form-item>
                                 <el-form-item :label="$t('xpack.alert.webhookUrl')" prop="url">
-                                    {{ weComConfig.config.url }}
+                                    <div class="webhook-field">
+                                        <template v-if="weComUrlVisible">
+                                            <el-tooltip :content="weComConfig.config.url" placement="top" effect="dark">
+                                                <span class="webhook-text">
+                                                    {{ weComConfig.config.url }}
+                                                </span>
+                                            </el-tooltip>
+                                        </template>
+                                        <template v-else>
+                                            <span class="webhook-text">****************</span>
+                                        </template>
+                                        <el-icon class="webhook-icon" @click="weComUrlVisible = !weComUrlVisible">
+                                            <Hide v-if="!weComUrlVisible" />
+                                            <View v-else />
+                                        </el-icon>
+                                    </div>
                                 </el-form-item>
                             </el-form>
                         </div>
@@ -208,7 +223,26 @@
                                     {{ dingTalkConfig.config.displayName }}
                                 </el-form-item>
                                 <el-form-item :label="$t('xpack.alert.webhookUrl')" prop="url">
-                                    {{ dingTalkConfig.config.url }}
+                                    <div class="webhook-field">
+                                        <template v-if="dingTalkUrlVisible">
+                                            <el-tooltip
+                                                :content="dingTalkConfig.config.url"
+                                                placement="top"
+                                                effect="dark"
+                                            >
+                                                <span class="webhook-text">
+                                                    {{ dingTalkConfig.config.url }}
+                                                </span>
+                                            </el-tooltip>
+                                        </template>
+                                        <template v-else>
+                                            <span class="webhook-text">****************</span>
+                                        </template>
+                                        <el-icon class="webhook-icon" @click="dingTalkUrlVisible = !dingTalkUrlVisible">
+                                            <Hide v-if="!dingTalkUrlVisible" />
+                                            <View v-else />
+                                        </el-icon>
+                                    </div>
                                 </el-form-item>
                             </el-form>
                         </div>
@@ -258,7 +292,26 @@
                                     {{ feiShuConfig.config.displayName }}
                                 </el-form-item>
                                 <el-form-item :label="$t('xpack.alert.webhookUrl')" prop="url">
-                                    {{ feiShuConfig.config.url }}
+                                    <div class="webhook-field">
+                                        <template v-if="feiShuUrlVisible">
+                                            <el-tooltip
+                                                :content="feiShuConfig.config.url"
+                                                placement="top"
+                                                effect="dark"
+                                            >
+                                                <span class="webhook-text">
+                                                    {{ feiShuConfig.config.url }}
+                                                </span>
+                                            </el-tooltip>
+                                        </template>
+                                        <template v-else>
+                                            <span class="webhook-text">****************</span>
+                                        </template>
+                                        <el-icon class="webhook-icon" @click="feiShuUrlVisible = !feiShuUrlVisible">
+                                            <Hide v-if="!feiShuUrlVisible" />
+                                            <View v-else />
+                                        </el-icon>
+                                    </div>
                                 </el-form-item>
                             </el-form>
                         </div>
@@ -318,10 +371,11 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, Ref } from 'vue';
 import { GlobalStore } from '@/store';
 import { ListAlertConfigs, DeleteAlertConfig, UpdateAlertConfig } from '@/api/modules/alert';
 import { ElMessageBox, FormInstance } from 'element-plus';
+import { View, Hide } from '@element-plus/icons-vue';
 import Phone from '@/views/setting/alert/setting/phone/index.vue';
 import SendTimeRange from '@/views/setting/alert/setting/time-range/index.vue';
 import i18n from '@/lang';
@@ -431,6 +485,10 @@ const defaultFeiShuConfig: Alert.WebhookConfig = {
     },
 };
 const feiShuConfig = ref<Alert.WebhookConfig>({ ...defaultFeiShuConfig });
+
+const weComUrlVisible = ref(false);
+const dingTalkUrlVisible = ref(false);
+const feiShuUrlVisible = ref(false);
 
 const config = ref<Alert.AlertConfigInfo>({
     id: 0,
@@ -634,5 +692,23 @@ onMounted(async () => {
     .el-form-item {
         margin-bottom: 0 !important;
     }
+}
+.webhook-field {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 100%;
+}
+.webhook-text {
+    max-width: 100%;
+    word-break: break-all;
+    white-space: normal;
+}
+.webhook-icon {
+    cursor: pointer;
+    color: var(--el-text-color-secondary);
+}
+.webhook-icon:hover {
+    color: var(--el-color-primary);
 }
 </style>
