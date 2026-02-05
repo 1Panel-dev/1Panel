@@ -2147,15 +2147,21 @@ func handleSSLConfig(appInstall *model.AppInstall, hasDefaultWebsite bool, sslRe
 	return nil
 }
 
-func SyncTags(remoteProperties dto.ExtraProperties) error {
+func SyncTags(remoteProperties dto.ExtraProperties) (err error) {
 	tx, ctx := getTxAndContext()
-	defer tx.Rollback()
-	localTags, _ := tagRepo.All()
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+		}
+	}()
+	localTags, err := tagRepo.All()
+	if err != nil {
+		return err
+	}
 	localTagsMap := make(map[string]*model.Tag)
 	for i := range localTags {
 		localTagsMap[localTags[i].Key] = &localTags[i]
 	}
-	var err error
 	remoteTagsMap := make(map[string]*dto.Tag)
 	for i := range remoteProperties.Tags {
 		remoteTagsMap[remoteProperties.Tags[i].Key] = &remoteProperties.Tags[i]
@@ -2163,7 +2169,9 @@ func SyncTags(remoteProperties dto.ExtraProperties) error {
 
 	for key, localTag := range localTagsMap {
 		if _, exists := remoteTagsMap[key]; !exists {
-			_ = tagRepo.DeleteByID(ctx, localTag.ID)
+			if err = tagRepo.DeleteByID(ctx, localTag.ID); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -2193,7 +2201,9 @@ func SyncTags(remoteProperties dto.ExtraProperties) error {
 		}
 	}
 
-	tx.Commit()
+	if err = tx.Commit().Error; err != nil {
+		return err
+	}
 	return nil
 }
 
