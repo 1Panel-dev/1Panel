@@ -215,10 +215,10 @@ func (c *appSyncContext) syncAppIconsAndDetails() error {
 }
 
 func (c *appSyncContext) downloadAppIcon(iconUrl, appKey, oldIcon string) (status int, iconField string) {
-	existingEtag := appicon.GetETagFromIconField(oldIcon)
+	iconFileName, existingEtag := appicon.ParseIconField(oldIcon)
 
 	reqHeaders := make(map[string]string)
-	if existingEtag != "" {
+	if existingEtag != "" && iconFileName != "" && appicon.IconFileExists(iconFileName) {
 		reqHeaders["If-None-Match"] = existingEtag
 	}
 
