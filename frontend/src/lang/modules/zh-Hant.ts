@@ -1903,9 +1903,8 @@ const message = {
         passkey: '通行密鑰',
         passkeyManage: '管理',
         passkeyHelper: '用於快速登入，最多可綁定 5 個通行密鑰',
-        passkeyRequireSSL: '啟用 HTTPS 後可使用通行密鑰',
-        passkeyNotSupported:
-            '目前瀏覽器或環境不支援通行密鑰 \n 請確認您已綁定域名並啟用面板 SSL, 並且訪問時使用了可信的證書',
+        passkeyRequireSSL: '使用可信證書啟用 SSL 並且設定網域綁定後才可使用通行密鑰',
+        passkeyNotSupported: '目前瀏覽器或環境不支援通行密鑰',
         passkeyCount: '已綁定 {0}/{1}',
         passkeyName: '名稱',
         passkeyNameHelper: '請輸入用於區分裝置的名稱',

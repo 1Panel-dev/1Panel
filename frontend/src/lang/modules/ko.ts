@@ -1843,7 +1843,7 @@ const message = {
         passkey: '패스키',
         passkeyManage: '관리',
         passkeyHelper: '빠른 로그인을 위해 최대 5개의 패스키를 등록할 수 있습니다',
-        passkeyRequireSSL: 'HTTPS를 활성화하면 패스키를 사용할 수 있습니다',
+        passkeyRequireSSL: '신뢰할 수 있는 인증서로 SSL을 활성화하고 도메인을 바인딩한 후 패스키를 사용할 수 있습니다',
         passkeyNotSupported: '현재 브라우저 또는 환경에서 패스키를 지원하지 않습니다',
         passkeyCount: '등록됨 {0}/{1}',
         passkeyName: '이름',

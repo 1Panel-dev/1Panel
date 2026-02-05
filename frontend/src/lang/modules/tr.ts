@@ -1962,7 +1962,7 @@ const message = {
         passkey: 'Passkey',
         passkeyManage: 'Yönet',
         passkeyHelper: 'Hızlı giriş için en fazla 5 passkey bağlanabilir',
-        passkeyRequireSSL: 'Passkey kullanmak için HTTPS’i etkinleştirin',
+        passkeyRequireSSL: 'Passkey kullanmak için güvenilir sertifika ile SSL’yi etkinleştirin ve alan adını bağlayın',
         passkeyNotSupported: 'Mevcut tarayıcı veya ortam passkey desteklemiyor',
         passkeyCount: 'Bağlı {0}/{1}',
         passkeyName: 'Ad',

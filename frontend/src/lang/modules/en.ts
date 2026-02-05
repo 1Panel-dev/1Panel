@@ -1942,7 +1942,7 @@ const message = {
         passkey: 'Passkey',
         passkeyManage: 'Manage',
         passkeyHelper: 'For quick login, up to 5 passkeys can be bound',
-        passkeyRequireSSL: 'Enable HTTPS to use passkeys',
+        passkeyRequireSSL: 'Enable SSL with a trusted certificate and bind a domain name before using passkeys',
         passkeyNotSupported: 'Current browser or environment does not support passkeys',
         passkeyCount: 'Bound {0}/{1}',
         passkeyName: 'Name',

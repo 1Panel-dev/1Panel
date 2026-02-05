@@ -1921,7 +1921,7 @@ const message = {
         passkey: 'Passkey',
         passkeyManage: 'Urus',
         passkeyHelper: 'Untuk log masuk pantas, maksimum 5 passkey boleh dipautkan',
-        passkeyRequireSSL: 'Aktifkan HTTPS untuk menggunakan passkey',
+        passkeyRequireSSL: 'Aktifkan SSL dengan sijil dipercayai dan ikat nama domain untuk menggunakan passkey',
         passkeyNotSupported: 'Pelayar atau persekitaran semasa tidak menyokong passkey',
         passkeyCount: 'Dipaut {0}/{1}',
         passkeyName: 'Nama',

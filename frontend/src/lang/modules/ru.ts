@@ -1910,7 +1910,7 @@ const message = {
         passkey: 'Passkey',
         passkeyManage: 'Управление',
         passkeyHelper: 'Для быстрого входа можно привязать до 5 passkey',
-        passkeyRequireSSL: 'Включите HTTPS, чтобы использовать passkey',
+        passkeyRequireSSL: 'Включите SSL с доверенным сертификатом и привяжите домен, чтобы использовать passkey',
         passkeyNotSupported: 'Текущий браузер или среда не поддерживает passkey',
         passkeyCount: 'Привязано {0}/{1}',
         passkeyName: 'Название',

@@ -1867,7 +1867,7 @@ const message = {
         passkey: 'パスキー',
         passkeyManage: '管理',
         passkeyHelper: '素早くログインするため、最大 5 個のパスキーを登録できます',
-        passkeyRequireSSL: 'HTTPS を有効にするとパスキーを使用できます',
+        passkeyRequireSSL: '信頼された証明書で SSL を有効化し、ドメインをバインドしてからパスキーを使用できます',
         passkeyNotSupported: '現在のブラウザまたは環境はパスキーに対応していません',
         passkeyCount: '登録済み {0}/{1}',
         passkeyName: '名称',
