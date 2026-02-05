@@ -23,7 +23,10 @@ func syncApp() {
 	if global.CONF.Base.IsOffLine {
 		return
 	}
-	_ = service.NewISettingService().Update("AppStoreSyncStatus", constant.StatusSyncSuccess)
+	setting, err := service.NewISettingService().GetSettingInfo()
+	if err == nil && setting.AppStoreSyncStatus == constant.StatusSyncing {
+		_ = service.NewISettingService().Update("AppStoreSyncStatus", constant.StatusSyncSuccess)
+	}
 	if err := service.NewIAppService().SyncAppListFromRemote(""); err != nil {
 		global.LOG.Errorf("App Store synchronization failed")
 		return

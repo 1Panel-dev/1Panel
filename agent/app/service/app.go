@@ -12,6 +12,7 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/gin-gonic/gin"
 
@@ -32,6 +33,11 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/req_helper"
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 	"gopkg.in/yaml.v3"
+)
+
+var (
+	appStoreSyncMu  sync.Mutex
+	appStoreSyncing bool
 )
 
 type AppService struct {
@@ -840,6 +846,13 @@ func (a AppService) GetAppUpdate() (*response.AppUpdateRes, error) {
 			res.CanUpdate = true
 			return res, err
 		}
+		if appicon.IsIconFile(app.Icon) {
+			fileName, _ := appicon.ParseIconField(app.Icon)
+			if fileName == "" || !appicon.IconFileExists(fileName) {
+				res.CanUpdate = true
+				return res, err
+			}
+		}
 	}
 
 	list, err := getAppList()
@@ -922,10 +935,26 @@ func (a AppService) SyncAppListFromRemote(taskID string) (err error) {
 	if xpack.IsUseCustomApp() {
 		return nil
 	}
+	global.LOG.Info("[AppStore] sync app list from remote: start")
+	appStoreSyncMu.Lock()
+	if appStoreSyncing {
+		appStoreSyncMu.Unlock()
+		global.LOG.Info("[AppStore] sync already in progress, skipping")
+		return nil
+	}
+	appStoreSyncing = true
+	appStoreSyncMu.Unlock()
+
+	global.LOG.Info("[AppStore] sync app list from remote: main sync task")
 	syncTask, err := task.NewTaskWithOps(i18n.GetMsgByKey("App"), task.TaskSync, task.TaskScopeAppStore, taskID, 0)
 	if err != nil {
+		appStoreSyncMu.Lock()
+		appStoreSyncing = false
+		appStoreSyncMu.Unlock()
 		return err
 	}
+
+	global.LOG.Info("[AppStore] sync app list from remote:  resource info sync task")
 
 	var sharedCtx *appSyncContext
 
@@ -933,6 +962,11 @@ func (a AppService) SyncAppListFromRemote(taskID string) (err error) {
 	syncTask.AddSubTask(i18n.GetMsgByKey("SyncAppDetail"), a.createSyncAppStoreMetaTask(&sharedCtx), nil)
 
 	go func() {
+		defer func() {
+			appStoreSyncMu.Lock()
+			appStoreSyncing = false
+			appStoreSyncMu.Unlock()
+		}()
 		if err := syncTask.Execute(); err != nil {
 			_ = NewISettingService().Update("AppStoreLastModified", "0")
 			_ = NewISettingService().Update("AppStoreSyncStatus", constant.StatusError)
@@ -940,6 +974,7 @@ func (a AppService) SyncAppListFromRemote(taskID string) (err error) {
 		}
 	}()
 
+	global.LOG.Info("[AppStore] sync app list from remote: end")
 	return nil
 }
 

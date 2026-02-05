@@ -342,6 +342,31 @@ func (c *appSyncContext) classifyAndPersistAppsWithStats(addCount, updateCount, 
 		}
 	}
 
+	if len(addAppArray) > 0 {
+		addKeys := make([]string, 0, len(addAppArray))
+		for _, app := range addAppArray {
+			addKeys = append(addKeys, app.Key)
+		}
+		existingApps, _ := appRepo.GetBy(appRepo.WithKeyIn(addKeys))
+		if len(existingApps) > 0 {
+			existingMap := make(map[string]model.App, len(existingApps))
+			for _, e := range existingApps {
+				existingMap[e.Key] = e
+			}
+			filteredAdd := make([]model.App, 0, len(addAppArray))
+			for _, app := range addAppArray {
+				if existing, ok := existingMap[app.Key]; ok {
+					app.ID = existing.ID
+					app.Details = existing.Details
+					updateAppArray = append(updateAppArray, app)
+				} else {
+					filteredAdd = append(filteredAdd, app)
+				}
+			}
+			addAppArray = filteredAdd
+		}
+	}
+
 	*addCount = len(addAppArray)
 	*updateCount = len(updateAppArray)
 	*deleteCount = len(deleteAppArray)
