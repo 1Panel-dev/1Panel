@@ -1,7 +1,13 @@
 <template>
     <div>
         <RouterMenu />
-        <LayoutContent :title="$t('aiTools.agents.agentList')">
+        <DockerStatus v-model:isActive="isActive" v-model:isExist="isExist" />
+        <LayoutContent
+            v-loading="loading"
+            v-if="isExist"
+            :class="{ mask: !isActive }"
+            :title="$t('aiTools.agents.agentList')"
+        >
             <template #leftToolBar>
                 <el-button type="primary" @click="openCreate">{{ $t('aiTools.agents.createAgent') }}</el-button>
             </template>
@@ -21,7 +27,11 @@
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('aiTools.agents.bridgePort')" prop="bridgePort" width="120" />
-                    <el-table-column :label="$t('aiTools.agents.provider')" prop="provider" width="120" />
+                    <el-table-column :label="$t('aiTools.agents.provider')" prop="provider" width="120">
+                        <template #default="{ row }">
+                            {{ getProviderLabel(row.provider) }}
+                        </template>
+                    </el-table-column>
                     <el-table-column :label="$t('aiTools.model.model')" prop="model" min-width="180" />
                     <el-table-column :label="$t('aiTools.agents.token')" width="120">
                         <template #default="{ row }">
@@ -42,10 +52,10 @@
                     />
                     <fu-table-operations
                         :buttons="buttons"
-                        min-width="300"
+                        min-width="200"
                         :label="$t('commons.table.operate')"
                         fixed="right"
-                        :ellipsis="5"
+                        :ellipsis="2"
                     />
                 </ComplexTable>
             </template>
@@ -75,17 +85,42 @@ import ComposeLogs from '@/components/log/compose/index.vue';
 import TerminalDialog from '@/views/container/container/terminal/index.vue';
 import i18n from '@/lang';
 import PortJumpDialog from '@/components/port-jump/index.vue';
+import DockerStatus from '@/views/container/docker-status/index.vue';
 
 const items = ref<AI.AgentItem[]>([]);
+const loading = ref(false);
 const addRef = ref();
 const taskLogRef = ref();
 const deleteRef = ref();
 const composeLogRef = ref();
 const dialogTerminalRef = ref();
 const dialogPortJumpRef = ref();
+const isActive = ref(false);
+const isExist = ref(false);
 const searchName = ref('');
+const providerLabelMap: Record<string, string> = {
+    openai: 'OpenAI',
+    ollama: 'Ollama',
+    minimax: 'MiniMax',
+    qwen: 'Qwen',
+    deepseek: 'DeepSeek',
+    anthropic: 'Anthropic',
+    gemini: 'Gemini',
+};
+
+const getProviderLabel = (value: string) => {
+    return providerLabelMap[value] || value;
+};
 
 const buttons = [
+    {
+        label: i18n.global.t('menu.terminal'),
+        click: (row: AI.AgentItem) => openTerminal(row),
+    },
+    {
+        label: i18n.global.t('commons.button.log'),
+        click: (row: AI.AgentItem) => openLog(row),
+    },
     {
         label: i18n.global.t('commons.operate.start'),
         click: (row: AI.AgentItem) => onOperate(row, 'start'),
@@ -101,14 +136,6 @@ const buttons = [
         click: (row: AI.AgentItem) => onOperate(row, 'restart'),
     },
     {
-        label: i18n.global.t('commons.button.log'),
-        click: (row: AI.AgentItem) => openLog(row),
-    },
-    {
-        label: i18n.global.t('menu.terminal'),
-        click: (row: AI.AgentItem) => openTerminal(row),
-    },
-    {
         label: i18n.global.t('commons.button.delete'),
         click: (row: AI.AgentItem) => onDelete(row),
     },
@@ -121,14 +148,19 @@ const paginationConfig = reactive({
 });
 
 const search = async () => {
-    const req: SearchWithPage = {
-        page: paginationConfig.currentPage,
-        pageSize: paginationConfig.pageSize,
-        info: searchName.value || '',
-    };
-    const res = await pageAgents(req);
-    items.value = res.data.items || [];
-    paginationConfig.total = res.data.total || 0;
+    loading.value = true;
+    try {
+        const req: SearchWithPage = {
+            page: paginationConfig.currentPage,
+            pageSize: paginationConfig.pageSize,
+            info: searchName.value || '',
+        };
+        const res = await pageAgents(req);
+        items.value = res.data.items || [];
+        paginationConfig.total = res.data.total || 0;
+    } finally {
+        loading.value = false;
+    }
 };
 
 const openCreate = () => {

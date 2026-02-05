@@ -1,13 +1,18 @@
 <template>
     <DrawerPro v-model="open" :header="headerTitle" size="large" @close="handleClose">
         <el-form ref="formRef" :model="form" :rules="rules" label-position="top" v-loading="loading">
+            <el-form-item :label="$t('commons.table.name')" prop="name">
+                <el-input v-model="form.name" />
+            </el-form-item>
             <el-form-item :label="$t('aiTools.agents.provider')" prop="provider">
                 <el-select v-model="form.provider" @change="handleProviderChange" :disabled="form.id > 0">
-                    <el-option v-for="item in providerOptions" :key="item" :label="item" :value="item" />
+                    <el-option
+                        v-for="item in providerOptions"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value"
+                    />
                 </el-select>
-            </el-form-item>
-            <el-form-item :label="$t('aiTools.agents.accountName')" prop="name">
-                <el-input v-model="form.name" />
             </el-form-item>
             <el-form-item :label="$t('aiTools.agents.baseUrl')" prop="baseURL">
                 <el-input v-model="form.baseURL" :disabled="form.provider !== 'ollama'" />
@@ -39,16 +44,28 @@ import { computed, onMounted, reactive, ref } from 'vue';
 import { FormInstance } from 'element-plus';
 import { Rules } from '@/global/form-rules';
 import { createAgentAccount, getAgentProviders, updateAgentAccount } from '@/api/modules/ai';
-import { MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
 
 const emit = defineEmits(['search']);
 
 const open = ref(false);
 const formRef = ref<FormInstance>();
-const providerOptions = ref<string[]>([]);
+const providerOptions = ref<Array<{ label: string; value: string }>>([]);
 const providerBaseURL = ref<Record<string, string>>({});
 const loading = ref(false);
+const providerLabelMap: Record<string, string> = {
+    openai: 'OpenAI',
+    ollama: 'Ollama',
+    minimax: 'MiniMax',
+    qwen: 'Qwen',
+    deepseek: 'DeepSeek',
+    anthropic: 'Anthropic',
+    gemini: 'Gemini',
+};
+
+const getProviderLabel = (value: string) => {
+    return providerLabelMap[value] || value;
+};
 
 const form = reactive({
     id: 0,
@@ -95,7 +112,6 @@ const submit = async () => {
                 remark: form.remark,
             });
         }
-        MsgSuccess();
         emit('search');
         open.value = false;
     } finally {
@@ -147,13 +163,16 @@ const openDrawer = (params?: OpenParams) => {
 const loadProviders = async () => {
     const res = await getAgentProviders();
     const data = res.data || [];
-    providerOptions.value = data.map((item) => item.provider);
+    providerOptions.value = data.map((item) => ({
+        value: item.provider,
+        label: getProviderLabel(item.provider),
+    }));
     providerBaseURL.value = data.reduce((acc, item) => {
         acc[item.provider] = item.baseUrl || '';
         return acc;
     }, {} as Record<string, string>);
     if (!form.provider && providerOptions.value.length > 0) {
-        form.provider = providerOptions.value[0];
+        form.provider = providerOptions.value[0].value;
         handleProviderChange();
     }
 };

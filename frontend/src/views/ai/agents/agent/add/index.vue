@@ -17,7 +17,12 @@
             </el-form-item>
             <el-form-item :label="$t('aiTools.agents.provider')" prop="provider">
                 <el-select v-model="form.provider" @change="handleProviderChange">
-                    <el-option v-for="item in providerOptions" :key="item" :label="item" :value="item" />
+                    <el-option
+                        v-for="item in providerOptions"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value"
+                    />
                 </el-select>
             </el-form-item>
             <el-form-item v-if="accountOptions.length > 0" :label="$t('aiTools.agents.account')" prop="accountId">
@@ -82,7 +87,7 @@ const open = ref(false);
 const formRef = ref<FormInstance>();
 const versions = ref<string[]>([]);
 const accountOptions = ref<AI.AgentAccountItem[]>([]);
-const providerOptions = ref<string[]>([]);
+const providerOptions = ref<Array<{ label: string; value: string }>>([]);
 const providerModels = ref<Record<string, AI.ProviderModelInfo[]>>({});
 const manualModel = ref(false);
 const appInfo = ref<App.AppDTO>();
@@ -146,16 +151,33 @@ const loadCompose = async () => {
     form.dockerCompose = res.data.dockerCompose || '';
 };
 
+const providerLabelMap: Record<string, string> = {
+    openai: 'OpenAI',
+    ollama: 'Ollama',
+    minimax: 'MiniMax',
+    qwen: 'Qwen',
+    deepseek: 'DeepSeek',
+    anthropic: 'Anthropic',
+    gemini: 'Gemini',
+};
+
+const getProviderLabel = (value: string) => {
+    return providerLabelMap[value] || value;
+};
+
 const loadProviders = async () => {
     const res = await getAgentProviders();
     const data = res.data || [];
-    providerOptions.value = data.map((item) => item.provider);
+    providerOptions.value = data.map((item) => ({
+        value: item.provider,
+        label: getProviderLabel(item.provider),
+    }));
     providerModels.value = data.reduce((acc, item) => {
         acc[item.provider] = item.models || [];
         return acc;
     }, {} as Record<string, AI.ProviderModelInfo[]>);
-    if (!providerOptions.value.includes(form.provider) && providerOptions.value.length > 0) {
-        form.provider = providerOptions.value[0];
+    if (!providerOptions.value.find((item) => item.value === form.provider) && providerOptions.value.length > 0) {
+        form.provider = providerOptions.value[0].value;
     }
     setDefaultModel();
 };

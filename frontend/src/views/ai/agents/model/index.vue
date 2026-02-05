@@ -11,8 +11,12 @@
             </template>
             <template #main>
                 <ComplexTable :data="items" :pagination-config="paginationConfig" @search="search">
-                    <el-table-column :label="$t('aiTools.agents.provider')" prop="provider" width="120" />
-                    <el-table-column :label="$t('aiTools.agents.accountName')" prop="name" min-width="200" />
+                    <el-table-column :label="$t('commons.table.name')" prop="name" min-width="200" />
+                    <el-table-column :label="$t('aiTools.agents.provider')" prop="provider" width="120">
+                        <template #default="{ row }">
+                            {{ getProviderLabel(row.provider) }}
+                        </template>
+                    </el-table-column>
                     <el-table-column :label="$t('aiTools.agents.baseUrl')" prop="baseUrl" min-width="200" />
                     <el-table-column :label="$t('aiTools.agents.apiKey')" prop="apiKey" min-width="160">
                         <template #default="{ row }">
@@ -53,6 +57,19 @@ import { dateFormat } from '@/utils/util';
 const items = ref<AI.AgentAccountItem[]>([]);
 const addRef = ref();
 const searchName = ref('');
+const providerLabelMap: Record<string, string> = {
+    openai: 'OpenAI',
+    ollama: 'Ollama',
+    minimax: 'MiniMax',
+    qwen: 'Qwen',
+    deepseek: 'DeepSeek',
+    anthropic: 'Anthropic',
+    gemini: 'Gemini',
+};
+
+const getProviderLabel = (value: string) => {
+    return providerLabelMap[value] || value;
+};
 
 const buttons = [
     {
