@@ -529,7 +529,7 @@ func (b *BaseApi) DownloadContainerLogs(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	err := containerService.DownloadContainerLogs(req.ContainerType, req.Container, req.Since, strconv.Itoa(int(req.Tail)), c)
+	err := containerService.DownloadContainerLogs(req.ContainerType, req.Container, req.Since, strconv.Itoa(int(req.Tail)), req.Timestamp, c)
 	if err != nil {
 		helper.InternalServer(c, err)
 	}
@@ -757,6 +757,7 @@ func (b *BaseApi) LoadComposeEnv(c *gin.Context) {
 // @Param since query string false "时间筛选"
 // @Param follow query string false "是否追踪"
 // @Param tail query string false "显示行号"
+// @Param timestamp query string false "是否显示时间"
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
@@ -770,6 +771,7 @@ func (b *BaseApi) ContainerStreamLogs(c *gin.Context) {
 	since := c.Query("since")
 	follow := c.Query("follow") == "true"
 	tail := c.Query("tail")
+	timestamp := c.Query("timestamp") == "true"
 
 	container := c.Query("container")
 	compose := c.Query("compose")
@@ -779,6 +781,7 @@ func (b *BaseApi) ContainerStreamLogs(c *gin.Context) {
 		Since:     since,
 		Follow:    follow,
 		Tail:      tail,
+		Timestamp: timestamp,
 		Type:      "container",
 	}
 	if compose != "" {

@@ -17,6 +17,11 @@
                 {{ $t('commons.button.watch') }}
             </el-checkbox>
         </div>
+        <div class="margin-button float-left">
+            <el-checkbox border @change="searchLogs" v-model="logSearch.isShowTimestamp">
+                {{ $t('commons.table.date') }}
+            </el-checkbox>
+        </div>
         <el-button class="margin-button" @click="onDownload" icon="Download">
             {{ $t('commons.button.download') }}
         </el-button>
@@ -79,6 +84,10 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    defaultIsShowTimestamp: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const styleVars = computed(() => ({
@@ -91,6 +100,7 @@ const logs = ref<string[]>([]);
 let eventSource: EventSource | null = null;
 const logSearch = reactive({
     isWatch: props.defaultFollow ? true : true,
+    isShowTimestamp: props.defaultIsShowTimestamp,
     container: '',
     mode: 'all',
     tail: props.defaultFollow ? 0 : 100,
@@ -152,9 +162,9 @@ const searchLogs = async () => {
     if (props.node && props.node !== '') {
         currentNode = props.node;
     }
-    let url = `/api/v2/containers/search/log?container=${logSearch.container}&since=${logSearch.mode}&tail=${logSearch.tail}&follow=${logSearch.isWatch}&operateNode=${currentNode}`;
+    let url = `/api/v2/containers/search/log?container=${logSearch.container}&since=${logSearch.mode}&tail=${logSearch.tail}&follow=${logSearch.isWatch}&timestamp=${logSearch.isShowTimestamp}&operateNode=${currentNode}`;
     if (logSearch.compose !== '') {
-        url = `/api/v2/containers/search/log?compose=${logSearch.compose}&since=${logSearch.mode}&tail=${logSearch.tail}&follow=${logSearch.isWatch}&operateNode=${currentNode}`;
+        url = `/api/v2/containers/search/log?compose=${logSearch.compose}&since=${logSearch.mode}&tail=${logSearch.tail}&follow=${logSearch.isWatch}&timestamp=${logSearch.isShowTimestamp}&operateNode=${currentNode}`;
     }
     eventSource = new EventSource(url);
     eventSource.onmessage = (event: MessageEvent) => {
@@ -192,6 +202,7 @@ const onDownload = async () => {
             container: container,
             since: logSearch.mode,
             tail: logSearch.tail,
+            timestamp: logSearch.isShowTimestamp,
             containerType: containerType,
         };
         let addItem = {};

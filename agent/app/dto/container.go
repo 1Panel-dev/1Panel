@@ -305,6 +305,7 @@ type ContainerLog struct {
 	Container     string `json:"container" validate:"required"`
 	Since         string `json:"since"`
 	Tail          uint   `json:"tail"`
+	Timestamp     bool   `json:"timestamp"`
 	ContainerType string `json:"containerType"`
 }
 
@@ -314,5 +315,6 @@ type StreamLog struct {
 	Since     string
 	Follow    bool
 	Tail      string
+	Timestamp bool
 	Type      string
 }
