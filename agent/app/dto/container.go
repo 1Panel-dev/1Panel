@@ -279,7 +279,7 @@ type ComposeCreate struct {
 	Path      string `json:"path"`
 	Template  uint   `json:"template"`
 	Env       string `json:"env"`
-	PullImage *bool  `json:"pullImage,omitempty"`
+	ForcePull bool   `json:"forcePull"`
 }
 type ComposeOperation struct {
 	Name      string `json:"name" validate:"required"`
@@ -289,11 +289,13 @@ type ComposeOperation struct {
 	Force     bool   `json:"force"`
 }
 type ComposeUpdate struct {
+	TaskID     string `json:"taskID"`
 	Name       string `json:"name" validate:"required"`
 	Path       string `json:"path" validate:"required"`
 	DetailPath string `json:"detailPath"`
 	Content    string `json:"content" validate:"required"`
 	Env        string `json:"env"`
+	ForcePull  bool   `json:"forcePull"`
 }
 type ComposeLogClean struct {
 	Name       string `json:"name" validate:"required"`

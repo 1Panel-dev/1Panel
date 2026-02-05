@@ -257,6 +257,10 @@
                                 <span v-if="currentCompose.createdBy === 'Apps'" class="input-help">
                                     {{ $t('container.composeEnvHelper2') }}
                                 </span>
+                                <div class="mt-2">
+                                    <el-checkbox v-model="form.forcePull" :label="$t('container.forcePull')" />
+                                    <span class="input-help">{{ $t('container.forcePullHelper') }}</span>
+                                </div>
 
                                 <el-button type="primary" class="mt-2" @click="onSubmitEdit">
                                     {{ $t('commons.button.save') }}
@@ -336,8 +340,8 @@
                                 <el-input placeholder="key=value" type="textarea" :rows="3" v-model="form.env" />
                                 <span class="envTitle">{{ $t('commons.button.set') }}</span>
                                 <el-form-item>
-                                    <el-checkbox v-model="form.pullImage" :label="$t('app.pullImage')" />
-                                    <span class="input-help">{{ $t('app.pullImageHelper') }}</span>
+                                    <el-checkbox v-model="form.forcePull" :label="$t('container.forcePull')" />
+                                    <span class="input-help">{{ $t('container.forcePullHelper') }}</span>
                                 </el-form-item>
                             </el-form>
 
@@ -432,7 +436,7 @@ const form = reactive({
     file: '',
     template: null as number,
     env: '',
-    pullImage: true,
+    forcePull: false,
 });
 const rules = reactive({
     name: [Rules.requiredInput, Rules.composeName],
@@ -523,6 +527,7 @@ const loadDetail = async (row: Container.ComposeInfo, withRefresh: boolean) => {
     if (currentCompose.value?.name === row.name && withRefresh !== true) {
         return;
     }
+    form.forcePull = false;
     isOnCreate.value = false;
     detailLoading.value = true;
     currentCompose.value = row;
@@ -562,7 +567,7 @@ const onOpenDialog = async () => {
     form.file = '';
     form.template = null;
     form.env = '';
-    form.pullImage = true;
+    form.forcePull = false;
     loadPath();
     loadTemplates();
 };
@@ -683,18 +688,22 @@ const loadSize = async (row: any) => {
 };
 
 const onSubmitEdit = async () => {
+    const taskID = newUUID();
     const param = {
+        taskID: taskID,
         name: currentCompose.value.name,
         path: currentCompose.value.path,
         detailPath: currentYamlPath.value,
         content: composeContent.value,
         createdBy: currentCompose.value.createdBy,
         env: env.value || '',
+        forcePull: form.forcePull,
     };
     loading.value = true;
     await composeUpdate(param)
         .then(async () => {
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            openTaskLog(taskID);
             await search();
             if (currentCompose.value) {
                 const updated = data.value.find((item) => item.name === currentCompose.value.name);

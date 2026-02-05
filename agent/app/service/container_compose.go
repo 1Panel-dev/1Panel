@@ -203,13 +203,9 @@ func (u *ContainerService) CreateCompose(req dto.ComposeCreate) error {
 	if err := newComposeEnv(req.Path, req.Env); err != nil {
 		return err
 	}
-	pullImages := true
-	if req.PullImage != nil {
-		pullImages = *req.PullImage
-	}
 	go func() {
 		taskItem.AddSubTask(i18n.GetMsgByKey("ComposeCreate"), func(t *task.Task) error {
-			err := compose.UpWithTask(req.Path, t, pullImages)
+			err := compose.UpWithTask(req.Path, t, req.ForcePull)
 			t.LogWithStatus(i18n.GetMsgByKey("ComposeCreate"), err)
 			if err != nil {
 				_, _ = compose.Down(req.Path)
@@ -262,31 +258,43 @@ func (u *ContainerService) ComposeUpdate(req dto.ComposeUpdate) error {
 	if cmd.CheckIllegal(req.Name, req.Path) {
 		return buserr.New("ErrCmdIllegal")
 	}
-	oldFile, err := os.ReadFile(req.DetailPath)
+	taskItem, err := task.NewTaskWithOps(req.Name, task.TaskUpdate, task.TaskScopeCompose, req.TaskID, 1)
 	if err != nil {
-		return fmt.Errorf("load file with path %s failed, %v", req.DetailPath, err)
-	}
-	file, err := os.OpenFile(req.DetailPath, os.O_WRONLY|os.O_TRUNC, 0640)
-	if err != nil {
+		global.LOG.Errorf("new task for update compose failed, err: %v", err)
 		return err
 	}
-	defer file.Close()
-	write := bufio.NewWriter(file)
-	_, _ = write.WriteString(req.Content)
-	write.Flush()
+	go func() {
+		taskItem.AddSubTask(i18n.GetMsgByKey("TaskUpdate"), func(t *task.Task) error {
+			oldFile, err := os.ReadFile(req.DetailPath)
+			if err != nil {
+				return fmt.Errorf("load file with path %s failed, %v", req.DetailPath, err)
+			}
+			file, err := os.OpenFile(req.DetailPath, os.O_WRONLY|os.O_TRUNC, 0640)
+			if err != nil {
+				return err
+			}
+			defer file.Close()
+			write := bufio.NewWriter(file)
+			_, _ = write.WriteString(req.Content)
+			write.Flush()
 
-	global.LOG.Infof("docker-compose.yml %s has been replaced, now start to docker-compose restart", req.DetailPath)
-	if err := newComposeEnv(req.DetailPath, req.Env); err != nil {
-		return err
-	}
+			global.LOG.Infof("docker-compose.yml %s has been replaced, now start to docker-compose restart", req.DetailPath)
+			if err := newComposeEnv(req.DetailPath, req.Env); err != nil {
+				return err
+			}
 
-	if stdout, err := compose.Up(req.Path); err != nil {
-		global.LOG.Errorf("update failed when handle compose up, std: %s, err: %s, now try to recreate the old compose file", stdout, err)
-		if err := recreateCompose(string(oldFile), req.Path); err != nil {
-			return fmt.Errorf("update failed and recreate old compose file also failed, err: %v", err)
-		}
-		return fmt.Errorf("update failed when handle compose up, std: %v, err: %s", stdout, err)
-	}
+			if err := compose.UpWithTask(req.Path, t, req.ForcePull); err != nil {
+				global.LOG.Errorf("update failed when handle compose up, err: %s, now try to recreate the old compose file", err)
+				if err := recreateCompose(string(oldFile), req.Path); err != nil {
+					return fmt.Errorf("update failed and recreate old compose file also failed, err: %v", err)
+				}
+				return fmt.Errorf("update failed when handle compose up, err: %s", err)
+			}
+
+			return nil
+		}, nil)
+		_ = taskItem.Execute()
+	}()
 
 	return nil
 }

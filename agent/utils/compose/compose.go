@@ -36,10 +36,14 @@ func Up(filePath string) (string, error) {
 	return cmd.NewCommandMgr(cmd.WithTimeout(20*time.Minute)).RunWithStdoutBashCf("%s %s up -d", global.CONF.DockerConfig.Command, loadFiles(filePath))
 }
 
-func UpWithTask(filePath string, task *task.Task, pullImages bool) error {
-	if !pullImages {
-		return cmd.NewCommandMgr(cmd.WithTask(*task)).RunBashCf("%s %s up -d", global.CONF.DockerConfig.Command, loadFiles(filePath))
+func UpWithTask(filePath string, task *task.Task, forcePull bool) error {
+	if err := pullComposeImages(filePath, forcePull, task); err != nil {
+		return err
 	}
+	return cmd.NewCommandMgr(cmd.WithTask(*task)).RunBashCf("%s %s up -d", global.CONF.DockerConfig.Command, loadFiles(filePath))
+}
+
+func pullComposeImages(filePath string, forcePull bool, task *task.Task) error {
 	content, err := os.ReadFile(filePath)
 	if err != nil {
 		return err
@@ -57,11 +61,28 @@ func UpWithTask(filePath string, task *task.Task, pullImages bool) error {
 	if err != nil {
 		return err
 	}
-	errMsg := ""
 	for _, image := range images {
-		task.Log(i18n.GetWithName("PullImageStart", image))
-		if err = dockerCLi.PullImageWithProcess(task, image); err != nil {
-			errOur := err.Error()
+		if !forcePull {
+			if exist, _ := dockerCLi.ImageExists(image); exist {
+				if task != nil {
+					task.Log(i18n.GetMsgByKey("UseExistImage"))
+				}
+				continue
+			}
+		}
+
+		if task != nil {
+			task.Log(i18n.GetWithName("PullImageStart", image))
+		}
+		pullErr := error(nil)
+		if task != nil {
+			pullErr = dockerCLi.PullImageWithProcess(task, image)
+		} else {
+			pullErr = docker.PullImage(image)
+		}
+		if pullErr != nil {
+			errMsg := ""
+			errOur := pullErr.Error()
 			if errOur != "" {
 				if strings.Contains(errOur, "no such host") {
 					errMsg = i18n.GetMsgByKey("ErrNoSuchHost") + ":"
@@ -72,18 +93,21 @@ func UpWithTask(filePath string, task *task.Task, pullImages bool) error {
 			}
 			message := errMsg + errOur
 			installErr := errors.New(message)
-			task.LogFailedWithErr(i18n.GetMsgByKey("PullImage"), installErr)
+			if task != nil {
+				task.LogFailedWithErr(i18n.GetMsgByKey("PullImage"), installErr)
+			}
 			if exist, _ := dockerCLi.ImageExists(image); !exist {
 				return installErr
-			} else {
+			}
+			if task != nil {
 				task.Log(i18n.GetMsgByKey("UseExistImage"))
 			}
-		} else {
+		} else if task != nil {
 			task.Log(i18n.GetMsgByKey("PullImageSuccess"))
 		}
 	}
 
-	return cmd.NewCommandMgr(cmd.WithTask(*task)).RunBashCf("%s %s up -d", global.CONF.DockerConfig.Command, loadFiles(filePath))
+	return nil
 }
 
 func Down(filePath string) (string, error) {

@@ -329,7 +329,7 @@ export namespace Container {
         path: string;
         template: number;
         env: string;
-        pullImage?: boolean;
+        forcePull: boolean;
     }
     export interface ComposeOperation {
         name: string;
@@ -339,10 +339,12 @@ export namespace Container {
         force: boolean;
     }
     export interface ComposeUpdate {
+        taskID: string;
         name: string;
         path: string;
         content: string;
         env: string;
+        forcePull: boolean;
         createdBy: string;
     }
 
