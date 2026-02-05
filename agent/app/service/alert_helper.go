@@ -626,7 +626,7 @@ func sendAlerts(alert dto.AlertDTO, alertType, quota, quotaType string, params [
 					global.LOG.Infof("%s alert webhook %s push faild, err: %v", alertType, m, err)
 					continue
 				}
-				alertUtil.CreateNewAlertTask(quota, alertUtil.GetCronJobType(alert.Type), quotaType, m)
+				alertUtil.CreateNewAlertTask(quota, alertType, quotaType, m)
 			default:
 			}
 		}

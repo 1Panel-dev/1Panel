@@ -217,8 +217,6 @@ const formatMethod = (row: Alert.AlertLog) => {
     switch (row.method) {
         case 'mail':
             return t('xpack.alert.mail');
-        case 'sms':
-            return t('xpack.alert.sms');
         case 'dingTalk':
             return t('xpack.alert.dingTalk');
         case 'weCom':
@@ -227,6 +225,8 @@ const formatMethod = (row: Alert.AlertLog) => {
             return t('xpack.alert.feiShu');
         case 'wechat':
             return t('xpack.alert.wechat');
+        case 'sms':
+            return t('xpack.alert.sms');
         case 'webhook':
             return t('xpack.alert.webhook');
         default:

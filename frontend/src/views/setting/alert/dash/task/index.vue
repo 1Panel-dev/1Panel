@@ -323,12 +323,6 @@
                         <el-select class="selectClass" v-model="dialogData.rowData!.sendMethod" multiple cleanable>
                             <el-option value="mail" :label="$t('xpack.alert.mail')" />
                             <el-option
-                                value="sms"
-                                v-if="!globalStore.isIntl"
-                                :disabled="!globalStore.isProductPro"
-                                :label="$t('xpack.alert.sms')"
-                            />
-                            <el-option
                                 value="weCom"
                                 v-if="!globalStore.isIntl"
                                 :disabled="!globalStore.isProductPro"
@@ -345,6 +339,12 @@
                                 v-if="!globalStore.isIntl"
                                 :disabled="!globalStore.isProductPro"
                                 :label="$t('xpack.alert.feiShu')"
+                            />
+                            <el-option
+                                value="sms"
+                                v-if="!globalStore.isIntl"
+                                :disabled="!globalStore.isProductPro"
+                                :label="$t('xpack.alert.sms')"
                             />
                         </el-select>
                     </el-form-item>
@@ -803,16 +803,14 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         try {
             if (dialogData.value.title === 'create') {
                 await CreateAlert(dialogData.value.rowData);
-                loading.value = false;
                 MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
-            }
-            if (dialogData.value.title === 'edit') {
+            } else if (dialogData.value.title === 'edit') {
                 await UpdateAlert(dialogData.value.rowData);
-                loading.value = false;
                 MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
             }
             emit('search');
             visible.value = false;
+        } catch (err) {
         } finally {
             loading.value = false;
         }

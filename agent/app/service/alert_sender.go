@@ -186,7 +186,7 @@ func (s *AlertSender) sendResourceWebhook(quota string, params []dto.Param, meth
 	transport := xpack.LoadRequestTransport()
 	agentInfo, _ := xpack.GetAgentInfo()
 	if err := xpack.CreateWebhookAlertLog(s.alert.Type, s.alert, create, quota, params, method, transport, agentInfo); err != nil {
-		global.LOG.Errorf("failed to send webhook alert: %v", err)
+		global.LOG.Errorf("%s alert %s webhook push failed: %v", s.alert.Type, method, err)
 		return
 	}
 	alertUtil.CreateNewAlertTask(quota, s.alert.Type, s.quotaType, method)

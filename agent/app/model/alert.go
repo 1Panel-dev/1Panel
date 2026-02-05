@@ -11,7 +11,7 @@ type Alert struct {
 	Status         string `gorm:"type:varchar(64);not null" json:"status"`
 	Method         string `gorm:"type:varchar(64);not null" json:"method"`
 	SendCount      uint   `gorm:"type:integer" json:"sendCount"`
-	AdvancedParams string `gorm:"type:longText" json:"advancedParam"`
+	AdvancedParams string `gorm:"type:longText" json:"advancedParams"`
 }
 
 type AlertTask struct {

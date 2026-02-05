@@ -337,9 +337,9 @@ func (c *ClamService) HandleOnce(id uint) error {
 			clamRepo.EndRecords(record, constant.StatusFailed, err.Error())
 			return
 		}
-		handleAlert(record.InfectedFiles, clamItem.Name, clamItem.ID)
 		clam.AnalysisFromLog(taskItem.LogFile, &record)
 		clamRepo.EndRecords(record, constant.StatusDone, "")
+		handleAlert(record.InfectedFiles, clamItem.Name, clamItem.ID)
 	}()
 	return nil
 }

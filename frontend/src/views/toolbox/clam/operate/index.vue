@@ -155,12 +155,6 @@
                             >
                                 <el-option value="mail" :label="$t('xpack.alert.mail')" />
                                 <el-option
-                                    value="sms"
-                                    v-if="!globalStore.isIntl"
-                                    :disabled="!dialogData.rowData!.hasAlert || !isProductPro"
-                                    :label="$t('xpack.alert.sms')"
-                                />
-                                <el-option
                                     value="weCom"
                                     v-if="!globalStore.isIntl"
                                     :disabled="!dialogData.rowData!.hasAlert || !isProductPro"
@@ -177,6 +171,12 @@
                                     v-if="!globalStore.isIntl"
                                     :disabled="!dialogData.rowData!.hasAlert || !isProductPro"
                                     :label="$t('xpack.alert.feiShu')"
+                                />
+                                <el-option
+                                    value="sms"
+                                    v-if="!globalStore.isIntl"
+                                    :disabled="!dialogData.rowData!.hasAlert || !isProductPro"
+                                    :label="$t('xpack.alert.sms')"
                                 />
                             </el-select>
                         </el-form-item>

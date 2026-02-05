@@ -123,44 +123,6 @@
                         v-if="globalStore.isProductPro && !globalStore.isIntl"
                     >
                         <div class="flex items-center justify-between mb-2">
-                            <div class="text-lg font-semibold">
-                                {{ $t('xpack.alert.smsConfig') }}
-                            </div>
-                            <div>
-                                <el-button plain round @click="onChangePhone(smsConfig.id)">
-                                    {{ $t('commons.button.edit') }}
-                                </el-button>
-                            </div>
-                        </div>
-                        <div class="text-sm mb-2 flex items-center justify-start">
-                            {{ $t('xpack.alert.alertSmsHelper', [totalSms, usedSms]) }}
-                            <el-link class="ml-1 text-xs" @click="goBuy" type="primary" icon="Position">
-                                <span class="ml-0.5">{{ $t('xpack.alert.goBuy') }}</span>
-                            </el-link>
-                        </div>
-                        <el-divider class="!mb-2 !mt-3" />
-                        <div class="text-sm config-form">
-                            <el-form
-                                @submit.prevent
-                                ref="alertFormRef"
-                                :label-position="mobile ? 'top' : 'left'"
-                                label-width="110px"
-                            >
-                                <el-form-item :label="$t('xpack.alert.phone')">
-                                    <span v-if="smsConfig.config.phone">{{ smsConfig.config.phone }}</span>
-                                    <span v-else class="label">{{ $t('xpack.alert.defaultPhone') }}</span>
-                                </el-form-item>
-                                <el-form-item :label="$t('xpack.alert.dailyAlertNum')" prop="dailyAlertNum">
-                                    {{ smsConfig.config.alertDailyNum }}
-                                </el-form-item>
-                            </el-form>
-                        </div>
-                    </el-card>
-                    <el-card
-                        class="rounded-2xl shadow hover:shadow-md transition-all"
-                        v-if="globalStore.isProductPro && !globalStore.isIntl"
-                    >
-                        <div class="flex items-center justify-between mb-2">
                             <div class="text-lg font-semibold">{{ $t('xpack.alert.weCom') }}</div>
                             <div>
                                 <el-button
@@ -268,7 +230,7 @@
                                     round
                                     size="default"
                                     :disabled="!feiShuConfig.id"
-                                    @click="onChangeDingTalk(feiShuConfig.id)"
+                                    @click="onChangeFeiShu(feiShuConfig.id)"
                                 >
                                     {{ $t('commons.button.edit') }}
                                 </el-button>
@@ -305,6 +267,44 @@
                                 {{ $t('commons.button.create') }}{{ $t('xpack.alert.feiShu') }}
                             </el-button>
                         </el-alert>
+                    </el-card>
+                    <el-card
+                        class="rounded-2xl shadow hover:shadow-md transition-all"
+                        v-if="globalStore.isProductPro && !globalStore.isIntl"
+                    >
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="text-lg font-semibold">
+                                {{ $t('xpack.alert.smsConfig') }}
+                            </div>
+                            <div>
+                                <el-button plain round @click="onChangePhone(smsConfig.id)">
+                                    {{ $t('commons.button.edit') }}
+                                </el-button>
+                            </div>
+                        </div>
+                        <div class="text-sm mb-2 flex items-center justify-start">
+                            {{ $t('xpack.alert.alertSmsHelper', [totalSms, usedSms]) }}
+                            <el-link class="ml-1 text-xs" @click="goBuy" type="primary" icon="Position">
+                                <span class="ml-0.5">{{ $t('xpack.alert.goBuy') }}</span>
+                            </el-link>
+                        </div>
+                        <el-divider class="!mb-2 !mt-3" />
+                        <div class="text-sm config-form">
+                            <el-form
+                                @submit.prevent
+                                ref="alertFormRef"
+                                :label-position="mobile ? 'top' : 'left'"
+                                label-width="110px"
+                            >
+                                <el-form-item :label="$t('xpack.alert.phone')">
+                                    <span v-if="smsConfig.config.phone">{{ smsConfig.config.phone }}</span>
+                                    <span v-else class="label">{{ $t('xpack.alert.defaultPhone') }}</span>
+                                </el-form-item>
+                                <el-form-item :label="$t('xpack.alert.dailyAlertNum')" prop="dailyAlertNum">
+                                    {{ smsConfig.config.alertDailyNum }}
+                                </el-form-item>
+                            </el-form>
+                        </div>
                     </el-card>
                 </div>
             </template>
@@ -364,7 +364,7 @@ const defaultEmailConfig: Alert.EmailConfig = {
 };
 const emailConfig = ref<Alert.EmailConfig>({ ...defaultEmailConfig });
 
-const defaultCommonConfig: Alert.CommonConfig = {
+const defaultCommonConfig: Alert.CommonAlertConfig = {
     id: undefined,
     type: 'common',
     title: 'xpack.alert.commonConfig',
@@ -382,7 +382,7 @@ const defaultCommonConfig: Alert.CommonConfig = {
     },
 };
 
-const commonConfig = ref<Alert.CommonConfig>({ ...defaultCommonConfig });
+const commonConfig = ref<Alert.CommonAlertConfig>({ ...defaultCommonConfig });
 
 const defaultSmsConfig: Alert.SmsConfig = {
     id: undefined,
