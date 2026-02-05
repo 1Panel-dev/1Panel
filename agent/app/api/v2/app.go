@@ -210,7 +210,7 @@ func (b *BaseApi) GetAppIcon(c *gin.Context) {
 		helper.BadRequest(c, err)
 		return
 	}
-	iconBytes, _, etag, err := appService.GetAppIcon(appKey)
+	iconBytes, filename, etag, err := appService.GetAppIcon(appKey)
 	if err != nil {
 		helper.InternalServer(c, err)
 		return
@@ -223,7 +223,7 @@ func (b *BaseApi) GetAppIcon(c *gin.Context) {
 
 	c.Header("Cache-Control", "public, max-age=2592000")
 
-	if etag != "" {
+	if etag != "" && filename != "" {
 		c.Header("ETag", etag)
 		if c.GetHeader("If-None-Match") == etag {
 			c.Status(http.StatusNotModified)
