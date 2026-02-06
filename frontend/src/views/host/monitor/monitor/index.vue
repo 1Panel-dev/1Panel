@@ -741,4 +741,7 @@ onMounted(() => {
     width: 100%;
     height: 400px;
 }
+.el-dropdown {
+    vertical-align: baseline;
+}
 </style>
