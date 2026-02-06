@@ -14,11 +14,11 @@
                     />
                 </el-select>
             </el-form-item>
-            <el-form-item :label="$t('aiTools.agents.baseUrl')" prop="baseURL">
-                <el-input v-model="form.baseURL" :disabled="form.provider !== 'ollama'" />
-            </el-form-item>
             <el-form-item :label="$t('aiTools.agents.apiKey')" prop="apiKey">
                 <el-input v-model="form.apiKey" type="password" show-password />
+            </el-form-item>
+            <el-form-item :label="$t('aiTools.agents.baseUrl')" prop="baseURL">
+                <el-input v-model="form.baseURL" :disabled="form.provider !== 'ollama'" />
             </el-form-item>
             <el-form-item :label="$t('website.remark')" prop="remark">
                 <el-input v-model="form.remark" />
@@ -78,7 +78,7 @@ const form = reactive({
 });
 
 const headerTitle = computed(() =>
-    form.id ? i18n.global.t('commons.button.edit') : i18n.global.t('commons.button.add'),
+    form.id ? i18n.global.t('commons.button.edit') : i18n.global.t('aiTools.agents.createModelAccount'),
 );
 
 const rules = reactive({

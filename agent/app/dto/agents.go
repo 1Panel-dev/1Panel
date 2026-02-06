@@ -103,6 +103,7 @@ type ProviderModelInfo struct {
 }
 
 type ProviderInfo struct {
+	Sort     uint                `json:"-"`
 	Provider string              `json:"provider"`
 	BaseURL  string              `json:"baseUrl"`
 	Models   []ProviderModelInfo `json:"models"`

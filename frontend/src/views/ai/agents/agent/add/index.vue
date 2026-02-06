@@ -52,17 +52,17 @@
                     <el-select v-model="form.accountId" @change="handleAccountChange">
                         <el-option v-for="item in accountOptions" :key="item.id" :label="item.name" :value="item.id" />
                     </el-select>
-                    <span v-if="accountOptions.length === 0" class="input-help">
+                    <span class="input-help">
                         {{ $t('aiTools.agents.noAccountHint') }}
                         <el-button type="primary" link class="inline-link" @click="openAccountCreate">
-                            {{ $t('commons.button.add') }}
+                            {{ $t('aiTools.agents.createModelAccount') }}
                         </el-button>
                     </span>
                 </el-form-item>
-                <el-form-item :label="$t('aiTools.agents.apiKey')" prop="apiKey">
+                <el-form-item :label="$t('aiTools.agents.apiKey')" v-if="form.accountId" prop="apiKey">
                     <el-input v-model="form.apiKey" type="password" show-password readonly />
                 </el-form-item>
-                <el-form-item :label="$t('aiTools.agents.baseUrl')" prop="baseURL">
+                <el-form-item :label="$t('aiTools.agents.baseUrl')" v-if="form.accountId" prop="baseURL">
                     <el-input v-model="form.baseURL" readonly />
                 </el-form-item>
                 <el-form-item :label="$t('aiTools.agents.token')">
@@ -117,7 +117,7 @@ const form = reactive({
     appVersion: '',
     webUIPort: 18789,
     bridgePort: 18790,
-    provider: 'deepseek',
+    provider: 'ollama',
     accountId: undefined as unknown as number,
     model: '',
     apiKey: '',

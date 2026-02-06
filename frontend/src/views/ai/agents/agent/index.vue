@@ -2,12 +2,7 @@
     <div>
         <RouterMenu />
         <DockerStatus v-model:isActive="isActive" v-model:isExist="isExist" />
-        <LayoutContent
-            v-loading="loading"
-            v-if="isExist"
-            :class="{ mask: !isActive }"
-            :title="$t('aiTools.agents.agentList')"
-        >
+        <LayoutContent v-loading="loading" v-if="isExist" :class="{ mask: !isActive }">
             <template #leftToolBar>
                 <el-button type="primary" @click="openCreate">{{ $t('aiTools.agents.createAgent') }}</el-button>
             </template>

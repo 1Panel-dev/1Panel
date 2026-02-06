@@ -14,14 +14,14 @@ func LoadMenus() string {
 	item := []dto.ShowMenu{
 		{ID: "1", Disabled: true, Title: "menu.home", IsShow: true, Label: "Home-Menu", Path: "/", Sort: 100},
 		{ID: "2", Disabled: true, Title: "menu.apps", IsShow: true, Label: "App-Menu", Path: "/apps/all", Sort: 200},
-		{ID: "3", Disabled: false, Title: "menu.aiTools", IsShow: true, Label: "AI-Menu", Path: "/ai/model", Sort: 400,
+		{ID: "3", Disabled: false, Title: "menu.aiTools", IsShow: true, Label: "AI-Menu", Path: "/ai/model", Sort: 300,
 			Children: []dto.ShowMenu{
 				{ID: "44", Disabled: false, Title: "aiTools.agents.agents", IsShow: true, Label: "Agents", Path: "/ai/agents/agent", Sort: 50},
 				{ID: "41", Disabled: false, Title: "aiTools.model.model", IsShow: true, Label: "OllamaModel", Path: "/ai/model", Sort: 100},
 				{ID: "42", Disabled: false, Title: "menu.mcp", IsShow: true, Label: "MCPServer", Path: "/ai/mcp", Sort: 200},
 				{ID: "43", Disabled: false, Title: "aiTools.gpu.gpu", IsShow: true, Label: "GPU", Path: "/ai/gpu", Sort: 300},
 			}},
-		{ID: "4", Disabled: false, Title: "menu.website", IsShow: true, Label: "Website-Menu", Path: "/websites", Sort: 300,
+		{ID: "4", Disabled: false, Title: "menu.website", IsShow: true, Label: "Website-Menu", Path: "/websites", Sort: 400,
 			Children: []dto.ShowMenu{
 				{ID: "31", Disabled: false, Title: "menu.website", IsShow: true, Label: "Website", Path: "/websites", Sort: 100},
 				{ID: "32", Disabled: false, Title: "menu.ssl", IsShow: true, Label: "SSL", Path: "/websites/ssl", Sort: 200},

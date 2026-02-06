@@ -1,9 +1,9 @@
 <template>
     <div>
         <RouterMenu />
-        <LayoutContent :title="$t('aiTools.agents.accountList')">
+        <LayoutContent>
             <template #leftToolBar>
-                <el-button type="primary" @click="openCreate">{{ $t('commons.button.add') }}</el-button>
+                <el-button type="primary" @click="openCreate">{{ $t('aiTools.agents.createModelAccount') }}</el-button>
             </template>
             <template #rightToolBar>
                 <TableSearch v-model:searchName="searchName" @search="search" />

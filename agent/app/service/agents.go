@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"path"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -205,11 +206,15 @@ func (a AgentService) GetProviders() ([]dto.ProviderInfo, error) {
 	providers := make([]dto.ProviderInfo, 0, len(definitions))
 	for key, def := range definitions {
 		providers = append(providers, dto.ProviderInfo{
+			Sort:     def.Sort,
 			Provider: key,
 			BaseURL:  def.BaseURL,
 			Models:   def.Models,
 		})
 	}
+	sort.Slice(providers, func(i, j int) bool {
+		return providers[i].Sort < providers[j].Sort
+	})
 	return providers, nil
 }
 
@@ -673,13 +678,29 @@ func providerEnvKey(provider string) string {
 }
 
 type providerDefinition struct {
+	Sort    uint
 	BaseURL string
 	Models  []dto.ProviderModelInfo
 }
 
 func providerDefinitions() map[string]providerDefinition {
 	return map[string]providerDefinition{
+		"ollama": {
+			Sort:    1,
+			BaseURL: "",
+			Models:  []dto.ProviderModelInfo{},
+		},
+		"deepseek": {
+			Sort:    2,
+			BaseURL: "https://api.deepseek.com/v1",
+			Models: []dto.ProviderModelInfo{
+				{ID: "deepseek/deepseek-chat", Name: "DeepSeek Chat"},
+				{ID: "deepseek/deepseek-reasoner", Name: "DeepSeek Reasoner"},
+				{ID: "deepseek/deepseek-r1:1.5b", Name: "DeepSeek R1 1.5B"},
+			},
+		},
 		"openai": {
+			Sort:    3,
 			BaseURL: "https://api.openai.com/v1",
 			Models: []dto.ProviderModelInfo{
 				{ID: "openai/codex-mini-latest", Name: "Codex Mini"},
@@ -691,6 +712,7 @@ func providerDefinitions() map[string]providerDefinition {
 			},
 		},
 		"anthropic": {
+			Sort:    4,
 			BaseURL: "https://api.anthropic.com",
 			Models: []dto.ProviderModelInfo{
 				{ID: "anthropic/claude-3-haiku-20240307", Name: "Claude 3 Haiku"},
@@ -701,6 +723,7 @@ func providerDefinitions() map[string]providerDefinition {
 			},
 		},
 		"gemini": {
+			Sort:    5,
 			BaseURL: "https://generativelanguage.googleapis.com",
 			Models: []dto.ProviderModelInfo{
 				{ID: "google/gemini-1.5-flash", Name: "Gemini 1.5 Flash"},
@@ -712,22 +735,11 @@ func providerDefinitions() map[string]providerDefinition {
 			},
 		},
 		"minimax": {
+			Sort:    6,
 			BaseURL: "https://api.minimax.chat/v1",
 			Models: []dto.ProviderModelInfo{
 				{ID: "minimax/Minimax-M2.1", Name: "Minimax M2.1"},
 			},
-		},
-		"deepseek": {
-			BaseURL: "https://api.deepseek.com/v1",
-			Models: []dto.ProviderModelInfo{
-				{ID: "deepseek/deepseek-chat", Name: "DeepSeek Chat"},
-				{ID: "deepseek/deepseek-reasoner", Name: "DeepSeek Reasoner"},
-				{ID: "deepseek/deepseek-r1:1.5b", Name: "DeepSeek R1 1.5B"},
-			},
-		},
-		"ollama": {
-			BaseURL: "",
-			Models:  []dto.ProviderModelInfo{},
 		},
 	}
 }
