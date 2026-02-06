@@ -9,13 +9,13 @@ import (
 func GlobalLoading() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		settingRepo := repo.NewISettingRepo()
-		status, err := settingRepo.Get(repo.WithByKey("SystemStatus"))
+		status, err := settingRepo.GetValueByKey("SystemStatus")
 		if err != nil {
 			helper.InternalServer(c, err)
 			return
 		}
-		if status.Value != "Free" {
-			helper.ErrorWithDetail(c, 407, status.Value, err)
+		if status != "Free" {
+			helper.ErrorWithDetail(c, 407, status, err)
 			return
 		}
 		c.Next()

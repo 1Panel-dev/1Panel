@@ -71,16 +71,16 @@ func checkSession(c *gin.Context) bool {
 		return false
 	}
 	settingRepo := repo.NewISettingRepo()
-	setting, err := settingRepo.Get(repo.WithByKey("SessionTimeout"))
+	sessionTimeout, err := settingRepo.GetValueByKey("SessionTimeout")
 	if err != nil {
 		return false
 	}
-	lifeTime, _ := strconv.Atoi(setting.Value)
-	httpsSetting, err := settingRepo.Get(repo.WithByKey("SSL"))
+	lifeTime, _ := strconv.Atoi(sessionTimeout)
+	ssl, err := settingRepo.GetValueByKey("SSL")
 	if err != nil {
 		return false
 	}
-	_ = global.SESSION.Set(c, psession, httpsSetting.Value == constant.StatusEnable, lifeTime)
+	_ = global.SESSION.Set(c, psession, ssl == constant.StatusEnable, lifeTime)
 	return true
 }
 
