@@ -44,16 +44,17 @@ frontend/src/xpack
 agent/xpack
 agent/router/entry_xpack.go
 agent/server/init_xpack.go
+agent/utils/xpack/xpack.go
 agent/utils/xpack/xpack_xpack.go
 core/xpack
 core/router/entry_xpack.go
 core/server/init_xpack.go
+core/utils/xpack/xpack.go
 core/utils/xpack/xpack_xpack.go
 core/xpack-ee
-core/router/entry_xpack_ee.go
-core/server/init_xpack_ee.go
-core/utils/xpack/xpack_xpack_ee.go
-xpack
+core/router/entry_xpackee.go
+core/server/init_xpackee.go
+core/utils/xpack/xpack_xpackee.go
 
 .history/
 dist/
