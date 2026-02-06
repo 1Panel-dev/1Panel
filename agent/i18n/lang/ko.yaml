@@ -38,6 +38,19 @@ ErrGroupIsDefault: '기본 그룹, 삭제할 수 없습니다'
 ErrGroupIsInWebsiteUse: '그룹이 다른 웹사이트에서 사용 중이므로 삭제할 수 없습니다.'
 Decrypt: "복호화"
 
+#agent
+ErrAgentAccountBound: '이 계정은 에이전트에 바인딩되어 있어 삭제할 수 없습니다. 확인 후 다시 시도하세요!'
+ErrAgentAccountUnavailable: '계정 연결 정보를 사용할 수 없습니다. 오류: {{ .err }}. 확인 후 다시 시도하세요!'
+ErrAgentProviderNotSupported: '이 에이전트 제공자는 지원되지 않습니다. 확인 후 다시 시도하세요!'
+ErrAgentAccountRequired: '에이전트 계정을 선택한 후 다시 시도하세요.'
+ErrAgentAccountNotVerified: '계정이 검증되지 않았습니다. 확인 후 다시 시도하세요!'
+ErrAgentProviderMismatch: '계정 제공자가 일치하지 않습니다. 확인 후 다시 시도하세요!'
+ErrAgentBaseURLRequired: 'Base URL은 비워 둘 수 없습니다. 확인 후 다시 시도하세요!'
+ErrAgentApiKeyRequired: 'API Key는 비워 둘 수 없습니다. 확인 후 다시 시도하세요!'
+ErrAgentComposeRequired: '사용자 정의 compose 내용은 비워 둘 수 없습니다. 확인 후 다시 시도하세요!'
+ErrAgentIDRequired: '에이전트 ID는 비워 둘 수 없습니다. 확인 후 다시 시도하세요!'
+ErrAgentAccountIDRequired: '계정 ID는 비워 둘 수 없습니다. 확인 후 다시 시도하세요!'
+
 #지원
 Localhost: '로컬 머신'
 ErrBackupInUsed: '백업 계정이 예약된 작업에 사용되었으므로 삭제할 수 없습니다.'

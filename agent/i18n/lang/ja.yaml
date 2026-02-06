@@ -37,6 +37,19 @@ ErrGroupIsDefault: 'デフォルト グループ、削除できません'
 ErrGroupIsInWebsiteUse: 'グループは別の Web サイトで使用されているため、削除できません。'
 Decrypt: "復号化"
 
+#agent
+ErrAgentAccountBound: 'このアカウントはエージェントに紐付いているため削除できません。確認して再試行してください！'
+ErrAgentAccountUnavailable: 'アカウント接続情報を利用できません。エラー: {{ .err }}。確認して再試行してください！'
+ErrAgentProviderNotSupported: 'このエージェント提供元はサポートされていません。確認して再試行してください！'
+ErrAgentAccountRequired: 'エージェントアカウントを選択して再試行してください。'
+ErrAgentAccountNotVerified: 'アカウントの検証が完了していません。確認して再試行してください！'
+ErrAgentProviderMismatch: 'アカウントの提供元が一致しません。確認して再試行してください！'
+ErrAgentBaseURLRequired: 'Base URL を空にできません。確認して再試行してください！'
+ErrAgentApiKeyRequired: 'API Key を空にできません。確認して再試行してください！'
+ErrAgentComposeRequired: 'カスタム compose 内容を空にできません。確認して再試行してください！'
+ErrAgentIDRequired: 'エージェント ID を空にできません。確認して再試行してください！'
+ErrAgentAccountIDRequired: 'アカウント ID を空にできません。確認して再試行してください！'
+
 #backup
 Localhost: 'ローカルマシン'
 ErrBackupInUsed: 'バックアップ アカウントはスケジュールされたタスクで使用されているため、削除できません。'

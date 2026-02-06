@@ -353,7 +353,7 @@
                     />
                     <fu-table-operations
                         fix
-                        width="200px"
+                        width="220px"
                         :ellipsis="2"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"

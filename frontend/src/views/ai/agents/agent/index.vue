@@ -17,30 +17,46 @@
             </template>
             <template #main>
                 <ComplexTable :data="items" :pagination-config="paginationConfig" @search="search">
-                    <el-table-column :label="$t('commons.table.name')" prop="name" min-width="160" />
-                    <el-table-column :label="$t('aiTools.agents.appVersion')" prop="appVersion" width="120" />
-                    <el-table-column :label="$t('aiTools.agents.webuiPort')" prop="webUIPort" width="140">
-                        <template #default="{ row }">
-                            <el-button icon="Position" plain size="small" @click="jumpWebUI(row)">
-                                {{ row.webUIPort }}
-                            </el-button>
-                        </template>
-                    </el-table-column>
-                    <el-table-column :label="$t('aiTools.agents.bridgePort')" prop="bridgePort" width="120" />
-                    <el-table-column :label="$t('aiTools.agents.provider')" prop="provider" width="120">
-                        <template #default="{ row }">
-                            {{ getProviderLabel(row.provider) }}
-                        </template>
-                    </el-table-column>
-                    <el-table-column :label="$t('aiTools.model.model')" prop="model" min-width="180" />
-                    <el-table-column :label="$t('aiTools.agents.token')" width="120">
-                        <template #default="{ row }">
-                            <CopyButton :content="row.token" />
-                        </template>
-                    </el-table-column>
+                    <el-table-column
+                        :label="$t('commons.table.name')"
+                        show-overflow-tooltip
+                        prop="name"
+                        min-width="120"
+                    />
                     <el-table-column :label="$t('commons.table.status')" prop="status" width="120">
                         <template #default="{ row }">
                             <Status :status="row.status" />
+                        </template>
+                    </el-table-column>
+                    <el-table-column :label="$t('aiTools.agents.appVersion')" prop="appVersion" min-width="100" />
+                    <el-table-column
+                        :label="$t('aiTools.model.model')"
+                        show-overflow-tooltip
+                        prop="provider"
+                        min-width="120"
+                    >
+                        <template #default="{ row }">
+                            {{ getProviderLabel(row.provider) }}
+                            <div>
+                                <span>{{ row.model }}</span>
+                            </div>
+                        </template>
+                    </el-table-column>
+                    <el-table-column :label="$t('commons.table.port')" prop="webUIPort" min-width="150">
+                        <template #default="{ row }">
+                            <el-button icon="Position" plain size="small" @click="jumpWebUI(row)">
+                                {{ $t('aiTools.agents.webuiPort') }}: {{ row.webUIPort }}
+                            </el-button>
+                            <div class="mt-0.5">
+                                <el-button plain size="small">
+                                    {{ $t('aiTools.agents.bridgePort') }} {{ row.bridgePort }}
+                                </el-button>
+                            </div>
+                        </template>
+                    </el-table-column>
+                    <el-table-column :label="$t('aiTools.agents.token')" min-width="80">
+                        <template #default="{ row }">
+                            <CopyButton :content="row.token" />
                         </template>
                     </el-table-column>
                     <el-table-column
@@ -52,7 +68,7 @@
                     />
                     <fu-table-operations
                         :buttons="buttons"
-                        min-width="200"
+                        min-width="220"
                         :label="$t('commons.table.operate')"
                         fixed="right"
                         :ellipsis="2"

@@ -41,6 +41,19 @@ ErrGroupIsDefault: 'Kumpulan lalai, tidak boleh dipadamkan'
 ErrGroupIsInWebsiteUse: 'Kumpulan sedang digunakan oleh tapak web lain dan tidak boleh dipadamkan.'
 Decrypt: "Dekripsi"
 
+#agent
+ErrAgentAccountBound: 'Akaun ini telah dipautkan kepada ejen dan tidak boleh dipadam. Sila semak dan cuba lagi!'
+ErrAgentAccountUnavailable: 'Maklumat sambungan akaun tidak tersedia. Ralat: {{ .err }}. Sila semak dan cuba lagi!'
+ErrAgentProviderNotSupported: 'Penyedia ejen ini tidak disokong. Sila semak dan cuba lagi!'
+ErrAgentAccountRequired: 'Sila pilih akaun ejen dan cuba lagi.'
+ErrAgentAccountNotVerified: 'Akaun belum disahkan. Sila semak dan cuba lagi!'
+ErrAgentProviderMismatch: 'Penyedia akaun tidak sepadan. Sila semak dan cuba lagi!'
+ErrAgentBaseURLRequired: 'Base URL tidak boleh kosong. Sila semak dan cuba lagi!'
+ErrAgentApiKeyRequired: 'API Key tidak boleh kosong. Sila semak dan cuba lagi!'
+ErrAgentComposeRequired: 'Kandungan compose tersuai tidak boleh kosong. Sila semak dan cuba lagi!'
+ErrAgentIDRequired: 'ID ejen tidak boleh kosong. Sila semak dan cuba lagi!'
+ErrAgentAccountIDRequired: 'ID akaun tidak boleh kosong. Sila semak dan cuba lagi!'
+
 #sandaran
 Localhost: 'Mesin Tempatan'
 ErrBackupInUsed: 'Akaun sandaran telah digunakan dalam tugas yang dijadualkan dan tidak boleh dipadamkan.'

@@ -38,6 +38,19 @@ ErrGroupIsDefault: 'Grupo predeterminado, no se puede eliminar'
 ErrGroupIsInWebsiteUse: 'El grupo está siendo usado por otro sitio web y no se puede eliminar.'
 Decrypt: "Descifrar"
 
+#agent
+ErrAgentAccountBound: 'Esta cuenta está vinculada a un agente y no se puede eliminar. Verifique e inténtelo de nuevo!'
+ErrAgentAccountUnavailable: 'La información de conexión de la cuenta no está disponible. Error: {{ .err }}. Verifique e inténtelo de nuevo!'
+ErrAgentProviderNotSupported: 'Este proveedor de agente no es compatible. Verifique e inténtelo de nuevo!'
+ErrAgentAccountRequired: 'Seleccione una cuenta de agente y vuelva a intentarlo.'
+ErrAgentAccountNotVerified: 'La cuenta no está verificada. Verifique e inténtelo de nuevo!'
+ErrAgentProviderMismatch: 'El proveedor de la cuenta no coincide. Verifique e inténtelo de nuevo!'
+ErrAgentBaseURLRequired: 'Base URL no puede estar vacío. Verifique e inténtelo de nuevo!'
+ErrAgentApiKeyRequired: 'API Key no puede estar vacío. Verifique e inténtelo de nuevo!'
+ErrAgentComposeRequired: 'El contenido personalizado de compose no puede estar vacío. Verifique e inténtelo de nuevo!'
+ErrAgentIDRequired: 'El ID del agente no puede estar vacío. Verifique e inténtelo de nuevo!'
+ErrAgentAccountIDRequired: 'El ID de la cuenta no puede estar vacío. Verifique e inténtelo de nuevo!'
+
 #backup
 ErrBackupInUsed: 'La cuenta de respaldo está siendo utilizada en una tarea programada y no se puede eliminar.'
 ErrBackupCheck: 'Error al probar la conexión de la cuenta de respaldo {{ .err }}'

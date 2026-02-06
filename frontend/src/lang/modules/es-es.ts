@@ -683,6 +683,8 @@ const message = {
             accountName: 'Account Name',
             accountList: 'Account List',
             createAccount: 'Create Account',
+            noAccountHint: 'Selecciona una cuenta existente o agrega una nueva.',
+            accountCount: '{0} cuentas',
             syncAgents: 'Sync related agents',
             syncAgentsHelper: 'Update openclaw.json for agents using this account',
             appVersion: 'App Version',

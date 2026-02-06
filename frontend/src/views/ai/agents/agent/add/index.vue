@@ -1,63 +1,81 @@
 <template>
     <DrawerPro v-model="open" :header="$t('aiTools.agents.createAgent')" size="large" @close="handleClose">
         <el-form ref="formRef" :model="form" :rules="rules" label-position="top">
-            <el-form-item :label="$t('commons.table.name')" prop="name">
-                <el-input v-model="form.name" />
-            </el-form-item>
-            <el-form-item :label="$t('aiTools.agents.appVersion')" prop="appVersion">
-                <el-select v-model="form.appVersion" filterable>
-                    <el-option v-for="item in versions" :key="item" :label="item" :value="item" />
-                </el-select>
-            </el-form-item>
-            <el-form-item :label="$t('aiTools.agents.webuiPort')" prop="webUIPort">
-                <el-input-number v-model="form.webUIPort" :min="1" :max="65535" />
-            </el-form-item>
-            <el-form-item :label="$t('aiTools.agents.bridgePort')" prop="bridgePort">
-                <el-input-number v-model="form.bridgePort" :min="1" :max="65535" />
-            </el-form-item>
-            <el-form-item :label="$t('aiTools.agents.provider')" prop="provider">
-                <el-select v-model="form.provider" @change="handleProviderChange">
-                    <el-option
-                        v-for="item in providerOptions"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value"
-                    />
-                </el-select>
-            </el-form-item>
-            <el-form-item v-if="accountOptions.length > 0" :label="$t('aiTools.agents.account')" prop="accountId">
-                <el-select v-model="form.accountId" @change="handleAccountChange">
-                    <el-option v-for="item in accountOptions" :key="item.id" :label="item.name" :value="item.id" />
-                </el-select>
-            </el-form-item>
-            <el-form-item v-else :label="$t('aiTools.agents.account')">
-                <el-button type="text" @click="openAccountCreate">
-                    {{ $t('aiTools.agents.createAccount') }}
-                </el-button>
-            </el-form-item>
-            <el-form-item>
-                <el-checkbox v-model="manualModel">{{ $t('aiTools.agents.manualModel') }}</el-checkbox>
-            </el-form-item>
-            <el-form-item :label="$t('aiTools.model.model')" prop="model">
-                <el-input v-if="manualModel" v-model="form.model" />
-                <el-select v-else v-model="form.model" filterable @change="handleModelChange">
-                    <el-option v-for="item in filteredModels" :key="item.id" :label="item.name" :value="item.id" />
-                </el-select>
-            </el-form-item>
-            <el-form-item :label="$t('aiTools.agents.apiKey')" prop="apiKey">
-                <el-input v-model="form.apiKey" type="password" show-password readonly />
-            </el-form-item>
-            <el-form-item :label="$t('aiTools.agents.baseUrl')" prop="baseURL">
-                <el-input v-model="form.baseURL" readonly />
-            </el-form-item>
-            <el-form-item :label="$t('aiTools.agents.token')">
-                <el-input v-model="form.token" readonly>
-                    <template #append>
-                        <CopyButton :content="form.token" />
-                    </template>
-                </el-input>
-            </el-form-item>
-            <AdvancedSetting :form="form" />
+            <el-card class="form-card">
+                <el-form-item :label="$t('commons.table.name')" prop="name">
+                    <el-input v-model="form.name" />
+                </el-form-item>
+                <el-form-item :label="$t('aiTools.agents.appVersion')" prop="appVersion">
+                    <el-select v-model="form.appVersion" filterable>
+                        <el-option v-for="item in versions" :key="item" :label="item" :value="item" />
+                    </el-select>
+                </el-form-item>
+                <el-form-item :label="$t('aiTools.agents.webuiPort')" prop="webUIPort">
+                    <el-input-number v-model="form.webUIPort" :min="1" :max="65535" />
+                </el-form-item>
+                <el-form-item :label="$t('aiTools.agents.bridgePort')" prop="bridgePort">
+                    <el-input-number v-model="form.bridgePort" :min="1" :max="65535" />
+                </el-form-item>
+            </el-card>
+            <el-card class="form-card">
+                <el-form-item :label="$t('aiTools.agents.provider')" prop="provider">
+                    <el-select v-model="form.provider" @change="handleProviderChange">
+                        <el-option
+                            v-for="item in providerOptions"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value"
+                        >
+                            <div class="option-row">
+                                <span class="option-label">{{ item.label }}</span>
+                                <el-tag
+                                    size="small"
+                                    :type="providerAccountCount[item.value] > 0 ? 'success' : 'info'"
+                                    class="option-tag"
+                                >
+                                    {{ $t('aiTools.agents.accountCount', [providerAccountCount[item.value] || 0]) }}
+                                </el-tag>
+                            </div>
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item>
+                    <el-checkbox v-model="manualModel">{{ $t('aiTools.agents.manualModel') }}</el-checkbox>
+                </el-form-item>
+                <el-form-item :label="$t('aiTools.model.model')" prop="model">
+                    <el-input v-if="manualModel" v-model="form.model" />
+                    <el-select v-else v-model="form.model" filterable @change="handleModelChange">
+                        <el-option v-for="item in filteredModels" :key="item.id" :label="item.name" :value="item.id" />
+                    </el-select>
+                </el-form-item>
+                <el-form-item :label="$t('aiTools.agents.account')" prop="accountId">
+                    <el-select v-model="form.accountId" @change="handleAccountChange">
+                        <el-option v-for="item in accountOptions" :key="item.id" :label="item.name" :value="item.id" />
+                    </el-select>
+                    <span v-if="accountOptions.length === 0" class="input-help">
+                        {{ $t('aiTools.agents.noAccountHint') }}
+                        <el-button type="primary" link class="inline-link" @click="openAccountCreate">
+                            {{ $t('commons.button.add') }}
+                        </el-button>
+                    </span>
+                </el-form-item>
+                <el-form-item :label="$t('aiTools.agents.apiKey')" prop="apiKey">
+                    <el-input v-model="form.apiKey" type="password" show-password readonly />
+                </el-form-item>
+                <el-form-item :label="$t('aiTools.agents.baseUrl')" prop="baseURL">
+                    <el-input v-model="form.baseURL" readonly />
+                </el-form-item>
+                <el-form-item :label="$t('aiTools.agents.token')">
+                    <el-input v-model="form.token" readonly>
+                        <template #append>
+                            <CopyButton :content="form.token" />
+                        </template>
+                    </el-input>
+                </el-form-item>
+            </el-card>
+            <el-card class="form-card">
+                <AdvancedSetting :form="form" />
+            </el-card>
         </el-form>
         <template #footer>
             <span class="dialog-footer">
@@ -89,6 +107,7 @@ const versions = ref<string[]>([]);
 const accountOptions = ref<AI.AgentAccountItem[]>([]);
 const providerOptions = ref<Array<{ label: string; value: string }>>([]);
 const providerModels = ref<Record<string, AI.ProviderModelInfo[]>>({});
+const providerAccountCount = ref<Record<string, number>>({});
 const manualModel = ref(false);
 const appInfo = ref<App.AppDTO>();
 const accountAddRef = ref();
@@ -99,7 +118,7 @@ const form = reactive({
     webUIPort: 18789,
     bridgePort: 18790,
     provider: 'deepseek',
-    accountId: 0,
+    accountId: undefined as unknown as number,
     model: '',
     apiKey: '',
     baseURL: '',
@@ -179,7 +198,22 @@ const loadProviders = async () => {
     if (!providerOptions.value.find((item) => item.value === form.provider) && providerOptions.value.length > 0) {
         form.provider = providerOptions.value[0].value;
     }
+    await loadProviderAccountCounts(providerOptions.value.map((item) => item.value));
     setDefaultModel();
+};
+
+const loadProviderAccountCounts = async (providers: string[]) => {
+    const tasks = providers.map(async (provider) => {
+        const req: AI.AgentAccountSearch = {
+            page: 1,
+            pageSize: 1,
+            provider: provider,
+            name: '',
+        };
+        const res = await pageAgentAccounts(req);
+        providerAccountCount.value[provider] = res.data.total || 0;
+    });
+    await Promise.all(tasks);
 };
 
 const loadAccounts = async () => {
@@ -195,11 +229,12 @@ const loadAccounts = async () => {
     };
     const res = await pageAgentAccounts(req);
     accountOptions.value = res.data.items || [];
+    providerAccountCount.value[form.provider] = res.data.total || accountOptions.value.length;
     if (accountOptions.value.length > 0) {
         form.accountId = accountOptions.value[0].id;
         handleAccountChange();
     } else {
-        form.accountId = 0;
+        form.accountId = undefined as unknown as number;
         form.apiKey = '';
         form.baseURL = '';
     }
@@ -209,7 +244,7 @@ const handleProviderChange = () => {
     form.model = '';
     form.apiKey = '';
     form.baseURL = '';
-    form.accountId = 0;
+    form.accountId = undefined as unknown as number;
     loadAccounts();
     setDefaultModel();
 };
@@ -328,3 +363,35 @@ defineExpose({
     open: openDrawer,
 });
 </script>
+
+<style scoped>
+.form-card {
+    margin-bottom: 16px;
+}
+
+.inline-link {
+    padding: 0;
+    margin-top: -1px;
+    margin-left: 5px;
+    height: auto;
+    line-height: inherit;
+    font-size: inherit;
+}
+
+.option-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.option-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.option-tag {
+    flex-shrink: 0;
+}
+</style>

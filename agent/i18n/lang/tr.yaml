@@ -41,6 +41,19 @@ ErrGroupIsDefault: 'Varsayılan grup, silinemez'
 ErrGroupIsInWebsiteUse: 'Grup başka bir web sitesi tarafından kullanılıyor ve silinemez.'
 Decrypt: "Şifre Çöz"
 
+#agent
+ErrAgentAccountBound: 'Bu hesap bir ajana bağlı ve silinemez. Kontrol edip tekrar deneyin!'
+ErrAgentAccountUnavailable: 'Hesap bağlantı bilgileri kullanılamıyor. Hata: {{ .err }}. Kontrol edip tekrar deneyin!'
+ErrAgentProviderNotSupported: 'Bu ajan sağlayıcısı desteklenmiyor. Kontrol edip tekrar deneyin!'
+ErrAgentAccountRequired: 'Lütfen bir ajan hesabı seçip tekrar deneyin.'
+ErrAgentAccountNotVerified: 'Hesap doğrulanmadı. Kontrol edip tekrar deneyin!'
+ErrAgentProviderMismatch: 'Hesap sağlayıcısı eşleşmiyor. Kontrol edip tekrar deneyin!'
+ErrAgentBaseURLRequired: 'Base URL boş olamaz. Kontrol edip tekrar deneyin!'
+ErrAgentApiKeyRequired: 'API Key boş olamaz. Kontrol edip tekrar deneyin!'
+ErrAgentComposeRequired: 'Özel compose içeriği boş olamaz. Kontrol edip tekrar deneyin!'
+ErrAgentIDRequired: 'Ajan ID boş olamaz. Kontrol edip tekrar deneyin!'
+ErrAgentAccountIDRequired: 'Hesap ID boş olamaz. Kontrol edip tekrar deneyin!'
+
 #backup
 Localhost: 'Yerel Makine'
 ErrBackupInUsed: 'Yedekleme hesabı zamanlanmış görevde kullanıldı ve silinemez.'

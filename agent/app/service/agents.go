@@ -43,20 +43,20 @@ func NewIAgentService() IAgentService {
 func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 	provider := strings.ToLower(strings.TrimSpace(req.Provider))
 	if !isSupportedAgentProvider(provider) {
-		return nil, buserr.WithDetail("ErrInvalidParams", "provider", nil)
+		return nil, buserr.New("ErrAgentProviderNotSupported")
 	}
 	if req.AccountID == 0 {
-		return nil, buserr.WithDetail("ErrInvalidParams", "accountId", nil)
+		return nil, buserr.New("ErrAgentAccountRequired")
 	}
 	account, err := agentAccountRepo.GetFirst(repo.WithByID(req.AccountID))
 	if err != nil {
 		return nil, err
 	}
 	if !account.Verified {
-		return nil, buserr.WithDetail("ErrInvalidParams", "account", nil)
+		return nil, buserr.New("ErrAgentAccountNotVerified")
 	}
 	if account.Provider != "" && provider != "" && account.Provider != provider {
-		return nil, buserr.WithDetail("ErrInvalidParams", "provider", nil)
+		return nil, buserr.New("ErrAgentProviderMismatch")
 	}
 	provider = strings.ToLower(strings.TrimSpace(account.Provider))
 	baseURL := strings.TrimSpace(account.BaseURL)
@@ -66,10 +66,10 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 		}
 	}
 	if provider == "ollama" && baseURL == "" {
-		return nil, buserr.WithDetail("ErrInvalidParams", "baseURL", nil)
+		return nil, buserr.New("ErrAgentBaseURLRequired")
 	}
 	if provider != "ollama" && strings.TrimSpace(account.APIKey) == "" {
-		return nil, buserr.WithDetail("ErrInvalidParams", "apiKey", nil)
+		return nil, buserr.New("ErrAgentApiKeyRequired")
 	}
 	if err := checkPortExist(req.WebUIPort); err != nil {
 		return nil, err
@@ -110,7 +110,7 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 	}
 
 	if req.EditCompose && strings.TrimSpace(req.DockerCompose) == "" {
-		return nil, buserr.WithDetail("ErrInvalidParams", "dockerCompose", nil)
+		return nil, buserr.New("ErrAgentComposeRequired")
 	}
 	installReq := request.AppInstallCreate{
 		AppDetailId: detail.ID,
@@ -178,7 +178,7 @@ func (a AgentService) Page(req dto.SearchWithPage) (int64, []dto.AgentItem, erro
 
 func (a AgentService) Delete(req dto.AgentDeleteReq) error {
 	if req.ID == 0 {
-		return buserr.WithDetail("ErrInvalidParams", "id", nil)
+		return buserr.New("ErrAgentIDRequired")
 	}
 	agent, err := agentRepo.GetFirst(repo.WithByID(req.ID))
 	if err != nil {
@@ -216,11 +216,11 @@ func (a AgentService) GetProviders() ([]dto.ProviderInfo, error) {
 func (a AgentService) CreateAccount(req dto.AgentAccountCreateReq) error {
 	provider := strings.ToLower(strings.TrimSpace(req.Provider))
 	if !isSupportedAgentProvider(provider) {
-		return buserr.WithDetail("ErrInvalidParams", "provider", nil)
+		return buserr.New("ErrAgentProviderNotSupported")
 	}
 	apiKey := strings.TrimSpace(req.APIKey)
 	if apiKey == "" {
-		return buserr.WithDetail("ErrInvalidParams", "apiKey", nil)
+		return buserr.New("ErrAgentApiKeyRequired")
 	}
 	baseURL := strings.TrimSpace(req.BaseURL)
 	if provider != "ollama" {
@@ -229,7 +229,7 @@ func (a AgentService) CreateAccount(req dto.AgentAccountCreateReq) error {
 		}
 	}
 	if provider == "ollama" && baseURL == "" {
-		return buserr.WithDetail("ErrInvalidParams", "baseURL", nil)
+		return buserr.New("ErrAgentBaseURLRequired")
 	}
 	if exist, _ := agentAccountRepo.GetFirst(repo.WithByProvider(provider), repo.WithByName(req.Name)); exist != nil && exist.ID > 0 {
 		return buserr.New("ErrRecordExist")
@@ -261,7 +261,7 @@ func (a AgentService) UpdateAccount(req dto.AgentAccountUpdateReq) error {
 		}
 	}
 	if provider == "ollama" && baseURL == "" {
-		return buserr.WithDetail("ErrInvalidParams", "baseURL", nil)
+		return buserr.New("ErrAgentBaseURLRequired")
 	}
 	if err := a.VerifyAccount(dto.AgentAccountVerifyReq{Provider: provider, BaseURL: baseURL, APIKey: req.APIKey}); err != nil {
 		return err
@@ -313,11 +313,11 @@ func (a AgentService) PageAccounts(req dto.AgentAccountSearch) (int64, []dto.Age
 func (a AgentService) VerifyAccount(req dto.AgentAccountVerifyReq) error {
 	provider := strings.ToLower(strings.TrimSpace(req.Provider))
 	if !isSupportedAgentProvider(provider) {
-		return buserr.WithDetail("ErrInvalidParams", "provider", nil)
+		return buserr.New("ErrAgentProviderNotSupported")
 	}
 	apiKey := strings.TrimSpace(req.APIKey)
 	if apiKey == "" {
-		return buserr.WithDetail("ErrInvalidParams", "apiKey", nil)
+		return buserr.New("ErrAgentApiKeyRequired")
 	}
 	baseURL := strings.TrimSpace(req.BaseURL)
 	if baseURL == "" {
@@ -326,7 +326,7 @@ func (a AgentService) VerifyAccount(req dto.AgentAccountVerifyReq) error {
 		}
 	}
 	if provider == "ollama" && baseURL == "" {
-		return buserr.WithDetail("ErrInvalidParams", "baseURL", nil)
+		return buserr.New("ErrAgentBaseURLRequired")
 	}
 	if provider == "ollama" {
 		return nil
@@ -336,10 +336,10 @@ func (a AgentService) VerifyAccount(req dto.AgentAccountVerifyReq) error {
 
 func (a AgentService) DeleteAccount(req dto.AgentAccountDeleteReq) error {
 	if req.ID == 0 {
-		return buserr.WithDetail("ErrInvalidParams", "id", nil)
+		return buserr.New("ErrAgentAccountIDRequired")
 	}
 	if exists, _ := agentRepo.GetFirst(repo.WithByAccountID(req.ID)); exists != nil && exists.ID > 0 {
-		return buserr.New("ErrRecordExist")
+		return buserr.New("ErrAgentAccountBound")
 	}
 	return agentAccountRepo.DeleteByID(req.ID)
 }
@@ -391,11 +391,11 @@ func verifyProvider(provider, baseURL, apiKey string) error {
 	}
 	resp, err := client.Do(request)
 	if err != nil {
-		return err
+		return buserr.WithErr("ErrAgentAccountUnavailable", err)
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode >= 400 {
-		return buserr.WithDetail("ErrInvalidParams", fmt.Sprintf("verify failed: %d", resp.StatusCode), nil)
+		return buserr.WithErr("ErrAgentAccountUnavailable", fmt.Errorf("verify failed: %s", resp.Status))
 	}
 	return nil
 }

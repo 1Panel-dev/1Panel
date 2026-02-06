@@ -41,6 +41,19 @@ ErrGroupIsDefault: 'Grupo padrão, não pode ser excluído'
 ErrGroupIsInWebsiteUse: 'O grupo está sendo usado por outro site e não pode ser excluído.'
 Decrypt: "Descriptografar"
 
+#agent
+ErrAgentAccountBound: 'Esta conta está vinculada a um agente e não pode ser excluída. Verifique e tente novamente!'
+ErrAgentAccountUnavailable: 'As informações de conexão da conta não estão disponíveis. Erro: {{ .err }}. Verifique e tente novamente!'
+ErrAgentProviderNotSupported: 'Este provedor de agente não é suportado. Verifique e tente novamente!'
+ErrAgentAccountRequired: 'Selecione uma conta de agente e tente novamente.'
+ErrAgentAccountNotVerified: 'A conta não foi verificada. Verifique e tente novamente!'
+ErrAgentProviderMismatch: 'O provedor da conta não corresponde. Verifique e tente novamente!'
+ErrAgentBaseURLRequired: 'Base URL não pode estar vazio. Verifique e tente novamente!'
+ErrAgentApiKeyRequired: 'API Key não pode estar vazio. Verifique e tente novamente!'
+ErrAgentComposeRequired: 'O conteúdo personalizado do compose não pode estar vazio. Verifique e tente novamente!'
+ErrAgentIDRequired: 'ID do agente não pode estar vazio. Verifique e tente novamente!'
+ErrAgentAccountIDRequired: 'ID da conta não pode estar vazio. Verifique e tente novamente!'
+
 #backup
 Localhost: 'Máquina Local'
 ErrBackupInUsed: 'A conta de backup foi usada na tarefa agendada e não pode ser excluída.'

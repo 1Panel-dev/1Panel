@@ -38,6 +38,19 @@ ErrGroupIsDefault: 'Default group, cannot be deleted'
 ErrGroupIsInWebsiteUse: 'The group is being used by another website and cannot be deleted.'
 Decrypt: "Decrypt"
 
+#agent
+ErrAgentAccountBound: 'This account is bound to an agent and cannot be deleted. Please check and try again!'
+ErrAgentAccountUnavailable: 'The account connection information is unavailable. Error: {{ .err }}. Please check and try again!'
+ErrAgentProviderNotSupported: 'This agent provider is not supported. Please check and try again!'
+ErrAgentAccountRequired: 'Please select an agent account and try again.'
+ErrAgentAccountNotVerified: 'The account has not been verified. Please check and try again!'
+ErrAgentProviderMismatch: 'The account provider does not match. Please check and try again!'
+ErrAgentBaseURLRequired: 'Base URL cannot be empty. Please check and try again!'
+ErrAgentApiKeyRequired: 'API Key cannot be empty. Please check and try again!'
+ErrAgentComposeRequired: 'Custom compose content cannot be empty. Please check and try again!'
+ErrAgentIDRequired: 'Agent ID cannot be empty. Please check and try again!'
+ErrAgentAccountIDRequired: 'Account ID cannot be empty. Please check and try again!'
+
 #backup
 Localhost: 'Local Machine'
 ErrBackupInUsed: 'The backup account has been used in the scheduled task and cannot be deleted.'
