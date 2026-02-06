@@ -233,7 +233,7 @@ func (u *ScriptService) Sync(req dto.OperateByTaskID) error {
 			_ = os.MkdirAll(tmpDir, 0755)
 		}
 		scriptsUrl := fmt.Sprintf("%s/scripts/scripts.tar.gz", global.CONF.RemoteURL.ResourceURL)
-		err = files.DownloadFileWithProxy(scriptsUrl, tmpDir+"/scripts.tar.gz")
+		err = files.DownloadFileWithProxyStream(scriptsUrl, tmpDir+"/scripts.tar.gz")
 		syncTask.LogWithStatus(i18n.GetMsgByKey("DownloadPackage"), err)
 		if err != nil {
 			return fmt.Errorf("download scripts.tar.gz failed, err: %v", err)

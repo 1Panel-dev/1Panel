@@ -167,7 +167,7 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 	_ = settingRepo.Update("SystemStatus", "Upgrading")
 	go func() {
 		oldLang := common.LoadParams("LANGUAGE")
-		if err := files.DownloadFileWithProxy(downloadPath+"/"+fileName, downloadDir+"/"+fileName); err != nil {
+		if err := files.DownloadFileWithProxyStream(downloadPath+"/"+fileName, downloadDir+"/"+fileName); err != nil {
 			global.LOG.Errorf("download service file failed, err: %v", err)
 			_ = settingRepo.Update("SystemStatus", "Free")
 			return

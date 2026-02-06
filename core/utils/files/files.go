@@ -1,7 +1,6 @@
 package files
 
 import (
-	"bytes"
 	"crypto/md5"
 	"encoding/hex"
 	"errors"
@@ -189,22 +188,63 @@ func DownloadFile(url, dst string) error {
 	return nil
 }
 
-func DownloadFileWithProxy(url, dst string) error {
-	_, resp, err := req_helper.HandleRequestWithProxy(url, http.MethodGet, constant.TimeOut5m)
+// func DownloadFileWithProxy(url, dst string) error {
+// 	_, resp, err := req_helper.HandleRequestWithProxy(url, http.MethodGet, constant.TimeOut5m)
+// 	if err != nil {
+// 		return err
+// 	}
+
+// 	out, err := os.Create(dst)
+// 	if err != nil {
+// 		return fmt.Errorf("create download file [%s] error, err %s", dst, err.Error())
+// 	}
+// 	defer out.Close()
+
+// 	reader := bytes.NewReader(resp)
+// 	if _, err = io.Copy(out, reader); err != nil {
+// 		return fmt.Errorf("save download file [%s] error, err %s", dst, err.Error())
+// 	}
+// 	return nil
+// }
+
+func DownloadFileWithProxyStream(url, dst string) error {
+	resp, err := req_helper.HandleGetWithProxy(url)
 	if err != nil {
 		return err
 	}
+	defer resp.Body.Close()
+	if resp.StatusCode >= http.StatusBadRequest {
+		return fmt.Errorf("download file [%s] failed, status code: %d", url, resp.StatusCode)
+	}
 
-	out, err := os.Create(dst)
+	tmpDst := dst + ".part"
+	_ = os.Remove(tmpDst)
+	out, err := os.Create(tmpDst)
 	if err != nil {
 		return fmt.Errorf("create download file [%s] error, err %s", dst, err.Error())
 	}
-	defer out.Close()
+	success := false
+	defer func() {
+		_ = out.Close()
+		if !success {
+			_ = os.Remove(tmpDst)
+		}
+	}()
 
-	reader := bytes.NewReader(resp)
-	if _, err = io.Copy(out, reader); err != nil {
+	n, err := io.Copy(out, resp.Body)
+	if err != nil {
 		return fmt.Errorf("save download file [%s] error, err %s", dst, err.Error())
 	}
+	if resp.ContentLength > 0 && n != resp.ContentLength {
+		return fmt.Errorf("save download file [%s] error, content-length mismatch: expected %d, actual %d", dst, resp.ContentLength, n)
+	}
+	if err = out.Sync(); err != nil {
+		return fmt.Errorf("sync download file [%s] error, err %s", dst, err.Error())
+	}
+	if err = os.Rename(tmpDst, dst); err != nil {
+		return fmt.Errorf("rename download file [%s] error, err %s", dst, err.Error())
+	}
+	success = true
 	return nil
 }
 
