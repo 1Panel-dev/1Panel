@@ -188,25 +188,6 @@ func DownloadFile(url, dst string) error {
 	return nil
 }
 
-// func DownloadFileWithProxy(url, dst string) error {
-// 	_, resp, err := req_helper.HandleRequestWithProxy(url, http.MethodGet, constant.TimeOut5m)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	out, err := os.Create(dst)
-// 	if err != nil {
-// 		return fmt.Errorf("create download file [%s] error, err %s", dst, err.Error())
-// 	}
-// 	defer out.Close()
-
-// 	reader := bytes.NewReader(resp)
-// 	if _, err = io.Copy(out, reader); err != nil {
-// 		return fmt.Errorf("save download file [%s] error, err %s", dst, err.Error())
-// 	}
-// 	return nil
-// }
-
 func DownloadFileWithProxyStream(url, dst string) error {
 	resp, err := req_helper.HandleGetWithProxy(url)
 	if err != nil {
