@@ -14,9 +14,8 @@ import (
 type SettingRepo struct{}
 
 var (
-	settingCache       = cache.New(5*time.Minute, 10*time.Minute)
-	settingDefaultTTL  = 5 * time.Minute
-	settingCriticalTTL = 5 * time.Second
+	settingCache = cache.New(5*time.Minute, 10*time.Minute)
+	settingTTL   = 5 * time.Minute
 )
 
 type ISettingRepo interface {
@@ -31,14 +30,6 @@ type ISettingRepo interface {
 
 func NewISettingRepo() ISettingRepo {
 	return &SettingRepo{}
-}
-
-func loadSettingTTL(key string) time.Duration {
-	switch key {
-	case "AllowIPs", "BindDomain", "SSL":
-		return settingCriticalTTL
-	}
-	return settingDefaultTTL
 }
 
 func (u *SettingRepo) List(opts ...global.DBOption) ([]model.Setting, error) {
@@ -59,7 +50,7 @@ func (u *SettingRepo) Create(key, value string) error {
 	if err := global.DB.Create(setting).Error; err != nil {
 		return err
 	}
-	settingCache.Set(key, value, loadSettingTTL(key))
+	settingCache.Set(key, value, settingTTL)
 	return nil
 }
 
@@ -72,7 +63,7 @@ func (u *SettingRepo) Get(opts ...global.DBOption) (model.Setting, error) {
 
 	err := db.First(&settings).Error
 	if err == nil && settings.Key != "" {
-		settingCache.Set(settings.Key, settings.Value, loadSettingTTL(settings.Key))
+		settingCache.Set(settings.Key, settings.Value, settingTTL)
 	}
 	return settings, err
 }
@@ -86,7 +77,7 @@ func (u *SettingRepo) GetValueByKey(key string) (string, error) {
 	if err := global.DB.Model(&model.Setting{}).Where("key = ?", key).First(&setting).Error; err != nil {
 		return "", err
 	}
-	settingCache.Set(key, setting.Value, loadSettingTTL(key))
+	settingCache.Set(key, setting.Value, settingTTL)
 	return setting.Value, nil
 }
 
@@ -94,7 +85,7 @@ func (u *SettingRepo) Update(key, value string) error {
 	if err := global.DB.Model(&model.Setting{}).Where("key = ?", key).Updates(map[string]interface{}{"value": value}).Error; err != nil {
 		return err
 	}
-	settingCache.Set(key, value, loadSettingTTL(key))
+	settingCache.Set(key, value, settingTTL)
 	return nil
 }
 
@@ -106,7 +97,7 @@ func (u *SettingRepo) UpdateOrCreate(key, value string) error {
 			if err := global.DB.Create(&model.Setting{Key: key, Value: value}).Error; err != nil {
 				return err
 			}
-			settingCache.Set(key, value, loadSettingTTL(key))
+			settingCache.Set(key, value, settingTTL)
 			return nil
 		}
 		return result.Error
@@ -114,7 +105,7 @@ func (u *SettingRepo) UpdateOrCreate(key, value string) error {
 	if err := global.DB.Model(&setting).UpdateColumn("value", value).Error; err != nil {
 		return err
 	}
-	settingCache.Set(key, value, loadSettingTTL(key))
+	settingCache.Set(key, value, settingTTL)
 	return nil
 }
 
@@ -125,6 +116,6 @@ func (u *SettingRepo) DefaultMenu() error {
 		Update("value", menus).Error; err != nil {
 		return err
 	}
-	settingCache.Set("HideMenu", menus, settingDefaultTTL)
+	settingCache.Set("HideMenu", menus, settingTTL)
 	return nil
 }
