@@ -501,19 +501,19 @@ const toDoc = (type: string) => {
     let uri = '';
     switch (type) {
         case 'onedrive':
-            uri = '#32-onedrive';
+            uri = '#42-onedrive';
             break;
         case 'onedrive-bind':
-            uri = '#33-onedrive';
+            uri = '#43-onedrive';
             break;
         case 'ali-pan':
-            uri = '#34';
+            uri = '#44';
             break;
         case 'google-drive':
-            uri = '#35';
+            uri = '#45';
             break;
         case 'webdav':
-            uri = '#36-webdav-alist';
+            uri = '#46-webdav-alist';
             break;
     }
     window.open(globalStore.docsUrl + '/user_manual/settings/' + uri, '_blank', 'noopener,noreferrer');

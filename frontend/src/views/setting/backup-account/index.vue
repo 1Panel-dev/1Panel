@@ -20,7 +20,7 @@
                                 class="ml-1 text-xs"
                                 type="primary"
                                 target="_blank"
-                                :href="globalStore.docsUrl + '/user_manual/settings/#3'"
+                                :href="globalStore.docsUrl + '/user_manual/settings/#4'"
                             >
                                 {{ $t('commons.button.helpDoc') }}
                             </el-link>
