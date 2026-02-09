@@ -142,7 +142,7 @@ const getProviderLabel = (value: string) => {
 
 const buttons = [
     {
-        label: i18n.global.t('commons.button.set'),
+        label: i18n.global.t('menu.config'),
         click: (row: AI.AgentItem) => openConfig(row),
     },
     {

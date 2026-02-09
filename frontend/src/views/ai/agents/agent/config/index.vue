@@ -65,7 +65,7 @@ const handleModelUpdated = () => {
 const openDrawer = async (agent: AI.AgentItem) => {
     agentId.value = agent.id;
     currentAgent.value = agent;
-    header.value = `${agent.name} - ${t('aiTools.agents.configTitle')}`;
+    header.value = `${agent.name} - ${t('menu.config')}`;
     activeTab.value = 'model';
     open.value = true;
     await loadModel();
