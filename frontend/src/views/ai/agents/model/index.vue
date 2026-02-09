@@ -102,7 +102,9 @@ const search = async () => {
 
 const openCreate = () => {
     if (addRef.value?.open) {
-        addRef.value.open();
+        addRef.value.open({
+            provider: 'deepseek',
+        });
     }
 };
 

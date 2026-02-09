@@ -1,6 +1,7 @@
 package service
 
 import (
+	"bytes"
 	"context"
 	"crypto/rand"
 	"encoding/hex"
@@ -542,6 +543,9 @@ func (a AgentService) syncAgentsByAccount(account *model.AgentAccount) error {
 }
 
 func verifyProvider(provider, baseURL, apiKey string) error {
+	if provider == "minimax" {
+		return verifyMinimax(baseURL, apiKey)
+	}
 	client := &http.Client{Timeout: 10 * time.Second}
 	reqURL, headers := buildVerifyRequest(provider, baseURL, apiKey)
 	request, err := http.NewRequest(http.MethodGet, reqURL, nil)
@@ -551,6 +555,40 @@ func verifyProvider(provider, baseURL, apiKey string) error {
 	for key, value := range headers {
 		request.Header.Set(key, value)
 	}
+	resp, err := client.Do(request)
+	if err != nil {
+		return buserr.WithErr("ErrAgentAccountUnavailable", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode >= 400 {
+		return buserr.WithErr("ErrAgentAccountUnavailable", fmt.Errorf("verify failed: %s", resp.Status))
+	}
+	return nil
+}
+
+func verifyMinimax(baseURL, apiKey string) error {
+	client := &http.Client{Timeout: 10 * time.Second}
+	base := strings.TrimRight(baseURL, "/")
+	if !strings.Contains(base, "/v1") {
+		base = base + "/v1"
+	}
+	reqURL := base + "/chat/completions"
+	body := map[string]interface{}{
+		"model": "MiniMax-M2.1",
+		"messages": []map[string]string{
+			{"role": "user", "content": "test"},
+		},
+	}
+	payload, err := json.Marshal(body)
+	if err != nil {
+		return err
+	}
+	request, err := http.NewRequest(http.MethodPost, reqURL, bytes.NewBuffer(payload))
+	if err != nil {
+		return err
+	}
+	request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", apiKey))
+	request.Header.Set("Content-Type", "application/json")
 	resp, err := client.Do(request)
 	if err != nil {
 		return buserr.WithErr("ErrAgentAccountUnavailable", err)
@@ -875,11 +913,6 @@ type providerDefinition struct {
 
 func providerDefinitions() map[string]providerDefinition {
 	return map[string]providerDefinition{
-		"ollama": {
-			Sort:    1,
-			BaseURL: "",
-			Models:  []dto.ProviderModelInfo{},
-		},
 		"deepseek": {
 			Sort:    2,
 			BaseURL: "https://api.deepseek.com/v1",
@@ -924,9 +957,14 @@ func providerDefinitions() map[string]providerDefinition {
 				{ID: "google/gemini-3-flash-preview", Name: "Gemini 3 Flash Preview"},
 			},
 		},
+		"ollama": {
+			Sort:    1,
+			BaseURL: "",
+			Models:  []dto.ProviderModelInfo{},
+		},
 		"minimax": {
 			Sort:    6,
-			BaseURL: "https://api.minimax.chat/v1",
+			BaseURL: "https://api.minimaxi.com/v1",
 			Models: []dto.ProviderModelInfo{
 				{ID: "minimax/Minimax-M2.1", Name: "Minimax M2.1"},
 			},

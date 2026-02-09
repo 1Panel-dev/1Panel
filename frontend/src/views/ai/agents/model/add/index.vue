@@ -54,11 +54,11 @@ const providerOptions = ref<Array<{ label: string; value: string }>>([]);
 const providerBaseURL = ref<Record<string, string>>({});
 const loading = ref(false);
 const providerLabelMap: Record<string, string> = {
+    deepseek: 'DeepSeek',
     openai: 'OpenAI',
     ollama: 'Ollama',
     minimax: 'MiniMax',
     qwen: 'Qwen',
-    deepseek: 'DeepSeek',
     anthropic: 'Anthropic',
     gemini: 'Gemini',
 };
@@ -85,6 +85,7 @@ const rules = reactive({
     provider: [Rules.requiredSelect],
     name: [Rules.requiredInput],
     apiKey: [Rules.requiredInput],
+    baseURL: [Rules.requiredInput],
 });
 
 const submit = async () => {
@@ -135,7 +136,7 @@ interface OpenParams {
     remark?: string;
 }
 
-const openDrawer = (params?: OpenParams) => {
+const openDrawer = async (params?: OpenParams) => {
     open.value = true;
     loading.value = false;
     if (params?.id) {
@@ -154,10 +155,15 @@ const openDrawer = (params?: OpenParams) => {
     form.apiKey = '';
     form.remark = '';
     form.syncAgents = false;
+    if (providerOptions.value.length === 0) {
+        await loadProviders();
+    }
     if (params?.provider) {
         form.provider = params.provider;
-        handleProviderChange();
+    } else if (providerOptions.value.length > 0) {
+        form.provider = providerOptions.value[0].value;
     }
+    handleProviderChange();
 };
 
 const loadProviders = async () => {

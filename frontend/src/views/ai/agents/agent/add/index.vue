@@ -117,7 +117,7 @@ const form = reactive({
     appVersion: '',
     webUIPort: 18789,
     bridgePort: 18790,
-    provider: 'ollama',
+    provider: 'deepseek',
     accountId: undefined as unknown as number,
     model: '',
     apiKey: '',
