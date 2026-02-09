@@ -363,7 +363,9 @@ func (c *appSyncContext) classifyAndPersistAppsWithStats(addCount, updateCount, 
 			for _, app := range addAppArray {
 				if existing, ok := existingMap[app.Key]; ok {
 					app.ID = existing.ID
-					app.Details = existing.Details
+					if len(app.Details) == 0 {
+						app.Details = existing.Details
+					}
 					updateAppArray = append(updateAppArray, app)
 				} else {
 					filteredAdd = append(filteredAdd, app)
@@ -477,25 +479,29 @@ func (c *appSyncContext) classifyAndPersistAppsWithStats(addCount, updateCount, 
 		}
 	}
 
-	syncedAppIds := make([]uint, 0, len(addAppArray)+len(updateAppArray)+len(deleteIds))
-	for _, app := range addAppArray {
-		if app.ID > 0 {
-			syncedAppIds = append(syncedAppIds, app.ID)
+	if len(c.appTags) > 0 {
+		syncedAppIds := make([]uint, 0, len(addAppArray)+len(updateAppArray)+len(deleteIds))
+		for _, app := range addAppArray {
+			if app.ID > 0 && app.Resource == constant.AppResourceRemote {
+				syncedAppIds = append(syncedAppIds, app.ID)
+			}
 		}
-	}
-	for _, app := range updateAppArray {
-		syncedAppIds = append(syncedAppIds, app.ID)
-	}
-	syncedAppIds = append(syncedAppIds, deleteIds...)
-
-	if len(syncedAppIds) > 0 {
-		if err = appTagRepo.DeleteByAppIds(ctx, syncedAppIds); err != nil {
+		for _, app := range updateAppArray {
+			if app.Resource == constant.AppResourceRemote {
+				syncedAppIds = append(syncedAppIds, app.ID)
+			}
+		}
+		syncedAppIds = append(syncedAppIds, deleteIds...)
+		if len(syncedAppIds) > 0 {
+			if err = appTagRepo.DeleteByAppIds(ctx, syncedAppIds); err != nil {
+				return
+			}
+		}
+		if err = appTagRepo.BatchCreate(ctx, c.appTags); err != nil {
 			return
 		}
-	}
-
-	if len(c.appTags) > 0 {
-		if err = appTagRepo.BatchCreate(ctx, c.appTags); err != nil {
+	} else if len(deleteIds) > 0 {
+		if err = appTagRepo.DeleteByAppIds(ctx, deleteIds); err != nil {
 			return
 		}
 	}
