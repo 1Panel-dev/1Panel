@@ -427,10 +427,13 @@ func (c *appSyncContext) classifyAndPersistAppsWithStats(addCount, updateCount, 
 		for _, tag := range app.TagsKey {
 			tagId, ok := tagMap[tag]
 			if ok {
-				c.appTags = append(c.appTags, &model.AppTag{
-					AppId: app.ID,
-					TagId: tagId,
-				})
+				exist, _ := appTagRepo.GetFirst(ctx, appTagRepo.WithByTagID(tagId), appTagRepo.WithByAppID(app.ID))
+				if exist == nil {
+					c.appTags = append(c.appTags, &model.AppTag{
+						AppId: app.ID,
+						TagId: tagId,
+					})
+				}
 			}
 		}
 
@@ -479,29 +482,14 @@ func (c *appSyncContext) classifyAndPersistAppsWithStats(addCount, updateCount, 
 		}
 	}
 
-	if len(c.appTags) > 0 {
-		syncedAppIds := make([]uint, 0, len(addAppArray)+len(updateAppArray)+len(deleteIds))
-		for _, app := range addAppArray {
-			if app.ID > 0 && app.Resource == constant.AppResourceRemote {
-				syncedAppIds = append(syncedAppIds, app.ID)
-			}
-		}
-		for _, app := range updateAppArray {
-			if app.Resource == constant.AppResourceRemote {
-				syncedAppIds = append(syncedAppIds, app.ID)
-			}
-		}
-		syncedAppIds = append(syncedAppIds, deleteIds...)
-		if len(syncedAppIds) > 0 {
-			if err = appTagRepo.DeleteByAppIds(ctx, syncedAppIds); err != nil {
-				return
-			}
-		}
-		if err = appTagRepo.BatchCreate(ctx, c.appTags); err != nil {
+	if len(c.oldAppIds) > 0 {
+		if err = appTagRepo.DeleteByAppIds(ctx, deleteIds); err != nil {
 			return
 		}
-	} else if len(deleteIds) > 0 {
-		if err = appTagRepo.DeleteByAppIds(ctx, deleteIds); err != nil {
+	}
+
+	if len(c.appTags) > 0 {
+		if err = appTagRepo.BatchCreate(ctx, c.appTags); err != nil {
 			return
 		}
 	}
