@@ -670,6 +670,7 @@ const message = {
             manualModel: '手动输入模型',
             verified: '验证状态',
             configTitle: '配置',
+            switchModelSuccess: '模型切换成功',
             channelsTab: '聊天渠道',
             feishu: '飞书',
             dmPolicy: '私聊策略',

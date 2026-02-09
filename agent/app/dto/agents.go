@@ -38,6 +38,7 @@ type AgentItem struct {
 	Status       string    `json:"status"`
 	Message      string    `json:"message"`
 	AppInstallID uint      `json:"appInstallId"`
+	AccountID    uint      `json:"accountId"`
 	AppVersion   string    `json:"appVersion"`
 	Container    string    `json:"containerName"`
 	WebUIPort    int       `json:"webUIPort"`
@@ -52,6 +53,12 @@ type AgentDeleteReq struct {
 	ID          uint   `json:"id" validate:"required"`
 	TaskID      string `json:"taskID"`
 	ForceDelete bool   `json:"forceDelete"`
+}
+
+type AgentModelConfigUpdateReq struct {
+	AgentID   uint   `json:"agentId" validate:"required"`
+	AccountID uint   `json:"accountId" validate:"required"`
+	Model     string `json:"model" validate:"required"`
 }
 
 type AgentAccountCreateReq struct {

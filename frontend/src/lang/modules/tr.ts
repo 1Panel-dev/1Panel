@@ -700,6 +700,7 @@ const message = {
             manualModel: 'Manuel giriş',
             verified: 'Doğrulandı',
             configTitle: 'Configuration',
+            switchModelSuccess: 'Model switched successfully',
             channelsTab: 'Channels',
             feishu: 'Feishu',
             dmPolicy: 'DM Policy',

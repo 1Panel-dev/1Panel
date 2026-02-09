@@ -81,7 +81,7 @@
         <AddDialog ref="addRef" @search="search" @task="openTaskLog" />
         <TaskLog ref="taskLogRef" @close="search" />
         <DeleteDialog ref="deleteRef" @close="search" />
-        <ConfigDrawer ref="configRef" />
+        <ConfigDrawer ref="configRef" @updated="search" />
         <AppUpgrade ref="upgradeRef" @close="search" />
         <ComposeLogs ref="composeLogRef" />
         <TerminalDialog ref="dialogTerminalRef" />
@@ -127,6 +127,9 @@ const providerLabelMap: Record<string, string> = {
     openai: 'OpenAI',
     ollama: 'Ollama',
     minimax: 'MiniMax',
+    moonshot: 'Moonshot',
+    kimi: 'Kimi',
+    'kimi-coding': 'Kimi Coding',
     qwen: 'Qwen',
     deepseek: 'DeepSeek',
     anthropic: 'Anthropic',

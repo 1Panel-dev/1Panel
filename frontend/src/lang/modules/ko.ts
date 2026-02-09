@@ -678,6 +678,7 @@ const message = {
             manualModel: '수동 입력',
             verified: '검증됨',
             configTitle: 'Configuration',
+            switchModelSuccess: 'Model switched successfully',
             channelsTab: 'Channels',
             feishu: 'Feishu',
             dmPolicy: 'DM Policy',

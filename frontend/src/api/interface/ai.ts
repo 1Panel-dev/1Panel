@@ -272,6 +272,7 @@ export namespace AI {
         status: string;
         message: string;
         appInstallId: number;
+        accountId: number;
         appVersion: string;
         containerName: string;
         webUIPort: number;
@@ -282,11 +283,16 @@ export namespace AI {
         createdAt: string;
     }
 
-
     export interface AgentDeleteReq {
         id: number;
         taskID: string;
         forceDelete: boolean;
+    }
+
+    export interface AgentModelConfigUpdateReq {
+        agentId: number;
+        accountId: number;
+        model: string;
     }
 
     export interface ProviderModelInfo {

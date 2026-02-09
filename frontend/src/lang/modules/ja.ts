@@ -681,6 +681,7 @@ const message = {
             manualModel: '手動入力',
             verified: '検証済み',
             configTitle: 'Configuration',
+            switchModelSuccess: 'Model switched successfully',
             channelsTab: 'Channels',
             feishu: 'Feishu',
             dmPolicy: 'DM Policy',

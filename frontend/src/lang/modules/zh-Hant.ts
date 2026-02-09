@@ -668,6 +668,7 @@ const message = {
             manualModel: '手動輸入模型',
             verified: '驗證狀態',
             configTitle: '配置',
+            switchModelSuccess: '模型切換成功',
             channelsTab: '聊天渠道',
             feishu: '飛書',
             dmPolicy: '私聊策略',

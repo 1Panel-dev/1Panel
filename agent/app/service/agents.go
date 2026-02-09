@@ -32,6 +32,7 @@ type IAgentService interface {
 	Create(req dto.AgentCreateReq) (*dto.AgentItem, error)
 	Page(req dto.SearchWithPage) (int64, []dto.AgentItem, error)
 	Delete(req dto.AgentDeleteReq) error
+	UpdateModelConfig(req dto.AgentModelConfigUpdateReq) error
 	GetProviders() ([]dto.ProviderInfo, error)
 	CreateAccount(req dto.AgentAccountCreateReq) error
 	UpdateAccount(req dto.AgentAccountUpdateReq) error
@@ -207,6 +208,64 @@ func (a AgentService) Delete(req dto.AgentDeleteReq) error {
 	}
 	go a.waitAndDeleteAgent(agent.ID, agent.AppInstallID)
 	return nil
+}
+
+func (a AgentService) UpdateModelConfig(req dto.AgentModelConfigUpdateReq) error {
+	agent, err := agentRepo.GetFirst(repo.WithByID(req.AgentID))
+	if err != nil {
+		return err
+	}
+	account, err := agentAccountRepo.GetFirst(repo.WithByID(req.AccountID))
+	if err != nil {
+		return err
+	}
+	if !account.Verified {
+		return buserr.New("ErrAgentAccountNotVerified")
+	}
+	provider := strings.ToLower(strings.TrimSpace(account.Provider))
+	if !isSupportedAgentProvider(provider) {
+		return buserr.New("ErrAgentProviderNotSupported")
+	}
+	modelName := strings.TrimSpace(req.Model)
+	if modelName == "" {
+		return buserr.New("ErrAgentProviderMismatch")
+	}
+	if !strings.HasPrefix(modelName, provider+"/") {
+		return buserr.New("ErrAgentProviderMismatch")
+	}
+	baseURL := strings.TrimSpace(account.BaseURL)
+	if provider != "ollama" {
+		if defaultURL, ok := providerDefaultBaseURL(provider); ok {
+			baseURL = defaultURL
+		}
+	}
+	if provider == "ollama" && baseURL == "" {
+		return buserr.New("ErrAgentBaseURLRequired")
+	}
+	if provider != "ollama" && strings.TrimSpace(account.APIKey) == "" {
+		return buserr.New("ErrAgentApiKeyRequired")
+	}
+	confDir := ""
+	if agent.ConfigPath != "" {
+		confDir = path.Dir(agent.ConfigPath)
+	} else if agent.AppInstallID > 0 {
+		install, errGet := appInstallRepo.GetFirst(repo.WithByID(agent.AppInstallID))
+		if errGet == nil {
+			confDir = path.Join(install.GetPath(), "data", "conf")
+		}
+	}
+	if confDir == "" {
+		return buserr.New("ErrRecordNotFound")
+	}
+	if err := writeOpenclawConfig(confDir, provider, modelName, baseURL, account.APIKey, agent.Token); err != nil {
+		return err
+	}
+	agent.Provider = provider
+	agent.Model = modelName
+	agent.BaseURL = baseURL
+	agent.APIKey = account.APIKey
+	agent.AccountID = account.ID
+	return agentRepo.Save(agent)
 }
 
 func (a AgentService) GetProviders() ([]dto.ProviderInfo, error) {
@@ -612,6 +671,7 @@ func buildAgentItem(agent *model.Agent, appInstall *model.AppInstall, envMap map
 		Status:       agent.Status,
 		Message:      agent.Message,
 		AppInstallID: agent.AppInstallID,
+		AccountID:    agent.AccountID,
 		ConfigPath:   agent.ConfigPath,
 		CreatedAt:    agent.CreatedAt,
 	}
@@ -768,12 +828,20 @@ type modelProvider struct {
 }
 
 type modelEntry struct {
-	ID            string   `json:"id"`
-	Name          string   `json:"name"`
-	Reasoning     bool     `json:"reasoning"`
-	Input         []string `json:"input"`
-	ContextWindow int      `json:"contextWindow"`
-	MaxTokens     int      `json:"maxTokens"`
+	ID            string    `json:"id"`
+	Name          string    `json:"name"`
+	Reasoning     bool      `json:"reasoning"`
+	Input         []string  `json:"input"`
+	ContextWindow int       `json:"contextWindow"`
+	MaxTokens     int       `json:"maxTokens"`
+	Cost          modelCost `json:"cost"`
+}
+
+type modelCost struct {
+	Input      float64 `json:"input"`
+	Output     float64 `json:"output"`
+	CacheRead  float64 `json:"cacheRead"`
+	CacheWrite float64 `json:"cacheWrite"`
 }
 
 func writeOpenclawConfig(confDir, provider, modelName, baseURL, apiKey, token string) error {
@@ -814,16 +882,28 @@ func writeOpenclawConfig(confDir, provider, modelName, baseURL, apiKey, token st
 	}
 
 	provider = strings.ToLower(strings.TrimSpace(provider))
+	modelID := modelName
+	if parts := strings.SplitN(modelName, "/", 2); len(parts) == 2 {
+		modelID = parts[1]
+	}
+	configProvider := provider
+	primaryModel := modelName
+	if provider == "kimi" {
+		configProvider = "moonshot"
+		primaryModel = "moonshot/" + modelID
+	}
 	if provider == "deepseek" {
+		cfg.Agents.Defaults.Model.Primary = modelName
 		base := baseURL
 		if base == "" {
 			base = "https://api.deepseek.com/v1"
 		}
+		plainKey := strings.TrimSpace(apiKey)
 		cfg.Models = &modelsConfig{
 			Mode: "merge",
 			Providers: map[string]modelProvider{
 				"deepseek": {
-					ApiKey:  "${DEEPSEEK_API_KEY}",
+					ApiKey:  plainKey,
 					BaseUrl: base,
 					Api:     "openai-completions",
 					Models: []modelEntry{
@@ -834,16 +914,44 @@ func writeOpenclawConfig(confDir, provider, modelName, baseURL, apiKey, token st
 							Input:         []string{"text"},
 							ContextWindow: 128000,
 							MaxTokens:     8192,
+							Cost:          modelCost{},
+						},
+					},
+				},
+			},
+		}
+	} else if provider == "moonshot" || provider == "kimi" {
+		cfg.Agents.Defaults.Model.Primary = primaryModel
+		base := baseURL
+		if base == "" {
+			if defaultURL, ok := providerDefaultBaseURL(provider); ok {
+				base = defaultURL
+			}
+		}
+		plainKey := strings.TrimSpace(apiKey)
+		cfg.Models = &modelsConfig{
+			Mode: "merge",
+			Providers: map[string]modelProvider{
+				configProvider: {
+					ApiKey:  plainKey,
+					BaseUrl: base,
+					Api:     "openai-completions",
+					Models: []modelEntry{
+						{
+							ID:            modelID,
+							Name:          modelID,
+							Reasoning:     strings.Contains(modelID, "thinking"),
+							Input:         []string{"text"},
+							ContextWindow: 256000,
+							MaxTokens:     8192,
+							Cost:          modelCost{},
 						},
 					},
 				},
 			},
 		}
 	} else if provider == "ollama" {
-		modelID := modelName
-		if parts := strings.SplitN(modelName, "/", 2); len(parts) == 2 {
-			modelID = parts[1]
-		}
+		cfg.Agents.Defaults.Model.Primary = modelName
 		cfg.Models = &modelsConfig{
 			Mode: "merge",
 			Providers: map[string]modelProvider{
@@ -859,6 +967,37 @@ func writeOpenclawConfig(confDir, provider, modelName, baseURL, apiKey, token st
 							Input:         []string{"text"},
 							ContextWindow: 160000,
 							MaxTokens:     8192,
+							Cost:          modelCost{},
+						},
+					},
+				},
+			},
+		}
+	} else if provider == "kimi-coding" {
+		cfg.Agents.Defaults.Model.Primary = modelName
+		base := baseURL
+		if base == "" {
+			if defaultURL, ok := providerDefaultBaseURL(provider); ok {
+				base = defaultURL
+			}
+		}
+		plainKey := strings.TrimSpace(apiKey)
+		cfg.Models = &modelsConfig{
+			Mode: "merge",
+			Providers: map[string]modelProvider{
+				"kimi-coding": {
+					ApiKey:  plainKey,
+					BaseUrl: base,
+					Api:     "anthropic-messages",
+					Models: []modelEntry{
+						{
+							ID:            modelID,
+							Name:          modelID,
+							Reasoning:     true,
+							Input:         []string{"text"},
+							ContextWindow: 200000,
+							MaxTokens:     8192,
+							Cost:          modelCost{},
 						},
 					},
 				},
@@ -896,6 +1035,12 @@ func providerEnvKey(provider string) string {
 		return "MINIMAX_API_KEY"
 	case "deepseek":
 		return "DEEPSEEK_API_KEY"
+	case "moonshot":
+		return "MOONSHOT_API_KEY"
+	case "kimi":
+		return "KIMI_API_KEY"
+	case "kimi-coding":
+		return "KIMI_API_KEY"
 	case "qwen":
 		return "QWEN_API_KEY"
 	case "ollama":
@@ -969,6 +1114,31 @@ func providerDefinitions() map[string]providerDefinition {
 				{ID: "minimax/Minimax-M2.1", Name: "Minimax M2.1"},
 			},
 		},
+		"moonshot": {
+			Sort:    7,
+			BaseURL: "https://api.moonshot.ai/v1",
+			Models: []dto.ProviderModelInfo{
+				{ID: "moonshot/kimi-k2.5", Name: "Kimi K2.5"},
+				{ID: "moonshot/kimi-k2-0905-preview", Name: "Kimi K2 0905 Preview"},
+				{ID: "moonshot/kimi-k2-thinking", Name: "Kimi K2 Thinking"},
+			},
+		},
+		"kimi": {
+			Sort:    8,
+			BaseURL: "https://api.moonshot.cn/v1",
+			Models: []dto.ProviderModelInfo{
+				{ID: "kimi/kimi-k2.5", Name: "Kimi K2.5"},
+				{ID: "kimi/kimi-k2-0905-preview", Name: "Kimi K2 0905 Preview"},
+				{ID: "kimi/kimi-k2-thinking", Name: "Kimi K2 Thinking"},
+			},
+		},
+		"kimi-coding": {
+			Sort:    9,
+			BaseURL: "https://api.moonshot.cn/anthropic/v1",
+			Models: []dto.ProviderModelInfo{
+				{ID: "kimi-coding/k2p5", Name: "Kimi K2.5"},
+			},
+		},
 	}
 }
 
@@ -993,6 +1163,13 @@ func buildVerifyRequest(provider, baseURL, apiKey string) (string, map[string]st
 	base := strings.TrimRight(baseURL, "/")
 	switch provider {
 	case "anthropic":
+		headers["x-api-key"] = apiKey
+		headers["anthropic-version"] = "2023-06-01"
+		if strings.Contains(base, "/v1") {
+			return base + "/models", headers
+		}
+		return base + "/v1/models", headers
+	case "kimi-coding":
 		headers["x-api-key"] = apiKey
 		headers["anthropic-version"] = "2023-06-01"
 		if strings.Contains(base, "/v1") {

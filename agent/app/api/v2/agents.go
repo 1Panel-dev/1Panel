@@ -72,6 +72,26 @@ func (b *BaseApi) DeleteAgent(c *gin.Context) {
 }
 
 // @Tags AI
+// @Summary Update Agent model config
+// @Accept json
+// @Param request body dto.AgentModelConfigUpdateReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/model/update [post]
+func (b *BaseApi) UpdateAgentModelConfig(c *gin.Context) {
+	var req dto.AgentModelConfigUpdateReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := agentService.UpdateModelConfig(req); err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags AI
 // @Summary Get Providers
 // @Success 200 {object} []dto.ProviderInfo
 // @Security ApiKeyAuth
