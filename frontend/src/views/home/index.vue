@@ -394,7 +394,14 @@ import { dateFormatForSecond, computeSize, computeSizeFromKBs, loadUpTime, jumpT
 import { useRouter } from 'vue-router';
 import { loadBaseInfo, loadCurrentInfo } from '@/api/modules/dashboard';
 import { getIOOptions, getNetworkOptions } from '@/api/modules/host';
-import { getSettingInfo, listAllSimpleNodes, loadUpgradeInfo, getMemo, updateMemo } from '@/api/modules/setting';
+import {
+    getSettingInfo,
+    getAgentSettingInfo,
+    listAllSimpleNodes,
+    loadUpgradeInfo,
+    getMemo,
+    updateMemo,
+} from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
 import { storeToRefs } from 'pinia';
 import { routerToFileWithPath, routerToNameWithQuery, routerToPath } from '@/utils/router';
@@ -555,6 +562,13 @@ const applyDefaultNetOption = () => {
     }
 };
 
+const onLoadAgentSettingInfo = async () => {
+    await getAgentSettingInfo().then((res) => {
+        globalStore.defaultIO = res.data.defaultIO;
+        globalStore.defaultNetwork = res.data.defaultNetwork;
+    });
+};
+
 const onLoadNetworkOptions = async (force?: boolean) => {
     const cache = force ? null : getDashboardCache('netOptions');
     if (cache !== null) {
@@ -575,7 +589,7 @@ const onLoadSimpleNode = async () => {
     simpleNodes.value = res.data || [];
 };
 
-const applyDefaultIOOption = () => {
+const applyDefaultIOOption = async () => {
     if (!ioOptions.value || ioOptions.value.length === 0) return;
     const defaultIO = globalStore.defaultIO || ioOptions.value[0];
     if (defaultIO && searchInfo.ioOption !== defaultIO) {
@@ -905,6 +919,7 @@ const fetchData = async () => {
     window.addEventListener('blur', onBlur);
     hasRefreshedOptionsOnHover.value = false;
     loadSafeStatus();
+    onLoadAgentSettingInfo();
     onLoadBaseInfo(true, 'all');
     scheduleDeferredFetch();
     setTimeout(() => {

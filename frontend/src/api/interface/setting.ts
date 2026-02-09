@@ -20,6 +20,7 @@ export namespace Setting {
         theme: string;
         menuTabs: string;
         language: string;
+        defaultIO: string;
         defaultNetwork: string;
         lastCleanTime: string;
         lastCleanSize: string;
