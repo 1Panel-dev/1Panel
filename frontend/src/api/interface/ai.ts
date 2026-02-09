@@ -278,6 +278,7 @@ export namespace AI {
         bridgePort: number;
         path: string;
         configPath: string;
+        upgradable: boolean;
         createdAt: string;
     }
 
@@ -342,5 +343,31 @@ export namespace AI {
 
     export interface AgentAccountDeleteReq {
         id: number;
+    }
+
+    export interface AgentFeishuConfigReq {
+        agentId: number;
+    }
+
+    export interface AgentFeishuConfig {
+        enabled: boolean;
+        dmPolicy: string;
+        botName: string;
+        appId: string;
+        appSecret: string;
+    }
+
+    export interface AgentFeishuConfigUpdateReq {
+        agentId: number;
+        enabled: boolean;
+        dmPolicy: string;
+        botName: string;
+        appId: string;
+        appSecret: string;
+    }
+
+    export interface AgentFeishuPairingApproveReq {
+        agentId: number;
+        pairingCode: string;
     }
 }

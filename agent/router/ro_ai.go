@@ -49,5 +49,8 @@ func (a *AIToolsRouter) InitRouter(Router *gin.RouterGroup) {
 		aiToolsRouter.POST("/agents/accounts/search", baseApi.PageAgentAccounts)
 		aiToolsRouter.POST("/agents/accounts/verify", baseApi.VerifyAgentAccount)
 		aiToolsRouter.POST("/agents/accounts/delete", baseApi.DeleteAgentAccount)
+		aiToolsRouter.POST("/agents/channel/feishu/get", baseApi.GetAgentFeishuConfig)
+		aiToolsRouter.POST("/agents/channel/feishu/update", baseApi.UpdateAgentFeishuConfig)
+		aiToolsRouter.POST("/agents/channel/feishu/approve", baseApi.ApproveAgentFeishuPairing)
 	}
 }

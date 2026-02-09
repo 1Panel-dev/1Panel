@@ -23,7 +23,14 @@
                             <Status :status="row.status" />
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('aiTools.agents.appVersion')" prop="appVersion" min-width="100" />
+                    <el-table-column :label="$t('aiTools.agents.appVersion')" prop="appVersion" min-width="140">
+                        <template #default="{ row }">
+                            <span>{{ row.appVersion }}</span>
+                            <el-button v-if="row.upgradable" link type="primary" class="ml-1" @click="openUpgrade(row)">
+                                {{ $t('commons.button.upgrade') }}
+                            </el-button>
+                        </template>
+                    </el-table-column>
                     <el-table-column
                         :label="$t('aiTools.model.model')"
                         show-overflow-tooltip
@@ -66,7 +73,7 @@
                         min-width="220"
                         :label="$t('commons.table.operate')"
                         fixed="right"
-                        :ellipsis="2"
+                        :ellipsis="3"
                     />
                 </ComplexTable>
             </template>
@@ -74,6 +81,8 @@
         <AddDialog ref="addRef" @search="search" @task="openTaskLog" />
         <TaskLog ref="taskLogRef" @close="search" />
         <DeleteDialog ref="deleteRef" @close="search" />
+        <ConfigDrawer ref="configRef" />
+        <AppUpgrade ref="upgradeRef" @close="search" />
         <ComposeLogs ref="composeLogRef" />
         <TerminalDialog ref="dialogTerminalRef" />
         <PortJumpDialog ref="dialogPortJumpRef" />
@@ -83,14 +92,17 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue';
 import { pageAgents } from '@/api/modules/ai';
-import { installedOp } from '@/api/modules/app';
+import { installedOp, searchAppInstalled } from '@/api/modules/app';
 import { AI } from '@/api/interface/ai';
+import { App } from '@/api/interface/app';
 import { SearchWithPage } from '@/api/interface';
 import { dateFormat, newUUID } from '@/utils/util';
 
 import RouterMenu from '@/views/ai/agents/index.vue';
 import AddDialog from '@/views/ai/agents/agent/add/index.vue';
 import DeleteDialog from '@/views/ai/agents/agent/delete/index.vue';
+import ConfigDrawer from '@/views/ai/agents/agent/config/index.vue';
+import AppUpgrade from '@/views/app-store/installed/upgrade/index.vue';
 import TaskLog from '@/components/log/task/index.vue';
 import ComposeLogs from '@/components/log/compose/index.vue';
 import TerminalDialog from '@/views/container/container/terminal/index.vue';
@@ -103,6 +115,8 @@ const loading = ref(false);
 const addRef = ref();
 const taskLogRef = ref();
 const deleteRef = ref();
+const configRef = ref();
+const upgradeRef = ref();
 const composeLogRef = ref();
 const dialogTerminalRef = ref();
 const dialogPortJumpRef = ref();
@@ -125,6 +139,10 @@ const getProviderLabel = (value: string) => {
 
 const buttons = [
     {
+        label: i18n.global.t('commons.button.set'),
+        click: (row: AI.AgentItem) => openConfig(row),
+    },
+    {
         label: i18n.global.t('menu.terminal'),
         click: (row: AI.AgentItem) => openTerminal(row),
     },
@@ -145,6 +163,11 @@ const buttons = [
     {
         label: i18n.global.t('commons.operate.restart'),
         click: (row: AI.AgentItem) => onOperate(row, 'restart'),
+    },
+    {
+        label: i18n.global.t('commons.button.upgrade'),
+        click: (row: AI.AgentItem) => openUpgrade(row),
+        disabled: (row: AI.AgentItem) => !row.upgradable,
     },
     {
         label: i18n.global.t('commons.button.delete'),
@@ -230,6 +253,19 @@ const jumpWebUI = (row: AI.AgentItem) => {
 
 const onDelete = (row: AI.AgentItem) => {
     deleteRef.value?.acceptParams(row.id, row.name);
+};
+
+const openConfig = (row: AI.AgentItem) => {
+    configRef.value?.open(row);
+};
+
+const openUpgrade = async (row: AI.AgentItem) => {
+    const res = await searchAppInstalled({ page: 1, pageSize: 200, name: row.name });
+    const appInstall = (res.data.items || []).find((item: App.AppInstallDto) => item.id === row.appInstallId);
+    if (!appInstall) {
+        return;
+    }
+    upgradeRef.value?.acceptParams(appInstall, 'upgrade');
 };
 
 onMounted(async () => {

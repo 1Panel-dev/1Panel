@@ -545,7 +545,6 @@ const passkeyLogin = async () => {
     } catch (res: any) {
         if (res?.message) {
             MsgError(i18n.t('commons.login.passkeyFailed'));
-            console.log(res.message);
         }
     } finally {
         isLoggingIn = false;

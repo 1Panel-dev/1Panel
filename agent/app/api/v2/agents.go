@@ -189,3 +189,64 @@ func (b *BaseApi) DeleteAgentAccount(c *gin.Context) {
 	}
 	helper.Success(c)
 }
+
+// @Tags AI
+// @Summary Get Agent Feishu channel config
+// @Accept json
+// @Param request body dto.AgentFeishuConfigReq true "request"
+// @Success 200 {object} dto.AgentFeishuConfig
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/channel/feishu/get [post]
+func (b *BaseApi) GetAgentFeishuConfig(c *gin.Context) {
+	var req dto.AgentFeishuConfigReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	data, err := agentService.GetFeishuConfig(req)
+	if err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.SuccessWithData(c, data)
+}
+
+// @Tags AI
+// @Summary Update Agent Feishu channel config
+// @Accept json
+// @Param request body dto.AgentFeishuConfigUpdateReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/channel/feishu/update [post]
+func (b *BaseApi) UpdateAgentFeishuConfig(c *gin.Context) {
+	var req dto.AgentFeishuConfigUpdateReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := agentService.UpdateFeishuConfig(req); err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags AI
+// @Summary Approve Agent Feishu pairing code
+// @Accept json
+// @Param request body dto.AgentFeishuPairingApproveReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/channel/feishu/approve [post]
+func (b *BaseApi) ApproveAgentFeishuPairing(c *gin.Context) {
+	var req dto.AgentFeishuPairingApproveReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := agentService.ApproveFeishuPairing(req); err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.Success(c)
+}

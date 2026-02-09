@@ -293,7 +293,6 @@ const acceptParams = async (props: ParamProps) => {
     await get();
     open.value = true;
     openConfig.value = false;
-    console.log('params', params.value);
 };
 
 const handleClose = () => {

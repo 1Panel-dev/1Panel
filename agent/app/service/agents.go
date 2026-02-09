@@ -20,6 +20,8 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
+	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 )
 
@@ -35,6 +37,9 @@ type IAgentService interface {
 	PageAccounts(req dto.AgentAccountSearch) (int64, []dto.AgentAccountInfo, error)
 	VerifyAccount(req dto.AgentAccountVerifyReq) error
 	DeleteAccount(req dto.AgentAccountDeleteReq) error
+	GetFeishuConfig(req dto.AgentFeishuConfigReq) (*dto.AgentFeishuConfig, error)
+	UpdateFeishuConfig(req dto.AgentFeishuConfigUpdateReq) error
+	ApproveFeishuPairing(req dto.AgentFeishuPairingApproveReq) error
 }
 
 func NewIAgentService() IAgentService {
@@ -172,7 +177,9 @@ func (a AgentService) Page(req dto.SearchWithPage) (int64, []dto.AgentItem, erro
 	for _, item := range list {
 		appInstall, _ := appInstallRepo.GetFirst(repo.WithByID(item.AppInstallID))
 		envMap := readInstallEnv(appInstall.Env)
-		items = append(items, buildAgentItem(&item, &appInstall, envMap))
+		agentItem := buildAgentItem(&item, &appInstall, envMap)
+		agentItem.Upgradable = checkAgentUpgradable(appInstall)
+		items = append(items, agentItem)
 	}
 	return count, items, nil
 }
@@ -349,6 +356,156 @@ func (a AgentService) DeleteAccount(req dto.AgentAccountDeleteReq) error {
 	return agentAccountRepo.DeleteByID(req.ID)
 }
 
+func (a AgentService) GetFeishuConfig(req dto.AgentFeishuConfigReq) (*dto.AgentFeishuConfig, error) {
+	agent, install, err := a.loadAgentAndInstall(req.AgentID)
+	if err != nil {
+		return nil, err
+	}
+	_ = install
+	conf, err := readOpenclawConfig(agent.ConfigPath)
+	if err != nil {
+		return nil, err
+	}
+	result := extractFeishuConfig(conf)
+	return &result, nil
+}
+
+func (a AgentService) UpdateFeishuConfig(req dto.AgentFeishuConfigUpdateReq) error {
+	agent, _, err := a.loadAgentAndInstall(req.AgentID)
+	if err != nil {
+		return err
+	}
+	conf, err := readOpenclawConfig(agent.ConfigPath)
+	if err != nil {
+		return err
+	}
+	if req.DmPolicy == "" {
+		req.DmPolicy = "pairing"
+	}
+	setFeishuConfig(conf, dto.AgentFeishuConfig{
+		Enabled:   req.Enabled,
+		DmPolicy:  req.DmPolicy,
+		BotName:   req.BotName,
+		AppID:     req.AppID,
+		AppSecret: req.AppSecret,
+	})
+	if err := writeOpenclawConfigRaw(agent.ConfigPath, conf); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (a AgentService) ApproveFeishuPairing(req dto.AgentFeishuPairingApproveReq) error {
+	_, install, err := a.loadAgentAndInstall(req.AgentID)
+	if err != nil {
+		return err
+	}
+	if err := cmd.RunDefaultBashCf(
+		"docker exec %s openclaw pairing approve feishu %q",
+		install.ContainerName,
+		strings.TrimSpace(req.PairingCode),
+	); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (a AgentService) loadAgentAndInstall(agentID uint) (*model.Agent, *model.AppInstall, error) {
+	agent, err := agentRepo.GetFirst(repo.WithByID(agentID))
+	if err != nil {
+		return nil, nil, err
+	}
+	if agent.AppInstallID == 0 {
+		return nil, nil, buserr.New("ErrRecordNotFound")
+	}
+	install, err := appInstallRepo.GetFirst(repo.WithByID(agent.AppInstallID))
+	if err != nil {
+		return nil, nil, err
+	}
+	return agent, &install, nil
+}
+
+func readOpenclawConfig(configPath string) (map[string]interface{}, error) {
+	if strings.TrimSpace(configPath) == "" {
+		return nil, buserr.New("ErrRecordNotFound")
+	}
+	fileOp := files.NewFileOp()
+	content, err := fileOp.GetContent(configPath)
+	if err != nil {
+		return nil, err
+	}
+	conf := map[string]interface{}{}
+	if err := json.Unmarshal(content, &conf); err != nil {
+		return nil, err
+	}
+	return conf, nil
+}
+
+func writeOpenclawConfigRaw(configPath string, conf map[string]interface{}) error {
+	payload, err := json.MarshalIndent(conf, "", "  ")
+	if err != nil {
+		return err
+	}
+	fileOp := files.NewFileOp()
+	return fileOp.SaveFile(configPath, string(payload), 0600)
+}
+
+func extractFeishuConfig(conf map[string]interface{}) dto.AgentFeishuConfig {
+	result := dto.AgentFeishuConfig{Enabled: true, DmPolicy: "pairing"}
+	channels, ok := conf["channels"].(map[string]interface{})
+	if !ok {
+		return result
+	}
+	feishu, ok := channels["feishu"].(map[string]interface{})
+	if !ok {
+		return result
+	}
+	if enabled, ok := feishu["enabled"].(bool); ok {
+		result.Enabled = enabled
+	}
+	if dmPolicy, ok := feishu["dmPolicy"].(string); ok && strings.TrimSpace(dmPolicy) != "" {
+		result.DmPolicy = dmPolicy
+	}
+	accounts, ok := feishu["accounts"].(map[string]interface{})
+	if !ok {
+		return result
+	}
+	main, ok := accounts["main"].(map[string]interface{})
+	if !ok {
+		return result
+	}
+	if appID, ok := main["appId"].(string); ok {
+		result.AppID = appID
+	}
+	if appSecret, ok := main["appSecret"].(string); ok {
+		result.AppSecret = appSecret
+	}
+	if botName, ok := main["botName"].(string); ok {
+		result.BotName = botName
+	}
+	return result
+}
+
+func setFeishuConfig(conf map[string]interface{}, config dto.AgentFeishuConfig) {
+	channels, ok := conf["channels"].(map[string]interface{})
+	if !ok {
+		channels = map[string]interface{}{}
+		conf["channels"] = channels
+	}
+	feishu := map[string]interface{}{
+		"enabled":  config.Enabled,
+		"dmPolicy": config.DmPolicy,
+		"accounts": map[string]interface{}{
+			"main": map[string]interface{}{
+				"appId":     config.AppID,
+				"appSecret": config.AppSecret,
+				"botName":   config.BotName,
+			},
+		},
+	}
+	channels["feishu"] = feishu
+}
+
 func (a AgentService) syncAgentsByAccount(account *model.AgentAccount) error {
 	agents, err := agentRepo.List(repo.WithByAccountID(account.ID))
 	if err != nil {
@@ -434,6 +591,39 @@ func buildAgentItem(agent *model.Agent, appInstall *model.AppInstall, envMap map
 		}
 	}
 	return item
+}
+
+func checkAgentUpgradable(install model.AppInstall) bool {
+	if install.ID == 0 || install.Version == "" || install.Version == "latest" {
+		return false
+	}
+	if install.App.ID == 0 {
+		return false
+	}
+	details, err := appDetailRepo.GetBy(appDetailRepo.WithAppId(install.App.ID))
+	if err != nil || len(details) == 0 {
+		return false
+	}
+	versions := make([]string, 0, len(details))
+	for _, item := range details {
+		ignores, _ := appIgnoreUpgradeRepo.List(runtimeRepo.WithDetailId(item.ID), appIgnoreUpgradeRepo.WithScope("version"))
+		if len(ignores) > 0 {
+			continue
+		}
+		if common.IsCrossVersion(install.Version, item.Version) && !install.App.CrossVersionUpdate {
+			continue
+		}
+		versions = append(versions, item.Version)
+	}
+	if len(versions) == 0 {
+		return false
+	}
+	versions = common.GetSortedVersions(versions)
+	lastVersion := versions[0]
+	if common.IsCrossVersion(install.Version, lastVersion) {
+		return install.App.CrossVersionUpdate
+	}
+	return common.CompareVersion(lastVersion, install.Version)
 }
 
 func (a AgentService) waitAndDeleteAgent(agentID uint, appInstallID uint) {

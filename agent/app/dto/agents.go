@@ -44,6 +44,7 @@ type AgentItem struct {
 	BridgePort   int       `json:"bridgePort"`
 	Path         string    `json:"path"`
 	ConfigPath   string    `json:"configPath"`
+	Upgradable   bool      `json:"upgradable"`
 	CreatedAt    time.Time `json:"createdAt"`
 }
 
@@ -107,4 +108,30 @@ type ProviderInfo struct {
 	Provider string              `json:"provider"`
 	BaseURL  string              `json:"baseUrl"`
 	Models   []ProviderModelInfo `json:"models"`
+}
+
+type AgentFeishuConfigReq struct {
+	AgentID uint `json:"agentId" validate:"required"`
+}
+
+type AgentFeishuConfigUpdateReq struct {
+	AgentID   uint   `json:"agentId" validate:"required"`
+	BotName   string `json:"botName" validate:"required"`
+	AppID     string `json:"appId" validate:"required"`
+	AppSecret string `json:"appSecret" validate:"required"`
+	Enabled   bool   `json:"enabled"`
+	DmPolicy  string `json:"dmPolicy" validate:"required"`
+}
+
+type AgentFeishuPairingApproveReq struct {
+	AgentID     uint   `json:"agentId" validate:"required"`
+	PairingCode string `json:"pairingCode" validate:"required"`
+}
+
+type AgentFeishuConfig struct {
+	Enabled   bool   `json:"enabled"`
+	DmPolicy  string `json:"dmPolicy"`
+	BotName   string `json:"botName"`
+	AppID     string `json:"appId"`
+	AppSecret string `json:"appSecret"`
 }

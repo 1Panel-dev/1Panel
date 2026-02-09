@@ -127,3 +127,15 @@ export const verifyAgentAccount = (req: AI.AgentAccountVerifyReq) => {
 export const deleteAgentAccount = (req: AI.AgentAccountDeleteReq) => {
     return http.post(`/ai/agents/accounts/delete`, req);
 };
+
+export const getAgentFeishuConfig = (req: AI.AgentFeishuConfigReq) => {
+    return http.post<AI.AgentFeishuConfig>(`/ai/agents/channel/feishu/get`, req);
+};
+
+export const updateAgentFeishuConfig = (req: AI.AgentFeishuConfigUpdateReq) => {
+    return http.post(`/ai/agents/channel/feishu/update`, req);
+};
+
+export const approveAgentFeishuPairing = (req: AI.AgentFeishuPairingApproveReq) => {
+    return http.post(`/ai/agents/channel/feishu/approve`, req);
+};
