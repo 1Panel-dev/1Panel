@@ -122,7 +122,6 @@ func (a AppService) createSyncAppStoreTask(sharedCtx **appSyncContext) func(t *t
 		global.LOG.Infof("[AppStore] Appstore sync completed")
 
 		*sharedCtx = ctx
-		t.Logf("App store sync completed: total=%d, add=%d, update=%d, delete=%d", len(ctx.appsMap), addCount, updateCount, deleteCount)
 		t.LogSuccess(i18n.GetMsgByKey("AppStore") + " " + i18n.GetMsgByKey("TaskSync"))
 		return nil
 	}
@@ -310,7 +309,6 @@ func (a AppService) createSyncAppStoreMetaTask(sharedCtx **appSyncContext) func(
 		}
 
 		global.LOG.Infof("[AppStore] Appstore meta sync completed")
-		t.LogSuccess(i18n.GetMsgByKey("SyncAppDetail"))
 		return nil
 	}
 }
