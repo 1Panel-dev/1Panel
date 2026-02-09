@@ -20,14 +20,12 @@
             </el-row>
         </el-form>
         <template #footer>
-            <div class="flex items-center justify-between">
-                <div>
-                    <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
-                    <el-button :disabled="loading" type="primary" @click="onSave(formRef)">
-                        {{ $t('commons.button.confirm') }}
-                    </el-button>
-                </div>
-            </div>
+            <span class="dialog-footer">
+                <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
+                <el-button :disabled="loading" type="primary" @click="onSave(formRef)">
+                    {{ $t('commons.button.confirm') }}
+                </el-button>
+            </span>
         </template>
     </DrawerPro>
 </template>
@@ -75,12 +73,13 @@ const acceptParams = (params: DialogProps): void => {
     form.type = params.type;
     form.title = params.title;
     form.config = params.config;
+    form.config = { ...params.config };
     drawerVisible.value = true;
 };
 
 const onSave = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
-    formEl.validate(async (valid) => {
+    await formEl.validate(async (valid) => {
         if (!valid) return;
         loading.value = true;
         try {
