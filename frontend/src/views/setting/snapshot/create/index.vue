@@ -35,7 +35,7 @@
                         </el-select>
                     </el-form-item>
                     <el-form-item :label="$t('setting.compressPassword')" prop="secret">
-                        <el-input v-model="form.secret"></el-input>
+                        <el-input type="password" show-password clearable v-model="form.secret"></el-input>
                     </el-form-item>
                     <el-form-item :label="$t('cronjob.timeout')" prop="timeoutItem">
                         <el-input type="number" class="selectClass" v-model.number="form.timeoutItem">

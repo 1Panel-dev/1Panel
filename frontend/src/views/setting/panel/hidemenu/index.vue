@@ -17,7 +17,13 @@
                         {{ i18n.global.t(data.title) }}
                     </span>
                     <span class="flex justify-center w-[60px]">
-                        <el-switch v-if="!data.disabled" v-model="data.isShow" @change="onChangeShow(data)" />
+                        <el-switch
+                            v-if="!data.disabled"
+                            v-model="data.isShow"
+                            @change="onChangeShow(data)"
+                            @click.stop
+                            @mousedown.stop
+                        />
                         <span v-else>-</span>
                     </span>
                     <span

@@ -29,6 +29,7 @@ func Init() {
 		migrations.AddScriptSync,
 		migrations.UpdateXpackHideMenuSort,
 		migrations.AdjustXpackNode,
+		migrations.UpdateAiAgentsMenu,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

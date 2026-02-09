@@ -687,3 +687,78 @@ var AdjustXpackNode = &gormigrate.Migration{
 		return tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Update("value", string(updatedJSON)).Error
 	},
 }
+
+var UpdateAiAgentsMenu = &gormigrate.Migration{
+	ID: "20260209-update-ai-agents-menu",
+	Migrate: func(tx *gorm.DB) error {
+		var menuJSON string
+		if err := tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Pluck("value", &menuJSON).Error; err != nil {
+			return err
+		}
+		if menuJSON == "" {
+			menuJSON = helper.LoadMenus()
+		}
+
+		var menus []dto.ShowMenu
+		if err := json.Unmarshal([]byte(menuJSON), &menus); err != nil {
+			return tx.Model(&model.Setting{}).
+				Where("key = ?", "HideMenu").
+				Update("value", helper.LoadMenus()).Error
+		}
+
+		foundAI := false
+		newItem := dto.ShowMenu{
+			ID:       "44",
+			Disabled: false,
+			Title:    "aiTools.agents.agents",
+			IsShow:   true,
+			Label:    "Agents",
+			Path:     "/ai/agents/agent",
+			Sort:     50,
+		}
+
+		for i := range menus {
+			if menus[i].Label != "AI-Menu" {
+				continue
+			}
+			foundAI = true
+			menus[i].IsShow = true
+
+			exists := false
+			for j := range menus[i].Children {
+				child := &menus[i].Children[j]
+				if child.Label == newItem.Label {
+					exists = true
+					child.IsShow = true
+					if child.Title == "" {
+						child.Title = newItem.Title
+					}
+					if child.Sort == 0 {
+						child.Sort = newItem.Sort
+					}
+					break
+				}
+			}
+
+			if !exists {
+				menus[i].Children = append([]dto.ShowMenu{newItem}, menus[i].Children...)
+			}
+			break
+		}
+
+		if !foundAI {
+			return tx.Model(&model.Setting{}).
+				Where("key = ?", "HideMenu").
+				Update("value", helper.LoadMenus()).Error
+		}
+
+		updatedJSON, err := json.Marshal(menus)
+		if err != nil {
+			return tx.Model(&model.Setting{}).
+				Where("key = ?", "HideMenu").
+				Update("value", helper.LoadMenus()).Error
+		}
+
+		return tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Update("value", string(updatedJSON)).Error
+	},
+}
