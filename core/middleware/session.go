@@ -1,13 +1,15 @@
 package middleware
 
 import (
+	"strconv"
+	"strings"
+
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/core/app/repo"
+	"github.com/1Panel-dev/1Panel/core/buserr"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/gin-gonic/gin"
-	"strconv"
-	"strings"
 )
 
 func SessionAuth() gin.HandlerFunc {
@@ -20,6 +22,11 @@ func SessionAuth() gin.HandlerFunc {
 
 		psession, err := global.SESSION.Get(c)
 		if err != nil {
+			errItem := err.Error()
+			if errItem == "ErrSessionDataFormat" || errItem == "ErrSessionDataNotFound" {
+				helper.BadAuth(c, "ErrNotLogin", buserr.New(errItem))
+				return
+			}
 			helper.BadAuth(c, "ErrNotLogin", err)
 			return
 		}

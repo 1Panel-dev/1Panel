@@ -46,7 +46,7 @@ func NewPSession(dbPath string) *PSession {
 	}
 	sqlDB, dbError := db.DB()
 	if dbError != nil {
-		panic(err)
+		panic(dbError)
 	}
 	sqlDB.SetMaxOpenConns(4)
 	sqlDB.SetMaxIdleConns(1)
@@ -68,11 +68,11 @@ func (p *PSession) Get(c *gin.Context) (SessionUser, error) {
 	}
 	data, ok := session.Values["user"]
 	if !ok {
-		return result, errors.New("session data not found")
+		return result, errors.New("ErrSessionDataNotFound")
 	}
 	bytes, ok := data.([]byte)
 	if !ok {
-		return result, errors.New("invalid session data format")
+		return result, errors.New("ErrSessionDataFormat")
 	}
 	err = json.Unmarshal(bytes, &result)
 	return result, err
