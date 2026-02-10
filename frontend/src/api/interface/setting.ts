@@ -34,6 +34,8 @@ export namespace Setting {
         allowIPs: string;
         bindDomain: string;
         securityEntrance: string;
+        dashboardMemoVisible: string;
+        dashboardSimpleNodeVisible: string;
         expirationDays: number;
         expirationTime: string;
         complexityVerification: string;

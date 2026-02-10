@@ -166,6 +166,7 @@
             <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
                 <el-carousel
                     class="my-carousel"
+                    :class="{ 'no-indicator': carouselItemCount <= 1 }"
                     :key="simpleNodes.length"
                     height="368px"
                     indicator-position=""
@@ -174,6 +175,49 @@
                     <el-carousel-item key="systemInfo">
                         <CardWithHeader :header="$t('home.systemInfo')">
                             <template #header-r>
+                                <el-popover
+                                    popper-class="dashboard-carousel-popover"
+                                    placement="bottom"
+                                    :title="$t('home.carouselSetting')"
+                                    width="220"
+                                    trigger="click"
+                                >
+                                    <div class="dashboard-carousel-setting">
+                                        <div class="setting-item mt-2">
+                                            <span>{{ $t('home.systemInfo') }}</span>
+                                            <div class="mr-4">-</div>
+                                        </div>
+                                        <div class="setting-item mt-2">
+                                            <span>{{ $t('home.memo') }}</span>
+                                            <el-switch
+                                                v-model="memoCarouselSetting"
+                                                active-value="Enable"
+                                                inactive-value="Disable"
+                                                @change="
+                                                    (val) => updateDashboardCarouselSetting('DashboardMemoVisible', val)
+                                                "
+                                            />
+                                        </div>
+                                        <div class="setting-item">
+                                            <span>{{ $t('setting.panel') }}</span>
+                                            <el-switch
+                                                v-model="simpleNodeCarouselSetting"
+                                                active-value="Enable"
+                                                inactive-value="Disable"
+                                                @change="
+                                                    (val) =>
+                                                        updateDashboardCarouselSetting(
+                                                            'DashboardSimpleNodeVisible',
+                                                            val,
+                                                        )
+                                                "
+                                            />
+                                        </div>
+                                    </div>
+                                    <template #reference>
+                                        <el-button class="h-button-setting" link icon="Setting" />
+                                    </template>
+                                </el-popover>
                                 <el-tooltip :content="$t('commons.button.refresh')" placement="top">
                                     <el-button class="h-button-setting" @click="refreshDashboard" link icon="Refresh" />
                                 </el-tooltip>
@@ -276,12 +320,9 @@
                             </template>
                         </CardWithHeader>
                     </el-carousel-item>
-                    <el-carousel-item key="memoInfo">
+                    <el-carousel-item key="memoInfo" v-if="showMemoCarousel">
                         <CardWithHeader :header="$t('home.memo')" class="memo-card">
                             <template #header-r>
-                                <el-tooltip v-if="!memoEditing" :content="$t('commons.button.edit')" placement="top">
-                                    <el-button class="h-button-setting" @click="startMemoEdit" link icon="Edit" />
-                                </el-tooltip>
                                 <el-tooltip v-if="memoEditing" :content="$t('commons.button.save')" placement="top">
                                     <el-button
                                         class="h-button-setting"
@@ -307,7 +348,7 @@
                                             show-word-limit
                                             :placeholder="$t('home.memoPlaceholder')"
                                         />
-                                        <div v-else class="memo-content">
+                                        <div v-else class="memo-content" @dblclick="startMemoEdit">
                                             <MarkDownEditor v-if="memoContent" :content="memoContent" />
                                             <span v-else class="memo-placeholder">
                                                 {{ $t('home.memoPlaceholder') }}
@@ -380,7 +421,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, onBeforeUnmount, ref, reactive } from 'vue';
+import { onMounted, onBeforeUnmount, ref, reactive, computed } from 'vue';
 import SystemStatus from '@/views/home/status/index.vue';
 import AppLauncher from '@/views/home/app/index.vue';
 import VCharts from '@/components/v-charts/index.vue';
@@ -401,6 +442,7 @@ import {
     loadUpgradeInfo,
     getMemo,
     updateMemo,
+    updateSetting,
 } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
 import { storeToRefs } from 'pinia';
@@ -461,6 +503,16 @@ const memoContent = ref('');
 const memoEditContent = ref('');
 const memoEditing = ref(false);
 const memoSaving = ref(false);
+const memoCarouselSetting = ref();
+const simpleNodeCarouselSetting = ref();
+
+const showMemoCarousel = computed(() => memoCarouselSetting.value === 'Enable');
+const carouselItemCount = computed(() => {
+    let count = 1;
+    if (showMemoCarousel.value) count += 1;
+    if (showSimpleNode()) count += 1;
+    return count;
+});
 
 const baseInfo = ref<Dashboard.BaseInfo>({
     hostname: '',
@@ -655,7 +707,11 @@ const quickJump = (item: any) => {
 };
 
 const showSimpleNode = () => {
-    return globalStore.isMasterProductPro && simpleNodes.value?.length !== 0;
+    return (
+        simpleNodeCarouselSetting.value === 'Enable' &&
+        globalStore.isMasterProductPro &&
+        simpleNodes.value?.length !== 0
+    );
 };
 
 const toggleSensitiveInfo = () => {
@@ -783,6 +839,18 @@ const loadMemo = async () => {
     }
 };
 
+const updateDashboardCarouselSetting = async (key: string, value: 'Enable' | 'Disable') => {
+    const target = key === 'DashboardMemoVisible' ? memoCarouselSetting : simpleNodeCarouselSetting;
+    const previous = value === 'Enable' ? 'Disable' : 'Enable';
+    try {
+        await updateSetting({ key, value });
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+    } catch (error) {
+        target.value = previous;
+        MsgError(error.message);
+    }
+};
+
 const startMemoEdit = () => {
     memoEditContent.value = memoContent.value;
     memoEditing.value = true;
@@ -862,6 +930,8 @@ const loadSafeStatus = async () => {
     }
     const res = await getSettingInfo();
     isSafety.value = res.data.securityEntrance;
+    memoCarouselSetting.value = res.data.dashboardMemoVisible;
+    simpleNodeCarouselSetting.value = res.data.dashboardSimpleNodeVisible;
     setDashboardCache('safeStatus', isSafety.value, DASHBOARD_CACHE_TTL.safeStatus);
 };
 
@@ -1027,6 +1097,12 @@ onBeforeUnmount(() => {
 }
 
 .my-carousel {
+    &.no-indicator {
+        .el-carousel__indicators {
+            display: none;
+        }
+    }
+
     .el-carousel__button {
         margin-bottom: -4px;
         background-color: var(--el-text-color-regular);
@@ -1129,5 +1205,24 @@ onBeforeUnmount(() => {
 .memo-placeholder {
     color: var(--el-text-color-placeholder);
     font-style: italic;
+}
+
+.dashboard-carousel-setting {
+    display: flex;
+    flex-direction: column;
+
+    .setting-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+}
+
+.dashboard-carousel-popover {
+    .el-popover__title {
+        padding-bottom: 10px;
+        margin-bottom: 8px;
+        border-bottom: 1px solid var(--el-border-color);
+    }
 }
 </style>

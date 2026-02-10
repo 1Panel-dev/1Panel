@@ -591,13 +591,36 @@ var AddUpgradeBackupCopies = &gormigrate.Migration{
 }
 
 var AddScriptSync = &gormigrate.Migration{
-	ID: "20250916-add-script-sync",
-	Migrate: func(tx *gorm.DB) error {
-		if err := tx.Create(&model.Setting{Key: "ScriptSync", Value: constant.StatusEnable}).Error; err != nil {
-			return err
-		}
-		return nil
-	},
+    ID: "20250916-add-script-sync",
+    Migrate: func(tx *gorm.DB) error {
+        if err := tx.Create(&model.Setting{Key: "ScriptSync", Value: constant.StatusEnable}).Error; err != nil {
+            return err
+        }
+        return nil
+    },
+}
+
+var AddDashboardCarouselSetting = &gormigrate.Migration{
+    ID: "20260210-add-dashboard-carousel-setting",
+    Migrate: func(tx *gorm.DB) error {
+        var addSettingsIfMissing = func(tx *gorm.DB, key, value string) error {
+            var setting model.Setting
+            if err := tx.Where("key = ?", key).First(&setting).Error; err != nil {
+                if errors.Is(err, gorm.ErrRecordNotFound) {
+                    return tx.Create(&model.Setting{Key: key, Value: value}).Error
+                }
+                return err
+            }
+            return nil
+        }
+        if err := addSettingsIfMissing(tx, "DashboardMemoVisible", constant.StatusEnable); err != nil {
+            return err
+        }
+        if err := addSettingsIfMissing(tx, "DashboardSimpleNodeVisible", constant.StatusEnable); err != nil {
+            return err
+        }
+        return nil
+    },
 }
 
 var UpdateXpackHideMenuSort = &gormigrate.Migration{

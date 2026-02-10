@@ -461,7 +461,8 @@ const message = {
         networkCard: 'Интерфейс',
         disk: 'Диск',
         memo: 'Заметка',
-        memoPlaceholder: 'Нажмите, чтобы редактировать заметку...',
+        memoPlaceholder: 'Дважды щелкните, чтобы редактировать заметку...',
+        carouselSetting: 'Настройки карусели',
         tooltipSensitiveInfo: 'Показать/скрыть конфиденциальную информацию',
     },
     tabs: {

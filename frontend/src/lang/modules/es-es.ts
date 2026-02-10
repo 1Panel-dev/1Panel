@@ -473,7 +473,8 @@ const message = {
         networkCard: 'Tarjeta de red',
         disk: 'Disco',
         memo: 'Memo',
-        memoPlaceholder: 'Haga clic para editar el memo...',
+        memoPlaceholder: 'Doble clic para editar el memo...',
+        carouselSetting: 'Configuración del carrusel',
         tooltipSensitiveInfo: 'Mostrar/Ocultar información sensible',
     },
     tabs: {

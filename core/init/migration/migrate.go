@@ -30,6 +30,7 @@ func Init() {
 		migrations.UpdateXpackHideMenuSort,
 		migrations.AdjustXpackNode,
 		migrations.UpdateAiAgentsMenu,
+		migrations.AddDashboardCarouselSetting,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)
