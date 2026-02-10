@@ -170,29 +170,12 @@ const loadCompose = async () => {
     form.dockerCompose = res.data.dockerCompose || '';
 };
 
-const providerLabelMap: Record<string, string> = {
-    openai: 'OpenAI',
-    ollama: 'Ollama',
-    minimax: 'MiniMax',
-    moonshot: 'Moonshot',
-    kimi: 'Kimi',
-    'kimi-coding': 'Kimi Coding',
-    qwen: 'Qwen',
-    deepseek: 'DeepSeek',
-    anthropic: 'Anthropic',
-    gemini: 'Gemini',
-};
-
-const getProviderLabel = (value: string) => {
-    return providerLabelMap[value] || value;
-};
-
 const loadProviders = async () => {
     const res = await getAgentProviders();
     const data = res.data || [];
     providerOptions.value = data.map((item) => ({
         value: item.provider,
-        label: getProviderLabel(item.provider),
+        label: item.displayName || item.provider,
     }));
     providerModels.value = data.reduce((acc, item) => {
         acc[item.provider] = item.models || [];
@@ -323,6 +306,7 @@ const handleClose = () => {
 };
 
 const openDrawer = async () => {
+    form.name = 'openclaw';
     open.value = true;
     manualModel.value = false;
     form.token = getRandomStr(32).toLowerCase();

@@ -53,22 +53,6 @@ const formRef = ref<FormInstance>();
 const providerOptions = ref<Array<{ label: string; value: string }>>([]);
 const providerBaseURL = ref<Record<string, string>>({});
 const loading = ref(false);
-const providerLabelMap: Record<string, string> = {
-    deepseek: 'DeepSeek',
-    openai: 'OpenAI',
-    ollama: 'Ollama',
-    minimax: 'MiniMax',
-    moonshot: 'Moonshot',
-    kimi: 'Kimi',
-    'kimi-coding': 'Kimi Coding',
-    qwen: 'Qwen',
-    anthropic: 'Anthropic',
-    gemini: 'Gemini',
-};
-
-const getProviderLabel = (value: string) => {
-    return providerLabelMap[value] || value;
-};
 
 const form = reactive({
     id: 0,
@@ -174,7 +158,7 @@ const loadProviders = async () => {
     const data = res.data || [];
     providerOptions.value = data.map((item) => ({
         value: item.provider,
-        label: getProviderLabel(item.provider),
+        label: item.displayName || item.provider,
     }));
     providerBaseURL.value = data.reduce((acc, item) => {
         acc[item.provider] = item.baseUrl || '';

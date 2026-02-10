@@ -14,6 +14,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
+	providercatalog "github.com/1Panel-dev/1Panel/agent/app/provider"
 	"github.com/1Panel-dev/1Panel/agent/app/service"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
@@ -937,26 +938,5 @@ func getEnvStr(envMap map[string]interface{}, key string) string {
 }
 
 func defaultBaseURL(provider string) (string, bool) {
-	switch provider {
-	case "openai":
-		return "https://api.openai.com/v1", true
-	case "anthropic":
-		return "https://api.anthropic.com", true
-	case "gemini":
-		return "https://generativelanguage.googleapis.com", true
-	case "minimax":
-		return "https://api.minimax.chat/v1", true
-	case "deepseek":
-		return "https://api.deepseek.com/v1", true
-	case "moonshot":
-		return "https://api.moonshot.ai/v1", true
-	case "kimi":
-		return "https://api.moonshot.cn/v1", true
-	case "kimi-coding":
-		return "https://api.moonshot.cn/anthropic/v1", true
-	case "qwen":
-		return "https://dashscope.aliyuncs.com/compatible-mode/v1", true
-	default:
-		return "", false
-	}
+	return providercatalog.DefaultBaseURL(provider)
 }

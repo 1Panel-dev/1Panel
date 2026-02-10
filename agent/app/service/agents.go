@@ -17,6 +17,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
+	providercatalog "github.com/1Panel-dev/1Panel/agent/app/provider"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
@@ -234,7 +235,7 @@ func (a AgentService) UpdateModelConfig(req dto.AgentModelConfigUpdateReq) error
 		return buserr.New("ErrAgentProviderMismatch")
 	}
 	baseURL := strings.TrimSpace(account.BaseURL)
-	if provider != "ollama" {
+	if baseURL == "" {
 		if defaultURL, ok := providerDefaultBaseURL(provider); ok {
 			baseURL = defaultURL
 		}
@@ -273,10 +274,11 @@ func (a AgentService) GetProviders() ([]dto.ProviderInfo, error) {
 	providers := make([]dto.ProviderInfo, 0, len(definitions))
 	for key, def := range definitions {
 		providers = append(providers, dto.ProviderInfo{
-			Sort:     def.Sort,
-			Provider: key,
-			BaseURL:  def.BaseURL,
-			Models:   def.Models,
+			Sort:        def.Sort,
+			Provider:    key,
+			DisplayName: def.DisplayName,
+			BaseURL:     def.BaseURL,
+			Models:      def.Models,
 		})
 	}
 	sort.Slice(providers, func(i, j int) bool {
@@ -295,7 +297,7 @@ func (a AgentService) CreateAccount(req dto.AgentAccountCreateReq) error {
 		return buserr.New("ErrAgentApiKeyRequired")
 	}
 	baseURL := strings.TrimSpace(req.BaseURL)
-	if provider != "ollama" {
+	if baseURL == "" {
 		if defaultURL, ok := providerDefaultBaseURL(provider); ok {
 			baseURL = defaultURL
 		}
@@ -327,7 +329,7 @@ func (a AgentService) UpdateAccount(req dto.AgentAccountUpdateReq) error {
 	}
 	provider := strings.ToLower(strings.TrimSpace(account.Provider))
 	baseURL := strings.TrimSpace(req.BaseURL)
-	if provider != "ollama" {
+	if baseURL == "" {
 		if defaultURL, ok := providerDefaultBaseURL(provider); ok {
 			baseURL = defaultURL
 		}
@@ -369,14 +371,15 @@ func (a AgentService) PageAccounts(req dto.AgentAccountSearch) (int64, []dto.Age
 	items := make([]dto.AgentAccountInfo, 0, len(list))
 	for _, item := range list {
 		items = append(items, dto.AgentAccountInfo{
-			ID:        item.ID,
-			Provider:  item.Provider,
-			Name:      item.Name,
-			APIKey:    item.APIKey,
-			BaseURL:   item.BaseURL,
-			Verified:  item.Verified,
-			Remark:    item.Remark,
-			CreatedAt: item.CreatedAt,
+			ID:           item.ID,
+			Provider:     item.Provider,
+			ProviderName: providerDisplayName(item.Provider),
+			Name:         item.Name,
+			APIKey:       item.APIKey,
+			BaseURL:      item.BaseURL,
+			Verified:     item.Verified,
+			Remark:       item.Remark,
+			CreatedAt:    item.CreatedAt,
 		})
 	}
 	return count, items, nil
@@ -571,8 +574,8 @@ func (a AgentService) syncAgentsByAccount(account *model.AgentAccount) error {
 	if err != nil {
 		return err
 	}
-	baseURL := account.BaseURL
-	if account.Provider != "ollama" {
+	baseURL := strings.TrimSpace(account.BaseURL)
+	if baseURL == "" {
 		if defaultURL, ok := providerDefaultBaseURL(account.Provider); ok {
 			baseURL = defaultURL
 		}
@@ -603,7 +606,7 @@ func (a AgentService) syncAgentsByAccount(account *model.AgentAccount) error {
 
 func verifyProvider(provider, baseURL, apiKey string) error {
 	if provider == "minimax" {
-		return verifyMinimax(baseURL, apiKey)
+		return verifyMinimax("https://api.minimax.chat/v1", apiKey)
 	}
 	client := &http.Client{Timeout: 10 * time.Second}
 	reqURL, headers := buildVerifyRequest(provider, baseURL, apiKey)
@@ -664,6 +667,7 @@ func buildAgentItem(agent *model.Agent, appInstall *model.AppInstall, envMap map
 		ID:           agent.ID,
 		Name:         agent.Name,
 		Provider:     agent.Provider,
+		ProviderName: providerDisplayName(agent.Provider),
 		Model:        agent.Model,
 		BaseURL:      agent.BaseURL,
 		APIKey:       maskKey(agent.APIKey),
@@ -950,6 +954,41 @@ func writeOpenclawConfig(confDir, provider, modelName, baseURL, apiKey, token st
 				},
 			},
 		}
+	} else if provider == "minimax" {
+		normalizedID := modelID
+		switch strings.ToLower(modelID) {
+		case "minimax-m2.1", "minimax m2.1", "minimax-m2.1-preview", "minimax-m2.1-latest":
+			normalizedID = "MiniMax-M2.1"
+		case "minimax-m2.1-lightning", "minimax m2.1 lightning":
+			normalizedID = "MiniMax-M2.1-lightning"
+		}
+		cfg.Agents.Defaults.Model.Primary = "minimax-portal/" + normalizedID
+		base := baseURL
+		if base == "" {
+			base = "https://api.minimaxi.com/anthropic"
+		}
+		plainKey := strings.TrimSpace(apiKey)
+		cfg.Models = &modelsConfig{
+			Mode: "merge",
+			Providers: map[string]modelProvider{
+				"minimax-portal": {
+					ApiKey:  plainKey,
+					BaseUrl: base,
+					Api:     "anthropic-messages",
+					Models: []modelEntry{
+						{
+							ID:            normalizedID,
+							Name:          strings.ReplaceAll(normalizedID, "-", " "),
+							Reasoning:     false,
+							Input:         []string{"text"},
+							ContextWindow: 200000,
+							MaxTokens:     8192,
+							Cost:          modelCost{},
+						},
+					},
+				},
+			},
+		}
 	} else if provider == "ollama" {
 		cfg.Agents.Defaults.Model.Primary = modelName
 		cfg.Models = &modelsConfig{
@@ -1005,12 +1044,42 @@ func writeOpenclawConfig(confDir, provider, modelName, baseURL, apiKey, token st
 		}
 	}
 
-	payload, err := json.MarshalIndent(cfg, "", "  ")
-	if err != nil {
-		return err
-	}
 	configPath := path.Join(confDir, "openclaw.json")
-	if err := fileOp.SaveFile(configPath, string(payload), 0600); err != nil {
+	conf := map[string]interface{}{}
+	if fileOp.Stat(configPath) {
+		existing, err := readOpenclawConfig(configPath)
+		if err != nil {
+			return err
+		}
+		conf = existing
+	}
+	if len(conf) == 0 {
+		initial, err := structToMap(cfg)
+		if err != nil {
+			return err
+		}
+		conf = initial
+	} else {
+		if cfg.Models != nil {
+			modelsMap, err := structToMap(cfg.Models)
+			if err != nil {
+				return err
+			}
+			conf["models"] = modelsMap
+		}
+		agentsMap := ensureChildMap(conf, "agents")
+		defaultsMap := ensureChildMap(agentsMap, "defaults")
+		modelMap := ensureChildMap(defaultsMap, "model")
+		modelMap["primary"] = cfg.Agents.Defaults.Model.Primary
+
+		gatewayMap := ensureChildMap(conf, "gateway")
+		authMap := ensureChildMap(gatewayMap, "auth")
+		if _, ok := authMap["mode"]; !ok {
+			authMap["mode"] = "token"
+		}
+		authMap["token"] = token
+	}
+	if err := writeOpenclawConfigRaw(configPath, conf); err != nil {
 		return err
 	}
 
@@ -1023,139 +1092,68 @@ func writeOpenclawConfig(confDir, provider, modelName, baseURL, apiKey, token st
 	return fileOp.SaveFile(envPath, content, 0600)
 }
 
-func providerEnvKey(provider string) string {
-	switch provider {
-	case "openai":
-		return "OPENAI_API_KEY"
-	case "anthropic":
-		return "ANTHROPIC_API_KEY"
-	case "gemini":
-		return "GEMINI_API_KEY"
-	case "minimax":
-		return "MINIMAX_API_KEY"
-	case "deepseek":
-		return "DEEPSEEK_API_KEY"
-	case "moonshot":
-		return "MOONSHOT_API_KEY"
-	case "kimi":
-		return "KIMI_API_KEY"
-	case "kimi-coding":
-		return "KIMI_API_KEY"
-	case "qwen":
-		return "QWEN_API_KEY"
-	case "ollama":
-		return ""
-	default:
-		return ""
+func ensureChildMap(parent map[string]interface{}, key string) map[string]interface{} {
+	if child, ok := parent[key].(map[string]interface{}); ok {
+		return child
 	}
+	child := map[string]interface{}{}
+	parent[key] = child
+	return child
+}
+
+func structToMap(value interface{}) (map[string]interface{}, error) {
+	payload, err := json.Marshal(value)
+	if err != nil {
+		return nil, err
+	}
+	result := map[string]interface{}{}
+	if err := json.Unmarshal(payload, &result); err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func providerEnvKey(provider string) string {
+	return providercatalog.EnvKey(provider)
 }
 
 type providerDefinition struct {
-	Sort    uint
-	BaseURL string
-	Models  []dto.ProviderModelInfo
+	Sort        uint
+	DisplayName string
+	BaseURL     string
+	Models      []dto.ProviderModelInfo
 }
 
 func providerDefinitions() map[string]providerDefinition {
-	return map[string]providerDefinition{
-		"deepseek": {
-			Sort:    2,
-			BaseURL: "https://api.deepseek.com/v1",
-			Models: []dto.ProviderModelInfo{
-				{ID: "deepseek/deepseek-chat", Name: "DeepSeek Chat"},
-				{ID: "deepseek/deepseek-reasoner", Name: "DeepSeek Reasoner"},
-				{ID: "deepseek/deepseek-r1:1.5b", Name: "DeepSeek R1 1.5B"},
-			},
-		},
-		"openai": {
-			Sort:    3,
-			BaseURL: "https://api.openai.com/v1",
-			Models: []dto.ProviderModelInfo{
-				{ID: "openai/codex-mini-latest", Name: "Codex Mini"},
-				{ID: "openai/gpt-4.1", Name: "GPT-4.1"},
-				{ID: "openai/gpt-4o", Name: "GPT-4o"},
-				{ID: "openai/gpt-4o-mini", Name: "GPT-4o Mini"},
-				{ID: "openai/gpt-5", Name: "GPT-5"},
-				{ID: "openai/gpt-5-mini", Name: "GPT-5 Mini"},
-			},
-		},
-		"anthropic": {
-			Sort:    4,
-			BaseURL: "https://api.anthropic.com",
-			Models: []dto.ProviderModelInfo{
-				{ID: "anthropic/claude-3-haiku-20240307", Name: "Claude 3 Haiku"},
-				{ID: "anthropic/claude-3-5-haiku-latest", Name: "Claude 3.5 Haiku"},
-				{ID: "anthropic/claude-3-5-sonnet-20241022", Name: "Claude 3.5 Sonnet"},
-				{ID: "anthropic/claude-3-7-sonnet-20250219", Name: "Claude 3.7 Sonnet"},
-				{ID: "anthropic/claude-opus-4-1", Name: "Claude Opus 4.1"},
-			},
-		},
-		"gemini": {
-			Sort:    5,
-			BaseURL: "https://generativelanguage.googleapis.com",
-			Models: []dto.ProviderModelInfo{
-				{ID: "google/gemini-1.5-flash", Name: "Gemini 1.5 Flash"},
-				{ID: "google/gemini-1.5-pro", Name: "Gemini 1.5 Pro"},
-				{ID: "google/gemini-2.0-flash", Name: "Gemini 2.0 Flash"},
-				{ID: "google/gemini-2.5-flash", Name: "Gemini 2.5 Flash"},
-				{ID: "google/gemini-2.5-pro", Name: "Gemini 2.5 Pro"},
-				{ID: "google/gemini-3-flash-preview", Name: "Gemini 3 Flash Preview"},
-			},
-		},
-		"ollama": {
-			Sort:    1,
-			BaseURL: "",
-			Models:  []dto.ProviderModelInfo{},
-		},
-		"minimax": {
-			Sort:    6,
-			BaseURL: "https://api.minimaxi.com/v1",
-			Models: []dto.ProviderModelInfo{
-				{ID: "minimax/Minimax-M2.1", Name: "Minimax M2.1"},
-			},
-		},
-		"moonshot": {
-			Sort:    7,
-			BaseURL: "https://api.moonshot.ai/v1",
-			Models: []dto.ProviderModelInfo{
-				{ID: "moonshot/kimi-k2.5", Name: "Kimi K2.5"},
-				{ID: "moonshot/kimi-k2-0905-preview", Name: "Kimi K2 0905 Preview"},
-				{ID: "moonshot/kimi-k2-thinking", Name: "Kimi K2 Thinking"},
-			},
-		},
-		"kimi": {
-			Sort:    8,
-			BaseURL: "https://api.moonshot.cn/v1",
-			Models: []dto.ProviderModelInfo{
-				{ID: "kimi/kimi-k2.5", Name: "Kimi K2.5"},
-				{ID: "kimi/kimi-k2-0905-preview", Name: "Kimi K2 0905 Preview"},
-				{ID: "kimi/kimi-k2-thinking", Name: "Kimi K2 Thinking"},
-			},
-		},
-		"kimi-coding": {
-			Sort:    9,
-			BaseURL: "https://api.moonshot.cn/anthropic/v1",
-			Models: []dto.ProviderModelInfo{
-				{ID: "kimi-coding/k2p5", Name: "Kimi K2.5"},
-			},
-		},
+	definitions := map[string]providerDefinition{}
+	for key, meta := range providercatalog.All() {
+		if !meta.Enabled {
+			continue
+		}
+		models := make([]dto.ProviderModelInfo, 0, len(meta.Models))
+		for _, m := range meta.Models {
+			models = append(models, dto.ProviderModelInfo{ID: m.ID, Name: m.Name})
+		}
+		definitions[key] = providerDefinition{
+			Sort:        meta.Sort,
+			DisplayName: meta.DisplayName,
+			BaseURL:     meta.DefaultBaseURL,
+			Models:      models,
+		}
 	}
+	return definitions
 }
 
 func providerDefaultBaseURL(provider string) (string, bool) {
-	defs := providerDefinitions()
-	if def, ok := defs[provider]; ok {
-		if def.BaseURL == "" {
-			return "", false
-		}
-		return def.BaseURL, true
-	}
-	return "", false
+	return providercatalog.DefaultBaseURL(provider)
 }
 
 func isSupportedAgentProvider(provider string) bool {
-	_, ok := providerDefinitions()[provider]
-	return ok
+	return providercatalog.IsEnabled(provider)
+}
+
+func providerDisplayName(provider string) string {
+	return providercatalog.DisplayName(provider)
 }
 
 func buildVerifyRequest(provider, baseURL, apiKey string) (string, map[string]string) {

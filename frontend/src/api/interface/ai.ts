@@ -265,6 +265,7 @@ export namespace AI {
         id: number;
         name: string;
         provider: string;
+        providerName: string;
         model: string;
         baseUrl: string;
         apiKey: string;
@@ -302,6 +303,7 @@ export namespace AI {
 
     export interface ProviderInfo {
         provider: string;
+        displayName: string;
         baseUrl: string;
         models: ProviderModelInfo[];
     }
@@ -333,6 +335,7 @@ export namespace AI {
     export interface AgentAccountItem {
         id: number;
         provider: string;
+        providerName: string;
         name: string;
         apiKey: string;
         baseUrl: string;

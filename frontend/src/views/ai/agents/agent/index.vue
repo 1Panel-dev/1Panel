@@ -38,7 +38,7 @@
                         min-width="120"
                     >
                         <template #default="{ row }">
-                            {{ getProviderLabel(row.provider) }}
+                            {{ row.providerName || row.provider }}
                             <div>
                                 <span>{{ row.model }}</span>
                             </div>
@@ -123,22 +123,6 @@ const dialogPortJumpRef = ref();
 const isActive = ref(false);
 const isExist = ref(false);
 const searchName = ref('');
-const providerLabelMap: Record<string, string> = {
-    openai: 'OpenAI',
-    ollama: 'Ollama',
-    minimax: 'MiniMax',
-    moonshot: 'Moonshot',
-    kimi: 'Kimi',
-    'kimi-coding': 'Kimi Coding',
-    qwen: 'Qwen',
-    deepseek: 'DeepSeek',
-    anthropic: 'Anthropic',
-    gemini: 'Gemini',
-};
-
-const getProviderLabel = (value: string) => {
-    return providerLabelMap[value] || value;
-};
 
 const buttons = [
     {

@@ -31,6 +31,7 @@ type AgentItem struct {
 	ID           uint      `json:"id"`
 	Name         string    `json:"name"`
 	Provider     string    `json:"provider"`
+	ProviderName string    `json:"providerName"`
 	Model        string    `json:"model"`
 	BaseURL      string    `json:"baseUrl"`
 	APIKey       string    `json:"apiKey"`
@@ -95,14 +96,15 @@ type AgentAccountSearch struct {
 }
 
 type AgentAccountInfo struct {
-	ID        uint      `json:"id"`
-	Provider  string    `json:"provider"`
-	Name      string    `json:"name"`
-	APIKey    string    `json:"apiKey"`
-	BaseURL   string    `json:"baseUrl"`
-	Verified  bool      `json:"verified"`
-	Remark    string    `json:"remark"`
-	CreatedAt time.Time `json:"createdAt"`
+	ID           uint      `json:"id"`
+	Provider     string    `json:"provider"`
+	ProviderName string    `json:"providerName"`
+	Name         string    `json:"name"`
+	APIKey       string    `json:"apiKey"`
+	BaseURL      string    `json:"baseUrl"`
+	Verified     bool      `json:"verified"`
+	Remark       string    `json:"remark"`
+	CreatedAt    time.Time `json:"createdAt"`
 }
 
 type ProviderModelInfo struct {
@@ -111,10 +113,11 @@ type ProviderModelInfo struct {
 }
 
 type ProviderInfo struct {
-	Sort     uint                `json:"-"`
-	Provider string              `json:"provider"`
-	BaseURL  string              `json:"baseUrl"`
-	Models   []ProviderModelInfo `json:"models"`
+	Sort        uint                `json:"-"`
+	Provider    string              `json:"provider"`
+	DisplayName string              `json:"displayName"`
+	BaseURL     string              `json:"baseUrl"`
+	Models      []ProviderModelInfo `json:"models"`
 }
 
 type AgentFeishuConfigReq struct {
