@@ -142,7 +142,7 @@ func (u *DashboardService) LoadCurrentInfoForNode() *dto.NodeCurrent {
 
 func (u *DashboardService) LoadBaseInfo(ioOption string, netOption string) (*dto.DashboardBase, error) {
 	var baseInfo dto.DashboardBase
-	hostInfo, err := psutil.HOST.GetHostInfo(false)
+	hostInfo, err := psutil.HOST.GetHostInfo(true)
 	if err != nil {
 		return nil, err
 	}
