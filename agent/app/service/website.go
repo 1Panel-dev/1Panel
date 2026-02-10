@@ -1943,25 +1943,40 @@ func (w WebsiteService) LoadWebsiteDirConfig(req request.WebsiteCommonReq) (*res
 		return nil, err
 	}
 	res.Dirs = []string{"/"}
-	for _, file := range indexFiles {
-		if !file.IsDir() || file.Name() == "node_modules" || file.Name() == "vendor" {
-			continue
-		}
-		res.Dirs = append(res.Dirs, fmt.Sprintf("/%s", file.Name()))
-		fileInfo, _ := file.Info()
-		if fileInfo.Sys().(*syscall.Stat_t).Uid != 1000 || fileInfo.Sys().(*syscall.Stat_t).Gid != 1000 {
-			res.Msg = i18n.GetMsgByKey("ErrPathPermission")
-		}
-		childFiles, _ := os.ReadDir(absoluteIndexPath + "/" + file.Name())
-		for _, childFile := range childFiles {
-			if !childFile.IsDir() {
+	checkAndAppendDirs := func(relPath string, entries []os.DirEntry) {
+		for _, entry := range entries {
+			if !entry.IsDir() || entry.Name() == "node_modules" || entry.Name() == "vendor" {
 				continue
 			}
-			childInfo, _ := childFile.Info()
-			if childInfo.Sys().(*syscall.Stat_t).Uid != 1000 || childInfo.Sys().(*syscall.Stat_t).Gid != 1000 {
-				res.Msg = i18n.GetMsgByKey("ErrPathPermission")
+			nextRelPath := path.Join(relPath, entry.Name())
+			res.Dirs = append(res.Dirs, "/"+strings.TrimPrefix(nextRelPath, "/"))
+			entryInfo, _ := entry.Info()
+			if entryInfo != nil {
+				if stat, ok := entryInfo.Sys().(*syscall.Stat_t); ok {
+					if stat.Uid != 1000 || stat.Gid != 1000 {
+						res.Msg = i18n.GetMsgByKey("ErrPathPermission")
+					}
+				}
 			}
-			res.Dirs = append(res.Dirs, fmt.Sprintf("/%s/%s", file.Name(), childFile.Name()))
+		}
+	}
+
+	checkAndAppendDirs("", indexFiles)
+	for _, firstDir := range indexFiles {
+		if !firstDir.IsDir() || firstDir.Name() == "node_modules" || firstDir.Name() == "vendor" {
+			continue
+		}
+		secondLevelPath := path.Join(absoluteIndexPath, firstDir.Name())
+		secondLevelDirs, _ := os.ReadDir(secondLevelPath)
+		checkAndAppendDirs(firstDir.Name(), secondLevelDirs)
+
+		for _, secondDir := range secondLevelDirs {
+			if !secondDir.IsDir() || secondDir.Name() == "node_modules" || secondDir.Name() == "vendor" {
+				continue
+			}
+			thirdLevelPath := path.Join(secondLevelPath, secondDir.Name())
+			thirdLevelDirs, _ := os.ReadDir(thirdLevelPath)
+			checkAndAppendDirs(path.Join(firstDir.Name(), secondDir.Name()), thirdLevelDirs)
 		}
 	}
 
