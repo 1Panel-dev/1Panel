@@ -2297,6 +2297,9 @@ func (w WebsiteService) OperateCrossSiteAccess(req request.CrossSiteAccessOp) er
 }
 
 func (w WebsiteService) ExecComposer(req request.ExecComposerReq) error {
+	if cmd.CheckIllegal(req.User, req.Mirror, req.Command, req.ExtCommand) {
+		return buserr.New("ErrCmdIllegal")
+	}
 	website, err := websiteRepo.GetFirst(repo.WithByID(req.WebsiteID))
 	if err != nil {
 		return err

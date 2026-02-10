@@ -196,6 +196,9 @@ func (f *Firewall) RichRules(rule FireInfo, operation string) error {
 }
 
 func (f *Firewall) PortForward(info Forward, operation string) error {
+	if cmd.CheckIllegal(operation, info.Port, info.Protocol, info.TargetIP, info.TargetPort) {
+		return buserr.New("ErrCmdIllegal")
+	}
 	ruleStr := fmt.Sprintf("firewall-cmd --zone=public --%s-forward-port=port=%s:proto=%s:toport=%s --permanent", operation, info.Port, info.Protocol, info.TargetPort)
 	if info.TargetIP != "" && info.TargetIP != "127.0.0.1" && info.TargetIP != "localhost" {
 		ruleStr = fmt.Sprintf("firewall-cmd --zone=public --%s-forward-port=port=%s:proto=%s:toaddr=%s:toport=%s --permanent", operation, info.Port, info.Protocol, info.TargetIP, info.TargetPort)

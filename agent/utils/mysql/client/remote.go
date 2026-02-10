@@ -17,6 +17,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/docker/docker/api/types/image"
@@ -234,6 +235,9 @@ func (r *Remote) ChangeAccess(info AccessChangeInfo) error {
 }
 
 func (r *Remote) Backup(info BackupInfo) error {
+	if cmd.CheckIllegal(r.Password, r.Address, r.User, info.Name, info.Format) {
+		return buserr.New("ErrCmdIllegal")
+	}
 	fileOp := files.NewFileOp()
 	if !fileOp.Stat(info.TargetDir) {
 		if err := os.MkdirAll(info.TargetDir, os.ModePerm); err != nil {
@@ -285,6 +289,9 @@ func (r *Remote) Backup(info BackupInfo) error {
 }
 
 func (r *Remote) Recover(info RecoverInfo) error {
+	if cmd.CheckIllegal(r.Password, r.Address, r.User, info.Name, info.Format) {
+		return buserr.New("ErrCmdIllegal")
+	}
 	fi, _ := os.Open(info.SourceFile)
 	defer fi.Close()
 

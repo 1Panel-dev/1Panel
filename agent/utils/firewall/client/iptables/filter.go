@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 )
@@ -70,6 +71,9 @@ func DeleteFilterRule(chain string, policy FilterRules) error {
 
 func ReadFilterRulesByChain(chain string) ([]FilterRules, error) {
 	var rules []FilterRules
+	if cmd.CheckIllegal(chain) {
+		return rules, buserr.New("ErrCmdIllegal")
+	}
 	cmdMgr := cmd.NewCommandMgr(cmd.WithIgnoreExist1(), cmd.WithTimeout(20*time.Second))
 	stdout, err := cmdMgr.RunWithStdoutBashCf("%s iptables -w -t %s -nL %s", cmd.SudoHandleCmd(), FilterTab, chain)
 	if err != nil {
@@ -100,6 +104,9 @@ func ReadFilterRulesByChain(chain string) ([]FilterRules, error) {
 }
 
 func LoadDefaultStrategy(chain string) (string, error) {
+	if cmd.CheckIllegal(chain) {
+		return "", buserr.New("ErrCmdIllegal")
+	}
 	cmdMgr := cmd.NewCommandMgr(cmd.WithIgnoreExist1(), cmd.WithTimeout(20*time.Second))
 	stdout, err := cmdMgr.RunWithStdoutBashCf("%s iptables -w -t %s -L %s", cmd.SudoHandleCmd(), FilterTab, chain)
 	if err != nil {

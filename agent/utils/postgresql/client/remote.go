@@ -14,6 +14,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
+	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/docker/docker/api/types/image"
 	"github.com/pkg/errors"
 
@@ -119,6 +120,9 @@ func (r *Remote) ChangePassword(info PasswordChangeInfo) error {
 }
 
 func (r *Remote) Backup(info BackupInfo) error {
+	if cmd.CheckIllegal(r.Password, r.Address, r.User, info.Name) {
+		return buserr.New("ErrCmdIllegal")
+	}
 	imageTag, err := loadImageTag(info.Database)
 	if err != nil {
 		return err
@@ -157,6 +161,9 @@ func (r *Remote) Backup(info BackupInfo) error {
 }
 
 func (r *Remote) Recover(info RecoverInfo) error {
+	if cmd.CheckIllegal(r.Password, r.Address, r.User, info.Name, info.Username) {
+		return buserr.New("ErrCmdIllegal")
+	}
 	imageTag, err := loadImageTag(info.Database)
 	if err != nil {
 		return err

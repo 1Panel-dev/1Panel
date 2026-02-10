@@ -465,6 +465,9 @@ func (u *SSHService) LoadLog(ctx *gin.Context, req dto.SearchSSHLog) (int64, []d
 
 	command := ""
 	if len(req.Info) != 0 {
+		if cmd.CheckIllegal(req.Info) {
+			return 0, data, buserr.New("ErrCmdIllegal")
+		}
 		command = fmt.Sprintf(" | grep '%s'", req.Info)
 	}
 

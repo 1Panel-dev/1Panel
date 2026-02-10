@@ -50,6 +50,9 @@ func (s *DiskService) GetCompleteDiskInfo() (*response.CompleteDiskInfo, error) 
 }
 
 func (s *DiskService) PartitionDisk(req request.DiskPartitionRequest) (string, error) {
+	if cmd.CheckIllegal(req.Device, req.Filesystem, req.MountPoint, req.Label) {
+		return "", buserr.New("ErrCmdIllegal")
+	}
 	if !strings.HasPrefix("/dev", req.Device) {
 		req.Device = "/dev/" + req.Device
 	}
@@ -104,6 +107,9 @@ func (s *DiskService) PartitionDisk(req request.DiskPartitionRequest) (string, e
 }
 
 func (s *DiskService) MountDisk(req request.DiskMountRequest) error {
+	if cmd.CheckIllegal(req.Device, req.MountPoint, req.Filesystem) {
+		return buserr.New("ErrCmdIllegal")
+	}
 	if !deviceExists(req.Device) {
 		return buserr.WithName("DeviceNotFound", req.Device)
 	}
@@ -144,6 +150,9 @@ func (s *DiskService) MountDisk(req request.DiskMountRequest) error {
 }
 
 func (s *DiskService) UnmountDisk(req request.DiskUnmountRequest) error {
+	if cmd.CheckIllegal(req.MountPoint) {
+		return buserr.New("ErrCmdIllegal")
+	}
 	if !isPointMounted(req.MountPoint) {
 		return buserr.New("MountDiskErr")
 	}
