@@ -58,7 +58,7 @@
                         </div>
                     </template>
                 </el-alert>
-                <div class="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3 mt-3">
+                <div class="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3 mt-3 app">
                     <el-card class="rounded-2xl shadow hover:shadow-md transition-all">
                         <div class="flex items-center justify-between mb-2">
                             <div class="text-lg font-semibold">{{ $t('xpack.alert.emailConfig') }}</div>
@@ -115,11 +115,11 @@
                                 </el-form-item>
                             </el-form>
                         </div>
-                        <el-alert v-else center class="alert" style="height: 257px" :closable="false">
+                        <div v-else class="flex items-center justify-center" style="height: 257px">
                             <el-button size="large" round plain type="primary" @click="onChangeEmail(0)">
                                 {{ $t('commons.button.create') }}{{ $t('xpack.alert.emailConfig') }}
                             </el-button>
-                        </el-alert>
+                        </div>
                     </el-card>
                     <el-card
                         class="rounded-2xl shadow hover:shadow-md transition-all"
@@ -180,11 +180,11 @@
                                 </el-form-item>
                             </el-form>
                         </div>
-                        <el-alert v-else center class="alert" style="height: 257px" :closable="false">
+                        <div v-else class="flex items-center justify-center" style="height: 257px">
                             <el-button size="large" round plain type="primary" @click="onChangeWeCom(0)">
                                 {{ $t('commons.button.create') }}{{ $t('xpack.alert.weCom') }}
                             </el-button>
-                        </el-alert>
+                        </div>
                     </el-card>
                     <el-card
                         class="rounded-2xl shadow hover:shadow-md transition-all"
@@ -249,11 +249,11 @@
                                 </el-form-item>
                             </el-form>
                         </div>
-                        <el-alert v-else center class="alert" style="height: 257px" :closable="false">
+                        <div v-else class="flex items-center justify-center" style="height: 257px">
                             <el-button size="large" round plain type="primary" @click="onChangeDingTalk(0)">
                                 {{ $t('commons.button.create') }}{{ $t('xpack.alert.dingTalk') }}
                             </el-button>
-                        </el-alert>
+                        </div>
                     </el-card>
                     <el-card
                         class="rounded-2xl shadow hover:shadow-md transition-all"
@@ -318,11 +318,11 @@
                                 </el-form-item>
                             </el-form>
                         </div>
-                        <el-alert v-else center class="alert" style="height: 257px" :closable="false">
+                        <div v-else class="flex items-center justify-center" style="height: 257px">
                             <el-button size="large" round plain type="primary" @click="onChangeFeiShu(0)">
                                 {{ $t('commons.button.create') }}{{ $t('xpack.alert.feiShu') }}
                             </el-button>
-                        </el-alert>
+                        </div>
                     </el-card>
                     <el-card
                         class="rounded-2xl shadow hover:shadow-md transition-all"
@@ -688,6 +688,16 @@ onMounted(async () => {
 });
 </script>
 <style scoped lang="scss">
+.app {
+    .el-card {
+        padding: 0 !important;
+        border: var(--panel-border) !important;
+
+        &:hover {
+            border: 1px solid var(--el-color-primary) !important;
+        }
+    }
+}
 .label {
     color: var(--el-text-color-placeholder);
 }
@@ -695,6 +705,7 @@ onMounted(async () => {
     .el-form-item {
         margin-bottom: 0 !important;
     }
+    height: 257px;
 }
 .webhook-field {
     display: inline-flex;
