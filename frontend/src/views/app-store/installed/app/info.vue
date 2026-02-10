@@ -15,8 +15,8 @@
                 placement="right"
                 trigger="hover"
                 v-if="hasLinkButton(installed)"
-                :width="400"
-                popper-class="overflow-auto"
+                popper-class="app-link-popover"
+                :popper-style="linkPopoverStyle"
             >
                 <template #reference>
                     <el-button plain icon="Promotion" size="small">{{ $t('app.toLink') }}</el-button>
@@ -89,6 +89,11 @@ const hasLinkButton = (installed: any) => {
         (installed.httpPort > 0 || installed.httpsPort > 0 || installed.webUI != '')
     );
 };
+
+const linkPopoverStyle = {
+    width: 'fit-content',
+    maxWidth: 'min(92vw, 560px)',
+};
 </script>
 
 <style scoped lang="scss">
@@ -97,6 +102,29 @@ const hasLinkButton = (installed: any) => {
 .d-description {
     .el-button + .el-button {
         margin-left: 0;
+    }
+}
+
+:deep(.app-link-popover) {
+    max-height: 65vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    table {
+        width: 100%;
+        table-layout: fixed;
+    }
+
+    td {
+        max-width: 100%;
+    }
+
+    .el-button.is-link {
+        white-space: normal;
+        text-align: left;
+        height: auto;
+        line-height: 1.4;
+        word-break: break-all;
     }
 }
 </style>
