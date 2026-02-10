@@ -111,7 +111,7 @@ func (m *AlertTaskHelper) getClassifiedAlerts() (baseAlerts, resourceAlerts []dt
 
 func handleBaseAlerts(baseAlerts []dto.AlertDTO) {
 	if len(baseAlerts) == 0 {
-		stopResourceJob()
+		stopBaseJob()
 		return
 	}
 	if global.AlertBaseJobID == 0 {
@@ -228,11 +228,30 @@ func loadSSLInfo(alert dto.AlertDTO) {
 		return
 	}
 	sender := NewAlertSender(alert, projectJSON)
+	minDays := math.MaxInt
+	maxDays := 0
+	allDomains := make([]string, 0)
 	for daysDiff, domains := range daysDiffMap {
-		domainStr := strings.Join(domains, ",")
-		params := createAlertBaseParams(strconv.Itoa(len(domains)), strconv.Itoa(daysDiff))
-		sender.Send(domainStr, params)
+		allDomains = append(allDomains, domains...)
+		if daysDiff < minDays {
+			minDays = daysDiff
+		}
+		if daysDiff > maxDays {
+			maxDays = daysDiff
+		}
 	}
+	if len(allDomains) == 0 {
+		return
+	}
+	var daysStr string
+	if len(allDomains) == 1 {
+		daysStr = strconv.Itoa(minDays)
+	} else {
+		daysStr = strconv.Itoa(minDays) + "-" + strconv.Itoa(maxDays)
+	}
+	domainStr := strings.Join(allDomains, ",")
+	params := createAlertBaseParams(strconv.Itoa(len(daysDiffMap)), daysStr)
+	sender.Send(domainStr, params)
 }
 
 func loadWebsiteInfo(alert dto.AlertDTO) {
@@ -248,11 +267,30 @@ func loadWebsiteInfo(alert dto.AlertDTO) {
 		return
 	}
 	sender := NewAlertSender(alert, projectJSON)
+	minDays := math.MaxInt
+	maxDays := 0
+	allDomains := make([]string, 0)
 	for daysDiff, domains := range daysDiffMap {
-		domainStr := strings.Join(domains, ",")
-		params := createAlertBaseParams(strconv.Itoa(len(domains)), strconv.Itoa(daysDiff))
-		sender.Send(domainStr, params)
+		allDomains = append(allDomains, domains...)
+		if daysDiff < minDays {
+			minDays = daysDiff
+		}
+		if daysDiff > maxDays {
+			maxDays = daysDiff
+		}
 	}
+	if len(allDomains) == 0 {
+		return
+	}
+	var daysStr string
+	if len(allDomains) == 1 {
+		daysStr = strconv.Itoa(minDays)
+	} else {
+		daysStr = strconv.Itoa(minDays) + "-" + strconv.Itoa(maxDays)
+	}
+	domainStr := strings.Join(allDomains, ",")
+	params := createAlertBaseParams(strconv.Itoa(len(daysDiffMap)), daysStr)
+	sender.Send(domainStr, params)
 }
 
 func loadPanelPwd(alert dto.AlertDTO) {
@@ -667,7 +705,9 @@ func calculateSSLExpiryDays(sslList []model.WebsiteSSL, cycle uint) (map[int][]s
 	projectMap := make(map[uint][]time.Time)
 
 	for _, ssl := range sslList {
-		daysDiff := int(ssl.ExpireDate.Sub(currentDate).Hours() / 24)
+		daysDiff := int(math.Ceil(
+			ssl.ExpireDate.Sub(currentDate).Hours() / 24,
+		))
 		if daysDiff > 0 && int(cycle) >= daysDiff {
 			daysDiffMap[daysDiff] = append(daysDiffMap[daysDiff], ssl.PrimaryDomain)
 			projectMap[ssl.ID] = append(projectMap[ssl.ID], ssl.ExpireDate)
@@ -682,7 +722,9 @@ func calculateWebsiteExpiryDays(websites []model.Website, cycle uint) (map[int][
 	projectMap := make(map[uint][]time.Time)
 
 	for _, website := range websites {
-		daysDiff := int(website.ExpireDate.Sub(currentDate).Hours() / 24)
+		daysDiff := int(math.Ceil(
+			website.ExpireDate.Sub(currentDate).Hours() / 24,
+		))
 		if daysDiff > 0 && int(cycle) >= daysDiff {
 			daysDiffMap[daysDiff] = append(daysDiffMap[daysDiff], website.PrimaryDomain)
 			projectMap[website.ID] = append(projectMap[website.ID], website.ExpireDate)
