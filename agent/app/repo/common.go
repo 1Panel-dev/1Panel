@@ -3,6 +3,7 @@ package repo
 import (
 	"context"
 	"fmt"
+	"regexp"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/constant"
@@ -151,8 +152,13 @@ func WithByCreatedAt(startTime, endTime time.Time) DBOption {
 	}
 }
 
+var validColumnName = regexp.MustCompile(`^[a-zA-Z_][a-zA-Z0-9_]*$`)
+
 func WithOrderBy(orderStr string) DBOption {
 	if orderStr == "createdAt" {
+		orderStr = "created_at"
+	}
+	if !validColumnName.MatchString(orderStr) {
 		orderStr = "created_at"
 	}
 	return func(g *gorm.DB) *gorm.DB {
@@ -161,6 +167,9 @@ func WithOrderBy(orderStr string) DBOption {
 }
 func WithOrderRuleBy(orderBy, order string) DBOption {
 	if orderBy == "createdAt" {
+		orderBy = "created_at"
+	}
+	if !validColumnName.MatchString(orderBy) {
 		orderBy = "created_at"
 	}
 	switch order {

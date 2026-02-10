@@ -26,7 +26,7 @@ import (
 // @Router /websites/ssl/search [post]
 func (b *BaseApi) PageWebsiteSSL(c *gin.Context) {
 	var req request.WebsiteSSLSearch
-	if err := helper.CheckBind(&req, c); err != nil {
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
 	if !reflect.DeepEqual(req.PageInfo, dto.PageInfo{}) {
