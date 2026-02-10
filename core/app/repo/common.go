@@ -5,6 +5,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
+	"github.com/1Panel-dev/1Panel/core/utils/re"
 	"gorm.io/gorm"
 )
 
@@ -65,6 +66,9 @@ func WithOrderBy(orderStr string) global.DBOption {
 	if orderStr == "createdAt" {
 		orderStr = "created_at"
 	}
+	if !re.GetRegex(re.OrderByValidationPattern).MatchString(orderStr) {
+		orderStr = "created_at"
+	}
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Order(orderStr)
 	}
@@ -72,6 +76,9 @@ func WithOrderBy(orderStr string) global.DBOption {
 
 func WithOrderRuleBy(orderBy, order string) global.DBOption {
 	if orderBy == "createdAt" {
+		orderBy = "created_at"
+	}
+	if !re.GetRegex(re.OrderByValidationPattern).MatchString(orderBy) {
 		orderBy = "created_at"
 	}
 	switch order {

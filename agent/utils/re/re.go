@@ -28,12 +28,11 @@ const (
 	MysqlGroupPattern                  = `\[*\]`
 	AnsiEscapePattern                  = "\x1b\\[[0-9;?]*[A-Za-z]|\x1b=|\x1b>"
 	RecycleBinFilePattern              = `_1p_file_1p_(.+)_p_(\d+)_(\d+)`
+	OrderByValidationPattern           = `^[a-zA-Z_][a-zA-Z0-9_]*$`
 )
 
 var regexMap = make(map[string]*regexp.Regexp)
 
-// InitRegex compiles all regex patterns and stores them in the map.
-// This function should be called once at program startup.
 func Init() {
 	patterns := []string{
 		NumberAlphaPattern,
@@ -58,6 +57,7 @@ func Init() {
 		MysqlGroupPattern,
 		AnsiEscapePattern,
 		RecycleBinFilePattern,
+		OrderByValidationPattern,
 	}
 
 	for _, pattern := range patterns {
@@ -65,8 +65,6 @@ func Init() {
 	}
 }
 
-// GetRegex retrieves a compiled regex by its pattern string.
-// Panics if the pattern is not found in the map.
 func GetRegex(pattern string) *regexp.Regexp {
 	regex, exists := regexMap[pattern]
 	if !exists {
@@ -75,8 +73,6 @@ func GetRegex(pattern string) *regexp.Regexp {
 	return regex
 }
 
-// RegisterRegex registers a regex pattern and stores it in the map.
-// This function should be called once at program startup.
 func RegisterRegex(pattern string) {
 	regexMap[pattern] = regexp.MustCompile(pattern)
 }

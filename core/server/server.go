@@ -32,9 +32,11 @@ import (
 	"github.com/1Panel-dev/1Panel/core/init/session/psession"
 	"github.com/1Panel-dev/1Panel/core/init/validator"
 	"github.com/1Panel-dev/1Panel/core/init/viper"
+	"github.com/1Panel-dev/1Panel/core/utils/re"
 )
 
 func Start() {
+	re.Init()
 	viper.Init()
 	log.Init()
 	db.Init()
