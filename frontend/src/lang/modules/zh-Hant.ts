@@ -353,6 +353,7 @@ const message = {
             hourUnit: '小時',
             dayUnit: '天',
             millisecond: '毫秒',
+            semicolon: '；',
         },
         log: {
             noLog: '暫無日誌',
@@ -3866,6 +3867,7 @@ const message = {
             feiShuConfigHelper: '飛書告警通知配置',
             webhookName: '機器人名稱',
             webhookUrl: 'Webhook 位址',
+            alertConfigProHelper: '專業版額外支援企業微信、釘釘、飛書及簡訊告警。',
         },
         theme: {
             lingXiaGold: '凌霞金',

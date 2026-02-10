@@ -366,6 +366,7 @@ const message = {
             minuteUnit: 'min',
             hourUnit: 'h',
             dayUnit: 'd',
+            semicolon: ';',
         },
         log: {
             noLog: 'No logs available',
@@ -4147,11 +4148,11 @@ const message = {
             alertTestOk: 'Test notification succeeded',
             alertTestFailed: 'Test notification failed',
             displayName: 'Display Name',
-            sender: 'Sender Address',
+            sender: 'Sender',
             password: 'Password',
             host: 'SMTP Server',
             port: 'Port',
-            encryption: 'Encryption Method',
+            encryption: 'Encryption',
             recipient: 'Recipient',
             licenseTime: 'License Expiration Reminder',
             licenseTimeTitle: 'License Expiration Reminder',
@@ -4182,8 +4183,10 @@ const message = {
             wechatConfigHelper: 'WeChat Official Account alert notification configuration',
             dingTalkConfigHelper: 'DingTalk alert notification configuration',
             feiShuConfigHelper: 'Feishu alert notification configuration',
-            webhookName: 'Bot name or remark',
+            webhookName: 'Bot name',
             webhookUrl: 'Webhook URL',
+            alertConfigProHelper:
+                'The Professional edition additionally supports WeCom, DingTalk, Feishu, and SMS alerts.',
         },
         theme: {
             lingXiaGold: 'Ling Xia Gold',

@@ -354,6 +354,7 @@ const message = {
             hourUnit: 'h',
             dayUnit: 'd',
             millisecond: 'ミリ秒',
+            semicolon: ';',
         },
         log: {
             noLog: 'ログはありません',
@@ -4067,8 +4068,10 @@ const message = {
             wechatConfigHelper: 'WeChat公式アカウントアラート通知設定',
             dingTalkConfigHelper: 'DingTalkアラート通知設定',
             feiShuConfigHelper: 'Feishuアラート通知設定',
-            webhookName: 'ボット名または',
+            webhookName: 'ボット名',
             webhookUrl: 'Webhook URL',
+            alertConfigProHelper:
+                'プロフェッショナル版では、企業微信（WeCom）、DingTalk、Feishu、およびSMS通知を追加でサポートします。',
         },
         theme: {
             lingXiaGold: '凌霞金',

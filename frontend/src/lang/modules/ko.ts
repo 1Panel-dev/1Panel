@@ -356,6 +356,7 @@ const message = {
             hourUnit: '시간',
             dayUnit: '일',
             millisecond: '밀리초',
+            semicolon: ';',
         },
         log: {
             noLog: '로그 없음',
@@ -3991,8 +3992,10 @@ const message = {
             wechatConfigHelper: 'WeChat 공식 계정 알림 구성',
             dingTalkConfigHelper: 'DingTalk 알림 구성',
             feiShuConfigHelper: 'Feishu 알림 구성',
-            webhookName: '봇 이름 또는 비고',
+            webhookName: '봇 이름',
             webhookUrl: 'Webhook URL',
+            alertConfigProHelper:
+                '프로페셔널 버전에서는 기업 위챗(WeCom), DingTalk, Feishu 및 SMS 알림을 추가로 지원합니다.',
         },
         theme: {
             lingXiaGold: '링샤 골드',
