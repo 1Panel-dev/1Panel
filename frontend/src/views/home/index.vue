@@ -351,7 +351,7 @@
                                             :placeholder="$t('home.memoPlaceholder')"
                                             show-word-limit
                                         />
-                                        <div v-else class="memo-content" @dblclick="startMemoEdit">
+                                        <div v-else class="memo-content">
                                             <MarkDownEditor v-if="memoContent" :content="memoContent" />
                                             <span v-else class="memo-placeholder">
                                                 {{ $t('home.memoPlaceholder') }}
