@@ -33,6 +33,7 @@ type IAgentService interface {
 	Create(req dto.AgentCreateReq) (*dto.AgentItem, error)
 	Page(req dto.SearchWithPage) (int64, []dto.AgentItem, error)
 	Delete(req dto.AgentDeleteReq) error
+	ResetToken(req dto.AgentTokenResetReq) error
 	UpdateModelConfig(req dto.AgentModelConfigUpdateReq) error
 	GetProviders() ([]dto.ProviderInfo, error)
 	CreateAccount(req dto.AgentAccountCreateReq) error
@@ -103,7 +104,7 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 
 	token := strings.TrimSpace(req.Token)
 	if token == "" {
-		token = randomToken()
+		token = generateToken()
 	}
 	params := map[string]interface{}{
 		"PROVIDER":               provider,
@@ -209,6 +210,46 @@ func (a AgentService) Delete(req dto.AgentDeleteReq) error {
 	}
 	go a.waitAndDeleteAgent(agent.ID, agent.AppInstallID)
 	return nil
+}
+
+func (a AgentService) ResetToken(req dto.AgentTokenResetReq) error {
+	agent, err := agentRepo.GetFirst(repo.WithByID(req.ID))
+	if err != nil {
+		return err
+	}
+	configPath := strings.TrimSpace(agent.ConfigPath)
+	if configPath == "" && agent.AppInstallID > 0 {
+		install, err := appInstallRepo.GetFirst(repo.WithByID(agent.AppInstallID))
+		if err != nil {
+			return err
+		}
+		configPath = path.Join(install.GetPath(), "data", "conf", "openclaw.json")
+	}
+	if configPath == "" {
+		return buserr.New("ErrRecordNotFound")
+	}
+	conf, err := readOpenclawConfig(configPath)
+	if err != nil {
+		return err
+	}
+	newToken := generateToken()
+	if newToken == "" {
+		return fmt.Errorf("generate token failed")
+	}
+	gatewayMap := ensureChildMap(conf, "gateway")
+	authMap := ensureChildMap(gatewayMap, "auth")
+	if _, ok := authMap["mode"]; !ok {
+		authMap["mode"] = "token"
+	}
+	authMap["token"] = newToken
+	if err := writeOpenclawConfigRaw(configPath, conf); err != nil {
+		return err
+	}
+	agent.Token = newToken
+	if agent.ConfigPath == "" {
+		agent.ConfigPath = configPath
+	}
+	return agentRepo.Save(agent)
 }
 
 func (a AgentService) UpdateModelConfig(req dto.AgentModelConfigUpdateReq) error {
@@ -1226,7 +1267,7 @@ func toInt(value interface{}) int {
 	}
 }
 
-func randomToken() string {
+func generateToken() string {
 	bytes := make([]byte, 24)
 	if _, err := rand.Read(bytes); err != nil {
 		return ""

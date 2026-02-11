@@ -56,6 +56,10 @@ type AgentDeleteReq struct {
 	ForceDelete bool   `json:"forceDelete"`
 }
 
+type AgentTokenResetReq struct {
+	ID uint `json:"id" validate:"required"`
+}
+
 type AgentModelConfigUpdateReq struct {
 	AgentID   uint   `json:"agentId" validate:"required"`
 	AccountID uint   `json:"accountId" validate:"required"`

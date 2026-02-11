@@ -104,6 +104,10 @@ export const deleteAgent = (req: AI.AgentDeleteReq) => {
     return http.post(`/ai/agents/delete`, req);
 };
 
+export const resetAgentToken = (req: AI.AgentTokenResetReq) => {
+    return http.post(`/ai/agents/token/reset`, req);
+};
+
 export const updateAgentModelConfig = (req: AI.AgentModelConfigUpdateReq) => {
     return http.post(`/ai/agents/model/update`, req);
 };

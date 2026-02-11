@@ -3,6 +3,11 @@
         <el-form-item :label="t('aiTools.agents.feishu')">
             <el-switch v-model="form.enabled" />
         </el-form-item>
+        <el-form-item>
+            <el-link type="primary" icon="Position" @click="toFeishuDoc">
+                {{ t('container.mirrorsHelper2') }}
+            </el-link>
+        </el-form-item>
         <el-form-item :label="t('aiTools.agents.dmPolicy')" prop="dmPolicy">
             <el-select v-model="form.dmPolicy">
                 <el-option label="pairing" value="pairing" />
@@ -66,6 +71,10 @@ const rules = reactive({
     appId: [Rules.requiredInput],
     appSecret: [Rules.requiredInput],
 });
+
+const toFeishuDoc = () => {
+    window.open('https://openclaw.club/guides/feishu-platform', '_blank');
+};
 
 const load = async (id: number) => {
     agentId.value = id;

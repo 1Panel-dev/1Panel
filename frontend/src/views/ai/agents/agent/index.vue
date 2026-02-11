@@ -58,7 +58,12 @@
                     </el-table-column>
                     <el-table-column :label="$t('aiTools.agents.token')" min-width="80">
                         <template #default="{ row }">
-                            <CopyButton :content="row.token" />
+                            <el-space>
+                                <CopyButton :content="row.token" />
+                                <el-button link type="primary" @click="onResetToken(row)">
+                                    {{ $t('commons.button.reset') }}
+                                </el-button>
+                            </el-space>
                         </template>
                     </el-table-column>
                     <el-table-column
@@ -91,12 +96,13 @@
 
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue';
-import { pageAgents } from '@/api/modules/ai';
+import { pageAgents, resetAgentToken } from '@/api/modules/ai';
 import { installedOp, searchAppInstalled } from '@/api/modules/app';
 import { AI } from '@/api/interface/ai';
 import { App } from '@/api/interface/app';
 import { SearchWithPage } from '@/api/interface';
 import { dateFormat, newUUID } from '@/utils/util';
+import { MsgSuccess } from '@/utils/message';
 
 import RouterMenu from '@/views/ai/agents/index.vue';
 import AddDialog from '@/views/ai/agents/agent/add/index.vue';
@@ -242,12 +248,27 @@ const onDelete = (row: AI.AgentItem) => {
     deleteRef.value?.acceptParams(row.id, row.name);
 };
 
+const onResetToken = async (row: AI.AgentItem) => {
+    await ElMessageBox.confirm(
+        i18n.global.t('aiTools.mcp.operatorHelper', ['token', i18n.global.t('commons.button.reset')]),
+        i18n.global.t('commons.button.reset'),
+        {
+            confirmButtonText: i18n.global.t('commons.button.confirm'),
+            cancelButtonText: i18n.global.t('commons.button.cancel'),
+            type: 'info',
+        },
+    );
+    await resetAgentToken({ id: row.id });
+    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+    await search();
+};
+
 const openConfig = (row: AI.AgentItem) => {
     configRef.value?.open(row);
 };
 
 const openUpgrade = async (row: AI.AgentItem) => {
-    const res = await searchAppInstalled({ page: 1, pageSize: 200, name: row.name });
+    const res = await searchAppInstalled({ page: 1, pageSize: 200, name: row.name, update: true });
     const appInstall = (res.data.items || []).find((item: App.AppInstallDto) => item.id === row.appInstallId);
     if (!appInstall) {
         return;

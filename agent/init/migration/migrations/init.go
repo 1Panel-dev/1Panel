@@ -14,10 +14,10 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
-	providercatalog "github.com/1Panel-dev/1Panel/agent/app/provider"
 	"github.com/1Panel-dev/1Panel/agent/app/service"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	migrationutils "github.com/1Panel-dev/1Panel/agent/init/migration/migrations/utils"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/copier"
 	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
@@ -864,17 +864,38 @@ var MigrateOpenclawAgents = &gormigrate.Migration{
 			if strings.TrimSpace(install.Env) != "" {
 				_ = json.Unmarshal([]byte(install.Env), &envMap)
 			}
-			provider := strings.ToLower(getEnvStr(envMap, "PROVIDER"))
+			configPath := path.Join(install.GetPath(), "data", "conf", "openclaw.json")
+			cfgMeta := migrationutils.OpenclawMeta{}
+			if fileData, err := os.ReadFile(configPath); err == nil {
+				cfgMeta = migrationutils.ParseOpenclawMeta(fileData)
+			}
+			provider := strings.ToLower(migrationutils.GetEnvStr(envMap, "PROVIDER"))
+			if provider == "" {
+				provider = strings.ToLower(cfgMeta.Provider)
+			}
 			if provider == "" {
 				continue
 			}
-			modelName := getEnvStr(envMap, "MODEL")
-			baseURL := getEnvStr(envMap, "BASE_URL")
-			apiKey := getEnvStr(envMap, "API_KEY")
-			token := getEnvStr(envMap, "OPENCLAW_GATEWAY_TOKEN")
+			provider = migrationutils.NormalizeOpenclawProvider(provider, cfgMeta.BaseURL)
+			modelName := migrationutils.GetEnvStr(envMap, "MODEL")
+			if modelName == "" {
+				modelName = cfgMeta.Model
+			}
+			baseURL := migrationutils.GetEnvStr(envMap, "BASE_URL")
+			if baseURL == "" {
+				baseURL = cfgMeta.BaseURL
+			}
+			apiKey := migrationutils.GetEnvStr(envMap, "API_KEY")
+			if apiKey == "" {
+				apiKey = cfgMeta.APIKey
+			}
+			token := migrationutils.GetEnvStr(envMap, "OPENCLAW_GATEWAY_TOKEN")
+			if token == "" {
+				token = cfgMeta.Token
+			}
 			if provider != "ollama" {
 				if baseURL == "" {
-					if defaultURL, ok := defaultBaseURL(provider); ok {
+					if defaultURL, ok := migrationutils.DefaultBaseURL(provider); ok {
 						baseURL = defaultURL
 					}
 				}
@@ -900,7 +921,6 @@ var MigrateOpenclawAgents = &gormigrate.Migration{
 					return err
 				}
 			}
-			configPath := path.Join(install.GetPath(), "data", "conf", "openclaw.json")
 			agent := model.Agent{
 				Name:         install.Name,
 				Provider:     provider,
@@ -920,23 +940,4 @@ var MigrateOpenclawAgents = &gormigrate.Migration{
 		}
 		return nil
 	},
-}
-
-func getEnvStr(envMap map[string]interface{}, key string) string {
-	if envMap == nil {
-		return ""
-	}
-	if value, ok := envMap[key]; ok {
-		switch v := value.(type) {
-		case string:
-			return strings.TrimSpace(v)
-		default:
-			return strings.TrimSpace(fmt.Sprintf("%v", v))
-		}
-	}
-	return ""
-}
-
-func defaultBaseURL(provider string) (string, bool) {
-	return providercatalog.DefaultBaseURL(provider)
 }

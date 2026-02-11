@@ -290,6 +290,10 @@ export namespace AI {
         forceDelete: boolean;
     }
 
+    export interface AgentTokenResetReq {
+        id: number;
+    }
+
     export interface AgentModelConfigUpdateReq {
         agentId: number;
         accountId: number;
