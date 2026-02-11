@@ -493,6 +493,7 @@ func (a AgentService) UpdateFeishuConfig(req dto.AgentFeishuConfigUpdateReq) err
 		AppID:     req.AppID,
 		AppSecret: req.AppSecret,
 	})
+	setFeishuPluginEnabled(conf, req.Enabled)
 	if err := writeOpenclawConfigRaw(agent.ConfigPath, conf); err != nil {
 		return err
 	}
@@ -608,6 +609,13 @@ func setFeishuConfig(conf map[string]interface{}, config dto.AgentFeishuConfig) 
 		},
 	}
 	channels["feishu"] = feishu
+}
+
+func setFeishuPluginEnabled(conf map[string]interface{}, enabled bool) {
+	plugins := ensureChildMap(conf, "plugins")
+	entries := ensureChildMap(plugins, "entries")
+	feishu := ensureChildMap(entries, "feishu")
+	feishu["enabled"] = enabled
 }
 
 func (a AgentService) syncAgentsByAccount(account *model.AgentAccount) error {
