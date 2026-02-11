@@ -457,7 +457,7 @@ import {
     getDashboardCache,
     setDashboardCache,
 } from '@/utils/dashboardCache';
-import { MsgError, MsgSuccess } from '@/utils/message';
+import { MsgSuccess } from '@/utils/message';
 const router = useRouter();
 const globalStore = GlobalStore();
 
@@ -843,7 +843,6 @@ const loadMemo = async () => {
         const res = await getMemo();
         memoContent.value = res.data || '';
     } catch (error) {
-        MsgError(error.message);
         memoContent.value = '';
     }
 };
@@ -866,7 +865,6 @@ const updateDashboardCarouselSetting = async (key: string, value: 'Enable' | 'Di
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
     } catch (error) {
         target.value = previous;
-        MsgError(error.message);
     }
 };
 
@@ -887,8 +885,6 @@ const saveMemo = async () => {
         memoContent.value = memoEditContent.value;
         memoEditing.value = false;
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-    } catch (error) {
-        MsgError(error.message);
     } finally {
         memoSaving.value = false;
     }

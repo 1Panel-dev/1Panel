@@ -27,7 +27,7 @@ import LoadBalanceForm from '@/views/website/website/config/basic/load-balance/f
 import { getWebsite, updateWebsiteStream } from '@/api/modules/website';
 import { ref, onMounted } from 'vue';
 import { Rules } from '@/global/form-rules';
-import { MsgError, MsgSuccess } from '@/utils/message';
+import { MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
 
 const props = defineProps({
@@ -57,10 +57,6 @@ const submit = async () => {
         if (!lbValid) return;
         await updateWebsiteStream(form.value);
         MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
-    } catch (error) {
-        if (error.message != '') {
-            MsgError(error.message);
-        }
     } finally {
         loading.value = false;
     }
