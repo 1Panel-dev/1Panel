@@ -10,6 +10,10 @@ type WebsiteSSLSearch struct {
 	Order         string `json:"order" validate:"required,oneof=null ascending descending"`
 }
 
+type WebsiteSSLListReq struct {
+	AcmeAccountID string `json:"acmeAccountID"`
+}
+
 type WebsiteSSLCreate struct {
 	PrimaryDomain string `json:"primaryDomain" validate:"required"`
 	OtherDomains  string `json:"otherDomains"`

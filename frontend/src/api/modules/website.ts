@@ -113,11 +113,11 @@ export const searchSSL = (req: ReqPage) => {
 };
 
 export const listSSL = (req: Website.SSLReq) => {
-    return http.post<Website.SSLDTO[]>(`/websites/ssl/search`, req);
+    return http.post<Website.SSLDTO[]>(`/websites/ssl/list`, req);
 };
 
 export const listLocalNodeSSL = (req: Website.SSLReq) => {
-    return http.postLocalNode<Website.SSLDTO[]>(`/websites/ssl/search`, req);
+    return http.postLocalNode<Website.SSLDTO[]>(`/websites/ssl/list`, req);
 };
 
 export const createSSL = (req: Website.SSLCreate) => {

@@ -37,7 +37,7 @@ type WebsiteSSLService struct {
 type IWebsiteSSLService interface {
 	Page(search request.WebsiteSSLSearch) (int64, []response.WebsiteSSLDTO, error)
 	GetSSL(id uint) (*response.WebsiteSSLDTO, error)
-	Search(req request.WebsiteSSLSearch) ([]response.WebsiteSSLDTO, error)
+	Search(req request.WebsiteSSLListReq) ([]response.WebsiteSSLDTO, error)
 	Create(create request.WebsiteSSLCreate) (request.WebsiteSSLCreate, error)
 	GetDNSResolve(req request.WebsiteDNSReq) ([]response.WebsiteDNSRes, error)
 	GetWebsiteSSL(websiteId uint) (response.WebsiteSSLDTO, error)
@@ -90,7 +90,7 @@ func (w WebsiteSSLService) GetSSL(id uint) (*response.WebsiteSSLDTO, error) {
 	return &res, nil
 }
 
-func (w WebsiteSSLService) Search(search request.WebsiteSSLSearch) ([]response.WebsiteSSLDTO, error) {
+func (w WebsiteSSLService) Search(search request.WebsiteSSLListReq) ([]response.WebsiteSSLDTO, error) {
 	var (
 		opts   []repo.DBOption
 		result []response.WebsiteSSLDTO
