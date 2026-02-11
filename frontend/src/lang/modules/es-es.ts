@@ -1992,8 +1992,12 @@ const message = {
         safe: 'Seguridad',
         passkey: 'Passkey',
         passkeyManage: 'Administrar',
+        passkeyKeyManagement: 'Gestión de claves',
         passkeyHelper: 'Para inicio rápido, se pueden vincular hasta 5 passkeys',
-        passkeyRequireSSL: 'Activa SSL con un certificado de confianza y vincula un dominio para usar passkeys',
+        passkeyRequireSSL: 'Los passkeys requieren un dominio vinculado y acceso por HTTPS',
+        passkeyTrustedProxies: 'Proxies confiables',
+        passkeyTrustedProxiesHelper:
+            'Solo las solicitudes desde estas IP/CIDR confiarán en Forwarded y X-Forwarded-Proto para detectar HTTPS',
         passkeyNotSupported: 'El navegador o entorno actual no admite passkeys',
         passkeyCount: 'Vinculadas {0}/{1}',
         passkeyName: 'Nombre',

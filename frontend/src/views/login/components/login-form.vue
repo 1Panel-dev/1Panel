@@ -268,8 +268,7 @@ const errCaptcha = ref(false);
 const errMfaInfo = ref(false);
 const passkeySetting = ref(false);
 const passkeySupported = ref(false);
-const autoPasskeyTried = ref(false);
-const autoPasskeyTriedKey = '1panel-passkey-auto-tried';
+const autoPasskeyEnabledKey = '1panel-passkey-auto-enabled';
 const showPasswordLogin = ref(false);
 const isDemo = ref(false);
 const isIntl = ref(true);
@@ -342,15 +341,22 @@ const captcha = reactive({
 const loading = ref<boolean>(false);
 const mfaShow = ref<boolean>(false);
 const dropdownText = ref('中文(简体)');
-const initAutoPasskeyTried = () => {
+
+const isAutoPasskeyEnabled = () => {
     try {
-        autoPasskeyTried.value = sessionStorage.getItem(autoPasskeyTriedKey) === '1';
+        return localStorage.getItem(autoPasskeyEnabledKey) === '1';
+    } catch (error) {
+        return false;
+    }
+};
+const enableAutoPasskey = () => {
+    try {
+        localStorage.setItem(autoPasskeyEnabledKey, '1');
     } catch (error) {}
 };
-const markAutoPasskeyTried = () => {
-    autoPasskeyTried.value = true;
+const disableAutoPasskey = () => {
     try {
-        sessionStorage.setItem(autoPasskeyTriedKey, '1');
+        localStorage.removeItem(autoPasskeyEnabledKey);
     } catch (error) {}
 };
 
@@ -506,6 +512,7 @@ const mfaLogin = async (auto: boolean) => {
 const passkeyLogin = async () => {
     if (isLoggingIn || !passkeySetting.value) return;
     if (!passkeySupported.value) {
+        disableAutoPasskey();
         MsgError(i18n.t('commons.login.passkeyNotSupported'));
         return;
     }
@@ -525,11 +532,13 @@ const passkeyLogin = async () => {
         const publicKey = normalizePasskeyRequest(res.data.publicKey);
         const credential = (await navigator.credentials.get({ publicKey })) as PublicKeyCredential | null;
         if (!credential) {
+            disableAutoPasskey();
             MsgError(i18n.t('commons.login.passkeyFailed'));
             return;
         }
         const payload = buildPasskeyAssertion(credential);
         await passkeyFinishApi(payload, res.data.sessionId);
+        enableAutoPasskey();
         globalStore.ignoreCaptcha = true;
         globalStore.setLogStatus(true);
         globalStore.setAgreeLicense(true);
@@ -543,6 +552,7 @@ const passkeyLogin = async () => {
         routerToName('home');
         document.onkeydown = null;
     } catch (res: any) {
+        disableAutoPasskey();
         if (res?.message) {
             MsgError(i18n.t('commons.login.passkeyFailed'));
         }
@@ -614,8 +624,7 @@ const getSetting = async () => {
         if (res.data.passkeySetting && !isIntl.value && !isFxplay.value) {
             loginForm.agreeLicense = true;
         }
-        if (passkeySetting.value && passkeySupported.value && !autoPasskeyTried.value) {
-            markAutoPasskeyTried();
+        if (passkeySetting.value && passkeySupported.value && isAutoPasskeyEnabled()) {
             passkeyLogin();
         }
     } catch (error) {}
@@ -665,7 +674,6 @@ function adjustColorToRGBA(color: string, percent: number, opacity: number): str
 onMounted(() => {
     globalStore.isOnRestart = false;
     passkeySupported.value = !!window.PublicKeyCredential && window.isSecureContext;
-    initAutoPasskeyTried();
     getSetting();
     getXpackSettingForTheme();
     if (!globalStore.ignoreCaptcha) {

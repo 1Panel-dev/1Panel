@@ -1958,8 +1958,12 @@ const message = {
         safe: 'Keselamatan',
         passkey: 'Passkey',
         passkeyManage: 'Urus',
+        passkeyKeyManagement: 'Pengurusan kunci',
         passkeyHelper: 'Untuk log masuk pantas, maksimum 5 passkey boleh dipautkan',
-        passkeyRequireSSL: 'Aktifkan SSL dengan sijil dipercayai dan ikat nama domain untuk menggunakan passkey',
+        passkeyRequireSSL: 'Passkey memerlukan nama domain terikat dan akses HTTPS',
+        passkeyTrustedProxies: 'Proksi dipercayai',
+        passkeyTrustedProxiesHelper:
+            'Hanya permintaan daripada IP/CIDR ini akan mempercayai Forwarded dan X-Forwarded-Proto untuk menentukan HTTPS',
         passkeyNotSupported: 'Pelayar atau persekitaran semasa tidak menyokong passkey',
         passkeyCount: 'Dipaut {0}/{1}',
         passkeyName: 'Nama',

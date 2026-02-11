@@ -283,9 +283,6 @@ func (u *SettingService) UpdateSSL(c *gin.Context, req dto.SSLUpdate) error {
 		if err := settingRepo.Update("SSLType", "self"); err != nil {
 			return err
 		}
-		if err := u.clearPasskeySettings(); err != nil {
-			return err
-		}
 		_ = os.Remove(path.Join(secretDir, "server.crt"))
 		_ = os.Remove(path.Join(secretDir, "server.key"))
 		go func() {
@@ -389,9 +386,6 @@ func (u *SettingService) UpdateSSL(c *gin.Context, req dto.SSLUpdate) error {
 		}()
 	}
 	if err := settingRepo.Update("SSL", req.SSL); err != nil {
-		return err
-	}
-	if err := u.clearPasskeySettings(); err != nil {
 		return err
 	}
 	return u.UpdateSystemSSL()

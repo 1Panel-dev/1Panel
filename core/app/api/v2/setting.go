@@ -15,6 +15,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/buserr"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
+	"github.com/1Panel-dev/1Panel/core/utils/common"
 	"github.com/1Panel-dev/1Panel/core/utils/mfa"
 	"github.com/gin-gonic/gin"
 )
@@ -97,6 +98,14 @@ func (b *BaseApi) UpdateSetting(c *gin.Context) {
 			helper.ErrorWithDetail(c, http.StatusBadRequest, "ErrInvalidParams", buserr.WithName("ErrEntranceFormat", req.Value))
 			return
 		}
+	}
+	if req.Key == "PasskeyTrustedProxies" {
+		value, err := normalizePasskeyTrustedProxies(req.Value)
+		if err != nil {
+			helper.BadRequest(c, err)
+			return
+		}
+		req.Value = value
 	}
 
 	if err := settingService.Update(req.Key, req.Value); err != nil {
@@ -665,4 +674,27 @@ func checkEntrancePattern(val string) bool {
 		}
 	}
 	return true
+}
+
+func normalizePasskeyTrustedProxies(value string) (string, error) {
+	if strings.TrimSpace(value) == "" {
+		return "", nil
+	}
+	lines := strings.Split(value, "\n")
+	validLines := make([]string, 0, len(lines))
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if line == "" {
+			continue
+		}
+		validLines = append(validLines, line)
+	}
+	if len(validLines) == 0 {
+		return "", nil
+	}
+	normalized := strings.Join(validLines, "\n")
+	if _, err := common.HandleIPList(normalized); err != nil {
+		return "", err
+	}
+	return normalized, nil
 }

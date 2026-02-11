@@ -219,7 +219,7 @@ const message = {
                 'In order to better protect your legitimate rights and interests, please read and agree to the following agreement &laquo; <a href = "https://www.fit2cloud.com/legal/licenses.html" target = "_blank" > Community License Agreement </a> &raquo;',
             passkeyFailed: 'Passkey login failed, please try again',
             passkeyNotSupported:
-                'Current browser or environment does not support passkeys, please confirm you have bound the domain name and enabled the panel SSL, and used a trusted certificate when accessing',
+                'Current browser or environment does not support passkeys, please confirm you have bound a domain name and are accessing through HTTPS',
             passkeyToPassword: 'Have trouble using a passkey? Use password instead',
         },
         rule: {
@@ -1979,8 +1979,12 @@ const message = {
         safe: 'Security',
         passkey: 'Passkey',
         passkeyManage: 'Manage',
+        passkeyKeyManagement: 'Key Management',
         passkeyHelper: 'For quick login, up to 5 passkeys can be bound',
-        passkeyRequireSSL: 'Enable SSL with a trusted certificate and bind a domain name before using passkeys',
+        passkeyRequireSSL: 'Passkeys require a bound domain name and HTTPS access',
+        passkeyTrustedProxies: 'Trusted proxies',
+        passkeyTrustedProxiesHelper:
+            'Only requests from these IP/CIDR sources will trust Forwarded and X-Forwarded-Proto when determining HTTPS',
         passkeyNotSupported: 'Current browser or environment does not support passkeys',
         passkeyCount: 'Bound {0}/{1}',
         passkeyName: 'Name',

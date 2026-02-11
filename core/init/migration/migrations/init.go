@@ -139,6 +139,9 @@ var InitSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "PasskeyCredentials", Value: ""}).Error; err != nil {
 			return err
 		}
+		if err := tx.Create(&model.Setting{Key: "PasskeyTrustedProxies", Value: "127.0.0.1\n::1"}).Error; err != nil {
+			return err
+		}
 		if err := tx.Create(&model.Setting{Key: "SystemVersion", Value: global.CONF.Base.Version}).Error; err != nil {
 			return err
 		}
@@ -209,6 +212,23 @@ var AddPasskeySetting = &gormigrate.Migration{
 			return err
 		}
 		return nil
+	},
+}
+
+var AddPasskeyTrustedProxySetting = &gormigrate.Migration{
+	ID: "20260210-add-passkey-trusted-proxy-setting",
+	Migrate: func(tx *gorm.DB) error {
+		var addSettingsIfMissing = func(tx *gorm.DB, key, value string) error {
+			var setting model.Setting
+			if err := tx.Where("key = ?", key).First(&setting).Error; err != nil {
+				if errors.Is(err, gorm.ErrRecordNotFound) {
+					return tx.Create(&model.Setting{Key: key, Value: value}).Error
+				}
+				return err
+			}
+			return nil
+		}
+		return addSettingsIfMissing(tx, "PasskeyTrustedProxies", "127.0.0.1\n::1")
 	},
 }
 

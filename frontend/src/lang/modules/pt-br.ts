@@ -1946,8 +1946,12 @@ const message = {
         safe: 'Segurança',
         passkey: 'Passkey',
         passkeyManage: 'Gerenciar',
+        passkeyKeyManagement: 'Gerenciamento de chaves',
         passkeyHelper: 'Para login rápido, é possível vincular até 5 passkeys',
-        passkeyRequireSSL: 'Ative o SSL com um certificado confiável e vincule um domínio para usar passkeys',
+        passkeyRequireSSL: 'Passkeys exigem domínio vinculado e acesso via HTTPS',
+        passkeyTrustedProxies: 'Proxies confiáveis',
+        passkeyTrustedProxiesHelper:
+            'Somente requisições originadas nesses IP/CIDR confiarão em Forwarded e X-Forwarded-Proto para detectar HTTPS',
         passkeyNotSupported: 'O navegador ou ambiente atual não suporta passkeys',
         passkeyCount: 'Vinculadas {0}/{1}',
         passkeyName: 'Nome',

@@ -33,6 +33,7 @@ export namespace Setting {
         sslType: string;
         allowIPs: string;
         bindDomain: string;
+        passkeyTrustedProxies: string;
         securityEntrance: string;
         dashboardMemoVisible: string;
         dashboardSimpleNodeVisible: string;

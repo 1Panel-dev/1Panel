@@ -166,10 +166,7 @@
                             </el-form-item>
 
                             <el-form-item :label="$t('setting.passkey')">
-                                <el-button
-                                    @click="openPasskeyDialog"
-                                    :disabled="!passkeySupported || form.ssl === 'Disable'"
-                                >
+                                <el-button @click="openPasskeyDialog" :disabled="!passkeySupported || !hasBindDomain">
                                     {{ $t('setting.passkeyManage') }}
                                 </el-button>
                                 <span class="input-help">
@@ -253,8 +250,11 @@ const form = reactive({
 });
 
 const passkeySupported = ref(false);
+const hasBindDomain = computed(() => {
+    return form.bindDomain.trim() !== '';
+});
 const passkeyHint = computed(() => {
-    if (form.ssl === 'Disable') {
+    if (!hasBindDomain.value) {
         return i18n.global.t('setting.passkeyRequireSSL');
     }
     if (!passkeySupported.value) {
@@ -284,9 +284,6 @@ const search = async () => {
     form.mfaInterval = Number(res.data.mfaInterval);
     form.allowIPs = res.data.allowIPs.replaceAll(',', '\n');
     form.bindDomain = res.data.bindDomain;
-    if (res.data.bindDomain === '') {
-        passkeySupported.value = false;
-    }
     form.noAuthSettingValue = res.data.noAuthSetting;
     if (res.data.noAuthSetting !== '200') {
         form.noAuthSetting = res.data.noAuthSetting + ' - ' + i18n.global.t('setting.error' + res.data.noAuthSetting);
@@ -340,7 +337,7 @@ const handleMFA = async () => {
 };
 
 const openPasskeyDialog = async () => {
-    passkeyRef.value.acceptParams({ sslStatus: form.ssl, supported: passkeySupported.value });
+    passkeyRef.value.acceptParams({ bindDomain: form.bindDomain, supported: passkeySupported.value });
 };
 
 const onChangeEntrance = () => {
