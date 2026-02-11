@@ -43,7 +43,7 @@ func NewIScriptService() IScriptService {
 }
 
 func (u *ScriptService) Search(ctx *gin.Context, req dto.SearchPageWithGroup) (int64, interface{}, error) {
-	options := []global.DBOption{repo.WithOrderBy("created_at desc")}
+	options := []global.DBOption{repo.WithOrderDesc("created_at")}
 	if len(req.Info) != 0 {
 		options = append(options, scriptRepo.WithByInfo(req.Info))
 	}

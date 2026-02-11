@@ -38,7 +38,7 @@ func (u *LogService) CreateLoginLog(operation model.LoginLog) error {
 
 func (u *LogService) PageLoginLog(ctx *gin.Context, req dto.SearchLgLogWithPage) (int64, interface{}, error) {
 	options := []global.DBOption{
-		repo.WithOrderBy("created_at desc"),
+		repo.WithOrderDesc("created_at"),
 	}
 	if len(req.IP) != 0 {
 		options = append(options, logRepo.WithByIP(req.IP))
@@ -72,7 +72,7 @@ func (u *LogService) CreateOperationLog(operation *model.OperationLog) error {
 
 func (u *LogService) PageOperationLog(req dto.SearchOpLogWithPage) (int64, interface{}, error) {
 	options := []global.DBOption{
-		repo.WithOrderBy("created_at desc"),
+		repo.WithOrderDesc("created_at"),
 		logRepo.WithByLikeOperation(req.Operation),
 	}
 	if len(req.Source) != 0 {

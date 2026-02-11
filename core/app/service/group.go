@@ -32,8 +32,8 @@ func NewIGroupService() IGroupService {
 
 func (u *GroupService) List(req dto.OperateByType) ([]dto.GroupInfo, error) {
 	options := []global.DBOption{
-		repo.WithOrderBy("is_default desc"),
-		repo.WithOrderBy("created_at desc"),
+		repo.WithOrderDesc("is_default"),
+		repo.WithOrderDesc("created_at"),
 	}
 	if len(req.Type) != 0 {
 		options = append(options, repo.WithByType(req.Type))

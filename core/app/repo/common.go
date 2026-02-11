@@ -62,16 +62,12 @@ func WithByNode(node string) global.DBOption {
 	}
 }
 
-func WithOrderBy(orderStr string) global.DBOption {
-	if orderStr == "createdAt" {
-		orderStr = "created_at"
-	}
-	if !re.GetRegex(re.OrderByValidationPattern).MatchString(orderStr) {
-		orderStr = "created_at"
-	}
-	return func(g *gorm.DB) *gorm.DB {
-		return g.Order(orderStr)
-	}
+func WithOrderDesc(orderBy string) global.DBOption {
+	return WithOrderRuleBy(orderBy, constant.OrderDesc)
+}
+
+func WithOrderAsc(orderBy string) global.DBOption {
+	return WithOrderRuleBy(orderBy, constant.OrderAsc)
 }
 
 func WithOrderRuleBy(orderBy, order string) global.DBOption {
