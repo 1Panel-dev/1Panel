@@ -38,7 +38,7 @@ func NewIBackupRecordService() IBackupRecordService {
 func (u *BackupRecordService) SearchRecordsWithPage(search dto.RecordSearch) (int64, []dto.BackupRecords, error) {
 	total, records, err := backupRepo.PageRecord(
 		search.Page, search.PageSize,
-		repo.WithOrderBy("created_at desc"),
+		repo.WithOrderDesc("created_at"),
 		repo.WithByName(search.Name),
 		repo.WithByType(search.Type),
 		repo.WithByDetailName(search.DetailName),
@@ -69,7 +69,7 @@ func (u *BackupRecordService) SearchRecordsWithPage(search dto.RecordSearch) (in
 func (u *BackupRecordService) SearchRecordsByCronjobWithPage(search dto.RecordSearchByCronjob) (int64, []dto.BackupRecords, error) {
 	total, records, err := backupRepo.PageRecord(
 		search.Page, search.PageSize,
-		repo.WithOrderBy("created_at desc"),
+		repo.WithOrderDesc("created_at"),
 		backupRepo.WithByCronID(search.CronjobID),
 	)
 	if err != nil {
@@ -166,7 +166,7 @@ func (u *BackupRecordService) BatchDeleteRecord(ids []uint) error {
 
 func (u *BackupRecordService) ListAppRecords(name, detailName, fileName string) ([]model.BackupRecord, error) {
 	records, err := backupRepo.ListRecord(
-		repo.WithOrderBy("created_at asc"),
+		repo.WithOrderAsc("created_at"),
 		repo.WithByName(name),
 		repo.WithByType("app"),
 		backupRepo.WithFileNameStartWith(fileName),
@@ -221,7 +221,7 @@ func (u *BackupRecordService) LoadRecordSize(req dto.SearchForSize) ([]dto.Recor
 			list = append(list, backupSizeHelper{ID: item.ID, DownloadID: item.DownloadAccountID, FilePath: fmt.Sprintf("system_snapshot/%s.tar.gz", item.Name)})
 		}
 	case "cronjob":
-		_, records, err := backupRepo.PageRecord(req.Page, req.PageSize, repo.WithOrderBy("created_at desc"), backupRepo.WithByCronID(req.CronjobID))
+		_, records, err := backupRepo.PageRecord(req.Page, req.PageSize, repo.WithOrderDesc("created_at"), backupRepo.WithByCronID(req.CronjobID))
 		if err != nil {
 			return nil, err
 		}
@@ -231,7 +231,7 @@ func (u *BackupRecordService) LoadRecordSize(req dto.SearchForSize) ([]dto.Recor
 	default:
 		_, records, err := backupRepo.PageRecord(
 			req.Page, req.PageSize,
-			repo.WithOrderBy("created_at desc"),
+			repo.WithOrderDesc("created_at"),
 			repo.WithByName(req.Name),
 			repo.WithByType(req.Type),
 			repo.WithByDetailName(req.DetailName),

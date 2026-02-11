@@ -60,7 +60,7 @@ func (a AlertService) PageAlert(search dto.AlertSearch) (int64, []dto.AlertDTO, 
 	if search.Type != "" {
 		opts = append(opts, alertRepo.WithByType(search.Type))
 	}
-	opts = append(opts, repo.WithOrderBy("created_at desc"))
+	opts = append(opts, repo.WithOrderDesc("created_at"))
 
 	total, alerts, err := alertRepo.Page(search.Page, search.PageSize, opts...)
 	if err != nil {
@@ -343,7 +343,7 @@ func (a AlertService) PageAlertLogs(search dto.AlertLogSearch) (int64, []dto.Ale
 	if search.Count != 0 {
 		opts = append(opts, alertRepo.WithByCount(search.Count))
 	}
-	opts = append(opts, repo.WithOrderBy("created_at desc"))
+	opts = append(opts, repo.WithOrderDesc("created_at"))
 
 	total, alerts, err := alertRepo.PageLog(search.Page, search.PageSize, opts...)
 	if err != nil {

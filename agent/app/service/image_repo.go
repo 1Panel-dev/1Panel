@@ -37,7 +37,7 @@ func NewIImageRepoService() IImageRepoService {
 }
 
 func (u *ImageRepoService) Page(req dto.SearchWithPage) (int64, interface{}, error) {
-	total, ops, err := imageRepoRepo.Page(req.Page, req.PageSize, repo.WithByLikeName(req.Info), repo.WithOrderBy("created_at desc"))
+	total, ops, err := imageRepoRepo.Page(req.Page, req.PageSize, repo.WithByLikeName(req.Info), repo.WithOrderDesc("created_at"))
 	var dtoOps []dto.ImageRepoInfo
 	for _, op := range ops {
 		var item dto.ImageRepoInfo
@@ -65,7 +65,7 @@ func (u *ImageRepoService) Login(req dto.OperateByID) error {
 }
 
 func (u *ImageRepoService) List() ([]dto.ImageRepoOption, error) {
-	ops, err := imageRepoRepo.List(repo.WithOrderBy("created_at desc"))
+	ops, err := imageRepoRepo.List(repo.WithOrderDesc("created_at"))
 	var dtoOps []dto.ImageRepoOption
 	for _, op := range ops {
 		if op.Status == constant.StatusSuccess {

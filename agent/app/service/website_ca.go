@@ -51,7 +51,7 @@ func NewIWebsiteCAService() IWebsiteCAService {
 }
 
 func (w WebsiteCAService) Page(search request.WebsiteCASearch) (int64, []response.WebsiteCADTO, error) {
-	total, cas, err := websiteCARepo.Page(search.Page, search.PageSize, repo.WithOrderBy("created_at desc"))
+	total, cas, err := websiteCARepo.Page(search.Page, search.PageSize, repo.WithOrderDesc("created_at"))
 	if err != nil {
 		return 0, nil, err
 	}

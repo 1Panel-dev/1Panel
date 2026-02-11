@@ -72,7 +72,7 @@ func (u *BackupService) GetLocalDir() (string, error) {
 }
 
 func (u *BackupService) SearchWithPage(req dto.SearchPageWithType) (int64, interface{}, error) {
-	options := []repo.DBOption{repo.WithOrderBy("created_at desc")}
+	options := []repo.DBOption{repo.WithOrderDesc("created_at")}
 	if len(req.Type) != 0 {
 		options = append(options, repo.WithByType(req.Type))
 	}
@@ -372,7 +372,7 @@ func (u *BackupService) checkBackupConn(backup *model.BackupAccount) (bool, erro
 }
 
 func (u *BackupService) LoadBackupOptions() ([]dto.BackupOption, error) {
-	accounts, err := backupRepo.List(repo.WithOrderBy("created_at desc"))
+	accounts, err := backupRepo.List(repo.WithOrderDesc("created_at"))
 	if err != nil {
 		return nil, err
 	}

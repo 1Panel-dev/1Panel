@@ -19,7 +19,7 @@ func NewITaskService() ITaskLogService {
 
 func (u *TaskLogService) Page(req dto.SearchTaskLogReq) (int64, []dto.TaskDTO, error) {
 	opts := []repo.DBOption{
-		repo.WithOrderBy("created_at desc"),
+		repo.WithOrderDesc("created_at"),
 	}
 	if req.Status != "" {
 		opts = append(opts, repo.WithByStatus(req.Status))

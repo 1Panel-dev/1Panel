@@ -62,7 +62,7 @@ func (w WebsiteSSLService) Page(search request.WebsiteSSLSearch) (int64, []respo
 	if search.OrderBy != "" && search.Order != "null" {
 		opts = append(opts, repo.WithOrderRuleBy(search.OrderBy, search.Order))
 	} else {
-		opts = append(opts, repo.WithOrderBy("created_at desc"))
+		opts = append(opts, repo.WithOrderDesc("created_at"))
 	}
 	if search.Domain != "" {
 		opts = append(opts, websiteSSLRepo.WithByDomain(search.Domain))
@@ -95,7 +95,7 @@ func (w WebsiteSSLService) Search(search request.WebsiteSSLListReq) ([]response.
 		opts   []repo.DBOption
 		result []response.WebsiteSSLDTO
 	)
-	opts = append(opts, repo.WithOrderBy("created_at desc"))
+	opts = append(opts, repo.WithOrderDesc("created_at"))
 	if search.AcmeAccountID != "" {
 		acmeAccountID, err := strconv.ParseUint(search.AcmeAccountID, 10, 64)
 		if err != nil {

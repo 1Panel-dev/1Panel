@@ -27,7 +27,7 @@ func NewIWebsiteDnsAccountService() IWebsiteDnsAccountService {
 }
 
 func (w WebsiteDnsAccountService) Page(search dto.PageInfo) (int64, []response.WebsiteDnsAccountDTO, error) {
-	total, accounts, err := websiteDnsRepo.Page(search.Page, search.PageSize, repo.WithOrderBy("created_at desc"))
+	total, accounts, err := websiteDnsRepo.Page(search.Page, search.PageSize, repo.WithOrderDesc("created_at"))
 	var accountDTOs []response.WebsiteDnsAccountDTO
 	for _, account := range accounts {
 		auth := make(map[string]string)

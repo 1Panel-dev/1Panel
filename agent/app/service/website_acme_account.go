@@ -25,7 +25,7 @@ func NewIWebsiteAcmeAccountService() IWebsiteAcmeAccountService {
 }
 
 func (w WebsiteAcmeAccountService) Page(search dto.PageInfo) (int64, []response.WebsiteAcmeAccountDTO, error) {
-	total, accounts, err := websiteAcmeRepo.Page(search.Page, search.PageSize, repo.WithOrderBy("created_at desc"))
+	total, accounts, err := websiteAcmeRepo.Page(search.Page, search.PageSize, repo.WithOrderDesc("created_at"))
 	var accountDTOs []response.WebsiteAcmeAccountDTO
 	for _, account := range accounts {
 		accountDTOs = append(accountDTOs, response.WebsiteAcmeAccountDTO{

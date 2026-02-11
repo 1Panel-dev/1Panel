@@ -152,17 +152,14 @@ func WithByCreatedAt(startTime, endTime time.Time) DBOption {
 	}
 }
 
-func WithOrderBy(orderStr string) DBOption {
-	if orderStr == "createdAt" {
-		orderStr = "created_at"
-	}
-	if !re.GetRegex(re.OrderByValidationPattern).MatchString(orderStr) {
-		orderStr = "created_at"
-	}
-	return func(g *gorm.DB) *gorm.DB {
-		return g.Order(orderStr)
-	}
+func WithOrderDesc(orderBy string) DBOption {
+	return WithOrderRuleBy(orderBy, constant.Desc)
 }
+
+func WithOrderAsc(orderBy string) DBOption {
+	return WithOrderRuleBy(orderBy, constant.Asc)
+}
+
 func WithOrderRuleBy(orderBy, order string) DBOption {
 	if orderBy == "createdAt" {
 		orderBy = "created_at"
@@ -174,6 +171,10 @@ func WithOrderRuleBy(orderBy, order string) DBOption {
 	case constant.OrderDesc:
 		order = "desc"
 	case constant.OrderAsc:
+		order = "asc"
+	case constant.Desc:
+		order = "desc"
+	case constant.Asc:
 		order = "asc"
 	default:
 		orderBy = "created_at"

@@ -418,7 +418,7 @@ func (u *CronjobService) removeExpiredBackup(cronjob model.Cronjob, accountMap m
 	var opts []repo.DBOption
 	opts = append(opts, repo.WithByFrom("cronjob"))
 	opts = append(opts, backupRepo.WithByCronID(cronjob.ID))
-	opts = append(opts, repo.WithOrderBy("created_at desc"))
+	opts = append(opts, repo.WithOrderDesc("created_at"))
 	if record.ID != 0 {
 		opts = append(opts, repo.WithByType(record.Type))
 		opts = append(opts, repo.WithByName(record.Name))
@@ -461,7 +461,7 @@ func (u *CronjobService) removeExpiredBackup(cronjob model.Cronjob, accountMap m
 }
 
 func (u *CronjobService) removeExpiredLog(cronjob model.Cronjob) {
-	records, _ := cronjobRepo.ListRecord(cronjobRepo.WithByJobID(int(cronjob.ID)), repo.WithOrderBy("created_at desc"))
+	records, _ := cronjobRepo.ListRecord(cronjobRepo.WithByJobID(int(cronjob.ID)), repo.WithOrderDesc("created_at"))
 	if len(records) <= int(cronjob.RetainCopies) {
 		return
 	}
