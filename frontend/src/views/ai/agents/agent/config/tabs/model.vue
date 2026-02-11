@@ -5,8 +5,10 @@
                 <el-option v-for="item in accountOptions" :key="item.id" :label="item.name" :value="item.id" />
             </el-select>
         </el-form-item>
-        <el-form-item :label="t('aiTools.agents.manualModel')">
-            <el-switch v-model="form.manualModel" @change="handleManualModelChange" />
+        <el-form-item>
+            <el-checkbox v-model="form.manualModel" @change="handleManualModelChange">
+                {{ t('aiTools.agents.manualModel') }}
+            </el-checkbox>
         </el-form-item>
         <el-form-item :label="t('aiTools.model.model')" prop="model">
             <el-input v-if="form.manualModel" v-model="form.model" />
@@ -93,8 +95,8 @@ const handleAccountChange = () => {
     }
 };
 
-const handleManualModelChange = (val: boolean) => {
-    if (val) {
+const handleManualModelChange = (val: unknown) => {
+    if (Boolean(val)) {
         return;
     }
     const selected = accountOptions.value.find((item) => item.id === form.accountId);
