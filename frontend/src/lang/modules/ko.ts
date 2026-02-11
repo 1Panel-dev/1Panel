@@ -461,7 +461,7 @@ const message = {
         networkCard: '네트워크 카드',
         disk: '디스크',
         memo: '메모',
-        memoPlaceholder: '메모를 편집하려면 두 번 클릭...',
+        memoPlaceholder: '편집 버튼을 클릭하여 편집을 활성화하세요.',
         carouselSetting: '캐러셀 설정',
         tooltipSensitiveInfo: '민감한 정보 표시/숨기기',
     },

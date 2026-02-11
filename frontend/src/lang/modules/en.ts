@@ -472,7 +472,7 @@ const message = {
         disk: 'Disk',
 
         memo: 'Memo',
-        memoPlaceholder: 'Double-click to edit memo content...',
+        memoPlaceholder: 'Click the edit button to enable editing.',
         carouselSetting: 'Carousel settings',
         tooltipSensitiveInfo: 'Show/Hide sensitive info',
     },

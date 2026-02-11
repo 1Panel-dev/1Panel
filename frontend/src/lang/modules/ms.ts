@@ -467,7 +467,7 @@ const message = {
         networkCard: 'Kad rangkaian',
         disk: 'Disk',
         memo: 'Catatan',
-        memoPlaceholder: 'Dwiklik untuk mengedit memo...',
+        memoPlaceholder: 'Klik butang edit untuk mengaktifkan penyuntingan.',
         carouselSetting: 'Tetapan karusel',
         tooltipSensitiveInfo: 'Tunjuk/Sembunyikan maklumat sensitif',
     },

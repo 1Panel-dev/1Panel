@@ -19,18 +19,20 @@ type SettingInfo struct {
 	MenuTabs       string `json:"menuTabs"`
 	Language       string `json:"language"`
 
-	ServerPort             string `json:"serverPort"`
-	SSL                    string `json:"ssl"`
-	SSLType                string `json:"sslType"`
-	BindDomain             string `json:"bindDomain"`
-	AllowIPs               string `json:"allowIPs"`
-	SecurityEntrance       string `json:"securityEntrance"`
-	ExpirationDays         string `json:"expirationDays"`
-	ExpirationTime         string `json:"expirationTime"`
-	ComplexityVerification string `json:"complexityVerification"`
-	MFAStatus              string `json:"mfaStatus"`
-	MFASecret              string `json:"mfaSecret"`
-	MFAInterval            string `json:"mfaInterval"`
+	ServerPort                 string `json:"serverPort"`
+	SSL                        string `json:"ssl"`
+	SSLType                    string `json:"sslType"`
+	BindDomain                 string `json:"bindDomain"`
+	AllowIPs                   string `json:"allowIPs"`
+	SecurityEntrance           string `json:"securityEntrance"`
+	DashboardMemoVisible       string `json:"dashboardMemoVisible"`
+	DashboardSimpleNodeVisible string `json:"dashboardSimpleNodeVisible"`
+	ExpirationDays             string `json:"expirationDays"`
+	ExpirationTime             string `json:"expirationTime"`
+	ComplexityVerification     string `json:"complexityVerification"`
+	MFAStatus                  string `json:"mfaStatus"`
+	MFASecret                  string `json:"mfaSecret"`
+	MFAInterval                string `json:"mfaInterval"`
 
 	AppStoreVersion      string `json:"appStoreVersion"`
 	AppStoreLastModified string `json:"appStoreLastModified"`
@@ -241,16 +243,16 @@ type AppstoreConfig struct {
 }
 
 type LoginSetting struct {
-	IsDemo      bool   `json:"isDemo"`
-	IsIntl      bool   `json:"isIntl"`
-	IsOffLine   bool   `json:"isOffLine"`
-	IsFxplay    bool   `json:"isFxplay"`
-	Language    string `json:"language"`
-	MenuTabs    string `json:"menuTabs"`
-	PanelName   string `json:"panelName"`
-	Theme       string `json:"theme"`
-	NeedCaptcha bool   `json:"needCaptcha"`
-	PasskeySetting bool `json:"passkeySetting"`
+	IsDemo         bool   `json:"isDemo"`
+	IsIntl         bool   `json:"isIntl"`
+	IsOffLine      bool   `json:"isOffLine"`
+	IsFxplay       bool   `json:"isFxplay"`
+	Language       string `json:"language"`
+	MenuTabs       string `json:"menuTabs"`
+	PanelName      string `json:"panelName"`
+	Theme          string `json:"theme"`
+	NeedCaptcha    bool   `json:"needCaptcha"`
+	PasskeySetting bool   `json:"passkeySetting"`
 }
 
 type PasskeyRegisterRequest struct {

@@ -323,6 +323,9 @@
                     <el-carousel-item key="memoInfo" v-if="showMemoCarousel">
                         <CardWithHeader :header="$t('home.memo')" class="memo-card">
                             <template #header-r>
+                                <el-tooltip v-if="!memoEditing" :content="$t('commons.button.edit')" placement="top">
+                                    <el-button class="h-button-setting" @click="startMemoEdit" link icon="Edit" />
+                                </el-tooltip>
                                 <el-tooltip v-if="memoEditing" :content="$t('commons.button.save')" placement="top">
                                     <el-button
                                         class="h-button-setting"
@@ -345,8 +348,8 @@
                                             type="textarea"
                                             :rows="10"
                                             :maxlength="500"
-                                            show-word-limit
                                             :placeholder="$t('home.memoPlaceholder')"
+                                            show-word-limit
                                         />
                                         <div v-else class="memo-content" @dblclick="startMemoEdit">
                                             <MarkDownEditor v-if="memoContent" :content="memoContent" />
@@ -421,7 +424,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, onBeforeUnmount, ref, reactive, computed } from 'vue';
+import { onMounted, onBeforeUnmount, ref, reactive, computed, nextTick } from 'vue';
 import SystemStatus from '@/views/home/status/index.vue';
 import AppLauncher from '@/views/home/app/index.vue';
 import VCharts from '@/components/v-charts/index.vue';
@@ -448,7 +451,12 @@ import { GlobalStore } from '@/store';
 import { storeToRefs } from 'pinia';
 import { routerToFileWithPath, routerToNameWithQuery, routerToPath } from '@/utils/router';
 import { getWelcomePage } from '@/api/modules/auth';
-import { clearDashboardCache, getDashboardCache, setDashboardCache } from '@/utils/dashboardCache';
+import {
+    clearDashboardCache,
+    clearDashboardCacheByPrefix,
+    getDashboardCache,
+    setDashboardCache,
+} from '@/utils/dashboardCache';
 import { MsgError, MsgSuccess } from '@/utils/message';
 const router = useRouter();
 const globalStore = GlobalStore();
@@ -505,6 +513,7 @@ const memoEditing = ref(false);
 const memoSaving = ref(false);
 const memoCarouselSetting = ref();
 const simpleNodeCarouselSetting = ref();
+const carouselSettingReady = ref(false);
 
 const showMemoCarousel = computed(() => memoCarouselSetting.value === 'Enable');
 const carouselItemCount = computed(() => {
@@ -722,7 +731,7 @@ const refreshDashboard = async () => {
     clearDashboardCache();
     onLoadBaseInfo(false, '');
     hasRefreshedOptionsOnHover.value = false;
-    await Promise.allSettled([onLoadNetworkOptions(true), onLoadIOOptions(true), loadSafeStatus()]);
+    await Promise.allSettled([onLoadNetworkOptions(true), onLoadIOOptions(true), loadSettingInfo()]);
     MsgSuccess(i18n.global.t('commons.msg.refreshSuccess'));
 };
 
@@ -840,7 +849,17 @@ const loadMemo = async () => {
 };
 
 const updateDashboardCarouselSetting = async (key: string, value: 'Enable' | 'Disable') => {
-    const target = key === 'DashboardMemoVisible' ? memoCarouselSetting : simpleNodeCarouselSetting;
+    if (!carouselSettingReady.value) {
+        return;
+    }
+    let target;
+    if (key === 'DashboardMemoVisible') {
+        target = memoCarouselSetting.value;
+        clearDashboardCacheByPrefix(['memoCarouselSetting']);
+    } else {
+        target = simpleNodeCarouselSetting.value;
+        clearDashboardCacheByPrefix(['simpleNodeCarouselSetting']);
+    }
     const previous = value === 'Enable' ? 'Disable' : 'Enable';
     try {
         await updateSetting({ key, value });
@@ -922,17 +941,31 @@ const loadUpgradeStatus = async () => {
     }
 };
 
-const loadSafeStatus = async () => {
-    const cache = getDashboardCache('safeStatus');
-    if (cache !== null) {
-        isSafety.value = cache;
+const loadSettingInfo = async () => {
+    const safeCache = getDashboardCache('safeStatus');
+    const memoCache = getDashboardCache('memoCarouselSetting');
+    const simpleNodeCache = getDashboardCache('simpleNodeCarouselSetting');
+    if (safeCache === null || memoCache === null || simpleNodeCache === null) {
+        const res = await getSettingInfo();
+        isSafety.value = res.data.securityEntrance;
+        memoCarouselSetting.value = res.data.dashboardMemoVisible;
+        simpleNodeCarouselSetting.value = res.data.dashboardSimpleNodeVisible;
+        setDashboardCache('safeStatus', isSafety.value, DASHBOARD_CACHE_TTL.safeStatus);
+        setDashboardCache('memoCarouselSetting', memoCarouselSetting.value, DASHBOARD_CACHE_TTL.safeStatus);
+        setDashboardCache('simpleNodeCarouselSetting', simpleNodeCarouselSetting.value, DASHBOARD_CACHE_TTL.safeStatus);
+        if (!carouselSettingReady.value) {
+            await nextTick();
+            carouselSettingReady.value = true;
+        }
         return;
     }
-    const res = await getSettingInfo();
-    isSafety.value = res.data.securityEntrance;
-    memoCarouselSetting.value = res.data.dashboardMemoVisible;
-    simpleNodeCarouselSetting.value = res.data.dashboardSimpleNodeVisible;
-    setDashboardCache('safeStatus', isSafety.value, DASHBOARD_CACHE_TTL.safeStatus);
+    isSafety.value = safeCache;
+    memoCarouselSetting.value = memoCache;
+    simpleNodeCarouselSetting.value = simpleNodeCache;
+    if (!carouselSettingReady.value) {
+        await nextTick();
+        carouselSettingReady.value = true;
+    }
 };
 
 const loadSource = (row: any) => {
@@ -988,7 +1021,7 @@ const fetchData = async () => {
     window.addEventListener('focus', onFocus);
     window.addEventListener('blur', onBlur);
     hasRefreshedOptionsOnHover.value = false;
-    loadSafeStatus();
+    loadSettingInfo();
     onLoadAgentSettingInfo();
     onLoadBaseInfo(true, 'all');
     scheduleDeferredFetch();
@@ -1190,9 +1223,9 @@ onBeforeUnmount(() => {
 }
 
 .memo-content {
-    min-height: 100px;
-    padding: 10px;
+    min-height: 218px;
     border-radius: 4px;
+    border: 1px solid var(--el-border-color);
     background-color: var(--el-fill-color-light);
     word-wrap: break-word;
     white-space: pre-wrap;
@@ -1204,7 +1237,8 @@ onBeforeUnmount(() => {
 
 .memo-placeholder {
     color: var(--el-text-color-placeholder);
-    font-style: italic;
+    display: inline-block;
+    font-size: 14px;
 }
 
 .dashboard-carousel-setting {

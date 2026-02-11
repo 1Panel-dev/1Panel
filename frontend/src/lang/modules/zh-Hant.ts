@@ -456,7 +456,7 @@ const message = {
         networkCard: '網卡',
         disk: '磁碟',
         memo: '備忘錄',
-        memoPlaceholder: '雙擊可編輯備忘錄內容...',
+        memoPlaceholder: '點擊編輯按鈕啟用編輯',
         carouselSetting: '輪播設定',
         tooltipSensitiveInfo: '顯示/隱藏敏感資訊',
     },

@@ -465,7 +465,7 @@ const message = {
         networkCard: 'Placa de rede',
         disk: 'Disco',
         memo: 'Memo',
-        memoPlaceholder: 'Clique duas vezes para editar o memo...',
+        memoPlaceholder: 'Clique no botão de editar para habilitar a edição.',
         carouselSetting: 'Configuração do carrossel',
         tooltipSensitiveInfo: 'Mostrar/Ocultar informações sensíveis',
     },

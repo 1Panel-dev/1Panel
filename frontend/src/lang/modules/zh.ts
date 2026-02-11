@@ -458,7 +458,7 @@ const message = {
         disk: '磁盘',
 
         memo: '备忘录',
-        memoPlaceholder: '双击可编辑备忘录内容...',
+        memoPlaceholder: '点击编辑按钮启用编辑',
         carouselSetting: '轮播设置',
         tooltipSensitiveInfo: '显示/隐藏敏感信息',
     },

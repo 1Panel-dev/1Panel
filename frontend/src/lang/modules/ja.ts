@@ -458,7 +458,7 @@ const message = {
         networkCard: 'ネットワークカード',
         disk: 'ディスク',
         memo: 'メモ',
-        memoPlaceholder: 'ダブルクリックしてメモを編集...',
+        memoPlaceholder: '編集ボタンをクリックして編集を有効にします。',
         carouselSetting: 'カルーセル設定',
         tooltipSensitiveInfo: '機密情報を表示/非表示',
     },
