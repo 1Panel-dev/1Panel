@@ -167,7 +167,7 @@
                 <el-carousel
                     class="my-carousel"
                     :class="{ 'no-indicator': carouselItemCount <= 1 }"
-                    :key="simpleNodes.length"
+                    :key="simpleNodes.length + carouselItemCount"
                     height="368px"
                     indicator-position=""
                     arrow="never"

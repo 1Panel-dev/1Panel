@@ -163,6 +163,7 @@ import LogDialog from '@/views/toolbox/ftp/log/index.vue';
 import { Toolbox } from '@/api/interface/toolbox';
 import { GlobalStore } from '@/store';
 import { routerToFileWithPath } from '@/utils/router';
+import { getRandomStr } from '@/utils/util';
 
 const globalStore = GlobalStore();
 
@@ -263,7 +264,12 @@ const onChange = async (row: any) => {
     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
 };
 
-const onOpenDialog = async (title: string, rowData: Partial<Toolbox.FtpInfo> = {}) => {
+const onOpenDialog = async (
+    title: string,
+    rowData: Partial<Toolbox.FtpInfo> = {
+        password: getRandomStr(12),
+    },
+) => {
     let params = {
         title,
         rowData: { ...rowData },
@@ -306,7 +312,7 @@ const onDelete = async (row: Toolbox.FtpInfo | null) => {
         title: i18n.global.t('commons.button.delete'),
         names: names,
         msg: i18n.global.t('commons.msg.operatorHelper', [
-            i18n.global.t('menu.cronjob'),
+            i18n.global.t('website.ftpUser'),
             i18n.global.t('commons.button.delete'),
         ]),
         api: null,
