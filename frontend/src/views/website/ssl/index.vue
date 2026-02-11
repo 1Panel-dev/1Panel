@@ -309,7 +309,7 @@ const mobile = computed(() => {
 
 const changeSort = ({ order }) => {
     req.orderBy = 'expire_date';
-    req.order = order;
+    req.order = order || 'descending';
     search();
 };
 
@@ -319,7 +319,7 @@ const search = () => {
         pageSize: paginationConfig.pageSize,
         domain: req.domain,
         orderBy: req.orderBy,
-        order: req.order,
+        order: req.order || 'descending',
     };
     loading.value = true;
     searchSSL(request)
