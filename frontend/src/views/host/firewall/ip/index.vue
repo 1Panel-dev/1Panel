@@ -163,7 +163,6 @@ const search = async () => {
     }
     let params = {
         type: activeTag.value,
-        status: '',
         strategy: searchStrategy.value,
         info: searchName.value,
         page: paginationConfig.currentPage,

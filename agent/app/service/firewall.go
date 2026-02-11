@@ -112,29 +112,15 @@ func (u *FirewallService) SearchWithPage(req dto.RuleSearch) (int64, interface{}
 		}
 	}
 
-	var datasFilterStatus []fireClient.FireInfo
-	if len(req.Status) != 0 {
-		for _, data := range datas {
-			if req.Status == "free" && len(data.UsedStatus) == 0 {
-				datasFilterStatus = append(datasFilterStatus, data)
-			}
-			if req.Status == "used" && len(data.UsedStatus) != 0 {
-				datasFilterStatus = append(datasFilterStatus, data)
-			}
-		}
-	} else {
-		datasFilterStatus = datas
-	}
-
 	var datasFilterStrategy []fireClient.FireInfo
 	if len(req.Strategy) != 0 {
-		for _, data := range datasFilterStatus {
+		for _, data := range datas {
 			if req.Strategy == data.Strategy {
 				datasFilterStrategy = append(datasFilterStrategy, data)
 			}
 		}
 	} else {
-		datasFilterStrategy = datasFilterStatus
+		datasFilterStrategy = datas
 	}
 
 	total, start, end := len(datasFilterStrategy), (req.Page-1)*req.PageSize, req.Page*req.PageSize

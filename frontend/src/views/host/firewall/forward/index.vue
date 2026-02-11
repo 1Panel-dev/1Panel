@@ -111,7 +111,6 @@ const loading = ref();
 const activeTag = ref('forward');
 const selects = ref<any>([]);
 const searchName = ref();
-const searchStatus = ref('');
 const searchStrategy = ref('');
 
 const maskShow = ref(true);
@@ -141,7 +140,6 @@ const search = async () => {
     }
     let params = {
         type: activeTag.value,
-        status: searchStatus.value,
         strategy: searchStrategy.value,
         info: searchName.value,
         page: paginationConfig.currentPage,
