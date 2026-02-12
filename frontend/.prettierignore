@@ -6,3 +6,4 @@
 **/*.sh
 
 /public/*
+/src/assets/iconfont/**
