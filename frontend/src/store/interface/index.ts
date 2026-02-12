@@ -72,6 +72,7 @@ export interface TerminalState {
     lineHeight: number;
     letterSpacing: number;
     fontSize: number;
+    fontFamily: string;
     cursorBlink: string;
     cursorStyle: string;
     scrollback: number;

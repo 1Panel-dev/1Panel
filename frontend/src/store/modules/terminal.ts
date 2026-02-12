@@ -8,6 +8,7 @@ export const TerminalStore = defineStore({
         lineHeight: 1.2,
         letterSpacing: 1.2,
         fontSize: 12,
+        fontFamily: '',
         cursorBlink: 'enable',
         cursorStyle: 'underline',
         scrollback: 1000,
@@ -22,6 +23,9 @@ export const TerminalStore = defineStore({
         },
         setFontSize(fontSize: number) {
             this.fontSize = fontSize;
+        },
+        setFontFamily(fontFamily: string) {
+            this.fontFamily = fontFamily;
         },
         setCursorBlink(cursorBlink: string) {
             this.cursorBlink = cursorBlink;
