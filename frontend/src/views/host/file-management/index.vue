@@ -520,7 +520,7 @@
                                     </div>
                                 </template>
                             </el-table-column>
-                            <el-table-column :label="$t('file.mode')" prop="mode" min-width="110">
+                            <el-table-column :label="$t('file.mode')" prop="mode" width="80">
                                 <template #default="{ row }">
                                     <el-link underline="never" @click="openMode(row)">{{ row.mode }}</el-link>
                                 </template>
@@ -538,7 +538,7 @@
                                     </el-link>
                                 </template>
                             </el-table-column>
-                            <el-table-column :label="$t('file.size')" prop="size" min-width="100" :sortable="'custom'">
+                            <el-table-column :label="$t('file.size')" prop="size" width="80" :sortable="'custom'">
                                 <template #default="{ row }">
                                     <el-button
                                         type="primary"
@@ -567,12 +567,7 @@
                                 show-overflow-tooltip
                                 :sortable="'custom'"
                             ></el-table-column>
-                            <el-table-column
-                                :label="$t('file.remark')"
-                                prop="remark"
-                                min-width="180"
-                                show-overflow-tooltip
-                            >
+                            <el-table-column :label="$t('file.remark')" prop="remark" width="180" show-overflow-tooltip>
                                 <template #default="{ row }">
                                     <span>{{ row.remark ? row.remark : '-' }}</span>
                                 </template>
@@ -584,7 +579,7 @@
                                 :label="$t('commons.table.operate')"
                                 :min-width="mobile ? 'auto' : 200"
                                 :fixed="mobile ? false : 'right'"
-                                width="270"
+                                width="200"
                                 fix
                             />
                             <template #paginationLeft>

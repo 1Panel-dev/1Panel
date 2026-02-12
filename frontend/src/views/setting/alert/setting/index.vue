@@ -44,7 +44,7 @@
                     <template #title>
                         <div class="flex items-center justify-start">
                             {{ $t('xpack.alert.alertConfigHelper') }}
-                            <span v-if="globalStore.isProductPro">
+                            <span v-if="!globalStore.isProductPro">
                                 {{ $t('commons.units.semicolon') }}{{ $t('xpack.alert.alertConfigProHelper') }}
                             </span>
                             <el-link
