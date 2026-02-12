@@ -1054,7 +1054,10 @@ const fillAliasFromDomainIfEmpty = (value: string) => {
     if (!value || website.value.alias.trim() !== '') {
         return;
     }
-    const domain = value.split(':')[0];
+    const domain = value.split(':')[0].trim();
+    if (!domain) {
+        return;
+    }
     website.value.alias = domain;
 };
 
