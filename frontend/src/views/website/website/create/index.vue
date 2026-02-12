@@ -192,7 +192,11 @@
                     </el-form-item>
                 </div>
                 <div v-else>
-                    <DomainCreate v-model:form="website" @gengerate="websiteForm.clearValidate()"></DomainCreate>
+                    <DomainCreate
+                        v-model:form="website"
+                        @gengerate="websiteForm.clearValidate()"
+                        @domain-blur="handleFirstDomainBlur"
+                    ></DomainCreate>
                 </div>
                 <el-divider content-position="left">
                     <el-text type="info" size="small">{{ $t('website.advancedSettings') }}</el-text>
@@ -1003,11 +1007,7 @@ const submit = async (formEl: FormInstance | undefined) => {
 
 watch(
     () => website.value.domains,
-    (value) => {
-        if (value && value.length > 0) {
-            const firstDomain = value[0].domain;
-            changeAlias(firstDomain);
-        }
+    () => {
         tryAutoSelectSSL();
     },
     { deep: true },
@@ -1042,7 +1042,18 @@ watch(
     { deep: true },
 );
 
-const changeAlias = (value: string) => {
+const handleFirstDomainBlur = (index: number) => {
+    if (index !== 0) {
+        return;
+    }
+    const firstDomain = website.value.domains?.[0]?.domain || '';
+    fillAliasFromDomainIfEmpty(firstDomain);
+};
+
+const fillAliasFromDomainIfEmpty = (value: string) => {
+    if (!value || website.value.alias.trim() !== '') {
+        return;
+    }
     const domain = value.split(':')[0];
     website.value.alias = domain;
 };

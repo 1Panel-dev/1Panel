@@ -83,6 +83,7 @@
 import { checkAppInstalled } from '@/api/modules/app';
 import { Rules, checkNumberRange } from '@/global/form-rules';
 import { MsgError } from '@/utils/message';
+import { toASCII } from 'punycode';
 import { ref, onMounted, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -97,7 +98,7 @@ const props = defineProps({
     },
 });
 
-const emit = defineEmits(['gengerate']);
+const emit = defineEmits(['gengerate', 'domain-blur']);
 
 const ipv4Regex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
 
@@ -128,17 +129,22 @@ function toPunycode(hostname: string): string {
             return hostname;
         }
 
+        const convertLabels = (value: string): string => {
+            return value
+                .split('.')
+                .map((label) => (label === '*' || label === '' ? label : toASCII(label)))
+                .join('.');
+        };
+
         if (hostname.startsWith('*.')) {
             const domainPart = hostname.substring(2);
-            const convertedDomain = new URL(`http://${domainPart}`).hostname;
-            return `*.${convertedDomain}`;
+            return `*.${convertLabels(domainPart)}`;
         }
         if (hostname.endsWith('.*')) {
             const domainPart = hostname.slice(0, -2);
-            const convertedDomain = new URL(`http://${domainPart}`).hostname;
-            return `${convertedDomain}.*`;
+            return `${convertLabels(domainPart)}.*`;
         }
-        return new URL(`http://${hostname}`).hostname;
+        return convertLabels(hostname);
     } catch {
         return hostname;
     }
@@ -149,6 +155,7 @@ const handleDomainBlur = (index: number) => {
     if (!originalDomain) {
         create.value.domains[index].host = '';
         domainWarnings.value[index] = false;
+        emit('domain-blur', index);
         return;
     }
 
@@ -157,12 +164,14 @@ const handleDomainBlur = (index: number) => {
         create.value.domains[index].host = originalDomain;
         create.value.domains[index].domain = originalDomain;
         domainWarnings.value[index] = false;
+        emit('domain-blur', index);
         return;
     }
 
     let singleRegexChecked = singleDomainRegex.test(originalDomain);
     if (!singleRegexChecked) {
         domainWarnings.value[index] = false;
+        emit('domain-blur', index);
         return;
     }
 
@@ -179,6 +188,7 @@ const handleDomainBlur = (index: number) => {
     } else {
         domainWarnings.value[index] = false;
     }
+    emit('domain-blur', index);
 };
 
 const validateSingleDomain = (_rule: any, value: string, callback: (error?: Error) => void) => {
