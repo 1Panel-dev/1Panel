@@ -2,8 +2,6 @@ package ssl
 
 import (
 	"encoding/json"
-	"time"
-
 	"github.com/go-acme/lego/v4/challenge"
 	"github.com/go-acme/lego/v4/providers/dns/acmedns"
 	"github.com/go-acme/lego/v4/providers/dns/alidns"
@@ -31,6 +29,7 @@ import (
 	"github.com/go-acme/lego/v4/providers/dns/vercel"
 	"github.com/go-acme/lego/v4/providers/dns/volcengine"
 	"github.com/go-acme/lego/v4/providers/dns/westcn"
+	"time"
 )
 
 type DnsType string
