@@ -522,6 +522,26 @@ monaco.editor.defineTheme('vs', {
 
 const selectTab = ref();
 const fileTabs = ref([]);
+const maxTabs = 10;
+const codeTabsStorageKey = 'code-editor-tabs';
+
+const saveTabsToStorage = () => {
+    const simpleTabs = fileTabs.value.map((tab: any) => ({
+        path: tab.path,
+        name: tab.name,
+    }));
+    localStorage.setItem(codeTabsStorageKey, JSON.stringify(simpleTabs.slice(0, maxTabs)));
+};
+
+const loadTabsFromStorage = (): { path: string; name: string }[] => {
+    const raw = localStorage.getItem(codeTabsStorageKey);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) {
+        return parsed.filter((item) => item && item.path && item.name);
+    }
+    return [];
+};
 const removeTab = (targetPath: TabPaneName) => {
     const tabs = fileTabs.value;
     let activeName = selectTab.value;
@@ -890,19 +910,19 @@ const acceptParams = (props: EditProps) => {
     directoryPath.value = getDirectoryPath(props.path);
     fileExtension.value = props.extension;
     fileName.value = props.name;
-    fileTabs.value = [];
-    selectTab.value = '';
-    fileTabs.value.push({
-        name: fileName.value,
-        path: props.path,
-    });
+    const savedTabs = loadTabsFromStorage();
+    const withoutCurrent = savedTabs.filter((tab) => tab.path !== props.path);
+    const merged = [...withoutCurrent, { path: props.path, name: props.name }];
+    fileTabs.value = merged.slice(-maxTabs);
     selectTab.value = props.path;
+
     config.language = props.language;
     config.eol = monaco.editor.EndOfLineSequence.LF;
     config.theme = localStorage.getItem(codeThemeKey) || 'vs-dark';
     config.wordWrap = (localStorage.getItem(warpKey) as WordWrapOptions) || 'on';
     config.minimap = localStorage.getItem(minimapKey) !== null ? localStorage.getItem(minimapKey) === 'true' : true;
     open.value = true;
+    saveTabsToStorage();
 };
 
 const getIconName = (extension: string) => getIcon(extension);
@@ -969,6 +989,10 @@ const getContent = (path: string, extension: string) => {
     if (form.value.path === path || isCreate.value == 'file') {
         return;
     }
+    const existsInTabs = fileTabs.value.some((tab) => tab.path === path);
+    if (!existsInTabs && fileTabs.value.length >= maxTabs) {
+        fileTabs.value.shift();
+    }
     const fetchFileContent = () => {
         codeReq.path = path;
         codeReq.expand = true;
@@ -999,12 +1023,17 @@ const getContent = (path: string, extension: string) => {
                     });
                 }
                 const exists = fileTabs.value.some((tab) => tab.path === path);
-                if (!exists) {
+                if (exists) {
+                    fileTabs.value = fileTabs.value
+                        .filter((t) => t.path !== path)
+                        .concat([{ name: res.data.name, path: res.data.path }]);
+                } else {
                     fileTabs.value.push({
                         name: res.data.name,
-                        path: path,
+                        path: res.data.path,
                     });
                 }
+                saveTabsToStorage();
                 selectTab.value = res.data.path;
             })
             .catch(() => {});
