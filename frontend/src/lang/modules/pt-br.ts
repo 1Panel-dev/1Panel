@@ -1348,6 +1348,9 @@ const message = {
         key: 'Chave privada',
         keyPassword: 'Senha da chave privada',
         emptyTerminal: 'Nenhum terminal está conectado no momento.',
+        fontFamily: 'Fonte personalizada',
+        fontFamilyHelper:
+            'Deixe em branco para usar fontes padrão. Se você inserir um nome de fonte personalizado, certifique-se de que a fonte esteja instalada no seu sistema operacional local, caso contrário será renderizada com a fonte padrão',
     },
     toolbox: {
         common: {

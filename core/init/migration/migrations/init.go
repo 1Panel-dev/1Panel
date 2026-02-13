@@ -785,3 +785,23 @@ var UpdateAiAgentsMenu = &gormigrate.Migration{
 		return tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Update("value", string(updatedJSON)).Error
 	},
 }
+
+var AddTerminalFontFamily = &gormigrate.Migration{
+	ID: "20260212-add-terminal-font-family",
+	Migrate: func(tx *gorm.DB) error {
+		var addSettingsIfMissing = func(tx *gorm.DB, key, value string) error {
+			var setting model.Setting
+			if err := tx.Where("key = ?", key).First(&setting).Error; err != nil {
+				if errors.Is(err, gorm.ErrRecordNotFound) {
+					return tx.Create(&model.Setting{Key: key, Value: value}).Error
+				}
+				return err
+			}
+			return nil
+		}
+		if err := addSettingsIfMissing(tx, "FontFamily", ""); err != nil {
+			return err
+		}
+		return nil
+	},
+}

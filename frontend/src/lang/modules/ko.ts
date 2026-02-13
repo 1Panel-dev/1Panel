@@ -1310,6 +1310,9 @@ const message = {
         key: '개인 키',
         keyPassword: '개인 키 비밀번호',
         emptyTerminal: '현재 연결된 터미널이 없습니다.',
+        fontFamily: '사용자 정의 글꼴',
+        fontFamilyHelper:
+            '비워두면 기본 글꼴을 사용합니다. 사용자 정의 글꼴 이름을 입력한 후에는 로컬 운영 체제에 해당 글꼴이 설치되어 있는지 확인하세요. 그렇지 않으면 기본 글꼴로 렌더링됩니다',
     },
     toolbox: {
         common: {

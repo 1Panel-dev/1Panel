@@ -1374,6 +1374,9 @@ const message = {
         lineHeight: 'Altura de línea',
         letterSpacing: 'Espaciado de letras',
         fontSize: 'Tamaño de fuente',
+        fontFamily: 'Fuente personalizada',
+        fontFamilyHelper:
+            'Dejar vacío para usar fuentes predeterminadas. Si ingresa un nombre de fuente personalizado, asegúrese de que la fuente esté instalada en su sistema operativo local, de lo contrario se renderizará con la fuente predeterminada',
         cursorBlink: 'Parpadeo del cursor',
         cursorStyle: 'Estilo de cursor',
         cursorUnderline: 'Subrayado',

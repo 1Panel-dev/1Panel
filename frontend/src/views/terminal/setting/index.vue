@@ -38,6 +38,15 @@
                                     @change="changeItem()"
                                 />
                             </el-form-item>
+                            <el-form-item :label="$t('terminal.fontFamily')">
+                                <el-input
+                                    class="formInput"
+                                    v-model="form.fontFamily"
+                                    :placeholder="$t('terminal.fontFamily')"
+                                    @change="changeItem()"
+                                />
+                                <span class="input-help">{{ $t('terminal.fontFamilyHelper') }}</span>
+                            </el-form-item>
 
                             <el-form-item>
                                 <div class="terminal" ref="terminalElement"></div>
@@ -142,6 +151,7 @@ const form = reactive({
     lineHeight: 1.2,
     letterSpacing: 1.2,
     fontSize: 12,
+    fontFamily: '',
     cursorBlink: 'Enable',
     cursorStyle: 'underline',
     scrollback: 1000,
@@ -168,10 +178,14 @@ const search = async (withReset?: boolean) => {
             form.lineHeight = Number(res.data.lineHeight);
             form.letterSpacing = Number(res.data.letterSpacing);
             form.fontSize = Number(res.data.fontSize);
+            form.fontFamily = res.data.fontFamily || '';
             form.cursorBlink = res.data.cursorBlink;
             form.cursorStyle = res.data.cursorStyle;
             form.scrollback = Number(res.data.scrollback);
             form.scrollSensitivity = Number(res.data.scrollSensitivity);
+
+            // 同步到 store，确保已打开的终端也能使用新字体
+            terminalStore.setFontFamily(res.data.fontFamily || '');
 
             if (withReset) {
                 changeItem();
@@ -221,10 +235,13 @@ const submitChangeShow = async () => {
 };
 
 const iniTerm = () => {
+    const defaultFontFamily = "Monaco, Menlo, Consolas, 'Courier New', monospace";
+    const fontFamily = form.fontFamily || defaultFontFamily;
+
     term.value = new Terminal({
         lineHeight: 1.2,
         fontSize: 12,
-        fontFamily: "Monaco, Menlo, Consolas, 'Courier New', monospace",
+        fontFamily: fontFamily,
         theme: {
             background: '#000000',
         },
@@ -240,9 +257,13 @@ const iniTerm = () => {
 };
 
 const changeItem = () => {
+    const defaultFontFamily = "Monaco, Menlo, Consolas, 'Courier New', monospace";
+    const fontFamily = form.fontFamily || defaultFontFamily;
+
     term.value.options.lineHeight = form.lineHeight;
     term.value.options.letterSpacing = form.letterSpacing;
     term.value.options.fontSize = form.fontSize;
+    term.value.options.fontFamily = fontFamily;
     term.value.options.cursorBlink = form.cursorBlink === 'Enable';
     term.value.options.cursorStyle = form.cursorStyle;
     term.value.options.scrollback = form.scrollback;
@@ -255,6 +276,7 @@ const onSetDefault = () => {
     form.lineHeight = 1.2;
     form.letterSpacing = 0;
     form.fontSize = 12;
+    form.fontFamily = '';
     form.cursorBlink = 'Enable';
     form.cursorStyle = 'block';
     form.scrollback = 1000;
@@ -274,6 +296,7 @@ const onSave = () => {
             lineHeight: form.lineHeight + '',
             letterSpacing: form.letterSpacing + '',
             fontSize: form.fontSize + '',
+            fontFamily: form.fontFamily,
             cursorBlink: form.cursorBlink,
             cursorStyle: form.cursorStyle,
             scrollback: form.scrollback + '',
@@ -286,6 +309,7 @@ const onSave = () => {
                 terminalStore.setLineHeight(form.lineHeight);
                 terminalStore.setLetterSpacing(form.letterSpacing);
                 terminalStore.setFontSize(form.fontSize);
+                terminalStore.setFontFamily(form.fontFamily);
                 terminalStore.setCursorBlink(form.cursorBlink);
                 terminalStore.setCursorStyle(form.cursorStyle);
                 terminalStore.setScrollback(form.scrollback);

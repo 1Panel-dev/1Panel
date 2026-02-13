@@ -226,6 +226,7 @@ type TerminalInfo struct {
 	LineHeight        string `json:"lineHeight"`
 	LetterSpacing     string `json:"letterSpacing"`
 	FontSize          string `json:"fontSize"`
+	FontFamily        string `json:"fontFamily"`
 	CursorBlink       string `json:"cursorBlink"`
 	CursorStyle       string `json:"cursorStyle"`
 	Scrollback        string `json:"scrollback"`

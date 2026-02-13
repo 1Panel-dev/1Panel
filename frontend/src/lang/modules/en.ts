@@ -1362,6 +1362,9 @@ const message = {
         lineHeight: 'Line Height',
         letterSpacing: 'Letter Spacing',
         fontSize: 'Font Size',
+        fontFamily: 'Custom Font',
+        fontFamilyHelper:
+            'Leave empty to use default fonts. If you enter a custom font name, ensure the font is installed on your local system, otherwise the default font will be used',
         cursorBlink: 'Cursor Blink',
         cursorStyle: 'Cursor Style',
         cursorUnderline: 'Underline',

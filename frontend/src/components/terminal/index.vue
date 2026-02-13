@@ -41,6 +41,11 @@ watch([lineHeight, fontSize, letterSpacing], ([newLineHeight, newFontSize, newLe
     term.value.options.fontSize = newFontSize;
     changeTerminalSize();
 });
+const fontFamily = computed(() => terminalStore.fontFamily);
+watch(fontFamily, (newFontFamily) => {
+    const defaultFontFamily = "Monaco, Menlo, Consolas, 'Courier New', monospace";
+    term.value.options.fontFamily = newFontFamily || defaultFontFamily;
+});
 const cursorStyle = computed(() => terminalStore.cursorStyle);
 watch(cursorStyle, (newCursorStyle) => {
     term.value.options.cursorStyle = newCursorStyle;
@@ -77,10 +82,14 @@ const acceptParams = (props: WsProps) => {
 
 const newTerm = () => {
     const background = getComputedStyle(document.documentElement).getPropertyValue('--panel-terminal-bg-color').trim();
+    const defaultFontFamily = "Monaco, Menlo, Consolas, 'Courier New', monospace";
+    // fontFamily 从后端获取，如果为空则使用默认值
+    const fontFamily = terminalStore.fontFamily || defaultFontFamily;
+
     term.value = new Terminal({
         lineHeight: terminalStore.lineHeight || 1.2,
         fontSize: terminalStore.fontSize || 12,
-        fontFamily: "Monaco, Menlo, Consolas, 'Courier New', monospace",
+        fontFamily: fontFamily,
         theme: {
             background: background,
         },

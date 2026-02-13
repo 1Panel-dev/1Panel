@@ -1353,6 +1353,9 @@ const message = {
         key: 'Kunci peribadi',
         keyPassword: 'Kata laluan kunci peribadi',
         emptyTerminal: 'Tiada terminal yang sedang disambungkan.',
+        fontFamily: 'Fon tersuai',
+        fontFamilyHelper:
+            'Biarkan kosong untuk menggunakan fon lalai. Jika anda memasukkan nama fon tersuai, pastikan fon tersebut dipasang pada sistem operasi tempatan anda, jika tidak ia akan dipaparkan dengan fon lalai',
     },
     toolbox: {
         common: {
