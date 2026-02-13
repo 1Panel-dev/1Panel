@@ -272,6 +272,10 @@ export const DNSTypes = [
         label: 'DNSPod (' + i18n.global.t('ssl.deprecated') + ')',
         value: 'DnsPod',
     },
+    {
+        label: 'Technitium',
+        value: 'Technitium',
+    },
 ];
 
 export const Fields = [

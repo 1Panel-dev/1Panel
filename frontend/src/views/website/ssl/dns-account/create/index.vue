@@ -183,6 +183,14 @@
                             <el-input v-model.trim="account.authorization['secretKey']"></el-input>
                         </el-form-item>
                     </div>
+                    <div v-if="account.type === 'Technitium'">
+                        <el-form-item label="BASE URL" prop="authorization.baseURL" :rules="[Rules.requiredInput]">
+                            <el-input v-model.trim="account.authorization['baseURL']"></el-input>
+                        </el-form-item>
+                        <el-form-item label="Token" prop="authorization.token">
+                            <el-input v-model.trim="account.authorization['token']"></el-input>
+                        </el-form-item>
+                    </div>
                 </el-form>
             </el-col>
         </el-row>

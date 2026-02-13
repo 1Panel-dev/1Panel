@@ -24,6 +24,7 @@ import (
 	"github.com/go-acme/lego/v4/providers/dns/regru"
 	"github.com/go-acme/lego/v4/providers/dns/route53"
 	"github.com/go-acme/lego/v4/providers/dns/spaceship"
+	"github.com/go-acme/lego/v4/providers/dns/technitium"
 	"github.com/go-acme/lego/v4/providers/dns/tencentcloud"
 	"github.com/go-acme/lego/v4/providers/dns/vercel"
 	"github.com/go-acme/lego/v4/providers/dns/volcengine"
@@ -59,6 +60,7 @@ const (
 	Ovh          DnsType = "Ovh"
 	AcmeDNS      DnsType = "AcmeDNS"
 	PorkBun      DnsType = "PorkBun"
+	Technitium	 DnsType = "Technitium"
 )
 
 type DNSParam struct {
@@ -301,6 +303,14 @@ func getDNSProviderConfig(dnsType DnsType, params string) (challenge.Provider, e
 		config.PollingInterval = pollingInterval
 		config.TTL = ttl
 		p, err = porkbun.NewDNSProviderConfig(config)
+	case Technitium:
+		config := technitium.NewDefaultConfig()
+		config.BaseURL = param.BaseURL
+		config.APIToken = param.Token
+		config.PropagationTimeout = propagationTimeout
+		config.PollingInterval = pollingInterval
+		config.TTL = ttl
+		p, err = technitium.NewDNSProviderConfig(config)
 	}
 
 	if err != nil {
