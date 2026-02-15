@@ -98,9 +98,6 @@
         "@vue-office/docx",
         "@vue-office/excel"
     ],
-    "overrides": {
-        "esbuild": "npm:esbuild-wasm@latest"
-    },
     "config": {
         "commitizen": {
             "path": "node_modules/cz-git"
