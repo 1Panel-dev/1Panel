@@ -712,6 +712,7 @@ const onSubmitEdit = async () => {
                     },
                 ),
                 h('div', { class: 'input-help mt-1' }, i18n.global.t('container.forcePullHelper')),
+                h('div', { class: 'mt-2 leading-6' }, i18n.global.t('container.updateHelper4')),
             ]),
             showCancelButton: true,
             confirmButtonText: i18n.global.t('commons.button.confirm'),
