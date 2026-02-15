@@ -95,6 +95,8 @@
         "vue-tsc": "^0.29.8"
     },
     "trustedDependencies": [
+        "@parcel/watcher",
+        "esbuild",
         "@vue-office/docx",
         "@vue-office/excel"
     ],
