@@ -19,100 +19,206 @@
                 <TableSetting title="container-refresh" @search="refresh()" />
             </template>
             <template #main>
-                <el-row v-if="data.length > 0 || isOnCreate" :gutter="20" class="row-box">
-                    <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="6">
-                        <el-card>
-                            <el-table
-                                :max-height="loadTableHeight()"
-                                :show-header="false"
-                                @row-click="(row, column, event) => loadDetail(row, true)"
-                                :data="data"
-                            >
-                                <el-table-column prop="name">
-                                    <template #default="{ row }">
-                                        <div class="cursor-pointer">
-                                            <div class="font-medium text-base">
-                                                {{ row.name }}
+                <div v-if="data.length > 0 || isOnCreate" class="compose-layout">
+                    <div class="compose-sidebar" :class="{ 'is-collapsed': sidebarCollapsed }">
+                        <el-card class="compose-list-card" :body-style="{ padding: 0 }">
+                            <div class="sidebar-toggle" @click="sidebarCollapsed = !sidebarCollapsed">
+                                <el-icon :size="14">
+                                    <Fold v-if="!sidebarCollapsed" />
+                                    <Expand v-else />
+                                </el-icon>
+                                <span v-if="!sidebarCollapsed" class="text-xs text-gray-400 ml-1">
+                                    {{ $t('commons.button.collapse') }}
+                                </span>
+                            </div>
+
+                            <el-scrollbar :max-height="loadTableHeight()">
+                                <template v-if="!sidebarCollapsed">
+                                    <div
+                                        v-for="row in data"
+                                        :key="row.name"
+                                        class="compose-item"
+                                        :class="{ 'is-active': currentCompose?.name === row.name && !isOnCreate }"
+                                        @click="loadDetail(row, true)"
+                                    >
+                                        <div class="flex items-center justify-between mb-1">
+                                            <div class="flex items-center gap-2 min-w-0">
+                                                <el-icon class="compose-icon" :class="statusClass(row)">
+                                                    <Files />
+                                                </el-icon>
+                                                <span class="font-medium text-sm truncate">{{ row.name }}</span>
                                             </div>
-                                            <div class="mb-1">
-                                                <el-text class="w-12" link size="small" type="info">
-                                                    {{ loadFrom(row) }}
-                                                </el-text>
-                                                <el-divider direction="vertical" />
-                                                <el-text link size="small" type="info" class="ml-2">
-                                                    {{ row.createdAt }}
-                                                </el-text>
-                                                <el-divider direction="vertical" />
-                                                <el-text
-                                                    link
-                                                    v-if="row.containerCount === 0"
-                                                    type="danger"
-                                                    size="small"
-                                                >
-                                                    {{ $t('container.exited') }}
-                                                </el-text>
-                                                <el-text
-                                                    link
-                                                    v-else
-                                                    :type="
-                                                        row.containerCount === row.runningCount ? 'success' : 'warning'
-                                                    "
-                                                    size="small"
-                                                >
-                                                    {{
-                                                        $t('container.running', [row.runningCount, row.containerCount])
-                                                    }}
-                                                </el-text>
-                                            </div>
-                                            <el-button
-                                                plain
-                                                round
+                                            <el-tag
+                                                v-if="row.containerCount === 0"
+                                                type="danger"
                                                 size="small"
-                                                :disabled="!row?.workdir"
-                                                @click="openComposeFolder(row)"
-                                            >
-                                                {{ $t('home.dir') }}
-                                            </el-button>
-                                            <el-button
-                                                plain
                                                 round
-                                                size="small"
-                                                @click="handleComposeOperate('up', row)"
+                                                effect="light"
                                             >
-                                                {{ $t('commons.operate.start') }}
-                                            </el-button>
-                                            <el-button
-                                                plain
+                                                {{ $t('container.exited') }}
+                                            </el-tag>
+                                            <el-tag
+                                                v-else
+                                                :type="row.containerCount === row.runningCount ? 'success' : 'warning'"
+                                                size="small"
                                                 round
-                                                size="small"
-                                                @click="handleComposeOperate('stop', row)"
+                                                effect="light"
                                             >
-                                                {{ $t('commons.operate.stop') }}
-                                            </el-button>
-                                            <el-button
-                                                plain
-                                                round
-                                                size="small"
-                                                @click="handleComposeOperate('restart', row)"
-                                            >
-                                                {{ $t('commons.operate.restart') }}
-                                            </el-button>
-                                            <el-button plain round size="small" @click="onDelete(row)">
-                                                {{ $t('commons.operate.delete') }}
-                                            </el-button>
+                                                {{ $t('container.running', [row.runningCount, row.containerCount]) }}
+                                            </el-tag>
                                         </div>
-                                    </template>
-                                </el-table-column>
-                            </el-table>
+
+                                        <div class="flex items-center gap-1.5 ml-6">
+                                            <el-tag size="small" effect="plain" round>{{ loadFrom(row) }}</el-tag>
+                                            <el-text size="small" type="info" class="text-xs">
+                                                {{ row.createdAt }}
+                                            </el-text>
+                                        </div>
+
+                                        <div class="compose-actions">
+                                            <el-tooltip :content="$t('home.dir')" placement="top" :show-after="400">
+                                                <el-button
+                                                    size="small"
+                                                    :icon="FolderOpened"
+                                                    :disabled="!row?.workdir"
+                                                    circle
+                                                    plain
+                                                    @click.stop="openComposeFolder(row)"
+                                                />
+                                            </el-tooltip>
+                                            <el-tooltip
+                                                :content="$t('commons.operate.start')"
+                                                placement="top"
+                                                :show-after="400"
+                                            >
+                                                <el-button
+                                                    size="small"
+                                                    :icon="VideoPlay"
+                                                    circle
+                                                    plain
+                                                    type="success"
+                                                    @click.stop="handleComposeOperate('up', row)"
+                                                />
+                                            </el-tooltip>
+                                            <el-tooltip
+                                                :content="$t('commons.operate.stop')"
+                                                placement="top"
+                                                :show-after="400"
+                                            >
+                                                <el-button
+                                                    size="small"
+                                                    :icon="VideoPause"
+                                                    circle
+                                                    plain
+                                                    type="warning"
+                                                    @click.stop="handleComposeOperate('stop', row)"
+                                                />
+                                            </el-tooltip>
+                                            <el-tooltip
+                                                :content="$t('commons.operate.restart')"
+                                                placement="top"
+                                                :show-after="400"
+                                            >
+                                                <el-button
+                                                    size="small"
+                                                    :icon="RefreshRight"
+                                                    circle
+                                                    plain
+                                                    type="primary"
+                                                    @click.stop="handleComposeOperate('restart', row)"
+                                                />
+                                            </el-tooltip>
+                                            <el-tooltip
+                                                :content="$t('commons.operate.delete')"
+                                                placement="top"
+                                                :show-after="400"
+                                            >
+                                                <el-button
+                                                    size="small"
+                                                    :icon="Delete"
+                                                    circle
+                                                    plain
+                                                    type="danger"
+                                                    @click.stop="onDelete(row)"
+                                                />
+                                            </el-tooltip>
+                                        </div>
+                                    </div>
+                                </template>
+
+                                <template v-else>
+                                    <el-tooltip
+                                        v-for="row in data"
+                                        :key="row.name"
+                                        :content="row.name"
+                                        placement="right"
+                                        :show-after="200"
+                                    >
+                                        <div
+                                            class="compose-item-mini"
+                                            :class="{
+                                                'is-active': currentCompose?.name === row.name && !isOnCreate,
+                                            }"
+                                            @click="loadDetail(row, true)"
+                                        >
+                                            <el-icon class="compose-icon" :class="statusClass(row)">
+                                                <Files />
+                                            </el-icon>
+                                        </div>
+                                    </el-tooltip>
+                                </template>
+
+                                <el-empty
+                                    v-if="data.length === 0"
+                                    :description="$t('commons.msg.noneData')"
+                                    :image-size="80"
+                                />
+                            </el-scrollbar>
                         </el-card>
-                    </el-col>
-                    <el-col :xs="24" :sm="24" :md="16" :lg="16" :xl="18">
+                    </div>
+
+                    <div class="compose-content">
                         <el-card v-if="currentCompose && !isOnCreate" v-loading="detailLoading">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2.5">
+                                    <span class="text-base font-medium">{{ currentCompose.name }}</span>
+                                    <el-tag size="small" effect="plain" round>
+                                        {{ loadFrom(currentCompose) }}
+                                    </el-tag>
+                                    <el-divider direction="vertical" />
+                                    <el-text size="small" type="info">{{ currentCompose.createdAt }}</el-text>
+                                </div>
+                                <el-tag v-if="currentCompose.containerCount === 0" type="danger" effect="light" round>
+                                    {{ $t('container.exited') }}
+                                </el-tag>
+                                <el-tag
+                                    v-else
+                                    :type="
+                                        currentCompose.containerCount === currentCompose.runningCount
+                                            ? 'success'
+                                            : 'warning'
+                                    "
+                                    effect="light"
+                                    round
+                                >
+                                    {{
+                                        $t('container.running', [
+                                            currentCompose.runningCount,
+                                            currentCompose.containerCount,
+                                        ])
+                                    }}
+                                </el-tag>
+                            </div>
+
+                            <el-divider class="!my-3" />
+
                             <el-table
                                 v-if="composeContainers.length > 0"
                                 :data="tableData"
                                 size="small"
-                                max-height="250"
+                                max-height="230"
+                                stripe
+                                class="compose-container-table"
                             >
                                 <el-table-column
                                     :label="$t('commons.table.name')"
@@ -126,7 +232,7 @@
                                         </el-text>
                                     </template>
                                 </el-table-column>
-                                <el-table-column :label="$t('commons.table.status')" prop="state">
+                                <el-table-column :label="$t('commons.table.status')" prop="state" width="120">
                                     <template #default="{ row }">
                                         <Status :key="row.state" :status="row.state"></Status>
                                     </template>
@@ -209,7 +315,7 @@
                                         </div>
                                     </template>
                                 </el-table-column>
-                                <el-table-column :label="$t('commons.table.operate')">
+                                <el-table-column :label="$t('commons.table.operate')" width="160">
                                     <template #default="{ row }">
                                         <el-button type="primary" link @click="onOpenTerminal(row)">
                                             {{ $t('menu.terminal') }}
@@ -221,12 +327,27 @@
                                 </el-table-column>
                             </el-table>
 
-                            <el-radio-group class="mt-1 mb-1" v-model="showType">
-                                <el-radio-button value="compose">{{ $t('container.compose') }}</el-radio-button>
-                                <el-radio-button value="log">{{ $t('commons.button.log') }}</el-radio-button>
-                            </el-radio-group>
+                            <el-divider v-if="composeContainers.length > 0" class="!my-2" />
+
+                            <div class="flex items-center justify-between mb-2">
+                                <el-radio-group v-model="showType">
+                                    <el-radio-button value="compose">
+                                        {{ $t('container.compose') }}
+                                    </el-radio-button>
+                                    <el-radio-button value="log">
+                                        {{ $t('commons.button.log') }}
+                                    </el-radio-button>
+                                    <el-radio-button v-if="canEditComposeEnv" value="env">
+                                        {{ $t('container.env') }}
+                                    </el-radio-button>
+                                </el-radio-group>
+                                <el-button v-if="showType !== 'log'" type="primary" @click="onSubmitEdit">
+                                    {{ $t('commons.button.save') }}
+                                </el-button>
+                            </div>
+
                             <el-select
-                                class="p-w-300 mt-2 ml-2"
+                                class="p-w-300 mb-2"
                                 v-model="currentYamlPath"
                                 @change="inspectCompose(currentCompose.name, currentYamlPath)"
                                 v-if="currentCompose.path.indexOf(',') !== -1"
@@ -239,6 +360,7 @@
                                     :label="item.split('/').pop()"
                                 />
                             </el-select>
+
                             <div v-show="showType === 'compose'">
                                 <CodemirrorPro
                                     v-model="composeContent"
@@ -246,25 +368,6 @@
                                     :heightDiff="475"
                                     placeholder="#Define or paste the content of your docker-compose file here"
                                 />
-                                <span class="envTitle">{{ $t('container.env') }}</span>
-                                <el-input
-                                    placeholder="key=value"
-                                    type="textarea"
-                                    :rows="3"
-                                    :disabled="currentCompose.createdBy === 'Apps'"
-                                    v-model="env"
-                                />
-                                <span v-if="currentCompose.createdBy === 'Apps'" class="input-help">
-                                    {{ $t('container.composeEnvHelper2') }}
-                                </span>
-                                <div class="mt-2">
-                                    <el-checkbox v-model="form.forcePull" :label="$t('container.forcePull')" />
-                                    <span class="input-help">{{ $t('container.forcePullHelper') }}</span>
-                                </div>
-
-                                <el-button type="primary" class="mt-2" @click="onSubmitEdit">
-                                    {{ $t('commons.button.save') }}
-                                </el-button>
                             </div>
 
                             <div v-show="showType === 'log'">
@@ -277,7 +380,21 @@
                                     :defaultFollow="true"
                                 />
                             </div>
+
+                            <div v-show="showType === 'env'">
+                                <el-input
+                                    placeholder="key=value"
+                                    type="textarea"
+                                    :rows="10"
+                                    :disabled="currentCompose.createdBy === 'Apps'"
+                                    v-model="env"
+                                />
+                                <span v-if="currentCompose.createdBy === 'Apps'" class="input-help">
+                                    {{ $t('container.composeEnvHelper2') }}
+                                </span>
+                            </div>
                         </el-card>
+
                         <el-card v-else>
                             <el-form
                                 ref="formRef"
@@ -289,9 +406,15 @@
                             >
                                 <el-form-item :label="$t('app.source')">
                                     <el-radio-group v-model="form.from" @change="onEdit('form')">
-                                        <el-radio value="edit">{{ $t('commons.button.edit') }}</el-radio>
-                                        <el-radio value="path">{{ $t('container.pathSelect') }}</el-radio>
-                                        <el-radio value="template">{{ $t('container.composeTemplate') }}</el-radio>
+                                        <el-radio-button value="edit">
+                                            {{ $t('commons.button.edit') }}
+                                        </el-radio-button>
+                                        <el-radio-button value="path">
+                                            {{ $t('container.pathSelect') }}
+                                        </el-radio-button>
+                                        <el-radio-button value="template">
+                                            {{ $t('container.composeTemplate') }}
+                                        </el-radio-button>
                                     </el-radio-group>
                                 </el-form-item>
                                 <el-form-item v-if="form.from === 'path'" prop="path">
@@ -319,7 +442,7 @@
                                 <el-form-item v-if="form.from === 'edit' || form.from === 'template'" prop="name">
                                     <el-input @input="changePath" @change="onEdit('')" v-model.trim="form.name">
                                         <template #prefix>
-                                            <span style="margin-right: 8px">{{ $t('file.dir') }}</span>
+                                            <span class="mr-2">{{ $t('file.dir') }}</span>
                                         </template>
                                     </el-input>
                                     <span class="input-help">
@@ -336,10 +459,11 @@
                                         ></CodemirrorPro>
                                     </div>
                                 </el-form-item>
-                                <span class="envTitle">{{ $t('container.env') }}</span>
-                                <el-input placeholder="key=value" type="textarea" :rows="3" v-model="form.env" />
-                                <span class="envTitle">{{ $t('commons.button.set') }}</span>
-                                <el-form-item>
+
+                                <el-form-item :label="$t('container.env')" class="mt-4">
+                                    <el-input placeholder="key=value" type="textarea" :rows="3" v-model="form.env" />
+                                </el-form-item>
+                                <el-form-item :label="$t('commons.button.set')">
                                     <el-checkbox v-model="form.forcePull" :label="$t('container.forcePull')" />
                                     <span class="input-help">{{ $t('container.forcePullHelper') }}</span>
                                 </el-form-item>
@@ -349,8 +473,8 @@
                                 {{ $t('commons.button.save') }}
                             </el-button>
                         </el-card>
-                    </el-col>
-                </el-row>
+                    </div>
+                </div>
                 <el-empty v-else :description="$t('commons.msg.noneData')" />
             </template>
         </LayoutContent>
@@ -370,7 +494,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
+import { computed, h, ref } from 'vue';
 import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 import ContainerLog from '@/components/log/container/index.vue';
 import TaskLog from '@/components/log/task/index.vue';
@@ -399,7 +523,8 @@ import { MsgError, MsgSuccess } from '@/utils/message';
 import { computeCPU, computeSize2, computeSizeForDocker, newUUID } from '@/utils/util';
 import { Rules } from '@/global/form-rules';
 import { loadBaseDir } from '@/api/modules/setting';
-import { ElForm } from 'element-plus';
+import { ElCheckbox, ElForm } from 'element-plus';
+import { Delete, Expand, Fold, FolderOpened, RefreshRight, VideoPause, VideoPlay } from '@element-plus/icons-vue';
 
 const data = ref<any[]>([]);
 const loading = ref(false);
@@ -446,6 +571,14 @@ const rules = reactive({
 
 const isActive = ref(false);
 const isExist = ref(false);
+const sidebarCollapsed = ref(false);
+const canEditComposeEnv = computed(() => currentCompose.value?.createdBy !== 'Apps');
+
+const statusClass = (row: any) => {
+    if (!row) return '';
+    if (row.containerCount === 0) return 'is-danger';
+    return row.containerCount === row.runningCount ? 'is-success' : 'is-warning';
+};
 
 const tableData = computed(() => {
     return composeContainers.value.map((container) => {
@@ -531,6 +664,9 @@ const loadDetail = async (row: Container.ComposeInfo, withRefresh: boolean) => {
     isOnCreate.value = false;
     detailLoading.value = true;
     currentCompose.value = row;
+    if (!canEditComposeEnv.value && showType.value === 'env') {
+        showType.value = 'compose';
+    }
     currentYamlPath.value = row.path.indexOf(',') !== -1 ? row.path.split(',')[0] : row.path;
     env.value = row.env || '';
     composeContainers.value = row.containers || [];
@@ -688,6 +824,34 @@ const loadSize = async (row: any) => {
 };
 
 const onSubmitEdit = async () => {
+    const forcePull = ref(false);
+    try {
+        await ElMessageBox({
+            title: i18n.global.t('commons.button.save'),
+            message: h('div', { class: 'w-full' }, [
+                h(
+                    ElCheckbox,
+                    {
+                        onChange: (value: string | number | boolean) => {
+                            forcePull.value = Boolean(value);
+                        },
+                    },
+                    {
+                        default: () => i18n.global.t('container.forcePull'),
+                    },
+                ),
+                h('div', { class: 'input-help mt-1' }, i18n.global.t('container.forcePullHelper')),
+                h('div', { class: 'mt-2 leading-6' }, i18n.global.t('container.updateHelper4')),
+            ]),
+            showCancelButton: true,
+            confirmButtonText: i18n.global.t('commons.button.confirm'),
+            cancelButtonText: i18n.global.t('commons.button.cancel'),
+            closeOnClickModal: false,
+        });
+    } catch {
+        return;
+    }
+
     const taskID = newUUID();
     const param = {
         taskID: taskID,
@@ -697,7 +861,7 @@ const onSubmitEdit = async () => {
         content: composeContent.value,
         createdBy: currentCompose.value.createdBy,
         env: env.value || '',
-        forcePull: form.forcePull,
+        forcePull: forcePull.value,
     };
     loading.value = true;
     await composeUpdate(param)
@@ -770,17 +934,121 @@ const onOpenLog = (row: any) => {
 </script>
 
 <style scoped lang="scss">
+.compose-layout {
+    display: flex;
+    gap: 16px;
+}
+
+.compose-sidebar {
+    width: 320px;
+    min-width: 320px;
+    transition: width 0.25s ease, min-width 0.25s ease;
+
+    &.is-collapsed {
+        width: 52px;
+        min-width: 52px;
+    }
+}
+
+.compose-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.sidebar-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 0;
+    cursor: pointer;
+    border-bottom: 1px solid var(--el-border-color-lighter);
+    transition: background-color 0.15s;
+
+    &:hover {
+        background-color: var(--el-fill-color-light);
+    }
+}
+
+.compose-item {
+    padding: 10px 14px;
+    cursor: pointer;
+    border-left: 2px solid transparent;
+    transition: background-color 0.15s, border-color 0.15s;
+
+    &:not(:last-child) {
+        border-bottom: 1px solid var(--el-border-color-lighter);
+    }
+
+    &:hover {
+        background-color: var(--el-fill-color-light);
+    }
+
+    &.is-active {
+        background-color: var(--el-color-primary-light-9);
+        border-left-color: var(--el-color-primary);
+    }
+}
+
+.compose-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: 24px;
+    margin-top: 6px;
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: opacity 0.2s, max-height 0.2s;
+}
+
+.compose-item:hover .compose-actions,
+.compose-item.is-active .compose-actions {
+    opacity: 1;
+    max-height: 40px;
+}
+
+.compose-item-mini {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 0;
+    cursor: pointer;
+    border-left: 2px solid transparent;
+    transition: background-color 0.15s, border-color 0.15s;
+
+    &:not(:last-child) {
+        border-bottom: 1px solid var(--el-border-color-lighter);
+    }
+
+    &:hover {
+        background-color: var(--el-fill-color-light);
+    }
+
+    &.is-active {
+        background-color: var(--el-color-primary-light-9);
+        border-left-color: var(--el-color-primary);
+    }
+}
+
+.compose-icon {
+    font-size: 16px;
+    color: var(--el-text-color-secondary);
+    flex-shrink: 0;
+
+    &.is-success {
+        color: var(--el-color-success);
+    }
+    &.is-warning {
+        color: var(--el-color-warning);
+    }
+    &.is-danger {
+        color: var(--el-color-danger);
+    }
+}
+
 .svg-icon {
     margin-top: -3px;
     font-size: 6px;
     cursor: pointer;
-}
-.envTitle {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--el-text-color-primary);
-    margin-top: 12px;
-    margin-bottom: 4px;
-    display: block;
 }
 </style>

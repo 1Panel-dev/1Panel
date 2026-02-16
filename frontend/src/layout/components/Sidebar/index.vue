@@ -16,7 +16,6 @@
                 :router="true"
                 :collapse="isCollapse"
                 :collapse-transition="false"
-                :unique-opened="true"
                 @select="handleMenuClick"
                 class="custom-menu"
             >

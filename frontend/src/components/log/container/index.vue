@@ -1,44 +1,63 @@
 <template>
-    <div v-if="showControl">
-        <el-select @change="searchLogs" class="fetchClass" v-model="logSearch.mode">
-            <template #prefix>{{ $t('container.fetch') }}</template>
-            <el-option v-for="item in timeOptions" :key="item.label" :value="item.value" :label="item.label" />
-        </el-select>
-        <el-select @change="searchLogs" class="tailClass" v-model.number="logSearch.tail">
-            <template #prefix>{{ $t('container.lines') }}</template>
-            <el-option :value="0" :label="$t('commons.table.all')" />
-            <el-option :value="100" :label="100" />
-            <el-option :value="200" :label="200" />
-            <el-option :value="500" :label="500" />
-            <el-option :value="1000" :label="1000" />
-        </el-select>
-        <div class="margin-button float-left">
-            <el-checkbox border @change="searchLogs" v-model="logSearch.isWatch">
-                {{ $t('commons.button.watch') }}
-            </el-checkbox>
+    <div v-if="showControl" class="toolbar-container">
+        <div class="filter-row">
+            <div class="select-group">
+                <el-select @change="searchLogs" class="fetchClass" v-model="logSearch.mode" :disabled="isCopyMode">
+                    <template #prefix>{{ $t('container.fetch') }}</template>
+                    <el-option v-for="item in timeOptions" :key="item.label" :value="item.value" :label="item.label" />
+                </el-select>
+                <el-select
+                    @change="searchLogs"
+                    class="tailClass"
+                    v-model.number="logSearch.tail"
+                    :disabled="isCopyMode"
+                >
+                    <template #prefix>{{ $t('container.lines') }}</template>
+                    <el-option :value="0" :label="$t('commons.table.all')" />
+                    <el-option :value="100" :label="100" />
+                    <el-option :value="200" :label="200" />
+                    <el-option :value="500" :label="500" />
+                    <el-option :value="1000" :label="1000" />
+                </el-select>
+            </div>
+            <div class="checkbox-group">
+                <el-checkbox border @change="searchLogs" v-model="logSearch.isWatch" :disabled="isCopyMode">
+                    {{ $t('commons.button.watch') }}
+                </el-checkbox>
+                <el-checkbox border @change="searchLogs" v-model="logSearch.isShowTimestamp" :disabled="isCopyMode">
+                    {{ $t('commons.table.date') }}
+                </el-checkbox>
+            </div>
         </div>
-        <div class="margin-button float-left">
-            <el-checkbox border @change="searchLogs" v-model="logSearch.isShowTimestamp">
-                {{ $t('commons.table.date') }}
-            </el-checkbox>
+        <div class="button-row">
+            <el-button @click="toggleCopyMode" :type="isCopyMode ? 'primary' : 'default'">
+                {{ isCopyMode ? $t('commons.button.close') : $t('commons.button.copy') }}
+            </el-button>
+            <el-button @click="onDownload" icon="Download" :disabled="isCopyMode">
+                {{ $t('commons.button.download') }}
+            </el-button>
+            <el-button @click="onClean" icon="Delete" :disabled="isCopyMode">
+                {{ $t('commons.button.clean') }}
+            </el-button>
         </div>
-        <el-button class="margin-button" @click="onDownload" icon="Download">
-            {{ $t('commons.button.download') }}
-        </el-button>
-        <el-button class="margin-button" @click="onClean" icon="Delete">
-            {{ $t('commons.button.clean') }}
-        </el-button>
     </div>
     <div class="log-container" :style="styleVars" ref="logContainer">
-        <div class="log-spacer" :style="{ height: `${totalHeight}px` }"></div>
-        <div
-            v-for="(log, index) in visibleLogs"
-            :key="startIndex + index"
-            class="log-item"
-            :style="{ top: `${(startIndex + index) * logHeight}px` }"
-        >
-            <hightlight :log="log" type="container" :container="container"></hightlight>
-        </div>
+        <template v-if="isCopyMode">
+            <div v-for="(log, index) in logs" :key="`copy-${index}`" class="log-copy-item">
+                <span class="whitespace-pre">{{ log }}</span>
+            </div>
+        </template>
+        <template v-else>
+            <div class="log-spacer" :style="{ height: `${totalHeight}px` }"></div>
+            <div
+                v-for="(log, index) in visibleLogs"
+                :key="startIndex + index"
+                class="log-item"
+                :style="{ top: `${(startIndex + index) * logHeight}px` }"
+            >
+                <hightlight :log="log" type="container" :container="container"></hightlight>
+            </div>
+        </template>
     </div>
 </template>
 
@@ -97,6 +116,8 @@ const styleVars = computed(() => ({
 const logVisible = ref(false);
 const logContainer = ref<HTMLElement | null>(null);
 const logs = ref<string[]>([]);
+const isCopyMode = ref(false);
+const copyPendingLogs = ref<string[]>([]);
 let eventSource: EventSource | null = null;
 const logSearch = reactive({
     isWatch: props.defaultFollow ? true : true,
@@ -148,7 +169,31 @@ const stopListening = () => {
 
 const handleClose = async () => {
     stopListening();
+    isCopyMode.value = false;
+    copyPendingLogs.value = [];
     logVisible.value = false;
+};
+
+const flushCopyPendingLogs = () => {
+    if (copyPendingLogs.value.length === 0) {
+        return;
+    }
+    logs.value.push(...copyPendingLogs.value);
+    copyPendingLogs.value = [];
+};
+
+const toggleCopyMode = () => {
+    if (isCopyMode.value) {
+        isCopyMode.value = false;
+        flushCopyPendingLogs();
+        nextTick(() => {
+            if (logContainer.value) {
+                logContainer.value.scrollTop = logContainer.value.scrollHeight;
+            }
+        });
+        return;
+    }
+    isCopyMode.value = true;
 };
 
 const searchLogs = async () => {
@@ -157,7 +202,9 @@ const searchLogs = async () => {
         return;
     }
     stopListening();
+    isCopyMode.value = false;
     logs.value = [];
+    copyPendingLogs.value = [];
     let currentNode = globalStore.currentNode;
     if (props.node && props.node !== '') {
         currentNode = props.node;
@@ -169,6 +216,10 @@ const searchLogs = async () => {
     eventSource = new EventSource(url);
     eventSource.onmessage = (event: MessageEvent) => {
         const data = event.data;
+        if (isCopyMode.value) {
+            copyPendingLogs.value.push(data);
+            return;
+        }
         logs.value.push(data);
         nextTick(() => {
             if (logContainer.value) {
@@ -290,20 +341,50 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
-.margin-button {
-    margin-left: 20px;
+.toolbar-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
-.fullScreen {
-    border: none;
+
+.filter-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px 12px;
 }
-.tailClass {
-    width: 20%;
-    float: left;
-    margin-left: 20px;
+
+.button-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
 }
+
+.select-group {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-left: auto;
+}
+
 .fetchClass {
-    width: 30%;
-    float: left;
+    width: 320px;
+    max-width: 100%;
+}
+
+.tailClass {
+    width: 220px;
+    max-width: 100%;
 }
 
 .log-container {
@@ -317,6 +398,14 @@ onMounted(() => {
 
 .log-item {
     position: absolute;
+    width: 100%;
+    padding: 2px;
+    color: #f5f5f5;
+    box-sizing: border-box;
+    white-space: nowrap;
+}
+
+.log-copy-item {
     width: 100%;
     padding: 2px;
     color: #f5f5f5;
