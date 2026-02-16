@@ -30,7 +30,11 @@
             </div>
         </div>
         <div class="button-row">
-            <el-button @click="toggleCopyMode" :type="isCopyMode ? 'primary' : 'default'">
+            <el-button
+                @click="toggleCopyMode"
+                :type="isCopyMode ? 'primary' : 'default'"
+                :icon="isCopyMode ? 'Close' : 'CopyDocument'"
+            >
                 {{ isCopyMode ? $t('commons.button.close') : $t('commons.button.copy') }}
             </el-button>
             <el-button @click="onDownload" icon="Download" :disabled="isCopyMode">

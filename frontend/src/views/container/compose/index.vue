@@ -385,7 +385,7 @@
                                 <el-input
                                     placeholder="key=value"
                                     type="textarea"
-                                    :rows="10"
+                                    :rows="18"
                                     :disabled="currentCompose.createdBy === 'Apps'"
                                     v-model="env"
                                 />
@@ -461,7 +461,7 @@
                                 </el-form-item>
 
                                 <el-form-item :label="$t('container.env')" class="mt-4">
-                                    <el-input placeholder="key=value" type="textarea" :rows="3" v-model="form.env" />
+                                    <el-input placeholder="key=value" type="textarea" :rows="20" v-model="form.env" />
                                 </el-form-item>
                                 <el-form-item :label="$t('commons.button.set')">
                                     <el-checkbox v-model="form.forcePull" :label="$t('container.forcePull')" />
