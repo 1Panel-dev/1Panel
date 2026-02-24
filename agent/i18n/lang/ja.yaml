@@ -185,7 +185,7 @@ dnsAccount: 'DNS 自動'
 dnsManual: 'DNS マニュアル'
 http: "HTTP"
 ApplySSLFailed: '[{{ .domain }}] 証明書の申請に失敗しました、{{ .detail }}'
-ApplySSLSuccess: '[{{ .domain }}] 証明書の申請に成功しました! '
+ApplySSLSuccess: '[{{ .domain }}] 証明書の申請に成功しました。'
 DNSAccountName: 'DNS アカウント [{{ .name }}] ベンダー [{{ .type }}]'
 PushDirLog: '証明書がディレクトリ [{{ .path }}] {{ .status }} にプッシュされました'
 ErrDeleteCAWithSSL: '現在の組織には発行済みの証明書があり、削除できません。'

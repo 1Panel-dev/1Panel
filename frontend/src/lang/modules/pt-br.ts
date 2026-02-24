@@ -1607,8 +1607,8 @@ const message = {
             'O usuário padrão do ambiente PHP: o grupo de usuários é 1000:1000, é normal que os usuários dentro e fora do container mostrem inconsistências',
         searchHelper: 'Suporte a curingas como *',
         uploadFailed: '[{0}] Falha no upload do arquivo',
-        fileUploadStart: 'Carregando [{0}]....',
-        currentSelect: 'Selecionado atualmente: ',
+        fileUploadStart: 'Carregando [{0}]...',
+        currentSelect: 'Seleção atual: ',
         unsupportedType: 'Tipo de arquivo não suportado',
         deleteHelper:
             'Tem certeza de que deseja excluir os seguintes arquivos? Por padrão, eles irão para a lixeira após a exclusão',

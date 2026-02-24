@@ -165,7 +165,7 @@ const message = {
             createSuccess: 'Başarıyla oluşturuldu',
             updateSuccess: 'Başarıyla güncellendi',
             uploadSuccess: 'Başarıyla yüklendi',
-            operateConfirm: 'İşlemden eminseniz, lütfen manuel olarak girin : ',
+            operateConfirm: 'İşlemden eminseniz, lütfen manuel olarak girin: ',
             inputOrSelect: 'Lütfen seçin veya girin',
             copyFailed: 'Kopyalama başarısız',
             operatorHelper:

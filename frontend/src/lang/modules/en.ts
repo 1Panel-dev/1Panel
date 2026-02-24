@@ -165,7 +165,7 @@ const message = {
             createSuccess: 'Created successfully',
             updateSuccess: 'Updated successfully',
             uploadSuccess: 'Uploaded successfully',
-            operateConfirm: 'If you are sure about the operation, please input it manually : ',
+            operateConfirm: 'If you are sure about the operation, please input it manually: ',
             inputOrSelect: 'Please select or enter',
             copyFailed: 'Failed to copy',
             operatorHelper: `The operation "{1}" will be performed on "{0}" and can't be undone. Do you want to continue?`,
@@ -1626,9 +1626,9 @@ const message = {
         ownerHelper:
             'The default user of the PHP operating environment: the user group is 1000:1000, it is normal that the users inside and outside the container show inconsistencies',
         searchHelper: 'Support wildcards such as *',
-        uploadFailed: '[{0}] File upload file',
-        fileUploadStart: 'Uploading [{0}]....',
-        currentSelect: 'Current select: ',
+        uploadFailed: '[{0}] File upload failed',
+        fileUploadStart: 'Uploading [{0}]...',
+        currentSelect: 'Current selection: ',
         unsupportedType: 'Unsupported file type',
         deleteHelper:
             'Are you sure you want to delete the following files? By default, it will enter the recycle bin after deletion',

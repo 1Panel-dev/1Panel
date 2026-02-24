@@ -1578,8 +1578,8 @@ const message = {
         ownerHelper:
             'PHP運用環境のデフォルトユーザー:ユーザーグループは1000:1000です。コンテナの内側と外側のユーザーが矛盾を示すのは普通です',
         searchHelper: '*などのワイルドカードをサポート',
-        uploadFailed: '[{0}]ファイルアップロードファイル',
-        fileUploadStart: 'アップロード[{0}] ....',
+        uploadFailed: '[{0}] ファイルのアップロードに失敗しました',
+        fileUploadStart: 'アップロード[{0}]...',
         currentSelect: '現在の選択:',
         unsupportedType: 'サポートされていないファイルタイプ',
         deleteHelper: '次のファイルを削除したいですか？デフォルトでは、削除後にリサイクルビンに入ります',
@@ -2470,7 +2470,7 @@ const message = {
         deleteDatabaseHelper: 'ウェブサイトに関連付けられたデータベースも削除します',
         deleteConfirmHelper:
             '削除操作を元に戻すことはできません。<span style = "color:red"> "{0}" </span>を入力して、削除を確認します。',
-        staticPath: '対応するメインディレクトリはです',
+        staticPath: '対応するメインディレクトリは ',
         limit: 'スキーム',
         blog: 'フォーラム/ブログ',
         imageSite: '写真サイト',

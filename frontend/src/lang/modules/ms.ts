@@ -1616,10 +1616,10 @@ const message = {
         changeOwner: 'Ubah suai pengguna dan kumpulan pengguna',
         containSub: 'Guna perubahan kebenaran secara rekursif',
         ownerHelper:
-            'Pengguna lalai persekitaran operasi PHP: kumpulan pengguna adalah 1000:1000, adalah normal jika pengguna di dalam dan di luar kontena menunjukkan ketidakkonsistenan',
+            'Pengguna lalai persekitaran operasi PHP: kumpulan pengguna adalah 1000:1000, dan adalah normal jika pengguna di dalam dan di luar kontena menunjukkan ketidakkonsistenan',
         searchHelper: 'Sokong wildcard seperti *',
         uploadFailed: '[{0}] Gagal memuat naik fail',
-        fileUploadStart: 'Memuat naik [{0}]....',
+        fileUploadStart: 'Memuat naik [{0}]...',
         currentSelect: 'Pilihan semasa: ',
         unsupportedType: 'Jenis fail tidak disokong',
         deleteHelper:

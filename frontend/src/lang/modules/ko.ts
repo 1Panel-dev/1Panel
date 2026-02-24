@@ -1559,7 +1559,7 @@ const message = {
             'PHP 운영 환경의 기본 사용자: 사용자 그룹은 1000:1000 입니다. 컨테이너 내부 및 외부에서 표시되는 불일치는 정상입니다.',
         searchHelper: '* 등의 와일드카드를 지원합니다',
         uploadFailed: '[{0}] 파일 업로드 실패',
-        fileUploadStart: '[{0}] 업로드 중....',
+        fileUploadStart: '[{0}] 업로드 중...',
         currentSelect: '현재 선택: ',
         unsupportedType: '지원되지 않는 파일 유형',
         deleteHelper: '다음 파일을 삭제하시겠습니까? 기본적으로 삭제 후 휴지통으로 이동합니다.',
@@ -2429,7 +2429,7 @@ const message = {
         deleteDatabaseHelper: '웹사이트와 연결된 데이터베이스도 삭제합니다',
         deleteConfirmHelper:
             '삭제 작업은 되돌릴 수 없습니다. 확인하려면 <span style=\'color:red\'>"{0}"</span>을(를) 입력하세요.',
-        staticPath: '해당 주요 디렉터리는',
+        staticPath: '해당 주요 디렉터리는 ',
         limit: '제한',
         blog: '포럼/블로그',
         imageSite: '이미지 사이트',
