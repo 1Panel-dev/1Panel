@@ -68,6 +68,9 @@ const loadTerminalSetting = async () => {
         terminalStore.setLineHeight(Number(res.data.lineHeight));
         terminalStore.setLetterSpacing(Number(res.data.letterSpacing));
         terminalStore.setFontSize(Number(res.data.fontSize));
+        terminalStore.setFontFamily(res.data.fontFamily || "Monaco, Menlo, Consolas, 'Courier New', monospace");
+        terminalStore.setBackgroundColor(res.data.backgroundColor || '#000000');
+        terminalStore.setForegroundColor(res.data.foregroundColor || '#f5f5f5');
         terminalStore.setCursorBlink(res.data.cursorBlink);
         terminalStore.setCursorStyle(res.data.cursorStyle);
         terminalStore.setScrollback(Number(res.data.scrollback));

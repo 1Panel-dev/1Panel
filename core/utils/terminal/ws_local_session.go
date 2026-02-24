@@ -3,6 +3,7 @@ package terminal
 import (
 	"encoding/base64"
 	"encoding/json"
+	"strings"
 	"sync"
 
 	"github.com/1Panel-dev/1Panel/core/global"
@@ -16,6 +17,7 @@ type LocalWsSession struct {
 
 	allowCtrlC bool
 	writeMutex sync.Mutex
+	completer  *TabCompleter
 }
 
 func NewLocalWsSession(cols, rows int, wsConn *websocket.Conn, slave *LocalCommand, allowCtrlC bool) (*LocalWsSession, error) {
@@ -28,6 +30,7 @@ func NewLocalWsSession(cols, rows int, wsConn *websocket.Conn, slave *LocalComma
 		wsConn: wsConn,
 
 		allowCtrlC: allowCtrlC,
+		completer:  NewTabCompleter(),
 	}, nil
 }
 
@@ -116,6 +119,14 @@ func (sws *LocalWsSession) receiveWsMsg(exitCh chan bool) {
 				if err != nil {
 					global.LOG.Errorf("ssh sending heartbeat to webSocket failed, err: %v", err)
 				}
+			case WsMsgComplete:
+				decodeBytes, err := base64.StdEncoding.DecodeString(msgObj.Data)
+				if err != nil {
+					global.LOG.Errorf("websock complete string base64 decoding failed, err: %v", err)
+					break
+				}
+				suggestion := sws.completer.GetCompletions(string(decodeBytes))
+				sws.sendComplete(wsConn, strings.Join(suggestion, "\n"))
 			}
 		}
 	}
@@ -124,5 +135,19 @@ func (sws *LocalWsSession) receiveWsMsg(exitCh chan bool) {
 func (sws *LocalWsSession) sendWebsocketInputCommandToSshSessionStdinPipe(cmdBytes []byte) {
 	if _, err := sws.slave.Write(cmdBytes); err != nil {
 		global.LOG.Errorf("ws cmd bytes write to ssh.stdin pipe failed, err: %v", err)
+	}
+}
+
+func (sws *LocalWsSession) sendComplete(wsConn *websocket.Conn, suggestion string) {
+	wsData, err := json.Marshal(WsMsg{
+		Type: WsMsgComplete,
+		Data: base64.StdEncoding.EncodeToString([]byte(suggestion)),
+	})
+	if err != nil {
+		global.LOG.Errorf("encoding complete output to json failed, err: %v", err)
+		return
+	}
+	if err := wsConn.WriteMessage(websocket.TextMessage, wsData); err != nil {
+		global.LOG.Errorf("sending complete output to webSocket failed, err: %v", err)
 	}
 }

@@ -1348,9 +1348,22 @@ const message = {
         key: 'Chave privada',
         keyPassword: 'Senha da chave privada',
         emptyTerminal: 'Nenhum terminal está conectado no momento.',
-        fontFamily: 'Fonte personalizada',
-        fontFamilyHelper:
-            'Deixe em branco para usar fontes padrão. Se você inserir um nome de fonte personalizado, certifique-se de que a fonte esteja instalada no seu sistema operacional local, caso contrário será renderizada com a fonte padrão',
+        lineHeight: 'Altura da linha',
+        letterSpacing: 'Espaçamento entre letras',
+        fontSize: 'Tamanho da fonte',
+        fontFamily: 'Conjunto de fontes',
+        fontFamilySupportHelper:
+            'Selecione ou digite fontes. O efeito depende de a fonte estar instalada no sistema do navegador; se não estiver, haverá fallback automático. Se estiver vazio, a fonte padrão será usada.',
+        backgroundColor: 'Cor de fundo',
+        foregroundColor: 'Cor do texto',
+        cursorBlink: 'Piscar do cursor',
+        cursorStyle: 'Estilo do cursor',
+        cursorUnderline: 'Sublinhado',
+        cursorBlock: 'Bloco',
+        cursorBar: 'Barra',
+        scrollback: 'Scrollback',
+        scrollSensitivity: 'Sensibilidade de rolagem',
+        saveHelper: 'Tem certeza de que deseja salvar a configuração atual do terminal?',
     },
     toolbox: {
         common: {

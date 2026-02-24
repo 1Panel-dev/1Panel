@@ -1376,9 +1376,11 @@ const message = {
         lineHeight: 'Satır Yüksekliği',
         letterSpacing: 'Harf Aralığı',
         fontSize: 'Font Boyutu',
-        fontFamily: 'Özel yazı tipi',
-        fontFamilyHelper:
-            'Varsayılan yazı tiplerini kullanmak için boş bırakın. Özel bir yazı tipi adı girerseniz, yazı tipinin yerel işletim sisteminizde yüklü olduğundan emin olun, aksi takdirde varsayılan yazı tipiyle işlenecektir',
+        fontFamily: 'Yazı tipi kümesi',
+        fontFamilySupportHelper:
+            'Yazı tiplerini seçin veya girin. Etkin olup olmaması, tarayıcının bulunduğu sistemde bu yazı tipinin kurulu olmasına bağlıdır; kurulu değilse otomatik olarak geri dönüş yapılır. Boşsa varsayılan yazı tipi kullanılır.',
+        backgroundColor: 'Arka plan rengi',
+        foregroundColor: 'Ön plan rengi',
         cursorBlink: 'İmleç Yanıp Sönme',
         cursorStyle: 'İmleç Stili',
         cursorUnderline: 'Alt Çizgi',

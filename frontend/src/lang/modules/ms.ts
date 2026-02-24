@@ -1353,9 +1353,22 @@ const message = {
         key: 'Kunci peribadi',
         keyPassword: 'Kata laluan kunci peribadi',
         emptyTerminal: 'Tiada terminal yang sedang disambungkan.',
-        fontFamily: 'Fon tersuai',
-        fontFamilyHelper:
-            'Biarkan kosong untuk menggunakan fon lalai. Jika anda memasukkan nama fon tersuai, pastikan fon tersebut dipasang pada sistem operasi tempatan anda, jika tidak ia akan dipaparkan dengan fon lalai',
+        lineHeight: 'Ketinggian baris',
+        letterSpacing: 'Jarak huruf',
+        fontSize: 'Saiz fon',
+        fontFamily: 'Set fon',
+        fontFamilySupportHelper:
+            'Pilih atau masukkan fon. Sama ada berkesan bergantung pada sama ada fon tersebut dipasang pada sistem pelayar; jika tiada, ia akan fallback secara automatik. Jika kosong, fon lalai akan digunakan.',
+        backgroundColor: 'Warna latar belakang',
+        foregroundColor: 'Warna teks',
+        cursorBlink: 'Kedipan kursor',
+        cursorStyle: 'Gaya kursor',
+        cursorUnderline: 'Garis bawah',
+        cursorBlock: 'Blok',
+        cursorBar: 'Bar',
+        scrollback: 'Skrol balik',
+        scrollSensitivity: 'Kepekaan skrol',
+        saveHelper: 'Adakah anda pasti mahu menyimpan konfigurasi terminal semasa?',
     },
     toolbox: {
         common: {

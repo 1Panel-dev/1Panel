@@ -73,6 +73,8 @@ export interface TerminalState {
     letterSpacing: number;
     fontSize: number;
     fontFamily: string;
+    backgroundColor: string;
+    foregroundColor: string;
     cursorBlink: string;
     cursorStyle: string;
     scrollback: number;

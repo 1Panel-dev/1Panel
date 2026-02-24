@@ -72,6 +72,8 @@ export namespace Setting {
         letterSpacing: string;
         fontSize: string;
         fontFamily: string;
+        backgroundColor: string;
+        foregroundColor: string;
         cursorBlink: string;
         cursorStyle: string;
         scrollback: string;

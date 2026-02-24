@@ -1310,9 +1310,22 @@ const message = {
         key: '개인 키',
         keyPassword: '개인 키 비밀번호',
         emptyTerminal: '현재 연결된 터미널이 없습니다.',
-        fontFamily: '사용자 정의 글꼴',
-        fontFamilyHelper:
-            '비워두면 기본 글꼴을 사용합니다. 사용자 정의 글꼴 이름을 입력한 후에는 로컬 운영 체제에 해당 글꼴이 설치되어 있는지 확인하세요. 그렇지 않으면 기본 글꼴로 렌더링됩니다',
+        lineHeight: '줄 높이',
+        letterSpacing: '자간',
+        fontSize: '글꼴 크기',
+        fontFamily: '글꼴 세트',
+        fontFamilySupportHelper:
+            '글꼴을 선택하거나 직접 입력할 수 있습니다. 적용 여부는 브라우저가 실행 중인 시스템에 해당 글꼴이 설치되어 있는지에 따라 달라지며, 미설치 시 자동으로 폴백됩니다. 비어 있으면 기본 글꼴을 사용합니다.',
+        backgroundColor: '배경색',
+        foregroundColor: '전경색',
+        cursorBlink: '커서 깜박임',
+        cursorStyle: '커서 스타일',
+        cursorUnderline: '밑줄',
+        cursorBlock: '블록',
+        cursorBar: '막대',
+        scrollback: '스크롤백',
+        scrollSensitivity: '스크롤 감도',
+        saveHelper: '현재 터미널 설정을 저장하시겠습니까?',
     },
     toolbox: {
         common: {

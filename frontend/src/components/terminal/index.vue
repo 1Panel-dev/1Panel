@@ -1,9 +1,9 @@
 <template>
-    <div ref="terminalElement"></div>
+    <div ref="terminalElement" class="terminal-container"></div>
 </template>
 
 <script lang="ts" setup>
-import { ref, watch, onBeforeUnmount, nextTick } from 'vue';
+import { ref, watch, onBeforeUnmount, nextTick, computed, onMounted } from 'vue';
 import { Terminal } from '@xterm/xterm';
 import '@xterm/xterm/css/xterm.css';
 import { FitAddon } from '@xterm/addon-fit';
@@ -20,6 +20,12 @@ const terminalSocket = ref<WebSocket>();
 const heartbeatTimer = ref<NodeJS.Timer>();
 const latency = ref(0);
 const initCmd = ref('');
+const currentLine = ref('');
+const suggestionText = ref('');
+const ghostText = ref('');
+let suggestTimer: ReturnType<typeof setTimeout> | null = null;
+const COMPLETION_DEBOUNCE_MS = 500;
+const COMPLETION_MIN_CHARS = 2;
 
 const readyWatcher = watch(
     () => webSocketReady.value && termReady.value,
@@ -34,32 +40,48 @@ const readyWatcher = watch(
 const terminalStore = TerminalStore();
 const lineHeight = computed(() => terminalStore.lineHeight);
 const fontSize = computed(() => terminalStore.fontSize);
-const letterSpacing = computed(() => terminalStore.letterSpacing);
-watch([lineHeight, fontSize, letterSpacing], ([newLineHeight, newFontSize, newLetterSpacing]) => {
-    term.value.options.lineHeight = newLineHeight;
-    term.value.options.letterSpacing = newLetterSpacing;
-    term.value.options.fontSize = newFontSize;
-    changeTerminalSize();
-});
 const fontFamily = computed(() => terminalStore.fontFamily);
-watch(fontFamily, (newFontFamily) => {
-    const defaultFontFamily = "Monaco, Menlo, Consolas, 'Courier New', monospace";
-    term.value.options.fontFamily = newFontFamily || defaultFontFamily;
+const backgroundColor = computed(() => terminalStore.backgroundColor);
+const foregroundColor = computed(() => terminalStore.foregroundColor);
+const letterSpacing = computed(() => terminalStore.letterSpacing);
+watch(
+    [lineHeight, fontSize, letterSpacing, fontFamily],
+    ([newLineHeight, newFontSize, newLetterSpacing, newFontFamily]) => {
+        if (!term.value) return;
+        term.value.options.lineHeight = newLineHeight;
+        term.value.options.letterSpacing = newLetterSpacing;
+        term.value.options.fontSize = newFontSize;
+        term.value.options.fontFamily = newFontFamily;
+        changeTerminalSize();
+    },
+);
+watch([backgroundColor, foregroundColor], ([newBackgroundColor, newForegroundColor]) => {
+    if (!term.value) return;
+    term.value.options.theme = {
+        ...(term.value.options.theme || {}),
+        background: newBackgroundColor,
+        foreground: newForegroundColor,
+    };
+    applyTerminalBackground(newBackgroundColor);
 });
 const cursorStyle = computed(() => terminalStore.cursorStyle);
 watch(cursorStyle, (newCursorStyle) => {
+    if (!term.value) return;
     term.value.options.cursorStyle = newCursorStyle;
 });
 const cursorBlink = computed(() => terminalStore.cursorBlink);
 watch(cursorBlink, (newCursorBlink) => {
-    term.value.options.cursorBlink = newCursorBlink === 'enable';
+    if (!term.value) return;
+    term.value.options.cursorBlink = String(newCursorBlink).toLowerCase() === 'enable';
 });
 const scrollback = computed(() => terminalStore.scrollback);
 watch(scrollback, (newScrollback) => {
+    if (!term.value) return;
     term.value.options.scrollback = newScrollback;
 });
 const scrollSensitivity = computed(() => terminalStore.scrollSensitivity);
 watch(scrollSensitivity, (newScrollSensitivity) => {
+    if (!term.value) return;
     term.value.options.scrollSensitivity = newScrollSensitivity;
 });
 
@@ -81,23 +103,31 @@ const acceptParams = (props: WsProps) => {
 };
 
 const newTerm = () => {
-    const background = getComputedStyle(document.documentElement).getPropertyValue('--panel-terminal-bg-color').trim();
-    const defaultFontFamily = "Monaco, Menlo, Consolas, 'Courier New', monospace";
-    // fontFamily 从后端获取，如果为空则使用默认值
-    const fontFamily = terminalStore.fontFamily || defaultFontFamily;
-
+    const bg = terminalStore.backgroundColor || '#000000';
+    const fg = terminalStore.foregroundColor || '#f5f5f5';
     term.value = new Terminal({
         lineHeight: terminalStore.lineHeight || 1.2,
         fontSize: terminalStore.fontSize || 12,
-        fontFamily: fontFamily,
+        fontFamily: terminalStore.fontFamily || "Monaco, Menlo, Consolas, 'Courier New', monospace",
         theme: {
-            background: background,
+            background: bg,
+            foreground: fg,
         },
-        cursorBlink: terminalStore.cursorBlink ? terminalStore.cursorBlink === 'Enable' : true,
+        cursorBlink: terminalStore.cursorBlink ? String(terminalStore.cursorBlink).toLowerCase() === 'enable' : true,
         cursorStyle: terminalStore.cursorStyle ? getStyle() : 'underline',
         scrollback: terminalStore.scrollback || 1000,
         scrollSensitivity: terminalStore.scrollSensitivity || 15,
     });
+};
+
+const applyTerminalBackground = (color: string) => {
+    if (!terminalElement.value) return;
+    terminalElement.value.style.backgroundColor = color || '#000000';
+    terminalElement.value.style.backgroundImage = '';
+    terminalElement.value.style.backgroundSize = '';
+    terminalElement.value.style.backgroundPosition = '';
+    terminalElement.value.style.backgroundRepeat = '';
+    terminalElement.value.style.imageRendering = '';
 };
 
 const getStyle = (): 'underline' | 'block' | 'bar' => {
@@ -144,10 +174,11 @@ const initTerminal = (online: boolean = false): boolean => {
     newTerm();
     if (terminalElement.value) {
         term.value.open(terminalElement.value);
+        applyTerminalBackground(terminalStore.backgroundColor);
         term.value.loadAddon(fitAddon);
         window.addEventListener('resize', changeTerminalSize);
         if (online) {
-            term.value.onData((data) => sendMsg(data));
+            term.value.onData((data) => onTermData(data));
         }
         termReady.value = true;
     }
@@ -209,6 +240,7 @@ const onWSReceive = (message: MessageEvent) => {
     const wsMsg = JSON.parse(message.data);
     switch (wsMsg.type) {
         case 'cmd': {
+            clearGhost();
             term.value.element && term.value.focus();
             if (wsMsg.data) {
                 let receiveMsg = Base64.decode(wsMsg.data);
@@ -217,6 +249,27 @@ const onWSReceive = (message: MessageEvent) => {
                     initCmd.value = '';
                 }
                 term.value.write(receiveMsg);
+            }
+            break;
+        }
+        case 'complete': {
+            if (!currentLine.value || currentLine.value.trim().length === 0) {
+                clearGhost();
+                break;
+            }
+            if (wsMsg.data) {
+                const raw = Base64.decode(wsMsg.data);
+                const items = raw
+                    .split('\n')
+                    .map((item) => item.trim())
+                    .filter((item) => item.length > 0);
+                if (items.length >= 1) {
+                    applySuggestion(items[0]);
+                } else {
+                    clearGhost();
+                }
+            } else {
+                clearGhost();
             }
             break;
         }
@@ -257,6 +310,127 @@ function sendMsg(data: string) {
     }
 }
 
+function sendSuggestRequest(line: string) {
+    if (!line || line.trim().length === 0) {
+        return;
+    }
+    if (isWsOpen()) {
+        terminalSocket.value!.send(
+            JSON.stringify({
+                type: 'complete',
+                data: Base64.encode(line),
+            }),
+        );
+    }
+}
+
+function scheduleSuggest() {
+    if (suggestTimer) {
+        clearTimeout(suggestTimer);
+    }
+    if (!currentLine.value || currentLine.value.trim().length === 0) {
+        clearGhost();
+        return;
+    }
+    const token = currentLine.value.trim().split(/\s+/).pop() || '';
+    if (token.length < COMPLETION_MIN_CHARS) {
+        clearGhost();
+        return;
+    }
+    suggestTimer = setTimeout(() => {
+        sendSuggestRequest(currentLine.value);
+    }, COMPLETION_DEBOUNCE_MS);
+}
+
+function applySuggestion(raw: string) {
+    if (!raw) {
+        clearGhost();
+        return;
+    }
+    const lastTokenMatch = currentLine.value.match(/(\S+)$/);
+    const lastToken = lastTokenMatch ? lastTokenMatch[1] : '';
+    let suffix = raw;
+    if (lastToken && raw.startsWith(lastToken)) {
+        suffix = raw.slice(lastToken.length);
+    }
+    if (!suffix) {
+        clearGhost();
+        return;
+    }
+    suggestionText.value = suffix;
+    renderGhost(suffix);
+}
+
+function renderGhost(suffix: string) {
+    if (!term.value) return;
+    term.value.write('\x1b7');
+    term.value.write('\x1b[0K');
+    term.value.write(`\x1b[90m${suffix}\x1b[0m`);
+    term.value.write('\x1b8');
+    ghostText.value = suffix;
+}
+
+function clearGhost() {
+    if (!ghostText.value || !term.value) return;
+    term.value.write('\x1b7');
+    term.value.write('\x1b[0K');
+    term.value.write('\x1b8');
+    ghostText.value = '';
+    suggestionText.value = '';
+}
+
+function onTermData(data: string) {
+    if (!data) return;
+    if (data === '\t') {
+        if (ghostText.value) {
+            sendMsg(ghostText.value);
+            currentLine.value += ghostText.value;
+            clearGhost();
+            scheduleSuggest();
+            return;
+        }
+        sendMsg(data);
+        return;
+    }
+    if (data === '\r' || data === '\n') {
+        currentLine.value = '';
+        clearGhost();
+        sendMsg(data);
+        return;
+    }
+    if (data === '\x7f') {
+        if (currentLine.value.length > 0) {
+            currentLine.value = currentLine.value.slice(0, -1);
+        }
+        clearGhost();
+        sendMsg(data);
+        scheduleSuggest();
+        return;
+    }
+    if (data === '\x15') {
+        currentLine.value = '';
+        clearGhost();
+        sendMsg(data);
+        return;
+    }
+    if (data === '\x17') {
+        currentLine.value = currentLine.value.replace(/\s+\S*$/, '');
+        clearGhost();
+        sendMsg(data);
+        scheduleSuggest();
+        return;
+    }
+    if (data.startsWith('\x1b')) {
+        clearGhost();
+        sendMsg(data);
+        return;
+    }
+    currentLine.value += data;
+    clearGhost();
+    sendMsg(data);
+    scheduleSuggest();
+}
+
 // websocket 相关代码 end
 
 const resizeObserver = ref<ResizeObserver>();
@@ -289,16 +463,39 @@ onBeforeUnmount(() => {
 </script>
 
 <style lang="scss" scoped>
-#terminal {
+.terminal-container {
     width: 100%;
     height: 100%;
 }
 :deep(.xterm) {
     padding: 5px !important;
-    background-color: var(--panel-logs-bg-color) !important;
+    background-color: transparent !important;
 }
 
 :deep(.xterm .xterm-viewport) {
-    background-color: var(--panel-logs-bg-color) !important;
+    background-color: transparent !important;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.3) rgba(255, 255, 255, 0.1);
+}
+
+:deep(.xterm .xterm-viewport::-webkit-scrollbar) {
+    width: 10px;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+:deep(.xterm .xterm-viewport::-webkit-scrollbar-thumb) {
+    border-radius: 6px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+:deep(.xterm .xterm-viewport::-webkit-scrollbar-thumb:hover) {
+    background-color: rgba(255, 255, 255, 0.45);
+}
+
+:deep(.xterm .xterm-viewport::-webkit-scrollbar-corner) {
+    background: transparent;
 }
 </style>

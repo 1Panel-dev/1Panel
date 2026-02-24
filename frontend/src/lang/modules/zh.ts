@@ -1296,9 +1296,11 @@ const message = {
         lineHeight: '字体行高',
         letterSpacing: '字体间距',
         fontSize: '字体大小',
-        fontFamily: '自定义字体',
-        fontFamilyHelper:
-            '留空则使用默认字体。输入自定义字体名后，需确保本地操作系统已安装该字体，否则将使用默认字体渲染',
+        fontFamily: '字体集',
+        fontFamilySupportHelper:
+            '选择或输入字体，是否生效取决于浏览器所在系统是否已安装该字体，未安装会自动回退，为空则使用默认字体',
+        backgroundColor: '背景色',
+        foregroundColor: '前景色',
         cursorBlink: '光标闪烁',
         cursorStyle: '光标样式',
         cursorUnderline: '下划线',

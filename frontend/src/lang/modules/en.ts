@@ -1362,9 +1362,11 @@ const message = {
         lineHeight: 'Line Height',
         letterSpacing: 'Letter Spacing',
         fontSize: 'Font Size',
-        fontFamily: 'Custom Font',
-        fontFamilyHelper:
-            'Leave empty to use default fonts. If you enter a custom font name, ensure the font is installed on your local system, otherwise the default font will be used',
+        fontFamily: 'Font Set',
+        fontFamilySupportHelper:
+            'Select or input fonts. Actual rendering depends on fonts installed on the client OS/browser. If empty, the default font is used.',
+        backgroundColor: 'Background Color',
+        foregroundColor: 'Foreground Color',
         cursorBlink: 'Cursor Blink',
         cursorStyle: 'Cursor Style',
         cursorUnderline: 'Underline',

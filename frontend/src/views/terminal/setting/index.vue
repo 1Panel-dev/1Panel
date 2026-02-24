@@ -39,13 +39,30 @@
                                 />
                             </el-form-item>
                             <el-form-item :label="$t('terminal.fontFamily')">
-                                <el-input
+                                <el-select
                                     class="formInput"
-                                    v-model="form.fontFamily"
-                                    :placeholder="$t('terminal.fontFamily')"
-                                    @change="changeItem()"
-                                />
-                                <span class="input-help">{{ $t('terminal.fontFamilyHelper') }}</span>
+                                    clearable
+                                    v-model="selectedFontFamilies"
+                                    multiple
+                                    filterable
+                                    allow-create
+                                    default-first-option
+                                    :reserve-keyword="false"
+                                >
+                                    <el-option
+                                        v-for="item in fontFamilyOptions"
+                                        :key="item.value"
+                                        :label="item.label"
+                                        :value="item.value"
+                                    />
+                                </el-select>
+                                <span class="input-help">{{ $t('terminal.fontFamilySupportHelper') }}</span>
+                            </el-form-item>
+                            <el-form-item :label="$t('terminal.backgroundColor')">
+                                <el-color-picker v-model="form.backgroundColor" @change="changeItem()" />
+                            </el-form-item>
+                            <el-form-item :label="$t('terminal.foregroundColor')">
+                                <el-color-picker v-model="form.foregroundColor" @change="changeItem()" />
                             </el-form-item>
 
                             <el-form-item>
@@ -127,8 +144,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive } from 'vue';
-import { ElForm } from 'element-plus';
+import { ref, reactive, watch, onMounted, onBeforeUnmount } from 'vue';
 import { getTerminalInfo, UpdateTerminalInfo } from '@/api/modules/setting';
 import { Terminal } from '@xterm/xterm';
 import OperateDialog from '@/views/terminal/setting/default_conn/index.vue';
@@ -146,12 +162,30 @@ const dialogRef = ref();
 const terminalElement = ref<HTMLDivElement | null>(null);
 const fitAddon = new FitAddon();
 const term = ref();
+const previewResizeObserver = ref<ResizeObserver>();
+const DEFAULT_FONT_FAMILY = "Monaco, Menlo, Consolas, 'Courier New', monospace";
+const selectedFontFamilies = ref<string[]>([]);
+const fontFamilyOptions = [
+    { label: 'Monaco', value: 'Monaco' },
+    { label: 'Menlo', value: 'Menlo' },
+    { label: 'Consolas', value: 'Consolas' },
+    { label: 'JetBrains Mono', value: "'JetBrains Mono'" },
+    { label: 'Fira Code', value: "'Fira Code'" },
+    { label: 'Cascadia Code', value: "'Cascadia Code'" },
+    { label: 'Source Code Pro', value: "'Source Code Pro'" },
+    { label: 'Ubuntu Mono', value: "'Ubuntu Mono'" },
+    { label: 'DejaVu Sans Mono', value: "'DejaVu Sans Mono'" },
+    { label: 'Courier New', value: "'Courier New'" },
+    { label: 'monospace', value: 'monospace' },
+];
 
 const form = reactive({
     lineHeight: 1.2,
     letterSpacing: 1.2,
     fontSize: 12,
-    fontFamily: '',
+    fontFamily: DEFAULT_FONT_FAMILY,
+    backgroundColor: '#000000',
+    foregroundColor: '#f5f5f5',
     cursorBlink: 'Enable',
     cursorStyle: 'underline',
     scrollback: 1000,
@@ -164,11 +198,56 @@ const form = reactive({
 const resetConn = ref(false);
 const opRef = ref();
 
+const splitFontFamily = (value: string): string[] => {
+    return value
+        .split(',')
+        .map((item) => item.trim())
+        .filter((item) => item.length > 0);
+};
+
+const syncFontFamilyFromSelected = () => {
+    const values = selectedFontFamilies.value.map((item) => item.trim()).filter((item) => item.length > 0);
+    form.fontFamily = values.join(', ');
+};
+
+const ensureFontFamily = () => {
+    if (selectedFontFamilies.value.length > 0) return;
+    selectedFontFamilies.value = splitFontFamily(DEFAULT_FONT_FAMILY);
+    form.fontFamily = DEFAULT_FONT_FAMILY;
+    if (term.value) {
+        changeItem();
+    }
+};
+
+watch(
+    selectedFontFamilies,
+    () => {
+        syncFontFamilyFromSelected();
+        if (!term.value) return;
+        changeItem();
+    },
+    { deep: true },
+);
+
 const acceptParams = () => {
     search(true);
     loadConnShow();
     iniTerm();
 };
+
+onMounted(() => {
+    previewResizeObserver.value = new ResizeObserver(() => {
+        if (!term.value) return;
+        fitAddon.fit();
+    });
+    if (terminalElement.value) {
+        previewResizeObserver.value.observe(terminalElement.value);
+    }
+});
+
+onBeforeUnmount(() => {
+    previewResizeObserver.value?.disconnect();
+});
 
 const search = async (withReset?: boolean) => {
     loading.value = true;
@@ -178,13 +257,15 @@ const search = async (withReset?: boolean) => {
             form.lineHeight = Number(res.data.lineHeight);
             form.letterSpacing = Number(res.data.letterSpacing);
             form.fontSize = Number(res.data.fontSize);
-            form.fontFamily = res.data.fontFamily || '';
+            form.fontFamily = res.data.fontFamily || DEFAULT_FONT_FAMILY;
+            selectedFontFamilies.value = splitFontFamily(form.fontFamily);
+            form.backgroundColor = res.data.backgroundColor || '#000000';
+            form.foregroundColor = res.data.foregroundColor || '#f5f5f5';
             form.cursorBlink = res.data.cursorBlink;
             form.cursorStyle = res.data.cursorStyle;
             form.scrollback = Number(res.data.scrollback);
             form.scrollSensitivity = Number(res.data.scrollSensitivity);
 
-            // 同步到 store，确保已打开的终端也能使用新字体
             terminalStore.setFontFamily(res.data.fontFamily || '');
 
             if (withReset) {
@@ -244,6 +325,7 @@ const iniTerm = () => {
         fontFamily: fontFamily,
         theme: {
             background: '#000000',
+            foreground: '#f5f5f5',
         },
         cursorBlink: true,
         cursorStyle: 'block',
@@ -251,9 +333,20 @@ const iniTerm = () => {
         scrollSensitivity: 15,
     });
     term.value.open(terminalElement.value);
+    applyPreviewBackground();
     term.value.loadAddon(fitAddon);
     term.value.write('the first line \r\nthe second line');
     fitAddon.fit();
+};
+
+const applyPreviewBackground = () => {
+    if (!terminalElement.value) return;
+    terminalElement.value.style.backgroundColor = form.backgroundColor || '#000000';
+    terminalElement.value.style.backgroundImage = '';
+    terminalElement.value.style.backgroundSize = '';
+    terminalElement.value.style.backgroundPosition = '';
+    terminalElement.value.style.backgroundRepeat = '';
+    terminalElement.value.style.imageRendering = '';
 };
 
 const changeItem = () => {
@@ -264,10 +357,16 @@ const changeItem = () => {
     term.value.options.letterSpacing = form.letterSpacing;
     term.value.options.fontSize = form.fontSize;
     term.value.options.fontFamily = fontFamily;
+    term.value.options.theme = {
+        ...(term.value.options.theme || {}),
+        background: form.backgroundColor,
+        foreground: form.foregroundColor,
+    };
     term.value.options.cursorBlink = form.cursorBlink === 'Enable';
     term.value.options.cursorStyle = form.cursorStyle;
     term.value.options.scrollback = form.scrollback;
     term.value.options.scrollSensitivity = form.scrollSensitivity;
+    applyPreviewBackground();
 
     fitAddon.fit();
 };
@@ -276,7 +375,10 @@ const onSetDefault = () => {
     form.lineHeight = 1.2;
     form.letterSpacing = 0;
     form.fontSize = 12;
-    form.fontFamily = '';
+    form.fontFamily = DEFAULT_FONT_FAMILY;
+    selectedFontFamilies.value = splitFontFamily(DEFAULT_FONT_FAMILY);
+    form.backgroundColor = '#000000';
+    form.foregroundColor = '#f5f5f5';
     form.cursorBlink = 'Enable';
     form.cursorStyle = 'block';
     form.scrollback = 1000;
@@ -286,38 +388,41 @@ const onSetDefault = () => {
 };
 
 const onSave = () => {
+    ensureFontFamily();
     ElMessageBox.confirm(i18n.global.t('terminal.saveHelper'), i18n.global.t('container.setting'), {
         confirmButtonText: i18n.global.t('commons.button.confirm'),
         cancelButtonText: i18n.global.t('commons.button.cancel'),
         type: 'info',
     }).then(async () => {
         loading.value = true;
-        let param = {
-            lineHeight: form.lineHeight + '',
-            letterSpacing: form.letterSpacing + '',
-            fontSize: form.fontSize + '',
-            fontFamily: form.fontFamily,
-            cursorBlink: form.cursorBlink,
-            cursorStyle: form.cursorStyle,
-            scrollback: form.scrollback + '',
-            scrollSensitivity: form.scrollSensitivity + '',
-        };
-        await UpdateTerminalInfo(param)
-            .then(() => {
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                loading.value = false;
-                terminalStore.setLineHeight(form.lineHeight);
-                terminalStore.setLetterSpacing(form.letterSpacing);
-                terminalStore.setFontSize(form.fontSize);
-                terminalStore.setFontFamily(form.fontFamily);
-                terminalStore.setCursorBlink(form.cursorBlink);
-                terminalStore.setCursorStyle(form.cursorStyle);
-                terminalStore.setScrollback(form.scrollback);
-                terminalStore.setScrollSensitivity(form.scrollSensitivity);
-            })
-            .catch(() => {
-                loading.value = false;
-            });
+        try {
+            let param = {
+                lineHeight: form.lineHeight + '',
+                letterSpacing: form.letterSpacing + '',
+                fontSize: form.fontSize + '',
+                fontFamily: form.fontFamily,
+                backgroundColor: form.backgroundColor,
+                foregroundColor: form.foregroundColor,
+                cursorBlink: form.cursorBlink,
+                cursorStyle: form.cursorStyle,
+                scrollback: form.scrollback + '',
+                scrollSensitivity: form.scrollSensitivity + '',
+            };
+            await UpdateTerminalInfo(param);
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            terminalStore.setLineHeight(form.lineHeight);
+            terminalStore.setLetterSpacing(form.letterSpacing);
+            terminalStore.setFontSize(form.fontSize);
+            terminalStore.setFontFamily(form.fontFamily);
+            terminalStore.setBackgroundColor(form.backgroundColor);
+            terminalStore.setForegroundColor(form.foregroundColor);
+            terminalStore.setCursorBlink(form.cursorBlink);
+            terminalStore.setCursorStyle(form.cursorStyle);
+            terminalStore.setScrollback(form.scrollback);
+            terminalStore.setScrollSensitivity(form.scrollSensitivity);
+        } finally {
+            loading.value = false;
+        }
     });
 };
 

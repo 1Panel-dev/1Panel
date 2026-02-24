@@ -1325,9 +1325,22 @@ const message = {
         key: '秘密鍵',
         keyPassword: '秘密キーパスワード',
         emptyTerminal: '現在接続されている端子はありません。',
-        fontFamily: 'カスタムフォント',
-        fontFamilyHelper:
-            '空欄の場合はデフォルトフォントを使用します。カスタムフォント名を入力する場合は、ローカルOSにそのフォントがインストールされていることを確認してください。インストールされていない場合はデフォルトフォントでレンダリングされます',
+        lineHeight: '行の高さ',
+        letterSpacing: '文字間隔',
+        fontSize: 'フォントサイズ',
+        fontFamily: 'フォントセット',
+        fontFamilySupportHelper:
+            'フォントを選択または入力できます。適用可否はブラウザ側OSにそのフォントがインストールされているかに依存し、未インストール時は自動でフォールバックします。空の場合はデフォルトフォントを使用します。',
+        backgroundColor: '背景色',
+        foregroundColor: '前景色',
+        cursorBlink: 'カーソル点滅',
+        cursorStyle: 'カーソルスタイル',
+        cursorUnderline: '下線',
+        cursorBlock: 'ブロック',
+        cursorBar: 'バー',
+        scrollback: 'スクロールバック',
+        scrollSensitivity: 'スクロール感度',
+        saveHelper: '現在のターミナル設定を保存してもよろしいですか？',
     },
     toolbox: {
         common: {

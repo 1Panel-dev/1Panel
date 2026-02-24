@@ -1374,9 +1374,11 @@ const message = {
         lineHeight: 'Altura de línea',
         letterSpacing: 'Espaciado de letras',
         fontSize: 'Tamaño de fuente',
-        fontFamily: 'Fuente personalizada',
-        fontFamilyHelper:
-            'Dejar vacío para usar fuentes predeterminadas. Si ingresa un nombre de fuente personalizado, asegúrese de que la fuente esté instalada en su sistema operativo local, de lo contrario se renderizará con la fuente predeterminada',
+        fontFamily: 'Conjunto de fuentes',
+        fontFamilySupportHelper:
+            'Seleccione o introduzca fuentes. El efecto depende de si el sistema del navegador tiene instalada la fuente; si no, se usará una de respaldo. Si queda vacío, se usará la fuente predeterminada.',
+        backgroundColor: 'Color de fondo',
+        foregroundColor: 'Color de primer plano',
         cursorBlink: 'Parpadeo del cursor',
         cursorStyle: 'Estilo de cursor',
         cursorUnderline: 'Subrayado',

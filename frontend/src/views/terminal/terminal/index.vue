@@ -360,10 +360,10 @@ const cleanTimer = () => {
 };
 
 const loadHeight = () => {
-    return globalStore.openMenuTabs ? '230px' : '190px';
+    return globalStore.openMenuTabs ? '250px' : '210px';
 };
 const loadHeightWithPanel = () => {
-    return globalStore.openMenuTabs ? '470px' : '430px';
+    return globalStore.openMenuTabs ? '490px' : '450px';
 };
 const loadEmptyHeight = () => {
     return globalStore.openMenuTabs ? '201px' : '156px';

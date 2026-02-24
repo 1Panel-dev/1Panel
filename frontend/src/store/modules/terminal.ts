@@ -8,7 +8,9 @@ export const TerminalStore = defineStore({
         lineHeight: 1.2,
         letterSpacing: 1.2,
         fontSize: 12,
-        fontFamily: '',
+        fontFamily: "Monaco, Menlo, Consolas, 'Courier New', monospace",
+        backgroundColor: '#000000',
+        foregroundColor: '#f5f5f5',
         cursorBlink: 'enable',
         cursorStyle: 'underline',
         scrollback: 1000,
@@ -26,6 +28,12 @@ export const TerminalStore = defineStore({
         },
         setFontFamily(fontFamily: string) {
             this.fontFamily = fontFamily;
+        },
+        setBackgroundColor(backgroundColor: string) {
+            this.backgroundColor = backgroundColor;
+        },
+        setForegroundColor(foregroundColor: string) {
+            this.foregroundColor = foregroundColor;
         },
         setCursorBlink(cursorBlink: string) {
             this.cursorBlink = cursorBlink;
