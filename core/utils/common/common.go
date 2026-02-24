@@ -245,6 +245,13 @@ func LoadParams(param string) string {
 	}
 	return info
 }
+func LoadParamsWithoutPanic(param string) string {
+	stdout, err := cmd.RunDefaultWithStdoutBashCf("grep '^%s=' /usr/local/bin/1pctl | cut -d'=' -f2", param)
+	if err != nil {
+		return ""
+	}
+	return strings.ReplaceAll(stdout, "\n", "")
+}
 
 func GetRealClientIP(c *gin.Context) string {
 	addr := c.Request.RemoteAddr

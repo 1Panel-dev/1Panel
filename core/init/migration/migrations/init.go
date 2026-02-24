@@ -64,6 +64,9 @@ var InitSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "PanelName", Value: "1Panel"}).Error; err != nil {
 			return err
 		}
+		if err := tx.Create(&model.Setting{Key: "Edition", Value: global.CONF.Base.Edition}).Error; err != nil {
+			return err
+		}
 		if err := tx.Create(&model.Setting{Key: "Language", Value: language}).Error; err != nil {
 			return err
 		}
@@ -792,5 +795,22 @@ var UpdateAiAgentsMenu = &gormigrate.Migration{
 		}
 
 		return tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Update("value", string(updatedJSON)).Error
+	},
+}
+
+var AddEditionSetting = &gormigrate.Migration{
+	ID: "20260224-add-edition-setting",
+	Migrate: func(tx *gorm.DB) error {
+		var setting model.Setting
+		if err := tx.Where("key = ?", "Edition").First(&setting).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return tx.Create(&model.Setting{Key: "Edition", Value: global.CONF.Base.Edition}).Error
+			}
+			return err
+		}
+		if setting.Value == "" {
+			return tx.Model(&model.Setting{}).Where("key = ?", "Edition").Update("value", global.CONF.Base.Edition).Error
+		}
+		return nil
 	},
 }

@@ -16,6 +16,7 @@ func Init() {
 	settingRepo := repo.NewISettingRepo()
 	global.CONF.Conn.Port, _ = settingRepo.GetValueByKey("ServerPort")
 	global.CONF.Conn.Ipv6, _ = settingRepo.GetValueByKey("Ipv6")
+	global.CONF.Base.Edition, _ = settingRepo.GetValueByKey("Edition")
 	global.Api.ApiInterfaceStatus, _ = settingRepo.GetValueByKey("ApiInterfaceStatus")
 	if global.Api.ApiInterfaceStatus == constant.StatusEnable {
 		global.Api.ApiKey, _ = settingRepo.GetValueByKey("ApiKey")

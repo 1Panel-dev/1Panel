@@ -117,7 +117,7 @@ func (u *UpgradeService) SearchUpgrade() (*dto.UpgradeInfo, error) {
 	if strings.HasPrefix(upgrade.TestVersion, upgrade.LatestVersion+"-beta") {
 		upgrade.TestVersion = ""
 	}
-	notes, err := u.loadReleaseNotes(fmt.Sprintf("%s/%s/%s/release/1panel-%s-release-notes", global.CONF.RemoteURL.RepoUrl, mode, itemVersion, itemVersion))
+	notes, err := u.loadReleaseNotes(fmt.Sprintf("%s/%s/%s/release/1panel-%s-release-notes", global.RepoURL(), mode, itemVersion, itemVersion))
 	if err != nil {
 		return nil, fmt.Errorf("load releases-notes of version %s failed, err: %v", itemVersion, err)
 	}
@@ -130,7 +130,7 @@ func (u *UpgradeService) LoadNotes(req dto.Upgrade) (string, error) {
 	if strings.Contains(req.Version, "beta") {
 		mode = "beta"
 	}
-	notes, err := u.loadReleaseNotes(fmt.Sprintf("%s/%s/%s/release/1panel-%s-release-notes", global.CONF.RemoteURL.RepoUrl, mode, req.Version, req.Version))
+	notes, err := u.loadReleaseNotes(fmt.Sprintf("%s/%s/%s/release/1panel-%s-release-notes", global.RepoURL(), mode, req.Version, req.Version))
 	if err != nil {
 		return "", fmt.Errorf("load releases-notes of version %s failed, err: %v", req.Version, err)
 	}
@@ -162,7 +162,7 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 	if strings.Contains(req.Version, "beta") {
 		mode = "beta"
 	}
-	downloadPath := fmt.Sprintf("%s/%s/%s/release", global.CONF.RemoteURL.RepoUrl, mode, req.Version)
+	downloadPath := fmt.Sprintf("%s/%s/%s/release", global.RepoURL(), mode, req.Version)
 	fileName := fmt.Sprintf("1panel-%s-%s-%s.tar.gz", req.Version, "linux", itemArch)
 	_ = settingRepo.Update("SystemStatus", "Upgrading")
 	go func() {
@@ -442,9 +442,9 @@ func (u *UpgradeService) loadVersionByMode(developer, currentVersion string) (st
 }
 
 func (u *UpgradeService) loadVersion(isLatest bool, currentVersion, mode string) string {
-	path := fmt.Sprintf("%s/%s/latest", global.CONF.RemoteURL.RepoUrl, mode)
+	path := fmt.Sprintf("%s/%s/latest", global.RepoURL(), mode)
 	if !isLatest {
-		path = fmt.Sprintf("%s/%s/latest.current", global.CONF.RemoteURL.RepoUrl, mode)
+		path = fmt.Sprintf("%s/%s/latest.current", global.RepoURL(), mode)
 	}
 	_, latestVersionRes, err := req_helper.HandleRequestWithProxy(path, http.MethodGet, constant.TimeOut20s)
 	if err != nil {

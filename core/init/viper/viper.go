@@ -21,7 +21,7 @@ func Init() {
 	port := "9999"
 	mode := ""
 	version := "v2.0.0"
-	username, password, entrance, language := "", "", "", "zh"
+	username, password, entrance, language, edition := "", "", "", "zh", ""
 	v := viper.NewWithOptions()
 	v.SetConfigType("yaml")
 
@@ -37,7 +37,7 @@ func Init() {
 		v.SetConfigName("app")
 		v.AddConfigPath(path.Join("/opt/1panel/conf"))
 		if err := v.ReadInConfig(); err != nil {
-			panic(fmt.Errorf("Fatal error config file: %s \n", err))
+			panic(fmt.Errorf("fatal error config file: %s", err))
 		}
 	} else {
 		baseDir = common.LoadParams("BASE_DIR")
@@ -47,10 +47,11 @@ func Init() {
 		password = common.LoadParams("ORIGINAL_PASSWORD")
 		entrance = common.LoadParams("ORIGINAL_ENTRANCE")
 		language = common.LoadParams("LANGUAGE")
+		edition = common.LoadParamsWithoutPanic("EDITION")
 
 		reader := bytes.NewReader(conf.AppYaml)
 		if err := v.ReadConfig(reader); err != nil {
-			panic(fmt.Errorf("Fatal error config file: %s \n", err))
+			panic(fmt.Errorf("fatal error config file: %s", err))
 		}
 	}
 	v.OnConfigChange(func(e fsnotify.Event) {
@@ -82,17 +83,18 @@ func Init() {
 		if serverConfig.Conn.Entrance != "" {
 			entrance = serverConfig.Conn.Entrance
 		}
-		if serverConfig.Base.IsIntl {
-			language = "en"
-		}
 	}
 
 	global.CONF = serverConfig
 	global.CONF.Base.InstallDir = baseDir
 	global.CONF.Base.IsDemo = v.GetBool("base.is_demo")
-	global.CONF.Base.IsIntl = v.GetBool("base.is_intl")
 	global.CONF.Base.IsFxplay = v.GetBool("base.is_fxplay")
 	global.CONF.Base.IsOffLine = v.GetBool("base.is_offline")
+	if edition == "intl" {
+		global.CONF.Base.Edition = "intl"
+	} else {
+		global.CONF.Base.Edition = "cn"
+	}
 	global.CONF.Base.Version = version
 	global.CONF.Base.Username = username
 	global.CONF.Base.Password = password

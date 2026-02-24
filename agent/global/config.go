@@ -2,25 +2,19 @@ package global
 
 type ServerConfig struct {
 	Base         Base      `mapstructure:"base"`
-	RemoteURL    RemoteURL `mapstructure:"remote_url"`
 	Log          LogConfig `mapstructure:"log"`
 	DockerConfig DockerConfig
 }
 
 type Base struct {
 	Port       string `mapstructure:"port"`
+	Edition    string `mapstructure:"edition"` // [ cn / intl]
 	Version    string `mapstructure:"version"`
 	EncryptKey string `mapstructure:"encrypt_key"`
 	Mode       string `mapstructure:"mode"` // xpack [ Enable / Disable ]
 	IsDemo     bool   `mapstructure:"is_demo"`
 	InstallDir string `mapstructure:"install_dir"`
 	IsOffLine  bool   `mapstructure:"is_offline"`
-}
-
-type RemoteURL struct {
-	AppRepo     string `mapstructure:"app_repo"`
-	RepoUrl     string `mapstructure:"repo_url"`
-	ResourceUrl string `mapstructure:"resource_url"`
 }
 
 type SystemDir struct {

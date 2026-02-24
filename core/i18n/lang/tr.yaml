@@ -79,6 +79,7 @@ ErrNoSuchNode: "Düğüm bilgisi bulunamadı, lütfen kontrol edip tekrar deneyi
 ErrNodeUnbind: "Bu düğüm lisans bağlama aralığında değil, lütfen kontrol edip tekrar deneyin!"
 ErrNodeBind: "Bu düğüm zaten bir lisansa bağlı, lütfen kontrol edip tekrar deneyin!"
 ErrNodeLocalRollback: "Ana düğüm doğrudan geri alma desteklemiyor. Lütfen geri almak için '1pctl restore' komutunu manuel olarak çalıştırın!"
+ErrIntlLicense: "Mevcut sürüm uluslararası sürüm lisansının içe aktarılmasını henüz desteklemiyor. Yakında!"
 
 InvalidRequestBodyType: "Geçersiz istek gövdesi formatı, lütfen içeriğin format gereksinimlerine uygun olduğunu kontrol edip tekrar deneyin!"  
 InvalidLicenseCodeType: "Sağlanan lisans kodu formatı geçersiz, lütfen kontrol edip tekrar deneyin!"  

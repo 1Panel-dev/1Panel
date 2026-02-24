@@ -416,7 +416,7 @@ func (a AppService) Install(req request.AppInstallCreate, executeScript bool) (a
 		}
 	} else {
 		if appDetail.DockerCompose == "" {
-			dockerComposeUrl := fmt.Sprintf("%s/%s/1panel/%s/%s/docker-compose.yml", global.CONF.RemoteURL.AppRepo, global.CONF.Base.Mode, app.Key, appDetail.Version)
+			dockerComposeUrl := fmt.Sprintf("%s/%s/1panel/%s/%s/docker-compose.yml", global.AppRepoURL(), global.CONF.Base.Mode, app.Key, appDetail.Version)
 			_, composeRes, err = req_helper.HandleRequest(dockerComposeUrl, http.MethodGet, constant.TimeOut20s)
 			if err != nil {
 				return
@@ -817,7 +817,7 @@ func (a AppService) GetAppUpdate() (*response.AppUpdateRes, error) {
 		return res, nil
 	}
 
-	versionUrl := fmt.Sprintf("%s/%s/1panel.json.version.txt", global.CONF.RemoteURL.AppRepo, global.CONF.Base.Mode)
+	versionUrl := fmt.Sprintf("%s/%s/1panel.json.version.txt", global.AppRepoURL(), global.CONF.Base.Mode)
 	_, versionRes, err := req_helper.HandleRequest(versionUrl, http.MethodGet, constant.TimeOut20s)
 	if err != nil {
 		return nil, err
@@ -889,7 +889,7 @@ func getAppFromRepo(downloadPath string) error {
 
 func getAppList() (*dto.AppList, error) {
 	list := &dto.AppList{}
-	if err := getAppFromRepo(fmt.Sprintf("%s/%s/1panel.json.zip", global.CONF.RemoteURL.AppRepo, global.CONF.Base.Mode)); err != nil {
+	if err := getAppFromRepo(fmt.Sprintf("%s/%s/1panel.json.zip", global.AppRepoURL(), global.CONF.Base.Mode)); err != nil {
 		return nil, err
 	}
 	listFile := filepath.Join(global.Dir.ResourceDir, "1panel.json")

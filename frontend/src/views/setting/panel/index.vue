@@ -201,6 +201,18 @@
                                     {{ $t('commons.button.set') }}
                                 </el-button>
                             </el-form-item>
+
+                            <el-form-item :label="$t('setting.region')" prop="edition">
+                                <el-radio-group @change="onSave('Edition', form.edition)" v-model="form.edition">
+                                    <el-radio value="cn">
+                                        <span>{{ $t('setting.cn') }}</span>
+                                    </el-radio>
+                                    <el-radio value="intl">
+                                        <span>{{ $t('setting.intl') }}</span>
+                                    </el-radio>
+                                </el-radio-group>
+                                <span class="input-help">{{ $t('setting.regionHelper') }}</span>
+                            </el-form-item>
                         </el-col>
                     </el-row>
                 </el-form>
@@ -278,6 +290,7 @@ const form = reactive({
     themeColor: {} as ThemeColor,
     menuTabs: '',
     language: '',
+    edition: '',
     complexityVerification: '',
     developerMode: '',
     systemIP: '',
@@ -341,6 +354,7 @@ const search = async () => {
     form.menuTabs = res.data.menuTabs;
     form.panelName = res.data.panelName;
     form.language = res.data.language;
+    form.edition = res.data.edition;
     form.sessionTimeout = Number(res.data.sessionTimeout);
 
     form.proxyUrl = res.data.proxyUrl;
@@ -511,15 +525,20 @@ const onSave = async (key: string, val: any) => {
     };
     try {
         await updateSetting(param);
-        if (key === 'Language') {
-            await globalStore.updateLanguage(val);
-            location.reload();
-        }
-        if (key === 'Theme') {
-            handleThemeChange(val);
-        }
-        if (key === 'MenuTabs') {
-            globalStore.setOpenMenuTabs(val === 'Enable');
+        switch (key) {
+            case 'Theme':
+                handleThemeChange(val);
+                break;
+            case 'MenuTabs':
+                globalStore.setOpenMenuTabs(val === 'Enable');
+                break;
+            case 'Language':
+                await globalStore.updateLanguage(val);
+                location.reload();
+                break;
+            case 'Edition':
+                globalStore.isIntl = val === 'intl';
+                break;
         }
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         search();

@@ -1814,6 +1814,11 @@ const message = {
         light: 'Terang',
         auto: 'Ikut Sistem',
         language: 'Bahasa',
+        region: 'Wilayah operasi',
+        regionHelper:
+            'Wilayah operasi yang berbeza mempunyai alamat muat turun dan pautan dokumentasi berbeza untuk gedung aplikasi serta pustaka skrip.',
+        cn: 'Tanah Besar China',
+        intl: 'Antarabangsa',
         languageHelper:
             'Secara lalai, ia mengikuti bahasa penyemak imbas. Parameter ini hanya berkuat kuasa pada penyemak imbas semasa',
         sessionTimeout: 'Tempoh tamat sesi',

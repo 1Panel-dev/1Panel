@@ -211,7 +211,7 @@ func (b *BaseApi) GetLoginSetting(c *gin.Context) {
 	needCaptcha := global.IPTracker.NeedCaptcha(ip)
 	res := &dto.LoginSetting{
 		IsDemo:      global.CONF.Base.IsDemo,
-		IsIntl:      global.CONF.Base.IsIntl,
+		IsIntl:      global.CONF.Base.Edition == "intl",
 		IsFxplay:    global.CONF.Base.IsFxplay,
 		IsOffLine:   global.CONF.Base.IsOffLine,
 		Language:    settingInfo.Language,

@@ -42,6 +42,7 @@ func initGlobalData() {
 		_ = settingRepo.Update("SystemVersion", node.Version)
 	}
 	global.CONF.Base.Version = node.Version
+	global.CONF.Base.Edition = node.Edition
 	global.CONF.Base.EncryptKey, _ = settingRepo.GetValueByKey("EncryptKey")
 }
 

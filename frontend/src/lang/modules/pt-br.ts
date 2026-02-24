@@ -1803,6 +1803,11 @@ const message = {
         light: 'Claro',
         auto: 'Seguir o sistema',
         language: 'Idioma',
+        region: 'Região de operação',
+        regionHelper:
+            'Regiões de operação diferentes usam endereços de download e links de documentação distintos para a loja de aplicativos e a biblioteca de scripts.',
+        cn: 'China continental',
+        intl: 'Internacional',
         languageHelper: 'Por padrão, segue o idioma do navegador. Este parâmetro tem efeito apenas no navegador atual',
         sessionTimeout: 'Tempo limite de sessão',
         sessionTimeoutError: 'O tempo mínimo de sessão é de 300 segundos',

@@ -201,7 +201,7 @@ func (u *ScriptService) Sync(req dto.OperateByTaskID) error {
 	}
 
 	syncTask.AddSubTask(task.GetTaskName(i18n.GetMsgByKey("RemoteScriptLibrary"), task.TaskSync, task.TaskScopeScript), func(t *task.Task) (err error) {
-		versionUrl := fmt.Sprintf("%s/scripts/version.txt", global.CONF.RemoteURL.ResourceURL)
+		versionUrl := fmt.Sprintf("%s/scripts/version.txt", global.ResourceURL())
 		_, versionRes, err := req_helper.HandleRequestWithProxy(versionUrl, http.MethodGet, constant.TimeOut20s)
 		if err != nil {
 			return fmt.Errorf("load scripts version from remote failed, err: %v", err)
@@ -216,7 +216,7 @@ func (u *ScriptService) Sync(req dto.OperateByTaskID) error {
 			return nil
 		}
 
-		dataUrl := fmt.Sprintf("%s/scripts/data.yaml", global.CONF.RemoteURL.ResourceURL)
+		dataUrl := fmt.Sprintf("%s/scripts/data.yaml", global.ResourceURL())
 		_, dataRes, err := req_helper.HandleRequestWithProxy(dataUrl, http.MethodGet, constant.TimeOut20s)
 		syncTask.LogWithStatus(i18n.GetMsgByKey("DownloadData"), err)
 		if err != nil {
@@ -232,7 +232,7 @@ func (u *ScriptService) Sync(req dto.OperateByTaskID) error {
 		if _, err := os.Stat(tmpDir); err != nil {
 			_ = os.MkdirAll(tmpDir, 0755)
 		}
-		scriptsUrl := fmt.Sprintf("%s/scripts/scripts.tar.gz", global.CONF.RemoteURL.ResourceURL)
+		scriptsUrl := fmt.Sprintf("%s/scripts/scripts.tar.gz", global.ResourceURL())
 		err = files.DownloadFileWithProxyStream(scriptsUrl, tmpDir+"/scripts.tar.gz")
 		syncTask.LogWithStatus(i18n.GetMsgByKey("DownloadPackage"), err)
 		if err != nil {

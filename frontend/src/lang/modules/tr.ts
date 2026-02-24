@@ -1829,6 +1829,11 @@ const message = {
         light: 'Açık',
         auto: 'Sistemi takip et',
         language: 'Dil',
+        region: 'Çalışma bölgesi',
+        regionHelper:
+            'Farklı çalışma bölgelerinde uygulama mağazası ve betik kütüphanesi için indirme adresleri ile ilgili dokümantasyon bağlantıları farklı olabilir.',
+        cn: 'Çin anakarası',
+        intl: 'Uluslararası',
         languageHelper:
             'Varsayılan olarak tarayıcı dilini takip eder. Bu parametre yalnızca geçerli tarayıcıda etkilidir',
         sessionTimeout: 'Oturum zaman aşımı',

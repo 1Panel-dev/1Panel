@@ -86,6 +86,7 @@ ErrNoSuchNode: "Información del nodo no encontrada, ¡verifique e intente de nu
 ErrNodeUnbind: "Este nodo no está dentro del rango de vinculación de la licencia, ¡verifique e intente de nuevo!"
 ErrNodeBind: "Este nodo ya está vinculado a una licencia, ¡verifique e intente de nuevo!"
 ErrNodeLocalRollback: "El nodo principal no admite la reversión directa. ¡Ejecute manualmente el comando '1pctl restore' para revertir!"
+ErrIntlLicense: "La versión actual aún no admite importar licencias de la edición internacional. ¡Próximamente!"
 InvalidRequestBodyType: "Formato del cuerpo de la solicitud no válido, por favor revisa y asegúrate de que el contenido cumpla con el formato requerido antes de reintentar."
 InvalidLicenseCodeType: "Formato de código de licencia no válido, por favor revisa e inténtalo de nuevo."
 LicenseNotFoundType: "Licencia no encontrada, no existe ningún registro coincidente en el sistema para la licencia proporcionada. Por favor revisa e inténtalo de nuevo."

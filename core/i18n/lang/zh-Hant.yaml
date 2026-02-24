@@ -80,6 +80,7 @@ ErrNoSuchNode: "未能找到該節點資訊，請檢查後重試！"
 ErrNodeUnbind: "檢測到該節點未在許可證綁定範圍內，請檢查後重試！"
 ErrNodeBind: "檢測到該節點已綁定許可證，請檢查後重試！"
 ErrNodeLocalRollback: "主節點暫不支援直接回滾，請手動執行「1pctl restore」指令回滾！"
+ErrIntlLicense: "當前版本暫不支援匯入國際版許可證，敬請期待！"
 
 InvalidRequestBodyType: "請求體格式錯誤，請檢查請求內容是否符合格式要求後重試！"
 InvalidLicenseCodeType: "提供的許可證格式錯誤，請檢查後重試！"

@@ -40,3 +40,25 @@ var (
 
 	TaskCtxMap = make(map[string]context.CancelFunc)
 )
+
+func RepoURL() string {
+	if CONF.Base.Edition == "cn" {
+		return "https://resource.fit2cloud.com/1panel/package/v2"
+	} else {
+		return "https://resource.1panel.pro"
+	}
+}
+func ResourceURL() string {
+	if CONF.Base.Edition == "cn" {
+		return "https://resource.fit2cloud.com/1panel/resource/v2"
+	} else {
+		return "https://resource.1panel.pro"
+	}
+}
+func AppRepoURL() string {
+	if CONF.Base.Edition == "cn" {
+		return "https://apps-assets.fit2cloud.com"
+	} else {
+		return "https://apps.1panel.pro"
+	}
+}

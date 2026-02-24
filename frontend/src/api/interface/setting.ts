@@ -17,6 +17,7 @@ export namespace Setting {
         ntpSite: string;
 
         panelName: string;
+        edition: string;
         theme: string;
         menuTabs: string;
         language: string;

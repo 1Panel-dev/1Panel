@@ -86,6 +86,7 @@ ErrNoSuchNode: "Node information not found, please check and retry!"
 ErrNodeUnbind: "This node is not within the license binding range, please check and retry!"
 ErrNodeBind: "This node is already bound to a license, please check and retry!"
 ErrNodeLocalRollback: "The primary node does not support direct rollback. Please manually execute the '1pctl restore' command to rollback!"
+ErrIntlLicense: "The current version does not support importing international licenses yet. Stay tuned!"
 
 InvalidRequestBodyType: "Invalid request body format, please check and ensure the content meets the required format before retrying!"  
 InvalidLicenseCodeType: "Invalid license code format provided, please check and try again!"  

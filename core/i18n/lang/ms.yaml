@@ -75,6 +75,7 @@ ErrNoSuchNode: "Maklumat nod tidak ditemui, sila semak dan cuba lagi!"
 ErrNodeUnbind: "Nod di luar skop lesen dikesan, sila semak dan cuba lagi!"
 ErrNodeBind: "Nod ini telah diikat dengan lesen, sila semak dan cuba lagi!"
 ErrNodeLocalRollback: "Nod utama tidak menyokong rollback secara langsung. Sila laksanakan arahan '1pctl restore' secara manual untuk rollback!"
+ErrIntlLicense: "Versi semasa belum menyokong import lesen edisi antarabangsa. Nantikan!"
 
 InvalidRequestBodyType: "Format badan permintaan tidak sah, sila periksa dan pastikan kandungan memenuhi format yang diperlukan sebelum mencuba semula!"  
 InvalidLicenseCodeType: "Format kod lesen yang diberikan tidak sah, sila periksa dan cuba lagi!"  

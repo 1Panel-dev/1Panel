@@ -4,17 +4,15 @@ package xpack
 
 import (
 	"crypto/tls"
-	"fmt"
 	"net"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/global"
-	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
+	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/gin-gonic/gin"
 )
 
@@ -26,23 +24,12 @@ func StartClam(startClam *model.Clam, isUpdate bool) (int, error) {
 
 func LoadNodeInfo(isBase bool) (model.NodeInfo, error) {
 	var info model.NodeInfo
-	info.BaseDir = loadParams("BASE_DIR")
-	info.Version = loadParams("ORIGINAL_VERSION")
+	info.BaseDir = common.LoadParams("BASE_DIR")
+	info.Version = common.LoadParams("ORIGINAL_VERSION")
+	info.Edition = common.LoadParamsWithoutPanic("EDITION")
 	info.Scope = "master"
 	global.IsMaster = true
 	return info, nil
-}
-
-func loadParams(param string) string {
-	stdout, err := cmd.RunDefaultWithStdoutBashCf("grep '^%s=' /usr/local/bin/1pctl | cut -d'=' -f2", param)
-	if err != nil {
-		panic(err)
-	}
-	info := strings.ReplaceAll(stdout, "\n", "")
-	if len(info) == 0 || info == `""` {
-		panic(fmt.Sprintf("error `%s` find in /usr/local/bin/1pctl", param))
-	}
-	return info
 }
 
 func GetImagePrefix() string {

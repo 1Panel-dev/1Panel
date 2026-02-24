@@ -61,8 +61,6 @@ type ISettingService interface {
 	UpdateSystemSSL() error
 	GenerateRSAKey() error
 
-	GetLoginSetting() (*dto.SystemSetting, error)
-
 	UpdateAppstoreConfig(req dto.AppstoreUpdate) error
 	GetAppstoreConfig() (*dto.AppstoreConfig, error)
 	DefaultMenu() error
@@ -91,6 +89,10 @@ func (u *SettingService) GetSettingInfo() (*dto.SettingInfo, error) {
 	}
 	if err := json.Unmarshal(arr, &info); err != nil {
 		return nil, err
+	}
+	if info.Edition == "" {
+		info.Edition = "cn"
+		_ = settingRepo.UpdateOrCreate("Edition", info.Edition)
 	}
 	if info.ProxyPasswdKeep != constant.StatusEnable {
 		info.ProxyPasswd = ""
@@ -168,6 +170,8 @@ func (u *SettingService) Update(key, value string) error {
 		} else {
 			global.Cron.Remove(global.ScriptSyncJobID)
 		}
+	case "Edition":
+		global.CONF.Base.Edition = value
 	}
 
 	return nil
@@ -683,19 +687,6 @@ func (u *SettingService) GenerateRSAKey() error {
 		return err
 	}
 	return nil
-}
-
-func (u *SettingService) GetLoginSetting() (*dto.SystemSetting, error) {
-	settingInfo, err := u.GetSettingInfo()
-	if err != nil {
-		return nil, err
-	}
-	res := &dto.SystemSetting{
-		Language: settingInfo.Language,
-		IsDemo:   global.CONF.Base.IsDemo,
-		IsIntl:   global.CONF.Base.IsIntl,
-	}
-	return res, nil
 }
 
 func (u *SettingService) UpdateAppstoreConfig(req dto.AppstoreUpdate) error {
