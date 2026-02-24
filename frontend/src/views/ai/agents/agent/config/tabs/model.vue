@@ -15,6 +15,9 @@
             <el-select v-else v-model="form.model" filterable>
                 <el-option v-for="item in modelOptions" :key="item.id" :label="item.name" :value="item.id" />
             </el-select>
+            <span class="input-help" v-if="provdier == 'custom'">
+                {{ $t('aiTools.agents.customModelHelper') }}
+            </span>
         </el-form-item>
         <el-form-item>
             <el-button type="primary" :loading="saving" @click="saveModel">
@@ -44,6 +47,7 @@ const agentId = ref(0);
 const providerModels = ref<Record<string, AI.ProviderModelInfo[]>>({});
 const accountOptions = ref<AI.AgentAccountItem[]>([]);
 const modelOptions = ref<AI.ProviderModelInfo[]>([]);
+const provdier = ref('');
 
 const form = reactive({
     accountId: undefined as unknown as number,
@@ -89,6 +93,13 @@ const handleAccountChange = () => {
         form.model = '';
         return;
     }
+    provdier.value = selected.provider;
+    if (selected.provider === 'custom') {
+        form.manualModel = true;
+        form.model = selected.model ? `custom/${selected.model}` : form.model;
+        modelOptions.value = [];
+        return;
+    }
     setModelsByProvider(selected.provider);
     if (!form.manualModel && (!form.model || !form.model.startsWith(`${selected.provider}/`))) {
         form.model = modelOptions.value.length > 0 ? modelOptions.value[0].id : '';
@@ -96,10 +107,14 @@ const handleAccountChange = () => {
 };
 
 const handleManualModelChange = (val: unknown) => {
+    const selected = accountOptions.value.find((item) => item.id === form.accountId);
+    if (selected?.provider === 'custom' && !Boolean(val)) {
+        form.manualModel = true;
+        return;
+    }
     if (Boolean(val)) {
         return;
     }
-    const selected = accountOptions.value.find((item) => item.id === form.accountId);
     if (!selected) {
         form.model = '';
         return;
@@ -126,11 +141,14 @@ const load = async (agent: AI.AgentItem) => {
         form.accountId = currentAccount.id;
         setModelsByProvider(currentAccount.provider);
         const inProviderModels = modelOptions.value.some((item) => item.id === agent.model);
-        form.manualModel = !inProviderModels;
+        form.manualModel = currentAccount.provider === 'custom' || !inProviderModels;
         if (agent.model && (form.manualModel || agent.model.startsWith(`${currentAccount.provider}/`))) {
             form.model = agent.model;
         } else {
             form.model = modelOptions.value.length > 0 ? modelOptions.value[0].id : '';
+        }
+        if (currentAccount.provider === 'custom' && currentAccount.model && !form.model) {
+            form.model = `custom/${currentAccount.model}`;
         }
     } finally {
         loading.value = false;

@@ -16,9 +16,25 @@
             </el-form-item>
             <el-form-item :label="$t('aiTools.agents.apiKey')" prop="apiKey">
                 <el-input v-model="form.apiKey" type="password" show-password />
+                <span class="input-help">{{ $t('aiTools.agents.customProviderHelper') }}</span>
             </el-form-item>
             <el-form-item :label="$t('aiTools.agents.baseUrl')" prop="baseURL">
-                <el-input v-model="form.baseURL" :disabled="form.provider !== 'ollama'" />
+                <el-input v-model="form.baseURL" :disabled="form.provider !== 'ollama' && form.provider !== 'custom'" />
+            </el-form-item>
+            <el-form-item :label="$t('aiTools.model.model')" prop="model" v-if="form.provider === 'custom'">
+                <el-input v-model="form.model" placeholder="gpt-4o-mini" />
+            </el-form-item>
+            <el-form-item :label="'API ' + $t('commons.table.type')" prop="apiType" v-if="form.provider === 'custom'">
+                <el-select v-model="form.apiType">
+                    <el-option label="openai-completions" value="openai-completions" />
+                    <el-option label="openai-responses" value="openai-responses" />
+                </el-select>
+            </el-form-item>
+            <el-form-item label="Max Tokens" prop="maxTokens" v-if="form.provider === 'custom'">
+                <el-input-number v-model="form.maxTokens" :min="1" :max="2000000" />
+            </el-form-item>
+            <el-form-item label="Context Window" prop="contextWindow" v-if="form.provider === 'custom'">
+                <el-input-number v-model="form.contextWindow" :min="1" :max="2000000" />
             </el-form-item>
             <el-form-item :label="$t('website.remark')" prop="remark">
                 <el-input v-model="form.remark" />
@@ -45,6 +61,7 @@ import { FormInstance } from 'element-plus';
 import { Rules } from '@/global/form-rules';
 import { createAgentAccount, getAgentProviders, updateAgentAccount } from '@/api/modules/ai';
 import i18n from '@/lang';
+import { getAgentProviderDisplayName } from '@/utils/agent';
 
 const emit = defineEmits(['search']);
 
@@ -59,6 +76,10 @@ const form = reactive({
     provider: '',
     name: '',
     baseURL: '',
+    model: '',
+    apiType: 'openai-completions',
+    maxTokens: 8192,
+    contextWindow: 128000,
     apiKey: '',
     remark: '',
     syncAgents: false,
@@ -73,6 +94,8 @@ const rules = reactive({
     name: [Rules.requiredInput],
     apiKey: [Rules.requiredInput],
     baseURL: [Rules.requiredInput],
+    model: [Rules.requiredInput],
+    apiType: [Rules.requiredSelect],
 });
 
 const submit = async () => {
@@ -88,6 +111,10 @@ const submit = async () => {
                 name: form.name,
                 baseURL: form.baseURL,
                 apiKey: form.apiKey,
+                model: form.model,
+                apiType: form.apiType,
+                maxTokens: form.maxTokens,
+                contextWindow: form.contextWindow,
                 remark: form.remark,
                 syncAgents: form.syncAgents,
             });
@@ -97,6 +124,10 @@ const submit = async () => {
                 name: form.name,
                 baseURL: form.baseURL,
                 apiKey: form.apiKey,
+                model: form.model,
+                apiType: form.apiType,
+                maxTokens: form.maxTokens,
+                contextWindow: form.contextWindow,
                 remark: form.remark,
             });
         }
@@ -111,6 +142,10 @@ const handleClose = () => {
     formRef.value?.resetFields();
     loading.value = false;
     form.id = 0;
+    form.model = '';
+    form.apiType = 'openai-completions';
+    form.maxTokens = 8192;
+    form.contextWindow = 128000;
     form.syncAgents = false;
 };
 
@@ -120,6 +155,10 @@ interface OpenParams {
     name?: string;
     baseURL?: string;
     apiKey?: string;
+    model?: string;
+    apiType?: string;
+    maxTokens?: number;
+    contextWindow?: number;
     remark?: string;
 }
 
@@ -132,6 +171,10 @@ const openDrawer = async (params?: OpenParams) => {
         form.name = params.name || '';
         form.baseURL = params.baseURL || '';
         form.apiKey = params.apiKey || '';
+        form.model = params.model || '';
+        form.apiType = params.apiType || 'openai-completions';
+        form.maxTokens = params.maxTokens || 8192;
+        form.contextWindow = params.contextWindow || 128000;
         form.remark = params.remark || '';
         form.syncAgents = false;
         return;
@@ -140,6 +183,10 @@ const openDrawer = async (params?: OpenParams) => {
     form.name = '';
     form.baseURL = '';
     form.apiKey = '';
+    form.model = '';
+    form.apiType = 'openai-completions';
+    form.maxTokens = 8192;
+    form.contextWindow = 128000;
     form.remark = '';
     form.syncAgents = false;
     if (providerOptions.value.length === 0) {
@@ -158,7 +205,7 @@ const loadProviders = async () => {
     const data = res.data || [];
     providerOptions.value = data.map((item) => ({
         value: item.provider,
-        label: item.displayName || item.provider,
+        label: getAgentProviderDisplayName(item.provider, item.displayName),
     }));
     providerBaseURL.value = data.reduce((acc, item) => {
         acc[item.provider] = item.baseUrl || '';
@@ -171,6 +218,14 @@ const loadProviders = async () => {
 };
 
 const handleProviderChange = () => {
+    if (form.provider === 'custom') {
+        form.baseURL = '';
+        form.apiType = form.apiType || 'openai-completions';
+        form.maxTokens = form.maxTokens || 8192;
+        form.contextWindow = form.contextWindow || 128000;
+        form.model = form.model || '';
+        return;
+    }
     if (form.provider !== 'ollama') {
         form.baseURL = providerBaseURL.value[form.provider] || '';
     } else {

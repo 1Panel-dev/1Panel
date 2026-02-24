@@ -703,6 +703,8 @@ const message = {
             feishuSaveSuccess: 'Saved successfully',
             pairingCodeRequired: 'Please enter pairing code',
             pairingApproveSuccess: 'Pairing approved successfully',
+            customModelHelper: 'Для пользовательской учетной записи модели имя модели должно начинаться с custom/',
+            customProviderHelper: 'Для пользовательского провайдера модели доступность учетной записи не проверяется',
         },
         model: {
             model: 'Модель',

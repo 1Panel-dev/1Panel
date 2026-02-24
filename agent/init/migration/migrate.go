@@ -65,6 +65,7 @@ func InitAgentDB() {
 		migrations.AddWebsiteAcmeAccountColumn,
 		migrations.AddAgentTables,
 		migrations.MigrateOpenclawAgents,
+		migrations.AddAgentCustomModelFields,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

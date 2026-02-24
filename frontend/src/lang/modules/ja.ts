@@ -698,6 +698,8 @@ const message = {
             feishuSaveSuccess: 'Saved successfully',
             pairingCodeRequired: 'Please enter pairing code',
             pairingApproveSuccess: 'Pairing approved successfully',
+            customModelHelper: 'カスタムモデルアカウントでは、モデル名は必ず custom/ で始めてください',
+            customProviderHelper: 'カスタムモデルプロバイダーでは、アカウントの有効性を検証しません',
         },
         model: {
             model: 'モデル',
