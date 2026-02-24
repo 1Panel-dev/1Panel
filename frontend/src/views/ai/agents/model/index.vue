@@ -14,7 +14,7 @@
                     <el-table-column :label="$t('commons.table.name')" prop="name" min-width="200" />
                     <el-table-column :label="$t('aiTools.agents.provider')" prop="provider" width="120">
                         <template #default="{ row }">
-                            {{ row.providerName || row.provider }}
+                            {{ getAgentProviderDisplayName(row.provider, row.providerName) }}
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('aiTools.agents.baseUrl')" prop="baseUrl" min-width="200" />
@@ -53,6 +53,7 @@ import AddDialog from '@/views/ai/agents/model/add/index.vue';
 import { ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
 import { dateFormat } from '@/utils/util';
+import { getAgentProviderDisplayName } from '@/utils/agent';
 
 const items = ref<AI.AgentAccountItem[]>([]);
 const addRef = ref();
@@ -103,6 +104,10 @@ const onEdit = (row: AI.AgentAccountItem) => {
             name: row.name,
             baseURL: row.baseUrl,
             apiKey: row.apiKey,
+            model: row.model,
+            apiType: row.apiType,
+            maxTokens: row.maxTokens,
+            contextWindow: row.contextWindow,
             remark: row.remark,
         });
     }

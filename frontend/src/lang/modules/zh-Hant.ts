@@ -685,6 +685,8 @@ const message = {
             feishuSaveSuccess: '保存成功',
             pairingCodeRequired: '請輸入配對碼',
             pairingApproveSuccess: '配對成功',
+            customModelHelper: '自訂模型帳號，模型需固定以 custom/ 開頭',
+            customProviderHelper: '自訂模型供應商不驗證帳號是否可用',
         },
         model: {
             model: '模型',

@@ -44,9 +44,13 @@
                 </el-form-item>
                 <el-form-item :label="$t('aiTools.model.model')" prop="model">
                     <el-input v-if="manualModel" v-model="form.model" />
+
                     <el-select v-else v-model="form.model" filterable @change="handleModelChange">
                         <el-option v-for="item in filteredModels" :key="item.id" :label="item.name" :value="item.id" />
                     </el-select>
+                    <span class="input-help" v-if="form.provider == 'custom'">
+                        {{ $t('aiTools.agents.customModelHelper') }}
+                    </span>
                 </el-form-item>
                 <el-form-item :label="$t('aiTools.agents.account')" prop="accountId">
                     <el-select v-model="form.accountId" @change="handleAccountChange">
@@ -95,6 +99,7 @@ import { createAgent, getAgentProviders, pageAgentAccounts } from '@/api/modules
 import { AI } from '@/api/interface/ai';
 import { getAppByKey, getAppDetail } from '@/api/modules/app';
 import { getRandomStr, newUUID } from '@/utils/util';
+import { getAgentProviderDisplayName } from '@/utils/agent';
 import { App } from '@/api/interface/app';
 import AdvancedSetting from '@/components/advanced-setting/index.vue';
 import AccountAddDialog from '@/views/ai/agents/model/add/index.vue';
@@ -120,6 +125,9 @@ const form = reactive({
     provider: 'deepseek',
     accountId: undefined as unknown as number,
     model: '',
+    apiType: 'openai-completions',
+    maxTokens: 8192,
+    contextWindow: 128000,
     apiKey: '',
     baseURL: '',
     token: '',
@@ -175,7 +183,7 @@ const loadProviders = async () => {
     const data = res.data || [];
     providerOptions.value = data.map((item) => ({
         value: item.provider,
-        label: item.displayName || item.provider,
+        label: getAgentProviderDisplayName(item.provider, item.displayName),
     }));
     providerModels.value = data.reduce((acc, item) => {
         acc[item.provider] = item.models || [];
@@ -246,6 +254,12 @@ const handleAccountChange = () => {
     if (selected) {
         form.baseURL = selected.baseUrl || '';
         form.apiKey = selected.apiKey || '';
+        form.apiType = selected.apiType || 'openai-completions';
+        form.maxTokens = selected.maxTokens || 8192;
+        form.contextWindow = selected.contextWindow || 128000;
+        if (selected.provider === 'custom' && selected.model && !manualModel.value) {
+            form.model = `custom/${selected.model}`;
+        }
     }
     setDefaultModel();
 };
@@ -257,6 +271,13 @@ const setDefaultModel = () => {
     const models = filteredModels.value;
     if (models.length > 0 && !form.model) {
         form.model = models[0].id;
+        return;
+    }
+    if (form.provider === 'custom') {
+        const selected = accountOptions.value.find((item) => item.id === form.accountId);
+        if (selected?.model && !form.model) {
+            form.model = `custom/${selected.model}`;
+        }
     }
 };
 
@@ -276,6 +297,9 @@ const submit = async () => {
         bridgePort: form.bridgePort,
         provider: form.provider,
         model: form.model,
+        apiType: form.apiType,
+        maxTokens: form.maxTokens,
+        contextWindow: form.contextWindow,
         accountId: form.accountId,
         apiKey: form.apiKey,
         baseURL: form.baseURL,

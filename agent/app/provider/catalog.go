@@ -1,6 +1,8 @@
 package provider
 
-import "strings"
+import (
+	"strings"
+)
 
 type Model struct {
 	ID   string
@@ -21,13 +23,13 @@ var catalog = map[string]Meta{
 	"ollama": {
 		Key:         "ollama",
 		DisplayName: "Ollama",
-		Sort:        1,
+		Sort:        10,
 		Enabled:     true,
 	},
 	"deepseek": {
 		Key:            "deepseek",
 		DisplayName:    "DeepSeek",
-		Sort:           2,
+		Sort:           20,
 		DefaultBaseURL: "https://api.deepseek.com/v1",
 		EnvKey:         "DEEPSEEK_API_KEY",
 		Enabled:        true,
@@ -37,10 +39,19 @@ var catalog = map[string]Meta{
 			{ID: "deepseek/deepseek-r1:1.5b", Name: "DeepSeek R1 1.5B"},
 		},
 	},
+	"custom": {
+		Key:            "custom",
+		DisplayName:    "Custom",
+		Sort:           30,
+		DefaultBaseURL: "",
+		EnvKey:         "CUSTOM_API_KEY",
+		Enabled:        true,
+		Models:         []Model{},
+	},
 	"openai": {
 		Key:            "openai",
 		DisplayName:    "OpenAI",
-		Sort:           3,
+		Sort:           40,
 		DefaultBaseURL: "https://api.openai.com/v1",
 		EnvKey:         "OPENAI_API_KEY",
 		Enabled:        true,
@@ -56,7 +67,7 @@ var catalog = map[string]Meta{
 	"anthropic": {
 		Key:            "anthropic",
 		DisplayName:    "Anthropic",
-		Sort:           4,
+		Sort:           50,
 		DefaultBaseURL: "https://api.anthropic.com",
 		EnvKey:         "ANTHROPIC_API_KEY",
 		Enabled:        true,
@@ -71,7 +82,7 @@ var catalog = map[string]Meta{
 	"gemini": {
 		Key:            "gemini",
 		DisplayName:    "Gemini",
-		Sort:           5,
+		Sort:           60,
 		DefaultBaseURL: "https://generativelanguage.googleapis.com",
 		EnvKey:         "GEMINI_API_KEY",
 		Enabled:        true,
@@ -87,7 +98,7 @@ var catalog = map[string]Meta{
 	"minimax": {
 		Key:            "minimax",
 		DisplayName:    "MiniMax (CN)",
-		Sort:           6,
+		Sort:           70,
 		DefaultBaseURL: "https://api.minimaxi.com/anthropic",
 		EnvKey:         "MINIMAX_API_KEY",
 		Enabled:        true,
@@ -99,7 +110,7 @@ var catalog = map[string]Meta{
 	"moonshot": {
 		Key:            "moonshot",
 		DisplayName:    "Moonshot (Global)",
-		Sort:           7,
+		Sort:           80,
 		DefaultBaseURL: "https://api.moonshot.ai/v1",
 		EnvKey:         "MOONSHOT_API_KEY",
 		Enabled:        true,
@@ -112,7 +123,7 @@ var catalog = map[string]Meta{
 	"kimi": {
 		Key:            "kimi",
 		DisplayName:    "Kimi (CN)",
-		Sort:           8,
+		Sort:           90,
 		DefaultBaseURL: "https://api.moonshot.cn/v1",
 		EnvKey:         "KIMI_API_KEY",
 		Enabled:        true,
@@ -125,7 +136,7 @@ var catalog = map[string]Meta{
 	"kimi-coding": {
 		Key:            "kimi-coding",
 		DisplayName:    "Kimi Coding",
-		Sort:           9,
+		Sort:           100,
 		DefaultBaseURL: "https://api.moonshot.cn/anthropic/v1",
 		EnvKey:         "KIMI_API_KEY",
 		Enabled:        true,
@@ -136,7 +147,7 @@ var catalog = map[string]Meta{
 	"qwen": {
 		Key:            "qwen",
 		DisplayName:    "Qwen",
-		Sort:           10,
+		Sort:           110,
 		DefaultBaseURL: "https://dashscope.aliyuncs.com/compatible-mode/v1",
 		EnvKey:         "QWEN_API_KEY",
 		Enabled:        false,

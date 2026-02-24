@@ -695,6 +695,8 @@ const message = {
             feishuSaveSuccess: 'Saved successfully',
             pairingCodeRequired: 'Please enter pairing code',
             pairingApproveSuccess: 'Pairing approved successfully',
+            customModelHelper: '사용자 정의 모델 계정의 모델명은 반드시 custom/ 로 시작해야 합니다',
+            customProviderHelper: '사용자 정의 모델 공급자는 계정 사용 가능 여부를 검증하지 않습니다',
         },
         model: {
             model: '모델',

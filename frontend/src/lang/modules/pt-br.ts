@@ -707,6 +707,8 @@ const message = {
             feishuSaveSuccess: 'Saved successfully',
             pairingCodeRequired: 'Please enter pairing code',
             pairingApproveSuccess: 'Pairing approved successfully',
+            customModelHelper: 'Conta de modelo personalizada: o nome do modelo deve começar com custom/',
+            customProviderHelper: 'Provedores de modelo personalizados não validam se a conta está disponível',
         },
         model: {
             model: 'Modelo',

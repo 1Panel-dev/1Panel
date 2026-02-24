@@ -81,6 +81,7 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 	if provider != "ollama" && strings.TrimSpace(account.APIKey) == "" {
 		return nil, buserr.New("ErrAgentApiKeyRequired")
 	}
+	apiType, maxTokens, contextWindow := resolveRuntimeParams(provider, account.APIType, account.MaxTokens, account.ContextWindow)
 	if err := checkPortExist(req.WebUIPort); err != nil {
 		return nil, err
 	}
@@ -109,6 +110,9 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 	params := map[string]interface{}{
 		"PROVIDER":               provider,
 		"MODEL":                  req.Model,
+		"API_TYPE":               apiType,
+		"MAX_TOKENS":             maxTokens,
+		"CONTEXT_WINDOW":         contextWindow,
 		"BASE_URL":               baseURL,
 		"API_KEY":                account.APIKey,
 		"OPENCLAW_GATEWAY_TOKEN": token,
@@ -147,22 +151,25 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 	}
 	configPath := path.Join(appInstall.GetPath(), "data", "conf", "openclaw.json")
 	agent := &model.Agent{
-		Name:         req.Name,
-		Provider:     provider,
-		Model:        req.Model,
-		BaseURL:      baseURL,
-		APIKey:       account.APIKey,
-		Token:        token,
-		Status:       appInstall.Status,
-		Message:      appInstall.Message,
-		AppInstallID: appInstall.ID,
-		AccountID:    account.ID,
-		ConfigPath:   configPath,
+		Name:          req.Name,
+		Provider:      provider,
+		Model:         req.Model,
+		APIType:       apiType,
+		MaxTokens:     maxTokens,
+		ContextWindow: contextWindow,
+		BaseURL:       baseURL,
+		APIKey:        account.APIKey,
+		Token:         token,
+		Status:        appInstall.Status,
+		Message:       appInstall.Message,
+		AppInstallID:  appInstall.ID,
+		AccountID:     account.ID,
+		ConfigPath:    configPath,
 	}
 	if err := agentRepo.Create(agent); err != nil {
 		return nil, err
 	}
-	go a.writeConfigWithRetry(appInstall, provider, req.Model, baseURL, req.APIKey, token, agent.ID)
+	go a.writeConfigWithRetry(appInstall, provider, req.Model, apiType, maxTokens, contextWindow, baseURL, account.APIKey, token, agent.ID)
 
 	item := buildAgentItem(agent, appInstall, nil)
 	return &item, nil
@@ -287,6 +294,7 @@ func (a AgentService) UpdateModelConfig(req dto.AgentModelConfigUpdateReq) error
 	if provider != "ollama" && strings.TrimSpace(account.APIKey) == "" {
 		return buserr.New("ErrAgentApiKeyRequired")
 	}
+	apiType, maxTokens, contextWindow := resolveRuntimeParams(provider, account.APIType, account.MaxTokens, account.ContextWindow)
 	confDir := ""
 	if agent.ConfigPath != "" {
 		confDir = path.Dir(agent.ConfigPath)
@@ -299,11 +307,14 @@ func (a AgentService) UpdateModelConfig(req dto.AgentModelConfigUpdateReq) error
 	if confDir == "" {
 		return buserr.New("ErrRecordNotFound")
 	}
-	if err := writeOpenclawConfig(confDir, provider, modelName, baseURL, account.APIKey, agent.Token); err != nil {
+	if err := writeOpenclawConfig(confDir, provider, modelName, apiType, maxTokens, contextWindow, baseURL, account.APIKey, agent.Token); err != nil {
 		return err
 	}
 	agent.Provider = provider
 	agent.Model = modelName
+	agent.APIType = apiType
+	agent.MaxTokens = maxTokens
+	agent.ContextWindow = contextWindow
 	agent.BaseURL = baseURL
 	agent.APIKey = account.APIKey
 	agent.AccountID = account.ID
@@ -338,7 +349,10 @@ func (a AgentService) CreateAccount(req dto.AgentAccountCreateReq) error {
 		return buserr.New("ErrAgentApiKeyRequired")
 	}
 	baseURL := strings.TrimSpace(req.BaseURL)
-	if baseURL == "" {
+	if provider == "custom" && baseURL == "" {
+		return buserr.New("ErrAgentBaseURLRequired")
+	}
+	if provider != "custom" && baseURL == "" {
 		if defaultURL, ok := providerDefaultBaseURL(provider); ok {
 			baseURL = defaultURL
 		}
@@ -349,16 +363,36 @@ func (a AgentService) CreateAccount(req dto.AgentAccountCreateReq) error {
 	if exist, _ := agentAccountRepo.GetFirst(repo.WithByProvider(provider), repo.WithByName(req.Name)); exist != nil && exist.ID > 0 {
 		return buserr.New("ErrRecordExist")
 	}
+	modelName := strings.TrimSpace(req.Model)
+	apiType := normalizeAPIType(req.APIType)
+	if provider == "custom" {
+		if modelName == "" {
+			return fmt.Errorf("model is required")
+		}
+		if !isSupportedAPIType(apiType) {
+			return fmt.Errorf("apiType is invalid")
+		}
+	}
 	if err := a.VerifyAccount(dto.AgentAccountVerifyReq{Provider: provider, BaseURL: baseURL, APIKey: apiKey}); err != nil {
 		return err
 	}
+	_, maxTokens, contextWindow := resolveRuntimeParams(provider, apiType, req.MaxTokens, req.ContextWindow)
 	account := &model.AgentAccount{
-		Provider: provider,
-		Name:     req.Name,
-		APIKey:   apiKey,
-		BaseURL:  baseURL,
-		Verified: true,
-		Remark:   req.Remark,
+		Provider:      provider,
+		Name:          req.Name,
+		APIKey:        apiKey,
+		BaseURL:       baseURL,
+		Model:         "",
+		APIType:       apiType,
+		MaxTokens:     0,
+		ContextWindow: 0,
+		Verified:      true,
+		Remark:        req.Remark,
+	}
+	if provider == "custom" {
+		account.Model = normalizeCustomModel(modelName)
+		account.MaxTokens = maxTokens
+		account.ContextWindow = contextWindow
 	}
 	return agentAccountRepo.Create(account)
 }
@@ -370,7 +404,10 @@ func (a AgentService) UpdateAccount(req dto.AgentAccountUpdateReq) error {
 	}
 	provider := strings.ToLower(strings.TrimSpace(account.Provider))
 	baseURL := strings.TrimSpace(req.BaseURL)
-	if baseURL == "" {
+	if provider == "custom" && baseURL == "" {
+		return buserr.New("ErrAgentBaseURLRequired")
+	}
+	if provider != "custom" && baseURL == "" {
 		if defaultURL, ok := providerDefaultBaseURL(provider); ok {
 			baseURL = defaultURL
 		}
@@ -378,12 +415,31 @@ func (a AgentService) UpdateAccount(req dto.AgentAccountUpdateReq) error {
 	if provider == "ollama" && baseURL == "" {
 		return buserr.New("ErrAgentBaseURLRequired")
 	}
+	apiType := normalizeAPIType(req.APIType)
+	if provider == "custom" && strings.TrimSpace(req.Model) == "" {
+		return fmt.Errorf("model is required")
+	}
+	if provider == "custom" && !isSupportedAPIType(apiType) {
+		return fmt.Errorf("apiType is invalid")
+	}
+	if provider != "custom" {
+		apiType = normalizeAPIType(account.APIType)
+	}
+	_, maxTokens, contextWindow := resolveRuntimeParams(provider, apiType, req.MaxTokens, req.ContextWindow)
 	if err := a.VerifyAccount(dto.AgentAccountVerifyReq{Provider: provider, BaseURL: baseURL, APIKey: req.APIKey}); err != nil {
 		return err
 	}
 	account.Name = req.Name
 	account.APIKey = req.APIKey
 	account.BaseURL = baseURL
+	if provider == "custom" {
+		account.Model = normalizeCustomModel(req.Model)
+	}
+	account.APIType = apiType
+	if provider == "custom" {
+		account.MaxTokens = maxTokens
+		account.ContextWindow = contextWindow
+	}
 	account.Remark = req.Remark
 	account.Verified = true
 	if err := agentAccountRepo.Save(account); err != nil {
@@ -412,15 +468,19 @@ func (a AgentService) PageAccounts(req dto.AgentAccountSearch) (int64, []dto.Age
 	items := make([]dto.AgentAccountInfo, 0, len(list))
 	for _, item := range list {
 		items = append(items, dto.AgentAccountInfo{
-			ID:           item.ID,
-			Provider:     item.Provider,
-			ProviderName: providerDisplayName(item.Provider),
-			Name:         item.Name,
-			APIKey:       item.APIKey,
-			BaseURL:      item.BaseURL,
-			Verified:     item.Verified,
-			Remark:       item.Remark,
-			CreatedAt:    item.CreatedAt,
+			ID:            item.ID,
+			Provider:      item.Provider,
+			ProviderName:  providerDisplayName(item.Provider),
+			Name:          item.Name,
+			APIKey:        item.APIKey,
+			BaseURL:       item.BaseURL,
+			Model:         item.Model,
+			APIType:       item.APIType,
+			MaxTokens:     item.MaxTokens,
+			ContextWindow: item.ContextWindow,
+			Verified:      item.Verified,
+			Remark:        item.Remark,
+			CreatedAt:     item.CreatedAt,
 		})
 	}
 	return count, items, nil
@@ -445,6 +505,9 @@ func (a AgentService) VerifyAccount(req dto.AgentAccountVerifyReq) error {
 		return buserr.New("ErrAgentBaseURLRequired")
 	}
 	if provider == "ollama" {
+		return nil
+	}
+	if provider == "custom" {
 		return nil
 	}
 	return verifyProvider(provider, baseURL, apiKey)
@@ -642,12 +705,16 @@ func (a AgentService) syncAgentsByAccount(account *model.AgentAccount) error {
 		if confDir == "" {
 			continue
 		}
-		if err := writeOpenclawConfig(confDir, account.Provider, agent.Model, baseURL, account.APIKey, agent.Token); err != nil {
+		apiType, maxTokens, contextWindow := resolveRuntimeParams(account.Provider, account.APIType, account.MaxTokens, account.ContextWindow)
+		if err := writeOpenclawConfig(confDir, account.Provider, agent.Model, apiType, maxTokens, contextWindow, baseURL, account.APIKey, agent.Token); err != nil {
 			return err
 		}
 		agent.BaseURL = baseURL
 		agent.APIKey = account.APIKey
 		agent.Provider = account.Provider
+		agent.APIType = apiType
+		agent.MaxTokens = maxTokens
+		agent.ContextWindow = contextWindow
 		_ = agentRepo.Save(&agent)
 	}
 	return nil
@@ -713,20 +780,23 @@ func verifyMinimax(baseURL, apiKey string) error {
 
 func buildAgentItem(agent *model.Agent, appInstall *model.AppInstall, envMap map[string]interface{}) dto.AgentItem {
 	item := dto.AgentItem{
-		ID:           agent.ID,
-		Name:         agent.Name,
-		Provider:     agent.Provider,
-		ProviderName: providerDisplayName(agent.Provider),
-		Model:        agent.Model,
-		BaseURL:      agent.BaseURL,
-		APIKey:       maskKey(agent.APIKey),
-		Token:        agent.Token,
-		Status:       agent.Status,
-		Message:      agent.Message,
-		AppInstallID: agent.AppInstallID,
-		AccountID:    agent.AccountID,
-		ConfigPath:   agent.ConfigPath,
-		CreatedAt:    agent.CreatedAt,
+		ID:            agent.ID,
+		Name:          agent.Name,
+		Provider:      agent.Provider,
+		ProviderName:  providerDisplayName(agent.Provider),
+		Model:         agent.Model,
+		APIType:       agent.APIType,
+		MaxTokens:     agent.MaxTokens,
+		ContextWindow: agent.ContextWindow,
+		BaseURL:       agent.BaseURL,
+		APIKey:        maskKey(agent.APIKey),
+		Token:         agent.Token,
+		Status:        agent.Status,
+		Message:       agent.Message,
+		AppInstallID:  agent.AppInstallID,
+		AccountID:     agent.AccountID,
+		ConfigPath:    agent.ConfigPath,
+		CreatedAt:     agent.CreatedAt,
 	}
 	if appInstall != nil && appInstall.ID > 0 {
 		item.Container = appInstall.ContainerName
@@ -792,7 +862,7 @@ func (a AgentService) waitAndDeleteAgent(agentID uint, appInstallID uint) {
 	}
 }
 
-func (a AgentService) writeConfigWithRetry(appInstall *model.AppInstall, provider, modelName, baseURL, apiKey, token string, agentID uint) {
+func (a AgentService) writeConfigWithRetry(appInstall *model.AppInstall, provider, modelName, apiType string, maxTokens, contextWindow int, baseURL, apiKey, token string, agentID uint) {
 	if appInstall == nil {
 		return
 	}
@@ -805,7 +875,7 @@ func (a AgentService) writeConfigWithRetry(appInstall *model.AppInstall, provide
 		time.Sleep(time.Second)
 	}
 	confDir := path.Join(appInstall.GetPath(), "data", "conf")
-	if err := writeOpenclawConfig(confDir, provider, modelName, baseURL, apiKey, token); err != nil {
+	if err := writeOpenclawConfig(confDir, provider, modelName, apiType, maxTokens, contextWindow, baseURL, apiKey, token); err != nil {
 		global.LOG.Errorf("write openclaw config failed: %v", err)
 		agent, errGet := agentRepo.GetFirst(repo.WithByID(agentID))
 		if errGet == nil && agent != nil {
@@ -848,7 +918,8 @@ type gatewayConfig struct {
 }
 
 type gatewayControlUi struct {
-	AllowInsecureAuth bool `json:"allowInsecureAuth"`
+	DangerouslyDisableDeviceAuth             bool `json:"dangerouslyDisableDeviceAuth"`
+	DangerouslyAllowHostHeaderOriginFallback bool `json:"dangerouslyAllowHostHeaderOriginFallback"`
 }
 
 type gatewayAuth struct {
@@ -897,7 +968,7 @@ type modelCost struct {
 	CacheWrite float64 `json:"cacheWrite"`
 }
 
-func writeOpenclawConfig(confDir, provider, modelName, baseURL, apiKey, token string) error {
+func writeOpenclawConfig(confDir, provider, modelName, apiType string, maxTokens, contextWindow int, baseURL, apiKey, token string) error {
 	if strings.TrimSpace(confDir) == "" {
 		return fmt.Errorf("config dir is required")
 	}
@@ -924,7 +995,8 @@ func writeOpenclawConfig(confDir, provider, modelName, baseURL, apiKey, token st
 				Token: token,
 			},
 			ControlUi: gatewayControlUi{
-				AllowInsecureAuth: true,
+				DangerouslyDisableDeviceAuth:             true,
+				DangerouslyAllowHostHeaderOriginFallback: true,
 			},
 		},
 		Agents: agentsConfig{
@@ -1032,6 +1104,43 @@ func writeOpenclawConfig(confDir, provider, modelName, baseURL, apiKey, token st
 							Input:         []string{"text"},
 							ContextWindow: 200000,
 							MaxTokens:     8192,
+							Cost:          modelCost{},
+						},
+					},
+				},
+			},
+		}
+	} else if provider == "custom" {
+		primary := modelName
+		if !strings.Contains(primary, "/") {
+			primary = "custom/" + strings.TrimSpace(primary)
+		}
+		cfg.Agents.Defaults.Model.Primary = primary
+		base := strings.TrimSpace(baseURL)
+		plainKey := strings.TrimSpace(apiKey)
+		if !strings.Contains(modelName, "/") {
+			modelName = primary
+		}
+		customModelID := modelID
+		if parts := strings.SplitN(modelName, "/", 2); len(parts) == 2 {
+			customModelID = parts[1]
+		}
+		useAPIType, useMaxTokens, useContextWindow := resolveRuntimeParams(provider, apiType, maxTokens, contextWindow)
+		cfg.Models = &modelsConfig{
+			Mode: "merge",
+			Providers: map[string]modelProvider{
+				"custom": {
+					ApiKey:  plainKey,
+					BaseUrl: base,
+					Api:     useAPIType,
+					Models: []modelEntry{
+						{
+							ID:            customModelID,
+							Name:          customModelID,
+							Reasoning:     strings.Contains(strings.ToLower(customModelID), "reason") || strings.Contains(strings.ToLower(customModelID), "thinking"),
+							Input:         []string{"text"},
+							ContextWindow: useContextWindow,
+							MaxTokens:     useMaxTokens,
 							Cost:          modelCost{},
 						},
 					},
@@ -1273,6 +1382,62 @@ func toInt(value interface{}) int {
 	default:
 		return 0
 	}
+}
+
+func normalizeCustomModel(modelName string) string {
+	trim := strings.TrimSpace(modelName)
+	if parts := strings.SplitN(trim, "/", 2); len(parts) == 2 {
+		if strings.EqualFold(parts[0], "custom") {
+			return strings.TrimSpace(parts[1])
+		}
+	}
+	return trim
+}
+
+func normalizeAPIType(apiType string) string {
+	trim := strings.ToLower(strings.TrimSpace(apiType))
+	if trim == "" {
+		return "openai-completions"
+	}
+	return trim
+}
+
+func isSupportedAPIType(apiType string) bool {
+	switch normalizeAPIType(apiType) {
+	case "openai-completions", "openai-responses":
+		return true
+	default:
+		return false
+	}
+}
+
+func resolveRuntimeParams(provider, apiType string, maxTokens, contextWindow int) (string, int, int) {
+	resolvedAPI := normalizeAPIType(apiType)
+	resolvedMaxTokens := maxTokens
+	resolvedContextWindow := contextWindow
+	if resolvedMaxTokens <= 0 {
+		switch provider {
+		case "deepseek":
+			resolvedMaxTokens = 8192
+		case "minimax", "kimi-coding", "custom":
+			resolvedMaxTokens = 8192
+		default:
+			resolvedMaxTokens = 8192
+		}
+	}
+	if resolvedContextWindow <= 0 {
+		switch provider {
+		case "deepseek":
+			resolvedContextWindow = 128000
+		case "minimax", "kimi-coding":
+			resolvedContextWindow = 200000
+		case "custom":
+			resolvedContextWindow = 128000
+		default:
+			resolvedContextWindow = 256000
+		}
+	}
+	return resolvedAPI, resolvedMaxTokens, resolvedContextWindow
 }
 
 func generateToken() string {

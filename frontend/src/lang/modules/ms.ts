@@ -710,6 +710,8 @@ const message = {
             feishuSaveSuccess: 'Saved successfully',
             pairingCodeRequired: 'Please enter pairing code',
             pairingApproveSuccess: 'Pairing approved successfully',
+            customModelHelper: 'Akaun model tersuai, nama model mesti bermula dengan custom/',
+            customProviderHelper: 'Penyedia model tersuai tidak mengesahkan sama ada akaun boleh digunakan',
         },
         model: {
             model: 'Model',

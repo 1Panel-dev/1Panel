@@ -9,6 +9,9 @@ type AgentCreateReq struct {
 	BridgePort    int     `json:"bridgePort" validate:"required"`
 	Provider      string  `json:"provider" validate:"required"`
 	Model         string  `json:"model" validate:"required"`
+	APIType       string  `json:"apiType"`
+	MaxTokens     int     `json:"maxTokens"`
+	ContextWindow int     `json:"contextWindow"`
 	AccountID     uint    `json:"accountId"`
 	APIKey        string  `json:"apiKey"`
 	BaseURL       string  `json:"baseURL"`
@@ -28,26 +31,29 @@ type AgentCreateReq struct {
 }
 
 type AgentItem struct {
-	ID           uint      `json:"id"`
-	Name         string    `json:"name"`
-	Provider     string    `json:"provider"`
-	ProviderName string    `json:"providerName"`
-	Model        string    `json:"model"`
-	BaseURL      string    `json:"baseUrl"`
-	APIKey       string    `json:"apiKey"`
-	Token        string    `json:"token"`
-	Status       string    `json:"status"`
-	Message      string    `json:"message"`
-	AppInstallID uint      `json:"appInstallId"`
-	AccountID    uint      `json:"accountId"`
-	AppVersion   string    `json:"appVersion"`
-	Container    string    `json:"containerName"`
-	WebUIPort    int       `json:"webUIPort"`
-	BridgePort   int       `json:"bridgePort"`
-	Path         string    `json:"path"`
-	ConfigPath   string    `json:"configPath"`
-	Upgradable   bool      `json:"upgradable"`
-	CreatedAt    time.Time `json:"createdAt"`
+	ID            uint      `json:"id"`
+	Name          string    `json:"name"`
+	Provider      string    `json:"provider"`
+	ProviderName  string    `json:"providerName"`
+	Model         string    `json:"model"`
+	APIType       string    `json:"apiType"`
+	MaxTokens     int       `json:"maxTokens"`
+	ContextWindow int       `json:"contextWindow"`
+	BaseURL       string    `json:"baseUrl"`
+	APIKey        string    `json:"apiKey"`
+	Token         string    `json:"token"`
+	Status        string    `json:"status"`
+	Message       string    `json:"message"`
+	AppInstallID  uint      `json:"appInstallId"`
+	AccountID     uint      `json:"accountId"`
+	AppVersion    string    `json:"appVersion"`
+	Container     string    `json:"containerName"`
+	WebUIPort     int       `json:"webUIPort"`
+	BridgePort    int       `json:"bridgePort"`
+	Path          string    `json:"path"`
+	ConfigPath    string    `json:"configPath"`
+	Upgradable    bool      `json:"upgradable"`
+	CreatedAt     time.Time `json:"createdAt"`
 }
 
 type AgentDeleteReq struct {
@@ -67,20 +73,28 @@ type AgentModelConfigUpdateReq struct {
 }
 
 type AgentAccountCreateReq struct {
-	Provider string `json:"provider" validate:"required"`
-	Name     string `json:"name" validate:"required"`
-	APIKey   string `json:"apiKey" validate:"required"`
-	BaseURL  string `json:"baseURL"`
-	Remark   string `json:"remark"`
+	Provider      string `json:"provider" validate:"required"`
+	Name          string `json:"name" validate:"required"`
+	APIKey        string `json:"apiKey" validate:"required"`
+	BaseURL       string `json:"baseURL"`
+	Model         string `json:"model"`
+	APIType       string `json:"apiType"`
+	MaxTokens     int    `json:"maxTokens"`
+	ContextWindow int    `json:"contextWindow"`
+	Remark        string `json:"remark"`
 }
 
 type AgentAccountUpdateReq struct {
-	ID         uint   `json:"id" validate:"required"`
-	Name       string `json:"name" validate:"required"`
-	APIKey     string `json:"apiKey" validate:"required"`
-	BaseURL    string `json:"baseURL"`
-	Remark     string `json:"remark"`
-	SyncAgents bool   `json:"syncAgents"`
+	ID            uint   `json:"id" validate:"required"`
+	Name          string `json:"name" validate:"required"`
+	APIKey        string `json:"apiKey" validate:"required"`
+	BaseURL       string `json:"baseURL"`
+	Model         string `json:"model"`
+	APIType       string `json:"apiType"`
+	MaxTokens     int    `json:"maxTokens"`
+	ContextWindow int    `json:"contextWindow"`
+	Remark        string `json:"remark"`
+	SyncAgents    bool   `json:"syncAgents"`
 }
 
 type AgentAccountVerifyReq struct {
@@ -100,15 +114,19 @@ type AgentAccountSearch struct {
 }
 
 type AgentAccountInfo struct {
-	ID           uint      `json:"id"`
-	Provider     string    `json:"provider"`
-	ProviderName string    `json:"providerName"`
-	Name         string    `json:"name"`
-	APIKey       string    `json:"apiKey"`
-	BaseURL      string    `json:"baseUrl"`
-	Verified     bool      `json:"verified"`
-	Remark       string    `json:"remark"`
-	CreatedAt    time.Time `json:"createdAt"`
+	ID            uint      `json:"id"`
+	Provider      string    `json:"provider"`
+	ProviderName  string    `json:"providerName"`
+	Name          string    `json:"name"`
+	APIKey        string    `json:"apiKey"`
+	BaseURL       string    `json:"baseUrl"`
+	Model         string    `json:"model"`
+	APIType       string    `json:"apiType"`
+	MaxTokens     int       `json:"maxTokens"`
+	ContextWindow int       `json:"contextWindow"`
+	Verified      bool      `json:"verified"`
+	Remark        string    `json:"remark"`
+	CreatedAt     time.Time `json:"createdAt"`
 }
 
 type ProviderModelInfo struct {

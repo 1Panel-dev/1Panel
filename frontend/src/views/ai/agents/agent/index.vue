@@ -38,7 +38,7 @@
                         min-width="120"
                     >
                         <template #default="{ row }">
-                            {{ row.providerName || row.provider }}
+                            <span>{{ getAgentProviderDisplayName(row.provider, row.providerName) }}</span>
                             <div>
                                 <span>{{ row.model }}</span>
                             </div>
@@ -115,6 +115,7 @@ import TerminalDialog from '@/views/container/container/terminal/index.vue';
 import i18n from '@/lang';
 import PortJumpDialog from '@/components/port-jump/index.vue';
 import DockerStatus from '@/views/container/docker-status/index.vue';
+import { getAgentProviderDisplayName } from '@/utils/agent';
 
 const items = ref<AI.AgentItem[]>([]);
 const loading = ref(false);

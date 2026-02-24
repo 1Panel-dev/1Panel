@@ -243,6 +243,9 @@ export namespace AI {
         bridgePort: number;
         provider: string;
         model: string;
+        apiType: string;
+        maxTokens: number;
+        contextWindow: number;
         accountId: number;
         apiKey: string;
         baseURL: string;
@@ -267,6 +270,9 @@ export namespace AI {
         provider: string;
         providerName: string;
         model: string;
+        apiType: string;
+        maxTokens: number;
+        contextWindow: number;
         baseUrl: string;
         apiKey: string;
         token: string;
@@ -317,6 +323,10 @@ export namespace AI {
         name: string;
         apiKey: string;
         baseURL: string;
+        model: string;
+        apiType: string;
+        maxTokens: number;
+        contextWindow: number;
         remark: string;
     }
 
@@ -325,6 +335,10 @@ export namespace AI {
         name: string;
         apiKey: string;
         baseURL: string;
+        model: string;
+        apiType: string;
+        maxTokens: number;
+        contextWindow: number;
         remark: string;
         syncAgents: boolean;
     }
@@ -343,6 +357,10 @@ export namespace AI {
         name: string;
         apiKey: string;
         baseUrl: string;
+        model: string;
+        apiType: string;
+        maxTokens: number;
+        contextWindow: number;
         verified: boolean;
         remark: string;
         createdAt: string;

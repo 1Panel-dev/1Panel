@@ -941,3 +941,19 @@ var MigrateOpenclawAgents = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddAgentCustomModelFields = &gormigrate.Migration{
+	ID: "20260224-add-agent-custom-model-fields",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.Agent{}, &model.AgentAccount{}); err != nil {
+			return err
+		}
+		if err := tx.Model(&model.AgentAccount{}).Where("api_type = '' OR api_type IS NULL").Update("api_type", "openai-completions").Error; err != nil {
+			return err
+		}
+		if err := tx.Model(&model.Agent{}).Where("api_type = '' OR api_type IS NULL").Update("api_type", "openai-completions").Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}
