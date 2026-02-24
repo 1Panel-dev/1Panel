@@ -2,11 +2,9 @@ package cmd
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/i18n"
-	cmdUtils "github.com/1Panel-dev/1Panel/core/utils/cmd"
 	"github.com/1Panel-dev/1Panel/core/utils/passkey"
 	"github.com/spf13/cobra"
 )
@@ -67,7 +65,7 @@ var resetSSLCmd = &cobra.Command{
 		if err := setSettingByKey(db, "SSL", constant.StatusDisable); err != nil {
 			return err
 		}
-		return restartCoreAfterReset()
+		return nil
 	},
 }
 var resetEntranceCmd = &cobra.Command{
@@ -102,7 +100,7 @@ var resetBindIpsCmd = &cobra.Command{
 		if err := setSettingByKey(db, "AllowIPs", ""); err != nil {
 			return err
 		}
-		return restartCoreAfterReset()
+		return nil
 	},
 }
 var resetDomainCmd = &cobra.Command{
@@ -121,7 +119,7 @@ var resetDomainCmd = &cobra.Command{
 		if err := setSettingByKey(db, "BindDomain", ""); err != nil {
 			return err
 		}
-		return restartCoreAfterReset()
+		return nil
 	},
 }
 
@@ -142,22 +140,6 @@ var resetPasskeyCmd = &cobra.Command{
 		}
 		return setSettingByKey(db, passkey.PasskeyCredentialSettingKey, "")
 	},
-}
-
-func restartCoreAfterReset() error {
-	stdout, err := cmdUtils.RunDefaultWithStdoutBashC("1pctl restart core")
-	if len(stdout) != 0 {
-		fmt.Print(stdout)
-	}
-	if err == nil {
-		return nil
-	}
-
-	stdout = strings.TrimSpace(stdout)
-	if len(stdout) != 0 {
-		return fmt.Errorf("reset succeeded but restart core failed: %s", stdout)
-	}
-	return fmt.Errorf("reset succeeded but restart core failed: %v", err)
 }
 
 func loadResetHelper() {
