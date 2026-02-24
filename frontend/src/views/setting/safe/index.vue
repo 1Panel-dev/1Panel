@@ -340,7 +340,7 @@ const handleMFA = async () => {
 };
 
 const openPasskeyDialog = async () => {
-    passkeyRef.value.acceptParams({ sslStatus: form.ssl, supported: passkeySupported.value });
+    passkeyRef.value.acceptParams({ bindDomain: form.bindDomain, supported: passkeySupported.value });
 };
 
 const onChangeEntrance = () => {

@@ -1984,8 +1984,12 @@ const message = {
         safe: 'Security',
         passkey: 'Passkey',
         passkeyManage: 'Manage',
+        passkeyKeyManagement: 'Key Management',
         passkeyHelper: 'For quick login, up to 5 passkeys can be bound',
-        passkeyRequireSSL: 'Enable SSL with a trusted certificate and bind a domain name before using passkeys',
+        passkeyRequireSSL: 'Passkeys require a bound domain name and HTTPS access',
+        passkeyTrustedProxies: 'Trusted proxies',
+        passkeyTrustedProxiesHelper:
+            'Only requests from these IP/CIDR sources will trust Forwarded and X-Forwarded-Proto when determining HTTPS',
         passkeyNotSupported: 'Current browser or environment does not support passkeys',
         passkeyCount: 'Bound {0}/{1}',
         passkeyName: 'Name',

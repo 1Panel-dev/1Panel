@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net"
 	"strconv"
@@ -22,6 +23,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-webauthn/webauthn/protocol"
 	"github.com/go-webauthn/webauthn/webauthn"
+	"gorm.io/gorm"
 )
 
 type AuthService struct{}
@@ -454,13 +456,6 @@ func (u *AuthService) PasskeyDelete(id string) error {
 }
 
 func (u *AuthService) passkeyEnabled(c *gin.Context) (bool, error) {
-	sslSetting, err := settingRepo.Get(repo.WithByKey("SSL"))
-	if err != nil {
-		return false, err
-	}
-	if sslSetting.Value == constant.StatusDisable {
-		return false, nil
-	}
 	return strings.EqualFold(passkeyRequestScheme(c), "https"), nil
 }
 
@@ -679,7 +674,112 @@ func passkeyRequestScheme(c *gin.Context) string {
 	if c.Request.TLS != nil {
 		return "https"
 	}
+	if !passkeyIsFromTrustedProxy(c) {
+		return "http"
+	}
+	if proto := passkeyForwardedProto(c.GetHeader("Forwarded")); proto != "" {
+		return proto
+	}
+	if proto := passkeyXForwardedProto(c.GetHeader("X-Forwarded-Proto")); proto != "" {
+		return proto
+	}
 	return "http"
+}
+
+func passkeyIsFromTrustedProxy(c *gin.Context) bool {
+	remoteIP := passkeyRemoteIP(c.Request.RemoteAddr)
+	if remoteIP == nil {
+		return false
+	}
+	proxies, err := loadPasskeyTrustedProxies()
+	if err != nil {
+		global.LOG.Errorf("load passkey trusted proxies failed, err: %v", err)
+		return false
+	}
+	for _, cidr := range proxies {
+		if cidr.Contains(remoteIP) {
+			return true
+		}
+	}
+	return false
+}
+
+func passkeyRemoteIP(remoteAddr string) net.IP {
+	if host, _, err := net.SplitHostPort(strings.TrimSpace(remoteAddr)); err == nil {
+		return net.ParseIP(host)
+	}
+	return net.ParseIP(strings.TrimSpace(remoteAddr))
+}
+
+func loadPasskeyTrustedProxies() ([]*net.IPNet, error) {
+	setting, err := settingRepo.Get(repo.WithByKey("PasskeyTrustedProxies"))
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return parsePasskeyTrustedProxies("127.0.0.1\n::1")
+		}
+		return nil, err
+	}
+	return parsePasskeyTrustedProxies(setting.Value)
+}
+
+func parsePasskeyTrustedProxies(value string) ([]*net.IPNet, error) {
+	lines := strings.Split(strings.TrimSpace(value), "\n")
+	if len(lines) == 0 {
+		return []*net.IPNet{}, nil
+	}
+	cidrs := make([]*net.IPNet, 0, len(lines))
+	for _, line := range lines {
+		item := strings.TrimSpace(line)
+		if item == "" {
+			continue
+		}
+		if ip := net.ParseIP(item); ip != nil {
+			if ip.To4() != nil {
+				item += "/32"
+			} else {
+				item += "/128"
+			}
+		}
+		_, ipNet, err := net.ParseCIDR(item)
+		if err != nil {
+			return nil, err
+		}
+		cidrs = append(cidrs, ipNet)
+	}
+	return cidrs, nil
+}
+
+func passkeyForwardedProto(value string) string {
+	if value == "" {
+		return ""
+	}
+	for _, item := range strings.Split(value, ",") {
+		for _, part := range strings.Split(item, ";") {
+			kv := strings.SplitN(strings.TrimSpace(part), "=", 2)
+			if len(kv) != 2 {
+				continue
+			}
+			if !strings.EqualFold(strings.TrimSpace(kv[0]), "proto") {
+				continue
+			}
+			proto := strings.ToLower(strings.Trim(strings.TrimSpace(kv[1]), `"`))
+			if proto == "http" || proto == "https" {
+				return proto
+			}
+		}
+	}
+	return ""
+}
+
+func passkeyXForwardedProto(value string) string {
+	if value == "" {
+		return ""
+	}
+	proto := strings.ToLower(strings.TrimSpace(strings.Split(value, ",")[0]))
+	if proto == "http" || proto == "https" {
+		return proto
+	}
+	return ""
 }
 
 func stripHostPort(hostport string) string {

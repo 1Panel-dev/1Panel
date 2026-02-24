@@ -23,6 +23,7 @@ type SettingInfo struct {
 	SSL                        string `json:"ssl"`
 	SSLType                    string `json:"sslType"`
 	BindDomain                 string `json:"bindDomain"`
+	PasskeyTrustedProxies      string `json:"passkeyTrustedProxies"`
 	AllowIPs                   string `json:"allowIPs"`
 	SecurityEntrance           string `json:"securityEntrance"`
 	DashboardMemoVisible       string `json:"dashboardMemoVisible"`
