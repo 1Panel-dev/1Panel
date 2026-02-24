@@ -123,6 +123,10 @@ export const updateInstallConfig = (req: App.AppConfigUpdate) => {
     return http.post(`apps/installed/config/update`, req);
 };
 
+export const updateAppInstallSort = (items: Array<{ installID: number; sortOrder: number }>) => {
+    return http.post(`apps/installed/sort/update`, { items });
+};
+
 export const syncCutomAppStore = (req: App.AppStoreSync) => {
     return http.post(`/custom/app/sync`, req);
 };

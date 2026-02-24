@@ -349,3 +349,15 @@ func (b *BaseApi) GetAppInstallInfo(c *gin.Context) {
 	}
 	helper.SuccessWithData(c, info)
 }
+
+func (b *BaseApi) UpdateAppInstallSort(c *gin.Context) {
+	var req request.AppInstallSort
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := appInstallService.UpdateSort(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}

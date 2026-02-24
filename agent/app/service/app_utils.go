@@ -1613,6 +1613,7 @@ func handleInstalled(appInstallList []model.AppInstall, updated, sync, checkUpda
 				Document: installed.App.Document,
 			},
 			Favorite:    installed.Favorite,
+			SortOrder:   installed.SortOrder,
 			Container:   installed.ContainerName,
 			ServiceName: strings.ToLower(installed.ServiceName),
 		}

@@ -4,8 +4,22 @@
             <Tags @change="changeTag" hideKey="Runtime" />
         </template>
         <template #leftToolBar>
-            <el-button @click="sync" type="primary" plain v-if="mode === 'installed' && data != null">
+            <el-button @click="sync" type="primary" plain v-if="mode === 'installed' && !sortMode && data != null">
                 {{ $t('commons.button.refresh') }}
+            </el-button>
+            <el-button
+                @click="enterSortMode"
+                type="primary"
+                plain
+                v-if="mode === 'installed' && !sortMode && data != null"
+            >
+                {{ $t('app.sortMode') }}
+            </el-button>
+            <el-button @click="saveSortOrder" type="primary" v-if="sortMode">
+                {{ $t('commons.button.confirm') }}
+            </el-button>
+            <el-button @click="exitSortMode" plain v-if="sortMode">
+                {{ $t('commons.button.cancel') }}
             </el-button>
             <el-button @click="openIgnore" type="primary" plain v-if="mode === 'upgrade'">
                 {{ $t('app.showIgnore') }}
@@ -38,10 +52,11 @@
                             <img src="@/assets/images/no_update_app.svg" />
                         </div>
                     </div>
-                    <el-row :gutter="5">
+                    <el-row :gutter="5" ref="sortContainer">
                         <el-col
                             v-for="(installed, index) in data"
-                            :key="index"
+                            :key="installed.id"
+                            :data-sort-index="index"
                             :xs="24"
                             :sm="24"
                             :md="24"
@@ -90,7 +105,7 @@
                     </el-row>
                 </MainDiv>
             </div>
-            <div class="page-button" v-if="mode === 'installed'">
+            <div class="page-button" v-if="mode === 'installed' && !sortMode">
                 <fu-table-pagination
                     v-model:current-page="paginationConfig.currentPage"
                     v-model:page-size="paginationConfig.pageSize"
@@ -132,8 +147,9 @@ import ComposeLogs from '@/components/log/compose/index.vue';
 import IgnoreApp from '@/views/app-store/installed/ignore/create/index.vue';
 import TerminalDialog from '@/views/container/container/terminal/index.vue';
 
-import { searchAppInstalled, installedOp, appInstalledDeleteCheck } from '@/api/modules/app';
-import { onMounted, onUnmounted, reactive, ref } from 'vue';
+import { searchAppInstalled, installedOp, appInstalledDeleteCheck, updateAppInstallSort } from '@/api/modules/app';
+import { onMounted, onUnmounted, reactive, ref, nextTick } from 'vue';
+import Sortable from 'sortablejs';
 import i18n from '@/lang';
 import { ElMessageBox } from 'element-plus';
 import { App } from '@/api/interface/app';
@@ -148,6 +164,9 @@ const { currentNode, isMaster, currentNodeAddr } = useGlobalStore();
 const data = ref<any>();
 const loading = ref(false);
 const syncLoading = ref(false);
+const sortMode = ref(false);
+const sortContainer = ref();
+let sortableInstance: Sortable | null = null;
 let timer: NodeJS.Timer | null = null;
 const paginationConfig = reactive({
     cacheSizeKey: 'app-installed-page-size',
@@ -427,6 +446,61 @@ const openLog = (row: any) => {
 const openTerminal = (row: any) => {
     const title = i18n.global.t('app.app') + ' ' + row.name;
     dialogTerminalRef.value!.acceptParams({ containerID: row.container, title: title });
+};
+
+const enterSortMode = async () => {
+    sortMode.value = true;
+    clearInterval(Number(timer));
+    timer = null;
+    const res = await searchAppInstalled({ page: 1, pageSize: 10000, name: '', tags: [], update: false, sync: false });
+    data.value = res.data.items;
+    await nextTick();
+    const el = sortContainer.value?.$el;
+    if (el) {
+        const favCount = data.value.filter((i: any) => i.favorite).length;
+        sortableInstance = Sortable.create(el, {
+            animation: 150,
+            ghostClass: 'sortable-ghost',
+            onMove: (evt: any) => {
+                const from = evt.dragged.dataset.sortIndex;
+                const to = evt.related.dataset.sortIndex;
+                const fromFav = Number(from) < favCount;
+                const toFav = Number(to) < favCount;
+                return fromFav === toFav;
+            },
+            onEnd: (evt: any) => {
+                const list = [...data.value];
+                const [moved] = list.splice(evt.oldIndex, 1);
+                list.splice(evt.newIndex, 0, moved);
+                data.value = list;
+            },
+        });
+    }
+};
+
+const saveSortOrder = async () => {
+    if (!data.value) return;
+    let favIdx = 0;
+    let normalIdx = 0;
+    const items = data.value.map((item: any) => ({
+        installID: item.id,
+        sortOrder: item.favorite ? favIdx++ : normalIdx++,
+    }));
+    await updateAppInstallSort(items);
+    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+    exitSortMode();
+};
+
+const exitSortMode = () => {
+    if (sortableInstance) {
+        sortableInstance.destroy();
+        sortableInstance = null;
+    }
+    sortMode.value = false;
+    search();
+    timer = setInterval(() => {
+        search();
+    }, 1000 * 30);
 };
 
 const getConfig = async () => {

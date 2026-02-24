@@ -957,3 +957,10 @@ var AddAgentCustomModelFields = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddAppInstallSortOrder = &gormigrate.Migration{
+	ID: "20260222-add-app-install-sort-order",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(&model.AppInstall{})
+	},
+}

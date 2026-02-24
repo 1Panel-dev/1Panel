@@ -126,6 +126,7 @@ type AppInstallDTO struct {
 	WebUI         string    `json:"webUI"`
 	CreatedAt     time.Time `json:"createdAt"`
 	Favorite      bool      `json:"favorite"`
+	SortOrder     int       `json:"sortOrder"`
 	App           AppDetail `json:"app"`
 	Container     string    `json:"container"`
 	IsEdit        bool      `json:"isEdit"`

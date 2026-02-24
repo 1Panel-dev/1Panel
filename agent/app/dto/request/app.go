@@ -138,3 +138,12 @@ type AppUpdateVersion struct {
 	AppInstallID  uint   `json:"appInstallID" validate:"required"`
 	UpdateVersion string `json:"updateVersion"`
 }
+
+type AppInstallSortItem struct {
+	InstallID uint `json:"installID"`
+	SortOrder int  `json:"sortOrder"`
+}
+
+type AppInstallSort struct {
+	Items []AppInstallSortItem `json:"items" validate:"required"`
+}

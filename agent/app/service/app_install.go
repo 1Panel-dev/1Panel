@@ -57,6 +57,7 @@ type IAppInstallService interface {
 	UpdateAppConfig(req request.AppConfigUpdate) error
 	GetInstallList() ([]dto.AppInstallInfo, error)
 	GetAppInstallInfo(appInstallID uint) (*response.AppInstallInfo, error)
+	UpdateSort(req request.AppInstallSort) error
 }
 
 func NewIAppInstalledService() IAppInstallService {
@@ -83,6 +84,7 @@ func (a *AppInstallService) Page(req request.AppInstalledSearch) (int64, []respo
 		err      error
 	)
 	opts = append(opts, repo.WithOrderRuleBy("favorite", "descending"))
+	opts = append(opts, repo.WithOrderRuleBy("sort_order", "ascending"))
 
 	if req.Name != "" {
 		opts = append(opts, repo.WithByLikeName(req.Name))
@@ -300,6 +302,9 @@ func (a *AppInstallService) Operate(req request.AppInstalledOperate) error {
 		return opNginx(install.ContainerName, constant.NginxReload)
 	case constant.Favorite:
 		install.Favorite = req.Favorite
+		var maxSort int
+		global.DB.Model(&model.AppInstall{}).Where("favorite = ?", req.Favorite).Select("COALESCE(MAX(sort_order),0)").Scan(&maxSort)
+		install.SortOrder = maxSort + 1
 		return appInstallRepo.Save(context.Background(), &install)
 	default:
 		return errors.New("operate not support")
@@ -316,6 +321,15 @@ func (a *AppInstallService) UpdateAppConfig(req request.AppConfigUpdate) error {
 		installed.WebUI = req.WebUI
 	}
 	return appInstallRepo.Save(context.Background(), &installed)
+}
+
+func (a *AppInstallService) UpdateSort(req request.AppInstallSort) error {
+	for _, item := range req.Items {
+		if err := appInstallRepo.BatchUpdateBy(map[string]interface{}{"sort_order": item.SortOrder}, repo.WithByID(item.InstallID)); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {

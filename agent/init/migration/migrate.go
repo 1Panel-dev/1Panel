@@ -66,6 +66,7 @@ func InitAgentDB() {
 		migrations.AddAgentTables,
 		migrations.MigrateOpenclawAgents,
 		migrations.AddAgentCustomModelFields,
+		migrations.AddAppInstallSortOrder,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

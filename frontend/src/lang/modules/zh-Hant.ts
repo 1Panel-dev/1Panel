@@ -2231,6 +2231,7 @@ const message = {
         takeDown: '已廢棄',
         allReadyInstalled: '已安裝',
         installHelper: '配置鏡像加速可以解決鏡像拉取失敗的問題',
+		sortMode: '排序',
         installWarn: '目前未勾選埠外部訪問，將無法透過外網IP:埠訪問，是否繼續？ ',
         showIgnore: '查看忽略應用',
         cancelIgnore: '取消忽略',

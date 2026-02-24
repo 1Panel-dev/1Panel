@@ -2288,6 +2288,7 @@ const message = {
         takeDown: '내리기',
         allReadyInstalled: '설치됨',
         installHelper: '이미지 풀 문제 시 이미지 가속을 구성하세요.',
+		sortMode: '정렬',
         installWarn:
             '외부 접근이 활성화되지 않아 애플리케이션이 외부 네트워크에서 접근할 수 없습니다. 계속 하시겠습니까?',
         showIgnore: '무시된 애플리케이션 보기',

@@ -2324,6 +2324,7 @@ const message = {
         takeDown: '降ろす',
         allReadyInstalled: 'インストール',
         installHelper: '画像プルの問題がある場合は、画像アクセラレーションを構成します。',
+		sortMode: '並べ替え',
         installWarn: `外部アクセスは有効になっていないため、アプリケーションが外部ネットワークを介してアクセスできるようになります。続けたいですか？`,
         showIgnore: '無視されたアプリケーションを表示します',
         cancelIgnore: 'キャンセルは無視します',
