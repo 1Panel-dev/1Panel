@@ -918,8 +918,8 @@ type gatewayConfig struct {
 }
 
 type gatewayControlUi struct {
-	AllowInsecureAuth            bool `json:"allowInsecureAuth"`
-	DangerouslyDisableDeviceAuth bool `json:"dangerouslyDisableDeviceAuth"`
+	DangerouslyDisableDeviceAuth             bool `json:"dangerouslyDisableDeviceAuth"`
+	DangerouslyAllowHostHeaderOriginFallback bool `json:"dangerouslyAllowHostHeaderOriginFallback"`
 }
 
 type gatewayAuth struct {
@@ -995,8 +995,8 @@ func writeOpenclawConfig(confDir, provider, modelName, apiType string, maxTokens
 				Token: token,
 			},
 			ControlUi: gatewayControlUi{
-				AllowInsecureAuth:            true,
-				DangerouslyDisableDeviceAuth: true,
+				DangerouslyDisableDeviceAuth:             true,
+				DangerouslyAllowHostHeaderOriginFallback: true,
 			},
 		},
 		Agents: agentsConfig{
