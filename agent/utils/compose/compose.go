@@ -15,7 +15,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
-	"gopkg.in/yaml.v3"
 )
 
 func checkCmd() error {
@@ -44,16 +43,7 @@ func UpWithTask(filePath string, task *task.Task, forcePull bool) error {
 }
 
 func pullComposeImages(filePath string, forcePull bool, task *task.Task) error {
-	content, err := os.ReadFile(filePath)
-	if err != nil {
-		return err
-	}
-	env, _ := os.ReadFile(path.Join(path.Dir(filePath), ".env"))
-	var compose docker.ComposeProject
-	if err := yaml.Unmarshal(content, &compose); err != nil {
-		return fmt.Errorf("parse docker-compose file failed: %v", err)
-	}
-	images, err := docker.GetImagesFromDockerCompose(env, content)
+	images, err := GetComposeImages(filePath)
 	if err != nil {
 		return err
 	}
@@ -108,6 +98,53 @@ func pullComposeImages(filePath string, forcePull bool, task *task.Task) error {
 	}
 
 	return nil
+}
+
+func GetComposeImages(filePath string) ([]string, error) {
+	images, err := getComposeImagesByCommand(filePath)
+	if err == nil {
+		return images, nil
+	}
+
+	content, readErr := os.ReadFile(filePath)
+	if readErr != nil {
+		return nil, readErr
+	}
+	env, _ := os.ReadFile(path.Join(path.Dir(filePath), ".env"))
+	images, parseErr := docker.GetImagesFromDockerCompose(env, content)
+	if parseErr != nil {
+		return nil, fmt.Errorf("get compose images failed, cmd err: %v, parse err: %v", err, parseErr)
+	}
+	return images, nil
+}
+
+func getComposeImagesByCommand(filePath string) ([]string, error) {
+	if err := checkCmd(); err != nil {
+		return nil, err
+	}
+	stdout, err := cmd.NewCommandMgr(cmd.WithTimeout(5*time.Minute)).
+		RunWithStdoutBashCf("%s %s config --images", global.CONF.DockerConfig.Command, loadFiles(filePath))
+	if err != nil {
+		return nil, fmt.Errorf("run compose config --images failed, std: %s, err: %v", stdout, err)
+	}
+
+	var images []string
+	seen := make(map[string]struct{})
+	for _, line := range strings.Split(stdout, "\n") {
+		image := strings.TrimSpace(line)
+		if len(image) == 0 {
+			continue
+		}
+		if _, ok := seen[image]; ok {
+			continue
+		}
+		seen[image] = struct{}{}
+		images = append(images, image)
+	}
+	if len(images) == 0 {
+		return nil, errors.New("no images found from compose config")
+	}
+	return images, nil
 }
 
 func Down(filePath string) (string, error) {

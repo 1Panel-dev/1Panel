@@ -108,7 +108,8 @@ ErrCustomRuntimes: 'ランタイム環境がインストールされています
 ErrAppVersionDeprecated: "{{ .name }} アプリケーションは現在の 1Panel バージョンと互換性がありません、スキップしました"
 ErrDockerFailed: "Docker の状態が異常です。サービス状態を確認してください"
 ErrDockerComposeCmdNotFound: "Docker Compose コマンドは存在しません。ホストマシンにこのコマンドを先にインストールしてください"
-UseExistImage: 'イメージのプルに失敗しました、既存のイメージを使用します'
+UseExistImage: 'イメージは既に存在します。既存のイメージを使用します'
+ErrDatabaseNotFound: 'データベース {{ .name }} は存在しません'
 
 #ssh
 ExportIP: "ログインIP"
