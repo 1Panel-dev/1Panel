@@ -1314,7 +1314,7 @@ const message = {
         up: 'Naik',
         down: 'Turun',
         interval: 'Selang Kumpulan',
-        intervalHelper: 'Sila masukkan selang kumpulan pemantauan yang sesuai (5 saat - 12 jam)',
+        intervalHelper: 'Sila masukkan selang kumpulan pemantauan yang sesuai (10 saat - 12 jam)',
     },
     terminal: {
         local: 'Tempatan',

@@ -1285,7 +1285,7 @@ const message = {
         up: '上',
         down: '下',
         interval: '収集間隔',
-        intervalHelper: '適切な監視収集間隔を入力してください（5秒 - 12時間）',
+        intervalHelper: '適切な監視収集間隔を入力してください（10秒 - 12時間）',
     },
     terminal: {
         local: 'ローカル',

@@ -1307,7 +1307,7 @@ const message = {
         up: 'Para cima',
         down: 'Para baixo',
         interval: 'Intervalo de Coleta',
-        intervalHelper: 'Insira um intervalo de coleta de monitoramento apropriado (5 segundos - 12 horas)',
+        intervalHelper: 'Insira um intervalo de coleta de monitoramento apropriado (10 segundos - 12 horas)',
     },
     terminal: {
         local: 'Local',

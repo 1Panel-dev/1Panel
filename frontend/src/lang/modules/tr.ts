@@ -1334,7 +1334,7 @@ const message = {
         up: 'Yukarı',
         down: 'Aşağı',
         interval: 'Toplama Aralığı',
-        intervalHelper: 'Lütfen uygun bir izleme toplama aralığı girin (5 saniye - 12 saat)',
+        intervalHelper: 'Lütfen uygun bir izleme toplama aralığı girin (10 saniye - 12 saat)',
     },
     terminal: {
         local: 'Yerel',

@@ -1321,7 +1321,7 @@ const message = {
         up: 'Up',
         down: 'Down',
         interval: 'Collection Interval',
-        intervalHelper: 'Please enter an appropriate monitoring collection interval (5 seconds - 12 hours)',
+        intervalHelper: 'Please enter an appropriate monitoring collection interval (10 seconds - 12 hours)',
     },
     terminal: {
         local: 'Local',

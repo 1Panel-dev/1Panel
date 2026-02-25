@@ -1259,7 +1259,7 @@ const message = {
         up: '上行',
         down: '下行',
         interval: '采集间隔',
-        intervalHelper: '请输入合适的监控采集时间间隔（5秒 - 12小时）',
+        intervalHelper: '请输入合适的监控采集时间间隔（10秒 - 12小时）',
     },
     terminal: {
         local: '本机',

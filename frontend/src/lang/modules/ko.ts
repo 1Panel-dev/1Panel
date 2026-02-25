@@ -1274,7 +1274,7 @@ const message = {
         up: '업',
         down: '다운',
         interval: '수집 간격',
-        intervalHelper: '적절한 모니터링 수집 간격을 입력하세요 (5초 - 12시간)',
+        intervalHelper: '적절한 모니터링 수집 간격을 입력하세요 (10초 - 12시간)',
     },
     terminal: {
         local: '로컬',

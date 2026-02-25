@@ -1331,7 +1331,7 @@ const message = {
         up: 'Subida',
         down: 'Bajada',
         interval: 'Intervalo de Recolección',
-        intervalHelper: 'Ingrese un intervalo de recolección de monitoreo apropiado (5 segundos - 12 horas)',
+        intervalHelper: 'Ingrese un intervalo de recolección de monitoreo apropiado (10 segundos - 12 horas)',
     },
     terminal: {
         local: 'Local',

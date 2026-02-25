@@ -1251,7 +1251,7 @@ const message = {
         up: '上行',
         down: '下行',
         interval: '採集間隔',
-        intervalHelper: '請輸入合適的監控採集時間間隔（5秒 - 12小時）',
+        intervalHelper: '請輸入合適的監控採集時間間隔（10秒 - 12小時）',
     },
     terminal: {
         local: '本機',
