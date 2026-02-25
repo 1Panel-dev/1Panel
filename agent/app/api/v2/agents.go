@@ -313,6 +313,47 @@ func (b *BaseApi) UpdateAgentTelegramConfig(c *gin.Context) {
 }
 
 // @Tags AI
+// @Summary Get Agent Discord channel config
+// @Accept json
+// @Param request body dto.AgentDiscordConfigReq true "request"
+// @Success 200 {object} dto.AgentDiscordConfig
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/channel/discord/get [post]
+func (b *BaseApi) GetAgentDiscordConfig(c *gin.Context) {
+	var req dto.AgentDiscordConfigReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	data, err := agentService.GetDiscordConfig(req)
+	if err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.SuccessWithData(c, data)
+}
+
+// @Tags AI
+// @Summary Update Agent Discord channel config
+// @Accept json
+// @Param request body dto.AgentDiscordConfigUpdateReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/channel/discord/update [post]
+func (b *BaseApi) UpdateAgentDiscordConfig(c *gin.Context) {
+	var req dto.AgentDiscordConfigUpdateReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := agentService.UpdateDiscordConfig(req); err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags AI
 // @Summary Approve Agent Feishu pairing code
 // @Accept json
 // @Param request body dto.AgentFeishuPairingApproveReq true "request"

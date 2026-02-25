@@ -156,6 +156,14 @@ export const updateAgentTelegramConfig = (req: AI.AgentTelegramConfigUpdateReq) 
     return http.post(`/ai/agents/channel/telegram/update`, req);
 };
 
+export const getAgentDiscordConfig = (req: AI.AgentDiscordConfigReq) => {
+    return http.post<AI.AgentDiscordConfig>(`/ai/agents/channel/discord/get`, req);
+};
+
+export const updateAgentDiscordConfig = (req: AI.AgentDiscordConfigUpdateReq) => {
+    return http.post(`/ai/agents/channel/discord/update`, req);
+};
+
 export const approveAgentChannelPairing = (req: AI.AgentChannelPairingApproveReq) => {
     return http.post(`/ai/agents/channel/pairing/approve`, req);
 };

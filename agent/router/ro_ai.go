@@ -56,6 +56,8 @@ func (a *AIToolsRouter) InitRouter(Router *gin.RouterGroup) {
 		aiToolsRouter.POST("/agents/channel/feishu/approve", baseApi.ApproveAgentFeishuPairing)
 		aiToolsRouter.POST("/agents/channel/telegram/get", baseApi.GetAgentTelegramConfig)
 		aiToolsRouter.POST("/agents/channel/telegram/update", baseApi.UpdateAgentTelegramConfig)
+		aiToolsRouter.POST("/agents/channel/discord/get", baseApi.GetAgentDiscordConfig)
+		aiToolsRouter.POST("/agents/channel/discord/update", baseApi.UpdateAgentDiscordConfig)
 		aiToolsRouter.POST("/agents/channel/pairing/approve", baseApi.ApproveAgentChannelPairing)
 	}
 }

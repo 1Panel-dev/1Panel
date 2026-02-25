@@ -5,11 +5,15 @@
         </el-form-item>
         <el-form-item :label="t('aiTools.agents.dmPolicy')" prop="dmPolicy">
             <el-select v-model="form.dmPolicy">
-                <el-option label="pairing" value="pairing" />
+                <el-option :label="t('aiTools.agents.policyPairing')" value="pairing" />
+                <el-option :label="t('aiTools.agents.policyOpen')" value="open" />
             </el-select>
         </el-form-item>
         <el-form-item label="Bot Token" prop="botToken">
             <el-input v-model="form.botToken" type="password" show-password />
+        </el-form-item>
+        <el-form-item :label="t('setting.proxy')">
+            <el-input v-model="form.proxy" placeholder="http://127.0.0.1:7890" />
         </el-form-item>
         <el-form-item>
             <el-button type="primary" :loading="saving" @click="saveChannel">
@@ -50,6 +54,7 @@ const form = reactive<AI.AgentTelegramConfig>({
     enabled: true,
     dmPolicy: 'pairing',
     botToken: '',
+    proxy: '',
 });
 
 const rules = reactive({
@@ -79,6 +84,7 @@ const saveChannel = async () => {
             enabled: form.enabled,
             dmPolicy: form.dmPolicy || 'pairing',
             botToken: form.botToken,
+            proxy: form.proxy,
         });
         MsgSuccess(t('aiTools.agents.saveSuccess'));
     } finally {

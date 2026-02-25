@@ -413,6 +413,7 @@ export namespace AI {
         enabled: boolean;
         dmPolicy: string;
         botToken: string;
+        proxy: string;
     }
 
     export interface AgentTelegramConfigUpdateReq {
@@ -420,11 +421,33 @@ export namespace AI {
         enabled: boolean;
         dmPolicy: string;
         botToken: string;
+        proxy: string;
     }
 
     export interface AgentChannelPairingApproveReq {
         agentId: number;
-        type: 'feishu' | 'telegram';
+        type: 'feishu' | 'telegram' | 'discord';
         pairingCode: string;
+    }
+
+    export interface AgentDiscordConfigReq {
+        agentId: number;
+    }
+
+    export interface AgentDiscordConfig {
+        enabled: boolean;
+        dmPolicy: string;
+        groupPolicy: string;
+        token: string;
+        proxy: string;
+    }
+
+    export interface AgentDiscordConfigUpdateReq {
+        agentId: number;
+        enabled: boolean;
+        dmPolicy: string;
+        groupPolicy: string;
+        token: string;
+        proxy: string;
     }
 }

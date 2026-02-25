@@ -6,6 +6,9 @@
         <el-tab-pane label="Telegram" name="telegram">
             <TelegramTab ref="telegramRef" />
         </el-tab-pane>
+        <el-tab-pane label="Discord" name="discord">
+            <DiscordTab ref="discordRef" />
+        </el-tab-pane>
     </el-tabs>
 </template>
 
@@ -14,18 +17,24 @@ import { nextTick, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import FeishuTab from './channels/feishu.vue';
 import TelegramTab from './channels/telegram.vue';
+import DiscordTab from './channels/discord.vue';
 
 const { t } = useI18n();
 const activeTab = ref('feishu');
 const agentId = ref(0);
 const feishuRef = ref();
 const telegramRef = ref();
+const discordRef = ref();
 
 const loadCurrentTab = async () => {
     if (agentId.value <= 0) {
         return;
     }
     await nextTick();
+    if (activeTab.value === 'discord') {
+        await discordRef.value?.load(agentId.value);
+        return;
+    }
     if (activeTab.value === 'telegram') {
         await telegramRef.value?.load(agentId.value);
         return;

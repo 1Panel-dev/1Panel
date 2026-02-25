@@ -180,16 +180,39 @@ type AgentTelegramConfigUpdateReq struct {
 	Enabled  bool   `json:"enabled"`
 	DmPolicy string `json:"dmPolicy" validate:"required"`
 	BotToken string `json:"botToken" validate:"required"`
+	Proxy    string `json:"proxy"`
 }
 
 type AgentTelegramConfig struct {
 	Enabled  bool   `json:"enabled"`
 	DmPolicy string `json:"dmPolicy"`
 	BotToken string `json:"botToken"`
+	Proxy    string `json:"proxy"`
 }
 
 type AgentChannelPairingApproveReq struct {
 	AgentID     uint   `json:"agentId" validate:"required"`
-	Type        string `json:"type" validate:"required,oneof=feishu telegram"`
+	Type        string `json:"type" validate:"required,oneof=feishu telegram discord"`
 	PairingCode string `json:"pairingCode" validate:"required"`
+}
+
+type AgentDiscordConfigReq struct {
+	AgentID uint `json:"agentId" validate:"required"`
+}
+
+type AgentDiscordConfigUpdateReq struct {
+	AgentID     uint   `json:"agentId" validate:"required"`
+	Enabled     bool   `json:"enabled"`
+	DmPolicy    string `json:"dmPolicy" validate:"required"`
+	GroupPolicy string `json:"groupPolicy" validate:"required,oneof=open allowlist disabled"`
+	Token       string `json:"token" validate:"required"`
+	Proxy       string `json:"proxy"`
+}
+
+type AgentDiscordConfig struct {
+	Enabled     bool   `json:"enabled"`
+	DmPolicy    string `json:"dmPolicy"`
+	GroupPolicy string `json:"groupPolicy"`
+	Token       string `json:"token"`
+	Proxy       string `json:"proxy"`
 }

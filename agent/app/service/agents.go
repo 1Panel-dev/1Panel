@@ -45,6 +45,8 @@ type IAgentService interface {
 	UpdateFeishuConfig(req dto.AgentFeishuConfigUpdateReq) error
 	GetTelegramConfig(req dto.AgentTelegramConfigReq) (*dto.AgentTelegramConfig, error)
 	UpdateTelegramConfig(req dto.AgentTelegramConfigUpdateReq) error
+	GetDiscordConfig(req dto.AgentDiscordConfigReq) (*dto.AgentDiscordConfig, error)
+	UpdateDiscordConfig(req dto.AgentDiscordConfigUpdateReq) error
 	ApproveChannelPairing(req dto.AgentChannelPairingApproveReq) error
 	ApproveFeishuPairing(req dto.AgentFeishuPairingApproveReq) error
 }
@@ -602,6 +604,48 @@ func (a AgentService) UpdateTelegramConfig(req dto.AgentTelegramConfigUpdateReq)
 		Enabled:  req.Enabled,
 		DmPolicy: req.DmPolicy,
 		BotToken: req.BotToken,
+		Proxy:    req.Proxy,
+	})
+	if err := writeOpenclawConfigRaw(agent.ConfigPath, conf); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (a AgentService) GetDiscordConfig(req dto.AgentDiscordConfigReq) (*dto.AgentDiscordConfig, error) {
+	agent, _, err := a.loadAgentAndInstall(req.AgentID)
+	if err != nil {
+		return nil, err
+	}
+	conf, err := readOpenclawConfig(agent.ConfigPath)
+	if err != nil {
+		return nil, err
+	}
+	result := extractDiscordConfig(conf)
+	return &result, nil
+}
+
+func (a AgentService) UpdateDiscordConfig(req dto.AgentDiscordConfigUpdateReq) error {
+	agent, _, err := a.loadAgentAndInstall(req.AgentID)
+	if err != nil {
+		return err
+	}
+	conf, err := readOpenclawConfig(agent.ConfigPath)
+	if err != nil {
+		return err
+	}
+	if req.DmPolicy == "" {
+		req.DmPolicy = "pairing"
+	}
+	if req.GroupPolicy == "" {
+		req.GroupPolicy = "open"
+	}
+	setDiscordConfig(conf, dto.AgentDiscordConfig{
+		Enabled:     req.Enabled,
+		DmPolicy:    req.DmPolicy,
+		GroupPolicy: req.GroupPolicy,
+		Token:       req.Token,
+		Proxy:       req.Proxy,
 	})
 	if err := writeOpenclawConfigRaw(agent.ConfigPath, conf); err != nil {
 		return err
@@ -618,7 +662,7 @@ func (a AgentService) ApproveChannelPairing(req dto.AgentChannelPairingApproveRe
 	if channelType == "" {
 		channelType = "feishu"
 	}
-	if channelType != "feishu" && channelType != "telegram" {
+	if channelType != "feishu" && channelType != "telegram" && channelType != "discord" {
 		return fmt.Errorf("unsupported channel type: %s", channelType)
 	}
 	if err := cmd.RunDefaultBashCf(
@@ -733,6 +777,9 @@ func setFeishuConfig(conf map[string]interface{}, config dto.AgentFeishuConfig) 
 			},
 		},
 	}
+	if strings.EqualFold(config.DmPolicy, "open") {
+		feishu["allowFrom"] = []string{"*"}
+	}
 	channels["feishu"] = feishu
 }
 
@@ -762,6 +809,9 @@ func extractTelegramConfig(conf map[string]interface{}) dto.AgentTelegramConfig 
 	if botToken, ok := telegram["botToken"].(string); ok {
 		result.BotToken = botToken
 	}
+	if proxy, ok := telegram["proxy"].(string); ok {
+		result.Proxy = proxy
+	}
 	return result
 }
 
@@ -772,7 +822,69 @@ func setTelegramConfig(conf map[string]interface{}, config dto.AgentTelegramConf
 		"dmPolicy": config.DmPolicy,
 		"botToken": config.BotToken,
 	}
+	if strings.EqualFold(config.DmPolicy, "open") {
+		telegram["allowFrom"] = []string{"*"}
+	}
+	if strings.TrimSpace(config.Proxy) != "" {
+		telegram["proxy"] = strings.TrimSpace(config.Proxy)
+	}
 	channels["telegram"] = telegram
+}
+
+func extractDiscordConfig(conf map[string]interface{}) dto.AgentDiscordConfig {
+	result := dto.AgentDiscordConfig{Enabled: true, DmPolicy: "pairing", GroupPolicy: "open"}
+	channels, ok := conf["channels"].(map[string]interface{})
+	if !ok {
+		return result
+	}
+	discord, ok := channels["discord"].(map[string]interface{})
+	if !ok {
+		return result
+	}
+	if enabled, ok := discord["enabled"].(bool); ok {
+		result.Enabled = enabled
+	}
+	if token, ok := discord["token"].(string); ok {
+		result.Token = token
+	}
+	if groupPolicy, ok := discord["groupPolicy"].(string); ok && strings.TrimSpace(groupPolicy) != "" {
+		result.GroupPolicy = groupPolicy
+	}
+	if proxy, ok := discord["proxy"].(string); ok {
+		result.Proxy = proxy
+	}
+	if policy, ok := discord["dmPolicy"].(string); ok && strings.TrimSpace(policy) != "" {
+		result.DmPolicy = policy
+		return result
+	}
+	// backward compatibility: old nested style
+	dm, ok := discord["dm"].(map[string]interface{})
+	if ok {
+		if policy, ok := dm["policy"].(string); ok && strings.TrimSpace(policy) != "" {
+			result.DmPolicy = policy
+		}
+	}
+	return result
+}
+
+func setDiscordConfig(conf map[string]interface{}, config dto.AgentDiscordConfig) {
+	channels := ensureChildMap(conf, "channels")
+	discord := ensureChildMap(channels, "discord")
+	discord["enabled"] = config.Enabled
+	discord["token"] = config.Token
+	discord["dmPolicy"] = config.DmPolicy
+	discord["groupPolicy"] = config.GroupPolicy
+	if strings.EqualFold(config.DmPolicy, "open") {
+		discord["allowFrom"] = []string{"*"}
+	} else {
+		delete(discord, "allowFrom")
+	}
+	if strings.TrimSpace(config.Proxy) != "" {
+		discord["proxy"] = strings.TrimSpace(config.Proxy)
+	} else {
+		delete(discord, "proxy")
+	}
+	delete(discord, "dm")
 }
 
 func (a AgentService) syncAgentsByAccount(account *model.AgentAccount) error {

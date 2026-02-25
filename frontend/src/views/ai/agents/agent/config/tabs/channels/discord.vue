@@ -3,25 +3,23 @@
         <el-form-item :label="t('commons.table.status')">
             <el-switch v-model="form.enabled" />
         </el-form-item>
-        <el-form-item>
-            <el-link type="primary" icon="Position" @click="toFeishuDoc">
-                {{ t('container.mirrorsHelper2') }}
-            </el-link>
-        </el-form-item>
         <el-form-item :label="t('aiTools.agents.dmPolicy')" prop="dmPolicy">
             <el-select v-model="form.dmPolicy">
                 <el-option :label="t('aiTools.agents.policyPairing')" value="pairing" />
                 <el-option :label="t('aiTools.agents.policyOpen')" value="open" />
             </el-select>
         </el-form-item>
-        <el-form-item :label="t('aiTools.agents.botName')" prop="botName">
-            <el-input v-model="form.botName" />
+        <el-form-item :label="t('aiTools.agents.groupPolicy')" prop="groupPolicy">
+            <el-select v-model="form.groupPolicy">
+                <el-option :label="t('aiTools.agents.policyOpen')" value="open" />
+                <el-option :label="t('aiTools.agents.policyDisabled')" value="disabled" />
+            </el-select>
         </el-form-item>
-        <el-form-item :label="t('aiTools.agents.appId')" prop="appId">
-            <el-input v-model="form.appId" />
+        <el-form-item label="Token" prop="token">
+            <el-input v-model="form.token" type="password" show-password />
         </el-form-item>
-        <el-form-item :label="t('aiTools.agents.appSecret')" prop="appSecret">
-            <el-input v-model="form.appSecret" type="password" show-password />
+        <el-form-item :label="t('setting.proxy')">
+            <el-input v-model="form.proxy" placeholder="http://127.0.0.1:7890" />
         </el-form-item>
         <el-form-item>
             <el-button type="primary" :loading="saving" @click="saveChannel">
@@ -47,7 +45,7 @@ import { reactive, ref } from 'vue';
 import type { FormInstance } from 'element-plus';
 import { useI18n } from 'vue-i18n';
 import { AI } from '@/api/interface/ai';
-import { approveAgentChannelPairing, getAgentFeishuConfig, updateAgentFeishuConfig } from '@/api/modules/ai';
+import { approveAgentChannelPairing, getAgentDiscordConfig, updateAgentDiscordConfig } from '@/api/modules/ai';
 import { MsgSuccess, MsgWarning } from '@/utils/message';
 import { Rules } from '@/global/form-rules';
 
@@ -58,32 +56,30 @@ const agentId = ref(0);
 const pairingCode = ref('');
 const formRef = ref<FormInstance>();
 
-const form = reactive<AI.AgentFeishuConfig>({
+const form = reactive<AI.AgentDiscordConfig>({
     enabled: true,
     dmPolicy: 'pairing',
-    botName: '',
-    appId: '',
-    appSecret: '',
+    groupPolicy: 'open',
+    token: '',
+    proxy: '',
 });
 
 const rules = reactive({
     dmPolicy: [Rules.requiredSelect],
-    botName: [Rules.requiredInput],
-    appId: [Rules.requiredInput],
-    appSecret: [Rules.requiredInput],
+    groupPolicy: [Rules.requiredSelect],
+    token: [Rules.requiredInput],
 });
-
-const toFeishuDoc = () => {
-    window.open('https://openclaw.club/guides/feishu-platform', '_blank');
-};
 
 const load = async (id: number) => {
     agentId.value = id;
     pairingCode.value = '';
-    const res = await getAgentFeishuConfig({ agentId: id });
+    const res = await getAgentDiscordConfig({ agentId: id });
     Object.assign(form, res.data || {});
     if (!form.dmPolicy) {
         form.dmPolicy = 'pairing';
+    }
+    if (!form.groupPolicy) {
+        form.groupPolicy = 'open';
     }
 };
 
@@ -94,13 +90,13 @@ const saveChannel = async () => {
     await formRef.value.validate();
     saving.value = true;
     try {
-        await updateAgentFeishuConfig({
+        await updateAgentDiscordConfig({
             agentId: agentId.value,
             enabled: form.enabled,
             dmPolicy: form.dmPolicy || 'pairing',
-            botName: form.botName,
-            appId: form.appId,
-            appSecret: form.appSecret,
+            groupPolicy: form.groupPolicy || 'open',
+            token: form.token,
+            proxy: form.proxy,
         });
         MsgSuccess(t('aiTools.agents.saveSuccess'));
     } finally {
@@ -120,7 +116,7 @@ const approvePairing = async () => {
     try {
         await approveAgentChannelPairing({
             agentId: agentId.value,
-            type: 'feishu',
+            type: 'discord',
             pairingCode: pairingCode.value,
         });
         MsgSuccess(t('aiTools.agents.pairingApproveSuccess'));
