@@ -9,6 +9,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/core/app/dto"
 	"github.com/1Panel-dev/1Panel/core/app/model"
+	"github.com/1Panel-dev/1Panel/core/buserr"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/utils/captcha"
@@ -53,7 +54,9 @@ func (b *BaseApi) Login(c *gin.Context) {
 	}
 
 	user, msgKey, err := authService.Login(c, req, string(entrance))
-	go saveLoginLogs(c, err)
+	if user == nil || user.MfaStatus != constant.StatusEnable {
+		go saveLoginLogs(c, wrapLoginErr(msgKey, err))
+	}
 	if msgKey == "ErrAuth" || msgKey == "ErrEntrance" {
 		if msgKey == "ErrAuth" {
 			global.IPTracker.SetNeedCaptcha(ip)
@@ -90,6 +93,7 @@ func (b *BaseApi) MFALogin(c *gin.Context) {
 	}
 
 	user, msgKey, err := authService.MFALogin(c, req, string(entrance))
+	go saveLoginLogs(c, wrapLoginErr(msgKey, err))
 	if msgKey == "ErrAuth" {
 		helper.BadAuth(c, msgKey, err)
 		return
@@ -135,7 +139,7 @@ func (b *BaseApi) PasskeyFinishLogin(c *gin.Context) {
 	sessionID := c.GetHeader("Passkey-Session")
 	entrance := loadEntranceFromRequest(c)
 	user, msgKey, err := authService.PasskeyFinishLogin(c, sessionID, entrance)
-	go saveLoginLogs(c, err)
+	go saveLoginLogs(c, wrapLoginErr(msgKey, err))
 	if msgKey == "ErrAuth" || msgKey == "ErrEntrance" {
 		if msgKey == "ErrAuth" {
 			global.IPTracker.SetNeedCaptcha(common.GetRealClientIP(c))
@@ -235,6 +239,16 @@ func saveLoginLogs(c *gin.Context, err error) {
 	logs.IP = c.ClientIP()
 	logs.Agent = c.GetHeader("User-Agent")
 	_ = logService.CreateLoginLog(logs)
+}
+
+func wrapLoginErr(msgKey string, err error) error {
+	if err != nil {
+		return err
+	}
+	if msgKey == "ErrAuth" || msgKey == "ErrEntrance" {
+		return buserr.New(msgKey)
+	}
+	return nil
 }
 
 func loadEntranceFromRequest(c *gin.Context) string {

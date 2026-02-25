@@ -116,7 +116,7 @@ func (u *AuthService) MFALogin(c *gin.Context, info dto.MFALogin, entrance strin
 	}
 	success := mfa.ValidCode(info.Code, mfaInterval.Value, mfaSecret.Value)
 	if !success {
-		return nil, "ErrAuth", nil
+		return nil, "ErrMFA", nil
 	}
 	res, err := u.generateSession(c, info.Name)
 	if err != nil {
