@@ -104,6 +104,7 @@ const onEdit = (row: AI.AgentAccountItem) => {
             name: row.name,
             baseURL: row.baseUrl,
             apiKey: row.apiKey,
+            rememberApiKey: row.rememberApiKey,
             model: row.model,
             apiType: row.apiType,
             maxTokens: row.maxTokens,

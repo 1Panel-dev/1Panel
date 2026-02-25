@@ -378,16 +378,17 @@ func (a AgentService) CreateAccount(req dto.AgentAccountCreateReq) error {
 	}
 	_, maxTokens, contextWindow := resolveRuntimeParams(provider, apiType, req.MaxTokens, req.ContextWindow)
 	account := &model.AgentAccount{
-		Provider:      provider,
-		Name:          req.Name,
-		APIKey:        apiKey,
-		BaseURL:       baseURL,
-		Model:         "",
-		APIType:       apiType,
-		MaxTokens:     0,
-		ContextWindow: 0,
-		Verified:      true,
-		Remark:        req.Remark,
+		Provider:       provider,
+		Name:           req.Name,
+		APIKey:         apiKey,
+		RememberAPIKey: req.RememberAPIKey,
+		BaseURL:        baseURL,
+		Model:          "",
+		APIType:        apiType,
+		MaxTokens:      0,
+		ContextWindow:  0,
+		Verified:       true,
+		Remark:         req.Remark,
 	}
 	if provider == "custom" {
 		account.Model = normalizeCustomModel(modelName)
@@ -431,6 +432,7 @@ func (a AgentService) UpdateAccount(req dto.AgentAccountUpdateReq) error {
 	}
 	account.Name = req.Name
 	account.APIKey = req.APIKey
+	account.RememberAPIKey = req.RememberAPIKey
 	account.BaseURL = baseURL
 	if provider == "custom" {
 		account.Model = normalizeCustomModel(req.Model)
@@ -467,20 +469,25 @@ func (a AgentService) PageAccounts(req dto.AgentAccountSearch) (int64, []dto.Age
 	}
 	items := make([]dto.AgentAccountInfo, 0, len(list))
 	for _, item := range list {
+		apiKey := ""
+		if item.RememberAPIKey {
+			apiKey = item.APIKey
+		}
 		items = append(items, dto.AgentAccountInfo{
-			ID:            item.ID,
-			Provider:      item.Provider,
-			ProviderName:  providerDisplayName(item.Provider),
-			Name:          item.Name,
-			APIKey:        item.APIKey,
-			BaseURL:       item.BaseURL,
-			Model:         item.Model,
-			APIType:       item.APIType,
-			MaxTokens:     item.MaxTokens,
-			ContextWindow: item.ContextWindow,
-			Verified:      item.Verified,
-			Remark:        item.Remark,
-			CreatedAt:     item.CreatedAt,
+			ID:             item.ID,
+			Provider:       item.Provider,
+			ProviderName:   providerDisplayName(item.Provider),
+			Name:           item.Name,
+			APIKey:         apiKey,
+			RememberAPIKey: item.RememberAPIKey,
+			BaseURL:        item.BaseURL,
+			Model:          item.Model,
+			APIType:        item.APIType,
+			MaxTokens:      item.MaxTokens,
+			ContextWindow:  item.ContextWindow,
+			Verified:       item.Verified,
+			Remark:         item.Remark,
+			CreatedAt:      item.CreatedAt,
 		})
 	}
 	return count, items, nil

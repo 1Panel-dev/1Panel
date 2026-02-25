@@ -42,16 +42,6 @@
                 <el-form-item>
                     <el-checkbox v-model="manualModel">{{ $t('aiTools.agents.manualModel') }}</el-checkbox>
                 </el-form-item>
-                <el-form-item :label="$t('aiTools.model.model')" prop="model">
-                    <el-input v-if="manualModel" v-model="form.model" />
-
-                    <el-select v-else v-model="form.model" filterable @change="handleModelChange">
-                        <el-option v-for="item in filteredModels" :key="item.id" :label="item.name" :value="item.id" />
-                    </el-select>
-                    <span class="input-help" v-if="form.provider == 'custom'">
-                        {{ $t('aiTools.agents.customModelHelper') }}
-                    </span>
-                </el-form-item>
                 <el-form-item :label="$t('aiTools.agents.account')" prop="accountId">
                     <el-select v-model="form.accountId" @change="handleAccountChange">
                         <el-option v-for="item in accountOptions" :key="item.id" :label="item.name" :value="item.id" />
@@ -63,14 +53,21 @@
                         </el-button>
                     </span>
                 </el-form-item>
-                <el-form-item :label="$t('aiTools.agents.apiKey')" v-if="form.accountId" prop="apiKey">
-                    <el-input v-model="form.apiKey" type="password" show-password readonly />
+                <el-form-item :label="$t('aiTools.model.model')" prop="model">
+                    <el-input v-if="manualModel" v-model="form.model" />
+
+                    <el-select v-else v-model="form.model" filterable @change="handleModelChange">
+                        <el-option v-for="item in filteredModels" :key="item.id" :label="item.name" :value="item.id" />
+                    </el-select>
+                    <span class="input-help" v-if="form.provider == 'custom'">
+                        {{ $t('aiTools.agents.customModelHelper') }}
+                    </span>
                 </el-form-item>
                 <el-form-item :label="$t('aiTools.agents.baseUrl')" v-if="form.accountId" prop="baseURL">
-                    <el-input v-model="form.baseURL" readonly />
+                    <el-input v-model="form.baseURL" disabled />
                 </el-form-item>
                 <el-form-item :label="$t('aiTools.agents.token')">
-                    <el-input v-model="form.token" readonly>
+                    <el-input v-model="form.token" disabled>
                         <template #append>
                             <CopyButton :content="form.token" />
                         </template>

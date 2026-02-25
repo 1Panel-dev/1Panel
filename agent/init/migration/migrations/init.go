@@ -964,3 +964,13 @@ var AddAppInstallSortOrder = &gormigrate.Migration{
 		return tx.AutoMigrate(&model.AppInstall{})
 	},
 }
+
+var AddAgentAccountRememberAPIKey = &gormigrate.Migration{
+	ID: "20260225-add-agent-account-remember-api-key",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.AgentAccount{}); err != nil {
+			return err
+		}
+		return tx.Model(&model.AgentAccount{}).Where("remember_api_key IS NULL").Update("remember_api_key", true).Error
+	},
+}

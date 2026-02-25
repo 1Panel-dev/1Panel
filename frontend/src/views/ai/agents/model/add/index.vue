@@ -18,6 +18,9 @@
                 <el-input v-model="form.apiKey" type="password" show-password />
                 <span class="input-help">{{ $t('aiTools.agents.customProviderHelper') }}</span>
             </el-form-item>
+            <el-form-item>
+                <el-checkbox v-model="form.rememberApiKey">{{ $t('terminal.rememberPassword') }}</el-checkbox>
+            </el-form-item>
             <el-form-item :label="$t('aiTools.agents.baseUrl')" prop="baseURL">
                 <el-input v-model="form.baseURL" :disabled="form.provider !== 'ollama' && form.provider !== 'custom'" />
             </el-form-item>
@@ -81,6 +84,7 @@ const form = reactive({
     maxTokens: 8192,
     contextWindow: 128000,
     apiKey: '',
+    rememberApiKey: false,
     remark: '',
     syncAgents: false,
 });
@@ -111,6 +115,7 @@ const submit = async () => {
                 name: form.name,
                 baseURL: form.baseURL,
                 apiKey: form.apiKey,
+                rememberApiKey: form.rememberApiKey,
                 model: form.model,
                 apiType: form.apiType,
                 maxTokens: form.maxTokens,
@@ -124,6 +129,7 @@ const submit = async () => {
                 name: form.name,
                 baseURL: form.baseURL,
                 apiKey: form.apiKey,
+                rememberApiKey: form.rememberApiKey,
                 model: form.model,
                 apiType: form.apiType,
                 maxTokens: form.maxTokens,
@@ -146,6 +152,7 @@ const handleClose = () => {
     form.apiType = 'openai-completions';
     form.maxTokens = 8192;
     form.contextWindow = 128000;
+    form.rememberApiKey = false;
     form.syncAgents = false;
 };
 
@@ -155,6 +162,7 @@ interface OpenParams {
     name?: string;
     baseURL?: string;
     apiKey?: string;
+    rememberApiKey?: boolean;
     model?: string;
     apiType?: string;
     maxTokens?: number;
@@ -171,6 +179,7 @@ const openDrawer = async (params?: OpenParams) => {
         form.name = params.name || '';
         form.baseURL = params.baseURL || '';
         form.apiKey = params.apiKey || '';
+        form.rememberApiKey = params.rememberApiKey || false;
         form.model = params.model || '';
         form.apiType = params.apiType || 'openai-completions';
         form.maxTokens = params.maxTokens || 8192;
@@ -183,6 +192,7 @@ const openDrawer = async (params?: OpenParams) => {
     form.name = '';
     form.baseURL = '';
     form.apiKey = '';
+    form.rememberApiKey = false;
     form.model = '';
     form.apiType = 'openai-completions';
     form.maxTokens = 8192;

@@ -322,6 +322,7 @@ export namespace AI {
         provider: string;
         name: string;
         apiKey: string;
+        rememberApiKey: boolean;
         baseURL: string;
         model: string;
         apiType: string;
@@ -334,6 +335,7 @@ export namespace AI {
         id: number;
         name: string;
         apiKey: string;
+        rememberApiKey: boolean;
         baseURL: string;
         model: string;
         apiType: string;
@@ -356,6 +358,7 @@ export namespace AI {
         providerName: string;
         name: string;
         apiKey: string;
+        rememberApiKey: boolean;
         baseUrl: string;
         model: string;
         apiType: string;
