@@ -2400,7 +2400,7 @@ const message = {
         takeDown: 'TakeDown',
         allReadyInstalled: 'Installed',
         installHelper: 'If you have image pull issues, configure image acceleration.',
-		sortMode: 'Sort',
+        sortMode: 'Sort',
         installWarn: `The external access isn't checked, and it will make the application unable to access through external network. Do you want to continue?`,
         showIgnore: 'View ignored applications',
         cancelIgnore: 'Cancel ignore',

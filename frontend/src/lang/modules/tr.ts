@@ -2426,7 +2426,7 @@ const message = {
         takeDown: 'Kaldır',
         allReadyInstalled: 'Kurulu',
         installHelper: 'Görüntü çekme sorunlarınız varsa, görüntü hızlandırmasını yapılandırın.',
-		sortMode: 'Sırala',
+        sortMode: 'Sırala',
         installWarn:
             'Dış erişim işaretlenmedi, bu uygulama dış ağ üzerinden erişilemez hale getirecek. Devam etmek istiyor musunuz?',
         showIgnore: 'Yoksayılan uygulamaları görüntüle',

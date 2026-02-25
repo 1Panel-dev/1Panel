@@ -1181,7 +1181,7 @@ func (u *ContainerService) ContainerStats(id string) (*dto.ContainerStats, error
 
 func (u *ContainerService) LoadUsers(req dto.OperationWithName) []string {
 	var users []string
-	std, err := cmd.RunDefaultWithStdoutBashCf("docker exec %s cat /etc/passwd", req.Name)
+	std, err := cmd.NewCommandMgr(cmd.WithTimeout(20*time.Second)).RunWithStdout("docker", "exec", req.Name, "cat", "/etc/passwd")
 	if err != nil {
 		return users
 	}

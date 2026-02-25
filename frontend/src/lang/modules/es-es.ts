@@ -2414,7 +2414,7 @@ const message = {
         takeDown: 'Desinstalar',
         allReadyInstalled: 'Instaladas',
         installHelper: 'Si tiene problemas con el pull de imagen, configure aceleración.',
-		sortMode: 'Ordenar',
+        sortMode: 'Ordenar',
         installWarn: 'Si no habilita el acceso externo, la app no será accesible externamente. ¿Desea continuar?',
         showIgnore: 'Ver aplicaciones ignoradas',
         cancelIgnore: 'Cancelar ignoradas',

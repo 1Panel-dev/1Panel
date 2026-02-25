@@ -2383,7 +2383,7 @@ const message = {
         takeDown: 'Retirar',
         allReadyInstalled: 'Instalado',
         installHelper: 'Se houver problemas ao puxar a imagem, configure a aceleração da imagem.',
-		sortMode: 'Ordenar',
+        sortMode: 'Ordenar',
         upgradeHelper:
             'Coloque aplicativos anormais de volta ao estado normal antes de atualizar. Se a atualização falhar, vá para "Logs > Logs do Sistema" para verificar a razão da falha.',
         installWarn: `O acesso externo não foi habilitado, o que impede que o aplicativo seja acessado via redes externas. Deseja continuar?`,

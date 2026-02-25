@@ -2232,7 +2232,7 @@ const message = {
         takeDown: '已废弃',
         allReadyInstalled: '已安装',
         installHelper: '配置镜像加速可以解决镜像拉取失败的问题',
-		sortMode: '排序',
+        sortMode: '排序',
         installWarn: '当前未勾选端口外部访问，将无法通过外网IP:端口访问，是否继续？',
         showIgnore: '查看忽略应用',
         cancelIgnore: '取消忽略',
