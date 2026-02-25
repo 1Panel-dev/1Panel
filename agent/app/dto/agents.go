@@ -170,3 +170,26 @@ type AgentFeishuConfig struct {
 	AppID     string `json:"appId"`
 	AppSecret string `json:"appSecret"`
 }
+
+type AgentTelegramConfigReq struct {
+	AgentID uint `json:"agentId" validate:"required"`
+}
+
+type AgentTelegramConfigUpdateReq struct {
+	AgentID  uint   `json:"agentId" validate:"required"`
+	Enabled  bool   `json:"enabled"`
+	DmPolicy string `json:"dmPolicy" validate:"required"`
+	BotToken string `json:"botToken" validate:"required"`
+}
+
+type AgentTelegramConfig struct {
+	Enabled  bool   `json:"enabled"`
+	DmPolicy string `json:"dmPolicy"`
+	BotToken string `json:"botToken"`
+}
+
+type AgentChannelPairingApproveReq struct {
+	AgentID     uint   `json:"agentId" validate:"required"`
+	Type        string `json:"type" validate:"required,oneof=feishu telegram"`
+	PairingCode string `json:"pairingCode" validate:"required"`
+}

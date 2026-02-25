@@ -682,7 +682,7 @@ const message = {
             pairingCodePlaceholder: '請輸入配對碼',
             approvePairing: '批准配對',
             feishuRequired: '請填寫 botName / appId / appSecret',
-            feishuSaveSuccess: '保存成功',
+            saveSuccess: '保存成功',
             pairingCodeRequired: '請輸入配對碼',
             pairingApproveSuccess: '配對成功',
             customModelHelper: '自訂模型帳號，模型需固定以 custom/ 開頭',

@@ -700,7 +700,7 @@ const message = {
             pairingCodePlaceholder: 'Enter pairing code',
             approvePairing: 'Approve Pairing',
             feishuRequired: 'Please fill botName / appId / appSecret',
-            feishuSaveSuccess: 'Saved successfully',
+            saveSuccess: 'Saved successfully',
             pairingCodeRequired: 'Please enter pairing code',
             pairingApproveSuccess: 'Pairing approved successfully',
             customModelHelper: 'Для пользовательской учетной записи модели имя модели должно начинаться с custom/',

@@ -684,7 +684,7 @@ const message = {
             pairingCodePlaceholder: '请输入配对码',
             approvePairing: '批准配对',
             feishuRequired: '请填写 botName / appId / appSecret',
-            feishuSaveSuccess: '保存成功',
+            saveSuccess: '保存成功',
             pairingCodeRequired: '请输入配对码',
             pairingApproveSuccess: '配对成功',
             customModelHelper: '自定义模型账号，模型固定以 custom/ 开头',

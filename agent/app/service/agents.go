@@ -43,6 +43,9 @@ type IAgentService interface {
 	DeleteAccount(req dto.AgentAccountDeleteReq) error
 	GetFeishuConfig(req dto.AgentFeishuConfigReq) (*dto.AgentFeishuConfig, error)
 	UpdateFeishuConfig(req dto.AgentFeishuConfigUpdateReq) error
+	GetTelegramConfig(req dto.AgentTelegramConfigReq) (*dto.AgentTelegramConfig, error)
+	UpdateTelegramConfig(req dto.AgentTelegramConfigUpdateReq) error
+	ApproveChannelPairing(req dto.AgentChannelPairingApproveReq) error
 	ApproveFeishuPairing(req dto.AgentFeishuPairingApproveReq) error
 }
 
@@ -570,19 +573,71 @@ func (a AgentService) UpdateFeishuConfig(req dto.AgentFeishuConfigUpdateReq) err
 	return nil
 }
 
-func (a AgentService) ApproveFeishuPairing(req dto.AgentFeishuPairingApproveReq) error {
+func (a AgentService) GetTelegramConfig(req dto.AgentTelegramConfigReq) (*dto.AgentTelegramConfig, error) {
+	agent, _, err := a.loadAgentAndInstall(req.AgentID)
+	if err != nil {
+		return nil, err
+	}
+	conf, err := readOpenclawConfig(agent.ConfigPath)
+	if err != nil {
+		return nil, err
+	}
+	result := extractTelegramConfig(conf)
+	return &result, nil
+}
+
+func (a AgentService) UpdateTelegramConfig(req dto.AgentTelegramConfigUpdateReq) error {
+	agent, _, err := a.loadAgentAndInstall(req.AgentID)
+	if err != nil {
+		return err
+	}
+	conf, err := readOpenclawConfig(agent.ConfigPath)
+	if err != nil {
+		return err
+	}
+	if req.DmPolicy == "" {
+		req.DmPolicy = "pairing"
+	}
+	setTelegramConfig(conf, dto.AgentTelegramConfig{
+		Enabled:  req.Enabled,
+		DmPolicy: req.DmPolicy,
+		BotToken: req.BotToken,
+	})
+	if err := writeOpenclawConfigRaw(agent.ConfigPath, conf); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (a AgentService) ApproveChannelPairing(req dto.AgentChannelPairingApproveReq) error {
 	_, install, err := a.loadAgentAndInstall(req.AgentID)
 	if err != nil {
 		return err
 	}
+	channelType := strings.ToLower(strings.TrimSpace(req.Type))
+	if channelType == "" {
+		channelType = "feishu"
+	}
+	if channelType != "feishu" && channelType != "telegram" {
+		return fmt.Errorf("unsupported channel type: %s", channelType)
+	}
 	if err := cmd.RunDefaultBashCf(
-		"docker exec %s openclaw pairing approve feishu %q",
+		"docker exec %s openclaw pairing approve %s %q",
 		install.ContainerName,
+		channelType,
 		strings.TrimSpace(req.PairingCode),
 	); err != nil {
 		return err
 	}
 	return nil
+}
+
+func (a AgentService) ApproveFeishuPairing(req dto.AgentFeishuPairingApproveReq) error {
+	return a.ApproveChannelPairing(dto.AgentChannelPairingApproveReq{
+		AgentID:     req.AgentID,
+		Type:        "feishu",
+		PairingCode: req.PairingCode,
+	})
 }
 
 func (a AgentService) loadAgentAndInstall(agentID uint) (*model.Agent, *model.AppInstall, error) {
@@ -686,6 +741,38 @@ func setFeishuPluginEnabled(conf map[string]interface{}, enabled bool) {
 	entries := ensureChildMap(plugins, "entries")
 	feishu := ensureChildMap(entries, "feishu")
 	feishu["enabled"] = enabled
+}
+
+func extractTelegramConfig(conf map[string]interface{}) dto.AgentTelegramConfig {
+	result := dto.AgentTelegramConfig{Enabled: true, DmPolicy: "pairing"}
+	channels, ok := conf["channels"].(map[string]interface{})
+	if !ok {
+		return result
+	}
+	telegram, ok := channels["telegram"].(map[string]interface{})
+	if !ok {
+		return result
+	}
+	if enabled, ok := telegram["enabled"].(bool); ok {
+		result.Enabled = enabled
+	}
+	if dmPolicy, ok := telegram["dmPolicy"].(string); ok && strings.TrimSpace(dmPolicy) != "" {
+		result.DmPolicy = dmPolicy
+	}
+	if botToken, ok := telegram["botToken"].(string); ok {
+		result.BotToken = botToken
+	}
+	return result
+}
+
+func setTelegramConfig(conf map[string]interface{}, config dto.AgentTelegramConfig) {
+	channels := ensureChildMap(conf, "channels")
+	telegram := map[string]interface{}{
+		"enabled":  config.Enabled,
+		"dmPolicy": config.DmPolicy,
+		"botToken": config.BotToken,
+	}
+	channels["telegram"] = telegram
 }
 
 func (a AgentService) syncAgentsByAccount(account *model.AgentAccount) error {

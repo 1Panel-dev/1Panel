@@ -404,4 +404,27 @@ export namespace AI {
         agentId: number;
         pairingCode: string;
     }
+
+    export interface AgentTelegramConfigReq {
+        agentId: number;
+    }
+
+    export interface AgentTelegramConfig {
+        enabled: boolean;
+        dmPolicy: string;
+        botToken: string;
+    }
+
+    export interface AgentTelegramConfigUpdateReq {
+        agentId: number;
+        enabled: boolean;
+        dmPolicy: string;
+        botToken: string;
+    }
+
+    export interface AgentChannelPairingApproveReq {
+        agentId: number;
+        type: 'feishu' | 'telegram';
+        pairingCode: string;
+    }
 }

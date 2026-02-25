@@ -1,13 +1,15 @@
 <template>
     <DrawerPro v-model="open" :header="header" size="large" @close="handleClose">
-        <el-tabs v-model="activeTab" tab-position="left" class="config-tabs" @tab-click="handleTabClick">
-            <el-tab-pane :label="t('aiTools.model.model')" name="model">
-                <ModelTab ref="modelRef" @updated="handleModelUpdated" />
-            </el-tab-pane>
-            <el-tab-pane :label="t('aiTools.agents.channelsTab')" name="channels">
-                <ChannelsTab ref="channelsRef" />
-            </el-tab-pane>
-        </el-tabs>
+        <template #content>
+            <el-tabs v-model="activeTab" tab-position="left" class="config-tabs" @tab-click="handleTabClick">
+                <el-tab-pane :label="t('aiTools.model.model')" name="model">
+                    <ModelTab ref="modelRef" @updated="handleModelUpdated" />
+                </el-tab-pane>
+                <el-tab-pane :label="t('aiTools.agents.channelsTab')" name="channels">
+                    <ChannelsTab ref="channelsRef" />
+                </el-tab-pane>
+            </el-tabs>
+        </template>
     </DrawerPro>
 </template>
 

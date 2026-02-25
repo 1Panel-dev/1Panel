@@ -692,7 +692,7 @@ const message = {
             pairingCodePlaceholder: 'Enter pairing code',
             approvePairing: 'Approve Pairing',
             feishuRequired: 'Please fill botName / appId / appSecret',
-            feishuSaveSuccess: 'Saved successfully',
+            saveSuccess: 'Saved successfully',
             pairingCodeRequired: 'Please enter pairing code',
             pairingApproveSuccess: 'Pairing approved successfully',
             customModelHelper: '사용자 정의 모델 계정의 모델명은 반드시 custom/ 로 시작해야 합니다',

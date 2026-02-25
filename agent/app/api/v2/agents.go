@@ -272,6 +272,47 @@ func (b *BaseApi) UpdateAgentFeishuConfig(c *gin.Context) {
 }
 
 // @Tags AI
+// @Summary Get Agent Telegram channel config
+// @Accept json
+// @Param request body dto.AgentTelegramConfigReq true "request"
+// @Success 200 {object} dto.AgentTelegramConfig
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/channel/telegram/get [post]
+func (b *BaseApi) GetAgentTelegramConfig(c *gin.Context) {
+	var req dto.AgentTelegramConfigReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	data, err := agentService.GetTelegramConfig(req)
+	if err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.SuccessWithData(c, data)
+}
+
+// @Tags AI
+// @Summary Update Agent Telegram channel config
+// @Accept json
+// @Param request body dto.AgentTelegramConfigUpdateReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/channel/telegram/update [post]
+func (b *BaseApi) UpdateAgentTelegramConfig(c *gin.Context) {
+	var req dto.AgentTelegramConfigUpdateReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := agentService.UpdateTelegramConfig(req); err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags AI
 // @Summary Approve Agent Feishu pairing code
 // @Accept json
 // @Param request body dto.AgentFeishuPairingApproveReq true "request"
@@ -285,6 +326,26 @@ func (b *BaseApi) ApproveAgentFeishuPairing(c *gin.Context) {
 		return
 	}
 	if err := agentService.ApproveFeishuPairing(req); err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags AI
+// @Summary Approve Agent channel pairing code
+// @Accept json
+// @Param request body dto.AgentChannelPairingApproveReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/channel/pairing/approve [post]
+func (b *BaseApi) ApproveAgentChannelPairing(c *gin.Context) {
+	var req dto.AgentChannelPairingApproveReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := agentService.ApproveChannelPairing(req); err != nil {
 		helper.BadRequest(c, err)
 		return
 	}

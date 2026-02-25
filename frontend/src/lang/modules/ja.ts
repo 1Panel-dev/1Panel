@@ -695,7 +695,7 @@ const message = {
             pairingCodePlaceholder: 'Enter pairing code',
             approvePairing: 'Approve Pairing',
             feishuRequired: 'Please fill botName / appId / appSecret',
-            feishuSaveSuccess: 'Saved successfully',
+            saveSuccess: 'Saved successfully',
             pairingCodeRequired: 'Please enter pairing code',
             pairingApproveSuccess: 'Pairing approved successfully',
             customModelHelper: 'カスタムモデルアカウントでは、モデル名は必ず custom/ で始めてください',
