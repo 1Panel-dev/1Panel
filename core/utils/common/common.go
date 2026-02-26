@@ -2,9 +2,10 @@ package common
 
 import (
 	"crypto/md5"
+	"crypto/rand"
 	"encoding/hex"
 	"fmt"
-	mathRand "math/rand"
+	"math/big"
 	"net"
 	"os"
 	"path"
@@ -22,20 +23,29 @@ var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456
 
 func RandStr(n int) string {
 	b := make([]rune, n)
+	max := big.NewInt(int64(len(letters)))
 	for i := range b {
-		b[i] = letters[mathRand.Intn(len(letters))]
+		num, err := rand.Int(rand.Reader, max)
+		if err != nil {
+			return ""
+		}
+		b[i] = letters[num.Int64()]
 	}
 	return string(b)
 }
+
 func RandStrAndNum(n int) string {
-	source := mathRand.NewSource(time.Now().UnixNano())
-	randGen := mathRand.New(source)
 	const charset = "abcdefghijklmnopqrstuvwxyz0123456789"
 	b := make([]byte, n)
+	max := big.NewInt(int64(len(charset)))
 	for i := range b {
-		b[i] = charset[randGen.Intn(len(charset)-1)]
+		num, err := rand.Int(rand.Reader, max)
+		if err != nil {
+			return ""
+		}
+		b[i] = charset[num.Int64()]
 	}
-	return (string(b))
+	return string(b)
 }
 
 func Md5(val string) string {
@@ -68,7 +78,7 @@ func ScanPort(port int) bool {
 	if err != nil {
 		return true
 	}
-	defer ln.Close()
+	defer func() { _ = ln.Close() }()
 	return false
 }
 
@@ -81,7 +91,7 @@ func CheckPort(host string, port string, timeout time.Duration) bool {
 		}
 		return strings.Contains(err.Error(), "connection refused")
 	}
-	defer conn.Close()
+	defer func() { _ = conn.Close() }()
 	return true
 }
 

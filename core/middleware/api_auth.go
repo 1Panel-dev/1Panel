@@ -1,17 +1,19 @@
 package middleware
 
 import (
-	"crypto/md5"
+	"crypto/hmac"
+	"crypto/sha256"
 	"encoding/hex"
+	"net"
+	"strconv"
+	"strings"
+	"time"
+
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/utils/common"
 	"github.com/gin-gonic/gin"
-	"net"
-	"strconv"
-	"strings"
-	"time"
 )
 
 func ApiAuth() gin.HandlerFunc {
@@ -76,7 +78,8 @@ func isValid1PanelTimestamp(panelTimestamp string) bool {
 
 func isValid1PanelToken(panelToken string, panelTimestamp string) bool {
 	system1PanelToken := global.Api.ApiKey
-	return panelToken == GenerateMD5("1panel"+system1PanelToken+panelTimestamp)
+	expected := GenerateHMAC(system1PanelToken, panelTimestamp)
+	return hmac.Equal([]byte(panelToken), []byte(expected))
 }
 
 func isIPInWhiteList(clientIP string) bool {
@@ -111,8 +114,8 @@ func isIPInWhiteList(clientIP string) bool {
 	return false
 }
 
-func GenerateMD5(param string) string {
-	hash := md5.New()
-	hash.Write([]byte(param))
-	return hex.EncodeToString(hash.Sum(nil))
+func GenerateHMAC(systemToken, timestamp string) string {
+	mac := hmac.New(sha256.New, []byte(systemToken))
+	mac.Write([]byte("1panel" + timestamp))
+	return hex.EncodeToString(mac.Sum(nil))
 }

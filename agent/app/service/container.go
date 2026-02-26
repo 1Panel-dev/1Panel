@@ -43,7 +43,6 @@ import (
 	"github.com/docker/go-connections/nat"
 	"github.com/gin-gonic/gin"
 	v1 "github.com/opencontainers/image-spec/specs-go/v1"
-	"github.com/pkg/errors"
 	"github.com/shirou/gopsutil/v4/cpu"
 	"github.com/shirou/gopsutil/v4/mem"
 )
@@ -69,7 +68,6 @@ type IContainerService interface {
 	ComposeLogClean(req dto.ComposeLogClean) error
 
 	ContainerCreate(req dto.ContainerOperate, inThread bool) error
-	ContainerCreateByCommand(req dto.ContainerCreateByCommand) error
 	ContainerUpdate(req dto.ContainerOperate) error
 	ContainerUpgrade(req dto.ContainerUpgrade) error
 	ContainerInfo(req dto.OperationWithName) (*dto.ContainerOperate, error)
@@ -104,7 +102,7 @@ func (u *ContainerService) Page(req dto.PageContainer) (int64, interface{}, erro
 	if err != nil {
 		return 0, nil, err
 	}
-	defer client.Close()
+	defer func() { _ = client.Close() }()
 	options := container.ListOptions{All: true}
 	if len(req.Filters) != 0 {
 		options.Filters = filters.NewArgs()
@@ -300,42 +298,6 @@ func (u *ContainerService) ContainerListStats() ([]dto.ContainerListStats, error
 	}
 	wg.Wait()
 	return datas, nil
-}
-
-func (u *ContainerService) ContainerCreateByCommand(req dto.ContainerCreateByCommand) error {
-	if cmd.CheckIllegal(req.Command) {
-		return buserr.New("ErrCmdIllegal")
-	}
-	if !strings.HasPrefix(strings.TrimSpace(req.Command), "docker run ") {
-		return errors.New("error command format")
-	}
-	containerName := ""
-	commands := strings.Split(req.Command, " ")
-	for index, val := range commands {
-		if val == "--name" && len(commands) > index+1 {
-			containerName = commands[index+1]
-		}
-	}
-	if !strings.Contains(req.Command, " -d ") {
-		req.Command = strings.ReplaceAll(req.Command, "docker run", "docker run -d")
-	}
-	if len(containerName) == 0 {
-		containerName = fmt.Sprintf("1Panel-%s-%s", common.RandStr(5), common.RandStrAndNum(4))
-		req.Command += fmt.Sprintf(" --name %s", containerName)
-	}
-	taskItem, err := task.NewTaskWithOps(containerName, task.TaskCreate, task.TaskScopeContainer, req.TaskID, 1)
-	if err != nil {
-		global.LOG.Errorf("new task for create container failed, err: %v", err)
-		return err
-	}
-	go func() {
-		taskItem.AddSubTask(i18n.GetWithName("ContainerCreate", containerName), func(t *task.Task) error {
-			cmdMgr := cmd.NewCommandMgr(cmd.WithTask(*taskItem), cmd.WithTimeout(5*time.Minute))
-			return cmdMgr.RunBashC(req.Command)
-		}, nil)
-		_ = taskItem.Execute()
-	}()
-	return nil
 }
 
 func (u *ContainerService) Inspect(req dto.InspectReq) (string, error) {

@@ -3,6 +3,10 @@ package service
 import (
 	"bytes"
 	"fmt"
+	"os"
+	"path"
+	"strings"
+
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
@@ -13,9 +17,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/nginx"
 	"github.com/1Panel-dev/1Panel/agent/utils/nginx/components"
 	"github.com/1Panel-dev/1Panel/agent/utils/nginx/parser"
-	"os"
-	"path"
-	"strings"
 )
 
 func (w WebsiteService) GetLoadBalances(id uint) ([]dto.NginxUpstream, error) {
@@ -87,6 +88,10 @@ func (w WebsiteService) CreateLoadBalance(req request.WebsiteLBCreate) error {
 	if !fileOp.Stat(includeDir) {
 		_ = fileOp.CreateDir(includeDir, constant.DirPerm)
 	}
+	safeName := path.Base(req.Name)
+	if safeName != req.Name || strings.Contains(safeName, "..") {
+		return buserr.New("ErrInvalidParams")
+	}
 	filePath := path.Join(includeDir, fmt.Sprintf("%s.conf", req.Name))
 	if fileOp.Stat(filePath) {
 		return buserr.New("ErrNameIsExist")
@@ -133,6 +138,10 @@ func (w WebsiteService) UpdateLoadBalance(req request.WebsiteLBUpdate) error {
 	}
 	includeDir := GetSitePath(website, SiteUpstreamDir)
 	fileOp := files.NewFileOp()
+	safeName := path.Base(req.Name)
+	if safeName != req.Name || strings.Contains(safeName, "..") {
+		return buserr.New("ErrInvalidParams")
+	}
 	filePath := path.Join(includeDir, fmt.Sprintf("%s.conf", req.Name))
 	if !fileOp.Stat(filePath) {
 		return nil
@@ -191,6 +200,10 @@ func (w WebsiteService) DeleteLoadBalance(req request.WebsiteLBDelete) error {
 
 	includeDir := GetSitePath(website, SiteUpstreamDir)
 	fileOp := files.NewFileOp()
+	safeName := path.Base(req.Name)
+	if safeName != req.Name || strings.Contains(safeName, "..") {
+		return buserr.New("ErrInvalidParams")
+	}
 	filePath := path.Join(includeDir, fmt.Sprintf("%s.conf", req.Name))
 	if !fileOp.Stat(filePath) {
 		return nil
@@ -211,6 +224,10 @@ func (w WebsiteService) UpdateLoadBalanceFile(req request.WebsiteLBUpdateFile) e
 		return err
 	}
 	includeDir := GetSitePath(website, SiteUpstreamDir)
+	safeName := path.Base(req.Name)
+	if safeName != req.Name || strings.Contains(safeName, "..") {
+		return buserr.New("ErrInvalidParams")
+	}
 	filePath := path.Join(includeDir, fmt.Sprintf("%s.conf", req.Name))
 	fileOp := files.NewFileOp()
 	oldContent, err := fileOp.GetContent(filePath)

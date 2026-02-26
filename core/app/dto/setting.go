@@ -33,7 +33,6 @@ type SettingInfo struct {
 	ExpirationTime             string `json:"expirationTime"`
 	ComplexityVerification     string `json:"complexityVerification"`
 	MFAStatus                  string `json:"mfaStatus"`
-	MFASecret                  string `json:"mfaSecret"`
 	MFAInterval                string `json:"mfaInterval"`
 
 	AppStoreVersion      string `json:"appStoreVersion"`

@@ -109,7 +109,7 @@ func (u *DeviceService) CheckDNS(key, value string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	defer conn.Close()
+	defer func() { _ = conn.Close() }()
 
 	return true, nil
 }
@@ -132,7 +132,7 @@ func (u *DeviceService) Update(key, value string) error {
 		if cmd.CheckIllegal(value) {
 			return buserr.New("ErrCmdIllegal")
 		}
-		if err := cmd.RunDefaultBashCf("%s hostnamectl set-hostname %s", cmd.SudoHandleCmd(), value); err != nil {
+		if err := cmd.NewCommandMgr(cmd.WithTimeout(20*time.Second)).Run("hostnamectl", "set-hostname", value); err != nil {
 			return err
 		}
 		_, _ = psutil.HOST.GetHostInfo(true)
@@ -245,7 +245,7 @@ func (u *DeviceService) UpdateSwap(req dto.SwapHelper) error {
 		}
 		cmdMgr := cmd.NewCommandMgr(cmd.WithTask(*taskItem))
 		if !req.IsNew {
-			if err := cmdMgr.RunBashCf("%s swapoff %s", cmd.SudoHandleCmd(), req.Path); err != nil {
+			if err := cmdMgr.Run("swapoff", req.Path); err != nil {
 				return fmt.Errorf("handle swapoff %s failed, %v", req.Path, err)
 			}
 		}
@@ -256,22 +256,22 @@ func (u *DeviceService) UpdateSwap(req dto.SwapHelper) error {
 			return operateSwapWithFile(true, req)
 		}
 		taskItem.LogStart(i18n.GetMsgByKey("CreateSwap"))
-		if err := cmdMgr.RunBashCf("%s dd if=/dev/zero of=%s bs=1024 count=%d", cmd.SudoHandleCmd(), req.Path, req.Size); err != nil {
+		if err := cmdMgr.Run("dd", "if=/dev/zero", fmt.Sprintf("of=%s", req.Path), "bs=1024", fmt.Sprintf("count=%d", req.Size)); err != nil {
 			return fmt.Errorf("handle dd %s failed, %v", req.Path, err)
 		}
 
 		taskItem.Log("chmod 0600 " + req.Path)
-		if err := cmdMgr.RunBashCf("%s chmod 0600 %s", cmd.SudoHandleCmd(), req.Path); err != nil {
+		if err := cmdMgr.Run("chmod", "0600", req.Path); err != nil {
 			return fmt.Errorf("handle chmod 0600 %s failed, %v", req.Path, err)
 		}
 		taskItem.LogStart(i18n.GetMsgByKey("FormatSwap"))
-		if err := cmdMgr.RunBashCf("%s mkswap -f %s", cmd.SudoHandleCmd(), req.Path); err != nil {
+		if err := cmdMgr.Run("mkswap", "-f", req.Path); err != nil {
 			return fmt.Errorf("handle mkswap -f %s failed, %v", req.Path, err)
 		}
 
 		taskItem.LogStart(i18n.GetMsgByKey("EnableSwap"))
-		if err := cmdMgr.RunBashCf("%s swapon %s", cmd.SudoHandleCmd(), req.Path); err != nil {
-			_ = cmdMgr.RunBashCf("%s swapoff %s", cmd.SudoHandleCmd(), req.Path)
+		if err := cmdMgr.Run("swapon", req.Path); err != nil {
+			_ = cmdMgr.Run("swapoff", req.Path)
 			return fmt.Errorf("handle swapoff %s failed, %v", req.Path, err)
 		}
 		return operateSwapWithFile(false, req)

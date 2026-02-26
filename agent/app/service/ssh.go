@@ -269,16 +269,26 @@ func (u *SSHService) CreateRootCert(req dto.RootCertOperate) error {
 	publicPath := fmt.Sprintf("%s/.ssh/%s.pub", currentUser.HomeDir, req.Name)
 	authFilePath := currentUser.HomeDir + "/.ssh/authorized_keys"
 
-	authFileItem, _ := os.ReadFile(authFilePath)
-	authFile := string(authFileItem)
-	if authFile != "" && !strings.HasSuffix(authFile, "\n") {
-		file, err := os.OpenFile(authFilePath, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
+	if info, err := os.Stat(authFilePath); err == nil && info.Size() > 0 {
+		f, err := os.Open(authFilePath)
 		if err != nil {
 			return err
 		}
-		defer file.Close()
-		if _, err := file.WriteString("\n"); err != nil {
-			return err
+		defer func() { _ = f.Close() }()
+
+		if _, err := f.Seek(-1, 2); err == nil {
+			buf := make([]byte, 1)
+			if _, err := f.Read(buf); err == nil && buf[0] != '\n' {
+				appendFile, err := os.OpenFile(authFilePath, os.O_APPEND|os.O_WRONLY, 0600)
+				if err != nil {
+					return err
+				}
+				if _, err := appendFile.Write([]byte("\n")); err != nil {
+					_ = appendFile.Close()
+					return err
+				}
+				_ = appendFile.Close()
+			}
 		}
 	}
 
@@ -290,17 +300,43 @@ func (u *SSHService) CreateRootCert(req dto.RootCertOperate) error {
 			return err
 		}
 	} else {
-		command := fmt.Sprintf("ssh-keygen -t %s -f %s/.ssh/%s -N ''", req.EncryptionMode, currentUser.HomeDir, req.Name)
-		if len(req.PassPhrase) != 0 {
-			command = fmt.Sprintf("ssh-keygen -t %s -P %s -f %s/.ssh/%s | echo y", req.EncryptionMode, req.PassPhrase, currentUser.HomeDir, req.Name)
+		tmpPrivatePath := privatePath + ".tmp"
+		tmpPublicPath := privatePath + ".tmp.pub"
+		cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(2 * time.Minute))
+		args := []string{
+			"-t", req.EncryptionMode,
+			"-f", tmpPrivatePath,
+			"-N", req.PassPhrase,
+			"-q",
 		}
-		if err := cmd.RunDefaultBashC(command); err != nil {
+
+		if err := cmdMgr.Run("ssh-keygen", args...); err != nil {
+			_ = os.Remove(tmpPrivatePath)
+			_ = os.Remove(tmpPublicPath)
 			return fmt.Errorf("generate failed, %v", err)
+		}
+		if err := os.Rename(tmpPrivatePath, privatePath); err != nil {
+			return fmt.Errorf("replace private key failed, %v", err)
+		}
+		if err := os.Rename(tmpPublicPath, publicPath); err != nil {
+			return fmt.Errorf("replace public key failed, %v", err)
 		}
 	}
 
-	if err := cmd.RunDefaultBashCf("cat %s >> %s", publicPath, authFilePath); err != nil {
-		return fmt.Errorf("generate failed, %v", err)
+	publicKeyBytes, err := os.ReadFile(publicPath)
+	if err != nil {
+		return fmt.Errorf("read public key failed, %v", err)
+	}
+
+	cleanKey := strings.TrimRight(string(publicKeyBytes), "\n") + "\n"
+	authFile, err := os.OpenFile(authFilePath, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+	if err != nil {
+		return fmt.Errorf("open authorized_keys failed, %v", err)
+	}
+	defer func() { _ = authFile.Close() }()
+
+	if _, err := authFile.Write([]byte(cleanKey)); err != nil {
+		return fmt.Errorf("append authorized_keys failed, %v", err)
 	}
 
 	cert.PrivateKeyPath = privatePath

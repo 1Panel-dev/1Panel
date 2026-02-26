@@ -4,6 +4,10 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"os"
+	"path"
+	"strings"
+
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/response"
@@ -12,9 +16,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/cmd/server/nginx_conf"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
-	"os"
-	"path"
-	"strings"
 )
 
 func (w WebsiteService) UpdateRewriteConfig(req request.NginxRewriteUpdate) error {
@@ -73,6 +74,10 @@ func (w WebsiteService) GetRewriteConfig(req request.NginxRewriteReq) (*response
 		contentByte, _ = nginx_conf.Rewrites.ReadFile(rewriteFile)
 		if contentByte == nil {
 			customRewriteDir := GetOpenrestyDir(DefaultRewriteDir)
+			safeName := path.Base(req.Name)
+			if safeName != req.Name || strings.Contains(safeName, "..") {
+				return nil, buserr.New("ErrInvalidParams")
+			}
 			customRewriteFile := path.Join(customRewriteDir, fmt.Sprintf("%s.conf", strings.ToLower(req.Name)))
 			contentByte, err = files.NewFileOp().GetContent(customRewriteFile)
 		}
@@ -89,6 +94,10 @@ func (w WebsiteService) OperateCustomRewrite(req request.CustomRewriteOperate) e
 		if err := fileOp.CreateDir(rewriteDir, constant.DirPerm); err != nil {
 			return err
 		}
+	}
+	safeName := path.Base(req.Name)
+	if safeName != req.Name || strings.Contains(safeName, "..") {
+		return buserr.New("ErrInvalidParams")
 	}
 	rewriteFile := path.Join(rewriteDir, fmt.Sprintf("%s.conf", req.Name))
 	switch req.Operate {

@@ -29,6 +29,8 @@ const (
 	AnsiEscapePattern                  = "\x1b\\[[0-9;?]*[A-Za-z]|\x1b=|\x1b>"
 	RecycleBinFilePattern              = `_1p_file_1p_(.+)_p_(\d+)_(\d+)`
 	OrderByValidationPattern           = `^[a-zA-Z_][a-zA-Z0-9_]*$`
+	NginxHostPattern                   = `^[a-zA-Z0-9.-]+(:[0-9]+)?$`
+	NginxPathPattern                   = `^/[a-zA-Z0-9._/\-]*$`
 )
 
 var regexMap = make(map[string]*regexp.Regexp)
@@ -58,6 +60,8 @@ func Init() {
 		AnsiEscapePattern,
 		RecycleBinFilePattern,
 		OrderByValidationPattern,
+		NginxHostPattern,
+		NginxPathPattern,
 	}
 
 	for _, pattern := range patterns {

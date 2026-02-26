@@ -163,14 +163,31 @@ func aesDecrypt(ciphertext, key, iv []byte) ([]byte, error) {
 	}
 	mode := cipher.NewCBCDecrypter(block, iv)
 	mode.CryptBlocks(ciphertext, ciphertext)
-	ciphertext = pkcs7Unpad(ciphertext)
-	return ciphertext, nil
+	unpadded, err := pkcs7Unpad(ciphertext)
+	if err != nil {
+		return nil, err
+	}
+	return unpadded, nil
 }
 
-func pkcs7Unpad(data []byte) []byte {
+func pkcs7Unpad(data []byte) ([]byte, error) {
 	length := len(data)
+	if length == 0 {
+		return nil, errors.New("invalid padding size")
+	}
+
 	padLength := int(data[length-1])
-	return data[:length-padLength]
+	if padLength == 0 || padLength > length {
+		return nil, errors.New("invalid padding")
+	}
+
+	for i := 0; i < padLength; i++ {
+		if data[length-1-i] != byte(padLength) {
+			return nil, errors.New("invalid padding")
+		}
+	}
+
+	return data[:length-padLength], nil
 }
 
 func DecryptPassword(encryptedData string, privateKey *rsa.PrivateKey) (string, error) {

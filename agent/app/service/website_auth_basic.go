@@ -3,6 +3,10 @@ package service
 import (
 	"bufio"
 	"fmt"
+	"os"
+	"path"
+	"strings"
+
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/response"
@@ -11,14 +15,12 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/cmd/server/nginx_conf"
 	"github.com/1Panel-dev/1Panel/agent/constant"
+	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/1Panel-dev/1Panel/agent/utils/nginx"
 	"github.com/1Panel-dev/1Panel/agent/utils/nginx/components"
 	"github.com/1Panel-dev/1Panel/agent/utils/nginx/parser"
 	"golang.org/x/crypto/bcrypt"
-	"os"
-	"path"
-	"strings"
 )
 
 func (w WebsiteService) GetAuthBasics(req request.NginxAuthReq) (res response.NginxAuthRes, err error) {
@@ -260,6 +262,10 @@ func (w WebsiteService) UpdatePathAuthBasic(req request.NginxPathAuthUpdate) err
 	if !fileOp.Stat(passDir) {
 		_ = fileOp.CreateDir(passDir, constant.DirPerm)
 	}
+	safeName := path.Base(req.Name)
+	if safeName != req.Name || strings.Contains(safeName, "..") {
+		return buserr.New("ErrInvalidParams")
+	}
 	confPath := path.Join(authDir, fmt.Sprintf("%s.conf", req.Name))
 	passPath := path.Join(passDir, fmt.Sprintf("%s.pass", req.Name))
 	var config *components.Config
@@ -289,7 +295,12 @@ func (w WebsiteService) UpdatePathAuthBasic(req request.NginxPathAuthUpdate) err
 	config.FilePath = confPath
 	directives := config.Directives
 	location, _ := directives[0].(*components.Location)
-	location.UpdateDirective("auth_basic_user_file", []string{fmt.Sprintf("/www/sites/%s/path_auth/pass/%s", website.Alias, fmt.Sprintf("%s.pass", req.Name))})
+	safePass, err := nginx.NginxSafeString(fmt.Sprintf("/www/sites/%s/path_auth/pass/%s", website.Alias, fmt.Sprintf("%s.pass", req.Name)), nginx.ModePath)
+	if err != nil {
+		global.LOG.Errorf("invalid auth_basic_user_file path, err: %v", err)
+		return err
+	}
+	location.UpdateDirective("auth_basic_user_file", []string{safePass})
 	location.ChangePath("~*", fmt.Sprintf("^%s", req.Path))
 	var passwdHash []byte
 	passwdHash, err = bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
@@ -306,7 +317,7 @@ func (w WebsiteService) UpdatePathAuthBasic(req request.NginxPathAuthUpdate) err
 	}
 	nginxInclude := fmt.Sprintf("/www/sites/%s/path_auth/*.conf", website.Alias)
 	if err = updateNginxConfig(constant.NginxScopeServer, []dto.NginxParam{{Name: "include", Params: []string{nginxInclude}}}, &website); err != nil {
-		return nil
+		return err
 	}
 	return nil
 }

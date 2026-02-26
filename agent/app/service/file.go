@@ -263,7 +263,7 @@ func (f *FileService) Create(op request.FileCreate) error {
 func (f *FileService) Delete(op request.FileDelete) error {
 	if op.IsDir {
 		excludeDir := global.Dir.DataDir
-		if filepath.Base(op.Path) == ".1panel_clash" || op.Path == excludeDir {
+		if path.Base(op.Path) == ".1panel_clash" || op.Path == excludeDir {
 			return buserr.New("ErrPathNotDelete")
 		}
 	}
@@ -592,6 +592,12 @@ func (f *FileService) DepthDirSize(req request.DirSizeReq) ([]response.DepthDirS
 func (f *FileService) ReadLogByLine(req request.FileReadByLineReq) (*response.FileLineContent, error) {
 	logFilePath := ""
 	taskStatus := ""
+	if len(req.Name) != 0 {
+		safeName := path.Base(req.Name)
+		if safeName != req.Name || strings.Contains(safeName, "..") {
+			return nil, buserr.New("ErrInvalidParams")
+		}
+	}
 	switch req.Type {
 	case constant.TypeWebsite:
 		website, err := websiteRepo.GetFirst(repo.WithByID(req.ID))
@@ -649,9 +655,9 @@ func (f *FileService) ReadLogByLine(req request.FileReadByLineReq) (*response.Fi
 		logFilePath = taskModel.LogFile
 		taskStatus = taskModel.Status
 	case "mysql-slow-logs":
-		logFilePath = path.Join(global.Dir.DataDir, fmt.Sprintf("apps/mysql/%s/data/1Panel-slow.log", req.Name))
+		logFilePath = path.Join(global.Dir.DataDir, "apps", "mysql", req.Name, "data", "1Panel-slow.log")
 	case "mariadb-slow-logs":
-		logFilePath = path.Join(global.Dir.DataDir, fmt.Sprintf("apps/mariadb/%s/db/data/1Panel-slow.log", req.Name))
+		logFilePath = path.Join(global.Dir.DataDir, "apps", "mariadb", req.Name, "db", "data", "1Panel-slow.log")
 	case "php-fpm-slow-logs":
 		php, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(req.ID))
 		if err != nil {
@@ -666,8 +672,7 @@ func (f *FileService) ReadLogByLine(req request.FileReadByLineReq) (*response.Fi
 		}
 		logFilePath, _ = ini_conf.GetIniValue(configPath, "supervisord", "logfile")
 	case constant.Supervisor:
-		logDir := path.Join(global.Dir.DataDir, "tools", "supervisord", "log")
-		logFilePath = path.Join(logDir, req.Name)
+		logFilePath = path.Join(global.Dir.DataDir, "tools", "supervisord", "log", req.Name)
 	}
 
 	file, err := os.Open(logFilePath)

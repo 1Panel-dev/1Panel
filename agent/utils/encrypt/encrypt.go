@@ -118,10 +118,24 @@ func padding(plaintext []byte, blockSize int) []byte {
 	return append(plaintext, padtext...)
 }
 
-func unPadding(origData []byte) []byte {
+func unPadding(origData []byte) ([]byte, error) {
 	length := len(origData)
+	if length == 0 {
+		return nil, fmt.Errorf("invalid padding size")
+	}
+
 	unpadding := int(origData[length-1])
-	return origData[:(length - unpadding)]
+	if unpadding == 0 || unpadding > length {
+		return nil, fmt.Errorf("invalid padding")
+	}
+
+	for i := 0; i < unpadding; i++ {
+		if origData[length-1-i] != byte(unpadding) {
+			return nil, fmt.Errorf("invalid padding")
+		}
+	}
+
+	return origData[:(length - unpadding)], nil
 }
 
 func aesEncryptWithSalt(key, plaintext []byte) ([]byte, error) {
@@ -152,6 +166,10 @@ func aesDecryptWithSalt(key, ciphertext []byte) ([]byte, error) {
 	ciphertext = ciphertext[aes.BlockSize:]
 	cbc := cipher.NewCBCDecrypter(block, iv)
 	cbc.CryptBlocks(ciphertext, ciphertext)
-	ciphertext = unPadding(ciphertext)
-	return ciphertext, nil
+
+	unpadded, err := unPadding(ciphertext)
+	if err != nil {
+		return nil, err
+	}
+	return unpadded, nil
 }

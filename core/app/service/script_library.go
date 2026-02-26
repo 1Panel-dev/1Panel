@@ -1,9 +1,10 @@
 package service
 
 import (
+	"crypto/rand"
 	"encoding/json"
 	"fmt"
-	mathRand "math/rand"
+	"math/big"
 	"net/http"
 	"os"
 	"path"
@@ -172,7 +173,17 @@ func StartSync() {
 	service := NewIScriptService()
 	scriptSync, _ := repo.NewISettingRepo().GetValueByKey("ScriptSync")
 	if !global.CONF.Base.IsOffLine && scriptSync == constant.StatusEnable {
-		id, err := global.Cron.AddJob(fmt.Sprintf("%v %v * * *", mathRand.Intn(60), mathRand.Intn(3)), service)
+		minuteRand, err := rand.Int(rand.Reader, big.NewInt(60))
+		if err != nil {
+			global.LOG.Errorf("generate random minute failed: %v", err)
+			minuteRand = big.NewInt(0)
+		}
+		hourRand, err := rand.Int(rand.Reader, big.NewInt(3))
+		if err != nil {
+			global.LOG.Errorf("generate random hour failed: %v", err)
+			hourRand = big.NewInt(0)
+		}
+		id, err := global.Cron.AddJob(fmt.Sprintf("%v %v * * *", minuteRand.Int64(), hourRand.Int64()), service)
 		if err != nil {
 			global.LOG.Errorf("[core] can not add script sync corn job: %s", err.Error())
 		}

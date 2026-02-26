@@ -307,27 +307,6 @@ func (b *BaseApi) ContainerCreate(c *gin.Context) {
 }
 
 // @Tags Container
-// @Summary Create container by command
-// @Accept json
-// @Param request body dto.ContainerCreateByCommand true "request"
-// @Success 200
-// @Security ApiKeyAuth
-// @Security Timestamp
-// @Router /containers/command [post]
-func (b *BaseApi) ContainerCreateByCommand(c *gin.Context) {
-	var req dto.ContainerCreateByCommand
-	if err := helper.CheckBindAndValidate(&req, c); err != nil {
-		return
-	}
-
-	if err := containerService.ContainerCreateByCommand(req); err != nil {
-		helper.InternalServer(c, err)
-		return
-	}
-	helper.Success(c)
-}
-
-// @Tags Container
 // @Summary Upgrade container
 // @Accept json
 // @Param request body dto.ContainerUpgrade true "request"

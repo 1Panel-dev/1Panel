@@ -1906,6 +1906,10 @@ func (w WebsiteService) UpdateRedirectFile(req request.NginxRedirectUpdate) (err
 	if err != nil {
 		return err
 	}
+	safeName := path.Base(req.Name)
+	if safeName != req.Name || strings.Contains(safeName, "..") {
+		return buserr.New("ErrInvalidParams")
+	}
 	absolutePath := path.Join(GetSitePath(website, SiteRedirectDir), req.Name+".conf")
 	fileOp := files.NewFileOp()
 	oldRewriteContent, err = fileOp.GetContent(absolutePath)
@@ -2333,9 +2337,25 @@ func (w WebsiteService) ExecComposer(req request.ExecComposerReq) error {
 	siteDir, _ := settingRepo.Get(settingRepo.WithByKey("WEBSITE_DIR"))
 	execDir := strings.ReplaceAll(req.Dir, siteDir.Value, "/www")
 	composerTask.AddSubTask("", func(t *task.Task) error {
-		cmdStr := fmt.Sprintf("docker exec -u %s %s sh -c 'composer config -g repo.packagist composer %s && composer %s --working-dir=%s'", req.User, runtime.ContainerName, req.Mirror, command, execDir)
-		err = cmdMgr.RunBashC(cmdStr)
-		if err != nil {
+		if err := cmdMgr.Run("docker", "exec",
+			"-u", req.User,
+			runtime.ContainerName,
+			"composer",
+			"config", "-g",
+			"repo.packagist",
+			"composer",
+			req.Mirror,
+		); err != nil {
+			return err
+		}
+
+		if err := cmdMgr.Run("docker", "exec",
+			"-u", req.User,
+			runtime.ContainerName,
+			"composer",
+			command,
+			"--working-dir="+execDir,
+		); err != nil {
 			return err
 		}
 		return nil

@@ -258,7 +258,7 @@ func isValidPassword(password string) bool {
 		}
 	}
 
-	if len(password) < 8 && len(password) > 30 {
+	if len(password) < 8 || len(password) > 30 {
 		return false
 	}
 	if (numCount == 0 && alphaCount == 0) || (alphaCount == 0 && specialCount == 0) || (numCount == 0 && specialCount == 0) {

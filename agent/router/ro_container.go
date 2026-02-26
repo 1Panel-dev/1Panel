@@ -15,7 +15,6 @@ func (s *ContainerRouter) InitRouter(Router *gin.RouterGroup) {
 		baRouter.GET("/stats/:id", baseApi.ContainerStats)
 
 		baRouter.POST("", baseApi.ContainerCreate)
-		baRouter.POST("command", baseApi.ContainerCreateByCommand)
 		baRouter.POST("/update", baseApi.ContainerUpdate)
 		baRouter.POST("/upgrade", baseApi.ContainerUpgrade)
 		baRouter.POST("/info", baseApi.ContainerInfo)

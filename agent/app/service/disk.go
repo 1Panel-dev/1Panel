@@ -2,13 +2,14 @@ package service
 
 import (
 	"fmt"
+	"os"
+	"strings"
+	"time"
+
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
-	"os"
-	"strings"
-	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/response"
@@ -65,19 +66,19 @@ func (s *DiskService) PartitionDisk(req request.DiskPartitionRequest) (string, e
 	}
 
 	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(10 * time.Second))
-	if err := cmdMgr.RunBashC(fmt.Sprintf("partprobe %s", req.Device)); err != nil {
+	if err := cmdMgr.Run("partprobe", req.Device); err != nil {
 		return "", buserr.WithErr("PartitionDiskErr", err)
 	}
 
-	if err := cmdMgr.RunBashC(fmt.Sprintf("parted -s %s mklabel gpt", req.Device)); err != nil {
+	if err := cmdMgr.Run("parted", "-s", req.Device, "mklabel", "gpt"); err != nil {
 		return "", buserr.WithErr("PartitionDiskErr", err)
 	}
 
-	if err := cmdMgr.RunBashC(fmt.Sprintf("parted -s %s mkpart primary 1MiB 100%%", req.Device)); err != nil {
+	if err := cmdMgr.Run("parted", "-s", req.Device, "mkpart", "primary", "1MiB", "100%"); err != nil {
 		return "", buserr.WithErr("PartitionDiskErr", err)
 	}
 
-	if err := cmdMgr.RunBashC(fmt.Sprintf("partprobe %s", req.Device)); err != nil {
+	if err := cmdMgr.Run("partprobe", req.Device); err != nil {
 		return "", buserr.WithErr("PartitionDiskErr", err)
 	}
 	partition := req.Device + "1"
@@ -133,7 +134,7 @@ func (s *DiskService) MountDisk(req request.DiskMountRequest) error {
 	}
 
 	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(1 * time.Minute))
-	if err := cmdMgr.RunBashC(fmt.Sprintf("mount  -t %s %s %s", req.Filesystem, req.Device, req.MountPoint)); err != nil {
+	if err := cmdMgr.Run("mount", "-t", req.Filesystem, req.Device, req.MountPoint); err != nil {
 		return buserr.WithErr("MountDiskErr", err)
 	}
 	if req.AutoMount {
@@ -156,7 +157,7 @@ func (s *DiskService) UnmountDisk(req request.DiskUnmountRequest) error {
 	if !isPointMounted(req.MountPoint) {
 		return buserr.New("MountDiskErr")
 	}
-	if err := cmd.RunDefaultBashC(fmt.Sprintf("umount -f  %s", req.MountPoint)); err != nil {
+	if err := cmd.NewCommandMgr(cmd.WithTimeout(20*time.Second)).Run("umount", "-f", req.MountPoint); err != nil {
 		return buserr.WithErr("MountDiskErr", err)
 	}
 	if err := removeFromFstab(req.MountPoint); err != nil {

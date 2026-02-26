@@ -24,9 +24,6 @@ export const loadResourceLimit = () => {
 export const createContainer = (params: Container.ContainerHelper) => {
     return http.post(`/containers`, params, TimeoutEnum.T_10M);
 };
-export const createContainerByCommand = (command: string, taskID: string) => {
-    return http.post(`/containers/command`, { command: command, taskID: taskID });
-};
 export const updateContainer = (params: Container.ContainerHelper) => {
     return http.post(`/containers/update`, params, TimeoutEnum.T_10M);
 };
