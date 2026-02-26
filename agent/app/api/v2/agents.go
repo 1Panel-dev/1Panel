@@ -354,6 +354,47 @@ func (b *BaseApi) UpdateAgentDiscordConfig(c *gin.Context) {
 }
 
 // @Tags AI
+// @Summary Get Agent Browser config
+// @Accept json
+// @Param request body dto.AgentBrowserConfigReq true "request"
+// @Success 200 {object} dto.AgentBrowserConfig
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/browser/get [post]
+func (b *BaseApi) GetAgentBrowserConfig(c *gin.Context) {
+	var req dto.AgentBrowserConfigReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	data, err := agentService.GetBrowserConfig(req)
+	if err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.SuccessWithData(c, data)
+}
+
+// @Tags AI
+// @Summary Update Agent Browser config
+// @Accept json
+// @Param request body dto.AgentBrowserConfigUpdateReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/browser/update [post]
+func (b *BaseApi) UpdateAgentBrowserConfig(c *gin.Context) {
+	var req dto.AgentBrowserConfigUpdateReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := agentService.UpdateBrowserConfig(req); err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags AI
 // @Summary Approve Agent Feishu pairing code
 // @Accept json
 // @Param request body dto.AgentFeishuPairingApproveReq true "request"

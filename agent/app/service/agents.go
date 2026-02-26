@@ -47,6 +47,8 @@ type IAgentService interface {
 	UpdateTelegramConfig(req dto.AgentTelegramConfigUpdateReq) error
 	GetDiscordConfig(req dto.AgentDiscordConfigReq) (*dto.AgentDiscordConfig, error)
 	UpdateDiscordConfig(req dto.AgentDiscordConfigUpdateReq) error
+	GetBrowserConfig(req dto.AgentBrowserConfigReq) (*dto.AgentBrowserConfig, error)
+	UpdateBrowserConfig(req dto.AgentBrowserConfigUpdateReq) error
 	ApproveChannelPairing(req dto.AgentChannelPairingApproveReq) error
 	ApproveFeishuPairing(req dto.AgentFeishuPairingApproveReq) error
 }
@@ -54,6 +56,11 @@ type IAgentService interface {
 func NewIAgentService() IAgentService {
 	return &AgentService{}
 }
+
+const (
+	defaultBrowserExecutablePath = "/home/node/.cache/ms-playwright/chromium-1208/chrome-linux64/chrome"
+	defaultBrowserProfile        = "openclaw"
+)
 
 func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 	provider := strings.ToLower(strings.TrimSpace(req.Provider))
@@ -653,6 +660,41 @@ func (a AgentService) UpdateDiscordConfig(req dto.AgentDiscordConfigUpdateReq) e
 	return nil
 }
 
+func (a AgentService) GetBrowserConfig(req dto.AgentBrowserConfigReq) (*dto.AgentBrowserConfig, error) {
+	agent, _, err := a.loadAgentAndInstall(req.AgentID)
+	if err != nil {
+		return nil, err
+	}
+	conf, err := readOpenclawConfig(agent.ConfigPath)
+	if err != nil {
+		return nil, err
+	}
+	result := extractBrowserConfig(conf)
+	return &result, nil
+}
+
+func (a AgentService) UpdateBrowserConfig(req dto.AgentBrowserConfigUpdateReq) error {
+	agent, _, err := a.loadAgentAndInstall(req.AgentID)
+	if err != nil {
+		return err
+	}
+	conf, err := readOpenclawConfig(agent.ConfigPath)
+	if err != nil {
+		return err
+	}
+	setBrowserConfig(conf, dto.AgentBrowserConfig{
+		Enabled:        req.Enabled,
+		ExecutablePath: defaultBrowserExecutablePath,
+		Headless:       req.Headless,
+		NoSandbox:      req.NoSandbox,
+		DefaultProfile: strings.TrimSpace(req.DefaultProfile),
+	})
+	if err := writeOpenclawConfigRaw(agent.ConfigPath, conf); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (a AgentService) ApproveChannelPairing(req dto.AgentChannelPairingApproveReq) error {
 	_, install, err := a.loadAgentAndInstall(req.AgentID)
 	if err != nil {
@@ -887,6 +929,49 @@ func setDiscordConfig(conf map[string]interface{}, config dto.AgentDiscordConfig
 	delete(discord, "dm")
 }
 
+func extractBrowserConfig(conf map[string]interface{}) dto.AgentBrowserConfig {
+	result := dto.AgentBrowserConfig{
+		Enabled:        true,
+		ExecutablePath: defaultBrowserExecutablePath,
+		Headless:       true,
+		NoSandbox:      true,
+		DefaultProfile: defaultBrowserProfile,
+	}
+	browser, ok := conf["browser"].(map[string]interface{})
+	if !ok {
+		return result
+	}
+	if enabled, ok := browser["enabled"].(bool); ok {
+		result.Enabled = enabled
+	}
+	if executablePath, ok := browser["executablePath"].(string); ok && strings.TrimSpace(executablePath) != "" {
+		result.ExecutablePath = executablePath
+	}
+	if headless, ok := browser["headless"].(bool); ok {
+		result.Headless = headless
+	}
+	if noSandbox, ok := browser["noSandbox"].(bool); ok {
+		result.NoSandbox = noSandbox
+	}
+	if defaultProfile, ok := browser["defaultProfile"].(string); ok && strings.TrimSpace(defaultProfile) != "" {
+		result.DefaultProfile = defaultProfile
+	}
+	return result
+}
+
+func setBrowserConfig(conf map[string]interface{}, config dto.AgentBrowserConfig) {
+	browser := ensureChildMap(conf, "browser")
+	browser["enabled"] = config.Enabled
+	browser["executablePath"] = defaultBrowserExecutablePath
+	browser["headless"] = config.Headless
+	browser["noSandbox"] = config.NoSandbox
+	if strings.TrimSpace(config.DefaultProfile) == "" {
+		browser["defaultProfile"] = defaultBrowserProfile
+	} else {
+		browser["defaultProfile"] = strings.TrimSpace(config.DefaultProfile)
+	}
+}
+
 func (a AgentService) syncAgentsByAccount(account *model.AgentAccount) error {
 	agents, err := agentRepo.List(repo.WithByAccountID(account.ID))
 	if err != nil {
@@ -1112,6 +1197,7 @@ func (a AgentService) writeConfigWithRetry(appInstall *model.AppInstall, provide
 type openclawConfig struct {
 	Gateway gatewayConfig `json:"gateway"`
 	Agents  agentsConfig  `json:"agents"`
+	Browser browserConfig `json:"browser"`
 	Models  *modelsConfig `json:"models,omitempty"`
 }
 
@@ -1174,6 +1260,14 @@ type modelCost struct {
 	CacheWrite float64 `json:"cacheWrite"`
 }
 
+type browserConfig struct {
+	Enabled        bool   `json:"enabled"`
+	ExecutablePath string `json:"executablePath"`
+	Headless       bool   `json:"headless"`
+	NoSandbox      bool   `json:"noSandbox"`
+	DefaultProfile string `json:"defaultProfile"`
+}
+
 func writeOpenclawConfig(confDir, provider, modelName, apiType string, maxTokens, contextWindow int, baseURL, apiKey, token string) error {
 	if strings.TrimSpace(confDir) == "" {
 		return fmt.Errorf("config dir is required")
@@ -1209,6 +1303,13 @@ func writeOpenclawConfig(confDir, provider, modelName, apiType string, maxTokens
 			Defaults: agentDefaults{
 				Model: modelRef{Primary: modelName},
 			},
+		},
+		Browser: browserConfig{
+			Enabled:        true,
+			ExecutablePath: defaultBrowserExecutablePath,
+			Headless:       true,
+			NoSandbox:      true,
+			DefaultProfile: defaultBrowserProfile,
 		},
 	}
 
@@ -1430,6 +1531,13 @@ func writeOpenclawConfig(confDir, provider, modelName, apiType string, maxTokens
 				return err
 			}
 			conf["models"] = modelsMap
+		}
+		if _, ok := conf["browser"]; !ok {
+			browserMap, err := structToMap(cfg.Browser)
+			if err != nil {
+				return err
+			}
+			conf["browser"] = browserMap
 		}
 		agentsMap := ensureChildMap(conf, "agents")
 		defaultsMap := ensureChildMap(agentsMap, "defaults")

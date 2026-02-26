@@ -216,3 +216,23 @@ type AgentDiscordConfig struct {
 	Token       string `json:"token"`
 	Proxy       string `json:"proxy"`
 }
+
+type AgentBrowserConfigReq struct {
+	AgentID uint `json:"agentId" validate:"required"`
+}
+
+type AgentBrowserConfigUpdateReq struct {
+	AgentID        uint   `json:"agentId" validate:"required"`
+	Enabled        bool   `json:"enabled"`
+	Headless       bool   `json:"headless"`
+	NoSandbox      bool   `json:"noSandbox"`
+	DefaultProfile string `json:"defaultProfile" validate:"required"`
+}
+
+type AgentBrowserConfig struct {
+	Enabled        bool   `json:"enabled"`
+	ExecutablePath string `json:"executablePath"`
+	Headless       bool   `json:"headless"`
+	NoSandbox      bool   `json:"noSandbox"`
+	DefaultProfile string `json:"defaultProfile"`
+}

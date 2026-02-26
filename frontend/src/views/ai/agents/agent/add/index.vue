@@ -39,9 +39,7 @@
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item>
-                    <el-checkbox v-model="manualModel">{{ $t('aiTools.agents.manualModel') }}</el-checkbox>
-                </el-form-item>
+
                 <el-form-item :label="$t('aiTools.agents.account')" prop="accountId">
                     <el-select v-model="form.accountId" @change="handleAccountChange">
                         <el-option v-for="item in accountOptions" :key="item.id" :label="item.name" :value="item.id" />
@@ -52,6 +50,9 @@
                             {{ $t('aiTools.agents.createModelAccount') }}
                         </el-button>
                     </span>
+                </el-form-item>
+                <el-form-item>
+                    <el-checkbox v-model="manualModel">{{ $t('aiTools.agents.manualModel') }}</el-checkbox>
                 </el-form-item>
                 <el-form-item :label="$t('aiTools.model.model')" prop="model">
                     <el-input v-if="manualModel" v-model="form.model" />

@@ -450,4 +450,24 @@ export namespace AI {
         token: string;
         proxy: string;
     }
+
+    export interface AgentBrowserConfigReq {
+        agentId: number;
+    }
+
+    export interface AgentBrowserConfig {
+        enabled: boolean;
+        executablePath: string;
+        headless: boolean;
+        noSandbox: boolean;
+        defaultProfile: string;
+    }
+
+    export interface AgentBrowserConfigUpdateReq {
+        agentId: number;
+        enabled: boolean;
+        headless: boolean;
+        noSandbox: boolean;
+        defaultProfile: string;
+    }
 }
