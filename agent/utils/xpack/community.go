@@ -26,7 +26,7 @@ func LoadNodeInfo(isBase bool) (model.NodeInfo, error) {
 	var info model.NodeInfo
 	info.BaseDir = common.LoadParams("BASE_DIR")
 	info.Version = common.LoadParams("ORIGINAL_VERSION")
-	info.Edition = common.LoadParamsWithoutPanic("EDITION")
+	info.Edition = common.LoadParamsWithoutPanic("PANEL_EDITION")
 	info.Scope = "master"
 	global.IsMaster = true
 	return info, nil

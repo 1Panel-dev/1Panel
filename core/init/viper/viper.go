@@ -47,7 +47,7 @@ func Init() {
 		password = common.LoadParams("ORIGINAL_PASSWORD")
 		entrance = common.LoadParams("ORIGINAL_ENTRANCE")
 		language = common.LoadParams("LANGUAGE")
-		edition = common.LoadParamsWithoutPanic("EDITION")
+		edition = common.LoadParamsWithoutPanic("PANEL_EDITION")
 
 		reader := bytes.NewReader(conf.AppYaml)
 		if err := v.ReadConfig(reader); err != nil {
