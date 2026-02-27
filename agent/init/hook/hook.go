@@ -31,7 +31,7 @@ func Init() {
 
 func initGlobalData() {
 	settingRepo := repo.NewISettingRepo()
-	if _, err := settingRepo.Get(settingRepo.WithByKey("SystemStatus")); err != nil {
+	if _, err := settingRepo.GetValueByKey("SystemStatus"); err != nil {
 		_ = settingRepo.Create("SystemStatus", "Free")
 	}
 	if err := settingRepo.Update("SystemStatus", "Free"); err != nil {
@@ -42,7 +42,7 @@ func initGlobalData() {
 		_ = settingRepo.Update("SystemVersion", node.Version)
 	}
 	global.CONF.Base.Version = node.Version
-	global.CONF.Base.Edition = node.Edition
+	global.CONF.Base.Edition, _ = settingRepo.GetValueByKey("Edition")
 	global.CONF.Base.EncryptKey, _ = settingRepo.GetValueByKey("EncryptKey")
 }
 
