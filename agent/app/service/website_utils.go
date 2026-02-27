@@ -1048,6 +1048,31 @@ func opWebsite(website *model.Website, operate string) error {
 				proxy := fmt.Sprintf("http://%s", website.Proxy)
 				server.UpdateRootProxy([]string{proxy})
 			}
+		case constant.Subsite:
+			parentWebsite, err := websiteRepo.GetFirst(repo.WithByID(website.ParentWebsiteID))
+			if err != nil {
+				return err
+			}
+			website.Proxy = parentWebsite.Proxy
+			rootIndex = path.Join("/www/sites", parentWebsite.Alias, "index", website.SiteDir)
+			if parentWebsite.Type == constant.Runtime {
+				parentRuntime, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(parentWebsite.RuntimeID))
+				if err != nil {
+					return err
+				}
+				website.RuntimeID = parentRuntime.ID
+				if parentRuntime.Type == constant.RuntimePHP {
+					server.UpdateRoot(rootIndex)
+					localPath := ""
+					if parentRuntime.Resource == constant.ResourceLocal {
+						localPath = path.Join(rootIndex, "index.php")
+					}
+					server.UpdatePHPProxy([]string{website.Proxy}, localPath)
+				}
+			}
+			if parentWebsite.Type == constant.Static {
+				server.UpdateRoot(rootIndex)
+			}
 		}
 		website.Status = constant.WebRunning
 		now := time.Now()
