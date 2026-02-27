@@ -173,11 +173,10 @@ func (w WebsiteService) PageWebsite(req request.WebsiteSearch) (int64, []respons
 		switch web.Type {
 		case constant.Deployment:
 			appInstall, err := appInstallRepo.GetFirst(repo.WithByID(web.AppInstallID))
-			if err != nil {
-				return 0, nil, err
+			if err == nil {
+				appName = appInstall.Name
+				appInstallID = appInstall.ID
 			}
-			appName = appInstall.Name
-			appInstallID = appInstall.ID
 		case constant.Runtime:
 			runtime, _ := runtimeRepo.GetFirst(context.Background(), repo.WithByID(web.RuntimeID))
 			if runtime != nil {

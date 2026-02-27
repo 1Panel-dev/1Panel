@@ -68,6 +68,7 @@
                                     :key="index"
                                     :label="app.name"
                                     :value="app.id"
+                                    :disabled="app.key == 'openclaw'"
                                 ></el-option>
                             </el-select>
                         </el-form-item>
@@ -675,9 +676,11 @@ const changeInstall = () => {
 const searchAppList = () => {
     searchApp(appReq).then((res) => {
         apps.value = res.data.items;
-        if (res.data.items.length > 0) {
-            website.value.appinstall.appId = res.data.items[0].id;
-            website.value.appinstall.appkey = res.data.items[0].key;
+
+        const selectableApp = res.data.items.find((item) => item.key !== 'openclaw');
+        if (selectableApp) {
+            website.value.appinstall.appId = selectableApp.id;
+            website.value.appinstall.appkey = selectableApp.key;
             changeApp();
         }
     });
