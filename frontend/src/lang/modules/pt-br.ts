@@ -1666,7 +1666,7 @@ const message = {
         ignoreCertificateHelper:
             'Permitir conexões inseguras com o servidor pode levar a vazamento ou adulteração de dados. Use esta opção apenas quando confiar na fonte de download.',
         uploadOverLimit: 'O número de arquivos excede 1000! Por favor, compacte e envie novamente',
-        clashDitNotSupport: 'Os nomes de arquivos são proibidos de conter .1panel_clash',
+        clashDidNotSupport: 'Os nomes de arquivos são proibidos de conter .1panel_clash',
         clashDeleteAlert: 'A pasta "Lixeira" não pode ser excluída',
         clashOpenAlert: 'Clique no botão "Lixeira" para abrir o diretório da lixeira',
         right: 'Avançar',
@@ -2855,8 +2855,8 @@ const message = {
         execDir: 'Diretório de Execução',
         packagist: 'Espelho Completo da China',
 
-        batchOpreate: 'Operação em Lote',
-        batchOpreateHelper: 'Lote {0} sites, continuar operação?',
+        batchOperate: 'Operação em Lote',
+        batchOperateHelper: 'Lote {0} sites, continuar operação?',
         stream: 'Proxy TCP/UDP',
         streamPorts: 'Portas de escuta',
         streamPortsHelper:
@@ -3394,7 +3394,7 @@ const message = {
             phpExec: 'Execução de script PHP',
             oneWordTrojan: 'Cavalo de Troia de uma palavra',
             appFilter: 'Filtragem de diretórios perigosos',
-            webshell: 'Webshell',
+            webShell: 'Webshell',
             args: 'Parâmetros maliciosos',
             protocolFilter: 'Filtro de protocolo',
             javaFilter: 'Filtragem de arquivos Java perigosos',

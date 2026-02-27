@@ -14,15 +14,9 @@ ErrApiConfigKeyInvalid: 'Ralat kunci antara muka API: {{ .detail }}'
 ErrApiConfigIPInvalid: 'IP yang digunakan untuk memanggil antara muka API tiada dalam senarai putih: {{ .detail }}'
 ErrApiConfigDisable: 'Antara muka ini melarang penggunaan panggilan antara muka API: {{ .detail }}'
 ErrApiConfigKeyTimeInvalid: 'Ralat cap masa antara muka API: {{ .detail }}'
-StartPushSSLToNode: "Mula menolak sijil ke nod"
-PushSSLToNodeFailed: "Gagal menolak sijil ke nod: {{ .err }}"
-PushSSLToNodeSuccess: "Berjaya menolak sijil ke nod"
-ErrShutDown: "Arahan dihentikan secara manual!"
-
-ErrMinQuickJump: "Sila tetapkan sekurang-kurangnya satu entri lompat pantas!"
-ErrMaxQuickJump: "Anda boleh menetapkan sehingga empat entri lompat pantas!"
-
-#biasa
+ErrShutDown: 'Arahan dihentikan secara manual!'
+ErrMinQuickJump: 'Sila tetapkan sekurang-kurangnya satu entri lompat pantas!'
+ErrMaxQuickJump: 'Anda boleh menetapkan sehingga empat entri lompat pantas!'
 ErrUsernameIsExist: 'Nama pengguna sudah wujud'
 ErrNameIsExist: 'Nama sudah wujud'
 ErrDemoEnvironment: 'Pelayan demo, operasi ini dilarang!'
@@ -32,16 +26,14 @@ ErrPortExist: '{{ .port }} port sudah diduduki oleh {{ .type }} [{{ .name }}]'
 TYPE_APP: 'Aplikasi'
 TYPE_RUNTIME: 'Persekitaran masa jalan'
 TYPE_DOMAIN: 'Nama Domain'
-ErrTypePort: Format 'Port {{ .name }} tidak betul'
+ErrTypePort: 'Format ''Port {{ .name }} tidak betul'''
 ErrTypePortRange: 'Julat port perlu antara 1-65535'
 Success: 'Kejayaan'
 Failed: 'Gagal'
 SystemRestart: 'Tugas terganggu kerana sistem mula semula'
 ErrGroupIsDefault: 'Kumpulan lalai, tidak boleh dipadamkan'
 ErrGroupIsInWebsiteUse: 'Kumpulan sedang digunakan oleh tapak web lain dan tidak boleh dipadamkan.'
-Decrypt: "Dekripsi"
-
-#agent
+Decrypt: 'Dekripsi'
 ErrAgentAccountBound: 'Akaun ini telah dipautkan kepada ejen dan tidak boleh dipadam. Sila semak dan cuba lagi!'
 ErrAgentAccountUnavailable: 'Maklumat sambungan akaun tidak tersedia. Ralat: {{ .err }}. Sila semak dan cuba lagi!'
 ErrAgentProviderNotSupported: 'Penyedia ejen ini tidak disokong. Sila semak dan cuba lagi!'
@@ -53,26 +45,22 @@ ErrAgentApiKeyRequired: 'API Key tidak boleh kosong. Sila semak dan cuba lagi!'
 ErrAgentComposeRequired: 'Kandungan compose tersuai tidak boleh kosong. Sila semak dan cuba lagi!'
 ErrAgentIDRequired: 'ID ejen tidak boleh kosong. Sila semak dan cuba lagi!'
 ErrAgentAccountIDRequired: 'ID akaun tidak boleh kosong. Sila semak dan cuba lagi!'
-
-#sandaran
 Localhost: 'Mesin Tempatan'
 ErrBackupInUsed: 'Akaun sandaran telah digunakan dalam tugas yang dijadualkan dan tidak boleh dipadamkan.'
 ErrBackupCheck: 'Sambungan ujian akaun sandaran gagal {{ .err }}'
 ErrBackupLocalDelete: 'Memadam akaun sandaran pelayan tempatan belum disokong lagi'
 ErrBackupLocalCreate: 'Membuat akaun sandaran pelayan tempatan belum disokong lagi'
-
-#app
 ErrPortInUsed: 'Port {{ .detail }} sudah diduduki!'
 ErrAppLimit: 'Bilangan aplikasi yang dipasang telah melebihi had'
 ErrNotInstall: 'Aplikasi tidak dipasang'
 ErrPortInOtherApp: 'Port {{ .port }} sudah diduduki oleh aplikasi {{ .apps }}!'
 ErrDbUserNotValid: 'Pangkalan data sedia ada, nama pengguna dan kata laluan tidak sepadan!'
-ErrUpdateBuWebsite: 'Aplikasi telah berjaya dikemas kini, tetapi pengubahsuaian fail konfigurasi tapak web gagal. Sila semak konfigurasi! '
+ErrUpdateBuWebsite: 'Aplikasi telah berjaya dikemas kini, tetapi pengubahsuaian fail konfigurasi tapak web gagal. Sila semak konfigurasi!'
 Err1PanelNetworkFailed: 'Pembuatan rangkaian kontena lalai gagal! {{ .detail }}'
 ErrFileParse: 'Penghuraian fail karang docker aplikasi gagal!'
 ErrInstallDirNotFound: 'Direktori pemasangan tidak wujud. Jika anda perlu menyahpasang, sila pilih Paksa Nyahpasang'
 AppStoreIsUpToDate: 'Gedung aplikasi sudah pun versi terkini'
-LocalAppVersionNull: Aplikasi '{{ .name }} tidak disegerakkan ke versi! Tidak dapat menambah pada senarai apl'
+LocalAppVersionNull: 'Aplikasi ''{{ .name }} tidak disegerakkan ke versi! Tidak dapat menambah pada senarai apl'''
 LocalAppVersionErr: '{{ .name }} versi penyegerakan {{ .version }} gagal! {{ .err }}'
 ErrFileNotFound: 'Fail {{ .name }} tidak wujud'
 ErrFileParseApp: '{{ .name }} penghuraian fail gagal {{ .err }}'
@@ -85,7 +73,7 @@ ErrHttpReqFailed: 'Permintaan gagal {{ .err }}'
 ErrNoSuchHost: 'Tidak dapat mencari pelayan yang diminta {{ .err }}'
 ErrHttpReqNotFound: 'Sumber yang diminta {{ .err }} tidak dapat ditemui'
 ErrContainerNotFound: 'Bekas {{ .name }} tidak wujud'
-ErrContainerMsg: Bekas '{{ .name }} adalah tidak normal. Sila semak log pada halaman kontena untuk butiran'
+ErrContainerMsg: 'Bekas ''{{ .name }} adalah tidak normal. Sila semak log pada halaman kontena untuk butiran'''
 ErrAppBackup: '{{ .name }} sandaran aplikasi gagal {{ .err }}'
 ErrVersionTooLow: 'Versi 1Panel semasa terlalu rendah untuk mengemas kini App Store. Sila tingkatkan versi sebelum beroperasi.'
 ErrAppNameExist: 'Nama aplikasi sudah wujud'
@@ -97,34 +85,29 @@ ErrAppUpgrade: 'Peningkatan {{ .name }} aplikasi gagal {{ .err }}'
 AppRecover: 'Aplikasi tarik balik {{ .name }}'
 PullImageStart: 'Mula tarik imej [{{ .name }}]'
 PullImageSuccess: 'Tarik imej berjaya'
-AppStoreIsLastVersion: 'App Store sudah pun versi terkini'
 AppStoreSyncSuccess: 'Penyegerakan App Store berjaya'
 SyncAppDetail: 'Segerakkan konfigurasi aplikasi'
 AppVersionNotMatch: 'Aplikasi {{ .name }} memerlukan versi 1Panel yang lebih tinggi, melangkau penyegerakan'
-MoveSiteDir: "Perubahan direktori laman web didapati. Perlu memindahkan direktori laman web OpenResty ke {{ .name }}"
+MoveSiteDir: 'Perubahan direktori laman web didapati. Perlu memindahkan direktori laman web OpenResty ke {{ .name }}'
 MoveSiteDirSuccess: 'Penghijrahan direktori tapak web yang berjaya'
 DeleteRuntimePHP: 'Padam masa jalan PHP'
-CustomAppStoreFileValid: 'Pakej gedung apl perlu dalam format .tar.gz'
+CustomAppStoreFileValid: 'Pakej gedung apl perlu dalam format.tar.gz'
 PullImageTimeout: 'Tarik tamat masa imej, sila cuba tingkatkan pecutan imej atau tukar kepada pecutan imej lain'
 ErrAppIsDown: 'Status permohonan {{ .name }} tidak normal, sila semak'
 ErrCustomApps: 'Ada aplikasi yang dipasang, sila nyahpasangnya dahulu'
 ErrCustomRuntimes: 'Terdapat persekitaran masa jalan yang dipasang, sila padamkannya dahulu'
-ErrAppVersionDeprecated: "Aplikasi {{ .name }} tidak sesuai dengan versi 1Panel saat ini, dilewati"
-ErrDockerFailed: "Keadaan Docker tidak normal, sila periksa status perkhidmatan"
-ErrDockerComposeCmdNotFound: "Perintah Docker Compose tidak wujud, sila pasang perintah ini di mesin tuan terlebih dahulu"
+ErrAppVersionDeprecated: 'Aplikasi {{ .name }} tidak sesuai dengan versi 1Panel saat ini, dilewati'
+ErrDockerFailed: 'Keadaan Docker tidak normal, sila periksa status perkhidmatan'
+ErrDockerComposeCmdNotFound: 'Perintah Docker Compose tidak wujud, sila pasang perintah ini di mesin tuan terlebih dahulu'
 UseExistImage: 'Imej sudah wujud, menggunakan imej sedia ada'
 ErrDatabaseNotFound: 'Pangkalan data {{ .name }} tidak wujud'
-
-#ssh
-ExportIP: "IP Log Masuk"
-ExportArea: "Lokasi"
-ExportPort: "Port"
-ExportAuthMode: "Kaedah Log Masuk"
-ExportUser: "Pengguna"
-ExportStatus: "Status Log Masuk"
-ExportDate: "Masa"
-
-#fail
+ExportIP: 'IP Log Masuk'
+ExportArea: 'Lokasi'
+ExportPort: 'Port'
+ExportAuthMode: 'Kaedah Log Masuk'
+ExportUser: 'Pengguna'
+ExportStatus: 'Status Log Masuk'
+ExportDate: 'Masa'
 ErrFileCanNotRead: 'Fail ini tidak menyokong pratonton'
 ErrFileToLarge: 'Fail lebih besar daripada 10M dan tidak boleh dibuka'
 ErrPathNotFound: 'Direktori tidak wujud'
@@ -133,22 +116,20 @@ ErrLinkPathNotFound: 'Laluan sasaran tidak wujud!'
 ErrFileIsExist: 'Fail atau folder sudah wujud!'
 ErrFileUpload: '{{ .name }} gagal memuat naik fail {{ .detail }}'
 ErrFileDownloadDir: 'Folder muat turun tidak disokong'
-ErrCmdNotFound: 'Arahan {{ .name}} tidak wujud, sila pasang arahan ini pada hos dahulu'
+ErrCmdNotFound: 'Arahan {{ .name }} tidak wujud, sila pasang arahan ini pada hos dahulu'
 ErrSourcePathNotFound: 'Direktori sumber tidak wujud'
 ErrFavoriteExist: 'Laluan ini telah digemari'
 ErrInvalidChar: 'Aksara haram tidak dibenarkan'
 ErrPathNotDelete: 'Direktori yang dipilih tidak boleh dipadamkan'
-ErrLogFileTooLarge: "Fail log melebihi 500MB dan tidak boleh dibuka"
-FileDropFailed: "Gagal membersihkan fail {{ .name }}: {{ .err }}"
-FileDropSuccess: "Berjaya membersihkan fail {{ .name }}, {{ .count }} fail dibersihkan, {{ .size }} ruang cakera dibebaskan"
-FileDropSum: "Pembersihan fail selesai, sejumlah {{ .count }} fail dibersihkan, sejumlah {{ .size }} ruang cakera dibebaskan"
-ErrBadDecrypt: "Kata laluan penyahsulitan pakej termampat salah, penyahmampatan gagal, sila periksa dan cuba lagi!"
-
-#laman web
+ErrLogFileToLarge: 'Fail log melebihi 500MB dan tidak boleh dibuka'
+FileDropFailed: 'Gagal membersihkan fail {{ .name }}: {{ .err }}'
+FileDropSuccess: 'Berjaya membersihkan fail {{ .name }}, {{ .count }} fail dibersihkan, {{ .size }} ruang cakera dibebaskan'
+FileDropSum: 'Pembersihan fail selesai, sejumlah {{ .count }} fail dibersihkan, sejumlah {{ .size }} ruang cakera dibebaskan'
+ErrBadDecrypt: 'Kata laluan penyahsulitan pakej termampat salah, penyahmampatan gagal, sila periksa dan cuba lagi!'
 ErrAliasIsExist: 'Alias sudah wujud'
 ErrBackupMatch: 'Fail sandaran tidak sepadan dengan beberapa data tapak web semasa {{ .detail }}'
 ErrBackupExist: 'Bahagian sepadan data sumber dalam fail sandaran tidak wujud {{ .detail }}'
-ErrPHPResource: 'Persekitaran operasi tempatan tidak menyokong penukaran! '
+ErrPHPResource: 'Persekitaran operasi tempatan tidak menyokong penukaran!'
 ErrPathPermission: 'Folder dengan keizinan bukan 1000:1000 telah dikesan dalam direktori indeks, yang mungkin menyebabkan ralat dinafikan Akses pada tapak web. Sila klik butang Simpan di atas'
 ErrDomainIsUsed: 'Nama domain telah digunakan oleh tapak web [{{ .name }}]'
 ErrDomainFormat: 'Format nama domain {{ .name }} tidak betul'
@@ -156,11 +137,11 @@ ErrDefaultAlias: 'lalai ialah kod simpanan, sila gunakan kod lain'
 ErrParentWebsite: 'Anda perlu memadamkan subtapak {{ .name }} dahulu'
 ErrBuildDirNotFound: 'Direktori binaan tidak wujud'
 ErrImageNotExist: 'Imej persekitaran operasi {{ .name }} tidak wujud, sila edit semula persekitaran pengendalian'
-ErrProxyIsUsed: "Pengimbang beban telah digunakan oleh pengganti terbalik, tidak boleh dipadamkan"
+ErrProxyIsUsed: 'Pengimbang beban telah digunakan oleh pengganti terbalik, tidak boleh dipadamkan'
 ErrSSLValid: 'Fail sijil bermasalah, sila periksa status sijil!'
-ErrWebsiteDir: "Sila pilih direktori dalam direktori laman web."
-ErrComposerFileNotFound: "Fail composer.json tidak wujud"
-ErrRuntimeNoPort: "Persekitaran runtime tidak diset dengan port, sila edit persekitaran runtime terlebih dahulu."
+ErrWebsiteDir: 'Sila pilih direktori dalam direktori laman web.'
+ErrComposerFileNotFound: 'Fail composer.json tidak wujud'
+ErrRuntimeNoPort: 'Persekitaran runtime tidak diset dengan port, sila edit persekitaran runtime terlebih dahulu.'
 Status: 'Status'
 start: 'Mulakan'
 stop: 'Berhenti'
@@ -173,23 +154,21 @@ delete: 'Padam'
 ErrDefaultWebsite: 'Laman web lalai telah ditetapkan, sila batalkan sebelum menetapkan!'
 SSL: 'Sijil'
 Set: 'Tetapan'
-
-#ssl
 ErrSSLCannotDelete: 'Sijil {{ .name }} sedang digunakan oleh tapak web dan tidak boleh dipadamkan'
 ErrAccountCannotDelete: 'Akaun dikaitkan dengan sijil dan tidak boleh dipadamkan'
-ErrSSSLApply: 'Pembaharuan sijil berjaya, muat semula openresty gagal, sila semak konfigurasi!'
+ErrSSLApply: 'Pembaharuan sijil berjaya, muat semula openresty gagal, sila semak konfigurasi!'
 ErrEmailIsExist: 'Peti mel sudah wujud'
 ErrSSLKeyNotFound: 'Fail kunci peribadi tidak wujud'
 ErrSSLCertificateNotFound: 'Fail sijil tidak wujud'
 ErrSSLKeyFormat: 'Pengesahan fail kunci peribadi gagal'
 ErrSSLCertificateFormat: 'Format fail sijil tidak betul, sila gunakan format pem'
-ErrEabKidOrEabHmacKeyCannot Blank: 'EabKid atau EabHmacKey tidak boleh kosong'
+ErrEabKidOrEabHmacKeyCannotBlank: 'EabKid atau EabHmacKey tidak boleh kosong'
 ErrOpenrestyNotFound: 'Mod Http memerlukan Openresty dipasang dahulu'
-ApplySSLStart: 'Mula memohon sijil, nama domain [{{ .domain }}] kaedah permohonan [{{ .type }}] '
+ApplySSLStart: 'Mula memohon sijil, nama domain [{{ .domain }}] kaedah permohonan [{{ .type }}]'
 dnsAccount: 'DNS Auto'
 dnsManual: 'Manual DNS'
 http: 'HTTP'
-ApplySSLFailed: 'Permohonan untuk sijil [{{ .domain }}] gagal, {{ .detail }} '
+ApplySSLFailed: 'Permohonan untuk sijil [{{ .domain }}] gagal, {{ .detail }}'
 ApplySSLSuccess: 'Berjaya memohon sijil [{{ .domain }}]!'
 DNSAccountName: 'Akaun DNS [{{ .name }}] vendor [{{ .type }}]'
 PushDirLog: 'Sijil ditolak ke direktori [{{ .path }}] {{ .status }}'
@@ -205,94 +184,79 @@ ExecShellSuccess: 'Pelaksanaan skrip berjaya'
 StartUpdateSystemSSL: 'Mula mengemas kini sijil sistem'
 UpdateSystemSSLSuccess: 'Berjaya kemas kini sijil sistem'
 ErrWildcardDomain: 'Tidak dapat memohon sijil nama domain kad bebas dalam mod HTTP'
-ErrApplySSLCanNotDelete: "Sertifikat {{.name}} yang sedang diajukan tidak dapat dihapus, sila cuba lagi kemudian."
-
-#mysql
+ErrApplySSLCanNotDelete: 'Sertifikat {{ .name }} yang sedang diajukan tidak dapat dihapus, sila cuba lagi kemudian.'
+StartPushSSLToNode: 'Mula menolak sijil ke nod'
+PushSSLToNodeFailed: 'Gagal menolak sijil ke nod: {{ .err }}'
+PushSSLToNodeSuccess: 'Berjaya menolak sijil ke nod'
 ErrUserIsExist: 'Pengguna semasa sudah wujud, sila masukkan semula'
 ErrDatabaseIsExist: 'Pangkalan data semasa sudah wujud, sila masukkan semula'
 ErrExecTimeOut: 'Pelaksanaan SQL tamat masa, sila semak pangkalan data'
 ErrRemoteExist: 'Pangkalan data jauh sudah wujud dengan nama ini, sila ubah suainya dan cuba lagi'
 ErrLocalExist: 'Nama sudah wujud dalam pangkalan data tempatan, sila ubah suai dan cuba lagi'
-RemoteBackup: "Untuk menyandarkan pangkalan data jauh, perkhidmatan pangkalan data bekas tempatan perlu dimulakan terlebih dahulu menggunakan imej {{ .name }}, sila tunggu..."
-RemoteRecover: "Untuk memulihkan pangkalan data jauh, perkhidmatan pangkalan data bekas tempatan perlu dimulakan terlebih dahulu menggunakan imej {{ .name }}, sila tunggu..."
-Arg: "Hujah"
-
-#redis
+RemoteBackup: 'Untuk menyandarkan pangkalan data jauh, perkhidmatan pangkalan data bekas tempatan perlu dimulakan terlebih dahulu menggunakan imej {{ .name }}, sila tunggu...'
+RemoteRecover: 'Untuk memulihkan pangkalan data jauh, perkhidmatan pangkalan data bekas tempatan perlu dimulakan terlebih dahulu menggunakan imej {{ .name }}, sila tunggu...'
+Arg: 'Hujah'
 ErrTypeOfRedis: 'Jenis fail pemulihan tidak sepadan dengan kaedah kegigihan semasa, sila ubah suai dan cuba lagi'
-
-#bekas
-ErrInUsed: "{{ .detail }} sedang digunakan dan tidak boleh dipadam!"
-ErrObjectInUsed: "Objek ini sedang digunakan dan tidak boleh dipadam!"
-ErrObjectBeDependent: "Imej ini digantungkan oleh imej lain dan tidak boleh dipadam!"
+ErrInUsed: '{{ .detail }} sedang digunakan dan tidak boleh dipadam!'
+ErrObjectInUsed: 'Objek ini sedang digunakan dan tidak boleh dipadam!'
+ErrObjectBeDependent: 'Imej ini digantungkan oleh imej lain dan tidak boleh dipadam!'
 ErrPortRules: 'Nombor port tidak sepadan, sila masukkan semula!'
 ErrPgImagePull: 'Tarikh imej tamat masa, sila konfigurasikan pecutan imej atau tarik imej {{ .name }} secara manual dan cuba lagi'
-PruneHelper: "Pembersihan ini {{ .name }} membebaskan ruang cakera {{ .size }}"
-ImageRemoveHelper: "Padam imej {{ .name }}, membebaskan {{ .size }} ruang cakera"
-BuildCache: "Cache binaan"
-Volume: "Jilid storan"
-Network: "Rangkaian"
-PruneStart: "Pembersihan sedang dijalankan, sila tunggu..."
-
-#masa berjalan
+PruneHelper: 'Pembersihan ini {{ .name }} membebaskan ruang cakera {{ .size }}'
+ImageRemoveHelper: 'Padam imej {{ .name }}, membebaskan {{ .size }} ruang cakera'
+BuildCache: 'Cache binaan'
+Volume: 'Jilid storan'
+Network: 'Rangkaian'
+PruneStart: 'Pembersihan sedang dijalankan, sila tunggu...'
 ErrFileNotExist: 'Fail {{ .detail }} tidak wujud! Sila semak integriti fail sumber!'
 ErrImageBuildErr: 'Pembinaan imej gagal'
-ErrImageExist: "Imej sudah wujud! Sila ubah nama imej."
+ErrImageExist: 'Imej sudah wujud! Sila ubah nama imej.'
 ErrDelWithWebsite: 'Persekitaran pengendalian sudah dikaitkan dengan tapak web dan tidak boleh dipadamkan'
 ErrRuntimeStart: 'Permulaan gagal'
 ErrPackageJsonNotFound: 'fail package.json tidak wujud'
 ErrScriptsNotFound: 'Item konfigurasi skrip tidak ditemui dalam package.json'
-ErrContainerNameNotFound: 'Tidak dapat mendapatkan nama kontena, sila semak fail .env'
+ErrContainerNameNotFound: 'Tidak dapat mendapatkan nama kontena, sila semak fail.env'
 ErrNodeModulesNotFound: 'Folder node_modules tidak wujud! Sila edit persekitaran masa jalan atau tunggu persekitaran masa jalan berjaya dimulakan'
 ErrContainerNameIsNull: 'Nama kontena tidak wujud'
-ErrPHPPortIsDefault: "Порт 9000 является портом по умолчанию, пожалуйста, измените и попробуйте снова"
-ErrPHPRuntimePortFailed: "Порт {{ .name }} уже используется текущей средой выполнения, пожалуйста, измените и попробуйте снова"
-
-#alat
+ErrPHPPortIsDefault: 'Порт 9000 является портом по умолчанию, пожалуйста, измените и попробуйте снова'
+ErrPHPRuntimePortFailed: 'Порт {{ .name }} уже используется текущей средой выполнения, пожалуйста, измените и попробуйте снова'
 ErrConfigNotFound: 'Fail konfigurasi tidak wujud'
 ErrConfigParse: 'Format fail konfigurasi tidak betul'
 ErrConfigIsNull: 'Fail konfigurasi tidak boleh kosong'
 ErrConfigDirNotFound: 'Direktori berjalan tidak wujud'
 ErrConfigAlreadyExist: 'Fail konfigurasi dengan nama yang sama sudah wujud'
 ErrUserFindErr: 'Pengguna {{ .name }} carian gagal {{ .err }}'
-
-#cronjob
 CutWebsiteLogSuccess: '{{ .name }} log tapak web berjaya dipotong, laluan sandaran {{ .path }}'
 HandleShell: 'Laksanakan skrip {{ .name }}'
-HandleCurl: "Akses URL {{ .name }}"
+HandleCurl: 'Akses URL {{ .name }}'
 HandleNtpSync: 'Penyegerakan masa sistem'
 HandleSystemClean: 'Pembersihan cache sistem'
 SystemLog: 'Log Sistem'
 CutWebsiteLog: 'Putar Log Laman Web'
 FileOrDir: 'Direktori / Fail'
 UploadFile: 'Muat naik fail sandaran {{ .file }} ke {{ .backup }}'
-Upload: "Muat Naik"
-IgnoreBackupErr: "Sandaran gagal, ralat: {{ .detail }}, abaikan ralat ini..."
-IgnoreUploadErr: "Muat naik gagal, ralat: {{ .detail }}, abaikan ralat ini..."
-LoadBackupFailed: "Gagal mendapatkan sambungan akaun sandaran, ralat: {{ .detail }}"
-InExecuting: "Tugas semasa sedang dilaksanakan, jangan ulangi pelaksanaan!"
-NoSuchResource: "Tiada kandungan sandaran ditemui dalam pangkalan data, dilangkau..."
-CleanLog: "Bersihkan log"
-CleanLogByName: "Bersihkan log {{.name}}"
-WafIpGroupNotFound: "Kumpulan IP WAF tidak ditemui. Sila pergi ke [Ciri Lanjutan - WAF - Senarai Hitam/Putih - Kumpulan IP] untuk menambah kumpulan IP melalui kaedah muat turun jauh."
-
-#kotak alat
+Upload: 'Muat Naik'
+IgnoreBackupErr: 'Sandaran gagal, ralat: {{ .detail }}, abaikan ralat ini...'
+IgnoreUploadErr: 'Muat naik gagal, ralat: {{ .detail }}, abaikan ralat ini...'
+LoadBackupFailed: 'Gagal mendapatkan sambungan akaun sandaran, ralat: {{ .detail }}'
+InExecuting: 'Tugas semasa sedang dilaksanakan, jangan ulangi pelaksanaan!'
+NoSuchResource: 'Tiada kandungan sandaran ditemui dalam pangkalan data, dilangkau...'
+CleanLog: 'Bersihkan log'
+CleanLogByName: 'Bersihkan log {{ .name }}'
+WafIpGroupNotFound: 'Kumpulan IP WAF tidak ditemui. Sila pergi ke [Ciri Lanjutan - WAF - Senarai Hitam/Putih - Kumpulan IP] untuk menambah kumpulan IP melalui kaedah muat turun jauh.'
 ErrNotExistUser: 'Pengguna semasa tidak wujud, sila ubah suai dan cuba lagi!'
 ErrBanAction: 'Tetapan gagal. Perkhidmatan {{ .name }} semasa tidak tersedia. Sila semak dan cuba lagi!'
 ErrClamdscanNotFound: 'Arahan clamdscan tidak dikesan, sila rujuk dokumentasi untuk memasangnya!'
-TaskSwapSet: "Tetapkan Swap"
-SetSwap: "Tetapkan Swap {{ .path }} - {{ .size }}"
-CreateSwap: "Buat Fail Swap"
-FormatSwap: "Format Fail Swap"
-EnableSwap: "Dayakan Swap"
-
-#tamper
-CleanTamperSetting: "Bersihkan tetapan perlindungan sejarah"
-SetTamperWithRules: "Mulakan perlindungan direktori mengikut peraturan"
-ProtectDir: "Lindungi direktori {{ .name }}"
-IgnoreFile: "Lindungi fail {{ .name }}"
-TamperSetSuccessful: "Tetapan perlindungan selesai, mula memantau direktori berikut:"
-
-#waf
+TaskSwapSet: 'Tetapkan Swap'
+SetSwap: 'Tetapkan Swap {{ .path }} - {{ .size }}'
+CreateSwap: 'Buat Fail Swap'
+FormatSwap: 'Format Fail Swap'
+EnableSwap: 'Dayakan Swap'
+CleanTamperSetting: 'Bersihkan tetapan perlindungan sejarah'
+SetTamperWithRules: 'Mulakan perlindungan direktori mengikut peraturan'
+ProtectDir: 'Lindungi direktori {{ .name }}'
+IgnoreFile: 'Lindungi fail {{ .name }}'
+TamperSetSuccessful: 'Tetapan perlindungan selesai, mula memantau direktori berikut:'
 ErrScope: 'Mengubah suai konfigurasi ini tidak disokong'
 ErrStateChange: 'Perubahan keadaan gagal'
 ErrRuleExist: 'Peraturan sudah wujud'
@@ -300,7 +264,7 @@ ErrRuleNotExist: 'Peraturan tidak wujud'
 ErrParseIP: 'Format IP salah'
 ErrDefaultIP: 'default ialah nama simpanan, sila tukar kepada nama lain'
 ErrGroupInUse: 'Kumpulan IP digunakan oleh senarai hitam/senarai putih dan tidak boleh dipadamkan'
-ErrIPGroupAclUse: "Kumpulan IP digunakan oleh peraturan tersuai tapak web {{ .name }}, tidak boleh dipadamkan"
+ErrIPGroupAclUse: 'Kumpulan IP digunakan oleh peraturan tersuai tapak web {{ .name }}, tidak boleh dipadamkan'
 ErrGroupExist: 'Nama kumpulan IP sudah wujud'
 ErrIPRange: 'Julat IP salah'
 ErrIPExist: 'IP sudah wujud'
@@ -311,11 +275,11 @@ xss: 'XSS'
 phpExec: 'Pelaksanaan skrip PHP'
 oneWordTrojan: 'One Word Trojan'
 appFilter: 'Gunakan penapisan direktori berbahaya'
-webshell: 'Webshell'
+webShell: 'Webshell'
 args: 'Peraturan parameter'
 protocolFilter: 'Penapisan protokol'
-javaFileter: 'Penapis fail berbahaya Java'
-Penapis pengimbas: 'Penapis pengimbas'
+javaFilter: 'Penapis fail berbahaya Java'
+scannerFilter: 'Penapis pengimbas'
 escapeFilter: 'penapis melarikan diri'
 customRule: 'Peraturan tersuai'
 httpMethod: 'Penapisan kaedah HTTP'
@@ -344,10 +308,9 @@ ErrDBNotExist: 'Pangkalan data tidak wujud'
 allow: 'membenarkan'
 deny: 'menafikan'
 OpenrestyNotFound: 'Openresty tidak dipasang'
-remoteIpIsNull: "Senarai IP kosong"
-OpenrestyVersionErr: "Versi Openresty terlalu rendah, sila naik taraf Openresty ke 1.27.1.2-2-2-focal"
-
-#tugas
+remoteIpIsNull: 'Senarai IP kosong'
+OpenrestyVersionErr: 'Versi Openresty terlalu rendah, sila naik taraf Openresty ke 1.27.1.2-2-2-focal'
+ErrFileTooLarge: 'File is larger than 1 MB and cannot be uploaded'
 TaskStart: '{{ .name }} Task mula [MULA]'
 TaskEnd: '{{ .name }} Task selesai [SELESAI]'
 TaskFailed: 'tugas {{ .name }} gagal'
@@ -363,7 +326,7 @@ TaskDelete: 'Padam'
 TaskUpgrade: 'Naik taraf'
 TaskUpdate: 'Kemas kini'
 TaskRestart: 'Mulakan semula'
-TaskProtect: "Lindungi"
+TaskProtect: 'Lindungi'
 TaskBackup: 'Sandaran'
 TaskRecover: 'Pulihkan'
 TaskRollback: 'Rollback'
@@ -371,10 +334,10 @@ TaskPull: 'Tarik'
 TaskCommit: 'Komit'
 TaskBuild: 'Bina'
 TaskPush: 'Tolak'
-TaskClean: "Pembersihan"
+TaskClean: 'Pembersihan'
 TaskHandle: 'Laksanakan'
-TaskImport: "Import"
-TaskExport: "Eksport"
+TaskImport: 'Import'
+TaskExport: 'Eksport'
 Website: 'Laman web'
 App: 'Aplikasi'
 Runtime: 'Persekitaran masa jalan'
@@ -406,18 +369,12 @@ RuntimeExtension: 'Sambungan Persekitaran Runtime'
 TaskIsExecuting: 'Tugas sedang berjalan'
 CustomAppstore: 'Gudang aplikasi tersuai'
 TaskExec: 'Laksanakan'
-TaskBatch: "Operasi Batch"
+TaskBatch: 'Operasi Batch'
 FileConvert: 'Penukaran Format Fail'
-
-# task - clam
-Clamscan: "Imbas {{ .name }}"
-TaskScan: "Imbas"
-
-# tugasan - ai
+Clamscan: 'Imbas {{ .name }}'
+TaskScan: 'Imbas'
 OllamaModelPull: 'Tarik model Ollama {{ .name }}'
 OllamaModelSize: 'Dapatkan saiz model Ollama {{ .name }}'
-
-# gambar tugasan
 Snapshot: 'Snapshot'
 SnapDBInfo: 'Tulis maklumat pangkalan data 1Panel'
 SnapCopy: 'Salin fail & direktori {{ .name }}'
@@ -443,7 +400,6 @@ SnapCompressSize: 'Saiz fail syot kilat {{ .name }}'
 SnapUpload: 'Muat naik fail syot kilat'
 SnapUploadTo: 'Muat naik fail syot kilat ke {{ .name }}'
 SnapUploadRes: 'Muat naik fail syot kilat ke {{ .name }}'
-
 SnapshotRecover: 'Snapshot Restore'
 RecoverDownload: 'Muat turun fail syot kilat'
 Download: 'Muat turun'
@@ -451,10 +407,10 @@ RecoverDownloadAccount: 'Dapatkan syot kilat muat turun akaun sandaran {{ .name 
 RecoverDecompress: 'Nyahmampatkan fail termampat syot kilat'
 Decompress: 'Penyahmampatan'
 BackupBeforeRecover: 'Sandarkan data berkaitan sistem sebelum syot kilat'
-Readjson: 'Baca fail Json dalam petikan'
-ReadjsonPath: 'Dapatkan laluan fail Json dalam petikan'
-ReadjsonContent: 'Baca fail Json'
-ReadjsonMarshal: 'Pemprosesan melarikan diri Json'
+ReadJson: 'Baca fail Json dalam petikan'
+ReadJsonPath: 'Dapatkan laluan fail Json dalam petikan'
+ReadJsonContent: 'Baca fail Json'
+ReadJsonMarshal: 'Pemprosesan melarikan diri Json'
 RecoverApp: 'Pulihkan apl yang dipasang'
 RecoverWebsite: 'Pulihkan direktori tapak web'
 RecoverAppImage: 'Pulihkan sandaran imej syot kilat'
@@ -468,9 +424,6 @@ RecoverDaemonJson: 'Pulihkan fail daemon.json konfigurasi bekas'
 RecoverDBData: 'Pulihkan data pangkalan data'
 RecoverBackups: 'Pulihkan direktori sandaran tempatan'
 RecoverPanelData: 'Direktori data pemulihan'
-
-# tugas - bekas
-ContainerNewCliet: 'Memulakan Klien Docker'
 ContainerImagePull: 'Tarik imej bekas {{ .name }}'
 ContainerRemoveOld: 'Alih keluar bekas asal {{ .name }}'
 ContainerImageCheck: 'Periksa sama ada imej ditarik seperti biasa'
@@ -479,22 +432,13 @@ ContainerRecreate: 'Kemas kini kontena gagal, kini mula memulihkan bekas asal'
 ContainerCreate: 'Buat bekas baharu {{ .name }}'
 ContainerCreateFailed: 'Penciptaan bekas gagal, padamkan bekas yang gagal'
 ContainerStartCheck: 'Periksa sama ada bekas telah dimulakan'
-
-# tugas - imej
 ImageBuild: 'Membina Imej'
-ImageBuildStdoutCheck: 'Menghuraikan kandungan output imej'
-ImageBuildRes: 'Output binaan imej: {{ .name }}'
 ImagePull: 'Tarik imej'
 ImageRepoAuthFromDB: 'Dapatkan maklumat pengesahan repositori daripada pangkalan data'
-ImaegPullRes: 'Output tarik imej: {{ .name }}'
 ImagePush: 'Tolak imej'
 ImageRenameTag: 'Ubah suai teg imej'
 ImageNewTag: 'Teg imej baharu {{ .name }}'
-ImaegPushRes: 'Output tolak imej: {{ .name }}'
 ComposeCreate: 'Buat gubahan'
-ComposeCreateRes: 'Karang cipta output: {{ .name }}'
-
-# tugas - laman web
 BackupNginxConfig: 'Fail konfigurasi OpenResty tapak web sandaran'
 CompressFileSuccess: 'Mampatkan direktori berjaya, dimampatkan ke {{ .name }}'
 CompressDir: 'Direktori mampatan'
@@ -505,40 +449,27 @@ websiteDir: 'Direktori Laman Web'
 RecoverFailedStartRollBack: 'Pemulihan gagal, mulakan rollback'
 AppBackupFileIncomplete: 'Fail sandaran tidak lengkap dan tidak mempunyai fail app.json atau app.tar.gz'
 AppAttributesNotMatch: 'Jenis atau nama aplikasi tidak sepadan'
-
-#alert
-ErrAlert: 'Format mesej amaran tidak betul, sila semak dan cuba lagi!'
-ErrAlertPush: 'Ralat dalam menolak maklumat amaran, sila semak dan cuba lagi!'
-ErrAlertSave: 'Ralat menyimpan maklumat penggera, sila semak dan cuba lagi!'
 ErrAlertSync: 'Ralat penyegerakan maklumat penggera, sila semak dan cuba lagi!'
-ErrAlertRemote: 'Ralat jauh mesej penggera, sila semak dan cuba lagi!'
-
-#task - runtime
-ErrInstallExtension: "Tugas pemasangan sudah sedang berjalan, silakan tunggu tugas selesai"
-
-# alert mail template
-PanelAlertTitle: "Notifikasi Amaran Panel"
-TestAlertTitle: "E-mel Ujian - Sahkan Sambungan E-mel"
-TestAlert: "Ini adalah e-mel ujian untuk mengesahkan konfigurasi penghantaran e-mel anda betul."
-LicenseExpirationAlert: "Panel {{ .node }}{{ .ip }} Anda, lesen akan tamat tempoh dalam {{ .day }} hari. Sila log masuk ke panel untuk butiran lanjut."
-CronJobFailedAlert: "Panel {{ .node }}{{ .ip }} Anda, tugas jadual {{ .name }} gagal dilaksanakan. Sila log masuk ke panel untuk butiran lanjut."
-ClamAlert: "Panel {{ .node }}{{ .ip }} Anda, tugas imbasan virus mengesan {{ .num }} fail yang dijangkiti. Sila log masuk ke panel untuk butiran lanjut."
-WebSiteAlert: "Panel {{ .node }}{{ .ip }} Anda, {{ .num }} laman web akan tamat tempoh dalam {{ .day }} hari. Sila log masuk ke panel untuk butiran lanjut."
-SSLAlert: "Panel {{ .node }}{{ .ip }} Anda, {{ .num }} sijil SSL akan tamat tempoh dalam {{ .day }} hari. Sila log masuk ke panel untuk butiran lanjut."
-DiskUsedAlert: "Panel {{ .node }}{{ .ip }} Anda, penggunaan cakera {{ .name }} telah mencapai {{ .used }}. Sila log masuk ke panel untuk butiran lanjut."
-ResourceAlert: "Panel {{ .node }}{{ .ip }} Anda, kadar penggunaan purata {{ .name }} dalam tempoh {{ .time }} minit ialah {{ .used }}. Sila log masuk ke panel untuk butiran lanjut."
-PanelVersionAlert: "Panel {{ .node }}{{ .ip }} Anda, versi panel terkini tersedia untuk dinaik taraf. Sila log masuk ke panel untuk butiran lanjut."
-PanelPwdExpirationAlert: "Panel {{ .node }}{{ .ip }} Anda, kata laluan panel akan tamat tempoh dalam {{ .day }} hari. Sila log masuk ke panel untuk butiran lanjut."
-CommonAlert: "Panel {{ .node }}{{ .ip }} Anda, {{ .msg }}. Sila log masuk ke panel untuk butiran lanjut."
-NodeExceptionAlert: "Panel {{ .node }}{{ .ip }} Anda, {{ .num }} nod tidak normal. Sila log masuk ke panel untuk butiran lanjut."
-LicenseExceptionAlert: "Panel {{ .node }}{{ .ip }} Anda, {{ .num }} lesen tidak normal. Sila log masuk ke panel untuk butiran lanjut."
-SSHAndPanelLoginAlert: "Panel {{ .node }}{{ .ip }} Anda, log masuk {{ .name }} dari {{ .loginIp }} tidak normal. Sila log masuk ke panel untuk butiran lanjut."
-
-#disk
-DeviceNotFound: "Peranti {{ .name }} tidak ditemui"
-DeviceIsMounted: "Peranti {{ .name }} telah dikaitkan, sila nyahkaitkan terlebih dahulu"
-PartitionDiskErr: "Gagal membahagikan, {{ .err }}"
-FormatDiskErr: "Gagal memformat cakera, {{ .err }}"
-MountDiskErr: "Gagal mengkaitkan cakera, {{ .err }}"
-UnMountDiskErr: "Gagal nyahkaitkan cakera, {{ .err }}"
-XfsNotFound: "Sistem fail xfs tidak dikesan, sila pasang xfsprogs terlebih dahulu"
+ErrInstallExtension: 'Tugas pemasangan sudah sedang berjalan, silakan tunggu tugas selesai'
+PanelAlertTitle: 'Notifikasi Amaran Panel'
+TestAlertTitle: 'E-mel Ujian - Sahkan Sambungan E-mel'
+TestAlert: 'Ini adalah e-mel ujian untuk mengesahkan konfigurasi penghantaran e-mel anda betul.'
+LicenseExpirationAlert: 'Panel {{ .node }}{{ .ip }} Anda, lesen akan tamat tempoh dalam {{ .day }} hari. Sila log masuk ke panel untuk butiran lanjut.'
+CronJobFailedAlert: 'Panel {{ .node }}{{ .ip }} Anda, tugas jadual {{ .name }} gagal dilaksanakan. Sila log masuk ke panel untuk butiran lanjut.'
+ClamAlert: 'Panel {{ .node }}{{ .ip }} Anda, tugas imbasan virus mengesan {{ .num }} fail yang dijangkiti. Sila log masuk ke panel untuk butiran lanjut.'
+WebSiteAlert: 'Panel {{ .node }}{{ .ip }} Anda, {{ .num }} laman web akan tamat tempoh dalam {{ .day }} hari. Sila log masuk ke panel untuk butiran lanjut.'
+SSLAlert: 'Panel {{ .node }}{{ .ip }} Anda, {{ .num }} sijil SSL akan tamat tempoh dalam {{ .day }} hari. Sila log masuk ke panel untuk butiran lanjut.'
+DiskUsedAlert: 'Panel {{ .node }}{{ .ip }} Anda, penggunaan cakera {{ .name }} telah mencapai {{ .used }}. Sila log masuk ke panel untuk butiran lanjut.'
+ResourceAlert: 'Panel {{ .node }}{{ .ip }} Anda, kadar penggunaan purata {{ .name }} dalam tempoh {{ .time }} minit ialah {{ .used }}. Sila log masuk ke panel untuk butiran lanjut.'
+PanelVersionAlert: 'Panel {{ .node }}{{ .ip }} Anda, versi panel terkini tersedia untuk dinaik taraf. Sila log masuk ke panel untuk butiran lanjut.'
+PanelPwdExpirationAlert: 'Panel {{ .node }}{{ .ip }} Anda, kata laluan panel akan tamat tempoh dalam {{ .day }} hari. Sila log masuk ke panel untuk butiran lanjut.'
+CommonAlert: 'Panel {{ .node }}{{ .ip }} Anda, {{ .msg }}. Sila log masuk ke panel untuk butiran lanjut.'
+NodeExceptionAlert: 'Panel {{ .node }}{{ .ip }} Anda, {{ .num }} nod tidak normal. Sila log masuk ke panel untuk butiran lanjut.'
+LicenseExceptionAlert: 'Panel {{ .node }}{{ .ip }} Anda, {{ .num }} lesen tidak normal. Sila log masuk ke panel untuk butiran lanjut.'
+SSHAndPanelLoginAlert: 'Panel {{ .node }}{{ .ip }} Anda, log masuk {{ .name }} dari {{ .loginIp }} tidak normal. Sila log masuk ke panel untuk butiran lanjut.'
+DeviceNotFound: 'Peranti {{ .name }} tidak ditemui'
+DeviceIsMounted: 'Peranti {{ .name }} telah dikaitkan, sila nyahkaitkan terlebih dahulu'
+PartitionDiskErr: 'Gagal membahagikan, {{ .err }}'
+FormatDiskErr: 'Gagal memformat cakera, {{ .err }}'
+MountDiskErr: 'Gagal mengkaitkan cakera, {{ .err }}'
+XfsNotFound: 'Sistem fail xfs tidak dikesan, sila pasang xfsprogs terlebih dahulu'

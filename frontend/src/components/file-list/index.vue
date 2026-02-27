@@ -437,7 +437,7 @@ const createFolder = async (row: any) => {
     const basePath = req.path === '/' ? req.path : `${req.path}/`;
     addForm.path = `${basePath}${newFolder.value}`;
     if (addForm.path.indexOf('.1panel_clash') > -1) {
-        MsgWarning(i18n.global.t('file.clashDitNotSupport'));
+        MsgWarning(i18n.global.t('file.clashDidNotSupport'));
         return;
     }
     addForm.isDir = row.isDir;

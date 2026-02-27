@@ -1635,7 +1635,7 @@ const message = {
         ignoreCertificateHelper:
             '不安定なサーバー接続を可能にすると、データが漏れたり改ざんしたりする可能性があります。ダウンロードソースを信頼する場合にのみ、このオプションを使用します。',
         uploadOverLimit: 'ファイルの数は1000を超えています！圧縮してアップロードしてください',
-        clashDitNotSupport: 'ファイル名は、.1panel_clashを含むことを禁止されています',
+        clashDidNotSupport: 'ファイル名は、.1panel_clashを含むことを禁止されています',
         clashDeleteAlert: `「リサイクルビン」フォルダーを削除することはできません`,
         clashOpenAlert: '「リサイクルビン」ボタンをクリックして、リサイクルビンディレクトリを開きます',
         right: 'フォワード',
@@ -2791,8 +2791,8 @@ const message = {
         execDir: '実行ディレクトリ',
         packagist: '中国フルミラー',
 
-        batchOpreate: 'バッチ操作',
-        batchOpreateHelper: 'ウェブサイトをバッチ{0}しますか？',
+        batchOperate: 'バッチ操作',
+        batchOperateHelper: 'ウェブサイトをバッチ{0}しますか？',
         stream: 'TCP/UDP プロキシ',
         streamPorts: '待ち受けポート',
         streamPortsHelper:
@@ -3319,7 +3319,7 @@ const message = {
             phpExec: 'PHPスクリプト実行',
             oneWordTrojan: 'ワンワードトロイの木馬',
             appFilter: '危険なディレクトリフィルタリング',
-            webshell: 'Webシェル',
+            webShell: 'Webシェル',
             args: '悪意のあるパラメータ',
             protocolFilter: 'プロトコルフィルター',
             javaFilter: 'Java危険ファイルフィルタリング',

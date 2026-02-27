@@ -1615,7 +1615,7 @@ const message = {
         ignoreCertificateHelper:
             '안전하지 않은 서버 연결을 허용하면 데이터 유출 또는 변조가 발생할 수 있습니다. 이 옵션은 다운로드 소스를 신뢰할 때만 사용하세요.',
         uploadOverLimit: '파일 수가 1000 개를 초과했습니다! 압축하여 업로드하세요.',
-        clashDitNotSupport: '파일 이름에 .1panel_clash 를 포함할 수 없습니다.',
+        clashDidNotSupport: '파일 이름에 .1panel_clash 를 포함할 수 없습니다.',
         clashDeleteAlert: `"휴지통" 폴더는 삭제할 수 없습니다.`,
         clashOpenAlert: '휴지통 디렉터리를 열려면 "휴지통" 버튼을 클릭하세요.',
         right: '앞으로',
@@ -2746,8 +2746,8 @@ const message = {
         execDir: '실행 디렉토리',
         packagist: '중국 전체 미러',
 
-        batchOpreate: '일괄 작업',
-        batchOpreateHelper: '웹사이트를 일괄 {0}, 계속 작업하시겠습니까?',
+        batchOperate: '일괄 작업',
+        batchOperateHelper: '웹사이트를 일괄 {0}, 계속 작업하시겠습니까?',
         stream: 'TCP/UDP 프록시',
         streamPorts: '수신 포트',
         streamPortsHelper:
@@ -3262,7 +3262,7 @@ const message = {
             phpExec: 'PHP 스크립트 실행',
             oneWordTrojan: '단어 트로이',
             appFilter: '위험한 디렉터리 필터링',
-            webshell: '웹쉘',
+            webShell: '웹쉘',
             args: '악성 파라미터',
             protocolFilter: '프로토콜 필터',
             javaFilter: '자바 위험 파일 필터링',

@@ -1691,7 +1691,7 @@ const message = {
         ignoreCertificateHelper:
             'Güvensiz sunucu bağlantılarına izin vermek, veri sızıntısına veya değiştirilmesine yol açabilir. Bu seçeneği yalnızca indirme kaynağına güvendiğinizde kullanın.',
         uploadOverLimit: 'Dosya sayısı 1000’i aşıyor! Lütfen sıkıştırıp yükleyin',
-        clashDitNotSupport: 'Dosya adlarının .1panel_clash içermesi yasaktır',
+        clashDidNotSupport: 'Dosya adlarının .1panel_clash içermesi yasaktır',
         clashDeleteAlert: '"Geri Dönüşüm Kutusu" klasörü silinemez',
         clashOpenAlert: 'Geri dönüşüm kutusu dizinini açmak için lütfen "Geri Dönüşüm Kutusu" düğmesine tıklayın',
         right: 'İleri',
@@ -2893,8 +2893,8 @@ const message = {
         execDir: 'Çalıştırma Dizini',
         packagist: 'Çin Tam Aynası',
 
-        batchOpreate: 'Toplu İşlem',
-        batchOpreateHelper: 'Toplu {0} web siteleri, işlemi devam ettir?',
+        batchOperate: 'Toplu İşlem',
+        batchOperateHelper: 'Toplu {0} web siteleri, işlemi devam ettir?',
         stream: 'TCP/UDP Proxy',
         streamPorts: 'Dinleme Portları',
         streamPortsHelper:
@@ -3448,7 +3448,7 @@ const message = {
             phpExec: 'PHP Betiği Yürütme',
             oneWordTrojan: 'Tek Kelime Truva Atı',
             appFilter: 'Tehlikeli Dizin Filtreleme',
-            webshell: 'Webshell',
+            webShell: 'Webshell',
             args: 'Kötü Amaçlı Parametreler',
             protocolFilter: 'Protokol Filtresi',
             javaFilter: 'Java Tehlikeli Dosya Filtreleme',

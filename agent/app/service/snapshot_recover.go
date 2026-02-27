@@ -133,7 +133,7 @@ func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
 
 		var snapJson SnapshotJson
 		taskItem.AddSubTaskWithAliasAndOps(
-			"Readjson",
+			"ReadJson",
 			func(t *task.Task) error {
 				snapJson, err = readFromJson(path.Join(rootDir, snap.Name), &itemHelper)
 				return err
@@ -346,22 +346,22 @@ func backupBeforeRecover(name string, itemHelper *snapRecoverHelper) error {
 
 func readFromJson(rootDir string, itemHelper *snapRecoverHelper) (SnapshotJson, error) {
 	itemHelper.Task.Log("---------------------- 4 / 11 ----------------------")
-	itemHelper.Task.LogStart(i18n.GetMsgByKey("Readjson"))
+	itemHelper.Task.LogStart(i18n.GetMsgByKey("ReadJson"))
 
 	snapJsonPath := path.Join(rootDir, "base/snapshot.json")
 	var snap SnapshotJson
 	_, err := os.Stat(snapJsonPath)
-	itemHelper.Task.LogWithStatus(i18n.GetMsgByKey("ReadjsonPath"), err)
+	itemHelper.Task.LogWithStatus(i18n.GetMsgByKey("ReadJsonPath"), err)
 	if err != nil {
 		return snap, err
 	}
 	fileByte, err := os.ReadFile(snapJsonPath)
-	itemHelper.Task.LogWithStatus(i18n.GetMsgByKey("ReadjsonContent"), err)
+	itemHelper.Task.LogWithStatus(i18n.GetMsgByKey("ReadJsonContent"), err)
 	if err != nil {
 		return snap, err
 	}
 	err = json.Unmarshal(fileByte, &snap)
-	itemHelper.Task.LogWithStatus(i18n.GetMsgByKey("ReadjsonMarshal"), err)
+	itemHelper.Task.LogWithStatus(i18n.GetMsgByKey("ReadJsonMarshal"), err)
 	if err != nil {
 		return snap, err
 	}

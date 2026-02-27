@@ -1668,7 +1668,7 @@ const message = {
         ignoreCertificateHelper:
             'Разрешение небезопасных подключений к серверу может привести к утечке или подмене данных. Используйте эту опцию только если доверяете источнику загрузки.',
         uploadOverLimit: 'Количество файлов превышает 1000! Пожалуйста, сожмите и загрузите',
-        clashDitNotSupport: 'Имена файлов не должны содержать .1panel_clash',
+        clashDidNotSupport: 'Имена файлов не должны содержать .1panel_clash',
         clashDeleteAlert: 'Папку "Корзина" нельзя удалить',
         clashOpenAlert: 'Пожалуйста, нажмите кнопку "Корзина" чтобы открыть директорию корзины',
         right: 'Вперед',
@@ -2850,8 +2850,8 @@ const message = {
         execDir: 'Каталог выполнения',
         packagist: 'Полное зеркало Китая',
 
-        batchOpreate: 'Пакетная операция',
-        batchOpreateHelper: 'Пакетное {0} веб-сайтов, продолжить операцию?',
+        batchOperate: 'Пакетная операция',
+        batchOperateHelper: 'Пакетное {0} веб-сайтов, продолжить операцию?',
         stream: 'Прокси TCP/UDP',
         streamPorts: 'Порты прослушивания',
         streamPortsHelper:
@@ -3382,7 +3382,7 @@ const message = {
             phpExec: 'Выполнение PHP-скриптов',
             oneWordTrojan: 'Троян одно слово',
             appFilter: 'Фильтрация опасных директорий',
-            webshell: 'Webshell',
+            webShell: 'Webshell',
             args: 'Вредоносные параметры',
             protocolFilter: 'Фильтр протоколов',
             javaFilter: 'Фильтрация опасных файлов Java',

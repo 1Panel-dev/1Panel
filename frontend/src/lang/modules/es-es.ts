@@ -1680,7 +1680,7 @@ const message = {
         ignoreCertificateHelper:
             'Permitir conexiones inseguras puede provocar fugas o alteraciones de datos. Úselo solo si confía en la fuente.',
         uploadOverLimit: '¡El número de archivos supera los 1000! Por favor, comprima y cargue',
-        clashDitNotSupport: 'Los nombres de archivo no pueden contener .1panel_clash',
+        clashDidNotSupport: 'Los nombres de archivo no pueden contener .1panel_clash',
         clashDeleteAlert: 'No se puede eliminar la carpeta "Papelera"',
         clashOpenAlert: 'Haga clic en "Papelera" para abrir la carpeta de papelera',
         right: 'Adelante',
@@ -2851,8 +2851,8 @@ const message = {
         execDir: 'Directorio de ejecución',
         packagist: 'Mirror China completo',
 
-        batchOpreate: 'Operación en Lote',
-        batchOpreateHelper: 'Lote {0} sitios web, ¿continuar operación?',
+        batchOperate: 'Operación en Lote',
+        batchOperateHelper: 'Lote {0} sitios web, ¿continuar operación?',
         stream: 'Proxy TCP/UDP',
         streamPorts: 'Puertos de escucha',
         streamPortsHelper:
@@ -3395,7 +3395,7 @@ const message = {
             phpExec: 'Ejecución de scripts PHP',
             oneWordTrojan: 'Troyano de una línea',
             appFilter: 'Filtrado de directorios peligrosos',
-            webshell: 'Webshell',
+            webShell: 'Webshell',
             args: 'Parámetros maliciosos',
             protocolFilter: 'Filtro de protocolos',
             javaFilter: 'Filtro de ficheros Java peligrosos',

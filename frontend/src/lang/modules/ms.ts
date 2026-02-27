@@ -1677,7 +1677,7 @@ const message = {
         ignoreCertificateHelper:
             'Membenarkan sambungan pelayan tidak selamat boleh menyebabkan kebocoran atau pengubahan data. Gunakan pilihan ini hanya jika mempercayai sumber muat turun.',
         uploadOverLimit: 'Bilangan fail melebihi 1000! Sila mampatkan dan muat naik',
-        clashDitNotSupport: 'Nama fail dilarang mengandungi .1panel_clash',
+        clashDidNotSupport: 'Nama fail dilarang mengandungi .1panel_clash',
         clashDeleteAlert: 'Folder "Tong Kitar Semula" tidak boleh dipadamkan',
         clashOpenAlert: 'Sila klik butang "Tong Kitar Semula" untuk membuka direktori tong kitar semula',
         right: 'Ke hadapan',
@@ -2849,8 +2849,8 @@ const message = {
         execDir: 'Direktori Pelaksanaan',
         packagist: 'Cermin Penuh China',
 
-        batchOpreate: 'Operasi Pukal',
-        batchOpreateHelper: 'Pukal {0} laman web, teruskan operasi?',
+        batchOperate: 'Operasi Pukal',
+        batchOperateHelper: 'Pukal {0} laman web, teruskan operasi?',
         stream: 'Proksi TCP/UDP',
         streamPorts: 'Port Mendengar',
         streamPortsHelper:
@@ -3378,7 +3378,7 @@ const message = {
             phpExec: 'Pelaksanaan Skrip PHP',
             oneWordTrojan: 'Trojan Satu Perkataan',
             appFilter: 'Penapisan Direktori Berbahaya',
-            webshell: 'Webshell',
+            webShell: 'Webshell',
             args: 'Parameter Berbahaya',
             protocolFilter: 'Penapis Protokol',
             javaFilter: 'Penapisan Fail Berbahaya Java',
