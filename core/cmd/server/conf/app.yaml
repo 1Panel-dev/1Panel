@@ -2,7 +2,6 @@ base:
   install_dir: /opt
   mode: dev
   is_demo: false
-  is_intl: false
   is_offline: false
   is_fxplay: false
   port: 9999

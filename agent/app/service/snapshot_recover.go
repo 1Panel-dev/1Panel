@@ -156,14 +156,6 @@ func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
 			)
 			req.IsNew = true
 		}
-		if req.IsNew || snap.InterruptStep == "RecoverDBData" {
-			taskItem.AddSubTaskWithAliasAndOps(
-				"RecoverDBData",
-				func(t *task.Task) error { return recoverDBData(path.Join(rootDir, snap.Name, "db"), &itemHelper) },
-				nil, 0, 90*time.Minute,
-			)
-			req.IsNew = true
-		}
 		if req.IsNew || snap.InterruptStep == "RecoverBackups" {
 			taskItem.AddSubTaskWithAliasAndOps(
 				"RecoverBackups",
@@ -222,13 +214,24 @@ func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
 			)
 			req.IsNew = true
 		}
-		taskItem.AddSubTaskWithAliasAndOps(
-			"RecoverDBData",
-			func(t *task.Task) error {
-				return restartCompose(path.Join(snapJson.BaseDir, "1panel/docker/compose"), &itemHelper)
-			},
-			nil, 0, 90*time.Minute,
-		)
+		if req.IsNew || snap.InterruptStep == "RecoverCompose" {
+			taskItem.AddSubTaskWithAliasAndOps(
+				"RecoverCompose",
+				func(t *task.Task) error {
+					return restartCompose(path.Join(snapJson.BaseDir, "1panel/docker/compose"), &itemHelper)
+				},
+				nil, 0, 90*time.Minute,
+			)
+			req.IsNew = true
+		}
+		if req.IsNew || snap.InterruptStep == "RecoverDBData" {
+			taskItem.AddSubTaskWithAliasAndOps(
+				"RecoverDBData",
+				func(t *task.Task) error { return recoverDBData(path.Join(rootDir, snap.Name, "db"), &itemHelper) },
+				nil, 0, 90*time.Minute,
+			)
+			req.IsNew = true
+		}
 
 		if err := taskItem.Execute(); err != nil {
 			_ = settingRepo.Update("SystemStatus", "Free")
@@ -439,17 +442,8 @@ func recoverBaseData(src string, itemHelper *snapRecoverHelper) error {
 	return nil
 }
 
-func recoverDBData(src string, itemHelper *snapRecoverHelper) error {
-	itemHelper.Task.Log("---------------------- 7 / 11 ----------------------")
-	itemHelper.Task.LogStart(i18n.GetMsgByKey("RecoverDBData"))
-	err := itemHelper.FileOp.CopyDirWithExclude(src, global.Dir.DataDir, nil)
-
-	itemHelper.Task.LogWithStatus(i18n.GetMsgByKey("RecoverDBData"), err)
-	return err
-}
-
 func restartCompose(composePath string, itemHelper *snapRecoverHelper) error {
-	itemHelper.Task.Log("---------------------- 11 / 11 ----------------------")
+	itemHelper.Task.Log("---------------------- 7 / 11 ----------------------")
 	itemHelper.Task.LogStart(i18n.GetMsgByKey("RecoverCompose"))
 
 	composes, err := composeRepo.ListRecord()
@@ -471,4 +465,14 @@ func restartCompose(composePath string, itemHelper *snapRecoverHelper) error {
 		itemHelper.Task.LogSuccess(i18n.GetWithName("RecoverComposeItem", pathItem))
 	}
 	return nil
+}
+
+func recoverDBData(src string, itemHelper *snapRecoverHelper) error {
+	itemHelper.Task.Log("---------------------- 11 / 11 ----------------------")
+	itemHelper.Task.LogStart(i18n.GetMsgByKey("RecoverDBData"))
+	_ = os.Remove(path.Join(global.Dir.DataDir, "db"))
+	err := itemHelper.FileOp.CopyDirWithExclude(src, global.Dir.DataDir, nil)
+
+	itemHelper.Task.LogWithStatus(i18n.GetMsgByKey("RecoverDBData"), err)
+	return err
 }

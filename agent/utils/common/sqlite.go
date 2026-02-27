@@ -67,14 +67,29 @@ func GetDBWithPath(dbPath string) (*gorm.DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	sqlDB, dbError := db.DB()
-	if dbError != nil {
-		return nil, dbError
+
+	sqlDB, err := db.DB()
+	if err != nil {
+		return nil, err
 	}
+
 	sqlDB.SetMaxOpenConns(4)
 	sqlDB.SetMaxIdleConns(1)
-	sqlDB.SetConnMaxIdleTime(15 * time.Minute)
-	sqlDB.SetConnMaxLifetime(time.Hour)
+	sqlDB.SetConnMaxLifetime(0)
+	sqlDB.SetConnMaxIdleTime(0)
+
+	if err := db.Exec("PRAGMA journal_mode = WAL;").Error; err != nil {
+		return nil, err
+	}
+	if err := db.Exec("PRAGMA synchronous = NORMAL;").Error; err != nil {
+		return nil, err
+	}
+	if err := db.Exec("PRAGMA busy_timeout = 5000;").Error; err != nil {
+		return nil, err
+	}
+	if err := db.Exec("PRAGMA temp_store = MEMORY;").Error; err != nil {
+		return nil, err
+	}
 	return db, nil
 }
 
