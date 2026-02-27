@@ -233,7 +233,7 @@ func (r *Local) Backup(info BackupInfo) error {
 	if err != nil {
 		return fmt.Errorf("open file %s failed, err: %v", path.Join(info.TargetDir, info.FileName), err)
 	}
-	defer outfile.Close()
+	defer func() { _ = outfile.Close() }()
 	dumpCmd := "mysqldump"
 	if r.Type == constant.AppMariaDB {
 		dumpCmd = "mariadb-dump"
@@ -268,24 +268,27 @@ func (r *Local) Backup(info BackupInfo) error {
 
 func (r *Local) Recover(info RecoverInfo) error {
 	fi, _ := os.Open(info.SourceFile)
-	defer fi.Close()
+	defer func() { _ = fi.Close() }()
 	mysqlCli := r.Type
 	if mysqlCli == "mysql-cluster" {
 		mysqlCli = "mysql"
 	}
 
+	if err := r.ExecSQL(fmt.Sprintf("drop database if exists `%s`", info.Name), 300); err != nil {
+		return fmt.Errorf("drop database failed, err: %v", err)
+	}
 	cmd := exec.Command("docker", "exec", "-i", r.ContainerName, mysqlCli, "-uroot", "-p"+r.Password, "--default-character-set="+info.Format, info.Name)
 	if strings.HasSuffix(info.SourceFile, ".gz") {
 		gzipFile, err := os.Open(info.SourceFile)
 		if err != nil {
 			return err
 		}
-		defer gzipFile.Close()
+		defer func() { _ = gzipFile.Close() }()
 		gzipReader, err := gzip.NewReader(gzipFile)
 		if err != nil {
 			return err
 		}
-		defer gzipReader.Close()
+		defer func() { _ = gzipReader.Close() }()
 		cmd.Stdin = gzipReader
 	} else {
 		cmd.Stdin = fi

@@ -27,6 +27,7 @@ func Init() {
 
 	initDockerConf()
 	initAlertTask()
+	initMonitorDB()
 }
 
 func initGlobalData() {
@@ -151,4 +152,9 @@ func initDockerConf() {
 
 func initAlertTask() {
 	service.NewIAlertTaskHelper().ResetTask()
+}
+
+func initMonitorDB() {
+	_ = global.MonitorDB.AutoMigrate(&model.MonitorBase{}, model.MonitorGPU{}, model.MonitorIO{}).Error()
+	_ = global.TaskDB.AutoMigrate(&model.Task{}).Error()
 }
