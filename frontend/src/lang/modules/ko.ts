@@ -650,6 +650,7 @@ const message = {
         rdbInfo: '규칙 목록의 값이 1에서 100000 사이여야 합니다.',
 
         containerConn: '컨테이너 연결',
+        copyConnURL: '연결 URL 복사',
         connAddress: '주소',
         containerConnHelper:
             '이 연결 주소는 웹사이트 런타임(PHP 등) 또는 컨테이너에서 실행 중인 애플리케이션에서 사용할 수 있습니다.',

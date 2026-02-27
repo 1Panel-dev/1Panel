@@ -653,6 +653,7 @@ const message = {
         rdbInfo: 'ルールリストの値が1〜100000の範囲であることを確認してください',
 
         containerConn: 'コンテナ接続',
+        copyConnURL: '接続 URL をコピー',
         connAddress: '住所',
         containerConnHelper:
             'この接続アドレスは、Webサイトのランタイム（PHPなど）またはコンテナで実行されているアプリケーションで使用できます。',

@@ -642,6 +642,7 @@ const message = {
         rdbInfo: '請確認規則列表中值在 1-100000 之間',
 
         containerConn: '容器連接',
+        copyConnURL: '複製連接 URL',
         connAddress: '地址',
         containerConnHelper: 'PHP 執行環境/容器安裝的應用程式使用此連接地址',
         remoteConn: '外部連接',

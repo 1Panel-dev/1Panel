@@ -669,6 +669,7 @@ const message = {
         rdbInfo: 'Ensure that the value in the rule list ranges from 1 to 100000',
 
         containerConn: 'Container connection',
+        copyConnURL: 'Copy connection URL',
         connAddress: 'Address',
         containerConnHelper:
             'This connection address is used by applications running on the PHP execution environment/container installation.',

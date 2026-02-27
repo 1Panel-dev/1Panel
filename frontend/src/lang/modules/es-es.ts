@@ -663,6 +663,7 @@ const message = {
         rdbInfo: 'Asegúrese de que el valor de la regla esté entre 1 y 100000',
 
         containerConn: 'Conexión del contenedor',
+        copyConnURL: 'Copiar URL de conexión',
         connAddress: 'Dirección',
         containerConnHelper:
             'Esta dirección de conexión es usada por aplicaciones en entorno de ejecución PHP o instalaciones en contenedores.',

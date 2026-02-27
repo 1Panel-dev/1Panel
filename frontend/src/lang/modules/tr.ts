@@ -671,6 +671,7 @@ const message = {
         rdbInfo: 'Kural listesindeki değerin 1 ile 100000 arasında olduğundan emin olun',
 
         containerConn: 'Konteyner bağlantısı',
+        copyConnURL: 'Bağlantı URL\'sini kopyala',
         connAddress: 'Adres',
         containerConnHelper:
             'Bu bağlantı adresi PHP yürütme ortamı/konteyner kurulumunda çalışan uygulamalar tarafından kullanılır.',

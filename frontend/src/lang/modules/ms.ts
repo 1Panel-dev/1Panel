@@ -665,6 +665,7 @@ const message = {
         rdbInfo: 'Pastikan nilai dalam senarai peraturan berada dalam julat 1 hingga 100000',
 
         containerConn: 'Sambungan kontena',
+        copyConnURL: 'Salin URL sambungan',
         connAddress: 'Alamat',
         containerConnHelper:
             'Alamat sambungan ini boleh digunakan oleh aplikasi yang berjalan pada runtime laman web (PHP, dll.) atau kontena.',
