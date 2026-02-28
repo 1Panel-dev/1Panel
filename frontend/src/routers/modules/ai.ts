@@ -69,7 +69,7 @@ const databaseRouter = {
             meta: {
                 icon: 'p-gpu-menu',
                 title: 'aiTools.gpu.gpu',
-                activeMenu: '/ai/gpu',
+                activeMenu: '/ai/gpu/current',
                 requiresAuth: true,
             },
         },
@@ -79,7 +79,7 @@ const databaseRouter = {
             component: () => import('@/views/ai/gpu/history/index.vue'),
             meta: {
                 title: 'aiTools.gpu.history',
-                activeMenu: '/ai/gpu',
+                activeMenu: '/ai/gpu/current',
                 requiresAuth: true,
             },
         },

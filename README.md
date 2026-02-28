@@ -36,23 +36,12 @@
 
 ## Key Features  
 
-🔹 **One-Click OpenClaw Deployment**  
-Seamlessly deploy OpenClaw agents, host local LLMs via Ollama, and monitor GPU utilization—all within a unified workspace.  
-
-🔹 **One-Click Website Deployment**  
-Launch production-ready websites instantly with automatic domain binding, SSL certificate provisioning, and configuration—zero manual setup required.  
-
-🔹 **Curated App Marketplace**  
-Discover, install, and update trusted open-source applications (WordPress, MySQL, Redis, and more) with a single click.  
-
-🔹 **Centralized Server Management**  
-Monitor system resources and manage files, databases, containers, and services effortlessly through a unified, intuitive dashboard.  
-
-🔹 **Enterprise-Grade Security**  
-Strengthen defenses with container isolation, firewall controls, audit logging, and secure deployment practices—ensuring compliance and peace of mind.  
-
-🔹 **Intelligent Backup & Restore**  
-Schedule automated backups or perform instant restores to local storage or leading cloud platforms (AWS S3, Cloudflare R2, and more), with flexible retention and destination options.
+- **One-Click OpenClaw Deployment**: Seamlessly deploy OpenClaw agents, host local LLMs using Ollama, and monitor GPU utilization—all within a unified workspace.  
+- **One-Click Website Deployment**: Launch production-ready websites instantly with automatic domain binding, SSL certificate provisioning, and configuration—zero manual setup required.  
+- **Curated App Marketplace**: Discover, install, and update trusted open-source applications (Nextcloud, Bitwarden, Umami, and more) with a single click.  
+- **Centralized Server Management**: Monitor system resources and manage files, databases, containers, and services effortlessly through a unified, intuitive dashboard.  
+- **Enterprise-Grade Security**: Strengthen your defenses with container isolation, firewall controls, audit logging, and secure deployment practices—ensuring compliance and peace of mind.  
+- **Intelligent Backup & Restore**: Schedule automated backups or perform instant restores to local storage or major cloud platforms (AWS S3, Cloudflare R2, and more), with flexible retention and destination options.  
 
 ## Quick Start
 

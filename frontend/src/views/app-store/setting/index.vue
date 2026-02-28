@@ -4,8 +4,8 @@
             <el-form
                 :model="config"
                 label-position="left"
-                label-width="180px"
-                class="ml-2.5"
+                label-width="260px"
+                class="ml-2.5 app-setting-form"
                 v-loading="loading"
                 :rules="rules"
                 ref="configForm"
@@ -142,6 +142,10 @@ onMounted(() => {
 </script>
 
 <style lang="css" scoped>
+.app-setting-form :deep(.el-form-item__label) {
+    white-space: nowrap;
+}
+
 .logText {
     line-height: 22px;
     font-size: 12px;
