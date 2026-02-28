@@ -480,7 +480,7 @@
                                             <svg-icon
                                                 v-else
                                                 className="table-icon"
-                                                :iconName="getIconName(row.extension)"
+                                                :iconName="getIconName(row.name, row.extension)"
                                             ></svg-icon>
                                         </div>
                                         <div class="file-name">
@@ -696,7 +696,7 @@ import Convert from './convert/index.vue';
 import { debounce } from 'lodash-es';
 import TerminalDialog from './terminal/index.vue';
 import { Dashboard } from '@/api/interface/dashboard';
-import { CompressExtension, CompressType } from '@/enums/files';
+import { CompressExtension, MimetypeByExtensionObject } from '@/enums/files';
 import type { TabPaneName } from 'element-plus';
 import { getComponentInfo } from '@/api/modules/host';
 import { routerToNameWithQuery } from '@/utils/router';
@@ -1195,8 +1195,8 @@ const calculateSize = (path: string) => {
     }, 0);
 };
 
-const getIconName = (extension: string) => {
-    return getIcon(extension);
+const getIconName = (name: string, extension: string) => {
+    return getIcon(getFileExtension(name, extension));
 };
 
 const openMode = (item: File.File) => {
@@ -1224,16 +1224,18 @@ const openCompress = (items: File.File[]) => {
 };
 
 const openDeCompress = (item: File.File) => {
-    if (Mimetypes.get(item.mimeType) == undefined) {
+    const extension = getFileExtension(item.name, item.extension);
+    const mimeType = item.mimeType || MimetypeByExtensionObject[extension];
+    const typeByMime = mimeType ? Mimetypes.get(mimeType) : undefined;
+    const typeByExtension = getEnumKeyByValue(extension);
+
+    if (typeByMime && (!typeByExtension || CompressExtension[typeByMime] === extension)) {
+        fileDeCompress.type = typeByMime;
+    } else if (typeByExtension) {
+        fileDeCompress.type = typeByExtension;
+    } else {
         MsgWarning(i18n.global.t('file.canNotDeCompress'));
         return;
-    }
-    fileDeCompress.type = Mimetypes.get(item.mimeType);
-    if (CompressExtension[Mimetypes.get(item.mimeType)] != item.extension) {
-        fileDeCompress.type = getEnumKeyByValue(item.extension);
-    }
-    if (item.name.endsWith('.tar.gz') || item.name.endsWith('.tgz')) {
-        fileDeCompress.type = CompressType.TarGz;
     }
 
     fileDeCompress.name = item.name;
@@ -1244,10 +1246,28 @@ const openDeCompress = (item: File.File) => {
 };
 
 function getEnumKeyByValue(value: string): keyof typeof CompressExtension | undefined {
+    const normalizedValue = value.toLowerCase();
     return (Object.keys(CompressExtension) as Array<keyof typeof CompressExtension>).find(
-        (k) => CompressExtension[k] === value,
+        (k) => CompressExtension[k] === normalizedValue,
     );
 }
+
+const sortedCompressExtensions = Object.values(CompressExtension).sort((a, b) => b.length - a.length);
+
+const getFileExtension = (name: string, extension?: string): string => {
+    const lowerName = name?.toLowerCase() ?? '';
+    const compoundMatch = sortedCompressExtensions.find((compressExtension) => lowerName.endsWith(compressExtension));
+    if (compoundMatch) {
+        return compoundMatch;
+    }
+
+    if (extension) {
+        return extension.toLowerCase();
+    }
+
+    const extensionIndex = lowerName.lastIndexOf('.');
+    return extensionIndex === -1 ? '' : lowerName.slice(extensionIndex);
+};
 
 const openView = (item: File.File) => {
     const fileType = getFileType(item.extension);
@@ -1263,14 +1283,17 @@ const openView = (item: File.File) => {
         return openPreview(item, fileType);
     }
 
+    if (fileType === 'compress') {
+        return openDeCompress(item);
+    }
+
     const path = item.isSymlink ? item.linkPath : item.path;
     if (item.size > MAX_OPEN_SIZE) {
         return openTextPreview(path, item.name);
     }
 
     const actionMap = {
-        compress: openDeCompress,
-        text: () => openCodeEditor(item.path, item.extension),
+        text: () => openCodeEditor(path, item.extension),
     };
 
     return actionMap[fileType] ? actionMap[fileType](item) : openCodeEditor(path, item.extension);
@@ -1549,8 +1572,11 @@ const toFavorite = (row: File.Favorite) => {
         jump(row.path);
     } else {
         let file = {} as File.File;
+        const extension = getFileExtension(row.name);
         file.path = row.path;
-        file.extension = '.' + row.name.split('.').pop();
+        file.name = row.name;
+        file.extension = extension;
+        file.mimeType = MimetypeByExtensionObject[extension] || '';
         openView(file);
     }
 };
@@ -1586,7 +1612,7 @@ const beforeButtons = [
         label: i18n.global.t('commons.button.open'),
         click: open,
         show: (row: File.File) => {
-            return row?.isDir || row?.size <= MAX_OPEN_SIZE;
+            return row?.isDir || row?.size <= MAX_OPEN_SIZE || isDecompressFile(row);
         },
     },
     {
@@ -1596,7 +1622,7 @@ const beforeButtons = [
             openTextPreview(path, row.name);
         },
         show: (row: File.File) => {
-            return !row?.isDir && row?.size > MAX_OPEN_SIZE;
+            return !row?.isDir && row?.size > MAX_OPEN_SIZE && !isDecompressFile(row);
         },
     },
     {
