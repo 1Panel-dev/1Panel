@@ -55,8 +55,8 @@ ErrAgentAccountIDRequired: 'Account ID is required'
 Localhost: 'Local'
 ErrBackupInUsed: 'Backup account is in use by a scheduled task'
 ErrBackupCheck: 'Backup account connectivity test failed: {{ .err }}'
-ErrBackupLocalDelete: 'Deleting local backup accounts is not supported'
-ErrBackupLocalCreate: 'Creating local backup accounts is not supported'
+ErrBackupLocalDelete: 'Local backup accounts cannot be deleted'
+ErrBackupLocalCreate: 'Local backup accounts cannot be created'
 
 #app
 ErrPortInUsed: '{{ .detail }} port is already occupied!'
@@ -121,7 +121,7 @@ ExportStatus: "Login Status"
 ExportDate: "Time"
 
 #file
-ErrFileCanNotRead: 'File preview not supported'
+ErrFileCanNotRead: 'File preview is not supported'
 ErrFileToLarge: 'File is larger than 10 MB'
 ErrPathNotFound: 'Directory does not exist'
 ErrMovePathFailed: 'Target path cannot include source path'
@@ -235,7 +235,7 @@ PruneStart: 'Cleaning in progress'
 #runtime
 ErrFileNotExist: 'Source file not found: {{ .detail }}'
 ErrImageBuildErr: 'Image build failed'
-ErrImageExist: "Image already exists. Please use a different image name."
+ErrImageExist: "Image already exists. Use a different image name."
 ErrDelWithWebsite: 'Runtime is linked to a website and cannot be deleted'
 ErrRuntimeStart: 'Startup failed'
 ErrPackageJsonNotFound: 'package.json file does not exist'
@@ -510,19 +510,19 @@ ErrInstallExtension: 'Another extension install task is running'
 PanelAlertTitle: "Panel Alert Notification"
 TestAlertTitle: "Test Email - Verify Email Connectivity"
 TestAlert: "This is a test email to verify that your email sending configuration is correct."
-LicenseExpirationAlert: "Your {{ .node }}{{ .ip }} Panel, the license will expire in {{ .day }} days. Please log in to the panel for details."
-CronJobFailedAlert: "Your {{ .node }}{{ .ip }} Panel, scheduled task - {{ .name }} execution failed. Please log in to the panel for details."
-ClamAlert: "Your {{ .node }}{{ .ip }} Panel, the virus scan task detected {{ .num }} infected files. Please log in to the panel for details."
-WebSiteAlert: "Your {{ .node }}{{ .ip }} Panel, {{ .num }} websites will expire in {{ .day }} days. Please log in to the panel for details."
-SSLAlert: "Your {{ .node }}{{ .ip }} Panel, {{ .num }} SSL certificates will expire in {{ .day }} days. Please log in to the panel for details."
-DiskUsedAlert: "Your {{ .node }}{{ .ip }} Panel, disk {{ .name }} usage has reached {{ .used }}. Please log in to the panel for details."
-ResourceAlert: "Your {{ .node }}{{ .ip }} Panel, the average {{ .name }} usage rate in {{ .time }} minutes is {{ .used }}. Please log in to the panel for details."
-PanelVersionAlert: "Your {{ .node }}{{ .ip }} Panel, the latest panel version is available for upgrade. Please log in to the panel for details."
-PanelPwdExpirationAlert: "Your {{ .node }}{{ .ip }} Panel, the panel password will expire in {{ .day }} days. Please log in to the panel for details."
-CommonAlert: "Your {{ .node }}{{ .ip }} Panel, {{ .msg }}. Please log in to the panel for details."
-NodeExceptionAlert: "Your {{ .node }}{{ .ip }} Panel, {{ .num }} nodes are abnormal. Please log in to the panel for details."
-LicenseExceptionAlert: "Your {{ .node }}{{ .ip }} Panel, {{ .num }} licenses are abnormal. Please log in to the panel for details."
-SSHAndPanelLoginAlert: "Your {{ .node }}{{ .ip }} Panel, {{ .name }} login from {{ .loginIp }} is abnormal. Please log in to the panel for details."
+LicenseExpirationAlert: "Panel {{ .node }}{{ .ip }}: license expires in {{ .day }} days. Log in to view details."
+CronJobFailedAlert: "Panel {{ .node }}{{ .ip }}: scheduled task {{ .name }} failed. Log in to view details."
+ClamAlert: "Panel {{ .node }}{{ .ip }}: virus scan found {{ .num }} infected files. Log in to view details."
+WebSiteAlert: "Panel {{ .node }}{{ .ip }}: {{ .num }} websites expire in {{ .day }} days. Log in to view details."
+SSLAlert: "Panel {{ .node }}{{ .ip }}: {{ .num }} SSL certificates expire in {{ .day }} days. Log in to view details."
+DiskUsedAlert: "Panel {{ .node }}{{ .ip }}: disk {{ .name }} usage reached {{ .used }}. Log in to view details."
+ResourceAlert: "Panel {{ .node }}{{ .ip }}: average {{ .name }} usage in {{ .time }} minutes is {{ .used }}. Log in to view details."
+PanelVersionAlert: "Panel {{ .node }}{{ .ip }}: a new panel version is available. Log in to view details."
+PanelPwdExpirationAlert: "Panel {{ .node }}{{ .ip }}: panel password expires in {{ .day }} days. Log in to view details."
+CommonAlert: "Panel {{ .node }}{{ .ip }}: {{ .msg }}. Log in to view details."
+NodeExceptionAlert: "Panel {{ .node }}{{ .ip }}: {{ .num }} nodes are abnormal. Log in to view details."
+LicenseExceptionAlert: "Panel {{ .node }}{{ .ip }}: {{ .num }} licenses are abnormal. Log in to view details."
+SSHAndPanelLoginAlert: "Panel {{ .node }}{{ .ip }}: abnormal {{ .name }} login from {{ .loginIp }}. Log in to view details."
 
 #disk
 DeviceNotFound: "Device {{ .name }} not found"
