@@ -24,7 +24,7 @@
             </template>
             <template v-if="showTable" #leftToolBar>
                 <el-button type="primary" @click="openCreate" :disabled="showStopped">
-                    {{ $t('commons.button.create') + $t('tool.supervisor.list').toLowerCase() }}
+                    {{ $t('commons.button.create') }}
                 </el-button>
             </template>
             <template v-if="showTable" #rightToolBar>

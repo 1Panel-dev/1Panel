@@ -1829,10 +1829,14 @@ const message = {
         auto: 'Ikut Sistem',
         language: 'Bahasa',
         region: 'Wilayah operasi',
-        regionHelper:
-            'Wilayah operasi yang berbeza mempunyai alamat muat turun dan pautan dokumentasi berbeza untuk gedung aplikasi serta pustaka skrip.',
         cn: 'Tanah Besar China',
         intl: 'Global',
+        regionHelper: 'Menukar wilayah akan menukar sumber berikut:',
+        regionHelper1: 'Pakej pemasangan sistem',
+        regionHelper2: 'Kedai aplikasi dan pustaka skrip',
+        regionHelper3: 'Manual pengguna dan dokumen berkaitan',
+        regionHelper4:
+            'Tindakan ini mungkin menjejaskan muat turun dan akses seterusnya. Sila teruskan dengan berhati-hati.',
         languageHelper:
             'Secara lalai, ia mengikuti bahasa penyemak imbas. Parameter ini hanya berkuat kuasa pada penyemak imbas semasa',
         sessionTimeout: 'Tempoh tamat sesi',
@@ -3075,11 +3079,8 @@ const message = {
         addressHelper2: 'Untuk pelbagai alamat IP, pisahkan dengan koma. Contohnya, "172.16.10.11, 172.16.0.0/24".',
         allIP: 'Semua IP',
         portRule: 'Peraturan | Peraturan',
-        createPortRule: '@:commons.button.create @.lower:firewall.portRule',
         forwardRule: 'Peraturan Pemajuan Port | Peraturan Pemajuan Port',
-        createForwardRule: '@:commons.button.create @:firewall.forwardRule',
         ipRule: 'Peraturan IP | Peraturan IP',
-        createIpRule: '@:commons.button.create @:firewall.ipRule',
         userAgent: 'Penapis User-Agent',
         sourcePort: 'Port sumber',
         targetIP: 'IP sasaran',

@@ -68,6 +68,7 @@
                                                 plain
                                                 round
                                                 size="small"
+                                                class="round-btn"
                                                 :disabled="!row?.workdir"
                                                 @click="openComposeFolder(row)"
                                             >
@@ -77,6 +78,7 @@
                                                 plain
                                                 round
                                                 size="small"
+                                                class="round-btn"
                                                 @click="handleComposeOperate('up', row)"
                                             >
                                                 {{ $t('commons.operate.start') }}
@@ -85,6 +87,7 @@
                                                 plain
                                                 round
                                                 size="small"
+                                                class="round-btn"
                                                 @click="handleComposeOperate('stop', row)"
                                             >
                                                 {{ $t('commons.operate.stop') }}
@@ -93,11 +96,18 @@
                                                 plain
                                                 round
                                                 size="small"
+                                                class="round-btn"
                                                 @click="handleComposeOperate('restart', row)"
                                             >
                                                 {{ $t('commons.operate.restart') }}
                                             </el-button>
-                                            <el-button plain round size="small" @click="onDelete(row)">
+                                            <el-button
+                                                plain
+                                                round
+                                                size="small"
+                                                class="round-btn"
+                                                @click="onDelete(row)"
+                                            >
                                                 {{ $t('commons.operate.delete') }}
                                             </el-button>
                                         </div>
@@ -782,5 +792,8 @@ const onOpenLog = (row: any) => {
     margin-top: 12px;
     margin-bottom: 4px;
     display: block;
+}
+.round-btn {
+    padding: 4px 8px;
 }
 </style>

@@ -267,7 +267,7 @@
                     <el-checkbox
                         @change="random"
                         v-model="website.enableFtp"
-                        :label="$t('commons.button.create') + ' FTP'"
+                        :label="$t('commons.button.create')"
                         size="large"
                     />
                     <span class="input-help">{{ $t('website.ftpHelper') }}</span>

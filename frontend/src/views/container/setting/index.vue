@@ -140,7 +140,7 @@
                                     {{ $t('container.liveWithSwarmHelper') }}
                                 </span>
                             </el-form-item>
-                            <el-form-item label="cgroup driver" prop="cgroupDriver">
+                            <el-form-item label="Cgroup Driver" prop="cgroupDriver">
                                 <el-radio-group v-model="form.cgroupDriver" @change="handleCgroup">
                                     <el-radio value="cgroupfs">cgroupfs</el-radio>
                                     <el-radio value="systemd">systemd</el-radio>

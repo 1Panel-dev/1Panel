@@ -203,15 +203,14 @@
                             </el-form-item>
 
                             <el-form-item :label="$t('setting.region')" prop="edition">
-                                <el-radio-group @change="onSave('Edition', form.edition)" v-model="form.edition">
-                                    <el-radio value="cn">
+                                <el-radio-group @change="onSaveEdition" v-model="form.edition">
+                                    <el-radio-button value="cn">
                                         <span>{{ $t('setting.cn') }}</span>
-                                    </el-radio>
-                                    <el-radio value="intl">
+                                    </el-radio-button>
+                                    <el-radio-button value="intl">
                                         <span>{{ $t('setting.intl') }}</span>
-                                    </el-radio>
+                                    </el-radio-button>
                                 </el-radio-group>
-                                <span class="input-help">{{ $t('setting.regionHelper') }}</span>
                             </el-form-item>
                         </el-col>
                     </el-row>
@@ -547,6 +546,38 @@ const onSave = async (key: string, val: any) => {
         return;
     }
     loading.value = false;
+};
+
+const onSaveEdition = async () => {
+    ElMessageBox.confirm(
+        `
+        <div style="line-height: 1.6;">
+            <div style="margin-bottom: 8px;">
+                ${i18n.global.t('setting.regionHelper')}
+            </div>
+            <ul style="padding-left: 18px; margin: 0;">
+                <li>${i18n.global.t('setting.regionHelper1')}</li>
+                <li>${i18n.global.t('setting.regionHelper2')}</li>
+                <li>${i18n.global.t('setting.regionHelper3')}</li>
+            </ul>
+            <div style="margin-bottom: 8px;">
+                ${i18n.global.t('setting.regionHelper4')}
+            </div>
+        </div>
+        `,
+        i18n.global.t('setting.region'),
+        {
+            confirmButtonText: i18n.global.t('commons.button.confirm'),
+            cancelButtonText: i18n.global.t('commons.button.cancel'),
+            dangerouslyUseHTMLString: true,
+        },
+    )
+        .then(async () => {
+            await onSave('Edition', form.edition);
+        })
+        .catch(() => {
+            form.edition = form.edition === 'cn' ? 'intl' : 'cn';
+        });
 };
 
 onMounted(() => {

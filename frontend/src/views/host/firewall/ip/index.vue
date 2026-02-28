@@ -30,7 +30,7 @@
                     </template>
                     <template #leftToolBar>
                         <el-button type="primary" @click="onOpenDialog('create')">
-                            {{ $t('firewall.createIpRule') }}
+                            {{ $t('commons.button.create') }}
                         </el-button>
                         <el-button @click="onDelete(null)" plain :disabled="selects.length === 0">
                             {{ $t('commons.button.delete') }}

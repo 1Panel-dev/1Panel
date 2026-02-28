@@ -44,7 +44,7 @@
                     </template>
                     <template #leftToolBar>
                         <el-button type="primary" @click="onOpenDialog('create')">
-                            {{ $t('commons.button.create') }}{{ $t('firewall.portRule') }}
+                            {{ $t('commons.button.create') }}
                         </el-button>
                         <el-button @click="onDelete(null)" plain :disabled="selects.length === 0">
                             {{ $t('commons.button.delete') }}
