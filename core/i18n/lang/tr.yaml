@@ -1,21 +1,21 @@
-ErrInvalidParams: "Geçersiz istek parametreleri: {{ .detail }}"
-ErrTokenParse: "Token oluşturma hatası: {{ .detail }}"
-ErrInitialPassword: "Yanlış başlangıç şifresi"
-ErrInternalServer: "İç sunucu hatası: {{ .detail }}"
-ErrRecordExist: "Kayıt zaten mevcut"
-ErrRecordNotFound: "Kayıt bulunamadı"
-ErrStructTransform: "Tip dönüştürme başarısız: {{ .detail }}"
-ErrNotLogin: "Kullanıcı giriş yapmamış: {{ .detail }}"
-ErrSessionDataNotFound: "Mevcut oturumun süresi doldu!"
-ErrSessionDataFormat: "Mevcut oturum verisi biçimi anormal!"
-ErrPasswordExpired: "Mevcut şifrenin süresi dolmuş: {{ .detail }}"
-ErrNotSupportType: "Mevcut tip desteklenmiyor: {{ .detail }}"
-ErrProxy: "İstek hatası, lütfen bu düğümün durumunu kontrol edin: {{ .detail }}"
-ErrApiConfigStatusInvalid: "API erişimi yasaklandı: {{ .detail }}"
-ErrApiConfigKeyInvalid: "API anahtarı hatası: {{ .detail }}"
-ErrApiConfigIPInvalid: "API istek IP'si beyaz listede değil: {{ .detail }}"
-ErrApiConfigDisable: "Bu arayüz API çağrılarını yasaklıyor: {{ .detail }}"
-ErrApiConfigKeyTimeInvalid: "API zaman damgası hatası: {{ .detail }}"
+ErrInvalidParams: 'İstek geçersiz: {{ .detail }}'
+ErrTokenParse: 'Token hatası: {{ .detail }}'
+ErrInitialPassword: 'Orijinal şifre yanlış'
+ErrInternalServer: 'Sunucu hatası: {{ .detail }}'
+ErrRecordExist: 'Kayıt zaten var'
+ErrRecordNotFound: 'Kayıt bulunamadı'
+ErrStructTransform: 'Dönüşüm hatası: {{ .err }}'
+ErrNotLogin: 'Oturum açılmamış: {{ .detail }}'
+ErrSessionDataNotFound: "Mevcut oturumun süresi doldu"
+ErrSessionDataFormat: "Mevcut oturum verisi biçimi anormal"
+ErrPasswordExpired: 'Şifre süresi doldu: {{ .detail }}'
+ErrNotSupportType: 'Bu tür desteklenmiyor: {{ .name }}'
+ErrProxy: 'İstek başarısız: {{ .detail }}'
+ErrApiConfigStatusInvalid: 'API kapalı: {{ .detail }}'
+ErrApiConfigKeyInvalid: 'Geçersiz API anahtarı: {{ .detail }}'
+ErrApiConfigIPInvalid: 'IP izinli değil: {{ .detail }}'
+ErrApiConfigDisable: 'API erişimi kapalı: {{ .detail }}'
+ErrApiConfigKeyTimeInvalid: 'Zaman damgası hatalı: {{ .detail }}'
 
 # request
 ErrNoSuchHost: "İstenen sunucu bulunamıyor {{ .err }}"
@@ -23,17 +23,17 @@ ErrHttpReqNotFound: "İstenen kaynak bulunamıyor {{ .err }}"
 ErrHttpReqFailed: "İstek başarısız {{ .err }}"
 ErrHttpReqTimeOut: "İstek zaman aşımına uğradı {{ .err }}"
 ErrCreateHttpClient: "İstek oluşturma başarısız {{ .err }}"
-ErrProxySetting: "Proxy sunucu bilgisi kullanılamıyor {{ .err }}, lütfen kontrol edip tekrar deneyin!"
-ErrEntranceFormat: "{{ .name }} güvenlik girişi şu anda desteklenmiyor. Lütfen kontrol edip tekrar deneyin!"
+ErrProxySetting: "Proxy sunucu bilgisi kullanılamıyor {{ .err }}, lütfen kontrol edip tekrar deneyin"
+ErrEntranceFormat: "{{ .name }} güvenlik girişi şu anda desteklenmiyor. Lütfen kontrol edip tekrar deneyin"
 
 # common
-ErrDemoEnvironment: "Demo sunucu, bu işlem yasak!"
-ErrCmdTimeout: "Komut çalıştırma zaman aşımı!"
-ErrEntrance: "Güvenlik girişi bilgi hatası, lütfen kontrol edip tekrar deneyin!"
+ErrDemoEnvironment: 'Demo modunda yok'
+ErrCmdTimeout: 'Komut zaman aşımına uğradı'
+ErrEntrance: "Güvenlik girişi bilgi hatası, lütfen kontrol edip tekrar deneyin"
 ErrGroupIsDefault: "Varsayılan grup, silinemez"
 ErrGroupIsInUse: "Grup kullanımda ve silinemez."
-ErrLocalDelete: "Yerel düğüm silinemez!"
-ErrPortInUsed: "{{ .name }} portu zaten kullanımda!"
+ErrLocalDelete: "Yerel düğüm silinemez"
+ErrPortInUsed: "{{ .name }} portu zaten kullanımda"
 ErrInternalServerKey: "İç sunucu hatası:"
 MasterNode: "Ana Düğüm"
 
@@ -42,57 +42,57 @@ CustomAppStoreFileValid: "Uygulama mağazası paketi .tar.gz formatında olmalı
 ErrFileNotFound: "{{ .name }} dosyası mevcut değil"
 AppBackup: 'Uygulama yedekleme'
 AppBackupPush: 'Uygulama yedek dosyası {{.file}} düğüm {{ .name }} a aktar'
-ErrSourceTargetSame: 'Kaynak düğüm ve hedef düğüm aynı olamaz!'
+ErrSourceTargetSame: 'Kaynak düğüm ve hedef düğüm aynı olamaz'
 AppInstall: 'Düğüm {{ .targetNode }} üzerine {{ .name }} uygulamasını yükle'
 AppInstallCheck: 'Uygulama kurulum ortamını kontrol et'
 
 # backup
-ErrBackupInUsed: "Bu yedekleme hesabı zamanlanmış görevlerde kullanılıyor ve silinemez"
-ErrBackupCheck: "Yedekleme hesabı bağlantı testi başarısız {{ .err }}"
-ErrBackupLocal: "Yerel sunucu yedekleme hesabı bu işlemi desteklemiyor!"
-ErrBackupPublic: "Bu yedekleme hesabının herkese açık olmadığı tespit edildi, lütfen kontrol edip tekrar deneyin!"
+ErrBackupInUsed: 'Yedek hesabı görevde kullanılıyor'
+ErrBackupCheck: 'Bağlantı testi başarısız: {{ .err }}'
+ErrBackupLocal: "Yerel sunucu yedekleme hesabı bu işlemi desteklemiyor"
+ErrBackupPublic: "Bu yedekleme hesabının herkese açık olmadığı tespit edildi, lütfen kontrol edip tekrar deneyin"
 ErrOSSConn: "En son sürüm alınamıyor, lütfen sunucunun dış ağ bağlantısını kontrol edin."
 
 #license
 LicenseCheck: 'Lisansın mevcut olup olmadığını kontrol et'
-ErrLicenseInUsed: 'Lisans zaten bağlı. Lütfen kontrol edip tekrar deneyin!'
-ErrLicenseExpired: 'Lisansın süresi dolmuş. Lütfen kontrol edip tekrar deneyin!'
-ErrLicense: "Lisans format hatası, lütfen kontrol edip tekrar deneyin!"
-ErrLicenseCheck: "Lisans doğrulama başarısız, lütfen kontrol edip tekrar deneyin!"
-ErrXpackVersion: "Lisans doğrulama başarısız, bu lisans sürüm sınırlıdır, içe aktarılamıyor, lütfen kontrol edip tekrar deneyin!"
-ErrLicenseSave: "Lisans bilgilerini kaydetme başarısız, hata {{ .err }}, lütfen tekrar deneyin!"
-ErrLicenseSync: "Lisans senkronizasyonu başarısız, veritabanında lisans bilgisi tespit edilmedi!"
+ErrLicenseInUsed: 'Lisans zaten bağlı. Lütfen kontrol edip tekrar deneyin'
+ErrLicenseExpired: 'Lisansın süresi dolmuş. Lütfen kontrol edip tekrar deneyin'
+ErrLicense: "Lisans format hatası, lütfen kontrol edip tekrar deneyin"
+ErrLicenseCheck: "Lisans doğrulama başarısız, lütfen kontrol edip tekrar deneyin"
+ErrXpackVersion: "Lisans doğrulama başarısız, bu lisans sürüm sınırlıdır, içe aktarılamıyor, lütfen kontrol edip tekrar deneyin"
+ErrLicenseSave: "Lisans bilgilerini kaydetme başarısız, hata {{ .err }}, lütfen tekrar deneyin"
+ErrLicenseSync: "Lisans senkronizasyonu başarısız, veritabanında lisans bilgisi tespit edilmedi"
 ErrLicenseExist: "Bu lisans kaydı zaten mevcut. Düğüm bağlama için doğrudan lisans sayfasına gidebilirsiniz."
 ErrXpackNotFound: "Bu bölüm profesyonel sürüm içindir, lütfen Panel Ayarları - Lisans'ta lisansı içe aktarın"
 ErrXpackExceptional: "Bu bölüm profesyonel sürüm içindir, lütfen Panel Ayarları - Lisans'ta lisans durumunu senkronize edin"
 ErrXpackLost: "Lisans maksimum yeniden deneme sayısına ulaştı, lütfen [Panel Ayarları] [Lisans] sayfasına gidin ve profesyonel özelliklerin doğru çalışması için manuel olarak senkronize butonuna tıklayın"
-ErrDeviceLost: "Lisans doğrulama için gerekli dosyalar eksik, lütfen kontrol edip tekrar deneyin!"
-ErrXpackTimeout: "İstek zaman aşımı, ağ bağlantısı kararsız olabilir, lütfen daha sonra tekrar deneyin!"
-ErrUnbindMaster: "Düğüm yönetiminde düğümler tespit edildi, mevcut lisansın bağı çözülemiyor, lütfen önce düğümleri kaldırın ve tekrar deneyin!"
-ErrFreeNodeLimit: "Topluluk sürümü düğüm limiti ulaşıldı, lütfen www.lxware.cn/1panel adresinden satın alın ve tekrar deneyin!"
-ErrNodeBound: "Bu lisans başka bir düğüme bağlı, lütfen kontrol edip tekrar deneyin!"
-ErrNodeBoundDelete: "Bu lisans bağlı ve silme işlemlerini desteklemiyor. Lütfen kontrol edip tekrar deneyin!"
-ErrNodeBoundLimit: "Mevcut ücretsiz düğüm limitine ulaştı, lütfen kontrol edip tekrar deneyin!"
-ErrLicenseFree: "Ücretsiz düğümler yalnızca lisans bir düğüme düzgün şekilde bağlandığında kullanılabilir. Lütfen doğrulayın ve tekrar deneyin!"
-ErrLicenseUnbind: "Bu lisans için Topluluk Sürümü düğümleri tespit edildi. Lütfen [Panel Ayarları - Lisans]'ta bağı çözün ve tekrar deneyin!"
-ErrNoSuchNode: "Düğüm bilgisi bulunamadı, lütfen kontrol edip tekrar deneyin!"
-ErrNodeUnbind: "Bu düğüm lisans bağlama aralığında değil, lütfen kontrol edip tekrar deneyin!"
-ErrNodeBind: "Bu düğüm zaten bir lisansa bağlı, lütfen kontrol edip tekrar deneyin!"
-ErrNodeLocalRollback: "Ana düğüm doğrudan geri alma desteklemiyor. Lütfen geri almak için '1pctl restore' komutunu manuel olarak çalıştırın!"
-ErrIntlLicense: "Mevcut sürüm uluslararası sürüm lisansının içe aktarılmasını henüz desteklemiyor. Yakında!"
+ErrDeviceLost: "Lisans doğrulama için gerekli dosyalar eksik, lütfen kontrol edip tekrar deneyin"
+ErrXpackTimeout: "İstek zaman aşımı, ağ bağlantısı kararsız olabilir, lütfen daha sonra tekrar deneyin"
+ErrUnbindMaster: "Düğüm yönetiminde düğümler tespit edildi, mevcut lisansın bağı çözülemiyor, lütfen önce düğümleri kaldırın ve tekrar deneyin"
+ErrFreeNodeLimit: "Topluluk sürümü düğüm limiti ulaşıldı, lütfen www.lxware.cn/1panel adresinden satın alın ve tekrar deneyin"
+ErrNodeBound: "Bu lisans başka bir düğüme bağlı, lütfen kontrol edip tekrar deneyin"
+ErrNodeBoundDelete: "Bu lisans bağlı ve silme işlemlerini desteklemiyor. Lütfen kontrol edip tekrar deneyin"
+ErrNodeBoundLimit: "Mevcut ücretsiz düğüm limitine ulaştı, lütfen kontrol edip tekrar deneyin"
+ErrLicenseFree: "Ücretsiz düğümler yalnızca lisans bir düğüme düzgün şekilde bağlandığında kullanılabilir. Lütfen doğrulayın ve tekrar deneyin"
+ErrLicenseUnbind: "Bu lisans için Topluluk Sürümü düğümleri tespit edildi. Lütfen [Panel Ayarları - Lisans]'ta bağı çözün ve tekrar deneyin"
+ErrNoSuchNode: "Düğüm bilgisi bulunamadı, lütfen kontrol edip tekrar deneyin"
+ErrNodeUnbind: "Bu düğüm lisans bağlama aralığında değil, lütfen kontrol edip tekrar deneyin"
+ErrNodeBind: "Bu düğüm zaten bir lisansa bağlı, lütfen kontrol edip tekrar deneyin"
+ErrNodeLocalRollback: "Ana düğüm doğrudan geri alma desteklemiyor. Lütfen geri almak için '1pctl restore' komutunu manuel olarak çalıştırın"
+ErrIntlLicense: "Mevcut sürüm uluslararası sürüm lisansının içe aktarılmasını henüz desteklemiyor. Yakında"
 
-InvalidRequestBodyType: "Geçersiz istek gövdesi formatı, lütfen içeriğin format gereksinimlerine uygun olduğunu kontrol edip tekrar deneyin!"  
-InvalidLicenseCodeType: "Sağlanan lisans kodu formatı geçersiz, lütfen kontrol edip tekrar deneyin!"  
-LicenseNotFoundType: "Lisans bulunamadı, sistemde sağlanan lisansla eşleşen bir kayıt yok. Lütfen kontrol edip tekrar deneyin!"  
-LicenseRevokedType: "İstenen lisans iptal edilmiş ve artık kullanılamaz. Lütfen kontrol edip tekrar deneyin!"  
-LicenseExpiredType: "Lisansın süresi doldu. Lütfen yenileyin veya Panel Ayarları - Lisans bölümünden yeniden içe aktarın!"  
-LicenseProductMismatchType: "Lisans, istenen ürün veya hizmetle eşleşmiyor!"  
-InvalidAssigneeType: "Lisans ataması için hedef kullanıcı veya cihaz bilgisi geçersiz. Lütfen kontrol edip tekrar deneyin!"  
-LicenseUsageNotFoundType: "Kullanım kaydı bulunamadı. Bu lisans henüz etkinleştirilmemiş veya kullanılmamış. Lütfen kontrol edip tekrar deneyin!"  
-LicenseUsageLimitExceededType: "Bu lisans zaten başka bir düğüme bağlı. Lütfen kontrol edip tekrar deneyin!"  
+InvalidRequestBodyType: "Geçersiz istek gövdesi formatı, lütfen içeriğin format gereksinimlerine uygun olduğunu kontrol edip tekrar deneyin"
+InvalidLicenseCodeType: "Sağlanan lisans kodu formatı geçersiz, lütfen kontrol edip tekrar deneyin"
+LicenseNotFoundType: "Lisans bulunamadı, sistemde sağlanan lisansla eşleşen bir kayıt yok. Lütfen kontrol edip tekrar deneyin"
+LicenseRevokedType: "İstenen lisans iptal edilmiş ve artık kullanılamaz. Lütfen kontrol edip tekrar deneyin"
+LicenseExpiredType: "Lisansın süresi doldu. Lütfen yenileyin veya Panel Ayarları - Lisans bölümünden yeniden içe aktarın"
+LicenseProductMismatchType: "Lisans, istenen ürün veya hizmetle eşleşmiyor"
+InvalidAssigneeType: "Lisans ataması için hedef kullanıcı veya cihaz bilgisi geçersiz. Lütfen kontrol edip tekrar deneyin"
+LicenseUsageNotFoundType: "Kullanım kaydı bulunamadı. Bu lisans henüz etkinleştirilmemiş veya kullanılmamış. Lütfen kontrol edip tekrar deneyin"
+LicenseUsageLimitExceededType: "Bu lisans zaten başka bir düğüme bağlı. Lütfen kontrol edip tekrar deneyin"
 
 # alert
-ErrAlertSync: "Uyarı bilgisi senkronizasyon hatası, lütfen kontrol edip tekrar deneyin!"
+ErrAlertSync: "Uyarı bilgisi senkronizasyon hatası, lütfen kontrol edip tekrar deneyin"
 
 # task
 TaskStart: "{{ .name }} görevi başladı [BAŞLANGIÇ]"
@@ -122,7 +122,7 @@ Success: "Başarılı"
 #script
 ScriptLibrary: "Betik Kütüphanesi"
 RemoteScriptLibrary: "Uzak Komut Dosyası Kütüphanesi"
-ScriptSyncSkip: "Mevcut betik kütüphanesi zaten en son sürüm!"
+ScriptSyncSkip: "Mevcut betik kütüphanesi zaten en son sürüm"
 DownloadData: "Betik kütüphanesi dosyası data.yaml indiriliyor"
 DownloadPackage: "Betik kütüphanesi paketi indiriliyor"
 AnalyticCompletion: "Analiz tamamlandı, şimdi veritabanına senkronize ediliyor..."
@@ -134,7 +134,7 @@ SyncPackageData: "Paket senkronizasyon verisi"
 SyncPackageEncrypt: "Veri paketi şifreleme"
 SyncRequest: "Düğüm senkronizasyon API'si isteği"
 SyncFailedRetry: "Düğüm veri senkronizasyonu zaman aşımı (deneme {{ .index }}), yeniden deneniyor..."
-SyncFailed: "Senkronizasyon başarısız, lütfen düğüm listesinde manuel senkronize edin!"
+SyncFailed: "Senkronizasyon başarısız, lütfen düğüm listesinde manuel senkronize edin"
 SyncSystemProxy: "Sistem Vekil Sunucu Ayarları"
 SyncScripts: "Komut Dosyası Kütüphanesi"
 SyncBackupAccounts: "Yedek Hesaplar"
@@ -168,7 +168,7 @@ ConnInfoNotMatch: "Bağlantı bilgisi uyuşmuyor"
 MakeAgentPackage: "Düğüm kurulum paketini oluştur"
 SendAgent: "Düğüm kurulum paketini dağıt"
 StartService: "Servisi başlat"
-NoBackupNode: "Yedek düğüm şu anda boş. Lütfen kaydetmek için bir yedek düğüm seçin ve tekrar deneyin!"
+NoBackupNode: "Yedek düğüm şu anda boş. Lütfen kaydetmek için bir yedek düğüm seçin ve tekrar deneyin"
 
 #cmd
 AppVersion: "Uygulama sürümü"
@@ -179,14 +179,14 @@ AppCreateFileErr: "Dosya {{ .name }} oluşturma başarısız {{ .err }}"
 AppCreateDirErr: "Klasör {{ .name }} oluşturma başarısız {{ .err }}"
 AppMissKey: "Uygulama anahtarı eksik, belirtmek için -k kullanın"
 AppMissVersion: "Uygulama sürümü eksik, belirtmek için -v kullanın"
-AppVersionExist: "Sürüm zaten mevcut!"
-AppCreateSuccessful: "Oluşturma başarılı!"
+AppVersionExist: "Sürüm zaten mevcut"
+AppCreateSuccessful: "Oluşturma başarılı"
 AppWriteErr: "Dosya {{ .name }} yazma başarısız {{ .err }}"
 SudoHelper: "Lütfen {{ .cmd }} kullanın veya root kullanıcısına geçin"
 ListenIPCommands: "Dinleme IP'sini değiştir"
 ListenIPv4: "IPv4'te dinle"
 ListenIPv6: "IPv6'da dinle"
-ListenChangeSuccessful: "Değişiklik başarılı! Şimdi {{ .value }} üzerinde dinleniyor"
+ListenChangeSuccessful: "Değişiklik başarılı Şimdi {{ .value }} üzerinde dinleniyor"
 ResetCommands: "Sistem bilgilerini sıfırla"
 ResetMFA: "1Panel iki faktörlü kimlik doğrulamayı iptal et"
 ResetHttps: "1Panel https girişini iptal et"
@@ -201,28 +201,28 @@ RestoreStep2: "(2/5) 1Panel binary geri alımı başarılı"
 RestoreStep3: "(3/5) 1Panel betik geri alımı başarılı"
 RestoreStep4: "(4/5) 1Panel servis geri alımı başarılı"
 RestoreStep5: "(5/5) 1Panel veri geri alımı başarılı"
-RestoreSuccessful: "Geri alma başarılı! {{ .version }} sürümüne geri alındı, hizmet yeniden başlatılıyor, lütfen bekleyin..."
+RestoreSuccessful: "Geri alma başarılı {{ .version }} sürümüne geri alındı, hizmet yeniden başlatılıyor, lütfen bekleyin..."
 UpdateCommands: "Panel bilgilerini güncelle"
 UpdateUser: "Panel kullanıcısını güncelle"
 UpdatePassword: "Panel şifresini güncelle"
 UpdatePort: "Panel portunu güncelle"
-UpdateUserNull: "Hata: panel kullanıcısı boş!"
-UpdateUserBlank: "Hata: panel kullanıcısı boşluk içeriyor!"
-UpdateUserFormat: "Hata: Geçersiz panel kullanıcı formatı! Sadece İngilizce, Çince, sayılar ve _ destekler, uzunluk 3-30"
+UpdateUserNull: "Hata: panel kullanıcısı boş"
+UpdateUserBlank: "Hata: panel kullanıcısı boşluk içeriyor"
+UpdateUserFormat: "Hata: Geçersiz panel kullanıcı formatı Sadece İngilizce, Çince, sayılar ve _ destekler, uzunluk 3-30"
 UpdateUserErr: "Hata: Panel kullanıcısı güncelleme başarısız, {{ .err }}"
-UpdateSuccessful: "Güncelleme başarılı!"
+UpdateSuccessful: "Güncelleme başarılı"
 UpdateUserResult: "Panel kullanıcısı: {{ .name }}"
 UpdatePasswordRead: "Hata: Panel şifre bilgilerini okuma başarısız, {{ .err }}"
-UpdatePasswordNull: "Hata: Panel şifresi boş!"
-UpdateUPasswordBlank: "Hata: Panel şifresi boşluk içeriyor!"
-UpdatePasswordFormat: "Hata: Panel şifresi yalnızca harf, sayı ve özel karakter (!@#$%*_,.?) içerebilir ve uzunluğu 8-30 olmalıdır."
-UpdatePasswordLen: "Hata: Lütfen 6 karakterden uzun bir şifre girin!"
+UpdatePasswordNull: "Hata: Panel şifresi boş"
+UpdateUPasswordBlank: "Hata: Panel şifresi boşluk içeriyor"
+UpdatePasswordFormat: "Hata: Panel şifresi yalnızca harf, sayı ve özel karakter (@#$%*_,.?) içerebilir ve uzunluğu 8-30 olmalıdır."
+UpdatePasswordLen: "Hata: Lütfen 6 karakterden uzun bir şifre girin"
 UpdatePasswordRe: "Şifreyi onayla:"
 UpdatePasswordErr: "Hata: Panel şifresi güncelleme başarısız, {{ .err }}"
-UpdatePasswordSame: "Hata: İki şifre eşleşmiyor, lütfen kontrol edip tekrar deneyin!"
+UpdatePasswordSame: "Hata: İki şifre eşleşmiyor, lütfen kontrol edip tekrar deneyin"
 UpdatePasswordResult: "Panel şifresi: {{ .name }}"
-UpdatePortFormat: "Hata: Girilen port numarası 1 ile 65535 arasında olmalıdır!"
-UpdatePortUsed: "Hata: Port numarası zaten kullanımda, lütfen kontrol edip tekrar deneyin!"
+UpdatePortFormat: "Hata: Girilen port numarası 1 ile 65535 arasında olmalıdır"
+UpdatePortUsed: "Hata: Port numarası zaten kullanımda, lütfen kontrol edip tekrar deneyin"
 UpdatePortErr: "Hata: Panel port güncelleme başarısız, {{ .err }}"
 UpdatePortResult: "Panel Portu: {{ .name }}"
 UpdatePortFirewallAdd: "Güvenlik duvarı port kuralı ekleme başarısız, {{ .err }}, lütfen {{ .name }} portunu güvenlik duvarı kurallarına manuel olarak ekleyin."

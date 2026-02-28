@@ -2,10 +2,10 @@ import fit2cloudEnLocale from 'fit2cloud-ui-plus/src/locale/lang/en';
 
 const message = {
     commons: {
-        true: 'doğru',
-        false: 'yanlış',
+        true: 'Doğru',
+        false: 'Yanlış',
         colon: ': ',
-        example: 'Örneğin, ',
+        example: 'örnek: ',
         fit2cloud: 'FIT2CLOUD',
         lingxia: 'Lingxia',
         button: {
@@ -376,7 +376,7 @@ const message = {
         },
     },
     menu: {
-        home: 'Genel Bakış',
+        home: 'Kontrol Paneli',
         apps: 'Uygulama Mağazası',
         website: 'Web Sitesi | Web Siteleri',
         project: 'Proje | Projeler',
@@ -394,7 +394,7 @@ const message = {
         files: 'Dosya Tarayıcısı',
         monitor: 'İzleme',
         terminal: 'Terminal | Terminaller',
-        settings: 'Ayar | Ayarlar',
+        settings: 'Ayarlar',
         toolbox: 'Araç Kutusu',
         logs: 'Günlük | Günlükler',
         runtime: 'Çalışma Zamanı | Çalışma Zamanları',
@@ -404,21 +404,20 @@ const message = {
         supervisor: 'Supervisor',
         tamper: 'Kurcalama Koruması',
         app: 'Uygulama',
-        msgCenter: 'Görev Merkezi',
+        msgCenter: 'Görevler',
     },
     home: {
-        recommend: 'tavsiye etmek',
-        dir: 'dizin',
+        recommend: 'Önerilen',
+        dir: 'Dizin',
         alias: 'Takma Ad',
-        quickDir: 'Hızlı Dizin',
-        minQuickJump: 'Lütfen en az bir hızlı atlama girişi ayarlayın!',
-        maxQuickJump: 'En fazla dört hızlı atlama girişi ayarlayabilirsiniz!',
+        quickDir: 'Hızlı Erişim',
+        minQuickJump: 'En az bir hızlı erişim girdisi ekleyin',
+        maxQuickJump: 'En fazla dört hızlı erişim girdisi ekleyebilirsiniz',
         database: 'Veritabanı - Tümü',
         restart_1panel: 'Paneli yeniden başlat',
         restart_system: 'Sunucuyu yeniden başlat',
-        operationSuccess: 'İşlem başarılı, yeniden başlatılıyor, lütfen tarayıcıyı daha sonra manuel olarak yenileyin!',
-        entranceHelper:
-            'Güvenlik girişi etkinleştirilmedi. Sistem güvenliğini artırmak için "Ayarlar -> Güvenlik" bölümünden etkinleştirebilirsiniz.',
+        operationSuccess: 'Tamamlandı. Yeniden başlatılıyor, tarayıcıyı daha sonra yenileyin.',
+        entranceHelper: 'Güvenli giriş etkin değil. "Ayarlar -> Güvenlik" üzerinden etkinleştirerek güvenliği artırın.',
         appInstalled: 'Uygulamalar',
         systemInfo: 'Sistem bilgisi',
         hostname: 'Host adı',
@@ -671,7 +670,7 @@ const message = {
         rdbInfo: 'Kural listesindeki değerin 1 ile 100000 arasında olduğundan emin olun',
 
         containerConn: 'Konteyner bağlantısı',
-        copyConnURL: 'Bağlantı URL\'sini kopyala',
+        copyConnURL: "Bağlantı URL'sini kopyala",
         connAddress: 'Adres',
         containerConnHelper:
             'Bu bağlantı adresi PHP yürütme ortamı/konteyner kurulumunda çalışan uygulamalar tarafından kullanılır.',

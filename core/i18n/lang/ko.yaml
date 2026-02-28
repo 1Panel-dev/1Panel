@@ -1,21 +1,21 @@
-ErrInvalidParams: "요청 매개변수가 잘못되었습니다: {{ .detail }}"
-ErrTokenParse: "토큰 생성 오류: {{ .detail }}"
-ErrInitialPassword: "초기 비밀번호가 잘못되었습니다"
-ErrInternalServer: "서버 내부 오류: {{ .detail }}"
-ErrRecordExist: "레코드가 이미 존재합니다"
-ErrRecordNotFound: "레코드를 찾을 수 없습니다"
-ErrStructTransform: "형 변환 실패: {{ .detail }}"
-ErrNotLogin: "사용자가 로그인되지 않았습니다: {{ .detail }}"
-ErrSessionDataNotFound: "현재 세션이 만료되었습니다!"
-ErrSessionDataFormat: "현재 세션 데이터 형식이 비정상입니다!"
-ErrPasswordExpired: "현재 비밀번호가 만료되었습니다: {{ .detail }}"
-ErrNotSupportType: "현재 유형은 지원되지 않습니다: {{ .detail }}"
-ErrProxy: "요청 오류, 이 노드 상태를 확인하세요: {{ .detail }}"
-ErrApiConfigStatusInvalid: "API 액세스가 금지되었습니다: {{ .detail }}"
-ErrApiConfigKeyInvalid: "API 키 오류: {{ .detail }}"
-ErrApiConfigIPInvalid: "API 요청 IP가 화이트리스트에 없습니다: {{ .detail }}"
-ErrApiConfigDisable: "이 인터페이스는 API 호출을 금지합니다: {{ .detail }}"
-ErrApiConfigKeyTimeInvalid: "API 타임스탬프 오류: {{ .detail }}"
+ErrInvalidParams: '잘못된 요청: {{ .detail }}'
+ErrTokenParse: '토큰 오류: {{ .detail }}'
+ErrInitialPassword: '원래 비밀번호가 틀립니다'
+ErrInternalServer: '서버 오류: {{ .detail }}'
+ErrRecordExist: '레코드가 이미 있습니다'
+ErrRecordNotFound: '레코드를 찾을 수 없습니다'
+ErrStructTransform: '형 변환 실패: {{ .err }}'
+ErrNotLogin: '로그인하지 않음: {{ .detail }}'
+ErrSessionDataNotFound: "현재 세션이 만료되었습니다"
+ErrSessionDataFormat: "현재 세션 데이터 형식이 비정상입니다"
+ErrPasswordExpired: '비밀번호 만료: {{ .detail }}'
+ErrNotSupportType: '지원하지 않는 타입: {{ .name }}'
+ErrProxy: '요청 실패: {{ .detail }}'
+ErrApiConfigStatusInvalid: 'API 사용 중지: {{ .detail }}'
+ErrApiConfigKeyInvalid: 'API 키가 잘못됨: {{ .detail }}'
+ErrApiConfigIPInvalid: 'IP 허용되지 않음: {{ .detail }}'
+ErrApiConfigDisable: 'API 접근 금지: {{ .detail }}'
+ErrApiConfigKeyTimeInvalid: '타임스탬프 오류: {{ .detail }}'
 
 # request
 ErrNoSuchHost: "요청한 서버를 찾을 수 없습니다 {{ .err }}"
@@ -23,17 +23,17 @@ ErrHttpReqNotFound: "요청한 리소스를 찾을 수 없습니다 {{ .err }}"
 ErrHttpReqFailed: "요청 실패 {{ .err }}"
 ErrHttpReqTimeOut: "요청 시간이 초과되었습니다 {{ .err }}"
 ErrCreateHttpClient: "요청 생성 실패 {{ .err }}"
-ErrProxySetting: "프록시 서버 정보를 사용할 수 없음 {{ .err }}, 확인 후 다시 시도하세요!"
-ErrEntranceFormat: "보안 입구 {{ .name }}은(는) 현재 지원되지 않습니다. 확인 후 다시 시도해 주세요!"
+ErrProxySetting: "프록시 서버 정보를 사용할 수 없음 {{ .err }}, 확인 후 다시 시도하세요"
+ErrEntranceFormat: "보안 입구 {{ .name }}은(는) 현재 지원되지 않습니다. 확인 후 다시 시도해 주세요"
 
 # common
-ErrDemoEnvironment: "데모 서버에서는 이 작업이 금지되어 있습니다!"
-ErrCmdTimeout: "명령 실행 시간 초과!"
-ErrEntrance: "보안 정보 오류입니다. 확인 후 다시 시도하십시오!"
+ErrDemoEnvironment: '데모 환경에서는 불가'
+ErrCmdTimeout: '명령이 시간 초과했습니다'
+ErrEntrance: "보안 정보 오류입니다. 확인 후 다시 시도하십시오"
 ErrGroupIsDefault: "기본 그룹은 삭제할 수 없습니다"
 ErrGroupIsInUse: "그룹이 사용 중이므로 삭제할 수 없습니다."
-ErrLocalDelete: "로컬 노드는 삭제할 수 없습니다!"
-ErrPortInUsed: "{{ .name }} 포트가 이미 사용 중입니다!"
+ErrLocalDelete: "로컬 노드는 삭제할 수 없습니다"
+ErrPortInUsed: "{{ .name }} 포트가 이미 사용 중입니다"
 ErrInternalServerKey: "서버 내부 오류:"
 MasterNode: "마스터 노드"
 
@@ -42,58 +42,58 @@ CustomAppStoreFileValid: "앱 스토어 패키지는 .tar.gz 형식이어야 합
 ErrFileNotFound: "{{ .name }} 파일이 존재하지 않습니다"
 AppBackup: '애플리케이션 백업'
 AppBackupPush: '애플리케이션 백업 파일 {{.file}}을(를) 노드 {{ .name }}(으)로 전송'
-ErrSourceTargetSame: '소스 노드와 대상 노드는 동일할 수 없습니다!'
+ErrSourceTargetSame: '소스 노드와 대상 노드는 동일할 수 없습니다'
 AppInstall: '노드 {{ .targetNode }}에 애플리케이션 {{ .name }} 설치'
 AppInstallCheck: '애플리케이션 설치 환경 확인'
 
 # backup
-ErrBackupInUsed: "이 백업 계정은 예약된 작업에 사용 중이며 삭제할 수 없습니다"
-ErrBackupCheck: "백업 계정 연결 테스트 실패 {{ .err }}"
-ErrBackupLocal: "로컬 서버 백업 계정은 이 작업을 지원하지 않습니다!"
-ErrBackupPublic: "이 백업 계정이 공개된 것으로 감지되지 않았습니다. 다시 확인하십시오!"
+ErrBackupInUsed: '백업 계정이 예약에 사용 중'
+ErrBackupCheck: '연결 테스트 실패: {{ .err }}'
+ErrBackupLocal: "로컬 서버 백업 계정은 이 작업을 지원하지 않습니다"
+ErrBackupPublic: "이 백업 계정이 공개된 것으로 감지되지 않았습니다. 다시 확인하십시오"
 ErrOSSConn: "최신 버전을 가져올 수 없습니다. 외부 네트워크 연결을 확인하십시오."
 
 #license
 LicenseCheck: '라이선스 사용 가능 여부 확인'
-ErrLicenseInUsed: '해당 라이선스가 이미 연결되었습니다. 확인 후 다시 시도하세요!'
-ErrLicenseExpired: '해당 라이선스가 만료되었습니다. 확인 후 다시 시도하세요!'
-ErrLicense: "라이선스 형식이 잘못되었습니다. 다시 확인하고 시도해 주세요!"
-ErrLicenseCheck: "라이선스 검증 실패. 다시 확인하고 시도해 주세요!"
-ErrXpackVersion: "라이선스 검증 실패, 이 라이선스는 버전 제한이 있습니다. 성공적으로 가져올 수 없습니다. 다시 확인하고 시도해 주세요!"
-ErrLicenseSave: "라이선스 정보 저장 실패, 오류 {{ .err }}, 다시 시도해 주세요!"
-ErrLicenseSync: "라이선스 정보 동기화 실패, 데이터베이스에서 라이선스 정보를 찾을 수 없습니다!"
+ErrLicenseInUsed: '해당 라이선스가 이미 연결되었습니다. 확인 후 다시 시도하세요'
+ErrLicenseExpired: '해당 라이선스가 만료되었습니다. 확인 후 다시 시도하세요'
+ErrLicense: "라이선스 형식이 잘못되었습니다. 다시 확인하고 시도해 주세요"
+ErrLicenseCheck: "라이선스 검증 실패. 다시 확인하고 시도해 주세요"
+ErrXpackVersion: "라이선스 검증 실패, 이 라이선스는 버전 제한이 있습니다. 성공적으로 가져올 수 없습니다. 다시 확인하고 시도해 주세요"
+ErrLicenseSave: "라이선스 정보 저장 실패, 오류 {{ .err }}, 다시 시도해 주세요"
+ErrLicenseSync: "라이선스 정보 동기화 실패, 데이터베이스에서 라이선스 정보를 찾을 수 없습니다"
 ErrLicenseExist: "해당 라이선스 기록이 이미 존재합니다. 라이선스 페이지에서 직접 노드 바인딩이 가능합니다."
 ErrXpackNotFound: "이 섹션은 프로페셔널 에디션 기능입니다. 먼저 [패널 설정]-[라이선스] 인터페이스에서 라이선스를 가져오세요."
 ErrXpackExceptional: "이 섹션은 프로페셔널 에디션 기능입니다. 먼저 [패널 설정]-[라이선스] 인터페이스에서 라이선스 상태를 동기화하세요."
 ErrXpackLost: "라이선스가 최대 재시도 횟수에 도달했습니다. [패널 설정][라이선스] 페이지로 이동하여 수동으로 동기화 버튼을 클릭하여 프로페셔널 기능을 정상적으로 사용할 수 있도록 하세요."
-ErrDeviceLost: "라이센스 검증에 필요한 파일이 누락되었습니다. 확인 후 다시 시도해 주세요!"
-ErrDeviceErr: "현재 환경이 라이선스 가져오기 환경과 일치하지 않습니다. 라이선스를 편집하고 다시 가져오십시오!"
-ErrXpackTimeout: "요청 시간 초과, 네트워크 연결이 불안정할 수 있습니다. 나중에 다시 시도해 주세요!"
-ErrUnbindMaster: "노드 관리 내에 노드가 존재함을 감지하였습니다. 현재 라이선스를 해제할 수 없습니다. 먼저 제거 후 다시 시도해 주세요!"
-ErrFreeNodeLimit: "커뮤니티 에디션 노드 수가 무료 한도에 도달하였습니다. www.lxware.cn/1panel 에서 구매 후 다시 시도해 주세요!"
-ErrNodeBound: "이 라이선스는 다른 노드에 바인딩되어 있습니다. 다시 확인하고 시도해 주세요!"
-ErrNodeBoundDelete: "이 라이센스는 바인딩되어 있으며 삭제 작업을 지원하지 않습니다. 확인 후 다시 시도해 주세요!"
-ErrNodeBoundLimit: "현재 무료 노드가 한도에 도달했습니다. 확인 후 다시 시도해 주세요!"
-ErrLicenseFree: "라이선스가 노드에 정상적으로 바인딩된 경우에만 무료 노드를 사용할 수 있습니다. 확인 후 다시 시도하세요!"
-ErrLicenseUnbind: "이 라이선스에 커뮤니티 에디션 노드가 존재합니다. [패널 설정 - 라이선스]에서 바인딩 해제 후 다시 시도하세요!"
-ErrNoSuchNode: "노드 정보를 찾을 수 없습니다. 다시 확인하고 시도해 주세요!"
-ErrNodeUnbind: "이 노드가 라이선스 바인딩 범위에 있지 않음을 감지하였습니다. 다시 확인하고 시도해 주세요!"
-ErrNodeBind: "이 노드가 이미 라이선스에 바인딩되어 있음을 감지하였습니다. 다시 확인하고 시도해 주세요!"
-ErrNodeLocalRollback: "마스터 노드는 직접 롤백을 지원하지 않습니다. 수동으로 '1pctl restore' 명령어를 실행하여 롤백하세요!"
-ErrIntlLicense: "현재 버전에서는 국제판 라이선스 가져오기를 아직 지원하지 않습니다. 곧 제공될 예정입니다!"
+ErrDeviceLost: "라이센스 검증에 필요한 파일이 누락되었습니다. 확인 후 다시 시도해 주세요"
+ErrDeviceErr: "현재 환경이 라이선스 가져오기 환경과 일치하지 않습니다. 라이선스를 편집하고 다시 가져오십시오"
+ErrXpackTimeout: "요청 시간 초과, 네트워크 연결이 불안정할 수 있습니다. 나중에 다시 시도해 주세요"
+ErrUnbindMaster: "노드 관리 내에 노드가 존재함을 감지하였습니다. 현재 라이선스를 해제할 수 없습니다. 먼저 제거 후 다시 시도해 주세요"
+ErrFreeNodeLimit: "커뮤니티 에디션 노드 수가 무료 한도에 도달하였습니다. www.lxware.cn/1panel 에서 구매 후 다시 시도해 주세요"
+ErrNodeBound: "이 라이선스는 다른 노드에 바인딩되어 있습니다. 다시 확인하고 시도해 주세요"
+ErrNodeBoundDelete: "이 라이센스는 바인딩되어 있으며 삭제 작업을 지원하지 않습니다. 확인 후 다시 시도해 주세요"
+ErrNodeBoundLimit: "현재 무료 노드가 한도에 도달했습니다. 확인 후 다시 시도해 주세요"
+ErrLicenseFree: "라이선스가 노드에 정상적으로 바인딩된 경우에만 무료 노드를 사용할 수 있습니다. 확인 후 다시 시도하세요"
+ErrLicenseUnbind: "이 라이선스에 커뮤니티 에디션 노드가 존재합니다. [패널 설정 - 라이선스]에서 바인딩 해제 후 다시 시도하세요"
+ErrNoSuchNode: "노드 정보를 찾을 수 없습니다. 다시 확인하고 시도해 주세요"
+ErrNodeUnbind: "이 노드가 라이선스 바인딩 범위에 있지 않음을 감지하였습니다. 다시 확인하고 시도해 주세요"
+ErrNodeBind: "이 노드가 이미 라이선스에 바인딩되어 있음을 감지하였습니다. 다시 확인하고 시도해 주세요"
+ErrNodeLocalRollback: "마스터 노드는 직접 롤백을 지원하지 않습니다. 수동으로 '1pctl restore' 명령어를 실행하여 롤백하세요"
+ErrIntlLicense: "현재 버전에서는 국제판 라이선스 가져오기를 아직 지원하지 않습니다. 곧 제공될 예정입니다"
 
-InvalidRequestBodyType: "요청 본문 형식이 잘못되었습니다. 내용이 형식 요구 사항을 충족하는지 확인한 후 다시 시도하세요!"  
-InvalidLicenseCodeType: "제공된 라이선스 코드 형식이 잘못되었습니다. 확인 후 다시 시도하세요!"  
-LicenseNotFoundType: "라이선스가 존재하지 않습니다. 시스템에서 제공된 라이선스와 일치하는 기록을 찾을 수 없습니다. 확인 후 다시 시도하세요!"  
-LicenseRevokedType: "요청한 라이선스는 폐기되어 사용할 수 없습니다. 확인 후 다시 시도하세요!"  
-LicenseExpiredType: "라이선스가 만료되었습니다. 갱신하거나 패널 설정 - 라이선스에서 다시 가져온 후 시도하세요!"  
-LicenseProductMismatchType: "라이선스가 요청한 제품 또는 서비스와 일치하지 않습니다!"  
-InvalidAssigneeType: "라이선스 할당 대상 사용자 또는 장치 정보가 유효하지 않습니다. 확인 후 다시 시도하세요!"  
-LicenseUsageNotFoundType: "사용 기록이 없습니다. 이 라이선스는 아직 활성화되거나 사용되지 않았습니다. 확인 후 다시 시도하세요!"  
-LicenseUsageLimitExceededType: "이 라이선스는 이미 다른 노드에 연결되었습니다. 확인 후 다시 시도하세요!" 
+InvalidRequestBodyType: "요청 본문 형식이 잘못되었습니다. 내용이 형식 요구 사항을 충족하는지 확인한 후 다시 시도하세요"
+InvalidLicenseCodeType: "제공된 라이선스 코드 형식이 잘못되었습니다. 확인 후 다시 시도하세요"
+LicenseNotFoundType: "라이선스가 존재하지 않습니다. 시스템에서 제공된 라이선스와 일치하는 기록을 찾을 수 없습니다. 확인 후 다시 시도하세요"
+LicenseRevokedType: "요청한 라이선스는 폐기되어 사용할 수 없습니다. 확인 후 다시 시도하세요"
+LicenseExpiredType: "라이선스가 만료되었습니다. 갱신하거나 패널 설정 - 라이선스에서 다시 가져온 후 시도하세요"
+LicenseProductMismatchType: "라이선스가 요청한 제품 또는 서비스와 일치하지 않습니다"
+InvalidAssigneeType: "라이선스 할당 대상 사용자 또는 장치 정보가 유효하지 않습니다. 확인 후 다시 시도하세요"
+LicenseUsageNotFoundType: "사용 기록이 없습니다. 이 라이선스는 아직 활성화되거나 사용되지 않았습니다. 확인 후 다시 시도하세요"
+LicenseUsageLimitExceededType: "이 라이선스는 이미 다른 노드에 연결되었습니다. 확인 후 다시 시도하세요"
 
 # alert
-ErrAlertSync: "경고 정보 동기화 오류, 다시 확인하고 시도해 주세요!"
+ErrAlertSync: "경고 정보 동기화 오류, 다시 확인하고 시도해 주세요"
 
 #task
 TaskStart: "{{ .name }} 작업 시작 [START]"
@@ -123,7 +123,7 @@ Success: "성공"
 #script
 ScriptLibrary: "스크립트 라이브러리"
 RemoteScriptLibrary: "원격 스크립트 라이브러리"
-ScriptSyncSkip: "현재 스크립트 라이브러리가 이미 최신 버전입니다!"
+ScriptSyncSkip: "현재 스크립트 라이브러리가 이미 최신 버전입니다"
 DownloadData: "스크립트 라이브러리 파일 data.yaml 다운로드 중"
 DownloadPackage: "스크립트 라이브러리 패키지 다운로드 중"
 AnalyticCompletion: "분석 완료, 데이터베이스에 동기화 중..."
@@ -135,7 +135,7 @@ SyncPackageData: "동기화 데이터 패키징"
 SyncPackageEncrypt: "데이터 패키지 암호화"
 SyncRequest: "노드 동기화 API 요청"
 SyncFailedRetry: "노드 데이터 동기화 시간 초과 ({{ .index }}번째 시도), 재시도 중..."
-SyncFailed: "동기화 실패, 노드 목록에서 수동 동기화를 실행하세요!"
+SyncFailed: "동기화 실패, 노드 목록에서 수동 동기화를 실행하세요"
 SyncSystemProxy: "시스템 프록시 설정"
 SyncScripts: "스크립트 라이브러리"
 SyncBackupAccounts: "백업 계정"
@@ -169,7 +169,7 @@ ConnInfoNotMatch: "연결 정보가 일치하지 않음"
 MakeAgentPackage: "노드 설치 패키지 생성"
 SendAgent: "노드 설치 패키지 배포"
 StartService: "서비스 시작"
-NoBackupNode: "현재 백업 노드가 비어 있습니다. 저장할 백업 노드를 선택한 후 다시 시도하십시오!"
+NoBackupNode: "현재 백업 노드가 비어 있습니다. 저장할 백업 노드를 선택한 후 다시 시도하십시오"
 
 # CMD
 AppVersion: "앱 버전"
@@ -180,14 +180,14 @@ AppCreateFileErr: "파일 {{ .name }} 생성 실패 {{ .err }}"
 AppCreateDirErr: "폴더 {{ .name }} 생성 실패 {{ .err }}"
 AppMissKey: "앱 키가 없습니다. -k 옵션으로 지정하세요."
 AppMissVersion: "앱 버전이 없습니다. -v 옵션으로 지정하세요."
-AppVersionExist: "버전이 이미 존재합니다!"
-AppCreateSuccessful: "생성 성공!"
+AppVersionExist: "버전이 이미 존재합니다"
+AppCreateSuccessful: "생성 성공"
 AppWriteErr: "파일 {{ .name }} 쓰기 실패 {{ .err }}"
 SudoHelper: "{{ .cmd }} 명령을 사용하거나 root 사용자로 전환하세요."
 ListenIPCommands: "IP 변경"
 ListenIPv4: "IPv4 에서 수신 대기"
 ListenIPv6: "IPv6 에서 수신 대기"
-ListenChangeSuccessful: "변경 성공! 현재 {{ .value }}에서 수신 대기 중입니다."
+ListenChangeSuccessful: "변경 성공 현재 {{ .value }}에서 수신 대기 중입니다."
 ResetCommands: "시스템 정보 초기화"
 ResetMFA: "1Panel 이중 인증 취소"
 ResetHttps: "1Panel HTTPS 로그인 취소"
@@ -202,28 +202,28 @@ RestoreStep2: "(2/5) 1Panel 바이너리 복구 성공"
 RestoreStep3: "(3/5) 1Panel 스크립트 복구 성공"
 RestoreStep4: "(4/5) 1Panel 서비스 복구 성공"
 RestoreStep5: "(5/5) 1Panel 데이터 복구 성공"
-RestoreSuccessful: "롤백 성공! {{ .version }}(으)로 롤백되었습니다. 서비스를 재시작 중입니다. 잠시만 기다려 주세요..."
+RestoreSuccessful: "롤백 성공 {{ .version }}(으)로 롤백되었습니다. 서비스를 재시작 중입니다. 잠시만 기다려 주세요..."
 UpdateCommands: "패널 정보 업데이트"
 UpdateUser: "패널 사용자 업데이트"
 UpdatePassword: "패널 비밀번호 업데이트"
 UpdatePort: "패널 포트 업데이트"
-UpdateUserNull: "오류: 패널 사용자가 비어 있습니다!"
-UpdateUserBlank: "오류: 패널 사용자에 공백이 포함되어 있습니다!"
-UpdateUserFormat: "오류: 잘못된 패널 사용자 형식! 영어, 중국어, 숫자, _만 지원하며 길이는 3~30자입니다."
+UpdateUserNull: "오류: 패널 사용자가 비어 있습니다"
+UpdateUserBlank: "오류: 패널 사용자에 공백이 포함되어 있습니다"
+UpdateUserFormat: "오류: 잘못된 패널 사용자 형식 영어, 중국어, 숫자, _만 지원하며 길이는 3~30자입니다."
 UpdateUserErr: "오류: 패널 사용자 업데이트 실패 {{ .err }}"
-UpdateSuccessful: "업데이트 성공!"
+UpdateSuccessful: "업데이트 성공"
 UpdateUserResult: "패널 사용자: {{ .name }}"
 UpdatePasswordRead: "오류: 패널 비밀번호 정보 읽기 실패 {{ .err }}"
-UpdatePasswordNull: "오류: 패널 비밀번호가 비어 있습니다!"
-UpdateUPasswordBlank: "오류: 패널 비밀번호에 공백이 포함되어 있습니다!"
-UpdatePasswordFormat: "오류: 패널 비밀번호는 문자, 숫자, 특수문자(!@#$%*_,.?)만 지원하며 길이는 8~30자입니다."
-UpdatePasswordLen: "오류: 6자 이상의 비밀번호를 입력하세요!"
+UpdatePasswordNull: "오류: 패널 비밀번호가 비어 있습니다"
+UpdateUPasswordBlank: "오류: 패널 비밀번호에 공백이 포함되어 있습니다"
+UpdatePasswordFormat: "오류: 패널 비밀번호는 문자, 숫자, 특수문자(@#$%*_,.?)만 지원하며 길이는 8~30자입니다."
+UpdatePasswordLen: "오류: 6자 이상의 비밀번호를 입력하세요"
 UpdatePasswordRe: "비밀번호 확인:"
 UpdatePasswordErr: "오류: 패널 비밀번호 업데이트 실패 {{ .err }}"
-UpdatePasswordSame: "오류: 두 비밀번호가 일치하지 않습니다. 확인 후 다시 시도하세요!"
+UpdatePasswordSame: "오류: 두 비밀번호가 일치하지 않습니다. 확인 후 다시 시도하세요"
 UpdatePasswordResult: "패널 비밀번호: {{ .name }}"
-UpdatePortFormat: "오류: 입력한 포트 번호는 1~65535 사이여야 합니다!"
-UpdatePortUsed: "오류: 포트 번호가 이미 사용 중입니다. 확인 후 다시 시도하세요!"
+UpdatePortFormat: "오류: 입력한 포트 번호는 1~65535 사이여야 합니다"
+UpdatePortUsed: "오류: 포트 번호가 이미 사용 중입니다. 확인 후 다시 시도하세요"
 UpdatePortErr: "오류: 패널 포트 업데이트 실패 {{ .err }}"
 UpdatePortResult: "패널 포트: {{ .name }}"
 UpdatePortFirewallAdd: "방화벽 포트 규칙 추가 실패 {{ .err }}, 방화벽 규칙에 {{ .name }} 포트를 수동으로 추가하세요."

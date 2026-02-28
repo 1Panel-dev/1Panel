@@ -1,21 +1,21 @@
-ErrInvalidParams: "Parámetros de solicitud no son válidos: {{ .detail }}"
-ErrTokenParse: "Error al generar el token: {{ .detail }}"
-ErrInitialPassword: "Contraseña inicial incorrecta"
-ErrInternalServer: "Error interno del servidor: {{ .detail }}"
-ErrRecordExist: "El registro ya existe"
-ErrRecordNotFound: "Registro no encontrado"
-ErrStructTransform: "Error en la conversión de tipo: {{ .detail }}"
-ErrNotLogin: "Usuario no ha iniciado sesión: {{ .detail }}"
-ErrSessionDataNotFound: "¡La sesión actual ha caducado!"
-ErrSessionDataFormat: "¡El formato de los datos de la sesión actual es anómalo!"
-ErrPasswordExpired: "La contraseña actual ha expirado: {{ .detail }}"
-ErrNotSupportType: "El tipo actual no es compatible: {{ .detail }}"
-ErrProxy: "Error en la solicitud, por favor revise el estado de este nodo: {{ .detail }}"
-ErrApiConfigStatusInvalid: "Acceso a la API prohibido: {{ .detail }}"
-ErrApiConfigKeyInvalid: "Error de clave API: {{ .detail }}"
-ErrApiConfigIPInvalid: "La IP de la solicitud API no está en la lista blanca: {{ .detail }}"
-ErrApiConfigDisable: "Esta interfaz prohíbe llamadas a la API: {{ .detail }}"
-ErrApiConfigKeyTimeInvalid: "Error de marca de tiempo de API: {{ .detail }}"
+ErrInvalidParams: 'Solicitud inválida: {{ .detail }}'
+ErrTokenParse: 'Token inválido: {{ .detail }}'
+ErrInitialPassword: 'Contraseña original incorrecta'
+ErrInternalServer: 'Error interno: {{ .detail }}'
+ErrRecordExist: 'Registro ya existe'
+ErrRecordNotFound: 'Registro no encontrado'
+ErrStructTransform: 'Error de conversión: {{ .err }}'
+ErrNotLogin: 'No has iniciado sesión: {{ .detail }}'
+ErrSessionDataNotFound: "La sesión actual ha caducado"
+ErrSessionDataFormat: "El formato de los datos de la sesión actual es anómalo"
+ErrPasswordExpired: 'Contraseña expirada: {{ .detail }}'
+ErrNotSupportType: 'Tipo no soportado: {{ .name }}'
+ErrProxy: 'Solicitud fallida: {{ .detail }}'
+ErrApiConfigStatusInvalid: 'API desactivada: {{ .detail }}'
+ErrApiConfigKeyInvalid: 'Clave API inválida: {{ .detail }}'
+ErrApiConfigIPInvalid: 'IP no permitida: {{ .detail }}'
+ErrApiConfigDisable: 'API no permitida: {{ .detail }}'
+ErrApiConfigKeyTimeInvalid: 'Timestamp inválido: {{ .detail }}'
 PushAppInstallTaskToNode: "Enviar tarea de instalación de aplicación al nodo [{{ .name }}]"
 TaskPush: "Enviar"
 AppInstallTask: "Tarea de instalación de aplicación"
@@ -28,17 +28,17 @@ ErrHttpReqNotFound: "No se pudo encontrar el recurso solicitado {{ .err }}"
 ErrHttpReqFailed: "Solicitud fallida {{ .err }}"
 ErrHttpReqTimeOut: "La solicitud ha expirado {{ .err }}"
 ErrCreateHttpClient: "Error al crear la solicitud {{ .err }}"
-ErrProxySetting: "Información del servidor proxy no disponible {{ .err }}, ¡compruebe e inténtelo de nuevo!"
-ErrEntranceFormat: "La entrada de seguridad {{ .name }} no está actualmente soportada. ¡Por favor verifique e inténtelo de nuevo!"
+ErrProxySetting: "Información del servidor proxy no disponible {{ .err }}, compruebe e inténtelo de nuevo"
+ErrEntranceFormat: "La entrada de seguridad {{ .name }} no está actualmente soportada. Por favor verifique e inténtelo de nuevo"
 
 # common
-ErrDemoEnvironment: "Servidor de demostración, ¡esta operación está prohibida!"
-ErrCmdTimeout: "¡Tiempo de espera al ejecutar el comando!"
-ErrEntrance: "Error en la información de entrada de seguridad, ¡por favor revise e intente de nuevo!"
+ErrDemoEnvironment: 'No disponible en demo'
+ErrCmdTimeout: 'Comando agotó tiempo'
+ErrEntrance: "Error en la información de entrada de seguridad, por favor revise e intente de nuevo"
 ErrGroupIsDefault: "Grupo predeterminado, no se puede eliminar"
 ErrGroupIsInUse: "El grupo está en uso y no se puede eliminar."
-ErrLocalDelete: "¡No se puede eliminar el nodo local!"
-ErrPortInUsed: "¡El puerto {{ .name }} ya está en uso!"
+ErrLocalDelete: "No se puede eliminar el nodo local"
+ErrPortInUsed: "El puerto {{ .name }} ya está en uso"
 ErrInternalServerKey: "Error interno del servidor:"
 MasterNode: "Nodo Maestro"
 
@@ -47,46 +47,46 @@ CustomAppStoreFileValid: "El paquete de la tienda de aplicaciones debe tener for
 ErrFileNotFound: "El archivo {{ .name }} no existe"
 AppBackup: 'Copia de seguridad de aplicación'
 AppBackupPush: 'Transferir archivo de copia de seguridad de aplicación {{.file}} al nodo {{ .name }}'
-ErrSourceTargetSame: '¡El nodo de origen y el nodo de destino no pueden ser el mismo!'
+ErrSourceTargetSame: 'El nodo de origen y el nodo de destino no pueden ser el mismo'
 AppInstall: 'Instalar aplicación {{ .name }} en nodo {{ .targetNode }}'
 AppInstallCheck: 'Verificar entorno de instalación de aplicación'
 
 # backup
-ErrBackupInUsed: "Esta cuenta de respaldo se utiliza en tareas programadas y no se puede eliminar"
-ErrBackupCheck: "Fallo en la prueba de conexión de la cuenta de respaldo {{ .err }}"
-ErrBackupLocal: "¡La cuenta de respaldo del servidor local no admite esta operación!"
-ErrBackupPublic: "Se detectó que esta cuenta de respaldo no es pública, ¡verifique e intente de nuevo!"
+ErrBackupInUsed: 'Cuenta de respaldo en uso por tarea programada'
+ErrBackupCheck: 'Conexión de respaldo falló: {{ .err }}'
+ErrBackupLocal: "La cuenta de respaldo del servidor local no admite esta operación"
+ErrBackupPublic: "Se detectó que esta cuenta de respaldo no es pública, verifique e intente de nuevo"
 ErrOSSConn: "No se pudo obtener la última versión, por favor revise la conectividad de red externa del servidor."
 
 #license
 LicenseCheck: 'Comprobar si la licencia está disponible'
-ErrLicenseInUsed: 'La licencia ya está vinculada. ¡Verifique e intente de nuevo!'
-ErrLicenseExpired: 'La licencia ha expirado. ¡Verifique e intente de nuevo!'
-ErrLicense: "Error en el formato de la licencia, ¡verifique y reintente!"
-ErrLicenseCheck: "Validación de licencia fallida, ¡verifique y reintente!"
-ErrXpackVersion: "Validación de licencia fallida, esta licencia está limitada por versión, no se puede importar, ¡verifique y reintente!"
-ErrLicenseSave: "Error al guardar la información de la licencia, error {{ .err }}, ¡reintente!"
-ErrLicenseSync: "Sincronización de licencia fallida, ¡no se detectó información de licencia en la base de datos!"
+ErrLicenseInUsed: 'La licencia ya está vinculada. Verifique e intente de nuevo'
+ErrLicenseExpired: 'La licencia ha expirado. Verifique e intente de nuevo'
+ErrLicense: "Error en el formato de la licencia, verifique y reintente"
+ErrLicenseCheck: "Validación de licencia fallida, verifique y reintente"
+ErrXpackVersion: "Validación de licencia fallida, esta licencia está limitada por versión, no se puede importar, verifique y reintente"
+ErrLicenseSave: "Error al guardar la información de la licencia, error {{ .err }}, reintente"
+ErrLicenseSync: "Sincronización de licencia fallida, no se detectó información de licencia en la base de datos"
 ErrLicenseExist: "Este registro de licencia ya existe. Puede ir directamente a la página de licencia para la vinculación del nodo."
 ErrXpackNotFound: "Esta sección es para la edición profesional, importe la licencia en Panel > Ajustes > Licencia"
 ErrXpackExceptional: "Esta sección es para la edición profesional, sincronice el estado de la licencia en Panel > Ajustes > Licencia"
 ErrXpackOutOfDate: "La licencia actual ha expirado, importe nuevamente la licencia en Panel > Ajustes > Licencia"
 ErrXpackLost: "La licencia ha alcanzado el número máximo de reintentos, vaya a [Ajustes del Panel] [Licencia] y haga clic en el botón de sincronización manualmente para asegurar el funcionamiento correcto de las funciones profesionales"
-ErrDeviceLost: "Faltan archivos necesarios para la verificación de licencia, ¡verifique e intente de nuevo!"
-ErrDeviceErr: "El entorno actual no coincide con el entorno de importación de la licencia. ¡Edite la licencia e impórtela de nuevo!"
-ErrXpackTimeout: "Tiempo de espera de la solicitud, puede que la conexión de red sea inestable, ¡intente más tarde!"
-ErrUnbindMaster: "Se detectaron nodos en la gestión de nodos, no se puede desvincular la licencia actual, elimine los nodos primero e intente de nuevo!"
-ErrFreeNodeLimit: "Se alcanzó el límite de nodos en la versión comunitaria, ¡vaya a www.lxware.cn/1panel para comprar y reintentar!"
-ErrNodeBound: "Esta licencia está vinculada a otro nodo, ¡verifique e intente de nuevo!"
-ErrNodeBoundDelete: "Esta licencia está vinculada y no admite operaciones de eliminación. ¡Verifique e intente de nuevo!"
-ErrNodeBoundLimit: "El nodo gratuito actual ha alcanzado su límite, ¡verifique e intente de nuevo!"
-ErrLicenseFree: "Los nodos gratuitos solo pueden usarse si la licencia está correctamente vinculada a un nodo. ¡Verifique e intente de nuevo!"
-ErrLicenseUnbind: "Se detectaron nodos de la Edición Comunitaria para esta licencia. ¡Desvincule en [Panel > Ajustes > Licencia] y vuelva a intentarlo!"
-ErrNoSuchNode: "Información del nodo no encontrada, ¡verifique e intente de nuevo!"
-ErrNodeUnbind: "Este nodo no está dentro del rango de vinculación de la licencia, ¡verifique e intente de nuevo!"
-ErrNodeBind: "Este nodo ya está vinculado a una licencia, ¡verifique e intente de nuevo!"
-ErrNodeLocalRollback: "El nodo principal no admite la reversión directa. ¡Ejecute manualmente el comando '1pctl restore' para revertir!"
-ErrIntlLicense: "La versión actual aún no admite importar licencias de la edición internacional. ¡Próximamente!"
+ErrDeviceLost: "Faltan archivos necesarios para la verificación de licencia, verifique e intente de nuevo"
+ErrDeviceErr: "El entorno actual no coincide con el entorno de importación de la licencia. Edite la licencia e impórtela de nuevo"
+ErrXpackTimeout: "Tiempo de espera de la solicitud, puede que la conexión de red sea inestable, intente más tarde"
+ErrUnbindMaster: "Se detectaron nodos en la gestión de nodos, no se puede desvincular la licencia actual, elimine los nodos primero e intente de nuevo"
+ErrFreeNodeLimit: "Se alcanzó el límite de nodos en la versión comunitaria, vaya a www.lxware.cn/1panel para comprar y reintentar"
+ErrNodeBound: "Esta licencia está vinculada a otro nodo, verifique e intente de nuevo"
+ErrNodeBoundDelete: "Esta licencia está vinculada y no admite operaciones de eliminación. Verifique e intente de nuevo"
+ErrNodeBoundLimit: "El nodo gratuito actual ha alcanzado su límite, verifique e intente de nuevo"
+ErrLicenseFree: "Los nodos gratuitos solo pueden usarse si la licencia está correctamente vinculada a un nodo. Verifique e intente de nuevo"
+ErrLicenseUnbind: "Se detectaron nodos de la Edición Comunitaria para esta licencia. Desvincule en [Panel > Ajustes > Licencia] y vuelva a intentarlo"
+ErrNoSuchNode: "Información del nodo no encontrada, verifique e intente de nuevo"
+ErrNodeUnbind: "Este nodo no está dentro del rango de vinculación de la licencia, verifique e intente de nuevo"
+ErrNodeBind: "Este nodo ya está vinculado a una licencia, verifique e intente de nuevo"
+ErrNodeLocalRollback: "El nodo principal no admite la reversión directa. Ejecute manualmente el comando '1pctl restore' para revertir"
+ErrIntlLicense: "La versión actual aún no admite importar licencias de la edición internacional. Próximamente"
 InvalidRequestBodyType: "Formato del cuerpo de la solicitud no válido, por favor revisa y asegúrate de que el contenido cumpla con el formato requerido antes de reintentar."
 InvalidLicenseCodeType: "Formato de código de licencia no válido, por favor revisa e inténtalo de nuevo."
 LicenseNotFoundType: "Licencia no encontrada, no existe ningún registro coincidente en el sistema para la licencia proporcionada. Por favor revisa e inténtalo de nuevo."
@@ -98,7 +98,7 @@ LicenseUsageNotFoundType: "No se encontraron registros de uso. Esta licencia no 
 LicenseUsageLimitExceededType: "Esta licencia ya está vinculada a otro nodo. Por favor revisa e inténtalo de nuevo."
 
 # alert
-ErrAlertSync: "Error al sincronizar la información de alertas, ¡verifique e intente de nuevo!"
+ErrAlertSync: "Error al sincronizar la información de alertas, verifique e intente de nuevo"
 
 # task
 TaskStart: "Tarea {{ .name }} iniciada [INICIO]"
@@ -123,7 +123,7 @@ Skip: "Omitir errores y continuar..."
 #script
 ScriptLibrary: "Biblioteca de scripts"
 RemoteScriptLibrary: "Biblioteca de Scripts Remota"
-ScriptSyncSkip: "¡La biblioteca de scripts ya está en la última versión!"
+ScriptSyncSkip: "La biblioteca de scripts ya está en la última versión"
 DownloadData: "Descargando archivo de datos de la biblioteca de scripts data.yaml"
 DownloadPackage: "Descargando paquete de la biblioteca de scripts"
 AnalyticCompletion: "Análisis completado, sincronizando con la base de datos..."
@@ -135,7 +135,7 @@ SyncPackageData: "Sincronizar datos del paquete [{{ .detail }}]"
 SyncPackageEncrypt: "Encriptación del paquete de datos"
 SyncRequest: "Solicitar API de sincronización de nodos"
 SyncFailedRetry: "Tiempo de espera en la sincronización de datos del nodo (intento {{ .index }}), reintentando..."
-SyncFailed: "¡La sincronización falló, sincronice manualmente en la lista de nodos!"
+SyncFailed: "La sincronización falló, sincronice manualmente en la lista de nodos"
 SyncSystemProxy: "Configuración del proxy del sistema"
 SyncScripts: "Biblioteca de scripts"
 SyncBackupAccounts: "Cuentas de copia de seguridad"
@@ -180,14 +180,14 @@ AppCreateFileErr: "Error al crear el archivo {{ .name }} {{ .err }}"
 AppCreateDirErr: "Error al crear la carpeta {{ .name }} {{ .err }}"
 AppMissKey: "Falta la clave de la app, use -k para especificar"
 AppMissVersion: "Falta la versión de la app, use -v para especificar"
-AppVersionExist: "¡La versión ya existe!"
-AppCreateSuccessful: "¡Creación finalizada con éxito!"
+AppVersionExist: "La versión ya existe"
+AppCreateSuccessful: "Creación finalizada con éxito"
 AppWriteErr: "Error al escribir el archivo {{ .name }} {{ .err }}"
 SudoHelper: "Por favor use {{ .cmd }} o cambie al usuario root"
 ListenIPCommands: "Cambiar ip de escucha"
 ListenIPv4: "Escuchar en IPv4"
 ListenIPv6: "Escuchar en IPv6"
-ListenChangeSuccessful: "¡Cambio exitoso! Ahora escuchando en {{ .value }}"
+ListenChangeSuccessful: "Cambio exitoso Ahora escuchando en {{ .value }}"
 ResetCommands: "Restablecer información del sistema"
 ResetMFA: "Cancelar autenticación de dos factores de 1Panel"
 ResetHttps: "Cancelar inicio de sesión https de 1Panel"
@@ -202,28 +202,28 @@ RestoreStep2: "(2/5) Reversión de binarios de 1Panel finalizada con éxito"
 RestoreStep3: "(3/5) Reversión de scripts de 1Panel finalizada con éxito"
 RestoreStep4: "(4/5) Reversión de servicio de 1Panel finalizada con éxito"
 RestoreStep5: "(5/5) Reversión de datos de 1Panel finalizada con éxito"
-RestoreSuccessful: "¡Reversión exitosa! Revertido a {{ .version }}, reiniciando servicio, espere por favor..."
+RestoreSuccessful: "Reversión exitosa Revertido a {{ .version }}, reiniciando servicio, espere por favor..."
 UpdateCommands: "Actualizar información del panel"
 UpdateUser: "Actualizar usuario del panel"
 UpdatePassword: "Actualizar contraseña del panel"
 UpdatePort: "Actualizar puerto del panel"
-UpdateUserNull: "Error: ¡el usuario del panel está vacío!"
-UpdateUserBlank: "Error: ¡el usuario del panel contiene espacios!"
-UpdateUserFormat: "Error: ¡formato de usuario del panel inválido! Solo admite inglés, chino, números y _, longitud 3-30"
+UpdateUserNull: "Error: el usuario del panel está vacío"
+UpdateUserBlank: "Error: el usuario del panel contiene espacios"
+UpdateUserFormat: "Error: formato de usuario del panel inválido Solo admite inglés, chino, números y _, longitud 3-30"
 UpdateUserErr: "Error: Fallo al actualizar usuario del panel, {{ .err }}"
-UpdateSuccessful: "¡Actualización finalizada con éxito!"
+UpdateSuccessful: "Actualización finalizada con éxito"
 UpdateUserResult: "Usuario del panel: {{ .name }}"
 UpdatePasswordRead: "Error: Fallo al leer información de la contraseña del panel, {{ .err }}"
-UpdatePasswordNull: "Error: ¡la contraseña del panel está vacía!"
-UpdateUPasswordBlank: "Error: ¡la contraseña del panel contiene espacios!"
-UpdatePasswordFormat: "Error: La contraseña del panel solo admite letras, números y caracteres especiales (!@#$%*_,.?), con una longitud de 8-30."
-UpdatePasswordLen: "Error: ¡Ingrese una contraseña mayor a 6 caracteres!"
+UpdatePasswordNull: "Error: la contraseña del panel está vacía"
+UpdateUPasswordBlank: "Error: la contraseña del panel contiene espacios"
+UpdatePasswordFormat: "Error: La contraseña del panel solo admite letras, números y caracteres especiales (@#$%*_,.?), con una longitud de 8-30."
+UpdatePasswordLen: "Error: Ingrese una contraseña mayor a 6 caracteres"
 UpdatePasswordRe: "Confirmar contraseña:"
 UpdatePasswordErr: "Error: Fallo al actualizar la contraseña del panel, {{ .err }}"
-UpdatePasswordSame: "Error: Las dos contraseñas no coinciden, ¡verifique e intente de nuevo!"
+UpdatePasswordSame: "Error: Las dos contraseñas no coinciden, verifique e intente de nuevo"
 UpdatePasswordResult: "Contraseña del panel: {{ .name }}"
-UpdatePortFormat: "Error: ¡El puerto debe estar entre 1 y 65535!"
-UpdatePortUsed: "Error: ¡El puerto ya está en uso, verifique e intente de nuevo!"
+UpdatePortFormat: "Error: El puerto debe estar entre 1 y 65535"
+UpdatePortUsed: "Error: El puerto ya está en uso, verifique e intente de nuevo"
 UpdatePortErr: "Error: Fallo al actualizar el puerto del panel, {{ .err }}"
 UpdatePortResult: "Puerto del panel: {{ .name }}"
 UpdatePortFirewallAdd: "Fallo al agregar la regla de puerto al firewall, {{ .err }}, agregue manualmente el puerto {{ .name }} al firewall."
