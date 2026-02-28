@@ -1837,7 +1837,7 @@ const message = {
         regionHelper:
             'Different regions use different download sources and related documentation links for app store and script library. Choose as needed.',
         cn: 'China Mainland',
-        intl: 'Overseas',
+        intl: 'Global',
         languageHelper:
             'By default, it follows the browser language. This parameter takes effect only on the current browser',
         sessionTimeout: 'Session timeout',

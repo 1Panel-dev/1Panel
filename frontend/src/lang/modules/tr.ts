@@ -1846,7 +1846,7 @@ const message = {
         regionHelper:
             'Farklı çalışma bölgelerinde uygulama mağazası ve betik kütüphanesi için indirme adresleri ile ilgili dokümantasyon bağlantıları farklı olabilir.',
         cn: 'Çin anakarası',
-        intl: 'Uluslararası',
+        intl: 'Küresel',
         languageHelper:
             'Varsayılan olarak tarayıcı dilini takip eder. Bu parametre yalnızca geçerli tarayıcıda etkilidir',
         sessionTimeout: 'Oturum zaman aşımı',

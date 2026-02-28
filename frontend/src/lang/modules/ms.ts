@@ -1831,7 +1831,7 @@ const message = {
         regionHelper:
             'Wilayah operasi yang berbeza mempunyai alamat muat turun dan pautan dokumentasi berbeza untuk gedung aplikasi serta pustaka skrip.',
         cn: 'Tanah Besar China',
-        intl: 'Antarabangsa',
+        intl: 'Global',
         languageHelper:
             'Secara lalai, ia mengikuti bahasa penyemak imbas. Parameter ini hanya berkuat kuasa pada penyemak imbas semasa',
         sessionTimeout: 'Tempoh tamat sesi',

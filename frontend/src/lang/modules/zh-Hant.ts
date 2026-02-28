@@ -1730,7 +1730,7 @@ const message = {
         region: '運行區域',
         regionHelper: '不同運行區域的應用商店、腳本庫下載地址及相關檔案連結有所差異，請按需選擇',
         cn: '中國大陸',
-        intl: '海外',
+        intl: '全球',
         languageHelper: '預設跟隨瀏覽器語言，設定後只對目前瀏覽器生效，更換瀏覽器後需要重新設定',
         sessionTimeout: '超時時間',
         sessionTimeoutError: '最小超時時間為 300 秒',

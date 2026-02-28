@@ -1833,7 +1833,7 @@ const message = {
         regionHelper:
             'Diferentes regiones tienen distintas direcciones de descarga y enlaces de documentación para la tienda de aplicaciones y la biblioteca de scripts.',
         cn: 'China continental',
-        intl: 'Internacional',
+        intl: 'Global',
         languageHelper:
             'Por defecto sigue el idioma del navegador. Este parámetro solo tiene efecto en el navegador actual',
         sessionTimeout: 'Tiempo de espera de sesión',

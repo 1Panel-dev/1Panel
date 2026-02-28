@@ -155,6 +155,6 @@ func initAlertTask() {
 }
 
 func initMonitorDB() {
-	_ = global.MonitorDB.AutoMigrate(&model.MonitorBase{}, model.MonitorGPU{}, model.MonitorIO{}).Error()
-	_ = global.TaskDB.AutoMigrate(&model.Task{}).Error()
+	_ = global.MonitorDB.AutoMigrate(&model.MonitorBase{}, model.MonitorGPU{}, model.MonitorIO{})
+	_ = global.TaskDB.AutoMigrate(&model.Task{})
 }

@@ -1764,7 +1764,7 @@ const message = {
         regionHelper:
             '운영 지역에 따라 앱 스토어, 스크립트 라이브러리의 다운로드 주소 및 관련 문서 링크가 다를 수 있습니다.',
         cn: '중국 본토',
-        intl: '해외',
+        intl: '글로벌',
         languageHelper: '기본적으로 브라우저 언어를 따릅니다. 이 설정은 현재 브라우저에서만 적용됩니다.',
         sessionTimeout: '세션 타임아웃',
         sessionTimeoutError: '최소 세션 타임아웃은 300초입니다.',

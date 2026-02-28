@@ -1706,7 +1706,7 @@ const message = {
         region: '运行区域',
         regionHelper: '不同运行区域应用商店、脚本库等下载地址及相关文档链接有所区别，请按需选择',
         cn: '中国大陆',
-        intl: '海外',
+        intl: '全球',
         languageHelper: '默认跟随浏览器语言，设置后只对当前浏览器生效，更换浏览器后需要重新设置',
         sessionTimeout: '超时时间',
         sessionTimeoutError: '最小超时时间为 300 秒',
