@@ -23,7 +23,9 @@
         }
         &.is-active {
             background-color: var(--el-menu-item-bg-color-active);
-            border: 2px solid var(--el-color-primary);
+            box-shadow:
+                0px 0px 4px rgba(0, 94, 235, 0.1),
+                inset 0 0 0 2px var(--el-color-primary);
 
             &::before {
                 position: absolute;

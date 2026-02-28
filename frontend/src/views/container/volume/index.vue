@@ -10,7 +10,7 @@
         <LayoutContent v-if="isExist" :title="$t('container.volume', 2)" :class="{ mask: !isActive }">
             <template #leftToolBar>
                 <el-button type="primary" @click="onCreate()">
-                    {{ $t('container.createVolume') }}
+                    {{ $t('commons.button.create') }}
                 </el-button>
                 <el-button type="primary" plain @click="onClean()">
                     {{ $t('container.volumePrune') }}

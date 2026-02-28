@@ -21,7 +21,7 @@
             </template>
             <template v-if="!openNginxConfig && nginxIsExist" #leftToolBar>
                 <el-button type="primary" @click="openCreate" :disabled="disabledConfig">
-                    {{ $t('website.create') }}
+                    {{ $t('commons.button.create') }}
                 </el-button>
                 <el-button type="primary" plain @click="openGroup" :disabled="disabledConfig">
                     {{ $t('commons.table.group') }}

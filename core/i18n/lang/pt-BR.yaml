@@ -142,6 +142,7 @@ SyncBackupAccounts: "Contas de Backup"
 SyncAlertSetting: "Configurações de Alerta"
 SyncCustomApp: "Aplicativo Personalizado"
 SyncLanguage: "Idioma do Sistema"
+SyncEdition: "Região de Operação"
 
 #upgrade node
 NodeUpgrade: "Atualizar nó {{ .name }}"

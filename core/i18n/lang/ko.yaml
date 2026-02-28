@@ -142,6 +142,7 @@ SyncBackupAccounts: "백업 계정"
 SyncAlertSetting: "알림 설정"
 SyncCustomApp: "사용자 정의 앱"
 SyncLanguage: "시스템 언어"
+SyncEdition: "운영 지역"
 
 #upgrade node
 NodeUpgrade: "{{ .name }} 노드 업그레이드"

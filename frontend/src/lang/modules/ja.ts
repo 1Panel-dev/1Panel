@@ -480,7 +480,6 @@ const message = {
         deleteBackupHelper: 'データベースのバックアップを同時に削除します',
         delete: '削除操作はロールバックできません、入力してください」',
         deleteHelper: '「このデータベースを削除します',
-        create: 'データベースを作成します',
         noMysql: 'データベースサービス（mysqlまたはmariadb）',
         noPostgresql: 'データベースサービスpostgreSql',
         goUpgrade: 'アップグレードに移動します',
@@ -494,7 +493,7 @@ const message = {
         permissionAll: 'それらすべて（％）',
         localhostHelper:
             'コンテナ展開でデータベース権限を"localhost"に設定すると、コンテナ外部からのアクセスができなくなります。慎重に選択してください！',
-        databaseConnInfo: '接続情報',
+        databaseConnInfo: '接続',
         rootPassword: 'ルートパスワード',
         serviceName: 'サービス名',
         serviceNameHelper: '同じネットワーク内のコンテナ間のアクセス。',
@@ -668,8 +667,6 @@ const message = {
         agents: {
             agents: 'エージェント',
             agent: 'エージェント',
-            createAgent: 'エージェントを作成',
-            createModelAccount: 'モデルアカウントを作成',
             account: 'モデルアカウント',
             noAccountHint: '既存のモデルアカウントを選択するか、新規に追加してください。',
             accountCount: 'モデルアカウント {0} 件',
@@ -793,8 +790,6 @@ const message = {
         },
         mcp: {
             server: 'MCP サーバー',
-            create: 'サーバーを追加',
-            edit: 'サーバーを編集',
             baseUrl: '外部アクセスパス',
             baseUrlHelper: '例: http://192.168.1.2:8000',
             ssePath: 'SSE パス',
@@ -830,8 +825,10 @@ const message = {
         },
     },
     container: {
-        create: 'コンテナを作成します',
-        edit: 'コンテナを編集します',
+        createByCommand: 'コマンドで作成',
+        commandInput: 'コマンド入力',
+        commandRule: 'コンテナ作成用の正しい docker run コマンドを入力してください。',
+        commandHelper: 'このコマンドはサーバー上で実行され、コンテナを作成します。続行しますか？',
         updateHelper1: 'このコンテナがアプリストアから取得されたことを検出しました。以下の2点にご注意ください:',
         updateHelper2: '1.現在の変更内容は、アプリストアにインストールされているアプリケーションには同期されません。',
         updateHelper3:
@@ -1019,7 +1016,6 @@ const message = {
         network: 'ネットワーク|ネットワーク',
         networkHelper:
             'これにより、一部のアプリケーションとランタイム環境が適切に機能しない場合があります。続けたいですか？',
-        createNetwork: '作成する',
         networkName: '名前',
         driver: 'ドライバ',
         option: 'オプション',
@@ -1037,10 +1033,8 @@ const message = {
         mountpoint: 'マウントポイント',
         mountpointNFSHelper: '例えば/nfs、 /nfs-sh',
         options: 'オプション',
-        createVolume: '作成する',
 
         repo: 'レジストリ',
-        createRepo: '追加',
         httpRepoHelper: 'HTTPタイプのリポジトリを操作するにはDockerサービスの再起動が必要です。',
         httpRepo:
             'HTTPプロトコルを選択するには、Dockerサービスを再起動して不安定なレジストリに追加する必要があります。',
@@ -1064,11 +1058,9 @@ const message = {
         deleteComposeHelper:
             '構成ファイルや永続的なファイルを含む、コンテナに関連するすべてのファイルを削除します。注意して進めてください！',
         deleteCompose: 'この構成を削除します。',
-        createCompose: '作成する',
         composeDirectory: 'ディレクトリ',
         template: 'テンプレート',
         composeTemplate: 'テンプレートを作成|テンプレートを作成します',
-        createComposeTemplate: '作成する',
         content: 'コンテンツ',
         contentEmpty: 'コンテンツを空にすることはできません。入力して再試行してください！',
         containerNumber: 'コンテナ番号',
@@ -1135,8 +1127,6 @@ const message = {
         finishTime: '前回の停止時間',
     },
     cronjob: {
-        create: 'Cronジョブを作成します',
-        edit: 'Cronジョブを編集します',
         importHelper:
             'インポート時に同名のスケジュールタスクは自動的にスキップされます。タスクはデフォルトで【無効】状態に設定され、データ関連付け異常時には【編集待ち】状態に設定されます。',
         changeStatus: 'ステータスを変更します',
@@ -1740,7 +1730,7 @@ const message = {
         acceptHelper:
             '次のアドレスで「受け入れる」操作を実行します。設定後、IPは通常のアクセスを取り戻します。続けたいですか？',
         noAddrWarning: '[{0}]アドレスは現在選択されていません。チェックしてもう一度やり直してください！',
-        loginLogs: 'ログインログ',
+        loginLogs: 'SSHログ',
         loginMode: 'モード',
         authenticating: '鍵',
         publickey: '鍵',
@@ -2003,7 +1993,7 @@ const message = {
             '承認されたIPアドレスリストを設定した後、リスト内のIPアドレスのみがパネルサービスにアクセスできます。続けたいですか？',
         allowIPsHelper1: `IPアドレスの制限を無効にするために空白のままにします。`,
         allowIPEgs: '1行に1つ。たとえば、 \n172.16.10.111  \n172.16.10.0/24',
-        mfa: '二因子認証（2FA）',
+        mfa: '二段階認証',
         mfaClose: 'MFAを無効にすると、サービスのセキュリティが減少します。続けたいですか？',
         secret: '秘密',
         mfaInterval: '間隔を更新する',
@@ -2106,8 +2096,6 @@ const message = {
         compress: 'スナップショットファイルを作成します',
         upload: 'スナップショットファイルをアップロードします',
         recoverDetail: '詳細を回復します',
-        createSnapshot: 'スナップショットを作成します',
-        importSnapshot: 'スナップショットを同期します',
         lastRecoverAt: '最後の回復時間',
         lastRollbackAt: '最後のロールバック時間',
         reDownload: 'バックアップファイルをもう一度ダウンロードしてください',
@@ -2186,7 +2174,7 @@ const message = {
             '強制的にバインド解除を行うと、解除プロセス中に発生するエラーを無視し、最終的にライセンスのバインドを解除します。',
         updateForce: '強制更新（アンバインド中のすべてのエラーを無視し、最終操作の成功を保証します）',
         trialInfo: 'バージョン',
-        authorizationId: 'サブスクリプション承認ID',
+        authorizationId: 'サブスクリプションID',
         authorizedUser: '認定ユーザー',
         lostHelper:
             'ライセンスは、再試行の最大数に達しました。プロのバージョン機能が適切に機能していることを確認するには、手動で同期ボタンをクリックしてください。세부사항: ',
@@ -2430,7 +2418,6 @@ const message = {
         createGroup: 'グループを作成します',
         appNew: '新しいアプリケーション',
         appInstalled: 'インストールされたアプリケーション',
-        create: 'Webサイトを作成します',
         delete: 'Webサイトを削除します',
         deleteApp: 'アプリケーションを削除します',
         deleteBackup: 'バックアップを削除します',
@@ -3065,7 +3052,6 @@ const message = {
     runtime: {
         runtime: 'ランタイム',
         workDir: '作業ディレクトリ',
-        create: 'ランタイムを作成します',
         localHelper:
             'ローカル環境のインストールおよびオフライン環境の使用に関する問題については、以下を参照してください ',
         versionHelper: 'PHPバージョン、例えばv8.0',

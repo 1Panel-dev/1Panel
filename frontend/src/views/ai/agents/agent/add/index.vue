@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('aiTools.agents.createAgent')" size="large" @close="handleClose">
+    <DrawerPro v-model="open" :header="$t('commons.button.create')" size="large" @close="handleClose">
         <el-form ref="formRef" :model="form" :rules="rules" label-position="top">
             <el-card class="form-card">
                 <el-form-item :label="$t('commons.table.name')" prop="name">
@@ -47,7 +47,7 @@
                     <span class="input-help">
                         {{ $t('aiTools.agents.noAccountHint') }}
                         <el-button type="primary" link class="inline-link" @click="openAccountCreate">
-                            {{ $t('aiTools.agents.createModelAccount') }}
+                            {{ $t('commons.button.create') }}
                         </el-button>
                     </span>
                 </el-form-item>

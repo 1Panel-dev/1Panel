@@ -481,7 +481,6 @@ const message = {
         deleteBackupHelper: '데이터베이스 백업을 동시에 삭제',
         delete: '삭제 작업은 되돌릴 수 없습니다. 삭제하려면 "',
         deleteHelper: '"를 입력하세요.',
-        create: '데이터베이스 생성',
         noMysql: '데이터베이스 서비스 (MySQL 또는 MariaDB)',
         noPostgresql: '데이터베이스 서비스 PostgreSQL',
         goUpgrade: '업그레이드로 이동',
@@ -495,7 +494,7 @@ const message = {
         permissionAll: '모두(%)',
         localhostHelper:
             '컨테이너 배포 시 데이터베이스 권한을 "localhost"로 설정하면 컨테이너 외부에서 접근할 수 없게 됩니다. 신중하게 선택하세요!',
-        databaseConnInfo: '연결 정보',
+        databaseConnInfo: '연결',
         rootPassword: '루트 비밀번호',
         serviceName: '서비스 이름',
         serviceNameHelper: '같은 네트워크 내 컨테이너 간의 접근.',
@@ -663,8 +662,6 @@ const message = {
         agents: {
             agents: '에이전트',
             agent: '에이전트',
-            createAgent: '에이전트 생성',
-            createModelAccount: '모델 계정 생성',
             account: '모델 계정',
             noAccountHint: '기존 모델 계정을 선택하거나 새로 추가하세요.',
             accountCount: '모델 계정 {0}개',
@@ -787,8 +784,6 @@ const message = {
         },
         mcp: {
             server: 'MCP サーバー',
-            create: 'サーバーを追加',
-            edit: 'サーバーを編集',
             baseUrl: '外部アクセスパス',
             baseUrlHelper: '例: http://192.168.1.2:8000',
             ssePath: 'SSE パス',
@@ -822,8 +817,10 @@ const message = {
         },
     },
     container: {
-        create: '컨테이너 만들기',
-        edit: '컨테이너 편집',
+        createByCommand: '명령으로 생성',
+        commandInput: '명령 입력',
+        commandRule: '컨테이너 생성을 위한 올바른 docker run 명령을 입력하세요.',
+        commandHelper: '이 명령은 서버에서 실행되어 컨테이너를 생성합니다. 계속하시겠습니까?',
         updateHelper1: '이 컨테이너가 앱 스토어에서 왔음을 감지했습니다. 다음 두 가지 사항을 유의하십시오:',
         updateHelper2: '1. 현재 수정 사항은 앱 스토어에 설치된 애플리케이션에 동기화되지 않습니다.',
         updateHelper3: '2. 설치된 페이지에서 애플리케이션을 수정하면 현재 편집된 내용이 무효화됩니다.',
@@ -1004,7 +1001,6 @@ const message = {
 
         network: '네트워크 | 네트워크들',
         networkHelper: '이로 인해 일부 애플리케이션과 실행 환경이 제대로 작동하지 않을 수 있습니다. 계속 하시겠습니까?',
-        createNetwork: '생성',
         networkName: '이름',
         driver: '드라이버',
         option: '옵션',
@@ -1022,10 +1018,8 @@ const message = {
         mountpoint: '마운트 지점',
         mountpointNFSHelper: '예: /nfs, /nfs-share',
         options: '옵션',
-        createVolume: '생성',
 
         repo: '레지스트리',
-        createRepo: '추가',
         httpRepoHelper: 'HTTP 타입 저장소 작업 시 Docker 서비스 재시작이 필요합니다.',
         httpRepo: 'HTTP 프로토콜을 선택하면 Docker 서비스를 재시작하여 불안정한 레지스트리에 추가해야 합니다.',
         delInsecure: '신뢰할 수 없는 항목 삭제',
@@ -1049,11 +1043,9 @@ const message = {
         deleteComposeHelper:
             '이 작업은 컴포즈와 관련된 모든 파일을 삭제합니다. 구성을 포함한 지속적인 파일도 포함됩니다. 신중히 진행해 주세요!',
         deleteCompose: '" 이 컴포즈를 삭제하시겠습니까?',
-        createCompose: '생성',
         composeDirectory: '디렉토리',
         template: '템플릿',
         composeTemplate: '컴포즈 템플릿 | 컴포즈 템플릿들',
-        createComposeTemplate: '생성',
         content: '내용',
         contentEmpty: '컴포즈 내용이 비어 있습니다. 입력 후 다시 시도해 주세요!',
         containerNumber: '컨테이너 수',
@@ -1119,8 +1111,6 @@ const message = {
         finishTime: '마지막 중지 시간',
     },
     cronjob: {
-        create: '크론 작업 생성',
-        edit: '크론 작업 수정',
         importHelper:
             '가져오기 시 동일한 이름의 예약 작업은 자동으로 건너뜁니다. 작업은 기본적으로 【비활성화】 상태로 설정되며, 데이터 연동 이상 시 【편집 대기】 상태로 설정됩니다.',
         changeStatus: '상태 변경',
@@ -1716,7 +1706,7 @@ const message = {
         acceptHelper:
             "'수락' 작업을 다음 주소에서 수행합니다. 설정 후 해당 IP는 정상적으로 접근할 수 있습니다. 계속하시겠습니까?",
         noAddrWarning: '현재 [{0}] 주소가 선택되지 않았습니다. 확인 후 다시 시도하십시오!',
-        loginLogs: '로그인 로그',
+        loginLogs: 'SSH 로그',
         loginMode: '모드',
         authenticating: '키',
         publickey: '키',
@@ -1971,7 +1961,7 @@ const message = {
             '허가된 IP 주소 목록을 설정하면 목록에 있는 IP 주소만 패널 서비스에 접근할 수 있습니다. 계속하시겠습니까?',
         allowIPsHelper1: '공백으로 남기면 IP 주소 제한이 비활성화됩니다.',
         allowIPEgs: '한 줄에 하나씩 입력하십시오. 예:\n172.16.10.111\n172.16.10.0/24',
-        mfa: '2단계 인증 (2FA)',
+        mfa: '2단계 인증',
         mfaClose: 'MFA를 비활성화하면 서비스 보안이 낮아집니다. 계속하시겠습니까?',
         secret: '비밀키',
         mfaInterval: '갱신 간격(초)',
@@ -2071,8 +2061,6 @@ const message = {
         compress: '스냅샷 파일 생성',
         upload: '스냅샷 파일 업로드',
         recoverDetail: '복구 세부정보',
-        createSnapshot: '스냅샷 생성',
-        importSnapshot: '스냅샷 동기화',
         importHelper: '스냅샷 디렉토리: ',
         lastRecoverAt: '마지막 복구 시간',
         lastRollbackAt: '마지막 롤백 시간',
@@ -2149,7 +2137,7 @@ const message = {
             '강제 바인딩 해제를 수행하면 해제 과정에서 발생하는 오류를 무시하고 궁극적으로 라이센스 바인딩을 해제합니다.',
         updateForce: '강제 업데이트 (바인딩 해제 과정의 모든 오류를 무시하고 최종 작업 성공을 보장합니다)',
         trialInfo: '버전',
-        authorizationId: '구독 인증 ID',
+        authorizationId: '구독 ID',
         authorizedUser: '인증된 사용자',
         lostHelper:
             '라이센스가 최대 재시도 횟수를 초과했습니다. 전문가 버전 기능이 제대로 작동하는지 확인하려면 동기화 버튼을 수동으로 클릭하세요.',
@@ -2388,7 +2376,6 @@ const message = {
         createGroup: '그룹 생성',
         appNew: '새로운 애플리케이션',
         appInstalled: '설치된 애플리케이션',
-        create: '생성',
         delete: '웹사이트 삭제',
         deleteApp: '애플리케이션 삭제',
         deleteBackup: '백업 삭제',
@@ -3009,7 +2996,6 @@ const message = {
     runtime: {
         runtime: '실행 환경',
         workDir: '작업 디렉토리',
-        create: '실행 환경 생성',
         localHelper: '로컬 환경 설치 및 오프라인 환경 사용 관련 문제는 다음을 참조하세요 ',
         versionHelper: 'PHP 버전, 예: v8.0',
         buildHelper:

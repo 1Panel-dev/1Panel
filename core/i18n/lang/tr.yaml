@@ -141,6 +141,7 @@ SyncBackupAccounts: "Yedek Hesaplar"
 SyncAlertSetting: "Uyarı Ayarları"
 SyncCustomApp: "Özel Uygulama"
 SyncLanguage: "Sistem Dili"
+SyncEdition: "Çalışma Bölgesi"
 
 #upgrade node
 NodeUpgrade: "Düğümü yükselt {{ .name }}"

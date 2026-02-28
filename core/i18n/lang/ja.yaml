@@ -143,6 +143,7 @@ SyncBackupAccounts: "バックアップアカウント"
 SyncAlertSetting: "アラート設定"
 SyncCustomApp: "カスタムアプリ"
 SyncLanguage: "システム言語"
+SyncEdition: "実行リージョン"
 
 #upgrade node
 NodeUpgrade: "{{ .name }} ノードのアップグレード"

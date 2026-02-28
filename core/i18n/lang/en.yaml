@@ -148,6 +148,7 @@ SyncBackupAccounts: "Backup Accounts"
 SyncAlertSetting: "Alert Settings"
 SyncCustomApp: "Custom App"
 SyncLanguage: "System Language"
+SyncEdition: "Region"
 
 #upgrade node
 NodeUpgrade: "Upgrade node {{ .name }}"

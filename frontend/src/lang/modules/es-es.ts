@@ -493,7 +493,6 @@ const message = {
         deleteBackupHelper: 'Eliminar copias de seguridad de la base de datos simultáneamente',
         delete: 'La operación de eliminación no se puede revertir, por favor introduzca "',
         deleteHelper: '" para eliminar esta base de datos',
-        create: 'Crear base de datos',
         noMysql: 'Servicio de base de datos (MySQL o MariaDB)',
         noPostgresql: 'Servicio de base de datos PostgreSQL',
         goUpgrade: 'Ir a actualizar',
@@ -507,7 +506,7 @@ const message = {
         permissionAll: 'Todos (%)',
         localhostHelper:
             'Configurar los permisos de la base de datos como "localhost" para el despliegue en contenedores impedirá el acceso externo al contenedor. ¡Por favor elija cuidadosamente!',
-        databaseConnInfo: 'Ver información de conexión',
+        databaseConnInfo: 'Conexión',
         rootPassword: 'Contraseña root',
         serviceName: 'Nombre del servicio',
         serviceNameHelper: 'Acceso entre contenedores en la misma red.',
@@ -676,8 +675,6 @@ const message = {
         agents: {
             agents: 'Agentes',
             agent: 'Agente',
-            createAgent: 'Crear agente',
-            createModelAccount: 'Crear cuenta de modelo',
             account: 'Cuenta de modelo',
             noAccountHint: 'Selecciona una cuenta de modelo existente o agrega una nueva.',
             accountCount: '{0} cuentas de modelo',
@@ -804,8 +801,6 @@ const message = {
         },
         mcp: {
             server: 'Servidor MCP',
-            create: 'Agregar servidor MCP',
-            edit: 'Editar servidor MCP',
             baseUrl: 'Ruta de acceso externa',
             baseUrlHelper: 'Por ejemplo: http://192.168.1.2:8000',
             ssePath: 'Ruta SSE',
@@ -842,12 +837,10 @@ const message = {
         },
     },
     container: {
-        create: 'Crear',
         createByCommand: 'Crear por comando',
         commandInput: 'Introducir comando',
         commandRule: 'Por favor introduzca el comando correcto para crear el contenedor con docker run.',
         commandHelper: 'Este comando se ejecutará en el servidor para crear el contenedor. ¿Desea continuar?',
-        edit: 'Editar contenedor',
         updateHelper1:
             'Se detectó que este contenedor proviene de la tienda de aplicaciones. Tenga en cuenta lo siguiente:',
         updateHelper2:
@@ -1044,7 +1037,6 @@ const message = {
         network: 'Red | Redes',
         networkHelper:
             'Esto puede causar que algunas aplicaciones o entornos no funcionen correctamente. ¿Desea continuar?',
-        createNetwork: 'Crear',
         networkName: 'Nombre',
         driver: 'Driver',
         option: 'Opción',
@@ -1061,9 +1053,7 @@ const message = {
         mountpoint: 'Punto de montaje',
         mountpointNFSHelper: 'ej: /nfs, /nfs-share',
         options: 'Opciones',
-        createVolume: 'Crear',
         repo: 'Repositorio de contenedores | Repositorios de contenedores',
-        createRepo: 'Agregar',
         httpRepoHelper: 'Operar un repositorio tipo HTTP requiere reiniciar el servicio Docker.',
         httpRepo:
             'Elegir el protocolo HTTP requiere reiniciar el servicio Docker para agregarlo a los registros inseguros.',
@@ -1089,11 +1079,9 @@ const message = {
         deleteComposeHelper:
             'Elimina todos los archivos relacionados con la composición de contenedores, incluidos los archivos de configuración y los persistentes. ¡Proceda con precaución!',
         deleteCompose: '" Eliminar esta composición.',
-        createCompose: 'Crear',
         composeDirectory: 'Directorio de compose',
         template: 'Plantilla',
         composeTemplate: 'Plantilla de compose | Plantillas de compose',
-        createComposeTemplate: 'Crear',
         content: 'Contenido',
         contentEmpty: 'El contenido de Compose no puede estar vacío, por favor introduzca algo y vuelva a intentarlo.',
         containerNumber: 'Número de contenedores',
@@ -1162,8 +1150,6 @@ const message = {
         finishTime: 'Hora de la última detención',
     },
     cronjob: {
-        create: 'Crear tarea programada',
-        edit: 'Editar tarea programada',
         importHelper:
             'Las tareas programadas duplicadas se omitirán automáticamente durante la importación. Las tareas se establecerán en estado [Deshabilitado] por defecto, y en estado [Pendiente de edición] cuando la asociación de datos sea anormal.',
         changeStatus: 'Cambiar estado',
@@ -1783,7 +1769,7 @@ const message = {
             "Se realizará una operación de 'aceptar' sobre las siguientes direcciones. Tras la configuración, la IP recuperará el acceso normal. ¿Desea continuar?",
         noAddrWarning:
             'Actualmente no se han seleccionado direcciones [{0}]. ¡Por favor verifique e inténtelo de nuevo!',
-        loginLogs: 'Registros de inicio de sesión',
+        loginLogs: 'Registros de SSH',
         loginMode: 'Modo',
         authenticating: 'Clave',
         publickey: 'Clave',
@@ -2080,7 +2066,7 @@ const message = {
             'Tras configurar la lista de IP autorizadas, solo las IP en la lista podrán acceder al panel. ¿Deseas continuar?',
         allowIPsHelper1: 'Déjalo en blanco para desactivar la restricción por IP.',
         allowIPEgs: 'Una por línea. Por ejemplo,\n172.16.10.111\n172.16.10.0/24',
-        mfa: 'Autenticación en dos pasos (2FA)',
+        mfa: 'Autenticación en Dos Pasos',
         mfaClose: 'Desactivar MFA reducirá la seguridad del servicio. ¿Deseas continuar?',
         secret: 'Secreto',
         mfaInterval: 'Intervalo de refresco',
@@ -2183,8 +2169,6 @@ const message = {
         compress: 'Crear archivo de instantánea',
         upload: 'Subir archivo de instantánea',
         recoverDetail: 'Detalle de recuperación',
-        createSnapshot: 'Crear instantánea',
-        importSnapshot: 'Sincronizar instantánea',
         importHelper: 'Directorio de instantánea: ',
         lastRecoverAt: 'Última hora de recuperación',
         lastRollbackAt: 'Última hora de reversión',
@@ -2504,7 +2488,6 @@ const message = {
         createGroup: 'Crear grupo',
         appNew: 'Nueva aplicación',
         appInstalled: 'Aplicación instalada',
-        create: 'Crear',
         delete: 'Eliminar sitio',
         deleteApp: 'Eliminar aplicación',
         deleteBackup: 'Eliminar copia de seguridad',
@@ -3118,7 +3101,6 @@ const message = {
     runtime: {
         runtime: 'Runtime',
         workDir: 'Directorio de trabajo',
-        create: 'Crear',
         localHelper: 'Para problemas de instalación en entorno local y uso en entorno sin conexión, consulte ',
         versionHelper: 'Versión de PHP, ej. v8.0',
         buildHelper: `Si se seleccionan más extensiones, el uso de CPU será mayor durante el proceso de creación de la imagen. Evita seleccionar todas las extensiones.`,

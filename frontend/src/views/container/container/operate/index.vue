@@ -2,7 +2,7 @@
     <div>
         <LayoutContent
             back-name="ContainerItem"
-            :title="isCreate ? $t('container.create') : $t('commons.button.edit') + ' - ' + form.name"
+            :title="isCreate ? $t('commons.button.create') : $t('commons.button.edit') + ' - ' + form.name"
         >
             <template #main>
                 <el-form

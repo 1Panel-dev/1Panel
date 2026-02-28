@@ -5,7 +5,7 @@
         <LayoutContent v-loading="loading" v-if="isExist" :class="{ mask: !isActive }">
             <template #leftToolBar>
                 <el-button type="primary" @click="openCreate">
-                    {{ $t('runtime.create') }}
+                    {{ $t('commons.button.create') }}
                 </el-button>
 
                 <el-button type="primary" plain @click="openExtensions">
@@ -43,7 +43,7 @@
                             </el-text>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('home.dir')" prop="codeDir" width="80px">
+                    <el-table-column :label="$t('home.dir')" prop="codeDir" width="90px">
                         <template #default="{ row }">
                             <el-button type="primary" link @click="routerToFileWithPath(row.path)">
                                 <el-icon>

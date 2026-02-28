@@ -30,7 +30,7 @@
                     type="primary"
                     @click="onOpenDialog()"
                 >
-                    {{ $t('database.create') }}
+                    {{ $t('commons.button.create') }}
                 </el-button>
                 <el-button v-if="currentDB" @click="onChangeConn()" type="primary" plain>
                     {{ $t('database.databaseConnInfo') }}

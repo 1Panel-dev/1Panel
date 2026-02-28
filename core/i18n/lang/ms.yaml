@@ -137,6 +137,7 @@ SyncBackupAccounts: "Akaun Sandaran"
 SyncAlertSetting: "Tetapan Amaran"
 SyncCustomApp: "Aplikasi Tersuai"
 SyncLanguage: "Bahasa Sistem"
+SyncEdition: "Wilayah Operasi"
 
 #upgrade node
 NodeUpgrade: "Naik taraf node {{ .name }}"

@@ -143,7 +143,7 @@ SyncBackupAccounts: "備份帳號"
 SyncAlertSetting: "告警設定"
 SyncCustomApp: "自訂應用"
 SyncLanguage: "系統語言"
-
+SyncEdition: "運行區域"
 
 #upgrade node
 NodeUpgrade: "升級節點 {{ .name }}"

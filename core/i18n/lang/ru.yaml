@@ -141,6 +141,7 @@ SyncBackupAccounts: "Резервные аккаунты"
 SyncAlertSetting: "Настройки оповещений"
 SyncCustomApp: "Пользовательское приложение"
 SyncLanguage: "Язык системы"
+SyncEdition: "Регион работы"
 
 #upgrade node
 NodeUpgrade: "Обновление узла {{ .name }}"

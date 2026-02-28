@@ -486,7 +486,6 @@ const message = {
         deleteBackupHelper: 'Excluir backups do banco de dados simultaneamente',
         delete: 'A operação de exclusão não pode ser desfeita, insira "',
         deleteHelper: '" para excluir este banco de dados',
-        create: 'Criar banco de dados',
         noMysql: 'Serviço de banco de dados (MySQL ou MariaDB)',
         noPostgresql: 'Serviço de banco de dados PostgreSQL',
         goUpgrade: 'Ir para atualização',
@@ -500,7 +499,7 @@ const message = {
         permissionAll: 'Todos (% de)',
         localhostHelper:
             'Configurar permissões de banco de dados como "localhost" para implantação em contêiner impedirá o acesso externo ao contêiner. Por favor, escolha com cuidado!',
-        databaseConnInfo: 'Informações de conexão',
+        databaseConnInfo: 'Conexão',
         rootPassword: 'Senha root',
         serviceName: 'Nome do serviço',
         serviceNameHelper: 'Acesso entre containers na mesma rede.',
@@ -676,8 +675,6 @@ const message = {
         agents: {
             agents: 'Agentes',
             agent: 'Agente',
-            createAgent: 'Criar agente',
-            createModelAccount: 'Criar conta de modelo',
             account: 'Conta de modelo',
             noAccountHint: 'Selecione uma conta de modelo existente ou adicione uma nova.',
             accountCount: '{0} contas de modelo',
@@ -801,8 +798,6 @@ const message = {
         },
         mcp: {
             server: 'Servidor MCP',
-            create: 'Adicionar Servidor',
-            edit: 'Editar Servidor',
             baseUrl: 'Caminho de Acesso Externo',
             baseUrlHelper: 'Por exemplo: http://192.168.1.2:8000',
             ssePath: 'Caminho SSE',
@@ -838,8 +833,10 @@ const message = {
         },
     },
     container: {
-        create: 'Criar contêiner',
-        edit: 'Editar contêiner',
+        createByCommand: 'Criar por comando',
+        commandInput: 'Entrada de comando',
+        commandRule: 'Insira um comando docker run válido para criar o contêiner.',
+        commandHelper: 'Este comando será executado no servidor para criar o contêiner. Continuar?',
         updateHelper1: 'Detectamos que este contêiner vem da loja de aplicativos. Observe os seguintes dois pontos:',
         updateHelper2:
             '1. As modificações atuais não serão sincronizadas com os aplicativos instalados na loja de aplicativos.',
@@ -1029,7 +1026,6 @@ const message = {
         network: 'Rede | Redes',
         networkHelper:
             'Isso pode fazer com que alguns aplicativos e ambientes de execução não funcionem corretamente. Deseja continuar?',
-        createNetwork: 'Criar',
         networkName: 'Nome',
         driver: 'Driver',
         option: 'Opção',
@@ -1047,10 +1043,8 @@ const message = {
         mountpoint: 'Ponto de montagem',
         mountpointNFSHelper: 'Exemplo: /nfs, /nfs-share',
         options: 'Opções',
-        createVolume: 'Criar',
 
         repo: 'Registries',
-        createRepo: 'Adicionar',
         httpRepoHelper: 'Operar um repositório do tipo HTTP requer reinicialização do serviço Docker.',
         httpRepo:
             'Escolher o protocolo HTTP requer reiniciar o serviço Docker para adicioná-lo a registries inseguros.',
@@ -1076,11 +1070,9 @@ const message = {
         deleteComposeHelper:
             'Excluir todos os arquivos relacionados à composição do container, incluindo arquivos de configuração e arquivos persistentes. Prossiga com cautela!',
         deleteCompose: 'Excluir esta composição.',
-        createCompose: 'Criar',
         composeDirectory: 'Diretório',
         template: 'Template',
         composeTemplate: 'Template de composição | Templates de composição',
-        createComposeTemplate: 'Criar',
         content: 'Conteúdo',
         contentEmpty: 'O conteúdo da composição não pode estar vazio, por favor, insira algo e tente novamente!',
         containerNumber: 'Número de containers',
@@ -1151,8 +1143,6 @@ const message = {
         finishTime: 'Horário da última parada',
     },
     cronjob: {
-        create: 'Criar tarefa cron',
-        edit: 'Editar tarefa cron',
         importHelper:
             'Tarefas agendadas duplicadas serão automaticamente ignoradas durante a importação. As tarefas serão definidas como status 【Desativado】 por padrão, e como status 【Aguardando Edição】 quando a associação de dados for anormal.',
         changeStatus: 'Alterar status',
@@ -1772,7 +1762,7 @@ const message = {
         acceptHelper:
             "Realizando uma operação de 'aceitar' nos seguintes endereços. Após a configuração, o IP recuperará o acesso normal. Você deseja continuar?",
         noAddrWarning: 'Nenhum endereço [{0}] foi selecionado atualmente. Por favor, verifique e tente novamente!',
-        loginLogs: 'Logs de login',
+        loginLogs: 'Logs de SSH',
         loginMode: 'Modo',
         authenticating: 'Chave',
         publickey: 'Chave',
@@ -2047,7 +2037,7 @@ const message = {
             'Após definir a lista de IPs autorizados, somente os IPs da lista poderão acessar o serviço do painel. Você deseja continuar?',
         allowIPsHelper1: 'Deixe em branco para desabilitar a restrição de IP.',
         allowIPEgs: 'Um por linha. Por exemplo,\n172.16.10.111\n172.16.10.0/24',
-        mfa: 'Autenticação de dois fatores (2FA)',
+        mfa: 'Autenticação em Dois Fatores',
         mfaClose: 'Desabilitar MFA reduzirá a segurança do serviço. Você deseja continuar?',
         secret: 'Segredo',
         mfaInterval: 'Intervalo de atualização (s)',
@@ -2152,8 +2142,6 @@ const message = {
         compress: 'Criar arquivo de snapshot',
         upload: 'Fazer upload do arquivo de snapshot',
         recoverDetail: 'Detalhes da recuperação',
-        createSnapshot: 'Criar snapshot',
-        importSnapshot: 'Sincronizar snapshot',
         importHelper: 'Diretório do snapshot: ',
         lastRecoverAt: 'Última recuperação realizada',
         lastRollbackAt: 'Último rollback realizado',
@@ -2238,7 +2226,7 @@ const message = {
         updateForce:
             'Atualização forçada (ignora todos os erros durante o desvinculamento para garantir o sucesso da operação final)',
         trialInfo: 'Versão',
-        authorizationId: 'ID de autorização',
+        authorizationId: 'ID da Assinatura',
         authorizedUser: 'Usuário autorizado',
         lostHelper:
             'A licença atingiu o número máximo de tentativas de reenvio. Por favor, clique manualmente no botão de sincronização para garantir que os recursos da versão profissional estão funcionando corretamente. detalhes: ',
@@ -2487,7 +2475,6 @@ const message = {
         createGroup: 'Criar grupo',
         appNew: 'Novo Aplicativo',
         appInstalled: 'Aplicativo instalado',
-        create: 'Criar site',
         delete: 'Excluir site',
         deleteApp: 'Excluir Aplicativo',
         deleteBackup: 'Excluir Backup',
@@ -3134,7 +3121,6 @@ const message = {
     runtime: {
         runtime: 'Runtime',
         workDir: 'Diretório de trabalho',
-        create: 'Criar runtime',
         localHelper: 'Para problemas de instalação em ambiente local e uso em ambiente offline, consulte ',
         versionHelper: 'Versão do PHP, por exemplo, v8.0',
         buildHelper:

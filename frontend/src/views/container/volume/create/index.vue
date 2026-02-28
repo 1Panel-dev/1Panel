@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="drawerVisible" :header="$t('container.createVolume')" @close="handleClose" size="small">
+    <DrawerPro v-model="drawerVisible" :header="$t('commons.button.create')" @close="handleClose" size="small">
         <el-form
             ref="formRef"
             v-loading="loading"

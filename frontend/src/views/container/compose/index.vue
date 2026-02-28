@@ -10,7 +10,7 @@
         <LayoutContent v-if="isExist" :title="$t('container.compose', 2)" :class="{ mask: !isActive }">
             <template #leftToolBar>
                 <el-button type="primary" @click="onOpenDialog()">
-                    {{ $t('container.createCompose') }}
+                    {{ $t('commons.button.create') }}
                 </el-button>
             </template>
             <template #rightToolBar>

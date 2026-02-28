@@ -488,7 +488,6 @@ const message = {
         deleteBackupHelper: 'Padam sandaran pangkalan data secara serentak',
         delete: 'Operasi padam tidak boleh diundurkan, sila masukkan "',
         deleteHelper: '" untuk memadam pangkalan data ini',
-        create: 'Cipta pangkalan data',
         noMysql: 'Perkhidmatan pangkalan data (MySQL atau MariaDB)',
         noPostgresql: 'Perkhidmatan pangkalan data PostgreSQL',
         goUpgrade: 'Pergi tingkatkan',
@@ -502,7 +501,7 @@ const message = {
         permissionAll: 'Kesemuanya(%)',
         localhostHelper:
             'Mengkonfigurasi kebenaran pangkalan data sebagai "localhost" untuk penyebaran kontena akan menghalang akses luar ke kontena. Sila pilih dengan teliti!',
-        databaseConnInfo: 'Maklumat sambungan',
+        databaseConnInfo: 'Sambungan',
         rootPassword: 'Kata laluan root',
         serviceName: 'Nama Perkhidmatan',
         serviceNameHelper: 'Akses antara kontena dalam rangkaian yang sama.',
@@ -679,8 +678,6 @@ const message = {
         agents: {
             agents: 'Agen',
             agent: 'Agen',
-            createAgent: 'Cipta agen',
-            createModelAccount: 'Cipta akaun model',
             account: 'Akaun model',
             noAccountHint: 'Pilih akaun model sedia ada atau tambah yang baharu.',
             accountCount: 'Akaun model {0}',
@@ -806,8 +803,6 @@ const message = {
         },
         mcp: {
             server: 'Pelayan MCP',
-            create: 'Tambah Pelayan',
-            edit: 'Edit Pelayan',
             baseUrl: 'Laluan Akses Luar',
             baseUrlHelper: 'Contoh: http://192.168.1.2:8000',
             ssePath: 'Laluan SSE',
@@ -842,8 +837,10 @@ const message = {
         },
     },
     container: {
-        create: 'Cipta kontena',
-        edit: 'Sunting kontena',
+        createByCommand: 'Cipta melalui perintah',
+        commandInput: 'Input perintah',
+        commandRule: 'Sila masukkan arahan docker run yang sah untuk mencipta kontena.',
+        commandHelper: 'Arahan ini akan dijalankan pada pelayan untuk mencipta kontena. Teruskan?',
         updateHelper1: 'Dikesan bahawa kontena ini berasal dari gedung aplikasi. Sila perhatikan dua perkara berikut:',
         updateHelper2: '1. Pengubahsuaian semasa tidak akan diselaraskan ke aplikasi yang dipasang di gedung aplikasi.',
         updateHelper3:
@@ -1033,7 +1030,6 @@ const message = {
         network: 'Rangkaian | Rangkaian-rangkaian',
         networkHelper:
             'Ini boleh menyebabkan beberapa aplikasi dan persekitaran runtime tidak berfungsi dengan betul. Adakah anda mahu meneruskan?',
-        createNetwork: 'Cipta',
         networkName: 'Nama',
         driver: 'Pemacu',
         option: 'Pilihan',
@@ -1051,10 +1047,8 @@ const message = {
         mountpoint: 'Titik pemasangan',
         mountpointNFSHelper: 'contoh: /nfs, /nfs-share',
         options: 'Pilihan',
-        createVolume: 'Cipta',
 
         repo: 'Pendaftaran',
-        createRepo: 'Tambah',
         httpRepoHelper: 'Mengoperasikan repositori jenis HTTP memerlukan mulakan semula perkhidmatan Docker.',
         httpRepo:
             'Memilih protokol HTTP memerlukan memulakan semula perkhidmatan Docker untuk menambahkannya ke pendaftaran tidak selamat.',
@@ -1080,11 +1074,9 @@ const message = {
         deleteComposeHelper:
             'Padam semua fail berkaitan komposisi kontena, termasuk fail konfigurasi dan fail berterusan. Sila berhati-hati!',
         deleteCompose: 'Padam komposisi ini.',
-        createCompose: 'Cipta',
         composeDirectory: 'Direktori',
         template: 'Templat',
         composeTemplate: 'Templat Compose | Templat Compose',
-        createComposeTemplate: 'Cipta',
         content: 'Kandungan',
         contentEmpty: 'Kandungan Compose tidak boleh kosong, sila masukkan dan cuba lagi!',
         containerNumber: 'Bilangan kontena',
@@ -1153,8 +1145,6 @@ const message = {
         finishTime: 'Masa berhenti terakhir',
     },
     cronjob: {
-        create: 'Cipta tugas cron',
-        edit: 'Edit tugas cron',
         importHelper:
             'Tugas terjadual dengan nama sama akan dilangkau secara automatik semasa import. Tugas akan ditetapkan ke status 【Lumpuh】 secara lalai, dan ditetapkan ke status 【Menunggu Edit】 apabila perkaitan data tidak normal.',
         changeStatus: 'Tukar status',
@@ -1783,7 +1773,7 @@ const message = {
         acceptHelper:
             "Melaksanakan operasi 'terima' pada alamat berikut. Selepas menetapkan, IP akan mendapatkan semula akses normal. Adakah anda mahu meneruskan?",
         noAddrWarning: 'Tiada alamat [{0}] yang dipilih pada masa ini. Sila periksa dan cuba lagi!',
-        loginLogs: 'Log Masuk',
+        loginLogs: 'Log SSH',
         loginMode: 'Mod',
         authenticating: 'Kunci',
         publickey: 'Kunci',
@@ -2060,7 +2050,7 @@ const message = {
             'Selepas anda menetapkan senarai alamat IP yang dibenarkan, hanya alamat IP dalam senarai yang boleh mengakses perkhidmatan panel. Adakah anda mahu meneruskan?',
         allowIPsHelper1: 'Biarkan kosong untuk melumpuhkan sekatan alamat IP.',
         allowIPEgs: 'Satu per baris. Contoh,\n172.16.10.111\n172.16.10.0/24',
-        mfa: 'Pengesahan dua faktor (2FA)',
+        mfa: 'Pengesahan Dua Faktor',
         mfaClose: 'Melumpuhkan MFA akan mengurangkan keselamatan perkhidmatan. Adakah anda mahu meneruskan?',
         secret: 'Rahsia',
         mfaInterval: 'Selang penyegaran (saat)',
@@ -2165,8 +2155,6 @@ const message = {
         compress: 'Cipta fail snapshot',
         upload: 'Muat naik fail snapshot',
         recoverDetail: 'Butiran pemulihan',
-        createSnapshot: 'Cipta snapshot',
-        importSnapshot: 'Segerakkan snapshot',
         recover: 'Pulihkan',
         lastRecoverAt: 'Waktu pemulihan terakhir',
         lastRollbackAt: 'Waktu pemulangan terakhir',
@@ -2246,7 +2234,7 @@ const message = {
             'Memaksa nyahikat akan mengabaikan sebarang ralat yang berlaku semasa proses nyahikat dan akhirnya melepaskan ikatan lesen.',
         updateForce: 'Kemas kini paksa (abaikan semua ralat semasa nyahikatan untuk memastikan operasi akhir berjaya)',
         trialInfo: 'Versi',
-        authorizationId: 'ID Kebenaran Langganan',
+        authorizationId: 'ID Langganan',
         authorizedUser: 'Pengguna yang Dibenarkan',
         lostHelper:
             'Lesen telah mencapai jumlah percubaan semula maksimum. Sila klik butang penyegerakan secara manual untuk memastikan ciri versi profesional berfungsi dengan baik. butiran: ',
@@ -2485,7 +2473,6 @@ const message = {
         createGroup: 'Cipta kumpulan',
         appNew: 'Aplikasi Baru',
         appInstalled: 'Aplikasi yang Dipasang',
-        create: 'Cipta laman web',
         delete: 'Padam Laman Web',
         deleteApp: 'Padam Aplikasi',
         deleteBackup: 'Padam Sandaran',
@@ -3127,7 +3114,6 @@ const message = {
     runtime: {
         runtime: 'Runtime',
         workDir: 'Direktori kerja',
-        create: 'Cipta runtime',
         localHelper:
             'Untuk masalah pemasangan persekitaran tempatan dan penggunaan persekitaran luar talian, sila rujuk ',
         versionHelper: 'Versi PHP, contohnya v8.0',

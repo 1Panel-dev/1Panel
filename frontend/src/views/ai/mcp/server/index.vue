@@ -5,7 +5,7 @@
             <template #leftToolBar>
                 <div class="flex flex-wrap gap-3">
                     <el-button type="primary" @click="openCreate">
-                        {{ $t('aiTools.mcp.create') }}
+                        {{ $t('commons.button.create') }}
                     </el-button>
                     <el-button type="primary" plain @click="openDomain">
                         {{ $t('aiTools.mcp.bindDomain') }}

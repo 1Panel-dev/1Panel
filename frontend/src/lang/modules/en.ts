@@ -493,7 +493,6 @@ const message = {
         deleteBackupHelper: 'Delete database backups simultaneously',
         delete: 'Delete action cannot be undone, please input "',
         deleteHelper: '" to delete this database',
-        create: 'Create database',
         noMysql: 'Database service (MySQL or MariaDB)',
         noPostgresql: 'Database service PostgreSQL',
         goUpgrade: 'Go to upgrade',
@@ -507,7 +506,7 @@ const message = {
         permissionAll: 'All (%)',
         localhostHelper:
             'Configuring database permissions as "localhost" for container deployment will prevent external access to the container. Please choose carefully!',
-        databaseConnInfo: 'View connection info',
+        databaseConnInfo: 'Connection',
         rootPassword: 'Root password',
         serviceName: 'Service name',
         serviceNameHelper: 'Access between containers in the same network.',
@@ -680,8 +679,6 @@ const message = {
         agents: {
             agents: 'Agents',
             agent: 'Agent',
-            createAgent: 'Create Agent',
-            createModelAccount: 'Create model account',
             account: 'Model Account',
             noAccountHint: 'Choose an existing model account or add a new one.',
             accountCount: '{0} model accounts',
@@ -806,8 +803,6 @@ const message = {
         },
         mcp: {
             server: 'MCP Server',
-            create: 'Add MCP Server',
-            edit: 'Edit MCP Server',
             baseUrl: 'External Access Path',
             baseUrlHelper: 'For example: http://192.168.1.2:8000',
             ssePath: 'SSE Path',
@@ -843,12 +838,10 @@ const message = {
         },
     },
     container: {
-        create: 'Create',
         createByCommand: 'Create by command',
         commandInput: 'Command input',
         commandRule: 'Enter the correct docker run container creation command!',
         commandHelper: 'This command will run on the server to create the container. Continue?',
-        edit: 'Edit container',
         updateHelper1: 'Detected that this container comes from the app store. Please note the following two points:',
         updateHelper2:
             '1. The current modifications will not be synchronized to the installed applications in the app store.',
@@ -1038,7 +1031,6 @@ const message = {
 
         network: 'Network | Networks',
         networkHelper: 'This may cause some applications and runtime environments to not work properly. Continue?',
-        createNetwork: 'Create',
         networkName: 'Name',
         driver: 'Driver',
         option: 'Option',
@@ -1056,10 +1048,8 @@ const message = {
         mountpoint: 'Mountpoint',
         mountpointNFSHelper: 'e.g. /nfs, /nfs-share',
         options: 'Options',
-        createVolume: 'Create',
 
         repo: 'Container registry | Container registries',
-        createRepo: 'Add',
         httpRepoHelper: 'Operating an HTTP-type repository requires restarting the Docker service.',
         httpRepo: 'Choosing HTTP protocol requires restarting the Docker service to add it into insecure registries.',
         delInsecure: 'Deletion of credit',
@@ -1083,11 +1073,9 @@ const message = {
         deleteComposeHelper:
             'Delete all files related to container compose, including configuration files and persistent files. Please proceed with caution!',
         deleteCompose: '" Delete this composition.',
-        createCompose: 'Create',
         composeDirectory: 'Compose directory',
         template: 'Template',
         composeTemplate: 'Compose template | Compose templates',
-        createComposeTemplate: 'Create',
         content: 'Content',
         contentEmpty: 'Compose content cannot be empty, enter and try again!',
         containerNumber: 'Container number',
@@ -1156,8 +1144,6 @@ const message = {
         finishTime: 'Last stop time',
     },
     cronjob: {
-        create: 'Create cron job',
-        edit: 'Edit cron job',
         importHelper:
             'Duplicate scheduled tasks will be automatically skipped during import. Tasks will be set to [Disabled] status by default, and set to [Pending Edit] status when data association is abnormal.',
         changeStatus: 'Change status',
@@ -1769,7 +1755,7 @@ const message = {
         acceptHelper:
             "Performing an 'accept' operation on the following addresses. After setting, the IP will regain normal access. Continue?",
         noAddrWarning: 'No [{0}] addresses are currently selected. Please check and try again!',
-        loginLogs: 'Login logs',
+        loginLogs: 'SSH logs',
         loginMode: 'Mode',
         authenticating: 'Key',
         publickey: 'Key',
@@ -2056,7 +2042,7 @@ const message = {
             'After you set the authorized IP address list, only the IP address in the list can access the panel service. Continue?',
         allowIPsHelper1: `Leave it blank to disable the IP address restriction.`,
         allowIPEgs: 'One per line. For example,\n172.16.10.111\n172.16.10.0/24',
-        mfa: 'Two-factor authentication (2FA)',
+        mfa: 'Two-Factor Auth',
         mfaClose: 'Disabling MFA will reduce the security of the service. Continue?',
         secret: 'Secret',
         mfaInterval: 'Refresh interval(s)',
@@ -2158,8 +2144,6 @@ const message = {
         upload: 'Upload snapshot file',
         recoverDetail: 'Recover detail',
         recoverFailed: 'Snapshot recovery failed',
-        createSnapshot: 'Create snapshot',
-        importSnapshot: 'Sync snapshot',
         importHelper: 'Snapshot directory: ',
         lastRecoverAt: 'Last recovery time',
         lastRollbackAt: 'Last rollback time',
@@ -2241,7 +2225,7 @@ const message = {
             'Forcing unbind will ignore any errors that occur during the unbinding process and ultimately release the license binding.',
         updateForce: 'Force update (ignore all errors during unbinding to ensure final operation succeeds)',
         trialInfo: 'Version',
-        authorizationId: 'Subscription authorization ID',
+        authorizationId: 'Subscription ID',
         authorizedUser: 'Authorized user',
         lostHelper:
             'The license has reached the maximum number of retry attempts. Please manually click the sync button to ensure the professional version features are functioning properly.',
@@ -2483,7 +2467,6 @@ const message = {
         createGroup: 'Create group',
         appNew: 'New Application',
         appInstalled: 'Installed application',
-        create: 'Create',
         delete: 'Delete Website',
         deleteApp: 'Delete Application',
         deleteBackup: 'Delete Backup',
@@ -2876,7 +2859,7 @@ const message = {
         uploadMaxSize: 'Upload limit',
         indexHelper:
             'In order to ensure the normal operation of the PHP website, please place the code in the index directory and avoid renaming',
-        extensions: 'Manage extension templates',
+        extensions: 'Extension Templates',
         extension: 'Extension',
         extensionsHelper: 'For multiple extensions, separate with commas',
         extensionHelper: 'Please use multiple extensions, split',
@@ -3120,7 +3103,6 @@ const message = {
     runtime: {
         runtime: 'Runtime',
         workDir: 'Working directory',
-        create: 'Create',
         localHelper: 'For local environment installation and offline environment usage issues, see ',
         versionHelper: 'PHP version, e.g. v8.0',
         buildHelper: `If more extensions are selected, the CPU usage will be higher during the image creation process. Avoid selecting all extensions.`,
