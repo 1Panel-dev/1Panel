@@ -2802,7 +2802,7 @@ const message = {
             'If unsure, you can enter 0.0.0.0/0 (ipv4) ::/0 (ipv6) [Note: Allowing any source IP is not secure]',
         http3Helper:
             'HTTP/3 is an upgrade to HTTP/2, offering faster connection speeds and better performance, but not all browsers support HTTP/3. Enabling it may cause some browsers to be unable to access the site.',
-        cors: 'Cross-Origin Resource Sharing (CORS)',
+        cors: 'CORS',
         enableCors: 'Enable CORS',
         allowOrigins: 'Allowed domains',
         allowMethods: 'Allowed request methods',

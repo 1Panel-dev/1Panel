@@ -59,7 +59,7 @@
                         prop="domains"
                         min-width="90px"
                     ></el-table-column>
-                    <el-table-column :label="$t('ssl.applyType')" show-overflow-tooltip prop="provider" width="120px">
+                    <el-table-column :label="$t('ssl.applyType')" show-overflow-tooltip prop="provider" width="200px">
                         <template #default="{ row }">{{ getProvider(row.provider) }}</template>
                     </el-table-column>
                     <el-table-column
@@ -72,7 +72,7 @@
                         :label="$t('commons.table.status')"
                         show-overflow-tooltip
                         prop="status"
-                        width="100px"
+                        width="110px"
                     >
                         <template #default="{ row }">
                             <el-popover
@@ -127,7 +127,7 @@
                             </fu-read-write-switch>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('ssl.autoRenew')" width="100px">
+                    <el-table-column :label="$t('ssl.autoRenew')" width="200px">
                         <template #default="{ row }">
                             <el-switch
                                 :disabled="
@@ -153,7 +153,7 @@
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
                         :fixed="mobile ? false : 'right'"
-                        width="300px"
+                        width="320px"
                         fix
                     />
                 </ComplexTable>

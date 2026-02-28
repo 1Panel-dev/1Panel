@@ -199,7 +199,7 @@
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('website.sslExpireDate')" prop="sslExpireDate" width="150px">
+                    <el-table-column :label="$t('website.sslExpireDate')" prop="sslExpireDate" width="160px">
                         <template #default="{ row }">
                             <el-tag v-if="row.protocol == 'HTTPS'" :type="row.sslStatus">
                                 {{ dateFormatSimple(row.sslExpireDate) }}
@@ -221,7 +221,7 @@
                     </el-table-column>
                     <fu-table-operations
                         :ellipsis="1"
-                        width="150px"
+                        width="180px"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
                         :fixed="mobile ? false : 'right'"
