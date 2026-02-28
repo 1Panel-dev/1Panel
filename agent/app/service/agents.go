@@ -803,26 +803,20 @@ func extractFeishuConfig(conf map[string]interface{}) dto.AgentFeishuConfig {
 }
 
 func setFeishuConfig(conf map[string]interface{}, config dto.AgentFeishuConfig) {
-	channels, ok := conf["channels"].(map[string]interface{})
-	if !ok {
-		channels = map[string]interface{}{}
-		conf["channels"] = channels
-	}
-	feishu := map[string]interface{}{
-		"enabled":  config.Enabled,
-		"dmPolicy": config.DmPolicy,
-		"accounts": map[string]interface{}{
-			"main": map[string]interface{}{
-				"appId":     config.AppID,
-				"appSecret": config.AppSecret,
-				"botName":   config.BotName,
-			},
-		},
-	}
+	channels := ensureChildMap(conf, "channels")
+	feishu := ensureChildMap(channels, "feishu")
+	feishu["enabled"] = config.Enabled
+	feishu["dmPolicy"] = config.DmPolicy
+
+	accounts := ensureChildMap(feishu, "accounts")
+	main := ensureChildMap(accounts, "main")
+	main["appId"] = config.AppID
+	main["appSecret"] = config.AppSecret
+	main["botName"] = config.BotName
+
 	if strings.EqualFold(config.DmPolicy, "open") {
 		feishu["allowFrom"] = []string{"*"}
 	}
-	channels["feishu"] = feishu
 }
 
 func setFeishuPluginEnabled(conf map[string]interface{}, enabled bool) {
