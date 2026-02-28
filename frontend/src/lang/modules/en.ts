@@ -2341,7 +2341,7 @@ const message = {
         all: 'All',
         version: 'Version',
         detail: 'Details',
-        params: 'Edit parameters',
+        params: 'Parameters',
         author: 'Author',
         source: 'Source',
         appName: 'Application Name',
