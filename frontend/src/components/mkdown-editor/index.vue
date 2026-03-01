@@ -1,5 +1,10 @@
 <template>
-    <MdEditor previewOnly v-model="sanitizedReadMe" :theme="isDarkTheme ? 'dark' : 'light'" />
+    <MdEditor
+        previewOnly
+        :model-value="props.content"
+        :sanitize="sanitizeHtml"
+        :theme="isDarkTheme ? 'dark' : 'light'"
+    />
 </template>
 
 <script lang="ts" setup>
@@ -17,7 +22,7 @@ const props = defineProps({
     },
 });
 
-const sanitizedReadMe = computed(() => {
-    return DOMPurify.sanitize(props.content);
-});
+const sanitizeHtml = (html: string): string => {
+    return DOMPurify.sanitize(html);
+};
 </script>
