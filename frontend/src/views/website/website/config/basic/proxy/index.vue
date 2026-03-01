@@ -149,6 +149,14 @@ const openEditFile = (proxyConfig: Website.ProxyConfig) => {
     fileRef.value.acceptParams({ name: proxyConfig.name, content: proxyConfig.content, websiteID: proxyConfig.id });
 };
 
+function toProxyConfigOp(proxyConfig: Website.ProxyConfig): Website.ProxyConfigOp {
+    return {
+        id: proxyConfig.id,
+        name: proxyConfig.name,
+        operate: proxyConfig.operate,
+    };
+}
+
 const deleteProxy = async (proxyConfig: Website.ProxyConfig) => {
     proxyConfig.operate = 'delete';
     opRef.value.acceptParams({
@@ -159,13 +167,13 @@ const deleteProxy = async (proxyConfig: Website.ProxyConfig) => {
             i18n.global.t('commons.button.delete'),
         ]),
         api: operateProxyConfig,
-        params: proxyConfig,
+        params: toProxyConfigOp(proxyConfig),
     });
 };
 
 const submit = async (proxyConfig: Website.ProxyConfig) => {
     loading.value = true;
-    operateProxyConfig(proxyConfig)
+    operateProxyConfig(toProxyConfigOp(proxyConfig))
         .then(() => {
             MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
             search();

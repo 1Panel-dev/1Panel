@@ -184,8 +184,12 @@ export const getProxyConfig = (req: Website.ProxyReq) => {
     return http.post<Website.ProxyConfig[]>(`/websites/proxies`, req);
 };
 
-export const operateProxyConfig = (req: Website.ProxyReq) => {
+export const updateProxyConfig = (req: Website.ProxyReq) => {
     return http.post<any>(`/websites/proxies/update`, req);
+};
+
+export const operateProxyConfig = (req: Website.ProxyConfigOp) => {
+    return http.post<any>(`/websites/proxies/operate`, req);
 };
 
 export const updateProxyConfigFile = (req: Website.ProxyFileUpdate) => {

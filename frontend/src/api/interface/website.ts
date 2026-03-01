@@ -448,6 +448,12 @@ export namespace Website {
         browserCache?: 'enable' | 'disable' | 'noModify';
     }
 
+    export interface ProxyConfigOp {
+        id: number;
+        name: string;
+        operate: string;
+    }
+
     export interface ProxReplace {
         [key: string]: string;
     }

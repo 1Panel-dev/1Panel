@@ -512,6 +512,28 @@ func (b *BaseApi) UpdateProxyConfig(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
+	err := websiteService.UpdateProxy(req)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags Website
+// @Summary Operate proxy conf
+// @Accept json
+// @Param request body request.WebsiteProxyConfig true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /websites/proxies/operate [post]
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"操作网站 [domain] 反向代理配置 ","formatEN":"Operate domain [domain] proxy config"}
+func (b *BaseApi) OperateProxyConfig(c *gin.Context) {
+	var req request.WebsiteProxyConfigOp
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
 	err := websiteService.OperateProxy(req)
 	if err != nil {
 		helper.InternalServer(c, err)
