@@ -523,7 +523,7 @@ func (b *BaseApi) UpdateProxyConfig(c *gin.Context) {
 // @Tags Website
 // @Summary Operate proxy conf
 // @Accept json
-// @Param request body request.WebsiteProxyConfig true "request"
+// @Param request body request.WebsiteProxyConfigOp true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
