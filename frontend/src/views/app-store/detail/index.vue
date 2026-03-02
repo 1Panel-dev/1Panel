@@ -168,6 +168,7 @@ defineExpose({
     }
 
     .icon {
+        flex-shrink: 0;
         width: 180px;
         height: 180px;
         background-color: #ffffff;
