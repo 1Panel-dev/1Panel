@@ -186,6 +186,11 @@ const initTerminal = (online: boolean = false): boolean => {
 };
 
 function changeTerminalSize() {
+    if (!terminalElement.value || !term.value) return;
+    if (terminalElement.value.clientWidth <= 0 || terminalElement.value.clientHeight <= 0) {
+        return;
+    }
+
     fitAddon.fit();
     if (isWsOpen()) {
         const { cols, rows } = term.value;

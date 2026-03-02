@@ -265,7 +265,6 @@ const search = async (withReset?: boolean) => {
             form.cursorStyle = res.data.cursorStyle;
             form.scrollback = Number(res.data.scrollback);
             form.scrollSensitivity = Number(res.data.scrollSensitivity);
-
             terminalStore.setFontFamily(res.data.fontFamily || '');
 
             if (withReset) {
