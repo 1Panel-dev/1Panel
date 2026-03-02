@@ -30,8 +30,11 @@
                             >
                                 <el-table-column prop="name">
                                     <template #default="{ row }">
-                                        <div class="cursor-pointer">
-                                            <div class="font-medium text-base">
+                                        <div
+                                            class="compose-item"
+                                            :class="{ 'is-active': currentCompose?.name === row.name && !isOnCreate }"
+                                        >
+                                            <div class="font-medium text-base compose-title">
                                                 {{ row.name }}
                                             </div>
                                             <div class="mb-1">
@@ -64,42 +67,44 @@
                                                     }}
                                                 </el-text>
                                             </div>
-                                            <el-button
-                                                plain
-                                                round
-                                                size="small"
-                                                :disabled="!row?.workdir"
-                                                @click="openComposeFolder(row)"
-                                            >
-                                                {{ $t('home.dir') }}
-                                            </el-button>
-                                            <el-button
-                                                plain
-                                                round
-                                                size="small"
-                                                @click="handleComposeOperate('up', row)"
-                                            >
-                                                {{ $t('commons.operate.start') }}
-                                            </el-button>
-                                            <el-button
-                                                plain
-                                                round
-                                                size="small"
-                                                @click="handleComposeOperate('stop', row)"
-                                            >
-                                                {{ $t('commons.operate.stop') }}
-                                            </el-button>
-                                            <el-button
-                                                plain
-                                                round
-                                                size="small"
-                                                @click="handleComposeOperate('restart', row)"
-                                            >
-                                                {{ $t('commons.operate.restart') }}
-                                            </el-button>
-                                            <el-button plain round size="small" @click="onDelete(row)">
-                                                {{ $t('commons.operate.delete') }}
-                                            </el-button>
+                                            <div class="compose-actions">
+                                                <el-button
+                                                    plain
+                                                    round
+                                                    size="small"
+                                                    :disabled="!row?.workdir"
+                                                    @click="openComposeFolder(row)"
+                                                >
+                                                    {{ $t('home.dir') }}
+                                                </el-button>
+                                                <el-button
+                                                    plain
+                                                    round
+                                                    size="small"
+                                                    @click="handleComposeOperate('up', row)"
+                                                >
+                                                    {{ $t('commons.operate.start') }}
+                                                </el-button>
+                                                <el-button
+                                                    plain
+                                                    round
+                                                    size="small"
+                                                    @click="handleComposeOperate('stop', row)"
+                                                >
+                                                    {{ $t('commons.operate.stop') }}
+                                                </el-button>
+                                                <el-button
+                                                    plain
+                                                    round
+                                                    size="small"
+                                                    @click="handleComposeOperate('restart', row)"
+                                                >
+                                                    {{ $t('commons.operate.restart') }}
+                                                </el-button>
+                                                <el-button plain round size="small" @click="onDelete(row)">
+                                                    {{ $t('commons.operate.delete') }}
+                                                </el-button>
+                                            </div>
                                         </div>
                                     </template>
                                 </el-table-column>
@@ -770,6 +775,31 @@ const onOpenLog = (row: any) => {
 </script>
 
 <style scoped lang="scss">
+.compose-item {
+    cursor: pointer;
+}
+
+.compose-title {
+    transition: color 0.15s;
+}
+
+.compose-item.is-active .compose-title {
+    color: var(--el-color-primary);
+}
+
+.compose-actions {
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: opacity 0.2s, max-height 0.2s;
+}
+
+.compose-item:hover .compose-actions,
+.compose-item.is-active .compose-actions {
+    opacity: 1;
+    max-height: 40px;
+}
+
 .svg-icon {
     margin-top: -3px;
     font-size: 6px;
