@@ -12,7 +12,7 @@
             <template #main>
                 <ComplexTable :data="items" :pagination-config="paginationConfig" @search="search">
                     <el-table-column :label="$t('commons.table.name')" prop="name" min-width="200" />
-                    <el-table-column :label="$t('aiTools.agents.provider')" prop="provider" width="120">
+                    <el-table-column :label="$t('aiTools.agents.provider')" prop="provider" width="200">
                         <template #default="{ row }">
                             {{ getAgentProviderDisplayName(row.provider, row.providerName) }}
                         </template>

@@ -16,7 +16,9 @@
             </el-form-item>
             <el-form-item :label="$t('aiTools.agents.apiKey')" prop="apiKey">
                 <el-input v-model="form.apiKey" type="password" show-password />
-                <span class="input-help">{{ $t('aiTools.agents.customProviderHelper') }}</span>
+                <span class="input-help" v-if="form.provider === 'custom'">
+                    {{ $t('aiTools.agents.customProviderHelper') }}
+                </span>
             </el-form-item>
             <el-form-item>
                 <el-checkbox v-model="form.rememberApiKey">{{ $t('terminal.rememberPassword') }}</el-checkbox>

@@ -369,6 +369,9 @@ func (a AgentService) CreateAccount(req dto.AgentAccountCreateReq) error {
 		return buserr.New("ErrAgentApiKeyRequired")
 	}
 	baseURL := strings.TrimSpace(req.BaseURL)
+	if fixedURL, ok := fixedProviderBaseURL(provider); ok {
+		baseURL = fixedURL
+	}
 	if provider == "custom" && baseURL == "" {
 		return buserr.New("ErrAgentBaseURLRequired")
 	}
@@ -425,6 +428,9 @@ func (a AgentService) UpdateAccount(req dto.AgentAccountUpdateReq) error {
 	}
 	provider := strings.ToLower(strings.TrimSpace(account.Provider))
 	baseURL := strings.TrimSpace(req.BaseURL)
+	if fixedURL, ok := fixedProviderBaseURL(provider); ok {
+		baseURL = fixedURL
+	}
 	if provider == "custom" && baseURL == "" {
 		return buserr.New("ErrAgentBaseURLRequired")
 	}
@@ -523,6 +529,9 @@ func (a AgentService) VerifyAccount(req dto.AgentAccountVerifyReq) error {
 		return buserr.New("ErrAgentApiKeyRequired")
 	}
 	baseURL := strings.TrimSpace(req.BaseURL)
+	if fixedURL, ok := fixedProviderBaseURL(provider); ok {
+		baseURL = fixedURL
+	}
 	if baseURL == "" {
 		if defaultURL, ok := providerDefaultBaseURL(provider); ok {
 			baseURL = defaultURL
@@ -1017,6 +1026,9 @@ func verifyProvider(provider, baseURL, apiKey string) error {
 	if provider == "minimax" {
 		return verifyMinimax("https://api.minimax.chat/v1", apiKey)
 	}
+	if provider == "bailian-coding-plan" {
+		return verifyBailianCodingPlan(baseURL, apiKey)
+	}
 	client := &http.Client{Timeout: 10 * time.Second}
 	reqURL, headers := buildVerifyRequest(provider, baseURL, apiKey)
 	request, err := http.NewRequest(http.MethodGet, reqURL, nil)
@@ -1026,6 +1038,41 @@ func verifyProvider(provider, baseURL, apiKey string) error {
 	for key, value := range headers {
 		request.Header.Set(key, value)
 	}
+	resp, err := client.Do(request)
+	if err != nil {
+		return buserr.WithErr("ErrAgentAccountUnavailable", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode >= 400 {
+		return buserr.WithErr("ErrAgentAccountUnavailable", fmt.Errorf("verify failed: %s", resp.Status))
+	}
+	return nil
+}
+
+func verifyBailianCodingPlan(baseURL, apiKey string) error {
+	client := &http.Client{Timeout: 10 * time.Second}
+	base := strings.TrimRight(baseURL, "/")
+	if !strings.Contains(base, "/v1") {
+		base = base + "/v1"
+	}
+	reqURL := base + "/chat/completions"
+	body := map[string]interface{}{
+		"model": "qwen3.5-plus",
+		"messages": []map[string]string{
+			{"role": "user", "content": "test"},
+		},
+		"max_tokens": 1,
+	}
+	payload, err := json.Marshal(body)
+	if err != nil {
+		return err
+	}
+	request, err := http.NewRequest(http.MethodPost, reqURL, bytes.NewBuffer(payload))
+	if err != nil {
+		return err
+	}
+	request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", apiKey))
+	request.Header.Set("Content-Type", "application/json")
 	resp, err := client.Do(request)
 	if err != nil {
 		return buserr.WithErr("ErrAgentAccountUnavailable", err)
@@ -1384,6 +1431,37 @@ func writeOpenclawConfig(confDir, provider, modelName, apiType string, maxTokens
 				},
 			},
 		}
+	} else if provider == "bailian-coding-plan" {
+		cfg.Agents.Defaults.Model.Primary = modelName
+		base := baseURL
+		if base == "" {
+			if defaultURL, ok := providerDefaultBaseURL(provider); ok {
+				base = defaultURL
+			}
+		}
+		plainKey := strings.TrimSpace(apiKey)
+		_, useMaxTokens, useContextWindow := resolveRuntimeParams(provider, apiType, maxTokens, contextWindow)
+		cfg.Models = &modelsConfig{
+			Mode: "merge",
+			Providers: map[string]modelProvider{
+				"bailian-coding-plan": {
+					ApiKey:  plainKey,
+					BaseUrl: base,
+					Api:     "openai-completions",
+					Models: []modelEntry{
+						{
+							ID:            modelID,
+							Name:          modelID,
+							Reasoning:     strings.Contains(strings.ToLower(modelID), "reason") || strings.Contains(strings.ToLower(modelID), "thinking"),
+							Input:         []string{"text"},
+							ContextWindow: useContextWindow,
+							MaxTokens:     useMaxTokens,
+							Cost:          modelCost{},
+						},
+					},
+				},
+			},
+		}
 	} else if provider == "minimax" {
 		normalizedID := modelID
 		switch strings.ToLower(modelID) {
@@ -1615,6 +1693,15 @@ func providerDefinitions() map[string]providerDefinition {
 
 func providerDefaultBaseURL(provider string) (string, bool) {
 	return providercatalog.DefaultBaseURL(provider)
+}
+
+func fixedProviderBaseURL(provider string) (string, bool) {
+	switch strings.ToLower(strings.TrimSpace(provider)) {
+	case "bailian-coding-plan":
+		return providerDefaultBaseURL(provider)
+	default:
+		return "", false
+	}
 }
 
 func isSupportedAgentProvider(provider string) bool {
