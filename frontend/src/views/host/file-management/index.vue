@@ -1255,14 +1255,18 @@ function getEnumKeyByValue(value: string): keyof typeof CompressExtension | unde
 const sortedCompressExtensions = Object.values(CompressExtension).sort((a, b) => b.length - a.length);
 
 const getFileExtension = (name: string, extension?: string): string => {
-    const lowerName = name?.toLowerCase() ?? '';
+    const lowerName = name?.toLowerCase().split('?')[0] ?? '';
+    if (lowerName.startsWith('.') && lowerName.indexOf('.', 1) === -1) {
+        return extension.toLowerCase();
+    }
     const compoundMatch = sortedCompressExtensions.find((compressExtension) => lowerName.endsWith(compressExtension));
     if (compoundMatch) {
         return compoundMatch;
     }
 
     if (extension) {
-        return extension.toLowerCase();
+        const lowerExt = extension.toLowerCase();
+        return lowerExt.startsWith('.') ? lowerExt : `.${lowerExt}`;
     }
 
     const extensionIndex = lowerName.lastIndexOf('.');
@@ -1779,14 +1783,19 @@ const isDecompressFile = (row: File.File) => {
     if (row.isDir) {
         return false;
     }
-    if (getFileType(row.extension) === 'compress') {
+
+    const extension = getFileExtension(row.name, row.extension);
+    const mimeType = row.mimeType || MimetypeByExtensionObject[extension];
+
+    if (getFileType(extension) === 'compress') {
         return true;
     }
-    if (row.mimeType == 'application/octet-stream') {
+
+    if (!mimeType || mimeType === 'application/octet-stream') {
         return false;
-    } else {
-        return Mimetypes.get(row.mimeType) != undefined;
     }
+
+    return Mimetypes.get(mimeType) != undefined;
 };
 
 const getHostMount = async () => {

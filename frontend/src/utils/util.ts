@@ -302,6 +302,7 @@ let icons = new Map([
     ['.tar.bz2', 'p-file-zip'],
     ['.bz2', 'p-file-zip'],
     ['.xz', 'p-file-zip'],
+    ['.tar.xz', 'p-file-zip'],
     ['.tar', 'p-file-zip'],
     ['.tar.gz', 'p-file-zip'],
     ['.war', 'p-file-zip'],
