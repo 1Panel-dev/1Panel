@@ -470,9 +470,60 @@ func restartCompose(composePath string, itemHelper *snapRecoverHelper) error {
 func recoverDBData(src string, itemHelper *snapRecoverHelper) error {
 	itemHelper.Task.Log("---------------------- 11 / 11 ----------------------")
 	itemHelper.Task.LogStart(i18n.GetMsgByKey("RecoverDBData"))
-	_ = os.Remove(path.Join(global.Dir.DataDir, "db"))
-	err := itemHelper.FileOp.CopyDirWithExclude(src, global.Dir.DataDir, nil)
+	dbDir := path.Join(global.Dir.DataDir, "db")
+	if err := os.RemoveAll(dbDir); err != nil {
+		itemHelper.Task.LogWithStatus(i18n.GetMsgByKey("RecoverDBData"), err)
+		return err
+	}
 
-	itemHelper.Task.LogWithStatus(i18n.GetMsgByKey("RecoverDBData"), err)
-	return err
+	err := itemHelper.FileOp.CopyDirWithExclude(src, global.Dir.DataDir, nil)
+	if err != nil {
+		itemHelper.Task.LogWithStatus(i18n.GetMsgByKey("RecoverDBData"), err)
+		return err
+	}
+	if cleanErr := cleanOrphanSQLiteSidecars(dbDir); cleanErr != nil {
+		itemHelper.Task.LogWithStatus(i18n.GetMsgByKey("RecoverDBData"), cleanErr)
+		return cleanErr
+	}
+
+	itemHelper.Task.LogWithStatus(i18n.GetMsgByKey("RecoverDBData"), nil)
+	return nil
+}
+
+func cleanOrphanSQLiteSidecars(dbDir string) error {
+	entries, err := os.ReadDir(dbDir)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil
+		}
+		return err
+	}
+
+	for _, entry := range entries {
+		if entry.IsDir() {
+			continue
+		}
+
+		name := entry.Name()
+		var mainDB string
+		switch {
+		case strings.HasSuffix(name, ".db-wal"):
+			mainDB = strings.TrimSuffix(name, "-wal")
+		case strings.HasSuffix(name, ".db-shm"):
+			mainDB = strings.TrimSuffix(name, "-shm")
+		default:
+			continue
+		}
+
+		if _, statErr := os.Stat(path.Join(dbDir, mainDB)); statErr != nil {
+			if !os.IsNotExist(statErr) {
+				return statErr
+			}
+			if removeErr := os.Remove(path.Join(dbDir, name)); removeErr != nil && !os.IsNotExist(removeErr) {
+				return removeErr
+			}
+		}
+	}
+
+	return nil
 }

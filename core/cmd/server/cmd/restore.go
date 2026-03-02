@@ -92,8 +92,15 @@ var restoreCmd = &cobra.Command{
 		fmt.Println(i18n.GetMsgByKeyForCmd("RestoreStep4"))
 		if _, err := os.Stat(path.Join(tmpPath, "db")); err == nil {
 			dbPath := path.Join(baseDir, "1panel")
+			targetDBDir := path.Join(dbPath, "db")
+			if err := os.RemoveAll(targetDBDir); err != nil {
+				global.LOG.Errorf("rollback 1panel db cleanup failed, err: %v", err)
+			}
 			if err := files.CopyItem(true, true, path.Join(tmpPath, "db"), dbPath); err != nil {
 				global.LOG.Errorf("rollback 1panel db failed, err: %v", err)
+			}
+			if err := cleanOrphanSQLiteSidecars(targetDBDir); err != nil {
+				global.LOG.Errorf("rollback 1panel db sidecar cleanup failed, err: %v", err)
 			}
 		}
 
@@ -139,4 +146,42 @@ func loadRollbackVersion(upgradeDir string) string {
 		return "-"
 	}
 	return info
+}
+
+func cleanOrphanSQLiteSidecars(dbDir string) error {
+	entries, err := os.ReadDir(dbDir)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil
+		}
+		return err
+	}
+
+	for _, entry := range entries {
+		if entry.IsDir() {
+			continue
+		}
+
+		name := entry.Name()
+		var mainDB string
+		switch {
+		case strings.HasSuffix(name, ".db-wal"):
+			mainDB = strings.TrimSuffix(name, "-wal")
+		case strings.HasSuffix(name, ".db-shm"):
+			mainDB = strings.TrimSuffix(name, "-shm")
+		default:
+			continue
+		}
+
+		if _, statErr := os.Stat(path.Join(dbDir, mainDB)); statErr != nil {
+			if !os.IsNotExist(statErr) {
+				return statErr
+			}
+			if removeErr := os.Remove(path.Join(dbDir, name)); removeErr != nil && !os.IsNotExist(removeErr) {
+				return removeErr
+			}
+		}
+	}
+
+	return nil
 }
