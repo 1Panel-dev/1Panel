@@ -147,7 +147,7 @@ var catalog = map[string]Meta{
 	"bailian-coding-plan": {
 		Key:            "bailian-coding-plan",
 		DisplayName:    "阿里云百炼 Coding Plan",
-		Sort:           105,
+		Sort:           11,
 		DefaultBaseURL: "https://coding.dashscope.aliyuncs.com/v1",
 		EnvKey:         "QWEN_API_KEY",
 		Enabled:        true,

@@ -71,6 +71,9 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 		return nil, err
 	}
 	if agentType == constant.AppOpenclaw {
+		if req.BridgePort <= 0 {
+			return nil, fmt.Errorf("bridge port is required")
+		}
 		if err := checkPortExist(req.BridgePort); err != nil {
 			return nil, err
 		}
