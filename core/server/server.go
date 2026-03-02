@@ -49,6 +49,7 @@ func Start() {
 	session.Init()
 	hook.Init()
 	InitOthers()
+	startPprof()
 
 	run.Init()
 	proxy.Init()

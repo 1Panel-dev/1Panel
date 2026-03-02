@@ -48,6 +48,7 @@ func Start() {
 	hook.Init()
 	go firewall.Init()
 	InitOthers()
+	startPprof()
 
 	rootRouter := router.Routers()
 
