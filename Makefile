@@ -1,3 +1,4 @@
+
 GOCMD=go
 GOBUILD=$(GOCMD) build
 GOCLEAN=$(GOCMD) clean
@@ -44,6 +45,16 @@ build_agent_on_darwin:
 	cd $(AGENT_PATH) \
     &&  CGO_ENABLED=0 GOOS=linux GOARCH=amd64 $(GOBUILD) -trimpath -ldflags '-s -w'  -o $(BUILD_PATH)/$(AGENT_NAME) $(AGENT_MAIN)
 
+build_pprof_core_on_linux:
+	cd $(CORE_PATH) \
+	&& CGO_ENABLED=0 GOOS=$(GOOS) GOARCH=$(GOARCH) $(GOBUILD) -trimpath -tags pprof -ldflags '-s -w' -o $(BUILD_PATH)/$(CORE_NAME) $(CORE_MAIN)
+
+build_pprof_agent_on_linux:
+	cd $(AGENT_PATH) \
+	&& CGO_ENABLED=0 GOOS=$(GOOS) GOARCH=$(GOARCH) $(GOBUILD) -trimpath -tags pprof -ldflags '-s -w' -o $(BUILD_PATH)/$(AGENT_NAME) $(AGENT_MAIN)
+
 build_all: build_frontend build_core_on_linux build_agent_on_linux
+
+build_pprof_all: build_frontend build_core_on_linux_pprof build_agent_on_linux_pprof
 
 build_on_local: clean_assets build_frontend build_core_on_darwin build_agent_on_darwin
