@@ -1,5 +1,5 @@
 <template>
-    <div v-if="showControl">
+    <div v-if="showControl" class="log-toolbar">
         <el-select @change="searchLogs" class="fetchClass" v-model="logSearch.mode">
             <template #prefix>{{ $t('container.fetch') }}</template>
             <el-option v-for="item in timeOptions" :key="item.label" :value="item.value" :label="item.label" />
@@ -22,34 +22,58 @@
                 {{ $t('commons.table.date') }}
             </el-checkbox>
         </div>
-        <el-button class="margin-button" @click="onDownload" icon="Download">
+        <el-button class="margin-button" @click="openDownloadDialog" icon="Download">
             {{ $t('commons.button.download') }}
         </el-button>
         <el-button class="margin-button" @click="onClean" icon="Delete">
             {{ $t('commons.button.clean') }}
         </el-button>
     </div>
-    <div class="log-container" :style="styleVars" ref="logContainer">
-        <div class="log-spacer" :style="{ height: `${totalHeight}px` }"></div>
-        <div
-            v-for="(log, index) in visibleLogs"
-            :key="startIndex + index"
-            class="log-item"
-            :style="{ top: `${(startIndex + index) * logHeight}px` }"
-        >
-            <hightlight :log="log" type="container" :container="container"></hightlight>
-        </div>
+    <div class="log-container" :style="styleVars">
+        <div class="xterm-log-viewer" ref="terminalElement"></div>
     </div>
+    <el-dialog v-model="downloadDialogVisible" :title="$t('commons.button.download')" width="420px">
+        <el-form label-position="top">
+            <el-form-item :label="$t('container.fetch')">
+                <el-select v-model="downloadForm.mode" class="w-full">
+                    <el-option v-for="item in timeOptions" :key="item.label" :value="item.value" :label="item.label" />
+                </el-select>
+            </el-form-item>
+            <el-form-item :label="$t('container.lines')">
+                <el-select
+                    v-model="downloadForm.tail"
+                    class="w-full"
+                    filterable
+                    allow-create
+                    default-first-option
+                    :reserve-keyword="false"
+                >
+                    <el-option :value="0" :label="$t('commons.table.all')" />
+                    <el-option :value="100" :label="100" />
+                    <el-option :value="200" :label="200" />
+                    <el-option :value="500" :label="500" />
+                    <el-option :value="1000" :label="1000" />
+                </el-select>
+                <div class="download-tail-helper">{{ $t('container.downloadLinesHelper') }}</div>
+            </el-form-item>
+        </el-form>
+        <template #footer>
+            <el-button @click="downloadDialogVisible = false">{{ $t('commons.button.cancel') }}</el-button>
+            <el-button type="primary" @click="onDownload">{{ $t('commons.button.confirm') }}</el-button>
+        </template>
+    </el-dialog>
 </template>
 
 <script lang="ts" setup>
 import { cleanComposeLog, cleanContainerLog, DownloadFile } from '@/api/modules/container';
+import { FitAddon } from '@xterm/addon-fit';
+import { Terminal } from '@xterm/xterm';
+import '@xterm/xterm/css/xterm.css';
 import i18n from '@/lang';
 import { dateFormatForName } from '@/utils/util';
 import { computed, nextTick, onMounted, onUnmounted, reactive, ref } from 'vue';
 import { ElMessageBox } from 'element-plus';
 import { MsgError, MsgSuccess } from '@/utils/message';
-import hightlight from '@/components/log/custom-hightlight/index.vue';
 import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();
 
@@ -94,10 +118,14 @@ const styleVars = computed(() => ({
     '--custom-height': `${props.highlightDiff || 320}px`,
 }));
 
-const logVisible = ref(false);
-const logContainer = ref<HTMLElement | null>(null);
-const logs = ref<string[]>([]);
+const terminalElement = ref<HTMLDivElement | null>(null);
 let eventSource: EventSource | null = null;
+let term: Terminal | null = null;
+const fitAddon = new FitAddon();
+let onScrollDisposable: { dispose: () => void } | null = null;
+const MAX_VIEW_LINES = 20000;
+const followBottom = ref(true);
+
 const logSearch = reactive({
     isWatch: props.defaultFollow ? true : true,
     isShowTimestamp: props.defaultIsShowTimestamp,
@@ -107,16 +135,10 @@ const logSearch = reactive({
     compose: '',
     resource: '',
 });
-const logHeight = 20;
-const logCount = computed(() => logs.value.length);
-const totalHeight = computed(() => logHeight * logCount.value);
-const startIndex = ref(0);
-const containerHeight = ref(500);
-const visibleCount = computed(() => Math.ceil(containerHeight.value / logHeight) + 2);
-const visibleLogs = computed(() => {
-    const start = Math.max(0, startIndex.value - 1);
-    const end = startIndex.value + visibleCount.value + 1;
-    return logs.value.slice(start, end);
+const downloadDialogVisible = ref(false);
+const downloadForm = reactive<{ mode: string; tail: number | string }>({
+    mode: 'all',
+    tail: 0,
 });
 
 const timeOptions = ref([
@@ -146,9 +168,56 @@ const stopListening = () => {
     }
 };
 
+const clearTerminal = () => {
+    term?.reset();
+    followBottom.value = true;
+};
+
+const writeLogLine = (data: string) => {
+    if (!term) return;
+    term.writeln(data);
+    if (followBottom.value) {
+        term.scrollToBottom();
+    }
+};
+
+const bindXTermEvents = () => {
+    if (!term) return;
+    onScrollDisposable?.dispose();
+    onScrollDisposable = term.onScroll(() => {
+        if (!term) return;
+        const active = term.buffer.active;
+        followBottom.value = active.baseY + active.cursorY >= active.length - 2;
+    });
+};
+
+const initTerminal = () => {
+    if (!terminalElement.value || term) return;
+    term = new Terminal({
+        cursorBlink: false,
+        cursorStyle: 'block',
+        disableStdin: true,
+        convertEol: true,
+        scrollback: MAX_VIEW_LINES,
+        fontSize: 14,
+        fontFamily: "'JetBrains Mono', Monaco, Menlo, Consolas, 'Courier New', monospace",
+        fontWeight: '500',
+        lineHeight: 1.2,
+        theme: {
+            background: '#1e1e1e',
+            foreground: '#666666',
+            selectionBackground: 'rgba(102, 178, 255, 0.30)',
+            selectionInactiveBackground: 'rgba(102, 178, 255, 0.20)',
+        },
+    });
+    term.open(terminalElement.value);
+    term.loadAddon(fitAddon);
+    fitAddon.fit();
+    bindXTermEvents();
+};
+
 const handleClose = async () => {
     stopListening();
-    logVisible.value = false;
 };
 
 const searchLogs = async () => {
@@ -157,24 +226,21 @@ const searchLogs = async () => {
         return;
     }
     stopListening();
-    logs.value = [];
+    clearTerminal();
+
     let currentNode = globalStore.currentNode;
     if (props.node && props.node !== '') {
         currentNode = props.node;
     }
+
     let url = `/api/v2/containers/search/log?container=${logSearch.container}&since=${logSearch.mode}&tail=${logSearch.tail}&follow=${logSearch.isWatch}&timestamp=${logSearch.isShowTimestamp}&operateNode=${currentNode}`;
     if (logSearch.compose !== '') {
         url = `/api/v2/containers/search/log?compose=${logSearch.compose}&since=${logSearch.mode}&tail=${logSearch.tail}&follow=${logSearch.isWatch}&timestamp=${logSearch.isShowTimestamp}&operateNode=${currentNode}`;
     }
+
     eventSource = new EventSource(url);
     eventSource.onmessage = (event: MessageEvent) => {
-        const data = event.data;
-        logs.value.push(data);
-        nextTick(() => {
-            if (logContainer.value) {
-                logContainer.value.scrollTop = logContainer.value.scrollHeight;
-            }
-        });
+        writeLogLine(event.data);
     };
     eventSource.onerror = (event: MessageEvent) => {
         stopListening();
@@ -184,39 +250,43 @@ const searchLogs = async () => {
     };
 };
 
+const openDownloadDialog = () => {
+    downloadForm.mode = logSearch.mode;
+    downloadForm.tail = logSearch.tail;
+    downloadDialogVisible.value = true;
+};
+
 const onDownload = async () => {
-    logSearch.tail = 0;
+    const customTail = Number(downloadForm.tail);
+    if (Number.isNaN(customTail) || customTail < 0) {
+        MsgError(i18n.global.t('container.linesHelper'));
+        return;
+    }
     const container = logSearch.compose === '' ? logSearch.container : logSearch.compose;
     let resource = container;
     if (props.resource) {
         resource = props.resource;
     }
     const containerType = logSearch.compose === '' ? 'container' : 'compose';
-    let msg = i18n.global.t('container.downLogHelper1', [resource]);
-    ElMessageBox.confirm(msg, i18n.global.t('commons.button.download'), {
-        confirmButtonText: i18n.global.t('commons.button.confirm'),
-        cancelButtonText: i18n.global.t('commons.button.cancel'),
-        type: 'info',
-    }).then(async () => {
-        let params = {
-            container: container,
-            since: logSearch.mode,
-            tail: logSearch.tail,
-            timestamp: logSearch.isShowTimestamp,
-            containerType: containerType,
-        };
-        let addItem = {};
-        addItem['name'] = resource + '-' + dateFormatForName(new Date()) + '.log';
-        DownloadFile(params).then((res) => {
-            const downloadUrl = window.URL.createObjectURL(new Blob([res]));
-            const a = document.createElement('a');
-            a.style.display = 'none';
-            a.href = downloadUrl;
-            a.download = addItem['name'];
-            const event = new MouseEvent('click');
-            a.dispatchEvent(event);
-        });
+    const params = {
+        container: container,
+        since: downloadForm.mode,
+        tail: customTail,
+        timestamp: logSearch.isShowTimestamp,
+        containerType: containerType,
+    };
+    const addItem = {};
+    addItem['name'] = resource + '-' + dateFormatForName(new Date()) + '.log';
+    DownloadFile(params).then((res) => {
+        const downloadUrl = window.URL.createObjectURL(new Blob([res]));
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = downloadUrl;
+        a.download = addItem['name'];
+        const event = new MouseEvent('click');
+        a.dispatchEvent(event);
     });
+    downloadDialogVisible.value = false;
 };
 
 const onClean = async () => {
@@ -248,20 +318,6 @@ const onClean = async () => {
     });
 };
 
-const handleScroll = () => {
-    if (logContainer.value) {
-        const scrollTop = logContainer.value.scrollTop;
-        startIndex.value = Math.max(0, Math.floor(scrollTop / logHeight) - 1);
-    }
-};
-
-onUnmounted(() => {
-    handleClose();
-    if (logContainer.value) {
-        logContainer.value.removeEventListener('scroll', handleScroll);
-    }
-});
-
 const resizeObserver = ref<ResizeObserver | null>(null);
 
 onMounted(() => {
@@ -269,58 +325,80 @@ onMounted(() => {
     logSearch.compose = props.compose;
     logSearch.resource = props.resource;
 
-    logVisible.value = true;
     logSearch.tail = 100;
     logSearch.mode = 'all';
     logSearch.isWatch = true;
 
     nextTick(() => {
-        if (logContainer.value) {
-            containerHeight.value = logContainer.value.clientHeight;
-            logContainer.value.addEventListener('scroll', handleScroll);
-            resizeObserver.value = new ResizeObserver((entries) => {
-                containerHeight.value = entries[0].contentRect.height;
+        initTerminal();
+        if (terminalElement.value) {
+            resizeObserver.value = new ResizeObserver(() => {
+                fitAddon.fit();
             });
-            resizeObserver.value.observe(logContainer.value);
+            resizeObserver.value.observe(terminalElement.value);
         }
+        searchLogs();
     });
+});
 
-    searchLogs();
+onUnmounted(() => {
+    handleClose();
+    onScrollDisposable?.dispose();
+    if (term) {
+        term.dispose();
+        term = null;
+    }
+    resizeObserver.value?.disconnect();
 });
 </script>
 
 <style scoped lang="scss">
 .margin-button {
-    margin-left: 20px;
+    margin-left: 0;
 }
 .fullScreen {
     border: none;
 }
 .tailClass {
-    width: 20%;
-    float: left;
-    margin-left: 20px;
+    width: 160px;
 }
 .fetchClass {
-    width: 30%;
-    float: left;
+    width: 220px;
+}
+
+.log-toolbar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.log-toolbar :deep(.el-button),
+.log-toolbar :deep(.el-checkbox) {
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.download-tail-helper {
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--el-text-color-secondary);
 }
 
 .log-container {
     height: calc(100vh - var(--custom-height, 320px));
-    overflow-y: auto;
-    overflow-x: auto;
+    overflow: hidden;
     position: relative;
     background-color: #1e1e1e;
     margin-top: 10px;
 }
 
-.log-item {
-    position: absolute;
+.xterm-log-viewer {
     width: 100%;
-    padding: 2px;
-    color: #f5f5f5;
-    box-sizing: border-box;
-    white-space: nowrap;
+    height: 100%;
+}
+
+:deep(.xterm) {
+    padding: 2px !important;
 }
 </style>

@@ -892,6 +892,7 @@ const message = {
         fetch: 'Getir',
         lines: 'Satırlar',
         linesHelper: 'Lütfen alınacak log sayısını doğru girin!',
+        downloadLinesHelper: 'İndirilecek log satırı sayısını seçin veya girin.',
         lastDay: 'Son gün',
         last4Hour: 'Son 4 saat',
         lastHour: 'Son saat',
