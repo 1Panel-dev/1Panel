@@ -698,6 +698,8 @@ const message = {
             configTitle: 'Configuration',
             settingsTab: 'Settings',
             browserTab: 'Browser',
+            otherTab: 'Other',
+            timeZone: 'Time Zone',
             browserEnabled: 'Browser Enabled',
             headless: 'Headless',
             noSandbox: 'No Sandbox',

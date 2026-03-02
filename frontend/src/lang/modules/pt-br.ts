@@ -694,6 +694,8 @@ const message = {
             configTitle: 'Configuration',
             settingsTab: 'Settings',
             browserTab: 'Browser',
+            otherTab: 'Other',
+            timeZone: 'Fuso horário',
             browserEnabled: 'Browser Enabled',
             headless: 'Headless',
             noSandbox: 'No Sandbox',

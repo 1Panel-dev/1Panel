@@ -3,6 +3,9 @@
         <el-tab-pane :label="t('aiTools.agents.browserTab')" name="browser">
             <BrowserTab ref="browserRef" />
         </el-tab-pane>
+        <el-tab-pane :label="t('aiTools.agents.otherTab')" name="other">
+            <OtherTab ref="otherRef" />
+        </el-tab-pane>
     </el-tabs>
 </template>
 
@@ -10,11 +13,13 @@
 import { nextTick, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import BrowserTab from './settings/browser.vue';
+import OtherTab from './settings/other.vue';
 
 const { t } = useI18n();
 const activeTab = ref('browser');
 const agentId = ref(0);
 const browserRef = ref();
+const otherRef = ref();
 
 const loadCurrentTab = async () => {
     if (agentId.value <= 0) {
@@ -23,6 +28,10 @@ const loadCurrentTab = async () => {
     await nextTick();
     if (activeTab.value === 'browser') {
         await browserRef.value?.load(agentId.value);
+        return;
+    }
+    if (activeTab.value === 'other') {
+        await otherRef.value?.load(agentId.value);
     }
 };
 

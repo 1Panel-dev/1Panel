@@ -395,6 +395,47 @@ func (b *BaseApi) UpdateAgentBrowserConfig(c *gin.Context) {
 }
 
 // @Tags AI
+// @Summary Get Agent Other config
+// @Accept json
+// @Param request body dto.AgentOtherConfigReq true "request"
+// @Success 200 {object} dto.AgentOtherConfig
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/other/get [post]
+func (b *BaseApi) GetAgentOtherConfig(c *gin.Context) {
+	var req dto.AgentOtherConfigReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	data, err := agentService.GetOtherConfig(req)
+	if err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.SuccessWithData(c, data)
+}
+
+// @Tags AI
+// @Summary Update Agent Other config
+// @Accept json
+// @Param request body dto.AgentOtherConfigUpdateReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/other/update [post]
+func (b *BaseApi) UpdateAgentOtherConfig(c *gin.Context) {
+	var req dto.AgentOtherConfigUpdateReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := agentService.UpdateOtherConfig(req); err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags AI
 // @Summary Approve Agent Feishu pairing code
 // @Accept json
 // @Param request body dto.AgentFeishuPairingApproveReq true "request"

@@ -49,6 +49,8 @@ type IAgentService interface {
 	UpdateDiscordConfig(req dto.AgentDiscordConfigUpdateReq) error
 	GetBrowserConfig(req dto.AgentBrowserConfigReq) (*dto.AgentBrowserConfig, error)
 	UpdateBrowserConfig(req dto.AgentBrowserConfigUpdateReq) error
+	GetOtherConfig(req dto.AgentOtherConfigReq) (*dto.AgentOtherConfig, error)
+	UpdateOtherConfig(req dto.AgentOtherConfigUpdateReq) error
 	ApproveChannelPairing(req dto.AgentChannelPairingApproveReq) error
 	ApproveFeishuPairing(req dto.AgentFeishuPairingApproveReq) error
 }
@@ -60,6 +62,7 @@ func NewIAgentService() IAgentService {
 const (
 	defaultBrowserExecutablePath = "/home/node/.cache/ms-playwright/chromium-1208/chrome-linux64/chrome"
 	defaultBrowserProfile        = "openclaw"
+	defaultUserTimezone          = "Asia/Shanghai"
 )
 
 func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
@@ -759,6 +762,35 @@ func (a AgentService) UpdateBrowserConfig(req dto.AgentBrowserConfigUpdateReq) e
 	return nil
 }
 
+func (a AgentService) GetOtherConfig(req dto.AgentOtherConfigReq) (*dto.AgentOtherConfig, error) {
+	agent, _, err := a.loadAgentAndInstall(req.AgentID)
+	if err != nil {
+		return nil, err
+	}
+	conf, err := readOpenclawConfig(agent.ConfigPath)
+	if err != nil {
+		return nil, err
+	}
+	result := extractOtherConfig(conf)
+	return &result, nil
+}
+
+func (a AgentService) UpdateOtherConfig(req dto.AgentOtherConfigUpdateReq) error {
+	agent, _, err := a.loadAgentAndInstall(req.AgentID)
+	if err != nil {
+		return err
+	}
+	conf, err := readOpenclawConfig(agent.ConfigPath)
+	if err != nil {
+		return err
+	}
+	setOtherConfig(conf, dto.AgentOtherConfig{UserTimezone: strings.TrimSpace(req.UserTimezone)})
+	if err := writeOpenclawConfigRaw(agent.ConfigPath, conf); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (a AgentService) ApproveChannelPairing(req dto.AgentChannelPairingApproveReq) error {
 	_, install, err := a.loadAgentAndInstall(req.AgentID)
 	if err != nil {
@@ -1028,6 +1060,32 @@ func setBrowserConfig(conf map[string]interface{}, config dto.AgentBrowserConfig
 	} else {
 		browser["defaultProfile"] = strings.TrimSpace(config.DefaultProfile)
 	}
+}
+
+func extractOtherConfig(conf map[string]interface{}) dto.AgentOtherConfig {
+	result := dto.AgentOtherConfig{UserTimezone: resolveServerTimezone()}
+	agents, ok := conf["agents"].(map[string]interface{})
+	if !ok {
+		return result
+	}
+	defaults, ok := agents["defaults"].(map[string]interface{})
+	if !ok {
+		return result
+	}
+	if timezone, ok := defaults["userTimezone"].(string); ok && strings.TrimSpace(timezone) != "" {
+		result.UserTimezone = strings.TrimSpace(timezone)
+	}
+	return result
+}
+
+func setOtherConfig(conf map[string]interface{}, config dto.AgentOtherConfig) {
+	agents := ensureChildMap(conf, "agents")
+	defaults := ensureChildMap(agents, "defaults")
+	timezone := strings.TrimSpace(config.UserTimezone)
+	if timezone == "" {
+		timezone = resolveServerTimezone()
+	}
+	defaults["userTimezone"] = timezone
 }
 
 func (a AgentService) syncAgentsByAccount(account *model.AgentAccount) error {
@@ -1325,7 +1383,8 @@ type agentsConfig struct {
 }
 
 type agentDefaults struct {
-	Model modelRef `json:"model"`
+	UserTimezone string   `json:"userTimezone,omitempty"`
+	Model        modelRef `json:"model"`
 }
 
 type modelRef struct {
@@ -1402,7 +1461,8 @@ func writeOpenclawConfig(confDir, provider, modelName, apiType string, maxTokens
 		},
 		Agents: agentsConfig{
 			Defaults: agentDefaults{
-				Model: modelRef{Primary: modelName},
+				UserTimezone: resolveServerTimezone(),
+				Model:        modelRef{Primary: modelName},
 			},
 		},
 		Browser: browserConfig{
@@ -1668,6 +1728,9 @@ func writeOpenclawConfig(confDir, provider, modelName, apiType string, maxTokens
 		}
 		agentsMap := ensureChildMap(conf, "agents")
 		defaultsMap := ensureChildMap(agentsMap, "defaults")
+		if tz, ok := defaultsMap["userTimezone"]; !ok || strings.TrimSpace(fmt.Sprintf("%v", tz)) == "" {
+			defaultsMap["userTimezone"] = resolveServerTimezone()
+		}
 		modelMap := ensureChildMap(defaultsMap, "model")
 		modelMap["primary"] = cfg.Agents.Defaults.Model.Primary
 
@@ -1689,6 +1752,17 @@ func writeOpenclawConfig(confDir, provider, modelName, apiType string, maxTokens
 	}
 	content := strings.Join(lines, "\n") + "\n"
 	return fileOp.SaveFile(envPath, content, 0600)
+}
+
+func resolveServerTimezone() string {
+	timezone := strings.TrimSpace(common.LoadTimeZoneByCmd())
+	if timezone == "" {
+		return defaultUserTimezone
+	}
+	if _, err := time.LoadLocation(timezone); err != nil {
+		return defaultUserTimezone
+	}
+	return timezone
 }
 
 func ensureChildMap(parent map[string]interface{}, key string) map[string]interface{} {

@@ -472,4 +472,17 @@ export namespace AI {
         noSandbox: boolean;
         defaultProfile: string;
     }
+
+    export interface AgentOtherConfigReq {
+        agentId: number;
+    }
+
+    export interface AgentOtherConfig {
+        userTimezone: string;
+    }
+
+    export interface AgentOtherConfigUpdateReq {
+        agentId: number;
+        userTimezone: string;
+    }
 }

@@ -656,6 +656,8 @@ const message = {
             configTitle: '配置',
             settingsTab: '设置',
             browserTab: '浏览器',
+            otherTab: '其他',
+            timeZone: '时区',
             browserEnabled: '浏览器开关',
             headless: '无头模式',
             noSandbox: '禁用沙箱',

@@ -703,6 +703,8 @@ const message = {
             configTitle: 'Configuration',
             settingsTab: 'Settings',
             browserTab: 'Browser',
+            otherTab: 'Other',
+            timeZone: 'Saat Dilimi',
             browserEnabled: 'Browser Enabled',
             headless: 'Headless',
             noSandbox: 'No Sandbox',

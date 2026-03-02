@@ -672,6 +672,8 @@ const message = {
             configTitle: '設定',
             settingsTab: '設定',
             browserTab: '瀏覽器',
+            otherTab: '其他',
+            timeZone: '時區',
             browserEnabled: '瀏覽器開關',
             headless: '無頭模式',
             noSandbox: '禁用沙箱',

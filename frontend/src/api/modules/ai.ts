@@ -173,6 +173,14 @@ export const updateAgentBrowserConfig = (req: AI.AgentBrowserConfigUpdateReq) =>
     return http.post(`/ai/agents/browser/update`, req);
 };
 
+export const getAgentOtherConfig = (req: AI.AgentOtherConfigReq) => {
+    return http.post<AI.AgentOtherConfig>(`/ai/agents/other/get`, req);
+};
+
+export const updateAgentOtherConfig = (req: AI.AgentOtherConfigUpdateReq) => {
+    return http.post(`/ai/agents/other/update`, req);
+};
+
 export const approveAgentChannelPairing = (req: AI.AgentChannelPairingApproveReq) => {
     return http.post(`/ai/agents/channel/pairing/approve`, req);
 };

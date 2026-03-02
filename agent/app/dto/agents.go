@@ -238,3 +238,16 @@ type AgentBrowserConfig struct {
 	NoSandbox      bool   `json:"noSandbox"`
 	DefaultProfile string `json:"defaultProfile"`
 }
+
+type AgentOtherConfigReq struct {
+	AgentID uint `json:"agentId" validate:"required"`
+}
+
+type AgentOtherConfigUpdateReq struct {
+	AgentID      uint   `json:"agentId" validate:"required"`
+	UserTimezone string `json:"userTimezone" validate:"required"`
+}
+
+type AgentOtherConfig struct {
+	UserTimezone string `json:"userTimezone"`
+}

@@ -60,6 +60,8 @@ func (a *AIToolsRouter) InitRouter(Router *gin.RouterGroup) {
 		aiToolsRouter.POST("/agents/channel/discord/update", baseApi.UpdateAgentDiscordConfig)
 		aiToolsRouter.POST("/agents/browser/get", baseApi.GetAgentBrowserConfig)
 		aiToolsRouter.POST("/agents/browser/update", baseApi.UpdateAgentBrowserConfig)
+		aiToolsRouter.POST("/agents/other/get", baseApi.GetAgentOtherConfig)
+		aiToolsRouter.POST("/agents/other/update", baseApi.UpdateAgentOtherConfig)
 		aiToolsRouter.POST("/agents/channel/pairing/approve", baseApi.ApproveAgentChannelPairing)
 	}
 }
