@@ -1053,7 +1053,7 @@ const message = {
         mountpoint: 'Punto de montaje',
         mountpointNFSHelper: 'ej: /nfs, /nfs-share',
         options: 'Opciones',
-        repo: 'Repositorio de contenedores | Repositorios de contenedores',
+        repo: 'Repositorio | Repositorios',
         httpRepoHelper: 'Operar un repositorio tipo HTTP requiere reiniciar el servicio Docker.',
         httpRepo:
             'Elegir el protocolo HTTP requiere reiniciar el servicio Docker para agregarlo a los registros inseguros.',

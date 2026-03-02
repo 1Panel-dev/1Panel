@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="drawerVisible" :header="$t('aiTools.model.create')" @close="handleClose">
+    <DrawerPro v-model="drawerVisible" :header="$t('commons.button.add')" @close="handleClose">
         <el-alert type="info" :closable="false">
             <template #title>
                 <span class="flx-align-center">

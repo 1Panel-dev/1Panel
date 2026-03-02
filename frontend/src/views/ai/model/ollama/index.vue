@@ -22,7 +22,7 @@
             </template>
             <template #leftToolBar>
                 <el-button :disabled="modelInfo.status !== 'Running'" type="primary" @click="onCreate()">
-                    {{ $t('aiTools.model.create') }}
+                    {{ $t('commons.button.add') }}
                 </el-button>
                 <el-button plain type="primary" :disabled="modelInfo.status !== 'Running'" @click="bindDomain">
                     {{ $t('aiTools.proxy.proxy') }}

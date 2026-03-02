@@ -39,7 +39,7 @@ func RepoURL() string {
 	if CONF.Base.Edition != "intl" {
 		return "https://resource.fit2cloud.com/1panel/package/v2"
 	}
-	return "https://resource.1panel.pro"
+	return "https://resource.1panel.pro/v2"
 }
 func ResourceURL() string {
 	if CONF.Base.Edition != "intl" {
@@ -51,5 +51,5 @@ func AppRepoURL() string {
 	if CONF.Base.Edition != "intl" {
 		return "https://apps-assets.fit2cloud.com"
 	}
-	return "https://apps.1panel.pro"
+	return "https://apps.1panel.pro/v2"
 }

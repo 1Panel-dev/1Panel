@@ -31,7 +31,7 @@
         <template #main>
             <div>
                 <MainDiv :heightDiff="mode === 'upgrade' ? 280 : 300">
-                    <el-alert type="info" :closable="false" v-if="mode === 'installed'">
+                    <el-alert type="info" :closable="false" v-if="mode === 'installed' && !isIntl">
                         <template #title>
                             <span class="flx-align-center">
                                 {{ $t('app.installHelper') }}
@@ -159,7 +159,7 @@ import { MsgSuccess } from '@/utils/message';
 import { getAgentSettingByKey } from '@/api/modules/setting';
 import { routerToFileWithPath, routerToNameWithQuery } from '@/utils/router';
 import { useGlobalStore } from '@/composables/useGlobalStore';
-const { currentNode, isMaster, currentNodeAddr } = useGlobalStore();
+const { currentNode, isMaster, currentNodeAddr, isIntl } = useGlobalStore();
 
 const data = ref<any>();
 const loading = ref(false);

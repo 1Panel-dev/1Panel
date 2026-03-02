@@ -1,7 +1,7 @@
 <template>
     <DrawerPro
         v-model="open"
-        :header="$t('runtime.' + mode)"
+        :header="$t('commons.button.' + mode)"
         :resource="mode === 'edit' ? runtime.name : ''"
         size="large"
         @close="handleClose"

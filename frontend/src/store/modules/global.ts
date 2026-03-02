@@ -60,7 +60,7 @@ const GlobalStore = defineStore({
             state.themeConfig.theme === 'dark' ||
             (state.themeConfig.theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches),
         isDarkGoldTheme: (state) => state.themeConfig.primary === '#F0BE96' && state.isProductPro,
-        docsUrl: (state) => (state.isIntl ? 'https://docs.1panel.hk' : 'https://1panel.cn/docs/v2'),
+        docsUrl: (state) => (state.isIntl ? 'https://docs.1panel.pro/v1' : 'https://1panel.cn/docs/v2'),
         isMaster: (state) => state.currentNode === 'local',
     },
     actions: {

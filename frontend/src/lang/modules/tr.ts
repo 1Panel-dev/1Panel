@@ -1060,7 +1060,7 @@ const message = {
         mountpointNFSHelper: 'örn. /nfs, /nfs-share',
         options: 'Seçenekler',
 
-        repo: 'Konteyner kayıt defteri | Konteyner kayıt defterleri',
+        repo: 'Depo | Depolar',
         httpRepoHelper: 'HTTP tipinde bir depo işlemi Docker servisinin yeniden başlatılmasını gerektirir.',
         httpRepo:
             'HTTP protokolü seçilmesi Docker servisinin güvenli olmayan kayıt defterlerine eklemek için yeniden başlatılmasını gerektirir.',

@@ -1595,7 +1595,8 @@ onMounted(() => {
     width: 17% !important;
     margin-left: 20px;
     .append {
-        width: 20px;
+        margin-left: -10px;
+        width: 30px;
     }
 }
 @media only screen and (max-width: 1000px) {

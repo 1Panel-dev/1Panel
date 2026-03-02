@@ -1049,7 +1049,7 @@ const message = {
         mountpointNFSHelper: 'e.g. /nfs, /nfs-share',
         options: 'Options',
 
-        repo: 'Container registry | Container registries',
+        repo: 'Repository | Repositories',
         httpRepoHelper: 'Operating an HTTP-type repository requires restarting the Docker service.',
         httpRepo: 'Choosing HTTP protocol requires restarting the Docker service to add it into insecure registries.',
         delInsecure: 'Deletion of credit',
