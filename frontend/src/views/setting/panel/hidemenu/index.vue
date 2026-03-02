@@ -70,7 +70,7 @@ const acceptParams = (params: DialogProps): void => {
     sortMenu(hideMenu);
     treeData.hideMenu = hideMenu;
     if (globalStore.isIntl) {
-        treeData.hideMenu = removeXAlertDashboard(treeData.hideMenu);
+        treeData.hideMenu = removeUpage(treeData.hideMenu);
     }
 };
 type Node = RenderContentContext['node'];
@@ -141,12 +141,12 @@ const treeData = reactive({
     checkedData: [],
 });
 
-const removeXAlertDashboard = (data: any): any => {
+const removeUpage = (data: any): any => {
     return data
-        .filter((item: { label: string }) => item.label !== 'XAlertDashboard')
+        .filter((item: { label: string }) => item.label !== 'Upage')
         .map((item: { children: any }) => {
             if (Array.isArray(item.children)) {
-                item.children = removeXAlertDashboard(item.children);
+                item.children = removeUpage(item.children);
             }
             return item;
         });

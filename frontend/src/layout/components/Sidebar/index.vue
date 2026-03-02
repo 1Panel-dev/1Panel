@@ -114,9 +114,7 @@ const search = async () => {
             (menuItem.children ?? [])
                 .filter(
                     (item) =>
-                        item.name &&
-                        showMap[item.name as string] &&
-                        !(item.name === 'XAlertDashboard' && globalStore.isIntl),
+                        item.name && showMap[item.name as string] && !(item.name === 'Upage' && globalStore.isIntl),
                 )
                 .sort(sortByMap(childMap)) || [];
 

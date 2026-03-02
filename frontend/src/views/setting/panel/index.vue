@@ -574,6 +574,7 @@ const onSaveEdition = async () => {
     )
         .then(async () => {
             await onSave('Edition', form.edition);
+            location.reload();
         })
         .catch(() => {
             form.edition = form.edition === 'cn' ? 'intl' : 'cn';
