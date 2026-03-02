@@ -1,46 +1,52 @@
 <template>
     <DrawerPro v-model="drawerVisible" :header="$t('setting.passkey')" @close="handleClose" size="large">
-        <el-alert
-            v-if="!allPrerequisitesMet"
-            :title="$t('setting.passkeyPrereqTitle')"
-            type="warning"
-            :closable="false"
-            class="mb-4"
-        >
-            <template #default>
-                <div class="flex flex-col gap-2 mt-2">
-                    <div class="flex items-center gap-2">
-                        <el-icon :color="prereqBindDomain ? '#67c23a' : '#f56c6c'">
-                            <Check v-if="prereqBindDomain" />
-                            <Close v-else />
-                        </el-icon>
-                        <span>{{ $t('setting.passkeyPrereqBindDomain') }}</span>
-                        <el-button v-if="!prereqBindDomain" link type="primary" @click="goConfigureDomain">
-                            {{ $t('setting.passkeyPrereqGoSetup') }}
-                        </el-button>
+        <div class="mb-4">
+            <el-alert
+                v-if="!allPrerequisitesMet"
+                :title="$t('setting.passkeyPrereqTitle')"
+                type="warning"
+                :closable="false"
+                class="mb-4"
+            >
+                <template #default>
+                    <div class="flex flex-col gap-2 mt-2">
+                        <div class="flex items-center gap-2">
+                            <el-icon :color="prereqBindDomain ? '#67c23a' : '#f56c6c'">
+                                <Check v-if="prereqBindDomain" />
+                                <Close v-else />
+                            </el-icon>
+                            <span>{{ $t('setting.passkeyPrereqBindDomain') }}</span>
+                            <el-button v-if="!prereqBindDomain" link type="primary" @click="goConfigureDomain">
+                                {{ $t('setting.passkeyPrereqGoSetup') }}
+                            </el-button>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <el-icon :color="prereqHttps ? '#67c23a' : '#f56c6c'">
+                                <Check v-if="prereqHttps" />
+                                <Close v-else />
+                            </el-icon>
+                            <span>{{ $t('setting.passkeyPrereqHttps') }}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <el-icon :color="prereqBrowser ? '#67c23a' : '#f56c6c'">
+                                <Check v-if="prereqBrowser" />
+                                <Close v-else />
+                            </el-icon>
+                            <span>{{ $t('setting.passkeyPrereqBrowser') }}</span>
+                        </div>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <el-icon :color="prereqHttps ? '#67c23a' : '#f56c6c'">
-                            <Check v-if="prereqHttps" />
-                            <Close v-else />
-                        </el-icon>
-                        <span>{{ $t('setting.passkeyPrereqHttps') }}</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <el-icon :color="prereqBrowser ? '#67c23a' : '#f56c6c'">
-                            <Check v-if="prereqBrowser" />
-                            <Close v-else />
-                        </el-icon>
-                        <span>{{ $t('setting.passkeyPrereqBrowser') }}</span>
-                    </div>
-                </div>
-            </template>
-        </el-alert>
-        <el-tabs v-if="allPrerequisitesMet" v-model="activeTab" type="border-card">
+                </template>
+            </el-alert>
+        </div>
+        <el-tabs v-model="activeTab" type="border-card">
             <el-tab-pane :label="$t('setting.passkeyKeyManagement')" name="keys">
                 <el-form label-position="top">
                     <el-form-item :label="$t('setting.passkeyName')">
-                        <el-input v-model.trim="passkeyForm.name" :placeholder="$t('setting.passkeyNameHelper')" />
+                        <el-input
+                            v-model.trim="passkeyForm.name"
+                            :placeholder="$t('setting.passkeyNameHelper')"
+                            :disabled="!allPrerequisitesMet"
+                        />
                     </el-form-item>
                     <el-button type="primary" @click="registerPasskey" :disabled="!canRegisterPasskey">
                         {{ $t('setting.passkeyAdd') }}
@@ -57,7 +63,12 @@
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.operate')" width="120">
                         <template #default="scope">
-                            <el-button link type="danger" @click="removePasskey(scope.row.id)">
+                            <el-button
+                                link
+                                type="danger"
+                                :disabled="!allPrerequisitesMet"
+                                @click="removePasskey(scope.row.id)"
+                            >
                                 {{ $t('commons.button.delete') }}
                             </el-button>
                         </template>
@@ -140,10 +151,8 @@ const canRegisterPasskey = computed(() => {
 const acceptParams = async (params: DrawerParams) => {
     hasBindDomain.value = params.bindDomain.trim().length > 0;
     drawerVisible.value = true;
-    if (allPrerequisitesMet.value) {
-        await loadPasskeyTrustedProxies();
-        await loadPasskeys();
-    }
+    await loadPasskeyTrustedProxies();
+    await loadPasskeys();
 };
 
 const loadPasskeyTrustedProxies = async () => {
