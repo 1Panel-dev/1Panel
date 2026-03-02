@@ -152,6 +152,14 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 			}
 			runtimeModel = "custom/" + primaryID
 		}
+		if provider == "bailian-coding-plan" {
+			modelID := runtimeModel
+			if parts := strings.SplitN(runtimeModel, "/", 2); len(parts) == 2 {
+				modelID = parts[1]
+			}
+			normalizedID := normalizeBailianCodingPlanModelID(modelID)
+			runtimeModel = "bailian-coding-plan/" + bailianPrimaryModelID(normalizedID)
+		}
 		storedModel = req.Model
 		apiKey = account.APIKey
 		accountID = account.ID
@@ -1484,7 +1492,8 @@ func writeOpenclawConfig(confDir, provider, modelName, apiType string, maxTokens
 			},
 		}
 	} else if provider == "bailian-coding-plan" {
-		cfg.Agents.Defaults.Model.Primary = modelName
+		normalizedID := normalizeBailianCodingPlanModelID(modelID)
+		cfg.Agents.Defaults.Model.Primary = "bailian-coding-plan/" + bailianPrimaryModelID(normalizedID)
 		base := baseURL
 		if base == "" {
 			if defaultURL, ok := providerDefaultBaseURL(provider); ok {
@@ -1502,9 +1511,9 @@ func writeOpenclawConfig(confDir, provider, modelName, apiType string, maxTokens
 					Api:     "openai-completions",
 					Models: []modelEntry{
 						{
-							ID:            modelID,
-							Name:          modelID,
-							Reasoning:     strings.Contains(strings.ToLower(modelID), "reason") || strings.Contains(strings.ToLower(modelID), "thinking"),
+							ID:            normalizedID,
+							Name:          normalizedID,
+							Reasoning:     strings.Contains(strings.ToLower(normalizedID), "reason") || strings.Contains(strings.ToLower(normalizedID), "thinking"),
 							Input:         []string{"text"},
 							ContextWindow: useContextWindow,
 							MaxTokens:     useMaxTokens,
@@ -1839,6 +1848,31 @@ func normalizeCustomModel(modelName string) string {
 	if parts := strings.SplitN(trim, "/", 2); len(parts) == 2 {
 		if strings.EqualFold(parts[0], "custom") {
 			return strings.TrimSpace(parts[1])
+		}
+	}
+	return trim
+}
+
+func normalizeBailianCodingPlanModelID(modelID string) string {
+	trim := strings.TrimSpace(modelID)
+	switch strings.ToLower(trim) {
+	case "minimax-m2.5", "minimax m2.5", "minimax/minimax-m2.5", "minimax/minimax m2.5":
+		return "MiniMax/MiniMax-M2.5"
+	default:
+		return trim
+	}
+}
+
+func bailianPrimaryModelID(modelID string) string {
+	trim := strings.TrimSpace(modelID)
+	if trim == "" {
+		return ""
+	}
+	parts := strings.Split(trim, "/")
+	for i := len(parts) - 1; i >= 0; i-- {
+		part := strings.TrimSpace(parts[i])
+		if part != "" {
+			return part
 		}
 	}
 	return trim
