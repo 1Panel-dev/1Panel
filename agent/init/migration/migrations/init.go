@@ -993,3 +993,20 @@ var AddEditionSetting = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddAgentTypeForAgents = &gormigrate.Migration{
+	ID: "20260302-add-agent-type-for-agents",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.Agent{}); err != nil {
+			return err
+		}
+		if err := tx.Model(&model.Agent{}).Where("agent_type = '' OR agent_type IS NULL").Update("agent_type", constant.AppOpenclaw).Error; err != nil {
+			return err
+		}
+		return tx.Exec(
+			"UPDATE agents SET agent_type = ? WHERE app_install_id IN (SELECT ai.id FROM app_installs ai JOIN apps a ON ai.app_id = a.id WHERE a.key = ?)",
+			constant.AppCopaw,
+			constant.AppCopaw,
+		).Error
+	},
+}

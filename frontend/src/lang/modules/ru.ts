@@ -675,6 +675,8 @@ const message = {
             accountCount: '{0} аккаунтов модели',
             syncAgents: 'Синхронизировать связанные агенты',
             syncAgentsHelper: 'Обновите openclaw.json для агентов, использующих этот аккаунт модели',
+            openclawType: 'OpenClaw',
+            copawType: 'CoPaw',
             appVersion: 'Версия приложения',
             webuiPort: 'Порт WebUI',
             bridgePort: 'Порт Bridge',

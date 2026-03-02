@@ -672,6 +672,8 @@ const message = {
             accountCount: 'モデルアカウント {0} 件',
             syncAgents: '関連エージェントを同期',
             syncAgentsHelper: 'このモデルアカウントを使用するエージェントの openclaw.json を更新',
+            openclawType: 'OpenClaw',
+            copawType: 'CoPaw',
             appVersion: 'アプリバージョン',
             webuiPort: 'WebUI ポート',
             bridgePort: 'Bridge ポート',

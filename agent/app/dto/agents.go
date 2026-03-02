@@ -6,9 +6,10 @@ type AgentCreateReq struct {
 	Name          string  `json:"name" validate:"required"`
 	AppVersion    string  `json:"appVersion" validate:"required"`
 	WebUIPort     int     `json:"webUIPort" validate:"required"`
-	BridgePort    int     `json:"bridgePort" validate:"required"`
-	Provider      string  `json:"provider" validate:"required"`
-	Model         string  `json:"model" validate:"required"`
+	BridgePort    int     `json:"bridgePort"`
+	AgentType     string  `json:"agentType"`
+	Provider      string  `json:"provider"`
+	Model         string  `json:"model"`
 	APIType       string  `json:"apiType"`
 	MaxTokens     int     `json:"maxTokens"`
 	ContextWindow int     `json:"contextWindow"`
@@ -33,6 +34,7 @@ type AgentCreateReq struct {
 type AgentItem struct {
 	ID            uint      `json:"id"`
 	Name          string    `json:"name"`
+	AgentType     string    `json:"agentType"`
 	Provider      string    `json:"provider"`
 	ProviderName  string    `json:"providerName"`
 	Model         string    `json:"model"`

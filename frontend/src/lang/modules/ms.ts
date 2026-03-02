@@ -683,6 +683,8 @@ const message = {
             accountCount: 'Akaun model {0}',
             syncAgents: 'Segerakkan agen berkaitan',
             syncAgentsHelper: 'Kemas kini openclaw.json untuk agen yang menggunakan akaun model ini',
+            openclawType: 'OpenClaw',
+            copawType: 'CoPaw',
             appVersion: 'Versi aplikasi',
             webuiPort: 'Port WebUI',
             bridgePort: 'Port Bridge',

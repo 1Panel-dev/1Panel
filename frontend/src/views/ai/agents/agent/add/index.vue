@@ -5,6 +5,12 @@
                 <el-form-item :label="$t('commons.table.name')" prop="name">
                     <el-input v-model="form.name" />
                 </el-form-item>
+                <el-form-item :label="`${$t('aiTools.agents.agents')}${$t('commons.table.type')}`" prop="agentType">
+                    <el-select v-model="form.agentType" @change="handleAgentTypeChange">
+                        <el-option :label="$t('aiTools.agents.openclawType')" value="openclaw" />
+                        <el-option :label="$t('aiTools.agents.copawType')" value="copaw" />
+                    </el-select>
+                </el-form-item>
                 <el-form-item :label="$t('aiTools.agents.appVersion')" prop="appVersion">
                     <el-select v-model="form.appVersion" filterable>
                         <el-option v-for="item in versions" :key="item" :label="item" :value="item" />
@@ -13,11 +19,15 @@
                 <el-form-item :label="$t('aiTools.agents.webuiPort')" prop="webUIPort">
                     <el-input-number v-model="form.webUIPort" :min="1" :max="65535" />
                 </el-form-item>
-                <el-form-item :label="$t('aiTools.agents.bridgePort')" prop="bridgePort">
+                <el-form-item
+                    v-if="form.agentType === 'openclaw'"
+                    :label="$t('aiTools.agents.bridgePort')"
+                    prop="bridgePort"
+                >
                     <el-input-number v-model="form.bridgePort" :min="1" :max="65535" />
                 </el-form-item>
             </el-card>
-            <el-card class="form-card">
+            <el-card class="form-card" v-if="form.agentType === 'openclaw'">
                 <el-form-item :label="$t('aiTools.agents.provider')" prop="provider">
                     <el-select v-model="form.provider" @change="handleProviderChange">
                         <el-option
@@ -114,6 +124,7 @@ const accountAddRef = ref();
 
 const form = reactive({
     name: '',
+    agentType: 'openclaw' as 'openclaw' | 'copaw',
     appVersion: '',
     webUIPort: 18789,
     bridgePort: 18790,
@@ -139,14 +150,37 @@ const form = reactive({
     dockerCompose: '',
 });
 
+const validateOpenclawOnly = (field: 'provider' | 'accountId' | 'model' | 'bridgePort') => {
+    return (_rule: any, value: any, callback: (error?: Error) => void) => {
+        if (form.agentType !== 'openclaw') {
+            callback();
+            return;
+        }
+        if (field === 'bridgePort') {
+            if (!value || Number(value) <= 0) {
+                callback(new Error('bridge port is required'));
+                return;
+            }
+            callback();
+            return;
+        }
+        if (value === undefined || value === null || value === '') {
+            callback(new Error(`${field} is required`));
+            return;
+        }
+        callback();
+    };
+};
+
 const rules = reactive({
     name: [Rules.requiredInput],
+    agentType: [Rules.requiredSelect],
     appVersion: [Rules.requiredSelect],
     webUIPort: [Rules.requiredInput],
-    bridgePort: [Rules.requiredInput],
-    provider: [Rules.requiredSelect],
-    accountId: [Rules.requiredSelect],
-    model: [Rules.requiredSelect],
+    bridgePort: [{ validator: validateOpenclawOnly('bridgePort'), trigger: 'blur' }],
+    provider: [{ validator: validateOpenclawOnly('provider'), trigger: 'change' }],
+    accountId: [{ validator: validateOpenclawOnly('accountId'), trigger: 'change' }],
+    model: [{ validator: validateOpenclawOnly('model'), trigger: 'change' }],
     containerName: [Rules.containerName],
     restartPolicy: [Rules.requiredSelect],
     cpuQuota: [checkNumberRange(0, 99999)],
@@ -156,8 +190,8 @@ const rules = reactive({
 
 const filteredModels = computed(() => providerModels.value[form.provider] || []);
 
-const loadVersions = async () => {
-    const res = await getAppByKey('openclaw');
+const loadVersions = async (appKey: 'openclaw' | 'copaw') => {
+    const res = await getAppByKey(appKey);
     appInfo.value = res.data;
     versions.value = res.data.versions || [];
     if (!form.appVersion && versions.value.length > 0) {
@@ -174,6 +208,11 @@ const loadCompose = async () => {
 };
 
 const loadProviders = async () => {
+    if (form.agentType !== 'openclaw') {
+        providerOptions.value = [];
+        providerModels.value = {};
+        return;
+    }
     const res = await getAgentProviders();
     const data = res.data || [];
     providerOptions.value = data.map((item) => ({
@@ -206,6 +245,10 @@ const loadProviderAccountCounts = async (providers: string[]) => {
 };
 
 const loadAccounts = async () => {
+    if (form.agentType !== 'openclaw') {
+        accountOptions.value = [];
+        return;
+    }
     if (!form.provider) {
         accountOptions.value = [];
         return;
@@ -230,12 +273,36 @@ const loadAccounts = async () => {
 };
 
 const handleProviderChange = () => {
+    if (form.agentType !== 'openclaw') {
+        return;
+    }
     form.model = '';
     form.apiKey = '';
     form.baseURL = '';
     form.accountId = undefined as unknown as number;
     loadAccounts();
     setDefaultModel();
+};
+
+const handleAgentTypeChange = async () => {
+    if (form.name === '' || form.name === 'OpenClaw' || form.name === 'CoPaw') {
+        form.name = form.agentType === 'copaw' ? 'CoPaw' : 'OpenClaw';
+    }
+    form.appVersion = '';
+    form.model = '';
+    form.provider = 'deepseek';
+    form.accountId = undefined as unknown as number;
+    form.apiKey = '';
+    form.baseURL = '';
+    form.apiType = 'openai-completions';
+    if (form.agentType === 'openclaw') {
+        form.bridgePort = form.bridgePort || 18790;
+        await loadVersions('openclaw');
+        await loadProviders();
+        await loadAccounts();
+        return;
+    }
+    await loadVersions('copaw');
 };
 
 const handleModelChange = () => {
@@ -245,6 +312,9 @@ const handleModelChange = () => {
 };
 
 const handleAccountChange = () => {
+    if (form.agentType !== 'openclaw') {
+        return;
+    }
     const selected = accountOptions.value.find((item) => item.id === form.accountId);
     if (selected) {
         form.baseURL = selected.baseUrl || '';
@@ -260,6 +330,9 @@ const handleAccountChange = () => {
 };
 
 const setDefaultModel = () => {
+    if (form.agentType !== 'openclaw') {
+        return;
+    }
     if (manualModel.value) {
         return;
     }
@@ -282,40 +355,50 @@ const submit = async () => {
     }
     await formRef.value.validate();
     const taskID = newUUID();
-    if (!form.token) {
+    if (form.agentType === 'openclaw' && !form.token) {
         form.token = getRandomStr(32).toLowerCase();
     }
-    const res = await createAgent({
-        name: form.name,
-        appVersion: form.appVersion,
-        webUIPort: form.webUIPort,
-        bridgePort: form.bridgePort,
-        provider: form.provider,
-        model: form.model,
-        apiType: form.apiType,
-        maxTokens: form.maxTokens,
-        contextWindow: form.contextWindow,
-        accountId: form.accountId,
-        apiKey: form.apiKey,
-        baseURL: form.baseURL,
-        token: form.token,
-        taskID: taskID,
-        advanced: form.advanced,
-        containerName: form.containerName,
-        allowPort: form.allowPort,
-        specifyIP: form.specifyIP,
-        restartPolicy: form.restartPolicy,
-        cpuQuota: form.cpuQuota,
-        memoryLimit: form.memoryLimit,
-        memoryUnit: form.memoryUnit,
-        pullImage: form.pullImage,
-        editCompose: form.editCompose,
-        dockerCompose: form.dockerCompose,
-    });
-    form.token = res.data.token || form.token;
-    emit('search');
-    emit('task', taskID);
-    open.value = false;
+    try {
+        const res = await createAgent({
+            name: form.name,
+            appVersion: form.appVersion,
+            webUIPort: form.webUIPort,
+            bridgePort: form.agentType === 'openclaw' ? form.bridgePort : undefined,
+            agentType: form.agentType,
+            provider: form.agentType === 'openclaw' ? form.provider : undefined,
+            model: form.agentType === 'openclaw' ? form.model : undefined,
+            apiType: form.agentType === 'openclaw' ? form.apiType : undefined,
+            maxTokens: form.agentType === 'openclaw' ? form.maxTokens : undefined,
+            contextWindow: form.agentType === 'openclaw' ? form.contextWindow : undefined,
+            accountId: form.agentType === 'openclaw' ? form.accountId : undefined,
+            apiKey: form.agentType === 'openclaw' ? form.apiKey : undefined,
+            baseURL: form.agentType === 'openclaw' ? form.baseURL : undefined,
+            token: form.agentType === 'openclaw' ? form.token : undefined,
+            taskID: taskID,
+            advanced: form.advanced,
+            containerName: form.containerName,
+            allowPort: form.allowPort,
+            specifyIP: form.specifyIP,
+            restartPolicy: form.restartPolicy,
+            cpuQuota: form.cpuQuota,
+            memoryLimit: form.memoryLimit,
+            memoryUnit: form.memoryUnit,
+            pullImage: form.pullImage,
+            editCompose: form.editCompose,
+            dockerCompose: form.dockerCompose,
+        });
+        form.token = res.data.token || form.token;
+        emit('search');
+        emit('task', taskID);
+        open.value = false;
+    } catch (error: any) {
+        const message = String(error?.message || '').toLowerCase();
+        const isTimeout = message.includes('timeout') || error?.code === 'ECONNABORTED';
+        if (isTimeout) {
+            emit('task', taskID);
+            open.value = false;
+        }
+    }
 };
 
 const handleClose = () => {
@@ -324,17 +407,29 @@ const handleClose = () => {
     form.dockerCompose = '';
 };
 
-const openDrawer = async () => {
-    form.name = 'openclaw';
+const openDrawer = async (agentType?: 'openclaw' | 'copaw') => {
+    const targetType = agentType === 'copaw' ? 'copaw' : 'openclaw';
+    form.name = targetType === 'copaw' ? 'CoPaw' : 'OpenClaw';
     open.value = true;
     manualModel.value = false;
+    form.agentType = targetType;
     form.token = getRandomStr(32).toLowerCase();
-    await loadVersions();
+    if (form.agentType === 'copaw') {
+        await loadVersions('copaw');
+        providerOptions.value = [];
+        providerModels.value = {};
+        accountOptions.value = [];
+        return;
+    }
+    await loadVersions('openclaw');
     await loadProviders();
     await loadAccounts();
 };
 
 const openAccountCreate = () => {
+    if (form.agentType !== 'openclaw') {
+        return;
+    }
     if (accountAddRef.value?.open) {
         accountAddRef.value.open({ provider: form.provider });
     }

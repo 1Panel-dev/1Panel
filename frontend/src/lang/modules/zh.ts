@@ -642,6 +642,8 @@ const message = {
             accountCount: '模型账号 {0} 个',
             syncAgents: '同步关联智能体',
             syncAgentsHelper: '更新使用该模型账号的智能体 openclaw.json',
+            openclawType: 'OpenClaw',
+            copawType: 'CoPaw',
             appVersion: '应用版本',
             webuiPort: 'WebUI 端口',
             bridgePort: 'Bridge 端口',

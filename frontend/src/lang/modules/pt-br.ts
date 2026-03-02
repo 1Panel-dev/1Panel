@@ -680,6 +680,8 @@ const message = {
             accountCount: '{0} contas de modelo',
             syncAgents: 'Sincronizar agentes vinculados',
             syncAgentsHelper: 'Atualize o openclaw.json para agentes que usam esta conta de modelo',
+            openclawType: 'OpenClaw',
+            copawType: 'CoPaw',
             appVersion: 'Versão do app',
             webuiPort: 'Porta WebUI',
             bridgePort: 'Porta Bridge',

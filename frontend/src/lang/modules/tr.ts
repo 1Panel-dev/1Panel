@@ -689,6 +689,8 @@ const message = {
             accountCount: '{0} model hesabı',
             syncAgents: 'İlişkili ajanları senkronize et',
             syncAgentsHelper: 'Bu model hesabını kullanan ajanlar için openclaw.json dosyasını güncelleyin',
+            openclawType: 'OpenClaw',
+            copawType: 'CoPaw',
             appVersion: 'Uygulama sürümü',
             webuiPort: 'WebUI portu',
             bridgePort: 'Bridge portu',

@@ -16,6 +16,16 @@ export const jumpToInstall = (type: string, key: string) => {
         case 'openclaw':
             jumpToPath(router, '/ai/agents/agent');
             return true;
+        case 'copaw':
+            router.push({
+                path: '/ai/agents/agent',
+                query: {
+                    uncached: 'true',
+                    open: 'create',
+                    agentType: 'copaw',
+                },
+            });
+            return true;
         case 'mysql-cluster':
             jumpToPath(router, '/xpack/cluster/mysql');
             return true;

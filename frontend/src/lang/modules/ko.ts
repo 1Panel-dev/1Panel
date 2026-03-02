@@ -667,6 +667,8 @@ const message = {
             accountCount: '모델 계정 {0}개',
             syncAgents: '관련 에이전트 동기화',
             syncAgentsHelper: '이 모델 계정을 사용하는 에이전트의 openclaw.json 업데이트',
+            openclawType: 'OpenClaw',
+            copawType: 'CoPaw',
             appVersion: '앱 버전',
             webuiPort: 'WebUI 포트',
             bridgePort: 'Bridge 포트',

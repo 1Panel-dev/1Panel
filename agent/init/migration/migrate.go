@@ -69,6 +69,7 @@ func InitAgentDB() {
 		migrations.AddAppInstallSortOrder,
 		migrations.AddAgentAccountRememberAPIKey,
 		migrations.AddEditionSetting,
+		migrations.AddAgentTypeForAgents,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

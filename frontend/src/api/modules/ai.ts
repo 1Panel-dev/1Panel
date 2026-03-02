@@ -1,6 +1,7 @@
 import { AI } from '@/api/interface/ai';
 import http from '@/api';
 import { ResPage, SearchWithPage } from '../interface';
+import { TimeoutEnum } from '@/enums/http-enum';
 
 export const createOllamaModel = (name: string, taskID: string) => {
     return http.post(`/ai/ollama/model`, { name: name, taskID: taskID });
@@ -93,7 +94,7 @@ export const operateTensorRTLLM = (req: AI.TensorRTLLMOperate) => {
 };
 
 export const createAgent = (req: AI.AgentCreateReq) => {
-    return http.post<AI.AgentItem>(`/ai/agents`, req);
+    return http.post<AI.AgentItem>(`/ai/agents`, req, TimeoutEnum.T_60S);
 };
 
 export const pageAgents = (req: SearchWithPage) => {

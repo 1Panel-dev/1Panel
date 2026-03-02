@@ -240,16 +240,17 @@ export namespace AI {
         name: string;
         appVersion: string;
         webUIPort: number;
-        bridgePort: number;
-        provider: string;
-        model: string;
-        apiType: string;
-        maxTokens: number;
-        contextWindow: number;
-        accountId: number;
-        apiKey: string;
-        baseURL: string;
-        token: string;
+        bridgePort?: number;
+        agentType: 'openclaw' | 'copaw';
+        provider?: string;
+        model?: string;
+        apiType?: string;
+        maxTokens?: number;
+        contextWindow?: number;
+        accountId?: number;
+        apiKey?: string;
+        baseURL?: string;
+        token?: string;
         taskID: string;
         advanced: boolean;
         containerName: string;
@@ -267,6 +268,7 @@ export namespace AI {
     export interface AgentItem {
         id: number;
         name: string;
+        agentType: 'openclaw' | 'copaw';
         provider: string;
         providerName: string;
         model: string;

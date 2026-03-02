@@ -18,6 +18,19 @@
                         prop="name"
                         min-width="120"
                     />
+                    <el-table-column
+                        :label="`${$t('aiTools.agents.agents')}${$t('commons.table.type')}`"
+                        prop="agentType"
+                        min-width="120"
+                    >
+                        <template #default="{ row }">
+                            {{
+                                row.agentType === 'copaw'
+                                    ? $t('aiTools.agents.copawType')
+                                    : $t('aiTools.agents.openclawType')
+                            }}
+                        </template>
+                    </el-table-column>
                     <el-table-column :label="$t('commons.table.status')" prop="status" width="120">
                         <template #default="{ row }">
                             <Status :status="row.status" />
@@ -38,10 +51,13 @@
                         min-width="120"
                     >
                         <template #default="{ row }">
-                            <span>{{ getAgentProviderDisplayName(row.provider, row.providerName) }}</span>
-                            <div>
-                                <span>{{ row.model }}</span>
-                            </div>
+                            <template v-if="row.agentType !== 'copaw'">
+                                <span>{{ getAgentProviderDisplayName(row.provider, row.providerName) }}</span>
+                                <div>
+                                    <span>{{ row.model }}</span>
+                                </div>
+                            </template>
+                            <span v-else>-</span>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.port')" prop="webUIPort" min-width="150">
@@ -49,7 +65,7 @@
                             <el-button icon="Position" plain size="small" @click="jumpWebUI(row)">
                                 {{ $t('aiTools.agents.webuiPort') }}: {{ row.webUIPort }}
                             </el-button>
-                            <div class="mt-0.5">
+                            <div v-if="row.agentType !== 'copaw'" class="mt-0.5">
                                 <el-button plain size="small">
                                     {{ $t('aiTools.agents.bridgePort') }} {{ row.bridgePort }}
                                 </el-button>
@@ -58,12 +74,13 @@
                     </el-table-column>
                     <el-table-column :label="$t('aiTools.agents.token')" min-width="80">
                         <template #default="{ row }">
-                            <el-space>
+                            <el-space v-if="row.agentType !== 'copaw'">
                                 <CopyButton :content="row.token" />
                                 <el-button link type="primary" @click="onResetToken(row)">
                                     {{ $t('commons.button.reset') }}
                                 </el-button>
                             </el-space>
+                            <span v-else>-</span>
                         </template>
                     </el-table-column>
                     <el-table-column
@@ -96,6 +113,7 @@
 
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { pageAgents, resetAgentToken } from '@/api/modules/ai';
 import { installedOp, searchAppInstalled } from '@/api/modules/app';
 import { AI } from '@/api/interface/ai';
@@ -127,6 +145,8 @@ const upgradeRef = ref();
 const composeLogRef = ref();
 const dialogTerminalRef = ref();
 const dialogPortJumpRef = ref();
+const route = useRoute();
+const router = useRouter();
 const isActive = ref(false);
 const isExist = ref(false);
 const searchName = ref('');
@@ -135,6 +155,7 @@ const buttons = [
     {
         label: i18n.global.t('menu.config'),
         click: (row: AI.AgentItem) => openConfig(row),
+        show: (row: AI.AgentItem) => row.agentType !== 'copaw',
     },
     {
         label: i18n.global.t('menu.terminal'),
@@ -191,10 +212,24 @@ const search = async () => {
     }
 };
 
-const openCreate = () => {
+const openCreate = (agentType?: 'openclaw' | 'copaw') => {
+    const targetType = agentType === 'copaw' ? 'copaw' : 'openclaw';
     if (addRef.value?.open) {
-        addRef.value.open();
+        addRef.value.open(targetType);
     }
+};
+
+const openCreateFromQuery = async () => {
+    const shouldOpen = route.query.open === 'create';
+    if (!shouldOpen) {
+        return;
+    }
+    const agentType = route.query.agentType === 'copaw' ? 'copaw' : 'openclaw';
+    openCreate(agentType);
+    const nextQuery = { ...route.query };
+    delete nextQuery.open;
+    delete nextQuery.agentType;
+    await router.replace({ path: route.path, query: nextQuery });
 };
 
 const openTaskLog = (taskID: string) => {
@@ -236,11 +271,12 @@ const openTerminal = (row: AI.AgentItem) => {
 };
 
 const jumpWebUI = (row: AI.AgentItem) => {
+    const query = row.agentType === 'copaw' ? '' : `token=${row.token}`;
     if (dialogPortJumpRef.value?.acceptParams) {
         dialogPortJumpRef.value.acceptParams({
             port: row.webUIPort,
             protocol: 'http',
-            query: `token=${row.token}`,
+            query,
         });
     }
 };
@@ -265,6 +301,9 @@ const onResetToken = async (row: AI.AgentItem) => {
 };
 
 const openConfig = (row: AI.AgentItem) => {
+    if (row.agentType === 'copaw') {
+        return;
+    }
     configRef.value?.open(row);
 };
 
@@ -279,5 +318,6 @@ const openUpgrade = async (row: AI.AgentItem) => {
 
 onMounted(async () => {
     await search();
+    await openCreateFromQuery();
 });
 </script>

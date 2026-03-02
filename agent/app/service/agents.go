@@ -63,50 +63,17 @@ const (
 )
 
 func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
-	provider := strings.ToLower(strings.TrimSpace(req.Provider))
-	if !isSupportedAgentProvider(provider) {
-		return nil, buserr.New("ErrAgentProviderNotSupported")
-	}
-	if req.AccountID == 0 {
-		return nil, buserr.New("ErrAgentAccountRequired")
-	}
-	account, err := agentAccountRepo.GetFirst(repo.WithByID(req.AccountID))
-	if err != nil {
-		return nil, err
-	}
-	if !account.Verified {
-		return nil, buserr.New("ErrAgentAccountNotVerified")
-	}
-	if account.Provider != "" && provider != "" && account.Provider != provider {
-		return nil, buserr.New("ErrAgentProviderMismatch")
-	}
-	provider = strings.ToLower(strings.TrimSpace(account.Provider))
-	baseURL := strings.TrimSpace(account.BaseURL)
-	if baseURL == "" {
-		if defaultURL, ok := providerDefaultBaseURL(provider); ok {
-			baseURL = defaultURL
-		}
-	}
-	if provider == "ollama" && baseURL == "" {
-		return nil, buserr.New("ErrAgentBaseURLRequired")
-	}
-	if provider != "ollama" && strings.TrimSpace(account.APIKey) == "" {
-		return nil, buserr.New("ErrAgentApiKeyRequired")
-	}
-	apiType, maxTokens, contextWindow := resolveRuntimeParams(provider, account.APIType, account.MaxTokens, account.ContextWindow)
-	runtimeModel := strings.TrimSpace(req.Model)
-	if provider == "custom" {
-		primaryID := customPrimaryModelID(req.Model)
-		if primaryID == "" {
-			primaryID = normalizeCustomModel(req.Model)
-		}
-		runtimeModel = "custom/" + primaryID
+	agentType := normalizeAgentType(req.AgentType)
+	if !isSupportedAgentType(agentType) {
+		return nil, fmt.Errorf("agent type is invalid")
 	}
 	if err := checkPortExist(req.WebUIPort); err != nil {
 		return nil, err
 	}
-	if err := checkPortExist(req.BridgePort); err != nil {
-		return nil, err
+	if agentType == constant.AppOpenclaw {
+		if err := checkPortExist(req.BridgePort); err != nil {
+			return nil, err
+		}
 	}
 	if exist, _ := agentRepo.GetFirst(repo.WithByLowerName(req.Name)); exist != nil && exist.ID > 0 {
 		return nil, buserr.New("ErrNameIsExist")
@@ -114,7 +81,11 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 	if installs, _ := appInstallRepo.ListBy(context.Background(), repo.WithByLowerName(req.Name)); len(installs) > 0 {
 		return nil, buserr.New("ErrNameIsExist")
 	}
-	app, err := appRepo.GetFirst(appRepo.WithKey(constant.AppOpenclaw))
+	appKey := constant.AppOpenclaw
+	if agentType == constant.AppCopaw {
+		appKey = constant.AppCopaw
+	}
+	app, err := appRepo.GetFirst(appRepo.WithKey(appKey))
 	if err != nil || app.ID == 0 {
 		return nil, buserr.New("ErrRecordNotFound")
 	}
@@ -123,24 +94,86 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 		return nil, buserr.New("ErrRecordNotFound")
 	}
 
-	token := strings.TrimSpace(req.Token)
-	if token == "" {
-		token = generateToken()
+	provider := ""
+	baseURL := ""
+	apiType := ""
+	maxTokens := 0
+	contextWindow := 0
+	apiKey := ""
+	runtimeModel := ""
+	accountID := uint(0)
+	token := ""
+	configPath := ""
+	storedModel := ""
+
+	if agentType == constant.AppOpenclaw {
+		provider = strings.ToLower(strings.TrimSpace(req.Provider))
+		if !isSupportedAgentProvider(provider) {
+			return nil, buserr.New("ErrAgentProviderNotSupported")
+		}
+		if req.AccountID == 0 {
+			return nil, buserr.New("ErrAgentAccountRequired")
+		}
+		account, err := agentAccountRepo.GetFirst(repo.WithByID(req.AccountID))
+		if err != nil {
+			return nil, err
+		}
+		if !account.Verified {
+			return nil, buserr.New("ErrAgentAccountNotVerified")
+		}
+		if account.Provider != "" && provider != "" && account.Provider != provider {
+			return nil, buserr.New("ErrAgentProviderMismatch")
+		}
+		provider = strings.ToLower(strings.TrimSpace(account.Provider))
+		baseURL = strings.TrimSpace(account.BaseURL)
+		if baseURL == "" {
+			if defaultURL, ok := providerDefaultBaseURL(provider); ok {
+				baseURL = defaultURL
+			}
+		}
+		if provider == "ollama" && baseURL == "" {
+			return nil, buserr.New("ErrAgentBaseURLRequired")
+		}
+		if provider != "ollama" && strings.TrimSpace(account.APIKey) == "" {
+			return nil, buserr.New("ErrAgentApiKeyRequired")
+		}
+		apiType, maxTokens, contextWindow = resolveRuntimeParams(provider, account.APIType, account.MaxTokens, account.ContextWindow)
+		runtimeModel = strings.TrimSpace(req.Model)
+		if runtimeModel == "" {
+			return nil, buserr.New("ErrAgentProviderMismatch")
+		}
+		if provider == "custom" {
+			primaryID := customPrimaryModelID(req.Model)
+			if primaryID == "" {
+				primaryID = normalizeCustomModel(req.Model)
+			}
+			runtimeModel = "custom/" + primaryID
+		}
+		storedModel = req.Model
+		apiKey = account.APIKey
+		accountID = account.ID
+		token = strings.TrimSpace(req.Token)
+		if token == "" {
+			token = generateToken()
+		}
 	}
+
 	params := map[string]interface{}{
-		"PROVIDER":               provider,
-		"MODEL":                  runtimeModel,
-		"API_TYPE":               apiType,
-		"MAX_TOKENS":             maxTokens,
-		"CONTEXT_WINDOW":         contextWindow,
-		"BASE_URL":               baseURL,
-		"API_KEY":                account.APIKey,
-		"OPENCLAW_GATEWAY_TOKEN": token,
-		"PANEL_APP_PORT_HTTP":    req.WebUIPort,
-		"PANEL_APP_PORT_BRIDGE":  req.BridgePort,
-		constant.CPUS:            "0",
-		constant.MemoryLimit:     "0",
-		constant.HostIP:          "",
+		"PANEL_APP_PORT_HTTP": req.WebUIPort,
+		constant.CPUS:         "0",
+		constant.MemoryLimit:  "0",
+		constant.HostIP:       "",
+	}
+	if agentType == constant.AppOpenclaw {
+		params["PROVIDER"] = provider
+		params["MODEL"] = runtimeModel
+		params["API_TYPE"] = apiType
+		params["MAX_TOKENS"] = maxTokens
+		params["CONTEXT_WINDOW"] = contextWindow
+		params["BASE_URL"] = baseURL
+		params["API_KEY"] = apiKey
+		params["OPENCLAW_GATEWAY_TOKEN"] = token
+		params["PANEL_APP_PORT_BRIDGE"] = req.BridgePort
 	}
 
 	if req.EditCompose && strings.TrimSpace(req.DockerCompose) == "" {
@@ -169,27 +202,32 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 	if err != nil {
 		return nil, err
 	}
-	configPath := path.Join(appInstall.GetPath(), "data", "conf", "openclaw.json")
+	if agentType == constant.AppOpenclaw {
+		configPath = path.Join(appInstall.GetPath(), "data", "conf", "openclaw.json")
+	}
 	agent := &model.Agent{
 		Name:          req.Name,
+		AgentType:     agentType,
 		Provider:      provider,
-		Model:         req.Model,
+		Model:         storedModel,
 		APIType:       apiType,
 		MaxTokens:     maxTokens,
 		ContextWindow: contextWindow,
 		BaseURL:       baseURL,
-		APIKey:        account.APIKey,
+		APIKey:        apiKey,
 		Token:         token,
 		Status:        appInstall.Status,
 		Message:       appInstall.Message,
 		AppInstallID:  appInstall.ID,
-		AccountID:     account.ID,
+		AccountID:     accountID,
 		ConfigPath:    configPath,
 	}
 	if err := agentRepo.Create(agent); err != nil {
 		return nil, err
 	}
-	go a.writeConfigWithRetry(appInstall, provider, req.Model, apiType, maxTokens, contextWindow, baseURL, account.APIKey, token, agent.ID)
+	if agentType == constant.AppOpenclaw {
+		go a.writeConfigWithRetry(appInstall, provider, req.Model, apiType, maxTokens, contextWindow, baseURL, apiKey, token, agent.ID)
+	}
 
 	item := buildAgentItem(agent, appInstall, nil)
 	return &item, nil
@@ -244,6 +282,9 @@ func (a AgentService) ResetToken(req dto.AgentTokenResetReq) error {
 	if err != nil {
 		return err
 	}
+	if normalizeAgentType(agent.AgentType) == constant.AppCopaw {
+		return fmt.Errorf("copaw does not support token")
+	}
 	configPath := strings.TrimSpace(agent.ConfigPath)
 	if configPath == "" && agent.AppInstallID > 0 {
 		install, err := appInstallRepo.GetFirst(repo.WithByID(agent.AppInstallID))
@@ -283,6 +324,9 @@ func (a AgentService) UpdateModelConfig(req dto.AgentModelConfigUpdateReq) error
 	agent, err := agentRepo.GetFirst(repo.WithByID(req.AgentID))
 	if err != nil {
 		return err
+	}
+	if normalizeAgentType(agent.AgentType) == constant.AppCopaw {
+		return fmt.Errorf("copaw does not support model config")
 	}
 	account, err := agentAccountRepo.GetFirst(repo.WithByID(req.AccountID))
 	if err != nil {
@@ -1119,9 +1163,14 @@ func verifyMinimax(baseURL, apiKey string) error {
 }
 
 func buildAgentItem(agent *model.Agent, appInstall *model.AppInstall, envMap map[string]interface{}) dto.AgentItem {
+	agentType := normalizeAgentType(agent.AgentType)
+	if appInstall != nil && appInstall.ID > 0 && appInstall.App.Key == constant.AppCopaw {
+		agentType = constant.AppCopaw
+	}
 	item := dto.AgentItem{
 		ID:            agent.ID,
 		Name:          agent.Name,
+		AgentType:     agentType,
 		Provider:      agent.Provider,
 		ProviderName:  providerDisplayName(agent.Provider),
 		Model:         agent.Model,
@@ -1805,6 +1854,23 @@ func customPrimaryModelID(modelName string) string {
 		}
 	}
 	return ""
+}
+
+func normalizeAgentType(agentType string) string {
+	trim := strings.ToLower(strings.TrimSpace(agentType))
+	if trim == "" {
+		return constant.AppOpenclaw
+	}
+	return trim
+}
+
+func isSupportedAgentType(agentType string) bool {
+	switch normalizeAgentType(agentType) {
+	case constant.AppOpenclaw, constant.AppCopaw:
+		return true
+	default:
+		return false
+	}
 }
 
 func normalizeAPIType(apiType string) string {

@@ -3,6 +3,7 @@ package model
 type Agent struct {
 	BaseModel
 	Name          string `json:"name" gorm:"not null;unique"`
+	AgentType     string `json:"agentType" gorm:"default:openclaw"`
 	Provider      string `json:"provider"`
 	Model         string `json:"model"`
 	APIType       string `json:"apiType"`

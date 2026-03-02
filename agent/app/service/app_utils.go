@@ -393,7 +393,7 @@ func deleteAppInstall(deleteReq request.AppInstallDelete) error {
 			return err
 		}
 		appKey := install.App.Key
-		if appKey == constant.AppOpenclaw {
+		if appKey == constant.AppOpenclaw || appKey == constant.AppCopaw {
 			_ = agentRepo.DeleteByAppInstallIDWithCtx(ctx, install.ID)
 		}
 
