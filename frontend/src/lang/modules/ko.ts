@@ -867,6 +867,7 @@ const message = {
         fetch: '가져오기',
         lines: '라인',
         linesHelper: '올바른 로그 수를 입력하세요!',
+        downloadLinesHelper: '다운로드할 로그 줄 수를 선택하거나 입력하세요.',
         lastDay: '지난 하루',
         last4Hour: '지난 4시간',
         lastHour: '지난 1시간',

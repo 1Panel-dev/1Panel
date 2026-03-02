@@ -886,6 +886,7 @@ const message = {
         fetch: 'Buscar',
         lines: 'Linhas',
         linesHelper: 'Por favor, insira o número correto de logs a serem recuperados!',
+        downloadLinesHelper: 'Selecione ou insira o número de linhas de log para download.',
         lastDay: 'Último dia',
         last4Hour: 'Últimas 4 horas',
         lastHour: 'Última hora',

@@ -163,6 +163,14 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 			normalizedID := normalizeBailianCodingPlanModelID(modelID)
 			runtimeModel = "bailian-coding-plan/" + bailianPrimaryModelID(normalizedID)
 		}
+		if provider == "ark-coding-plan" {
+			modelID := runtimeModel
+			if parts := strings.SplitN(runtimeModel, "/", 2); len(parts) == 2 {
+				modelID = parts[1]
+			}
+			normalizedID := normalizeArkCodingPlanModelID(modelID)
+			runtimeModel = "ark-coding-plan/" + normalizedID
+		}
 		storedModel = req.Model
 		apiKey = account.APIKey
 		accountID = account.ID
@@ -1142,6 +1150,9 @@ func verifyProvider(provider, baseURL, apiKey string) error {
 	if provider == "bailian-coding-plan" {
 		return verifyBailianCodingPlan(baseURL, apiKey)
 	}
+	if provider == "ark-coding-plan" {
+		return verifyArkCodingPlan(baseURL, apiKey)
+	}
 	client := &http.Client{Timeout: 10 * time.Second}
 	reqURL, headers := buildVerifyRequest(provider, baseURL, apiKey)
 	request, err := http.NewRequest(http.MethodGet, reqURL, nil)
@@ -1171,6 +1182,41 @@ func verifyBailianCodingPlan(baseURL, apiKey string) error {
 	reqURL := base + "/chat/completions"
 	body := map[string]interface{}{
 		"model": "qwen3.5-plus",
+		"messages": []map[string]string{
+			{"role": "user", "content": "test"},
+		},
+		"max_tokens": 1,
+	}
+	payload, err := json.Marshal(body)
+	if err != nil {
+		return err
+	}
+	request, err := http.NewRequest(http.MethodPost, reqURL, bytes.NewBuffer(payload))
+	if err != nil {
+		return err
+	}
+	request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", apiKey))
+	request.Header.Set("Content-Type", "application/json")
+	resp, err := client.Do(request)
+	if err != nil {
+		return buserr.WithErr("ErrAgentAccountUnavailable", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode >= 400 {
+		return buserr.WithErr("ErrAgentAccountUnavailable", fmt.Errorf("verify failed: %s", resp.Status))
+	}
+	return nil
+}
+
+func verifyArkCodingPlan(baseURL, apiKey string) error {
+	client := &http.Client{Timeout: 10 * time.Second}
+	base := strings.TrimRight(baseURL, "/")
+	if !strings.Contains(base, "/api/coding/v3") {
+		base = "https://ark.cn-beijing.volces.com/api/coding/v3"
+	}
+	reqURL := base + "/chat/completions"
+	body := map[string]interface{}{
+		"model": "doubao-seed-2.0-code",
 		"messages": []map[string]string{
 			{"role": "user", "content": "test"},
 		},
@@ -1583,6 +1629,38 @@ func writeOpenclawConfig(confDir, provider, modelName, apiType string, maxTokens
 				},
 			},
 		}
+	} else if provider == "ark-coding-plan" {
+		normalizedID := normalizeArkCodingPlanModelID(modelID)
+		cfg.Agents.Defaults.Model.Primary = "ark-coding-plan/" + normalizedID
+		base := baseURL
+		if base == "" {
+			if defaultURL, ok := providerDefaultBaseURL(provider); ok {
+				base = defaultURL
+			}
+		}
+		plainKey := strings.TrimSpace(apiKey)
+		_, useMaxTokens, useContextWindow := resolveRuntimeParams(provider, apiType, maxTokens, contextWindow)
+		cfg.Models = &modelsConfig{
+			Mode: "merge",
+			Providers: map[string]modelProvider{
+				"ark-coding-plan": {
+					ApiKey:  plainKey,
+					BaseUrl: base,
+					Api:     "openai-completions",
+					Models: []modelEntry{
+						{
+							ID:            normalizedID,
+							Name:          normalizedID,
+							Reasoning:     strings.Contains(strings.ToLower(normalizedID), "reason") || strings.Contains(strings.ToLower(normalizedID), "thinking"),
+							Input:         []string{"text"},
+							ContextWindow: useContextWindow,
+							MaxTokens:     useMaxTokens,
+							Cost:          modelCost{},
+						},
+					},
+				},
+			},
+		}
 	} else if provider == "minimax" {
 		normalizedID := modelID
 		switch strings.ToLower(modelID) {
@@ -1834,6 +1912,8 @@ func fixedProviderBaseURL(provider string) (string, bool) {
 	switch strings.ToLower(strings.TrimSpace(provider)) {
 	case "bailian-coding-plan":
 		return providerDefaultBaseURL(provider)
+	case "ark-coding-plan":
+		return providerDefaultBaseURL(provider)
 	default:
 		return "", false
 	}
@@ -1935,6 +2015,10 @@ func normalizeBailianCodingPlanModelID(modelID string) string {
 	default:
 		return trim
 	}
+}
+
+func normalizeArkCodingPlanModelID(modelID string) string {
+	return strings.ToLower(strings.TrimSpace(modelID))
 }
 
 func bailianPrimaryModelID(modelID string) string {

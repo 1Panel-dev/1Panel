@@ -889,6 +889,7 @@ const message = {
         fetch: 'Dapatkan',
         lines: 'Baris',
         linesHelper: 'Sila masukkan bilangan log yang betul untuk diambil!',
+        downloadLinesHelper: 'Pilih atau masukkan bilangan baris log untuk dimuat turun.',
         lastDay: 'Hari terakhir',
         last4Hour: '4 jam terakhir',
         lastHour: 'Jam terakhir',

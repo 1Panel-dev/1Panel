@@ -876,6 +876,7 @@ const message = {
         fetch: 'フェッチ',
         lines: '線',
         linesHelper: '取得するには、正しい数のログを入力してください！',
+        downloadLinesHelper: 'ログダウンロード行数を選択または入力してください。',
         lastDay: '最終日',
         last4Hour: '最後の4時間',
         lastHour: '最後の時間',

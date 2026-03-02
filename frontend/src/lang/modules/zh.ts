@@ -839,6 +839,7 @@ const message = {
         fetch: '过滤',
         lines: '条数',
         linesHelper: '请输入正确的日志获取条数！',
+        downloadLinesHelper: '选择或者输入日志下载行数',
         lastDay: '最近一天',
         last4Hour: '最近 4 小时',
         lastHour: '最近 1 小时',

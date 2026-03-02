@@ -854,6 +854,7 @@ const message = {
         fetch: '過濾',
         lines: '條數',
         linesHelper: '請輸入正確的日誌取得條數',
+        downloadLinesHelper: '選擇或輸入日誌下載行數',
         lastDay: '最近一天',
         last4Hour: '最近 4 小時',
         lastHour: '最近 1 小時',

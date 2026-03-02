@@ -162,6 +162,22 @@ var catalog = map[string]Meta{
 			{ID: "bailian-coding-plan/glm-4.7", Name: "GLM-4.7"},
 		},
 	},
+	"ark-coding-plan": {
+		Key:            "ark-coding-plan",
+		DisplayName:    "方舟 Coding Plan",
+		Sort:           12,
+		DefaultBaseURL: "https://ark.cn-beijing.volces.com/api/coding/v3",
+		EnvKey:         "ARK_API_KEY",
+		Enabled:        true,
+		Models: []Model{
+			{ID: "ark-coding-plan/doubao-seed-2.0-code", Name: "Doubao-Seed-2.0-Code"},
+			{ID: "ark-coding-plan/doubao-seed-code", Name: "Doubao-Seed-Code"},
+			{ID: "ark-coding-plan/kimi-k2.5", Name: "Kimi-K2.5"},
+			{ID: "ark-coding-plan/glm-4.7", Name: "GLM-4.7"},
+			{ID: "ark-coding-plan/deepseek-v3.2", Name: "DeepSeek-V3.2"},
+			{ID: "ark-coding-plan/kimi-k2-thinking", Name: "Kimi-K2-thinking"},
+		},
+	},
 	"qwen": {
 		Key:            "qwen",
 		DisplayName:    "Qwen",
