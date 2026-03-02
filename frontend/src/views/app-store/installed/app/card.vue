@@ -15,6 +15,7 @@
                             :installed="installed"
                             :mode="mode"
                             :defaultLink="defaultLink"
+                            :sortMode="sortMode"
                             @open-backups="$emit('openBackups')"
                             @open-log="$emit('openLog')"
                             @open-terminal="$emit('openTerminal')"
@@ -51,6 +52,7 @@ interface Props {
     mode: string;
     defaultLink: string;
     currentNode: string;
+    sortMode?: boolean;
 }
 defineProps<Props>();
 

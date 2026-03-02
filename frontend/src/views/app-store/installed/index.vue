@@ -68,6 +68,7 @@
                                 :mode="mode"
                                 :defaultLink="defaultLink"
                                 :currentNode="currentNode"
+                                :sortMode="sortMode"
                                 @open-detail="openDetail(installed.appKey)"
                                 @open-backups="openBackups(installed)"
                                 @open-log="openLog(installed)"
@@ -469,6 +470,10 @@ const enterSortMode = async () => {
                 return fromFav === toFav;
             },
             onEnd: (evt: any) => {
+                const el = evt.from;
+                el.removeChild(evt.item);
+                el.insertBefore(evt.item, el.children[evt.oldIndex] || null);
+
                 const list = [...data.value];
                 const [moved] = list.splice(evt.oldIndex, 1);
                 list.splice(evt.newIndex, 0, moved);

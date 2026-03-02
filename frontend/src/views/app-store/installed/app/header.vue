@@ -86,11 +86,18 @@
                             size="large"
                             icon="StarFilled"
                             type="warning"
+                            :disabled="sortMode"
                             @click="$emit('favoriteInstall')"
                         ></el-button>
                     </el-tooltip>
                     <el-tooltip effect="dark" :content="$t('website.favorite')" placement="top-start" v-else>
-                        <el-button link icon="Star" type="info" @click="$emit('favoriteInstall')"></el-button>
+                        <el-button
+                            link
+                            icon="Star"
+                            type="info"
+                            :disabled="sortMode"
+                            @click="$emit('favoriteInstall')"
+                        ></el-button>
                     </el-tooltip>
                 </span>
             </div>
@@ -151,6 +158,7 @@ import { App } from '@/api/interface/app';
 interface Props {
     installed: App.AppInstalled;
     mode: string;
+    sortMode?: boolean;
 }
 defineProps<Props>();
 
