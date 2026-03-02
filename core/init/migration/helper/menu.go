@@ -64,11 +64,11 @@ func MenuSort() []dto.MenuLabelSort {
 	var MenuLabelsWithSort = []dto.MenuLabelSort{
 		{Label: "Home-Menu", Sort: 100},
 		{Label: "App-Menu", Sort: 200},
-		{Label: "Website-Menu", Sort: 300},
+		{Label: "AI-Menu", Sort: 300},
+		{Label: "Website-Menu", Sort: 400},
 		{Label: "Website", Sort: 100},
 		{Label: "SSL", Sort: 200},
 		{Label: "PHP", Sort: 300},
-		{Label: "AI-Menu", Sort: 400},
 		{Label: "Agents", Sort: 50},
 		{Label: "OllamaModel", Sort: 100},
 		{Label: "MCPServer", Sort: 200},
