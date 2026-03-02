@@ -512,7 +512,7 @@ func (b *BaseApi) UpdateProxyConfig(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	err := websiteService.UpdateProxy(req)
+	err := websiteService.OperateProxy(req)
 	if err != nil {
 		helper.InternalServer(c, err)
 		return
@@ -521,20 +521,42 @@ func (b *BaseApi) UpdateProxyConfig(c *gin.Context) {
 }
 
 // @Tags Website
-// @Summary Operate proxy conf
+// @Summary Delete proxy config
 // @Accept json
-// @Param request body request.WebsiteProxyConfigOp true "request"
+// @Param request body request.WebsiteProxyDel true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /websites/proxies/operate [post]
-// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"操作网站 [domain] 反向代理配置 ","formatEN":"Operate domain [domain] proxy config"}
-func (b *BaseApi) OperateProxyConfig(c *gin.Context) {
-	var req request.WebsiteProxyConfigOp
+// @Router /websites/proxies/delete [post]
+// @x-panel-log {"bodyKeys":["id","name"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"删除网站 [domain] 反向代理配置 [name] ","formatEN":"Delete domain [domain] proxy config [name]"}
+func (b *BaseApi) DeleteProxyConfig(c *gin.Context) {
+	var req request.WebsiteProxyDel
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	err := websiteService.OperateProxy(req)
+	err := websiteService.DeleteProxy(req)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags Website
+// @Summary Update proxy config status
+// @Accept json
+// @Param request body request.WebsiteProxyStatusUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /websites/proxies/status [post]
+// @x-panel-log {"bodyKeys":["id","name","status"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"更新网站 [domain] 反向代理配置 [name] 状态 [status] ","formatEN":"Update domain [domain] proxy config [name] status [status]"}
+func (b *BaseApi) UpdateProxyConfigStatus(c *gin.Context) {
+	var req request.WebsiteProxyStatusUpdate
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	err := websiteService.UpdateProxyStatus(req)
 	if err != nil {
 		helper.InternalServer(c, err)
 		return

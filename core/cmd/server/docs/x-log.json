@@ -3008,6 +3008,25 @@
 		"formatZH": "php 版本变更 [domain]",
 		"formatEN": "php version update [domain]"
 	},
+	"/websites/proxies/delete": {
+		"bodyKeys": [
+			"id",
+			"name"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"db": "websites",
+				"output_column": "primary_domain",
+				"output_value": "domain"
+			}
+		],
+		"formatZH": "删除网站 [domain] 反向代理配置 [name] ",
+		"formatEN": "Delete domain [domain] proxy config [name]"
+	},
 	"/websites/proxies/file": {
 		"bodyKeys": [
 			"websiteID"
@@ -3026,9 +3045,11 @@
 		"formatZH": "更新反向代理文件 [domain]",
 		"formatEN": "Nginx conf proxy file update [domain]"
 	},
-	"/websites/proxies/operate": {
+	"/websites/proxies/status": {
 		"bodyKeys": [
-			"id"
+			"id",
+			"name",
+			"status"
 		],
 		"paramKeys": [],
 		"beforeFunctions": [
@@ -3041,8 +3062,8 @@
 				"output_value": "domain"
 			}
 		],
-		"formatZH": "操作网站 [domain] 反向代理配置 ",
-		"formatEN": "Operate domain [domain] proxy config"
+		"formatZH": "更新网站 [domain] 反向代理配置 [name] 状态 [status] ",
+		"formatEN": "Update domain [domain] proxy config [name] status [status]"
 	},
 	"/websites/proxies/update": {
 		"bodyKeys": [

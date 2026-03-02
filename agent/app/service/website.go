@@ -103,14 +103,14 @@ type IWebsiteService interface {
 	UpdateLoadBalance(req request.WebsiteLBUpdate) error
 	UpdateLoadBalanceFile(req request.WebsiteLBUpdateFile) error
 
-	UpdateProxy(req request.WebsiteProxyConfig) (err error)
-	OperateProxy(req request.WebsiteProxyConfigOp) (err error)
+	OperateProxy(req request.WebsiteProxyConfig) (err error)
 	GetProxies(id uint) (res []request.WebsiteProxyConfig, err error)
 	UpdateProxyFile(req request.NginxProxyUpdate) (err error)
 	UpdateProxyCache(req request.NginxProxyCacheUpdate) (err error)
 	GetProxyCache(id uint) (res response.NginxProxyCache, err error)
 	ClearProxyCache(req request.NginxCommonReq) error
 	DeleteProxy(req request.WebsiteProxyDel) (err error)
+	UpdateProxyStatus(req request.WebsiteProxyStatusUpdate) (err error)
 
 	CreateWebsiteDomain(create request.WebsiteDomainCreate) ([]model.WebsiteDomain, error)
 	GetWebsiteDomain(websiteId uint) ([]model.WebsiteDomain, error)

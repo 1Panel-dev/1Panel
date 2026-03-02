@@ -45,7 +45,7 @@
 
 <script lang="ts" setup name="proxy">
 import { Website } from '@/api/interface/website';
-import { operateProxyConfig, getProxyConfig, clearProxyCache } from '@/api/modules/website';
+import { getProxyConfig, deleteProxyConfig, updateProxyConfigStatus, clearProxyCache } from '@/api/modules/website';
 import { computed, onMounted, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
@@ -149,14 +149,6 @@ const openEditFile = (proxyConfig: Website.ProxyConfig) => {
     fileRef.value.acceptParams({ name: proxyConfig.name, content: proxyConfig.content, websiteID: proxyConfig.id });
 };
 
-function toProxyConfigOp(proxyConfig: Website.ProxyConfig): Website.ProxyConfigOp {
-    return {
-        id: proxyConfig.id,
-        name: proxyConfig.name,
-        operate: proxyConfig.operate,
-    };
-}
-
 const deleteProxy = async (proxyConfig: Website.ProxyConfig) => {
     proxyConfig.operate = 'delete';
     opRef.value.acceptParams({
@@ -166,14 +158,17 @@ const deleteProxy = async (proxyConfig: Website.ProxyConfig) => {
             i18n.global.t('website.proxy'),
             i18n.global.t('commons.button.delete'),
         ]),
-        api: operateProxyConfig,
-        params: toProxyConfigOp(proxyConfig),
+        api: deleteProxyConfig,
+        params: {
+            id: proxyConfig.id,
+            name: proxyConfig.name,
+        },
     });
 };
 
-const submit = async (proxyConfig: Website.ProxyConfig) => {
+const submit = async (proxyConfig: Website.ProxyStatusUpdate) => {
     loading.value = true;
-    operateProxyConfig(toProxyConfigOp(proxyConfig))
+    updateProxyConfigStatus(proxyConfig)
         .then(() => {
             MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
             search();
@@ -184,14 +179,14 @@ const submit = async (proxyConfig: Website.ProxyConfig) => {
 };
 
 const opProxy = (proxyConfig: Website.ProxyConfig) => {
-    let proxy = JSON.parse(JSON.stringify(proxyConfig));
-    proxy.enable = !proxyConfig.enable;
+    const enable = !proxyConfig.enable;
+    let status = '';
     let message = '';
-    if (proxy.enable) {
-        proxy.operate = 'enable';
+    if (enable) {
+        status = 'enable';
         message = i18n.global.t('website.startProxy');
     } else {
-        proxy.operate = 'disable';
+        status = 'disable';
         message = i18n.global.t('website.stopProxy');
     }
     ElMessageBox.confirm(message, i18n.global.t('cronjob.changeStatus'), {
@@ -199,7 +194,11 @@ const opProxy = (proxyConfig: Website.ProxyConfig) => {
         cancelButtonText: i18n.global.t('commons.button.cancel'),
     })
         .then(async () => {
-            await submit(proxy);
+            await submit({
+                id: proxyConfig.id,
+                name: proxyConfig.name,
+                status,
+            });
             search();
         })
         .catch(() => {});

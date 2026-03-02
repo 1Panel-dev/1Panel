@@ -184,12 +184,16 @@ export const getProxyConfig = (req: Website.ProxyReq) => {
     return http.post<Website.ProxyConfig[]>(`/websites/proxies`, req);
 };
 
-export const updateProxyConfig = (req: Website.ProxyReq) => {
+export const operateProxyConfig = (req: Website.ProxyReq) => {
     return http.post<any>(`/websites/proxies/update`, req);
 };
 
-export const operateProxyConfig = (req: Website.ProxyConfigOp) => {
-    return http.post<any>(`/websites/proxies/operate`, req);
+export const deleteProxyConfig = (req: Website.ProxyDel) => {
+    return http.post<any>(`/websites/proxies/delete`, req);
+};
+
+export const updateProxyConfigStatus = (req: Website.ProxyStatusUpdate) => {
+    return http.post<any>(`/websites/proxies/status`, req);
 };
 
 export const updateProxyConfigFile = (req: Website.ProxyFileUpdate) => {

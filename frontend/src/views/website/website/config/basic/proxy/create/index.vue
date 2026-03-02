@@ -233,7 +233,7 @@
 </template>
 
 <script lang="ts" setup>
-import { updateProxyConfig } from '@/api/modules/website';
+import { operateProxyConfig } from '@/api/modules/website';
 import { checkNumberRange, Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { FormInstance } from 'element-plus';
@@ -400,7 +400,7 @@ const submit = async (formEl: FormInstance | undefined) => {
         }
         loading.value = true;
         proxy.value.proxyPass = proxy.value.proxyProtocol + proxy.value.proxyAddress;
-        updateProxyConfig(proxy.value)
+        operateProxyConfig(proxy.value)
             .then(() => {
                 if (proxy.value.operate == 'create') {
                     MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
