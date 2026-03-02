@@ -2019,6 +2019,11 @@ const message = {
         passkeyTrustedProxiesHelper:
             'Only requests from these IP/CIDR sources will trust Forwarded and X-Forwarded-Proto when determining HTTPS',
         passkeyNotSupported: 'Current browser or environment does not support passkeys',
+        passkeyPrereqTitle: 'The following prerequisites are required for Passkey',
+        passkeyPrereqBindDomain: 'Domain name configured',
+        passkeyPrereqHttps: 'HTTPS / Secure context',
+        passkeyPrereqBrowser: 'Browser supports WebAuthn',
+        passkeyPrereqGoSetup: 'Configure',
         passkeyCount: 'Bound {0}/{1}',
         passkeyName: 'Name',
         passkeyNameHelper: 'Enter a name to distinguish devices',

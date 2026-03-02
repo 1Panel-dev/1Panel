@@ -1987,6 +1987,11 @@ const message = {
         passkeyTrustedProxiesHelper:
             'Somente requisições originadas nesses IP/CIDR confiarão em Forwarded e X-Forwarded-Proto para detectar HTTPS',
         passkeyNotSupported: 'O navegador ou ambiente atual não suporta passkeys',
+        passkeyPrereqTitle: 'Os seguintes pré-requisitos são necessários para Passkey',
+        passkeyPrereqBindDomain: 'Nome de domínio configurado',
+        passkeyPrereqHttps: 'HTTPS / Contexto seguro',
+        passkeyPrereqBrowser: 'Navegador suporta WebAuthn',
+        passkeyPrereqGoSetup: 'Configurar',
         passkeyCount: 'Vinculadas {0}/{1}',
         passkeyName: 'Nome',
         passkeyNameHelper: 'Digite um nome para distinguir dispositivos',

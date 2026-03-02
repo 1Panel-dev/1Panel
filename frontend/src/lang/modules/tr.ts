@@ -2029,6 +2029,11 @@ const message = {
         passkeyTrustedProxiesHelper:
             'Sadece bu IP/CIDR kaynaklarından gelen isteklerde Forwarded ve X-Forwarded-Proto HTTPS belirlenmesinde kullanılır',
         passkeyNotSupported: 'Tarayıcı/ortam passkey desteklemiyor; alan adı ve HTTPS erişimini doğrulayın',
+        passkeyPrereqTitle: 'Passkey için aşağıdaki ön koşullar gereklidir',
+        passkeyPrereqBindDomain: 'Alan adı yapılandırıldı',
+        passkeyPrereqHttps: 'HTTPS / Güvenli bağlam',
+        passkeyPrereqBrowser: 'Tarayıcı WebAuthn destekliyor',
+        passkeyPrereqGoSetup: 'Yapılandır',
         passkeyCount: 'Bağlı {0}/{1}',
         passkeyName: 'Ad',
         passkeyNameHelper: 'Cihazları ayırt etmek için bir ad girin',

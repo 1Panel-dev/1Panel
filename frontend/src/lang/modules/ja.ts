@@ -1945,6 +1945,11 @@ const message = {
         passkeyTrustedProxiesHelper:
             '以下の IP/CIDR からのリクエストのみが Forwarded/X-Forwarded-Proto を HTTPS 判定に使います',
         passkeyNotSupported: 'ブラウザまたは環境がパスキー非対応です。ドメインと HTTPS を確認してください',
+        passkeyPrereqTitle: 'Passkey を使用するには次の前提条件が必要です',
+        passkeyPrereqBindDomain: 'ドメイン名が設定済み',
+        passkeyPrereqHttps: 'HTTPS / セキュアコンテキスト',
+        passkeyPrereqBrowser: 'ブラウザが WebAuthn をサポート',
+        passkeyPrereqGoSetup: '設定する',
         passkeyCount: '登録済み {0}/{1}',
         passkeyName: '名称',
         passkeyNameHelper: 'デバイスを区別する名称を入力してください',

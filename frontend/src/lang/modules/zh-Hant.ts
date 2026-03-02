@@ -1969,6 +1969,11 @@ const message = {
         passkeyTrustedProxiesHelper:
             '僅當請求來源命中以下 IP/CIDR 時，才會信任 Forwarded 與 X-Forwarded-Proto 判斷 HTTPS',
         passkeyNotSupported: '目前瀏覽器或環境不支援通行金鑰，請確認網域與 HTTPS',
+        passkeyPrereqTitle: '使用通行金鑰需滿足以下前置條件',
+        passkeyPrereqBindDomain: '已綁定網域',
+        passkeyPrereqHttps: 'HTTPS 安全上下文',
+        passkeyPrereqBrowser: '瀏覽器支援 WebAuthn',
+        passkeyPrereqGoSetup: '去設定',
         passkeyCount: '已綁定 {0}/{1}',
         passkeyName: '名稱',
         passkeyNameHelper: '請輸入用於區分裝置的名稱',

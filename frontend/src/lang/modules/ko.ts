@@ -1921,6 +1921,11 @@ const message = {
         passkeyTrustedProxiesHelper:
             '이 IP/CIDR 출처의 요청만 Forwarded와 X-Forwarded-Proto 헤더를 HTTPS 판단에 사용합니다',
         passkeyNotSupported: '브라우저/환경이 패스키를 지원하지 않습니다. 도메인과 HTTPS를 확인하세요',
+        passkeyPrereqTitle: 'Passkey 사용을 위해 다음 전제 조건이 필요합니다',
+        passkeyPrereqBindDomain: '도메인 이름 구성됨',
+        passkeyPrereqHttps: 'HTTPS / 보안 컨텍스트',
+        passkeyPrereqBrowser: '브라우저가 WebAuthn을 지원합니다',
+        passkeyPrereqGoSetup: '설정',
         passkeyCount: '등록됨 {0}/{1}',
         passkeyName: '이름',
         passkeyNameHelper: '기기를 구분할 이름을 입력하세요',

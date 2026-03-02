@@ -1999,6 +1999,11 @@ const message = {
         passkeyTrustedProxiesHelper:
             'Hanya permintaan daripada IP/CIDR ini akan mempercayai Forwarded dan X-Forwarded-Proto untuk menentukan HTTPS',
         passkeyNotSupported: 'Pelayar atau persekitaran semasa tidak menyokong passkey',
+        passkeyPrereqTitle: 'Prasyarat berikut diperlukan untuk Passkey',
+        passkeyPrereqBindDomain: 'Nama domain dikonfigurasi',
+        passkeyPrereqHttps: 'HTTPS / Konteks selamat',
+        passkeyPrereqBrowser: 'Pelayar menyokong WebAuthn',
+        passkeyPrereqGoSetup: 'Konfigurasi',
         passkeyCount: 'Dipaut {0}/{1}',
         passkeyName: 'Nama',
         passkeyNameHelper: 'Masukkan nama untuk membezakan peranti',

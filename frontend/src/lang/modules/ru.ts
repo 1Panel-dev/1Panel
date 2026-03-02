@@ -1988,6 +1988,11 @@ const message = {
         passkeyTrustedProxiesHelper:
             'Только запросы с этих IP/CIDR будут доверять заголовкам Forwarded и X-Forwarded-Proto при определении HTTPS',
         passkeyNotSupported: 'Текущий браузер или среда не поддерживает passkey; проверьте домен и HTTPS',
+        passkeyPrereqTitle: 'Для использования Passkey необходимо выполнить следующие условия',
+        passkeyPrereqBindDomain: 'Домен настроен',
+        passkeyPrereqHttps: 'HTTPS / Безопасный контекст',
+        passkeyPrereqBrowser: 'Браузер поддерживает WebAuthn',
+        passkeyPrereqGoSetup: 'Настроить',
         passkeyCount: 'Привязано {0}/{1}',
         passkeyName: 'Название',
         passkeyNameHelper: 'Введите название для различения устройств',

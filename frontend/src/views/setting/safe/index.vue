@@ -166,11 +166,11 @@
                             </el-form-item>
 
                             <el-form-item :label="$t('setting.passkey')">
-                                <el-button @click="openPasskeyDialog" :disabled="!passkeySupported || !hasBindDomain">
+                                <el-button @click="openPasskeyDialog">
                                     {{ $t('setting.passkeyManage') }}
                                 </el-button>
                                 <span class="input-help">
-                                    {{ passkeyHint }}
+                                    {{ $t('setting.passkeyHelper') }}
                                 </span>
                             </el-form-item>
                         </el-col>
@@ -188,7 +188,7 @@
         <DomainSetting ref="domainRef" @search="search" />
         <AllowIPsSetting ref="allowIPsRef" @search="search" />
         <ResponseSetting ref="responseRef" @search="search()" />
-        <PasskeySetting ref="passkeyRef" />
+        <PasskeySetting ref="passkeyRef" @go-configure-domain="onChangeBindDomain" />
     </div>
 </template>
 
@@ -249,19 +249,6 @@ const form = reactive({
     noAuthSettingValue: '200',
 });
 
-const passkeySupported = ref(false);
-const hasBindDomain = computed(() => {
-    return form.bindDomain.trim() !== '';
-});
-const passkeyHint = computed(() => {
-    if (!hasBindDomain.value) {
-        return i18n.global.t('setting.passkeyRequireSSL');
-    }
-    if (!passkeySupported.value) {
-        return i18n.global.t('setting.passkeyNotSupported');
-    }
-    return i18n.global.t('setting.passkeyHelper');
-});
 const unset = ref(i18n.global.t('setting.unSetting'));
 
 const search = async () => {
@@ -337,7 +324,7 @@ const handleMFA = async () => {
 };
 
 const openPasskeyDialog = async () => {
-    passkeyRef.value.acceptParams({ bindDomain: form.bindDomain, supported: passkeySupported.value });
+    passkeyRef.value.acceptParams({ bindDomain: form.bindDomain });
 };
 
 const onChangeEntrance = () => {
@@ -419,7 +406,6 @@ function loadTimeOut() {
 }
 
 onMounted(() => {
-    passkeySupported.value = !!window.PublicKeyCredential && window.isSecureContext;
     search();
     getSystemAvailable();
 });
