@@ -10,7 +10,7 @@
         <LayoutContent v-if="isExist" :title="$t('container.composeTemplate', 2)" :class="{ mask: !isActive }">
             <template #leftToolBar>
                 <el-button type="primary" @click="onOpenDialog('create')">
-                    {{ $t('container.createComposeTemplate') }}
+                    {{ $t('commons.button.create') }}
                 </el-button>
                 <el-button type="primary" plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
                     {{ $t('commons.button.delete') }}

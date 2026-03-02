@@ -1264,7 +1264,7 @@ const createFolder = async (isDir: boolean) => {
     const editingNode = currentEditingNode.value;
     if (!editingNode) return;
     if (addForm.path.indexOf('.1panel_clash') > -1) {
-        MsgWarning(i18n.global.t('file.clashDitNotSupport'));
+        MsgWarning(i18n.global.t('file.clashDidNotSupport'));
         return;
     }
     addForm.isDir = isDir;

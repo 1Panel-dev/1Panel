@@ -1,7 +1,7 @@
 <template>
     <LayoutContent
         back-name="CronjobItem"
-        :title="isCreate ? $t('cronjob.create') : $t('commons.button.edit') + ' - ' + form.name"
+        :title="isCreate ? $t('commons.button.create') : $t('commons.button.edit') + ' - ' + form.name"
     >
         <template #main>
             <el-form ref="formRef" label-position="top" :model="form" :rules="rules">

@@ -172,6 +172,9 @@ func (u *SettingService) Update(key, value string) error {
 		}
 	case "Edition":
 		global.CONF.Base.Edition = value
+		if err := xpack.Sync(constant.SyncEdition); err != nil {
+			global.LOG.Errorf("sync edition to node failed, err: %v", err)
+		}
 	}
 
 	return nil

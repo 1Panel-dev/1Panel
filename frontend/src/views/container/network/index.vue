@@ -10,7 +10,7 @@
         <LayoutContent v-if="isExist" :title="$t('container.network', 2)" :class="{ mask: !isActive }">
             <template #leftToolBar>
                 <el-button type="primary" @click="onCreate()">
-                    {{ $t('container.createNetwork') }}
+                    {{ $t('commons.button.create') }}
                 </el-button>
                 <el-button type="primary" plain @click="onClean()">
                     {{ $t('container.networkPrune') }}

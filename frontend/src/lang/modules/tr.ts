@@ -2,10 +2,10 @@ import fit2cloudEnLocale from 'fit2cloud-ui-plus/src/locale/lang/en';
 
 const message = {
     commons: {
-        true: 'doğru',
-        false: 'yanlış',
+        true: 'Doğru',
+        false: 'Yanlış',
         colon: ': ',
-        example: 'Örneğin, ',
+        example: 'örnek: ',
         fit2cloud: 'FIT2CLOUD',
         lingxia: 'Lingxia',
         button: {
@@ -376,7 +376,7 @@ const message = {
         },
     },
     menu: {
-        home: 'Genel Bakış',
+        home: 'Kontrol Paneli',
         apps: 'Uygulama Mağazası',
         website: 'Web Sitesi | Web Siteleri',
         project: 'Proje | Projeler',
@@ -394,7 +394,7 @@ const message = {
         files: 'Dosya Tarayıcısı',
         monitor: 'İzleme',
         terminal: 'Terminal | Terminaller',
-        settings: 'Ayar | Ayarlar',
+        settings: 'Ayarlar',
         toolbox: 'Araç Kutusu',
         logs: 'Günlük | Günlükler',
         runtime: 'Çalışma Zamanı | Çalışma Zamanları',
@@ -404,21 +404,20 @@ const message = {
         supervisor: 'Supervisor',
         tamper: 'Kurcalama Koruması',
         app: 'Uygulama',
-        msgCenter: 'Görev Merkezi',
+        msgCenter: 'Görevler',
     },
     home: {
-        recommend: 'tavsiye etmek',
-        dir: 'dizin',
+        recommend: 'Önerilen',
+        dir: 'Dizin',
         alias: 'Takma Ad',
-        quickDir: 'Hızlı Dizin',
-        minQuickJump: 'Lütfen en az bir hızlı atlama girişi ayarlayın!',
-        maxQuickJump: 'En fazla dört hızlı atlama girişi ayarlayabilirsiniz!',
+        quickDir: 'Hızlı Erişim',
+        minQuickJump: 'En az bir hızlı erişim girdisi ekleyin',
+        maxQuickJump: 'En fazla dört hızlı erişim girdisi ekleyebilirsiniz',
         database: 'Veritabanı - Tümü',
         restart_1panel: 'Paneli yeniden başlat',
         restart_system: 'Sunucuyu yeniden başlat',
-        operationSuccess: 'İşlem başarılı, yeniden başlatılıyor, lütfen tarayıcıyı daha sonra manuel olarak yenileyin!',
-        entranceHelper:
-            'Güvenlik girişi etkinleştirilmedi. Sistem güvenliğini artırmak için "Ayarlar -> Güvenlik" bölümünden etkinleştirebilirsiniz.',
+        operationSuccess: 'Tamamlandı. Yeniden başlatılıyor, tarayıcıyı daha sonra yenileyin.',
+        entranceHelper: 'Güvenli giriş etkin değil. "Ayarlar -> Güvenlik" üzerinden etkinleştirerek güvenliği artırın.',
         appInstalled: 'Uygulamalar',
         systemInfo: 'Sistem bilgisi',
         hostname: 'Host adı',
@@ -494,7 +493,6 @@ const message = {
         deleteBackupHelper: 'Veritabanı yedeklerini aynı anda sil',
         delete: 'Silme işlemi geri alınamaz, lütfen "',
         deleteHelper: '" girerek bu veritabanını silin',
-        create: 'Veritabanı oluştur',
         noMysql: 'Veritabanı hizmeti (MySQL veya MariaDB)',
         noPostgresql: 'Veritabanı hizmeti PostgreSQL',
         goUpgrade: 'Yükseltmeye git',
@@ -508,7 +506,7 @@ const message = {
         permissionAll: 'Tümü(%)',
         localhostHelper:
             'Konteyner dağıtımı için veritabanı izinlerini "localhost" olarak yapılandırmak konteynere dış erişimi engelleyecektir. Lütfen dikkatli seçin!',
-        databaseConnInfo: 'Bağlantı bilgilerini görüntüle',
+        databaseConnInfo: 'Bağlantı',
         rootPassword: 'Root şifresi',
         serviceName: 'Servis Adı',
         serviceNameHelper: 'Aynı ağdaki konteynerler arası erişim.',
@@ -671,6 +669,7 @@ const message = {
         rdbInfo: 'Kural listesindeki değerin 1 ile 100000 arasında olduğundan emin olun',
 
         containerConn: 'Konteyner bağlantısı',
+        copyConnURL: "Bağlantı URL'sini kopyala",
         connAddress: 'Adres',
         containerConnHelper:
             'Bu bağlantı adresi PHP yürütme ortamı/konteyner kurulumunda çalışan uygulamalar tarafından kullanılır.',
@@ -685,8 +684,6 @@ const message = {
         agents: {
             agents: 'Ajanlar',
             agent: 'Ajan',
-            createAgent: 'Ajan oluştur',
-            createModelAccount: 'Model hesabı oluştur',
             account: 'Model hesabı',
             noAccountHint: 'Mevcut bir model hesabını seçin veya yeni bir tane ekleyin.',
             accountCount: '{0} model hesabı',
@@ -812,8 +809,6 @@ const message = {
         },
         mcp: {
             server: 'MCP Sunucusu',
-            create: 'MCP Sunucusu Ekle',
-            edit: 'MCP Sunucusunu Düzenle',
             baseUrl: 'Harici Erişim Yolu',
             baseUrlHelper: 'Örneğin: http://192.168.1.2:8000',
             ssePath: 'SSE Yolu',
@@ -849,12 +844,10 @@ const message = {
         },
     },
     container: {
-        create: 'Oluştur',
         createByCommand: 'Komutla oluştur',
         commandInput: 'Komut girişi',
         commandRule: 'Lütfen doğru docker run konteyner oluşturma komutunu girin!',
         commandHelper: 'Bu komut konteyneri oluşturmak için sunucuda çalıştırılacak. Devam etmek istiyor musunuz?',
-        edit: 'Konteyneri düzenle',
         updateHelper1:
             'Bu konteynerin uygulama mağazasından geldiği tespit edildi. Lütfen aşağıdaki iki noktaya dikkat edin:',
         updateHelper2: '1. Mevcut değişiklikler uygulama mağazasındaki kurulu uygulamalarla senkronize edilmeyecektir.',
@@ -1049,7 +1042,6 @@ const message = {
         network: 'Ağ | Ağlar',
         networkHelper:
             'Bu, bazı uygulamaların ve çalışma zamanı ortamlarının düzgün çalışmamasına neden olabilir. Devam etmek istiyor musunuz?',
-        createNetwork: 'Oluştur',
         networkName: 'Ad',
         driver: 'Sürücü',
         option: 'Seçenek',
@@ -1067,10 +1059,8 @@ const message = {
         mountpoint: 'Bağlama noktası',
         mountpointNFSHelper: 'örn. /nfs, /nfs-share',
         options: 'Seçenekler',
-        createVolume: 'Oluştur',
 
         repo: 'Konteyner kayıt defteri | Konteyner kayıt defterleri',
-        createRepo: 'Ekle',
         httpRepoHelper: 'HTTP tipinde bir depo işlemi Docker servisinin yeniden başlatılmasını gerektirir.',
         httpRepo:
             'HTTP protokolü seçilmesi Docker servisinin güvenli olmayan kayıt defterlerine eklemek için yeniden başlatılmasını gerektirir.',
@@ -1097,11 +1087,9 @@ const message = {
         deleteComposeHelper:
             'Yapılandırma dosyaları ve kalıcı dosyalar dahil olmak üzere konteyner compose ile ilgili tüm dosyaları silin. Lütfen dikkatli ilerleyin!',
         deleteCompose: '" Bu kompozisyonu sil.',
-        createCompose: 'Oluştur',
         composeDirectory: 'Compose dizini',
         template: 'Şablon',
         composeTemplate: 'Compose şablonu | Compose şablonları',
-        createComposeTemplate: 'Oluştur',
         content: 'İçerik',
         contentEmpty: 'Compose içeriği boş olamaz, lütfen girin ve tekrar deneyin!',
         containerNumber: 'Konteyner sayısı',
@@ -1171,8 +1159,6 @@ const message = {
         finishTime: 'Son durdurma zamanı',
     },
     cronjob: {
-        create: 'Cron görevi oluştur',
-        edit: 'Cron görevini düzenle',
         importHelper:
             'İçe aktarım sırasında aynı isimli zamanlanmış görevler otomatik olarak atlanacaktır. Görevler varsayılan olarak 【Devre Dışı】 durumuna ayarlanır ve veri ilişkilendirme anormalse 【Düzenleme Bekliyor】 durumuna ayarlanır.',
         changeStatus: 'Durumu değiştir',
@@ -1691,7 +1677,7 @@ const message = {
         ignoreCertificateHelper:
             'Güvensiz sunucu bağlantılarına izin vermek, veri sızıntısına veya değiştirilmesine yol açabilir. Bu seçeneği yalnızca indirme kaynağına güvendiğinizde kullanın.',
         uploadOverLimit: 'Dosya sayısı 1000’i aşıyor! Lütfen sıkıştırıp yükleyin',
-        clashDitNotSupport: 'Dosya adlarının .1panel_clash içermesi yasaktır',
+        clashDidNotSupport: 'Dosya adlarının .1panel_clash içermesi yasaktır',
         clashDeleteAlert: '"Geri Dönüşüm Kutusu" klasörü silinemez',
         clashOpenAlert: 'Geri dönüşüm kutusu dizinini açmak için lütfen "Geri Dönüşüm Kutusu" düğmesine tıklayın',
         right: 'İleri',
@@ -1797,7 +1783,7 @@ const message = {
         acceptHelper:
             'Aşağıdaki adreslerde "kabul et" işlemi gerçekleştiriliyor. Ayar yapıldıktan sonra IP, normal erişimi geri kazanacak. Devam etmek istiyor musunuz?',
         noAddrWarning: 'Şu anda [{0}] adres seçilmedi. Lütfen kontrol edin ve tekrar deneyin!',
-        loginLogs: 'Oturum açma günlükleri',
+        loginLogs: 'SSH Günlükleri',
         loginMode: 'Mod',
         authenticating: 'Anahtar',
         publickey: 'Anahtar',
@@ -1843,10 +1829,13 @@ const message = {
         auto: 'Sistemi takip et',
         language: 'Dil',
         region: 'Çalışma bölgesi',
-        regionHelper:
-            'Farklı çalışma bölgelerinde uygulama mağazası ve betik kütüphanesi için indirme adresleri ile ilgili dokümantasyon bağlantıları farklı olabilir.',
         cn: 'Çin anakarası',
-        intl: 'Uluslararası',
+        intl: 'Küresel',
+        regionHelper: 'Bölge değiştirildiğinde aşağıdaki kaynaklar güncellenir:',
+        regionHelper1: 'Sistem kurulum paketleri',
+        regionHelper2: 'Uygulama mağazası ve betik kütüphanesi',
+        regionHelper3: 'Kullanım kılavuzu ve ilgili dokümanlar',
+        regionHelper4: 'Bu işlem sonraki indirme ve erişimleri etkileyebilir. Lütfen dikkatli olun.',
         languageHelper:
             'Varsayılan olarak tarayıcı dilini takip eder. Bu parametre yalnızca geçerli tarayıcıda etkilidir',
         sessionTimeout: 'Oturum zaman aşımı',
@@ -2085,7 +2074,7 @@ const message = {
             'Yetkili IP adres listesini ayarladıktan sonra, yalnızca listedeki IP adresi panel servisine erişebilir. Devam etmek istiyor musunuz?',
         allowIPsHelper1: 'IP adresi kısıtlamasını devre dışı bırakmak için boş bırakın.',
         allowIPEgs: 'Her satıra bir tane. Örneğin,\n172.16.10.111\n172.16.10.0/24',
-        mfa: 'İki faktörlü kimlik doğrulama (2FA)',
+        mfa: 'İki Aşamalı Doğrulama',
         mfaClose: 'MFA’yı devre dışı bırakmak servisin güvenliğini azaltabilir. Devam etmek istiyor musunuz?',
         secret: 'Gizli',
         mfaInterval: 'Yenileme aralığı(saniye)',
@@ -2187,8 +2176,6 @@ const message = {
         compress: 'Anlık görüntü dosyası oluştur',
         upload: 'Anlık görüntü dosyasını yükle',
         recoverDetail: 'Kurtarma detayı',
-        createSnapshot: 'Anlık görüntü oluştur',
-        importSnapshot: 'Anlık görüntüyü senkronize et',
         importHelper: 'Anlık görüntü dizini: ',
         lastRecoverAt: 'Son kurtarma zamanı',
         lastRollbackAt: 'Son geri alma zamanı',
@@ -2273,7 +2260,7 @@ const message = {
         updateForce:
             'Zorla güncelle (bağlantı kaldırma sırasında tüm hataları yok sayarak son işlemin başarılı olmasını sağla)',
         trialInfo: 'Sürüm',
-        authorizationId: 'Abonelik yetkilendirme kimliği',
+        authorizationId: 'Abonelik ID',
         authorizedUser: 'Yetkili kullanıcı',
         lostHelper:
             'Lisans maksimum yeniden deneme sayısına ulaştı. Profesyonel sürüm özelliklerinin düzgün çalıştığından emin olmak için lütfen senkronizasyon düğmesine manuel olarak tıklayın.',
@@ -2522,7 +2509,6 @@ const message = {
         createGroup: 'Grup Oluştur',
         appNew: 'Yeni Uygulama',
         appInstalled: 'Kurulu uygulama',
-        create: 'Oluştur',
         delete: 'Web Sitesini Sil',
         deleteApp: 'Uygulamayı Sil',
         deleteBackup: 'Yedeği Sil',
@@ -2893,8 +2879,8 @@ const message = {
         execDir: 'Çalıştırma Dizini',
         packagist: 'Çin Tam Aynası',
 
-        batchOpreate: 'Toplu İşlem',
-        batchOpreateHelper: 'Toplu {0} web siteleri, işlemi devam ettir?',
+        batchOperate: 'Toplu İşlem',
+        batchOperateHelper: 'Toplu {0} web siteleri, işlemi devam ettir?',
         stream: 'TCP/UDP Proxy',
         streamPorts: 'Dinleme Portları',
         streamPortsHelper:
@@ -2924,7 +2910,7 @@ const message = {
         uploadMaxSize: 'Yükleme sınırı',
         indexHelper:
             'PHP web sitesinin normal çalışmasını sağlamak için, lütfen kodu index dizinine yerleştirin ve yeniden adlandırmaktan kaçının',
-        extensions: 'Uzantı şablonlarını yönet',
+        extensions: 'Eklenti Şablonları',
         extension: 'Uzantı',
         extensionHelper: 'Lütfen birden fazla uzantı için virgülle ayırın',
         toExtensionsList: 'Uzantı listesini görüntüle',
@@ -3117,11 +3103,8 @@ const message = {
         addressHelper2: 'Birden fazla IP adresi için virgülle ayırın. Örneğin, "172.16.10.11, 172.16.10.0/24".',
         allIP: 'Tüm IP’ler',
         portRule: 'Kural | Kurallar',
-        createPortRule: '@:commons.button.create @.lower:firewall.portRule',
         forwardRule: 'Port-Yönlendirme kuralı | Port-Yönlendirme kuralları',
-        createForwardRule: '@:commons.button.create @:firewall.forwardRule',
         ipRule: 'IP kuralı | IP kuralları',
-        createIpRule: '@:commons.button.create @:firewall.ipRule',
         userAgent: 'Kullanıcı-Aracısı filtresi',
         sourcePort: 'Kaynak port',
         targetIP: 'Hedef IP',
@@ -3169,7 +3152,6 @@ const message = {
     runtime: {
         runtime: 'Çalışma Zamanı',
         workDir: 'Çalışma dizini',
-        create: 'Oluştur',
         localHelper: 'Yerel ortam kurulumu ve çevrimdışı ortam kullanımı sorunları için lütfen bakın ',
         versionHelper: 'PHP sürümü, ör. v8.0',
         buildHelper:
@@ -3448,7 +3430,7 @@ const message = {
             phpExec: 'PHP Betiği Yürütme',
             oneWordTrojan: 'Tek Kelime Truva Atı',
             appFilter: 'Tehlikeli Dizin Filtreleme',
-            webshell: 'Webshell',
+            webShell: 'Webshell',
             args: 'Kötü Amaçlı Parametreler',
             protocolFilter: 'Protokol Filtresi',
             javaFilter: 'Java Tehlikeli Dosya Filtreleme',

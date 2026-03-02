@@ -4,7 +4,7 @@
         <DockerStatus v-model:isActive="isActive" v-model:isExist="isExist" />
         <LayoutContent v-loading="loading" v-if="isExist" :class="{ mask: !isActive }">
             <template #leftToolBar>
-                <el-button type="primary" @click="openCreate">{{ $t('aiTools.agents.createAgent') }}</el-button>
+                <el-button type="primary" @click="openCreate">{{ $t('commons.button.create') }}</el-button>
             </template>
             <template #rightToolBar>
                 <TableSearch v-model:searchName="searchName" @search="search" />

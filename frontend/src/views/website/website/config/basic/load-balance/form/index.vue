@@ -149,7 +149,7 @@
             </el-card>
 
             <el-button class="add-server-btn" type="primary" plain @click="addServer" icon="Plus">
-                {{ $t('commons.button.add') + $t('website.server') }}
+                {{ $t('commons.button.add') }}
             </el-button>
         </div>
     </el-form>

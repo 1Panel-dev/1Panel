@@ -46,6 +46,7 @@ const (
 	SyncAlertSetting                 = "SyncAlertSetting"
 	SyncCustomApp                    = "SyncCustomApp"
 	SyncLanguage                     = "SyncLanguage"
+	SyncEdition                      = "SyncEdition"
 	SyncSystemProxyWithRestartDocker = "SyncSystemProxyWithRestartDocker"
 )
 

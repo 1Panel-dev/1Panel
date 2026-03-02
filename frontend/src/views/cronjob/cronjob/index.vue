@@ -3,7 +3,7 @@
         <LayoutContent v-loading="loading" v-if="!isRecordShow" :title="$t('menu.cronjob')">
             <template #leftToolBar>
                 <el-button type="primary" @click="onOpenDialog('')">
-                    {{ $t('commons.button.create') }}{{ $t('menu.cronjob') }}
+                    {{ $t('commons.button.create') }}
                 </el-button>
                 <el-button @click="onOpenGroupDialog()">
                     {{ $t('commons.table.group') }}

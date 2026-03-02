@@ -23,7 +23,7 @@
 
             <template #leftToolBar>
                 <el-button type="primary" @click="onContainerOperate('')">
-                    {{ $t('container.create') }}
+                    {{ $t('commons.button.create') }}
                 </el-button>
                 <el-button type="primary" plain @click="onClean()">
                     {{ $t('container.containerPrune') }}

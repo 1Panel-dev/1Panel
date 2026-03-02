@@ -149,6 +149,7 @@ SyncBackupAccounts: "备份账号"
 SyncAlertSetting: "告警设置"
 SyncCustomApp: "自定义应用"
 SyncLanguage: "系统语言"
+SyncEdition: "运行区域"
 
 
 #upgrade node

@@ -1,12 +1,12 @@
 <template>
     <div class="d-name">
-        <div class="flex items-center justify-between">
-            <div class="min-w-50 flex items-center justify-start gap-1">
-                <el-button link type="info">
+        <div class="d-name-row flex items-center justify-between">
+            <div class="name-actions flex items-center justify-start gap-1">
+                <div class="name-wrap">
                     <el-tooltip :content="installed.name" placement="top">
                         <span class="name">{{ installed.name }}</span>
                     </el-tooltip>
-                </el-button>
+                </div>
                 <span class="status">
                     <Status :key="installed.status" :status="installed.status"></Status>
                 </span>
@@ -94,7 +94,7 @@
                     </el-tooltip>
                 </span>
             </div>
-            <div class="flex flex-wrap items-center justify-end gap-1">
+            <div class="operate-actions flex flex-wrap items-center justify-end gap-1">
                 <el-button
                     class="h-button"
                     plain

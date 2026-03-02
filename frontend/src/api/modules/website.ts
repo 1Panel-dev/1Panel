@@ -358,7 +358,7 @@ export const execComposer = (req: Website.ExecComposer) => {
     return http.post(`/websites/exec/composer`, req);
 };
 
-export const batchOpreate = (req: Website.BatchOperate) => {
+export const batchOperate = (req: Website.BatchOperate) => {
     return http.post(`/websites/batch/operate`, req);
 };
 

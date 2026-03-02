@@ -117,7 +117,7 @@
                         </div>
                         <div v-else class="flex items-center justify-center" style="height: 257px">
                             <el-button size="large" round plain type="primary" @click="onChangeEmail(0)">
-                                {{ $t('commons.button.create') }}{{ $t('xpack.alert.emailConfig') }}
+                                {{ $t('commons.button.create') }}
                             </el-button>
                         </div>
                     </el-card>
@@ -182,7 +182,7 @@
                         </div>
                         <div v-else class="flex items-center justify-center" style="height: 257px">
                             <el-button size="large" round plain type="primary" @click="onChangeWeCom(0)">
-                                {{ $t('commons.button.create') }}{{ $t('xpack.alert.weCom') }}
+                                {{ $t('commons.button.create') }}
                             </el-button>
                         </div>
                     </el-card>
@@ -251,7 +251,7 @@
                         </div>
                         <div v-else class="flex items-center justify-center" style="height: 257px">
                             <el-button size="large" round plain type="primary" @click="onChangeDingTalk(0)">
-                                {{ $t('commons.button.create') }}{{ $t('xpack.alert.dingTalk') }}
+                                {{ $t('commons.button.create') }}
                             </el-button>
                         </div>
                     </el-card>
@@ -320,7 +320,7 @@
                         </div>
                         <div v-else class="flex items-center justify-center" style="height: 257px">
                             <el-button size="large" round plain type="primary" @click="onChangeFeiShu(0)">
-                                {{ $t('commons.button.create') }}{{ $t('xpack.alert.feiShu') }}
+                                {{ $t('commons.button.create') }}
                             </el-button>
                         </div>
                     </el-card>

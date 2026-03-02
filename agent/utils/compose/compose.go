@@ -28,18 +28,33 @@ func checkCmd() error {
 	return nil
 }
 
+func getComposeBaseCmd() (string, []string) {
+	cmdStr := strings.TrimSpace(global.CONF.DockerConfig.Command)
+	parts := strings.Fields(cmdStr)
+	if len(parts) == 0 {
+		return "", nil
+	}
+	return parts[0], parts[1:]
+}
+
 func Up(filePath string) (string, error) {
 	if err := checkCmd(); err != nil {
 		return "", err
 	}
-	return cmd.NewCommandMgr(cmd.WithTimeout(20*time.Minute)).RunWithStdout(global.CONF.DockerConfig.Command, loadFiles(filePath), "up", "-d")
+	base, extra := getComposeBaseCmd()
+	args := append(extra, strings.Fields(loadFiles(filePath))...)
+	args = append(args, "up", "-d")
+	return cmd.NewCommandMgr(cmd.WithTimeout(20*time.Minute)).RunWithStdout(base, args...)
 }
 
 func UpWithTask(filePath string, task *task.Task, forcePull bool) error {
 	if err := pullComposeImages(filePath, forcePull, task); err != nil {
 		return err
 	}
-	return cmd.NewCommandMgr(cmd.WithTask(*task)).Run(global.CONF.DockerConfig.Command, loadFiles(filePath), "up", "-d")
+	base, extra := getComposeBaseCmd()
+	args := append(extra, strings.Fields(loadFiles(filePath))...)
+	args = append(args, "up", "-d")
+	return cmd.NewCommandMgr(cmd.WithTask(*task)).Run(base, args...)
 }
 
 func pullComposeImages(filePath string, forcePull bool, task *task.Task) error {
@@ -122,8 +137,11 @@ func getComposeImagesByCommand(filePath string) ([]string, error) {
 	if err := checkCmd(); err != nil {
 		return nil, err
 	}
+	base, extra := getComposeBaseCmd()
+	args := append(extra, strings.Fields(loadFiles(filePath))...)
+	args = append(args, "config", "--images")
 	stdout, err := cmd.NewCommandMgr(cmd.WithTimeout(5*time.Minute)).
-		RunWithStdout(global.CONF.DockerConfig.Command, loadFiles(filePath), "config", "--images")
+		RunWithStdout(base, args...)
 	if err != nil {
 		return nil, fmt.Errorf("run compose config --images failed, std: %s, err: %v", stdout, err)
 	}
@@ -151,28 +169,40 @@ func Down(filePath string) (string, error) {
 	if err := checkCmd(); err != nil {
 		return "", err
 	}
-	return cmd.NewCommandMgr(cmd.WithTimeout(20*time.Minute)).RunWithStdout(global.CONF.DockerConfig.Command, loadFiles(filePath), "down", "--remove-orphans")
+	base, extra := getComposeBaseCmd()
+	args := append(extra, strings.Fields(loadFiles(filePath))...)
+	args = append(args, "down", "--remove-orphans")
+	return cmd.NewCommandMgr(cmd.WithTimeout(20*time.Minute)).RunWithStdout(base, args...)
 }
 
 func Stop(filePath string) (string, error) {
 	if err := checkCmd(); err != nil {
 		return "", err
 	}
-	return cmd.NewCommandMgr(cmd.WithTimeout(20*time.Minute)).RunWithStdout(global.CONF.DockerConfig.Command, loadFiles(filePath), "stop")
+	base, extra := getComposeBaseCmd()
+	args := append(extra, strings.Fields(loadFiles(filePath))...)
+	args = append(args, "stop")
+	return cmd.NewCommandMgr(cmd.WithTimeout(20*time.Minute)).RunWithStdout(base, args...)
 }
 
 func Restart(filePath string) (string, error) {
 	if err := checkCmd(); err != nil {
 		return "", err
 	}
-	return cmd.NewCommandMgr(cmd.WithTimeout(20*time.Minute)).RunWithStdout(global.CONF.DockerConfig.Command, loadFiles(filePath), "restart")
+	base, extra := getComposeBaseCmd()
+	args := append(extra, strings.Fields(loadFiles(filePath))...)
+	args = append(args, "restart")
+	return cmd.NewCommandMgr(cmd.WithTimeout(20*time.Minute)).RunWithStdout(base, args...)
 }
 
 func Operate(filePath, operation string) (string, error) {
 	if err := checkCmd(); err != nil {
 		return "", err
 	}
-	return cmd.NewCommandMgr(cmd.WithTimeout(20*time.Minute)).RunWithStdout(global.CONF.DockerConfig.Command, loadFiles(filePath), operation)
+	base, extra := getComposeBaseCmd()
+	args := append(extra, strings.Fields(loadFiles(filePath))...)
+	args = append(args, operation)
+	return cmd.NewCommandMgr(cmd.WithTimeout(20*time.Minute)).RunWithStdout(base, args...)
 }
 
 func DownAndUp(filePath string) (string, error) {
@@ -180,11 +210,16 @@ func DownAndUp(filePath string) (string, error) {
 		return "", err
 	}
 	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(20 * time.Minute))
-	stdout, err := cmdMgr.RunWithStdout(global.CONF.DockerConfig.Command, loadFiles(filePath), "down")
+	base, extra := getComposeBaseCmd()
+	argsDown := append(extra, strings.Fields(loadFiles(filePath))...)
+	argsDown = append(argsDown, "down")
+	stdout, err := cmdMgr.RunWithStdout(base, argsDown...)
 	if err != nil {
 		return stdout, err
 	}
-	stdout, err = cmdMgr.RunWithStdout(global.CONF.DockerConfig.Command, loadFiles(filePath), "up", "-d")
+	argsUp := append(extra, strings.Fields(loadFiles(filePath))...)
+	argsUp = append(argsUp, "up", "-d")
+	stdout, err = cmdMgr.RunWithStdout(base, argsUp...)
 	return stdout, err
 }
 

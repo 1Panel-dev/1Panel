@@ -20,7 +20,7 @@
                 <LayoutContent :title="$t('firewall.forwardRule', 2)" :class="{ mask: !isActive }">
                     <template #leftToolBar>
                         <el-button type="primary" @click="onOpenDialog('create')">
-                            {{ $t('firewall.createForwardRule') }}
+                            {{ $t('commons.button.create') }}
                         </el-button>
                         <el-button @click="onDelete(null)" plain :disabled="selects.length === 0">
                             {{ $t('commons.button.delete') }}

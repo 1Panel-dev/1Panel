@@ -19,7 +19,6 @@ type NodeInfo struct {
 	Scope     string `json:"scope"`
 	BaseDir   string `json:"baseDir"`
 	NodePort  uint   `json:"nodePort"`
-	Edition   string `json:"edition"`
 	Version   string `json:"version"`
 	ServerCrt string `json:"serverCrt"`
 	ServerKey string `json:"serverKey"`

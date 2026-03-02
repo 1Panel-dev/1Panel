@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('website.create')" size="60%" @close="handleClose">
+    <DrawerPro v-model="open" :header="$t('commons.button.create')" size="60%" @close="handleClose">
         <div v-loading="loading" :class="{ mask: !versionExist }">
             <el-form
                 ref="websiteForm"
@@ -68,6 +68,7 @@
                                     :key="index"
                                     :label="app.name"
                                     :value="app.id"
+                                    :disabled="app.key == 'openclaw'"
                                 ></el-option>
                             </el-select>
                         </el-form-item>
@@ -266,7 +267,7 @@
                     <el-checkbox
                         @change="random"
                         v-model="website.enableFtp"
-                        :label="$t('commons.button.create') + ' FTP'"
+                        :label="$t('commons.button.create')"
                         size="large"
                     />
                     <span class="input-help">{{ $t('website.ftpHelper') }}</span>
@@ -675,9 +676,11 @@ const changeInstall = () => {
 const searchAppList = () => {
     searchApp(appReq).then((res) => {
         apps.value = res.data.items;
-        if (res.data.items.length > 0) {
-            website.value.appinstall.appId = res.data.items[0].id;
-            website.value.appinstall.appkey = res.data.items[0].key;
+
+        const selectableApp = res.data.items.find((item) => item.key !== 'openclaw');
+        if (selectableApp) {
+            website.value.appinstall.appId = selectableApp.id;
+            website.value.appinstall.appkey = selectableApp.key;
             changeApp();
         }
     });

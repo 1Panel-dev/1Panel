@@ -21,7 +21,7 @@
             </template>
             <template v-if="!openNginxConfig && nginxIsExist" #leftToolBar>
                 <el-button type="primary" @click="openCreate" :disabled="disabledConfig">
-                    {{ $t('website.create') }}
+                    {{ $t('commons.button.create') }}
                 </el-button>
                 <el-button type="primary" plain @click="openGroup" :disabled="disabledConfig">
                     {{ $t('commons.table.group') }}
@@ -199,7 +199,7 @@
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('website.sslExpireDate')" prop="sslExpireDate" width="150px">
+                    <el-table-column :label="$t('website.sslExpireDate')" prop="sslExpireDate" width="160px">
                         <template #default="{ row }">
                             <el-tag v-if="row.protocol == 'HTTPS'" :type="row.sslStatus">
                                 {{ dateFormatSimple(row.sslExpireDate) }}
@@ -221,7 +221,7 @@
                     </el-table-column>
                     <fu-table-operations
                         :ellipsis="1"
-                        width="150px"
+                        width="180px"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
                         :fixed="mobile ? false : 'right'"
@@ -257,7 +257,7 @@
                                 :disabled="selects.length == 0 || batchReq.operate == ''"
                                 @click="batchOp"
                             >
-                                {{ $t('website.batchOpreate') }}
+                                {{ $t('website.batchOperate') }}
                                 <span class="ml-1" v-if="selects.length > 0">({{ selects.length }})</span>
                             </el-button>
                         </div>
@@ -311,7 +311,7 @@ import BatchSetHttps from '@/views/website/website/batch-op/https.vue';
 
 import i18n from '@/lang';
 import { onMounted, reactive, ref, computed } from 'vue';
-import { batchOpreate, opWebsite, searchWebsites, updateWebsite } from '@/api/modules/website';
+import { batchOperate, opWebsite, searchWebsites, updateWebsite } from '@/api/modules/website';
 import { Website } from '@/api/interface/website';
 import { App } from '@/api/interface/app';
 import { ElMessageBox } from 'element-plus';
@@ -672,9 +672,9 @@ const batchOp = () => {
             batchReq.taskID = taskID;
             opRef.value.acceptParams({
                 names: names,
-                title: i18n.global.t('website.batchOpreate'),
-                api: batchOpreate,
-                msg: i18n.global.t('website.batchOpreateHelper', [i18n.global.t('commons.button.' + batchReq.operate)]),
+                title: i18n.global.t('website.batchOperate'),
+                api: batchOperate,
+                msg: i18n.global.t('website.batchOperateHelper', [i18n.global.t('commons.button.' + batchReq.operate)]),
                 params: batchReq,
                 noMsg: true,
             });

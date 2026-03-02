@@ -1,21 +1,21 @@
-ErrInvalidParams: "リクエストパラメータが無効です: {{ .detail }}"
-ErrTokenParse: "トークン生成エラー: {{ .detail }}"
-ErrInitialPassword: "初期パスワードが間違っています"
-ErrInternalServer: "サーバー内部エラー: {{ .detail }}"
-ErrRecordExist: "レコードはすでに存在します"
-ErrRecordNotFound: "レコードが見つかりません"
-ErrStructTransform: "型変換に失敗しました: {{ .detail }}"
-ErrNotLogin: "ユーザーがログインしていません: {{ .detail }}"
+ErrInvalidParams: '不正なリクエスト: {{ .detail }}'
+ErrTokenParse: 'トークンエラー: {{ .detail }}'
+ErrInitialPassword: '元のパスワードが違います'
+ErrInternalServer: '内部エラー: {{ .detail }}'
+ErrRecordExist: 'レコードが既に存在します'
+ErrRecordNotFound: 'レコードが見つかりません'
+ErrStructTransform: '型変換エラー: {{ .err }}'
+ErrNotLogin: 'ログインしていません: {{ .detail }}'
 ErrSessionDataNotFound: "現在のセッションは期限切れです！"
 ErrSessionDataFormat: "現在のセッションデータ形式が異常です！"
-ErrPasswordExpired: "現在のパスワードの有効期限が切れています: {{ .detail }}"
-ErrNotSupportType: "現在のタイプはサポートされていません: {{ .detail }}"
-ErrProxy: "リクエストエラー、このノードの状態を確認してください: {{ .detail }}"
-ErrApiConfigStatusInvalid: "APIアクセスは禁止されています: {{ .detail }}"
-ErrApiConfigKeyInvalid: "APIキーが無効です: {{ .detail }}"
-ErrApiConfigIPInvalid: "APIリクエストIPがホワイトリストにありません: {{ .detail }}"
-ErrApiConfigDisable: "このインターフェースはAPI呼び出しを禁止しています: {{ .detail }}"
-ErrApiConfigKeyTimeInvalid: "APIタイムスタンプエラー: {{ .detail }}"
+ErrPasswordExpired: 'パスワード期限切れ: {{ .detail }}'
+ErrNotSupportType: '未対応のタイプ: {{ .name }}'
+ErrProxy: 'リクエストに失敗しました: {{ .detail }}'
+ErrApiConfigStatusInvalid: 'API利用不可: {{ .detail }}'
+ErrApiConfigKeyInvalid: 'APIキーが無効です: {{ .detail }}'
+ErrApiConfigIPInvalid: 'IPが許可されていません: {{ .detail }}'
+ErrApiConfigDisable: 'APIは無効です: {{ .detail }}'
+ErrApiConfigKeyTimeInvalid: 'タイムスタンプが無効です: {{ .detail }}'
 
 # request
 ErrNoSuchHost: "要求されたサーバーが見つかりません {{ .err }}"
@@ -27,8 +27,8 @@ ErrProxySetting: "プロキシサーバー情報が利用できません {{ .err
 ErrEntranceFormat: "セキュリティエントランス {{ .name }} は現在サポートされていません。確認して再試行してください！"
 
 # common
-ErrDemoEnvironment: "デモサーバーではこの操作は許可されていません！"
-ErrCmdTimeout: "コマンドの実行がタイムアウトしました！"
+ErrDemoEnvironment: 'デモ環境では利用できません'
+ErrCmdTimeout: 'コマンドがタイムアウトしました'
 ErrEntrance: "セキュリティ情報エラー、再確認してください！"
 ErrGroupIsDefault: "デフォルトグループの削除はできません"
 ErrGroupIsInUse: "グループは使用中のため、削除できません。"
@@ -47,8 +47,8 @@ AppInstall: 'ノード {{ .targetNode }} にアプリケーション {{ .name }}
 AppInstallCheck: 'アプリケーションインストール環境を確認'
 
 # backup
-ErrBackupInUsed: "このバックアップアカウントはスケジュールタスクで使用されており、削除できません"
-ErrBackupCheck: "バックアップアカウントの接続テストが失敗しました {{ .err }}"
+ErrBackupInUsed: 'バックアップアカウントがスケジュールで使用中'
+ErrBackupCheck: '接続テストに失敗しました: {{ .err }}'
 ErrBackupLocal: "ローカルサーバーバックアップアカウントはこの操作をサポートしていません！"
 ErrBackupPublic: "このバックアップアカウントが公開されていないと検出されました。再確認してください！"
 ErrOSSConn: "最新バージョンを取得できません。外部ネットワーク接続を確認してください。"
@@ -58,40 +58,40 @@ ErrOSSConn: "最新バージョンを取得できません。外部ネットワ�
 LicenseCheck: 'ライセンスが利用可能か確認する'
 ErrLicenseInUsed: 'このライセンスは既に紐付けられています。確認して再試行してください！'
 ErrLicenseExpired: 'このライセンスは期限切れです。確認して再試行してください！'
-ErrLicense: "ライセンスフォーマットエラー、確認して再試行してください!"
-ErrLicenseCheck: "ライセンスの確認に失敗しました、確認して再試行してください!"
-ErrXpackVersion: "ライセンスの確認に失敗しました、このライセンスはバージョン制限があり、正常にインポートできません、確認して再試行してください!"
-ErrLicenseSave: "ライセンス情報の保存に失敗しました、エラー {{ .err }}、再試行してください!"
-ErrLicenseSync: "ライセンス情報の同期に失敗しました、データベースにライセンス情報が検出されませんでした!"
+ErrLicense: "ライセンスフォーマットエラー、確認して再試行してください"
+ErrLicenseCheck: "ライセンスの確認に失敗しました、確認して再試行してください"
+ErrXpackVersion: "ライセンスの確認に失敗しました、このライセンスはバージョン制限があり、正常にインポートできません、確認して再試行してください"
+ErrLicenseSave: "ライセンス情報の保存に失敗しました、エラー {{ .err }}、再試行してください"
+ErrLicenseSync: "ライセンス情報の同期に失敗しました、データベースにライセンス情報が検出されませんでした"
 ErrLicenseExist: "このライセンス記録は既に存在します。ライセンスページで直接ノードの紐付けが可能です。"
 ErrXpackNotFound: "この部分はプロフェッショナル版機能です、まず「パネル設定-ライセンス」画面でライセンスをインポートしてください"
 ErrXpackExceptional: "この部分はプロフェッショナル版機能です、まず「パネル設定-ライセンス」画面でライセンス状態を同期してください"
 ErrXpackLost: "ライセンスの最大試行回数に達しました、「パネル設定」「ライセンス」ページに移動し、手動で同期ボタンをクリックして、プロフェッショナル版機能が正常に使用できることを確認してください"
 ErrDeviceLost: "ライセンス検証に必要なファイルが失われました。確認して再試行してください！"
 ErrDeviceErr: "現在の環境とライセンスのインポート環境が一致しません。ライセンスを編集して再度インポートしてください！"
-ErrXpackTimeout: "リクエストタイムアウト、ネットワーク接続が不安定な可能性があります。後で再試行してください!"
-ErrUnbindMaster: "ノード管理にノードが存在するため、現在のライセンスを解除できません。ノードを削除してから再試行してください!"
-ErrFreeNodeLimit: "コミュニティ版のノード数が無料上限に達しました、www.lxware.cn/1panel で購入して再試行してください!"
-ErrNodeBound: "このライセンスは他のノードにバインドされています、確認して再試行してください!"
+ErrXpackTimeout: "リクエストタイムアウト、ネットワーク接続が不安定な可能性があります。後で再試行してください"
+ErrUnbindMaster: "ノード管理にノードが存在するため、現在のライセンスを解除できません。ノードを削除してから再試行してください"
+ErrFreeNodeLimit: "コミュニティ版のノード数が無料上限に達しました、www.lxware.cn/1panel で購入して再試行してください"
+ErrNodeBound: "このライセンスは他のノードにバインドされています、確認して再試行してください"
 ErrNodeBoundDelete: "このライセンスはバインドされており、削除操作はサポートされていません。確認して再試行してください！"
 ErrNodeBoundLimit: "現在の無料ノードは上限に達しました。確認して再試行してください！"
 ErrLicenseFree: "ライセンスがノードに正常にバインドされている場合のみ、その無料ノードを使用できます。確認して再試行してください！"
 ErrLicenseUnbind: "このライセンスにコミュニティ版ノードが存在します。[パネル設定 - ライセンス]でバインド解除してから再試行してください！"
-ErrNoSuchNode: "そのノード情報が見つかりませんでした、確認して再試行してください!"
-ErrNodeUnbind: "そのノードはライセンスのバインド範囲内ではありません、確認して再試行してください!"
-ErrNodeBind: "そのノードはライセンスにバインドされています、確認して再試行してください!"
+ErrNoSuchNode: "そのノード情報が見つかりませんでした、確認して再試行してください"
+ErrNodeUnbind: "そのノードはライセンスのバインド範囲内ではありません、確認して再試行してください"
+ErrNodeBind: "そのノードはライセンスにバインドされています、確認して再試行してください"
 ErrNodeLocalRollback: "マスターノードは直接ロールバックをサポートしていません。手動で「1pctl restore」コマンドを実行してロールバックしてください！"
 ErrIntlLicense: "現在のバージョンでは国際版ライセンスのインポートはまだサポートされていません。しばらくお待ちください！"
 
-InvalidRequestBodyType: "リクエストボディの形式が無効です。内容が要求された形式に準拠しているか確認してから再試行してください！"  
-InvalidLicenseCodeType: "提供されたライセンスコードの形式が無効です。確認してから再試行してください！"  
-LicenseNotFoundType: "ライセンスが見つかりません。提供されたライセンスに一致する記録がシステム内に存在しません。確認してから再試行してください！"  
-LicenseRevokedType: "リクエストされたライセンスは廃止されており、使用できません。確認してから再試行してください！"  
-LicenseExpiredType: "ライセンスの有効期限が切れています。更新するか、パネル設定 - ライセンス 画面で再インポートしてから再試行してください！"  
-LicenseProductMismatchType: "ライセンスがリクエストされた製品またはサービスと一致しません！"  
-InvalidAssigneeType: "ライセンス割り当ての対象ユーザーまたはデバイス情報が無効です。確認してから再試行してください！"  
-LicenseUsageNotFoundType: "使用記録がありません。このライセンスはまだ有効化または使用されていません。確認してから再試行してください！"  
-LicenseUsageLimitExceededType: "このライセンスは既に他のノードにバインドされています。確認してから再試行してください！"  
+InvalidRequestBodyType: "リクエストボディの形式が無効です。内容が要求された形式に準拠しているか確認してから再試行してください！"
+InvalidLicenseCodeType: "提供されたライセンスコードの形式が無効です。確認してから再試行してください！"
+LicenseNotFoundType: "ライセンスが見つかりません。提供されたライセンスに一致する記録がシステム内に存在しません。確認してから再試行してください！"
+LicenseRevokedType: "リクエストされたライセンスは廃止されており、使用できません。確認してから再試行してください！"
+LicenseExpiredType: "ライセンスの有効期限が切れています。更新するか、パネル設定 - ライセンス 画面で再インポートしてから再試行してください！"
+LicenseProductMismatchType: "ライセンスがリクエストされた製品またはサービスと一致しません！"
+InvalidAssigneeType: "ライセンス割り当ての対象ユーザーまたはデバイス情報が無効です。確認してから再試行してください！"
+LicenseUsageNotFoundType: "使用記録がありません。このライセンスはまだ有効化または使用されていません。確認してから再試行してください！"
+LicenseUsageLimitExceededType: "このライセンスは既に他のノードにバインドされています。確認してから再試行してください！"
 
 # alert
 ErrAlertSync: "アラート情報の同期エラーです。後で再試行してください！"
@@ -143,6 +143,7 @@ SyncBackupAccounts: "バックアップアカウント"
 SyncAlertSetting: "アラート設定"
 SyncCustomApp: "カスタムアプリ"
 SyncLanguage: "システム言語"
+SyncEdition: "実行リージョン"
 
 #upgrade node
 NodeUpgrade: "{{ .name }} ノードのアップグレード"
@@ -217,7 +218,7 @@ UpdateUserResult: "パネルユーザー: {{ .name }}"
 UpdatePasswordRead: "エラー: パネルパスワード情報の読み取りに失敗しました、{{ .err }}"
 UpdatePasswordNull: "エラー: パネルパスワードは空です！"
 UpdateUPasswordBlank: "エラー: パスワードにはスペースが含まれています！"
-UpdatePasswordFormat: "エラー: パネルパスワードは英字、数字、特殊文字（!@#$%*_,.?）のみ使用でき、長さは8〜30文字です。"
+UpdatePasswordFormat: "エラー: パネルパスワードは英字、数字、特殊文字（@#$%*_,.?）のみ使用でき、長さは8〜30文字です。"
 UpdatePasswordLen: "エラー: 6文字より長くパスワードを入力してください！"
 UpdatePasswordRe: "パスワードを認証する: "
 UpdatePasswordErr: "エラー: {{ .err }}のパスワードの更新に失敗しました"

@@ -13,39 +13,39 @@
 
     .a-detail {
         .d-name {
+            .d-name-row {
+                gap: 8px;
+                min-width: 0;
+            }
+
+            .name-actions {
+                flex: 1;
+                min-width: 0;
+                flex-wrap: nowrap;
+                overflow: hidden;
+            }
+
+            .operate-actions {
+                flex-shrink: 0;
+            }
+
+            .name-wrap {
+                min-width: 0;
+                max-width: clamp(140px, 22vw, 320px);
+                flex-shrink: 1;
+                margin-right: 4px;
+                overflow: hidden;
+            }
+
             .name {
+                display: block;
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
                 font-weight: 500;
                 font-size: 18px;
                 color: var(--panel-text-color);
-
-                max-width: 100px;
-
-                @media (min-width: 576px) {
-                    max-width: 120px;
-                }
-
-                @media (min-width: 768px) {
-                    max-width: 150px;
-                }
-
-                @media (min-width: 992px) {
-                    max-width: 180px;
-                }
-
-                @media (min-width: 1200px) {
-                    max-width: 220px;
-                }
-
-                @media (min-width: 1600px) {
-                    max-width: 280px;
-                }
-
-                @media (min-width: 1920px) {
-                    max-width: 350px;
-                }
+                max-width: 100%;
             }
 
             .status {

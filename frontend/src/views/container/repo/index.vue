@@ -10,7 +10,7 @@
         <LayoutContent v-if="isExist" :title="$t('container.repo', 2)" :class="{ mask: !isActive }">
             <template #leftToolBar>
                 <el-button type="primary" @click="onOpenDialog('add')">
-                    {{ $t('container.createRepo') }}
+                    {{ $t('commons.button.add') }}
                 </el-button>
             </template>
             <template #rightToolBar>

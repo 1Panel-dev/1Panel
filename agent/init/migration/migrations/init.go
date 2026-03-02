@@ -128,7 +128,8 @@ var InitSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "SystemStatus", Value: "Free"}).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Setting{Key: "Language", Value: "zh"}).Error; err != nil {
+		lang := common.LoadParamsWithoutPanic("LANGUAGE")
+		if err := tx.Create(&model.Setting{Key: "Language", Value: lang}).Error; err != nil {
 			return err
 		}
 		if err := tx.Create(&model.Setting{Key: "SystemIP", Value: ""}).Error; err != nil {
@@ -972,5 +973,23 @@ var AddAgentAccountRememberAPIKey = &gormigrate.Migration{
 			return err
 		}
 		return tx.Model(&model.AgentAccount{}).Where("remember_api_key IS NULL").Update("remember_api_key", true).Error
+	},
+}
+
+var AddEditionSetting = &gormigrate.Migration{
+	ID: "20260224-add-edition-setting",
+	Migrate: func(tx *gorm.DB) error {
+		var setting model.Setting
+		edition := common.LoadParamsWithoutPanic("PANEL_EDITION")
+		if err := tx.Where("key = ?", "Edition").First(&setting).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return tx.Create(&model.Setting{Key: "Edition", Value: edition}).Error
+			}
+			return err
+		}
+		if setting.Value == "" {
+			return tx.Model(&model.Setting{}).Where("key = ?", "Edition").Update("value", edition).Error
+		}
+		return nil
 	},
 }

@@ -2,10 +2,10 @@ import fit2cloudEnLocale from 'fit2cloud-ui-plus/src/locale/lang/ms';
 
 const message = {
     commons: {
-        true: 'true',
-        false: 'false',
+        true: 'Benar',
+        false: 'Palsu',
         colon: ': ',
-        example: 'Sebagai contoh, ',
+        example: 'cth., ',
         fit2cloud: 'FIT2CLOUD',
         lingxia: 'Lingxia',
         button: {
@@ -369,9 +369,9 @@ const message = {
         },
     },
     menu: {
-        home: 'Overview',
+        home: 'Papan Pemuka',
         apps: 'App Store',
-        website: 'Website | Websites',
+        website: 'Laman | Laman',
         project: 'Project | Projects',
         config: 'Configuration | Configurations',
         ssh: 'SSH Settings',
@@ -387,7 +387,7 @@ const message = {
         files: 'Files',
         monitor: 'Monitoring',
         terminal: 'Terminal',
-        settings: 'Setting | Settings',
+        settings: 'Tetapan',
         toolbox: 'Toolbox',
         logs: 'Log | Logs',
         runtime: 'Runtime | Runtimes',
@@ -397,22 +397,22 @@ const message = {
         supervisor: 'Supervisor',
         tamper: 'Bukti Pengubahsuaian',
         app: 'Aplikasi',
-        msgCenter: 'Pusat Tugas',
+        msgCenter: 'Tugas',
         disk: 'Disk',
     },
     home: {
-        recommend: 'cadangan',
-        dir: 'direktori',
+        recommend: 'Disyorkan',
+        dir: 'Direktori',
         alias: 'Alias',
-        quickDir: 'Direktori Pantas',
-        minQuickJump: 'Sila tetapkan sekurang-kurangnya satu entri lompat pantas!',
-        maxQuickJump: 'Anda boleh menetapkan sehingga empat entri lompat pantas!',
+        quickDir: 'Akses Pantas',
+        minQuickJump: 'Tambah sekurang-kurangnya satu entri akses pantas',
+        maxQuickJump: 'Anda boleh menambah sehingga empat entri akses pantas',
         database: 'Pangkalan Data - Semua',
         restart_1panel: 'Mulakan semula panel',
         restart_system: 'Mulakan semula pelayan',
-        operationSuccess: 'Operasi berjaya, sedang memulakan semula, sila segarkan pelayar secara manual nanti!',
+        operationSuccess: 'Selesai dengan jayanya. Menyusun semula sekarang, muat semula pelayar kemudian.',
         entranceHelper:
-            'Pintu masuk keselamatan tidak diaktifkan. Anda boleh mengaktifkannya di "Tetapan -> Keselamatan" untuk meningkatkan keselamatan sistem.',
+            'Pintu masuk selamat tidak diaktifkan. Hidupkan di "Tetapan -> Keselamatan" untuk tingkatkan keselamatan.',
         appInstalled: 'Aplikasi yang dipasang',
         systemInfo: 'Maklumat sistem',
         hostname: 'Nama hos',
@@ -488,7 +488,6 @@ const message = {
         deleteBackupHelper: 'Padam sandaran pangkalan data secara serentak',
         delete: 'Operasi padam tidak boleh diundurkan, sila masukkan "',
         deleteHelper: '" untuk memadam pangkalan data ini',
-        create: 'Cipta pangkalan data',
         noMysql: 'Perkhidmatan pangkalan data (MySQL atau MariaDB)',
         noPostgresql: 'Perkhidmatan pangkalan data PostgreSQL',
         goUpgrade: 'Pergi tingkatkan',
@@ -502,7 +501,7 @@ const message = {
         permissionAll: 'Kesemuanya(%)',
         localhostHelper:
             'Mengkonfigurasi kebenaran pangkalan data sebagai "localhost" untuk penyebaran kontena akan menghalang akses luar ke kontena. Sila pilih dengan teliti!',
-        databaseConnInfo: 'Maklumat sambungan',
+        databaseConnInfo: 'Sambungan',
         rootPassword: 'Kata laluan root',
         serviceName: 'Nama Perkhidmatan',
         serviceNameHelper: 'Akses antara kontena dalam rangkaian yang sama.',
@@ -665,6 +664,7 @@ const message = {
         rdbInfo: 'Pastikan nilai dalam senarai peraturan berada dalam julat 1 hingga 100000',
 
         containerConn: 'Sambungan kontena',
+        copyConnURL: 'Salin URL sambungan',
         connAddress: 'Alamat',
         containerConnHelper:
             'Alamat sambungan ini boleh digunakan oleh aplikasi yang berjalan pada runtime laman web (PHP, dll.) atau kontena.',
@@ -678,8 +678,6 @@ const message = {
         agents: {
             agents: 'Agen',
             agent: 'Agen',
-            createAgent: 'Cipta agen',
-            createModelAccount: 'Cipta akaun model',
             account: 'Akaun model',
             noAccountHint: 'Pilih akaun model sedia ada atau tambah yang baharu.',
             accountCount: 'Akaun model {0}',
@@ -805,8 +803,6 @@ const message = {
         },
         mcp: {
             server: 'Pelayan MCP',
-            create: 'Tambah Pelayan',
-            edit: 'Edit Pelayan',
             baseUrl: 'Laluan Akses Luar',
             baseUrlHelper: 'Contoh: http://192.168.1.2:8000',
             ssePath: 'Laluan SSE',
@@ -841,8 +837,10 @@ const message = {
         },
     },
     container: {
-        create: 'Cipta kontena',
-        edit: 'Sunting kontena',
+        createByCommand: 'Cipta melalui perintah',
+        commandInput: 'Input perintah',
+        commandRule: 'Sila masukkan arahan docker run yang sah untuk mencipta kontena.',
+        commandHelper: 'Arahan ini akan dijalankan pada pelayan untuk mencipta kontena. Teruskan?',
         updateHelper1: 'Dikesan bahawa kontena ini berasal dari gedung aplikasi. Sila perhatikan dua perkara berikut:',
         updateHelper2: '1. Pengubahsuaian semasa tidak akan diselaraskan ke aplikasi yang dipasang di gedung aplikasi.',
         updateHelper3:
@@ -1032,7 +1030,6 @@ const message = {
         network: 'Rangkaian | Rangkaian-rangkaian',
         networkHelper:
             'Ini boleh menyebabkan beberapa aplikasi dan persekitaran runtime tidak berfungsi dengan betul. Adakah anda mahu meneruskan?',
-        createNetwork: 'Cipta',
         networkName: 'Nama',
         driver: 'Pemacu',
         option: 'Pilihan',
@@ -1050,10 +1047,8 @@ const message = {
         mountpoint: 'Titik pemasangan',
         mountpointNFSHelper: 'contoh: /nfs, /nfs-share',
         options: 'Pilihan',
-        createVolume: 'Cipta',
 
         repo: 'Pendaftaran',
-        createRepo: 'Tambah',
         httpRepoHelper: 'Mengoperasikan repositori jenis HTTP memerlukan mulakan semula perkhidmatan Docker.',
         httpRepo:
             'Memilih protokol HTTP memerlukan memulakan semula perkhidmatan Docker untuk menambahkannya ke pendaftaran tidak selamat.',
@@ -1079,11 +1074,9 @@ const message = {
         deleteComposeHelper:
             'Padam semua fail berkaitan komposisi kontena, termasuk fail konfigurasi dan fail berterusan. Sila berhati-hati!',
         deleteCompose: 'Padam komposisi ini.',
-        createCompose: 'Cipta',
         composeDirectory: 'Direktori',
         template: 'Templat',
         composeTemplate: 'Templat Compose | Templat Compose',
-        createComposeTemplate: 'Cipta',
         content: 'Kandungan',
         contentEmpty: 'Kandungan Compose tidak boleh kosong, sila masukkan dan cuba lagi!',
         containerNumber: 'Bilangan kontena',
@@ -1152,8 +1145,6 @@ const message = {
         finishTime: 'Masa berhenti terakhir',
     },
     cronjob: {
-        create: 'Cipta tugas cron',
-        edit: 'Edit tugas cron',
         importHelper:
             'Tugas terjadual dengan nama sama akan dilangkau secara automatik semasa import. Tugas akan ditetapkan ke status 【Lumpuh】 secara lalai, dan ditetapkan ke status 【Menunggu Edit】 apabila perkaitan data tidak normal.',
         changeStatus: 'Tukar status',
@@ -1677,7 +1668,7 @@ const message = {
         ignoreCertificateHelper:
             'Membenarkan sambungan pelayan tidak selamat boleh menyebabkan kebocoran atau pengubahan data. Gunakan pilihan ini hanya jika mempercayai sumber muat turun.',
         uploadOverLimit: 'Bilangan fail melebihi 1000! Sila mampatkan dan muat naik',
-        clashDitNotSupport: 'Nama fail dilarang mengandungi .1panel_clash',
+        clashDidNotSupport: 'Nama fail dilarang mengandungi .1panel_clash',
         clashDeleteAlert: 'Folder "Tong Kitar Semula" tidak boleh dipadamkan',
         clashOpenAlert: 'Sila klik butang "Tong Kitar Semula" untuk membuka direktori tong kitar semula',
         right: 'Ke hadapan',
@@ -1782,7 +1773,7 @@ const message = {
         acceptHelper:
             "Melaksanakan operasi 'terima' pada alamat berikut. Selepas menetapkan, IP akan mendapatkan semula akses normal. Adakah anda mahu meneruskan?",
         noAddrWarning: 'Tiada alamat [{0}] yang dipilih pada masa ini. Sila periksa dan cuba lagi!',
-        loginLogs: 'Log Masuk',
+        loginLogs: 'Log SSH',
         loginMode: 'Mod',
         authenticating: 'Kunci',
         publickey: 'Kunci',
@@ -1828,10 +1819,14 @@ const message = {
         auto: 'Ikut Sistem',
         language: 'Bahasa',
         region: 'Wilayah operasi',
-        regionHelper:
-            'Wilayah operasi yang berbeza mempunyai alamat muat turun dan pautan dokumentasi berbeza untuk gedung aplikasi serta pustaka skrip.',
         cn: 'Tanah Besar China',
-        intl: 'Antarabangsa',
+        intl: 'Global',
+        regionHelper: 'Menukar wilayah akan menukar sumber berikut:',
+        regionHelper1: 'Pakej pemasangan sistem',
+        regionHelper2: 'Kedai aplikasi dan pustaka skrip',
+        regionHelper3: 'Manual pengguna dan dokumen berkaitan',
+        regionHelper4:
+            'Tindakan ini mungkin menjejaskan muat turun dan akses seterusnya. Sila teruskan dengan berhati-hati.',
         languageHelper:
             'Secara lalai, ia mengikuti bahasa penyemak imbas. Parameter ini hanya berkuat kuasa pada penyemak imbas semasa',
         sessionTimeout: 'Tempoh tamat sesi',
@@ -2055,7 +2050,7 @@ const message = {
             'Selepas anda menetapkan senarai alamat IP yang dibenarkan, hanya alamat IP dalam senarai yang boleh mengakses perkhidmatan panel. Adakah anda mahu meneruskan?',
         allowIPsHelper1: 'Biarkan kosong untuk melumpuhkan sekatan alamat IP.',
         allowIPEgs: 'Satu per baris. Contoh,\n172.16.10.111\n172.16.10.0/24',
-        mfa: 'Pengesahan dua faktor (2FA)',
+        mfa: 'Pengesahan Dua Faktor',
         mfaClose: 'Melumpuhkan MFA akan mengurangkan keselamatan perkhidmatan. Adakah anda mahu meneruskan?',
         secret: 'Rahsia',
         mfaInterval: 'Selang penyegaran (saat)',
@@ -2160,8 +2155,6 @@ const message = {
         compress: 'Cipta fail snapshot',
         upload: 'Muat naik fail snapshot',
         recoverDetail: 'Butiran pemulihan',
-        createSnapshot: 'Cipta snapshot',
-        importSnapshot: 'Segerakkan snapshot',
         recover: 'Pulihkan',
         lastRecoverAt: 'Waktu pemulihan terakhir',
         lastRollbackAt: 'Waktu pemulangan terakhir',
@@ -2241,7 +2234,7 @@ const message = {
             'Memaksa nyahikat akan mengabaikan sebarang ralat yang berlaku semasa proses nyahikat dan akhirnya melepaskan ikatan lesen.',
         updateForce: 'Kemas kini paksa (abaikan semua ralat semasa nyahikatan untuk memastikan operasi akhir berjaya)',
         trialInfo: 'Versi',
-        authorizationId: 'ID Kebenaran Langganan',
+        authorizationId: 'ID Langganan',
         authorizedUser: 'Pengguna yang Dibenarkan',
         lostHelper:
             'Lesen telah mencapai jumlah percubaan semula maksimum. Sila klik butang penyegerakan secara manual untuk memastikan ciri versi profesional berfungsi dengan baik. butiran: ',
@@ -2480,7 +2473,6 @@ const message = {
         createGroup: 'Cipta kumpulan',
         appNew: 'Aplikasi Baru',
         appInstalled: 'Aplikasi yang Dipasang',
-        create: 'Cipta laman web',
         delete: 'Padam Laman Web',
         deleteApp: 'Padam Aplikasi',
         deleteBackup: 'Padam Sandaran',
@@ -2849,8 +2841,8 @@ const message = {
         execDir: 'Direktori Pelaksanaan',
         packagist: 'Cermin Penuh China',
 
-        batchOpreate: 'Operasi Pukal',
-        batchOpreateHelper: 'Pukal {0} laman web, teruskan operasi?',
+        batchOperate: 'Operasi Pukal',
+        batchOperateHelper: 'Pukal {0} laman web, teruskan operasi?',
         stream: 'Proksi TCP/UDP',
         streamPorts: 'Port Mendengar',
         streamPortsHelper:
@@ -3074,11 +3066,8 @@ const message = {
         addressHelper2: 'Untuk pelbagai alamat IP, pisahkan dengan koma. Contohnya, "172.16.10.11, 172.16.0.0/24".',
         allIP: 'Semua IP',
         portRule: 'Peraturan | Peraturan',
-        createPortRule: '@:commons.button.create @.lower:firewall.portRule',
         forwardRule: 'Peraturan Pemajuan Port | Peraturan Pemajuan Port',
-        createForwardRule: '@:commons.button.create @:firewall.forwardRule',
         ipRule: 'Peraturan IP | Peraturan IP',
-        createIpRule: '@:commons.button.create @:firewall.ipRule',
         userAgent: 'Penapis User-Agent',
         sourcePort: 'Port sumber',
         targetIP: 'IP sasaran',
@@ -3125,7 +3114,6 @@ const message = {
     runtime: {
         runtime: 'Runtime',
         workDir: 'Direktori kerja',
-        create: 'Cipta runtime',
         localHelper:
             'Untuk masalah pemasangan persekitaran tempatan dan penggunaan persekitaran luar talian, sila rujuk ',
         versionHelper: 'Versi PHP, contohnya v8.0',
@@ -3378,7 +3366,7 @@ const message = {
             phpExec: 'Pelaksanaan Skrip PHP',
             oneWordTrojan: 'Trojan Satu Perkataan',
             appFilter: 'Penapisan Direktori Berbahaya',
-            webshell: 'Webshell',
+            webShell: 'Webshell',
             args: 'Parameter Berbahaya',
             protocolFilter: 'Penapis Protokol',
             javaFilter: 'Penapisan Fail Berbahaya Java',

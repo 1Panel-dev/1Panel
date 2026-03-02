@@ -1,7 +1,7 @@
 <template>
     <DrawerPro
         v-model="open"
-        :header="$t('aiTools.mcp.' + mode)"
+        :header="$t('commons.button.' + mode)"
         :resource="mcpServer.name"
         @close="handleClose"
         size="large"

@@ -192,6 +192,10 @@ func handleAppRecover(install *model.AppInstall, parentTask *task.Task, recoverF
 		if err != nil {
 			return err
 		}
+		newEnv, err := os.ReadFile(install.GetEnvPath())
+		if err != nil {
+			return err
+		}
 		if err := json.Unmarshal(appJson, &oldInstall); err != nil {
 			return fmt.Errorf("unmarshal app.json failed, err: %v", err)
 		}
@@ -199,7 +203,6 @@ func handleAppRecover(install *model.AppInstall, parentTask *task.Task, recoverF
 			return errors.New(i18n.GetMsgByKey("AppAttributesNotMatch"))
 		}
 
-		newEnvFile := ""
 		resources, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithAppInstallId(install.ID))
 		for _, resource := range resources {
 			var database model.Database
@@ -241,24 +244,11 @@ func handleAppRecover(install *model.AppInstall, parentTask *task.Task, recoverF
 				if err != nil {
 					return err
 				}
-				newDB, envMap, err := reCreateDB(db.ID, database, oldInstall.Env)
-				if err != nil {
-					return err
-				}
-				oldHost := fmt.Sprintf("\"PANEL_DB_HOST\":\"%v\"", envMap["PANEL_DB_HOST"].(string))
-				newHost := fmt.Sprintf("\"PANEL_DB_HOST\":\"%v\"", database.Address)
-				oldInstall.Env = strings.ReplaceAll(oldInstall.Env, oldHost, newHost)
-				envMap["PANEL_DB_HOST"] = database.Address
-				newEnvFile, err = coverEnvJsonToStr(oldInstall.Env)
-				if err != nil {
-					return err
-				}
-				_ = appInstallResourceRepo.BatchUpdateBy(map[string]interface{}{"resource_id": newDB.ID}, repo.WithByID(resource.ID))
 				taskName := task.GetTaskName(db.Name, task.TaskRecover, task.TaskScopeDatabase)
 				t.LogStart(taskName)
 				if err := handleMysqlRecover(dto.CommonRecover{
-					Name:       newDB.MysqlName,
-					DetailName: newDB.Name,
+					Name:       database.Name,
+					DetailName: db.Name,
 					File:       fmt.Sprintf("%s/%s.sql.gz", tmpPath, install.Name),
 				}, parentTask, true); err != nil {
 					t.LogFailedWithErr(taskName, err)
@@ -284,14 +274,12 @@ func handleAppRecover(install *model.AppInstall, parentTask *task.Task, recoverF
 		t.LogSuccess(deCompressName)
 		_ = fileOp.DeleteDir(backPath)
 
-		if len(newEnvFile) != 0 {
-			envPath := fmt.Sprintf("%s/%s/.env", install.GetAppPath(), install.Name)
-			file, err := os.OpenFile(envPath, os.O_WRONLY|os.O_TRUNC, 0640)
-			if err != nil {
-				return err
-			}
-			defer file.Close()
-			_, _ = file.WriteString(newEnvFile)
+		oldEnv, err := os.ReadFile(install.GetEnvPath())
+		if err != nil {
+			return err
+		}
+		if err := handleRecoverEnv(install, string(newEnv), string(oldEnv)); err != nil {
+			return err
 		}
 
 		oldInstall.ID = install.ID
@@ -373,33 +361,58 @@ func doAppBackup(install *model.AppInstall, parentTask *task.Task, backupDir, fi
 	return nil
 }
 
-func reCreateDB(dbID uint, database model.Database, oldEnv string) (*model.DatabaseMysql, map[string]interface{}, error) {
-	mysqlService := NewIMysqlService()
-	ctx := context.Background()
-	_ = mysqlService.Delete(ctx, dto.MysqlDBDelete{ID: dbID, Database: database.Name, Type: database.Type, DeleteBackup: false, ForceDelete: true})
+func handleRecoverEnv(install *model.AppInstall, newEnvFile string, oldEnvFile string) error {
+	oldEnvInDB := make(map[string]interface{})
+	if err := json.Unmarshal([]byte(install.Env), &oldEnvInDB); err != nil {
+		return err
+	}
 
-	envMap := make(map[string]interface{})
-	if err := json.Unmarshal([]byte(oldEnv), &envMap); err != nil {
-		return nil, envMap, err
+	lines := strings.Split(newEnvFile, "\n")
+	oldEnvMap := make(map[string]string)
+	oldLines := strings.Split(oldEnvFile, "\n")
+	for _, line := range oldLines {
+		if strings.TrimSpace(line) == "" || strings.HasPrefix(line, "#") {
+			continue
+		}
+		parts := strings.SplitN(line, "=", 2)
+		if len(parts) == 2 {
+			oldEnvMap[parts[0]] = parts[1]
+		}
 	}
-	oldName, _ := envMap["PANEL_DB_NAME"].(string)
-	oldUser, _ := envMap["PANEL_DB_USER"].(string)
-	oldPassword, _ := envMap["PANEL_DB_USER_PASSWORD"].(string)
-	createDB, err := mysqlService.Create(context.Background(), dto.MysqlDBCreate{
-		Name:       oldName,
-		From:       database.From,
-		Database:   database.Name,
-		Format:     "utf8mb4",
-		Username:   oldUser,
-		Password:   oldPassword,
-		Permission: "%",
-	})
-	cronjobs, _ := cronjobRepo.List(cronjobRepo.WithByDbName(fmt.Sprintf("%v", dbID)))
-	for _, job := range cronjobs {
-		_ = cronjobRepo.Update(job.ID, map[string]interface{}{"db_name": fmt.Sprintf("%v", createDB.ID)})
+
+	keysToKeep := []string{
+		"PANEL_DB_PORT",
+		"PANEL_DB_NAME",
+		"PANEL_DB_USER",
+		"PANEL_DB_USER_PASSWORD",
+		"PANEL_DB_TYPE",
+		"PANEL_DB_HOST",
+		"DATABASE_NAME",
+		"PANEL_DB_HOST_NAME",
+		"CASDOOR_DRIVER_NAME",
+		"CASDOOR_DATASOURCE_NAME",
 	}
+
+	for i := 0; i < len(lines); i++ {
+		for _, key := range keysToKeep {
+			prefix := key + "="
+			if strings.HasPrefix(lines[i], prefix) {
+				if val, ok := oldEnvMap[key]; ok {
+					lines[i] = fmt.Sprintf("%s=%v", key, val)
+					oldEnvInDB[key] = val
+				}
+			}
+		}
+	}
+	newEnvFile = strings.Join(lines, "\n")
+	file, err := os.OpenFile(install.GetEnvPath(), os.O_WRONLY|os.O_TRUNC, 0640)
 	if err != nil {
-		return nil, envMap, err
+		return err
 	}
-	return createDB, envMap, nil
+	defer file.Close()
+	_, _ = file.WriteString(newEnvFile)
+
+	newEnvToDB, _ := json.Marshal(oldEnvInDB)
+	install.Env = string(newEnvToDB)
+	return nil
 }

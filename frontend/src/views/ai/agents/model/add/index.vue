@@ -90,7 +90,7 @@ const form = reactive({
 });
 
 const headerTitle = computed(() =>
-    form.id ? i18n.global.t('commons.button.edit') : i18n.global.t('aiTools.agents.createModelAccount'),
+    form.id ? i18n.global.t('commons.button.edit') : i18n.global.t('commons.button.create'),
 );
 
 const rules = reactive({
