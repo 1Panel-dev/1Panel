@@ -77,7 +77,7 @@ const GlobalStore = defineStore({
             this.isLoading = loading;
         },
         setLoadingText(text: string) {
-            this.loadingText = i18n.global.t('commons.loadingText.' + text);
+            this.loadingText = text;
         },
         setCsrfToken(token: string) {
             this.csrfToken = token;
