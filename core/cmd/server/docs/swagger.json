@@ -20559,6 +20559,59 @@
 				}
 			}
 		},
+		"/websites/proxies/operate": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.WebsiteProxyConfigOp"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Operate proxy conf",
+				"tags": [
+					"Website"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [
+						{
+							"db": "websites",
+							"input_column": "id",
+							"input_value": "id",
+							"isList": false,
+							"output_column": "primary_domain",
+							"output_value": "domain"
+						}
+					],
+					"bodyKeys": [
+						"id"
+					],
+					"formatEN": "Operate domain [domain] proxy config",
+					"formatZH": "操作网站 [domain] 反向代理配置 ",
+					"paramKeys": []
+				}
+			}
+		},
 		"/websites/proxies/update": {
 			"post": {
 				"consumes": [
@@ -32456,6 +32509,25 @@
 				"operate",
 				"proxyHost",
 				"proxyPass"
+			],
+			"type": "object"
+		},
+		"request.WebsiteProxyConfigOp": {
+			"properties": {
+				"id": {
+					"type": "integer"
+				},
+				"name": {
+					"type": "string"
+				},
+				"operate": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"id",
+				"name",
+				"operate"
 			],
 			"type": "object"
 		},
