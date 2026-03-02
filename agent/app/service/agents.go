@@ -94,6 +94,14 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 		return nil, buserr.New("ErrAgentApiKeyRequired")
 	}
 	apiType, maxTokens, contextWindow := resolveRuntimeParams(provider, account.APIType, account.MaxTokens, account.ContextWindow)
+	runtimeModel := strings.TrimSpace(req.Model)
+	if provider == "custom" {
+		primaryID := customPrimaryModelID(req.Model)
+		if primaryID == "" {
+			primaryID = normalizeCustomModel(req.Model)
+		}
+		runtimeModel = "custom/" + primaryID
+	}
 	if err := checkPortExist(req.WebUIPort); err != nil {
 		return nil, err
 	}
@@ -121,7 +129,7 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 	}
 	params := map[string]interface{}{
 		"PROVIDER":               provider,
-		"MODEL":                  req.Model,
+		"MODEL":                  runtimeModel,
 		"API_TYPE":               apiType,
 		"MAX_TOKENS":             maxTokens,
 		"CONTEXT_WINDOW":         contextWindow,
@@ -291,7 +299,7 @@ func (a AgentService) UpdateModelConfig(req dto.AgentModelConfigUpdateReq) error
 	if modelName == "" {
 		return buserr.New("ErrAgentProviderMismatch")
 	}
-	if !strings.HasPrefix(modelName, provider+"/") {
+	if provider != "custom" && !strings.HasPrefix(modelName, provider+"/") {
 		return buserr.New("ErrAgentProviderMismatch")
 	}
 	baseURL := strings.TrimSpace(account.BaseURL)
@@ -526,7 +534,7 @@ func (a AgentService) VerifyAccount(req dto.AgentAccountVerifyReq) error {
 	if provider == "ollama" {
 		return nil
 	}
-	if provider == "custom" {
+	if provider == "custom" || provider == "kimi-coding" {
 		return nil
 	}
 	return verifyProvider(provider, baseURL, apiKey)
@@ -1412,20 +1420,15 @@ func writeOpenclawConfig(confDir, provider, modelName, apiType string, maxTokens
 			},
 		}
 	} else if provider == "custom" {
-		primary := modelName
-		if !strings.Contains(primary, "/") {
-			primary = "custom/" + strings.TrimSpace(primary)
+		customModelID := normalizeCustomModel(modelName)
+		primaryID := customPrimaryModelID(customModelID)
+		if primaryID == "" {
+			primaryID = customModelID
 		}
+		primary := "custom/" + primaryID
 		cfg.Agents.Defaults.Model.Primary = primary
 		base := strings.TrimSpace(baseURL)
 		plainKey := strings.TrimSpace(apiKey)
-		if !strings.Contains(modelName, "/") {
-			modelName = primary
-		}
-		customModelID := modelID
-		if parts := strings.SplitN(modelName, "/", 2); len(parts) == 2 {
-			customModelID = parts[1]
-		}
 		useAPIType, useMaxTokens, useContextWindow := resolveRuntimeParams(provider, apiType, maxTokens, contextWindow)
 		cfg.Models = &modelsConfig{
 			Mode: "merge",
@@ -1702,6 +1705,21 @@ func normalizeCustomModel(modelName string) string {
 	return trim
 }
 
+func customPrimaryModelID(modelName string) string {
+	trim := normalizeCustomModel(modelName)
+	if trim == "" {
+		return ""
+	}
+	parts := strings.Split(trim, "/")
+	for i := len(parts) - 1; i >= 0; i-- {
+		part := strings.TrimSpace(parts[i])
+		if part != "" {
+			return part
+		}
+	}
+	return ""
+}
+
 func normalizeAPIType(apiType string) string {
 	trim := strings.ToLower(strings.TrimSpace(apiType))
 	if trim == "" {
@@ -1712,7 +1730,7 @@ func normalizeAPIType(apiType string) string {
 
 func isSupportedAPIType(apiType string) bool {
 	switch normalizeAPIType(apiType) {
-	case "openai-completions", "openai-responses":
+	case "openai-completions", "openai-responses", "anthropic-messages":
 		return true
 	default:
 		return false

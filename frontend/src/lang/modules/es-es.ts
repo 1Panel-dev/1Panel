@@ -716,7 +716,6 @@ const message = {
             saveSuccess: 'Saved successfully',
             pairingCodeRequired: 'Please enter pairing code',
             pairingApproveSuccess: 'Pairing approved successfully',
-            customModelHelper: 'En la cuenta de modelo personalizada, el nombre del modelo debe empezar por custom/',
             customProviderHelper: 'En el proveedor de modelo personalizado no se valida si la cuenta está disponible',
         },
         model: {

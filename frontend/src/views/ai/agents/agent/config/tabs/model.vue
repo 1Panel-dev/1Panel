@@ -15,9 +15,6 @@
             <el-select v-else v-model="form.model" filterable>
                 <el-option v-for="item in modelOptions" :key="item.id" :label="item.name" :value="item.id" />
             </el-select>
-            <span class="input-help" v-if="provdier == 'custom'">
-                {{ $t('aiTools.agents.customModelHelper') }}
-            </span>
         </el-form-item>
         <el-form-item>
             <el-button type="primary" :loading="saving" @click="saveModel">
@@ -96,7 +93,7 @@ const handleAccountChange = () => {
     provdier.value = selected.provider;
     if (selected.provider === 'custom') {
         form.manualModel = true;
-        form.model = selected.model ? `custom/${selected.model}` : form.model;
+        form.model = selected.model || form.model;
         modelOptions.value = [];
         return;
     }
@@ -148,7 +145,7 @@ const load = async (agent: AI.AgentItem) => {
             form.model = modelOptions.value.length > 0 ? modelOptions.value[0].id : '';
         }
         if (currentAccount.provider === 'custom' && currentAccount.model && !form.model) {
-            form.model = `custom/${currentAccount.model}`;
+            form.model = currentAccount.model;
         }
     } finally {
         loading.value = false;

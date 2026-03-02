@@ -60,9 +60,6 @@
                     <el-select v-else v-model="form.model" filterable @change="handleModelChange">
                         <el-option v-for="item in filteredModels" :key="item.id" :label="item.name" :value="item.id" />
                     </el-select>
-                    <span class="input-help" v-if="form.provider == 'custom'">
-                        {{ $t('aiTools.agents.customModelHelper') }}
-                    </span>
                 </el-form-item>
                 <el-form-item :label="$t('aiTools.agents.baseUrl')" v-if="form.accountId" prop="baseURL">
                     <el-input v-model="form.baseURL" disabled />
@@ -256,7 +253,7 @@ const handleAccountChange = () => {
         form.maxTokens = selected.maxTokens || 8192;
         form.contextWindow = selected.contextWindow || 128000;
         if (selected.provider === 'custom' && selected.model && !manualModel.value) {
-            form.model = `custom/${selected.model}`;
+            form.model = selected.model;
         }
     }
     setDefaultModel();
@@ -274,7 +271,7 @@ const setDefaultModel = () => {
     if (form.provider === 'custom') {
         const selected = accountOptions.value.find((item) => item.id === form.accountId);
         if (selected?.model && !form.model) {
-            form.model = `custom/${selected.model}`;
+            form.model = selected.model;
         }
     }
 };

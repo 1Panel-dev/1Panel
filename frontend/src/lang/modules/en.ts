@@ -720,7 +720,6 @@ const message = {
             saveSuccess: 'Saved successfully',
             pairingCodeRequired: 'Enter pairing code',
             pairingApproveSuccess: 'Pairing approved successfully',
-            customModelHelper: 'For custom model accounts, model names must start with custom/.',
             customProviderHelper: 'Custom model providers do not validate whether the account is available.',
         },
         model: {

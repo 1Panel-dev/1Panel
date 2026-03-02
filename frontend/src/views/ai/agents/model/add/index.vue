@@ -31,6 +31,7 @@
                 <el-select v-model="form.apiType">
                     <el-option label="openai-completions" value="openai-completions" />
                     <el-option label="openai-responses" value="openai-responses" />
+                    <el-option label="anthropic-messages" value="anthropic-messages" />
                 </el-select>
             </el-form-item>
             <el-form-item label="Max Tokens" prop="maxTokens" v-if="form.provider === 'custom'">
