@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
@@ -127,90 +129,197 @@ func (a AppService) createSyncAppStoreTask(sharedCtx **appSyncContext) func(t *t
 	}
 }
 
+type appWorkItem struct {
+	appDef  dto.AppDefine
+	app     model.App
+	iconUrl string
+	hadIcon bool
+}
+
+type appWorkResult struct {
+	appKey     string
+	app        model.App
+	iconStatus int
+	hadIcon    bool
+	httpFailed bool
+}
+
+func (c *appSyncContext) processOneApp(item appWorkItem) appWorkResult {
+	app := item.app
+	l := item.appDef
+	result := appWorkResult{
+		appKey:  l.AppProperty.Key,
+		hadIcon: item.hadIcon,
+	}
+
+	if item.hadIcon {
+		status, iconField := c.downloadAppIcon(item.iconUrl, l.AppProperty.Key, app.Icon)
+		result.iconStatus = status
+		switch status {
+		case http.StatusOK:
+			app.Icon = iconField
+		case http.StatusNotModified:
+		default:
+			result.httpFailed = true
+		}
+	}
+
+	app.TagsKey = l.AppProperty.Tags
+	if l.AppProperty.Recommend > 0 {
+		app.Recommend = l.AppProperty.Recommend
+	} else {
+		app.Recommend = 9999
+	}
+	app.ReadMe = l.ReadMe
+	app.LastModified = l.LastModified
+
+	versions := l.Versions
+	detailsMap := getAppDetails(app.Details, versions)
+	for _, v := range versions {
+		version := v.Name
+		detail := detailsMap[version]
+		versionUrl := fmt.Sprintf("%s/%s/%s", c.baseRemoteUrl, app.Key, version)
+
+		paramByte, _ := json.Marshal(v.AppForm)
+		var appForm dto.AppForm
+		_ = json.Unmarshal(paramByte, &appForm)
+
+		if appForm.SupportVersion > 0 && common.CompareVersion(strconv.FormatFloat(appForm.SupportVersion, 'f', -1, 64), c.systemVersion) {
+			delete(detailsMap, version)
+			continue
+		}
+
+		if _, ok := InitTypes[app.Type]; ok {
+			dockerComposeUrl := fmt.Sprintf("%s/%s", versionUrl, "docker-compose.yml")
+			_, composeRes, err := req_helper.HandleRequestWithClient(&c.httpClient, dockerComposeUrl, http.MethodGet, constant.TimeOut20s)
+			if err == nil {
+				detail.DockerCompose = string(composeRes)
+			} else {
+				result.httpFailed = true
+			}
+		} else {
+			detail.DockerCompose = ""
+		}
+
+		detail.Params = string(paramByte)
+		detail.DownloadUrl = fmt.Sprintf("%s/%s", versionUrl, app.Key+"-"+version+".tar.gz")
+		detail.DownloadCallBackUrl = v.DownloadCallBackUrl
+		detail.Update = true
+		detail.LastModified = v.LastModified
+		detailsMap[version] = detail
+	}
+
+	newDetails := make([]model.AppDetail, 0, len(detailsMap))
+	for _, detail := range detailsMap {
+		newDetails = append(newDetails, detail)
+	}
+	app.Details = newDetails
+
+	result.app = app
+	return result
+}
+
 func (c *appSyncContext) syncAppIconsAndDetails() error {
 	total := len(c.list.Apps)
 	global.LOG.Infof("[AppStore] sync app detail start, total apps: %d", total)
 
-	var (
-		icon200Count  = 0
-		icon304Count  = 0
-		iconFailCount = 0
-	)
-
-	for i, l := range c.list.Apps {
-		if (i+1)%10 == 0 {
-			c.task.LogWithProgress(i18n.GetMsgByKey("SyncAppDetail"), i+1, total)
-		}
-
+	workItems := make([]appWorkItem, 0, total)
+	for _, l := range c.list.Apps {
 		app, ok := c.appsMap[l.AppProperty.Key]
 		if !ok {
 			continue
 		}
-
 		iconUrl, hasPending := c.pendingIcons[l.AppProperty.Key]
-		if hasPending {
-			status, iconField := c.downloadAppIcon(iconUrl, l.AppProperty.Key, app.Icon)
-			switch status {
+		workItems = append(workItems, appWorkItem{
+			appDef:  l,
+			app:     app,
+			iconUrl: iconUrl,
+			hadIcon: hasPending,
+		})
+	}
+
+	totalWork := len(workItems)
+	if totalWork == 0 {
+		return nil
+	}
+
+	const maxWorkers = 4
+	var (
+		failFlag atomic.Bool
+		workCh   = make(chan int, maxWorkers)
+		resultCh = make(chan appWorkResult, maxWorkers)
+		wg       sync.WaitGroup
+	)
+
+	wg.Add(maxWorkers)
+	for range maxWorkers {
+		go func() {
+			defer wg.Done()
+			for idx := range workCh {
+				result := c.processOneApp(workItems[idx])
+				resultCh <- result
+				if result.httpFailed {
+					failFlag.Store(true)
+				}
+			}
+		}()
+	}
+	go func() { wg.Wait(); close(resultCh) }()
+
+	var fed atomic.Int32
+	go func() {
+		for i := range workItems {
+			if failFlag.Load() {
+				break
+			}
+			workCh <- i
+			fed.Store(int32(i + 1))
+		}
+		close(workCh)
+	}()
+
+	var (
+		completed    int
+		icon200Count int
+		icon304Count int
+		iconFailCount int
+	)
+	milestones := [4]int{totalWork / 4, totalWork / 2, totalWork * 3 / 4, totalWork}
+	nextMS := 0
+	checkProgress := func() {
+		if nextMS < len(milestones) && completed >= milestones[nextMS] {
+			c.task.LogWithProgress(i18n.GetMsgByKey("SyncAppDetail"), completed, totalWork)
+			nextMS++
+		}
+	}
+
+	applyResult := func(result appWorkResult) {
+		c.appsMap[result.appKey] = result.app
+		if result.hadIcon {
+			switch result.iconStatus {
 			case http.StatusOK:
-				app.Icon = iconField
 				icon200Count++
 			case http.StatusNotModified:
 				icon304Count++
 			default:
-				global.LOG.Warnf("[AppStore] download icon failed url=%s, appKey=%s", iconUrl, l.AppProperty.Key)
 				iconFailCount++
 			}
 		}
+		completed++
+		checkProgress()
+	}
 
-		app.TagsKey = l.AppProperty.Tags
-		if l.AppProperty.Recommend > 0 {
-			app.Recommend = l.AppProperty.Recommend
-		} else {
-			app.Recommend = 9999
+	for result := range resultCh {
+		applyResult(result)
+	}
+
+	fedCount := int(fed.Load())
+	if failFlag.Load() && fedCount < len(workItems) {
+		global.LOG.Warnf("[AppStore] HTTP failure detected, falling back to serial for remaining %d apps", len(workItems)-fedCount)
+		for i := fedCount; i < len(workItems); i++ {
+			result := c.processOneApp(workItems[i])
+			applyResult(result)
 		}
-		app.ReadMe = l.ReadMe
-		app.LastModified = l.LastModified
-
-		versions := l.Versions
-		detailsMap := getAppDetails(app.Details, versions)
-		for _, v := range versions {
-			version := v.Name
-			detail := detailsMap[version]
-			versionUrl := fmt.Sprintf("%s/%s/%s", c.baseRemoteUrl, app.Key, version)
-
-			paramByte, _ := json.Marshal(v.AppForm)
-			var appForm dto.AppForm
-			_ = json.Unmarshal(paramByte, &appForm)
-
-			if appForm.SupportVersion > 0 && common.CompareVersion(strconv.FormatFloat(appForm.SupportVersion, 'f', -1, 64), c.systemVersion) {
-				delete(detailsMap, version)
-				continue
-			}
-
-			if _, ok := InitTypes[app.Type]; ok {
-				dockerComposeUrl := fmt.Sprintf("%s/%s", versionUrl, "docker-compose.yml")
-				_, composeRes, err := req_helper.HandleRequestWithClient(&c.httpClient, dockerComposeUrl, http.MethodGet, constant.TimeOut20s)
-				if err == nil {
-					detail.DockerCompose = string(composeRes)
-				}
-			} else {
-				detail.DockerCompose = ""
-			}
-
-			detail.Params = string(paramByte)
-			detail.DownloadUrl = fmt.Sprintf("%s/%s", versionUrl, app.Key+"-"+version+".tar.gz")
-			detail.DownloadCallBackUrl = v.DownloadCallBackUrl
-			detail.Update = true
-			detail.LastModified = v.LastModified
-			detailsMap[version] = detail
-		}
-
-		var newDetails []model.AppDetail
-		for _, detail := range detailsMap {
-			newDetails = append(newDetails, detail)
-		}
-		app.Details = newDetails
-		c.appsMap[l.AppProperty.Key] = app
 	}
 
 	global.LOG.Infof("[AppStore] icon download completed - total: %d, success(200): %d, cached(304): %d, failed: %d",
