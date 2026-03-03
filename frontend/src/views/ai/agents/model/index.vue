@@ -25,8 +25,8 @@
                     </el-table-column>
                     <el-table-column :label="$t('aiTools.agents.verified')" prop="verified" width="120">
                         <template #default="{ row }">
-                            <el-tag :type="row.verified ? 'success' : 'info'">
-                                {{ row.verified ? 'OK' : 'N/A' }}
+                            <el-tag :type="verificationTagType(row)">
+                                {{ verificationLabel(row) }}
                             </el-tag>
                         </template>
                     </el-table-column>
@@ -112,6 +112,25 @@ const onEdit = (row: AI.AgentAccountItem) => {
             remark: row.remark,
         });
     }
+};
+
+const isVerificationSkipped = (provider: string) => {
+    const key = (provider || '').toLowerCase();
+    return key === 'custom' || key === 'ollama' || key === 'kimi-coding';
+};
+
+const verificationLabel = (row: AI.AgentAccountItem) => {
+    if (isVerificationSkipped(row.provider)) {
+        return i18n.global.t('aiTools.agents.verifySkipped');
+    }
+    return row.verified ? 'OK' : 'N/A';
+};
+
+const verificationTagType = (row: AI.AgentAccountItem) => {
+    if (isVerificationSkipped(row.provider)) {
+        return 'warning';
+    }
+    return row.verified ? 'success' : 'info';
 };
 
 const maskKey = (value: string) => {

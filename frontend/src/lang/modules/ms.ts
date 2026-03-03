@@ -694,6 +694,7 @@ const message = {
             token: 'Token',
             manualModel: 'Input manual',
             verified: 'Disahkan',
+            verifySkipped: 'Dilangkau',
             configTitle: 'Configuration',
             settingsTab: 'Settings',
             browserTab: 'Browser',

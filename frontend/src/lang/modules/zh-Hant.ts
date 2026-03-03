@@ -669,6 +669,7 @@ const message = {
             token: 'Token',
             manualModel: '手動輸入模型',
             verified: '驗證狀態',
+            verifySkipped: '已跳過',
             configTitle: '設定',
             settingsTab: '設定',
             browserTab: '瀏覽器',

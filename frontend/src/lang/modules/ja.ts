@@ -683,6 +683,7 @@ const message = {
             token: 'トークン',
             manualModel: '手動入力',
             verified: '検証済み',
+            verifySkipped: 'スキップ済み',
             configTitle: 'Configuration',
             settingsTab: 'Settings',
             browserTab: 'Browser',

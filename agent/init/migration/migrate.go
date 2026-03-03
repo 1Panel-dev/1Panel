@@ -70,6 +70,7 @@ func InitAgentDB() {
 		migrations.AddAgentAccountRememberAPIKey,
 		migrations.AddEditionSetting,
 		migrations.AddAgentTypeForAgents,
+		migrations.NormalizeAgentAccountVerifiedStatus,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

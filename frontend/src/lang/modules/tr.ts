@@ -700,6 +700,7 @@ const message = {
             token: 'Token',
             manualModel: 'Manuel giriş',
             verified: 'Doğrulandı',
+            verifySkipped: 'Atlandı',
             configTitle: 'Configuration',
             settingsTab: 'Settings',
             browserTab: 'Browser',

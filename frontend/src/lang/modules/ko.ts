@@ -678,6 +678,7 @@ const message = {
             token: '토큰',
             manualModel: '수동 입력',
             verified: '검증됨',
+            verifySkipped: '건너뜀',
             configTitle: 'Configuration',
             settingsTab: 'Settings',
             browserTab: 'Browser',

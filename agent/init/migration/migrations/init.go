@@ -1010,3 +1010,15 @@ var AddAgentTypeForAgents = &gormigrate.Migration{
 		).Error
 	},
 }
+
+var NormalizeAgentAccountVerifiedStatus = &gormigrate.Migration{
+	ID: "20260303-normalize-agent-account-verified-status",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.AgentAccount{}); err != nil {
+			return err
+		}
+		return tx.Model(&model.AgentAccount{}).
+			Where("provider IN ?", []string{"custom", "ollama", "kimi-coding"}).
+			Update("verified", false).Error
+	},
+}

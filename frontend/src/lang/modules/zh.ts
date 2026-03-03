@@ -653,6 +653,7 @@ const message = {
             token: 'Token',
             manualModel: '手动输入模型',
             verified: '验证状态',
+            verifySkipped: '已跳过',
             configTitle: '配置',
             settingsTab: '设置',
             browserTab: '浏览器',

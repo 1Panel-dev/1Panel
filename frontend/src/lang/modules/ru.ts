@@ -686,6 +686,7 @@ const message = {
             token: 'Токен',
             manualModel: 'Ручной ввод',
             verified: 'Проверено',
+            verifySkipped: 'Пропущено',
             configTitle: 'Configuration',
             settingsTab: 'Settings',
             browserTab: 'Browser',

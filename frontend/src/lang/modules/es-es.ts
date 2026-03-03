@@ -691,6 +691,7 @@ const message = {
             token: 'Token',
             manualModel: 'Entrada manual de modelo',
             verified: 'Verificado',
+            verifySkipped: 'Omitido',
             configTitle: 'Configuration',
             settingsTab: 'Settings',
             browserTab: 'Browser',

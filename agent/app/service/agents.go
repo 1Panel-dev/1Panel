@@ -124,7 +124,7 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 		if err != nil {
 			return nil, err
 		}
-		if !account.Verified {
+		if !account.Verified && !isVerificationSkippedProvider(account.Provider) {
 			return nil, buserr.New("ErrAgentAccountNotVerified")
 		}
 		if account.Provider != "" && provider != "" && account.Provider != provider {
@@ -354,7 +354,7 @@ func (a AgentService) UpdateModelConfig(req dto.AgentModelConfigUpdateReq) error
 	if err != nil {
 		return err
 	}
-	if !account.Verified {
+	if !account.Verified && !isVerificationSkippedProvider(account.Provider) {
 		return buserr.New("ErrAgentAccountNotVerified")
 	}
 	provider := strings.ToLower(strings.TrimSpace(account.Provider))
@@ -465,6 +465,7 @@ func (a AgentService) CreateAccount(req dto.AgentAccountCreateReq) error {
 	if err := a.VerifyAccount(dto.AgentAccountVerifyReq{Provider: provider, BaseURL: baseURL, APIKey: apiKey}); err != nil {
 		return err
 	}
+	verified := !isVerificationSkippedProvider(provider)
 	_, maxTokens, contextWindow := resolveRuntimeParams(provider, apiType, req.MaxTokens, req.ContextWindow)
 	account := &model.AgentAccount{
 		Provider:       provider,
@@ -476,7 +477,7 @@ func (a AgentService) CreateAccount(req dto.AgentAccountCreateReq) error {
 		APIType:        apiType,
 		MaxTokens:      0,
 		ContextWindow:  0,
-		Verified:       true,
+		Verified:       verified,
 		Remark:         req.Remark,
 	}
 	if provider == "custom" {
@@ -522,6 +523,7 @@ func (a AgentService) UpdateAccount(req dto.AgentAccountUpdateReq) error {
 	if err := a.VerifyAccount(dto.AgentAccountVerifyReq{Provider: provider, BaseURL: baseURL, APIKey: req.APIKey}); err != nil {
 		return err
 	}
+	verified := !isVerificationSkippedProvider(provider)
 	account.Name = req.Name
 	account.APIKey = req.APIKey
 	account.RememberAPIKey = req.RememberAPIKey
@@ -535,7 +537,7 @@ func (a AgentService) UpdateAccount(req dto.AgentAccountUpdateReq) error {
 		account.ContextWindow = contextWindow
 	}
 	account.Remark = req.Remark
-	account.Verified = true
+	account.Verified = verified
 	if err := agentAccountRepo.Save(account); err != nil {
 		return err
 	}
@@ -1916,6 +1918,15 @@ func fixedProviderBaseURL(provider string) (string, bool) {
 		return providerDefaultBaseURL(provider)
 	default:
 		return "", false
+	}
+}
+
+func isVerificationSkippedProvider(provider string) bool {
+	switch strings.ToLower(strings.TrimSpace(provider)) {
+	case "custom", "ollama", "kimi-coding":
+		return true
+	default:
+		return false
 	}
 }
 
