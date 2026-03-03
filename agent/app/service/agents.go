@@ -1789,11 +1789,11 @@ func writeOpenclawConfig(confDir, provider, modelName, apiType string, maxTokens
 					Models: []modelEntry{
 						{
 							ID:            modelID,
-							Name:          modelID,
+							Name:          "Kimi for Coding",
 							Reasoning:     true,
-							Input:         []string{"text"},
-							ContextWindow: 200000,
-							MaxTokens:     8192,
+							Input:         []string{"text", "image"},
+							ContextWindow: 262144,
+							MaxTokens:     32768,
 							Cost:          modelCost{},
 						},
 					},

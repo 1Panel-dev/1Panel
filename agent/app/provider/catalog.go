@@ -151,7 +151,7 @@ var catalog = map[string]Meta{
 		Key:            "kimi-coding",
 		DisplayName:    "Kimi Coding",
 		Sort:           100,
-		DefaultBaseURL: "https://kimi-code.moonshot.cn/api",
+		DefaultBaseURL: "https://api.kimi.com/coding/",
 		EnvKey:         "KIMI_API_KEY",
 		Enabled:        true,
 		Models: []Model{
