@@ -10,6 +10,7 @@ const LOCALE_LOADERS: Record<string, LocaleLoader> = {
     zh: () => import('./modules/zh'),
     'zh-Hant': () => import('./modules/zh-Hant'),
     en: () => import('./modules/en'),
+    'de-DE': () => import('./modules/de'),
     'pt-BR': () => import('./modules/pt-br'),
     ja: () => import('./modules/ja'),
     ru: () => import('./modules/ru'),

@@ -17,6 +17,7 @@ import ru from 'element-plus/es/locale/lang/ru';
 import ko from 'element-plus/es/locale/lang/ko';
 import tr from 'element-plus/es/locale/lang/tr';
 import esES from 'element-plus/es/locale/lang/es';
+import de from 'element-plus/es/locale/lang/de';
 import { useTheme } from '@/global/use-theme';
 useTheme();
 
@@ -36,6 +37,7 @@ const i18nLocale = computed(() => {
     if (globalStore.language === 'ko') return ko;
     if (globalStore.language === 'tr') return tr;
     if (globalStore.language === 'es-ES') return esES;
+    if (globalStore.language === 'de-DE') return de;
     return zhCn;
 });
 

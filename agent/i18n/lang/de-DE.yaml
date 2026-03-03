@@ -1,0 +1,533 @@
+ErrInvalidParams: 'Bad request: {{ .detail }}'
+ErrTokenParse: 'Token error: {{ .detail }}'
+ErrInitialPassword: 'Original password is incorrect'
+ErrInternalServer: 'Internal server error: {{ .detail }}'
+ErrRecordExist: 'Record already exists'
+ErrRecordNotFound: 'Record not found'
+ErrStructTransform: 'Type conversion failed: {{ .err }}'
+ErrNotLogin: 'Not logged in: {{ .detail }}'
+ErrPasswordExpired: 'Password expired: {{ .detail }}'
+ErrNotSupportType: 'Unsupported type: {{ .name }}'
+ErrProxy: 'Request failed: {{ .detail }}'
+ErrApiConfigStatusInvalid: 'API access disabled: {{ .detail }}'
+ErrApiConfigKeyInvalid: 'Invalid API key: {{ .detail }}'
+ErrApiConfigIPInvalid: 'IP not in API allowlist: {{ .detail }}'
+ErrApiConfigDisable: 'Endpoint not allowed via API: {{ .detail }}'
+ErrApiConfigKeyTimeInvalid: 'Invalid API timestamp: {{ .detail }}'
+ErrShutDown: 'Command stopped manually'
+
+ErrMinQuickJump: 'Set at least one quick jump entry'
+ErrMaxQuickJump: 'At most 4 quick jump entries'
+
+#common
+ErrUsernameIsExist: 'Username already exists'
+ErrNameIsExist: 'Name already exists'
+ErrDemoEnvironment: 'Disabled in demo environment'
+ErrCmdTimeout: 'Command timed out'
+ErrCmdIllegal: 'Command has invalid characters'
+ErrPortExist: '{{ .port }} port is already occupied by {{ .type }} [{{ .name }}]'
+TYPE_APP: 'Application'
+TYPE_RUNTIME: 'Runtime'
+TYPE_DOMAIN: 'Domain'
+ErrTypePort: 'Invalid port format: {{ .name }}'
+ErrTypePortRange: 'Port range must be 1-65535'
+Success: 'Success'
+Failed: 'Failed'
+SystemRestart: 'Task interrupted by system restart'
+ErrGroupIsDefault: 'Default group, cannot be deleted'
+ErrGroupIsInWebsiteUse: 'Group is in use by a website'
+Decrypt: "Decrypt"
+
+#agent
+ErrAgentAccountBound: 'Account is bound to an agent and cannot be deleted'
+ErrAgentAccountUnavailable: 'Account connection unavailable: {{ .err }}'
+ErrAgentProviderNotSupported: 'Unsupported agent provider'
+ErrAgentAccountRequired: 'Select an agent account first'
+ErrAgentAccountNotVerified: 'Agent account not verified'
+ErrAgentProviderMismatch: 'Agent provider mismatch'
+ErrAgentBaseURLRequired: 'Base URL is required'
+ErrAgentApiKeyRequired: 'API key is required'
+ErrAgentComposeRequired: 'Compose content is required'
+ErrAgentIDRequired: 'Agent ID is required'
+ErrAgentAccountIDRequired: 'Account ID is required'
+
+#backup
+Localhost: 'Local'
+ErrBackupInUsed: 'Backup account is in use by a scheduled task'
+ErrBackupCheck: 'Backup account connectivity test failed: {{ .err }}'
+ErrBackupLocalDelete: 'Local backup accounts cannot be deleted'
+ErrBackupLocalCreate: 'Local backup accounts cannot be created'
+
+#app
+ErrPortInUsed: '{{ .detail }} port is already occupied!'
+ErrAppLimit: 'App install limit reached'
+ErrNotInstall: 'Application not installed'
+ErrPortInOtherApp: '{{ .port }} port is already occupied by application {{ .apps }}!'
+ErrDbUserNotValid: 'Database username/password mismatch'
+ErrUpdateBuWebsite: 'App updated, but website config update failed'
+Err1PanelNetworkFailed: 'Default container network creation failed! {{ .detail }}'
+ErrFileParse: 'Failed to parse app docker-compose file'
+ErrInstallDirNotFound: 'Install directory not found; use Force Uninstall'
+AppStoreIsUpToDate: 'The app store is already the latest version'
+LocalAppVersionNull: 'App {{ .name }} has no synced version'
+LocalAppVersionErr: 'Failed to sync {{ .name }} version {{ .version }}: {{ .err }}'
+ErrFileNotFound: '{{ .name }} file does not exist'
+ErrFileParseApp: 'Failed to parse {{ .name }}: {{ .err }}'
+ErrAppDirNull: 'The version folder does not exist'
+LocalAppErr: 'Failed to sync app {{ .name }}: {{ .err }}'
+ErrContainerName: 'Container name already exists'
+ErrCreateHttpClient: 'Failed to create HTTP request: {{ .err }}'
+ErrHttpReqTimeOut: 'HTTP request timed out: {{ .err }}'
+ErrHttpReqFailed: 'HTTP request failed: {{ .err }}'
+ErrNoSuchHost: 'Host resolve failed: {{ .err }}'
+ErrHttpReqNotFound: 'Requested resource not found: {{ .err }}'
+ErrContainerNotFound: '{{ .name }} container does not exist'
+ErrContainerMsg: 'Container {{ .name }} is abnormal; check logs'
+ErrAppBackup: 'App backup failed: {{ .name }} {{ .err }}'
+ErrVersionTooLow: '1Panel version too low to update App Store'
+ErrAppNameExist: 'The application name already exists'
+AppStoreIsSyncing: 'App Store is syncing; try again later'
+ErrGetCompose: 'Failed to read docker-compose.yml: {{ .detail }}'
+ErrAppWarn: 'App status abnormal; check logs'
+ErrAppParamKey: 'Invalid app parameter: {{ .name }}'
+ErrAppUpgrade: 'App upgrade failed: {{ .name }} {{ .err }}'
+AppRecover: 'Rollback application {{ .name }}'
+PullImageStart: 'Pull image [{{ .name }}]'
+PullImageSuccess: 'Image pulled'
+AppStoreSyncSuccess: 'App Store synced'
+SyncAppDetail: 'Sync app config'
+AppVersionNotMatch: 'Skip {{ .name }}: requires newer 1Panel'
+MoveSiteDir: 'Website dir changed; migrate OpenResty dir to {{ .name }}'
+MoveSiteDirSuccess: 'Website dir migrated'
+DeleteRuntimePHP: 'Delete PHP runtime'
+CustomAppStoreFileValid: 'App Store package must be .tar.gz'
+PullImageTimeout: 'Image pull timed out; try another mirror'
+ErrAppIsDown: 'App {{ .name }} is abnormal'
+ErrCustomApps: 'Installed apps detected; uninstall first'
+ErrCustomRuntimes: 'Installed runtimes detected; delete first'
+ErrAppVersionDeprecated: "The {{ .name }} application is not compatible with the current 1Panel version, skipped"
+ErrDockerFailed: 'Docker is abnormal; check service status'
+ErrDockerComposeCmdNotFound: 'Docker Compose not found on host'
+UseExistImage: 'Image exists; using existing image'
+ErrDatabaseNotFound: 'Database not found: {{ .name }}'
+
+#ssh
+ExportIP: "Login IP"
+ExportArea: "Location"
+ExportPort: "Port"
+ExportAuthMode: "Login Method"
+ExportUser: "User"
+ExportStatus: "Login Status"
+ExportDate: "Time"
+
+#file
+ErrFileCanNotRead: 'File preview is not supported'
+ErrFileToLarge: 'File is larger than 10 MB'
+ErrPathNotFound: 'Directory does not exist'
+ErrMovePathFailed: 'Target path cannot include source path'
+ErrLinkPathNotFound: 'The target path does not exist!'
+ErrFileIsExist: 'The file or folder already exists!'
+ErrFileUpload: 'Upload failed: {{ .name }} {{ .detail }}'
+ErrFileDownloadDir: 'Directory download is not supported'
+ErrCmdNotFound: 'Command not found: {{ .name }}'
+ErrSourcePathNotFound: 'Source directory does not exist'
+ErrFavoriteExist: 'Path already in favorites'
+ErrInvalidChar: 'Illegal characters are not allowed'
+ErrPathNotDelete: 'The selected directory cannot be deleted'
+ErrLogFileToLarge: 'Log file exceeds 500 MB'
+FileDropFailed: 'File cleanup failed: {{ .name }} {{ .err }}'
+FileDropSuccess: 'Cleaned {{ .name }}; files: {{ .count }}, freed: {{ .size }}'
+FileDropSum: 'Cleanup done; files: {{ .count }}, freed: {{ .size }}'
+ErrBadDecrypt: 'Wrong archive password; extract failed'
+
+#website
+ErrAliasIsExist: 'Alias already exists'
+ErrBackupMatch: 'Backup data mismatch: {{ .detail }}'
+ErrBackupExist: 'Backup source data missing: {{ .detail }}'
+ErrPHPResource: 'Switching local runtime is not supported'
+ErrPathPermission: 'Non-1000:1000 folder in index dir may cause Access denied'
+ErrDomainIsUsed: 'The domain name is already used by the website [{{ .name }}]'
+ErrDomainFormat: 'Invalid domain format: {{ .name }}'
+ErrDefaultAlias: 'default is reserved; use another alias'
+ErrParentWebsite: 'Delete subsite {{ .name }} first'
+ErrBuildDirNotFound: 'The build directory does not exist'
+ErrImageNotExist: 'Runtime image not found: {{ .name }}'
+ErrProxyIsUsed: 'Load balancer is used by reverse proxy'
+ErrSSLValid: 'Certificate file is invalid'
+ErrWebsiteDir: 'Select a subdirectory under the website directory'
+ErrComposerFileNotFound: "composer.json file does not exist"
+ErrRuntimeNoPort: 'Runtime port is not set'
+Status: 'Status'
+start: 'Start'
+stop: 'Stop'
+restart: 'Restart'
+kill: 'Force Stop'
+pause: 'Pause'
+unpause: 'Resume'
+remove: 'Delete'
+delete: 'Delete'
+ErrDefaultWebsite: 'Default website already set; unset it first'
+SSL: 'Certificate'
+Set: 'Settings'
+
+#ssl
+ErrSSLCannotDelete: 'Certificate {{ .name }} is in use by a website'
+ErrAccountCannotDelete: 'Account is linked to a certificate and cannot be deleted'
+ErrSSLApply: 'Certificate renewed; OpenResty reload failed'
+ErrEmailIsExist: 'Email already exists'
+ErrSSLKeyNotFound: 'The private key file does not exist'
+ErrSSLCertificateNotFound: 'The certificate file does not exist'
+ErrSSLKeyFormat: 'Private key file verification failed'
+ErrSSLCertificateFormat: 'Invalid certificate format; use PEM'
+ErrEabKidOrEabHmacKeyCannotBlank: 'EabKid or EabHmacKey cannot be blank'
+ErrOpenrestyNotFound: 'HTTP mode requires OpenResty'
+ApplySSLStart: 'Starting certificate request. Domain: [{{ .domain }}], method: [{{ .type }}]'
+dnsAccount: 'DNS Auto'
+dnsManual: 'DNS Manual'
+http: 'HTTP'
+ApplySSLFailed: 'Failed to request certificate for [{{ .domain }}]: {{ .detail }}'
+ApplySSLSuccess: 'Certificate issued for [{{ .domain }}]'
+DNSAccountName: 'DNS account [{{ .name }}], provider [{{ .type }}]'
+PushDirLog: 'Certificate pushed to directory [{{ .path }}] {{ .status }}'
+ErrDeleteCAWithSSL: 'CA has issued certificates; cannot delete'
+ErrDeleteWithPanelSSL: 'Certificate is in use by Panel SSL settings'
+ErrDefaultCA: 'The default authority cannot be deleted'
+ApplyWebSiteSSLLog: 'Updating website certificate: {{ .name }}'
+ErrUpdateWebsiteSSL: '{{ .name }} website certificate update failed: {{ .err }}'
+ApplyWebSiteSSLSuccess: 'Website certificate updated'
+ErrExecShell: 'Failed to execute script {{ .err }}'
+ExecShellStart: 'Run script'
+ExecShellSuccess: 'Script succeeded'
+StartUpdateSystemSSL: 'Update system certificate'
+UpdateSystemSSLSuccess: 'System certificate updated'
+ErrWildcardDomain: 'Wildcard certificates are not supported in HTTP mode'
+ErrApplySSLCanNotDelete: 'Certificate {{ .name }} is being issued and cannot be deleted yet'
+StartPushSSLToNode: 'Push certificate to node'
+PushSSLToNodeFailed: "Failed to push certificate to node: {{ .err }}"
+PushSSLToNodeSuccess: 'Certificate pushed to node'
+
+#mysql
+ErrUserIsExist: 'User already exists'
+ErrDatabaseIsExist: 'Database already exists'
+ErrExecTimeOut: 'SQL execution timed out'
+ErrRemoteExist: 'Remote database name already exists'
+ErrLocalExist: 'Local database name already exists'
+RemoteBackup: 'Start local DB container with image {{ .name }} before backing up remote DB'
+RemoteRecover: 'Start local DB container with image {{ .name }} before restoring remote DB'
+Arg: "Argument"
+
+#redis
+ErrTypeOfRedis: 'Backup file type does not match current persistence mode'
+
+#container
+ErrInUsed: "{{ .detail }} is in use and cannot be deleted!"
+ErrObjectInUsed: "This object is in use and cannot be deleted!"
+ErrObjectBeDependent: "This image is referenced by other images and cannot be deleted!"
+ErrPortRules: 'Port count does not match'
+ErrPgImagePull: 'Image pull timed out; configure acceleration or pull {{ .name }} manually'
+PruneHelper: "Cleanup {{ .name }} released {{ .size }} disk space"
+ImageRemoveHelper: "Removed image {{ .name }}, released {{ .size }} disk space"
+BuildCache: 'Build Cache'
+Volume: 'Volume'
+Network: "Network"
+PruneStart: 'Cleaning in progress'
+
+#runtime
+ErrFileNotExist: 'Source file not found: {{ .detail }}'
+ErrImageBuildErr: 'Image build failed'
+ErrImageExist: "Image already exists. Use a different image name."
+ErrDelWithWebsite: 'Runtime is linked to a website and cannot be deleted'
+ErrRuntimeStart: 'Startup failed'
+ErrPackageJsonNotFound: 'package.json file does not exist'
+ErrScriptsNotFound: 'No scripts section found in package.json'
+ErrContainerNameNotFound: 'Container name not found; check .env'
+ErrNodeModulesNotFound: 'node_modules not found; edit runtime or wait for startup'
+ErrContainerNameIsNull: 'Container name is empty'
+ErrPHPPortIsDefault: 'Port 9000 is reserved as default; use another port'
+ErrPHPRuntimePortFailed: 'Port {{ .name }} is already used by this runtime'
+
+#tool
+ErrConfigNotFound: 'Configuration file does not exist'
+ErrConfigParse: 'Invalid configuration file format'
+ErrConfigIsNull: 'Configuration file cannot be empty'
+ErrConfigDirNotFound: 'Run directory not found'
+ErrConfigAlreadyExist: 'Configuration file with the same name already exists'
+ErrUserFindErr: 'Failed to find user {{ .name }}: {{ .err }}'
+
+#cronjob
+CutWebsiteLogSuccess: 'Website log rotated: {{ .name }} (backup: {{ .path }})'
+HandleShell: 'Run script {{ .name }}'
+HandleCurl: 'Request URL {{ .name }}'
+HandleNtpSync: 'Sync system time'
+HandleSystemClean: 'Clean system cache'
+SystemLog: 'System Log'
+CutWebsiteLog: 'Rotate Website Log'
+FileOrDir: 'Directory / File'
+UploadFile: 'Upload backup {{ .file }} to {{ .backup }}'
+Upload: "Upload"
+IgnoreBackupErr: 'Backup failed: {{ .detail }} (ignored)'
+IgnoreUploadErr: 'Upload failed: {{ .detail }} (ignored)'
+LoadBackupFailed: 'Failed to get backup account connection info: {{ .detail }}'
+InExecuting: 'Task is already running'
+NoSuchResource: 'No backup records found; skipped'
+CleanLog: 'Clean logs'
+CleanLogByName: 'Clean {{ .name }} logs'
+WafIpGroupNotFound: "WAF IP group not found. Go to [Advanced Features -> WAF -> Black/White List -> IP Group] and add one using Remote Download."
+
+#toolbox
+ErrNotExistUser: 'User does not exist'
+ErrBanAction: 'Config failed: service {{ .name }} unavailable'
+ErrClamdscanNotFound: 'clamdscan command not found'
+TaskSwapSet: 'Set swap'
+SetSwap: "Set Swap {{ .path }} - {{ .size }}"
+CreateSwap: 'Create swap file'
+FormatSwap: 'Format swap file'
+EnableSwap: 'Enable swap'
+
+#tamper
+CleanTamperSetting: 'Clean historical protection settings'
+SetTamperWithRules: 'Enable directory protection by rules'
+ProtectDir: "Protect directory {{ .name }}"
+IgnoreFile: "Protect file {{ .name }}"
+TamperSetSuccessful: 'Protection set. Monitoring these directories:'
+
+#waf
+ErrScope: 'This config cannot be changed'
+ErrStateChange: 'Failed to change state'
+ErrRuleExist: 'Rule already exists'
+ErrRuleNotExist: 'Rule does not exist'
+ErrParseIP: 'Invalid IP format'
+ErrDefaultIP: 'default is reserved; use another name'
+ErrGroupInUse: 'IP group is used by blacklist/whitelist rules'
+ErrIPGroupAclUse: 'IP group is used by website {{ .name }} custom rules'
+ErrGroupExist: 'IP group name already exists'
+ErrIPRange: 'Invalid IP range'
+ErrIPExist: 'IP already exists'
+urlDefense: 'URL rules'
+urlHelper: 'Blocked URL'
+dirFilter: 'Directory filter'
+xss: 'XSS'
+phpExec: 'PHP script execution'
+oneWordTrojan: 'One Word Trojan'
+appFilter: 'App dangerous directory filtering'
+webShell: 'WebShell'
+args: 'Parameter rules'
+protocolFilter: 'Protocol filtering'
+javaFilter: 'Java dangerous file filtering'
+scannerFilter: 'Scanner filter'
+escapeFilter: 'Escape filtering'
+customRule: 'Custom rules'
+httpMethod: 'HTTP method filtering'
+fileExt: 'File upload restrictions'
+defaultIpBlack: 'Malicious IP group'
+cookie: 'Cookie Rules'
+urlBlack: 'URL blacklist'
+uaBlack: 'User-Agent blacklist'
+attackCount: 'Attack frequency limit'
+fileExtCheck: 'File upload restrictions'
+geoRestrict: 'Regional access restrictions'
+unknownWebsite: 'Unauthorized domain name access'
+notFoundCount: '404 Rate Limit'
+headerDefense: 'Header rules'
+defaultUaBlack: 'User-Agent rules'
+methodWhite: 'HTTP rules'
+captcha: 'Human verification'
+fiveSeconds: '5-second verification'
+vulnCheck: 'Supplementary rules'
+acl: 'Custom rules'
+sql: 'SQL injection'
+cc: 'Access frequency limit'
+defaultUrlBlack: 'URL rules'
+sqlInject: 'SQL injection'
+ErrDBNotExist: 'Database does not exist'
+allow: 'Allow'
+deny: 'Deny'
+OpenrestyNotFound: 'OpenResty is not installed'
+remoteIpIsNull: "IP list is empty"
+OpenrestyVersionErr: 'OpenResty version too low; upgrade to 1.27.1.2-2-2-focal'
+ErrFileTooLarge: 'File is larger than 1 MB and cannot be uploaded'
+
+#task
+TaskStart: '{{ .name }} [START]'
+TaskEnd: '{{ .name }} [DONE]'
+TaskFailed: '{{ .name }} task failed'
+TaskTimeout: '{{ .name }} timed out'
+TaskSuccess: '{{ .name }} succeeded'
+TaskRetry: 'Retry #{{ .name }}'
+SubTaskSuccess: '{{ .name }} succeeded'
+SubTaskFailed: '{{ .name }} failed: {{ .err }}'
+TaskInstall: 'Install'
+TaskUninstall: 'Uninstall'
+TaskCreate: 'Create'
+TaskDelete: 'Delete'
+TaskUpgrade: 'Upgrade'
+TaskUpdate: 'Update'
+TaskRestart: 'Restart'
+TaskProtect: "Protect"
+TaskBackup: 'Backup'
+TaskRecover: 'Recover'
+TaskRollback: 'Rollback'
+TaskPull: 'Pull'
+TaskCommit: 'Commit'
+TaskBuild: 'Build'
+TaskPush: 'Push'
+TaskClean: "Cleanup"
+TaskHandle: 'Execute'
+TaskImport: "Import"
+TaskExport: "Export"
+Website: 'Website'
+App: 'Application'
+Runtime: 'Runtime'
+Database: 'Database'
+ConfigFTP: 'Create FTP user {{ .name }}'
+ConfigOpenresty: 'Create OpenResty config file'
+InstallAppSuccess: 'App {{ .name }} installed'
+ConfigRuntime: 'Configure runtime'
+ConfigApp: 'Configure app'
+SuccessStatus: '{{ .name }} succeeded'
+FailedStatus: '{{ .name }} failed: {{ .err }}'
+HandleLink: 'Process app links'
+HandleDatabaseApp: 'Process app parameters'
+ExecShell: 'Run script {{ .name }}'
+PullImage: 'Pull image'
+Start: 'Start'
+Run: 'Start'
+Stop: 'Stop'
+Image: 'Image'
+Compose: 'Compose'
+Container: 'Container'
+AppLink: 'Linked Application'
+EnableSSL: 'Enable HTTPS'
+AppStore: 'App Store'
+TaskSync: 'Sync'
+LocalApp: 'Local Application'
+SubTask: 'Subtask'
+RuntimeExtension: 'Runtime extension'
+TaskIsExecuting: 'Task is running'
+CustomAppstore: 'Custom application repository'
+TaskExec: 'Execute'
+TaskBatch: "Batch Operation"
+FileConvert: 'File Conversion'
+
+# task - clam
+Clamscan: "Scan {{ .name }}"
+TaskScan: "Scan"
+
+# task - ai
+OllamaModelPull: 'Pull Ollama model {{ .name }}'
+OllamaModelSize: 'Get Ollama model size: {{ .name }}'
+
+# task-snapshot
+Snapshot: 'Snapshot'
+SnapDBInfo: 'Write 1Panel DB info'
+SnapCopy: 'Copy files/directories {{ .name }}'
+SnapNewDB: 'Init DB connection {{ .name }}'
+SnapDeleteOperationLog: 'Delete operation logs'
+SnapDeleteLoginLog: 'Delete access logs'
+SnapDeleteMonitor: 'Delete monitoring data'
+SnapRemoveSystemIP: 'Remove system IP'
+SnapBaseInfo: 'Write 1Panel base info'
+SnapInstallAppImageEmpty: 'No app images selected; skipped'
+SnapInstallApp: 'Backup installed apps'
+SnapDockerSave: 'Compress installed applications'
+SnapLocalBackup: 'Backup local backup directory'
+SnapCompressBackup: 'Compress local backup directory'
+SnapPanelData: 'Backup 1Panel data directory'
+SnapCompressPanel: 'Compress data directory'
+SnapWebsite: 'Backup website directory'
+SnapCloseDBConn: 'Close DB connection'
+SnapCompress: 'Create snapshot file'
+SnapCompressFile: 'Compress snapshot file'
+SnapCheckCompress: 'Check snapshot archive'
+SnapCompressSize: 'Snapshot size {{ .name }}'
+SnapUpload: 'Upload snapshot file'
+SnapUploadTo: 'Upload snapshot to {{ .name }}'
+SnapUploadRes: 'Upload snapshot to {{ .name }}'
+
+SnapshotRecover: 'Recover snapshot'
+RecoverDownload: 'Download snapshot file'
+Download: 'Download'
+RecoverDownloadAccount: 'Get snapshot download account {{ .name }}'
+RecoverDecompress: 'Decompress snapshot archive'
+Decompress: 'Decompression'
+BackupBeforeRecover: 'Backup system data before recovery'
+ReadJson: 'Read snapshot JSON file'
+ReadJsonPath: 'Get snapshot JSON path'
+ReadJsonContent: 'Read JSON content'
+ReadJsonMarshal: 'Json escape processing'
+RecoverApp: 'Restore installed apps'
+RecoverWebsite: 'Restore website directory'
+RecoverAppImage: 'Restore snapshot image backup'
+RecoverCompose: 'Restore other compose projects'
+RecoverComposeList: 'Get all compose projects to restore'
+RecoverComposeItem: 'Recover compose {{ .name }}'
+RecoverAppEmpty: 'No app image backup found in snapshot'
+RecoverBaseData: 'Restore base data and files'
+RecoverDaemonJsonEmpty: 'daemon.json not found in snapshot or current host'
+RecoverDaemonJson: 'Restore daemon.json'
+RecoverDBData: 'Recover database data'
+RecoverBackups: 'Restore local backup directory'
+RecoverPanelData: 'Restore data directory'
+
+# task - container
+ContainerImagePull: 'Pull container image {{ .name }}'
+ContainerRemoveOld: 'Remove the original container {{ .name }}'
+ContainerImageCheck: 'Check image pull result'
+ContainerLoadInfo: 'Load container info'
+ContainerRecreate: 'Container update failed; restoring original container'
+ContainerCreate: 'Create a new container {{ .name }}'
+ContainerCreateFailed: 'Container create failed; deleting failed container'
+ContainerStartCheck: 'Check container started'
+
+# task - image
+ImageBuild: 'Build image'
+ImagePull: 'Pull image'
+ImageRepoAuthFromDB: 'Load registry auth from DB'
+ImagePush: 'Push image'
+ImageRenameTag: 'Update image tag'
+ImageNewTag: 'New image tag {{ .name }}'
+ComposeCreate: 'Create compose project'
+
+# task - website
+BackupNginxConfig: 'Backup website OpenResty config'
+CompressFileSuccess: 'Directory compressed to {{ .name }}'
+CompressDir: 'Compress directory'
+DeCompressFile: 'Decompress file {{ .name }}'
+ErrCheckValid: 'Backup file validation failed: {{ .name }}'
+Rollback: 'Rollback'
+websiteDir: 'Website directory'
+RecoverFailedStartRollBack: 'Recovery failed; starting rollback'
+AppBackupFileIncomplete: 'Backup is incomplete: missing app.json or app.tar.gz'
+AppAttributesNotMatch: 'Application type or name does not match'
+
+#alert
+ErrAlertSync: 'Failed to sync alert message'
+
+#task - runtime
+ErrInstallExtension: 'Another extension install task is running'
+
+# alert mail template
+PanelAlertTitle: "Panel Alert Notification"
+TestAlertTitle: "Test Email - Verify Email Connectivity"
+TestAlert: "This is a test email to verify that your email sending configuration is correct."
+LicenseExpirationAlert: "Panel {{ .node }}{{ .ip }}: license expires in {{ .day }} days. Log in to view details."
+CronJobFailedAlert: "Panel {{ .node }}{{ .ip }}: scheduled task {{ .name }} failed. Log in to view details."
+ClamAlert: "Panel {{ .node }}{{ .ip }}: virus scan found {{ .num }} infected files. Log in to view details."
+WebSiteAlert: "Panel {{ .node }}{{ .ip }}: {{ .num }} websites expire in {{ .day }} days. Log in to view details."
+SSLAlert: "Panel {{ .node }}{{ .ip }}: {{ .num }} SSL certificates expire in {{ .day }} days. Log in to view details."
+DiskUsedAlert: "Panel {{ .node }}{{ .ip }}: disk {{ .name }} usage reached {{ .used }}. Log in to view details."
+ResourceAlert: "Panel {{ .node }}{{ .ip }}: average {{ .name }} usage in {{ .time }} minutes is {{ .used }}. Log in to view details."
+PanelVersionAlert: "Panel {{ .node }}{{ .ip }}: a new panel version is available. Log in to view details."
+PanelPwdExpirationAlert: "Panel {{ .node }}{{ .ip }}: panel password expires in {{ .day }} days. Log in to view details."
+CommonAlert: "Panel {{ .node }}{{ .ip }}: {{ .msg }}. Log in to view details."
+NodeExceptionAlert: "Panel {{ .node }}{{ .ip }}: {{ .num }} nodes are abnormal. Log in to view details."
+LicenseExceptionAlert: "Panel {{ .node }}{{ .ip }}: {{ .num }} licenses are abnormal. Log in to view details."
+SSHAndPanelLoginAlert: "Panel {{ .node }}{{ .ip }}: abnormal {{ .name }} login from {{ .loginIp }}. Log in to view details."
+
+#disk
+DeviceNotFound: "Device {{ .name }} not found"
+DeviceIsMounted: 'Device {{ .name }} is mounted; unmount first'
+PartitionDiskErr: 'Partition failed: {{ .err }}'
+FormatDiskErr: 'Format failed: {{ .err }}'
+MountDiskErr: 'Mount failed: {{ .err }}'
+XfsNotFound: 'xfs not found; install xfsprogs first'

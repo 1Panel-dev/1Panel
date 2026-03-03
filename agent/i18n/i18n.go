@@ -24,6 +24,7 @@ var langFiles = map[string]string{
 	"ko":      "lang/ko.yaml",
 	"tr":      "lang/tr.yaml",
 	"es-ES":   "lang/es-ES.yaml",
+	"de-DE":   "lang/de-DE.yaml",
 }
 
 func GetMsgWithMap(key string, maps map[string]interface{}) string {

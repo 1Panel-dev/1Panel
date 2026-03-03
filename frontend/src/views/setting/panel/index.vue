@@ -336,6 +336,7 @@ const languageOptions = ref([
     { value: 'ms', label: 'Bahasa Melayu' },
     { value: 'tr', label: 'Turkish' },
     { value: 'es-ES', label: 'España - Español' },
+    { value: 'de-DE', label: 'Deutsch' },
 ]);
 
 if (globalStore.isIntl) {
