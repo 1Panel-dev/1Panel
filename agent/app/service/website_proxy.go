@@ -24,6 +24,21 @@ import (
 )
 
 func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error) {
+	switch req.Operate {
+	case "delete":
+		return w.DeleteProxy(request.WebsiteProxyDel{
+			ID: req.ID,
+			Name: req.Name,
+		})
+	case "disable":
+		fallthrough
+	case "enable":
+		return w.UpdateProxyStatus(request.WebsiteProxyStatusUpdate{
+			ID: req.ID,
+			Name: req.Name,
+			Status: req.Operate,
+		})
+	}
 	var (
 		website    model.Website
 		par        *parser.Parser
@@ -81,16 +96,8 @@ func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error)
 		if err != nil {
 			return
 		}
-	case "delete":
-		_ = fileOp.DeleteFile(includePath)
-		_ = fileOp.DeleteFile(backPath)
-		return updateNginxConfig(constant.NginxScopeServer, nil, &website)
-	case "disable":
-		_ = fileOp.Rename(includePath, backPath)
-		return updateNginxConfig(constant.NginxScopeServer, nil, &website)
-	case "enable":
-		_ = fileOp.Rename(backPath, includePath)
-		return updateNginxConfig(constant.NginxScopeServer, nil, &website)
+	default:
+		return errors.New("unknown operate")
 	}
 
 	config.FilePath = includePath

@@ -20609,10 +20609,11 @@ const docTemplate = `{
 						}
 					],
 					"bodyKeys": [
-						"websiteID"
+						"websiteID",
+						"name"
 					],
-					"formatEN": "Nginx conf proxy file update [domain]",
-					"formatZH": "更新反向代理文件 [domain]",
+					"formatEN": "Update domain [domain] proxy config file [name]",
+					"formatZH": "修改网站 [domain] 反向代理配置文件 [name] ",
 					"paramKeys": []
 				}
 			}
@@ -20667,7 +20668,7 @@ const docTemplate = `{
 						"status"
 					],
 					"formatEN": "Update domain [domain] proxy config [name] status [status]",
-					"formatZH": "更新网站 [domain] 反向代理配置 [name] 状态 [status] ",
+					"formatZH": "修改网站 [domain] 反向代理配置 [name] 状态 [status] ",
 					"paramKeys": []
 				}
 			}
@@ -20717,10 +20718,12 @@ const docTemplate = `{
 						}
 					],
 					"bodyKeys": [
-						"id"
+						"id",
+						"name",
+						"operate"
 					],
-					"formatEN": "Update domain [domain] proxy config",
-					"formatZH": "修改网站 [domain] 反向代理配置 ",
+					"formatEN": "Update [operate] domain [domain] proxy config [name]",
+					"formatZH": "修改 [operate] 网站 [domain] 反向代理配置 [name] ",
 					"paramKeys": []
 				}
 			}

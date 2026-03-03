@@ -3029,7 +3029,8 @@
 	},
 	"/websites/proxies/file": {
 		"bodyKeys": [
-			"websiteID"
+			"websiteID",
+			"name"
 		],
 		"paramKeys": [],
 		"beforeFunctions": [
@@ -3042,8 +3043,8 @@
 				"output_value": "domain"
 			}
 		],
-		"formatZH": "更新反向代理文件 [domain]",
-		"formatEN": "Nginx conf proxy file update [domain]"
+		"formatZH": "修改网站 [domain] 反向代理配置文件 [name] ",
+		"formatEN": "Update domain [domain] proxy config file [name]"
 	},
 	"/websites/proxies/status": {
 		"bodyKeys": [
@@ -3062,12 +3063,14 @@
 				"output_value": "domain"
 			}
 		],
-		"formatZH": "更新网站 [domain] 反向代理配置 [name] 状态 [status] ",
+		"formatZH": "修改网站 [domain] 反向代理配置 [name] 状态 [status] ",
 		"formatEN": "Update domain [domain] proxy config [name] status [status]"
 	},
 	"/websites/proxies/update": {
 		"bodyKeys": [
-			"id"
+			"id",
+			"name",
+			"operate"
 		],
 		"paramKeys": [],
 		"beforeFunctions": [
@@ -3080,8 +3083,8 @@
 				"output_value": "domain"
 			}
 		],
-		"formatZH": "修改网站 [domain] 反向代理配置 ",
-		"formatEN": "Update domain [domain] proxy config"
+		"formatZH": "修改 [operate] 网站 [domain] 反向代理配置 [name] ",
+		"formatEN": "Update [operate] domain [domain] proxy config [name]"
 	},
 	"/websites/proxy/clear": {
 		"bodyKeys": [],
