@@ -164,6 +164,9 @@
                                 <el-tab-pane :label="$t('container.mount')">
                                     <Volume ref="volumeRef" :volumes="form.volumes" />
                                 </el-tab-pane>
+                                <el-tab-pane :label="$t('runtime.extraHosts')">
+                                    <ExtraHosts :extraHosts="form.extraHosts" />
+                                </el-tab-pane>
 
                                 <el-tab-pane :label="$t('terminal.command')">
                                     <el-row :gutter="20">
@@ -342,6 +345,7 @@ import { ElForm } from 'element-plus';
 import Confirm from '@/views/container/container/operate/confirm.vue';
 import Volume from '@/views/container/container/operate/volume.vue';
 import Network from '@/views/container/container/operate/network.vue';
+import ExtraHosts from '@/views/website/runtime/components/extra_hosts/index.vue';
 import {
     listImage,
     createContainer,
@@ -388,6 +392,7 @@ const form = reactive<Container.ContainerHelper>({
     cpuShares: 1024,
     memory: 0,
     volumes: [],
+    extraHosts: [],
     privileged: false,
     autoRemove: false,
     labels: [],
@@ -450,6 +455,7 @@ const search = async () => {
                     }
                 }
                 form.volumes = res.data.volumes || [];
+                form.extraHosts = res.data.extraHosts || [];
             })
             .catch(() => {
                 loading.value = false;

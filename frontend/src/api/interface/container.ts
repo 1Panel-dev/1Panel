@@ -85,11 +85,16 @@ export namespace Container {
         cpuShares: number;
         memory: number;
         volumes: Array<Volume>;
+        extraHosts: Array<ExtraHost>;
         privileged: boolean;
         autoRemove: boolean;
         labels: Array<string>;
         env: Array<string>;
         restartPolicy: string;
+    }
+    export interface ExtraHost {
+        hostname: string;
+        ip: string;
     }
     export interface ContainerUpgrade {
         taskID: string;

@@ -583,6 +583,16 @@ func (u *ContainerService) ContainerInfo(req dto.OperationWithName) (*dto.Contai
 	data.ExposedPorts = loadContainerPortForInfo(exposePorts)
 	data.Hostname = oldContainer.Config.Hostname
 	data.DNS = oldContainer.HostConfig.DNS
+	for _, item := range oldContainer.HostConfig.ExtraHosts {
+		parts := strings.SplitN(item, ":", 2)
+		if len(parts) != 2 || len(parts[0]) == 0 || len(parts[1]) == 0 {
+			continue
+		}
+		data.ExtraHosts = append(data.ExtraHosts, dto.ExtraHost{
+			Hostname: parts[0],
+			IP:       parts[1],
+		})
+	}
 	data.DomainName = oldContainer.Config.Domainname
 
 	data.Cmd = oldContainer.Config.Cmd
@@ -1450,6 +1460,13 @@ func loadConfigInfo(isCreate bool, req dto.ContainerOperate, oldContainer *conta
 	hostConf.Binds = []string{}
 	hostConf.Mounts = []mount.Mount{}
 	hostConf.DNS = req.DNS
+	hostConf.ExtraHosts = []string{}
+	for _, item := range req.ExtraHosts {
+		if len(item.Hostname) == 0 || len(item.IP) == 0 {
+			continue
+		}
+		hostConf.ExtraHosts = append(hostConf.ExtraHosts, fmt.Sprintf("%s:%s", item.Hostname, item.IP))
+	}
 	config.Volumes = make(map[string]struct{})
 	for _, volume := range req.Volumes {
 		item := mount.Mount{

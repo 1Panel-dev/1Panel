@@ -95,9 +95,15 @@ type ContainerOperate struct {
 	Privileged      bool           `json:"privileged"`
 	AutoRemove      bool           `json:"autoRemove"`
 	Volumes         []VolumeHelper `json:"volumes"`
+	ExtraHosts      []ExtraHost    `json:"extraHosts"`
 	Labels          []string       `json:"labels"`
 	Env             []string       `json:"env"`
 	RestartPolicy   string         `json:"restartPolicy"`
+}
+
+type ExtraHost struct {
+	Hostname string `json:"hostname"`
+	IP       string `json:"ip"`
 }
 type ContainerNetwork struct {
 	Network string `json:"network"`
