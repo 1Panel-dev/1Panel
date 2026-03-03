@@ -133,6 +133,20 @@ var catalog = map[string]Meta{
 			{ID: "kimi/kimi-k2-thinking", Name: "Kimi K2 Thinking"},
 		},
 	},
+	"zai": {
+		Key:            "zai",
+		DisplayName:    "Z.ai",
+		Sort:           95,
+		DefaultBaseURL: "https://open.bigmodel.cn/api/paas/v4",
+		EnvKey:         "ZAI_API_KEY",
+		Enabled:        true,
+		Models: []Model{
+			{ID: "zai/glm-5", Name: "GLM-5"},
+			{ID: "zai/glm-4.7", Name: "GLM-4.7"},
+			{ID: "zai/glm-4.7-flash", Name: "GLM-4.7-Flash"},
+			{ID: "zai/glm-4.7-flashx", Name: "GLM-4.7-FlashX"},
+		},
+	},
 	"kimi-coding": {
 		Key:            "kimi-coding",
 		DisplayName:    "Kimi Coding",

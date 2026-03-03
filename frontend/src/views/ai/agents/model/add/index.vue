@@ -24,7 +24,7 @@
                 <el-checkbox v-model="form.rememberApiKey">{{ $t('terminal.rememberPassword') }}</el-checkbox>
             </el-form-item>
             <el-form-item :label="$t('aiTools.agents.baseUrl')" prop="baseURL">
-                <el-input v-model="form.baseURL" :disabled="form.provider !== 'ollama' && form.provider !== 'custom'" />
+                <el-input v-model="form.baseURL" :disabled="!editableBaseURLProviders.includes(form.provider)" />
             </el-form-item>
             <el-form-item :label="$t('aiTools.model.model')" prop="model" v-if="form.provider === 'custom'">
                 <el-input v-model="form.model" placeholder="gpt-4o-mini" />
@@ -84,6 +84,7 @@ const formRef = ref<FormInstance>();
 const providerOptions = ref<Array<{ label: string; value: string }>>([]);
 const providerBaseURL = ref<Record<string, string>>({});
 const loading = ref(false);
+const editableBaseURLProviders = ['ollama', 'custom', 'zai'];
 
 const form = reactive({
     id: 0,

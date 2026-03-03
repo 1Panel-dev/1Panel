@@ -1800,6 +1800,37 @@ func writeOpenclawConfig(confDir, provider, modelName, apiType string, maxTokens
 				},
 			},
 		}
+	} else if provider == "zai" {
+		cfg.Agents.Defaults.Model.Primary = "zai/" + modelID
+		base := baseURL
+		if base == "" {
+			if defaultURL, ok := providerDefaultBaseURL(provider); ok {
+				base = defaultURL
+			}
+		}
+		plainKey := strings.TrimSpace(apiKey)
+		_, useMaxTokens, useContextWindow := resolveRuntimeParams(provider, apiType, maxTokens, contextWindow)
+		cfg.Models = &modelsConfig{
+			Mode: "merge",
+			Providers: map[string]modelProvider{
+				"zai": {
+					ApiKey:  plainKey,
+					BaseUrl: base,
+					Api:     "openai-completions",
+					Models: []modelEntry{
+						{
+							ID:            modelID,
+							Name:          zaiModelDisplayName(modelID),
+							Reasoning:     modelID == "glm-5",
+							Input:         []string{"text"},
+							ContextWindow: useContextWindow,
+							MaxTokens:     useMaxTokens,
+							Cost:          modelCost{},
+						},
+					},
+				},
+			},
+		}
 	}
 
 	configPath := path.Join(confDir, "openclaw.json")
@@ -1978,6 +2009,9 @@ func buildVerifyRequest(provider, baseURL, apiKey string) (string, map[string]st
 			return fmt.Sprintf("%s/models?key=%s", base, apiKey), headers
 		}
 		return fmt.Sprintf("%s/v1beta/models?key=%s", base, apiKey), headers
+	case "zai":
+		headers["Authorization"] = fmt.Sprintf("Bearer %s", apiKey)
+		return base + "/models", headers
 	default:
 		headers["Authorization"] = fmt.Sprintf("Bearer %s", apiKey)
 		if strings.Contains(base, "/v1") {
@@ -2047,6 +2081,21 @@ func normalizeBailianCodingPlanModelID(modelID string) string {
 
 func normalizeArkCodingPlanModelID(modelID string) string {
 	return strings.ToLower(strings.TrimSpace(modelID))
+}
+
+func zaiModelDisplayName(modelID string) string {
+	switch strings.ToLower(strings.TrimSpace(modelID)) {
+	case "glm-5":
+		return "GLM-5"
+	case "glm-4.7":
+		return "GLM-4.7"
+	case "glm-4.7-flash":
+		return "GLM-4.7-Flash"
+	case "glm-4.7-flashx":
+		return "GLM-4.7-FlashX"
+	default:
+		return strings.TrimSpace(modelID)
+	}
 }
 
 func bailianPrimaryModelID(modelID string) string {
@@ -2133,6 +2182,8 @@ func resolveRuntimeParams(provider, apiType string, maxTokens, contextWindow int
 		switch provider {
 		case "deepseek":
 			resolvedMaxTokens = 8192
+		case "zai":
+			resolvedMaxTokens = 131072
 		case "minimax", "kimi-coding", "custom":
 			resolvedMaxTokens = 8192
 		default:
@@ -2143,6 +2194,8 @@ func resolveRuntimeParams(provider, apiType string, maxTokens, contextWindow int
 		switch provider {
 		case "deepseek":
 			resolvedContextWindow = 128000
+		case "zai":
+			resolvedContextWindow = 204800
 		case "minimax", "kimi-coding":
 			resolvedContextWindow = 200000
 		case "custom":
