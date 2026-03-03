@@ -1966,7 +1966,8 @@ const message = {
         mfaInterval: '갱신 간격(초)',
         mfaTitleHelper:
             '제목은 다른 1Panel 호스트를 구별하는 데 사용됩니다. 제목을 수정한 후 다시 스캔하거나 비밀키를 수동으로 추가하세요.',
-        mfaIntervalHelper: '갱신 시간을 수정한 후 다시 스캔하거나 비밀키를 수동으로 추가하세요.',
+        mfaIntervalHelper:
+            '갱신 간격을 변경한 후 다시 스캔하거나 비밀키를 수동으로 추가하세요.\n일부 인증 앱은 30초 간격만 지원합니다(예: Google/Microsoft Authenticator).',
         mfaAlert:
             '일회용 토큰은 현재 시간을 기반으로 생성된 동적 6자리 숫자입니다. 서버 시간이 동기화되어 있는지 확인하세요.',
         mfaHelper: '활성화 후 일회용 토큰 검증이 필요합니다.',

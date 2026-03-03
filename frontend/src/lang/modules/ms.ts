@@ -2056,7 +2056,7 @@ const message = {
         mfaTitleHelper:
             'Judul digunakan untuk membezakan hos 1Panel yang berbeza. Imbas lagi atau tambahkan kunci rahsia secara manual selepas anda mengubah judul.',
         mfaIntervalHelper:
-            'Imbas lagi atau tambahkan kunci rahsia secara manual selepas anda mengubah masa penyegaran.',
+            'Selepas mengubah selang penyegaran, imbas semula atau tambahkan kunci rahsia secara manual.\nSesetengah aplikasi pengesah hanya menyokong selang 30 saat (contohnya, Google/Microsoft Authenticator).',
         mfaAlert:
             'Token satu kali ialah nombor 6 digit yang dijana secara dinamik berdasarkan masa semasa. Pastikan masa pelayan disegerakkan.',
         mfaHelper: 'Selepas anda mengaktifkannya, token satu kali perlu disahkan.',

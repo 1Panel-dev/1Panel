@@ -2047,7 +2047,8 @@ const message = {
         mfaInterval: 'Refresh interval(s)',
         mfaTitleHelper:
             'The title is used to distinguish different 1Panel hosts. Scan again or manually add the secret key after you modify the title.',
-        mfaIntervalHelper: 'Scan again or manually add the secret key after you modify the refresh time.',
+        mfaIntervalHelper:
+            'Scan again or manually add the secret key after changing the refresh interval.\nSome authenticators only support a 30-second interval (for example, Google/Microsoft Authenticator).',
         mfaAlert:
             'One-time token is dynamically generated 6-digit number and based on the current time. Make sure that the server time is synchronized.',
         mfaHelper: 'After you enabled it, the one-time token needs to be verified.',

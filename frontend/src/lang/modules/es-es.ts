@@ -2072,7 +2072,7 @@ const message = {
         mfaTitleHelper:
             'El título se usa para distinguir diferentes hosts de 1Panel. Tras modificarlo, vuelve a escanear o añade la clave secreta manualmente.',
         mfaIntervalHelper:
-            'Tras modificar el tiempo de refresco, vuelve a escanear o añade la clave secreta manualmente.',
+            'Tras modificar el intervalo de refresco, vuelve a escanear o añade la clave secreta manualmente.\nAlgunas apps de autenticación solo admiten un intervalo de 30 segundos (por ejemplo, Google/Microsoft Authenticator).',
         mfaAlert:
             'El token de un solo uso es un número dinámico de 6 dígitos basado en la hora actual. Asegúrate de que la hora del servidor esté sincronizada.',
         mfaHelper: 'Tras habilitarlo, será necesario verificar el token de un solo uso.',

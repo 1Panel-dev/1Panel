@@ -2012,7 +2012,8 @@ const message = {
         mfaCode: '驗證碼',
         mfaInterval: '重新整理時間（秒）',
         mfaTitleHelper: '用於區分不同 1Panel 主機，修改後請重新掃描或手動新增金鑰資訊',
-        mfaIntervalHelper: '修改重新整理時間後，請重新掃描或手動新增金鑰資訊',
+        mfaIntervalHelper:
+            '修改重新整理時間後，請重新掃描或手動新增金鑰資訊。\n部分驗證器僅支援 30 秒重新整理時間（如 Google/Microsoft Authenticator），請確認相容性。',
         sslChangeHelper: 'https 設定修改需要重新啟動服務，是否繼續？',
         sslDisable: '停用',
         sslDisableHelper: '停用 https 服務，需要重新啟動面板才能生效，是否繼續？',

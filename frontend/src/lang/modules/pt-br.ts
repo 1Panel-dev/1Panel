@@ -2043,7 +2043,7 @@ const message = {
         mfaTitleHelper:
             'O título é usado para distinguir diferentes hosts do 1Panel. Escaneie novamente ou adicione manualmente a chave secreta após modificar o título.',
         mfaIntervalHelper:
-            'Escaneie novamente ou adicione manualmente a chave secreta após modificar o intervalo de atualização.',
+            'Após alterar o intervalo de atualização, escaneie novamente ou adicione a chave secreta manualmente.\nAlguns aplicativos autenticadores suportam apenas intervalo de 30 segundos (por exemplo, Google/Microsoft Authenticator).',
         mfaAlert:
             'O token de uso único é um número dinâmico de 6 dígitos e baseado no tempo atual. Certifique-se de que o horário do servidor esteja sincronizado.',
         mfaHelper: 'Após ativá-lo, o token de uso único precisará ser verificado.',

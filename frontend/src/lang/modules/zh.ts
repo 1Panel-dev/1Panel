@@ -1966,7 +1966,8 @@ const message = {
         mfaCode: '验证码',
         mfaInterval: '刷新时间（秒）',
         mfaTitleHelper: '用于区分不同 1Panel 主机，修改后请重新扫描或手动添加密钥信息！',
-        mfaIntervalHelper: '修改刷新时间后，请重新扫描或手动添加密钥信息！',
+        mfaIntervalHelper:
+            '修改刷新时间后，请重新扫描或手动添加密钥信息！\n部分验证器仅支持 30 秒刷新时间（如 Google/Microsoft Authenticator），请确认兼容性。',
         passkey: '通行密钥',
         passkeyManage: '管理',
         passkeyKeyManagement: '密钥管理',

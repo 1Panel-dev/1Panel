@@ -2080,7 +2080,7 @@ const message = {
         mfaTitleHelper:
             'Başlık, farklı 1Panel ana bilgisayarlarını ayırt etmek için kullanılır. Başlığı değiştirdikten sonra QR kodunu tekrar tarayın veya gizli anahtarı manuel olarak ekleyin.',
         mfaIntervalHelper:
-            'Yenileme süresini değiştirdikten sonra QR kodunu tekrar tarayın veya gizli anahtarı manuel olarak ekleyin.',
+            'Yenileme aralığını değiştirdikten sonra QR kodunu tekrar tarayın veya gizli anahtarı manuel olarak ekleyin.\nBazı doğrulayıcı uygulamalar yalnızca 30 saniyelik aralığı destekler (ör. Google/Microsoft Authenticator).',
         mfaAlert:
             'Tek kullanımlık token, geçerli zamana dayalı olarak dinamik olarak oluşturulan 6 haneli bir sayıdır. Sunucu saatinin senkronize olduğundan emin olun.',
         mfaHelper: 'Etkinleştirildiğinde, tek kullanımlık token doğrulanmalıdır.',
