@@ -4,14 +4,17 @@
         <DockerStatus v-model:isActive="isActive" v-model:isExist="isExist" />
         <LayoutContent v-loading="loading" v-if="isExist" :class="{ mask: !isActive }">
             <template #leftToolBar>
-                <el-button type="primary" @click="openCreate">{{ $t('commons.button.create') }}</el-button>
+                <el-button type="primary" @click="openCreate" :disabled="noApp">
+                    {{ $t('commons.button.create') }}
+                </el-button>
             </template>
             <template #rightToolBar>
                 <TableSearch v-model:searchName="searchName" @search="search" />
                 <TableRefresh @search="search" />
             </template>
             <template #main>
-                <ComplexTable :data="items" :pagination-config="paginationConfig" @search="search">
+                <NoApp v-if="noApp" />
+                <ComplexTable :data="items" :pagination-config="paginationConfig" @search="search" v-if="!noApp">
                     <el-table-column
                         :label="$t('commons.table.name')"
                         show-overflow-tooltip
@@ -115,7 +118,7 @@
 import { onMounted, reactive, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { pageAgents, resetAgentToken } from '@/api/modules/ai';
-import { installedOp, searchAppInstalled } from '@/api/modules/app';
+import { installedOp, searchApp, searchAppInstalled } from '@/api/modules/app';
 import { AI } from '@/api/interface/ai';
 import { App } from '@/api/interface/app';
 import { SearchWithPage } from '@/api/interface';
@@ -134,6 +137,7 @@ import i18n from '@/lang';
 import PortJumpDialog from '@/components/port-jump/index.vue';
 import DockerStatus from '@/views/container/docker-status/index.vue';
 import { getAgentProviderDisplayName } from '@/utils/agent';
+import NoApp from '@/views/app-store/apps/no-app/index.vue';
 
 const items = ref<AI.AgentItem[]>([]);
 const loading = ref(false);
@@ -149,6 +153,7 @@ const route = useRoute();
 const router = useRouter();
 const isActive = ref(false);
 const isExist = ref(false);
+const noApp = ref(false);
 const searchName = ref('');
 
 const buttons = [
@@ -196,6 +201,22 @@ const paginationConfig = reactive({
     total: 0,
 });
 
+const checkNoApp = async () => {
+    try {
+        const appRes = await searchApp({
+            page: 1,
+            pageSize: 1,
+            name: '',
+            tags: [],
+            resource: 'all',
+            showCurrentArch: false,
+        });
+        noApp.value = (appRes.data.total || 0) === 0;
+    } catch {
+        noApp.value = false;
+    }
+};
+
 const search = async () => {
     loading.value = true;
     try {
@@ -204,7 +225,7 @@ const search = async () => {
             pageSize: paginationConfig.pageSize,
             info: searchName.value || '',
         };
-        const res = await pageAgents(req);
+        const [res] = await Promise.all([pageAgents(req), checkNoApp()]);
         items.value = res.data.items || [];
         paginationConfig.total = res.data.total || 0;
     } finally {
@@ -213,6 +234,9 @@ const search = async () => {
 };
 
 const openCreate = (agentType?: 'openclaw' | 'copaw') => {
+    if (noApp.value) {
+        return;
+    }
     const targetType = agentType === 'copaw' ? 'copaw' : 'openclaw';
     if (addRef.value?.open) {
         addRef.value.open(targetType);
