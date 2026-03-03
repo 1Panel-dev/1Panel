@@ -27,6 +27,9 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: '1.24'
+          cache-dependency-path: |
+            core/go.sum
+            agent/go.sum
 
       - name: Build Release
         uses: goreleaser/goreleaser-action@v6
