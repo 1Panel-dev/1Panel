@@ -1022,3 +1022,15 @@ var NormalizeAgentAccountVerifiedStatus = &gormigrate.Migration{
 			Update("verified", false).Error
 	},
 }
+
+var NormalizeOllamaAccountAPIType = &gormigrate.Migration{
+	ID: "20260304-normalize-ollama-account-api-type",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.AgentAccount{}); err != nil {
+			return err
+		}
+		return tx.Model(&model.AgentAccount{}).
+			Where("provider = ?", "ollama").
+			Update("api_type", "openai-responses").Error
+	},
+}

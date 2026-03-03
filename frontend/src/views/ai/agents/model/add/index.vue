@@ -29,11 +29,19 @@
             <el-form-item :label="$t('aiTools.model.model')" prop="model" v-if="form.provider === 'custom'">
                 <el-input v-model="form.model" placeholder="gpt-4o-mini" />
             </el-form-item>
-            <el-form-item :label="'API ' + $t('commons.table.type')" prop="apiType" v-if="form.provider === 'custom'">
+            <el-form-item
+                :label="'API ' + $t('commons.table.type')"
+                prop="apiType"
+                v-if="form.provider === 'custom' || form.provider === 'ollama'"
+            >
                 <el-select v-model="form.apiType">
                     <el-option label="openai-completions" value="openai-completions" />
                     <el-option label="openai-responses" value="openai-responses" />
-                    <el-option label="anthropic-messages" value="anthropic-messages" />
+                    <el-option
+                        v-if="form.provider === 'custom'"
+                        label="anthropic-messages"
+                        value="anthropic-messages"
+                    />
                 </el-select>
             </el-form-item>
             <el-form-item label="Max Tokens" prop="maxTokens" v-if="form.provider === 'custom'">
@@ -237,6 +245,11 @@ const handleProviderChange = () => {
         form.maxTokens = form.maxTokens || 8192;
         form.contextWindow = form.contextWindow || 128000;
         form.model = form.model || '';
+        return;
+    }
+    if (form.provider === 'ollama') {
+        form.baseURL = '';
+        form.apiType = 'openai-completions';
         return;
     }
     if (form.provider !== 'ollama') {

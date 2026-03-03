@@ -71,6 +71,7 @@ func InitAgentDB() {
 		migrations.AddEditionSetting,
 		migrations.AddAgentTypeForAgents,
 		migrations.NormalizeAgentAccountVerifiedStatus,
+		migrations.NormalizeOllamaAccountAPIType,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

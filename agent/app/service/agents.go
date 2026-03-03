@@ -462,6 +462,11 @@ func (a AgentService) CreateAccount(req dto.AgentAccountCreateReq) error {
 			return fmt.Errorf("apiType is invalid")
 		}
 	}
+	if provider == "ollama" {
+		if !isSupportedOllamaAPIType(apiType) {
+			return fmt.Errorf("apiType is invalid")
+		}
+	}
 	if err := a.VerifyAccount(dto.AgentAccountVerifyReq{Provider: provider, BaseURL: baseURL, APIKey: apiKey}); err != nil {
 		return err
 	}
@@ -510,13 +515,24 @@ func (a AgentService) UpdateAccount(req dto.AgentAccountUpdateReq) error {
 		return buserr.New("ErrAgentBaseURLRequired")
 	}
 	apiType := normalizeAPIType(req.APIType)
+	rawAPIType := strings.TrimSpace(req.APIType)
 	if provider == "custom" && strings.TrimSpace(req.Model) == "" {
 		return fmt.Errorf("model is required")
 	}
 	if provider == "custom" && !isSupportedAPIType(apiType) {
 		return fmt.Errorf("apiType is invalid")
 	}
-	if provider != "custom" {
+	if provider == "ollama" {
+		if rawAPIType == "" {
+			apiType = normalizeAPIType(account.APIType)
+			if !isSupportedOllamaAPIType(apiType) {
+				apiType = "openai-responses"
+			}
+		} else if !isSupportedOllamaAPIType(apiType) {
+			return fmt.Errorf("apiType is invalid")
+		}
+	}
+	if provider != "custom" && provider != "ollama" {
 		apiType = normalizeAPIType(account.APIType)
 	}
 	_, maxTokens, contextWindow := resolveRuntimeParams(provider, apiType, req.MaxTokens, req.ContextWindow)
@@ -1732,13 +1748,14 @@ func writeOpenclawConfig(confDir, provider, modelName, apiType string, maxTokens
 		}
 	} else if provider == "ollama" {
 		cfg.Agents.Defaults.Model.Primary = modelName
+		useAPIType, _, _ := resolveRuntimeParams(provider, apiType, maxTokens, contextWindow)
 		cfg.Models = &modelsConfig{
 			Mode: "merge",
 			Providers: map[string]modelProvider{
 				"ollama": {
 					ApiKey:  "ollama",
 					BaseUrl: baseURL,
-					Api:     "openai-responses",
+					Api:     useAPIType,
 					Models: []modelEntry{
 						{
 							ID:            modelID,
@@ -2096,8 +2113,20 @@ func isSupportedAPIType(apiType string) bool {
 	}
 }
 
+func isSupportedOllamaAPIType(apiType string) bool {
+	switch normalizeAPIType(apiType) {
+	case "openai-completions", "openai-responses":
+		return true
+	default:
+		return false
+	}
+}
+
 func resolveRuntimeParams(provider, apiType string, maxTokens, contextWindow int) (string, int, int) {
 	resolvedAPI := normalizeAPIType(apiType)
+	if provider == "ollama" && !isSupportedOllamaAPIType(resolvedAPI) {
+		resolvedAPI = "openai-responses"
+	}
 	resolvedMaxTokens := maxTokens
 	resolvedContextWindow := contextWindow
 	if resolvedMaxTokens <= 0 {
