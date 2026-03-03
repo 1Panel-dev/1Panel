@@ -123,11 +123,46 @@
                     </el-col>
                     <el-col :xs="24" :sm="24" :md="16" :lg="16" :xl="18">
                         <el-card v-if="currentCompose && !isOnCreate" v-loading="detailLoading">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2.5">
+                                    <span class="text-base font-medium">{{ currentCompose.name }}</span>
+                                    <el-tag size="small" effect="plain" round>
+                                        {{ loadFrom(currentCompose) }}
+                                    </el-tag>
+                                    <el-divider direction="vertical" />
+                                    <el-text size="small" type="info">{{ currentCompose.createdAt }}</el-text>
+                                </div>
+                                <el-tag v-if="currentCompose.containerCount === 0" type="danger" effect="light" round>
+                                    {{ $t('container.exited') }}
+                                </el-tag>
+                                <el-tag
+                                    v-else
+                                    :type="
+                                        currentCompose.containerCount === currentCompose.runningCount
+                                            ? 'success'
+                                            : 'warning'
+                                    "
+                                    effect="light"
+                                    round
+                                >
+                                    {{
+                                        $t('container.running', [
+                                            currentCompose.runningCount,
+                                            currentCompose.containerCount,
+                                        ])
+                                    }}
+                                </el-tag>
+                            </div>
+
+                            <el-divider class="!my-3" />
+
                             <el-table
                                 v-if="composeContainers.length > 0"
                                 :data="tableData"
                                 size="small"
-                                max-height="250"
+                                max-height="230"
+                                stripe
+                                class="compose-container-table"
                             >
                                 <el-table-column
                                     :label="$t('commons.table.name')"
@@ -141,7 +176,7 @@
                                         </el-text>
                                     </template>
                                 </el-table-column>
-                                <el-table-column :label="$t('commons.table.status')" prop="state">
+                                <el-table-column :label="$t('commons.table.status')" prop="state" width="120">
                                     <template #default="{ row }">
                                         <Status :key="row.state" :status="row.state"></Status>
                                     </template>
@@ -224,7 +259,7 @@
                                         </div>
                                     </template>
                                 </el-table-column>
-                                <el-table-column :label="$t('commons.table.operate')">
+                                <el-table-column :label="$t('commons.table.operate')" width="160">
                                     <template #default="{ row }">
                                         <el-button type="primary" link @click="onOpenTerminal(row)">
                                             {{ $t('menu.terminal') }}
@@ -236,12 +271,24 @@
                                 </el-table-column>
                             </el-table>
 
-                            <el-radio-group class="mt-1 mb-1" v-model="showType">
-                                <el-radio-button value="compose">{{ $t('container.compose') }}</el-radio-button>
-                                <el-radio-button value="log">{{ $t('commons.button.log') }}</el-radio-button>
-                            </el-radio-group>
+                            <el-divider v-if="composeContainers.length > 0" class="!my-2" />
+
+                            <div class="flex items-center justify-between mb-2">
+                                <el-radio-group v-model="showType">
+                                    <el-radio-button value="compose">{{ $t('container.compose') }}</el-radio-button>
+                                    <el-radio-button value="log">{{ $t('commons.button.log') }}</el-radio-button>
+                                    <el-radio-button value="env">{{ $t('container.env') }}</el-radio-button>
+                                </el-radio-group>
+                                <el-button
+                                    v-if="showType !== 'log' && !(showType === 'env' && isAppStoreCompose)"
+                                    type="primary"
+                                    @click="onSubmitEdit"
+                                >
+                                    {{ $t('commons.button.save') }}
+                                </el-button>
+                            </div>
                             <el-select
-                                class="p-w-300 mt-2 ml-2"
+                                class="p-w-300 mb-2"
                                 v-model="currentYamlPath"
                                 @change="inspectCompose(currentCompose.name, currentYamlPath)"
                                 v-if="currentCompose.path.indexOf(',') !== -1"
@@ -261,25 +308,6 @@
                                     :heightDiff="475"
                                     placeholder="#Define or paste the content of your docker-compose file here"
                                 />
-                                <span class="envTitle">{{ $t('container.env') }}</span>
-                                <el-input
-                                    placeholder="key=value"
-                                    type="textarea"
-                                    :rows="3"
-                                    :disabled="currentCompose.createdBy === 'Apps'"
-                                    v-model="env"
-                                />
-                                <span v-if="currentCompose.createdBy === 'Apps'" class="input-help">
-                                    {{ $t('container.composeEnvHelper2') }}
-                                </span>
-                                <div class="mt-2">
-                                    <el-checkbox v-model="form.forcePull" :label="$t('container.forcePull')" />
-                                    <span class="input-help">{{ $t('container.forcePullHelper') }}</span>
-                                </div>
-
-                                <el-button type="primary" class="mt-2" @click="onSubmitEdit">
-                                    {{ $t('commons.button.save') }}
-                                </el-button>
                             </div>
 
                             <div v-show="showType === 'log'">
@@ -291,6 +319,19 @@
                                     :highlightDiff="450"
                                     :defaultFollow="true"
                                 />
+                            </div>
+
+                            <div v-show="showType === 'env'">
+                                <el-input
+                                    placeholder="key=value"
+                                    type="textarea"
+                                    :rows="18"
+                                    :readonly="isAppStoreCompose"
+                                    v-model="env"
+                                />
+                                <span v-if="isAppStoreCompose" class="input-help">
+                                    {{ $t('container.composeEnvHelper2') }}
+                                </span>
                             </div>
                         </el-card>
                         <el-card v-else>
@@ -385,7 +426,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
+import { computed, h, ref } from 'vue';
 import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 import ContainerLog from '@/components/log/container/index.vue';
 import TaskLog from '@/components/log/task/index.vue';
@@ -414,7 +455,7 @@ import { MsgError, MsgSuccess } from '@/utils/message';
 import { computeCPU, computeSize2, computeSizeForDocker, newUUID } from '@/utils/util';
 import { Rules } from '@/global/form-rules';
 import { loadBaseDir } from '@/api/modules/setting';
-import { ElForm } from 'element-plus';
+import { ElCheckbox, ElForm } from 'element-plus';
 
 const data = ref<any[]>([]);
 const loading = ref(false);
@@ -461,6 +502,7 @@ const rules = reactive({
 
 const isActive = ref(false);
 const isExist = ref(false);
+const isAppStoreCompose = computed(() => currentCompose.value?.createdBy === 'Apps');
 
 const tableData = computed(() => {
     return composeContainers.value.map((container) => {
@@ -703,6 +745,34 @@ const loadSize = async (row: any) => {
 };
 
 const onSubmitEdit = async () => {
+    const forcePull = ref(false);
+    try {
+        await ElMessageBox({
+            title: i18n.global.t('commons.button.save'),
+            message: h('div', { class: 'w-full' }, [
+                h(
+                    ElCheckbox,
+                    {
+                        onChange: (value: string | number | boolean) => {
+                            forcePull.value = Boolean(value);
+                        },
+                    },
+                    {
+                        default: () => i18n.global.t('container.forcePull'),
+                    },
+                ),
+                h('div', { class: 'input-help mt-1' }, i18n.global.t('container.forcePullHelper')),
+                h('div', { class: 'mt-2 leading-6' }, i18n.global.t('container.updateHelper4')),
+            ]),
+            showCancelButton: true,
+            confirmButtonText: i18n.global.t('commons.button.confirm'),
+            cancelButtonText: i18n.global.t('commons.button.cancel'),
+            closeOnClickModal: false,
+        });
+    } catch {
+        return;
+    }
+
     const taskID = newUUID();
     const param = {
         taskID: taskID,
@@ -712,7 +782,7 @@ const onSubmitEdit = async () => {
         content: composeContent.value,
         createdBy: currentCompose.value.createdBy,
         env: env.value || '',
-        forcePull: form.forcePull,
+        forcePull: forcePull.value,
     };
     loading.value = true;
     await composeUpdate(param)
