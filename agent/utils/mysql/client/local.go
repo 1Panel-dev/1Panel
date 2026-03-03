@@ -274,9 +274,6 @@ func (r *Local) Recover(info RecoverInfo) error {
 		mysqlCli = "mysql"
 	}
 
-	if err := r.ExecSQL(fmt.Sprintf("drop database if exists `%s`", info.Name), 300); err != nil {
-		return fmt.Errorf("drop database failed, err: %v", err)
-	}
 	cmd := exec.Command("docker", "exec", "-i", r.ContainerName, mysqlCli, "-uroot", "-p"+r.Password, "--default-character-set="+info.Format, info.Name)
 	if strings.HasSuffix(info.SourceFile, ".gz") {
 		gzipFile, err := os.Open(info.SourceFile)

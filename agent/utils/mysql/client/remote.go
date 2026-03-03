@@ -300,10 +300,6 @@ func (r *Remote) Recover(info RecoverInfo) error {
 		return err
 	}
 
-	if err := r.ExecSQL(fmt.Sprintf("drop database if exists `%s`", info.Name), 300); err != nil {
-		return fmt.Errorf("drop database failed, err: %v", err)
-	}
-
 	recoverCmd := fmt.Sprintf("docker run --rm --net=host -i %s /bin/bash -c '%s -h %s -P %d -u%s -p%s %s --default-character-set=%s %s'",
 		image, r.Type, r.Address, r.Port, r.User, r.Password, sslSkip(info.Version, r.Type), info.Format, info.Name)
 
