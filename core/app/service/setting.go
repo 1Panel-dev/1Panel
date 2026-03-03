@@ -510,10 +510,10 @@ func (u *SettingService) UpdateTerminal(req dto.TerminalInfo) error {
 	if err := settingRepo.UpdateOrCreate("FontSize", req.FontSize); err != nil {
 		return err
 	}
-	if err := settingRepo.Update("FontFamily", req.FontFamily); err != nil {
+	if err := settingRepo.UpdateOrCreate("FontFamily", req.FontFamily); err != nil {
 		return err
 	}
-	if err := settingRepo.Update("CursorBlink", req.CursorBlink); err != nil {
+	if err := settingRepo.UpdateOrCreate("CursorBlink", req.CursorBlink); err != nil {
 		return err
 	}
 	if err := settingRepo.UpdateOrCreate("BackgroundColor", req.BackgroundColor); err != nil {
