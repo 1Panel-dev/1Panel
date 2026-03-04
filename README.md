@@ -48,7 +48,7 @@
 Execute the script below and follow the prompts to install 1Panel:
 
 ```bash
-bash -c "$(curl -sSL https://resource.fit2cloud.com/1panel/package/v2/quick_start.sh)"
+bash -c "$(curl -sSL https://resource.1panel.pro/v2/quick_start.sh)"
 ```
 
 ## Screenshot
