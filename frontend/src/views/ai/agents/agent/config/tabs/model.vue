@@ -11,7 +11,10 @@
             </el-checkbox>
         </el-form-item>
         <el-form-item :label="t('aiTools.model.model')" prop="model">
-            <el-input v-if="form.manualModel" v-model="form.model" />
+            <el-input v-if="form.manualModel && isOllamaProvider" v-model="ollamaModelSuffix">
+                <template #prepend>ollama/</template>
+            </el-input>
+            <el-input v-else-if="form.manualModel" v-model="form.model" />
             <el-select v-else v-model="form.model" filterable>
                 <el-option v-for="item in modelOptions" :key="item.id" :label="item.name" :value="item.id" />
             </el-select>
@@ -25,7 +28,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue';
+import { computed, reactive, ref } from 'vue';
 import type { FormInstance } from 'element-plus';
 import { useI18n } from 'vue-i18n';
 import { AI } from '@/api/interface/ai';
@@ -50,6 +53,21 @@ const form = reactive({
     accountId: undefined as unknown as number,
     manualModel: false,
     model: '',
+});
+
+const isOllamaProvider = computed(() => provdier.value === 'ollama');
+
+const ollamaModelSuffix = computed({
+    get: () => {
+        const model = form.model || '';
+        if (model.startsWith('ollama/')) {
+            return model.slice('ollama/'.length);
+        }
+        return model;
+    },
+    set: (value: string) => {
+        form.model = `ollama/${value || ''}`;
+    },
 });
 
 const rules = reactive({
@@ -97,6 +115,14 @@ const handleAccountChange = () => {
         modelOptions.value = [];
         return;
     }
+    if (selected.provider === 'ollama') {
+        form.manualModel = true;
+        if (!form.model.startsWith('ollama/')) {
+            form.model = 'ollama/';
+        }
+        setModelsByProvider(selected.provider);
+        return;
+    }
     setModelsByProvider(selected.provider);
     if (!form.manualModel && (!form.model || !form.model.startsWith(`${selected.provider}/`))) {
         form.model = modelOptions.value.length > 0 ? modelOptions.value[0].id : '';
@@ -108,6 +134,9 @@ const handleManualModelChange = (val: unknown) => {
     if (selected?.provider === 'custom' && !Boolean(val)) {
         form.manualModel = true;
         return;
+    }
+    if (selected?.provider === 'ollama' && Boolean(val) && !form.model.startsWith('ollama/')) {
+        form.model = 'ollama/';
     }
     if (Boolean(val)) {
         return;
@@ -136,9 +165,11 @@ const load = async (agent: AI.AgentItem) => {
         const currentAccount =
             accountOptions.value.find((item) => item.id === agent.accountId) || accountOptions.value[0];
         form.accountId = currentAccount.id;
+        provdier.value = currentAccount.provider;
         setModelsByProvider(currentAccount.provider);
         const inProviderModels = modelOptions.value.some((item) => item.id === agent.model);
-        form.manualModel = currentAccount.provider === 'custom' || !inProviderModels;
+        form.manualModel =
+            currentAccount.provider === 'custom' || currentAccount.provider === 'ollama' || !inProviderModels;
         if (agent.model && (form.manualModel || agent.model.startsWith(`${currentAccount.provider}/`))) {
             form.model = agent.model;
         } else {
@@ -146,6 +177,9 @@ const load = async (agent: AI.AgentItem) => {
         }
         if (currentAccount.provider === 'custom' && currentAccount.model && !form.model) {
             form.model = currentAccount.model;
+        }
+        if (currentAccount.provider === 'ollama' && !form.model.startsWith('ollama/')) {
+            form.model = 'ollama/';
         }
     } finally {
         loading.value = false;
