@@ -5,7 +5,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"io"
-	"strings"
 	"sync"
 	"time"
 
@@ -39,7 +38,6 @@ const (
 	WsMsgCmd       = "cmd"
 	WsMsgResize    = "resize"
 	WsMsgHeartbeat = "heartbeat"
-	WsMsgComplete  = "complete"
 )
 
 type WsMsg struct {
@@ -57,7 +55,6 @@ type LogicSshWsSession struct {
 	inputFilterBuff *safeBuffer
 	session         *ssh.Session
 	wsConn          *websocket.Conn
-	completer       *TabCompleter
 	isAdmin         bool
 	IsFlagged       bool
 }
@@ -90,7 +87,6 @@ func NewLogicSshWsSession(cols, rows int, sshClient *ssh.Client, wsConn *websock
 	if err := sshSession.Shell(); err != nil {
 		return nil, err
 	}
-	completer := NewTabCompleter()
 	if len(initCmd) != 0 {
 		time.Sleep(100 * time.Millisecond)
 		_, _ = stdinP.Write([]byte(initCmd + "\n"))
@@ -102,7 +98,6 @@ func NewLogicSshWsSession(cols, rows int, sshClient *ssh.Client, wsConn *websock
 		inputFilterBuff: inputBuf,
 		session:         sshSession,
 		wsConn:          wsConn,
-		completer:       completer,
 		isAdmin:         true,
 		IsFlagged:       false,
 	}, nil
@@ -162,14 +157,6 @@ func (sws *LogicSshWsSession) receiveWsMsg(exitCh chan bool) {
 				if err != nil {
 					global.LOG.Errorf("ssh sending heartbeat to webSocket failed, err: %v", err)
 				}
-			case WsMsgComplete:
-				decodeBytes, err := base64.StdEncoding.DecodeString(msgObj.Data)
-				if err != nil {
-					global.LOG.Errorf("websock complete string base64 decoding failed, err: %v", err)
-					break
-				}
-				suggestion := sws.completer.GetCompletions(string(decodeBytes))
-				sws.sendComplete(wsConn, strings.Join(suggestion, "\n"))
 			}
 		}
 	}
@@ -221,20 +208,6 @@ func (sws *LogicSshWsSession) sendComboOutput(exitCh chan bool) {
 		case <-exitCh:
 			return
 		}
-	}
-}
-
-func (sws *LogicSshWsSession) sendComplete(wsConn *websocket.Conn, suggestion string) {
-	wsData, err := json.Marshal(WsMsg{
-		Type: WsMsgComplete,
-		Data: base64.StdEncoding.EncodeToString([]byte(suggestion)),
-	})
-	if err != nil {
-		global.LOG.Errorf("encoding complete output to json failed, err: %v", err)
-		return
-	}
-	if err := wsConn.WriteMessage(websocket.TextMessage, wsData); err != nil {
-		global.LOG.Errorf("sending complete output to webSocket failed, err: %v", err)
 	}
 }
 

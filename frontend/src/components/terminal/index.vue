@@ -20,12 +20,6 @@ const terminalSocket = ref<WebSocket>();
 const heartbeatTimer = ref<NodeJS.Timer>();
 const latency = ref(0);
 const initCmd = ref('');
-const currentLine = ref('');
-const suggestionText = ref('');
-const ghostText = ref('');
-let suggestTimer: ReturnType<typeof setTimeout> | null = null;
-const COMPLETION_DEBOUNCE_MS = 500;
-const COMPLETION_MIN_CHARS = 2;
 
 const readyWatcher = watch(
     () => webSocketReady.value && termReady.value,
@@ -245,7 +239,6 @@ const onWSReceive = (message: MessageEvent) => {
     const wsMsg = JSON.parse(message.data);
     switch (wsMsg.type) {
         case 'cmd': {
-            clearGhost();
             term.value.element && term.value.focus();
             if (wsMsg.data) {
                 let receiveMsg = Base64.decode(wsMsg.data);
@@ -254,27 +247,6 @@ const onWSReceive = (message: MessageEvent) => {
                     initCmd.value = '';
                 }
                 term.value.write(receiveMsg);
-            }
-            break;
-        }
-        case 'complete': {
-            if (!currentLine.value || currentLine.value.trim().length === 0) {
-                clearGhost();
-                break;
-            }
-            if (wsMsg.data) {
-                const raw = Base64.decode(wsMsg.data);
-                const items = raw
-                    .split('\n')
-                    .map((item) => item.trim())
-                    .filter((item) => item.length > 0);
-                if (items.length >= 1) {
-                    applySuggestion(items[0]);
-                } else {
-                    clearGhost();
-                }
-            } else {
-                clearGhost();
             }
             break;
         }
@@ -315,125 +287,9 @@ function sendMsg(data: string) {
     }
 }
 
-function sendSuggestRequest(line: string) {
-    if (!line || line.trim().length === 0) {
-        return;
-    }
-    if (isWsOpen()) {
-        terminalSocket.value!.send(
-            JSON.stringify({
-                type: 'complete',
-                data: Base64.encode(line),
-            }),
-        );
-    }
-}
-
-function scheduleSuggest() {
-    if (suggestTimer) {
-        clearTimeout(suggestTimer);
-    }
-    if (!currentLine.value || currentLine.value.trim().length === 0) {
-        clearGhost();
-        return;
-    }
-    const token = currentLine.value.trim().split(/\s+/).pop() || '';
-    if (token.length < COMPLETION_MIN_CHARS) {
-        clearGhost();
-        return;
-    }
-    suggestTimer = setTimeout(() => {
-        sendSuggestRequest(currentLine.value);
-    }, COMPLETION_DEBOUNCE_MS);
-}
-
-function applySuggestion(raw: string) {
-    if (!raw) {
-        clearGhost();
-        return;
-    }
-    const lastTokenMatch = currentLine.value.match(/(\S+)$/);
-    const lastToken = lastTokenMatch ? lastTokenMatch[1] : '';
-    let suffix = raw;
-    if (lastToken && raw.startsWith(lastToken)) {
-        suffix = raw.slice(lastToken.length);
-    }
-    if (!suffix) {
-        clearGhost();
-        return;
-    }
-    suggestionText.value = suffix;
-    renderGhost(suffix);
-}
-
-function renderGhost(suffix: string) {
-    if (!term.value) return;
-    term.value.write('\x1b7');
-    term.value.write('\x1b[0K');
-    term.value.write(`\x1b[90m${suffix}\x1b[0m`);
-    term.value.write('\x1b8');
-    ghostText.value = suffix;
-}
-
-function clearGhost() {
-    if (!ghostText.value || !term.value) return;
-    term.value.write('\x1b7');
-    term.value.write('\x1b[0K');
-    term.value.write('\x1b8');
-    ghostText.value = '';
-    suggestionText.value = '';
-}
-
 function onTermData(data: string) {
     if (!data) return;
-    if (data === '\t') {
-        if (ghostText.value) {
-            sendMsg(ghostText.value);
-            currentLine.value += ghostText.value;
-            clearGhost();
-            scheduleSuggest();
-            return;
-        }
-        sendMsg(data);
-        return;
-    }
-    if (data === '\r' || data === '\n') {
-        currentLine.value = '';
-        clearGhost();
-        sendMsg(data);
-        return;
-    }
-    if (data === '\x7f') {
-        if (currentLine.value.length > 0) {
-            currentLine.value = currentLine.value.slice(0, -1);
-        }
-        clearGhost();
-        sendMsg(data);
-        scheduleSuggest();
-        return;
-    }
-    if (data === '\x15') {
-        currentLine.value = '';
-        clearGhost();
-        sendMsg(data);
-        return;
-    }
-    if (data === '\x17') {
-        currentLine.value = currentLine.value.replace(/\s+\S*$/, '');
-        clearGhost();
-        sendMsg(data);
-        scheduleSuggest();
-        return;
-    }
-    if (data.startsWith('\x1b')) {
-        clearGhost();
-        sendMsg(data);
-        return;
-    }
-    currentLine.value += data;
-    clearGhost();
     sendMsg(data);
-    scheduleSuggest();
 }
 
 // websocket 相关代码 end
