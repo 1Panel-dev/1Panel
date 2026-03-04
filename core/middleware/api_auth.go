@@ -1,8 +1,7 @@
 package middleware
 
 import (
-	"crypto/hmac"
-	"crypto/sha256"
+	"crypto/md5"
 	"encoding/hex"
 	"net"
 	"strconv"
@@ -78,8 +77,7 @@ func isValid1PanelTimestamp(panelTimestamp string) bool {
 
 func isValid1PanelToken(panelToken string, panelTimestamp string) bool {
 	system1PanelToken := global.Api.ApiKey
-	expected := GenerateHMAC(system1PanelToken, panelTimestamp)
-	return hmac.Equal([]byte(panelToken), []byte(expected))
+	return panelToken == GenerateMD5("1panel"+system1PanelToken+panelTimestamp)
 }
 
 func isIPInWhiteList(clientIP string) bool {
@@ -114,8 +112,8 @@ func isIPInWhiteList(clientIP string) bool {
 	return false
 }
 
-func GenerateHMAC(systemToken, timestamp string) string {
-	mac := hmac.New(sha256.New, []byte(systemToken))
-	mac.Write([]byte("1panel" + timestamp))
-	return hex.EncodeToString(mac.Sum(nil))
+func GenerateMD5(param string) string {
+	hash := md5.New()
+	hash.Write([]byte(param))
+	return hex.EncodeToString(hash.Sum(nil))
 }
