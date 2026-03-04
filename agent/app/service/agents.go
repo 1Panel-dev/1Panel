@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"path"
 	"sort"
 	"strconv"
@@ -25,6 +26,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
+	"github.com/1Panel-dev/1Panel/agent/utils/req_helper"
 )
 
 type AgentService struct{}
@@ -490,7 +492,11 @@ func (a AgentService) CreateAccount(req dto.AgentAccountCreateReq) error {
 		account.MaxTokens = maxTokens
 		account.ContextWindow = contextWindow
 	}
-	return agentAccountRepo.Create(account)
+	if err := agentAccountRepo.Create(account); err != nil {
+		return err
+	}
+	asyncReportAIProviderInstall(provider)
+	return nil
 }
 
 func (a AgentService) UpdateAccount(req dto.AgentAccountUpdateReq) error {
@@ -2213,4 +2219,22 @@ func generateToken() string {
 		return ""
 	}
 	return hex.EncodeToString(bytes)
+}
+
+func asyncReportAIProviderInstall(provider string) {
+	if global.CONF.Base.Mode != "stable" {
+		return
+	}
+	provider = strings.ToLower(strings.TrimSpace(provider))
+	if provider == "" {
+		return
+	}
+	go func(provider string) {
+		query := url.Values{}
+		query.Set("product", "ai-provider")
+		query.Set("type", "install")
+		query.Set("version", provider)
+		reqURL := "https://community.fit2cloud.com/installation-analytics?" + query.Encode()
+		_, _, _ = req_helper.HandleRequest(reqURL, http.MethodGet, constant.TimeOut5s)
+	}(provider)
 }
