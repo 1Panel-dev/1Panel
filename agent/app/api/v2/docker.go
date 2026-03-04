@@ -12,7 +12,7 @@ import (
 // @Tags Container Docker
 // @Summary Load docker status
 // @Produce json
-// @Success 200 {string} dto.DockerStatus
+// @Success 200 {object} dto.DockerStatus
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /containers/docker/status [get]
@@ -24,7 +24,7 @@ func (b *BaseApi) LoadDockerStatus(c *gin.Context) {
 // @Tags Container Docker
 // @Summary Load docker daemon.json
 // @Produce json
-// @Success 200 {object} string
+// @Success 200 {string} string
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /containers/daemonjson/file [get]

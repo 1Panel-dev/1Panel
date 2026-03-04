@@ -113,7 +113,7 @@ func (b *BaseApi) UpdateAgentModelConfig(c *gin.Context) {
 
 // @Tags AI
 // @Summary Get Providers
-// @Success 200 {object} []dto.ProviderInfo
+// @Success 200 {array} dto.ProviderInfo
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /ai/agents/providers [get]
