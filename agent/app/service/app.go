@@ -516,6 +516,10 @@ func (a AppService) Install(req request.AppInstallCreate, executeScript bool) (a
 	}
 	appInstall.Env = string(paramByte)
 
+	var maxSort int
+	global.DB.Model(&model.AppInstall{}).Where("favorite = ?", false).Select("COALESCE(MAX(sort_order),0)").Scan(&maxSort)
+	appInstall.SortOrder = maxSort + 1
+
 	if err = appInstallRepo.Create(context.Background(), appInstall); err != nil {
 		return
 	}
