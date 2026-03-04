@@ -1755,6 +1755,7 @@ func writeOpenclawConfig(confDir, provider, modelName, apiType string, maxTokens
 	} else if provider == "ollama" {
 		cfg.Agents.Defaults.Model.Primary = modelName
 		useAPIType, _, _ := resolveRuntimeParams(provider, apiType, maxTokens, contextWindow)
+		reasoning := useAPIType != "openai-completions"
 		cfg.Models = &modelsConfig{
 			Mode: "merge",
 			Providers: map[string]modelProvider{
@@ -1766,7 +1767,7 @@ func writeOpenclawConfig(confDir, provider, modelName, apiType string, maxTokens
 						{
 							ID:            modelID,
 							Name:          modelID,
-							Reasoning:     true,
+							Reasoning:     reasoning,
 							Input:         []string{"text"},
 							ContextWindow: 160000,
 							MaxTokens:     8192,
