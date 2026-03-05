@@ -53,7 +53,7 @@ bash -c "$(curl -sSL https://resource.1panel.pro/v2/quick_start.sh)"
 
 ## Screenshot
 
-![UI Display](https://resource.1panel.pro/img/1panel.png)
+![UI Display](https://resource.1panel.pro/img/overview_en_v2.png)
 
 ## Star History
 
