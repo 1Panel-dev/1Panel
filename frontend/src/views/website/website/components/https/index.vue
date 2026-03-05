@@ -67,7 +67,15 @@
                         :label="ssl.primaryDomain"
                         :value="ssl.id"
                         :disabled="ssl.pem === ''"
-                    ></el-option>
+                    >
+                        <span>{{ ssl.primaryDomain }}</span>
+                        <el-tag class="tagClass" v-if="ssl.expireDate">
+                            {{ dateFormatSimple(ssl.expireDate) }}
+                        </el-tag>
+                        <el-tag class="tagClass" v-if="ssl.organization">
+                            {{ ssl.organization }}
+                        </el-tag>
+                    </el-option>
                 </el-select>
             </el-form-item>
         </div>
@@ -139,10 +147,12 @@
 
 <script lang="ts" setup>
 import { computed, watch, onMounted, ref } from 'vue';
-import { getAccountName } from '@/utils/util';
+import { getAccountName, dateFormatSimple } from '@/utils/util';
 import WebsiteSSL from '@/views/website/website/components/website-ssl/index.vue';
 import { Website } from '@/api/interface/website';
 import { listSSL, searchAcmeAccount } from '@/api/modules/website';
+
+type SSLItem = Website.SSL & { organization?: string };
 
 interface AcmeAccount {
     id: number;
@@ -187,7 +197,7 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<Emits>();
 
 const acmeAccounts = ref<AcmeAccount[]>([]);
-const ssls = ref<Website.SSL[]>([]);
+const ssls = ref<SSLItem[]>([]);
 const keyFileRef = ref();
 const certFileRef = ref();
 
@@ -297,5 +307,11 @@ onMounted(() => {
     margin-left: 8px;
     color: var(--el-text-color-secondary);
     font-size: 12px;
+}
+.tagClass {
+    float: right;
+    margin-right: 10px;
+    font-size: 12px;
+    margin-top: 5px;
 }
 </style>

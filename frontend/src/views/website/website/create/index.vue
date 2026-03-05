@@ -255,7 +255,15 @@
                                     :label="ssl.primaryDomain"
                                     :value="ssl.id"
                                     :disabled="ssl.pem == ''"
-                                ></el-option>
+                                >
+                                    <span>{{ ssl.primaryDomain }}</span>
+                                    <el-tag class="tagClass" v-if="ssl.expireDate">
+                                        {{ dateFormatSimple(ssl.expireDate) }}
+                                    </el-tag>
+                                    <el-tag class="tagClass" v-if="ssl.organization">
+                                        {{ ssl.organization }}
+                                    </el-tag>
+                                </el-option>
                             </el-select>
                         </el-form-item>
                         <el-form-item :label="' '" v-if="websiteSSL && websiteSSL.id > 0">
@@ -443,7 +451,7 @@ import { reactive, ref, watch } from 'vue';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { SearchRuntimes } from '@/api/modules/runtime';
 import { Runtime } from '@/api/interface/runtime';
-import { getRandomStr, getRuntimeLabel } from '@/utils/util';
+import { getRandomStr, getRuntimeLabel, dateFormatSimple } from '@/utils/util';
 import { getAppService } from '@/api/modules/app';
 import { v4 as uuidv4 } from 'uuid';
 import { getAccountName } from '@/utils/util';
@@ -1097,5 +1105,11 @@ defineExpose({
     text-overflow: ellipsis;
     white-space: nowrap;
     display: inline-block;
+}
+.tagClass {
+    float: right;
+    margin-right: 10px;
+    font-size: 12px;
+    margin-top: 5px;
 }
 </style>
