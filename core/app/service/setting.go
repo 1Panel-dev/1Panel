@@ -16,6 +16,7 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -82,6 +83,15 @@ func (u *SettingService) GetSettingInfo() (*dto.SettingInfo, error) {
 	for _, set := range setting {
 		settingMap[set.Key] = set.Value
 	}
+	if hideMenu, ok := settingMap["HideMenu"]; ok && len(hideMenu) > 0 {
+		var menus []dto.ShowMenu
+		if err := json.Unmarshal([]byte(hideMenu), &menus); err == nil {
+			sortShowMenus(menus)
+			if sortedBytes, err := json.Marshal(menus); err == nil {
+				settingMap["HideMenu"] = string(sortedBytes)
+			}
+		}
+	}
 	var info dto.SettingInfo
 	arr, err := json.Marshal(settingMap)
 	if err != nil {
@@ -101,6 +111,20 @@ func (u *SettingService) GetSettingInfo() (*dto.SettingInfo, error) {
 	}
 
 	return &info, err
+}
+
+func sortShowMenus(menus []dto.ShowMenu) {
+	for i := range menus {
+		if len(menus[i].Children) > 0 {
+			sortShowMenus(menus[i].Children)
+		}
+	}
+	sort.SliceStable(menus, func(i, j int) bool {
+		if menus[i].Sort == menus[j].Sort {
+			return menus[i].ID < menus[j].ID
+		}
+		return menus[i].Sort < menus[j].Sort
+	})
 }
 
 func (u *SettingService) Update(key, value string) error {
