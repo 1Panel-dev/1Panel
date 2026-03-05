@@ -2145,7 +2145,7 @@ const message = {
 
         about: 'について',
         versionItem: '現在のバージョン',
-        backupCopies: '保持するバックアップ数',
+        backupCopies: 'バックアップ数',
         backupCopiesHelper:
             'バージョンロールバック用に保持するアップグレードバックアップの数を設定します。0はすべて保持を意味します。',
         backupCopiesRule: '少なくとも3つのアップグレードバックアップ記録を保持してください',
@@ -3781,7 +3781,7 @@ const message = {
             masterBackup: 'マスターノードバックアップ',
             backupNode: 'バックアップノード',
             backupFrequency: 'バックアップ頻度（時間）',
-            backupCopies: 'バックアップ保持数',
+            backupCopies: 'バックアップ数',
             noBackupNode: '現在バックアップノードが空です。保存するバックアップノードを選択して再試行してください！',
             masterBackupAlert:
                 '現在マスターノードのバックアップが設定されていません。データセキュリティを確保するため、障害時に新しいマスターノードに手動で切り替えられるよう、速やかにバックアップノードを設定してください。',

@@ -2062,7 +2062,7 @@ const message = {
 
         about: '關於',
         versionItem: '當前版本',
-        backupCopies: '保留份數',
+        backupCopies: '備份份數',
         backupCopiesHelper: '設定用於版本回滾的升級備份保留份數。0 表示保留所有。',
         backupCopiesRule: '請至少儲存 3 份升級備份記錄',
         release: '版本更新日誌',
@@ -3580,7 +3580,7 @@ const message = {
             masterBackup: '主節點備份',
             backupNode: '備份節點',
             backupFrequency: '備份頻率（小時）',
-            backupCopies: '備份記錄保留份數',
+            backupCopies: '備份份數',
             noBackupNode: '目前備份節點為空，請選擇備份節點儲存後重試',
             masterBackupAlert:
                 '目前未設定主節點備份，為保障資料安全，請盡快設定備份節點，便於主節點故障時可人工切換新主節點。',

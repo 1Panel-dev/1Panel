@@ -76,6 +76,7 @@ import { Rules } from '@/global/form-rules';
 import { createAgentAccount, getAgentProviders, updateAgentAccount } from '@/api/modules/ai';
 import i18n from '@/lang';
 import { getAgentProviderDisplayName } from '@/utils/agent';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
 const emit = defineEmits(['search']);
 
@@ -85,6 +86,7 @@ const providerOptions = ref<Array<{ label: string; value: string }>>([]);
 const providerBaseURL = ref<Record<string, string>>({});
 const loading = ref(false);
 const editableBaseURLProviders = ['ollama', 'custom', 'zai'];
+const { isIntl } = useGlobalStore();
 
 const form = reactive({
     id: 0,
@@ -225,11 +227,13 @@ const openDrawer = async (params?: OpenParams) => {
 const loadProviders = async () => {
     const res = await getAgentProviders();
     const data = res.data || [];
-    providerOptions.value = data.map((item) => ({
+    const blockedProviders = new Set(['ark-coding-plan', 'bailian-coding-plan']);
+    const filteredData = isIntl.value ? data.filter((item) => !blockedProviders.has(item.provider)) : data;
+    providerOptions.value = filteredData.map((item) => ({
         value: item.provider,
         label: getAgentProviderDisplayName(item.provider, item.displayName),
     }));
-    providerBaseURL.value = data.reduce((acc, item) => {
+    providerBaseURL.value = filteredData.reduce((acc, item) => {
         acc[item.provider] = item.baseUrl || '';
         return acc;
     }, {} as Record<string, string>);

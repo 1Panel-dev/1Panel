@@ -106,7 +106,8 @@ const toLxware = () => {
 };
 
 const to1Panel = () => {
-    window.open('https://1panel.cn', '_blank', 'noopener,noreferrer');
+    let url = globalStore.isIntl ? 'https://1panel.pro' : 'https://1panel.cn';
+    window.open(url, '_blank', 'noopener,noreferrer');
 };
 
 const toDoc = () => {
@@ -117,7 +118,7 @@ const toForum = () => {
     let url = globalStore.isIntl
         ? 'https://github.com/1Panel-dev/1Panel/discussions'
         : 'https://bbs.fit2cloud.com/c/1p/7';
-    window.open(url, '_blank');
+    window.open(url, '_blank', 'noopener,noreferrer');
 };
 
 const toGithub = () => {

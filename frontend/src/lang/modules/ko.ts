@@ -2108,7 +2108,7 @@ const message = {
 
         about: '정보',
         versionItem: '현재 버전',
-        backupCopies: '보관할 백업 복사본 수',
+        backupCopies: '백업 수',
         backupCopiesHelper:
             '버전 롤백을 위해 보관할 업그레이드 백업 복사본 수를 설정합니다. 0은 모두 보관을 의미합니다.',
         backupCopiesRule: '최소 3개의 업그레이드 백업 기록을 보관하세요',
@@ -3708,7 +3708,7 @@ const message = {
             masterBackup: '마스터 노드 백업',
             backupNode: '백업 노드',
             backupFrequency: '백업 주기(시간)',
-            backupCopies: '백업 기록 보관 수',
+            backupCopies: '백업 수',
             noBackupNode: '현재 백업 노드가 비어 있습니다. 저장할 백업 노드를 선택한 후 다시 시도하십시오!',
             masterBackupAlert:
                 '현재 마스터 노드 백업이 구성되지 않았습니다. 데이터 보안을 위해 장애 시 새로운 마스터 노드로 수동 전환이 가능하도록 가능한 빨리 백업 노드를 설정하십시오.',

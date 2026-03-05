@@ -2032,7 +2032,7 @@ const message = {
 
         about: '关于',
         versionItem: '当前版本',
-        backupCopies: '保留份数',
+        backupCopies: '备份份数',
         backupCopiesHelper: '设置用于版本回滚的升级备份保留份数，为 0 则保留所有。',
         backupCopiesRule: '请至少保存 3 份升级备份记录',
         release: '版本更新日志',
@@ -3534,7 +3534,7 @@ const message = {
             masterBackup: '主节点备份',
             backupNode: '备份节点',
             backupFrequency: '备份频率（小时）',
-            backupCopies: '备份记录保留份数',
+            backupCopies: '备份份数',
             noBackupNode: '当前备份节点为空，请选择备份节点保存后重试！',
             masterBackupAlert:
                 '当前未配置主节点备份，为保障数据安全，请尽快设置备份节点，便于主节点故障时可人工切换新主节点。',
