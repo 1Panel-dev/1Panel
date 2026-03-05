@@ -2203,7 +2203,7 @@ const message = {
 
         about: 'Mengenai',
         versionItem: 'Versi Semasa',
-        backupCopies: 'Bilangan Salinan untuk Disimpan',
+        backupCopies: 'Salinan Sandaran',
         backupCopiesHelper:
             'Tetapkan bilangan salinan sandaran naik taraf untuk disimpan untuk pemulihan versi. 0 bermakna simpan semua.',
         backupCopiesRule: 'Sila simpan sekurang-kurangnya 3 rekod sandaran naik taraf',
@@ -3848,7 +3848,7 @@ const message = {
             masterBackup: 'Sandaran Nod Master',
             backupNode: 'Nod Sandaran',
             backupFrequency: 'Kekerapan Sandaran (jam)',
-            backupCopies: 'Bilangan salinan sandaran yang disimpan',
+            backupCopies: 'Salinan Sandaran',
             noBackupNode: 'Nod sandaran kosong. Sila pilih nod sandaran untuk disimpan dan cuba lagi!',
             masterBackupAlert:
                 'Sandaran nod master belum dikonfigurasikan. Untuk memastikan keselamatan data, sila sediakan nod sandaran secepat mungkin untuk memudahkan pertukaran manual ke nod master baru sekiranya berlaku kegagalan.',

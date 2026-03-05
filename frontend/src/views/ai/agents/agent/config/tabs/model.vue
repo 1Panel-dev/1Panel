@@ -35,6 +35,7 @@ import { AI } from '@/api/interface/ai';
 import { getAgentProviders, pageAgentAccounts, updateAgentModelConfig } from '@/api/modules/ai';
 import { Rules } from '@/global/form-rules';
 import { MsgSuccess } from '@/utils/message';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
 const emit = defineEmits(['updated']);
 const { t } = useI18n();
@@ -42,6 +43,8 @@ const { t } = useI18n();
 const loading = ref(false);
 const saving = ref(false);
 const formRef = ref<FormInstance>();
+const { isIntl } = useGlobalStore();
+const blockedProviders = new Set(['ark-coding-plan', 'bailian-coding-plan']);
 
 const agentId = ref(0);
 const providerModels = ref<Record<string, AI.ProviderModelInfo[]>>({});
@@ -81,7 +84,8 @@ const loadProviders = async () => {
     }
     const res = await getAgentProviders();
     const data = res.data || [];
-    providerModels.value = data.reduce((acc, item) => {
+    const filteredData = isIntl.value ? data.filter((item) => !blockedProviders.has(item.provider)) : data;
+    providerModels.value = filteredData.reduce((acc, item) => {
         acc[item.provider] = item.models || [];
         return acc;
     }, {} as Record<string, AI.ProviderModelInfo[]>);
@@ -94,7 +98,8 @@ const loadAccounts = async () => {
         provider: '',
         name: '',
     });
-    accountOptions.value = res.data.items || [];
+    const items = res.data.items || [];
+    accountOptions.value = isIntl.value ? items.filter((item) => !blockedProviders.has(item.provider)) : items;
 };
 
 const setModelsByProvider = (provider: string) => {

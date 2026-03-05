@@ -2223,7 +2223,7 @@ const message = {
 
         about: 'Acerca de',
         versionItem: 'Versión Actual',
-        backupCopies: 'Número de Copias a Conservar',
+        backupCopies: 'Copias de Respaldo',
         backupCopiesHelper:
             'Establezca el número de copias de respaldo de actualización para conservar para la reversión de versión. 0 significa conservar todas.',
         backupCopiesRule: 'Conserve al menos 3 registros de respaldo de actualización',
@@ -3843,7 +3843,7 @@ const message = {
             masterBackup: 'Respaldo del Nodo Principal',
             backupNode: 'Nodo de Respaldo',
             backupFrequency: 'Frecuencia de Respaldo (horas)',
-            backupCopies: 'Copias de Retención de Respaldo',
+            backupCopies: 'Copias de Respaldo',
             noBackupNode: 'Actualmente no hay nodo de respaldo configurado. Selecciona uno y vuelve a intentarlo.',
             masterBackupAlert:
                 'No se ha configurado un respaldo del nodo principal. Para garantizar la seguridad de los datos, configura un nodo de respaldo lo antes posible y así facilitar el cambio manual en caso de fallo.',

@@ -2192,7 +2192,7 @@ const message = {
 
         about: 'Sobre',
         versionItem: 'Versão Atual',
-        backupCopies: 'Número de Cópias a Manter',
+        backupCopies: 'Cópias de Backup',
         backupCopiesHelper:
             'Defina o número de cópias de backup de atualização para manter para reversão de versão. 0 significa manter todas.',
         backupCopiesRule: 'Mantenha pelo menos 3 registros de backup de atualização',
@@ -3867,7 +3867,7 @@ const message = {
             masterBackup: 'Backup do Nó Mestre',
             backupNode: 'Nó de Backup',
             backupFrequency: 'Frequência de Backup (horas)',
-            backupCopies: 'Número de cópias de backup a reter',
+            backupCopies: 'Cópias de Backup',
             noBackupNode:
                 'O nó de backup está vazio atualmente. Selecione um nó de backup para salvar e tente novamente!',
             masterBackupAlert:

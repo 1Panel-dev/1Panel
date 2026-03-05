@@ -2228,7 +2228,7 @@ const message = {
 
         about: 'Hakkında',
         versionItem: 'Mevcut Sürüm',
-        backupCopies: 'Saklanacak Kopya Sayısı',
+        backupCopies: 'Yedek Kopya',
         backupCopiesHelper:
             'Sürüm geri alma için saklanacak yükseltme yedek kopya sayısını ayarlayın. 0, tümünü sakla anlamına gelir.',
         backupCopiesRule: 'Lütfen en az 3 yükseltme yedek kaydı saklayın',
@@ -3911,7 +3911,7 @@ const message = {
             masterBackup: 'Ana Düğüm Yedekleme',
             backupNode: 'Yedek Düğüm',
             backupFrequency: 'Yedekleme Sıklığı (saat)',
-            backupCopies: 'Saklanacak yedek kopya sayısı',
+            backupCopies: 'Yedek Kopya',
             noBackupNode: 'Yedek düğüm şu anda boş. Lütfen kaydetmek için bir yedek düğüm seçin ve tekrar deneyin!',
             masterBackupAlert:
                 'Ana düğüm yedeklemesi şu anda yapılandırılmamış. Veri güvenliği için, lütfen arıza durumunda yeni bir ana düğüme manuel geçiş yapabilmek amacıyla en kısa sürede bir yedek düğüm ayarlayın.',

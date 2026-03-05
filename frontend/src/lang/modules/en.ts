@@ -2196,7 +2196,7 @@ const message = {
 
         about: 'About',
         versionItem: 'Current Version',
-        backupCopies: 'Number of Copies to Keep',
+        backupCopies: 'Backup Copies',
         backupCopiesHelper: 'Set the number of upgrade backup copies to keep for version rollback. 0 means keep all.',
         backupCopiesRule: 'Please keep at least 3 upgrade backup records',
         release: 'Release Notes',
@@ -3858,7 +3858,7 @@ const message = {
             masterBackup: 'Master Node Backup',
             backupNode: 'Backup Node',
             backupFrequency: 'Backup Frequency (hours)',
-            backupCopies: 'Backup Retention Copies',
+            backupCopies: 'Backup Copies',
             noBackupNode: 'The backup node is currently empty. Select a backup node to save and try again!',
             masterBackupAlert:
                 'Master node backup is not currently configured. To ensure data security, please set up a backup node as soon as possible to facilitate manual switching to a new master node in case of failure.',

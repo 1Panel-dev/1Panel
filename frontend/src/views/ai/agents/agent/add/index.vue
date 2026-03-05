@@ -108,6 +108,7 @@ import { getAgentProviderDisplayName } from '@/utils/agent';
 import { App } from '@/api/interface/app';
 import AdvancedSetting from '@/components/advanced-setting/index.vue';
 import AccountAddDialog from '@/views/ai/agents/model/add/index.vue';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
 const emit = defineEmits(['search', 'task']);
 
@@ -121,6 +122,7 @@ const providerAccountCount = ref<Record<string, number>>({});
 const manualModel = ref(false);
 const appInfo = ref<App.AppDTO>();
 const accountAddRef = ref();
+const { isIntl } = useGlobalStore();
 
 const form = reactive({
     name: '',
@@ -215,11 +217,13 @@ const loadProviders = async () => {
     }
     const res = await getAgentProviders();
     const data = res.data || [];
-    providerOptions.value = data.map((item) => ({
+    const blockedProviders = new Set(['ark-coding-plan', 'bailian-coding-plan']);
+    const filteredData = isIntl.value ? data.filter((item) => !blockedProviders.has(item.provider)) : data;
+    providerOptions.value = filteredData.map((item) => ({
         value: item.provider,
         label: getAgentProviderDisplayName(item.provider, item.displayName),
     }));
-    providerModels.value = data.reduce((acc, item) => {
+    providerModels.value = filteredData.reduce((acc, item) => {
         acc[item.provider] = item.models || [];
         return acc;
     }, {} as Record<string, AI.ProviderModelInfo[]>);

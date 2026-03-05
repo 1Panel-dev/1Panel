@@ -287,7 +287,11 @@ type noteDetailHelper struct {
 
 func (u *UpgradeService) LoadRelease() ([]dto.ReleasesNotes, error) {
 	var notes []dto.ReleasesNotes
-	resp, err := req_helper.HandleGet("https://1panel.cn/docs/v2/search/search_index.json")
+	url := "https://docs.1panel.pro/v2/search/search_index.json"
+	if global.CONF.Base.Edition != "intl" {
+		url = "https://1panel.cn/docs/v2/search/search_index.json"
+	}
+	resp, err := req_helper.HandleGet(url)
 	if err != nil {
 		return notes, err
 	}
@@ -321,13 +325,13 @@ func analyzeDoc(version, content string) dto.ReleasesNotes {
 	}
 	item.CreatedAt = strings.ReplaceAll(strings.TrimSpace(parts[1]), "</p>", "")
 	for i := 1; i < len(parts); i++ {
-		if strings.Contains(parts[i], "问题修复") {
+		if strings.Contains(parts[i], "问题修复") || strings.Contains(parts[i], "Bug Fixes") {
 			item.FixCount = strings.Count(parts[i], "<li>")
 		}
-		if strings.Contains(parts[i], "新增功能") {
+		if strings.Contains(parts[i], "新增功能") || strings.Contains(parts[i], "New Features") {
 			item.NewCount = strings.Count(parts[i], "<li>")
 		}
-		if strings.Contains(parts[i], "功能优化") {
+		if strings.Contains(parts[i], "功能优化") || strings.Contains(parts[i], "Improvements") {
 			item.OptimizationCount = strings.Count(parts[i], "<li>")
 		}
 	}
