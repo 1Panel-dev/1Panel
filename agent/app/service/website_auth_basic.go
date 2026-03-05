@@ -15,7 +15,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/cmd/server/nginx_conf"
 	"github.com/1Panel-dev/1Panel/agent/constant"
-	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/1Panel-dev/1Panel/agent/utils/nginx"
 	"github.com/1Panel-dev/1Panel/agent/utils/nginx/components"
@@ -295,12 +294,7 @@ func (w WebsiteService) UpdatePathAuthBasic(req request.NginxPathAuthUpdate) err
 	config.FilePath = confPath
 	directives := config.Directives
 	location, _ := directives[0].(*components.Location)
-	safePass, err := nginx.NginxSafeString(fmt.Sprintf("/www/sites/%s/path_auth/pass/%s", website.Alias, fmt.Sprintf("%s.pass", req.Name)), nginx.ModePath)
-	if err != nil {
-		global.LOG.Errorf("invalid auth_basic_user_file path, err: %v", err)
-		return err
-	}
-	location.UpdateDirective("auth_basic_user_file", []string{safePass})
+	location.UpdateDirective("auth_basic_user_file", []string{fmt.Sprintf("/www/sites/%s/path_auth/pass/%s", website.Alias, fmt.Sprintf("%s.pass", req.Name))})
 	location.ChangePath("~*", fmt.Sprintf("^%s", req.Path))
 	var passwdHash []byte
 	passwdHash, err = bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)

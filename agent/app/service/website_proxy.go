@@ -27,15 +27,15 @@ func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error)
 	switch req.Operate {
 	case "delete":
 		return w.DeleteProxy(request.WebsiteProxyDel{
-			ID: req.ID,
+			ID:   req.ID,
 			Name: req.Name,
 		})
 	case "disable":
 		fallthrough
 	case "enable":
 		return w.UpdateProxyStatus(request.WebsiteProxyStatusUpdate{
-			ID: req.ID,
-			Name: req.Name,
+			ID:     req.ID,
+			Name:   req.Name,
 			Status: req.Operate,
 		})
 	}
@@ -114,16 +114,8 @@ func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error)
 		err = errors.New("invalid proxy config, no location found")
 		return
 	}
-	safePass, err := nginx.NginxSafeString(req.ProxyPass, nginx.ModeURL)
-	if err != nil {
-		return err
-	}
-	safeHeader, err := nginx.NginxSafeString(req.ProxyHost, nginx.ModeHost)
-	if err != nil {
-		return err
-	}
-	location.UpdateDirective("proxy_pass", []string{safePass})
-	location.UpdateDirective("proxy_set_header", []string{"Host", safeHeader})
+	location.UpdateDirective("proxy_pass", []string{req.ProxyPass})
+	location.UpdateDirective("proxy_set_header", []string{"Host", req.ProxyHost})
 	location.ChangePath(req.Modifier, req.Match)
 	// Server Cache Settings
 	if req.Cache {
@@ -162,26 +154,14 @@ func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error)
 	}
 	// CORS Settings
 	if req.Cors {
-		safeAllowOrigins, err := nginx.NginxSafeString(req.AllowOrigins, nginx.ModeGeneric)
-		if err != nil {
-			return err
-		}
-		location.UpdateDirective("add_header", []string{"Access-Control-Allow-Origin", safeAllowOrigins, "always"})
+		location.UpdateDirective("add_header", []string{"Access-Control-Allow-Origin", req.AllowOrigins, "always"})
 		if req.AllowMethods != "" {
-			safeAllowMethods, err := nginx.NginxSafeString(req.AllowMethods, nginx.ModeAllowMethods)
-			if err != nil {
-				return err
-			}
-			location.UpdateDirective("add_header", []string{"Access-Control-Allow-Methods", safeAllowMethods, "always"})
+			location.UpdateDirective("add_header", []string{"Access-Control-Allow-Methods", req.AllowMethods, "always"})
 		} else {
 			location.RemoveDirective("add_header", []string{"Access-Control-Allow-Methods"})
 		}
 		if req.AllowHeaders != "" {
-			safeAllowHeaders, err := nginx.NginxSafeString(req.AllowHeaders, nginx.ModeGeneric)
-			if err != nil {
-				return err
-			}
-			location.UpdateDirective("add_header", []string{"Access-Control-Allow-Headers", safeAllowHeaders, "always"})
+			location.UpdateDirective("add_header", []string{"Access-Control-Allow-Headers", req.AllowHeaders, "always"})
 		} else {
 			location.RemoveDirective("add_header", []string{"Access-Control-Allow-Headers"})
 		}

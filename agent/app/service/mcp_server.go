@@ -459,12 +459,7 @@ func addProxy(server *model.McpServer) {
 	} else {
 		proxyPath = server.StreamableHttpPath
 	}
-	safePass, err := nginx.NginxSafeString(fmt.Sprintf("http://127.0.0.1:%d%s", server.Port, proxyPath), nginx.ModeURL)
-	if err != nil {
-		global.LOG.Errorf("mcp add proxy failed, err: %v", err)
-		return
-	}
-	location.UpdateDirective("proxy_pass", []string{safePass})
+	location.UpdateDirective("proxy_pass", []string{fmt.Sprintf("http://127.0.0.1:%d%s", server.Port, proxyPath)})
 	location.ChangePath("^~", proxyPath)
 	if err = nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
 		global.LOG.Errorf("write config failed, err: %v", buserr.WithErr("ErrUpdateBuWebsite", err))
@@ -522,12 +517,7 @@ func addMCPProxy(websiteID uint) error {
 		} else {
 			proxyPath = server.StreamableHttpPath
 		}
-		safePass, err := nginx.NginxSafeString(fmt.Sprintf("http://127.0.0.1:%d%s", server.Port, proxyPath), nginx.ModeURL)
-		if err != nil {
-			global.LOG.Errorf("mcp add proxy failed, err: %v", err)
-			return err
-		}
-		location.UpdateDirective("proxy_pass", []string{safePass})
+		location.UpdateDirective("proxy_pass", []string{fmt.Sprintf("http://127.0.0.1:%d%s", server.Port, proxyPath)})
 		location.ChangePath("^~", proxyPath)
 		if err = nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
 			return buserr.WithErr("ErrUpdateBuWebsite", err)
