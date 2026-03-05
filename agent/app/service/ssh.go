@@ -1,18 +1,23 @@
 package service
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
+	stdErrors "errors"
 	"fmt"
 	"net"
 	"os"
+	"os/exec"
 	"os/user"
 	"path"
+	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
 	"time"
+	"unsafe"
 
 	"github.com/1Panel-dev/1Panel/agent/utils/controller"
 	"github.com/1Panel-dev/1Panel/agent/utils/copier"
@@ -20,6 +25,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
 	"github.com/1Panel-dev/1Panel/agent/utils/geo"
 	"github.com/gin-gonic/gin"
+	"github.com/google/shlex"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
@@ -33,6 +39,8 @@ import (
 )
 
 const sshPath = "/etc/ssh/sshd_config"
+
+var errNotFoundSSHD = errors.New("Not found sshd")
 
 type SSHService struct{}
 
@@ -68,17 +76,18 @@ func (u *SSHService) GetSSHInfo() (*dto.SSHInfo, error) {
 		PasswordAuthentication: "yes",
 		PubkeyAuthentication:   "yes",
 		PermitRootLogin:        "yes",
-		UseDNS:                 "yes",
+		UseDNS:                 "no",
 	}
+	var msgArr []string
 	serviceName, err := loadServiceName()
 	if err != nil {
 		data.IsExist = false
-		data.Message = err.Error()
+		msgArr = append(msgArr, err.Error())
 	} else {
 		active, err := controller.CheckActive(serviceName)
 		data.IsActive = active
 		if !active && err != nil {
-			data.Message = err.Error()
+			msgArr = append(msgArr, err.Error())
 		}
 	}
 
@@ -89,35 +98,45 @@ func (u *SSHService) GetSSHInfo() (*dto.SSHInfo, error) {
 		data.AutoStart = enable
 	}
 
-	sshConf, err := os.ReadFile(sshPath)
+	sshConf, err := loadSSHConf()
 	if err != nil {
-		data.Message = err.Error()
-		data.IsActive = false
+		msgArr = append(msgArr, err.Error())
 	}
-	lines := strings.Split(string(sshConf), "\n")
-	for _, line := range lines {
-		if strings.HasPrefix(line, "Port ") {
-			data.Port = strings.ReplaceAll(line, "Port ", "")
+	uniqueSet := make(map[string]struct{})
+	getUnique := func(line []byte, kw string, val *string) (ok bool) {
+		if _, ok = uniqueSet[kw]; ok {
+			return false
 		}
-		if strings.HasPrefix(line, "ListenAddress ") {
-			itemAddr := strings.ReplaceAll(line, "ListenAddress ", "")
-			if len(data.ListenAddress) != 0 {
-				data.ListenAddress += ("," + itemAddr)
+		v, ok := getSSHConfStringValue(line, kw)
+		if ok {
+			*val = strings.ToLower(v)
+		}
+		return ok
+	}
+	getMultiple := func(line []byte, kw string, val *string) (ok bool) {
+		v, ok := getSSHConfStringValue(line, kw)
+		if ok {
+			if len(*val) != 0 {
+				*val += ("," + v)
 			} else {
-				data.ListenAddress = itemAddr
+				*val = v
 			}
 		}
-		if strings.HasPrefix(line, "PasswordAuthentication ") {
-			data.PasswordAuthentication = strings.ReplaceAll(line, "PasswordAuthentication ", "")
-		}
-		if strings.HasPrefix(line, "PubkeyAuthentication ") {
-			data.PubkeyAuthentication = strings.ReplaceAll(line, "PubkeyAuthentication ", "")
-		}
-		if strings.HasPrefix(line, "PermitRootLogin ") {
-			data.PermitRootLogin = strings.ReplaceAll(strings.ReplaceAll(line, "PermitRootLogin ", ""), "prohibit-password", "without-password")
-		}
-		if strings.HasPrefix(line, "UseDNS ") {
-			data.UseDNS = strings.ReplaceAll(line, "UseDNS ", "")
+		return ok
+	}
+	scanner := bufio.NewScanner(bytes.NewReader(sshConf))
+	for scanner.Scan() {
+		line := scanner.Bytes()
+		switch {
+		case getUnique(line, "Port", &data.Port):
+		case getMultiple(line, "ListenAddress", &data.ListenAddress):
+		case getUnique(line, "PasswordAuthentication", &data.PasswordAuthentication):
+		case getUnique(line, "PubkeyAuthentication", &data.PubkeyAuthentication):
+		case getUnique(line, "PermitRootLogin", &data.PermitRootLogin):
+			if data.PermitRootLogin == "prohibit-password" {
+				data.PermitRootLogin = "without-password"
+			}
+		case getUnique(line, "UseDNS", &data.UseDNS):
 		}
 	}
 
@@ -127,6 +146,8 @@ func (u *SSHService) GetSSHInfo() (*dto.SSHInfo, error) {
 	} else {
 		data.CurrentUser = currentUser.Name
 	}
+
+	data.Message = strings.Join(msgArr, "\u200b\n\u200b")
 
 	return &data, nil
 }
@@ -927,19 +948,142 @@ func updateSSHSocketFile(newPort string) error {
 	return nil
 }
 
+func getSSHConfValue(line []byte, kw string) (v []byte, ok bool) {
+	i := 0
+	n := len(line)
+	skipWhiteSpace := func() bool {
+		for i < n {
+			c := line[i]
+			if c == ' ' || c == '\t' {
+				i++
+				continue
+			}
+			break
+		}
+		return i >= n
+	}
+	if skipWhiteSpace() {
+		return nil, false
+	}
+	kwLen := len(kw)
+	end := i + kwLen
+	if end >= n {
+		return nil, false
+	}
+	arr1 := line[i:end]
+	arr2 := unsafe.Slice(unsafe.StringData(kw), kwLen)
+	if !bytes.EqualFold(arr1, arr2) {
+		return nil, false
+	}
+	i = end
+	if skipWhiteSpace() {
+		return nil, false
+	}
+	if line[i] == '=' {
+		i++
+		if i >= n {
+			return nil, false
+		}
+		if skipWhiteSpace() {
+			return nil, false
+		}
+	}
+	return line[i:], true
+}
+
+func getSSHConfStringValue(line []byte, kw string) (val string, ok bool) {
+	data, ok := getSSHConfValue(line, kw)
+	if ok {
+		val = string(data)
+	}
+	return
+}
+
+func scanSSHConf(bb *bytes.Buffer, pathSet map[string]struct{}, confPath string) error {
+	_, ok := pathSet[confPath]
+	if ok {
+		return nil
+	}
+	pathSet[confPath] = struct{}{}
+	data, err := os.ReadFile(confPath)
+	if err != nil {
+		if len(pathSet) == 1 {
+			return err
+		}
+	}
+	scanner := bufio.NewScanner(bytes.NewReader(data))
+	for scanner.Scan() {
+		line := scanner.Bytes()
+		if argsStr, ok := getSSHConfStringValue(line, "Include"); ok {
+			args, err := shlex.Split(argsStr)
+			if err != nil {
+				continue
+			}
+			for _, arg := range args {
+				files, err := filepath.Glob(arg)
+				if err != nil {
+					continue
+				}
+				for _, file := range files {
+					_ = scanSSHConf(bb, pathSet, file)
+				}
+			}
+		}
+		bb.Write(line)
+		bb.WriteByte('\n')
+	}
+	return nil
+}
+
+func loadSSHConfFromFile() ([]byte, error) {
+	var bb bytes.Buffer
+	pathSet := make(map[string]struct{})
+	err := scanSSHConf(&bb, pathSet, sshPath)
+	if err != nil {
+		return nil, err
+	}
+	return bb.Bytes(), nil
+}
+
+func loadSSHConfFromCmd() ([]byte, error) {
+	bin, err := exec.LookPath("sshd")
+	if err != nil {
+		return nil, errNotFoundSSHD
+	}
+	cmd := exec.Command(bin, "-T")
+	data, err := cmd.CombinedOutput()
+	if err != nil {
+		return nil, fmt.Errorf("execute command failed\n> %s -T\n%s\n%w",
+			bin, string(data), err)
+	}
+	return data, nil
+}
+
+func loadSSHConf() ([]byte, error) {
+	var err2 error
+	conf, err := loadSSHConfFromCmd()
+	if err != nil {
+		if errors.Is(err, errNotFoundSSHD) {
+			err = nil
+		}
+		conf, err2 = loadSSHConfFromFile()
+	}
+	return conf, stdErrors.Join(err, err2)
+}
+
 func loadSSHPort() string {
 	port := "22"
-	sshConf, err := os.ReadFile(sshPath)
+	sshConf, err := loadSSHConf()
 	if err != nil {
 		return port
 	}
-	lines := strings.Split(string(sshConf), "\n")
-	for _, line := range lines {
-		if strings.HasPrefix(line, "Port ") {
-			portStr := strings.ReplaceAll(line, "Port ", "")
-			portItem, _ := strconv.Atoi(portStr)
+	scanner := bufio.NewScanner(bytes.NewReader(sshConf))
+	for scanner.Scan() {
+		line := scanner.Bytes()
+		if v, ok := getSSHConfStringValue(line, "Port"); ok {
+			portItem, _ := strconv.Atoi(v)
 			if portItem > 0 && portItem < 65535 {
-				return portStr
+				return v
 			}
 		}
 	}

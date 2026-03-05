@@ -7,7 +7,7 @@
                 <div class="flex w-full flex-col gap-4 md:flex-row">
                     <div class="flex flex-wrap gap-4 ml-3">
                         <el-tag class="float-left" effect="dark" type="success">SSH</el-tag>
-                        <Status class="mt-0.5" :status="form.isActive ? 'enable' : 'disable'" :msg="form.message" />
+                        <Status class="mt-0.5" :status="form.isActive ? 'enable' : 'disable'" />
                     </div>
                     <div class="mt-0.5">
                         <el-button v-if="form.isActive" type="primary" @click="onOperate('stop')" link>
@@ -32,6 +32,26 @@
                             @change="onOperate(autoStart)"
                             v-model="autoStart"
                         />
+                    </div>
+                    <div class="ml-5" v-if="form.message">
+                        <el-tooltip>
+                            <template #content>
+                                <el-scrollbar max-height="50vh" style="max-width: 90vw">
+                                    <template v-for="(msg, index) in form.message.split('\u200b\n\u200b')" :key="index">
+                                        <hr v-if="index != 0" />
+                                        <pre>{{ msg }}</pre>
+                                    </template>
+                                </el-scrollbar>
+                            </template>
+                            <el-alert
+                                :title="$t('commons.msg.infoTitle')"
+                                :closable="false"
+                                center
+                                type="warning"
+                                show-icon
+                                class="h-6"
+                            />
+                        </el-tooltip>
                     </div>
                 </div>
             </el-card>
@@ -310,6 +330,7 @@ const changeMode = async () => {
 const search = async () => {
     const res = await getSSHInfo();
     form.isActive = res.data.isActive;
+    form.message = res.data.message;
     form.port = Number(res.data.port);
     autoStart.value = res.data.autoStart ? 'enable' : 'disable';
     form.listenAddress = res.data.listenAddress;
