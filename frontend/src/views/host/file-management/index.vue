@@ -425,31 +425,13 @@
                                 </el-tooltip>
                             </el-button-group>
                             <div class="flex items-center gap-2">
-                                <el-dropdown trigger="click">
-                                    <el-button plain>
-                                        {{ $t('file.columnSetting') }}
-                                    </el-button>
-                                    <template #dropdown>
-                                        <el-dropdown-menu>
-                                            <div class="column-setting-menu">
-                                                <div class="column-setting-title">
-                                                    {{ $t('file.showColumns') }}
-                                                </div>
-                                                <el-dropdown-item v-for="column in hideableColumns" :key="column.key">
-                                                    <div class="column-setting-item">
-                                                        <el-checkbox
-                                                            :model-value="isColumnVisible(column.key)"
-                                                            @click.stop
-                                                            @change="() => toggleColumn(column.key)"
-                                                        >
-                                                            {{ getColumnLabel(column.key) }}
-                                                        </el-checkbox>
-                                                    </div>
-                                                </el-dropdown-item>
-                                            </div>
-                                        </el-dropdown-menu>
-                                    </template>
-                                </el-dropdown>
+                                <fu-table-column-select
+                                    :columns="columns"
+                                    trigger="hover"
+                                    :title="$t('commons.table.selectColumn')"
+                                    popper-class="popper-class"
+                                    :only-icon="true"
+                                />
                                 <div class="w-80">
                                     <el-input
                                         v-model="req.search"
@@ -483,6 +465,8 @@
                             @cell-mouse-leave="hideFavorite"
                             :heightDiff="heightDiff"
                             :right-buttons="rightButtons"
+                            :columns="columns"
+                            localKey="fileManagementColumn"
                         >
                             <el-table-column type="selection" width="30" />
                             <el-table-column
@@ -757,8 +741,10 @@ interface FilePaths {
 type FileColumnKey = 'mode' | 'size' | 'modTime' | 'remark';
 
 interface FileColumnConfig {
-    key: FileColumnKey;
-    defaultVisible: boolean;
+    label: string;
+    show: boolean;
+    fix?: boolean;
+    value: FileColumnKey;
 }
 
 const router = useRouter();
@@ -770,7 +756,6 @@ const dropdownMaxHeight = ref(450);
 const baseDir = ref();
 const remarkRequestId = ref(0);
 const remarkLoadTimer = ref<number | null>(null);
-const FILE_VISIBLE_COLUMNS_KEY = 'file-management-visible-columns';
 const editableTabsKey = ref('');
 const editableTabs = ref([
     { id: '1', name: getLastPath(baseDir.value), path: baseDir.value },
@@ -880,22 +865,12 @@ const setRenameRef = (key: string, el: any) => {
 const getCurrentRename = () => renameRefs.value[editableTabsKey.value];
 
 const pathRefs = ref<Record<string, any>>({});
-const fileColumns: FileColumnConfig[] = [
-    { key: 'mode', defaultVisible: true },
-    { key: 'size', defaultVisible: true },
-    { key: 'modTime', defaultVisible: true },
-    { key: 'remark', defaultVisible: true },
-];
-const visibleColumnKeys = ref<FileColumnKey[]>(
-    fileColumns.filter((column) => column.defaultVisible).map((column) => column.key),
-);
-const hideableColumns = computed(() => fileColumns);
-const columnLabelMap: Record<FileColumnKey, () => string> = {
-    mode: () => i18n.global.t('file.mode'),
-    size: () => i18n.global.t('file.size'),
-    modTime: () => i18n.global.t('file.updateTime'),
-    remark: () => i18n.global.t('file.remark'),
-};
+const columns = ref<FileColumnConfig[]>([
+    { label: i18n.global.t('file.mode'), value: 'mode', show: true },
+    { label: i18n.global.t('file.size'), value: 'size', show: true },
+    { label: i18n.global.t('file.updateTime'), value: 'modTime', show: true },
+    { label: i18n.global.t('file.remark'), value: 'remark', show: true },
+]);
 
 const setPathRef = (key: string, el: any) => {
     if (el) {
@@ -903,40 +878,7 @@ const setPathRef = (key: string, el: any) => {
     }
 };
 const getCurrentPath = () => pathRefs.value[editableTabsKey.value];
-const getColumnLabel = (key: FileColumnKey) => columnLabelMap[key]();
-const isColumnVisible = (key: FileColumnKey) => visibleColumnKeys.value.includes(key);
-
-const getDefaultVisibleColumns = () =>
-    fileColumns.filter((column) => column.defaultVisible).map((column) => column.key);
-
-const persistVisibleColumns = () => {
-    localStorage.setItem(FILE_VISIBLE_COLUMNS_KEY, JSON.stringify(visibleColumnKeys.value));
-};
-
-const loadVisibleColumns = () => {
-    const raw = localStorage.getItem(FILE_VISIBLE_COLUMNS_KEY);
-    if (!raw) {
-        visibleColumnKeys.value = getDefaultVisibleColumns();
-        return;
-    }
-    try {
-        const saved = JSON.parse(raw);
-        visibleColumnKeys.value = fileColumns
-            .filter((column) => column.defaultVisible || (Array.isArray(saved) && saved.includes(column.key)))
-            .map((column) => column.key);
-    } catch (error) {
-        visibleColumnKeys.value = getDefaultVisibleColumns();
-    }
-};
-
-const toggleColumn = (key: FileColumnKey) => {
-    if (isColumnVisible(key)) {
-        visibleColumnKeys.value = visibleColumnKeys.value.filter((columnKey) => columnKey !== key);
-    } else {
-        visibleColumnKeys.value = [...visibleColumnKeys.value, key];
-    }
-    persistVisibleColumns();
-};
+const isColumnVisible = (key: FileColumnKey) => columns.value.find((column) => column.value === key)?.show !== false;
 
 const { searchableStatus, searchablePath, setSearchableInputRef, searchableInputBlur } = useMultipleSearchable(paths);
 
@@ -2164,7 +2106,6 @@ onMounted(async () => {
     updateHeight();
     window.addEventListener('resize', updateHeight);
     initShowHidden();
-    loadVisibleColumns();
     initTabsAndPaths();
     await getHostMount();
     initHistory();
@@ -2260,17 +2201,6 @@ onBeforeUnmount(() => {
 }
 .table-input {
     --el-input-inner-height: 22px !important;
-}
-.column-setting-menu {
-    padding: 4px 0;
-}
-.column-setting-title {
-    padding: 4px 16px 8px;
-    color: var(--el-text-color-secondary);
-    font-size: 12px;
-}
-.column-setting-item {
-    width: 100%;
 }
 :deep(.file-tabs .el-tabs__nav .el-tabs__item:last-child) {
     border-bottom: 1px solid var(--el-border-color-light) !important;
