@@ -1560,6 +1560,8 @@ const message = {
         remarkPlaceholder: '비고',
         remarkToggle: '비고',
         remarkToggleTip: '파일 비고 로드',
+        columnSetting: '열 설정',
+        showColumns: '표시 열',
         canNotDeCompress: '이 파일은 압축 해제할 수 없습니다',
         uploadSuccess: '업로드 성공',
         downloadProcess: '다운로드 진행률',

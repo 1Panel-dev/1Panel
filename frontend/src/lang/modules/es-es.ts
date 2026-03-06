@@ -1618,6 +1618,8 @@ const message = {
         remarkPlaceholder: 'Observación',
         remarkToggle: 'Notas',
         remarkToggleTip: 'Cargar notas del archivo',
+        columnSetting: 'Columnas',
+        showColumns: 'Mostrar columnas',
         canNotDeCompress: 'No se puede descomprimir este archivo',
         uploadSuccess: 'Carga completada correctamente',
         downloadProcess: 'Progreso de descarga',

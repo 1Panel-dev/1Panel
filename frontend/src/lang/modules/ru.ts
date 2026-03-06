@@ -1612,6 +1612,8 @@ const message = {
         remarkPlaceholder: 'Примечание',
         remarkToggle: 'Примечания',
         remarkToggleTip: 'Загружать примечания файлов',
+        columnSetting: 'Столбцы',
+        showColumns: 'Показать столбцы',
         canNotDeCompress: 'Невозможно распаковать этот файл',
         uploadSuccess: 'Успешно загружено',
         downloadProcess: 'Прогресс загрузки',
