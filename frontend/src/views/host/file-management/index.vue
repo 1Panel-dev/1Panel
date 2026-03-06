@@ -531,12 +531,7 @@
                                     </div>
                                 </template>
                             </el-table-column>
-                            <el-table-column
-                                v-if="isColumnVisible('mode')"
-                                :label="$t('file.mode')"
-                                prop="mode"
-                                width="80"
-                            >
+                            <el-table-column :label="$t('file.mode')" prop="mode" width="80">
                                 <template #default="{ row }">
                                     <el-link underline="never" @click="openMode(row)">{{ row.mode }}</el-link>
                                 </template>
@@ -554,13 +549,7 @@
                                     </el-link>
                                 </template>
                             </el-table-column>
-                            <el-table-column
-                                v-if="isColumnVisible('size')"
-                                :label="$t('file.size')"
-                                prop="size"
-                                width="80"
-                                :sortable="'custom'"
-                            >
+                            <el-table-column :label="$t('file.size')" prop="size" width="80" :sortable="'custom'">
                                 <template #default="{ row }">
                                     <el-button
                                         type="primary"
@@ -582,7 +571,6 @@
                                 </template>
                             </el-table-column>
                             <el-table-column
-                                v-if="isColumnVisible('modTime')"
                                 :label="$t('file.updateTime')"
                                 prop="modTime"
                                 width="180"
@@ -590,13 +578,7 @@
                                 show-overflow-tooltip
                                 :sortable="'custom'"
                             ></el-table-column>
-                            <el-table-column
-                                v-if="isColumnVisible('remark')"
-                                :label="$t('file.remark')"
-                                prop="remark"
-                                width="180"
-                                show-overflow-tooltip
-                            >
+                            <el-table-column :label="$t('file.remark')" prop="remark" width="180" show-overflow-tooltip>
                                 <template #default="{ row }">
                                     <span>{{ row.remark ? row.remark : '-' }}</span>
                                 </template>
@@ -738,15 +720,6 @@ interface FilePaths {
     name: string;
 }
 
-type FileColumnKey = 'mode' | 'size' | 'modTime' | 'remark';
-
-interface FileColumnConfig {
-    label: string;
-    show: boolean;
-    fix?: boolean;
-    value: FileColumnKey;
-}
-
 const router = useRouter();
 const data = ref();
 const tableRefs = ref<Record<string, any>>({});
@@ -865,12 +838,7 @@ const setRenameRef = (key: string, el: any) => {
 const getCurrentRename = () => renameRefs.value[editableTabsKey.value];
 
 const pathRefs = ref<Record<string, any>>({});
-const columns = ref<FileColumnConfig[]>([
-    { label: i18n.global.t('file.mode'), value: 'mode', show: true },
-    { label: i18n.global.t('file.size'), value: 'size', show: true },
-    { label: i18n.global.t('file.updateTime'), value: 'modTime', show: true },
-    { label: i18n.global.t('file.remark'), value: 'remark', show: true },
-]);
+const columns = ref([]);
 
 const setPathRef = (key: string, el: any) => {
     if (el) {
@@ -878,7 +846,6 @@ const setPathRef = (key: string, el: any) => {
     }
 };
 const getCurrentPath = () => pathRefs.value[editableTabsKey.value];
-const isColumnVisible = (key: FileColumnKey) => columns.value.find((column) => column.value === key)?.show !== false;
 
 const { searchableStatus, searchablePath, setSearchableInputRef, searchableInputBlur } = useMultipleSearchable(paths);
 
