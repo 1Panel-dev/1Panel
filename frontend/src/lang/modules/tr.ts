@@ -87,6 +87,7 @@ const message = {
             hide: 'Gizle',
             visit: 'Visit',
             migrate: 'Taşı',
+            disConn: 'Bağlantıyı kes',
         },
         operate: {
             start: 'Başlat',
@@ -192,6 +193,8 @@ const message = {
             importHelper:
                 'Çakışan veya yinelenen verileri içe aktarırken, içe aktarılan içerik orijinal veritabanı verilerini güncellemek için standart olarak kullanılacaktır.',
             errImport: 'Dosya içeriği anormal:',
+            backupSuccess: 'Yedekleme başarılı',
+            restoreSuccess: 'Geri yükleme başarılı',
         },
         login: {
             username: 'Kullanıcı adı',
@@ -405,6 +408,8 @@ const message = {
         tamper: 'Kurcalama Koruması',
         app: 'Uygulama',
         msgCenter: 'Görevler',
+        filter: 'Filtre',
+        disk: 'Disk',
     },
     home: {
         recommend: 'Önerilen',
@@ -437,12 +442,10 @@ const message = {
         runningTime: 'Şu tarihten beri açık',
         mem: 'Sistem Belleği',
         swapMem: 'Swap Bölümü',
-
         runSmoothly: 'Düşük yük',
         runNormal: 'Orta yük',
         runSlowly: 'Yüksek yük',
         runJam: 'Ağır yük',
-
         core: 'Fiziksel çekirdek',
         logicCore: 'Mantıksal çekirdek',
         corePercent: 'Çekirdek Kullanımı',
@@ -468,7 +471,6 @@ const message = {
         available: 'Kullanılabilir',
         percent: 'Kullanım',
         goInstall: 'Yüklemeye git',
-
         networkCard: 'Ağ kartı',
         disk: 'Disk',
         memo: 'Not',
@@ -524,14 +526,11 @@ const message = {
         changePasswordHelper:
             'Veritabanı bir uygulamayla ilişkilendirildi. Şifre değiştirmek aynı zamanda uygulamanın veritabanı şifresini de değiştirecek. Değişiklik uygulama yeniden başlatıldıktan sonra etkili olur.',
         recoverTimeoutHelper: '-1, zaman aşımı sınırı olmadığı anlamına gelir',
-
         confChange: 'Yapılandırma',
         confNotFound:
             'Yapılandırma dosyası bulunamadı. Lütfen uygulama mağazasından uygulamayı en son sürüme yükseltin ve tekrar deneyin!',
-
         portHelper:
             'Bu port konteynerin açığa çıkan portudur. Değişikliği ayrı olarak kaydetmeniz ve konteyneri yeniden başlatmanız gerekir!',
-
         loadFromRemote: 'Sunucudan senkronize et',
         userBind: 'Kullanıcı bağla',
         pgBindHelper:
@@ -563,14 +562,12 @@ const message = {
         hasCA: 'CA sertifikası var',
         skipVerify: 'Sertifika geçerlilik kontrolünü yoksay',
         initialDB: 'Başlangıç Veritabanı',
-
         formatHelper:
             'Mevcut veritabanı karakter seti {0}, karakter seti tutarsızlığı kurtarma işleminin başarısız olmasına neden olabilir',
         dropHelper: 'Yüklenen dosyayı buraya sürükleyip bırakabilir veya',
         clickHelper: 'yüklemek için tıklayın',
         supportUpType:
             'Yalnızca sql, sql.gz, tar.gz, .zip dosya formatlarını destekler. İçe aktarılan sıkıştırılmış dosya yalnızca bir .sql dosyası içermeli veya test.sql içermelidir',
-
         currentStatus: 'Mevcut durum',
         baseParam: 'Temel parametre',
         performanceParam: 'Performans parametresi',
@@ -602,7 +599,6 @@ const message = {
         sortMergePassesHelper: 'Değer çok büyükse, "sort_buffer_size" değerini artırın.',
         tableLocksWaited: 'Kilitli tablo sayısı',
         tableLocksWaitedHelper: 'Değer çok büyükse, veritabanı performansınızı artırmayı düşünün.',
-
         performanceTuning: 'Performans ayarlama',
         optimizationScheme: 'Optimizasyon şeması',
         keyBufferSizeHelper: 'İndeks için tampon boyutu',
@@ -620,14 +616,11 @@ const message = {
         tableOpenCacheHelper: 'Tablo önbelleği',
         maxConnectionsHelper: 'Maksimum bağlantılar',
         restart: 'Yeniden başlat',
-
         slowLog: 'Yavaş loglar',
         noData: 'Henüz yavaş log yok.',
-
         isOn: 'Açık',
         longQueryTime: 'eşik(saniye)',
         thresholdRangeHelper: 'Lütfen doğru eşik değerini girin (1 - 600).',
-
         timeout: 'Zaman aşımı(saniye)',
         timeoutHelper: 'Boştaki bağlantı zaman aşımı süresi. 0, bağlantının sürekli açık olduğunu gösterir.',
         maxclients: 'Maksimum istemci',
@@ -654,20 +647,17 @@ const message = {
         redisQuickCmd: 'Redis hızlı komutları',
         recoverHelper: 'Bu işlem verileri [{0}] ile üzerine yazacak. Devam etmek istiyor musunuz?',
         submitIt: 'Verilerin üzerine yaz',
-
         baseConf: 'Temel',
         allConf: 'Tümü',
         restartNow: 'Şimdi yeniden başlat',
         restartNowHelper1:
             'Yapılandırma değişikliklerinin etkili olması için sistemi yeniden başlatmanız gerekir. Verilerinizin kalıcı olması gerekiyorsa, önce kaydetme işlemini gerçekleştirin.',
         restartNowHelper: 'Bu yalnızca sistem yeniden başlatıldıktan sonra etkili olacaktır.',
-
         persistence: 'Kalıcılık',
         rdbHelper1: 'saniye, ekleme',
         rdbHelper2: 'veri parçası',
         rdbHelper3: 'Koşullardan herhangi birinin karşılanması RDB kalıcılığını tetikleyecektir.',
         rdbInfo: 'Kural listesindeki değerin 1 ile 100000 arasında olduğundan emin olun',
-
         containerConn: 'Konteyner bağlantısı',
         copyConnURL: "Bağlantı URL'sini kopyala",
         connAddress: 'Adres',
@@ -731,6 +721,7 @@ const message = {
             pairingCodeRequired: 'Please enter pairing code',
             pairingApproveSuccess: 'Pairing approved successfully',
             customProviderHelper: 'Özel model sağlayıcısında hesabın kullanılabilirliği doğrulanmaz',
+            feishuSaveSuccess: "Feishu'ya kaydedildi",
         },
         model: {
             model: 'Model',
@@ -778,7 +769,6 @@ const message = {
             memoryUsed: 'Kullanılan Bellek',
             memoryTotal: 'Toplam Bellek',
             percent: 'Kullanım',
-
             base: 'Temel Bilgiler',
             driverVersion: 'Sürücü Sürümü',
             cudaVersion: 'CUDA Sürümü',
@@ -810,6 +800,7 @@ const message = {
             current: 'Gerçek Zamanlı İzleme',
             history: 'Geçmiş Kayıtlar',
             notSupport: 'Mevcut sürüm veya sürücü bu parametrenin görüntülenmesini desteklemiyor.',
+            processCount: 'Süreç sayısı',
         },
         mcp: {
             server: 'MCP Sunucusu',
@@ -923,7 +914,6 @@ const message = {
             'Konteyner motoru CPU paylaşımları için 1024 temel değerini kullanır. Konteynere daha fazla CPU zamanı vermek için bunu artırabilirsiniz.',
         inputIpv4: 'Örnek: 192.168.1.1',
         inputIpv6: 'Örnek: 2001:0db8:85a3:0000:0000:8a2e:0370:7334',
-
         diskUsage: 'Disk Kullanımı',
         localVolume: 'Yerel Depolama Birimi',
         buildCache: 'Derleme Önbelleği',
@@ -937,7 +927,6 @@ const message = {
         sizeRwHelper: 'Konteynere özel yazılabilir katman boyutu',
         sizeRootFs: 'Sanal Boyut',
         sizeRootFsHelper: 'Konteynerin bağımlı olduğu tüm görüntü katmanları + konteyner katmanının toplam boyutu',
-
         containerFromAppHelper:
             'Bu konteynerin uygulama mağazasından geldiği tespit edildi. Uygulama işlemleri mevcut düzenlemelerin geçersiz hale gelmesine neden olabilir.',
         containerFromAppHelper1:
@@ -951,7 +940,6 @@ const message = {
         privileged: 'Ayrıcalıklı',
         privilegedHelper:
             'Konteynerin ana bilgisayarda belirli ayrıcalıklı işlemler gerçekleştirmesine izin verir, bu da konteyner risklerini artırabilir. Dikkatli kullanın!',
-
         upgradeHelper: 'Depo Adı/İmaj Adı: İmaj Sürümü',
         upgradeWarning2:
             'Yükseltme işlemi konteynerin yeniden oluşturulmasını gerektirir, kalıcı olmayan tüm veriler kaybedilecektir. Devam etmek istiyor musunuz?',
@@ -961,7 +949,6 @@ const message = {
         targetImage: 'Hedef imaj',
         imageLoadErr: 'Konteyner için imaj adı algılanmadı',
         appHelper: 'Konteyner uygulama mağazasından geliyor ve yükseltme hizmeti kullanılamaz hale getirebilir.',
-
         resource: 'Kaynak',
         input: 'Manuel giriş',
         forcePull: 'Her zaman imajı çek ',
@@ -1007,10 +994,8 @@ const message = {
         unlessStopped: 'unless-stopped',
         onFailure: 'on-failure (varsayılan olarak beş kere)',
         no: 'never',
-
         refreshTime: 'Yenileme aralığı',
         cache: 'Önbellek',
-
         image: 'İmaj | İmajlar',
         imagePull: 'Çek',
         imagePullHelper:
@@ -1043,7 +1028,6 @@ const message = {
         delBuildCacheHelper:
             'Bu, oluşturma sırasında üretilen tüm önbelleğe alınmış yapıları silecek ve geri alınamaz. Devam etmek istiyor musunuz?',
         urlWarning: 'URL öneki http:// veya https:// içermemelidir. Lütfen değiştirin.',
-
         network: 'Ağ | Ağlar',
         networkHelper:
             'Bu, bazı uygulamaların ve çalışma zamanı ortamlarının düzgün çalışmamasına neden olabilir. Devam etmek istiyor musunuz?',
@@ -1056,7 +1040,6 @@ const message = {
         scope: 'IP kapsamı',
         gateway: 'Ağ geçidi',
         auxAddress: 'IP hariç tut',
-
         volume: 'Birim | Birimler',
         volumeDir: 'Birim dizini',
         nfsEnable: 'NFS depolamayı etkinleştir',
@@ -1064,7 +1047,6 @@ const message = {
         mountpoint: 'Bağlama noktası',
         mountpointNFSHelper: 'örn. /nfs, /nfs-share',
         options: 'Seçenekler',
-
         repo: 'Depo | Depolar',
         httpRepoHelper: 'HTTP tipinde bir depo işlemi Docker servisinin yeniden başlatılmasını gerektirir.',
         httpRepo:
@@ -1080,7 +1062,6 @@ const message = {
             'Birden fazla ayna varsa, yeni satırlar gösterilmelidir, örneğin:\nhttp://xxxxxx.m.daocloud.io \nhttps://xxxxxx.mirror.aliyuncs.com',
         registrieHelper:
             'Birden fazla özel depo varsa, yeni satırlar gösterilmelidir, örneğin:\n172.16.10.111:8081 \n172.16.10.112:8081',
-
         compose: 'Compose | Composelar',
         composeFile: 'Düzenleme Dosyası',
         fromChangeHelper:
@@ -1107,7 +1088,6 @@ const message = {
             'Bu, {0} compose altındaki tüm konteynerleri ve ağları durduracak ve kaldıracaktır. Devam etmek istiyor musunuz?',
         composeEnvHelper2:
             'Bu düzenleme 1Panel Uygulama Mağazası tarafından oluşturuldu. Lütfen ortam değişkenlerini yüklü uygulamalarda değiştirin.',
-
         setting: 'Ayar | Ayarlar',
         goSetting: 'Düzenlemeye git',
         operatorStatusHelper: 'Bu, Docker servisini "{0}" yapacaktır. Devam etmek istiyor musunuz?',
@@ -1149,12 +1129,10 @@ const message = {
         related: 'İlgili',
         includeAppstore: 'Uygulama mağazasından konteynerleri göster',
         excludeAppstore: 'Uygulama Mağazası Konteynerini Gizle',
-
         cleanDockerDiskZone: 'Docker tarafından kullanılan disk alanını temizle',
         cleanImagesHelper: '( Herhangi bir konteyner tarafından kullanılmayan tüm imajları temizle )',
         cleanContainersHelper: '( Durmuş olan tüm konteynerleri temizle )',
         cleanVolumesHelper: '( Kullanılmayan tüm yerel birimleri temizle )',
-
         makeImage: 'İmaj oluştur',
         newImageName: 'Yeni imaj adı',
         commitMessage: 'Commit mesajı',
@@ -1162,6 +1140,7 @@ const message = {
         ifPause: 'Oluşturma Sırasında Konteyneri Duraklat',
         ifMakeImageWithContainer: 'Bu Konteynerden Yeni İmaj Oluşturulsun mu?',
         finishTime: 'Son durdurma zamanı',
+        exportHelper: 'Seçilen imajları tek bir tar dosyasına aktarır.',
     },
     cronjob: {
         importHelper:
@@ -1276,7 +1255,6 @@ const message = {
         cutWebsiteLog: 'Website log döndürme',
         cutWebsiteLogHelper: 'Döndürülen log dosyaları 1Panel yedek dizinine yedeklenecektir.',
         syncIpGroup: 'WAF IP gruplarını senkronize et',
-
         requestExpirationTime: 'Yükleme isteği son kullanma süresi(Saat)',
         unitHours: 'Birim: Saat',
         alertTitle: 'Planlanmış Görev - {0} 「{1}」 Görev Başarısızlık Uyarısı',
@@ -1303,6 +1281,11 @@ const message = {
             syncHelper:
                 'Sistem script kütüphanesini senkronize etmek üzere. Bu işlem sadece sistem scriptlerini etkiler. Devam edilsin mi?',
         },
+        logHelper1: '1. 1Panel sistem günlüğü',
+        ignoreErr: 'Hataları yok say',
+        ignoreErrHelper: 'Tüm görevlerin tamamlanması için yedekleme hatalarını yok say',
+        cleanLog: 'Günlükleri otomatik temizle',
+        cleanLogscope: 'Günlük saklama',
     },
     monitor: {
         globalFilter: 'Genel Filtre',
@@ -1314,7 +1297,6 @@ const message = {
         defaultIOHelper: 'İzleme ve genel bakış arayüzlerinde görüntülenen varsayılan disk seçeneği',
         cleanMonitor: 'İzleme Kayıtlarını Temizle',
         cleanHelper: 'Bu işlem GPU dahil tüm izleme kayıtlarını temizleyecektir. Devam etmek istiyor musunuz?',
-
         avgLoad: 'Ortalama yük',
         loadDetail: 'Yük detayı',
         resourceUsage: 'Kullanım',
@@ -1451,6 +1433,7 @@ const message = {
             dnsCheck: 'Kullanılabilirliği Test Et',
             dnsOK: 'DNS yapılandırma bilgileri mevcut!',
             dnsTestFailed: 'DNS yapılandırma bilgileri mevcut değil.',
+            syncSiteHelper: 'Sistem saati {0} ile eşitlensin mi?',
         },
         fail2ban: {
             sshPort: 'SSH portunu dinle',
@@ -1487,6 +1470,10 @@ const message = {
                 'Seçilen FTP hesabını devre dışı bırakmak erişim izinlerini iptal edecektir. Devam etmek istiyor musunuz?',
             syncHelper:
                 'Sunucu ve veritabanı arasında FTP hesap verilerini senkronize et. Devam etmek istiyor musunuz?',
+            dirSystem:
+                'Bu dizin sistem tarafından ayrılmıştır. Değişiklik sistemin çökmesine neden olabilir, kontrol edip tekrar deneyin!',
+            dirHelper: "FTP'yi etkinleştirmek dizin izinlerini değiştirir, lütfen dikkatle seçin",
+            dirMsg: 'FTP etkinleştirildiğinde {0} dizininin tamamının izinleri değiştirilecektir. Devam edilsin mi?',
         },
         clam: {
             clam: 'Virüs taraması',
@@ -1798,6 +1785,7 @@ const message = {
         loginTime: 'Oturum açma zamanı',
         loginIP: 'Oturum açma IP’si',
         stopSSHWarn: 'Bu SSH bağlantısını kesmek ister misiniz?',
+        remote: 'Uzak SSH',
     },
     setting: {
         panel: 'Panel',
@@ -2223,7 +2211,6 @@ const message = {
         versionNotSame: 'Düğüm sürümü ana düğümle uyuşmuyor. Lütfen Düğüm Yönetiminde yükseltin ve tekrar deneyin.',
         versionCompare:
             '{0} düğümünün zaten en son yükseltilebilir sürümde olduğu tespit edildi. Lütfen birincil düğüm sürümünü kontrol edin ve tekrar deneyin!',
-
         about: 'Hakkında',
         versionItem: 'Mevcut Sürüm',
         backupCopies: 'Yedek Kopya',
@@ -2254,6 +2241,9 @@ const message = {
             'Sayfa yenilenecek ve menü listesi başlangıç durumuna geri yüklenecektir. Devam etmek istiyor musunuz?',
         compressPassword: 'Sıkıştırma parolası',
         backupRecoverMessage: 'Lütfen sıkıştırma veya sıkıştırma açma parolasını girin (ayarlamamak için boş bırakın)',
+        componentSize: 'Bileşen boyutu',
+        dockerConf: 'Docker yapılandırmasını koru',
+        recoverFailed: 'Anlık görüntü geri yükleme başarısız',
     },
     license: {
         offLine: 'Çevrimdışı Sürüm',
@@ -2328,7 +2318,6 @@ const message = {
         suggest: '(Önerilen)',
         totalScan: 'Temizlenecek toplam gereksiz dosya: ',
         selectScan: 'Seçilen toplam gereksiz dosya: ',
-
         system: 'Sistem Gereksiz Dosyaları',
         systemHelper: 'Anlık görüntü, yükseltme ve diğer işlemler sırasında oluşturulan geçici dosyalar',
         panelOriginal: 'Sistem anlık görüntüsü geri yükleme öncesi yedekleme dosyaları',
@@ -2337,7 +2326,6 @@ const message = {
         upgradeHelper: '(Sistem geri alımı için en son yükseltme yedeğini tutmanız önerilir)',
         snapshot: 'Sistem anlık görüntü geçici dosyaları',
         rollback: 'Kurtarma öncesi yedek dosyaları',
-
         backup: 'Sistem Yedekleme',
         backupHelper: 'Yerel yedekleme hesaplarıyla ilişkili olmayan yedekleme dosyaları',
         unknownBackup: 'Sistem Yedekleme',
@@ -2346,13 +2334,11 @@ const message = {
         unknownDatabase: 'İlişkili Olmayan Veritabanı Yedeklemesi',
         unknownWebsite: 'İlişkili Olmayan Web Sitesi Yedeklemesi',
         unknownSnapshot: 'İlişkili Olmayan Anlık Görüntü Yedeklemesi',
-
         upload: 'Geçici Yükleme Dosyaları',
         uploadHelper: 'Sistem yedek listesinden yüklenen geçici dosyalar',
         download: 'Geçici İndirme Dosyaları',
         downloadHelper: 'Sistem tarafından üçüncü taraf yedek hesaplarından indirilen geçici dosyalar',
         directory: 'Dizin',
-
         systemLog: 'Günlük dosyası',
         systemLogHelper: 'Sistem günlükleri, görev günlükleri, web sitesi günlük dosyaları',
         dockerLog: 'Konteyner işlem günlüğü dosyaları',
@@ -2360,14 +2346,13 @@ const message = {
         shell: 'Shell script zamanlanmış görevler',
         containerShell: 'Konteynerler içinde yürütülen shell script zamanlanmış görevler',
         curl: 'CURL zamanlanmış görevler',
-
         docker: 'Konteyner çöpü',
         dockerHelper: 'Konteynerler, görüntüler, hacimler, derleme önbelleği vb. dosyalar',
         volumes: 'Birimler',
         buildCache: 'Konteyner Oluşturma Önbelleği',
-
         appTmpDownload: 'Uygulama geçici indirme dosyası',
         unknownWebsiteLog: 'Bağlantısız web sitesi günlük yedekleme dosyası',
+        statusSuggest: 'Disk ekleme/silme/değiştirme sonrası son durumun doğru olması için taramayı tekrar yapın',
     },
     app: {
         app: 'Uygulama | Uygulamalar',
@@ -2830,7 +2815,6 @@ const message = {
         failTimeout: 'Hata zaman aşımı',
         failTimeoutHelper:
             'Sunucu sağlık kontrolleri için zaman penceresi uzunluğu. Bu süre içinde biriken hata sayısı eşiğe ulaştığında, sunucu geçici olarak kaldırılacak ve aynı süre sonunda yeniden denenir. Varsayılan 10 saniye',
-
         staticChangePHPHelper: 'Şu anda statik bir web sitesi, PHP web sitesine geçiş yapabilirsiniz',
         proxyCache: 'Ters Vekil Önbelleği',
         cacheLimit: 'Önbellek Alanı Sınırı',
@@ -2858,7 +2842,6 @@ const message = {
         preflight: 'Ön istek hızlı yanıtı',
         preflightHleper:
             'Etkinleştirildiğinde, tarayıcı çapraz kaynak ön isteği (OPTIONS isteği) gönderdiğinde, sistem otomatik olarak 204 durum kodunu döndürecek ve gerekli çapraz kaynak yanıt başlıklarını ayarlayacaktır',
-
         changeDatabase: 'Veritabanını Değiştir',
         changeDatabaseHelper1:
             'Veritabanı ilişkilendirmesi, web sitesinin yedeklenmesi ve geri yüklenmesi için kullanılır.',
@@ -2894,7 +2877,6 @@ const message = {
         execUser: 'Çalıştıran Kullanıcı',
         execDir: 'Çalıştırma Dizini',
         packagist: 'Çin Tam Aynası',
-
         batchOperate: 'Toplu İşlem',
         batchOperateHelper: 'Toplu {0} web siteleri, işlemi devam ettir?',
         stream: 'TCP/UDP Proxy',
@@ -2903,8 +2885,8 @@ const message = {
             'Harici dinleme bağlantı noktası numarasını ayarlayın, istemciler bu bağlantı noktası üzerinden hizmete erişecektir, virgülle ayırın, örn.: 5222,5223',
         streamHelper: 'TCP/UDP Port Yönlendirme ve Yük Dengeleme',
         udp: "UDP'yi etkinleştir",
-
         syncHtmlHelper: 'PHP ve statik web siteleriyle senkronize et',
+        wafValueHelper: 'Değer',
     },
     php: {
         short_open_tag: 'Kısa etiket desteği',
@@ -2934,6 +2916,7 @@ const message = {
         containerConfigHelper:
             'Oluşturulduktan sonra Yapılandırma - Konteyner Yapılandırması’nda ortam değişkenleri ve diğer bilgiler değiştirilebilir',
         dateTimezoneHelper: 'Örnek: TZ=Asia/Shanghai (Gerektiğinde ekleyin)',
+        extensionsHelper: 'Birden fazla uzantı için virgül ile ayırın',
     },
     nginx: {
         serverNamesHashBucketSizeHelper: 'Sunucu adının karma tablosu boyutu',
@@ -3069,7 +3052,6 @@ const message = {
         argsCheck: 'GET parametre kontrolü',
         postCheck: 'POST parametre doğrulaması',
         cookieBlockList: 'Çerez engelleme listesi',
-
         dockerHelper:
             'Mevcut güvenlik duvarı konteyner port eşlemesini devre dışı bırakamaz. Yüklü uygulamalar, uygulama parametrelerini düzenlemek ve port serbest bırakma kurallarını yapılandırmak için [Yüklü] sayfasına gidebilir.',
         iptablesHelper:
@@ -3132,7 +3114,6 @@ const message = {
         exportHelper: '{0} güvenlik duvarı kuralını dışa aktarmak üzere. Devam etmek istiyor musunuz?',
         importSuccess: '{0} kural başarıyla içe aktarıldı',
         importPartialSuccess: 'İçe aktarma tamamlandı: {0} başarılı, {1} başarısız',
-
         ipv4Limit: 'Mevcut işlem yalnızca IPv4 adreslerini destekler',
         basicStatus: 'Mevcut zincir {0} bağlı değil, lütfen önce bağlayın!',
         baseIptables: 'iptables Servisi',
@@ -3164,6 +3145,10 @@ const message = {
         portHelper: '0 herhangi bir port anlamına gelir',
         allPorts: 'Tüm Portlar',
         deleteRuleConfirm: '{0} kural silinecek. Devam etmek istiyor musunuz?',
+        advancedControl: 'Gelişmiş kontrol',
+        advancedControlNotAvailable:
+            'Şu anda {0} güvenlik duvarı kullanılıyor, gelişmiş kurallar yalnızca iptables destekler',
+        destination: 'Hedef',
     },
     runtime: {
         runtime: 'Çalışma Zamanı',
@@ -3627,6 +3612,7 @@ const message = {
             importRuleHelper: 'Her satıra bir kural',
         },
         monitor: {
+            '360': '360 Arama',
             name: 'Web Sitesi İzleme',
             pv: 'Sayfa Görüntülemeleri',
             uv: 'Benzersiz Ziyaretçiler',
@@ -3696,7 +3682,6 @@ const message = {
             statusErr: 'Geçersiz durum kodu formatı',
             shenma: 'Shenma Arama',
             duckduckgo: 'DuckDuckGo',
-            '360': '360 Arama',
             excludeUri: 'URI’leri Hariç Tut',
             top100Helper: 'İlk 100 veriyi göster',
             logSaveDay: 'Günlük Saklama Süresi (gün)',
@@ -3807,7 +3792,6 @@ const message = {
             wafContent3: 'Bir istek engellendiğinde gösterilecek özel bir sayfa oluşturun',
             wafTitle4: 'Özel Kurallar (ACL)',
             wafContent4: 'İstekleri özel kurallara göre engelleyin',
-
             tamperTitle1: 'Dosya Bütünlüğü İzleme',
             tamperContent1:
                 'Web sitesi dosyalarının bütünlüğünü izler, çekirdek dosyalar, betik dosyaları ve yapılandırma dosyaları dahil.',
@@ -3820,7 +3804,6 @@ const message = {
             tamperTitle4: 'Günlük Kaydı ve Analiz',
             tamperContent4:
                 'Yöneticilerin sonraki denetim ve analiz için dosya erişimi ve işlem günlüklerini kaydeder, potansiyel güvenlik tehditlerini belirler.',
-
             settingTitle1: 'Özel Hoş Geldiniz Mesajı',
             settingContent1: '1Panel giriş sayfasında özel bir hoş geldiniz mesajı ayarlayın.',
             settingTitle2: 'Özel Logo',
@@ -3828,7 +3811,6 @@ const message = {
             settingTitle3: 'Özel Web Sitesi Simgesi',
             settingContent3:
                 'Varsayılan tarayıcı simgesini değiştirmek için özel simgelerin yüklenmesine izin verir, kullanıcı deneyimini iyileştirir.',
-
             monitorTitle1: 'Ziyaretçi Trendi',
             monitorContent1: 'Web sitesi ziyaretçi trendlerini istatistiksel olarak toplar ve gösterir',
             monitorTitle2: 'Ziyaretçi Haritası',
@@ -3839,7 +3821,6 @@ const message = {
                 'Web sitesi istek bilgileri hakkında istatistikler, örümcekler, erişim cihazları, istek durumu vb. içerir.',
             monitorTitle4: 'Gerçek Zamanlı İzleme',
             monitorContent4: 'Web sitesi istek bilgilerinin gerçek zamanlı izlenmesi, istek sayısı, trafik vb. içerir.',
-
             alertTitle1: 'SMS Uyarıları',
             alertContent1:
                 'Anormal sunucu kaynak kullanımı, web sitesi ve sertifika sona ermesi, yeni sürüm güncellemesi, şifre sona ermesi vb. durumlarda kullanıcılar SMS alarmı ile bilgilendirilir, zamanında işlem yapılmasını sağlar.',
@@ -3849,7 +3830,6 @@ const message = {
             alertTitle3: 'Uyarı Ayarları',
             alertContent3:
                 'Kullanıcılara özel telefon numaraları, günlük gönderim sıklığı ve günlük gönderim zamanı yapılandırmaları sağlar, kullanıcıların daha makul gönderim uyarıları ayarlamasını kolaylaştırır.',
-
             nodeDashTitle1: 'Uygulama Yönetimi',
             nodeDashContent1:
                 'Çoklu düğüm uygulamalarının birleşik yönetimi, durum izleme, hızlı başlatma/durdurma, terminal bağlantısı ve yedekleme desteği',
@@ -3862,7 +3842,6 @@ const message = {
             nodeDashTitle4: 'Zamanlanmış Görev Yönetimi',
             nodeDashContent4:
                 'Çoklu düğüm zamanlanmış görevlerinin birleşik yönetimi, durum izleme, hızlı başlatma/durdurma ve manuel tetikleme çalıştırma desteği',
-
             nodeTitle1: 'Tek Tıkla Düğüm Ekleme',
             nodeContent1: 'Birden fazla sunucu düğümünü hızlıca entegre eder',
             nodeTitle2: 'Toplu Yükseltme',
@@ -3871,7 +3850,6 @@ const message = {
             nodeContent3: 'Her düğümün çalışma durumunu gerçek zamanlı olarak izler',
             nodeTitle4: 'Hızlı Uzak Bağlantı',
             nodeContent4: 'Düğümlere tek tıkla doğrudan uzak terminal bağlantısı',
-
             fileExchangeTitle1: 'Anahtar Kimlik Doğrulama İletimi',
             fileExchangeContent1: 'İletim güvenliğini sağlamak için SSH anahtarları ile kimlik doğrulaması yapar.',
             fileExchangeTitle2: 'Verimli Dosya Senkronizasyonu',
@@ -3880,11 +3858,9 @@ const message = {
             fileExchangeTitle3: 'Çoklu Düğüm İletişimini Destekler',
             fileExchangeContent3:
                 'Farklı düğümler arasında proje dosyalarını kolayca aktarır, birden fazla sunucuyu esnek bir şekilde yönetir.',
-
             nodeAppTitle1: 'Uygulama Yükseltme Yönetimi',
             nodeAppContent1:
                 'Çoklu düğüm uygulama güncellemelerinin birleşik izlenmesi, tek tıklamayla yükseltme desteği',
-
             appTitle1: 'Esnek Panel Yönetimi',
             appContent1: '1Panel sunucunuzu her zaman, her yerde kolayca yönetin.',
             appTitle2: 'Kapsamlı Hizmet Bilgisi',
@@ -3893,7 +3869,6 @@ const message = {
             appTitle3: 'Gerçek Zamanlı Anormallik İzleme',
             appContent3:
                 'Mobil uygulama üzerinden gerçek zamanlı sunucu durumu, WAF güvenlik izleme, web sitesi trafik istatistikleri ve işlem sağlığı durumunu görüntüleyin.',
-
             clusterTitle1: 'Ana-Çalışan Dağıtımı',
             clusterContent1:
                 'Farklı düğümlerde MySQL/Postgres/Redis ana-çalışan örnekleri oluşturmayı destekler, ana-çalışan ilişkisi ve başlatmayı otomatik olarak tamamlar',
@@ -3962,7 +3937,6 @@ const message = {
             nodeSyncHelper: 'Düğüm bilgisi senkronizasyonu aşağıdaki bilgileri senkronize eder:',
             nodeSyncHelper1: '1. Genel yedekleme hesabı bilgileri',
             nodeSyncHelper2: '2. Ana düğüm ile alt düğümler arasındaki bağlantı bilgileri',
-
             nodeCheck: 'Kullanılabilirlik kontrolü',
             checkSSH: 'Düğüm SSH bağlantısını kontrol et',
             checkUserPermission: 'Düğüm kullanıcı izinlerini kontrol et',
@@ -3983,7 +3957,6 @@ const message = {
             errLicense: 'Bu düğüme bağlı lisans kullanılamıyor. Lütfen kontrol edin ve tekrar deneyin!',
             errNodePort:
                 'Düğüm portu [ {0} ] erişilemez olarak algılandı. Lütfen güvenlik duvarı veya güvenlik grubunun bu portu izin verdiğinden emin olun.',
-
             reinstallHelper: '{0} düğümünü yeniden kurmak istiyor musunuz?',
             unhealthyCheck: 'Anormal Kontrol',
             fixOperation: 'Düzeltme İşlemi',
@@ -4008,7 +3981,6 @@ const message = {
             offline: 'Çevrimdışı mod',
             freeCount: 'Ücretsiz kota [{0}]',
             offlineHelper: 'Düğüm çevrimdışı bir ortamda olduğunda kullanılır',
-
             appUpgrade: 'Uygulama Yükseltme',
             appUpgradeHelper: 'Yükseltilmesi gereken {0} uygulama var',
         },
@@ -4105,7 +4077,6 @@ const message = {
             specifiedTime: 'Belirtilen Süre',
             deleteTitle: 'Uyarıyı Sil',
             deleteMsg: 'Uyarı görevini silmek istediğinizden emin misiniz?',
-
             allSslTitle: 'Tüm Web Sitesi SSL Sertifikası Sona Erme Uyarıları',
             sslTitle: 'Web Sitesi {0} için SSL Sertifikası Sona Erme Uyarısı',
             allSiteEndTimeTitle: 'Tüm Web Sitesi Sona Erme Uyarıları',
@@ -4117,7 +4088,6 @@ const message = {
             loadTitle: 'Yüksek Yük Uyarısı',
             diskTitle: 'Bağlama Dizini {0} için Yüksek Disk Kullanımı Uyarısı',
             allDiskTitle: 'Yüksek Disk Kullanımı Uyarısı',
-
             timeRule: 'Kalan süre {0} günden az olduğunda (işlenmezse ertesi gün tekrar gönderilir)',
             panelUpdateRule:
                 'Yeni bir panel sürümü algılandığında bir kez uyarı gönder (işlenmezse ertesi gün tekrar gönderilir)',
@@ -4126,12 +4096,10 @@ const message = {
             diskRule:
                 '{0} bağlama dizini için disk kullanımı {1}{2}’yi aşarsa, uyarı tetiklenir, günde {3} kez gönderilir',
             allDiskRule: 'Disk kullanımı {0}{1}’yi aşarsa, uyarı tetiklenir, günde {2} kez gönderilir',
-
             cpuName: ' CPU ',
             memoryName: 'Bellek',
             loadName: 'Yük',
             diskName: 'Disk',
-
             syncAlertInfo: 'Manuel Gönderim',
             syncAlertInfoMsg: 'Uyarı görevini manuel olarak göndermek istiyor musunuz?',
             pushError: 'Gönderim Başarısız',
