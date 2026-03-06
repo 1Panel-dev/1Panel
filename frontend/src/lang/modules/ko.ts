@@ -84,6 +84,10 @@ const message = {
             hide: '숨기기',
             visit: '방문',
             migrate: '마이그레이션',
+            prev: '이전',
+            next: '다음',
+            setDefault: '기본값 복원',
+            bind: '바인딩',
         },
         operate: {
             start: '시작',
@@ -133,6 +137,8 @@ const message = {
             manageGroup: '그룹 관리',
             backToList: '목록으로 돌아가기',
             keepEdit: '계속 편집',
+            default: '기본값',
+            noRefresh: '자동 새로고침 안 함',
         },
         loadingText: {
             Upgrading: '시스템 업그레이드 중입니다. 잠시만 기다려 주십시오...',
@@ -142,14 +148,14 @@ const message = {
         },
         msg: {
             noneData: '데이터가 없습니다',
-            delete: `이 작업은 되돌릴 수 없습니다. 계속하시겠습니까?`,
-            clean: `이 작업은 되돌릴 수 없습니다. 계속하시겠습니까?`,
+            delete: '이 작업은 되돌릴 수 없습니다. 계속하시겠습니까?',
+            clean: '이 작업은 되돌릴 수 없습니다. 계속하시겠습니까?',
             closeDrawerHelper: '시스템에서 변경 사항을 저장하지 않을 수 있습니다. 계속하시겠습니까?',
             deleteSuccess: '삭제 완료',
             loginSuccess: '로그인 성공',
             operationSuccess: '작업 완료',
             copySuccess: '복사 완료',
-            notSupportOperation: `이 작업은 지원되지 않습니다`,
+            notSupportOperation: '이 작업은 지원되지 않습니다',
             requestTimeout: '요청이 시간 초과되었습니다. 나중에 다시 시도해 주십시오',
             infoTitle: '안내',
             notRecords: '현재 작업에 대한 실행 기록이 생성되지 않았습니다',
@@ -160,13 +166,13 @@ const message = {
             operateConfirm: '작업을 확인하려면 수동으로 입력하십시오: ',
             inputOrSelect: '선택하거나 입력해 주십시오',
             copyFailed: '복사 실패',
-            operatorHelper: `"{0}"에 대해 "{1}" 작업이 수행되며 이 작업은 되돌릴 수 없습니다. 계속하시겠습니까?`,
+            operatorHelper: '"{0}"에 대해 "{1}" 작업이 수행되며 이 작업은 되돌릴 수 없습니다. 계속하시겠습니까?',
             notFound: '죄송합니다. 요청하신 페이지를 찾을 수 없습니다.',
-            unSupportType: `현재 파일 형식은 지원되지 않습니다.`,
+            unSupportType: '현재 파일 형식은 지원되지 않습니다.',
             unSupportSize: '업로드된 파일이 {0}M을 초과했습니다. 확인해 주십시오!',
-            fileExist: `현재 폴더에 이미 동일한 파일이 존재합니다. 중복 업로드는 지원되지 않습니다.`,
+            fileExist: '현재 폴더에 이미 동일한 파일이 존재합니다. 중복 업로드는 지원되지 않습니다.',
             fileNameErr: '파일 이름은 1~256 자 사이의 영어, 중국어, 숫자, 또는 점(.-_)만 포함해야 합니다.',
-            confirmNoNull: `{0} 값이 비어 있지 않은지 확인하십시오.`,
+            confirmNoNull: '{0} 값이 비어 있지 않은지 확인하십시오.',
             errPort: '포트 정보가 올바르지 않습니다. 확인해 주십시오!',
             remove: '제거',
             backupHelper: '현재 작업은 {0}을(를) 백업합니다. 계속하시겠습니까?',
@@ -180,6 +186,10 @@ const message = {
             importHelper:
                 '충돌하거나 중복되는 데이터를 가져올 때 가져온 내용을 기준으로 원래 데이터베이스 데이터를 업데이트합니다.',
             errImport: '파일 내용이 비정상입니다:',
+            backupSuccess: '백업 성공',
+            restoreSuccess: '복원 성공',
+            installSuccess: '설치 성공',
+            uninstallSuccess: '제거 성공',
         },
         login: {
             username: '사용자 이름',
@@ -278,7 +288,7 @@ const message = {
             commonError: '요청이 실패했습니다',
         },
         service: {
-            serviceNotStarted: `{0} 서비스가 시작되지 않았습니다.`,
+            serviceNotStarted: '{0} 서비스가 시작되지 않았습니다.',
         },
         status: {
             running: '실행 중',
@@ -340,6 +350,7 @@ const message = {
             conflict: '충돌',
             duplicate: '중복',
             unexecuted: '실행되지 않음',
+            unused: '미사용',
         },
         units: {
             second: '초 | 초 | 초',
@@ -393,6 +404,7 @@ const message = {
         app: '애플리케이션',
         msgCenter: '작업',
         disk: '디스크',
+        filter: '필터',
     },
     home: {
         recommend: '추천',
@@ -425,12 +437,10 @@ const message = {
         runningTime: '가동 시간',
         mem: '시스템 메모리',
         swapMem: '스왑 파티션',
-
         runSmoothly: '낮은 부하',
         runNormal: '보통 부하',
         runSlowly: '높은 부하',
         runJam: '심한 부하',
-
         core: '물리적 코어',
         logicCore: '논리 코어',
         corePercent: '코어 사용률',
@@ -456,7 +466,6 @@ const message = {
         available: '사용 가능',
         percent: '사용률',
         goInstall: 'Go 설치',
-
         networkCard: '네트워크 카드',
         disk: '디스크',
         memo: '메모',
@@ -518,7 +527,8 @@ const message = {
         portHelper: '이 포트는 컨테이너의 노출된 포트입니다. 수정을 별도로 저장하고 컨테이너를 재시작해야 합니다!',
         loadFromRemote: '동기화',
         userBind: '사용자 바인딩',
-        pgBindHelper: `이 작업은 새 사용자를 생성하여 대상 데이터베이스에 바인딩하는 데 사용됩니다. 현재 데이터베이스에 이미 존재하는 사용자 선택은 지원되지 않습니다.`,
+        pgBindHelper:
+            '이 작업은 새 사용자를 생성하여 대상 데이터베이스에 바인딩하는 데 사용됩니다. 현재 데이터베이스에 이미 존재하는 사용자 선택은 지원되지 않습니다.',
         pgSuperUser: '슈퍼 사용자',
         loadFromRemoteHelper: '이 작업은 서버의 데이터베이스 정보를 1Panel로 동기화합니다. 계속 진행하시겠습니까?',
         passwordHelper: '확인 불가, 수정하려면 클릭',
@@ -543,13 +553,11 @@ const message = {
         hasCA: 'CA 인증서 있음',
         skipVerify: '인증서 유효성 검사 무시',
         initialDB: '초기 데이터베이스',
-
         formatHelper: '현재 데이터베이스 문자셋은 {0} 입니다. 문자셋 불일치로 인해 복구에 실패할 수 있습니다.',
         dropHelper: '여기에 업로드한 파일을 드래그 앤 드롭하거나',
         clickHelper: '클릭하여 업로드',
         supportUpType:
             'sql, sql.gz, tar.gz, .zip 파일 형식만 지원합니다. 가져오는 압축 파일에는 하나의 .sql 파일만 있거나 test.sql이 포함되어 있어야 합니다',
-
         currentStatus: '현재 상태',
         baseParam: '기본 파라미터',
         performanceParam: '성능 파라미터',
@@ -581,7 +589,6 @@ const message = {
         sortMergePassesHelper: '값이 너무 크면 "sort_buffer_size" 값을 증가시켜야 합니다.',
         tableLocksWaited: '테이블 잠금 대기',
         tableLocksWaitedHelper: '값이 너무 크면 데이터베이스 성능을 증가시키는 것을 고려해야 합니다.',
-
         performanceTuning: '성능 튜닝',
         optimizationScheme: '최적화 방안',
         keyBufferSizeHelper: '인덱스용 버퍼 크기',
@@ -599,14 +606,11 @@ const message = {
         tableOpenCacheHelper: '테이블 캐시',
         maxConnectionsHelper: '최대 연결 수',
         restart: '재시작',
-
         slowLog: '느린 로그',
         noData: '아직 느린 로그가 없습니다.',
-
         isOn: '켜짐',
         longQueryTime: '임계값(s)',
         thresholdRangeHelper: '올바른 임계값을 입력하십시오 (1 - 600).',
-
         timeout: '타임아웃(s)',
         timeoutHelper: '유휴 연결의 타임아웃 기간. 0은 연결이 지속적으로 유지됨을 의미합니다.',
         maxclients: '최대 클라이언트',
@@ -629,24 +633,21 @@ const message = {
         keyspaceMisses: '데이터베이스 키를 찾지 못한 횟수.',
         hit: '데이터베이스 키 발견 비율.',
         latestForkUsec: '마지막 fork() 작업에 소요된 마이크로초 수.',
-        redisCliHelper: `"redis-cli" 서비스가 감지되지 않았습니다. 서비스를 먼저 활성화하십시오.`,
+        redisCliHelper: '"redis-cli" 서비스가 감지되지 않았습니다. 서비스를 먼저 활성화하십시오.',
         redisQuickCmd: 'Redis 빠른 명령',
         recoverHelper: '이 작업은 데이터를 [{0}]으로 덮어씁니다. 계속하시겠습니까?',
         submitIt: '데이터 덮어쓰기',
-
         baseConf: '기본 설정',
         allConf: '모든 설정',
         restartNow: '지금 재시작',
         restartNowHelper1:
             '구성 변경 사항이 적용되려면 시스템을 재시작해야 합니다. 데이터가 지속되어야 하는 경우 먼저 저장 작업을 수행하십시오.',
         restartNowHelper: '이 작업은 시스템이 재시작된 후에만 적용됩니다.',
-
         persistence: '지속성',
         rdbHelper1: '초 단위, 삽입',
         rdbHelper2: '데이터 항목 수',
         rdbHelper3: '조건을 충족하면 RDB 지속성이 트리거됩니다.',
         rdbInfo: '규칙 목록의 값이 1에서 100000 사이여야 합니다.',
-
         containerConn: '컨테이너 연결',
         copyConnURL: '연결 URL 복사',
         connAddress: '주소',
@@ -709,6 +710,7 @@ const message = {
             pairingCodeRequired: 'Please enter pairing code',
             pairingApproveSuccess: 'Pairing approved successfully',
             customProviderHelper: '사용자 정의 모델 공급자는 계정 사용 가능 여부를 검증하지 않습니다',
+            feishuSaveSuccess: 'Feishu에 저장됨',
         },
         model: {
             model: '모델',
@@ -755,7 +757,6 @@ const message = {
             memoryUsed: '사용된 메모리',
             memoryTotal: '전체 메모리',
             percent: '사용률',
-
             base: '기본 정보',
             driverVersion: '드라이버 버전',
             cudaVersion: 'CUDA 버전',
@@ -785,6 +786,7 @@ const message = {
             current: '실시간 모니터링',
             history: '기록',
             notSupport: '현재 버전 또는 드라이버는 이 매개변수 표시를 지원하지 않습니다.',
+            processCount: '프로세스 수',
         },
         mcp: {
             server: 'MCP サーバー',
@@ -892,7 +894,6 @@ const message = {
             '컨테이너 엔진은 기본값으로 1024를 사용합니다. 이를 늘리면 컨테이너에 더 많은 CPU 시간을 할당할 수 있습니다.',
         inputIpv4: '예시: 192.168.1.1',
         inputIpv6: '예시: 2001:0db8:85a3:0000:0000:8a2e:0370:7334',
-
         diskUsage: '디스크 사용량',
         localVolume: '로컬 스토리지 볼륨',
         buildCache: '빌드 캐시',
@@ -906,7 +907,6 @@ const message = {
         sizeRwHelper: '컨테이너에 고유한 쓰기 가능 레이어 크기',
         sizeRootFs: '가상 크기',
         sizeRootFsHelper: '컨테이너가 의존하는 모든 이미지 레이어 + 컨테이너 레이어의 총 크기',
-
         containerFromAppHelper:
             '이 컨테이너가 앱 스토어에서 왔음을 감지했습니다. 앱 작업으로 현재 편집이 무효화될 수 있습니다.',
         containerFromAppHelper1:
@@ -1001,9 +1001,9 @@ const message = {
         tagHelper: '한 줄에 하나씩. 예시:\nkey1=value1\nkey2=value2',
         imageNameHelper: '이미지 이름과 태그, 예시: nginx:latest',
         cleanBuildCache: '빌드 캐시 정리',
-        delBuildCacheHelper: `이 작업은 빌드 중 생성된 모든 캐시된 아티팩트를 삭제하며 되돌릴 수 없습니다. 계속 하시겠습니까?`,
+        delBuildCacheHelper:
+            '이 작업은 빌드 중 생성된 모든 캐시된 아티팩트를 삭제하며 되돌릴 수 없습니다. 계속 하시겠습니까?',
         urlWarning: 'URL 접두어에 http:// 또는 https://를 포함할 필요는 없습니다. 수정해 주세요.',
-
         network: '네트워크 | 네트워크들',
         networkHelper: '이로 인해 일부 애플리케이션과 실행 환경이 제대로 작동하지 않을 수 있습니다. 계속 하시겠습니까?',
         networkName: '이름',
@@ -1015,7 +1015,6 @@ const message = {
         scope: 'IP 범위',
         gateway: '게이트웨이',
         auxAddress: '제외 IP',
-
         volume: '볼륨 | 볼륨들',
         volumeDir: '볼륨 디렉터리',
         nfsEnable: 'NFS 스토리지 사용',
@@ -1023,7 +1022,6 @@ const message = {
         mountpoint: '마운트 지점',
         mountpointNFSHelper: '예: /nfs, /nfs-share',
         options: '옵션',
-
         repo: '레지스트리',
         httpRepoHelper: 'HTTP 타입 저장소 작업 시 Docker 서비스 재시작이 필요합니다.',
         httpRepo: 'HTTP 프로토콜을 선택하면 Docker 서비스를 재시작하여 불안정한 레지스트리에 추가해야 합니다.',
@@ -1038,7 +1036,6 @@ const message = {
             '거울이 여러 개 있을 경우 각 줄에 하나씩 표시해야 합니다. 예시:\nhttp://xxxxxx.m.daocloud.io \nhttps://xxxxxx.mirror.aliyuncs.com',
         registrieHelper:
             '개인 레지스트리가 여러 개 있을 경우 각 줄에 하나씩 표시해야 합니다. 예시:\n172.16.10.111:8081 \n172.16.10.112:8081',
-
         compose: '컴포즈 | 컴포즈들',
         composeFile: '컴포즈 파일',
         fromChangeHelper: '소스를 변경하면 현재 편집한 내용이 삭제됩니다. 계속 하시겠습니까?',
@@ -1063,7 +1060,6 @@ const message = {
             '이 작업은 {0} 컴포즈 아래의 모든 컨테이너와 네트워크를 중지하고 제거합니다. 계속 하시겠습니까?',
         composeEnvHelper2:
             '이 오케스트레이션은 1Panel 앱 스토어에서 생성되었습니다. 설치된 애플리케이션에서 환경 변수를 수정하세요.',
-
         setting: '설정 | 설정들',
         operatorStatusHelper: '이 작업은 Docker 서비스를 "{0}" 합니다. 계속 하시겠습니까?',
         dockerStatus: 'Docker 서비스',
@@ -1091,7 +1087,7 @@ const message = {
         iptablesHelper1: 'Docker 에 대한 iptables 규칙을 자동으로 구성합니다.',
         iptablesHelper2: 'iptables 를 비활성화하면 컨테이너가 외부 네트워크와 통신할 수 없습니다.',
         daemonJsonPath: '구성 경로',
-        serviceUnavailable: `현재 Docker 서비스가 시작되지 않았습니다.`,
+        serviceUnavailable: '현재 Docker 서비스가 시작되지 않았습니다.',
         startIn: '시작하려면',
         sockPath: '유닉스 도메인 소켓',
         sockPathHelper: 'Docker 데몬과 클라이언트 간의 통신 채널입니다.',
@@ -1101,12 +1097,10 @@ const message = {
         related: '관련',
         includeAppstore: '앱 스토어에서 컨테이너 표시',
         excludeAppstore: '앱스토어 컨테이너 숨기기',
-
         cleanDockerDiskZone: 'Docker 에서 사용하는 디스크 공간 정리',
         cleanImagesHelper: '(사용되지 않는 모든 이미지를 정리합니다.)',
         cleanContainersHelper: '(정지된 모든 컨테이너를 정리합니다.)',
         cleanVolumesHelper: '(사용되지 않는 모든 로컬 볼륨을 정리합니다.)',
-
         makeImage: '이미지 생성',
         newImageName: '새 이미지 이름',
         commitMessage: '커밋 메시지',
@@ -1114,6 +1108,11 @@ const message = {
         ifPause: '생성 중 컨테이너 일시 정지',
         ifMakeImageWithContainer: '이 컨테이너에서 새 이미지를 생성하시겠습니까?',
         finishTime: '마지막 중지 시간',
+        workingDir: '작업 디렉토리',
+        resource: '리소스',
+        macAddr: 'MAC 주소',
+        exportHelper: '선택한 이미지를 하나의 tar 파일로 내보냅니다.',
+        goSetting: '편집으로 이동',
     },
     cronjob: {
         importHelper:
@@ -1163,7 +1162,8 @@ const message = {
         directory: '백업 디렉토리',
         sourceDir: '백업 디렉토리',
         snapshot: '시스템 스냅샷',
-        allOptionHelper: `현재 작업 계획은 모든 [{0}]을 백업하는 것입니다. 현재 직접 다운로드는 지원되지 않습니다. [{0}] 메뉴에서 백업 목록을 확인하실 수 있습니다.`,
+        allOptionHelper:
+            '현재 작업 계획은 모든 [{0}]을 백업하는 것입니다. 현재 직접 다운로드는 지원되지 않습니다. [{0}] 메뉴에서 백업 목록을 확인하실 수 있습니다.',
         exclusionRules: '배제 규칙',
         exclusionRulesHelper:
             '제외 규칙을 선택하거나 입력하고, 각 세트 입력 후 Enter 키를 눌러 계속합니다. 제외 규칙은 이 백업의 모든 압축 작업에 적용됩니다',
@@ -1222,7 +1222,6 @@ const message = {
         cutWebsiteLog: '웹사이트 로그 회전',
         cutWebsiteLogHelper: '회전된 로그 파일은 1Panel 의 백업 디렉토리로 백업됩니다.',
         syncIpGroup: 'WAF IP 그룹 동기화',
-
         requestExpirationTime: '업로드 요청 만료 시간(시간)',
         unitHours: '단위: 시간',
         alertTitle: '예정된 작업 - {0} 「{1}」 작업 실패 경고',
@@ -1247,6 +1246,13 @@ const message = {
             syncHelper:
                 '시스템 스크립트 라이브러리를 동기화합니다. 이 작업은 시스템 스크립트에만 적용됩니다. 계속하시겠습니까?',
         },
+        nextTime: '다음 5회 실행',
+        logHelper1: '1. 1Panel 시스템 로그',
+        backupContent: '백업 내용',
+        cronSpecRule2: '실행 주기 형식이 올바르지 않습니다. 확인 후 다시 시도하세요.',
+        executor: '실행자',
+        cleanLog: '로그 자동 정리',
+        cleanLogscope: '로그 보관 기간',
     },
     monitor: {
         globalFilter: '전역 필터',
@@ -1258,7 +1264,6 @@ const message = {
         defaultIOHelper: '모니터링 및 개요 인터페이스에 표시되는 기본 디스크 옵션',
         cleanMonitor: '모니터링 기록 지우기',
         cleanHelper: '이 작업은 GPU를 포함한 모든 모니터링 기록을 지웁니다. 계속하시겠습니까?',
-
         avgLoad: '평균 부하',
         loadDetail: '부하 세부사항',
         resourceUsage: '자원 사용률',
@@ -1369,20 +1374,25 @@ const message = {
             timeZone: '시간대',
             localTime: '서버 시간',
             timeZoneChangeHelper: '시스템 시간대를 변경하려면 서비스를 재시작해야 합니다. 계속하시겠습니까?',
-            timeZoneHelper: `"timedatectl" 명령이 설치되지 않은 경우 시간대를 변경할 수 없습니다. 시스템은 시간대 변경에 이 명령을 사용합니다.`,
+            timeZoneHelper:
+                '"timedatectl" 명령이 설치되지 않은 경우 시간대를 변경할 수 없습니다. 시스템은 시간대 변경에 이 명령을 사용합니다.',
             timeZoneCN: '베이징',
             timeZoneAM: '로스앤젤레스',
             timeZoneNY: '뉴욕',
             ntpALi: '알리바바',
             ntpGoogle: '구글',
             syncSite: 'NTP 서버',
-            hostnameHelper: `호스트 이름 수정은 "hostnamectl" 명령에 따라 달라집니다. 명령이 설치되지 않은 경우 수정이 실패할 수 있습니다.`,
-            userHelper: `사용자 이름은 "whoami" 명령을 사용하여 검색됩니다. 명령이 설치되지 않은 경우 검색이 실패할 수 있습니다.`,
-            passwordHelper: `비밀번호 수정은 "chpasswd" 명령에 따라 달라집니다. 명령이 설치되지 않은 경우 수정이 실패할 수 있습니다.`,
+            hostnameHelper:
+                '호스트 이름 수정은 "hostnamectl" 명령에 따라 달라집니다. 명령이 설치되지 않은 경우 수정이 실패할 수 있습니다.',
+            userHelper:
+                '사용자 이름은 "whoami" 명령을 사용하여 검색됩니다. 명령이 설치되지 않은 경우 검색이 실패할 수 있습니다.',
+            passwordHelper:
+                '비밀번호 수정은 "chpasswd" 명령에 따라 달라집니다. 명령이 설치되지 않은 경우 수정이 실패할 수 있습니다.',
             hostHelper: '제공된 내용에 빈 값이 포함되어 있습니다. 확인 후 수정하여 다시 시도해주세요!',
             dnsCheck: '가용성 테스트',
             dnsOK: 'DNS 구성 정보가 유효합니다!',
             dnsTestFailed: 'DNS 구성 정보가 유효하지 않습니다.',
+            syncSiteHelper: '{0}을(를) 기준으로 시스템 시간을 동기화하시겠습니까?',
         },
         fail2ban: {
             sshPort: 'SSH 포트 청취',
@@ -1498,6 +1508,9 @@ const message = {
         websiteLog: '웹사이트 로그',
         runLog: '실행 로그',
         errLog: '에러 로그',
+        task: '작업 로그',
+        taskName: '작업 이름',
+        taskRunning: '실행 중',
     },
     file: {
         fileDirNum: '총 {0}개 디렉터리, {1}개 파일,',
@@ -1584,7 +1597,7 @@ const message = {
         currentSelect: '현재 선택: ',
         unsupportedType: '지원되지 않는 파일 유형',
         deleteHelper: '다음 파일을 삭제하시겠습니까? 기본적으로 삭제 후 휴지통으로 이동합니다.',
-        fileHelper: `참고:\n1. 검색 결과는 정렬할 수 없습니다.\n2. 폴더는 크기로 정렬할 수 없습니다.`,
+        fileHelper: '참고:\n1. 검색 결과는 정렬할 수 없습니다.\n2. 폴더는 크기로 정렬할 수 없습니다.',
         forceDeleteHelper: '파일을 영구적으로 삭제합니다(휴지통으로 이동하지 않고 바로 삭제).',
         recycleBin: '휴지통',
         sourcePath: '원래 경로',
@@ -1611,7 +1624,7 @@ const message = {
             '안전하지 않은 서버 연결을 허용하면 데이터 유출 또는 변조가 발생할 수 있습니다. 이 옵션은 다운로드 소스를 신뢰할 때만 사용하세요.',
         uploadOverLimit: '파일 수가 1000 개를 초과했습니다! 압축하여 업로드하세요.',
         clashDidNotSupport: '파일 이름에 .1panel_clash 를 포함할 수 없습니다.',
-        clashDeleteAlert: `"휴지통" 폴더는 삭제할 수 없습니다.`,
+        clashDeleteAlert: '"휴지통" 폴더는 삭제할 수 없습니다.',
         clashOpenAlert: '휴지통 디렉터리를 열려면 "휴지통" 버튼을 클릭하세요.',
         right: '앞으로',
         back: '뒤로',
@@ -1629,7 +1642,7 @@ const message = {
         previewTruncated: '파일이 너무 커서 마지막 부분만 표시됩니다',
         previewEmpty: '파일이 비어 있거나 텍스트 파일이 아닙니다',
         previewLargeFile: '미리보기',
-        panelInstallDir: `1Panel 설치 디렉터리는 삭제할 수 없습니다.`,
+        panelInstallDir: '1Panel 설치 디렉터리는 삭제할 수 없습니다.',
         wgetTask: '다운로드 작업',
         existFileTitle: '동일한 이름의 파일 경고',
         existFileHelper: '업로드한 파일에 동일한 이름의 파일이 포함되어 있습니다. 덮어쓰시겠습니까?',
@@ -1721,6 +1734,7 @@ const message = {
         loginTime: '로그인 시간',
         loginIP: '로그인 IP',
         stopSSHWarn: '이 SSH 연결을 끊으시겠습니까?',
+        remote: '원격 SSH',
     },
     setting: {
         panel: '패널',
@@ -1908,7 +1922,6 @@ const message = {
         accountKey: '계정 키',
         address: '주소',
         path: '경로',
-
         safe: '보안',
         passkey: '패스키',
         passkeyManage: '관리',
@@ -2011,7 +2024,6 @@ const message = {
         error416: '범위 불만족',
         error444: '연결 닫힘',
         error500: '서버 오류',
-
         https: '패널에 HTTPS를 설정하면 액세스 보안이 향상됩니다',
         strictHelper: '비 HTTPS 트래픽은 패널에 연결할 수 없습니다',
         muxHelper:
@@ -2026,7 +2038,6 @@ const message = {
         primaryKey: '개인 키',
         certificate: '인증서',
         backupJump: '현재 백업 목록에 없는 파일입니다. 파일 디렉토리에서 다운로드하여 백업에 가져오기를 시도하세요.',
-
         snapshot: '스냅샷 | 스냅샷들',
         noAppData: '선택할 수 있는 시스템 앱이 없습니다',
         noBackupData: '선택할 수 있는 백업 데이터가 없습니다',
@@ -2094,7 +2105,6 @@ const message = {
         rollback: '롤백',
         rollbackHelper:
             '이 복구를 롤백하면 해당 복구의 모든 파일이 대체되며 Docker 및 1Panel 서비스를 재시작해야 할 수 있습니다. 계속하시겠습니까?',
-
         upgradeHelper: '업그레이드에는 1Panel 서비스를 재시작해야 합니다. 계속하시겠습니까?',
         rollbackLocalHelper:
             '마스터 노드는 직접 롤백을 지원하지 않습니다. 수동으로 [1pctl restore] 명령어를 실행하여 롤백하세요!',
@@ -2105,7 +2115,6 @@ const message = {
         versionNotSame: '노드 버전이 메인 노드와 일치하지 않습니다. 노드 관리에서 업그레이드한 후 다시 시도해 주세요.',
         versionCompare:
             '노드 {0}이(가) 이미 업그레이드 가능한 최신 버전입니다. 마스터 노드 버전을 확인 후 다시 시도하세요!',
-
         about: '정보',
         versionItem: '현재 버전',
         backupCopies: '백업 수',
@@ -2123,7 +2132,6 @@ const message = {
         forum: '토론',
         doc2: '문서',
         currentVersion: '버전',
-
         license: '라이선스',
         bindNode: '노드 바인딩',
         menuSetting: '메뉴 설정',
@@ -2136,6 +2144,31 @@ const message = {
         recoverMessage: '페이지가 새로고침되어 메뉴 목록이 초기 상태로 복원됩니다. 계속하시겠습니까?',
         compressPassword: '압축 비밀번호',
         backupRecoverMessage: '압축 또는 압축 해제 비밀번호를 입력하세요 (설정하지 않으려면 비워 두세요)',
+        componentSize: '컴포넌트 크기',
+        scope: '범위',
+        public: '공개',
+        publicHelper: '공개 타입 백업 계정은 각 하위 노드로 동기화되어 함께 사용할 수 있습니다',
+        private: '비공개',
+        privateHelper: '비공개 타입 백업 계정은 현재 노드에서만 생성되며 현재 노드에서만 사용됩니다',
+        UPYUN: 'UPYUN',
+        ALIYUN: 'Aliyun Drive',
+        ALIYUNHelper:
+            'Aliyun Drive의 비클라이언트 다운로드 최대 용량은 100MB입니다. 초과 시 클라이언트로 다운로드하세요.',
+        ALIYUNRecover:
+            'Aliyun Drive의 비클라이언트 다운로드 최대 용량은 100MB입니다. 초과 시 클라이언트로 로컬 다운로드 후 스냅샷을 동기화해 복원하세요.',
+        GoogleDrive: 'Google Drive',
+        analysis: '분석',
+        analysisHelper:
+            '전체 토큰 내용을 붙여넣으면 필요한 항목을 자동으로 파싱합니다. 자세한 내용은 공식 문서를 참고하세요.',
+        serviceName: '서비스 이름',
+        operator: '운영자',
+        clickToRefresh: '클릭하여 새로고침',
+        recoverFailed: '스냅샷 복원 실패',
+        upgradeRecord: '업그레이드 기록',
+        upgrading: '업그레이드 중, 잠시만 기다려 주세요...',
+        versionHelper: '명명 규칙: [메이저].[기능].[버그 수정], 예시:',
+        upgradeCheck: '업데이트 확인',
+        panelSSLHelper: '패널 SSL 자동 갱신 후 1Panel 서비스를 수동 재시작해야 적용됩니다.',
     },
     license: {
         offLine: '오프라인 버전',
@@ -2189,6 +2222,9 @@ const message = {
         app: '프로페셔널 버전으로 업그레이드하면 모바일 APP을 통해 서비스 정보, 이상 모니터링 등을 확인할 수 있습니다.',
         cluster:
             '프로페셔널 에디션으로 업그레이드하면 MySQL/Postgres/Redis 마스터-슬레이브 클러스터를 관리할 수 있습니다.',
+        exceptionalHelper:
+            '라이선스 동기화 검증이 비정상입니다. 수동으로 동기화 버튼을 눌러 프로 버전 기능을 확인하세요. 상세: ',
+        tamperHelper: '작업 실패, 파일/폴더에 변조 방지가 활성화되어 있습니다. 확인 후 다시 시도하세요!',
     },
     clean: {
         scan: '스캔 시작',
@@ -2207,7 +2243,6 @@ const message = {
         suggest: '(권장)',
         totalScan: '정리해야 할 총 불필요 파일: ',
         selectScan: '선택된 불필요 파일 총합: ',
-
         system: '시스템 불필요 파일',
         systemHelper: '스냅샷, 업그레이드 및 기타 프로세스 중에 생성된 임시 파일',
         panelOriginal: '시스템 스냅샷 복원 전 백업 파일',
@@ -2215,7 +2250,6 @@ const message = {
         agentPackages: '이전 버전 자식 노드 업그레이드/설치 패키지',
         upgradeHelper: '(시스템 롤백을 위해 최신 업그레이드 백업을 유지하는 것이 좋습니다)',
         rollback: '복구 전 백업 파일',
-
         backup: '시스템 백업',
         backupHelper: '로컬 백업 계정에 연결되지 않은 백업 파일',
         unknownBackup: '시스템 백업',
@@ -2224,13 +2258,11 @@ const message = {
         unknownDatabase: '연결되지 않은 데이터베이스 백업',
         unknownWebsite: '연결되지 않은 웹사이트 백업',
         unknownSnapshot: '연결되지 않은 스냅샷 백업',
-
         upload: '임시 업로드 파일',
         uploadHelper: '시스템 백업 리스트에서 업로드된 임시 파일',
         download: '임시 다운로드 파일',
         downloadHelper: '시스템에서 제3자 백업 계정으로 다운로드된 임시 파일',
         directory: '디렉터리',
-
         systemLog: '로그 파일',
         systemLogHelper: '시스템 로그, 작업 로그, 웹사이트 로그 파일',
         dockerLog: '컨테이너 작업 로그 파일',
@@ -2238,14 +2270,13 @@ const message = {
         shell: '셸 스크립트 예약 작업',
         containerShell: '컨테이너 내에서 실행하는 셸 스크립트 예약 작업',
         curl: 'CURL 예약 작업',
-
         docker: '컨테이너 쓰레기',
         dockerHelper: '컨테이너, 이미지, 볼륨, 빌드 캐시 등의 파일',
         volumes: '볼륨',
         buildCache: '컨테이너 빌드 캐시',
-
         appTmpDownload: '앱 임시 다운로드 파일',
         unknownWebsiteLog: '연결되지 않은 웹사이트 로그 백업 파일',
+        snapshot: '시스템 스냅샷 임시 파일',
     },
     app: {
         app: '애플리케이션 | 애플리케이션들',
@@ -2692,7 +2723,6 @@ const message = {
         failTimeout: '장애 시간 초과',
         failTimeoutHelper:
             '서버 상태 점검 시간 창 길이. 이 기간 동안 누적 실패 횟수가 임계값에 도달하면 서버가 일시적으로 제거되고 동일한 시간 후에 재시도됩니다. 기본값 10초',
-
         staticChangePHPHelper: '현재 정적 웹사이트이며 PHP 웹사이트로 전환할 수 있습니다.',
         proxyCache: '리버스 프록시 캐시',
         cacheLimit: '캐시 공간 제한',
@@ -2720,7 +2750,6 @@ const message = {
         preflight: '프리플라이트 요청 빠른 응답',
         preflightHleper:
             '활성화하면 브라우저가 교차 출처 프리플라이트 요청(OPTIONS 요청)을 보낼 때 시스템이 자동으로 204 상태 코드를 반환하고 필요한 교차 출처 응답 헤더를 설정합니다',
-
         changeDatabase: '데이터베이스 전환',
         changeDatabaseHelper1: '데이터베이스 연관은 웹사이트 백업 및 복원에 사용됩니다.',
         changeDatabaseHelper2: '다른 데이터베이스로 전환하면 이전 백업을 복원할 수 없게 될 수 있습니다.',
@@ -2754,7 +2783,6 @@ const message = {
         execUser: '실행 사용자',
         execDir: '실행 디렉토리',
         packagist: '중국 전체 미러',
-
         batchOperate: '일괄 작업',
         batchOperateHelper: '웹사이트를 일괄 {0}, 계속 작업하시겠습니까?',
         stream: 'TCP/UDP 프록시',
@@ -2763,8 +2791,12 @@ const message = {
             '외부 수신 포트 번호를 설정합니다. 클라이언트는 이 포트를 통해 서비스에 액세스합니다. 쉼표로 구분하세요. 예: 5222,5223',
         streamHelper: 'TCP/UDP 포트 포워딩 및 로드 밸런싱',
         udp: 'UDP 활성화',
-
         syncHtmlHelper: 'PHP 및 정적 웹사이트에 동기화',
+        wafValueHelper: '값',
+        parentWbeiste: '상위 웹사이트',
+        shareCahe: '캐시 수 메모리 크기',
+        shareCaheHelper: '메모리 1M당 약 8000개의 캐시 객체를 저장할 수 있습니다',
+        cacheExpireJHelper: '만료 후 미적중 시 캐시가 삭제됩니다',
     },
     php: {
         short_open_tag: '짧은 태그 지원',
@@ -2791,6 +2823,7 @@ const message = {
         containerConfig: '컨테이너 구성',
         containerConfigHelper: '환경 변수 및 기타 정보는 생성 후 구성 - 컨테이너 구성에서 수정할 수 있습니다',
         dateTimezoneHelper: '예: TZ=Asia/Shanghai（필요에 따라 추가하세요）',
+        extensionsHelper: '여러 확장은 쉼표로 구분하세요',
     },
     nginx: {
         serverNamesHashBucketSizeHelper: '서버 이름의 해시 테이블 크기',
@@ -2953,7 +2986,6 @@ const message = {
         portHelper2: '포트 범위, 예: 8080-8089',
         changeStrategyHelper:
             '[{1}] {0} 전략을 [{2}]로 변경합니다. 설정 후 {0}은(는) {2}로 외부 접근을 허용합니다. 계속하시겠습니까?',
-
         strategy: '전략',
         accept: '허용',
         drop: '차단',
@@ -2980,7 +3012,6 @@ const message = {
         exportHelper: '{0}개의 방화벽 규칙을 내보내려고 합니다. 계속하시겠습니까?',
         importSuccess: '{0}개의 규칙을 성공적으로 가져왔습니다',
         importPartialSuccess: '가져오기 완료: 성공 {0}건, 실패 {1}건',
-
         ipv4Limit: '현재 작업은 IPv4 주소만 지원합니다',
         basicStatus: '현재 체인 {0}이(가) 바인딩되지 않았습니다. 먼저 바인딩하세요!',
         baseIptables: 'iptables 서비스',
@@ -3011,6 +3042,10 @@ const message = {
         portHelper: '0은 모든 포트를 의미합니다',
         allPorts: '모든 포트',
         deleteRuleConfirm: '{0}개의 규칙을 삭제합니다. 계속하시겠습니까?',
+        advancedControl: '고급 제어',
+        advancedControlNotAvailable: '현재 {0} 방화벽 사용 중이며, 고급 규칙은 iptables만 지원합니다',
+        quickJump: '빠른 이동',
+        destination: '대상',
     },
     runtime: {
         runtime: '실행 환경',
@@ -3068,6 +3103,26 @@ const message = {
         concurrency: '동시성 체계',
         loadStatus: '부하 상태',
         extraHosts: '호스트 매핑',
+        extension: '확장',
+        installExtension: '확장 {0} 설치를 확인하시겠습니까',
+        loadedExtension: '로드된 확장',
+        popularExtension: '인기 확장',
+        uninstallExtension: '확장 {0}을(를) 제거하시겠습니까',
+        phpConfigHelper: '설정 변경 후 운영 환경 재시작이 필요합니다. 계속하시겠습니까',
+        operateMode: '운영 모드',
+        dynamic: '동적',
+        static: '고정',
+        ondemand: '온디맨드',
+        dynamicHelper: '프로세스 수를 동적으로 조정합니다. 트래픽 변동이 크거나 메모리가 적은 사이트에 적합합니다',
+        staticHelper: '프로세스 수를 고정합니다. 고동시성·안정 트래픽 사이트에 적합하지만 자원 소모가 큽니다',
+        ondemandHelper: '필요 시 프로세스를 시작/종료합니다. 자원 효율은 좋지만 초기 응답이 느릴 수 있습니다',
+        max_children: '생성 가능한 최대 프로세스 수',
+        start_servers: '시작 시 생성되는 프로세스 수',
+        min_spare_servers: '최소 유휴 프로세스 수',
+        max_spare_servers: '최대 유휴 프로세스 수',
+        envKey: '이름',
+        envValue: '값',
+        environment: '환경 변수',
     },
     process: {
         pid: '프로세스 ID',
@@ -3114,7 +3169,7 @@ const message = {
             list: '데몬 프로세스 | 데몬 프로세스들',
             config: 'Supervisor 설정',
             primaryConfig: '주 설정 파일 위치',
-            notSupportCtl: `supervisorctl 이 감지되지 않았습니다.  스크립트 라이브러리 페이지에서 수동으로 설치하세요.`,
+            notSupportCtl: 'supervisorctl 이 감지되지 않았습니다.  스크립트 라이브러리 페이지에서 수동으로 설치하세요.',
             user: '사용자',
             command: '명령어',
             dir: '디렉토리',
@@ -3123,7 +3178,7 @@ const message = {
                 '이 작업은 주 설정 파일의 "[include]" 섹션에 있는 "files" 값을 수정합니다. 다른 설정 파일의 디렉토리는 "{1Panel 설치 디렉토리}/1panel/tools/supervisord/supervisor.d/"입니다.',
             operatorHelper: '{1} 작업을 {0}에서 수행합니다. 계속하시겠습니까?',
             uptime: '운영 시간',
-            notStartWarn: `Supervisor 가 시작되지 않았습니다. 먼저 시작하세요.`,
+            notStartWarn: 'Supervisor 가 시작되지 않았습니다. 먼저 시작하세요.',
             serviceName: '서비스 이름',
             initHelper:
                 'Supervisor 서비스가 감지되었지만 초기화되지 않았습니다. 상단 상태 표시줄의 초기화 버튼을 클릭하여 구성하세요.',
@@ -3441,8 +3496,10 @@ const message = {
             fileToLarge: '파일이 1MB를 초과하여 업로드할 수 없습니다',
             uploadOverLimit: '업로드된 파일 수가 제한을 초과했습니다, 최대 1개',
             importRuleHelper: '한 줄에 하나의 규칙',
+            name: 'WAF 이름',
         },
         monitor: {
+            '360': '360 검색',
             name: '웹사이트 모니터링',
             pv: '페이지 조회수',
             uv: '고유 방문자 수',
@@ -3512,7 +3569,6 @@ const message = {
             statusErr: '잘못된 상태 코드 형식',
             shenma: '션마 검색',
             duckduckgo: '덕덕고',
-            '360': '360 검색',
             excludeUri: 'URI 제외',
             top100Helper: '상위 100 개의 데이터를 표시합니다',
             logSaveDay: '로그 보관 기간 (일)',
@@ -3617,7 +3673,6 @@ const message = {
             wafContent3: '요청이 차단된 후 표시할 사용자 지정 페이지를 생성합니다.',
             wafTitle4: '사용자 지정 규칙 (ACL)',
             wafContent4: '사용자 지정 규칙에 따라 요청을 차단합니다.',
-
             tamperTitle1: '파일 무결성 모니터링',
             tamperContent1: '핵심 파일, 스크립트 파일, 구성 파일을 포함한 웹사이트 파일의 무결성을 모니터링합니다.',
             tamperTitle2: '실시간 스캔 및 감지',
@@ -3628,14 +3683,12 @@ const message = {
             tamperTitle4: '로그 기록 및 분석',
             tamperContent4:
                 '파일 접근 및 작업 로그를 기록하여 관리자가 감사 및 분석을 수행할 수 있도록 하고, 잠재적 보안 위협을 식별합니다.',
-
             settingTitle1: '사용자 정의 환영 메시지',
             settingContent1: '1Panel 로그인 페이지에 사용자 정의 환영 메시지를 설정합니다.',
             settingTitle2: '사용자 정의 로고',
             settingContent2: '브랜드명이나 텍스트가 포함된 로고 이미지를 업로드할 수 있습니다.',
             settingTitle3: '사용자 정의 웹사이트 아이콘',
             settingContent3: '브라우저 기본 아이콘을 대체할 사용자 정의 아이콘을 업로드하여 사용자 경험을 개선합니다.',
-
             monitorTitle1: '방문자 추세',
             monitorContent1: '웹사이트 방문자 추세를 통계적으로 표시합니다.',
             monitorTitle2: '방문자 지도',
@@ -3644,7 +3697,6 @@ const message = {
             monitorContent3: '웹사이트 요청 정보(스파이더, 접속 장치, 요청 상태 등)에 대한 통계를 제공합니다.',
             monitorTitle4: '실시간 모니터링',
             monitorContent4: '웹사이트 요청 정보(요청 수, 트래픽 등)를 실시간으로 모니터링합니다.',
-
             alertTitle1: 'SMS 알림',
             alertContent1:
                 '서버 리소스 사용량 이상, 웹사이트 및 인증서 만료, 새로운 버전 업데이트, 비밀번호 만료 등의 문제가 발생하면 SMS 알림을 통해 사용자가 신속히 처리할 수 있도록 합니다.',
@@ -3654,7 +3706,6 @@ const message = {
             alertTitle3: '알림 설정',
             alertContent3:
                 '사용자에게 전화번호, 일일 푸시 빈도, 일일 푸시 시간 등을 사용자 정의할 수 있는 설정을 제공하여 보다 합리적인 푸시 알림을 설정할 수 있도록 합니다.',
-
             nodeDashTitle1: '애플리케이션 관리',
             nodeDashContent1:
                 '다중 노드 애플리케이션의 통합 관리, 상태 모니터링, 빠른 시작/중지, 터미널 연결 및 백업 지원',
@@ -3664,7 +3715,6 @@ const message = {
             nodeDashContent3: '다중 노드 데이터베이스의 통합 관리, 주요 상태 한눈에 확인, 원클릭 백업 지원',
             nodeDashTitle4: '예약 작업 관리',
             nodeDashContent4: '다중 노드 예약 작업의 통합 관리, 상태 모니터링, 빠른 시작/중지 및 수동 트리거 실행 지원',
-
             nodeTitle1: '원클릭 노드 추가',
             nodeContent1: '여러 서버 노드를 빠르게 통합',
             nodeTitle2: '일괄 업그레이드',
@@ -3673,17 +3723,14 @@ const message = {
             nodeContent3: '각 노드의 운영 상태를 실시간으로 파악',
             nodeTitle4: '빠른 원격 연결',
             nodeContent4: '원클릭으로 노드 원격 터미널에 직접 연결',
-
             fileExchangeTitle1: '키 인증 전송',
             fileExchangeContent1: 'SSH 키를 통해 인증하여 전송 보안을 보장합니다.',
             fileExchangeTitle2: '효율적인 파일 동기화',
             fileExchangeContent2: '변경된 내용만 동기화하여 전송 속도와 안정성을 크게 향상시킵니다.',
             fileExchangeTitle3: '다중 노드 상호 통신 지원',
             fileExchangeContent3: '다른 노드 간에 프로젝트 파일을 쉽게 전송하고, 여러 서버를 유연하게 관리합니다.',
-
             nodeAppTitle1: '애플리케이션 업그레이드 관리',
             nodeAppContent1: '다중 노드 애플리케이션 업데이트 통합 모니터링, 원클릭 업그레이드 지원',
-
             appTitle1: '유연한 패널 관리',
             appContent1: '언제 어디서나 1Panel 서버를 쉽게 관리하세요.',
             appTitle2: '종합적인 서비스 정보',
@@ -3692,7 +3739,6 @@ const message = {
             appTitle3: '실시간 이상 모니터링',
             appContent3:
                 '모바일 앱에서 서버 상태, WAF 보안 모니터링, 웹사이트 방문 통계 및 프로세스 건강 상태를 실시간으로 확인하세요.',
-
             clusterTitle1: '마스터-슬레이브 배포',
             clusterContent1:
                 '다른 노드에서 MySQL/Postgres/Redis 마스터-슬레이브 인스턴스를 생성하는 것을 지원하며, 자동으로 마스터-슬레이브 연결 및 초기화를 완료합니다',
@@ -3759,7 +3805,6 @@ const message = {
             nodeSyncHelper: '노드 정보 동기화는 다음 정보를 동기화합니다:',
             nodeSyncHelper1: '1. 공용 백업 계정 정보',
             nodeSyncHelper2: '2. 주 노드와 하위 노드 간의 연결 정보',
-
             nodeCheck: '가용성 확인',
             checkSSH: '노드 SSH 연결 확인',
             checkUserPermission: '노드 사용자 권한 확인',
@@ -3781,7 +3826,6 @@ const message = {
             errLicense: '이 노드에 바인딩된 라이선스를 사용할 수 없습니다. 확인 후 다시 시도하십시오!',
             errNodePort:
                 '노드 포트 [ {0} ]에 접근할 수 없는 것으로 감지되었습니다. 방화벽 또는 보안 그룹에서 해당 포트가 허용되었는지 확인하십시오.',
-
             reinstallHelper: '노드 {0}를 재설치합니다. 계속하시겠습니까?',
             unhealthyCheck: '비정상 체크',
             fixOperation: '수정 작업',
@@ -3805,7 +3849,6 @@ const message = {
             offline: '오프라인 모드',
             freeCount: '무료 할당량 [{0}]',
             offlineHelper: '노드가 오프라인 환경일 때 사용',
-
             appUpgrade: '앱 업그레이드',
             appUpgradeHelper: '업그레이드가 필요한 앱이 {0}개 있습니다',
         },

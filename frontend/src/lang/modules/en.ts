@@ -71,7 +71,7 @@ const message = {
             notAgree: 'Disagree',
             preview: 'Preview',
             open: 'Open',
-            notSave: `Don't Save`,
+            notSave: "Don't Save",
             createNewFolder: 'Create new folder',
             createNewFile: 'Create new file',
             helpDoc: 'Docs',
@@ -150,14 +150,14 @@ const message = {
         },
         msg: {
             noneData: 'No data available',
-            delete: `This action cannot be undone. Continue?`,
-            clean: `This cleanup cannot be undone. Continue?`,
+            delete: 'This action cannot be undone. Continue?',
+            clean: 'This cleanup cannot be undone. Continue?',
             closeDrawerHelper: 'Unsaved changes may be lost. Continue?',
             deleteSuccess: 'Deleted successfully',
             loginSuccess: 'Logged in successfully',
             operationSuccess: 'Completed successfully',
             copySuccess: 'Copied successfully',
-            notSupportOperation: `This operation is not supported`,
+            notSupportOperation: 'This operation is not supported',
             requestTimeout: 'Request timed out, try again later',
             infoTitle: 'Notice',
             notRecords: 'No run records for this task',
@@ -168,13 +168,13 @@ const message = {
             operateConfirm: 'To confirm, type: ',
             inputOrSelect: 'Select or enter',
             copyFailed: 'Failed to copy',
-            operatorHelper: `Run "{1}" on "{0}". This cannot be undone. Continue?`,
+            operatorHelper: 'Run "{1}" on "{0}". This cannot be undone. Continue?',
             notFound: 'Sorry, the page you requested does not exist.',
-            unSupportType: `Current file type is not supported.`,
+            unSupportType: 'Current file type is not supported.',
             unSupportSize: 'Uploaded file exceeds {0}M. Confirm.',
-            fileExist: `The file already exists in the current folder. Repeat uploading is not supported.`,
+            fileExist: 'The file already exists in the current folder. Repeat uploading is not supported.',
             fileNameErr: 'Filename must be 1-256 chars and only include letters, numbers, dots, dashes, or underscores',
-            confirmNoNull: `Make sure the value {0} is not empty.`,
+            confirmNoNull: 'Make sure the value {0} is not empty.',
             errPort: 'Invalid port, please check',
             remove: 'Remove',
             backupHelper: 'The current operation will back up {0}. Proceed?',
@@ -229,13 +229,15 @@ const message = {
             requiredInput: 'This field is required.',
             requiredSelect: 'Select an item in the list',
             illegalChar: 'Injection of characters & ; $ \' ` ( ) " > < | is currently not supported',
-            illegalInput: `This field mustn't contains illegal characters.`,
+            illegalInput: "This field mustn't contains illegal characters.",
             commonName:
                 'This field must start with non-special characters and must consist of English, Chinese, numbers, ".", "-", and "_" characters with a length of 1-128.',
             userName: 'This field must consist of English, Chinese, numbers and "_" characters with a length of 3-30.',
-            simpleName: `This field mustn't start with underscore character and must consist of English, numbers, and "_" characters with a length of 3-30.`,
-            simplePassword: `This field mustn't start with underscore character and must consist of English, numbers, and "_" characters with a length of 1-30.`,
-            dbName: `This field mustn't start with underscore character and must consist of English, numbers, and "_" characters with a length of 1-64.`,
+            simpleName:
+                'This field mustn\'t start with underscore character and must consist of English, numbers, and "_" characters with a length of 3-30.',
+            simplePassword:
+                'This field mustn\'t start with underscore character and must consist of English, numbers, and "_" characters with a length of 1-30.',
+            dbName: 'This field mustn\'t start with underscore character and must consist of English, numbers, and "_" characters with a length of 1-64.',
             imageName:
                 'This field must consist of English, numbers, ":", "@", "/", ".", "-", and "_" characters with a length of 1-256.',
             volumeName:
@@ -247,7 +249,8 @@ const message = {
             complexityPassword:
                 'This field must consist of English, numbers with a length of 8-30 and contain at least two special characters.',
             commonPassword: 'This field length must be more than 6.',
-            linuxName: `This field length must be between 1 and 128. The field mustn't contain these special characters: "{0}".`,
+            linuxName:
+                'This field length must be between 1 and 128. The field mustn\'t contain these special characters: "{0}".',
             email: 'This field must be a valid email address.',
             number: 'This field must be a number.',
             integer: 'This field must be a positive integer.',
@@ -262,10 +265,12 @@ const message = {
             numberRange: 'This field must be a number between {0} and {1}.',
             paramName:
                 'This field must consist of English, numbers, ".", "-", and "_" characters with a length of 2-30.',
-            paramComplexity: `This field mustn't start and end with special characters and must consist of English, numbers, "{0}" characters with a length of 6-128.`,
+            paramComplexity:
+                'This field mustn\'t start and end with special characters and must consist of English, numbers, "{0}" characters with a length of 6-128.',
             paramUrlAndPort: 'This field must be in the format of "http(s)://(domain name/ip):(port)".',
             nginxDoc: 'This field must consist of English, numbers and "." characters.',
-            appName: `This field musnt't start and end with "-" and "_" characters and must consist of English, numbers, "-", and "_" characters with a length of 2-30.`,
+            appName:
+                'This field musnt\'t start and end with "-" and "_" characters and must consist of English, numbers, "-", and "_" characters with a length of 2-30.',
             containerName: 'Supports letters, numbers, -, _ and .; cannot start with - _ or .; length: 2-128',
             mirror: 'The mirror acceleration address should start with http(s)://, support English letters (both uppercase and lowercase), numbers, . / and -, and should not contain blank lines.',
             disableFunction: 'Only support letters ,underscores,and,',
@@ -289,7 +294,7 @@ const message = {
             commonError: 'Request failed',
         },
         service: {
-            serviceNotStarted: `The {0} service is not started.`,
+            serviceNotStarted: 'The {0} service is not started.',
         },
         status: {
             running: 'Running',
@@ -416,7 +421,8 @@ const message = {
         restart_1panel: 'Restart panel',
         restart_system: 'Restart server',
         operationSuccess: 'Completed successfully. Rebooting now, refresh the browser later.',
-        entranceHelper: `Security entrance is not enabled. You can enable it in "Settings -> Security" to improve system security.`,
+        entranceHelper:
+            'Security entrance is not enabled. You can enable it in "Settings -> Security" to improve system security.',
         appInstalled: 'Applications',
         systemInfo: 'System information',
         hostname: 'Hostname',
@@ -436,12 +442,10 @@ const message = {
         runningTime: 'Up since',
         mem: 'System memory',
         swapMem: 'Swap',
-
         runSmoothly: 'Low load',
         runNormal: 'Moderate load',
         runSlowly: 'High load',
         runJam: 'Heavy load',
-
         core: 'Physical cores',
         logicCore: 'Logical cores',
         corePercent: 'Core Usage',
@@ -467,10 +471,8 @@ const message = {
         available: 'Available',
         percent: 'Utilization',
         goInstall: 'Go install',
-
         networkCard: 'NIC',
         disk: 'Disk',
-
         memo: 'Memo',
         memoPlaceholder: 'Click the edit button to enable editing.',
         carouselSetting: 'Carousel settings',
@@ -523,17 +525,15 @@ const message = {
         changePasswordHelper:
             'The database has been associated with an application. Changing the password will change the database password of the application at the same time. The change takes effect after the application restarts.',
         recoverTimeoutHelper: '-1 means no timeout',
-
         confChange: 'Configuration',
         confNotFound:
             'The configuration file could not be found. Please upgrade the application to the latest version in the app store and try again!',
-
         portHelper:
             'This port is the exposed port of the container. You need to save the modification separately and restart the container!',
-
         loadFromRemote: 'Sync from server',
         userBind: 'Bind user',
-        pgBindHelper: `This operation is used to create a new user and bind it to the target database. Currently, selecting users already existing in the database is not supported.`,
+        pgBindHelper:
+            'This operation is used to create a new user and bind it to the target database. Currently, selecting users already existing in the database is not supported.',
         pgSuperUser: 'Superuser',
         loadFromRemoteHelper: 'Sync database info from the server to 1Panel. Continue?',
         passwordHelper: 'Not available, click to update',
@@ -558,14 +558,12 @@ const message = {
         hasCA: 'Has CA certificate',
         skipVerify: 'Skip certificate validation',
         initialDB: 'Initial Database',
-
         formatHelper:
             'The current database character set is {0}, the character set inconsistency may cause recovery failure',
         dropHelper: 'You can drag and drop the uploaded file here or',
         clickHelper: 'click to upload',
         supportUpType:
             'Only supports sql, sql.gz, tar.gz, .zip file formats. The imported compressed file must contain only one .sql file or include test.sql',
-
         currentStatus: 'Current status',
         baseParam: 'Basic parameter',
         performanceParam: 'Performance parameter',
@@ -590,14 +588,13 @@ const message = {
         openTables: 'Open tables',
         openTablesHelper: 'The configuration value of "table_open_cache" must be greater than or equal to this value.',
         selectFullJoin: 'Select full join',
-        selectFullJoinHelper: `If this value is not 0, check table indexes.`,
+        selectFullJoinHelper: 'If this value is not 0, check table indexes.',
         selectRangeCheck: 'The number of joins with no index',
-        selectRangeCheckHelper: `If this value is not 0, check table indexes.`,
+        selectRangeCheckHelper: 'If this value is not 0, check table indexes.',
         sortMergePasses: 'Number of sorted merges',
         sortMergePassesHelper: 'If the value is too large, increase "sort_buffer_size".',
         tableLocksWaited: 'Lock table number',
         tableLocksWaitedHelper: 'If the value is too large, consider increasing your database performance.',
-
         performanceTuning: 'Performance tuning',
         optimizationScheme: 'Optimization scheme',
         keyBufferSizeHelper: 'Buffer size for index',
@@ -615,14 +612,11 @@ const message = {
         tableOpenCacheHelper: 'Table cache',
         maxConnectionsHelper: 'Max connections',
         restart: 'Restart',
-
         slowLog: 'Slow logs',
         noData: 'No slow logs yet.',
-
         isOn: 'On',
         longQueryTime: 'threshold(s)',
         thresholdRangeHelper: 'Enter the correct threshold (1 - 600).',
-
         timeout: 'Timeout(s)',
         timeoutHelper: 'Idle connection timeout period. 0 indicates that the connection is on continuously.',
         maxclients: 'Max clients',
@@ -645,24 +639,21 @@ const message = {
         keyspaceMisses: 'Number of failed attempts to find the database key.',
         hit: 'Find the database key hit ratio.',
         latestForkUsec: 'The number of microseconds spent on the last fork() operation.',
-        redisCliHelper: `"redis-cli" not detected. Enable the service first.`,
+        redisCliHelper: '"redis-cli" not detected. Enable the service first.',
         redisQuickCmd: 'Redis quick commands',
         recoverHelper: 'This will overwrite data with [{0}]. Continue?',
         submitIt: 'Overwrite the data',
-
         baseConf: 'Basic',
         allConf: 'All',
         restartNow: 'Restart now',
         restartNowHelper1:
             'You need to restart the system after the configuration changes take effect. If your data needs to be persisted, perform the save operation first.',
         restartNowHelper: 'This will take effect only after the system restarts.',
-
         persistence: 'Persistence',
         rdbHelper1: 'second(s), insert',
         rdbHelper2: 'pieces of data',
         rdbHelper3: 'Meeting any of the conditions will trigger RDB persistence.',
         rdbInfo: 'Ensure that the value in the rule list ranges from 1 to 100000',
-
         containerConn: 'Container connection',
         copyConnURL: 'Copy connection URL',
         connAddress: 'Address',
@@ -726,6 +717,7 @@ const message = {
             pairingCodeRequired: 'Enter pairing code',
             pairingApproveSuccess: 'Pairing approved successfully',
             customProviderHelper: 'Custom model providers do not validate whether the account is available.',
+            feishuSaveSuccess: 'Saved to Feishu',
         },
         model: {
             model: 'Models',
@@ -773,7 +765,6 @@ const message = {
             memoryUsed: 'Memory Used',
             memoryTotal: 'Total Memory',
             percent: 'Utilization',
-
             base: 'Basic Information',
             driverVersion: 'Driver Version',
             cudaVersion: 'CUDA Version',
@@ -870,7 +861,7 @@ const message = {
         containerPruneHelper1: 'This will delete all containers that are in stopped state.',
         containerPruneHelper2:
             'If the containers are from the app store, you need to go to "App Store -> Installed" and click the "Rebuild" button to reinstall them after performing the cleanup.',
-        containerPruneHelper3: `This operation cannot be undone. Continue?`,
+        containerPruneHelper3: 'This operation cannot be undone. Continue?',
         imagePrune: 'Prune',
         imagePruneSome: 'Clean unlabeled',
         imagePruneSomeEmpty: 'No images with the "none" tag can be cleaned.',
@@ -899,7 +890,7 @@ const message = {
         cleanLogscope: 'Cleanup Type',
         downLogHelper1: 'This will download all logs from container {0}. Continue?',
         downLogHelper2: 'This will download the latest {1} logs from container {0}. Continue?',
-        cleanLogHelper: `This will require restarting the container and cannot be undone. Continue?`,
+        cleanLogHelper: 'This will require restarting the container and cannot be undone. Continue?',
         newName: 'New name',
         workingDir: 'Working Dir',
         source: 'Resource usage',
@@ -916,7 +907,6 @@ const message = {
             'Container engine uses a base value of 1024 for CPU shares. You can increase it to give the container more CPU time.',
         inputIpv4: 'Example: 192.168.1.1',
         inputIpv6: 'Example: 2001:0db8:85a3:0000:0000:8a2e:0370:7334',
-
         diskUsage: 'Disk Usage',
         localVolume: 'Local Storage Volume',
         buildCache: 'Build Cache',
@@ -929,7 +919,6 @@ const message = {
         sizeRwHelper: 'Size of the writable layer unique to the container',
         sizeRootFs: 'Virtual Size',
         sizeRootFsHelper: 'Total size of all image layers the container depends on + container layer',
-
         containerFromAppHelper:
             'Detected that this container originates from the app store. App operations may cause current edits to be invalidated.',
         containerFromAppHelper1:
@@ -943,7 +932,6 @@ const message = {
         privileged: 'Privileged',
         privilegedHelper:
             'Allow the container to perform certain privileged operations on the host, which may increase container risks. Use with caution!',
-
         upgradeHelper: 'Repository Name/Image Name: Image Version',
         upgradeWarning2:
             'The upgrade operation requires rebuilding the container, any unpersisted data will be lost. Continue?',
@@ -953,7 +941,6 @@ const message = {
         targetImage: 'Target image',
         imageLoadErr: 'No image name detected for the container',
         appHelper: 'The container comes from the app store, and upgrading may make the service unavailable.',
-
         resource: 'Resource',
         input: 'Manually input',
         forcePull: 'Always pull image ',
@@ -968,7 +955,7 @@ const message = {
         autoRemove: 'Auto remove',
         cpuQuota: 'Number of CPU cores',
         memoryLimit: 'Memory',
-        limitHelper: `If set to 0, it means that there is no limitation. The maximum value is {0}`,
+        limitHelper: 'If set to 0, it means that there is no limitation. The maximum value is {0}',
         macAddr: 'MAC Address',
         mount: 'Mount',
         volumeOption: 'Volume',
@@ -999,10 +986,8 @@ const message = {
         unlessStopped: 'unless-stopped',
         onFailure: 'on-failure (five times by default)',
         no: 'never',
-
         refreshTime: 'Refresh interval',
         cache: 'Cache',
-
         image: 'Image | Images',
         imagePull: 'Pull',
         imagePullHelper:
@@ -1031,9 +1016,9 @@ const message = {
         tagHelper: 'One per line. For example,\nkey1=value1\nkey2=value2',
         imageNameHelper: 'Image name and Tag, for example: nginx:latest',
         cleanBuildCache: 'Clean build cache',
-        delBuildCacheHelper: `This will delete all cached artifacts that are generated during builds and cannot be undone. Continue?`,
+        delBuildCacheHelper:
+            'This will delete all cached artifacts that are generated during builds and cannot be undone. Continue?',
         urlWarning: 'The URL prefix does not need to include http:// or https://. Please modify.',
-
         network: 'Network | Networks',
         networkHelper: 'This may cause some applications and runtime environments to not work properly. Continue?',
         networkName: 'Name',
@@ -1045,7 +1030,6 @@ const message = {
         scope: 'IP scope',
         gateway: 'Gateway',
         auxAddress: 'Exclude IP',
-
         volume: 'Volume | Volumes',
         volumeDir: 'Volume directory',
         nfsEnable: 'Enable NFS storage',
@@ -1053,7 +1037,6 @@ const message = {
         mountpoint: 'Mountpoint',
         mountpointNFSHelper: 'e.g. /nfs, /nfs-share',
         options: 'Options',
-
         repo: 'Repository | Repositories',
         httpRepoHelper: 'Operating an HTTP-type repository requires restarting the Docker service.',
         httpRepo: 'Choosing HTTP protocol requires restarting the Docker service to add it into insecure registries.',
@@ -1067,7 +1050,6 @@ const message = {
             'If there are multiple mirrors, newlines must be displayed, for example:\nhttp://xxxxxx.m.daocloud.io \nhttps://xxxxxx.mirror.aliyuncs.com',
         registrieHelper:
             'If multiple private repositories exist, newlines must be displayed, for example:\n172.16.10.111:8081 \n172.16.10.112:8081',
-
         compose: 'Compose | Composes',
         composeFile: 'Compose File',
         fromChangeHelper: 'Switching the source will clean the current edited content. Continue?',
@@ -1093,7 +1075,6 @@ const message = {
         composeDownHelper: 'This will stop and remove all containers and networks under the {0} compose. Continue?',
         composeEnvHelper2:
             'This orchestration was created by the 1Panel App Store. Please modify environment variables in the installed applications.',
-
         setting: 'Setting | Settings',
         goSetting: 'Go to edit',
         operatorStatusHelper: 'This will "{0}" the Docker service. Continue?',
@@ -1124,7 +1105,7 @@ const message = {
         iptablesHelper2:
             'Disabling iptables will result in the containers being unable to communicate with external networks.',
         daemonJsonPath: 'Conf Path',
-        serviceUnavailable: `Docker service is not started at present.`,
+        serviceUnavailable: 'Docker service is not started at present.',
         startIn: ' to start',
         sockPath: 'Unix domain socket',
         sockPathHelper: 'Communication channel between Docker daemon and the client.',
@@ -1134,12 +1115,10 @@ const message = {
         related: 'Related',
         includeAppstore: 'Show containers from the app store',
         excludeAppstore: 'Hide App Store Container',
-
         cleanDockerDiskZone: 'Clean up disk space used by Docker',
         cleanImagesHelper: '( Clean up all images that are not used by any containers )',
         cleanContainersHelper: '( Clean up all stopped containers )',
         cleanVolumesHelper: '( Clean up all unused local volumes )',
-
         makeImage: 'Create image',
         newImageName: 'New image name',
         commitMessage: 'Commit message',
@@ -1147,6 +1126,7 @@ const message = {
         ifPause: 'Pause Container During Creation',
         ifMakeImageWithContainer: 'Create New Image from This Container?',
         finishTime: 'Last stop time',
+        exportHelper: 'Export selected images to one tar file.',
     },
     cronjob: {
         importHelper:
@@ -1199,7 +1179,8 @@ const message = {
         directory: 'Backup directory',
         sourceDir: 'Backup directory',
         snapshot: 'System snapshot',
-        allOptionHelper: `The current task plan is to back up all [{0}]. Direct download is not supported at the moment. You can check the backup list of [{0}] menu.`,
+        allOptionHelper:
+            'The current task plan is to back up all [{0}]. Direct download is not supported at the moment. You can check the backup list of [{0}] menu.',
         exclusionRules: 'Exclusive rule',
         exclusionRulesHelper:
             'Select or enter exclusion rules, press Enter after each set to continue. Exclusion rules will apply to all compression operations in this backup',
@@ -1259,7 +1240,6 @@ const message = {
         cutWebsiteLog: 'Website log rotation',
         cutWebsiteLogHelper: 'The rotated log files will be backed up to the backup directory of 1Panel.',
         syncIpGroup: 'Sync WAF IP groups',
-
         requestExpirationTime: 'Upload request expiration time(Hours)',
         unitHours: 'Unit: Hours',
         alertTitle: 'Planned Task - {0} 「{1}」 Task Failure Alert',
@@ -1284,6 +1264,8 @@ const message = {
             noSuchApp: 'The {0} service was not detected. Please install it quickly using the script library first!',
             syncHelper: 'About to sync system script library. This operation only affects system scripts. Continue?',
         },
+        cleanLog: 'Auto clean logs',
+        cleanLogscope: 'Log retention',
     },
     monitor: {
         globalFilter: 'Global Filter',
@@ -1295,7 +1277,6 @@ const message = {
         defaultIOHelper: 'Default disk option displayed in monitoring and overview interfaces',
         cleanMonitor: 'Clear Monitoring Records',
         cleanHelper: 'This operation will clear all monitoring records including GPU. Continue?',
-
         avgLoad: 'Load average',
         loadDetail: 'Load detail',
         resourceUsage: 'Utilization',
@@ -1411,26 +1392,31 @@ const message = {
             timeZone: 'System time zone',
             localTime: 'Server time',
             timeZoneChangeHelper: 'Modifying the system time zone requires restarting the service. Continue?',
-            timeZoneHelper: `If you don't install "timedatectl" command, you may not change the time zone. Because system uses that command to change time zone.`,
+            timeZoneHelper:
+                'If you don\'t install "timedatectl" command, you may not change the time zone. Because system uses that command to change time zone.',
             timeZoneCN: 'Beijing',
             timeZoneAM: 'Los Angeles',
             timeZoneNY: 'New York',
             ntpALi: 'Alibaba',
             ntpGoogle: 'Google',
             syncSite: 'NTP server',
-            hostnameHelper: `Hostname modification depends on the "hostnamectl" command. If the command is not installed, the modification may fail.`,
-            userHelper: `The username depends on the "whoami" command for retrieval. If the command is not installed, retrieval may fail.`,
-            passwordHelper: `Password modification depends on the "chpasswd" command. If the command is not installed, the modification may fail.`,
+            hostnameHelper:
+                'Hostname modification depends on the "hostnamectl" command. If the command is not installed, the modification may fail.',
+            userHelper:
+                'The username depends on the "whoami" command for retrieval. If the command is not installed, retrieval may fail.',
+            passwordHelper:
+                'Password modification depends on the "chpasswd" command. If the command is not installed, the modification may fail.',
             hostHelper:
                 'There is an empty value in the provided content. Please check and try again after modification!',
             dnsCheck: 'Test Availability',
             dnsOK: 'DNS configuration information is available!',
-            dnsTestFailed: `DNS configuration information is not available.`,
+            dnsTestFailed: 'DNS configuration information is not available.',
+            syncSiteHelper: 'Sync system time with {0}. Continue?',
         },
         fail2ban: {
             sshPort: 'Listen to SSH port',
             sshPortHelper: 'Current Fail2ban listens to the SSH connection port of the host',
-            unActive: `The Fail2ban service is not enabled at present.`,
+            unActive: 'The Fail2ban service is not enabled at present.',
             operation: 'You will perform operation "{0}" on Fail2ban service. Continue?',
             fail2banChange: 'Fail2ban Configuration Modification',
             ignoreHelper: 'The IP list in the allowlist will be ignored for blocking. Continue?',
@@ -1629,7 +1615,7 @@ const message = {
         unsupportedType: 'Unsupported file type',
         deleteHelper:
             'Are you sure you want to delete the following files? By default, it will enter the recycle bin after deletion',
-        fileHelper: `Note:\n1. Search results can't be sorted.\n2. Folders can't be sorted by size.`,
+        fileHelper: "Note:\n1. Search results can't be sorted.\n2. Folders can't be sorted by size.",
         forceDeleteHelper: 'Permanently delete the file (without entering the recycle bin, delete it directly)',
         recycleBin: 'Recycle bin',
         sourcePath: 'Original path',
@@ -1658,7 +1644,7 @@ const message = {
             'Allowing inscure server connections may lead to data leak or tampering. Use this option only when trusting the download source.',
         uploadOverLimit: 'The number of files exceeds 1000! Please compress and upload',
         clashDidNotSupport: 'File names are prohibited from containing .1panel_clash',
-        clashDeleteAlert: `The "Recycle Bin" folder can't be deleted`,
+        clashDeleteAlert: 'The "Recycle Bin" folder can\'t be deleted',
         clashOpenAlert: 'Click the "Recycle Bin" button to open the recycle bin directory',
         right: 'Forward',
         back: 'Back',
@@ -1676,7 +1662,7 @@ const message = {
         previewTruncated: 'File is too large, only showing the last part',
         previewEmpty: 'File is empty or not a text file',
         previewLargeFile: 'Preview',
-        panelInstallDir: `1Panel installation directory can't be deleted`,
+        panelInstallDir: "1Panel installation directory can't be deleted",
         wgetTask: 'Download Task',
         existFileTitle: 'Same name file prompt',
         existFileHelper: 'The uploaded file contains a file with the same name, do you want to overwrite it?',
@@ -1770,6 +1756,7 @@ const message = {
         loginTime: 'Login time',
         loginIP: 'Login IP',
         stopSSHWarn: 'Whether to disconnect this SSH connection',
+        remote: 'Remote SSH',
     },
     setting: {
         panel: 'Panel',
@@ -1847,8 +1834,8 @@ const message = {
         apiInterface: 'Enable API',
         apiInterfaceClose: 'Once closed, API interfaces cannot be accessed. Continue?',
         apiInterfaceHelper: 'Allow third-party applications to access the API.',
-        apiInterfaceAlert1: `Don't enable it in production environments because it may increase server security risks.`,
-        apiInterfaceAlert2: `Don't use third-party applications to call the API to prevent potential security threats.`,
+        apiInterfaceAlert1: "Don't enable it in production environments because it may increase server security risks.",
+        apiInterfaceAlert2: "Don't use third-party applications to call the API to prevent potential security threats.",
         apiInterfaceAlert3: 'API document:',
         apiInterfaceAlert4: 'Usage document:',
         apiKey: 'API key',
@@ -1866,8 +1853,8 @@ const message = {
         restartNowHelper: 'Configuring Docker proxy requires restarting the Docker service.',
         restartNow: 'Restart immediately',
         restartLater: 'Restart manually later',
-        systemIPWarning: `The server address is not currently set. Set it in the control panel first.`,
-        systemIPWarning1: `The current server address is set to {0}, and quick redirection is not possible!`,
+        systemIPWarning: 'The server address is not currently set. Set it in the control panel first.',
+        systemIPWarning1: 'The current server address is set to {0}, and quick redirection is not possible!',
         syncTime: 'Server Time',
         timeZone: 'Time Zone',
         timeZoneChangeHelper: 'Changing the time zone requires restarting the service. Continue?',
@@ -1888,7 +1875,8 @@ const message = {
         duplicatePassword: 'The new password cannot be the same as the original password, enter again!',
         diskClean: 'Cache clean',
         developerMode: 'Preview Program',
-        developerModeHelper: `You will get to expirence new features and fixes before they're released broadly and give early feedback.`,
+        developerModeHelper:
+            "You will get to expirence new features and fixes before they're released broadly and give early feedback.",
         thirdParty: 'Third-party accounts',
         scope: 'Scope',
         public: 'Public',
@@ -1983,7 +1971,6 @@ const message = {
         accountKey: 'Account key',
         address: 'Address',
         path: 'Path',
-
         safe: 'Security',
         passkey: 'Passkey',
         passkeyManage: 'Manage',
@@ -2038,7 +2025,8 @@ const message = {
         timeoutHelper:
             '[ {0} days ] The panel password is about to expire. After the expiration, you need to reset the password',
         complexity: 'Complexity validation',
-        complexityHelper: `After you enable it, the password validation rule will be: 8-30 characters, including English, numbers, and at least two special characters.`,
+        complexityHelper:
+            'After you enable it, the password validation rule will be: 8-30 characters, including English, numbers, and at least two special characters.',
         bindDomain: 'Bind domain',
         unBindDomain: 'Unbind domain',
         panelSSL: 'Panel SSL',
@@ -2057,7 +2045,7 @@ const message = {
             'After you set the authorized IP address list, only the IP address in the list can access the panel service.',
         allowIPsWarning:
             'After you set the authorized IP address list, only the IP address in the list can access the panel service. Continue?',
-        allowIPsHelper1: `Leave it blank to disable the IP address restriction.`,
+        allowIPsHelper1: 'Leave it blank to disable the IP address restriction.',
         allowIPEgs: 'One per line. For example,\n172.16.10.111\n172.16.10.0/24',
         mfa: 'Two-Factor Auth',
         mfaClose: 'Disabling MFA will reduce the security of the service. Continue?',
@@ -2080,7 +2068,8 @@ const message = {
         sslDisableHelper:
             'If the https service is disabled, you need to restart the panel for it to take effect. Continue?',
         noAuthSetting: 'Unauthorized setting',
-        noAuthSettingHelper: `When users don't log in with specified security entrance, or don't access the panel from specified IP or domain name, this response can hid panel characteristic.`,
+        noAuthSettingHelper:
+            "When users don't log in with specified security entrance, or don't access the panel from specified IP or domain name, this response can hid panel characteristic.",
         responseSetting: 'Response setting',
         help200: 'Help Page',
         error400: 'Bad Request',
@@ -2091,14 +2080,13 @@ const message = {
         error416: 'Range Not Satisfiable',
         error444: 'Connection Closed',
         error500: 'Internal Server Error',
-
         https: 'Setting HTTPS for the panel improves access security',
         strictHelper: 'Non-HTTPS traffic cannot connect to the panel',
         muxHelper:
             "The panel will listen on both HTTP and HTTPS protocols and redirect HTTP traffic to HTTPS, but this may reduce the panel's security",
         certType: 'Certificate type',
         selfSigned: 'Self signed',
-        selfSignedHelper: `Browsers may not trust self-signed certificates and may display security warnings.`,
+        selfSignedHelper: 'Browsers may not trust self-signed certificates and may display security warnings.',
         select: 'Select',
         domainOrIP: 'Domain or IP:',
         timeOut: 'Timeout',
@@ -2107,7 +2095,6 @@ const message = {
         certificate: 'Certificate',
         backupJump:
             'Backup files not in the current backup list, please try downloading from the file directory and importing for backup.',
-
         snapshot: 'Snapshot | Snaphshots',
         noAppData: 'No system applications available for selection',
         noBackupData: 'No backup data available for selection',
@@ -2166,7 +2153,7 @@ const message = {
         lastRecoverAt: 'Last recovery time',
         lastRollbackAt: 'Last rollback time',
         reDownload: 'Download the backup file again',
-        recoverErrArch: `Snapshot recovery between different server architectures is not supported!`,
+        recoverErrArch: 'Snapshot recovery between different server architectures is not supported!',
         recoverErrSize: 'Detected insufficient disk space, please check or clean up and try again!',
         recoverHelper: 'Starting recovery from snapshot {0}, confirm the following information before proceeding:',
         recoverHelper1: 'Recovery requires restarting Docker and 1Panel services',
@@ -2177,7 +2164,6 @@ const message = {
         rollback: 'Rollback',
         rollbackHelper:
             'Rolling back this recovery will replace all files from this recovery, and may require restarting Docker and 1Panel services. Continue?',
-
         upgradeRecord: 'Upgrade record',
         upgrading: 'Upgrading, please wait...',
         upgradeHelper: 'The upgrade requires restarting the 1Panel service. Continue?',
@@ -2193,7 +2179,6 @@ const message = {
         versionNotSame: 'Node version mismatch with the main node. Please upgrade in Node Management before retrying.',
         versionCompare:
             'Detected that node {0} is already at the latest upgradable version. Please check the primary node version and try again!',
-
         about: 'About',
         versionItem: 'Current Version',
         backupCopies: 'Backup Copies',
@@ -2210,7 +2195,6 @@ const message = {
         forum: 'Discussions',
         doc2: 'Docs',
         currentVersion: 'Version',
-
         license: 'License',
         bindNode: 'Bind Node',
         menuSetting: 'Menu Settings',
@@ -2295,7 +2279,6 @@ const message = {
         suggest: '(Recommended)',
         totalScan: 'Total junk files to be cleaned: ',
         selectScan: 'Total selected junk files: ',
-
         system: 'System Junk Files',
         systemHelper: 'Temporary files generated during snapshot, upgrade, and other processes',
         panelOriginal: 'Backup files before system snapshot restore',
@@ -2304,7 +2287,6 @@ const message = {
         upgradeHelper: '(Recommend keeping the latest upgrade backup for system rollback)',
         snapshot: 'System snapshot temporary files',
         rollback: 'Backup files before recover',
-
         backup: 'System Backup',
         backupHelper: 'Backup files not associated with local backup accounts',
         unknownBackup: 'System Backup',
@@ -2313,13 +2295,11 @@ const message = {
         unknownDatabase: 'Unassociated Database Backup',
         unknownWebsite: 'Unassociated Website Backup',
         unknownSnapshot: 'Unassociated Snapshot Backup',
-
         upload: 'Temporary Upload Files',
         uploadHelper: 'Temporary files uploaded from the system backup list',
         download: 'Temporary Download Files',
         downloadHelper: 'Temporary files downloaded from third-party backup accounts by the system',
         directory: 'Directory',
-
         systemLog: 'Log file',
         systemLogHelper: 'System logs, task logs, website log files',
         dockerLog: 'Container operation log files',
@@ -2327,12 +2307,10 @@ const message = {
         shell: 'Shell script scheduled tasks',
         containerShell: 'Shell script scheduled tasks executed inside containers',
         curl: 'CURL scheduled tasks',
-
         docker: 'Container garbage',
         dockerHelper: 'Files such as containers, images, volumes, build cache, etc.',
         volumes: 'Volumes',
         buildCache: 'Container Build Cache',
-
         appTmpDownload: 'App temporary download file',
         unknownWebsiteLog: 'Unlinked website log backup file',
     },
@@ -2360,9 +2338,9 @@ const message = {
         stopOperatorHelper: 'The application will be stopped. Continue?',
         restartOperatorHelper: 'The application will be restarted. Continue?',
         reloadOperatorHelper: 'The application will be reloaded. Continue?',
-        checkInstalledWarn: `"{0}" is not detected. Go to "App Store" to install.`,
+        checkInstalledWarn: '"{0}" is not detected. Go to "App Store" to install.',
         limitHelper: 'The application has already been installed.',
-        deleteHelper: `"{0}" has been associated with the following resource(s) and can't be deleted`,
+        deleteHelper: '"{0}" has been associated with the following resource(s) and can\'t be deleted',
         checkTitle: 'Hint',
         defaultConfig: 'Default configuration',
         defaultConfigHelper: 'It has been restored to the default configuration, it will take effect after saving',
@@ -2394,7 +2372,8 @@ const message = {
         containerNameHelper: 'The container name will be automatically generated when not set',
         allowPort: 'External access',
         allowPortHelper: 'Allowing external port access will release the firewall port',
-        appInstallWarn: `The application dosn't expose the external access port by default. Click "Advanced settings" to expose it.`,
+        appInstallWarn:
+            'The application dosn\'t expose the external access port by default. Click "Advanced settings" to expose it.',
         upgradeStart: 'Start upgrading! Please refresh the page later',
         toFolder: 'Open the installation directory',
         editCompose: 'Edit compose file',
@@ -2404,7 +2383,8 @@ const message = {
         allReadyInstalled: 'Installed',
         installHelper: 'If you have image pull issues, configure image acceleration.',
         sortMode: 'Sort',
-        installWarn: `The external access is not checked, and it will make the application unable to access through external network. Continue?`,
+        installWarn:
+            'The external access is not checked, and it will make the application unable to access through external network. Continue?',
         showIgnore: 'View ignored applications',
         cancelIgnore: 'Cancel ignore',
         ignoreList: 'Ignored applications',
@@ -2429,7 +2409,8 @@ const message = {
         useNew: 'Use custom version',
         useDefault: 'Use default version',
         useCustom: 'Customize docker-compose.yml',
-        useCustomHelper: `Using a custom docker-compose.yml file may cause the application upgrade to fail. If it is not necessary, don't check it.`,
+        useCustomHelper:
+            "Using a custom docker-compose.yml file may cause the application upgrade to fail. If it is not necessary, don't check it.",
         diffHelper:
             'The left side is the old version, the right side is the new version. After editing, click to save the custom version',
         pullImage: 'Pull Image',
@@ -2563,7 +2544,8 @@ const message = {
         deleteAppHelper: 'Delete associated applications and application backups at the same time',
         deleteBackupHelper: 'Also delete website backups.',
         deleteDatabaseHelper: 'Also delete the database associated with the website',
-        deleteConfirmHelper: `The delete operation cannot be undone. Enter <span style="color:red"> "{0}" </span> to confirm deletion.`,
+        deleteConfirmHelper:
+            'The delete operation cannot be undone. Enter <span style="color:red"> "{0}" </span> to confirm deletion.',
         staticPath: 'The corresponding main directory is ',
         limit: 'Scheme',
         blog: 'Forum/Blog',
@@ -2784,7 +2766,6 @@ const message = {
         failTimeout: 'Failure timeout',
         failTimeoutHelper:
             'The time window length for server health checks. When the cumulative number of failures reaches the threshold within this period, the server will be temporarily removed and retried after the same duration. Default 10 seconds',
-
         staticChangePHPHelper: 'Currently a static website, you can switch to a PHP website',
         proxyCache: 'Reverse Proxy Cache',
         cacheLimit: 'Cache Space Limit',
@@ -2812,7 +2793,6 @@ const message = {
         preflight: 'Preflight request fast response',
         preflightHleper:
             'When enabled, when the browser sends a cross-origin preflight request (OPTIONS request), the system will automatically return a 204 status code and set the necessary cross-origin response headers',
-
         changeDatabase: 'Change Database',
         changeDatabaseHelper1: 'Database association is used for backing up and restoring the website.',
         changeDatabaseHelper2: 'Switching to another database will cause previous backups to be unrecoverable.',
@@ -2846,7 +2826,6 @@ const message = {
         execUser: 'Executing User',
         execDir: 'Execution Directory',
         packagist: 'China Full Mirror',
-
         batchOperate: 'Batch Operation',
         batchOperateHelper: 'Batch {0} websites, continue operation?',
         stream: 'TCP/UDP Proxy',
@@ -2855,7 +2834,6 @@ const message = {
             'Set the external listening port number, clients will access the service through this port, separated by commas, e.g., 5222,5223',
         streamHelper: 'TCP/UDP Port Forwarding and Load Balancing',
         udp: 'Enable UDP',
-
         syncHtmlHelper: 'Sync to PHP and static websites',
     },
     php: {
@@ -2980,9 +2958,9 @@ const message = {
             'In manual resolution mode, you need to click the apply button after creation to obtain the DNS resolution value',
         httpHelper:
             'Using HTTP mode requires installing OpenResty and does not support applying for wildcard domain certificates.',
-        buypassHelper: `Buypass is not accessible in mainland China`,
+        buypassHelper: 'Buypass is not accessible in mainland China',
         googleHelper: 'How to get EAB HmacKey and EAB kid',
-        googleCloudHelper: `Google Cloud API is not accessible in most parts of mainland China`,
+        googleCloudHelper: 'Google Cloud API is not accessible in most parts of mainland China',
         skipDNSCheck: 'Skip DNS check',
         skipDNSCheckHelper: 'Check here only if you encounter a timeout issue during certification request.',
         cfHelper: 'Do not use Global API Key',
@@ -3022,7 +3000,6 @@ const message = {
         argsCheck: 'GET parameter check',
         postCheck: 'POST parameter verification',
         cookieBlockList: 'Cookie blocklist',
-
         dockerHelper:
             'The current firewall cannot disable container port mapping. Installed applications can go to the [Installed] page to edit application parameters and configure port release rules.',
         iptablesHelper:
@@ -3032,7 +3009,7 @@ const message = {
         unUsed: 'Unused',
         dockerRestart: 'Firewall operations require restarting the Docker service',
         firewallHelper: '{0} system firewall',
-        firewallNotStart: `The system firewall is not enabled at present. Enable it first.`,
+        firewallNotStart: 'The system firewall is not enabled at present. Enable it first.',
         restartFirewallHelper: 'This operation will restart the current firewall. Continue?',
         stopFirewallHelper: 'This will make the server lose security protection. Continue?',
         startFirewallHelper: 'After the firewall is enabled, the server security can be better protected. Continue?',
@@ -3040,7 +3017,7 @@ const message = {
         enableBanPing: 'Block Ping',
         disableBanPing: 'Unblock Ping',
         noPingTitle: 'Disable ping',
-        noPingHelper: `This will disable ping, and the server won't echo ICMP response. Continue?`,
+        noPingHelper: "This will disable ping, and the server won't echo ICMP response. Continue?",
         onPingHelper: 'This will enable ping, and hackers may discover your server. Continue?',
         changeStrategy: 'Change the {0} strategy',
         changeStrategyIPHelper1:
@@ -3057,7 +3034,6 @@ const message = {
         portHelper2: 'Range port, e.g. 8080-8089',
         changeStrategyHelper:
             'Change [{1}] {0} strategy to [{2}]. After setting, {0} will access {2} externally. Continue?',
-
         strategy: 'Strategy',
         accept: 'Accept',
         drop: 'Drop',
@@ -3085,7 +3061,6 @@ const message = {
         exportHelper: 'About to export {0} firewall rules. Continue?',
         importSuccess: 'Successfully imported {0} rules',
         importPartialSuccess: 'Import completed: {0} succeeded, {1} failed',
-
         ipv4Limit: 'The current operation only supports IPv4 addresses',
         basicStatus: 'Current chain {0} is unbound, please bind first!',
         baseIptables: 'iptables Service',
@@ -3123,11 +3098,13 @@ const message = {
         workDir: 'Working directory',
         localHelper: 'For local environment installation and offline environment usage issues, see ',
         versionHelper: 'PHP version, e.g. v8.0',
-        buildHelper: `If more extensions are selected, the CPU usage will be higher during the image creation process. Avoid selecting all extensions.`,
+        buildHelper:
+            'If more extensions are selected, the CPU usage will be higher during the image creation process. Avoid selecting all extensions.',
         openrestyWarn: 'PHP needs to be upgraded to OpenResty to version 1.21.4.1 or later to use',
         toupgrade: 'To Upgrade',
         edit: 'Edit runtime',
-        extendHelper: `If the extensions you need are not in the list, you can manually input the extension name. For example, input "sockets", then select the first one.`,
+        extendHelper:
+            'If the extensions you need are not in the list, you can manually input the extension name. For example, input "sockets", then select the first one.',
         rebuildHelper: 'After editing the extension, you need to rebuild the PHP application to take effect',
         rebuild: 'Rebuild PHP App',
         source: 'PHP extension source',
@@ -3158,7 +3135,7 @@ const message = {
         customScript: 'Custom startup command',
         customScriptHelper:
             'Enter the complete startup command, for example: npm run start. For PM2 startup commands, please replace with pm2-runtime, otherwise it will fail to start.',
-        portError: `Don't repeat the same port.`,
+        portError: "Don't repeat the same port.",
         systemRestartHelper: 'Status description: Interruption - status acquisition failed due to system restart',
         javaScriptHelper: 'Provide a full startup command. For example, "java -jar halo.jar -Xmx1024M -Xms256M".',
         javaDirHelper: 'The directory must contain jar files, subdirectories are also acceptable',
@@ -3239,7 +3216,7 @@ const message = {
             list: 'Daemon process',
             config: 'Supervisor configuration',
             primaryConfig: 'Main configuration file location',
-            notSupportCtl: `The supervisorctl is not detected, go to the script library page to install it manually`,
+            notSupportCtl: 'The supervisorctl is not detected, go to the script library page to install it manually',
             user: 'User',
             command: 'Command',
             dir: 'Directory',
@@ -3248,7 +3225,7 @@ const message = {
                 'This will modify "files" value in "[include"] section in the main configuration file. The directory of other configuration file will be: "{1Panel installation directory}/1panel/tools/supervisord/supervisor.d/".',
             operatorHelper: 'Operation {1} will be performed on {0}, continue? ',
             uptime: 'Running time',
-            notStartWarn: `Supervisor is not started. Start it first.`,
+            notStartWarn: 'Supervisor is not started. Start it first.',
             serviceName: 'Service name',
             initHelper:
                 'Supervisor service is detected but not initialized. Click the initialization button in the top status bar to configure it.',
@@ -3507,7 +3484,6 @@ const message = {
                 'Global Mode: Triggered when the total number of requests to any URL within a unit of time exceeds the threshold',
             uriModeHelper:
                 'URL Mode: Triggered when the number of requests to a single URL within a unit of time exceeds the threshold',
-
             ip: 'IP BlackList',
             globalSettingHelper:
                 'Settings with the [Website] tag need to be enabled in [Website Settings], and global settings are only the default settings for newly created websites',
@@ -3579,6 +3555,7 @@ const message = {
             importRuleHelper: 'One rule per line',
         },
         monitor: {
+            '360': '360 Search',
             name: 'Website Monitoring',
             pv: 'Page Views',
             uv: 'Unique Visitors',
@@ -3649,7 +3626,6 @@ const message = {
             statusErr: 'Invalid status code format',
             shenma: 'Shenma Search',
             duckduckgo: 'DuckDuckGo',
-            '360': '360 Search',
             excludeUri: 'Exclude URIs',
             top100Helper: 'Show the top 100 data',
             logSaveDay: 'Log Retention Period (days)',
@@ -3758,7 +3734,6 @@ const message = {
             wafContent3: 'Create a custom page to display after a request is intercepted',
             wafTitle4: 'Custom Rules (ACL)',
             wafContent4: 'Intercept requests according to custom rules',
-
             tamperTitle1: 'File Integrity Monitoring',
             tamperContent1:
                 'Monitor the integrity of website files, including core files, script files, and configuration files.',
@@ -3770,7 +3745,6 @@ const message = {
             tamperTitle4: 'Logging and Analysis',
             tamperContent4:
                 'Record file access and operation logs for subsequent auditing and analysis by administrators, as well as to identify potential security threats.',
-
             settingTitle1: 'Custom Welcome Message',
             settingContent1: 'Set a custom welcome message on the 1Panel login page.',
             settingTitle2: 'Custom Logo',
@@ -3778,7 +3752,6 @@ const message = {
             settingTitle3: 'Custom Website Icon',
             settingContent3:
                 'Allow uploading custom icons to replace the default browser icon, improving user experience.',
-
             monitorTitle1: 'Visitor Trend',
             monitorContent1: 'Statistics and displays website visitor trends',
             monitorTitle2: 'Visitor Map',
@@ -3789,7 +3762,6 @@ const message = {
             monitorTitle4: 'Real-time monitoring',
             monitorContent4:
                 'Real-time monitoring of website request information, including number of requests, traffic, etc.',
-
             alertTitle1: 'SMS Alerts',
             alertContent1:
                 'When abnormal server resource usage, website and certificate expiration, new version update, password expiration, etc. occur, users will be notified via SMS alarm to ensure timely processing.',
@@ -3799,7 +3771,6 @@ const message = {
             alertTitle3: 'Alert Settings',
             alertContent3:
                 'Provide users with custom phone numbers, daily push frequency, and daily push time configurations, making it easier for users to set up more reasonable push alerts.',
-
             nodeDashTitle1: 'Application Management',
             nodeDashContent1:
                 'Unified management of multi-node applications, supports status monitoring, quick start/stop, terminal connection, and backup',
@@ -3812,7 +3783,6 @@ const message = {
             nodeDashTitle4: 'Scheduled Task Management',
             nodeDashContent4:
                 'Unified management of multi-node scheduled tasks, supports status monitoring, quick start/stop, and manual trigger execution',
-
             nodeTitle1: 'One-Click Node Addition',
             nodeContent1: 'Quickly integrate multiple server nodes',
             nodeTitle2: 'Batch Upgrade',
@@ -3821,7 +3791,6 @@ const message = {
             nodeContent3: "Real-time monitoring of each node's operational status",
             nodeTitle4: 'Quick Remote Connection',
             nodeContent4: 'One-click direct connection to node remote terminals',
-
             fileExchangeTitle1: 'Key Authentication Transmission',
             fileExchangeContent1: 'Authenticate via SSH keys to ensure transmission security.',
             fileExchangeTitle2: 'Efficient File Synchronization',
@@ -3830,10 +3799,8 @@ const message = {
             fileExchangeTitle3: 'Support Multi-Node Intercommunication',
             fileExchangeContent3:
                 'Easily transfer project files between different nodes, flexible management of multiple servers.',
-
             nodeAppTitle1: 'Application Upgrade Management',
             nodeAppContent1: 'Unified monitoring of multi-node application updates, supports one-click upgrade',
-
             appTitle1: 'Flexible Panel Management',
             appContent1: 'Easily manage your 1Panel server anytime, anywhere.',
             appTitle2: 'Comprehensive Service Information',
@@ -3842,7 +3809,6 @@ const message = {
             appTitle3: 'Real-Time Abnormal Monitoring',
             appContent3:
                 'View real-time server status, WAF security monitoring, website traffic statistics, and process health status on the mobile app.',
-
             clusterTitle1: 'Master-Slave Deployment',
             clusterContent1:
                 'Supports creating MySQL/Postgres/Redis master-slave instances on different nodes, automatically completing master-slave association and initialization',
@@ -3910,7 +3876,6 @@ const message = {
             nodeSyncHelper: 'Node information synchronization will sync the following information:',
             nodeSyncHelper1: '1. Public backup account information',
             nodeSyncHelper2: '2. Connection information between the main node and sub-nodes',
-
             nodeCheck: 'Availability check',
             checkSSH: 'Check node SSH connection',
             checkUserPermission: 'Check node user permissions',
@@ -3931,7 +3896,6 @@ const message = {
             errLicense: 'The license bound to this node is unavailable. Please check and try again!',
             errNodePort:
                 'Node port [ {0} ] is detected as inaccessible. Please check if the firewall or security group has allowed this port.',
-
             reinstallHelper: 'Reinstall node {0}, continue?',
             unhealthyCheck: 'Abnormal Check',
             fixOperation: 'Fix Operation',
@@ -3956,7 +3920,6 @@ const message = {
             offline: 'Offline mode',
             freeCount: 'Free quota [{0}]',
             offlineHelper: 'Used when the node is in an offline environment',
-
             appUpgrade: 'App Upgrade',
             appUpgradeHelper: 'There are {0} apps that need to be upgraded',
         },
@@ -4050,7 +4013,6 @@ const message = {
             specifiedTime: 'Specified Time',
             deleteTitle: 'Delete Alert',
             deleteMsg: 'Are you sure you want to delete the alert task?',
-
             allSslTitle: 'All Website SSL Certificate Expiry Alerts',
             sslTitle: 'SSL Certificate Expiry Alert for Website {0}',
             allSiteEndTimeTitle: 'All Website Expiry Alerts',
@@ -4062,19 +4024,16 @@ const message = {
             loadTitle: 'High Load Alert',
             diskTitle: 'High Disk Usage Alert for Mount Directory {0}',
             allDiskTitle: 'High Disk Usage Alert',
-
             timeRule: 'Remaining time less than {0} days (if not handled, will resend the next day)',
             panelUpdateRule:
                 'Send an alert once when a new panel version is detected (if not handled, will resend the next day)',
             avgRule: 'Average {1} usage exceeds {2}% within {0} minutes, triggers alert, sends {3} times per day',
             diskRule: 'Disk usage for mount directory {0} exceeds {1}{2}, triggers alert, sends {3} times per day',
             allDiskRule: 'Disk usage exceeds {0}{1}, triggers alert, sends {2} times per day',
-
             cpuName: ' CPU ',
             memoryName: 'Memory',
             loadName: 'Load',
             diskName: 'Disk',
-
             syncAlertInfo: 'Manual Push',
             syncAlertInfoMsg: 'manually push the alert task?',
             pushError: 'Push Failed',

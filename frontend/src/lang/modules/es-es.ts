@@ -86,6 +86,8 @@ const message = {
             show: 'Mostrar',
             hide: 'Ocultar',
             migrate: 'Migrar',
+            disConn: 'Desconectar',
+            visit: 'Visitar',
         },
         operate: {
             start: 'Iniciar',
@@ -189,6 +191,8 @@ const message = {
             errImportFormat: 'Los datos de importación o el formato son incorrectos, verifica y vuelve a intentarlo',
             importHelper: 'Si hay conflictos, los datos importados sobrescribirán los existentes.',
             errImport: 'El contenido del archivo es anormal:',
+            backupSuccess: 'Copia completada',
+            restoreSuccess: 'Restauración completada',
         },
         login: {
             username: 'Usuario',
@@ -294,7 +298,7 @@ const message = {
             commonError: 'La solicitud falló',
         },
         service: {
-            serviceNotStarted: `El servicio {0} no está iniciado.`,
+            serviceNotStarted: 'El servicio {0} no está iniciado.',
         },
         status: {
             running: 'En ejecución',
@@ -408,6 +412,7 @@ const message = {
         app: 'Aplicación',
         msgCenter: 'Tareas',
         disk: 'Disco',
+        filter: 'Filtro',
     },
     home: {
         recommend: 'Recomendado',
@@ -475,6 +480,7 @@ const message = {
         memoPlaceholder: 'Haz clic en el botón de editar para habilitar la edición.',
         carouselSetting: 'Configuración del carrusel',
         tooltipSensitiveInfo: 'Mostrar/Ocultar información sensible',
+        alias: 'Alias',
     },
     tabs: {
         more: 'Más',
@@ -524,7 +530,6 @@ const message = {
         changePasswordHelper:
             'La base de datos ha sido asociada a una aplicación. Cambiar la contraseña también cambiará la contraseña de la base de datos en la aplicación. El cambio se aplica después de reiniciar la aplicación.',
         recoverTimeoutHelper: '-1 significa sin límite de tiempo de espera',
-
         confChange: 'Configuración',
         confNotFound:
             'No se pudo encontrar el archivo de configuración. Por favor actualice la aplicación a la última versión en la tienda y vuelva a intentarlo.',
@@ -561,7 +566,6 @@ const message = {
         hasCA: 'Posee certificado CA',
         skipVerify: 'Omitir la verificación de validez del certificado',
         initialDB: 'Base de Datos Inicial',
-
         formatHelper:
             'El conjunto de caracteres actual de la base de datos es {0}, la inconsistencia de conjuntos puede causar errores al recuperar',
         dropHelper: 'Puede arrastrar y soltar el archivo aquí o',
@@ -658,7 +662,6 @@ const message = {
         rdbHelper2: 'piezas de datos',
         rdbHelper3: 'Cumplir cualquiera de las condiciones activará la persistencia RDB.',
         rdbInfo: 'Asegúrese de que el valor de la regla esté entre 1 y 100000',
-
         containerConn: 'Conexión del contenedor',
         copyConnURL: 'Copiar URL de conexión',
         connAddress: 'Dirección',
@@ -722,6 +725,7 @@ const message = {
             pairingCodeRequired: 'Please enter pairing code',
             pairingApproveSuccess: 'Pairing approved successfully',
             customProviderHelper: 'En el proveedor de modelo personalizado no se valida si la cuenta está disponible',
+            feishuSaveSuccess: 'Guardado en Feishu',
         },
         model: {
             model: 'Modelo',
@@ -770,7 +774,6 @@ const message = {
             memoryUsed: 'Memoria Utilizada',
             memoryTotal: 'Memoria Total',
             percent: 'Utilización',
-
             base: 'Información Básica',
             driverVersion: 'Versión del Controlador',
             cudaVersion: 'Versión de CUDA',
@@ -802,6 +805,7 @@ const message = {
             current: 'Monitoreo en Tiempo Real',
             history: 'Registros Históricos',
             notSupport: 'La versión actual o el controlador no admiten mostrar este parámetro.',
+            processCount: 'Procesos',
         },
         mcp: {
             server: 'Servidor MCP',
@@ -918,7 +922,6 @@ const message = {
             'El motor de contenedores usa un valor base de 1024 para la proporción de CPU. Puede aumentarlo para darle al contenedor más tiempo de CPU.',
         inputIpv4: 'Ejemplo: 192.168.1.1',
         inputIpv6: 'Ejemplo: 2001:0db8:85a3:0000:0000:8a2e:0370:7334',
-
         diskUsage: 'Uso del Disco',
         localVolume: 'Volumen de Almacenamiento Local',
         buildCache: 'Caché de Construcción',
@@ -933,7 +936,6 @@ const message = {
         sizeRootFs: 'Tamaño Virtual',
         sizeRootFsHelper:
             'Tamaño total de todas las capas de imagen de las que depende el contenedor + capa del contenedor',
-
         containerFromAppHelper:
             'Se detectó que este contenedor proviene de la tienda de aplicaciones. Las operaciones sobre la app pueden invalidar los cambios actuales.',
         containerFromAppHelper1:
@@ -1073,7 +1075,6 @@ const message = {
             'Si hay varios mirrors, deben estar en líneas separadas. Ejemplo:\nhttp://xxxxxx.m.daocloud.io\nhttps://xxxxxx.mirror.aliyuncs.com',
         registrieHelper:
             'Si existen varios repositorios privados, deben estar en líneas separadas. Ejemplo:\n172.16.10.111:8081\n172.16.10.112:8081',
-
         compose: 'Compose | Composes',
         composeFile: 'Archivo de Orquestación',
         fromChangeHelper: 'Cambiar la fuente limpiará el contenido actualmente editado. ¿Desea continuar?',
@@ -1100,7 +1101,6 @@ const message = {
             'Esto detendrá y eliminará todos los contenedores y redes bajo la composición {0}. ¿Desea continuar?',
         composeEnvHelper2:
             'Esta orquestación fue creada por la Tienda de Aplicaciones 1Panel. Modifique las variables de entorno en las aplicaciones instaladas.',
-
         setting: 'Configuración | Configuraciones',
         goSetting: 'Ir a editar',
         operatorStatusHelper: 'Esto "{0}" el servicio Docker. ¿Desea continuar?',
@@ -1153,6 +1153,7 @@ const message = {
         ifPause: '¿Pausar el contenedor durante la creación?',
         ifMakeImageWithContainer: '¿Crear nueva imagen a partir de este contenedor?',
         finishTime: 'Hora de la última detención',
+        exportHelper: 'Exporta las imágenes seleccionadas en un solo archivo tar.',
     },
     cronjob: {
         importHelper:
@@ -1208,7 +1209,8 @@ const message = {
         directory: 'Directorio de respaldo',
         sourceDir: 'Directorio de respaldo',
         snapshot: 'Instantánea del sistema',
-        allOptionHelper: `El plan actual es respaldar todos los [{0}]. La descarga directa no está soportada por ahora. Puede consultar la lista de respaldos en el menú [{0}].`,
+        allOptionHelper:
+            'El plan actual es respaldar todos los [{0}]. La descarga directa no está soportada por ahora. Puede consultar la lista de respaldos en el menú [{0}].',
         exclusionRules: 'Reglas de exclusión',
         exclusionRulesHelper:
             'Seleccione o ingrese reglas de exclusión, presione Enter después de cada conjunto para continuar. Las reglas de exclusión se aplicarán a todas las operaciones de compresión en esta copia de seguridad',
@@ -1270,7 +1272,6 @@ const message = {
         cutWebsiteLog: 'Rotación de logs del sitio',
         cutWebsiteLogHelper: 'Los archivos de log rotados se respaldarán en el directorio de respaldos de 1Panel.',
         syncIpGroup: 'Sincronizar grupos de IP de WAF',
-
         requestExpirationTime: 'Tiempo de expiración de solicitud de subida (Horas)',
         unitHours: 'Unidad: Horas',
         alertTitle: 'Tarea programada - {0} 「{1}」 Alerta de fallo',
@@ -1298,6 +1299,9 @@ const message = {
             syncHelper:
                 'Se va a sincronizar la librería de scripts del sistema. Solo afecta a los scripts del sistema. ¿Desea continuar?',
         },
+        logHelper1: '1. Registro del sistema de 1Panel',
+        cleanLog: 'Limpieza automática de logs',
+        cleanLogscope: 'Retención de logs',
     },
     monitor: {
         globalFilter: 'Filtro Global',
@@ -1310,7 +1314,6 @@ const message = {
         defaultIOHelper: 'Opción de disco predeterminada mostrada en las interfaces de monitoreo y resumen',
         cleanMonitor: 'Limpiar Registros de Monitoreo',
         cleanHelper: 'Esta operación borrará todos los registros de monitoreo, incluidos los de GPU. ¿Continuar?',
-
         avgLoad: 'Carga promedio',
         loadDetail: 'Detalle de carga',
         resourceUsage: 'Utilización',
@@ -1440,6 +1443,7 @@ const message = {
             dnsCheck: 'Probar disponibilidad',
             dnsOK: '¡La configuración DNS es válida!',
             dnsTestFailed: 'La configuración DNS no es válida.',
+            syncSiteHelper: '¿Sincronizar la hora del sistema con {0}?',
         },
         fail2ban: {
             sshPort: 'Puerto SSH',
@@ -1784,6 +1788,7 @@ const message = {
         loginTime: 'Hora de inicio de sesión',
         loginIP: 'IP de inicio de sesión',
         stopSSHWarn: 'Indica si se debe desconectar esta conexión SSH',
+        remote: 'SSH remoto',
     },
     setting: {
         panel: 'Panel',
@@ -2220,7 +2225,6 @@ const message = {
             'La versión del nodo no coincide con la del nodo principal. Actualiza en la gestión de nodos antes de reintentar.',
         versionCompare:
             'Se detectó que el nodo {0} ya está en la última versión actualizable. Verifica la versión del nodo principal e inténtalo de nuevo.',
-
         about: 'Acerca de',
         versionItem: 'Versión Actual',
         backupCopies: 'Copias de Respaldo',
@@ -2252,6 +2256,8 @@ const message = {
         compressPassword: 'Contraseña de compresión',
         backupRecoverMessage:
             'Introduce la contraseña de compresión o descompresión (déjalo en blanco para no establecerla)',
+        componentSize: 'Tamaño del componente',
+        recoverFailed: 'Error al restaurar la instantánea',
     },
     license: {
         community: 'OSS',
@@ -2303,6 +2309,7 @@ const message = {
         app: 'Pro permite ver información de servicio, monitoreo, etc. vía app móvil.',
         cluster:
             'Actualizar a la Edición Profesional te permite gestionar clústeres maestro-esclavo de MySQL/Postgres/Redis.',
+        offLine: 'Sin conexión',
     },
     clean: {
         scan: 'Iniciar escaneo',
@@ -2330,7 +2337,6 @@ const message = {
         upgradeHelper: '(Mantenga el último respaldo para restaurar el sistema)',
         snapshot: 'Archivos temporales de instantáneas',
         rollback: 'Archivos de respaldo antes de recuperación',
-
         backup: 'Copia de Seguridad del Sistema',
         backupHelper: 'Archivos de copia de seguridad no asociados con cuentas de copia de seguridad locales',
         unknownBackup: 'Copia de Seguridad del Sistema',
@@ -2339,13 +2345,11 @@ const message = {
         unknownDatabase: 'Copia de Seguridad de Base de Datos no Asociada',
         unknownWebsite: 'Copia de Seguridad de Sitio Web no Asociada',
         unknownSnapshot: 'Copia de Seguridad de Instantánea no Asociada',
-
         upload: 'Archivos temporales de carga',
         uploadHelper: 'Archivos temporales subidos en la lista de respaldos',
         download: 'Archivos temporales de descarga',
         downloadHelper: 'Archivos temporales descargados desde respaldos externos',
         directory: 'Directorio',
-
         systemLog: 'Archivo de registro',
         systemLogHelper: 'Registros del sistema, registros de tareas, archivos de registro del sitio web',
         dockerLog: 'Archivos de registro de operaciones de contenedores',
@@ -2353,12 +2357,10 @@ const message = {
         shell: 'Tareas programadas de script de shell',
         containerShell: 'Tareas programadas de script de shell ejecutadas dentro de contenedores',
         curl: 'Tareas programadas de CURL',
-
         docker: 'Basura de contenedores',
         dockerHelper: 'Archivos como contenedores, imágenes, volúmenes, caché de construcción, etc.',
         volumes: 'Volúmenes',
         buildCache: 'Caché de build de contenedores',
-
         appTmpDownload: 'Archivo de descarga temporal de la aplicación',
         unknownWebsiteLog: 'Archivo de respaldo de registro de sitio web no vinculado',
     },
@@ -2583,7 +2585,8 @@ const message = {
         deleteAppHelper: 'Eliminar también aplicaciones y backups asociados',
         deleteBackupHelper: 'Eliminar también copias de seguridad del sitio',
         deleteDatabaseHelper: 'También eliminar la base de datos asociada al sitio web',
-        deleteConfirmHelper: `Esta acción es irreversible. Escribe <span style="color:red"> "{0}" </span> para confirmar.`,
+        deleteConfirmHelper:
+            'Esta acción es irreversible. Escribe <span style="color:red"> "{0}" </span> para confirmar.',
         staticPath: 'El directorio principal correspondiente es ',
         limit: 'Esquema',
         blog: 'Foro/Blog',
@@ -2797,7 +2800,6 @@ const message = {
         failTimeout: 'Tiempo de espera de fallo',
         failTimeoutHelper:
             'La duración de la ventana de tiempo para las comprobaciones de estado del servidor. Cuando el número acumulado de fallos alcanza el umbral dentro de este período, el servidor se eliminará temporalmente y se reintentará después de la misma duración. Por defecto 10 segundos',
-
         staticChangePHPHelper: 'Actualmente es un sitio estático, puedes cambiarlo a PHP',
         proxyCache: 'Caché de proxy inverso',
         cacheLimit: 'Límite de espacio de caché',
@@ -2822,7 +2824,6 @@ const message = {
         preflight: 'Respuesta rápida a solicitud de preflight',
         preflightHleper:
             'Cuando está habilitado, cuando el navegador envía una solicitud de preflight de origen cruzado (solicitud OPTIONS), el sistema devolverá automáticamente un código de estado 204 y establecerá los encabezados de respuesta de origen cruzado necesarios',
-
         changeDatabase: 'Cambiar base de datos',
         changeDatabaseHelper1: 'La asociación se usa en backups/restauraciones.',
         changeDatabaseHelper2: 'Cambiar de DB invalida backups previos.',
@@ -2853,7 +2854,6 @@ const message = {
         execUser: 'Usuario de ejecución',
         execDir: 'Directorio de ejecución',
         packagist: 'Mirror China completo',
-
         batchOperate: 'Operación en Lote',
         batchOperateHelper: 'Lote {0} sitios web, ¿continuar operación?',
         stream: 'Proxy TCP/UDP',
@@ -2862,8 +2862,8 @@ const message = {
             'Configura el número de puerto de escucha externo, los clientes accederán al servicio a través de este puerto, separado por comas, p. ej., 5222,5223',
         streamHelper: 'Reenvío de Puertos y Balanceo de Carga TCP/UDP',
         udp: 'Habilitar UDP',
-
         syncHtmlHelper: 'Sincronizar con PHP y sitios web estáticos',
+        wafValueHelper: 'Valor',
     },
     php: {
         short_open_tag: 'Soporte de etiquetas cortas',
@@ -2892,6 +2892,7 @@ const message = {
         containerConfigHelper:
             'Las variables de entorno y demás se pueden modificar en Configuración - Configuración del Contenedor después de la creación',
         dateTimezoneHelper: 'Ejemplo: TZ=America/Mexico_City (ajusta según necesites)',
+        extensionsHelper: 'Para varias extensiones, sepáralas con comas',
     },
     nginx: {
         serverNamesHashBucketSizeHelper: 'Tamaño de la tabla hash para nombres de servidor',
@@ -3029,7 +3030,7 @@ const message = {
         unUsed: 'No usado',
         dockerRestart: 'Las operaciones del firewall requieren reiniciar el servicio de Docker',
         firewallHelper: 'Firewall del sistema {0}',
-        firewallNotStart: `El firewall del sistema no está habilitado actualmente. Actívalo primero.`,
+        firewallNotStart: 'El firewall del sistema no está habilitado actualmente. Actívalo primero.',
         restartFirewallHelper: 'Esta operación reiniciará el firewall actual. ¿Deseas continuar?',
         stopFirewallHelper: 'Esto hará que el servidor pierda protección de seguridad. ¿Deseas continuar?',
         startFirewallHelper:
@@ -3038,7 +3039,7 @@ const message = {
         enableBanPing: 'Bloquear Ping',
         disableBanPing: 'Desbloquear Ping',
         noPingTitle: 'Deshabilitar ping',
-        noPingHelper: `Esto deshabilitará el ping, y el servidor no responderá con eco ICMP. ¿Deseas continuar?`,
+        noPingHelper: 'Esto deshabilitará el ping, y el servidor no responderá con eco ICMP. ¿Deseas continuar?',
         onPingHelper: 'Esto habilitará el ping, y los atacantes podrían descubrir tu servidor. ¿Deseas continuar?',
         changeStrategy: 'Cambiar la estrategia de {0}',
         changeStrategyIPHelper1:
@@ -3055,7 +3056,6 @@ const message = {
         portHelper2: 'Rango de puertos, ej. 8080-8089',
         changeStrategyHelper:
             'Cambiar estrategia de {0} [{1}] a [{2}]. Después de configurarla, {0} tendrá acceso externo como {2}. ¿Deseas continuar?',
-
         strategy: 'Estrategia',
         accept: 'Aceptar',
         drop: 'Rechazar',
@@ -3082,7 +3082,6 @@ const message = {
         exportHelper: 'A punto de exportar {0} reglas de firewall. ¿Continuar?',
         importSuccess: 'Se importaron correctamente {0} reglas',
         importPartialSuccess: 'Importación completada: {0} correctas, {1} fallidas',
-
         ipv4Limit: 'La operación actual solo admite direcciones IPv4',
         basicStatus: 'La cadena actual {0} no está vinculada, ¡vincule primero!',
         baseIptables: 'Servicio iptables',
@@ -3115,17 +3114,22 @@ const message = {
         portHelper: '0 significa cualquier puerto',
         allPorts: 'Todos los Puertos',
         deleteRuleConfirm: 'Se eliminarán {0} reglas. ¿Continuar?',
+        advancedControl: 'Control avanzado',
+        advancedControlNotAvailable: 'Actualmente se usa el firewall {0}; las reglas avanzadas solo admiten iptables',
+        destination: 'Destino',
     },
     runtime: {
         runtime: 'Runtime',
         workDir: 'Directorio de trabajo',
         localHelper: 'Para problemas de instalación en entorno local y uso en entorno sin conexión, consulte ',
         versionHelper: 'Versión de PHP, ej. v8.0',
-        buildHelper: `Si se seleccionan más extensiones, el uso de CPU será mayor durante el proceso de creación de la imagen. Evita seleccionar todas las extensiones.`,
+        buildHelper:
+            'Si se seleccionan más extensiones, el uso de CPU será mayor durante el proceso de creación de la imagen. Evita seleccionar todas las extensiones.',
         openrestyWarn: 'PHP necesita actualizarse a OpenResty versión 1.21.4.1 o superior para poder usarse',
         toupgrade: 'Actualizar',
         edit: 'Editar runtime',
-        extendHelper: `Si las extensiones que necesitas no están en la lista, puedes introducir el nombre manualmente. Ejemplo: "sockets", luego selecciona la primera.`,
+        extendHelper:
+            'Si las extensiones que necesitas no están en la lista, puedes introducir el nombre manualmente. Ejemplo: "sockets", luego selecciona la primera.',
         rebuildHelper: 'Tras editar la extensión, debes reconstruir la aplicación PHP para que surta efecto',
         rebuild: 'Reconstruir aplicación PHP',
         source: 'Origen de extensiones PHP',
@@ -3240,7 +3244,8 @@ const message = {
             list: 'Procesos en segundo plano',
             config: 'Configuración de Supervisor',
             primaryConfig: 'Ubicación del archivo de configuración principal',
-            notSupportCtl: `No se detectó supervisorctl, ve a la página de librería de scripts para instalarlo manualmente`,
+            notSupportCtl:
+                'No se detectó supervisorctl, ve a la página de librería de scripts para instalarlo manualmente',
             user: 'Usuario',
             command: 'Comando',
             dir: 'Directorio',
@@ -3249,7 +3254,7 @@ const message = {
                 'Esto modificará el valor de "files" en la sección "[include]" del archivo de configuración principal. El directorio de otros archivos de configuración será: "{directorio de instalación de 1Panel}/1panel/tools/supervisord/supervisor.d/".',
             operatorHelper: 'La operación {1} se ejecutará en {0}, ¿quieres continuar?',
             uptime: 'Tiempo en ejecución',
-            notStartWarn: `Supervisor no está iniciado. Inícialo primero.`,
+            notStartWarn: 'Supervisor no está iniciado. Inícialo primero.',
             serviceName: 'Nombre del servicio',
             initHelper:
                 'El servicio Supervisor está detectado pero no inicializado. Haz clic en el botón de inicialización en la barra de estado superior para configurarlo.',
@@ -3570,6 +3575,7 @@ const message = {
             importRuleHelper: 'Una regla por línea',
         },
         monitor: {
+            '360': '360 Search',
             name: 'Monitorización Web',
             pv: 'Page Views (PV)',
             uv: 'Unique Visitors (UV)',
@@ -3637,7 +3643,6 @@ const message = {
             statusErr: 'Formato de código de estado inválido',
             shenma: 'Shenma',
             duckduckgo: 'DuckDuckGo',
-            '360': '360 Search',
             excludeUri: 'Excluir URIs',
             top100Helper: 'Mostrar top 100',
             logSaveDay: 'Retención de logs (días)',
@@ -3785,7 +3790,6 @@ const message = {
             alertTitle3: 'Configuración de Alertas',
             alertContent3:
                 'Permite configurar números de teléfono, frecuencia y horarios de notificación para alertas más personalizadas.',
-
             nodeDashTitle1: 'Gestión de Aplicaciones',
             nodeDashContent1:
                 'Gestión unificada de aplicaciones multi-nodo, admite monitoreo de estado, inicio/parada rápida, conexión de terminal y copia de seguridad',
@@ -3798,7 +3802,6 @@ const message = {
             nodeDashTitle4: 'Gestión de Tareas Programadas',
             nodeDashContent4:
                 'Gestión unificada de tareas programadas multi-nodo, admite monitoreo de estado, inicio/parada rápida y ejecución manual por activación',
-
             nodeTitle1: 'Adición de Nodo en un Clic',
             nodeContent1: 'Integra rápidamente múltiples nodos de servidor',
             nodeTitle2: 'Actualización en Lote',
@@ -3815,11 +3818,9 @@ const message = {
             fileExchangeTitle3: 'Intercomunicación Multi-Nodo',
             fileExchangeContent3:
                 'Permite transferir fácilmente archivos entre diferentes nodos y gestionar múltiples servidores de forma flexible.',
-
             nodeAppTitle1: 'Gestión de Actualización de Aplicaciones',
             nodeAppContent1:
                 'Monitoreo unificado de actualizaciones de aplicaciones multi-nodo, admite actualización con un clic',
-
             appTitle1: 'Gestión Flexible del Panel',
             appContent1: 'Gestiona tu servidor 1Panel en cualquier momento y lugar.',
             appTitle2: 'Información Completa de Servicios',
@@ -3936,9 +3937,13 @@ const message = {
             offline: 'Modo Offline',
             freeCount: 'Cuota gratuita [{0}]',
             offlineHelper: 'Usado cuando el nodo está en un entorno sin conexión',
-
             appUpgrade: 'Actualización de la aplicación',
             appUpgradeHelper: 'Hay {0} aplicaciones que necesitan ser actualizadas',
+            addPanel: 'Añadir panel',
+            addPanelHelper: 'Tras añadir el panel, podrás acceder rápidamente en [Resumen - Paneles].',
+            panel: 'Panel 1Panel',
+            others: 'Otros paneles',
+            operatePanelHelper: 'Los siguientes paneles ejecutarán {0}. ¿Continuar?',
         },
         customApp: {
             name: 'Repositorio de Apps Personalizadas',

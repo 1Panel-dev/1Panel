@@ -389,6 +389,7 @@ const message = {
         app: '應用',
         msgCenter: '任務中心',
         disk: '磁碟管理',
+        filter: '篩選器',
     },
     home: {
         recommend: '推薦',
@@ -421,12 +422,10 @@ const message = {
         runningTime: '執行時間',
         mem: '系統記憶體',
         swapMem: 'Swap 分區',
-
         runSmoothly: '執行流暢',
         runNormal: '執行正常',
         runSlowly: '執行緩慢',
         runJam: '執行堵塞',
-
         core: '物理核心',
         logicCore: '邏輯核心',
         corePercent: '核心使用率',
@@ -452,7 +451,6 @@ const message = {
         available: '可用',
         percent: '使用率',
         goInstall: '去安裝',
-
         networkCard: '網卡',
         disk: '磁碟',
         memo: '備忘錄',
@@ -505,12 +503,9 @@ const message = {
         changeConnHelper: '此操作將修改目前資料庫 {0}，是否繼續？',
         changePasswordHelper: '目前資料庫已經關聯應用，修改密碼將同步修改應用中資料庫密碼，修改後重新啟動生效。',
         recoverTimeoutHelper: '-1 表示不限制逾時時間',
-
         portHelper: '該埠為容器對外暴露埠，修改需要單獨儲存並且重新啟動容器',
-
         confChange: '設定修改',
         confNotFound: '未能找到該應用設定檔，請在應用商店升級該應用至最新版本後重試',
-
         loadFromRemote: '從伺服器同步',
         userBind: '綁定使用者',
         pgBindHelper: '此操作用於建立新使用者並將其綁定到目標資料庫，暫不支援選擇已存在於資料庫中的使用者。',
@@ -537,13 +532,11 @@ const message = {
         caCert: 'CA 憑證',
         skipVerify: '忽略校驗憑證可用性偵測',
         initialDB: '初始資料庫',
-
         formatHelper: '目前資料庫字元集為 {0}，字元集不一致可能導致復原失敗',
         dropHelper: '將上傳檔案拖曳到此處，或',
         clickHelper: '點選上傳',
         supportUpType:
             '僅支援 sql、sql.gz、tar.gz、.zip 檔案格式，匯入的壓縮檔案必須保證只有一個 .sql 檔案或包含 test.sql',
-
         currentStatus: '當前狀態',
         baseParam: '基礎參數',
         performanceParam: '效能參數',
@@ -575,7 +568,6 @@ const message = {
         sortMergePassesHelper: '若值過大，增加sort_buffer_size',
         tableLocksWaited: '鎖表次數',
         tableLocksWaitedHelper: '若值過大，請考慮增加您的資料庫效能',
-
         performanceTuning: '效能調整',
         optimizationScheme: '最佳化方案',
         keyBufferSizeHelper: '用於索引的緩衝區大小',
@@ -593,14 +585,11 @@ const message = {
         tableOpenCacheHelper: '表快取',
         maxConnectionsHelper: '最大連接數',
         restart: '重新啟動資料庫',
-
         slowLog: '慢日誌',
         noData: '暫無慢日誌...',
-
         isOn: '開啟',
         longQueryTime: '閾值(秒)',
         thresholdRangeHelper: '請輸入正確的閾值(1 - 600)',
-
         timeout: '逾時時間(秒)',
         timeoutHelper: '空閒連接逾時時間，0表示不斷開',
         maxclients: '最大連接數',
@@ -624,22 +613,18 @@ const message = {
         latestForkUsec: '最近一次 fork() 操作耗費的微秒數',
         redisCliHelper: '未偵測到 redis-cli 服務，請先啟用服務',
         redisQuickCmd: 'Redis 快速指令',
-
         recoverHelper: '即將使用 [{0}] 對資料進行覆蓋，是否繼續？',
         submitIt: '覆蓋資料',
-
         baseConf: '基本設定',
         allConf: '全部設定',
         restartNow: '立即重新啟動',
         restartNowHelper1: '修改設定後需要重新啟動生效，若您的資料需要持久化請先執行 save 操作。',
         restartNowHelper: '修改設定後需要重新啟動生效。',
-
         persistence: '持久化',
         rdbHelper1: '秒內,插入',
         rdbHelper2: '條資料',
         rdbHelper3: '符合任意一個條件將會觸發RDB持久化',
         rdbInfo: '請確認規則列表中值在 1-100000 之間',
-
         containerConn: '容器連接',
         copyConnURL: '複製連接 URL',
         connAddress: '地址',
@@ -700,6 +685,7 @@ const message = {
             pairingCodeRequired: '請輸入配對碼',
             pairingApproveSuccess: '配對成功',
             customProviderHelper: '自訂模型供應商不驗證帳號是否可用',
+            feishuSaveSuccess: '儲存成功',
         },
         model: {
             model: '模型',
@@ -745,7 +731,6 @@ const message = {
             memoryUsed: '顯存使用',
             memoryTotal: '顯存總計',
             percent: '使用率',
-
             base: '基礎資訊',
             driverVersion: '驅動程式版本',
             cudaVersion: 'CUDA 版本',
@@ -774,6 +759,7 @@ const message = {
             current: '即時監控',
             history: '歷史記錄',
             notSupport: '當前版本或驅動不支援顯示該參數。',
+            processCount: '行程數',
         },
         mcp: {
             server: 'MCP Server',
@@ -879,7 +865,6 @@ const message = {
         cpuShareHelper: '容器預設份額為 1024 個 CPU，增大可使目前容器獲得更多的 CPU 時間',
         inputIpv4: '請輸入 IPv4 位址',
         inputIpv6: '請輸入 IPv6 位址',
-
         diskUsage: '磁碟佔用',
         localVolume: '本機儲存卷',
         buildCache: '建置快取',
@@ -891,7 +876,6 @@ const message = {
         sizeRwHelper: '容器獨有的可寫層大小',
         sizeRootFs: '虛擬大小',
         sizeRootFsHelper: '容器依賴的所有映像層 + 容器層的總大小',
-
         containerFromAppHelper: '偵測到該容器來源於應用商店，應用操作可能會導致目前編輯失效',
         containerFromAppHelper1: '在已安裝應用程式列表點選 [參數] 按鈕，進入編輯頁面即可修改容器名稱。',
         command: '指令',
@@ -902,7 +886,6 @@ const message = {
         emptyUser: '為空時，將使用容器預設的使用者登入',
         privileged: '特權模式',
         privilegedHelper: '允許容器在主機上執行某些特權操作，可能會增加容器風險，請謹慎開啟',
-
         upgradeHelper: '倉庫名稱/映像名稱:映像版本',
         upgradeWarning2: '升級操作需要重建容器，任何未持久化的資料將會遺失，是否繼續？',
         oldImage: '目前映像',
@@ -911,7 +894,6 @@ const message = {
         targetImage: '目標映像',
         imageLoadErr: '未偵測到容器的映像名稱',
         appHelper: '該容器來源於應用商店，升級可能導致該服務不可用',
-
         resource: '資源',
         input: '手動輸入',
         forcePull: '強制拉取映像',
@@ -957,10 +939,8 @@ const message = {
         unlessStopped: '未手動停止則重新啟動',
         onFailure: '失敗後重新啟動（預設重新啟動 5 次）',
         no: '不重新啟動',
-
         refreshTime: '重新整理間隔',
         cache: '快取',
-
         image: '映像',
         imagePull: '拉取映像',
         imagePullHelper: '支援選擇拉取多個映像，輸入一組映像後Enter繼續',
@@ -992,7 +972,6 @@ const message = {
         cleanBuildCache: '清理建置快取',
         delBuildCacheHelper: '清理建置快取將刪除所有建置所產生的快取，此操作無法回復。是否繼續？',
         urlWarning: '路徑前綴不需要新增 http:// 或 https://，請修改',
-
         network: '網路',
         networkHelper: '刪除 1panel-network 容器網路將影響部分應用和執行環境的正常使用，是否繼續？',
         networkName: '網路名',
@@ -1004,7 +983,6 @@ const message = {
         scope: 'IP 範圍',
         gateway: '閘道器',
         auxAddress: '排除 IP',
-
         volume: '磁碟區',
         volumeDir: '磁碟區目錄',
         nfsEnable: '啟用 NFS 儲存',
@@ -1012,7 +990,6 @@ const message = {
         mountpoint: '掛載點',
         mountpointNFSHelper: '例：/nfs, /nfs-share',
         options: '可選參數',
-
         repo: '倉庫',
         httpRepoHelper: '操作 HTTP 類型倉庫需要重新啟動 Docker 服務。',
         downloadUrl: '下載網址',
@@ -1022,7 +999,6 @@ const message = {
         mirrorHelper:
             '當存在多個加速器時，需要換行顯示，例： \nhttp://xxxxxx.m.daocloud.io \nhttps://xxxxxx.mirror.aliyuncs.com',
         registrieHelper: '當存在多個私有倉庫時，需要換行顯示，例：\n172.16.10.111:8081 \n172.16.10.112:8081',
-
         compose: '編排',
         composeFile: '編排檔案',
         fromChangeHelper: '切換來源將清空當前已編輯內容，是否繼續？',
@@ -1044,7 +1020,6 @@ const message = {
         composeOperatorHelper: '將對 {0} 進行 {1} 操作，是否繼續？',
         composeDownHelper: '將停止並刪除 {0} 編排下所有容器及網路，是否繼續？',
         composeEnvHelper2: '該編排為 1Panel 應用商店建立，請在已安裝應用中修改環境變數。',
-
         setting: '設定',
         goSetting: '去修改',
         operatorStatusHelper: '此操作將{0}Docker 服務，是否繼續？',
@@ -1081,12 +1056,10 @@ const message = {
         related: '相關資源',
         includeAppstore: '顯示應用商店容器',
         excludeAppstore: '隱藏應用商店容器',
-
         cleanDockerDiskZone: '清理 Docker 使用的磁碟空間',
         cleanImagesHelper: '( 清理所有未被任何容器使用的映像 )',
         cleanContainersHelper: '( 清理所有處於停止狀態的容器 )',
         cleanVolumesHelper: '( 清理所有未被使用的本機磁碟區 )',
-
         makeImage: '製作映像',
         newImageName: '新映像名稱',
         commitMessage: '提交資訊',
@@ -1094,6 +1067,7 @@ const message = {
         ifPause: '製作過程中是否暫停容器',
         ifMakeImageWithContainer: '是否根據此容器製作新映像？',
         finishTime: '上一次停止時間',
+        exportHelper: '即將匯出 {0} 條編排範本，是否繼續？',
     },
     cronjob: {
         importHelper:
@@ -1198,7 +1172,6 @@ const message = {
         cutWebsiteLog: '切割網站日誌',
         cutWebsiteLogHelper: '切割的日誌檔案會備份到 1Panel 的 backup 目錄下',
         syncIpGroup: '同步 WAF IP 組',
-
         requestExpirationTime: '上傳請求過期時間（小時）',
         unitHours: '單位：小時',
         alertTitle: '計劃任務-{0}「{1}」任務失敗告警',
@@ -1221,6 +1194,9 @@ const message = {
             noSuchApp: '未偵測到 {0} 服務，請前往腳本庫頁面手動安裝',
             syncHelper: '即將同步系統腳本庫，該操作僅針對系統腳本，是否繼續？',
         },
+        withImageHelper: '備份應用商店映像，但會增加快照檔案體積。',
+        cleanLog: '清理日誌',
+        cleanLogscope: '清理類型',
     },
     monitor: {
         globalFilter: '全域過濾',
@@ -1232,7 +1208,6 @@ const message = {
         defaultIOHelper: '預設監控和概覽介面顯示的磁碟選項',
         cleanMonitor: '清空監控記錄',
         cleanHelper: '該操作將清空包括 GPU 在內的所有監控記錄，是否繼續？',
-
         avgLoad: '平均負載',
         loadDetail: '負載詳情',
         resourceUsage: '資源使用率',
@@ -1785,7 +1760,6 @@ const message = {
         diskClean: '快取清理',
         developerMode: '預覽體驗計劃',
         developerModeHelper: '取得 1Panel 的預覽版本，以分享有關新功能和更新的回饋',
-
         thirdParty: '第三方帳號',
         scope: '使用範圍',
         public: '公有',
@@ -1872,7 +1846,6 @@ const message = {
         address: '地址',
         path: '路徑',
         backupJump: '未在目前備份列表中的備份檔案，請嘗試從檔案目錄中下載後匯入備份。',
-
         snapshot: '快照',
         noAppData: '暫無可選擇系統應用',
         noBackupData: '暫無可選擇備份資料',
@@ -1939,7 +1912,6 @@ const message = {
         rollback: '回滾',
         rollbackHelper:
             '即將回滾本次復原，回滾將取代所有本次復原的檔案，過程中可能需要重新啟動 Docker 以及 1Panel 服務，是否繼續？',
-
         upgradeRecord: '升級記錄',
         upgrading: '正在升級中，請稍候',
         upgradeHelper: '升級操作需要重新啟動 1Panel 服務，是否繼續？',
@@ -1952,7 +1924,6 @@ const message = {
         source: '下載源',
         versionNotSame: '節點版本與主節點不一致，請在節點管理中升級後重試。',
         versionCompare: '偵測到節點 {0} 版本已是目前可升級最新版本，請檢查主節點版本後重試',
-
         safe: '安全',
         passkey: '通行金鑰',
         passkeyManage: '管理',
@@ -2046,7 +2017,6 @@ const message = {
         error416: '無效請求',
         error444: '連線已關閉',
         error500: '內部伺服器錯誤',
-
         https: '為面板設置 HTTPS 可提升存取安全性',
         strictHelper: '非 HTTPS 流量無法連接面板',
         muxHelper: '面板將同時監聽 HTTP 和 HTTPS 協議，並將 HTTP 重定向到 HTTPS，此模式下可能會降低面板安全性',
@@ -2059,7 +2029,6 @@ const message = {
         rootCrtDownload: '根憑證下載',
         primaryKey: '金鑰',
         certificate: '憑證',
-
         about: '關於',
         versionItem: '當前版本',
         backupCopies: '備份份數',
@@ -2075,7 +2044,6 @@ const message = {
         forum: '論壇求助',
         doc2: '使用手冊',
         currentVersion: '當前執行版本：',
-
         license: '許可證',
         bindNode: '綁定節點',
         menuSetting: '選單設定',
@@ -2150,7 +2118,6 @@ const message = {
         suggest: '( 建議清理 )',
         totalScan: '待清理垃圾檔案共計： ',
         selectScan: '已選中垃圾檔案共計： ',
-
         system: '系統垃圾',
         systemHelper: '快照、升級等過程中產生的臨時檔案',
         panelOriginal: '系統快照恢復前備份檔案',
@@ -2159,7 +2126,6 @@ const message = {
         upgradeHelper: '( 建議保留最新的升級備份用於系統回滾 )',
         snapshot: '系統快照暫存檔',
         rollback: '復原前備份目錄',
-
         backup: '系統備份',
         backupHelper: '本地備份帳號中未關聯的備份檔案',
         unknownBackup: '系統備份',
@@ -2168,13 +2134,11 @@ const message = {
         unknownDatabase: '未關聯資料庫備份',
         unknownWebsite: '未關聯網站備份',
         unknownSnapshot: '未關聯快照備份',
-
         upload: '臨時上傳檔案',
         uploadHelper: '系統上傳備份列表中上傳的暫存檔',
         download: '臨時下載檔案',
         downloadHelper: '系統從第三方備份帳號下載的暫存檔',
         directory: '資料夾',
-
         systemLog: '日誌檔案',
         systemLogHelper: '系統日誌、任務日誌、網站日誌檔案',
         dockerLog: '容器操作日誌檔案',
@@ -2182,12 +2146,10 @@ const message = {
         shell: 'Shell 腳本計劃任務',
         containerShell: '容器內執行 Shell 腳本計劃任務',
         curl: 'CURL 計劃任務',
-
         docker: '容器垃圾',
         dockerHelper: '容器、映像、儲存卷、建置快取等檔案',
         volumes: '磁碟區',
         buildCache: '容器建置快取',
-
         appTmpDownload: '應用程式暫存下載檔案',
         unknownWebsiteLog: '未關聯網站日誌備份檔案',
     },
@@ -2607,7 +2569,6 @@ const message = {
         failTimeout: '故障逾時',
         failTimeoutHelper:
             '伺服器健康檢查的時間視窗長度。在該時間段內累計失敗次數達到閾值時，伺服器將被暫時移除，並在經過相同時長後重新嘗試。預設 10 秒',
-
         staticChangePHPHelper: '目前為靜態網站，可切換為 PHP 網站',
         proxyCache: '反向代理快取',
         cacheLimit: '快取空間限制',
@@ -2634,7 +2595,6 @@ const message = {
         preflight: '預檢請求快速回應',
         preflightHleper:
             '開啟後，當瀏覽器發送跨域預檢請求（OPTIONS 請求）時，系統會自動返回 204 狀態碼並設定必要的跨域回應標頭',
-
         changeDatabase: '切換資料庫',
         changeDatabaseHelper1: '資料庫關聯用於備份復原網站。',
         changeDatabaseHelper2: '切換其他資料庫會導致以前的備份無法復原。',
@@ -2665,7 +2625,6 @@ const message = {
         execUser: '執行使用者',
         execDir: '執行目錄',
         packagist: '中國全量映像',
-
         batchOperate: '批次操作',
         batchOperateHelper: '批次{0}網站，是否繼續？',
         stream: 'TCP/UDP 代理',
@@ -2673,7 +2632,6 @@ const message = {
         streamPortsHelper: '設定對外監聽的埠號，客戶端將透過此埠存取服務，按逗號分割，例：5222,5223',
         streamHelper: 'TCP/UDP 埠轉發與負載均衡',
         udp: '啟用 UDP',
-
         syncHtmlHelper: '同步到 PHP 和靜態網站',
     },
     php: {
@@ -2701,6 +2659,7 @@ const message = {
         containerConfig: '容器設定',
         containerConfigHelper: '環境變數等資訊可以在建立完成之後在設定-容器設定中修改',
         dateTimezoneHelper: '範例：TZ=Asia/Shanghai（請根據需要自行新增）',
+        extensionsHelper: '多個擴展請用 , 分隔',
     },
     nginx: {
         serverNamesHashBucketSizeHelper: '伺服器名字的hash表大小',
@@ -2826,7 +2785,6 @@ const message = {
         argsCheck: 'GET 參數校驗',
         postCheck: 'POST 參數校驗',
         cookieBlockList: 'Cookie 黑名單',
-
         dockerHelper: '目前防火牆無法停用容器埠映射，已安裝應用可前往【已安裝】頁面編輯應用參數，設定埠放行規則。',
         iptablesHelper: '偵測到系統正在使用 {0} 防火牆，如需切換至 iptables，請先手動解除安裝',
         quickJump: '快速跳轉',
@@ -2879,7 +2837,6 @@ const message = {
         exportHelper: '即將匯出 {0} 條防火牆規則，是否繼續？',
         importSuccess: '成功匯入 {0} 條規則',
         importPartialSuccess: '匯入完成：成功 {0} 條，失敗 {1} 條',
-
         ipv4Limit: '目前操作暫僅支援 IPv4 地址',
         basicStatus: '目前未綁定鏈 {0} ，請先綁定',
         baseIptables: 'iptables 服務',
@@ -2907,6 +2864,9 @@ const message = {
         portHelper: '0 表示任意埠',
         allPorts: '所有埠',
         deleteRuleConfirm: '將刪除 {0} 條規則，是否繼續？',
+        advancedControl: '進階控制',
+        advancedControlNotAvailable: '目前使用 {0} 防火牆，進階規則僅支援 iptables',
+        destination: '目的地',
     },
     runtime: {
         runtime: '執行環境',
@@ -3329,6 +3289,7 @@ const message = {
             importRuleHelper: '一行一個規則',
         },
         monitor: {
+            '360': '360 搜尋',
             name: '網站監控',
             pv: '瀏覽量',
             uv: '訪客數',
@@ -3397,7 +3358,6 @@ const message = {
             statusErr: '狀態碼格式錯誤',
             shenma: '神馬搜尋',
             duckduckgo: 'DuckDuckGo',
-            '360': '360 搜尋',
             exceptUri: '排除 Uri',
             top100Helper: '顯示 Top 100 的資料',
             logSaveDay: '日誌儲存天數',
@@ -3419,6 +3379,7 @@ const message = {
             trend: '趨勢統計',
             reqCount: '請求數',
             uriHelper: '可以使用 /test/* 或 /*/index.php 來排除 Uri',
+            excludeUri: '排除 Uri',
         },
         tamper: {
             tamper: '網站防篡改',
@@ -3497,7 +3458,6 @@ const message = {
             wafContent3: '自訂請求被攔截之後的顯示頁面',
             wafTitle4: '自訂規則（ACL）',
             wafContent4: '根據自訂的規則攔截請求',
-
             tamperTitle1: '檔案完整性監控',
             tamperContent1: '監控網站檔案的完整性，包括核心檔案、腳本檔案和設定檔案等。',
             tamperTitle2: '即時掃描和偵測',
@@ -3507,14 +3467,12 @@ const message = {
                 '透過合理的權限設定和瀏覽控制策略，網站防篡改功能可以限制對網站檔案的瀏覽權限，減少潛在的攻擊面。',
             tamperTitle4: '日誌紀錄與分析',
             tamperContent4: '紀錄檔案瀏覽和操作日誌，以便管理員進行後續的審計和分析，以及發現潛在的安全威脅。',
-
             settingTitle1: '自訂歡迎語',
             settingContent1: '在 1Panel 登入頁上設定自訂的歡迎語。',
             settingTitle2: '自訂 Logo',
             settingContent2: '允許上傳包含品牌名稱或其他文字的 Logo 圖像。',
             settingTitle3: '自訂網站圖示',
             settingContent3: '允許上傳自訂的圖示，以替代預設的瀏覽器圖示，提升使用者體驗。',
-
             monitorTitle1: '訪客趨勢',
             monitorContent1: '統計並顯示網站的訪客趨勢',
             monitorTitle2: '訪客地圖',
@@ -3523,7 +3481,6 @@ const message = {
             monitorContent3: '統計網站的請求資訊，包括蜘蛛，瀏覽裝置，請求狀態等',
             monitorTitle4: '即時監控',
             monitorContent4: '即時監控網站的請求訊息，包括請求數，流量等',
-
             alertTitle1: '簡訊告警',
             alertContent1:
                 '當伺服器資源使用異常、網站及憑證過期、新版本更新、密碼過期等情況發生時，透過簡訊告警通知使用者，確保及時處理。',
@@ -3532,7 +3489,6 @@ const message = {
             alertTitle3: '告警設定',
             alertContent3:
                 '為使用者提供自訂手機號碼、每日推送次數、每日推送時間的設定，方便使用者的設定來更加合理的進行推送告警。',
-
             nodeDashTitle1: '應用管理',
             nodeDashContent1: '統一管理多節點應用，支援狀態監控、快速起停、終端連線及備份',
             nodeDashTitle2: '網站管理',
@@ -3541,7 +3497,6 @@ const message = {
             nodeDashContent3: '統一管理多節點資料庫，關鍵狀態一目了然，支援一鍵備份',
             nodeDashTitle4: '計劃任務管理',
             nodeDashContent4: '統一管理多節點計劃任務，支援狀態監控、快速啟停與手動觸發執行',
-
             nodeTitle1: '一鍵新增節點',
             nodeContent1: '快速接入多台伺服器節點',
             nodeTitle2: '批次升級',
@@ -3550,24 +3505,20 @@ const message = {
             nodeContent3: '即時掌握各節點執行狀態',
             nodeTitle4: '快速遠端連接',
             nodeContent4: '一鍵直連節點遠端終端',
-
             fileExchangeTitle1: '金鑰認證傳輸',
             fileExchangeContent1: '通過 SSH 金鑰進行身份驗證，確保傳輸的安全性。',
             fileExchangeTitle2: '高效檔案同步',
             fileExchangeContent2: '僅同步變化內容，大幅提高傳輸速度與穩定性。',
             fileExchangeTitle3: '支援多節點互傳',
             fileExchangeContent3: '可在不同節點間便捷傳送項目檔案，靈活管理多台伺服器。',
-
             nodeAppTitle1: '應用升級管理',
             nodeAppContent1: '統一監控多節點應用更新情況，支援一鍵升級',
-
             appTitle1: '靈活管理面板',
             appContent1: '隨時隨地輕鬆管理你的 1Panel 伺服器。',
             appTitle2: '全面服務資訊',
             appContent2: '在行動端進行應用、網站、Docker、資料庫等基礎管理，支援快速建立應用與網站。',
             appTitle3: '即時異常監控',
             appContent3: '行動端即時檢視伺服器狀態、WAF 安全監控、網站存取統計與行程健康狀況。',
-
             clusterTitle1: '主從部署',
             clusterContent1: '支援在不同節點建立 MySQL/Postgres/Redis 主從實例，自動完成主從關聯與初始化',
             clusterTitle2: '主從管理',
@@ -3624,7 +3575,6 @@ const message = {
             nodeSyncHelper: '節點資訊同步將同步以下資訊：',
             nodeSyncHelper1: '1. 公用的備份帳號資訊',
             nodeSyncHelper2: '2. 主節點與子節點的連接資訊',
-
             nodeCheck: '可用性檢查',
             checkSSH: '檢查節點 SSH 連接',
             checkUserPermission: '檢查節點使用者權限',
@@ -3640,7 +3590,6 @@ const message = {
             oldDataExist: '檢查到該節點存在 1Panel V2 歷史資料，將使用以下資訊覆蓋目前設定',
             errLicense: '檢查到該節點綁定的許可證不可用，請檢查後重試',
             errNodePort: '檢查到節點埠 [ {0} ] 無法存取，請檢查防火牆或安全組是否已放行該埠。',
-
             reinstallHelper: '重新安裝節點 {0}，是否繼續？',
             unhealthyCheck: '異常檢查',
             fixOperation: '修復方案',
@@ -3664,7 +3613,6 @@ const message = {
             offline: '離線模式',
             freeCount: '免費額度 [{0}]',
             offlineHelper: '當節點處於離線環境時使用',
-
             appUpgrade: '應用程式升級',
             appUpgradeHelper: '有 {0} 個應用程式需要升級',
         },
@@ -3754,7 +3702,6 @@ const message = {
             specifiedTime: '指定時間',
             deleteTitle: '刪除告警',
             deleteMsg: '是否確認刪除告警任務？',
-
             allSslTitle: '所有網站憑證到期告警',
             sslTitle: '網站「{0}」憑證到期告警',
             allSiteEndTimeTitle: '所有網站到期告警',
@@ -3766,18 +3713,15 @@ const message = {
             loadTitle: '負載佔用過高告警',
             diskTitle: '掛載目錄「{0}」的磁碟佔用過高告警',
             allDiskTitle: '磁碟佔用過高告警',
-
             timeRule: '剩餘時間小於{0}天（如未處理，次日會重新發送）',
             panelUpdateRule: '偵測到面板有新版本時發送一次（如未處理，次日會重新發送）',
             avgRule: '{0}分鐘內平均{1}佔用超過{2}%觸發，每天發送{3}次',
             diskRule: '掛載目錄「{0}」的磁碟佔用超過{1}{2}觸發，每天發送{3}次',
             allDiskRule: '磁碟佔用超過{0}{1}觸發，每天發送{2}次',
-
             cpuName: ' CPU ',
             memoryName: '記憶體',
             loadName: '負載',
             diskName: '磁碟',
-
             syncAlertInfo: '同步告警資訊',
             syncAlertInfoMsg: '是否同步告警資訊內容狀態？',
             pushError: '推送失敗',

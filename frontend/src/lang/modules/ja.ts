@@ -84,6 +84,10 @@ const message = {
             hide: '隠す',
             visit: '訪問',
             migrate: '移行',
+            prev: '前へ',
+            next: '次へ',
+            setDefault: 'デフォルトに戻す',
+            bind: 'バインド',
         },
         operate: {
             start: '開始',
@@ -133,6 +137,8 @@ const message = {
             manageGroup: 'グループ管理',
             backToList: 'リストに戻る',
             keepEdit: '編集を続ける',
+            default: 'デフォルト',
+            noRefresh: '自動更新なし',
         },
         loadingText: {
             Upgrading: 'システムのアップグレード、待ってください...',
@@ -142,14 +148,14 @@ const message = {
         },
         msg: {
             noneData: '利用可能なデータはありません',
-            delete: `この操作削除は元に戻すことはできません。続けたいですか？`,
-            clean: `この操作は取り消すことはできません。続けたいですか？`,
+            delete: 'この操作削除は元に戻すことはできません。続けたいですか？',
+            clean: 'この操作は取り消すことはできません。続けたいですか？',
             closeDrawerHelper: 'システムは変更を保存しない可能性があります。続行しますか？',
             deleteSuccess: '正常に削除されました',
             loginSuccess: '正常にログインしました',
             operationSuccess: '正常に完了',
             copySuccess: '正常にコピーされました',
-            notSupportOperation: `この操作はサポートされていません`,
+            notSupportOperation: 'この操作はサポートされていません',
             requestTimeout: 'リクエストがタイムアウトしました。後でもう一度やり直してください',
             infoTitle: 'ヒント',
             notRecords: '現在のタスクの実行レコードは生成されません',
@@ -160,14 +166,15 @@ const message = {
             operateConfirm: '操作について確信している場合は、手動で入力してください。',
             inputOrSelect: '選択または入力してください',
             copyFailed: 'コピーに失敗しました',
-            operatorHelper: `操作「{1}」は「{0}」で実行され、元に戻すことはできません。続けたいですか？`,
+            operatorHelper: '操作「{1}」は「{0}」で実行され、元に戻すことはできません。続けたいですか？',
             notFound: '申し訳ありませんが、要求したページは存在しません。',
-            unSupportType: `現在のファイルタイプはサポートされていません。`,
+            unSupportType: '現在のファイルタイプはサポートされていません。',
             unSupportSize: 'アップロードされたファイルは{0} mを超えています、確認してください！',
-            fileExist: `ファイルはすでに現在のフォルダーに存在しています。リピートアップロードはサポートされていません。`,
+            fileExist:
+                'ファイルはすでに現在のフォルダーに存在しています。リピートアップロードはサポートされていません。',
             fileNameErr:
                 '名前には、英語、中国語、数字、または期間を含む1〜256文字が含まれるファイルのみをアップロードできます（。-_）',
-            confirmNoNull: `値{0}が空でないことを確認してください。`,
+            confirmNoNull: '値{0}が空でないことを確認してください。',
             errPort: 'ポート情報が正しくありません、確認してください！',
             remove: '取り除く',
             backupHelper: '現在の操作は{0}をバックアップします。先に進みたいですか？',
@@ -181,6 +188,10 @@ const message = {
             importHelper:
                 '競合または重複するデータをインポートする場合、インポートされた内容を基準として元のデータベースデータを更新します。',
             errImport: 'ファイル内容が異常です：',
+            backupSuccess: 'バックアップ成功',
+            restoreSuccess: '復元成功',
+            installSuccess: 'インストール成功',
+            uninstallSuccess: 'アンインストール成功',
         },
         login: {
             username: 'ユーザー名',
@@ -218,13 +229,15 @@ const message = {
             requiredInput: 'この項目は必須です。',
             requiredSelect: 'リスト内のアイテムを選択します',
             illegalChar: '現在、文字 & ; $ \' ` ( ) " > < | の注入はサポートされていません',
-            illegalInput: `このフィールドには違法なキャラクターが含まれてはなりません。`,
+            illegalInput: 'このフィールドには違法なキャラクターが含まれてはなりません。',
             commonName:
                 'このフィールドは、特別なキャラクターではなく、英語、中国語、数字で構成されている必要があります。「。」、「」、および「_」文字が1〜128の文字で構成されている必要があります。',
             userName: '特殊文字で始まらない、英字、漢字、数字、および_をサポート、長さ3-30',
-            simpleName: `このフィールドは、アンダースコアキャラクターから始めてはなりません。長さ3〜30の英語、数字、「_」文字で構成されている必要があります。`,
-            simplePassword: `このフィールドは、アンダースコアキャラクターから始めてはなりません。長さ1〜30の英語、数字、「_」文字で構成されている必要があります。`,
-            dbName: `このフィールドは、アンダースコアキャラクターから始めてはなりません。長さ1〜64の英語、数字、「_」文字で構成されている必要があります。`,
+            simpleName:
+                'このフィールドは、アンダースコアキャラクターから始めてはなりません。長さ3〜30の英語、数字、「_」文字で構成されている必要があります。',
+            simplePassword:
+                'このフィールドは、アンダースコアキャラクターから始めてはなりません。長さ1〜30の英語、数字、「_」文字で構成されている必要があります。',
+            dbName: 'このフィールドは、アンダースコアキャラクターから始めてはなりません。長さ1〜64の英語、数字、「_」文字で構成されている必要があります。',
             imageName: '特殊文字で始まらない、英字、数字、:@/.-_をサポート、長さ1-256',
             composeName: '最初の特別な文字、小文字、数字、_、長さ1-256をサポートします',
             volumeName:
@@ -234,7 +247,8 @@ const message = {
             complexityPassword:
                 'このフィールドは、英語で構成され、長さは8〜30で、少なくとも2つの特殊文字が含まれている必要があります。',
             commonPassword: 'このフィールドの長さは6を超える必要があります。',
-            linuxName: `このフィールドの長さは1〜128でなければなりません。フィールドには、これらの特殊文字を含めてはなりません。「{0}」。`,
+            linuxName:
+                'このフィールドの長さは1〜128でなければなりません。フィールドには、これらの特殊文字を含めてはなりません。「{0}」。',
             email: 'このフィールドは有効な電子メールアドレスでなければなりません。',
             number: 'このフィールドは数字でなければなりません。',
             integer: 'このフィールドは正の整数でなければなりません。',
@@ -248,11 +262,13 @@ const message = {
             ipErr: 'このフィールドは有効なIPアドレスでなければなりません。',
             numberRange: 'このフィールドは、{0}と{1}の間の数字でなければなりません。',
             paramName: 'このフィールドは、英語、数字、「。」、「 - 」、および「_」文字で構成されている必要があります。',
-            paramComplexity: `このフィールドは、特殊文字で開始および終了する必要はなく、英語、数字「{0}」文字で構成されている必要があります。`,
+            paramComplexity:
+                'このフィールドは、特殊文字で開始および終了する必要はなく、英語、数字「{0}」文字で構成されている必要があります。',
             paramUrlAndPort:
                 'このフィールドは、「http（s）://（domain name/ip）:(ポート）」の形式でなければなりません。',
             nginxDoc: 'このフィールドは、英語、数字、「」で構成されている必要があります。文字。',
-            appName: `このフィールドは、「 - 」と「_」文字で開始および終了してはなりません。英語、数字、 "、および「_」文字で2〜30の文字で構成されている必要があります。`,
+            appName:
+                'このフィールドは、「 - 」と「_」文字で開始および終了してはなりません。英語、数字、 "、および「_」文字で2〜30の文字で構成されている必要があります。',
             containerName: '文字、数字、 - 、_および。;-  _または。で始めることはできません。長さ:2-128',
             mirror: 'ミラーアクセラレーションアドレスは、http（s）://、英語の文字（大文字と小文字の両方）、数字をサポートする必要があります。/および - 、そして空白の行を含めてはなりません。',
             disableFunction: 'サポートレター、アンダースコア、および',
@@ -276,7 +292,7 @@ const message = {
             commonError: 'リクエストに失敗しました',
         },
         service: {
-            serviceNotStarted: `{0}サービスは開始されません。`,
+            serviceNotStarted: '{0}サービスは開始されません。',
         },
         status: {
             running: 'ランニング',
@@ -338,6 +354,7 @@ const message = {
             conflict: '競合',
             duplicate: '重複',
             unexecuted: '未実行',
+            unused: '未使用',
         },
         units: {
             second: '2番目|2番目|秒',
@@ -391,6 +408,7 @@ const message = {
         app: 'アプリケーション',
         msgCenter: 'タスク',
         disk: 'ディスク',
+        filter: 'フィルター',
     },
     home: {
         recommend: 'おすすめ',
@@ -424,12 +442,10 @@ const message = {
         runningTime: '稼働時間',
         mem: 'システムメモリ',
         swapMem: 'パーティションを交換します',
-
         runSmoothly: '低負荷',
         runNormal: '中程度の負荷',
         runSlowly: '高負荷',
         runJam: '重い負荷',
-
         core: '物理コア',
         logicCore: '論理コア',
         corePercent: 'コア使用率',
@@ -455,7 +471,6 @@ const message = {
         available: '利用可能',
         percent: '利用',
         goInstall: 'インストールします',
-
         networkCard: 'ネットワークカード',
         disk: 'ディスク',
         memo: 'メモ',
@@ -511,17 +526,15 @@ const message = {
         changePasswordHelper:
             'データベースはアプリケーションに関連付けられています。パスワードを変更すると、アプリケーションのデータベースパスワードが同時に変更されます。アプリケーションが再起動した後、変更は有効になります。',
         recoverTimeoutHelper: '-1 はタイムアウト制限なしを意味します',
-
         confChange: '構成',
         confNotFound:
             '設定ファイルが見つかりませんでした。アプリストアでアプリケーションを最新バージョンにアップグレードして、再度お試しください！',
-
         portHelper:
             'このポートは、コンテナの露出したポートです。変更を個別に保存して、コンテナを再起動する必要があります！',
-
         loadFromRemote: '同期',
         userBind: 'バインドユーザー',
-        pgBindHelper: `この操作は、新しいユーザーを作成し、ターゲットデータベースにバインドするために使用されます。現在、データベースに既存のユーザーを選択することはサポートされていません。`,
+        pgBindHelper:
+            'この操作は、新しいユーザーを作成し、ターゲットデータベースにバインドするために使用されます。現在、データベースに既存のユーザーを選択することはサポートされていません。',
         pgSuperUser: 'スーパーユーザー',
         loadFromRemoteHelper: 'これにより、サーバー上のデータベース情報が1パネルに同期します。続けたいですか？',
         passwordHelper: '取得できません、クリックして修正',
@@ -547,13 +560,11 @@ const message = {
         hasCA: 'CA証明書があります',
         skipVerify: '証明書の有効性チェックを無視します',
         initialDB: '初期データベース',
-
         formatHelper: '現在のデータベース文字セットは{0}です。文字セットの矛盾は回復の故障を引き起こす可能性があります',
         dropHelper: 'ここでアップロードされたファイルをドラッグアンドドロップするか、',
         clickHelper: 'クリックしてアップロードします',
         supportUpType:
             'sql、sql.gz、tar.gz、.zip ファイル形式のみサポートしています。インポートする圧縮ファイルには、1つの.sqlファイルのみ、またはtest.sqlが含まれている必要があります',
-
         currentStatus: '現在の状態',
         baseParam: '基本パラメーター',
         performanceParam: 'パフォーマンスパラメーター',
@@ -578,15 +589,14 @@ const message = {
         openTables: 'テーブルを開きます',
         openTablesHelper: '「table_open_cache」の構成値は、この値以上に等しくなければなりません。',
         selectFullJoin: '完全な結合を選択します',
-        selectFullJoinHelper: `値が0でない場合は、データテーブルのインデックスが正しいかどうかを確認します。`,
+        selectFullJoinHelper: '値が0でない場合は、データテーブルのインデックスが正しいかどうかを確認します。',
         selectRangeCheck: 'インデックスなしの結合の数',
-        selectRangeCheckHelper: `値が0でない場合は、データテーブルのインデックスが正しいかどうかを確認します。`,
+        selectRangeCheckHelper: '値が0でない場合は、データテーブルのインデックスが正しいかどうかを確認します。',
         sortMergePasses: 'ソートされたマージの数',
         sortMergePassesHelper: '値が大きすぎる場合は、「sort_buffer_size」を増やします。',
         tableLocksWaited: 'テーブル番号をロックします',
         tableLocksWaitedHelper:
             '値が大きすぎる場合は、データベースのパフォーマンスを向上させることを検討してください。',
-
         performanceTuning: 'パフォーマンスチューニング',
         optimizationScheme: '最適化スキーム',
         keyBufferSizeHelper: 'インデックスのバッファサイズ',
@@ -604,14 +614,11 @@ const message = {
         tableOpenCacheHelper: 'テーブルキャッシュ',
         maxConnectionsHelper: 'マックス接続',
         restart: '再起動',
-
         slowLog: '遅いログ',
         noData: 'まだ遅いログはありません。',
-
         isOn: 'の上',
         longQueryTime: 'しきい値',
         thresholdRangeHelper: '正しいしきい値（1-600）を入力してください。',
-
         timeout: 'タイムアウト(s)',
         timeoutHelper: 'アイドル接続タイムアウト期間。0は、接続が継続的にオンになっていることを示します。',
         maxclients: 'マックスクライアント',
@@ -634,24 +641,21 @@ const message = {
         keyspaceMisses: 'データベースキーを見つけようとする試みの失敗の数。',
         hit: 'データベースキーヒット率を見つけます。',
         latestForkUsec: '最後のfork（）操作に費やされたマイクロ秒数。',
-        redisCliHelper: `「Redis-Cli」サービスは検出されません。最初にサービスを有効にします。`,
+        redisCliHelper: '「Redis-Cli」サービスは検出されません。最初にサービスを有効にします。',
         redisQuickCmd: 'Redis Quickコマンド',
         recoverHelper: 'これにより、[{0}]でデータが上書きされます。続けたいですか？',
         submitIt: 'データを上書きします',
-
         baseConf: '基本',
         allConf: '全て',
         restartNow: '今すぐ再起動します',
         restartNowHelper1:
             '構成の変更が有効になった後、システムを再起動する必要があります。データを持続する必要がある場合は、最初に保存操作を実行します。',
         restartNowHelper: 'これは、システムが再起動した後にのみ有効になります。',
-
         persistence: '持続性',
         rdbHelper1: '2番目、挿入',
         rdbHelper2: 'データの部分',
         rdbHelper3: '条件のいずれかを満たすと、RDBの持続性がトリガーされます。',
         rdbInfo: 'ルールリストの値が1〜100000の範囲であることを確認してください',
-
         containerConn: 'コンテナ接続',
         copyConnURL: '接続 URL をコピー',
         connAddress: '住所',
@@ -714,6 +718,7 @@ const message = {
             pairingCodeRequired: 'Please enter pairing code',
             pairingApproveSuccess: 'Pairing approved successfully',
             customProviderHelper: 'カスタムモデルプロバイダーでは、アカウントの有効性を検証しません',
+            feishuSaveSuccess: 'Feishuに保存済み',
         },
         model: {
             model: 'モデル',
@@ -761,7 +766,6 @@ const message = {
             memoryUsed: '使用メモリ',
             memoryTotal: '総メモリ',
             percent: '使用率',
-
             base: '基本情報',
             driverVersion: 'ドライバーバージョン',
             cudaVersion: 'CUDA バージョン',
@@ -791,6 +795,7 @@ const message = {
             current: 'リアルタイム監視',
             history: '履歴記録',
             notSupport: '現在のバージョンまたはドライバーはこのパラメータの表示をサポートしていません。',
+            processCount: 'プロセス数',
         },
         mcp: {
             server: 'MCP サーバー',
@@ -901,7 +906,6 @@ const message = {
             'コンテナエンジンは、CPU株に1024の基本値を使用します。それを増やして、コンテナにCPU時間を増やすことができます。',
         inputIpv4: '例:192.168.1.1',
         inputIpv6: '例:2001:0DB8:85A3:0000:0000:8A2E:0370:7334',
-
         diskUsage: 'ディスク使用量',
         localVolume: 'ローカルストレージボリューム',
         buildCache: 'ビルドキャッシュ',
@@ -915,7 +919,6 @@ const message = {
         sizeRwHelper: 'コンテナ固有の書き込み可能レイヤーのサイズ',
         sizeRootFs: '仮想サイズ',
         sizeRootFsHelper: 'コンテナが依存するすべてのイメージレイヤー + コンテナレイヤーの合計サイズ',
-
         containerFromAppHelper:
             'このコンテナがアプリストアから取得されたことが検出されました。アプリの操作により、現在の編集が無効になる可能性があります。',
         containerFromAppHelper1:
@@ -931,7 +934,6 @@ const message = {
             'コンテナがホストに特定の特権操作を実行できるようにします。これにより、コンテナのリスクが増加する可能性があります。注意して使用してください！',
         editComposeHelper:
             '注意：環境変数は1panel.envファイルに保存され、composeでenv_fileを介して参照する必要があります。\n変数はコンテナ内部でのみ有効であり、composeファイルの${VAR}置換には参加しません。',
-
         upgradeHelper: 'リポジトリ名/画像名:画像バージョン',
         upgradeWarning2: 'アップグレード操作では、コンテナを再構築する必要があります。続けたいですか？',
         oldImage: '現在の画像',
@@ -954,7 +956,7 @@ const message = {
         autoRemove: '自動削除',
         cpuQuota: 'CPUコアの数',
         memoryLimit: 'メモリ',
-        limitHelper: `0に設定すると、制限がないことを意味します。最大値は{0}です`,
+        limitHelper: '0に設定すると、制限がないことを意味します。最大値は{0}です',
         mount: 'マウント',
         volumeOption: '音量',
         hostOption: 'ホスト',
@@ -984,10 +986,8 @@ const message = {
         unlessStopped: '止まらない限り',
         onFailure: 'オンフェイル（デフォルトで5回）',
         no: '一度もない',
-
         refreshTime: '間隔を更新します',
         cache: 'キャッシュ',
-
         image: '画像|画像',
         imagePull: '引く',
         imagePullHelper: '複数のイメージの選択をサポートし、各イメージ入力後にEnterキーを押して続行します',
@@ -1015,9 +1015,9 @@ const message = {
         tagHelper: '1行に1つ。たとえば、 nkey1 = value1  nkey2 = value2',
         imageNameHelper: '画像名とタグ、例:nginx:最新',
         cleanBuildCache: 'クリーンビルドキャッシュ',
-        delBuildCacheHelper: `これにより、ビルド中に生成され、元に戻すことができないすべてのキャッシュされたアーティファクトが削除されます。続けたいですか？`,
+        delBuildCacheHelper:
+            'これにより、ビルド中に生成され、元に戻すことができないすべてのキャッシュされたアーティファクトが削除されます。続けたいですか？',
         urlWarning: 'URLプレフィックスには、http://またはhttps://を含める必要はありません。変更してください。',
-
         network: 'ネットワーク|ネットワーク',
         networkHelper:
             'これにより、一部のアプリケーションとランタイム環境が適切に機能しない場合があります。続けたいですか？',
@@ -1030,7 +1030,6 @@ const message = {
         scope: 'IPスコープ',
         gateway: 'ゲートウェイ',
         auxAddress: 'IPを除外します',
-
         volume: 'ボリューム|ボリューム',
         volumeDir: 'ボリュームディレクトリ',
         nfsEnable: 'NFSストレージを有効にします',
@@ -1038,7 +1037,6 @@ const message = {
         mountpoint: 'マウントポイント',
         mountpointNFSHelper: '例えば/nfs、 /nfs-sh',
         options: 'オプション',
-
         repo: 'レジストリ',
         httpRepoHelper: 'HTTPタイプのリポジトリを操作するにはDockerサービスの再起動が必要です。',
         httpRepo:
@@ -1052,7 +1050,6 @@ const message = {
         mirrorHelper:
             '複数のミラーがある場合、たとえばnewlinesを表示する必要があります:Nhttp://xxxxxxMDaocloudIo Nhttps://xxxxxxMirrorAliyuncsCom',
         registrieHelper: '複数のプライベートリポジトリが存在する場合、たとえばnewlinesを表示する必要があります。',
-
         compose: '構成|作曲',
         composeFile: 'オーケストレーションファイル',
         fromChangeHelper: 'ソースを切り替えると、現在の編集されたコンテンツがきれいになります。続けたいですか？',
@@ -1078,7 +1075,6 @@ const message = {
             'これにより、{0}構成の下のすべてのコンテナとネットワークが停止して削除されます。続けたいですか？',
         composeEnvHelper2:
             'このオーケストレーションは1Panelアプリストアで作成されました。インストール済みアプリケーションで環境変数を変更してください。',
-
         setting: '設定|設定',
         operatorStatusHelper: 'これは「{0}」Dockerサービスになります。続けたいですか？',
         dockerStatus: 'Dockerサービス',
@@ -1106,7 +1102,7 @@ const message = {
         iptablesHelper1: 'DockerのiPtablesルールの自動構成。',
         iptablesHelper2: 'IPTABLEを無効にすると、コンテナが外部ネットワークと通信できなくなります。',
         daemonJsonPath: 'conf path',
-        serviceUnavailable: `現在、Dockerサービスは開始されていません。`,
+        serviceUnavailable: '現在、Dockerサービスは開始されていません。',
         startIn: '開始する',
         sockPath: 'UNIXドメインソケット',
         sockPathHelper: 'Dockerデーモンとクライアントの間のコミュニケーションチャネル。',
@@ -1117,12 +1113,10 @@ const message = {
         related: '関連している',
         includeAppstore: 'アプリストアから取得したコンテナを表示',
         excludeAppstore: 'アプリストアコンテナを隠す',
-
         cleanDockerDiskZone: 'Dockerが使用するディスクスペースをクリーンアップします',
         cleanImagesHelper: '（コンテナで使用されていないすべての画像をクリーンアップ）',
         cleanContainersHelper: '（停止したすべての容器をクリーンアップ）',
         cleanVolumesHelper: '（未使用のすべてのローカルボリュームをクリーンアップ）',
-
         makeImage: '画像を作成します',
         newImageName: '新しい画像名',
         commitMessage: 'メッセージをコミットします',
@@ -1130,6 +1124,12 @@ const message = {
         ifPause: '作成中にコンテナを一時停止します',
         ifMakeImageWithContainer: 'このコンテナから新しい画像を作成しますか？',
         finishTime: '前回の停止時間',
+        workingDir: '作業ディレクトリ',
+        resource: 'リソース',
+        macAddr: 'MACアドレス',
+        exportHelper: '選択したイメージを1つのtarにエクスポートします。',
+        goSetting: '編集へ',
+        mirrorsHelper: '',
     },
     cronjob: {
         importHelper:
@@ -1235,7 +1235,6 @@ const message = {
         cutWebsiteLog: 'ウェブサイトのログローテーション',
         cutWebsiteLogHelper: '回転したログファイルは、1パネルのバックアップディレクトリにバックアップされます。',
         syncIpGroup: 'WAF IP グループを同期',
-
         requestExpirationTime: 'リクエストの有効期限（時間）のアップロード',
         unitHours: 'ユニット:時間',
         alertTitle: '計画タスク -  {0}「{1}」タスク障害アラート',
@@ -1259,7 +1258,23 @@ const message = {
                 '{0} サービスが検出されませんでした。スクリプトライブラリを使って素早くインストールしてください！',
             syncHelper:
                 'システムスクリプトライブラリを同期します。この操作はシステムスクリプトのみ影響します。続行しますか？',
+            remoteLibrary: 'リモートスクリプトライブラリ',
         },
+        nextTime: '次の5回の実行',
+        logHelper1: '1. 1Panel システムログ',
+        backupContent: 'バックアップ内容',
+        cronSpecRule2: '実行周期の形式が不正です。確認して再試行してください。',
+        perMonthHelper: '毎月 {0} 日 {1}:{2} に実行',
+        perWeekHelper: '毎週 {0} {1}:{2} に実行',
+        perDayHelper: '毎日 {0}:{1} に実行',
+        perHourHelper: '毎時 {0} 分に実行',
+        perNDayHelper: '毎 {0} 日 {1}:{2} に実行',
+        perNHourHelper: '毎 {0} 時間 {1} に実行',
+        perNMinuteHelper: '毎 {0} 分に実行',
+        perNSecondHelper: '毎 {0} 秒に実行',
+        executor: '実行者',
+        cleanLog: 'ログ自動削除',
+        cleanLogscope: 'ログ保持',
     },
     monitor: {
         globalFilter: 'グローバルフィルター',
@@ -1271,7 +1286,6 @@ const message = {
         defaultIOHelper: '監視および概要インターフェースに表示されるデフォルトのディスクオプション',
         cleanMonitor: '監視記録をクリア',
         cleanHelper: 'この操作により、GPUを含むすべての監視記録がクリアされます。続行しますか？',
-
         avgLoad: 'ロード平均',
         loadDetail: '詳細を読み込みます',
         resourceUsage: '利用',
@@ -1388,25 +1402,30 @@ const message = {
             timeZone: 'タイムゾーン',
             localTime: 'サーバー時間',
             timeZoneChangeHelper: 'システムタイムゾーンを変更するには、サービスを再起動する必要があります。続く？',
-            timeZoneHelper: `「TimeDatectl」コマンドをインストールしない場合、タイムゾーンを変更することはできません。システムはそのコマンドを使用してタイムゾーンを変更するためです。`,
+            timeZoneHelper:
+                '「TimeDatectl」コマンドをインストールしない場合、タイムゾーンを変更することはできません。システムはそのコマンドを使用してタイムゾーンを変更するためです。',
             timeZoneCN: '北京',
             timeZoneAM: 'ロサンゼルス',
             timeZoneNY: 'ニューヨーク',
             ntpALi: 'アリババ',
             ntpGoogle: 'グーグル',
             syncSite: 'NTPサーバー',
-            hostnameHelper: `ホスト名の変更は、「hostnamectl」コマンドに依存します。コマンドがインストールされていない場合、変更が失敗する可能性があります。`,
-            userHelper: `ユーザー名は、取得の「whoami」コマンドに依存します。コマンドがインストールされていない場合、検索が失敗する可能性があります。`,
-            passwordHelper: `パスワードの変更は、「chpasswd」コマンドに依存します。コマンドがインストールされていない場合、変更が失敗する可能性があります。`,
+            hostnameHelper:
+                'ホスト名の変更は、「hostnamectl」コマンドに依存します。コマンドがインストールされていない場合、変更が失敗する可能性があります。',
+            userHelper:
+                'ユーザー名は、取得の「whoami」コマンドに依存します。コマンドがインストールされていない場合、検索が失敗する可能性があります。',
+            passwordHelper:
+                'パスワードの変更は、「chpasswd」コマンドに依存します。コマンドがインストールされていない場合、変更が失敗する可能性があります。',
             hostHelper: '提供されたコンテンツには空の値があります。変更後に確認して再試行してください！',
             dnsCheck: 'テストの可用性',
             dnsOK: 'DNS構成情報が利用可能です！',
-            dnsTestFailed: `DNS構成情報は利用できません。`,
+            dnsTestFailed: 'DNS構成情報は利用できません。',
+            syncSiteHelper: 'システム時刻を {0} と同期しますか？',
         },
         fail2ban: {
             sshPort: 'SSHポートを聞いてください',
             sshPortHelper: '現在のFAL2BANは、ホストのSSH接続ポートに耳を傾けます',
-            unActive: `現在、Fail2Banサービスは有効になっていません。`,
+            unActive: '現在、Fail2Banサービスは有効になっていません。',
             operation: 'fail2banサービスで操作「{0}」を実行します。続けたいですか？',
             fail2banChange: 'fail2ban構成の変更',
             ignoreHelper: 'AllowListのIPリストは、ブロックについて無視されます。続けたいですか？',
@@ -1520,6 +1539,9 @@ const message = {
         websiteLog: 'ウェブサイトログ',
         runLog: 'ログを実行します',
         errLog: 'エラーログ',
+        task: 'タスクログ',
+        taskName: 'タスク名',
+        taskRunning: '実行中',
     },
     file: {
         fileDirNum: '{0} 個のディレクトリ、{1} 個のファイル、',
@@ -1606,7 +1628,7 @@ const message = {
         currentSelect: '現在の選択:',
         unsupportedType: 'サポートされていないファイルタイプ',
         deleteHelper: '次のファイルを削除したいですか？デフォルトでは、削除後にリサイクルビンに入ります',
-        fileHelper: `注意:1. 検索結果は並べ替え機能をサポートしていません 2. フォルダはサイズで並べ替えできません。`,
+        fileHelper: '注意:1. 検索結果は並べ替え機能をサポートしていません 2. フォルダはサイズで並べ替えできません。',
         forceDeleteHelper: 'ファイルを永久に削除します（リサイクルビンを入力せずに、直接削除します）',
         recycleBin: 'ビンをリサイクルします',
         sourcePath: 'オリジナルパス',
@@ -1633,7 +1655,7 @@ const message = {
             '不安定なサーバー接続を可能にすると、データが漏れたり改ざんしたりする可能性があります。ダウンロードソースを信頼する場合にのみ、このオプションを使用します。',
         uploadOverLimit: 'ファイルの数は1000を超えています！圧縮してアップロードしてください',
         clashDidNotSupport: 'ファイル名は、.1panel_clashを含むことを禁止されています',
-        clashDeleteAlert: `「リサイクルビン」フォルダーを削除することはできません`,
+        clashDeleteAlert: '「リサイクルビン」フォルダーを削除することはできません',
         clashOpenAlert: '「リサイクルビン」ボタンをクリックして、リサイクルビンディレクトリを開きます',
         right: 'フォワード',
         back: '戻る',
@@ -1652,7 +1674,7 @@ const message = {
         previewTruncated: 'ファイルが大きすぎるため、末尾の内容のみ表示しています',
         previewEmpty: 'ファイルが空であるか、テキストファイルではありません',
         previewLargeFile: 'プレビュー',
-        panelInstallDir: `1Panelインストールディレクトリは削除できません`,
+        panelInstallDir: '1Panelインストールディレクトリは削除できません',
         wgetTask: 'ダウンロードタスク',
         existFileTitle: '同名ファイルの警告',
         existFileHelper: 'アップロードしたファイルに同じ名前のファイルが含まれています。上書きしますか？',
@@ -1745,6 +1767,7 @@ const message = {
         loginTime: 'ログイン時間',
         loginIP: 'ログインIP',
         stopSSHWarn: 'このSSH接続を切断するかどうか',
+        remote: 'リモートSSH',
     },
     setting: {
         panel: 'パネル',
@@ -1819,8 +1842,10 @@ const message = {
         apiInterface: 'APIを有効にします',
         apiInterfaceClose: '閉じたら、APIインターフェイスにアクセスできません。続けたいですか？',
         apiInterfaceHelper: 'サードパーティのアプリケーションにAPIにアクセスできるようにします。',
-        apiInterfaceAlert1: `サーバーのセキュリティリスクが増加する可能性があるため、生産環境で有効にしないでください。`,
-        apiInterfaceAlert2: `サードパーティのアプリケーションを使用してAPIを呼び出して、潜在的なセキュリティの脅威を防止しないでください。`,
+        apiInterfaceAlert1:
+            'サーバーのセキュリティリスクが増加する可能性があるため、生産環境で有効にしないでください。',
+        apiInterfaceAlert2:
+            'サードパーティのアプリケーションを使用してAPIを呼び出して、潜在的なセキュリティの脅威を防止しないでください。',
         apiInterfaceAlert3: 'APIドキュメント',
         apiInterfaceAlert4: '使用ドキュメント',
         apiKey: 'APIキー',
@@ -1836,7 +1861,7 @@ const message = {
         restartLater: '後で手動で再起動',
         systemIPWarning:
             '現在のノードにはデフォルトアクセスアドレスが設定されていません。パネル設定から設定してください！',
-        systemIPWarning1: `現在のサーバーアドレスは{0}に設定されており、クイックリダイレクトは不可能です！`,
+        systemIPWarning1: '現在のサーバーアドレスは{0}に設定されており、クイックリダイレクトは不可能です！',
         defaultNetwork: 'ネットワークカード',
         syncTime: 'サーバー時間',
         timeZone: 'タイムゾーン',
@@ -1858,7 +1883,8 @@ const message = {
         duplicatePassword: '新しいパスワードは元のパスワードと同じになることはできません。再入力してください！',
         diskClean: 'キャッシュクリーン',
         developerMode: 'プレビュープログラム',
-        developerModeHelper: `それらが広くリリースされる前に、新しい機能と修正を体験し、早期のフィードバックを提供できます。`,
+        developerModeHelper:
+            'それらが広くリリースされる前に、新しい機能と修正を体験し、早期のフィードバックを提供できます。',
         thirdParty: 'サードパーティのアカウント',
         noTypeForCreate: '現在、バックアップタイプは作成されていません',
         LOCAL: 'サーバーディスク',
@@ -1934,7 +1960,6 @@ const message = {
         accountKey: 'アカウントキー',
         address: '住所',
         path: 'パス',
-
         safe: '安全',
         passkey: 'パスキー',
         passkeyManage: '管理',
@@ -1991,7 +2016,8 @@ const message = {
         timeoutHelper:
             '[{0}日]パネルパスワードの有効期限が切れようとしています。有効期限が切れた後、パスワードをリセットする必要があります',
         complexity: '複雑さの検証',
-        complexityHelper: `有効にした後、パスワード検証ルールは次のとおりです。英語、数字、少なくとも2つの特殊文字を含む8〜30文字です。`,
+        complexityHelper:
+            '有効にした後、パスワード検証ルールは次のとおりです。英語、数字、少なくとも2つの特殊文字を含む8〜30文字です。',
         bindDomain: 'バインドドメイン',
         unBindDomain: 'バインドドメイン',
         panelSSL: 'パネルSSL',
@@ -2009,7 +2035,7 @@ const message = {
             '承認されたIPアドレスリストを設定した後、リスト内のIPアドレスのみがパネルサービスにアクセスできます。',
         allowIPsWarning:
             '承認されたIPアドレスリストを設定した後、リスト内のIPアドレスのみがパネルサービスにアクセスできます。続けたいですか？',
-        allowIPsHelper1: `IPアドレスの制限を無効にするために空白のままにします。`,
+        allowIPsHelper1: 'IPアドレスの制限を無効にするために空白のままにします。',
         allowIPEgs: '1行に1つ。たとえば、 \n172.16.10.111  \n172.16.10.0/24',
         mfa: '二段階認証',
         mfaClose: 'MFAを無効にすると、サービスのセキュリティが減少します。続けたいですか？',
@@ -2044,14 +2070,14 @@ const message = {
         error416: '範囲は満足できません',
         error444: '接続が閉じた',
         error500: 'サーバーエラー',
-
         https: 'パネルにHTTPSを設定するとアクセスセキュリティが向上します',
         strictHelper: 'HTTPS以外のトラフィックはパネルに接続できません',
         muxHelper:
             'パネルはHTTPピュロコールとHTTPSピュロコールの両方を監視し、HTTPをHTTPSにリダイレクトしますが、このモードではパネルのセキュリティが低下する可能性があります',
         certType: '証明書の種類',
         selfSigned: '自己署名',
-        selfSignedHelper: `ブラウザは、自己署名の証明書を信頼していない場合があり、セキュリティ警告を表示する場合があります。`,
+        selfSignedHelper:
+            'ブラウザは、自己署名の証明書を信頼していない場合があり、セキュリティ警告を表示する場合があります。',
         select: '選択します',
         domainOrIP: 'ドメインまたはIP:',
         timeOut: 'タイムアウト',
@@ -2060,7 +2086,6 @@ const message = {
         certificate: '証明書',
         backupJump:
             'バックアップファイルは現在のバックアップリストにありません。ファイルディレクトリからダウンロードして、バックアップ用にインポートしてみてください。',
-
         snapshot: 'スナップショット|スナップショット',
         noAppData: '選択可能なシステムアプリはありません',
         noBackupData: '選択可能なバックアップデータはありません',
@@ -2118,7 +2143,7 @@ const message = {
         lastRecoverAt: '最後の回復時間',
         lastRollbackAt: '最後のロールバック時間',
         reDownload: 'バックアップファイルをもう一度ダウンロードしてください',
-        recoverErrArch: `さまざまなサーバーアーキテクチャ間のスナップショット回復はサポートされていません！`,
+        recoverErrArch: 'さまざまなサーバーアーキテクチャ間のスナップショット回復はサポートされていません！',
         recoverErrSize:
             '不十分なディスクスペースが検出されました。チェックまたはクリーンアップして、再試行してください！',
         recoverHelper: 'Snapshot {0}からの回復を開始して、先に進む前に次の情報を確認してください。',
@@ -2130,7 +2155,6 @@ const message = {
         rollback: 'ロールバック',
         rollbackHelper:
             'この回復をロールバックすると、この回復からすべてのファイルを置き換え、Dockerサービスと1パネルサービスを再起動する必要がある場合があります。続けたいですか？',
-
         upgradeHelper: 'アップグレードには、1パネルサービスを再起動する必要があります。続けたいですか？',
         rollbackLocalHelper:
             'マスターノードは直接ロールバックをサポートしていません。手動で「1pctl restore」コマンドを実行してロールバックしてください！',
@@ -2142,7 +2166,6 @@ const message = {
             'ノードのバージョンがメインノードと一致していません。ノード管理でアップグレードしてから再試行してください。',
         versionCompare:
             'ノード {0} は既にアップグレード可能な最新バージョンです。マスターノードのバージョンを確認後、再試行してください！',
-
         about: 'について',
         versionItem: '現在のバージョン',
         backupCopies: 'バックアップ数',
@@ -2159,7 +2182,6 @@ const message = {
         forum: '議論',
         doc2: 'ドキュメント',
         currentVersion: 'バージョン',
-
         license: 'ライセンス',
         bindNode: 'ノードをバインド',
         menuSetting: 'メニュー設定',
@@ -2172,6 +2194,35 @@ const message = {
         recoverMessage: 'ページが更新され、メニューリストが初期状態に戻ります。続行しますか？',
         compressPassword: '圧縮パスワード',
         backupRecoverMessage: '圧縮または減圧パスワードを入力してください（設定しないように空白のままにしてください）',
+        componentSize: 'コンポーネントサイズ',
+        apiKeyValidityTime: 'インターフェースキー有効期間',
+        apiKeyValidityTimeEgs: 'インターフェースキー有効期間（分）',
+        apiKeyValidityTimeHelper: '現在時刻との差（分）が許容範囲内なら有効です。0 は検証無効。',
+        scope: '範囲',
+        public: 'パブリック',
+        publicHelper: 'パブリック型バックアップアカウントは各子ノードへ同期され共同利用できます',
+        private: 'プライベート',
+        privateHelper: 'プライベート型バックアップアカウントは現在ノードのみで使用します',
+        UPYUN: 'UPYUN',
+        ALIYUN: 'Aliyun Drive',
+        ALIYUNHelper:
+            'Aliyun Drive の非クライアントダウンロード上限は 100MB です。超える場合はクライアントでダウンロードしてください。',
+        ALIYUNRecover:
+            'Aliyun Drive の非クライアントダウンロード上限は 100MB です。超える場合はクライアントでローカルにダウンロード後、スナップショットを同期して復元してください。',
+        GoogleDrive: 'Google Drive',
+        analysis: '解析',
+        analysisHelper:
+            'トークン全体を貼り付けると必要項目を自動解析します。詳細は公式ドキュメントを参照してください。',
+        serviceName: 'サービス名',
+        operator: 'オペレーター',
+        clickToRefresh: 'クリックして更新',
+        recoverFailed: 'スナップショット復元失敗',
+        importHelper: 'スナップショットディレクトリ: ',
+        upgradeRecord: 'アップグレード履歴',
+        upgrading: 'アップグレード中、しばらくお待ちください...',
+        versionHelper: '命名規則: [メジャー].[機能].[バグ修正]。例:',
+        upgradeCheck: '更新を確認',
+        panelSSLHelper: 'パネルSSL自動更新後、1Panelサービスを手動再起動してください。',
     },
     license: {
         offLine: 'オフライン版',
@@ -2227,6 +2278,8 @@ const message = {
         fileExchange: 'プロフェッショナル版にアップグレードすると、複数のサーバー間でファイルを迅速に転送できます。',
         cluster:
             'プロフェッショナル版にアップグレードすると、MySQL/Postgres/Redisマスタースレーブクラスタを管理できます。',
+        exceptionalHelper: 'ライセンス同期検証が異常です。手動で同期して機能を確認してください。詳細: ',
+        tamperHelper: '操作失敗。ファイル/フォルダの改ざん保護を確認してください。',
     },
     clean: {
         scan: 'スキャンを開始します',
@@ -2245,7 +2298,6 @@ const message = {
         suggest: '（推奨）',
         totalScan: 'クリーニングするジャンクファイルの合計:',
         selectScan: '選択したジャンクファイルの合計:',
-
         system: 'システムジャンクファイル',
         systemHelper: 'スナップショット、アップグレードなどのプロセスで生成された一時ファイル',
         panelOriginal: 'システムスナップショット復元前のバックアップファイル',
@@ -2253,7 +2305,6 @@ const message = {
         agentPackages: '履歴バージョンの子ノードアップグレード/インストールパッケージ',
         upgradeHelper: '（システムロールバックのために最新のアップグレードバックアップを保持することをお勧めします）',
         rollback: '回復する前にファイルをバックアップします',
-
         backup: 'システムバックアップ',
         backupHelper: 'ローカルバックアップアカウントに関連付けられていないバックアップファイル',
         unknownBackup: 'システムバックアップ',
@@ -2262,13 +2313,11 @@ const message = {
         unknownDatabase: '関連付けられていないデータベースバックアップ',
         unknownWebsite: '関連付けられていないWebサイトバックアップ',
         unknownSnapshot: '関連付けられていないスナップショットバックアップ',
-
         upload: '一時的なアップロードファイル',
         uploadHelper: 'システムバックアップリストからアップロードされた一時ファイル',
         download: '一時的なダウンロードファイル',
         downloadHelper: 'システムによってサードパーティのバックアップアカウントからダウンロードされた一時ファイル',
         directory: 'ディレクトリ',
-
         systemLog: 'ログファイル',
         systemLogHelper: 'システムログ、タスクログ、ウェブサイトログファイル',
         dockerLog: 'コンテナ操作ログファイル',
@@ -2276,14 +2325,13 @@ const message = {
         shell: 'シェルスクリプトスケジュールタスク',
         containerShell: 'コンテナ内で実行するシェルスクリプトスケジュールタスク',
         curl: 'CURLスケジュールタスク',
-
         docker: 'コンテナゴミ',
         dockerHelper: 'コンテナ、イメージ、ボリューム、ビルドキャッシュなどのファイル',
         volumes: 'ボリューム',
         buildCache: 'コンテナビルドキャッシュ',
-
         appTmpDownload: 'Archivo de descarga temporal de la aplicación',
         unknownWebsiteLog: '未関連ウェブサイトログバックアップファイル',
+        snapshot: 'システムスナップショット一時ファイル',
     },
     app: {
         app: 'アプリケーション|アプリケーション',
@@ -2309,9 +2357,9 @@ const message = {
         stopOperatorHelper: 'アプリケーションは停止します。続けたいですか？',
         restartOperatorHelper: 'アプリケーションが再起動されます。続けたいですか？',
         reloadOperatorHelper: 'アプリケーションはリロードされます。続けたいですか？',
-        checkInstalledWarn: `「{0}」が検出されませんでした。「アプリストア」に移動してインストールしてください。`,
+        checkInstalledWarn: '「{0}」が検出されませんでした。「アプリストア」に移動してインストールしてください。',
         limitHelper: 'アプリケーションはすでにインストールされています。',
-        deleteHelper: `「{0}」は、次のリソースに関連付けられています。チェックしてもう一度やり直してください！`,
+        deleteHelper: '「{0}」は、次のリソースに関連付けられています。チェックしてもう一度やり直してください！',
         checkTitle: 'ヒント',
         defaultConfig: 'デフォルトの構成',
         defaultConfigHelper: 'デフォルトの構成に復元されており、保存後に有効になります',
@@ -2343,7 +2391,8 @@ const message = {
         containerNameHelper: 'コンテナ名は設定されていないときに自動的に生成されます',
         allowPort: '外部アクセス',
         allowPortHelper: '外部ポートアクセスを許可すると、ファイアウォールポートがリリースされます',
-        appInstallWarn: `アプリケーションは、デフォルトで外部アクセスポートを公開しません。[Advanced Settings]をクリックして公開します。`,
+        appInstallWarn:
+            'アプリケーションは、デフォルトで外部アクセスポートを公開しません。[Advanced Settings]をクリックして公開します。',
         upgradeStart: 'アップグレードを起動します！後でページを更新してください',
         toFolder: 'インストールディレクトリを開きます',
         editCompose: '編集ファイルを作成します',
@@ -2353,7 +2402,8 @@ const message = {
         allReadyInstalled: 'インストール',
         installHelper: '画像プルの問題がある場合は、画像アクセラレーションを構成します。',
         sortMode: '並べ替え',
-        installWarn: `外部アクセスは有効になっていないため、アプリケーションが外部ネットワークを介してアクセスできるようになります。続けたいですか？`,
+        installWarn:
+            '外部アクセスは有効になっていないため、アプリケーションが外部ネットワークを介してアクセスできるようになります。続けたいですか？',
         showIgnore: '無視されたアプリケーションを表示します',
         cancelIgnore: 'キャンセルは無視します',
         ignoreList: '無視されたアプリケーション',
@@ -2379,7 +2429,8 @@ const message = {
         useNew: 'カスタムバージョンを使用します',
         useDefault: 'デフォルトバージョンを使用します',
         useCustom: 'docker-compose.ymlをカスタマイズします',
-        useCustomHelper: `カスタムdocker-compose.ymlファイルを使用すると、アプリケーションのアップグレードが失敗する場合があります。必要でない場合は、確認しないでください。`,
+        useCustomHelper:
+            'カスタムdocker-compose.ymlファイルを使用すると、アプリケーションのアップグレードが失敗する場合があります。必要でない場合は、確認しないでください。',
         diffHelper:
             '左側は古いバージョンで、右側は新しいバージョンです。編集後、クリックしてカスタムバージョンを保存します',
         pullImage: '画像を引っ張ります',
@@ -2739,7 +2790,6 @@ const message = {
         failTimeout: '障害タイムアウト',
         failTimeoutHelper:
             'サーバーのヘルスチェックの時間ウィンドウの長さ。この期間内に累積障害回数がしきい値に達すると、サーバーは一時的に削除され、同じ時間経過後に再試行されます。デフォルト 10 秒',
-
         staticChangePHPHelper: '現在は静的ウェブサイトですが、PHPウェブサイトに切り替えることができます。',
         proxyCache: 'リバースプロキシキャッシュ',
         cacheLimit: 'キャッシュスペース制限',
@@ -2767,7 +2817,6 @@ const message = {
         preflight: 'プリフライトリクエストの高速応答',
         preflightHleper:
             '有効にすると、ブラウザがクロスオリジンのプリフライトリクエスト（OPTIONSリクエスト）を送信した場合、システムは自動的に204ステータスコードを返し、必要なクロスオリジン応答ヘッダーを設定します',
-
         changeDatabase: 'データベースを切り替え',
         changeDatabaseHelper1: 'データベースの関連付けは、ウェブサイトのバックアップと復元に使用されます。',
         changeDatabaseHelper2: '別のデータベースに切り替えると、以前のバックアップが復元できなくなる可能性があります。',
@@ -2801,7 +2850,6 @@ const message = {
         execUser: '実行ユーザー',
         execDir: '実行ディレクトリ',
         packagist: '中国フルミラー',
-
         batchOperate: 'バッチ操作',
         batchOperateHelper: 'ウェブサイトをバッチ{0}しますか？',
         stream: 'TCP/UDP プロキシ',
@@ -2810,8 +2858,12 @@ const message = {
             '外部リスニングポート番号を設定します。クライアントはこのポートを通じてサービスにアクセスします。カンマで区切ってください。例：5222,5223',
         streamHelper: 'TCP/UDP ポート転送とロードバランシング',
         udp: 'UDPを有効化',
-
         syncHtmlHelper: 'PHP と静的ウェブサイトに同期',
+        wafValueHelper: '値',
+        parentWbeiste: '親サイト',
+        shareCahe: 'キャッシュ数メモリサイズ',
+        shareCaheHelper: 'メモリ1Mあたり約8000件のキャッシュを保存可能',
+        cacheExpireJHelper: '有効期限後に未ヒットならキャッシュを削除',
     },
     php: {
         short_open_tag: '短いタグサポート',
@@ -2839,6 +2891,7 @@ const message = {
         containerConfig: 'コンテナ設定',
         containerConfigHelper: '環境変数などの情報は、作成完了後に設定 - コンテナ設定で変更できます',
         dateTimezoneHelper: '例：TZ=Asia/Shanghai（必要に応じて追加してください）',
+        extensionsHelper: '複数拡張はカンマで区切ってください',
     },
     nginx: {
         serverNamesHashBucketSizeHelper: 'サーバー名のハッシュテーブルサイズ',
@@ -2932,9 +2985,9 @@ const message = {
         dnsMauanlHelper: '手動解像度モードでは、作成後に適用ボタンをクリックしてDNS解像度値を取得する必要があります',
         httpHelper:
             'HTTPモードを使用するにはOpenRestyをインストールする必要があり、ワイルドカードドメイン証明書の申請はサポートされていません。',
-        buypassHelper: `中国本土では、ブライパスはアクセスできません`,
+        buypassHelper: '中国本土では、ブライパスはアクセスできません',
         googleHelper: 'EAB HMACキーとEABキッドを取得する方法',
-        googleCloudHelper: `GoogleクラウドAPIは中国本土のほとんどの地域でアクセスできません`,
+        googleCloudHelper: 'GoogleクラウドAPIは中国本土のほとんどの地域でアクセスできません',
         skipDNSCheck: 'DNSチェックをスキップします',
         skipDNSCheckHelper: '認定リクエスト中にタイムアウトの問題が発生した場合にのみ、こちらを確認してください。',
         cfHelper: 'グローバルAPIキーを使用しないでください',
@@ -2972,7 +3025,6 @@ const message = {
         argsCheck: 'パラメーターチェックを取得します',
         postCheck: 'パラメーターの検証を投稿します',
         cookieBlockList: 'クッキーブロックリスト',
-
         dockerHelper:
             '現在のファイアウォールではコンテナのポートマッピングを無効にできません。インストール済みアプリケーションは【インストール済み】ページでアプリケーションパラメータを編集し、ポート開放ルールを設定できます。',
         iptablesHelper:
@@ -2982,7 +3034,7 @@ const message = {
         unUsed: '未使用',
         dockerRestart: 'ファイアウォール操作にはDockerサービスの再起動が必要です',
         firewallHelper: '{0}システムファイアウォール',
-        firewallNotStart: `現在、システムファイアウォールは有効になっていません。最初に有効にします。`,
+        firewallNotStart: '現在、システムファイアウォールは有効になっていません。最初に有効にします。',
         restartFirewallHelper: 'この操作は、現在のファイアウォールを再起動します。続けたいですか？',
         stopFirewallHelper: 'これにより、サーバーはセキュリティ保護を失います。続けたいですか？',
         startFirewallHelper:
@@ -2991,7 +3043,7 @@ const message = {
         enableBanPing: 'Ping禁止',
         disableBanPing: 'Ping禁止解除',
         noPingTitle: 'pingを無効にします',
-        noPingHelper: `これによりPingが無効になり、サーバーはICMP応答をエコーし​​ません。続けたいですか？`,
+        noPingHelper: 'これによりPingが無効になり、サーバーはICMP応答をエコーし​​ません。続けたいですか？',
         onPingHelper: 'これによりPingが可能になり、ハッカーはサーバーを発見する場合があります。続けたいですか？',
         changeStrategy: '{0}戦略を変更します',
         changeStrategyIPHelper1:
@@ -3008,7 +3060,6 @@ const message = {
         portHelper2: '範囲ポート、例えば8080-8089',
         changeStrategyHelper:
             '[{1}] {0}戦略を[{2}]に変更します。設定後、{0}は外部から{2}にアクセスします。続けたいですか？',
-
         strategy: '戦略',
         accept: '受け入れる',
         drop: '落とす',
@@ -3035,7 +3086,6 @@ const message = {
         exportHelper: '{0} 件のファイアウォールルールをエクスポートします。続行しますか？',
         importSuccess: '{0} 件のルールを正常にインポートしました',
         importPartialSuccess: 'インポート完了: {0} 件成功、{1} 件失敗',
-
         ipv4Limit: '現在の操作は IPv4 アドレスのみをサポートしています',
         basicStatus: '現在のチェーン {0} は未バインドです。まずバインドしてください！',
         baseIptables: 'iptables サービス',
@@ -3067,6 +3117,9 @@ const message = {
         portHelper: '0 は任意のポートを意味します',
         allPorts: 'すべてのポート',
         deleteRuleConfirm: '{0} 個のルールを削除します。続行しますか？',
+        advancedControl: '高度制御',
+        advancedControlNotAvailable: '{0} ファイアウォールを使用中。高度ルールは iptables のみ対応',
+        destination: '宛先',
     },
     runtime: {
         runtime: 'ランタイム',
@@ -3112,7 +3165,7 @@ const message = {
         customScript: 'カスタムスタートアップコマンド',
         customScriptHelper:
             '完全な起動コマンドを入力してください。例：npm run start。PM2の起動コマンドはpm2-runtimeに置き換えてください。そうしないと起動に失敗します。',
-        portError: `同じポートを繰り返さないでください。`,
+        portError: '同じポートを繰り返さないでください。',
         systemRestartHelper: 'ステータスの説明:中断 - システムの再起動によりステータスの取得が失敗しました',
         javaScriptHelper: '完全な起動コマンドを提供します。たとえば、「Java -Jar Halo.Jar -XMX1024M -XMS256M」。',
         javaDirHelper: 'ディレクトリにはjarファイルが含まれている必要があり、サブディレクトリも受け入れられます',
@@ -3125,6 +3178,26 @@ const message = {
         concurrency: '並行処理スキーム',
         loadStatus: '負荷状態',
         extraHosts: 'ホストマッピング',
+        extension: '拡張',
+        installExtension: '拡張 {0} をインストールしますか',
+        loadedExtension: 'ロード済み拡張',
+        popularExtension: '人気の拡張',
+        uninstallExtension: '拡張 {0} をアンインストールしますか',
+        phpConfigHelper: '設定変更には環境再起動が必要です。続行しますか',
+        operateMode: '動作モード',
+        dynamic: '動的',
+        static: '静的',
+        ondemand: 'オンデマンド',
+        dynamicHelper: '動的にプロセス数を調整。変動トラフィックや低メモリ向け',
+        staticHelper: '固定プロセス数。高並列で安定トラフィック向け、消費高め',
+        ondemandHelper: '必要時に起動/終了。効率は高いが初回応答は遅い',
+        max_children: '作成可能な最大プロセス数',
+        start_servers: '起動時のプロセス数',
+        min_spare_servers: '最小アイドルプロセス数',
+        max_spare_servers: '最大アイドルプロセス数',
+        envKey: '名前',
+        envValue: '値',
+        environment: '環境変数',
     },
     process: {
         pid: 'プロセスID',
@@ -3172,7 +3245,8 @@ const message = {
             list: 'デーモンプロセス|デーモンプロセス',
             config: 'スーパーバイザー構成',
             primaryConfig: 'メイン構成ファイルの場所',
-            notSupportCtl: `supervisorctlは検出されません。スクリプトライブラリページに移動して手動でインストールしてください。`,
+            notSupportCtl:
+                'supervisorctlは検出されません。スクリプトライブラリページに移動して手動でインストールしてください。',
             user: 'ユーザー',
             command: '指示',
             dir: 'ディレクトリ',
@@ -3181,7 +3255,7 @@ const message = {
                 'これにより、メイン構成ファイルの[[include] [include]セクションの「ファイル」値が変更されます。他の構成ファイルのディレクトリは、「{1Panel Installation Directory} /1Panel/tools/supervisord/supervisor.d/」になります。',
             operatorHelper: '操作{1}は{0}で実行されます、続行しますか？',
             uptime: '実行時間',
-            notStartWarn: `スーパーバイザーは開始されません。最初に開始します。`,
+            notStartWarn: 'スーパーバイザーは開始されません。最初に開始します。',
             serviceName: 'サービス名',
             initHelper:
                 'Supervisor サービスが検出されましたが、初期化されていません。上部のステータスバーにある初期化ボタンをクリックして設定してください。',
@@ -3505,6 +3579,7 @@ const message = {
             importRuleHelper: '1行に1つのルール',
         },
         monitor: {
+            '360': '360検索',
             name: 'ウェブサイトモニタリング',
             pv: 'ページビュー',
             uv: 'ユニークビジター',
@@ -3573,7 +3648,6 @@ const message = {
             statusErr: '無効なステータスコード形式',
             shenma: '神馬検索',
             duckduckgo: 'DuckDuckGo',
-            '360': '360検索',
             excludeUri: 'URIを除外',
             top100Helper: '上位100データを表示',
             logSaveDay: 'ログ保持期間（日数）',
@@ -3681,7 +3755,6 @@ const message = {
             wafContent3: 'リクエストがインターセプトされた後に表示するカスタムページを作成',
             wafTitle4: 'カスタムルール (ACL)',
             wafContent4: 'カスタムルールに基づいてリクエストをインターセプト',
-
             tamperTitle1: 'ファイル整合性監視',
             tamperContent1:
                 'ウェブサイトのファイルの整合性を監視、コアファイル、スクリプトファイル、設定ファイルを含む。',
@@ -3694,7 +3767,6 @@ const message = {
             tamperTitle4: 'ログ記録と分析',
             tamperContent4:
                 'ファイルのアクセスおよび操作ログを記録し、後の監査および分析に使用、また潜在的なセキュリティ脅威を特定。',
-
             settingTitle1: 'カスタムウェルカムメッセージ',
             settingContent1: '1Panelのログインページにカスタムウェルカムメッセージを設定。',
             settingTitle2: 'カスタムロゴ',
@@ -3702,7 +3774,6 @@ const message = {
             settingTitle3: 'カスタムウェブサイトアイコン',
             settingContent3:
                 'カスタムアイコンをアップロードして、デフォルトのブラウザアイコンを置き換え、ユーザー体験を向上。',
-
             monitorTitle1: '訪問者トレンド',
             monitorContent1: 'ウェブサイト訪問者のトレンドを統計および表示',
             monitorTitle2: '訪問者マップ',
@@ -3713,7 +3784,6 @@ const message = {
             monitorTitle4: 'リアルタイムモニタリング',
             monitorContent4:
                 'ウェブサイトリクエスト情報をリアルタイムでモニタリング、リクエスト数、トラフィックなどを含む。',
-
             alertTitle1: 'SMSアラート',
             alertContent1:
                 'サーバーリソース使用量の異常、ウェブサイトおよび証明書の有効期限、新しいバージョンの更新、パスワードの期限切れなどが発生した場合、ユーザーにSMSアラートで通知し、タイムリーな処理を確保。',
@@ -3723,7 +3793,6 @@ const message = {
             alertTitle3: 'アラート設定',
             alertContent3:
                 'カスタム電話番号、日々のプッシュ頻度、日々のプッシュ時間設定を提供し、ユーザーがより合理的なプッシュアラートを設定しやすく。',
-
             nodeDashTitle1: 'アプリケーション管理',
             nodeDashContent1:
                 'マルチノードアプリケーションの統一管理、ステータス監視、迅速な起動/停止、端末接続、バックアップをサポート',
@@ -3736,7 +3805,6 @@ const message = {
             nodeDashTitle4: 'スケジュールタスク管理',
             nodeDashContent4:
                 'マルチノードスケジュールタスクの統一管理、ステータス監視、迅速な起動/停止、手動トリガー実行をサポート',
-
             nodeTitle1: 'ワンクリックノード追加',
             nodeContent1: '複数のサーバーノードを迅速に統合',
             nodeTitle2: 'バッチアップグレード',
@@ -3745,7 +3813,6 @@ const message = {
             nodeContent3: '各ノードの運用状況をリアルタイムで把握',
             nodeTitle4: '迅速なリモート接続',
             nodeContent4: 'ワンクリックでノードリモート端末に直接接続',
-
             fileExchangeTitle1: 'キー認証伝送',
             fileExchangeContent1: 'SSHキーを介して認証し、伝送のセキュリティを確保します。',
             fileExchangeTitle2: '効率的なファイル同期',
@@ -3753,10 +3820,8 @@ const message = {
             fileExchangeTitle3: 'マルチノード相互通信のサポート',
             fileExchangeContent3:
                 '異なるノード間でプロジェクトファイルを簡単に転送し、複数のサーバーを柔軟に管理します。',
-
             nodeAppTitle1: 'アプリケーションアップグレード管理',
             nodeAppContent1: 'マルチノードアプリケーションの更新状況を統一監視、ワンクリックアップグレードをサポート',
-
             appTitle1: '柔軟なパネル管理',
             appContent1: 'いつでもどこでも1Panelサーバーを簡単に管理できます。',
             appTitle2: '包括的なサービス情報',
@@ -3765,7 +3830,6 @@ const message = {
             appTitle3: 'リアルタイム異常監視',
             appContent3:
                 'モバイル端末でサーバーステータス、WAFセキュリティ監視、ウェブサイトの訪問統計、プロセスの健康状態をリアルタイムで確認できます。',
-
             clusterTitle1: 'マスタースレーブ展開',
             clusterContent1:
                 '異なるノードで MySQL/Postgres/Redis マスタースレーブインスタンスを作成することをサポートし、自動的にマスタースレーブ関連付けと初期化を完了します',
@@ -3833,7 +3897,6 @@ const message = {
             nodeSyncHelper: 'ノード情報の同期は、以下の情報を同期します：',
             nodeSyncHelper1: '1. 公共のバックアップアカウント情報',
             nodeSyncHelper2: '2. 主ノードとサブノードの接続情報',
-
             nodeCheck: '可用性チェック',
             checkSSH: 'ノードSSH接続を確認',
             checkUserPermission: 'ノードユーザー権限を確認',
@@ -3854,7 +3917,6 @@ const message = {
             errLicense: 'このノードに紐づけられたライセンスが利用できません。確認して再試行してください！',
             errNodePort:
                 'ノードポート[ {0} ]にアクセスできないことが検出されました。ファイアウォールまたはセキュリティグループでこのポートが開放されているか確認してください。',
-
             reinstallHelper: 'ノード{0}を再インストールします。続行しますか？',
             unhealthyCheck: '異常チェック',
             fixOperation: '修正操作',
@@ -3878,7 +3940,6 @@ const message = {
             offline: 'オフラインモード',
             freeCount: '無料枠 [{0}]',
             offlineHelper: 'ノードがオフライン環境にある場合に使用',
-
             appUpgrade: 'アプリのアップグレード',
             appUpgradeHelper: 'アップグレードが必要なアプリが {0} 個あります',
         },
