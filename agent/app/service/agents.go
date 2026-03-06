@@ -62,9 +62,11 @@ func NewIAgentService() IAgentService {
 }
 
 const (
-	defaultBrowserExecutablePath = "/home/node/.cache/ms-playwright/chromium-1208/chrome-linux64/chrome"
-	defaultBrowserProfile        = "openclaw"
-	defaultUserTimezone          = "Asia/Shanghai"
+	defaultBrowserExecutablePath  = "/home/node/.cache/ms-playwright/chromium-1208/chrome-linux64/chrome"
+	defaultBrowserProfile         = "openclaw"
+	defaultUserTimezone           = "Asia/Shanghai"
+	defaultToolsProfile           = "full"
+	defaultToolsSessionVisibility = "all"
 )
 
 func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
@@ -1435,7 +1437,17 @@ type openclawConfig struct {
 	Gateway gatewayConfig `json:"gateway"`
 	Agents  agentsConfig  `json:"agents"`
 	Browser browserConfig `json:"browser"`
+	Tools   toolsConfig   `json:"tools"`
 	Models  *modelsConfig `json:"models,omitempty"`
+}
+
+type toolsConfig struct {
+	Profile  string             `json:"profile,omitempty"`
+	Sessions toolSessionsConfig `json:"sessions,omitempty"`
+}
+
+type toolSessionsConfig struct {
+	Visibility string `json:"visibility,omitempty"`
 }
 
 type gatewayConfig struct {
@@ -1549,6 +1561,12 @@ func writeOpenclawConfig(confDir, provider, modelName, apiType string, maxTokens
 			Headless:       true,
 			NoSandbox:      true,
 			DefaultProfile: defaultBrowserProfile,
+		},
+		Tools: toolsConfig{
+			Profile: defaultToolsProfile,
+			Sessions: toolSessionsConfig{
+				Visibility: defaultToolsSessionVisibility,
+			},
 		},
 	}
 
@@ -1869,6 +1887,14 @@ func writeOpenclawConfig(confDir, provider, modelName, apiType string, maxTokens
 				return err
 			}
 			conf["browser"] = browserMap
+		}
+		toolsMap := ensureChildMap(conf, "tools")
+		if profile, ok := toolsMap["profile"]; !ok || strings.TrimSpace(fmt.Sprintf("%v", profile)) == "" {
+			toolsMap["profile"] = defaultToolsProfile
+		}
+		sessionsMap := ensureChildMap(toolsMap, "sessions")
+		if visibility, ok := sessionsMap["visibility"]; !ok || strings.TrimSpace(fmt.Sprintf("%v", visibility)) == "" {
+			sessionsMap["visibility"] = defaultToolsSessionVisibility
 		}
 		agentsMap := ensureChildMap(conf, "agents")
 		defaultsMap := ensureChildMap(agentsMap, "defaults")
