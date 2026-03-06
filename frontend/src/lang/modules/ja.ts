@@ -1582,8 +1582,6 @@ const message = {
         remarkPlaceholder: '備考',
         remarkToggle: '備考',
         remarkToggleTip: 'ファイルの備考を読み込む',
-        columnSetting: '列設定',
-        showColumns: '表示列',
         canNotDeCompress: 'このファイルを解凍できません',
         uploadSuccess: '正常にアップロードします',
         downloadProcess: '進捗状況をダウンロードします',

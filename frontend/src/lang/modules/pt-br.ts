@@ -1609,8 +1609,6 @@ const message = {
         remarkPlaceholder: 'Observação',
         remarkToggle: 'Observações',
         remarkToggleTip: 'Carregar observações do arquivo',
-        columnSetting: 'Colunas',
-        showColumns: 'Mostrar colunas',
         canNotDeCompress: 'Não é possível descompactar este arquivo',
         uploadSuccess: 'Upload bem-sucedido',
         downloadProcess: 'Progresso do download',

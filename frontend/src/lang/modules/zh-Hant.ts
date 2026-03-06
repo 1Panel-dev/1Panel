@@ -1531,8 +1531,6 @@ const message = {
         remarkPlaceholder: '備註內容',
         remarkToggle: '備註',
         remarkToggleTip: '載入檔案備註',
-        columnSetting: '欄位設定',
-        showColumns: '顯示欄位',
         canNotDeCompress: '無法解壓此檔案',
         uploadSuccess: '上傳成功!',
         downloadProcess: '下載進度',

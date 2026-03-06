@@ -1604,8 +1604,6 @@ const message = {
         remarkPlaceholder: 'Remark',
         remarkToggle: 'Remarks',
         remarkToggleTip: 'Load file remarks',
-        columnSetting: 'Columns',
-        showColumns: 'Show columns',
         canNotDeCompress: 'Cannot decompress this file',
         uploadSuccess: 'Successfully upload',
         downloadProcess: 'Download progress',

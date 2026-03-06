@@ -1621,8 +1621,6 @@ const message = {
         remarkPlaceholder: 'Catatan',
         remarkToggle: 'Catatan',
         remarkToggleTip: 'Muatkan catatan fail',
-        columnSetting: 'Tetapan lajur',
-        showColumns: 'Tunjukkan lajur',
         canNotDeCompress: 'Tidak dapat nyahmampatkan fail ini',
         uploadSuccess: 'Berjaya dimuat naik',
         downloadProcess: 'Kemajuan muat turun',

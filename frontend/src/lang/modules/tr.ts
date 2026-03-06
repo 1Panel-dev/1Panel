@@ -1630,8 +1630,6 @@ const message = {
         remarkPlaceholder: 'Not',
         remarkToggle: 'Notlar',
         remarkToggleTip: 'Dosya notlarını yükle',
-        columnSetting: 'Sutunlar',
-        showColumns: 'Gosterilen sutunlar',
         canNotDeCompress: 'Bu dosyanın sıkıştırması açılamaz',
         uploadSuccess: 'Başarıyla yüklendi',
         downloadProcess: 'İndirme ilerlemesi',

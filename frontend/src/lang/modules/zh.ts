@@ -1507,8 +1507,6 @@ const message = {
         remarkPlaceholder: '备注内容',
         remarkToggle: '备注',
         remarkToggleTip: '加载文件备注',
-        columnSetting: '列设置',
-        showColumns: '显示列',
         canNotDeCompress: '无法解压此文件',
         uploadSuccess: '上传成功!',
         downloadProcess: '下载进度',
