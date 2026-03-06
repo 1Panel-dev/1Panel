@@ -2067,8 +2067,6 @@ const message = {
         bindDomain: 'Vincular dominio',
         unBindDomain: 'Desvincular dominio',
         panelSSL: 'SSL del panel',
-        panelSSLHelper:
-            'Tras la renovación automática del SSL del panel, deberás reiniciar manualmente el servicio 1Panel para que los cambios surtan efecto.',
         unBindDomainHelper:
             'La acción de desvincular un dominio puede provocar inseguridad en el sistema. ¿Deseas continuar?',
         bindDomainHelper: 'Tras vincular el dominio, solo ese dominio podrá acceder al servicio de 1Panel.',

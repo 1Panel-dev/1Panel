@@ -1,12 +1,5 @@
 <template>
     <DrawerPro v-model="drawerVisible" :header="$t('setting.panelSSL')" @close="handleClose" size="large">
-        <el-alert class="common-prompt" :closable="false" type="error">
-            <template #default>
-                <span>
-                    <span>{{ $t('setting.panelSSLHelper') }}</span>
-                </span>
-            </template>
-        </el-alert>
         <el-form ref="formRef" label-position="top" :model="form" :rules="rules" v-loading="loading">
             <el-form-item :label="$t('setting.mode')" prop="ssl">
                 <el-radio-group v-model="form.ssl">

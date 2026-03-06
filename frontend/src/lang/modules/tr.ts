@@ -2074,8 +2074,6 @@ const message = {
         bindDomain: 'Alan adı bağla',
         unBindDomain: 'Alan adı bağlamasını kaldır',
         panelSSL: 'Panel SSL',
-        panelSSLHelper:
-            'Panel SSL’nin otomatik yenilenmesinden sonra, değişikliklerin etkili olması için 1Panel servisini manuel olarak yeniden başlatmanız gerekir.',
         unBindDomainHelper:
             'Alan adı bağlamasını kaldırma işlemi sistem güvenliğini etkileyebilir. Devam etmek istiyor musunuz?',
         bindDomainHelper: 'Alan adı bağlandıktan sonra, yalnızca o alan adı 1Panel servisine erişebilir.',
