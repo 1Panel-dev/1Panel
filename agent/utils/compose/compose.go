@@ -1,6 +1,7 @@
 package compose
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
@@ -139,18 +140,27 @@ func getComposeImagesByCommand(filePath string) ([]string, error) {
 	}
 	base, extra := getComposeBaseCmd()
 	args := append(extra, strings.Fields(loadFiles(filePath))...)
-	args = append(args, "config", "--images")
+	args = append(args, "config", "--format", "json", "--no-normalize")
 	stdout, err := cmd.NewCommandMgr(cmd.WithTimeout(5*time.Minute)).
 		RunWithStdout(base, args...)
 	if err != nil {
-		return nil, fmt.Errorf("run compose config --images failed, std: %s, err: %v", stdout, err)
+		return nil, fmt.Errorf("run compose config --format json --no-normalize failed, std: %s, err: %v", stdout, err)
+	}
+
+	var composeConfig struct {
+		Services map[string]struct {
+			Image string `json:"image"`
+		} `json:"services"`
+	}
+	if err = json.Unmarshal([]byte(stdout), &composeConfig); err != nil {
+		return nil, fmt.Errorf("parse compose config json failed, std: %s, err: %v", stdout, err)
 	}
 
 	var images []string
 	seen := make(map[string]struct{})
-	for _, line := range strings.Split(stdout, "\n") {
-		image := strings.TrimSpace(line)
-		if len(image) == 0 {
+	for _, service := range composeConfig.Services {
+		image := strings.TrimSpace(service.Image)
+		if image == "" {
 			continue
 		}
 		if _, ok := seen[image]; ok {
@@ -160,7 +170,7 @@ func getComposeImagesByCommand(filePath string) ([]string, error) {
 		images = append(images, image)
 	}
 	if len(images) == 0 {
-		return nil, errors.New("no images found from compose config")
+		return nil, errors.New("no images found from compose config json")
 	}
 	return images, nil
 }
