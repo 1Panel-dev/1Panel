@@ -37,7 +37,7 @@ const databaseRouter = {
             component: () => import('@/views/ai/model/ollama/index.vue'),
             meta: {
                 icon: 'p-moxing-menu',
-                title: 'aiTools.model.model',
+                title: 'aiTools.model.localModel',
                 requiresAuth: true,
             },
         },

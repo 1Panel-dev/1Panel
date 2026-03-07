@@ -721,6 +721,7 @@ const message = {
         },
         model: {
             model: 'Models',
+            localModel: 'Local Models',
             create: 'Add Model',
             create_helper: 'Pull "{0}"',
             ollama_doc: 'You can visit the Ollama official website to search and find more models.',

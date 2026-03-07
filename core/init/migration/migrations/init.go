@@ -834,3 +834,15 @@ var AddEditionSetting = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var UpdateAiLocalModelMenuTitle = &gormigrate.Migration{
+	ID: "20260307-update-ai-local-model-menu-title",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.Exec(
+			`UPDATE settings
+			 SET value = REPLACE(value, 'aiTools.model.model', 'aiTools.model.localModel')
+			 WHERE key = 'HideMenu'
+			   AND value LIKE '%aiTools.model.model%'`,
+		).Error
+	},
+}

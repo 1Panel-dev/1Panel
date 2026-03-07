@@ -33,6 +33,7 @@ func Init() {
 		migrations.UpdateAiAgentsMenu,
 		migrations.AddDashboardCarouselSetting,
 		migrations.AddEditionSetting,
+		migrations.UpdateAiLocalModelMenuTitle,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

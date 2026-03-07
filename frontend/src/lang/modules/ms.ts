@@ -729,6 +729,7 @@ const message = {
         },
         model: {
             model: 'Model',
+            localModel: 'Model Tempatan',
             create: 'Tambah Model',
             create_helper: 'Tarik "{0}"',
             ollama_doc: 'Anda boleh melawat laman web rasmi Ollama untuk mencari dan menemui lebih banyak model.',

@@ -725,6 +725,7 @@ const message = {
         },
         model: {
             model: 'Model',
+            localModel: 'Yerel Modeller',
             create: 'Model Ekle',
             create_helper: '"{0}" çek',
             ollama_doc: 'Daha fazla model aramak ve bulmak için Ollama resmi web sitesini ziyaret edebilirsiniz.',
