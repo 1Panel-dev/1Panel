@@ -424,23 +424,32 @@
                                     <el-button plain class="close" icon="Close" @click="closeMove"></el-button>
                                 </el-tooltip>
                             </el-button-group>
-                            <div class="w-80">
-                                <el-input
-                                    v-model="req.search"
-                                    clearable
-                                    @clear="search()"
-                                    @keydown.enter="search()"
-                                    :placeholder="$t('file.search')"
-                                >
-                                    <template #prepend>
-                                        <el-checkbox v-model="req.containSub">
-                                            {{ $t('file.sub') }}
-                                        </el-checkbox>
-                                    </template>
-                                    <template #append>
-                                        <el-button icon="Search" @click="search" round />
-                                    </template>
-                                </el-input>
+                            <div class="flex items-center gap-2">
+                                <fu-table-column-select
+                                    :columns="columns"
+                                    trigger="hover"
+                                    :title="$t('commons.table.selectColumn')"
+                                    popper-class="popper-class"
+                                    :only-icon="true"
+                                />
+                                <div class="w-80">
+                                    <el-input
+                                        v-model="req.search"
+                                        clearable
+                                        @clear="search()"
+                                        @keydown.enter="search()"
+                                        :placeholder="$t('file.search')"
+                                    >
+                                        <template #prepend>
+                                            <el-checkbox v-model="req.containSub">
+                                                {{ $t('file.sub') }}
+                                            </el-checkbox>
+                                        </template>
+                                        <template #append>
+                                            <el-button icon="Search" @click="search" round />
+                                        </template>
+                                    </el-input>
+                                </div>
                             </div>
                         </div>
                     </template>
@@ -456,6 +465,8 @@
                             @cell-mouse-leave="hideFavorite"
                             :heightDiff="heightDiff"
                             :right-buttons="rightButtons"
+                            :columns="columns"
+                            localKey="fileManagementColumn"
                         >
                             <el-table-column type="selection" width="30" />
                             <el-table-column
@@ -827,6 +838,7 @@ const setRenameRef = (key: string, el: any) => {
 const getCurrentRename = () => renameRefs.value[editableTabsKey.value];
 
 const pathRefs = ref<Record<string, any>>({});
+const columns = ref([]);
 
 const setPathRef = (key: string, el: any) => {
     if (el) {
