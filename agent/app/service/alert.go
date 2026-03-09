@@ -15,6 +15,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/email"
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 	"github.com/shirou/gopsutil/v4/disk"
+	"mime"
 	"sort"
 	"strings"
 	"sync"
@@ -483,13 +484,14 @@ func (a AlertService) TestAlertConfig(req dto.AlertConfigTest) (bool, error) {
 	if username == "" {
 		username = req.Sender
 	}
+	encodedDisplayName := mime.BEncoding.Encode("UTF-8", req.DisplayName)
 	cfg := email.SMTPConfig{
 		Host:       req.Host,
 		Port:       req.Port,
 		Sender:     req.Sender,
 		Username:   username,
 		Password:   req.Password,
-		From:       fmt.Sprintf(`"%s" <%s>`, req.DisplayName, req.Sender),
+		From:       fmt.Sprintf(`"%s" <%s>`, encodedDisplayName, req.Sender),
 		Encryption: req.Encryption,
 		Recipient:  req.Recipient,
 	}
