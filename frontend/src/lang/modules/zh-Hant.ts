@@ -2103,6 +2103,7 @@ const message = {
         fileExchange: '升級專業版可以在多台伺服器之間快速傳輸檔案。',
         app: '升級專業版可透過手機APP，檢視服務資訊、異常監控等。',
         cluster: '升級專業版可以管理 MySQL/Postgres/Redis 主從叢集。',
+        vllm: '升級專業版可將 Vllm 服務統一納入 1Panel 管理，集中完成部署、設定調整、狀態維運與任務追蹤，降低本地模型服務維護成本。',
     },
     clean: {
         scan: '開始掃描',
@@ -3528,6 +3529,14 @@ const message = {
             clusterContent2: '統一頁面集中管理多個主從節點，檢視其角色、執行狀態等資訊',
             clusterTitle3: '複製狀態',
             clusterContent3: '展示主從複製狀態與延遲資訊，輔助排查同步異常問題',
+            vllmTitle1: '統一納管',
+            vllmContent1: '將分散的 Vllm 服務統一接入 1Panel，集中檢視實例、版本、狀態與執行目錄。',
+            vllmTitle2: '快速部署',
+            vllmContent2: '透過視覺化表單完成版本選擇、模型目錄掛載與啟動參數設定，減少手動編排成本。',
+            vllmTitle3: '維運便捷',
+            vllmContent3: '在同一頁面完成建立、編輯、啟停、重啟、刪除與任務追蹤，提升本地模型服務維護效率。',
+            vllmTitle4: '設定可控',
+            vllmContent4: '結合進階設定統一管理連接埠、容器、啟動命令與 Compose 設定，便於標準化交付與後續調整。',
         },
         node: {
             master: '主節點',

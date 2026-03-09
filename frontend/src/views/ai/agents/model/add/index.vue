@@ -16,7 +16,7 @@
             </el-form-item>
             <el-form-item :label="$t('aiTools.agents.apiKey')" prop="apiKey">
                 <el-input v-model="form.apiKey" type="password" show-password />
-                <span class="input-help" v-if="form.provider === 'custom'">
+                <span class="input-help" v-if="form.provider === 'custom' || form.provider === 'vllm'">
                     {{ $t('aiTools.agents.customProviderHelper') }}
                 </span>
             </el-form-item>
@@ -26,28 +26,40 @@
             <el-form-item :label="$t('aiTools.agents.baseUrl')" prop="baseURL">
                 <el-input v-model="form.baseURL" :disabled="!editableBaseURLProviders.includes(form.provider)" />
             </el-form-item>
-            <el-form-item :label="$t('aiTools.model.model')" prop="model" v-if="form.provider === 'custom'">
+            <el-form-item
+                :label="$t('aiTools.model.model')"
+                prop="model"
+                v-if="form.provider === 'custom' || form.provider === 'vllm'"
+            >
                 <el-input v-model="form.model" placeholder="gpt-4o-mini" />
             </el-form-item>
             <el-form-item
                 :label="'API ' + $t('commons.table.type')"
                 prop="apiType"
-                v-if="form.provider === 'custom' || form.provider === 'ollama'"
+                v-if="form.provider === 'custom' || form.provider === 'vllm' || form.provider === 'ollama'"
             >
                 <el-select v-model="form.apiType">
                     <el-option label="openai-completions" value="openai-completions" />
                     <el-option label="openai-responses" value="openai-responses" />
                     <el-option
-                        v-if="form.provider === 'custom'"
+                        v-if="form.provider === 'custom' || form.provider === 'vllm'"
                         label="anthropic-messages"
                         value="anthropic-messages"
                     />
                 </el-select>
             </el-form-item>
-            <el-form-item label="Max Tokens" prop="maxTokens" v-if="form.provider === 'custom'">
+            <el-form-item
+                label="Max Tokens"
+                prop="maxTokens"
+                v-if="form.provider === 'custom' || form.provider === 'vllm'"
+            >
                 <el-input-number v-model="form.maxTokens" :min="1" :max="2000000" />
             </el-form-item>
-            <el-form-item label="Context Window" prop="contextWindow" v-if="form.provider === 'custom'">
+            <el-form-item
+                label="Context Window"
+                prop="contextWindow"
+                v-if="form.provider === 'custom' || form.provider === 'vllm'"
+            >
                 <el-input-number v-model="form.contextWindow" :min="1" :max="2000000" />
             </el-form-item>
             <el-form-item :label="$t('website.remark')" prop="remark">
@@ -85,7 +97,7 @@ const formRef = ref<FormInstance>();
 const providerOptions = ref<Array<{ label: string; value: string }>>([]);
 const providerBaseURL = ref<Record<string, string>>({});
 const loading = ref(false);
-const editableBaseURLProviders = ['ollama', 'custom', 'zai'];
+const editableBaseURLProviders = ['ollama', 'custom', 'vllm', 'zai'];
 const { isIntl } = useGlobalStore();
 
 const form = reactive({
@@ -244,7 +256,7 @@ const loadProviders = async () => {
 };
 
 const handleProviderChange = () => {
-    if (form.provider === 'custom') {
+    if (form.provider === 'custom' || form.provider === 'vllm') {
         form.baseURL = '';
         form.apiType = form.apiType || 'openai-completions';
         form.maxTokens = form.maxTokens || 8192;
