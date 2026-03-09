@@ -1093,7 +1093,8 @@ const message = {
         composeContentPlaceholder: 'Docker-compose dosyanızın içeriğini buraya yazın veya yapıştırın',
         setting: 'Ayar | Ayarlar',
         goSetting: 'Düzenlemeye git',
-        restartHelper: 'Yapılandırma değişikliklerinin geçerli olması için Docker servisinin yeniden başlatılması gerekir',
+        restartHelper:
+            'Yapılandırma değişikliklerinin geçerli olması için Docker servisinin yeniden başlatılması gerekir',
         operatorStatusHelper: 'Bu, Docker servisini "{0}" yapacaktır. Devam etmek istiyor musunuz?',
         dockerStatus: 'Docker Servisi',
         daemonJsonPathHelper: 'Yapılandırma yolunun docker.servicede belirtilen ile aynı olduğundan emin olun.',
