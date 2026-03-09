@@ -352,7 +352,7 @@
                                 </el-form-item>
                                 <el-form-item v-if="form.from === 'path'" prop="path">
                                     <el-input
-                                        @change="onEdit('')"
+                                        @change="loadDir(form.path)"
                                         :placeholder="$t('commons.example') + '/tmp/docker-compose.yml'"
                                         v-model="form.path"
                                     >
