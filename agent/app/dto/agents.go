@@ -198,6 +198,39 @@ type AgentChannelPairingApproveReq struct {
 	PairingCode string `json:"pairingCode" validate:"required"`
 }
 
+type AgentQQBotConfigReq struct {
+	AgentID uint `json:"agentId" validate:"required"`
+}
+
+type AgentQQBotConfigUpdateReq struct {
+	AgentID      uint   `json:"agentId" validate:"required"`
+	Enabled      bool   `json:"enabled"`
+	AppID        string `json:"appId" validate:"required"`
+	ClientSecret string `json:"clientSecret" validate:"required"`
+}
+
+type AgentQQBotConfig struct {
+	Enabled      bool   `json:"enabled"`
+	AppID        string `json:"appId"`
+	ClientSecret string `json:"clientSecret"`
+	Installed    bool   `json:"installed"`
+}
+
+type AgentPluginInstallReq struct {
+	AgentID uint   `json:"agentId" validate:"required"`
+	Type    string `json:"type" validate:"required,oneof=qqbot"`
+	TaskID  string `json:"taskID" validate:"required"`
+}
+
+type AgentPluginCheckReq struct {
+	AgentID uint   `json:"agentId" validate:"required"`
+	Type    string `json:"type" validate:"required,oneof=qqbot"`
+}
+
+type AgentPluginStatus struct {
+	Installed bool `json:"installed"`
+}
+
 type AgentDiscordConfigReq struct {
 	AgentID uint `json:"agentId" validate:"required"`
 }

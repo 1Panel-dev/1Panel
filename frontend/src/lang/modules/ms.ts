@@ -708,6 +708,7 @@ const message = {
             switchModelSuccess: 'Model switched successfully',
             channelsTab: 'Channels',
             feishu: 'Feishu',
+            pluginNotInstalled: 'Plugin belum dipasang. Sila pasang dahulu.',
             dmPolicy: 'DM Policy',
             groupPolicy: 'Group Policy',
             policyPairing: 'Pairing',

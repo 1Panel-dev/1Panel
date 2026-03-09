@@ -693,6 +693,7 @@ const message = {
             switchModelSuccess: 'Model switched successfully',
             channelsTab: 'Channels',
             feishu: 'Feishu',
+            pluginNotInstalled: '플러그인이 설치되지 않았습니다. 먼저 설치해 주세요.',
             dmPolicy: 'DM Policy',
             groupPolicy: 'Group Policy',
             policyPairing: 'Pairing',

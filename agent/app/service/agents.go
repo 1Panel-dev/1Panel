@@ -21,6 +21,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	providercatalog "github.com/1Panel-dev/1Panel/agent/app/provider"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
+	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
@@ -50,6 +51,10 @@ type IAgentService interface {
 	UpdateTelegramConfig(req dto.AgentTelegramConfigUpdateReq) error
 	GetDiscordConfig(req dto.AgentDiscordConfigReq) (*dto.AgentDiscordConfig, error)
 	UpdateDiscordConfig(req dto.AgentDiscordConfigUpdateReq) error
+	GetQQBotConfig(req dto.AgentQQBotConfigReq) (*dto.AgentQQBotConfig, error)
+	UpdateQQBotConfig(req dto.AgentQQBotConfigUpdateReq) error
+	InstallPlugin(req dto.AgentPluginInstallReq) error
+	CheckPlugin(req dto.AgentPluginCheckReq) (*dto.AgentPluginStatus, error)
 	GetBrowserConfig(req dto.AgentBrowserConfigReq) (*dto.AgentBrowserConfig, error)
 	UpdateBrowserConfig(req dto.AgentBrowserConfigUpdateReq) error
 	GetOtherConfig(req dto.AgentOtherConfigReq) (*dto.AgentOtherConfig, error)
@@ -69,6 +74,7 @@ const (
 	defaultToolsProfile           = "full"
 	defaultToolsSessionVisibility = "all"
 	maxCommunityAIAgents          = int64(5)
+	openclawPluginBaseDir         = "/home/node/.openclaw/extensions"
 )
 
 func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
@@ -780,6 +786,78 @@ func (a AgentService) UpdateDiscordConfig(req dto.AgentDiscordConfigUpdateReq) e
 	return nil
 }
 
+func (a AgentService) GetQQBotConfig(req dto.AgentQQBotConfigReq) (*dto.AgentQQBotConfig, error) {
+	agent, install, err := a.loadAgentAndInstall(req.AgentID)
+	if err != nil {
+		return nil, err
+	}
+	conf, err := readOpenclawConfig(agent.ConfigPath)
+	if err != nil {
+		return nil, err
+	}
+	result := extractQQBotConfig(conf)
+	installed, _ := checkPluginInstalled(install.ContainerName, "qqbot")
+	result.Installed = installed
+	return &result, nil
+}
+
+func (a AgentService) UpdateQQBotConfig(req dto.AgentQQBotConfigUpdateReq) error {
+	agent, _, err := a.loadAgentAndInstall(req.AgentID)
+	if err != nil {
+		return err
+	}
+	conf, err := readOpenclawConfig(agent.ConfigPath)
+	if err != nil {
+		return err
+	}
+	setQQBotConfig(conf, dto.AgentQQBotConfig{
+		Enabled:      req.Enabled,
+		AppID:        req.AppID,
+		ClientSecret: req.ClientSecret,
+	})
+	if err := writeOpenclawConfigRaw(agent.ConfigPath, conf); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (a AgentService) InstallPlugin(req dto.AgentPluginInstallReq) error {
+	_, install, err := a.loadAgentAndInstall(req.AgentID)
+	if err != nil {
+		return err
+	}
+	spec, _, err := resolvePluginMeta(req.Type)
+	if err != nil {
+		return err
+	}
+	installTask, err := task.NewTaskWithOps(req.Type, task.TaskInstall, task.TaskScopeAI, req.TaskID, req.AgentID)
+	if err != nil {
+		return err
+	}
+	installTask.AddSubTask("Install OpenClaw plugin", func(t *task.Task) error {
+		mgr := cmd.NewCommandMgr(cmd.WithTask(*t), cmd.WithContext(t.TaskCtx), cmd.WithTimeout(10*time.Minute))
+		return mgr.RunBashCf("docker exec %s openclaw plugins install %s", install.ContainerName, spec)
+	}, nil)
+	go func() {
+		if err := installTask.Execute(); err != nil {
+			global.LOG.Errorf("install openclaw plugin failed: %v", err)
+		}
+	}()
+	return nil
+}
+
+func (a AgentService) CheckPlugin(req dto.AgentPluginCheckReq) (*dto.AgentPluginStatus, error) {
+	_, install, err := a.loadAgentAndInstall(req.AgentID)
+	if err != nil {
+		return nil, err
+	}
+	installed, err := checkPluginInstalled(install.ContainerName, req.Type)
+	if err != nil {
+		return nil, err
+	}
+	return &dto.AgentPluginStatus{Installed: installed}, nil
+}
+
 func (a AgentService) GetBrowserConfig(req dto.AgentBrowserConfigReq) (*dto.AgentBrowserConfig, error) {
 	agent, _, err := a.loadAgentAndInstall(req.AgentID)
 	if err != nil {
@@ -1113,6 +1191,67 @@ func setBrowserConfig(conf map[string]interface{}, config dto.AgentBrowserConfig
 	} else {
 		browser["defaultProfile"] = strings.TrimSpace(config.DefaultProfile)
 	}
+}
+
+func extractQQBotConfig(conf map[string]interface{}) dto.AgentQQBotConfig {
+	result := dto.AgentQQBotConfig{Enabled: true}
+	channels, ok := conf["channels"].(map[string]interface{})
+	if !ok {
+		return result
+	}
+	qqbot, ok := channels["qqbot"].(map[string]interface{})
+	if !ok {
+		return result
+	}
+	if enabled, ok := qqbot["enabled"].(bool); ok {
+		result.Enabled = enabled
+	}
+	if appID, ok := qqbot["appId"].(string); ok {
+		result.AppID = appID
+	}
+	if clientSecret, ok := qqbot["clientSecret"].(string); ok {
+		result.ClientSecret = clientSecret
+	}
+	return result
+}
+
+func setQQBotConfig(conf map[string]interface{}, config dto.AgentQQBotConfig) {
+	channels := ensureChildMap(conf, "channels")
+	qqbot := ensureChildMap(channels, "qqbot")
+	qqbot["enabled"] = config.Enabled
+	qqbot["allowFrom"] = []string{"*"}
+	qqbot["appId"] = strings.TrimSpace(config.AppID)
+	qqbot["clientSecret"] = strings.TrimSpace(config.ClientSecret)
+
+	plugins := ensureChildMap(conf, "plugins")
+	entries := ensureChildMap(plugins, "entries")
+	qqbotEntry := ensureChildMap(entries, "qqbot")
+	qqbotEntry["enabled"] = config.Enabled
+}
+
+func resolvePluginMeta(pluginType string) (string, string, error) {
+	switch strings.ToLower(strings.TrimSpace(pluginType)) {
+	case "qqbot":
+		return "@sliverp/qqbot@latest", "qqbot", nil
+	default:
+		return "", "", fmt.Errorf("unsupported plugin type")
+	}
+}
+
+func checkPluginInstalled(containerName, pluginType string) (bool, error) {
+	_, pluginDir, err := resolvePluginMeta(pluginType)
+	if err != nil {
+		return false, err
+	}
+	if strings.TrimSpace(containerName) == "" {
+		return false, buserr.New("ErrRecordNotFound")
+	}
+	pluginPath := path.Join(openclawPluginBaseDir, pluginDir)
+	mgr := cmd.NewCommandMgr(cmd.WithTimeout(20 * time.Second))
+	if err := mgr.RunBashCf("docker exec %s test -d %s", containerName, pluginPath); err != nil {
+		return false, nil
+	}
+	return true, nil
 }
 
 func extractOtherConfig(conf map[string]interface{}) dto.AgentOtherConfig {
