@@ -165,6 +165,22 @@ export const updateAgentDiscordConfig = (req: AI.AgentDiscordConfigUpdateReq) =>
     return http.post(`/ai/agents/channel/discord/update`, req);
 };
 
+export const getAgentQQBotConfig = (req: AI.AgentQQBotConfigReq) => {
+    return http.post<AI.AgentQQBotConfig>(`/ai/agents/channel/qqbot/get`, req);
+};
+
+export const updateAgentQQBotConfig = (req: AI.AgentQQBotConfigUpdateReq) => {
+    return http.post(`/ai/agents/channel/qqbot/update`, req);
+};
+
+export const installAgentPlugin = (req: AI.AgentPluginInstallReq) => {
+    return http.post(`/ai/agents/plugin/install`, req);
+};
+
+export const checkAgentPlugin = (req: AI.AgentPluginCheckReq) => {
+    return http.post<AI.AgentPluginStatus>(`/ai/agents/plugin/check`, req);
+};
+
 export const getAgentBrowserConfig = (req: AI.AgentBrowserConfigReq) => {
     return http.post<AI.AgentBrowserConfig>(`/ai/agents/browser/get`, req);
 };

@@ -668,6 +668,7 @@ const message = {
             switchModelSuccess: '模型切換成功',
             channelsTab: '聊天渠道',
             feishu: '飛書',
+            pluginNotInstalled: '插件未安裝，請先安裝插件',
             dmPolicy: '私聊策略',
             groupPolicy: '群組策略',
             policyPairing: '配對',

@@ -1,5 +1,8 @@
 <template>
     <el-tabs v-model="activeTab" @tab-click="handleTabClick">
+        <el-tab-pane label="QQ Bot" name="qqbot">
+            <QQBotTab ref="qqbotRef" />
+        </el-tab-pane>
         <el-tab-pane :label="t('aiTools.agents.feishu')" name="feishu">
             <FeishuTab ref="feishuRef" />
         </el-tab-pane>
@@ -18,13 +21,15 @@ import { useI18n } from 'vue-i18n';
 import FeishuTab from './channels/feishu.vue';
 import TelegramTab from './channels/telegram.vue';
 import DiscordTab from './channels/discord.vue';
+import QQBotTab from './channels/qq.vue';
 
 const { t } = useI18n();
-const activeTab = ref('feishu');
+const activeTab = ref('qqbot');
 const agentId = ref(0);
 const feishuRef = ref();
 const telegramRef = ref();
 const discordRef = ref();
+const qqbotRef = ref();
 
 const loadCurrentTab = async () => {
     if (agentId.value <= 0) {
@@ -37,6 +42,10 @@ const loadCurrentTab = async () => {
     }
     if (activeTab.value === 'telegram') {
         await telegramRef.value?.load(agentId.value);
+        return;
+    }
+    if (activeTab.value === 'qqbot') {
+        await qqbotRef.value?.load(agentId.value);
         return;
     }
     await feishuRef.value?.load(agentId.value);

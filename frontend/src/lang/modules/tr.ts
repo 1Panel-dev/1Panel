@@ -704,6 +704,7 @@ const message = {
             switchModelSuccess: 'Model switched successfully',
             channelsTab: 'Channels',
             feishu: 'Feishu',
+            pluginNotInstalled: 'Eklenti yüklü değil. Lütfen önce yükleyin.',
             dmPolicy: 'DM Policy',
             groupPolicy: 'Group Policy',
             policyPairing: 'Pairing',

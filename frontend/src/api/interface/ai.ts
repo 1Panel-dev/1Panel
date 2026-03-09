@@ -432,6 +432,39 @@ export namespace AI {
         pairingCode: string;
     }
 
+    export interface AgentQQBotConfigReq {
+        agentId: number;
+    }
+
+    export interface AgentQQBotConfig {
+        enabled: boolean;
+        appId: string;
+        clientSecret: string;
+        installed: boolean;
+    }
+
+    export interface AgentQQBotConfigUpdateReq {
+        agentId: number;
+        enabled: boolean;
+        appId: string;
+        clientSecret: string;
+    }
+
+    export interface AgentPluginInstallReq {
+        agentId: number;
+        type: 'qqbot';
+        taskID: string;
+    }
+
+    export interface AgentPluginCheckReq {
+        agentId: number;
+        type: 'qqbot';
+    }
+
+    export interface AgentPluginStatus {
+        installed: boolean;
+    }
+
     export interface AgentDiscordConfigReq {
         agentId: number;
     }

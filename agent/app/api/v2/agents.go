@@ -354,6 +354,88 @@ func (b *BaseApi) UpdateAgentDiscordConfig(c *gin.Context) {
 }
 
 // @Tags AI
+// @Summary Get Agent QQ Bot channel config
+// @Accept json
+// @Param request body dto.AgentQQBotConfigReq true "request"
+// @Success 200 {object} dto.AgentQQBotConfig
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/channel/qqbot/get [post]
+func (b *BaseApi) GetAgentQQBotConfig(c *gin.Context) {
+	var req dto.AgentQQBotConfigReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	data, err := agentService.GetQQBotConfig(req)
+	if err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.SuccessWithData(c, data)
+}
+
+// @Tags AI
+// @Summary Update Agent QQ Bot channel config
+// @Accept json
+// @Param request body dto.AgentQQBotConfigUpdateReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/channel/qqbot/update [post]
+func (b *BaseApi) UpdateAgentQQBotConfig(c *gin.Context) {
+	var req dto.AgentQQBotConfigUpdateReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := agentService.UpdateQQBotConfig(req); err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags AI
+// @Summary Install Agent plugin
+// @Accept json
+// @Param request body dto.AgentPluginInstallReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/plugin/install [post]
+func (b *BaseApi) InstallAgentPlugin(c *gin.Context) {
+	var req dto.AgentPluginInstallReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := agentService.InstallPlugin(req); err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags AI
+// @Summary Check Agent plugin installation status
+// @Accept json
+// @Param request body dto.AgentPluginCheckReq true "request"
+// @Success 200 {object} dto.AgentPluginStatus
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/plugin/check [post]
+func (b *BaseApi) CheckAgentPlugin(c *gin.Context) {
+	var req dto.AgentPluginCheckReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	data, err := agentService.CheckPlugin(req)
+	if err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.SuccessWithData(c, data)
+}
+
+// @Tags AI
 // @Summary Get Agent Browser config
 // @Accept json
 // @Param request body dto.AgentBrowserConfigReq true "request"
