@@ -1076,7 +1076,9 @@ const message = {
             'これにより、{0}構成の下のすべてのコンテナとネットワークが停止して削除されます。続けたいですか？',
         composeEnvHelper2:
             'このオーケストレーションは1Panelアプリストアで作成されました。インストール済みアプリケーションで環境変数を変更してください。',
+        composeContentPlaceholder: 'ここに docker-compose ファイルの内容を記述または貼り付けてください',
         setting: '設定|設定',
+        restartHelper: '設定変更を有効にするには Docker サービスの再起動が必要です',
         operatorStatusHelper: 'これは「{0}」Dockerサービスになります。続けたいですか？',
         dockerStatus: 'Dockerサービス',
         daemonJsonPathHelper: '構成パスがdocker.serviceで指定されているものと同じであることを確認してください。',

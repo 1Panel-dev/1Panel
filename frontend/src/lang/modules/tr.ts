@@ -1089,8 +1089,10 @@ const message = {
             'Bu, {0} compose altındaki tüm konteynerleri ve ağları durduracak ve kaldıracaktır. Devam etmek istiyor musunuz?',
         composeEnvHelper2:
             'Bu düzenleme 1Panel Uygulama Mağazası tarafından oluşturuldu. Lütfen ortam değişkenlerini yüklü uygulamalarda değiştirin.',
+        composeContentPlaceholder: 'Docker-compose dosyanızın içeriğini buraya yazın veya yapıştırın',
         setting: 'Ayar | Ayarlar',
         goSetting: 'Düzenlemeye git',
+        restartHelper: 'Yapılandırma değişikliklerinin geçerli olması için Docker servisinin yeniden başlatılması gerekir',
         operatorStatusHelper: 'Bu, Docker servisini "{0}" yapacaktır. Devam etmek istiyor musunuz?',
         dockerStatus: 'Docker Servisi',
         daemonJsonPathHelper: 'Yapılandırma yolunun docker.servicede belirtilen ile aynı olduğundan emin olun.',

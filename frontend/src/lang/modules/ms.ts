@@ -1087,7 +1087,9 @@ const message = {
             'Ini akan menghentikan dan menghapuskan semua kontena dan rangkaian di bawah komposisi {0}. Adakah anda mahu meneruskan?',
         composeEnvHelper2:
             'Penyelarasan ini dibuat oleh Kedai Apl 1Panel. Sila ubah pembolehubah persekitaran dalam aplikasi yang dipasang.',
+        composeContentPlaceholder: 'Tulis atau tampal kandungan fail docker-compose anda di sini',
         setting: 'Tetapan | Tetapan',
+        restartHelper: 'Perubahan konfigurasi memerlukan perkhidmatan Docker dimulakan semula untuk berkuat kuasa',
         operatorStatusHelper: 'Ini akan "{0}" perkhidmatan Docker. Adakah anda mahu meneruskan?',
         dockerStatus: 'Perkhidmatan Docker',
         daemonJsonPathHelper: 'Pastikan laluan konfigurasi sama seperti yang dinyatakan dalam docker.service.',

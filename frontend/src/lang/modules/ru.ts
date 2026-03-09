@@ -1079,7 +1079,9 @@ const message = {
         composeDownHelper: 'Это остановит и удалит все контейнеры и сети под compose {0}. Хотите продолжить?',
         composeEnvHelper2:
             'Эта оркестрация создана Магазином приложений 1Panel. Измените переменные среды в установленных приложениях.',
+        composeContentPlaceholder: 'Введите или вставьте здесь содержимое вашего файла docker-compose',
         setting: 'Настройка | Настройки',
+        restartHelper: 'Изменения конфигурации вступят в силу после перезапуска службы Docker',
         operatorStatusHelper: 'Это выполнит "{0}" службы Docker. Хотите продолжить?',
         dockerStatus: 'Служба Docker',
         daemonJsonPathHelper: 'Убедитесь, что путь конфигурации совпадает с указанным в docker.service.',
