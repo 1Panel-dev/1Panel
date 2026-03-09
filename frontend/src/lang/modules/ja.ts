@@ -722,6 +722,7 @@ const message = {
         },
         model: {
             model: 'モデル',
+            localModel: 'ローカルモデル',
             create: 'モデルを追加',
             create_helper: 'を取得 "{0}"',
             ollama_doc: 'Ollama の公式ウェブサイトを訪れて、さらに多くのモデルを検索して見つけることができます。',

@@ -689,6 +689,7 @@ const message = {
         },
         model: {
             model: '模型',
+            localModel: '本地模型',
             create: '新增模型',
             create_helper: '拉取 "{0}"',
             ollama_doc: '您可以瀏覽 Ollama 官方網站，搜尋並尋找更多模型。',
