@@ -76,11 +76,22 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        ElMessageBox.confirm(i18n.global.t('container.sockPathMsg'), i18n.global.t('container.sockPath'), {
-            confirmButtonText: i18n.global.t('commons.button.confirm'),
-            cancelButtonText: i18n.global.t('commons.button.cancel'),
-            type: 'info',
-        }).then(async () => {
+        ElMessageBox.confirm(
+            `
+            <div style="line-height: 1.6;">
+                <ul style="padding-left: 18px; margin: 0;">
+                    <li>${i18n.global.t('container.restartHelper')}</li>
+                    <li>${i18n.global.t('container.sockPathMsg')}</li>
+                </ul>
+            </div>
+            `,
+            i18n.global.t('container.sockPath'),
+            {
+                confirmButtonText: i18n.global.t('commons.button.confirm'),
+                cancelButtonText: i18n.global.t('commons.button.cancel'),
+                dangerouslyUseHTMLString: true,
+            },
+        ).then(async () => {
             loading.value = true;
             let params = {
                 key: 'DockerSockPath',

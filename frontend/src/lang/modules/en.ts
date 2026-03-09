@@ -1077,8 +1077,11 @@ const message = {
         composeDownHelper: 'This will stop and remove all containers and networks under the {0} compose. Continue?',
         composeEnvHelper2:
             'This orchestration was created by the 1Panel App Store. Please modify environment variables in the installed applications.',
+        composeContentPlaceholder: 'Write or paste the content of your docker-compose file here',
+
         setting: 'Setting | Settings',
         goSetting: 'Go to edit',
+        restartHelper: 'Configuration changes require restarting the Docker service to take effect',
         operatorStatusHelper: 'This will "{0}" the Docker service. Continue?',
         dockerStatus: 'Docker Service',
         daemonJsonPathHelper: 'Ensure that the configuration path is the same as that specified in docker.service.',

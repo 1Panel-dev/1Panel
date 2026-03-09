@@ -83,7 +83,7 @@ const onSave = async (formEl: FormInstance | undefined) => {
         if (!valid) return;
         let params = {
             header: i18n.global.t('database.confChange'),
-            operationInfo: i18n.global.t('database.restartNowHelper'),
+            operationInfo: i18n.global.t('container.restartHelper'),
             submitInputInfo: i18n.global.t('database.restartNow'),
         };
         confirmDialogRef.value!.acceptParams(params);

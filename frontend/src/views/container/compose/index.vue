@@ -306,7 +306,7 @@
                                     v-model="composeContent"
                                     mode="yaml"
                                     :heightDiff="475"
-                                    placeholder="#Define or paste the content of your docker-compose file here"
+                                    :placeholder="$t('container.composeContentPlaceholder')"
                                 />
                             </div>
 
@@ -386,7 +386,7 @@
                                     <div v-if="form.from === 'edit' || form.from === 'template'" class="w-full">
                                         <CodemirrorPro
                                             v-model="form.file"
-                                            placeholder="#Define or paste the content of your docker-compose file here"
+                                            :placeholder="$t('container.composeContentPlaceholder')"
                                             mode="yaml"
                                             :heightDiff="400"
                                         ></CodemirrorPro>

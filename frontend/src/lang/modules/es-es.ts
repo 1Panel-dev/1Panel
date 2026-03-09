@@ -1103,8 +1103,10 @@ const message = {
             'Esto detendrá y eliminará todos los contenedores y redes bajo la composición {0}. ¿Desea continuar?',
         composeEnvHelper2:
             'Esta orquestación fue creada por la Tienda de Aplicaciones 1Panel. Modifique las variables de entorno en las aplicaciones instaladas.',
+        composeContentPlaceholder: 'Escriba o pegue el contenido de su archivo docker-compose aquí',
         setting: 'Configuración | Configuraciones',
         goSetting: 'Ir a editar',
+        restartHelper: 'Los cambios de configuración requieren reiniciar el servicio Docker para surtir efecto',
         operatorStatusHelper: 'Esto "{0}" el servicio Docker. ¿Desea continuar?',
         dockerStatus: 'Servicio Docker',
         daemonJsonPathHelper:

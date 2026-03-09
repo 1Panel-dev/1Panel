@@ -180,7 +180,7 @@
             <div class="mt-2.5">
                 <span class="text-rose-500">{{ $t('container.iptablesHelper2') }}</span>
                 <div class="mt-2.5">
-                    <span class="text-xs">{{ $t('database.restartNowHelper') }}</span>
+                    <span class="text-xs">{{ $t('container.restartHelper') }}</span>
                 </div>
                 <div class="mt-2.5">
                     <span class="text-xs">{{ $t('commons.msg.operateConfirm') }}</span>
@@ -309,7 +309,7 @@ const open = ref();
 const onSaveFile = async () => {
     let params = {
         header: i18n.global.t('database.confChange'),
-        operationInfo: i18n.global.t('database.restartNowHelper'),
+        operationInfo: i18n.global.t('container.restartHelper'),
         submitInputInfo: i18n.global.t('database.restartNow'),
     };
     confirmDialogRefFile.value!.acceptParams(params);
@@ -341,7 +341,7 @@ const handleIPv6 = async () => {
     }
     let params = {
         header: i18n.global.t('database.confChange'),
-        operationInfo: i18n.global.t('database.restartNowHelper'),
+        operationInfo: i18n.global.t('container.restartHelper'),
         submitInputInfo: i18n.global.t('database.restartNow'),
     };
     confirmDialogRefIpv6.value!.acceptParams(params);
@@ -357,7 +357,7 @@ const handleLogOption = async () => {
     }
     let params = {
         header: i18n.global.t('database.confChange'),
-        operationInfo: i18n.global.t('database.restartNowHelper'),
+        operationInfo: i18n.global.t('container.restartHelper'),
         submitInputInfo: i18n.global.t('database.restartNow'),
     };
     confirmDialogRefLog.value!.acceptParams(params);
@@ -370,7 +370,7 @@ const handleIptables = () => {
     if (form.iptables) {
         let params = {
             header: i18n.global.t('database.confChange'),
-            operationInfo: i18n.global.t('database.restartNowHelper'),
+            operationInfo: i18n.global.t('container.restartHelper'),
             submitInputInfo: i18n.global.t('database.restartNow'),
         };
         confirmDialogRefIptable.value!.acceptParams(params);
@@ -390,7 +390,7 @@ const onSubmitOpenIPtable = () => {
 const handleLive = async () => {
     let params = {
         header: i18n.global.t('database.confChange'),
-        operationInfo: i18n.global.t('database.restartNowHelper'),
+        operationInfo: i18n.global.t('container.restartHelper'),
         submitInputInfo: i18n.global.t('database.restartNow'),
     };
     confirmDialogRefLive.value!.acceptParams(params);
@@ -401,7 +401,7 @@ const onSubmitSaveLive = () => {
 const handleCgroup = async () => {
     let params = {
         header: i18n.global.t('database.confChange'),
-        operationInfo: i18n.global.t('database.restartNowHelper'),
+        operationInfo: i18n.global.t('container.restartHelper'),
         submitInputInfo: i18n.global.t('database.restartNow'),
     };
     confirmDialogRefCgroup.value!.acceptParams(params);

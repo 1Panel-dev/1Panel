@@ -1032,9 +1032,11 @@ const message = {
         composeOperatorHelper: '将对 {0} 进行 {1} 操作，是否继续？',
         composeDownHelper: '将停止并删除 {0} 编排下所有容器及网络，是否继续？',
         composeEnvHelper2: '该编排为 1Panel 应用商店创建，请在已安装应用中修改环境变量。',
+        composeContentPlaceholder: '在此写入或粘贴 docker-compose 文件内容',
 
         setting: '配置',
         goSetting: '去修改',
+        restartHelper: '修改配置后需要重启 Docker 服务生效',
         operatorStatusHelper: '此操作将{0}Docker 服务，是否继续？',
         dockerStatus: 'Docker 服务',
         daemonJsonPathHelper: '请保证配置路径与 docker.service 中指定的配置路径保持一致。',

@@ -1062,7 +1062,9 @@ const message = {
             '이 작업은 {0} 컴포즈 아래의 모든 컨테이너와 네트워크를 중지하고 제거합니다. 계속 하시겠습니까?',
         composeEnvHelper2:
             '이 오케스트레이션은 1Panel 앱 스토어에서 생성되었습니다. 설치된 애플리케이션에서 환경 변수를 수정하세요.',
+        composeContentPlaceholder: '여기에 docker-compose 파일 내용을 작성하거나 붙여넣으세요',
         setting: '설정 | 설정들',
+        restartHelper: '구성 변경 사항을 적용하려면 Docker 서비스를 재시작해야 합니다',
         operatorStatusHelper: '이 작업은 Docker 서비스를 "{0}" 합니다. 계속 하시겠습니까?',
         dockerStatus: 'Docker 서비스',
         daemonJsonPathHelper: '구성 경로가 docker.service 에 지정된 경로와 동일한지 확인하십시오.',
