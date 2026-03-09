@@ -50,6 +50,7 @@ ErrAgentApiKeyRequired: "API Key 不能为空"
 ErrAgentComposeRequired: "自定义编排内容不能为空"
 ErrAgentIDRequired: "智能体 ID 不能为空"
 ErrAgentAccountIDRequired: "账号 ID 不能为空"
+ErrAgentLimitReached: "社区版最多只能创建 {{ .max }} 个智能体"
 
 #backup
 Localhost: '本机'
