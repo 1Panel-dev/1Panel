@@ -3,6 +3,7 @@ package middleware
 import (
 	"bytes"
 	"compress/gzip"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -25,8 +26,15 @@ import (
 	"gorm.io/gorm"
 )
 
+const (
+	headerNeedOperationResolve = "X-Need-Op-Resolve"
+	headerOperationResolved    = "X-Op-Resolved"
+)
+
 func OperationLog() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		c.Request.Header.Del(headerNeedOperationResolve)
+
 		if strings.Contains(c.Request.URL.Path, "search") || c.Request.Method == http.MethodGet {
 			c.Next()
 			return
@@ -78,60 +86,42 @@ func OperationLog() gin.HandlerFunc {
 				}
 			}
 		}
-		if len(operationDic.BeforeFunctions) != 0 {
-			dbItem, err := newDB(record.Path)
-			if err != nil {
-				c.Next()
-				return
-			}
-			for _, funcs := range operationDic.BeforeFunctions {
-				for key, value := range formatMap {
-					if funcs.InputValue == key {
-						var names []string
-						if funcs.IsList {
-							sql := fmt.Sprintf("SELECT %s FROM %s where %s in (?);", funcs.OutputColumn, funcs.DB, funcs.InputColumn)
-							_ = dbItem.Raw(sql, value).Scan(&names)
-						} else {
-							_ = dbItem.Raw(fmt.Sprintf("select %s from %s where %s = ?;", funcs.OutputColumn, funcs.DB, funcs.InputColumn), value).Scan(&names)
-						}
-						formatMap[funcs.OutputValue] = strings.Join(names, ",")
-						break
-					}
-				}
-			}
-			closeDB(dbItem)
+		needAgentResolve := len(operationDic.BeforeFunctions) != 0 &&
+			(len(currentNode) == 0 || currentNode == "local") &&
+			!strings.HasPrefix(record.Path, "/core")
+		allowCoreFallback := strings.HasPrefix(record.Path, "/core/xpack") || !willProxy(c.Request.URL.Path, currentNode)
+		if needAgentResolve {
+			c.Request.Header.Set(headerNeedOperationResolve, "1")
+			defer func() {
+				c.Request.Header.Del(headerNeedOperationResolve)
+			}()
 		}
-		for key, value := range formatMap {
-			if strings.Contains(operationDic.FormatEN, "["+key+"]") {
-				t := reflect.TypeOf(value)
-				if t.Kind() != reflect.Array && t.Kind() != reflect.Slice {
-					operationDic.FormatZH = strings.ReplaceAll(operationDic.FormatZH, "["+key+"]", fmt.Sprintf("[%v]", value))
-					operationDic.FormatEN = strings.ReplaceAll(operationDic.FormatEN, "["+key+"]", fmt.Sprintf("[%v]", value))
-				} else {
-					val := reflect.ValueOf(value)
-					length := val.Len()
-
-					var elements []string
-					for i := 0; i < length; i++ {
-						element := val.Index(i).Interface().(string)
-						elements = append(elements, element)
-					}
-					operationDic.FormatZH = strings.ReplaceAll(operationDic.FormatZH, "["+key+"]", fmt.Sprintf("[%v]", strings.Join(elements, ",")))
-					operationDic.FormatEN = strings.ReplaceAll(operationDic.FormatEN, "["+key+"]", fmt.Sprintf("[%v]", strings.Join(elements, ",")))
-				}
-			}
-		}
-		record.DetailEN = strings.ReplaceAll(operationDic.FormatEN, "[]", "")
-		record.DetailZH = strings.ReplaceAll(operationDic.FormatZH, "[]", "")
 
 		writer := responseBodyWriter{
 			ResponseWriter: c.Writer,
 			body:           &bytes.Buffer{},
 		}
-		c.Writer = writer
+		c.Writer = &writer
 		now := time.Now()
 
 		c.Next()
+
+		if len(operationDic.BeforeFunctions) != 0 {
+			if needAgentResolve {
+				mergeResolvedData(writer.resolvedHeader, formatMap)
+			}
+
+			if allowCoreFallback && !hasAllResolvedData(formatMap, operationDic.BeforeFunctions) {
+				dbItem, err := newDB(record.Path)
+				if err == nil {
+					resolveByDB(dbItem, formatMap, operationDic.BeforeFunctions)
+					closeDB(dbItem)
+				}
+			}
+		}
+		fillOperationDetail(&operationDic, formatMap)
+		record.DetailEN = strings.ReplaceAll(operationDic.FormatEN, "[]", "")
+		record.DetailZH = strings.ReplaceAll(operationDic.FormatZH, "[]", "")
 
 		datas := writer.body.Bytes()
 		logRepo := repo.NewILogRepo()
@@ -170,6 +160,30 @@ func OperationLog() gin.HandlerFunc {
 	}
 }
 
+func fillOperationDetail(operationDic *operationJson, formatMap map[string]interface{}) {
+	for key, value := range formatMap {
+		if !strings.Contains(operationDic.FormatEN, "["+key+"]") {
+			continue
+		}
+		t := reflect.TypeOf(value)
+		if t == nil || (t.Kind() != reflect.Array && t.Kind() != reflect.Slice) {
+			operationDic.FormatZH = strings.ReplaceAll(operationDic.FormatZH, "["+key+"]", fmt.Sprintf("[%v]", value))
+			operationDic.FormatEN = strings.ReplaceAll(operationDic.FormatEN, "["+key+"]", fmt.Sprintf("[%v]", value))
+			continue
+		}
+
+		val := reflect.ValueOf(value)
+		length := val.Len()
+		elements := make([]string, 0, length)
+		for i := 0; i < length; i++ {
+			elements = append(elements, fmt.Sprintf("%v", val.Index(i).Interface()))
+		}
+		replaced := fmt.Sprintf("[%v]", strings.Join(elements, ","))
+		operationDic.FormatZH = strings.ReplaceAll(operationDic.FormatZH, "["+key+"]", replaced)
+		operationDic.FormatEN = strings.ReplaceAll(operationDic.FormatEN, "["+key+"]", replaced)
+	}
+}
+
 type operationJson struct {
 	API             string         `json:"api"`
 	Method          string         `json:"method"`
@@ -195,10 +209,29 @@ type response struct {
 
 type responseBodyWriter struct {
 	gin.ResponseWriter
-	body *bytes.Buffer
+	body           *bytes.Buffer
+	resolvedHeader string
 }
 
-func (r responseBodyWriter) Write(b []byte) (int, error) {
+func (r *responseBodyWriter) sanitizeResolvedHeader() {
+	if len(r.resolvedHeader) == 0 {
+		r.resolvedHeader = r.ResponseWriter.Header().Get(headerOperationResolved)
+	}
+	r.ResponseWriter.Header().Del(headerOperationResolved)
+}
+
+func (r *responseBodyWriter) WriteHeader(code int) {
+	r.sanitizeResolvedHeader()
+	r.ResponseWriter.WriteHeader(code)
+}
+
+func (r *responseBodyWriter) WriteHeaderNow() {
+	r.sanitizeResolvedHeader()
+	r.ResponseWriter.WriteHeaderNow()
+}
+
+func (r *responseBodyWriter) Write(b []byte) (int, error) {
+	r.sanitizeResolvedHeader()
 	r.body.Write(b)
 	return r.ResponseWriter.Write(b)
 }
@@ -218,10 +251,10 @@ func loadLogInfo(path string) string {
 func newDB(pathItem string) (*gorm.DB, error) {
 	dbFile := ""
 	switch {
+	case strings.HasPrefix(pathItem, "/core/xpack") || strings.HasPrefix(pathItem, "/xpack"):
+		dbFile = path.Join(global.CONF.Base.InstallDir, "1panel/db/xpack.db")
 	case strings.HasPrefix(pathItem, "/core"):
 		dbFile = path.Join(global.CONF.Base.InstallDir, "1panel/db/core.db")
-	case strings.HasPrefix(pathItem, "/xpack"):
-		dbFile = path.Join(global.CONF.Base.InstallDir, "1panel/db/xpack.db")
 	default:
 		dbFile = path.Join(global.CONF.Base.InstallDir, "1panel/db/agent.db")
 	}
@@ -246,6 +279,26 @@ func closeDB(db *gorm.DB) {
 		return
 	}
 	_ = sqlDB.Close()
+}
+
+func resolveByDB(dbItem *gorm.DB, values map[string]interface{}, beforeFunctions []functionInfo) {
+	for _, funcs := range beforeFunctions {
+		for key, value := range values {
+			if funcs.InputValue != key {
+				continue
+			}
+			var names []string
+			if funcs.IsList {
+				sql := fmt.Sprintf("SELECT %s FROM %s where %s in (?);", funcs.OutputColumn, funcs.DB, funcs.InputColumn)
+				_ = dbItem.Raw(sql, value).Scan(&names)
+			} else {
+				sql := fmt.Sprintf("select %s from %s where %s = ?;", funcs.OutputColumn, funcs.DB, funcs.InputColumn)
+				_ = dbItem.Raw(sql, value).Scan(&names)
+			}
+			values[funcs.OutputValue] = strings.Join(names, ",")
+			break
+		}
+	}
 }
 
 func replaceStr(val string, rep ...string) string {
@@ -283,4 +336,44 @@ func parseMultipart(formData []byte, contentType string) (map[string]interface{}
 		}
 	}
 	return ret, nil
+}
+
+func mergeResolvedData(headerVal string, values map[string]interface{}) {
+	if len(headerVal) == 0 {
+		return
+	}
+	data, err := base64.RawURLEncoding.DecodeString(headerVal)
+	if err != nil {
+		return
+	}
+	resolved := make(map[string]string)
+	if err := json.Unmarshal(data, &resolved); err != nil {
+		return
+	}
+	for key, value := range resolved {
+		values[key] = value
+	}
+}
+
+func hasAllResolvedData(values map[string]interface{}, beforeFunctions []functionInfo) bool {
+	for _, item := range beforeFunctions {
+		if _, ok := values[item.OutputValue]; ok {
+			continue
+		}
+		return false
+	}
+	return true
+}
+
+func willProxy(reqPath, currentNode string) bool {
+	if strings.HasPrefix(reqPath, "/1panel/swagger") || !strings.HasPrefix(reqPath, "/api/v2") {
+		return false
+	}
+	if strings.HasPrefix(reqPath, "/api/v2/core") && !strings.HasPrefix(reqPath, "/api/v2/core/xpack") {
+		return false
+	}
+	if !strings.HasPrefix(reqPath, "/api/v2/core") && (currentNode == "local" || len(currentNode) == 0) {
+		return true
+	}
+	return true
 }
