@@ -95,6 +95,13 @@ func (r *Remote) CreateUser(info CreateInfo, withDeleteDB bool) error {
 
 func (r *Remote) Delete(info DeleteInfo) error {
 	if len(info.Name) != 0 {
+		inUse, err := r.isDatabaseInUse(info.Name, info.Timeout)
+		if err != nil && !info.ForceDelete {
+			return fmt.Errorf("check database connections failed, err: %v", err)
+		}
+		if inUse && !info.ForceDelete {
+			return buserr.WithDetail("ErrInUsed", info.Name, nil)
+		}
 		dropSql := fmt.Sprintf("DROP DATABASE \"%s\"", info.Name)
 		if err := r.ExecSQL(dropSql, info.Timeout); err != nil && !info.ForceDelete {
 			return fmt.Errorf("drop database failed, err: %v", err)
@@ -105,6 +112,24 @@ func (r *Remote) Delete(info DeleteInfo) error {
 		return fmt.Errorf("drop user failed, err: %v", err)
 	}
 	return nil
+}
+
+func (r *Remote) isDatabaseInUse(name string, timeout uint) (bool, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeout)*time.Second)
+	defer cancel()
+
+	var count int
+	if err := r.Client.QueryRowContext(
+		ctx,
+		"SELECT COUNT(*) FROM pg_stat_activity WHERE datname = $1 AND pid <> pg_backend_pid()",
+		name,
+	).Scan(&count); err != nil {
+		return false, err
+	}
+	if errors.Is(ctx.Err(), context.DeadlineExceeded) {
+		return false, buserr.New("ErrExecTimeOut")
+	}
+	return count > 0, nil
 }
 
 func (r *Remote) ChangePrivileges(info Privileges) error {
