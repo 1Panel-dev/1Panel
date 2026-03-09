@@ -62,7 +62,10 @@ func TestGenerateXlog(t *testing.T) {
 		panic(fmt.Sprintf("json marshal for new file failed, err: %v", err))
 	}
 	if err := os.WriteFile("x-log.json", newJson, 0640); err != nil {
-		panic(fmt.Sprintf("write new swagger.json failed, err: %v", err))
+		panic(fmt.Sprintf("write core x-log.json failed, err: %v", err))
+	}
+	if err := os.WriteFile(workDir+"/agent/cmd/server/docs/x-log.json", newJson, 0640); err != nil {
+		panic(fmt.Sprintf("write agent x-log.json failed, err: %v", err))
 	}
 }
 

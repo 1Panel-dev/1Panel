@@ -21,6 +21,7 @@ func Routers() *gin.Engine {
 	if !global.IsMaster {
 		PrivateGroup.Use(middleware.Certificate())
 	}
+	PrivateGroup.Use(middleware.OperationResolveMeta())
 	for _, router := range rou.RouterGroupApp {
 		router.InitRouter(PrivateGroup)
 	}

@@ -29,6 +29,7 @@ const (
 	AnsiEscapePattern                  = "\x1b\\[[0-9;?]*[A-Za-z]|\x1b=|\x1b>"
 	RecycleBinFilePattern              = `_1p_file_1p_(.+)_p_(\d+)_(\d+)`
 	OrderByValidationPattern           = `^[a-zA-Z_][a-zA-Z0-9_]*$`
+	SQLIdentifierPattern               = `^[A-Za-z_][A-Za-z0-9_]*$`
 	NginxHostPattern                   = `^[a-zA-Z0-9.-]+(:[0-9]+)?$`
 	NginxPathPattern                   = `^/[a-zA-Z0-9._/\-]*$`
 )
@@ -60,6 +61,7 @@ func Init() {
 		AnsiEscapePattern,
 		RecycleBinFilePattern,
 		OrderByValidationPattern,
+		SQLIdentifierPattern,
 		NginxHostPattern,
 		NginxPathPattern,
 	}
