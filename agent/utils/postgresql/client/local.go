@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"strconv"
 	"strings"
 	"time"
 
@@ -99,6 +100,13 @@ func (r *Local) CreateUser(info CreateInfo, withDeleteDB bool) error {
 
 func (r *Local) Delete(info DeleteInfo) error {
 	if len(info.Name) != 0 {
+		inUse, err := r.isDatabaseInUse(info.Name, info.Timeout)
+		if err != nil && !info.ForceDelete {
+			return fmt.Errorf("check database connections failed, err: %v", err)
+		}
+		if inUse && !info.ForceDelete {
+			return buserr.WithDetail("ErrInUsed", info.Name, nil)
+		}
 		dropSql := fmt.Sprintf("DROP DATABASE \"%s\"", info.Name)
 		if err := r.ExecSQL(dropSql, info.Timeout); err != nil && !info.ForceDelete {
 			return fmt.Errorf("drop database failed, err: %v", err)
@@ -202,6 +210,30 @@ func (r *Local) SyncDB() ([]SyncDBInfo, error) {
 }
 
 func (r *Local) Close() {}
+
+func (r *Local) isDatabaseInUse(name string, timeout uint) (bool, error) {
+	escapedName := strings.ReplaceAll(name, "'", "''")
+	checkSQL := fmt.Sprintf(
+		"SELECT COUNT(*) FROM pg_stat_activity WHERE datname='%s' AND pid <> pg_backend_pid()",
+		escapedName,
+	)
+	lines, err := r.ExecSQLForRows(checkSQL, timeout)
+	if err != nil {
+		return false, err
+	}
+	for _, line := range lines {
+		countStr := strings.TrimSpace(line)
+		if len(countStr) == 0 {
+			continue
+		}
+		count, parseErr := strconv.Atoi(countStr)
+		if parseErr != nil {
+			return false, parseErr
+		}
+		return count > 0, nil
+	}
+	return false, nil
+}
 
 func (r *Local) ExecSQL(command string, timeout uint) error {
 	itemCommand := r.PrefixCommand[:]
