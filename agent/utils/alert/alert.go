@@ -15,6 +15,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/psutil"
 	"github.com/1Panel-dev/1Panel/agent/utils/re"
 	"github.com/jinzhu/copier"
+	"mime"
 	network "net"
 	"net/http"
 	"os"
@@ -71,13 +72,14 @@ func CreateEmailAlertLog(create dto.AlertLogCreate, alert dto.AlertDTO, params [
 		if username == "" {
 			username = emailInfo.Sender
 		}
+		encodedDisplayName := mime.BEncoding.Encode("UTF-8", emailInfo.DisplayName)
 		smtpConfig := email.SMTPConfig{
 			Host:       emailInfo.Host,
 			Port:       emailInfo.Port,
 			Sender:     emailInfo.Sender,
 			Username:   username,
 			Password:   emailInfo.Password,
-			From:       fmt.Sprintf(`"%s" <%s>`, emailInfo.DisplayName, emailInfo.Sender),
+			From:       fmt.Sprintf(`"%s" <%s>`, encodedDisplayName, emailInfo.Sender),
 			Encryption: emailInfo.Encryption,
 			Recipient:  emailInfo.Recipient,
 		}
