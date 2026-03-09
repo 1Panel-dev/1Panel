@@ -63,6 +63,17 @@ const databaseRouter = {
             },
         },
         {
+            path: '/ai/model/vllm',
+            hidden: true,
+            name: 'Vllm',
+            component: () => import('@/xpack/views/vllm/index.vue'),
+            meta: {
+                title: 'vLLM',
+                activeMenu: '/ai/model/ollama',
+                requiresAuth: true,
+            },
+        },
+        {
             path: '/ai/gpu/current',
             name: 'GPU',
             component: () => import('@/views/ai/gpu/current/index.vue'),

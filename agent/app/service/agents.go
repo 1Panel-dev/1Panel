@@ -42,6 +42,7 @@ type IAgentService interface {
 	GetProviders() ([]dto.ProviderInfo, error)
 	CreateAccount(req dto.AgentAccountCreateReq) error
 	UpdateAccount(req dto.AgentAccountUpdateReq) error
+	SyncAgentsByAccountID(accountID uint) error
 	PageAccounts(req dto.AgentAccountSearch) (int64, []dto.AgentAccountInfo, error)
 	VerifyAccount(req dto.AgentAccountVerifyReq) error
 	DeleteAccount(req dto.AgentAccountDeleteReq) error
@@ -169,7 +170,7 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 		if runtimeModel == "" {
 			return nil, buserr.New("ErrAgentProviderMismatch")
 		}
-		if provider == "custom" {
+		if provider == "custom" || provider == "vllm" {
 			primaryID := customPrimaryModelID(req.Model)
 			if primaryID == "" {
 				primaryID = normalizeCustomModel(req.Model)
@@ -386,7 +387,7 @@ func (a AgentService) UpdateModelConfig(req dto.AgentModelConfigUpdateReq) error
 	if modelName == "" {
 		return buserr.New("ErrAgentProviderMismatch")
 	}
-	if provider != "custom" && !strings.HasPrefix(modelName, provider+"/") {
+	if provider != "custom" && provider != "vllm" && !strings.HasPrefix(modelName, provider+"/") {
 		return buserr.New("ErrAgentProviderMismatch")
 	}
 	baseURL := strings.TrimSpace(account.BaseURL)
@@ -459,10 +460,10 @@ func (a AgentService) CreateAccount(req dto.AgentAccountCreateReq) error {
 	if fixedURL, ok := fixedProviderBaseURL(provider); ok {
 		baseURL = fixedURL
 	}
-	if provider == "custom" && baseURL == "" {
+	if (provider == "custom" || provider == "vllm") && baseURL == "" {
 		return buserr.New("ErrAgentBaseURLRequired")
 	}
-	if provider != "custom" && baseURL == "" {
+	if provider != "custom" && provider != "vllm" && baseURL == "" {
 		if defaultURL, ok := providerDefaultBaseURL(provider); ok {
 			baseURL = defaultURL
 		}
@@ -475,7 +476,7 @@ func (a AgentService) CreateAccount(req dto.AgentAccountCreateReq) error {
 	}
 	modelName := strings.TrimSpace(req.Model)
 	apiType := normalizeAPIType(req.APIType)
-	if provider == "custom" {
+	if provider == "custom" || provider == "vllm" {
 		if modelName == "" {
 			return fmt.Errorf("model is required")
 		}
@@ -506,7 +507,7 @@ func (a AgentService) CreateAccount(req dto.AgentAccountCreateReq) error {
 		Verified:       verified,
 		Remark:         req.Remark,
 	}
-	if provider == "custom" {
+	if provider == "custom" || provider == "vllm" {
 		account.Model = normalizeCustomModel(modelName)
 		account.MaxTokens = maxTokens
 		account.ContextWindow = contextWindow
@@ -528,10 +529,10 @@ func (a AgentService) UpdateAccount(req dto.AgentAccountUpdateReq) error {
 	if fixedURL, ok := fixedProviderBaseURL(provider); ok {
 		baseURL = fixedURL
 	}
-	if provider == "custom" && baseURL == "" {
+	if (provider == "custom" || provider == "vllm") && baseURL == "" {
 		return buserr.New("ErrAgentBaseURLRequired")
 	}
-	if provider != "custom" && baseURL == "" {
+	if provider != "custom" && provider != "vllm" && baseURL == "" {
 		if defaultURL, ok := providerDefaultBaseURL(provider); ok {
 			baseURL = defaultURL
 		}
@@ -541,10 +542,10 @@ func (a AgentService) UpdateAccount(req dto.AgentAccountUpdateReq) error {
 	}
 	apiType := normalizeAPIType(req.APIType)
 	rawAPIType := strings.TrimSpace(req.APIType)
-	if provider == "custom" && strings.TrimSpace(req.Model) == "" {
+	if (provider == "custom" || provider == "vllm") && strings.TrimSpace(req.Model) == "" {
 		return fmt.Errorf("model is required")
 	}
-	if provider == "custom" && !isSupportedAPIType(apiType) {
+	if (provider == "custom" || provider == "vllm") && !isSupportedAPIType(apiType) {
 		return fmt.Errorf("apiType is invalid")
 	}
 	if provider == "ollama" {
@@ -557,7 +558,7 @@ func (a AgentService) UpdateAccount(req dto.AgentAccountUpdateReq) error {
 			return fmt.Errorf("apiType is invalid")
 		}
 	}
-	if provider != "custom" && provider != "ollama" {
+	if provider != "custom" && provider != "vllm" && provider != "ollama" {
 		apiType = normalizeAPIType(account.APIType)
 	}
 	_, maxTokens, contextWindow := resolveRuntimeParams(provider, apiType, req.MaxTokens, req.ContextWindow)
@@ -569,11 +570,11 @@ func (a AgentService) UpdateAccount(req dto.AgentAccountUpdateReq) error {
 	account.APIKey = req.APIKey
 	account.RememberAPIKey = req.RememberAPIKey
 	account.BaseURL = baseURL
-	if provider == "custom" {
+	if provider == "custom" || provider == "vllm" {
 		account.Model = normalizeCustomModel(req.Model)
 	}
 	account.APIType = apiType
-	if provider == "custom" {
+	if provider == "custom" || provider == "vllm" {
 		account.MaxTokens = maxTokens
 		account.ContextWindow = contextWindow
 	}
@@ -628,6 +629,17 @@ func (a AgentService) PageAccounts(req dto.AgentAccountSearch) (int64, []dto.Age
 	return count, items, nil
 }
 
+func (a AgentService) SyncAgentsByAccountID(accountID uint) error {
+	if accountID == 0 {
+		return nil
+	}
+	account, err := agentAccountRepo.GetFirst(repo.WithByID(accountID))
+	if err != nil {
+		return err
+	}
+	return a.syncAgentsByAccount(account)
+}
+
 func (a AgentService) VerifyAccount(req dto.AgentAccountVerifyReq) error {
 	provider := strings.ToLower(strings.TrimSpace(req.Provider))
 	if !isSupportedAgentProvider(provider) {
@@ -652,7 +664,7 @@ func (a AgentService) VerifyAccount(req dto.AgentAccountVerifyReq) error {
 	if provider == "ollama" {
 		return nil
 	}
-	if provider == "custom" || provider == "kimi-coding" {
+	if provider == "custom" || provider == "vllm" || provider == "kimi-coding" {
 		return nil
 	}
 	return verifyProvider(provider, baseURL, apiKey)
@@ -1305,12 +1317,17 @@ func (a AgentService) syncAgentsByAccount(account *model.AgentAccount) error {
 			continue
 		}
 		apiType, maxTokens, contextWindow := resolveRuntimeParams(account.Provider, account.APIType, account.MaxTokens, account.ContextWindow)
-		if err := writeOpenclawConfig(confDir, account.Provider, agent.Model, apiType, maxTokens, contextWindow, baseURL, account.APIKey, agent.Token); err != nil {
+		modelName := agent.Model
+		if strings.EqualFold(account.Provider, "vllm") && strings.TrimSpace(account.Model) != "" {
+			modelName = account.Model
+		}
+		if err := writeOpenclawConfig(confDir, account.Provider, modelName, apiType, maxTokens, contextWindow, baseURL, account.APIKey, agent.Token); err != nil {
 			return err
 		}
 		agent.BaseURL = baseURL
 		agent.APIKey = account.APIKey
 		agent.Provider = account.Provider
+		agent.Model = modelName
 		agent.APIType = apiType
 		agent.MaxTokens = maxTokens
 		agent.ContextWindow = contextWindow
@@ -1888,13 +1905,13 @@ func writeOpenclawConfig(confDir, provider, modelName, apiType string, maxTokens
 				},
 			},
 		}
-	} else if provider == "custom" {
+	} else if provider == "custom" || provider == "vllm" {
 		customModelID := normalizeCustomModel(modelName)
 		primaryID := customPrimaryModelID(customModelID)
 		if primaryID == "" {
 			primaryID = customModelID
 		}
-		primary := "custom/" + primaryID
+		primary := provider + "/" + primaryID
 		cfg.Agents.Defaults.Model.Primary = primary
 		base := strings.TrimSpace(baseURL)
 		plainKey := strings.TrimSpace(apiKey)
@@ -1902,7 +1919,7 @@ func writeOpenclawConfig(confDir, provider, modelName, apiType string, maxTokens
 		cfg.Models = &modelsConfig{
 			Mode: "merge",
 			Providers: map[string]modelProvider{
-				"custom": {
+				provider: {
 					ApiKey:  plainKey,
 					BaseUrl: base,
 					Api:     useAPIType,
@@ -2154,7 +2171,7 @@ func fixedProviderBaseURL(provider string) (string, bool) {
 
 func isVerificationSkippedProvider(provider string) bool {
 	switch strings.ToLower(strings.TrimSpace(provider)) {
-	case "custom", "ollama", "kimi-coding":
+	case "custom", "vllm", "ollama", "kimi-coding":
 		return true
 	default:
 		return false
@@ -2381,7 +2398,7 @@ func resolveRuntimeParams(provider, apiType string, maxTokens, contextWindow int
 			resolvedContextWindow = 204800
 		case "minimax", "kimi-coding":
 			resolvedContextWindow = 200000
-		case "custom":
+		case "custom", "vllm":
 			resolvedContextWindow = 128000
 		default:
 			resolvedContextWindow = 256000

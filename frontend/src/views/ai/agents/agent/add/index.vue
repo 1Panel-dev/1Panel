@@ -326,7 +326,7 @@ const handleAccountChange = () => {
         form.apiType = selected.apiType || 'openai-completions';
         form.maxTokens = selected.maxTokens || 8192;
         form.contextWindow = selected.contextWindow || 128000;
-        if (selected.provider === 'custom' && selected.model && !manualModel.value) {
+        if ((selected.provider === 'custom' || selected.provider === 'vllm') && selected.model && !manualModel.value) {
             form.model = selected.model;
         }
     }
@@ -345,7 +345,7 @@ const setDefaultModel = () => {
         form.model = models[0].id;
         return;
     }
-    if (form.provider === 'custom') {
+    if (form.provider === 'custom' || form.provider === 'vllm') {
         const selected = accountOptions.value.find((item) => item.id === form.accountId);
         if (selected?.model && !form.model) {
             form.model = selected.model;

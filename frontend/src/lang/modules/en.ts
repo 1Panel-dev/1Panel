@@ -2264,6 +2264,7 @@ const message = {
         app: 'Upgrade to the professional version to view service information, abnormal monitoring, etc. through the mobile APP. ',
         cluster:
             'Upgrading to the Professional Edition allows you to manage MySQL/Postgres/Redis master-slave clusters.',
+        vllm: 'Upgrade to the Professional Edition to bring Vllm services under 1Panel management, with centralized deployment, configuration, lifecycle operations, and task tracking for local model workloads.',
     },
     clean: {
         scan: 'Start scanning',
@@ -3821,6 +3822,18 @@ const message = {
             clusterTitle3: 'Replication Status',
             clusterContent3:
                 'Displays master-slave replication status and delay information, assisting in troubleshooting synchronization issues',
+            vllmTitle1: 'Centralized Management',
+            vllmContent1:
+                'Bring scattered Vllm services into 1Panel for unified visibility of instances, versions, status, and runtime paths.',
+            vllmTitle2: 'Fast Deployment',
+            vllmContent2:
+                'Use a visual form to configure version selection, model mounts, and startup parameters with less manual orchestration.',
+            vllmTitle3: 'Operational Efficiency',
+            vllmContent3:
+                'Handle create, edit, start, stop, restart, delete, and task tracking from one page to simplify local model operations.',
+            vllmTitle4: 'Controlled Configuration',
+            vllmContent4:
+                'Standardize ports, containers, startup commands, and Compose settings through advanced options for easier delivery and later adjustments.',
         },
         node: {
             master: 'Main Node',

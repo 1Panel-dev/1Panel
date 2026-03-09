@@ -116,7 +116,7 @@ const onEdit = (row: AI.AgentAccountItem) => {
 
 const isVerificationSkipped = (provider: string) => {
     const key = (provider || '').toLowerCase();
-    return key === 'custom' || key === 'ollama' || key === 'kimi-coding';
+    return key === 'custom' || key === 'vllm' || key === 'ollama' || key === 'kimi-coding';
 };
 
 const verificationLabel = (row: AI.AgentAccountItem) => {

@@ -48,6 +48,15 @@ var catalog = map[string]Meta{
 		Enabled:        true,
 		Models:         []Model{},
 	},
+	"vllm": {
+		Key:            "vllm",
+		DisplayName:    "vLLM",
+		Sort:           31,
+		DefaultBaseURL: "",
+		EnvKey:         "VLLM_API_KEY",
+		Enabled:        true,
+		Models:         []Model{},
+	},
 	"openai": {
 		Key:            "openai",
 		DisplayName:    "OpenAI",

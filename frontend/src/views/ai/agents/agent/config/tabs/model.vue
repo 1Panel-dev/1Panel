@@ -114,7 +114,7 @@ const handleAccountChange = () => {
         return;
     }
     provdier.value = selected.provider;
-    if (selected.provider === 'custom') {
+    if (selected.provider === 'custom' || selected.provider === 'vllm') {
         form.manualModel = true;
         form.model = selected.model || form.model;
         modelOptions.value = [];
@@ -136,7 +136,7 @@ const handleAccountChange = () => {
 
 const handleManualModelChange = (val: unknown) => {
     const selected = accountOptions.value.find((item) => item.id === form.accountId);
-    if (selected?.provider === 'custom' && !Boolean(val)) {
+    if ((selected?.provider === 'custom' || selected?.provider === 'vllm') && !Boolean(val)) {
         form.manualModel = true;
         return;
     }
@@ -174,13 +174,20 @@ const load = async (agent: AI.AgentItem) => {
         setModelsByProvider(currentAccount.provider);
         const inProviderModels = modelOptions.value.some((item) => item.id === agent.model);
         form.manualModel =
-            currentAccount.provider === 'custom' || currentAccount.provider === 'ollama' || !inProviderModels;
+            currentAccount.provider === 'custom' ||
+            currentAccount.provider === 'vllm' ||
+            currentAccount.provider === 'ollama' ||
+            !inProviderModels;
         if (agent.model && (form.manualModel || agent.model.startsWith(`${currentAccount.provider}/`))) {
             form.model = agent.model;
         } else {
             form.model = modelOptions.value.length > 0 ? modelOptions.value[0].id : '';
         }
-        if (currentAccount.provider === 'custom' && currentAccount.model && !form.model) {
+        if (
+            (currentAccount.provider === 'custom' || currentAccount.provider === 'vllm') &&
+            currentAccount.model &&
+            !form.model
+        ) {
             form.model = currentAccount.model;
         }
         if (currentAccount.provider === 'ollama' && !form.model.startsWith('ollama/')) {

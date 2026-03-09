@@ -17,5 +17,9 @@ const buttons = [
         label: 'TensorRT LLM',
         path: '/ai/model/tensorrt',
     },
+    {
+        label: 'vLLM',
+        path: '/ai/model/vllm',
+    },
 ];
 </script>
