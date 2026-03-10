@@ -735,6 +735,7 @@ const message = {
                 'Ollama modelini senkronize ederken aşağıdaki modellerin mevcut olmadığı tespit edildi, bunları silmek istiyor musunuz?',
             from_remote: 'Bu model 1Panel aracılığıyla indirilmedi, ilgili çekme logları yok.',
             no_logs: 'Bu modelin çekme logları silindi ve görüntülenemiyor.',
+            vllmVersionHelper: 'FusionXpark GB 10 sunucuları için lütfen -cu130 sürümünü seçin.',
         },
         proxy: {
             proxy: 'AI Proxy Geliştirmesi',

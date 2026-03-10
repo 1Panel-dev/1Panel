@@ -731,6 +731,7 @@ const message = {
             ollama_sync: 'Ollamaモデルの同期中に、以下のモデルが存在しないことが判明しました。削除しますか？',
             from_remote: 'このモデルは1Panelを介してダウンロードされておらず、関連するプルログはありません。',
             no_logs: 'このモデルのプルログは削除されており、関連するログを表示できません。',
+            vllmVersionHelper: 'FusionXpark GB 10 サーバーでは -cu130 バージョンを選択してください。',
         },
         proxy: {
             proxy: 'AI プロキシ強化',

@@ -696,6 +696,7 @@ const message = {
             ollama_sync: '同步 Ollama 模型发现下列模型不存在，是否删除？',
             from_remote: '该模型并非通过 1Panel 下载，无相关拉取日志。',
             no_logs: '该模型的拉取日志已被删除，无法查看相关日志。',
+            vllmVersionHelper: 'FusionXpark GB 10 服务器请选择 -cu130 版本',
         },
         proxy: {
             proxy: 'AI 代理增强',

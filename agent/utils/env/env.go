@@ -31,10 +31,10 @@ func Marshal(envMap map[string]string) (string, error) {
 	for k, v := range envMap {
 		if d, err := strconv.Atoi(v); err == nil && !isStartWithZero(v) {
 			lines = append(lines, fmt.Sprintf(`%s=%d`, k, d))
-		} else if hasEvenDoubleQuotes(v) {
+		} else if shouldUseSingleQuotes(v) {
 			lines = append(lines, fmt.Sprintf(`%s='%s'`, k, v))
 		} else {
-			lines = append(lines, fmt.Sprintf(`%s="%s"`, k, v))
+			lines = append(lines, fmt.Sprintf(`%s="%s"`, k, escapeDoubleQuotedEnvValue(v)))
 		}
 	}
 	return strings.Join(lines, "\n"), nil
@@ -88,10 +88,10 @@ func MarshalWithOrder(envMap map[string]string, orders []string) (string, error)
 func formatEnvLine(k, v string) string {
 	if d, err := strconv.Atoi(v); err == nil && !isStartWithZero(v) {
 		return fmt.Sprintf(`%s=%d`, k, d)
-	} else if hasEvenDoubleQuotes(v) {
+	} else if shouldUseSingleQuotes(v) {
 		return fmt.Sprintf(`%s='%s'`, k, v)
 	} else {
-		return fmt.Sprintf(`%s="%s"`, k, v)
+		return fmt.Sprintf(`%s="%s"`, k, escapeDoubleQuotedEnvValue(v))
 	}
 }
 
@@ -122,4 +122,17 @@ func hasEvenDoubleQuotes(s string) bool {
 		}
 	}
 	return count%2 == 0
+}
+
+func shouldUseSingleQuotes(s string) bool {
+	return hasEvenDoubleQuotes(s) && !strings.Contains(s, `\`) && !strings.Contains(s, `'`)
+}
+
+func escapeDoubleQuotedEnvValue(s string) string {
+	replacer := strings.NewReplacer(
+		`\`, `\\`,
+		`"`, `\"`,
+		"\n", `\n`,
+	)
+	return replacer.Replace(s)
 }

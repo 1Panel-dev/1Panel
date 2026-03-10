@@ -730,6 +730,7 @@ const message = {
             ollama_sync: 'Syncing Ollama model found the following models do not exist, do you want to delete them?',
             from_remote: 'This model was not downloaded via 1Panel, no related pull logs.',
             no_logs: 'The pull logs for this model have been deleted and cannot be viewed.',
+            vllmVersionHelper: 'For FusionXpark GB 10 servers, please select the -cu130 version.',
         },
         proxy: {
             proxy: 'AI Proxy Enhancement',
