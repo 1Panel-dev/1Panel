@@ -739,6 +739,7 @@ const message = {
                 'Al sincronizar modelos de Ollama, se detectaron los siguientes modelos que no existen. ¿Desea eliminarlos?',
             from_remote: 'Este modelo no fue descargado vía 1Panel, no hay registros de descarga relacionados.',
             no_logs: 'Los registros de descarga de este modelo han sido eliminados y no se pueden consultar.',
+            vllmVersionHelper: 'Para servidores FusionXpark GB 10, seleccione la versión -cu130.',
         },
         proxy: {
             proxy: 'Mejoras de proxy de IA',

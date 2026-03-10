@@ -723,6 +723,7 @@ const message = {
             ollama_sync: 'Ollama 모델 동기화 중 다음 모델이 존재하지 않음을 발견했습니다. 삭제하시겠습니까?',
             from_remote: '이 모델은 1Panel을 통해 다운로드되지 않았으며 관련 풀 로그가 없습니다.',
             no_logs: '이 모델의 풀 로그가 삭제되어 관련 로그를 볼 수 없습니다.',
+            vllmVersionHelper: 'FusionXpark GB 10 서버는 -cu130 버전을 선택하세요.',
         },
         proxy: {
             proxy: 'AI 프록시 강화',

@@ -739,6 +739,7 @@ const message = {
                 'Sincronizando o modelo Ollama, encontrou que os seguintes modelos não existem, deseja excluí-los?',
             from_remote: 'Este modelo não foi baixado via 1Panel, sem logs de pull relacionados.',
             no_logs: 'Os logs de pull deste modelo foram excluídos e não podem ser visualizados.',
+            vllmVersionHelper: 'Untuk pelayan FusionXpark GB 10, sila pilih versi -cu130.',
         },
         proxy: {
             proxy: 'Peningkatan Proksi AI',

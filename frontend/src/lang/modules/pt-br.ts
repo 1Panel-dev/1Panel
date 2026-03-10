@@ -734,6 +734,7 @@ const message = {
                 'Menyelaraskan model Ollama mendapati model berikut tidak wujud, adakah anda ingin memadamnya?',
             from_remote: 'Model ini tidak dimuat turun melalui 1Panel, tiada log pengambilan berkaitan.',
             no_logs: 'Log pengambilan untuk model ini telah dipadam dan tidak dapat dilihat.',
+            vllmVersionHelper: 'Para servidores FusionXpark GB 10, selecione a versão -cu130.',
         },
         proxy: {
             proxy: 'Melhoria de Proxy AI',
