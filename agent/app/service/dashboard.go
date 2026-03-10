@@ -284,7 +284,7 @@ func (u *DashboardService) LoadAppLauncher(ctx *gin.Context) ([]dto.AppLauncher,
 		return data, err
 	}
 
-	showList, err := launcherRepo.ListName()
+	showList, _ := launcherRepo.ListName()
 	defaultList, err := appRepo.GetTopRecommend()
 	if err != nil {
 		return data, nil

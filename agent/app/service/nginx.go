@@ -18,7 +18,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
-	cmd2 "github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/subosito/gotenv"
 
 	"github.com/1Panel-dev/1Panel/agent/utils/compose"
@@ -241,7 +240,7 @@ func (n NginxService) Build(req request.NginxBuildReq) error {
 		return err
 	}
 	buildTask.AddSubTaskWithOps("", func(t *task.Task) error {
-		cmdMgr := cmd2.NewCommandMgr(cmd.WithTask(*buildTask), cmd.WithTimeout(120*time.Minute))
+		cmdMgr := cmd.NewCommandMgr(cmd.WithTask(*buildTask), cmd.WithTimeout(120*time.Minute))
 		if err = cmdMgr.RunBashCf("docker compose -f %s build", nginxInstall.GetComposePath()); err != nil {
 			return err
 		}

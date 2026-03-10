@@ -30,11 +30,6 @@ import (
 
 var Orders = make(map[uint]*acme.Order)
 
-type domainError struct {
-	Domain string
-	Error  error
-}
-
 type zeroSSLRes struct {
 	Success    bool   `json:"success"`
 	EabKid     string `json:"eab_kid"`

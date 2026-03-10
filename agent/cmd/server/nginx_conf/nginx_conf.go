@@ -2,7 +2,6 @@ package nginx_conf
 
 import (
 	"embed"
-	_ "embed"
 	"io"
 )
 

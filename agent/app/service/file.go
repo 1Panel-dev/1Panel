@@ -691,7 +691,7 @@ func (f *FileService) ReadLogByLine(req request.FileReadByLineReq) (*response.Fi
 		logFileRes  *dto.LogFileRes
 	)
 	if stat.Size() > files.MaxReadFileSize {
-		lines, err = files.TailFromEnd(logFilePath, req.PageSize)
+		lines, _ = files.TailFromEnd(logFilePath, req.PageSize)
 		isEndOfFile = true
 		scope = "tail"
 	} else {

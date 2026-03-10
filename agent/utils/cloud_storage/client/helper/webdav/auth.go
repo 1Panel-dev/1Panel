@@ -34,10 +34,6 @@ type authorizer struct {
 	defAuth    Authenticator
 }
 
-type preemptiveAuthorizer struct {
-	auth Authenticator
-}
-
 type authShim struct {
 	factory AuthFactory
 	body    io.Reader
