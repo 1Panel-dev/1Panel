@@ -10,14 +10,22 @@
                     :closable="false"
                 />
                 <br />
-                <el-descriptions border :column="1" class="mt-5">
-                    <el-descriptions-item label-class-name="check-label" class-name="check-content" min-width="60px">
+                <el-descriptions border :column="1">
+                    <el-descriptions-item
+                        v-for="(item, key) in installData"
+                        :key="key"
+                        label-class-name="check-label"
+                        class-name="check-content"
+                        min-width="60px"
+                    >
                         <template #label>
-                            <a href="javascript:void(0);" class="check-label-a" @click="toApp()">
-                                {{ $t('app.app') }}
+                            <a href="javascript:void(0);" class="check-label-a" @click="toPage(item.type)">
+                                {{ $t('menu.' + item.type) }}
                             </a>
                         </template>
-                        <pre>{{ installData.join('\n') }}</pre>
+                        <span class="resources">
+                            {{ item.name }}
+                        </span>
                     </el-descriptions-item>
                 </el-descriptions>
             </el-col>
@@ -29,7 +37,7 @@ import { routerToName } from '@/utils/router';
 import { ref } from 'vue';
 
 interface InstallProps {
-    items: Array<string>;
+    items: Array<{ type: string; name: string }>;
 }
 const installData = ref();
 let open = ref(false);
@@ -39,8 +47,13 @@ const acceptParams = (props: InstallProps) => {
     open.value = true;
 };
 
-const toApp = () => {
-    routerToName('AppInstalled');
+const toPage = (key: string) => {
+    if (key === 'app') {
+        routerToName('App');
+    }
+    if (key === 'website') {
+        routerToName('Website');
+    }
 };
 
 defineExpose({
