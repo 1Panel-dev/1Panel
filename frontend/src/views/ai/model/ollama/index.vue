@@ -181,7 +181,7 @@ import Terminal from '@/views/ai/model/ollama/terminal/index.vue';
 import Del from '@/views/ai/model/ollama/del/index.vue';
 import PortJumpDialog from '@/components/port-jump/index.vue';
 import CodemirrorDrawer from '@/components/codemirror-pro/drawer.vue';
-import RouterMenu from '@/views/ai/model/index.vue';
+import RouterMenu from '@/views/ai/model/router-menu.vue';
 import { computed, onMounted, reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { App } from '@/api/interface/app';
