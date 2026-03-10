@@ -75,6 +75,15 @@
                             </div>
                         </template>
                     </el-table-column>
+                    <el-table-column :label="$t('runtime.workDir')" min-width="90">
+                        <template #default="{ row }">
+                            <el-button type="primary" link @click="openWorkDir(row)">
+                                <el-icon>
+                                    <FolderOpened />
+                                </el-icon>
+                            </el-button>
+                        </template>
+                    </el-table-column>
                     <el-table-column :label="$t('aiTools.agents.token')" min-width="80">
                         <template #default="{ row }">
                             <el-space v-if="row.agentType !== 'copaw'">
@@ -137,6 +146,7 @@ import i18n from '@/lang';
 import PortJumpDialog from '@/components/port-jump/index.vue';
 import DockerStatus from '@/views/container/docker-status/index.vue';
 import { getAgentProviderDisplayName } from '@/utils/agent';
+import { routerToFileWithPath } from '@/utils/router';
 import NoApp from '@/views/app-store/apps/no-app/index.vue';
 
 const items = ref<AI.AgentItem[]>([]);
@@ -161,6 +171,7 @@ const buttons = [
         label: i18n.global.t('menu.config'),
         click: (row: AI.AgentItem) => openConfig(row),
         show: (row: AI.AgentItem) => row.agentType !== 'copaw',
+        disabled: (row: AI.AgentItem) => row.status !== 'Running',
     },
     {
         label: i18n.global.t('menu.terminal'),
@@ -292,6 +303,13 @@ const openLog = (row: AI.AgentItem) => {
 const openTerminal = (row: AI.AgentItem) => {
     const title = i18n.global.t('aiTools.agents.agent') + ' ' + row.name;
     dialogTerminalRef.value?.acceptParams({ containerID: row.containerName, title });
+};
+
+const openWorkDir = (row: AI.AgentItem) => {
+    if (!row.path) {
+        return;
+    }
+    routerToFileWithPath(`${row.path}/data`);
 };
 
 const jumpWebUI = (row: AI.AgentItem) => {

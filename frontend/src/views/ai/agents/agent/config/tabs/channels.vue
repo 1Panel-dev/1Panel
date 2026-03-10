@@ -1,6 +1,6 @@
 <template>
     <el-tabs v-model="activeTab" @tab-click="handleTabClick">
-        <el-tab-pane label="QQ Bot" name="qqbot">
+        <el-tab-pane label="QQ" name="qqbot">
             <QQBotTab ref="qqbotRef" />
         </el-tab-pane>
         <el-tab-pane :label="t('aiTools.agents.feishu')" name="feishu">
