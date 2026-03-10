@@ -171,11 +171,8 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 			return nil, buserr.New("ErrAgentProviderMismatch")
 		}
 		if provider == "custom" || provider == "vllm" {
-			primaryID := customPrimaryModelID(req.Model)
-			if primaryID == "" {
-				primaryID = normalizeCustomModel(req.Model)
-			}
-			runtimeModel = "custom/" + primaryID
+			customModelID := normalizeCustomModel(req.Model)
+			runtimeModel = "custom/" + customModelID
 		}
 		if provider == "bailian-coding-plan" {
 			modelID := runtimeModel
@@ -1907,11 +1904,7 @@ func writeOpenclawConfig(confDir, provider, modelName, apiType string, maxTokens
 		}
 	} else if provider == "custom" || provider == "vllm" {
 		customModelID := normalizeCustomModel(modelName)
-		primaryID := customPrimaryModelID(customModelID)
-		if primaryID == "" {
-			primaryID = customModelID
-		}
-		primary := provider + "/" + primaryID
+		primary := provider + "/" + customModelID
 		cfg.Agents.Defaults.Model.Primary = primary
 		base := strings.TrimSpace(baseURL)
 		plainKey := strings.TrimSpace(apiKey)
@@ -2261,9 +2254,10 @@ func toInt(value interface{}) int {
 
 func normalizeCustomModel(modelName string) string {
 	trim := strings.TrimSpace(modelName)
+	trim = strings.TrimLeft(trim, "/")
 	if parts := strings.SplitN(trim, "/", 2); len(parts) == 2 {
 		if strings.EqualFold(parts[0], "custom") {
-			return strings.TrimSpace(parts[1])
+			return strings.TrimLeft(strings.TrimSpace(parts[1]), "/")
 		}
 	}
 	return trim
@@ -2311,21 +2305,6 @@ func bailianPrimaryModelID(modelID string) string {
 		}
 	}
 	return trim
-}
-
-func customPrimaryModelID(modelName string) string {
-	trim := normalizeCustomModel(modelName)
-	if trim == "" {
-		return ""
-	}
-	parts := strings.Split(trim, "/")
-	for i := len(parts) - 1; i >= 0; i-- {
-		part := strings.TrimSpace(parts[i])
-		if part != "" {
-			return part
-		}
-	}
-	return ""
 }
 
 func normalizeAgentType(agentType string) string {
