@@ -86,10 +86,8 @@ func OperationLog() gin.HandlerFunc {
 				}
 			}
 		}
-		needAgentResolve := len(operationDic.BeforeFunctions) != 0 &&
-			(len(currentNode) == 0 || currentNode == "local") &&
-			!strings.HasPrefix(record.Path, "/core")
-		allowCoreFallback := strings.HasPrefix(record.Path, "/core/xpack") || !willProxy(c.Request.URL.Path, currentNode)
+		needAgentResolve := len(operationDic.BeforeFunctions) != 0 && len(currentNode) != 0 && currentNode != "local" && !strings.HasPrefix(record.Path, "/core")
+		allowCoreFallback := strings.HasPrefix(record.Path, "/core/xpack") || !willProxy(c.Request.URL.Path, currentNode) || len(currentNode) == 0 || currentNode == "local"
 		if needAgentResolve {
 			c.Request.Header.Set(headerNeedOperationResolve, "1")
 			defer func() {
