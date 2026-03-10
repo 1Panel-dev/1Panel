@@ -666,7 +666,7 @@ const message = {
             defaultProfile: '預設設定檔',
             executablePath: '瀏覽器可執行路徑',
             switchModelSuccess: '模型切換成功',
-            channelsTab: '聊天渠道',
+            channelsTab: '頻道',
             feishu: '飛書',
             pluginNotInstalled: '插件未安裝，請先安裝插件',
             dmPolicy: '私聊策略',
