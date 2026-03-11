@@ -2363,6 +2363,8 @@ func resolveRuntimeParams(provider, apiType string, maxTokens, contextWindow int
 			resolvedMaxTokens = 8192
 		case "zai":
 			resolvedMaxTokens = 131072
+		case "openrouter":
+			resolvedMaxTokens = 8192
 		case "minimax", "kimi-coding", "custom":
 			resolvedMaxTokens = 8192
 		default:
@@ -2375,6 +2377,8 @@ func resolveRuntimeParams(provider, apiType string, maxTokens, contextWindow int
 			resolvedContextWindow = 128000
 		case "zai":
 			resolvedContextWindow = 204800
+		case "openrouter":
+			resolvedContextWindow = 128000
 		case "minimax", "kimi-coding":
 			resolvedContextWindow = 200000
 		case "custom", "vllm":

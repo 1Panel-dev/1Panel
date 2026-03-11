@@ -41,10 +41,12 @@
                     </el-table-column>
                     <el-table-column :label="$t('aiTools.agents.appVersion')" prop="appVersion" min-width="140">
                         <template #default="{ row }">
-                            <span>{{ row.appVersion }}</span>
-                            <el-button v-if="row.upgradable" link type="primary" class="ml-1" @click="openUpgrade(row)">
-                                {{ $t('commons.button.upgrade') }}
-                            </el-button>
+                            <div class="version-cell">
+                                <span>{{ row.appVersion }}</span>
+                                <el-button v-if="row.upgradable" link type="primary" @click="openUpgrade(row)">
+                                    {{ $t('commons.button.upgrade') }}
+                                </el-button>
+                            </div>
                         </template>
                     </el-table-column>
                     <el-table-column
@@ -363,3 +365,11 @@ onMounted(async () => {
     await openCreateFromQuery();
 });
 </script>
+
+<style scoped>
+.version-cell {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+</style>
