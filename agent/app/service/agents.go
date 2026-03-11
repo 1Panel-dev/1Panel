@@ -52,6 +52,8 @@ type IAgentService interface {
 	UpdateTelegramConfig(req dto.AgentTelegramConfigUpdateReq) error
 	GetDiscordConfig(req dto.AgentDiscordConfigReq) (*dto.AgentDiscordConfig, error)
 	UpdateDiscordConfig(req dto.AgentDiscordConfigUpdateReq) error
+	GetWecomConfig(req dto.AgentWecomConfigReq) (*dto.AgentWecomConfig, error)
+	UpdateWecomConfig(req dto.AgentWecomConfigUpdateReq) error
 	GetQQBotConfig(req dto.AgentQQBotConfigReq) (*dto.AgentQQBotConfig, error)
 	UpdateQQBotConfig(req dto.AgentQQBotConfigUpdateReq) error
 	InstallPlugin(req dto.AgentPluginInstallReq) error
@@ -61,7 +63,6 @@ type IAgentService interface {
 	GetOtherConfig(req dto.AgentOtherConfigReq) (*dto.AgentOtherConfig, error)
 	UpdateOtherConfig(req dto.AgentOtherConfigUpdateReq) error
 	ApproveChannelPairing(req dto.AgentChannelPairingApproveReq) error
-	ApproveFeishuPairing(req dto.AgentFeishuPairingApproveReq) error
 }
 
 func NewIAgentService() IAgentService {
@@ -830,6 +831,42 @@ func (a AgentService) UpdateQQBotConfig(req dto.AgentQQBotConfigUpdateReq) error
 	return nil
 }
 
+func (a AgentService) GetWecomConfig(req dto.AgentWecomConfigReq) (*dto.AgentWecomConfig, error) {
+	agent, install, err := a.loadAgentAndInstall(req.AgentID)
+	if err != nil {
+		return nil, err
+	}
+	conf, err := readOpenclawConfig(agent.ConfigPath)
+	if err != nil {
+		return nil, err
+	}
+	result := extractWecomConfig(conf)
+	installed, _ := checkPluginInstalled(install.ContainerName, "wecom")
+	result.Installed = installed
+	return &result, nil
+}
+
+func (a AgentService) UpdateWecomConfig(req dto.AgentWecomConfigUpdateReq) error {
+	agent, _, err := a.loadAgentAndInstall(req.AgentID)
+	if err != nil {
+		return err
+	}
+	conf, err := readOpenclawConfig(agent.ConfigPath)
+	if err != nil {
+		return err
+	}
+	setWecomConfig(conf, dto.AgentWecomConfig{
+		Enabled:  req.Enabled,
+		DmPolicy: req.DmPolicy,
+		BotID:    req.BotID,
+		Secret:   req.Secret,
+	})
+	if err := writeOpenclawConfigRaw(agent.ConfigPath, conf); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (a AgentService) InstallPlugin(req dto.AgentPluginInstallReq) error {
 	_, install, err := a.loadAgentAndInstall(req.AgentID)
 	if err != nil {
@@ -940,7 +977,7 @@ func (a AgentService) ApproveChannelPairing(req dto.AgentChannelPairingApproveRe
 	if channelType == "" {
 		channelType = "feishu"
 	}
-	if channelType != "feishu" && channelType != "telegram" && channelType != "discord" {
+	if channelType != "feishu" && channelType != "telegram" && channelType != "discord" && channelType != "wecom" {
 		return fmt.Errorf("unsupported channel type: %s", channelType)
 	}
 	if err := cmd.RunDefaultBashCf(
@@ -952,14 +989,6 @@ func (a AgentService) ApproveChannelPairing(req dto.AgentChannelPairingApproveRe
 		return err
 	}
 	return nil
-}
-
-func (a AgentService) ApproveFeishuPairing(req dto.AgentFeishuPairingApproveReq) error {
-	return a.ApproveChannelPairing(dto.AgentChannelPairingApproveReq{
-		AgentID:     req.AgentID,
-		Type:        "feishu",
-		PairingCode: req.PairingCode,
-	})
 }
 
 func (a AgentService) loadAgentAndInstall(agentID uint) (*model.Agent, *model.AppInstall, error) {
@@ -1224,6 +1253,50 @@ func extractQQBotConfig(conf map[string]interface{}) dto.AgentQQBotConfig {
 	return result
 }
 
+func extractWecomConfig(conf map[string]interface{}) dto.AgentWecomConfig {
+	result := dto.AgentWecomConfig{Enabled: true, DmPolicy: "pairing"}
+	channels, ok := conf["channels"].(map[string]interface{})
+	if !ok {
+		return result
+	}
+	wecom, ok := channels["wecom"].(map[string]interface{})
+	if !ok {
+		return result
+	}
+	if enabled, ok := wecom["enabled"].(bool); ok {
+		result.Enabled = enabled
+	}
+	if dmPolicy, ok := wecom["dmPolicy"].(string); ok && strings.TrimSpace(dmPolicy) != "" {
+		result.DmPolicy = strings.TrimSpace(dmPolicy)
+	}
+	if botID, ok := wecom["botId"].(string); ok {
+		result.BotID = botID
+	}
+	if secret, ok := wecom["secret"].(string); ok {
+		result.Secret = secret
+	}
+	return result
+}
+
+func setWecomConfig(conf map[string]interface{}, config dto.AgentWecomConfig) {
+	channels := ensureChildMap(conf, "channels")
+	wecom := ensureChildMap(channels, "wecom")
+	wecom["enabled"] = config.Enabled
+	wecom["botId"] = strings.TrimSpace(config.BotID)
+	wecom["secret"] = strings.TrimSpace(config.Secret)
+	wecom["dmPolicy"] = strings.TrimSpace(config.DmPolicy)
+	if strings.EqualFold(config.DmPolicy, "open") {
+		wecom["allowFrom"] = []string{"*"}
+	} else {
+		wecom["allowFrom"] = []string{}
+	}
+
+	plugins := ensureChildMap(conf, "plugins")
+	entries := ensureChildMap(plugins, "entries")
+	wecomEntry := ensureChildMap(entries, "wecom-openclaw-plugin")
+	wecomEntry["enabled"] = true
+}
+
 func setQQBotConfig(conf map[string]interface{}, config dto.AgentQQBotConfig) {
 	channels := ensureChildMap(conf, "channels")
 	qqbot := ensureChildMap(channels, "qqbot")
@@ -1242,6 +1315,8 @@ func resolvePluginMeta(pluginType string) (string, string, error) {
 	switch strings.ToLower(strings.TrimSpace(pluginType)) {
 	case "qqbot":
 		return "@sliverp/qqbot@latest", "qqbot", nil
+	case "wecom":
+		return "@wecom/wecom-openclaw-plugin", "wecom-openclaw-plugin", nil
 	default:
 		return "", "", fmt.Errorf("unsupported plugin type")
 	}

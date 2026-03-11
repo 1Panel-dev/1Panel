@@ -165,6 +165,14 @@ export const updateAgentDiscordConfig = (req: AI.AgentDiscordConfigUpdateReq) =>
     return http.post(`/ai/agents/channel/discord/update`, req);
 };
 
+export const getAgentWecomConfig = (req: AI.AgentWecomConfigReq) => {
+    return http.post<AI.AgentWecomConfig>(`/ai/agents/channel/wecom/get`, req);
+};
+
+export const updateAgentWecomConfig = (req: AI.AgentWecomConfigUpdateReq) => {
+    return http.post(`/ai/agents/channel/wecom/update`, req);
+};
+
 export const getAgentQQBotConfig = (req: AI.AgentQQBotConfigReq) => {
     return http.post<AI.AgentQQBotConfig>(`/ai/agents/channel/qqbot/get`, req);
 };

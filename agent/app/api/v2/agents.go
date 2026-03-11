@@ -356,6 +356,47 @@ func (b *BaseApi) UpdateAgentDiscordConfig(c *gin.Context) {
 // @Tags AI
 // @Summary Get Agent QQ Bot channel config
 // @Accept json
+// @Param request body dto.AgentWecomConfigReq true "request"
+// @Success 200 {object} dto.AgentWecomConfig
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/channel/wecom/get [post]
+func (b *BaseApi) GetAgentWecomConfig(c *gin.Context) {
+	var req dto.AgentWecomConfigReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	data, err := agentService.GetWecomConfig(req)
+	if err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.SuccessWithData(c, data)
+}
+
+// @Tags AI
+// @Summary Update Agent WeCom channel config
+// @Accept json
+// @Param request body dto.AgentWecomConfigUpdateReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/channel/wecom/update [post]
+func (b *BaseApi) UpdateAgentWecomConfig(c *gin.Context) {
+	var req dto.AgentWecomConfigUpdateReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := agentService.UpdateWecomConfig(req); err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags AI
+// @Summary Get Agent QQ Bot channel config
+// @Accept json
 // @Param request body dto.AgentQQBotConfigReq true "request"
 // @Success 200 {object} dto.AgentQQBotConfig
 // @Security ApiKeyAuth
@@ -511,26 +552,6 @@ func (b *BaseApi) UpdateAgentOtherConfig(c *gin.Context) {
 		return
 	}
 	if err := agentService.UpdateOtherConfig(req); err != nil {
-		helper.BadRequest(c, err)
-		return
-	}
-	helper.Success(c)
-}
-
-// @Tags AI
-// @Summary Approve Agent Feishu pairing code
-// @Accept json
-// @Param request body dto.AgentFeishuPairingApproveReq true "request"
-// @Success 200
-// @Security ApiKeyAuth
-// @Security Timestamp
-// @Router /ai/agents/channel/feishu/approve [post]
-func (b *BaseApi) ApproveAgentFeishuPairing(c *gin.Context) {
-	var req dto.AgentFeishuPairingApproveReq
-	if err := helper.CheckBindAndValidate(&req, c); err != nil {
-		return
-	}
-	if err := agentService.ApproveFeishuPairing(req); err != nil {
 		helper.BadRequest(c, err)
 		return
 	}
