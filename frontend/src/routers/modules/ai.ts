@@ -38,6 +38,7 @@ const databaseRouter = {
             meta: {
                 icon: 'p-moxing-menu',
                 title: 'aiTools.model.localModel',
+                activeMenu: '/ai/model/ollama',
                 requiresAuth: true,
             },
         },

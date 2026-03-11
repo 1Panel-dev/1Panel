@@ -1,6 +1,6 @@
 <template>
     <div>
-        <RouterMenu />
+        <RouterButton :buttons="buttons" />
         <LayoutContent>
             <router-view></router-view>
         </LayoutContent>
@@ -8,5 +8,18 @@
 </template>
 
 <script lang="ts" setup>
-import RouterMenu from '@/views/ai/model/router-menu.vue';
+const buttons = [
+    {
+        label: 'Ollama',
+        path: '/ai/model/ollama',
+    },
+    {
+        label: 'vLLM',
+        path: '/ai/model/vllm',
+    },
+    {
+        label: 'TensorRT LLM',
+        path: '/ai/model/tensorrt',
+    },
+];
 </script>
