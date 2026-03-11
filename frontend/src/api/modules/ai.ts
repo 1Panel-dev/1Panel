@@ -145,10 +145,6 @@ export const updateAgentFeishuConfig = (req: AI.AgentFeishuConfigUpdateReq) => {
     return http.post(`/ai/agents/channel/feishu/update`, req);
 };
 
-export const approveAgentFeishuPairing = (req: AI.AgentFeishuPairingApproveReq) => {
-    return http.post(`/ai/agents/channel/feishu/approve`, req);
-};
-
 export const getAgentTelegramConfig = (req: AI.AgentTelegramConfigReq) => {
     return http.post<AI.AgentTelegramConfig>(`/ai/agents/channel/telegram/get`, req);
 };
@@ -163,6 +159,14 @@ export const getAgentDiscordConfig = (req: AI.AgentDiscordConfigReq) => {
 
 export const updateAgentDiscordConfig = (req: AI.AgentDiscordConfigUpdateReq) => {
     return http.post(`/ai/agents/channel/discord/update`, req);
+};
+
+export const getAgentWecomConfig = (req: AI.AgentWecomConfigReq) => {
+    return http.post<AI.AgentWecomConfig>(`/ai/agents/channel/wecom/get`, req);
+};
+
+export const updateAgentWecomConfig = (req: AI.AgentWecomConfigUpdateReq) => {
+    return http.post(`/ai/agents/channel/wecom/update`, req);
 };
 
 export const getAgentQQBotConfig = (req: AI.AgentQQBotConfigReq) => {

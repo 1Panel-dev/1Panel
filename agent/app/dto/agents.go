@@ -194,8 +194,28 @@ type AgentTelegramConfig struct {
 
 type AgentChannelPairingApproveReq struct {
 	AgentID     uint   `json:"agentId" validate:"required"`
-	Type        string `json:"type" validate:"required,oneof=feishu telegram discord"`
+	Type        string `json:"type" validate:"required,oneof=feishu telegram discord wecom"`
 	PairingCode string `json:"pairingCode" validate:"required"`
+}
+
+type AgentWecomConfigReq struct {
+	AgentID uint `json:"agentId" validate:"required"`
+}
+
+type AgentWecomConfigUpdateReq struct {
+	AgentID  uint   `json:"agentId" validate:"required"`
+	Enabled  bool   `json:"enabled"`
+	DmPolicy string `json:"dmPolicy" validate:"required,oneof=pairing open"`
+	BotID    string `json:"botId" validate:"required"`
+	Secret   string `json:"secret" validate:"required"`
+}
+
+type AgentWecomConfig struct {
+	Enabled   bool   `json:"enabled"`
+	DmPolicy  string `json:"dmPolicy"`
+	BotID     string `json:"botId"`
+	Secret    string `json:"secret"`
+	Installed bool   `json:"installed"`
 }
 
 type AgentQQBotConfigReq struct {
@@ -218,13 +238,13 @@ type AgentQQBotConfig struct {
 
 type AgentPluginInstallReq struct {
 	AgentID uint   `json:"agentId" validate:"required"`
-	Type    string `json:"type" validate:"required,oneof=qqbot"`
+	Type    string `json:"type" validate:"required,oneof=qqbot wecom"`
 	TaskID  string `json:"taskID" validate:"required"`
 }
 
 type AgentPluginCheckReq struct {
 	AgentID uint   `json:"agentId" validate:"required"`
-	Type    string `json:"type" validate:"required,oneof=qqbot"`
+	Type    string `json:"type" validate:"required,oneof=qqbot wecom"`
 }
 
 type AgentPluginStatus struct {

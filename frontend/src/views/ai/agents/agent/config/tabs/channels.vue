@@ -3,6 +3,9 @@
         <el-tab-pane label="QQ" name="qqbot">
             <QQBotTab ref="qqbotRef" />
         </el-tab-pane>
+        <el-tab-pane :label="t('aiTools.agents.wecom')" name="wecom">
+            <WecomTab ref="wecomRef" />
+        </el-tab-pane>
         <el-tab-pane :label="t('aiTools.agents.feishu')" name="feishu">
             <FeishuTab ref="feishuRef" />
         </el-tab-pane>
@@ -22,6 +25,7 @@ import FeishuTab from './channels/feishu.vue';
 import TelegramTab from './channels/telegram.vue';
 import DiscordTab from './channels/discord.vue';
 import QQBotTab from './channels/qq.vue';
+import WecomTab from './channels/wecom.vue';
 
 const { t } = useI18n();
 const activeTab = ref('qqbot');
@@ -30,6 +34,7 @@ const feishuRef = ref();
 const telegramRef = ref();
 const discordRef = ref();
 const qqbotRef = ref();
+const wecomRef = ref();
 
 const loadCurrentTab = async () => {
     if (agentId.value <= 0) {
@@ -42,6 +47,10 @@ const loadCurrentTab = async () => {
     }
     if (activeTab.value === 'telegram') {
         await telegramRef.value?.load(agentId.value);
+        return;
+    }
+    if (activeTab.value === 'wecom') {
+        await wecomRef.value?.load(agentId.value);
         return;
     }
     if (activeTab.value === 'qqbot') {

@@ -428,8 +428,28 @@ export namespace AI {
 
     export interface AgentChannelPairingApproveReq {
         agentId: number;
-        type: 'feishu' | 'telegram' | 'discord';
+        type: 'feishu' | 'telegram' | 'discord' | 'wecom';
         pairingCode: string;
+    }
+
+    export interface AgentWecomConfigReq {
+        agentId: number;
+    }
+
+    export interface AgentWecomConfig {
+        enabled: boolean;
+        dmPolicy: 'pairing' | 'open';
+        botId: string;
+        secret: string;
+        installed: boolean;
+    }
+
+    export interface AgentWecomConfigUpdateReq {
+        agentId: number;
+        enabled: boolean;
+        dmPolicy: 'pairing' | 'open';
+        botId: string;
+        secret: string;
     }
 
     export interface AgentQQBotConfigReq {
@@ -452,13 +472,13 @@ export namespace AI {
 
     export interface AgentPluginInstallReq {
         agentId: number;
-        type: 'qqbot';
+        type: 'qqbot' | 'wecom';
         taskID: string;
     }
 
     export interface AgentPluginCheckReq {
         agentId: number;
-        type: 'qqbot';
+        type: 'qqbot' | 'wecom';
     }
 
     export interface AgentPluginStatus {
