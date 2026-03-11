@@ -157,6 +157,18 @@ var catalog = map[string]Meta{
 			{ID: "openai/gpt-5-mini", Name: "GPT-5 Mini"},
 		},
 	},
+	"openrouter": {
+		Key:            "openrouter",
+		DisplayName:    "OpenRouter",
+		Sort:           56,
+		DefaultBaseURL: "https://openrouter.ai/api/v1",
+		EnvKey:         "OPENROUTER_API_KEY",
+		Enabled:        true,
+		Models: []Model{
+			{ID: "openrouter/free", Name: "openrouter/free"},
+			{ID: "openrouter/auto", Name: "openrouter/auto"},
+		},
+	},
 	"anthropic": {
 		Key:            "anthropic",
 		DisplayName:    "Anthropic",
