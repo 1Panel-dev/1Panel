@@ -540,7 +540,7 @@
                                 :label="`${$t('commons.table.user')} / ${$t('file.group')}`"
                                 prop="user"
                                 show-overflow-tooltip
-                                min-width="150"
+                                width="200"
                             >
                                 <template #default="{ row }">
                                     <el-link underline="never" @click="openChown(row)">
@@ -549,7 +549,7 @@
                                     </el-link>
                                 </template>
                             </el-table-column>
-                            <el-table-column :label="$t('file.size')" prop="size" width="80" :sortable="'custom'">
+                            <el-table-column :label="$t('file.size')" prop="size" width="120" :sortable="'custom'">
                                 <template #default="{ row }">
                                     <el-button
                                         type="primary"
