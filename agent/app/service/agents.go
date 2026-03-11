@@ -1,7 +1,6 @@
 package service
 
 import (
-	"bytes"
 	"context"
 	"crypto/rand"
 	"encoding/hex"
@@ -147,7 +146,7 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 		if err != nil {
 			return nil, err
 		}
-		if !account.Verified && !isVerificationSkippedProvider(account.Provider) {
+		if !account.Verified && !providercatalog.SkipVerification(account.Provider) {
 			return nil, buserr.New("ErrAgentAccountNotVerified")
 		}
 		if account.Provider != "" && provider != "" && account.Provider != provider {
@@ -374,7 +373,7 @@ func (a AgentService) UpdateModelConfig(req dto.AgentModelConfigUpdateReq) error
 	if err != nil {
 		return err
 	}
-	if !account.Verified && !isVerificationSkippedProvider(account.Provider) {
+	if !account.Verified && !providercatalog.SkipVerification(account.Provider) {
 		return buserr.New("ErrAgentAccountNotVerified")
 	}
 	provider := strings.ToLower(strings.TrimSpace(account.Provider))
@@ -490,7 +489,7 @@ func (a AgentService) CreateAccount(req dto.AgentAccountCreateReq) error {
 	if err := a.VerifyAccount(dto.AgentAccountVerifyReq{Provider: provider, BaseURL: baseURL, APIKey: apiKey}); err != nil {
 		return err
 	}
-	verified := !isVerificationSkippedProvider(provider)
+	verified := !providercatalog.SkipVerification(provider)
 	_, maxTokens, contextWindow := resolveRuntimeParams(provider, apiType, req.MaxTokens, req.ContextWindow)
 	account := &model.AgentAccount{
 		Provider:       provider,
@@ -563,7 +562,7 @@ func (a AgentService) UpdateAccount(req dto.AgentAccountUpdateReq) error {
 	if err := a.VerifyAccount(dto.AgentAccountVerifyReq{Provider: provider, BaseURL: baseURL, APIKey: req.APIKey}); err != nil {
 		return err
 	}
-	verified := !isVerificationSkippedProvider(provider)
+	verified := !providercatalog.SkipVerification(provider)
 	account.Name = req.Name
 	account.APIKey = req.APIKey
 	account.RememberAPIKey = req.RememberAPIKey
@@ -659,13 +658,10 @@ func (a AgentService) VerifyAccount(req dto.AgentAccountVerifyReq) error {
 	if provider == "ollama" && baseURL == "" {
 		return buserr.New("ErrAgentBaseURLRequired")
 	}
-	if provider == "ollama" {
+	if providercatalog.SkipVerification(provider) {
 		return nil
 	}
-	if provider == "custom" || provider == "vllm" || provider == "kimi-coding" {
-		return nil
-	}
-	return verifyProvider(provider, baseURL, apiKey)
+	return providercatalog.VerifyAccount(provider, baseURL, apiKey)
 }
 
 func (a AgentService) DeleteAccount(req dto.AgentAccountDeleteReq) error {
@@ -1294,7 +1290,7 @@ func setWecomConfig(conf map[string]interface{}, config dto.AgentWecomConfig) {
 	plugins := ensureChildMap(conf, "plugins")
 	entries := ensureChildMap(plugins, "entries")
 	wecomEntry := ensureChildMap(entries, "wecom-openclaw-plugin")
-	wecomEntry["enabled"] = true
+	wecomEntry["enabled"] = config.Enabled
 }
 
 func setQQBotConfig(conf map[string]interface{}, config dto.AgentQQBotConfig) {
@@ -1404,140 +1400,6 @@ func (a AgentService) syncAgentsByAccount(account *model.AgentAccount) error {
 		agent.MaxTokens = maxTokens
 		agent.ContextWindow = contextWindow
 		_ = agentRepo.Save(&agent)
-	}
-	return nil
-}
-
-func verifyProvider(provider, baseURL, apiKey string) error {
-	if provider == "minimax" {
-		return verifyMinimax("https://api.minimax.chat/v1", apiKey)
-	}
-	if provider == "bailian-coding-plan" {
-		return verifyBailianCodingPlan(baseURL, apiKey)
-	}
-	if provider == "ark-coding-plan" {
-		return verifyArkCodingPlan(baseURL, apiKey)
-	}
-	client := &http.Client{Timeout: 10 * time.Second}
-	reqURL, headers := buildVerifyRequest(provider, baseURL, apiKey)
-	request, err := http.NewRequest(http.MethodGet, reqURL, nil)
-	if err != nil {
-		return err
-	}
-	for key, value := range headers {
-		request.Header.Set(key, value)
-	}
-	resp, err := client.Do(request)
-	if err != nil {
-		return buserr.WithErr("ErrAgentAccountUnavailable", err)
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode >= 400 {
-		return buserr.WithErr("ErrAgentAccountUnavailable", fmt.Errorf("verify failed: %s", resp.Status))
-	}
-	return nil
-}
-
-func verifyBailianCodingPlan(baseURL, apiKey string) error {
-	client := &http.Client{Timeout: 10 * time.Second}
-	base := strings.TrimRight(baseURL, "/")
-	if !strings.Contains(base, "/v1") {
-		base = base + "/v1"
-	}
-	reqURL := base + "/chat/completions"
-	body := map[string]interface{}{
-		"model": "qwen3.5-plus",
-		"messages": []map[string]string{
-			{"role": "user", "content": "test"},
-		},
-		"max_tokens": 1,
-	}
-	payload, err := json.Marshal(body)
-	if err != nil {
-		return err
-	}
-	request, err := http.NewRequest(http.MethodPost, reqURL, bytes.NewBuffer(payload))
-	if err != nil {
-		return err
-	}
-	request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", apiKey))
-	request.Header.Set("Content-Type", "application/json")
-	resp, err := client.Do(request)
-	if err != nil {
-		return buserr.WithErr("ErrAgentAccountUnavailable", err)
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode >= 400 {
-		return buserr.WithErr("ErrAgentAccountUnavailable", fmt.Errorf("verify failed: %s", resp.Status))
-	}
-	return nil
-}
-
-func verifyArkCodingPlan(baseURL, apiKey string) error {
-	client := &http.Client{Timeout: 10 * time.Second}
-	base := strings.TrimRight(baseURL, "/")
-	if !strings.Contains(base, "/api/coding/v3") {
-		base = "https://ark.cn-beijing.volces.com/api/coding/v3"
-	}
-	reqURL := base + "/chat/completions"
-	body := map[string]interface{}{
-		"model": "doubao-seed-2.0-code",
-		"messages": []map[string]string{
-			{"role": "user", "content": "test"},
-		},
-		"max_tokens": 1,
-	}
-	payload, err := json.Marshal(body)
-	if err != nil {
-		return err
-	}
-	request, err := http.NewRequest(http.MethodPost, reqURL, bytes.NewBuffer(payload))
-	if err != nil {
-		return err
-	}
-	request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", apiKey))
-	request.Header.Set("Content-Type", "application/json")
-	resp, err := client.Do(request)
-	if err != nil {
-		return buserr.WithErr("ErrAgentAccountUnavailable", err)
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode >= 400 {
-		return buserr.WithErr("ErrAgentAccountUnavailable", fmt.Errorf("verify failed: %s", resp.Status))
-	}
-	return nil
-}
-
-func verifyMinimax(baseURL, apiKey string) error {
-	client := &http.Client{Timeout: 10 * time.Second}
-	base := strings.TrimRight(baseURL, "/")
-	if !strings.Contains(base, "/v1") {
-		base = base + "/v1"
-	}
-	reqURL := base + "/chat/completions"
-	body := map[string]interface{}{
-		"model": "MiniMax-M2.1",
-		"messages": []map[string]string{
-			{"role": "user", "content": "test"},
-		},
-	}
-	payload, err := json.Marshal(body)
-	if err != nil {
-		return err
-	}
-	request, err := http.NewRequest(http.MethodPost, reqURL, bytes.NewBuffer(payload))
-	if err != nil {
-		return err
-	}
-	request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", apiKey))
-	request.Header.Set("Content-Type", "application/json")
-	resp, err := client.Do(request)
-	if err != nil {
-		return buserr.WithErr("ErrAgentAccountUnavailable", err)
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode >= 400 {
-		return buserr.WithErr("ErrAgentAccountUnavailable", fmt.Errorf("verify failed: %s", resp.Status))
 	}
 	return nil
 }
@@ -1809,288 +1671,18 @@ func writeOpenclawConfig(confDir, provider, modelName, apiType string, maxTokens
 		},
 	}
 
-	provider = strings.ToLower(strings.TrimSpace(provider))
-	modelID := modelName
-	if parts := strings.SplitN(modelName, "/", 2); len(parts) == 2 {
-		modelID = parts[1]
+	resolvedAPIType, resolvedMaxTokens, resolvedContextWindow := resolveRuntimeParams(provider, apiType, maxTokens, contextWindow)
+	patch, err := providercatalog.BuildOpenClawPatch(provider, modelName, resolvedAPIType, resolvedMaxTokens, resolvedContextWindow, baseURL, apiKey)
+	if err != nil {
+		return err
 	}
-	configProvider := provider
-	primaryModel := modelName
-	if provider == "kimi" {
-		configProvider = "moonshot"
-		primaryModel = "moonshot/" + modelID
-	}
-	if provider == "deepseek" {
-		cfg.Agents.Defaults.Model.Primary = modelName
-		base := baseURL
-		if base == "" {
-			base = "https://api.deepseek.com/v1"
+	cfg.Agents.Defaults.Model.Primary = patch.PrimaryModel
+	if patch.Models != nil {
+		modelsMap, err := mapToModelsConfig(patch.Models)
+		if err != nil {
+			return err
 		}
-		plainKey := strings.TrimSpace(apiKey)
-		cfg.Models = &modelsConfig{
-			Mode: "merge",
-			Providers: map[string]modelProvider{
-				"deepseek": {
-					ApiKey:  plainKey,
-					BaseUrl: base,
-					Api:     "openai-completions",
-					Models: []modelEntry{
-						{
-							ID:            "deepseek-chat",
-							Name:          "DeepSeek Chat",
-							Reasoning:     false,
-							Input:         []string{"text"},
-							ContextWindow: 128000,
-							MaxTokens:     8192,
-							Cost:          modelCost{},
-						},
-					},
-				},
-			},
-		}
-	} else if provider == "moonshot" || provider == "kimi" {
-		cfg.Agents.Defaults.Model.Primary = primaryModel
-		base := baseURL
-		if base == "" {
-			if defaultURL, ok := providerDefaultBaseURL(provider); ok {
-				base = defaultURL
-			}
-		}
-		plainKey := strings.TrimSpace(apiKey)
-		cfg.Models = &modelsConfig{
-			Mode: "merge",
-			Providers: map[string]modelProvider{
-				configProvider: {
-					ApiKey:  plainKey,
-					BaseUrl: base,
-					Api:     "openai-completions",
-					Models: []modelEntry{
-						{
-							ID:            modelID,
-							Name:          modelID,
-							Reasoning:     strings.Contains(modelID, "thinking"),
-							Input:         []string{"text"},
-							ContextWindow: 256000,
-							MaxTokens:     8192,
-							Cost:          modelCost{},
-						},
-					},
-				},
-			},
-		}
-	} else if provider == "bailian-coding-plan" {
-		normalizedID := normalizeBailianCodingPlanModelID(modelID)
-		cfg.Agents.Defaults.Model.Primary = "bailian-coding-plan/" + bailianPrimaryModelID(normalizedID)
-		base := baseURL
-		if base == "" {
-			if defaultURL, ok := providerDefaultBaseURL(provider); ok {
-				base = defaultURL
-			}
-		}
-		plainKey := strings.TrimSpace(apiKey)
-		_, useMaxTokens, useContextWindow := resolveRuntimeParams(provider, apiType, maxTokens, contextWindow)
-		cfg.Models = &modelsConfig{
-			Mode: "merge",
-			Providers: map[string]modelProvider{
-				"bailian-coding-plan": {
-					ApiKey:  plainKey,
-					BaseUrl: base,
-					Api:     "openai-completions",
-					Models: []modelEntry{
-						{
-							ID:            normalizedID,
-							Name:          normalizedID,
-							Reasoning:     strings.Contains(strings.ToLower(normalizedID), "reason") || strings.Contains(strings.ToLower(normalizedID), "thinking"),
-							Input:         []string{"text"},
-							ContextWindow: useContextWindow,
-							MaxTokens:     useMaxTokens,
-							Cost:          modelCost{},
-						},
-					},
-				},
-			},
-		}
-	} else if provider == "ark-coding-plan" {
-		normalizedID := normalizeArkCodingPlanModelID(modelID)
-		cfg.Agents.Defaults.Model.Primary = "ark-coding-plan/" + normalizedID
-		base := baseURL
-		if base == "" {
-			if defaultURL, ok := providerDefaultBaseURL(provider); ok {
-				base = defaultURL
-			}
-		}
-		plainKey := strings.TrimSpace(apiKey)
-		_, useMaxTokens, useContextWindow := resolveRuntimeParams(provider, apiType, maxTokens, contextWindow)
-		cfg.Models = &modelsConfig{
-			Mode: "merge",
-			Providers: map[string]modelProvider{
-				"ark-coding-plan": {
-					ApiKey:  plainKey,
-					BaseUrl: base,
-					Api:     "openai-completions",
-					Models: []modelEntry{
-						{
-							ID:            normalizedID,
-							Name:          normalizedID,
-							Reasoning:     strings.Contains(strings.ToLower(normalizedID), "reason") || strings.Contains(strings.ToLower(normalizedID), "thinking"),
-							Input:         []string{"text"},
-							ContextWindow: useContextWindow,
-							MaxTokens:     useMaxTokens,
-							Cost:          modelCost{},
-						},
-					},
-				},
-			},
-		}
-	} else if provider == "minimax" {
-		normalizedID := modelID
-		switch strings.ToLower(modelID) {
-		case "minimax-m2.1", "minimax m2.1", "minimax-m2.1-preview", "minimax-m2.1-latest":
-			normalizedID = "MiniMax-M2.1"
-		case "minimax-m2.1-lightning", "minimax m2.1 lightning":
-			normalizedID = "MiniMax-M2.1-lightning"
-		}
-		cfg.Agents.Defaults.Model.Primary = "minimax-portal/" + normalizedID
-		base := baseURL
-		if base == "" {
-			base = "https://api.minimaxi.com/anthropic"
-		}
-		plainKey := strings.TrimSpace(apiKey)
-		cfg.Models = &modelsConfig{
-			Mode: "merge",
-			Providers: map[string]modelProvider{
-				"minimax-portal": {
-					ApiKey:  plainKey,
-					BaseUrl: base,
-					Api:     "anthropic-messages",
-					Models: []modelEntry{
-						{
-							ID:            normalizedID,
-							Name:          strings.ReplaceAll(normalizedID, "-", " "),
-							Reasoning:     false,
-							Input:         []string{"text"},
-							ContextWindow: 200000,
-							MaxTokens:     8192,
-							Cost:          modelCost{},
-						},
-					},
-				},
-			},
-		}
-	} else if provider == "custom" || provider == "vllm" {
-		customModelID := normalizeCustomModel(modelName)
-		primary := provider + "/" + customModelID
-		cfg.Agents.Defaults.Model.Primary = primary
-		base := strings.TrimSpace(baseURL)
-		plainKey := strings.TrimSpace(apiKey)
-		useAPIType, useMaxTokens, useContextWindow := resolveRuntimeParams(provider, apiType, maxTokens, contextWindow)
-		cfg.Models = &modelsConfig{
-			Mode: "merge",
-			Providers: map[string]modelProvider{
-				provider: {
-					ApiKey:  plainKey,
-					BaseUrl: base,
-					Api:     useAPIType,
-					Models: []modelEntry{
-						{
-							ID:            customModelID,
-							Name:          customModelID,
-							Reasoning:     strings.Contains(strings.ToLower(customModelID), "reason") || strings.Contains(strings.ToLower(customModelID), "thinking"),
-							Input:         []string{"text"},
-							ContextWindow: useContextWindow,
-							MaxTokens:     useMaxTokens,
-							Cost:          modelCost{},
-						},
-					},
-				},
-			},
-		}
-	} else if provider == "ollama" {
-		cfg.Agents.Defaults.Model.Primary = modelName
-		useAPIType, _, _ := resolveRuntimeParams(provider, apiType, maxTokens, contextWindow)
-		reasoning := useAPIType != "openai-completions"
-		cfg.Models = &modelsConfig{
-			Mode: "merge",
-			Providers: map[string]modelProvider{
-				"ollama": {
-					ApiKey:  "ollama",
-					BaseUrl: baseURL,
-					Api:     useAPIType,
-					Models: []modelEntry{
-						{
-							ID:            modelID,
-							Name:          modelID,
-							Reasoning:     reasoning,
-							Input:         []string{"text"},
-							ContextWindow: 160000,
-							MaxTokens:     8192,
-							Cost:          modelCost{},
-						},
-					},
-				},
-			},
-		}
-	} else if provider == "kimi-coding" {
-		cfg.Agents.Defaults.Model.Primary = modelName
-		base := baseURL
-		if base == "" {
-			if defaultURL, ok := providerDefaultBaseURL(provider); ok {
-				base = defaultURL
-			}
-		}
-		plainKey := strings.TrimSpace(apiKey)
-		cfg.Models = &modelsConfig{
-			Mode: "merge",
-			Providers: map[string]modelProvider{
-				"kimi-coding": {
-					ApiKey:  plainKey,
-					BaseUrl: base,
-					Api:     "anthropic-messages",
-					Models: []modelEntry{
-						{
-							ID:            modelID,
-							Name:          "Kimi for Coding",
-							Reasoning:     true,
-							Input:         []string{"text", "image"},
-							ContextWindow: 262144,
-							MaxTokens:     32768,
-							Cost:          modelCost{},
-						},
-					},
-				},
-			},
-		}
-	} else if provider == "zai" {
-		cfg.Agents.Defaults.Model.Primary = "zai/" + modelID
-		base := baseURL
-		if base == "" {
-			if defaultURL, ok := providerDefaultBaseURL(provider); ok {
-				base = defaultURL
-			}
-		}
-		plainKey := strings.TrimSpace(apiKey)
-		_, useMaxTokens, useContextWindow := resolveRuntimeParams(provider, apiType, maxTokens, contextWindow)
-		cfg.Models = &modelsConfig{
-			Mode: "merge",
-			Providers: map[string]modelProvider{
-				"zai": {
-					ApiKey:  plainKey,
-					BaseUrl: base,
-					Api:     "openai-completions",
-					Models: []modelEntry{
-						{
-							ID:            modelID,
-							Name:          zaiModelDisplayName(modelID),
-							Reasoning:     modelID == "glm-5",
-							Input:         []string{"text"},
-							ContextWindow: useContextWindow,
-							MaxTokens:     useMaxTokens,
-							Cost:          modelCost{},
-						},
-					},
-				},
-			},
-		}
+		cfg.Models = modelsMap
 	}
 
 	configPath := path.Join(confDir, "openclaw.json")
@@ -2191,6 +1783,18 @@ func structToMap(value interface{}) (map[string]interface{}, error) {
 	return result, nil
 }
 
+func mapToModelsConfig(value map[string]interface{}) (*modelsConfig, error) {
+	payload, err := json.Marshal(value)
+	if err != nil {
+		return nil, err
+	}
+	result := &modelsConfig{}
+	if err := json.Unmarshal(payload, result); err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
 func providerEnvKey(provider string) string {
 	return providercatalog.EnvKey(provider)
 }
@@ -2237,56 +1841,12 @@ func fixedProviderBaseURL(provider string) (string, bool) {
 	}
 }
 
-func isVerificationSkippedProvider(provider string) bool {
-	switch strings.ToLower(strings.TrimSpace(provider)) {
-	case "custom", "vllm", "ollama", "kimi-coding":
-		return true
-	default:
-		return false
-	}
-}
-
 func isSupportedAgentProvider(provider string) bool {
 	return providercatalog.IsEnabled(provider)
 }
 
 func providerDisplayName(provider string) string {
 	return providercatalog.DisplayName(provider)
-}
-
-func buildVerifyRequest(provider, baseURL, apiKey string) (string, map[string]string) {
-	headers := map[string]string{}
-	base := strings.TrimRight(baseURL, "/")
-	switch provider {
-	case "anthropic":
-		headers["x-api-key"] = apiKey
-		headers["anthropic-version"] = "2023-06-01"
-		if strings.Contains(base, "/v1") {
-			return base + "/models", headers
-		}
-		return base + "/v1/models", headers
-	case "kimi-coding":
-		headers["x-api-key"] = apiKey
-		headers["anthropic-version"] = "2023-06-01"
-		if strings.Contains(base, "/v1") {
-			return base + "/models", headers
-		}
-		return base + "/v1/models", headers
-	case "gemini":
-		if strings.Contains(base, "/v1beta") {
-			return fmt.Sprintf("%s/models?key=%s", base, apiKey), headers
-		}
-		return fmt.Sprintf("%s/v1beta/models?key=%s", base, apiKey), headers
-	case "zai":
-		headers["Authorization"] = fmt.Sprintf("Bearer %s", apiKey)
-		return base + "/models", headers
-	default:
-		headers["Authorization"] = fmt.Sprintf("Bearer %s", apiKey)
-		if strings.Contains(base, "/v1") {
-			return base + "/models", headers
-		}
-		return base + "/v1/models", headers
-	}
 }
 
 func readInstallEnv(envStr string) map[string]interface{} {

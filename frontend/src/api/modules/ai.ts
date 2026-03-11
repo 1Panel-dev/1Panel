@@ -145,10 +145,6 @@ export const updateAgentFeishuConfig = (req: AI.AgentFeishuConfigUpdateReq) => {
     return http.post(`/ai/agents/channel/feishu/update`, req);
 };
 
-export const approveAgentFeishuPairing = (req: AI.AgentFeishuPairingApproveReq) => {
-    return http.post(`/ai/agents/channel/feishu/approve`, req);
-};
-
 export const getAgentTelegramConfig = (req: AI.AgentTelegramConfigReq) => {
     return http.post<AI.AgentTelegramConfig>(`/ai/agents/channel/telegram/get`, req);
 };
