@@ -696,12 +696,7 @@ func (a AgentService) DeleteAccount(req dto.AgentAccountDeleteReq) error {
 }
 
 func (a AgentService) GetFeishuConfig(req dto.AgentFeishuConfigReq) (*dto.AgentFeishuConfig, error) {
-	agent, install, err := a.loadAgentAndInstall(req.AgentID)
-	if err != nil {
-		return nil, err
-	}
-	_ = install
-	conf, err := readOpenclawConfig(agent.ConfigPath)
+	_, _, conf, err := a.loadAgentConfig(req.AgentID)
 	if err != nil {
 		return nil, err
 	}
@@ -710,37 +705,25 @@ func (a AgentService) GetFeishuConfig(req dto.AgentFeishuConfigReq) (*dto.AgentF
 }
 
 func (a AgentService) UpdateFeishuConfig(req dto.AgentFeishuConfigUpdateReq) error {
-	agent, _, err := a.loadAgentAndInstall(req.AgentID)
-	if err != nil {
-		return err
-	}
-	conf, err := readOpenclawConfig(agent.ConfigPath)
-	if err != nil {
-		return err
-	}
-	if req.DmPolicy == "" {
-		req.DmPolicy = "pairing"
-	}
-	setFeishuConfig(conf, dto.AgentFeishuConfig{
-		Enabled:   req.Enabled,
-		DmPolicy:  req.DmPolicy,
-		BotName:   req.BotName,
-		AppID:     req.AppID,
-		AppSecret: req.AppSecret,
+	return a.mutateAgentConfig(req.AgentID, func(_ *model.Agent, _ *model.AppInstall, conf map[string]interface{}) error {
+		dmPolicy := req.DmPolicy
+		if dmPolicy == "" {
+			dmPolicy = "pairing"
+		}
+		setFeishuConfig(conf, dto.AgentFeishuConfig{
+			Enabled:   req.Enabled,
+			DmPolicy:  dmPolicy,
+			BotName:   req.BotName,
+			AppID:     req.AppID,
+			AppSecret: req.AppSecret,
+		})
+		setFeishuPluginEnabled(conf, req.Enabled)
+		return nil
 	})
-	setFeishuPluginEnabled(conf, req.Enabled)
-	if err := writeOpenclawConfigRaw(agent.ConfigPath, conf); err != nil {
-		return err
-	}
-	return nil
 }
 
 func (a AgentService) GetTelegramConfig(req dto.AgentTelegramConfigReq) (*dto.AgentTelegramConfig, error) {
-	agent, _, err := a.loadAgentAndInstall(req.AgentID)
-	if err != nil {
-		return nil, err
-	}
-	conf, err := readOpenclawConfig(agent.ConfigPath)
+	_, _, conf, err := a.loadAgentConfig(req.AgentID)
 	if err != nil {
 		return nil, err
 	}
@@ -749,35 +732,23 @@ func (a AgentService) GetTelegramConfig(req dto.AgentTelegramConfigReq) (*dto.Ag
 }
 
 func (a AgentService) UpdateTelegramConfig(req dto.AgentTelegramConfigUpdateReq) error {
-	agent, _, err := a.loadAgentAndInstall(req.AgentID)
-	if err != nil {
-		return err
-	}
-	conf, err := readOpenclawConfig(agent.ConfigPath)
-	if err != nil {
-		return err
-	}
-	if req.DmPolicy == "" {
-		req.DmPolicy = "pairing"
-	}
-	setTelegramConfig(conf, dto.AgentTelegramConfig{
-		Enabled:  req.Enabled,
-		DmPolicy: req.DmPolicy,
-		BotToken: req.BotToken,
-		Proxy:    req.Proxy,
+	return a.mutateAgentConfig(req.AgentID, func(_ *model.Agent, _ *model.AppInstall, conf map[string]interface{}) error {
+		dmPolicy := req.DmPolicy
+		if dmPolicy == "" {
+			dmPolicy = "pairing"
+		}
+		setTelegramConfig(conf, dto.AgentTelegramConfig{
+			Enabled:  req.Enabled,
+			DmPolicy: dmPolicy,
+			BotToken: req.BotToken,
+			Proxy:    req.Proxy,
+		})
+		return nil
 	})
-	if err := writeOpenclawConfigRaw(agent.ConfigPath, conf); err != nil {
-		return err
-	}
-	return nil
 }
 
 func (a AgentService) GetDiscordConfig(req dto.AgentDiscordConfigReq) (*dto.AgentDiscordConfig, error) {
-	agent, _, err := a.loadAgentAndInstall(req.AgentID)
-	if err != nil {
-		return nil, err
-	}
-	conf, err := readOpenclawConfig(agent.ConfigPath)
+	_, _, conf, err := a.loadAgentConfig(req.AgentID)
 	if err != nil {
 		return nil, err
 	}
@@ -786,39 +757,28 @@ func (a AgentService) GetDiscordConfig(req dto.AgentDiscordConfigReq) (*dto.Agen
 }
 
 func (a AgentService) UpdateDiscordConfig(req dto.AgentDiscordConfigUpdateReq) error {
-	agent, _, err := a.loadAgentAndInstall(req.AgentID)
-	if err != nil {
-		return err
-	}
-	conf, err := readOpenclawConfig(agent.ConfigPath)
-	if err != nil {
-		return err
-	}
-	if req.DmPolicy == "" {
-		req.DmPolicy = "pairing"
-	}
-	if req.GroupPolicy == "" {
-		req.GroupPolicy = "open"
-	}
-	setDiscordConfig(conf, dto.AgentDiscordConfig{
-		Enabled:     req.Enabled,
-		DmPolicy:    req.DmPolicy,
-		GroupPolicy: req.GroupPolicy,
-		Token:       req.Token,
-		Proxy:       req.Proxy,
+	return a.mutateAgentConfig(req.AgentID, func(_ *model.Agent, _ *model.AppInstall, conf map[string]interface{}) error {
+		dmPolicy := req.DmPolicy
+		if dmPolicy == "" {
+			dmPolicy = "pairing"
+		}
+		groupPolicy := req.GroupPolicy
+		if groupPolicy == "" {
+			groupPolicy = "open"
+		}
+		setDiscordConfig(conf, dto.AgentDiscordConfig{
+			Enabled:     req.Enabled,
+			DmPolicy:    dmPolicy,
+			GroupPolicy: groupPolicy,
+			Token:       req.Token,
+			Proxy:       req.Proxy,
+		})
+		return nil
 	})
-	if err := writeOpenclawConfigRaw(agent.ConfigPath, conf); err != nil {
-		return err
-	}
-	return nil
 }
 
 func (a AgentService) GetQQBotConfig(req dto.AgentQQBotConfigReq) (*dto.AgentQQBotConfig, error) {
-	agent, install, err := a.loadAgentAndInstall(req.AgentID)
-	if err != nil {
-		return nil, err
-	}
-	conf, err := readOpenclawConfig(agent.ConfigPath)
+	_, install, conf, err := a.loadAgentConfig(req.AgentID)
 	if err != nil {
 		return nil, err
 	}
@@ -829,31 +789,18 @@ func (a AgentService) GetQQBotConfig(req dto.AgentQQBotConfigReq) (*dto.AgentQQB
 }
 
 func (a AgentService) UpdateQQBotConfig(req dto.AgentQQBotConfigUpdateReq) error {
-	agent, _, err := a.loadAgentAndInstall(req.AgentID)
-	if err != nil {
-		return err
-	}
-	conf, err := readOpenclawConfig(agent.ConfigPath)
-	if err != nil {
-		return err
-	}
-	setQQBotConfig(conf, dto.AgentQQBotConfig{
-		Enabled:      req.Enabled,
-		AppID:        req.AppID,
-		ClientSecret: req.ClientSecret,
+	return a.mutateAgentConfig(req.AgentID, func(_ *model.Agent, _ *model.AppInstall, conf map[string]interface{}) error {
+		setQQBotConfig(conf, dto.AgentQQBotConfig{
+			Enabled:      req.Enabled,
+			AppID:        req.AppID,
+			ClientSecret: req.ClientSecret,
+		})
+		return nil
 	})
-	if err := writeOpenclawConfigRaw(agent.ConfigPath, conf); err != nil {
-		return err
-	}
-	return nil
 }
 
 func (a AgentService) GetWecomConfig(req dto.AgentWecomConfigReq) (*dto.AgentWecomConfig, error) {
-	agent, install, err := a.loadAgentAndInstall(req.AgentID)
-	if err != nil {
-		return nil, err
-	}
-	conf, err := readOpenclawConfig(agent.ConfigPath)
+	_, install, conf, err := a.loadAgentConfig(req.AgentID)
 	if err != nil {
 		return nil, err
 	}
@@ -864,24 +811,15 @@ func (a AgentService) GetWecomConfig(req dto.AgentWecomConfigReq) (*dto.AgentWec
 }
 
 func (a AgentService) UpdateWecomConfig(req dto.AgentWecomConfigUpdateReq) error {
-	agent, _, err := a.loadAgentAndInstall(req.AgentID)
-	if err != nil {
-		return err
-	}
-	conf, err := readOpenclawConfig(agent.ConfigPath)
-	if err != nil {
-		return err
-	}
-	setWecomConfig(conf, dto.AgentWecomConfig{
-		Enabled:  req.Enabled,
-		DmPolicy: req.DmPolicy,
-		BotID:    req.BotID,
-		Secret:   req.Secret,
+	return a.mutateAgentConfig(req.AgentID, func(_ *model.Agent, _ *model.AppInstall, conf map[string]interface{}) error {
+		setWecomConfig(conf, dto.AgentWecomConfig{
+			Enabled:  req.Enabled,
+			DmPolicy: req.DmPolicy,
+			BotID:    req.BotID,
+			Secret:   req.Secret,
+		})
+		return nil
 	})
-	if err := writeOpenclawConfigRaw(agent.ConfigPath, conf); err != nil {
-		return err
-	}
-	return nil
 }
 
 func (a AgentService) InstallPlugin(req dto.AgentPluginInstallReq) error {
@@ -1031,6 +969,29 @@ func (a AgentService) loadAgentAndInstall(agentID uint) (*model.Agent, *model.Ap
 		return nil, nil, err
 	}
 	return agent, &install, nil
+}
+
+func (a AgentService) loadAgentConfig(agentID uint) (*model.Agent, *model.AppInstall, map[string]interface{}, error) {
+	agent, install, err := a.loadAgentAndInstall(agentID)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	conf, err := readOpenclawConfig(agent.ConfigPath)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	return agent, install, conf, nil
+}
+
+func (a AgentService) mutateAgentConfig(agentID uint, fn func(agent *model.Agent, install *model.AppInstall, conf map[string]interface{}) error) error {
+	agent, install, conf, err := a.loadAgentConfig(agentID)
+	if err != nil {
+		return err
+	}
+	if err := fn(agent, install, conf); err != nil {
+		return err
+	}
+	return writeOpenclawConfigRaw(agent.ConfigPath, conf)
 }
 
 func readOpenclawConfig(configPath string) (map[string]interface{}, error) {

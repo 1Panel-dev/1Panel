@@ -21,17 +21,22 @@
                         prop="name"
                         min-width="120"
                     />
-                    <el-table-column
-                        :label="`${$t('aiTools.agents.agents')}${$t('commons.table.type')}`"
-                        prop="agentType"
-                        min-width="120"
-                    >
+                    <el-table-column :label="$t('commons.table.type')" prop="agentType" min-width="120">
                         <template #default="{ row }">
-                            {{
-                                row.agentType === 'copaw'
-                                    ? $t('aiTools.agents.copawType')
-                                    : $t('aiTools.agents.openclawType')
-                            }}
+                            <div class="agent-type-cell">
+                                <img
+                                    class="agent-type-icon"
+                                    :src="row.agentType === 'copaw' ? copawIcon : openclawIcon"
+                                    :alt="row.agentType === 'copaw' ? 'CoPaw' : 'OpenClaw'"
+                                />
+                                <span>
+                                    {{
+                                        row.agentType === 'copaw'
+                                            ? $t('aiTools.agents.copawType')
+                                            : $t('aiTools.agents.openclawType')
+                                    }}
+                                </span>
+                            </div>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.status')" prop="status" width="120">
@@ -150,6 +155,8 @@ import DockerStatus from '@/views/container/docker-status/index.vue';
 import { getAgentProviderDisplayName } from '@/utils/agent';
 import { routerToFileWithPath } from '@/utils/router';
 import NoApp from '@/views/app-store/apps/no-app/index.vue';
+import openclawIcon from '@/assets/images/ai-agent-openclaw.svg';
+import copawIcon from '@/assets/images/ai-agent-copaw.svg';
 
 const items = ref<AI.AgentItem[]>([]);
 const loading = ref(false);
@@ -371,5 +378,18 @@ onMounted(async () => {
     display: inline-flex;
     align-items: center;
     gap: 4px;
+}
+
+.agent-type-cell {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.agent-type-icon {
+    width: 16px;
+    height: 16px;
+    flex: 0 0 16px;
+    object-fit: contain;
 }
 </style>
