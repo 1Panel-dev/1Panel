@@ -185,12 +185,12 @@ export const checkAgentPlugin = (req: AI.AgentPluginCheckReq) => {
     return http.post<AI.AgentPluginStatus>(`/ai/agents/plugin/check`, req);
 };
 
-export const getAgentBrowserConfig = (req: AI.AgentBrowserConfigReq) => {
-    return http.post<AI.AgentBrowserConfig>(`/ai/agents/browser/get`, req);
+export const getAgentSecurityConfig = (req: AI.AgentSecurityConfigReq) => {
+    return http.post<AI.AgentSecurityConfig>(`/ai/agents/security/get`, req);
 };
 
-export const updateAgentBrowserConfig = (req: AI.AgentBrowserConfigUpdateReq) => {
-    return http.post(`/ai/agents/browser/update`, req);
+export const updateAgentSecurityConfig = (req: AI.AgentSecurityConfigUpdateReq) => {
+    return http.post(`/ai/agents/security/update`, req);
 };
 
 export const getAgentOtherConfig = (req: AI.AgentOtherConfigReq) => {

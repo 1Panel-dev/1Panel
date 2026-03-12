@@ -1,5 +1,8 @@
 <template>
     <el-form ref="formRef" :model="form" :rules="rules" label-position="top" v-loading="loading">
+        <el-form-item :label="t('aiTools.agents.browserEnabled')">
+            <el-switch v-model="form.browserEnabled" />
+        </el-form-item>
         <el-form-item :label="t('aiTools.agents.timeZone')" prop="userTimezone">
             <el-input v-model="form.userTimezone" />
         </el-form-item>
@@ -28,6 +31,7 @@ const formRef = ref<FormInstance>();
 
 const form = reactive<AI.AgentOtherConfig>({
     userTimezone: '',
+    browserEnabled: true,
 });
 
 const rules = reactive({
@@ -55,6 +59,7 @@ const saveConfig = async () => {
         await updateAgentOtherConfig({
             agentId: agentId.value,
             userTimezone: form.userTimezone,
+            browserEnabled: form.browserEnabled,
         });
         MsgSuccess(t('aiTools.agents.saveSuccess'));
     } finally {

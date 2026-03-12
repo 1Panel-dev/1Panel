@@ -241,6 +241,7 @@ export namespace AI {
         appVersion: string;
         webUIPort: number;
         bridgePort?: number;
+        allowedOrigins?: string[];
         agentType: 'openclaw' | 'copaw';
         provider?: string;
         model?: string;
@@ -506,24 +507,17 @@ export namespace AI {
         proxy: string;
     }
 
-    export interface AgentBrowserConfigReq {
+    export interface AgentSecurityConfigReq {
         agentId: number;
     }
 
-    export interface AgentBrowserConfig {
-        enabled: boolean;
-        executablePath: string;
-        headless: boolean;
-        noSandbox: boolean;
-        defaultProfile: string;
+    export interface AgentSecurityConfig {
+        allowedOrigins: string[];
     }
 
-    export interface AgentBrowserConfigUpdateReq {
+    export interface AgentSecurityConfigUpdateReq {
         agentId: number;
-        enabled: boolean;
-        headless: boolean;
-        noSandbox: boolean;
-        defaultProfile: string;
+        allowedOrigins: string[];
     }
 
     export interface AgentOtherConfigReq {
@@ -532,10 +526,12 @@ export namespace AI {
 
     export interface AgentOtherConfig {
         userTimezone: string;
+        browserEnabled: boolean;
     }
 
     export interface AgentOtherConfigUpdateReq {
         agentId: number;
         userTimezone: string;
+        browserEnabled: boolean;
     }
 }

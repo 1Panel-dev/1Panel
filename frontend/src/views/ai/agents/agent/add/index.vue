@@ -26,6 +26,22 @@
                 >
                     <el-input-number v-model="form.bridgePort" :min="1" :max="65535" />
                 </el-form-item>
+                <el-form-item
+                    v-if="form.agentType === 'openclaw'"
+                    :label="$t('aiTools.agents.allowedOrigins')"
+                    prop="allowedOrigins"
+                >
+                    <el-input
+                        v-model="form.allowedOrigins"
+                        type="textarea"
+                        :rows="3"
+                        :placeholder="$t('aiTools.agents.allowedOriginsPlaceholder')"
+                        @input="handleAllowedOriginsInput"
+                    />
+                    <span class="input-help">
+                        {{ $t('aiTools.agents.allowedOriginsHelper') }}
+                    </span>
+                </el-form-item>
             </el-card>
             <el-card class="form-card" v-if="form.agentType === 'openclaw'">
                 <el-form-item :label="$t('aiTools.agents.provider')" prop="provider">
@@ -103,8 +119,14 @@ import { checkNumberRange, Rules } from '@/global/form-rules';
 import { createAgent, getAgentProviders, pageAgentAccounts } from '@/api/modules/ai';
 import { AI } from '@/api/interface/ai';
 import { getAppByKey, getAppDetail } from '@/api/modules/app';
+import { getAgentSettingByKey } from '@/api/modules/setting';
 import { getRandomStr, newUUID } from '@/utils/util';
-import { getAgentProviderDisplayName } from '@/utils/agent';
+import {
+    buildDefaultAllowedOrigin,
+    getAgentProviderDisplayName,
+    parseAllowedOriginsInput,
+    validateAllowedOriginsInput,
+} from '@/utils/agent';
 import { App } from '@/api/interface/app';
 import AdvancedSetting from '@/components/advanced-setting/index.vue';
 import AccountAddDialog from '@/views/ai/agents/model/add/index.vue';
@@ -122,6 +144,9 @@ const providerAccountCount = ref<Record<string, number>>({});
 const manualModel = ref(false);
 const appInfo = ref<App.AppDTO>();
 const accountAddRef = ref();
+const systemIP = ref('');
+const lastAutoAllowedOrigins = ref('');
+const allowedOriginsAutoFilled = ref(true);
 const { isIntl } = useGlobalStore();
 
 const form = reactive({
@@ -130,6 +155,7 @@ const form = reactive({
     appVersion: '',
     webUIPort: 18789,
     bridgePort: 18790,
+    allowedOrigins: '',
     provider: 'deepseek',
     accountId: undefined as unknown as number,
     model: '',
@@ -152,37 +178,29 @@ const form = reactive({
     dockerCompose: '',
 });
 
-const validateOpenclawOnly = (field: 'provider' | 'accountId' | 'model' | 'bridgePort') => {
-    return (_rule: any, value: any, callback: (error?: Error) => void) => {
-        if (form.agentType !== 'openclaw') {
-            callback();
-            return;
-        }
-        if (field === 'bridgePort') {
-            if (!value || Number(value) <= 0) {
-                callback(new Error('bridge port is required'));
-                return;
-            }
-            callback();
-            return;
-        }
-        if (value === undefined || value === null || value === '') {
-            callback(new Error(`${field} is required`));
-            return;
-        }
-        callback();
-    };
-};
-
 const rules = reactive({
     name: [Rules.requiredInput],
     agentType: [Rules.requiredSelect],
     appVersion: [Rules.requiredSelect],
     webUIPort: [Rules.requiredInput],
-    bridgePort: [{ validator: validateOpenclawOnly('bridgePort'), trigger: 'blur' }],
-    provider: [{ validator: validateOpenclawOnly('provider'), trigger: 'change' }],
-    accountId: [{ validator: validateOpenclawOnly('accountId'), trigger: 'change' }],
-    model: [{ validator: validateOpenclawOnly('model'), trigger: 'change' }],
+    bridgePort: [Rules.requiredInput],
+    allowedOrigins: [
+        Rules.requiredInput,
+        {
+            validator: (_rule: any, value: any, callback: (error?: Error) => void) => {
+                const message = validateAllowedOriginsInput(String(value || ''));
+                if (message) {
+                    callback(new Error(message));
+                    return;
+                }
+                callback();
+            },
+            trigger: 'blur',
+        },
+    ],
+    provider: [Rules.requiredSelect],
+    accountId: [Rules.requiredSelect],
+    model: [Rules.requiredInput],
     containerName: [Rules.containerName],
     restartPolicy: [Rules.requiredSelect],
     cpuQuota: [checkNumberRange(0, 99999)],
@@ -191,6 +209,28 @@ const rules = reactive({
 });
 
 const filteredModels = computed(() => providerModels.value[form.provider] || []);
+
+const syncAllowedOriginsWithDefault = (force = false) => {
+    if (form.agentType !== 'openclaw') {
+        return;
+    }
+    const defaultOrigin = buildDefaultAllowedOrigin(systemIP.value, form.webUIPort);
+    if (!force && !allowedOriginsAutoFilled.value && form.allowedOrigins !== lastAutoAllowedOrigins.value) {
+        return;
+    }
+    form.allowedOrigins = defaultOrigin;
+    lastAutoAllowedOrigins.value = defaultOrigin;
+    allowedOriginsAutoFilled.value = true;
+};
+
+const loadSystemIP = async () => {
+    try {
+        const res = await getAgentSettingByKey('SystemIP');
+        systemIP.value = String(res.data || '').trim();
+    } catch (error) {
+        systemIP.value = '';
+    }
+};
 
 const loadVersions = async (appKey: 'openclaw' | 'copaw') => {
     const res = await getAppByKey(appKey);
@@ -301,11 +341,17 @@ const handleAgentTypeChange = async () => {
     form.apiType = 'openai-completions';
     if (form.agentType === 'openclaw') {
         form.bridgePort = form.bridgePort || 18790;
+        await loadSystemIP();
+        allowedOriginsAutoFilled.value = true;
+        syncAllowedOriginsWithDefault(true);
         await loadVersions('openclaw');
         await loadProviders();
         await loadAccounts();
         return;
     }
+    form.allowedOrigins = '';
+    lastAutoAllowedOrigins.value = '';
+    allowedOriginsAutoFilled.value = true;
     await loadVersions('copaw');
 };
 
@@ -353,6 +399,10 @@ const setDefaultModel = () => {
     }
 };
 
+const handleAllowedOriginsInput = () => {
+    allowedOriginsAutoFilled.value = form.allowedOrigins === lastAutoAllowedOrigins.value;
+};
+
 const submit = async () => {
     if (!formRef.value) {
         return;
@@ -368,6 +418,7 @@ const submit = async () => {
             appVersion: form.appVersion,
             webUIPort: form.webUIPort,
             bridgePort: form.agentType === 'openclaw' ? form.bridgePort : undefined,
+            allowedOrigins: form.agentType === 'openclaw' ? parseAllowedOriginsInput(form.allowedOrigins) : undefined,
             agentType: form.agentType,
             provider: form.agentType === 'openclaw' ? form.provider : undefined,
             model: form.agentType === 'openclaw' ? form.model : undefined,
@@ -408,7 +459,10 @@ const submit = async () => {
 const handleClose = () => {
     formRef.value?.resetFields();
     form.token = '';
+    form.allowedOrigins = '';
     form.dockerCompose = '';
+    lastAutoAllowedOrigins.value = '';
+    allowedOriginsAutoFilled.value = true;
 };
 
 const openDrawer = async (agentType?: 'openclaw' | 'copaw') => {
@@ -419,12 +473,18 @@ const openDrawer = async (agentType?: 'openclaw' | 'copaw') => {
     form.agentType = targetType;
     form.token = getRandomStr(32).toLowerCase();
     if (form.agentType === 'copaw') {
+        form.allowedOrigins = '';
+        lastAutoAllowedOrigins.value = '';
+        allowedOriginsAutoFilled.value = true;
         await loadVersions('copaw');
         providerOptions.value = [];
         providerModels.value = {};
         accountOptions.value = [];
         return;
     }
+    await loadSystemIP();
+    allowedOriginsAutoFilled.value = true;
+    syncAllowedOriginsWithDefault(true);
     await loadVersions('openclaw');
     await loadProviders();
     await loadAccounts();
@@ -461,6 +521,13 @@ watch(
         if (form.editCompose) {
             await loadCompose();
         }
+    },
+);
+
+watch(
+    () => form.webUIPort,
+    () => {
+        syncAllowedOriginsWithDefault();
     },
 );
 

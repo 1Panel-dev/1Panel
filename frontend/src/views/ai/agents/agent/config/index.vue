@@ -37,11 +37,11 @@ const modelRef = ref();
 const settingsRef = ref();
 
 const loadSettings = async () => {
-    if (agentId.value <= 0) {
+    if (!currentAgent.value) {
         return;
     }
     await nextTick();
-    await settingsRef.value?.load(agentId.value);
+    await settingsRef.value?.load(currentAgent.value);
 };
 
 const loadModel = async () => {

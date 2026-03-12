@@ -57,8 +57,8 @@ type IAgentService interface {
 	UpdateQQBotConfig(req dto.AgentQQBotConfigUpdateReq) error
 	InstallPlugin(req dto.AgentPluginInstallReq) error
 	CheckPlugin(req dto.AgentPluginCheckReq) (*dto.AgentPluginStatus, error)
-	GetBrowserConfig(req dto.AgentBrowserConfigReq) (*dto.AgentBrowserConfig, error)
-	UpdateBrowserConfig(req dto.AgentBrowserConfigUpdateReq) error
+	GetSecurityConfig(req dto.AgentSecurityConfigReq) (*dto.AgentSecurityConfig, error)
+	UpdateSecurityConfig(req dto.AgentSecurityConfigUpdateReq) error
 	GetOtherConfig(req dto.AgentOtherConfigReq) (*dto.AgentOtherConfig, error)
 	UpdateOtherConfig(req dto.AgentOtherConfigUpdateReq) error
 	ApproveChannelPairing(req dto.AgentChannelPairingApproveReq) error
@@ -133,8 +133,17 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 	token := ""
 	configPath := ""
 	storedModel := ""
+	var allowedOrigins []string
 
 	if agentType == constant.AppOpenclaw {
+		var err error
+		allowedOrigins, err = normalizeAllowedOrigins(req.AllowedOrigins)
+		if err != nil {
+			return nil, err
+		}
+		if len(allowedOrigins) == 0 {
+			return nil, fmt.Errorf("allowed origins is required")
+		}
 		provider = strings.ToLower(strings.TrimSpace(req.Provider))
 		if !isSupportedAgentProvider(provider) {
 			return nil, buserr.New("ErrAgentProviderNotSupported")
@@ -267,7 +276,19 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 		return nil, err
 	}
 	if agentType == constant.AppOpenclaw {
-		go a.writeConfigWithRetry(appInstall, provider, req.Model, apiType, maxTokens, contextWindow, baseURL, apiKey, token, agent.ID)
+		go a.writeConfigWithRetry(
+			appInstall,
+			provider,
+			req.Model,
+			apiType,
+			maxTokens,
+			contextWindow,
+			baseURL,
+			apiKey,
+			token,
+			agent.ID,
+			allowedOrigins,
+		)
 	}
 
 	item := buildAgentItem(agent, appInstall, nil)
@@ -412,7 +433,7 @@ func (a AgentService) UpdateModelConfig(req dto.AgentModelConfigUpdateReq) error
 	if confDir == "" {
 		return buserr.New("ErrRecordNotFound")
 	}
-	if err := writeOpenclawConfig(confDir, provider, modelName, apiType, maxTokens, contextWindow, baseURL, account.APIKey, agent.Token); err != nil {
+	if err := writeOpenclawConfig(confDir, provider, modelName, apiType, maxTokens, contextWindow, baseURL, account.APIKey, agent.Token, nil); err != nil {
 		return err
 	}
 	agent.Provider = provider
@@ -900,35 +921,42 @@ func (a AgentService) CheckPlugin(req dto.AgentPluginCheckReq) (*dto.AgentPlugin
 	return &dto.AgentPluginStatus{Installed: installed}, nil
 }
 
-func (a AgentService) GetBrowserConfig(req dto.AgentBrowserConfigReq) (*dto.AgentBrowserConfig, error) {
+func (a AgentService) GetSecurityConfig(req dto.AgentSecurityConfigReq) (*dto.AgentSecurityConfig, error) {
 	agent, _, err := a.loadAgentAndInstall(req.AgentID)
 	if err != nil {
 		return nil, err
+	}
+	if normalizeAgentType(agent.AgentType) == constant.AppCopaw {
+		return nil, fmt.Errorf("copaw does not support security config")
 	}
 	conf, err := readOpenclawConfig(agent.ConfigPath)
 	if err != nil {
 		return nil, err
 	}
-	result := extractBrowserConfig(conf)
+	result := extractSecurityConfig(conf)
 	return &result, nil
 }
 
-func (a AgentService) UpdateBrowserConfig(req dto.AgentBrowserConfigUpdateReq) error {
+func (a AgentService) UpdateSecurityConfig(req dto.AgentSecurityConfigUpdateReq) error {
 	agent, _, err := a.loadAgentAndInstall(req.AgentID)
 	if err != nil {
 		return err
+	}
+	if normalizeAgentType(agent.AgentType) == constant.AppCopaw {
+		return fmt.Errorf("copaw does not support security config")
+	}
+	allowedOrigins, err := normalizeAllowedOrigins(req.AllowedOrigins)
+	if err != nil {
+		return err
+	}
+	if len(allowedOrigins) == 0 {
+		return fmt.Errorf("allowed origins is required")
 	}
 	conf, err := readOpenclawConfig(agent.ConfigPath)
 	if err != nil {
 		return err
 	}
-	setBrowserConfig(conf, dto.AgentBrowserConfig{
-		Enabled:        req.Enabled,
-		ExecutablePath: defaultBrowserExecutablePath,
-		Headless:       req.Headless,
-		NoSandbox:      req.NoSandbox,
-		DefaultProfile: strings.TrimSpace(req.DefaultProfile),
-	})
+	setSecurityConfig(conf, dto.AgentSecurityConfig{AllowedOrigins: allowedOrigins})
 	if err := writeOpenclawConfigRaw(agent.ConfigPath, conf); err != nil {
 		return err
 	}
@@ -957,7 +985,10 @@ func (a AgentService) UpdateOtherConfig(req dto.AgentOtherConfigUpdateReq) error
 	if err != nil {
 		return err
 	}
-	setOtherConfig(conf, dto.AgentOtherConfig{UserTimezone: strings.TrimSpace(req.UserTimezone)})
+	setOtherConfig(conf, dto.AgentOtherConfig{
+		UserTimezone:   strings.TrimSpace(req.UserTimezone),
+		BrowserEnabled: req.BrowserEnabled,
+	})
 	if err := writeOpenclawConfigRaw(agent.ConfigPath, conf); err != nil {
 		return err
 	}
@@ -1025,6 +1056,100 @@ func writeOpenclawConfigRaw(configPath string, conf map[string]interface{}) erro
 	}
 	fileOp := files.NewFileOp()
 	return fileOp.SaveFile(configPath, string(payload), 0600)
+}
+
+func normalizeAllowedOrigins(origins []string) ([]string, error) {
+	if len(origins) == 0 {
+		return nil, nil
+	}
+	result := make([]string, 0, len(origins))
+	seen := make(map[string]struct{}, len(origins))
+	for _, origin := range origins {
+		origin = strings.TrimSpace(origin)
+		if origin == "" {
+			continue
+		}
+		normalized, err := normalizeAllowedOrigin(origin)
+		if err != nil {
+			return nil, err
+		}
+		if _, ok := seen[normalized]; ok {
+			continue
+		}
+		seen[normalized] = struct{}{}
+		result = append(result, normalized)
+	}
+	return result, nil
+}
+
+func normalizeAllowedOrigin(origin string) (string, error) {
+	parsed, err := url.Parse(strings.TrimSpace(origin))
+	if err != nil {
+		return "", fmt.Errorf("invalid allowed origin: %s", origin)
+	}
+	if parsed.Scheme != "http" && parsed.Scheme != "https" {
+		return "", fmt.Errorf("invalid allowed origin: %s", origin)
+	}
+	if parsed.User != nil || parsed.Host == "" || parsed.Hostname() == "" {
+		return "", fmt.Errorf("invalid allowed origin: %s", origin)
+	}
+	if parsed.RawQuery != "" || parsed.Fragment != "" {
+		return "", fmt.Errorf("invalid allowed origin: %s", origin)
+	}
+	if pathValue := strings.TrimSpace(parsed.EscapedPath()); pathValue != "" && pathValue != "/" {
+		return "", fmt.Errorf("invalid allowed origin: %s", origin)
+	}
+	host := parsed.Hostname()
+	if strings.Contains(host, ":") {
+		host = "[" + host + "]"
+	}
+	normalized := parsed.Scheme + "://" + host
+	if port := parsed.Port(); port != "" {
+		normalized += ":" + port
+	}
+	return normalized, nil
+}
+
+func extractSecurityConfig(conf map[string]interface{}) dto.AgentSecurityConfig {
+	result := dto.AgentSecurityConfig{AllowedOrigins: []string{}}
+	gateway, ok := conf["gateway"].(map[string]interface{})
+	if !ok {
+		return result
+	}
+	controlUi, ok := gateway["controlUi"].(map[string]interface{})
+	if !ok {
+		return result
+	}
+	switch values := controlUi["allowedOrigins"].(type) {
+	case []interface{}:
+		for _, value := range values {
+			if text, ok := value.(string); ok && strings.TrimSpace(text) != "" {
+				result.AllowedOrigins = append(result.AllowedOrigins, strings.TrimSpace(text))
+			}
+		}
+	case []string:
+		for _, value := range values {
+			if strings.TrimSpace(value) != "" {
+				result.AllowedOrigins = append(result.AllowedOrigins, strings.TrimSpace(value))
+			}
+		}
+	}
+	return result
+}
+
+func setSecurityConfig(conf map[string]interface{}, config dto.AgentSecurityConfig) {
+	gateway := ensureChildMap(conf, "gateway")
+	controlUi := ensureChildMap(gateway, "controlUi")
+	if _, ok := controlUi["dangerouslyDisableDeviceAuth"]; !ok {
+		controlUi["dangerouslyDisableDeviceAuth"] = true
+	}
+	allowedOrigins := append([]string(nil), config.AllowedOrigins...)
+	if len(allowedOrigins) > 0 {
+		controlUi["allowedOrigins"] = allowedOrigins
+	} else {
+		delete(controlUi, "allowedOrigins")
+	}
+	delete(controlUi, "dangerouslyAllowHostHeaderOriginFallback")
 }
 
 func extractFeishuConfig(conf map[string]interface{}) dto.AgentFeishuConfig {
@@ -1184,8 +1309,8 @@ func setDiscordConfig(conf map[string]interface{}, config dto.AgentDiscordConfig
 	delete(discord, "dm")
 }
 
-func extractBrowserConfig(conf map[string]interface{}) dto.AgentBrowserConfig {
-	result := dto.AgentBrowserConfig{
+func extractBrowserConfig(conf map[string]interface{}) browserConfig {
+	result := browserConfig{
 		Enabled:        true,
 		ExecutablePath: defaultBrowserExecutablePath,
 		Headless:       true,
@@ -1214,7 +1339,7 @@ func extractBrowserConfig(conf map[string]interface{}) dto.AgentBrowserConfig {
 	return result
 }
 
-func setBrowserConfig(conf map[string]interface{}, config dto.AgentBrowserConfig) {
+func setBrowserConfig(conf map[string]interface{}, config browserConfig) {
 	browser := ensureChildMap(conf, "browser")
 	browser["enabled"] = config.Enabled
 	browser["executablePath"] = defaultBrowserExecutablePath
@@ -1335,18 +1460,24 @@ func checkPluginInstalled(containerName, pluginType string) (bool, error) {
 }
 
 func extractOtherConfig(conf map[string]interface{}) dto.AgentOtherConfig {
-	result := dto.AgentOtherConfig{UserTimezone: resolveServerTimezone()}
+	result := dto.AgentOtherConfig{UserTimezone: resolveServerTimezone(), BrowserEnabled: true}
 	agents, ok := conf["agents"].(map[string]interface{})
 	if !ok {
+		browser := extractBrowserConfig(conf)
+		result.BrowserEnabled = browser.Enabled
 		return result
 	}
 	defaults, ok := agents["defaults"].(map[string]interface{})
 	if !ok {
+		browser := extractBrowserConfig(conf)
+		result.BrowserEnabled = browser.Enabled
 		return result
 	}
 	if timezone, ok := defaults["userTimezone"].(string); ok && strings.TrimSpace(timezone) != "" {
 		result.UserTimezone = strings.TrimSpace(timezone)
 	}
+	browser := extractBrowserConfig(conf)
+	result.BrowserEnabled = browser.Enabled
 	return result
 }
 
@@ -1358,6 +1489,13 @@ func setOtherConfig(conf map[string]interface{}, config dto.AgentOtherConfig) {
 		timezone = resolveServerTimezone()
 	}
 	defaults["userTimezone"] = timezone
+	setBrowserConfig(conf, browserConfig{
+		Enabled:        config.BrowserEnabled,
+		ExecutablePath: defaultBrowserExecutablePath,
+		Headless:       true,
+		NoSandbox:      true,
+		DefaultProfile: defaultBrowserProfile,
+	})
 }
 
 func (a AgentService) syncAgentsByAccount(account *model.AgentAccount) error {
@@ -1389,7 +1527,7 @@ func (a AgentService) syncAgentsByAccount(account *model.AgentAccount) error {
 		if strings.EqualFold(account.Provider, "vllm") && strings.TrimSpace(account.Model) != "" {
 			modelName = account.Model
 		}
-		if err := writeOpenclawConfig(confDir, account.Provider, modelName, apiType, maxTokens, contextWindow, baseURL, account.APIKey, agent.Token); err != nil {
+		if err := writeOpenclawConfig(confDir, account.Provider, modelName, apiType, maxTokens, contextWindow, baseURL, account.APIKey, agent.Token, nil); err != nil {
 			return err
 		}
 		agent.BaseURL = baseURL
@@ -1493,7 +1631,7 @@ func (a AgentService) waitAndDeleteAgent(agentID uint, appInstallID uint) {
 	}
 }
 
-func (a AgentService) writeConfigWithRetry(appInstall *model.AppInstall, provider, modelName, apiType string, maxTokens, contextWindow int, baseURL, apiKey, token string, agentID uint) {
+func (a AgentService) writeConfigWithRetry(appInstall *model.AppInstall, provider, modelName, apiType string, maxTokens, contextWindow int, baseURL, apiKey, token string, agentID uint, allowedOrigins []string) {
 	if appInstall == nil {
 		return
 	}
@@ -1506,7 +1644,7 @@ func (a AgentService) writeConfigWithRetry(appInstall *model.AppInstall, provide
 		time.Sleep(time.Second)
 	}
 	confDir := path.Join(appInstall.GetPath(), "data", "conf")
-	if err := writeOpenclawConfig(confDir, provider, modelName, apiType, maxTokens, contextWindow, baseURL, apiKey, token); err != nil {
+	if err := writeOpenclawConfig(confDir, provider, modelName, apiType, maxTokens, contextWindow, baseURL, apiKey, token, allowedOrigins); err != nil {
 		global.LOG.Errorf("write openclaw config failed: %v", err)
 		agent, errGet := agentRepo.GetFirst(repo.WithByID(agentID))
 		if errGet == nil && agent != nil {
@@ -1560,8 +1698,8 @@ type gatewayConfig struct {
 }
 
 type gatewayControlUi struct {
-	DangerouslyDisableDeviceAuth             bool `json:"dangerouslyDisableDeviceAuth"`
-	DangerouslyAllowHostHeaderOriginFallback bool `json:"dangerouslyAllowHostHeaderOriginFallback"`
+	DangerouslyDisableDeviceAuth bool     `json:"dangerouslyDisableDeviceAuth"`
+	AllowedOrigins               []string `json:"allowedOrigins,omitempty"`
 }
 
 type gatewayAuth struct {
@@ -1619,7 +1757,7 @@ type browserConfig struct {
 	DefaultProfile string `json:"defaultProfile"`
 }
 
-func writeOpenclawConfig(confDir, provider, modelName, apiType string, maxTokens, contextWindow int, baseURL, apiKey, token string) error {
+func writeOpenclawConfig(confDir, provider, modelName, apiType string, maxTokens, contextWindow int, baseURL, apiKey, token string, allowedOrigins []string) error {
 	if strings.TrimSpace(confDir) == "" {
 		return fmt.Errorf("config dir is required")
 	}
@@ -1646,8 +1784,8 @@ func writeOpenclawConfig(confDir, provider, modelName, apiType string, maxTokens
 				Token: token,
 			},
 			ControlUi: gatewayControlUi{
-				DangerouslyDisableDeviceAuth:             true,
-				DangerouslyAllowHostHeaderOriginFallback: true,
+				DangerouslyDisableDeviceAuth: true,
+				AllowedOrigins:               append([]string(nil), allowedOrigins...),
 			},
 		},
 		Agents: agentsConfig{
@@ -1737,6 +1875,9 @@ func writeOpenclawConfig(confDir, provider, modelName, apiType string, maxTokens
 			authMap["mode"] = "token"
 		}
 		authMap["token"] = token
+	}
+	if allowedOrigins != nil {
+		setSecurityConfig(conf, dto.AgentSecurityConfig{AllowedOrigins: allowedOrigins})
 	}
 	if err := writeOpenclawConfigRaw(configPath, conf); err != nil {
 		return err
