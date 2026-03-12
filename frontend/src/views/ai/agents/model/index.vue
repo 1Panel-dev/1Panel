@@ -128,7 +128,7 @@ const verificationLabel = (row: AI.AgentAccountItem) => {
 
 const verificationTagType = (row: AI.AgentAccountItem) => {
     if (isVerificationSkipped(row.provider)) {
-        return 'warning';
+        return 'info';
     }
     return row.verified ? 'success' : 'info';
 };

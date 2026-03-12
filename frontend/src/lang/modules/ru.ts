@@ -692,7 +692,7 @@ const message = {
             token: 'Токен',
             manualModel: 'Ручной ввод',
             verified: 'Проверено',
-            verifySkipped: 'Пропущено',
+            verifySkipped: 'Без проверки',
             configTitle: 'Configuration',
             settingsTab: 'Settings',
             securityTab: 'Security',

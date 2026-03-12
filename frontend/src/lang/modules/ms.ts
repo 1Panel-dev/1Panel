@@ -700,7 +700,7 @@ const message = {
             token: 'Token',
             manualModel: 'Input manual',
             verified: 'Disahkan',
-            verifySkipped: 'Dilangkau',
+            verifySkipped: 'Tanpa pengesahan',
             configTitle: 'Configuration',
             settingsTab: 'Settings',
             securityTab: 'Security',

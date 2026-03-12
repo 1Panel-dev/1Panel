@@ -322,12 +322,12 @@ const openWorkDir = (row: AI.AgentItem) => {
 };
 
 const jumpWebUI = (row: AI.AgentItem) => {
-    const query = row.agentType === 'copaw' ? '' : `token=${row.token}`;
     if (dialogPortJumpRef.value?.acceptParams) {
         dialogPortJumpRef.value.acceptParams({
             port: row.webUIPort,
             protocol: 'http',
-            query,
+            path: row.agentType === 'copaw' ? undefined : '/',
+            hash: row.agentType === 'copaw' ? undefined : `token=${row.token}`,
         });
     }
 };

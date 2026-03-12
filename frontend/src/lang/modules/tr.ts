@@ -696,7 +696,7 @@ const message = {
             token: 'Token',
             manualModel: 'Manuel giriş',
             verified: 'Doğrulandı',
-            verifySkipped: 'Atlandı',
+            verifySkipped: 'Doğrulama yok',
             configTitle: 'Configuration',
             settingsTab: 'Settings',
             securityTab: 'Security',
