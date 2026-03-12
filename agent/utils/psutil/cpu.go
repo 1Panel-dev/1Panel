@@ -127,7 +127,6 @@ func (c *CPUUsageState) GetCPUUsage() (float64, []float64, []float64) {
 	}
 
 	c.cachedTotalUsage = totalUsage
-	c.cachedPerCore = c.cachedPerCore
 	c.cachedDetailedPercent = detailedPercent
 	c.lastTotalStat = &curTotal
 	c.lastDetailStat = &curDetail

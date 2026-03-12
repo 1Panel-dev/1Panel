@@ -3,6 +3,12 @@ package service
 import (
 	"encoding/json"
 	"fmt"
+	"math"
+	"sort"
+	"strconv"
+	"strings"
+	"time"
+
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
@@ -18,11 +24,6 @@ import (
 	"github.com/shirou/gopsutil/v4/load"
 	"github.com/shirou/gopsutil/v4/mem"
 	"github.com/shirou/gopsutil/v4/net"
-	"math"
-	"sort"
-	"strconv"
-	"strings"
-	"time"
 )
 
 const (
@@ -423,25 +424,19 @@ func loadDiskUsage(alert dto.AlertDTO) {
 	}
 	if isAlertDue(newDate) {
 		if strings.Contains(alert.Project, "all") {
-			err = processAllDisks(alert)
+			_ = processAllDisks(alert)
 		} else {
-			err = processSingleDisk(alert)
+			_ = processSingleDisk(alert)
 		}
 	}
 }
 
 func loadPanelLogin(alert dto.AlertDTO) {
 	count, isAlert, err := alertUtil.CountRecentFailedLoginLogs(alert.Cycle, alert.Count)
-	alertType := alert.Type
-	quota := strconv.Itoa(count)
-	quotaType := strconv.Itoa(int(alert.Cycle))
 	if err != nil {
 		global.LOG.Errorf("Failed to count recent failed login logs: %v", err)
 	}
 	if isAlert {
-		alertType = "panelLogin"
-		quota = strconv.Itoa(count)
-		quotaType = "panelLogin"
 		params := []dto.Param{
 			{
 				Index: "1",
@@ -454,7 +449,7 @@ func loadPanelLogin(alert dto.AlertDTO) {
 				Value: "",
 			},
 		}
-		sendAlerts(alert, alertType, quota, quotaType, params)
+		sendAlerts(alert, "panelLogin", strconv.Itoa(count), "panelLogin", params)
 	}
 
 	whitelist := strings.Split(strings.TrimSpace(alert.AdvancedParams), "\n")
@@ -463,15 +458,13 @@ func loadPanelLogin(alert dto.AlertDTO) {
 		global.LOG.Errorf("Failed to check recent failed ip login logs: %v", err)
 	}
 	if len(records) > 0 {
-		quota = strings.Join(func() []string {
+		quota := strings.Join(func() []string {
 			var ips []string
 			for _, r := range records {
 				ips = append(ips, r.IP)
 			}
 			return ips
 		}(), "\n")
-		alertType = "panelIpLogin"
-		quotaType = "panelIpLogin"
 		params := []dto.Param{
 			{
 				Index: "1",
@@ -484,22 +477,16 @@ func loadPanelLogin(alert dto.AlertDTO) {
 				Value: " IP ",
 			},
 		}
-		sendAlerts(alert, alertType, quota, quotaType, params)
+		sendAlerts(alert, "panelIpLogin", quota, "panelIpLogin", params)
 	}
 }
 
 func loadSSHLogin(alert dto.AlertDTO) {
 	count, isAlert, err := alertUtil.CountRecentFailedSSHLog(alert.Cycle, alert.Count)
-	alertType := alert.Type
-	quota := strconv.Itoa(count)
-	quotaType := strconv.Itoa(int(alert.Cycle))
 	if err != nil {
 		global.LOG.Errorf("Failed to count recent failed ssh login logs: %v", err)
 	}
 	if isAlert {
-		alertType = "sshLogin"
-		quota = strconv.Itoa(count)
-		quotaType = "sshLogin"
 		params := []dto.Param{
 			{
 				Index: "1",
@@ -512,7 +499,7 @@ func loadSSHLogin(alert dto.AlertDTO) {
 				Value: "",
 			},
 		}
-		sendAlerts(alert, alertType, quota, quotaType, params)
+		sendAlerts(alert, "sshLogin", strconv.Itoa(count), "sshLogin", params)
 	}
 	whitelist := strings.Split(strings.TrimSpace(alert.AdvancedParams), "\n")
 	records, err := alertUtil.FindRecentSuccessLoginNotInWhitelist(30, whitelist)
@@ -520,9 +507,7 @@ func loadSSHLogin(alert dto.AlertDTO) {
 		global.LOG.Errorf("Failed to check recent failed ip ssh login logs: %v", err)
 	}
 	if len(records) > 0 {
-		quota = strings.Join(records, "\n")
-		alertType = "sshIpLogin"
-		quotaType = "sshIpLogin"
+		quota := strings.Join(records, "\n")
 		params := []dto.Param{
 			{
 				Index: "1",
@@ -535,7 +520,7 @@ func loadSSHLogin(alert dto.AlertDTO) {
 				Value: " IP ",
 			},
 		}
-		sendAlerts(alert, alertType, quota, quotaType, params)
+		sendAlerts(alert, "sshIpLogin", quota, "sshIpLogin", params)
 	}
 }
 
@@ -894,7 +879,7 @@ func processAllDisks(alert dto.AlertDTO) error {
 		if err != nil {
 			errMsg := fmt.Sprintf("disk path %s process failed: %v", item.Path, err)
 			errMsgs = append(errMsgs, errMsg)
-			global.LOG.Errorf(errMsg)
+			global.LOG.Errorf("%s", errMsg)
 			continue
 		}
 	}
@@ -907,7 +892,7 @@ func processAllDisks(alert dto.AlertDTO) error {
 func processSingleDisk(alert dto.AlertDTO) error {
 	err := checkAndCreateDiskAlert(alert, alert.Project)
 	if err != nil {
-		global.LOG.Errorf(err.Error())
+		global.LOG.Errorf("%s", err.Error())
 		return err
 	}
 	return nil

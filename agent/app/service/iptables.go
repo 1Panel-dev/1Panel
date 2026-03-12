@@ -289,11 +289,11 @@ func (s *IptablesService) LoadChainStatus(req dto.OperationWithName) dto.Iptable
 	}
 	switch req.Name {
 	case iptables.Chain1PanelBasic:
-		data.IsBind, err = iptables.CheckChainBind(iptables.FilterTab, iptables.ChainInput, req.Name)
+		data.IsBind, _ = iptables.CheckChainBind(iptables.FilterTab, iptables.ChainInput, req.Name)
 	case iptables.Chain1PanelInput:
-		data.IsBind, err = iptables.CheckChainBind(iptables.FilterTab, iptables.ChainInput, req.Name)
+		data.IsBind, _ = iptables.CheckChainBind(iptables.FilterTab, iptables.ChainInput, req.Name)
 	case iptables.Chain1PanelOutput:
-		data.IsBind, err = iptables.CheckChainBind(iptables.FilterTab, iptables.ChainOutput, req.Name)
+		data.IsBind, _ = iptables.CheckChainBind(iptables.FilterTab, iptables.ChainOutput, req.Name)
 	}
 	return data
 }

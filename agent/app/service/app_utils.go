@@ -33,7 +33,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/compose"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
-	composeV2 "github.com/1Panel-dev/1Panel/agent/utils/docker"
 	"github.com/1Panel-dev/1Panel/agent/utils/env"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/1Panel-dev/1Panel/agent/utils/nginx"
@@ -363,7 +362,7 @@ func deleteAppInstall(deleteReq request.AppInstallDelete) error {
 				if err != nil {
 					return err
 				}
-				images, err := composeV2.GetImagesFromDockerCompose(content, []byte(install.DockerCompose))
+				images, err := docker.GetImagesFromDockerCompose(content, []byte(install.DockerCompose))
 				if err != nil {
 					return err
 				}
@@ -752,7 +751,7 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 			if req.DockerCompose != "" {
 				composeContent = []byte(req.DockerCompose)
 			}
-			images, err := composeV2.GetImagesFromDockerCompose(content, composeContent)
+			images, err := docker.GetImagesFromDockerCompose(content, composeContent)
 			if err != nil {
 				return err
 			}
@@ -911,7 +910,7 @@ func getContainerNames(install model.AppInstall) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	project, err := composeV2.GetComposeProject(install.Name, install.GetPath(), []byte(install.DockerCompose), []byte(envStr), true)
+	project, err := docker.GetComposeProject(install.Name, install.GetPath(), []byte(install.DockerCompose), []byte(envStr), true)
 	if err != nil {
 		return nil, err
 	}
@@ -1133,7 +1132,7 @@ func runScript(task *task.Task, appInstall *model.AppInstall, operate string) er
 }
 
 func checkContainerNameIsExist(containerName, appDir string) (bool, error) {
-	client, err := composeV2.NewDockerClient()
+	client, err := docker.NewDockerClient()
 	if err != nil {
 		return false, err
 	}
@@ -1169,7 +1168,7 @@ func upApp(task *task.Task, appInstall *model.AppInstall, pullImages bool) error
 			if err != nil {
 				return err
 			}
-			images, err := composeV2.GetImagesFromDockerCompose(envByte, []byte(appInstall.DockerCompose))
+			images, err := docker.GetImagesFromDockerCompose(envByte, []byte(appInstall.DockerCompose))
 			if err != nil {
 				return err
 			}
