@@ -4,6 +4,7 @@ import "time"
 
 type DashboardBase struct {
 	WebsiteNumber      int `json:"websiteNumber"`
+	AgentNumber        int `json:"agentNumber"`
 	DatabaseNumber     int `json:"databaseNumber"`
 	CronjobNumber      int `json:"cronjobNumber"`
 	AppInstalledNumber int `json:"appInstalledNumber"`
