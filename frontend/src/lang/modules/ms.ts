@@ -952,11 +952,14 @@ const message = {
         sameImageHelper: 'Kontena yang menggunakan imej sama boleh dinaik taraf secara berkumpulan setelah dipilih',
         targetImage: 'Imej sasaran',
         imageLoadErr: 'Tiada nama imej dikesan untuk kontena',
+        imageUpdateTagEmpty: 'Tiada tag imej yang boleh dikemas kini dikesan',
         appHelper:
             'Kontena berasal dari gedung aplikasi, dan peningkatan boleh menyebabkan perkhidmatan tidak tersedia.',
         input: 'Input manual',
         forcePull: 'Tarik imej sentiasa ',
         forcePullHelper: 'Ini akan mengabaikan imej sedia ada di pelayan dan menarik imej terkini dari pendaftaran.',
+        imageUpdateHelper:
+            'Semak tag yang sama di registry, jika ada kemas kini barulah tarik dan kemas kini imej tempatan.',
         server: 'Hos',
         serverExample: '80, 80-88, ip:80 atau ip:80-88',
         containerExample: '80 atau 80-88',
