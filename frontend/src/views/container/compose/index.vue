@@ -12,6 +12,9 @@
                 <el-button type="primary" @click="onOpenDialog()">
                     {{ $t('commons.button.create') }}
                 </el-button>
+                <el-button type="primary" plain @click="onImportCompose()">
+                    {{ $t('commons.button.import') }}
+                </el-button>
             </template>
             <template #rightToolBar>
                 <TableSearch @search="search()" v-model:searchName="searchName" />
@@ -68,11 +71,44 @@
                                                 </el-text>
                                             </div>
                                             <div class="compose-actions">
+                                                <el-dropdown placement="bottom">
+                                                    <Status
+                                                        v-if="row.containerCount === row.runningCount"
+                                                        status="running"
+                                                        :operate="true"
+                                                    />
+                                                    <Status
+                                                        v-if="row.runningCount === 0"
+                                                        status="exited"
+                                                        :operate="true"
+                                                    />
+                                                    <template #dropdown>
+                                                        <el-dropdown-menu>
+                                                            <el-dropdown-item
+                                                                :disabled="row.containerCount === row.runningCount"
+                                                                @click="handleComposeOperate('up', row)"
+                                                            >
+                                                                {{ $t('commons.operate.start') }}
+                                                            </el-dropdown-item>
+                                                            <el-dropdown-item
+                                                                :disabled="row.runningCount === 0"
+                                                                @click="handleComposeOperate('stop', row)"
+                                                            >
+                                                                {{ $t('commons.operate.stop') }}
+                                                            </el-dropdown-item>
+                                                            <el-dropdown-item
+                                                                @click="handleComposeOperate('restart', row)"
+                                                            >
+                                                                {{ $t('commons.button.restart') }}
+                                                            </el-dropdown-item>
+                                                        </el-dropdown-menu>
+                                                    </template>
+                                                </el-dropdown>
                                                 <el-button
                                                     plain
                                                     round
                                                     size="small"
-                                                    class="round-btn"
+                                                    class="round-btn ml-3"
                                                     :disabled="!row?.workdir"
                                                     @click="openComposeFolder(row)"
                                                 >
@@ -83,27 +119,9 @@
                                                     round
                                                     size="small"
                                                     class="round-btn"
-                                                    @click="handleComposeOperate('up', row)"
+                                                    @click="onBackupList(row)"
                                                 >
-                                                    {{ $t('commons.operate.start') }}
-                                                </el-button>
-                                                <el-button
-                                                    plain
-                                                    round
-                                                    size="small"
-                                                    class="round-btn"
-                                                    @click="handleComposeOperate('stop', row)"
-                                                >
-                                                    {{ $t('commons.operate.stop') }}
-                                                </el-button>
-                                                <el-button
-                                                    plain
-                                                    round
-                                                    size="small"
-                                                    class="round-btn"
-                                                    @click="handleComposeOperate('restart', row)"
-                                                >
-                                                    {{ $t('commons.operate.restart') }}
+                                                    {{ $t('commons.button.backup') }}
                                                 </el-button>
                                                 <el-button
                                                     plain
@@ -422,6 +440,8 @@
         <ContainerInspectDialog ref="containerInspectRef" />
         <TerminalDialog ref="terminalDialogRef" />
         <ContainerLogDialog ref="containerLogDialogRef" :highlightDiff="210" />
+        <Backups ref="dialogBackupRef" />
+        <Uploads ref="uploadRef" @close="search(true)" />
     </div>
 </template>
 
@@ -435,6 +455,8 @@ import ContainerInspectDialog from '@/views/container/container/inspect/index.vu
 import TerminalDialog from '@/views/container/container/terminal/index.vue';
 import ContainerLogDialog from '@/components/log/container-drawer/index.vue';
 import DeleteDialog from '@/views/container/compose/delete/index.vue';
+import Backups from '@/components/backup/index.vue';
+import Uploads from '@/components/upload/index.vue';
 import {
     composeOperate,
     composeUpdate,
@@ -456,6 +478,9 @@ import { computeCPU, computeSize2, computeSizeForDocker, newUUID } from '@/utils
 import { Rules } from '@/global/form-rules';
 import { loadBaseDir } from '@/api/modules/setting';
 import { ElCheckbox, ElForm } from 'element-plus';
+import { GlobalStore } from '@/store';
+
+const globalStore = GlobalStore();
 
 const data = ref<any[]>([]);
 const loading = ref(false);
@@ -469,6 +494,8 @@ const dialogDelRef = ref();
 const containerInspectRef = ref();
 const terminalDialogRef = ref();
 const containerLogDialogRef = ref();
+const dialogBackupRef = ref();
+const uploadRef = ref();
 
 const searchName = ref('');
 const showType = ref('compose');
@@ -698,6 +725,26 @@ const onDelete = (row: any) => {
     dialogDelRef.value.acceptParams({
         name: row.name,
         path: row.path,
+    });
+};
+
+const onBackupList = (row: Container.ComposeInfo) => {
+    dialogBackupRef.value?.acceptParams({
+        type: 'compose',
+        name: row.name,
+        detailName: '',
+        status: 'running',
+        node: globalStore.currentNode,
+    });
+};
+
+const onImportCompose = () => {
+    uploadRef.value?.acceptParams({
+        type: 'compose',
+        name: '',
+        detailName: '',
+        remark: '.tar.gz',
+        node: globalStore.currentNode,
     });
 };
 

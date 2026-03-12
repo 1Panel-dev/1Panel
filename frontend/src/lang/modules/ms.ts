@@ -846,6 +846,12 @@ const message = {
     },
     container: {
         createByCommand: 'Cipta melalui perintah',
+        importContainerBackupTip: 'Import fail sandaran kontena, hanya format .tar.gz disokong',
+        importComposeBackupTip: 'Import fail sandaran compose, hanya format .tar.gz disokong',
+        stopContainerBeforeBackup: 'Hentikan kontena sebelum sandaran',
+        stopComposeBeforeBackup: 'Hentikan compose sebelum sandaran',
+        stopBeforeBackupHelper:
+            'Apabila diaktifkan, kontena atau perkhidmatan compose akan dihentikan sebelum sandaran dan dipulihkan secara automatik selepas selesai untuk memastikan ketekalan data.',
         commandInput: 'Input perintah',
         commandRule: 'Sila masukkan arahan docker run yang sah untuk mencipta kontena.',
         commandHelper: 'Arahan ini akan dijalankan pada pelayan untuk mencipta kontena. Teruskan?',

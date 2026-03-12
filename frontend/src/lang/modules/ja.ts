@@ -838,6 +838,12 @@ const message = {
     },
     container: {
         createByCommand: 'コマンドで作成',
+        importContainerBackupTip: 'コンテナバックアップファイルをインポートします。.tar.gz のみ対応です',
+        importComposeBackupTip: 'Compose バックアップファイルをインポートします。.tar.gz のみ対応です',
+        stopContainerBeforeBackup: 'バックアップ前にコンテナを停止',
+        stopComposeBeforeBackup: 'バックアップ前に Compose を停止',
+        stopBeforeBackupHelper:
+            '有効にすると、バックアップ前にコンテナまたは Compose サービスを停止し、完了後に自動で復元してデータ整合性を確保します。',
         commandInput: 'コマンド入力',
         commandRule: 'コンテナ作成用の正しい docker run コマンドを入力してください。',
         commandHelper: 'このコマンドはサーバー上で実行され、コンテナを作成します。続行しますか？',

@@ -27,7 +27,11 @@
                 style="width: 100%"
             >
                 <template #toolbar>
-                    <el-button type="primary" :disabled="status && status != 'Running'" @click="onBackup()">
+                    <el-button
+                        type="primary"
+                        :disabled="status && status.toLowerCase() != 'running'"
+                        @click="onBackup()"
+                    >
                         {{ $t('commons.button.backup') }}
                     </el-button>
                     <el-button type="primary" plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
@@ -106,6 +110,16 @@
             {{ $t('commons.msg.' + (isBackup ? 'backupHelper' : 'recoverHelper'), [name + '( ' + detailName + ' )']) }}
         </el-alert>
         <el-form class="mt-5" ref="backupForm" @submit.prevent label-position="top" v-loading="loading">
+            <el-form-item v-if="isBackup && (type === 'container' || type === 'compose')">
+                <el-checkbox v-model="stopBefore">
+                    {{
+                        type === 'container'
+                            ? $t('container.stopContainerBeforeBackup')
+                            : $t('container.stopComposeBeforeBackup')
+                    }}
+                </el-checkbox>
+                <span class="input-help">{{ $t('container.stopBeforeBackupHelper') }}</span>
+            </el-form-item>
             <el-form-item :label="$t('setting.compressPassword')">
                 <el-input v-model="secret" :placeholder="$t('setting.backupRecoverMessage')" />
             </el-form-item>
@@ -213,6 +227,7 @@ const description = ref();
 const timeoutItem = ref(30);
 const timeoutUnit = ref('m');
 const node = ref();
+const stopBefore = ref(false);
 
 const open = ref();
 const isBackup = ref();
@@ -324,6 +339,7 @@ const backup = async () => {
         taskID: taskID,
         description: description.value,
         args: args.value,
+        stopBefore: stopBefore.value,
     };
     loading.value = true;
     await handleBackup(params, node.value)
@@ -366,6 +382,7 @@ const onBackup = async () => {
     description.value = '';
     secret.value = '';
     args.value = [];
+    stopBefore.value = false;
     isBackup.value = true;
     open.value = true;
 };

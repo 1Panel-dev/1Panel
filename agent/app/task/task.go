@@ -275,7 +275,8 @@ func (t *Task) Execute() error {
 	}
 	var err error
 	t.Log(i18n.GetWithName("TaskStart", t.Name))
-	for _, subTask := range t.SubTasks {
+	for i := 0; i < len(t.SubTasks); i++ {
+		subTask := t.SubTasks[i]
 		t.Task.CurrentStep = subTask.StepAlias
 		t.updateTask(t.Task)
 		if err = subTask.Execute(); err == nil {

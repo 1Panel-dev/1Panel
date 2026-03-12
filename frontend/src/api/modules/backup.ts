@@ -52,8 +52,9 @@ export const handleRecover = (params: Backup.Recover, node?: string) => {
     const query = node ? `?operateNode=${node}` : '';
     return http.post(`/backups/recover${query}`, params, TimeoutEnum.T_10M);
 };
-export const handleRecoverByUpload = (params: Backup.Recover) => {
-    return http.post(`/backups/recover/byupload`, params, TimeoutEnum.T_10M);
+export const handleRecoverByUpload = (params: Backup.Recover, node?: string) => {
+    const query = node ? `?operateNode=${node}` : '';
+    return http.post(`/backups/recover/byupload${query}`, params, TimeoutEnum.T_10M);
 };
 export const downloadBackupRecord = (params: Backup.RecordDownload, node?: string) => {
     const query = node ? `?operateNode=${node}` : '';
@@ -67,8 +68,9 @@ export const updateRecordDescription = (id: Number, description: String, node?: 
     const query = node ? `?operateNode=${node}` : '';
     return http.post(`/backups/record/description/update${query}`, { id: id, description: description });
 };
-export const uploadByRecover = (filePath: string, targetDir: String) => {
-    return http.post(`/backups/upload`, { filePath: filePath, targetDir: targetDir });
+export const uploadByRecover = (filePath: string, targetDir: String, node?: string) => {
+    const query = node ? `?operateNode=${node}` : '';
+    return http.post(`/backups/upload${query}`, { filePath: filePath, targetDir: targetDir });
 };
 export const searchBackupRecords = (params: Backup.SearchBackupRecord, node?: string) => {
     const query = node ? `?operateNode=${node}` : '';

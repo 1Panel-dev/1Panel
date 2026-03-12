@@ -60,8 +60,9 @@ export const listAppNodes = () => {
 };
 
 // agent
-export const loadBaseDir = () => {
-    return http.get<string>(`/settings/basedir`);
+export const loadBaseDir = (node?: string) => {
+    const query = node ? `?operateNode=${node}` : '';
+    return http.get<string>(`/settings/basedir${query}`);
 };
 export const loadDaemonJsonPath = () => {
     return http.get<string>(`/settings/daemonjson`, {});

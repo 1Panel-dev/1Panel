@@ -799,6 +799,12 @@ const message = {
     },
     container: {
         createByCommand: '指令建立',
+        importContainerBackupTip: '匯入容器備份檔案，僅支援 .tar.gz 格式',
+        importComposeBackupTip: '匯入編排備份檔案，僅支援 .tar.gz 格式',
+        stopContainerBeforeBackup: '備份前停止容器',
+        stopComposeBeforeBackup: '備份前停止編排',
+        stopBeforeBackupHelper:
+            '啟用後備份前將停止容器或編排服務，完成後自動恢復，以確保資料一致性',
         commandInput: '指令輸入',
         commandRule: '請輸入正確的 docker run 容器建立指令',
         commandHelper: '將在伺服器上執行該條指令以建立容器，是否繼續？',
