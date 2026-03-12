@@ -361,6 +361,9 @@ func (u *DashboardService) LoadQuickOptions() []dto.QuickJump {
 		_ = copier.Copy(&item, &quick)
 		list = append(list, item)
 	}
+	sort.Slice(list, func(i, j int) bool {
+		return list[i].Recommend < list[j].Recommend
+	})
 	return list
 }
 func (u *DashboardService) ChangeQuick(req dto.ChangeQuicks) error {
@@ -612,6 +615,9 @@ func loadQuickJump(base *dto.DashboardBase) {
 	website, _ := websiteRepo.GetBy()
 	base.WebsiteNumber = len(website)
 
+	agents, _ := agentRepo.List()
+	base.AgentNumber = len(agents)
+
 	postgresqlDbs, _ := postgresqlRepo.List()
 	mysqlDbs, _ := mysqlRepo.List()
 	base.DatabaseNumber = len(mysqlDbs) + len(postgresqlDbs)
@@ -625,6 +631,8 @@ func loadQuickJump(base *dto.DashboardBase) {
 	quicks := launcherRepo.ListQuickJump(false)
 	for i := 0; i < len(quicks); i++ {
 		switch quicks[i].Name {
+		case "Agent":
+			quicks[i].Detail = fmt.Sprintf("%d", base.AgentNumber)
 		case "Website":
 			quicks[i].Detail = fmt.Sprintf("%d", base.WebsiteNumber)
 		case "Database":
@@ -638,7 +646,7 @@ func loadQuickJump(base *dto.DashboardBase) {
 		_ = copier.Copy(&item, quicks[i])
 		base.QuickJumps = append(base.QuickJumps, item)
 	}
-	sort.Slice(quicks, func(i, j int) bool {
-		return quicks[i].Recommend < quicks[j].Recommend
+	sort.Slice(base.QuickJumps, func(i, j int) bool {
+		return base.QuickJumps[i].Recommend < base.QuickJumps[j].Recommend
 	})
 }
