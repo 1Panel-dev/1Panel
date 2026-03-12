@@ -384,7 +384,7 @@ func (a AgentService) UpdateModelConfig(req dto.AgentModelConfigUpdateReq) error
 	if modelName == "" {
 		return buserr.New("ErrAgentProviderMismatch")
 	}
-	if provider != "custom" && provider != "vllm" && !strings.HasPrefix(modelName, provider+"/") {
+	if provider != "custom" && provider != "vllm" && !modelMatchesProvider(provider, modelName) {
 		return buserr.New("ErrAgentProviderMismatch")
 	}
 	baseURL := strings.TrimSpace(account.BaseURL)
@@ -1948,6 +1948,20 @@ func normalizeAgentType(agentType string) string {
 		return constant.AppOpenclaw
 	}
 	return trim
+}
+
+func modelMatchesProvider(provider, modelName string) bool {
+	prefix := providerModelPrefix(provider)
+	return prefix != "" && strings.HasPrefix(strings.TrimSpace(modelName), prefix+"/")
+}
+
+func providerModelPrefix(provider string) string {
+	switch strings.ToLower(strings.TrimSpace(provider)) {
+	case "gemini":
+		return "google"
+	default:
+		return strings.ToLower(strings.TrimSpace(provider))
+	}
 }
 
 func isSupportedAgentType(agentType string) bool {

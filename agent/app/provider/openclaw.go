@@ -24,6 +24,8 @@ func BuildOpenClawPatch(provider, modelName, apiType string, maxTokens, contextW
 	switch provider {
 	case "deepseek":
 		return buildDeepseekPatch(modelName, baseURL, apiKey), nil
+	case "gemini":
+		return buildGeminiPatch(modelName), nil
 	case "moonshot", "kimi":
 		return buildMoonshotPatch(provider, modelName, modelID, baseURL, apiKey), nil
 	case "bailian-coding-plan":
@@ -43,6 +45,10 @@ func BuildOpenClawPatch(provider, modelName, apiType string, maxTokens, contextW
 	default:
 		return buildGenericPatch(provider, modelName, modelID, apiType, maxTokens, contextWindow, baseURL, apiKey), nil
 	}
+}
+
+func buildGeminiPatch(modelName string) *OpenClawPatch {
+	return &OpenClawPatch{PrimaryModel: modelName}
 }
 
 func buildDeepseekPatch(modelName, baseURL, apiKey string) *OpenClawPatch {

@@ -69,11 +69,21 @@ func BuildVerifyRequest(provider, baseURL, apiKey string) VerifyRequest {
 			request.URL = base + "/v1/models"
 		}
 	case "gemini":
+		request.Method = http.MethodPost
 		if strings.Contains(base, "/v1beta") {
-			request.URL = fmt.Sprintf("%s/models?key=%s", base, apiKey)
+			request.URL = base + "/models/gemini-3-flash-preview:generateContent"
 		} else {
-			request.URL = fmt.Sprintf("%s/v1beta/models?key=%s", base, apiKey)
+			request.URL = base + "/v1beta/models/gemini-3-flash-preview:generateContent"
 		}
+		headers["x-goog-api-key"] = apiKey
+		headers["Content-Type"] = "application/json"
+		request.Body = mustJSON(map[string]interface{}{
+			"contents": []map[string]interface{}{{
+				"parts": []map[string]string{{
+					"text": "Explain how AI works in a few words",
+				}},
+			}},
+		})
 	case "zai":
 		headers["Authorization"] = fmt.Sprintf("Bearer %s", apiKey)
 		request.URL = base + "/models"
