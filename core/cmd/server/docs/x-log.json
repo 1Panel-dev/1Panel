@@ -368,6 +368,36 @@
 		"formatZH": "docker 服务 [operation]",
 		"formatEN": "[operation] docker service"
 	},
+	"/containers/files/del": {
+		"bodyKeys": [
+			"containerID",
+			"paths"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "删除容器 [containerID] 文件 [paths]",
+		"formatEN": "Delete files [paths] in container [containerID]"
+	},
+	"/containers/files/download": {
+		"bodyKeys": [
+			"containerID",
+			"path"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "下载容器 [containerID] 文件 [path]",
+		"formatEN": "Download file [path] from container [containerID]"
+	},
+	"/containers/files/upload": {
+		"bodyKeys": [
+			"containerID",
+			"path"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "容器 [containerID] 上传文件到 [path]",
+		"formatEN": "Upload file to [path] in container [containerID]"
+	},
 	"/containers/image/build": {
 		"bodyKeys": [
 			"name"

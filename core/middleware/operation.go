@@ -100,6 +100,7 @@ func OperationLog() gin.HandlerFunc {
 		writer := responseBodyWriter{
 			ResponseWriter: c.Writer,
 			body:           &bytes.Buffer{},
+			captureBody:    shouldCaptureResponseBody(c.Request.URL.Path),
 		}
 		c.Writer = &writer
 		now := time.Now()
@@ -143,12 +144,24 @@ func OperationLog() gin.HandlerFunc {
 			datas, _ = io.ReadAll(reader)
 		}
 		var res response
-		_ = json.Unmarshal(datas, &res)
-		if res.Code == 200 {
-			record.Status = constant.StatusSuccess
+		contentType := strings.ToLower(c.Writer.Header().Get("Content-Type"))
+		isJSONResponse := strings.Contains(contentType, "application/json")
+		if isJSONResponse {
+			_ = json.Unmarshal(datas, &res)
+			if res.Code == 200 {
+				record.Status = constant.StatusSuccess
+			} else {
+				record.Status = constant.StatusFailed
+				record.Message = res.Message
+			}
 		} else {
-			record.Status = constant.StatusFailed
-			record.Message = res.Message
+			statusCode := c.Writer.Status()
+			if statusCode >= 200 && statusCode < 400 {
+				record.Status = constant.StatusSuccess
+			} else {
+				record.Status = constant.StatusFailed
+				record.Message = http.StatusText(statusCode)
+			}
 		}
 
 		latency := time.Since(now)
@@ -211,6 +224,7 @@ type responseBodyWriter struct {
 	gin.ResponseWriter
 	body           *bytes.Buffer
 	resolvedHeader string
+	captureBody    bool
 }
 
 func (r *responseBodyWriter) sanitizeResolvedHeader() {
@@ -232,8 +246,18 @@ func (r *responseBodyWriter) WriteHeaderNow() {
 
 func (r *responseBodyWriter) Write(b []byte) (int, error) {
 	r.sanitizeResolvedHeader()
-	r.body.Write(b)
+	if r.captureBody {
+		r.body.Write(b)
+	}
 	return r.ResponseWriter.Write(b)
+}
+
+func shouldCaptureResponseBody(reqPath string) bool {
+	reqPath = strings.ToLower(reqPath)
+	if strings.Contains(reqPath, "download") {
+		return false
+	}
+	return true
 }
 
 func loadLogInfo(path string) string {

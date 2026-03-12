@@ -35,6 +35,12 @@ func (s *ContainerRouter) InitRouter(Router *gin.RouterGroup) {
 		baRouter.POST("/prune", baseApi.ContainerPrune)
 
 		baRouter.POST("/users", baseApi.LoadContainerUsers)
+		baRouter.POST("/files/search", baseApi.ListContainerFiles)
+		baRouter.POST("/files/upload", baseApi.UploadContainerFile)
+		baRouter.POST("/files/content", baseApi.GetContainerFileContent)
+		baRouter.POST("/files/size", baseApi.GetContainerFileSize)
+		baRouter.POST("/files/del", baseApi.DeleteContainerFile)
+		baRouter.POST("/files/download", baseApi.DownloadContainerFile)
 
 		baRouter.GET("/repo", baseApi.ListRepo)
 		baRouter.POST("/repo/status", baseApi.CheckRepoStatus)
