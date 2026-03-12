@@ -1,7 +1,9 @@
 package service
 
 import (
+	"archive/tar"
 	"bufio"
+	"bytes"
 	"context"
 	"encoding/base64"
 	"encoding/json"
@@ -11,6 +13,7 @@ import (
 	"net/url"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 	"sort"
 	"strconv"
@@ -40,6 +43,7 @@ import (
 	"github.com/docker/docker/api/types/registry"
 	"github.com/docker/docker/api/types/volume"
 	"github.com/docker/docker/client"
+	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/docker/go-connections/nat"
 	"github.com/gin-gonic/gin"
 	v1 "github.com/opencontainers/image-spec/specs-go/v1"
@@ -89,6 +93,12 @@ type IContainerService interface {
 	Prune(req dto.ContainerPrune) error
 
 	LoadUsers(req dto.OperationWithName) []string
+	ListContainerFiles(req dto.ContainerFileReq) ([]dto.ContainerFileInfo, error)
+	UploadContainerFile(req dto.ContainerFileReq, fileName string, fileSize int64, file io.Reader) error
+	GetContainerFileContent(req dto.ContainerFileReq) (*dto.ContainerFileContent, error)
+	GetContainerFileSize(req dto.ContainerFileReq) (int64, error)
+	DeleteContainerFile(req dto.ContainerFileBatchDeleteReq) error
+	DownloadContainerFile(req dto.ContainerFileReq) (io.ReadCloser, string, string, error)
 
 	StreamLogs(ctx *gin.Context, params dto.StreamLog)
 }
@@ -1164,6 +1174,444 @@ func (u *ContainerService) LoadUsers(req dto.OperationWithName) []string {
 		}
 	}
 	return users
+}
+
+func (u *ContainerService) ListContainerFiles(req dto.ContainerFileReq) ([]dto.ContainerFileInfo, error) {
+	if len(req.Path) == 0 {
+		req.Path = "/"
+	}
+	cli, err := docker.NewDockerClient()
+	if err != nil {
+		return nil, err
+	}
+	defer cli.Close()
+
+	ctx := context.Background()
+	stat, err := cli.ContainerStatPath(ctx, req.ContainerID, req.Path)
+	if err != nil {
+		return nil, err
+	}
+	isDir := stat.Mode.IsDir()
+	isLink := stat.Mode&os.ModeSymlink != 0
+	if isLink && !isDir {
+		linkDir, linkErr := isContainerDir(cli, req.ContainerID, req.Path)
+		if linkErr == nil {
+			isDir = linkDir
+		}
+	}
+	if !isDir {
+		return []dto.ContainerFileInfo{toContainerFileInfo(req.Path, stat, isDir)}, nil
+	}
+
+	output, err := runContainerCommand(cli, req.ContainerID, []string{"ls", "-1A", "--", req.Path})
+	if err != nil {
+		return nil, err
+	}
+	lines := strings.Split(strings.TrimSpace(output), "\n")
+	files := make([]dto.ContainerFileInfo, 0, len(lines))
+	for _, line := range lines {
+		name := strings.TrimSpace(line)
+		if len(name) == 0 || name == "." || name == ".." {
+			continue
+		}
+		childPath := req.Path
+		if childPath == "/" {
+			childPath = "/" + name
+		} else {
+			childPath = strings.TrimSuffix(childPath, "/") + "/" + name
+		}
+		childStat, statErr := cli.ContainerStatPath(ctx, req.ContainerID, childPath)
+		if statErr != nil {
+			continue
+		}
+		childIsDir := childStat.Mode.IsDir()
+		if childStat.Mode&os.ModeSymlink != 0 && !childIsDir {
+			linkDir, linkErr := isContainerDir(cli, req.ContainerID, childPath)
+			if linkErr == nil {
+				childIsDir = linkDir
+			}
+		}
+		files = append(files, toContainerFileInfo(childPath, childStat, childIsDir))
+	}
+	sort.Slice(files, func(i, j int) bool {
+		if files[i].IsDir != files[j].IsDir {
+			return files[i].IsDir
+		}
+		return strings.ToLower(files[i].Name) < strings.ToLower(files[j].Name)
+	})
+	return files, nil
+}
+
+func (u *ContainerService) DeleteContainerFile(req dto.ContainerFileBatchDeleteReq) error {
+	for _, item := range req.Paths {
+		if strings.TrimSpace(item) == "/" {
+			return buserr.New("ErrPathNotDelete")
+		}
+	}
+	cli, err := docker.NewDockerClient()
+	if err != nil {
+		return err
+	}
+	defer cli.Close()
+
+	command := []string{"rm", "-rf", "--"}
+	command = append(command, req.Paths...)
+	_, err = runContainerCommand(cli, req.ContainerID, command)
+	return err
+}
+
+func (u *ContainerService) UploadContainerFile(req dto.ContainerFileReq, fileName string, fileSize int64, file io.Reader) error {
+	if len(req.Path) == 0 {
+		req.Path = "/"
+	}
+	safeName := path.Base(fileName)
+	if safeName == "." || safeName == "/" || len(safeName) == 0 {
+		return buserr.New("ErrInvalidChar")
+	}
+
+	cli, err := docker.NewDockerClient()
+	if err != nil {
+		return err
+	}
+	defer cli.Close()
+
+	ctx := context.Background()
+	stat, err := cli.ContainerStatPath(ctx, req.ContainerID, req.Path)
+	if err != nil {
+		if _, mkErr := runContainerCommand(cli, req.ContainerID, []string{"mkdir", "-p", "--", req.Path}); mkErr != nil {
+			return mkErr
+		}
+		stat, err = cli.ContainerStatPath(ctx, req.ContainerID, req.Path)
+		if err != nil {
+			return err
+		}
+	}
+	if !stat.Mode.IsDir() {
+		return fmt.Errorf("path %s is not directory", req.Path)
+	}
+
+	pipeReader, pipeWriter := io.Pipe()
+	writeErr := make(chan error, 1)
+	go func() {
+		tw := tar.NewWriter(pipeWriter)
+		header := &tar.Header{
+			Name:    safeName,
+			Mode:    0644,
+			Size:    fileSize,
+			ModTime: time.Now(),
+		}
+		if err := tw.WriteHeader(header); err != nil {
+			_ = tw.Close()
+			_ = pipeWriter.CloseWithError(err)
+			writeErr <- err
+			return
+		}
+		if _, err := io.Copy(tw, file); err != nil {
+			_ = tw.Close()
+			_ = pipeWriter.CloseWithError(err)
+			writeErr <- err
+			return
+		}
+		if err := tw.Close(); err != nil {
+			_ = pipeWriter.CloseWithError(err)
+			writeErr <- err
+			return
+		}
+		_ = pipeWriter.Close()
+		writeErr <- nil
+	}()
+
+	err = cli.CopyToContainer(ctx, req.ContainerID, req.Path, pipeReader, container.CopyToContainerOptions{
+		CopyUIDGID: true,
+	})
+	if err != nil {
+		_ = pipeReader.CloseWithError(err)
+		_ = pipeWriter.CloseWithError(err)
+		<-writeErr
+		return err
+	}
+	if err := <-writeErr; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *ContainerService) GetContainerFileContent(req dto.ContainerFileReq) (*dto.ContainerFileContent, error) {
+	if len(req.Path) == 0 {
+		return nil, buserr.New("ErrInvalidChar")
+	}
+	cli, err := docker.NewDockerClient()
+	if err != nil {
+		return nil, err
+	}
+	defer cli.Close()
+
+	stat, err := cli.ContainerStatPath(context.Background(), req.ContainerID, req.Path)
+	if err != nil {
+		return nil, err
+	}
+	if stat.Mode.IsDir() {
+		return nil, fmt.Errorf("path %s is directory", req.Path)
+	}
+
+	content := &dto.ContainerFileContent{Size: stat.Size}
+	headBytes, err := runContainerCommandRaw(cli, req.ContainerID, []string{"head", "-c", "4096", "--", req.Path})
+	if err != nil {
+		return nil, err
+	}
+	if bytes.IndexByte(headBytes, 0) >= 0 {
+		content.IsBinary = true
+		return content, nil
+	}
+
+	const inlinePreviewMax = 512 * 1024
+	if stat.Size <= inlinePreviewMax {
+		raw, err := runContainerCommandRaw(cli, req.ContainerID, []string{"cat", "--", req.Path})
+		if err != nil {
+			return nil, err
+		}
+		content.Content = string(raw)
+		return content, nil
+	}
+
+	raw, err := runContainerCommandRaw(cli, req.ContainerID, []string{"tail", "-n", "300", "--", req.Path})
+	if err != nil {
+		return nil, err
+	}
+	content.Content = string(raw)
+	content.Truncated = true
+	return content, nil
+}
+
+func (u *ContainerService) GetContainerFileSize(req dto.ContainerFileReq) (int64, error) {
+	if len(req.Path) == 0 {
+		return 0, buserr.New("ErrInvalidChar")
+	}
+	cli, err := docker.NewDockerClient()
+	if err != nil {
+		return 0, err
+	}
+	defer cli.Close()
+
+	stat, err := cli.ContainerStatPath(context.Background(), req.ContainerID, req.Path)
+	if err != nil {
+		return 0, err
+	}
+	if !stat.Mode.IsDir() {
+		return stat.Size, nil
+	}
+	output, err := runContainerCommand(cli, req.ContainerID, []string{"du", "-sb", "--", req.Path})
+	if err != nil {
+		return 0, err
+	}
+	parts := strings.Fields(output)
+	if len(parts) == 0 {
+		return 0, fmt.Errorf("invalid du output")
+	}
+	size, err := strconv.ParseInt(parts[0], 10, 64)
+	if err != nil {
+		return 0, err
+	}
+	return size, nil
+}
+
+func (u *ContainerService) DownloadContainerFile(req dto.ContainerFileReq) (io.ReadCloser, string, string, error) {
+	if len(req.Path) == 0 {
+		req.Path = "/"
+	}
+	cli, err := docker.NewDockerClient()
+	if err != nil {
+		return nil, "", "", err
+	}
+
+	ctx := context.Background()
+	stat, err := cli.ContainerStatPath(ctx, req.ContainerID, req.Path)
+	if err != nil {
+		_ = cli.Close()
+		return nil, "", "", err
+	}
+
+	fileName := stat.Name
+	if len(fileName) == 0 {
+		fileName = "container-file"
+	}
+	if stat.Mode.IsDir() {
+		if _, err := runContainerCommand(cli, req.ContainerID, []string{"sh", "-c", "command -v tar >/dev/null 2>&1"}); err != nil {
+			_ = cli.Close()
+			return nil, "", "", fmt.Errorf("tar command not found in container")
+		}
+
+		targetPath := path.Clean(req.Path)
+		parentPath := path.Dir(targetPath)
+		targetName := path.Base(targetPath)
+		if parentPath == "." || parentPath == "" {
+			parentPath = "/"
+		}
+		tarStream, err := runContainerCommandStream(cli, req.ContainerID, []string{
+			"tar", "-czf", "-", "-C", parentPath, "--", targetName,
+		})
+		if err != nil {
+			_ = cli.Close()
+			return nil, "", "", err
+		}
+		if !strings.HasSuffix(fileName, ".tar.gz") {
+			fileName += ".tar.gz"
+		}
+		return &closeHookReader{
+			ReadCloser: tarStream,
+			onClose:    cli.Close,
+		}, fileName, "application/gzip", nil
+	}
+
+	fileStream, err := runContainerCommandStream(cli, req.ContainerID, []string{"cat", "--", req.Path})
+	if err != nil {
+		_ = cli.Close()
+		return nil, "", "", err
+	}
+	return &closeHookReader{
+		ReadCloser: fileStream,
+		onClose:    cli.Close,
+	}, fileName, "application/octet-stream", nil
+}
+
+func runContainerCommand(cli *client.Client, containerID string, command []string) (string, error) {
+	raw, err := runContainerCommandRaw(cli, containerID, command)
+	if err != nil {
+		return "", err
+	}
+	return strings.TrimSpace(string(raw)), nil
+}
+
+type closeHookReader struct {
+	io.ReadCloser
+	onClose func() error
+}
+
+func (r *closeHookReader) Close() error {
+	var closeErr error
+	if r.ReadCloser != nil {
+		closeErr = r.ReadCloser.Close()
+	}
+	if r.onClose != nil {
+		if err := r.onClose(); err != nil && closeErr == nil {
+			closeErr = err
+		}
+	}
+	return closeErr
+}
+
+func runContainerCommandRaw(cli *client.Client, containerID string, command []string) ([]byte, error) {
+	ctx := context.Background()
+	resp, err := cli.ContainerExecCreate(ctx, containerID, container.ExecOptions{
+		Cmd:          command,
+		AttachStdout: true,
+		AttachStderr: true,
+	})
+	if err != nil {
+		return nil, err
+	}
+	hijack, err := cli.ContainerExecAttach(ctx, resp.ID, container.ExecAttachOptions{})
+	if err != nil {
+		return nil, err
+	}
+	defer hijack.Close()
+
+	raw, err := io.ReadAll(hijack.Reader)
+	if err != nil {
+		return nil, err
+	}
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	if _, err := stdcopy.StdCopy(&stdout, &stderr, bytes.NewReader(raw)); err != nil {
+		return nil, err
+	}
+	output := strings.TrimSpace(stdout.String())
+	errorOutput := strings.TrimSpace(stderr.String())
+	info, err := cli.ContainerExecInspect(ctx, resp.ID)
+	if err != nil {
+		return nil, err
+	}
+	if info.ExitCode != 0 {
+		if len(errorOutput) != 0 {
+			return nil, fmt.Errorf("%s", errorOutput)
+		}
+		if len(output) == 0 {
+			return nil, fmt.Errorf("container command failed with exit code %d", info.ExitCode)
+		}
+		return nil, fmt.Errorf("%s", output)
+	}
+	return stdout.Bytes(), nil
+}
+
+func runContainerCommandStream(cli *client.Client, containerID string, command []string) (io.ReadCloser, error) {
+	ctx := context.Background()
+	resp, err := cli.ContainerExecCreate(ctx, containerID, container.ExecOptions{
+		Cmd:          command,
+		AttachStdout: true,
+		AttachStderr: true,
+	})
+	if err != nil {
+		return nil, err
+	}
+	hijack, err := cli.ContainerExecAttach(ctx, resp.ID, container.ExecAttachOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	pipeReader, pipeWriter := io.Pipe()
+	go func() {
+		defer hijack.Close()
+		var stderr bytes.Buffer
+		_, copyErr := stdcopy.StdCopy(pipeWriter, &stderr, hijack.Reader)
+		if copyErr != nil {
+			_ = pipeWriter.CloseWithError(copyErr)
+			return
+		}
+		info, inspectErr := cli.ContainerExecInspect(ctx, resp.ID)
+		if inspectErr != nil {
+			_ = pipeWriter.CloseWithError(inspectErr)
+			return
+		}
+		if info.ExitCode != 0 {
+			msg := strings.TrimSpace(stderr.String())
+			if len(msg) == 0 {
+				msg = fmt.Sprintf("container command failed with exit code %d", info.ExitCode)
+			}
+			_ = pipeWriter.CloseWithError(fmt.Errorf("%s", msg))
+			return
+		}
+		_ = pipeWriter.Close()
+	}()
+	return pipeReader, nil
+}
+
+func toContainerFileInfo(filePath string, stat container.PathStat, isDir bool) dto.ContainerFileInfo {
+	name := stat.Name
+	if len(name) == 0 {
+		items := strings.Split(strings.TrimSuffix(filePath, "/"), "/")
+		name = items[len(items)-1]
+	}
+	isLink := stat.Mode&os.ModeSymlink != 0
+	return dto.ContainerFileInfo{
+		Name:    name,
+		Path:    filePath,
+		IsDir:   isDir,
+		IsLink:  isLink,
+		LinkTo:  stat.LinkTarget,
+		Size:    stat.Size,
+		Mode:    stat.Mode.String(),
+		ModTime: stat.Mtime.Format(constant.DateTimeLayout),
+	}
+}
+
+func isContainerDir(cli *client.Client, containerID, targetPath string) (bool, error) {
+	_, err := runContainerCommand(cli, containerID, []string{
+		"sh", "-c", "[ -d \"$1\" ]", "sh", targetPath,
+	})
+	if err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 func stringsToMap(list []string) map[string]string {

@@ -56,6 +56,26 @@ export namespace Container {
         name: string;
         state: string;
     }
+    export interface ContainerFileReq {
+        containerID: string;
+        path: string;
+    }
+    export interface ContainerFileInfo {
+        name: string;
+        path: string;
+        isDir: boolean;
+        isLink: boolean;
+        linkTo: string;
+        size: number;
+        mode: string;
+        modTime: string;
+    }
+    export interface ContainerFileContent {
+        content: string;
+        size: number;
+        truncated: boolean;
+        isBinary: boolean;
+    }
     export interface ResourceLimit {
         cpu: number;
         memory: number;

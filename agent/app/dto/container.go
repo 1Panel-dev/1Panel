@@ -48,6 +48,34 @@ type ContainerOptions struct {
 	State string `json:"state"`
 }
 
+type ContainerFileReq struct {
+	ContainerID string `json:"containerID" validate:"required"`
+	Path        string `json:"path" validate:"required"`
+}
+
+type ContainerFileBatchDeleteReq struct {
+	ContainerID string   `json:"containerID" validate:"required"`
+	Paths       []string `json:"paths" validate:"required,min=1,dive,required"`
+}
+
+type ContainerFileInfo struct {
+	Name    string `json:"name"`
+	Path    string `json:"path"`
+	IsDir   bool   `json:"isDir"`
+	IsLink  bool   `json:"isLink"`
+	LinkTo  string `json:"linkTo"`
+	Size    int64  `json:"size"`
+	Mode    string `json:"mode"`
+	ModTime string `json:"modTime"`
+}
+
+type ContainerFileContent struct {
+	Content   string `json:"content"`
+	Size      int64  `json:"size"`
+	Truncated bool   `json:"truncated"`
+	IsBinary  bool   `json:"isBinary"`
+}
+
 type ContainerStatus struct {
 	Created    int `json:"created"`
 	Running    int `json:"running"`

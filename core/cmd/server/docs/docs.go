@@ -523,6 +523,79 @@ const docTemplate = `{
 				]
 			}
 		},
+		"/ai/agents/channel/qqbot/get": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentQQBotConfigReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.AgentQQBotConfig"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get Agent QQ Bot channel config",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/channel/qqbot/update": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentQQBotConfigUpdateReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update Agent QQ Bot channel config",
+				"tags": [
+					"AI"
+				]
+			}
+		},
 		"/ai/agents/channel/telegram/get": {
 			"post": {
 				"consumes": [
@@ -734,6 +807,79 @@ const docTemplate = `{
 					}
 				],
 				"summary": "Update Agent Other config",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/plugin/check": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentPluginCheckReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.AgentPluginStatus"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Check Agent plugin installation status",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/plugin/install": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentPluginInstallReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Install Agent plugin",
 				"tags": [
 					"AI"
 				]
@@ -4092,6 +4238,225 @@ const docTemplate = `{
 				"summary": "Load docker status",
 				"tags": [
 					"Container Docker"
+				]
+			}
+		},
+		"/containers/files/content": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.ContainerFileReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.ContainerFileContent"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get container file content",
+				"tags": [
+					"Container"
+				]
+			}
+		},
+		"/containers/files/del": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.ContainerFileBatchDeleteReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Delete container file",
+				"tags": [
+					"Container"
+				]
+			}
+		},
+		"/containers/files/download": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"responses": {},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Download container file",
+				"tags": [
+					"Container"
+				]
+			}
+		},
+		"/containers/files/search": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.ContainerFileReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/dto.ContainerFileInfo"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "List container files",
+				"tags": [
+					"Container"
+				]
+			}
+		},
+		"/containers/files/size": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.ContainerFileReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"type": "int"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get container file size",
+				"tags": [
+					"Container"
+				]
+			}
+		},
+		"/containers/files/upload": {
+			"post": {
+				"consumes": [
+					"multipart/form-data"
+				],
+				"parameters": [
+					{
+						"description": "containerID",
+						"in": "formData",
+						"name": "containerID",
+						"required": true,
+						"type": "string"
+					},
+					{
+						"description": "path",
+						"in": "formData",
+						"name": "path",
+						"required": true,
+						"type": "string"
+					},
+					{
+						"description": "file",
+						"in": "formData",
+						"name": "file",
+						"required": true,
+						"type": "file"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Upload container file",
+				"tags": [
+					"Container"
 				]
 			}
 		},
@@ -23746,6 +24111,104 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
+		"dto.AgentPluginCheckReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				},
+				"type": {
+					"enum": [
+						"qqbot"
+					],
+					"type": "string"
+				}
+			},
+			"required": [
+				"agentId",
+				"type"
+			],
+			"type": "object"
+		},
+		"dto.AgentPluginInstallReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				},
+				"taskID": {
+					"type": "string"
+				},
+				"type": {
+					"enum": [
+						"qqbot"
+					],
+					"type": "string"
+				}
+			},
+			"required": [
+				"agentId",
+				"taskID",
+				"type"
+			],
+			"type": "object"
+		},
+		"dto.AgentPluginStatus": {
+			"properties": {
+				"installed": {
+					"type": "boolean"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AgentQQBotConfig": {
+			"properties": {
+				"appId": {
+					"type": "string"
+				},
+				"clientSecret": {
+					"type": "string"
+				},
+				"enabled": {
+					"type": "boolean"
+				},
+				"installed": {
+					"type": "boolean"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AgentQQBotConfigReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				}
+			},
+			"required": [
+				"agentId"
+			],
+			"type": "object"
+		},
+		"dto.AgentQQBotConfigUpdateReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				},
+				"appId": {
+					"type": "string"
+				},
+				"clientSecret": {
+					"type": "string"
+				},
+				"enabled": {
+					"type": "boolean"
+				}
+			},
+			"required": [
+				"agentId",
+				"appId",
+				"clientSecret"
+			],
+			"type": "object"
+		},
 		"dto.AgentTelegramConfig": {
 			"properties": {
 				"botToken": {
@@ -25032,6 +25495,86 @@ const docTemplate = `{
 			},
 			"required": [
 				"containerID"
+			],
+			"type": "object"
+		},
+		"dto.ContainerFileBatchDeleteReq": {
+			"properties": {
+				"containerID": {
+					"type": "string"
+				},
+				"paths": {
+					"items": {
+						"type": "string"
+					},
+					"minItems": 1,
+					"type": "array"
+				}
+			},
+			"required": [
+				"containerID",
+				"paths"
+			],
+			"type": "object"
+		},
+		"dto.ContainerFileContent": {
+			"properties": {
+				"content": {
+					"type": "string"
+				},
+				"isBinary": {
+					"type": "boolean"
+				},
+				"size": {
+					"type": "integer"
+				},
+				"truncated": {
+					"type": "boolean"
+				}
+			},
+			"type": "object"
+		},
+		"dto.ContainerFileInfo": {
+			"properties": {
+				"isDir": {
+					"type": "boolean"
+				},
+				"isLink": {
+					"type": "boolean"
+				},
+				"linkTo": {
+					"type": "string"
+				},
+				"modTime": {
+					"type": "string"
+				},
+				"mode": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"path": {
+					"type": "string"
+				},
+				"size": {
+					"type": "integer"
+				}
+			},
+			"type": "object"
+		},
+		"dto.ContainerFileReq": {
+			"properties": {
+				"containerID": {
+					"type": "string"
+				},
+				"path": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"containerID",
+				"path"
 			],
 			"type": "object"
 		},

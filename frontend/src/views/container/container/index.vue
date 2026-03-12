@@ -378,6 +378,7 @@
         <CommitDialog @search="search" ref="dialogCommitRef" />
         <MonitorDialog ref="dialogMonitorRef" />
         <TerminalDialog ref="dialogTerminalRef" />
+        <ContainerFileDrawer ref="dialogFileBrowserRef" />
 
         <PortJumpDialog ref="dialogPortJumpRef" />
         <Backups ref="dialogBackupRef" />
@@ -393,6 +394,7 @@ import UpgradeDialog from '@/views/container/container/upgrade/index.vue';
 import CommitDialog from '@/views/container/container/commit/index.vue';
 import MonitorDialog from '@/views/container/container/monitor/index.vue';
 import TerminalDialog from '@/views/container/container/terminal/index.vue';
+import ContainerFileDrawer from '@/views/container/container/file-browser/index.vue';
 import ContainerInspectDialog from '@/views/container/container/inspect/index.vue';
 import PortJumpDialog from '@/components/port-jump/index.vue';
 import TaskLog from '@/components/log/task/index.vue';
@@ -675,6 +677,11 @@ const onTerminal = (row: any) => {
     const title = i18n.global.t('menu.container') + ' ' + row.name;
     dialogTerminalRef.value!.acceptParams({ containerID: row.containerID, title: title });
 };
+const dialogFileBrowserRef = ref();
+const onOpenFileBrowser = (row: any) => {
+    const title = i18n.global.t('menu.container') + ' ' + row.name;
+    dialogFileBrowserRef.value!.acceptParams({ containerID: row.containerID, title: title });
+};
 
 const onInspect = async (row: any) => {
     const res = await inspect({ id: row.containerID, type: 'container', detail: '' });
@@ -780,6 +787,15 @@ const buttons = [
         label: i18n.global.t('commons.button.log'),
         click: (row: Container.ContainerInfo) => {
             dialogContainerLogRef.value!.acceptParams({ containerID: row.containerID, container: row.name });
+        },
+    },
+    {
+        label: i18n.global.t('home.dir'),
+        disabled: (row: Container.ContainerInfo) => {
+            return row.state !== 'running';
+        },
+        click: (row: Container.ContainerInfo) => {
+            onOpenFileBrowser(row);
         },
     },
     {
