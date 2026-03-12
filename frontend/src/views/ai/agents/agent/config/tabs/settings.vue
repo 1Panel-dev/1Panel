@@ -1,7 +1,7 @@
 <template>
     <el-tabs v-model="activeTab" @tab-click="handleTabClick">
-        <el-tab-pane :label="t('aiTools.agents.browserTab')" name="browser">
-            <BrowserTab ref="browserRef" />
+        <el-tab-pane v-if="agentType === 'openclaw'" :label="t('aiTools.agents.securityTab')" name="security">
+            <SecurityTab ref="securityRef" />
         </el-tab-pane>
         <el-tab-pane :label="t('aiTools.agents.otherTab')" name="other">
             <OtherTab ref="otherRef" />
@@ -12,13 +12,15 @@
 <script setup lang="ts">
 import { nextTick, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import BrowserTab from './settings/browser.vue';
+import { AI } from '@/api/interface/ai';
+import SecurityTab from './settings/security.vue';
 import OtherTab from './settings/other.vue';
 
 const { t } = useI18n();
-const activeTab = ref('browser');
+const activeTab = ref('security');
 const agentId = ref(0);
-const browserRef = ref();
+const agentType = ref<AI.AgentItem['agentType']>('openclaw');
+const securityRef = ref();
 const otherRef = ref();
 
 const loadCurrentTab = async () => {
@@ -26,8 +28,8 @@ const loadCurrentTab = async () => {
         return;
     }
     await nextTick();
-    if (activeTab.value === 'browser') {
-        await browserRef.value?.load(agentId.value);
+    if (activeTab.value === 'security' && agentType.value === 'openclaw') {
+        await securityRef.value?.load(agentId.value);
         return;
     }
     if (activeTab.value === 'other') {
@@ -39,9 +41,10 @@ const handleTabClick = async () => {
     await loadCurrentTab();
 };
 
-const load = async (id: number) => {
-    agentId.value = id;
-    activeTab.value = 'browser';
+const load = async (agent: AI.AgentItem) => {
+    agentId.value = agent.id;
+    agentType.value = agent.agentType;
+    activeTab.value = agent.agentType === 'openclaw' ? 'security' : 'other';
     await loadCurrentTab();
 };
 

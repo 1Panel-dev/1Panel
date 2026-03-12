@@ -3,32 +3,33 @@ package dto
 import "time"
 
 type AgentCreateReq struct {
-	Name          string  `json:"name" validate:"required"`
-	AppVersion    string  `json:"appVersion" validate:"required"`
-	WebUIPort     int     `json:"webUIPort" validate:"required"`
-	BridgePort    int     `json:"bridgePort"`
-	AgentType     string  `json:"agentType"`
-	Provider      string  `json:"provider"`
-	Model         string  `json:"model"`
-	APIType       string  `json:"apiType"`
-	MaxTokens     int     `json:"maxTokens"`
-	ContextWindow int     `json:"contextWindow"`
-	AccountID     uint    `json:"accountId"`
-	APIKey        string  `json:"apiKey"`
-	BaseURL       string  `json:"baseURL"`
-	Token         string  `json:"token"`
-	TaskID        string  `json:"taskID"`
-	Advanced      bool    `json:"advanced"`
-	ContainerName string  `json:"containerName"`
-	AllowPort     bool    `json:"allowPort"`
-	SpecifyIP     string  `json:"specifyIP"`
-	RestartPolicy string  `json:"restartPolicy"`
-	CpuQuota      float64 `json:"cpuQuota"`
-	MemoryLimit   float64 `json:"memoryLimit"`
-	MemoryUnit    string  `json:"memoryUnit"`
-	PullImage     bool    `json:"pullImage"`
-	EditCompose   bool    `json:"editCompose"`
-	DockerCompose string  `json:"dockerCompose"`
+	Name           string   `json:"name" validate:"required"`
+	AppVersion     string   `json:"appVersion" validate:"required"`
+	WebUIPort      int      `json:"webUIPort" validate:"required"`
+	BridgePort     int      `json:"bridgePort"`
+	AllowedOrigins []string `json:"allowedOrigins"`
+	AgentType      string   `json:"agentType"`
+	Provider       string   `json:"provider"`
+	Model          string   `json:"model"`
+	APIType        string   `json:"apiType"`
+	MaxTokens      int      `json:"maxTokens"`
+	ContextWindow  int      `json:"contextWindow"`
+	AccountID      uint     `json:"accountId"`
+	APIKey         string   `json:"apiKey"`
+	BaseURL        string   `json:"baseURL"`
+	Token          string   `json:"token"`
+	TaskID         string   `json:"taskID"`
+	Advanced       bool     `json:"advanced"`
+	ContainerName  string   `json:"containerName"`
+	AllowPort      bool     `json:"allowPort"`
+	SpecifyIP      string   `json:"specifyIP"`
+	RestartPolicy  string   `json:"restartPolicy"`
+	CpuQuota       float64  `json:"cpuQuota"`
+	MemoryLimit    float64  `json:"memoryLimit"`
+	MemoryUnit     string   `json:"memoryUnit"`
+	PullImage      bool     `json:"pullImage"`
+	EditCompose    bool     `json:"editCompose"`
+	DockerCompose  string   `json:"dockerCompose"`
 }
 
 type AgentItem struct {
@@ -272,24 +273,17 @@ type AgentDiscordConfig struct {
 	Proxy       string `json:"proxy"`
 }
 
-type AgentBrowserConfigReq struct {
+type AgentSecurityConfigReq struct {
 	AgentID uint `json:"agentId" validate:"required"`
 }
 
-type AgentBrowserConfigUpdateReq struct {
-	AgentID        uint   `json:"agentId" validate:"required"`
-	Enabled        bool   `json:"enabled"`
-	Headless       bool   `json:"headless"`
-	NoSandbox      bool   `json:"noSandbox"`
-	DefaultProfile string `json:"defaultProfile" validate:"required"`
+type AgentSecurityConfigUpdateReq struct {
+	AgentID        uint     `json:"agentId" validate:"required"`
+	AllowedOrigins []string `json:"allowedOrigins"`
 }
 
-type AgentBrowserConfig struct {
-	Enabled        bool   `json:"enabled"`
-	ExecutablePath string `json:"executablePath"`
-	Headless       bool   `json:"headless"`
-	NoSandbox      bool   `json:"noSandbox"`
-	DefaultProfile string `json:"defaultProfile"`
+type AgentSecurityConfig struct {
+	AllowedOrigins []string `json:"allowedOrigins"`
 }
 
 type AgentOtherConfigReq struct {
@@ -297,10 +291,12 @@ type AgentOtherConfigReq struct {
 }
 
 type AgentOtherConfigUpdateReq struct {
-	AgentID      uint   `json:"agentId" validate:"required"`
-	UserTimezone string `json:"userTimezone" validate:"required"`
+	AgentID        uint   `json:"agentId" validate:"required"`
+	UserTimezone   string `json:"userTimezone" validate:"required"`
+	BrowserEnabled bool   `json:"browserEnabled"`
 }
 
 type AgentOtherConfig struct {
-	UserTimezone string `json:"userTimezone"`
+	UserTimezone   string `json:"userTimezone"`
+	BrowserEnabled bool   `json:"browserEnabled"`
 }

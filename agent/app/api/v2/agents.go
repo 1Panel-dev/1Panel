@@ -477,19 +477,19 @@ func (b *BaseApi) CheckAgentPlugin(c *gin.Context) {
 }
 
 // @Tags AI
-// @Summary Get Agent Browser config
+// @Summary Get Agent Security config
 // @Accept json
-// @Param request body dto.AgentBrowserConfigReq true "request"
-// @Success 200 {object} dto.AgentBrowserConfig
+// @Param request body dto.AgentSecurityConfigReq true "request"
+// @Success 200 {object} dto.AgentSecurityConfig
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /ai/agents/browser/get [post]
-func (b *BaseApi) GetAgentBrowserConfig(c *gin.Context) {
-	var req dto.AgentBrowserConfigReq
+// @Router /ai/agents/security/get [post]
+func (b *BaseApi) GetAgentSecurityConfig(c *gin.Context) {
+	var req dto.AgentSecurityConfigReq
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	data, err := agentService.GetBrowserConfig(req)
+	data, err := agentService.GetSecurityConfig(req)
 	if err != nil {
 		helper.BadRequest(c, err)
 		return
@@ -498,19 +498,19 @@ func (b *BaseApi) GetAgentBrowserConfig(c *gin.Context) {
 }
 
 // @Tags AI
-// @Summary Update Agent Browser config
+// @Summary Update Agent Security config
 // @Accept json
-// @Param request body dto.AgentBrowserConfigUpdateReq true "request"
+// @Param request body dto.AgentSecurityConfigUpdateReq true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /ai/agents/browser/update [post]
-func (b *BaseApi) UpdateAgentBrowserConfig(c *gin.Context) {
-	var req dto.AgentBrowserConfigUpdateReq
+// @Router /ai/agents/security/update [post]
+func (b *BaseApi) UpdateAgentSecurityConfig(c *gin.Context) {
+	var req dto.AgentSecurityConfigUpdateReq
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	if err := agentService.UpdateBrowserConfig(req); err != nil {
+	if err := agentService.UpdateSecurityConfig(req); err != nil {
 		helper.BadRequest(c, err)
 		return
 	}
