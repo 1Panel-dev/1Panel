@@ -33,6 +33,7 @@ interface DialogProps {
     protocol: string;
     path?: string;
     query?: string;
+    hash?: string;
 }
 
 const acceptParams = async (params: DialogProps): Promise<void> => {
@@ -57,6 +58,9 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
         }
         if (params.query) {
             url += params.query.startsWith('?') ? params.query : `?${params.query}`;
+        }
+        if (params.hash) {
+            url += params.hash.startsWith('#') ? params.hash : `#${params.hash}`;
         }
         return url;
     };

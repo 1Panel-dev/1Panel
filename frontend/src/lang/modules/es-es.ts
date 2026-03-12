@@ -700,7 +700,7 @@ const message = {
             token: 'Token',
             manualModel: 'Entrada manual de modelo',
             verified: 'Verificado',
-            verifySkipped: 'Omitido',
+            verifySkipped: 'Sin verificacion',
             configTitle: 'Configuration',
             settingsTab: 'Settings',
             securityTab: 'Security',

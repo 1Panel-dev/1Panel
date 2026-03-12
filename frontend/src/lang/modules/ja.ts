@@ -693,7 +693,7 @@ const message = {
             token: 'トークン',
             manualModel: '手動入力',
             verified: '検証済み',
-            verifySkipped: 'スキップ済み',
+            verifySkipped: '検証なし',
             configTitle: 'Configuration',
             settingsTab: 'Settings',
             securityTab: 'Security',
