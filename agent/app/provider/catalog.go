@@ -192,12 +192,9 @@ var catalog = map[string]Meta{
 		EnvKey:         "GEMINI_API_KEY",
 		Enabled:        true,
 		Models: []Model{
-			{ID: "google/gemini-1.5-flash", Name: "Gemini 1.5 Flash"},
-			{ID: "google/gemini-1.5-pro", Name: "Gemini 1.5 Pro"},
-			{ID: "google/gemini-2.0-flash", Name: "Gemini 2.0 Flash"},
-			{ID: "google/gemini-2.5-flash", Name: "Gemini 2.5 Flash"},
-			{ID: "google/gemini-2.5-pro", Name: "Gemini 2.5 Pro"},
 			{ID: "google/gemini-3-flash-preview", Name: "Gemini 3 Flash Preview"},
+			{ID: "google/gemini-flash-latest", Name: "Gemini Flash Latest"},
+			{ID: "google/gemini-3-pro-preview", Name: "Gemini 3 Pro Preview"},
 		},
 	},
 	"moonshot": {

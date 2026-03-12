@@ -52,6 +52,15 @@ const accountOptions = ref<AI.AgentAccountItem[]>([]);
 const modelOptions = ref<AI.ProviderModelInfo[]>([]);
 const provdier = ref('');
 
+const getModelPrefix = (provider: string) => {
+    switch (provider) {
+        case 'gemini':
+            return 'google';
+        default:
+            return provider;
+    }
+};
+
 const form = reactive({
     accountId: undefined as unknown as number,
     manualModel: false,
@@ -128,8 +137,9 @@ const handleAccountChange = () => {
         setModelsByProvider(selected.provider);
         return;
     }
+    const modelPrefix = getModelPrefix(selected.provider);
     setModelsByProvider(selected.provider);
-    if (!form.manualModel && (!form.model || !form.model.startsWith(`${selected.provider}/`))) {
+    if (!form.manualModel && (!form.model || !form.model.startsWith(`${modelPrefix}/`))) {
         form.model = modelOptions.value.length > 0 ? modelOptions.value[0].id : '';
     }
 };
@@ -150,7 +160,8 @@ const handleManualModelChange = (val: unknown) => {
         form.model = '';
         return;
     }
-    if (!form.model || !form.model.startsWith(`${selected.provider}/`)) {
+    const modelPrefix = getModelPrefix(selected.provider);
+    if (!form.model || !form.model.startsWith(`${modelPrefix}/`)) {
         form.model = modelOptions.value.length > 0 ? modelOptions.value[0].id : '';
     }
 };
@@ -172,13 +183,14 @@ const load = async (agent: AI.AgentItem) => {
         form.accountId = currentAccount.id;
         provdier.value = currentAccount.provider;
         setModelsByProvider(currentAccount.provider);
+        const modelPrefix = getModelPrefix(currentAccount.provider);
         const inProviderModels = modelOptions.value.some((item) => item.id === agent.model);
         form.manualModel =
             currentAccount.provider === 'custom' ||
             currentAccount.provider === 'vllm' ||
             currentAccount.provider === 'ollama' ||
             !inProviderModels;
-        if (agent.model && (form.manualModel || agent.model.startsWith(`${currentAccount.provider}/`))) {
+        if (agent.model && (form.manualModel || agent.model.startsWith(`${modelPrefix}/`))) {
             form.model = agent.model;
         } else {
             form.model = modelOptions.value.length > 0 ? modelOptions.value[0].id : '';
