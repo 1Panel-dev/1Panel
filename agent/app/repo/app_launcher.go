@@ -80,9 +80,10 @@ func (u *LauncherRepo) ListQuickJump(withAll bool) []model.QuickJump {
 	}
 	if !withAll && len(quicks) == 0 {
 		return []model.QuickJump{
+			{Name: "Agent", Title: "aiTools.agents.agents", Recommend: 1, IsShow: true, Router: "/agents"},
 			{Name: "Website", Title: "menu.website", Recommend: 10, IsShow: true, Router: "/websites"},
 			{Name: "Database", Title: "menu.database", Recommend: 30, IsShow: true, Router: "/databases"},
-			{Name: "Cronjob", Title: "menu.cronjob", Recommend: 50, IsShow: true, Router: "/cronjobs"},
+			{Name: "Cronjob", Title: "menu.cronjob", Recommend: 50, IsShow: false, Router: "/cronjobs"},
 			{Name: "AppInstalled", Title: "home.appInstalled", Recommend: 70, IsShow: true, Router: "/apps/installed"},
 		}
 	}

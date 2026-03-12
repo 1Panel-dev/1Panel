@@ -43,6 +43,7 @@ func InitAgentDB() {
 		migrations.InitLocalSSHShow,
 		migrations.InitRecordStatus,
 		migrations.AddShowNameForQuickJump,
+		migrations.AddAgentQuickJump,
 		migrations.AddTimeoutForClam,
 		migrations.UpdateCronjobSpec,
 		migrations.UpdateWebsiteSSLAddColumn,

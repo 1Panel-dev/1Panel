@@ -589,6 +589,78 @@ var AddShowNameForQuickJump = &gormigrate.Migration{
 	},
 }
 
+var AddAgentQuickJump = &gormigrate.Migration{
+	ID: "20260312-add-agent-quick-jump",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.QuickJump{}); err != nil {
+			return err
+		}
+
+		var quicks []model.QuickJump
+		if err := tx.Find(&quicks).Error; err != nil {
+			return err
+		}
+
+		var (
+			agent    *model.QuickJump
+			cronjob  *model.QuickJump
+			database *model.QuickJump
+			showList []*model.QuickJump
+		)
+		for i := range quicks {
+			switch quicks[i].Name {
+			case "Agent":
+				agent = &quicks[i]
+			case "Cronjob":
+				cronjob = &quicks[i]
+			case "Database":
+				database = &quicks[i]
+			}
+			if quicks[i].IsShow {
+				showList = append(showList, &quicks[i])
+			}
+		}
+
+		if agent != nil {
+			return tx.Model(&model.QuickJump{}).Where("id = ?", agent.ID).Updates(map[string]interface{}{
+				"title":     "aiTools.agents.agents",
+				"recommend": 1,
+				"router":    "/ai/agents/agent",
+			}).Error
+		}
+
+		showCount := len(showList)
+		updatedIDs := make(map[uint]struct{})
+		kickedCronjob := false
+		if showCount >= 4 && cronjob != nil && cronjob.IsShow {
+			cronjob.IsShow = false
+			updatedIDs[cronjob.ID] = struct{}{}
+			kickedCronjob = true
+		}
+		if !kickedCronjob && database != nil && database.IsShow {
+			database.IsShow = false
+			updatedIDs[database.ID] = struct{}{}
+		}
+
+		for _, item := range quicks {
+			if _, ok := updatedIDs[item.ID]; !ok {
+				continue
+			}
+			if err := tx.Model(&model.QuickJump{}).Where("id = ?", item.ID).Update("is_show", item.IsShow).Error; err != nil {
+				return err
+			}
+		}
+
+		return tx.Create(&model.QuickJump{
+			Name:      "Agent",
+			Title:     "aiTools.agents.agents",
+			Recommend: 1,
+			IsShow:    true,
+			Router:    "/ai/agents/agent",
+		}).Error
+	},
+}
+
 var AddTimeoutForClam = &gormigrate.Migration{
 	ID: "20250922-add-timeout-for-clam",
 	Migrate: func(tx *gorm.DB) error {
