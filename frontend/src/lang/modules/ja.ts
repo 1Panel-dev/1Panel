@@ -952,11 +952,13 @@ const message = {
         sameImageContainer: '同一イメージコンテナ',
         sameImageHelper: '同一イメージを使用するコンテナは選択後一括アップグレード可能',
         imageLoadErr: 'コンテナの画像名は検出されません',
+        imageUpdateTagEmpty: '更新可能なイメージタグが検出されません',
         appHelper:
             'このコンテナはアプリストアから取得されたものであり、アップグレードによってサービスが利用不可になる可能性があります。',
         input: '手動入力',
         forcePull: '常に画像を引っ張ってください',
         forcePullHelper: 'これにより、サーバー上の既存の画像が無視され、レジストリから最新の画像が引き出されます。',
+        imageUpdateHelper: 'レジストリの同名タグを確認し、更新があれば取得してローカルイメージを更新します。',
         server: 'ホスト',
         serverExample: '80、80-88、IP:80またはIP:80-88',
         containerExample: '80または80-88',

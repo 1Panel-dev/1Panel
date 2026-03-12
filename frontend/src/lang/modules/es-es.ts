@@ -969,6 +969,7 @@ const message = {
             'Los contenedores que usan la misma imagen pueden actualizarse en lote después de seleccionarlos',
         targetImage: 'Imagen objetivo',
         imageLoadErr: 'No se detectó un nombre de imagen para el contenedor',
+        imageUpdateTagEmpty: 'No se detectaron etiquetas de imagen actualizables',
         appHelper:
             'El contenedor proviene de la tienda de aplicaciones, y al actualizar podría hacer que el servicio no esté disponible.',
         resource: 'Recurso',
@@ -976,6 +977,8 @@ const message = {
         forcePull: 'Siempre descargar imagen',
         forcePullHelper:
             'Esto ignorará las imágenes existentes en el servidor y descargará la más reciente desde el repositorio.',
+        imageUpdateHelper:
+            'Comprobar la misma etiqueta en el registro y, si hay cambios, descargar y actualizar la imagen local.',
         server: 'Servidor',
         serverExample: '80, 80-88, ip:80 o ip:80-88',
         containerExample: '80 o 80-88',

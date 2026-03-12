@@ -958,11 +958,14 @@ const message = {
         sameImageHelper: 'Contêineres usando a mesma imagem podem ser atualizados em lote após seleção',
         targetImage: 'Imagem alvo',
         imageLoadErr: 'Nenhum nome de imagem detectado para o contêiner',
+        imageUpdateTagEmpty: 'Nenhuma tag de imagem atualizável foi detectada',
         appHelper: 'O contêiner vem da loja de aplicativos, e o upgrade pode tornar o serviço indisponível.',
         input: 'Entrada manual',
         forcePull: 'Sempre puxar imagem',
         forcePullHelper:
             'Isso ignorará as imagens existentes no servidor e puxará a imagem mais recente do repositório.',
+        imageUpdateHelper:
+            'Verificar a mesma tag no registry e, se houver atualização, fazer pull e atualizar a imagem local.',
         server: 'Host',
         serverExample: '80, 80-88, ip:80 ou ip:80-88',
         containerExample: '80 ou 80-88',
