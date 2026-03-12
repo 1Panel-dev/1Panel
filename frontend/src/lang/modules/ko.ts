@@ -829,6 +829,12 @@ const message = {
     },
     container: {
         createByCommand: '명령으로 생성',
+        importContainerBackupTip: '컨테이너 백업 파일 가져오기, .tar.gz 형식만 지원합니다',
+        importComposeBackupTip: 'Compose 백업 파일 가져오기, .tar.gz 형식만 지원합니다',
+        stopContainerBeforeBackup: '백업 전에 컨테이너 중지',
+        stopComposeBeforeBackup: '백업 전에 Compose 중지',
+        stopBeforeBackupHelper:
+            '활성화하면 백업 전에 컨테이너 또는 Compose 서비스를 중지하고, 완료 후 자동으로 복구하여 데이터 일관성을 보장합니다.',
         commandInput: '명령 입력',
         commandRule: '컨테이너 생성을 위한 올바른 docker run 명령을 입력하세요.',
         commandHelper: '이 명령은 서버에서 실행되어 컨테이너를 생성합니다. 계속하시겠습니까?',

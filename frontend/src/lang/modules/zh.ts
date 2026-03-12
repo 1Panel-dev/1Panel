@@ -800,6 +800,11 @@ const message = {
     },
     container: {
         createByCommand: '命令创建',
+        importContainerBackupTip: '导入容器备份文件，仅支持 .tar.gz 格式',
+        importComposeBackupTip: '导入编排备份文件，仅支持 .tar.gz 格式',
+        stopContainerBeforeBackup: '备份前停止容器',
+        stopComposeBeforeBackup: '备份前停止编排',
+        stopBeforeBackupHelper: '启用后备份前将停止容器或编排服务，完成后自动恢复，以确保数据一致性',
         commandInput: '命令输入',
         commandRule: '请输入正确的 docker run 容器创建命令！',
         commandHelper: '将在服务器上执行该条命令以创建容器，是否继续？',

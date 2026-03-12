@@ -845,6 +845,12 @@ const message = {
     },
     container: {
         createByCommand: 'Komutla oluştur',
+        importContainerBackupTip: 'Konteyner yedek dosyasını içe aktar, yalnızca .tar.gz desteklenir',
+        importComposeBackupTip: 'Compose yedek dosyasını içe aktar, yalnızca .tar.gz desteklenir',
+        stopContainerBeforeBackup: 'Yedekleme öncesi konteyneri durdur',
+        stopComposeBeforeBackup: 'Yedekleme öncesi compose’u durdur',
+        stopBeforeBackupHelper:
+            'Etkinleştirildiğinde, yedekleme öncesinde konteyner veya compose servisi durdurulur ve veri tutarlılığını sağlamak için işlem tamamlandıktan sonra otomatik olarak geri açılır.',
         commandInput: 'Komut girişi',
         commandRule: 'Lütfen doğru docker run konteyner oluşturma komutunu girin!',
         commandHelper: 'Bu komut konteyneri oluşturmak için sunucuda çalıştırılacak. Devam etmek istiyor musunuz?',

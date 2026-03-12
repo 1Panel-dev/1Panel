@@ -839,6 +839,12 @@ const message = {
     },
     container: {
         createByCommand: 'Create by command',
+        importContainerBackupTip: 'Import container backup file, only .tar.gz is supported',
+        importComposeBackupTip: 'Import compose backup file, only .tar.gz is supported',
+        stopContainerBeforeBackup: 'Stop container before backup',
+        stopComposeBeforeBackup: 'Stop compose before backup',
+        stopBeforeBackupHelper:
+            'When enabled, the container or compose service is stopped before backup and automatically restored after completion to ensure data consistency.',
         commandInput: 'Command input',
         commandRule: 'Enter the correct docker run container creation command!',
         commandHelper: 'This command will run on the server to create the container. Continue?',

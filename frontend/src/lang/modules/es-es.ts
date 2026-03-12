@@ -851,6 +851,12 @@ const message = {
     },
     container: {
         createByCommand: 'Crear por comando',
+        importContainerBackupTip: 'Importar archivo de copia de seguridad de contenedor, solo se admite .tar.gz',
+        importComposeBackupTip: 'Importar archivo de copia de seguridad de compose, solo se admite .tar.gz',
+        stopContainerBeforeBackup: 'Detener contenedor antes de la copia de seguridad',
+        stopComposeBeforeBackup: 'Detener compose antes de la copia de seguridad',
+        stopBeforeBackupHelper:
+            'Al habilitarlo, se detendrá el contenedor o servicio compose antes del respaldo y se restaurará automáticamente al finalizar para garantizar la consistencia de datos.',
         commandInput: 'Introducir comando',
         commandRule: 'Por favor introduzca el comando correcto para crear el contenedor con docker run.',
         commandHelper: 'Este comando se ejecutará en el servidor para crear el contenedor. ¿Desea continuar?',

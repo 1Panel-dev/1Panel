@@ -93,6 +93,7 @@ export namespace Backup {
         detailName: string;
         secret: string;
         taskID: string;
+        stopBefore?: boolean;
     }
     export interface Recover {
         downloadAccountID: number;

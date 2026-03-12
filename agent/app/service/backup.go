@@ -57,6 +57,11 @@ type IBackupService interface {
 
 	AppBackup(db dto.CommonBackup) (*model.BackupRecord, error)
 	AppRecover(req dto.CommonRecover) error
+
+	ContainerBackup(req dto.CommonBackup) error
+	ContainerRecover(req dto.CommonRecover) error
+	ComposeBackup(req dto.CommonBackup) error
+	ComposeRecover(req dto.CommonRecover) error
 }
 
 func NewIBackupService() IBackupService {

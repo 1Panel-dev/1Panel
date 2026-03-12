@@ -430,6 +430,16 @@ func (b *BaseApi) Backup(c *gin.Context) {
 			helper.InternalServer(c, err)
 			return
 		}
+	case "container":
+		if err := backupService.ContainerBackup(req); err != nil {
+			helper.InternalServer(c, err)
+			return
+		}
+	case "compose":
+		if err := backupService.ComposeBackup(req); err != nil {
+			helper.InternalServer(c, err)
+			return
+		}
 	}
 	helper.Success(c)
 }
@@ -485,6 +495,16 @@ func (b *BaseApi) Recover(c *gin.Context) {
 			helper.InternalServer(c, err)
 			return
 		}
+	case "container":
+		if err := backupService.ContainerRecover(req); err != nil {
+			helper.InternalServer(c, err)
+			return
+		}
+	case "compose":
+		if err := backupService.ComposeRecover(req); err != nil {
+			helper.InternalServer(c, err)
+			return
+		}
 	}
 	helper.Success(c)
 }
@@ -522,6 +542,16 @@ func (b *BaseApi) RecoverByUpload(c *gin.Context) {
 		}
 	case "website":
 		if err := backupService.WebsiteRecover(req); err != nil {
+			helper.InternalServer(c, err)
+			return
+		}
+	case "container":
+		if err := backupService.ContainerRecover(req); err != nil {
+			helper.InternalServer(c, err)
+			return
+		}
+	case "compose":
+		if err := backupService.ComposeRecover(req); err != nil {
 			helper.InternalServer(c, err)
 			return
 		}

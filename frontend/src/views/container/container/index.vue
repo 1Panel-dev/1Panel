@@ -25,6 +25,9 @@
                 <el-button type="primary" @click="onContainerOperate('')">
                     {{ $t('commons.button.create') }}
                 </el-button>
+                <el-button type="primary" plain @click="onImportCreate()">
+                    {{ $t('commons.button.import') }}
+                </el-button>
                 <el-button type="primary" plain @click="onClean()">
                     {{ $t('container.containerPrune') }}
                 </el-button>
@@ -377,6 +380,8 @@
         <TerminalDialog ref="dialogTerminalRef" />
 
         <PortJumpDialog ref="dialogPortJumpRef" />
+        <Backups ref="dialogBackupRef" />
+        <Uploads ref="uploadRef" @close="search" />
         <TaskLog ref="taskLogRef" width="70%" @close="search" />
     </div>
 </template>
@@ -391,6 +396,8 @@ import TerminalDialog from '@/views/container/container/terminal/index.vue';
 import ContainerInspectDialog from '@/views/container/container/inspect/index.vue';
 import PortJumpDialog from '@/components/port-jump/index.vue';
 import TaskLog from '@/components/log/task/index.vue';
+import Backups from '@/components/backup/index.vue';
+import Uploads from '@/components/upload/index.vue';
 import DockerStatus from '@/views/container/docker-status/index.vue';
 import ContainerLogDialog from '@/components/log/container-drawer/index.vue';
 import Status from '@/components/status/index.vue';
@@ -435,6 +442,7 @@ const searchName = ref();
 const dialogUpgradeRef = ref();
 const dialogCommitRef = ref();
 const dialogPortJumpRef = ref();
+const dialogBackupRef = ref();
 const opRef = ref();
 const includeAppStore = ref(true);
 const columns = ref([]);
@@ -637,6 +645,26 @@ const onContainerOperate = async (container: string) => {
     routerToNameWithQuery('ContainerCreate', { name: container });
 };
 
+const onBackup = (row: Container.ContainerInfo) => {
+    dialogBackupRef.value!.acceptParams({
+        type: 'container',
+        name: row.name,
+        detailName: '',
+        status: row.state,
+    });
+};
+
+const uploadRef = ref();
+const onImportCreate = () => {
+    uploadRef.value!.acceptParams({
+        type: 'container',
+        name: '',
+        detailName: '',
+        remark: '.tar.gz',
+        node: globalStore.currentNode,
+    });
+};
+
 const dialogMonitorRef = ref();
 const onMonitor = (row: any) => {
     dialogMonitorRef.value!.acceptParams({ containerID: row.containerID, container: row.name });
@@ -764,6 +792,12 @@ const buttons = [
         label: i18n.global.t('commons.button.upgrade'),
         click: (row: Container.ContainerInfo) => {
             dialogUpgradeRef.value!.acceptParams({ container: row.name, image: row.imageName, fromApp: row.isFromApp });
+        },
+    },
+    {
+        label: i18n.global.t('commons.button.backup'),
+        click: (row: Container.ContainerInfo) => {
+            onBackup(row);
         },
     },
     {
