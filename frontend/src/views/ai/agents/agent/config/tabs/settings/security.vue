@@ -41,7 +41,7 @@ const rules = reactive({
     allowedOrigins: [
         {
             validator: (_rule: any, value: any, callback: (error?: Error) => void) => {
-                const message = validateAllowedOriginsInput(String(value || ''));
+                const message = validateAllowedOriginsInput(String(value || ''), { httpsOnly: true });
                 if (message) {
                     callback(new Error(message));
                     return;
@@ -73,7 +73,7 @@ const saveConfig = async () => {
     try {
         await updateAgentSecurityConfig({
             agentId: agentId.value,
-            allowedOrigins: parseAllowedOriginsInput(form.allowedOrigins),
+            allowedOrigins: parseAllowedOriginsInput(form.allowedOrigins, { httpsOnly: true }),
         });
         MsgSuccess(t('aiTools.agents.saveSuccess'));
     } finally {

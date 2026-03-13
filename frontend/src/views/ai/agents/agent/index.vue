@@ -75,11 +75,6 @@
                             <el-button icon="Position" plain size="small" @click="jumpWebUI(row)">
                                 {{ $t('aiTools.agents.webuiPort') }}: {{ row.webUIPort }}
                             </el-button>
-                            <div v-if="row.agentType !== 'copaw'" class="mt-0.5">
-                                <el-button plain size="small">
-                                    {{ $t('aiTools.agents.bridgePort') }} {{ row.bridgePort }}
-                                </el-button>
-                            </div>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('runtime.workDir')" min-width="90">
@@ -154,6 +149,7 @@ import PortJumpDialog from '@/components/port-jump/index.vue';
 import DockerStatus from '@/views/container/docker-status/index.vue';
 import { getAgentProviderDisplayName } from '@/utils/agent';
 import { routerToFileWithPath } from '@/utils/router';
+import { compareVersion } from '@/utils/version';
 import NoApp from '@/views/app-store/apps/no-app/index.vue';
 import openclawIcon from '@/assets/images/ai-agent-openclaw.svg';
 import copawIcon from '@/assets/images/ai-agent-copaw.svg';
@@ -321,11 +317,24 @@ const openWorkDir = (row: AI.AgentItem) => {
     routerToFileWithPath(`${row.path}/data`);
 };
 
+const isOpenClawHttpsVersion = (version: string) => {
+    const target = String(version || '')
+        .trim()
+        .toLowerCase();
+    if (!target || target === 'latest') {
+        return true;
+    }
+    if (!/\d/.test(target)) {
+        return true;
+    }
+    return compareVersion(target, '2026.3.12');
+};
+
 const jumpWebUI = (row: AI.AgentItem) => {
     if (dialogPortJumpRef.value?.acceptParams) {
         dialogPortJumpRef.value.acceptParams({
             port: row.webUIPort,
-            protocol: 'http',
+            protocol: row.agentType === 'openclaw' && isOpenClawHttpsVersion(row.appVersion) ? 'https' : 'http',
             path: row.agentType === 'copaw' ? undefined : '/',
             hash: row.agentType === 'copaw' ? undefined : `token=${row.token}`,
         });

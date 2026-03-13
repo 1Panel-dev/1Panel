@@ -76,6 +76,11 @@ const (
 	defaultToolsSessionVisibility = "all"
 	maxCommunityAIAgents          = int64(5)
 	openclawPluginBaseDir         = "/home/node/.openclaw/extensions"
+	openclawGatewayPort           = 18789
+	openclawCaddyPort             = 8443
+	openclawCaddyDataPerm         = 0777
+	openclawCaddyLoopbackAddress  = "https://127.0.0.1:8443"
+	openclawTrustedProxyLoopback  = "127.0.0.1/32"
 )
 
 func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
@@ -85,14 +90,6 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 	}
 	if err := checkPortExist(req.WebUIPort); err != nil {
 		return nil, err
-	}
-	if agentType == constant.AppOpenclaw {
-		if req.BridgePort <= 0 {
-			return nil, fmt.Errorf("bridge port is required")
-		}
-		if err := checkPortExist(req.BridgePort); err != nil {
-			return nil, err
-		}
 	}
 	if exist, _ := agentRepo.GetFirst(repo.WithByLowerName(req.Name)); exist != nil && exist.ID > 0 {
 		return nil, buserr.New("ErrNameIsExist")
@@ -209,12 +206,12 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 	}
 
 	params := map[string]interface{}{
-		"PANEL_APP_PORT_HTTP": req.WebUIPort,
-		constant.CPUS:         "0",
-		constant.MemoryLimit:  "0",
-		constant.HostIP:       "",
+		constant.CPUS:        "0",
+		constant.MemoryLimit: "0",
+		constant.HostIP:      "",
 	}
 	if agentType == constant.AppOpenclaw {
+		params["PANEL_APP_PORT_HTTPS"] = req.WebUIPort
 		params["PROVIDER"] = provider
 		params["MODEL"] = runtimeModel
 		params["API_TYPE"] = apiType
@@ -223,7 +220,8 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 		params["BASE_URL"] = baseURL
 		params["API_KEY"] = apiKey
 		params["OPENCLAW_GATEWAY_TOKEN"] = token
-		params["PANEL_APP_PORT_BRIDGE"] = req.BridgePort
+	} else {
+		params["PANEL_APP_PORT_HTTP"] = req.WebUIPort
 	}
 
 	if req.EditCompose && strings.TrimSpace(req.DockerCompose) == "" {
@@ -898,6 +896,9 @@ func (a AgentService) UpdateSecurityConfig(req dto.AgentSecurityConfigUpdateReq)
 	if err := writeOpenclawConfigRaw(agent.ConfigPath, conf); err != nil {
 		return err
 	}
+	if err := writeOpenclawCaddyfile(agent.ConfigPath, allowedOrigins); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -1011,6 +1012,7 @@ func readOpenclawConfig(configPath string) (map[string]interface{}, error) {
 }
 
 func writeOpenclawConfigRaw(configPath string, conf map[string]interface{}) error {
+	ensureGatewaySecurityDefaults(conf)
 	payload, err := json.MarshalIndent(conf, "", "  ")
 	if err != nil {
 		return err
@@ -1060,14 +1062,14 @@ func normalizeAllowedOrigin(origin string) (string, error) {
 	if pathValue := strings.TrimSpace(parsed.EscapedPath()); pathValue != "" && pathValue != "/" {
 		return "", fmt.Errorf("invalid allowed origin: %s", origin)
 	}
+	if parsed.Port() == "" {
+		return "", fmt.Errorf("invalid allowed origin: %s", origin)
+	}
 	host := parsed.Hostname()
 	if strings.Contains(host, ":") {
 		host = "[" + host + "]"
 	}
-	normalized := parsed.Scheme + "://" + host
-	if port := parsed.Port(); port != "" {
-		normalized += ":" + port
-	}
+	normalized := "https://" + host + ":" + parsed.Port()
 	return normalized, nil
 }
 
@@ -1099,18 +1101,60 @@ func extractSecurityConfig(conf map[string]interface{}) dto.AgentSecurityConfig 
 }
 
 func setSecurityConfig(conf map[string]interface{}, config dto.AgentSecurityConfig) {
+	ensureGatewaySecurityDefaults(conf)
 	gateway := ensureChildMap(conf, "gateway")
 	controlUi := ensureChildMap(gateway, "controlUi")
-	if _, ok := controlUi["dangerouslyDisableDeviceAuth"]; !ok {
-		controlUi["dangerouslyDisableDeviceAuth"] = true
-	}
 	allowedOrigins := append([]string(nil), config.AllowedOrigins...)
 	if len(allowedOrigins) > 0 {
 		controlUi["allowedOrigins"] = allowedOrigins
 	} else {
 		delete(controlUi, "allowedOrigins")
 	}
+}
+
+func ensureGatewaySecurityDefaults(conf map[string]interface{}) {
+	gateway := ensureChildMap(conf, "gateway")
+	controlUi := ensureChildMap(gateway, "controlUi")
+	if _, ok := controlUi["dangerouslyDisableDeviceAuth"]; !ok {
+		controlUi["dangerouslyDisableDeviceAuth"] = true
+	}
 	delete(controlUi, "dangerouslyAllowHostHeaderOriginFallback")
+	setTrustedProxies(gateway)
+}
+
+func setTrustedProxies(gateway map[string]interface{}) {
+	proxies := make([]string, 0, 4)
+	seen := map[string]struct{}{}
+	switch values := gateway["trustedProxies"].(type) {
+	case []interface{}:
+		for _, value := range values {
+			text := strings.TrimSpace(fmt.Sprintf("%v", value))
+			if text == "" {
+				continue
+			}
+			if _, ok := seen[text]; ok {
+				continue
+			}
+			seen[text] = struct{}{}
+			proxies = append(proxies, text)
+		}
+	case []string:
+		for _, value := range values {
+			text := strings.TrimSpace(value)
+			if text == "" {
+				continue
+			}
+			if _, ok := seen[text]; ok {
+				continue
+			}
+			seen[text] = struct{}{}
+			proxies = append(proxies, text)
+		}
+	}
+	if _, ok := seen[openclawTrustedProxyLoopback]; !ok {
+		proxies = append(proxies, openclawTrustedProxyLoopback)
+	}
+	gateway["trustedProxies"] = proxies
 }
 
 func extractFeishuConfig(conf map[string]interface{}) dto.AgentFeishuConfig {
@@ -1531,7 +1575,11 @@ func buildAgentItem(agent *model.Agent, appInstall *model.AppInstall, envMap map
 	if appInstall != nil && appInstall.ID > 0 {
 		item.Container = appInstall.ContainerName
 		item.AppVersion = appInstall.Version
-		item.WebUIPort = appInstall.HttpPort
+		if agentType == constant.AppOpenclaw {
+			item.WebUIPort = appInstall.HttpsPort
+		} else {
+			item.WebUIPort = appInstall.HttpPort
+		}
 		item.Path = appInstall.GetPath()
 		item.Status = appInstall.Status
 		item.Message = appInstall.Message
@@ -1542,6 +1590,82 @@ func buildAgentItem(agent *model.Agent, appInstall *model.AppInstall, envMap map
 		}
 	}
 	return item
+}
+
+func writeOpenclawCaddyfile(configPath string, allowedOrigins []string) error {
+	content, err := buildOpenclawCaddyfile(allowedOrigins)
+	if err != nil {
+		return err
+	}
+	dataDir := path.Dir(path.Dir(configPath))
+	caddyDir := path.Join(dataDir, "caddy")
+	fileOp := files.NewFileOp()
+	if !fileOp.Stat(caddyDir) {
+		if err := fileOp.CreateDir(caddyDir, constant.DirPerm); err != nil {
+			return err
+		}
+	}
+	caddyDataDir := path.Join(caddyDir, "data")
+	if !fileOp.Stat(caddyDataDir) {
+		if err := fileOp.CreateDir(caddyDataDir, constant.DirPerm); err != nil {
+			return err
+		}
+	}
+	if err := fileOp.ChmodR(caddyDataDir, openclawCaddyDataPerm, false); err != nil {
+		return err
+	}
+	return fileOp.SaveFile(path.Join(caddyDir, "Caddyfile"), content, 0644)
+}
+
+func buildOpenclawCaddyfile(allowedOrigins []string) (string, error) {
+	if len(allowedOrigins) == 0 {
+		return "", fmt.Errorf("allowed origins is required")
+	}
+	addresses := make([]string, 0, len(allowedOrigins))
+	seen := make(map[string]struct{}, len(allowedOrigins))
+	for _, origin := range allowedOrigins {
+		normalized, err := normalizeAllowedOrigin(origin)
+		if err != nil {
+			return "", err
+		}
+		parsed, err := url.Parse(normalized)
+		if err != nil {
+			return "", err
+		}
+		host := parsed.Hostname()
+		if strings.Contains(host, ":") {
+			host = "[" + host + "]"
+		}
+		address := fmt.Sprintf("https://%s:%d", host, openclawCaddyPort)
+		if _, ok := seen[address]; ok {
+			continue
+		}
+		seen[address] = struct{}{}
+		addresses = append(addresses, address)
+	}
+	if len(addresses) == 0 {
+		return "", fmt.Errorf("allowed origins is required")
+	}
+	if _, ok := seen[openclawCaddyLoopbackAddress]; !ok {
+		addresses = append(addresses, openclawCaddyLoopbackAddress)
+	}
+	content := `{
+    admin off
+    auto_https disable_redirects
+    default_sni 127.0.0.1
+    skip_install_trust
+    storage file_system {
+        root /data/caddy
+    }
+}
+
+` + strings.Join(addresses, ", ") + ` {
+    bind 0.0.0.0
+    tls internal
+    reverse_proxy 127.0.0.1:` + strconv.Itoa(openclawGatewayPort) + `
+}
+`
+	return content, nil
 }
 
 func checkAgentUpgradable(install model.AppInstall) bool {
@@ -1651,11 +1775,12 @@ type toolSessionsConfig struct {
 }
 
 type gatewayConfig struct {
-	Mode      string           `json:"mode"`
-	Bind      string           `json:"bind"`
-	Port      int              `json:"port"`
-	Auth      gatewayAuth      `json:"auth"`
-	ControlUi gatewayControlUi `json:"controlUi"`
+	Mode           string           `json:"mode"`
+	Bind           string           `json:"bind"`
+	Port           int              `json:"port"`
+	Auth           gatewayAuth      `json:"auth"`
+	ControlUi      gatewayControlUi `json:"controlUi"`
+	TrustedProxies []string         `json:"trustedProxies,omitempty"`
 }
 
 type gatewayControlUi struct {
@@ -1739,7 +1864,7 @@ func writeOpenclawConfig(confDir, provider, modelName, apiType string, maxTokens
 		Gateway: gatewayConfig{
 			Mode: "local",
 			Bind: "lan",
-			Port: 18789,
+			Port: openclawGatewayPort,
 			Auth: gatewayAuth{
 				Mode:  "token",
 				Token: token,
@@ -1748,6 +1873,7 @@ func writeOpenclawConfig(confDir, provider, modelName, apiType string, maxTokens
 				DangerouslyDisableDeviceAuth: true,
 				AllowedOrigins:               append([]string(nil), allowedOrigins...),
 			},
+			TrustedProxies: []string{openclawTrustedProxyLoopback},
 		},
 		Agents: agentsConfig{
 			Defaults: agentDefaults{
@@ -1830,7 +1956,17 @@ func writeOpenclawConfig(confDir, provider, modelName, apiType string, maxTokens
 		modelMap := ensureChildMap(defaultsMap, "model")
 		modelMap["primary"] = cfg.Agents.Defaults.Model.Primary
 
+		ensureGatewaySecurityDefaults(conf)
 		gatewayMap := ensureChildMap(conf, "gateway")
+		if _, ok := gatewayMap["mode"]; !ok {
+			gatewayMap["mode"] = "local"
+		}
+		if _, ok := gatewayMap["bind"]; !ok {
+			gatewayMap["bind"] = "lan"
+		}
+		if _, ok := gatewayMap["port"]; !ok {
+			gatewayMap["port"] = openclawGatewayPort
+		}
 		authMap := ensureChildMap(gatewayMap, "auth")
 		if _, ok := authMap["mode"]; !ok {
 			authMap["mode"] = "token"
@@ -1842,6 +1978,11 @@ func writeOpenclawConfig(confDir, provider, modelName, apiType string, maxTokens
 	}
 	if err := writeOpenclawConfigRaw(configPath, conf); err != nil {
 		return err
+	}
+	if allowedOrigins != nil {
+		if err := writeOpenclawCaddyfile(configPath, allowedOrigins); err != nil {
+			return err
+		}
 	}
 
 	envPath := path.Join(confDir, ".env")
