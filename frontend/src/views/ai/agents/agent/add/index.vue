@@ -21,13 +21,6 @@
                 </el-form-item>
                 <el-form-item
                     v-if="form.agentType === 'openclaw'"
-                    :label="$t('aiTools.agents.bridgePort')"
-                    prop="bridgePort"
-                >
-                    <el-input-number v-model="form.bridgePort" :min="1" :max="65535" />
-                </el-form-item>
-                <el-form-item
-                    v-if="form.agentType === 'openclaw'"
                     :label="$t('aiTools.agents.allowedOrigins')"
                     prop="allowedOrigins"
                 >
@@ -154,7 +147,6 @@ const form = reactive({
     agentType: 'openclaw' as 'openclaw' | 'copaw',
     appVersion: '',
     webUIPort: 18789,
-    bridgePort: 18790,
     allowedOrigins: '',
     provider: 'deepseek',
     accountId: undefined as unknown as number,
@@ -183,7 +175,6 @@ const rules = reactive({
     agentType: [Rules.requiredSelect],
     appVersion: [Rules.requiredSelect],
     webUIPort: [Rules.requiredInput],
-    bridgePort: [Rules.requiredInput],
     allowedOrigins: [
         Rules.requiredInput,
         {
@@ -340,7 +331,6 @@ const handleAgentTypeChange = async () => {
     form.baseURL = '';
     form.apiType = 'openai-completions';
     if (form.agentType === 'openclaw') {
-        form.bridgePort = form.bridgePort || 18790;
         await loadSystemIP();
         allowedOriginsAutoFilled.value = true;
         syncAllowedOriginsWithDefault(true);
@@ -417,7 +407,6 @@ const submit = async () => {
             name: form.name,
             appVersion: form.appVersion,
             webUIPort: form.webUIPort,
-            bridgePort: form.agentType === 'openclaw' ? form.bridgePort : undefined,
             allowedOrigins: form.agentType === 'openclaw' ? parseAllowedOriginsInput(form.allowedOrigins) : undefined,
             agentType: form.agentType,
             provider: form.agentType === 'openclaw' ? form.provider : undefined,
