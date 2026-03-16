@@ -21,6 +21,7 @@ export namespace Setting {
         theme: string;
         menuTabs: string;
         language: string;
+        docSource: string;
         defaultIO: string;
         defaultNetwork: string;
         lastCleanTime: string;

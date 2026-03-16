@@ -1846,6 +1846,10 @@ const message = {
         light: 'Terang',
         auto: 'Ikut Sistem',
         language: 'Bahasa',
+        runtimeEnv: 'Persekitaran operasi',
+        docSource: 'Sumber dokumentasi',
+        withByRegion: 'Ikut wilayah operasi (Lalai)',
+        withByLang: 'Ikut bahasa sistem',
         region: 'Wilayah operasi',
         cn: 'Tanah Besar China',
         intl: 'Global',
@@ -1855,6 +1859,8 @@ const message = {
         regionHelper3: 'Manual pengguna dan dokumen berkaitan',
         regionHelper4:
             'Tindakan ini mungkin menjejaskan muat turun dan akses seterusnya. Sila teruskan dengan berhati-hati.',
+        regionTip: 'Wilayah operasi mempengaruhi sumber kemas kini sistem serta alamat muat turun pakej pemasangan.',
+        docSourceTip: 'Sumber dokumentasi menentukan bahasa pautan untuk dokumentasi dan log kemas kini.',
         languageHelper:
             'Secara lalai, ia mengikuti bahasa penyemak imbas. Parameter ini hanya berkuat kuasa pada penyemak imbas semasa',
         sessionTimeout: 'Tempoh tamat sesi',

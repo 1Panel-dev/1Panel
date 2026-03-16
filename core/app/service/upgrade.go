@@ -286,10 +286,22 @@ type noteDetailHelper struct {
 }
 
 func (u *UpgradeService) LoadRelease() ([]dto.ReleasesNotes, error) {
+	docSource, _ := settingRepo.GetValueByKey("DocSource")
+	lang, _ := settingRepo.GetValueByKey("Language")
 	var notes []dto.ReleasesNotes
-	url := "https://docs.1panel.pro/v2/search/search_index.json"
-	if global.CONF.Base.Edition != "intl" {
-		url = "https://1panel.cn/docs/v2/search/search_index.json"
+	url := "https://1panel.cn/docs/v2/search/search_index.json"
+	useIntlDocs := false
+	lang = strings.ToLower(strings.TrimSpace(lang))
+	if docSource == "withByRegion" {
+		useIntlDocs = global.CONF.Base.Edition == "intl"
+		if !useIntlDocs && lang != "zh" {
+			useIntlDocs = true
+		}
+	} else {
+		useIntlDocs = lang != "zh"
+	}
+	if useIntlDocs {
+		url = "https://docs.1panel.pro/v2/search/search_index.json"
 	}
 	resp, err := req_helper.HandleGet(url)
 	if err != nil {

@@ -19,6 +19,7 @@ type SettingInfo struct {
 	Theme          string `json:"theme"`
 	MenuTabs       string `json:"menuTabs"`
 	Language       string `json:"language"`
+	DocSource      string `json:"docSource"`
 
 	ServerPort                 string `json:"serverPort"`
 	SSL                        string `json:"ssl"`
