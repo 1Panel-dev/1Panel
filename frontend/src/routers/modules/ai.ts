@@ -1,5 +1,14 @@
 import { Layout } from '@/routers/constant';
 
+const vllmModules = import.meta.glob('@/xpack/views/vllm/index.vue');
+const loadVllmView = () => {
+    const loader = vllmModules['/src/xpack/views/vllm/index.vue'];
+    if (loader) {
+        return loader();
+    }
+    return import('@/views/ai/model/vllm/index.vue');
+};
+
 const databaseRouter = {
     sort: 4,
     path: '/ai',
@@ -67,7 +76,7 @@ const databaseRouter = {
             path: '/ai/model/vllm',
             hidden: true,
             name: 'Vllm',
-            component: () => import('@/xpack/views/vllm/index.vue'),
+            component: loadVllmView,
             meta: {
                 title: 'vLLM',
                 activeMenu: '/ai/model/ollama',
