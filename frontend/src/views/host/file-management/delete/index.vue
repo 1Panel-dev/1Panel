@@ -46,7 +46,7 @@
                 <el-button @click="open = false" :disabled="loading">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
-                <el-button type="primary" @click="onConfirm" :disabled="loading">
+                <el-button type="primary" @click="onConfirm" :loading="loading" :disabled="loading">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -101,37 +101,43 @@ const getStatus = async () => {
 };
 
 const onConfirm = async () => {
-    const pros = [];
-    for (const s of files.value) {
-        if (s['isDir']) {
-            if (s['path'].indexOf('.1panel_clash') > -1) {
-                MsgWarning(i18n.global.t('file.clashDeleteAlert'));
-                return;
-            }
-            const pathRes = await loadBaseDir();
-            if (s['path'] === pathRes.data) {
-                MsgWarning(i18n.global.t('file.panelInstallDir'));
-                return;
-            }
-        }
-        if (reqNode.value != '') {
-            pros.push(
-                deleteFileByNode({ path: s['path'], isDir: s['isDir'], forceDelete: forceDelete.value }, reqNode.value),
-            );
-        } else {
-            pros.push(deleteFile({ path: s['path'], isDir: s['isDir'], forceDelete: forceDelete.value }));
-        }
-    }
     loading.value = true;
-    Promise.all(pros)
-        .then(() => {
-            MsgSuccess(i18n.global.t('commons.msg.deleteSuccess'));
-            open.value = false;
-            em('close');
-        })
-        .finally(() => {
-            loading.value = false;
-        });
+    try {
+        const pros = [];
+        let baseDir = '';
+        if (files.value.some((item) => item['isDir'])) {
+            const pathRes = await loadBaseDir();
+            baseDir = pathRes.data;
+        }
+        for (const s of files.value) {
+            if (s['isDir']) {
+                if (s['path'].indexOf('.1panel_clash') > -1) {
+                    MsgWarning(i18n.global.t('file.clashDeleteAlert'));
+                    return;
+                }
+                if (s['path'] === baseDir) {
+                    MsgWarning(i18n.global.t('file.panelInstallDir'));
+                    return;
+                }
+            }
+            if (reqNode.value != '') {
+                pros.push(
+                    deleteFileByNode(
+                        { path: s['path'], isDir: s['isDir'], forceDelete: forceDelete.value },
+                        reqNode.value,
+                    ),
+                );
+            } else {
+                pros.push(deleteFile({ path: s['path'], isDir: s['isDir'], forceDelete: forceDelete.value }));
+            }
+        }
+        await Promise.all(pros);
+        MsgSuccess(i18n.global.t('commons.msg.deleteSuccess'));
+        open.value = false;
+        em('close');
+    } finally {
+        loading.value = false;
+    }
 };
 
 const getIconName = (extension: string) => {
