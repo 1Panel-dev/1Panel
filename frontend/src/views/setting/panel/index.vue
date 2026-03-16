@@ -202,15 +202,10 @@
                                 </el-button>
                             </el-form-item>
 
-                            <el-form-item :label="$t('setting.region')" prop="edition">
-                                <el-radio-group @change="onSaveEdition" v-model="form.edition">
-                                    <el-radio-button value="cn">
-                                        <span>{{ $t('setting.cn') }}</span>
-                                    </el-radio-button>
-                                    <el-radio-button value="intl">
-                                        <span>{{ $t('setting.intl') }}</span>
-                                    </el-radio-button>
-                                </el-radio-group>
+                            <el-form-item :label="$t('setting.runtimeEnv')" prop="edition">
+                                <el-button icon="Setting" @click="onChangeRegion">
+                                    {{ runtimeEnvLabel() }}
+                                </el-button>
                             </el-form-item>
                         </el-col>
                     </el-row>
@@ -228,6 +223,7 @@
         <HideMenu ref="hideMenuRef" @search="search()" />
         <ThemeColor ref="themeColorRef" />
         <Watermark ref="watermarkRef" @search="search()" />
+        <Edition ref="editionRef" @search="search()" />
     </div>
 </template>
 
@@ -254,6 +250,7 @@ import PanelName from '@/views/setting/panel/name/index.vue';
 import SystemIP from '@/views/setting/panel/systemip/index.vue';
 import Proxy from '@/views/setting/panel/proxy/index.vue';
 import HideMenu from '@/views/setting/panel/hidemenu/index.vue';
+import Edition from '@/views/setting/panel/edition/index.vue';
 import { storeToRefs } from 'pinia';
 import { getXpackSetting, updateXpackSettingByKey } from '@/utils/xpack';
 import { setPrimaryColor } from '@/utils/theme';
@@ -289,6 +286,7 @@ const form = reactive({
     themeColor: {} as ThemeColor,
     menuTabs: '',
     language: '',
+    docSource: 'withByRegion',
     edition: '',
     complexityVerification: '',
     developerMode: '',
@@ -323,6 +321,7 @@ const hideMenuRef = ref();
 const watermarkRef = ref();
 const themeColorRef = ref();
 const apiInterfaceRef = ref();
+const editionRef = ref();
 const unset = ref(i18n.global.t('setting.unSetting'));
 
 const languageOptions = ref([
@@ -353,6 +352,7 @@ const search = async () => {
     form.menuTabs = res.data.menuTabs;
     form.panelName = res.data.panelName;
     form.language = res.data.language;
+    form.docSource = res.data.docSource || 'withByRegion';
     form.edition = res.data.edition;
     form.sessionTimeout = Number(res.data.sessionTimeout);
 
@@ -426,6 +426,16 @@ const onChangeProxy = () => {
 
 const onChangeHideMenus = () => {
     hideMenuRef.value.acceptParams({ hideMenu: form.hideMenu });
+};
+
+const onChangeRegion = () => {
+    editionRef.value.acceptParams({ edition: form.edition, docSource: form.docSource });
+};
+
+const runtimeEnvLabel = () => {
+    const editionLabel = form.edition === 'cn' ? i18n.global.t('setting.cn') : i18n.global.t('setting.intl');
+    const docSourceLabel = i18n.global.t(`setting.${form.docSource || 'withByRegion'}`);
+    return `${editionLabel} / ${docSourceLabel}`;
 };
 
 const onChangeThemeColor = () => {
@@ -535,9 +545,6 @@ const onSave = async (key: string, val: any) => {
                 await globalStore.updateLanguage(val);
                 location.reload();
                 break;
-            case 'Edition':
-                globalStore.isIntl = val === 'intl';
-                break;
         }
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         search();
@@ -546,39 +553,6 @@ const onSave = async (key: string, val: any) => {
         return;
     }
     loading.value = false;
-};
-
-const onSaveEdition = async () => {
-    ElMessageBox.confirm(
-        `
-        <div style="line-height: 1.6;">
-            <div style="margin-bottom: 8px;">
-                ${i18n.global.t('setting.regionHelper')}
-            </div>
-            <ul style="padding-left: 18px; margin: 0;">
-                <li>${i18n.global.t('setting.regionHelper1')}</li>
-                <li>${i18n.global.t('setting.regionHelper2')}</li>
-                <li>${i18n.global.t('setting.regionHelper3')}</li>
-            </ul>
-            <div style="margin-bottom: 8px;">
-                ${i18n.global.t('setting.regionHelper4')}
-            </div>
-        </div>
-        `,
-        i18n.global.t('setting.region'),
-        {
-            confirmButtonText: i18n.global.t('commons.button.confirm'),
-            cancelButtonText: i18n.global.t('commons.button.cancel'),
-            dangerouslyUseHTMLString: true,
-        },
-    )
-        .then(async () => {
-            await onSave('Edition', form.edition);
-            location.reload();
-        })
-        .catch(() => {
-            form.edition = form.edition === 'cn' ? 'intl' : 'cn';
-        });
 };
 
 onMounted(() => {

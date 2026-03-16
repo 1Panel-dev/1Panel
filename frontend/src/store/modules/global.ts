@@ -4,6 +4,9 @@ import { GlobalState, ThemeConfigProp } from '../interface';
 import { DeviceType } from '@/enums/app';
 import i18n, { setActiveLocale } from '@/lang';
 
+const CN_DOCS_URL = 'https://1panel.cn/docs/v2';
+const INTL_DOCS_URL = 'https://docs.1panel.pro/v2';
+
 const GlobalStore = defineStore({
     id: 'GlobalState',
     state: (): GlobalState => ({
@@ -47,6 +50,7 @@ const GlobalStore = defineStore({
 
         isProductPro: false,
         isIntl: false,
+        docWithRegion: true,
         productProExpires: 0,
         isMasterProductPro: false,
         isOffLine: false,
@@ -60,7 +64,14 @@ const GlobalStore = defineStore({
             state.themeConfig.theme === 'dark' ||
             (state.themeConfig.theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches),
         isDarkGoldTheme: (state) => state.themeConfig.primary === '#F0BE96' && state.isProductPro,
-        docsUrl: (state) => (state.isIntl ? 'https://docs.1panel.pro/v2' : 'https://1panel.cn/docs/v2'),
+        docsUrl: (state) => {
+            if (state.docWithRegion) {
+                return state.isIntl ? INTL_DOCS_URL : CN_DOCS_URL;
+            }
+            const lang = state.language.toLowerCase();
+            const isChinese = lang === 'zh';
+            return isChinese ? CN_DOCS_URL : INTL_DOCS_URL;
+        },
         isMaster: (state) => state.currentNode === 'local',
     },
     actions: {

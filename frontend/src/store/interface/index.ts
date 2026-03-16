@@ -53,6 +53,7 @@ export interface GlobalState {
 
     isProductPro: boolean;
     isIntl: boolean;
+    docWithRegion: boolean;
     productProExpires: number;
     isMasterProductPro: boolean;
     isOffLine: boolean;

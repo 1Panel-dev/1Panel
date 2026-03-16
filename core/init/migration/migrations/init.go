@@ -70,6 +70,9 @@ var InitSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "Language", Value: language}).Error; err != nil {
 			return err
 		}
+		if err := tx.Create(&model.Setting{Key: "DocSource", Value: "withByRegion"}).Error; err != nil {
+			return err
+		}
 		if err := tx.Create(&model.Setting{Key: "SessionTimeout", Value: "86400"}).Error; err != nil {
 			return err
 		}
@@ -830,6 +833,23 @@ var AddEditionSetting = &gormigrate.Migration{
 		}
 		if setting.Value == "" {
 			return tx.Model(&model.Setting{}).Where("key = ?", "Edition").Update("value", global.CONF.Base.Edition).Error
+		}
+		return nil
+	},
+}
+
+var AddDocSourceSetting = &gormigrate.Migration{
+	ID: "20260316-add-doc-source-setting",
+	Migrate: func(tx *gorm.DB) error {
+		var setting model.Setting
+		if err := tx.Where("key = ?", "DocSource").First(&setting).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return tx.Create(&model.Setting{Key: "DocSource", Value: "withByRegion"}).Error
+			}
+			return err
+		}
+		if setting.Value == "" {
+			return tx.Model(&model.Setting{}).Where("key = ?", "DocSource").Update("value", "withByRegion").Error
 		}
 		return nil
 	},
