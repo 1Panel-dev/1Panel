@@ -652,7 +652,6 @@ const onBackup = (row: Container.ContainerInfo) => {
         type: 'container',
         name: row.name,
         detailName: '',
-        status: row.state,
     });
 };
 
