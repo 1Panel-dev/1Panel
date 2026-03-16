@@ -2600,6 +2600,12 @@ const message = {
         reload: 'Recarregar',
         upgradeWarn:
             'Atualizar o aplicativo substituirá o arquivo docker-compose.yml. Se houver alterações, você pode clicar para visualizar a comparação do arquivo',
+        openclawHttpsUpgradeNoticeTitle:
+            'Nota: As instruções a seguir se aplicam apenas a usuários que estão atualizando o OpenClaw de versões anteriores à 2026.3.13:',
+        openclawHttpsUpgradeNoticeItem1:
+            'Depois que o agente implantado for atualizado, vá para Configuração -> Ajustes -> Segurança e adicione manualmente o endereço de acesso.',
+        openclawHttpsUpgradeNoticeItem2:
+            'A nova versão agora exige HTTPS para acessar o agente. Se você usava um site com proxy reverso, altere o destino do proxy para https://IP:Port.',
         newVersion: 'Nova versão',
         oldVersion: 'Versão atual',
         composeDiff: 'Comparação de arquivo',

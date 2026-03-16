@@ -327,7 +327,7 @@ const isOpenClawHttpsVersion = (version: string) => {
     if (!/\d/.test(target)) {
         return true;
     }
-    return compareVersion(target, '2026.3.12');
+    return compareVersion(target, '2026.3.13');
 };
 
 const jumpWebUI = (row: AI.AgentItem) => {

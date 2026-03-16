@@ -2382,6 +2382,12 @@ const message = {
         reload: '새로고침',
         upgradeWarn:
             '애플리케이션 업그레이드는 docker-compose.yml 파일을 교체합니다. 변경 사항이 있으면 파일 비교를 클릭하여 확인할 수 있습니다.',
+        openclawHttpsUpgradeNoticeTitle:
+            '주의: 다음 안내는 2026.3.13 이전 버전에서 OpenClaw 를 업그레이드하는 사용자에게만 적용됩니다:',
+        openclawHttpsUpgradeNoticeItem1:
+            '배포된 에이전트 업그레이드가 완료되면 구성 -> 설정 -> 보안 페이지로 이동해 접근 주소를 수동으로 추가해야 합니다.',
+        openclawHttpsUpgradeNoticeItem2:
+            '새 버전은 에이전트 접근에 HTTPS 를 강제합니다. 이전에 리버스 프록시 사이트로 접근했다면 프록시 대상 주소를 https://IP:Port 로 변경하세요.',
         newVersion: '새 버전',
         oldVersion: '현재 버전',
         composeDiff: '파일 비교',

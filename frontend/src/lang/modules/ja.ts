@@ -2439,6 +2439,12 @@ const message = {
         reload: 'リロード',
         upgradeWarn:
             'アプリケーションのアップグレードは、docker-compose.ymlファイルを置き換えます。変更がある場合は、クリックしてファイルの比較を表示できます',
+        openclawHttpsUpgradeNoticeTitle:
+            '注意: 以下の説明は、2026.3.13 より前のバージョンから OpenClaw をアップグレードするユーザーにのみ適用されます:',
+        openclawHttpsUpgradeNoticeItem1:
+            'デプロイ済みエージェントのアップグレード完了後、設定 -> 設定 -> セキュリティ に入り、アクセスアドレスを手動で追加してください。',
+        openclawHttpsUpgradeNoticeItem2:
+            '新バージョンではエージェントへのアクセスに HTTPS が必須です。以前リバースプロキシサイト経由でアクセスしていた場合は、プロキシ先を https://IP:Port に変更してください。',
         newVersion: '新しいバージョン',
         oldVersion: '現在のバージョン',
         composeDiff: 'ファイルの比較',

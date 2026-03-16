@@ -2469,6 +2469,12 @@ const message = {
         showLocal: 'Papar aplikasi tempatan',
         reload: 'Muat Semula',
         upgradeWarn: 'Meningkatkan aplikasi akan menggantikan fail docker-compose.yml.',
+        openclawHttpsUpgradeNoticeTitle:
+            'Nota: Arahan berikut hanya terpakai kepada pengguna yang menaik taraf OpenClaw daripada versi lebih awal daripada 2026.3.13:',
+        openclawHttpsUpgradeNoticeItem1:
+            'Selepas ejen yang telah dipasang selesai dinaik taraf, pergi ke Konfigurasi -> Tetapan -> Keselamatan dan tambah alamat akses secara manual.',
+        openclawHttpsUpgradeNoticeItem2:
+            'Versi baharu kini mewajibkan HTTPS untuk mengakses ejen. Jika anda sebelum ini menggunakan laman reverse proxy, tukar alamat sasaran proksi kepada https://IP:Port.',
         newVersion: 'Versi baru',
         oldVersion: 'Versi semasa',
         composeDiff: 'Perbandingan fail',
