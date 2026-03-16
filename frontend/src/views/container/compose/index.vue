@@ -330,7 +330,6 @@
 
                             <div v-show="showType === 'log'">
                                 <ContainerLog
-                                    v-model:loading="detailLoading"
                                     :key="currentCompose.path"
                                     :compose="currentCompose.path"
                                     :resource="currentCompose.name"
@@ -440,7 +439,7 @@
         <ContainerInspectDialog ref="containerInspectRef" />
         <TerminalDialog ref="terminalDialogRef" />
         <ContainerLogDialog ref="containerLogDialogRef" :highlightDiff="210" />
-        <Backups ref="dialogBackupRef" />
+        <Backups ref="dialogBackupRef" @close="search(true)" />
         <Uploads ref="uploadRef" @close="search(true)" />
     </div>
 </template>
@@ -733,7 +732,7 @@ const onBackupList = (row: Container.ComposeInfo) => {
         type: 'compose',
         name: row.name,
         detailName: '',
-        status: 'running',
+        status: '',
         node: globalStore.currentNode,
     });
 };

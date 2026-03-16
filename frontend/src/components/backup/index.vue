@@ -193,6 +193,8 @@ import { useGlobalStore } from '@/composables/useGlobalStore';
 import { mysqlArgs } from '@/views/cronjob/cronjob/helper';
 const { currentNode } = useGlobalStore();
 
+const emit = defineEmits(['close']);
+
 const PushApp = defineAsyncComponent(async () => {
     const modules = import.meta.glob('@/xpack/views/appstore/push-app/index.vue');
     const loader = modules['/src/xpack/views/appstore/push-app/index.vue'];
@@ -258,6 +260,7 @@ const acceptParams = (params: DialogProps): void => {
 };
 const handleClose = () => {
     backupVisible.value = false;
+    emit('close');
 };
 const handleBackupClose = () => {
     open.value = false;
