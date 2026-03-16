@@ -309,9 +309,42 @@ export namespace AI {
         model: string;
     }
 
+    export interface AgentAccountModel {
+        recordId: number;
+        id: string;
+        name: string;
+        contextWindow: number;
+        maxTokens: number;
+        reasoning: boolean;
+        input: string[];
+    }
+
+    export interface AgentAccountModelReq {
+        accountId: number;
+    }
+
+    export interface AgentAccountModelCreateReq {
+        accountId: number;
+        model: AgentAccountModel;
+    }
+
+    export interface AgentAccountModelUpdateReq {
+        accountId: number;
+        model: AgentAccountModel;
+    }
+
+    export interface AgentAccountModelDeleteReq {
+        accountId: number;
+        recordId: number;
+    }
+
     export interface ProviderModelInfo {
         id: string;
         name: string;
+        contextWindow: number;
+        maxTokens: number;
+        reasoning: boolean;
+        input: string[];
     }
 
     export interface ProviderInfo {
@@ -327,7 +360,6 @@ export namespace AI {
         apiKey: string;
         rememberApiKey: boolean;
         baseURL: string;
-        model: string;
         apiType: string;
         maxTokens: number;
         contextWindow: number;
@@ -340,7 +372,6 @@ export namespace AI {
         apiKey: string;
         rememberApiKey: boolean;
         baseURL: string;
-        model: string;
         apiType: string;
         maxTokens: number;
         contextWindow: number;
@@ -364,6 +395,7 @@ export namespace AI {
         rememberApiKey: boolean;
         baseUrl: string;
         model: string;
+        models: AgentAccountModel[];
         apiType: string;
         maxTokens: number;
         contextWindow: number;

@@ -681,6 +681,17 @@ const message = {
             provider: '모델 제공자',
             apiKey: 'API 키',
             baseUrl: '기본 URL',
+            accountModels: 'Model Catalog',
+            accountModelsHelper: 'Configure the models this account exposes to OpenClaw for switching and settings',
+            accountModelsRequired: 'Configure at least one model',
+            accountModelsDuplicate: 'Duplicate models exist in the catalog',
+            accountCreateHelper:
+                'After creating the model account, you can continue managing its model pool. If the provider catalog already defines Models, they will be imported automatically.',
+            modelPool: 'Model Pool',
+            modelPoolHelper:
+                'Manage the models exposed by this account here. Agent creation and OpenClaw model switching both use this pool.',
+            modelInputTypes: 'Input Types',
+            reasoning: 'Reasoning Model',
             token: '토큰',
             manualModel: '수동 입력',
             verified: '검증됨',

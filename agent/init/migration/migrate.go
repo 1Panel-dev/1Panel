@@ -74,6 +74,7 @@ func InitAgentDB() {
 		migrations.NormalizeAgentAccountVerifiedStatus,
 		migrations.NormalizeOllamaAccountAPIType,
 		migrations.RewriteOpenclawBundledCaddyfile,
+		migrations.InitAgentAccountModelPool,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

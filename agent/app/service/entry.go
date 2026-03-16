@@ -12,11 +12,12 @@ var (
 	appInstallResourceRepo = repo.NewIAppInstallResourceRpo()
 	appIgnoreUpgradeRepo   = repo.NewIAppIgnoreUpgradeRepo()
 
-	aiRepo           = repo.NewIAiRepo()
-	mcpServerRepo    = repo.NewIMcpServerRepo()
-	tensorrtLLMRepo  = repo.NewITensorRTLLMRepo()
-	agentRepo        = repo.NewIAgentRepo()
-	agentAccountRepo = repo.NewIAgentAccountRepo()
+	aiRepo                = repo.NewIAiRepo()
+	mcpServerRepo         = repo.NewIMcpServerRepo()
+	tensorrtLLMRepo       = repo.NewITensorRTLLMRepo()
+	agentRepo             = repo.NewIAgentRepo()
+	agentAccountRepo      = repo.NewIAgentAccountRepo()
+	agentAccountModelRepo = repo.NewIAgentAccountModelRepo()
 
 	mysqlRepo      = repo.NewIMysqlRepo()
 	postgresqlRepo = repo.NewIPostgresqlRepo()

@@ -7,6 +7,7 @@ type AgentAccount struct {
 	APIKey         string `json:"apiKey"`
 	BaseURL        string `json:"baseUrl"`
 	Model          string `json:"model"`
+	Models         string `json:"models" gorm:"type:text"`
 	APIType        string `json:"apiType"`
 	MaxTokens      int    `json:"maxTokens"`
 	ContextWindow  int    `json:"contextWindow"`

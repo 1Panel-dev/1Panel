@@ -1102,3 +1102,13 @@ var RewriteOpenclawBundledCaddyfile = &gormigrate.Migration{
 		return migrationutils.RewriteOpenclawBundledCaddyfile(tx)
 	},
 }
+
+var InitAgentAccountModelPool = &gormigrate.Migration{
+	ID: "20260319-init-agent-account-model-pool",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.AgentAccountModel{}); err != nil {
+			return err
+		}
+		return migrationutils.MigrateAgentAccountModelPool(tx)
+	},
+}
