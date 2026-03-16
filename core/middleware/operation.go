@@ -78,7 +78,9 @@ func OperationLog() gin.HandlerFunc {
 			if strings.Contains(c.Request.Header.Get("Content-Type"), "multipart/form-data") {
 				bodyMap, _ = parseMultipart(body, c.Request.Header.Get("Content-Type"))
 			} else {
-				_ = json.Unmarshal(body, &bodyMap)
+				decoder := json.NewDecoder(bytes.NewReader(body))
+				decoder.UseNumber()
+				_ = decoder.Decode(&bodyMap)
 			}
 			for _, key := range operationDic.BodyKeys {
 				if _, ok := bodyMap[key]; ok {
