@@ -1973,8 +1973,10 @@ const message = {
         regionHelper2: 'Loja de aplicativos e biblioteca de scripts',
         regionHelper3: 'Manual do usuário e documentação relacionada',
         regionHelper4: 'Isso pode afetar downloads e acessos futuros. Prossiga com cautela.',
-        regionTip: 'A região de operação afeta a fonte de atualização do sistema e o endereço de download dos pacotes de instalação.',
-        docSourceTip: 'A fonte da documentação determina o idioma de redirecionamento da documentação e do registro de atualizações.',
+        regionTip:
+            'A região de operação afeta a fonte de atualização do sistema e o endereço de download dos pacotes de instalação.',
+        docSourceTip:
+            'A fonte da documentação determina o idioma de redirecionamento da documentação e do registro de atualizações.',
         languageHelper: 'Por padrão, segue o idioma do navegador. Este parâmetro tem efeito apenas no navegador atual',
         sessionTimeout: 'Tempo limite de sessão',
         sessionTimeoutError: 'O tempo mínimo de sessão é de 300 segundos',
