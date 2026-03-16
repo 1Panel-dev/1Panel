@@ -2250,6 +2250,10 @@ const message = {
         showLocal: '本地应用',
         reload: '重载',
         upgradeWarn: '升级应用会替换 docker-compose.yml 文件，如有更改，可以点击查看文件对比',
+        openclawHttpsUpgradeNoticeTitle: '注意：以下说明仅适用于 OpenClaw 从 2026.3.13 之前版本升级的用户：',
+        openclawHttpsUpgradeNoticeItem1: '已部署的智能体升级完成后，需要进入 配置 → 设置 → 安全 页面手动添加访问地址。',
+        openclawHttpsUpgradeNoticeItem2:
+            '新版本已强制使用 HTTPS 访问智能体。如果之前通过反向代理网站访问，请将代理目标地址修改为 https://IP:Port。',
         newVersion: '新版本',
         oldVersion: '当前版本',
         composeDiff: '文件对比',

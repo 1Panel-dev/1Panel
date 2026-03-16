@@ -2464,6 +2464,12 @@ const message = {
         reload: 'Yeniden yükle',
         upgradeWarn:
             'Uygulamanın yükseltilmesi docker-compose.yml dosyasını değiştirecektir. Herhangi bir değişiklik varsa, dosya karşılaştırmasını görüntülemek için tıklayabilirsiniz',
+        openclawHttpsUpgradeNoticeTitle:
+            "Not: Aşağıdaki talimatlar yalnızca OpenClaw'ı 2026.3.13 öncesi sürümlerden yükselten kullanıcılar için geçerlidir:",
+        openclawHttpsUpgradeNoticeItem1:
+            'Dağıtılmış ajan yükseltmesi tamamlandıktan sonra Yapılandırma -> Ayarlar -> Güvenlik sayfasına gidip erişim adresini manuel olarak ekleyin.',
+        openclawHttpsUpgradeNoticeItem2:
+            'Yeni sürüm artık ajana erişim için HTTPS zorunlu kılıyor. Daha önce ters proxy sitesi kullanıyorsanız proxy hedef adresini https://IP:Port olarak değiştirin.',
         newVersion: 'Yeni sürüm',
         oldVersion: 'Mevcut sürüm',
         composeDiff: 'Dosya karşılaştırması',

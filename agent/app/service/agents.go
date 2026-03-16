@@ -6,7 +6,6 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/xpack/xglobal"
 	"net/http"
 	"net/url"
 	"path"
@@ -28,6 +27,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/1Panel-dev/1Panel/agent/utils/req_helper"
+	"github.com/1Panel-dev/1Panel/agent/xpack/xglobal"
 )
 
 type AgentService struct{}
@@ -80,6 +80,7 @@ const (
 	openclawCaddyPort             = 8443
 	openclawCaddyDataPerm         = 0777
 	openclawCaddyLoopbackAddress  = "https://127.0.0.1:8443"
+	openclawHTTPSVersion          = "2026.3.13"
 	openclawTrustedProxyLoopback  = "127.0.0.1/32"
 )
 
@@ -1576,7 +1577,11 @@ func buildAgentItem(agent *model.Agent, appInstall *model.AppInstall, envMap map
 		item.Container = appInstall.ContainerName
 		item.AppVersion = appInstall.Version
 		if agentType == constant.AppOpenclaw {
-			item.WebUIPort = appInstall.HttpsPort
+			if isOpenclawHTTPSVersion(appInstall.Version) {
+				item.WebUIPort = appInstall.HttpsPort
+			} else {
+				item.WebUIPort = appInstall.HttpPort
+			}
 		} else {
 			item.WebUIPort = appInstall.HttpPort
 		}
@@ -1590,6 +1595,102 @@ func buildAgentItem(agent *model.Agent, appInstall *model.AppInstall, envMap map
 		}
 	}
 	return item
+}
+
+func isOpenclawHTTPSVersion(version string) bool {
+	target := strings.TrimSpace(strings.ToLower(version))
+	if target == "" || target == "latest" {
+		return true
+	}
+	if !strings.ContainsAny(target, "0123456789") {
+		return true
+	}
+	return common.CompareAppVersion(target, openclawHTTPSVersion)
+}
+
+func shouldMigrateOpenclawHTTPSUpgrade(install *model.AppInstall, fromVersion, toVersion string) bool {
+	if install == nil || install.App.Key != constant.AppOpenclaw {
+		return false
+	}
+	return !isOpenclawHTTPSVersion(fromVersion) && isOpenclawHTTPSVersion(toVersion)
+}
+
+func migrateOpenclawHTTPSUpgrade(install *model.AppInstall, fromVersion, toVersion string) error {
+	systemIP, _ := settingRepo.GetValueByKey("SystemIP")
+	return migrateOpenclawHTTPSUpgradeWithSystemIP(install, fromVersion, toVersion, systemIP)
+}
+
+func migrateOpenclawHTTPSUpgradeWithSystemIP(install *model.AppInstall, fromVersion, toVersion, systemIP string) error {
+	if !shouldMigrateOpenclawHTTPSUpgrade(install, fromVersion, toVersion) {
+		return nil
+	}
+	migrateOpenclawInstallPorts(install)
+	if err := migrateOpenclawInstallEnv(install); err != nil {
+		return err
+	}
+	systemIP = strings.TrimSpace(systemIP)
+	if systemIP == "" || install.HttpsPort <= 0 {
+		return nil
+	}
+	allowedOrigin, err := buildOpenclawAllowedOrigin(systemIP, install.HttpsPort)
+	if err != nil {
+		return nil
+	}
+	configPath := path.Join(install.GetPath(), "data", "conf", "openclaw.json")
+	conf, err := readOpenclawConfig(configPath)
+	if err != nil {
+		return err
+	}
+	setSecurityConfig(conf, dto.AgentSecurityConfig{AllowedOrigins: []string{allowedOrigin}})
+	if err := writeOpenclawConfigRaw(configPath, conf); err != nil {
+		return err
+	}
+	return writeOpenclawCaddyfile(configPath, []string{allowedOrigin})
+}
+
+func migrateOpenclawInstallPorts(install *model.AppInstall) {
+	if install == nil {
+		return
+	}
+	if install.HttpsPort == 0 && install.HttpPort > 0 {
+		install.HttpsPort = install.HttpPort
+	}
+	if install.HttpPort > 0 {
+		install.HttpPort = 0
+	}
+}
+
+func migrateOpenclawInstallEnv(install *model.AppInstall) error {
+	if install == nil {
+		return nil
+	}
+	envMap := make(map[string]interface{})
+	if strings.TrimSpace(install.Env) != "" {
+		if err := json.Unmarshal([]byte(install.Env), &envMap); err != nil {
+			return err
+		}
+	}
+	if install.HttpsPort > 0 {
+		envMap["PANEL_APP_PORT_HTTPS"] = install.HttpsPort
+	}
+	delete(envMap, "PANEL_APP_PORT_HTTP")
+	payload, err := json.Marshal(envMap)
+	if err != nil {
+		return err
+	}
+	install.Env = string(payload)
+	return nil
+}
+
+func buildOpenclawAllowedOrigin(host string, port int) (string, error) {
+	host = strings.TrimSpace(host)
+	if host == "" || port <= 0 {
+		return "", fmt.Errorf("invalid openclaw allowed origin")
+	}
+	if strings.Contains(host, ":") && !strings.HasPrefix(host, "[") && strings.Count(host, ":") > 1 {
+		host = "[" + host + "]"
+	}
+	return normalizeAllowedOrigin(fmt.Sprintf("https://%s:%d", host, port))
 }
 
 func writeOpenclawCaddyfile(configPath string, allowedOrigins []string) error {

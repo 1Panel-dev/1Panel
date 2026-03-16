@@ -675,6 +675,7 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 	if err != nil {
 		return err
 	}
+	oldVersion := install.Version
 	detail, err := appDetailRepo.GetFirst(repo.WithByID(req.DetailID))
 	if err != nil {
 		return err
@@ -801,6 +802,9 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 		}
 
 		var newCompose string
+		if err = migrateOpenclawHTTPSUpgrade(&install, oldVersion, detail.Version); err != nil {
+			return err
+		}
 		if req.DockerCompose == "" {
 			newCompose, err = getUpgradeCompose(install, detail)
 			if err != nil {
