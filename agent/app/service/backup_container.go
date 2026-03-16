@@ -596,6 +596,7 @@ func stepRecreateContainer(recoverCtx *containerRecoverContext, taskItem *task.T
 	}
 
 	networkConfig, extraNetworks := buildContainerRecoverNetworkConfig(recoverCtx.inspectInfo.NetworkSettings, hostConfig)
+	removeBridgeDriverIPAM(recoverCtx.client, networkConfig, extraNetworks)
 	createRes, err := recoverCtx.client.ContainerCreate(ctx, config, hostConfig, networkConfig, nil, recoverCtx.targetName)
 	if err != nil {
 		return err
@@ -613,6 +614,28 @@ func stepRecreateContainer(recoverCtx *containerRecoverContext, taskItem *task.T
 		}
 	}
 	return nil
+}
+
+func removeBridgeDriverIPAM(cli *client.Client, primary *network.NetworkingConfig, extras map[string]*network.EndpointSettings) {
+	if primary != nil {
+		removeBridgeDriverIPAMFromEndpoints(cli, primary.EndpointsConfig)
+	}
+	removeBridgeDriverIPAMFromEndpoints(cli, extras)
+}
+
+func removeBridgeDriverIPAMFromEndpoints(cli *client.Client, endpoints map[string]*network.EndpointSettings) {
+	for netName, endpoint := range endpoints {
+		if endpoint == nil || endpoint.IPAMConfig == nil {
+			continue
+		}
+		info, err := cli.NetworkInspect(context.Background(), netName, network.InspectOptions{})
+		if err != nil {
+			continue
+		}
+		if info.Driver == "bridge" {
+			endpoint.IPAMConfig = nil
+		}
+	}
 }
 
 func ensureContainerRecoverNetworks(recoverCtx *containerRecoverContext) error {

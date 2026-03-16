@@ -132,7 +132,6 @@ const handleBack = () => {
             } else {
                 localOpenPage.value = false;
                 globalStore.isFullScreen = false;
-                emit('close');
             }
         };
         emit('beforeClose', done);
@@ -142,7 +141,6 @@ const handleBack = () => {
         } else {
             localOpenPage.value = false;
             globalStore.isFullScreen = false;
-            emit('close');
         }
     }
 };
