@@ -47,6 +47,30 @@ func handleChineseDomain(domain string) (string, error) {
 	return domain, nil
 }
 
+func isHTTPSProxyPass(proxyPass string) bool {
+	return strings.HasPrefix(strings.ToLower(strings.TrimSpace(proxyPass)), "https://")
+}
+
+func applyLocationProxyPass(location *components.Location, proxyPass string, sni *bool, proxySSLName string) {
+	location.UpdateDirective("proxy_pass", []string{proxyPass})
+
+	enableSNI := isHTTPSProxyPass(proxyPass)
+	if sni != nil {
+		enableSNI = enableSNI && *sni
+	}
+	if enableSNI {
+		location.UpdateDirective("proxy_ssl_server_name", []string{"on"})
+	} else {
+		location.UpdateDirective("proxy_ssl_server_name", []string{"off"})
+	}
+
+	sslName := "$proxy_host"
+	if proxySSLName != "" {
+		sslName = proxySSLName
+	}
+	location.UpdateDirective("proxy_ssl_name", []string{sslName})
+}
+
 func createIndexFile(website *model.Website, runtime *model.Runtime) error {
 	var (
 		indexPath      string
@@ -122,7 +146,7 @@ func createProxyFile(website *model.Website) error {
 		return errors.New("error")
 	}
 	location.ChangePath("^~", "/")
-	location.UpdateDirective("proxy_pass", []string{website.Proxy})
+	applyLocationProxyPass(location, website.Proxy, nil, "")
 	location.UpdateDirective("proxy_set_header", []string{"Host", "$host"})
 	if err := nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
 		return buserr.WithErr("ErrUpdateBuWebsite", err)

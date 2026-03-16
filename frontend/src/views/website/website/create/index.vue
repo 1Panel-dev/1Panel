@@ -672,11 +672,31 @@ const getAppByService = async (key: string) => {
     dbServices.value = res.data;
 };
 
+const getProxyTargetFromApp = (app: Pick<App.AppInstalled, 'httpPort' | 'httpsPort'>) => {
+    if ((app.httpPort ?? 0) > 0) {
+        return {
+            protocol: 'http://',
+            address: `127.0.0.1:${app.httpPort}`,
+        };
+    }
+    if ((app.httpsPort ?? 0) > 0) {
+        return {
+            protocol: 'https://',
+            address: `127.0.0.1:${app.httpsPort}`,
+        };
+    }
+    return {
+        protocol: 'http://',
+        address: '',
+    };
+};
+
 const changeInstall = () => {
     appInstalls.value.forEach((app) => {
         if (app.id === website.value.appInstallId) {
-            website.value.proxyProtocol = 'http://';
-            website.value.proxyAddress = '127.0.0.1:' + app.httpPort;
+            const target = getProxyTargetFromApp(app);
+            website.value.proxyProtocol = target.protocol;
+            website.value.proxyAddress = target.address;
         }
     });
 };
