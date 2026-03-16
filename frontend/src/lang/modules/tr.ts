@@ -1851,7 +1851,8 @@ const message = {
         regionHelper2: 'Uygulama mağazası ve betik kütüphanesi',
         regionHelper3: 'Kullanım kılavuzu ve ilgili dokümanlar',
         regionHelper4: 'Bu işlem sonraki indirme ve erişimleri etkileyebilir. Lütfen dikkatli olun.',
-        regionTip: 'Çalışma bölgesi, sistem güncelleme kaynağını ve kurulum paketi indirme adresini belirgin şekilde etkiler.',
+        regionTip:
+            'Çalışma bölgesi, sistem güncelleme kaynağını ve kurulum paketi indirme adresini belirgin şekilde etkiler.',
         docSourceTip: 'Doküman kaynağı, dokümantasyon ve güncelleme günlüğü bağlantılarının dilini belirler.',
         languageHelper:
             'Varsayılan olarak tarayıcı dilini takip eder. Bu parametre yalnızca geçerli tarayıcıda etkilidir',

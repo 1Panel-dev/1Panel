@@ -1856,7 +1856,8 @@ const message = {
         regionHelper4: 'Esto puede afectar futuras descargas y accesos. Proceda con precaución.',
         regionTip:
             'La región de operación afecta la fuente de actualización del sistema y la dirección de descarga de paquetes de instalación.',
-        docSourceTip: 'La fuente de documentación determina el idioma de los enlaces de documentación y registro de actualizaciones.',
+        docSourceTip:
+            'La fuente de documentación determina el idioma de los enlaces de documentación y registro de actualizaciones.',
         languageHelper:
             'Por defecto sigue el idioma del navegador. Este parámetro solo tiene efecto en el navegador actual',
         sessionTimeout: 'Tiempo de espera de sesión',
