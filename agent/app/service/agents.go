@@ -1014,6 +1014,7 @@ func readOpenclawConfig(configPath string) (map[string]interface{}, error) {
 
 func writeOpenclawConfigRaw(configPath string, conf map[string]interface{}) error {
 	ensureGatewaySecurityDefaults(conf)
+	ensureOpenclawUpdateDefaults(conf)
 	payload, err := json.MarshalIndent(conf, "", "  ")
 	if err != nil {
 		return err
@@ -1121,6 +1122,13 @@ func ensureGatewaySecurityDefaults(conf map[string]interface{}) {
 	}
 	delete(controlUi, "dangerouslyAllowHostHeaderOriginFallback")
 	setTrustedProxies(gateway)
+}
+
+func ensureOpenclawUpdateDefaults(conf map[string]interface{}) {
+	update := ensureChildMap(conf, "update")
+	if _, ok := update["checkOnStart"]; !ok {
+		update["checkOnStart"] = false
+	}
 }
 
 func setTrustedProxies(gateway map[string]interface{}) {
@@ -1863,6 +1871,7 @@ type openclawConfig struct {
 	Agents  agentsConfig  `json:"agents"`
 	Browser browserConfig `json:"browser"`
 	Tools   toolsConfig   `json:"tools"`
+	Update  updateConfig  `json:"update"`
 	Models  *modelsConfig `json:"models,omitempty"`
 }
 
@@ -1873,6 +1882,10 @@ type toolsConfig struct {
 
 type toolSessionsConfig struct {
 	Visibility string `json:"visibility,omitempty"`
+}
+
+type updateConfig struct {
+	CheckOnStart bool `json:"checkOnStart"`
 }
 
 type gatewayConfig struct {
@@ -1994,6 +2007,9 @@ func writeOpenclawConfig(confDir, provider, modelName, apiType string, maxTokens
 			Sessions: toolSessionsConfig{
 				Visibility: defaultToolsSessionVisibility,
 			},
+		},
+		Update: updateConfig{
+			CheckOnStart: false,
 		},
 	}
 
