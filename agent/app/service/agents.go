@@ -80,6 +80,7 @@ const (
 	openclawCaddyPort             = 8443
 	openclawCaddyDataPerm         = 0777
 	openclawCaddyLoopbackAddress  = "https://127.0.0.1:8443"
+	openclawAllowedOriginHost     = "127.0.0.1"
 	openclawHTTPSVersion          = "2026.3.13"
 	openclawTrustedProxyLoopback  = "127.0.0.1/32"
 )
@@ -213,6 +214,9 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 	}
 	if agentType == constant.AppOpenclaw {
 		params["PANEL_APP_PORT_HTTPS"] = req.WebUIPort
+		if allowedOrigin := firstAllowedOrigin(allowedOrigins); allowedOrigin != "" {
+			params["ALLOWED_ORIGIN"] = allowedOrigin
+		}
 		params["PROVIDER"] = provider
 		params["MODEL"] = runtimeModel
 		params["API_TYPE"] = apiType
@@ -875,7 +879,7 @@ func (a AgentService) GetSecurityConfig(req dto.AgentSecurityConfigReq) (*dto.Ag
 }
 
 func (a AgentService) UpdateSecurityConfig(req dto.AgentSecurityConfigUpdateReq) error {
-	agent, _, err := a.loadAgentAndInstall(req.AgentID)
+	agent, install, err := a.loadAgentAndInstall(req.AgentID)
 	if err != nil {
 		return err
 	}
@@ -900,7 +904,10 @@ func (a AgentService) UpdateSecurityConfig(req dto.AgentSecurityConfigUpdateReq)
 	if err := writeOpenclawCaddyfile(agent.ConfigPath, allowedOrigins); err != nil {
 		return err
 	}
-	return nil
+	if err := syncOpenclawAllowedOriginEnv(install, allowedOrigins); err != nil {
+		return err
+	}
+	return appInstallRepo.Save(context.Background(), install)
 }
 
 func (a AgentService) GetOtherConfig(req dto.AgentOtherConfigReq) (*dto.AgentOtherConfig, error) {
@@ -1633,27 +1640,33 @@ func migrateOpenclawHTTPSUpgradeWithSystemIP(install *model.AppInstall, fromVers
 		return nil
 	}
 	migrateOpenclawInstallPorts(install)
-	if err := migrateOpenclawInstallEnv(install); err != nil {
-		return err
-	}
-	systemIP = strings.TrimSpace(systemIP)
-	if systemIP == "" || install.HttpsPort <= 0 {
-		return nil
-	}
-	allowedOrigin, err := buildOpenclawAllowedOrigin(systemIP, install.HttpsPort)
-	if err != nil {
-		return nil
-	}
 	configPath := path.Join(install.GetPath(), "data", "conf", "openclaw.json")
-	conf, err := readOpenclawConfig(configPath)
-	if err != nil {
-		return err
+	var allowedOrigins []string
+	if conf, err := readOpenclawConfig(configPath); err == nil {
+		allowedOrigins = extractSecurityConfig(conf).AllowedOrigins
 	}
-	setSecurityConfig(conf, dto.AgentSecurityConfig{AllowedOrigins: []string{allowedOrigin}})
-	if err := writeOpenclawConfigRaw(configPath, conf); err != nil {
-		return err
+	originHost := strings.TrimSpace(systemIP)
+	if originHost == "" {
+		originHost = openclawAllowedOriginHost
 	}
-	return writeOpenclawCaddyfile(configPath, []string{allowedOrigin})
+	if install.HttpsPort > 0 {
+		allowedOrigin, err := buildOpenclawAllowedOrigin(originHost, install.HttpsPort)
+		if err == nil {
+			conf, err := readOpenclawConfig(configPath)
+			if err != nil {
+				return err
+			}
+			allowedOrigins = []string{allowedOrigin}
+			setSecurityConfig(conf, dto.AgentSecurityConfig{AllowedOrigins: allowedOrigins})
+			if err := writeOpenclawConfigRaw(configPath, conf); err != nil {
+				return err
+			}
+			if err := writeOpenclawCaddyfile(configPath, allowedOrigins); err != nil {
+				return err
+			}
+		}
+	}
+	return migrateOpenclawInstallEnv(install, allowedOrigins)
 }
 
 func migrateOpenclawInstallPorts(install *model.AppInstall) {
@@ -1668,7 +1681,7 @@ func migrateOpenclawInstallPorts(install *model.AppInstall) {
 	}
 }
 
-func migrateOpenclawInstallEnv(install *model.AppInstall) error {
+func migrateOpenclawInstallEnv(install *model.AppInstall, allowedOrigins []string) error {
 	if install == nil {
 		return nil
 	}
@@ -1681,6 +1694,9 @@ func migrateOpenclawInstallEnv(install *model.AppInstall) error {
 	if install.HttpsPort > 0 {
 		envMap["PANEL_APP_PORT_HTTPS"] = install.HttpsPort
 	}
+	if allowedOrigin := firstAllowedOrigin(allowedOrigins); allowedOrigin != "" {
+		envMap["ALLOWED_ORIGIN"] = allowedOrigin
+	}
 	delete(envMap, "PANEL_APP_PORT_HTTP")
 	payload, err := json.Marshal(envMap)
 	if err != nil {
@@ -1688,6 +1704,39 @@ func migrateOpenclawInstallEnv(install *model.AppInstall) error {
 	}
 	install.Env = string(payload)
 	return nil
+}
+
+func syncOpenclawAllowedOriginEnv(install *model.AppInstall, allowedOrigins []string) error {
+	if install == nil {
+		return nil
+	}
+	envMap := make(map[string]interface{})
+	if strings.TrimSpace(install.Env) != "" {
+		if err := json.Unmarshal([]byte(install.Env), &envMap); err != nil {
+			return err
+		}
+	}
+	if allowedOrigin := firstAllowedOrigin(allowedOrigins); allowedOrigin != "" {
+		envMap["ALLOWED_ORIGIN"] = allowedOrigin
+	} else {
+		delete(envMap, "ALLOWED_ORIGIN")
+	}
+	payload, err := json.Marshal(envMap)
+	if err != nil {
+		return err
+	}
+	install.Env = string(payload)
+	return nil
+}
+
+func firstAllowedOrigin(allowedOrigins []string) string {
+	for _, origin := range allowedOrigins {
+		trimmed := strings.TrimSpace(origin)
+		if trimmed != "" {
+			return trimmed
+		}
+	}
+	return ""
 }
 
 func buildOpenclawAllowedOrigin(host string, port int) (string, error) {
