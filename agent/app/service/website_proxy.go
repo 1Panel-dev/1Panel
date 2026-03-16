@@ -114,7 +114,7 @@ func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error)
 		err = errors.New("invalid proxy config, no location found")
 		return
 	}
-	location.UpdateDirective("proxy_pass", []string{req.ProxyPass})
+	applyLocationProxyPass(location, req.ProxyPass, &req.SNI, req.ProxySSLName)
 	location.UpdateDirective("proxy_set_header", []string{"Host", req.ProxyHost})
 	location.ChangePath(req.Modifier, req.Match)
 	// Server Cache Settings
@@ -143,15 +143,7 @@ func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error)
 	} else {
 		location.RemoveSubFilter()
 	}
-	// SSL Settings
-	if req.SNI {
-		location.UpdateDirective("proxy_ssl_server_name", []string{"on"})
-		if req.ProxySSLName != "" {
-			location.UpdateDirective("proxy_ssl_name", []string{req.ProxySSLName})
-		}
-	} else {
-		location.UpdateDirective("proxy_ssl_server_name", []string{"off"})
-	}
+	// Explicit SNI configuration still takes precedence over the automatic HTTPS upstream default.
 	// CORS Settings
 	if req.Cors {
 		location.UpdateDirective("add_header", []string{"Access-Control-Allow-Origin", req.AllowOrigins, "always"})

@@ -113,8 +113,8 @@ var catalog = map[string]Meta{
 		EnvKey:         "MINIMAX_API_KEY",
 		Enabled:        true,
 		Models: []Model{
-			{ID: "minimax/MiniMax-M2.1", Name: "MiniMax M2.1"},
-			{ID: "minimax/MiniMax-M2.1-lightning", Name: "MiniMax M2.1 Lightning"},
+			{ID: "minimax/MiniMax-M2.5", Name: "MiniMax M2.5"},
+			{ID: "minimax/MiniMax-M2.5-highspeed", Name: "MiniMax M2.5 highspeed"},
 		},
 	},
 	"kimi": {
