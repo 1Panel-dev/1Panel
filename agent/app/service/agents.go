@@ -27,7 +27,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/1Panel-dev/1Panel/agent/utils/req_helper"
-	"github.com/1Panel-dev/1Panel/agent/xpack/xglobal"
+	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 )
 
 type AgentService struct{}
@@ -99,7 +99,7 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 	if installs, _ := appInstallRepo.ListBy(context.Background(), repo.WithByLowerName(req.Name)); len(installs) > 0 {
 		return nil, buserr.New("ErrNameIsExist")
 	}
-	if !xglobal.IsXpack {
+	if !xpack.IsXpack() {
 		count, _, err := agentRepo.Page(1, 1)
 		if err != nil {
 			return nil, err
