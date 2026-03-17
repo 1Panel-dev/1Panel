@@ -1732,7 +1732,7 @@ const message = {
         proxyHelper1: '应用商店的安装包下载和同步（专业版功能）',
         proxyHelper2: '系统版本升级及获取更新说明（专业版功能）',
         proxyHelper3: '系统许可证的验证和同步',
-        proxyHelper4: 'Docker 的网络访问将通过代理服务器进行（专业版功能）',
+        proxyHelper4: 'Docker 拉取镜像等网络请求将通过代理服务器访问（专业版功能）',
         proxyHelper5: '系统类型脚本库的统一下载与同步（专业版功能）',
         proxyHelper6: '申请证书（专业版功能）',
         proxyType: '代理类型',

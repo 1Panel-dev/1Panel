@@ -1867,7 +1867,8 @@ const message = {
         proxyHelper1: 'Uygulama mağazasından kurulum paketi indirme ve senkronizasyon (Yalnızca Profesyonel sürüm)',
         proxyHelper2: 'Sistem güncelleme ve güncelleme bilgisi alma (Yalnızca Profesyonel sürüm)',
         proxyHelper3: 'Sistem lisansı doğrulama ve senkronizasyon',
-        proxyHelper4: 'Docker ağı vekil sunucu üzerinden erişilecek (Yalnızca Profesyonel sürüm)',
+        proxyHelper4:
+            'Docker imajı çekme gibi ağ istekleri vekil sunucu üzerinden yapılacaktır (Yalnızca Profesyonel sürüm)',
         proxyHelper5: 'Sistem tipi komut kütüphaneleri için birleşik indirme ve senkronizasyon (Profesyonel)',
         proxyHelper6: 'Sertifika başvurusu (Profesyonel)',
         proxyType: 'Vekil türü',

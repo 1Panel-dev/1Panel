@@ -1989,7 +1989,8 @@ const message = {
         proxyHelper1:
             'Download de pacotes de instalação e sincronização da loja de aplicativos (apenas edição profissional)',
         proxyHelper2: 'Atualização do sistema e recuperação de informações de atualização (apenas edição profissional)',
-        proxyHelper4: 'A rede Docker será acessada por meio de um servidor proxy (apenas edição profissional)',
+        proxyHelper4:
+            'As solicitações de rede, como o pull de imagens do Docker, serão feitas por meio do servidor proxy (apenas edição profissional)',
         proxyHelper3: 'Verificação e sincronização da licença do sistema',
         proxyHelper5:
             'Download e sincronização unificados para bibliotecas de scripts do tipo sistema (Recurso da Edição Profissional)',
