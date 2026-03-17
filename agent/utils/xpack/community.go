@@ -39,6 +39,10 @@ func IsUseCustomApp() bool {
 	return false
 }
 
+func IsXpack() bool {
+	return false
+}
+
 func CreateTaskScanSMSAlertLog(alert dto.AlertDTO, alertType string, create dto.AlertLogCreate, pushAlert dto.PushAlert, method string) error {
 	return nil
 }
