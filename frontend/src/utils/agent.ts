@@ -1,9 +1,5 @@
 import i18n from '@/lang';
 
-interface AllowedOriginOptions {
-    httpsOnly?: boolean;
-}
-
 export const getAgentProviderDisplayName = (provider: string, displayName?: string): string => {
     if (provider === 'custom' || displayName === 'Custom') {
         return i18n.global.t('container.custom');
@@ -23,7 +19,7 @@ export const buildDefaultAllowedOrigin = (systemIP: string, port?: number | stri
     return `https://${host}:${port}`;
 };
 
-export const normalizeAllowedOrigin = (value: string, options: AllowedOriginOptions = {}): string => {
+export const normalizeAllowedOrigin = (value: string): string => {
     const target = String(value || '').trim();
     if (!target) {
         throw new Error(i18n.global.t('aiTools.agents.allowedOriginsInvalid'));
@@ -34,9 +30,6 @@ export const normalizeAllowedOrigin = (value: string, options: AllowedOriginOpti
     } catch (error) {
         throw new Error(i18n.global.t('aiTools.agents.allowedOriginsInvalid'));
     }
-    if (options.httpsOnly && parsed.protocol !== 'https:') {
-        throw new Error(i18n.global.t('aiTools.agents.allowedOriginsHttpsOnly'));
-    }
     if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
         throw new Error(i18n.global.t('aiTools.agents.allowedOriginsInvalid'));
     }
@@ -46,13 +39,13 @@ export const normalizeAllowedOrigin = (value: string, options: AllowedOriginOpti
     if (parsed.pathname && parsed.pathname !== '/') {
         throw new Error(i18n.global.t('aiTools.agents.allowedOriginsInvalid'));
     }
-    if (!parsed.host || !parsed.port) {
+    if (!parsed.host) {
         throw new Error(i18n.global.t('aiTools.agents.allowedOriginsInvalid'));
     }
-    return `https://${parsed.host}`;
+    return `${parsed.protocol}//${parsed.host}`;
 };
 
-export const parseAllowedOriginsInput = (value: string, options: AllowedOriginOptions = {}): string[] => {
+export const parseAllowedOriginsInput = (value: string): string[] => {
     const result: string[] = [];
     const seen = new Set<string>();
     for (const line of String(value || '').split(/\r?\n/)) {
@@ -60,7 +53,7 @@ export const parseAllowedOriginsInput = (value: string, options: AllowedOriginOp
         if (!target) {
             continue;
         }
-        const normalized = normalizeAllowedOrigin(target, options);
+        const normalized = normalizeAllowedOrigin(target);
         if (seen.has(normalized)) {
             continue;
         }
@@ -70,9 +63,9 @@ export const parseAllowedOriginsInput = (value: string, options: AllowedOriginOp
     return result;
 };
 
-export const validateAllowedOriginsInput = (value: string, options: AllowedOriginOptions = {}): string => {
+export const validateAllowedOriginsInput = (value: string): string => {
     try {
-        const parsed = parseAllowedOriginsInput(value, options);
+        const parsed = parseAllowedOriginsInput(value);
         if (parsed.length === 0) {
             return i18n.global.t('aiTools.agents.allowedOriginsRequired');
         }

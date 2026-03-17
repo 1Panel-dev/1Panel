@@ -689,11 +689,10 @@ const message = {
             webuiPort: 'Puerto WebUI',
             allowedOrigins: 'Direcciones de acceso',
             allowedOriginsHelper:
-                'Introduce una dirección de acceso HTTPS completa por línea, por ejemplo https://192.168.1.2:18789. Si no hay una dirección predeterminada configurada, rellénala manualmente.',
+                'Introduce una dirección de acceso completa por línea. Se recomienda usar HTTPS, por ejemplo https://192.168.1.2:18789. Si no hay una dirección predeterminada configurada, rellénala manualmente.',
             allowedOriginsPlaceholder: 'https://192.168.1.2:18789',
             allowedOriginsRequired: 'Introduce al menos una dirección de acceso',
-            allowedOriginsInvalid: 'Usa el formato http(s)://host-o-ip:puerto',
-            allowedOriginsHttpsOnly: 'Las direcciones de acceso deben comenzar con https://',
+            allowedOriginsInvalid: 'Usa el formato http(s)://host-o-ip[:puerto]',
             provider: 'Proveedor de modelos',
             apiKey: 'Clave API',
             baseUrl: 'URL base',

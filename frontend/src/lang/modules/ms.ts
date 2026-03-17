@@ -689,11 +689,10 @@ const message = {
             webuiPort: 'Port WebUI',
             allowedOrigins: 'Alamat akses',
             allowedOriginsHelper:
-                'Masukkan satu alamat akses HTTPS penuh bagi setiap baris, contohnya https://192.168.1.2:18789. Isikan secara manual jika alamat akses lalai belum dikonfigurasi.',
+                'Masukkan satu alamat akses penuh bagi setiap baris. HTTPS disyorkan, contohnya https://192.168.1.2:18789. Isikan secara manual jika alamat akses lalai belum dikonfigurasi.',
             allowedOriginsPlaceholder: 'https://192.168.1.2:18789',
             allowedOriginsRequired: 'Masukkan sekurang-kurangnya satu alamat akses',
-            allowedOriginsInvalid: 'Gunakan format http(s)://hos-atau-ip:port',
-            allowedOriginsHttpsOnly: 'Alamat akses mesti bermula dengan https://',
+            allowedOriginsInvalid: 'Gunakan format http(s)://hos-atau-ip[:port]',
             provider: 'Penyedia model',
             apiKey: 'Kunci API',
             baseUrl: 'URL asas',

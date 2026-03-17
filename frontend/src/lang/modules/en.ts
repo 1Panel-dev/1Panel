@@ -681,11 +681,10 @@ const message = {
             webuiPort: 'WebUI Port',
             allowedOrigins: 'Access Addresses',
             allowedOriginsHelper:
-                'Enter one full HTTPS access address per line, for example https://192.168.1.2:18789. Fill it manually if the default access address is not configured.',
+                'Enter one full access address per line. HTTPS is recommended, for example https://192.168.1.2:18789. Fill it manually if the default access address is not configured.',
             allowedOriginsPlaceholder: 'https://192.168.1.2:18789',
             allowedOriginsRequired: 'Enter at least one access address',
-            allowedOriginsInvalid: 'Use the format http(s)://host-or-ip:port',
-            allowedOriginsHttpsOnly: 'Access addresses must start with https://',
+            allowedOriginsInvalid: 'Use the format http(s)://host-or-ip[:port]',
             provider: 'Provider',
             apiKey: 'API Key',
             baseUrl: 'Base URL',

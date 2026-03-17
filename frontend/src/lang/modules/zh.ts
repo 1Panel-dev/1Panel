@@ -648,11 +648,10 @@ const message = {
             webuiPort: 'WebUI 端口',
             allowedOrigins: '访问地址',
             allowedOriginsHelper:
-                '一行一个完整 HTTPS 访问地址，例如 https://192.168.1.2:18789；未配置默认访问地址时请手动填写',
+                '一行一个完整访问地址，建议优先使用 HTTPS，例如 https://192.168.1.2:18789；未配置默认访问地址时请手动填写',
             allowedOriginsPlaceholder: 'https://192.168.1.2:18789',
             allowedOriginsRequired: '请至少填写一个访问地址',
-            allowedOriginsInvalid: '访问地址格式错误，请输入 http(s)://域名或IP:端口',
-            allowedOriginsHttpsOnly: '访问地址必须以 https:// 开头',
+            allowedOriginsInvalid: '访问地址格式错误，请输入 http(s)://域名或IP[:端口]',
             provider: '模型供应商',
             apiKey: 'API Key',
             baseUrl: 'Base URL',

@@ -674,11 +674,10 @@ const message = {
             webuiPort: 'WebUI 포트',
             allowedOrigins: '접속 주소',
             allowedOriginsHelper:
-                '한 줄에 하나의 전체 HTTPS 접속 주소를 입력하세요. 예: https://192.168.1.2:18789. 기본 접속 주소가 설정되지 않은 경우 수동으로 입력하세요.',
+                '한 줄에 하나의 전체 접속 주소를 입력하세요. HTTPS 사용을 권장합니다. 예: https://192.168.1.2:18789. 기본 접속 주소가 설정되지 않은 경우 수동으로 입력하세요.',
             allowedOriginsPlaceholder: 'https://192.168.1.2:18789',
             allowedOriginsRequired: '접속 주소를 하나 이상 입력하세요',
-            allowedOriginsInvalid: 'http(s)://host-or-ip:port 형식으로 입력하세요',
-            allowedOriginsHttpsOnly: '접속 주소는 https:// 로 시작해야 합니다',
+            allowedOriginsInvalid: 'http(s)://host-or-ip[:port] 형식으로 입력하세요',
             provider: '모델 제공자',
             apiKey: 'API 키',
             baseUrl: '기본 URL',

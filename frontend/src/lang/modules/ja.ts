@@ -682,11 +682,10 @@ const message = {
             webuiPort: 'WebUI ポート',
             allowedOrigins: 'アクセスアドレス',
             allowedOriginsHelper:
-                '1 行に 1 つずつ完全な HTTPS アクセスアドレスを入力してください。例: https://192.168.1.2:18789。デフォルトのアクセスアドレスが未設定の場合は手動で入力してください。',
+                '1 行に 1 つずつ完全なアクセスアドレスを入力してください。HTTPS を推奨します。例: https://192.168.1.2:18789。デフォルトのアクセスアドレスが未設定の場合は手動で入力してください。',
             allowedOriginsPlaceholder: 'https://192.168.1.2:18789',
             allowedOriginsRequired: '少なくとも 1 つのアクセスアドレスを入力してください',
-            allowedOriginsInvalid: 'http(s)://host-or-ip:port の形式で入力してください',
-            allowedOriginsHttpsOnly: 'アクセスアドレスは https:// で始めてください',
+            allowedOriginsInvalid: 'http(s)://host-or-ip[:port] の形式で入力してください',
             provider: 'モデルプロバイダー',
             apiKey: 'API キー',
             baseUrl: 'ベースURL',
