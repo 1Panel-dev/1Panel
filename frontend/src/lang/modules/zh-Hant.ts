@@ -649,11 +649,10 @@ const message = {
             webuiPort: 'WebUI 埠',
             allowedOrigins: '訪問地址',
             allowedOriginsHelper:
-                '一行一個完整 HTTPS 訪問地址，例如 https://192.168.1.2:18789；未設定預設訪問地址時請手動填寫',
+                '一行一個完整訪問地址，建議優先使用 HTTPS，例如 https://192.168.1.2:18789；未設定預設訪問地址時請手動填寫',
             allowedOriginsPlaceholder: 'https://192.168.1.2:18789',
             allowedOriginsRequired: '請至少填寫一個訪問地址',
-            allowedOriginsInvalid: '訪問地址格式錯誤，請輸入 http(s)://網域或IP:埠',
-            allowedOriginsHttpsOnly: '訪問地址必須以 https:// 開頭',
+            allowedOriginsInvalid: '訪問地址格式錯誤，請輸入 http(s)://網域或IP[:埠]',
             provider: '模型供應商',
             apiKey: 'API Key',
             baseUrl: 'Base URL',

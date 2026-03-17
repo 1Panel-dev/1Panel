@@ -1071,14 +1071,14 @@ func normalizeAllowedOrigin(origin string) (string, error) {
 	if pathValue := strings.TrimSpace(parsed.EscapedPath()); pathValue != "" && pathValue != "/" {
 		return "", fmt.Errorf("invalid allowed origin: %s", origin)
 	}
-	if parsed.Port() == "" {
-		return "", fmt.Errorf("invalid allowed origin: %s", origin)
-	}
 	host := parsed.Hostname()
 	if strings.Contains(host, ":") {
 		host = "[" + host + "]"
 	}
-	normalized := "https://" + host + ":" + parsed.Port()
+	normalized := parsed.Scheme + "://" + host
+	if parsed.Port() != "" {
+		normalized += ":" + parsed.Port()
+	}
 	return normalized, nil
 }
 

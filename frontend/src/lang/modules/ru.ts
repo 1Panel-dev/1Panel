@@ -681,11 +681,10 @@ const message = {
             webuiPort: 'Порт WebUI',
             allowedOrigins: 'Адреса доступа',
             allowedOriginsHelper:
-                'Указывайте по одному полному HTTPS-адресу доступа в строке, например https://192.168.1.2:18789. Если адрес по умолчанию не настроен, введите его вручную.',
+                'Указывайте по одному полному адресу доступа в строке. Рекомендуется использовать HTTPS, например https://192.168.1.2:18789. Если адрес по умолчанию не настроен, введите его вручную.',
             allowedOriginsPlaceholder: 'https://192.168.1.2:18789',
             allowedOriginsRequired: 'Укажите хотя бы один адрес доступа',
-            allowedOriginsInvalid: 'Используйте формат http(s)://host-or-ip:port',
-            allowedOriginsHttpsOnly: 'Адреса доступа должны начинаться с https://',
+            allowedOriginsInvalid: 'Используйте формат http(s)://host-or-ip[:port]',
             provider: 'Поставщик моделей',
             apiKey: 'API ключ',
             baseUrl: 'Базовый URL',

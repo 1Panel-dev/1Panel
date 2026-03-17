@@ -684,11 +684,10 @@ const message = {
             webuiPort: 'Porta WebUI',
             allowedOrigins: 'Endereços de acesso',
             allowedOriginsHelper:
-                'Informe um endereço de acesso HTTPS completo por linha, por exemplo https://192.168.1.2:18789. Preencha manualmente se o endereço padrão não estiver configurado.',
+                'Informe um endereço de acesso completo por linha. O uso de HTTPS é recomendado, por exemplo https://192.168.1.2:18789. Preencha manualmente se o endereço padrão não estiver configurado.',
             allowedOriginsPlaceholder: 'https://192.168.1.2:18789',
             allowedOriginsRequired: 'Informe pelo menos um endereço de acesso',
-            allowedOriginsInvalid: 'Use o formato http(s)://host-ou-ip:porta',
-            allowedOriginsHttpsOnly: 'Os endereços de acesso devem começar com https://',
+            allowedOriginsInvalid: 'Use o formato http(s)://host-ou-ip[:porta]',
             provider: 'Provedor de modelos',
             apiKey: 'Chave API',
             baseUrl: 'URL base',

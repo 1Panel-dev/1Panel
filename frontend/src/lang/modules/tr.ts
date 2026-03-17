@@ -685,11 +685,10 @@ const message = {
             webuiPort: 'WebUI portu',
             allowedOrigins: 'Erişim adresleri',
             allowedOriginsHelper:
-                'Her satıra bir tam HTTPS erişim adresi girin. Örnek: https://192.168.1.2:18789. Varsayılan erişim adresi yapılandırılmamışsa elle girin.',
+                'Her satıra bir tam erişim adresi girin. HTTPS kullanmanız önerilir. Örnek: https://192.168.1.2:18789. Varsayılan erişim adresi yapılandırılmamışsa elle girin.',
             allowedOriginsPlaceholder: 'https://192.168.1.2:18789',
             allowedOriginsRequired: 'En az bir erişim adresi girin',
-            allowedOriginsInvalid: 'http(s)://host-veya-ip:port biçimini kullanın',
-            allowedOriginsHttpsOnly: 'Erişim adresleri https:// ile başlamalıdır',
+            allowedOriginsInvalid: 'http(s)://host-veya-ip[:port] biçimini kullanın',
             provider: 'Model sağlayıcı',
             apiKey: 'API anahtarı',
             baseUrl: 'Temel URL',
