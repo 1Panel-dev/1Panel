@@ -732,7 +732,6 @@ const onBackupList = (row: Container.ComposeInfo) => {
         type: 'compose',
         name: row.name,
         detailName: '',
-        status: '',
         node: globalStore.currentNode,
     });
 };
