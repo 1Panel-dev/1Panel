@@ -294,9 +294,6 @@ func (u *UpgradeService) LoadRelease() ([]dto.ReleasesNotes, error) {
 	lang = strings.ToLower(strings.TrimSpace(lang))
 	if docSource == "withByRegion" {
 		useIntlDocs = global.CONF.Base.Edition == "intl"
-		if !useIntlDocs && lang != "zh" {
-			useIntlDocs = true
-		}
 	} else {
 		useIntlDocs = lang != "zh"
 	}
