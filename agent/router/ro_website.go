@@ -94,6 +94,9 @@ func (a *WebsiteRouter) InitRouter(Router *gin.RouterGroup) {
 
 		websiteRouter.POST("/crosssite", baseApi.OperateCrossSiteAccess)
 
+		websiteRouter.POST("/webflow/sync", baseApi.SyncWebflow)
+		websiteRouter.POST("/webflow/update", baseApi.UpdateWebflow)
+
 		websiteRouter.POST("/exec/composer", baseApi.ExecComposer)
 		websiteRouter.POST("/stream/update", baseApi.UpdateStreamConfig)
 	}

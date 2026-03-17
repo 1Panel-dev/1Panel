@@ -88,6 +88,47 @@ func (b *BaseApi) CreateWebsite(c *gin.Context) {
 }
 
 // @Tags Website
+// @Summary Sync Webflow site
+// @Accept json
+// @Param request body request.WebsiteCommonReq true "request"
+// @Success 200 {string} string
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /websites/webflow/sync [post]
+func (b *BaseApi) SyncWebflow(c *gin.Context) {
+	var req request.WebsiteCommonReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	taskID, err := websiteService.SyncWebflow(req)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, taskID)
+}
+
+// @Tags Website
+// @Summary Update Webflow Config
+// @Accept json
+// @Param request body request.WebflowUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /websites/webflow/update [post]
+func (b *BaseApi) UpdateWebflow(c *gin.Context) {
+	var req request.WebflowUpdate
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := websiteService.UpdateWebflow(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags Website
 // @Summary Operate website
 // @Accept json
 // @Param request body request.WebsiteOp true "request"

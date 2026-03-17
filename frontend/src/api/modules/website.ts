@@ -381,3 +381,11 @@ export const updateWebsiteStream = (req: Website.WebsiteStreamUpdate) => {
 export const batchSetHttps = (req: Website.BatchSetHttps) => {
     return http.post(`/websites/batch/ssl`, req);
 };
+
+export const syncWebflow = (req: Website.WebsiteReq) => {
+    return http.post<string>(`/websites/webflow/sync`, req);
+};
+
+export const updateWebflow = (req: any) => {
+    return http.post<any>(`/websites/webflow/update`, req);
+};

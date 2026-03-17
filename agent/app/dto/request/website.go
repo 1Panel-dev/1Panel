@@ -372,3 +372,8 @@ type ExecComposerReq struct {
 	WebsiteID  uint   `json:"websiteID" validate:"required"`
 	TaskID     string `json:"taskID" validate:"required"`
 }
+
+type WebflowUpdate struct {
+	ID uint `json:"id" validate:"required"`
+	WebflowConfig
+}

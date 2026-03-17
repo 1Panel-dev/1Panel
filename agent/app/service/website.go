@@ -129,6 +129,9 @@ type IWebsiteService interface {
 	BatchOpWebsite(req request.BatchWebsiteOp) error
 	BatchSetGroup(req request.BatchWebsiteGroup) error
 	BatchSetHttps(ctx context.Context, req request.BatchWebsiteHttps) error
+
+	SyncWebflow(req request.WebsiteCommonReq) (string, error)
+	UpdateWebflow(req request.WebflowUpdate) error
 }
 
 func NewIWebsiteService() IWebsiteService {
@@ -2344,6 +2347,70 @@ func (w WebsiteService) ExecComposer(req request.ExecComposerReq) error {
 		_ = composerTask.Execute()
 	}()
 	return nil
+}
+
+func (w WebsiteService) UpdateWebflow(req request.WebflowUpdate) error {
+	website, err := websiteRepo.GetFirst(repo.WithByID(req.ID))
+	if err != nil {
+		return err
+	}
+	if website.WebflowType != req.WebflowType || website.WebflowURL != req.WebflowURL {
+		website.WebflowType = req.WebflowType
+		website.WebflowURL = req.WebflowURL
+		if website.WebflowType == "proxy" {
+			website.Proxy = website.WebflowURL
+		} else {
+			website.Proxy = ""
+		}
+		if err := updateWebsiteConfig(website, func(server *components.Server) error {
+			rootIndex := path.Join("/www/sites", website.Alias, "index")
+			if website.WebflowType == "proxy" {
+				server.RemoveDirective("root", nil)
+				server.UpdateRootProxy([]string{website.Proxy})
+			} else {
+				server.UpdateRoot(rootIndex)
+				server.UpdateDirective("error_page", []string{"404", "/404.html"})
+			}
+			return nil
+		}); err != nil {
+			return err
+		}
+		return websiteRepo.Save(context.Background(), &website)
+	}
+	return nil
+}
+
+func (w WebsiteService) SyncWebflow(req request.WebsiteCommonReq) (string, error) {
+	website, err := websiteRepo.GetFirst(repo.WithByID(req.ID))
+	if err != nil {
+		return "", err
+	}
+	if website.Type != constant.Webflow || website.WebflowType != "static" {
+		return "", errors.New("only static webflow website support sync")
+	}
+
+	taskName := i18n.GetMsgByKey("SyncWebflow") + ":" + website.PrimaryDomain
+	syncTask, err := task.NewTaskWithOps(taskName, task.TaskSync, task.TaskScopeWebsite, "", website.ID)
+	if err != nil {
+		return "", err
+	}
+
+	syncWebflow := func(t *task.Task) error {
+		indexDir := GetSitePath(website, SiteIndexDir)
+		cmdMgr := cmd.NewCommandMgr(cmd.WithTask(*syncTask))
+		wgetCmd := fmt.Sprintf("wget --mirror --convert-links --adjust-extension --page-requisites --no-parent -nH -P %s %s", indexDir, website.WebflowURL)
+		if err := cmdMgr.RunBashC(wgetCmd); err != nil {
+			return err
+		}
+		return nil
+	}
+	syncTask.AddSubTask(i18n.GetMsgByKey("SyncWebflow"), syncWebflow, nil)
+
+	go func() {
+		_ = syncTask.Execute()
+	}()
+
+	return syncTask.Task.ID, nil
 }
 
 func (w WebsiteService) UpdateStream(req request.StreamUpdate) error {
