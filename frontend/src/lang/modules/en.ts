@@ -1840,7 +1840,8 @@ const message = {
             'Installation package download and synchronization from the app store (Professional edition only)',
         proxyHelper2: 'System update and update information retrieval (Professional edition only)',
         proxyHelper3: 'System license verification and synchronization',
-        proxyHelper4: 'Network requests such as Docker image pulls will go through the proxy server (Professional edition only)',
+        proxyHelper4:
+            'Network requests such as Docker image pulls will go through the proxy server (Professional edition only)',
         proxyHelper5: 'Unified download and sync for system-type script libraries (Professional)',
         proxyHelper6: 'Apply for certificate (Professional)',
         proxyType: 'Proxy type',
