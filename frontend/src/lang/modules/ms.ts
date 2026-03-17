@@ -1873,7 +1873,8 @@ const message = {
         proxyHelper: 'Ia akan berkuat kuasa dalam senario berikut selepas anda menyediakan pelayan proksi:',
         proxyHelper1: 'Muat turun pakej pemasangan dan penyelarasan dari kedai aplikasi (Edisi Profesional sahaja)',
         proxyHelper2: 'Kemas kini sistem dan pengambilan maklumat kemas kini (Edisi Profesional sahaja)',
-        proxyHelper4: 'Rangkaian Docker akan diakses melalui pelayan proksi (Edisi Profesional sahaja)',
+        proxyHelper4:
+            'Permintaan rangkaian seperti tarikan imej Docker akan melalui pelayan proksi (Edisi Profesional sahaja)',
         proxyHelper3: 'Pengesahan dan penyelarasan lesen sistem',
         proxyHelper5: 'Muat turun dan penyegerakan bersepadu untuk pustaka skrip jenis sistem (Ciri Edisi Profesional)',
         proxyHelper6: 'Mohon sijil (Fungsi versi Pro)',

@@ -1874,7 +1874,8 @@ const message = {
         proxyHelper2:
             'Actualización del sistema y recuperación de información de actualización (solo edición profesional)',
         proxyHelper3: 'Verificación y sincronización de licencias del sistema',
-        proxyHelper4: 'La red de Docker se accederá a través de un servidor proxy (solo edición profesional)',
+        proxyHelper4:
+            'Las solicitudes de red, como la descarga de imágenes de Docker, se realizarán a través del servidor proxy (solo edición profesional)',
         proxyHelper5: 'Descarga y sincronización unificada para bibliotecas de scripts del sistema (Profesional)',
         proxyHelper6: 'Solicitud de certificado (Profesional)',
         proxyType: 'Tipo de proxy',

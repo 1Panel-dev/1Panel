@@ -1735,7 +1735,7 @@ const message = {
         proxyHelper1: '應用商店的安裝包下載和同步（專業版功能）',
         proxyHelper2: '系統版本升級及取得更新說明（專業版功能）',
         proxyHelper3: '系統許可證的驗證和同步',
-        proxyHelper4: 'Docker 的網路存取將透過代理伺服器進行（專業版功能）',
+        proxyHelper4: 'Docker 拉取映像等網路請求將透過代理伺服器存取（專業版功能）',
         proxyHelper5: '系統類型腳本庫的統一下載與同步（專業版功能）',
         proxyHelper6: '申請憑證（專業版功能）',
         proxyType: '代理類型',
