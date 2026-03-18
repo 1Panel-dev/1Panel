@@ -26,6 +26,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
+	openclawutil "github.com/1Panel-dev/1Panel/agent/utils/openclaw"
 	"github.com/1Panel-dev/1Panel/agent/utils/req_helper"
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 )
@@ -1634,6 +1635,9 @@ func migrateOpenclawHTTPSUpgradeWithSystemIP(install *model.AppInstall, fromVers
 		return nil
 	}
 	migrateOpenclawInstallPorts(install)
+	if err := openclawutil.WriteCatchAllCaddyfile(install.GetPath()); err != nil {
+		return err
+	}
 	configPath := path.Join(install.GetPath(), "data", "conf", "openclaw.json")
 	var allowedOrigins []string
 	if conf, err := readOpenclawConfig(configPath); err == nil {
