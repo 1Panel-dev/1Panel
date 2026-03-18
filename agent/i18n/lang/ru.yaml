@@ -40,6 +40,8 @@ ErrAgentProviderNotSupported: 'Провайдер агента не поддер
 ErrAgentAccountRequired: 'Выберите аккаунт агента'
 ErrAgentAccountNotVerified: 'Аккаунт не подтверждён'
 ErrAgentProviderMismatch: 'Провайдер не совпадает'
+ErrAgentModelNotInAccount: 'Модель не настроена в выбранном аккаунте'
+ErrAgentModelInUse: 'Эта модель всё ещё используется агентом: {{ .name }}'
 ErrAgentBaseURLRequired: 'Нужен базовый URL'
 ErrAgentApiKeyRequired: 'Нужен API-ключ'
 ErrAgentComposeRequired: 'Нужен compose'

@@ -129,6 +129,22 @@ export const pageAgentAccounts = (req: AI.AgentAccountSearch) => {
     return http.post<ResPage<AI.AgentAccountItem>>(`/ai/agents/accounts/search`, req);
 };
 
+export const getAgentAccountModels = (req: AI.AgentAccountModelReq) => {
+    return http.post<AI.AgentAccountModel[]>(`/ai/agents/accounts/models`, req);
+};
+
+export const createAgentAccountModel = (req: AI.AgentAccountModelCreateReq) => {
+    return http.post(`/ai/agents/accounts/models/create`, req);
+};
+
+export const updateAgentAccountModel = (req: AI.AgentAccountModelUpdateReq) => {
+    return http.post(`/ai/agents/accounts/models/update`, req);
+};
+
+export const deleteAgentAccountModel = (req: AI.AgentAccountModelDeleteReq) => {
+    return http.post(`/ai/agents/accounts/models/delete`, req);
+};
+
 export const verifyAgentAccount = (req: AI.AgentAccountVerifyReq) => {
     return http.post(`/ai/agents/accounts/verify`, req);
 };

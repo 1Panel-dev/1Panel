@@ -5,8 +5,12 @@ import (
 )
 
 type Model struct {
-	ID   string
-	Name string
+	ID            string
+	Name          string
+	ContextWindow int
+	MaxTokens     int
+	Reasoning     bool
+	Input         []string
 }
 
 type Meta struct {
@@ -264,7 +268,60 @@ func cloneMeta(meta Meta) Meta {
 	clone := meta
 	if len(meta.Models) > 0 {
 		clone.Models = make([]Model, len(meta.Models))
-		copy(clone.Models, meta.Models)
+		for i, item := range meta.Models {
+			clone.Models[i] = normalizeModel(meta.Key, item)
+		}
 	}
 	return clone
+}
+
+func normalizeModel(provider string, model Model) Model {
+	clone := model
+	clone.ID = strings.TrimSpace(clone.ID)
+	clone.Name = strings.TrimSpace(clone.Name)
+	if clone.Name == "" {
+		clone.Name = clone.ID
+	}
+	if clone.MaxTokens <= 0 || clone.ContextWindow <= 0 {
+		resolvedMaxTokens, resolvedContextWindow := catalogRuntimeDefaults(strings.ToLower(strings.TrimSpace(provider)))
+		if clone.MaxTokens <= 0 {
+			clone.MaxTokens = resolvedMaxTokens
+		}
+		if clone.ContextWindow <= 0 {
+			clone.ContextWindow = resolvedContextWindow
+		}
+	}
+	if len(clone.Input) == 0 {
+		clone.Input = defaultModelInputs(provider)
+	}
+	if !clone.Reasoning {
+		clone.Reasoning = isReasoningModel(clone.ID)
+	}
+	return clone
+}
+
+func defaultModelInputs(provider string) []string {
+	switch strings.ToLower(strings.TrimSpace(provider)) {
+	case "kimi-coding":
+		return []string{"text", "image"}
+	default:
+		return []string{"text"}
+	}
+}
+
+func catalogRuntimeDefaults(provider string) (int, int) {
+	switch provider {
+	case "deepseek":
+		return 8192, 128000
+	case "zai":
+		return 131072, 204800
+	case "openrouter":
+		return 8192, 128000
+	case "minimax", "kimi-coding":
+		return 8192, 200000
+	case "custom", "vllm":
+		return 8192, 128000
+	default:
+		return 8192, 256000
+	}
 }

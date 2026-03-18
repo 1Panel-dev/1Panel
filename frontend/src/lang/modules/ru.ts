@@ -688,6 +688,17 @@ const message = {
             provider: 'Поставщик моделей',
             apiKey: 'API ключ',
             baseUrl: 'Базовый URL',
+            accountModels: 'Model Catalog',
+            accountModelsHelper: 'Configure the models this account exposes to OpenClaw for switching and settings',
+            accountModelsRequired: 'Configure at least one model',
+            accountModelsDuplicate: 'Duplicate models exist in the catalog',
+            accountCreateHelper:
+                'After creating the model account, you can continue managing its model pool. If the provider catalog already defines Models, they will be imported automatically.',
+            modelPool: 'Model Pool',
+            modelPoolHelper:
+                'Manage the models exposed by this account here. Agent creation and OpenClaw model switching both use this pool.',
+            modelInputTypes: 'Input Types',
+            reasoning: 'Reasoning Model',
             token: 'Токен',
             manualModel: 'Ручной ввод',
             verified: 'Проверено',

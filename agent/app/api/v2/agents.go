@@ -191,6 +191,87 @@ func (b *BaseApi) PageAgentAccounts(c *gin.Context) {
 }
 
 // @Tags AI
+// @Summary List Agent account models
+// @Accept json
+// @Param request body dto.AgentAccountModelReq true "request"
+// @Success 200 {array} dto.AgentAccountModel
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/accounts/models [post]
+func (b *BaseApi) GetAgentAccountModels(c *gin.Context) {
+	var req dto.AgentAccountModelReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	list, err := agentService.GetAccountModels(req)
+	if err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.SuccessWithData(c, list)
+}
+
+// @Tags AI
+// @Summary Create Agent account model
+// @Accept json
+// @Param request body dto.AgentAccountModelCreateReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/accounts/models/create [post]
+func (b *BaseApi) CreateAgentAccountModel(c *gin.Context) {
+	var req dto.AgentAccountModelCreateReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := agentService.CreateAccountModel(req); err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags AI
+// @Summary Update Agent account model
+// @Accept json
+// @Param request body dto.AgentAccountModelUpdateReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/accounts/models/update [post]
+func (b *BaseApi) UpdateAgentAccountModel(c *gin.Context) {
+	var req dto.AgentAccountModelUpdateReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := agentService.UpdateAccountModel(req); err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags AI
+// @Summary Delete Agent account model
+// @Accept json
+// @Param request body dto.AgentAccountModelDeleteReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/accounts/models/delete [post]
+func (b *BaseApi) DeleteAgentAccountModel(c *gin.Context) {
+	var req dto.AgentAccountModelDeleteReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := agentService.DeleteAccountModel(req); err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags AI
 // @Summary Verify Agent account
 // @Accept json
 // @Param request body dto.AgentAccountVerifyReq true "request"
