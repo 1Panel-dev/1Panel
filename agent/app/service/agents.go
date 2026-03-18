@@ -190,10 +190,11 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 		if storedModel == "" {
 			return nil, buserr.New("ErrAgentModelNotInAccount")
 		}
-		selectedAccountModel, ok := findAgentAccountModel(accountModels, storedModel)
+		selectedAccountModel, ok := findAgentAccountModelForProvider(provider, accountModels, storedModel)
 		if !ok {
 			return nil, buserr.New("ErrAgentModelNotInAccount")
 		}
+		storedModel = strings.TrimSpace(selectedAccountModel.ID)
 		apiType, maxTokens, contextWindow = resolveRuntimeParams(
 			provider,
 			account.APIType,
@@ -427,10 +428,11 @@ func (a AgentService) UpdateModelConfig(req dto.AgentModelConfigUpdateReq) error
 	if err != nil {
 		return err
 	}
-	if _, ok := findAgentAccountModel(accountModels, modelName); !ok {
+	selectedAccountModel, ok := findAgentAccountModelForProvider(provider, accountModels, modelName)
+	if !ok {
 		return buserr.New("ErrAgentModelNotInAccount")
 	}
-	selectedAccountModel, _ := findAgentAccountModel(accountModels, modelName)
+	modelName = strings.TrimSpace(selectedAccountModel.ID)
 	apiType, maxTokens, contextWindow := resolveRuntimeParams(
 		provider,
 		account.APIType,
@@ -622,16 +624,35 @@ func (a AgentService) UpdateAccount(req dto.AgentAccountUpdateReq) error {
 	account.APIType = apiType
 	account.Remark = req.Remark
 	account.Verified = verified
-	if err := agentAccountRepo.Save(account); err != nil {
-		return err
-	}
+
+	var nextAccountModels []dto.AgentAccountModel
 	if len(req.Models) > 0 || strings.TrimSpace(req.Model) != "" {
 		accountModels, _, err := normalizeAgentAccountModels(account, req.Models, req.Model, true)
 		if err != nil {
 			return err
 		}
-		if err := replacePersistedAgentAccountModels(account.ID, accountModels); err != nil {
+		nextAccountModels = accountModels
+		if err := ensureAccountModelsNotBound(account, nextAccountModels); err != nil {
 			return err
+		}
+	}
+	if err := agentAccountRepo.Save(account); err != nil {
+		return err
+	}
+	if len(nextAccountModels) > 0 {
+		if err := replacePersistedAgentAccountModels(account.ID, nextAccountModels); err != nil {
+			return err
+		}
+	} else if shouldRefreshAccountModelRuntimeLimits(provider) {
+		accountModels, err := loadAgentAccountModels(account)
+		if err != nil {
+			return err
+		}
+		if len(accountModels) > 0 {
+			accountModels = refreshAccountModelRuntimeLimits(account, accountModels)
+			if err := replacePersistedAgentAccountModels(account.ID, accountModels); err != nil {
+				return err
+			}
 		}
 	}
 	if req.SyncAgents {
@@ -709,7 +730,7 @@ func (a AgentService) CreateAccountModel(req dto.AgentAccountModelCreateReq) err
 	if err != nil {
 		return err
 	}
-	if _, ok := findAgentAccountModel(models, normalized.ID); ok {
+	if _, ok := findAgentAccountModelForProvider(account.Provider, models, normalized.ID); ok {
 		return buserr.New("ErrRecordExist")
 	}
 	inputPayload, err := json.Marshal(sanitizeAgentAccountModelInputs(normalized.Input))
@@ -754,9 +775,20 @@ func (a AgentService) UpdateAccountModel(req dto.AgentAccountModelUpdateReq) err
 		if item.RecordID == req.Model.RecordID {
 			continue
 		}
-		if item.ID == normalized.ID {
+		if sameProviderModelID(account.Provider, item.ID, normalized.ID) {
 			return buserr.New("ErrRecordExist")
 		}
+	}
+	nextModels := make([]dto.AgentAccountModel, 0, len(models))
+	for _, item := range models {
+		if item.RecordID == req.Model.RecordID {
+			nextModels = append(nextModels, normalized)
+			continue
+		}
+		nextModels = append(nextModels, item)
+	}
+	if err := ensureAccountModelsNotBound(account, nextModels); err != nil {
+		return err
 	}
 	inputPayload, err := json.Marshal(sanitizeAgentAccountModelInputs(normalized.Input))
 	if err != nil {
@@ -780,6 +812,20 @@ func (a AgentService) DeleteAccountModel(req dto.AgentAccountModelDeleteReq) err
 		return err
 	}
 	if _, err := agentAccountModelRepo.GetFirst(repo.WithByID(req.RecordID), repo.WithByAccountID(req.AccountID)); err != nil {
+		return err
+	}
+	models, err := loadAgentAccountModels(account)
+	if err != nil {
+		return err
+	}
+	nextModels := make([]dto.AgentAccountModel, 0, len(models))
+	for _, item := range models {
+		if item.RecordID == req.RecordID {
+			continue
+		}
+		nextModels = append(nextModels, item)
+	}
+	if err := ensureAccountModelsNotBound(account, nextModels); err != nil {
 		return err
 	}
 	if err := agentAccountModelRepo.DeleteByID(req.RecordID); err != nil {
@@ -1686,18 +1732,24 @@ func (a AgentService) syncAgentsByAccount(account *model.AgentAccount) error {
 		if confDir == "" {
 			continue
 		}
-		modelName := agent.Model
-		if strings.TrimSpace(modelName) == "" {
+		modelName := strings.TrimSpace(agent.Model)
+		var selectedAccountModel dto.AgentAccountModel
+		var ok bool
+		if modelName != "" {
+			selectedAccountModel, ok = findAgentAccountModelForProvider(account.Provider, accountModels, modelName)
+			if !ok {
+				return buserr.WithName("ErrAgentModelInUse", agent.Name)
+			}
+		} else {
 			modelName = strings.TrimSpace(account.Model)
+			if modelName != "" {
+				selectedAccountModel, ok = findAgentAccountModelForProvider(account.Provider, accountModels, modelName)
+			}
+			if !ok {
+				selectedAccountModel = accountModels[0]
+			}
 		}
-		if strings.TrimSpace(modelName) == "" {
-			modelName = accountModels[0].ID
-		}
-		selectedAccountModel, ok := findAgentAccountModel(accountModels, modelName)
-		if !ok {
-			modelName = accountModels[0].ID
-			selectedAccountModel, _ = findAgentAccountModel(accountModels, modelName)
-		}
+		modelName = strings.TrimSpace(selectedAccountModel.ID)
 		apiType, maxTokens, contextWindow := resolveRuntimeParams(
 			account.Provider,
 			account.APIType,
@@ -2256,6 +2308,11 @@ func buildOpenclawModelsFromAccount(account *model.AgentAccount, selectedModel s
 	if selectedModel == "" {
 		return "", nil, nil, fmt.Errorf("model is required")
 	}
+	selectedAccountModel, ok := findAgentAccountModelForProvider(account.Provider, accountModels, selectedModel)
+	if !ok {
+		return "", nil, nil, buserr.New("ErrAgentModelNotInAccount")
+	}
+	selectedModel = strings.TrimSpace(selectedAccountModel.ID)
 
 	providerKey := ""
 	providerCfg := modelProvider{}
@@ -2275,7 +2332,7 @@ func buildOpenclawModelsFromAccount(account *model.AgentAccount, selectedModel s
 		}
 		entries = append(entries, entry)
 		defaultsModels[resolvedPrimary] = map[string]interface{}{}
-		if strings.TrimSpace(item.ID) == selectedModel {
+		if sameProviderModelID(account.Provider, item.ID, selectedModel) {
 			primaryModel = resolvedPrimary
 		}
 	}
@@ -2317,7 +2374,7 @@ func buildOpenclawPrimaryModel(account *model.AgentAccount, modelID string) (str
 	if err != nil {
 		return "", err
 	}
-	item, ok := findAgentAccountModel(models, modelID)
+	item, ok := findAgentAccountModelForProvider(account.Provider, models, modelID)
 	if !ok {
 		return "", buserr.New("ErrAgentModelNotInAccount")
 	}
@@ -2648,7 +2705,7 @@ func normalizeAgentAccountModels(account *model.AgentAccount, models []dto.Agent
 	if resolvedDefault == "" && allowFallbackDefault {
 		resolvedDefault = normalized[0].ID
 	}
-	if _, ok := findAgentAccountModel(normalized, resolvedDefault); !ok {
+	if _, ok := findAgentAccountModelForProvider(account.Provider, normalized, resolvedDefault); !ok {
 		if allowFallbackDefault {
 			resolvedDefault = normalized[0].ID
 		} else {
@@ -2723,10 +2780,36 @@ func normalizeAgentAccountModelID(provider, primaryModel, requestedID string) st
 		}
 		return "ollama/" + target
 	default:
-		if strings.TrimSpace(primaryModel) != "" {
-			return strings.TrimSpace(primaryModel)
+		target := strings.TrimSpace(requestedID)
+		if target == "" {
+			target = strings.TrimSpace(primaryModel)
 		}
-		return strings.TrimSpace(requestedID)
+		if target == "" {
+			return ""
+		}
+		prefix := poolModelPrefix(provider)
+		if strings.Contains(target, "/") {
+			parts := strings.SplitN(target, "/", 2)
+			targetPrefix := strings.ToLower(strings.TrimSpace(parts[0]))
+			targetModel := strings.TrimSpace(parts[1])
+			if targetModel == "" {
+				return strings.TrimSpace(target)
+			}
+			for _, item := range supportedProviderModelPrefixes(provider) {
+				if item == targetPrefix {
+					if prefix != "" {
+						return prefix + "/" + targetModel
+					}
+					return strings.TrimSpace(target)
+				}
+			}
+			return strings.TrimSpace(target)
+		}
+		target = strings.TrimLeft(strings.TrimSpace(target), "/")
+		if prefix == "" {
+			return target
+		}
+		return prefix + "/" + target
 	}
 }
 
@@ -2804,14 +2887,85 @@ func sanitizeAgentAccountModelInputs(values []string) []string {
 	return result
 }
 
-func findAgentAccountModel(models []dto.AgentAccountModel, modelID string) (dto.AgentAccountModel, bool) {
-	target := strings.TrimSpace(modelID)
+func shouldRefreshAccountModelRuntimeLimits(provider string) bool {
+	switch strings.ToLower(strings.TrimSpace(provider)) {
+	case "custom", "vllm", "ollama":
+		return true
+	default:
+		return false
+	}
+}
+
+func refreshAccountModelRuntimeLimits(account *model.AgentAccount, models []dto.AgentAccountModel) []dto.AgentAccountModel {
+	refreshed := make([]dto.AgentAccountModel, 0, len(models))
 	for _, item := range models {
-		if strings.TrimSpace(item.ID) == target {
+		next := item
+		next.MaxTokens = account.MaxTokens
+		next.ContextWindow = account.ContextWindow
+		refreshed = append(refreshed, next)
+	}
+	return refreshed
+}
+
+func normalizeComparableProviderModelID(provider, modelID string) string {
+	target := strings.TrimSpace(modelID)
+	if target == "" {
+		return ""
+	}
+	if !strings.Contains(target, "/") {
+		return target
+	}
+	parts := strings.SplitN(target, "/", 2)
+	prefix := strings.ToLower(strings.TrimSpace(parts[0]))
+	model := strings.TrimSpace(parts[1])
+	if model == "" {
+		return target
+	}
+	for _, item := range supportedProviderModelPrefixes(provider) {
+		if item == prefix {
+			return model
+		}
+	}
+	return target
+}
+
+func sameProviderModelID(provider, left, right string) bool {
+	leftTrimmed := strings.TrimSpace(left)
+	rightTrimmed := strings.TrimSpace(right)
+	if leftTrimmed == rightTrimmed {
+		return true
+	}
+	leftComparable := normalizeComparableProviderModelID(provider, leftTrimmed)
+	rightComparable := normalizeComparableProviderModelID(provider, rightTrimmed)
+	return leftComparable != "" && leftComparable == rightComparable
+}
+
+func findAgentAccountModelForProvider(provider string, models []dto.AgentAccountModel, modelID string) (dto.AgentAccountModel, bool) {
+	for _, item := range models {
+		if sameProviderModelID(provider, item.ID, modelID) {
 			return item, true
 		}
 	}
 	return dto.AgentAccountModel{}, false
+}
+
+func ensureAccountModelsNotBound(account *model.AgentAccount, models []dto.AgentAccountModel) error {
+	if account == nil || account.ID == 0 {
+		return nil
+	}
+	agents, err := agentRepo.List(repo.WithByAccountID(account.ID))
+	if err != nil {
+		return err
+	}
+	for _, agent := range agents {
+		if strings.TrimSpace(agent.Model) == "" {
+			continue
+		}
+		if _, ok := findAgentAccountModelForProvider(account.Provider, models, agent.Model); !ok {
+			return buserr.WithName("ErrAgentModelInUse", agent.Name)
+		}
+	}
+	return nil
 }
 
 func resolveServerTimezone() string {
@@ -3021,11 +3175,16 @@ func normalizeAgentType(agentType string) string {
 }
 
 func modelMatchesProvider(provider, modelName string) bool {
-	prefix := providerModelPrefix(provider)
-	return prefix != "" && strings.HasPrefix(strings.TrimSpace(modelName), prefix+"/")
+	target := strings.TrimSpace(modelName)
+	for _, prefix := range supportedProviderModelPrefixes(provider) {
+		if prefix != "" && strings.HasPrefix(target, prefix+"/") {
+			return true
+		}
+	}
+	return false
 }
 
-func providerModelPrefix(provider string) string {
+func runtimeProviderModelPrefix(provider string) string {
 	switch strings.ToLower(strings.TrimSpace(provider)) {
 	case "gemini":
 		return "google"
@@ -3036,6 +3195,35 @@ func providerModelPrefix(provider string) string {
 	default:
 		return strings.ToLower(strings.TrimSpace(provider))
 	}
+}
+
+func poolModelPrefix(provider string) string {
+	target := strings.ToLower(strings.TrimSpace(provider))
+	if definitions, ok := providerDefinitions()[target]; ok && len(definitions.Models) > 0 {
+		parts := strings.SplitN(strings.TrimSpace(definitions.Models[0].ID), "/", 2)
+		if len(parts) == 2 && strings.TrimSpace(parts[0]) != "" {
+			return strings.ToLower(strings.TrimSpace(parts[0]))
+		}
+	}
+	return target
+}
+
+func supportedProviderModelPrefixes(provider string) []string {
+	values := []string{poolModelPrefix(provider), runtimeProviderModelPrefix(provider)}
+	result := make([]string, 0, len(values))
+	seen := make(map[string]struct{}, len(values))
+	for _, value := range values {
+		target := strings.ToLower(strings.TrimSpace(value))
+		if target == "" {
+			continue
+		}
+		if _, ok := seen[target]; ok {
+			continue
+		}
+		seen[target] = struct{}{}
+		result = append(result, target)
+	}
+	return result
 }
 
 func isSupportedAgentType(agentType string) bool {
