@@ -81,6 +81,10 @@ export namespace Setting {
         cursorStyle: string;
         scrollback: string;
         scrollSensitivity: string;
+        aiStatus: string;
+        aiAccountId: string;
+        aiPrefix: string;
+        aiRiskCommands: string;
     }
     export interface SettingUpdate {
         key: string;

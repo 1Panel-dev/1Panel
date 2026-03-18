@@ -57,6 +57,7 @@ type LogicSshWsSession struct {
 	wsConn          *websocket.Conn
 	isAdmin         bool
 	IsFlagged       bool
+	aiInterceptor   *aiInputInterceptor
 }
 
 func NewLogicSshWsSession(cols, rows int, sshClient *ssh.Client, wsConn *websocket.Conn, initCmd string) (*LogicSshWsSession, error) {
@@ -100,6 +101,7 @@ func NewLogicSshWsSession(cols, rows int, sshClient *ssh.Client, wsConn *websock
 		wsConn:          wsConn,
 		isAdmin:         true,
 		IsFlagged:       false,
+		aiInterceptor:   newAIInputInterceptor(""),
 	}, nil
 }
 
@@ -150,6 +152,14 @@ func (sws *LogicSshWsSession) receiveWsMsg(exitCh chan bool) {
 				decodeBytes, err := base64.StdEncoding.DecodeString(msgObj.Data)
 				if err != nil {
 					global.LOG.Errorf("websock cmd string base64 decoding failed, err: %v", err)
+				}
+				if isEnterInput(decodeBytes) {
+					if generated, ok := sws.aiInterceptor.HandleEnter(); ok {
+						sws.sendWebsocketInputCommandToSshSessionStdinPipe(append([]byte{lineClearControl}, []byte(generated)...))
+						continue
+					}
+				} else {
+					sws.aiInterceptor.TrackInput(decodeBytes)
 				}
 				sws.sendWebsocketInputCommandToSshSessionStdinPipe(decodeBytes)
 			case WsMsgHeartbeat:

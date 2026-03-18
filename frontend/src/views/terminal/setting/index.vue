@@ -111,7 +111,22 @@
                                 <el-button @click="search(true)" plain>{{ $t('commons.button.reset') }}</el-button>
                                 <el-button @click="onSave" type="primary">{{ $t('commons.button.save') }}</el-button>
                             </el-form-item>
+
                             <el-divider border-style="dashed" />
+
+                            <AiSetting
+                                ref="aiSettingRef"
+                                v-model:status="aiForm.aiStatus"
+                                v-model:account-id="aiForm.aiAccountId"
+                                v-model:prefix="aiForm.aiPrefix"
+                                v-model:risk-commands="aiRiskCommands"
+                                :agent-account-options="agentAccountOptions"
+                                :submit-handler="saveAISettings"
+                                @refresh="refreshAISettings"
+                            />
+
+                            <el-divider border-style="dashed" />
+
                             <el-form-item :label="$t('terminal.defaultConn')">
                                 <el-switch v-model="form.showDefaultConn" @change="changeShow" />
                             </el-form-item>
@@ -146,8 +161,16 @@
 <script lang="ts" setup>
 import { ref, reactive, watch, onMounted, onBeforeUnmount } from 'vue';
 import { getTerminalInfo, UpdateTerminalInfo } from '@/api/modules/setting';
+import { pageAgentAccounts } from '@/api/modules/ai';
 import { Terminal } from '@xterm/xterm';
 import OperateDialog from '@/views/terminal/setting/default_conn/index.vue';
+import AiSetting from '@/views/terminal/setting/ai/index.vue';
+import {
+    DEFAULT_AI_PREFIX,
+    DEFAULT_AI_RISK_COMMANDS,
+    normalizeRiskCommands,
+    parseRiskCommands,
+} from '@/views/terminal/setting/ai/helper';
 import '@xterm/xterm/css/xterm.css';
 import { FitAddon } from '@xterm/addon-fit';
 import i18n from '@/lang';
@@ -157,7 +180,9 @@ import { loadLocalConn, updateLocalConn } from '@/api/modules/terminal';
 
 const loading = ref(false);
 const terminalStore = TerminalStore();
+const aiSettingRef = ref();
 const dialogRef = ref();
+const agentAccountOptions = ref([]);
 
 const terminalElement = ref<HTMLDivElement | null>(null);
 const fitAddon = new FitAddon();
@@ -190,10 +215,33 @@ const form = reactive({
     cursorStyle: 'underline',
     scrollback: 1000,
     scrollSensitivity: 10,
-
     showDefaultConn: false,
     defaultConn: '',
 });
+const savedTerminalForm = reactive({
+    lineHeight: '1.2',
+    letterSpacing: '1.2',
+    fontSize: '12',
+    fontFamily: DEFAULT_FONT_FAMILY,
+    backgroundColor: '#000000',
+    foregroundColor: '#f5f5f5',
+    cursorBlink: 'Enable',
+    cursorStyle: 'underline',
+    scrollback: '1000',
+    scrollSensitivity: '10',
+});
+const aiForm = reactive({
+    aiStatus: 'Disable',
+    aiAccountId: '',
+    aiPrefix: DEFAULT_AI_PREFIX,
+});
+const savedAIForm = reactive({
+    aiStatus: 'Disable',
+    aiAccountId: '',
+    aiPrefix: DEFAULT_AI_PREFIX,
+});
+const aiRiskCommands = ref<string[]>([...DEFAULT_AI_RISK_COMMANDS]);
+const savedAIRiskCommands = ref<string[]>([...DEFAULT_AI_RISK_COMMANDS]);
 
 const resetConn = ref(false);
 const opRef = ref();
@@ -232,6 +280,7 @@ watch(
 const acceptParams = () => {
     search(true);
     loadConnShow();
+    loadAgentAccounts();
     iniTerm();
 };
 
@@ -255,16 +304,34 @@ const search = async (withReset?: boolean) => {
         .then((res) => {
             loading.value = false;
             form.lineHeight = Number(res.data.lineHeight);
+            savedTerminalForm.lineHeight = res.data.lineHeight;
             form.letterSpacing = Number(res.data.letterSpacing);
+            savedTerminalForm.letterSpacing = res.data.letterSpacing;
             form.fontSize = Number(res.data.fontSize);
+            savedTerminalForm.fontSize = res.data.fontSize;
             form.fontFamily = res.data.fontFamily || DEFAULT_FONT_FAMILY;
+            savedTerminalForm.fontFamily = res.data.fontFamily || DEFAULT_FONT_FAMILY;
             selectedFontFamilies.value = splitFontFamily(form.fontFamily);
             form.backgroundColor = res.data.backgroundColor || '#000000';
+            savedTerminalForm.backgroundColor = res.data.backgroundColor || '#000000';
             form.foregroundColor = res.data.foregroundColor || '#f5f5f5';
+            savedTerminalForm.foregroundColor = res.data.foregroundColor || '#f5f5f5';
             form.cursorBlink = res.data.cursorBlink;
+            savedTerminalForm.cursorBlink = res.data.cursorBlink;
             form.cursorStyle = res.data.cursorStyle;
+            savedTerminalForm.cursorStyle = res.data.cursorStyle;
             form.scrollback = Number(res.data.scrollback);
+            savedTerminalForm.scrollback = res.data.scrollback;
             form.scrollSensitivity = Number(res.data.scrollSensitivity);
+            savedTerminalForm.scrollSensitivity = res.data.scrollSensitivity;
+            aiForm.aiStatus = res.data.aiStatus || 'Disable';
+            aiForm.aiAccountId = res.data.aiAccountId || '';
+            aiForm.aiPrefix = res.data.aiPrefix || DEFAULT_AI_PREFIX;
+            savedAIForm.aiStatus = aiForm.aiStatus;
+            savedAIForm.aiAccountId = aiForm.aiAccountId;
+            savedAIForm.aiPrefix = aiForm.aiPrefix;
+            aiRiskCommands.value = parseRiskCommands(res.data.aiRiskCommands);
+            savedAIRiskCommands.value = [...aiRiskCommands.value];
             terminalStore.setFontFamily(res.data.fontFamily || '');
 
             if (withReset) {
@@ -272,6 +339,35 @@ const search = async (withReset?: boolean) => {
             }
         })
         .catch(() => {
+            loading.value = false;
+        });
+};
+
+const loadAgentAccounts = async () => {
+    await pageAgentAccounts({
+        page: 1,
+        pageSize: 1000,
+        provider: '',
+        name: '',
+    }).then((res) => {
+        agentAccountOptions.value = res.data?.items || [];
+    });
+};
+
+const refreshAISettings = async () => {
+    loading.value = true;
+    await getTerminalInfo()
+        .then((res) => {
+            aiForm.aiStatus = res.data.aiStatus || 'Disable';
+            aiForm.aiAccountId = res.data.aiAccountId || '';
+            aiForm.aiPrefix = res.data.aiPrefix || DEFAULT_AI_PREFIX;
+            savedAIForm.aiStatus = aiForm.aiStatus;
+            savedAIForm.aiAccountId = aiForm.aiAccountId;
+            savedAIForm.aiPrefix = aiForm.aiPrefix;
+            aiRiskCommands.value = parseRiskCommands(res.data.aiRiskCommands);
+            savedAIRiskCommands.value = [...aiRiskCommands.value];
+        })
+        .finally(() => {
             loading.value = false;
         });
 };
@@ -386,6 +482,91 @@ const onSetDefault = () => {
     changeItem();
 };
 
+const saveAISettings = async () => {
+    loading.value = true;
+    try {
+        const valid = await aiSettingRef.value?.validate?.();
+        if (!valid) {
+            return false;
+        }
+        let param = {
+            lineHeight: savedTerminalForm.lineHeight,
+            letterSpacing: savedTerminalForm.letterSpacing,
+            fontSize: savedTerminalForm.fontSize,
+            fontFamily: savedTerminalForm.fontFamily,
+            backgroundColor: savedTerminalForm.backgroundColor,
+            foregroundColor: savedTerminalForm.foregroundColor,
+            cursorBlink: savedTerminalForm.cursorBlink,
+            cursorStyle: savedTerminalForm.cursorStyle,
+            scrollback: savedTerminalForm.scrollback,
+            scrollSensitivity: savedTerminalForm.scrollSensitivity,
+            aiStatus: aiForm.aiStatus,
+            aiAccountId: aiForm.aiStatus === 'Enable' ? aiForm.aiAccountId : '',
+            aiPrefix: aiForm.aiPrefix.trim() || DEFAULT_AI_PREFIX,
+            aiRiskCommands: JSON.stringify(normalizeRiskCommands(aiRiskCommands.value)),
+        };
+        await UpdateTerminalInfo(param);
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+        savedAIForm.aiStatus = aiForm.aiStatus;
+        savedAIForm.aiAccountId = aiForm.aiStatus === 'Enable' ? aiForm.aiAccountId : '';
+        savedAIForm.aiPrefix = aiForm.aiPrefix.trim() || DEFAULT_AI_PREFIX;
+        savedAIRiskCommands.value = normalizeRiskCommands(aiRiskCommands.value);
+        aiRiskCommands.value = [...savedAIRiskCommands.value];
+        aiForm.aiAccountId = savedAIForm.aiAccountId;
+        aiForm.aiPrefix = savedAIForm.aiPrefix;
+        return true;
+    } finally {
+        loading.value = false;
+    }
+};
+
+const saveTerminalInfo = async () => {
+    loading.value = true;
+    try {
+        let param = {
+            lineHeight: form.lineHeight + '',
+            letterSpacing: form.letterSpacing + '',
+            fontSize: form.fontSize + '',
+            fontFamily: form.fontFamily,
+            backgroundColor: form.backgroundColor,
+            foregroundColor: form.foregroundColor,
+            cursorBlink: form.cursorBlink,
+            cursorStyle: form.cursorStyle,
+            scrollback: form.scrollback + '',
+            scrollSensitivity: form.scrollSensitivity + '',
+            aiStatus: savedAIForm.aiStatus,
+            aiAccountId: savedAIForm.aiStatus === 'Enable' ? savedAIForm.aiAccountId : '',
+            aiPrefix: savedAIForm.aiPrefix,
+            aiRiskCommands: JSON.stringify(savedAIRiskCommands.value),
+        };
+        await UpdateTerminalInfo(param);
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+        terminalStore.setLineHeight(form.lineHeight);
+        terminalStore.setLetterSpacing(form.letterSpacing);
+        terminalStore.setFontSize(form.fontSize);
+        terminalStore.setFontFamily(form.fontFamily);
+        terminalStore.setBackgroundColor(form.backgroundColor);
+        terminalStore.setForegroundColor(form.foregroundColor);
+        terminalStore.setCursorBlink(form.cursorBlink);
+        terminalStore.setCursorStyle(form.cursorStyle);
+        terminalStore.setScrollback(form.scrollback);
+        terminalStore.setScrollSensitivity(form.scrollSensitivity);
+        savedTerminalForm.lineHeight = param.lineHeight;
+        savedTerminalForm.letterSpacing = param.letterSpacing;
+        savedTerminalForm.fontSize = param.fontSize;
+        savedTerminalForm.fontFamily = param.fontFamily;
+        savedTerminalForm.backgroundColor = param.backgroundColor;
+        savedTerminalForm.foregroundColor = param.foregroundColor;
+        savedTerminalForm.cursorBlink = param.cursorBlink;
+        savedTerminalForm.cursorStyle = param.cursorStyle;
+        savedTerminalForm.scrollback = param.scrollback;
+        savedTerminalForm.scrollSensitivity = param.scrollSensitivity;
+        return true;
+    } finally {
+        loading.value = false;
+    }
+};
+
 const onSave = () => {
     ensureFontFamily();
     ElMessageBox.confirm(i18n.global.t('terminal.saveHelper'), i18n.global.t('container.setting'), {
@@ -393,35 +574,7 @@ const onSave = () => {
         cancelButtonText: i18n.global.t('commons.button.cancel'),
         type: 'info',
     }).then(async () => {
-        loading.value = true;
-        try {
-            let param = {
-                lineHeight: form.lineHeight + '',
-                letterSpacing: form.letterSpacing + '',
-                fontSize: form.fontSize + '',
-                fontFamily: form.fontFamily,
-                backgroundColor: form.backgroundColor,
-                foregroundColor: form.foregroundColor,
-                cursorBlink: form.cursorBlink,
-                cursorStyle: form.cursorStyle,
-                scrollback: form.scrollback + '',
-                scrollSensitivity: form.scrollSensitivity + '',
-            };
-            await UpdateTerminalInfo(param);
-            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            terminalStore.setLineHeight(form.lineHeight);
-            terminalStore.setLetterSpacing(form.letterSpacing);
-            terminalStore.setFontSize(form.fontSize);
-            terminalStore.setFontFamily(form.fontFamily);
-            terminalStore.setBackgroundColor(form.backgroundColor);
-            terminalStore.setForegroundColor(form.foregroundColor);
-            terminalStore.setCursorBlink(form.cursorBlink);
-            terminalStore.setCursorStyle(form.cursorStyle);
-            terminalStore.setScrollback(form.scrollback);
-            terminalStore.setScrollSensitivity(form.scrollSensitivity);
-        } finally {
-            loading.value = false;
-        }
+        await saveTerminalInfo();
     });
 };
 

@@ -235,6 +235,10 @@ type TerminalInfo struct {
 	CursorStyle       string `json:"cursorStyle"`
 	Scrollback        string `json:"scrollback"`
 	ScrollSensitivity string `json:"scrollSensitivity"`
+	AIStatus          string `json:"aiStatus"`
+	AIAccountID       string `json:"aiAccountId"`
+	AIPrefix          string `json:"aiPrefix"`
+	AIRiskCommands    string `json:"aiRiskCommands"`
 }
 
 type AppstoreUpdate struct {

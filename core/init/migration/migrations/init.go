@@ -275,6 +275,25 @@ var InitTerminalSetting = &gormigrate.Migration{
 	},
 }
 
+var AddAITerminalSettings = &gormigrate.Migration{
+	ID: "20260318-add-ai-terminal-settings",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.Create(&model.Setting{Key: "AIStatus", Value: constant.StatusDisable}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "AIAccountID", Value: ""}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "AIPrefix", Value: "#"}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "AIRiskCommands", Value: "[\"rm -rf\",\"mkfs\",\"dd if=\",\"curl | sh\",\"wget | sh\",\"chmod -R 777 /\",\"shutdown\",\"reboot\",\"poweroff\",\"init 0\",\":(){ :|:& };:\"]"}).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}
+
 var InitHost = &gormigrate.Migration{
 	ID: "20240816-init-host",
 	Migrate: func(tx *gorm.DB) error {

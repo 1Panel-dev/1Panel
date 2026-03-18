@@ -558,6 +558,18 @@ func (u *SettingService) UpdateTerminal(req dto.TerminalInfo) error {
 	if err := settingRepo.UpdateOrCreate("ScrollSensitivity", req.ScrollSensitivity); err != nil {
 		return err
 	}
+	if err := settingRepo.UpdateOrCreate("AIStatus", req.AIStatus); err != nil {
+		return err
+	}
+	if err := settingRepo.UpdateOrCreate("AIAccountID", req.AIAccountID); err != nil {
+		return err
+	}
+	if err := settingRepo.UpdateOrCreate("AIPrefix", req.AIPrefix); err != nil {
+		return err
+	}
+	if err := settingRepo.UpdateOrCreate("AIRiskCommands", req.AIRiskCommands); err != nil {
+		return err
+	}
 	return nil
 }
 

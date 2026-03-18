@@ -1371,6 +1371,22 @@ const message = {
         cursorBar: 'Bar',
         scrollback: 'Scrollback',
         scrollSensitivity: 'Scroll Sensitivity',
+        aiStatus: 'AI Terminal',
+        aiSettings: 'AI Terminal Settings',
+        aiAccountHelper:
+            'When enabled, entering a line starting with # and pressing Enter will use the selected AgentAccount to generate a command and fill the current line.',
+        aiAccountRequired: 'Please select an available AI account first.',
+        aiPrefix: 'Trigger Prefix',
+        aiPrefixHelper:
+            'When a line starts with this prefix and you press Enter, AI command generation will be triggered, for example # or //ai.',
+        aiRiskCommands: 'Risk Command Interception',
+        aiRiskCommandsHelper:
+            'Generated commands matching any of these fragments will be blocked and filled back as comments. Supports add, edit, and delete.',
+        aiAddRiskCommand: 'Add Risk Command',
+        aiRemoveRiskCommand: 'Delete',
+        aiSummary: 'When a line starts with {0} and you press Enter, {1} ({2}) will generate AI commands.',
+        aiPrefixAsciiVisible:
+            'Only ASCII visible characters are supported. Spaces, CJK characters, and full-width symbols are not allowed.',
         saveHelper: 'Are you sure you want to save the current terminal configuration?',
     },
     toolbox: {
