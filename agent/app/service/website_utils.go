@@ -51,6 +51,30 @@ func isHTTPSProxyPass(proxyPass string) bool {
 	return strings.HasPrefix(strings.ToLower(strings.TrimSpace(proxyPass)), "https://")
 }
 
+func normalizeProxyPass(proxyPass string) string {
+	proxyPass = strings.TrimSpace(proxyPass)
+	if proxyPass == "" {
+		return ""
+	}
+	if strings.Contains(proxyPass, "://") || strings.HasPrefix(proxyPass, "unix:") {
+		return proxyPass
+	}
+	return fmt.Sprintf("http://%s", proxyPass)
+}
+
+func getAppInstallProxyPass(appInstall *model.AppInstall) (string, error) {
+	if appInstall == nil {
+		return "", errors.New("app install is nil")
+	}
+	if appInstall.HttpPort > 0 {
+		return fmt.Sprintf("http://127.0.0.1:%d", appInstall.HttpPort), nil
+	}
+	if appInstall.HttpsPort > 0 {
+		return fmt.Sprintf("https://127.0.0.1:%d", appInstall.HttpsPort), nil
+	}
+	return "", fmt.Errorf("app %s has no available http or https port", appInstall.Name)
+}
+
 func applyLocationProxyPass(location *components.Location, proxyPass string, sni *bool, proxySSLName string) {
 	location.UpdateDirective("proxy_pass", []string{proxyPass})
 
@@ -281,7 +305,10 @@ func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, a
 		rootIndex := path.Join("/www/sites", website.Alias, "index")
 		switch website.Type {
 		case constant.Deployment:
-			proxy := fmt.Sprintf("http://127.0.0.1:%d", appInstall.HttpPort)
+			proxy, err := getAppInstallProxyPass(appInstall)
+			if err != nil {
+				return err
+			}
 			server.UpdateRootProxy([]string{proxy})
 		case constant.Static:
 			server.UpdateRoot(rootIndex)
@@ -303,7 +330,7 @@ func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, a
 					server.UpdatePHPProxy([]string{website.Proxy}, "")
 				}
 			case constant.RuntimeNode, constant.RuntimeJava, constant.RuntimeGo, constant.RuntimePython, constant.RuntimeDotNet:
-				server.UpdateRootProxy([]string{fmt.Sprintf("http://%s", website.Proxy)})
+				server.UpdateRootProxy([]string{normalizeProxyPass(website.Proxy)})
 			}
 		case constant.Subsite:
 			parentWebsite, err := websiteRepo.GetFirst(repo.WithByID(website.ParentWebsiteID))
@@ -1049,7 +1076,10 @@ func opWebsite(website *model.Website, operate string) error {
 			if err != nil {
 				return err
 			}
-			proxy := fmt.Sprintf("http://127.0.0.1:%d", appInstall.HttpPort)
+			proxy, err := getAppInstallProxyPass(&appInstall)
+			if err != nil {
+				return err
+			}
 			server.UpdateRootProxy([]string{proxy})
 		case constant.Static:
 			server.UpdateRoot(rootIndex)
@@ -1069,7 +1099,7 @@ func opWebsite(website *model.Website, operate string) error {
 				}
 				server.UpdatePHPProxy([]string{website.Proxy}, localPath)
 			} else {
-				proxy := fmt.Sprintf("http://%s", website.Proxy)
+				proxy := normalizeProxyPass(website.Proxy)
 				server.UpdateRootProxy([]string{proxy})
 			}
 		case constant.Subsite:

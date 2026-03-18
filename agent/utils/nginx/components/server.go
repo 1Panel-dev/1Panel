@@ -3,6 +3,7 @@ package components
 import (
 	"errors"
 	"fmt"
+	"strings"
 )
 
 type Server struct {
@@ -352,6 +353,7 @@ func (s *Server) UpdateRootLocation() {
 }
 
 func (s *Server) UpdateRootProxy(proxy []string) {
+	httpsProxy := len(proxy) > 0 && strings.HasPrefix(strings.ToLower(strings.TrimSpace(proxy[0])), "https://")
 	newDir := Directive{
 		Name:       "location",
 		Parameters: []string{"/"},
@@ -391,6 +393,14 @@ func (s *Server) UpdateRootProxy(proxy []string) {
 		&Directive{
 			Name:       "proxy_http_version",
 			Parameters: []string{"1.1"},
+		},
+		&Directive{
+			Name:       "proxy_ssl_server_name",
+			Parameters: []string{map[bool]string{true: "on", false: "off"}[httpsProxy]},
+		},
+		&Directive{
+			Name:       "proxy_ssl_name",
+			Parameters: []string{"$proxy_host"},
 		},
 		&Directive{
 			Name:       "proxy_pass",

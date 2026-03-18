@@ -389,7 +389,10 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 			}
 			appInstall = install
 			website.AppInstallID = install.ID
-			website.Proxy = fmt.Sprintf("127.0.0.1:%d", appInstall.HttpPort)
+			website.Proxy, err = getAppInstallProxyPass(appInstall)
+			if err != nil {
+				return err
+			}
 		} else {
 			var install model.AppInstall
 			install, err = appInstallRepo.GetFirst(repo.WithByID(create.AppInstallID))
@@ -399,7 +402,10 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 			configApp := func(t *task.Task) error {
 				appInstall = &install
 				website.AppInstallID = appInstall.ID
-				website.Proxy = fmt.Sprintf("127.0.0.1:%d", appInstall.HttpPort)
+				website.Proxy, err = getAppInstallProxyPass(appInstall)
+				if err != nil {
+					return err
+				}
 				return nil
 			}
 			createTask.AddSubTask(i18n.GetMsgByKey("ConfigApp"), configApp, nil)
@@ -1503,7 +1509,7 @@ func (w WebsiteService) UpdateAntiLeech(req request.NginxAntiLeechUpdate) (err e
 				},
 				&components.Directive{
 					Name:       "proxy_pass",
-					Parameters: []string{fmt.Sprintf("http://%s", website.Proxy)},
+					Parameters: []string{normalizeProxyPass(website.Proxy)},
 				})
 		}
 		newDirective.Block = newBlock

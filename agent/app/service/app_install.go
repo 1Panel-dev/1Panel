@@ -443,7 +443,11 @@ func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
 				return
 			}
 			server := servers[0]
-			proxy := fmt.Sprintf("http://127.0.0.1:%d", installed.HttpPort)
+			proxy, err := getAppInstallProxyPass(&installed)
+			if err != nil {
+				global.LOG.Error(buserr.WithErr("ErrUpdateBuWebsite", err).Error())
+				return
+			}
 			server.UpdateRootProxy([]string{proxy})
 
 			if err := nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
