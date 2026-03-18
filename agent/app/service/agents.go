@@ -1822,7 +1822,7 @@ func migrateOpenclawHTTPSUpgradeWithSystemIP(install *model.AppInstall, fromVers
 			}
 		}
 	}
-	return writeOpenclawCaddyfile(configPath, []string{allowedOrigin})
+	return migrateOpenclawInstallEnv(install, allowedOrigins)
 }
 
 func migrateOpenclawInstallPorts(install *model.AppInstall) {
@@ -2119,7 +2119,7 @@ func writeOpenclawConfig(confDir string, account *model.AgentAccount, modelName,
 	cfg := openclawConfig{
 		Gateway: gatewayConfig{
 			Mode: "local",
-			Bind: "lan",
+			Bind: "loopback",
 			Port: openclawGatewayPort,
 			Auth: gatewayAuth{
 				Mode:  "token",
@@ -2212,7 +2212,7 @@ func writeOpenclawConfig(confDir string, account *model.AgentAccount, modelName,
 			gatewayMap["mode"] = "local"
 		}
 		if _, ok := gatewayMap["bind"]; !ok {
-			gatewayMap["bind"] = "lan"
+			gatewayMap["bind"] = "loopback"
 		}
 		if _, ok := gatewayMap["port"]; !ok {
 			gatewayMap["port"] = openclawGatewayPort
