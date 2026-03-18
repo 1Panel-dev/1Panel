@@ -75,6 +75,30 @@ func getAppInstallProxyPass(appInstall *model.AppInstall) (string, error) {
 	return "", fmt.Errorf("app %s has no available http or https port", appInstall.Name)
 }
 
+func getAppInstallProxyPassOrEmpty(appInstall *model.AppInstall) string {
+	proxyPass, err := getAppInstallProxyPass(appInstall)
+	if err != nil {
+		return ""
+	}
+	return proxyPass
+}
+
+func hasAppInstallProxyPassChanged(before *model.AppInstall, after *model.AppInstall) bool {
+	return getAppInstallProxyPassOrEmpty(before) != getAppInstallProxyPassOrEmpty(after)
+}
+
+func getRootProxyDirectives(proxyPass string) []components.IDirective {
+	server := &components.Server{}
+	server.UpdateRootProxy([]string{normalizeProxyPass(proxyPass)})
+
+	locations := server.FindDirectives("location")
+	if len(locations) == 0 || locations[0].GetBlock() == nil {
+		return nil
+	}
+
+	return append([]components.IDirective(nil), locations[0].GetBlock().GetDirectives()...)
+}
+
 func applyLocationProxyPass(location *components.Location, proxyPass string, sni *bool, proxySSLName string) {
 	location.UpdateDirective("proxy_pass", []string{proxyPass})
 

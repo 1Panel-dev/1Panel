@@ -1494,23 +1494,11 @@ func (w WebsiteService) UpdateAntiLeech(req request.NginxAntiLeechUpdate) (err e
 			newBlock.AppendDirectives(ifDir)
 		}
 		if website.Type == constant.Deployment {
-			newBlock.AppendDirectives(
-				&components.Directive{
-					Name:       "proxy_set_header",
-					Parameters: []string{"Host", "$host"},
-				},
-				&components.Directive{
-					Name:       "proxy_set_header",
-					Parameters: []string{"X-Real-IP", "$remote_addr"},
-				},
-				&components.Directive{
-					Name:       "proxy_set_header",
-					Parameters: []string{"X-Forwarded-For", "$proxy_add_x_forwarded_for"},
-				},
-				&components.Directive{
-					Name:       "proxy_pass",
-					Parameters: []string{normalizeProxyPass(website.Proxy)},
-				})
+			proxyDirectives := getRootProxyDirectives(website.Proxy)
+			if len(proxyDirectives) == 0 {
+				return errors.New("failed to build deployment proxy directives")
+			}
+			newBlock.AppendDirectives(proxyDirectives...)
 		}
 		newDirective.Block = newBlock
 		index := -1
