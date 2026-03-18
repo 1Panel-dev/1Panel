@@ -1095,3 +1095,10 @@ var NormalizeOllamaAccountAPIType = &gormigrate.Migration{
 			Update("api_type", "openai-responses").Error
 	},
 }
+
+var RewriteOpenclawBundledCaddyfile = &gormigrate.Migration{
+	ID: "20260318-rewrite-openclaw-bundled-caddyfile",
+	Migrate: func(tx *gorm.DB) error {
+		return migrationutils.RewriteOpenclawBundledCaddyfile(tx)
+	},
+}

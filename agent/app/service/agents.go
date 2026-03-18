@@ -26,6 +26,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
+	openclawutil "github.com/1Panel-dev/1Panel/agent/utils/openclaw"
 	"github.com/1Panel-dev/1Panel/agent/utils/req_helper"
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 )
@@ -77,9 +78,6 @@ const (
 	maxCommunityAIAgents          = int64(5)
 	openclawPluginBaseDir         = "/home/node/.openclaw/extensions"
 	openclawGatewayPort           = 18789
-	openclawCaddyPort             = 8443
-	openclawCaddyDataPerm         = 0777
-	openclawCaddyLoopbackAddress  = "https://127.0.0.1:8443"
 	openclawAllowedOriginHost     = "127.0.0.1"
 	openclawHTTPSVersion          = "2026.3.13"
 	openclawTrustedProxyLoopback  = "127.0.0.1/32"
@@ -901,9 +899,6 @@ func (a AgentService) UpdateSecurityConfig(req dto.AgentSecurityConfigUpdateReq)
 	if err := writeOpenclawConfigRaw(agent.ConfigPath, conf); err != nil {
 		return err
 	}
-	if err := writeOpenclawCaddyfile(agent.ConfigPath, allowedOrigins); err != nil {
-		return err
-	}
 	if err := syncOpenclawAllowedOriginEnv(install, allowedOrigins); err != nil {
 		return err
 	}
@@ -1640,6 +1635,9 @@ func migrateOpenclawHTTPSUpgradeWithSystemIP(install *model.AppInstall, fromVers
 		return nil
 	}
 	migrateOpenclawInstallPorts(install)
+	if err := openclawutil.WriteCatchAllCaddyfile(install.GetPath()); err != nil {
+		return err
+	}
 	configPath := path.Join(install.GetPath(), "data", "conf", "openclaw.json")
 	var allowedOrigins []string
 	if conf, err := readOpenclawConfig(configPath); err == nil {
@@ -1659,9 +1657,6 @@ func migrateOpenclawHTTPSUpgradeWithSystemIP(install *model.AppInstall, fromVers
 			allowedOrigins = []string{allowedOrigin}
 			setSecurityConfig(conf, dto.AgentSecurityConfig{AllowedOrigins: allowedOrigins})
 			if err := writeOpenclawConfigRaw(configPath, conf); err != nil {
-				return err
-			}
-			if err := writeOpenclawCaddyfile(configPath, allowedOrigins); err != nil {
 				return err
 			}
 		}
@@ -1748,82 +1743,6 @@ func buildOpenclawAllowedOrigin(host string, port int) (string, error) {
 		host = "[" + host + "]"
 	}
 	return normalizeAllowedOrigin(fmt.Sprintf("https://%s:%d", host, port))
-}
-
-func writeOpenclawCaddyfile(configPath string, allowedOrigins []string) error {
-	content, err := buildOpenclawCaddyfile(allowedOrigins)
-	if err != nil {
-		return err
-	}
-	dataDir := path.Dir(path.Dir(configPath))
-	caddyDir := path.Join(dataDir, "caddy")
-	fileOp := files.NewFileOp()
-	if !fileOp.Stat(caddyDir) {
-		if err := fileOp.CreateDir(caddyDir, constant.DirPerm); err != nil {
-			return err
-		}
-	}
-	caddyDataDir := path.Join(caddyDir, "data")
-	if !fileOp.Stat(caddyDataDir) {
-		if err := fileOp.CreateDir(caddyDataDir, constant.DirPerm); err != nil {
-			return err
-		}
-	}
-	if err := fileOp.ChmodR(caddyDataDir, openclawCaddyDataPerm, false); err != nil {
-		return err
-	}
-	return fileOp.SaveFile(path.Join(caddyDir, "Caddyfile"), content, 0644)
-}
-
-func buildOpenclawCaddyfile(allowedOrigins []string) (string, error) {
-	if len(allowedOrigins) == 0 {
-		return "", fmt.Errorf("allowed origins is required")
-	}
-	addresses := make([]string, 0, len(allowedOrigins))
-	seen := make(map[string]struct{}, len(allowedOrigins))
-	for _, origin := range allowedOrigins {
-		normalized, err := normalizeAllowedOrigin(origin)
-		if err != nil {
-			return "", err
-		}
-		parsed, err := url.Parse(normalized)
-		if err != nil {
-			return "", err
-		}
-		host := parsed.Hostname()
-		if strings.Contains(host, ":") {
-			host = "[" + host + "]"
-		}
-		address := fmt.Sprintf("https://%s:%d", host, openclawCaddyPort)
-		if _, ok := seen[address]; ok {
-			continue
-		}
-		seen[address] = struct{}{}
-		addresses = append(addresses, address)
-	}
-	if len(addresses) == 0 {
-		return "", fmt.Errorf("allowed origins is required")
-	}
-	if _, ok := seen[openclawCaddyLoopbackAddress]; !ok {
-		addresses = append(addresses, openclawCaddyLoopbackAddress)
-	}
-	content := `{
-    admin off
-    auto_https disable_redirects
-    default_sni 127.0.0.1
-    skip_install_trust
-    storage file_system {
-        root /data/caddy
-    }
-}
-
-` + strings.Join(addresses, ", ") + ` {
-    bind 0.0.0.0
-    tls internal
-    reverse_proxy 127.0.0.1:` + strconv.Itoa(openclawGatewayPort) + `
-}
-`
-	return content, nil
 }
 
 func checkAgentUpgradable(install model.AppInstall) bool {
@@ -2145,12 +2064,6 @@ func writeOpenclawConfig(confDir, provider, modelName, apiType string, maxTokens
 	if err := writeOpenclawConfigRaw(configPath, conf); err != nil {
 		return err
 	}
-	if allowedOrigins != nil {
-		if err := writeOpenclawCaddyfile(configPath, allowedOrigins); err != nil {
-			return err
-		}
-	}
-
 	envPath := path.Join(confDir, ".env")
 	lines := []string{fmt.Sprintf("OPENCLAW_GATEWAY_TOKEN=%s", token)}
 	if envKey := providerEnvKey(provider); envKey != "" && strings.TrimSpace(apiKey) != "" {
