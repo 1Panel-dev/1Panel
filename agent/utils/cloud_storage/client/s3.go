@@ -2,17 +2,29 @@ package client
 
 import (
 	"context"
+	"crypto/tls"
+	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
+)
+
+const (
+	s3DefaultTimeout  = 30 * time.Second
+	s3TransferTimeout = 24 * time.Hour
 )
 
 type s3Client struct {
 	scType string
 	bucket string
 	client *minio.Client
+}
+
+func (s *s3Client) ctx(timeout time.Duration) (context.Context, context.CancelFunc) {
+	return context.WithTimeout(context.Background(), timeout)
 }
 
 func NewS3Client(vars map[string]interface{}) (*s3Client, error) {
@@ -35,14 +47,25 @@ func NewS3Client(vars map[string]interface{}) (*s3Client, error) {
 		lookupStyle = minio.BucketLookupPath
 	}
 
-	endpoint = strings.TrimPrefix(endpoint, "https://")
-	endpoint = strings.TrimPrefix(endpoint, "http://")
+	ssl := strings.Split(endpoint, ":")[0]
+	secure := false
+	tlsConfig := &tls.Config{}
+	if ssl == "https" {
+		secure = true
+		tlsConfig.InsecureSkipVerify = true
+	}
+	var transport http.RoundTripper = &http.Transport{
+		TLSClientConfig: tlsConfig,
+	}
+
+	endpoint = strings.TrimPrefix(endpoint, ssl+"://")
 
 	client, err := minio.New(endpoint, &minio.Options{
 		Creds:        credentials.NewStaticV4(accessKey, secretKey, ""),
-		Secure:       false,
+		Secure:       secure,
 		Region:       region,
 		BucketLookup: lookupStyle,
+		Transport:    transport,
 	})
 	if err != nil {
 		return nil, err
@@ -51,7 +74,9 @@ func NewS3Client(vars map[string]interface{}) (*s3Client, error) {
 }
 
 func (s s3Client) ListBuckets() ([]interface{}, error) {
-	buckets, err := s.client.ListBuckets(context.Background())
+	ctx, cancel := s.ctx(s3DefaultTimeout)
+	defer cancel()
+	buckets, err := s.client.ListBuckets(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +88,9 @@ func (s s3Client) ListBuckets() ([]interface{}, error) {
 }
 
 func (s s3Client) Exist(path string) (bool, error) {
-	_, err := s.client.StatObject(context.Background(), s.bucket, path, minio.StatObjectOptions{})
+	ctx, cancel := s.ctx(s3DefaultTimeout)
+	defer cancel()
+	_, err := s.client.StatObject(ctx, s.bucket, path, minio.StatObjectOptions{})
 	if err != nil {
 		resp := minio.ToErrorResponse(err)
 		if resp.StatusCode == 404 {
@@ -75,7 +102,9 @@ func (s s3Client) Exist(path string) (bool, error) {
 }
 
 func (s *s3Client) Size(path string) (int64, error) {
-	info, err := s.client.StatObject(context.Background(), s.bucket, path, minio.StatObjectOptions{})
+	ctx, cancel := s.ctx(s3DefaultTimeout)
+	defer cancel()
+	info, err := s.client.StatObject(ctx, s.bucket, path, minio.StatObjectOptions{})
 	if err != nil {
 		return 0, err
 	}
@@ -83,7 +112,9 @@ func (s *s3Client) Size(path string) (int64, error) {
 }
 
 func (s s3Client) Delete(path string) (bool, error) {
-	if err := s.client.RemoveObject(context.Background(), s.bucket, path, minio.RemoveObjectOptions{}); err != nil {
+	ctx, cancel := s.ctx(s3DefaultTimeout)
+	defer cancel()
+	if err := s.client.RemoveObject(ctx, s.bucket, path, minio.RemoveObjectOptions{}); err != nil {
 		return false, err
 	}
 	return true, nil
@@ -112,7 +143,9 @@ func (s s3Client) Upload(src, target string) (bool, error) {
 	}
 	opts.PartSize = partSize
 
-	if _, err := s.client.PutObject(context.Background(), s.bucket, target, file, fileInfo.Size(), opts); err != nil {
+	ctx, cancel := s.ctx(s3TransferTimeout)
+	defer cancel()
+	if _, err := s.client.PutObject(ctx, s.bucket, target, file, fileInfo.Size(), opts); err != nil {
 		return false, err
 	}
 	return true, nil
@@ -122,7 +155,9 @@ func (s s3Client) Download(src, target string) (bool, error) {
 	if _, err := os.Stat(target); err == nil {
 		_ = os.Remove(target)
 	}
-	if err := s.client.FGetObject(context.Background(), s.bucket, src, target, minio.GetObjectOptions{}); err != nil {
+	ctx, cancel := s.ctx(s3TransferTimeout)
+	defer cancel()
+	if err := s.client.FGetObject(ctx, s.bucket, src, target, minio.GetObjectOptions{}); err != nil {
 		os.Remove(target)
 		return false, err
 	}
@@ -135,7 +170,9 @@ func (s *s3Client) ListObjects(prefix string) ([]string, error) {
 		Prefix:    prefix,
 	}
 	var result []string
-	for object := range s.client.ListObjects(context.Background(), s.bucket, opts) {
+	ctx, cancel := s.ctx(s3DefaultTimeout)
+	defer cancel()
+	for object := range s.client.ListObjects(ctx, s.bucket, opts) {
 		if object.Err != nil {
 			return result, object.Err
 		}
