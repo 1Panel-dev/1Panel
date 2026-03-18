@@ -1822,7 +1822,7 @@ func migrateOpenclawHTTPSUpgradeWithSystemIP(install *model.AppInstall, fromVers
 			}
 		}
 	}
-	return writeOpenclawCaddyfile(configPath, []string{allowedOrigin})
+	return migrateOpenclawInstallEnv(install, allowedOrigins)
 }
 
 func migrateOpenclawInstallPorts(install *model.AppInstall) {
