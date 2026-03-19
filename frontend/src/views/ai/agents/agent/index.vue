@@ -120,7 +120,7 @@
         <ConfigDrawer ref="configRef" @updated="search" />
         <AppUpgrade ref="upgradeRef" @close="search" />
         <ComposeLogs ref="composeLogRef" />
-        <TerminalDialog ref="dialogTerminalRef" />
+        <AgentTerminalDialog ref="dialogTerminalRef" />
         <PortJumpDialog ref="dialogPortJumpRef" />
     </div>
 </template>
@@ -143,7 +143,7 @@ import ConfigDrawer from '@/views/ai/agents/agent/config/index.vue';
 import AppUpgrade from '@/views/app-store/installed/upgrade/index.vue';
 import TaskLog from '@/components/log/task/index.vue';
 import ComposeLogs from '@/components/log/compose/index.vue';
-import TerminalDialog from '@/views/container/container/terminal/index.vue';
+import AgentTerminalDialog from '@/views/ai/agents/agent/components/terminal.vue';
 import i18n from '@/lang';
 import PortJumpDialog from '@/components/port-jump/index.vue';
 import DockerStatus from '@/views/container/docker-status/index.vue';
@@ -307,7 +307,12 @@ const openLog = (row: AI.AgentItem) => {
 
 const openTerminal = (row: AI.AgentItem) => {
     const title = i18n.global.t('aiTools.agents.agent') + ' ' + row.name;
-    dialogTerminalRef.value?.acceptParams({ containerID: row.containerName, title });
+    dialogTerminalRef.value?.acceptParams({
+        containerID: row.containerName,
+        title,
+        users: ['node', 'root'],
+        shell: '/bin/bash',
+    });
 };
 
 const openWorkDir = (row: AI.AgentItem) => {
