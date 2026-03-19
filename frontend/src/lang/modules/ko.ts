@@ -1514,6 +1514,7 @@ const message = {
             groups: '그룹',
             hosts: '호스트',
             apps: '애플리케이션',
+            openresty: 'OpenResty',
             websites: '웹사이트',
             containers: '컨테이너',
             files: '파일 관리',

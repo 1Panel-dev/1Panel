@@ -1680,6 +1680,7 @@ const message = {
             groups: 'Grupos',
             hosts: 'Hosts',
             apps: 'Aplicativos',
+            openresty: 'OpenResty',
             websites: 'Sites',
             containers: 'Contêineres',
             files: 'Gerenciamento de Arquivos',

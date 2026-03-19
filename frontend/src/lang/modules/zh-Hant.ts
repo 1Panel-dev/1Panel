@@ -1445,6 +1445,7 @@ const message = {
             groups: '分組',
             hosts: '主機',
             apps: '應用',
+            openresty: 'OpenResty',
             websites: '網站',
             containers: '容器',
             files: '檔案管理',

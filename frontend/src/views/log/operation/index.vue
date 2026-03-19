@@ -14,6 +14,7 @@
                     <template #prefix>{{ $t('logs.resource') }}</template>
                     <el-option :label="$t('commons.table.all')" value="" />
                     <el-option :label="$t('logs.detail.apps')" value="apps" />
+                    <el-option :label="$t('logs.detail.openresty')" value="openresty" />
                     <el-option :label="$t('logs.detail.websites')" value="websites" />
                     <el-option :label="$t('logs.detail.runtimes')" value="runtimes" />
                     <el-option :label="$t('logs.detail.ai')" value="ai" />
