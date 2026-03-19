@@ -1450,6 +1450,7 @@ const message = {
             groups: '分组',
             hosts: '主机',
             apps: '应用',
+            openresty: 'OpenResty',
             websites: '网站',
             containers: '容器',
             files: '文件管理',

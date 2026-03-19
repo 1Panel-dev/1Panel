@@ -1567,6 +1567,7 @@ const message = {
             groups: 'Kumpulan',
             hosts: 'Hos',
             apps: 'Aplikasi',
+            openresty: 'OpenResty',
             websites: 'Laman Web',
             containers: 'Kontena',
             files: 'Pengurusan Fail',

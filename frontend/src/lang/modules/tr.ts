@@ -1564,6 +1564,7 @@ const message = {
             groups: 'Grup',
             hosts: 'Ana Bilgisayar',
             apps: 'Uygulama',
+            openresty: 'OpenResty',
             websites: 'Website',
             containers: 'Konteyner',
             files: 'Dosya',
