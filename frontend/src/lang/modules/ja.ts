@@ -1391,6 +1391,21 @@ const message = {
         cursorBar: 'バー',
         scrollback: 'スクロールバック',
         scrollSensitivity: 'スクロール感度',
+        aiStatus: 'AI Terminal',
+        aiSettings: 'AI Terminal Settings',
+        aiAccountHelper:
+            '選択したモデルアカウントでコマンドを生成して補完します。Ollama や vLLM などのローカルモデルはカスタムモデルアカウントを使用してください。',
+        aiPrefix: 'Trigger Prefix',
+        aiPrefixHelper:
+            'When a line starts with this prefix and you press Enter, AI command generation will be triggered, for example # or //ai.',
+        aiRiskCommands: 'Risk Command Interception',
+        aiRiskCommandsHelper:
+            'Generated commands matching any of these fragments will be blocked and filled back as comments. Supports add, edit, and delete.',
+        aiAddRiskCommand: 'Add Risk Command',
+        aiRemoveRiskCommand: 'Delete',
+        aiSummary: 'When a line starts with the {0} prefix and you press Enter, AI command generation is triggered.',
+        aiPrefixAsciiVisible:
+            'Only ASCII visible characters are supported. Spaces, CJK characters, and full-width symbols are not allowed.',
         saveHelper: '現在のターミナル設定を保存してもよろしいですか？',
     },
     toolbox: {

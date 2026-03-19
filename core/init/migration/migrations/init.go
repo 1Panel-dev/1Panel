@@ -30,7 +30,6 @@ var AddTable = &gormigrate.Migration{
 			&model.Setting{},
 			&model.BackupAccount{},
 			&model.Group{},
-			&model.Host{},
 			&model.Command{},
 			&model.UpgradeLog{},
 			&model.ScriptLibrary{},

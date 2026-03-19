@@ -1,8 +1,6 @@
 package dto
 
-import (
-	"time"
-)
+import "time"
 
 type HostOperate struct {
 	ID               uint   `json:"id"`
@@ -32,11 +30,6 @@ type HostConnTest struct {
 
 type SearchForTree struct {
 	Info string `json:"info"`
-}
-
-type ChangeHostGroup struct {
-	ID      uint `json:"id" validate:"required"`
-	GroupID uint `json:"groupID" validate:"required"`
 }
 
 type HostInfo struct {

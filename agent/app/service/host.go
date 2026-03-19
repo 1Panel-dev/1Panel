@@ -4,13 +4,12 @@ import (
 	"encoding/base64"
 	"fmt"
 
-	"github.com/1Panel-dev/1Panel/core/app/dto"
-	"github.com/1Panel-dev/1Panel/core/app/model"
-	"github.com/1Panel-dev/1Panel/core/app/repo"
-	"github.com/1Panel-dev/1Panel/core/buserr"
-	"github.com/1Panel-dev/1Panel/core/global"
-	"github.com/1Panel-dev/1Panel/core/utils/encrypt"
-	"github.com/1Panel-dev/1Panel/core/utils/ssh"
+	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/1Panel-dev/1Panel/agent/app/model"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
+	"github.com/1Panel-dev/1Panel/agent/buserr"
+	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
+	"github.com/1Panel-dev/1Panel/agent/utils/ssh"
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
 )
@@ -75,11 +74,7 @@ func (u *HostService) TestByInfo(req dto.HostConnTest) bool {
 }
 
 func (u *HostService) TestLocalConn(id uint) bool {
-	var (
-		host model.Host
-		err  error
-	)
-	host, err = hostRepo.Get(repo.WithByID(id))
+	host, err := hostRepo.Get(repo.WithByID(id))
 	if err != nil {
 		return false
 	}
@@ -113,12 +108,11 @@ func (u *HostService) TestLocalConn(id uint) bool {
 		return false
 	}
 	defer client.Close()
-
 	return true
 }
 
 func (u *HostService) SearchWithPage(req dto.SearchPageWithGroup) (int64, interface{}, error) {
-	var options []global.DBOption
+	var options []repo.DBOption
 	if len(req.Info) != 0 {
 		options = append(options, hostRepo.WithByInfo(req.Info))
 	}
@@ -198,8 +192,7 @@ func (u *HostService) SearchForTree(search dto.SearchForTree) ([]dto.HostTree, e
 
 func (u *HostService) GetHostByID(id uint) (*dto.HostInfo, error) {
 	var item dto.HostInfo
-	var host model.Host
-	host, _ = hostRepo.Get(repo.WithByID(id))
+	host, _ := hostRepo.Get(repo.WithByID(id))
 	if host.ID == 0 {
 		return nil, buserr.New("ErrRecordNotFound")
 	}
@@ -336,7 +329,6 @@ func GetHostInfo(id uint) (*model.Host, error) {
 			return nil, err
 		}
 	}
-
 	if len(host.PassPhrase) != 0 {
 		host.PassPhrase, err = encrypt.StringDecrypt(host.PassPhrase)
 		if err != nil {

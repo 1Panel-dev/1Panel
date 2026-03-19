@@ -19,6 +19,12 @@ func WithByID(id uint) DBOption {
 	}
 }
 
+func WithByGroupID(id uint) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("group_id = ?", id)
+	}
+}
+
 func WithByNOTID(id uint) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("id != ?", id)
@@ -40,6 +46,12 @@ func WithByIDNotIn(ids []uint) DBOption {
 func WithByName(name string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("name = ?", name)
+	}
+}
+
+func WithByAddr(addr string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("addr = ?", addr)
 	}
 }
 

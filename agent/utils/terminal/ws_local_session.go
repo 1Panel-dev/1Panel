@@ -14,8 +14,9 @@ type LocalWsSession struct {
 	slave  *LocalCommand
 	wsConn *websocket.Conn
 
-	allowCtrlC bool
-	writeMutex sync.Mutex
+	allowCtrlC    bool
+	writeMutex    sync.Mutex
+	aiInterceptor *aiInputInterceptor
 }
 
 func NewLocalWsSession(cols, rows int, wsConn *websocket.Conn, slave *LocalCommand, allowCtrlC bool) (*LocalWsSession, error) {
@@ -27,7 +28,8 @@ func NewLocalWsSession(cols, rows int, wsConn *websocket.Conn, slave *LocalComma
 		slave:  slave,
 		wsConn: wsConn,
 
-		allowCtrlC: allowCtrlC,
+		allowCtrlC:    allowCtrlC,
+		aiInterceptor: newAIInputInterceptor(""),
 	}, nil
 }
 
@@ -107,6 +109,14 @@ func (sws *LocalWsSession) receiveWsMsg(exitCh chan bool) {
 				decodeBytes, err := base64.StdEncoding.DecodeString(msgObj.Data)
 				if err != nil {
 					global.LOG.Errorf("websock cmd string base64 decoding failed, err: %v", err)
+				}
+				if isEnterInput(decodeBytes) {
+					if generated, ok := sws.aiInterceptor.HandleEnter(); ok {
+						sws.sendWebsocketInputCommandToSshSessionStdinPipe(append([]byte{lineClearControl}, []byte(generated)...))
+						continue
+					}
+				} else {
+					sws.aiInterceptor.TrackInput(decodeBytes)
 				}
 				sws.sendWebsocketInputCommandToSshSessionStdinPipe(decodeBytes)
 			case WsMsgHeartbeat:

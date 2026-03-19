@@ -52,6 +52,7 @@ var AddTable = &gormigrate.Migration{
 			&model.DatabasePostgresql{},
 			&model.Favorite{},
 			&model.Firewall{},
+			&model.Host{},
 			&model.Ftp{},
 			&model.ImageRepo{},
 			&model.ScriptLibrary{},
@@ -1110,5 +1111,133 @@ var InitAgentAccountModelPool = &gormigrate.Migration{
 			return err
 		}
 		return migrationutils.MigrateAgentAccountModelPool(tx)
+	},
+}
+
+var AddHostTable = &gormigrate.Migration{
+	ID: "20260318-add-host-table",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.Host{}); err != nil {
+			return err
+		}
+		if global.CoreDB == nil || !global.CoreDB.Migrator().HasTable("hosts") {
+			if err := tx.Create(&model.Group{Name: "Default", Type: "host", IsDefault: true}).Error; err != nil {
+				return err
+			}
+			return nil
+		}
+
+		var encryptSetting model.Setting
+		if err := global.CoreDB.Where("key = ?", "EncryptKey").First(&encryptSetting).Error; err != nil {
+			global.LOG.Errorf("failed to get encrypt key from core db, err: %v", err)
+			return nil
+		}
+		coreEncryptKey := strings.TrimSpace(encryptSetting.Value)
+		if coreEncryptKey == "" {
+			global.LOG.Error("encrypt key from core db is empty")
+			return nil
+		}
+
+		groupIDMap := make(map[uint]uint)
+		defaultGroupID := uint(0)
+		var coreGroups []model.Group
+		if err := global.CoreDB.Where("type = ?", "host").Order("id asc").Find(&coreGroups).Error; err != nil {
+			return err
+		}
+		for _, coreGroup := range coreGroups {
+			agentGroup := model.Group{
+				Name:      coreGroup.Name,
+				Type:      "host",
+				IsDefault: coreGroup.IsDefault,
+			}
+			if agentGroup.IsDefault {
+				defaultGroupID = coreGroup.ID
+			}
+			if err := tx.Create(&agentGroup).Error; err != nil {
+				global.LOG.Errorf("failed to create group, group id: %v, err: %v", coreGroup.ID, err)
+				continue
+			}
+			groupIDMap[coreGroup.ID] = agentGroup.ID
+		}
+
+		var coreHosts []model.Host
+		if err := global.CoreDB.Order("id asc").Find(&coreHosts).Error; err != nil {
+			return err
+		}
+		for _, coreHost := range coreHosts {
+			password, err := encrypt.StringDecryptWithKey(coreHost.Password, coreEncryptKey)
+			if err != nil {
+				global.LOG.Errorf("failed to decrypt host password, host id: %v, err: %v", coreHost.ID, err)
+				continue
+			}
+			privateKey, err := encrypt.StringDecryptWithKey(coreHost.PrivateKey, coreEncryptKey)
+			if err != nil {
+				global.LOG.Errorf("failed to decrypt host private key, host id: %v, err: %v", coreHost.ID, err)
+				continue
+			}
+			passPhrase, err := encrypt.StringDecryptWithKey(coreHost.PassPhrase, coreEncryptKey)
+			if err != nil {
+				global.LOG.Errorf("failed to decrypt host pass phrase, host id: %v, err: %v", coreHost.ID, err)
+				continue
+			}
+
+			encryptedPassword, err := encrypt.StringEncrypt(password)
+			if err != nil {
+				global.LOG.Errorf("failed to encrypt host password, host id: %v, err: %v", coreHost.ID, err)
+				continue
+			}
+			encryptedPrivateKey, err := encrypt.StringEncrypt(privateKey)
+			if err != nil {
+				global.LOG.Errorf("failed to encrypt host private key, host id: %v, err: %v", coreHost.ID, err)
+				continue
+			}
+			encryptedPassPhrase, err := encrypt.StringEncrypt(passPhrase)
+			if err != nil {
+				global.LOG.Errorf("failed to encrypt host pass phrase, host id: %v, err: %v", coreHost.ID, err)
+				continue
+			}
+
+			groupID := defaultGroupID
+			if mappedGroupID, ok := groupIDMap[coreHost.GroupID]; ok && mappedGroupID != 0 {
+				groupID = mappedGroupID
+			}
+			host := model.Host{
+				GroupID:          groupID,
+				Name:             coreHost.Name,
+				Addr:             coreHost.Addr,
+				Port:             coreHost.Port,
+				User:             coreHost.User,
+				AuthMode:         coreHost.AuthMode,
+				Password:         encryptedPassword,
+				PrivateKey:       encryptedPrivateKey,
+				PassPhrase:       encryptedPassPhrase,
+				RememberPassword: coreHost.RememberPassword,
+				Description:      coreHost.Description,
+			}
+			if err := tx.Create(&host).Error; err != nil {
+				global.LOG.Errorf("failed to create host, host id: %v, err: %v", coreHost.ID, err)
+				continue
+			}
+		}
+		return nil
+	},
+}
+
+var AddAITerminalSettings = &gormigrate.Migration{
+	ID: "20260318-add-ai-terminal-settings",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.Create(&model.Setting{Key: "AIStatus", Value: constant.StatusDisable}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "AIAccountID", Value: ""}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "AIPrefix", Value: "#"}).Error; err != nil {
+			return err
+		}
+		return tx.Create(&model.Setting{
+			Key:   "AIRiskCommands",
+			Value: "[\"rm -rf\",\"mkfs\",\"dd if=\",\"curl | sh\",\"wget | sh\",\"chmod -R 777 /\",\"shutdown\",\"reboot\",\"poweroff\",\"init 0\",\":(){ :|:& };:\"]",
+		}).Error
 	},
 }

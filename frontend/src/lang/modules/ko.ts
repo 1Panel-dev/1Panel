@@ -1365,6 +1365,21 @@ const message = {
         cursorBar: '막대',
         scrollback: '스크롤백',
         scrollSensitivity: '스크롤 감도',
+        aiStatus: 'AI Terminal',
+        aiSettings: 'AI Terminal Settings',
+        aiAccountHelper:
+            '선택한 모델 계정으로 명령을 생성하고 채웁니다. Ollama, vLLM 같은 로컬 모델은 사용자 지정 모델 계정을 사용하세요.',
+        aiPrefix: 'Trigger Prefix',
+        aiPrefixHelper:
+            'When a line starts with this prefix and you press Enter, AI command generation will be triggered, for example # or //ai.',
+        aiRiskCommands: 'Risk Command Interception',
+        aiRiskCommandsHelper:
+            'Generated commands matching any of these fragments will be blocked and filled back as comments. Supports add, edit, and delete.',
+        aiAddRiskCommand: 'Add Risk Command',
+        aiRemoveRiskCommand: 'Delete',
+        aiSummary: 'When a line starts with the {0} prefix and you press Enter, AI command generation is triggered.',
+        aiPrefixAsciiVisible:
+            'Only ASCII visible characters are supported. Spaces, CJK characters, and full-width symbols are not allowed.',
         saveHelper: '현재 터미널 설정을 저장하시겠습니까?',
     },
     toolbox: {

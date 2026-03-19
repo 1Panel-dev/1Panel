@@ -70,6 +70,7 @@ var (
 
 	recycleBinService = service.NewIRecycleBinService()
 	favoriteService   = service.NewIFavoriteService()
+	hostService       = service.NewIHostService()
 
 	websiteCAService = service.NewIWebsiteCAService()
 	taskService      = service.NewITaskService()
