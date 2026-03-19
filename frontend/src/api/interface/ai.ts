@@ -449,7 +449,7 @@ export namespace AI {
 
     export interface AgentChannelPairingApproveReq {
         agentId: number;
-        type: 'feishu' | 'telegram' | 'discord' | 'wecom';
+        type: 'feishu' | 'telegram' | 'discord' | 'wecom' | 'dingtalk-connector';
         pairingCode: string;
     }
 
@@ -473,6 +473,32 @@ export namespace AI {
         secret: string;
     }
 
+    export interface AgentDingTalkConfigReq {
+        agentId: number;
+    }
+
+    export interface AgentDingTalkConfig {
+        enabled: boolean;
+        clientId: string;
+        clientSecret: string;
+        dmPolicy: 'pairing' | 'allowlist' | 'open' | 'disabled';
+        allowFrom: string[];
+        groupPolicy: 'open' | 'allowlist' | 'disabled';
+        groupAllowFrom: string[];
+        installed: boolean;
+    }
+
+    export interface AgentDingTalkConfigUpdateReq {
+        agentId: number;
+        enabled: boolean;
+        clientId: string;
+        clientSecret: string;
+        dmPolicy: 'pairing' | 'allowlist' | 'open' | 'disabled';
+        allowFrom: string[];
+        groupPolicy: 'open' | 'allowlist' | 'disabled';
+        groupAllowFrom: string[];
+    }
+
     export interface AgentQQBotConfigReq {
         agentId: number;
     }
@@ -493,13 +519,13 @@ export namespace AI {
 
     export interface AgentPluginInstallReq {
         agentId: number;
-        type: 'qqbot' | 'wecom';
+        type: 'qqbot' | 'wecom' | 'dingtalk';
         taskID: string;
     }
 
     export interface AgentPluginCheckReq {
         agentId: number;
-        type: 'qqbot' | 'wecom';
+        type: 'qqbot' | 'wecom' | 'dingtalk';
     }
 
     export interface AgentPluginStatus {

@@ -215,7 +215,7 @@ type AgentTelegramConfig struct {
 
 type AgentChannelPairingApproveReq struct {
 	AgentID     uint   `json:"agentId" validate:"required"`
-	Type        string `json:"type" validate:"required,oneof=feishu telegram discord wecom"`
+	Type        string `json:"type" validate:"required,oneof=feishu telegram discord wecom dingtalk-connector"`
 	PairingCode string `json:"pairingCode" validate:"required"`
 }
 
@@ -239,6 +239,32 @@ type AgentWecomConfig struct {
 	Installed bool   `json:"installed"`
 }
 
+type AgentDingTalkConfigReq struct {
+	AgentID uint `json:"agentId" validate:"required"`
+}
+
+type AgentDingTalkConfigUpdateReq struct {
+	AgentID        uint     `json:"agentId" validate:"required"`
+	Enabled        bool     `json:"enabled"`
+	ClientID       string   `json:"clientId" validate:"required"`
+	ClientSecret   string   `json:"clientSecret" validate:"required"`
+	DmPolicy       string   `json:"dmPolicy" validate:"required,oneof=pairing allowlist open disabled"`
+	AllowFrom      []string `json:"allowFrom"`
+	GroupPolicy    string   `json:"groupPolicy" validate:"required,oneof=open allowlist disabled"`
+	GroupAllowFrom []string `json:"groupAllowFrom"`
+}
+
+type AgentDingTalkConfig struct {
+	Enabled        bool     `json:"enabled"`
+	ClientID       string   `json:"clientId"`
+	ClientSecret   string   `json:"clientSecret"`
+	DmPolicy       string   `json:"dmPolicy"`
+	AllowFrom      []string `json:"allowFrom"`
+	GroupPolicy    string   `json:"groupPolicy"`
+	GroupAllowFrom []string `json:"groupAllowFrom"`
+	Installed      bool     `json:"installed"`
+}
+
 type AgentQQBotConfigReq struct {
 	AgentID uint `json:"agentId" validate:"required"`
 }
@@ -259,13 +285,13 @@ type AgentQQBotConfig struct {
 
 type AgentPluginInstallReq struct {
 	AgentID uint   `json:"agentId" validate:"required"`
-	Type    string `json:"type" validate:"required,oneof=qqbot wecom"`
+	Type    string `json:"type" validate:"required,oneof=qqbot wecom dingtalk"`
 	TaskID  string `json:"taskID" validate:"required"`
 }
 
 type AgentPluginCheckReq struct {
 	AgentID uint   `json:"agentId" validate:"required"`
-	Type    string `json:"type" validate:"required,oneof=qqbot wecom"`
+	Type    string `json:"type" validate:"required,oneof=qqbot wecom dingtalk"`
 }
 
 type AgentPluginStatus struct {

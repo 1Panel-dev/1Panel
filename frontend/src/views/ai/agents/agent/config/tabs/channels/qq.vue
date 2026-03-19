@@ -22,7 +22,7 @@
             <el-input v-model="form.clientSecret" type="password" show-password />
         </el-form-item>
         <el-form-item>
-            <el-button type="primary" :loading="saving" @click="saveChannel">
+            <el-button type="primary" :loading="saving" :disabled="!form.installed" @click="saveChannel">
                 {{ t('commons.button.save') }}
             </el-button>
         </el-form-item>

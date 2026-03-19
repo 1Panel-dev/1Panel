@@ -476,6 +476,47 @@ func (b *BaseApi) UpdateAgentWecomConfig(c *gin.Context) {
 }
 
 // @Tags AI
+// @Summary Get Agent DingTalk channel config
+// @Accept json
+// @Param request body dto.AgentDingTalkConfigReq true "request"
+// @Success 200 {object} dto.AgentDingTalkConfig
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/channel/dingtalk/get [post]
+func (b *BaseApi) GetAgentDingTalkConfig(c *gin.Context) {
+	var req dto.AgentDingTalkConfigReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	data, err := agentService.GetDingTalkConfig(req)
+	if err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.SuccessWithData(c, data)
+}
+
+// @Tags AI
+// @Summary Update Agent DingTalk channel config
+// @Accept json
+// @Param request body dto.AgentDingTalkConfigUpdateReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/channel/dingtalk/update [post]
+func (b *BaseApi) UpdateAgentDingTalkConfig(c *gin.Context) {
+	var req dto.AgentDingTalkConfigUpdateReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := agentService.UpdateDingTalkConfig(req); err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags AI
 // @Summary Get Agent QQ Bot channel config
 // @Accept json
 // @Param request body dto.AgentQQBotConfigReq true "request"
