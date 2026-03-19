@@ -1398,6 +1398,21 @@ const message = {
         cursorBar: 'Полоса',
         scrollback: 'Буфер прокрутки',
         scrollSensitivity: 'Чувствительность прокрутки',
+        aiStatus: 'AI Terminal',
+        aiSettings: 'AI Terminal Settings',
+        aiAccountHelper:
+            'Используйте выбранный модельный аккаунт для генерации и подстановки команд. Для локальных моделей, таких как Ollama и vLLM, используйте пользовательский модельный аккаунт.',
+        aiPrefix: 'Trigger Prefix',
+        aiPrefixHelper:
+            'When a line starts with this prefix and you press Enter, AI command generation will be triggered, for example # or //ai.',
+        aiRiskCommands: 'Risk Command Interception',
+        aiRiskCommandsHelper:
+            'Generated commands matching any of these fragments will be blocked and filled back as comments. Supports add, edit, and delete.',
+        aiAddRiskCommand: 'Add Risk Command',
+        aiRemoveRiskCommand: 'Delete',
+        aiSummary: 'When a line starts with the {0} prefix and you press Enter, AI command generation is triggered.',
+        aiPrefixAsciiVisible:
+            'Only ASCII visible characters are supported. Spaces, CJK characters, and full-width symbols are not allowed.',
         saveHelper: 'Вы уверены, что хотите сохранить текущую конфигурацию терминала?',
     },
     toolbox: {

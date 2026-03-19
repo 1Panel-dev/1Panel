@@ -11,6 +11,7 @@ type IScriptRepo interface {
 	GetList(opts ...global.DBOption) ([]model.ScriptLibrary, error)
 	Create(script *model.ScriptLibrary) error
 	Update(id uint, vars map[string]interface{}) error
+	UpdateGroup(group, newGroup uint) error
 	Page(limit, offset int, opts ...global.DBOption) (int64, []model.ScriptLibrary, error)
 	Delete(opts ...global.DBOption) error
 	SyncAll(scripts []model.ScriptLibrary) error
@@ -62,6 +63,9 @@ func (u *ScriptRepo) Create(ScriptLibrary *model.ScriptLibrary) error {
 
 func (u *ScriptRepo) Update(id uint, vars map[string]interface{}) error {
 	return global.DB.Model(&model.ScriptLibrary{}).Where("id = ?", id).Updates(vars).Error
+}
+func (u *ScriptRepo) UpdateGroup(group, newGroup uint) error {
+	return global.DB.Model(&model.ScriptLibrary{}).Where("group_id = ?", group).Updates(map[string]interface{}{"group_id": newGroup}).Error
 }
 
 func (u *ScriptRepo) Delete(opts ...global.DBOption) error {

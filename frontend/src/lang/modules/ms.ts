@@ -1405,6 +1405,21 @@ const message = {
         cursorBar: 'Bar',
         scrollback: 'Skrol balik',
         scrollSensitivity: 'Kepekaan skrol',
+        aiStatus: 'AI Terminal',
+        aiSettings: 'AI Terminal Settings',
+        aiAccountHelper:
+            'Gunakan akaun model yang dipilih untuk menjana dan mengisi arahan. Untuk model tempatan seperti Ollama dan vLLM, gunakan akaun model tersuai.',
+        aiPrefix: 'Trigger Prefix',
+        aiPrefixHelper:
+            'When a line starts with this prefix and you press Enter, AI command generation will be triggered, for example # or //ai.',
+        aiRiskCommands: 'Risk Command Interception',
+        aiRiskCommandsHelper:
+            'Generated commands matching any of these fragments will be blocked and filled back as comments. Supports add, edit, and delete.',
+        aiAddRiskCommand: 'Add Risk Command',
+        aiRemoveRiskCommand: 'Delete',
+        aiSummary: 'When a line starts with the {0} prefix and you press Enter, AI command generation is triggered.',
+        aiPrefixAsciiVisible:
+            'Only ASCII visible characters are supported. Spaces, CJK characters, and full-width symbols are not allowed.',
         saveHelper: 'Adakah anda pasti mahu menyimpan konfigurasi terminal semasa?',
     },
     toolbox: {

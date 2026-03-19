@@ -77,7 +77,7 @@ import { addHost, editHost, testByInfo } from '@/api/modules/terminal';
 import i18n from '@/lang';
 import { reactive, ref } from 'vue';
 import { MsgError, MsgSuccess } from '@/utils/message';
-import { getGroupList } from '@/api/modules/group';
+import { getAgentGroupList } from '@/api/modules/group';
 
 const dialogVisible = ref();
 const isOK = ref(false);
@@ -128,7 +128,7 @@ const handleClose = () => {
 const emit = defineEmits(['on-conn-terminal', 'on-new-local', 'load-host-tree']);
 
 const loadGroups = async () => {
-    const res = await getGroupList('host');
+    const res = await getAgentGroupList('host');
     groupList.value = res.data;
     for (const item of groupList.value) {
         if (item.isDefault) {
