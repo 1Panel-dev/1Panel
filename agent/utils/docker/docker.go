@@ -374,7 +374,6 @@ func loadRegistryAuthFromDockerConfig(imageName string) (string, bool) {
 			Username:      auth.Username,
 			Password:      auth.Password,
 			Auth:          auth.Auth,
-			Email:         auth.Email,
 			ServerAddress: auth.ServerAddress,
 			IdentityToken: auth.IdentityToken,
 			RegistryToken: auth.RegistryToken,

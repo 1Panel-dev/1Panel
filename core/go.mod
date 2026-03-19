@@ -1,6 +1,6 @@
 module github.com/1Panel-dev/1Panel/core
 
-go 1.24.9
+go 1.25.7
 
 require (
 	github.com/1panel-dev/base64Captcha v1.3.8
