@@ -544,6 +544,42 @@ func extractWecomConfig(conf map[string]interface{}) dto.AgentWecomConfig {
 	return result
 }
 
+func extractDingTalkConfig(conf map[string]interface{}) dto.AgentDingTalkConfig {
+	result := dto.AgentDingTalkConfig{
+		Enabled:        true,
+		DmPolicy:       "pairing",
+		GroupPolicy:    "disabled",
+		AllowFrom:      []string{},
+		GroupAllowFrom: []string{},
+	}
+	channels, ok := conf["channels"].(map[string]interface{})
+	if !ok {
+		return result
+	}
+	dingtalk, ok := channels["dingtalk-connector"].(map[string]interface{})
+	if !ok {
+		return result
+	}
+	if enabled, ok := dingtalk["enabled"].(bool); ok {
+		result.Enabled = enabled
+	}
+	if clientID, ok := dingtalk["clientId"].(string); ok {
+		result.ClientID = clientID
+	}
+	if clientSecret, ok := dingtalk["clientSecret"].(string); ok {
+		result.ClientSecret = clientSecret
+	}
+	if dmPolicy, ok := dingtalk["dmPolicy"].(string); ok && strings.TrimSpace(dmPolicy) != "" {
+		result.DmPolicy = dmPolicy
+	}
+	if groupPolicy, ok := dingtalk["groupPolicy"].(string); ok && strings.TrimSpace(groupPolicy) != "" {
+		result.GroupPolicy = groupPolicy
+	}
+	result.AllowFrom = extractStringList(dingtalk["allowFrom"])
+	result.GroupAllowFrom = extractStringList(dingtalk["groupAllowFrom"])
+	return result
+}
+
 func setWecomConfig(conf map[string]interface{}, config dto.AgentWecomConfig) {
 	channels := ensureChildMap(conf, "channels")
 	wecom := ensureChildMap(channels, "wecom")
@@ -561,6 +597,44 @@ func setWecomConfig(conf map[string]interface{}, config dto.AgentWecomConfig) {
 	entries := ensureChildMap(plugins, "entries")
 	wecomEntry := ensureChildMap(entries, "wecom-openclaw-plugin")
 	wecomEntry["enabled"] = config.Enabled
+}
+
+func setDingTalkConfig(conf map[string]interface{}, config dto.AgentDingTalkConfig) {
+	channels := ensureChildMap(conf, "channels")
+	dingtalk := ensureChildMap(channels, "dingtalk-connector")
+	dingtalk["enabled"] = config.Enabled
+	dingtalk["clientId"] = strings.TrimSpace(config.ClientID)
+	dingtalk["clientSecret"] = strings.TrimSpace(config.ClientSecret)
+	dingtalk["dmPolicy"] = config.DmPolicy
+	dingtalk["groupPolicy"] = config.GroupPolicy
+	dingtalk["gatewayToken"] = extractGatewayToken(conf)
+	switch config.DmPolicy {
+	case "open":
+		dingtalk["allowFrom"] = []string{"*"}
+	case "allowlist":
+		dingtalk["allowFrom"] = append([]string(nil), config.AllowFrom...)
+	default:
+		delete(dingtalk, "allowFrom")
+	}
+	switch config.GroupPolicy {
+	case "open":
+		dingtalk["groupAllowFrom"] = []string{"*"}
+	case "allowlist":
+		dingtalk["groupAllowFrom"] = append([]string(nil), config.GroupAllowFrom...)
+	default:
+		delete(dingtalk, "groupAllowFrom")
+	}
+
+	plugins := ensureChildMap(conf, "plugins")
+	entries := ensureChildMap(plugins, "entries")
+	dingtalkEntry := ensureChildMap(entries, "dingtalk-connector")
+	dingtalkEntry["enabled"] = config.Enabled
+
+	gateway := ensureChildMap(conf, "gateway")
+	httpMap := ensureChildMap(gateway, "http")
+	endpoints := ensureChildMap(httpMap, "endpoints")
+	chatCompletions := ensureChildMap(endpoints, "chatCompletions")
+	chatCompletions["enabled"] = true
 }
 
 func setQQBotConfig(conf map[string]interface{}, config dto.AgentQQBotConfig) {
@@ -583,6 +657,8 @@ func resolvePluginMeta(pluginType string) (string, string, error) {
 		return "@sliverp/qqbot@latest", "qqbot", nil
 	case "wecom":
 		return "@wecom/wecom-openclaw-plugin", "wecom-openclaw-plugin", nil
+	case "dingtalk":
+		return "@dingtalk-real-ai/dingtalk-connector", "dingtalk-connector", nil
 	default:
 		return "", "", fmt.Errorf("unsupported plugin type")
 	}
@@ -1715,6 +1791,46 @@ func resolveServerTimezone() string {
 		return defaultUserTimezone
 	}
 	return timezone
+}
+
+func extractStringList(value interface{}) []string {
+	switch values := value.(type) {
+	case []interface{}:
+		result := make([]string, 0, len(values))
+		for _, value := range values {
+			text := strings.TrimSpace(fmt.Sprintf("%v", value))
+			if text == "" {
+				continue
+			}
+			result = append(result, text)
+		}
+		return result
+	case []string:
+		result := make([]string, 0, len(values))
+		for _, value := range values {
+			text := strings.TrimSpace(value)
+			if text == "" {
+				continue
+			}
+			result = append(result, text)
+		}
+		return result
+	default:
+		return []string{}
+	}
+}
+
+func extractGatewayToken(conf map[string]interface{}) string {
+	gateway, ok := conf["gateway"].(map[string]interface{})
+	if !ok {
+		return ""
+	}
+	auth, ok := gateway["auth"].(map[string]interface{})
+	if !ok {
+		return ""
+	}
+	token, _ := auth["token"].(string)
+	return token
 }
 
 func ensureChildMap(parent map[string]interface{}, key string) map[string]interface{} {

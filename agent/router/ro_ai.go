@@ -63,6 +63,8 @@ func (a *AIToolsRouter) InitRouter(Router *gin.RouterGroup) {
 		aiToolsRouter.POST("/agents/channel/discord/update", baseApi.UpdateAgentDiscordConfig)
 		aiToolsRouter.POST("/agents/channel/wecom/get", baseApi.GetAgentWecomConfig)
 		aiToolsRouter.POST("/agents/channel/wecom/update", baseApi.UpdateAgentWecomConfig)
+		aiToolsRouter.POST("/agents/channel/dingtalk/get", baseApi.GetAgentDingTalkConfig)
+		aiToolsRouter.POST("/agents/channel/dingtalk/update", baseApi.UpdateAgentDingTalkConfig)
 		aiToolsRouter.POST("/agents/channel/qqbot/get", baseApi.GetAgentQQBotConfig)
 		aiToolsRouter.POST("/agents/channel/qqbot/update", baseApi.UpdateAgentQQBotConfig)
 		aiToolsRouter.POST("/agents/plugin/install", baseApi.InstallAgentPlugin)

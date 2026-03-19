@@ -17,6 +17,7 @@ import (
 )
 
 var agentAccountRepo = repo.NewIAgentAccountRepo()
+var agentAccountModelRepo = repo.NewIAgentAccountModelRepo()
 
 type TerminalRuntimeSettings struct {
 	AccountID    uint
@@ -48,9 +49,9 @@ func ResolveGeneratorConfig(accountID uint) (GeneratorConfig, time.Duration, err
 	if provider == "" {
 		return GeneratorConfig{}, 0, fmt.Errorf("agent account provider is required")
 	}
-	model := strings.TrimSpace(account.Model)
-	if model == "" {
-		model = defaultModelForProvider(provider)
+	model, maxTokens, err := resolveAccountModelConfig(account.ID, provider)
+	if err != nil {
+		return GeneratorConfig{}, 0, err
 	}
 	baseURL := strings.TrimSpace(account.BaseURL)
 	if baseURL == "" {
@@ -71,7 +72,7 @@ func ResolveGeneratorConfig(accountID uint) (GeneratorConfig, time.Duration, err
 		APIKey:    strings.TrimSpace(apiKey),
 		Model:     model,
 		APIType:   strings.TrimSpace(account.APIType),
-		MaxTokens: account.MaxTokens,
+		MaxTokens: maxTokens,
 	}, 30 * time.Second, nil
 }
 
@@ -83,12 +84,26 @@ func lookupProviderAPIKey(provider string) string {
 	return strings.TrimSpace(os.Getenv(envKey))
 }
 
-func defaultModelForProvider(provider string) string {
+func defaultModelForProvider(provider string) (string, int) {
 	meta, ok := providercatalog.Get(provider)
 	if !ok || len(meta.Models) == 0 {
-		return ""
+		return "", 0
 	}
-	return meta.Models[0].ID
+	return meta.Models[0].ID, meta.Models[0].MaxTokens
+}
+
+func resolveAccountModelConfig(accountID uint, provider string) (string, int, error) {
+	if accountID > 0 {
+		rows, err := agentAccountModelRepo.List(repo.WithByAccountID(accountID), repo.WithOrderAsc("sort_order"), repo.WithOrderAsc("id"))
+		if err != nil {
+			return "", 0, err
+		}
+		if len(rows) > 0 {
+			return strings.TrimSpace(rows[0].Model), rows[0].MaxTokens, nil
+		}
+	}
+	model, maxTokens := defaultModelForProvider(provider)
+	return model, maxTokens, nil
 }
 
 func ResolveGeneratorConfigFromAgentSettings() (GeneratorConfig, uint, time.Duration, error) {

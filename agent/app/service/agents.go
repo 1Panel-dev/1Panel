@@ -47,6 +47,8 @@ type IAgentService interface {
 	UpdateDiscordConfig(req dto.AgentDiscordConfigUpdateReq) error
 	GetWecomConfig(req dto.AgentWecomConfigReq) (*dto.AgentWecomConfig, error)
 	UpdateWecomConfig(req dto.AgentWecomConfigUpdateReq) error
+	GetDingTalkConfig(req dto.AgentDingTalkConfigReq) (*dto.AgentDingTalkConfig, error)
+	UpdateDingTalkConfig(req dto.AgentDingTalkConfigUpdateReq) error
 	GetQQBotConfig(req dto.AgentQQBotConfigReq) (*dto.AgentQQBotConfig, error)
 	UpdateQQBotConfig(req dto.AgentQQBotConfigUpdateReq) error
 	InstallPlugin(req dto.AgentPluginInstallReq) error
@@ -724,6 +726,32 @@ func (a AgentService) UpdateWecomConfig(req dto.AgentWecomConfigUpdateReq) error
 			DmPolicy: req.DmPolicy,
 			BotID:    req.BotID,
 			Secret:   req.Secret,
+		})
+		return nil
+	})
+}
+
+func (a AgentService) GetDingTalkConfig(req dto.AgentDingTalkConfigReq) (*dto.AgentDingTalkConfig, error) {
+	_, install, conf, err := a.loadAgentConfig(req.AgentID)
+	if err != nil {
+		return nil, err
+	}
+	result := extractDingTalkConfig(conf)
+	installed, _ := checkPluginInstalled(install.ContainerName, "dingtalk")
+	result.Installed = installed
+	return &result, nil
+}
+
+func (a AgentService) UpdateDingTalkConfig(req dto.AgentDingTalkConfigUpdateReq) error {
+	return a.mutateAgentConfig(req.AgentID, func(_ *model.Agent, _ *model.AppInstall, conf map[string]interface{}) error {
+		setDingTalkConfig(conf, dto.AgentDingTalkConfig{
+			Enabled:        req.Enabled,
+			ClientID:       req.ClientID,
+			ClientSecret:   req.ClientSecret,
+			DmPolicy:       req.DmPolicy,
+			AllowFrom:      req.AllowFrom,
+			GroupPolicy:    req.GroupPolicy,
+			GroupAllowFrom: req.GroupAllowFrom,
 		})
 		return nil
 	})
