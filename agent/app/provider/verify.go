@@ -18,6 +18,10 @@ type VerifyRequest struct {
 	Body    []byte
 }
 
+const (
+	defaultVerifyTimeout = 30 * time.Second
+)
+
 func SkipVerification(key string) bool {
 	switch strings.ToLower(strings.TrimSpace(key)) {
 	case "custom", "vllm", "ollama", "kimi-coding":
@@ -42,7 +46,7 @@ func VerifyAccount(provider, baseURL, apiKey string) error {
 	for key, value := range req.Headers {
 		httpReq.Header.Set(key, value)
 	}
-	resp, err := (&http.Client{Timeout: 10 * time.Second}).Do(httpReq)
+	resp, err := (&http.Client{Timeout: verifyTimeout()}).Do(httpReq)
 	if err != nil {
 		return buserr.WithErr("ErrAgentAccountUnavailable", err)
 	}
@@ -51,6 +55,10 @@ func VerifyAccount(provider, baseURL, apiKey string) error {
 		return buserr.WithErr("ErrAgentAccountUnavailable", fmt.Errorf("verify failed: %s", resp.Status))
 	}
 	return nil
+}
+
+func verifyTimeout() time.Duration {
+	return defaultVerifyTimeout
 }
 
 func BuildVerifyRequest(provider, baseURL, apiKey string) VerifyRequest {

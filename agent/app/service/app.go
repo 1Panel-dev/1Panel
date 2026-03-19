@@ -57,6 +57,10 @@ type IAppService interface {
 	GetAppDetailByKey(appKey, version string) (response.AppDetailSimpleDTO, error)
 }
 
+type appInstallHooks struct {
+	AfterCopyData func(appInstall *model.AppInstall) error
+}
+
 func NewIAppService() IAppService {
 	return &AppService{}
 }
@@ -340,6 +344,10 @@ func (a AppService) GetAppDetailByID(id uint) (*response.AppDetailDTO, error) {
 }
 
 func (a AppService) Install(req request.AppInstallCreate, executeScript bool) (appInstall *model.AppInstall, err error) {
+	return a.installWithHooks(req, executeScript, nil)
+}
+
+func (a AppService) installWithHooks(req request.AppInstallCreate, executeScript bool, hooks *appInstallHooks) (appInstall *model.AppInstall, err error) {
 	if err = docker.CreateDefaultDockerNetwork(); err != nil {
 		err = buserr.WithDetail("Err1PanelNetworkFailed", err.Error(), nil)
 		return
@@ -536,6 +544,11 @@ func (a AppService) Install(req request.AppInstallCreate, executeScript bool) (a
 	installApp := func(t *task.Task) error {
 		if err = copyData(t, app, appDetail, appInstall, req); err != nil {
 			return err
+		}
+		if hooks != nil && hooks.AfterCopyData != nil {
+			if err = hooks.AfterCopyData(appInstall); err != nil {
+				return err
+			}
 		}
 		if executeScript {
 			if err = runScript(t, appInstall, "init"); err != nil {

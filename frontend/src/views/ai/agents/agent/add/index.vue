@@ -146,10 +146,6 @@ const form = reactive({
     provider: 'deepseek',
     accountId: undefined as unknown as number,
     model: '',
-    apiType: 'openai-completions',
-    maxTokens: 8192,
-    contextWindow: 128000,
-    apiKey: '',
     baseURL: '',
     token: '',
     advanced: true,
@@ -300,7 +296,6 @@ const loadAccounts = async () => {
         handleAccountChange();
     } else {
         form.accountId = undefined as unknown as number;
-        form.apiKey = '';
         form.baseURL = '';
     }
 };
@@ -310,7 +305,6 @@ const handleProviderChange = () => {
         return;
     }
     form.model = '';
-    form.apiKey = '';
     form.baseURL = '';
     form.accountId = undefined as unknown as number;
     loadAccounts();
@@ -324,9 +318,7 @@ const handleAgentTypeChange = async () => {
     form.model = '';
     form.provider = 'deepseek';
     form.accountId = undefined as unknown as number;
-    form.apiKey = '';
     form.baseURL = '';
-    form.apiType = 'openai-completions';
     if (form.agentType === 'openclaw') {
         await loadSystemIP();
         allowedOriginsAutoFilled.value = true;
@@ -349,10 +341,6 @@ const handleAccountChange = () => {
     const selected = accountOptions.value.find((item) => item.id === form.accountId);
     if (selected) {
         form.baseURL = selected.baseUrl || '';
-        form.apiKey = selected.apiKey || '';
-        form.apiType = selected.apiType || 'openai-completions';
-        form.maxTokens = selected.maxTokens || 8192;
-        form.contextWindow = selected.contextWindow || 128000;
         if (!selected.models?.some((item) => item.id === form.model)) {
             form.model = selected.models?.[0]?.id || '';
         }
@@ -394,14 +382,8 @@ const submit = async () => {
             webUIPort: form.webUIPort,
             allowedOrigins: form.agentType === 'openclaw' ? parseAllowedOriginsInput(form.allowedOrigins) : undefined,
             agentType: form.agentType,
-            provider: form.agentType === 'openclaw' ? form.provider : undefined,
             model: form.agentType === 'openclaw' ? form.model : undefined,
-            apiType: form.agentType === 'openclaw' ? form.apiType : undefined,
-            maxTokens: form.agentType === 'openclaw' ? form.maxTokens : undefined,
-            contextWindow: form.agentType === 'openclaw' ? form.contextWindow : undefined,
             accountId: form.agentType === 'openclaw' ? form.accountId : undefined,
-            apiKey: form.agentType === 'openclaw' ? form.apiKey : undefined,
-            baseURL: form.agentType === 'openclaw' ? form.baseURL : undefined,
             token: form.agentType === 'openclaw' ? form.token : undefined,
             taskID: taskID,
             advanced: form.advanced,

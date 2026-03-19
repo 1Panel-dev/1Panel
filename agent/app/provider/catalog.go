@@ -20,7 +20,6 @@ type Meta struct {
 	DefaultBaseURL string
 	EnvKey         string
 	Models         []Model
-	Enabled        bool
 }
 
 var catalog = map[string]Meta{
@@ -30,14 +29,12 @@ var catalog = map[string]Meta{
 		Sort:           10,
 		DefaultBaseURL: "",
 		EnvKey:         "CUSTOM_API_KEY",
-		Enabled:        true,
 		Models:         []Model{},
 	},
 	"ollama": {
 		Key:         "ollama",
 		DisplayName: "Ollama",
 		Sort:        15,
-		Enabled:     true,
 	},
 	"vllm": {
 		Key:            "vllm",
@@ -45,7 +42,6 @@ var catalog = map[string]Meta{
 		Sort:           20,
 		DefaultBaseURL: "",
 		EnvKey:         "VLLM_API_KEY",
-		Enabled:        true,
 		Models:         []Model{},
 	},
 	"deepseek": {
@@ -54,7 +50,6 @@ var catalog = map[string]Meta{
 		Sort:           25,
 		DefaultBaseURL: "https://api.deepseek.com/v1",
 		EnvKey:         "DEEPSEEK_API_KEY",
-		Enabled:        true,
 		Models: []Model{
 			{ID: "deepseek/deepseek-chat", Name: "DeepSeek Chat"},
 			{ID: "deepseek/deepseek-reasoner", Name: "DeepSeek Reasoner"},
@@ -67,7 +62,6 @@ var catalog = map[string]Meta{
 		Sort:           30,
 		DefaultBaseURL: "https://coding.dashscope.aliyuncs.com/v1",
 		EnvKey:         "QWEN_API_KEY",
-		Enabled:        true,
 		Models: []Model{
 			{ID: "bailian-coding-plan/qwen3.5-plus", Name: "Qwen3.5-Plus"},
 			{ID: "bailian-coding-plan/qwen3-max", Name: "Qwen3-Max"},
@@ -85,7 +79,6 @@ var catalog = map[string]Meta{
 		Sort:           35,
 		DefaultBaseURL: "https://ark.cn-beijing.volces.com/api/coding/v3",
 		EnvKey:         "ARK_API_KEY",
-		Enabled:        true,
 		Models: []Model{
 			{ID: "ark-coding-plan/doubao-seed-2.0-code", Name: "Doubao-Seed-2.0-Code"},
 			{ID: "ark-coding-plan/doubao-seed-code", Name: "Doubao-Seed-Code"},
@@ -101,7 +94,6 @@ var catalog = map[string]Meta{
 		Sort:           40,
 		DefaultBaseURL: "https://open.bigmodel.cn/api/paas/v4",
 		EnvKey:         "ZAI_API_KEY",
-		Enabled:        true,
 		Models: []Model{
 			{ID: "zai/glm-5", Name: "GLM-5"},
 			{ID: "zai/glm-4.7", Name: "GLM-4.7"},
@@ -115,7 +107,6 @@ var catalog = map[string]Meta{
 		Sort:           45,
 		DefaultBaseURL: "https://api.minimaxi.com/anthropic",
 		EnvKey:         "MINIMAX_API_KEY",
-		Enabled:        true,
 		Models: []Model{
 			{ID: "minimax/MiniMax-M2.5", Name: "MiniMax M2.5"},
 			{ID: "minimax/MiniMax-M2.5-highspeed", Name: "MiniMax M2.5 highspeed"},
@@ -127,7 +118,6 @@ var catalog = map[string]Meta{
 		Sort:           50,
 		DefaultBaseURL: "https://api.moonshot.cn/v1",
 		EnvKey:         "KIMI_API_KEY",
-		Enabled:        true,
 		Models: []Model{
 			{ID: "kimi/kimi-k2.5", Name: "Kimi K2.5"},
 			{ID: "kimi/kimi-k2-0905-preview", Name: "Kimi K2 0905 Preview"},
@@ -140,7 +130,6 @@ var catalog = map[string]Meta{
 		Sort:           51,
 		DefaultBaseURL: "https://api.kimi.com/coding/",
 		EnvKey:         "KIMI_API_KEY",
-		Enabled:        true,
 		Models: []Model{
 			{ID: "kimi-coding/k2p5", Name: "Kimi K2.5"},
 		},
@@ -151,7 +140,6 @@ var catalog = map[string]Meta{
 		Sort:           55,
 		DefaultBaseURL: "https://api.openai.com/v1",
 		EnvKey:         "OPENAI_API_KEY",
-		Enabled:        true,
 		Models: []Model{
 			{ID: "openai/codex-mini-latest", Name: "Codex Mini"},
 			{ID: "openai/gpt-4.1", Name: "GPT-4.1"},
@@ -167,7 +155,6 @@ var catalog = map[string]Meta{
 		Sort:           56,
 		DefaultBaseURL: "https://openrouter.ai/api/v1",
 		EnvKey:         "OPENROUTER_API_KEY",
-		Enabled:        true,
 		Models: []Model{
 			{ID: "openrouter/free", Name: "openrouter/free"},
 			{ID: "openrouter/auto", Name: "openrouter/auto"},
@@ -179,7 +166,6 @@ var catalog = map[string]Meta{
 		Sort:           60,
 		DefaultBaseURL: "https://api.anthropic.com",
 		EnvKey:         "ANTHROPIC_API_KEY",
-		Enabled:        true,
 		Models: []Model{
 			{ID: "anthropic/claude-3-haiku-20240307", Name: "Claude 3 Haiku"},
 			{ID: "anthropic/claude-3-5-haiku-latest", Name: "Claude 3.5 Haiku"},
@@ -194,7 +180,6 @@ var catalog = map[string]Meta{
 		Sort:           65,
 		DefaultBaseURL: "https://generativelanguage.googleapis.com",
 		EnvKey:         "GEMINI_API_KEY",
-		Enabled:        true,
 		Models: []Model{
 			{ID: "google/gemini-3-flash-preview", Name: "Gemini 3 Flash Preview"},
 			{ID: "google/gemini-flash-latest", Name: "Gemini Flash Latest"},
@@ -207,7 +192,6 @@ var catalog = map[string]Meta{
 		Sort:           70,
 		DefaultBaseURL: "https://api.moonshot.ai/v1",
 		EnvKey:         "MOONSHOT_API_KEY",
-		Enabled:        true,
 		Models: []Model{
 			{ID: "moonshot/kimi-k2.5", Name: "Kimi K2.5"},
 			{ID: "moonshot/kimi-k2-0905-preview", Name: "Kimi K2 0905 Preview"},
@@ -230,11 +214,6 @@ func All() map[string]Meta {
 		result[key] = cloneMeta(meta)
 	}
 	return result
-}
-
-func IsEnabled(key string) bool {
-	meta, ok := catalog[strings.ToLower(strings.TrimSpace(key))]
-	return ok && meta.Enabled
 }
 
 func DefaultBaseURL(key string) (string, bool) {
