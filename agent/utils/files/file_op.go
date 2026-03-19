@@ -804,6 +804,12 @@ func (f FileOp) decompressWithSDK(srcFile string, dst string, cType CompressType
 		return nil
 	}
 
+	type dirEntry struct {
+		path    string
+		modTime time.Time
+	}
+	var dirs []dirEntry
+
 	handler := func(ctx context.Context, archFile archiver.File) error {
 		info := archFile.FileInfo
 		if isIgnoreFile(archFile.Name()) {
@@ -824,6 +830,7 @@ func (f FileOp) decompressWithSDK(srcFile string, dst string, cType CompressType
 			if err := f.Fs.MkdirAll(filePath, info.Mode()); err != nil {
 				return err
 			}
+			dirs = append(dirs, dirEntry{path: filePath, modTime: info.ModTime()})
 			return nil
 		} else {
 			parentDir := path.Dir(filePath)
@@ -846,14 +853,20 @@ func (f FileOp) decompressWithSDK(srcFile string, dst string, cType CompressType
 		if _, err := io.Copy(fw, fr); err != nil {
 			return err
 		}
-
+		_ = os.Chtimes(filePath, info.ModTime(), info.ModTime())
 		return nil
 	}
 	input, err := f.Fs.Open(srcFile)
 	if err != nil {
 		return err
 	}
-	return format.Extract(context.Background(), input, nil, handler)
+	if err := format.Extract(context.Background(), input, nil, handler); err != nil {
+		return err
+	}
+	for i := len(dirs) - 1; i >= 0; i-- {
+		_ = os.Chtimes(dirs[i].path, dirs[i].modTime, dirs[i].modTime)
+	}
+	return nil
 }
 
 func (f FileOp) Decompress(srcFile string, dst string, cType CompressType, secret string) error {
@@ -956,6 +969,10 @@ func (f FileOp) DecompressGzFile(srcFile, dst string) error {
 
 	if _, err := io.Copy(fw, gr); err != nil {
 		return fmt.Errorf("copy content failed: %w", err)
+	}
+
+	if !gr.ModTime.IsZero() {
+		_ = os.Chtimes(outPath, gr.ModTime, gr.ModTime)
 	}
 
 	return nil
