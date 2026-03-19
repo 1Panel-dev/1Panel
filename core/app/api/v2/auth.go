@@ -94,7 +94,7 @@ func (b *BaseApi) MFALogin(c *gin.Context) {
 
 	user, msgKey, err := authService.MFALogin(c, req, string(entrance))
 	go saveLoginLogs(c, wrapLoginErr(msgKey, err))
-	if msgKey == "ErrAuth" {
+	if msgKey == "ErrAuth" || msgKey == "ErrMFA" {
 		helper.BadAuth(c, msgKey, err)
 		return
 	}
