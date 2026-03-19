@@ -4,8 +4,6 @@ import { Base64 } from 'js-base64';
 import { ResPage } from '../interface';
 import { Backup } from '../interface/backup';
 import { TimeoutEnum } from '@/enums/http-enum';
-import { GlobalStore } from '@/store';
-const globalStore = GlobalStore();
 
 // backup-agent
 export const getLocalBackupDir = (node?: string) => {
@@ -23,10 +21,7 @@ export const checkBackup = (params: Backup.BackupOperate) => {
     if (request.credential) {
         request.credential = Base64.encode(request.credential);
     }
-    if (!params.isPublic || !globalStore.isProductPro) {
-        return http.postLocalNode<Backup.CheckResult>(`/backups/conn/check`, request);
-    }
-    return http.post<Backup.CheckResult>(`/backups/conn/check`, request);
+    return http.postLocalNode<Backup.CheckResult>(`/backups/conn/check`, request);
 };
 export const listBucket = (params: Backup.ForBucket) => {
     let request = deepCopy(params) as Backup.BackupOperate;
@@ -36,10 +31,7 @@ export const listBucket = (params: Backup.ForBucket) => {
     if (request.credential) {
         request.credential = Base64.encode(request.credential);
     }
-    if (!params.isPublic || !globalStore.isProductPro) {
-        return http.postLocalNode('/backups/buckets', request, TimeoutEnum.T_40S);
-    }
-    return http.post('/backups/buckets', request, TimeoutEnum.T_40S);
+    return http.postLocalNode('/backups/buckets', request, TimeoutEnum.T_40S);
 };
 export const handleBackup = (params: Backup.Backup, node?: string) => {
     const query = node ? `?operateNode=${node}` : '';
