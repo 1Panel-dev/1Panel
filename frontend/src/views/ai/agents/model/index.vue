@@ -118,8 +118,6 @@ const onEdit = (row: AI.AgentAccountItem) => {
             apiKey: row.apiKey,
             rememberApiKey: row.rememberApiKey,
             apiType: row.apiType,
-            maxTokens: row.maxTokens,
-            contextWindow: row.contextWindow,
             remark: row.remark,
         });
     }

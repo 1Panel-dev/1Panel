@@ -26,13 +26,6 @@
             <el-form-item :label="$t('aiTools.agents.baseUrl')" prop="baseURL">
                 <el-input v-model="form.baseURL" :disabled="!editableBaseURLProviders.includes(form.provider)" />
             </el-form-item>
-            <el-alert
-                :title="$t('aiTools.agents.accountCreateHelper')"
-                type="info"
-                :closable="false"
-                show-icon
-                class="mb-4"
-            />
             <el-form-item :label="'API ' + $t('commons.table.type')" prop="apiType">
                 <el-select v-model="form.apiType">
                     <el-option label="openai-completions" value="openai-completions" />
@@ -44,12 +37,30 @@
                     />
                 </el-select>
             </el-form-item>
-            <el-form-item label="Max Tokens" prop="maxTokens">
-                <el-input-number v-model="form.maxTokens" :min="1" :max="2000000" />
-            </el-form-item>
-            <el-form-item label="Context Window" prop="contextWindow">
-                <el-input-number v-model="form.contextWindow" :min="1" :max="2000000" />
-            </el-form-item>
+            <template v-if="showInitialModel">
+                <el-divider content-position="left">{{ $t('aiTools.agents.accountModels') }}</el-divider>
+                <el-form-item :label="$t('aiTools.model.model')" prop="initialModel.id" :rules="[Rules.requiredInput]">
+                    <el-input v-model="form.initialModel.id" />
+                </el-form-item>
+                <el-form-item :label="$t('commons.table.name')" prop="initialModel.name">
+                    <el-input v-model="form.initialModel.name" />
+                </el-form-item>
+                <el-form-item label="Context Window" prop="initialModel.contextWindow">
+                    <el-input-number v-model="form.initialModel.contextWindow" :min="1" :max="2000000" />
+                </el-form-item>
+                <el-form-item label="Max Tokens" prop="initialModel.maxTokens">
+                    <el-input-number v-model="form.initialModel.maxTokens" :min="1" :max="2000000" />
+                </el-form-item>
+                <el-form-item :label="$t('aiTools.agents.modelInputTypes')" prop="initialModel.input">
+                    <el-checkbox-group v-model="form.initialModel.input">
+                        <el-checkbox label="text">Text</el-checkbox>
+                        <el-checkbox label="image">Image</el-checkbox>
+                    </el-checkbox-group>
+                </el-form-item>
+                <el-form-item :label="$t('aiTools.agents.reasoning')" prop="initialModel.reasoning">
+                    <el-switch v-model="form.initialModel.reasoning" />
+                </el-form-item>
+            </template>
             <el-form-item :label="$t('website.remark')" prop="remark">
                 <el-input v-model="form.remark" />
             </el-form-item>
@@ -72,6 +83,7 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue';
 import { FormInstance } from 'element-plus';
+import { AI } from '@/api/interface/ai';
 import { Rules } from '@/global/form-rules';
 import { createAgentAccount, getAgentProviders, updateAgentAccount } from '@/api/modules/ai';
 import i18n from '@/lang';
@@ -87,6 +99,7 @@ const providerOptions = ref<Array<{ label: string; value: string }>>([]);
 const providerBaseURL = ref<Record<string, string>>({});
 const loading = ref(false);
 const editableBaseURLProviders = ['ollama', 'custom', 'vllm', 'zai'];
+const initialModelProviders = ['custom', 'vllm', 'ollama'];
 const { isIntl } = useGlobalStore();
 
 const form = reactive({
@@ -95,10 +108,9 @@ const form = reactive({
     name: '',
     baseURL: '',
     apiType: 'openai-completions',
-    maxTokens: 8192,
-    contextWindow: 128000,
     apiKey: '',
     rememberApiKey: false,
+    initialModel: {} as AI.AgentAccountModel,
     remark: '',
     syncAgents: false,
 });
@@ -106,6 +118,8 @@ const form = reactive({
 const headerTitle = computed(() =>
     form.id ? i18n.global.t('commons.button.edit') : i18n.global.t('commons.button.create'),
 );
+
+const showInitialModel = computed(() => !form.id && initialModelProviders.includes(form.provider));
 
 const rules = reactive({
     provider: [Rules.requiredSelect],
@@ -115,11 +129,59 @@ const rules = reactive({
     apiType: [Rules.requiredSelect],
 });
 
+const isInitialModelProvider = (provider: string) => initialModelProviders.includes(provider);
+
+const defaultContextWindowForProvider = (provider: string) => {
+    if (provider === 'custom' || provider === 'vllm') {
+        return 128000;
+    }
+    return 256000;
+};
+
+const buildInitialModel = (provider: string): AI.AgentAccountModel => ({
+    recordId: 0,
+    id: '',
+    name: '',
+    contextWindow: defaultContextWindowForProvider(provider),
+    maxTokens: 8192,
+    reasoning: false,
+    input: ['text'],
+});
+
+const normalizeInitialModel = () => {
+    const item = {
+        recordId: 0,
+        id: String(form.initialModel.id || '').trim(),
+        name: String(form.initialModel.name || form.initialModel.id || '').trim(),
+        contextWindow: Number(form.initialModel.contextWindow || 0) || defaultContextWindowForProvider(form.provider),
+        maxTokens: Number(form.initialModel.maxTokens || 0) || 8192,
+        reasoning: Boolean(form.initialModel.reasoning),
+        input: Array.from(
+            new Set((form.initialModel.input || []).filter((value) => value === 'text' || value === 'image')),
+        ),
+    };
+    if (item.id === '') {
+        return null;
+    }
+    return item;
+};
+
+const resetInitialModel = () => {
+    form.initialModel = isInitialModelProvider(form.provider)
+        ? buildInitialModel(form.provider)
+        : ({} as AI.AgentAccountModel);
+};
+
 const submit = async () => {
     if (!formRef.value) {
         return;
     }
     await formRef.value.validate();
+    const initialModel = normalizeInitialModel();
+    if (showInitialModel.value && !initialModel) {
+        MsgError(i18n.global.t('aiTools.agents.accountModelsRequired'));
+        return;
+    }
     loading.value = true;
     try {
         if (form.id) {
@@ -130,8 +192,6 @@ const submit = async () => {
                 apiKey: form.apiKey,
                 rememberApiKey: form.rememberApiKey,
                 apiType: form.apiType,
-                maxTokens: form.maxTokens,
-                contextWindow: form.contextWindow,
                 remark: form.remark,
                 syncAgents: form.syncAgents,
             });
@@ -143,8 +203,7 @@ const submit = async () => {
                 apiKey: form.apiKey,
                 rememberApiKey: form.rememberApiKey,
                 apiType: form.apiType,
-                maxTokens: form.maxTokens,
-                contextWindow: form.contextWindow,
+                models: initialModel ? [initialModel] : [],
                 remark: form.remark,
             });
         }
@@ -165,10 +224,9 @@ const handleClose = () => {
     form.name = '';
     form.baseURL = '';
     form.apiType = 'openai-completions';
-    form.maxTokens = 8192;
-    form.contextWindow = 128000;
     form.apiKey = '';
     form.rememberApiKey = false;
+    form.initialModel = {} as AI.AgentAccountModel;
     form.remark = '';
     form.syncAgents = false;
 };
@@ -181,8 +239,6 @@ interface OpenParams {
     apiKey?: string;
     rememberApiKey?: boolean;
     apiType?: string;
-    maxTokens?: number;
-    contextWindow?: number;
     remark?: string;
 }
 
@@ -200,8 +256,6 @@ const openDrawer = async (params?: OpenParams) => {
         form.apiKey = params.apiKey || '';
         form.rememberApiKey = params.rememberApiKey || false;
         form.apiType = params.apiType || 'openai-completions';
-        form.maxTokens = params.maxTokens || 8192;
-        form.contextWindow = params.contextWindow || 128000;
         form.remark = params.remark || '';
         form.syncAgents = false;
         return;
@@ -212,8 +266,7 @@ const openDrawer = async (params?: OpenParams) => {
     form.apiKey = '';
     form.rememberApiKey = false;
     form.apiType = 'openai-completions';
-    form.maxTokens = 8192;
-    form.contextWindow = 128000;
+    form.initialModel = {} as AI.AgentAccountModel;
     form.remark = '';
     form.syncAgents = false;
     if (params?.provider) {
@@ -255,6 +308,9 @@ const handleProviderChange = () => {
         if (!form.apiType) {
             form.apiType = 'openai-completions';
         }
+    }
+    if (!form.id) {
+        resetInitialModel();
     }
 };
 

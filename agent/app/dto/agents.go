@@ -8,15 +8,9 @@ type AgentCreateReq struct {
 	WebUIPort      int      `json:"webUIPort" validate:"required"`
 	BridgePort     int      `json:"bridgePort"`
 	AllowedOrigins []string `json:"allowedOrigins"`
-	AgentType      string   `json:"agentType"`
-	Provider       string   `json:"provider"`
+	AgentType      string   `json:"agentType" validate:"required,oneof=openclaw copaw"`
 	Model          string   `json:"model"`
-	APIType        string   `json:"apiType"`
-	MaxTokens      int      `json:"maxTokens"`
-	ContextWindow  int      `json:"contextWindow"`
 	AccountID      uint     `json:"accountId"`
-	APIKey         string   `json:"apiKey"`
-	BaseURL        string   `json:"baseURL"`
 	Token          string   `json:"token"`
 	TaskID         string   `json:"taskID"`
 	Advanced       bool     `json:"advanced"`
@@ -110,27 +104,20 @@ type AgentAccountCreateReq struct {
 	APIKey         string              `json:"apiKey" validate:"required"`
 	RememberAPIKey bool                `json:"rememberApiKey"`
 	BaseURL        string              `json:"baseURL"`
-	Model          string              `json:"model"`
 	Models         []AgentAccountModel `json:"models"`
 	APIType        string              `json:"apiType"`
-	MaxTokens      int                 `json:"maxTokens"`
-	ContextWindow  int                 `json:"contextWindow"`
 	Remark         string              `json:"remark"`
 }
 
 type AgentAccountUpdateReq struct {
-	ID             uint                `json:"id" validate:"required"`
-	Name           string              `json:"name" validate:"required"`
-	APIKey         string              `json:"apiKey" validate:"required"`
-	RememberAPIKey bool                `json:"rememberApiKey"`
-	BaseURL        string              `json:"baseURL"`
-	Model          string              `json:"model"`
-	Models         []AgentAccountModel `json:"models"`
-	APIType        string              `json:"apiType"`
-	MaxTokens      int                 `json:"maxTokens"`
-	ContextWindow  int                 `json:"contextWindow"`
-	Remark         string              `json:"remark"`
-	SyncAgents     bool                `json:"syncAgents"`
+	ID             uint   `json:"id" validate:"required"`
+	Name           string `json:"name" validate:"required"`
+	APIKey         string `json:"apiKey" validate:"required"`
+	RememberAPIKey bool   `json:"rememberApiKey"`
+	BaseURL        string `json:"baseURL"`
+	APIType        string `json:"apiType"`
+	Remark         string `json:"remark"`
+	SyncAgents     bool   `json:"syncAgents"`
 }
 
 type AgentAccountVerifyReq struct {
@@ -157,11 +144,8 @@ type AgentAccountInfo struct {
 	APIKey         string              `json:"apiKey"`
 	RememberAPIKey bool                `json:"rememberApiKey"`
 	BaseURL        string              `json:"baseUrl"`
-	Model          string              `json:"model"`
 	Models         []AgentAccountModel `json:"models"`
 	APIType        string              `json:"apiType"`
-	MaxTokens      int                 `json:"maxTokens"`
-	ContextWindow  int                 `json:"contextWindow"`
 	Verified       bool                `json:"verified"`
 	Remark         string              `json:"remark"`
 	CreatedAt      time.Time           `json:"createdAt"`

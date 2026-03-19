@@ -11,9 +11,15 @@ import (
 	"gorm.io/gorm"
 )
 
+type legacyAgentAccountModelPoolSource struct {
+	model.AgentAccount
+	LegacyModel  string `gorm:"column:model"`
+	LegacyModels string `gorm:"column:models"`
+}
+
 func MigrateAgentAccountModelPool(tx *gorm.DB) error {
-	var accounts []model.AgentAccount
-	if err := tx.Find(&accounts).Error; err != nil {
+	var accounts []legacyAgentAccountModelPoolSource
+	if err := tx.Table(model.AgentAccount{}.TableName()).Find(&accounts).Error; err != nil {
 		return err
 	}
 	for _, account := range accounts {
@@ -54,13 +60,14 @@ func MigrateAgentAccountModelPool(tx *gorm.DB) error {
 	return nil
 }
 
-func buildMigratedAgentAccountModels(tx *gorm.DB, account *model.AgentAccount) ([]dto.AgentAccountModel, error) {
+func buildMigratedAgentAccountModels(tx *gorm.DB, account *legacyAgentAccountModelPoolSource) ([]dto.AgentAccountModel, error) {
 	if account == nil {
 		return nil, nil
 	}
+	baseAccount := account.AgentAccount
 	requested := make([]dto.AgentAccountModel, 0)
-	if strings.TrimSpace(account.Models) != "" {
-		if err := json.Unmarshal([]byte(account.Models), &requested); err != nil {
+	if strings.TrimSpace(account.LegacyModels) != "" {
+		if err := json.Unmarshal([]byte(account.LegacyModels), &requested); err != nil {
 			return nil, err
 		}
 	}
@@ -83,7 +90,7 @@ func buildMigratedAgentAccountModels(tx *gorm.DB, account *model.AgentAccount) (
 		seen[target] = struct{}{}
 		requested = append(requested, dto.AgentAccountModel{ID: target})
 	}
-	appendModel(account.Model)
+	appendModel(account.LegacyModel)
 	if account.ID > 0 {
 		var agents []model.Agent
 		if err := tx.Where("account_id = ?", account.ID).Find(&agents).Error; err != nil {
@@ -93,7 +100,7 @@ func buildMigratedAgentAccountModels(tx *gorm.DB, account *model.AgentAccount) (
 			appendModel(agent.Model)
 		}
 	}
-	models, err := service.MergeCatalogAgentAccountModelsForMigration(account, requested)
+	models, err := service.MergeCatalogAgentAccountModelsForMigration(&baseAccount, requested)
 	if err != nil {
 		if strings.TrimSpace(err.Error()) == "model is required" {
 			return nil, nil

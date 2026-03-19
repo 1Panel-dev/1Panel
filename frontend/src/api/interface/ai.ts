@@ -243,14 +243,8 @@ export namespace AI {
         bridgePort?: number;
         allowedOrigins?: string[];
         agentType: 'openclaw' | 'copaw';
-        provider?: string;
         model?: string;
-        apiType?: string;
-        maxTokens?: number;
-        contextWindow?: number;
         accountId?: number;
-        apiKey?: string;
-        baseURL?: string;
         token?: string;
         taskID: string;
         advanced: boolean;
@@ -361,8 +355,7 @@ export namespace AI {
         rememberApiKey: boolean;
         baseURL: string;
         apiType: string;
-        maxTokens: number;
-        contextWindow: number;
+        models?: AgentAccountModel[];
         remark: string;
     }
 
@@ -373,8 +366,6 @@ export namespace AI {
         rememberApiKey: boolean;
         baseURL: string;
         apiType: string;
-        maxTokens: number;
-        contextWindow: number;
         remark: string;
         syncAgents: boolean;
     }
@@ -394,11 +385,8 @@ export namespace AI {
         apiKey: string;
         rememberApiKey: boolean;
         baseUrl: string;
-        model: string;
         models: AgentAccountModel[];
         apiType: string;
-        maxTokens: number;
-        contextWindow: number;
         verified: boolean;
         remark: string;
         createdAt: string;
