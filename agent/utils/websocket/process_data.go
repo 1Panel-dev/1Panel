@@ -144,7 +144,7 @@ func getDownloadProcess(progress DownloadProgress) (res []byte, err error) {
 	for _, k := range progress.Keys {
 		value := global.CACHE.Get(k)
 		if value == "" {
-			return nil, fmt.Errorf("get cache error,err value is nil")
+			continue
 		}
 		downloadProcess := &files.Process{}
 		_ = json.Unmarshal([]byte(value), downloadProcess)

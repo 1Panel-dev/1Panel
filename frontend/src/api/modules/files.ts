@@ -98,6 +98,10 @@ export const wgetFile = (params: File.FileWget) => {
     return http.post<File.FileWgetRes>('files/wget', params);
 };
 
+export const stopWgetFile = (key: string) => {
+    return http.post('files/wget/stop', { key });
+};
+
 export const moveFile = (params: File.FileMove) => {
     return http.post<File.File>('files/move', params, TimeoutEnum.T_5M);
 };

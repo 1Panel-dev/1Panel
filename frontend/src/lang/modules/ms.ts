@@ -88,6 +88,7 @@ const message = {
             next: 'Seterusnya',
             setDefault: 'Pulihkan lalai',
             bind: 'Ikat',
+            tip: 'Tip',
         },
         operate: {
             start: 'Mula',
@@ -1750,6 +1751,7 @@ const message = {
         previewLargeFile: 'Pratonton',
         panelInstallDir: 'Direktori pemasangan 1Panel tidak boleh dipadamkan',
         wgetTask: 'Tugas Muat Turun',
+        stopWgetConfirm: 'Adakah anda pasti mahu menghentikan tugas muat turun ini?',
         existFileTitle: 'Amaran fail dengan nama yang sama',
         existFileHelper: 'Fail yang dimuat naik mengandungi fail dengan nama yang sama. Adakah anda mahu menimpanya?',
         existFileSize: 'Saiz fail (baru -> lama)',

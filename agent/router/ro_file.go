@@ -33,6 +33,7 @@ func (f *FileRouter) InitRouter(Router *gin.RouterGroup) {
 		fileRouter.POST("/chunkupload", baseApi.UploadChunkFiles)
 		fileRouter.POST("/rename", baseApi.ChangeFileName)
 		fileRouter.POST("/wget", baseApi.WgetFile)
+		fileRouter.POST("/wget/stop", baseApi.StopWget)
 		fileRouter.POST("/move", baseApi.MoveFile)
 		fileRouter.GET("/download", baseApi.Download)
 		fileRouter.POST("/chunkdownload", baseApi.DownloadChunkFiles)

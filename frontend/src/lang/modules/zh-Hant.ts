@@ -87,6 +87,7 @@ const message = {
             hide: '隱藏',
             visit: '存取',
             migrate: '遷移',
+            tip: '提示',
         },
         operate: {
             start: '啟動',
@@ -1557,6 +1558,7 @@ const message = {
         downloadProcess: '下載進度',
         downloading: '正在下載...',
         infoDetail: '檔案屬性',
+        stopWgetConfirm: '確認停止該下載任務？',
         root: '根目錄',
         list: '檔案列表',
         sub: '子目錄',

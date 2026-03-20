@@ -87,6 +87,7 @@ const message = {
             hide: 'Hide',
             visit: 'Visit',
             migrate: 'Migrate',
+            tip: 'Tip',
         },
         operate: {
             start: 'Start',
@@ -1647,6 +1648,7 @@ const message = {
         uploadSuccess: 'Successfully upload',
         downloadProcess: 'Download progress',
         downloading: 'Downloading...',
+        stopWgetConfirm: 'Are you sure you want to stop this download task?',
         infoDetail: 'File properties',
         root: 'Root directory',
         list: 'File list',
