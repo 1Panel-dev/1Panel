@@ -34,6 +34,8 @@ func BuildOpenClawPatch(provider, modelName, apiType string, maxTokens, contextW
 		return buildArkPatch(modelID, maxTokens, contextWindow, baseURL, apiKey), nil
 	case "minimax":
 		return buildMiniMaxPatch(modelID, baseURL, apiKey), nil
+	case "xiaomi":
+		return buildXiaomiPatch(modelID, baseURL, apiKey), nil
 	case "custom", "vllm":
 		return buildCustomPatch(provider, modelName, apiType, maxTokens, contextWindow, baseURL, apiKey), nil
 	case "ollama":
@@ -139,6 +141,22 @@ func buildMiniMaxPatch(modelID, baseURL, apiKey string) *OpenClawPatch {
 				},
 			},
 		},
+	}
+}
+
+func buildXiaomiPatch(modelID, baseURL, apiKey string) *OpenClawPatch {
+	normalizedID := strings.TrimSpace(modelID)
+	return &OpenClawPatch{
+		PrimaryModel: "xiaomi/" + normalizedID,
+		Models: providerModels("xiaomi", strings.TrimSpace(apiKey), firstNonEmpty(strings.TrimSpace(baseURL), "https://api.xiaomimimo.com/anthropic"), "anthropic-messages", map[string]interface{}{
+			"id":            normalizedID,
+			"name":          normalizedID,
+			"reasoning":     false,
+			"input":         []string{"text"},
+			"contextWindow": 262144,
+			"maxTokens":     8192,
+			"cost":          map[string]interface{}{},
+		}),
 	}
 }
 

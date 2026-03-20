@@ -142,6 +142,27 @@ func BuildVerifyRequest(provider, baseURL, apiKey string) VerifyRequest {
 				}},
 			}},
 		})
+	case "xiaomi":
+		request.Method = http.MethodPost
+		headers["x-api-key"] = apiKey
+		headers["anthropic-version"] = "2023-06-01"
+		headers["Content-Type"] = "application/json"
+		if strings.Contains(base, "/v1") {
+			request.URL = base + "/messages"
+		} else {
+			request.URL = base + "/v1/messages"
+		}
+		request.Body = mustJSON(map[string]interface{}{
+			"model":      "mimo-v2-flash",
+			"max_tokens": 1,
+			"messages": []map[string]interface{}{{
+				"role": "user",
+				"content": []map[string]string{{
+					"type": "text",
+					"text": "test",
+				}},
+			}},
+		})
 	default:
 		headers["Authorization"] = fmt.Sprintf("Bearer %s", apiKey)
 		if strings.Contains(base, "/v1") {

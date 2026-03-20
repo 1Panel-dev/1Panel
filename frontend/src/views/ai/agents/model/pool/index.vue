@@ -2,13 +2,6 @@
     <DrawerPro v-model="open" :header="headerTitle" size="large" @close="handleClose">
         <template #content>
             <div v-loading="loading">
-                <el-alert
-                    :title="$t('aiTools.agents.modelPoolHelper')"
-                    type="info"
-                    :closable="false"
-                    show-icon
-                    class="mb-4"
-                />
                 <div class="toolbar">
                     <el-button type="primary" @click="openCreate">
                         {{ $t('commons.button.add') }}
@@ -45,21 +38,7 @@
     <DrawerPro v-model="editorOpen" :header="editorTitle" size="normal" @close="handleEditorClose">
         <el-form ref="formRef" :model="form" label-position="top" :rules="rules" v-loading="saving">
             <el-form-item :label="$t('aiTools.model.model')" prop="id">
-                <el-select
-                    v-model="form.id"
-                    filterable
-                    allow-create
-                    default-first-option
-                    :reserve-keyword="false"
-                    @change="handleModelIDChange"
-                >
-                    <el-option
-                        v-for="model in providerModelOptions"
-                        :key="model.id"
-                        :label="model.name"
-                        :value="model.id"
-                    />
-                </el-select>
+                <el-input v-model="form.id" clearable />
             </el-form-item>
             <el-form-item :label="$t('commons.table.name')" prop="name">
                 <el-input v-model="form.name" />
@@ -99,14 +78,12 @@ import {
     createAgentAccountModel,
     deleteAgentAccountModel,
     getAgentAccountModels,
-    getAgentProviders,
     updateAgentAccountModel,
 } from '@/api/modules/ai';
 import { AI } from '@/api/interface/ai';
 import i18n from '@/lang';
 import { MsgError } from '@/utils/message';
 import { getAgentProviderDisplayName } from '@/utils/agent';
-import { useGlobalStore } from '@/composables/useGlobalStore';
 import { Rules } from '@/global/form-rules';
 
 const emit = defineEmits(['updated']);
@@ -116,9 +93,7 @@ const editorOpen = ref(false);
 const loading = ref(false);
 const saving = ref(false);
 const formRef = ref<FormInstance>();
-const providerModels = ref<Record<string, AI.ProviderModelInfo[]>>({});
 const items = ref<AI.AgentAccountModel[]>([]);
-const { isIntl } = useGlobalStore();
 
 const account = reactive({
     id: 0,
@@ -144,8 +119,6 @@ const headerTitle = computed(() => {
 const editorTitle = computed(() =>
     form.recordId ? i18n.global.t('commons.button.edit') : i18n.global.t('commons.button.add'),
 );
-
-const providerModelOptions = computed(() => providerModels.value[account.provider] || []);
 
 const rules = reactive({
     id: [Rules.requiredInput],
@@ -173,20 +146,6 @@ const buildModelItem = (model?: Partial<AI.AgentAccountModel>): AI.AgentAccountM
     input: Array.from(new Set((model?.input || []).filter((value) => value === 'text' || value === 'image'))),
 });
 
-const loadProviders = async () => {
-    if (Object.keys(providerModels.value).length > 0) {
-        return;
-    }
-    const res = await getAgentProviders();
-    const data = res.data || [];
-    const blockedProviders = new Set(['ark-coding-plan', 'bailian-coding-plan']);
-    const filteredData = isIntl.value ? data.filter((item) => !blockedProviders.has(item.provider)) : data;
-    providerModels.value = filteredData.reduce((acc, item) => {
-        acc[item.provider] = item.models || [];
-        return acc;
-    }, {} as Record<string, AI.ProviderModelInfo[]>);
-};
-
 const search = async () => {
     if (!account.id) {
         items.value = [];
@@ -213,36 +172,12 @@ const resetForm = () => {
 
 const openCreate = () => {
     resetForm();
-    const firstModel = providerModelOptions.value[0];
-    if (firstModel) {
-        form.id = firstModel.id;
-        form.name = firstModel.name || firstModel.id;
-        form.contextWindow = firstModel.contextWindow || 128000;
-        form.maxTokens = firstModel.maxTokens || 8192;
-        form.reasoning = firstModel.reasoning;
-        form.input = firstModel.input?.length ? [...firstModel.input] : ['text'];
-    }
     editorOpen.value = true;
 };
 
 const openEdit = (row: AI.AgentAccountModel) => {
     Object.assign(form, buildModelItem(row));
     editorOpen.value = true;
-};
-
-const handleModelIDChange = (value: string) => {
-    form.id = String(value || '').trim();
-    const matched = providerModelOptions.value.find((item) => item.id === form.id);
-    if (!matched) {
-        return;
-    }
-    if (!form.name) {
-        form.name = matched.name || matched.id;
-    }
-    form.contextWindow = matched.contextWindow || form.contextWindow || 128000;
-    form.maxTokens = matched.maxTokens || form.maxTokens || 8192;
-    form.reasoning = matched.reasoning;
-    form.input = matched.input?.length ? [...matched.input] : ['text'];
 };
 
 const submit = async () => {
@@ -319,7 +254,6 @@ const openDrawer = async (row: AI.AgentAccountItem) => {
     account.name = row.name;
     account.provider = row.provider;
     open.value = true;
-    await loadProviders();
     await search();
 };
 

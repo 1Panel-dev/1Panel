@@ -660,7 +660,6 @@ const message = {
             accountModelsRequired: '请至少配置一个模型',
             accountModelsDuplicate: '模型池中存在重复模型，请检查后重试',
             modelPool: '模型池',
-            modelPoolHelper: '在这里维护该模型账号的模型池，智能体创建和 OpenClaw 模型切换都会使用这些模型',
             modelInputTypes: '输入类型',
             reasoning: '推理模型',
             token: 'Token',

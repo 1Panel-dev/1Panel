@@ -81,7 +81,7 @@ func verifyResolvedAgentAccount(input resolvedAgentAccountVerification) error {
 }
 
 func resolveAgentAccountAPIType(provider, apiType, fallbackAPIType string) (string, error) {
-	if provider == "minimax" {
+	if provider == "minimax" || provider == "xiaomi" {
 		return "anthropic-messages", nil
 	}
 	resolvedAPIType := normalizeAPIType(apiType)
@@ -1918,6 +1918,8 @@ func fixedProviderBaseURL(provider string) (string, bool) {
 	case "ark-coding-plan":
 		return providerDefaultBaseURL(provider)
 	case "minimax":
+		return providerDefaultBaseURL(provider)
+	case "xiaomi":
 		return providerDefaultBaseURL(provider)
 	default:
 		return "", false
