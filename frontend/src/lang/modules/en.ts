@@ -3920,6 +3920,7 @@ const message = {
                 'Detected that this node is not bound to a license. Please bind it in [Panel Settings - License] menu and try again!',
             memTotal: 'Total Memory',
             nodeManagement: 'Multi-Machine Management',
+            multiOverview: 'Multi-Machine',
             nodeItem: 'Node Management',
             panelItem: 'Panel Management',
             addPanel: 'Add Panel',

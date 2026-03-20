@@ -3612,6 +3612,7 @@ const message = {
             nodeUnbindHelper: '偵測到該節點未綁定許可證，請在 [面板設定 - 許可證] 選單中綁定後重試',
             memTotal: '記憶體總計',
             nodeManagement: '多機管理',
+            multiOverview: '多機概覽',
             nodeItem: '節點管理',
             panelItem: '面板管理',
             addPanel: '添加面板',

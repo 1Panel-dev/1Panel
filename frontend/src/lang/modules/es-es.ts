@@ -3929,6 +3929,7 @@ const message = {
                 'Se ha detectado que este nodo no está vinculado a una licencia. Vincúlalo desde [Ajustes del Panel - Licencia] e inténtalo de nuevo.',
             memTotal: 'Memoria Total',
             nodeManagement: 'Gestión Multi-Máquina',
+            multiOverview: 'Multimáquina',
             nodeItem: 'Gestión de Nodos',
             panelItem: 'Gestión de Paneles',
             addNode: 'Añadir Nodo',

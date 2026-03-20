@@ -3927,6 +3927,7 @@ const message = {
                 'このノードがライセンスにバインドされていないことを検出しました。[パネル設定 - ライセンス]メニューでバインドしてから再試行してください！',
             memTotal: '総メモリ',
             nodeManagement: 'マルチマシン管理',
+            multiOverview: 'マルチマシン',
             nodeItem: 'ノード管理',
             panelItem: 'パネル管理',
             addPanel: 'パネル追加',
