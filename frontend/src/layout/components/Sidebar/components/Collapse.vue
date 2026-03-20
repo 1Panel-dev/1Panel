@@ -31,9 +31,14 @@
                     <el-tag class="msg-tag" v-if="taskCount !== 0" size="small" round>{{ taskCount }}</el-tag>
                 </div>
                 <el-divider v-if="showNodes()" class="divider" />
+                <div class="dropdown-item" @click="openNodeDashboard" v-if="isMasterPro">
+                    <SvgIcon class="icon" iconName="p-gailan1" />
+                    {{ $t('xpack.node.multiOverview') }}
+                </div>
+                <el-divider v-if="isMasterPro" class="divider" />
 
                 <div v-if="showNodes()">
-                    <el-scrollbar max-height="218px" :noresize="true">
+                    <el-scrollbar :max-height="isMasterPro ? '257px' : '218px'" :noresize="true">
                         <div
                             class="dropdown-item"
                             @click="changeNode(item.name)"
@@ -243,6 +248,10 @@ const openTask = () => {
     emit('openTask');
 };
 
+const openNodeDashboard = () => {
+    routerToNameWithQuery('NodeDashboard', { uncached: 'true' });
+};
+
 const logout = () => {
     ElMessageBox.confirm(i18n.global.t('commons.msg.sureLogOut'), i18n.global.t('commons.msg.infoTitle'), {
         confirmButtonText: i18n.global.t('commons.button.confirm'),
@@ -314,7 +323,7 @@ onMounted(() => {
     min-height: 32px;
     transition: background 0.3s;
     .icon {
-        font-size: 6px;
+        font-size: 8px;
     }
     .icon-status {
         font-size: 16px;

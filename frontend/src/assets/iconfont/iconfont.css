@@ -1,9 +1,9 @@
 @font-face {
   font-family: "iconfont"; /* Project id 4776196 */
-  src: url('iconfont.woff2?t=1773971674579') format('woff2'),
-       url('iconfont.woff?t=1773971674579') format('woff'),
-       url('iconfont.ttf?t=1773971674579') format('truetype'),
-       url('iconfont.svg?t=1773971674579#iconfont') format('svg');
+  src: url('iconfont.woff2?t=1773998579784') format('woff2'),
+       url('iconfont.woff?t=1773998579784') format('woff'),
+       url('iconfont.ttf?t=1773998579784') format('truetype'),
+       url('iconfont.svg?t=1773998579784#iconfont') format('svg');
 }
 
 .iconfont {
@@ -12,6 +12,10 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.p-gailan1:before {
+  content: "\e62e";
 }
 
 .p-tuichudenglu3:before {
