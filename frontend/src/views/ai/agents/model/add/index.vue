@@ -115,7 +115,7 @@ const headerTitle = computed(() =>
 
 const showInitialModel = computed(() => !form.id && initialModelProviders.includes(form.provider));
 const apiTypeOptions = computed(() => {
-    if (form.provider === 'minimax') {
+    if (form.provider === 'minimax' || form.provider === 'xiaomi') {
         return ['anthropic-messages'];
     }
     if (form.provider === 'custom' || form.provider === 'vllm') {
@@ -176,7 +176,7 @@ const resetInitialModel = () => {
 };
 
 const normalizeProviderAPIType = (provider: string, apiType?: string) => {
-    if (provider === 'minimax') {
+    if (provider === 'minimax' || provider === 'xiaomi') {
         return 'anthropic-messages';
     }
     if (provider === 'ollama') {

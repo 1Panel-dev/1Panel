@@ -114,6 +114,19 @@ var catalog = map[string]Meta{
 			{ID: "minimax/MiniMax-M2.5-highspeed", Name: "MiniMax M2.5 highspeed"},
 		},
 	},
+	"xiaomi": {
+		Key:            "xiaomi",
+		DisplayName:    "Xiaomi",
+		Sort:           46,
+		DefaultBaseURL: "https://api.xiaomimimo.com/anthropic",
+		EnvKey:         "XIAOMI_API_KEY",
+		Models: []Model{
+			{ID: "xiaomi/mimo-v2-pro", Name: "Xiaomi MiMo V2 Pro", ContextWindow: 262144, MaxTokens: 8192, Reasoning: false, Input: []string{"text"}},
+			{ID: "xiaomi/mimo-v2-omni", Name: "Xiaomi MiMo V2 Omni", ContextWindow: 262144, MaxTokens: 8192, Reasoning: false, Input: []string{"text"}},
+			{ID: "xiaomi/mimo-v2-tts", Name: "Xiaomi MiMo V2 TTS", ContextWindow: 262144, MaxTokens: 8192, Reasoning: false, Input: []string{"text"}},
+			{ID: "xiaomi/mimo-v2-flash", Name: "Xiaomi MiMo V2 Flash", ContextWindow: 262144, MaxTokens: 8192, Reasoning: false, Input: []string{"text"}},
+		},
+	},
 	"kimi": {
 		Key:            "kimi",
 		DisplayName:    "Kimi (CN)",
