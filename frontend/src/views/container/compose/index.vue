@@ -72,20 +72,14 @@
                                             </div>
                                             <div class="compose-actions">
                                                 <el-dropdown placement="bottom">
-                                                    <Status
-                                                        v-if="row.containerCount === row.runningCount"
-                                                        status="running"
-                                                        :operate="true"
-                                                    />
-                                                    <Status
-                                                        v-if="row.runningCount === 0"
-                                                        status="exited"
-                                                        :operate="true"
-                                                    />
+                                                    <Status :status="getComposeStatus(row)" :operate="true" />
                                                     <template #dropdown>
                                                         <el-dropdown-menu>
                                                             <el-dropdown-item
-                                                                :disabled="row.containerCount === row.runningCount"
+                                                                :disabled="
+                                                                    row.containerCount === row.runningCount &&
+                                                                    row.runningCount > 0
+                                                                "
                                                                 @click="handleComposeOperate('up', row)"
                                                             >
                                                                 {{ $t('commons.operate.start') }}
@@ -559,6 +553,16 @@ const loadFrom = (row: any) => {
         default:
             return i18n.global.t('commons.table.local');
     }
+};
+
+const getComposeStatus = (row: { containerCount: number; runningCount: number }) => {
+    if (row.runningCount === 0) {
+        return 'exited';
+    }
+    if (row.containerCount === row.runningCount) {
+        return 'running';
+    }
+    return 'partial';
 };
 
 const loadTableHeight = () => {

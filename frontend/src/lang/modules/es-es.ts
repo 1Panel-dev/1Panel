@@ -317,6 +317,7 @@ const message = {
             removing: 'Eliminando',
             paused: 'Pausado',
             exited: 'Finalizado',
+            partial: 'Parcial',
             dead: 'Muerto',
             installing: 'Instalando',
             enabled: 'Habilitado',

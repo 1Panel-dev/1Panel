@@ -314,6 +314,7 @@ const message = {
             removing: 'Kaldırılıyor',
             paused: 'Duraklatıldı',
             exited: 'Çıkıldı',
+            partial: 'Kısmi',
             dead: 'Ölü',
             installing: 'Yükleniyor',
             enabled: 'Etkinleştirildi',

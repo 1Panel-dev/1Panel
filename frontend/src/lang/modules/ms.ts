@@ -317,6 +317,7 @@ const message = {
             removing: 'Sedang Membuang',
             paused: 'Dijeda',
             exited: 'Keluar',
+            partial: 'Separa',
             dead: 'Mati',
             installing: 'Sedang Memasang',
             enabled: 'Diaktifkan',
