@@ -1744,7 +1744,7 @@ func (w WebsiteService) OperateRedirect(req request.NginxRedirectReq) (err error
 		return buserr.WithErr("ErrUpdateBuWebsite", err)
 	}
 
-	nginxInclude := fmt.Sprintf("/www/sites/%s/redirect/*.conf", website.Alias)
+	nginxInclude := getWebsiteRedirectInclude(website)
 	if err = updateNginxConfig(constant.NginxScopeServer, []dto.NginxParam{{Name: "include", Params: []string{nginxInclude}}}, &website); err != nil {
 		return
 	}

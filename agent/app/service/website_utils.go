@@ -99,6 +99,10 @@ func getRootProxyDirectives(proxyPass string) []components.IDirective {
 	return append([]components.IDirective(nil), locations[0].GetBlock().GetDirectives()...)
 }
 
+func getWebsiteRedirectInclude(website model.Website) string {
+	return fmt.Sprintf("/www/sites/%s/redirect/*.conf", website.Alias)
+}
+
 func applyLocationProxyPass(location *components.Location, proxyPass string, sni *bool, proxySSLName string) {
 	location.UpdateDirective("proxy_pass", []string{proxyPass})
 
@@ -1052,7 +1056,7 @@ func opWebsite(website *model.Website, operate string) error {
 		server.RemoveDirective("include", []string{proxyInclude})
 		rewriteInclude := fmt.Sprintf("/www/sites/%s/rewrite/%s.conf", website.Alias, website.Alias)
 		server.RemoveDirective("include", []string{rewriteInclude})
-		redirectInclude := fmt.Sprintf("/www/sites/%s/redirect/%s.conf", website.Alias, website.Alias)
+		redirectInclude := getWebsiteRedirectInclude(*website)
 		server.RemoveDirective("include", []string{redirectInclude})
 
 		switch website.Type {
@@ -1084,7 +1088,7 @@ func opWebsite(website *model.Website, operate string) error {
 		if fileOp.Stat(absoluteRewritePath) {
 			server.UpdateDirective("include", []string{rewriteInclude})
 		}
-		redirectInclude := fmt.Sprintf("/www/sites/%s/redirect/%s.conf", website.Alias, website.Alias)
+		redirectInclude := getWebsiteRedirectInclude(*website)
 		absoluteRedirectPath := GetSitePath(*website, SiteRedirectDir)
 		if fileOp.Stat(absoluteRedirectPath) {
 			server.UpdateDirective("include", []string{redirectInclude})
