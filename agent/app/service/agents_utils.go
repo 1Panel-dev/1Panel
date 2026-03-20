@@ -1003,10 +1003,11 @@ type modelsConfig struct {
 }
 
 type modelProvider struct {
-	ApiKey  string       `json:"apiKey,omitempty"`
-	BaseUrl string       `json:"baseUrl,omitempty"`
-	Api     string       `json:"api,omitempty"`
-	Models  []modelEntry `json:"models,omitempty"`
+	ApiKey     string       `json:"apiKey,omitempty"`
+	BaseUrl    string       `json:"baseUrl,omitempty"`
+	Api        string       `json:"api,omitempty"`
+	AuthHeader bool         `json:"authHeader,omitempty"`
+	Models     []modelEntry `json:"models,omitempty"`
 }
 
 type modelEntry struct {
@@ -1228,6 +1229,7 @@ func buildOpenclawModelsFromAccount(account *model.AgentAccount, selectedModel s
 			providerCfg.ApiKey = baseCfg.ApiKey
 			providerCfg.BaseUrl = baseCfg.BaseUrl
 			providerCfg.Api = baseCfg.Api
+			providerCfg.AuthHeader = baseCfg.AuthHeader
 		}
 		entries = append(entries, entry)
 		defaultsModels[resolvedPrimary] = map[string]interface{}{}
@@ -1327,9 +1329,10 @@ func inferOpenclawCatalogModel(account *model.AgentAccount, modelID string, maxT
 			continue
 		}
 		return patch.PrimaryModel, providerCfg.Models[0], key, modelProvider{
-			ApiKey:  providerCfg.ApiKey,
-			BaseUrl: providerCfg.BaseUrl,
-			Api:     providerCfg.Api,
+			ApiKey:     providerCfg.ApiKey,
+			BaseUrl:    providerCfg.BaseUrl,
+			Api:        providerCfg.Api,
+			AuthHeader: providerCfg.AuthHeader,
 		}, nil
 	}
 	return "", modelEntry{}, "", modelProvider{}, fmt.Errorf("models patch is invalid")
