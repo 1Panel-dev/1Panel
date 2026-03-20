@@ -464,7 +464,7 @@ func (f FileOp) Cut(oldPaths []string, dst, name string, cover bool) error {
 		quotedPaths = append(quotedPaths, fmt.Sprintf("'%s'", p))
 	}
 	mvCommand := fmt.Sprintf("mv %s %s '%s'", coverFlag, strings.Join(quotedPaths, " "), dstPath)
-	if err := cmd.RunDefaultBashC(mvCommand); err != nil {
+	if err := cmd.RunDefaultBashCf(mvCommand); err != nil {
 		return err
 	}
 	return nil
@@ -527,22 +527,22 @@ func (f FileOp) CopyAndReName(src, dst, name string, cover bool) error {
 		if name != "" && !cover {
 			dstPath = filepath.Join(dst, name)
 		}
-		return cmd.RunDefaultBashCf(`cp -rf '%s' '%s'`, src, dstPath)
+		return cmd.RunDefaultBashCf(`cp -rfp '%s' '%s'`, src, dstPath)
 	} else {
 		dstPath := filepath.Join(dst, name)
 		if cover {
 			dstPath = dst
 		}
-		return cmd.RunDefaultBashCf(`cp -f '%s' '%s'`, src, dstPath)
+		return cmd.RunDefaultBashCf(`cp -fp '%s' '%s'`, src, dstPath)
 	}
 }
 
 func (f FileOp) CopyDirWithNewName(src, dst, newName string) error {
 	if newName == "." || newName == "" {
-		return cmd.RunDefaultBashCf(`cp -rf '%s'/. '%s'`, src, dst)
+		return cmd.RunDefaultBashCf(`cp -rfp '%s'/. '%s'`, src, dst)
 	}
 	dstDir := filepath.Join(dst, newName)
-	return cmd.RunDefaultBashCf(`cp -rf '%s' '%s'`, src, dstDir)
+	return cmd.RunDefaultBashCf(`cp -rfp '%s' '%s'`, src, dstDir)
 }
 
 func (f FileOp) CopyDir(src, dst string) error {
@@ -554,7 +554,7 @@ func (f FileOp) CopyDir(src, dst string) error {
 	if err = f.Fs.MkdirAll(dstDir, srcInfo.Mode()); err != nil {
 		return err
 	}
-	return cmd.NewCommandMgr(cmd.WithIgnoreExist1()).RunBashCf(`cp -rf '%s' '%s'`, src, dst+"/")
+	return cmd.NewCommandMgr(cmd.WithIgnoreExist1()).RunBashCf(`cp -rfp '%s' '%s'`, src, dst+"/")
 }
 
 func (f FileOp) CopyDirWithExclude(src, dst string, excludeNames []string) error {
@@ -567,7 +567,7 @@ func (f FileOp) CopyDirWithExclude(src, dst string, excludeNames []string) error
 		return err
 	}
 	if len(excludeNames) == 0 {
-		return cmd.NewCommandMgr(cmd.WithIgnoreExist1()).RunBashCf(`cp -rf '%s' '%s'`, src, dst+"/")
+		return cmd.NewCommandMgr(cmd.WithIgnoreExist1()).RunBashCf(`cp -rfp '%s' '%s'`, src, dst+"/")
 	}
 	tmpFiles, err := os.ReadDir(src)
 	if err != nil {
@@ -600,7 +600,7 @@ func (f FileOp) CopyDirWithExclude(src, dst string, excludeNames []string) error
 
 func (f FileOp) CopyFile(src, dst string) error {
 	dst = filepath.Clean(dst) + string(filepath.Separator)
-	return cmd.NewCommandMgr(cmd.WithIgnoreExist1()).RunBashCf(`cp -f '%s' '%s'`, src, dst+"/")
+	return cmd.NewCommandMgr(cmd.WithIgnoreExist1()).RunBashCf(`cp -fp '%s' '%s'`, src, dst+"/")
 }
 
 func (f FileOp) GetDirSize(path string) (int64, error) {
