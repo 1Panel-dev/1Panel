@@ -312,6 +312,7 @@ const message = {
             removing: '削除',
             paused: '一時停止',
             exited: '終了',
+            partial: '一部稼働',
             dead: '死んだ',
             installing: 'インストール',
             enabled: '有効になっています',

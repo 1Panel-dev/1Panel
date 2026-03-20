@@ -313,6 +313,7 @@ const message = {
             removing: 'Removing',
             paused: 'Paused',
             exited: 'Exited',
+            partial: 'Partial',
             dead: 'Dead',
             installing: 'Installing',
             enabled: 'Enabled',

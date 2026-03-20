@@ -295,6 +295,7 @@ const message = {
             removing: '移除中',
             paused: '已暫停',
             exited: '已停止',
+            partial: '部分啟動',
             dead: '已結束',
             installing: '安裝中',
             enabled: '已啟用',

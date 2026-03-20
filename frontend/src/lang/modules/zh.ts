@@ -282,6 +282,7 @@ const message = {
             removing: '移除中',
             paused: '已暂停',
             exited: '已停止',
+            partial: '部分启动',
             dead: '已结束',
             installing: '安装中',
             enabled: '已启用',

@@ -309,6 +309,7 @@ const message = {
             removing: 'Удаление',
             paused: 'Приостановлен',
             exited: 'Вышел',
+            partial: 'Частично',
             dead: 'Мертв',
             installing: 'Установка',
             enabled: 'Включен',

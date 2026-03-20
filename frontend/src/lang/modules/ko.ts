@@ -308,6 +308,7 @@ const message = {
             removing: '제거 중',
             paused: '일시 중지',
             exited: '종료됨',
+            partial: '부분 실행',
             dead: '중단됨',
             installing: '설치 중',
             enabled: '활성화됨',
