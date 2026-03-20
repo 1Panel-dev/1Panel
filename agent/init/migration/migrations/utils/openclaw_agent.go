@@ -80,8 +80,6 @@ func NormalizeOpenclawProvider(provider, baseURL string) string {
 	p := strings.ToLower(strings.TrimSpace(provider))
 	base := strings.ToLower(strings.TrimSpace(baseURL))
 	switch p {
-	case "minimax-portal":
-		return "minimax"
 	case "moonshot":
 		if strings.Contains(base, "moonshot.cn") {
 			return "kimi"

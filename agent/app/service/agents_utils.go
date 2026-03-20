@@ -81,6 +81,9 @@ func verifyResolvedAgentAccount(input resolvedAgentAccountVerification) error {
 }
 
 func resolveAgentAccountAPIType(provider, apiType, fallbackAPIType string) (string, error) {
+	if provider == "minimax" {
+		return "anthropic-messages", nil
+	}
 	resolvedAPIType := normalizeAPIType(apiType)
 	if provider == "custom" || provider == "vllm" {
 		if !isSupportedAPIType(resolvedAPIType) {
@@ -1911,6 +1914,8 @@ func fixedProviderBaseURL(provider string) (string, bool) {
 		return providerDefaultBaseURL(provider)
 	case "ark-coding-plan":
 		return providerDefaultBaseURL(provider)
+	case "minimax":
+		return providerDefaultBaseURL(provider)
 	default:
 		return "", false
 	}
@@ -1991,8 +1996,6 @@ func runtimeProviderModelPrefix(provider string) string {
 	switch provider {
 	case "gemini":
 		return "google"
-	case "minimax":
-		return "minimax-portal"
 	case "kimi":
 		return "moonshot"
 	default:
