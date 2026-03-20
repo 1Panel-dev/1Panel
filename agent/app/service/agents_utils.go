@@ -19,7 +19,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
-	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	openclawutil "github.com/1Panel-dev/1Panel/agent/utils/openclaw"
@@ -33,100 +32,32 @@ func NewIAgentService() IAgentService {
 	return &AgentService{}
 }
 
-type resolvedAgentAccountVerification struct {
-	Provider string
-	APIKey   string
-	BaseURL  string
-}
-
 type resolvedAgentAccountInput struct {
 	Provider string
 	APIKey   string
 	BaseURL  string
-	APIType  string
 }
 
-func resolveAgentAccountVerification(provider, apiKey, baseURL string) (resolvedAgentAccountVerification, error) {
+func resolveAgentAccountInput(provider, apiKey, baseURL string) (resolvedAgentAccountInput, error) {
 	resolvedAPIKey := strings.TrimSpace(apiKey)
-	if resolvedAPIKey == "" {
-		return resolvedAgentAccountVerification{}, buserr.New("ErrAgentApiKeyRequired")
-	}
 	resolvedBaseURL := strings.TrimSpace(baseURL)
-	if fixedURL, ok := fixedProviderBaseURL(provider); ok {
-		resolvedBaseURL = fixedURL
-	}
-	if (provider == "custom" || provider == "vllm") && resolvedBaseURL == "" {
-		return resolvedAgentAccountVerification{}, buserr.New("ErrAgentBaseURLRequired")
-	}
-	if provider != "custom" && provider != "vllm" && resolvedBaseURL == "" {
-		if defaultURL, ok := providerDefaultBaseURL(provider); ok {
+	if resolvedBaseURL == "" {
+		if requiresInitialAgentAccountModels(provider) {
+			return resolvedAgentAccountInput{}, buserr.New("ErrAgentBaseURLRequired")
+		}
+		if defaultURL, ok := providercatalog.DefaultBaseURL(provider); ok {
 			resolvedBaseURL = defaultURL
 		}
 	}
-	if provider == "ollama" && resolvedBaseURL == "" {
-		return resolvedAgentAccountVerification{}, buserr.New("ErrAgentBaseURLRequired")
-	}
-	return resolvedAgentAccountVerification{
-		Provider: provider,
-		APIKey:   resolvedAPIKey,
-		BaseURL:  resolvedBaseURL,
-	}, nil
-}
-
-func verifyResolvedAgentAccount(input resolvedAgentAccountVerification) error {
-	if providercatalog.SkipVerification(input.Provider) {
-		return nil
-	}
-	return providercatalog.VerifyAccount(input.Provider, input.BaseURL, input.APIKey)
-}
-
-func resolveAgentAccountAPIType(provider, apiType, fallbackAPIType string) (string, error) {
-	if provider == "minimax" || provider == "xiaomi" {
-		return "anthropic-messages", nil
-	}
-	resolvedAPIType := normalizeAPIType(apiType)
-	if provider == "custom" || provider == "vllm" {
-		if !isSupportedAPIType(resolvedAPIType) {
-			return "", fmt.Errorf("apiType is invalid")
+	if !providercatalog.SkipVerification(provider) {
+		if err := providercatalog.VerifyAccount(provider, resolvedBaseURL, resolvedAPIKey); err != nil {
+			return resolvedAgentAccountInput{}, err
 		}
-		return resolvedAPIType, nil
-	}
-	if provider == "ollama" {
-		if apiType == "" && fallbackAPIType != "" {
-			resolvedAPIType = normalizeAPIType(fallbackAPIType)
-			if !isSupportedOllamaAPIType(resolvedAPIType) {
-				resolvedAPIType = "openai-responses"
-			}
-			return resolvedAPIType, nil
-		}
-		if !isSupportedOllamaAPIType(resolvedAPIType) {
-			return "", fmt.Errorf("apiType is invalid")
-		}
-		return resolvedAPIType, nil
-	}
-	if fallbackAPIType != "" {
-		return normalizeAPIType(fallbackAPIType), nil
-	}
-	return resolvedAPIType, nil
-}
-
-func resolveAgentAccountInput(provider, apiKey, baseURL, apiType, fallbackAPIType string) (resolvedAgentAccountInput, error) {
-	resolvedVerification, err := resolveAgentAccountVerification(provider, apiKey, baseURL)
-	if err != nil {
-		return resolvedAgentAccountInput{}, err
-	}
-	if err := verifyResolvedAgentAccount(resolvedVerification); err != nil {
-		return resolvedAgentAccountInput{}, err
-	}
-	resolvedAPIType, err := resolveAgentAccountAPIType(provider, apiType, fallbackAPIType)
-	if err != nil {
-		return resolvedAgentAccountInput{}, err
 	}
 	return resolvedAgentAccountInput{
 		Provider: provider,
-		APIKey:   resolvedVerification.APIKey,
-		BaseURL:  resolvedVerification.BaseURL,
-		APIType:  resolvedAPIType,
+		APIKey:   resolvedAPIKey,
+		BaseURL:  resolvedBaseURL,
 	}, nil
 }
 
@@ -300,163 +231,6 @@ func setTrustedProxies(gateway map[string]interface{}) {
 	gateway["trustedProxies"] = proxies
 }
 
-func extractFeishuConfig(conf map[string]interface{}) dto.AgentFeishuConfig {
-	result := dto.AgentFeishuConfig{Enabled: true, DmPolicy: "pairing"}
-	channels, ok := conf["channels"].(map[string]interface{})
-	if !ok {
-		return result
-	}
-	feishu, ok := channels["feishu"].(map[string]interface{})
-	if !ok {
-		return result
-	}
-	if enabled, ok := feishu["enabled"].(bool); ok {
-		result.Enabled = enabled
-	}
-	if dmPolicy, ok := feishu["dmPolicy"].(string); ok && strings.TrimSpace(dmPolicy) != "" {
-		result.DmPolicy = dmPolicy
-	}
-	accounts, ok := feishu["accounts"].(map[string]interface{})
-	if !ok {
-		return result
-	}
-	main, ok := accounts["main"].(map[string]interface{})
-	if !ok {
-		return result
-	}
-	if appID, ok := main["appId"].(string); ok {
-		result.AppID = appID
-	}
-	if appSecret, ok := main["appSecret"].(string); ok {
-		result.AppSecret = appSecret
-	}
-	if botName, ok := main["botName"].(string); ok {
-		result.BotName = botName
-	}
-	return result
-}
-
-func setFeishuConfig(conf map[string]interface{}, config dto.AgentFeishuConfig) {
-	channels := ensureChildMap(conf, "channels")
-	feishu := ensureChildMap(channels, "feishu")
-	feishu["enabled"] = config.Enabled
-	feishu["dmPolicy"] = config.DmPolicy
-
-	accounts := ensureChildMap(feishu, "accounts")
-	main := ensureChildMap(accounts, "main")
-	main["appId"] = config.AppID
-	main["appSecret"] = config.AppSecret
-	main["botName"] = config.BotName
-
-	if strings.EqualFold(config.DmPolicy, "open") {
-		feishu["allowFrom"] = []string{"*"}
-	}
-}
-
-func setFeishuPluginEnabled(conf map[string]interface{}, enabled bool) {
-	plugins := ensureChildMap(conf, "plugins")
-	entries := ensureChildMap(plugins, "entries")
-	feishu := ensureChildMap(entries, "feishu")
-	feishu["enabled"] = enabled
-}
-
-func extractTelegramConfig(conf map[string]interface{}) dto.AgentTelegramConfig {
-	result := dto.AgentTelegramConfig{Enabled: true, DmPolicy: "pairing"}
-	channels, ok := conf["channels"].(map[string]interface{})
-	if !ok {
-		return result
-	}
-	telegram, ok := channels["telegram"].(map[string]interface{})
-	if !ok {
-		return result
-	}
-	if enabled, ok := telegram["enabled"].(bool); ok {
-		result.Enabled = enabled
-	}
-	if dmPolicy, ok := telegram["dmPolicy"].(string); ok && strings.TrimSpace(dmPolicy) != "" {
-		result.DmPolicy = dmPolicy
-	}
-	if botToken, ok := telegram["botToken"].(string); ok {
-		result.BotToken = botToken
-	}
-	if proxy, ok := telegram["proxy"].(string); ok {
-		result.Proxy = proxy
-	}
-	return result
-}
-
-func setTelegramConfig(conf map[string]interface{}, config dto.AgentTelegramConfig) {
-	channels := ensureChildMap(conf, "channels")
-	telegram := map[string]interface{}{
-		"enabled":  config.Enabled,
-		"dmPolicy": config.DmPolicy,
-		"botToken": config.BotToken,
-	}
-	if strings.EqualFold(config.DmPolicy, "open") {
-		telegram["allowFrom"] = []string{"*"}
-	}
-	if strings.TrimSpace(config.Proxy) != "" {
-		telegram["proxy"] = strings.TrimSpace(config.Proxy)
-	}
-	channels["telegram"] = telegram
-}
-
-func extractDiscordConfig(conf map[string]interface{}) dto.AgentDiscordConfig {
-	result := dto.AgentDiscordConfig{Enabled: true, DmPolicy: "pairing", GroupPolicy: "open"}
-	channels, ok := conf["channels"].(map[string]interface{})
-	if !ok {
-		return result
-	}
-	discord, ok := channels["discord"].(map[string]interface{})
-	if !ok {
-		return result
-	}
-	if enabled, ok := discord["enabled"].(bool); ok {
-		result.Enabled = enabled
-	}
-	if token, ok := discord["token"].(string); ok {
-		result.Token = token
-	}
-	if groupPolicy, ok := discord["groupPolicy"].(string); ok && strings.TrimSpace(groupPolicy) != "" {
-		result.GroupPolicy = groupPolicy
-	}
-	if proxy, ok := discord["proxy"].(string); ok {
-		result.Proxy = proxy
-	}
-	if policy, ok := discord["dmPolicy"].(string); ok && strings.TrimSpace(policy) != "" {
-		result.DmPolicy = policy
-		return result
-	}
-	// backward compatibility: old nested style
-	dm, ok := discord["dm"].(map[string]interface{})
-	if ok {
-		if policy, ok := dm["policy"].(string); ok && strings.TrimSpace(policy) != "" {
-			result.DmPolicy = policy
-		}
-	}
-	return result
-}
-
-func setDiscordConfig(conf map[string]interface{}, config dto.AgentDiscordConfig) {
-	channels := ensureChildMap(conf, "channels")
-	discord := ensureChildMap(channels, "discord")
-	discord["enabled"] = config.Enabled
-	discord["token"] = config.Token
-	discord["dmPolicy"] = config.DmPolicy
-	discord["groupPolicy"] = config.GroupPolicy
-	if strings.EqualFold(config.DmPolicy, "open") {
-		discord["allowFrom"] = []string{"*"}
-	} else {
-		delete(discord, "allowFrom")
-	}
-	if strings.TrimSpace(config.Proxy) != "" {
-		discord["proxy"] = strings.TrimSpace(config.Proxy)
-	} else {
-		delete(discord, "proxy")
-	}
-	delete(discord, "dm")
-}
-
 func extractBrowserConfig(conf map[string]interface{}) browserConfig {
 	result := browserConfig{
 		Enabled:        true,
@@ -498,189 +272,6 @@ func setBrowserConfig(conf map[string]interface{}, config browserConfig) {
 	} else {
 		browser["defaultProfile"] = strings.TrimSpace(config.DefaultProfile)
 	}
-}
-
-func extractQQBotConfig(conf map[string]interface{}) dto.AgentQQBotConfig {
-	result := dto.AgentQQBotConfig{Enabled: true}
-	channels, ok := conf["channels"].(map[string]interface{})
-	if !ok {
-		return result
-	}
-	qqbot, ok := channels["qqbot"].(map[string]interface{})
-	if !ok {
-		return result
-	}
-	if enabled, ok := qqbot["enabled"].(bool); ok {
-		result.Enabled = enabled
-	}
-	if appID, ok := qqbot["appId"].(string); ok {
-		result.AppID = appID
-	}
-	if clientSecret, ok := qqbot["clientSecret"].(string); ok {
-		result.ClientSecret = clientSecret
-	}
-	return result
-}
-
-func extractWecomConfig(conf map[string]interface{}) dto.AgentWecomConfig {
-	result := dto.AgentWecomConfig{Enabled: true, DmPolicy: "pairing"}
-	channels, ok := conf["channels"].(map[string]interface{})
-	if !ok {
-		return result
-	}
-	wecom, ok := channels["wecom"].(map[string]interface{})
-	if !ok {
-		return result
-	}
-	if enabled, ok := wecom["enabled"].(bool); ok {
-		result.Enabled = enabled
-	}
-	if dmPolicy, ok := wecom["dmPolicy"].(string); ok && strings.TrimSpace(dmPolicy) != "" {
-		result.DmPolicy = strings.TrimSpace(dmPolicy)
-	}
-	if botID, ok := wecom["botId"].(string); ok {
-		result.BotID = botID
-	}
-	if secret, ok := wecom["secret"].(string); ok {
-		result.Secret = secret
-	}
-	return result
-}
-
-func extractDingTalkConfig(conf map[string]interface{}) dto.AgentDingTalkConfig {
-	result := dto.AgentDingTalkConfig{
-		Enabled:        true,
-		DmPolicy:       "pairing",
-		GroupPolicy:    "disabled",
-		AllowFrom:      []string{},
-		GroupAllowFrom: []string{},
-	}
-	channels, ok := conf["channels"].(map[string]interface{})
-	if !ok {
-		return result
-	}
-	dingtalk, ok := channels["dingtalk-connector"].(map[string]interface{})
-	if !ok {
-		return result
-	}
-	if enabled, ok := dingtalk["enabled"].(bool); ok {
-		result.Enabled = enabled
-	}
-	if clientID, ok := dingtalk["clientId"].(string); ok {
-		result.ClientID = clientID
-	}
-	if clientSecret, ok := dingtalk["clientSecret"].(string); ok {
-		result.ClientSecret = clientSecret
-	}
-	if dmPolicy, ok := dingtalk["dmPolicy"].(string); ok && strings.TrimSpace(dmPolicy) != "" {
-		result.DmPolicy = dmPolicy
-	}
-	if groupPolicy, ok := dingtalk["groupPolicy"].(string); ok && strings.TrimSpace(groupPolicy) != "" {
-		result.GroupPolicy = groupPolicy
-	}
-	result.AllowFrom = extractStringList(dingtalk["allowFrom"])
-	result.GroupAllowFrom = extractStringList(dingtalk["groupAllowFrom"])
-	return result
-}
-
-func setWecomConfig(conf map[string]interface{}, config dto.AgentWecomConfig) {
-	channels := ensureChildMap(conf, "channels")
-	wecom := ensureChildMap(channels, "wecom")
-	wecom["enabled"] = config.Enabled
-	wecom["botId"] = strings.TrimSpace(config.BotID)
-	wecom["secret"] = strings.TrimSpace(config.Secret)
-	wecom["dmPolicy"] = strings.TrimSpace(config.DmPolicy)
-	if strings.EqualFold(config.DmPolicy, "open") {
-		wecom["allowFrom"] = []string{"*"}
-	} else {
-		wecom["allowFrom"] = []string{}
-	}
-
-	plugins := ensureChildMap(conf, "plugins")
-	entries := ensureChildMap(plugins, "entries")
-	wecomEntry := ensureChildMap(entries, "wecom-openclaw-plugin")
-	wecomEntry["enabled"] = config.Enabled
-}
-
-func setDingTalkConfig(conf map[string]interface{}, config dto.AgentDingTalkConfig) {
-	channels := ensureChildMap(conf, "channels")
-	dingtalk := ensureChildMap(channels, "dingtalk-connector")
-	dingtalk["enabled"] = config.Enabled
-	dingtalk["clientId"] = strings.TrimSpace(config.ClientID)
-	dingtalk["clientSecret"] = strings.TrimSpace(config.ClientSecret)
-	dingtalk["dmPolicy"] = config.DmPolicy
-	dingtalk["groupPolicy"] = config.GroupPolicy
-	dingtalk["gatewayToken"] = extractGatewayToken(conf)
-	switch config.DmPolicy {
-	case "open":
-		dingtalk["allowFrom"] = []string{"*"}
-	case "allowlist":
-		dingtalk["allowFrom"] = append([]string(nil), config.AllowFrom...)
-	default:
-		delete(dingtalk, "allowFrom")
-	}
-	switch config.GroupPolicy {
-	case "open":
-		dingtalk["groupAllowFrom"] = []string{"*"}
-	case "allowlist":
-		dingtalk["groupAllowFrom"] = append([]string(nil), config.GroupAllowFrom...)
-	default:
-		delete(dingtalk, "groupAllowFrom")
-	}
-
-	plugins := ensureChildMap(conf, "plugins")
-	entries := ensureChildMap(plugins, "entries")
-	dingtalkEntry := ensureChildMap(entries, "dingtalk-connector")
-	dingtalkEntry["enabled"] = config.Enabled
-
-	gateway := ensureChildMap(conf, "gateway")
-	httpMap := ensureChildMap(gateway, "http")
-	endpoints := ensureChildMap(httpMap, "endpoints")
-	chatCompletions := ensureChildMap(endpoints, "chatCompletions")
-	chatCompletions["enabled"] = true
-}
-
-func setQQBotConfig(conf map[string]interface{}, config dto.AgentQQBotConfig) {
-	channels := ensureChildMap(conf, "channels")
-	qqbot := ensureChildMap(channels, "qqbot")
-	qqbot["enabled"] = config.Enabled
-	qqbot["allowFrom"] = []string{"*"}
-	qqbot["appId"] = strings.TrimSpace(config.AppID)
-	qqbot["clientSecret"] = strings.TrimSpace(config.ClientSecret)
-
-	plugins := ensureChildMap(conf, "plugins")
-	entries := ensureChildMap(plugins, "entries")
-	qqbotEntry := ensureChildMap(entries, "qqbot")
-	qqbotEntry["enabled"] = config.Enabled
-}
-
-func resolvePluginMeta(pluginType string) (string, string, error) {
-	switch pluginType {
-	case "qqbot":
-		return "@sliverp/qqbot@latest", "qqbot", nil
-	case "wecom":
-		return "@wecom/wecom-openclaw-plugin", "wecom-openclaw-plugin", nil
-	case "dingtalk":
-		return "@dingtalk-real-ai/dingtalk-connector", "dingtalk-connector", nil
-	default:
-		return "", "", fmt.Errorf("unsupported plugin type")
-	}
-}
-
-func checkPluginInstalled(containerName, pluginType string) (bool, error) {
-	_, pluginDir, err := resolvePluginMeta(pluginType)
-	if err != nil {
-		return false, err
-	}
-	if strings.TrimSpace(containerName) == "" {
-		return false, buserr.New("ErrRecordNotFound")
-	}
-	pluginPath := path.Join(openclawPluginBaseDir, pluginDir)
-	mgr := cmd.NewCommandMgr(cmd.WithTimeout(20 * time.Second))
-	if err := mgr.RunBashCf("docker exec %s test -d %s", containerName, pluginPath); err != nil {
-		return false, nil
-	}
-	return true, nil
 }
 
 func extractOtherConfig(conf map[string]interface{}) dto.AgentOtherConfig {
@@ -732,7 +323,7 @@ func buildAgentItem(agent *model.Agent, appInstall *model.AppInstall, envMap map
 		Name:          agent.Name,
 		AgentType:     agentType,
 		Provider:      agent.Provider,
-		ProviderName:  providerDisplayName(agent.Provider),
+		ProviderName:  providercatalog.DisplayName(agent.Provider),
 		Model:         agent.Model,
 		APIType:       agent.APIType,
 		MaxTokens:     agent.MaxTokens,
@@ -1174,7 +765,7 @@ func writeOpenclawConfig(confDir string, account *model.AgentAccount, modelName,
 	}
 	envPath := path.Join(confDir, ".env")
 	lines := []string{fmt.Sprintf("OPENCLAW_GATEWAY_TOKEN=%s", token)}
-	if envKey := providerEnvKey(account.Provider); envKey != "" && strings.TrimSpace(account.APIKey) != "" {
+	if envKey := providercatalog.EnvKey(account.Provider); envKey != "" && strings.TrimSpace(account.APIKey) != "" {
 		lines = append(lines, fmt.Sprintf("%s=%s", envKey, account.APIKey))
 	}
 	content := strings.Join(lines, "\n") + "\n"
@@ -1250,7 +841,7 @@ func buildOpenclawModelsFromAccount(account *model.AgentAccount, selectedModel s
 }
 
 func buildOpenclawCatalogModel(account *model.AgentAccount, model dto.AgentAccountModel) (string, modelEntry, string, modelProvider, error) {
-	primaryModel, inferredEntry, providerKey, providerCfg, err := inferOpenclawCatalogModel(account, model.ID, model.MaxTokens, model.ContextWindow)
+	primaryModel, inferredEntry, providerKey, providerCfg, err := inferOpenclawCatalogModel(account, model.ID, model.Reasoning, model.MaxTokens, model.ContextWindow)
 	if err != nil {
 		return "", modelEntry{}, "", modelProvider{}, err
 	}
@@ -1279,7 +870,7 @@ type openclawAccountModelRuntime struct {
 }
 
 func buildOpenclawAccountModelRuntime(account *model.AgentAccount, model dto.AgentAccountModel) (openclawAccountModelRuntime, error) {
-	apiType, maxTokens, contextWindow := resolveRuntimeParams(
+	apiType, maxTokens, contextWindow := providercatalog.ResolveRuntimeParams(
 		account.Provider,
 		account.APIType,
 		model.MaxTokens,
@@ -1310,10 +901,10 @@ func resolveOpenclawAccountModelRuntimeByID(account *model.AgentAccount, modelID
 	return buildOpenclawAccountModelRuntime(account, selectedAccountModel)
 }
 
-func inferOpenclawCatalogModel(account *model.AgentAccount, modelID string, maxTokens, contextWindow int) (string, modelEntry, string, modelProvider, error) {
+func inferOpenclawCatalogModel(account *model.AgentAccount, modelID string, reasoning bool, maxTokens, contextWindow int) (string, modelEntry, string, modelProvider, error) {
 	baseURL := resolveAccountBaseURL(account)
-	resolvedAPIType, resolvedMaxTokens, resolvedContextWindow := resolveRuntimeParams(account.Provider, account.APIType, maxTokens, contextWindow)
-	patch, err := providercatalog.BuildOpenClawPatch(account.Provider, modelID, resolvedAPIType, resolvedMaxTokens, resolvedContextWindow, baseURL, account.APIKey)
+	resolvedAPIType, resolvedMaxTokens, resolvedContextWindow := providercatalog.ResolveRuntimeParams(account.Provider, account.APIType, maxTokens, contextWindow)
+	patch, err := providercatalog.BuildOpenClawPatch(account.Provider, modelID, resolvedAPIType, reasoning, resolvedMaxTokens, resolvedContextWindow, baseURL, account.APIKey)
 	if err != nil {
 		return "", modelEntry{}, "", modelProvider{}, err
 	}
@@ -1341,7 +932,7 @@ func inferOpenclawCatalogModel(account *model.AgentAccount, modelID string, maxT
 func resolveAccountBaseURL(account *model.AgentAccount) string {
 	baseURL := strings.TrimSpace(account.BaseURL)
 	if baseURL == "" {
-		if defaultURL, ok := providerDefaultBaseURL(account.Provider); ok {
+		if defaultURL, ok := providercatalog.DefaultBaseURL(account.Provider); ok {
 			baseURL = defaultURL
 		}
 	}
@@ -1356,9 +947,9 @@ func buildInitialAgentAccountModels(account *model.AgentAccount, requested []dto
 		return nil, buserr.New("ErrAgentAccountSingleInitialModel")
 	}
 	if len(requested) > 0 {
-		models, _, err := normalizeAgentAccountModels(account, requested, "", true)
-		if err != nil {
-			return nil, err
+		models := make([]dto.AgentAccountModel, 0, len(requested))
+		for _, item := range requested {
+			models = append(models, cloneAgentAccountModel(item))
 		}
 		return models, nil
 	}
@@ -1380,11 +971,7 @@ func buildInitialAgentAccountModels(account *model.AgentAccount, requested []dto
 			Input:         append([]string(nil), item.Input...),
 		})
 	}
-	models, _, err := normalizeAgentAccountModels(account, requested, "", true)
-	if err != nil {
-		return nil, err
-	}
-	return models, nil
+	return requested, nil
 }
 
 func compactPersistedAgentAccountModelSortOrder(accountID uint) error {
@@ -1412,6 +999,18 @@ func loadAgentAccountModels(account *model.AgentAccount) ([]dto.AgentAccountMode
 	return listPersistedAgentAccountModels(account.ID)
 }
 
+func cloneAgentAccountModel(model dto.AgentAccountModel) dto.AgentAccountModel {
+	return dto.AgentAccountModel{
+		RecordID:      model.RecordID,
+		ID:            model.ID,
+		Name:          model.Name,
+		ContextWindow: model.ContextWindow,
+		MaxTokens:     model.MaxTokens,
+		Reasoning:     model.Reasoning,
+		Input:         append([]string(nil), model.Input...),
+	}
+}
+
 func MergeCatalogAgentAccountModelsForMigration(account *model.AgentAccount, existing []dto.AgentAccountModel) ([]dto.AgentAccountModel, error) {
 	if account == nil {
 		return nil, fmt.Errorf("account is required")
@@ -1423,13 +1022,15 @@ func MergeCatalogAgentAccountModelsForMigration(account *model.AgentAccount, exi
 	requested := append([]dto.AgentAccountModel(nil), existing...)
 	seen := make(map[string]struct{}, len(existing))
 	for _, item := range existing {
-		if strings.TrimSpace(item.ID) == "" {
+		target := strings.TrimSpace(item.ID)
+		if target == "" {
 			continue
 		}
-		seen[strings.TrimSpace(item.ID)] = struct{}{}
+		seen[target] = struct{}{}
 	}
 	for _, item := range meta.Models {
-		if _, ok := seen[strings.TrimSpace(item.ID)]; ok {
+		target := strings.TrimSpace(item.ID)
+		if _, ok := seen[target]; ok {
 			continue
 		}
 		requested = append(requested, dto.AgentAccountModel{
@@ -1444,11 +1045,7 @@ func MergeCatalogAgentAccountModelsForMigration(account *model.AgentAccount, exi
 	if len(requested) == len(existing) {
 		return append([]dto.AgentAccountModel(nil), existing...), nil
 	}
-	normalized, _, err := normalizeAgentAccountModels(account, requested, "", true)
-	if err != nil {
-		return nil, err
-	}
-	return normalized, nil
+	return normalizeAgentAccountModels(account, requested)
 }
 
 func listPersistedAgentAccountModels(accountID uint) ([]dto.AgentAccountModel, error) {
@@ -1510,21 +1107,17 @@ func replacePersistedAgentAccountModels(accountID uint, models []dto.AgentAccoun
 	})
 }
 
-func normalizeAgentAccountModels(account *model.AgentAccount, models []dto.AgentAccountModel, defaultModel string, allowFallbackDefault bool) ([]dto.AgentAccountModel, string, error) {
+func normalizeAgentAccountModels(account *model.AgentAccount, models []dto.AgentAccountModel) ([]dto.AgentAccountModel, error) {
 	requested := append([]dto.AgentAccountModel(nil), models...)
 	if len(requested) == 0 {
-		if strings.TrimSpace(defaultModel) != "" {
-			requested = []dto.AgentAccountModel{{ID: defaultModel}}
-		} else {
-			requested = buildLegacyAgentAccountModels(account)
-		}
+		return nil, fmt.Errorf("model is required")
 	}
 	normalized := make([]dto.AgentAccountModel, 0, len(requested))
 	seen := make(map[string]struct{}, len(requested))
 	for _, item := range requested {
 		normalizedItem, err := normalizeAgentAccountModel(account, item)
 		if err != nil {
-			return nil, "", err
+			return nil, err
 		}
 		if strings.TrimSpace(normalizedItem.ID) == "" {
 			continue
@@ -1536,27 +1129,9 @@ func normalizeAgentAccountModels(account *model.AgentAccount, models []dto.Agent
 		normalized = append(normalized, normalizedItem)
 	}
 	if len(normalized) == 0 {
-		return nil, "", fmt.Errorf("model is required")
+		return nil, fmt.Errorf("model is required")
 	}
-
-	resolvedDefault := strings.TrimSpace(defaultModel)
-	if resolvedDefault != "" {
-		defaultItem, err := normalizeAgentAccountModel(account, dto.AgentAccountModel{ID: resolvedDefault})
-		if err == nil {
-			resolvedDefault = defaultItem.ID
-		}
-	}
-	if resolvedDefault == "" && allowFallbackDefault {
-		resolvedDefault = normalized[0].ID
-	}
-	if _, ok := findAgentAccountModelForProvider(account.Provider, normalized, resolvedDefault); !ok {
-		if allowFallbackDefault {
-			resolvedDefault = normalized[0].ID
-		} else {
-			return nil, "", buserr.New("ErrAgentModelNotInAccount")
-		}
-	}
-	return normalized, resolvedDefault, nil
+	return normalized, nil
 }
 
 func normalizeAgentAccountModel(account *model.AgentAccount, model dto.AgentAccountModel) (dto.AgentAccountModel, error) {
@@ -1564,7 +1139,13 @@ func normalizeAgentAccountModel(account *model.AgentAccount, model dto.AgentAcco
 	if modelID == "" {
 		return dto.AgentAccountModel{}, fmt.Errorf("model is required")
 	}
-	primaryModel, inferredEntry, _, _, err := inferOpenclawCatalogModel(account, modelID, model.MaxTokens, model.ContextWindow)
+	inferredReasoning := model.Reasoning
+	if !model.Reasoning && model.Name == "" && model.MaxTokens == 0 && model.ContextWindow == 0 && len(model.Input) == 0 {
+		if catalogModel, ok := providercatalog.FindModel(account.Provider, modelID); ok {
+			inferredReasoning = catalogModel.Reasoning
+		}
+	}
+	primaryModel, inferredEntry, _, _, err := inferOpenclawCatalogModel(account, modelID, inferredReasoning, model.MaxTokens, model.ContextWindow)
 	if err != nil {
 		return dto.AgentAccountModel{}, err
 	}
@@ -1655,39 +1236,6 @@ func normalizeAgentAccountModelID(provider, primaryModel, requestedID string) st
 		}
 		return prefix + "/" + target
 	}
-}
-
-func buildLegacyAgentAccountModels(account *model.AgentAccount) []dto.AgentAccountModel {
-	modelIDs := make([]string, 0, 4)
-	seen := make(map[string]struct{}, 4)
-	appendModel := func(value string) {
-		target := strings.TrimSpace(value)
-		if target == "" {
-			return
-		}
-		if _, ok := seen[target]; ok {
-			return
-		}
-		seen[target] = struct{}{}
-		modelIDs = append(modelIDs, target)
-	}
-	if account.ID > 0 {
-		if agents, err := agentRepo.List(repo.WithByAccountID(account.ID)); err == nil {
-			for _, agent := range agents {
-				appendModel(agent.Model)
-			}
-		}
-	}
-	if definitions, ok := providerDefinitions()[account.Provider]; ok && len(definitions.Models) > 0 {
-		for _, item := range definitions.Models {
-			appendModel(item.ID)
-		}
-	}
-	models := make([]dto.AgentAccountModel, 0, len(modelIDs))
-	for _, modelID := range modelIDs {
-		models = append(models, dto.AgentAccountModel{ID: modelID})
-	}
-	return models
 }
 
 func sanitizeAgentAccountModelInputs(values []string) []string {
@@ -1872,64 +1420,6 @@ func mapToModelsConfig(value map[string]interface{}) (*modelsConfig, error) {
 	return result, nil
 }
 
-func providerEnvKey(provider string) string {
-	return providercatalog.EnvKey(provider)
-}
-
-type providerDefinition struct {
-	Sort        uint
-	DisplayName string
-	BaseURL     string
-	Models      []dto.ProviderModelInfo
-}
-
-func providerDefinitions() map[string]providerDefinition {
-	definitions := map[string]providerDefinition{}
-	for key, meta := range providercatalog.All() {
-		models := make([]dto.ProviderModelInfo, 0, len(meta.Models))
-		for _, m := range meta.Models {
-			models = append(models, dto.ProviderModelInfo{
-				ID:            m.ID,
-				Name:          m.Name,
-				ContextWindow: m.ContextWindow,
-				MaxTokens:     m.MaxTokens,
-				Reasoning:     m.Reasoning,
-				Input:         append([]string(nil), m.Input...),
-			})
-		}
-		definitions[key] = providerDefinition{
-			Sort:        meta.Sort,
-			DisplayName: meta.DisplayName,
-			BaseURL:     meta.DefaultBaseURL,
-			Models:      models,
-		}
-	}
-	return definitions
-}
-
-func providerDefaultBaseURL(provider string) (string, bool) {
-	return providercatalog.DefaultBaseURL(provider)
-}
-
-func fixedProviderBaseURL(provider string) (string, bool) {
-	switch provider {
-	case "bailian-coding-plan":
-		return providerDefaultBaseURL(provider)
-	case "ark-coding-plan":
-		return providerDefaultBaseURL(provider)
-	case "minimax":
-		return providerDefaultBaseURL(provider)
-	case "xiaomi":
-		return providerDefaultBaseURL(provider)
-	default:
-		return "", false
-	}
-}
-
-func providerDisplayName(provider string) string {
-	return providercatalog.DisplayName(provider)
-}
-
 func readInstallEnv(envStr string) map[string]interface{} {
 	if strings.TrimSpace(envStr) == "" {
 		return nil
@@ -2009,14 +1499,14 @@ func runtimeProviderModelPrefix(provider string) string {
 }
 
 func poolModelPrefix(provider string) string {
-	target := provider
-	if definitions, ok := providerDefinitions()[target]; ok && len(definitions.Models) > 0 {
-		parts := strings.SplitN(strings.TrimSpace(definitions.Models[0].ID), "/", 2)
+	meta, ok := providercatalog.Get(provider)
+	if ok && len(meta.Models) > 0 {
+		parts := strings.SplitN(strings.TrimSpace(meta.Models[0].ID), "/", 2)
 		if len(parts) == 2 && strings.TrimSpace(parts[0]) != "" {
 			return parts[0]
 		}
 	}
-	return target
+	return provider
 }
 
 func supportedProviderModelPrefixes(provider string) []string {
@@ -2035,72 +1525,6 @@ func supportedProviderModelPrefixes(provider string) []string {
 		result = append(result, target)
 	}
 	return result
-}
-
-func normalizeAPIType(apiType string) string {
-	trim := apiType
-	if trim == "" {
-		return "openai-completions"
-	}
-	return trim
-}
-
-func isSupportedAPIType(apiType string) bool {
-	switch normalizeAPIType(apiType) {
-	case "openai-completions", "openai-responses", "anthropic-messages":
-		return true
-	default:
-		return false
-	}
-}
-
-func isSupportedOllamaAPIType(apiType string) bool {
-	switch normalizeAPIType(apiType) {
-	case "openai-completions", "openai-responses":
-		return true
-	default:
-		return false
-	}
-}
-
-func resolveRuntimeParams(provider, apiType string, maxTokens, contextWindow int) (string, int, int) {
-	resolvedAPI := normalizeAPIType(apiType)
-	if provider == "ollama" && !isSupportedOllamaAPIType(resolvedAPI) {
-		resolvedAPI = "openai-responses"
-	}
-	resolvedMaxTokens := maxTokens
-	resolvedContextWindow := contextWindow
-	if resolvedMaxTokens <= 0 {
-		switch provider {
-		case "deepseek":
-			resolvedMaxTokens = 8192
-		case "zai":
-			resolvedMaxTokens = 131072
-		case "openrouter":
-			resolvedMaxTokens = 8192
-		case "minimax", "kimi-coding", "custom":
-			resolvedMaxTokens = 8192
-		default:
-			resolvedMaxTokens = 8192
-		}
-	}
-	if resolvedContextWindow <= 0 {
-		switch provider {
-		case "deepseek":
-			resolvedContextWindow = 128000
-		case "zai":
-			resolvedContextWindow = 204800
-		case "openrouter":
-			resolvedContextWindow = 128000
-		case "minimax", "kimi-coding":
-			resolvedContextWindow = 200000
-		case "custom", "vllm":
-			resolvedContextWindow = 128000
-		default:
-			resolvedContextWindow = 256000
-		}
-	}
-	return resolvedAPI, resolvedMaxTokens, resolvedContextWindow
 }
 
 func generateToken() string {

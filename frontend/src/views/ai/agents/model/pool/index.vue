@@ -121,8 +121,11 @@ const editorTitle = computed(() =>
 );
 
 const rules = reactive({
-    id: [Rules.requiredInput],
+    id: [Rules.noSpace],
     name: [Rules.requiredInput],
+    contextWindow: [Rules.integerNumber],
+    maxTokens: [Rules.integerNumber],
+    input: [Rules.requiredSelect],
 });
 
 const buttons = [
@@ -140,8 +143,8 @@ const buildModelItem = (model?: Partial<AI.AgentAccountModel>): AI.AgentAccountM
     recordId: Number(model?.recordId || 0),
     id: String(model?.id || '').trim(),
     name: String(model?.name || '').trim(),
-    contextWindow: Number(model?.contextWindow || 0) || 128000,
-    maxTokens: Number(model?.maxTokens || 0) || 8192,
+    contextWindow: Number(model?.contextWindow || 0),
+    maxTokens: Number(model?.maxTokens || 0),
     reasoning: Boolean(model?.reasoning),
     input: Array.from(new Set((model?.input || []).filter((value) => value === 'text' || value === 'image'))),
 });
@@ -189,9 +192,6 @@ const submit = async () => {
     if (duplicate) {
         MsgError(i18n.global.t('aiTools.agents.accountModelsDuplicate'));
         return;
-    }
-    if (!form.input?.length) {
-        form.input = ['text'];
     }
     saving.value = true;
     try {

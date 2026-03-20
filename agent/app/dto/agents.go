@@ -105,7 +105,7 @@ type AgentAccountCreateReq struct {
 	RememberAPIKey bool                `json:"rememberApiKey"`
 	BaseURL        string              `json:"baseURL"`
 	Models         []AgentAccountModel `json:"models"`
-	APIType        string              `json:"apiType"`
+	APIType        string              `json:"apiType" validate:"required"`
 	Remark         string              `json:"remark"`
 }
 
@@ -115,7 +115,7 @@ type AgentAccountUpdateReq struct {
 	APIKey         string `json:"apiKey" validate:"required"`
 	RememberAPIKey bool   `json:"rememberApiKey"`
 	BaseURL        string `json:"baseURL"`
-	APIType        string `json:"apiType"`
+	APIType        string `json:"apiType" validate:"required"`
 	Remark         string `json:"remark"`
 	SyncAgents     bool   `json:"syncAgents"`
 }
