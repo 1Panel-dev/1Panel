@@ -88,6 +88,7 @@ const message = {
             next: '次へ',
             setDefault: 'デフォルトに戻す',
             bind: 'バインド',
+            tip: 'ヒント',
         },
         operate: {
             start: '開始',
@@ -1727,6 +1728,7 @@ const message = {
         previewLargeFile: 'プレビュー',
         panelInstallDir: '1Panelインストールディレクトリは削除できません',
         wgetTask: 'ダウンロードタスク',
+        stopWgetConfirm: 'このダウンロードタスクを停止しますか？',
         existFileTitle: '同名ファイルの警告',
         existFileHelper: 'アップロードしたファイルに同じ名前のファイルが含まれています。上書きしますか？',
         existFileSize: 'ファイルサイズ（新しい -> 古い）',

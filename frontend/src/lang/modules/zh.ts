@@ -87,6 +87,7 @@ const message = {
             hide: '隐藏',
             visit: '访问',
             migrate: '迁移',
+            tip: '提示',
         },
         operate: {
             start: '启动',
@@ -1557,6 +1558,7 @@ const message = {
         uploadSuccess: '上传成功!',
         downloadProcess: '下载进度',
         downloading: '正在下载...',
+        stopWgetConfirm: '确认停止该下载任务？',
         infoDetail: '文件属性',
         root: '根目录',
         list: '文件列表',

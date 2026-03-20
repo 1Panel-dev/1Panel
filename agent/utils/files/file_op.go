@@ -17,6 +17,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/buserr"
@@ -333,6 +334,17 @@ func (f FileOp) Rename(oldName string, newName string) error {
 	return f.Fs.Rename(oldName, newName)
 }
 
+type downloadTask struct {
+	resp *http.Response
+	file *os.File
+	dst  string
+}
+
+var (
+	downloadMu    sync.Mutex
+	downloadTasks = make(map[string]*downloadTask)
+)
+
 type WriteCounter struct {
 	Total   uint64
 	Written uint64
@@ -382,37 +394,65 @@ func (f FileOp) DownloadFileWithProcess(url, dst, key string, ignoreCertificate 
 		}
 	}
 	defer client.CloseIdleConnections()
+
 	request, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil
 	}
 	request.Header.Set("Accept-Encoding", "identity")
+
 	resp, err := client.Do(request)
 	if err != nil {
 		global.LOG.Errorf("get download file [%s] error, err %s", dst, err.Error())
 		return err
 	}
+
 	out, err := os.Create(dst)
 	if err != nil {
 		global.LOG.Errorf("create download file [%s] error, err %s", dst, err.Error())
+		resp.Body.Close()
 		return err
 	}
+
+	downloadMu.Lock()
+	downloadTasks[key] = &downloadTask{
+		resp: resp,
+		file: out,
+		dst:  dst,
+	}
+	downloadMu.Unlock()
+
 	go func() {
+		defer func() {
+			out.Close()
+			resp.Body.Close()
+
+			downloadMu.Lock()
+			delete(downloadTasks, key)
+			downloadMu.Unlock()
+		}()
+
 		counter := &WriteCounter{}
 		counter.Key = key
 		if resp.ContentLength > 0 {
 			counter.Total = uint64(resp.ContentLength)
 		}
 		counter.Name = filepath.Base(dst)
-		if _, err = io.Copy(out, io.TeeReader(resp.Body, counter)); err != nil {
+
+		if _, err := io.Copy(out, io.TeeReader(resp.Body, counter)); err != nil {
 			global.LOG.Errorf("save download file [%s] error, err %s", dst, err.Error())
+			global.CACHE.Del(counter.Key)
+			return
 		}
-		out.Close()
-		resp.Body.Close()
 
 		value := global.CACHE.Get(counter.Key)
+		if value == "" {
+			return
+		}
 		process := &Process{}
-		_ = json.Unmarshal([]byte(value), process)
+		if err := json.Unmarshal([]byte(value), process); err != nil {
+			return
+		}
 		process.Percent = 100
 		process.Name = counter.Name
 		process.Total = process.Written
@@ -420,6 +460,25 @@ func (f FileOp) DownloadFileWithProcess(url, dst, key string, ignoreCertificate 
 		global.CACHE.Set(counter.Key, string(by))
 	}()
 	return nil
+}
+
+func CancelDownload(key string) {
+	downloadMu.Lock()
+	task, ok := downloadTasks[key]
+	if !ok {
+		downloadMu.Unlock()
+		return
+	}
+	dst := task.dst
+	downloadMu.Unlock()
+
+	_ = task.file.Close()
+	_ = task.resp.Body.Close()
+
+	if dst != "" {
+		_ = os.Remove(dst)
+	}
+	global.CACHE.Del(key)
 }
 
 func (f FileOp) DownloadFile(url, dst string) error {

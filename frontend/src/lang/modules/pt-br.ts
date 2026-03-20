@@ -88,6 +88,7 @@ const message = {
             next: 'Próximo',
             setDefault: 'Restaurar padrão',
             bind: 'Vincular',
+            tip: 'Dica',
         },
         operate: {
             start: 'Iniciar',
@@ -1866,6 +1867,7 @@ const message = {
         previewLargeFile: 'Visualizar',
         panelInstallDir: 'O diretório de instalação do 1Panel não pode ser excluído',
         wgetTask: 'Tarefa de Download',
+        stopWgetConfirm: 'Tem certeza de que deseja parar esta tarefa de download?',
         existFileTitle: 'Aviso de arquivo com o mesmo nome',
         existFileHelper: 'O arquivo enviado contém um arquivo com o mesmo nome. Deseja substituí-lo?',
         existFileSize: 'Tamanho do arquivo (novo -> antigo)',

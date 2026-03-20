@@ -88,6 +88,7 @@ const message = {
             next: 'Далее',
             setDefault: 'Сбросить по умолчанию',
             bind: 'Привязать',
+            tip: 'Подсказка',
         },
         operate: {
             start: 'Запустить',
@@ -1738,6 +1739,7 @@ const message = {
         previewLargeFile: 'Предпросмотр',
         panelInstallDir: 'Директорию установки 1Panel нельзя удалить',
         wgetTask: 'Задача загрузки',
+        stopWgetConfirm: 'Вы уверены, что хотите остановить эту задачу загрузки?',
         existFileTitle: 'Предупреждение о файле с тем же именем',
         existFileHelper: 'Загруженный файл содержит файл с таким же именем. Заменить его?',
         existFileSize: 'Размер файла (новый -> старый)',

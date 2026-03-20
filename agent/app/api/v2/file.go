@@ -516,6 +516,29 @@ func (b *BaseApi) WgetFile(c *gin.Context) {
 }
 
 // @Tags File
+// @Summary Stop wget file download
+// @Accept json
+// @Param request body request.FileProcessReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /files/wget/stop [post]
+// @x-panel-log {"bodyKeys":["key"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"停止下载任务 [key]","formatEN":"Stop wget task [key]"}
+func (b *BaseApi) StopWget(c *gin.Context) {
+	var req request.FileProcessReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if strings.TrimSpace(req.Key) == "" {
+		helper.BadRequest(c, errors.New("key is required"))
+		return
+	}
+
+	files.CancelDownload(req.Key)
+	helper.Success(c)
+}
+
+// @Tags File
 // @Summary Move file
 // @Accept json
 // @Param request body request.FileMove true "request"

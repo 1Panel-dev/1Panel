@@ -88,6 +88,7 @@ const message = {
             migrate: 'Migrar',
             disConn: 'Desconectar',
             visit: 'Visitar',
+            tip: 'Aviso',
         },
         operate: {
             start: 'Iniciar',
@@ -1747,6 +1748,7 @@ const message = {
         previewLargeFile: 'Vista previa',
         panelInstallDir: 'El directorio de instalación de 1Panel no puede eliminarse',
         wgetTask: 'Tarea de descarga',
+        stopWgetConfirm: '¿Confirmar que desea detener esta tarea de descarga?',
         existFileTitle: 'Archivo con el mismo nombre',
         existFileHelper: 'El archivo cargado contiene un archivo con el mismo nombre, ¿desea sobrescribirlo?',
         existFileSize: 'Tamaño del archivo (nuevo -> viejo)',

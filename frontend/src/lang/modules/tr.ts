@@ -88,6 +88,7 @@ const message = {
             visit: 'Visit',
             migrate: 'Taşı',
             disConn: 'Bağlantıyı kes',
+            tip: 'İpucu',
         },
         operate: {
             start: 'Başlat',
@@ -1743,6 +1744,7 @@ const message = {
         previewLargeFile: 'Önizleme',
         panelInstallDir: '1Panel kurulum dizini silinemez',
         wgetTask: 'İndirme Görevi',
+        stopWgetConfirm: 'Bu indirme görevini durdurmak istediğinizden emin misiniz?',
         existFileTitle: 'Aynı ada sahip dosya uyarısı',
         existFileHelper: 'Yüklenen dosya, aynı ada sahip bir dosya içeriyor, üzerine yazmak istiyor musunuz?',
         existFileSize: 'Dosya boyutu (yeni -> eski)',
