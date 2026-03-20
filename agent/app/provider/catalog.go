@@ -108,6 +108,8 @@ var catalog = map[string]Meta{
 		DefaultBaseURL: "https://api.minimaxi.com/anthropic",
 		EnvKey:         "MINIMAX_API_KEY",
 		Models: []Model{
+			{ID: "minimax/MiniMax-M2.7", Name: "MiniMax M2.7"},
+			{ID: "minimax/MiniMax-M2.7-highspeed", Name: "MiniMax M2.7 highspeed"},
 			{ID: "minimax/MiniMax-M2.5", Name: "MiniMax M2.5"},
 			{ID: "minimax/MiniMax-M2.5-highspeed", Name: "MiniMax M2.5 highspeed"},
 		},

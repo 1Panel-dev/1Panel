@@ -27,14 +27,8 @@
                 <el-input v-model="form.baseURL" :disabled="!editableBaseURLProviders.includes(form.provider)" />
             </el-form-item>
             <el-form-item :label="'API ' + $t('commons.table.type')" prop="apiType">
-                <el-select v-model="form.apiType">
-                    <el-option label="openai-completions" value="openai-completions" />
-                    <el-option label="openai-responses" value="openai-responses" />
-                    <el-option
-                        v-if="form.provider === 'custom' || form.provider === 'vllm'"
-                        label="anthropic-messages"
-                        value="anthropic-messages"
-                    />
+                <el-select v-model="form.apiType" :disabled="apiTypeOptions.length === 1">
+                    <el-option v-for="item in apiTypeOptions" :key="item" :label="item" :value="item" />
                 </el-select>
             </el-form-item>
             <template v-if="showInitialModel">
@@ -120,6 +114,15 @@ const headerTitle = computed(() =>
 );
 
 const showInitialModel = computed(() => !form.id && initialModelProviders.includes(form.provider));
+const apiTypeOptions = computed(() => {
+    if (form.provider === 'minimax') {
+        return ['anthropic-messages'];
+    }
+    if (form.provider === 'custom' || form.provider === 'vllm') {
+        return ['openai-completions', 'openai-responses', 'anthropic-messages'];
+    }
+    return ['openai-completions', 'openai-responses'];
+});
 
 const rules = reactive({
     provider: [Rules.requiredSelect],
@@ -170,6 +173,19 @@ const resetInitialModel = () => {
     form.initialModel = isInitialModelProvider(form.provider)
         ? buildInitialModel(form.provider)
         : ({} as AI.AgentAccountModel);
+};
+
+const normalizeProviderAPIType = (provider: string, apiType?: string) => {
+    if (provider === 'minimax') {
+        return 'anthropic-messages';
+    }
+    if (provider === 'ollama') {
+        return 'openai-responses';
+    }
+    if (apiType) {
+        return apiType;
+    }
+    return 'openai-completions';
 };
 
 const submit = async () => {
@@ -255,7 +271,7 @@ const openDrawer = async (params?: OpenParams) => {
         form.baseURL = params.baseURL || '';
         form.apiKey = params.apiKey || '';
         form.rememberApiKey = params.rememberApiKey || false;
-        form.apiType = params.apiType || 'openai-completions';
+        form.apiType = normalizeProviderAPIType(form.provider, params.apiType);
         form.remark = params.remark || '';
         form.syncAgents = false;
         return;
@@ -299,15 +315,13 @@ const loadProviders = async () => {
 const handleProviderChange = () => {
     if (form.provider === 'custom' || form.provider === 'vllm') {
         form.baseURL = '';
-        form.apiType = form.apiType || 'openai-completions';
+        form.apiType = normalizeProviderAPIType(form.provider, form.apiType);
     } else if (form.provider === 'ollama') {
         form.baseURL = '';
-        form.apiType = 'openai-responses';
+        form.apiType = normalizeProviderAPIType(form.provider, form.apiType);
     } else {
         form.baseURL = providerBaseURL.value[form.provider] || '';
-        if (!form.apiType) {
-            form.apiType = 'openai-completions';
-        }
+        form.apiType = normalizeProviderAPIType(form.provider, form.apiType);
     }
     if (!form.id) {
         resetInitialModel();

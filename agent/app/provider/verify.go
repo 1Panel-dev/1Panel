@@ -123,16 +123,24 @@ func BuildVerifyRequest(provider, baseURL, apiKey string) VerifyRequest {
 		})
 	case "minimax":
 		request.Method = http.MethodPost
-		if !strings.Contains(base, "/v1") {
-			base = base + "/v1"
-		}
-		request.URL = base + "/chat/completions"
-		headers["Authorization"] = fmt.Sprintf("Bearer %s", apiKey)
+		headers["x-api-key"] = apiKey
+		headers["anthropic-version"] = "2023-06-01"
 		headers["Content-Type"] = "application/json"
+		if strings.Contains(base, "/v1") {
+			request.URL = base + "/messages"
+		} else {
+			request.URL = base + "/v1/messages"
+		}
 		request.Body = mustJSON(map[string]interface{}{
-			"model":      "MiniMax-M2.1",
-			"messages":   []map[string]string{{"role": "user", "content": "test"}},
+			"model":      "MiniMax-M2.5",
 			"max_tokens": 1,
+			"messages": []map[string]interface{}{{
+				"role": "user",
+				"content": []map[string]string{{
+					"type": "text",
+					"text": "test",
+				}},
+			}},
 		})
 	default:
 		headers["Authorization"] = fmt.Sprintf("Bearer %s", apiKey)

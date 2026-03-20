@@ -161,6 +161,10 @@ const form = reactive({
     dockerCompose: '',
 });
 
+const setDefaultWebUIPort = () => {
+    form.webUIPort = form.agentType === 'copaw' ? 8088 : 18789;
+};
+
 const rules = reactive({
     name: [Rules.requiredInput],
     agentType: [Rules.requiredSelect],
@@ -314,6 +318,7 @@ const handleAgentTypeChange = async () => {
     if (form.name === '' || form.name === 'OpenClaw' || form.name === 'CoPaw') {
         form.name = form.agentType === 'copaw' ? 'CoPaw' : 'OpenClaw';
     }
+    setDefaultWebUIPort();
     form.appVersion = '';
     form.model = '';
     form.provider = 'deepseek';
@@ -426,6 +431,7 @@ const openDrawer = async (agentType?: 'openclaw' | 'copaw') => {
     form.name = targetType === 'copaw' ? 'CoPaw' : 'OpenClaw';
     open.value = true;
     form.agentType = targetType;
+    setDefaultWebUIPort();
     form.token = getRandomStr(32).toLowerCase();
     if (form.agentType === 'copaw') {
         form.allowedOrigins = '';

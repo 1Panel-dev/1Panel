@@ -118,16 +118,27 @@ func buildArkPatch(modelID string, maxTokens, contextWindow int, baseURL, apiKey
 func buildMiniMaxPatch(modelID, baseURL, apiKey string) *OpenClawPatch {
 	normalizedID := normalizeMiniMaxModelID(modelID)
 	return &OpenClawPatch{
-		PrimaryModel: "minimax-portal/" + normalizedID,
-		Models: providerModels("minimax-portal", strings.TrimSpace(apiKey), firstNonEmpty(strings.TrimSpace(baseURL), "https://api.minimaxi.com/anthropic"), "anthropic-messages", map[string]interface{}{
-			"id":            normalizedID,
-			"name":          strings.ReplaceAll(normalizedID, "-", " "),
-			"reasoning":     false,
-			"input":         []string{"text"},
-			"contextWindow": 200000,
-			"maxTokens":     8192,
-			"cost":          map[string]interface{}{},
-		}),
+		PrimaryModel: "minimax/" + normalizedID,
+		Models: map[string]interface{}{
+			"mode": "merge",
+			"providers": map[string]interface{}{
+				"minimax": map[string]interface{}{
+					"apiKey":     strings.TrimSpace(apiKey),
+					"baseUrl":    firstNonEmpty(strings.TrimSpace(baseURL), "https://api.minimaxi.com/anthropic"),
+					"api":        "anthropic-messages",
+					"authHeader": true,
+					"models": []map[string]interface{}{{
+						"id":            normalizedID,
+						"name":          strings.ReplaceAll(normalizedID, "-", " "),
+						"reasoning":     false,
+						"input":         []string{"text"},
+						"contextWindow": 200000,
+						"maxTokens":     8192,
+						"cost":          map[string]interface{}{},
+					}},
+				},
+			},
+		},
 	}
 }
 
