@@ -163,6 +163,13 @@ func BuildVerifyRequest(provider, baseURL, apiKey string) VerifyRequest {
 				}},
 			}},
 		})
+	case "openrouter":
+		headers["Authorization"] = fmt.Sprintf("Bearer %s", apiKey)
+		if strings.Contains(base, "/v1") {
+			request.URL = base + "/key"
+		} else {
+			request.URL = base + "/v1/key"
+		}
 	default:
 		headers["Authorization"] = fmt.Sprintf("Bearer %s", apiKey)
 		if strings.Contains(base, "/v1") {

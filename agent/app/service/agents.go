@@ -7,17 +7,15 @@ import (
 	"path"
 	"sort"
 	"strings"
-	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
+	providercatalog "github.com/1Panel-dev/1Panel/agent/app/provider"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
-	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
-	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 	"gorm.io/gorm"
 )
@@ -29,6 +27,11 @@ type IAgentService interface {
 	ResetToken(req dto.AgentTokenResetReq) error
 	UpdateModelConfig(req dto.AgentModelConfigUpdateReq) error
 	GetProviders() ([]dto.ProviderInfo, error)
+	GetSecurityConfig(req dto.AgentSecurityConfigReq) (*dto.AgentSecurityConfig, error)
+	UpdateSecurityConfig(req dto.AgentSecurityConfigUpdateReq) error
+	GetOtherConfig(req dto.AgentOtherConfigReq) (*dto.AgentOtherConfig, error)
+	UpdateOtherConfig(req dto.AgentOtherConfigUpdateReq) error
+
 	CreateAccount(req dto.AgentAccountCreateReq) error
 	UpdateAccount(req dto.AgentAccountUpdateReq) error
 	SyncAgentsByAccount(account *model.AgentAccount) error
@@ -39,6 +42,7 @@ type IAgentService interface {
 	DeleteAccountModel(req dto.AgentAccountModelDeleteReq) error
 	VerifyAccount(req dto.AgentAccountVerifyReq) error
 	DeleteAccount(req dto.AgentAccountDeleteReq) error
+
 	GetFeishuConfig(req dto.AgentFeishuConfigReq) (*dto.AgentFeishuConfig, error)
 	UpdateFeishuConfig(req dto.AgentFeishuConfigUpdateReq) error
 	GetTelegramConfig(req dto.AgentTelegramConfigReq) (*dto.AgentTelegramConfig, error)
@@ -53,10 +57,6 @@ type IAgentService interface {
 	UpdateQQBotConfig(req dto.AgentQQBotConfigUpdateReq) error
 	InstallPlugin(req dto.AgentPluginInstallReq) error
 	CheckPlugin(req dto.AgentPluginCheckReq) (*dto.AgentPluginStatus, error)
-	GetSecurityConfig(req dto.AgentSecurityConfigReq) (*dto.AgentSecurityConfig, error)
-	UpdateSecurityConfig(req dto.AgentSecurityConfigUpdateReq) error
-	GetOtherConfig(req dto.AgentOtherConfigReq) (*dto.AgentOtherConfig, error)
-	UpdateOtherConfig(req dto.AgentOtherConfigUpdateReq) error
 	ApproveChannelPairing(req dto.AgentChannelPairingApproveReq) error
 }
 
@@ -340,15 +340,26 @@ func (a AgentService) UpdateModelConfig(req dto.AgentModelConfigUpdateReq) error
 }
 
 func (a AgentService) GetProviders() ([]dto.ProviderInfo, error) {
-	definitions := providerDefinitions()
+	definitions := providercatalog.All()
 	providers := make([]dto.ProviderInfo, 0, len(definitions))
 	for key, def := range definitions {
+		models := make([]dto.ProviderModelInfo, 0, len(def.Models))
+		for _, item := range def.Models {
+			models = append(models, dto.ProviderModelInfo{
+				ID:            item.ID,
+				Name:          item.Name,
+				ContextWindow: item.ContextWindow,
+				MaxTokens:     item.MaxTokens,
+				Reasoning:     item.Reasoning,
+				Input:         append([]string(nil), item.Input...),
+			})
+		}
 		providers = append(providers, dto.ProviderInfo{
 			Sort:        def.Sort,
 			Provider:    key,
 			DisplayName: def.DisplayName,
-			BaseURL:     def.BaseURL,
-			Models:      def.Models,
+			BaseURL:     def.DefaultBaseURL,
+			Models:      models,
 		})
 	}
 	sort.Slice(providers, func(i, j int) bool {
@@ -362,7 +373,7 @@ func (a AgentService) CreateAccount(req dto.AgentAccountCreateReq) error {
 	if exist, _ := agentAccountRepo.GetFirst(repo.WithByProvider(provider), repo.WithByName(req.Name)); exist != nil && exist.ID > 0 {
 		return buserr.New("ErrRecordExist")
 	}
-	resolvedInput, err := resolveAgentAccountInput(provider, req.APIKey, req.BaseURL, req.APIType, "")
+	resolvedInput, err := resolveAgentAccountInput(provider, req.APIKey, req.BaseURL)
 	if err != nil {
 		return err
 	}
@@ -372,7 +383,7 @@ func (a AgentService) CreateAccount(req dto.AgentAccountCreateReq) error {
 		APIKey:         resolvedInput.APIKey,
 		RememberAPIKey: req.RememberAPIKey,
 		BaseURL:        resolvedInput.BaseURL,
-		APIType:        resolvedInput.APIType,
+		APIType:        req.APIType,
 		Verified:       true,
 		Remark:         req.Remark,
 	}
@@ -401,7 +412,7 @@ func (a AgentService) UpdateAccount(req dto.AgentAccountUpdateReq) error {
 		return err
 	}
 	provider := account.Provider
-	resolvedInput, err := resolveAgentAccountInput(provider, req.APIKey, req.BaseURL, req.APIType, account.APIType)
+	resolvedInput, err := resolveAgentAccountInput(provider, req.APIKey, req.BaseURL)
 	if err != nil {
 		return err
 	}
@@ -409,7 +420,7 @@ func (a AgentService) UpdateAccount(req dto.AgentAccountUpdateReq) error {
 	account.APIKey = resolvedInput.APIKey
 	account.RememberAPIKey = req.RememberAPIKey
 	account.BaseURL = resolvedInput.BaseURL
-	account.APIType = resolvedInput.APIType
+	account.APIType = req.APIType
 	account.Remark = req.Remark
 	account.Verified = true
 
@@ -445,7 +456,7 @@ func (a AgentService) PageAccounts(req dto.AgentAccountSearch) (int64, []dto.Age
 		items = append(items, dto.AgentAccountInfo{
 			ID:             item.ID,
 			Provider:       item.Provider,
-			ProviderName:   providerDisplayName(item.Provider),
+			ProviderName:   providercatalog.DisplayName(item.Provider),
 			Name:           item.Name,
 			APIKey:         apiKey,
 			RememberAPIKey: item.RememberAPIKey,
@@ -484,25 +495,22 @@ func (a AgentService) CreateAccountModel(req dto.AgentAccountModelCreateReq) err
 	if err != nil {
 		return err
 	}
-	normalized, err := normalizeAgentAccountModel(account, req.Model)
-	if err != nil {
-		return err
-	}
-	if _, ok := findAgentAccountModelForProvider(account.Provider, models, normalized.ID); ok {
+	nextModel := cloneAgentAccountModel(req.Model)
+	if _, ok := findAgentAccountModelForProvider(account.Provider, models, nextModel.ID); ok {
 		return buserr.New("ErrRecordExist")
 	}
-	inputPayload, err := json.Marshal(sanitizeAgentAccountModelInputs(normalized.Input))
+	inputPayload, err := json.Marshal(nextModel.Input)
 	if err != nil {
 		return err
 	}
 	sortOrder := len(models) + 1
 	record := &model.AgentAccountModel{
 		AccountID:     account.ID,
-		Model:         normalized.ID,
-		Name:          normalized.Name,
-		ContextWindow: normalized.ContextWindow,
-		MaxTokens:     normalized.MaxTokens,
-		Reasoning:     normalized.Reasoning,
+		Model:         nextModel.ID,
+		Name:          nextModel.Name,
+		ContextWindow: nextModel.ContextWindow,
+		MaxTokens:     nextModel.MaxTokens,
+		Reasoning:     nextModel.Reasoning,
 		Input:         string(inputPayload),
 		SortOrder:     sortOrder,
 	}
@@ -525,22 +533,19 @@ func (a AgentService) UpdateAccountModel(req dto.AgentAccountModelUpdateReq) err
 	if err != nil {
 		return err
 	}
-	normalized, err := normalizeAgentAccountModel(account, req.Model)
-	if err != nil {
-		return err
-	}
+	nextModel := cloneAgentAccountModel(req.Model)
 	for _, item := range models {
 		if item.RecordID == req.Model.RecordID {
 			continue
 		}
-		if sameProviderModelID(account.Provider, item.ID, normalized.ID) {
+		if sameProviderModelID(account.Provider, item.ID, nextModel.ID) {
 			return buserr.New("ErrRecordExist")
 		}
 	}
 	nextModels := make([]dto.AgentAccountModel, 0, len(models))
 	for _, item := range models {
 		if item.RecordID == req.Model.RecordID {
-			nextModels = append(nextModels, normalized)
+			nextModels = append(nextModels, nextModel)
 			continue
 		}
 		nextModels = append(nextModels, item)
@@ -548,15 +553,15 @@ func (a AgentService) UpdateAccountModel(req dto.AgentAccountModelUpdateReq) err
 	if err := ensureAccountModelsNotBound(account, nextModels); err != nil {
 		return err
 	}
-	inputPayload, err := json.Marshal(sanitizeAgentAccountModelInputs(normalized.Input))
+	inputPayload, err := json.Marshal(nextModel.Input)
 	if err != nil {
 		return err
 	}
-	record.Model = normalized.ID
-	record.Name = normalized.Name
-	record.ContextWindow = normalized.ContextWindow
-	record.MaxTokens = normalized.MaxTokens
-	record.Reasoning = normalized.Reasoning
+	record.Model = nextModel.ID
+	record.Name = nextModel.Name
+	record.ContextWindow = nextModel.ContextWindow
+	record.MaxTokens = nextModel.MaxTokens
+	record.Reasoning = nextModel.Reasoning
 	record.Input = string(inputPayload)
 	if err := agentAccountModelRepo.Save(record); err != nil {
 		return err
@@ -603,11 +608,8 @@ func (a AgentService) SyncAgentsByAccount(account *model.AgentAccount) error {
 }
 
 func (a AgentService) VerifyAccount(req dto.AgentAccountVerifyReq) error {
-	resolvedVerification, err := resolveAgentAccountVerification(req.Provider, req.APIKey, req.BaseURL)
-	if err != nil {
-		return err
-	}
-	return verifyResolvedAgentAccount(resolvedVerification)
+	_, err := resolveAgentAccountInput(req.Provider, req.APIKey, req.BaseURL)
+	return err
 }
 
 func (a AgentService) DeleteAccount(req dto.AgentAccountDeleteReq) error {
@@ -618,180 +620,6 @@ func (a AgentService) DeleteAccount(req dto.AgentAccountDeleteReq) error {
 		return err
 	}
 	return agentAccountRepo.DeleteByID(req.ID)
-}
-
-func (a AgentService) GetFeishuConfig(req dto.AgentFeishuConfigReq) (*dto.AgentFeishuConfig, error) {
-	_, _, conf, err := a.loadAgentConfig(req.AgentID)
-	if err != nil {
-		return nil, err
-	}
-	result := extractFeishuConfig(conf)
-	return &result, nil
-}
-
-func (a AgentService) UpdateFeishuConfig(req dto.AgentFeishuConfigUpdateReq) error {
-	return a.mutateAgentConfig(req.AgentID, func(_ *model.Agent, _ *model.AppInstall, conf map[string]interface{}) error {
-		setFeishuConfig(conf, dto.AgentFeishuConfig{
-			Enabled:   req.Enabled,
-			DmPolicy:  req.DmPolicy,
-			BotName:   req.BotName,
-			AppID:     req.AppID,
-			AppSecret: req.AppSecret,
-		})
-		setFeishuPluginEnabled(conf, req.Enabled)
-		return nil
-	})
-}
-
-func (a AgentService) GetTelegramConfig(req dto.AgentTelegramConfigReq) (*dto.AgentTelegramConfig, error) {
-	_, _, conf, err := a.loadAgentConfig(req.AgentID)
-	if err != nil {
-		return nil, err
-	}
-	result := extractTelegramConfig(conf)
-	return &result, nil
-}
-
-func (a AgentService) UpdateTelegramConfig(req dto.AgentTelegramConfigUpdateReq) error {
-	return a.mutateAgentConfig(req.AgentID, func(_ *model.Agent, _ *model.AppInstall, conf map[string]interface{}) error {
-		setTelegramConfig(conf, dto.AgentTelegramConfig{
-			Enabled:  req.Enabled,
-			DmPolicy: req.DmPolicy,
-			BotToken: req.BotToken,
-			Proxy:    req.Proxy,
-		})
-		return nil
-	})
-}
-
-func (a AgentService) GetDiscordConfig(req dto.AgentDiscordConfigReq) (*dto.AgentDiscordConfig, error) {
-	_, _, conf, err := a.loadAgentConfig(req.AgentID)
-	if err != nil {
-		return nil, err
-	}
-	result := extractDiscordConfig(conf)
-	return &result, nil
-}
-
-func (a AgentService) UpdateDiscordConfig(req dto.AgentDiscordConfigUpdateReq) error {
-	return a.mutateAgentConfig(req.AgentID, func(_ *model.Agent, _ *model.AppInstall, conf map[string]interface{}) error {
-		setDiscordConfig(conf, dto.AgentDiscordConfig{
-			Enabled:     req.Enabled,
-			DmPolicy:    req.DmPolicy,
-			GroupPolicy: req.GroupPolicy,
-			Token:       req.Token,
-			Proxy:       req.Proxy,
-		})
-		return nil
-	})
-}
-
-func (a AgentService) GetQQBotConfig(req dto.AgentQQBotConfigReq) (*dto.AgentQQBotConfig, error) {
-	_, install, conf, err := a.loadAgentConfig(req.AgentID)
-	if err != nil {
-		return nil, err
-	}
-	result := extractQQBotConfig(conf)
-	installed, _ := checkPluginInstalled(install.ContainerName, "qqbot")
-	result.Installed = installed
-	return &result, nil
-}
-
-func (a AgentService) UpdateQQBotConfig(req dto.AgentQQBotConfigUpdateReq) error {
-	return a.mutateAgentConfig(req.AgentID, func(_ *model.Agent, _ *model.AppInstall, conf map[string]interface{}) error {
-		setQQBotConfig(conf, dto.AgentQQBotConfig{
-			Enabled:      req.Enabled,
-			AppID:        req.AppID,
-			ClientSecret: req.ClientSecret,
-		})
-		return nil
-	})
-}
-
-func (a AgentService) GetWecomConfig(req dto.AgentWecomConfigReq) (*dto.AgentWecomConfig, error) {
-	_, install, conf, err := a.loadAgentConfig(req.AgentID)
-	if err != nil {
-		return nil, err
-	}
-	result := extractWecomConfig(conf)
-	installed, _ := checkPluginInstalled(install.ContainerName, "wecom")
-	result.Installed = installed
-	return &result, nil
-}
-
-func (a AgentService) UpdateWecomConfig(req dto.AgentWecomConfigUpdateReq) error {
-	return a.mutateAgentConfig(req.AgentID, func(_ *model.Agent, _ *model.AppInstall, conf map[string]interface{}) error {
-		setWecomConfig(conf, dto.AgentWecomConfig{
-			Enabled:  req.Enabled,
-			DmPolicy: req.DmPolicy,
-			BotID:    req.BotID,
-			Secret:   req.Secret,
-		})
-		return nil
-	})
-}
-
-func (a AgentService) GetDingTalkConfig(req dto.AgentDingTalkConfigReq) (*dto.AgentDingTalkConfig, error) {
-	_, install, conf, err := a.loadAgentConfig(req.AgentID)
-	if err != nil {
-		return nil, err
-	}
-	result := extractDingTalkConfig(conf)
-	installed, _ := checkPluginInstalled(install.ContainerName, "dingtalk")
-	result.Installed = installed
-	return &result, nil
-}
-
-func (a AgentService) UpdateDingTalkConfig(req dto.AgentDingTalkConfigUpdateReq) error {
-	return a.mutateAgentConfig(req.AgentID, func(_ *model.Agent, _ *model.AppInstall, conf map[string]interface{}) error {
-		setDingTalkConfig(conf, dto.AgentDingTalkConfig{
-			Enabled:        req.Enabled,
-			ClientID:       req.ClientID,
-			ClientSecret:   req.ClientSecret,
-			DmPolicy:       req.DmPolicy,
-			AllowFrom:      req.AllowFrom,
-			GroupPolicy:    req.GroupPolicy,
-			GroupAllowFrom: req.GroupAllowFrom,
-		})
-		return nil
-	})
-}
-
-func (a AgentService) InstallPlugin(req dto.AgentPluginInstallReq) error {
-	_, install, err := a.loadAgentAndInstall(req.AgentID)
-	if err != nil {
-		return err
-	}
-	spec, _, err := resolvePluginMeta(req.Type)
-	if err != nil {
-		return err
-	}
-	installTask, err := task.NewTaskWithOps(req.Type, task.TaskInstall, task.TaskScopeAI, req.TaskID, req.AgentID)
-	if err != nil {
-		return err
-	}
-	installTask.AddSubTask("Install OpenClaw plugin", func(t *task.Task) error {
-		mgr := cmd.NewCommandMgr(cmd.WithTask(*t), cmd.WithContext(t.TaskCtx), cmd.WithTimeout(10*time.Minute))
-		return mgr.RunBashCf("docker exec %s openclaw plugins install %s", install.ContainerName, spec)
-	}, nil)
-	go func() {
-		if err := installTask.Execute(); err != nil {
-			global.LOG.Errorf("install openclaw plugin failed: %v", err)
-		}
-	}()
-	return nil
-}
-
-func (a AgentService) CheckPlugin(req dto.AgentPluginCheckReq) (*dto.AgentPluginStatus, error) {
-	_, install, err := a.loadAgentAndInstall(req.AgentID)
-	if err != nil {
-		return nil, err
-	}
-	installed, err := checkPluginInstalled(install.ContainerName, req.Type)
-	if err != nil {
-		return nil, err
-	}
-	return &dto.AgentPluginStatus{Installed: installed}, nil
 }
 
 func (a AgentService) GetSecurityConfig(req dto.AgentSecurityConfigReq) (*dto.AgentSecurityConfig, error) {
@@ -866,23 +694,6 @@ func (a AgentService) UpdateOtherConfig(req dto.AgentOtherConfigUpdateReq) error
 		BrowserEnabled: req.BrowserEnabled,
 	})
 	if err := writeOpenclawConfigRaw(agent.ConfigPath, conf); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (a AgentService) ApproveChannelPairing(req dto.AgentChannelPairingApproveReq) error {
-	_, install, err := a.loadAgentAndInstall(req.AgentID)
-	if err != nil {
-		return err
-	}
-	channelType := req.Type
-	if err := cmd.RunDefaultBashCf(
-		"docker exec %s openclaw pairing approve %s %q",
-		install.ContainerName,
-		channelType,
-		strings.TrimSpace(req.PairingCode),
-	); err != nil {
 		return err
 	}
 	return nil

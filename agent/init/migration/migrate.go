@@ -65,7 +65,6 @@ func InitAgentDB() {
 		migrations.AddCronjobArgs,
 		migrations.AddWebsiteAcmeAccountColumn,
 		migrations.AddAgentTables,
-		migrations.MigrateOpenclawAgents,
 		migrations.AddAgentCustomModelFields,
 		migrations.AddAppInstallSortOrder,
 		migrations.AddAgentAccountRememberAPIKey,

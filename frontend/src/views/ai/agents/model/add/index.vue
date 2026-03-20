@@ -33,19 +33,23 @@
             </el-form-item>
             <template v-if="showInitialModel">
                 <el-divider content-position="left">{{ $t('aiTools.agents.accountModels') }}</el-divider>
-                <el-form-item :label="$t('aiTools.model.model')" prop="initialModel.id" :rules="[Rules.requiredInput]">
+                <el-form-item :label="$t('aiTools.model.model')" prop="initialModel.id" :rules="[Rules.noSpace]">
                     <el-input v-model="form.initialModel.id" />
                 </el-form-item>
-                <el-form-item :label="$t('commons.table.name')" prop="initialModel.name">
+                <el-form-item :label="$t('commons.table.name')" prop="initialModel.name" :rules="[Rules.requiredInput]">
                     <el-input v-model="form.initialModel.name" />
                 </el-form-item>
-                <el-form-item label="Context Window" prop="initialModel.contextWindow">
+                <el-form-item label="Context Window" prop="initialModel.contextWindow" :rules="[Rules.integerNumber]">
                     <el-input-number v-model="form.initialModel.contextWindow" :min="1" :max="2000000" />
                 </el-form-item>
-                <el-form-item label="Max Tokens" prop="initialModel.maxTokens">
+                <el-form-item label="Max Tokens" prop="initialModel.maxTokens" :rules="[Rules.integerNumber]">
                     <el-input-number v-model="form.initialModel.maxTokens" :min="1" :max="2000000" />
                 </el-form-item>
-                <el-form-item :label="$t('aiTools.agents.modelInputTypes')" prop="initialModel.input">
+                <el-form-item
+                    :label="$t('aiTools.agents.modelInputTypes')"
+                    prop="initialModel.input"
+                    :rules="[Rules.requiredSelect]"
+                >
                     <el-checkbox-group v-model="form.initialModel.input">
                         <el-checkbox label="text">Text</el-checkbox>
                         <el-checkbox label="image">Image</el-checkbox>
@@ -155,15 +159,21 @@ const normalizeInitialModel = () => {
     const item = {
         recordId: 0,
         id: String(form.initialModel.id || '').trim(),
-        name: String(form.initialModel.name || form.initialModel.id || '').trim(),
-        contextWindow: Number(form.initialModel.contextWindow || 0) || defaultContextWindowForProvider(form.provider),
-        maxTokens: Number(form.initialModel.maxTokens || 0) || 8192,
+        name: String(form.initialModel.name || '').trim(),
+        contextWindow: Number(form.initialModel.contextWindow || 0),
+        maxTokens: Number(form.initialModel.maxTokens || 0),
         reasoning: Boolean(form.initialModel.reasoning),
         input: Array.from(
             new Set((form.initialModel.input || []).filter((value) => value === 'text' || value === 'image')),
         ),
     };
-    if (item.id === '') {
+    if (
+        item.id === '' ||
+        item.name === '' ||
+        item.contextWindow <= 0 ||
+        item.maxTokens <= 0 ||
+        item.input.length === 0
+    ) {
         return null;
     }
     return item;
