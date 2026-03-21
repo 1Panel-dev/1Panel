@@ -56,6 +56,7 @@ export function loadDefaultSpec(type: string) {
             break;
         case 'app':
         case 'database':
+        case 'compose':
             item.specType = 'perDay';
             item.hour = 2;
             item.minute = 30;
@@ -84,6 +85,7 @@ export function loadDefaultSpecCustom(type: string) {
             return '30 1 * * 1';
         case 'app':
         case 'database':
+        case 'compose':
             return '30 2 * * *';
         case 'directory':
         case 'cutWebsiteLog':
@@ -224,4 +226,5 @@ export const cronjobTypes = [
     { value: 'ntp', label: i18n.global.t('cronjob.ntp') },
     { value: 'syncIpGroup', label: i18n.global.t('cronjob.syncIpGroup') },
     { value: 'cleanLog', label: i18n.global.t('cronjob.cleanLog') },
+    { value: 'compose', label: i18n.global.t('cronjob.compose') },
 ];

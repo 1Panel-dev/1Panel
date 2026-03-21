@@ -300,6 +300,25 @@
                                         </el-select>
                                     </el-form-item>
                                 </LayoutCol>
+                                <LayoutCol v-if="form.type === 'compose'">
+                                    <el-form-item :label="$t('cronjob.compose')" prop="appIdList">
+                                        <el-select
+                                            clearable
+                                            v-model="form.appIdList"
+                                            multiple
+                                            @change="
+                                                form.appIdList = form.appIdList.includes('all')
+                                                    ? ['all']
+                                                    : form.appIdList
+                                            "
+                                        >
+                                            <el-option :label="$t('commons.table.all')" value="all" />
+                                            <div v-for="item in composeOptions" :key="item.name">
+                                                <el-option :value="item.name" :label="item.name" />
+                                            </div>
+                                        </el-select>
+                                    </el-form-item>
+                                </LayoutCol>
                                 <LayoutCol v-if="form.type === 'database'">
                                     <el-form-item :label="$t('cronjob.database')">
                                         <el-select v-model="form.dbType" @change="loadDatabases">
@@ -837,7 +856,7 @@ import { listDbItems } from '@/api/modules/database';
 import { getWebsiteOptions } from '@/api/modules/website';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { useRouter } from 'vue-router';
-import { listContainer } from '@/api/modules/container';
+import { listContainer, searchCompose } from '@/api/modules/container';
 import { Database } from '@/api/interface/database';
 import { listAppInstalled } from '@/api/modules/app';
 import {
@@ -1044,6 +1063,7 @@ const search = async () => {
     }
     loadBackups();
     loadAppInstalls();
+    loadComposeOptions();
     loadUserOptions(true);
     loadWebsites();
     loadContainers();
@@ -1064,6 +1084,7 @@ const websiteOptions = ref([]);
 const backupOptions = ref([]);
 const accountOptions = ref([]);
 const appOptions = ref([]);
+const composeOptions = ref<{ name: string }[]>([]);
 const userOptions = ref([]);
 const scriptOptions = ref([]);
 const groupOptions = ref([]);
@@ -1470,6 +1491,15 @@ const loadAppInstalls = async () => {
     appOptions.value = res.data || [];
 };
 
+const loadComposeOptions = async () => {
+    try {
+        const res = await searchCompose({ page: 1, pageSize: 1000, info: '' });
+        composeOptions.value = (res.data.items || []).map((item: any) => ({ name: item.name }));
+    } catch (e) {
+        composeOptions.value = [];
+    }
+};
+
 const loadWebsites = async () => {
     const res = await getWebsiteOptions({});
     websiteOptions.value = res.data || [];
@@ -1487,7 +1517,8 @@ function isBackup() {
         form.type === 'database' ||
         form.type === 'directory' ||
         form.type === 'snapshot' ||
-        form.type === 'log'
+        form.type === 'log' ||
+        form.type === 'compose'
     );
 }
 
