@@ -62,16 +62,30 @@ func NewLocalClient(reqUrl, reqMethod string, body io.Reader, ctx *gin.Context) 
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("do request failed, err: %v", resp.Status)
-	}
 	bodyByte, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("read resp body from request failed, err: %v", err)
 	}
+
+	if resp.StatusCode == http.StatusUnauthorized {
+		return nil, fmt.Errorf("authentication failed: remote panel returned 401 Unauthorized, please check API key or credentials")
+	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("do request failed, status: %s", resp.Status)
+	}
+
+	contentType := resp.Header.Get("Content-Type")
+	if !strings.Contains(contentType, "application/json") && !strings.Contains(contentType, "text/json") {
+		preview := string(bodyByte)
+		if len(preview) > 200 {
+			preview = preview[:200]
+		}
+		return nil, fmt.Errorf("expected JSON response but got Content-Type: %s, body: %s", contentType, preview)
+	}
+
 	var respJson dto.Response
 	if err := json.Unmarshal(bodyByte, &respJson); err != nil {
-		return nil, fmt.Errorf("json umarshal resp data failed, err: %v", err)
+		return nil, fmt.Errorf("json unmarshal resp data failed, err: %v", err)
 	}
 	if respJson.Code != http.StatusOK {
 		return nil, errors.New(strings.ReplaceAll(respJson.Message, i18n.Get("ErrInternalServerKey"), ""))
