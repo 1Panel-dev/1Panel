@@ -2473,6 +2473,13 @@ const message = {
         noDefaultServer: '未设置',
         defaultServerHelper:
             '设置默认站点后,所有未绑定的域名和IP都被定向到默认站点\n可有效防止恶意解析\n但同时会导致 WAF 未授权域名拦截失败',
+        defaultPage: '默认页',
+        defaultPageType: '默认页类型',
+        customHtml: '自定义 HTML',
+        noResponse: '不响应 (444)',
+        noResponseHelper: '不响应客户端请求。端口被扫描时更安全，不会暴露服务器信息。',
+        redirectTo: '跳转',
+        redirectUrl: '跳转地址',
         websiteDeploymentHelper: '使用从 1Panel 部署的应用创建网站',
         websiteStatictHelper: '在主机上创建网站目录',
         websiteProxyHelper:

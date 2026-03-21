@@ -2668,6 +2668,13 @@ const message = {
         noDefaultServer: 'Not set',
         defaultServerHelper:
             'After setting the default site, all unbinded domain names and IPs will be redirected to the default site\nThis can effectively prevent malicious resolution\nHowever, it will also cause the WAF unauthorized domain name interception to fail',
+        defaultPage: 'Default Page',
+        defaultPageType: 'Default Page Type',
+        customHtml: 'Custom HTML',
+        noResponse: 'No Response (444)',
+        noResponseHelper: 'Returns no response to the client. More secure when ports are scanned, as it reveals no server information.',
+        redirectTo: 'Redirect',
+        redirectUrl: 'Redirect URL',
         restoreHelper: 'Are you sure to restore using this backup?',
         websiteDeploymentHelper: 'Use an installed application or create a new application to create a website.',
         websiteStatictHelper: 'Create a website directory on the host.',
