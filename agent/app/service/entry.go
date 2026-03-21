@@ -58,4 +58,8 @@ var (
 
 	dnsZoneRepo   = repo.NewIDnsZoneRepo()
 	dnsRecordRepo = repo.NewIDnsRecordRepo()
+
+	mailDomainRepo  = repo.NewIMailDomainRepo()
+	mailAccountRepo = repo.NewIMailAccountRepo()
+	mailAliasRepo   = repo.NewIMailAliasRepo()
 )

@@ -66,6 +66,28 @@ const webSiteRouter = {
             },
         },
         {
+            path: '/websites/mail',
+            name: 'Mail',
+            component: () => import('@/views/website/mail/index.vue'),
+            meta: {
+                icon: 'p-website',
+                title: 'menu.mail',
+                requiresAuth: false,
+            },
+        },
+        {
+            path: '/websites/mail/:id',
+            name: 'MailDomainDetail',
+            component: () => import('@/views/website/mail/detail/index.vue'),
+            hidden: true,
+            props: true,
+            meta: {
+                activeMenu: '/websites/mail',
+                requiresAuth: false,
+                ignoreTab: true,
+            },
+        },
+        {
             path: '/websites/runtimes/php',
             name: 'PHP',
             component: () => import('@/views/website/runtime/php/index.vue'),

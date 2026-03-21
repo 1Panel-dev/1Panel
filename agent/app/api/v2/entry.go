@@ -79,5 +79,6 @@ var (
 
 	diskService = service.NewIDiskService()
 
-	dnsService = service.NewIDnsService()
+	dnsService  = service.NewIDnsService()
+	mailService = service.NewIMailService()
 )
