@@ -302,9 +302,15 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 			}
 		}
 	} else {
-		domains, _, _, err = getWebsiteDomains(create.Domains, defaultHttpPort, nginxInstall.HttpsPort, 0)
+		var addPorts []int
+		domains, addPorts, _, err = getWebsiteDomains(create.Domains, defaultHttpPort, nginxInstall.HttpsPort, 0)
 		if err != nil {
 			return err
+		}
+		if len(addPorts) > 0 {
+			go func() {
+				_ = OperateFirewallPort(nil, addPorts)
+			}()
 		}
 		primaryDomain = domains[0].Domain
 		if domains[0].Port != defaultHttpPort {
