@@ -495,6 +495,23 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 
 	createTask.AddSubTask(i18n.GetMsgByKey("ConfigOpenresty"), configNginx, deleteWebsite)
 
+	// Auto-create DNS A record if DNS is enabled
+	dnsEnabled, _ := settingRepo.GetValueByKey("DnsEnabled")
+	if dnsEnabled == "true" {
+		autoDnsRecord := func(t *task.Task) error {
+			serverIP, _ := settingRepo.GetValueByKey("SystemIP")
+			if serverIP == "" {
+				return nil
+			}
+			dnsSvc := NewIDnsService()
+			for _, d := range create.Domains {
+				_ = dnsSvc.AutoCreateARecord(d.Domain, serverIP)
+			}
+			return nil
+		}
+		createTask.AddSubTask("Auto DNS Record", autoDnsRecord, nil)
+	}
+
 	if create.EnableSSL {
 		enableSSL := func(t *task.Task) error {
 			websiteModel, err := websiteSSLRepo.GetFirst(repo.WithByID(create.WebsiteSSLID))

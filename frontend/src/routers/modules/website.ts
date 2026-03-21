@@ -44,6 +44,28 @@ const webSiteRouter = {
             },
         },
         {
+            path: '/websites/dns',
+            name: 'DNS',
+            component: () => import('@/views/website/dns/index.vue'),
+            meta: {
+                icon: 'p-website',
+                title: 'menu.dns',
+                requiresAuth: false,
+            },
+        },
+        {
+            path: '/websites/dns/:id',
+            name: 'DnsZoneDetail',
+            component: () => import('@/views/website/dns/detail/index.vue'),
+            hidden: true,
+            props: true,
+            meta: {
+                activeMenu: '/websites/dns',
+                requiresAuth: false,
+                ignoreTab: true,
+            },
+        },
+        {
             path: '/websites/runtimes/php',
             name: 'PHP',
             component: () => import('@/views/website/runtime/php/index.vue'),

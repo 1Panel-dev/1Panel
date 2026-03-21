@@ -565,3 +565,11 @@ PartitionDiskErr: "分区失败，{{ .err }}"
 FormatDiskErr: "格式化磁盘失败，{{ .err }}"
 MountDiskErr: "挂载磁盘失败，{{ .err }}"
 XfsNotFound: "未检测到 xfs 文件系统，请先安装 xfsprogs"
+
+#dns
+ErrDnsZoneExist: "DNS 域已存在: {{ .name }}"
+ErrDnsZoneNotFound: "DNS 域未找到"
+ErrDnsRecordNotFound: "DNS 记录未找到"
+ErrDnsNotEnabled: "DNS 管理未启用"
+ErrDnsContainerFailed: "PowerDNS 容器启动失败: {{ .detail }}"
+ErrDnsPdnsApi: "PowerDNS API 错误: {{ .detail }}"

@@ -565,3 +565,11 @@ PartitionDiskErr: 'Partition failed: {{ .err }}'
 FormatDiskErr: 'Format failed: {{ .err }}'
 MountDiskErr: 'Mount failed: {{ .err }}'
 XfsNotFound: 'xfs not found; install xfsprogs first'
+
+#dns
+ErrDnsZoneExist: 'DNS zone already exists: {{ .name }}'
+ErrDnsZoneNotFound: 'DNS zone not found'
+ErrDnsRecordNotFound: 'DNS record not found'
+ErrDnsNotEnabled: 'DNS management is not enabled'
+ErrDnsContainerFailed: 'Failed to start PowerDNS container: {{ .detail }}'
+ErrDnsPdnsApi: 'PowerDNS API error: {{ .detail }}'

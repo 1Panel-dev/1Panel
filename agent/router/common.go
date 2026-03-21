@@ -24,5 +24,6 @@ func commonGroups() []CommonRouter {
 		&AIToolsRouter{},
 		&GroupRouter{},
 		&AlertRouter{},
+		&DnsRouter{},
 	}
 }

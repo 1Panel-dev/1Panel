@@ -76,6 +76,8 @@ var AddTable = &gormigrate.Migration{
 			&model.McpServer{},
 			&model.RootCert{},
 			&model.ClamRecord{},
+			&model.DnsZone{},
+			&model.DnsRecord{},
 		)
 	},
 }
