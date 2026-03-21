@@ -115,6 +115,11 @@ func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error)
 		return
 	}
 	applyLocationProxyPass(location, req.ProxyPass, &req.SNI, req.ProxySSLName)
+	if isHTTPSProxyPass(req.ProxyPass) && req.SSLVerify {
+		location.UpdateDirective("proxy_ssl_verify", []string{"on"})
+	} else {
+		location.RemoveDirective("proxy_ssl_verify", []string{})
+	}
 	location.UpdateDirective("proxy_set_header", []string{"Host", req.ProxyHost})
 	location.ChangePath(req.Modifier, req.Match)
 	// Server Cache Settings
@@ -328,6 +333,9 @@ func (w WebsiteService) GetProxies(id uint) (res []request.WebsiteProxyConfig, e
 			}
 			if directive.GetName() == "proxy_ssl_name" && len(directive.GetParameters()) > 0 {
 				proxyConfig.ProxySSLName = directive.GetParameters()[0]
+			}
+			if directive.GetName() == "proxy_ssl_verify" {
+				proxyConfig.SSLVerify = len(directive.GetParameters()) > 0 && directive.GetParameters()[0] == "on"
 			}
 		}
 		proxyConfig.Cors = location.Cors

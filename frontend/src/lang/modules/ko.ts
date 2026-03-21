@@ -2715,6 +2715,8 @@ const message = {
         sni: '원본 SNI',
         sniHelper:
             '역방향 프록시 백엔드가 HTTPS 인 경우 원본 SNI 를 설정해야 할 수 있습니다. 자세한 내용은 CDN 서비스 제공자의 문서를 참조하세요.',
+        proxySslVerify: 'Verify Backend SSL Certificate',
+        proxySslVerifyHelper: 'When enabled, the proxy will strictly verify the upstream SSL certificate (disabled by default).',
         huaweicloud: '화웨이 클라우드',
         createDb: '데이터베이스 생성',
         enableSSLHelper: 'SSL 활성화 실패는 웹사이트 생성에 영향을 미치지 않습니다.',

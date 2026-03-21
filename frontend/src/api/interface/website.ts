@@ -439,6 +439,7 @@ export namespace Website {
         proxyProtocol?: string;
         sni?: boolean;
         proxySSLName: string;
+        sslVerify?: boolean;
         cors: boolean;
         allowOrigins: string;
         allowMethods: string;

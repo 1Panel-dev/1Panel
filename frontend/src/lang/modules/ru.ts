@@ -2811,6 +2811,8 @@ const message = {
         sni: 'Origin SNI',
         sniHelper:
             'Когда бэкенд обратного прокси использует HTTPS, может потребоваться установить origin SNI. Подробности см. в документации провайдера CDN.',
+        proxySslVerify: 'Verify Backend SSL Certificate',
+        proxySslVerifyHelper: 'When enabled, the proxy will strictly verify the upstream SSL certificate (disabled by default).',
         huaweicloud: 'Huawei Cloud',
         rcreateDb: 'Создать Базу Данных',
         enableSSLHelper: 'Неудача при включении SSL не повлияет на создание сайта.',
