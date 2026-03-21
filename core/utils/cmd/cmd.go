@@ -4,9 +4,36 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"os"
 	"os/exec"
 	"strings"
+	"sync"
 )
+
+var (
+	bashPathOnce  sync.Once
+	bashPathCache string
+)
+
+// BashPath returns the full path to bash, falling back to common locations
+// if "bash" is not found in $PATH. This fixes issues on minimal OS installs
+// (e.g., AlmaLinux) where bash may not be in the default PATH.
+func BashPath() string {
+	bashPathOnce.Do(func() {
+		if p, err := exec.LookPath("bash"); err == nil {
+			bashPathCache = p
+			return
+		}
+		for _, candidate := range []string{"/bin/bash", "/usr/bin/bash", "/usr/local/bin/bash"} {
+			if _, err := os.Stat(candidate); err == nil {
+				bashPathCache = candidate
+				return
+			}
+		}
+		bashPathCache = "bash"
+	})
+	return bashPathCache
+}
 
 func SudoHandleCmd() string {
 	cmd := exec.Command("sudo", "-n", "ls")
@@ -25,7 +52,7 @@ func Which(name string) bool {
 }
 
 func ExecWithStreamOutput(command string, outputCallback func(string)) error {
-	cmd := exec.Command("bash", "-c", command)
+	cmd := exec.Command(BashPath(), "-c", command)
 
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {

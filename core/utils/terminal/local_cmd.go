@@ -7,6 +7,7 @@ import (
 	"time"
 	"unsafe"
 
+	cmd2 "github.com/1Panel-dev/1Panel/core/utils/cmd"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/creack/pty"
 	"github.com/pkg/errors"
@@ -26,7 +27,7 @@ type LocalCommand struct {
 }
 
 func NewCommand(script string) (*LocalCommand, error) {
-	cmd := exec.Command("bash")
+	cmd := exec.Command(cmd2.BashPath())
 	if term := os.Getenv("TERM"); term != "" {
 		cmd.Env = append(os.Environ(), "TERM="+term)
 	} else {

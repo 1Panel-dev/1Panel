@@ -65,18 +65,18 @@ func (c *CommandHelper) Run(name string, arg ...string) error {
 }
 func (c *CommandHelper) RunBashCWithArgs(arg ...string) error {
 	arg = append([]string{"-c"}, arg...)
-	_, err := c.run("bash", arg...)
+	_, err := c.run(BashPath(), arg...)
 	return err
 }
 
 func (c *CommandHelper) RunBashC(command string) error {
-	if _, err := c.run("bash", "-c", command); err != nil {
+	if _, err := c.run(BashPath(), "-c", command); err != nil {
 		return err
 	}
 	return nil
 }
 func (c *CommandHelper) RunBashCf(command string, arg ...interface{}) error {
-	if _, err := c.run("bash", "-c", fmt.Sprintf(command, arg...)); err != nil {
+	if _, err := c.run(BashPath(), "-c", fmt.Sprintf(command, arg...)); err != nil {
 		return err
 	}
 	return nil
@@ -86,10 +86,10 @@ func (c *CommandHelper) RunWithStdout(name string, arg ...string) (string, error
 	return c.run(name, arg...)
 }
 func (c *CommandHelper) RunWithStdoutBashC(command string) (string, error) {
-	return c.run("bash", "-c", command)
+	return c.run(BashPath(), "-c", command)
 }
 func (c *CommandHelper) RunWithStdoutBashCf(command string, arg ...interface{}) (string, error) {
-	return c.run("bash", "-c", fmt.Sprintf(command, arg...))
+	return c.run(BashPath(), "-c", fmt.Sprintf(command, arg...))
 }
 
 func (c *CommandHelper) run(name string, arg ...string) (string, error) {
@@ -136,7 +136,7 @@ func (c *CommandHelper) run(name string, arg ...string) (string, error) {
 		cmd.Stdout = file
 		cmd.Stderr = file
 	} else if len(c.scriptPath) != 0 {
-		cmd = exec.Command("bash", c.scriptPath)
+		cmd = exec.Command(BashPath(), c.scriptPath)
 		cmd.Stdout = &stdout
 		cmd.Stderr = &stderr
 	} else {

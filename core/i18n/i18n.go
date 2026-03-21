@@ -8,6 +8,7 @@ import (
 	"sync/atomic"
 
 	"github.com/1Panel-dev/1Panel/core/app/repo"
+	cmd2 "github.com/1Panel-dev/1Panel/core/utils/cmd"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/gin-gonic/gin"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
@@ -209,7 +210,7 @@ func getLanguageFromDBInternal() string {
 	return lang
 }
 func getLanguageFrom1pctl() string {
-	cmd := exec.Command("bash", "-c", "grep '^LANGUAGE=' /usr/local/bin/1pctl | cut -d'=' -f2")
+	cmd := exec.Command(cmd2.BashPath(), "-c", "grep '^LANGUAGE=' /usr/local/bin/1pctl | cut -d'=' -f2")
 	stdout, err := cmd.CombinedOutput()
 	if err != nil {
 		panic(err)
