@@ -40,7 +40,7 @@ func NewClient(c ConnInfo) (*SSHClient, error) {
 		config.Auth = []gossh.AuthMethod{gossh.PublicKeys(signer)}
 	}
 	if c.DialTimeOut == 0 {
-		c.DialTimeOut = 5 * time.Second
+		c.DialTimeOut = 15 * time.Second
 	}
 	config.Timeout = c.DialTimeOut
 
