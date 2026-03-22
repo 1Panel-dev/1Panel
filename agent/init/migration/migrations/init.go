@@ -1133,3 +1133,10 @@ var AddAITerminalSettings = &gormigrate.Migration{
 		}).Error
 	},
 }
+
+var AddAgentRemark = &gormigrate.Migration{
+	ID: "20260322-add-agent-remark",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(&model.Agent{})
+	},
+}

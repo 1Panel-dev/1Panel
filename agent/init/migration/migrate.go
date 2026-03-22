@@ -76,6 +76,7 @@ func InitAgentDB() {
 		migrations.InitAgentAccountModelPool,
 		migrations.AddHostTable,
 		migrations.AddAITerminalSettings,
+		migrations.AddAgentRemark,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

@@ -336,6 +336,7 @@ func buildAgentItem(agent *model.Agent, appInstall *model.AppInstall, envMap map
 		AppInstallID:  agent.AppInstallID,
 		AccountID:     agent.AccountID,
 		ConfigPath:    agent.ConfigPath,
+		Remark:        agent.Remark,
 		CreatedAt:     agent.CreatedAt,
 	}
 	if appInstall != nil && appInstall.ID > 0 {

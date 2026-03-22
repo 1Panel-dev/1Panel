@@ -17,4 +17,5 @@ type Agent struct {
 	AppInstallID  uint   `json:"appInstallId"`
 	AccountID     uint   `json:"accountId"`
 	ConfigPath    string `json:"configPath"`
+	Remark        string `json:"remark"`
 }

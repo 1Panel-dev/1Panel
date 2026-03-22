@@ -118,6 +118,7 @@ const message = {
             operate: '操作',
             message: '信息',
             description: '描述',
+            remark: '备注',
             interval: '耗时',
             user: '用户',
             title: '标题',

@@ -72,6 +72,26 @@ func (b *BaseApi) DeleteAgent(c *gin.Context) {
 }
 
 // @Tags AI
+// @Summary Update Agent remark
+// @Accept json
+// @Param request body dto.AgentRemarkUpdateReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/remark/update [post]
+func (b *BaseApi) UpdateAgentRemark(c *gin.Context) {
+	var req dto.AgentRemarkUpdateReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := agentService.UpdateRemark(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags AI
 // @Summary Reset Agent token
 // @Accept json
 // @Param request body dto.AgentTokenResetReq true "request"

@@ -127,6 +127,7 @@ const message = {
             operate: 'Actions',
             message: 'Message',
             description: 'Description',
+            remark: 'Remark',
             interval: 'Interval',
             user: 'Owner',
             title: 'Title',

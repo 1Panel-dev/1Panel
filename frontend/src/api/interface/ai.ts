@@ -284,7 +284,13 @@ export namespace AI {
         path: string;
         configPath: string;
         upgradable: boolean;
+        remark: string;
         createdAt: string;
+    }
+
+    export interface AgentRemarkUpdateReq {
+        id: number;
+        remark: string;
     }
 
     export interface AgentDeleteReq {

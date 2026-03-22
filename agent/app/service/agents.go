@@ -26,6 +26,7 @@ type IAgentService interface {
 	Delete(req dto.AgentDeleteReq) error
 	ResetToken(req dto.AgentTokenResetReq) error
 	UpdateModelConfig(req dto.AgentModelConfigUpdateReq) error
+	UpdateRemark(req dto.AgentRemarkUpdateReq) error
 	GetProviders() ([]dto.ProviderInfo, error)
 	GetSecurityConfig(req dto.AgentSecurityConfigReq) (*dto.AgentSecurityConfig, error)
 	UpdateSecurityConfig(req dto.AgentSecurityConfigUpdateReq) error
@@ -275,6 +276,15 @@ func (a AgentService) Delete(req dto.AgentDeleteReq) error {
 		return err
 	}
 	return nil
+}
+
+func (a AgentService) UpdateRemark(req dto.AgentRemarkUpdateReq) error {
+	agent, err := agentRepo.GetFirst(repo.WithByID(req.ID))
+	if err != nil {
+		return err
+	}
+	agent.Remark = req.Remark
+	return agentRepo.Save(agent)
 }
 
 func (a AgentService) ResetToken(req dto.AgentTokenResetReq) error {

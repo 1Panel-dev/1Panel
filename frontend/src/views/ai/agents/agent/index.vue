@@ -97,6 +97,16 @@
                             <span v-else>-</span>
                         </template>
                     </el-table-column>
+                    <el-table-column :label="$t('commons.table.remark')" prop="remark" min-width="150">
+                        <template #default="{ row }">
+                            <el-input
+                                v-model="row.remark"
+                                size="small"
+                                :placeholder="$t('commons.table.remark')"
+                                @change="onRemarkChange(row)"
+                            />
+                        </template>
+                    </el-table-column>
                     <el-table-column
                         :label="$t('commons.table.date')"
                         prop="createdAt"
@@ -128,7 +138,7 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { pageAgents, resetAgentToken } from '@/api/modules/ai';
+import { pageAgents, resetAgentToken, updateAgentRemark } from '@/api/modules/ai';
 import { installedOp, searchApp, searchAppInstalled } from '@/api/modules/app';
 import { AI } from '@/api/interface/ai';
 import { App } from '@/api/interface/app';
@@ -348,6 +358,14 @@ const jumpWebUI = (row: AI.AgentItem) => {
 
 const onDelete = (row: AI.AgentItem) => {
     deleteRef.value?.acceptParams(row.id, row.name);
+};
+
+const onRemarkChange = async (row: AI.AgentItem) => {
+    try {
+        await updateAgentRemark({ id: row.id, remark: row.remark });
+    } catch (e) {
+        /* silent */
+    }
 };
 
 const onResetToken = async (row: AI.AgentItem) => {

@@ -50,6 +50,7 @@ type AgentItem struct {
 	Path          string    `json:"path"`
 	ConfigPath    string    `json:"configPath"`
 	Upgradable    bool      `json:"upgradable"`
+	Remark        string    `json:"remark"`
 	CreatedAt     time.Time `json:"createdAt"`
 }
 
@@ -61,6 +62,11 @@ type AgentDeleteReq struct {
 
 type AgentTokenResetReq struct {
 	ID uint `json:"id" validate:"required"`
+}
+
+type AgentRemarkUpdateReq struct {
+	ID     uint   `json:"id" validate:"required"`
+	Remark string `json:"remark"`
 }
 
 type AgentModelConfigUpdateReq struct {
