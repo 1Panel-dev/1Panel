@@ -90,6 +90,18 @@ const toolboxRouter = {
                     },
                 },
                 {
+                    path: 'net',
+                    name: 'NetTools',
+                    component: () => import('@/views/toolbox/net/index.vue'),
+                    hidden: true,
+                    meta: {
+                        parent: 'menu.toolbox',
+                        title: 'toolbox.net.title',
+                        activeMenu: '/toolbox',
+                        requiresAuth: false,
+                    },
+                },
+                {
                     path: 'clean',
                     name: 'Clean',
                     component: () => import('@/views/toolbox/clean/index.vue'),

@@ -1415,6 +1415,18 @@ const message = {
             dirHelper: '开启 FTP 需要修改目录权限，请谨慎选择',
             dirMsg: '开启 FTP 将修改整个 {0} 目录权限，是否继续？',
         },
+        net: {
+            title: '网络工具',
+            tool: '工具',
+            host: '主机 / URL',
+            run: '执行',
+            result: '结果',
+            waiting: '执行中...',
+            failed: '请求失败',
+            pingCount: '个数据包',
+            dnsLookup: 'DNS 查询',
+            httpCheck: 'HTTP 检测',
+        },
         clam: {
             clam: '病毒扫描',
             cron: '定时扫描',

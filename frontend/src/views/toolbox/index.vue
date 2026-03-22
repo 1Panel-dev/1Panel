@@ -77,5 +77,9 @@ const buttons = [
         label: 'Fail2ban',
         path: '/toolbox/fail2ban',
     },
+    {
+        label: i18n.global.t('toolbox.net.title'),
+        path: '/toolbox/net',
+    },
 ];
 </script>

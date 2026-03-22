@@ -1501,6 +1501,18 @@ const message = {
             dirHelper: 'Enabling FTP requires directory permission changes - please choose carefully',
             dirMsg: 'Enabling FTP will modify permissions for the entire {0} directory. Continue?',
         },
+        net: {
+            title: 'Network Tools',
+            tool: 'Tool',
+            host: 'Host / URL',
+            run: 'Run',
+            result: 'Result',
+            waiting: 'Running...',
+            failed: 'Request failed',
+            pingCount: 'packets',
+            dnsLookup: 'DNS Lookup',
+            httpCheck: 'HTTP Check',
+        },
         clam: {
             clam: 'Virus scan',
             cron: 'Scheduled scan',

@@ -77,5 +77,6 @@ var (
 	groupService     = service.NewIGroupService()
 	alertService     = service.NewIAlertService()
 
-	diskService = service.NewIDiskService()
+	diskService        = service.NewIDiskService()
+	toolboxNetService  = service.NewIToolboxNetService()
 )
