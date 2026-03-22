@@ -11,7 +11,7 @@
             label-position="left"
             label-width="90px"
             class="mt-5"
-            v-if="website.type === 'static' || website.type === 'runtime'"
+            v-if="website.type === 'static' || website.type === 'runtime' || website.type === 'proxy'"
         >
             <el-form-item :label="$t('website.changeDatabase')" prop="db">
                 <el-select v-model="req.db" class="w-full" @change="changeDB">
