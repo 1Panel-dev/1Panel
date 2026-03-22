@@ -58,8 +58,14 @@ func NewIMonitorService() IMonitorService {
 
 func (m *MonitorService) LoadMonitorData(req dto.MonitorSearch) ([]dto.MonitorData, error) {
 	loc, _ := time.LoadLocation(common.LoadTimeZoneByCmd())
-	req.StartTime = req.StartTime.In(loc)
-	req.EndTime = req.EndTime.In(loc)
+	if req.StartTime.Location() == time.UTC && loc != time.UTC {
+		req.StartTime = time.Date(req.StartTime.Year(), req.StartTime.Month(), req.StartTime.Day(),
+			req.StartTime.Hour(), req.StartTime.Minute(), req.StartTime.Second(), req.StartTime.Nanosecond(), loc)
+	}
+	if req.EndTime.Location() == time.UTC && loc != time.UTC {
+		req.EndTime = time.Date(req.EndTime.Year(), req.EndTime.Month(), req.EndTime.Day(),
+			req.EndTime.Hour(), req.EndTime.Minute(), req.EndTime.Second(), req.EndTime.Nanosecond(), loc)
+	}
 
 	var data []dto.MonitorData
 	if req.Param == "all" || req.Param == "cpu" || req.Param == "memory" || req.Param == "load" {
@@ -182,8 +188,14 @@ func (m *MonitorService) LoadGPUOptions() dto.MonitorGPUOptions {
 
 func (m *MonitorService) LoadGPUMonitorData(req dto.MonitorGPUSearch) (dto.MonitorGPUData, error) {
 	loc, _ := time.LoadLocation(common.LoadTimeZoneByCmd())
-	req.StartTime = req.StartTime.In(loc)
-	req.EndTime = req.EndTime.In(loc)
+	if req.StartTime.Location() == time.UTC && loc != time.UTC {
+		req.StartTime = time.Date(req.StartTime.Year(), req.StartTime.Month(), req.StartTime.Day(),
+			req.StartTime.Hour(), req.StartTime.Minute(), req.StartTime.Second(), req.StartTime.Nanosecond(), loc)
+	}
+	if req.EndTime.Location() == time.UTC && loc != time.UTC {
+		req.EndTime = time.Date(req.EndTime.Year(), req.EndTime.Month(), req.EndTime.Day(),
+			req.EndTime.Hour(), req.EndTime.Minute(), req.EndTime.Second(), req.EndTime.Nanosecond(), loc)
+	}
 	var data dto.MonitorGPUData
 	gpuList, err := monitorRepo.GetGPU(repo.WithByCreatedAt(req.StartTime, req.EndTime), monitorRepo.WithByProductName(req.ProductName))
 	if err != nil {
