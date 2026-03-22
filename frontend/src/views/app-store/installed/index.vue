@@ -365,7 +365,7 @@ const buttons = [
         },
         disabled: (row: any) => {
             return (
-                row.status !== 'Running' ||
+                (row.status !== 'Running' && row.status !== 'ReStarting') ||
                 row.status === 'DownloadErr' ||
                 row.status === 'Upgrading' ||
                 row.status === 'Rebuilding' ||
