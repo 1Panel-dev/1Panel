@@ -442,11 +442,19 @@ func stepBackupContainerMounts(backupCtx *containerBackupContext) error {
 			}
 			if sourceInfo.IsDir() {
 				if err := backupCtx.fileOp.CopyDirWithNewName(item.Source, dataDir, "."); err != nil {
-					return err
+					mountMeta.Status = "failed"
+					mountMeta.Message = fmt.Sprintf("copy dir failed: %v", err)
+					backupCtx.meta.Mounts = append(backupCtx.meta.Mounts, mountMeta)
+					global.LOG.Errorf("container backup: skip mount %s, copy dir failed: %v", item.Source, err)
+					continue
 				}
 			} else {
 				if err := backupCtx.fileOp.CopyFile(item.Source, dataDir); err != nil {
-					return err
+					mountMeta.Status = "failed"
+					mountMeta.Message = fmt.Sprintf("copy file failed: %v", err)
+					backupCtx.meta.Mounts = append(backupCtx.meta.Mounts, mountMeta)
+					global.LOG.Errorf("container backup: skip mount %s, copy file failed: %v", item.Source, err)
+					continue
 				}
 			}
 
