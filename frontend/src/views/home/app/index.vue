@@ -156,17 +156,28 @@
                                     </div>
                                 </div>
                             </el-col>
-                            <el-col :span="1">
+                            <el-col :span="1" v-if="!app.detail || app.detail.length === 0">
                                 <el-button
                                     class="h-app-button"
                                     type="primary"
                                     plain
                                     round
                                     size="small"
-                                    :disabled="app.limit == 1 && app.detail && app.detail.length !== 0"
                                     @click="goInstall(app.key, app.appType)"
                                 >
                                     {{ $t('commons.button.install') }}
+                                </el-button>
+                            </el-col>
+                            <el-col :span="1" v-else-if="app.limit !== 1">
+                                <el-button
+                                    class="h-app-button"
+                                    type="primary"
+                                    plain
+                                    round
+                                    size="small"
+                                    @click="goInstall(app.key, app.appType)"
+                                >
+                                    <el-icon><Plus /></el-icon>
                                 </el-button>
                             </el-col>
                         </el-row>
