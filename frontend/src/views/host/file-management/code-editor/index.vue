@@ -568,18 +568,25 @@ const removeTab = (targetPath: TabPaneName) => {
             .then(() => {
                 updateTabs();
                 saveContent();
-                getContent(selectTab.value, '');
+                saveTabsToStorage();
+                if (fileTabs.value.length > 0) {
+                    getContent(selectTab.value, '');
+                }
             })
             .catch(() => {
                 updateTabs();
                 isEdit.value = false;
+                saveTabsToStorage();
                 if (fileTabs.value.length > 0) {
                     getContent(selectTab.value, '');
                 }
             });
     } else {
         updateTabs();
-        getContent(selectTab.value, '');
+        saveTabsToStorage();
+        if (fileTabs.value.length > 0) {
+            getContent(selectTab.value, '');
+        }
     }
 };
 
@@ -613,6 +620,7 @@ const removeAllTab = (targetPath: string, type: 'left' | 'right' | 'all') => {
     const onConfirm = () => {
         updateTabs();
         saveContent();
+        saveTabsToStorage();
     };
 
     const onCancel = () => {
@@ -622,6 +630,7 @@ const removeAllTab = (targetPath: string, type: 'left' | 'right' | 'all') => {
         isEdit.value = false;
         isCreate.value = 'none';
         updateTabs();
+        saveTabsToStorage();
     };
 
     if (isEdit.value) {
@@ -635,6 +644,7 @@ const removeAllTab = (targetPath: string, type: 'left' | 'right' | 'all') => {
             .catch(onCancel);
     } else {
         updateTabs();
+        saveTabsToStorage();
         if (type === 'all') editor.dispose();
         else getContent(activeName, '');
     }

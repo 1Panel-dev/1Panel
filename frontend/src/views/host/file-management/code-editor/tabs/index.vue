@@ -2,17 +2,14 @@
     <el-tabs
         v-model="currentTab"
         type="card"
-        :closable="props.fileTabs.length > 1"
+        :closable="props.fileTabs.length >= 1"
         class="monaco-editor monaco-editor-background"
         @tab-remove="props.onRemoveTab"
         @tab-change="props.onChangeTab"
     >
         <el-tab-pane v-for="item in props.fileTabs" :key="item.path" :name="item.path">
             <template #label>
-                <el-tooltip v-if="props.fileTabs.length == 1" :content="item.path" placement="bottom-start">
-                    <span>{{ item.name }}</span>
-                </el-tooltip>
-                <template v-if="props.fileTabs.length > 1">
+                <template v-if="props.fileTabs.length >= 1">
                     <el-dropdown
                         size="small"
                         :id="item.path"
@@ -58,7 +55,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 
 interface FileTabs {
     path: string;
