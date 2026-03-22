@@ -3,12 +3,12 @@ package i18n
 import (
 	"embed"
 	"fmt"
+	"os"
 	"os/exec"
 	"strings"
 	"sync/atomic"
 
 	"github.com/1Panel-dev/1Panel/core/app/repo"
-	cmd2 "github.com/1Panel-dev/1Panel/core/utils/cmd"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/gin-gonic/gin"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
@@ -210,7 +210,18 @@ func getLanguageFromDBInternal() string {
 	return lang
 }
 func getLanguageFrom1pctl() string {
-	cmd := exec.Command(cmd2.BashPath(), "-c", "grep '^LANGUAGE=' /usr/local/bin/1pctl | cut -d'=' -f2")
+	bashBin := "bash"
+	if p, err := exec.LookPath("bash"); err == nil {
+		bashBin = p
+	} else {
+		for _, candidate := range []string{"/bin/bash", "/usr/bin/bash"} {
+			if _, err := os.Stat(candidate); err == nil {
+				bashBin = candidate
+				break
+			}
+		}
+	}
+	cmd := exec.Command(bashBin, "-c", "grep '^LANGUAGE=' /usr/local/bin/1pctl | cut -d'=' -f2")
 	stdout, err := cmd.CombinedOutput()
 	if err != nil {
 		panic(err)
