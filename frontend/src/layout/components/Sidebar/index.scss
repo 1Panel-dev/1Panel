@@ -38,6 +38,7 @@
         }
     }
     .el-sub-menu {
+        margin: 7px 0;
         &.is-active {
             .el-sub-menu__title {
                 span {
@@ -52,7 +53,7 @@
         .el-sub-menu__title {
             background-color: var(--el-menu-item-bg-color);
             box-shadow: 0 0 4px rgba(0, 94, 235, 0.1);
-            margin-top: 7px;
+            margin: 0;
             height: 42px;
             line-height: 42px;
             border-radius: 4px;
