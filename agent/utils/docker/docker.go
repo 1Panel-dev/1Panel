@@ -104,9 +104,16 @@ func (c Client) ListAllContainers() ([]container.Summary, error) {
 }
 
 func (c Client) CreateNetwork(name string) error {
+	enableIPv6 := true
 	_, err := c.cli.NetworkCreate(context.Background(), name, network.CreateOptions{
 		Driver:     "bridge",
-		EnableIPv6: new(bool),
+		EnableIPv6: &enableIPv6,
+		IPAM: &network.IPAM{
+			Config: []network.IPAMConfig{
+				{Subnet: "172.18.0.0/16", Gateway: "172.18.0.1"},
+				{Subnet: "fd00:1panel::/64", Gateway: "fd00:1panel::1"},
+			},
+		},
 	})
 	return err
 }
