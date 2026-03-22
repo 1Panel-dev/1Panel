@@ -363,7 +363,7 @@ const iniTerm = () => {
         cursorBlink: true,
         cursorStyle: 'block',
         scrollback: 1000,
-        scrollSensitivity: 15,
+        scrollSensitivity: 5,
     });
     term.value.open(terminalElement.value);
     applyPreviewBackground();
@@ -415,7 +415,7 @@ const onSetDefault = () => {
     form.cursorBlink = 'Enable';
     form.cursorStyle = 'block';
     form.scrollback = 1000;
-    form.scrollSensitivity = 6;
+    form.scrollSensitivity = 5;
 
     changeItem();
 };

@@ -747,6 +747,11 @@ const onLoadCurrentInfo = async () => {
     currentInfo.value.timeSinceUptime = res.data.timeSinceUptime;
 
     let timeInterval = Number(res.data.uptime - currentInfo.value.uptime) || 3;
+    if (skipNextChart.value || timeInterval > 10) {
+        skipNextChart.value = false;
+        currentInfo.value = res.data;
+        return;
+    }
     currentChartInfo.netBytesSent =
         res.data.netBytesSent - currentInfo.value.netBytesSent > 0
             ? Number(((res.data.netBytesSent - currentInfo.value.netBytesSent) / 1024 / timeInterval).toFixed(2))
@@ -982,7 +987,11 @@ const loadSource = (row: any) => {
     );
 };
 
+const skipNextChart = ref(false);
 const onFocus = () => {
+    if (!isActive.value) {
+        skipNextChart.value = true;
+    }
     isActive.value = true;
 };
 const onBlur = () => {
