@@ -131,6 +131,8 @@ func (u *CronjobService) loadTask(cronjob *model.Cronjob, record *model.JobRecor
 		err = u.handleDirectory(*cronjob, record.StartTime, taskItem)
 	case "log":
 		err = u.handleSystemLog(*cronjob, record.StartTime, taskItem)
+	case "compose":
+		err = u.handleCompose(*cronjob, record.StartTime, taskItem)
 	case "syncIpGroup":
 		u.handleSyncIpGroup(*cronjob, taskItem)
 	case "cleanLog":
@@ -479,7 +481,7 @@ func (u *CronjobService) removeExpiredLog(cronjob model.Cronjob) {
 }
 
 func hasBackup(cronjobType string) bool {
-	return cronjobType == "app" || cronjobType == "database" || cronjobType == "website" || cronjobType == "directory" || cronjobType == "snapshot" || cronjobType == "log" || cronjobType == "cutWebsiteLog"
+	return cronjobType == "app" || cronjobType == "database" || cronjobType == "website" || cronjobType == "directory" || cronjobType == "snapshot" || cronjobType == "log" || cronjobType == "cutWebsiteLog" || cronjobType == "compose"
 }
 
 func handleCronJobAlert(cronjob *model.Cronjob) {

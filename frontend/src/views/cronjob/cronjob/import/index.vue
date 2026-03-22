@@ -173,6 +173,7 @@ const checkDataFormat = (item: any) => {
         'clean',
         'snapshot',
         'ntp',
+        'compose',
     ];
     if (!item.type || cronjobTypes.indexOf(item.type) === -1) {
         return false;

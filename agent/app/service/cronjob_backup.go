@@ -357,6 +357,82 @@ func (u *CronjobService) handleSnapshot(cronjob model.Cronjob, jobRecord model.J
 	return nil
 }
 
+func (u *CronjobService) handleCompose(cronjob model.Cronjob, startTime time.Time, taskItem *task.Task) error {
+	composeNames := loadComposesForJob(cronjob)
+	if len(composeNames) == 0 {
+		addSkipTask("Compose", taskItem)
+		return nil
+	}
+	accountMap := NewBackupClientMap(strings.Split(cronjob.SourceAccountIDs, ","))
+	if !accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].isOk {
+		return buserr.New(i18n.GetMsgWithDetail("LoadBackupFailed", accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].message))
+	}
+	for _, composeName := range composeNames {
+		retry := 0
+		taskItem.AddSubTaskWithOps(task.GetTaskName(composeName, task.TaskBackup, task.TaskScopeCronjob), func(t *task.Task) error {
+			var record model.BackupRecord
+			record.Status = constant.StatusSuccess
+			record.From = "cronjob"
+			record.Type = "compose"
+			record.CronjobID = cronjob.ID
+			record.Name = composeName
+			record.DetailName = composeName
+			record.DownloadAccountID, record.SourceAccountIDs = cronjob.DownloadAccountID, cronjob.SourceAccountIDs
+			backupDir := path.Join(global.Dir.LocalBackupDir, fmt.Sprintf("tmp/compose/%s", composeName))
+			record.FileName = simplifiedFileName(fmt.Sprintf("compose_%s_%s.tar.gz", composeName, startTime.Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(5)))
+
+			req := dto.CommonBackup{
+				Type: "compose",
+				Name: composeName,
+			}
+			if err := handleComposeBackup(req, t, 0, backupDir, record.FileName); err != nil {
+				if retry < int(cronjob.RetryTimes) || !cronjob.IgnoreErr {
+					retry++
+					return err
+				} else {
+					t.Log(i18n.GetMsgWithDetail("IgnoreBackupErr", err.Error()))
+					cleanAccountMap(accountMap)
+					return nil
+				}
+			}
+			src := path.Join(backupDir, record.FileName)
+			dst := strings.TrimPrefix(src, global.Dir.LocalBackupDir+"/tmp/")
+			if err := uploadWithMap(*t, accountMap, src, dst, cronjob.SourceAccountIDs, cronjob.DownloadAccountID, cronjob.RetryTimes); err != nil {
+				if retry < int(cronjob.RetryTimes) || !cronjob.IgnoreErr {
+					retry++
+					return err
+				}
+				t.Log(i18n.GetMsgWithDetail("IgnoreUploadErr", err.Error()))
+				cleanAccountMap(accountMap)
+				return nil
+			}
+			record.FileDir = path.Dir(dst)
+			if err := backupRepo.CreateRecord(&record); err != nil {
+				global.LOG.Errorf("save compose backup record failed, err: %v", err)
+				return err
+			}
+			u.removeExpiredBackup(cronjob, accountMap, record)
+			cleanAccountMap(accountMap)
+			return nil
+		}, nil, int(cronjob.RetryTimes), time.Duration(cronjob.Timeout)*time.Second)
+	}
+	return nil
+}
+
+func loadComposesForJob(cronjob model.Cronjob) []string {
+	if cronjob.AppID == "all" {
+		records, _ := composeRepo.ListRecord()
+		var names []string
+		for _, record := range records {
+			if record.Name != "" {
+				names = append(names, record.Name)
+			}
+		}
+		return names
+	}
+	return strings.Split(cronjob.AppID, ",")
+}
+
 func loadAppsForJob(cronjob model.Cronjob) []model.AppInstall {
 	var apps []model.AppInstall
 	if cronjob.AppID == "all" {
