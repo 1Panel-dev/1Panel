@@ -10,7 +10,7 @@
         <template #content>
             <el-form label-position="top">
                 <el-form-item>
-                    <div class="path-breadcrumb">
+                    <div class="path-breadcrumb" v-if="!editingPath">
                         <el-breadcrumb separator="/">
                             <el-breadcrumb-item>
                                 <el-link type="primary" @click="navigateToPath('/')">
@@ -23,6 +23,29 @@
                                 </el-link>
                             </el-breadcrumb-item>
                         </el-breadcrumb>
+                        <el-button link type="primary" class="ml-2" @click="startEditPath">
+                            <el-icon><Edit /></el-icon>
+                        </el-button>
+                    </div>
+                    <div v-else class="path-input-row">
+                        <el-input
+                            ref="pathInputRef"
+                            v-model="editPathValue"
+                            size="default"
+                            placeholder="/"
+                            @keyup.enter="submitPath"
+                            @keyup.escape="cancelEditPath"
+                        >
+                            <template #prefix>
+                                <el-icon><FolderOpened /></el-icon>
+                            </template>
+                        </el-input>
+                        <el-button type="primary" size="default" class="ml-2" @click="submitPath">
+                            {{ $t('commons.button.confirm') }}
+                        </el-button>
+                        <el-button size="default" @click="cancelEditPath">
+                            {{ $t('commons.button.cancel') }}
+                        </el-button>
                     </div>
                     <el-upload ref="uploadRef" :auto-upload="false" :show-file-list="false" :on-change="onUploadChange">
                         <el-button class="mt-2" :loading="uploading" type="primary" plain>
@@ -103,7 +126,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
+import { computed, nextTick, ref } from 'vue';
 import {
     deleteContainerFile,
     downloadContainerFile,
@@ -115,7 +138,7 @@ import {
 import { MsgError, MsgSuccess, MsgWarning } from '@/utils/message';
 import i18n from '@/lang';
 import { ElMessageBox, UploadFile, UploadInstance } from 'element-plus';
-import { Document, FolderOpened, HomeFilled } from '@element-plus/icons-vue';
+import { Document, Edit, FolderOpened, HomeFilled } from '@element-plus/icons-vue';
 import { computeSize2 } from '@/utils/util';
 
 const visible = ref(false);
@@ -130,6 +153,28 @@ const previewTitle = ref('');
 const previewContent = ref('');
 const previewTruncated = ref(false);
 const selectedRows = ref<any[]>([]);
+const editingPath = ref(false);
+const editPathValue = ref('');
+const pathInputRef = ref();
+
+const startEditPath = () => {
+    editPathValue.value = filePath.value;
+    editingPath.value = true;
+    nextTick(() => {
+        pathInputRef.value?.focus();
+    });
+};
+
+const submitPath = () => {
+    const path = editPathValue.value.trim() || '/';
+    editingPath.value = false;
+    filePath.value = path;
+    loadContainerFiles();
+};
+
+const cancelEditPath = () => {
+    editingPath.value = false;
+};
 const pathSegments = computed(() => {
     const parts = filePath.value.split('/').filter((item) => item);
     return parts.map((name, index) => ({
@@ -330,6 +375,14 @@ defineExpose({
     border: 1px solid var(--el-border-color);
     border-radius: 4px;
     overflow-x: auto;
+    display: flex;
+    align-items: center;
+}
+
+.path-input-row {
+    display: flex;
+    align-items: center;
+    width: 100%;
 }
 
 .preview-content {
