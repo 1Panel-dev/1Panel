@@ -406,7 +406,11 @@ const loadSubmitCheck = (data: any) => {
             loadSubmitCheck(item.children);
             continue;
         }
-        if (item.isCheck && item.type !== 'app_tmp_download') {
+        if (item.isCheck && item.type === 'upgrade' && !item.children) {
+            submitCleans.value.push({ treeType: item.type, name: item.name, size: item.size });
+            continue;
+        }
+        if (item.isCheck && item.type !== 'app_tmp_download' && item.type !== 'upgrade') {
             submitCleans.value.push({ treeType: item.type, name: item.name, size: item.size });
             continue;
         }
