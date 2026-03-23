@@ -2322,6 +2322,7 @@ func (w WebsiteService) ExecComposer(req request.ExecComposerReq) error {
 	} else {
 		command = req.ExtCommand
 	}
+	command = strings.TrimSpace(command)
 	resourceName := fmt.Sprintf("composer %s", command)
 	composerTask, err := task.NewTaskWithOps(resourceName, task.TaskExec, req.Command, req.TaskID, website.ID)
 	if err != nil {
