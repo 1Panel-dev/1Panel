@@ -999,6 +999,11 @@ func ZipFile(files []archiver.File, dst afero.File) error {
 }
 
 func (f FileOp) DecompressGzFile(srcFile, dst string) error {
+	var archiveModTime time.Time
+	if st, err := f.Fs.Stat(srcFile); err == nil {
+		archiveModTime = st.ModTime()
+	}
+
 	in, err := f.Fs.Open(srcFile)
 	if err != nil {
 		return fmt.Errorf("open source file failed: %w", err)
@@ -1030,8 +1035,8 @@ func (f FileOp) DecompressGzFile(srcFile, dst string) error {
 		return fmt.Errorf("copy content failed: %w", err)
 	}
 
-	if !gr.ModTime.IsZero() {
-		_ = os.Chtimes(outPath, gr.ModTime, gr.ModTime)
+	if !archiveModTime.IsZero() {
+		_ = os.Chtimes(outPath, archiveModTime, archiveModTime)
 	}
 
 	return nil
