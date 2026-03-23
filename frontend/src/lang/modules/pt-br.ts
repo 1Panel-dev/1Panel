@@ -710,6 +710,12 @@ const message = {
             otherTab: 'Other',
             timeZone: 'Fuso horário',
             browserEnabled: 'Browser Enabled',
+            npmRegistry: 'NPM Registry',
+            npmRegistryHelper:
+                'Used for OpenClaw plugin installation. You can choose a preset registry or enter a custom one.',
+            npmRegistryInvalid: 'Enter a valid NPM registry URL starting with http:// or https://',
+            pluginInstallNPMRegistryHelper:
+                'Go to Settings -> Other to configure the NPM registry and speed up plugin installation',
             switchModelSuccess: 'Model switched successfully',
             channelsTab: 'Channels',
             weixin: 'Weixin',

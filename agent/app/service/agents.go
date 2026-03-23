@@ -7,6 +7,7 @@ import (
 	"path"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
@@ -16,6 +17,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 	"gorm.io/gorm"
 )
@@ -73,6 +75,7 @@ const (
 	openclawAllowedOriginHost     = "127.0.0.1"
 	openclawHTTPSVersion          = "2026.3.13"
 	openclawTrustedProxyLoopback  = "127.0.0.1/32"
+	defaultOpenclawNPMRegistry    = "https://registry.npmjs.org/"
 )
 
 func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
@@ -669,7 +672,7 @@ func (a AgentService) UpdateSecurityConfig(req dto.AgentSecurityConfigUpdateReq)
 }
 
 func (a AgentService) GetOtherConfig(req dto.AgentOtherConfigReq) (*dto.AgentOtherConfig, error) {
-	agent, _, err := a.loadAgentAndInstall(req.AgentID)
+	agent, install, err := a.loadAgentAndInstall(req.AgentID)
 	if err != nil {
 		return nil, err
 	}
@@ -678,11 +681,15 @@ func (a AgentService) GetOtherConfig(req dto.AgentOtherConfigReq) (*dto.AgentOth
 		return nil, err
 	}
 	result := extractOtherConfig(conf)
+	npmRegistry, err := getOpenclawNPMRegistry(install.ContainerName)
+	if err == nil {
+		result.NPMRegistry = npmRegistry
+	}
 	return &result, nil
 }
 
 func (a AgentService) UpdateOtherConfig(req dto.AgentOtherConfigUpdateReq) error {
-	agent, _, err := a.loadAgentAndInstall(req.AgentID)
+	agent, install, err := a.loadAgentAndInstall(req.AgentID)
 	if err != nil {
 		return err
 	}
@@ -697,7 +704,23 @@ func (a AgentService) UpdateOtherConfig(req dto.AgentOtherConfigUpdateReq) error
 	if err := writeOpenclawConfigRaw(agent.ConfigPath, conf); err != nil {
 		return err
 	}
-	return nil
+	return setOpenclawNPMRegistry(install.ContainerName, req.NPMRegistry)
+}
+
+func getOpenclawNPMRegistry(containerName string) (string, error) {
+	registry, err := cmd.RunDefaultWithStdoutBashCfAndTimeOut("docker exec %s npm get registry", 20*time.Second, containerName)
+	if err != nil {
+		return "", err
+	}
+	registry = strings.TrimSpace(registry)
+	if registry == "" {
+		return defaultOpenclawNPMRegistry, nil
+	}
+	return registry, nil
+}
+
+func setOpenclawNPMRegistry(containerName, registry string) error {
+	return cmd.RunDefaultBashCf("docker exec %s npm set registry %q", containerName, registry)
 }
 
 func (a AgentService) loadAgentAndInstall(agentID uint) (*model.Agent, *model.AppInstall, error) {
