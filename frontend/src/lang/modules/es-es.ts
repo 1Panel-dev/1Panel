@@ -2834,6 +2834,9 @@ const message = {
         sni: 'SNI de origen',
         sniHelper:
             'Cuando el backend proxy es HTTPS, puede ser necesario configurar el SNI. Consulta la doc del proveedor CDN.',
+        proxySslVerify: 'Verificar certificado SSL del backend',
+        proxySslVerifyHelper:
+            'Si está activada, el proxy verificará estrictamente el certificado SSL del servidor de origen (desactivada por defecto).',
         huaweicloud: 'Huawei Cloud',
         createDb: 'Crear base de datos',
         enableSSLHelper: 'Si falla, no afectará la creación del sitio',

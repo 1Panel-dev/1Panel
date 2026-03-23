@@ -2596,6 +2596,8 @@ const message = {
         website404Helper: '網站 404 錯誤頁僅支援 PHP 執行環境網站和靜態網站',
         sni: '回源 SNI',
         sniHelper: '反代後端為 https 的時候可能需要設定回源 SNI，詳細需要看 CDN 服務商檔案',
+        proxySslVerify: '校驗後端 SSL 憑證',
+        proxySslVerifyHelper: '開啟後，反向代理 HTTPS 後端時將嚴格校驗伺服器憑證（預設不校驗）',
         huaweicloud: '華為雲',
         createDb: '建立資料庫',
         enableSSLHelper: '開啟失敗不會影響網站建立',

@@ -2755,6 +2755,8 @@ const message = {
         sni: '원본 SNI',
         sniHelper:
             '역방향 프록시 백엔드가 HTTPS 인 경우 원본 SNI 를 설정해야 할 수 있습니다. 자세한 내용은 CDN 서비스 제공자의 문서를 참조하세요.',
+        proxySslVerify: '백엔드 SSL 인증서 검증',
+        proxySslVerifyHelper: '활성화하면 프록시가 업스트림 SSL 인증서를 엄격하게 검증합니다(기본값은 비활성화).',
         huaweicloud: '화웨이 클라우드',
         createDb: '데이터베이스 생성',
         enableSSLHelper: 'SSL 활성화 실패는 웹사이트 생성에 영향을 미치지 않습니다.',

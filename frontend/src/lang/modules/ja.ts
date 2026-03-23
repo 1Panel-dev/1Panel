@@ -2821,6 +2821,8 @@ const message = {
         sni: '起源は悲しい',
         sniHelper:
             '逆プロキシバックエンドがHTTPSの場合、Origin SNIを設定する必要がある場合があります。詳細については、CDNサービスプロバイダーのドキュメントを参照してください。',
+        proxySslVerify: 'バックエンド SSL 証明書を検証',
+        proxySslVerifyHelper: '有効にすると、プロキシは上流の SSL 証明書を厳格に検証します（既定では無効）。',
         huaweicloud: 'huaweiCloud',
         createDb: 'データベースを作成',
         enableSSLHelper: 'SSLの有効化に失敗しても、ウェブサイトの作成には影響しません。',
