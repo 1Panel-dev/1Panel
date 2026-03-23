@@ -1422,8 +1422,7 @@ const message = {
         aiAddRiskCommand: '危険コマンドを追加',
         aiRemoveRiskCommand: '削除',
         aiSummary: '行が {0} プレフィックスで始まり Enter を押すと、AI コマンド生成がトリガーされます。',
-        aiPrefixAsciiVisible:
-            'ASCII の表示可能文字のみ対応しています。スペース、CJK 文字、全角記号は使用できません。',
+        aiPrefixAsciiVisible: 'ASCII の表示可能文字のみ対応しています。スペース、CJK 文字、全角記号は使用できません。',
         saveHelper: '現在のターミナル設定を保存してもよろしいですか？',
     },
     toolbox: {

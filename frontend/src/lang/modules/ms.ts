@@ -1435,7 +1435,8 @@ const message = {
             'Arahan yang dijana dan sepadan dengan mana-mana fragmen ini akan disekat dan diisi semula sebagai komen. Biarkan kosong untuk mematikan pencegatan. Menyokong tambah, ubah suai dan padam.',
         aiAddRiskCommand: 'Tambah arahan berisiko',
         aiRemoveRiskCommand: 'Padam',
-        aiSummary: 'Apabila baris bermula dengan awalan {0} dan anda menekan Enter, penjanaan arahan AI akan dicetuskan.',
+        aiSummary:
+            'Apabila baris bermula dengan awalan {0} dan anda menekan Enter, penjanaan arahan AI akan dicetuskan.',
         aiPrefixAsciiVisible:
             'Hanya aksara ASCII yang kelihatan disokong. Ruang, aksara CJK dan simbol lebar penuh tidak dibenarkan.',
         saveHelper: 'Adakah anda pasti mahu menyimpan konfigurasi terminal semasa?',

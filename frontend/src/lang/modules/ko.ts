@@ -1396,8 +1396,7 @@ const message = {
         aiAddRiskCommand: '위험 명령 추가',
         aiRemoveRiskCommand: '삭제',
         aiSummary: '{0} 접두사로 시작하는 줄에서 Enter를 누르면 AI 명령 생성이 트리거됩니다.',
-        aiPrefixAsciiVisible:
-            'ASCII 표시 가능 문자만 지원합니다. 공백, CJK 문자 및 전각 기호는 사용할 수 없습니다.',
+        aiPrefixAsciiVisible: 'ASCII 표시 가능 문자만 지원합니다. 공백, CJK 문자 및 전각 기호는 사용할 수 없습니다.',
         saveHelper: '현재 터미널 설정을 저장하시겠습니까?',
     },
     toolbox: {
