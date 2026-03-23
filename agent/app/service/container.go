@@ -1189,7 +1189,7 @@ func (u *ContainerService) ListContainerFiles(req dto.ContainerFileReq) ([]dto.C
 	ctx := context.Background()
 	stat, err := cli.ContainerStatPath(ctx, req.ContainerID, req.Path)
 	if err != nil {
-		return nil, err
+		return nil, normalizeContainerFileError(err)
 	}
 	isDir := stat.Mode.IsDir()
 	isLink := stat.Mode&os.ModeSymlink != 0
@@ -1205,7 +1205,7 @@ func (u *ContainerService) ListContainerFiles(req dto.ContainerFileReq) ([]dto.C
 
 	output, err := runContainerCommand(cli, req.ContainerID, []string{"ls", "-1A", "--", req.Path})
 	if err != nil {
-		return nil, err
+		return nil, normalizeContainerFileError(err)
 	}
 	lines := strings.Split(strings.TrimSpace(output), "\n")
 	files := make([]dto.ContainerFileInfo, 0, len(lines))
@@ -1348,7 +1348,7 @@ func (u *ContainerService) GetContainerFileContent(req dto.ContainerFileReq) (*d
 
 	stat, err := cli.ContainerStatPath(context.Background(), req.ContainerID, req.Path)
 	if err != nil {
-		return nil, err
+		return nil, normalizeContainerFileError(err)
 	}
 	if stat.Mode.IsDir() {
 		return nil, fmt.Errorf("path %s is directory", req.Path)
@@ -1395,7 +1395,7 @@ func (u *ContainerService) GetContainerFileSize(req dto.ContainerFileReq) (int64
 
 	stat, err := cli.ContainerStatPath(context.Background(), req.ContainerID, req.Path)
 	if err != nil {
-		return 0, err
+		return 0, normalizeContainerFileError(err)
 	}
 	if !stat.Mode.IsDir() {
 		return stat.Size, nil
@@ -1428,7 +1428,7 @@ func (u *ContainerService) DownloadContainerFile(req dto.ContainerFileReq) (io.R
 	stat, err := cli.ContainerStatPath(ctx, req.ContainerID, req.Path)
 	if err != nil {
 		_ = cli.Close()
-		return nil, "", "", err
+		return nil, "", "", normalizeContainerFileError(err)
 	}
 
 	fileName := stat.Name
@@ -1472,6 +1472,17 @@ func (u *ContainerService) DownloadContainerFile(req dto.ContainerFileReq) (io.R
 		ReadCloser: fileStream,
 		onClose:    cli.Close,
 	}, fileName, "application/octet-stream", nil
+}
+
+func normalizeContainerFileError(err error) error {
+	if err == nil {
+		return nil
+	}
+	message := strings.ToLower(err.Error())
+	if strings.Contains(message, "no such file or directory") || strings.Contains(message, "not found") {
+		return buserr.New("ErrPathNotFound")
+	}
+	return err
 }
 
 func runContainerCommand(cli *client.Client, containerID string, command []string) (string, error) {
