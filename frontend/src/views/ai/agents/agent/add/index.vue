@@ -166,7 +166,7 @@ const setDefaultWebUIPort = () => {
 };
 
 const rules = reactive({
-    name: [Rules.requiredInput],
+    name: [Rules.appName],
     agentType: [Rules.requiredSelect],
     appVersion: [Rules.requiredSelect],
     webUIPort: [Rules.requiredInput],

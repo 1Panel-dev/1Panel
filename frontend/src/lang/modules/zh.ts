@@ -676,6 +676,7 @@ const message = {
             browserEnabled: '浏览器开关',
             switchModelSuccess: '模型切换成功',
             channelsTab: '频道',
+            weixin: '微信',
             wecom: '企业微信',
             dingtalk: '钉钉',
             feishu: '飞书',
@@ -707,6 +708,8 @@ const message = {
             feishuSaveSuccess: '保存成功',
             pairingCodeRequired: '请输入配对码',
             pairingApproveSuccess: '配对成功',
+            scanConnect: '扫码对接',
+            scanConnectHelper: '点击后将在任务日志中显示二维码，扫码确认后即可完成登录',
             customProviderHelper: '自定义模型供应商不验证账号是否可用',
         },
         model: {

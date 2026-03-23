@@ -193,6 +193,10 @@ export const updateAgentDingTalkConfig = (req: AI.AgentDingTalkConfigUpdateReq) 
     return http.post(`/ai/agents/channel/dingtalk/update`, req);
 };
 
+export const loginAgentWeixinChannel = (req: AI.AgentWeixinLoginReq) => {
+    return http.post(`/ai/agents/channel/weixin/login`, req);
+};
+
 export const getAgentQQBotConfig = (req: AI.AgentQQBotConfigReq) => {
     return http.post<AI.AgentQQBotConfig>(`/ai/agents/channel/qqbot/get`, req);
 };

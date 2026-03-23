@@ -27,13 +27,18 @@
                 <slot name="button"></slot>
             </span>
         </div>
-        <div class="log-container" ref="logContainer" @scroll="onScroll" :style="containerStyle">
+        <div
+            :class="['log-container', { 'task-mode': isTaskMode }]"
+            ref="logContainer"
+            @scroll="onScroll"
+            :style="containerStyle"
+        >
             <div class="log-spacer" :style="{ height: `${totalHeight}px` }"></div>
             <div class="log-viewport" :style="{ transform: `translateY(${offsetY}px)` }">
                 <div
                     v-for="(log, index) in visibleLogs"
                     :key="`${startIndex + index}-${log}`"
-                    class="log-item"
+                    :class="['log-item', { 'task-mode': isTaskMode }]"
                     :style="{ height: `${logHeight}px` }"
                 >
                     <hightlight :log="log" :type="config.colorMode ?? 'nginx'"></hightlight>
@@ -146,7 +151,8 @@ const isTailDisabled = ref();
 const firstLoading = ref(false);
 const logs = ref<string[]>([]);
 const logContainer = ref<HTMLElement | null>(null);
-const logHeight = 23;
+const isTaskMode = computed(() => props.config.colorMode === 'task');
+const logHeight = computed(() => (isTaskMode.value ? 16 : 23));
 const containerHeight = ref(500);
 const scrollTop = ref(0);
 const lastScrollTop = ref(0);
@@ -155,16 +161,16 @@ const totalPages = ref(0);
 let resizeObserver: ResizeObserver | null = null;
 const isEndOfFile = ref(false);
 
-const totalHeight = computed(() => logs.value.length * logHeight);
+const totalHeight = computed(() => logs.value.length * logHeight.value);
 
 const visibleCount = computed(() => {
     const buffer = 5;
-    return Math.ceil(containerHeight.value / logHeight) + buffer * 2;
+    return Math.ceil(containerHeight.value / logHeight.value) + buffer * 2;
 });
 
 const startIndex = computed(() => {
     const buffer = 5;
-    const index = Math.floor(scrollTop.value / logHeight) - buffer;
+    const index = Math.floor(scrollTop.value / logHeight.value) - buffer;
     return Math.max(0, index);
 });
 
@@ -177,7 +183,7 @@ const visibleLogs = computed(() => {
 });
 
 const offsetY = computed(() => {
-    return startIndex.value * logHeight;
+    return startIndex.value * logHeight.value;
 });
 
 const updateContainerHeight = () => {
@@ -333,7 +339,7 @@ const getContent = async (pre: boolean) => {
                 if (pre) {
                     if (readReq.page > 1) {
                         const addedLines = newLogs.length;
-                        const newScrollPosition = lastScrollTop.value + addedLines * logHeight;
+                        const newScrollPosition = lastScrollTop.value + addedLines * logHeight.value;
                         logContainer.value.scrollTop = newScrollPosition;
                     }
                 } else {
@@ -361,7 +367,7 @@ const getContent = async (pre: boolean) => {
     }
     if (logs.value && logs.value.length > 3000) {
         const removedCount = readReq.pageSize;
-        const currentScrollRatio = scrollTop.value / (logs.value.length * logHeight);
+        const currentScrollRatio = scrollTop.value / (logs.value.length * logHeight.value);
 
         if (pre) {
             logs.value.splice(logs.value.length - removedCount, removedCount);
@@ -373,8 +379,8 @@ const getContent = async (pre: boolean) => {
             logs.value.splice(0, removedCount);
             nextTick(() => {
                 if (logContainer.value) {
-                    const newScrollTop = currentScrollRatio * (logs.value.length * logHeight);
-                    logContainer.value.scrollTop = Math.max(0, newScrollTop - removedCount * logHeight);
+                    const newScrollTop = currentScrollRatio * (logs.value.length * logHeight.value);
+                    logContainer.value.scrollTop = Math.max(0, newScrollTop - removedCount * logHeight.value);
                 }
             });
             if (minPage.value > 1) {
@@ -495,6 +501,23 @@ defineExpose({ changeTail, onDownload, clearLog });
     color: #f5f5f5;
     box-sizing: border-box;
     white-space: nowrap;
+}
+
+.log-item.task-mode {
+    padding: 0 5px;
+    font-family: 'SFMono-Regular', 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 16px;
+    letter-spacing: 0;
+    font-variant-ligatures: none;
+}
+
+.log-container.task-mode :deep(.token),
+.log-container.task-mode :deep(.whitespace-pre) {
+    font-family: inherit;
+    line-height: inherit;
+    letter-spacing: inherit;
+    font-variant-ligatures: inherit;
 }
 
 .log-content {

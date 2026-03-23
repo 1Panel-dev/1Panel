@@ -681,6 +681,26 @@ func (b *BaseApi) UpdateAgentOtherConfig(c *gin.Context) {
 }
 
 // @Tags AI
+// @Summary Login Agent Weixin channel
+// @Accept json
+// @Param request body dto.AgentWeixinLoginReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/channel/weixin/login [post]
+func (b *BaseApi) LoginAgentWeixinChannel(c *gin.Context) {
+	var req dto.AgentWeixinLoginReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := agentService.LoginWeixinChannel(req); err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags AI
 // @Summary Approve Agent channel pairing code
 // @Accept json
 // @Param request body dto.AgentChannelPairingApproveReq true "request"

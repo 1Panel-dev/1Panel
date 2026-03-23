@@ -199,7 +199,7 @@ var catalog = map[string]Meta{
 			APIType:       "openai-completions",
 			ContextWindow: 256000,
 			MaxTokens:     8192,
-			Input:         []string{"text"},
+			Input:         []string{"text", "image"},
 		},
 		Models: []Model{
 			{ID: "kimi/kimi-k2.5", Name: "Kimi K2.5", Reasoning: true},
@@ -233,7 +233,7 @@ var catalog = map[string]Meta{
 			APIType:       "openai-completions",
 			ContextWindow: 256000,
 			MaxTokens:     8192,
-			Input:         []string{"text"},
+			Input:         []string{"text", "image"},
 		},
 		Models: []Model{
 			{ID: "openai/codex-mini-latest", Name: "Codex Mini", Reasoning: true},
@@ -270,7 +270,7 @@ var catalog = map[string]Meta{
 			APIType:       "openai-completions",
 			ContextWindow: 256000,
 			MaxTokens:     8192,
-			Input:         []string{"text"},
+			Input:         []string{"text", "image"},
 		},
 		Models: []Model{
 			{ID: "anthropic/claude-3-haiku-20240307", Name: "Claude 3 Haiku"},
@@ -290,7 +290,7 @@ var catalog = map[string]Meta{
 			APIType:       "openai-completions",
 			ContextWindow: 256000,
 			MaxTokens:     8192,
-			Input:         []string{"text"},
+			Input:         []string{"text", "image"},
 		},
 		Models: []Model{
 			{ID: "google/gemini-3-flash-preview", Name: "Gemini 3 Flash Preview", Reasoning: true},

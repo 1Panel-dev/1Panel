@@ -1,17 +1,6 @@
 <template>
     <el-form ref="formRef" :model="form" :rules="rules" label-position="top">
-        <el-alert
-            v-if="!form.installed"
-            type="warning"
-            :closable="false"
-            :title="t('aiTools.agents.pluginNotInstalled')"
-            class="mb-4"
-        />
-        <el-form-item>
-            <el-button v-if="!form.installed" type="primary" :loading="installing" @click="installPlugin">
-                {{ t('commons.button.install') }}
-            </el-button>
-        </el-form-item>
+        <PluginInstall :installed="installed" :installing="installing" @install="installPlugin" />
         <el-form-item :label="t('commons.table.status')">
             <el-switch v-model="form.enabled" />
         </el-form-item>
@@ -28,7 +17,7 @@
             <el-input v-model="form.secret" type="password" show-password />
         </el-form-item>
         <el-form-item>
-            <el-button type="primary" :loading="saving" :disabled="!form.installed" @click="saveChannel">
+            <el-button type="primary" :loading="saving" :disabled="!installed" @click="saveChannel">
                 {{ t('commons.button.save') }}
             </el-button>
         </el-form-item>
@@ -39,7 +28,7 @@
             <el-input v-model="pairingCode" :placeholder="t('aiTools.agents.pairingCodePlaceholder')" />
         </el-form-item>
         <el-form-item>
-            <el-button type="primary" :loading="approving" :disabled="!form.installed" @click="approvePairing">
+            <el-button type="primary" :loading="approving" :disabled="!installed" @click="approvePairing">
                 {{ t('aiTools.agents.approvePairing') }}
             </el-button>
         </el-form-item>
@@ -52,33 +41,28 @@ import { reactive, ref } from 'vue';
 import type { FormInstance } from 'element-plus';
 import { useI18n } from 'vue-i18n';
 import { AI } from '@/api/interface/ai';
-import {
-    approveAgentChannelPairing,
-    checkAgentPlugin,
-    getAgentWecomConfig,
-    installAgentPlugin,
-    updateAgentWecomConfig,
-} from '@/api/modules/ai';
+import { approveAgentChannelPairing, getAgentWecomConfig, updateAgentWecomConfig } from '@/api/modules/ai';
 import { MsgSuccess, MsgWarning } from '@/utils/message';
 import { Rules } from '@/global/form-rules';
-import { newUUID } from '@/utils/util';
 import TaskLog from '@/components/log/task/index.vue';
+import PluginInstall from './components/plugin-install.vue';
+import { useAgentPluginChannel } from './useAgentPluginChannel';
+
+type WecomForm = Omit<AI.AgentWecomConfig, 'installed'>;
 
 const { t } = useI18n();
 const saving = ref(false);
 const approving = ref(false);
-const installing = ref(false);
-const agentId = ref(0);
 const pairingCode = ref('');
 const formRef = ref<FormInstance>();
-const taskLogRef = ref();
+const { agentId, installed, installing, taskLogRef, checkPluginStatus, loadPlugin, installPlugin } =
+    useAgentPluginChannel('wecom');
 
-const form = reactive<AI.AgentWecomConfig>({
+const form = reactive<WecomForm>({
     enabled: true,
     dmPolicy: 'pairing',
     botId: '',
     secret: '',
-    installed: false,
 });
 
 const rules = reactive({
@@ -87,26 +71,17 @@ const rules = reactive({
     secret: [Rules.requiredInput],
 });
 
-const checkPluginStatus = async () => {
-    if (!agentId.value) {
-        return;
-    }
-    const res = await checkAgentPlugin({
-        agentId: agentId.value,
-        type: 'wecom',
-    });
-    form.installed = Boolean(res.data?.installed);
-};
-
 const load = async (id: number) => {
-    agentId.value = id;
+    await loadPlugin(id);
     pairingCode.value = '';
     const res = await getAgentWecomConfig({ agentId: id });
-    Object.assign(form, res.data || {});
+    form.enabled = res.data?.enabled ?? true;
+    form.dmPolicy = res.data?.dmPolicy || 'pairing';
+    form.botId = res.data?.botId || '';
+    form.secret = res.data?.secret || '';
     if (!form.dmPolicy) {
         form.dmPolicy = 'pairing';
     }
-    await checkPluginStatus();
 };
 
 const saveChannel = async () => {
@@ -148,24 +123,6 @@ const approvePairing = async () => {
         pairingCode.value = '';
     } finally {
         approving.value = false;
-    }
-};
-
-const installPlugin = async () => {
-    if (!agentId.value) {
-        return;
-    }
-    const taskID = newUUID();
-    installing.value = true;
-    try {
-        await installAgentPlugin({
-            agentId: agentId.value,
-            type: 'wecom',
-            taskID,
-        });
-        taskLogRef.value?.openWithTaskID(taskID);
-    } finally {
-        installing.value = false;
     }
 };
 

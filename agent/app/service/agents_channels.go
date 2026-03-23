@@ -152,11 +152,11 @@ func (a AgentService) UpdateDingTalkConfig(req dto.AgentDingTalkConfigUpdateReq)
 }
 
 func (a AgentService) InstallPlugin(req dto.AgentPluginInstallReq) error {
-	_, install, err := a.loadAgentAndInstall(req.AgentID)
+	agent, install, err := a.loadAgentAndInstall(req.AgentID)
 	if err != nil {
 		return err
 	}
-	spec, _, err := resolvePluginMeta(req.Type)
+	spec, pluginID, err := resolvePluginMeta(req.Type)
 	if err != nil {
 		return err
 	}
@@ -166,11 +166,40 @@ func (a AgentService) InstallPlugin(req dto.AgentPluginInstallReq) error {
 	}
 	installTask.AddSubTask("Install OpenClaw plugin", func(t *task.Task) error {
 		mgr := cmd.NewCommandMgr(cmd.WithTask(*t), cmd.WithContext(t.TaskCtx), cmd.WithTimeout(10*time.Minute))
-		return mgr.RunBashCf("docker exec %s openclaw plugins install %s", install.ContainerName, spec)
+		if err := mgr.RunBashCf("docker exec %s openclaw plugins install %s", install.ContainerName, spec); err != nil {
+			return err
+		}
+		conf, err := readOpenclawConfig(agent.ConfigPath)
+		if err != nil {
+			return err
+		}
+		appendPluginAllow(conf, pluginID)
+		return writeOpenclawConfigRaw(agent.ConfigPath, conf)
 	}, nil)
 	go func() {
 		if err := installTask.Execute(); err != nil {
 			global.LOG.Errorf("install openclaw plugin failed: %v", err)
+		}
+	}()
+	return nil
+}
+
+func (a AgentService) LoginWeixinChannel(req dto.AgentWeixinLoginReq) error {
+	_, install, err := a.loadAgentAndInstall(req.AgentID)
+	if err != nil {
+		return err
+	}
+	loginTask, err := task.NewTaskWithOps("weixin", task.TaskExec, task.TaskScopeAI, req.TaskID, req.AgentID)
+	if err != nil {
+		return err
+	}
+	loginTask.AddSubTask("Login OpenClaw Weixin channel", func(t *task.Task) error {
+		mgr := cmd.NewCommandMgr(cmd.WithTask(*t), cmd.WithContext(t.TaskCtx), cmd.WithTimeout(30*time.Minute))
+		return mgr.RunBashCf("docker exec %s openclaw channels login --channel openclaw-weixin", install.ContainerName)
+	}, nil)
+	go func() {
+		if err := loginTask.Execute(); err != nil {
+			global.LOG.Errorf("login openclaw weixin channel failed: %v", err)
 		}
 	}()
 	return nil
@@ -514,6 +543,31 @@ func setQQBotConfig(conf map[string]interface{}, config dto.AgentQQBotConfig) {
 	qqbotEntry["enabled"] = config.Enabled
 }
 
+func appendPluginAllow(conf map[string]interface{}, pluginID string) {
+	plugins := ensureChildMap(conf, "plugins")
+	allow := make([]string, 0, 4)
+	seen := map[string]struct{}{}
+	switch values := plugins["allow"].(type) {
+	case []interface{}:
+		for _, value := range values {
+			text, ok := value.(string)
+			if !ok || text == "" {
+				continue
+			}
+			if _, ok := seen[text]; ok {
+				continue
+			}
+			seen[text] = struct{}{}
+			allow = append(allow, text)
+		}
+	}
+	if _, ok := seen[pluginID]; ok {
+		plugins["allow"] = allow
+		return
+	}
+	plugins["allow"] = append(allow, pluginID)
+}
+
 func resolvePluginMeta(pluginType string) (string, string, error) {
 	switch pluginType {
 	case "qqbot":
@@ -522,6 +576,8 @@ func resolvePluginMeta(pluginType string) (string, string, error) {
 		return "@wecom/wecom-openclaw-plugin", "wecom-openclaw-plugin", nil
 	case "dingtalk":
 		return "@dingtalk-real-ai/dingtalk-connector", "dingtalk-connector", nil
+	case "weixin":
+		return "@tencent-weixin/openclaw-weixin", "openclaw-weixin", nil
 	default:
 		return "", "", fmt.Errorf("unsupported plugin type")
 	}

@@ -1,17 +1,6 @@
 <template>
     <el-form ref="formRef" :model="form" :rules="rules" label-position="top">
-        <el-alert
-            v-if="!form.installed"
-            type="warning"
-            :closable="false"
-            :title="t('aiTools.agents.pluginNotInstalled')"
-            class="mb-4"
-        />
-        <el-form-item>
-            <el-button v-if="!form.installed" type="primary" :loading="installing" @click="installPlugin">
-                {{ t('commons.button.install') }}
-            </el-button>
-        </el-form-item>
+        <PluginInstall :installed="installed" :installing="installing" @install="installPlugin" />
         <el-form-item :label="t('commons.table.status')">
             <el-switch v-model="form.enabled" />
         </el-form-item>
@@ -59,7 +48,7 @@
             <span class="input-help">{{ t('aiTools.agents.groupAllowFromHelper') }}</span>
         </el-form-item>
         <el-form-item>
-            <el-button type="primary" :loading="saving" :disabled="!form.installed" @click="saveChannel">
+            <el-button type="primary" :loading="saving" :disabled="!installed" @click="saveChannel">
                 {{ t('commons.button.save') }}
             </el-button>
         </el-form-item>
@@ -70,7 +59,7 @@
             <el-input v-model="pairingCode" :placeholder="t('aiTools.agents.pairingCodePlaceholder')" />
         </el-form-item>
         <el-form-item>
-            <el-button type="primary" :loading="approving" :disabled="!form.installed" @click="approvePairing">
+            <el-button type="primary" :loading="approving" :disabled="!installed" @click="approvePairing">
                 {{ t('aiTools.agents.approvePairing') }}
             </el-button>
         </el-form-item>
@@ -83,19 +72,14 @@ import { reactive, ref } from 'vue';
 import type { FormInstance, FormRules } from 'element-plus';
 import { useI18n } from 'vue-i18n';
 import { AI } from '@/api/interface/ai';
-import {
-    approveAgentChannelPairing,
-    checkAgentPlugin,
-    getAgentDingTalkConfig,
-    installAgentPlugin,
-    updateAgentDingTalkConfig,
-} from '@/api/modules/ai';
+import { approveAgentChannelPairing, getAgentDingTalkConfig, updateAgentDingTalkConfig } from '@/api/modules/ai';
 import { MsgSuccess, MsgWarning } from '@/utils/message';
 import { Rules } from '@/global/form-rules';
-import { newUUID } from '@/utils/util';
 import TaskLog from '@/components/log/task/index.vue';
+import PluginInstall from './components/plugin-install.vue';
+import { useAgentPluginChannel } from './useAgentPluginChannel';
 
-interface DingTalkForm extends AI.AgentDingTalkConfig {
+interface DingTalkForm extends Omit<AI.AgentDingTalkConfig, 'installed'> {
     allowFromText: string;
     groupAllowFromText: string;
 }
@@ -103,11 +87,10 @@ interface DingTalkForm extends AI.AgentDingTalkConfig {
 const { t } = useI18n();
 const saving = ref(false);
 const approving = ref(false);
-const installing = ref(false);
-const agentId = ref(0);
 const pairingCode = ref('');
 const formRef = ref<FormInstance>();
-const taskLogRef = ref();
+const { agentId, installed, installing, taskLogRef, checkPluginStatus, loadPlugin, installPlugin } =
+    useAgentPluginChannel('dingtalk');
 
 const form = reactive<DingTalkForm>({
     enabled: true,
@@ -117,7 +100,6 @@ const form = reactive<DingTalkForm>({
     allowFrom: [],
     groupPolicy: 'disabled',
     groupAllowFrom: [],
-    installed: false,
     allowFromText: '',
     groupAllowFromText: '',
 });
@@ -166,27 +148,19 @@ const rules = reactive<FormRules>({
     groupAllowFromText: [{ validator: validateGroupAllowFrom, trigger: 'blur' }],
 });
 
-const checkPluginStatus = async () => {
-    if (!agentId.value) {
-        return;
-    }
-    const res = await checkAgentPlugin({
-        agentId: agentId.value,
-        type: 'dingtalk',
-    });
-    form.installed = Boolean(res.data?.installed);
-};
-
 const load = async (id: number) => {
-    agentId.value = id;
+    await loadPlugin(id);
     pairingCode.value = '';
     const res = await getAgentDingTalkConfig({ agentId: id });
-    Object.assign(form, res.data || {});
-    form.dmPolicy = form.dmPolicy || 'pairing';
-    form.groupPolicy = form.groupPolicy || 'disabled';
+    form.enabled = res.data?.enabled ?? true;
+    form.clientId = res.data?.clientId || '';
+    form.clientSecret = res.data?.clientSecret || '';
+    form.dmPolicy = res.data?.dmPolicy || 'pairing';
+    form.allowFrom = res.data?.allowFrom || [];
+    form.groupPolicy = res.data?.groupPolicy || 'disabled';
+    form.groupAllowFrom = res.data?.groupAllowFrom || [];
     form.allowFromText = (res.data?.allowFrom || []).join('\n');
     form.groupAllowFromText = (res.data?.groupAllowFrom || []).join('\n');
-    await checkPluginStatus();
 };
 
 const saveChannel = async () => {
@@ -231,24 +205,6 @@ const approvePairing = async () => {
         pairingCode.value = '';
     } finally {
         approving.value = false;
-    }
-};
-
-const installPlugin = async () => {
-    if (!agentId.value) {
-        return;
-    }
-    const taskID = newUUID();
-    installing.value = true;
-    try {
-        await installAgentPlugin({
-            agentId: agentId.value,
-            type: 'dingtalk',
-            taskID,
-        });
-        taskLogRef.value?.openWithTaskID(taskID);
-    } finally {
-        installing.value = false;
     }
 };
 

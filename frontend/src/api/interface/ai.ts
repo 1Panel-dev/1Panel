@@ -499,6 +499,11 @@ export namespace AI {
         groupAllowFrom: string[];
     }
 
+    export interface AgentWeixinLoginReq {
+        agentId: number;
+        taskID: string;
+    }
+
     export interface AgentQQBotConfigReq {
         agentId: number;
     }
@@ -519,13 +524,13 @@ export namespace AI {
 
     export interface AgentPluginInstallReq {
         agentId: number;
-        type: 'qqbot' | 'wecom' | 'dingtalk';
+        type: 'qqbot' | 'wecom' | 'dingtalk' | 'weixin';
         taskID: string;
     }
 
     export interface AgentPluginCheckReq {
         agentId: number;
-        type: 'qqbot' | 'wecom' | 'dingtalk';
+        type: 'qqbot' | 'wecom' | 'dingtalk' | 'weixin';
     }
 
     export interface AgentPluginStatus {
