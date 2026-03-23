@@ -1161,6 +1161,7 @@ const message = {
         ifMakeImageWithContainer: 'このコンテナから新しい画像を作成しますか？',
         finishTime: '前回の停止時間',
         workingDir: '作業ディレクトリ',
+        composeFileMissing: 'Compose ファイルが検出されませんでした',
         resource: 'リソース',
         macAddr: 'MACアドレス',
         exportHelper: '選択したイメージを1つのtarにエクスポートします。',

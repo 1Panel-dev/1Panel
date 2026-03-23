@@ -925,6 +925,7 @@ const message = {
         cleanLogHelper: 'This will require restarting the container and cannot be undone. Continue?',
         newName: 'New name',
         workingDir: 'Working Dir',
+        composeFileMissing: 'Compose file not detected',
         source: 'Resource usage',
         cpuUsage: 'CPU usage',
         cpuTotal: 'CPU total',

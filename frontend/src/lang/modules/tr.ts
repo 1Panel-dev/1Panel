@@ -932,6 +932,7 @@ const message = {
             'Bu, konteynerin yeniden başlatılmasını gerektirir ve geri alınamaz. Devam etmek istiyor musunuz?',
         newName: 'Yeni ad',
         workingDir: 'Çalışma Dizini',
+        composeFileMissing: 'Compose dosyasi algilanmadi',
         source: 'Kaynak kullanımı',
         cpuUsage: 'CPU kullanımı',
         cpuTotal: 'CPU toplam',

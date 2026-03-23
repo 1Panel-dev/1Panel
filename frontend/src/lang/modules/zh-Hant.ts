@@ -883,6 +883,7 @@ const message = {
         cleanLogHelper: '清空日誌需要重新啟動容器，該操作無法回滾，是否繼續？',
         newName: '新名稱',
         workingDir: '工作目錄',
+        composeFileMissing: '未檢測到編排檔案',
         source: '資源使用率',
         cpuUsage: 'CPU 使用',
         cpuTotal: 'CPU 總計',

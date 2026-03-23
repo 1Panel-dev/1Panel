@@ -1145,6 +1145,7 @@ const message = {
         ifMakeImageWithContainer: '이 컨테이너에서 새 이미지를 생성하시겠습니까?',
         finishTime: '마지막 중지 시간',
         workingDir: '작업 디렉토리',
+        composeFileMissing: 'Compose 파일이 감지되지 않았습니다',
         resource: '리소스',
         macAddr: 'MAC 주소',
         exportHelper: '선택한 이미지를 하나의 tar 파일로 내보냅니다.',

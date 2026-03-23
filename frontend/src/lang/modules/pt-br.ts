@@ -1176,6 +1176,7 @@ const message = {
         ifMakeImageWithContainer: 'Criar nova imagem a partir deste container?',
         finishTime: 'Horário da última parada',
         workingDir: 'Diretório de trabalho',
+        composeFileMissing: 'Arquivo Compose nao detectado',
         resource: 'Recurso',
         macAddr: 'Endereço MAC',
         volumeHelper: 'Garanta que o conteúdo do volume esteja correto',

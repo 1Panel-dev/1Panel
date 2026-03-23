@@ -882,6 +882,7 @@ const message = {
         cleanLogHelper: '清空日志需要重启容器，该操作无法回滚，是否继续？',
         newName: '新名称',
         workingDir: '工作目录',
+        composeFileMissing: '未检测到编排文件',
         source: '资源使用率',
         cpuUsage: 'CPU 使用',
         cpuTotal: 'CPU 总计',
