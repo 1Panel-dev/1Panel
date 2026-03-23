@@ -2809,8 +2809,9 @@ const message = {
         sni: 'Kaynak SNI',
         sniHelper:
             'Ters vekil arka ucu HTTPS olduğunda, kaynak SNI’yi ayarlamanız gerekebilir. Ayrıntılar için CDN hizmet sağlayıcısının belgelerine bakın.',
-        proxySslVerify: 'Verify Backend SSL Certificate',
-        proxySslVerifyHelper: 'When enabled, the proxy will strictly verify the upstream SSL certificate (disabled by default).',
+        proxySslVerify: 'Arka uç SSL sertifikasını doğrula',
+        proxySslVerifyHelper:
+            'Etkinleştirildiğinde, vekil sunucu üst akış SSL sertifikasını sıkı biçimde doğrular (varsayılan olarak kapalı).',
         huaweicloud: 'Huawei Cloud',
         createDb: 'Veritabanı Oluştur',
         enableSSLHelper: 'Etkinleştirme başarısızlığı web sitesinin oluşturulmasını etkilemez',

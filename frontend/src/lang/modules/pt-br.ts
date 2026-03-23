@@ -2951,8 +2951,9 @@ const message = {
         sni: 'SNI de origem',
         sniHelper:
             'Quando o proxy reverso de backend for HTTPS, você pode precisar configurar o SNI de origem. Consulte a documentação do provedor de serviços CDN para mais detalhes.',
-        proxySslVerify: 'Verify Backend SSL Certificate',
-        proxySslVerifyHelper: 'When enabled, the proxy will strictly verify the upstream SSL certificate (disabled by default).',
+        proxySslVerify: 'Verificar certificado SSL do backend',
+        proxySslVerifyHelper:
+            'Quando ativado, o proxy verificará estritamente o certificado SSL do servidor de origem (desativado por padrão).',
         huaweicloud: 'Huawei Cloud',
         createDb: 'Criar Banco de Dados',
         enableSSLHelper: 'A falha ao ativar o SSL não afetará a criação do site.',

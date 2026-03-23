@@ -2811,8 +2811,9 @@ const message = {
         sni: 'Sumber SNI',
         sniHelper:
             'Apabila backend proksi terbalik adalah HTTPS, anda mungkin perlu menetapkan sumber SNI. Sila rujuk dokumentasi penyedia perkhidmatan CDN untuk butiran.',
-        proxySslVerify: 'Verify Backend SSL Certificate',
-        proxySslVerifyHelper: 'When enabled, the proxy will strictly verify the upstream SSL certificate (disabled by default).',
+        proxySslVerify: 'Sahkan sijil SSL pelayan belakang',
+        proxySslVerifyHelper:
+            'Apabila diaktifkan, proksi akan mengesahkan sijil SSL hulu dengan ketat (lalai dimatikan).',
         huaweicloud: 'Huawei Cloud',
         createDb: 'Cipta Pangkalan Data',
         enableSSLHelper: 'Kegagalan mengaktifkan SSL tidak akan menjejaskan penciptaan laman web.',
