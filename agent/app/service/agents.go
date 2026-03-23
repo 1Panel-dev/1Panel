@@ -693,6 +693,13 @@ func (a AgentService) UpdateOtherConfig(req dto.AgentOtherConfigUpdateReq) error
 	if err != nil {
 		return err
 	}
+	status, err := checkContainerStatus(install.ContainerName)
+	if err != nil {
+		return err
+	}
+	if status != "running" {
+		return fmt.Errorf("container %s is not running, please check and retry", install.ContainerName)
+	}
 	conf, err := readOpenclawConfig(agent.ConfigPath)
 	if err != nil {
 		return err
