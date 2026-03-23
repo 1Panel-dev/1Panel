@@ -507,3 +507,6 @@ PartitionDiskErr: 'Gagal membahagikan, {{ .err }}'
 FormatDiskErr: 'Gagal memformat cakera, {{ .err }}'
 MountDiskErr: 'Gagal mengkaitkan cakera, {{ .err }}'
 XfsNotFound: 'Sistem fail xfs tidak dikesan, sila pasang xfsprogs terlebih dahulu'
+
+# terminal
+TerminalAIBlockedRiskyCommand: 'Perintah berisiko telah disekat: {{ .command }}'

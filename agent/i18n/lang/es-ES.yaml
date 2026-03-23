@@ -507,3 +507,6 @@ PartitionDiskErr: 'Error al particionar, {{ .err }}'
 FormatDiskErr: 'Error al formatear disco, {{ .err }}'
 MountDiskErr: 'Error al montar disco, {{ .err }}'
 XfsNotFound: 'No se detectó el sistema de archivos xfs instale xfsprogs primero'
+
+# terminal
+TerminalAIBlockedRiskyCommand: 'Comando de riesgo bloqueado: {{ .command }}'

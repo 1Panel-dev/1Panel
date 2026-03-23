@@ -565,3 +565,6 @@ PartitionDiskErr: 'Partition failed: {{ .err }}'
 FormatDiskErr: 'Format failed: {{ .err }}'
 MountDiskErr: 'Mount failed: {{ .err }}'
 XfsNotFound: 'xfs not found; install xfsprogs first'
+
+# terminal
+TerminalAIBlockedRiskyCommand: 'blocked risky command: {{ .command }}'

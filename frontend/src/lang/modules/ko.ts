@@ -1374,21 +1374,20 @@ const message = {
         cursorBar: '막대',
         scrollback: '스크롤백',
         scrollSensitivity: '스크롤 감도',
-        aiStatus: 'AI Terminal',
-        aiSettings: 'AI Terminal Settings',
+        aiStatus: 'AI 터미널',
+        aiSettings: 'AI 터미널 설정',
         aiAccountHelper:
             '선택한 모델 계정으로 명령을 생성하고 채웁니다. Ollama, vLLM 같은 로컬 모델은 사용자 지정 모델 계정을 사용하세요.',
-        aiPrefix: 'Trigger Prefix',
-        aiPrefixHelper:
-            'When a line starts with this prefix and you press Enter, AI command generation will be triggered, for example # or //ai.',
-        aiRiskCommands: 'Risk Command Interception',
+        aiPrefix: '트리거 접두사',
+        aiPrefixHelper: '이 접두사를 입력하고 Enter를 누르면 AI 명령 생성이 트리거됩니다.',
+        aiRiskCommands: '위험 명령 차단',
         aiRiskCommandsHelper:
-            'Generated commands matching any of these fragments will be blocked and filled back as comments. Supports add, edit, and delete.',
-        aiAddRiskCommand: 'Add Risk Command',
-        aiRemoveRiskCommand: 'Delete',
-        aiSummary: 'When a line starts with the {0} prefix and you press Enter, AI command generation is triggered.',
+            '이 조각들 중 하나와 일치하는 생성 명령은 차단되고 주석으로 다시 채워집니다. 비워 두면 차단이 비활성화됩니다. 추가, 수정, 삭제를 지원합니다.',
+        aiAddRiskCommand: '위험 명령 추가',
+        aiRemoveRiskCommand: '삭제',
+        aiSummary: '{0} 접두사로 시작하는 줄에서 Enter를 누르면 AI 명령 생성이 트리거됩니다.',
         aiPrefixAsciiVisible:
-            'Only ASCII visible characters are supported. Spaces, CJK characters, and full-width symbols are not allowed.',
+            'ASCII 표시 가능 문자만 지원합니다. 공백, CJK 문자 및 전각 기호는 사용할 수 없습니다.',
         saveHelper: '현재 터미널 설정을 저장하시겠습니까?',
     },
     toolbox: {

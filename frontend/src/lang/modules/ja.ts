@@ -1400,21 +1400,20 @@ const message = {
         cursorBar: 'バー',
         scrollback: 'スクロールバック',
         scrollSensitivity: 'スクロール感度',
-        aiStatus: 'AI Terminal',
-        aiSettings: 'AI Terminal Settings',
+        aiStatus: 'AI ターミナル',
+        aiSettings: 'AI ターミナル設定',
         aiAccountHelper:
             '選択したモデルアカウントでコマンドを生成して補完します。Ollama や vLLM などのローカルモデルはカスタムモデルアカウントを使用してください。',
-        aiPrefix: 'Trigger Prefix',
-        aiPrefixHelper:
-            'When a line starts with this prefix and you press Enter, AI command generation will be triggered, for example # or //ai.',
-        aiRiskCommands: 'Risk Command Interception',
+        aiPrefix: 'トリガープレフィックス',
+        aiPrefixHelper: 'このプレフィックスを入力して Enter を押すと、AI コマンド生成がトリガーされます。',
+        aiRiskCommands: '危険コマンドの遮断',
         aiRiskCommandsHelper:
-            'Generated commands matching any of these fragments will be blocked and filled back as comments. Supports add, edit, and delete.',
-        aiAddRiskCommand: 'Add Risk Command',
-        aiRemoveRiskCommand: 'Delete',
-        aiSummary: 'When a line starts with the {0} prefix and you press Enter, AI command generation is triggered.',
+            'これらの断片のいずれかに一致する生成コマンドはブロックされ、コメントとして埋め戻されます。空欄にすると遮断を無効化できます。追加、編集、削除に対応しています。',
+        aiAddRiskCommand: '危険コマンドを追加',
+        aiRemoveRiskCommand: '削除',
+        aiSummary: '行が {0} プレフィックスで始まり Enter を押すと、AI コマンド生成がトリガーされます。',
         aiPrefixAsciiVisible:
-            'Only ASCII visible characters are supported. Spaces, CJK characters, and full-width symbols are not allowed.',
+            'ASCII の表示可能文字のみ対応しています。スペース、CJK 文字、全角記号は使用できません。',
         saveHelper: '現在のターミナル設定を保存してもよろしいですか？',
     },
     toolbox: {

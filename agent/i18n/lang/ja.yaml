@@ -507,3 +507,6 @@ PartitionDiskErr: 'パーティションに失敗しました、{{ .err }}'
 FormatDiskErr: 'ディスクのフォーマットに失敗しました、{{ .err }}'
 MountDiskErr: 'ディスクのマウントに失敗しました、{{ .err }}'
 XfsNotFound: 'xfs ファイルシステムが検出されませんでした、最初に xfsprogs をインストールしてください'
+
+# terminal
+TerminalAIBlockedRiskyCommand: '危険なコマンドをブロックしました: {{ .command }}'

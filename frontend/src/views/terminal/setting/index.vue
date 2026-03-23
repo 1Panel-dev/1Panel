@@ -119,6 +119,7 @@
                                 :account-id="aiForm.aiAccountId"
                                 :prefix="aiForm.aiPrefix"
                                 :risk-commands="aiForm.aiRiskCommands"
+                                :default-risk-commands="aiForm.aiRiskCommandsDefault"
                                 @refresh="loadAISettings"
                             />
 
@@ -212,6 +213,7 @@ const aiForm = reactive({
     aiAccountId: '',
     aiPrefix: '',
     aiRiskCommands: [],
+    aiRiskCommandsDefault: [],
 });
 
 const resetConn = ref(false);
@@ -304,6 +306,7 @@ const loadAISettings = async () => {
             aiForm.aiAccountId = res.data.aiAccountId || '';
             aiForm.aiPrefix = res.data.aiPrefix || DEFAULT_AI_PREFIX;
             aiForm.aiRiskCommands = parseRiskCommands(res.data.aiRiskCommands || '');
+            aiForm.aiRiskCommandsDefault = parseRiskCommands(res.data.aiRiskCommandsDefault || '');
         })
         .finally(() => {
             loading.value = false;

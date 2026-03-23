@@ -1124,12 +1124,12 @@ var AddAITerminalSettings = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "AIAccountID", Value: ""}).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Setting{Key: "AIPrefix", Value: "#"}).Error; err != nil {
+		if err := tx.Create(&model.Setting{Key: "AIPrefix", Value: constant.DefaultTerminalAIPrefix}).Error; err != nil {
 			return err
 		}
 		return tx.Create(&model.Setting{
 			Key:   "AIRiskCommands",
-			Value: "[\"rm -rf\",\"mkfs\",\"dd if=\",\"curl | sh\",\"wget | sh\",\"chmod -R 777 /\",\"shutdown\",\"reboot\",\"poweroff\",\"init 0\",\":(){ :|:& };:\"]",
+			Value: constant.DefaultTerminalAIRiskCommands,
 		}).Error
 	},
 }

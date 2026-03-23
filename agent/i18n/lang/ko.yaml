@@ -507,3 +507,6 @@ PartitionDiskErr: '파티션 분할에 실패했습니다, {{ .err }}'
 FormatDiskErr: '디스크 포맷에 실패했습니다, {{ .err }}'
 MountDiskErr: '디스크 마운트에 실패했습니다, {{ .err }}'
 XfsNotFound: 'xfs 파일 시스템이 감지되지 않았습니다, 먼저 xfsprogs 를 설치하세요'
+
+# terminal
+TerminalAIBlockedRiskyCommand: '위험한 명령이 차단되었습니다: {{ .command }}'
