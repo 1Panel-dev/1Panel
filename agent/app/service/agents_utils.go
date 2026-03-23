@@ -157,12 +157,6 @@ func extractSecurityConfig(conf map[string]interface{}) dto.AgentSecurityConfig 
 				result.AllowedOrigins = append(result.AllowedOrigins, strings.TrimSpace(text))
 			}
 		}
-	case []string:
-		for _, value := range values {
-			if strings.TrimSpace(value) != "" {
-				result.AllowedOrigins = append(result.AllowedOrigins, strings.TrimSpace(value))
-			}
-		}
 	}
 	return result
 }
@@ -1353,16 +1347,6 @@ func extractStringList(value interface{}) []string {
 		result := make([]string, 0, len(values))
 		for _, value := range values {
 			text := strings.TrimSpace(fmt.Sprintf("%v", value))
-			if text == "" {
-				continue
-			}
-			result = append(result, text)
-		}
-		return result
-	case []string:
-		result := make([]string, 0, len(values))
-		for _, value := range values {
-			text := strings.TrimSpace(value)
 			if text == "" {
 				continue
 			}

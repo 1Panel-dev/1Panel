@@ -1,17 +1,6 @@
 <template>
     <el-form ref="formRef" :model="form" :rules="rules" label-position="top">
-        <el-alert
-            v-if="!form.installed"
-            type="warning"
-            :closable="false"
-            :title="t('aiTools.agents.pluginNotInstalled')"
-            class="mb-4"
-        />
-        <el-form-item>
-            <el-button v-if="!form.installed" type="primary" :loading="installing" @click="installPlugin">
-                {{ t('commons.button.install') }}
-            </el-button>
-        </el-form-item>
+        <PluginInstall :installed="installed" :installing="installing" @install="installPlugin" />
         <el-form-item :label="t('commons.table.status')">
             <el-switch v-model="form.enabled" />
         </el-form-item>
@@ -22,7 +11,7 @@
             <el-input v-model="form.clientSecret" type="password" show-password />
         </el-form-item>
         <el-form-item>
-            <el-button type="primary" :loading="saving" :disabled="!form.installed" @click="saveChannel">
+            <el-button type="primary" :loading="saving" :disabled="!installed" @click="saveChannel">
                 {{ t('commons.button.save') }}
             </el-button>
         </el-form-item>
@@ -35,24 +24,25 @@ import { reactive, ref } from 'vue';
 import type { FormInstance } from 'element-plus';
 import { useI18n } from 'vue-i18n';
 import { AI } from '@/api/interface/ai';
-import { checkAgentPlugin, getAgentQQBotConfig, installAgentPlugin, updateAgentQQBotConfig } from '@/api/modules/ai';
+import { getAgentQQBotConfig, updateAgentQQBotConfig } from '@/api/modules/ai';
 import { MsgSuccess } from '@/utils/message';
 import { Rules } from '@/global/form-rules';
-import { newUUID } from '@/utils/util';
 import TaskLog from '@/components/log/task/index.vue';
+import PluginInstall from './components/plugin-install.vue';
+import { useAgentPluginChannel } from './useAgentPluginChannel';
+
+type QQBotForm = Omit<AI.AgentQQBotConfig, 'installed'>;
 
 const { t } = useI18n();
 const saving = ref(false);
-const installing = ref(false);
-const agentId = ref(0);
 const formRef = ref<FormInstance>();
-const taskLogRef = ref();
+const { agentId, installed, installing, taskLogRef, checkPluginStatus, loadPlugin, installPlugin } =
+    useAgentPluginChannel('qqbot');
 
-const form = reactive<AI.AgentQQBotConfig>({
+const form = reactive<QQBotForm>({
     enabled: true,
     appId: '',
     clientSecret: '',
-    installed: false,
 });
 
 const rules = reactive({
@@ -60,22 +50,12 @@ const rules = reactive({
     clientSecret: [Rules.requiredInput],
 });
 
-const checkPluginStatus = async () => {
-    if (!agentId.value) {
-        return;
-    }
-    const res = await checkAgentPlugin({
-        agentId: agentId.value,
-        type: 'qqbot',
-    });
-    form.installed = Boolean(res.data?.installed);
-};
-
 const load = async (id: number) => {
-    agentId.value = id;
+    await loadPlugin(id);
     const res = await getAgentQQBotConfig({ agentId: id });
-    Object.assign(form, res.data || {});
-    await checkPluginStatus();
+    form.enabled = res.data?.enabled ?? true;
+    form.appId = res.data?.appId || '';
+    form.clientSecret = res.data?.clientSecret || '';
 };
 
 const saveChannel = async () => {
@@ -94,24 +74,6 @@ const saveChannel = async () => {
         MsgSuccess(t('aiTools.agents.saveSuccess'));
     } finally {
         saving.value = false;
-    }
-};
-
-const installPlugin = async () => {
-    if (!agentId.value) {
-        return;
-    }
-    const taskID = newUUID();
-    installing.value = true;
-    try {
-        await installAgentPlugin({
-            agentId: agentId.value,
-            type: 'qqbot',
-            taskID,
-        });
-        taskLogRef.value?.openWithTaskID(taskID);
-    } finally {
-        installing.value = false;
     }
 };
 

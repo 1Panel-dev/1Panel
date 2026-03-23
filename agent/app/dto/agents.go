@@ -265,6 +265,11 @@ type AgentDingTalkConfig struct {
 	Installed      bool     `json:"installed"`
 }
 
+type AgentWeixinLoginReq struct {
+	AgentID uint   `json:"agentId" validate:"required"`
+	TaskID  string `json:"taskID" validate:"required"`
+}
+
 type AgentQQBotConfigReq struct {
 	AgentID uint `json:"agentId" validate:"required"`
 }
@@ -285,13 +290,13 @@ type AgentQQBotConfig struct {
 
 type AgentPluginInstallReq struct {
 	AgentID uint   `json:"agentId" validate:"required"`
-	Type    string `json:"type" validate:"required,oneof=qqbot wecom dingtalk"`
+	Type    string `json:"type" validate:"required,oneof=qqbot wecom dingtalk weixin"`
 	TaskID  string `json:"taskID" validate:"required"`
 }
 
 type AgentPluginCheckReq struct {
 	AgentID uint   `json:"agentId" validate:"required"`
-	Type    string `json:"type" validate:"required,oneof=qqbot wecom dingtalk"`
+	Type    string `json:"type" validate:"required,oneof=qqbot wecom dingtalk weixin"`
 }
 
 type AgentPluginStatus struct {
