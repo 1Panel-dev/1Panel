@@ -1437,7 +1437,8 @@ const message = {
             'Os comandos gerados que corresponderem a qualquer um destes fragmentos serão bloqueados e preenchidos de volta como comentários. Deixe em branco para desativar a intercepção. Suporta adicionar, editar e excluir.',
         aiAddRiskCommand: 'Adicionar comando de risco',
         aiRemoveRiskCommand: 'Excluir',
-        aiSummary: 'Quando uma linha começa com o prefixo {0} e você pressiona Enter, a geração de comandos por IA é acionada.',
+        aiSummary:
+            'Quando uma linha começa com o prefixo {0} e você pressiona Enter, a geração de comandos por IA é acionada.',
         aiPrefixAsciiVisible:
             'Apenas caracteres ASCII visíveis são suportados. Espaços, caracteres CJK e símbolos de largura total não são permitidos.',
         saveHelper: 'Tem certeza de que deseja salvar a configuração atual do terminal?',
