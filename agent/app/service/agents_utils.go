@@ -269,7 +269,11 @@ func setBrowserConfig(conf map[string]interface{}, config browserConfig) {
 }
 
 func extractOtherConfig(conf map[string]interface{}) dto.AgentOtherConfig {
-	result := dto.AgentOtherConfig{UserTimezone: resolveServerTimezone(), BrowserEnabled: true}
+	result := dto.AgentOtherConfig{
+		UserTimezone:   resolveServerTimezone(),
+		BrowserEnabled: true,
+		NPMRegistry:    defaultOpenclawNPMRegistry,
+	}
 	agents, ok := conf["agents"].(map[string]interface{})
 	if !ok {
 		browser := extractBrowserConfig(conf)

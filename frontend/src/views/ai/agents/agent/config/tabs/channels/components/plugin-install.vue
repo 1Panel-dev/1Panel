@@ -1,5 +1,11 @@
 <template>
-    <el-alert v-if="!installed" type="warning" :closable="false" :title="t('aiTools.agents.pluginNotInstalled')" />
+    <el-alert
+        v-if="!installed"
+        type="warning"
+        :closable="false"
+        :title="t('aiTools.agents.pluginNotInstalled')"
+        :description="t('aiTools.agents.pluginInstallNPMRegistryHelper')"
+    />
     <el-form-item v-if="!installed" class="mt-4">
         <el-button type="primary" :loading="installing" @click="emit('install')">
             {{ t('commons.button.install') }}

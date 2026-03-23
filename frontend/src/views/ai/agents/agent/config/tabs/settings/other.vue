@@ -3,6 +3,12 @@
         <el-form-item :label="t('aiTools.agents.browserEnabled')">
             <el-switch v-model="form.browserEnabled" />
         </el-form-item>
+        <el-form-item :label="t('aiTools.agents.npmRegistry')" prop="npmRegistry">
+            <el-select v-model="form.npmRegistry" filterable allow-create default-first-option>
+                <el-option v-for="item in npmRegistryOptions" :key="item" :label="item" :value="item" />
+            </el-select>
+            <span class="input-help">{{ t('aiTools.agents.npmRegistryHelper') }}</span>
+        </el-form-item>
         <el-form-item :label="t('aiTools.agents.timeZone')" prop="userTimezone">
             <el-input v-model="form.userTimezone" />
         </el-form-item>
@@ -28,14 +34,36 @@ const loading = ref(false);
 const saving = ref(false);
 const agentId = ref(0);
 const formRef = ref<FormInstance>();
+const defaultNPMRegistry = 'https://registry.npmjs.org/';
 
 const form = reactive<AI.AgentOtherConfig>({
     userTimezone: '',
     browserEnabled: true,
+    npmRegistry: defaultNPMRegistry,
 });
+
+const npmRegistryOptions = [
+    defaultNPMRegistry,
+    'https://registry.npmmirror.com',
+    'https://mirrors.cloud.tencent.com/npm/',
+    'https://repo.huaweicloud.com/repository/npm/',
+];
+
+const validateNPMRegistry = (_rule: any, value: string, callback: (error?: Error) => void) => {
+    if (!value) {
+        callback(new Error(t('commons.rule.requiredInput')));
+        return;
+    }
+    if (!/^https?:\/\/\S+$/.test(value)) {
+        callback(new Error(t('aiTools.agents.npmRegistryInvalid')));
+        return;
+    }
+    callback();
+};
 
 const rules = reactive({
     userTimezone: [Rules.requiredInput],
+    npmRegistry: [{ validator: validateNPMRegistry, trigger: 'blur' }],
 });
 
 const load = async (id: number) => {
@@ -60,6 +88,7 @@ const saveConfig = async () => {
             agentId: agentId.value,
             userTimezone: form.userTimezone,
             browserEnabled: form.browserEnabled,
+            npmRegistry: form.npmRegistry,
         });
         MsgSuccess(t('aiTools.agents.saveSuccess'));
     } finally {
@@ -71,3 +100,11 @@ defineExpose({
     load,
 });
 </script>
+
+<style lang="scss" scoped>
+.input-help {
+    font-size: 12px;
+    color: var(--el-text-color-secondary);
+    line-height: 1.5;
+}
+</style>

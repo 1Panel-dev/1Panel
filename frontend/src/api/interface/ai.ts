@@ -578,11 +578,13 @@ export namespace AI {
     export interface AgentOtherConfig {
         userTimezone: string;
         browserEnabled: boolean;
+        npmRegistry: string;
     }
 
     export interface AgentOtherConfigUpdateReq {
         agentId: number;
         userTimezone: string;
         browserEnabled: boolean;
+        npmRegistry: string;
     }
 }

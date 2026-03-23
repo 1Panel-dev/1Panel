@@ -345,9 +345,11 @@ type AgentOtherConfigUpdateReq struct {
 	AgentID        uint   `json:"agentId" validate:"required"`
 	UserTimezone   string `json:"userTimezone" validate:"required"`
 	BrowserEnabled bool   `json:"browserEnabled"`
+	NPMRegistry    string `json:"npmRegistry" validate:"required"`
 }
 
 type AgentOtherConfig struct {
 	UserTimezone   string `json:"userTimezone"`
 	BrowserEnabled bool   `json:"browserEnabled"`
+	NPMRegistry    string `json:"npmRegistry"`
 }
