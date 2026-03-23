@@ -141,13 +141,14 @@ const pathSegments = computed(() => {
 interface DrawerProps {
     containerID: string;
     title: string;
+    workdir?: string;
 }
 
 const acceptParams = async (params: DrawerProps): Promise<void> => {
     visible.value = true;
     containerID.value = params.containerID;
     title.value = params.title;
-    filePath.value = '/';
+    filePath.value = params.workdir || '/';
     await loadContainerFiles();
 };
 

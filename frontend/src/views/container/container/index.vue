@@ -409,6 +409,7 @@ import {
     containerListStats,
     containerOperator,
     inspect,
+    loadContainerInfo,
     loadContainerStatus,
     searchContainer,
 } from '@/api/modules/container';
@@ -677,9 +678,15 @@ const onTerminal = (row: any) => {
     dialogTerminalRef.value!.acceptParams({ containerID: row.containerID, title: title });
 };
 const dialogFileBrowserRef = ref();
-const onOpenFileBrowser = (row: any) => {
+const onOpenFileBrowser = async (row: any) => {
     const title = i18n.global.t('menu.container') + ' ' + row.name;
-    dialogFileBrowserRef.value!.acceptParams({ containerID: row.containerID, title: title });
+    let workdir = '/';
+    await loadContainerInfo(row.name)
+        .then((res) => {
+            workdir = res.data?.workingDir?.trim() || '/';
+        })
+        .catch(() => {});
+    dialogFileBrowserRef.value!.acceptParams({ containerID: row.containerID, title: title, workdir });
 };
 
 const onInspect = async (row: any) => {
