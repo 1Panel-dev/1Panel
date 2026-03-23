@@ -386,7 +386,7 @@
 </template>
 
 <script lang="ts" setup>
-import { createFile, getFileContent, getFilesTree, saveFileContent } from '@/api/modules/files';
+import { batchCheckFiles, createFile, getFileContent, getFilesTree, saveFileContent } from '@/api/modules/files';
 import i18n from '@/lang';
 import { MsgError, MsgSuccess, MsgWarning } from '@/utils/message';
 import * as monaco from 'monaco-editor';
@@ -556,6 +556,11 @@ const removeTab = (targetPath: TabPaneName) => {
         }
         selectTab.value = activeName;
         fileTabs.value = tabs.filter((tab) => tab.path !== targetPath);
+        saveTabsToStorage();
+        if (fileTabs.value.length === 0) {
+            selectTab.value = '';
+            editor.dispose();
+        }
     };
 
     if (isEdit.value) {
@@ -567,8 +572,10 @@ const removeTab = (targetPath: TabPaneName) => {
         })
             .then(() => {
                 updateTabs();
-                saveContent();
-                getContent(selectTab.value, '');
+                if (fileTabs.value.length > 0) {
+                    saveContent();
+                    getContent(selectTab.value, '');
+                }
             })
             .catch(() => {
                 updateTabs();
@@ -579,7 +586,9 @@ const removeTab = (targetPath: TabPaneName) => {
             });
     } else {
         updateTabs();
-        getContent(selectTab.value, '');
+        if (fileTabs.value.length > 0) {
+            getContent(selectTab.value, '');
+        }
     }
 };
 
@@ -601,6 +610,7 @@ const removeAllTab = (targetPath: string, type: 'left' | 'right' | 'all') => {
         const newTabs = type === 'all' ? [] : filterTabs();
         fileTabs.value = newTabs;
         selectTab.value = activeName;
+        saveTabsToStorage();
 
         if (type === 'all') {
             selectTab.value = '';
@@ -635,8 +645,6 @@ const removeAllTab = (targetPath: string, type: 'left' | 'right' | 'all') => {
             .catch(onCancel);
     } else {
         updateTabs();
-        if (type === 'all') editor.dispose();
-        else getContent(activeName, '');
     }
 };
 
@@ -648,6 +656,7 @@ const removeOtherTab = (targetPath: string) => {
     const updateTabs = () => {
         fileTabs.value = [targetTab];
         selectTab.value = targetTab.path;
+        saveTabsToStorage();
         getContent(targetTab.path, '');
     };
 
@@ -902,7 +911,7 @@ const saveContent = async () => {
     }
 };
 
-const acceptParams = (props: EditProps) => {
+const acceptParams = async (props: EditProps) => {
     form.value.content = props.content;
     oldFileContent.value = props.content;
     form.value.path = props.path;
@@ -910,9 +919,22 @@ const acceptParams = (props: EditProps) => {
     directoryPath.value = getDirectoryPath(props.path);
     fileExtension.value = props.extension;
     fileName.value = props.name;
-    const savedTabs = loadTabsFromStorage();
+
+    let savedTabs = loadTabsFromStorage();
     const withoutCurrent = savedTabs.filter((tab) => tab.path !== props.path);
-    const merged = [...withoutCurrent, { path: props.path, name: props.name }];
+    if (withoutCurrent.length > 0) {
+        try {
+            const existRes = await batchCheckFiles(withoutCurrent.map((t) => t.path));
+            const existList = existRes?.data ?? [];
+            const existingPaths = new Set(existList.map((r) => r.path));
+            savedTabs = withoutCurrent.filter((t) => existingPaths.has(t.path));
+        } catch {
+            savedTabs = withoutCurrent;
+        }
+    } else {
+        savedTabs = [];
+    }
+    const merged = [...savedTabs, { path: props.path, name: props.name }];
     fileTabs.value = merged.slice(-maxTabs);
     selectTab.value = props.path;
 
@@ -1024,9 +1046,8 @@ const getContent = (path: string, extension: string) => {
                 }
                 const exists = fileTabs.value.some((tab) => tab.path === path);
                 if (exists) {
-                    fileTabs.value = fileTabs.value
-                        .filter((t) => t.path !== path)
-                        .concat([{ name: res.data.name, path: res.data.path }]);
+                    const tab = fileTabs.value.find((t) => t.path === path);
+                    if (tab) tab.name = res.data.name;
                 } else {
                     fileTabs.value.push({
                         name: res.data.name,
