@@ -507,3 +507,6 @@ PartitionDiskErr: 'Bölümleme başarısız, {{ .err }}'
 FormatDiskErr: 'Disk biçimlendirme başarısız, {{ .err }}'
 MountDiskErr: 'Disk bağlama başarısız, {{ .err }}'
 XfsNotFound: 'XFS dosya sistemi algılanmadı, lütfen önce xfsprogs''i yükleyin'
+
+# terminal
+TerminalAIBlockedRiskyCommand: 'Riskli komut engellendi: {{ .command }}'

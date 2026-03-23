@@ -42,8 +42,10 @@
                 </el-select>
                 <span class="input-help">{{ $t('terminal.aiAccountHelper') }}</span>
             </el-form-item>
-            <el-form-item :label="$t('terminal.aiPrefix')" prop="prefix" :rules="prefixRules">
-                <el-input class="formInput" v-model="formModel.prefix" />
+            <el-form-item :label="$t('terminal.aiPrefix')" prop="prefix" :rules="Rules.requiredSelect">
+                <el-select class="formInput" v-model="formModel.prefix">
+                    <el-option v-for="item in prefixOptions" :key="item" :label="item" :value="item" />
+                </el-select>
                 <span class="input-help">{{ $t('terminal.aiPrefixHelper') }}</span>
             </el-form-item>
             <el-form-item :label="$t('terminal.aiRiskCommands')" prop="riskCommands" :rules="riskCommandRules">
@@ -81,7 +83,7 @@ import i18n from '@/lang';
 import { pageAgentAccounts } from '@/api/modules/ai';
 import { updateAgentTerminalAIInfo } from '@/api/modules/setting';
 import { MsgSuccess } from '@/utils/message';
-import { DEFAULT_AI_PREFIX, DEFAULT_AI_RISK_COMMANDS, normalizeRiskCommands } from '@/views/terminal/setting/ai/helper';
+import { AI_PREFIX_OPTIONS, DEFAULT_AI_PREFIX, normalizeRiskCommands } from '@/views/terminal/setting/ai/helper';
 
 interface AgentAccountOption {
     id: number | string;
@@ -96,6 +98,7 @@ const props = defineProps<{
     accountId: string;
     prefix: string;
     riskCommands: string[];
+    defaultRiskCommands: string[];
 }>();
 
 const emit = defineEmits<{
@@ -107,6 +110,7 @@ const formRef = ref<FormInstance>();
 const drawerVisible = ref(false);
 const saving = ref(false);
 const agentAccountOptions = ref<AgentAccountOption[]>([]);
+const prefixOptions = AI_PREFIX_OPTIONS;
 const formModel = reactive({
     status: props.status,
     accountId: props.accountId,
@@ -193,25 +197,6 @@ const accountRules = [
     },
 ];
 
-const prefixRules = [
-    Rules.requiredInput,
-    {
-        validator: (_rule, value, callback) => {
-            const normalized = String(value ?? '').trim();
-            if (!normalized) {
-                callback(new Error(i18n.global.t('commons.rule.requiredInput')));
-                return;
-            }
-            if (!/^[!-~]+$/.test(normalized)) {
-                callback(new Error(i18n.global.t('terminal.aiPrefixAsciiVisible')));
-                return;
-            }
-            callback();
-        },
-        trigger: 'blur',
-    },
-];
-
 const riskCommandRules = [
     {
         validator: (_rule, value, callback) => {
@@ -242,7 +227,7 @@ const removeRiskCommand = (index: number) => {
 
 const resetRiskCommands = () => {
     formModel.prefix = DEFAULT_AI_PREFIX;
-    formModel.riskCommands = [...DEFAULT_AI_RISK_COMMANDS];
+    formModel.riskCommands = [...props.defaultRiskCommands];
 };
 
 const handleConfirm = async () => {

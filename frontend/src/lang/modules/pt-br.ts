@@ -1422,21 +1422,20 @@ const message = {
         cursorBar: 'Barra',
         scrollback: 'Scrollback',
         scrollSensitivity: 'Sensibilidade de rolagem',
-        aiStatus: 'AI Terminal',
-        aiSettings: 'AI Terminal Settings',
+        aiStatus: 'Terminal de IA',
+        aiSettings: 'Configurações do terminal de IA',
         aiAccountHelper:
             'Use a conta de modelo selecionada para gerar e preencher comandos. Para modelos locais como Ollama e vLLM, use uma conta de modelo personalizada.',
-        aiPrefix: 'Trigger Prefix',
-        aiPrefixHelper:
-            'When a line starts with this prefix and you press Enter, AI command generation will be triggered, for example # or //ai.',
-        aiRiskCommands: 'Risk Command Interception',
+        aiPrefix: 'Prefixo de disparo',
+        aiPrefixHelper: 'Digite este prefixo e pressione Enter para acionar a geração de comandos por IA.',
+        aiRiskCommands: 'Intercepção de comandos de risco',
         aiRiskCommandsHelper:
-            'Generated commands matching any of these fragments will be blocked and filled back as comments. Supports add, edit, and delete.',
-        aiAddRiskCommand: 'Add Risk Command',
-        aiRemoveRiskCommand: 'Delete',
-        aiSummary: 'When a line starts with the {0} prefix and you press Enter, AI command generation is triggered.',
+            'Os comandos gerados que corresponderem a qualquer um destes fragmentos serão bloqueados e preenchidos de volta como comentários. Deixe em branco para desativar a intercepção. Suporta adicionar, editar e excluir.',
+        aiAddRiskCommand: 'Adicionar comando de risco',
+        aiRemoveRiskCommand: 'Excluir',
+        aiSummary: 'Quando uma linha começa com o prefixo {0} e você pressiona Enter, a geração de comandos por IA é acionada.',
         aiPrefixAsciiVisible:
-            'Only ASCII visible characters are supported. Spaces, CJK characters, and full-width symbols are not allowed.',
+            'Apenas caracteres ASCII visíveis são suportados. Espaços, caracteres CJK e símbolos de largura total não são permitidos.',
         saveHelper: 'Tem certeza de que deseja salvar a configuração atual do terminal?',
     },
     toolbox: {

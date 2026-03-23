@@ -25,20 +25,6 @@ type TerminalRuntimeSettings struct {
 	RiskCommands []string
 }
 
-var defaultRiskCommands = []string{
-	"rm -rf",
-	"mkfs",
-	"dd if=",
-	"curl | sh",
-	"wget | sh",
-	"chmod -R 777 /",
-	"shutdown",
-	"reboot",
-	"poweroff",
-	"init 0",
-	":(){ :|:& };:",
-}
-
 func ResolveGeneratorConfig(accountID uint) (GeneratorConfig, time.Duration, error) {
 	account, err := loadAgentAccount(accountID)
 	if err != nil {
@@ -135,9 +121,6 @@ func LoadTerminalRuntimeSettings() (TerminalRuntimeSettings, GeneratorConfig, ti
 	if err != nil && !os.IsNotExist(err) {
 		return TerminalRuntimeSettings{}, GeneratorConfig{}, 0, err
 	}
-	if strings.TrimSpace(prefix) == "" {
-		prefix = "#"
-	}
 	riskCommands, err := loadRiskCommands()
 	if err != nil {
 		return TerminalRuntimeSettings{}, GeneratorConfig{}, 0, err
@@ -175,12 +158,12 @@ func loadRiskCommands() ([]string, error) {
 	value, err := loadAgentSettingValue("AIRiskCommands")
 	if err != nil {
 		if os.IsNotExist(err) {
-			return append([]string(nil), defaultRiskCommands...), nil
+			return []string{}, nil
 		}
 		return nil, err
 	}
 	if strings.TrimSpace(value) == "" {
-		return append([]string(nil), defaultRiskCommands...), nil
+		return []string{}, nil
 	}
 	var commands []string
 	if err := json.Unmarshal([]byte(value), &commands); err != nil {
@@ -190,9 +173,6 @@ func loadRiskCommands() ([]string, error) {
 }
 
 func normalizeRiskCommands(commands []string) []string {
-	if len(commands) == 0 {
-		return append([]string(nil), defaultRiskCommands...)
-	}
 	seen := make(map[string]struct{}, len(commands))
 	result := make([]string, 0, len(commands))
 	for _, command := range commands {
@@ -205,9 +185,6 @@ func normalizeRiskCommands(commands []string) []string {
 		}
 		seen[command] = struct{}{}
 		result = append(result, command)
-	}
-	if len(result) == 0 {
-		return append([]string(nil), defaultRiskCommands...)
 	}
 	return result
 }

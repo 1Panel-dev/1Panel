@@ -8,10 +8,10 @@ import (
 	"strings"
 	"sync"
 	"time"
-	"unicode"
 	"unicode/utf8"
 
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/i18n"
 	terminalai "github.com/1Panel-dev/1Panel/agent/utils/terminal/ai"
 )
 
@@ -110,7 +110,9 @@ func (i *aiInputInterceptor) HandleEnter() (string, bool) {
 		return "", false
 	}
 	if i.isRiskCommand(resp.Command) {
-		return ": # blocked risky command: " + resp.Command, true
+		return ": # " + i18n.GetMsgWithMap("TerminalAIBlockedRiskyCommand", map[string]interface{}{
+			"command": resp.Command,
+		}), true
 	}
 	return resp.Command, strings.TrimSpace(resp.Command) != ""
 }
@@ -131,12 +133,14 @@ func (i *aiInputInterceptor) TrackInput(data []byte) {
 		switch b {
 		case '\r', '\n':
 			i.currentLine = nil
+		case 0x03:
+			i.currentLine = nil
+			i.inEscapeSeq = false
 		case 0x08, 0x7f:
 			i.currentLine = trimLastRuneBytes(i.currentLine)
 		case lineClearControl:
 			i.currentLine = nil
 		case 0x1b:
-			// Ignore ANSI escape sequences such as arrow keys and bracketed paste markers.
 			i.inEscapeSeq = true
 		default:
 			if b < 0x20 && b != '\t' {
@@ -180,25 +184,7 @@ func firstNonEmpty(values ...string) string {
 }
 
 func sanitizeInputLine(raw string) string {
-	raw = strings.TrimSpace(raw)
-	if raw == "" {
-		return ""
-	}
-	var builder strings.Builder
-	builder.Grow(len(raw))
-	for _, r := range raw {
-		switch {
-		case unicode.IsControl(r) && r != '\t' && r != ' ':
-			continue
-		case unicode.In(r, unicode.Cf):
-			continue
-		case r == '\u00a0' || r == '\u2007' || r == '\u202f' || r == '\u3000':
-			builder.WriteRune(' ')
-		default:
-			builder.WriteRune(r)
-		}
-	}
-	return strings.TrimSpace(builder.String())
+	return strings.TrimSpace(raw)
 }
 
 func trimLastRuneBytes(data []byte) []byte {

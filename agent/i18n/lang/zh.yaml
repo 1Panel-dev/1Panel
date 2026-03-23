@@ -565,3 +565,6 @@ PartitionDiskErr: "分区失败，{{ .err }}"
 FormatDiskErr: "格式化磁盘失败，{{ .err }}"
 MountDiskErr: "挂载磁盘失败，{{ .err }}"
 XfsNotFound: "未检测到 xfs 文件系统，请先安装 xfsprogs"
+
+# terminal
+TerminalAIBlockedRiskyCommand: "已拦截风险命令：{{ .command }}"

@@ -507,3 +507,6 @@ PartitionDiskErr: 'Не удалось разделить, {{ .err }}'
 FormatDiskErr: 'Не удалось отформатировать диск, {{ .err }}'
 MountDiskErr: 'Не удалось подключить диск, {{ .err }}'
 XfsNotFound: 'Файловая система xfs не обнаружена, сначала установите xfsprogs'
+
+# terminal
+TerminalAIBlockedRiskyCommand: 'Опасная команда заблокирована: {{ .command }}'

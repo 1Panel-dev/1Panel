@@ -1414,21 +1414,20 @@ const message = {
         cursorBar: 'Bar',
         scrollback: 'Skrol balik',
         scrollSensitivity: 'Kepekaan skrol',
-        aiStatus: 'AI Terminal',
-        aiSettings: 'AI Terminal Settings',
+        aiStatus: 'Terminal AI',
+        aiSettings: 'Tetapan terminal AI',
         aiAccountHelper:
             'Gunakan akaun model yang dipilih untuk menjana dan mengisi arahan. Untuk model tempatan seperti Ollama dan vLLM, gunakan akaun model tersuai.',
-        aiPrefix: 'Trigger Prefix',
-        aiPrefixHelper:
-            'When a line starts with this prefix and you press Enter, AI command generation will be triggered, for example # or //ai.',
-        aiRiskCommands: 'Risk Command Interception',
+        aiPrefix: 'Awalan pencetus',
+        aiPrefixHelper: 'Masukkan awalan ini dan tekan Enter untuk mencetuskan penjanaan arahan AI.',
+        aiRiskCommands: 'Pencegatan arahan berisiko',
         aiRiskCommandsHelper:
-            'Generated commands matching any of these fragments will be blocked and filled back as comments. Supports add, edit, and delete.',
-        aiAddRiskCommand: 'Add Risk Command',
-        aiRemoveRiskCommand: 'Delete',
-        aiSummary: 'When a line starts with the {0} prefix and you press Enter, AI command generation is triggered.',
+            'Arahan yang dijana dan sepadan dengan mana-mana fragmen ini akan disekat dan diisi semula sebagai komen. Biarkan kosong untuk mematikan pencegatan. Menyokong tambah, ubah suai dan padam.',
+        aiAddRiskCommand: 'Tambah arahan berisiko',
+        aiRemoveRiskCommand: 'Padam',
+        aiSummary: 'Apabila baris bermula dengan awalan {0} dan anda menekan Enter, penjanaan arahan AI akan dicetuskan.',
         aiPrefixAsciiVisible:
-            'Only ASCII visible characters are supported. Spaces, CJK characters, and full-width symbols are not allowed.',
+            'Hanya aksara ASCII yang kelihatan disokong. Ruang, aksara CJK dan simbol lebar penuh tidak dibenarkan.',
         saveHelper: 'Adakah anda pasti mahu menyimpan konfigurasi terminal semasa?',
     },
     toolbox: {

@@ -1396,11 +1396,10 @@ const message = {
             'Use the selected model account to generate and fill commands. For local models like Ollama and vLLM, use a custom model account.',
         aiAccountRequired: 'Please select an available AI account first.',
         aiPrefix: 'Trigger Prefix',
-        aiPrefixHelper:
-            'When a line starts with this prefix and you press Enter, AI command generation will be triggered, for example # or //ai.',
+        aiPrefixHelper: 'Enter this prefix and press Enter to trigger AI command generation.',
         aiRiskCommands: 'Risk Command Interception',
         aiRiskCommandsHelper:
-            'Generated commands matching any of these fragments will be blocked and filled back as comments. Supports add, edit, and delete.',
+            'Generated commands matching any of these fragments will be blocked and filled back as comments. Leave empty to disable interception. Supports add, edit, and delete.',
         aiAddRiskCommand: 'Add Risk Command',
         aiRemoveRiskCommand: 'Delete',
         aiSummary: 'When a line starts with the {0} prefix and you press Enter, AI command generation is triggered.',

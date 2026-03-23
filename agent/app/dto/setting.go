@@ -88,10 +88,11 @@ type SystemProxy struct {
 }
 
 type TerminalAIInfo struct {
-	AIStatus       string `json:"aiStatus"`
-	AIAccountID    string `json:"aiAccountId"`
-	AIPrefix       string `json:"aiPrefix"`
-	AIRiskCommands string `json:"aiRiskCommands"`
+	AIStatus              string `json:"aiStatus"`
+	AIAccountID           string `json:"aiAccountId"`
+	AIPrefix              string `json:"aiPrefix" validate:"required,oneof=@ai #ai /ai"`
+	AIRiskCommands        string `json:"aiRiskCommands"`
+	AIRiskCommandsDefault string `json:"aiRiskCommandsDefault"`
 }
 
 type CommonDescription struct {

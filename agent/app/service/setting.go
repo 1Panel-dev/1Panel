@@ -64,10 +64,11 @@ func (u *SettingService) GetSettingInfo() (*dto.SettingInfo, error) {
 
 func (u *SettingService) GetTerminalAIInfo() (*dto.TerminalAIInfo, error) {
 	info := &dto.TerminalAIInfo{
-		AIStatus:       constant.StatusDisable,
-		AIAccountID:    "",
-		AIPrefix:       "#",
-		AIRiskCommands: "[\"rm -rf\",\"mkfs\",\"dd if=\",\"curl | sh\",\"wget | sh\",\"chmod -R 777 /\",\"shutdown\",\"reboot\",\"poweroff\",\"init 0\",\":(){ :|:& };:\"]",
+		AIStatus:              constant.StatusDisable,
+		AIAccountID:           "",
+		AIPrefix:              constant.DefaultTerminalAIPrefix,
+		AIRiskCommands:        "[]",
+		AIRiskCommandsDefault: constant.DefaultTerminalAIRiskCommands,
 	}
 
 	if value, err := settingRepo.GetValueByKey("AIStatus"); err == nil && value != "" {
@@ -76,7 +77,7 @@ func (u *SettingService) GetTerminalAIInfo() (*dto.TerminalAIInfo, error) {
 	if value, err := settingRepo.GetValueByKey("AIAccountID"); err == nil {
 		info.AIAccountID = value
 	}
-	if value, err := settingRepo.GetValueByKey("AIPrefix"); err == nil && value != "" {
+	if value, err := settingRepo.GetValueByKey("AIPrefix"); err == nil {
 		info.AIPrefix = value
 	}
 	if value, err := settingRepo.GetValueByKey("AIRiskCommands"); err == nil && value != "" {

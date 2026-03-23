@@ -507,3 +507,6 @@ PartitionDiskErr: '分區失敗，{{ .err }}'
 FormatDiskErr: '格式化磁碟失敗，{{ .err }}'
 MountDiskErr: '掛載磁碟失敗，{{ .err }}'
 XfsNotFound: '未偵測到 xfs 檔案系統，請先安裝 xfsprogs'
+
+# terminal
+TerminalAIBlockedRiskyCommand: '已攔截風險命令：{{ .command }}'

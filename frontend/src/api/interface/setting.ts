@@ -87,6 +87,7 @@ export namespace Setting {
         aiAccountId: string;
         aiPrefix: string;
         aiRiskCommands: string;
+        aiRiskCommandsDefault?: string;
     }
     export interface SettingUpdate {
         key: string;
