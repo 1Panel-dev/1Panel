@@ -2,56 +2,60 @@
     <el-tabs
         v-model="currentTab"
         type="card"
-        :closable="props.fileTabs.length > 1"
+        :closable="true"
         class="monaco-editor monaco-editor-background"
         @tab-remove="props.onRemoveTab"
         @tab-change="props.onChangeTab"
     >
         <el-tab-pane v-for="item in props.fileTabs" :key="item.path" :name="item.path">
             <template #label>
-                <el-tooltip v-if="props.fileTabs.length == 1" :content="item.path" placement="bottom-start">
-                    <span>{{ item.name }}</span>
-                </el-tooltip>
-                <template v-if="props.fileTabs.length > 1">
-                    <el-dropdown
-                        size="small"
-                        :id="item.path"
-                        :ref="(el) => setDropdownRef(item.path, el)"
-                        trigger="contextmenu"
-                        placement="bottom"
-                        @visible-change="(visible) => onDropdownVisibleChange(visible, item.path)"
-                    >
-                        <span class="el-dropdown-link">
-                            <el-tooltip :content="item.path" placement="bottom-start">
-                                {{ item.name }}
-                            </el-tooltip>
-                        </span>
-                        <template #dropdown>
-                            <el-dropdown-menu>
-                                <el-dropdown-item @click="props.onRemoveTab(item.path)">
-                                    <el-icon><Close /></el-icon>
-                                    {{ $t('commons.button.close') }}
-                                </el-dropdown-item>
-                                <el-dropdown-item @click="props.onRemoveAllTab(item.path, 'left')">
-                                    <el-icon><DArrowLeft /></el-icon>
-                                    {{ $t('tabs.closeLeft') }}
-                                </el-dropdown-item>
-                                <el-dropdown-item @click="props.onRemoveAllTab(item.path, 'right')">
-                                    <el-icon><DArrowRight /></el-icon>
-                                    {{ $t('tabs.closeRight') }}
-                                </el-dropdown-item>
-                                <el-dropdown-item @click="props.onRemoveOtherTab(item.path)">
-                                    <el-icon><More /></el-icon>
-                                    {{ $t('tabs.closeOther') }}
-                                </el-dropdown-item>
-                                <el-dropdown-item @click="props.onRemoveAllTab(item.path, 'all')">
-                                    <el-icon><Operation /></el-icon>
-                                    {{ $t('tabs.closeAll') }}
-                                </el-dropdown-item>
-                            </el-dropdown-menu>
-                        </template>
-                    </el-dropdown>
-                </template>
+                <el-dropdown
+                    size="small"
+                    :id="item.path"
+                    :ref="(el) => setDropdownRef(item.path, el)"
+                    trigger="contextmenu"
+                    placement="bottom"
+                    @visible-change="(visible) => onDropdownVisibleChange(visible, item.path)"
+                >
+                    <span class="el-dropdown-link">
+                        <el-tooltip :content="item.path" placement="bottom-start">
+                            {{ item.name }}
+                        </el-tooltip>
+                    </span>
+                    <template #dropdown>
+                        <el-dropdown-menu>
+                            <el-dropdown-item @click="props.onRemoveTab(item.path)">
+                                <el-icon><Close /></el-icon>
+                                {{ $t('commons.button.close') }}
+                            </el-dropdown-item>
+                            <el-dropdown-item
+                                :disabled="props.fileTabs.length <= 1"
+                                @click="props.onRemoveAllTab(item.path, 'left')"
+                            >
+                                <el-icon><DArrowLeft /></el-icon>
+                                {{ $t('tabs.closeLeft') }}
+                            </el-dropdown-item>
+                            <el-dropdown-item
+                                :disabled="props.fileTabs.length <= 1"
+                                @click="props.onRemoveAllTab(item.path, 'right')"
+                            >
+                                <el-icon><DArrowRight /></el-icon>
+                                {{ $t('tabs.closeRight') }}
+                            </el-dropdown-item>
+                            <el-dropdown-item
+                                :disabled="props.fileTabs.length <= 1"
+                                @click="props.onRemoveOtherTab(item.path)"
+                            >
+                                <el-icon><More /></el-icon>
+                                {{ $t('tabs.closeOther') }}
+                            </el-dropdown-item>
+                            <el-dropdown-item @click="props.onRemoveAllTab(item.path, 'all')">
+                                <el-icon><Operation /></el-icon>
+                                {{ $t('tabs.closeAll') }}
+                            </el-dropdown-item>
+                        </el-dropdown-menu>
+                    </template>
+                </el-dropdown>
             </template>
         </el-tab-pane>
     </el-tabs>
