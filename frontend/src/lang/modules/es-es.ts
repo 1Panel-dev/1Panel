@@ -943,6 +943,7 @@ const message = {
         cleanLogHelper: 'Esto requerirá reiniciar el contenedor y no se puede deshacer. ¿Desea continuar?',
         newName: 'Nuevo nombre',
         workingDir: 'Directorio de trabajo',
+        composeFileMissing: 'No se detecto el archivo de Compose',
         source: 'Uso de recursos',
         cpuUsage: 'Uso de CPU',
         cpuTotal: 'CPU total',

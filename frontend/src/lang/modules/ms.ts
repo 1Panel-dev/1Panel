@@ -1178,6 +1178,7 @@ const message = {
         ifMakeImageWithContainer: 'Cipta Imej Baru daripada Kontena Ini?',
         finishTime: 'Masa berhenti terakhir',
         workingDir: 'Direktori kerja',
+        composeFileMissing: 'Fail Compose tidak dikesan',
         resource: 'Sumber',
         macAddr: 'Alamat MAC',
         volumeHelper: 'Pastikan kandungan volum storan adalah betul',

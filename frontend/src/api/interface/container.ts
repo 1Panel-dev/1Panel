@@ -335,6 +335,7 @@ export namespace Container {
         runningCount: number;
         configFile: string;
         workdir: string;
+        composeFileExists: boolean;
         path: string;
         containers: Array<ComposeContainer>;
         expand: boolean;

@@ -1170,6 +1170,7 @@ const message = {
         ifMakeImageWithContainer: 'Создать новый образ из этого контейнера?',
         finishTime: 'Время последней остановки',
         workingDir: 'Рабочий каталог',
+        composeFileMissing: 'Файл Compose не обнаружен',
         resource: 'Ресурс',
         macAddr: 'MAC-адрес',
         exportHelper: 'Экспортировать выбранные образы в один tar-файл.',

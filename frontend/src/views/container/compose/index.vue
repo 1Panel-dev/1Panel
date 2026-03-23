@@ -39,6 +39,14 @@
                                         >
                                             <div class="font-medium text-base compose-title">
                                                 {{ row.name }}
+                                                <el-tooltip
+                                                    v-if="!row.composeFileExists"
+                                                    :content="$t('container.composeFileMissing')"
+                                                >
+                                                    <el-button link icon="WarningFilled">
+                                                        <WarningFilled />
+                                                    </el-button>
+                                                </el-tooltip>
                                             </div>
                                             <div class="mb-1">
                                                 <el-text class="w-12" link size="small" type="info">
@@ -314,7 +322,15 @@
                                 />
                             </el-select>
                             <div v-show="showType === 'compose'">
+                                <el-alert
+                                    v-if="!currentCompose.composeFileExists"
+                                    :title="$t('container.composeFileMissing')"
+                                    type="warning"
+                                    :closable="false"
+                                    show-icon
+                                />
                                 <CodemirrorPro
+                                    v-else
                                     v-model="composeContent"
                                     mode="yaml"
                                     :heightDiff="475"
@@ -323,7 +339,15 @@
                             </div>
 
                             <div v-show="showType === 'log'">
+                                <el-alert
+                                    v-if="!currentCompose.composeFileExists"
+                                    :title="$t('container.composeFileMissing')"
+                                    type="warning"
+                                    :closable="false"
+                                    show-icon
+                                />
                                 <ContainerLog
+                                    v-else
                                     :key="currentCompose.path"
                                     :compose="currentCompose.path"
                                     :resource="currentCompose.name"
@@ -625,6 +649,12 @@ const loadDetail = async (row: Container.ComposeInfo, withRefresh: boolean) => {
 };
 
 const inspectCompose = async (name: string, detailPath: string) => {
+    if (!currentCompose.value?.composeFileExists) {
+        composeContent.value = '';
+        loadContainerStats();
+        detailLoading.value = false;
+        return;
+    }
     await inspect({ id: name, type: 'compose', detail: detailPath })
         .then((res) => {
             composeContent.value = res.data;
