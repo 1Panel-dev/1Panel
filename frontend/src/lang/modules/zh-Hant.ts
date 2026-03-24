@@ -1550,6 +1550,7 @@ const message = {
         downloadSuccess: '下載成功',
         downloadUrl: '下載網址',
         downloadStart: '下載開始!',
+        wgetUrlInvalid: '請輸入有效的 http(s) 下載網址',
         moveSuccess: '移動成功',
         copySuccess: '複製成功',
         pasteMsg: '請在目標目錄點選右上角【貼上】按鈕',

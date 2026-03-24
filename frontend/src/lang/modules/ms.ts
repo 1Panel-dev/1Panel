@@ -1677,6 +1677,7 @@ const message = {
         selectFile: 'Pilih fail',
         downloadUrl: 'URL Jarak Jauh',
         downloadStart: 'Muat turun bermula',
+        wgetUrlInvalid: 'Masukkan URL muat turun http(s) yang sah',
         moveSuccess: 'Berjaya dipindahkan',
         copySuccess: 'Berjaya disalin',
         pasteMsg: 'Sila klik butang "Tampal" di bahagian kanan atas direktori sasaran',

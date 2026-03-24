@@ -1642,6 +1642,7 @@ const message = {
         selectFile: 'Select file',
         downloadUrl: 'Remote URL',
         downloadStart: 'Download started',
+        wgetUrlInvalid: 'Please enter a valid http(s) download URL',
         moveSuccess: 'Successfully moved',
         copySuccess: 'Successfully copied',
         pasteMsg: 'Click the [Paste] button at the top right of the target directory',
