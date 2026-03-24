@@ -10,65 +10,67 @@
     </el-form-item>
 
     <DrawerPro v-model="drawerVisible" :header="$t('terminal.aiSettings')" size="60%" @close="handleClose">
-        <el-form ref="formRef" :model="formModel" label-position="top">
-            <el-form-item :label="$t('terminal.aiStatus')">
-                <el-switch v-model="formModel.status" active-value="Enable" inactive-value="Disable" />
-            </el-form-item>
-            <el-form-item
-                :label="$t('aiTools.agents.account')"
-                prop="accountId"
-                :rules="accountRules"
-                v-if="formModel.status === 'Enable'"
-            >
-                <el-select class="formInput" v-model="formModel.accountId" clearable filterable>
-                    <el-option
-                        v-for="item in agentAccountOptions"
-                        :key="item.id"
-                        :label="item.name"
-                        :value="String(item.id)"
-                    >
-                        <div class="account-option">
-                            <span class="account-option__name">{{ item.name }}</span>
-                            <div class="account-option__tags">
-                                <el-tag size="small" effect="plain">
-                                    {{ item.providerName || item.provider }}
-                                </el-tag>
-                                <el-tag size="small" effect="plain" :type="verificationTagType(item)">
-                                    {{ verificationLabel(item) }}
-                                </el-tag>
+        <div v-loading="loading">
+            <el-form ref="formRef" :model="formModel" label-position="top">
+                <el-form-item :label="$t('terminal.aiStatus')">
+                    <el-switch v-model="formModel.status" active-value="Enable" inactive-value="Disable" />
+                </el-form-item>
+                <el-form-item
+                    :label="$t('aiTools.agents.account')"
+                    prop="accountId"
+                    :rules="accountRules"
+                    v-if="formModel.status === 'Enable'"
+                >
+                    <el-select class="formInput" v-model="formModel.accountId" clearable filterable>
+                        <el-option
+                            v-for="item in agentAccountOptions"
+                            :key="item.id"
+                            :label="item.name"
+                            :value="String(item.id)"
+                        >
+                            <div class="account-option">
+                                <span class="account-option__name">{{ item.name }}</span>
+                                <div class="account-option__tags">
+                                    <el-tag size="small" effect="plain">
+                                        {{ item.providerName || item.provider }}
+                                    </el-tag>
+                                    <el-tag size="small" effect="plain" :type="verificationTagType(item)">
+                                        {{ verificationLabel(item) }}
+                                    </el-tag>
+                                </div>
                             </div>
+                        </el-option>
+                    </el-select>
+                    <span class="input-help">{{ $t('terminal.aiAccountHelper') }}</span>
+                </el-form-item>
+                <el-form-item :label="$t('terminal.aiPrefix')" prop="prefix" :rules="Rules.requiredSelect">
+                    <el-select class="formInput" v-model="formModel.prefix">
+                        <el-option v-for="item in prefixOptions" :key="item" :label="item" :value="item" />
+                    </el-select>
+                    <span class="input-help">{{ $t('terminal.aiPrefixHelper') }}</span>
+                </el-form-item>
+                <el-form-item :label="$t('terminal.aiRiskCommands')" prop="riskCommands" :rules="riskCommandRules">
+                    <div class="risk-command-list">
+                        <div class="risk-command-item" v-for="(command, index) in formModel.riskCommands" :key="index">
+                            <el-input :model-value="command" @update:model-value="updateRiskCommand(index, $event)" />
+                            <el-button link type="danger" @click="removeRiskCommand(index)">
+                                {{ $t('terminal.aiRemoveRiskCommand') }}
+                            </el-button>
                         </div>
-                    </el-option>
-                </el-select>
-                <span class="input-help">{{ $t('terminal.aiAccountHelper') }}</span>
-            </el-form-item>
-            <el-form-item :label="$t('terminal.aiPrefix')" prop="prefix" :rules="Rules.requiredSelect">
-                <el-select class="formInput" v-model="formModel.prefix">
-                    <el-option v-for="item in prefixOptions" :key="item" :label="item" :value="item" />
-                </el-select>
-                <span class="input-help">{{ $t('terminal.aiPrefixHelper') }}</span>
-            </el-form-item>
-            <el-form-item :label="$t('terminal.aiRiskCommands')" prop="riskCommands" :rules="riskCommandRules">
-                <div class="risk-command-list">
-                    <div class="risk-command-item" v-for="(command, index) in formModel.riskCommands" :key="index">
-                        <el-input :model-value="command" @update:model-value="updateRiskCommand(index, $event)" />
-                        <el-button link type="danger" @click="removeRiskCommand(index)">
-                            {{ $t('terminal.aiRemoveRiskCommand') }}
-                        </el-button>
+                        <div class="risk-command-actions">
+                            <el-button plain @click="addRiskCommand">{{ $t('terminal.aiAddRiskCommand') }}</el-button>
+                        </div>
                     </div>
-                    <div class="risk-command-actions">
-                        <el-button plain @click="addRiskCommand">{{ $t('terminal.aiAddRiskCommand') }}</el-button>
-                    </div>
-                </div>
-                <span class="input-help">{{ $t('terminal.aiRiskCommandsHelper') }}</span>
-            </el-form-item>
-        </el-form>
+                    <span class="input-help">{{ $t('terminal.aiRiskCommandsHelper') }}</span>
+                </el-form-item>
+            </el-form>
+        </div>
         <template #footer>
-            <el-button @click="drawerVisible = false" :disabled="saving">{{ $t('commons.button.cancel') }}</el-button>
-            <el-button plain @click="resetRiskCommands" :disabled="saving">
+            <el-button @click="drawerVisible = false" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
+            <el-button plain @click="resetRiskCommands" :disabled="loading">
                 {{ $t('commons.button.setDefault') }}
             </el-button>
-            <el-button type="primary" @click="handleConfirm" :loading="saving">
+            <el-button type="primary" @click="handleConfirm" :loading="loading">
                 {{ $t('commons.button.confirm') }}
             </el-button>
         </template>
@@ -108,7 +110,7 @@ const emit = defineEmits<{
 type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
 const drawerVisible = ref(false);
-const saving = ref(false);
+const loading = ref(false);
 const agentAccountOptions = ref<AgentAccountOption[]>([]);
 const prefixOptions = AI_PREFIX_OPTIONS;
 const formModel = reactive({
@@ -240,7 +242,7 @@ const handleConfirm = async () => {
     } catch {
         return;
     }
-    saving.value = true;
+    loading.value = true;
     try {
         await updateAgentTerminalAIInfo({
             aiStatus: formModel.status,
@@ -251,7 +253,7 @@ const handleConfirm = async () => {
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         drawerVisible.value = false;
     } finally {
-        saving.value = false;
+        loading.value = false;
     }
 };
 
