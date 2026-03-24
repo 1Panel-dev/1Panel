@@ -86,7 +86,7 @@
                             </el-button>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('aiTools.agents.token')" min-width="80">
+                    <el-table-column label="Token" min-width="80">
                         <template #default="{ row }">
                             <el-space v-if="row.agentType !== 'copaw'">
                                 <CopyButton :content="row.token" />

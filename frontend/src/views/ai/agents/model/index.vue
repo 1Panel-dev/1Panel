@@ -17,8 +17,8 @@
                             {{ getAgentProviderDisplayName(row.provider, row.providerName) }}
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('aiTools.agents.baseUrl')" prop="baseUrl" min-width="200" />
-                    <el-table-column :label="$t('aiTools.agents.apiKey')" prop="apiKey" min-width="160">
+                    <el-table-column label="Base URL" prop="baseUrl" min-width="200" />
+                    <el-table-column label="API Key" prop="apiKey" min-width="160">
                         <template #default="{ row }">
                             {{ maskKey(row.apiKey) }}
                         </template>

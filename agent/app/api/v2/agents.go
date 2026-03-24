@@ -681,6 +681,47 @@ func (b *BaseApi) UpdateAgentOtherConfig(c *gin.Context) {
 }
 
 // @Tags AI
+// @Summary List Agent skills
+// @Accept json
+// @Param request body dto.AgentSkillsReq true "request"
+// @Success 200 {array} dto.AgentSkillItem
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/skills/list [post]
+func (b *BaseApi) ListAgentSkills(c *gin.Context) {
+	var req dto.AgentSkillsReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	data, err := agentService.ListSkills(req)
+	if err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.SuccessWithData(c, data)
+}
+
+// @Tags AI
+// @Summary Update Agent skill status
+// @Accept json
+// @Param request body dto.AgentSkillUpdateReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/skills/update [post]
+func (b *BaseApi) UpdateAgentSkill(c *gin.Context) {
+	var req dto.AgentSkillUpdateReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := agentService.UpdateSkill(req); err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags AI
 // @Summary Login Agent Weixin channel
 // @Accept json
 // @Param request body dto.AgentWeixinLoginReq true "request"

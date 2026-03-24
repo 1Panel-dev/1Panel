@@ -166,6 +166,14 @@ func (a AgentService) InstallPlugin(req dto.AgentPluginInstallReq) error {
 	}
 	installTask.AddSubTask("Install OpenClaw plugin", func(t *task.Task) error {
 		mgr := cmd.NewCommandMgr(cmd.WithTask(*t), cmd.WithContext(t.TaskCtx), cmd.WithTimeout(10*time.Minute))
+		if req.Type == "qqbot" {
+			legacyPluginPath := path.Join(openclawPluginBaseDir, "qqbot")
+			if err := mgr.RunBashCf("docker exec %s test -d %s", install.ContainerName, legacyPluginPath); err == nil {
+				if err := mgr.RunBashCf("printf 'yes\\n' | docker exec -i %s openclaw plugins uninstall qqbot", install.ContainerName); err != nil {
+					return err
+				}
+			}
+		}
 		if err := mgr.RunBashCf("docker exec %s openclaw plugins install %s", install.ContainerName, spec); err != nil {
 			return err
 		}
@@ -539,7 +547,7 @@ func setQQBotConfig(conf map[string]interface{}, config dto.AgentQQBotConfig) {
 
 	plugins := ensureChildMap(conf, "plugins")
 	entries := ensureChildMap(plugins, "entries")
-	qqbotEntry := ensureChildMap(entries, "qqbot")
+	qqbotEntry := ensureChildMap(entries, "openclaw-qqbot")
 	qqbotEntry["enabled"] = config.Enabled
 }
 
@@ -571,7 +579,7 @@ func appendPluginAllow(conf map[string]interface{}, pluginID string) {
 func resolvePluginMeta(pluginType string) (string, string, error) {
 	switch pluginType {
 	case "qqbot":
-		return "@sliverp/qqbot@latest", "qqbot", nil
+		return "@tencent-connect/openclaw-qqbot@latest", "openclaw-qqbot", nil
 	case "wecom":
 		return "@wecom/wecom-openclaw-plugin", "wecom-openclaw-plugin", nil
 	case "dingtalk":

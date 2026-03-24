@@ -353,3 +353,21 @@ type AgentOtherConfig struct {
 	BrowserEnabled bool   `json:"browserEnabled"`
 	NPMRegistry    string `json:"npmRegistry"`
 }
+
+type AgentSkillsReq struct {
+	AgentID uint `json:"agentId" validate:"required"`
+}
+
+type AgentSkillItem struct {
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Source      string `json:"source"`
+	Bundled     bool   `json:"bundled"`
+	Disabled    bool   `json:"disabled"`
+}
+
+type AgentSkillUpdateReq struct {
+	AgentID uint   `json:"agentId" validate:"required"`
+	Name    string `json:"name" validate:"required"`
+	Enabled bool   `json:"enabled"`
+}

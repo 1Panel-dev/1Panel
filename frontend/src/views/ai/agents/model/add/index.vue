@@ -14,7 +14,7 @@
                     />
                 </el-select>
             </el-form-item>
-            <el-form-item :label="$t('aiTools.agents.apiKey')" prop="apiKey">
+            <el-form-item label="API Key" prop="apiKey">
                 <el-input v-model="form.apiKey" type="password" show-password />
                 <span class="input-help" v-if="form.provider === 'custom' || form.provider === 'vllm'">
                     {{ $t('aiTools.agents.customProviderHelper') }}
@@ -23,7 +23,7 @@
             <el-form-item>
                 <el-checkbox v-model="form.rememberApiKey">{{ $t('terminal.rememberPassword') }}</el-checkbox>
             </el-form-item>
-            <el-form-item :label="$t('aiTools.agents.baseUrl')" prop="baseURL">
+            <el-form-item label="Base URL" prop="baseURL">
                 <el-input v-model="form.baseURL" :disabled="!editableBaseURLProviders.includes(form.provider)" />
             </el-form-item>
             <el-form-item :label="'API ' + $t('commons.table.type')" prop="apiType">
@@ -32,7 +32,7 @@
                 </el-select>
             </el-form-item>
             <template v-if="showInitialModel">
-                <el-divider content-position="left">{{ $t('aiTools.agents.accountModels') }}</el-divider>
+                <el-divider content-position="left">{{ $t('aiTools.agents.modelPool') }}</el-divider>
                 <el-form-item :label="$t('aiTools.model.model')" prop="initialModel.id" :rules="[Rules.noSpace]">
                     <el-input v-model="form.initialModel.id" />
                 </el-form-item>

@@ -229,6 +229,14 @@ export const updateAgentOtherConfig = (req: AI.AgentOtherConfigUpdateReq) => {
     return http.post(`/ai/agents/other/update`, req);
 };
 
+export const listAgentSkills = (req: AI.AgentSkillsReq) => {
+    return http.post<AI.AgentSkillItem[]>(`/ai/agents/skills/list`, req);
+};
+
+export const updateAgentSkill = (req: AI.AgentSkillUpdateReq) => {
+    return http.post(`/ai/agents/skills/update`, req);
+};
+
 export const approveAgentChannelPairing = (req: AI.AgentChannelPairingApproveReq) => {
     return http.post(`/ai/agents/channel/pairing/approve`, req);
 };

@@ -42,6 +42,12 @@ const agentId = ref(0);
 const accountOptions = ref<AI.AgentAccountItem[]>([]);
 const modelOptions = ref<AI.AgentAccountModel[]>([]);
 
+interface AgentModelLoadParams {
+    agentId: number;
+    accountId: number;
+    model: string;
+}
+
 const form = reactive({
     accountId: undefined as unknown as number,
     model: '',
@@ -75,10 +81,10 @@ const handleAccountChange = () => {
     setModelOptionsByAccount(form.accountId);
 };
 
-const load = async (agent: AI.AgentItem) => {
+const load = async (params: AgentModelLoadParams) => {
     loading.value = true;
     try {
-        agentId.value = agent.id;
+        agentId.value = params.agentId;
         await loadAccounts();
         if (accountOptions.value.length === 0) {
             form.accountId = undefined as unknown as number;
@@ -87,9 +93,9 @@ const load = async (agent: AI.AgentItem) => {
             return;
         }
         const currentAccount =
-            accountOptions.value.find((item) => item.id === agent.accountId) || accountOptions.value[0];
+            accountOptions.value.find((item) => item.id === params.accountId) || accountOptions.value[0];
         form.accountId = currentAccount.id;
-        form.model = agent.model || currentAccount.models?.[0]?.id || '';
+        form.model = params.model || currentAccount.models?.[0]?.id || '';
         setModelOptionsByAccount(currentAccount.id);
     } finally {
         loading.value = false;
