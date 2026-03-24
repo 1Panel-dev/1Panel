@@ -41,7 +41,7 @@
                             </div>
                         </el-tooltip>
                         <div class="skill-tags">
-                            <el-tag class="skill-source-tag" size="small" effect="plain">
+                            <el-tag size="small" effect="plain">
                                 {{ group.tagLabel }}
                             </el-tag>
                         </div>
@@ -241,6 +241,7 @@ defineExpose({
 
 .skill-name {
     font-weight: 600;
+    font-size: 16px;
 }
 
 .skill-desc {

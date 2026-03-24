@@ -73,6 +73,7 @@ const (
 	defaultToolsSessionVisibility = "all"
 	maxCommunityAIAgents          = int64(5)
 	openclawPluginBaseDir         = "/home/node/.openclaw/extensions"
+	openclawPluginPackageTmpDir   = "/tmp/openclaw-plugin"
 	openclawGatewayPort           = 18789
 	openclawAllowedOriginHost     = "127.0.0.1"
 	openclawHTTPSVersion          = "2026.3.13"
