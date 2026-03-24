@@ -58,7 +58,7 @@
                         :label="$t('aiTools.model.model')"
                         show-overflow-tooltip
                         prop="provider"
-                        min-width="120"
+                        min-width="150"
                     >
                         <template #default="{ row }">
                             <template v-if="row.agentType !== 'copaw'">
@@ -70,7 +70,7 @@
                             <span v-else>-</span>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('commons.table.port')" prop="webUIPort" min-width="150">
+                    <el-table-column :label="$t('commons.table.port')" prop="webUIPort" min-width="180">
                         <template #default="{ row }">
                             <el-button icon="Position" plain size="small" @click="jumpWebUI(row)">
                                 {{ $t('aiTools.agents.webuiPort') }}: {{ row.webUIPort }}
@@ -86,7 +86,7 @@
                             </el-button>
                         </template>
                     </el-table-column>
-                    <el-table-column label="Token" min-width="80">
+                    <el-table-column label="Token" min-width="120">
                         <template #default="{ row }">
                             <el-space v-if="row.agentType !== 'copaw'">
                                 <CopyButton :content="row.token" />
