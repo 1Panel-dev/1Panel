@@ -86,9 +86,9 @@
                             </el-button>
                         </template>
                     </el-table-column>
-                    <el-table-column label="Token" min-width="80">
+                    <el-table-column label="Token" min-width="120">
                         <template #default="{ row }">
-                            <el-space v-if="row.agentType !== 'copaw'">
+                            <el-space v-if="row.agentType !== 'copaw'" class="token-actions" :size="4">
                                 <CopyButton :content="row.token" />
                                 <el-button link type="primary" @click="onResetToken(row)">
                                     {{ $t('commons.button.reset') }}
@@ -405,5 +405,9 @@ onMounted(async () => {
     height: 16px;
     flex: 0 0 16px;
     object-fit: contain;
+}
+
+.token-actions {
+    white-space: nowrap;
 }
 </style>
