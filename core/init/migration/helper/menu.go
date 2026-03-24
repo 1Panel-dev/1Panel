@@ -16,7 +16,7 @@ func LoadMenus() string {
 		{ID: "2", Disabled: true, Title: "menu.apps", IsShow: true, Label: "App-Menu", Path: "/apps/all", Sort: 200},
 		{ID: "3", Disabled: false, Title: "menu.aiTools", IsShow: true, Label: "AI-Menu", Path: "/ai/model", Sort: 300,
 			Children: []dto.ShowMenu{
-				{ID: "44", Disabled: false, Title: "aiTools.agents.agents", IsShow: true, Label: "Agents", Path: "/ai/agents/agent", Sort: 50},
+				{ID: "44", Disabled: false, Title: "aiTools.agents.agent", IsShow: true, Label: "Agents", Path: "/ai/agents/agent", Sort: 50},
 				{ID: "41", Disabled: false, Title: "aiTools.model.localModel", IsShow: true, Label: "OllamaModel", Path: "/ai/model", Sort: 100},
 				{ID: "42", Disabled: false, Title: "menu.mcp", IsShow: true, Label: "MCPServer", Path: "/ai/mcp", Sort: 200},
 				{ID: "43", Disabled: false, Title: "aiTools.gpu.gpu", IsShow: true, Label: "GPU", Path: "/ai/gpu", Sort: 300},

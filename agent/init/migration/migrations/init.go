@@ -643,7 +643,7 @@ var AddAgentQuickJump = &gormigrate.Migration{
 
 		return tx.Create(&model.QuickJump{
 			Name:      "Agent",
-			Title:     "aiTools.agents.agents",
+			Title:     "aiTools.agents.agent",
 			Recommend: 1,
 			IsShow:    true,
 			Router:    "/ai/agents/agent",
@@ -1131,5 +1131,14 @@ var AddAITerminalSettings = &gormigrate.Migration{
 			Key:   "AIRiskCommands",
 			Value: constant.DefaultTerminalAIRiskCommands,
 		}).Error
+	},
+}
+
+var UpdateAgentQuickJumpTitle = &gormigrate.Migration{
+	ID: "20260324-update-agent-quick-jump-title",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.Model(&model.QuickJump{}).
+			Where("title = ?", "aiTools.agents.agents").
+			Update("title", "aiTools.agents.agent").Error
 	},
 }
