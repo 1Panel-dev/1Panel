@@ -110,12 +110,9 @@
                     </div>
                 </transition>
 
-                <div class="flex items-center gap-3 w-full py-2 flex-wrap">
-                    <el-button
-                        @click="cmdPanelVisible = !cmdPanelVisible"
-                        type="primary"
-                        class="min-w-[120px] max-w-[150px] shrink-0"
-                    >
+                <div class="flex items-center gap-2 w-full py-2 flex-wrap">
+                    <AiSetting v-if="!mobile" class="shrink-0" />
+                    <el-button @click="cmdPanelVisible = !cmdPanelVisible" class="min-w-[120px] max-w-[150px] shrink-0">
                         {{ $t('terminal.quickCommand') }}
                         <el-icon class="ml-1">
                             <component :is="cmdPanelVisible ? 'ArrowUp' : 'ArrowDown'" />
@@ -283,6 +280,7 @@ import { GlobalStore } from '@/store';
 import router from '@/routers';
 import { getCommandTree } from '@/api/modules/command';
 import { getAgentSettingByKey } from '@/api/modules/setting';
+import AiSetting from '@/views/terminal/setting/ai/index.vue';
 
 const dialogRef = ref();
 const ctx = getCurrentInstance() as any;

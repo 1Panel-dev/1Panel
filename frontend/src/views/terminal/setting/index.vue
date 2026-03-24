@@ -114,17 +114,6 @@
 
                             <el-divider border-style="dashed" />
 
-                            <AiSetting
-                                :status="aiForm.aiStatus"
-                                :account-id="aiForm.aiAccountId"
-                                :prefix="aiForm.aiPrefix"
-                                :risk-commands="aiForm.aiRiskCommands"
-                                :default-risk-commands="aiForm.aiRiskCommandsDefault"
-                                @refresh="loadAISettings"
-                            />
-
-                            <el-divider border-style="dashed" />
-
                             <el-form-item :label="$t('terminal.defaultConn')">
                                 <el-switch v-model="form.showDefaultConn" @change="changeShow" />
                             </el-form-item>
@@ -158,11 +147,9 @@
 
 <script lang="ts" setup>
 import { ref, reactive, watch, onMounted, onBeforeUnmount } from 'vue';
-import { getAgentTerminalAIInfo, getTerminalInfo, UpdateTerminalInfo } from '@/api/modules/setting';
+import { getTerminalInfo, UpdateTerminalInfo } from '@/api/modules/setting';
 import { Terminal } from '@xterm/xterm';
 import OperateDialog from '@/views/terminal/setting/default_conn/index.vue';
-import AiSetting from '@/views/terminal/setting/ai/index.vue';
-import { DEFAULT_AI_PREFIX, parseRiskCommands } from '@/views/terminal/setting/ai/helper';
 import '@xterm/xterm/css/xterm.css';
 import { FitAddon } from '@xterm/addon-fit';
 import i18n from '@/lang';
@@ -208,14 +195,6 @@ const form = reactive({
     showDefaultConn: false,
     defaultConn: '',
 });
-const aiForm = reactive({
-    aiStatus: 'Disable',
-    aiAccountId: '',
-    aiPrefix: '',
-    aiRiskCommands: [],
-    aiRiskCommandsDefault: [],
-});
-
 const resetConn = ref(false);
 const opRef = ref();
 
@@ -252,7 +231,6 @@ watch(
 
 const acceptParams = () => {
     search(true);
-    loadAISettings();
     loadConnShow();
     iniTerm();
 };
@@ -294,21 +272,6 @@ const search = async (withReset?: boolean) => {
             }
         })
         .catch(() => {
-            loading.value = false;
-        });
-};
-
-const loadAISettings = async () => {
-    loading.value = true;
-    await getAgentTerminalAIInfo()
-        .then((res) => {
-            aiForm.aiStatus = res.data.aiStatus || 'Disable';
-            aiForm.aiAccountId = res.data.aiAccountId || '';
-            aiForm.aiPrefix = res.data.aiPrefix || DEFAULT_AI_PREFIX;
-            aiForm.aiRiskCommands = parseRiskCommands(res.data.aiRiskCommands || '');
-            aiForm.aiRiskCommandsDefault = parseRiskCommands(res.data.aiRiskCommandsDefault || '');
-        })
-        .finally(() => {
             loading.value = false;
         });
 };

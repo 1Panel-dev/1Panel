@@ -1416,17 +1416,15 @@ const message = {
         cursorBar: 'Çubuk',
         scrollback: 'Geri Kaydırma',
         scrollSensitivity: 'Kaydırma Hassasiyeti',
-        aiStatus: 'AI Terminali',
-        aiSettings: 'AI terminal ayarları',
+        aiAssistant: 'AI Asistani',
         aiAccountHelper:
             'Komut üretmek ve doldurmak için seçili model hesabını kullanın. Ollama ve vLLM gibi yerel modeller için özel model hesabı kullanın.',
         aiPrefix: 'Tetikleme öneki',
-        aiPrefixHelper: 'Bu öneki girip Enter tuşuna bastığınızda AI komut üretimi tetiklenir.',
+        aiPrefixHelper:
+            'Belirtilen öneki girip Enter tuşuna bastığınızda AI komut üretimi tetiklenir; örneğin: {0} disk bilgisini sorgulamama yardım et.',
         aiRiskCommands: 'Riskli komut engelleme',
         aiRiskCommandsHelper:
-            'Bu parçalardan herhangi biriyle eşleşen üretilmiş komutlar engellenir ve yorum olarak geri doldurulur. Engellemeyi kapatmak için boş bırakın. Ekleme, düzenleme ve silme desteklenir.',
-        aiAddRiskCommand: 'Riskli komut ekle',
-        aiRemoveRiskCommand: 'Sil',
+            'Engellenecek riskli komutlari yapılandırın, her satıra bir tane gelecek şekilde. Eşleşme olduğunda üretim durdurulur ve yorum olarak geri doldurulur.',
         aiSummary: 'Bir satır {0} önekiyle başladığında ve Enter tuşuna bastığınızda AI komut üretimi tetiklenir.',
         aiPrefixAsciiVisible:
             'Yalnızca görünür ASCII karakterleri desteklenir. Boşluklara, CJK karakterlerine ve tam genişlikli sembollere izin verilmez.',

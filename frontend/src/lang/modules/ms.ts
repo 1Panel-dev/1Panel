@@ -1419,17 +1419,15 @@ const message = {
         cursorBar: 'Bar',
         scrollback: 'Skrol balik',
         scrollSensitivity: 'Kepekaan skrol',
-        aiStatus: 'Terminal AI',
-        aiSettings: 'Tetapan terminal AI',
+        aiAssistant: 'Pembantu AI',
         aiAccountHelper:
             'Gunakan akaun model yang dipilih untuk menjana dan mengisi arahan. Untuk model tempatan seperti Ollama dan vLLM, gunakan akaun model tersuai.',
         aiPrefix: 'Awalan pencetus',
-        aiPrefixHelper: 'Masukkan awalan ini dan tekan Enter untuk mencetuskan penjanaan arahan AI.',
+        aiPrefixHelper:
+            'Masukkan awalan yang ditetapkan dan tekan Enter untuk mencetuskan penjanaan arahan AI, contohnya: {0} bantu saya semak maklumat cakera.',
         aiRiskCommands: 'Pencegatan arahan berisiko',
         aiRiskCommandsHelper:
-            'Arahan yang dijana dan sepadan dengan mana-mana fragmen ini akan disekat dan diisi semula sebagai komen. Biarkan kosong untuk mematikan pencegatan. Menyokong tambah, ubah suai dan padam.',
-        aiAddRiskCommand: 'Tambah arahan berisiko',
-        aiRemoveRiskCommand: 'Padam',
+            'Konfigurasikan arahan berisiko yang perlu dipintas, satu bagi setiap baris. Apabila sepadan, penjanaan akan disekat dan diisi semula sebagai komen.',
         aiSummary:
             'Apabila baris bermula dengan awalan {0} dan anda menekan Enter, penjanaan arahan AI akan dicetuskan.',
         aiPrefixAsciiVisible:

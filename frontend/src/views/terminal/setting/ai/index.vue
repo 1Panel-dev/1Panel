@@ -1,18 +1,12 @@
 <template>
-    <el-form-item :label="$t('terminal.aiSettings')">
-        <el-input :value="aiSummary" disabled>
-            <template #append>
-                <el-button @click="openDrawer" icon="Setting">
-                    {{ $t('commons.button.set') }}
-                </el-button>
-            </template>
-        </el-input>
-    </el-form-item>
+    <el-button @click="openDrawer" type="primary">
+        {{ $t('terminal.aiAssistant') }}
+    </el-button>
 
-    <DrawerPro v-model="drawerVisible" :header="$t('terminal.aiSettings')" size="60%" @close="handleClose">
+    <DrawerPro v-model="drawerVisible" :header="$t('terminal.aiAssistant')" size="60%" @close="handleClose">
         <div v-loading="loading">
             <el-form ref="formRef" :model="formModel" label-position="top">
-                <el-form-item :label="$t('terminal.aiStatus')">
+                <el-form-item :label="$t('terminal.aiAssistant')">
                     <el-switch v-model="formModel.status" active-value="Enable" inactive-value="Disable" />
                 </el-form-item>
                 <el-form-item
@@ -47,20 +41,18 @@
                     <el-select class="formInput" v-model="formModel.prefix">
                         <el-option v-for="item in prefixOptions" :key="item" :label="item" :value="item" />
                     </el-select>
-                    <span class="input-help">{{ $t('terminal.aiPrefixHelper') }}</span>
+                    <span class="input-help">
+                        {{ $t('terminal.aiPrefixHelper', [formModel.prefix || DEFAULT_AI_PREFIX]) }}
+                    </span>
                 </el-form-item>
-                <el-form-item :label="$t('terminal.aiRiskCommands')" prop="riskCommands" :rules="riskCommandRules">
-                    <div class="risk-command-list">
-                        <div class="risk-command-item" v-for="(command, index) in formModel.riskCommands" :key="index">
-                            <el-input :model-value="command" @update:model-value="updateRiskCommand(index, $event)" />
-                            <el-button link type="danger" @click="removeRiskCommand(index)">
-                                {{ $t('terminal.aiRemoveRiskCommand') }}
-                            </el-button>
-                        </div>
-                        <div class="risk-command-actions">
-                            <el-button plain @click="addRiskCommand">{{ $t('terminal.aiAddRiskCommand') }}</el-button>
-                        </div>
-                    </div>
+                <el-form-item :label="$t('terminal.aiRiskCommands')">
+                    <CodemirrorPro
+                        v-model="formModel.riskCommands"
+                        mode="shell"
+                        line-wrapping
+                        :height-diff="560"
+                        :min-height="180"
+                    ></CodemirrorPro>
                     <span class="input-help">{{ $t('terminal.aiRiskCommandsHelper') }}</span>
                 </el-form-item>
             </el-form>
@@ -78,14 +70,21 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, nextTick, reactive, ref, watch } from 'vue';
+import { nextTick, reactive, ref } from 'vue';
 import type { ElForm } from 'element-plus';
+import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { pageAgentAccounts } from '@/api/modules/ai';
-import { updateAgentTerminalAIInfo } from '@/api/modules/setting';
+import { getAgentTerminalAIInfo, updateAgentTerminalAIInfo } from '@/api/modules/setting';
 import { MsgSuccess } from '@/utils/message';
-import { AI_PREFIX_OPTIONS, DEFAULT_AI_PREFIX, normalizeRiskCommands } from '@/views/terminal/setting/ai/helper';
+import {
+    AI_PREFIX_OPTIONS,
+    DEFAULT_AI_PREFIX,
+    formatRiskCommandsText,
+    normalizeRiskCommands,
+    parseRiskCommands,
+} from '@/views/terminal/setting/ai/helper';
 
 interface AgentAccountOption {
     id: number | string;
@@ -95,62 +94,36 @@ interface AgentAccountOption {
     verified?: boolean;
 }
 
-const props = defineProps<{
-    status: string;
-    accountId: string;
-    prefix: string;
-    riskCommands: string[];
-    defaultRiskCommands: string[];
-}>();
-
-const emit = defineEmits<{
-    (e: 'refresh'): void;
-}>();
-
 type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
 const drawerVisible = ref(false);
 const loading = ref(false);
 const agentAccountOptions = ref<AgentAccountOption[]>([]);
+const defaultRiskCommands = ref<string[]>([]);
 const prefixOptions = AI_PREFIX_OPTIONS;
 const formModel = reactive({
-    status: props.status,
-    accountId: props.accountId,
-    prefix: props.prefix,
-    riskCommands: [...props.riskCommands],
+    status: 'Disable',
+    accountId: '',
+    prefix: DEFAULT_AI_PREFIX,
+    riskCommands: '',
 });
 
-const syncFormFromProps = () => {
-    formModel.status = props.status;
-    formModel.accountId = props.accountId;
-    formModel.prefix = props.prefix;
-    formModel.riskCommands = [...props.riskCommands];
+const loadTerminalAISettings = async () => {
+    const res = await getAgentTerminalAIInfo();
+    formModel.status = res.data.aiStatus || 'Disable';
+    formModel.accountId = res.data.aiAccountId || '';
+    formModel.prefix = res.data.aiPrefix || DEFAULT_AI_PREFIX;
+    formModel.riskCommands = formatRiskCommandsText(parseRiskCommands(res.data.aiRiskCommands || ''));
+    defaultRiskCommands.value = parseRiskCommands(res.data.aiRiskCommandsDefault || '');
 };
 
 const openDrawer = () => {
-    syncFormFromProps();
-    loadAgentAccounts();
     drawerVisible.value = true;
+    loading.value = true;
+    Promise.all([loadTerminalAISettings(), loadAgentAccounts()]).finally(() => {
+        loading.value = false;
+    });
 };
-
-watch(
-    () => [props.status, props.accountId, props.prefix, props.riskCommands],
-    () => {
-        if (drawerVisible.value) {
-            return;
-        }
-        syncFormFromProps();
-    },
-    { deep: true },
-);
-
-const aiSummary = computed(() => {
-    if (props.status !== 'Enable') {
-        return i18n.global.t('setting.unSetting');
-    }
-    const prefix = String(props.prefix || '').trim();
-    return i18n.global.t('terminal.aiSummary', [prefix]);
-});
 
 const isVerificationSkipped = (provider?: string) => {
     const key = (provider || '').toLowerCase();
@@ -199,37 +172,9 @@ const accountRules = [
     },
 ];
 
-const riskCommandRules = [
-    {
-        validator: (_rule, value, callback) => {
-            const commands = Array.isArray(value) ? value : [];
-            if (commands.some((item) => String(item ?? '').trim().length === 0)) {
-                callback(new Error(i18n.global.t('commons.rule.requiredInput')));
-                return;
-            }
-            callback();
-        },
-        trigger: 'blur',
-    },
-];
-
-const addRiskCommand = () => {
-    formModel.riskCommands = [...formModel.riskCommands, ''];
-};
-
-const updateRiskCommand = (index: number, value: string) => {
-    formModel.riskCommands = formModel.riskCommands.map((item, currentIndex) =>
-        currentIndex === index ? value : item,
-    );
-};
-
-const removeRiskCommand = (index: number) => {
-    formModel.riskCommands = formModel.riskCommands.filter((_, currentIndex) => currentIndex !== index);
-};
-
 const resetRiskCommands = () => {
     formModel.prefix = DEFAULT_AI_PREFIX;
-    formModel.riskCommands = [...props.defaultRiskCommands];
+    formModel.riskCommands = formatRiskCommandsText(defaultRiskCommands.value);
 };
 
 const handleConfirm = async () => {
@@ -248,8 +193,9 @@ const handleConfirm = async () => {
             aiStatus: formModel.status,
             aiAccountId: formModel.status === 'Enable' ? formModel.accountId : '',
             aiPrefix: formModel.prefix.trim() || DEFAULT_AI_PREFIX,
-            aiRiskCommands: JSON.stringify(normalizeRiskCommands(formModel.riskCommands)),
+            aiRiskCommands: JSON.stringify(normalizeRiskCommands(parseRiskCommands(formModel.riskCommands))),
         });
+        await loadTerminalAISettings();
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         drawerVisible.value = false;
     } finally {
@@ -258,32 +204,13 @@ const handleConfirm = async () => {
 };
 
 const handleClose = () => {
-    syncFormFromProps();
-    emit('refresh');
+    formRef.value?.clearValidate();
 };
 </script>
 
 <style lang="css" scoped>
 .formInput {
     width: 100%;
-}
-
-.risk-command-list {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.risk-command-actions {
-    display: flex;
-    gap: 8px;
-}
-
-.risk-command-item {
-    display: flex;
-    gap: 8px;
-    align-items: center;
 }
 
 .account-option {
