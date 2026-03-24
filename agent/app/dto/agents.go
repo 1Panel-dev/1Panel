@@ -69,6 +69,24 @@ type AgentModelConfigUpdateReq struct {
 	Model     string `json:"model" validate:"required"`
 }
 
+type AgentOverviewReq struct {
+	AgentID uint `json:"agentId" validate:"required"`
+}
+
+type AgentOverview struct {
+	Snapshot AgentOverviewSnapshot `json:"snapshot"`
+}
+
+type AgentOverviewSnapshot struct {
+	ContainerStatus string `json:"containerStatus"`
+	AppVersion      string `json:"appVersion"`
+	DefaultModel    string `json:"defaultModel"`
+	ChannelCount    int    `json:"channelCount"`
+	SkillCount      int    `json:"skillCount"`
+	JobCount        int    `json:"jobCount"`
+	SessionCount    int    `json:"sessionCount"`
+}
+
 type AgentAccountModel struct {
 	RecordID      uint     `json:"recordId"`
 	ID            string   `json:"id"`

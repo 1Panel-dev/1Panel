@@ -303,6 +303,24 @@ export namespace AI {
         model: string;
     }
 
+    export interface AgentOverviewReq {
+        agentId: number;
+    }
+
+    export interface AgentOverviewSnapshot {
+        containerStatus: string;
+        appVersion: string;
+        defaultModel: string;
+        channelCount: number;
+        skillCount: number;
+        jobCount: number;
+        sessionCount: number;
+    }
+
+    export interface AgentOverview {
+        snapshot: AgentOverviewSnapshot;
+    }
+
     export interface AgentAccountModel {
         recordId: number;
         id: string;

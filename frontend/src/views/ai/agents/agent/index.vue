@@ -58,7 +58,7 @@
                         :label="$t('aiTools.model.model')"
                         show-overflow-tooltip
                         prop="provider"
-                        min-width="120"
+                        min-width="150"
                     >
                         <template #default="{ row }">
                             <template v-if="row.agentType !== 'copaw'">
@@ -70,7 +70,7 @@
                             <span v-else>-</span>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('commons.table.port')" prop="webUIPort" min-width="150">
+                    <el-table-column :label="$t('commons.table.port')" prop="webUIPort" min-width="180">
                         <template #default="{ row }">
                             <el-button icon="Position" plain size="small" @click="jumpWebUI(row)">
                                 {{ $t('aiTools.agents.webuiPort') }}: {{ row.webUIPort }}
@@ -86,7 +86,7 @@
                             </el-button>
                         </template>
                     </el-table-column>
-                    <el-table-column label="Token" min-width="80">
+                    <el-table-column label="Token" min-width="120">
                         <template #default="{ row }">
                             <el-space v-if="row.agentType !== 'copaw'">
                                 <CopyButton :content="row.token" />
@@ -106,10 +106,10 @@
                     />
                     <fu-table-operations
                         :buttons="buttons"
-                        min-width="220"
+                        min-width="200"
                         :label="$t('commons.table.operate')"
                         fixed="right"
-                        :ellipsis="3"
+                        :ellipsis="4"
                     />
                 </ComplexTable>
             </template>
@@ -118,6 +118,7 @@
         <TaskLog ref="taskLogRef" @close="search" />
         <DeleteDialog ref="deleteRef" @close="search" />
         <ConfigDrawer ref="configRef" @updated="search" />
+        <OverviewDrawer ref="overviewRef" />
         <AppUpgrade ref="upgradeRef" @close="search" />
         <ComposeLogs ref="composeLogRef" />
         <AgentTerminalDialog ref="dialogTerminalRef" />
@@ -140,6 +141,7 @@ import RouterMenu from '@/views/ai/agents/index.vue';
 import AddDialog from '@/views/ai/agents/agent/add/index.vue';
 import DeleteDialog from '@/views/ai/agents/agent/delete/index.vue';
 import ConfigDrawer from '@/views/ai/agents/agent/config/index.vue';
+import OverviewDrawer from '@/views/ai/agents/agent/components/overview.vue';
 import AppUpgrade from '@/views/app-store/installed/upgrade/index.vue';
 import TaskLog from '@/components/log/task/index.vue';
 import ComposeLogs from '@/components/log/compose/index.vue';
@@ -160,6 +162,7 @@ const addRef = ref();
 const taskLogRef = ref();
 const deleteRef = ref();
 const configRef = ref();
+const overviewRef = ref();
 const upgradeRef = ref();
 const composeLogRef = ref();
 const dialogTerminalRef = ref();
@@ -172,6 +175,11 @@ const noApp = ref(false);
 const searchName = ref('');
 
 const buttons = [
+    {
+        label: i18n.global.t('menu.home'),
+        click: (row: AI.AgentItem) => openOverview(row),
+        show: (row: AI.AgentItem) => row.agentType !== 'copaw',
+    },
     {
         label: i18n.global.t('menu.config'),
         click: (row: AI.AgentItem) => openConfig(row),
@@ -366,10 +374,11 @@ const onResetToken = async (row: AI.AgentItem) => {
 };
 
 const openConfig = (row: AI.AgentItem) => {
-    if (row.agentType === 'copaw') {
-        return;
-    }
     configRef.value?.open(row);
+};
+
+const openOverview = (row: AI.AgentItem) => {
+    overviewRef.value?.acceptParams(row);
 };
 
 const openUpgrade = async (row: AI.AgentItem) => {

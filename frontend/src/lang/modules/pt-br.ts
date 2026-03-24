@@ -720,6 +720,12 @@ const message = {
             channelsTab: 'Channels',
             configFileRestartHelper:
                 'Saving the config file requires immediately restarting the container to take effect.',
+            overviewSnapshot: 'Snapshot',
+            defaultModel: 'Default Model',
+            channelCount: 'Configured Channels',
+            skillCount: 'Skills',
+            jobCount: 'Scheduled Jobs',
+            sessionCount: 'Sessions',
             weixin: 'Weixin',
             wecom: 'WeCom',
             dingtalk: 'DingTalk',

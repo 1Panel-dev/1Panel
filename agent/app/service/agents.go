@@ -29,6 +29,7 @@ type IAgentService interface {
 	Delete(req dto.AgentDeleteReq) error
 	ResetToken(req dto.AgentTokenResetReq) error
 	UpdateModelConfig(req dto.AgentModelConfigUpdateReq) error
+	GetOverview(req dto.AgentOverviewReq) (*dto.AgentOverview, error)
 	GetProviders() ([]dto.ProviderInfo, error)
 	GetSecurityConfig(req dto.AgentSecurityConfigReq) (*dto.AgentSecurityConfig, error)
 	UpdateSecurityConfig(req dto.AgentSecurityConfigUpdateReq) error
