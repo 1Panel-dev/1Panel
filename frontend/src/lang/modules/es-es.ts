@@ -1432,17 +1432,15 @@ const message = {
         cursorBar: 'Barra',
         scrollback: 'Scrollback',
         scrollSensitivity: 'Sensibilidad de scroll',
-        aiStatus: 'Terminal de IA',
-        aiSettings: 'Configuración del terminal de IA',
+        aiAssistant: 'Asistente de IA',
         aiAccountHelper:
             'Use la cuenta de modelo seleccionada para generar y rellenar comandos. Para modelos locales como Ollama y vLLM, use una cuenta de modelo personalizada.',
         aiPrefix: 'Prefijo de activación',
-        aiPrefixHelper: 'Introduzca este prefijo y pulse Enter para activar la generación de comandos por IA.',
+        aiPrefixHelper:
+            'Introduzca el prefijo indicado y pulse Enter para activar la generación de comandos por IA; por ejemplo: {0} ayúdame a consultar la información del disco.',
         aiRiskCommands: 'Intercepción de comandos de riesgo',
         aiRiskCommandsHelper:
-            'Los comandos generados que coincidan con cualquiera de estos fragmentos se bloquearán y se devolverán como comentarios. Déjelo vacío para desactivar la intercepción. Admite añadir, editar y eliminar.',
-        aiAddRiskCommand: 'Añadir comando de riesgo',
-        aiRemoveRiskCommand: 'Eliminar',
+            'Configure los comandos de riesgo que se deben interceptar, uno por línea. Si coinciden, se bloqueará la generación y se devolverán como comentarios.',
         aiSummary:
             'Cuando una línea comienza con el prefijo {0} y pulsa Enter, se activa la generación de comandos por IA.',
         aiPrefixAsciiVisible:

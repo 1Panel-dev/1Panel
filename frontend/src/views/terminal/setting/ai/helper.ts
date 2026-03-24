@@ -12,7 +12,10 @@ export const parseRiskCommands = (value: string): string[] => {
         }
         return parsed.map((item) => String(item).trim()).filter((item) => item.length > 0);
     } catch {
-        return [];
+        return value
+            .split(/\r?\n/)
+            .map((item) => String(item).trim())
+            .filter((item) => item.length > 0);
     }
 };
 
@@ -28,4 +31,8 @@ export const normalizeRiskCommands = (riskCommands: string[]): string[] => {
         result.push(normalized);
     }
     return result;
+};
+
+export const formatRiskCommandsText = (riskCommands: string[]): string => {
+    return normalizeRiskCommands(riskCommands).join('\n');
 };

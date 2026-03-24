@@ -1403,17 +1403,15 @@ const message = {
         cursorBar: 'バー',
         scrollback: 'スクロールバック',
         scrollSensitivity: 'スクロール感度',
-        aiStatus: 'AI ターミナル',
-        aiSettings: 'AI ターミナル設定',
+        aiAssistant: 'AI アシスタント',
         aiAccountHelper:
             '選択したモデルアカウントでコマンドを生成して補完します。Ollama や vLLM などのローカルモデルはカスタムモデルアカウントを使用してください。',
         aiPrefix: 'トリガープレフィックス',
-        aiPrefixHelper: 'このプレフィックスを入力して Enter を押すと、AI コマンド生成がトリガーされます。',
+        aiPrefixHelper:
+            '指定したプレフィックスを入力して Enter を押すと、AI コマンド生成がトリガーされます。例: {0} ディスク情報を確認して。',
         aiRiskCommands: '危険コマンドの遮断',
         aiRiskCommandsHelper:
-            'これらの断片のいずれかに一致する生成コマンドはブロックされ、コメントとして埋め戻されます。空欄にすると遮断を無効化できます。追加、編集、削除に対応しています。',
-        aiAddRiskCommand: '危険コマンドを追加',
-        aiRemoveRiskCommand: '削除',
+            'ブロック対象の危険コマンドを設定します（1 行に 1 件）。一致した場合、生成を停止しコメントとして埋め戻します。',
         aiSummary: '行が {0} プレフィックスで始まり Enter を押すと、AI コマンド生成がトリガーされます。',
         aiPrefixAsciiVisible: 'ASCII の表示可能文字のみ対応しています。スペース、CJK 文字、全角記号は使用できません。',
         saveHelper: '現在のターミナル設定を保存してもよろしいですか？',

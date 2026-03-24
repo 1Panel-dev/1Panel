@@ -1393,18 +1393,15 @@ const message = {
         cursorBar: 'Bar',
         scrollback: 'Scrollback',
         scrollSensitivity: 'Scroll Sensitivity',
-        aiStatus: 'AI Terminal',
-        aiSettings: 'AI Terminal Settings',
+        aiAssistant: 'AI Assistant',
         aiAccountHelper:
             'Use the selected model account to generate and fill commands. For local models like Ollama and vLLM, use a custom model account.',
-        aiAccountRequired: 'Please select an available AI account first.',
         aiPrefix: 'Trigger Prefix',
-        aiPrefixHelper: 'Enter this prefix and press Enter to trigger AI command generation.',
+        aiPrefixHelper:
+            'Enter the specified prefix and press Enter to trigger AI command generation, for example: {0} help me check disk usage.',
         aiRiskCommands: 'Risk Command Interception',
         aiRiskCommandsHelper:
-            'Generated commands matching any of these fragments will be blocked and filled back as comments. Leave empty to disable interception. Supports add, edit, and delete.',
-        aiAddRiskCommand: 'Add Risk Command',
-        aiRemoveRiskCommand: 'Delete',
+            'Configure risky commands to intercept, one per line. When matched, generation will be blocked and filled back as comments.',
         aiSummary: 'When a line starts with the {0} prefix and you press Enter, AI command generation is triggered.',
         aiPrefixAsciiVisible:
             'Only ASCII visible characters are supported. Spaces, CJK characters, and full-width symbols are not allowed.',
