@@ -106,10 +106,10 @@
                     />
                     <fu-table-operations
                         :buttons="buttons"
-                        min-width="220"
+                        min-width="200"
                         :label="$t('commons.table.operate')"
                         fixed="right"
-                        :ellipsis="3"
+                        :ellipsis="4"
                     />
                 </ComplexTable>
             </template>
