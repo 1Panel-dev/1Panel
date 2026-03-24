@@ -716,6 +716,8 @@ const message = {
             skillsGroupWorkspace: 'Workspace',
             switchModelSuccess: 'Model switched successfully',
             channelsTab: 'Channels',
+            configFileRestartHelper:
+                'Saving the config file requires immediately restarting the container to take effect.',
             weixin: 'Weixin',
             wecom: 'WeCom',
             dingtalk: 'DingTalk',

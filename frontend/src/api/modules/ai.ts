@@ -229,6 +229,14 @@ export const updateAgentOtherConfig = (req: AI.AgentOtherConfigUpdateReq) => {
     return http.post(`/ai/agents/other/update`, req);
 };
 
+export const getAgentConfigFile = (req: AI.AgentConfigFileReq) => {
+    return http.post<AI.AgentConfigFile>(`/ai/agents/config-file/get`, req);
+};
+
+export const updateAgentConfigFile = (req: AI.AgentConfigFileUpdateReq) => {
+    return http.post(`/ai/agents/config-file/update`, req);
+};
+
 export const listAgentSkills = (req: AI.AgentSkillsReq) => {
     return http.post<AI.AgentSkillItem[]>(`/ai/agents/skills/list`, req);
 };

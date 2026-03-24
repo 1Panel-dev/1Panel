@@ -354,6 +354,19 @@ type AgentOtherConfig struct {
 	NPMRegistry    string `json:"npmRegistry"`
 }
 
+type AgentConfigFileReq struct {
+	AgentID uint `json:"agentId" validate:"required"`
+}
+
+type AgentConfigFileUpdateReq struct {
+	AgentID uint   `json:"agentId" validate:"required"`
+	Content string `json:"content" validate:"required"`
+}
+
+type AgentConfigFile struct {
+	Content string `json:"content"`
+}
+
 type AgentSkillsReq struct {
 	AgentID uint `json:"agentId" validate:"required"`
 }

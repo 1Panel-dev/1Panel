@@ -588,6 +588,19 @@ export namespace AI {
         npmRegistry: string;
     }
 
+    export interface AgentConfigFileReq {
+        agentId: number;
+    }
+
+    export interface AgentConfigFile {
+        content: string;
+    }
+
+    export interface AgentConfigFileUpdateReq {
+        agentId: number;
+        content: string;
+    }
+
     export interface AgentSkillsReq {
         agentId: number;
     }

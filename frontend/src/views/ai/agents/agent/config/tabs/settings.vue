@@ -6,6 +6,9 @@
         <el-tab-pane :label="t('aiTools.agents.otherTab')" name="other">
             <OtherTab ref="otherRef" />
         </el-tab-pane>
+        <el-tab-pane :label="t('website.source')" name="configFile">
+            <ConfigFileTab ref="configFileRef" />
+        </el-tab-pane>
     </el-tabs>
 </template>
 
@@ -14,12 +17,14 @@ import { nextTick, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import SecurityTab from './settings/security.vue';
 import OtherTab from './settings/other.vue';
+import ConfigFileTab from './settings/config-file.vue';
 
 const { t } = useI18n();
 const activeTab = ref('security');
 const agentId = ref(0);
 const securityRef = ref();
 const otherRef = ref();
+const configFileRef = ref();
 
 const loadCurrentTab = async () => {
     if (agentId.value <= 0) {
@@ -32,6 +37,10 @@ const loadCurrentTab = async () => {
     }
     if (activeTab.value === 'other') {
         await otherRef.value?.load(agentId.value);
+        return;
+    }
+    if (activeTab.value === 'configFile') {
+        await configFileRef.value?.load(agentId.value);
     }
 };
 

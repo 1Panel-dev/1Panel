@@ -540,6 +540,7 @@ func setDingTalkConfig(conf map[string]interface{}, config dto.AgentDingTalkConf
 func setQQBotConfig(conf map[string]interface{}, config dto.AgentQQBotConfig) {
 	channels := ensureChildMap(conf, "channels")
 	qqbot := ensureChildMap(channels, "qqbot")
+	delete(qqbot, "dmPolicy")
 	qqbot["enabled"] = config.Enabled
 	qqbot["allowFrom"] = []string{"*"}
 	qqbot["appId"] = strings.TrimSpace(config.AppID)
@@ -547,6 +548,7 @@ func setQQBotConfig(conf map[string]interface{}, config dto.AgentQQBotConfig) {
 
 	plugins := ensureChildMap(conf, "plugins")
 	entries := ensureChildMap(plugins, "entries")
+	delete(entries, "qqbot")
 	qqbotEntry := ensureChildMap(entries, "openclaw-qqbot")
 	qqbotEntry["enabled"] = config.Enabled
 }
