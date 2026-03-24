@@ -397,14 +397,32 @@ func (f FileOp) DownloadFileWithProcess(url, dst, key string, ignoreCertificate 
 
 	request, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return nil
+		return buserr.WithDetail("ErrWgetRemoteFailed", err.Error(), err)
 	}
 	request.Header.Set("Accept-Encoding", "identity")
 
 	resp, err := client.Do(request)
 	if err != nil {
 		global.LOG.Errorf("get download file [%s] error, err %s", dst, err.Error())
-		return err
+		return buserr.WithDetail("ErrWgetRemoteFailed", err.Error(), err)
+	}
+
+	if resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusMultipleChoices {
+		_, _ = io.Copy(io.Discard, io.LimitReader(resp.Body, 64*1024))
+		_ = resp.Body.Close()
+		global.LOG.Errorf("wget remote returned non-success status %s for url %s", resp.Status, url)
+		return buserr.WithDetail("ErrWgetRemoteFailed", resp.StatusCode, nil)
+	}
+
+	ct := strings.ToLower(resp.Header.Get("Content-Type"))
+	dstExt := strings.ToLower(filepath.Ext(dst))
+	if (strings.Contains(ct, "text/html") || strings.Contains(ct, "text/xml")) &&
+		dstExt != ".html" && dstExt != ".htm" && dstExt != ".xml" && dstExt != ".svg" {
+		_, _ = io.Copy(io.Discard, io.LimitReader(resp.Body, 64*1024))
+		_ = resp.Body.Close()
+		detail := fmt.Sprintf("Content-Type: %s", ct)
+		global.LOG.Errorf("wget got html/xml response for non-html file %s, url %s, %s", dst, url, detail)
+		return buserr.WithDetail("ErrWgetInvalidContentType", detail, nil)
 	}
 
 	out, err := os.Create(dst)

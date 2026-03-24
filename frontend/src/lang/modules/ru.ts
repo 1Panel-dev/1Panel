@@ -1665,6 +1665,7 @@ const message = {
         selectFile: 'Выбрать файл',
         downloadUrl: 'Удаленный URL',
         downloadStart: 'Загрузка начата',
+        wgetUrlInvalid: 'Введите корректный URL загрузки (http/https)',
         moveSuccess: 'Успешно перемещено',
         copySuccess: 'Успешно скопировано',
         pasteMsg: 'Нажмите кнопку «Вставить» в правом верхнем углу целевой директории',

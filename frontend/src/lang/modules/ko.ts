@@ -1622,6 +1622,7 @@ const message = {
         selectFile: '파일 선택',
         downloadUrl: '원격 URL',
         downloadStart: '다운로드 시작됨',
+        wgetUrlInvalid: '유효한 http(s) 다운로드 주소를 입력하세요',
         moveSuccess: '이동 성공',
         copySuccess: '복사 성공',
         pasteMsg: '대상 디렉토리의 오른쪽 상단에 있는 [붙여넣기] 버튼을 클릭하세요',

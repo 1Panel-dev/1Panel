@@ -1668,6 +1668,7 @@ const message = {
         selectFile: 'Dosya seç',
         downloadUrl: 'Uzak URL',
         downloadStart: 'İndirme başladı',
+        wgetUrlInvalid: 'Geçerli bir http(s) indirme adresi girin',
         moveSuccess: 'Başarıyla taşındı',
         copySuccess: 'Başarıyla kopyalandı',
         pasteMsg: 'Hedef dizinin sağ üst köşesindeki "Yapıştır" düğmesine tıklayın',

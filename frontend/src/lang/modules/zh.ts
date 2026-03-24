@@ -1551,6 +1551,7 @@ const message = {
         downloadSuccess: '下载成功',
         downloadUrl: '下载地址',
         downloadStart: '下载开始!',
+        wgetUrlInvalid: '请输入有效的 http(s) 下载地址',
         moveSuccess: '移动成功',
         copySuccess: '复制成功',
         pasteMsg: '请在目标目录点击右上角【粘贴】按钮',

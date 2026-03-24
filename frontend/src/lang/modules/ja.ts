@@ -1653,6 +1653,7 @@ const message = {
         selectFile: '[ファイル]を選択します',
         downloadUrl: 'リモートURL',
         downloadStart: 'ダウンロードが始まりました',
+        wgetUrlInvalid: '有効な http(s) のダウンロード URL を入力してください',
         moveSuccess: '正常に移動しました',
         copySuccess: '正常にコピーされました',
         pasteMsg: '対象ディレクトリの右上にある「貼り付け」ボタンをクリックしてください',

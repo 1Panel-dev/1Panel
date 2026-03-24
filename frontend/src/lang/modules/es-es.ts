@@ -1674,6 +1674,7 @@ const message = {
         selectFile: 'Seleccionar archivo',
         downloadUrl: 'URL remota',
         downloadStart: 'Descarga iniciada',
+        wgetUrlInvalid: 'Introduzca una URL de descarga http(s) válida',
         moveSuccess: 'Movido correctamente',
         copySuccess: 'Copiado correctamente',
         pasteMsg: 'Por favor haz clic en el botón [Pegar] en la parte superior derecha del directorio de destino',
