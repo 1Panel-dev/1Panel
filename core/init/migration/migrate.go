@@ -34,6 +34,7 @@ func Init() {
 		migrations.AddDashboardCarouselSetting,
 		migrations.AddEditionSetting,
 		migrations.UpdateAiLocalModelMenuTitle,
+		migrations.UpdateAiAgentsHideMenuTitle,
 		migrations.AddDocSourceSetting,
 	})
 	if err := m.Migrate(); err != nil {

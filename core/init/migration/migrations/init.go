@@ -596,7 +596,7 @@ var AddAgentsMenu = &gormigrate.Migration{
 		return helper.AddMenu(dto.ShowMenu{
 			ID:       "44",
 			Disabled: false,
-			Title:    "aiTools.agents.agents",
+			Title:    "aiTools.agents.agent",
 			IsShow:   true,
 			Label:    "Agents",
 			Path:     "/ai/agents/agent",
@@ -767,7 +767,7 @@ var UpdateAiAgentsMenu = &gormigrate.Migration{
 		newItem := dto.ShowMenu{
 			ID:       "44",
 			Disabled: false,
-			Title:    "aiTools.agents.agents",
+			Title:    "aiTools.agents.agent",
 			IsShow:   true,
 			Label:    "Agents",
 			Path:     "/ai/agents/agent",
@@ -862,6 +862,18 @@ var UpdateAiLocalModelMenuTitle = &gormigrate.Migration{
 			 SET value = REPLACE(value, 'aiTools.model.model', 'aiTools.model.localModel')
 			 WHERE key = 'HideMenu'
 			   AND value LIKE '%aiTools.model.model%'`,
+		).Error
+	},
+}
+
+var UpdateAiAgentsHideMenuTitle = &gormigrate.Migration{
+	ID: "20260324-update-ai-agents-hide-menu-title",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.Exec(
+			`UPDATE settings
+			 SET value = REPLACE(value, 'aiTools.agents.agents', 'aiTools.agents.agent')
+			 WHERE key = 'HideMenu'
+			   AND value LIKE '%aiTools.agents.agents%'`,
 		).Error
 	},
 }
