@@ -45,6 +45,7 @@ func (a *AIToolsRouter) InitRouter(Router *gin.RouterGroup) {
 		aiToolsRouter.POST("/agents/delete", baseApi.DeleteAgent)
 		aiToolsRouter.POST("/agents/token/reset", baseApi.ResetAgentToken)
 		aiToolsRouter.POST("/agents/model/update", baseApi.UpdateAgentModelConfig)
+		aiToolsRouter.POST("/agents/overview", baseApi.GetAgentOverview)
 		aiToolsRouter.GET("/agents/providers", baseApi.GetAgentProviders)
 		aiToolsRouter.POST("/agents/accounts", baseApi.CreateAgentAccount)
 		aiToolsRouter.POST("/agents/accounts/update", baseApi.UpdateAgentAccount)
