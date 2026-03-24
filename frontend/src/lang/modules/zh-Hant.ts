@@ -681,6 +681,7 @@ const message = {
             skillsGroupWorkspace: '工作區',
             switchModelSuccess: '模型切換成功',
             channelsTab: '頻道',
+            configFileRestartHelper: '保存配置檔後需要立即重新啟動容器才能生效。',
             weixin: '微信',
             wecom: '企業微信',
             dingtalk: '釘釘',

@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
 	"path"
 	"sort"
 	"strings"
@@ -33,6 +34,8 @@ type IAgentService interface {
 	UpdateSecurityConfig(req dto.AgentSecurityConfigUpdateReq) error
 	GetOtherConfig(req dto.AgentOtherConfigReq) (*dto.AgentOtherConfig, error)
 	UpdateOtherConfig(req dto.AgentOtherConfigUpdateReq) error
+	GetConfigFile(req dto.AgentConfigFileReq) (*dto.AgentConfigFile, error)
+	UpdateConfigFile(req dto.AgentConfigFileUpdateReq) error
 	ListSkills(req dto.AgentSkillsReq) ([]dto.AgentSkillItem, error)
 	UpdateSkill(req dto.AgentSkillUpdateReq) error
 
@@ -715,6 +718,46 @@ func (a AgentService) UpdateOtherConfig(req dto.AgentOtherConfigUpdateReq) error
 		return err
 	}
 	return setOpenclawNPMRegistry(install.ContainerName, req.NPMRegistry)
+}
+
+func (a AgentService) GetConfigFile(req dto.AgentConfigFileReq) (*dto.AgentConfigFile, error) {
+	agent, _, err := a.loadAgentAndInstall(req.AgentID)
+	if err != nil {
+		return nil, err
+	}
+	if agent.AgentType == constant.AppCopaw {
+		return nil, fmt.Errorf("copaw does not support config file")
+	}
+	content, err := os.ReadFile(agent.ConfigPath)
+	if err != nil {
+		return nil, err
+	}
+	return &dto.AgentConfigFile{Content: string(content)}, nil
+}
+
+func (a AgentService) UpdateConfigFile(req dto.AgentConfigFileUpdateReq) error {
+	agent, install, err := a.loadAgentAndInstall(req.AgentID)
+	if err != nil {
+		return err
+	}
+	if agent.AgentType == constant.AppCopaw {
+		return fmt.Errorf("copaw does not support config file")
+	}
+	var payload interface{}
+	if err := json.Unmarshal([]byte(req.Content), &payload); err != nil {
+		return err
+	}
+	info, err := os.Stat(agent.ConfigPath)
+	if err != nil {
+		return err
+	}
+	if err := os.WriteFile(agent.ConfigPath, []byte(req.Content), info.Mode()); err != nil {
+		return err
+	}
+	return NewIAppInstalledService().Operate(request.AppInstalledOperate{
+		InstallId: install.ID,
+		Operate:   constant.Restart,
+	})
 }
 
 func getOpenclawNPMRegistry(containerName string) (string, error) {

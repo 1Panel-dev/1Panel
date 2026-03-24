@@ -681,6 +681,47 @@ func (b *BaseApi) UpdateAgentOtherConfig(c *gin.Context) {
 }
 
 // @Tags AI
+// @Summary Get Agent config file
+// @Accept json
+// @Param request body dto.AgentConfigFileReq true "request"
+// @Success 200 {object} dto.AgentConfigFile
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/config-file/get [post]
+func (b *BaseApi) GetAgentConfigFile(c *gin.Context) {
+	var req dto.AgentConfigFileReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	data, err := agentService.GetConfigFile(req)
+	if err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.SuccessWithData(c, data)
+}
+
+// @Tags AI
+// @Summary Update Agent config file
+// @Accept json
+// @Param request body dto.AgentConfigFileUpdateReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/config-file/update [post]
+func (b *BaseApi) UpdateAgentConfigFile(c *gin.Context) {
+	var req dto.AgentConfigFileUpdateReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := agentService.UpdateConfigFile(req); err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags AI
 // @Summary List Agent skills
 // @Accept json
 // @Param request body dto.AgentSkillsReq true "request"

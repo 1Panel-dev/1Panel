@@ -680,6 +680,7 @@ const message = {
             skillsGroupWorkspace: '工作区',
             switchModelSuccess: '模型切换成功',
             channelsTab: '频道',
+            configFileRestartHelper: '保存配置文件后需要重启容器才能生效。',
             weixin: '微信',
             wecom: '企业微信',
             dingtalk: '钉钉',
