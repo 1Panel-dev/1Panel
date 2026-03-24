@@ -169,12 +169,12 @@ func (a AgentService) InstallPlugin(req dto.AgentPluginInstallReq) error {
 		if req.Type == "qqbot" {
 			legacyPluginPath := path.Join(openclawPluginBaseDir, "qqbot")
 			if err := mgr.RunBashCf("docker exec %s test -d %s", install.ContainerName, legacyPluginPath); err == nil {
-				if err := mgr.RunBashCf("printf 'yes\\n' | docker exec -i %s openclaw plugins uninstall qqbot", install.ContainerName); err != nil {
+				if err := mgr.Run("docker", "exec", "-i", install.ContainerName, "sh", "-c", "printf 'yes\\n' | openclaw plugins uninstall qqbot"); err != nil {
 					return err
 				}
 			}
 		}
-		if err := mgr.RunBashCf("docker exec %s openclaw plugins install %s", install.ContainerName, spec); err != nil {
+		if err := mgr.Run("docker", "exec", install.ContainerName, "sh", "-c", buildOpenclawPluginInstallScript(spec, pluginID)); err != nil {
 			return err
 		}
 		conf, err := readOpenclawConfig(agent.ConfigPath)
@@ -574,6 +574,15 @@ func appendPluginAllow(conf map[string]interface{}, pluginID string) {
 		return
 	}
 	plugins["allow"] = append(allow, pluginID)
+}
+
+func buildOpenclawPluginInstallScript(spec, pluginID string) string {
+	return fmt.Sprintf(
+		"set -e; workdir=%s/%s; rm -rf \"$workdir\"; mkdir -p \"$workdir\"; cd \"$workdir\"; npm pack --silent %q >/dev/null 2>&1; pkg=$(find \"$workdir\" -maxdepth 1 -type f -name '*.tgz' | head -n 1); printf '%%s\\n' \"$pkg\"; openclaw plugins install \"$pkg\"; rm -rf \"$workdir\"",
+		openclawPluginPackageTmpDir,
+		pluginID,
+		spec,
+	)
 }
 
 func resolvePluginMeta(pluginType string) (string, string, error) {
