@@ -874,11 +874,10 @@ func decodeGBK(input string) (string, error) {
 func (f FileOp) decompressWithSDK(srcFile string, dst string, cType CompressType) error {
 	format := getFormat(cType)
 	if cType == Gz {
-		err := f.DecompressGzFile(srcFile, dst)
-		if err != nil {
-			return err
+		if err := f.tryDecompressTarGz(srcFile, dst, format); err == nil {
+			return nil
 		}
-		return nil
+		return f.DecompressGzFile(srcFile, dst)
 	}
 
 	type dirEntry struct {
@@ -1016,6 +1015,69 @@ func ZipFile(files []archiver.File, dst afero.File) error {
 	return nil
 }
 
+func (f FileOp) tryDecompressTarGz(srcFile string, dst string, format archiver.CompressedArchive) error {
+	input, err := f.Fs.Open(srcFile)
+	if err != nil {
+		return err
+	}
+	defer input.Close()
+
+	type dirEntry struct {
+		path    string
+		modTime time.Time
+	}
+	var dirs []dirEntry
+	extracted := false
+
+	handler := func(ctx context.Context, archFile archiver.File) error {
+		info := archFile.FileInfo
+		if isIgnoreFile(archFile.Name()) {
+			return nil
+		}
+		filePath := filepath.Join(dst, archFile.NameInArchive)
+		if info.IsDir() {
+			if err := f.Fs.MkdirAll(filePath, info.Mode()); err != nil {
+				return err
+			}
+			dirs = append(dirs, dirEntry{path: filePath, modTime: info.ModTime()})
+		} else {
+			parentDir := filepath.Dir(filePath)
+			if !f.Stat(parentDir) {
+				if err := f.Fs.MkdirAll(parentDir, info.Mode()); err != nil {
+					return err
+				}
+			}
+			fr, err := archFile.Open()
+			if err != nil {
+				return err
+			}
+			defer fr.Close()
+			fw, err := f.Fs.OpenFile(filePath, os.O_CREATE|os.O_RDWR|os.O_TRUNC, info.Mode())
+			if err != nil {
+				return err
+			}
+			defer fw.Close()
+			if _, err := io.Copy(fw, fr); err != nil {
+				return err
+			}
+			_ = os.Chtimes(filePath, info.ModTime(), info.ModTime())
+		}
+		extracted = true
+		return nil
+	}
+
+	if err := format.Extract(context.Background(), input, nil, handler); err != nil {
+		return err
+	}
+	if !extracted {
+		return fmt.Errorf("no files extracted as tar.gz")
+	}
+	for i := len(dirs) - 1; i >= 0; i-- {
+		_ = os.Chtimes(dirs[i].path, dirs[i].modTime, dirs[i].modTime)
+	}
+	return nil
+}
+
 func (f FileOp) DecompressGzFile(srcFile, dst string) error {
 	var archiveModTime time.Time
 	if st, err := f.Fs.Stat(srcFile); err == nil {
@@ -1034,7 +1096,13 @@ func (f FileOp) DecompressGzFile(srcFile, dst string) error {
 	}
 	defer gr.Close()
 
-	outName := strings.TrimSuffix(filepath.Base(srcFile), ".gz")
+	outName := ""
+	if gr.Name != "" {
+		outName = filepath.Base(gr.Name)
+	}
+	if outName == "" || outName == "." {
+		outName = strings.TrimSuffix(filepath.Base(srcFile), ".gz")
+	}
 	outPath := filepath.Join(dst, outName)
 	parentDir := filepath.Dir(outPath)
 	if !f.Stat(parentDir) {
