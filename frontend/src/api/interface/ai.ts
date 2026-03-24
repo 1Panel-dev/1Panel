@@ -587,4 +587,22 @@ export namespace AI {
         browserEnabled: boolean;
         npmRegistry: string;
     }
+
+    export interface AgentSkillsReq {
+        agentId: number;
+    }
+
+    export interface AgentSkillItem {
+        name: string;
+        description: string;
+        source: string;
+        bundled: boolean;
+        disabled: boolean;
+    }
+
+    export interface AgentSkillUpdateReq {
+        agentId: number;
+        name: string;
+        enabled: boolean;
+    }
 }

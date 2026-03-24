@@ -26,7 +26,7 @@ const databaseRouter = {
             component: () => import('@/views/ai/agents/agent/index.vue'),
             meta: {
                 icon: 'p-jiqiren2',
-                title: 'aiTools.agents.agents',
+                title: 'aiTools.agents.agent',
                 requiresAuth: true,
             },
         },

@@ -5,7 +5,7 @@
         </el-form-item>
         <el-form-item :label="t('aiTools.agents.dmPolicy')" prop="dmPolicy">
             <el-select v-model="form.dmPolicy">
-                <el-option :label="t('aiTools.agents.policyPairing')" value="pairing" />
+                <el-option :label="t('aiTools.agents.pairingCode')" value="pairing" />
                 <el-option :label="t('aiTools.agents.policyOpen')" value="open" />
             </el-select>
         </el-form-item>
@@ -109,7 +109,7 @@ const approvePairing = async () => {
         return;
     }
     if (!pairingCode.value) {
-        MsgWarning(t('aiTools.agents.pairingCodeRequired'));
+        MsgWarning(t('aiTools.agents.pairingCodePlaceholder'));
         return;
     }
     approving.value = true;

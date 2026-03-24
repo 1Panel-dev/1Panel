@@ -74,6 +74,8 @@ func (a *AIToolsRouter) InitRouter(Router *gin.RouterGroup) {
 		aiToolsRouter.POST("/agents/security/update", baseApi.UpdateAgentSecurityConfig)
 		aiToolsRouter.POST("/agents/other/get", baseApi.GetAgentOtherConfig)
 		aiToolsRouter.POST("/agents/other/update", baseApi.UpdateAgentOtherConfig)
+		aiToolsRouter.POST("/agents/skills/list", baseApi.ListAgentSkills)
+		aiToolsRouter.POST("/agents/skills/update", baseApi.UpdateAgentSkill)
 		aiToolsRouter.POST("/agents/channel/pairing/approve", baseApi.ApproveAgentChannelPairing)
 	}
 }

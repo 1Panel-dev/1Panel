@@ -4,16 +4,16 @@
         <el-form-item :label="t('commons.table.status')">
             <el-switch v-model="form.enabled" />
         </el-form-item>
-        <el-form-item :label="t('aiTools.agents.clientId')" prop="clientId">
+        <el-form-item label="Client ID" prop="clientId">
             <el-input v-model="form.clientId" />
         </el-form-item>
-        <el-form-item :label="t('aiTools.agents.clientSecret')" prop="clientSecret">
+        <el-form-item label="Client Secret" prop="clientSecret">
             <el-input v-model="form.clientSecret" type="password" show-password />
         </el-form-item>
         <el-form-item :label="t('aiTools.agents.dmPolicy')" prop="dmPolicy">
             <el-select v-model="form.dmPolicy">
-                <el-option :label="t('aiTools.agents.policyPairing')" value="pairing" />
-                <el-option :label="t('aiTools.agents.policyAllowlist')" value="allowlist" />
+                <el-option :label="t('aiTools.agents.pairingCode')" value="pairing" />
+                <el-option :label="t('waf.black.whiteList')" value="allowlist" />
                 <el-option :label="t('aiTools.agents.policyOpen')" value="open" />
                 <el-option :label="t('aiTools.agents.policyDisabled')" value="disabled" />
             </el-select>
@@ -30,7 +30,7 @@
         <el-form-item :label="t('aiTools.agents.groupPolicy')" prop="groupPolicy">
             <el-select v-model="form.groupPolicy">
                 <el-option :label="t('aiTools.agents.policyOpen')" value="open" />
-                <el-option :label="t('aiTools.agents.policyAllowlist')" value="allowlist" />
+                <el-option :label="t('waf.black.whiteList')" value="allowlist" />
                 <el-option :label="t('aiTools.agents.policyDisabled')" value="disabled" />
             </el-select>
         </el-form-item>
@@ -191,7 +191,7 @@ const approvePairing = async () => {
         return;
     }
     if (!pairingCode.value) {
-        MsgWarning(t('aiTools.agents.pairingCodeRequired'));
+        MsgWarning(t('aiTools.agents.pairingCodePlaceholder'));
         return;
     }
     approving.value = true;

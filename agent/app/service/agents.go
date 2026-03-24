@@ -33,6 +33,8 @@ type IAgentService interface {
 	UpdateSecurityConfig(req dto.AgentSecurityConfigUpdateReq) error
 	GetOtherConfig(req dto.AgentOtherConfigReq) (*dto.AgentOtherConfig, error)
 	UpdateOtherConfig(req dto.AgentOtherConfigUpdateReq) error
+	ListSkills(req dto.AgentSkillsReq) ([]dto.AgentSkillItem, error)
+	UpdateSkill(req dto.AgentSkillUpdateReq) error
 
 	CreateAccount(req dto.AgentAccountCreateReq) error
 	UpdateAccount(req dto.AgentAccountUpdateReq) error
