@@ -279,7 +279,7 @@
                                                             class="box-item"
                                                             effect="dark"
                                                             :content="row.path"
-                                                            placement="top"
+                                                            placement="left"
                                                         >
                                                             <span
                                                                 class="table-link text-ellipsis"
