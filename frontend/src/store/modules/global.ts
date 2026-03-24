@@ -14,7 +14,7 @@ const GlobalStore = defineStore({
         loadingText: '',
         isLogin: false,
         entrance: '',
-        language: '',
+        language: i18n.global.locale.value,
         themeConfig: {
             panelName: '',
             primary: '#005eeb',
