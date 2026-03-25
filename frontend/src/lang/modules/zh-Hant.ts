@@ -672,6 +672,8 @@ const message = {
             pluginInstallNPMRegistryHelper: '可前往 設定 -> 其他 設定 NPM 源，以加速外掛安裝',
             skillsSearchPlaceholder: '搜尋技能...',
             skillsEmpty: '暫無技能',
+            versionUnsupportedTitle: '當前版本暫不支援該功能',
+            versionUnsupportedHelper: '請升級 OpenClaw 到 {0} 或以上版本後使用。',
             skillsStatusDisabled: '已禁用',
             skillsGroupBuiltIn: '內置',
             skillsGroupExternal: '外部',

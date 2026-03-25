@@ -714,6 +714,8 @@ const message = {
                 'Go to Settings -> Other to configure the NPM registry and speed up plugin installation',
             skillsSearchPlaceholder: 'Search skills...',
             skillsEmpty: 'No skills',
+            versionUnsupportedTitle: 'This feature is not supported in the current version',
+            versionUnsupportedHelper: 'Please upgrade OpenClaw to version {0} or later.',
             skillsStatusDisabled: 'Disabled',
             skillsGroupBuiltIn: 'Built-in',
             skillsGroupExternal: 'External',
