@@ -649,9 +649,6 @@ const message = {
             appVersion: '應用版本',
             webuiPort: 'WebUI 埠',
             allowedOrigins: '訪問地址',
-            allowedOriginsHelper:
-                '一行一個完整訪問地址，建議優先使用 HTTPS，例如 https://192.168.1.2:18789.未設定預設訪問地址時請手動填寫',
-            allowedOriginsPlaceholder: 'https://192.168.1.2:18789',
             allowedOriginsRequired: '請至少填寫一個訪問地址',
             allowedOriginsInvalid: '訪問地址格式錯誤，請輸入 http(s)://網域或IP[:埠]',
             provider: '模型供應商',
@@ -2290,10 +2287,11 @@ const message = {
         showLocal: '顯示本機應用程式',
         reload: '重載',
         upgradeWarn: '升級應用程式會取代 docker-compose.yml 檔案，如有更改，可以點選檢視檔案對比',
-        openclawHttpsUpgradeNoticeTitle: '注意：以下說明僅適用於 OpenClaw 從 2026.3.13 之前版本升級的使用者：',
-        openclawHttpsUpgradeNoticeItem1: '已部署的智慧體升級完成後，需要進入 配置 → 設定 → 安全 頁面手動新增存取地址。',
-        openclawHttpsUpgradeNoticeItem2:
-            '新版本已強制使用 HTTPS 存取智慧體。如果之前透過反向代理網站存取，請將代理目標地址修改為 https://IP:Port。',
+        openclawHttpsUpgradeNoticeTitle:
+            '注意：以下說明僅適用於 OpenClaw 從 2026.3.13 ~ 2026.3.22 版本升級到 2026.3.23 及以上版本的使用者：',
+        openclawHttpsUpgradeNoticeItem1:
+            '升級完成後，智慧體訪問協議將恢復為 HTTP，請進入 配置 → 設定 → 安全 檢查訪問地址。',
+        openclawHttpsUpgradeNoticeItem2: '如果之前透過反向代理網站存取，請將代理目標地址修改為 http://IP:Port。',
         newVersion: '新版本',
         oldVersion: '當前版本',
         composeDiff: '檔案對比',

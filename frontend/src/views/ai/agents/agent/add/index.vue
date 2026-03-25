@@ -28,12 +28,9 @@
                         v-model="form.allowedOrigins"
                         type="textarea"
                         :rows="3"
-                        :placeholder="$t('aiTools.agents.allowedOriginsPlaceholder')"
+                        :placeholder="allowedOriginsPlaceholder"
                         @input="handleAllowedOriginsInput"
                     />
-                    <span class="input-help">
-                        {{ $t('aiTools.agents.allowedOriginsHelper') }}
-                    </span>
                 </el-form-item>
             </el-card>
             <el-card class="form-card" v-if="form.agentType === 'openclaw'">
@@ -199,11 +196,13 @@ const filteredModels = computed(() => {
     return selected?.models || [];
 });
 
+const allowedOriginsPlaceholder = computed(() => buildDefaultAllowedOrigin('192.168.1.2', 18789, form.appVersion));
+
 const syncAllowedOriginsWithDefault = (force = false) => {
     if (form.agentType !== 'openclaw') {
         return;
     }
-    const defaultOrigin = buildDefaultAllowedOrigin(systemIP.value, form.webUIPort);
+    const defaultOrigin = buildDefaultAllowedOrigin(systemIP.value, form.webUIPort, form.appVersion);
     if (!force && !allowedOriginsAutoFilled.value && form.allowedOrigins !== lastAutoAllowedOrigins.value) {
         return;
     }
@@ -479,6 +478,7 @@ watch(
         if (!value || value === oldValue) {
             return;
         }
+        syncAllowedOriginsWithDefault();
         if (form.editCompose) {
             await loadCompose();
         }

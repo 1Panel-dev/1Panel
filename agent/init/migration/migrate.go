@@ -72,11 +72,11 @@ func InitAgentDB() {
 		migrations.AddAgentTypeForAgents,
 		migrations.NormalizeAgentAccountVerifiedStatus,
 		migrations.NormalizeOllamaAccountAPIType,
-		migrations.RewriteOpenclawBundledCaddyfile,
 		migrations.InitAgentAccountModelPool,
 		migrations.AddHostTable,
 		migrations.AddAITerminalSettings,
 		migrations.UpdateAgentQuickJumpTitle,
+		migrations.FixOpenclaw20260323HTTPPort,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

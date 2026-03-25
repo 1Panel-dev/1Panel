@@ -37,6 +37,7 @@ const header = ref('');
 const agentId = ref(0);
 const accountId = ref(0);
 const model = ref('');
+const appVersion = ref('');
 const channelsRef = ref();
 const modelRef = ref();
 const skillsRef = ref();
@@ -47,7 +48,10 @@ const loadSettings = async () => {
         return;
     }
     await nextTick();
-    await settingsRef.value?.load(agentId.value);
+    await settingsRef.value?.load({
+        agentId: agentId.value,
+        appVersion: appVersion.value,
+    });
 };
 
 const loadModel = async () => {
@@ -105,6 +109,7 @@ const openDrawer = async (agent: AI.AgentItem) => {
     agentId.value = agent.id;
     accountId.value = agent.accountId;
     model.value = agent.model;
+    appVersion.value = agent.appVersion;
     header.value = `${agent.name} - ${t('menu.config')}`;
     activeTab.value = 'channels';
     open.value = true;

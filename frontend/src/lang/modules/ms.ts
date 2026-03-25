@@ -689,9 +689,6 @@ const message = {
             appVersion: 'Versi aplikasi',
             webuiPort: 'Port WebUI',
             allowedOrigins: 'Alamat akses',
-            allowedOriginsHelper:
-                'Masukkan satu alamat akses penuh bagi setiap baris. HTTPS disyorkan, contohnya https://192.168.1.2:18789. Isikan secara manual jika alamat akses lalai belum dikonfigurasi.',
-            allowedOriginsPlaceholder: 'https://192.168.1.2:18789',
             allowedOriginsRequired: 'Masukkan sekurang-kurangnya satu alamat akses',
             allowedOriginsInvalid: 'Gunakan format http(s)://hos-atau-ip[:port]',
             provider: 'Penyedia model',
@@ -2523,11 +2520,11 @@ const message = {
         reload: 'Muat Semula',
         upgradeWarn: 'Meningkatkan aplikasi akan menggantikan fail docker-compose.yml.',
         openclawHttpsUpgradeNoticeTitle:
-            'Nota: Arahan berikut hanya terpakai kepada pengguna yang menaik taraf OpenClaw daripada versi lebih awal daripada 2026.3.13:',
+            'Note: The following instructions only apply to users upgrading OpenClaw from versions 2026.3.13 through 2026.3.22 to 2026.3.23 or later:',
         openclawHttpsUpgradeNoticeItem1:
-            'Selepas ejen yang telah dipasang selesai dinaik taraf, pergi ke Konfigurasi -> Tetapan -> Keselamatan dan tambah alamat akses secara manual.',
+            'After the upgrade, agent access switches back to HTTP. Go to Configuration -> Settings -> Security and check the access address.',
         openclawHttpsUpgradeNoticeItem2:
-            'Versi baharu kini mewajibkan HTTPS untuk mengakses ejen. Jika anda sebelum ini menggunakan laman reverse proxy, tukar alamat sasaran proksi kepada https://IP:Port.',
+            'If you previously used a reverse proxy website, change the proxy target to http://IP:Port.',
         newVersion: 'Versi baru',
         oldVersion: 'Versi semasa',
         composeDiff: 'Perbandingan fail',

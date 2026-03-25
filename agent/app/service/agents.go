@@ -81,6 +81,7 @@ const (
 	openclawGatewayPort           = 18789
 	openclawAllowedOriginHost     = "127.0.0.1"
 	openclawHTTPSVersion          = "2026.3.13"
+	openclawHTTPVersion           = "2026.3.23"
 	openclawTrustedProxyLoopback  = "127.0.0.1/32"
 	defaultOpenclawNPMRegistry    = "https://registry.npmjs.org/"
 )
@@ -178,7 +179,11 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 		constant.HostIP:      "",
 	}
 	if agentType == constant.AppOpenclaw {
-		params["PANEL_APP_PORT_HTTPS"] = req.WebUIPort
+		if isOpenclawHTTPSWindowVersion(detail.Version) {
+			params["PANEL_APP_PORT_HTTPS"] = req.WebUIPort
+		} else {
+			params["PANEL_APP_PORT_HTTP"] = req.WebUIPort
+		}
 		if allowedOrigin := firstAllowedOrigin(allowedOrigins); allowedOrigin != "" {
 			params["ALLOWED_ORIGIN"] = allowedOrigin
 		}

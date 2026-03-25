@@ -802,7 +802,7 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 		}
 
 		var newCompose string
-		if err = migrateOpenclawHTTPSUpgrade(&install, oldVersion, detail.Version); err != nil {
+		if err = migrateOpenclawProtocolUpgrade(&install, oldVersion, detail.Version); err != nil {
 			return err
 		}
 		if req.DockerCompose == "" {

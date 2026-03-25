@@ -21,7 +21,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
-	openclawutil "github.com/1Panel-dev/1Panel/agent/utils/openclaw"
 	"github.com/1Panel-dev/1Panel/agent/utils/req_helper"
 	"gorm.io/gorm"
 )
@@ -340,7 +339,7 @@ func buildAgentItem(agent *model.Agent, appInstall *model.AppInstall, envMap map
 		item.Container = appInstall.ContainerName
 		item.AppVersion = appInstall.Version
 		if agentType == constant.AppOpenclaw {
-			if isOpenclawHTTPSVersion(appInstall.Version) {
+			if isOpenclawHTTPSWindowVersion(appInstall.Version) {
 				item.WebUIPort = appInstall.HttpsPort
 			} else {
 				item.WebUIPort = appInstall.HttpPort
@@ -360,36 +359,52 @@ func buildAgentItem(agent *model.Agent, appInstall *model.AppInstall, envMap map
 	return item
 }
 
-func isOpenclawHTTPSVersion(version string) bool {
-	target := strings.TrimSpace(strings.ToLower(version))
-	if target == "" || target == "latest" {
-		return true
-	}
-	if !strings.ContainsAny(target, "0123456789") {
-		return true
-	}
-	return common.CompareAppVersion(target, openclawHTTPSVersion)
+func isOpenclawLegacyHTTPVersion(version string) bool {
+	return !common.CompareAppVersion(version, openclawHTTPSVersion)
+}
+
+func isOpenclawHTTPSWindowVersion(version string) bool {
+	return common.CompareAppVersion(version, openclawHTTPSVersion) && !common.CompareAppVersion(version, openclawHTTPVersion)
+}
+
+func isOpenclawCurrentHTTPVersion(version string) bool {
+	return common.CompareAppVersion(version, openclawHTTPVersion)
 }
 
 func shouldMigrateOpenclawHTTPSUpgrade(install *model.AppInstall, fromVersion, toVersion string) bool {
 	if install == nil || install.App.Key != constant.AppOpenclaw {
 		return false
 	}
-	return !isOpenclawHTTPSVersion(fromVersion) && isOpenclawHTTPSVersion(toVersion)
+	return isOpenclawLegacyHTTPVersion(fromVersion) && isOpenclawHTTPSWindowVersion(toVersion)
 }
 
-func migrateOpenclawHTTPSUpgrade(install *model.AppInstall, fromVersion, toVersion string) error {
-	systemIP, _ := settingRepo.GetValueByKey("SystemIP")
-	return migrateOpenclawHTTPSUpgradeWithSystemIP(install, fromVersion, toVersion, systemIP)
-}
-
-func migrateOpenclawHTTPSUpgradeWithSystemIP(install *model.AppInstall, fromVersion, toVersion, systemIP string) error {
-	if !shouldMigrateOpenclawHTTPSUpgrade(install, fromVersion, toVersion) {
-		return nil
+func shouldMigrateOpenclawHTTPUpgrade(install *model.AppInstall, fromVersion, toVersion string) bool {
+	if install == nil || install.App.Key != constant.AppOpenclaw {
+		return false
 	}
-	migrateOpenclawInstallPorts(install)
-	if err := openclawutil.WriteCatchAllCaddyfile(install.GetPath()); err != nil {
-		return err
+	return !isOpenclawCurrentHTTPVersion(fromVersion) && isOpenclawCurrentHTTPVersion(toVersion)
+}
+
+func migrateOpenclawProtocolUpgrade(install *model.AppInstall, fromVersion, toVersion string) error {
+	systemIP, _ := settingRepo.GetValueByKey("SystemIP")
+	return migrateOpenclawProtocolUpgradeWithSystemIP(install, fromVersion, toVersion, systemIP)
+}
+
+func migrateOpenclawProtocolUpgradeWithSystemIP(install *model.AppInstall, fromVersion, toVersion, systemIP string) error {
+	if shouldMigrateOpenclawHTTPSUpgrade(install, fromVersion, toVersion) {
+		return applyOpenclawProtocolUpgradeWithSystemIP(install, toVersion, systemIP, true)
+	}
+	if shouldMigrateOpenclawHTTPUpgrade(install, fromVersion, toVersion) {
+		return applyOpenclawProtocolUpgradeWithSystemIP(install, toVersion, systemIP, false)
+	}
+	return nil
+}
+
+func applyOpenclawProtocolUpgradeWithSystemIP(install *model.AppInstall, toVersion, systemIP string, useHTTPS bool) error {
+	if useHTTPS {
+		migrateOpenclawInstallPortsToHTTPS(install)
+	} else {
+		migrateOpenclawInstallPortsToHTTP(install)
 	}
 	configPath := path.Join(install.GetPath(), "data", "conf", "openclaw.json")
 	var allowedOrigins []string
@@ -400,8 +415,12 @@ func migrateOpenclawHTTPSUpgradeWithSystemIP(install *model.AppInstall, fromVers
 	if originHost == "" {
 		originHost = openclawAllowedOriginHost
 	}
-	if install.HttpsPort > 0 {
-		allowedOrigin, err := buildOpenclawAllowedOrigin(originHost, install.HttpsPort)
+	port := install.HttpPort
+	if useHTTPS {
+		port = install.HttpsPort
+	}
+	if port > 0 {
+		allowedOrigin, err := buildOpenclawAllowedOrigin(openclawAllowedOriginScheme(toVersion), originHost, port)
 		if err == nil {
 			conf, err := readOpenclawConfig(configPath)
 			if err != nil {
@@ -417,7 +436,14 @@ func migrateOpenclawHTTPSUpgradeWithSystemIP(install *model.AppInstall, fromVers
 	return migrateOpenclawInstallEnv(install, allowedOrigins)
 }
 
-func migrateOpenclawInstallPorts(install *model.AppInstall) {
+func openclawAllowedOriginScheme(version string) string {
+	if isOpenclawHTTPSWindowVersion(version) {
+		return "https"
+	}
+	return "http"
+}
+
+func migrateOpenclawInstallPortsToHTTPS(install *model.AppInstall) {
 	if install == nil {
 		return
 	}
@@ -426,6 +452,18 @@ func migrateOpenclawInstallPorts(install *model.AppInstall) {
 	}
 	if install.HttpPort > 0 {
 		install.HttpPort = 0
+	}
+}
+
+func migrateOpenclawInstallPortsToHTTP(install *model.AppInstall) {
+	if install == nil {
+		return
+	}
+	if install.HttpPort == 0 && install.HttpsPort > 0 {
+		install.HttpPort = install.HttpsPort
+	}
+	if install.HttpsPort > 0 {
+		install.HttpsPort = 0
 	}
 }
 
@@ -441,11 +479,20 @@ func migrateOpenclawInstallEnv(install *model.AppInstall, allowedOrigins []strin
 	}
 	if install.HttpsPort > 0 {
 		envMap["PANEL_APP_PORT_HTTPS"] = install.HttpsPort
+	} else {
+		delete(envMap, "PANEL_APP_PORT_HTTPS")
+	}
+	if install.HttpPort > 0 {
+		envMap["PANEL_APP_PORT_HTTP"] = install.HttpPort
+	}
+	if install.HttpPort == 0 {
+		delete(envMap, "PANEL_APP_PORT_HTTP")
 	}
 	if allowedOrigin := firstAllowedOrigin(allowedOrigins); allowedOrigin != "" {
 		envMap["ALLOWED_ORIGIN"] = allowedOrigin
+	} else {
+		delete(envMap, "ALLOWED_ORIGIN")
 	}
-	delete(envMap, "PANEL_APP_PORT_HTTP")
 	payload, err := json.Marshal(envMap)
 	if err != nil {
 		return err
@@ -487,19 +534,20 @@ func firstAllowedOrigin(allowedOrigins []string) string {
 	return ""
 }
 
-func buildOpenclawAllowedOrigin(host string, port int) (string, error) {
+func buildOpenclawAllowedOrigin(scheme, host string, port int) (string, error) {
+	scheme = strings.TrimSpace(strings.ToLower(scheme))
 	host = strings.TrimSpace(host)
-	if host == "" || port <= 0 {
+	if (scheme != "http" && scheme != "https") || host == "" || port <= 0 {
 		return "", fmt.Errorf("invalid openclaw allowed origin")
 	}
 	if strings.Contains(host, ":") && !strings.HasPrefix(host, "[") && strings.Count(host, ":") > 1 {
 		host = "[" + host + "]"
 	}
-	return normalizeAllowedOrigin(fmt.Sprintf("https://%s:%d", host, port))
+	return normalizeAllowedOrigin(fmt.Sprintf("%s://%s:%d", scheme, host, port))
 }
 
 func checkAgentUpgradable(install model.AppInstall) bool {
-	if install.ID == 0 || install.Version == "" || install.Version == "latest" {
+	if install.ID == 0 || install.Version == "" {
 		return false
 	}
 	if install.App.ID == 0 {
@@ -651,7 +699,7 @@ func writeOpenclawConfig(confDir string, account *model.AgentAccount, modelName,
 	cfg := openclawConfig{
 		Gateway: gatewayConfig{
 			Mode: "local",
-			Bind: "loopback",
+			Bind: "lan",
 			Port: openclawGatewayPort,
 			Auth: gatewayAuth{
 				Mode:  "token",
@@ -744,7 +792,7 @@ func writeOpenclawConfig(confDir string, account *model.AgentAccount, modelName,
 			gatewayMap["mode"] = "local"
 		}
 		if _, ok := gatewayMap["bind"]; !ok {
-			gatewayMap["bind"] = "loopback"
+			gatewayMap["bind"] = "lan"
 		}
 		if _, ok := gatewayMap["port"]; !ok {
 			gatewayMap["port"] = openclawGatewayPort
