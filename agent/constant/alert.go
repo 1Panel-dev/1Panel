@@ -25,4 +25,5 @@ const (
 	DingTalk = "dingTalk"
 	FeiShu   = "feiShu"
 	Custom   = "custom"
+	Bark     = "bark"
 )
