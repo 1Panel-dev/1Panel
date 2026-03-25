@@ -1,4 +1,9 @@
 import i18n from '@/lang';
+import { compareVersion } from '@/utils/version';
+
+const openclawHTTPSVersion = '2026.3.13';
+const openclawHTTPVersion = '2026.3.23';
+const openclawDefaultAccessHost = '127.0.0.1';
 
 export const getAgentProviderDisplayName = (provider: string, displayName?: string): string => {
     if (provider === 'custom' || displayName === 'Custom') {
@@ -10,13 +15,25 @@ export const getAgentProviderDisplayName = (provider: string, displayName?: stri
     return displayName || provider;
 };
 
-export const buildDefaultAllowedOrigin = (systemIP: string, port?: number | string): string => {
-    const target = String(systemIP || '').trim();
-    if (!target || !port) {
+export const isOpenclawHTTPSWindowVersion = (version: string): boolean => {
+    return compareVersion(version, openclawHTTPSVersion) && !compareVersion(version, openclawHTTPVersion);
+};
+
+export const isOpenclawCurrentHTTPVersion = (version: string): boolean => {
+    return compareVersion(version, openclawHTTPVersion);
+};
+
+export const getOpenclawAccessScheme = (version: string): 'http' | 'https' => {
+    return isOpenclawHTTPSWindowVersion(version) ? 'https' : 'http';
+};
+
+export const buildDefaultAllowedOrigin = (systemIP: string, port?: number | string, version?: string): string => {
+    const target = String(systemIP || '').trim() || openclawDefaultAccessHost;
+    if (!port) {
         return '';
     }
     const host = target.includes(':') && !target.startsWith('[') && !target.endsWith(']') ? `[${target}]` : target;
-    return `https://${host}:${port}`;
+    return `${getOpenclawAccessScheme(String(version || ''))}://${host}:${port}`;
 };
 
 export const normalizeAllowedOrigin = (value: string): string => {

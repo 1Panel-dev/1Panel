@@ -682,9 +682,6 @@ const message = {
             appVersion: 'アプリバージョン',
             webuiPort: 'WebUI ポート',
             allowedOrigins: 'アクセスアドレス',
-            allowedOriginsHelper:
-                '1 行に 1 つずつ完全なアクセスアドレスを入力してください。HTTPS を推奨します。例: https://192.168.1.2:18789。デフォルトのアクセスアドレスが未設定の場合は手動で入力してください。',
-            allowedOriginsPlaceholder: 'https://192.168.1.2:18789',
             allowedOriginsRequired: '少なくとも 1 つのアクセスアドレスを入力してください',
             allowedOriginsInvalid: 'http(s)://host-or-ip[:port] の形式で入力してください',
             provider: 'モデルプロバイダー',
@@ -2490,11 +2487,11 @@ const message = {
         upgradeWarn:
             'アプリケーションのアップグレードは、docker-compose.ymlファイルを置き換えます。変更がある場合は、クリックしてファイルの比較を表示できます',
         openclawHttpsUpgradeNoticeTitle:
-            '注意: 以下の説明は、2026.3.13 より前のバージョンから OpenClaw をアップグレードするユーザーにのみ適用されます:',
+            'Note: The following instructions only apply to users upgrading OpenClaw from versions 2026.3.13 through 2026.3.22 to 2026.3.23 or later:',
         openclawHttpsUpgradeNoticeItem1:
-            'デプロイ済みエージェントのアップグレード完了後、設定 -> 設定 -> セキュリティ に入り、アクセスアドレスを手動で追加してください。',
+            'After the upgrade, agent access switches back to HTTP. Go to Configuration -> Settings -> Security and check the access address.',
         openclawHttpsUpgradeNoticeItem2:
-            '新バージョンではエージェントへのアクセスに HTTPS が必須です。以前リバースプロキシサイト経由でアクセスしていた場合は、プロキシ先を https://IP:Port に変更してください。',
+            'If you previously used a reverse proxy website, change the proxy target to http://IP:Port.',
         newVersion: '新しいバージョン',
         oldVersion: '現在のバージョン',
         composeDiff: 'ファイルの比較',

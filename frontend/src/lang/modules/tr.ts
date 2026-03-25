@@ -685,9 +685,6 @@ const message = {
             appVersion: 'Uygulama sürümü',
             webuiPort: 'WebUI portu',
             allowedOrigins: 'Erişim adresleri',
-            allowedOriginsHelper:
-                'Her satıra bir tam erişim adresi girin. HTTPS kullanmanız önerilir. Örnek: https://192.168.1.2:18789. Varsayılan erişim adresi yapılandırılmamışsa elle girin.',
-            allowedOriginsPlaceholder: 'https://192.168.1.2:18789',
             allowedOriginsRequired: 'En az bir erişim adresi girin',
             allowedOriginsInvalid: 'http(s)://host-veya-ip[:port] biçimini kullanın',
             provider: 'Model sağlayıcı',
@@ -2518,11 +2515,11 @@ const message = {
         upgradeWarn:
             'Uygulamanın yükseltilmesi docker-compose.yml dosyasını değiştirecektir. Herhangi bir değişiklik varsa, dosya karşılaştırmasını görüntülemek için tıklayabilirsiniz',
         openclawHttpsUpgradeNoticeTitle:
-            "Not: Aşağıdaki talimatlar yalnızca OpenClaw'ı 2026.3.13 öncesi sürümlerden yükselten kullanıcılar için geçerlidir:",
+            'Note: The following instructions only apply to users upgrading OpenClaw from versions 2026.3.13 through 2026.3.22 to 2026.3.23 or later:',
         openclawHttpsUpgradeNoticeItem1:
-            'Dağıtılmış ajan yükseltmesi tamamlandıktan sonra Yapılandırma -> Ayarlar -> Güvenlik sayfasına gidip erişim adresini manuel olarak ekleyin.',
+            'After the upgrade, agent access switches back to HTTP. Go to Configuration -> Settings -> Security and check the access address.',
         openclawHttpsUpgradeNoticeItem2:
-            'Yeni sürüm artık ajana erişim için HTTPS zorunlu kılıyor. Daha önce ters proxy sitesi kullanıyorsanız proxy hedef adresini https://IP:Port olarak değiştirin.',
+            'If you previously used a reverse proxy website, change the proxy target to http://IP:Port.',
         newVersion: 'Yeni sürüm',
         oldVersion: 'Mevcut sürüm',
         composeDiff: 'Dosya karşılaştırması',

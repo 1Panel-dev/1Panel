@@ -22,6 +22,7 @@ import ConfigFileTab from './settings/config-file.vue';
 const { t } = useI18n();
 const activeTab = ref('security');
 const agentId = ref(0);
+const appVersion = ref('');
 const securityRef = ref();
 const otherRef = ref();
 const configFileRef = ref();
@@ -32,7 +33,7 @@ const loadCurrentTab = async () => {
     }
     await nextTick();
     if (activeTab.value === 'security') {
-        await securityRef.value?.load(agentId.value);
+        await securityRef.value?.load(agentId.value, appVersion.value);
         return;
     }
     if (activeTab.value === 'other') {
@@ -48,8 +49,9 @@ const handleTabClick = async () => {
     await loadCurrentTab();
 };
 
-const load = async (id: number) => {
-    agentId.value = id;
+const load = async (params: { agentId: number; appVersion: string }) => {
+    agentId.value = params.agentId;
+    appVersion.value = params.appVersion;
     activeTab.value = 'security';
     await loadCurrentTab();
 };

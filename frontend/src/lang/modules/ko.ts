@@ -674,9 +674,6 @@ const message = {
             appVersion: '앱 버전',
             webuiPort: 'WebUI 포트',
             allowedOrigins: '접속 주소',
-            allowedOriginsHelper:
-                '한 줄에 하나의 전체 접속 주소를 입력하세요. HTTPS 사용을 권장합니다. 예: https://192.168.1.2:18789. 기본 접속 주소가 설정되지 않은 경우 수동으로 입력하세요.',
-            allowedOriginsPlaceholder: 'https://192.168.1.2:18789',
             allowedOriginsRequired: '접속 주소를 하나 이상 입력하세요',
             allowedOriginsInvalid: 'http(s)://host-or-ip[:port] 형식으로 입력하세요',
             provider: '모델 제공자',
@@ -2433,11 +2430,11 @@ const message = {
         upgradeWarn:
             '애플리케이션 업그레이드는 docker-compose.yml 파일을 교체합니다. 변경 사항이 있으면 파일 비교를 클릭하여 확인할 수 있습니다.',
         openclawHttpsUpgradeNoticeTitle:
-            '주의: 다음 안내는 2026.3.13 이전 버전에서 OpenClaw 를 업그레이드하는 사용자에게만 적용됩니다:',
+            'Note: The following instructions only apply to users upgrading OpenClaw from versions 2026.3.13 through 2026.3.22 to 2026.3.23 or later:',
         openclawHttpsUpgradeNoticeItem1:
-            '배포된 에이전트 업그레이드가 완료되면 구성 -> 설정 -> 보안 페이지로 이동해 접근 주소를 수동으로 추가해야 합니다.',
+            'After the upgrade, agent access switches back to HTTP. Go to Configuration -> Settings -> Security and check the access address.',
         openclawHttpsUpgradeNoticeItem2:
-            '새 버전은 에이전트 접근에 HTTPS 를 강제합니다. 이전에 리버스 프록시 사이트로 접근했다면 프록시 대상 주소를 https://IP:Port 로 변경하세요.',
+            'If you previously used a reverse proxy website, change the proxy target to http://IP:Port.',
         newVersion: '새 버전',
         oldVersion: '현재 버전',
         composeDiff: '파일 비교',

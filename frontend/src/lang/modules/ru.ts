@@ -681,9 +681,6 @@ const message = {
             appVersion: 'Версия приложения',
             webuiPort: 'Порт WebUI',
             allowedOrigins: 'Адреса доступа',
-            allowedOriginsHelper:
-                'Указывайте по одному полному адресу доступа в строке. Рекомендуется использовать HTTPS, например https://192.168.1.2:18789. Если адрес по умолчанию не настроен, введите его вручную.',
-            allowedOriginsPlaceholder: 'https://192.168.1.2:18789',
             allowedOriginsRequired: 'Укажите хотя бы один адрес доступа',
             allowedOriginsInvalid: 'Используйте формат http(s)://host-or-ip[:port]',
             provider: 'Поставщик моделей',
@@ -2517,11 +2514,11 @@ const message = {
         upgradeWarn:
             'Обновление приложения заменит файл docker-compose.yml. Если есть изменения, вы можете нажать для просмотра сравнения файлов',
         openclawHttpsUpgradeNoticeTitle:
-            'Примечание: Следующие инструкции применяются только к пользователям, обновляющим OpenClaw с версий ниже 2026.3.13:',
+            'Note: The following instructions only apply to users upgrading OpenClaw from versions 2026.3.13 through 2026.3.22 to 2026.3.23 or later:',
         openclawHttpsUpgradeNoticeItem1:
-            'После завершения обновления развернутого агента перейдите в Конфигурация -> Настройки -> Безопасность и вручную добавьте адрес доступа.',
+            'After the upgrade, agent access switches back to HTTP. Go to Configuration -> Settings -> Security and check the access address.',
         openclawHttpsUpgradeNoticeItem2:
-            'Новая версия теперь требует HTTPS для доступа к агенту. Если раньше использовался сайт с обратным прокси, измените адрес назначения прокси на https://IP:Port.',
+            'If you previously used a reverse proxy website, change the proxy target to http://IP:Port.',
         newVersion: 'Новая версия',
         oldVersion: 'Текущая версия',
         composeDiff: 'Сравнение файлов',

@@ -681,9 +681,6 @@ const message = {
             appVersion: 'App Version',
             webuiPort: 'WebUI Port',
             allowedOrigins: 'Access Addresses',
-            allowedOriginsHelper:
-                'Enter one full access address per line. HTTPS is recommended, for example https://192.168.1.2:18789. Fill it manually if the default access address is not configured.',
-            allowedOriginsPlaceholder: 'https://192.168.1.2:18789',
             allowedOriginsRequired: 'Enter at least one access address',
             allowedOriginsInvalid: 'Use the format http(s)://host-or-ip[:port]',
             provider: 'Provider',
@@ -2472,11 +2469,11 @@ const message = {
         upgradeWarn:
             'Upgrading the application will replace the docker-compose.yml file. If there are any changes, you can click to view the file comparison',
         openclawHttpsUpgradeNoticeTitle:
-            'Note: The following instructions only apply to users upgrading OpenClaw from versions earlier than 2026.3.13:',
+            'Note: The following instructions only apply to users upgrading OpenClaw from versions 2026.3.13 through 2026.3.22 to 2026.3.23 or later:',
         openclawHttpsUpgradeNoticeItem1:
-            'After the deployed agent is upgraded, go to Configuration -> Settings -> Security and manually add the access address.',
+            'After the upgrade, agent access switches back to HTTP. Go to Configuration -> Settings -> Security and check the access address.',
         openclawHttpsUpgradeNoticeItem2:
-            'The new version now requires HTTPS to access the agent. If you previously used a reverse proxy website, change the proxy target to https://IP:Port.',
+            'If you previously used a reverse proxy website, change the proxy target to http://IP:Port.',
         newVersion: 'New version',
         oldVersion: 'Current version',
         composeDiff: 'File comparison',
