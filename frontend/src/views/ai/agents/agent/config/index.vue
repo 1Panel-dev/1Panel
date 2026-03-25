@@ -3,13 +3,13 @@
         <template #content>
             <el-tabs v-model="activeTab" tab-position="left" class="config-tabs" @tab-click="handleTabClick">
                 <el-tab-pane :label="t('aiTools.agents.channelsTab')" name="channels">
-                    <ChannelsTab ref="channelsRef" />
+                    <ChannelsTab ref="channelsRef" :app-version="appVersion" />
                 </el-tab-pane>
                 <el-tab-pane :label="t('aiTools.model.model')" name="model">
                     <ModelTab ref="modelRef" @updated="handleModelUpdated" />
                 </el-tab-pane>
                 <el-tab-pane :label="t('aiTools.agents.skillsTab')" name="skills">
-                    <SkillsTab ref="skillsRef" />
+                    <SkillsTab ref="skillsRef" :app-version="appVersion" />
                 </el-tab-pane>
                 <el-tab-pane :label="t('file.setting')" name="settings">
                     <SettingsTab ref="settingsRef" />

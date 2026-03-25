@@ -1,34 +1,26 @@
 <template>
     <DrawerPro v-model="drawerVisible" :header="$t('menu.home')" :resource="resource" size="60%" @close="handleClose">
-        <div v-loading="loading" class="overview-drawer">
-            <div class="toolbar">
-                <el-button :loading="loading" @click="loadOverview">
-                    <el-icon><Refresh /></el-icon>
-                    {{ $t('commons.button.refresh') }}
-                </el-button>
-            </div>
-
-            <section class="section">
-                <span class="section-title">{{ $t('aiTools.agents.overviewSnapshot') }}</span>
+        <div v-loading="loading" class="database-status">
+            <el-form label-position="top">
+                <span class="title">{{ $t('aiTools.agents.overviewSnapshot') }}</span>
                 <el-divider class="divider" />
-                <el-row :gutter="20" class="metrics-row">
+                <el-row class="content" :gutter="20">
                     <el-col v-for="item in snapshotCards" :key="item.label" :xs="24" :sm="12" :md="12" :lg="6" :xl="6">
-                        <el-form-item label-position="top">
+                        <el-form-item>
                             <template #label>
-                                <span class="metric-label">{{ item.label }}</span>
+                                <span class="status-label">{{ item.label }}</span>
                             </template>
-                            <span class="metric-value">{{ item.value }}</span>
+                            <span class="status-count">{{ item.value }}</span>
                         </el-form-item>
                     </el-col>
                 </el-row>
-            </section>
+            </el-form>
         </div>
     </DrawerPro>
 </template>
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { Refresh } from '@element-plus/icons-vue';
 import { useI18n } from 'vue-i18n';
 import { AI } from '@/api/interface/ai';
 import { getAgentOverview } from '@/api/modules/ai';
@@ -98,54 +90,23 @@ defineExpose({
 </script>
 
 <style scoped lang="scss">
-.overview-drawer {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
+.database-status {
+    .divider {
+        display: block;
+        height: 1px;
+        width: 100%;
+        margin: 12px 0;
+        border-top: 1px var(--el-border-color) var(--el-border-style);
+    }
 
-.toolbar {
-    display: flex;
-    justify-content: flex-end;
-}
+    .title {
+        font-size: 20px;
+        font-weight: 500;
+        margin-left: 50px;
+    }
 
-.section {
-    display: flex;
-    flex-direction: column;
-}
-
-.section-title {
-    font-size: 20px;
-    font-weight: 600;
-}
-
-.divider {
-    display: block;
-    height: 1px;
-    width: 100%;
-    margin: 12px 0;
-    border-top: 1px var(--el-border-color) var(--el-border-style);
-}
-
-.metrics-row {
-    padding: 0 16px;
-}
-
-.metric-label {
-    color: var(--el-text-color-secondary);
-}
-
-.metric-value {
-    display: inline-block;
-    margin-top: 2px;
-    font-size: 16px;
-    font-weight: 600;
-    word-break: break-word;
-}
-
-@media (max-width: 1200px) {
-    .metrics-row {
-        padding: 0;
+    .content {
+        margin-left: 50px;
     }
 }
 </style>

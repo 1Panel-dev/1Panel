@@ -1,5 +1,6 @@
 <template>
-    <div v-loading="loading">
+    <VersionSupport v-if="!supported" :min-version="openclawMinSupportedVersion" />
+    <div v-else v-loading="loading">
         <div class="toolbar">
             <el-input
                 v-model="keyword"
@@ -60,8 +61,15 @@ import { useI18n } from 'vue-i18n';
 import { AI } from '@/api/interface/ai';
 import { listAgentSkills, updateAgentSkill } from '@/api/modules/ai';
 import { MsgSuccess } from '@/utils/message';
+import { isOpenclawCurrentHTTPVersion } from '@/utils/agent';
+import VersionSupport from './components/version-support.vue';
 
 type SkillGroupKey = 'builtIn' | 'external' | 'workspace' | 'extra' | 'other';
+
+const openclawMinSupportedVersion = '2026.3.23';
+const props = defineProps<{
+    appVersion: string;
+}>();
 
 const { t } = useI18n();
 const loading = ref(false);
@@ -69,6 +77,7 @@ const keyword = ref('');
 const agentId = ref(0);
 const skills = ref<AI.AgentSkillItem[]>([]);
 const updatingSkill = ref('');
+const supported = computed(() => isOpenclawCurrentHTTPVersion(props.appVersion));
 
 const groupTagLabels = computed<Record<SkillGroupKey, string>>(() => ({
     builtIn: t('aiTools.agents.skillsGroupBuiltIn'),
@@ -140,7 +149,7 @@ const resolveGroupKey = (skill: AI.AgentSkillItem): SkillGroupKey => {
 };
 
 const loadSkills = async () => {
-    if (!agentId.value) {
+    if (!supported.value || !agentId.value) {
         return;
     }
     loading.value = true;
@@ -158,7 +167,7 @@ const load = async (id: number) => {
 };
 
 const toggleSkill = async (skill: AI.AgentSkillItem, enabled: boolean) => {
-    if (!agentId.value) {
+    if (!supported.value || !agentId.value) {
         return;
     }
     updatingSkill.value = skill.name;
