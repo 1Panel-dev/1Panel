@@ -1135,3 +1135,19 @@ var UpdateAgentQuickJumpTitle = &gormigrate.Migration{
 			Update("title", "aiTools.agents.agent").Error
 	},
 }
+
+var FixOpenclaw20260323HTTPPort = &gormigrate.Migration{
+	ID: "20260325-fix-openclaw-20260323-http-port",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.Exec(
+			`UPDATE app_installs
+SET http_port = https_port,
+    https_port = 0
+WHERE version = ?
+  AND https_port > 0
+  AND app_id IN (SELECT id FROM apps WHERE key = ?)`,
+			"2026.3.23",
+			constant.AppOpenclaw,
+		).Error
+	},
+}

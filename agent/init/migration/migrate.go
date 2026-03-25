@@ -76,6 +76,7 @@ func InitAgentDB() {
 		migrations.AddHostTable,
 		migrations.AddAITerminalSettings,
 		migrations.UpdateAgentQuickJumpTitle,
+		migrations.FixOpenclaw20260323HTTPPort,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)
