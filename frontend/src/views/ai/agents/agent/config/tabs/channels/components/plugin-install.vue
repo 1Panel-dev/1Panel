@@ -1,6 +1,7 @@
 <template>
     <el-alert
         v-if="!installed"
+        class="plugin-install-alert"
         type="warning"
         :closable="false"
         :title="t('aiTools.agents.pluginNotInstalled')"
@@ -27,3 +28,13 @@ const emit = defineEmits<{
 
 const { t } = useI18n();
 </script>
+
+<style scoped lang="scss">
+.plugin-install-alert {
+    :deep(.el-alert__title),
+    :deep(.el-alert__description) {
+        font-size: var(--el-font-size-base);
+        line-height: 1.5;
+    }
+}
+</style>

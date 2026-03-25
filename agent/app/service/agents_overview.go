@@ -3,7 +3,10 @@ package service
 import (
 	"encoding/json"
 	"fmt"
+	"os"
+	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
@@ -12,7 +15,9 @@ import (
 )
 
 const (
-	openclawCronJobsPath = "/home/node/.openclaw/cron/jobs.json"
+	openclawCronJobsRelativePath     = "data/conf/cron/jobs.json"
+	openclawSessionStoreRelativeGlob = "data/conf/agents/*/sessions/sessions.json"
+	openclawSessionFilesRelativeGlob = "data/conf/agents/*/sessions/*.jsonl"
 )
 
 func (a AgentService) GetOverview(req dto.AgentOverviewReq) (*dto.AgentOverview, error) {
@@ -39,20 +44,30 @@ func (a AgentService) GetOverview(req dto.AgentOverviewReq) (*dto.AgentOverview,
 		return overview, nil
 	}
 
-	skillCount, err := loadOpenclawOverviewSkillStats(install.ContainerName)
-	if err == nil {
-		overview.Snapshot.SkillCount = skillCount
-	}
-
-	sessionCount, err := loadOpenclawOverviewSessionCount(install.ContainerName)
-	if err == nil {
-		overview.Snapshot.SessionCount = sessionCount
-	}
-
-	jobCount, err := loadOpenclawOverviewJobCount(install.ContainerName)
-	if err == nil {
-		overview.Snapshot.JobCount = jobCount
-	}
+	var wg sync.WaitGroup
+	wg.Add(3)
+	go func() {
+		defer wg.Done()
+		skillCount, err := loadOpenclawOverviewSkillStats(install.ContainerName)
+		if err == nil {
+			overview.Snapshot.SkillCount = skillCount
+		}
+	}()
+	go func() {
+		defer wg.Done()
+		sessionCount, err := loadOpenclawOverviewSessionCount(install.GetPath())
+		if err == nil {
+			overview.Snapshot.SessionCount = sessionCount
+		}
+	}()
+	go func() {
+		defer wg.Done()
+		jobCount, err := loadOpenclawOverviewJobCount(install.GetPath())
+		if err == nil {
+			overview.Snapshot.JobCount = jobCount
+		}
+	}()
+	wg.Wait()
 
 	return overview, nil
 }
@@ -109,30 +124,46 @@ func loadOpenclawOverviewSkillStats(containerName string) (int, error) {
 	return len(skills), nil
 }
 
-func loadOpenclawOverviewSessionCount(containerName string) (int, error) {
-	output, err := cmd.RunDefaultWithStdoutBashCfAndTimeOut(
-		"docker exec %s openclaw sessions --all-agents --json",
-		20*time.Second,
-		containerName,
-	)
+func loadOpenclawOverviewSessionCount(installPath string) (int, error) {
+	sessionStorePaths, err := filepath.Glob(filepath.Join(installPath, openclawSessionStoreRelativeGlob))
 	if err != nil {
 		return 0, err
 	}
-	return parseOpenclawSessionCount(output)
+	total := 0
+	for _, sessionStorePath := range sessionStorePaths {
+		count, err := loadOpenclawSessionCountFromFile(sessionStorePath)
+		if err != nil {
+			continue
+		}
+		total += count
+	}
+	if total > 0 {
+		return total, nil
+	}
+	sessionFiles, err := filepath.Glob(filepath.Join(installPath, openclawSessionFilesRelativeGlob))
+	if err != nil {
+		return 0, err
+	}
+	return len(sessionFiles), nil
 }
 
-func loadOpenclawOverviewJobCount(containerName string) (int, error) {
-	script := fmt.Sprintf(`if [ -f %q ]; then cat %q; fi`, openclawCronJobsPath, openclawCronJobsPath)
-	output, err := cmd.RunDefaultWithStdoutBashCfAndTimeOut(
-		"docker exec %s sh -c %q",
-		20*time.Second,
-		containerName,
-		script,
-	)
+func loadOpenclawSessionCountFromFile(sessionStorePath string) (int, error) {
+	content, err := os.ReadFile(sessionStorePath)
 	if err != nil {
 		return 0, err
 	}
-	return parseOpenclawCronCount(output)
+	return parseOpenclawSessionCount(string(content))
+}
+
+func loadOpenclawOverviewJobCount(installPath string) (int, error) {
+	content, err := os.ReadFile(filepath.Join(installPath, openclawCronJobsRelativePath))
+	if err != nil {
+		if os.IsNotExist(err) {
+			return 0, nil
+		}
+		return 0, err
+	}
+	return parseOpenclawCronCount(string(content))
 }
 
 func parseOpenclawSessionCount(output string) (int, error) {
@@ -143,18 +174,7 @@ func parseOpenclawSessionCount(output string) (int, error) {
 	if err := json.Unmarshal([]byte(strings.TrimSpace(output)), &payload); err != nil {
 		return 0, err
 	}
-	switch value := payload.(type) {
-	case []interface{}:
-		return len(value), nil
-	case map[string]interface{}:
-		if count, ok := value["count"].(float64); ok {
-			return int(count), nil
-		}
-		if sessions, ok := value["sessions"].([]interface{}); ok {
-			return len(sessions), nil
-		}
-	}
-	return 0, nil
+	return countOpenclawSessions(payload), nil
 }
 
 func parseOpenclawCronCount(output string) (int, error) {
@@ -179,4 +199,50 @@ func parseOpenclawCronCount(output string) (int, error) {
 	default:
 		return 0, nil
 	}
+}
+
+func countOpenclawSessions(payload interface{}) int {
+	switch value := payload.(type) {
+	case []interface{}:
+		return len(value)
+	case map[string]interface{}:
+		if count, ok := value["count"].(float64); ok {
+			return int(count)
+		}
+		if sessions, ok := value["sessions"]; ok {
+			return countOpenclawSessions(sessions)
+		}
+		count := 0
+		for _, item := range value {
+			switch typed := item.(type) {
+			case map[string]interface{}:
+				if looksLikeOpenclawSession(typed) {
+					count++
+				}
+			case string:
+				if strings.HasSuffix(strings.TrimSpace(typed), ".jsonl") {
+					count++
+				}
+			}
+		}
+		return count
+	default:
+		return 0
+	}
+}
+
+func looksLikeOpenclawSession(item map[string]interface{}) bool {
+	if _, ok := item["sessionFile"]; ok {
+		return true
+	}
+	if _, ok := item["agentId"]; ok {
+		return true
+	}
+	if _, ok := item["lastActivityTs"]; ok {
+		return true
+	}
+	if _, ok := item["updatedAt"]; ok {
+		return true
+	}
+	return false
 }

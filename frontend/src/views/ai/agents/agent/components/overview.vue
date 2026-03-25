@@ -4,8 +4,8 @@
             <el-form label-position="top">
                 <span class="title">{{ $t('aiTools.agents.overviewSnapshot') }}</span>
                 <el-divider class="divider" />
-                <el-row class="content" :gutter="20">
-                    <el-col v-for="item in snapshotCards" :key="item.label" :xs="24" :sm="12" :md="12" :lg="6" :xl="6">
+                <el-row v-for="(row, index) in snapshotRows" :key="index" type="flex" :gutter="20">
+                    <el-col v-for="item in row" :key="item.label" :xs="24" :sm="12" :md="12" :lg="6" :xl="6">
                         <el-form-item>
                             <template #label>
                                 <span class="status-label">{{ item.label }}</span>
@@ -50,14 +50,18 @@ const formatText = (value: string) => {
     return value || '-';
 };
 
-const snapshotCards = computed(() => [
-    { label: t('commons.table.status'), value: formatText(data.value.snapshot.containerStatus) },
-    { label: t('aiTools.agents.appVersion'), value: formatText(data.value.snapshot.appVersion) },
-    { label: t('aiTools.agents.defaultModel'), value: formatText(data.value.snapshot.defaultModel) },
-    { label: t('aiTools.agents.channelCount'), value: formatNumber(data.value.snapshot.channelCount) },
-    { label: t('aiTools.agents.skillCount'), value: formatNumber(data.value.snapshot.skillCount) },
-    { label: t('aiTools.agents.jobCount'), value: formatNumber(data.value.snapshot.jobCount) },
-    { label: t('aiTools.agents.sessionCount'), value: formatNumber(data.value.snapshot.sessionCount) },
+const snapshotRows = computed(() => [
+    [
+        { label: t('commons.table.status'), value: formatText(data.value.snapshot.containerStatus) },
+        { label: t('aiTools.agents.appVersion'), value: formatText(data.value.snapshot.appVersion) },
+        { label: t('aiTools.agents.defaultModel'), value: formatText(data.value.snapshot.defaultModel) },
+        { label: t('aiTools.agents.channelCount'), value: formatNumber(data.value.snapshot.channelCount) },
+    ],
+    [
+        { label: t('aiTools.agents.skillCount'), value: formatNumber(data.value.snapshot.skillCount) },
+        { label: t('aiTools.agents.jobCount'), value: formatNumber(data.value.snapshot.jobCount) },
+        { label: t('aiTools.agents.sessionCount'), value: formatNumber(data.value.snapshot.sessionCount) },
+    ],
 ]);
 
 const loadOverview = async () => {
@@ -91,6 +95,8 @@ defineExpose({
 
 <style scoped lang="scss">
 .database-status {
+    color: var(--el-text-color-primary);
+
     .divider {
         display: block;
         height: 1px;
@@ -102,11 +108,13 @@ defineExpose({
     .title {
         font-size: 20px;
         font-weight: 500;
-        margin-left: 50px;
+        color: var(--el-text-color-primary);
     }
-
-    .content {
-        margin-left: 50px;
+    :deep(.status-count) {
+        color: var(--el-text-color-primary);
+    }
+    :deep(.status-label) {
+        color: var(--el-text-color-secondary);
     }
 }
 </style>

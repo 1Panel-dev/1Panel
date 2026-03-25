@@ -1,127 +1,131 @@
 <template>
     <VersionSupport v-if="!supported" :min-version="openclawMinSupportedVersion" />
-    <div v-else v-loading="loading">
+    <div v-else>
         <el-radio-group v-model="mode" class="view-switch">
             <el-radio-button label="installed">{{ t('app.installed') }}</el-radio-button>
             <el-radio-button label="market">{{ t('aiTools.agents.skillsMarket') }}</el-radio-button>
         </el-radio-group>
 
-        <div class="toolbar">
+        <div v-loading="loading" class="skills-content">
+            <div class="toolbar">
+                <template v-if="mode === 'installed'">
+                    <el-input
+                        v-model="installedKeyword"
+                        :placeholder="t('aiTools.agents.skillsSearchPlaceholder')"
+                        clearable
+                        class="search-input"
+                    >
+                        <template #prefix>
+                            <el-icon><Search /></el-icon>
+                        </template>
+                    </el-input>
+                    <el-button :loading="loading" @click="loadSkills">
+                        <el-icon><Refresh /></el-icon>
+                    </el-button>
+                </template>
+                <template v-else>
+                    <el-select v-model="marketSource" class="p-w-200" @change="handleMarketSourceChange">
+                        <el-option :value="'clawhub'" :label="t('aiTools.agents.skillsMarketSourceClawhub')" />
+                        <el-option :value="'skillhub'" :label="t('aiTools.agents.skillsMarketSourceSkillhub')" />
+                    </el-select>
+                    <el-input
+                        v-model="marketKeyword"
+                        :placeholder="t('aiTools.agents.skillsSearchPlaceholder')"
+                        clearable
+                        class="search-input"
+                        @keyup.enter="searchMarketSkills"
+                    >
+                        <template #prefix>
+                            <el-icon><Search /></el-icon>
+                        </template>
+                    </el-input>
+                    <el-button :loading="searching" @click="searchMarketSkills">
+                        {{ t('commons.button.search') }}
+                    </el-button>
+                </template>
+            </div>
+
             <template v-if="mode === 'installed'">
-                <el-input
-                    v-model="installedKeyword"
-                    :placeholder="t('aiTools.agents.skillsSearchPlaceholder')"
-                    clearable
-                    class="search-input"
-                >
-                    <template #prefix>
-                        <el-icon><Search /></el-icon>
-                    </template>
-                </el-input>
-                <el-button :loading="loading" @click="loadSkills">
-                    <el-icon><Refresh /></el-icon>
-                </el-button>
+                <div v-if="groupedSkills.length" class="group-list">
+                    <section v-for="group in groupedSkills" :key="group.key" class="group-section">
+                        <div class="group-header">
+                            <span class="group-title">{{ group.label }}</span>
+                            <span class="group-count">{{ group.items.length }}</span>
+                        </div>
+                        <div class="skills-grid">
+                            <el-card v-for="skill in group.items" :key="skill.name" class="skill-card">
+                                <div class="skill-head">
+                                    <div class="skill-name">{{ skill.name }}</div>
+                                    <el-switch
+                                        :model-value="!skill.disabled"
+                                        :loading="updatingSkill === skill.name"
+                                        @change="(value) => toggleSkill(skill, Boolean(value))"
+                                    />
+                                </div>
+                                <el-tooltip placement="top-start" :show-after="200" popper-class="skill-desc-tooltip">
+                                    <template #content>
+                                        <div class="skill-desc-tooltip-content">{{ skill.description }}</div>
+                                    </template>
+                                    <div class="skill-desc">
+                                        {{ skill.description }}
+                                    </div>
+                                </el-tooltip>
+                                <div class="skill-tags">
+                                    <el-tag size="small" type="primary" effect="plain">
+                                        {{ group.tagLabel }}
+                                    </el-tag>
+                                </div>
+                            </el-card>
+                        </div>
+                    </section>
+                </div>
+                <el-empty v-else :description="t('aiTools.agents.skillsEmpty')" />
             </template>
+
             <template v-else>
-                <el-select v-model="marketSource" class="p-w-200" @change="handleMarketSourceChange">
-                    <el-option :value="'clawhub'" :label="t('aiTools.agents.skillsMarketSourceClawhub')" />
-                    <el-option :value="'skillhub'" :label="t('aiTools.agents.skillsMarketSourceSkillhub')" />
-                </el-select>
-                <el-input
-                    v-model="marketKeyword"
-                    :placeholder="t('aiTools.agents.skillsSearchPlaceholder')"
-                    clearable
-                    class="search-input"
-                    @keyup.enter="searchMarketSkills"
-                >
-                    <template #prefix>
-                        <el-icon><Search /></el-icon>
-                    </template>
-                </el-input>
-                <el-button :loading="searching" @click="searchMarketSkills">{{ t('commons.button.search') }}</el-button>
+                <div v-if="marketResults.length" class="skills-grid">
+                    <el-card v-for="skill in marketResults" :key="`${marketSource}-${skill.slug}`" class="skill-card">
+                        <div class="skill-head">
+                            <div>
+                                <div class="skill-name">{{ skill.name || skill.slug }}</div>
+                                <div class="skill-slug">{{ skill.slug }}</div>
+                            </div>
+                            <el-button
+                                type="primary"
+                                link
+                                :loading="installingSkill === skill.slug"
+                                @click="installSkill(skill)"
+                            >
+                                {{ t('commons.button.install') }}
+                            </el-button>
+                        </div>
+                        <el-tooltip
+                            v-if="skill.description || skill.summary"
+                            placement="top-start"
+                            :show-after="200"
+                            popper-class="skill-desc-tooltip"
+                        >
+                            <template #content>
+                                <div class="skill-desc-tooltip-content">{{ skill.description || skill.summary }}</div>
+                            </template>
+                            <div class="skill-desc">
+                                {{ skill.description || skill.summary }}
+                            </div>
+                        </el-tooltip>
+                        <div class="skill-meta">
+                            <span v-if="skill.version">{{ `${t('app.version')}: ${skill.version}` }}</span>
+                            <span v-if="skill.score">{{ `${t('aiTools.agents.skillsScore')}: ${skill.score}` }}</span>
+                        </div>
+                    </el-card>
+                </div>
+                <el-empty
+                    v-else
+                    :description="
+                        marketSearched ? t('aiTools.agents.skillsMarketEmpty') : t('aiTools.agents.skillsMarketHint')
+                    "
+                />
             </template>
         </div>
-
-        <template v-if="mode === 'installed'">
-            <div v-if="groupedSkills.length" class="group-list">
-                <section v-for="group in groupedSkills" :key="group.key" class="group-section">
-                    <div class="group-header">
-                        <span class="group-title">{{ group.label }}</span>
-                        <span class="group-count">{{ group.items.length }}</span>
-                    </div>
-                    <div class="skills-grid">
-                        <el-card v-for="skill in group.items" :key="skill.name" class="skill-card">
-                            <div class="skill-head">
-                                <div class="skill-name">{{ skill.name }}</div>
-                                <el-switch
-                                    :model-value="!skill.disabled"
-                                    :loading="updatingSkill === skill.name"
-                                    @change="(value) => toggleSkill(skill, Boolean(value))"
-                                />
-                            </div>
-                            <el-tooltip placement="top-start" :show-after="200" popper-class="skill-desc-tooltip">
-                                <template #content>
-                                    <div class="skill-desc-tooltip-content">{{ skill.description }}</div>
-                                </template>
-                                <div class="skill-desc">
-                                    {{ skill.description }}
-                                </div>
-                            </el-tooltip>
-                            <div class="skill-tags">
-                                <el-tag size="small" type="primary" effect="plain">
-                                    {{ group.tagLabel }}
-                                </el-tag>
-                            </div>
-                        </el-card>
-                    </div>
-                </section>
-            </div>
-            <el-empty v-else :description="t('aiTools.agents.skillsEmpty')" />
-        </template>
-
-        <template v-else>
-            <div v-if="marketResults.length" class="skills-grid">
-                <el-card v-for="skill in marketResults" :key="`${marketSource}-${skill.slug}`" class="skill-card">
-                    <div class="skill-head">
-                        <div>
-                            <div class="skill-name">{{ skill.name || skill.slug }}</div>
-                            <div class="skill-slug">{{ skill.slug }}</div>
-                        </div>
-                        <el-button
-                            type="primary"
-                            link
-                            :loading="installingSkill === skill.slug"
-                            @click="installSkill(skill)"
-                        >
-                            {{ t('commons.button.install') }}
-                        </el-button>
-                    </div>
-                    <el-tooltip
-                        v-if="skill.description || skill.summary"
-                        placement="top-start"
-                        :show-after="200"
-                        popper-class="skill-desc-tooltip"
-                    >
-                        <template #content>
-                            <div class="skill-desc-tooltip-content">{{ skill.description || skill.summary }}</div>
-                        </template>
-                        <div class="skill-desc">
-                            {{ skill.description || skill.summary }}
-                        </div>
-                    </el-tooltip>
-                    <div class="skill-meta">
-                        <span v-if="skill.version">{{ `${t('app.version')}: ${skill.version}` }}</span>
-                        <span v-if="skill.score">{{ `${t('aiTools.agents.skillsScore')}: ${skill.score}` }}</span>
-                    </div>
-                </el-card>
-            </div>
-            <el-empty
-                v-else
-                :description="
-                    marketSearched ? t('aiTools.agents.skillsMarketEmpty') : t('aiTools.agents.skillsMarketHint')
-                "
-            />
-        </template>
 
         <TaskLog ref="taskLogRef" @close="handleTaskClose" />
     </div>
@@ -329,6 +333,10 @@ defineExpose({
 <style scoped lang="scss">
 .view-switch {
     margin-bottom: 16px;
+}
+
+.skills-content {
+    min-height: 200px;
 }
 
 .toolbar {
