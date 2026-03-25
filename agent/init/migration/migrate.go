@@ -72,7 +72,6 @@ func InitAgentDB() {
 		migrations.AddAgentTypeForAgents,
 		migrations.NormalizeAgentAccountVerifiedStatus,
 		migrations.NormalizeOllamaAccountAPIType,
-		migrations.RewriteOpenclawBundledCaddyfile,
 		migrations.InitAgentAccountModelPool,
 		migrations.AddHostTable,
 		migrations.AddAITerminalSettings,

@@ -989,13 +989,6 @@ var NormalizeOllamaAccountAPIType = &gormigrate.Migration{
 	},
 }
 
-var RewriteOpenclawBundledCaddyfile = &gormigrate.Migration{
-	ID: "20260318-rewrite-openclaw-bundled-caddyfile",
-	Migrate: func(tx *gorm.DB) error {
-		return migrationutils.RewriteOpenclawBundledCaddyfile(tx)
-	},
-}
-
 var InitAgentAccountModelPool = &gormigrate.Migration{
 	ID: "20260319-init-agent-account-model-pool",
 	Migrate: func(tx *gorm.DB) error {

@@ -805,6 +805,9 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 		if err = migrateOpenclawHTTPSUpgrade(&install, oldVersion, detail.Version); err != nil {
 			return err
 		}
+		if err = rewriteOpenclawBundledCaddyfileOnUpgrade(&install, oldVersion, detail.Version, detailDir); err != nil {
+			return err
+		}
 		if req.DockerCompose == "" {
 			newCompose, err = getUpgradeCompose(install, detail)
 			if err != nil {

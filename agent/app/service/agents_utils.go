@@ -21,7 +21,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
-	openclawutil "github.com/1Panel-dev/1Panel/agent/utils/openclaw"
 	"github.com/1Panel-dev/1Panel/agent/utils/req_helper"
 	"gorm.io/gorm"
 )
@@ -388,9 +387,6 @@ func migrateOpenclawHTTPSUpgradeWithSystemIP(install *model.AppInstall, fromVers
 		return nil
 	}
 	migrateOpenclawInstallPorts(install)
-	if err := openclawutil.WriteCatchAllCaddyfile(install.GetPath()); err != nil {
-		return err
-	}
 	configPath := path.Join(install.GetPath(), "data", "conf", "openclaw.json")
 	var allowedOrigins []string
 	if conf, err := readOpenclawConfig(configPath); err == nil {
@@ -415,6 +411,35 @@ func migrateOpenclawHTTPSUpgradeWithSystemIP(install *model.AppInstall, fromVers
 		}
 	}
 	return migrateOpenclawInstallEnv(install, allowedOrigins)
+}
+
+func shouldRewriteOpenclawBundledCaddyfileOnUpgrade(install *model.AppInstall, fromVersion, toVersion string) bool {
+	if install == nil || install.App.Key != constant.AppOpenclaw {
+		return false
+	}
+	if strings.TrimSpace(fromVersion) != openclawHTTPSVersion {
+		return false
+	}
+	return common.CompareVersion(strings.TrimSpace(toVersion), openclawHTTPSVersion)
+}
+
+func rewriteOpenclawBundledCaddyfileOnUpgrade(install *model.AppInstall, fromVersion, toVersion, sourceAppDir string) error {
+	if !shouldRewriteOpenclawBundledCaddyfileOnUpgrade(install, fromVersion, toVersion) {
+		return nil
+	}
+	return copyOpenclawBundledCaddyfile(sourceAppDir, install.GetPath())
+}
+
+func copyOpenclawBundledCaddyfile(sourceAppDir, installPath string) error {
+	sourcePath := path.Join(sourceAppDir, "data", "caddy", "Caddyfile")
+	targetDir := path.Join(installPath, "data", "caddy")
+	fileOp := files.NewFileOp()
+	if !fileOp.Stat(targetDir) {
+		if err := fileOp.CreateDir(targetDir, constant.DirPerm); err != nil {
+			return err
+		}
+	}
+	return fileOp.CopyFile(sourcePath, targetDir)
 }
 
 func migrateOpenclawInstallPorts(install *model.AppInstall) {
