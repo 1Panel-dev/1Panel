@@ -764,6 +764,27 @@ func (b *BaseApi) ListAgentSkills(c *gin.Context) {
 }
 
 // @Tags AI
+// @Summary Search Agent skills
+// @Accept json
+// @Param request body dto.AgentSkillSearchReq true "request"
+// @Success 200 {array} dto.AgentSkillSearchItem
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/skills/search [post]
+func (b *BaseApi) SearchAgentSkills(c *gin.Context) {
+	var req dto.AgentSkillSearchReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	data, err := agentService.SearchSkills(req)
+	if err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.SuccessWithData(c, data)
+}
+
+// @Tags AI
 // @Summary Update Agent skill status
 // @Accept json
 // @Param request body dto.AgentSkillUpdateReq true "request"
@@ -777,6 +798,26 @@ func (b *BaseApi) UpdateAgentSkill(c *gin.Context) {
 		return
 	}
 	if err := agentService.UpdateSkill(req); err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags AI
+// @Summary Install Agent skill
+// @Accept json
+// @Param request body dto.AgentSkillInstallReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/skills/install [post]
+func (b *BaseApi) InstallAgentSkill(c *gin.Context) {
+	var req dto.AgentSkillInstallReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := agentService.InstallSkill(req); err != nil {
 		helper.BadRequest(c, err)
 		return
 	}

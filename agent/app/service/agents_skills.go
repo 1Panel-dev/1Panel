@@ -3,11 +3,14 @@ package service
 import (
 	"encoding/json"
 	"fmt"
+	"regexp"
 	"strings"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"github.com/1Panel-dev/1Panel/agent/constant"
+	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 )
 
@@ -26,6 +29,13 @@ type openclawSkillListItem struct {
 type openclawSkillInfo struct {
 	SkillKey string `json:"skillKey"`
 }
+
+type skillhubSearchPayload struct {
+	Skills  []dto.AgentSkillSearchItem `json:"skills"`
+	Results []dto.AgentSkillSearchItem `json:"results"`
+}
+
+var clawhubSearchLinePattern = regexp.MustCompile(`^(\S+)\s+(.+?)\s+\(([\d.]+)\)$`)
 
 func (a AgentService) ListSkills(req dto.AgentSkillsReq) ([]dto.AgentSkillItem, error) {
 	agent, install, err := a.loadAgentAndInstall(req.AgentID)
@@ -56,6 +66,36 @@ func (a AgentService) ListSkills(req dto.AgentSkillsReq) ([]dto.AgentSkillItem, 
 	return parseOpenclawSkillsList(output)
 }
 
+func (a AgentService) SearchSkills(req dto.AgentSkillSearchReq) ([]dto.AgentSkillSearchItem, error) {
+	agent, install, err := a.loadAgentAndInstall(req.AgentID)
+	if err != nil {
+		return nil, err
+	}
+	if agent.AgentType != constant.AppOpenclaw {
+		return nil, fmt.Errorf("copaw does not support skills")
+	}
+	status, err := checkContainerStatus(install.ContainerName)
+	if err != nil {
+		return nil, err
+	}
+	if status != "running" {
+		return nil, fmt.Errorf("container %s is not running, please check and retry", install.ContainerName)
+	}
+	output, err := loadOpenclawSkillSearchOutput(install.ContainerName, req.Source, req.Keyword)
+	if err != nil {
+		return nil, err
+	}
+	if len(output) == 0 {
+		return nil, nil
+	}
+	switch req.Source {
+	case "skillhub":
+		return parseSkillhubSearchResult(output)
+	default:
+		return parseClawhubSearchResult(output), nil
+	}
+}
+
 func (a AgentService) UpdateSkill(req dto.AgentSkillUpdateReq) error {
 	agent, install, err := a.loadAgentAndInstall(req.AgentID)
 	if err != nil {
@@ -83,6 +123,37 @@ func (a AgentService) UpdateSkill(req dto.AgentSkillUpdateReq) error {
 	return writeOpenclawConfigRaw(agent.ConfigPath, conf)
 }
 
+func (a AgentService) InstallSkill(req dto.AgentSkillInstallReq) error {
+	agent, install, err := a.loadAgentAndInstall(req.AgentID)
+	if err != nil {
+		return err
+	}
+	if agent.AgentType != constant.AppOpenclaw {
+		return fmt.Errorf("copaw does not support skills")
+	}
+	status, err := checkContainerStatus(install.ContainerName)
+	if err != nil {
+		return err
+	}
+	if status != "running" {
+		return fmt.Errorf("container %s is not running, please check and retry", install.ContainerName)
+	}
+	installTask, err := task.NewTaskWithOps(req.Slug, task.TaskInstall, task.TaskScopeAI, req.TaskID, req.AgentID)
+	if err != nil {
+		return err
+	}
+	installTask.AddSubTask("Install OpenClaw skill", func(t *task.Task) error {
+		mgr := cmd.NewCommandMgr(cmd.WithTask(*t), cmd.WithContext(t.TaskCtx), cmd.WithTimeout(10*time.Minute))
+		return mgr.Run("docker", "exec", install.ContainerName, "sh", "-c", buildOpenclawSkillInstallCommand(req.Source, req.Slug))
+	}, nil)
+	go func() {
+		if err := installTask.Execute(); err != nil {
+			global.LOG.Errorf("install openclaw skill failed: %v", err)
+		}
+	}()
+	return nil
+}
+
 func parseOpenclawSkillsList(output string) ([]dto.AgentSkillItem, error) {
 	var payload openclawSkillsList
 	if err := json.Unmarshal([]byte(strings.TrimSpace(output)), &payload); err != nil {
@@ -99,6 +170,87 @@ func parseOpenclawSkillsList(output string) ([]dto.AgentSkillItem, error) {
 		})
 	}
 	return items, nil
+}
+
+func loadOpenclawSkillSearchOutput(containerName, source, keyword string) (string, error) {
+	switch source {
+	case "skillhub":
+		return cmd.RunDefaultWithStdoutBashCfAndTimeOut(
+			"docker exec %s skillhub search %q --json 2>&1",
+			30*time.Second,
+			containerName,
+			keyword,
+		)
+	default:
+		return cmd.RunDefaultWithStdoutBashCfAndTimeOut(
+			"docker exec %s clawhub search %q 2>&1",
+			30*time.Second,
+			containerName,
+			keyword,
+		)
+	}
+}
+
+func parseSkillhubSearchResult(output string) ([]dto.AgentSkillSearchItem, error) {
+	trimmed := strings.TrimSpace(output)
+	if trimmed == "" {
+		return nil, nil
+	}
+	var list []dto.AgentSkillSearchItem
+	if err := json.Unmarshal([]byte(trimmed), &list); err == nil {
+		for i := range list {
+			list[i].Source = "skillhub"
+		}
+		return list, nil
+	}
+	var payload skillhubSearchPayload
+	if err := json.Unmarshal([]byte(trimmed), &payload); err != nil {
+		return nil, err
+	}
+	items := payload.Skills
+	if len(items) == 0 {
+		items = payload.Results
+	}
+	for i := range items {
+		items[i].Source = "skillhub"
+	}
+	return items, nil
+}
+
+func parseClawhubSearchResult(output string) []dto.AgentSkillSearchItem {
+	lines := strings.Split(strings.TrimSpace(output), "\n")
+	items := make([]dto.AgentSkillSearchItem, 0, len(lines))
+	for _, line := range lines {
+		matches := clawhubSearchLinePattern.FindStringSubmatch(strings.TrimSpace(line))
+		if len(matches) != 4 {
+			continue
+		}
+		items = append(items, dto.AgentSkillSearchItem{
+			Slug:   matches[1],
+			Name:   matches[2],
+			Score:  matches[3],
+			Source: "clawhub",
+		})
+	}
+	return items
+}
+
+func buildOpenclawSkillInstallCommand(source, slug string) string {
+	switch source {
+	case "clawhub":
+		return fmt.Sprintf(
+			"mkdir -p %s && clawhub --workdir /home/node/.openclaw --dir skills install %q",
+			openclawManagedSkillsDir,
+			slug,
+		)
+	default:
+		return fmt.Sprintf(
+			"mkdir -p %s && skillhub --dir %s install %q",
+			openclawManagedSkillsDir,
+			openclawManagedSkillsDir,
+			slug,
+		)
+	}
 }
 
 func getOpenclawSkillKey(containerName, name string) (string, error) {

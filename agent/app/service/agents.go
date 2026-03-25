@@ -39,7 +39,9 @@ type IAgentService interface {
 	GetConfigFile(req dto.AgentConfigFileReq) (*dto.AgentConfigFile, error)
 	UpdateConfigFile(req dto.AgentConfigFileUpdateReq) error
 	ListSkills(req dto.AgentSkillsReq) ([]dto.AgentSkillItem, error)
+	SearchSkills(req dto.AgentSkillSearchReq) ([]dto.AgentSkillSearchItem, error)
 	UpdateSkill(req dto.AgentSkillUpdateReq) error
+	InstallSkill(req dto.AgentSkillInstallReq) error
 
 	CreateAccount(req dto.AgentAccountCreateReq) error
 	UpdateAccount(req dto.AgentAccountUpdateReq) error
@@ -79,6 +81,7 @@ const (
 	maxCommunityAIAgents          = int64(5)
 	openclawPluginBaseDir         = "/home/node/.openclaw/extensions"
 	openclawPluginPackageTmpDir   = "/tmp/openclaw-plugin"
+	openclawManagedSkillsDir      = "/home/node/.openclaw/skills"
 	openclawGatewayPort           = 18789
 	openclawAllowedOriginHost     = "127.0.0.1"
 	openclawHTTPSVersion          = "2026.3.13"

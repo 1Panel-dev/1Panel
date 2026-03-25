@@ -245,8 +245,16 @@ export const listAgentSkills = (req: AI.AgentSkillsReq) => {
     return http.post<AI.AgentSkillItem[]>(`/ai/agents/skills/list`, req);
 };
 
+export const searchAgentSkills = (req: AI.AgentSkillSearchReq) => {
+    return http.post<AI.AgentSkillSearchItem[]>(`/ai/agents/skills/search`, req);
+};
+
 export const updateAgentSkill = (req: AI.AgentSkillUpdateReq) => {
     return http.post(`/ai/agents/skills/update`, req);
+};
+
+export const installAgentSkill = (req: AI.AgentSkillInstallReq) => {
+    return http.post(`/ai/agents/skills/install`, req);
 };
 
 export const approveAgentChannelPairing = (req: AI.AgentChannelPairingApproveReq) => {

@@ -78,7 +78,9 @@ func (a *AIToolsRouter) InitRouter(Router *gin.RouterGroup) {
 		aiToolsRouter.POST("/agents/config-file/get", baseApi.GetAgentConfigFile)
 		aiToolsRouter.POST("/agents/config-file/update", baseApi.UpdateAgentConfigFile)
 		aiToolsRouter.POST("/agents/skills/list", baseApi.ListAgentSkills)
+		aiToolsRouter.POST("/agents/skills/search", baseApi.SearchAgentSkills)
 		aiToolsRouter.POST("/agents/skills/update", baseApi.UpdateAgentSkill)
+		aiToolsRouter.POST("/agents/skills/install", baseApi.InstallAgentSkill)
 		aiToolsRouter.POST("/agents/channel/pairing/approve", baseApi.ApproveAgentChannelPairing)
 	}
 }
