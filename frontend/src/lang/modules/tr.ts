@@ -1424,7 +1424,7 @@ const message = {
             'Komut üretmek ve doldurmak için seçili model hesabını kullanın. Ollama ve vLLM gibi yerel modeller için özel model hesabı kullanın.',
         aiPrefix: 'Tetikleme öneki',
         aiPrefixHelper:
-            'Belirtilen öneki girip Enter tuşuna bastığınızda AI komut üretimi tetiklenir; örneğin: {0} disk bilgisini sorgulamama yardım et.',
+            '"Önek + boşluk" girip Enter tuşuna bastığınızda AI komut üretimi tetiklenir; örneğin: {0} disk bilgisini sorgulamama yardım et.',
         aiRiskCommands: 'Riskli komut engelleme',
         aiRiskCommandsHelper:
             'Engellenecek riskli komutlari yapılandırın, her satıra bir tane gelecek şekilde. Eşleşme olduğunda üretim durdurulur ve yorum olarak geri doldurulur.',

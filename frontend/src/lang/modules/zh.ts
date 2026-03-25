@@ -1332,7 +1332,7 @@ const message = {
         aiAssistant: 'AI 助手',
         aiAccountHelper: '使用所选模型账号生成并回填命令。Ollama、vLLM 本地模型请用自定义模型账号。',
         aiPrefix: '触发前缀',
-        aiPrefixHelper: '输入指定前缀并按回车后，将触发 AI 命令生成，例如：{0} 帮我查询磁盘信息。',
+        aiPrefixHelper: '输入“前缀 + 空格”并回车时，将触发 AI 命令生成，例如：{0} 帮我查询磁盘信息。',
         aiRiskCommands: '风险命令拦截',
         aiRiskCommandsHelper: '配置需拦截的风险命令（每行一条），命中后将阻止生成并以注释回填。',
         aiSummary: '以 {0} 前缀开头并回车时，会触发 AI 命令生成',

@@ -1427,7 +1427,7 @@ const message = {
             'Gunakan akaun model yang dipilih untuk menjana dan mengisi arahan. Untuk model tempatan seperti Ollama dan vLLM, gunakan akaun model tersuai.',
         aiPrefix: 'Awalan pencetus',
         aiPrefixHelper:
-            'Masukkan awalan yang ditetapkan dan tekan Enter untuk mencetuskan penjanaan arahan AI, contohnya: {0} bantu saya semak maklumat cakera.',
+            'Masukkan "awalan + ruang" dan tekan Enter untuk mencetuskan penjanaan arahan AI, contohnya: {0} bantu saya semak maklumat cakera.',
         aiRiskCommands: 'Pencegatan arahan berisiko',
         aiRiskCommandsHelper:
             'Konfigurasikan arahan berisiko yang perlu dipintas, satu bagi setiap baris. Apabila sepadan, penjanaan akan disekat dan diisi semula sebagai komen.',

@@ -1435,7 +1435,7 @@ const message = {
             'Use a conta de modelo selecionada para gerar e preencher comandos. Para modelos locais como Ollama e vLLM, use uma conta de modelo personalizada.',
         aiPrefix: 'Prefixo de disparo',
         aiPrefixHelper:
-            'Digite o prefixo especificado e pressione Enter para acionar a geração de comandos por IA, por exemplo: {0} me ajude a consultar as informações do disco.',
+            'Digite "prefixo + espaço" e pressione Enter para acionar a geração de comandos por IA, por exemplo: {0} me ajude a consultar as informações do disco.',
         aiRiskCommands: 'Intercepção de comandos de risco',
         aiRiskCommandsHelper:
             'Configure os comandos de risco que devem ser interceptados, um por linha. Quando houver correspondência, a geração será bloqueada e preenchida de volta como comentário.',
