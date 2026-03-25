@@ -1682,6 +1682,8 @@ const message = {
         searchHelper: '*などのワイルドカードをサポート',
         uploadFailed: '[{0}] ファイルのアップロードに失敗しました',
         fileUploadStart: 'アップロード[{0}]...',
+        uploadOverallProgress: '全体の進捗',
+        uploadCurrentFileProgress: '現在のファイル',
         currentSelect: '現在の選択:',
         unsupportedType: 'サポートされていないファイルタイプ',
         deleteHelper: '次のファイルを削除したいですか？デフォルトでは、削除後にリサイクルビンに入ります',

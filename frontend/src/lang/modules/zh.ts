@@ -1577,6 +1577,8 @@ const message = {
         searchHelper: '支持 * 等通配符',
         uploadFailed: '【{0}】 文件上传失败',
         fileUploadStart: '正在上传【{0}】...',
+        uploadOverallProgress: '总进度',
+        uploadCurrentFileProgress: '当前文件',
         currentSelect: '当前选中: ',
         unsupportedType: '不支持的文件类型',
         deleteHelper: '确定删除所选文件？ 默认删除之后将进入回收站',

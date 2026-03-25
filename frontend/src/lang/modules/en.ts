@@ -1671,6 +1671,8 @@ const message = {
         searchHelper: 'Support wildcards such as *',
         uploadFailed: '[{0}] File upload failed',
         fileUploadStart: 'Uploading [{0}]...',
+        uploadOverallProgress: 'Overall progress',
+        uploadCurrentFileProgress: 'Current file',
         currentSelect: 'Current selection: ',
         unsupportedType: 'Unsupported file type',
         deleteHelper:

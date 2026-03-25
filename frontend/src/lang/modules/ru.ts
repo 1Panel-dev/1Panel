@@ -1694,6 +1694,8 @@ const message = {
         searchHelper: 'Поддерживает подстановочные знаки, такие как *',
         uploadFailed: '[{0}] Ошибка загрузки файла',
         fileUploadStart: 'Загрузка [{0}]...',
+        uploadOverallProgress: 'Общий прогресс',
+        uploadCurrentFileProgress: 'Текущий файл',
         currentSelect: 'Текущий выбор: ',
         unsupportedType: 'Неподдерживаемый тип файла',
         deleteHelper: 'Вы уверены, что хотите удалить следующие файлы? По умолчанию они будут помещены в корзину',

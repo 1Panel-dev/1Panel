@@ -1651,6 +1651,8 @@ const message = {
         searchHelper: '* 등의 와일드카드를 지원합니다',
         uploadFailed: '[{0}] 파일 업로드 실패',
         fileUploadStart: '[{0}] 업로드 중...',
+        uploadOverallProgress: '전체 진행률',
+        uploadCurrentFileProgress: '현재 파일',
         currentSelect: '현재 선택: ',
         unsupportedType: '지원되지 않는 파일 유형',
         deleteHelper: '다음 파일을 삭제하시겠습니까? 기본적으로 삭제 후 휴지통으로 이동합니다.',

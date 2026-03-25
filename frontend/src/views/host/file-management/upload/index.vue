@@ -51,12 +51,19 @@
             >
                 <template #tip>
                     <el-text>{{ uploadHelper }}</el-text>
-                    <el-progress
-                        v-if="upLoading"
-                        text-inside
-                        :stroke-width="20"
-                        :percentage="uploadPercent"
-                    ></el-progress>
+                    <div v-if="upLoading && uploadTotalCount > 1" class="mt-3 space-y-1">
+                        <div class="flex justify-between text-sm text-gray-500">
+                            <span>{{ $t('file.uploadOverallProgress') }}</span>
+                            <span>{{ uploadCurrentIndex + 1 }} / {{ uploadTotalCount }}</span>
+                        </div>
+                        <el-progress :stroke-width="20" :percentage="uploadOverallPercent" />
+                    </div>
+                    <div v-if="upLoading" :class="{ 'mt-3': upLoading && uploadTotalCount > 1 }" class="space-y-1">
+                        <div v-if="uploadTotalCount > 1" class="text-sm text-gray-500">
+                            {{ $t('file.uploadCurrentFileProgress') }}
+                        </div>
+                        <el-progress text-inside :stroke-width="16" :percentage="uploadPercent"></el-progress>
+                    </div>
                 </template>
             </el-upload>
 
@@ -101,7 +108,7 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, reactive, ref } from 'vue';
+import { computed, nextTick, reactive, ref } from 'vue';
 import { UploadFile, UploadFiles, UploadInstance, UploadProps, UploadRawFile } from 'element-plus';
 import { batchCheckFiles, chunkUploadFileData, uploadFileData } from '@/api/modules/files';
 import i18n from '@/lang';
@@ -116,12 +123,22 @@ interface UploadFileProps {
 
 const uploadRef = ref<UploadInstance>();
 const loading = ref(false);
+const upLoading = ref(false);
 let uploadPercent = ref(0);
+const uploadTotalCount = ref(0);
+const uploadCurrentIndex = ref(0);
+const uploadOverallPercent = computed(() => {
+    const total = uploadTotalCount.value;
+    if (!upLoading.value || total === 0) {
+        return 0;
+    }
+    const raw = (uploadCurrentIndex.value * 100 + uploadPercent.value) / total;
+    return Math.min(100, Math.round(raw));
+});
 const open = ref(false);
 const path = ref();
 let uploadHelper = ref('');
 const dialogExistFileRef = ref();
-const upLoading = ref(false);
 const abortController = ref<AbortController | null>(null);
 
 const em = defineEmits(['close']);
@@ -147,6 +164,8 @@ const handleClose = (done) => {
 const closePage = () => {
     open.value = false;
     upLoading.value = false;
+    uploadTotalCount.value = 0;
+    uploadCurrentIndex.value = 0;
     clearFiles();
     em('close', false);
 };
@@ -337,10 +356,13 @@ const uploadFile = async (files: any[]) => {
     } else {
         loading.value = true;
         upLoading.value = true;
+        uploadTotalCount.value = files.length;
         abortController.value = new AbortController();
         let successCount = 0;
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
+            uploadCurrentIndex.value = i;
+            uploadPercent.value = 0;
             uploadHelper.value = i18n.global.t('file.fileUploadStart', [file.name]);
 
             if (abortController.value.signal.aborted) {
@@ -360,6 +382,8 @@ const uploadFile = async (files: any[]) => {
 
         loading.value = false;
         upLoading.value = false;
+        uploadTotalCount.value = 0;
+        uploadCurrentIndex.value = 0;
         uploadHelper.value = '';
 
         if (successCount === files.length && !abortController.value.signal.aborted) {
@@ -441,6 +465,8 @@ const acceptParams = (props: UploadFileProps) => {
     path.value = props.path;
     open.value = true;
     uploadPercent.value = 0;
+    uploadTotalCount.value = 0;
+    uploadCurrentIndex.value = 0;
     uploadHelper.value = '';
 
     nextTick(() => {

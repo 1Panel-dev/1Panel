@@ -1703,6 +1703,8 @@ const message = {
         searchHelper: 'Soporta comodines como *',
         uploadFailed: '[{0}] Fallo en la carga del archivo',
         fileUploadStart: 'Cargando [{0}]...',
+        uploadOverallProgress: 'Progreso total',
+        uploadCurrentFileProgress: 'Archivo actual',
         currentSelect: 'Selección actual: ',
         unsupportedType: 'Tipo de archivo no soportado',
         deleteHelper: '¿Está seguro de eliminar los siguientes archivos? Por defecto irán a la papelera de reciclaje.',
