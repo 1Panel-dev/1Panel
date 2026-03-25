@@ -1323,7 +1323,7 @@ const message = {
         aiAssistant: 'AI 助手',
         aiAccountHelper: '使用所選模型帳號生成並回填命令。Ollama、vLLM 本地模型請使用自訂模型帳號。',
         aiPrefix: '觸發前綴',
-        aiPrefixHelper: '輸入指定前綴並按下 Enter 後，將觸發 AI 指令生成，例如：{0} 幫我查詢磁碟資訊。',
+        aiPrefixHelper: '輸入「前綴 + 空格」並按下 Enter 時，將觸發 AI 指令生成，例如：{0} 幫我查詢磁碟資訊。',
         aiRiskCommands: '風險命令攔截',
         aiRiskCommandsHelper: '配置需攔截的風險命令（每行一條），命中後將阻止生成並以註解回填。',
         aiSummary: '以 {0} 前綴開頭並按下 Enter 時，會觸發 AI 命令生成',

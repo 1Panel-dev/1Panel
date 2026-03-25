@@ -1403,7 +1403,7 @@ const message = {
             'Use the selected model account to generate and fill commands. For local models like Ollama and vLLM, use a custom model account.',
         aiPrefix: 'Trigger Prefix',
         aiPrefixHelper:
-            'Enter the specified prefix and press Enter to trigger AI command generation, for example: {0} help me check disk usage.',
+            'Enter "prefix + space" and press Enter to trigger AI command generation, for example: {0} help me check disk usage.',
         aiRiskCommands: 'Risk Command Interception',
         aiRiskCommandsHelper:
             'Configure risky commands to intercept, one per line. When matched, generation will be blocked and filled back as comments.',

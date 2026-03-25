@@ -105,7 +105,7 @@ func (i *aiInputInterceptor) HandleEnter(onStart func(), onDone func(string), on
 	recentCommands := append([]string(nil), i.recentCommands...)
 	i.mu.Unlock()
 
-	if !strings.HasPrefix(currentLine, i.prefix) {
+	if !matchesAIPrefix(currentLine, i.prefix) {
 		if currentLine != "" {
 			i.pushRecentCommand(currentLine)
 		}
@@ -211,13 +211,22 @@ func sanitizeInputLine(raw string) string {
 	return strings.TrimSpace(raw)
 }
 
+func matchesAIPrefix(line, prefix string) bool {
+	line = strings.TrimSpace(line)
+	prefix = strings.TrimSpace(prefix)
+	if line == "" || prefix == "" {
+		return false
+	}
+	return line == prefix || strings.HasPrefix(line, prefix+" ")
+}
+
 func normalizeCurrentLine(raw, prefix string) string {
 	line := sanitizeInputLine(raw)
 	prefix = strings.TrimSpace(prefix)
 	if line == "" || prefix == "" {
 		return line
 	}
-	if strings.HasPrefix(line, prefix) {
+	if matchesAIPrefix(line, prefix) {
 		return line
 	}
 	prefixIdx := strings.Index(line, prefix)
@@ -240,7 +249,7 @@ func looksLikePromptPrefix(value string) bool {
 	if value == "" {
 		return false
 	}
-	if strings.ContainsAny(value, " \t\r\n'\"`") {
+	if strings.ContainsAny(value, "'\"`") {
 		return false
 	}
 	return true
