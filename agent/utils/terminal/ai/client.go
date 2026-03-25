@@ -13,6 +13,7 @@ import (
 	"unicode/utf8"
 
 	providercatalog "github.com/1Panel-dev/1Panel/agent/app/provider"
+	"github.com/1Panel-dev/1Panel/agent/global"
 )
 
 const (
@@ -55,6 +56,10 @@ type ChatCompletionRequest struct {
 	MaxTokens   int           `json:"max_tokens,omitempty"`
 	Temperature *float64      `json:"temperature,omitempty"`
 	TopP        *float64      `json:"top_p,omitempty"`
+}
+
+type ThinkingMode struct {
+	Type string `json:"type"`
 }
 
 type ChatCompletionResponse struct {
@@ -150,6 +155,7 @@ func (c *terminalAIClient) chatCompletionOpenAI(ctx context.Context, req ChatCom
 		MaxTokens:   firstPositive(req.MaxTokens, c.config.MaxTokens),
 		Temperature: req.Temperature,
 		TopP:        req.TopP,
+		Thinking:    thinkingModeForModel(c.config.Model),
 	}
 	body, err := json.Marshal(payload)
 	if err != nil {
@@ -325,20 +331,54 @@ func (c *terminalAIClient) chatCompletionGemini(ctx context.Context, req ChatCom
 }
 
 func (c *terminalAIClient) do(httpReq *http.Request) ([]byte, error) {
+	start := time.Now()
 	resp, err := c.httpClient.Do(httpReq)
 	if err != nil {
+		c.logRequestCost(httpReq, 0, time.Since(start), err)
 		return nil, fmt.Errorf("do request: %w", err)
 	}
 	defer resp.Body.Close()
 
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
+		c.logRequestCost(httpReq, resp.StatusCode, time.Since(start), err)
 		return nil, fmt.Errorf("read response: %w", err)
 	}
 	if resp.StatusCode >= http.StatusBadRequest {
-		return nil, parseProviderError(resp.StatusCode, respBody)
+		providerErr := parseProviderError(resp.StatusCode, respBody)
+		c.logRequestCost(httpReq, resp.StatusCode, time.Since(start), providerErr)
+		return nil, providerErr
 	}
+	c.logRequestCost(httpReq, resp.StatusCode, time.Since(start), nil)
 	return respBody, nil
+}
+
+func (c *terminalAIClient) logRequestCost(httpReq *http.Request, statusCode int, duration time.Duration, err error) {
+	if global.LOG == nil || httpReq == nil {
+		return
+	}
+	if err != nil {
+		global.LOG.Warnf("[terminal-ai] request finished, provider=%s model=%s apiType=%s method=%s url=%s status=%d duration=%s err=%v",
+			c.config.Provider,
+			c.config.Model,
+			c.config.APIType,
+			httpReq.Method,
+			httpReq.URL.String(),
+			statusCode,
+			duration,
+			err,
+		)
+		return
+	}
+	global.LOG.Infof("[terminal-ai] request finished, provider=%s model=%s apiType=%s method=%s url=%s status=%d duration=%s",
+		c.config.Provider,
+		c.config.Model,
+		c.config.APIType,
+		httpReq.Method,
+		httpReq.URL.String(),
+		statusCode,
+		duration,
+	)
 }
 
 type openAIChatCompletionRequest struct {
@@ -347,6 +387,7 @@ type openAIChatCompletionRequest struct {
 	MaxTokens   int           `json:"max_tokens,omitempty"`
 	Temperature *float64      `json:"temperature,omitempty"`
 	TopP        *float64      `json:"top_p,omitempty"`
+	Thinking    *ThinkingMode `json:"thinking,omitempty"`
 }
 
 type openAIChatCompletionResponse struct {
@@ -557,6 +598,13 @@ func normalizeModelID(model string) string {
 		return parts[1]
 	}
 	return model
+}
+
+func thinkingModeForModel(model string) *ThinkingMode {
+	if strings.EqualFold(normalizeModelID(model), "kimi-k2.5") {
+		return &ThinkingMode{Type: "disabled"}
+	}
+	return nil
 }
 
 func normalizeClientAPIType(provider, apiType string) string {

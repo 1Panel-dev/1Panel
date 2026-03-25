@@ -512,3 +512,6 @@ XfsNotFound: 'Sistema de arquivos xfs não detectado instale xfsprogs primeiro'
 
 # terminal
 TerminalAIBlockedRiskyCommand: 'Comando de risco bloqueado: {{ .command }}'
+TerminalAIThinking: 'A IA está pensando...'
+TerminalAIReadyToExecute: 'Pensamento concluído, pressione Enter para executar (duração: {{ .duration }}, token: {{ .tokens }})'
+TerminalAIRequestFailed: 'Falha na solicitação de AI: {{ .err }}'

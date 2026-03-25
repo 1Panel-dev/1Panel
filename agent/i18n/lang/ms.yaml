@@ -512,3 +512,6 @@ XfsNotFound: 'Sistem fail xfs tidak dikesan, sila pasang xfsprogs terlebih dahul
 
 # terminal
 TerminalAIBlockedRiskyCommand: 'Perintah berisiko telah disekat: {{ .command }}'
+TerminalAIThinking: 'AI sedang berfikir...'
+TerminalAIReadyToExecute: 'Pemikiran selesai, tekan Enter untuk jalankan (tempoh: {{ .duration }}, token: {{ .tokens }})'
+TerminalAIRequestFailed: 'Permintaan AI gagal: {{ .err }}'

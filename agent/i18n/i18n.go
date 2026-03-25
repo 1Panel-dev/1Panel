@@ -27,13 +27,18 @@ var langFiles = map[string]string{
 }
 
 func GetMsgWithMap(key string, maps map[string]interface{}) string {
+	return GetMsgWithMapAndLang("", key, maps)
+}
+
+func GetMsgWithMapAndLang(lang string, key string, maps map[string]interface{}) string {
 	var content string
+	localizer := newLocalizer(lang)
 	if maps == nil {
-		content, _ = global.I18n.Localize(&i18n.LocalizeConfig{
+		content, _ = localizer.Localize(&i18n.LocalizeConfig{
 			MessageID: key,
 		})
 	} else {
-		content, _ = global.I18n.Localize(&i18n.LocalizeConfig{
+		content, _ = localizer.Localize(&i18n.LocalizeConfig{
 			MessageID:    key,
 			TemplateData: maps,
 		})
@@ -78,7 +83,11 @@ func GetErrMsg(key string, maps map[string]interface{}) string {
 }
 
 func GetMsgByKey(key string) string {
-	content, _ := global.I18n.Localize(&i18n.LocalizeConfig{
+	return GetMsgByKeyAndLang("", key)
+}
+
+func GetMsgByKeyAndLang(lang string, key string) string {
+	content, _ := newLocalizer(lang).Localize(&i18n.LocalizeConfig{
 		MessageID: key,
 	})
 	return content
@@ -149,6 +158,17 @@ func Init() {
 	}
 	lang := GetLanguageFromDB()
 	global.I18n = i18n.NewLocalizer(bundle, lang)
+}
+
+func newLocalizer(lang string) *i18n.Localizer {
+	lang = strings.TrimSpace(lang)
+	if lang == "" {
+		if global.I18n != nil {
+			return global.I18n
+		}
+		lang = GetLanguageFromDB()
+	}
+	return i18n.NewLocalizer(bundle, lang)
 }
 
 func GetLanguageFromDB() string {

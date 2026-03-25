@@ -8,7 +8,6 @@ import (
 	"strings"
 	"sync"
 	"time"
-	"unicode/utf8"
 
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
@@ -21,16 +20,17 @@ type aiInputInterceptor struct {
 	config  terminalai.GeneratorConfig
 	timeout time.Duration
 	shell   string
+	lang    string
 	prefix  string
+	version uint64
 
 	mu             sync.Mutex
-	currentLine    []byte
+	currentLine    string
 	recentCommands []string
 	riskCommands   []string
-	inEscapeSeq    bool
 }
 
-func newAIInputInterceptor(shell string) *aiInputInterceptor {
+func newAIInputInterceptor(shell string, lang string) *aiInputInterceptor {
 	settings, config, timeout, err := terminalai.LoadTerminalRuntimeSettings()
 	if err != nil {
 		if !os.IsNotExist(err) {
@@ -45,12 +45,17 @@ func newAIInputInterceptor(shell string) *aiInputInterceptor {
 		config:       config,
 		timeout:      timeout,
 		shell:        strings.TrimSpace(shell),
+		lang:         strings.TrimSpace(lang),
 		prefix:       settings.Prefix,
 		riskCommands: append([]string(nil), settings.RiskCommands...),
+		version:      terminalai.CurrentTerminalRuntimeVersion(),
 	}
 }
 
 func (i *aiInputInterceptor) refreshSettings() error {
+	if !i.needsRefresh() {
+		return nil
+	}
 	settings, config, timeout, err := terminalai.LoadTerminalRuntimeSettings()
 	if err != nil {
 		return err
@@ -61,10 +66,30 @@ func (i *aiInputInterceptor) refreshSettings() error {
 	i.timeout = timeout
 	i.prefix = settings.Prefix
 	i.riskCommands = append([]string(nil), settings.RiskCommands...)
+	i.version = terminalai.CurrentTerminalRuntimeVersion()
 	return nil
 }
 
-func (i *aiInputInterceptor) HandleEnter() (string, bool) {
+func (i *aiInputInterceptor) SetCurrentLine(line string) {
+	if i == nil {
+		return
+	}
+	i.mu.Lock()
+	defer i.mu.Unlock()
+	i.currentLine = normalizeCurrentLine(line, i.prefix)
+}
+
+func (i *aiInputInterceptor) needsRefresh() bool {
+	if i == nil {
+		return false
+	}
+	currentVersion := terminalai.CurrentTerminalRuntimeVersion()
+	i.mu.Lock()
+	defer i.mu.Unlock()
+	return i.version != currentVersion
+}
+
+func (i *aiInputInterceptor) HandleEnter(onStart func(), onDone func(string), onError func(string)) (string, bool) {
 	if i == nil {
 		return "", false
 	}
@@ -75,29 +100,37 @@ func (i *aiInputInterceptor) HandleEnter() (string, bool) {
 		return "", false
 	}
 	i.mu.Lock()
-	line := sanitizeInputLine(string(i.currentLine))
-	i.currentLine = nil
-	i.inEscapeSeq = false
+	currentLine := i.currentLine
+	i.currentLine = ""
 	recentCommands := append([]string(nil), i.recentCommands...)
 	i.mu.Unlock()
 
-	if !strings.HasPrefix(line, i.prefix) {
-		if line != "" {
-			i.pushRecentCommand(line)
+	if !strings.HasPrefix(currentLine, i.prefix) {
+		if currentLine != "" {
+			i.pushRecentCommand(currentLine)
 		}
 		return "", false
 	}
-	prompt := strings.TrimSpace(strings.TrimPrefix(line, i.prefix))
+	prompt := strings.TrimSpace(strings.TrimPrefix(currentLine, i.prefix))
 	if prompt == "" {
-		return "", false
+		return "", true
+	}
+	if onStart != nil {
+		onStart()
 	}
 
+	start := time.Now()
 	ctx, cancel := context.WithTimeout(context.Background(), i.timeout)
 	defer cancel()
 	generator, err := terminalai.NewCommandGeneratorFromConfig(i.config)
 	if err != nil {
 		global.LOG.Errorf("create terminal ai generator failed: %v", err)
-		return "", false
+		if onError != nil {
+			onError(i18n.GetMsgWithMapAndLang(i.lang, "TerminalAIRequestFailed", map[string]interface{}{
+				"err": err.Error(),
+			}))
+		}
+		return "", true
 	}
 	resp, err := generator.Generate(ctx, terminalai.CommandGenerateRequest{
 		Input:          prompt,
@@ -107,48 +140,39 @@ func (i *aiInputInterceptor) HandleEnter() (string, bool) {
 	})
 	if err != nil {
 		global.LOG.Errorf("generate terminal ai command failed: %v", err)
-		return "", false
+		if onError != nil {
+			onError(i18n.GetMsgWithMapAndLang(i.lang, "TerminalAIRequestFailed", map[string]interface{}{
+				"err": err.Error(),
+			}))
+		}
+		return "", true
+	}
+	if onDone != nil {
+		onDone(i18n.GetMsgWithMapAndLang(i.lang, "TerminalAIReadyToExecute", map[string]interface{}{
+			"duration": formatAIDuration(time.Since(start)),
+			"tokens":   resolveTotalTokens(resp.Usage),
+		}))
 	}
 	if i.isRiskCommand(resp.Command) {
-		return ": # " + i18n.GetMsgWithMap("TerminalAIBlockedRiskyCommand", map[string]interface{}{
+		return "# " + i18n.GetMsgWithMapAndLang(i.lang, "TerminalAIBlockedRiskyCommand", map[string]interface{}{
 			"command": resp.Command,
 		}), true
 	}
 	return resp.Command, strings.TrimSpace(resp.Command) != ""
 }
 
-func (i *aiInputInterceptor) TrackInput(data []byte) {
-	if i == nil || len(data) == 0 {
-		return
+func resolveTotalTokens(usage terminalai.ResponseUsage) int {
+	if usage.TotalTokens > 0 {
+		return usage.TotalTokens
 	}
-	i.mu.Lock()
-	defer i.mu.Unlock()
-	for _, b := range data {
-		if i.inEscapeSeq {
-			if isEscapeSequenceTerminator(b) {
-				i.inEscapeSeq = false
-			}
-			continue
-		}
-		switch b {
-		case '\r', '\n':
-			i.currentLine = nil
-		case 0x03:
-			i.currentLine = nil
-			i.inEscapeSeq = false
-		case 0x08, 0x7f:
-			i.currentLine = trimLastRuneBytes(i.currentLine)
-		case lineClearControl:
-			i.currentLine = nil
-		case 0x1b:
-			i.inEscapeSeq = true
-		default:
-			if b < 0x20 && b != '\t' {
-				continue
-			}
-			i.currentLine = append(i.currentLine, b)
-		}
+	return usage.PromptTokens + usage.CompletionTokens
+}
+
+func formatAIDuration(duration time.Duration) string {
+	if duration < time.Millisecond {
+		return duration.String()
 	}
+	return duration.Round(time.Millisecond).String()
 }
 
 func (i *aiInputInterceptor) pushRecentCommand(command string) {
@@ -187,19 +211,39 @@ func sanitizeInputLine(raw string) string {
 	return strings.TrimSpace(raw)
 }
 
-func trimLastRuneBytes(data []byte) []byte {
-	if len(data) == 0 {
-		return data
+func normalizeCurrentLine(raw, prefix string) string {
+	line := sanitizeInputLine(raw)
+	prefix = strings.TrimSpace(prefix)
+	if line == "" || prefix == "" {
+		return line
 	}
-	_, size := utf8.DecodeLastRune(data)
-	if size <= 0 || size > len(data) {
-		return data[:len(data)-1]
+	if strings.HasPrefix(line, prefix) {
+		return line
 	}
-	return data[:len(data)-size]
+	prefixIdx := strings.Index(line, prefix)
+	if prefixIdx < 0 {
+		return line
+	}
+	for _, marker := range []string{"# ", "$ ", "% ", "> "} {
+		if idx := strings.LastIndex(line[:prefixIdx], marker); idx >= 0 {
+			promptPart := strings.TrimSpace(line[:idx+len(marker)-1])
+			if looksLikePromptPrefix(promptPart) {
+				return strings.TrimSpace(line[idx+len(marker):])
+			}
+		}
+	}
+	return line
 }
 
-func isEscapeSequenceTerminator(b byte) bool {
-	return b >= 0x40 && b <= 0x7e
+func looksLikePromptPrefix(value string) bool {
+	value = strings.TrimSpace(value)
+	if value == "" {
+		return false
+	}
+	if strings.ContainsAny(value, " \t\r\n'\"`") {
+		return false
+	}
+	return true
 }
 
 func (i *aiInputInterceptor) isRiskCommand(command string) bool {

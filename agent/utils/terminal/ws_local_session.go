@@ -3,9 +3,11 @@ package terminal
 import (
 	"encoding/base64"
 	"encoding/json"
+	"strings"
 	"sync"
 
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/gorilla/websocket"
 	"github.com/pkg/errors"
 )
@@ -16,6 +18,7 @@ type LocalWsSession struct {
 
 	allowCtrlC    bool
 	writeMutex    sync.Mutex
+	lang          string
 	aiInterceptor *aiInputInterceptor
 }
 
@@ -23,13 +26,15 @@ func NewLocalWsSession(cols, rows int, wsConn *websocket.Conn, slave *LocalComma
 	if err := slave.ResizeTerminal(cols, rows); err != nil {
 		global.LOG.Errorf("ssh pty change windows size failed, err: %v", err)
 	}
+	lang := i18n.GetLanguageFromDB()
 
 	return &LocalWsSession{
 		slave:  slave,
 		wsConn: wsConn,
 
 		allowCtrlC:    allowCtrlC,
-		aiInterceptor: newAIInputInterceptor(""),
+		lang:          lang,
+		aiInterceptor: newAIInputInterceptor("", lang),
 	}, nil
 }
 
@@ -111,12 +116,17 @@ func (sws *LocalWsSession) receiveWsMsg(exitCh chan bool) {
 					global.LOG.Errorf("websock cmd string base64 decoding failed, err: %v", err)
 				}
 				if isEnterInput(decodeBytes) {
-					if generated, ok := sws.aiInterceptor.HandleEnter(); ok {
-						sws.sendWebsocketInputCommandToSshSessionStdinPipe(append([]byte{lineClearControl}, []byte(generated)...))
+					if sws.aiInterceptor != nil {
+						sws.aiInterceptor.SetCurrentLine(msgObj.Line)
+					}
+					if generated, handled := sws.aiInterceptor.HandleEnter(sws.notifyAIThinking, sws.notifyAIDone, sws.notifyAIError); handled {
+						payload := []byte{lineClearControl}
+						if strings.TrimSpace(generated) != "" {
+							payload = append(payload, []byte(generated)...)
+						}
+						sws.sendWebsocketInputCommandToSshSessionStdinPipe(payload)
 						continue
 					}
-				} else {
-					sws.aiInterceptor.TrackInput(decodeBytes)
 				}
 				sws.sendWebsocketInputCommandToSshSessionStdinPipe(decodeBytes)
 			case WsMsgHeartbeat:
@@ -126,6 +136,33 @@ func (sws *LocalWsSession) receiveWsMsg(exitCh chan bool) {
 				}
 			}
 		}
+	}
+}
+
+func (sws *LocalWsSession) notifyAIThinking() {
+	if sws == nil {
+		return
+	}
+	if err := sws.masterWrite([]byte("\r\n" + i18n.GetMsgByKeyAndLang(sws.lang, "TerminalAIThinking") + "\r\n")); err != nil {
+		global.LOG.Errorf("write terminal ai thinking message failed, err: %v", err)
+	}
+}
+
+func (sws *LocalWsSession) notifyAIDone(message string) {
+	if sws == nil || strings.TrimSpace(message) == "" {
+		return
+	}
+	if err := sws.masterWrite([]byte(message + "\r\n")); err != nil {
+		global.LOG.Errorf("write terminal ai done message failed, err: %v", err)
+	}
+}
+
+func (sws *LocalWsSession) notifyAIError(message string) {
+	if sws == nil || strings.TrimSpace(message) == "" {
+		return
+	}
+	if err := sws.masterWrite([]byte(message + "\r\n")); err != nil {
+		global.LOG.Errorf("write terminal ai error message failed, err: %v", err)
 	}
 }
 

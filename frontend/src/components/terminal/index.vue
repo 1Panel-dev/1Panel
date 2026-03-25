@@ -85,6 +85,11 @@ interface WsProps {
     error: string;
     initCmd: string;
 }
+
+interface TerminalBufferLine {
+    isWrapped?: boolean;
+    translateToString(trimRight?: boolean, startColumn?: number, endColumn?: number): string;
+}
 const acceptParams = (props: WsProps) => {
     nextTick(() => {
         if (props.error.length !== 0) {
@@ -276,12 +281,51 @@ const isWsOpen = () => {
     return readyState === 1;
 };
 
-function sendMsg(data: string) {
+function isEnterInputData(data: string): boolean {
+    return data === '\r' || data === '\n' || data === '\r\n';
+}
+
+function getCurrentTerminalLine(): string {
+    const xterm = term.value;
+    if (!xterm?.buffer?.active) return '';
+    const buffer = xterm.buffer.active;
+    const cursorRow = buffer.baseY + buffer.cursorY;
+    let startRow = cursorRow;
+    let endRow = cursorRow;
+
+    for (let row = cursorRow; row > 0; row--) {
+        const line = buffer.getLine(row) as TerminalBufferLine | undefined;
+        if (!line?.isWrapped) {
+            startRow = row;
+            break;
+        }
+        startRow = row - 1;
+    }
+
+    for (let row = cursorRow + 1; row < buffer.length; row++) {
+        const line = buffer.getLine(row) as TerminalBufferLine | undefined;
+        if (!line?.isWrapped) {
+            break;
+        }
+        endRow = row;
+    }
+
+    let content = '';
+    for (let row = startRow; row <= endRow; row++) {
+        const line = buffer.getLine(row) as TerminalBufferLine | undefined;
+        if (!line) continue;
+        content += line.translateToString(false);
+    }
+    return content.trimEnd();
+}
+
+function sendMsg(data: string, line: string = '') {
     if (isWsOpen()) {
         terminalSocket.value!.send(
             JSON.stringify({
                 type: 'cmd',
                 data: Base64.encode(data),
+                line,
             }),
         );
     }
@@ -289,7 +333,7 @@ function sendMsg(data: string) {
 
 function onTermData(data: string) {
     if (!data) return;
-    sendMsg(data);
+    sendMsg(data, isEnterInputData(data) ? getCurrentTerminalLine() : '');
 }
 
 // websocket 相关代码 end

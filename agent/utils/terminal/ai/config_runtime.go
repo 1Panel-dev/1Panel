@@ -7,6 +7,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/model"
@@ -18,11 +19,20 @@ import (
 
 var agentAccountRepo = repo.NewIAgentAccountRepo()
 var agentAccountModelRepo = repo.NewIAgentAccountModelRepo()
+var terminalRuntimeVersion atomic.Uint64
 
 type TerminalRuntimeSettings struct {
 	AccountID    uint
 	Prefix       string
 	RiskCommands []string
+}
+
+func CurrentTerminalRuntimeVersion() uint64 {
+	return terminalRuntimeVersion.Load()
+}
+
+func InvalidateTerminalRuntimeCache() {
+	terminalRuntimeVersion.Add(1)
 }
 
 func ResolveGeneratorConfig(accountID uint) (GeneratorConfig, time.Duration, error) {
