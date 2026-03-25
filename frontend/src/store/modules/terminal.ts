@@ -14,7 +14,7 @@ export const TerminalStore = defineStore({
         cursorBlink: 'enable',
         cursorStyle: 'underline',
         scrollback: 1000,
-        scrollSensitivity: 10,
+        scrollSensitivity: 6,
     }),
     actions: {
         setLineHeight(lineHeight: number) {

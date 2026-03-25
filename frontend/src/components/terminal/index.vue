@@ -115,7 +115,7 @@ const newTerm = () => {
         cursorBlink: terminalStore.cursorBlink ? String(terminalStore.cursorBlink).toLowerCase() === 'enable' : true,
         cursorStyle: terminalStore.cursorStyle ? getStyle() : 'underline',
         scrollback: terminalStore.scrollback || 1000,
-        scrollSensitivity: terminalStore.scrollSensitivity || 15,
+        scrollSensitivity: terminalStore.scrollSensitivity || 6,
     });
 };
 

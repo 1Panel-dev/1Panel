@@ -191,7 +191,7 @@ const form = reactive({
     cursorBlink: 'Enable',
     cursorStyle: 'underline',
     scrollback: 1000,
-    scrollSensitivity: 10,
+    scrollSensitivity: 6,
     showDefaultConn: false,
     defaultConn: '',
 });
@@ -329,7 +329,7 @@ const iniTerm = () => {
         cursorBlink: true,
         cursorStyle: 'block',
         scrollback: 1000,
-        scrollSensitivity: 15,
+        scrollSensitivity: 6,
     });
     term.value.open(terminalElement.value);
     applyPreviewBackground();
