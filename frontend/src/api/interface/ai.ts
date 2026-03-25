@@ -623,6 +623,12 @@ export namespace AI {
         agentId: number;
     }
 
+    export interface AgentSkillSearchReq {
+        agentId: number;
+        source: 'clawhub' | 'skillhub';
+        keyword: string;
+    }
+
     export interface AgentSkillItem {
         name: string;
         description: string;
@@ -631,9 +637,26 @@ export namespace AI {
         disabled: boolean;
     }
 
+    export interface AgentSkillSearchItem {
+        slug: string;
+        name: string;
+        description: string;
+        summary: string;
+        version: string;
+        source: string;
+        score: string;
+    }
+
     export interface AgentSkillUpdateReq {
         agentId: number;
         name: string;
         enabled: boolean;
+    }
+
+    export interface AgentSkillInstallReq {
+        agentId: number;
+        source: 'clawhub' | 'skillhub';
+        slug: string;
+        taskID: string;
     }
 }

@@ -389,6 +389,12 @@ type AgentSkillsReq struct {
 	AgentID uint `json:"agentId" validate:"required"`
 }
 
+type AgentSkillSearchReq struct {
+	AgentID uint   `json:"agentId" validate:"required"`
+	Source  string `json:"source" validate:"required,oneof=clawhub skillhub"`
+	Keyword string `json:"keyword" validate:"required"`
+}
+
 type AgentSkillItem struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
@@ -397,8 +403,25 @@ type AgentSkillItem struct {
 	Disabled    bool   `json:"disabled"`
 }
 
+type AgentSkillSearchItem struct {
+	Slug        string `json:"slug"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Summary     string `json:"summary"`
+	Version     string `json:"version"`
+	Source      string `json:"source"`
+	Score       string `json:"score"`
+}
+
 type AgentSkillUpdateReq struct {
 	AgentID uint   `json:"agentId" validate:"required"`
 	Name    string `json:"name" validate:"required"`
 	Enabled bool   `json:"enabled"`
+}
+
+type AgentSkillInstallReq struct {
+	AgentID uint   `json:"agentId" validate:"required"`
+	Source  string `json:"source" validate:"required,oneof=clawhub skillhub"`
+	Slug    string `json:"slug" validate:"required"`
+	TaskID  string `json:"taskID" validate:"required"`
 }
