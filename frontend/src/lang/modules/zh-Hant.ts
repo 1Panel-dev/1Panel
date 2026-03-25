@@ -1296,6 +1296,7 @@ const message = {
         noSuchCommand: '匯入的CSV檔案中未能發現快速指令資料，請檢查後重試',
         quickCommandHelper: '常用命令列表，用於在終端介面底部快速選擇',
         groupDeleteHelper: '移除組後，組內所有連接將遷移到 default 組內，是否繼續？',
+        quickCommandBatchHelper: '每行一條快速指令，以 名稱|命令 格式，例如：查看磁碟|df -h',
         command: '指令',
         addHost: '新增主機',
         localhost: '本機伺服器',

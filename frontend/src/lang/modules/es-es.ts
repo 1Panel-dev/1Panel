@@ -1412,6 +1412,8 @@ const message = {
         quickCommandHelper: 'Puede usar comandos rápidos en la parte inferior de "Terminales -> Terminales".',
         groupDeleteHelper:
             'Después de eliminar el grupo, todas las conexiones pasarán al grupo predeterminado. ¿Desea continuar?',
+        quickCommandBatchHelper:
+            'Un comando rápido por línea, usando el formato Nombre|Comando, por ejemplo: Ver disco|df -h',
         command: 'Comando',
         quickCmd: 'Comando rápido',
         addHost: 'Agregar',
