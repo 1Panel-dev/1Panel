@@ -41,7 +41,31 @@
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.status')" prop="status" width="120">
                         <template #default="{ row }">
-                            <Status :status="row.status" />
+                            <el-dropdown placement="bottom">
+                                <Status :status="row.status" :operate="true" />
+                                <template #dropdown>
+                                    <el-dropdown-menu>
+                                        <el-dropdown-item
+                                            :disabled="checkStatus('start', row)"
+                                            @click="onOperate(row, 'start')"
+                                        >
+                                            {{ $t('commons.operate.start') }}
+                                        </el-dropdown-item>
+                                        <el-dropdown-item
+                                            :disabled="checkStatus('stop', row)"
+                                            @click="onOperate(row, 'stop')"
+                                        >
+                                            {{ $t('commons.operate.stop') }}
+                                        </el-dropdown-item>
+                                        <el-dropdown-item
+                                            :disabled="checkStatus('restart', row)"
+                                            @click="onOperate(row, 'restart')"
+                                        >
+                                            {{ $t('commons.button.restart') }}
+                                        </el-dropdown-item>
+                                    </el-dropdown-menu>
+                                </template>
+                            </el-dropdown>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('aiTools.agents.appVersion')" prop="appVersion" min-width="140">
@@ -175,11 +199,6 @@ const searchName = ref('');
 
 const buttons = [
     {
-        label: i18n.global.t('menu.home'),
-        click: (row: AI.AgentItem) => openOverview(row),
-        show: (row: AI.AgentItem) => row.agentType !== 'copaw',
-    },
-    {
         label: i18n.global.t('menu.config'),
         click: (row: AI.AgentItem) => openConfig(row),
         show: (row: AI.AgentItem) => row.agentType !== 'copaw',
@@ -192,6 +211,11 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.log'),
         click: (row: AI.AgentItem) => openLog(row),
+    },
+    {
+        label: i18n.global.t('menu.home'),
+        click: (row: AI.AgentItem) => openOverview(row),
+        show: (row: AI.AgentItem) => row.agentType !== 'copaw',
     },
     {
         label: i18n.global.t('commons.operate.start'),
@@ -282,6 +306,20 @@ const openCreateFromQuery = async () => {
 const openTaskLog = (taskID: string) => {
     if (taskLogRef.value?.openWithTaskID) {
         taskLogRef.value.openWithTaskID(taskID);
+    }
+};
+
+const checkStatus = (operate: string, row: AI.AgentItem) => {
+    const status = row.status.toLowerCase();
+    switch (operate) {
+        case 'start':
+            return status === 'running' || status === 'starting' || status === 'restarting';
+        case 'stop':
+            return status !== 'running';
+        case 'restart':
+            return status === 'starting';
+        default:
+            return false;
     }
 };
 
