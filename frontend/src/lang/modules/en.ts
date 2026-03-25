@@ -1369,6 +1369,8 @@ const message = {
         quickCommand: 'Quick command | Quick commands',
         noSuchCommand: 'No quick command data found in the imported CSV file, check and try again!',
         quickCommandHelper: 'You can use the quick commands at the bottom of the "Terminals -> Terminals".',
+        quickCommandBatchHelper:
+            'One quick command per line, using the Name|Command format, for example: Check disk|df -h',
         groupDeleteHelper:
             'After the group is removed, all connections in the group will be migrated to the default group. Continue?',
         command: 'Command',

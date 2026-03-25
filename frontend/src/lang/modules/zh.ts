@@ -1303,6 +1303,7 @@ const message = {
         quickCommand: '快速命令',
         noSuchCommand: '导入的 csv 文件中未能发现快速命令数据，请检查后重试！',
         quickCommandHelper: '常用命令列表，用于在终端界面底部快速选择',
+        quickCommandBatchHelper: '每行一条快速命令，以 名称|命令 格式，例如：查看磁盘|df -h',
         command: '命令',
         addHost: '添加主机',
         localhost: '本地服务器',

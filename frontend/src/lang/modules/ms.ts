@@ -1395,6 +1395,8 @@ const message = {
         quickCommandHelper: 'Anda boleh menggunakan arahan pantas di bahagian bawah "Terminal -> Terminal".',
         groupDeleteHelper:
             'Selepas kumpulan dikeluarkan, semua sambungan dalam kumpulan akan dipindahkan ke kumpulan lalai. Adakah anda mahu meneruskan?',
+        quickCommandBatchHelper:
+            'Satu arahan pantas setiap baris, menggunakan format Nama|Arahan, contohnya: Semak cakera|df -h',
         command: 'Arahan',
         quickCmd: 'Arahan pantas',
         addHost: 'Tambah',

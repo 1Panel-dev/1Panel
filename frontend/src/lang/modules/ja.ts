@@ -1381,6 +1381,8 @@ const message = {
         quickCommandHelper: '「端末 - >端子」の下部にあるクイックコマンドを使用できます。',
         groupDeleteHelper:
             'グループが削除された後、グループ内のすべての接続がデフォルトグループに移行されます。続けたいですか？',
+        quickCommandBatchHelper:
+            '1 行に 1 つのクイックコマンドを、名前|コマンド の形式で入力します。例: ディスク確認|df -h',
         command: '指示',
         quickCmd: 'クイックコマンド',
         addHost: '追加',
