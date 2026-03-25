@@ -19,6 +19,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
+	terminalai "github.com/1Panel-dev/1Panel/agent/utils/terminal/ai"
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 	"gorm.io/gorm"
 )
@@ -443,6 +444,7 @@ func (a AgentService) UpdateAccount(req dto.AgentAccountUpdateReq) error {
 	if err := global.DB.Save(account).Error; err != nil {
 		return err
 	}
+	terminalai.InvalidateTerminalRuntimeCache()
 	if req.SyncAgents {
 		if err := a.syncAgentsByAccount(account); err != nil {
 			return err
@@ -582,6 +584,7 @@ func (a AgentService) UpdateAccountModel(req dto.AgentAccountModelUpdateReq) err
 	if err := agentAccountModelRepo.Save(record); err != nil {
 		return err
 	}
+	terminalai.InvalidateTerminalRuntimeCache()
 	return a.syncAgentsByAccount(account)
 }
 
@@ -613,6 +616,7 @@ func (a AgentService) DeleteAccountModel(req dto.AgentAccountModelDeleteReq) err
 	if err := compactPersistedAgentAccountModelSortOrder(req.AccountID); err != nil {
 		return err
 	}
+	terminalai.InvalidateTerminalRuntimeCache()
 	return a.syncAgentsByAccount(account)
 }
 
@@ -635,6 +639,7 @@ func (a AgentService) DeleteAccount(req dto.AgentAccountDeleteReq) error {
 	if err := agentAccountModelRepo.Delete(repo.WithByAccountID(req.ID)); err != nil {
 		return err
 	}
+	terminalai.InvalidateTerminalRuntimeCache()
 	return agentAccountRepo.DeleteByID(req.ID)
 }
 

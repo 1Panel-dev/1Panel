@@ -512,3 +512,6 @@ XfsNotFound: '未偵測到 xfs 檔案系統，請先安裝 xfsprogs'
 
 # terminal
 TerminalAIBlockedRiskyCommand: '已攔截風險命令：{{ .command }}'
+TerminalAIThinking: 'AI 正在思考...'
+TerminalAIReadyToExecute: '思考完成，請按 Enter 執行（耗時 {{ .duration }}，token：{{ .tokens }}）'
+TerminalAIRequestFailed: 'AI 請求失敗：{{ .err }}'

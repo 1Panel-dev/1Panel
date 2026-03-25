@@ -512,3 +512,6 @@ XfsNotFound: 'Файловая система xfs не обнаружена, с�
 
 # terminal
 TerminalAIBlockedRiskyCommand: 'Опасная команда заблокирована: {{ .command }}'
+TerminalAIThinking: 'AI думает...'
+TerminalAIReadyToExecute: 'Обдумывание завершено, нажмите Enter для выполнения (время: {{ .duration }}, token: {{ .tokens }})'
+TerminalAIRequestFailed: 'Ошибка запроса AI: {{ .err }}'

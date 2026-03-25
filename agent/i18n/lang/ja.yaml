@@ -512,3 +512,6 @@ XfsNotFound: 'xfs ファイルシステムが検出されませんでした、�
 
 # terminal
 TerminalAIBlockedRiskyCommand: '危険なコマンドをブロックしました: {{ .command }}'
+TerminalAIThinking: 'AI が考えています...'
+TerminalAIReadyToExecute: '思考が完了しました。Enter で実行してください（所要時間 {{ .duration }}、token: {{ .tokens }}）'
+TerminalAIRequestFailed: 'AI リクエストに失敗しました: {{ .err }}'

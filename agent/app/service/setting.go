@@ -116,7 +116,11 @@ func (u *SettingService) UpdateTerminalAI(req dto.TerminalAIInfo) error {
 	if err := settingRepo.UpdateOrCreate("AIPrefix", req.AIPrefix); err != nil {
 		return err
 	}
-	return settingRepo.UpdateOrCreate("AIRiskCommands", req.AIRiskCommands)
+	if err := settingRepo.UpdateOrCreate("AIRiskCommands", req.AIRiskCommands); err != nil {
+		return err
+	}
+	terminalai.InvalidateTerminalRuntimeCache()
+	return nil
 }
 
 func (u *SettingService) TestConnByInfo(req dto.SSHConnData) bool {
