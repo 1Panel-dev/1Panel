@@ -1576,6 +1576,8 @@ const message = {
         searchHelper: '支援 * 等萬用字元',
         uploadFailed: '【{0}】 檔案上傳失敗',
         fileUploadStart: '正在上傳【{0}】...',
+        uploadOverallProgress: '總進度',
+        uploadCurrentFileProgress: '目前檔案',
         currentSelect: '當前選中: ',
         unsupportedType: '不支援的檔案類型',
         deleteHelper: '確定刪除所選檔案？ 預設刪除之後將進入回收站？',

@@ -1706,6 +1706,8 @@ const message = {
         searchHelper: 'Sokong wildcard seperti *',
         uploadFailed: '[{0}] Gagal memuat naik fail',
         fileUploadStart: 'Memuat naik [{0}]...',
+        uploadOverallProgress: 'Kemajuan keseluruhan',
+        uploadCurrentFileProgress: 'Fail semasa',
         currentSelect: 'Pilihan semasa: ',
         unsupportedType: 'Jenis fail tidak disokong',
         deleteHelper:

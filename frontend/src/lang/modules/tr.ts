@@ -1697,6 +1697,8 @@ const message = {
         searchHelper: '* gibi joker karakterleri destekler',
         uploadFailed: '[{0}] Dosya yükleme hatası',
         fileUploadStart: '[{0}] yükleniyor...',
+        uploadOverallProgress: 'Genel ilerleme',
+        uploadCurrentFileProgress: 'Geçerli dosya',
         currentSelect: 'Geçerli seçim: ',
         unsupportedType: 'Desteklenmeyen dosya türü',
         deleteHelper:

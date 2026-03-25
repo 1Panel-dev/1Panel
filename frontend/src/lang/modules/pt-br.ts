@@ -1819,6 +1819,8 @@ const message = {
         searchHelper: 'Suporte a curingas como *',
         uploadFailed: '[{0}] Falha no upload do arquivo',
         fileUploadStart: 'Carregando [{0}]...',
+        uploadOverallProgress: 'Progresso geral',
+        uploadCurrentFileProgress: 'Arquivo atual',
         currentSelect: 'Seleção atual: ',
         unsupportedType: 'Tipo de arquivo não suportado',
         deleteHelper:
