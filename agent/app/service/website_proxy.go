@@ -117,8 +117,10 @@ func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error)
 	applyLocationProxyPass(location, req.ProxyPass, &req.SNI, req.ProxySSLName)
 	if isHTTPSProxyPass(req.ProxyPass) && req.SSLVerify {
 		location.UpdateDirective("proxy_ssl_verify", []string{"on"})
+		location.UpdateDirective("proxy_ssl_trusted_certificate", []string{"/etc/ssl/certs/ca-certificates.crt"})
 	} else {
 		location.RemoveDirective("proxy_ssl_verify", []string{})
+		location.RemoveDirective("proxy_ssl_trusted_certificate", []string{})
 	}
 	location.UpdateDirective("proxy_set_header", []string{"Host", req.ProxyHost})
 	location.ChangePath(req.Modifier, req.Match)
