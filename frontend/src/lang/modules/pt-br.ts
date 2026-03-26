@@ -4285,6 +4285,7 @@ const message = {
             feiShu: 'FeiShu',
             mail: 'E-mail',
             weCom: 'WeCom',
+            bark: 'Bark',
             sendCountRulesHelper: 'Alertas totais enviados antes da expiração (uma vez por dia)',
             panelUpdateRulesHelper: 'Alertas totais enviados para nova versão do painel (uma vez por dia)',
             oneDaySendCountRulesHelper: 'Número máximo de alertas enviados por dia',
@@ -4461,6 +4462,7 @@ const message = {
             wechatConfigHelper: 'Configuração de notificação de alerta da Conta Oficial WeChat',
             dingTalkConfigHelper: 'Configuração de notificação de alerta DingTalk',
             feiShuConfigHelper: 'Configuração de notificação de alerta Feishu',
+            barkConfigHelper: 'Configuração de notificação de alerta Bark',
             webhookName: 'Nome do bot',
             webhookUrl: 'URL do Webhook',
             alertConfigProHelper:

@@ -11,6 +11,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
+	"github.com/1Panel-dev/1Panel/agent/utils/bark"
 	"github.com/1Panel-dev/1Panel/agent/utils/email"
 	"github.com/1Panel-dev/1Panel/agent/utils/psutil"
 	"github.com/1Panel-dev/1Panel/agent/utils/re"
@@ -101,6 +102,40 @@ func CreateEmailAlertLog(create dto.AlertLogCreate, alert dto.AlertDTO, params [
 		create.Status = constant.AlertSuccess
 		return SaveAlertLog(create, &alertLog)
 	}
+}
+
+func CreateBarkAlertLog(create dto.AlertLogCreate, alert dto.AlertDTO, params []dto.Param, transport *http.Transport, agentInfo *dto.AgentInfo) error {
+	var alertLog model.AlertLog
+	alertRepo := repo.NewIAlertRepo()
+
+	create.Method = constant.Bark
+	barkConfig, err := alertRepo.GetConfig(alertRepo.WithByType(constant.Bark))
+	if err != nil {
+		return err
+	}
+	var barkInfo dto.AlertWebhookConfig
+	err = json.Unmarshal([]byte(barkConfig.Config), &barkInfo)
+	if err != nil {
+		return err
+	}
+	if barkInfo.Url == "" {
+		create.Message = "bark config url is required"
+		create.Status = constant.AlertError
+		return SaveAlertLog(create, &alertLog)
+	}
+
+	content := GetSendContent(alert.Type, params, agentInfo)
+	if content == "" {
+		content = i18n.GetMsgWithMap("CommonAlert", map[string]interface{}{"msg": alert.Title})
+	}
+
+	if err = bark.SendMessage(barkInfo.Url, i18n.GetMsgByKey("PanelAlertTitle"), content, transport); err != nil {
+		create.Message = err.Error()
+		create.Status = constant.AlertError
+		return SaveAlertLog(create, &alertLog)
+	}
+	create.Status = constant.AlertSuccess
+	return SaveAlertLog(create, &alertLog)
 }
 
 func SaveAlertLog(create dto.AlertLogCreate, alertLog *model.AlertLog) error {

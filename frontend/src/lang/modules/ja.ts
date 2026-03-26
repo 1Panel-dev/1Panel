@@ -4081,6 +4081,7 @@ const message = {
             feiShu: 'FeiShu',
             mail: 'メール',
             weCom: 'WeCom',
+            bark: 'Bark',
             sendCountRulesHelper: '期限前に送信されるアラートの合計（1日1回）',
             panelUpdateRulesHelper: '新しいパネルバージョンに関するアラートの合計（1日1回）',
             oneDaySendCountRulesHelper: '1日に送信できる最大アラート回数',
@@ -4254,6 +4255,7 @@ const message = {
             wechatConfigHelper: 'WeChat公式アカウントアラート通知設定',
             dingTalkConfigHelper: 'DingTalkアラート通知設定',
             feiShuConfigHelper: 'Feishuアラート通知設定',
+            barkConfigHelper: 'Barkアラート通知設定',
             webhookName: 'ボット名',
             webhookUrl: 'Webhook URL',
             alertConfigProHelper:

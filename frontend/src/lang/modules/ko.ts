@@ -3990,6 +3990,7 @@ const message = {
             feiShu: '페이슈',
             mail: '이메일',
             weCom: 'WeCom',
+            bark: 'Bark',
             sendCountRulesHelper: '만료 전 발송된 총 알림 수 (하루 1회)',
             panelUpdateRulesHelper: '새 패널 버전에 대한 총 알림 수 (하루 1회)',
             oneDaySendCountRulesHelper: '하루 최대 발송 가능한 알림 수',
@@ -4158,6 +4159,7 @@ const message = {
             wechatConfigHelper: 'WeChat 공식 계정 알림 구성',
             dingTalkConfigHelper: 'DingTalk 알림 구성',
             feiShuConfigHelper: 'Feishu 알림 구성',
+            barkConfigHelper: 'Bark 알림 구성',
             webhookName: '봇 이름',
             webhookUrl: 'Webhook URL',
             alertConfigProHelper:

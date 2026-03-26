@@ -650,6 +650,28 @@ func sendAlerts(alert dto.AlertDTO, alertType, quota, quotaType string, params [
 					continue
 				}
 				alertUtil.CreateNewAlertTask(quota, alertType, quotaType, m)
+			case constant.Bark:
+				todayCount, isValid := canSendAlertToday(alertType, quotaType, alert.SendCount, m)
+				if !isValid {
+					continue
+				}
+				var create = dto.AlertLogCreate{
+					Type:    alertUtil.GetCronJobType(alert.Type),
+					AlertId: alert.ID,
+					Count:   todayCount + 1,
+				}
+				alertInfo := alert
+				alertInfo.Type = alertType
+				create.AlertRule = alertUtil.ProcessAlertRule(alert)
+				create.AlertDetail = alertUtil.ProcessAlertDetail(alertInfo, quotaType, params, m)
+				transport := xpack.LoadRequestTransport()
+				agentInfo, _ := xpack.GetAgentInfo()
+				alertErr := alertUtil.CreateBarkAlertLog(create, alertInfo, params, transport, agentInfo)
+				if alertErr != nil {
+					global.LOG.Infof("%s alert %s push failed, err: %v", alertType, m, alertErr.Error())
+					continue
+				}
+				alertUtil.CreateNewAlertTask(quota, alertType, quotaType, m)
 			default:
 			}
 		}
