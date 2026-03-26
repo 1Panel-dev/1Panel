@@ -6,6 +6,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
+	providercatalog "github.com/1Panel-dev/1Panel/agent/app/provider"
 	"github.com/1Panel-dev/1Panel/agent/app/service"
 
 	"gorm.io/gorm"
@@ -107,5 +108,27 @@ func buildMigratedAgentAccountModels(tx *gorm.DB, account *legacyAgentAccountMod
 		}
 		return nil, err
 	}
+	applyLegacyAgentAccountModelDefaults(account.Provider, models)
 	return models, nil
+}
+
+func applyLegacyAgentAccountModelDefaults(provider string, models []dto.AgentAccountModel) {
+	if provider != "custom" && provider != "ollama" && provider != "vllm" {
+		return
+	}
+	meta, ok := providercatalog.Get(provider)
+	if !ok {
+		return
+	}
+	for i := range models {
+		if strings.TrimSpace(models[i].Name) == "" {
+			models[i].Name = strings.TrimSpace(models[i].ID)
+		}
+		if models[i].ContextWindow <= 0 {
+			models[i].ContextWindow = meta.Default.ContextWindow
+		}
+		if models[i].MaxTokens <= 0 {
+			models[i].MaxTokens = meta.Default.MaxTokens
+		}
+	}
 }

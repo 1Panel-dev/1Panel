@@ -133,7 +133,7 @@
                         min-width="200"
                         :label="$t('commons.table.operate')"
                         fixed="right"
-                        :ellipsis="4"
+                        :ellipsis="3"
                     />
                 </ComplexTable>
             </template>

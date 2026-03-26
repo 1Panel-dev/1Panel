@@ -62,7 +62,11 @@
                                         @change="(value) => toggleSkill(skill, Boolean(value))"
                                     />
                                 </div>
-                                <el-tooltip placement="top-start" :show-after="200" popper-class="skill-desc-tooltip">
+                                <el-tooltip
+                                    placement="bottom-start"
+                                    :show-after="200"
+                                    popper-class="skill-desc-tooltip"
+                                >
                                     <template #content>
                                         <div class="skill-desc-tooltip-content">{{ skill.description }}</div>
                                     </template>
@@ -101,7 +105,7 @@
                         </div>
                         <el-tooltip
                             v-if="skill.description || skill.summary"
-                            placement="top-start"
+                            placement="bottom-start"
                             :show-after="200"
                             popper-class="skill-desc-tooltip"
                         >
