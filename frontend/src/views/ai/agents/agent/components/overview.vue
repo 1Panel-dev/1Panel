@@ -111,6 +111,7 @@ defineExpose({
         color: var(--el-text-color-primary);
     }
     :deep(.status-count) {
+        font-size: 18px;
         color: var(--el-text-color-primary);
     }
     :deep(.status-label) {

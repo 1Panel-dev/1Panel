@@ -58,7 +58,7 @@ func (a AgentService) UpdateTelegramConfig(req dto.AgentTelegramConfigUpdateReq)
 	})
 }
 
-func (a AgentService) GetDiscordConfig(req dto.AgentDiscordConfigReq) (*dto.AgentDiscordConfig, error) {
+func (a AgentService) GetDiscordConfig(req dto.AgentIDReq) (*dto.AgentDiscordConfig, error) {
 	_, _, conf, err := a.loadAgentConfig(req.AgentID)
 	if err != nil {
 		return nil, err
@@ -80,7 +80,7 @@ func (a AgentService) UpdateDiscordConfig(req dto.AgentDiscordConfigUpdateReq) e
 	})
 }
 
-func (a AgentService) GetQQBotConfig(req dto.AgentQQBotConfigReq) (*dto.AgentQQBotConfig, error) {
+func (a AgentService) GetQQBotConfig(req dto.AgentIDReq) (*dto.AgentQQBotConfig, error) {
 	_, install, conf, err := a.loadAgentConfig(req.AgentID)
 	if err != nil {
 		return nil, err
@@ -102,7 +102,7 @@ func (a AgentService) UpdateQQBotConfig(req dto.AgentQQBotConfigUpdateReq) error
 	})
 }
 
-func (a AgentService) GetWecomConfig(req dto.AgentWecomConfigReq) (*dto.AgentWecomConfig, error) {
+func (a AgentService) GetWecomConfig(req dto.AgentIDReq) (*dto.AgentWecomConfig, error) {
 	_, install, conf, err := a.loadAgentConfig(req.AgentID)
 	if err != nil {
 		return nil, err
@@ -125,7 +125,7 @@ func (a AgentService) UpdateWecomConfig(req dto.AgentWecomConfigUpdateReq) error
 	})
 }
 
-func (a AgentService) GetDingTalkConfig(req dto.AgentDingTalkConfigReq) (*dto.AgentDingTalkConfig, error) {
+func (a AgentService) GetDingTalkConfig(req dto.AgentIDReq) (*dto.AgentDingTalkConfig, error) {
 	_, install, conf, err := a.loadAgentConfig(req.AgentID)
 	if err != nil {
 		return nil, err

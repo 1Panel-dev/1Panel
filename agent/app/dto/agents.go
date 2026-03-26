@@ -73,6 +73,10 @@ type AgentOverviewReq struct {
 	AgentID uint `json:"agentId" validate:"required"`
 }
 
+type AgentIDReq struct {
+	AgentID uint `json:"agentId" validate:"required"`
+}
+
 type AgentOverview struct {
 	Snapshot AgentOverviewSnapshot `json:"snapshot"`
 }
@@ -237,10 +241,6 @@ type AgentChannelPairingApproveReq struct {
 	PairingCode string `json:"pairingCode" validate:"required"`
 }
 
-type AgentWecomConfigReq struct {
-	AgentID uint `json:"agentId" validate:"required"`
-}
-
 type AgentWecomConfigUpdateReq struct {
 	AgentID  uint   `json:"agentId" validate:"required"`
 	Enabled  bool   `json:"enabled"`
@@ -255,10 +255,6 @@ type AgentWecomConfig struct {
 	BotID     string `json:"botId"`
 	Secret    string `json:"secret"`
 	Installed bool   `json:"installed"`
-}
-
-type AgentDingTalkConfigReq struct {
-	AgentID uint `json:"agentId" validate:"required"`
 }
 
 type AgentDingTalkConfigUpdateReq struct {
@@ -286,10 +282,6 @@ type AgentDingTalkConfig struct {
 type AgentWeixinLoginReq struct {
 	AgentID uint   `json:"agentId" validate:"required"`
 	TaskID  string `json:"taskID" validate:"required"`
-}
-
-type AgentQQBotConfigReq struct {
-	AgentID uint `json:"agentId" validate:"required"`
 }
 
 type AgentQQBotConfigUpdateReq struct {
@@ -321,10 +313,6 @@ type AgentPluginStatus struct {
 	Installed bool `json:"installed"`
 }
 
-type AgentDiscordConfigReq struct {
-	AgentID uint `json:"agentId" validate:"required"`
-}
-
 type AgentDiscordConfigUpdateReq struct {
 	AgentID     uint   `json:"agentId" validate:"required"`
 	Enabled     bool   `json:"enabled"`
@@ -342,10 +330,6 @@ type AgentDiscordConfig struct {
 	Proxy       string `json:"proxy"`
 }
 
-type AgentSecurityConfigReq struct {
-	AgentID uint `json:"agentId" validate:"required"`
-}
-
 type AgentSecurityConfigUpdateReq struct {
 	AgentID        uint     `json:"agentId" validate:"required"`
 	AllowedOrigins []string `json:"allowedOrigins"`
@@ -353,10 +337,6 @@ type AgentSecurityConfigUpdateReq struct {
 
 type AgentSecurityConfig struct {
 	AllowedOrigins []string `json:"allowedOrigins"`
-}
-
-type AgentOtherConfigReq struct {
-	AgentID uint `json:"agentId" validate:"required"`
 }
 
 type AgentOtherConfigUpdateReq struct {
@@ -383,10 +363,6 @@ type AgentConfigFileUpdateReq struct {
 
 type AgentConfigFile struct {
 	Content string `json:"content"`
-}
-
-type AgentSkillsReq struct {
-	AgentID uint `json:"agentId" validate:"required"`
 }
 
 type AgentSkillSearchReq struct {

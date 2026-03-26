@@ -32,13 +32,13 @@ type IAgentService interface {
 	UpdateModelConfig(req dto.AgentModelConfigUpdateReq) error
 	GetOverview(req dto.AgentOverviewReq) (*dto.AgentOverview, error)
 	GetProviders() ([]dto.ProviderInfo, error)
-	GetSecurityConfig(req dto.AgentSecurityConfigReq) (*dto.AgentSecurityConfig, error)
+	GetSecurityConfig(req dto.AgentIDReq) (*dto.AgentSecurityConfig, error)
 	UpdateSecurityConfig(req dto.AgentSecurityConfigUpdateReq) error
-	GetOtherConfig(req dto.AgentOtherConfigReq) (*dto.AgentOtherConfig, error)
+	GetOtherConfig(req dto.AgentIDReq) (*dto.AgentOtherConfig, error)
 	UpdateOtherConfig(req dto.AgentOtherConfigUpdateReq) error
 	GetConfigFile(req dto.AgentConfigFileReq) (*dto.AgentConfigFile, error)
 	UpdateConfigFile(req dto.AgentConfigFileUpdateReq) error
-	ListSkills(req dto.AgentSkillsReq) ([]dto.AgentSkillItem, error)
+	ListSkills(req dto.AgentIDReq) ([]dto.AgentSkillItem, error)
 	SearchSkills(req dto.AgentSkillSearchReq) ([]dto.AgentSkillSearchItem, error)
 	UpdateSkill(req dto.AgentSkillUpdateReq) error
 	InstallSkill(req dto.AgentSkillInstallReq) error
@@ -58,14 +58,14 @@ type IAgentService interface {
 	UpdateFeishuConfig(req dto.AgentFeishuConfigUpdateReq) error
 	GetTelegramConfig(req dto.AgentTelegramConfigReq) (*dto.AgentTelegramConfig, error)
 	UpdateTelegramConfig(req dto.AgentTelegramConfigUpdateReq) error
-	GetDiscordConfig(req dto.AgentDiscordConfigReq) (*dto.AgentDiscordConfig, error)
+	GetDiscordConfig(req dto.AgentIDReq) (*dto.AgentDiscordConfig, error)
 	UpdateDiscordConfig(req dto.AgentDiscordConfigUpdateReq) error
-	GetWecomConfig(req dto.AgentWecomConfigReq) (*dto.AgentWecomConfig, error)
+	GetWecomConfig(req dto.AgentIDReq) (*dto.AgentWecomConfig, error)
 	UpdateWecomConfig(req dto.AgentWecomConfigUpdateReq) error
-	GetDingTalkConfig(req dto.AgentDingTalkConfigReq) (*dto.AgentDingTalkConfig, error)
+	GetDingTalkConfig(req dto.AgentIDReq) (*dto.AgentDingTalkConfig, error)
 	UpdateDingTalkConfig(req dto.AgentDingTalkConfigUpdateReq) error
 	LoginWeixinChannel(req dto.AgentWeixinLoginReq) error
-	GetQQBotConfig(req dto.AgentQQBotConfigReq) (*dto.AgentQQBotConfig, error)
+	GetQQBotConfig(req dto.AgentIDReq) (*dto.AgentQQBotConfig, error)
 	UpdateQQBotConfig(req dto.AgentQQBotConfigUpdateReq) error
 	InstallPlugin(req dto.AgentPluginInstallReq) error
 	CheckPlugin(req dto.AgentPluginCheckReq) (*dto.AgentPluginStatus, error)
@@ -640,7 +640,7 @@ func (a AgentService) DeleteAccount(req dto.AgentAccountDeleteReq) error {
 	return agentAccountRepo.DeleteByID(req.ID)
 }
 
-func (a AgentService) GetSecurityConfig(req dto.AgentSecurityConfigReq) (*dto.AgentSecurityConfig, error) {
+func (a AgentService) GetSecurityConfig(req dto.AgentIDReq) (*dto.AgentSecurityConfig, error) {
 	agent, _, err := a.loadOpenclawAgentAndInstall(req.AgentID)
 	if err != nil {
 		return nil, err
@@ -679,7 +679,7 @@ func (a AgentService) UpdateSecurityConfig(req dto.AgentSecurityConfigUpdateReq)
 	return appInstallRepo.Save(context.Background(), install)
 }
 
-func (a AgentService) GetOtherConfig(req dto.AgentOtherConfigReq) (*dto.AgentOtherConfig, error) {
+func (a AgentService) GetOtherConfig(req dto.AgentIDReq) (*dto.AgentOtherConfig, error) {
 	agent, install, err := a.loadAgentAndInstall(req.AgentID)
 	if err != nil {
 		return nil, err

@@ -44,7 +44,7 @@ const config = reactive({
 const open = ref(false);
 const showTail = ref(true);
 
-const openWithTaskID = (id: string, tail: boolean, operateNode?: string) => {
+const openWithTaskID = (id: string, tail?: boolean, operateNode?: string) => {
     config.taskID = id;
     if (tail === undefined) {
         config.tail = true;

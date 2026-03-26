@@ -36,7 +36,7 @@ type skillhubSearchPayload struct {
 
 var clawhubSearchLinePattern = regexp.MustCompile(`^(\S+)\s+(.+?)\s+\(([\d.]+)\)$`)
 
-func (a AgentService) ListSkills(req dto.AgentSkillsReq) ([]dto.AgentSkillItem, error) {
+func (a AgentService) ListSkills(req dto.AgentIDReq) ([]dto.AgentSkillItem, error) {
 	_, install, err := a.loadOpenclawAgentAndInstall(req.AgentID)
 	if err != nil {
 		return nil, err

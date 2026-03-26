@@ -417,13 +417,13 @@ func (b *BaseApi) UpdateAgentTelegramConfig(c *gin.Context) {
 // @Tags AI
 // @Summary Get Agent Discord channel config
 // @Accept json
-// @Param request body dto.AgentDiscordConfigReq true "request"
+// @Param request body dto.AgentIDReq true "request"
 // @Success 200 {object} dto.AgentDiscordConfig
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /ai/agents/channel/discord/get [post]
 func (b *BaseApi) GetAgentDiscordConfig(c *gin.Context) {
-	var req dto.AgentDiscordConfigReq
+	var req dto.AgentIDReq
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
@@ -458,13 +458,13 @@ func (b *BaseApi) UpdateAgentDiscordConfig(c *gin.Context) {
 // @Tags AI
 // @Summary Get Agent QQ Bot channel config
 // @Accept json
-// @Param request body dto.AgentWecomConfigReq true "request"
+// @Param request body dto.AgentIDReq true "request"
 // @Success 200 {object} dto.AgentWecomConfig
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /ai/agents/channel/wecom/get [post]
 func (b *BaseApi) GetAgentWecomConfig(c *gin.Context) {
-	var req dto.AgentWecomConfigReq
+	var req dto.AgentIDReq
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
@@ -499,13 +499,13 @@ func (b *BaseApi) UpdateAgentWecomConfig(c *gin.Context) {
 // @Tags AI
 // @Summary Get Agent DingTalk channel config
 // @Accept json
-// @Param request body dto.AgentDingTalkConfigReq true "request"
+// @Param request body dto.AgentIDReq true "request"
 // @Success 200 {object} dto.AgentDingTalkConfig
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /ai/agents/channel/dingtalk/get [post]
 func (b *BaseApi) GetAgentDingTalkConfig(c *gin.Context) {
-	var req dto.AgentDingTalkConfigReq
+	var req dto.AgentIDReq
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
@@ -540,13 +540,13 @@ func (b *BaseApi) UpdateAgentDingTalkConfig(c *gin.Context) {
 // @Tags AI
 // @Summary Get Agent QQ Bot channel config
 // @Accept json
-// @Param request body dto.AgentQQBotConfigReq true "request"
+// @Param request body dto.AgentIDReq true "request"
 // @Success 200 {object} dto.AgentQQBotConfig
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /ai/agents/channel/qqbot/get [post]
 func (b *BaseApi) GetAgentQQBotConfig(c *gin.Context) {
-	var req dto.AgentQQBotConfigReq
+	var req dto.AgentIDReq
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
@@ -622,13 +622,13 @@ func (b *BaseApi) CheckAgentPlugin(c *gin.Context) {
 // @Tags AI
 // @Summary Get Agent Security config
 // @Accept json
-// @Param request body dto.AgentSecurityConfigReq true "request"
+// @Param request body dto.AgentIDReq true "request"
 // @Success 200 {object} dto.AgentSecurityConfig
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /ai/agents/security/get [post]
 func (b *BaseApi) GetAgentSecurityConfig(c *gin.Context) {
-	var req dto.AgentSecurityConfigReq
+	var req dto.AgentIDReq
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
@@ -663,13 +663,13 @@ func (b *BaseApi) UpdateAgentSecurityConfig(c *gin.Context) {
 // @Tags AI
 // @Summary Get Agent Other config
 // @Accept json
-// @Param request body dto.AgentOtherConfigReq true "request"
+// @Param request body dto.AgentIDReq true "request"
 // @Success 200 {object} dto.AgentOtherConfig
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /ai/agents/other/get [post]
 func (b *BaseApi) GetAgentOtherConfig(c *gin.Context) {
-	var req dto.AgentOtherConfigReq
+	var req dto.AgentIDReq
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
@@ -745,13 +745,13 @@ func (b *BaseApi) UpdateAgentConfigFile(c *gin.Context) {
 // @Tags AI
 // @Summary List Agent skills
 // @Accept json
-// @Param request body dto.AgentSkillsReq true "request"
+// @Param request body dto.AgentIDReq true "request"
 // @Success 200 {array} dto.AgentSkillItem
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /ai/agents/skills/list [post]
 func (b *BaseApi) ListAgentSkills(c *gin.Context) {
-	var req dto.AgentSkillsReq
+	var req dto.AgentIDReq
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}

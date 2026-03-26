@@ -1146,7 +1146,7 @@ SET http_port = https_port,
 WHERE version = ?
   AND https_port > 0
   AND app_id IN (SELECT id FROM apps WHERE key = ?)`,
-			"2026.3.23",
+			"2026.3.24",
 			constant.AppOpenclaw,
 		).Error
 	},
