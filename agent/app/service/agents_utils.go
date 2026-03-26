@@ -37,6 +37,28 @@ type resolvedAgentAccountInput struct {
 	BaseURL  string
 }
 
+func loadOpenclawAgentByID(agentID uint) (*model.Agent, error) {
+	agent, err := agentRepo.GetFirst(repo.WithByID(agentID))
+	if err != nil {
+		return nil, err
+	}
+	if agent.AgentType == constant.AppCopaw {
+		return nil, fmt.Errorf("copaw does not support")
+	}
+	return agent, nil
+}
+
+func ensureContainerRunning(containerName string) error {
+	status, err := checkContainerStatus(containerName)
+	if err != nil {
+		return err
+	}
+	if status != "running" {
+		return fmt.Errorf("container %s is not running, please check and retry", containerName)
+	}
+	return nil
+}
+
 func resolveAgentAccountInput(provider, apiKey, baseURL string) (resolvedAgentAccountInput, error) {
 	resolvedAPIKey := strings.TrimSpace(apiKey)
 	resolvedBaseURL := strings.TrimSpace(baseURL)
