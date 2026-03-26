@@ -298,12 +298,9 @@ func (a AgentService) Delete(req dto.AgentDeleteReq) error {
 }
 
 func (a AgentService) ResetToken(req dto.AgentTokenResetReq) error {
-	agent, err := agentRepo.GetFirst(repo.WithByID(req.ID))
+	agent, err := loadOpenclawAgentByID(req.ID)
 	if err != nil {
 		return err
-	}
-	if agent.AgentType == constant.AppCopaw {
-		return fmt.Errorf("copaw does not support token")
 	}
 	conf, err := readOpenclawConfig(agent.ConfigPath)
 	if err != nil {
@@ -327,12 +324,9 @@ func (a AgentService) ResetToken(req dto.AgentTokenResetReq) error {
 }
 
 func (a AgentService) UpdateModelConfig(req dto.AgentModelConfigUpdateReq) error {
-	agent, err := agentRepo.GetFirst(repo.WithByID(req.AgentID))
+	agent, err := loadOpenclawAgentByID(req.AgentID)
 	if err != nil {
 		return err
-	}
-	if agent.AgentType == constant.AppCopaw {
-		return fmt.Errorf("copaw does not support model config")
 	}
 	account, err := agentAccountRepo.GetFirst(repo.WithByID(req.AccountID))
 	if err != nil {
@@ -647,12 +641,9 @@ func (a AgentService) DeleteAccount(req dto.AgentAccountDeleteReq) error {
 }
 
 func (a AgentService) GetSecurityConfig(req dto.AgentSecurityConfigReq) (*dto.AgentSecurityConfig, error) {
-	agent, _, err := a.loadAgentAndInstall(req.AgentID)
+	agent, _, err := a.loadOpenclawAgentAndInstall(req.AgentID)
 	if err != nil {
 		return nil, err
-	}
-	if agent.AgentType == constant.AppCopaw {
-		return nil, fmt.Errorf("copaw does not support security config")
 	}
 	conf, err := readOpenclawConfig(agent.ConfigPath)
 	if err != nil {
@@ -663,12 +654,9 @@ func (a AgentService) GetSecurityConfig(req dto.AgentSecurityConfigReq) (*dto.Ag
 }
 
 func (a AgentService) UpdateSecurityConfig(req dto.AgentSecurityConfigUpdateReq) error {
-	agent, install, err := a.loadAgentAndInstall(req.AgentID)
+	agent, install, err := a.loadOpenclawAgentAndInstall(req.AgentID)
 	if err != nil {
 		return err
-	}
-	if agent.AgentType == constant.AppCopaw {
-		return fmt.Errorf("copaw does not support security config")
 	}
 	allowedOrigins, err := normalizeAllowedOrigins(req.AllowedOrigins)
 	if err != nil {
@@ -713,12 +701,8 @@ func (a AgentService) UpdateOtherConfig(req dto.AgentOtherConfigUpdateReq) error
 	if err != nil {
 		return err
 	}
-	status, err := checkContainerStatus(install.ContainerName)
-	if err != nil {
+	if err := ensureContainerRunning(install.ContainerName); err != nil {
 		return err
-	}
-	if status != "running" {
-		return fmt.Errorf("container %s is not running, please check and retry", install.ContainerName)
 	}
 	conf, err := readOpenclawConfig(agent.ConfigPath)
 	if err != nil {
@@ -735,12 +719,9 @@ func (a AgentService) UpdateOtherConfig(req dto.AgentOtherConfigUpdateReq) error
 }
 
 func (a AgentService) GetConfigFile(req dto.AgentConfigFileReq) (*dto.AgentConfigFile, error) {
-	agent, _, err := a.loadAgentAndInstall(req.AgentID)
+	agent, _, err := a.loadOpenclawAgentAndInstall(req.AgentID)
 	if err != nil {
 		return nil, err
-	}
-	if agent.AgentType == constant.AppCopaw {
-		return nil, fmt.Errorf("copaw does not support config file")
 	}
 	content, err := os.ReadFile(agent.ConfigPath)
 	if err != nil {
@@ -750,12 +731,9 @@ func (a AgentService) GetConfigFile(req dto.AgentConfigFileReq) (*dto.AgentConfi
 }
 
 func (a AgentService) UpdateConfigFile(req dto.AgentConfigFileUpdateReq) error {
-	agent, install, err := a.loadAgentAndInstall(req.AgentID)
+	agent, install, err := a.loadOpenclawAgentAndInstall(req.AgentID)
 	if err != nil {
 		return err
-	}
-	if agent.AgentType == constant.AppCopaw {
-		return fmt.Errorf("copaw does not support config file")
 	}
 	var payload interface{}
 	if err := json.Unmarshal([]byte(req.Content), &payload); err != nil {
@@ -805,6 +783,17 @@ func (a AgentService) loadAgentAndInstall(agentID uint) (*model.Agent, *model.Ap
 	return agent, &install, nil
 }
 
+func (a AgentService) loadOpenclawAgentAndInstall(agentID uint) (*model.Agent, *model.AppInstall, error) {
+	agent, install, err := a.loadAgentAndInstall(agentID)
+	if err != nil {
+		return nil, nil, err
+	}
+	if agent.AgentType == constant.AppCopaw {
+		return nil, nil, fmt.Errorf("copaw does not support")
+	}
+	return agent, install, nil
+}
+
 func (a AgentService) loadAgentConfig(agentID uint) (*model.Agent, *model.AppInstall, map[string]interface{}, error) {
 	agent, install, err := a.loadAgentAndInstall(agentID)
 	if err != nil {
@@ -813,6 +802,17 @@ func (a AgentService) loadAgentConfig(agentID uint) (*model.Agent, *model.AppIns
 	conf, err := readOpenclawConfig(agent.ConfigPath)
 	if err != nil {
 		return nil, nil, nil, err
+	}
+	return agent, install, conf, nil
+}
+
+func (a AgentService) loadOpenclawAgentConfig(agentID uint) (*model.Agent, *model.AppInstall, map[string]interface{}, error) {
+	agent, install, conf, err := a.loadAgentConfig(agentID)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	if agent.AgentType == constant.AppCopaw {
+		return nil, nil, nil, fmt.Errorf("copaw does not support")
 	}
 	return agent, install, conf, nil
 }

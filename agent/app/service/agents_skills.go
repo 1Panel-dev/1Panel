@@ -9,7 +9,6 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/task"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 )
@@ -38,19 +37,12 @@ type skillhubSearchPayload struct {
 var clawhubSearchLinePattern = regexp.MustCompile(`^(\S+)\s+(.+?)\s+\(([\d.]+)\)$`)
 
 func (a AgentService) ListSkills(req dto.AgentSkillsReq) ([]dto.AgentSkillItem, error) {
-	agent, install, err := a.loadAgentAndInstall(req.AgentID)
+	_, install, err := a.loadOpenclawAgentAndInstall(req.AgentID)
 	if err != nil {
 		return nil, err
 	}
-	if agent.AgentType != constant.AppOpenclaw {
-		return nil, fmt.Errorf("copaw does not support skills")
-	}
-	status, err := checkContainerStatus(install.ContainerName)
-	if err != nil {
+	if err := ensureContainerRunning(install.ContainerName); err != nil {
 		return nil, err
-	}
-	if status != "running" {
-		return nil, fmt.Errorf("container %s is not running, please check and retry", install.ContainerName)
 	}
 	output, err := cmd.RunDefaultWithStdoutBashCfAndTimeOut(
 		"docker exec %s openclaw skills list --json 2>&1",
@@ -67,19 +59,12 @@ func (a AgentService) ListSkills(req dto.AgentSkillsReq) ([]dto.AgentSkillItem, 
 }
 
 func (a AgentService) SearchSkills(req dto.AgentSkillSearchReq) ([]dto.AgentSkillSearchItem, error) {
-	agent, install, err := a.loadAgentAndInstall(req.AgentID)
+	_, install, err := a.loadOpenclawAgentAndInstall(req.AgentID)
 	if err != nil {
 		return nil, err
 	}
-	if agent.AgentType != constant.AppOpenclaw {
-		return nil, fmt.Errorf("copaw does not support skills")
-	}
-	status, err := checkContainerStatus(install.ContainerName)
-	if err != nil {
+	if err := ensureContainerRunning(install.ContainerName); err != nil {
 		return nil, err
-	}
-	if status != "running" {
-		return nil, fmt.Errorf("container %s is not running, please check and retry", install.ContainerName)
 	}
 	output, err := loadOpenclawSkillSearchOutput(install.ContainerName, req.Source, req.Keyword)
 	if err != nil {
@@ -97,19 +82,12 @@ func (a AgentService) SearchSkills(req dto.AgentSkillSearchReq) ([]dto.AgentSkil
 }
 
 func (a AgentService) UpdateSkill(req dto.AgentSkillUpdateReq) error {
-	agent, install, err := a.loadAgentAndInstall(req.AgentID)
+	agent, install, err := a.loadOpenclawAgentAndInstall(req.AgentID)
 	if err != nil {
 		return err
 	}
-	if agent.AgentType != constant.AppOpenclaw {
-		return fmt.Errorf("copaw does not support skills")
-	}
-	status, err := checkContainerStatus(install.ContainerName)
-	if err != nil {
+	if err := ensureContainerRunning(install.ContainerName); err != nil {
 		return err
-	}
-	if status != "running" {
-		return fmt.Errorf("container %s is not running, please check and retry", install.ContainerName)
 	}
 	conf, err := readOpenclawConfig(agent.ConfigPath)
 	if err != nil {
@@ -124,19 +102,12 @@ func (a AgentService) UpdateSkill(req dto.AgentSkillUpdateReq) error {
 }
 
 func (a AgentService) InstallSkill(req dto.AgentSkillInstallReq) error {
-	agent, install, err := a.loadAgentAndInstall(req.AgentID)
+	_, install, err := a.loadOpenclawAgentAndInstall(req.AgentID)
 	if err != nil {
 		return err
 	}
-	if agent.AgentType != constant.AppOpenclaw {
-		return fmt.Errorf("copaw does not support skills")
-	}
-	status, err := checkContainerStatus(install.ContainerName)
-	if err != nil {
+	if err := ensureContainerRunning(install.ContainerName); err != nil {
 		return err
-	}
-	if status != "running" {
-		return fmt.Errorf("container %s is not running, please check and retry", install.ContainerName)
 	}
 	installTask, err := task.NewTaskWithOps(req.Slug, task.TaskInstall, task.TaskScopeAI, req.TaskID, req.AgentID)
 	if err != nil {

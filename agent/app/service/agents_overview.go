@@ -2,7 +2,6 @@ package service
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -21,12 +20,9 @@ const (
 )
 
 func (a AgentService) GetOverview(req dto.AgentOverviewReq) (*dto.AgentOverview, error) {
-	agent, install, conf, err := a.loadAgentConfig(req.AgentID)
+	agent, install, conf, err := a.loadOpenclawAgentConfig(req.AgentID)
 	if err != nil {
 		return nil, err
-	}
-	if agent.AgentType != constant.AppOpenclaw {
-		return nil, fmt.Errorf("copaw does not support overview")
 	}
 
 	overview := &dto.AgentOverview{
