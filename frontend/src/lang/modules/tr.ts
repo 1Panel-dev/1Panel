@@ -1401,7 +1401,7 @@ const message = {
         groupDeleteHelper:
             'Grup kaldırıldıktan sonra, gruptaki tüm bağlantılar varsayılan gruba taşınacaktır. Devam etmek istiyor musunuz?',
         quickCommandBatchHelper:
-            'Her satıra bir hızlı komut, Ad|Komut formatında girin, örneğin: Diski kontrol et|df -h',
+            'Her satıra bir hızlı komut, Ad---Komut formatında girin, örneğin: Diski kontrol et---df -h',
         command: 'Komut',
         quickCmd: 'Hızlı komut',
         addHost: 'Ekle',

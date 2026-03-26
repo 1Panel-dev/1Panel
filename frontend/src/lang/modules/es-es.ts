@@ -1419,7 +1419,7 @@ const message = {
         groupDeleteHelper:
             'Después de eliminar el grupo, todas las conexiones pasarán al grupo predeterminado. ¿Desea continuar?',
         quickCommandBatchHelper:
-            'Un comando rápido por línea, usando el formato Nombre|Comando, por ejemplo: Ver disco|df -h',
+            'Un comando rápido por línea, usando el formato Nombre---Comando, por ejemplo: Ver disco---df -h',
         command: 'Comando',
         quickCmd: 'Comando rápido',
         addHost: 'Agregar',

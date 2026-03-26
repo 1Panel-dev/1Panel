@@ -112,10 +112,13 @@ const buildBatchCommands = (): Array<Command.CommandOperate> => {
         .map((line) => line.trim())
         .filter(Boolean);
     return lines.map((line) => {
-        const separatorIndex = line.indexOf('|');
+        const tripleDashSeparator = '---';
+        const tripleDashIndex = line.indexOf(tripleDashSeparator);
+        const separator = tripleDashIndex > 0 ? tripleDashSeparator : '';
+        const separatorIndex = separator ? line.indexOf(separator) : -1;
         const hasCustomName = separatorIndex > 0;
         const name = hasCustomName ? line.slice(0, separatorIndex).trim() : line;
-        const command = hasCustomName ? line.slice(separatorIndex + 1).trim() : line;
+        const command = hasCustomName ? line.slice(separatorIndex + separator.length).trim() : line;
         return {
             id: 0,
             type: 'command',
