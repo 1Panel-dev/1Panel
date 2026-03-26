@@ -1412,7 +1412,7 @@ const message = {
         groupDeleteHelper:
             'Após o grupo ser removido, todas as conexões no grupo serão migradas para o grupo padrão. Você deseja continuar?',
         quickCommandBatchHelper:
-            'Um comando rápido por linha, usando o formato Nome|Comando, por exemplo: Ver disco|df -h',
+            'Um comando rápido por linha, usando o formato Nome---Comando, por exemplo: Ver disco---df -h',
         command: 'Comando',
         quickCmd: 'Comando rápido',
         addHost: 'Adicionar',
