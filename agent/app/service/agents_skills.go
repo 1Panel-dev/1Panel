@@ -23,10 +23,7 @@ type openclawSkillListItem struct {
 	Source      string `json:"source"`
 	Bundled     bool   `json:"bundled"`
 	Disabled    bool   `json:"disabled"`
-}
-
-type openclawSkillInfo struct {
-	SkillKey string `json:"skillKey"`
+	SkillKey    string `json:"skillKey"`
 }
 
 type skillhubSearchPayload struct {
@@ -44,11 +41,7 @@ func (a AgentService) ListSkills(req dto.AgentIDReq) ([]dto.AgentSkillItem, erro
 	if err := ensureContainerRunning(install.ContainerName); err != nil {
 		return nil, err
 	}
-	output, err := cmd.RunDefaultWithStdoutBashCfAndTimeOut(
-		"docker exec %s openclaw skills list --json 2>&1",
-		30*time.Second,
-		install.ContainerName,
-	)
+	output, err := loadOpenclawSkillsStatus(install.ContainerName)
 	if err != nil {
 		return nil, err
 	}
@@ -93,7 +86,7 @@ func (a AgentService) UpdateSkill(req dto.AgentSkillUpdateReq) error {
 	if err != nil {
 		return err
 	}
-	skillKey, err := getOpenclawSkillKey(install.ContainerName, req.Name)
+	skillKey, err := getOpenclawSkillKeyFromStatus(install.ContainerName, req.Name)
 	if err != nil {
 		return err
 	}
@@ -126,8 +119,12 @@ func (a AgentService) InstallSkill(req dto.AgentSkillInstallReq) error {
 }
 
 func parseOpenclawSkillsList(output string) ([]dto.AgentSkillItem, error) {
+	trimmed := strings.TrimSpace(output)
+	if trimmed == "" {
+		return nil, nil
+	}
 	var payload openclawSkillsList
-	if err := json.Unmarshal([]byte(strings.TrimSpace(output)), &payload); err != nil {
+	if err := json.Unmarshal([]byte(trimmed), &payload); err != nil {
 		return nil, err
 	}
 	items := make([]dto.AgentSkillItem, 0, len(payload.Skills))
@@ -141,6 +138,14 @@ func parseOpenclawSkillsList(output string) ([]dto.AgentSkillItem, error) {
 		})
 	}
 	return items, nil
+}
+
+func loadOpenclawSkillsStatus(containerName string) (string, error) {
+	return cmd.RunDefaultWithStdoutBashCfAndTimeOut(
+		"docker exec %s openclaw gateway call skills.status --json 2>&1",
+		30*time.Second,
+		containerName,
+	)
 }
 
 func loadOpenclawSkillSearchOutput(containerName, source, keyword string) (string, error) {
@@ -224,28 +229,32 @@ func buildOpenclawSkillInstallCommand(source, slug string) string {
 	}
 }
 
-func getOpenclawSkillKey(containerName, name string) (string, error) {
-	output, err := cmd.RunDefaultWithStdoutBashCfAndTimeOut(
-		"docker exec %s openclaw skills info %q --json 2>&1",
-		30*time.Second,
-		containerName,
-		name,
-	)
+func getOpenclawSkillKeyFromStatus(containerName, name string) (string, error) {
+	output, err := loadOpenclawSkillsStatus(containerName)
 	if err != nil {
 		return "", err
 	}
-	return parseOpenclawSkillKey(name, output)
+	return parseOpenclawSkillKeyFromStatus(name, output)
 }
 
-func parseOpenclawSkillKey(name, output string) (string, error) {
-	var payload openclawSkillInfo
-	if err := json.Unmarshal([]byte(strings.TrimSpace(output)), &payload); err != nil {
-		return "", err
-	}
-	if payload.SkillKey == "" {
+func parseOpenclawSkillKeyFromStatus(name, output string) (string, error) {
+	trimmed := strings.TrimSpace(output)
+	if trimmed == "" {
 		return "", fmt.Errorf("skill %s does not have a skillKey", name)
 	}
-	return payload.SkillKey, nil
+	var payload openclawSkillsList
+	if err := json.Unmarshal([]byte(trimmed), &payload); err != nil {
+		return "", err
+	}
+	for _, item := range payload.Skills {
+		if item.Name == name {
+			if item.SkillKey == "" {
+				return "", fmt.Errorf("skill %s does not have a skillKey", name)
+			}
+			return item.SkillKey, nil
+		}
+	}
+	return "", fmt.Errorf("skill %s not found", name)
 }
 
 func setOpenclawSkillEnabled(conf map[string]interface{}, skillKey string, enabled bool) {
