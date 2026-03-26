@@ -103,7 +103,7 @@ func countOpenclawConfiguredChannels(conf map[string]interface{}) int {
 
 func loadOpenclawOverviewSkillStats(containerName string) (int, error) {
 	output, err := cmd.RunDefaultWithStdoutBashCfAndTimeOut(
-		"docker exec %s openclaw gateway call skills.status --json 2>&1",
+		"docker exec %s openclaw skills list --json 2>&1",
 		30*time.Second,
 		containerName,
 	)
