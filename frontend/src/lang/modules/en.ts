@@ -380,7 +380,7 @@ const message = {
         },
     },
     menu: {
-        home: 'Dashboard',
+        home: 'Overview',
         apps: 'App Store',
         website: 'Website | WebSites',
         project: 'Project | Projects',
