@@ -3,7 +3,7 @@
         v-model="open"
         @close="handleClose"
         size="large"
-        :header="$t('commons.button.' + operate) + $t('website.loadBalance')"
+        :header="joinLabel('commons.button.' + operate, 'website.loadBalance')"
         :resource="operate == 'create' ? '' : formData.name"
     >
         <LoadBalanceForm ref="lbFormRef" v-model="formData" :disabled="operate === 'edit' && disableName" />
@@ -41,6 +41,11 @@ const loading = ref(false);
 const operate = ref('create');
 const websiteID = ref(0);
 const disableName = ref(false);
+const joinLabel = (...keys: string[]) => {
+    const locale = i18n.global.locale.value.toString();
+    const separator = locale.startsWith('zh') || locale.startsWith('ja') ? '' : ' ';
+    return keys.map((key) => i18n.global.t(key)).join(separator);
+};
 
 const formData = ref({
     name: '',

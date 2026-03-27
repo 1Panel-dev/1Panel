@@ -231,25 +231,16 @@
                         <div class="footer-left-button">
                             <el-select class="p-w-200" v-model="batchReq.operate">
                                 <el-option
-                                    :label="$t('commons.button.start') + $t('menu.website')"
+                                    :label="joinLabel('commons.button.start', 'menu.website')"
                                     value="start"
                                 ></el-option>
                                 <el-option
-                                    :label="$t('commons.button.stop') + $t('menu.website')"
+                                    :label="joinLabel('commons.button.stop', 'menu.website')"
                                     value="stop"
                                 ></el-option>
-                                <el-option
-                                    :label="$t('commons.button.delete') + $t('menu.website')"
-                                    value="delete"
-                                ></el-option>
-                                <el-option
-                                    :label="$t('commons.button.set') + $t('commons.table.group')"
-                                    value="group"
-                                ></el-option>
-                                <el-option
-                                    :label="$t('commons.button.set') + $t('website.ssl')"
-                                    value="setHttps"
-                                ></el-option>
+                                <el-option :label="$t('website.delete')" value="delete"></el-option>
+                                <el-option :label="$t('website.groupSetting')" value="group"></el-option>
+                                <el-option :label="$t('website.sslConfig')" value="setHttps"></el-option>
                             </el-select>
                             <el-button
                                 class="ml-2"
@@ -342,6 +333,11 @@ const shortcuts = [
     },
 ];
 const WebsiteTypes = getWebsiteTypes();
+const joinLabel = (...keys: string[]) => {
+    const locale = i18n.global.locale.value.toString();
+    const separator = locale.startsWith('zh') || locale.startsWith('ja') ? '' : ' ';
+    return keys.map((key) => i18n.global.t(key)).join(separator);
+};
 const loading = ref(false);
 const maskShow = ref(false);
 const createRef = ref();

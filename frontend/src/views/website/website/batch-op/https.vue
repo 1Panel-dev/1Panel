@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('commons.button.set') + $t('website.ssl')" size="50%" @close="handleClose">
+    <DrawerPro v-model="open" :header="$t('website.sslConfig')" size="50%" @close="handleClose">
         <el-form ref="websiteForm" label-position="top" :model="form" :rules="rules" v-loading="loading">
             <HttpsConfig v-model="form" :website-ssl="websiteSSL" @ssl-change="handleSSLChange" />
         </el-form>
