@@ -32,7 +32,9 @@
 ------------------------------
 ## What is 1Panel? 
 
-1Panel is a modern, open-source VPS control panel that streamlines administration through an intuitive, clean web interface. 
+1Panel is a modern, open-source VPS control panel that streamlines administration through an intuitive, clean web interface.  
+
+👉 Watch our concise [2-minute introduction to 1Panel](https://www.youtube.com/watch?v=Jl_wqp-XA08).
 
 ## Key Features  
 
