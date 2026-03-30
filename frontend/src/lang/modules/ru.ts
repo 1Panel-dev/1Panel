@@ -4146,6 +4146,7 @@ const message = {
             feiShu: 'FeiShu',
             mail: 'Электронная Почта',
             weCom: 'WeCom',
+            bark: 'Bark',
             sendCountRulesHelper: 'Общее количество уведомлений до истечения срока действия (раз в день)',
             panelUpdateRulesHelper: 'Общее количество уведомлений для новой версии панели (раз в день)',
             oneDaySendCountRulesHelper: 'Максимальное количество уведомлений в день',
@@ -4326,6 +4327,7 @@ const message = {
             wechatConfigHelper: 'Конфигурация уведомлений официального аккаунта WeChat',
             dingTalkConfigHelper: 'Конфигурация уведомлений DingTalk',
             feiShuConfigHelper: 'Конфигурация уведомлений Feishu',
+            barkConfigHelper: 'Конфигурация уведомлений Bark',
             webhookName: 'Имя бота',
             webhookUrl: 'URL Webhook',
             alertConfigProHelper:

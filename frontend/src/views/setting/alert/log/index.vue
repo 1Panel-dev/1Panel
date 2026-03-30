@@ -229,6 +229,8 @@ const formatMethod = (row: Alert.AlertLog) => {
             return t('xpack.alert.sms');
         case 'webhook':
             return t('xpack.alert.webhook');
+        case 'bark':
+            return t('xpack.alert.bark');
         default:
             return t('xpack.alert.unknown');
     }

@@ -4136,6 +4136,7 @@ const message = {
             feiShu: 'FeiShu',
             mail: 'E-posta',
             weCom: 'WeCom',
+            bark: 'Bark',
             sendCountRulesHelper: 'Sona ermeden önce gönderilen toplam uyarılar (günde bir kez)',
             panelUpdateRulesHelper:
                 'Yeni panel sürümü algılandığında bir kez uyarı gönder (işlenmezse ertesi gün tekrar gönderilir)',
@@ -4314,6 +4315,7 @@ const message = {
             wechatConfigHelper: 'WeChat Resmi Hesap uyarı bildirim yapılandırması',
             dingTalkConfigHelper: 'DingTalk uyarı bildirim yapılandırması',
             feiShuConfigHelper: 'Feishu uyarı bildirim yapılandırması',
+            barkConfigHelper: 'Bark uyarı bildirim yapılandırması',
             webhookName: 'Bot adı',
             webhookUrl: 'Webhook URL',
             alertConfigProHelper:
