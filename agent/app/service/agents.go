@@ -43,6 +43,13 @@ type IAgentService interface {
 	UpdateSkill(req dto.AgentSkillUpdateReq) error
 	InstallSkill(req dto.AgentSkillInstallReq) error
 
+	CreateRole(req dto.AgentRoleCreateReq) (*dto.AgentRoleCreateResp, error)
+	DeleteRole(req dto.AgentRoleDeleteReq) error
+	GetConfiguredAgents(req dto.AgentConfiguredAgentsReq) ([]dto.AgentConfiguredAgentItem, error)
+	GetRoleChannels(req dto.AgentRoleChannelsReq) ([]dto.AgentRoleChannelItem, error)
+	GetRoleMarkdownFiles(req dto.AgentRoleMarkdownFilesReq) ([]dto.AgentRoleMarkdownFileItem, error)
+	UpdateRoleMarkdownFiles(req dto.AgentRoleMarkdownFilesUpdateReq) error
+
 	CreateAccount(req dto.AgentAccountCreateReq) error
 	UpdateAccount(req dto.AgentAccountUpdateReq) error
 	SyncAgentsByAccount(account *model.AgentAccount) error

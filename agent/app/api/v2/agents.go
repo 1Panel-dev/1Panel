@@ -333,6 +333,130 @@ func (b *BaseApi) DeleteAgentAccount(c *gin.Context) {
 }
 
 // @Tags AI
+// @Summary Create Agent role
+// @Accept json
+// @Param request body dto.AgentRoleCreateReq true "request"
+// @Success 200 {object} dto.AgentRoleCreateResp
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/agent/create [post]
+func (b *BaseApi) CreateAgentRole(c *gin.Context) {
+	var req dto.AgentRoleCreateReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	data, err := agentService.CreateRole(req)
+	if err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.SuccessWithData(c, data)
+}
+
+// @Tags AI
+// @Summary Delete Agent role
+// @Accept json
+// @Param request body dto.AgentRoleDeleteReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/agent/delete [post]
+func (b *BaseApi) DeleteAgentRole(c *gin.Context) {
+	var req dto.AgentRoleDeleteReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := agentService.DeleteRole(req); err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags AI
+// @Summary Get configured Agent roles from config file
+// @Accept json
+// @Param request body dto.AgentConfiguredAgentsReq true "request"
+// @Success 200 {array} dto.AgentConfiguredAgentItem
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/agent/list [post]
+func (b *BaseApi) GetConfiguredAgentRoles(c *gin.Context) {
+	var req dto.AgentConfiguredAgentsReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	data, err := agentService.GetConfiguredAgents(req)
+	if err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.SuccessWithData(c, data)
+}
+
+// @Tags AI
+// @Summary Get Agent role channels from config file
+// @Accept json
+// @Param request body dto.AgentRoleChannelsReq true "request"
+// @Success 200 {array} dto.AgentRoleChannelItem
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/agent/channels [post]
+func (b *BaseApi) GetAgentRoleChannels(c *gin.Context) {
+	var req dto.AgentRoleChannelsReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	data, err := agentService.GetRoleChannels(req)
+	if err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.SuccessWithData(c, data)
+}
+
+// @Tags AI
+// @Summary Get Agent role markdown files
+// @Accept json
+// @Param request body dto.AgentRoleMarkdownFilesReq true "request"
+// @Success 200 {array} dto.AgentRoleMarkdownFileItem
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/agent/md/list [post]
+func (b *BaseApi) GetAgentRoleMarkdownFiles(c *gin.Context) {
+	var req dto.AgentRoleMarkdownFilesReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	data, err := agentService.GetRoleMarkdownFiles(req)
+	if err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.SuccessWithData(c, data)
+}
+
+// @Tags AI
+// @Summary Update Agent role markdown file
+// @Accept json
+// @Param request body dto.AgentRoleMarkdownFilesUpdateReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/agent/md/update [post]
+func (b *BaseApi) UpdateAgentRoleMarkdownFile(c *gin.Context) {
+	var req dto.AgentRoleMarkdownFilesUpdateReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := agentService.UpdateRoleMarkdownFiles(req); err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags AI
 // @Summary Get Agent Feishu channel config
 // @Accept json
 // @Param request body dto.AgentFeishuConfigReq true "request"

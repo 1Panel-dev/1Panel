@@ -307,6 +307,72 @@ export namespace AI {
         agentId: number;
     }
 
+    export interface AgentRoleCreateReq {
+        agentId: number;
+        name: string;
+        model: string;
+        bindings: AgentRoleBinding[];
+    }
+
+    export interface AgentRoleBinding {
+        channel: string;
+        accountId: string;
+    }
+
+    export interface AgentRoleCreateResp {
+        output: string;
+    }
+
+    export interface AgentRoleDeleteReq {
+        agentId: number;
+        id: string;
+    }
+
+    export interface AgentConfiguredAgentsReq {
+        agentId: number;
+    }
+
+    export interface AgentRoleChannelsReq {
+        agentId: number;
+    }
+
+    export interface AgentRoleChannelItem {
+        name: string;
+        bound: boolean;
+        accountIds: string[];
+    }
+
+    export interface AgentRoleMarkdownFilesReq {
+        agentId: number;
+        workspace: string;
+    }
+
+    export interface AgentConfiguredAgentItem {
+        id: string;
+        name: string;
+        workspace: string;
+        model: string;
+        agentDir: string;
+        bindings: AgentRoleBinding[];
+    }
+
+    export interface AgentRoleMarkdownFileItem {
+        name: string;
+        content: string;
+    }
+
+    export interface AgentRoleMarkdownFileUpdateItem {
+        name: string;
+        content: string;
+    }
+
+    export interface AgentRoleMarkdownFilesUpdateReq {
+        agentId: number;
+        workspace: string;
+        restart: boolean;
+        files: AgentRoleMarkdownFileUpdateItem[];
+    }
+
     export interface AgentOverviewSnapshot {
         containerStatus: string;
         appVersion: string;
