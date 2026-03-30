@@ -322,7 +322,7 @@
                     <el-form-item :label="$t('xpack.alert.alertMethod')" prop="sendMethod">
                         <el-select class="selectClass" v-model="dialogData.rowData!.sendMethod" multiple cleanable>
                             <el-option value="mail" :label="$t('xpack.alert.mail')" />
-                            <el-option value="bark" :label="$t('xpack.alert.bark')" />
+                            <el-option v-if="!globalStore.isProductPro" value="bark" :label="$t('xpack.alert.bark')" />
                             <el-option
                                 value="weCom"
                                 v-if="!globalStore.isIntl"
@@ -341,6 +341,7 @@
                                 :disabled="!globalStore.isProductPro"
                                 :label="$t('xpack.alert.feiShu')"
                             />
+                            <el-option v-if="globalStore.isProductPro" value="bark" :label="$t('xpack.alert.bark')" />
                             <el-option
                                 value="sms"
                                 v-if="!globalStore.isIntl"
