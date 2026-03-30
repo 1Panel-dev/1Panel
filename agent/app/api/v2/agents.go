@@ -92,6 +92,26 @@ func (b *BaseApi) ResetAgentToken(c *gin.Context) {
 }
 
 // @Tags AI
+// @Summary Update Agent remark
+// @Accept json
+// @Param request body dto.AgentRemarkUpdateReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/remark [post]
+func (b *BaseApi) UpdateAgentRemark(c *gin.Context) {
+	var req dto.AgentRemarkUpdateReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := agentService.UpdateRemark(req); err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags AI
 // @Summary Update Agent model config
 // @Accept json
 // @Param request body dto.AgentModelConfigUpdateReq true "request"
