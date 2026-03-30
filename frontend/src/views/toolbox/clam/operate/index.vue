@@ -154,6 +154,7 @@
                                 cleanable
                             >
                                 <el-option value="mail" :label="$t('xpack.alert.mail')" />
+                                <el-option v-if="!isProductPro" value="bark" :label="$t('xpack.alert.bark')" />
                                 <el-option
                                     value="weCom"
                                     v-if="!globalStore.isIntl"
@@ -172,6 +173,7 @@
                                     :disabled="!dialogData.rowData!.hasAlert || !isProductPro"
                                     :label="$t('xpack.alert.feiShu')"
                                 />
+                                <el-option v-if="isProductPro" value="bark" :label="$t('xpack.alert.bark')" />
                                 <el-option
                                     value="sms"
                                     v-if="!globalStore.isIntl"
