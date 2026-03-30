@@ -5,7 +5,7 @@
                 <el-select v-model="ssl.type">
                     <el-option :label="$t('website.pasteSSL')" :value="'paste'"></el-option>
                     <el-option :label="$t('website.localSSL')" :value="'local'"></el-option>
-                    <el-option :label="joinLabel('commons.button.upload', 'menu.files')" :value="'upload'"></el-option>
+                    <el-option :label="$t('commons.button.upload') + $t('menu.files')" :value="'upload'"></el-option>
                 </el-select>
             </el-form-item>
             <div v-if="ssl.type === 'paste'">
@@ -102,11 +102,6 @@ const privateKeyFileList = ref([]);
 const certificateFileList = ref([]);
 const privateKeyUpload = ref();
 const certificateUpload = ref();
-const joinLabel = (...keys: string[]) => {
-    const locale = i18n.global.locale.value.toString();
-    const separator = locale.startsWith('zh') || locale.startsWith('ja') ? '' : ' ';
-    return keys.map((key) => i18n.global.t(key)).join(separator);
-};
 
 const rules = ref({
     privateKey: [Rules.requiredInput],

@@ -1,7 +1,7 @@
 <template>
     <DialogPro
         v-model="open"
-        :title="joinLabel('commons.button.' + operate, 'php.extensions')"
+        :title="$t('commons.button.' + operate) + $t('php.extensions')"
         size="small"
         @close="handleClose"
     >
@@ -58,11 +58,6 @@ const open = ref(false);
 const operate = ref('create');
 const loading = ref(false);
 const updateID = ref(0);
-const joinLabel = (...keys: string[]) => {
-    const locale = i18n.global.locale.value.toString();
-    const separator = locale.startsWith('zh') || locale.startsWith('ja') ? '' : ' ';
-    return keys.map((key) => i18n.global.t(key)).join(separator);
-};
 const extensionsForm = ref<FormInstance>();
 const rules = ref({
     name: [Rules.requiredInput, Rules.name],
