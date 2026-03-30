@@ -88,6 +88,72 @@ type AgentOverview struct {
 	Snapshot AgentOverviewSnapshot `json:"snapshot"`
 }
 
+type AgentRoleBinding struct {
+	Channel   string `json:"channel" validate:"required"`
+	AccountID string `json:"accountId"`
+}
+
+type AgentRoleCreateReq struct {
+	AgentID  uint               `json:"agentId" validate:"required"`
+	Name     string             `json:"name" validate:"required"`
+	Model    string             `json:"model"`
+	Bindings []AgentRoleBinding `json:"bindings"`
+}
+
+type AgentRoleCreateResp struct {
+	Output string `json:"output"`
+}
+
+type AgentRoleDeleteReq struct {
+	AgentID uint   `json:"agentId" validate:"required"`
+	ID      string `json:"id" validate:"required"`
+}
+
+type AgentConfiguredAgentsReq struct {
+	AgentID uint `json:"agentId" validate:"required"`
+}
+
+type AgentRoleChannelsReq struct {
+	AgentID uint `json:"agentId" validate:"required"`
+}
+
+type AgentRoleChannelItem struct {
+	Name       string   `json:"name"`
+	Bound      bool     `json:"bound"`
+	AccountIDs []string `json:"accountIds"`
+}
+
+type AgentRoleMarkdownFilesReq struct {
+	AgentID   uint   `json:"agentId" validate:"required"`
+	Workspace string `json:"workspace" validate:"required"`
+}
+
+type AgentConfiguredAgentItem struct {
+	ID        string             `json:"id"`
+	Name      string             `json:"name"`
+	Workspace string             `json:"workspace"`
+	Model     string             `json:"model"`
+	AgentDir  string             `json:"agentDir"`
+	Bindings  []AgentRoleBinding `json:"bindings"`
+}
+
+type AgentRoleMarkdownFileItem struct {
+	Name    string `json:"name"`
+	Content string `json:"content"`
+}
+
+type AgentRoleMarkdownFileUpdateItem struct {
+	Name    string `json:"name" validate:"required,oneof=AGENTS.md SOUL.md USER.md IDENTITY.md TOOLS.md HEARTBEAT.md BOOT.md BOOTSTRAP.md"`
+	Content string `json:"content"`
+}
+
+type AgentRoleMarkdownFilesUpdateReq struct {
+	AgentID   uint                              `json:"agentId" validate:"required"`
+	Workspace string                            `json:"workspace" validate:"required"`
+	Restart   bool                              `json:"restart"`
+	Files     []AgentRoleMarkdownFileUpdateItem `json:"files" validate:"required"`
+}
+
 type AgentOverviewSnapshot struct {
 	ContainerStatus string `json:"containerStatus"`
 	AppVersion      string `json:"appVersion"`

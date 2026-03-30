@@ -724,6 +724,42 @@ const message = {
             skillsGroupWorkspace: 'Workspace',
             switchModelSuccess: 'Model switched successfully',
             channelsTab: 'Channels',
+            agentRoleTab: 'Agents',
+            agentRoleUnsupported: 'Role management is currently supported only for OpenClaw.',
+            workspace: 'Workspace Directory',
+            agentDir: 'Agent Directory',
+            roleMarkdownDescriptions: {
+                'AGENTS.md': [
+                    'Operating instructions for the agent and how it should use memory.',
+                    'Loaded at the start of every session.',
+                    'Good place for rules, priorities, and "how to behave" details.',
+                ],
+                'SOUL.md': ['Persona, tone, and boundaries.', 'Loaded every session.'],
+                'USER.md': ['Who the user is and how to address them.', 'Loaded every session.'],
+                'IDENTITY.md': [
+                    "The agent's name, vibe, and emoji.",
+                    'Created or updated during the bootstrap ritual.',
+                ],
+                'TOOLS.md': [
+                    'Notes about your local tools and conventions.',
+                    'Does not control tool availability; it is only guidance.',
+                ],
+                'HEARTBEAT.md': ['Optional tiny checklist for heartbeat runs.', 'Keep it short to avoid token burn.'],
+                'BOOT.md': [
+                    'Optional startup checklist executed on gateway restart when internal hooks are enabled.',
+                    'Keep it short; use the message tool for outbound sends.',
+                ],
+                'BOOTSTRAP.md': [
+                    'One-time first-run ritual.',
+                    'Only created for a brand-new workspace.',
+                    'Delete it after the ritual is complete.',
+                ],
+            },
+            bindings: 'Bindings',
+            accountIdOptional: 'Account ID (Optional)',
+            saveAllMd: 'Save All',
+            roleMarkdownRestartHelper:
+                'Saving all current markdown files requires a container restart to take effect. Choose whether to restart now or later.',
             configFileRestartHelper:
                 'Saving the config file requires immediately restarting the container to take effect.',
             overviewSnapshot: 'Snapshot',
