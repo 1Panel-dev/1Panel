@@ -85,6 +85,11 @@ func (b *BaseApi) MFALogin(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
+	ip := common.GetRealClientIP(c)
+	if global.IPTracker.NeedCaptcha(ip) {
+		helper.BadAuth(c, "ErrMFA", nil)
+		return
+	}
 
 	entranceItem := c.Request.Header.Get("EntranceCode")
 	var entrance []byte
@@ -95,13 +100,16 @@ func (b *BaseApi) MFALogin(c *gin.Context) {
 	user, msgKey, err := authService.MFALogin(c, req, string(entrance))
 	go saveLoginLogs(c, wrapLoginErr(msgKey, err))
 	if msgKey == "ErrAuth" || msgKey == "ErrMFA" {
+		global.IPTracker.SetNeedCaptcha(ip)
 		helper.BadAuth(c, msgKey, err)
 		return
 	}
 	if err != nil {
+		global.IPTracker.SetNeedCaptcha(ip)
 		helper.InternalServer(c, err)
 		return
 	}
+	global.IPTracker.Clear(ip)
 	helper.SuccessWithData(c, user)
 }
 
