@@ -80,7 +80,10 @@ func checkSession(c *gin.Context) bool {
 	if err != nil {
 		return false
 	}
-	_ = global.SESSION.Set(c, psession, ssl == constant.StatusEnable, lifeTime)
+	if _, err := global.SESSION.RefreshIfNeeded(c, psession, ssl == constant.StatusEnable, lifeTime); err != nil {
+		global.LOG.Warnf("proxy refresh session failed, path=%s, err=%v", c.Request.URL.Path, err)
+		return false
+	}
 	return true
 }
 

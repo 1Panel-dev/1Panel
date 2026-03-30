@@ -17,6 +17,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/buserr"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
+	"github.com/1Panel-dev/1Panel/core/init/session/psession"
 	"github.com/1Panel-dev/1Panel/core/utils/encrypt"
 	"github.com/1Panel-dev/1Panel/core/utils/mfa"
 	"github.com/1Panel-dev/1Panel/core/utils/passkey"
@@ -143,15 +144,8 @@ func (u *AuthService) generateSession(c *gin.Context, name string) (*dto.UserLog
 		return nil, err
 	}
 
-	sessionUser, err := global.SESSION.Get(c)
-	if err != nil {
-		err := global.SESSION.Set(c, sessionUser, httpsSetting.Value == constant.StatusEnable, lifeTime)
-		if err != nil {
-			return nil, err
-		}
-		return &dto.UserLoginInfo{Name: name}, nil
-	}
-	if err := global.SESSION.Set(c, sessionUser, httpsSetting.Value == constant.StatusEnable, lifeTime); err != nil {
+	sessionUser := psession.SessionUser{Name: name}
+	if err := global.SESSION.SetFresh(c, sessionUser, httpsSetting.Value == constant.StatusEnable, lifeTime); err != nil {
 		return nil, err
 	}
 
