@@ -55,7 +55,7 @@ ErrAgentApiKeyRequired: 'API key is required'
 ErrAgentComposeRequired: 'Compose content is required'
 ErrAgentIDRequired: 'Agent ID is required'
 ErrAgentAccountIDRequired: 'Account ID is required'
-ErrAgentLimitReached: 'Community Edition supports up to {{ .max }} AI agents. Upgrade to Professional Edition for unlimited agents'
+ErrAgentLimitReached: 'Community Edition supports up to {{ .max }} AI agents. Upgrade to Pro Edition for unlimited agents'
 
 #backup
 Localhost: 'Local'
