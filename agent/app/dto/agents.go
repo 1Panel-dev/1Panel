@@ -4,6 +4,7 @@ import "time"
 
 type AgentCreateReq struct {
 	Name           string   `json:"name" validate:"required"`
+	Remark         string   `json:"remark"`
 	AppVersion     string   `json:"appVersion" validate:"required"`
 	WebUIPort      int      `json:"webUIPort" validate:"required"`
 	BridgePort     int      `json:"bridgePort"`
@@ -29,6 +30,7 @@ type AgentCreateReq struct {
 type AgentItem struct {
 	ID            uint      `json:"id"`
 	Name          string    `json:"name"`
+	Remark        string    `json:"remark"`
 	AgentType     string    `json:"agentType"`
 	Provider      string    `json:"provider"`
 	ProviderName  string    `json:"providerName"`
@@ -61,6 +63,11 @@ type AgentDeleteReq struct {
 
 type AgentTokenResetReq struct {
 	ID uint `json:"id" validate:"required"`
+}
+
+type AgentRemarkUpdateReq struct {
+	ID     uint   `json:"id" validate:"required"`
+	Remark string `json:"remark"`
 }
 
 type AgentModelConfigUpdateReq struct {

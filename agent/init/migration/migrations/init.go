@@ -1151,3 +1151,10 @@ WHERE version = ?
 		).Error
 	},
 }
+
+var AddAgentRemarkColumn = &gormigrate.Migration{
+	ID: "20260330-add-agent-remark-column",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(&model.Agent{})
+	},
+}

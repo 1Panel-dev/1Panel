@@ -5,6 +5,9 @@
                 <el-form-item :label="$t('commons.table.name')" prop="name">
                     <el-input v-model="form.name" />
                 </el-form-item>
+                <el-form-item :label="$t('website.remark')" prop="remark">
+                    <el-input v-model="form.remark" />
+                </el-form-item>
                 <el-form-item :label="`${$t('aiTools.agents.agent')}${$t('commons.table.type')}`" prop="agentType">
                     <el-select v-model="form.agentType" @change="handleAgentTypeChange">
                         <el-option :label="$t('aiTools.agents.openclawType')" value="openclaw" />
@@ -136,6 +139,7 @@ const { isIntl } = useGlobalStore();
 
 const form = reactive({
     name: '',
+    remark: '',
     agentType: 'openclaw' as 'openclaw' | 'copaw',
     appVersion: '',
     webUIPort: 18789,
@@ -382,6 +386,7 @@ const submit = async () => {
     try {
         const res = await createAgent({
             name: form.name,
+            remark: form.remark,
             appVersion: form.appVersion,
             webUIPort: form.webUIPort,
             allowedOrigins: form.agentType === 'openclaw' ? parseAllowedOriginsInput(form.allowedOrigins) : undefined,
@@ -419,6 +424,7 @@ const submit = async () => {
 const handleClose = () => {
     formRef.value?.resetFields();
     form.token = '';
+    form.remark = '';
     form.allowedOrigins = '';
     form.dockerCompose = '';
     lastAutoAllowedOrigins.value = '';

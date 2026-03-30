@@ -340,6 +340,7 @@ func buildAgentItem(agent *model.Agent, appInstall *model.AppInstall, envMap map
 	item := dto.AgentItem{
 		ID:            agent.ID,
 		Name:          agent.Name,
+		Remark:        agent.Remark,
 		AgentType:     agentType,
 		Provider:      agent.Provider,
 		ProviderName:  providercatalog.DisplayName(agent.Provider),

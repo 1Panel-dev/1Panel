@@ -29,6 +29,7 @@ type IAgentService interface {
 	Page(req dto.SearchWithPage) (int64, []dto.AgentItem, error)
 	Delete(req dto.AgentDeleteReq) error
 	ResetToken(req dto.AgentTokenResetReq) error
+	UpdateRemark(req dto.AgentRemarkUpdateReq) error
 	UpdateModelConfig(req dto.AgentModelConfigUpdateReq) error
 	GetOverview(req dto.AgentOverviewReq) (*dto.AgentOverview, error)
 	GetProviders() ([]dto.ProviderInfo, error)
@@ -234,6 +235,7 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 	}
 	agent := &model.Agent{
 		Name:          req.Name,
+		Remark:        req.Remark,
 		AgentType:     agentType,
 		Provider:      provider,
 		Model:         storedModel,
@@ -320,6 +322,15 @@ func (a AgentService) ResetToken(req dto.AgentTokenResetReq) error {
 		return err
 	}
 	agent.Token = newToken
+	return agentRepo.Save(agent)
+}
+
+func (a AgentService) UpdateRemark(req dto.AgentRemarkUpdateReq) error {
+	agent, err := agentRepo.GetFirst(repo.WithByID(req.ID))
+	if err != nil {
+		return err
+	}
+	agent.Remark = req.Remark
 	return agentRepo.Save(agent)
 }
 

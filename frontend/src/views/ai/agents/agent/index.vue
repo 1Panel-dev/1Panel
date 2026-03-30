@@ -101,6 +101,18 @@
                             </el-button>
                         </template>
                     </el-table-column>
+                    <el-table-column :label="$t('website.remark')" prop="remark" min-width="150">
+                        <template #default="{ row }">
+                            <fu-read-write-switch>
+                                <template #read>
+                                    <MsgInfo :info="row.remark" :width="'150'" />
+                                </template>
+                                <template #default="{ read }">
+                                    <el-input v-model="row.remark" @blur="handleUpdateRemark(row, read)" />
+                                </template>
+                            </fu-read-write-switch>
+                        </template>
+                    </el-table-column>
                     <el-table-column :label="$t('runtime.workDir')" min-width="90">
                         <template #default="{ row }">
                             <el-button type="primary" link @click="openWorkDir(row)">
@@ -153,7 +165,7 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { pageAgents, resetAgentToken } from '@/api/modules/ai';
+import { pageAgents, resetAgentToken, updateAgentRemark } from '@/api/modules/ai';
 import { installedOp, searchApp, searchAppInstalled } from '@/api/modules/app';
 import { AI } from '@/api/interface/ai';
 import { App } from '@/api/interface/app';
@@ -395,6 +407,12 @@ const onResetToken = async (row: AI.AgentItem) => {
     await resetAgentToken({ id: row.id });
     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
     await search();
+};
+
+const handleUpdateRemark = async (row: AI.AgentItem, read: Function) => {
+    read();
+    await updateAgentRemark({ id: row.id, remark: row.remark });
+    MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
 };
 
 const openConfig = (row: AI.AgentItem) => {

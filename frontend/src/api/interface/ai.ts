@@ -238,6 +238,7 @@ export namespace AI {
 
     export interface AgentCreateReq {
         name: string;
+        remark: string;
         appVersion: string;
         webUIPort: number;
         bridgePort?: number;
@@ -263,6 +264,7 @@ export namespace AI {
     export interface AgentItem {
         id: number;
         name: string;
+        remark: string;
         agentType: 'openclaw' | 'copaw';
         provider: string;
         providerName: string;
@@ -295,6 +297,11 @@ export namespace AI {
 
     export interface AgentTokenResetReq {
         id: number;
+    }
+
+    export interface AgentRemarkUpdateReq {
+        id: number;
+        remark: string;
     }
 
     export interface AgentModelConfigUpdateReq {
