@@ -497,21 +497,28 @@ export namespace AI {
         agentId: number;
     }
 
-    export interface AgentFeishuConfig {
+    export interface AgentChannelBotBase {
+        accountId: string;
+        name: string;
         enabled: boolean;
-        dmPolicy: string;
-        botName: string;
+        isDefault: boolean;
+    }
+
+    export interface AgentFeishuBot extends AgentChannelBotBase {
         appId: string;
         appSecret: string;
+    }
+
+    export interface AgentFeishuConfig {
+        enabled: boolean;
+        bots: AgentFeishuBot[];
+        installed: boolean;
     }
 
     export interface AgentFeishuConfigUpdateReq {
         agentId: number;
         enabled: boolean;
-        dmPolicy: string;
-        botName: string;
-        appId: string;
-        appSecret: string;
+        bots: AgentFeishuBot[];
     }
 
     export interface AgentFeishuPairingApproveReq {
@@ -526,22 +533,29 @@ export namespace AI {
     export interface AgentTelegramConfig {
         enabled: boolean;
         dmPolicy: string;
-        botToken: string;
         proxy: string;
+        defaultAccount: string;
+        bots: AgentTelegramBot[];
     }
 
     export interface AgentTelegramConfigUpdateReq {
         agentId: number;
         enabled: boolean;
         dmPolicy: string;
-        botToken: string;
         proxy: string;
+        defaultAccount: string;
+        bots: AgentTelegramBot[];
     }
 
     export interface AgentChannelPairingApproveReq {
         agentId: number;
-        type: 'feishu' | 'telegram' | 'discord' | 'wecom' | 'dingtalk-connector';
+        type: 'feishu' | 'telegram' | 'discord' | 'wecom';
         pairingCode: string;
+        accountId?: string;
+    }
+
+    export interface AgentTelegramBot extends AgentChannelBotBase {
+        botToken: string;
     }
 
     export interface AgentWecomConfigReq {
@@ -570,24 +584,22 @@ export namespace AI {
 
     export interface AgentDingTalkConfig {
         enabled: boolean;
-        clientId: string;
-        clientSecret: string;
-        dmPolicy: 'pairing' | 'allowlist' | 'open' | 'disabled';
+        dmPolicy: 'allowlist' | 'open' | 'disabled';
         allowFrom: string[];
         groupPolicy: 'open' | 'allowlist' | 'disabled';
         groupAllowFrom: string[];
+        bots: AgentDingTalkBot[];
         installed: boolean;
     }
 
     export interface AgentDingTalkConfigUpdateReq {
         agentId: number;
         enabled: boolean;
-        clientId: string;
-        clientSecret: string;
-        dmPolicy: 'pairing' | 'allowlist' | 'open' | 'disabled';
+        dmPolicy: 'allowlist' | 'open' | 'disabled';
         allowFrom: string[];
         groupPolicy: 'open' | 'allowlist' | 'disabled';
         groupAllowFrom: string[];
+        bots: AgentDingTalkBot[];
     }
 
     export interface AgentWeixinLoginReq {
@@ -601,27 +613,25 @@ export namespace AI {
 
     export interface AgentQQBotConfig {
         enabled: boolean;
-        appId: string;
-        clientSecret: string;
+        bots: AgentQQBotBot[];
         installed: boolean;
     }
 
     export interface AgentQQBotConfigUpdateReq {
         agentId: number;
         enabled: boolean;
-        appId: string;
-        clientSecret: string;
+        bots: AgentQQBotBot[];
     }
 
     export interface AgentPluginInstallReq {
         agentId: number;
-        type: 'qqbot' | 'wecom' | 'dingtalk' | 'weixin';
+        type: 'feishu' | 'qqbot' | 'wecom' | 'dingtalk' | 'weixin';
         taskID: string;
     }
 
     export interface AgentPluginCheckReq {
         agentId: number;
-        type: 'qqbot' | 'wecom' | 'dingtalk' | 'weixin';
+        type: 'feishu' | 'qqbot' | 'wecom' | 'dingtalk' | 'weixin';
     }
 
     export interface AgentPluginStatus {
@@ -636,8 +646,9 @@ export namespace AI {
         enabled: boolean;
         dmPolicy: string;
         groupPolicy: string;
-        token: string;
         proxy: string;
+        defaultAccount: string;
+        bots: AgentDiscordBot[];
     }
 
     export interface AgentDiscordConfigUpdateReq {
@@ -645,8 +656,23 @@ export namespace AI {
         enabled: boolean;
         dmPolicy: string;
         groupPolicy: string;
-        token: string;
         proxy: string;
+        defaultAccount: string;
+        bots: AgentDiscordBot[];
+    }
+
+    export interface AgentDiscordBot extends AgentChannelBotBase {
+        token: string;
+    }
+
+    export interface AgentQQBotBot extends AgentChannelBotBase {
+        appId: string;
+        clientSecret: string;
+    }
+
+    export interface AgentDingTalkBot extends AgentChannelBotBase {
+        clientId: string;
+        clientSecret: string;
     }
 
     export interface AgentSecurityConfigReq {

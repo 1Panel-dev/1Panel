@@ -1,5 +1,6 @@
 <template>
-    <el-form ref="formRef" :model="form" :rules="rules" label-position="top">
+    <el-form ref="formRef" v-loading="approving" :model="form" :rules="rules" label-position="top">
+        <PluginInstall :installed="installed" :installing="installing" @install="installPlugin" />
         <el-form-item :label="t('commons.table.status')">
             <el-switch v-model="form.enabled" />
         </el-form-item>
@@ -8,87 +9,96 @@
                 {{ t('container.mirrorsHelper2') }}
             </el-link>
         </el-form-item>
-        <el-form-item :label="t('aiTools.agents.dmPolicy')" prop="dmPolicy">
-            <el-select v-model="form.dmPolicy">
-                <el-option :label="t('aiTools.agents.pairingCode')" value="pairing" />
-                <el-option :label="t('aiTools.agents.policyOpen')" value="open" />
-            </el-select>
-        </el-form-item>
-        <el-form-item :label="t('aiTools.agents.botName')" prop="botName">
-            <el-input v-model="form.botName" />
-        </el-form-item>
-        <el-form-item :label="t('aiTools.agents.appId')" prop="appId">
-            <el-input v-model="form.appId" />
-        </el-form-item>
-        <el-form-item :label="t('aiTools.agents.appSecret')" prop="appSecret">
-            <el-input v-model="form.appSecret" type="password" show-password />
-        </el-form-item>
-        <el-form-item>
-            <el-button type="primary" :loading="saving" @click="saveChannel">
+        <ChannelBots
+            :bots="form.bots"
+            :fields="botFields"
+            :create-bot="createBot"
+            summary-label="App ID"
+            :summary-formatter="getBotSummary"
+            :add-disabled="!installed"
+            approvable
+            :fixed-account-ids="['default']"
+            :undeletable-account-ids="['default']"
+            @update:bots="updateBots"
+            @save="saveChannel"
+            @approve="approvePairing"
+        />
+        <el-form-item class="mt-4">
+            <el-button type="primary" :loading="saving" :disabled="!installed" @click="saveChannel">
                 {{ t('commons.button.save') }}
             </el-button>
         </el-form-item>
-
-        <el-divider />
-
-        <el-form-item :label="t('aiTools.agents.pairingCode')">
-            <el-input v-model="pairingCode" :placeholder="t('aiTools.agents.pairingCodePlaceholder')" />
-        </el-form-item>
-        <el-form-item>
-            <el-button type="primary" :loading="approving" @click="approvePairing">
-                {{ t('aiTools.agents.approvePairing') }}
-            </el-button>
-        </el-form-item>
     </el-form>
+    <TaskLog ref="taskLogRef" @close="checkPluginStatus" />
 </template>
 
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
 import type { FormInstance } from 'element-plus';
+import { ElMessageBox } from 'element-plus';
 import { useI18n } from 'vue-i18n';
 import { AI } from '@/api/interface/ai';
 import { approveAgentChannelPairing, getAgentFeishuConfig, updateAgentFeishuConfig } from '@/api/modules/ai';
 import { MsgSuccess, MsgWarning } from '@/utils/message';
-import { Rules } from '@/global/form-rules';
+import TaskLog from '@/components/log/task/index.vue';
+import PluginInstall from './components/plugin-install.vue';
+import { useAgentPluginChannel } from './useAgentPluginChannel';
+import ChannelBots from './components/channel-bots.vue';
 
 const { t } = useI18n();
 const saving = ref(false);
 const approving = ref(false);
-const agentId = ref(0);
-const pairingCode = ref('');
 const formRef = ref<FormInstance>();
+const { agentId, installed, installing, taskLogRef, checkPluginStatus, loadPlugin, installPlugin } =
+    useAgentPluginChannel('feishu');
 
 const form = reactive<AI.AgentFeishuConfig>({
     enabled: true,
-    dmPolicy: 'pairing',
-    botName: '',
+    bots: [],
+    installed: false,
+});
+
+const rules = reactive({});
+
+const botFields = [
+    { prop: 'appId', label: 'App ID', required: true },
+    { prop: 'appSecret', label: 'App Secret', type: 'password', required: true },
+];
+
+const createBot = (): AI.AgentFeishuBot => ({
+    accountId: '',
+    name: '',
+    enabled: true,
+    isDefault: false,
     appId: '',
     appSecret: '',
 });
 
-const rules = reactive({
-    dmPolicy: [Rules.requiredSelect],
-    botName: [Rules.requiredInput],
-    appId: [Rules.requiredInput],
-    appSecret: [Rules.requiredInput],
-});
+const getBotSummary = (bot: AI.AgentFeishuBot) => {
+    return bot.appId;
+};
+
+const updateBots = (bots: AI.AgentFeishuBot[]) => {
+    form.bots = bots;
+};
 
 const toFeishuDoc = () => {
-    window.open('https://openclaw.club/guides/feishu-platform', '_blank');
+    window.open('https://bytedance.larkoffice.com/docx/MFK7dDFLFoVlOGxWCv5cTXKmnMh', '_blank');
 };
 
 const load = async (id: number) => {
-    agentId.value = id;
-    pairingCode.value = '';
+    await loadPlugin(id);
     const res = await getAgentFeishuConfig({ agentId: id });
-    Object.assign(form, res.data || {});
-    if (!form.dmPolicy) {
-        form.dmPolicy = 'pairing';
-    }
+    form.enabled = res.data?.enabled ?? true;
+    form.bots = res.data?.bots || [];
 };
 
 const saveChannel = async () => {
     if (!agentId.value || !formRef.value) {
+        return;
+    }
+    if (form.bots.length === 0) {
+        MsgWarning(t('aiTools.agents.botRequired'));
         return;
     }
     await formRef.value.validate();
@@ -97,10 +107,7 @@ const saveChannel = async () => {
         await updateAgentFeishuConfig({
             agentId: agentId.value,
             enabled: form.enabled,
-            dmPolicy: form.dmPolicy || 'pairing',
-            botName: form.botName,
-            appId: form.appId,
-            appSecret: form.appSecret,
+            bots: form.bots,
         });
         MsgSuccess(t('aiTools.agents.saveSuccess'));
     } finally {
@@ -108,23 +115,30 @@ const saveChannel = async () => {
     }
 };
 
-const approvePairing = async () => {
+const approvePairing = async (bot: AI.AgentFeishuBot) => {
     if (!agentId.value) {
         return;
     }
-    if (!pairingCode.value) {
-        MsgWarning(t('aiTools.agents.pairingCodePlaceholder'));
-        return;
-    }
-    approving.value = true;
     try {
+        const res = await ElMessageBox.prompt(
+            t('aiTools.agents.pairingCodePlaceholder'),
+            t('aiTools.agents.pairingCode'),
+            {
+                confirmButtonText: t('commons.button.confirm'),
+                cancelButtonText: t('commons.button.cancel'),
+                inputPlaceholder: t('aiTools.agents.pairingCodePlaceholder'),
+            },
+        );
+        approving.value = true;
         await approveAgentChannelPairing({
             agentId: agentId.value,
             type: 'feishu',
-            pairingCode: pairingCode.value,
+            accountId: bot.accountId === 'default' ? '' : bot.accountId,
+            pairingCode: res.value,
         });
         MsgSuccess(t('aiTools.agents.pairingApproveSuccess'));
-        pairingCode.value = '';
+    } catch (error) {
+        return;
     } finally {
         approving.value = false;
     }
