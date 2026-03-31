@@ -325,8 +325,7 @@ const mfaLoginRef = ref();
 const mfaButtonFocused = ref();
 const pendingLoginMethod = ref<'password' | 'passkey'>('password');
 const mfaLoginForm = reactive({
-    name: '',
-    password: '',
+    sessionId: '',
     secret: '',
     code: '',
     authMethod: 'session',
@@ -434,6 +433,8 @@ const login = (formEl: FormInstance | undefined) => {
             const res = await loginApi(requestLoginForm);
             globalStore.ignoreCaptcha = true;
             if (res.data.mfaStatus === 'Enable') {
+                mfaLoginForm.sessionId = res.data.mfaSession || '';
+                mfaLoginForm.code = '';
                 mfaShow.value = true;
                 errMfaInfo.value = false;
                 nextTick(() => {
@@ -483,8 +484,6 @@ const mfaLogin = async (auto: boolean) => {
     if (isLoggingIn) return;
     if ((!auto && mfaLoginForm.code) || (auto && mfaLoginForm.code.length === 6)) {
         isLoggingIn = true;
-        mfaLoginForm.name = loginForm.name;
-        mfaLoginForm.password = encryptPassword(loginForm.password);
         try {
             await mfaLoginApi(mfaLoginForm);
             globalStore.setLogStatus(true);
