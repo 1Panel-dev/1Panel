@@ -22,6 +22,7 @@ ErrPasskeyLimit: "Passkey 数量已达上限（最多 5 个）"
 ErrPasskeySession: "Passkey 会话已过期或无效"
 ErrPasskeyDuplicate: "Passkey 已存在"
 ErrPasskeyVerify: "Passkey 验证失败"
+ErrLoginLocked: "失败次数过多，当前登录已被临时锁定 5 分钟。"
 
 #request
 ErrNoSuchHost: "无法找到请求的服务器 {{ .err }}"

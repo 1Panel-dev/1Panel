@@ -16,6 +16,7 @@ ErrApiConfigKeyInvalid: 'Geçersiz API anahtarı: {{ .detail }}'
 ErrApiConfigIPInvalid: 'IP izinli değil: {{ .detail }}'
 ErrApiConfigDisable: 'API erişimi kapalı: {{ .detail }}'
 ErrApiConfigKeyTimeInvalid: 'Zaman damgası hatalı: {{ .detail }}'
+ErrLoginLocked: "Çok fazla başarısız deneme yapıldı. Giriş 5 dakika boyunca geçici olarak kilitlendi."
 
 # request
 ErrNoSuchHost: "İstenen sunucu bulunamıyor {{ .err }}"

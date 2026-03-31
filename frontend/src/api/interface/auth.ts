@@ -7,8 +7,7 @@ export namespace Login {
         authMethod: string;
     }
     export interface MFALoginForm {
-        name: string;
-        password: string;
+        sessionId: string;
         code: string;
         authMethod: string;
     }
@@ -16,6 +15,7 @@ export namespace Login {
         name: string;
         token: string;
         mfaStatus: string;
+        mfaSession: string;
     }
     export interface PasskeyBeginResponse {
         sessionId: string;
