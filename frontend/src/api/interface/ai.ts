@@ -629,13 +629,29 @@ export namespace AI {
         taskID: string;
     }
 
+    export interface AgentPluginUpgradeReq {
+        agentId: number;
+        type: 'feishu' | 'qqbot' | 'wecom' | 'dingtalk' | 'weixin';
+        taskID: string;
+    }
+
+    export interface AgentPluginUninstallReq {
+        agentId: number;
+        type: 'feishu' | 'qqbot' | 'wecom' | 'dingtalk' | 'weixin';
+        taskID: string;
+    }
+
     export interface AgentPluginCheckReq {
         agentId: number;
         type: 'feishu' | 'qqbot' | 'wecom' | 'dingtalk' | 'weixin';
+        checkLatest?: boolean;
     }
 
     export interface AgentPluginStatus {
         installed: boolean;
+        currentVersion: string;
+        latestVersion: string;
+        upgradable: boolean;
     }
 
     export interface AgentDiscordConfigReq {

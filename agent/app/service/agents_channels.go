@@ -1,7 +1,9 @@
 package service
 
 import (
+	"encoding/json"
 	"fmt"
+	"os"
 	"path"
 	"sort"
 	"strings"
@@ -13,7 +15,12 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
+	"github.com/1Panel-dev/1Panel/agent/utils/common"
 )
+
+type openclawPluginPackage struct {
+	Version string `json:"version"`
+}
 
 func (a AgentService) GetFeishuConfig(req dto.AgentFeishuConfigReq) (*dto.AgentFeishuConfig, error) {
 	_, install, conf, err := a.loadAgentConfig(req.AgentID)
@@ -21,7 +28,7 @@ func (a AgentService) GetFeishuConfig(req dto.AgentFeishuConfigReq) (*dto.AgentF
 		return nil, err
 	}
 	result := extractFeishuConfig(conf)
-	installed, _ := checkPluginInstalled(install.ContainerName, "feishu")
+	installed, _ := checkPluginInstalled(install.GetPath(), "feishu")
 	result.Installed = installed
 	return &result, nil
 }
@@ -89,7 +96,7 @@ func (a AgentService) GetQQBotConfig(req dto.AgentIDReq) (*dto.AgentQQBotConfig,
 		return nil, err
 	}
 	result := extractQQBotConfig(conf)
-	installed, _ := checkPluginInstalled(install.ContainerName, "qqbot")
+	installed, _ := checkPluginInstalled(install.GetPath(), "qqbot")
 	result.Installed = installed
 	return &result, nil
 }
@@ -110,7 +117,7 @@ func (a AgentService) GetWecomConfig(req dto.AgentIDReq) (*dto.AgentWecomConfig,
 		return nil, err
 	}
 	result := extractWecomConfig(conf)
-	installed, _ := checkPluginInstalled(install.ContainerName, "wecom")
+	installed, _ := checkPluginInstalled(install.GetPath(), "wecom")
 	result.Installed = installed
 	return &result, nil
 }
@@ -133,7 +140,7 @@ func (a AgentService) GetDingTalkConfig(req dto.AgentIDReq) (*dto.AgentDingTalkC
 		return nil, err
 	}
 	result := extractDingTalkConfig(conf)
-	installed, _ := checkPluginInstalled(install.ContainerName, "dingtalk")
+	installed, _ := checkPluginInstalled(install.GetPath(), "dingtalk")
 	result.Installed = installed
 	return &result, nil
 }
@@ -170,9 +177,10 @@ func (a AgentService) InstallPlugin(req dto.AgentPluginInstallReq) error {
 		if req.Type == "qqbot" {
 			legacyPluginPath := path.Join(openclawPluginBaseDir, "qqbot")
 			if err := mgr.RunBashCf("docker exec %s test -d %s", install.ContainerName, legacyPluginPath); err == nil {
-				if err := mgr.Run("docker", "exec", "-i", install.ContainerName, "sh", "-c", "printf 'yes\\n' | openclaw plugins uninstall qqbot"); err != nil {
+				if err := mgr.Run("docker", "exec", "-i", install.ContainerName, "sh", "-c", buildOpenclawPluginUninstallScript("qqbot")); err != nil {
 					return err
 				}
+				time.Sleep(2 * time.Second)
 			}
 		}
 		if err := mgr.Run("docker", "exec", install.ContainerName, "sh", "-c", buildOpenclawPluginInstallScript(spec, pluginID)); err != nil {
@@ -188,6 +196,76 @@ func (a AgentService) InstallPlugin(req dto.AgentPluginInstallReq) error {
 	go func() {
 		if err := installTask.Execute(); err != nil {
 			global.LOG.Errorf("install openclaw plugin failed: %v", err)
+		}
+	}()
+	return nil
+}
+
+func (a AgentService) UpgradePlugin(req dto.AgentPluginUpgradeReq) error {
+	agent, install, err := a.loadAgentAndInstall(req.AgentID)
+	if err != nil {
+		return err
+	}
+	spec, pluginID, err := resolvePluginMeta(req.Type)
+	if err != nil {
+		return err
+	}
+	upgradeTask, err := task.NewTaskWithOps(req.Type, task.TaskUpgrade, task.TaskScopeAI, req.TaskID, req.AgentID)
+	if err != nil {
+		return err
+	}
+	upgradeTask.AddSubTask("Upgrade OpenClaw plugin", func(t *task.Task) error {
+		mgr := cmd.NewCommandMgr(cmd.WithTask(*t), cmd.WithContext(t.TaskCtx), cmd.WithTimeout(10*time.Minute))
+		if err := mgr.Run("docker", "exec", "-i", install.ContainerName, "sh", "-c", buildOpenclawPluginUninstallScript(pluginID)); err != nil {
+			return err
+		}
+		time.Sleep(2 * time.Second)
+		if err := mgr.Run("docker", "exec", install.ContainerName, "sh", "-c", buildOpenclawPluginInstallScript(spec, pluginID)); err != nil {
+			return err
+		}
+		conf, err := readOpenclawConfig(agent.ConfigPath)
+		if err != nil {
+			return err
+		}
+		appendPluginAllow(conf, pluginID)
+		return writeOpenclawConfigRaw(agent.ConfigPath, conf)
+	}, nil)
+	go func() {
+		if err := upgradeTask.Execute(); err != nil {
+			global.LOG.Errorf("upgrade openclaw plugin failed: %v", err)
+		}
+	}()
+	return nil
+}
+
+func (a AgentService) UninstallPlugin(req dto.AgentPluginUninstallReq) error {
+	agent, install, err := a.loadAgentAndInstall(req.AgentID)
+	if err != nil {
+		return err
+	}
+	_, pluginID, err := resolvePluginMeta(req.Type)
+	if err != nil {
+		return err
+	}
+	uninstallTask, err := task.NewTaskWithOps(req.Type, task.TaskUninstall, task.TaskScopeAI, req.TaskID, req.AgentID)
+	if err != nil {
+		return err
+	}
+	uninstallTask.AddSubTask("Uninstall OpenClaw plugin", func(t *task.Task) error {
+		mgr := cmd.NewCommandMgr(cmd.WithTask(*t), cmd.WithContext(t.TaskCtx), cmd.WithTimeout(10*time.Minute))
+		if err := mgr.Run("docker", "exec", "-i", install.ContainerName, "sh", "-c", buildOpenclawPluginUninstallScript(pluginID)); err != nil {
+			return err
+		}
+		conf, err := readOpenclawConfig(agent.ConfigPath)
+		if err != nil {
+			return err
+		}
+		cleanupOpenclawPluginConfig(conf, req.Type)
+		return writeOpenclawConfigRaw(agent.ConfigPath, conf)
+	}, nil)
+	go func() {
+		if err := uninstallTask.Execute(); err != nil {
+			global.LOG.Errorf("uninstall openclaw plugin failed: %v", err)
 		}
 	}()
 	return nil
@@ -219,11 +297,33 @@ func (a AgentService) CheckPlugin(req dto.AgentPluginCheckReq) (*dto.AgentPlugin
 	if err != nil {
 		return nil, err
 	}
-	installed, err := checkPluginInstalled(install.ContainerName, req.Type)
+	installed, err := checkPluginInstalled(install.GetPath(), req.Type)
 	if err != nil {
 		return nil, err
 	}
-	return &dto.AgentPluginStatus{Installed: installed}, nil
+	status := &dto.AgentPluginStatus{Installed: installed}
+	if !installed {
+		return status, nil
+	}
+	currentVersion, err := loadOpenclawPluginCurrentVersion(install.GetPath(), req.Type)
+	if err != nil {
+		global.LOG.Errorf("load openclaw plugin current version failed: %v", err)
+		return status, nil
+	}
+	status.CurrentVersion = currentVersion
+	if !req.CheckLatest {
+		return status, nil
+	}
+	latestVersion, err := loadOpenclawPluginLatestVersion(install.ContainerName, req.Type)
+	if err != nil {
+		global.LOG.Errorf("load openclaw plugin latest version failed: %v", err)
+		return status, nil
+	}
+	status.LatestVersion = latestVersion
+	if currentVersion != "" && latestVersion != "" {
+		status.Upgradable = common.CompareVersion(latestVersion, currentVersion)
+	}
+	return status, nil
 }
 
 func (a AgentService) ApproveChannelPairing(req dto.AgentChannelPairingApproveReq) error {
@@ -717,6 +817,13 @@ func buildOpenclawPluginInstallScript(spec, pluginID string) string {
 	)
 }
 
+func buildOpenclawPluginUninstallScript(pluginID string) string {
+	return fmt.Sprintf(
+		"set +e; printf 'yes\\n' | openclaw plugins uninstall %s; code=$?; if [ \"$code\" -eq 137 ]; then exit 0; fi; exit \"$code\"",
+		pluginID,
+	)
+}
+
 func resolvePluginMeta(pluginType string) (string, string, error) {
 	switch pluginType {
 	case "qqbot":
@@ -734,20 +841,92 @@ func resolvePluginMeta(pluginType string) (string, string, error) {
 	}
 }
 
-func checkPluginInstalled(containerName, pluginType string) (bool, error) {
-	_, pluginDir, err := resolvePluginMeta(pluginType)
+func checkPluginInstalled(installPath, pluginType string) (bool, error) {
+	packagePath, err := resolveOpenclawPluginPackagePath(installPath, pluginType)
 	if err != nil {
 		return false, err
 	}
-	if strings.TrimSpace(containerName) == "" {
-		return false, buserr.New("ErrRecordNotFound")
-	}
-	pluginPath := path.Join(openclawPluginBaseDir, pluginDir)
-	mgr := cmd.NewCommandMgr(cmd.WithTimeout(20 * time.Second))
-	if err := mgr.RunBashCf("docker exec %s test -d %s", containerName, pluginPath); err != nil {
-		return false, nil
+	if _, err := os.Stat(packagePath); err != nil {
+		if os.IsNotExist(err) {
+			return false, nil
+		}
+		return false, err
 	}
 	return true, nil
+}
+
+func loadOpenclawPluginCurrentVersion(installPath, pluginType string) (string, error) {
+	packagePath, err := resolveOpenclawPluginPackagePath(installPath, pluginType)
+	if err != nil {
+		return "", err
+	}
+	content, err := os.ReadFile(packagePath)
+	if err != nil {
+		return "", err
+	}
+	var pkg openclawPluginPackage
+	if err := json.Unmarshal(content, &pkg); err != nil {
+		return "", err
+	}
+	return pkg.Version, nil
+}
+
+func loadOpenclawPluginLatestVersion(containerName, pluginType string) (string, error) {
+	spec, _, err := resolvePluginMeta(pluginType)
+	if err != nil {
+		return "", err
+	}
+	output, err := runDockerExecWithStdout(20*time.Second, containerName, "npm", "view", spec, "version", "--json")
+	if err != nil {
+		return "", err
+	}
+	var version string
+	if err := json.Unmarshal([]byte(strings.TrimSpace(output)), &version); err == nil {
+		return version, nil
+	}
+	return strings.Trim(strings.TrimSpace(output), `"`), nil
+}
+
+func resolveOpenclawPluginPackagePath(installPath, pluginType string) (string, error) {
+	_, pluginID, err := resolvePluginMeta(pluginType)
+	if err != nil {
+		return "", err
+	}
+	if installPath == "" {
+		return "", buserr.New("ErrRecordNotFound")
+	}
+	return path.Join(installPath, "data", "conf", "extensions", pluginID, "package.json"), nil
+}
+
+func cleanupOpenclawPluginConfig(conf map[string]interface{}, pluginType string) {
+	channels, _ := conf["channels"].(map[string]interface{})
+	plugins, _ := conf["plugins"].(map[string]interface{})
+	entries, _ := plugins["entries"].(map[string]interface{})
+
+	switch pluginType {
+	case "feishu":
+		delete(channels, "feishu")
+		delete(entries, "openclaw-lark")
+		delete(entries, "feishu")
+	case "qqbot":
+		delete(channels, "qqbot")
+		delete(entries, "openclaw-qqbot")
+		delete(entries, "qqbot")
+	case "wecom":
+		delete(channels, "wecom")
+		delete(entries, "wecom-openclaw-plugin")
+	case "dingtalk":
+		delete(channels, "dingtalk-connector")
+		delete(entries, "dingtalk-connector")
+		gateway := ensureChildMap(conf, "gateway")
+		httpMap := ensureChildMap(gateway, "http")
+		endpoints := ensureChildMap(httpMap, "endpoints")
+		chatCompletions := ensureChildMap(endpoints, "chatCompletions")
+		chatCompletions["enabled"] = false
+	case "weixin":
+		delete(channels, "weixin")
+		delete(entries, "openclaw-weixin")
+	}
 }
 
 func getChannelConfig(conf map[string]interface{}, channel string) map[string]interface{} {

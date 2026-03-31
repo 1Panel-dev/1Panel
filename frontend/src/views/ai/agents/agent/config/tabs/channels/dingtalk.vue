@@ -1,63 +1,81 @@
 <template>
     <VersionSupport v-if="!supported" :min-version="openclawMinSupportedVersion" />
-    <el-form v-else ref="formRef" :model="form" :rules="rules" label-position="top">
-        <PluginInstall :installed="installed" :installing="installing" @install="installPlugin" />
-        <el-form-item :label="t('commons.table.status')">
-            <el-switch v-model="form.enabled" />
-        </el-form-item>
-        <el-form-item :label="t('aiTools.agents.dmPolicy')" prop="dmPolicy">
-            <el-select v-model="form.dmPolicy">
-                <el-option :label="t('aiTools.agents.policyAllowlist')" value="allowlist" />
-                <el-option :label="t('aiTools.agents.policyOpen')" value="open" />
-                <el-option :label="t('aiTools.agents.policyDisabled')" value="disabled" />
-            </el-select>
-        </el-form-item>
-        <el-form-item v-if="form.dmPolicy === 'allowlist'" :label="t('aiTools.agents.allowFrom')" prop="allowFromText">
-            <el-input
-                v-model="form.allowFromText"
-                type="textarea"
-                :rows="3"
-                :placeholder="t('aiTools.agents.allowFromPlaceholder')"
-            />
-            <span class="input-help">{{ t('aiTools.agents.allowFromHelper') }}</span>
-        </el-form-item>
-        <el-form-item :label="t('aiTools.agents.groupPolicy')" prop="groupPolicy">
-            <el-select v-model="form.groupPolicy">
-                <el-option :label="t('aiTools.agents.policyOpen')" value="open" />
-                <el-option :label="t('aiTools.agents.policyAllowlist')" value="allowlist" />
-                <el-option :label="t('aiTools.agents.policyDisabled')" value="disabled" />
-            </el-select>
-        </el-form-item>
-        <el-form-item
-            v-if="form.groupPolicy === 'allowlist'"
-            :label="t('aiTools.agents.groupAllowFrom')"
-            prop="groupAllowFromText"
-        >
-            <el-input
-                v-model="form.groupAllowFromText"
-                type="textarea"
-                :rows="3"
-                :placeholder="t('aiTools.agents.groupAllowFromPlaceholder')"
-            />
-            <span class="input-help">{{ t('aiTools.agents.groupAllowFromHelper') }}</span>
-        </el-form-item>
-        <ChannelBots
-            :bots="form.bots"
-            :fields="botFields"
-            :create-bot="createBot"
-            summary-label="Client ID"
-            :summary-formatter="getBotSummary"
-            :add-disabled="!installed"
-            @update:bots="updateBots"
-            @save="saveChannel"
+    <el-form v-else ref="formRef" v-loading="loading" :model="form" :rules="rules" label-position="top">
+        <PluginInstall
+            :installed="installed"
+            :installing="installing"
+            :upgrading="upgrading"
+            :uninstalling="uninstalling"
+            :current-version="currentVersion"
+            :latest-version="latestVersion"
+            :upgradable="upgradable"
+            :install-action="installPlugin"
+            :upgrade-action="upgradePlugin"
+            :uninstall-action="uninstallPlugin"
+            :on-task-close="reload"
         />
-        <el-form-item class="mt-4">
-            <el-button type="primary" :loading="saving" :disabled="!installed" @click="saveChannel">
-                {{ t('commons.button.save') }}
-            </el-button>
-        </el-form-item>
+        <template v-if="installed">
+            <el-form-item :label="t('commons.table.status')" class="mt-4">
+                <el-switch v-model="form.enabled" />
+            </el-form-item>
+            <el-form-item :label="t('aiTools.agents.dmPolicy')" prop="dmPolicy">
+                <el-select v-model="form.dmPolicy">
+                    <el-option :label="t('aiTools.agents.policyAllowlist')" value="allowlist" />
+                    <el-option :label="t('aiTools.agents.policyOpen')" value="open" />
+                    <el-option :label="t('aiTools.agents.policyDisabled')" value="disabled" />
+                </el-select>
+            </el-form-item>
+            <el-form-item
+                v-if="form.dmPolicy === 'allowlist'"
+                :label="t('aiTools.agents.allowFrom')"
+                prop="allowFromText"
+            >
+                <el-input
+                    v-model="form.allowFromText"
+                    type="textarea"
+                    :rows="3"
+                    :placeholder="t('aiTools.agents.allowFromPlaceholder')"
+                />
+                <span class="input-help">{{ t('aiTools.agents.allowFromHelper') }}</span>
+            </el-form-item>
+            <el-form-item :label="t('aiTools.agents.groupPolicy')" prop="groupPolicy">
+                <el-select v-model="form.groupPolicy">
+                    <el-option :label="t('aiTools.agents.policyOpen')" value="open" />
+                    <el-option :label="t('aiTools.agents.policyAllowlist')" value="allowlist" />
+                    <el-option :label="t('aiTools.agents.policyDisabled')" value="disabled" />
+                </el-select>
+            </el-form-item>
+            <el-form-item
+                v-if="form.groupPolicy === 'allowlist'"
+                :label="t('aiTools.agents.groupAllowFrom')"
+                prop="groupAllowFromText"
+            >
+                <el-input
+                    v-model="form.groupAllowFromText"
+                    type="textarea"
+                    :rows="3"
+                    :placeholder="t('aiTools.agents.groupAllowFromPlaceholder')"
+                />
+                <span class="input-help">{{ t('aiTools.agents.groupAllowFromHelper') }}</span>
+            </el-form-item>
+            <ChannelBots
+                :bots="form.bots"
+                :fields="botFields"
+                :create-bot="createBot"
+                summary-label="Client ID"
+                :summary-formatter="getBotSummary"
+                :add-disabled="!installed"
+                :disabled="!installed"
+                @update:bots="updateBots"
+                @save="saveChannel"
+            />
+            <el-form-item class="mt-4">
+                <el-button type="primary" :loading="saving" :disabled="!installed" @click="saveChannel">
+                    {{ t('commons.button.save') }}
+                </el-button>
+            </el-form-item>
+        </template>
     </el-form>
-    <TaskLog ref="taskLogRef" @close="checkPluginStatus" />
 </template>
 
 <script setup lang="ts">
@@ -69,7 +87,6 @@ import { getAgentDingTalkConfig, updateAgentDingTalkConfig } from '@/api/modules
 import { MsgSuccess, MsgWarning } from '@/utils/message';
 import { Rules } from '@/global/form-rules';
 import { isOpenclawCurrentHTTPVersion } from '@/utils/agent';
-import TaskLog from '@/components/log/task/index.vue';
 import PluginInstall from './components/plugin-install.vue';
 import VersionSupport from '../components/version-support.vue';
 import { useAgentPluginChannel } from './useAgentPluginChannel';
@@ -79,6 +96,12 @@ interface DingTalkForm extends Omit<AI.AgentDingTalkConfig, 'installed' | 'allow
     allowFromText: string;
     groupAllowFromText: string;
 }
+type BotField = {
+    prop: string;
+    label: string;
+    type?: 'text' | 'password';
+    required?: boolean;
+};
 
 const openclawMinSupportedVersion = '2026.3.23';
 const props = defineProps<{
@@ -89,8 +112,20 @@ const { t } = useI18n();
 const saving = ref(false);
 const agentId = ref(0);
 const formRef = ref<FormInstance>();
-const { installed, installing, taskLogRef, checkPluginStatus, loadPlugin, installPlugin } =
-    useAgentPluginChannel('dingtalk');
+const {
+    installed,
+    loading,
+    installing,
+    upgrading,
+    uninstalling,
+    currentVersion,
+    latestVersion,
+    upgradable,
+    loadPlugin,
+    installPlugin,
+    upgradePlugin,
+    uninstallPlugin,
+} = useAgentPluginChannel('dingtalk');
 const supported = computed(() => isOpenclawCurrentHTTPVersion(props.appVersion));
 
 const form = reactive<DingTalkForm>({
@@ -144,7 +179,7 @@ const rules = reactive<FormRules>({
     groupAllowFromText: [{ validator: validateGroupAllowFrom, trigger: 'blur' }],
 });
 
-const botFields = [
+const botFields: BotField[] = [
     { prop: 'clientId', label: 'Client ID', required: true },
     { prop: 'clientSecret', label: 'Client Secret', type: 'password', required: true },
 ];
@@ -179,6 +214,13 @@ const load = async (id: number) => {
     form.bots = res.data?.bots || [];
     form.allowFromText = (res.data?.allowFrom || []).join('\n');
     form.groupAllowFromText = (res.data?.groupAllowFrom || []).join('\n');
+};
+
+const reload = async () => {
+    if (!agentId.value) {
+        return;
+    }
+    await load(agentId.value);
 };
 
 const saveChannel = async () => {

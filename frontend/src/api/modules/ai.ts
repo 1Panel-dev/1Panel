@@ -241,6 +241,14 @@ export const installAgentPlugin = (req: AI.AgentPluginInstallReq) => {
     return http.post(`/ai/agents/plugin/install`, req);
 };
 
+export const upgradeAgentPlugin = (req: AI.AgentPluginUpgradeReq) => {
+    return http.post(`/ai/agents/plugin/upgrade`, req);
+};
+
+export const uninstallAgentPlugin = (req: AI.AgentPluginUninstallReq) => {
+    return http.post(`/ai/agents/plugin/uninstall`, req);
+};
+
 export const checkAgentPlugin = (req: AI.AgentPluginCheckReq) => {
     return http.post<AI.AgentPluginStatus>(`/ai/agents/plugin/check`, req);
 };

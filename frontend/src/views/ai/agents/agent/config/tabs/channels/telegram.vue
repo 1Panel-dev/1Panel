@@ -44,6 +44,12 @@ import { Rules } from '@/global/form-rules';
 import ChannelBots from './components/channel-bots.vue';
 
 const { t } = useI18n();
+type BotField = {
+    prop: string;
+    label: string;
+    type?: 'text' | 'password';
+    required?: boolean;
+};
 const saving = ref(false);
 const approving = ref(false);
 const agentId = ref(0);
@@ -61,7 +67,7 @@ const rules = reactive({
     dmPolicy: [Rules.requiredSelect],
 });
 
-const botFields = [{ prop: 'botToken', label: 'Bot Token', type: 'password', required: true }];
+const botFields: BotField[] = [{ prop: 'botToken', label: 'Bot Token', type: 'password', required: true }];
 
 const createBot = (): AI.AgentTelegramBot => ({
     accountId: '',

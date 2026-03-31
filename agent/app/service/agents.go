@@ -76,6 +76,8 @@ type IAgentService interface {
 	GetQQBotConfig(req dto.AgentIDReq) (*dto.AgentQQBotConfig, error)
 	UpdateQQBotConfig(req dto.AgentQQBotConfigUpdateReq) error
 	InstallPlugin(req dto.AgentPluginInstallReq) error
+	UpgradePlugin(req dto.AgentPluginUpgradeReq) error
+	UninstallPlugin(req dto.AgentPluginUninstallReq) error
 	CheckPlugin(req dto.AgentPluginCheckReq) (*dto.AgentPluginStatus, error)
 	ApproveChannelPairing(req dto.AgentChannelPairingApproveReq) error
 }
@@ -771,7 +773,7 @@ func (a AgentService) UpdateConfigFile(req dto.AgentConfigFileUpdateReq) error {
 }
 
 func getOpenclawNPMRegistry(containerName string) (string, error) {
-	registry, err := cmd.RunDefaultWithStdoutBashCfAndTimeOut("docker exec %s npm get registry", 20*time.Second, containerName)
+	registry, err := runDockerExecWithStdout(20*time.Second, containerName, "npm", "get", "registry")
 	if err != nil {
 		return "", err
 	}

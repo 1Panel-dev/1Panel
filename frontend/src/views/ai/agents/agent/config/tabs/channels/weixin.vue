@@ -1,15 +1,29 @@
 <template>
     <VersionSupport v-if="!supported" :min-version="openclawMinSupportedVersion" />
-    <el-form v-else label-position="top">
-        <PluginInstall :installed="installed" :installing="installing" @install="installPlugin" />
-        <el-alert type="info" :closable="false" :title="t('aiTools.agents.scanConnectHelper')" />
-        <el-form-item class="mt-4">
-            <el-button type="primary" :loading="loggingIn" :disabled="!installed" @click="loginChannel">
-                {{ t('aiTools.agents.scanConnect') }}
-            </el-button>
-        </el-form-item>
+    <el-form v-else v-loading="loading" label-position="top">
+        <PluginInstall
+            :installed="installed"
+            :installing="installing"
+            :upgrading="upgrading"
+            :uninstalling="uninstalling"
+            :current-version="currentVersion"
+            :latest-version="latestVersion"
+            :upgradable="upgradable"
+            :install-action="installPlugin"
+            :upgrade-action="upgradePlugin"
+            :uninstall-action="uninstallPlugin"
+            :on-task-close="reload"
+        />
+        <template v-if="installed">
+            <el-form-item class="mt-4">
+                <el-button type="primary" :loading="loggingIn" :disabled="!installed" @click="loginChannel">
+                    {{ t('aiTools.agents.scanConnect') }}
+                </el-button>
+            </el-form-item>
+            <el-alert type="info" :closable="false" :title="t('aiTools.agents.scanConnectHelper')" />
+        </template>
     </el-form>
-    <TaskLog ref="taskLogRef" @close="reload" />
+    <TaskLog ref="loginTaskLogRef" @close="reload" />
 </template>
 
 <script setup lang="ts">
@@ -30,7 +44,22 @@ const props = defineProps<{
 
 const { t } = useI18n();
 const loggingIn = ref(false);
-const { agentId, installed, installing, taskLogRef, loadPlugin, installPlugin } = useAgentPluginChannel('weixin');
+const loginTaskLogRef = ref();
+const {
+    agentId,
+    loading,
+    installed,
+    installing,
+    upgrading,
+    uninstalling,
+    currentVersion,
+    latestVersion,
+    upgradable,
+    loadPlugin,
+    installPlugin,
+    upgradePlugin,
+    uninstallPlugin,
+} = useAgentPluginChannel('weixin');
 const supported = computed(() => isOpenclawCurrentHTTPVersion(props.appVersion));
 
 const load = async (id: number) => {
@@ -58,7 +87,7 @@ const loginChannel = async () => {
             agentId: agentId.value,
             taskID,
         });
-        taskLogRef.value?.openWithTaskID(taskID);
+        loginTaskLogRef.value?.openWithTaskID(taskID);
     } finally {
         loggingIn.value = false;
     }

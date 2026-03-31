@@ -77,6 +77,8 @@ func (a *AIToolsRouter) InitRouter(Router *gin.RouterGroup) {
 		aiToolsRouter.POST("/agents/channel/qqbot/get", baseApi.GetAgentQQBotConfig)
 		aiToolsRouter.POST("/agents/channel/qqbot/update", baseApi.UpdateAgentQQBotConfig)
 		aiToolsRouter.POST("/agents/plugin/install", baseApi.InstallAgentPlugin)
+		aiToolsRouter.POST("/agents/plugin/upgrade", baseApi.UpgradeAgentPlugin)
+		aiToolsRouter.POST("/agents/plugin/uninstall", baseApi.UninstallAgentPlugin)
 		aiToolsRouter.POST("/agents/plugin/check", baseApi.CheckAgentPlugin)
 		aiToolsRouter.POST("/agents/security/get", baseApi.GetAgentSecurityConfig)
 		aiToolsRouter.POST("/agents/security/update", baseApi.UpdateAgentSecurityConfig)

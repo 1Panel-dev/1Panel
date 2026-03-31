@@ -1,35 +1,49 @@
 <template>
-    <el-form ref="formRef" v-loading="approving" :model="form" :rules="rules" label-position="top">
-        <PluginInstall :installed="installed" :installing="installing" @install="installPlugin" />
-        <el-form-item :label="t('commons.table.status')">
-            <el-switch v-model="form.enabled" />
-        </el-form-item>
-        <el-form-item>
-            <el-link type="primary" icon="Position" @click="toFeishuDoc">
-                {{ t('container.mirrorsHelper2') }}
-            </el-link>
-        </el-form-item>
-        <ChannelBots
-            :bots="form.bots"
-            :fields="botFields"
-            :create-bot="createBot"
-            summary-label="App ID"
-            :summary-formatter="getBotSummary"
-            :add-disabled="!installed"
-            approvable
-            :fixed-account-ids="['default']"
-            :undeletable-account-ids="['default']"
-            @update:bots="updateBots"
-            @save="saveChannel"
-            @approve="approvePairing"
+    <el-form ref="formRef" v-loading="loading || approving" :model="form" :rules="rules" label-position="top">
+        <PluginInstall
+            :installed="installed"
+            :installing="installing"
+            :upgrading="upgrading"
+            :uninstalling="uninstalling"
+            :current-version="currentVersion"
+            :latest-version="latestVersion"
+            :upgradable="upgradable"
+            :install-action="installPlugin"
+            :upgrade-action="upgradePlugin"
+            :uninstall-action="uninstallPlugin"
+            :on-task-close="reload"
         />
-        <el-form-item class="mt-4">
-            <el-button type="primary" :loading="saving" :disabled="!installed" @click="saveChannel">
-                {{ t('commons.button.save') }}
-            </el-button>
-        </el-form-item>
+        <template v-if="installed">
+            <el-form-item :label="t('commons.table.status')" class="mt-4">
+                <el-switch v-model="form.enabled" />
+            </el-form-item>
+            <el-form-item>
+                <el-link type="primary" icon="Position" @click="toFeishuDoc">
+                    {{ t('container.mirrorsHelper2') }}
+                </el-link>
+            </el-form-item>
+            <ChannelBots
+                :bots="form.bots"
+                :fields="botFields"
+                :create-bot="createBot"
+                summary-label="App ID"
+                :summary-formatter="getBotSummary"
+                :add-disabled="!installed"
+                :disabled="!installed"
+                approvable
+                :fixed-account-ids="['default']"
+                :undeletable-account-ids="['default']"
+                @update:bots="updateBots"
+                @save="saveChannel"
+                @approve="approvePairing"
+            />
+            <el-form-item class="mt-4">
+                <el-button type="primary" :loading="saving" :disabled="!installed" @click="saveChannel">
+                    {{ t('commons.button.save') }}
+                </el-button>
+            </el-form-item>
+        </template>
     </el-form>
-    <TaskLog ref="taskLogRef" @close="checkPluginStatus" />
 </template>
 
 <script setup lang="ts">
@@ -40,17 +54,35 @@ import { useI18n } from 'vue-i18n';
 import { AI } from '@/api/interface/ai';
 import { approveAgentChannelPairing, getAgentFeishuConfig, updateAgentFeishuConfig } from '@/api/modules/ai';
 import { MsgSuccess, MsgWarning } from '@/utils/message';
-import TaskLog from '@/components/log/task/index.vue';
 import PluginInstall from './components/plugin-install.vue';
 import { useAgentPluginChannel } from './useAgentPluginChannel';
 import ChannelBots from './components/channel-bots.vue';
 
 const { t } = useI18n();
+type BotField = {
+    prop: string;
+    label: string;
+    type?: 'text' | 'password';
+    required?: boolean;
+};
 const saving = ref(false);
 const approving = ref(false);
 const formRef = ref<FormInstance>();
-const { agentId, installed, installing, taskLogRef, checkPluginStatus, loadPlugin, installPlugin } =
-    useAgentPluginChannel('feishu');
+const {
+    agentId,
+    loading,
+    installed,
+    installing,
+    upgrading,
+    uninstalling,
+    currentVersion,
+    latestVersion,
+    upgradable,
+    loadPlugin,
+    installPlugin,
+    upgradePlugin,
+    uninstallPlugin,
+} = useAgentPluginChannel('feishu');
 
 const form = reactive<AI.AgentFeishuConfig>({
     enabled: true,
@@ -60,7 +92,7 @@ const form = reactive<AI.AgentFeishuConfig>({
 
 const rules = reactive({});
 
-const botFields = [
+const botFields: BotField[] = [
     { prop: 'appId', label: 'App ID', required: true },
     { prop: 'appSecret', label: 'App Secret', type: 'password', required: true },
 ];
@@ -91,6 +123,13 @@ const load = async (id: number) => {
     const res = await getAgentFeishuConfig({ agentId: id });
     form.enabled = res.data?.enabled ?? true;
     form.bots = res.data?.bots || [];
+};
+
+const reload = async () => {
+    if (!agentId.value) {
+        return;
+    }
+    await load(agentId.value);
 };
 
 const saveChannel = async () => {
