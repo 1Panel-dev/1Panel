@@ -371,13 +371,29 @@ type AgentPluginInstallReq struct {
 	TaskID  string `json:"taskID" validate:"required"`
 }
 
-type AgentPluginCheckReq struct {
+type AgentPluginUpgradeReq struct {
 	AgentID uint   `json:"agentId" validate:"required"`
 	Type    string `json:"type" validate:"required,oneof=feishu qqbot wecom dingtalk weixin"`
+	TaskID  string `json:"taskID" validate:"required"`
+}
+
+type AgentPluginUninstallReq struct {
+	AgentID uint   `json:"agentId" validate:"required"`
+	Type    string `json:"type" validate:"required,oneof=feishu qqbot wecom dingtalk weixin"`
+	TaskID  string `json:"taskID" validate:"required"`
+}
+
+type AgentPluginCheckReq struct {
+	AgentID     uint   `json:"agentId" validate:"required"`
+	Type        string `json:"type" validate:"required,oneof=feishu qqbot wecom dingtalk weixin"`
+	CheckLatest bool   `json:"checkLatest"`
 }
 
 type AgentPluginStatus struct {
-	Installed bool `json:"installed"`
+	Installed      bool   `json:"installed"`
+	CurrentVersion string `json:"currentVersion"`
+	LatestVersion  string `json:"latestVersion"`
+	Upgradable     bool   `json:"upgradable"`
 }
 
 type AgentDiscordConfigUpdateReq struct {

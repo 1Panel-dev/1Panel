@@ -25,39 +25,46 @@
             </el-table-column>
             <el-table-column :label="t('commons.table.status')" width="120">
                 <template #default="{ row, $index }">
-                    <el-switch :model-value="row.enabled" @change="updateEnabled($index, $event)" />
+                    <el-switch
+                        :model-value="row.enabled"
+                        :disabled="disabled || isBotActionDisabled(row)"
+                        @change="updateEnabled($index, $event)"
+                    />
                 </template>
             </el-table-column>
-            <el-table-column :label="t('commons.table.operate')" width="260" fixed="right">
+            <el-table-column :label="t('commons.table.operate')" min-width="320" fixed="right">
                 <template #default="{ row, $index }">
-                    <el-button link type="primary" @click="openEdit(row, $index)">
-                        {{ t('commons.button.edit') }}
-                    </el-button>
-                    <el-button
-                        v-if="defaultable && !row.isDefault"
-                        link
-                        type="primary"
-                        @click="setDefault(row.accountId)"
-                    >
-                        {{ t('aiTools.agents.setDefaultBot') }}
-                    </el-button>
-                    <el-button
-                        v-if="approvable"
-                        link
-                        type="primary"
-                        :disabled="!row.enabled"
-                        @click="emit('approve', row)"
-                    >
-                        {{ t('aiTools.agents.approvePairing') }}
-                    </el-button>
-                    <el-button
-                        link
-                        type="primary"
-                        :disabled="undeletableAccountIds.includes(row.accountId)"
-                        @click="removeBot($index)"
-                    >
-                        {{ t('commons.button.delete') }}
-                    </el-button>
+                    <div class="channel-bots__actions">
+                        <el-button link type="primary" :disabled="disabled" @click="openEdit(row, $index)">
+                            {{ t('commons.button.edit') }}
+                        </el-button>
+                        <el-button
+                            v-if="defaultable && !row.isDefault"
+                            link
+                            type="primary"
+                            :disabled="disabled || isBotActionDisabled(row)"
+                            @click="setDefault(row.accountId)"
+                        >
+                            {{ t('aiTools.agents.setDefaultBot') }}
+                        </el-button>
+                        <el-button
+                            v-if="approvable"
+                            link
+                            type="primary"
+                            :disabled="disabled || !row.enabled || isBotActionDisabled(row)"
+                            @click="emit('approve', row)"
+                        >
+                            {{ t('aiTools.agents.approvePairing') }}
+                        </el-button>
+                        <el-button
+                            link
+                            type="primary"
+                            :disabled="disabled || undeletableAccountIds.includes(row.accountId)"
+                            @click="removeBot($index)"
+                        >
+                            {{ t('commons.button.delete') }}
+                        </el-button>
+                    </div>
                 </template>
             </el-table-column>
         </el-table>
@@ -65,13 +72,13 @@
         <el-dialog v-model="dialogVisible" width="520px" :title="dialogTitle" destroy-on-close>
             <el-form ref="formRef" :model="form" :rules="rules" label-position="top">
                 <el-form-item :label="t('commons.table.name')" prop="name">
-                    <el-input v-model="form.name" />
+                    <el-input v-model="form.name" :disabled="disabled" />
                 </el-form-item>
                 <el-form-item :label="t('aiTools.agents.accountId')" prop="accountId">
-                    <el-input v-model="form.accountId" :disabled="accountIdLocked" />
+                    <el-input v-model="form.accountId" :disabled="disabled || accountIdLocked" />
                 </el-form-item>
                 <el-form-item :label="t('commons.table.status')">
-                    <el-switch v-model="form.enabled" />
+                    <el-switch v-model="form.enabled" :disabled="disabled" />
                 </el-form-item>
                 <el-form-item v-for="field in fields" :key="field.prop" :label="field.label" :prop="field.prop">
                     <el-input
@@ -79,14 +86,17 @@
                         v-model="form[field.prop]"
                         type="password"
                         show-password
+                        :disabled="disabled"
                         :placeholder="field.placeholder"
                     />
-                    <el-input v-else v-model="form[field.prop]" :placeholder="field.placeholder" />
+                    <el-input v-else v-model="form[field.prop]" :disabled="disabled" :placeholder="field.placeholder" />
                 </el-form-item>
             </el-form>
             <template #footer>
                 <el-button @click="dialogVisible = false">{{ t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="saveBot">{{ t('commons.button.save') }}</el-button>
+                <el-button type="primary" :disabled="disabled" @click="saveBot">
+                    {{ t('commons.button.save') }}
+                </el-button>
             </template>
         </el-dialog>
     </div>
@@ -150,6 +160,10 @@ const props = defineProps({
         default: false,
     },
     addDisabled: {
+        type: Boolean,
+        default: false,
+    },
+    disabled: {
         type: Boolean,
         default: false,
     },
@@ -222,6 +236,10 @@ const emitBots = (bots: ChannelBotItem[]) => {
         nextBots[0].isDefault = true;
     }
     emit('update:bots', nextBots);
+};
+
+const isBotActionDisabled = (bot: ChannelBotItem) => {
+    return props.fields.some((field) => field.required && !bot[field.prop]);
 };
 
 const openCreate = () => {
@@ -305,5 +323,17 @@ const updateEnabled = (index: number, enabled: boolean | string | number) => {
     display: flex;
     align-items: center;
     gap: 8px;
+}
+
+.channel-bots__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 12px;
+
+    :deep(.el-button) {
+        margin-left: 0;
+        white-space: nowrap;
+    }
 }
 </style>

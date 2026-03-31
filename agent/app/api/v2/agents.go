@@ -743,6 +743,46 @@ func (b *BaseApi) InstallAgentPlugin(c *gin.Context) {
 }
 
 // @Tags AI
+// @Summary Upgrade Agent plugin
+// @Accept json
+// @Param request body dto.AgentPluginUpgradeReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/plugin/upgrade [post]
+func (b *BaseApi) UpgradeAgentPlugin(c *gin.Context) {
+	var req dto.AgentPluginUpgradeReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := agentService.UpgradePlugin(req); err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags AI
+// @Summary Uninstall Agent plugin
+// @Accept json
+// @Param request body dto.AgentPluginUninstallReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/plugin/uninstall [post]
+func (b *BaseApi) UninstallAgentPlugin(c *gin.Context) {
+	var req dto.AgentPluginUninstallReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := agentService.UninstallPlugin(req); err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags AI
 // @Summary Check Agent plugin installation status
 // @Accept json
 // @Param request body dto.AgentPluginCheckReq true "request"

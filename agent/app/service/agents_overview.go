@@ -10,7 +10,6 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/constant"
-	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 )
 
 const (
@@ -102,11 +101,7 @@ func countOpenclawConfiguredChannels(conf map[string]interface{}) int {
 }
 
 func loadOpenclawOverviewSkillStats(containerName string) (int, error) {
-	output, err := cmd.RunDefaultWithStdoutBashCfAndTimeOut(
-		"docker exec %s openclaw skills list --json 2>&1",
-		30*time.Second,
-		containerName,
-	)
+	output, err := runDockerExecWithStdout(30*time.Second, containerName, "sh", "-c", "openclaw skills list --json 2>&1")
 	if err != nil {
 		return 0, err
 	}
