@@ -62,13 +62,22 @@ func NewLocalClient(reqUrl, reqMethod string, body io.Reader, ctx *gin.Context) 
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("do request failed, err: %v", resp.Status)
-	}
 	bodyByte, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("read resp body from request failed, err: %v", err)
 	}
+
+	if resp.StatusCode != http.StatusOK {
+		var respJSON dto.Response
+		if err := json.Unmarshal(bodyByte, &respJSON); err == nil && respJSON.Message != "" {
+			return nil, fmt.Errorf("do request failed, status=%v, message=%s", resp.Status, respJSON.Message)
+		}
+		if msg := strings.TrimSpace(string(bodyByte)); msg != "" {
+			return nil, fmt.Errorf("do request failed, status=%v, body=%s", resp.Status, msg)
+		}
+		return nil, fmt.Errorf("do request failed, err: %v", resp.Status)
+	}
+
 	var respJson dto.Response
 	if err := json.Unmarshal(bodyByte, &respJson); err != nil {
 		return nil, fmt.Errorf("json umarshal resp data failed, err: %v", err)
