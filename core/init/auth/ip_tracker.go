@@ -6,12 +6,16 @@ import (
 )
 
 const (
-	MaxIPCount     = 100
-	ExpireDuration = 30 * time.Minute
+	MaxIPCount        = 100
+	ExpireDuration    = 30 * time.Minute
+	MaxFailedAttempts = 10
+	LockDuration      = 5 * time.Minute
 )
 
 type IPRecord struct {
 	NeedCaptcha bool
+	FailedCount int
+	LockedUntil time.Time
 	LastUpdate  time.Time
 }
 
@@ -45,6 +49,23 @@ func (t *IPTracker) NeedCaptcha(ip string) bool {
 	return record.NeedCaptcha
 }
 
+func (t *IPTracker) IsLocked(ip string) bool {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+
+	record, exists := t.records[ip]
+	if !exists {
+		return false
+	}
+
+	if time.Since(record.LastUpdate) > ExpireDuration {
+		t.removeIPUnsafe(ip)
+		return false
+	}
+
+	return time.Now().Before(record.LockedUntil)
+}
+
 func (t *IPTracker) SetNeedCaptcha(ip string) {
 	t.mu.Lock()
 	defer t.mu.Unlock()
@@ -65,6 +86,34 @@ func (t *IPTracker) SetNeedCaptcha(ip string) {
 
 	t.records[ip] = &IPRecord{
 		NeedCaptcha: true,
+		LastUpdate:  time.Now(),
+	}
+	t.ipOrder = append(t.ipOrder, ip)
+}
+
+func (t *IPTracker) RecordFailure(ip string) {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+
+	if record, exists := t.records[ip]; exists {
+		if time.Since(record.LastUpdate) > ExpireDuration {
+			t.removeIPUnsafe(ip)
+		} else {
+			record.FailedCount++
+			record.LastUpdate = time.Now()
+			if record.FailedCount >= MaxFailedAttempts {
+				record.LockedUntil = time.Now().Add(LockDuration)
+			}
+			return
+		}
+	}
+
+	if len(t.records) >= MaxIPCount {
+		t.removeOldestUnsafe()
+	}
+
+	t.records[ip] = &IPRecord{
+		FailedCount: 1,
 		LastUpdate:  time.Now(),
 	}
 	t.ipOrder = append(t.ipOrder, ip)

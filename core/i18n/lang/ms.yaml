@@ -16,6 +16,7 @@ ErrApiConfigKeyInvalid: 'Kunci API tidak sah: {{ .detail }}'
 ErrApiConfigIPInvalid: 'IP tidak dibenarkan: {{ .detail }}'
 ErrApiConfigDisable: 'API tidak dibenarkan: {{ .detail }}'
 ErrApiConfigKeyTimeInvalid: 'Cap masa tidak sah: {{ .detail }}'
+ErrLoginLocked: "Terlalu banyak percubaan gagal. Log masuk dikunci sementara selama 5 minit."
 
 # request
 ErrNoSuchHost: "Pelayan yang diminta tidak dapat ditemui {{ .err }}"

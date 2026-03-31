@@ -16,6 +16,7 @@ ErrApiConfigKeyInvalid: 'Неверный API-ключ: {{ .detail }}'
 ErrApiConfigIPInvalid: 'IP не в списке: {{ .detail }}'
 ErrApiConfigDisable: 'Доступ по API запрещён: {{ .detail }}'
 ErrApiConfigKeyTimeInvalid: 'Неверная метка времени: {{ .detail }}'
+ErrLoginLocked: "Слишком много неудачных попыток. Вход временно заблокирован на 5 минут."
 
 # request
 ErrNoSuchHost: "Не удалось найти запрашиваемый сервер {{ .err }}"

@@ -33,6 +33,10 @@ func (b *BaseApi) Login(c *gin.Context) {
 	}
 
 	ip := common.GetRealClientIP(c)
+	if global.IPTracker.IsLocked(ip) {
+		helper.BadAuth(c, "ErrLoginLocked", nil)
+		return
+	}
 	needCaptcha := global.IPTracker.NeedCaptcha(ip)
 	if needCaptcha {
 		if errMsg := captcha.VerifyCode(req.CaptchaID, req.Captcha); errMsg != "" {
@@ -59,17 +63,21 @@ func (b *BaseApi) Login(c *gin.Context) {
 	}
 	if msgKey == "ErrAuth" || msgKey == "ErrEntrance" {
 		if msgKey == "ErrAuth" {
+			global.IPTracker.RecordFailure(ip)
 			global.IPTracker.SetNeedCaptcha(ip)
 		}
 		helper.BadAuth(c, msgKey, err)
 		return
 	}
 	if err != nil {
+		global.IPTracker.RecordFailure(ip)
 		global.IPTracker.SetNeedCaptcha(ip)
 		helper.InternalServer(c, err)
 		return
 	}
-	global.IPTracker.Clear(ip)
+	if user == nil || user.MfaStatus != constant.StatusEnable {
+		global.IPTracker.Clear(ip)
+	}
 	helper.SuccessWithData(c, user)
 }
 
@@ -86,8 +94,8 @@ func (b *BaseApi) MFALogin(c *gin.Context) {
 		return
 	}
 	ip := common.GetRealClientIP(c)
-	if global.IPTracker.NeedCaptcha(ip) {
-		helper.BadAuth(c, "ErrMFA", nil)
+	if global.IPTracker.IsLocked(ip) {
+		helper.BadAuth(c, "ErrLoginLocked", nil)
 		return
 	}
 
@@ -100,12 +108,12 @@ func (b *BaseApi) MFALogin(c *gin.Context) {
 	user, msgKey, err := authService.MFALogin(c, req, string(entrance))
 	go saveLoginLogs(c, wrapLoginErr(msgKey, err))
 	if msgKey == "ErrAuth" || msgKey == "ErrMFA" {
-		global.IPTracker.SetNeedCaptcha(ip)
+		global.IPTracker.RecordFailure(ip)
 		helper.BadAuth(c, msgKey, err)
 		return
 	}
 	if err != nil {
-		global.IPTracker.SetNeedCaptcha(ip)
+		global.IPTracker.RecordFailure(ip)
 		helper.InternalServer(c, err)
 		return
 	}

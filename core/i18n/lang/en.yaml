@@ -22,6 +22,7 @@ ErrPasskeyLimit: "Passkey limit reached (max 5)"
 ErrPasskeySession: "Passkey session expired or invalid"
 ErrPasskeyDuplicate: "Passkey already exists"
 ErrPasskeyVerify: "Passkey verification failed"
+ErrLoginLocked: "Too many failed attempts. Login is temporarily locked for 5 minutes."
 
 # request
 ErrNoSuchHost: "Host resolution failed: {{ .err }}"

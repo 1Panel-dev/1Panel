@@ -499,7 +499,11 @@ const mfaLogin = async (auto: boolean) => {
             document.onkeydown = null;
         } catch (res) {
             if (res.code === 401) {
-                errMfaInfo.value = true;
+                if (res.message === 'ErrMFA') {
+                    errMfaInfo.value = true;
+                } else if (res.message) {
+                    MsgError(res.message);
+                }
                 isLoggingIn = false;
                 return;
             }

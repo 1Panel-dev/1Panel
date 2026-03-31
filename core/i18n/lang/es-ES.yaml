@@ -16,6 +16,7 @@ ErrApiConfigKeyInvalid: 'Clave API inválida: {{ .detail }}'
 ErrApiConfigIPInvalid: 'IP no permitida: {{ .detail }}'
 ErrApiConfigDisable: 'API no permitida: {{ .detail }}'
 ErrApiConfigKeyTimeInvalid: 'Timestamp inválido: {{ .detail }}'
+ErrLoginLocked: "Demasiados intentos fallidos. El inicio de sesión se ha bloqueado temporalmente durante 5 minutos."
 PushAppInstallTaskToNode: "Enviar tarea de instalación de aplicación al nodo [{{ .name }}]"
 TaskPush: "Enviar"
 AppInstallTask: "Tarea de instalación de aplicación"
