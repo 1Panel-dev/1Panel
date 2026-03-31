@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 	"path"
+	"sort"
 	"strings"
 	"time"
 
@@ -15,24 +16,24 @@ import (
 )
 
 func (a AgentService) GetFeishuConfig(req dto.AgentFeishuConfigReq) (*dto.AgentFeishuConfig, error) {
-	_, _, conf, err := a.loadAgentConfig(req.AgentID)
+	_, install, conf, err := a.loadAgentConfig(req.AgentID)
 	if err != nil {
 		return nil, err
 	}
 	result := extractFeishuConfig(conf)
+	installed, _ := checkPluginInstalled(install.ContainerName, "feishu")
+	result.Installed = installed
 	return &result, nil
 }
 
 func (a AgentService) UpdateFeishuConfig(req dto.AgentFeishuConfigUpdateReq) error {
 	return a.mutateAgentConfig(req.AgentID, func(_ *model.Agent, _ *model.AppInstall, conf map[string]interface{}) error {
-		setFeishuConfig(conf, dto.AgentFeishuConfig{
-			Enabled:   req.Enabled,
-			DmPolicy:  req.DmPolicy,
-			BotName:   req.BotName,
-			AppID:     req.AppID,
-			AppSecret: req.AppSecret,
-		})
-		setFeishuPluginEnabled(conf, req.Enabled)
+		config := dto.AgentFeishuConfig{
+			Enabled: req.Enabled,
+			Bots:    req.Bots,
+		}
+		setFeishuConfig(conf, config)
+		setFeishuPluginEnabled(conf, config.Enabled && hasEnabledFeishuBots(config.Bots))
 		return nil
 	})
 }
@@ -49,10 +50,11 @@ func (a AgentService) GetTelegramConfig(req dto.AgentTelegramConfigReq) (*dto.Ag
 func (a AgentService) UpdateTelegramConfig(req dto.AgentTelegramConfigUpdateReq) error {
 	return a.mutateAgentConfig(req.AgentID, func(_ *model.Agent, _ *model.AppInstall, conf map[string]interface{}) error {
 		setTelegramConfig(conf, dto.AgentTelegramConfig{
-			Enabled:  req.Enabled,
-			DmPolicy: req.DmPolicy,
-			BotToken: req.BotToken,
-			Proxy:    req.Proxy,
+			Enabled:        req.Enabled,
+			DmPolicy:       req.DmPolicy,
+			Proxy:          req.Proxy,
+			DefaultAccount: req.DefaultAccount,
+			Bots:           req.Bots,
 		})
 		return nil
 	})
@@ -70,11 +72,12 @@ func (a AgentService) GetDiscordConfig(req dto.AgentIDReq) (*dto.AgentDiscordCon
 func (a AgentService) UpdateDiscordConfig(req dto.AgentDiscordConfigUpdateReq) error {
 	return a.mutateAgentConfig(req.AgentID, func(_ *model.Agent, _ *model.AppInstall, conf map[string]interface{}) error {
 		setDiscordConfig(conf, dto.AgentDiscordConfig{
-			Enabled:     req.Enabled,
-			DmPolicy:    req.DmPolicy,
-			GroupPolicy: req.GroupPolicy,
-			Token:       req.Token,
-			Proxy:       req.Proxy,
+			Enabled:        req.Enabled,
+			DmPolicy:       req.DmPolicy,
+			GroupPolicy:    req.GroupPolicy,
+			Proxy:          req.Proxy,
+			DefaultAccount: req.DefaultAccount,
+			Bots:           req.Bots,
 		})
 		return nil
 	})
@@ -94,9 +97,8 @@ func (a AgentService) GetQQBotConfig(req dto.AgentIDReq) (*dto.AgentQQBotConfig,
 func (a AgentService) UpdateQQBotConfig(req dto.AgentQQBotConfigUpdateReq) error {
 	return a.mutateAgentConfig(req.AgentID, func(_ *model.Agent, _ *model.AppInstall, conf map[string]interface{}) error {
 		setQQBotConfig(conf, dto.AgentQQBotConfig{
-			Enabled:      req.Enabled,
-			AppID:        req.AppID,
-			ClientSecret: req.ClientSecret,
+			Enabled: req.Enabled,
+			Bots:    req.Bots,
 		})
 		return nil
 	})
@@ -140,12 +142,11 @@ func (a AgentService) UpdateDingTalkConfig(req dto.AgentDingTalkConfigUpdateReq)
 	return a.mutateAgentConfig(req.AgentID, func(_ *model.Agent, _ *model.AppInstall, conf map[string]interface{}) error {
 		setDingTalkConfig(conf, dto.AgentDingTalkConfig{
 			Enabled:        req.Enabled,
-			ClientID:       req.ClientID,
-			ClientSecret:   req.ClientSecret,
 			DmPolicy:       req.DmPolicy,
 			AllowFrom:      req.AllowFrom,
 			GroupPolicy:    req.GroupPolicy,
 			GroupAllowFrom: req.GroupAllowFrom,
+			Bots:           req.Bots,
 		})
 		return nil
 	})
@@ -230,192 +231,277 @@ func (a AgentService) ApproveChannelPairing(req dto.AgentChannelPairingApproveRe
 	if err != nil {
 		return err
 	}
-	if err := cmd.RunDefaultBashCf(
+	if req.AccountID != "" {
+		return cmd.RunDefaultBashCf(
+			"docker exec %s openclaw pairing approve %s %q --account %q",
+			install.ContainerName,
+			req.Type,
+			req.PairingCode,
+			req.AccountID,
+		)
+	}
+	return cmd.RunDefaultBashCf(
 		"docker exec %s openclaw pairing approve %s %q",
 		install.ContainerName,
 		req.Type,
-		strings.TrimSpace(req.PairingCode),
-	); err != nil {
-		return err
-	}
-	return nil
+		req.PairingCode,
+	)
 }
 
 func extractFeishuConfig(conf map[string]interface{}) dto.AgentFeishuConfig {
-	result := dto.AgentFeishuConfig{Enabled: true, DmPolicy: "pairing"}
-	channels, ok := conf["channels"].(map[string]interface{})
-	if !ok {
-		return result
-	}
-	feishu, ok := channels["feishu"].(map[string]interface{})
-	if !ok {
+	result := dto.AgentFeishuConfig{Enabled: true, Bots: []dto.AgentFeishuBot{defaultFeishuBot()}}
+	feishu := getChannelConfig(conf, "feishu")
+	if len(feishu) == 0 {
 		return result
 	}
 	if enabled, ok := feishu["enabled"].(bool); ok {
 		result.Enabled = enabled
 	}
-	if dmPolicy, ok := feishu["dmPolicy"].(string); ok && strings.TrimSpace(dmPolicy) != "" {
-		result.DmPolicy = dmPolicy
+	defaultBot := defaultFeishuBot()
+	defaultBot.Enabled = extractBoolValue(feishu["enabled"], true)
+	defaultBot.Name = extractDisplayName(feishu, extractStringValue(feishu["botName"]), "Default")
+	defaultBot.AppID = extractStringValue(feishu["appId"])
+	defaultBot.AppSecret = extractStringValue(feishu["appSecret"])
+	bots := []dto.AgentFeishuBot{defaultBot}
+	accounts := childMap(feishu, "accounts")
+	for _, accountID := range sortedChildKeys(accounts) {
+		account := childMap(accounts, accountID)
+		bots = append(bots, dto.AgentFeishuBot{
+			AgentChannelBotBase: dto.AgentChannelBotBase{
+				AccountID: accountID,
+				Name:      extractDisplayName(account, extractStringValue(account["botName"]), accountID),
+				Enabled:   extractBoolValue(account["enabled"], true),
+			},
+			AppID:     extractStringValue(account["appId"]),
+			AppSecret: extractStringValue(account["appSecret"]),
+		})
 	}
-	accounts, ok := feishu["accounts"].(map[string]interface{})
-	if !ok {
-		return result
-	}
-	main, ok := accounts["main"].(map[string]interface{})
-	if !ok {
-		return result
-	}
-	if appID, ok := main["appId"].(string); ok {
-		result.AppID = appID
-	}
-	if appSecret, ok := main["appSecret"].(string); ok {
-		result.AppSecret = appSecret
-	}
-	if botName, ok := main["botName"].(string); ok {
-		result.BotName = botName
-	}
+	result.Bots = bots
 	return result
 }
 
 func setFeishuConfig(conf map[string]interface{}, config dto.AgentFeishuConfig) {
 	channels := ensureChildMap(conf, "channels")
 	feishu := ensureChildMap(channels, "feishu")
-	feishu["enabled"] = config.Enabled
-	feishu["dmPolicy"] = config.DmPolicy
-
-	accounts := ensureChildMap(feishu, "accounts")
-	main := ensureChildMap(accounts, "main")
-	main["appId"] = config.AppID
-	main["appSecret"] = config.AppSecret
-	main["botName"] = config.BotName
-
-	if strings.EqualFold(config.DmPolicy, "open") {
-		feishu["allowFrom"] = []string{"*"}
+	defaultBot := getDefaultFeishuBot(config.Bots)
+	effectiveEnabled := config.Enabled && hasEnabledFeishuBots(config.Bots)
+	feishu["enabled"] = effectiveEnabled
+	feishu["appId"] = defaultBot.AppID
+	feishu["appSecret"] = defaultBot.AppSecret
+	feishu["botName"] = defaultBot.Name
+	accounts := make(map[string]interface{}, len(config.Bots))
+	for _, bot := range config.Bots {
+		if bot.AccountID == "default" || bot.IsDefault {
+			continue
+		}
+		accounts[bot.AccountID] = map[string]interface{}{
+			"enabled":   bot.Enabled,
+			"botName":   bot.Name,
+			"appId":     bot.AppID,
+			"appSecret": bot.AppSecret,
+		}
 	}
+	feishu["accounts"] = accounts
 }
 
 func setFeishuPluginEnabled(conf map[string]interface{}, enabled bool) {
 	plugins := ensureChildMap(conf, "plugins")
 	entries := ensureChildMap(plugins, "entries")
-	feishu := ensureChildMap(entries, "feishu")
-	feishu["enabled"] = enabled
+	lark := ensureChildMap(entries, "openclaw-lark")
+	lark["enabled"] = enabled
+	legacy := ensureChildMap(entries, "feishu")
+	legacy["enabled"] = false
 }
 
 func extractTelegramConfig(conf map[string]interface{}) dto.AgentTelegramConfig {
 	result := dto.AgentTelegramConfig{Enabled: true, DmPolicy: "pairing"}
-	channels, ok := conf["channels"].(map[string]interface{})
-	if !ok {
-		return result
-	}
-	telegram, ok := channels["telegram"].(map[string]interface{})
-	if !ok {
+	telegram := getChannelConfig(conf, "telegram")
+	if len(telegram) == 0 {
 		return result
 	}
 	if enabled, ok := telegram["enabled"].(bool); ok {
 		result.Enabled = enabled
 	}
-	if dmPolicy, ok := telegram["dmPolicy"].(string); ok && strings.TrimSpace(dmPolicy) != "" {
+	if dmPolicy := extractStringValue(telegram["dmPolicy"]); dmPolicy != "" {
 		result.DmPolicy = dmPolicy
 	}
-	if botToken, ok := telegram["botToken"].(string); ok {
-		result.BotToken = botToken
+	result.Proxy = extractStringValue(telegram["proxy"])
+	accounts := childMap(telegram, "accounts")
+	if len(accounts) == 0 {
+		botToken := extractStringValue(telegram["botToken"])
+		if botToken != "" {
+			accounts["default"] = map[string]interface{}{
+				"enabled":  extractBoolValue(telegram["enabled"], true),
+				"botToken": botToken,
+			}
+		}
 	}
-	if proxy, ok := telegram["proxy"].(string); ok {
-		result.Proxy = proxy
+	bots := make([]dto.AgentTelegramBot, 0, len(accounts))
+	for _, accountID := range sortedChildKeys(accounts) {
+		account := childMap(accounts, accountID)
+		bots = append(bots, dto.AgentTelegramBot{
+			AgentChannelBotBase: dto.AgentChannelBotBase{
+				AccountID: accountID,
+				Name:      extractDisplayName(account, accountID, accountID),
+				Enabled:   extractBoolValue(account["enabled"], true),
+			},
+			BotToken: extractStringValue(account["botToken"]),
+		})
 	}
+	result.DefaultAccount = normalizeDefaultAccount(extractStringValue(telegram["defaultAccount"]), getTelegramBotAccountIDs(bots))
+	setTelegramDefaultFlags(bots, result.DefaultAccount)
+	result.Bots = bots
 	return result
 }
 
 func setTelegramConfig(conf map[string]interface{}, config dto.AgentTelegramConfig) {
 	channels := ensureChildMap(conf, "channels")
-	telegram := map[string]interface{}{
-		"enabled":  config.Enabled,
-		"dmPolicy": config.DmPolicy,
-		"botToken": config.BotToken,
-	}
-	if strings.EqualFold(config.DmPolicy, "open") {
+	telegram := ensureChildMap(channels, "telegram")
+	defaultAccount := normalizeDefaultAccount(config.DefaultAccount, getTelegramBotAccountIDs(config.Bots))
+	effectiveEnabled := config.Enabled && hasEnabledTelegramBots(config.Bots)
+	telegram["enabled"] = effectiveEnabled
+	telegram["dmPolicy"] = config.DmPolicy
+	telegram["defaultAccount"] = defaultAccount
+	if config.DmPolicy == "open" {
 		telegram["allowFrom"] = []string{"*"}
+	} else {
+		delete(telegram, "allowFrom")
 	}
-	if strings.TrimSpace(config.Proxy) != "" {
-		telegram["proxy"] = strings.TrimSpace(config.Proxy)
+	if config.Proxy != "" {
+		telegram["proxy"] = config.Proxy
+	} else {
+		delete(telegram, "proxy")
 	}
-	channels["telegram"] = telegram
+	accounts := make(map[string]interface{}, len(config.Bots))
+	for _, bot := range config.Bots {
+		accounts[bot.AccountID] = map[string]interface{}{
+			"enabled":  bot.Enabled,
+			"name":     bot.Name,
+			"botToken": bot.BotToken,
+		}
+	}
+	telegram["accounts"] = accounts
+	delete(telegram, "botToken")
 }
 
 func extractDiscordConfig(conf map[string]interface{}) dto.AgentDiscordConfig {
 	result := dto.AgentDiscordConfig{Enabled: true, DmPolicy: "pairing", GroupPolicy: "open"}
-	channels, ok := conf["channels"].(map[string]interface{})
-	if !ok {
-		return result
-	}
-	discord, ok := channels["discord"].(map[string]interface{})
-	if !ok {
+	discord := getChannelConfig(conf, "discord")
+	if len(discord) == 0 {
 		return result
 	}
 	if enabled, ok := discord["enabled"].(bool); ok {
 		result.Enabled = enabled
 	}
-	if token, ok := discord["token"].(string); ok {
-		result.Token = token
-	}
-	if groupPolicy, ok := discord["groupPolicy"].(string); ok && strings.TrimSpace(groupPolicy) != "" {
-		result.GroupPolicy = groupPolicy
-	}
-	if proxy, ok := discord["proxy"].(string); ok {
-		result.Proxy = proxy
-	}
-	if policy, ok := discord["dmPolicy"].(string); ok && strings.TrimSpace(policy) != "" {
-		result.DmPolicy = policy
-		return result
-	}
-	dm, ok := discord["dm"].(map[string]interface{})
-	if ok {
-		if policy, ok := dm["policy"].(string); ok && strings.TrimSpace(policy) != "" {
+	if dmPolicy := extractStringValue(discord["dmPolicy"]); dmPolicy != "" {
+		result.DmPolicy = dmPolicy
+	} else if dm := childMap(discord, "dm"); dm != nil {
+		if policy := extractStringValue(dm["policy"]); policy != "" {
 			result.DmPolicy = policy
 		}
 	}
+	if groupPolicy := extractStringValue(discord["groupPolicy"]); groupPolicy != "" {
+		result.GroupPolicy = groupPolicy
+	}
+	result.Proxy = extractStringValue(discord["proxy"])
+	accounts := childMap(discord, "accounts")
+	if len(accounts) == 0 {
+		token := extractStringValue(discord["token"])
+		if token != "" {
+			accounts["default"] = map[string]interface{}{
+				"enabled": extractBoolValue(discord["enabled"], true),
+				"token":   token,
+			}
+		}
+	}
+	bots := make([]dto.AgentDiscordBot, 0, len(accounts))
+	for _, accountID := range sortedChildKeys(accounts) {
+		account := childMap(accounts, accountID)
+		bots = append(bots, dto.AgentDiscordBot{
+			AgentChannelBotBase: dto.AgentChannelBotBase{
+				AccountID: accountID,
+				Name:      extractDisplayName(account, accountID, accountID),
+				Enabled:   extractBoolValue(account["enabled"], true),
+			},
+			Token: extractStringValue(account["token"]),
+		})
+	}
+	result.DefaultAccount = normalizeDefaultAccount(extractStringValue(discord["defaultAccount"]), getDiscordBotAccountIDs(bots))
+	setDiscordDefaultFlags(bots, result.DefaultAccount)
+	result.Bots = bots
 	return result
 }
 
 func setDiscordConfig(conf map[string]interface{}, config dto.AgentDiscordConfig) {
 	channels := ensureChildMap(conf, "channels")
 	discord := ensureChildMap(channels, "discord")
-	discord["enabled"] = config.Enabled
-	discord["token"] = config.Token
+	defaultAccount := normalizeDefaultAccount(config.DefaultAccount, getDiscordBotAccountIDs(config.Bots))
+	effectiveEnabled := config.Enabled && hasEnabledDiscordBots(config.Bots)
+	discord["enabled"] = effectiveEnabled
 	discord["dmPolicy"] = config.DmPolicy
 	discord["groupPolicy"] = config.GroupPolicy
-	if strings.EqualFold(config.DmPolicy, "open") {
+	discord["defaultAccount"] = defaultAccount
+	if config.DmPolicy == "open" {
 		discord["allowFrom"] = []string{"*"}
 	} else {
 		delete(discord, "allowFrom")
 	}
-	if strings.TrimSpace(config.Proxy) != "" {
-		discord["proxy"] = strings.TrimSpace(config.Proxy)
+	if config.Proxy != "" {
+		discord["proxy"] = config.Proxy
 	} else {
 		delete(discord, "proxy")
 	}
+	accounts := make(map[string]interface{}, len(config.Bots))
+	for _, bot := range config.Bots {
+		accounts[bot.AccountID] = map[string]interface{}{
+			"enabled": bot.Enabled,
+			"name":    bot.Name,
+			"token":   bot.Token,
+		}
+	}
+	discord["accounts"] = accounts
+	delete(discord, "token")
 	delete(discord, "dm")
 }
 
 func extractQQBotConfig(conf map[string]interface{}) dto.AgentQQBotConfig {
 	result := dto.AgentQQBotConfig{Enabled: true}
-	channels, ok := conf["channels"].(map[string]interface{})
-	if !ok {
-		return result
-	}
-	qqbot, ok := channels["qqbot"].(map[string]interface{})
-	if !ok {
+	qqbot := getChannelConfig(conf, "qqbot")
+	if len(qqbot) == 0 {
+		result.Bots = []dto.AgentQQBotBot{defaultQQBot()}
 		return result
 	}
 	if enabled, ok := qqbot["enabled"].(bool); ok {
 		result.Enabled = enabled
 	}
-	if appID, ok := qqbot["appId"].(string); ok {
-		result.AppID = appID
+	bots := []dto.AgentQQBotBot{
+		{
+			AgentChannelBotBase: dto.AgentChannelBotBase{
+				AccountID: "default",
+				Name:      extractStringValue(qqbot["name"]),
+				Enabled:   extractBoolValue(qqbot["enabled"], true),
+				IsDefault: true,
+			},
+			AppID:        extractStringValue(qqbot["appId"]),
+			ClientSecret: extractStringValue(qqbot["clientSecret"]),
+		},
 	}
-	if clientSecret, ok := qqbot["clientSecret"].(string); ok {
-		result.ClientSecret = clientSecret
+	if bots[0].Name == "" {
+		bots[0].Name = "Default"
 	}
+	for _, accountID := range sortedChildKeys(childMap(qqbot, "accounts")) {
+		account := childMap(childMap(qqbot, "accounts"), accountID)
+		bots = append(bots, dto.AgentQQBotBot{
+			AgentChannelBotBase: dto.AgentChannelBotBase{
+				AccountID: accountID,
+				Name:      extractDisplayName(account, accountID, accountID),
+				Enabled:   extractBoolValue(account["enabled"], true),
+			},
+			AppID:        extractStringValue(account["appId"]),
+			ClientSecret: extractStringValue(account["clientSecret"]),
+		})
+	}
+	result.Bots = bots
 	return result
 }
 
@@ -432,51 +518,67 @@ func extractWecomConfig(conf map[string]interface{}) dto.AgentWecomConfig {
 	if enabled, ok := wecom["enabled"].(bool); ok {
 		result.Enabled = enabled
 	}
-	if dmPolicy, ok := wecom["dmPolicy"].(string); ok && strings.TrimSpace(dmPolicy) != "" {
-		result.DmPolicy = strings.TrimSpace(dmPolicy)
+	if dmPolicy := extractStringValue(wecom["dmPolicy"]); dmPolicy != "" {
+		result.DmPolicy = dmPolicy
 	}
-	if botID, ok := wecom["botId"].(string); ok {
-		result.BotID = botID
-	}
-	if secret, ok := wecom["secret"].(string); ok {
-		result.Secret = secret
-	}
+	result.BotID = extractStringValue(wecom["botId"])
+	result.Secret = extractStringValue(wecom["secret"])
 	return result
 }
 
 func extractDingTalkConfig(conf map[string]interface{}) dto.AgentDingTalkConfig {
 	result := dto.AgentDingTalkConfig{
 		Enabled:        true,
-		DmPolicy:       "pairing",
+		DmPolicy:       "open",
 		GroupPolicy:    "disabled",
 		AllowFrom:      []string{},
 		GroupAllowFrom: []string{},
 	}
-	channels, ok := conf["channels"].(map[string]interface{})
-	if !ok {
-		return result
-	}
-	dingtalk, ok := channels["dingtalk-connector"].(map[string]interface{})
-	if !ok {
+	dingtalk := getChannelConfig(conf, "dingtalk-connector")
+	if len(dingtalk) == 0 {
 		return result
 	}
 	if enabled, ok := dingtalk["enabled"].(bool); ok {
 		result.Enabled = enabled
 	}
-	if clientID, ok := dingtalk["clientId"].(string); ok {
-		result.ClientID = clientID
+	if dmPolicy := extractStringValue(dingtalk["dmPolicy"]); dmPolicy != "" {
+		if dmPolicy == "pairing" {
+			result.DmPolicy = "open"
+		} else {
+			result.DmPolicy = dmPolicy
+		}
 	}
-	if clientSecret, ok := dingtalk["clientSecret"].(string); ok {
-		result.ClientSecret = clientSecret
-	}
-	if dmPolicy, ok := dingtalk["dmPolicy"].(string); ok && strings.TrimSpace(dmPolicy) != "" {
-		result.DmPolicy = dmPolicy
-	}
-	if groupPolicy, ok := dingtalk["groupPolicy"].(string); ok && strings.TrimSpace(groupPolicy) != "" {
+	if groupPolicy := extractStringValue(dingtalk["groupPolicy"]); groupPolicy != "" {
 		result.GroupPolicy = groupPolicy
 	}
 	result.AllowFrom = extractStringList(dingtalk["allowFrom"])
 	result.GroupAllowFrom = extractStringList(dingtalk["groupAllowFrom"])
+	accounts := childMap(dingtalk, "accounts")
+	if len(accounts) == 0 {
+		clientID := extractStringValue(dingtalk["clientId"])
+		clientSecret := extractStringValue(dingtalk["clientSecret"])
+		if clientID != "" || clientSecret != "" {
+			accounts["default"] = map[string]interface{}{
+				"enabled":      extractBoolValue(dingtalk["enabled"], true),
+				"clientId":     clientID,
+				"clientSecret": clientSecret,
+			}
+		}
+	}
+	bots := make([]dto.AgentDingTalkBot, 0, len(accounts))
+	for _, accountID := range sortedChildKeys(accounts) {
+		account := childMap(accounts, accountID)
+		bots = append(bots, dto.AgentDingTalkBot{
+			AgentChannelBotBase: dto.AgentChannelBotBase{
+				AccountID: accountID,
+				Name:      extractDisplayName(account, accountID, accountID),
+				Enabled:   extractBoolValue(account["enabled"], true),
+			},
+			ClientID:     extractStringValue(account["clientId"]),
+			ClientSecret: extractStringValue(account["clientSecret"]),
+		})
+	}
+	result.Bots = bots
 	return result
 }
 
@@ -484,10 +586,10 @@ func setWecomConfig(conf map[string]interface{}, config dto.AgentWecomConfig) {
 	channels := ensureChildMap(conf, "channels")
 	wecom := ensureChildMap(channels, "wecom")
 	wecom["enabled"] = config.Enabled
-	wecom["botId"] = strings.TrimSpace(config.BotID)
-	wecom["secret"] = strings.TrimSpace(config.Secret)
-	wecom["dmPolicy"] = strings.TrimSpace(config.DmPolicy)
-	if strings.EqualFold(config.DmPolicy, "open") {
+	wecom["botId"] = config.BotID
+	wecom["secret"] = config.Secret
+	wecom["dmPolicy"] = config.DmPolicy
+	if config.DmPolicy == "open" {
 		wecom["allowFrom"] = []string{"*"}
 	} else {
 		wecom["allowFrom"] = []string{}
@@ -502,9 +604,8 @@ func setWecomConfig(conf map[string]interface{}, config dto.AgentWecomConfig) {
 func setDingTalkConfig(conf map[string]interface{}, config dto.AgentDingTalkConfig) {
 	channels := ensureChildMap(conf, "channels")
 	dingtalk := ensureChildMap(channels, "dingtalk-connector")
-	dingtalk["enabled"] = config.Enabled
-	dingtalk["clientId"] = strings.TrimSpace(config.ClientID)
-	dingtalk["clientSecret"] = strings.TrimSpace(config.ClientSecret)
+	effectiveEnabled := config.Enabled && hasEnabledDingTalkBots(config.Bots)
+	dingtalk["enabled"] = effectiveEnabled
 	dingtalk["dmPolicy"] = config.DmPolicy
 	dingtalk["groupPolicy"] = config.GroupPolicy
 	dingtalk["gatewayToken"] = extractGatewayToken(conf)
@@ -524,11 +625,23 @@ func setDingTalkConfig(conf map[string]interface{}, config dto.AgentDingTalkConf
 	default:
 		delete(dingtalk, "groupAllowFrom")
 	}
+	accounts := make(map[string]interface{}, len(config.Bots))
+	for _, bot := range config.Bots {
+		accounts[bot.AccountID] = map[string]interface{}{
+			"enabled":      bot.Enabled,
+			"name":         bot.Name,
+			"clientId":     bot.ClientID,
+			"clientSecret": bot.ClientSecret,
+		}
+	}
+	dingtalk["accounts"] = accounts
+	delete(dingtalk, "clientId")
+	delete(dingtalk, "clientSecret")
 
 	plugins := ensureChildMap(conf, "plugins")
 	entries := ensureChildMap(plugins, "entries")
 	dingtalkEntry := ensureChildMap(entries, "dingtalk-connector")
-	dingtalkEntry["enabled"] = config.Enabled
+	dingtalkEntry["enabled"] = effectiveEnabled
 
 	gateway := ensureChildMap(conf, "gateway")
 	httpMap := ensureChildMap(gateway, "http")
@@ -540,17 +653,34 @@ func setDingTalkConfig(conf map[string]interface{}, config dto.AgentDingTalkConf
 func setQQBotConfig(conf map[string]interface{}, config dto.AgentQQBotConfig) {
 	channels := ensureChildMap(conf, "channels")
 	qqbot := ensureChildMap(channels, "qqbot")
+	defaultBot := getDefaultQQBot(config.Bots)
+	effectiveEnabled := config.Enabled && hasEnabledQQBots(config.Bots)
 	delete(qqbot, "dmPolicy")
-	qqbot["enabled"] = config.Enabled
+	qqbot["enabled"] = effectiveEnabled
 	qqbot["allowFrom"] = []string{"*"}
-	qqbot["appId"] = strings.TrimSpace(config.AppID)
-	qqbot["clientSecret"] = strings.TrimSpace(config.ClientSecret)
+	qqbot["appId"] = defaultBot.AppID
+	qqbot["clientSecret"] = defaultBot.ClientSecret
+	qqbot["name"] = defaultBot.Name
+
+	accounts := make(map[string]interface{}, len(config.Bots))
+	for _, bot := range config.Bots {
+		if bot.AccountID == "default" || bot.IsDefault {
+			continue
+		}
+		accounts[bot.AccountID] = map[string]interface{}{
+			"enabled":      bot.Enabled,
+			"name":         bot.Name,
+			"appId":        bot.AppID,
+			"clientSecret": bot.ClientSecret,
+		}
+	}
+	qqbot["accounts"] = accounts
 
 	plugins := ensureChildMap(conf, "plugins")
 	entries := ensureChildMap(plugins, "entries")
 	delete(entries, "qqbot")
 	qqbotEntry := ensureChildMap(entries, "openclaw-qqbot")
-	qqbotEntry["enabled"] = config.Enabled
+	qqbotEntry["enabled"] = effectiveEnabled
 }
 
 func appendPluginAllow(conf map[string]interface{}, pluginID string) {
@@ -590,7 +720,9 @@ func buildOpenclawPluginInstallScript(spec, pluginID string) string {
 func resolvePluginMeta(pluginType string) (string, string, error) {
 	switch pluginType {
 	case "qqbot":
-		return "@tencent-connect/openclaw-qqbot@latest", "openclaw-qqbot", nil
+		return "@tencent-connect/openclaw-qqbot", "openclaw-qqbot", nil
+	case "feishu":
+		return "@larksuite/openclaw-lark", "openclaw-lark", nil
 	case "wecom":
 		return "@wecom/wecom-openclaw-plugin", "wecom-openclaw-plugin", nil
 	case "dingtalk":
@@ -616,4 +748,211 @@ func checkPluginInstalled(containerName, pluginType string) (bool, error) {
 		return false, nil
 	}
 	return true, nil
+}
+
+func getChannelConfig(conf map[string]interface{}, channel string) map[string]interface{} {
+	channels, ok := conf["channels"].(map[string]interface{})
+	if !ok {
+		return nil
+	}
+	channelMap, _ := channels[channel].(map[string]interface{})
+	return channelMap
+}
+
+func childMap(parent map[string]interface{}, key string) map[string]interface{} {
+	if parent == nil {
+		return map[string]interface{}{}
+	}
+	if value, ok := parent[key].(map[string]interface{}); ok {
+		return value
+	}
+	return map[string]interface{}{}
+}
+
+func extractStringValue(value interface{}) string {
+	text, _ := value.(string)
+	return text
+}
+
+func extractBoolValue(value interface{}, defaultValue bool) bool {
+	result, ok := value.(bool)
+	if !ok {
+		return defaultValue
+	}
+	return result
+}
+
+func sortedChildKeys(values map[string]interface{}) []string {
+	keys := make([]string, 0, len(values))
+	for key := range values {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	return keys
+}
+
+func extractDisplayName(values map[string]interface{}, fallback string, accountID string) string {
+	name := extractStringValue(values["name"])
+	if name != "" {
+		return name
+	}
+	if fallback != "" {
+		return fallback
+	}
+	if accountID == "default" {
+		return "Default"
+	}
+	return accountID
+}
+
+func normalizeDefaultAccount(defaultAccount string, accountIDs []string) string {
+	if len(accountIDs) == 0 {
+		return ""
+	}
+	for _, accountID := range accountIDs {
+		if accountID == defaultAccount {
+			return defaultAccount
+		}
+	}
+	return accountIDs[0]
+}
+
+func getTelegramBotAccountIDs(bots []dto.AgentTelegramBot) []string {
+	accountIDs := make([]string, 0, len(bots))
+	for _, bot := range bots {
+		accountIDs = append(accountIDs, bot.AccountID)
+	}
+	return accountIDs
+}
+
+func getDiscordBotAccountIDs(bots []dto.AgentDiscordBot) []string {
+	accountIDs := make([]string, 0, len(bots))
+	for _, bot := range bots {
+		accountIDs = append(accountIDs, bot.AccountID)
+	}
+	return accountIDs
+}
+
+func setTelegramDefaultFlags(bots []dto.AgentTelegramBot, defaultAccount string) {
+	for i := range bots {
+		bots[i].IsDefault = bots[i].AccountID == defaultAccount
+	}
+}
+
+func setDiscordDefaultFlags(bots []dto.AgentDiscordBot, defaultAccount string) {
+	for i := range bots {
+		bots[i].IsDefault = bots[i].AccountID == defaultAccount
+	}
+}
+
+func hasEnabledFeishuBots(bots []dto.AgentFeishuBot) bool {
+	for _, bot := range bots {
+		if bot.Enabled {
+			return true
+		}
+	}
+	return false
+}
+
+func hasEnabledTelegramBots(bots []dto.AgentTelegramBot) bool {
+	for _, bot := range bots {
+		if bot.Enabled {
+			return true
+		}
+	}
+	return false
+}
+
+func hasEnabledDiscordBots(bots []dto.AgentDiscordBot) bool {
+	for _, bot := range bots {
+		if bot.Enabled {
+			return true
+		}
+	}
+	return false
+}
+
+func hasEnabledQQBots(bots []dto.AgentQQBotBot) bool {
+	for _, bot := range bots {
+		if bot.Enabled {
+			return true
+		}
+	}
+	return false
+}
+
+func hasEnabledDingTalkBots(bots []dto.AgentDingTalkBot) bool {
+	for _, bot := range bots {
+		if bot.Enabled {
+			return true
+		}
+	}
+	return false
+}
+
+func defaultQQBot() dto.AgentQQBotBot {
+	return dto.AgentQQBotBot{
+		AgentChannelBotBase: dto.AgentChannelBotBase{
+			AccountID: "default",
+			Name:      "Default",
+			Enabled:   true,
+			IsDefault: true,
+		},
+	}
+}
+
+func defaultFeishuBot() dto.AgentFeishuBot {
+	return dto.AgentFeishuBot{
+		AgentChannelBotBase: dto.AgentChannelBotBase{
+			AccountID: "default",
+			Name:      "Default",
+			Enabled:   true,
+			IsDefault: true,
+		},
+	}
+}
+
+func getDefaultFeishuBot(bots []dto.AgentFeishuBot) dto.AgentFeishuBot {
+	for _, bot := range bots {
+		if bot.IsDefault || bot.AccountID == "default" {
+			bot.IsDefault = true
+			if bot.Name == "" {
+				bot.Name = "Default"
+			}
+			return bot
+		}
+	}
+	if len(bots) > 0 {
+		bot := bots[0]
+		bot.IsDefault = true
+		if bot.AccountID == "" {
+			bot.AccountID = "default"
+		}
+		if bot.Name == "" {
+			bot.Name = "Default"
+		}
+		return bot
+	}
+	return defaultFeishuBot()
+}
+
+func getDefaultQQBot(bots []dto.AgentQQBotBot) dto.AgentQQBotBot {
+	for _, bot := range bots {
+		if bot.IsDefault || bot.AccountID == "default" {
+			bot.IsDefault = true
+			if bot.Name == "" {
+				bot.Name = "Default"
+			}
+			return bot
+		}
+	}
+	if len(bots) > 0 {
+		bot := bots[0]
+		bot.IsDefault = true
+		if bot.Name == "" {
+			bot.Name = "Default"
+		}
+		return bot
+	}
+	return defaultQQBot()
 }

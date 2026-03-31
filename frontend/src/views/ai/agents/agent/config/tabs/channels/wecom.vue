@@ -1,5 +1,5 @@
 <template>
-    <el-form ref="formRef" :model="form" :rules="rules" label-position="top">
+    <el-form ref="formRef" v-loading="approving" :model="form" :rules="rules" label-position="top">
         <PluginInstall :installed="installed" :installing="installing" @install="installPlugin" />
         <el-form-item :label="t('commons.table.status')">
             <el-switch v-model="form.enabled" />
