@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"errors"
+	"net/http"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -18,6 +19,8 @@ type SessionUser struct {
 }
 
 type sessionItem struct {
+	CreatedAt time.Time
+	CSRFToken string
 	User      SessionUser
 	ExpiredAt time.Time
 }
@@ -28,6 +31,8 @@ type PSession struct {
 	cleanupCursor   uint64
 	lastFullCleanup time.Time
 }
+
+const maxSessionEntries = 64
 
 func NewPSession(_ string) *PSession {
 	return &PSession{
@@ -84,16 +89,62 @@ func (p *PSession) set(c *gin.Context, user SessionUser, secure bool, ttlSeconds
 	}
 
 	expiredAt := time.Now().Add(time.Duration(ttlSeconds) * time.Second)
+	createdAt := time.Now()
+	csrfToken := ""
+
 	p.mu.Lock()
+	if existing, ok := p.sessions[sessionID]; ok {
+		if !existing.CreatedAt.IsZero() {
+			createdAt = existing.CreatedAt
+		}
+		csrfToken = existing.CSRFToken
+	}
+	if csrfToken == "" {
+		csrfToken, err = generateSessionID()
+		if err != nil {
+			p.mu.Unlock()
+			return err
+		}
+	}
 	p.sessions[sessionID] = sessionItem{
+		CreatedAt: createdAt,
+		CSRFToken: csrfToken,
 		User:      user,
 		ExpiredAt: expiredAt,
 	}
+	p.evictOverflowLocked(sessionID)
 	p.mu.Unlock()
 	p.cleanupExpiredOnWrite()
 
+	c.SetSameSite(http.SameSiteLaxMode)
 	c.SetCookie(constant.SessionName, sessionID, ttlSeconds, "/", "", secure, true)
+	c.SetSameSite(http.SameSiteLaxMode)
+	c.SetCookie(constant.CSRFTokenName, csrfToken, ttlSeconds, "/", "", secure, false)
 	return nil
+}
+
+func (p *PSession) evictOverflowLocked(currentSessionID string) {
+	if maxSessionEntries <= 0 || len(p.sessions) <= maxSessionEntries {
+		return
+	}
+
+	for len(p.sessions) > maxSessionEntries {
+		oldestID := ""
+		var oldestItem sessionItem
+		for sessionID, item := range p.sessions {
+			if sessionID == currentSessionID {
+				continue
+			}
+			if oldestID == "" || item.CreatedAt.Before(oldestItem.CreatedAt) {
+				oldestID = sessionID
+				oldestItem = item
+			}
+		}
+		if oldestID == "" {
+			return
+		}
+		delete(p.sessions, oldestID)
+	}
 }
 
 func (p *PSession) RefreshIfNeeded(c *gin.Context, user SessionUser, secure bool, ttlSeconds int) (bool, error) {
@@ -102,23 +153,17 @@ func (p *PSession) RefreshIfNeeded(c *gin.Context, user SessionUser, secure bool
 		return false, p.Set(c, user, secure, ttlSeconds)
 	}
 
-	now := time.Now()
-	window := refreshWindow(ttlSeconds)
-
 	p.mu.RLock()
 	item, ok := p.sessions[sessionID]
 	p.mu.RUnlock()
 	if !ok {
 		return false, p.Set(c, user, secure, ttlSeconds)
 	}
-	if !item.ExpiredAt.IsZero() && now.After(item.ExpiredAt) {
+	if !item.ExpiredAt.IsZero() && time.Now().After(item.ExpiredAt) {
 		p.mu.Lock()
 		delete(p.sessions, sessionID)
 		p.mu.Unlock()
 		return false, errors.New("ErrSessionDataNotFound")
-	}
-	if item.ExpiredAt.Sub(now) > window {
-		return false, nil
 	}
 	return true, p.Set(c, user, secure, ttlSeconds)
 }
@@ -131,6 +176,27 @@ func (p *PSession) Delete(c *gin.Context) error {
 		p.mu.Unlock()
 	}
 	return nil
+}
+
+func (p *PSession) CheckCSRFToken(c *gin.Context, token string) bool {
+	sessionID, err := c.Cookie(constant.SessionName)
+	if err != nil || sessionID == "" || token == "" {
+		return false
+	}
+
+	p.mu.RLock()
+	item, ok := p.sessions[sessionID]
+	p.mu.RUnlock()
+	if !ok {
+		return false
+	}
+	if !item.ExpiredAt.IsZero() && time.Now().After(item.ExpiredAt) {
+		p.mu.Lock()
+		delete(p.sessions, sessionID)
+		p.mu.Unlock()
+		return false
+	}
+	return item.CSRFToken == token
 }
 
 func (p *PSession) Clean() error {
@@ -147,26 +213,6 @@ func generateSessionID() (string, error) {
 		return "", err
 	}
 	return hex.EncodeToString(buf), nil
-}
-
-func refreshWindow(ttlSeconds int) time.Duration {
-	if ttlSeconds <= 0 {
-		return 0
-	}
-	windowSeconds := ttlSeconds / 10
-	if windowSeconds < 60 {
-		windowSeconds = 60
-	}
-	if windowSeconds > 300 {
-		windowSeconds = 300
-	}
-	if windowSeconds >= ttlSeconds {
-		windowSeconds = ttlSeconds - 1
-	}
-	if windowSeconds <= 0 {
-		windowSeconds = 1
-	}
-	return time.Duration(windowSeconds) * time.Second
 }
 
 func (p *PSession) cleanupExpiredOnWrite() {

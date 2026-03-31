@@ -30,6 +30,7 @@ export interface GlobalState {
     isLoading: boolean;
     loadingText: string;
     isLogin: boolean;
+    csrfToken: string;
     entrance: string;
     language: string; // zh | en | tw
     themeConfig: ThemeConfigProp;

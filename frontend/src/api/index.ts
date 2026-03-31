@@ -8,6 +8,7 @@ import { MsgError } from '@/utils/message';
 import { Base64 } from 'js-base64';
 import i18n from '@/lang';
 import { changeToLocal } from '@/utils/node';
+import { getCookie } from '@/utils/util';
 
 const globalStore = GlobalStore();
 
@@ -41,6 +42,15 @@ class RequestHttp {
                 ) {
                     let entrance = Base64.encode(globalStore.entrance);
                     config.headers.EntranceCode = entrance;
+                }
+                const method = (config.method || 'get').toUpperCase();
+                const requiresToken = !['GET', 'HEAD', 'OPTIONS', 'TRACE'].includes(method);
+                if (requiresToken) {
+                    const csrfToken = getCookie('pcsrftoken');
+                    if (csrfToken) {
+                        config.headers['X-CSRF-Token'] = csrfToken;
+                        globalStore.setCsrfToken(csrfToken);
+                    }
                 }
                 return {
                     ...config,
@@ -107,6 +117,13 @@ class RequestHttp {
                         case 313:
                             router.push({ name: 'Expired' });
                             return;
+                        case 403:
+                            if (response.data && response.data['message']) {
+                                MsgError(response.data['message']);
+                            } else {
+                                MsgError(i18n.global.t('commons.res.forbidden'));
+                            }
+                            return Promise.reject(error);
                         case 500:
                         case 502:
                         case 524:
@@ -117,7 +134,7 @@ class RequestHttp {
                             );
                             return Promise.reject(error);
                         default:
-                            return;
+                            return Promise.reject(error);
                     }
                 }
                 if (!window.navigator.onLine) router.replace({ path: '/500' });
