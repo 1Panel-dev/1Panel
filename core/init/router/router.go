@@ -88,6 +88,7 @@ func Routers() *gin.Engine {
 	Router.Use(middleware.GlobalLoading())
 	Router.Use(middleware.PasswordExpired())
 	Router.Use(middleware.ApiAuth())
+	Router.Use(middleware.CSRFTokenGuard())
 
 	PrivateGroup := Router.Group("/api/v2/core")
 	PrivateGroup.Use(middleware.SetPasswordPublicKey())

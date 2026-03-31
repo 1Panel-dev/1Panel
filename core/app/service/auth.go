@@ -160,6 +160,7 @@ func (u *AuthService) LogOut(c *gin.Context) error {
 	sID, _ := c.Cookie(constant.SessionName)
 	if sID != "" {
 		c.SetCookie(constant.SessionName, sID, -1, "", "", httpsSetting.Value == constant.StatusEnable, true)
+		c.SetCookie(constant.CSRFTokenName, "", -1, "/", "", httpsSetting.Value == constant.StatusEnable, false)
 		err := global.SESSION.Delete(c)
 		if err != nil {
 			return err

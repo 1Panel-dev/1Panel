@@ -13,6 +13,7 @@ const GlobalStore = defineStore({
         isLoading: false,
         loadingText: '',
         isLogin: false,
+        csrfToken: '',
         entrance: '',
         language: i18n.global.locale.value,
         themeConfig: {
