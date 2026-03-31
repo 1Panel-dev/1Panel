@@ -16,6 +16,7 @@ ErrApiConfigKeyInvalid: 'Chave API inválida: {{ .detail }}'
 ErrApiConfigIPInvalid: 'IP sem permissão: {{ .detail }}'
 ErrApiConfigDisable: 'API bloqueada: {{ .detail }}'
 ErrApiConfigKeyTimeInvalid: 'Timestamp inválido: {{ .detail }}'
+ErrLoginLocked: "Muitas tentativas falharam. O login foi bloqueado temporariamente por 5 minutos."
 
 # request
 ErrNoSuchHost: "Servidor solicitado não encontrado {{ .err }}"

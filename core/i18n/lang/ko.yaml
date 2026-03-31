@@ -16,6 +16,7 @@ ErrApiConfigKeyInvalid: 'API 키가 잘못됨: {{ .detail }}'
 ErrApiConfigIPInvalid: 'IP 허용되지 않음: {{ .detail }}'
 ErrApiConfigDisable: 'API 접근 금지: {{ .detail }}'
 ErrApiConfigKeyTimeInvalid: '타임스탬프 오류: {{ .detail }}'
+ErrLoginLocked: "실패한 시도가 너무 많습니다. 로그인이 5분 동안 일시적으로 잠겼습니다."
 
 # request
 ErrNoSuchHost: "요청한 서버를 찾을 수 없습니다 {{ .err }}"

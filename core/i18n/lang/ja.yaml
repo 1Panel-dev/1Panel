@@ -16,6 +16,7 @@ ErrApiConfigKeyInvalid: 'APIキーが無効です: {{ .detail }}'
 ErrApiConfigIPInvalid: 'IPが許可されていません: {{ .detail }}'
 ErrApiConfigDisable: 'APIは無効です: {{ .detail }}'
 ErrApiConfigKeyTimeInvalid: 'タイムスタンプが無効です: {{ .detail }}'
+ErrLoginLocked: "失敗回数が多すぎます。ログインは 5 分間一時的にロックされています。"
 
 # request
 ErrNoSuchHost: "要求されたサーバーが見つかりません {{ .err }}"

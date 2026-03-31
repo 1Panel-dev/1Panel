@@ -16,6 +16,7 @@ ErrApiConfigKeyInvalid: "API 金鑰錯誤: {{ .detail }}"
 ErrApiConfigIPInvalid: "API 請求 IP 不在白名單: {{ .detail }}"
 ErrApiConfigDisable: "此介面禁止使用 API 呼叫: {{ .detail }}"
 ErrApiConfigKeyTimeInvalid: "API 時間戳錯誤: {{ .detail }}"
+ErrLoginLocked: "失敗次數過多，目前登入已被暫時鎖定 5 分鐘。"
 
 #request
 ErrNoSuchHost: "無法找到請求的伺服器 {{ .err }}"
