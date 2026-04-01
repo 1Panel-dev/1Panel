@@ -58,6 +58,24 @@
                 />
                 <span class="input-help">{{ t('aiTools.agents.groupAllowFromHelper') }}</span>
             </el-form-item>
+            <el-form-item :label="t('aiTools.agents.separateSessionByConversation')">
+                <el-switch v-model="form.separateSessionByConversation" />
+            </el-form-item>
+            <el-form-item :label="t('aiTools.agents.groupSessionScope')" prop="groupSessionScope">
+                <el-select v-model="form.groupSessionScope">
+                    <el-option :label="t('aiTools.agents.groupSessionScopeGroup')" value="group" />
+                    <el-option :label="t('aiTools.agents.groupSessionScopeGroupSender')" value="group_sender" />
+                </el-select>
+            </el-form-item>
+            <el-form-item :label="t('aiTools.agents.sharedMemoryAcrossConversations')">
+                <el-switch v-model="form.sharedMemoryAcrossConversations" />
+            </el-form-item>
+            <el-form-item :label="t('aiTools.agents.asyncMode')">
+                <el-switch v-model="form.asyncMode" />
+            </el-form-item>
+            <el-form-item v-if="form.asyncMode" :label="t('aiTools.agents.ackText')">
+                <el-input v-model="form.ackText" />
+            </el-form-item>
             <ChannelBots
                 :bots="form.bots"
                 :fields="botFields"
@@ -127,11 +145,17 @@ const {
     uninstallPlugin,
 } = useAgentPluginChannel('dingtalk');
 const supported = computed(() => isOpenclawCurrentHTTPVersion(props.appVersion));
+const defaultAckText = t('aiTools.agents.ackTextDefault');
 
 const form = reactive<DingTalkForm>({
     enabled: true,
     dmPolicy: 'open',
     groupPolicy: 'disabled',
+    separateSessionByConversation: true,
+    groupSessionScope: 'group',
+    sharedMemoryAcrossConversations: false,
+    asyncMode: false,
+    ackText: defaultAckText,
     bots: [],
     allowFromText: '',
     groupAllowFromText: '',
@@ -175,6 +199,7 @@ const validateGroupAllowFrom = (_rule: any, value: string, callback: (error?: Er
 const rules = reactive<FormRules>({
     dmPolicy: [Rules.requiredSelect],
     groupPolicy: [Rules.requiredSelect],
+    groupSessionScope: [Rules.requiredSelect],
     allowFromText: [{ validator: validateAllowFrom, trigger: 'blur' }],
     groupAllowFromText: [{ validator: validateGroupAllowFrom, trigger: 'blur' }],
 });
@@ -211,6 +236,11 @@ const load = async (id: number) => {
     form.enabled = res.data?.enabled ?? true;
     form.dmPolicy = res.data?.dmPolicy || 'open';
     form.groupPolicy = res.data?.groupPolicy || 'disabled';
+    form.separateSessionByConversation = res.data?.separateSessionByConversation ?? true;
+    form.groupSessionScope = res.data?.groupSessionScope || 'group';
+    form.sharedMemoryAcrossConversations = res.data?.sharedMemoryAcrossConversations ?? false;
+    form.asyncMode = res.data?.asyncMode ?? false;
+    form.ackText = res.data?.ackText || defaultAckText;
     form.bots = res.data?.bots || [];
     form.allowFromText = (res.data?.allowFrom || []).join('\n');
     form.groupAllowFromText = (res.data?.groupAllowFrom || []).join('\n');
@@ -241,6 +271,11 @@ const saveChannel = async () => {
             allowFrom: parseTextList(form.allowFromText),
             groupPolicy: form.groupPolicy,
             groupAllowFrom: parseTextList(form.groupAllowFromText),
+            separateSessionByConversation: form.separateSessionByConversation,
+            groupSessionScope: form.groupSessionScope,
+            sharedMemoryAcrossConversations: form.sharedMemoryAcrossConversations,
+            asyncMode: form.asyncMode,
+            ackText: form.ackText,
             bots: form.bots,
         });
         MsgSuccess(t('aiTools.agents.saveSuccess'));
