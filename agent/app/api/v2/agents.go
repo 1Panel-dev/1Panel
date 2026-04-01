@@ -394,6 +394,46 @@ func (b *BaseApi) DeleteAgentRole(c *gin.Context) {
 }
 
 // @Tags AI
+// @Summary Bind Agent role channel
+// @Accept json
+// @Param request body dto.AgentRoleBindReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/agent/bind [post]
+func (b *BaseApi) BindAgentRole(c *gin.Context) {
+	var req dto.AgentRoleBindReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := agentService.BindRole(req); err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags AI
+// @Summary Unbind Agent role channel
+// @Accept json
+// @Param request body dto.AgentRoleBindReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/agent/unbind [post]
+func (b *BaseApi) UnbindAgentRole(c *gin.Context) {
+	var req dto.AgentRoleBindReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := agentService.UnbindRole(req); err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags AI
 // @Summary Get configured Agent roles from config file
 // @Accept json
 // @Param request body dto.AgentConfiguredAgentsReq true "request"

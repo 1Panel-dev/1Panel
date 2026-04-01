@@ -752,6 +752,7 @@ const message = {
                 ],
             },
             bindings: 'Bindings',
+            duplicateBinding: 'The channel and account ID combination must be unique',
             accountIdOptional: 'Account ID (Optional)',
             saveAllMd: 'Save All',
             roleMarkdownRestartHelper:

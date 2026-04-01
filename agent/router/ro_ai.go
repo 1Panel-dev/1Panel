@@ -59,6 +59,8 @@ func (a *AIToolsRouter) InitRouter(Router *gin.RouterGroup) {
 		aiToolsRouter.POST("/agents/accounts/delete", baseApi.DeleteAgentAccount)
 		aiToolsRouter.POST("/agents/agent/create", baseApi.CreateAgentRole)
 		aiToolsRouter.POST("/agents/agent/delete", baseApi.DeleteAgentRole)
+		aiToolsRouter.POST("/agents/agent/bind", baseApi.BindAgentRole)
+		aiToolsRouter.POST("/agents/agent/unbind", baseApi.UnbindAgentRole)
 		aiToolsRouter.POST("/agents/agent/list", baseApi.GetConfiguredAgentRoles)
 		aiToolsRouter.POST("/agents/agent/channels", baseApi.GetAgentRoleChannels)
 		aiToolsRouter.POST("/agents/agent/md/list", baseApi.GetAgentRoleMarkdownFiles)

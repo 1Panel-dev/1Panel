@@ -46,6 +46,8 @@ type IAgentService interface {
 
 	CreateRole(req dto.AgentRoleCreateReq) (*dto.AgentRoleCreateResp, error)
 	DeleteRole(req dto.AgentRoleDeleteReq) error
+	BindRole(req dto.AgentRoleBindReq) error
+	UnbindRole(req dto.AgentRoleBindReq) error
 	GetConfiguredAgents(req dto.AgentConfiguredAgentsReq) ([]dto.AgentConfiguredAgentItem, error)
 	GetRoleChannels(req dto.AgentRoleChannelsReq) ([]dto.AgentRoleChannelItem, error)
 	GetRoleMarkdownFiles(req dto.AgentRoleMarkdownFilesReq) ([]dto.AgentRoleMarkdownFileItem, error)

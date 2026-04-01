@@ -703,6 +703,7 @@ const message = {
                 'BOOTSTRAP.md': ['首次运行引导流程', '只会在全新的工作区中创建。'],
             },
             bindings: '绑定',
+            duplicateBinding: '频道和账号 ID 不能重复',
             accountIdOptional: '账号 ID（可选）',
             saveAllMd: '保存全部',
             roleMarkdownRestartHelper: '保存当前全部 MD 文件后，需要重启容器才能生效。请选择立即重启或稍后重启。',

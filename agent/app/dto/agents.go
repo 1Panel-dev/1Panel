@@ -109,6 +109,13 @@ type AgentRoleDeleteReq struct {
 	ID      string `json:"id" validate:"required"`
 }
 
+type AgentRoleBindReq struct {
+	AgentID   uint   `json:"agentId" validate:"required"`
+	ID        string `json:"id" validate:"required"`
+	Channel   string `json:"channel" validate:"required"`
+	AccountID string `json:"accountId"`
+}
+
 type AgentConfiguredAgentsReq struct {
 	AgentID uint `json:"agentId" validate:"required"`
 }
