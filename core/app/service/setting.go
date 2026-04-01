@@ -777,6 +777,7 @@ func checkProxy(req dto.ProxyUpdate) error {
 		}
 		transport = http.Transport{DialContext: dialContext}
 	case "", "close":
+		return nil
 	default:
 		return buserr.WithDetail("ErrNotSupportType", req.ProxyType, nil)
 	}
