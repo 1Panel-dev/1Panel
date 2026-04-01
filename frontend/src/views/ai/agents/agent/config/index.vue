@@ -68,8 +68,6 @@ const loadModel = async () => {
     await nextTick();
     await modelRef.value?.load({
         agentId: agentId.value,
-        accountId: accountId.value,
-        model: model.value,
     });
 };
 

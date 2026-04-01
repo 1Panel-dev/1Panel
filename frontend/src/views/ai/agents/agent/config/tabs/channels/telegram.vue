@@ -244,7 +244,7 @@ const load = async (id: number) => {
     form.bots = res.data?.bots || [];
 };
 
-const saveChannel = async () => {
+const saveChannel = async (action: 'delete' | 'save' = 'save') => {
     if (!agentId.value || !formRef.value) {
         return;
     }
@@ -267,7 +267,7 @@ const saveChannel = async () => {
             defaultAccount: form.defaultAccount,
             bots: form.bots,
         });
-        MsgSuccess(t('aiTools.agents.saveSuccess'));
+        MsgSuccess(action === 'delete' ? t('commons.msg.deleteSuccess') : t('aiTools.agents.saveSuccess'));
     } finally {
         saving.value = false;
     }

@@ -162,7 +162,7 @@ const reload = async () => {
     await load(agentId.value);
 };
 
-const saveChannel = async () => {
+const saveChannel = async (action: 'delete' | 'save' = 'save') => {
     if (!agentId.value) {
         return;
     }
@@ -186,7 +186,7 @@ const saveChannel = async () => {
                 systemPrompt: bot.systemPrompt,
             })),
         });
-        MsgSuccess(t('aiTools.agents.saveSuccess'));
+        MsgSuccess(action === 'delete' ? t('commons.msg.deleteSuccess') : t('aiTools.agents.saveSuccess'));
     } finally {
         saving.value = false;
     }

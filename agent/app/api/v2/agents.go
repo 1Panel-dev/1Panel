@@ -112,6 +112,27 @@ func (b *BaseApi) UpdateAgentRemark(c *gin.Context) {
 }
 
 // @Tags AI
+// @Summary Get Agent model config
+// @Accept json
+// @Param request body dto.AgentIDReq true "request"
+// @Success 200 {object} dto.AgentModelConfig
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/model/get [post]
+func (b *BaseApi) GetAgentModelConfig(c *gin.Context) {
+	var req dto.AgentIDReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	res, err := agentService.GetModelConfig(req)
+	if err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.SuccessWithData(c, res)
+}
+
+// @Tags AI
 // @Summary Update Agent model config
 // @Accept json
 // @Param request body dto.AgentModelConfigUpdateReq true "request"
