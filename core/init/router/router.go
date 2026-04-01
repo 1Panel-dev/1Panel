@@ -1,7 +1,6 @@
 package router
 
 import (
-	"encoding/base64"
 	"io"
 	"net/http"
 	"os"
@@ -57,8 +56,7 @@ func setWebStatic(rootRouter *gin.RouterGroup) {
 		}
 		entrance = authService.GetSecurityEntrance()
 		if entrance != "" {
-			entranceValue := base64.StdEncoding.EncodeToString([]byte(entrance))
-			c.SetCookie("SecurityEntrance", entranceValue, 0, "", "", false, true)
+			service.SetSecurityEntranceCookie(c, entrance)
 		}
 		staticServer := http.FileServer(http.FS(web.IndexHtml))
 		staticServer.ServeHTTP(c.Writer, c.Request)

@@ -12,6 +12,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/core/app/dto"
 	"github.com/1Panel-dev/1Panel/core/app/repo"
+	"github.com/1Panel-dev/1Panel/core/app/service"
 	"github.com/1Panel-dev/1Panel/core/buserr"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
@@ -113,8 +114,7 @@ func (b *BaseApi) UpdateSetting(c *gin.Context) {
 		return
 	}
 	if req.Key == "SecurityEntrance" {
-		entranceValue := base64.StdEncoding.EncodeToString([]byte(req.Value))
-		c.SetCookie("SecurityEntrance", entranceValue, 0, "", "", false, true)
+		service.SetSecurityEntranceCookie(c, req.Value)
 	}
 	helper.Success(c)
 }
