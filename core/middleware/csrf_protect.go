@@ -7,6 +7,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/app/dto"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
+	"github.com/1Panel-dev/1Panel/core/i18n"
 	"github.com/gin-gonic/gin"
 )
 
@@ -21,7 +22,7 @@ func CSRFTokenGuard() gin.HandlerFunc {
 		if !global.SESSION.CheckCSRFToken(c, token) {
 			c.AbortWithStatusJSON(http.StatusForbidden, dto.Response{
 				Code:    http.StatusForbidden,
-				Message: "invalid request token",
+				Message: i18n.GetMsgWithMap("ErrNotLogin", map[string]interface{}{"detail": "CSRF token invalid"}),
 				Data:    nil,
 			})
 			return
