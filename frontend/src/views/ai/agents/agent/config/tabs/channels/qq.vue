@@ -49,13 +49,22 @@ import PluginInstall from './components/plugin-install.vue';
 import { useAgentPluginChannel } from './useAgentPluginChannel';
 import ChannelBots from './components/channel-bots.vue';
 
-type QQBotForm = Pick<AI.AgentQQBotConfig, 'enabled' | 'bots'>;
 type BotField = {
     prop: string;
     label: string;
-    type?: 'text' | 'password';
+    type?: 'text' | 'password' | 'textarea';
     required?: boolean;
+    placeholder?: string;
 };
+
+interface QQBotFormItem extends AI.AgentQQBotBot {
+    allowFromText: string;
+}
+
+interface QQBotForm {
+    enabled: boolean;
+    bots: QQBotFormItem[];
+}
 
 const { t } = useI18n();
 const saving = ref(false);
@@ -80,25 +89,62 @@ const form = reactive<QQBotForm>({
     bots: [],
 });
 
+const parseTextList = (value: string): string[] => {
+    return Array.from(
+        new Set(
+            String(value || '')
+                .split(/\r?\n/)
+                .map((item) => item.trim())
+                .filter(Boolean),
+        ),
+    );
+};
+
 const botFields: BotField[] = [
     { prop: 'appId', label: 'App ID', required: true },
     { prop: 'clientSecret', label: 'App Secret', type: 'password', required: true },
+    {
+        prop: 'allowFromText',
+        label: t('aiTools.agents.allowFrom'),
+        type: 'textarea',
+        placeholder: t('aiTools.agents.allowFromPlaceholder'),
+    },
+    {
+        prop: 'systemPrompt',
+        label: t('aiTools.agents.systemPrompt'),
+        type: 'textarea',
+    },
 ];
 
-const createBot = (): AI.AgentQQBotBot => ({
+const createBot = (): QQBotFormItem => ({
     accountId: '',
     name: '',
     enabled: true,
     isDefault: false,
     appId: '',
     clientSecret: '',
+    allowFrom: [],
+    allowFromText: '',
+    systemPrompt: '',
 });
 
-const getBotSummary = (bot: AI.AgentQQBotBot) => {
+const normalizeBot = (bot?: Partial<AI.AgentQQBotBot>): QQBotFormItem => ({
+    accountId: bot?.accountId || '',
+    name: bot?.name || bot?.accountId || '',
+    enabled: bot?.enabled ?? true,
+    isDefault: bot?.isDefault ?? false,
+    appId: bot?.appId || '',
+    clientSecret: bot?.clientSecret || '',
+    allowFrom: bot?.allowFrom || [],
+    allowFromText: (bot?.allowFrom || []).join('\n'),
+    systemPrompt: bot?.systemPrompt || '',
+});
+
+const getBotSummary = (bot: QQBotFormItem) => {
     return bot.appId;
 };
 
-const updateBots = (bots: AI.AgentQQBotBot[]) => {
+const updateBots = (bots: QQBotFormItem[]) => {
     form.bots = bots;
 };
 
@@ -106,7 +152,7 @@ const load = async (id: number) => {
     await loadPlugin(id);
     const res = await getAgentQQBotConfig({ agentId: id });
     form.enabled = res.data?.enabled ?? true;
-    form.bots = res.data?.bots || [];
+    form.bots = (res.data?.bots || []).map((bot) => normalizeBot(bot));
 };
 
 const reload = async () => {
@@ -129,7 +175,16 @@ const saveChannel = async () => {
         await updateAgentQQBotConfig({
             agentId: agentId.value,
             enabled: form.enabled,
-            bots: form.bots,
+            bots: form.bots.map((bot) => ({
+                accountId: bot.accountId,
+                name: bot.name,
+                enabled: bot.enabled,
+                isDefault: bot.isDefault,
+                appId: bot.appId,
+                clientSecret: bot.clientSecret,
+                allowFrom: parseTextList(bot.allowFromText),
+                systemPrompt: bot.systemPrompt,
+            })),
         });
         MsgSuccess(t('aiTools.agents.saveSuccess'));
     } finally {

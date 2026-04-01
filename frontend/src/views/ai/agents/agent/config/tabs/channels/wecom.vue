@@ -21,7 +21,42 @@
                 <el-select v-model="form.dmPolicy">
                     <el-option :label="t('aiTools.agents.pairingCode')" value="pairing" />
                     <el-option :label="t('aiTools.agents.policyOpen')" value="open" />
+                    <el-option :label="t('aiTools.agents.policyAllowlist')" value="allowlist" />
+                    <el-option :label="t('aiTools.agents.policyDisabled')" value="disabled" />
                 </el-select>
+            </el-form-item>
+            <el-form-item
+                v-if="form.dmPolicy === 'allowlist'"
+                :label="t('aiTools.agents.allowFrom')"
+                prop="allowFromText"
+            >
+                <el-input
+                    v-model="form.allowFromText"
+                    type="textarea"
+                    :rows="3"
+                    :placeholder="t('aiTools.agents.allowFromPlaceholder')"
+                />
+                <span class="input-help">{{ t('aiTools.agents.allowFromHelper') }}</span>
+            </el-form-item>
+            <el-form-item :label="t('aiTools.agents.groupPolicy')" prop="groupPolicy">
+                <el-select v-model="form.groupPolicy">
+                    <el-option :label="t('aiTools.agents.policyOpen')" value="open" />
+                    <el-option :label="t('aiTools.agents.policyAllowlist')" value="allowlist" />
+                    <el-option :label="t('aiTools.agents.policyDisabled')" value="disabled" />
+                </el-select>
+            </el-form-item>
+            <el-form-item
+                v-if="form.groupPolicy === 'allowlist'"
+                :label="t('aiTools.agents.groupAllowFrom')"
+                prop="groupAllowFromText"
+            >
+                <el-input
+                    v-model="form.groupAllowFromText"
+                    type="textarea"
+                    :rows="3"
+                    :placeholder="t('aiTools.agents.groupAllowFromPlaceholder')"
+                />
+                <span class="input-help">{{ t('aiTools.agents.groupAllowFromHelper') }}</span>
             </el-form-item>
             <el-form-item :label="t('aiTools.agents.botId')" prop="botId">
                 <el-input v-model="form.botId" />
@@ -35,16 +70,18 @@
                 </el-button>
             </el-form-item>
 
-            <el-divider />
+            <template v-if="form.dmPolicy === 'pairing'">
+                <el-divider />
 
-            <el-form-item :label="t('aiTools.agents.pairingCode')">
-                <el-input v-model="pairingCode" :placeholder="t('aiTools.agents.pairingCodePlaceholder')" />
-            </el-form-item>
-            <el-form-item>
-                <el-button type="primary" :loading="approving" :disabled="!installed" @click="approvePairing">
-                    {{ t('aiTools.agents.approvePairing') }}
-                </el-button>
-            </el-form-item>
+                <el-form-item :label="t('aiTools.agents.pairingCode')">
+                    <el-input v-model="pairingCode" :placeholder="t('aiTools.agents.pairingCodePlaceholder')" />
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" :loading="approving" :disabled="!installed" @click="approvePairing">
+                        {{ t('aiTools.agents.approvePairing') }}
+                    </el-button>
+                </el-form-item>
+            </template>
         </template>
     </el-form>
 </template>
@@ -60,7 +97,10 @@ import { Rules } from '@/global/form-rules';
 import PluginInstall from './components/plugin-install.vue';
 import { useAgentPluginChannel } from './useAgentPluginChannel';
 
-type WecomForm = Omit<AI.AgentWecomConfig, 'installed'>;
+interface WecomForm extends Omit<AI.AgentWecomConfig, 'installed' | 'allowFrom' | 'groupAllowFrom'> {
+    allowFromText: string;
+    groupAllowFromText: string;
+}
 
 const { t } = useI18n();
 const saving = ref(false);
@@ -86,12 +126,53 @@ const {
 const form = reactive<WecomForm>({
     enabled: true,
     dmPolicy: 'pairing',
+    allowFromText: '',
+    groupPolicy: 'open',
+    groupAllowFromText: '',
     botId: '',
     secret: '',
 });
 
+const parseTextList = (value: string): string[] => {
+    return Array.from(
+        new Set(
+            String(value || '')
+                .split(/\r?\n/)
+                .map((item) => item.trim())
+                .filter(Boolean),
+        ),
+    );
+};
+
+const validateAllowFrom = (_rule: any, value: string, callback: (error?: Error) => void) => {
+    if (form.dmPolicy !== 'allowlist') {
+        callback();
+        return;
+    }
+    if (parseTextList(value).length === 0) {
+        callback(new Error(t('aiTools.agents.allowFromRequired')));
+        return;
+    }
+    callback();
+};
+
+const validateGroupAllowFrom = (_rule: any, value: string, callback: (error?: Error) => void) => {
+    if (form.groupPolicy !== 'allowlist') {
+        callback();
+        return;
+    }
+    if (parseTextList(value).length === 0) {
+        callback(new Error(t('aiTools.agents.allowFromRequired')));
+        return;
+    }
+    callback();
+};
+
 const rules = reactive({
     dmPolicy: [Rules.requiredSelect],
+    groupPolicy: [Rules.requiredSelect],
+    allowFromText: [{ validator: validateAllowFrom, trigger: 'blur' }],
+    groupAllowFromText: [{ validator: validateGroupAllowFrom, trigger: 'blur' }],
     botId: [Rules.requiredInput],
     secret: [Rules.requiredInput],
 });
@@ -102,6 +183,9 @@ const load = async (id: number) => {
     const res = await getAgentWecomConfig({ agentId: id });
     form.enabled = res.data?.enabled ?? true;
     form.dmPolicy = res.data?.dmPolicy || 'pairing';
+    form.allowFromText = (res.data?.allowFrom || []).join('\n');
+    form.groupPolicy = res.data?.groupPolicy || 'open';
+    form.groupAllowFromText = (res.data?.groupAllowFrom || []).join('\n');
     form.botId = res.data?.botId || '';
     form.secret = res.data?.secret || '';
     if (!form.dmPolicy) {
@@ -127,6 +211,9 @@ const saveChannel = async () => {
             agentId: agentId.value,
             enabled: form.enabled,
             dmPolicy: form.dmPolicy,
+            allowFrom: parseTextList(form.allowFromText),
+            groupPolicy: form.groupPolicy,
+            groupAllowFrom: parseTextList(form.groupAllowFromText),
             botId: form.botId,
             secret: form.secret,
         });
@@ -162,3 +249,11 @@ defineExpose({
     load,
 });
 </script>
+
+<style lang="scss" scoped>
+.input-help {
+    font-size: 12px;
+    color: var(--el-text-color-secondary);
+    line-height: 1.5;
+}
+</style>

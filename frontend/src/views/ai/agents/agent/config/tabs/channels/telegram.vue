@@ -7,10 +7,49 @@
             <el-select v-model="form.dmPolicy">
                 <el-option :label="t('aiTools.agents.pairingCode')" value="pairing" />
                 <el-option :label="t('aiTools.agents.policyOpen')" value="open" />
+                <el-option :label="t('aiTools.agents.policyAllowlist')" value="allowlist" />
+                <el-option :label="t('aiTools.agents.policyDisabled')" value="disabled" />
             </el-select>
+        </el-form-item>
+        <el-form-item v-if="form.dmPolicy === 'allowlist'" :label="t('aiTools.agents.allowFrom')" prop="allowFromText">
+            <el-input
+                v-model="form.allowFromText"
+                type="textarea"
+                :rows="3"
+                :placeholder="t('aiTools.agents.allowFromPlaceholder')"
+            />
+            <span class="input-help">{{ t('aiTools.agents.allowFromHelper') }}</span>
+        </el-form-item>
+        <el-form-item :label="t('aiTools.agents.groupPolicy')" prop="groupPolicy">
+            <el-select v-model="form.groupPolicy">
+                <el-option :label="t('aiTools.agents.policyOpen')" value="open" />
+                <el-option :label="t('aiTools.agents.policyAllowlist')" value="allowlist" />
+                <el-option :label="t('aiTools.agents.policyDisabled')" value="disabled" />
+            </el-select>
+        </el-form-item>
+        <el-form-item
+            v-if="form.groupPolicy === 'allowlist'"
+            :label="t('aiTools.agents.groupAllowFrom')"
+            prop="groupAllowFromText"
+        >
+            <el-input
+                v-model="form.groupAllowFromText"
+                type="textarea"
+                :rows="3"
+                :placeholder="t('aiTools.agents.groupAllowFromPlaceholder')"
+            />
+            <span class="input-help">{{ t('aiTools.agents.groupAllowFromHelper') }}</span>
         </el-form-item>
         <el-form-item :label="t('setting.proxy')">
             <el-input v-model="form.proxy" placeholder="http://127.0.0.1:7890" />
+        </el-form-item>
+        <el-form-item :label="t('aiTools.agents.streaming')" prop="streaming">
+            <el-select v-model="form.streaming">
+                <el-option :label="t('aiTools.agents.streamingOff')" value="off" />
+                <el-option :label="t('aiTools.agents.streamingPartial')" value="partial" />
+                <el-option :label="t('aiTools.agents.streamingBlock')" value="block" />
+                <el-option :label="t('aiTools.agents.streamingProgress')" value="progress" />
+            </el-select>
         </el-form-item>
         <ChannelBots
             :bots="form.bots"
@@ -20,6 +59,7 @@
             :summary-formatter="getBotSummary"
             defaultable
             approvable
+            :approve-disabled="isApproveDisabled"
             @update:bots="updateBots"
             @save="saveChannel"
             @approve="approvePairing"
@@ -44,30 +84,121 @@ import { Rules } from '@/global/form-rules';
 import ChannelBots from './components/channel-bots.vue';
 
 const { t } = useI18n();
+
 type BotField = {
     prop: string;
     label: string;
-    type?: 'text' | 'password';
+    type?: 'text' | 'password' | 'select';
     required?: boolean;
+    options?: Array<{
+        label: string;
+        value: string;
+    }>;
 };
+
+interface TelegramForm extends Omit<AI.AgentTelegramConfig, 'allowFrom' | 'groupAllowFrom'> {
+    allowFromText: string;
+    groupAllowFromText: string;
+}
+
 const saving = ref(false);
 const approving = ref(false);
 const agentId = ref(0);
 const formRef = ref<FormInstance>();
 
-const form = reactive<AI.AgentTelegramConfig>({
+const form = reactive<TelegramForm>({
     enabled: true,
     dmPolicy: 'pairing',
+    allowFromText: '',
+    groupPolicy: 'open',
+    groupAllowFromText: '',
     proxy: '',
+    streaming: 'partial',
     defaultAccount: '',
     bots: [],
 });
 
+const parseTextList = (value: string): string[] => {
+    return Array.from(
+        new Set(
+            String(value || '')
+                .split(/\r?\n/)
+                .map((item) => item.trim())
+                .filter(Boolean),
+        ),
+    );
+};
+
+const validateAllowFrom = (_rule: any, value: string, callback: (error?: Error) => void) => {
+    if (form.dmPolicy !== 'allowlist') {
+        callback();
+        return;
+    }
+    if (parseTextList(value).length === 0) {
+        callback(new Error(t('aiTools.agents.allowFromRequired')));
+        return;
+    }
+    callback();
+};
+
+const validateGroupAllowFrom = (_rule: any, value: string, callback: (error?: Error) => void) => {
+    if (form.groupPolicy !== 'allowlist') {
+        callback();
+        return;
+    }
+    if (parseTextList(value).length === 0) {
+        callback(new Error(t('aiTools.agents.allowFromRequired')));
+        return;
+    }
+    callback();
+};
+
 const rules = reactive({
     dmPolicy: [Rules.requiredSelect],
+    groupPolicy: [Rules.requiredSelect],
+    allowFromText: [{ validator: validateAllowFrom, trigger: 'blur' }],
+    groupAllowFromText: [{ validator: validateGroupAllowFrom, trigger: 'blur' }],
+    streaming: [Rules.requiredSelect],
 });
 
-const botFields: BotField[] = [{ prop: 'botToken', label: 'Bot Token', type: 'password', required: true }];
+const botFields: BotField[] = [
+    { prop: 'botToken', label: 'Bot Token', type: 'password', required: true },
+    {
+        prop: 'dmPolicy',
+        label: t('aiTools.agents.dmPolicy'),
+        type: 'select',
+        required: true,
+        options: [
+            { label: t('aiTools.agents.pairingCode'), value: 'pairing' },
+            { label: t('aiTools.agents.policyOpen'), value: 'open' },
+            { label: t('aiTools.agents.policyAllowlist'), value: 'allowlist' },
+            { label: t('aiTools.agents.policyDisabled'), value: 'disabled' },
+        ],
+    },
+    {
+        prop: 'groupPolicy',
+        label: t('aiTools.agents.groupPolicy'),
+        type: 'select',
+        required: true,
+        options: [
+            { label: t('aiTools.agents.policyOpen'), value: 'open' },
+            { label: t('aiTools.agents.policyAllowlist'), value: 'allowlist' },
+            { label: t('aiTools.agents.policyDisabled'), value: 'disabled' },
+        ],
+    },
+    {
+        prop: 'streaming',
+        label: t('aiTools.agents.streaming'),
+        type: 'select',
+        required: true,
+        options: [
+            { label: t('aiTools.agents.streamingOff'), value: 'off' },
+            { label: t('aiTools.agents.streamingPartial'), value: 'partial' },
+            { label: t('aiTools.agents.streamingBlock'), value: 'block' },
+            { label: t('aiTools.agents.streamingProgress'), value: 'progress' },
+        ],
+    },
+];
 
 const createBot = (): AI.AgentTelegramBot => ({
     accountId: '',
@@ -75,6 +206,9 @@ const createBot = (): AI.AgentTelegramBot => ({
     enabled: true,
     isDefault: false,
     botToken: '',
+    dmPolicy: form.dmPolicy,
+    groupPolicy: form.groupPolicy,
+    streaming: form.streaming,
 });
 
 const maskValue = (value: string) => {
@@ -87,9 +221,9 @@ const maskValue = (value: string) => {
     return `${value.slice(0, 4)}****${value.slice(-4)}`;
 };
 
-const getBotSummary = (bot: AI.AgentTelegramBot) => {
-    return maskValue(bot.botToken);
-};
+const getBotSummary = (bot: AI.AgentTelegramBot) => maskValue(bot.botToken);
+
+const isApproveDisabled = (bot: AI.AgentTelegramBot) => bot.dmPolicy !== 'pairing';
 
 const updateBots = (bots: AI.AgentTelegramBot[]) => {
     form.bots = bots;
@@ -101,7 +235,11 @@ const load = async (id: number) => {
     const res = await getAgentTelegramConfig({ agentId: id });
     form.enabled = res.data?.enabled ?? true;
     form.dmPolicy = res.data?.dmPolicy || 'pairing';
+    form.allowFromText = (res.data?.allowFrom || []).join('\n');
+    form.groupPolicy = res.data?.groupPolicy || 'open';
+    form.groupAllowFromText = (res.data?.groupAllowFrom || []).join('\n');
     form.proxy = res.data?.proxy || '';
+    form.streaming = res.data?.streaming || 'partial';
     form.defaultAccount = res.data?.defaultAccount || '';
     form.bots = res.data?.bots || [];
 };
@@ -121,7 +259,11 @@ const saveChannel = async () => {
             agentId: agentId.value,
             enabled: form.enabled,
             dmPolicy: form.dmPolicy || 'pairing',
+            allowFrom: parseTextList(form.allowFromText),
+            groupPolicy: form.groupPolicy || 'open',
+            groupAllowFrom: parseTextList(form.groupAllowFromText),
             proxy: form.proxy,
+            streaming: form.streaming || 'partial',
             defaultAccount: form.defaultAccount,
             bots: form.bots,
         });
@@ -164,3 +306,11 @@ defineExpose({
     load,
 });
 </script>
+
+<style lang="scss" scoped>
+.input-help {
+    font-size: 12px;
+    color: var(--el-text-color-secondary);
+    line-height: 1.5;
+}
+</style>

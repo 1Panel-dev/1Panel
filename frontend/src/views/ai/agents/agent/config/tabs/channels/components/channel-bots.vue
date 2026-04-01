@@ -51,7 +51,12 @@
                             v-if="approvable"
                             link
                             type="primary"
-                            :disabled="disabled || !row.enabled || isBotActionDisabled(row)"
+                            :disabled="
+                                disabled ||
+                                !row.enabled ||
+                                isBotActionDisabled(row) ||
+                                (approveDisabled ? approveDisabled(row) : false)
+                            "
                             @click="emit('approve', row)"
                         >
                             {{ t('aiTools.agents.approvePairing') }}
@@ -81,11 +86,32 @@
                     <el-switch v-model="form.enabled" :disabled="disabled" />
                 </el-form-item>
                 <el-form-item v-for="field in fields" :key="field.prop" :label="field.label" :prop="field.prop">
+                    <el-select
+                        v-if="field.type === 'select'"
+                        v-model="form[field.prop]"
+                        :disabled="disabled"
+                        :placeholder="field.placeholder"
+                    >
+                        <el-option
+                            v-for="option in field.options || []"
+                            :key="option.value"
+                            :label="option.label"
+                            :value="option.value"
+                        />
+                    </el-select>
                     <el-input
-                        v-if="field.type === 'password'"
+                        v-else-if="field.type === 'password'"
                         v-model="form[field.prop]"
                         type="password"
                         show-password
+                        :disabled="disabled"
+                        :placeholder="field.placeholder"
+                    />
+                    <el-input
+                        v-else-if="field.type === 'textarea'"
+                        v-model="form[field.prop]"
+                        type="textarea"
+                        :rows="3"
                         :disabled="disabled"
                         :placeholder="field.placeholder"
                     />
@@ -113,9 +139,13 @@ import { MsgWarning } from '@/utils/message';
 interface ChannelBotField {
     prop: string;
     label: string;
-    type?: 'text' | 'password';
+    type?: 'text' | 'password' | 'select' | 'textarea';
     placeholder?: string;
     required?: boolean;
+    options?: Array<{
+        label: string;
+        value: string;
+    }>;
 }
 
 interface ChannelBotItem {
@@ -158,6 +188,10 @@ const props = defineProps({
     approvable: {
         type: Boolean,
         default: false,
+    },
+    approveDisabled: {
+        type: Function as PropType<(bot: ChannelBotItem) => boolean>,
+        default: undefined,
     },
     addDisabled: {
         type: Boolean,
@@ -317,6 +351,7 @@ const updateEnabled = (index: number, enabled: boolean | string | number) => {
 .channel-bots__title {
     font-size: 14px;
     font-weight: 500;
+    color: var(--el-text-color-primary);
 }
 
 .channel-bots__name {

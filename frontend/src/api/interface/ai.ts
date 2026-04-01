@@ -507,10 +507,18 @@ export namespace AI {
     export interface AgentFeishuBot extends AgentChannelBotBase {
         appId: string;
         appSecret: string;
+        dmPolicy: 'pairing' | 'open' | 'allowlist' | 'disabled';
+        allowFrom: string[];
     }
 
     export interface AgentFeishuConfig {
         enabled: boolean;
+        threadSession: boolean;
+        replyMode: string;
+        streaming: boolean;
+        requireMention: 'true' | 'false' | 'open';
+        groupPolicy: 'open' | 'allowlist' | 'disabled';
+        groupAllowFrom: string[];
         bots: AgentFeishuBot[];
         installed: boolean;
     }
@@ -518,6 +526,12 @@ export namespace AI {
     export interface AgentFeishuConfigUpdateReq {
         agentId: number;
         enabled: boolean;
+        threadSession: boolean;
+        replyMode: string;
+        streaming: boolean;
+        requireMention: 'true' | 'false' | 'open';
+        groupPolicy: 'open' | 'allowlist' | 'disabled';
+        groupAllowFrom: string[];
         bots: AgentFeishuBot[];
     }
 
@@ -532,8 +546,12 @@ export namespace AI {
 
     export interface AgentTelegramConfig {
         enabled: boolean;
-        dmPolicy: string;
+        dmPolicy: 'pairing' | 'open' | 'allowlist' | 'disabled';
+        allowFrom: string[];
+        groupPolicy: 'open' | 'allowlist' | 'disabled';
+        groupAllowFrom: string[];
         proxy: string;
+        streaming: 'off' | 'partial' | 'block' | 'progress';
         defaultAccount: string;
         bots: AgentTelegramBot[];
     }
@@ -541,8 +559,12 @@ export namespace AI {
     export interface AgentTelegramConfigUpdateReq {
         agentId: number;
         enabled: boolean;
-        dmPolicy: string;
+        dmPolicy: 'pairing' | 'open' | 'allowlist' | 'disabled';
+        allowFrom: string[];
+        groupPolicy: 'open' | 'allowlist' | 'disabled';
+        groupAllowFrom: string[];
         proxy: string;
+        streaming: 'off' | 'partial' | 'block' | 'progress';
         defaultAccount: string;
         bots: AgentTelegramBot[];
     }
@@ -556,6 +578,9 @@ export namespace AI {
 
     export interface AgentTelegramBot extends AgentChannelBotBase {
         botToken: string;
+        dmPolicy: 'pairing' | 'open' | 'allowlist' | 'disabled';
+        groupPolicy: 'open' | 'allowlist' | 'disabled';
+        streaming: 'off' | 'partial' | 'block' | 'progress';
     }
 
     export interface AgentWecomConfigReq {
@@ -564,7 +589,10 @@ export namespace AI {
 
     export interface AgentWecomConfig {
         enabled: boolean;
-        dmPolicy: 'pairing' | 'open';
+        dmPolicy: 'pairing' | 'open' | 'allowlist' | 'disabled';
+        allowFrom: string[];
+        groupPolicy: 'open' | 'allowlist' | 'disabled';
+        groupAllowFrom: string[];
         botId: string;
         secret: string;
         installed: boolean;
@@ -573,7 +601,10 @@ export namespace AI {
     export interface AgentWecomConfigUpdateReq {
         agentId: number;
         enabled: boolean;
-        dmPolicy: 'pairing' | 'open';
+        dmPolicy: 'pairing' | 'open' | 'allowlist' | 'disabled';
+        allowFrom: string[];
+        groupPolicy: 'open' | 'allowlist' | 'disabled';
+        groupAllowFrom: string[];
         botId: string;
         secret: string;
     }
@@ -588,6 +619,11 @@ export namespace AI {
         allowFrom: string[];
         groupPolicy: 'open' | 'allowlist' | 'disabled';
         groupAllowFrom: string[];
+        separateSessionByConversation: boolean;
+        groupSessionScope: 'group' | 'group_sender';
+        sharedMemoryAcrossConversations: boolean;
+        asyncMode: boolean;
+        ackText: string;
         bots: AgentDingTalkBot[];
         installed: boolean;
     }
@@ -599,6 +635,11 @@ export namespace AI {
         allowFrom: string[];
         groupPolicy: 'open' | 'allowlist' | 'disabled';
         groupAllowFrom: string[];
+        separateSessionByConversation: boolean;
+        groupSessionScope: 'group' | 'group_sender';
+        sharedMemoryAcrossConversations: boolean;
+        asyncMode: boolean;
+        ackText: string;
         bots: AgentDingTalkBot[];
     }
 
@@ -684,6 +725,8 @@ export namespace AI {
     export interface AgentQQBotBot extends AgentChannelBotBase {
         appId: string;
         clientSecret: string;
+        allowFrom: string[];
+        systemPrompt: string;
     }
 
     export interface AgentDingTalkBot extends AgentChannelBotBase {

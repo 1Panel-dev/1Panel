@@ -36,8 +36,14 @@ func (a AgentService) GetFeishuConfig(req dto.AgentFeishuConfigReq) (*dto.AgentF
 func (a AgentService) UpdateFeishuConfig(req dto.AgentFeishuConfigUpdateReq) error {
 	return a.mutateAgentConfig(req.AgentID, func(_ *model.Agent, _ *model.AppInstall, conf map[string]interface{}) error {
 		config := dto.AgentFeishuConfig{
-			Enabled: req.Enabled,
-			Bots:    req.Bots,
+			Enabled:        req.Enabled,
+			ThreadSession:  req.ThreadSession,
+			ReplyMode:      req.ReplyMode,
+			Streaming:      req.Streaming,
+			RequireMention: req.RequireMention,
+			GroupPolicy:    req.GroupPolicy,
+			GroupAllowFrom: req.GroupAllowFrom,
+			Bots:           req.Bots,
 		}
 		setFeishuConfig(conf, config)
 		setFeishuPluginEnabled(conf, config.Enabled && hasEnabledFeishuBots(config.Bots))
@@ -59,7 +65,11 @@ func (a AgentService) UpdateTelegramConfig(req dto.AgentTelegramConfigUpdateReq)
 		setTelegramConfig(conf, dto.AgentTelegramConfig{
 			Enabled:        req.Enabled,
 			DmPolicy:       req.DmPolicy,
+			AllowFrom:      req.AllowFrom,
+			GroupPolicy:    req.GroupPolicy,
+			GroupAllowFrom: req.GroupAllowFrom,
 			Proxy:          req.Proxy,
+			Streaming:      req.Streaming,
 			DefaultAccount: req.DefaultAccount,
 			Bots:           req.Bots,
 		})
@@ -125,10 +135,13 @@ func (a AgentService) GetWecomConfig(req dto.AgentIDReq) (*dto.AgentWecomConfig,
 func (a AgentService) UpdateWecomConfig(req dto.AgentWecomConfigUpdateReq) error {
 	return a.mutateAgentConfig(req.AgentID, func(_ *model.Agent, _ *model.AppInstall, conf map[string]interface{}) error {
 		setWecomConfig(conf, dto.AgentWecomConfig{
-			Enabled:  req.Enabled,
-			DmPolicy: req.DmPolicy,
-			BotID:    req.BotID,
-			Secret:   req.Secret,
+			Enabled:        req.Enabled,
+			DmPolicy:       req.DmPolicy,
+			AllowFrom:      req.AllowFrom,
+			GroupPolicy:    req.GroupPolicy,
+			GroupAllowFrom: req.GroupAllowFrom,
+			BotID:          req.BotID,
+			Secret:         req.Secret,
 		})
 		return nil
 	})
@@ -148,12 +161,17 @@ func (a AgentService) GetDingTalkConfig(req dto.AgentIDReq) (*dto.AgentDingTalkC
 func (a AgentService) UpdateDingTalkConfig(req dto.AgentDingTalkConfigUpdateReq) error {
 	return a.mutateAgentConfig(req.AgentID, func(_ *model.Agent, _ *model.AppInstall, conf map[string]interface{}) error {
 		setDingTalkConfig(conf, dto.AgentDingTalkConfig{
-			Enabled:        req.Enabled,
-			DmPolicy:       req.DmPolicy,
-			AllowFrom:      req.AllowFrom,
-			GroupPolicy:    req.GroupPolicy,
-			GroupAllowFrom: req.GroupAllowFrom,
-			Bots:           req.Bots,
+			Enabled:                         req.Enabled,
+			DmPolicy:                        req.DmPolicy,
+			AllowFrom:                       req.AllowFrom,
+			GroupPolicy:                     req.GroupPolicy,
+			GroupAllowFrom:                  req.GroupAllowFrom,
+			SeparateSessionByConversation:   req.SeparateSessionByConversation,
+			GroupSessionScope:               req.GroupSessionScope,
+			SharedMemoryAcrossConversations: req.SharedMemoryAcrossConversations,
+			AsyncMode:                       req.AsyncMode,
+			AckText:                         req.AckText,
+			Bots:                            req.Bots,
 		})
 		return nil
 	})
@@ -349,7 +367,16 @@ func (a AgentService) ApproveChannelPairing(req dto.AgentChannelPairingApproveRe
 }
 
 func extractFeishuConfig(conf map[string]interface{}) dto.AgentFeishuConfig {
-	result := dto.AgentFeishuConfig{Enabled: true, Bots: []dto.AgentFeishuBot{defaultFeishuBot()}}
+	result := dto.AgentFeishuConfig{
+		Enabled:        true,
+		ThreadSession:  true,
+		ReplyMode:      "auto",
+		Streaming:      false,
+		RequireMention: "true",
+		GroupPolicy:    "open",
+		GroupAllowFrom: []string{},
+		Bots:           []dto.AgentFeishuBot{defaultFeishuBot()},
+	}
 	feishu := getChannelConfig(conf, "feishu")
 	if len(feishu) == 0 {
 		return result
@@ -357,16 +384,38 @@ func extractFeishuConfig(conf map[string]interface{}) dto.AgentFeishuConfig {
 	if enabled, ok := feishu["enabled"].(bool); ok {
 		result.Enabled = enabled
 	}
+	if threadSession, ok := feishu["threadSession"].(bool); ok {
+		result.ThreadSession = threadSession
+	}
+	if replyMode := extractStringValue(feishu["replyMode"]); replyMode != "" {
+		result.ReplyMode = replyMode
+	}
+	if streaming, ok := feishu["streaming"].(bool); ok {
+		result.Streaming = streaming
+	}
+	result.RequireMention = extractRequireMentionValue(feishu["requireMention"], result.RequireMention)
+	if groupPolicy := extractStringValue(feishu["groupPolicy"]); groupPolicy != "" {
+		result.GroupPolicy = groupPolicy
+	}
+	result.GroupAllowFrom = extractStringList(feishu["groupAllowFrom"])
 	defaultBot := defaultFeishuBot()
-	defaultBot.Enabled = extractBoolValue(feishu["enabled"], true)
-	defaultBot.Name = extractDisplayName(feishu, extractStringValue(feishu["botName"]), "Default")
 	defaultBot.AppID = extractStringValue(feishu["appId"])
 	defaultBot.AppSecret = extractStringValue(feishu["appSecret"])
-	bots := []dto.AgentFeishuBot{defaultBot}
 	accounts := childMap(feishu, "accounts")
+	defaultAccount := childMap(accounts, "default")
+	defaultBot.Enabled = extractBoolValue(defaultAccount["enabled"], extractBoolValue(feishu["enabled"], true))
+	defaultBot.Name = extractDisplayName(defaultAccount, extractStringValue(defaultAccount["botName"]), "Default")
+	if dmPolicy := extractStringValue(defaultAccount["dmPolicy"]); dmPolicy != "" {
+		defaultBot.DmPolicy = dmPolicy
+	}
+	defaultBot.AllowFrom = extractStringList(defaultAccount["allowFrom"])
+	bots := []dto.AgentFeishuBot{defaultBot}
 	for _, accountID := range sortedChildKeys(accounts) {
+		if accountID == "default" {
+			continue
+		}
 		account := childMap(accounts, accountID)
-		bots = append(bots, dto.AgentFeishuBot{
+		bot := dto.AgentFeishuBot{
 			AgentChannelBotBase: dto.AgentChannelBotBase{
 				AccountID: accountID,
 				Name:      extractDisplayName(account, extractStringValue(account["botName"]), accountID),
@@ -374,7 +423,12 @@ func extractFeishuConfig(conf map[string]interface{}) dto.AgentFeishuConfig {
 			},
 			AppID:     extractStringValue(account["appId"]),
 			AppSecret: extractStringValue(account["appSecret"]),
-		})
+			AllowFrom: extractStringList(account["allowFrom"]),
+		}
+		if dmPolicy := extractStringValue(account["dmPolicy"]); dmPolicy != "" {
+			bot.DmPolicy = dmPolicy
+		}
+		bots = append(bots, bot)
 	}
 	result.Bots = bots
 	return result
@@ -386,20 +440,68 @@ func setFeishuConfig(conf map[string]interface{}, config dto.AgentFeishuConfig) 
 	defaultBot := getDefaultFeishuBot(config.Bots)
 	effectiveEnabled := config.Enabled && hasEnabledFeishuBots(config.Bots)
 	feishu["enabled"] = effectiveEnabled
+	feishu["threadSession"] = config.ThreadSession
+	feishu["replyMode"] = config.ReplyMode
+	feishu["streaming"] = config.Streaming
+	if config.RequireMention == "open" {
+		feishu["requireMention"] = "open"
+	} else {
+		feishu["requireMention"] = config.RequireMention == "true"
+	}
+	feishu["groupPolicy"] = config.GroupPolicy
+	if config.GroupPolicy == "allowlist" {
+		feishu["groupAllowFrom"] = append([]string(nil), config.GroupAllowFrom...)
+	} else {
+		delete(feishu, "groupAllowFrom")
+	}
 	feishu["appId"] = defaultBot.AppID
 	feishu["appSecret"] = defaultBot.AppSecret
-	feishu["botName"] = defaultBot.Name
+	delete(feishu, "botName")
+	delete(feishu, "dmPolicy")
+	delete(feishu, "allowFrom")
+	delete(feishu, "connectionMode")
+	delete(feishu, "domain")
+	delete(feishu, "webhookPath")
+	delete(feishu, "reactionNotifications")
+	delete(feishu, "typingIndicator")
+	delete(feishu, "resolveSenderNames")
+	delete(feishu, "defaultAccount")
 	accounts := make(map[string]interface{}, len(config.Bots))
+	defaultAccount := map[string]interface{}{}
+	if !defaultBot.Enabled {
+		defaultAccount["enabled"] = false
+	}
+	if defaultBot.Name != "" && defaultBot.Name != "Default" {
+		defaultAccount["botName"] = defaultBot.Name
+	}
+	if defaultBot.DmPolicy != "" {
+		defaultAccount["dmPolicy"] = defaultBot.DmPolicy
+	}
+	if defaultBot.DmPolicy == "open" {
+		defaultAccount["allowFrom"] = []string{"*"}
+	} else if defaultBot.DmPolicy == "allowlist" {
+		defaultAccount["allowFrom"] = append([]string(nil), defaultBot.AllowFrom...)
+	}
+	accounts["default"] = defaultAccount
 	for _, bot := range config.Bots {
 		if bot.AccountID == "default" || bot.IsDefault {
 			continue
 		}
-		accounts[bot.AccountID] = map[string]interface{}{
+		account := map[string]interface{}{
 			"enabled":   bot.Enabled,
 			"botName":   bot.Name,
 			"appId":     bot.AppID,
 			"appSecret": bot.AppSecret,
 		}
+		if bot.DmPolicy != "" {
+			account["dmPolicy"] = bot.DmPolicy
+		}
+		if bot.DmPolicy == "open" {
+			account["allowFrom"] = []string{"*"}
+		} else if bot.DmPolicy == "allowlist" {
+			account["allowFrom"] = append([]string(nil), bot.AllowFrom...)
+		}
+		accounts[bot.AccountID] = account
 	}
 	feishu["accounts"] = accounts
 }
@@ -414,7 +516,14 @@ func setFeishuPluginEnabled(conf map[string]interface{}, enabled bool) {
 }
 
 func extractTelegramConfig(conf map[string]interface{}) dto.AgentTelegramConfig {
-	result := dto.AgentTelegramConfig{Enabled: true, DmPolicy: "pairing"}
+	result := dto.AgentTelegramConfig{
+		Enabled:        true,
+		DmPolicy:       "pairing",
+		AllowFrom:      []string{},
+		GroupPolicy:    "open",
+		GroupAllowFrom: []string{},
+		Streaming:      "partial",
+	}
 	telegram := getChannelConfig(conf, "telegram")
 	if len(telegram) == 0 {
 		return result
@@ -425,14 +534,25 @@ func extractTelegramConfig(conf map[string]interface{}) dto.AgentTelegramConfig 
 	if dmPolicy := extractStringValue(telegram["dmPolicy"]); dmPolicy != "" {
 		result.DmPolicy = dmPolicy
 	}
+	result.AllowFrom = extractStringList(telegram["allowFrom"])
+	if groupPolicy := extractStringValue(telegram["groupPolicy"]); groupPolicy != "" {
+		result.GroupPolicy = groupPolicy
+	}
+	result.GroupAllowFrom = extractStringList(telegram["groupAllowFrom"])
 	result.Proxy = extractStringValue(telegram["proxy"])
+	if streaming := extractStringValue(telegram["streaming"]); streaming != "" {
+		result.Streaming = streaming
+	}
 	accounts := childMap(telegram, "accounts")
 	if len(accounts) == 0 {
 		botToken := extractStringValue(telegram["botToken"])
 		if botToken != "" {
 			accounts["default"] = map[string]interface{}{
-				"enabled":  extractBoolValue(telegram["enabled"], true),
-				"botToken": botToken,
+				"enabled":     extractBoolValue(telegram["enabled"], true),
+				"botToken":    botToken,
+				"dmPolicy":    result.DmPolicy,
+				"groupPolicy": result.GroupPolicy,
+				"streaming":   result.Streaming,
 			}
 		}
 	}
@@ -445,7 +565,10 @@ func extractTelegramConfig(conf map[string]interface{}) dto.AgentTelegramConfig 
 				Name:      extractDisplayName(account, accountID, accountID),
 				Enabled:   extractBoolValue(account["enabled"], true),
 			},
-			BotToken: extractStringValue(account["botToken"]),
+			BotToken:    extractStringValue(account["botToken"]),
+			DmPolicy:    extractStringValue(account["dmPolicy"]),
+			GroupPolicy: extractStringValue(account["groupPolicy"]),
+			Streaming:   extractStringValue(account["streaming"]),
 		})
 	}
 	result.DefaultAccount = normalizeDefaultAccount(extractStringValue(telegram["defaultAccount"]), getTelegramBotAccountIDs(bots))
@@ -461,24 +584,40 @@ func setTelegramConfig(conf map[string]interface{}, config dto.AgentTelegramConf
 	effectiveEnabled := config.Enabled && hasEnabledTelegramBots(config.Bots)
 	telegram["enabled"] = effectiveEnabled
 	telegram["dmPolicy"] = config.DmPolicy
+	telegram["groupPolicy"] = config.GroupPolicy
 	telegram["defaultAccount"] = defaultAccount
 	if config.DmPolicy == "open" {
 		telegram["allowFrom"] = []string{"*"}
+	} else if config.DmPolicy == "allowlist" {
+		telegram["allowFrom"] = append([]string(nil), config.AllowFrom...)
 	} else {
 		delete(telegram, "allowFrom")
+	}
+	if config.GroupPolicy == "allowlist" {
+		telegram["groupAllowFrom"] = append([]string(nil), config.GroupAllowFrom...)
+	} else {
+		delete(telegram, "groupAllowFrom")
 	}
 	if config.Proxy != "" {
 		telegram["proxy"] = config.Proxy
 	} else {
 		delete(telegram, "proxy")
 	}
+	telegram["streaming"] = config.Streaming
 	accounts := make(map[string]interface{}, len(config.Bots))
 	for _, bot := range config.Bots {
-		accounts[bot.AccountID] = map[string]interface{}{
-			"enabled":  bot.Enabled,
-			"name":     bot.Name,
-			"botToken": bot.BotToken,
+		account := map[string]interface{}{
+			"enabled":     bot.Enabled,
+			"name":        bot.Name,
+			"botToken":    bot.BotToken,
+			"dmPolicy":    bot.DmPolicy,
+			"groupPolicy": bot.GroupPolicy,
+			"streaming":   bot.Streaming,
 		}
+		if bot.DmPolicy == "open" {
+			account["allowFrom"] = []string{"*"}
+		}
+		accounts[bot.AccountID] = account
 	}
 	telegram["accounts"] = accounts
 	delete(telegram, "botToken")
@@ -584,6 +723,8 @@ func extractQQBotConfig(conf map[string]interface{}) dto.AgentQQBotConfig {
 			},
 			AppID:        extractStringValue(qqbot["appId"]),
 			ClientSecret: extractStringValue(qqbot["clientSecret"]),
+			AllowFrom:    extractStringList(qqbot["allowFrom"]),
+			SystemPrompt: extractStringValue(qqbot["systemPrompt"]),
 		},
 	}
 	if bots[0].Name == "" {
@@ -599,6 +740,8 @@ func extractQQBotConfig(conf map[string]interface{}) dto.AgentQQBotConfig {
 			},
 			AppID:        extractStringValue(account["appId"]),
 			ClientSecret: extractStringValue(account["clientSecret"]),
+			AllowFrom:    extractStringList(account["allowFrom"]),
+			SystemPrompt: extractStringValue(account["systemPrompt"]),
 		})
 	}
 	result.Bots = bots
@@ -606,7 +749,13 @@ func extractQQBotConfig(conf map[string]interface{}) dto.AgentQQBotConfig {
 }
 
 func extractWecomConfig(conf map[string]interface{}) dto.AgentWecomConfig {
-	result := dto.AgentWecomConfig{Enabled: true, DmPolicy: "pairing"}
+	result := dto.AgentWecomConfig{
+		Enabled:        true,
+		DmPolicy:       "pairing",
+		AllowFrom:      []string{},
+		GroupPolicy:    "open",
+		GroupAllowFrom: []string{},
+	}
 	channels, ok := conf["channels"].(map[string]interface{})
 	if !ok {
 		return result
@@ -621,6 +770,11 @@ func extractWecomConfig(conf map[string]interface{}) dto.AgentWecomConfig {
 	if dmPolicy := extractStringValue(wecom["dmPolicy"]); dmPolicy != "" {
 		result.DmPolicy = dmPolicy
 	}
+	result.AllowFrom = extractStringList(wecom["allowFrom"])
+	if groupPolicy := extractStringValue(wecom["groupPolicy"]); groupPolicy != "" {
+		result.GroupPolicy = groupPolicy
+	}
+	result.GroupAllowFrom = extractStringList(wecom["groupAllowFrom"])
 	result.BotID = extractStringValue(wecom["botId"])
 	result.Secret = extractStringValue(wecom["secret"])
 	return result
@@ -628,11 +782,16 @@ func extractWecomConfig(conf map[string]interface{}) dto.AgentWecomConfig {
 
 func extractDingTalkConfig(conf map[string]interface{}) dto.AgentDingTalkConfig {
 	result := dto.AgentDingTalkConfig{
-		Enabled:        true,
-		DmPolicy:       "open",
-		GroupPolicy:    "disabled",
-		AllowFrom:      []string{},
-		GroupAllowFrom: []string{},
+		Enabled:                         true,
+		DmPolicy:                        "open",
+		GroupPolicy:                     "disabled",
+		AllowFrom:                       []string{},
+		GroupAllowFrom:                  []string{},
+		SeparateSessionByConversation:   true,
+		GroupSessionScope:               "group",
+		SharedMemoryAcrossConversations: false,
+		AsyncMode:                       false,
+		AckText:                         "🫡 任务已接收，处理中...",
 	}
 	dingtalk := getChannelConfig(conf, "dingtalk-connector")
 	if len(dingtalk) == 0 {
@@ -653,6 +812,21 @@ func extractDingTalkConfig(conf map[string]interface{}) dto.AgentDingTalkConfig 
 	}
 	result.AllowFrom = extractStringList(dingtalk["allowFrom"])
 	result.GroupAllowFrom = extractStringList(dingtalk["groupAllowFrom"])
+	if separateSessionByConversation, ok := dingtalk["separateSessionByConversation"].(bool); ok {
+		result.SeparateSessionByConversation = separateSessionByConversation
+	}
+	if groupSessionScope := extractStringValue(dingtalk["groupSessionScope"]); groupSessionScope != "" {
+		result.GroupSessionScope = groupSessionScope
+	}
+	if sharedMemoryAcrossConversations, ok := dingtalk["sharedMemoryAcrossConversations"].(bool); ok {
+		result.SharedMemoryAcrossConversations = sharedMemoryAcrossConversations
+	}
+	if asyncMode, ok := dingtalk["asyncMode"].(bool); ok {
+		result.AsyncMode = asyncMode
+	}
+	if ackText := extractStringValue(dingtalk["ackText"]); ackText != "" {
+		result.AckText = ackText
+	}
 	accounts := childMap(dingtalk, "accounts")
 	if len(accounts) == 0 {
 		clientID := extractStringValue(dingtalk["clientId"])
@@ -689,10 +863,17 @@ func setWecomConfig(conf map[string]interface{}, config dto.AgentWecomConfig) {
 	wecom["botId"] = config.BotID
 	wecom["secret"] = config.Secret
 	wecom["dmPolicy"] = config.DmPolicy
-	if config.DmPolicy == "open" {
-		wecom["allowFrom"] = []string{"*"}
+	wecom["groupPolicy"] = config.GroupPolicy
+	wecom["sendThinkingMessage"] = true
+	if config.DmPolicy == "allowlist" {
+		wecom["allowFrom"] = append([]string(nil), config.AllowFrom...)
 	} else {
-		wecom["allowFrom"] = []string{}
+		delete(wecom, "allowFrom")
+	}
+	if config.GroupPolicy == "allowlist" {
+		wecom["groupAllowFrom"] = append([]string(nil), config.GroupAllowFrom...)
+	} else {
+		delete(wecom, "groupAllowFrom")
 	}
 
 	plugins := ensureChildMap(conf, "plugins")
@@ -709,6 +890,11 @@ func setDingTalkConfig(conf map[string]interface{}, config dto.AgentDingTalkConf
 	dingtalk["dmPolicy"] = config.DmPolicy
 	dingtalk["groupPolicy"] = config.GroupPolicy
 	dingtalk["gatewayToken"] = extractGatewayToken(conf)
+	dingtalk["separateSessionByConversation"] = config.SeparateSessionByConversation
+	dingtalk["groupSessionScope"] = config.GroupSessionScope
+	dingtalk["sharedMemoryAcrossConversations"] = config.SharedMemoryAcrossConversations
+	dingtalk["asyncMode"] = config.AsyncMode
+	dingtalk["ackText"] = config.AckText
 	switch config.DmPolicy {
 	case "open":
 		dingtalk["allowFrom"] = []string{"*"}
@@ -757,22 +943,38 @@ func setQQBotConfig(conf map[string]interface{}, config dto.AgentQQBotConfig) {
 	effectiveEnabled := config.Enabled && hasEnabledQQBots(config.Bots)
 	delete(qqbot, "dmPolicy")
 	qqbot["enabled"] = effectiveEnabled
-	qqbot["allowFrom"] = []string{"*"}
 	qqbot["appId"] = defaultBot.AppID
 	qqbot["clientSecret"] = defaultBot.ClientSecret
 	qqbot["name"] = defaultBot.Name
+	if len(defaultBot.AllowFrom) > 0 {
+		qqbot["allowFrom"] = append([]string(nil), defaultBot.AllowFrom...)
+	} else {
+		delete(qqbot, "allowFrom")
+	}
+	if defaultBot.SystemPrompt != "" {
+		qqbot["systemPrompt"] = defaultBot.SystemPrompt
+	} else {
+		delete(qqbot, "systemPrompt")
+	}
 
 	accounts := make(map[string]interface{}, len(config.Bots))
 	for _, bot := range config.Bots {
 		if bot.AccountID == "default" || bot.IsDefault {
 			continue
 		}
-		accounts[bot.AccountID] = map[string]interface{}{
+		account := map[string]interface{}{
 			"enabled":      bot.Enabled,
 			"name":         bot.Name,
 			"appId":        bot.AppID,
 			"clientSecret": bot.ClientSecret,
 		}
+		if len(bot.AllowFrom) > 0 {
+			account["allowFrom"] = append([]string(nil), bot.AllowFrom...)
+		}
+		if bot.SystemPrompt != "" {
+			account["systemPrompt"] = bot.SystemPrompt
+		}
+		accounts[bot.AccountID] = account
 	}
 	qqbot["accounts"] = accounts
 
@@ -953,6 +1155,21 @@ func extractStringValue(value interface{}) string {
 	return text
 }
 
+func extractRequireMentionValue(value interface{}, defaultValue string) string {
+	switch typed := value.(type) {
+	case bool:
+		if typed {
+			return "true"
+		}
+		return "false"
+	case string:
+		if typed != "" {
+			return typed
+		}
+	}
+	return defaultValue
+}
+
 func extractBoolValue(value interface{}, defaultValue bool) bool {
 	result, ok := value.(bool)
 	if !ok {
@@ -1088,6 +1305,8 @@ func defaultFeishuBot() dto.AgentFeishuBot {
 			Enabled:   true,
 			IsDefault: true,
 		},
+		DmPolicy:  "pairing",
+		AllowFrom: []string{},
 	}
 }
 
