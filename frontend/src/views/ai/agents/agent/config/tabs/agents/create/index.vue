@@ -3,7 +3,6 @@
         <div v-loading="loading" class="create-role-dialog">
             <el-form ref="formRef" :model="form" :rules="rules" label-position="top">
                 <div class="create-role-section">
-                    <div class="create-role-section__title">{{ $t('commons.table.name') }}</div>
                     <el-form-item :label="$t('commons.table.name')" prop="name">
                         <el-input v-model.trim="form.name" />
                     </el-form-item>
@@ -90,7 +89,7 @@ import { createAgentRole, getAgentRoleChannels, pageAgentAccounts } from '@/api/
 import { AI } from '@/api/interface/ai';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 
 interface SelectOption {
@@ -151,6 +150,10 @@ const handleBindingChannelChange = (index: number) => {
         return;
     }
     binding.accountId = '';
+    const options = getAccountIdOptions(binding.channel);
+    if (options.length === 1) {
+        binding.accountId = options[0];
+    }
 };
 
 const getAccountIdOptions = (channel: string) => {
@@ -160,6 +163,9 @@ const getAccountIdOptions = (channel: string) => {
 const isChannelDisabled = (option: SelectOption, index: number) => {
     if (option.bound) {
         return true;
+    }
+    if ((option.accountIds || []).length > 0) {
+        return false;
     }
     return form.bindings.some((item, bindingIndex) => bindingIndex !== index && item.channel === option.value);
 };
@@ -209,18 +215,27 @@ const submit = async () => {
         return;
     }
     await formRef.value.validate();
+    const bindings = form.bindings.filter((item) => item.channel);
+    const hasDuplicate = bindings.some((item, index) =>
+        bindings.some(
+            (current, currentIndex) =>
+                currentIndex !== index && current.channel === item.channel && current.accountId === item.accountId,
+        ),
+    );
+    if (hasDuplicate) {
+        MsgError(i18n.global.t('aiTools.agents.duplicateBinding'));
+        return;
+    }
     loading.value = true;
     try {
         await createAgentRole({
             agentId: agentId.value,
             name: form.name.trim(),
             model: form.model.trim(),
-            bindings: form.bindings
-                .filter((item) => item.channel)
-                .map((item) => ({
-                    channel: item.channel,
-                    accountId: item.accountId.trim(),
-                })),
+            bindings: bindings.map((item) => ({
+                channel: item.channel,
+                accountId: item.accountId.trim(),
+            })),
         } as AI.AgentRoleCreateReq);
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         emit('success');

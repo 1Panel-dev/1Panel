@@ -91,18 +91,19 @@ func (a AgentService) GetRoleChannels(req dto.AgentRoleChannelsReq) ([]dto.Agent
 	if !ok || len(channels) == 0 {
 		return []dto.AgentRoleChannelItem{}, nil
 	}
-	boundChannels := loadBoundChannelSet(conf["bindings"])
+	boundBindings := loadBoundChannelBindings(conf["bindings"])
 	result := make([]dto.AgentRoleChannelItem, 0, len(channels))
 	for key := range channels {
 		key = strings.TrimSpace(key)
 		if key == "" {
 			continue
 		}
-		channelConf, _ := channels[key].(map[string]interface{})
+		accountIDs := extractRoleChannelAccountIDs(conf, key)
+		availableAccountIDs := filterAvailableChannelAccountIDs(boundBindings, key, accountIDs)
 		result = append(result, dto.AgentRoleChannelItem{
 			Name:       key,
-			Bound:      boundChannels[key],
-			AccountIDs: extractChannelAccountIDs(channelConf),
+			Bound:      isRoleChannelFullyBound(boundBindings, key, accountIDs, availableAccountIDs),
+			AccountIDs: availableAccountIDs,
 		})
 	}
 	sort.Slice(result, func(i, j int) bool {
@@ -144,6 +145,50 @@ func (a AgentService) DeleteRole(req dto.AgentRoleDeleteReq) error {
 		}
 	}
 	return nil
+}
+
+func (a AgentService) BindRole(req dto.AgentRoleBindReq) error {
+	return a.operateRoleBinding(req, "bind")
+}
+
+func (a AgentService) UnbindRole(req dto.AgentRoleBindReq) error {
+	return a.operateRoleBinding(req, "unbind")
+}
+
+func (a AgentService) operateRoleBinding(req dto.AgentRoleBindReq, action string) error {
+	agent, install, conf, err := a.loadAgentConfig(req.AgentID)
+	if err != nil {
+		return err
+	}
+
+	baseDir := path.Join(global.Dir.AppInstallDir, agent.AgentType, agent.Name, "data")
+	roleID := req.ID
+	if roleID == "" {
+		return buserr.New("ErrRecordNotFound")
+	}
+	if _, ok := findConfiguredAgentByID(baseDir, conf, roleID); !ok {
+		return buserr.New("ErrRecordNotFound")
+	}
+
+	binding := formatRoleBinding(req.Channel, req.AccountID)
+	if binding == "" {
+		return buserr.New("ErrInvalidParams")
+	}
+	args := []string{
+		"exec",
+		install.ContainerName,
+		"openclaw",
+		"agents",
+		action,
+		"--agent",
+		roleID,
+		"--bind",
+		binding,
+	}
+	args = append(args, "--json")
+	mgr := cmd.NewCommandMgr(cmd.WithTimeout(2 * time.Minute))
+	_, err = mgr.RunWithStdout("docker", args...)
+	return err
 }
 
 func (a AgentService) GetRoleMarkdownFiles(req dto.AgentRoleMarkdownFilesReq) ([]dto.AgentRoleMarkdownFileItem, error) {
@@ -250,6 +295,16 @@ func findConfiguredAgentByID(baseDir string, conf map[string]interface{}, id str
 	return dto.AgentConfiguredAgentItem{}, false
 }
 
+func formatRoleBinding(channel, accountID string) string {
+	if channel == "" {
+		return ""
+	}
+	if accountID == "" {
+		return channel
+	}
+	return channel + ":" + accountID
+}
+
 func applyConfiguredAgentBindings(agents []dto.AgentConfiguredAgentItem, value interface{}) {
 	bindings, ok := value.([]interface{})
 	if !ok || len(agents) == 0 {
@@ -305,8 +360,8 @@ func applyConfiguredAgentBindings(agents []dto.AgentConfiguredAgentItem, value i
 	}
 }
 
-func loadBoundChannelSet(value interface{}) map[string]bool {
-	result := make(map[string]bool)
+func loadBoundChannelBindings(value interface{}) map[string]map[string]struct{} {
+	result := make(map[string]map[string]struct{})
 	bindings, ok := value.([]interface{})
 	if !ok {
 		return result
@@ -328,12 +383,112 @@ func loadBoundChannelSet(value interface{}) map[string]bool {
 		if channel == "" {
 			continue
 		}
-		result[channel] = true
+		accountID, _ := match["accountId"].(string)
+		accountID = strings.TrimSpace(accountID)
+		if accountID == "" {
+			accountID, _ = record["accountId"].(string)
+			accountID = strings.TrimSpace(accountID)
+		}
+		if _, ok := result[channel]; !ok {
+			result[channel] = make(map[string]struct{})
+		}
+		result[channel][accountID] = struct{}{}
 	}
 	return result
 }
 
-func extractChannelAccountIDs(channel map[string]interface{}) []string {
+func extractRoleChannelAccountIDs(conf map[string]interface{}, channel string) []string {
+	switch channel {
+	case "feishu":
+		config := extractFeishuConfig(conf)
+		accountIDs := make([]string, 0, len(config.Bots))
+		for _, item := range config.Bots {
+			if accountID := item.AccountID; accountID != "" {
+				accountIDs = append(accountIDs, accountID)
+			}
+		}
+		sort.Strings(accountIDs)
+		return accountIDs
+	case "telegram":
+		config := extractTelegramConfig(conf)
+		accountIDs := make([]string, 0, len(config.Bots))
+		for _, item := range config.Bots {
+			if accountID := item.AccountID; accountID != "" {
+				accountIDs = append(accountIDs, accountID)
+			}
+		}
+		sort.Strings(accountIDs)
+		return accountIDs
+	case "discord":
+		config := extractDiscordConfig(conf)
+		accountIDs := make([]string, 0, len(config.Bots))
+		for _, item := range config.Bots {
+			if accountID := item.AccountID; accountID != "" {
+				accountIDs = append(accountIDs, accountID)
+			}
+		}
+		sort.Strings(accountIDs)
+		return accountIDs
+	case "qqbot":
+		config := extractQQBotConfig(conf)
+		accountIDs := make([]string, 0, len(config.Bots))
+		for _, item := range config.Bots {
+			if accountID := item.AccountID; accountID != "" {
+				accountIDs = append(accountIDs, accountID)
+			}
+		}
+		sort.Strings(accountIDs)
+		return accountIDs
+	case "dingtalk-connector":
+		config := extractDingTalkConfig(conf)
+		accountIDs := make([]string, 0, len(config.Bots))
+		for _, item := range config.Bots {
+			if accountID := item.AccountID; accountID != "" {
+				accountIDs = append(accountIDs, accountID)
+			}
+		}
+		sort.Strings(accountIDs)
+		return accountIDs
+	case "wecom":
+		return []string{}
+	default:
+		return extractRawChannelAccountIDs(getChannelConfig(conf, channel))
+	}
+}
+
+func filterAvailableChannelAccountIDs(bindings map[string]map[string]struct{}, channel string, accountIDs []string) []string {
+	channelBindings, ok := bindings[strings.TrimSpace(channel)]
+	if !ok || len(channelBindings) == 0 {
+		return append([]string(nil), accountIDs...)
+	}
+	if _, ok := channelBindings[""]; ok {
+		return []string{}
+	}
+	result := make([]string, 0, len(accountIDs))
+	for _, accountID := range accountIDs {
+		if _, ok := channelBindings[accountID]; ok {
+			continue
+		}
+		result = append(result, accountID)
+	}
+	return result
+}
+
+func isRoleChannelFullyBound(bindings map[string]map[string]struct{}, channel string, allAccountIDs, availableAccountIDs []string) bool {
+	channelBindings, ok := bindings[strings.TrimSpace(channel)]
+	if !ok || len(channelBindings) == 0 {
+		return false
+	}
+	if _, ok := channelBindings[""]; ok {
+		return true
+	}
+	if len(allAccountIDs) == 0 {
+		return true
+	}
+	return len(availableAccountIDs) == 0
+}
+
+func extractRawChannelAccountIDs(channel map[string]interface{}) []string {
 	if len(channel) == 0 {
 		return []string{}
 	}

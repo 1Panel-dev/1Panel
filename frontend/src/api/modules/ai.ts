@@ -129,6 +129,14 @@ export const deleteAgentRole = (req: AI.AgentRoleDeleteReq) => {
     return http.post(`/ai/agents/agent/delete`, req);
 };
 
+export const bindAgentRole = (req: AI.AgentRoleBindReq) => {
+    return http.post(`/ai/agents/agent/bind`, req);
+};
+
+export const unbindAgentRole = (req: AI.AgentRoleBindReq) => {
+    return http.post(`/ai/agents/agent/unbind`, req);
+};
+
 export const getConfiguredAgentRoles = (req: AI.AgentConfiguredAgentsReq) => {
     return http.post<AI.AgentConfiguredAgentItem[]>(`/ai/agents/agent/list`, req);
 };

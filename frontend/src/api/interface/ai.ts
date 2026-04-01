@@ -335,6 +335,13 @@ export namespace AI {
         id: string;
     }
 
+    export interface AgentRoleBindReq {
+        agentId: number;
+        id: string;
+        channel: string;
+        accountId: string;
+    }
+
     export interface AgentConfiguredAgentsReq {
         agentId: number;
     }
