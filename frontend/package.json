@@ -86,7 +86,7 @@
         "unplugin-vue-define-options": "^3.0.0-beta.23",
         "vite": "^7.1.5",
         "vite-plugin-compression": "^0.5.1",
-        "vite-plugin-eslint": "^1.8.1",
+        "vite-plugin-eslint2": "^5.0.3",
         "vite-plugin-html": "^3.2.2",
         "vite-plugin-monaco-editor": "^1.1.0",
         "vite-plugin-vue-setup-extend": "^0.4.0",
