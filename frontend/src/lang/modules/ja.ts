@@ -756,6 +756,7 @@ const message = {
                 ],
             },
             bindings: 'バインディング',
+            duplicateBinding: 'チャネルとアカウント ID の組み合わせは一意である必要があります',
             accountIdOptional: 'アカウント ID（任意）',
             saveAllMd: 'すべて保存',
             roleMarkdownRestartHelper:

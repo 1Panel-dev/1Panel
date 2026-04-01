@@ -708,6 +708,7 @@ const message = {
                 'BOOTSTRAP.md': ['一次性的首次執行儀式。', '只會在全新的 workspace 中建立。', '儀式完成後請刪除它。'],
             },
             bindings: '綁定',
+            duplicateBinding: '頻道和帳號 ID 不能重複',
             accountIdOptional: '帳號 ID（可選）',
             saveAllMd: '保存全部',
             roleMarkdownRestartHelper: '保存當前全部 MD 檔案後，需要重新啟動容器才能生效。請選擇立即重啟或稍後重啟。',

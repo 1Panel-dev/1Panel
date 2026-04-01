@@ -742,6 +742,7 @@ const message = {
                 ],
             },
             bindings: '바인딩',
+            duplicateBinding: '채널과 계정 ID 조합은 중복될 수 없습니다',
             accountIdOptional: '계정 ID (선택 사항)',
             saveAllMd: '모두 저장',
             roleMarkdownRestartHelper:

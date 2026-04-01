@@ -760,6 +760,7 @@ const message = {
                 ],
             },
             bindings: 'Ikatan',
+            duplicateBinding: 'Gabungan saluran dan ID akaun mesti unik',
             accountIdOptional: 'ID akaun (pilihan)',
             saveAllMd: 'Simpan semua',
             roleMarkdownRestartHelper:
