@@ -30,6 +30,7 @@ type IAgentService interface {
 	Delete(req dto.AgentDeleteReq) error
 	ResetToken(req dto.AgentTokenResetReq) error
 	UpdateRemark(req dto.AgentRemarkUpdateReq) error
+	GetModelConfig(req dto.AgentIDReq) (*dto.AgentModelConfig, error)
 	UpdateModelConfig(req dto.AgentModelConfigUpdateReq) error
 	GetOverview(req dto.AgentOverviewReq) (*dto.AgentOverview, error)
 	GetProviders() ([]dto.ProviderInfo, error)
@@ -343,6 +344,30 @@ func (a AgentService) UpdateRemark(req dto.AgentRemarkUpdateReq) error {
 	return agentRepo.Save(agent)
 }
 
+func (a AgentService) GetModelConfig(req dto.AgentIDReq) (*dto.AgentModelConfig, error) {
+	agent, _, conf, err := a.loadOpenclawAgentConfig(req.AgentID)
+	if err != nil {
+		return nil, err
+	}
+	account, err := agentAccountRepo.GetFirst(repo.WithByID(agent.AccountID))
+	if err != nil {
+		return nil, err
+	}
+	models, err := loadAgentAccountModels(account)
+	if err != nil {
+		return nil, err
+	}
+	model := extractOpenclawPrimaryModelID(conf, account, models)
+	if model == "" {
+		model = agent.Model
+	}
+	return &dto.AgentModelConfig{
+		AccountID: agent.AccountID,
+		Model:     model,
+		Fallbacks: extractOpenclawFallbackModelIDs(conf, account, models, model),
+	}, nil
+}
+
 func (a AgentService) UpdateModelConfig(req dto.AgentModelConfigUpdateReq) error {
 	agent, err := loadOpenclawAgentByID(req.AgentID)
 	if err != nil {
@@ -359,7 +384,7 @@ func (a AgentService) UpdateModelConfig(req dto.AgentModelConfigUpdateReq) error
 	modelName := resolvedRuntime.StoredModel
 	apiType, maxTokens, contextWindow := resolvedRuntime.APIType, resolvedRuntime.MaxTokens, resolvedRuntime.ContextWindow
 	confDir := path.Dir(agent.ConfigPath)
-	if err := writeOpenclawConfig(confDir, account, modelName, agent.Token, nil); err != nil {
+	if err := writeOpenclawConfig(confDir, account, modelName, agent.Token, nil, req.Fallbacks); err != nil {
 		return err
 	}
 	agent.Provider = account.Provider
@@ -873,13 +898,18 @@ func (a AgentService) syncAgentsByAccount(account *model.AgentAccount) error {
 		} else {
 			selectedAccountModel = accountModels[0]
 		}
+		conf, err := readOpenclawConfig(agent.ConfigPath)
+		if err != nil {
+			return err
+		}
+		fallbacks := extractOpenclawFallbackModelIDs(conf, account, accountModels, selectedAccountModel.ID)
 		resolvedRuntime, err := buildOpenclawAccountModelRuntime(account, selectedAccountModel)
 		if err != nil {
 			return err
 		}
 		modelName = resolvedRuntime.StoredModel
 		apiType, maxTokens, contextWindow := resolvedRuntime.APIType, resolvedRuntime.MaxTokens, resolvedRuntime.ContextWindow
-		if err := writeOpenclawConfig(confDir, account, modelName, agent.Token, nil); err != nil {
+		if err := writeOpenclawConfig(confDir, account, modelName, agent.Token, nil, fallbacks); err != nil {
 			return err
 		}
 		agent.BaseURL = baseURL

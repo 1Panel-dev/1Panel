@@ -71,9 +71,16 @@ type AgentRemarkUpdateReq struct {
 }
 
 type AgentModelConfigUpdateReq struct {
-	AgentID   uint   `json:"agentId" validate:"required"`
-	AccountID uint   `json:"accountId" validate:"required"`
-	Model     string `json:"model" validate:"required"`
+	AgentID   uint     `json:"agentId" validate:"required"`
+	AccountID uint     `json:"accountId" validate:"required"`
+	Model     string   `json:"model" validate:"required"`
+	Fallbacks []string `json:"fallbacks"`
+}
+
+type AgentModelConfig struct {
+	AccountID uint     `json:"accountId"`
+	Model     string   `json:"model"`
+	Fallbacks []string `json:"fallbacks"`
 }
 
 type AgentOverviewReq struct {

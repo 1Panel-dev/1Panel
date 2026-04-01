@@ -691,6 +691,9 @@ const message = {
             accountModelsRequired: 'Configure at least one model',
             accountModelsDuplicate: 'Duplicate models exist in the catalog',
             modelPool: 'Model Pool',
+            fallbackModels: 'Modelos de fallback',
+            addFallbackModel: 'Adicionar modelo de fallback',
+            fallbackModelsEmpty: 'Nenhum modelo de fallback configurado',
             modelInputTypes: 'Tipos de entrada',
             reasoning: 'Modelo de raciocínio',
             manualModel: 'Entrada manual',
@@ -765,6 +768,7 @@ const message = {
             configFileRestartHelper:
                 'Salvar o arquivo de configuração exige reiniciar imediatamente o contêiner para entrar em vigor.',
             overviewSnapshot: 'Visão geral',
+            primaryModel: 'Modelo principal',
             defaultModel: 'Modelo padrão',
             channelCount: 'Canais configurados',
             skillCount: 'Habilidades',

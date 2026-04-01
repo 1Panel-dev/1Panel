@@ -214,7 +214,7 @@ const props = defineProps({
 const emit = defineEmits<{
     (e: 'update:bots', bots: ChannelBotItem[]): void;
     (e: 'approve', bot: ChannelBotItem): void;
-    (e: 'save'): void;
+    (e: 'save', action?: 'delete' | 'save'): void;
 }>();
 
 const { t } = useI18n();
@@ -306,7 +306,7 @@ const saveBot = async () => {
     }
     emitBots(nextBots);
     dialogVisible.value = false;
-    emit('save');
+    emit('save', 'save');
 };
 
 const removeBot = (index: number) => {
@@ -316,7 +316,7 @@ const removeBot = (index: number) => {
         return;
     }
     emitBots(nextBots);
-    emit('save');
+    emit('save', 'delete');
 };
 
 const setDefault = (accountId: string) => {
@@ -325,14 +325,14 @@ const setDefault = (accountId: string) => {
         isDefault: bot.accountId === accountId,
     }));
     emitBots(nextBots);
-    emit('save');
+    emit('save', 'save');
 };
 
 const updateEnabled = (index: number, enabled: boolean | string | number) => {
     const nextBots = props.bots.map((bot) => ({ ...bot }));
     nextBots[index].enabled = Boolean(enabled);
     emitBots(nextBots);
-    emit('save');
+    emit('save', 'save');
 };
 </script>
 

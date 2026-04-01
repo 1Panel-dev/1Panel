@@ -697,6 +697,9 @@ const message = {
             accountModelsRequired: 'Configure al menos un modelo',
             accountModelsDuplicate: 'Existen modelos duplicados en el catálogo',
             modelPool: 'Pool de modelos',
+            fallbackModels: 'Modelos de respaldo',
+            addFallbackModel: 'Agregar modelo de respaldo',
+            fallbackModelsEmpty: 'No hay modelos de respaldo configurados',
             modelInputTypes: 'Tipos de entrada',
             reasoning: 'Modelo de razonamiento',
             manualModel: 'Entrada manual de modelo',
@@ -771,6 +774,7 @@ const message = {
             configFileRestartHelper:
                 'Guardar el archivo de configuración requiere reiniciar inmediatamente el contenedor para surtir efecto.',
             overviewSnapshot: 'Resumen',
+            primaryModel: 'Modelo principal',
             defaultModel: 'Modelo predeterminado',
             channelCount: 'Canales configurados',
             skillCount: 'Habilidades',

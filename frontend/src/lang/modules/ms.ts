@@ -696,6 +696,9 @@ const message = {
             accountModelsRequired: 'Configure at least one model',
             accountModelsDuplicate: 'Duplicate models exist in the catalog',
             modelPool: 'Model Pool',
+            fallbackModels: 'Model fallback',
+            addFallbackModel: 'Tambah model fallback',
+            fallbackModelsEmpty: 'Tiada model fallback dikonfigurasikan',
             modelInputTypes: 'Jenis input',
             reasoning: 'Model penaakulan',
             manualModel: 'Input manual',
@@ -767,6 +770,7 @@ const message = {
             configFileRestartHelper:
                 'Menyimpan fail konfigurasi memerlukan kontena dimulakan semula serta-merta untuk berkuat kuasa.',
             overviewSnapshot: 'Ringkasan',
+            primaryModel: 'Model utama',
             defaultModel: 'Model lalai',
             channelCount: 'Bilangan saluran dikonfigurasi',
             skillCount: 'Bilangan kemahiran',

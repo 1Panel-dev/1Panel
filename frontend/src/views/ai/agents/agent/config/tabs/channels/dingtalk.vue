@@ -253,7 +253,7 @@ const reload = async () => {
     await load(agentId.value);
 };
 
-const saveChannel = async () => {
+const saveChannel = async (action: 'delete' | 'save' = 'save') => {
     if (!supported.value || !agentId.value || !formRef.value) {
         return;
     }
@@ -278,7 +278,7 @@ const saveChannel = async () => {
             ackText: form.ackText,
             bots: form.bots,
         });
-        MsgSuccess(t('aiTools.agents.saveSuccess'));
+        MsgSuccess(action === 'delete' ? t('commons.msg.deleteSuccess') : t('aiTools.agents.saveSuccess'));
     } finally {
         saving.value = false;
     }

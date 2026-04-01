@@ -688,6 +688,9 @@ const message = {
             accountModelsRequired: 'Configure at least one model',
             accountModelsDuplicate: 'Duplicate models exist in the catalog',
             modelPool: 'Model Pool',
+            fallbackModels: 'Fallback Models',
+            addFallbackModel: 'Add Fallback Model',
+            fallbackModelsEmpty: 'No fallback models configured',
             modelInputTypes: 'Input Types',
             reasoning: 'Reasoning Model',
             manualModel: 'Manual input',
@@ -759,6 +762,7 @@ const message = {
             configFileRestartHelper:
                 'Saving the config file requires immediately restarting the container to take effect.',
             overviewSnapshot: 'Snapshot',
+            primaryModel: 'Primary Model',
             defaultModel: 'Default Model',
             channelCount: 'Configured Channels',
             skillCount: 'Skills',

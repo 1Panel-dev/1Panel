@@ -692,6 +692,9 @@ const message = {
             accountModelsRequired: 'Configure at least one model',
             accountModelsDuplicate: 'Duplicate models exist in the catalog',
             modelPool: 'Model Pool',
+            fallbackModels: 'Yedek modeller',
+            addFallbackModel: 'Yedek model ekle',
+            fallbackModelsEmpty: 'Yapılandırılmış yedek model yok',
             modelInputTypes: 'Input Types',
             reasoning: 'Reasoning Model',
             manualModel: 'Manuel giriş',
@@ -766,6 +769,7 @@ const message = {
             configFileRestartHelper:
                 'Yapılandırma dosyasını kaydetmek, etkin olması için konteynerin hemen yeniden başlatılmasını gerektirir.',
             overviewSnapshot: 'Özet',
+            primaryModel: 'Birincil model',
             defaultModel: 'Varsayılan model',
             channelCount: 'Yapılandırılmış kanallar',
             skillCount: 'Yetenekler',

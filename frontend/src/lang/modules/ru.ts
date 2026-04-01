@@ -688,6 +688,9 @@ const message = {
             accountModelsRequired: 'Configure at least one model',
             accountModelsDuplicate: 'Duplicate models exist in the catalog',
             modelPool: 'Model Pool',
+            fallbackModels: 'Резервные модели',
+            addFallbackModel: 'Добавить резервную модель',
+            fallbackModelsEmpty: 'Резервные модели не настроены',
             modelInputTypes: 'Input Types',
             reasoning: 'Reasoning Model',
             manualModel: 'Ручной ввод',
@@ -759,6 +762,7 @@ const message = {
             configFileRestartHelper:
                 'Сохранение файла конфигурации требует немедленного перезапуска контейнера для применения.',
             overviewSnapshot: 'Сводка',
+            primaryModel: 'Основная модель',
             defaultModel: 'Модель по умолчанию',
             channelCount: 'Настроенные каналы',
             skillCount: 'Навыки',

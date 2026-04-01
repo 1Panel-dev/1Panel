@@ -283,7 +283,7 @@ const validateBots = () => {
     return true;
 };
 
-const saveChannel = async () => {
+const saveChannel = async (action: 'delete' | 'save' = 'save') => {
     if (!agentId.value || !formRef.value) {
         return;
     }
@@ -308,7 +308,7 @@ const saveChannel = async () => {
             groupAllowFrom: parseTextList(form.groupAllowFromText),
             bots: buildPayloadBots(),
         });
-        MsgSuccess(t('aiTools.agents.saveSuccess'));
+        MsgSuccess(action === 'delete' ? t('commons.msg.deleteSuccess') : t('aiTools.agents.saveSuccess'));
     } finally {
         saving.value = false;
     }

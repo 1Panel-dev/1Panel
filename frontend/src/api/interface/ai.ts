@@ -308,9 +308,20 @@ export namespace AI {
         agentId: number;
         accountId: number;
         model: string;
+        fallbacks: string[];
+    }
+
+    export interface AgentModelConfig {
+        accountId: number;
+        model: string;
+        fallbacks: string[];
     }
 
     export interface AgentOverviewReq {
+        agentId: number;
+    }
+
+    export interface AgentIDReq {
         agentId: number;
     }
 
