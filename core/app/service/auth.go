@@ -19,6 +19,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/global"
 	initauth "github.com/1Panel-dev/1Panel/core/init/auth"
 	"github.com/1Panel-dev/1Panel/core/init/session/psession"
+	"github.com/1Panel-dev/1Panel/core/utils/common"
 	"github.com/1Panel-dev/1Panel/core/utils/encrypt"
 	"github.com/1Panel-dev/1Panel/core/utils/mfa"
 	"github.com/1Panel-dev/1Panel/core/utils/passkey"
@@ -77,7 +78,7 @@ func (u *AuthService) Login(c *gin.Context, info dto.Login, entrance string) (*d
 		return nil, "", err
 	}
 	if mfa.Value == constant.StatusEnable {
-		ip := c.ClientIP()
+		ip := common.GetRealClientIP(c)
 		mfaSession := initauth.GetMFASessionStore().Set(nameSetting.Value, entrance, ip)
 		return &dto.UserLoginInfo{Name: nameSetting.Value, MfaStatus: mfa.Value, MfaSession: mfaSession}, "", nil
 	}
@@ -86,8 +87,7 @@ func (u *AuthService) Login(c *gin.Context, info dto.Login, entrance string) (*d
 		return nil, "", err
 	}
 	if entrance != "" {
-		entranceValue := base64.StdEncoding.EncodeToString([]byte(entrance))
-		c.SetCookie("SecurityEntrance", entranceValue, 0, "", "", false, true)
+		SetSecurityEntranceCookie(c, entrance)
 	}
 	return res, "", nil
 }
@@ -98,7 +98,7 @@ func (u *AuthService) MFALogin(c *gin.Context, info dto.MFALogin, entrance strin
 	if !ok {
 		return nil, "ErrMFA", nil
 	}
-	if session.IP != c.ClientIP() {
+	if session.IP != common.GetRealClientIP(c) {
 		return nil, "ErrMFA", nil
 	}
 	if session.Entrance != entrance {
@@ -123,8 +123,7 @@ func (u *AuthService) MFALogin(c *gin.Context, info dto.MFALogin, entrance strin
 	}
 	mfaSessions.Delete(info.SessionID)
 	if entrance != "" {
-		entranceValue := base64.StdEncoding.EncodeToString([]byte(entrance))
-		c.SetCookie("SecurityEntrance", entranceValue, 0, "", "", false, true)
+		SetSecurityEntranceCookie(c, entrance)
 	}
 	return res, "", nil
 }
@@ -309,10 +308,18 @@ func (u *AuthService) PasskeyFinishLogin(c *gin.Context, sessionID, entrance str
 		return nil, "", err
 	}
 	if entrance != "" {
-		entranceValue := base64.StdEncoding.EncodeToString([]byte(entrance))
-		c.SetCookie("SecurityEntrance", entranceValue, 0, "", "", false, true)
+		SetSecurityEntranceCookie(c, entrance)
 	}
 	return res, "", nil
+}
+
+func SetSecurityEntranceCookie(c *gin.Context, entrance string) {
+	entranceValue := base64.StdEncoding.EncodeToString([]byte(entrance))
+	sslEnabled := false
+	if setting, err := settingRepo.Get(repo.WithByKey("SSL")); err == nil {
+		sslEnabled = setting.Value == constant.StatusEnable
+	}
+	c.SetCookie("SecurityEntrance", entranceValue, 0, "/", "", sslEnabled, true)
 }
 
 func (u *AuthService) PasskeyBeginRegister(c *gin.Context, name string) (*dto.PasskeyBeginResponse, string, error) {
