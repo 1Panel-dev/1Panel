@@ -758,6 +758,7 @@ const message = {
                 ],
             },
             bindings: 'Vínculos',
+            duplicateBinding: 'A combinacao de canal e ID da conta deve ser unica',
             accountIdOptional: 'ID da conta (opcional)',
             saveAllMd: 'Salvar tudo',
             roleMarkdownRestartHelper:

@@ -759,6 +759,7 @@ const message = {
                 ],
             },
             bindings: 'Bağlamalar',
+            duplicateBinding: 'Kanal ve hesap kimligi kombinasyonu benzersiz olmalidir',
             accountIdOptional: 'Hesap ID (İsteğe bağlı)',
             saveAllMd: 'Tümünü kaydet',
             roleMarkdownRestartHelper:

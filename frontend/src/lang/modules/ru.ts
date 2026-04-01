@@ -752,6 +752,7 @@ const message = {
                 ],
             },
             bindings: 'Привязки',
+            duplicateBinding: 'Комбинация канала и ID аккаунта должна быть уникальной',
             accountIdOptional: 'ID аккаунта (необязательно)',
             saveAllMd: 'Сохранить все',
             roleMarkdownRestartHelper:

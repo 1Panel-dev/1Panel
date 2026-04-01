@@ -39,14 +39,7 @@
                         </el-table-column>
                         <el-table-column :label="$t('aiTools.agents.accountIdOptional')" min-width="180">
                             <template #default="{ row }">
-                                <el-select
-                                    v-model="row.accountId"
-                                    clearable
-                                    filterable
-                                    allow-create
-                                    default-first-option
-                                    class="w-full"
-                                >
+                                <el-select v-model="row.accountId" clearable filterable class="w-full">
                                     <el-option
                                         v-for="item in getAccountIdOptions(row.channel)"
                                         :key="item"
@@ -234,7 +227,7 @@ const submit = async () => {
             model: form.model.trim(),
             bindings: bindings.map((item) => ({
                 channel: item.channel,
-                accountId: item.accountId.trim(),
+                accountId: item.accountId,
             })),
         } as AI.AgentRoleCreateReq);
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
