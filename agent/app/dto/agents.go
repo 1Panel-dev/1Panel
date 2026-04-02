@@ -544,7 +544,7 @@ type AgentConfigFile struct {
 
 type AgentSkillSearchReq struct {
 	AgentID uint   `json:"agentId" validate:"required"`
-	Source  string `json:"source" validate:"required,oneof=clawhub skillhub"`
+	Source  string `json:"source" validate:"required,oneof=clawhub-global clawhub-cn skillhub"`
 	Keyword string `json:"keyword" validate:"required"`
 }
 
@@ -574,7 +574,7 @@ type AgentSkillUpdateReq struct {
 
 type AgentSkillInstallReq struct {
 	AgentID uint   `json:"agentId" validate:"required"`
-	Source  string `json:"source" validate:"required,oneof=clawhub skillhub"`
+	Source  string `json:"source" validate:"required,oneof=clawhub-global clawhub-cn skillhub"`
 	Slug    string `json:"slug" validate:"required"`
 	TaskID  string `json:"taskID" validate:"required"`
 }
