@@ -167,7 +167,7 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 			return nil, buserr.New("ErrAgentAccountNotVerified")
 		}
 		provider = account.Provider
-		baseURL = strings.TrimSpace(account.BaseURL)
+		baseURL = account.BaseURL
 		resolvedRuntime, err := resolveOpenclawAccountModelRuntimeByID(account, req.Model)
 		if err != nil {
 			return nil, err
@@ -887,7 +887,6 @@ func (a AgentService) syncAgentsByAccount(account *model.AgentAccount) error {
 	if len(accountModels) == 0 {
 		return nil
 	}
-	baseURL := resolveAccountBaseURL(account)
 	for _, agent := range agents {
 		confDir := path.Dir(agent.ConfigPath)
 		modelName := strings.TrimSpace(agent.Model)
@@ -914,7 +913,7 @@ func (a AgentService) syncAgentsByAccount(account *model.AgentAccount) error {
 		if err := writeOpenclawConfig(confDir, account, modelName, agent.Token, nil, fallbacks); err != nil {
 			return err
 		}
-		agent.BaseURL = baseURL
+		agent.BaseURL = account.BaseURL
 		agent.APIKey = account.APIKey
 		agent.Provider = account.Provider
 		agent.Model = modelName
