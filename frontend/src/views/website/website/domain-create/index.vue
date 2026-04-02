@@ -62,7 +62,7 @@
             {{ $t('website.batchInput') }}
         </el-button>
 
-        <el-dialog v-model="batchDialogVisible" :title="$t('website.batchAdd')" width="600px">
+        <DialogPro v-model="batchDialogVisible" :title="$t('website.batchAdd')" size="large">
             <el-input
                 type="textarea"
                 :rows="8"
@@ -75,7 +75,7 @@
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </template>
-        </el-dialog>
+        </DialogPro>
     </div>
 </template>
 

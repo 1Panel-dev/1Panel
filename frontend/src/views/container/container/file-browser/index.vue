@@ -97,7 +97,7 @@
             </el-form>
         </template>
     </DrawerPro>
-    <el-dialog v-model="previewVisible" :title="previewTitle" width="70%" destroy-on-close>
+    <DialogPro v-model="previewVisible" :title="previewTitle" size="w-70" :close-on-click-modal="true">
         <el-alert
             v-if="previewTruncated"
             :title="$t('file.previewTruncated')"
@@ -107,7 +107,7 @@
             class="mb-2"
         />
         <pre class="preview-content">{{ previewContent }}</pre>
-    </el-dialog>
+    </DialogPro>
 </template>
 
 <script lang="ts" setup>
