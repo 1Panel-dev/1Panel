@@ -32,7 +32,12 @@
     <div class="log-container" :style="styleVars">
         <div class="xterm-log-viewer" ref="terminalElement"></div>
     </div>
-    <el-dialog v-model="downloadDialogVisible" :title="$t('commons.button.download')" width="420px">
+    <DialogPro
+        v-model="downloadDialogVisible"
+        :title="$t('commons.button.download')"
+        size="small"
+        :close-on-click-modal="true"
+    >
         <el-form label-position="top">
             <el-form-item :label="$t('container.fetch')">
                 <el-select v-model="downloadForm.mode" class="w-full">
@@ -61,7 +66,7 @@
             <el-button @click="downloadDialogVisible = false">{{ $t('commons.button.cancel') }}</el-button>
             <el-button type="primary" @click="onDownload">{{ $t('commons.button.confirm') }}</el-button>
         </template>
-    </el-dialog>
+    </DialogPro>
 </template>
 
 <script lang="ts" setup>

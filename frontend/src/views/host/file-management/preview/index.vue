@@ -1,14 +1,14 @@
 <template>
-    <el-dialog
+    <DialogPro
         v-model="open"
         :show-close="false"
-        :before-close="handleClose"
-        destroy-on-close
         append-to-body
         @opened="onOpen"
         :class="isFullscreen ? 'w-full' : '!w-3/4'"
         :top="'5vh'"
         :fullscreen="isFullscreen"
+        :close-on-click-modal="true"
+        @close="handleClose"
     >
         <template #header>
             <div class="flex items-center justify-between">
@@ -81,7 +81,7 @@
                 @error="errorHandler"
             />
         </div>
-    </el-dialog>
+    </DialogPro>
 </template>
 
 <script lang="ts" setup>

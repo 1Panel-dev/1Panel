@@ -74,7 +74,7 @@
             </el-table-column>
         </el-table>
 
-        <el-dialog v-model="dialogVisible" width="520px" :title="dialogTitle" destroy-on-close>
+        <DialogPro v-model="dialogVisible" :title="dialogTitle">
             <el-form ref="formRef" :model="form" :rules="rules" label-position="top">
                 <el-form-item :label="t('commons.table.name')" prop="name">
                     <el-input v-model="form.name" :disabled="disabled" />
@@ -124,7 +124,7 @@
                     {{ t('commons.button.save') }}
                 </el-button>
             </template>
-        </el-dialog>
+        </DialogPro>
     </div>
 </template>
 
