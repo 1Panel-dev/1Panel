@@ -20,7 +20,10 @@
 
 <script setup lang="ts">
 import { nextTick, ref } from 'vue';
+import { setupMonacoEnvironment } from '@/utils/monaco';
 import * as monaco from 'monaco-editor';
+
+setupMonacoEnvironment();
 
 const open = ref(false);
 const newContent = ref('');

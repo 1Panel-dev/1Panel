@@ -389,14 +389,10 @@
 import { batchCheckFiles, createFile, getFileContent, getFilesTree, saveFileContent } from '@/api/modules/files';
 import i18n from '@/lang';
 import { MsgError, MsgSuccess, MsgWarning } from '@/utils/message';
+import { setupMonacoEnvironment } from '@/utils/monaco';
 import * as monaco from 'monaco-editor';
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
 import { Languages } from '@/global/mimetype';
-import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
-import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker';
-import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
-import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
-import EditorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
 
 import type { TabPaneName } from 'element-plus';
 import { ElMessageBox, ElTreeV2 } from 'element-plus';
@@ -412,24 +408,7 @@ import noUpdateImage from '@/assets/images/no_update_app.svg';
 
 let editor: monaco.editor.IStandaloneCodeEditor | undefined;
 
-self.MonacoEnvironment = {
-    getWorker(workerId, label) {
-        if (label === 'json') {
-            return new jsonWorker();
-        }
-        if (label === 'css' || label === 'scss' || label === 'less') {
-            return new cssWorker();
-        }
-        if (label === 'html' || label === 'handlebars' || label === 'razor') {
-            return new htmlWorker();
-        }
-        if (['typescript', 'javascript'].includes(label)) {
-            return new tsWorker();
-        }
-        return new EditorWorker();
-    },
-};
-
+setupMonacoEnvironment();
 interface EditProps {
     language: string;
     content: string;

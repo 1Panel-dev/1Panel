@@ -511,8 +511,6 @@ func setFeishuPluginEnabled(conf map[string]interface{}, enabled bool) {
 	entries := ensureChildMap(plugins, "entries")
 	lark := ensureChildMap(entries, "openclaw-lark")
 	lark["enabled"] = enabled
-	legacy := ensureChildMap(entries, "feishu")
-	legacy["enabled"] = false
 }
 
 func extractTelegramConfig(conf map[string]interface{}) dto.AgentTelegramConfig {
