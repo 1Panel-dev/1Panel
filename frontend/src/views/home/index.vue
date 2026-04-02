@@ -599,6 +599,7 @@ const currentChartInfo = reactive({
     netBytesSent: 0,
     netBytesRecv: 0,
 });
+const skipNextCurrentInfoDelta = ref(false);
 
 const chartsOption = ref({ ioChart1: null, networkChart: null });
 
@@ -686,6 +687,7 @@ const onLoadBaseInfo = async (isInit: boolean, range: string) => {
     const res = await loadBaseInfo(searchInfo.ioOption, searchInfo.netOption);
     baseInfo.value = res.data;
     updateCurrentInfo(baseInfo.value.currentInfo);
+    skipNextCurrentInfoDelta.value = true;
     onLoadCurrentInfo();
     isStatusInit.value = false;
     statusRef.value?.acceptParams(currentInfo.value, baseInfo.value);
@@ -744,6 +746,19 @@ const jumpPanel = (row: any) => {
 
 const onLoadCurrentInfo = async () => {
     const res = await loadCurrentInfo(searchInfo.ioOption, searchInfo.netOption);
+    if (skipNextCurrentInfoDelta.value) {
+        skipNextCurrentInfoDelta.value = false;
+        currentChartInfo.netBytesSent = 0;
+        currentChartInfo.netBytesRecv = 0;
+        currentChartInfo.ioReadBytes = 0;
+        currentChartInfo.ioWriteBytes = 0;
+        currentChartInfo.ioCount = 0;
+        currentChartInfo.ioTime = 0;
+        updateCurrentInfo(res.data);
+        statusRef.value?.acceptParams(currentInfo.value, baseInfo.value);
+        return;
+    }
+
     currentInfo.value.timeSinceUptime = res.data.timeSinceUptime;
 
     let timeInterval = Number(res.data.uptime - currentInfo.value.uptime) || 3;
@@ -984,6 +999,7 @@ const loadSource = (row: any) => {
 
 const onFocus = () => {
     isActive.value = true;
+    skipNextCurrentInfoDelta.value = true;
 };
 const onBlur = () => {
     isActive.value = false;
