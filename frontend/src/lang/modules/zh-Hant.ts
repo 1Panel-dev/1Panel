@@ -1757,6 +1757,8 @@ const message = {
         keyAuthHelper: '是否啟用金鑰認證，預設啟用。',
         useDNS: '反向解析',
         dnsHelper: '控制 SSH 伺服器是否啟用 DNS 解析功能，從而驗證連接方的身份。',
+        confFileOrderHelper: '下拉切換配置檔案並編輯儲存；按載入順序生效，先載入優先生效，後載入不覆蓋前值。',
+        confFileOrderLabel: '{0}（載入順序 #{1}）',
         analysis: '統計資訊',
         denyHelper: '將對下列地址進行【封鎖】操作，設定後該 IP 將禁止存取伺服器，是否繼續？',
         acceptHelper: '將對下列地址進行【放行】操作，設定後該 IP 將復原正常存取，是否繼續？',

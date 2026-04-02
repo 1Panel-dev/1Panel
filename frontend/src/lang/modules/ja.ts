@@ -1884,6 +1884,9 @@ const message = {
         keyAuthHelper: 'キー認証を有効にするかどうか。',
         useDNS: '使用済み',
         dnsHelper: 'DNS解像度関数がSSHサーバーで有効になっているかどうかを制御して、接続のIDを確認します。',
+        confFileOrderHelper:
+            'ドロップダウンで設定ファイルを切り替えて編集・保存します。適用は読み込み順で、先に読み込まれた値が優先されます。',
+        confFileOrderLabel: '{0}（読み込み順 #{1}）',
         analysis: '統計情報',
         denyHelper:
             '次のアドレスで「拒否」操作を実行します。設定後、IPはサーバーへのアクセスが禁止されます。続けたいですか？',

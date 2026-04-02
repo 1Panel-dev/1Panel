@@ -1910,6 +1910,9 @@ const message = {
         useDNS: 'useDNS',
         dnsHelper:
             'Controla si la función de resolución DNS está habilitada en el servidor SSH para verificar la identidad de la conexión.',
+        confFileOrderHelper:
+            'Use el desplegable para cambiar de archivo de configuración y editar/guardar; se aplica por orden de carga y prevalece el valor cargado antes.',
+        confFileOrderLabel: '{0} (Orden de carga #{1})',
         analysis: 'Información estadística',
         denyHelper:
             "Se realizará una operación de 'denegar' sobre las siguientes direcciones. Tras la configuración, la IP quedará prohibida de acceder al servidor. ¿Desea continuar?",

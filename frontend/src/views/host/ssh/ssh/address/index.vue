@@ -131,7 +131,6 @@ const onSave = async (formEl: FormInstance | undefined) => {
             .then(async () => {
                 let params = {
                     key: 'ListenAddress',
-                    oldValue: '',
                     newValue: itemAddr.join(','),
                 };
                 loading.value = true;

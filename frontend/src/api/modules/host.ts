@@ -100,8 +100,8 @@ export const updateSSH = (params: Host.SSHUpdate) => {
 export const loadSSHFile = (name: string) => {
     return http.post<string>(`/hosts/ssh/file`, { name: name });
 };
-export const updateSSHByFile = (key: string, file: string) => {
-    return http.post(`/hosts/ssh/file/update`, { key: key, value: file }, TimeoutEnum.T_60S);
+export const updateSSHByFile = (key: string, value: string, path = '') => {
+    return http.post(`/hosts/ssh/file/update`, { key, path, value }, TimeoutEnum.T_60S);
 };
 export const createCert = (params: Host.RootCert) => {
     let request = deepCopy(params) as Host.RootCert;

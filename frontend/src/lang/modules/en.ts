@@ -1873,6 +1873,9 @@ const message = {
         useDNS: 'useDNS',
         dnsHelper:
             'Control whether the DNS resolution function is enabled on the SSH server to verify the identity of the connection.',
+        confFileOrderHelper:
+            'Use the dropdown to switch config files and edit/save directly; settings apply by load order, and earlier loaded values win.',
+        confFileOrderLabel: '{0} (Load order #{1})',
         analysis: 'Statistical information',
         denyHelper:
             "Performing a 'deny' operation on the following addresses. After setting, the IP will be prohibited from accessing the server. Continue?",
