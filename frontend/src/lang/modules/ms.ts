@@ -1917,6 +1917,9 @@ const message = {
         useDNS: 'Gunakan DNS',
         dnsHelper:
             'Kawal sama ada fungsi resolusi DNS diaktifkan pada pelayan SSH untuk mengesahkan identiti sambungan.',
+        confFileOrderHelper:
+            'Gunakan dropdown untuk tukar fail konfigurasi dan terus edit/simpan; tetapan berkuat kuasa mengikut turutan muat, nilai yang dimuat dahulu diutamakan.',
+        confFileOrderLabel: '{0} (Turutan muat #{1})',
         analysis: 'Maklumat statistik',
         denyHelper:
             "Melaksanakan operasi 'tolak' pada alamat berikut. Selepas menetapkan, IP akan dilarang mengakses pelayan. Adakah anda mahu meneruskan?",

@@ -4,7 +4,6 @@ import "time"
 
 type SSHUpdate struct {
 	Key      string `json:"key" validate:"required"`
-	OldValue string `json:"oldValue"`
 	NewValue string `json:"newValue"`
 }
 
@@ -49,6 +48,12 @@ type GenerateLoad struct {
 
 type SSHConf struct {
 	File string `json:"file"`
+}
+
+type SSHConfUpdate struct {
+	Key   string `json:"key" validate:"required"`
+	Path  string `json:"path"`
+	Value string `json:"value"`
 }
 type SearchSSHLog struct {
 	PageInfo

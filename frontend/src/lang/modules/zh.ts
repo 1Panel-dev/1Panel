@@ -1760,6 +1760,8 @@ const message = {
         keyAuthHelper: '是否启用密钥认证，默认启用。',
         useDNS: '反向解析',
         dnsHelper: '控制 SSH 服务器是否启用 DNS 解析功能，从而验证连接方的身份。',
+        confFileOrderHelper: '下拉切换配置文件并编辑保存；按加载顺序生效，先加载优先生效，后加载不覆盖前值。',
+        confFileOrderLabel: '{0}（加载顺序 #{1}）',
         analysis: '统计信息',
         denyHelper: '将对下列地址进行【屏蔽】操作，设置后该 IP 将禁止访问服务器，是否继续？',
         acceptHelper: '将对下列地址进行【放行】操作，设置后该 IP 将恢复正常访问，是否继续？',

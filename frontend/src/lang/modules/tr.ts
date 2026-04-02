@@ -1911,6 +1911,9 @@ const message = {
         useDNS: 'DNS kullanımı',
         dnsHelper:
             'SSH sunucusunda DNS çözümleme işlevinin, bağlantının kimliğini doğrulamak için etkinleştirilip etkinleştirilmeyeceğini kontrol eder.',
+        confFileOrderHelper:
+            'Açılır listeden yapılandırma dosyasını değiştirip doğrudan düzenleyin/kaydedin; ayarlar yükleme sırasına göre uygulanır ve önce yüklenen değer geçerli olur.',
+        confFileOrderLabel: '{0} (Yükleme sırası #{1})',
         analysis: 'İstatistiksel bilgi',
         denyHelper:
             'Aşağıdaki adreslerde "reddet" işlemi gerçekleştiriliyor. Ayar yapıldıktan sonra IP, sunucuya erişimden yasaklanacak. Devam etmek istiyor musunuz?',

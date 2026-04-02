@@ -1849,6 +1849,9 @@ const message = {
         keyAuthHelper: '키 인증을 활성화할지 여부입니다.',
         useDNS: 'useDNS',
         dnsHelper: 'SSH 서버에서 DNS 확인 기능을 활성화하여 연결의 신원을 확인할지 여부를 제어합니다.',
+        confFileOrderHelper:
+            '드롭다운으로 구성 파일을 전환해 바로 편집/저장하세요. 적용은 로드 순서 기준이며, 먼저 로드된 값이 우선합니다.',
+        confFileOrderLabel: '{0} (로드 순서 #{1})',
         analysis: '통계 정보',
         denyHelper:
             "'거부' 작업을 다음 주소에서 수행합니다. 설정 후 해당 IP는 서버에 접근할 수 없습니다. 계속하시겠습니까?",
