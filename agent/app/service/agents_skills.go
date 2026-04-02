@@ -13,6 +13,9 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 )
 
+const clawhubGlobalRegistry = "https://clawhub.com"
+const clawhubChinaRegistry = "https://mirror-cn.clawhub.com"
+
 type openclawSkillsList struct {
 	Skills []openclawSkillListItem `json:"skills"`
 }
@@ -74,7 +77,7 @@ func (a AgentService) SearchSkills(req dto.AgentSkillSearchReq) ([]dto.AgentSkil
 	case "skillhub":
 		return parseSkillhubSearchResult(output)
 	default:
-		return parseClawhubSearchResult(output), nil
+		return parseClawhubSearchResult(output, req.Source), nil
 	}
 }
 
@@ -152,7 +155,13 @@ func loadOpenclawSkillSearchOutput(containerName, source, keyword string) (strin
 	case "skillhub":
 		return runDockerExecWithStdout(30*time.Second, containerName, "skillhub", "search", keyword, "--json")
 	default:
-		return runDockerExecWithStdout(30*time.Second, containerName, "clawhub", "search", keyword)
+		return runDockerExecWithStdout(
+			30*time.Second,
+			containerName,
+			"sh",
+			"-c",
+			fmt.Sprintf("CLAWHUB_REGISTRY=%q clawhub search %q", resolveClawhubRegistry(source), keyword),
+		)
 	}
 }
 
@@ -182,7 +191,7 @@ func parseSkillhubSearchResult(output string) ([]dto.AgentSkillSearchItem, error
 	return items, nil
 }
 
-func parseClawhubSearchResult(output string) []dto.AgentSkillSearchItem {
+func parseClawhubSearchResult(output, source string) []dto.AgentSkillSearchItem {
 	lines := strings.Split(strings.TrimSpace(output), "\n")
 	items := make([]dto.AgentSkillSearchItem, 0, len(lines))
 	for _, line := range lines {
@@ -194,7 +203,7 @@ func parseClawhubSearchResult(output string) []dto.AgentSkillSearchItem {
 			Slug:   matches[1],
 			Name:   matches[2],
 			Score:  matches[3],
-			Source: "clawhub",
+			Source: source,
 		})
 	}
 	return items
@@ -202,10 +211,11 @@ func parseClawhubSearchResult(output string) []dto.AgentSkillSearchItem {
 
 func buildOpenclawSkillInstallCommand(source, slug string) string {
 	switch source {
-	case "clawhub":
+	case "clawhub-global", "clawhub-cn":
 		return fmt.Sprintf(
-			"mkdir -p %s && clawhub --workdir /home/node/.openclaw --dir skills install %q",
+			"mkdir -p %s && CLAWHUB_REGISTRY=%q clawhub --workdir /home/node/.openclaw --dir skills install %q",
 			openclawManagedSkillsDir,
+			resolveClawhubRegistry(source),
 			slug,
 		)
 	default:
@@ -215,6 +225,15 @@ func buildOpenclawSkillInstallCommand(source, slug string) string {
 			openclawManagedSkillsDir,
 			slug,
 		)
+	}
+}
+
+func resolveClawhubRegistry(source string) string {
+	switch source {
+	case "clawhub-cn":
+		return clawhubChinaRegistry
+	default:
+		return clawhubGlobalRegistry
 	}
 }
 

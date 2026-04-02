@@ -1,9 +1,9 @@
 <template>
     <VersionSupport v-if="!supported" :min-version="openclawMinSupportedVersion" />
     <div v-else>
-        <el-radio-group v-model="mode" class="view-switch">
-            <el-radio-button label="installed">{{ t('app.installed') }}</el-radio-button>
+        <el-radio-group v-model="mode" class="view-switch" @change="handleModeChange">
             <el-radio-button label="market">{{ t('aiTools.agents.skillsMarket') }}</el-radio-button>
+            <el-radio-button label="installed">{{ t('app.installed') }}</el-radio-button>
         </el-radio-group>
 
         <div v-loading="loading" class="skills-content">
@@ -25,7 +25,11 @@
                 </template>
                 <template v-else>
                     <el-select v-model="marketSource" class="p-w-200" @change="handleMarketSourceChange">
-                        <el-option :value="'clawhub'" :label="t('aiTools.agents.skillsMarketSourceClawhub')" />
+                        <el-option
+                            :value="'clawhub-global'"
+                            :label="t('aiTools.agents.skillsMarketSourceClawhubGlobal')"
+                        />
+                        <el-option :value="'clawhub-cn'" :label="t('aiTools.agents.skillsMarketSourceClawhubChina')" />
                         <el-option :value="'skillhub'" :label="t('aiTools.agents.skillsMarketSourceSkillhub')" />
                     </el-select>
                     <el-input
@@ -150,7 +154,7 @@ import VersionSupport from './components/version-support.vue';
 
 type SkillGroupKey = 'builtIn' | 'external' | 'workspace' | 'extra' | 'other';
 type SkillViewMode = 'installed' | 'market';
-type SkillMarketSource = 'clawhub' | 'skillhub';
+type SkillMarketSource = 'clawhub-global' | 'clawhub-cn' | 'skillhub';
 
 const openclawMinSupportedVersion = '2026.3.23';
 const props = defineProps<{
@@ -161,10 +165,11 @@ const { t } = useI18n();
 const { isIntl } = useGlobalStore();
 const loading = ref(false);
 const searching = ref(false);
-const mode = ref<SkillViewMode>('installed');
+const mode = ref<SkillViewMode>('market');
 const installedKeyword = ref('');
 const marketKeyword = ref('');
-const marketSource = ref<SkillMarketSource>(isIntl.value ? 'clawhub' : 'skillhub');
+const getDefaultMarketSource = (): SkillMarketSource => (isIntl.value ? 'clawhub-global' : 'clawhub-cn');
+const marketSource = ref<SkillMarketSource>(getDefaultMarketSource());
 const marketSearched = ref(false);
 const agentId = ref(0);
 const skills = ref<AI.AgentSkillItem[]>([]);
@@ -172,6 +177,7 @@ const marketResults = ref<AI.AgentSkillSearchItem[]>([]);
 const updatingSkill = ref('');
 const installingSkill = ref('');
 const taskLogRef = ref<InstanceType<typeof TaskLog>>();
+const installedLoaded = ref(false);
 const supported = computed(() => isOpenclawCurrentHTTPVersion(props.appVersion));
 
 const groupTagLabels = computed<Record<SkillGroupKey, string>>(() => ({
@@ -251,6 +257,7 @@ const loadSkills = async () => {
     try {
         const res = await listAgentSkills({ agentId: agentId.value });
         skills.value = res.data || [];
+        installedLoaded.value = true;
     } finally {
         loading.value = false;
     }
@@ -279,13 +286,21 @@ const handleMarketSourceChange = () => {
     marketSearched.value = false;
 };
 
+const handleModeChange = async (value: SkillViewMode) => {
+    if (value !== 'installed' || installedLoaded.value) {
+        return;
+    }
+    await loadSkills();
+};
+
 const load = async (id: number) => {
     agentId.value = id;
-    mode.value = 'installed';
-    marketSource.value = isIntl.value ? 'clawhub' : 'skillhub';
+    mode.value = 'market';
+    marketSource.value = getDefaultMarketSource();
     marketResults.value = [];
     marketSearched.value = false;
-    await loadSkills();
+    skills.value = [];
+    installedLoaded.value = false;
 };
 
 const toggleSkill = async (skill: AI.AgentSkillItem, enabled: boolean) => {
@@ -326,7 +341,11 @@ const installSkill = async (skill: AI.AgentSkillSearchItem) => {
 };
 
 const handleTaskClose = async () => {
-    await loadSkills();
+    if (mode.value === 'installed') {
+        await loadSkills();
+        return;
+    }
+    installedLoaded.value = false;
 };
 
 defineExpose({
