@@ -119,7 +119,7 @@ const headerTitle = computed(() =>
 
 const showInitialModel = computed(() => !form.id && initialModelProviders.includes(form.provider));
 const apiTypeOptions = computed(() => {
-    if (form.provider === 'minimax' || form.provider === 'xiaomi') {
+    if (form.provider === 'minimax' || form.provider === 'anthropic' || form.provider === 'kimi-coding') {
         return ['anthropic-messages'];
     }
     if (form.provider === 'custom' || form.provider === 'vllm') {
@@ -186,10 +186,16 @@ const resetInitialModel = () => {
 };
 
 const normalizeProviderAPIType = (provider: string, apiType?: string) => {
-    if (provider === 'minimax' || provider === 'xiaomi') {
+    if (provider === 'minimax' || provider === 'anthropic' || provider === 'kimi-coding') {
         return 'anthropic-messages';
     }
     if (provider === 'ollama') {
+        return 'openai-responses';
+    }
+    if (provider === 'openai') {
+        if (apiType === 'openai-completions' || apiType === 'openai-responses') {
+            return apiType;
+        }
         return 'openai-responses';
     }
     if (apiType) {
@@ -325,14 +331,14 @@ const loadProviders = async () => {
 const handleProviderChange = () => {
     if (form.provider === 'custom' || form.provider === 'vllm') {
         form.baseURL = '';
-        form.apiType = normalizeProviderAPIType(form.provider, form.apiType);
     } else if (form.provider === 'ollama') {
         form.baseURL = '';
-        form.apiType = normalizeProviderAPIType(form.provider, form.apiType);
     } else {
         form.baseURL = providerBaseURL.value[form.provider] || '';
-        form.apiType = normalizeProviderAPIType(form.provider, form.apiType);
     }
+    form.apiType = form.id
+        ? normalizeProviderAPIType(form.provider, form.apiType)
+        : normalizeProviderAPIType(form.provider);
     if (!form.id) {
         resetInitialModel();
     }

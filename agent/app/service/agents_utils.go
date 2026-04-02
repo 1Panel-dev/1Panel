@@ -684,6 +684,23 @@ type modelEntry struct {
 	Cost          modelCost `json:"cost"`
 }
 
+func requiresOpenclawProviderModels(provider string) bool {
+	return provider != "gemini"
+}
+
+func applyOpenclawModelsConfig(conf map[string]interface{}, models *modelsConfig) error {
+	if models == nil {
+		delete(conf, "models")
+		return nil
+	}
+	modelsMap, err := structToMap(models)
+	if err != nil {
+		return err
+	}
+	conf["models"] = modelsMap
+	return nil
+}
+
 type modelCost struct {
 	Input      float64 `json:"input"`
 	Output     float64 `json:"output"`
@@ -784,12 +801,8 @@ func writeOpenclawConfig(confDir string, account *model.AgentAccount, modelName,
 		}
 		conf = initial
 	} else {
-		if cfg.Models != nil {
-			modelsMap, err := structToMap(cfg.Models)
-			if err != nil {
-				return err
-			}
-			conf["models"] = modelsMap
+		if err := applyOpenclawModelsConfig(conf, cfg.Models); err != nil {
+			return err
 		}
 		if _, ok := conf["browser"]; !ok {
 			browserMap, err := structToMap(cfg.Browser)
@@ -847,7 +860,7 @@ func writeOpenclawConfig(confDir string, account *model.AgentAccount, modelName,
 	}
 	envPath := path.Join(confDir, ".env")
 	lines := []string{fmt.Sprintf("OPENCLAW_GATEWAY_TOKEN=%s", token)}
-	if envKey := providercatalog.EnvKey(account.Provider); envKey != "" && strings.TrimSpace(account.APIKey) != "" {
+	if envKey := providercatalog.EnvKey(account.Provider); envKey != "" && account.APIKey != "" {
 		lines = append(lines, fmt.Sprintf("%s=%s", envKey, account.APIKey))
 	}
 	content := strings.Join(lines, "\n") + "\n"
@@ -886,7 +899,7 @@ func resolveOpenclawFallbackModelsFromPool(account *model.AgentAccount, accountM
 			}
 			continue
 		}
-		resolvedPrimary, _, _, _, err := buildOpenclawCatalogModel(account, accountModel)
+		resolvedPrimary, _, _, _, err := buildOpenclawAccountModelConfig(account, accountModel)
 		if err != nil {
 			return nil, err
 		}
@@ -961,7 +974,7 @@ func openclawModelRefMap(conf map[string]interface{}) map[string]interface{} {
 func buildOpenclawResolvedModelIDMap(account *model.AgentAccount, accountModels []dto.AgentAccountModel) (map[string]string, error) {
 	result := make(map[string]string, len(accountModels))
 	for _, item := range accountModels {
-		resolvedPrimary, _, _, _, err := buildOpenclawCatalogModel(account, item)
+		resolvedPrimary, _, _, _, err := buildOpenclawAccountModelConfig(account, item)
 		if err != nil {
 			return nil, err
 		}
@@ -1009,7 +1022,7 @@ func buildOpenclawModelsFromAccount(account *model.AgentAccount, selectedModel s
 	primaryModel := ""
 	defaultsModels := make(map[string]map[string]interface{}, len(accountModels))
 	for _, item := range accountModels {
-		resolvedPrimary, entry, key, baseCfg, err := buildOpenclawCatalogModel(account, item)
+		resolvedPrimary, entry, key, baseCfg, err := buildOpenclawAccountModelConfig(account, item)
 		if err != nil {
 			return "", nil, nil, err
 		}
@@ -1029,6 +1042,9 @@ func buildOpenclawModelsFromAccount(account *model.AgentAccount, selectedModel s
 	if primaryModel == "" {
 		return "", nil, nil, buserr.New("ErrAgentModelNotInAccount")
 	}
+	if !requiresOpenclawProviderModels(account.Provider) {
+		return primaryModel, defaultsModels, nil, nil
+	}
 	providerCfg.Models = entries
 	return primaryModel, defaultsModels, &modelsConfig{
 		Mode: "merge",
@@ -1038,25 +1054,33 @@ func buildOpenclawModelsFromAccount(account *model.AgentAccount, selectedModel s
 	}, nil
 }
 
-func buildOpenclawCatalogModel(account *model.AgentAccount, model dto.AgentAccountModel) (string, modelEntry, string, modelProvider, error) {
-	primaryModel, inferredEntry, providerKey, providerCfg, err := inferOpenclawCatalogModel(account, model.ID, model.Reasoning, model.MaxTokens, model.ContextWindow)
+func buildOpenclawAccountModelConfig(account *model.AgentAccount, model dto.AgentAccountModel) (string, modelEntry, string, modelProvider, error) {
+	providerPatch, err := providercatalog.BuildOpenClawProviderPatch(account.Provider, model.ID, account.APIType, account.BaseURL, account.APIKey)
 	if err != nil {
 		return "", modelEntry{}, "", modelProvider{}, err
 	}
-	if strings.TrimSpace(model.Name) != "" {
-		inferredEntry.Name = strings.TrimSpace(model.Name)
+	return providerPatch.PrimaryModel, buildOpenclawModelEntry(providerPatch.ModelID, model), providerPatch.ProviderKey, modelProvider{
+		ApiKey:     providerPatch.APIKey,
+		BaseUrl:    providerPatch.BaseURL,
+		Api:        providerPatch.APIType,
+		AuthHeader: providerPatch.AuthHeader,
+	}, nil
+}
+
+func buildOpenclawModelEntry(modelID string, model dto.AgentAccountModel) modelEntry {
+	name := strings.TrimSpace(model.Name)
+	if name == "" {
+		name = strings.TrimSpace(modelID)
 	}
-	if len(model.Input) > 0 {
-		inferredEntry.Input = sanitizeAgentAccountModelInputs(model.Input)
+	return modelEntry{
+		ID:            strings.TrimSpace(modelID),
+		Name:          name,
+		Reasoning:     model.Reasoning,
+		Input:         sanitizeAgentAccountModelInputs(model.Input),
+		ContextWindow: model.ContextWindow,
+		MaxTokens:     model.MaxTokens,
+		Cost:          modelCost{},
 	}
-	inferredEntry.Reasoning = model.Reasoning
-	if model.ContextWindow > 0 {
-		inferredEntry.ContextWindow = model.ContextWindow
-	}
-	if model.MaxTokens > 0 {
-		inferredEntry.MaxTokens = model.MaxTokens
-	}
-	return primaryModel, inferredEntry, providerKey, providerCfg, nil
 }
 
 type openclawAccountModelRuntime struct {
@@ -1068,22 +1092,16 @@ type openclawAccountModelRuntime struct {
 }
 
 func buildOpenclawAccountModelRuntime(account *model.AgentAccount, model dto.AgentAccountModel) (openclawAccountModelRuntime, error) {
-	apiType, maxTokens, contextWindow := providercatalog.ResolveRuntimeParams(
-		account.Provider,
-		account.APIType,
-		model.MaxTokens,
-		model.ContextWindow,
-	)
-	primaryModel, _, _, _, err := buildOpenclawCatalogModel(account, model)
+	primaryModel, _, _, _, err := buildOpenclawAccountModelConfig(account, model)
 	if err != nil {
 		return openclawAccountModelRuntime{}, err
 	}
 	return openclawAccountModelRuntime{
 		StoredModel:   model.ID,
 		PrimaryModel:  primaryModel,
-		APIType:       apiType,
-		MaxTokens:     maxTokens,
-		ContextWindow: contextWindow,
+		APIType:       account.APIType,
+		MaxTokens:     model.MaxTokens,
+		ContextWindow: model.ContextWindow,
 	}, nil
 }
 
@@ -1097,44 +1115,6 @@ func resolveOpenclawAccountModelRuntimeByID(account *model.AgentAccount, modelID
 		return openclawAccountModelRuntime{}, err
 	}
 	return buildOpenclawAccountModelRuntime(account, selectedAccountModel)
-}
-
-func inferOpenclawCatalogModel(account *model.AgentAccount, modelID string, reasoning bool, maxTokens, contextWindow int) (string, modelEntry, string, modelProvider, error) {
-	baseURL := resolveAccountBaseURL(account)
-	resolvedAPIType, resolvedMaxTokens, resolvedContextWindow := providercatalog.ResolveRuntimeParams(account.Provider, account.APIType, maxTokens, contextWindow)
-	patch, err := providercatalog.BuildOpenClawPatch(account.Provider, modelID, resolvedAPIType, reasoning, resolvedMaxTokens, resolvedContextWindow, baseURL, account.APIKey)
-	if err != nil {
-		return "", modelEntry{}, "", modelProvider{}, err
-	}
-	if patch.Models == nil {
-		return "", modelEntry{}, "", modelProvider{}, fmt.Errorf("models patch is required")
-	}
-	modelsCfg, err := mapToModelsConfig(patch.Models)
-	if err != nil {
-		return "", modelEntry{}, "", modelProvider{}, err
-	}
-	for key, providerCfg := range modelsCfg.Providers {
-		if len(providerCfg.Models) == 0 {
-			continue
-		}
-		return patch.PrimaryModel, providerCfg.Models[0], key, modelProvider{
-			ApiKey:     providerCfg.ApiKey,
-			BaseUrl:    providerCfg.BaseUrl,
-			Api:        providerCfg.Api,
-			AuthHeader: providerCfg.AuthHeader,
-		}, nil
-	}
-	return "", modelEntry{}, "", modelProvider{}, fmt.Errorf("models patch is invalid")
-}
-
-func resolveAccountBaseURL(account *model.AgentAccount) string {
-	baseURL := strings.TrimSpace(account.BaseURL)
-	if baseURL == "" {
-		if defaultURL, ok := providercatalog.DefaultBaseURL(account.Provider); ok {
-			baseURL = defaultURL
-		}
-	}
-	return baseURL
 }
 
 func buildInitialAgentAccountModels(account *model.AgentAccount, requested []dto.AgentAccountModel) ([]dto.AgentAccountModel, error) {
@@ -1331,76 +1311,37 @@ func normalizeAgentAccountModel(account *model.AgentAccount, model dto.AgentAcco
 	if modelID == "" {
 		return dto.AgentAccountModel{}, fmt.Errorf("model is required")
 	}
-	inferredReasoning := model.Reasoning
-	if !model.Reasoning && model.Name == "" && model.MaxTokens == 0 && model.ContextWindow == 0 && len(model.Input) == 0 {
-		if catalogModel, ok := providercatalog.FindModel(account.Provider, modelID); ok {
-			inferredReasoning = catalogModel.Reasoning
-		}
-	}
-	primaryModel, inferredEntry, _, _, err := inferOpenclawCatalogModel(account, modelID, inferredReasoning, model.MaxTokens, model.ContextWindow)
-	if err != nil {
-		return dto.AgentAccountModel{}, err
-	}
 	name := strings.TrimSpace(model.Name)
 	if name == "" {
-		name = strings.TrimSpace(inferredEntry.Name)
-	}
-	reasoning := model.Reasoning
-	if !model.Reasoning && model.Name == "" && model.MaxTokens == 0 && model.ContextWindow == 0 && len(model.Input) == 0 {
-		reasoning = inferredEntry.Reasoning
+		name = modelID
 	}
 	inputs := sanitizeAgentAccountModelInputs(model.Input)
-	if len(inputs) == 0 {
-		inputs = sanitizeAgentAccountModelInputs(inferredEntry.Input)
-	}
-	contextWindow := model.ContextWindow
-	if contextWindow <= 0 {
-		contextWindow = inferredEntry.ContextWindow
-	}
-	maxTokens := model.MaxTokens
-	if maxTokens <= 0 {
-		maxTokens = inferredEntry.MaxTokens
-	}
 	return dto.AgentAccountModel{
-		ID:            normalizeAgentAccountModelID(account.Provider, primaryModel, modelID),
+		ID:            normalizeAgentAccountModelID(account.Provider, modelID),
 		Name:          name,
-		ContextWindow: contextWindow,
-		MaxTokens:     maxTokens,
-		Reasoning:     reasoning,
+		ContextWindow: model.ContextWindow,
+		MaxTokens:     model.MaxTokens,
+		Reasoning:     model.Reasoning,
 		Input:         inputs,
 	}, nil
 }
 
-func normalizeAgentAccountModelID(provider, primaryModel, requestedID string) string {
+func normalizeAgentAccountModelID(provider, requestedID string) string {
 	switch provider {
 	case "custom", "vllm":
-		target := requestedID
-		if strings.TrimSpace(target) == "" {
-			target = primaryModel
-		}
-		return normalizeCustomModel(target)
+		return normalizeCustomModel(requestedID)
 	case "ollama":
-		target := strings.TrimSpace(primaryModel)
-		if strings.HasPrefix(target, "ollama/") {
-			return target
-		}
-		target = strings.TrimSpace(requestedID)
+		target := strings.TrimSpace(requestedID)
 		if strings.HasPrefix(target, "ollama/") {
 			return target
 		}
 		target = strings.TrimLeft(strings.TrimSpace(target), "/")
-		if target == "" {
-			target = strings.TrimLeft(strings.TrimSpace(primaryModel), "/")
-		}
 		if target == "" {
 			return ""
 		}
 		return "ollama/" + target
 	default:
 		target := strings.TrimSpace(requestedID)
-		if target == "" {
-			target = strings.TrimSpace(primaryModel)
-		}
 		if target == "" {
 			return ""
 		}
@@ -1585,18 +1526,6 @@ func structToMap(value interface{}) (map[string]interface{}, error) {
 	}
 	result := map[string]interface{}{}
 	if err := json.Unmarshal(payload, &result); err != nil {
-		return nil, err
-	}
-	return result, nil
-}
-
-func mapToModelsConfig(value map[string]interface{}) (*modelsConfig, error) {
-	payload, err := json.Marshal(value)
-	if err != nil {
-		return nil, err
-	}
-	result := &modelsConfig{}
-	if err := json.Unmarshal(payload, result); err != nil {
 		return nil, err
 	}
 	return result, nil
