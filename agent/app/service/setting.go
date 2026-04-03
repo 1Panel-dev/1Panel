@@ -23,8 +23,10 @@ type SettingService struct{}
 type ISettingService interface {
 	GetSettingInfo() (*dto.SettingInfo, error)
 	GetTerminalAIInfo() (*dto.TerminalAIInfo, error)
+	GetFileManageAIInfo() (*dto.FileManageAIInfo, error)
 	Update(key, value string) error
 	UpdateTerminalAI(req dto.TerminalAIInfo) error
+	UpdateFileManageAI(req dto.FileManageAIInfo) error
 
 	TestConnByInfo(req dto.SSHConnData) bool
 	SaveConnInfo(req dto.SSHConnData) error
@@ -87,6 +89,20 @@ func (u *SettingService) GetTerminalAIInfo() (*dto.TerminalAIInfo, error) {
 	return info, nil
 }
 
+func (u *SettingService) GetFileManageAIInfo() (*dto.FileManageAIInfo, error) {
+	info := &dto.FileManageAIInfo{
+		AIStatus:    constant.StatusDisable,
+		AIAccountID: "",
+	}
+	if value, err := settingRepo.GetValueByKey("FileAIStatus"); err == nil && value != "" {
+		info.AIStatus = value
+	}
+	if value, err := settingRepo.GetValueByKey("FileAIAccountID"); err == nil {
+		info.AIAccountID = value
+	}
+	return info, nil
+}
+
 func (u *SettingService) Update(key, value string) error {
 	return settingRepo.UpdateOrCreate(key, value)
 }
@@ -120,6 +136,36 @@ func (u *SettingService) UpdateTerminalAI(req dto.TerminalAIInfo) error {
 		return err
 	}
 	terminalai.InvalidateTerminalRuntimeCache()
+	return nil
+}
+
+func (u *SettingService) UpdateFileManageAI(req dto.FileManageAIInfo) error {
+	if strings.EqualFold(strings.TrimSpace(req.AIStatus), constant.StatusEnable) {
+		accountID, err := strconv.ParseUint(strings.TrimSpace(req.AIAccountID), 10, 64)
+		if err != nil || accountID == 0 {
+			return buserr.New("ErrAgentAccountIDRequired")
+		}
+		currentStatus, _ := settingRepo.GetValueByKey("FileAIStatus")
+		currentAccountID, _ := settingRepo.GetValueByKey("FileAIAccountID")
+		needValidate := !strings.EqualFold(strings.TrimSpace(currentStatus), constant.StatusEnable) ||
+			strings.TrimSpace(currentAccountID) != strings.TrimSpace(req.AIAccountID)
+		if needValidate {
+			if err := terminalai.ValidateTerminalAccount(uint(accountID)); err != nil {
+				return buserr.WithErr("ErrAgentAccountUnavailable", err)
+			}
+		}
+	}
+	accountVal := strings.TrimSpace(req.AIAccountID)
+	if !strings.EqualFold(strings.TrimSpace(req.AIStatus), constant.StatusEnable) {
+		accountVal = ""
+	}
+	if err := settingRepo.UpdateOrCreate("FileAIStatus", req.AIStatus); err != nil {
+		return err
+	}
+	if err := settingRepo.UpdateOrCreate("FileAIAccountID", accountVal); err != nil {
+		return err
+	}
+	terminalai.InvalidateFileAIRuntimeCache()
 	return nil
 }
 

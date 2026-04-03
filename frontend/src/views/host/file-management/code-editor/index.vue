@@ -415,6 +415,7 @@ interface EditProps {
     path: string;
     name: string;
     extension: string;
+    initialLine?: number;
 }
 
 interface EditorConfig {
@@ -435,6 +436,18 @@ interface TreeNode {
     name?: string;
     isLeaf?: boolean;
 }
+
+const pendingInitialLine = ref(0);
+
+const revealPendingInitialLine = () => {
+    const line = pendingInitialLine.value;
+    if (!editor || line < 1) {
+        return;
+    }
+    editor.setPosition({ lineNumber: line, column: 1 });
+    editor.revealLineInCenter(line);
+    pendingInitialLine.value = 0;
+};
 
 const open = ref(false);
 const loading = ref(false);
@@ -862,6 +875,8 @@ const initEditor = () => {
                 isEdit.value = true;
             }
         });
+
+        revealPendingInitialLine();
     });
 };
 
@@ -891,6 +906,7 @@ const saveContent = async () => {
 };
 
 const acceptParams = async (props: EditProps) => {
+    pendingInitialLine.value = props.initialLine && props.initialLine > 0 ? Math.floor(props.initialLine) : 0;
     form.value.content = props.content;
     oldFileContent.value = props.content;
     form.value.path = props.path;
@@ -924,6 +940,11 @@ const acceptParams = async (props: EditProps) => {
     config.minimap = localStorage.getItem(minimapKey) !== null ? localStorage.getItem(minimapKey) === 'true' : true;
     open.value = true;
     saveTabsToStorage();
+    nextTick(() => {
+        if (editor) {
+            revealPendingInitialLine();
+        }
+    });
 };
 
 const getIconName = (extension: string) => getIcon(extension);

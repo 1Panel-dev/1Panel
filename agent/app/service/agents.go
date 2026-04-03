@@ -494,6 +494,7 @@ func (a AgentService) UpdateAccount(req dto.AgentAccountUpdateReq) error {
 		return err
 	}
 	terminalai.InvalidateTerminalRuntimeCache()
+	terminalai.InvalidateFileAIRuntimeCache()
 	if req.SyncAgents {
 		if err := a.syncAgentsByAccount(account); err != nil {
 			return err
@@ -634,6 +635,7 @@ func (a AgentService) UpdateAccountModel(req dto.AgentAccountModelUpdateReq) err
 		return err
 	}
 	terminalai.InvalidateTerminalRuntimeCache()
+	terminalai.InvalidateFileAIRuntimeCache()
 	return a.syncAgentsByAccount(account)
 }
 
@@ -666,6 +668,7 @@ func (a AgentService) DeleteAccountModel(req dto.AgentAccountModelDeleteReq) err
 		return err
 	}
 	terminalai.InvalidateTerminalRuntimeCache()
+	terminalai.InvalidateFileAIRuntimeCache()
 	return a.syncAgentsByAccount(account)
 }
 
@@ -694,6 +697,7 @@ func (a AgentService) DeleteAccount(req dto.AgentAccountDeleteReq) error {
 		return err
 	}
 	terminalai.InvalidateTerminalRuntimeCache()
+	terminalai.InvalidateFileAIRuntimeCache()
 	return agentAccountRepo.DeleteByID(req.ID)
 }
 

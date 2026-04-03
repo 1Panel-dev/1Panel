@@ -1194,3 +1194,26 @@ var AddAgentWebsiteBinding = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddFileManageAISettings = &gormigrate.Migration{
+	ID: "20260330-add-file-manage-ai-settings",
+	Migrate: func(tx *gorm.DB) error {
+		rows := []model.Setting{
+			{Key: "FileAIStatus", Value: constant.StatusDisable},
+			{Key: "FileAIAccountID", Value: ""},
+		}
+		for i := range rows {
+			var exist model.Setting
+			if err := tx.Where("`key` = ?", rows[i].Key).First(&exist).Error; err != nil {
+				if errors.Is(err, gorm.ErrRecordNotFound) {
+					if err := tx.Create(&rows[i]).Error; err != nil {
+						return err
+					}
+				} else {
+					return err
+				}
+			}
+		}
+		return nil
+	},
+}

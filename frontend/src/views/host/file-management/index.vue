@@ -450,6 +450,9 @@
                                         </template>
                                     </el-input>
                                 </div>
+                                <el-button plain type="primary" @click="openAiSearchDrawer">
+                                    {{ $t('file.aiSearch') }}
+                                </el-button>
                             </div>
                         </div>
                     </template>
@@ -644,11 +647,20 @@
         <TextPreview ref="textPreviewRef" />
         <TerminalDialog ref="dialogTerminalRef" />
         <Convert ref="convertRef" @close="search" />
+
+        <FileAiSearchDrawer
+            ref="aiSearchDrawerRef"
+            v-model="aiSearchDrawerVisible"
+            :list-path="req.path"
+            @pick-directory="fileRef.acceptParams({ dir: false, multiple: true })"
+            @open-editor="onAiSearchOpenEditor"
+        />
+        <FileList ref="fileRef" @choose="getSearchPath" />
     </div>
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onMounted, reactive, ref } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
 import {
     addFavorite,
     batchGetFileRemarks,
@@ -704,6 +716,7 @@ import Preview from './preview/index.vue';
 import TextPreview from './text-preview/index.vue';
 import VscodeOpenDialog from '@/components/vscode-open/index.vue';
 import Convert from './convert/index.vue';
+import FileAiSearchDrawer from './file-ai-search-drawer.vue';
 import { debounce } from 'lodash-es';
 import TerminalDialog from './terminal/index.vue';
 import { Dashboard } from '@/api/interface/dashboard';
@@ -712,6 +725,7 @@ import type { TabPaneName } from 'element-plus';
 import { getComponentInfo } from '@/api/modules/host';
 import { routerToNameWithQuery } from '@/utils/router';
 import { loadBaseDir } from '@/api/modules/setting';
+import FileList from '@/components/file-list/index.vue';
 
 const globalStore = GlobalStore();
 
@@ -720,6 +734,7 @@ interface FilePaths {
     name: string;
 }
 
+const fileRef = ref();
 const router = useRouter();
 const data = ref();
 const tableRefs = ref<Record<string, any>>({});
@@ -766,7 +781,14 @@ let pointer = -1;
 const fileCreate = reactive({ path: '/', isDir: false, mode: 0o755 });
 const fileCompress = reactive({ files: [''], name: '', dst: '', operate: 'compress' });
 const fileDeCompress = reactive({ path: '', name: '', dst: '', type: '' });
-const fileEdit = reactive({ content: '', path: '', name: '', language: 'plaintext', extension: '' });
+const fileEdit = reactive<{
+    content: string;
+    path: string;
+    name: string;
+    language: string;
+    extension: string;
+    initialLine?: number;
+}>({ content: '', path: '', name: '', language: 'plaintext', extension: '' });
 const filePreview = reactive({ path: '', name: '', extension: '', fileType: '', imageFiles: [], currentNode: '' });
 const codeReq = reactive({ path: '', expand: false, page: 1, pageSize: 100, isDetail: false });
 const fileUpload = reactive({ path: '' });
@@ -789,6 +811,17 @@ const fileConvert = reactive<{
     ],
 });
 const ffmpegExist = ref(false);
+
+const aiSearchDrawerVisible = ref(false);
+const aiSearchDrawerRef = ref<InstanceType<typeof FileAiSearchDrawer> | null>(null);
+
+const openAiSearchDrawer = () => {
+    aiSearchDrawerVisible.value = true;
+};
+
+const getSearchPath = (path: string) => {
+    aiSearchDrawerRef.value?.applyPathFromPicker(path);
+};
 
 const createRef = ref();
 const roleRef = ref();
@@ -1330,11 +1363,29 @@ const openPreview = (item: File.File, fileType: string) => {
     previewRef.value.acceptParams(filePreview);
 };
 
-const openCodeEditor = (path: string, extension: string) => {
+const extensionFromPath = (p: string) => {
+    const i = p.lastIndexOf('.');
+    if (i <= 0 || i === p.length - 1) {
+        return '';
+    }
+    return p.slice(i);
+};
+
+const openPathInCodeEditor = (
+    path: string,
+    opts?: {
+        extension?: string;
+        initialLine?: number;
+    },
+) => {
+    if (!path) {
+        return;
+    }
+    const extension = opts?.extension && opts.extension !== '' ? opts.extension : extensionFromPath(path);
     codeReq.path = path;
     codeReq.expand = true;
 
-    if (extension != '') {
+    if (extension !== '') {
         Languages.forEach((language) => {
             const ext = extension.substring(1);
             if (language.value.indexOf(ext) > -1) {
@@ -1343,16 +1394,27 @@ const openCodeEditor = (path: string, extension: string) => {
         });
     }
 
+    const line = opts?.initialLine && opts.initialLine > 0 ? Math.floor(opts.initialLine) : undefined;
+
     getFileContent(codeReq)
         .then((res) => {
             fileEdit.content = res.data.content;
             fileEdit.path = res.data.path;
             fileEdit.name = res.data.name;
             fileEdit.extension = res.data.extension;
-
+            fileEdit.initialLine = line;
             codeEditorRef.value.acceptParams(fileEdit);
+            fileEdit.initialLine = undefined;
         })
         .catch(() => {});
+};
+
+const onAiSearchOpenEditor = (payload: { path: string; initialLine?: number }) => {
+    openPathInCodeEditor(payload.path, { initialLine: payload.initialLine });
+};
+
+const openCodeEditor = (path: string, extension: string) => {
+    openPathInCodeEditor(path, { extension });
 };
 
 const openTextPreview = (path: string, name: string) => {
