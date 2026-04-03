@@ -14,10 +14,10 @@ func LoadMenus() string {
 	item := []dto.ShowMenu{
 		{ID: "1", Disabled: true, Title: "menu.home", IsShow: true, Label: "Home-Menu", Path: "/", Sort: 100},
 		{ID: "2", Disabled: true, Title: "menu.apps", IsShow: true, Label: "App-Menu", Path: "/apps/all", Sort: 200},
-		{ID: "3", Disabled: false, Title: "menu.aiTools", IsShow: true, Label: "AI-Menu", Path: "/ai/model", Sort: 300,
+		{ID: "3", Disabled: false, Title: "menu.aiTools", IsShow: true, Label: "AI-Menu", Path: "/ai/model/account", Sort: 300,
 			Children: []dto.ShowMenu{
 				{ID: "44", Disabled: false, Title: "aiTools.agents.agent", IsShow: true, Label: "Agents", Path: "/ai/agents/agent", Sort: 50},
-				{ID: "41", Disabled: false, Title: "aiTools.model.localModel", IsShow: true, Label: "OllamaModel", Path: "/ai/model", Sort: 100},
+				{ID: "41", Disabled: false, Title: "aiTools.model.model", IsShow: true, Label: "AIModel", Path: "/ai/model/account", Sort: 100},
 				{ID: "42", Disabled: false, Title: "menu.mcp", IsShow: true, Label: "MCPServer", Path: "/ai/mcp", Sort: 200},
 				{ID: "43", Disabled: false, Title: "aiTools.gpu.gpu", IsShow: true, Label: "GPU", Path: "/ai/gpu", Sort: 300},
 			}},
@@ -66,7 +66,7 @@ func MenuSort() []dto.MenuLabelSort {
 		{Label: "App-Menu", Sort: 200},
 		{Label: "AI-Menu", Sort: 300},
 		{Label: "Agents", Sort: 50},
-		{Label: "OllamaModel", Sort: 100},
+		{Label: "AIModel", Sort: 100},
 		{Label: "MCPServer", Sort: 200},
 		{Label: "GPU", Sort: 300},
 		{Label: "Website-Menu", Sort: 400},
