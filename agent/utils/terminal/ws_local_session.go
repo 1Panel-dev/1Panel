@@ -130,7 +130,9 @@ func (sws *LocalWsSession) receiveWsMsg(exitCh chan bool) {
 				}
 				sws.sendWebsocketInputCommandToSshSessionStdinPipe(decodeBytes)
 			case WsMsgHeartbeat:
+				sws.writeMutex.Lock()
 				err = wsConn.WriteMessage(websocket.TextMessage, wsData)
+				sws.writeMutex.Unlock()
 				if err != nil {
 					global.LOG.Errorf("ssh sending heartbeat to webSocket failed, err: %v", err)
 				}
@@ -143,7 +145,7 @@ func (sws *LocalWsSession) notifyAIThinking() {
 	if sws == nil {
 		return
 	}
-	if err := sws.masterWrite([]byte("\r\n" + i18n.GetMsgByKeyAndLang(sws.lang, "TerminalAIThinking") + "\r\n")); err != nil {
+	if err := sws.writeAINotice("info", i18n.GetMsgByKeyAndLang(sws.lang, "TerminalAIThinking")); err != nil {
 		global.LOG.Errorf("write terminal ai thinking message failed, err: %v", err)
 	}
 }
@@ -152,7 +154,7 @@ func (sws *LocalWsSession) notifyAIDone(message string) {
 	if sws == nil || strings.TrimSpace(message) == "" {
 		return
 	}
-	if err := sws.masterWrite([]byte(message + "\r\n")); err != nil {
+	if err := sws.writeAINotice("success", message); err != nil {
 		global.LOG.Errorf("write terminal ai done message failed, err: %v", err)
 	}
 }
@@ -161,9 +163,26 @@ func (sws *LocalWsSession) notifyAIError(message string) {
 	if sws == nil || strings.TrimSpace(message) == "" {
 		return
 	}
-	if err := sws.masterWrite([]byte(message + "\r\n")); err != nil {
+	if err := sws.writeAINotice("error", message); err != nil {
 		global.LOG.Errorf("write terminal ai error message failed, err: %v", err)
 	}
+}
+
+func (sws *LocalWsSession) writeAINotice(level, message string) error {
+	if sws == nil || strings.TrimSpace(message) == "" {
+		return nil
+	}
+	wsData, err := json.Marshal(WsMsg{
+		Type:    WsMsgAINotice,
+		Level:   strings.TrimSpace(level),
+		Message: strings.TrimSpace(message),
+	})
+	if err != nil {
+		return err
+	}
+	sws.writeMutex.Lock()
+	defer sws.writeMutex.Unlock()
+	return sws.wsConn.WriteMessage(websocket.TextMessage, wsData)
 }
 
 func (sws *LocalWsSession) sendWebsocketInputCommandToSshSessionStdinPipe(cmdBytes []byte) {

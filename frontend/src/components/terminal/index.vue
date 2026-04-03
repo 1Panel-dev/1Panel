@@ -1,5 +1,19 @@
 <template>
-    <div ref="terminalElement" class="terminal-container"></div>
+    <div class="terminal-shell">
+        <div ref="terminalElement" class="terminal-container"></div>
+        <transition name="ai-mask-fade">
+            <div v-if="aiNotice.loading" class="ai-notice-mask"></div>
+        </transition>
+        <transition name="ai-notice-fade">
+            <div
+                v-if="aiNotice.visible"
+                class="ai-notice"
+                :class="[`ai-notice--${aiNotice.level}`, { 'ai-notice--loading': aiNotice.loading }]"
+            >
+                {{ aiNotice.message }}
+            </div>
+        </transition>
+    </div>
 </template>
 
 <script lang="ts" setup>
@@ -20,6 +34,13 @@ const terminalSocket = ref<WebSocket>();
 const heartbeatTimer = ref<NodeJS.Timer>();
 const latency = ref(0);
 const initCmd = ref('');
+const aiNotice = ref({
+    visible: false,
+    loading: false,
+    level: 'info',
+    message: '',
+});
+let aiNoticeTimer: ReturnType<typeof setTimeout> | null = null;
 
 const readyWatcher = watch(
     () => webSocketReady.value && termReady.value,
@@ -154,6 +175,7 @@ const initError = (errorInfo: string) => {
 
 function onClose(isKeepShow: boolean = false) {
     window.removeEventListener('resize', changeTerminalSize);
+    clearAINotice();
     try {
         terminalSocket.value?.close();
     } catch {}
@@ -259,16 +281,26 @@ const onWSReceive = (message: MessageEvent) => {
             latency.value = new Date().getTime() - wsMsg.timestamp;
             break;
         }
+        case 'ai_notice': {
+            const message = wsMsg.message?.trim();
+            if (!message) {
+                break;
+            }
+            showAINotice(wsMsg.level || 'info', message);
+            break;
+        }
     }
 };
 
 const errorRealTerminal = (ex: any) => {
+    clearAINotice();
     let message = ex.message;
     if (!message) message = 'disconnected';
     term.value.write(`\x1b[31m${message}\x1b[m\r\n`);
 };
 
 const closeRealTerminal = (ev: CloseEvent) => {
+    clearAINotice();
     if (heartbeatTimer.value) {
         clearInterval(Number(heartbeatTimer.value));
     }
@@ -333,7 +365,45 @@ function sendMsg(data: string, line: string = '') {
 
 function onTermData(data: string) {
     if (!data) return;
+    if (aiNotice.value.loading) return;
     sendMsg(data, isEnterInputData(data) ? getCurrentTerminalLine() : '');
+}
+
+function clearAINotice() {
+    if (aiNoticeTimer) {
+        clearTimeout(aiNoticeTimer);
+        aiNoticeTimer = null;
+    }
+    aiNotice.value = {
+        ...aiNotice.value,
+        visible: false,
+        loading: false,
+    };
+}
+
+function showAINotice(level: string, message: string) {
+    if (aiNoticeTimer) {
+        clearTimeout(aiNoticeTimer);
+        aiNoticeTimer = null;
+    }
+    const resolvedLevel = ['success', 'error', 'info'].includes(level) ? level : 'info';
+    aiNotice.value = {
+        visible: true,
+        loading: resolvedLevel === 'info',
+        level: resolvedLevel,
+        message,
+    };
+    if (resolvedLevel === 'info') {
+        return;
+    }
+    aiNoticeTimer = setTimeout(() => {
+        aiNotice.value = {
+            ...aiNotice.value,
+            visible: false,
+            loading: false,
+        };
+        aiNoticeTimer = null;
+    }, 2600);
 }
 
 // websocket 相关代码 end
@@ -372,6 +442,95 @@ onBeforeUnmount(() => {
     width: 100%;
     height: 100%;
 }
+
+.terminal-shell {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.ai-notice-mask {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    background: rgba(8, 10, 14, 0.12);
+    backdrop-filter: blur(1.5px);
+    pointer-events: auto;
+    cursor: progress;
+}
+
+.ai-notice {
+    position: absolute;
+    left: 50%;
+    top: 24px;
+    transform: translateX(-50%);
+    z-index: 12;
+    width: fit-content;
+    min-width: 240px;
+    max-width: min(72%, 560px);
+    padding: 9px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: rgba(16, 18, 24, 0.78);
+    color: #f3f4f6;
+    font-size: 12px;
+    line-height: 1.4;
+    text-align: center;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(8px);
+    pointer-events: none;
+    white-space: pre-wrap;
+}
+
+.ai-notice--loading {
+    top: 50%;
+    width: min(72%, 560px);
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 13px;
+    line-height: 1.5;
+    transform: translate(-50%, -50%);
+    background: rgba(16, 18, 24, 0.92);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+}
+
+.ai-notice--success {
+    border-color: rgba(34, 197, 94, 0.45);
+    background: rgba(10, 28, 18, 0.78);
+}
+
+.ai-notice--error {
+    border-color: rgba(248, 113, 113, 0.45);
+    background: rgba(40, 16, 16, 0.8);
+}
+
+.ai-notice-fade-enter-active,
+.ai-notice-fade-leave-active {
+    transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.ai-mask-fade-enter-active,
+.ai-mask-fade-leave-active {
+    transition: opacity 180ms ease;
+}
+
+.ai-notice-fade-enter-from,
+.ai-notice-fade-leave-to {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-6px);
+}
+
+.ai-notice--loading.ai-notice-fade-enter-from,
+.ai-notice--loading.ai-notice-fade-leave-to {
+    transform: translate(-50%, calc(-50% + 8px));
+}
+
+.ai-mask-fade-enter-from,
+.ai-mask-fade-leave-to {
+    opacity: 0;
+}
+
 :deep(.xterm) {
     padding: 5px !important;
     background-color: transparent !important;
