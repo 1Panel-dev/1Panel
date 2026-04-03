@@ -877,3 +877,96 @@ var UpdateAiAgentsHideMenuTitle = &gormigrate.Migration{
 		).Error
 	},
 }
+
+var UpdateAiModelMenuStructure = &gormigrate.Migration{
+	ID: "20260403-update-ai-model-menu-structure",
+	Migrate: func(tx *gorm.DB) error {
+		var menuJSON string
+		if err := tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Pluck("value", &menuJSON).Error; err != nil {
+			return err
+		}
+		if menuJSON == "" {
+			return tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Update("value", helper.LoadMenus()).Error
+		}
+
+		var menus []dto.ShowMenu
+		if err := json.Unmarshal([]byte(menuJSON), &menus); err != nil {
+			return tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Update("value", helper.LoadMenus()).Error
+		}
+
+		for i := range menus {
+			if menus[i].Label != "AI-Menu" {
+				continue
+			}
+			menus[i].Path = "/ai/model/account"
+			menus[i].Children = buildAiMenuChildren(menus[i].Children)
+			break
+		}
+
+		updatedJSON, err := json.Marshal(menus)
+		if err != nil {
+			return tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Update("value", helper.LoadMenus()).Error
+		}
+		return tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Update("value", string(updatedJSON)).Error
+	},
+}
+
+func buildAiMenuChildren(children []dto.ShowMenu) []dto.ShowMenu {
+	return []dto.ShowMenu{
+		normalizeAiMenuChild(children, dto.ShowMenu{
+			ID:       "44",
+			Label:    "Agents",
+			Disabled: false,
+			IsShow:   true,
+			Title:    "aiTools.agents.agent",
+			Path:     "/ai/agents/agent",
+			Sort:     50,
+		}, "Agents"),
+		normalizeAiMenuChild(children, dto.ShowMenu{
+			ID:       "41",
+			Label:    "AIModel",
+			Disabled: false,
+			IsShow:   true,
+			Title:    "aiTools.model.model",
+			Path:     "/ai/model/account",
+			Sort:     100,
+		}, "AIModel", "OllamaModel"),
+		normalizeAiMenuChild(children, dto.ShowMenu{
+			ID:       "42",
+			Label:    "MCPServer",
+			Disabled: false,
+			IsShow:   true,
+			Title:    "menu.mcp",
+			Path:     "/ai/mcp",
+			Sort:     200,
+		}, "MCPServer"),
+		normalizeAiMenuChild(children, dto.ShowMenu{
+			ID:       "43",
+			Label:    "GPU",
+			Disabled: false,
+			IsShow:   true,
+			Title:    "aiTools.gpu.gpu",
+			Path:     "/ai/gpu",
+			Sort:     300,
+		}, "GPU"),
+	}
+}
+
+func normalizeAiMenuChild(children []dto.ShowMenu, fallback dto.ShowMenu, labels ...string) dto.ShowMenu {
+	for _, child := range children {
+		for _, label := range labels {
+			if child.Label != label {
+				continue
+			}
+			child.ID = fallback.ID
+			child.Label = fallback.Label
+			child.Disabled = fallback.Disabled
+			child.Title = fallback.Title
+			child.Path = fallback.Path
+			child.Sort = fallback.Sort
+			child.Children = nil
+			return child
+		}
+	}
+	return fallback
+}

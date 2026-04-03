@@ -1,20 +1,11 @@
 import { Layout } from '@/routers/constant';
 
-const vllmModules = import.meta.glob('@/xpack/views/vllm/index.vue');
-const loadVllmView = () => {
-    const loader = vllmModules['/src/xpack/views/vllm/index.vue'];
-    if (loader) {
-        return loader();
-    }
-    return import('@/views/ai/model/vllm/index.vue');
-};
-
 const databaseRouter = {
     sort: 4,
     path: '/ai',
     name: 'AI-Menu',
     component: Layout,
-    redirect: '/ai/model',
+    redirect: '/ai/model/account',
     meta: {
         icon: 'p-jiqiren2',
         title: 'menu.aiTools',
@@ -31,23 +22,23 @@ const databaseRouter = {
             },
         },
         {
-            path: '/ai/agents/model',
-            name: 'AgentsModel',
-            component: () => import('@/views/ai/agents/model/index.vue'),
+            path: '/ai/model/account',
+            name: 'AIModel',
+            component: () => import('@/views/ai/model/index.vue'),
             meta: {
-                title: 'aiTools.agents.account',
-                activeMenu: '/ai/agents/agent',
+                icon: 'p-moxing-menu',
+                title: 'aiTools.model.model',
                 requiresAuth: true,
             },
         },
         {
-            path: '/ai/model/ollama',
-            name: 'OllamaModel',
-            component: () => import('@/views/ai/model/ollama/index.vue'),
+            path: '/ai/model/local',
+            hidden: true,
+            name: 'LocalModel',
+            component: () => import('@/views/ai/model/index.vue'),
             meta: {
-                icon: 'p-moxing-menu',
                 title: 'aiTools.model.localModel',
-                activeMenu: '/ai/model/ollama',
+                activeMenu: '/ai/model/account',
                 requiresAuth: true,
             },
         },
@@ -58,28 +49,6 @@ const databaseRouter = {
             meta: {
                 icon: 'p-mcp-menu',
                 title: 'menu.mcp',
-                requiresAuth: true,
-            },
-        },
-        {
-            path: '/ai/model/tensorrt',
-            hidden: true,
-            name: 'TensorRTLLm',
-            component: () => import('@/views/ai/model/tensorrt/index.vue'),
-            meta: {
-                title: 'aiTools.tensorRT.llm',
-                activeMenu: '/ai/model/ollama',
-                requiresAuth: true,
-            },
-        },
-        {
-            path: '/ai/model/vllm',
-            hidden: true,
-            name: 'Vllm',
-            component: loadVllmView,
-            meta: {
-                title: 'vLLM',
-                activeMenu: '/ai/model/ollama',
                 requiresAuth: true,
             },
         },

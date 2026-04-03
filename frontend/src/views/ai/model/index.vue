@@ -1,25 +1,31 @@
 <template>
     <div>
         <RouterButton :buttons="buttons" />
-        <LayoutContent>
-            <router-view></router-view>
-        </LayoutContent>
+        <component :is="currentComponent" />
     </div>
 </template>
 
 <script lang="ts" setup>
+import { computed } from 'vue';
+import { useRoute } from 'vue-router';
+import i18n from '@/lang';
+import AccountView from '@/views/ai/agents/model/index.vue';
+import LocalView from '@/views/ai/model/local/index.vue';
+
+const route = useRoute();
+
 const buttons = [
     {
-        label: 'Ollama',
-        path: '/ai/model/ollama',
+        label: i18n.global.t('aiTools.agents.account'),
+        path: '/ai/model/account',
     },
     {
-        label: 'vLLM',
-        path: '/ai/model/vllm',
-    },
-    {
-        label: 'TensorRT LLM',
-        path: '/ai/model/tensorrt',
+        label: i18n.global.t('aiTools.model.localModel'),
+        path: '/ai/model/local',
     },
 ];
+
+const currentComponent = computed(() => {
+    return route.path === '/ai/model/local' ? LocalView : AccountView;
+});
 </script>

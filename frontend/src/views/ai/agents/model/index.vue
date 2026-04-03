@@ -1,6 +1,5 @@
 <template>
     <div>
-        <RouterMenu />
         <LayoutContent>
             <template #leftToolBar>
                 <el-button type="primary" @click="openCreate">{{ $t('commons.button.create') }}</el-button>
@@ -54,7 +53,6 @@
 import { onMounted, reactive, ref } from 'vue';
 import { deleteAgentAccount, pageAgentAccounts } from '@/api/modules/ai';
 import { AI } from '@/api/interface/ai';
-import RouterMenu from '@/views/ai/agents/index.vue';
 import AddDialog from '@/views/ai/agents/model/add/index.vue';
 import ModelPoolDialog from '@/views/ai/agents/model/pool/index.vue';
 import { ElMessageBox } from 'element-plus';

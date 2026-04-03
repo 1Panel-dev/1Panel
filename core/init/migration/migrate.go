@@ -35,6 +35,7 @@ func Init() {
 		migrations.AddEditionSetting,
 		migrations.UpdateAiLocalModelMenuTitle,
 		migrations.UpdateAiAgentsHideMenuTitle,
+		migrations.UpdateAiModelMenuStructure,
 		migrations.AddDocSourceSetting,
 	})
 	if err := m.Migrate(); err != nil {

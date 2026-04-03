@@ -1,6 +1,6 @@
 <template>
     <div>
-        <RouterMenu />
+        <RouterButton :buttons="headerButtons" />
         <DockerStatus v-model:isActive="isActive" v-model:isExist="isExist" />
         <LayoutContent v-loading="loading" v-if="isExist" :class="{ mask: !isActive }">
             <template #leftToolBar>
@@ -173,7 +173,6 @@ import { SearchWithPage } from '@/api/interface';
 import { dateFormat, newUUID } from '@/utils/util';
 import { MsgSuccess } from '@/utils/message';
 
-import RouterMenu from '@/views/ai/agents/index.vue';
 import AddDialog from '@/views/ai/agents/agent/add/index.vue';
 import DeleteDialog from '@/views/ai/agents/agent/delete/index.vue';
 import ConfigDrawer from '@/views/ai/agents/agent/config/index.vue';
@@ -208,6 +207,13 @@ const isActive = ref(false);
 const isExist = ref(false);
 const noApp = ref(false);
 const searchName = ref('');
+
+const headerButtons = [
+    {
+        label: i18n.global.t('aiTools.agents.agent'),
+        path: '/ai/agents/agent',
+    },
+];
 
 const buttons = [
     {

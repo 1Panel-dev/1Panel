@@ -1,6 +1,5 @@
 <template>
     <div>
-        <RouterMenu />
         <LayoutContent>
             <template #leftToolBar>
                 <div class="flex flex-wrap gap-3">
@@ -81,7 +80,6 @@
 import OperateDialog from './operate/index.vue';
 import ComposeLogs from '@/components/log/compose/index.vue';
 import PortJumpDialog from '@/components/port-jump/index.vue';
-import RouterMenu from '@/views/ai/model/router-menu.vue';
 import PortJump from '@/views/website/runtime/components/port-jump.vue';
 
 import { reactive, onMounted, ref } from 'vue';
