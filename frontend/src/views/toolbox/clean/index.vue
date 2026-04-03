@@ -315,6 +315,10 @@ const form = reactive({
     lastCleanData: '',
 });
 
+const hasChildren = (node: any) => Array.isArray(node?.children) && node.children.length > 0;
+
+const canDeleteNode = (node: any) => !!node?.canDelete;
+
 const scanData = async () => {
     loading.value = true;
     await scan()
@@ -395,26 +399,12 @@ const search = async () => {
 };
 
 const loadSubmitCheck = (data: any) => {
-    if (data.children === null) {
-        if (data.isCheck) {
-            submitCleans.value.push({ treeType: data.type, name: data.name, size: data.size });
-        }
-        return;
-    }
-    for (const item of data) {
-        if (item.type === 'unknown_backup' && item.isCheck && item.children) {
-            loadSubmitCheck(item.children);
-            continue;
-        }
-        if (item.isCheck && item.type === 'upgrade' && !item.children) {
+    const nodes = Array.isArray(data) ? data : [data];
+    for (const item of nodes) {
+        if (canDeleteNode(item) && item.isCheck) {
             submitCleans.value.push({ treeType: item.type, name: item.name, size: item.size });
-            continue;
         }
-        if (item.isCheck && item.type !== 'app_tmp_download' && item.type !== 'upgrade') {
-            submitCleans.value.push({ treeType: item.type, name: item.name, size: item.size });
-            continue;
-        }
-        if (item.children) {
+        if (hasChildren(item)) {
             loadSubmitCheck(item.children);
         }
     }
@@ -435,56 +425,50 @@ function onChange(data: any, checked: any) {
     selectSize.value = 0;
     let systemSelects = systemRef.value.getCheckedNodes(false, true);
     for (const item of systemSelects) {
-        if (item.children === null) {
+        if (canDeleteNode(item)) {
             selectSize.value = selectSize.value + Number(item.size);
         }
     }
     let backupSelects = backupRef.value.getCheckedNodes(false, true);
     for (const item of backupSelects) {
-        if (item.children === null) {
+        if (canDeleteNode(item)) {
             selectSize.value = selectSize.value + Number(item.size);
         }
     }
     let uploadSelects = uploadRef.value.getCheckedNodes(false, true);
     for (const item of uploadSelects) {
-        if (item.children === null) {
+        if (canDeleteNode(item)) {
             selectSize.value = selectSize.value + Number(item.size);
         }
     }
     let downloadSelects = downloadRef.value.getCheckedNodes(false, true);
     for (const item of downloadSelects) {
-        if (item.children === null) {
+        if (canDeleteNode(item)) {
             selectSize.value = selectSize.value + Number(item.size);
         }
     }
     let systemLogSelects = systemLogRef.value.getCheckedNodes(false, true);
     for (const item of systemLogSelects) {
-        if (item.children === null) {
+        if (canDeleteNode(item)) {
             selectSize.value = selectSize.value + Number(item.size);
         }
     }
     let containerSelects = containerRef.value.getCheckedNodes(false, true);
     for (const item of containerSelects) {
-        if (item.children === null) {
+        if (canDeleteNode(item)) {
             selectSize.value = selectSize.value + Number(item.size);
         }
     }
 }
 
 function loadCheck(data: any, checkList: any) {
-    if (data.children === null) {
-        if (data.isCheck) {
-            checkList.push(data.id);
-        }
-        return;
-    }
-    for (const item of data) {
-        if (item.isCheck) {
+    const nodes = Array.isArray(data) ? data : [data];
+    for (const item of nodes) {
+        if (canDeleteNode(item) && item.isCheck) {
             selectSize.value = selectSize.value + Number(item.size);
             checkList.push(item.id);
-            continue;
         }
-        if (item.children) {
+        if (hasChildren(item)) {
             loadCheck(item.children, checkList);
         }
     }
