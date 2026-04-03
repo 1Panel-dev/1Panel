@@ -37,6 +37,7 @@ ErrGroupIsDefault: 'Группа по умолчанию, не может быт
 ErrGroupIsInWebsiteUse: 'Группа используется другим веб-сайтом и не может быть удалена.'
 Decrypt: 'Расшифровать'
 ErrAgentAccountBound: 'Акаунт привязан к агенту'
+ErrTerminalAIAccountInUse: 'Эта учетная запись модели сейчас используется Terminal AI. Смените учетную запись в настройках Terminal AI или отключите Terminal AI и повторите попытку.'
 ErrAgentAccountUnavailable: 'Связь с аккаунтом недоступна: {{ .err }}'
 ErrAgentProviderNotSupported: 'Провайдер агента не поддерживается'
 ErrAgentAccountRequired: 'Выберите аккаунт агента'

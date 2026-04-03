@@ -8,6 +8,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
+	terminalai "github.com/1Panel-dev/1Panel/agent/utils/terminal/ai"
 	"github.com/gorilla/websocket"
 	"github.com/pkg/errors"
 )
@@ -20,6 +21,7 @@ type LocalWsSession struct {
 	writeMutex    sync.Mutex
 	lang          string
 	aiInterceptor *aiInputInterceptor
+	aiVersion     uint64
 }
 
 func NewLocalWsSession(cols, rows int, wsConn *websocket.Conn, slave *LocalCommand, allowCtrlC bool) (*LocalWsSession, error) {
@@ -35,6 +37,7 @@ func NewLocalWsSession(cols, rows int, wsConn *websocket.Conn, slave *LocalComma
 		allowCtrlC:    allowCtrlC,
 		lang:          lang,
 		aiInterceptor: newAIInputInterceptor("", lang),
+		aiVersion:     terminalai.CurrentTerminalRuntimeVersion(),
 	}, nil
 }
 
@@ -116,6 +119,7 @@ func (sws *LocalWsSession) receiveWsMsg(exitCh chan bool) {
 					global.LOG.Errorf("websock cmd string base64 decoding failed, err: %v", err)
 				}
 				if isEnterInput(decodeBytes) {
+					sws.ensureAIInterceptor()
 					if sws.aiInterceptor != nil {
 						sws.aiInterceptor.SetCurrentLine(msgObj.Line)
 					}
@@ -139,6 +143,18 @@ func (sws *LocalWsSession) receiveWsMsg(exitCh chan bool) {
 			}
 		}
 	}
+}
+
+func (sws *LocalWsSession) ensureAIInterceptor() {
+	if sws == nil || sws.aiInterceptor != nil {
+		return
+	}
+	currentVersion := terminalai.CurrentTerminalRuntimeVersion()
+	if sws.aiVersion == currentVersion {
+		return
+	}
+	sws.aiVersion = currentVersion
+	sws.aiInterceptor = newAIInputInterceptor("", sws.lang)
 }
 
 func (sws *LocalWsSession) notifyAIThinking() {
