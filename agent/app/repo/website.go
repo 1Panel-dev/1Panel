@@ -10,6 +10,7 @@ import (
 
 type IWebsiteRepo interface {
 	WithAppInstallId(appInstallId uint) DBOption
+	WithAppInstallIds(appInstallIds []uint) DBOption
 	WithDomain(domain string) DBOption
 	WithAlias(alias string) DBOption
 	WithWebsiteSSLID(sslId uint) DBOption
@@ -45,6 +46,15 @@ type WebsiteRepo struct {
 func (w *WebsiteRepo) WithAppInstallId(appInstallID uint) DBOption {
 	return func(db *gorm.DB) *gorm.DB {
 		return db.Where("app_install_id = ?", appInstallID)
+	}
+}
+
+func (w *WebsiteRepo) WithAppInstallIds(appInstallIDs []uint) DBOption {
+	return func(db *gorm.DB) *gorm.DB {
+		if len(appInstallIDs) == 0 {
+			return db
+		}
+		return db.Where("app_install_id in (?)", appInstallIDs)
 	}
 }
 

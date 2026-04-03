@@ -357,6 +357,7 @@ func buildAgentItem(agent *model.Agent, appInstall *model.AppInstall, envMap map
 		Status:        agent.Status,
 		Message:       agent.Message,
 		AppInstallID:  agent.AppInstallID,
+		WebsiteID:     agent.WebsiteID,
 		AccountID:     agent.AccountID,
 		ConfigPath:    agent.ConfigPath,
 		CreatedAt:     agent.CreatedAt,
