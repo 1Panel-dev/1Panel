@@ -7,6 +7,7 @@ import (
 	"os"
 	"path"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -679,6 +680,11 @@ func (a AgentService) VerifyAccount(req dto.AgentAccountVerifyReq) error {
 func (a AgentService) DeleteAccount(req dto.AgentAccountDeleteReq) error {
 	if exists, _ := agentRepo.GetFirst(repo.WithByAccountID(req.ID)); exists != nil && exists.ID > 0 {
 		return buserr.New("ErrAgentAccountBound")
+	}
+	if aiStatus, _ := settingRepo.GetValueByKey("AIStatus"); strings.EqualFold(strings.TrimSpace(aiStatus), constant.StatusEnable) {
+		if aiAccountID, _ := settingRepo.GetValueByKey("AIAccountID"); strings.TrimSpace(aiAccountID) == strconv.FormatUint(uint64(req.ID), 10) {
+			return buserr.New("ErrTerminalAIAccountInUse")
+		}
 	}
 	if err := agentAccountModelRepo.Delete(repo.WithByAccountID(req.ID)); err != nil {
 		return err

@@ -11,6 +11,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
+	terminalai "github.com/1Panel-dev/1Panel/agent/utils/terminal/ai"
 	"github.com/gorilla/websocket"
 	"golang.org/x/crypto/ssh"
 )
@@ -65,6 +66,7 @@ type LogicSshWsSession struct {
 	isAdmin       bool
 	IsFlagged     bool
 	aiInterceptor *aiInputInterceptor
+	aiVersion     uint64
 }
 
 func NewLogicSshWsSession(cols, rows int, sshClient *ssh.Client, wsConn *websocket.Conn, initCmd string) (*LogicSshWsSession, error) {
@@ -109,6 +111,7 @@ func NewLogicSshWsSession(cols, rows int, sshClient *ssh.Client, wsConn *websock
 		isAdmin:       true,
 		IsFlagged:     false,
 		aiInterceptor: newAIInputInterceptor("", lang),
+		aiVersion:     terminalai.CurrentTerminalRuntimeVersion(),
 	}, nil
 }
 
@@ -161,6 +164,7 @@ func (sws *LogicSshWsSession) receiveWsMsg(exitCh chan bool) {
 					global.LOG.Errorf("websock cmd string base64 decoding failed, err: %v", err)
 				}
 				if isEnterInput(decodeBytes) {
+					sws.ensureAIInterceptor()
 					if sws.aiInterceptor != nil {
 						sws.aiInterceptor.SetCurrentLine(msgObj.Line)
 					}
@@ -182,6 +186,18 @@ func (sws *LogicSshWsSession) receiveWsMsg(exitCh chan bool) {
 			}
 		}
 	}
+}
+
+func (sws *LogicSshWsSession) ensureAIInterceptor() {
+	if sws == nil || sws.aiInterceptor != nil {
+		return
+	}
+	currentVersion := terminalai.CurrentTerminalRuntimeVersion()
+	if sws.aiVersion == currentVersion {
+		return
+	}
+	sws.aiVersion = currentVersion
+	sws.aiInterceptor = newAIInputInterceptor("", sws.lang)
 }
 
 func (sws *LogicSshWsSession) notifyAIThinking() {

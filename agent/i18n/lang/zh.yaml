@@ -42,6 +42,7 @@ Decrypt: "解密"
 
 #agent
 ErrAgentAccountBound: "该账号已绑定智能体，无法删除"
+ErrTerminalAIAccountInUse: "该模型账号正被终端 AI 使用，请在终端 AI 设置中更换账号或关闭终端 AI 后重试"
 ErrAgentAccountUnavailable: "账号连接信息不可用: {{ .err }}"
 ErrAgentProviderNotSupported: "不支持该智能体提供商"
 ErrAgentAccountRequired: "请选择智能体账号后重试"

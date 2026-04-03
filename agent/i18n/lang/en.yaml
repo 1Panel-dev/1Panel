@@ -42,6 +42,7 @@ Decrypt: "Decrypt"
 
 #agent
 ErrAgentAccountBound: 'Account is bound to an agent and cannot be deleted'
+ErrTerminalAIAccountInUse: 'This model account is currently used by Terminal AI. Switch the account in Terminal AI settings or disable Terminal AI and try again.'
 ErrAgentAccountUnavailable: 'Account connection unavailable: {{ .err }}'
 ErrAgentProviderNotSupported: 'Unsupported agent provider'
 ErrAgentAccountRequired: 'Select an agent account first'
