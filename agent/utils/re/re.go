@@ -27,6 +27,7 @@ const (
 	DurationWithOptionalUnitPattern    = `^(\d+)([smhdw]?)$`
 	MysqlGroupPattern                  = `\[*\]`
 	AnsiEscapePattern                  = "\x1b\\[[0-9;?]*[A-Za-z]|\x1b=|\x1b>"
+	AnsiControlSeqPattern              = `\x1b\[[0-9;?]*[ -/]*[@-~]`
 	RecycleBinFilePattern              = `_1p_file_1p_(.+)_p_(\d+)_(\d+)`
 	OrderByValidationPattern           = `^[a-zA-Z_][a-zA-Z0-9_]*$`
 	SQLIdentifierPattern               = `^[A-Za-z_][A-Za-z0-9_]*$`
@@ -59,6 +60,7 @@ func Init() {
 		DurationWithOptionalUnitPattern,
 		MysqlGroupPattern,
 		AnsiEscapePattern,
+		AnsiControlSeqPattern,
 		RecycleBinFilePattern,
 		OrderByValidationPattern,
 		SQLIdentifierPattern,
@@ -81,4 +83,8 @@ func GetRegex(pattern string) *regexp.Regexp {
 
 func RegisterRegex(pattern string) {
 	regexMap[pattern] = regexp.MustCompile(pattern)
+}
+
+func StripAnsiControlSeq(value string) string {
+	return GetRegex(AnsiControlSeqPattern).ReplaceAllString(value, "")
 }
