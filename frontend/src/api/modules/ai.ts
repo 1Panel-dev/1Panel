@@ -113,6 +113,10 @@ export const updateAgentRemark = (req: AI.AgentRemarkUpdateReq) => {
     return http.post(`/ai/agents/remark`, req);
 };
 
+export const bindAgentWebsite = (req: AI.AgentWebsiteBindReq) => {
+    return http.post(`/ai/agents/website/bind`, req);
+};
+
 export const getAgentModelConfig = (req: AI.AgentIDReq) => {
     return http.post<AI.AgentModelConfig>(`/ai/agents/model/get`, req);
 };

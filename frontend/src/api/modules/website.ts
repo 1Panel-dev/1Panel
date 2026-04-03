@@ -41,7 +41,7 @@ export const getWebsite = (id: number) => {
 };
 
 export const getWebsiteOptions = (req: Website.OptionReq) => {
-    return http.post<any>(`/websites/options`, req);
+    return http.post<Website.WebsiteOption[]>(`/websites/options`, req);
 };
 
 export const getWebsiteConfig = (id: number, type: string) => {

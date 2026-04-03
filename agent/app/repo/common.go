@@ -112,6 +112,24 @@ func WithByAccountID(accountID uint) DBOption {
 	}
 }
 
+func WithByWebsiteID(websiteID uint) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		if websiteID == 0 {
+			return g
+		}
+		return g.Where("website_id = ?", websiteID)
+	}
+}
+
+func WithByAppInstallID(appInstallID uint) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		if appInstallID == 0 {
+			return g
+		}
+		return g.Where("app_install_id = ?", appInstallID)
+	}
+}
+
 func WithByType(tp string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("`type` = ?", tp)

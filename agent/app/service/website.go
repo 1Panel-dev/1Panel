@@ -538,7 +538,13 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 		createTask.AddSubTaskWithIgnoreErr(i18n.GetWithName("ConfigFTP", create.FtpUser), createFtpUser)
 	}
 
-	return createTask.Execute()
+	if err := createTask.Execute(); err != nil {
+		return err
+	}
+	if err := bindDeploymentWebsiteToAgentByAppInstall(website); err != nil {
+		global.LOG.Errorf("bind deployment website to agent failed: %v", err)
+	}
+	return nil
 }
 
 func (w WebsiteService) OpWebsite(req request.WebsiteOp) error {
@@ -731,6 +737,9 @@ func (w WebsiteService) DeleteWebsite(req request.WebsiteDelete) error {
 	}()
 
 	if err := websiteRepo.DeleteBy(ctx, repo.WithByID(req.ID)); err != nil {
+		return err
+	}
+	if err := agentRepo.ClearWebsiteIDByWebsiteIDWithCtx(ctx, req.ID); err != nil {
 		return err
 	}
 	if err := websiteDomainRepo.DeleteBy(ctx, websiteDomainRepo.WithWebsiteId(req.ID)); err != nil {

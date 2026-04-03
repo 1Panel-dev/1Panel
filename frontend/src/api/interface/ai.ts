@@ -278,6 +278,9 @@ export namespace AI {
         status: string;
         message: string;
         appInstallId: number;
+        websiteId: number;
+        websitePrimaryDomain: string;
+        websiteProtocol: string;
         accountId: number;
         appVersion: string;
         containerName: string;
@@ -302,6 +305,11 @@ export namespace AI {
     export interface AgentRemarkUpdateReq {
         id: number;
         remark: string;
+    }
+
+    export interface AgentWebsiteBindReq {
+        agentId: number;
+        websiteId: number;
     }
 
     export interface AgentModelConfigUpdateReq {

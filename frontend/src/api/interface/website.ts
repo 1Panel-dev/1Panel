@@ -138,6 +138,12 @@ export namespace Website {
         types?: string[];
     }
 
+    export interface WebsiteOption {
+        id: number;
+        primaryDomain: string;
+        alias: string;
+    }
+
     export interface WebSiteLog {
         enable: boolean;
         content: string;

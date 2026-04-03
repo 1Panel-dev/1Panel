@@ -13,6 +13,7 @@ type WebsiteDomainRepo struct {
 
 type IWebsiteDomainRepo interface {
 	WithWebsiteId(websiteId uint) DBOption
+	WithWebsiteIds(websiteIds []uint) DBOption
 	WithPort(port int) DBOption
 	WithDomain(domain string) DBOption
 	WithDomainLike(domain string) DBOption
@@ -33,6 +34,15 @@ func NewIWebsiteDomainRepo() IWebsiteDomainRepo {
 func (w WebsiteDomainRepo) WithWebsiteId(websiteId uint) DBOption {
 	return func(db *gorm.DB) *gorm.DB {
 		return db.Where("website_id = ?", websiteId)
+	}
+}
+
+func (w WebsiteDomainRepo) WithWebsiteIds(websiteIds []uint) DBOption {
+	return func(db *gorm.DB) *gorm.DB {
+		if len(websiteIds) == 0 {
+			return db
+		}
+		return db.Where("website_id in (?)", websiteIds)
 	}
 }
 

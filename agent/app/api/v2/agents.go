@@ -112,6 +112,26 @@ func (b *BaseApi) UpdateAgentRemark(c *gin.Context) {
 }
 
 // @Tags AI
+// @Summary Bind Agent website
+// @Accept json
+// @Param request body dto.AgentWebsiteBindReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/website/bind [post]
+func (b *BaseApi) BindAgentWebsite(c *gin.Context) {
+	var req dto.AgentWebsiteBindReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := agentService.BindWebsite(req); err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags AI
 // @Summary Get Agent model config
 // @Accept json
 // @Param request body dto.AgentIDReq true "request"

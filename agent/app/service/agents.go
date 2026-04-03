@@ -31,6 +31,7 @@ type IAgentService interface {
 	Delete(req dto.AgentDeleteReq) error
 	ResetToken(req dto.AgentTokenResetReq) error
 	UpdateRemark(req dto.AgentRemarkUpdateReq) error
+	BindWebsite(req dto.AgentWebsiteBindReq) error
 	GetModelConfig(req dto.AgentIDReq) (*dto.AgentModelConfig, error)
 	UpdateModelConfig(req dto.AgentModelConfigUpdateReq) error
 	GetOverview(req dto.AgentOverviewReq) (*dto.AgentOverview, error)
@@ -288,6 +289,9 @@ func (a AgentService) Page(req dto.SearchWithPage) (int64, []dto.AgentItem, erro
 		agentItem := buildAgentItem(&item, &appInstall, envMap)
 		agentItem.Upgradable = checkAgentUpgradable(appInstall)
 		items = append(items, agentItem)
+	}
+	if err := hydrateAgentWebsiteItems(items); err != nil {
+		return 0, nil, err
 	}
 	return count, items, nil
 }

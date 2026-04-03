@@ -28,31 +28,34 @@ type AgentCreateReq struct {
 }
 
 type AgentItem struct {
-	ID            uint      `json:"id"`
-	Name          string    `json:"name"`
-	Remark        string    `json:"remark"`
-	AgentType     string    `json:"agentType"`
-	Provider      string    `json:"provider"`
-	ProviderName  string    `json:"providerName"`
-	Model         string    `json:"model"`
-	APIType       string    `json:"apiType"`
-	MaxTokens     int       `json:"maxTokens"`
-	ContextWindow int       `json:"contextWindow"`
-	BaseURL       string    `json:"baseUrl"`
-	APIKey        string    `json:"apiKey"`
-	Token         string    `json:"token"`
-	Status        string    `json:"status"`
-	Message       string    `json:"message"`
-	AppInstallID  uint      `json:"appInstallId"`
-	AccountID     uint      `json:"accountId"`
-	AppVersion    string    `json:"appVersion"`
-	Container     string    `json:"containerName"`
-	WebUIPort     int       `json:"webUIPort"`
-	BridgePort    int       `json:"bridgePort"`
-	Path          string    `json:"path"`
-	ConfigPath    string    `json:"configPath"`
-	Upgradable    bool      `json:"upgradable"`
-	CreatedAt     time.Time `json:"createdAt"`
+	ID                   uint      `json:"id"`
+	Name                 string    `json:"name"`
+	Remark               string    `json:"remark"`
+	AgentType            string    `json:"agentType"`
+	Provider             string    `json:"provider"`
+	ProviderName         string    `json:"providerName"`
+	Model                string    `json:"model"`
+	APIType              string    `json:"apiType"`
+	MaxTokens            int       `json:"maxTokens"`
+	ContextWindow        int       `json:"contextWindow"`
+	BaseURL              string    `json:"baseUrl"`
+	APIKey               string    `json:"apiKey"`
+	Token                string    `json:"token"`
+	Status               string    `json:"status"`
+	Message              string    `json:"message"`
+	AppInstallID         uint      `json:"appInstallId"`
+	WebsiteID            uint      `json:"websiteId"`
+	WebsitePrimaryDomain string    `json:"websitePrimaryDomain"`
+	WebsiteProtocol      string    `json:"websiteProtocol"`
+	AccountID            uint      `json:"accountId"`
+	AppVersion           string    `json:"appVersion"`
+	Container            string    `json:"containerName"`
+	WebUIPort            int       `json:"webUIPort"`
+	BridgePort           int       `json:"bridgePort"`
+	Path                 string    `json:"path"`
+	ConfigPath           string    `json:"configPath"`
+	Upgradable           bool      `json:"upgradable"`
+	CreatedAt            time.Time `json:"createdAt"`
 }
 
 type AgentDeleteReq struct {
@@ -68,6 +71,11 @@ type AgentTokenResetReq struct {
 type AgentRemarkUpdateReq struct {
 	ID     uint   `json:"id" validate:"required"`
 	Remark string `json:"remark"`
+}
+
+type AgentWebsiteBindReq struct {
+	AgentID   uint `json:"agentId" validate:"required"`
+	WebsiteID uint `json:"websiteId" validate:"required"`
 }
 
 type AgentModelConfigUpdateReq struct {

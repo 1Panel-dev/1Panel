@@ -1158,3 +1158,39 @@ var AddAgentRemarkColumn = &gormigrate.Migration{
 		return tx.AutoMigrate(&model.Agent{})
 	},
 }
+
+var AddAgentWebsiteBinding = &gormigrate.Migration{
+	ID: "20260403-add-agent-website-binding",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.Agent{}); err != nil {
+			return err
+		}
+
+		var agents []model.Agent
+		if err := tx.Find(&agents).Error; err != nil {
+			return err
+		}
+		if len(agents) == 0 {
+			return nil
+		}
+
+		var websites []model.Website
+		if err := tx.Where("type = ? AND app_install_id > 0", constant.Deployment).Find(&websites).Error; err != nil {
+			return err
+		}
+		websiteMap := service.UniqueDeploymentWebsiteMapForMigration(websites)
+		for _, agent := range agents {
+			if agent.WebsiteID != 0 || agent.AppInstallID == 0 {
+				continue
+			}
+			website, ok := websiteMap[agent.AppInstallID]
+			if !ok {
+				continue
+			}
+			if err := tx.Model(&model.Agent{}).Where("id = ?", agent.ID).Update("website_id", website.ID).Error; err != nil {
+				return err
+			}
+		}
+		return nil
+	},
+}
