@@ -89,6 +89,11 @@ export namespace Setting {
         aiRiskCommands: string;
         aiRiskCommandsDefault?: string;
     }
+
+    export interface FileManageAIInfo {
+        aiStatus: string;
+        aiAccountId: string;
+    }
     export interface SettingUpdate {
         key: string;
         value: string;

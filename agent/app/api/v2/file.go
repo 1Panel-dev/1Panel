@@ -49,6 +49,28 @@ func (b *BaseApi) ListFiles(c *gin.Context) {
 }
 
 // @Tags File
+// @Summary File search: content grep + optional AI summary
+// @Description When file-management AI is enabled, returns mode=ai with summary and hits. When disabled, returns mode=grep with hits only. Scans file contents only. Supports match options, extension/size/time filters, and scan limits.
+// @Accept json
+// @Param request body request.FileAISearch true "request"
+// @Success 200 {object} response.FileAISearchResult
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /files/ai-search [post]
+func (b *BaseApi) FileAISearch(c *gin.Context) {
+	var req request.FileAISearch
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	res, err := fileService.AISearch(req)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, res)
+}
+
+// @Tags File
 // @Summary Page file
 // @Accept json
 // @Param request body request.SearchUploadWithPage true "request"

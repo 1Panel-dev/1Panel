@@ -20,6 +20,7 @@ import (
 var agentAccountRepo = repo.NewIAgentAccountRepo()
 var agentAccountModelRepo = repo.NewIAgentAccountModelRepo()
 var terminalRuntimeVersion atomic.Uint64
+var fileAIRuntimeVersion atomic.Uint64
 
 type TerminalRuntimeSettings struct {
 	AccountID    uint
@@ -33,6 +34,10 @@ func CurrentTerminalRuntimeVersion() uint64 {
 
 func InvalidateTerminalRuntimeCache() {
 	terminalRuntimeVersion.Add(1)
+}
+
+func InvalidateFileAIRuntimeCache() {
+	fileAIRuntimeVersion.Add(1)
 }
 
 func ResolveGeneratorConfig(accountID uint) (GeneratorConfig, time.Duration, error) {
@@ -120,6 +125,36 @@ func ResolveGeneratorConfigFromAgentSettings() (GeneratorConfig, uint, time.Dura
 	}
 	config, timeout, err := ResolveGeneratorConfig(uint(accountID))
 	return config, uint(accountID), timeout, err
+}
+
+// ResolveGeneratorConfigFromFileSettings loads file-management AI search settings (independent from terminal AI).
+func ResolveGeneratorConfigFromFileSettings() (GeneratorConfig, uint, time.Duration, error) {
+	status, err := loadAgentSettingValue("FileAIStatus")
+	if err != nil {
+		if os.IsNotExist(err) {
+			return GeneratorConfig{}, 0, 0, os.ErrNotExist
+		}
+		return GeneratorConfig{}, 0, 0, err
+	}
+	if !strings.EqualFold(strings.TrimSpace(status), "Enable") {
+		return GeneratorConfig{}, 0, 0, os.ErrNotExist
+	}
+	accountValue, err := loadAgentSettingValue("FileAIAccountID")
+	if err != nil {
+		return GeneratorConfig{}, 0, 0, err
+	}
+	accountID, err := strconv.ParseUint(strings.TrimSpace(accountValue), 10, 64)
+	if err != nil || accountID == 0 {
+		return GeneratorConfig{}, 0, 0, os.ErrNotExist
+	}
+	config, timeout, err := ResolveGeneratorConfig(uint(accountID))
+	return config, uint(accountID), timeout, err
+}
+
+// LoadFileAIRuntimeConfig returns LLM client config for file-management AI search.
+func LoadFileAIRuntimeConfig() (GeneratorConfig, time.Duration, error) {
+	cfg, _, timeout, err := ResolveGeneratorConfigFromFileSettings()
+	return cfg, timeout, err
 }
 
 func LoadTerminalRuntimeSettings() (TerminalRuntimeSettings, GeneratorConfig, time.Duration, error) {

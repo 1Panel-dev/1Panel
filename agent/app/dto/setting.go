@@ -96,6 +96,11 @@ type TerminalAIInfo struct {
 	AIRiskCommandsDefault string `json:"aiRiskCommandsDefault"`
 }
 
+type FileManageAIInfo struct {
+	AIStatus    string `json:"aiStatus"`
+	AIAccountID string `json:"aiAccountId"`
+}
+
 type CommonDescription struct {
 	ID          string `json:"id" validate:"required"`
 	Type        string `json:"type" validate:"required"`

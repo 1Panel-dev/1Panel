@@ -79,6 +79,12 @@ export const getAgentTerminalAIInfo = () => {
 export const updateAgentTerminalAIInfo = (param: Setting.TerminalAIInfo) => {
     return http.post(`/settings/terminal/ai/update`, param);
 };
+export const getAgentFileManageAIInfo = () => {
+    return http.post<Setting.FileManageAIInfo>(`/settings/files/ai/search`);
+};
+export const updateAgentFileManageAIInfo = (param: Setting.FileManageAIInfo) => {
+    return http.post(`/settings/files/ai/update`, param);
+};
 export const getAgentSettingByKey = (key: string) => {
     return http.get<string>(`/settings/get/${key}`);
 };

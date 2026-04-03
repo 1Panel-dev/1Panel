@@ -41,6 +41,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
+	terminalai "github.com/1Panel-dev/1Panel/agent/utils/terminal/ai"
 	"github.com/pkg/errors"
 )
 
@@ -78,10 +79,7 @@ type IFileService interface {
 	ConvertLog(req dto.PageInfo) (int64, []response.FileConvertLog, error)
 	BatchGetRemarks(req request.FileRemarkBatch) map[string]string
 	SetRemark(req request.FileRemarkUpdate) error
-}
-
-var filteredPaths = []string{
-	"/.1panel_clash",
+	AISearch(req request.FileAISearch) (*response.FileAISearchResult, error)
 }
 
 const (
@@ -170,14 +168,7 @@ func (f *FileService) GetFileTree(op request.FileOption) ([]response.FileTree, e
 }
 
 func shouldFilterPath(path string) bool {
-	cleanedPath := filepath.Clean(path)
-	for _, filteredPath := range filteredPaths {
-		cleanedFilteredPath := filepath.Clean(filteredPath)
-		if cleanedFilteredPath == cleanedPath || strings.HasPrefix(cleanedPath, cleanedFilteredPath+"/") {
-			return true
-		}
-	}
-	return false
+	return files.ShouldFilterSensitivePath(path)
 }
 
 func (f *FileService) buildFileTree(node *response.FileTree, items []*files.FileInfo, op request.FileOption, level int) error {
@@ -1018,4 +1009,156 @@ func (f *FileService) ConvertLog(req dto.PageInfo) (total int64, data []response
 	}
 
 	return total, data, nil
+}
+
+func (f *FileService) AISearch(req request.FileAISearch) (*response.FileAISearchResult, error) {
+	root := filepath.Clean(strings.TrimSpace(req.Path))
+	if root == "" {
+		return nil, buserr.WithDetail("ErrInvalidParams", "path is required", nil)
+	}
+	query := strings.TrimSpace(req.Query)
+	if query == "" {
+		return nil, buserr.WithDetail("ErrInvalidParams", "query is required", nil)
+	}
+	st, err := os.Stat(root)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil, buserr.New("ErrPathNotFound")
+		}
+		return nil, err
+	}
+	if !st.IsDir() {
+		return nil, buserr.New("ErrPathNotFound")
+	}
+
+	maxItems := req.MaxItems
+	if maxItems <= 0 {
+		maxItems = files.DefaultFileAIMaxItems
+	}
+	if maxItems > 2000 {
+		maxItems = 2000
+	}
+
+	containSub := true
+	if req.ContainSub != nil {
+		containSub = *req.ContainSub
+	}
+
+	searchOpts, err := files.MergeContentSearchOptions(
+		req.MatchCase, req.WholeWord, req.UseRegex,
+		req.Extensions,
+		req.MinSize, req.MaxSize,
+		req.ModifiedAfter, req.ModifiedBefore,
+		req.MaxScanFiles,
+		req.MaxFileBytes,
+		req.MaxHitsPerFile, req.MaxTotalHits,
+		req.ContentHitsPromptMaxBytes,
+		req.LlmMaxOutputTokens,
+	)
+	if err != nil {
+		return nil, buserr.WithDetail("ErrInvalidParams", err.Error(), nil)
+	}
+
+	matchFn, err := files.NewContentLineMatcher(query, searchOpts)
+	if err != nil {
+		return nil, buserr.WithDetail("ErrFileAISearchBadPattern", err.Error(), nil)
+	}
+
+	cfg, timeout, err := terminalai.LoadFileAIRuntimeConfig()
+	aiEnabled := err == nil
+	if err != nil && !errors.Is(err, os.ErrNotExist) {
+		return nil, err
+	}
+
+	items, truncated, err := files.CollectDirInventory(root, containSub, maxItems)
+	if err != nil {
+		return nil, err
+	}
+
+	preFiltered := false
+	llmItems := items
+	qLower := strings.ToLower(query)
+	if len(llmItems) > 0 && query != "" {
+		filtered := make([]files.AISearchInventoryItem, 0, len(llmItems))
+		for _, it := range llmItems {
+			rel := strings.TrimSpace(it.RelPath)
+			if rel == "" {
+				continue
+			}
+			if !req.UseRegex && !req.MatchCase && !req.WholeWord && strings.Contains(strings.ToLower(rel), qLower) {
+				filtered = append(filtered, it)
+			}
+		}
+		if len(filtered) >= 8 {
+			llmItems = filtered
+			preFiltered = true
+		}
+	}
+
+	start := time.Now()
+	contentHits, scannedFiles, hitsTrunc := files.SearchFileAIContentHits(root, llmItems, searchOpts, matchFn)
+	hitsDTO := make([]response.FileAIContentHit, 0, len(contentHits))
+	for _, h := range contentHits {
+		hitsDTO = append(hitsDTO, response.FileAIContentHit{Path: h.Path, Line: h.Line, Text: h.Text})
+	}
+
+	matchDesc := searchOpts.ContentMatchDescription()
+	result := &response.FileAISearchResult{
+		Hits:                 hitsDTO,
+		ContentScannedFiles:  scannedFiles,
+		ContentHitsTruncated: hitsTrunc,
+		Truncated:            truncated,
+		PreFiltered:          preFiltered,
+		ItemCount:            len(llmItems),
+	}
+
+	if len(llmItems) == 0 {
+		if aiEnabled {
+			result.Mode = "ai"
+			result.Summary = i18n.GetMsgByKey("FileAISearchEmptyDir")
+			if result.Summary == "" || result.Summary == "FileAISearchEmptyDir" {
+				result.Summary = "No files or directories found under this path (or all entries were filtered)."
+			}
+		} else {
+			result.Mode = "grep"
+			result.Summary = ""
+		}
+		result.Duration = time.Since(start).Round(time.Millisecond).String()
+		return result, nil
+	}
+
+	if !aiEnabled {
+		result.Mode = "grep"
+		result.Summary = ""
+		result.Duration = time.Since(start).Round(time.Millisecond).String()
+		return result, nil
+	}
+
+	result.Mode = "ai"
+
+	clientTimeout := timeout
+	if clientTimeout < 30*time.Second {
+		clientTimeout = 90 * time.Second
+	}
+	if clientTimeout > 5*time.Minute {
+		clientTimeout = 5 * time.Minute
+	}
+
+	runCtx, cancel := context.WithTimeout(context.Background(), timeout+time.Minute)
+	defer cancel()
+
+	llmMaxOut := searchOpts.LlmMaxOutputTokens
+	summary, usage, err := files.RunFileAISearchLLM(runCtx, cfg, clientTimeout, root, query, llmItems, truncated, preFiltered, contentHits, scannedFiles, hitsTrunc, matchDesc, searchOpts.ContentHitsPromptMaxBytes, llmMaxOut)
+	if err != nil {
+		return nil, err
+	}
+	result.Summary = summary
+	result.PromptTokens = usage.PromptTokens
+	result.CompletionTokens = usage.CompletionTokens
+	result.TotalTokens = usage.TotalTokens
+	if result.TotalTokens == 0 {
+		result.TotalTokens = usage.PromptTokens + usage.CompletionTokens
+	}
+	result.Duration = time.Since(start).Round(time.Millisecond).String()
+	return result, nil
 }
