@@ -120,10 +120,11 @@ func (f FileOp) CreateDirWithPath(isDir bool, pathItem string) (string, error) {
 }
 
 func (f FileOp) CreateFile(dst string) error {
-	if _, err := f.Fs.Create(dst); err != nil {
+	file, err := f.Fs.Create(dst)
+	if err != nil {
 		return err
 	}
-	return nil
+	return file.Close()
 }
 
 func (f FileOp) CreateFileWithMode(dst string, mode fs.FileMode) error {
@@ -822,6 +823,7 @@ func (f FileOp) Compress(srcRiles []string, dst string, name string, cType Compr
 	if err != nil {
 		return err
 	}
+	defer out.Close()
 
 	switch cType {
 	case Zip:
@@ -936,6 +938,7 @@ func (f FileOp) decompressWithSDK(srcFile string, dst string, cType CompressType
 	if err != nil {
 		return err
 	}
+	defer input.Close()
 	if err := format.Extract(context.Background(), input, nil, handler); err != nil {
 		return err
 	}
@@ -1007,6 +1010,7 @@ func ZipFile(files []archiver.File, dst afero.File) error {
 				return err
 			}
 			_, err = io.Copy(w, fileReader)
+			fileReader.Close()
 			if err != nil {
 				return err
 			}
