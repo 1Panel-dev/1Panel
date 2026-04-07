@@ -28,6 +28,7 @@ import (
 type IAgentService interface {
 	Create(req dto.AgentCreateReq) (*dto.AgentItem, error)
 	Page(req dto.SearchWithPage) (int64, []dto.AgentItem, error)
+	DeleteCheck(req dto.AgentIDReq) ([]dto.AppResource, error)
 	Delete(req dto.AgentDeleteReq) error
 	ResetToken(req dto.AgentTokenResetReq) error
 	UpdateRemark(req dto.AgentRemarkUpdateReq) error
@@ -301,6 +302,13 @@ func (a AgentService) Delete(req dto.AgentDeleteReq) error {
 	if err != nil {
 		return err
 	}
+	resources, err := a.deleteCheckByAgent(agent)
+	if err != nil {
+		return err
+	}
+	if len(resources) > 0 {
+		return buserr.New("ErrAgentWebsiteBound")
+	}
 	if agent.AppInstallID == 0 {
 		return agentRepo.DeleteByID(agent.ID)
 	}
@@ -314,6 +322,32 @@ func (a AgentService) Delete(req dto.AgentDeleteReq) error {
 		return err
 	}
 	return nil
+}
+
+func (a AgentService) DeleteCheck(req dto.AgentIDReq) ([]dto.AppResource, error) {
+	agent, err := agentRepo.GetFirst(repo.WithByID(req.AgentID))
+	if err != nil {
+		return nil, err
+	}
+	return a.deleteCheckByAgent(agent)
+}
+
+func (a AgentService) deleteCheckByAgent(agent *model.Agent) ([]dto.AppResource, error) {
+	if agent == nil || agent.WebsiteID == 0 {
+		return nil, nil
+	}
+	website, err := websiteRepo.GetFirst(repo.WithByID(agent.WebsiteID))
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
+		return nil, err
+	}
+	websiteName, err := loadAgentWebsiteResourceName(website)
+	if err != nil {
+		return nil, err
+	}
+	return []dto.AppResource{{Type: "website", Name: websiteName}}, nil
 }
 
 func (a AgentService) ResetToken(req dto.AgentTokenResetReq) error {
