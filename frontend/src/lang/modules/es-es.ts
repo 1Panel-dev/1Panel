@@ -2645,6 +2645,7 @@ const message = {
         uninstallDeleteBackup: 'Desinstalar - Eliminar respaldo',
         uninstallDeleteImage: 'Desinstalar - Eliminar imagen',
         upgradeBackup: 'Respaldar app antes de actualizar',
+        installAllowPort: 'Abrir el acceso externo al puerto por defecto al instalar apps',
         noAppHelper:
             'No se detectó ninguna aplicación, por favor vaya al centro de tareas para ver el registro de sincronización de la tienda de aplicaciones',
         isEdirWarn: 'Se detectó modificación en el archivo docker-compose.yml, por favor revise la comparación',

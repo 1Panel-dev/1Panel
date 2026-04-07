@@ -344,6 +344,7 @@ export namespace App {
         uninstallDeleteImage: string;
         uninstallDeleteBackup: string;
         upgradeBackup: string;
+        installAllowPort: string;
     }
 
     export interface AppStoreConfigUpdate {

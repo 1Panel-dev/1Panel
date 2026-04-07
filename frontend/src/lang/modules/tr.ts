@@ -2647,6 +2647,7 @@ const message = {
         uninstallDeleteBackup: 'Uygulamayı Kaldır - Yedeği Sil',
         uninstallDeleteImage: 'Uygulamayı Kaldır - Görüntüyü Sil',
         upgradeBackup: 'Yükseltmeden Önce Uygulamayı Yedekle',
+        installAllowPort: 'Uygulama kurulurken varsayılan olarak dış port erişimini aç',
         noAppHelper:
             'Uygulama tespit edilmedi, lütfen uygulama mağazası senkronizasyon günlüğünü görüntülemek için görev merkezine gidin',
         isEdirWarn: 'docker-compose.yml dosyasında değişiklik tespit edildi, lütfen karşılaştırmayı kontrol edin',

@@ -2397,6 +2397,7 @@ const message = {
         uninstallDeleteBackup: '移除應用-刪除備份',
         uninstallDeleteImage: '移除應用-刪除映像',
         upgradeBackup: '應用升級前備份應用',
+        installAllowPort: '安裝應用預設開啟埠外部存取',
         noAppHelper: '未偵測到應用程式，請前往任務中心檢視應用商店同步日誌',
         isEdirWarn: '偵測到 docker-compose.yml 檔案被修改，請檢視對比',
     },

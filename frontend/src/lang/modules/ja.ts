@@ -2617,6 +2617,7 @@ const message = {
         uninstallDeleteBackup: 'アプリをアンインストール - バックアップを削除',
         uninstallDeleteImage: 'アプリをアンインストール - イメージを削除',
         upgradeBackup: 'アプリのアップグレード前にアプリをバックアップ',
+        installAllowPort: 'アプリインストール時に外部アクセスを既定で有効化',
         noAppHelper: 'アプリケーションが検出されませんでした。タスクセンターでアプリストアの同期ログを確認してください',
         isEdirWarn: 'docker-compose.yml ファイルが変更されたことを検出しました。比較を確認してください',
     },

@@ -2665,6 +2665,7 @@ const message = {
         uninstallDeleteBackup: 'Uninstall App - Delete Backup',
         uninstallDeleteImage: 'Uninstall App - Delete Image',
         upgradeBackup: 'Backup App Before Upgrade',
+        installAllowPort: 'Open external port access by default when installing apps',
         noAppHelper: 'No application detected, go to the task center to view the app store sync log',
         isEdirWarn: 'Detected modification to docker-compose.yml file, please check the comparison',
     },

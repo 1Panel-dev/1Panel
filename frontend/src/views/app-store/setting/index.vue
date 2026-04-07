@@ -39,6 +39,15 @@
                                 @change="updateConfig('UpgradeBackup', config.upgradeBackup)"
                             />
                         </el-form-item>
+                        <el-form-item :label="$t('app.installAllowPort')" prop="installAllowPort">
+                            <el-switch
+                                v-model="config.installAllowPort"
+                                active-value="Enable"
+                                inactive-value="Disable"
+                                :loading="loading"
+                                @change="updateConfig('InstallAllowPort', config.installAllowPort)"
+                            />
+                        </el-form-item>
                         <CustomSetting v-if="isProductPro" />
                         <span class="input-help logText" v-else>
                             {{ $t('xpack.customApp.licenseHelper') }}
@@ -78,6 +87,7 @@ const config = ref({
     uninstallDeleteImage: '',
     uninstallDeleteBackup: '',
     upgradeBackup: '',
+    installAllowPort: '',
 });
 const loading = ref(false);
 const configForm = ref();

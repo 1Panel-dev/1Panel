@@ -2647,6 +2647,7 @@ const message = {
         uninstallDeleteBackup: 'Cop Terhapus Semasa Nyahpasang Aplikasi',
         uninstallDeleteImage: 'Imej Terhapus Semasa Nyahpasang Aplikasi',
         upgradeBackup: 'Sandaran Aplikasi Sebelum Naik Taraf',
+        installAllowPort: 'Buka akses port luaran secara lalai semasa memasang aplikasi',
         noAppHelper: 'Tiada aplikasi dikesan, sila pergi ke pusat tugas untuk melihat log penyegerakan kedai aplikasi',
         isEdirWarn: 'Mengesan pengubahsuaian pada fail docker-compose.yml, sila semak perbandingan',
     },
