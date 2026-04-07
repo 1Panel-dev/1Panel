@@ -3,7 +3,7 @@
 <h3 align="center">The open-source VPS control panel with native AI agent support</h3>
 
 <p align="center">
-  Trusted by <strong>1,500,000+</strong> self-hosters worldwide
+  Trusted by <strong>2,000,000+</strong> self-hosters worldwide
 </p>
 
 <p align="center">
