@@ -46,7 +46,7 @@ func (a AgentService) UpdateFeishuConfig(req dto.AgentFeishuConfigUpdateReq) err
 			Bots:           req.Bots,
 		}
 		setFeishuConfig(conf, config)
-		setFeishuPluginEnabled(conf, config.Enabled && hasEnabledFeishuBots(config.Bots))
+		setFeishuPluginEnabled(conf, config.Enabled && hasEnabledBots(config.Bots))
 		return nil
 	})
 }
@@ -182,6 +182,9 @@ func (a AgentService) InstallPlugin(req dto.AgentPluginInstallReq) error {
 	if err != nil {
 		return err
 	}
+	if err := task.CheckScopeTaskIsExecuting(task.TaskScopeAI, req.AgentID); err != nil {
+		return err
+	}
 	spec, pluginID, err := resolvePluginMeta(req.Type)
 	if err != nil {
 		return err
@@ -195,13 +198,13 @@ func (a AgentService) InstallPlugin(req dto.AgentPluginInstallReq) error {
 		if req.Type == "qqbot" {
 			legacyPluginPath := path.Join(openclawPluginBaseDir, "qqbot")
 			if err := mgr.RunBashCf("docker exec %s test -d %s", install.ContainerName, legacyPluginPath); err == nil {
-				if err := mgr.Run("docker", "exec", "-i", install.ContainerName, "sh", "-c", buildOpenclawPluginUninstallScript("qqbot")); err != nil {
+				if _, err := mgr.RunWithStdout("docker", "exec", "-i", install.ContainerName, "sh", "-c", buildOpenclawPluginUninstallScript("qqbot")); err != nil {
 					return err
 				}
 				time.Sleep(2 * time.Second)
 			}
 		}
-		if err := mgr.Run("docker", "exec", install.ContainerName, "sh", "-c", buildOpenclawPluginInstallScript(spec, pluginID)); err != nil {
+		if _, err := mgr.RunWithStdout("docker", "exec", install.ContainerName, "sh", "-c", buildOpenclawPluginInstallScript(spec, pluginID)); err != nil {
 			return err
 		}
 		conf, err := readOpenclawConfig(agent.ConfigPath)
@@ -224,6 +227,9 @@ func (a AgentService) UpgradePlugin(req dto.AgentPluginUpgradeReq) error {
 	if err != nil {
 		return err
 	}
+	if err := task.CheckScopeTaskIsExecuting(task.TaskScopeAI, req.AgentID); err != nil {
+		return err
+	}
 	spec, pluginID, err := resolvePluginMeta(req.Type)
 	if err != nil {
 		return err
@@ -234,11 +240,11 @@ func (a AgentService) UpgradePlugin(req dto.AgentPluginUpgradeReq) error {
 	}
 	upgradeTask.AddSubTask("Upgrade OpenClaw plugin", func(t *task.Task) error {
 		mgr := cmd.NewCommandMgr(cmd.WithTask(*t), cmd.WithContext(t.TaskCtx), cmd.WithTimeout(10*time.Minute))
-		if err := mgr.Run("docker", "exec", "-i", install.ContainerName, "sh", "-c", buildOpenclawPluginUninstallScript(pluginID)); err != nil {
+		if _, err := mgr.RunWithStdout("docker", "exec", "-i", install.ContainerName, "sh", "-c", buildOpenclawPluginUninstallScript(pluginID)); err != nil {
 			return err
 		}
 		time.Sleep(2 * time.Second)
-		if err := mgr.Run("docker", "exec", install.ContainerName, "sh", "-c", buildOpenclawPluginInstallScript(spec, pluginID)); err != nil {
+		if _, err := mgr.RunWithStdout("docker", "exec", install.ContainerName, "sh", "-c", buildOpenclawPluginInstallScript(spec, pluginID)); err != nil {
 			return err
 		}
 		conf, err := readOpenclawConfig(agent.ConfigPath)
@@ -261,6 +267,9 @@ func (a AgentService) UninstallPlugin(req dto.AgentPluginUninstallReq) error {
 	if err != nil {
 		return err
 	}
+	if err := task.CheckScopeTaskIsExecuting(task.TaskScopeAI, req.AgentID); err != nil {
+		return err
+	}
 	_, pluginID, err := resolvePluginMeta(req.Type)
 	if err != nil {
 		return err
@@ -271,7 +280,7 @@ func (a AgentService) UninstallPlugin(req dto.AgentPluginUninstallReq) error {
 	}
 	uninstallTask.AddSubTask("Uninstall OpenClaw plugin", func(t *task.Task) error {
 		mgr := cmd.NewCommandMgr(cmd.WithTask(*t), cmd.WithContext(t.TaskCtx), cmd.WithTimeout(10*time.Minute))
-		if err := mgr.Run("docker", "exec", "-i", install.ContainerName, "sh", "-c", buildOpenclawPluginUninstallScript(pluginID)); err != nil {
+		if _, err := mgr.RunWithStdout("docker", "exec", "-i", install.ContainerName, "sh", "-c", buildOpenclawPluginUninstallScript(pluginID)); err != nil {
 			return err
 		}
 		conf, err := readOpenclawConfig(agent.ConfigPath)
@@ -438,7 +447,7 @@ func setFeishuConfig(conf map[string]interface{}, config dto.AgentFeishuConfig) 
 	channels := ensureChildMap(conf, "channels")
 	feishu := ensureChildMap(channels, "feishu")
 	defaultBot := getDefaultFeishuBot(config.Bots)
-	effectiveEnabled := config.Enabled && hasEnabledFeishuBots(config.Bots)
+	effectiveEnabled := config.Enabled && hasEnabledBots(config.Bots)
 	feishu["enabled"] = effectiveEnabled
 	feishu["threadSession"] = config.ThreadSession
 	feishu["replyMode"] = config.ReplyMode
@@ -579,7 +588,7 @@ func setTelegramConfig(conf map[string]interface{}, config dto.AgentTelegramConf
 	channels := ensureChildMap(conf, "channels")
 	telegram := ensureChildMap(channels, "telegram")
 	defaultAccount := normalizeDefaultAccount(config.DefaultAccount, getTelegramBotAccountIDs(config.Bots))
-	effectiveEnabled := config.Enabled && hasEnabledTelegramBots(config.Bots)
+	effectiveEnabled := config.Enabled && hasEnabledBots(config.Bots)
 	telegram["enabled"] = effectiveEnabled
 	telegram["dmPolicy"] = config.DmPolicy
 	telegram["groupPolicy"] = config.GroupPolicy
@@ -673,7 +682,7 @@ func setDiscordConfig(conf map[string]interface{}, config dto.AgentDiscordConfig
 	channels := ensureChildMap(conf, "channels")
 	discord := ensureChildMap(channels, "discord")
 	defaultAccount := normalizeDefaultAccount(config.DefaultAccount, getDiscordBotAccountIDs(config.Bots))
-	effectiveEnabled := config.Enabled && hasEnabledDiscordBots(config.Bots)
+	effectiveEnabled := config.Enabled && hasEnabledBots(config.Bots)
 	discord["enabled"] = effectiveEnabled
 	discord["dmPolicy"] = config.DmPolicy
 	discord["groupPolicy"] = config.GroupPolicy
@@ -789,7 +798,7 @@ func extractDingTalkConfig(conf map[string]interface{}) dto.AgentDingTalkConfig 
 		GroupSessionScope:               "group",
 		SharedMemoryAcrossConversations: false,
 		AsyncMode:                       false,
-		AckText:                         "🫡 任务已接收，处理中...",
+		AckText:                         "任务已接收，处理中...",
 	}
 	dingtalk := getChannelConfig(conf, "dingtalk-connector")
 	if len(dingtalk) == 0 {
@@ -883,7 +892,7 @@ func setWecomConfig(conf map[string]interface{}, config dto.AgentWecomConfig) {
 func setDingTalkConfig(conf map[string]interface{}, config dto.AgentDingTalkConfig) {
 	channels := ensureChildMap(conf, "channels")
 	dingtalk := ensureChildMap(channels, "dingtalk-connector")
-	effectiveEnabled := config.Enabled && hasEnabledDingTalkBots(config.Bots)
+	effectiveEnabled := config.Enabled && hasEnabledBots(config.Bots)
 	dingtalk["enabled"] = effectiveEnabled
 	dingtalk["dmPolicy"] = config.DmPolicy
 	dingtalk["groupPolicy"] = config.GroupPolicy
@@ -938,7 +947,7 @@ func setQQBotConfig(conf map[string]interface{}, config dto.AgentQQBotConfig) {
 	channels := ensureChildMap(conf, "channels")
 	qqbot := ensureChildMap(channels, "qqbot")
 	defaultBot := getDefaultQQBot(config.Bots)
-	effectiveEnabled := config.Enabled && hasEnabledQQBots(config.Bots)
+	effectiveEnabled := config.Enabled && hasEnabledBots(config.Bots)
 	delete(qqbot, "dmPolicy")
 	qqbot["enabled"] = effectiveEnabled
 	qqbot["appId"] = defaultBot.AppID
@@ -1010,7 +1019,7 @@ func appendPluginAllow(conf map[string]interface{}, pluginID string) {
 
 func buildOpenclawPluginInstallScript(spec, pluginID string) string {
 	return fmt.Sprintf(
-		"set -e; workdir=%s/%s; rm -rf \"$workdir\"; mkdir -p \"$workdir\"; cd \"$workdir\"; npm pack --silent %q >/dev/null 2>&1; pkg=$(find \"$workdir\" -maxdepth 1 -type f -name '*.tgz' | head -n 1); printf '%%s\\n' \"$pkg\"; openclaw plugins install \"$pkg\"; rm -rf \"$workdir\"",
+		"set -e; workdir=%s/%s; rm -rf \"$workdir\"; mkdir -p \"$workdir\"; cd \"$workdir\"; npm pack --silent %q >/dev/null 2>&1; pkg=$(find \"$workdir\" -maxdepth 1 -type f -name '*.tgz' | head -n 1); printf '%%s\\n' \"$pkg\"; openclaw plugins install \"$pkg\" --dangerously-force-unsafe-install; rm -rf \"$workdir\"",
 		openclawPluginPackageTmpDir,
 		pluginID,
 		spec,
@@ -1239,45 +1248,13 @@ func setDiscordDefaultFlags(bots []dto.AgentDiscordBot, defaultAccount string) {
 	}
 }
 
-func hasEnabledFeishuBots(bots []dto.AgentFeishuBot) bool {
-	for _, bot := range bots {
-		if bot.Enabled {
-			return true
-		}
-	}
-	return false
+type enabledBot interface {
+	IsEnabled() bool
 }
 
-func hasEnabledTelegramBots(bots []dto.AgentTelegramBot) bool {
+func hasEnabledBots[T enabledBot](bots []T) bool {
 	for _, bot := range bots {
-		if bot.Enabled {
-			return true
-		}
-	}
-	return false
-}
-
-func hasEnabledDiscordBots(bots []dto.AgentDiscordBot) bool {
-	for _, bot := range bots {
-		if bot.Enabled {
-			return true
-		}
-	}
-	return false
-}
-
-func hasEnabledQQBots(bots []dto.AgentQQBotBot) bool {
-	for _, bot := range bots {
-		if bot.Enabled {
-			return true
-		}
-	}
-	return false
-}
-
-func hasEnabledDingTalkBots(bots []dto.AgentDingTalkBot) bool {
-	for _, bot := range bots {
-		if bot.Enabled {
+		if bot.IsEnabled() {
 			return true
 		}
 	}
