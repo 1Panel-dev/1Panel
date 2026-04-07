@@ -62,7 +62,7 @@ const acceptParams = async (row: AI.AgentItem) => {
     open.value = true;
     loading.value = true;
     try {
-        const res = await getWebsiteOptions({ types: ['proxy', 'deployment', 'static'] });
+        const res = await getWebsiteOptions({ types: ['proxy', 'static'] });
         websites.value = res.data || [];
         form.websiteId = websites.value[0]?.id || 0;
     } finally {
