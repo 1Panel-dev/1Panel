@@ -1,7 +1,7 @@
 <template>
     <el-row :gutter="20" v-loading="loading">
-        <el-col :xs="24" :sm="18" :md="8" :lg="8" :xl="8">
-            <el-form ref="nginxForm" label-position="right" label-width="180px" :model="form" :rules="rules">
+        <el-col :xs="24" :sm="20" :md="16" :lg="14" :xl="14">
+            <el-form ref="nginxForm" label-position="right" label-width="140px" :model="form" :rules="rules">
                 <el-form-item :label="$t('commons.table.status')" prop="enable">
                     <el-switch v-model="enable"></el-switch>
                     <span class="input-help">{{ $t('nginx.defaultHttpsHelper1') }}</span>
