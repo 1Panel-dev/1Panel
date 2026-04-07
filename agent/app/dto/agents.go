@@ -480,6 +480,10 @@ type AgentChannelBotBase struct {
 	IsDefault bool   `json:"isDefault"`
 }
 
+func (b AgentChannelBotBase) IsEnabled() bool {
+	return b.Enabled
+}
+
 type AgentFeishuBot struct {
 	AgentChannelBotBase
 	AppID     string   `json:"appId"`

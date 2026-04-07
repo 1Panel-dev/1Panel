@@ -127,6 +127,19 @@ func CheckResourceTaskIsExecuting(operate, scope string, resourceID uint) bool {
 	return task.ID != ""
 }
 
+func CheckScopeTaskIsExecuting(scope string, resourceID uint) error {
+	taskRepo := repo.NewITaskRepo()
+	task, _ := taskRepo.GetFirst(
+		taskRepo.WithByStatus(constant.StatusExecuting),
+		taskRepo.WithResourceID(resourceID),
+		repo.WithByType(scope),
+	)
+	if task.ID != "" {
+		return buserr.New("TaskIsExecuting")
+	}
+	return nil
+}
+
 func NewTask(name, operate, taskScope, taskID string, resourceID uint) (*Task, error) {
 	if taskID == "" {
 		taskID = uuid.New().String()
