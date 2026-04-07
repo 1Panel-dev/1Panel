@@ -190,6 +190,7 @@
         <AddDialog ref="addRef" @search="search" @task="openTaskLog" />
         <TaskLog ref="taskLogRef" @close="search" />
         <DeleteDialog ref="deleteRef" @close="search" />
+        <AppResources ref="checkRef" @close="search" />
         <ConfigDrawer ref="configRef" @updated="search" />
         <OverviewDrawer ref="overviewRef" />
         <BindWebsiteDialog ref="bindWebsiteRef" @success="search" />
@@ -203,7 +204,7 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { pageAgents, resetAgentToken, updateAgentRemark } from '@/api/modules/ai';
+import { deleteAgentCheck, pageAgents, resetAgentToken, updateAgentRemark } from '@/api/modules/ai';
 import { checkAppInstalled, installedOp, searchApp, searchAppInstalled } from '@/api/modules/app';
 import { AI } from '@/api/interface/ai';
 import { App } from '@/api/interface/app';
@@ -214,6 +215,7 @@ import { MsgSuccess } from '@/utils/message';
 
 import AddDialog from '@/views/ai/agents/agent/add/index.vue';
 import DeleteDialog from '@/views/ai/agents/agent/delete/index.vue';
+import AppResources from '@/views/app-store/installed/check/index.vue';
 import ConfigDrawer from '@/views/ai/agents/agent/config/index.vue';
 import OverviewDrawer from '@/views/ai/agents/agent/components/overview.vue';
 import BindWebsiteDialog from '@/views/ai/agents/agent/website/index.vue';
@@ -236,6 +238,7 @@ const loading = ref(false);
 const addRef = ref();
 const taskLogRef = ref();
 const deleteRef = ref();
+const checkRef = ref();
 const configRef = ref();
 const overviewRef = ref();
 const bindWebsiteRef = ref();
@@ -442,7 +445,16 @@ const jumpWebUI = (row: AI.AgentItem) => {
     }
 };
 
-const onDelete = (row: AI.AgentItem) => {
+const onDelete = async (row: AI.AgentItem) => {
+    const res = await deleteAgentCheck({ agentId: row.id });
+    if ((res.data || []).length > 0) {
+        checkRef.value?.acceptParams({
+            items: res.data,
+            installID: row.appInstallId,
+            key: row.agentType,
+        });
+        return;
+    }
     deleteRef.value?.acceptParams(row.id, row.name);
 };
 

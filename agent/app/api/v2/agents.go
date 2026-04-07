@@ -52,6 +52,27 @@ func (b *BaseApi) PageAgents(c *gin.Context) {
 }
 
 // @Tags AI
+// @Summary Delete check Agent
+// @Accept json
+// @Param request body dto.AgentIDReq true "request"
+// @Success 200 {array} dto.AppResource
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/delete/check [post]
+func (b *BaseApi) DeleteCheckAgent(c *gin.Context) {
+	var req dto.AgentIDReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	checkData, err := agentService.DeleteCheck(req)
+	if err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.SuccessWithData(c, checkData)
+}
+
+// @Tags AI
 // @Summary Delete Agent
 // @Accept json
 // @Param request body dto.AgentDeleteReq true "request"

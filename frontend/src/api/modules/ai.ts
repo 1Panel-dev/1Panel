@@ -1,4 +1,5 @@
 import { AI } from '@/api/interface/ai';
+import { App } from '@/api/interface/app';
 import http from '@/api';
 import { ResPage, SearchWithPage } from '../interface';
 import { TimeoutEnum } from '@/enums/http-enum';
@@ -99,6 +100,10 @@ export const createAgent = (req: AI.AgentCreateReq) => {
 
 export const pageAgents = (req: SearchWithPage) => {
     return http.post<ResPage<AI.AgentItem>>(`/ai/agents/search`, req);
+};
+
+export const deleteAgentCheck = (req: AI.AgentIDReq) => {
+    return http.post<App.AppInstallResource[]>(`/ai/agents/delete/check`, req);
 };
 
 export const deleteAgent = (req: AI.AgentDeleteReq) => {

@@ -103,6 +103,20 @@ func loadAgentWebsiteDomainMapByWebsiteID(items []dto.AgentItem) (map[uint][]mod
 	return websiteDomainMap, nil
 }
 
+func loadAgentWebsiteResourceName(website model.Website) (string, error) {
+	websiteDomains, err := websiteDomainRepo.GetBy(websiteDomainRepo.WithWebsiteId(website.ID), repo.WithOrderAsc("id"))
+	if err != nil {
+		return "", err
+	}
+	if len(websiteDomains) > 0 {
+		return websiteDomains[0].Domain, nil
+	}
+	if website.PrimaryDomain != "" {
+		return website.PrimaryDomain, nil
+	}
+	return fmt.Sprintf("%d", website.ID), nil
+}
+
 func fillAgentWebsiteItems(items []dto.AgentItem, explicitWebsiteMap map[uint]model.Website, websiteDomainMap map[uint][]model.WebsiteDomain) {
 	for index := range items {
 		if items[index].WebsiteID == 0 {
