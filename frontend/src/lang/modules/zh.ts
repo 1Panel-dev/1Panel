@@ -2463,6 +2463,7 @@ const message = {
         uninstallDeleteBackup: '卸载应用-删除备份',
         uninstallDeleteImage: '卸载应用-删除镜像',
         upgradeBackup: '应用升级前备份应用',
+        installAllowPort: '安装应用默认打开端口外部访问',
         noAppHelper: '未检测到应用，请前往任务中心查看应用商店同步日志',
         isEdirWarn: '检测到 docker-compose.yml 文件被修改，请查看对比',
     },

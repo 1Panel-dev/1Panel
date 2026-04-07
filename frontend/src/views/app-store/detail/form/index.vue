@@ -147,6 +147,7 @@
 <script lang="ts" setup name="AppInstallForm">
 import { App } from '@/api/interface/app';
 import { getAppByKey, getAppDetail, getAppInstalledByID } from '@/api/modules/app';
+import { getAppStoreConfig } from '@/api/modules/setting';
 import { Rules, checkNumberRange } from '@/global/form-rules';
 import { FormInstance, FormRules } from 'element-plus';
 import { ref, watch } from 'vue';
@@ -298,8 +299,21 @@ const getVersionDetail = async (version: string) => {
     } catch (error) {}
 };
 
+const loadInstallDefaultConfig = async () => {
+    try {
+        const res = await getAppStoreConfig(operateNode.value);
+        formData.value.allowPort = res.data.installAllowPort === 'Enable';
+    } catch (error) {
+        formData.value.allowPort = false;
+    }
+};
+
 const initForm = async (appKey: string) => {
+    operateNode.value = undefined;
+    env.value = undefined;
+    masterNodeAddr.value = undefined;
     formData.value.name = appKey.replace(/^local/, '');
+    await loadInstallDefaultConfig();
     const res = await getAppByKey(appKey);
     currentApp.value = res.data;
     appVersions.value = currentApp.value.versions;
@@ -353,6 +367,7 @@ const initClusterForm = async (props: ClusterProps) => {
     }
     masterNodeAddr.value = props.masterNodeAddr;
     operateNode.value = props.node;
+    await loadInstallDefaultConfig();
     const res = await getAppByKey(props.key, props.node);
     currentApp.value = res.data;
     appVersions.value = currentApp.value.versions;

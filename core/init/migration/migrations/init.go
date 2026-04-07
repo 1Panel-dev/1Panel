@@ -193,6 +193,9 @@ var InitSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "UninstallDeleteBackup", Value: constant.StatusDisable}).Error; err != nil {
 			return err
 		}
+		if err := tx.Create(&model.Setting{Key: "InstallAllowPort", Value: constant.StatusDisable}).Error; err != nil {
+			return err
+		}
 		return nil
 	},
 }
@@ -849,6 +852,23 @@ var AddDocSourceSetting = &gormigrate.Migration{
 		}
 		if setting.Value == "" {
 			return tx.Model(&model.Setting{}).Where("key = ?", "DocSource").Update("value", "withByRegion").Error
+		}
+		return nil
+	},
+}
+
+var AddAppStoreInstallAllowPortSetting = &gormigrate.Migration{
+	ID: "20260407-add-app-store-install-allow-port-setting",
+	Migrate: func(tx *gorm.DB) error {
+		var setting model.Setting
+		if err := tx.Where("key = ?", "InstallAllowPort").First(&setting).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return tx.Create(&model.Setting{Key: "InstallAllowPort", Value: constant.StatusDisable}).Error
+			}
+			return err
+		}
+		if setting.Value == "" {
+			return tx.Model(&model.Setting{}).Where("key = ?", "InstallAllowPort").Update("value", constant.StatusDisable).Error
 		}
 		return nil
 	},

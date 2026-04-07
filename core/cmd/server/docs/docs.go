@@ -126,6 +126,152 @@ const docTemplate = `{
 				]
 			}
 		},
+		"/ai/agents/accounts/models": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentAccountModelReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/dto.AgentAccountModel"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "List Agent account models",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/accounts/models/create": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentAccountModelCreateReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Create Agent account model",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/accounts/models/delete": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentAccountModelDeleteReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Delete Agent account model",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/accounts/models/update": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentAccountModelUpdateReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update Agent account model",
+				"tags": [
+					"AI"
+				]
+			}
+		},
 		"/ai/agents/accounts/search": {
 			"post": {
 				"consumes": [
@@ -234,7 +380,7 @@ const docTemplate = `{
 				]
 			}
 		},
-		"/ai/agents/browser/get": {
+		"/ai/agents/agent/bind": {
 			"post": {
 				"consumes": [
 					"application/json"
@@ -246,45 +392,7 @@ const docTemplate = `{
 						"name": "request",
 						"required": true,
 						"schema": {
-							"$ref": "#/definitions/dto.AgentBrowserConfigReq"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"$ref": "#/definitions/dto.AgentBrowserConfig"
-						}
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Get Agent Browser config",
-				"tags": [
-					"AI"
-				]
-			}
-		},
-		"/ai/agents/browser/update": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/dto.AgentBrowserConfigUpdateReq"
+							"$ref": "#/definitions/dto.AgentRoleBindReq"
 						}
 					}
 				],
@@ -301,7 +409,346 @@ const docTemplate = `{
 						"Timestamp": []
 					}
 				],
-				"summary": "Update Agent Browser config",
+				"summary": "Bind Agent role channel",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/agent/channels": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentRoleChannelsReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/dto.AgentRoleChannelItem"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get Agent role channels from config file",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/agent/create": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentRoleCreateReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.AgentRoleCreateResp"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Create Agent role",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/agent/delete": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentRoleDeleteReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Delete Agent role",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/agent/list": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentConfiguredAgentsReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/dto.AgentConfiguredAgentItem"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get configured Agent roles from config file",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/agent/md/list": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentRoleMarkdownFilesReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/dto.AgentRoleMarkdownFileItem"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get Agent role markdown files",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/agent/md/update": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentRoleMarkdownFilesUpdateReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update Agent role markdown file",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/agent/unbind": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentRoleBindReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Unbind Agent role channel",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/channel/dingtalk/get": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentIDReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.AgentDingTalkConfig"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get Agent DingTalk channel config",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/channel/dingtalk/update": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentDingTalkConfigUpdateReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update Agent DingTalk channel config",
 				"tags": [
 					"AI"
 				]
@@ -319,7 +766,7 @@ const docTemplate = `{
 						"name": "request",
 						"required": true,
 						"schema": {
-							"$ref": "#/definitions/dto.AgentDiscordConfigReq"
+							"$ref": "#/definitions/dto.AgentIDReq"
 						}
 					}
 				],
@@ -375,41 +822,6 @@ const docTemplate = `{
 					}
 				],
 				"summary": "Update Agent Discord channel config",
-				"tags": [
-					"AI"
-				]
-			}
-		},
-		"/ai/agents/channel/feishu/approve": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/dto.AgentFeishuPairingApproveReq"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK"
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Approve Agent Feishu pairing code",
 				"tags": [
 					"AI"
 				]
@@ -535,7 +947,7 @@ const docTemplate = `{
 						"name": "request",
 						"required": true,
 						"schema": {
-							"$ref": "#/definitions/dto.AgentQQBotConfigReq"
+							"$ref": "#/definitions/dto.AgentIDReq"
 						}
 					}
 				],
@@ -669,6 +1081,187 @@ const docTemplate = `{
 				]
 			}
 		},
+		"/ai/agents/channel/wecom/get": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentIDReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.AgentWecomConfig"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get Agent QQ Bot channel config",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/channel/wecom/update": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentWecomConfigUpdateReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update Agent WeCom channel config",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/channel/weixin/login": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentWeixinLoginReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Login Agent Weixin channel",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/config-file/get": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentConfigFileReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.AgentConfigFile"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get Agent config file",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/config-file/update": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentConfigFileUpdateReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update Agent config file",
+				"tags": [
+					"AI"
+				]
+			}
+		},
 		"/ai/agents/delete": {
 			"post": {
 				"consumes": [
@@ -699,6 +1292,44 @@ const docTemplate = `{
 					}
 				],
 				"summary": "Delete Agent",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/model/get": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentIDReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.AgentModelConfig"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get Agent model config",
 				"tags": [
 					"AI"
 				]
@@ -751,7 +1382,7 @@ const docTemplate = `{
 						"name": "request",
 						"required": true,
 						"schema": {
-							"$ref": "#/definitions/dto.AgentOtherConfigReq"
+							"$ref": "#/definitions/dto.AgentIDReq"
 						}
 					}
 				],
@@ -807,6 +1438,44 @@ const docTemplate = `{
 					}
 				],
 				"summary": "Update Agent Other config",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/overview": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentOverviewReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.AgentOverview"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get Agent overview",
 				"tags": [
 					"AI"
 				]
@@ -885,6 +1554,76 @@ const docTemplate = `{
 				]
 			}
 		},
+		"/ai/agents/plugin/uninstall": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentPluginUninstallReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Uninstall Agent plugin",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/plugin/upgrade": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentPluginUpgradeReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Upgrade Agent plugin",
+				"tags": [
+					"AI"
+				]
+			}
+		},
 		"/ai/agents/providers": {
 			"get": {
 				"responses": {
@@ -907,6 +1646,41 @@ const docTemplate = `{
 					}
 				],
 				"summary": "Get Providers",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/remark": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentRemarkUpdateReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update Agent remark",
 				"tags": [
 					"AI"
 				]
@@ -950,6 +1724,231 @@ const docTemplate = `{
 				]
 			}
 		},
+		"/ai/agents/security/get": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentIDReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.AgentSecurityConfig"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get Agent Security config",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/security/update": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentSecurityConfigUpdateReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update Agent Security config",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/skills/install": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentSkillInstallReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Install Agent skill",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/skills/list": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentIDReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/dto.AgentSkillItem"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "List Agent skills",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/skills/search": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentSkillSearchReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/dto.AgentSkillSearchItem"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Search Agent skills",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/skills/update": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentSkillUpdateReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update Agent skill status",
+				"tags": [
+					"AI"
+				]
+			}
+		},
 		"/ai/agents/token/reset": {
 			"post": {
 				"consumes": [
@@ -980,6 +1979,41 @@ const docTemplate = `{
 					}
 				],
 				"summary": "Reset Agent token",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/website/bind": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentWebsiteBindReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Bind Agent website",
 				"tags": [
 					"AI"
 				]
@@ -4311,13 +5345,34 @@ const docTemplate = `{
 				"summary": "Delete container file",
 				"tags": [
 					"Container"
-				]
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"containerID",
+						"paths"
+					],
+					"formatEN": "Delete files [paths] in container [containerID]",
+					"formatZH": "删除容器 [containerID] 文件 [paths]",
+					"paramKeys": []
+				}
 			}
 		},
 		"/containers/files/download": {
 			"post": {
 				"consumes": [
 					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.ContainerFileReq"
+						}
+					}
 				],
 				"responses": {},
 				"security": [
@@ -4331,7 +5386,17 @@ const docTemplate = `{
 				"summary": "Download container file",
 				"tags": [
 					"Container"
-				]
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"containerID",
+						"path"
+					],
+					"formatEN": "Download file [path] from container [containerID]",
+					"formatZH": "下载容器 [containerID] 文件 [path]",
+					"paramKeys": []
+				}
 			}
 		},
 		"/containers/files/search": {
@@ -4457,7 +5522,17 @@ const docTemplate = `{
 				"summary": "Upload container file",
 				"tags": [
 					"Container"
-				]
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"containerID",
+						"path"
+					],
+					"formatEN": "Upload file to [path] in container [containerID]",
+					"formatZH": "容器 [containerID] 上传文件到 [path]",
+					"paramKeys": []
+				}
 			}
 		},
 		"/containers/image": {
@@ -7344,400 +8419,6 @@ const docTemplate = `{
 					],
 					"formatEN": "update group [name][type]",
 					"formatZH": "更新组 [name][type]",
-					"paramKeys": []
-				}
-			}
-		},
-		"/core/hosts": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/dto.HostOperate"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"$ref": "#/definitions/dto.HostInfo"
-						}
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Create host",
-				"tags": [
-					"Host"
-				],
-				"x-panel-log": {
-					"BeforeFunctions": [],
-					"bodyKeys": [
-						"name",
-						"addr"
-					],
-					"formatEN": "create host [name][addr]",
-					"formatZH": "创建主机 [name][addr]",
-					"paramKeys": []
-				}
-			}
-		},
-		"/core/hosts/del": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/dto.OperateByIDs"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK"
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Delete host",
-				"tags": [
-					"Host"
-				],
-				"x-panel-log": {
-					"BeforeFunctions": [
-						{
-							"db": "hosts",
-							"input_column": "id",
-							"input_value": "ids",
-							"isList": true,
-							"output_column": "addr",
-							"output_value": "addrs"
-						}
-					],
-					"bodyKeys": [
-						"ids"
-					],
-					"formatEN": "delete host [addrs]",
-					"formatZH": "删除主机 [addrs]",
-					"paramKeys": []
-				}
-			}
-		},
-		"/core/hosts/info": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/dto.OperateByID"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"$ref": "#/definitions/dto.HostInfo"
-						}
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Get host info",
-				"tags": [
-					"Host"
-				]
-			}
-		},
-		"/core/hosts/search": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/dto.SearchPageWithGroup"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"$ref": "#/definitions/dto.PageResult"
-						}
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Page host",
-				"tags": [
-					"Host"
-				]
-			}
-		},
-		"/core/hosts/test/byid/:id": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "path",
-						"name": "id",
-						"required": true,
-						"type": "integer"
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"type": "boolean"
-						}
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Test host conn by host id",
-				"tags": [
-					"Host"
-				]
-			}
-		},
-		"/core/hosts/test/byinfo": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/dto.HostConnTest"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"type": "boolean"
-						}
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Test host conn by info",
-				"tags": [
-					"Host"
-				]
-			}
-		},
-		"/core/hosts/tree": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/dto.SearchForTree"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"items": {
-								"$ref": "#/definitions/dto.HostTree"
-							},
-							"type": "array"
-						}
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Load host tree",
-				"tags": [
-					"Host"
-				]
-			}
-		},
-		"/core/hosts/update": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/dto.HostOperate"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"$ref": "#/definitions/dto.HostInfo"
-						}
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Update host",
-				"tags": [
-					"Host"
-				],
-				"x-panel-log": {
-					"BeforeFunctions": [],
-					"bodyKeys": [
-						"name",
-						"addr"
-					],
-					"formatEN": "update host [name][addr]",
-					"formatZH": "更新主机信息 [name][addr]",
-					"paramKeys": []
-				}
-			}
-		},
-		"/core/hosts/update/group": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/dto.ChangeHostGroup"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK"
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Update host group",
-				"tags": [
-					"Host"
-				],
-				"x-panel-log": {
-					"BeforeFunctions": [
-						{
-							"db": "hosts",
-							"input_column": "id",
-							"input_value": "id",
-							"isList": false,
-							"output_column": "addr",
-							"output_value": "addr"
-						}
-					],
-					"bodyKeys": [
-						"id",
-						"group"
-					],
-					"formatEN": "change host [addr] group =\u003e [group]",
-					"formatZH": "切换主机[addr]分组 =\u003e [group]",
 					"paramKeys": []
 				}
 			}
@@ -13622,6 +14303,50 @@ const docTemplate = `{
 				}
 			}
 		},
+		"/files/wget/stop": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.FileProcessReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Stop wget file download",
+				"tags": [
+					"File"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"key"
+					],
+					"formatEN": "Stop wget task [key]",
+					"formatZH": "停止下载任务 [key]",
+					"paramKeys": []
+				}
+			}
+		},
 		"/groups": {
 			"post": {
 				"consumes": [
@@ -15024,7 +15749,7 @@ const docTemplate = `{
 						"name": "request",
 						"required": true,
 						"schema": {
-							"$ref": "#/definitions/dto.SSHConf"
+							"$ref": "#/definitions/dto.SSHConfUpdate"
 						}
 					}
 				],
@@ -23534,14 +24259,11 @@ const docTemplate = `{
 				"baseURL": {
 					"type": "string"
 				},
-				"contextWindow": {
-					"type": "integer"
-				},
-				"maxTokens": {
-					"type": "integer"
-				},
-				"model": {
-					"type": "string"
+				"models": {
+					"items": {
+						"$ref": "#/definitions/dto.AgentAccountModel"
+					},
+					"type": "array"
 				},
 				"name": {
 					"type": "string"
@@ -23558,6 +24280,7 @@ const docTemplate = `{
 			},
 			"required": [
 				"apiKey",
+				"apiType",
 				"name",
 				"provider"
 			],
@@ -23571,6 +24294,91 @@ const docTemplate = `{
 			},
 			"required": [
 				"id"
+			],
+			"type": "object"
+		},
+		"dto.AgentAccountModel": {
+			"properties": {
+				"contextWindow": {
+					"type": "integer"
+				},
+				"id": {
+					"type": "string"
+				},
+				"input": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"maxTokens": {
+					"type": "integer"
+				},
+				"name": {
+					"type": "string"
+				},
+				"reasoning": {
+					"type": "boolean"
+				},
+				"recordId": {
+					"type": "integer"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AgentAccountModelCreateReq": {
+			"properties": {
+				"accountId": {
+					"type": "integer"
+				},
+				"model": {
+					"$ref": "#/definitions/dto.AgentAccountModel"
+				}
+			},
+			"required": [
+				"accountId",
+				"model"
+			],
+			"type": "object"
+		},
+		"dto.AgentAccountModelDeleteReq": {
+			"properties": {
+				"accountId": {
+					"type": "integer"
+				},
+				"recordId": {
+					"type": "integer"
+				}
+			},
+			"required": [
+				"accountId",
+				"recordId"
+			],
+			"type": "object"
+		},
+		"dto.AgentAccountModelReq": {
+			"properties": {
+				"accountId": {
+					"type": "integer"
+				}
+			},
+			"required": [
+				"accountId"
+			],
+			"type": "object"
+		},
+		"dto.AgentAccountModelUpdateReq": {
+			"properties": {
+				"accountId": {
+					"type": "integer"
+				},
+				"model": {
+					"$ref": "#/definitions/dto.AgentAccountModel"
+				}
+			},
+			"required": [
+				"accountId",
+				"model"
 			],
 			"type": "object"
 		},
@@ -23606,17 +24414,8 @@ const docTemplate = `{
 				"baseURL": {
 					"type": "string"
 				},
-				"contextWindow": {
-					"type": "integer"
-				},
 				"id": {
 					"type": "integer"
-				},
-				"maxTokens": {
-					"type": "integer"
-				},
-				"model": {
-					"type": "string"
 				},
 				"name": {
 					"type": "string"
@@ -23633,6 +24432,7 @@ const docTemplate = `{
 			},
 			"required": [
 				"apiKey",
+				"apiType",
 				"id",
 				"name"
 			],
@@ -23656,63 +24456,11 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
-		"dto.AgentBrowserConfig": {
-			"properties": {
-				"defaultProfile": {
-					"type": "string"
-				},
-				"enabled": {
-					"type": "boolean"
-				},
-				"executablePath": {
-					"type": "string"
-				},
-				"headless": {
-					"type": "boolean"
-				},
-				"noSandbox": {
-					"type": "boolean"
-				}
-			},
-			"type": "object"
-		},
-		"dto.AgentBrowserConfigReq": {
-			"properties": {
-				"agentId": {
-					"type": "integer"
-				}
-			},
-			"required": [
-				"agentId"
-			],
-			"type": "object"
-		},
-		"dto.AgentBrowserConfigUpdateReq": {
-			"properties": {
-				"agentId": {
-					"type": "integer"
-				},
-				"defaultProfile": {
-					"type": "string"
-				},
-				"enabled": {
-					"type": "boolean"
-				},
-				"headless": {
-					"type": "boolean"
-				},
-				"noSandbox": {
-					"type": "boolean"
-				}
-			},
-			"required": [
-				"agentId",
-				"defaultProfile"
-			],
-			"type": "object"
-		},
 		"dto.AgentChannelPairingApproveReq": {
 			"properties": {
+				"accountId": {
+					"type": "string"
+				},
 				"agentId": {
 					"type": "integer"
 				},
@@ -23723,7 +24471,8 @@ const docTemplate = `{
 					"enum": [
 						"feishu",
 						"telegram",
-						"discord"
+						"discord",
+						"wecom"
 					],
 					"type": "string"
 				}
@@ -23732,6 +24481,77 @@ const docTemplate = `{
 				"agentId",
 				"pairingCode",
 				"type"
+			],
+			"type": "object"
+		},
+		"dto.AgentConfigFile": {
+			"properties": {
+				"content": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AgentConfigFileReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				}
+			},
+			"required": [
+				"agentId"
+			],
+			"type": "object"
+		},
+		"dto.AgentConfigFileUpdateReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				},
+				"content": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"agentId",
+				"content"
+			],
+			"type": "object"
+		},
+		"dto.AgentConfiguredAgentItem": {
+			"properties": {
+				"agentDir": {
+					"type": "string"
+				},
+				"bindings": {
+					"items": {
+						"$ref": "#/definitions/dto.AgentRoleBinding"
+					},
+					"type": "array"
+				},
+				"id": {
+					"type": "string"
+				},
+				"model": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"workspace": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AgentConfiguredAgentsReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				}
+			},
+			"required": [
+				"agentId"
 			],
 			"type": "object"
 		},
@@ -23744,21 +24564,22 @@ const docTemplate = `{
 					"type": "boolean"
 				},
 				"agentType": {
+					"enum": [
+						"openclaw",
+						"copaw"
+					],
 					"type": "string"
 				},
 				"allowPort": {
 					"type": "boolean"
 				},
-				"apiKey": {
-					"type": "string"
-				},
-				"apiType": {
-					"type": "string"
+				"allowedOrigins": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
 				},
 				"appVersion": {
-					"type": "string"
-				},
-				"baseURL": {
 					"type": "string"
 				},
 				"bridgePort": {
@@ -23766,9 +24587,6 @@ const docTemplate = `{
 				},
 				"containerName": {
 					"type": "string"
-				},
-				"contextWindow": {
-					"type": "integer"
 				},
 				"cpuQuota": {
 					"type": "number"
@@ -23778,9 +24596,6 @@ const docTemplate = `{
 				},
 				"editCompose": {
 					"type": "boolean"
-				},
-				"maxTokens": {
-					"type": "integer"
 				},
 				"memoryLimit": {
 					"type": "number"
@@ -23794,11 +24609,11 @@ const docTemplate = `{
 				"name": {
 					"type": "string"
 				},
-				"provider": {
-					"type": "string"
-				},
 				"pullImage": {
 					"type": "boolean"
+				},
+				"remark": {
+					"type": "string"
 				},
 				"restartPolicy": {
 					"type": "string"
@@ -23817,6 +24632,7 @@ const docTemplate = `{
 				}
 			},
 			"required": [
+				"agentType",
 				"appVersion",
 				"name",
 				"webUIPort"
@@ -23840,8 +24656,182 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
+		"dto.AgentDingTalkBot": {
+			"properties": {
+				"accountId": {
+					"type": "string"
+				},
+				"clientId": {
+					"type": "string"
+				},
+				"clientSecret": {
+					"type": "string"
+				},
+				"enabled": {
+					"type": "boolean"
+				},
+				"isDefault": {
+					"type": "boolean"
+				},
+				"name": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AgentDingTalkConfig": {
+			"properties": {
+				"ackText": {
+					"type": "string"
+				},
+				"allowFrom": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"asyncMode": {
+					"type": "boolean"
+				},
+				"bots": {
+					"items": {
+						"$ref": "#/definitions/dto.AgentDingTalkBot"
+					},
+					"type": "array"
+				},
+				"dmPolicy": {
+					"type": "string"
+				},
+				"enabled": {
+					"type": "boolean"
+				},
+				"groupAllowFrom": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"groupPolicy": {
+					"type": "string"
+				},
+				"groupSessionScope": {
+					"type": "string"
+				},
+				"installed": {
+					"type": "boolean"
+				},
+				"separateSessionByConversation": {
+					"type": "boolean"
+				},
+				"sharedMemoryAcrossConversations": {
+					"type": "boolean"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AgentDingTalkConfigUpdateReq": {
+			"properties": {
+				"ackText": {
+					"type": "string"
+				},
+				"agentId": {
+					"type": "integer"
+				},
+				"allowFrom": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"asyncMode": {
+					"type": "boolean"
+				},
+				"bots": {
+					"items": {
+						"$ref": "#/definitions/dto.AgentDingTalkBot"
+					},
+					"minItems": 1,
+					"type": "array"
+				},
+				"dmPolicy": {
+					"enum": [
+						"allowlist",
+						"open",
+						"disabled"
+					],
+					"type": "string"
+				},
+				"enabled": {
+					"type": "boolean"
+				},
+				"groupAllowFrom": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"groupPolicy": {
+					"enum": [
+						"open",
+						"allowlist",
+						"disabled"
+					],
+					"type": "string"
+				},
+				"groupSessionScope": {
+					"enum": [
+						"group",
+						"group_sender"
+					],
+					"type": "string"
+				},
+				"separateSessionByConversation": {
+					"type": "boolean"
+				},
+				"sharedMemoryAcrossConversations": {
+					"type": "boolean"
+				}
+			},
+			"required": [
+				"agentId",
+				"bots",
+				"dmPolicy",
+				"groupPolicy",
+				"groupSessionScope"
+			],
+			"type": "object"
+		},
+		"dto.AgentDiscordBot": {
+			"properties": {
+				"accountId": {
+					"type": "string"
+				},
+				"enabled": {
+					"type": "boolean"
+				},
+				"isDefault": {
+					"type": "boolean"
+				},
+				"name": {
+					"type": "string"
+				},
+				"token": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
 		"dto.AgentDiscordConfig": {
 			"properties": {
+				"bots": {
+					"items": {
+						"$ref": "#/definitions/dto.AgentDiscordBot"
+					},
+					"type": "array"
+				},
+				"defaultAccount": {
+					"type": "string"
+				},
 				"dmPolicy": {
 					"type": "string"
 				},
@@ -23853,28 +24843,24 @@ const docTemplate = `{
 				},
 				"proxy": {
 					"type": "string"
-				},
-				"token": {
-					"type": "string"
 				}
 			},
-			"type": "object"
-		},
-		"dto.AgentDiscordConfigReq": {
-			"properties": {
-				"agentId": {
-					"type": "integer"
-				}
-			},
-			"required": [
-				"agentId"
-			],
 			"type": "object"
 		},
 		"dto.AgentDiscordConfigUpdateReq": {
 			"properties": {
 				"agentId": {
 					"type": "integer"
+				},
+				"bots": {
+					"items": {
+						"$ref": "#/definitions/dto.AgentDiscordBot"
+					},
+					"minItems": 1,
+					"type": "array"
+				},
+				"defaultAccount": {
+					"type": "string"
 				},
 				"dmPolicy": {
 					"type": "string"
@@ -23892,34 +24878,82 @@ const docTemplate = `{
 				},
 				"proxy": {
 					"type": "string"
-				},
-				"token": {
-					"type": "string"
 				}
 			},
 			"required": [
 				"agentId",
+				"bots",
+				"defaultAccount",
 				"dmPolicy",
-				"groupPolicy",
-				"token"
+				"groupPolicy"
 			],
 			"type": "object"
 		},
-		"dto.AgentFeishuConfig": {
+		"dto.AgentFeishuBot": {
 			"properties": {
+				"accountId": {
+					"type": "string"
+				},
+				"allowFrom": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
 				"appId": {
 					"type": "string"
 				},
 				"appSecret": {
 					"type": "string"
 				},
-				"botName": {
-					"type": "string"
-				},
 				"dmPolicy": {
 					"type": "string"
 				},
 				"enabled": {
+					"type": "boolean"
+				},
+				"isDefault": {
+					"type": "boolean"
+				},
+				"name": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AgentFeishuConfig": {
+			"properties": {
+				"bots": {
+					"items": {
+						"$ref": "#/definitions/dto.AgentFeishuBot"
+					},
+					"type": "array"
+				},
+				"enabled": {
+					"type": "boolean"
+				},
+				"groupAllowFrom": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"groupPolicy": {
+					"type": "string"
+				},
+				"installed": {
+					"type": "boolean"
+				},
+				"replyMode": {
+					"type": "string"
+				},
+				"requireMention": {
+					"type": "string"
+				},
+				"streaming": {
+					"type": "boolean"
+				},
+				"threadSession": {
 					"type": "boolean"
 				}
 			},
@@ -23941,43 +24975,65 @@ const docTemplate = `{
 				"agentId": {
 					"type": "integer"
 				},
-				"appId": {
-					"type": "string"
-				},
-				"appSecret": {
-					"type": "string"
-				},
-				"botName": {
-					"type": "string"
-				},
-				"dmPolicy": {
-					"type": "string"
+				"bots": {
+					"items": {
+						"$ref": "#/definitions/dto.AgentFeishuBot"
+					},
+					"minItems": 1,
+					"type": "array"
 				},
 				"enabled": {
+					"type": "boolean"
+				},
+				"groupAllowFrom": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"groupPolicy": {
+					"enum": [
+						"open",
+						"allowlist",
+						"disabled"
+					],
+					"type": "string"
+				},
+				"replyMode": {
+					"type": "string"
+				},
+				"requireMention": {
+					"enum": [
+						"true",
+						"false",
+						"open"
+					],
+					"type": "string"
+				},
+				"streaming": {
+					"type": "boolean"
+				},
+				"threadSession": {
 					"type": "boolean"
 				}
 			},
 			"required": [
 				"agentId",
-				"appId",
-				"appSecret",
-				"botName",
-				"dmPolicy"
+				"bots",
+				"groupPolicy",
+				"replyMode",
+				"requireMention"
 			],
 			"type": "object"
 		},
-		"dto.AgentFeishuPairingApproveReq": {
+		"dto.AgentIDReq": {
 			"properties": {
 				"agentId": {
 					"type": "integer"
-				},
-				"pairingCode": {
-					"type": "string"
 				}
 			},
 			"required": [
-				"agentId",
-				"pairingCode"
+				"agentId"
 			],
 			"type": "object"
 		},
@@ -24043,6 +25099,9 @@ const docTemplate = `{
 				"providerName": {
 					"type": "string"
 				},
+				"remark": {
+					"type": "string"
+				},
 				"status": {
 					"type": "string"
 				},
@@ -24054,6 +25113,32 @@ const docTemplate = `{
 				},
 				"webUIPort": {
 					"type": "integer"
+				},
+				"websiteId": {
+					"type": "integer"
+				},
+				"websitePrimaryDomain": {
+					"type": "string"
+				},
+				"websiteProtocol": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AgentModelConfig": {
+			"properties": {
+				"accountId": {
+					"type": "integer"
+				},
+				"fallbacks": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"model": {
+					"type": "string"
 				}
 			},
 			"type": "object"
@@ -24065,6 +25150,12 @@ const docTemplate = `{
 				},
 				"agentId": {
 					"type": "integer"
+				},
+				"fallbacks": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
 				},
 				"model": {
 					"type": "string"
@@ -24079,13 +25170,49 @@ const docTemplate = `{
 		},
 		"dto.AgentOtherConfig": {
 			"properties": {
+				"browserEnabled": {
+					"type": "boolean"
+				},
+				"npmRegistry": {
+					"type": "string"
+				},
 				"userTimezone": {
 					"type": "string"
 				}
 			},
 			"type": "object"
 		},
-		"dto.AgentOtherConfigReq": {
+		"dto.AgentOtherConfigUpdateReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				},
+				"browserEnabled": {
+					"type": "boolean"
+				},
+				"npmRegistry": {
+					"type": "string"
+				},
+				"userTimezone": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"agentId",
+				"npmRegistry",
+				"userTimezone"
+			],
+			"type": "object"
+		},
+		"dto.AgentOverview": {
+			"properties": {
+				"snapshot": {
+					"$ref": "#/definitions/dto.AgentOverviewSnapshot"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AgentOverviewReq": {
 			"properties": {
 				"agentId": {
 					"type": "integer"
@@ -24096,19 +25223,30 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
-		"dto.AgentOtherConfigUpdateReq": {
+		"dto.AgentOverviewSnapshot": {
 			"properties": {
-				"agentId": {
+				"appVersion": {
+					"type": "string"
+				},
+				"channelCount": {
 					"type": "integer"
 				},
-				"userTimezone": {
+				"containerStatus": {
 					"type": "string"
+				},
+				"defaultModel": {
+					"type": "string"
+				},
+				"jobCount": {
+					"type": "integer"
+				},
+				"sessionCount": {
+					"type": "integer"
+				},
+				"skillCount": {
+					"type": "integer"
 				}
 			},
-			"required": [
-				"agentId",
-				"userTimezone"
-			],
 			"type": "object"
 		},
 		"dto.AgentPluginCheckReq": {
@@ -24116,9 +25254,16 @@ const docTemplate = `{
 				"agentId": {
 					"type": "integer"
 				},
+				"checkLatest": {
+					"type": "boolean"
+				},
 				"type": {
 					"enum": [
-						"qqbot"
+						"feishu",
+						"qqbot",
+						"wecom",
+						"dingtalk",
+						"weixin"
 					],
 					"type": "string"
 				}
@@ -24139,7 +25284,11 @@ const docTemplate = `{
 				},
 				"type": {
 					"enum": [
-						"qqbot"
+						"feishu",
+						"qqbot",
+						"wecom",
+						"dingtalk",
+						"weixin"
 					],
 					"type": "string"
 				}
@@ -24153,19 +25302,112 @@ const docTemplate = `{
 		},
 		"dto.AgentPluginStatus": {
 			"properties": {
+				"currentVersion": {
+					"type": "string"
+				},
 				"installed": {
 					"type": "boolean"
+				},
+				"latestVersion": {
+					"type": "string"
+				},
+				"upgradable": {
+					"type": "boolean"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AgentPluginUninstallReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				},
+				"taskID": {
+					"type": "string"
+				},
+				"type": {
+					"enum": [
+						"feishu",
+						"qqbot",
+						"wecom",
+						"dingtalk",
+						"weixin"
+					],
+					"type": "string"
+				}
+			},
+			"required": [
+				"agentId",
+				"taskID",
+				"type"
+			],
+			"type": "object"
+		},
+		"dto.AgentPluginUpgradeReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				},
+				"taskID": {
+					"type": "string"
+				},
+				"type": {
+					"enum": [
+						"feishu",
+						"qqbot",
+						"wecom",
+						"dingtalk",
+						"weixin"
+					],
+					"type": "string"
+				}
+			},
+			"required": [
+				"agentId",
+				"taskID",
+				"type"
+			],
+			"type": "object"
+		},
+		"dto.AgentQQBotBot": {
+			"properties": {
+				"accountId": {
+					"type": "string"
+				},
+				"allowFrom": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"appId": {
+					"type": "string"
+				},
+				"clientSecret": {
+					"type": "string"
+				},
+				"enabled": {
+					"type": "boolean"
+				},
+				"isDefault": {
+					"type": "boolean"
+				},
+				"name": {
+					"type": "string"
+				},
+				"systemPrompt": {
+					"type": "string"
 				}
 			},
 			"type": "object"
 		},
 		"dto.AgentQQBotConfig": {
 			"properties": {
-				"appId": {
-					"type": "string"
-				},
-				"clientSecret": {
-					"type": "string"
+				"bots": {
+					"items": {
+						"$ref": "#/definitions/dto.AgentQQBotBot"
+					},
+					"type": "array"
 				},
 				"enabled": {
 					"type": "boolean"
@@ -24176,7 +25418,96 @@ const docTemplate = `{
 			},
 			"type": "object"
 		},
-		"dto.AgentQQBotConfigReq": {
+		"dto.AgentQQBotConfigUpdateReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				},
+				"bots": {
+					"items": {
+						"$ref": "#/definitions/dto.AgentQQBotBot"
+					},
+					"minItems": 1,
+					"type": "array"
+				},
+				"enabled": {
+					"type": "boolean"
+				}
+			},
+			"required": [
+				"agentId",
+				"bots"
+			],
+			"type": "object"
+		},
+		"dto.AgentRemarkUpdateReq": {
+			"properties": {
+				"id": {
+					"type": "integer"
+				},
+				"remark": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"id"
+			],
+			"type": "object"
+		},
+		"dto.AgentRoleBindReq": {
+			"properties": {
+				"accountId": {
+					"type": "string"
+				},
+				"agentId": {
+					"type": "integer"
+				},
+				"channel": {
+					"type": "string"
+				},
+				"id": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"agentId",
+				"channel",
+				"id"
+			],
+			"type": "object"
+		},
+		"dto.AgentRoleBinding": {
+			"properties": {
+				"accountId": {
+					"type": "string"
+				},
+				"channel": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"channel"
+			],
+			"type": "object"
+		},
+		"dto.AgentRoleChannelItem": {
+			"properties": {
+				"accountIds": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"bound": {
+					"type": "boolean"
+				},
+				"name": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AgentRoleChannelsReq": {
 			"properties": {
 				"agentId": {
 					"type": "integer"
@@ -24187,30 +25518,277 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
-		"dto.AgentQQBotConfigUpdateReq": {
+		"dto.AgentRoleCreateReq": {
 			"properties": {
 				"agentId": {
 					"type": "integer"
 				},
-				"appId": {
+				"bindings": {
+					"items": {
+						"$ref": "#/definitions/dto.AgentRoleBinding"
+					},
+					"type": "array"
+				},
+				"model": {
 					"type": "string"
 				},
-				"clientSecret": {
+				"name": {
 					"type": "string"
-				},
-				"enabled": {
-					"type": "boolean"
 				}
 			},
 			"required": [
 				"agentId",
-				"appId",
-				"clientSecret"
+				"name"
 			],
 			"type": "object"
 		},
-		"dto.AgentTelegramConfig": {
+		"dto.AgentRoleCreateResp": {
 			"properties": {
+				"output": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AgentRoleDeleteReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				},
+				"id": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"agentId",
+				"id"
+			],
+			"type": "object"
+		},
+		"dto.AgentRoleMarkdownFileItem": {
+			"properties": {
+				"content": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AgentRoleMarkdownFileUpdateItem": {
+			"properties": {
+				"content": {
+					"type": "string"
+				},
+				"name": {
+					"enum": [
+						"AGENTS.md",
+						"SOUL.md",
+						"USER.md",
+						"IDENTITY.md",
+						"TOOLS.md",
+						"HEARTBEAT.md",
+						"BOOT.md",
+						"BOOTSTRAP.md"
+					],
+					"type": "string"
+				}
+			},
+			"required": [
+				"name"
+			],
+			"type": "object"
+		},
+		"dto.AgentRoleMarkdownFilesReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				},
+				"workspace": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"agentId",
+				"workspace"
+			],
+			"type": "object"
+		},
+		"dto.AgentRoleMarkdownFilesUpdateReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				},
+				"files": {
+					"items": {
+						"$ref": "#/definitions/dto.AgentRoleMarkdownFileUpdateItem"
+					},
+					"type": "array"
+				},
+				"restart": {
+					"type": "boolean"
+				},
+				"workspace": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"agentId",
+				"files",
+				"workspace"
+			],
+			"type": "object"
+		},
+		"dto.AgentSecurityConfig": {
+			"properties": {
+				"allowedOrigins": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AgentSecurityConfigUpdateReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				},
+				"allowedOrigins": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				}
+			},
+			"required": [
+				"agentId"
+			],
+			"type": "object"
+		},
+		"dto.AgentSkillInstallReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				},
+				"slug": {
+					"type": "string"
+				},
+				"source": {
+					"enum": [
+						"clawhub-global",
+						"clawhub-cn",
+						"skillhub"
+					],
+					"type": "string"
+				},
+				"taskID": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"agentId",
+				"slug",
+				"source",
+				"taskID"
+			],
+			"type": "object"
+		},
+		"dto.AgentSkillItem": {
+			"properties": {
+				"bundled": {
+					"type": "boolean"
+				},
+				"description": {
+					"type": "string"
+				},
+				"disabled": {
+					"type": "boolean"
+				},
+				"name": {
+					"type": "string"
+				},
+				"source": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AgentSkillSearchItem": {
+			"properties": {
+				"description": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"score": {
+					"type": "string"
+				},
+				"slug": {
+					"type": "string"
+				},
+				"source": {
+					"type": "string"
+				},
+				"summary": {
+					"type": "string"
+				},
+				"version": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AgentSkillSearchReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				},
+				"keyword": {
+					"type": "string"
+				},
+				"source": {
+					"enum": [
+						"clawhub-global",
+						"clawhub-cn",
+						"skillhub"
+					],
+					"type": "string"
+				}
+			},
+			"required": [
+				"agentId",
+				"keyword",
+				"source"
+			],
+			"type": "object"
+		},
+		"dto.AgentSkillUpdateReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				},
+				"enabled": {
+					"type": "boolean"
+				},
+				"name": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"agentId",
+				"name"
+			],
+			"type": "object"
+		},
+		"dto.AgentTelegramBot": {
+			"properties": {
+				"accountId": {
+					"type": "string"
+				},
 				"botToken": {
 					"type": "string"
 				},
@@ -24220,7 +25798,57 @@ const docTemplate = `{
 				"enabled": {
 					"type": "boolean"
 				},
+				"groupPolicy": {
+					"type": "string"
+				},
+				"isDefault": {
+					"type": "boolean"
+				},
+				"name": {
+					"type": "string"
+				},
+				"streaming": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AgentTelegramConfig": {
+			"properties": {
+				"allowFrom": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"bots": {
+					"items": {
+						"$ref": "#/definitions/dto.AgentTelegramBot"
+					},
+					"type": "array"
+				},
+				"defaultAccount": {
+					"type": "string"
+				},
+				"dmPolicy": {
+					"type": "string"
+				},
+				"enabled": {
+					"type": "boolean"
+				},
+				"groupAllowFrom": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"groupPolicy": {
+					"type": "string"
+				},
 				"proxy": {
+					"type": "string"
+				},
+				"streaming": {
 					"type": "string"
 				}
 			},
@@ -24242,23 +25870,68 @@ const docTemplate = `{
 				"agentId": {
 					"type": "integer"
 				},
-				"botToken": {
+				"allowFrom": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"bots": {
+					"items": {
+						"$ref": "#/definitions/dto.AgentTelegramBot"
+					},
+					"minItems": 1,
+					"type": "array"
+				},
+				"defaultAccount": {
 					"type": "string"
 				},
 				"dmPolicy": {
+					"enum": [
+						"pairing",
+						"open",
+						"allowlist",
+						"disabled"
+					],
 					"type": "string"
 				},
 				"enabled": {
 					"type": "boolean"
 				},
+				"groupAllowFrom": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"groupPolicy": {
+					"enum": [
+						"open",
+						"allowlist",
+						"disabled"
+					],
+					"type": "string"
+				},
 				"proxy": {
+					"type": "string"
+				},
+				"streaming": {
+					"enum": [
+						"off",
+						"partial",
+						"block",
+						"progress"
+					],
 					"type": "string"
 				}
 			},
 			"required": [
 				"agentId",
-				"botToken",
-				"dmPolicy"
+				"bots",
+				"defaultAccount",
+				"dmPolicy",
+				"groupPolicy",
+				"streaming"
 			],
 			"type": "object"
 		},
@@ -24270,6 +25943,124 @@ const docTemplate = `{
 			},
 			"required": [
 				"id"
+			],
+			"type": "object"
+		},
+		"dto.AgentWebsiteBindReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				},
+				"websiteId": {
+					"type": "integer"
+				}
+			},
+			"required": [
+				"agentId",
+				"websiteId"
+			],
+			"type": "object"
+		},
+		"dto.AgentWecomConfig": {
+			"properties": {
+				"allowFrom": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"botId": {
+					"type": "string"
+				},
+				"dmPolicy": {
+					"type": "string"
+				},
+				"enabled": {
+					"type": "boolean"
+				},
+				"groupAllowFrom": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"groupPolicy": {
+					"type": "string"
+				},
+				"installed": {
+					"type": "boolean"
+				},
+				"secret": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AgentWecomConfigUpdateReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				},
+				"allowFrom": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"botId": {
+					"type": "string"
+				},
+				"dmPolicy": {
+					"enum": [
+						"pairing",
+						"open",
+						"allowlist",
+						"disabled"
+					],
+					"type": "string"
+				},
+				"enabled": {
+					"type": "boolean"
+				},
+				"groupAllowFrom": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"groupPolicy": {
+					"enum": [
+						"open",
+						"allowlist",
+						"disabled"
+					],
+					"type": "string"
+				},
+				"secret": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"agentId",
+				"botId",
+				"dmPolicy",
+				"groupPolicy",
+				"secret"
+			],
+			"type": "object"
+		},
+		"dto.AgentWeixinLoginReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				},
+				"taskID": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"agentId",
+				"taskID"
 			],
 			"type": "object"
 		},
@@ -24513,6 +26304,9 @@ const docTemplate = `{
 		},
 		"dto.AppstoreConfig": {
 			"properties": {
+				"installAllowPort": {
+					"type": "string"
+				},
 				"uninstallDeleteBackup": {
 					"type": "string"
 				},
@@ -24531,7 +26325,8 @@ const docTemplate = `{
 					"enum": [
 						"UninstallDeleteImage",
 						"UpgradeBackup",
-						"UninstallDeleteBackup"
+						"UninstallDeleteBackup",
+						"InstallAllowPort"
 					],
 					"type": "string"
 				},
@@ -24767,21 +26562,6 @@ const docTemplate = `{
 			"type": "object"
 		},
 		"dto.ChangeGroup": {
-			"properties": {
-				"groupID": {
-					"type": "integer"
-				},
-				"id": {
-					"type": "integer"
-				}
-			},
-			"required": [
-				"groupID",
-				"id"
-			],
-			"type": "object"
-		},
-		"dto.ChangeHostGroup": {
 			"properties": {
 				"groupID": {
 					"type": "integer"
@@ -25072,6 +26852,9 @@ const docTemplate = `{
 		},
 		"dto.CleanTree": {
 			"properties": {
+				"canDelete": {
+					"type": "boolean"
+				},
 				"children": {
 					"items": {
 						"$ref": "#/definitions/dto.CleanTree"
@@ -25192,6 +26975,9 @@ const docTemplate = `{
 				"secret": {
 					"type": "string"
 				},
+				"stopBefore": {
+					"type": "boolean"
+				},
 				"taskID": {
 					"type": "string"
 				},
@@ -25205,7 +26991,9 @@ const docTemplate = `{
 						"postgresql",
 						"mysql-cluster",
 						"postgresql-cluster",
-						"redis-cluster"
+						"redis-cluster",
+						"container",
+						"compose"
 					],
 					"type": "string"
 				}
@@ -25275,7 +27063,9 @@ const docTemplate = `{
 						"postgresql",
 						"mysql-cluster",
 						"postgresql-cluster",
-						"redis-cluster"
+						"redis-cluster",
+						"container",
+						"compose"
 					],
 					"type": "string"
 				}
@@ -26366,6 +28156,9 @@ const docTemplate = `{
 		},
 		"dto.DashboardBase": {
 			"properties": {
+				"agentNumber": {
+					"type": "integer"
+				},
 				"appInstalledNumber": {
 					"type": "integer"
 				},
@@ -27469,165 +29262,12 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
-		"dto.HostConnTest": {
-			"properties": {
-				"addr": {
-					"type": "string"
-				},
-				"authMode": {
-					"enum": [
-						"password",
-						"key"
-					],
-					"type": "string"
-				},
-				"passPhrase": {
-					"type": "string"
-				},
-				"password": {
-					"type": "string"
-				},
-				"port": {
-					"maximum": 65535,
-					"minimum": 1,
-					"type": "integer"
-				},
-				"privateKey": {
-					"type": "string"
-				},
-				"user": {
-					"type": "string"
-				}
-			},
-			"required": [
-				"addr",
-				"port",
-				"user"
-			],
-			"type": "object"
-		},
 		"dto.HostHelper": {
 			"properties": {
 				"host": {
 					"type": "string"
 				},
 				"ip": {
-					"type": "string"
-				}
-			},
-			"type": "object"
-		},
-		"dto.HostInfo": {
-			"properties": {
-				"addr": {
-					"type": "string"
-				},
-				"authMode": {
-					"type": "string"
-				},
-				"createdAt": {
-					"type": "string"
-				},
-				"description": {
-					"type": "string"
-				},
-				"groupBelong": {
-					"type": "string"
-				},
-				"groupID": {
-					"type": "integer"
-				},
-				"id": {
-					"type": "integer"
-				},
-				"name": {
-					"type": "string"
-				},
-				"passPhrase": {
-					"type": "string"
-				},
-				"password": {
-					"type": "string"
-				},
-				"port": {
-					"type": "integer"
-				},
-				"privateKey": {
-					"type": "string"
-				},
-				"rememberPassword": {
-					"type": "boolean"
-				},
-				"user": {
-					"type": "string"
-				}
-			},
-			"type": "object"
-		},
-		"dto.HostOperate": {
-			"properties": {
-				"addr": {
-					"type": "string"
-				},
-				"authMode": {
-					"enum": [
-						"password",
-						"key"
-					],
-					"type": "string"
-				},
-				"description": {
-					"type": "string"
-				},
-				"groupID": {
-					"type": "integer"
-				},
-				"id": {
-					"type": "integer"
-				},
-				"name": {
-					"type": "string"
-				},
-				"passPhrase": {
-					"type": "string"
-				},
-				"password": {
-					"type": "string"
-				},
-				"port": {
-					"maximum": 65535,
-					"minimum": 1,
-					"type": "integer"
-				},
-				"privateKey": {
-					"type": "string"
-				},
-				"rememberPassword": {
-					"type": "boolean"
-				},
-				"user": {
-					"type": "string"
-				}
-			},
-			"required": [
-				"addr",
-				"port",
-				"user"
-			],
-			"type": "object"
-		},
-		"dto.HostTree": {
-			"properties": {
-				"children": {
-					"items": {
-						"$ref": "#/definitions/dto.TreeChild"
-					},
-					"type": "array"
-				},
-				"id": {
-					"type": "integer"
-				},
-				"label": {
 					"type": "string"
 				}
 			},
@@ -28105,17 +29745,13 @@ const docTemplate = `{
 				"code": {
 					"type": "string"
 				},
-				"name": {
-					"type": "string"
-				},
-				"password": {
+				"sessionId": {
 					"type": "string"
 				}
 			},
 			"required": [
 				"code",
-				"name",
-				"password"
+				"sessionId"
 			],
 			"type": "object"
 		},
@@ -29673,11 +31309,26 @@ const docTemplate = `{
 		},
 		"dto.ProviderModelInfo": {
 			"properties": {
+				"contextWindow": {
+					"type": "integer"
+				},
 				"id": {
 					"type": "string"
 				},
+				"input": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"maxTokens": {
+					"type": "integer"
+				},
 				"name": {
 					"type": "string"
+				},
+				"reasoning": {
+					"type": "boolean"
 				}
 			},
 			"type": "object"
@@ -30064,12 +31715,21 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
-		"dto.SSHConf": {
+		"dto.SSHConfUpdate": {
 			"properties": {
-				"file": {
+				"key": {
+					"type": "string"
+				},
+				"path": {
+					"type": "string"
+				},
+				"value": {
 					"type": "string"
 				}
 			},
+			"required": [
+				"key"
+			],
 			"type": "object"
 		},
 		"dto.SSHConnData": {
@@ -30167,9 +31827,6 @@ const docTemplate = `{
 					"type": "string"
 				},
 				"newValue": {
-					"type": "string"
-				},
-				"oldValue": {
 					"type": "string"
 				}
 			},
@@ -30353,14 +32010,6 @@ const docTemplate = `{
 				"pageSize",
 				"type"
 			],
-			"type": "object"
-		},
-		"dto.SearchForTree": {
-			"properties": {
-				"info": {
-					"type": "string"
-				}
-			},
 			"type": "object"
 		},
 		"dto.SearchLgLogWithPage": {
@@ -30931,17 +32580,6 @@ const docTemplate = `{
 			},
 			"type": "object"
 		},
-		"dto.TreeChild": {
-			"properties": {
-				"id": {
-					"type": "integer"
-				},
-				"label": {
-					"type": "string"
-				}
-			},
-			"type": "object"
-		},
 		"dto.UpdateByFile": {
 			"properties": {
 				"file": {
@@ -31056,6 +32694,9 @@ const docTemplate = `{
 		},
 		"dto.UserLoginInfo": {
 			"properties": {
+				"mfaSession": {
+					"type": "string"
+				},
 				"mfaStatus": {
 					"type": "string"
 				},
@@ -32864,6 +34505,14 @@ const docTemplate = `{
 			"required": [
 				"paths"
 			],
+			"type": "object"
+		},
+		"request.FileProcessReq": {
+			"properties": {
+				"key": {
+					"type": "string"
+				}
+			},
 			"type": "object"
 		},
 		"request.FileReadByLineReq": {
@@ -35182,6 +36831,9 @@ const docTemplate = `{
 					"type": "string"
 				},
 				"sni": {
+					"type": "boolean"
+				},
+				"sslVerify": {
 					"type": "boolean"
 				}
 			},
