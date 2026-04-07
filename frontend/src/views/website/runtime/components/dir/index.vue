@@ -16,17 +16,21 @@
         <el-row :gutter="20">
             <el-col :span="18">
                 <el-form-item :label="$t('runtime.runScript')" prop="params.EXEC_SCRIPT">
-                    <el-select v-model="runtime.params['EXEC_SCRIPT']" v-if="runtime.params['CUSTOM_SCRIPT'] == '0'">
+                    <el-select
+                        v-model="runtime.params['EXEC_SCRIPT']"
+                        v-if="runtime.params['CUSTOM_SCRIPT'] == '0'"
+                        popper-class="runtime-script-select-dropdown"
+                    >
                         <el-option
                             v-for="(script, index) in scripts"
                             :key="index"
-                            :label="script.name + ' 【 ' + script.script + ' 】'"
+                            :label="formatScriptLabel(script)"
                             :value="script.name"
                         >
-                            <el-row :gutter="10">
-                                <el-col :span="4">{{ script.name }}</el-col>
-                                <el-col :span="10">{{ ' 【 ' + script.script + ' 】' }}</el-col>
-                            </el-row>
+                            <div class="script-option" :title="formatScriptLabel(script)">
+                                <span class="script-name">{{ script.name }}</span>
+                                <span class="script-command">{{ `【 ${script.script} 】` }}</span>
+                            </div>
                         </el-option>
                     </el-select>
                     <el-input v-else v-model="runtime.params['EXEC_SCRIPT']"></el-input>
@@ -125,6 +129,10 @@ const changeScriptType = () => {
     }
 };
 
+const formatScriptLabel = (script: Runtime.NodeScripts) => {
+    return `${script.name} 【 ${script.script} 】`;
+};
+
 const getScripts = () => {
     GetNodeScripts({ codeDir: runtime.value.codeDir }).then((res) => {
         scripts.value = res.data;
@@ -140,3 +148,38 @@ onMounted(() => {
     }
 });
 </script>
+
+<style lang="scss" scoped>
+.script-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.script-name,
+.script-command {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.script-name {
+    flex: 0 0 72px;
+}
+
+.script-command {
+    flex: 1;
+    min-width: 0;
+}
+
+:deep(.runtime-script-select-dropdown) {
+    max-width: min(720px, calc(100vw - 64px));
+}
+
+:deep(.runtime-script-select-dropdown .el-select-dropdown__item) {
+    overflow: hidden;
+}
+</style>
