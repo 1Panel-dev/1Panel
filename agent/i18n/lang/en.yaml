@@ -62,7 +62,7 @@ ErrAgentIDRequired: 'Agent ID is required'
 ErrAgentAccountIDRequired: 'Account ID is required'
 ErrAgentLimitReached: 'Community Edition supports up to {{ .max }} AI agents. Upgrade to Pro Edition for unlimited agents'
 ErrAgentWebsiteBound: 'This agent is already bound to a website'
-ErrAgentWebsiteTypeUnsupported: 'Only proxy, static, or deployment websites can be bound'
+ErrAgentWebsiteTypeUnsupported: 'Only proxy or static websites can be bound'
 ErrAgentWebsiteInUse: 'This website is already bound to another agent'
 
 #backup
