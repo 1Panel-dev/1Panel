@@ -1,4 +1,4 @@
-import fit2cloudEnLocale from 'fit2cloud-ui-plus/src/locale/lang/ru';
+import { getFuLocaleMessage } from '@/lang/fu';
 
 const message = {
     commons: {
@@ -4474,6 +4474,6 @@ const message = {
 };
 
 export default {
-    ...fit2cloudEnLocale,
+    ...getFuLocaleMessage('ru'),
     ...message,
 };

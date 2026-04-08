@@ -1,4 +1,4 @@
-import fit2cloudTwLocale from 'fit2cloud-ui-plus/src/locale/lang/zh-tw';
+import { getFuLocaleMessage } from '@/lang/fu';
 
 const message = {
     commons: {
@@ -4067,6 +4067,6 @@ const message = {
     },
 };
 export default {
-    ...fit2cloudTwLocale,
+    ...getFuLocaleMessage('zh-Hant'),
     ...message,
 };

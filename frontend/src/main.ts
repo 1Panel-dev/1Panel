@@ -1,4 +1,4 @@
-import { computed, createApp } from 'vue';
+import { createApp } from 'vue';
 import App from './App.vue';
 
 import '@/styles/index.scss';
@@ -17,7 +17,6 @@ import SvgIcon from './components/svg-icon/svg-icon.vue';
 import Components from '@/components';
 
 import ElementPlus from 'element-plus';
-import Fit2CloudPlus from 'fit2cloud-ui-plus';
 import * as Icons from '@element-plus/icons-vue';
 
 import directives from '@/directives/index';
@@ -28,10 +27,8 @@ const bootstrap = async () => {
     await Promise.all([loadLocaleMessages(currentLocale), ensureFallbackLocale()]);
 
     const app = createApp(App);
-    const fit2cloudLocale = computed(() => i18n.global.getLocaleMessage(i18n.global.locale.value));
     app.component('SvgIcon', SvgIcon);
     app.use(ElementPlus);
-    app.use(Fit2CloudPlus, { locale: fit2cloudLocale });
 
     Object.keys(Icons).forEach((key) => {
         app.component(key, Icons[key as keyof typeof Icons]);

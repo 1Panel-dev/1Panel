@@ -1,4 +1,4 @@
-import fit2cloudPtBrLocale from 'fit2cloud-ui-plus/src/locale/lang/pt-br';
+import { getFuLocaleMessage } from '@/lang/fu';
 
 const message = {
     commons: {
@@ -4617,6 +4617,6 @@ const message = {
 };
 
 export default {
-    ...fit2cloudPtBrLocale,
+    ...getFuLocaleMessage('pt-BR'),
     ...message,
 };
