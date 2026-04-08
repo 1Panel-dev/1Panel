@@ -20,8 +20,10 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
+	"github.com/1Panel-dev/1Panel/agent/utils/docker"
 	terminalai "github.com/1Panel-dev/1Panel/agent/utils/terminal/ai"
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
+	"github.com/docker/docker/api/types/container"
 	"gorm.io/gorm"
 )
 
@@ -284,8 +286,14 @@ func (a AgentService) Page(req dto.SearchWithPage) (int64, []dto.AgentItem, erro
 		return 0, nil, err
 	}
 	items := make([]dto.AgentItem, 0, len(list))
+	appInstalls := make([]model.AppInstall, 0, len(list))
 	for _, item := range list {
 		appInstall, _ := appInstallRepo.GetFirst(repo.WithByID(item.AppInstallID))
+		appInstalls = append(appInstalls, appInstall)
+	}
+	syncAgentAppInstalls(appInstalls)
+	for index, item := range list {
+		appInstall := appInstalls[index]
 		envMap := readInstallEnv(appInstall.Env)
 		agentItem := buildAgentItem(&item, &appInstall, envMap)
 		agentItem.Upgradable = checkAgentUpgradable(appInstall)
@@ -348,6 +356,32 @@ func (a AgentService) deleteCheckByAgent(agent *model.Agent) ([]dto.AppResource,
 		return nil, err
 	}
 	return []dto.AppResource{{Type: "website", Name: websiteName}}, nil
+}
+
+func syncAgentAppInstalls(appInstalls []model.AppInstall) {
+	if len(appInstalls) == 0 {
+		return
+	}
+
+	var containersMap map[string]container.Summary
+	cli, err := docker.NewClient()
+	if err == nil {
+		defer cli.Close()
+		containers, err := cli.ListAllContainers()
+		if err == nil {
+			containersMap = make(map[string]container.Summary, len(containers))
+			for _, contain := range containers {
+				containersMap[contain.Names[0]] = contain
+			}
+		}
+	}
+
+	for index := range appInstalls {
+		if appInstalls[index].ID == 0 || doNotNeedSync(appInstalls[index]) {
+			continue
+		}
+		synAppInstall(containersMap, &appInstalls[index], false)
+	}
 }
 
 func (a AgentService) ResetToken(req dto.AgentTokenResetReq) error {

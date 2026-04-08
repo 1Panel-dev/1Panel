@@ -853,6 +853,10 @@ func syncAppInstallStatus(appInstall *model.AppInstall, force bool) error {
 	return nil
 }
 
+func SyncAppInstallStatus(appInstall *model.AppInstall, force bool) error {
+	return syncAppInstallStatus(appInstall, force)
+}
+
 func updateInstallInfoInDB(appKey, appName, param string, value interface{}) error {
 	if param != "password" && param != "port" && param != "user-password" {
 		return nil

@@ -62,7 +62,7 @@ ErrAgentIDRequired: "智能体 ID 不能为空"
 ErrAgentAccountIDRequired: "账号 ID 不能为空"
 ErrAgentLimitReached: "社区版最多支持创建 {{ .max }} 个智能体，升级至专业版无数量限制"
 ErrAgentWebsiteBound: "该智能体已关联网站"
-ErrAgentWebsiteTypeUnsupported: "只能关联反向代理、静态网站或一键部署网站"
+ErrAgentWebsiteTypeUnsupported: "只能关联反向代理或静态网站"
 ErrAgentWebsiteInUse: "该网站已被其他智能体关联"
 
 #backup
