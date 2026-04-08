@@ -3872,7 +3872,7 @@ const message = {
             uriHelper: 'Anda boleh menggunakan /test/* atau /*/index.php untuk mengecualikan Uri',
         },
         tamper: {
-            tamper: 'Perlindungan daripada peng篡改 laman web',
+            tamper: 'Perlindungan laman web',
             ignoreTemplate: 'Templat Pengecualian',
             protectTemplate: 'Templat Perlindungan',
             ignoreTemplateHelper:

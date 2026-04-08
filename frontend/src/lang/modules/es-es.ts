@@ -3828,7 +3828,7 @@ const message = {
             uriHelper: 'Puedes usar /test/* o /*/index.php para excluir URIs',
         },
         tamper: {
-            tamper: 'Protección contra manipulación web',
+            tamper: 'Anti-manipulación web',
             ignoreTemplate: 'Plantilla de Exclusión',
             protectTemplate: 'Plantilla de Protección',
             ignoreTemplateHelper:
