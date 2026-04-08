@@ -315,5 +315,5 @@ export const installAgentSkill = (req: AI.AgentSkillInstallReq) => {
 };
 
 export const approveAgentChannelPairing = (req: AI.AgentChannelPairingApproveReq) => {
-    return http.post(`/ai/agents/channel/pairing/approve`, req);
+    return http.post(`/ai/agents/channel/pairing/approve`, req, TimeoutEnum.T_60S);
 };

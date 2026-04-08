@@ -80,6 +80,7 @@
                 :bots="form.bots"
                 :fields="botFields"
                 :create-bot="createBot"
+                :show-name-field="false"
                 summary-label="Client ID"
                 :summary-formatter="getBotSummary"
                 :add-disabled="!installed"

@@ -10,7 +10,7 @@
             <el-table-column :label="t('commons.table.name')" min-width="140">
                 <template #default="{ row }">
                     <div class="channel-bots__name">
-                        <span>{{ row.name }}</span>
+                        <span>{{ row.name || row.accountId }}</span>
                         <el-tag v-if="row.isDefault" type="success" size="small">
                             {{ t('commons.table.default') }}
                         </el-tag>
@@ -76,7 +76,7 @@
 
         <DialogPro v-model="dialogVisible" :title="dialogTitle">
             <el-form ref="formRef" :model="form" :rules="rules" label-position="top">
-                <el-form-item :label="t('commons.table.name')" prop="name">
+                <el-form-item v-if="showNameField" :label="t('commons.table.name')" prop="name">
                     <el-input v-model="form.name" :disabled="disabled" />
                 </el-form-item>
                 <el-form-item :label="t('aiTools.agents.accountId')" prop="accountId">
@@ -201,6 +201,10 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    showNameField: {
+        type: Boolean,
+        default: true,
+    },
     undeletableAccountIds: {
         type: Array as PropType<string[]>,
         default: () => [],
@@ -230,7 +234,6 @@ const dialogTitle = computed(() => (editIndex.value >= 0 ? t('commons.button.edi
 
 const rules = computed<FormRules>(() => {
     const config: FormRules = {
-        name: [Rules.requiredInput],
         accountId: [
             Rules.appName,
             {
@@ -248,6 +251,9 @@ const rules = computed<FormRules>(() => {
             },
         ],
     };
+    if (props.showNameField) {
+        config.name = [Rules.requiredInput];
+    }
     for (const field of props.fields) {
         if (!field.required) {
             continue;
@@ -296,13 +302,17 @@ const saveBot = async () => {
     }
     await formRef.value.validate();
     const nextBots = props.bots.map((bot) => ({ ...bot }));
+    const nextBot = { ...form };
+    if (!props.showNameField) {
+        nextBot.name = nextBot.accountId;
+    }
     if (editIndex.value >= 0) {
-        nextBots.splice(editIndex.value, 1, { ...form });
+        nextBots.splice(editIndex.value, 1, nextBot);
     } else {
         if (props.defaultable && nextBots.every((bot) => !bot.isDefault)) {
-            form.isDefault = true;
+            nextBot.isDefault = true;
         }
-        nextBots.push({ ...form });
+        nextBots.push(nextBot);
     }
     emitBots(nextBots);
     dialogVisible.value = false;
