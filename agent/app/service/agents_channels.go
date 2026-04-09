@@ -852,7 +852,7 @@ func extractDingTalkConfig(conf map[string]interface{}) dto.AgentDingTalkConfig 
 		bots = append(bots, dto.AgentDingTalkBot{
 			AgentChannelBotBase: dto.AgentChannelBotBase{
 				AccountID: accountID,
-				Name:      extractDisplayName(account, accountID, accountID),
+				Name:      accountID,
 				Enabled:   extractBoolValue(account["enabled"], true),
 			},
 			ClientID:     extractStringValue(account["clientId"]),
@@ -896,12 +896,12 @@ func setDingTalkConfig(conf map[string]interface{}, config dto.AgentDingTalkConf
 	dingtalk["enabled"] = effectiveEnabled
 	dingtalk["dmPolicy"] = config.DmPolicy
 	dingtalk["groupPolicy"] = config.GroupPolicy
-	dingtalk["gatewayToken"] = extractGatewayToken(conf)
 	dingtalk["separateSessionByConversation"] = config.SeparateSessionByConversation
 	dingtalk["groupSessionScope"] = config.GroupSessionScope
 	dingtalk["sharedMemoryAcrossConversations"] = config.SharedMemoryAcrossConversations
 	dingtalk["asyncMode"] = config.AsyncMode
 	dingtalk["ackText"] = config.AckText
+	delete(dingtalk, "gatewayToken")
 	switch config.DmPolicy {
 	case "open":
 		dingtalk["allowFrom"] = []string{"*"}
@@ -922,7 +922,6 @@ func setDingTalkConfig(conf map[string]interface{}, config dto.AgentDingTalkConf
 	for _, bot := range config.Bots {
 		accounts[bot.AccountID] = map[string]interface{}{
 			"enabled":      bot.Enabled,
-			"name":         bot.Name,
 			"clientId":     bot.ClientID,
 			"clientSecret": bot.ClientSecret,
 		}

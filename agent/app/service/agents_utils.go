@@ -1498,19 +1498,6 @@ func extractStringList(value interface{}) []string {
 	}
 }
 
-func extractGatewayToken(conf map[string]interface{}) string {
-	gateway, ok := conf["gateway"].(map[string]interface{})
-	if !ok {
-		return ""
-	}
-	auth, ok := gateway["auth"].(map[string]interface{})
-	if !ok {
-		return ""
-	}
-	token, _ := auth["token"].(string)
-	return token
-}
-
 func ensureChildMap(parent map[string]interface{}, key string) map[string]interface{} {
 	if child, ok := parent[key].(map[string]interface{}); ok {
 		return child
