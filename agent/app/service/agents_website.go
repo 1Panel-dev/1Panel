@@ -180,7 +180,7 @@ func uniqueUintList(items []uint) []uint {
 }
 
 func isBindableAgentWebsiteType(websiteType string) bool {
-	return websiteType == constant.Proxy || websiteType == constant.Deployment || websiteType == constant.Static
+	return websiteType == constant.Proxy || websiteType == constant.Static
 }
 
 func bindDeploymentWebsiteToAgentByAppInstall(website *model.Website) error {
