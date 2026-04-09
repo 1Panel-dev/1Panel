@@ -11,7 +11,8 @@ router.beforeEach((to, from, next) => {
     NProgress.start();
     axiosCanceler.removeAllPending();
     const globalStore = GlobalStore();
-    if (to.name !== 'entrance' && !globalStore.isLogin) {
+    const isPublicRoute = to.name === 'entrance' || to.matched.some((record) => record.meta.requiresAuth === false);
+    if (!isPublicRoute && !globalStore.isLogin) {
         next({
             name: 'entrance',
             params: to.params,

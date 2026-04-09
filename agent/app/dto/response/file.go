@@ -86,6 +86,22 @@ type FileRemarksRes struct {
 	Remarks map[string]string `json:"remarks"`
 }
 
+type FileShareInfo struct {
+	Code        string `json:"code"`
+	Path        string `json:"path"`
+	FileName    string `json:"fileName"`
+	ExpiresAt   int64  `json:"expiresAt"`
+	Permanent   bool   `json:"permanent"`
+	HasPassword bool   `json:"hasPassword"`
+}
+
+type FileSharePublicInfo struct {
+	FileName    string `json:"fileName"`
+	ExpiresAt   int64  `json:"expiresAt"`
+	Permanent   bool   `json:"permanent"`
+	HasPassword bool   `json:"hasPassword"`
+}
+
 type FileAIContentHit struct {
 	Path string `json:"path"`
 	Line int    `json:"line"`

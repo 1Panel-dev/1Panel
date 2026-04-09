@@ -65,7 +65,7 @@
             @click.stop
         >
             <li
-                v-for="(btn, index) in rightButtons"
+                v-for="(btn, index) in visibleRightButtons"
                 :key="index"
                 :class="[{ disabled: disabled(btn) }, { divided: btn.divided }]"
                 @click="!disabled(btn) && rightButtonClick(btn)"
@@ -146,6 +146,20 @@ const disabled = computed(() => {
     return function (btn: any) {
         return typeof btn.disabled === 'function' ? btn.disabled(rightClick.value.currentRow) : btn.disabled;
     };
+});
+const visibleRightButtons = computed(() => {
+    if (!props.rightButtons) {
+        return [];
+    }
+    return props.rightButtons.filter((btn: any) => {
+        if (typeof btn.show === 'function') {
+            return btn.show(rightClick.value.currentRow);
+        }
+        if (typeof btn.show === 'boolean') {
+            return btn.show;
+        }
+        return true;
+    });
 });
 function rightButtonClick(btn: any) {
     closeRightClick();

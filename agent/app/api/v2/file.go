@@ -25,6 +25,7 @@ import (
 	websocket2 "github.com/1Panel-dev/1Panel/agent/utils/websocket"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
+	qrcode "github.com/skip2/go-qrcode"
 )
 
 // @Tags File
@@ -1059,4 +1060,245 @@ func (b *BaseApi) SetFileRemark(c *gin.Context) {
 		return
 	}
 	helper.Success(c)
+}
+
+// @Tags File
+// @Summary List file shares
+// @Accept json
+// @Param request body dto.PageInfo true "request"
+// @Success 200 {object} dto.PageResult
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /files/share/search [post]
+func (b *BaseApi) SearchFileShare(c *gin.Context) {
+	var req dto.PageInfo
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	total, list, err := fileShareService.Page(req)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, dto.PageResult{
+		Total: total,
+		Items: list,
+	})
+}
+
+// @Tags File
+// @Summary Get file share detail by path
+// @Accept json
+// @Param request body dto.FilePath true "request"
+// @Success 200 {object} response.FileShareInfo
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /files/share/detail [post]
+func (b *BaseApi) GetFileShareDetail(c *gin.Context) {
+	var req dto.FilePath
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	info, err := fileShareService.GetByPath(req.Path)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, info)
+}
+
+// @Tags File
+// @Summary Get file share detail by code (no login)
+// @Param code query string true "share code"
+// @Success 200 {object} response.FileSharePublicInfo
+// @Router /files/share/info [get]
+func (b *BaseApi) GetPublicFileShareInfo(c *gin.Context) {
+	code := strings.TrimSpace(c.Query("code"))
+	if code == "" {
+		helper.BadRequest(c, errors.New("code is required"))
+		return
+	}
+	info, err := fileShareService.GetPublicByCode(code)
+	if err != nil {
+		if be, ok := err.(buserr.BusinessError); ok {
+			helper.ErrorWithDetail(c, http.StatusBadRequest, be.Msg, be)
+			return
+		}
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, info)
+}
+
+func buildSharePublicURL(c *gin.Context, code, operateNode string) string {
+	scheme := strings.TrimSpace(c.GetHeader("X-Forwarded-Proto"))
+	if scheme == "" {
+		if c.Request.TLS != nil {
+			scheme = "https"
+		} else {
+			scheme = "http"
+		}
+	}
+	host := strings.TrimSpace(c.GetHeader("X-Forwarded-Host"))
+	if host == "" {
+		host = c.Request.Host
+	}
+	shareURL := url.URL{
+		Scheme: scheme,
+		Host:   host,
+		Path:   "/s/" + url.PathEscape(code),
+	}
+	query := shareURL.Query()
+	if strings.TrimSpace(operateNode) != "" {
+		query.Set("operateNode", operateNode)
+	}
+	shareURL.RawQuery = query.Encode()
+	return shareURL.String()
+}
+
+// @Tags File
+// @Summary Get file share QR code image
+// @Produce png
+// @Param code query string true "share code"
+// @Param operateNode query string false "operate node"
+// @Success 200 {file} file
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /files/share/qrcode [get]
+func (b *BaseApi) GetFileShareQRCode(c *gin.Context) {
+	code := strings.TrimSpace(c.Query("code"))
+	if code == "" {
+		helper.BadRequest(c, errors.New("code is required"))
+		return
+	}
+	if _, err := fileShareService.GetByCode(code); err != nil {
+		if be, ok := err.(buserr.BusinessError); ok {
+			helper.ErrorWithDetail(c, http.StatusBadRequest, be.Msg, be)
+			return
+		}
+		helper.InternalServer(c, err)
+		return
+	}
+
+	png, err := qrcode.Encode(buildSharePublicURL(c, code, c.Query("operateNode")), qrcode.Medium, 256)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	c.Header("Cache-Control", "private, max-age=300")
+	c.Data(http.StatusOK, "image/png", png)
+}
+
+// @Tags File
+// @Summary Create temporary file share link
+// @Accept json
+// @Param request body request.FileShareCreate true "request"
+// @Success 200 {object} response.FileShareInfo
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /files/share/create [post]
+// @x-panel-log {"bodyKeys":["path","expireMinutes"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"创建文件分享 [path]","formatEN":"Create file share [path]"}
+func (b *BaseApi) CreateFileShare(c *gin.Context) {
+	var req request.FileShareCreate
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	res, err := fileShareService.Create(req)
+	if err != nil {
+		if be, ok := err.(buserr.BusinessError); ok {
+			helper.ErrorWithDetail(c, http.StatusInternalServerError, be.Msg, be.Err)
+			return
+		}
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, res)
+}
+
+// @Tags File
+// @Summary Delete file share by path
+// @Accept json
+// @Param request body dto.FilePath true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /files/share/del [post]
+// @x-panel-log {"bodyKeys":["path"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"关闭文件分享 [path]","formatEN":"Close file share [path]"}
+func (b *BaseApi) DeleteFileShare(c *gin.Context) {
+	var req dto.FilePath
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := fileShareService.DeleteByPath(req.Path); err != nil {
+		if be, ok := err.(buserr.BusinessError); ok {
+			helper.ErrorWithDetail(c, http.StatusInternalServerError, be.Msg, be.Err)
+			return
+		}
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags File
+// @Summary Check file share code (no login)
+// @Param code query string true "share code"
+// @Param password query string false "optional password"
+// @Success 200 {object} dto.Response
+// @Router /files/share/check [get]
+func (b *BaseApi) CheckFileShare(c *gin.Context) {
+	code := strings.TrimSpace(c.Query("code"))
+	password := c.Query("password")
+	if code == "" {
+		helper.BadRequest(c, errors.New("code is required"))
+		return
+	}
+	if err := fileShareService.Check(code, password); err != nil {
+		if be, ok := err.(buserr.BusinessError); ok {
+			helper.ErrorWithDetail(c, http.StatusBadRequest, be.Msg, be)
+			return
+		}
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags File
+// @Summary Download file by share code (no login)
+// @Produce octet-stream
+// @Param code query string true "share code"
+// @Param password query string false "optional password"
+// @Success 200 {file} file
+// @Router /files/share/download [get]
+func (b *BaseApi) DownloadFileShare(c *gin.Context) {
+	code := strings.TrimSpace(c.Query("code"))
+	password := c.Query("password")
+	if code == "" {
+		helper.BadRequest(c, errors.New("code is required"))
+		return
+	}
+	filePath, displayName, err := fileShareService.PrepareDownload(code, password)
+	if err != nil {
+		if be, ok := err.(buserr.BusinessError); ok {
+			helper.ErrorWithDetail(c, http.StatusBadRequest, be.Msg, be)
+			return
+		}
+		helper.InternalServer(c, err)
+		return
+	}
+	file, err := os.Open(filePath)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	defer file.Close()
+	info, err := file.Stat()
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	c.Header("Content-Length", strconv.FormatInt(info.Size(), 10))
+	c.Header("Content-Disposition", "attachment; filename*=utf-8''"+url.PathEscape(displayName))
+	http.ServeContent(c.Writer, c.Request, displayName, info.ModTime(), file)
 }

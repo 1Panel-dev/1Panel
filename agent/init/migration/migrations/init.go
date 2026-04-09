@@ -51,6 +51,7 @@ var AddTable = &gormigrate.Migration{
 			&model.DatabaseMysql{},
 			&model.DatabasePostgresql{},
 			&model.Favorite{},
+			&model.FileShare{},
 			&model.Firewall{},
 			&model.Host{},
 			&model.Ftp{},
@@ -1215,5 +1216,12 @@ var AddFileManageAISettings = &gormigrate.Migration{
 			}
 		}
 		return nil
+	},
+}
+
+var AddFileShareTable = &gormigrate.Migration{
+	ID: "20260407-add-file-share-table",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(&model.FileShare{})
 	},
 }

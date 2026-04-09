@@ -49,7 +49,8 @@ var (
 	runtimeRepo       = repo.NewIRunTimeRepo()
 	phpExtensionsRepo = repo.NewIPHPExtensionsRepo()
 
-	favoriteRepo = repo.NewIFavoriteRepo()
+	favoriteRepo  = repo.NewIFavoriteRepo()
+	fileShareRepo = repo.NewIFileShareRepo()
 
 	taskRepo = repo.NewITaskRepo()
 

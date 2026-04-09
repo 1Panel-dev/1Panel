@@ -114,6 +114,30 @@ export const downloadFile = (params: File.FileDownload) => {
     return http.download<BlobPart>('files/download', params, { responseType: 'blob', timeout: TimeoutEnum.T_40S });
 };
 
+export const createFileShare = (params: File.FileShareCreate) => {
+    return http.post<File.FileShareInfo>('files/share/create', params);
+};
+
+export const searchFileShare = (params: ReqPage) => {
+    return http.post<ResPage<File.FileShareInfo>>('files/share/search', params);
+};
+
+export const getFileShareDetail = (path: string) => {
+    return http.post<File.FileShareInfo | null>('files/share/detail', { path });
+};
+
+export const removeFileShare = (path: string) => {
+    return http.post<any>('files/share/del', { path });
+};
+
+export const getPublicFileShareInfo = (code: string, operateNode: string) => {
+    return http.get<File.FileSharePublicInfo>('files/share/info', { code, operateNode });
+};
+
+export const checkFileShare = (params: File.FileShareCheck) => {
+    return http.get('files/share/check', params);
+};
+
 export const computeDirSize = (params: File.DirSizeReq) => {
     return http.post<File.DirSizeRes>('files/size', params, TimeoutEnum.T_5M);
 };

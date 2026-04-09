@@ -6,6 +6,20 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "14679640",
+      "name": "qrcode",
+      "font_class": "qrcode",
+      "unicode": "e72a",
+      "unicode_decimal": 59178
+    },
+    {
+      "icon_id": "39643896",
+      "name": "qrcode",
+      "font_class": "qrcode-line",
+      "unicode": "e669",
+      "unicode_decimal": 58985
+    },
+    {
       "icon_id": "9783460",
       "name": "概览",
       "font_class": "gailan1",

@@ -43,7 +43,7 @@ func Proxy() gin.HandlerFunc {
 
 		apiReq := c.GetBool("API_AUTH")
 
-		if !apiReq && strings.HasPrefix(c.Request.URL.Path, "/api/v2/") && !isLocalAPI(c.Request.URL.Path) && !checkSession(c) {
+		if !apiReq && strings.HasPrefix(c.Request.URL.Path, "/api/v2/") && !isLocalAPI(c.Request.URL.Path) && !isPublicFileShareAPI(c.Request.URL.Path) && !checkSession(c) {
 			data, _ := res.ErrorMsg.ReadFile("html/401.html")
 			c.Data(401, "text/html; charset=utf-8", data)
 			c.Abort()
@@ -89,4 +89,8 @@ func checkSession(c *gin.Context) bool {
 
 func isLocalAPI(urlPath string) bool {
 	return urlPath == "/api/v2/core/xpack/sync/ssl"
+}
+
+func isPublicFileShareAPI(urlPath string) bool {
+	return urlPath == "/api/v2/files/share/download" || urlPath == "/api/v2/files/share/check" || urlPath == "/api/v2/files/share/info"
 }

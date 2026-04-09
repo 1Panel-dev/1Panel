@@ -45,6 +45,7 @@ type FileInfo struct {
 	Items      []*FileInfo `json:"items"`
 	ItemTotal  int         `json:"itemTotal"`
 	FavoriteID uint        `json:"favoriteID"`
+	ShareCode  string      `json:"shareCode"`
 	IsDetail   bool        `json:"isDetail"`
 }
 

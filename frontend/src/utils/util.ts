@@ -607,10 +607,44 @@ export function toLowerCase(str: string) {
     return str.toLowerCase();
 }
 
+export function buildFileDownloadUrl(filePath: string, currentNode: string): string {
+    const base = `${import.meta.env.VITE_API_URL as string}/files/download?operateNode=${currentNode}&`;
+    return base + 'path=' + encodeURIComponent(filePath);
+}
+
+export function buildFileSharePageUrl(code: string, currentNode: string): string {
+    const shareUrl = new URL(`/s/${encodeURIComponent(code)}`, window.location.origin);
+    shareUrl.searchParams.set('operateNode', currentNode);
+    return shareUrl.toString();
+}
+
+export function buildFileShareDownloadUrl(code: string, currentNode: string, password?: string): string {
+    const apiBase = import.meta.env.VITE_API_URL as string;
+    const normalizedBase = apiBase.replace(/\/$/, '');
+    const shareUrl = /^https?:\/\//i.test(normalizedBase)
+        ? new URL(`${normalizedBase}/files/share/download`)
+        : new URL(`${normalizedBase}/files/share/download`, window.location.origin);
+    shareUrl.searchParams.set('operateNode', currentNode);
+    shareUrl.searchParams.set('code', code);
+    if (password && password.length > 0) {
+        shareUrl.searchParams.set('password', password);
+    }
+    return shareUrl.toString();
+}
+
+export function buildFileShareQrCodeUrl(code: string, currentNode: string): string {
+    const apiBase = import.meta.env.VITE_API_URL as string;
+    const normalizedBase = apiBase.replace(/\/$/, '');
+    const shareUrl = /^https?:\/\//i.test(normalizedBase)
+        ? new URL(`${normalizedBase}/files/share/qrcode`)
+        : new URL(`${normalizedBase}/files/share/qrcode`, window.location.origin);
+    shareUrl.searchParams.set('operateNode', currentNode);
+    shareUrl.searchParams.set('code', code);
+    return shareUrl.toString();
+}
+
 export function downloadFile(filePath: string, currentNode: string) {
-    let url = `${import.meta.env.VITE_API_URL as string}/files/download?operateNode=${currentNode}&`;
-    let path = encodeURIComponent(filePath);
-    window.open(url + 'path=' + path, '_blank');
+    window.open(buildFileDownloadUrl(filePath, currentNode), '_blank');
 }
 
 export function downloadWithContent(content: string, fileName: string) {
