@@ -76,27 +76,27 @@ func (s *mfaSessionStore) Delete(sessionID string) {
 	delete(s.items, sessionID)
 }
 
-func (s *mfaSessionStore) RecordFailure(sessionID string) bool {
+func (s *mfaSessionStore) RecordFailure(sessionID string) int {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	item, ok := s.items[sessionID]
 	if !ok {
-		return false
+		return 0
 	}
 	if time.Now().After(item.ExpiresAt) {
 		delete(s.items, sessionID)
-		return false
+		return 0
 	}
 
 	item.Failures++
 	if item.Failures >= MFASessionMaxFailures {
 		delete(s.items, sessionID)
-		return false
+		return item.Failures
 	}
 
 	s.items[sessionID] = item
-	return true
+	return item.Failures
 }
 
 func (s *mfaSessionStore) cleanupExpiredLocked() {

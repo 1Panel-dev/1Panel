@@ -12,6 +12,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/buserr"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
+	initauth "github.com/1Panel-dev/1Panel/core/init/auth"
 	"github.com/1Panel-dev/1Panel/core/utils/captcha"
 	"github.com/1Panel-dev/1Panel/core/utils/common"
 	"github.com/gin-gonic/gin"
@@ -109,6 +110,12 @@ func (b *BaseApi) MFALogin(c *gin.Context) {
 	go saveLoginLogs(c, wrapLoginErr(msgKey, err))
 	if msgKey == "ErrMFA" {
 		global.IPTracker.RecordFailure(ip)
+		failures := initauth.GetMFASessionStore().RecordFailure(req.SessionID)
+		if failures >= initauth.MFASessionMaxFailures {
+			global.IPTracker.SetNeedCaptcha(ip)
+			helper.BadAuth(c, "ErrCaptchaCode", nil)
+			return
+		}
 		helper.BadAuth(c, msgKey, err)
 		return
 	}

@@ -437,6 +437,7 @@ const login = (formEl: FormInstance | undefined) => {
                 mfaLoginForm.code = '';
                 mfaShow.value = true;
                 errMfaInfo.value = false;
+                errCaptcha.value = false;
                 nextTick(() => {
                     mfaLoginRef.value?.focus();
                 });
@@ -485,6 +486,7 @@ const mfaLogin = async (auto: boolean) => {
     if ((!auto && mfaLoginForm.code) || (auto && mfaLoginForm.code.length === 6)) {
         isLoggingIn = true;
         try {
+            errMfaInfo.value = false;
             await mfaLoginApi(mfaLoginForm);
             globalStore.setLogStatus(true);
             menuStore.setMenuList([]);
@@ -498,7 +500,15 @@ const mfaLogin = async (auto: boolean) => {
             document.onkeydown = null;
         } catch (res) {
             if (res.code === 401) {
-                if (res.message === 'ErrMFA') {
+                if (res.message === 'ErrCaptchaCode') {
+                    globalStore.ignoreCaptcha = false;
+                    mfaLoginForm.code = '';
+                    mfaShow.value = false;
+                    loginVerify();
+                    nextTick(() => {
+                        userNameRef.value?.focus();
+                    });
+                } else if (res.message === 'ErrMFA') {
                     errMfaInfo.value = true;
                 } else if (res.message) {
                     MsgError(res.message);
@@ -506,6 +516,7 @@ const mfaLogin = async (auto: boolean) => {
                 isLoggingIn = false;
                 return;
             }
+            loginVerify();
         } finally {
             isLoggingIn = false;
         }
