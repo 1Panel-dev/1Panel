@@ -247,7 +247,7 @@ const onSave = async (formEl: FormInstance | undefined) => {
         await formEl.validate(async (valid) => {
             if (!valid) return;
             form.themeColor = { light: form.light, dark: form.dark, themePredefineColors: themeColors.value };
-            if (globalStore.isMasterProductPro) {
+            if (globalStore.isXpackOrEE()) {
                 await updateXpackSettingByKey('ThemeColor', JSON.stringify(form.themeColor));
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 globalStore.themeConfig.themeColor = JSON.stringify(form.themeColor);
@@ -275,7 +275,7 @@ const onReSet = async () => {
         type: 'info',
     }).then(async () => {
         form.themeColor = { light: '#005eeb', dark: '#F0BE96', themePredefineColors: themeColors.value };
-        if (globalStore.isMasterProductPro) {
+        if (globalStore.isXpackOrEE()) {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultColors));
             themeColors.value = { ...defaultColors };
             darkColors = [...defaultDarkColors];

@@ -25,6 +25,12 @@
                 </div>
             </template>
             <div class="dropdown-menu" v-loading="loading">
+                <div class="dropdown-item" v-if="currentUser" @click="changeUserInfo">
+                    <SvgIcon class="icon" iconName="p-gerenzhongxin1" />
+                    {{ currentUser.name }}
+                </div>
+                <el-divider class="divider" />
+
                 <div class="dropdown-item" @click="openTask">
                     <div class="node">
                         <SvgIcon class="icon" iconName="p-renwuzhongxin1" />
@@ -33,16 +39,14 @@
                     <el-tag class="msg-tag" v-if="taskCount !== 0" size="small" round>{{ taskCount }}</el-tag>
                 </div>
                 <el-divider v-if="showNodes()" class="divider" />
-                <div class="dropdown-item" @click="openNodeDashboard" v-if="isMasterPro">
-                    <div class="node">
-                        <SvgIcon class="icon" iconName="p-gailan1" />
-                        {{ $t('xpack.node.multiOverview') }}
-                    </div>
+                <div class="dropdown-item" @click="openNodeDashboard" v-if="isXpackOrEE">
+                    <SvgIcon class="icon" iconName="p-gailan1" />
+                    {{ $t('xpack.node.multiOverview') }}
                 </div>
-                <el-divider v-if="isMasterPro" class="divider" />
+                <el-divider v-if="isXpackOrEE" class="divider" />
 
                 <div v-if="showNodes()">
-                    <el-scrollbar :max-height="isMasterPro ? '257px' : '218px'" :noresize="true">
+                    <el-scrollbar max-height="168px" :noresize="true">
                         <div
                             class="dropdown-item"
                             @click="changeNode(item.name)"
@@ -52,9 +56,7 @@
                         >
                             <div class="node">
                                 <SvgIcon class="icon" iconName="p-zhuji" />
-                                <span class="node-name">
-                                    {{ item.name === 'local' ? globalStore.getMasterAlias() : item.name }}
-                                </span>
+                                {{ item.name === 'local' ? globalStore.getMasterAlias() : item.name }}
                                 <el-tooltip
                                     v-if="item.status !== 'Healthy' || !item.isBound"
                                     :content="
@@ -86,6 +88,30 @@
                 </div>
             </div>
         </el-popover>
+        <DrawerPro v-model="open" :title="$t('xpack.user.userInfo')">
+            <el-form ref="userRef" label-position="top" :model="userForm" :rules="userRules" v-loading="loading">
+                <el-form-item :label="$t('commons.login.username')" prop="name">
+                    <el-tag type="primary">{{ userForm.name }}</el-tag>
+                </el-form-item>
+                <el-form-item :label="$t('setting.oldPassword')" prop="oldPassword">
+                    <el-input type="password" show-password clearable v-model.trim="userForm.oldPassword" />
+                </el-form-item>
+                <el-form-item :label="$t('setting.newPassword')" prop="newPassword">
+                    <el-input type="password" show-password clearable v-model.trim="userForm.newPassword" />
+                </el-form-item>
+                <el-form-item :label="$t('setting.retryPassword')" prop="retryPassword">
+                    <el-input type="password" show-password clearable v-model.trim="userForm.retryPassword" />
+                </el-form-item>
+            </el-form>
+            <template #footer>
+                <el-button :disabled="loading" @click="open = false">
+                    {{ $t('commons.button.cancel') }}
+                </el-button>
+                <el-button :disabled="loading" type="primary" @click="onSubmit(userRef)">
+                    {{ $t('commons.button.confirm') }}
+                </el-button>
+            </template>
+        </DrawerPro>
     </div>
 </template>
 
@@ -94,16 +120,19 @@ import { GlobalStore, MenuStore } from '@/store';
 import { countExecutingTask } from '@/api/modules/log';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
-import { getAgentSettingInfo, listNodeOptions } from '@/api/modules/setting';
-import { ref, watch } from 'vue';
+import { getAgentSettingInfo } from '@/api/modules/setting';
+import { ref } from 'vue';
 import bus from '@/global/bus';
-import { logOutApi } from '@/api/modules/auth';
+import { getAuthInfo, logOutApi, updateAuthInfo } from '@/api/modules/auth';
 import router from '@/routers';
 import { loadProductProFromDB } from '@/utils/xpack';
 import { routerToNameWithQuery } from '@/utils/router';
-import { setDefaultNodeInfo } from '@/utils/node';
+import { changeToLocal, listNodes, setDefaultNodeInfo } from '@/utils/node';
+import { Login } from '@/api/interface/auth';
+import { Rules } from '@/global/form-rules';
 
 const filter = ref();
+const currentUser = ref<Login.AuthInfo>();
 const globalStore = GlobalStore();
 const menuStore = MenuStore();
 const nodes = ref([]);
@@ -112,15 +141,31 @@ const loading = ref();
 const props = defineProps({
     version: String,
 });
-const isMasterPro = computed(() => {
-    return globalStore.isMasterPro();
+const isXpackOrEE = computed(() => {
+    return globalStore.isXpackOrEE();
 });
-watch(
-    () => globalStore.isMasterPro(),
-    () => {
-        loadNodes();
-    },
-);
+
+const open = ref(false);
+const userRef = ref();
+const userForm = reactive({
+    id: 0,
+    name: '',
+    oldPassword: '',
+    newPassword: '',
+    retryPassword: '',
+});
+const userRules = reactive({
+    oldPassword: [Rules.requiredInput, Rules.noSpace],
+    newPassword: [Rules.requiredInput, Rules.noSpace],
+    retryPassword: [Rules.requiredInput, Rules.noSpace, { validator: checkPassword, trigger: 'blur' }],
+});
+function checkPassword(rule: any, value: any, callback: any) {
+    let password = userForm.newPassword;
+    if (password !== userForm.retryPassword) {
+        return callback(new Error(i18n.global.t('commons.rule.rePassword')));
+    }
+    callback();
+}
 
 const emit = defineEmits(['openTask']);
 bus.on('refreshTask', () => {
@@ -155,20 +200,14 @@ const changeFilter = () => {
 const loadNodes = async () => {
     loading.value = true;
     nodes.value = [];
-    if (!isMasterPro.value) {
-        setDefaultNodeInfo();
+    if (!isXpackOrEE.value) {
+        changeToLocal();
         loading.value = false;
         return;
     }
-    await listNodeOptions('all')
+    await listNodes('all')
         .then((res) => {
-            if (!res) {
-                nodes.value = [];
-                setDefaultNodeInfo();
-                loading.value = false;
-                return;
-            }
-            nodes.value = res.data || [];
+            nodes.value = res || [];
             if (nodes.value.length === 0) {
                 setDefaultNodeInfo();
             }
@@ -181,7 +220,7 @@ const loadNodes = async () => {
             loading.value = false;
         })
         .catch(() => {
-            nodes.value = [];
+            setDefaultNodeInfo();
             loading.value = false;
         });
 };
@@ -231,7 +270,7 @@ const loadGlobalSetting = async () => {
 };
 
 const showNodes = () => {
-    return nodes.value.length > 0 && isMasterPro;
+    return nodes.value.length > 0 && isXpackOrEE.value;
 };
 
 const taskCount = ref(0);
@@ -265,9 +304,49 @@ const logout = () => {
         .catch(() => {});
 };
 
+const loadCurrentUser = async () => {
+    await getAuthInfo().then((res) => {
+        currentUser.value = res.data;
+    });
+};
+const changeUserInfo = () => {
+    if (currentUser.value.role === 'ADMIN') {
+        return;
+    }
+    userForm.id = currentUser.value?.id || 0;
+    userForm.name = currentUser.value?.name || '';
+    open.value = true;
+};
+const onSubmit = async (formEl: any) => {
+    if (!formEl) return;
+    formEl.validate(async (valid: boolean) => {
+        if (!valid) return;
+        if (userForm.newPassword === userForm.oldPassword) {
+            MsgError(i18n.global.t('setting.duplicatePassword'));
+            return;
+        }
+        loading.value = true;
+        await updateAuthInfo(userForm)
+            .then(async () => {
+                loading.value = false;
+                open.value = false;
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                await logOutApi();
+                router.push({ name: 'entrance', params: { code: globalStore.entrance } });
+                globalStore.setLogStatus(false);
+            })
+            .catch(() => {
+                loading.value = false;
+            });
+    });
+};
+
 onMounted(() => {
     loadNodes();
     checkTask();
+    if (globalStore.isXpackEE) {
+        loadCurrentUser();
+    }
 });
 </script>
 
@@ -318,7 +397,7 @@ onMounted(() => {
     align-items: center;
     padding: 2px 8px;
     cursor: pointer;
-    min-height: 32px;
+    line-height: 26px;
     transition: background 0.3s;
     .icon {
         font-size: 8px;
@@ -342,7 +421,8 @@ onMounted(() => {
         white-space: nowrap;
     }
     .msg-tag {
-        margin-left: auto;
+        margin-top: 3px;
+        float: right;
         background-color: transparent;
         color: var(--panel-main-bg-color-1);
     }

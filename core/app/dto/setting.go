@@ -5,7 +5,6 @@ import (
 )
 
 type SettingInfo struct {
-	UserName            string `json:"userName"`
 	SystemVersion       string `json:"systemVersion"`
 	DeveloperMode       string `json:"developerMode"`
 	UpgradeBackupCopies string `json:"upgradeBackupCopies"`
@@ -253,6 +252,7 @@ type LoginSetting struct {
 	IsIntl         bool   `json:"isIntl"`
 	IsOffLine      bool   `json:"isOffLine"`
 	IsFxplay       bool   `json:"isFxplay"`
+	IsXPackEE      bool   `json:"isXpackEE"`
 	Language       string `json:"language"`
 	MenuTabs       string `json:"menuTabs"`
 	PanelName      string `json:"panelName"`

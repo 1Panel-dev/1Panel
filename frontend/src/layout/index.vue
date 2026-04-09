@@ -24,7 +24,7 @@
         </div>
 
         <el-watermark
-            v-if="globalStore.isMasterProductPro && globalStore.watermarkShow && globalStore.watermark"
+            v-if="globalStore.isXpackOrEE() && globalStore.watermarkShow && globalStore.watermark"
             :content="loadContent()"
             :font="{
                 fontSize: globalStore.watermark.fontSize,

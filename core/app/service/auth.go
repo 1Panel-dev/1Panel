@@ -16,6 +16,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/app/repo"
 	"github.com/1Panel-dev/1Panel/core/buserr"
 	"github.com/1Panel-dev/1Panel/core/constant"
+	xpack "github.com/1Panel-dev/1Panel/core/edition"
 	"github.com/1Panel-dev/1Panel/core/global"
 	initauth "github.com/1Panel-dev/1Panel/core/init/auth"
 	"github.com/1Panel-dev/1Panel/core/init/session/psession"
@@ -58,7 +59,7 @@ func (u *AuthService) Login(c *gin.Context, info dto.Login, entrance string) (*d
 		return nil, "", buserr.New("ErrRecordNotFound")
 	}
 	if nameSetting.Value != info.Name {
-		return nil, "ErrAuth", buserr.New("ErrAuth")
+		return xpack.Login(c, info, entrance)
 	}
 	if err = checkPassword(info.Password); err != nil {
 		return nil, "ErrAuth", err
@@ -792,7 +793,6 @@ func stripHostPort(hostport string) string {
 	}
 	return strings.Trim(hostport, "[]")
 }
-
 func checkPassword(password string) error {
 	priKey, _ := settingRepo.Get(repo.WithByKey("PASSWORD_PRIVATE_KEY"))
 

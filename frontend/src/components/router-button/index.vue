@@ -23,7 +23,7 @@
 </template>
 
 <script lang="ts" setup>
-import { routerToName, routerToPath } from '@/utils/router';
+import { routerToNameWithQuery, routerToPathWithQuery } from '@/utils/router';
 import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
@@ -46,8 +46,8 @@ const activeName = ref('');
 const handleChange = (label: string) => {
     const btn = buttonArray.value.find((btn) => btn.label === label);
     if (!btn) return;
-    if (btn.path) routerToPath(btn.path);
-    else if (btn.name) routerToName(btn.name);
+    if (btn.path) routerToPathWithQuery(btn.path, { uncached: 'true' });
+    else if (btn.name) routerToNameWithQuery(btn.name, { uncached: 'true' });
     activeName.value = btn.label;
 };
 

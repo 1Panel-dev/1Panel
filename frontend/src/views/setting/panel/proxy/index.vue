@@ -47,7 +47,7 @@
                 <el-form-item>
                     <el-checkbox v-model="form.proxyPasswdKeepItem" :label="$t('setting.proxyPasswdKeep')" />
                 </el-form-item>
-                <el-form-item v-if="isMasterProductPro">
+                <el-form-item v-if="globalStore.isXpackOrEE()" :label="$t('setting.proxyDocker')" prop="proxyDocker">
                     <el-checkbox v-model="form.proxyDocker" :label="$t('setting.proxyDocker')" />
                     <span class="input-help">{{ $t('setting.proxyDockerHelper') }}</span>
                 </el-form-item>
@@ -75,14 +75,12 @@ import { FormInstance } from 'element-plus';
 import { reactive, ref } from 'vue';
 import { updateProxy } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
-import { storeToRefs } from 'pinia';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import DockerProxyDialog from '@/components/docker-proxy/dialog.vue';
 import { loadDockerStatus } from '@/api/modules/container';
 
 const globalStore = GlobalStore();
 const emit = defineEmits<{ (e: 'search'): void }>();
-const { isMasterProductPro } = storeToRefs(globalStore);
 
 const confirmDialogRef = ref();
 const formRef = ref<FormInstance>();
@@ -166,7 +164,7 @@ const submitChangePassword = async (formEl: FormInstance | undefined) => {
         if (form.proxyType === 'http' || form.proxyType === 'https') {
             params.proxyUrl = form.proxyUrl;
         }
-        if (dockerStatus.value && isMasterProductPro.value && (params.proxyDocker || proxyDockerVisible.value)) {
+        if (dockerStatus.value && globalStore.isXpackOrEE() && (params.proxyDocker || proxyDockerVisible.value)) {
             dockerProxyRef.value.acceptParams({
                 syncList: 'SyncSystemProxy',
                 open: true,

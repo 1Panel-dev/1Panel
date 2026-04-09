@@ -9,6 +9,7 @@
             {{ $t('logs.operation') }}
         </el-button>
         <el-button
+            v-if="isAdmin"
             class="tag-button"
             :class="current != 'LoginLog' ? 'no-active' : ''"
             :type="current === 'LoginLog' ? 'primary' : ''"
@@ -36,6 +37,8 @@
 </template>
 <script setup lang="ts">
 import { routerToName } from '@/utils/router';
+import { useGlobalStore } from '@/composables/useGlobalStore';
+const { isAdmin } = useGlobalStore();
 
 defineProps({
     current: {

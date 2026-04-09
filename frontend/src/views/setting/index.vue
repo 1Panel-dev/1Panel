@@ -10,7 +10,7 @@
 <script lang="ts" setup>
 import i18n from '@/lang';
 import { useGlobalStore } from '@/composables/useGlobalStore';
-const { isOffLine, isFxplay } = useGlobalStore();
+const { isOffLine, isFxplay, isAdmin, isXpackEE } = useGlobalStore();
 
 const buttons = [
     {
@@ -35,7 +35,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('setting.license'),
-        path: '/settings/license',
+        path: isXpackEE.value ? '/xpack-ee/license' : '/settings/license',
     },
     {
         label: i18n.global.t('setting.about'),
@@ -49,6 +49,11 @@ onMounted(() => {
     }
     if (isFxplay.value) {
         buttons.splice(6, 1);
+    }
+    if (isXpackEE.value && !isAdmin.value) {
+        buttons.splice(0, 1);
+        buttons.splice(0, 1);
+        buttons.splice(3, 1);
     }
 });
 </script>

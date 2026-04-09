@@ -693,6 +693,10 @@ const onLoadNetworkOptions = async (force?: boolean) => {
 };
 
 const onLoadSimpleNode = async () => {
+    if (!globalStore.isAdmin) {
+        simpleNodes.value = [];
+        return;
+    }
     const res = await listAllSimpleNodes();
     simpleNodes.value = res.data || [];
 };
@@ -771,11 +775,7 @@ const quickJump = (item: any) => {
 };
 
 const showSimpleNode = () => {
-    return (
-        simpleNodeCarouselSetting.value === 'Enable' &&
-        globalStore.isMasterProductPro &&
-        simpleNodes.value?.length !== 0
-    );
+    return simpleNodeCarouselSetting.value === 'Enable' && globalStore.isXpackOrEE() && simpleNodes.value?.length !== 0;
 };
 
 const toggleSensitiveInfo = () => {
@@ -971,6 +971,9 @@ const hideEntrance = () => {
 };
 
 const loadUpgradeStatus = async () => {
+    if (!globalStore.isAdmin) {
+        return;
+    }
     const res = await loadUpgradeInfo();
     if (res && (res.data.testVersion || res.data.newVersion || res.data.latestVersion)) {
         globalStore.hasNewVersion = true;
