@@ -169,6 +169,7 @@ const message = {
             uploadSuccess: 'Başarıyla yüklendi',
             operateConfirm: 'İşlemden eminseniz, lütfen manuel olarak girin: ',
             inputOrSelect: 'Lütfen seçin veya girin',
+            selectOne: 'Lütfen bir {0} seçin',
             copyFailed: 'Kopyalama başarısız',
             operatorHelper:
                 '"{0}" üzerinde "{1}" işlemi gerçekleştirilecek ve geri alınamaz. Devam etmek istiyor musunuz?',

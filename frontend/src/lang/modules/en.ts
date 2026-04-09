@@ -168,6 +168,7 @@ const message = {
             uploadSuccess: 'Uploaded successfully',
             operateConfirm: 'To confirm, type: ',
             inputOrSelect: 'Select or enter',
+            selectOne: 'Please select one {0}',
             copyFailed: 'Failed to copy',
             operatorHelper: 'Run "{1}" on "{0}". This cannot be undone. Continue?',
             notFound: 'Sorry, the page you requested does not exist.',

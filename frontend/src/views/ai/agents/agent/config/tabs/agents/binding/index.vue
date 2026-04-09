@@ -35,7 +35,7 @@
                 </el-table-column>
                 <el-table-column :label="$t('commons.table.operate')" width="100" align="right">
                     <template #default="{ $index }">
-                        <el-button link type="danger" @click="removeBinding($index)">
+                        <el-button link @click="removeBinding($index)">
                             {{ $t('commons.button.delete') }}
                         </el-button>
                     </template>
@@ -51,6 +51,9 @@
             </div>
         </div>
         <template #footer>
+            <el-button :disabled="loading || submitting" @click="handleClose">
+                {{ $t('commons.button.cancel') }}
+            </el-button>
             <el-button
                 type="primary"
                 :loading="submitting"
@@ -58,9 +61,6 @@
                 @click="submitBind"
             >
                 {{ $t('commons.button.bind') }}
-            </el-button>
-            <el-button :disabled="loading || submitting" @click="handleClose">
-                {{ $t('commons.button.cancel') }}
             </el-button>
         </template>
     </DialogPro>

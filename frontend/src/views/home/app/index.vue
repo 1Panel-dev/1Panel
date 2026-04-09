@@ -23,7 +23,7 @@
                 </el-popover>
             </template>
             <template #body>
-                <el-scrollbar height="531px" class="moz-height">
+                <el-scrollbar height="536px" class="moz-height">
                     <div class="h-app-card" v-for="(app, index) in apps" :key="index">
                         <el-row :gutter="5">
                             <el-col :span="5" class="h-app-media-col">

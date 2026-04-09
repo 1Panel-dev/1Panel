@@ -224,7 +224,7 @@ const submit = async () => {
         await createAgentRole({
             agentId: agentId.value,
             name: form.name.trim(),
-            model: form.model.trim(),
+            model: form.model?.trim(),
             bindings: bindings.map((item) => ({
                 channel: item.channel,
                 accountId: item.accountId,

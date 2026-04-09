@@ -165,6 +165,7 @@ const message = {
             uploadSuccess: '上傳成功',
             operateConfirm: '確認操作請輸入 ',
             inputOrSelect: '請選擇或輸入',
+            selectOne: '請選擇一個{0}',
             copyFailed: '複製失敗',
             operatorHelper: '將對以下{0}進行{1}操作，是否繼續？',
             backupSuccess: '備份成功',

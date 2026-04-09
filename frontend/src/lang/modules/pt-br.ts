@@ -166,6 +166,7 @@ const message = {
             uploadSuccess: 'Enviado com sucesso',
             operateConfirm: 'Se você tem certeza da operação, insira-a manualmente: ',
             inputOrSelect: 'Por favor, selecione ou insira',
+            selectOne: 'Selecione um(a) {0}',
             copyFailed: 'Falha ao copiar',
             operatorHelper: 'A operação "{1}" será realizada em "{0}" e não poderá ser desfeita. Deseja continuar?',
             notFound: 'Desculpe, a página solicitada não existe.',

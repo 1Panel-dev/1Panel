@@ -166,6 +166,7 @@ const message = {
             uploadSuccess: '업로드 성공',
             operateConfirm: '작업을 확인하려면 수동으로 입력하십시오: ',
             inputOrSelect: '선택하거나 입력해 주십시오',
+            selectOne: '{0}을(를) 하나 선택해 주십시오',
             copyFailed: '복사 실패',
             operatorHelper: '"{0}"에 대해 "{1}" 작업이 수행되며 이 작업은 되돌릴 수 없습니다. 계속하시겠습니까?',
             notFound: '죄송합니다. 요청하신 페이지를 찾을 수 없습니다.',

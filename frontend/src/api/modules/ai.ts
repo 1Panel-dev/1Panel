@@ -95,7 +95,7 @@ export const operateTensorRTLLM = (req: AI.TensorRTLLMOperate) => {
 };
 
 export const createAgent = (req: AI.AgentCreateReq) => {
-    return http.post<AI.AgentItem>(`/ai/agents`, req, TimeoutEnum.T_60S);
+    return http.post<AI.AgentItem>(`/ai/agents`, req, TimeoutEnum.T_5M);
 };
 
 export const pageAgents = (req: SearchWithPage) => {
@@ -131,23 +131,23 @@ export const updateAgentModelConfig = (req: AI.AgentModelConfigUpdateReq) => {
 };
 
 export const getAgentOverview = (req: AI.AgentOverviewReq) => {
-    return http.post<AI.AgentOverview>(`/ai/agents/overview`, req, TimeoutEnum.T_60S);
+    return http.post<AI.AgentOverview>(`/ai/agents/overview`, req, TimeoutEnum.T_5M);
 };
 
 export const createAgentRole = (req: AI.AgentRoleCreateReq) => {
-    return http.post<AI.AgentRoleCreateResp>(`/ai/agents/agent/create`, req, TimeoutEnum.T_60S);
+    return http.post<AI.AgentRoleCreateResp>(`/ai/agents/agent/create`, req, TimeoutEnum.T_5M);
 };
 
 export const deleteAgentRole = (req: AI.AgentRoleDeleteReq) => {
-    return http.post(`/ai/agents/agent/delete`, req, TimeoutEnum.T_60S);
+    return http.post(`/ai/agents/agent/delete`, req, TimeoutEnum.T_5M);
 };
 
 export const bindAgentRole = (req: AI.AgentRoleBindReq) => {
-    return http.post(`/ai/agents/agent/bind`, req, TimeoutEnum.T_60S);
+    return http.post(`/ai/agents/agent/bind`, req, TimeoutEnum.T_5M);
 };
 
 export const unbindAgentRole = (req: AI.AgentRoleBindReq) => {
-    return http.post(`/ai/agents/agent/unbind`, req, TimeoutEnum.T_60S);
+    return http.post(`/ai/agents/agent/unbind`, req, TimeoutEnum.T_5M);
 };
 
 export const getConfiguredAgentRoles = (req: AI.AgentConfiguredAgentsReq) => {
@@ -155,7 +155,7 @@ export const getConfiguredAgentRoles = (req: AI.AgentConfiguredAgentsReq) => {
 };
 
 export const getAgentRoleChannels = (req: AI.AgentRoleChannelsReq) => {
-    return http.post<AI.AgentRoleChannelItem[]>(`/ai/agents/agent/channels`, req, TimeoutEnum.T_60S);
+    return http.post<AI.AgentRoleChannelItem[]>(`/ai/agents/agent/channels`, req, TimeoutEnum.T_5M);
 };
 
 export const getAgentRoleMarkdownFiles = (req: AI.AgentRoleMarkdownFilesReq) => {
@@ -163,7 +163,7 @@ export const getAgentRoleMarkdownFiles = (req: AI.AgentRoleMarkdownFilesReq) => 
 };
 
 export const updateAgentRoleMarkdownFile = (req: AI.AgentRoleMarkdownFilesUpdateReq) => {
-    return http.post(`/ai/agents/agent/md/update`, req, TimeoutEnum.T_60S);
+    return http.post(`/ai/agents/agent/md/update`, req, TimeoutEnum.T_5M);
 };
 
 export const getAgentProviders = () => {
@@ -299,11 +299,11 @@ export const updateAgentConfigFile = (req: AI.AgentConfigFileUpdateReq) => {
 };
 
 export const listAgentSkills = (req: AI.AgentSkillsReq) => {
-    return http.post<AI.AgentSkillItem[]>(`/ai/agents/skills/list`, req, TimeoutEnum.T_60S);
+    return http.post<AI.AgentSkillItem[]>(`/ai/agents/skills/list`, req, TimeoutEnum.T_5M);
 };
 
 export const searchAgentSkills = (req: AI.AgentSkillSearchReq) => {
-    return http.post<AI.AgentSkillSearchItem[]>(`/ai/agents/skills/search`, req, TimeoutEnum.T_60S);
+    return http.post<AI.AgentSkillSearchItem[]>(`/ai/agents/skills/search`, req, TimeoutEnum.T_5M);
 };
 
 export const updateAgentSkill = (req: AI.AgentSkillUpdateReq) => {
@@ -315,5 +315,5 @@ export const installAgentSkill = (req: AI.AgentSkillInstallReq) => {
 };
 
 export const approveAgentChannelPairing = (req: AI.AgentChannelPairingApproveReq) => {
-    return http.post(`/ai/agents/channel/pairing/approve`, req, TimeoutEnum.T_60S);
+    return http.post(`/ai/agents/channel/pairing/approve`, req, TimeoutEnum.T_5M);
 };

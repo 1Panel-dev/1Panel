@@ -166,6 +166,7 @@ const message = {
             uploadSuccess: 'Berjaya dimuat naik',
             operateConfirm: 'Jika anda pasti dengan operasi ini, sila masukkan secara manual: ',
             inputOrSelect: 'Sila pilih atau masukkan',
+            selectOne: 'Sila pilih satu {0}',
             copyFailed: 'Gagal disalin',
             operatorHelper:
                 'Operasi "{1}" akan dilakukan pada "{0}" dan tidak boleh diundur. Adakah anda mahu meneruskan?',

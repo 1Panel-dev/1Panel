@@ -166,6 +166,7 @@ const message = {
             uploadSuccess: '正常にアップロードされました',
             operateConfirm: '操作について確信している場合は、手動で入力してください。',
             inputOrSelect: '選択または入力してください',
+            selectOne: '{0}を1つ選択してください',
             copyFailed: 'コピーに失敗しました',
             operatorHelper: '操作「{1}」は「{0}」で実行され、元に戻すことはできません。続けたいですか？',
             notFound: '申し訳ありませんが、要求したページは存在しません。',

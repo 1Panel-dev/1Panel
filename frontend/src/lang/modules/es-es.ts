@@ -169,6 +169,7 @@ const message = {
             uploadSuccess: 'Carga completada correctamente',
             operateConfirm: 'Para confirmar, escribe: ',
             inputOrSelect: 'Selecciona o ingresa',
+            selectOne: 'Selecciona un(a) {0}',
             copyFailed: 'Error al copiar',
             operatorHelper: 'Ejecuta "{1}" en "{0}". Esto no se puede deshacer. ¿Continuar?',
             notFound: 'Lo sentimos, la página que solicitó no existe.',
