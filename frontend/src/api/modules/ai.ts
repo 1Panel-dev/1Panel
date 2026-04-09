@@ -131,7 +131,7 @@ export const updateAgentModelConfig = (req: AI.AgentModelConfigUpdateReq) => {
 };
 
 export const getAgentOverview = (req: AI.AgentOverviewReq) => {
-    return http.post<AI.AgentOverview>(`/ai/agents/overview`, req);
+    return http.post<AI.AgentOverview>(`/ai/agents/overview`, req, TimeoutEnum.T_60S);
 };
 
 export const createAgentRole = (req: AI.AgentRoleCreateReq) => {
