@@ -104,8 +104,27 @@ func (f *FileService) GetFileList(op request.FileOption) (response.FileInfo, err
 	if err != nil {
 		return fileInfo, err
 	}
+	shareMap, err := NewIFileShareService().SharePathCodeMap()
+	if err != nil {
+		return fileInfo, err
+	}
+	applyFileShares(info, shareMap)
 	fileInfo.FileInfo = *info
 	return fileInfo, nil
+}
+
+func applyFileShares(info *files.FileInfo, shareMap map[string]string) {
+	if info == nil {
+		return
+	}
+	if code, ok := shareMap[info.Path]; ok {
+		info.ShareCode = code
+	} else {
+		info.ShareCode = ""
+	}
+	for _, item := range info.Items {
+		applyFileShares(item, shareMap)
+	}
 }
 
 func (f *FileService) SearchUploadWithPage(req request.SearchUploadWithPage) (int64, interface{}, error) {

@@ -74,6 +74,14 @@ export const routes: RouteRecordRaw[] = [
         },
     },
     {
+        path: '/s/:code',
+        name: 'file-share',
+        component: () => import('@/views/share/index.vue'),
+        meta: {
+            requiresAuth: false,
+        },
+    },
+    {
         path: '/:code?',
         name: 'entrance',
         component: () => import('@/views/login/index.vue'),

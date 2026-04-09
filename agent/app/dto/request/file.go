@@ -194,3 +194,9 @@ type FileRemarkUpdate struct {
 	Path   string `json:"path" validate:"required"`
 	Remark string `json:"remark"`
 }
+
+type FileShareCreate struct {
+	Path          string `json:"path" validate:"required"`
+	ExpireMinutes int    `json:"expireMinutes" validate:"min=0,max=10080"`
+	Password      string `json:"password" validate:"omitempty,min=4,max=256"`
+}

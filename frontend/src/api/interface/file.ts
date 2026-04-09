@@ -23,6 +23,7 @@ export namespace File {
         extension: string;
         itemTotal: number;
         favoriteID: number;
+        shareCode: string;
         remark?: string;
     }
 
@@ -301,5 +302,33 @@ export namespace File {
         log: string;
         status: string;
         message: string;
+    }
+
+    export interface FileShareCreate {
+        path: string;
+        expireMinutes: number;
+        password?: string;
+    }
+
+    export interface FileShareCheck {
+        code: string;
+        password?: string;
+        operateNode: string;
+    }
+
+    export interface FileShareInfo {
+        code: string;
+        path: string;
+        fileName: string;
+        expiresAt: number;
+        permanent: boolean;
+        hasPassword: boolean;
+    }
+
+    export interface FileSharePublicInfo {
+        fileName: string;
+        expiresAt: number;
+        permanent: boolean;
+        hasPassword: boolean;
     }
 }
