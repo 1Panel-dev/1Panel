@@ -280,6 +280,22 @@ export namespace Setting {
         smsTotal: number;
         smsUsed: number;
     }
+    export interface LicenseEE {
+        deviceID: string;
+        corporation: string;
+        isv: string;
+        expired: string;
+        product: string;
+        edition: string;
+        licenseVersion: string;
+        count: number;
+        serialNo: string;
+        remark: string;
+        ext: string;
+
+        status: string;
+        message: string;
+    }
     export interface NodeItem {
         id: number;
         addr: string;

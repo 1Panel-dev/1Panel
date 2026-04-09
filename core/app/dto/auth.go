@@ -7,6 +7,7 @@ type CaptchaResponse struct {
 
 type UserLoginInfo struct {
 	Name       string `json:"name"`
+	Role       string `json:"role"`
 	Token      string `json:"token"`
 	MfaStatus  string `json:"mfaStatus"`
 	MfaSession string `json:"mfaSession"`

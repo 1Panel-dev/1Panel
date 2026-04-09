@@ -8,7 +8,7 @@
                 <el-input v-else v-model="dialogData.rowData!.name" />
             </el-form-item>
             <el-form-item
-                v-if="globalStore.isProductPro"
+                v-if="globalStore.isXpackNodeOrEE()"
                 :label="$t('setting.scope')"
                 prop="isPublic"
                 :rules="Rules.requiredSelect"

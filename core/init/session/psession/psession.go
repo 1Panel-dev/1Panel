@@ -14,7 +14,7 @@ import (
 )
 
 type SessionUser struct {
-	ID   uint   `json:"id"`
+	ID   string `json:"id"`
 	Name string `json:"name"`
 }
 
@@ -197,6 +197,20 @@ func (p *PSession) CheckCSRFToken(c *gin.Context, token string) bool {
 		return false
 	}
 	return item.CSRFToken == token
+}
+
+func (p *PSession) DeleteByID(id string) error {
+	if id == "" {
+		return nil
+	}
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	for sessionID, item := range p.sessions {
+		if item.User.ID == id {
+			delete(p.sessions, sessionID)
+		}
+	}
+	return nil
 }
 
 func (p *PSession) Clean() error {

@@ -4,7 +4,7 @@
             <template #toolbar>
                 <div class="flex justify-between gap-2 flex-wrap sm:flex-row">
                     <div class="flex flex-wrap gap-3">
-                        <el-button type="primary" @click="syncAll" v-if="isProductPro && !globalStore.isIntl">
+                        <el-button type="primary" @click="syncAll" v-if="isXpackNodeOrEE && !globalStore.isIntl">
                             {{ $t('commons.button.sync') }}
                         </el-button>
                         <el-button type="primary" plain @click="onClean">{{ $t('xpack.alert.cleanLog') }}</el-button>
@@ -61,7 +61,7 @@
                         </template>
                     </el-table-column>
                     <fu-table-operations
-                        v-if="isProductPro && !globalStore.isIntl"
+                        v-if="isXpackNodeOrEE && !globalStore.isIntl"
                         :ellipsis="2"
                         width="130px"
                         :buttons="buttons"
@@ -94,7 +94,7 @@ import { ElMessageBox } from 'element-plus';
 
 const globalStore = GlobalStore();
 const { t } = i18n.global;
-const isProductPro = ref(false);
+const isXpackNodeOrEE = ref(false);
 const loading = ref(false);
 const data = ref();
 const isOffline = ref('Disable');
@@ -318,8 +318,8 @@ const searchAlertInfo = async () => {
 
 onMounted(async () => {
     await searchAlertInfo();
-    isProductPro.value = globalStore.isProductPro;
-    if (globalStore.isProductPro && !globalStore.isIntl) {
+    isXpackNodeOrEE.value = globalStore.isXpackNodeOrEE();
+    if (isXpackNodeOrEE.value && !globalStore.isIntl) {
         await syncAllAlert();
     }
 });

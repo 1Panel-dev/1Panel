@@ -145,8 +145,8 @@
                         {{ $t('ssl.shellHelper') }}
                     </span>
                 </el-form-item>
-                <PushtoNode
-                    v-if="isMaster && isMasterProductPro"
+                <PushToNode
+                    v-if="globalStore.isMaster && globalStore.isXpackOrEE()"
                     :push-node="ssl.pushNode"
                     :nodes="ssl.pushNodes"
                     type="ssl"
@@ -179,11 +179,17 @@ import { MsgSuccess } from '@/utils/message';
 import { KeyTypes } from '@/global/mimetype';
 import { getDNSName, getAccountName } from '@/utils/ssl';
 import { defineAsyncComponent } from 'vue';
-import { useGlobalStore } from '@/composables/useGlobalStore';
-import { loadOptionalComponent } from '@/extensions/optional';
-const { isMasterProductPro, isMaster } = useGlobalStore();
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
 
-const PushtoNode = defineAsyncComponent(() => loadOptionalComponent('/src/xpack/views/ssl/index.vue'));
+const PushToNode = defineAsyncComponent(async () => {
+    const modules = import.meta.glob('@/xpack/views/ssl/index.vue');
+    const loader = modules['/src/xpack/views/ssl/index.vue'];
+    if (loader) {
+        return ((await loader()) as any).default;
+    }
+    return { template: '<div></div>' };
+});
 
 const props = defineProps({
     id: {
