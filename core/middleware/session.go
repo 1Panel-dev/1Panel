@@ -9,6 +9,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/buserr"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
+	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 	"github.com/gin-gonic/gin"
 )
 
@@ -41,6 +42,7 @@ func SessionAuth() gin.HandlerFunc {
 			return
 		}
 		lifeTime, _ := strconv.Atoi(sessionTimeout)
+		lifeTime = xpack.LoadSessionTimeout(psession, lifeTime)
 		ssl, err := settingRepo.GetValueByKey("SSL")
 		if err != nil {
 			global.LOG.Errorf("create operation record failed, err: %v", err)

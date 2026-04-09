@@ -1,12 +1,15 @@
 type VueComponent = { template?: string } | Record<string, any>;
 
 const EmptyComponent: VueComponent = { template: '<div></div>' };
-const xpackViewModules = import.meta.glob('@/xpack/views/**/*.vue');
+const extensionViewModules = {
+    ...import.meta.glob('@/xpack/views/**/*.vue'),
+    ...import.meta.glob('@/xpack-ee/views/**/*.vue'),
+};
 
 function findLoader(suffix: string) {
-    for (const path in xpackViewModules) {
+    for (const path in extensionViewModules) {
         if (path.endsWith(suffix)) {
-            return xpackViewModules[path];
+            return extensionViewModules[path];
         }
     }
     return null;
@@ -19,3 +22,5 @@ export async function loadOptionalComponent(key: string): Promise<VueComponent> 
     }
     return ((await loader()) as { default?: VueComponent }).default || EmptyComponent;
 }
+
+export const loadExtensionComponent = loadOptionalComponent;

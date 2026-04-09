@@ -85,6 +85,7 @@ func checkSession(c *gin.Context) bool {
 		return false
 	}
 	lifeTime, _ := strconv.Atoi(sessionTimeout)
+	lifeTime = xpack.LoadSessionTimeout(psession, lifeTime)
 	ssl, err := settingRepo.GetValueByKey("SSL")
 	if err != nil {
 		return false
