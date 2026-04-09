@@ -18,6 +18,11 @@ const config = {
     withCredentials: true,
 };
 
+const isCsrfForbidden = (response?: AxiosResponse<any>) => {
+    const message = response?.data?.message;
+    return typeof message === 'string' && message.toLowerCase().includes('csrf token invalid');
+};
+
 class RequestHttp {
     service: AxiosInstance;
     public constructor(config: AxiosRequestConfig) {
@@ -118,6 +123,9 @@ class RequestHttp {
                             router.push({ name: 'Expired' });
                             return;
                         case 403:
+                            if (isCsrfForbidden(response)) {
+                                return Promise.reject(error);
+                            }
                             if (response.data && response.data['message']) {
                                 MsgError(response.data['message']);
                             } else {
