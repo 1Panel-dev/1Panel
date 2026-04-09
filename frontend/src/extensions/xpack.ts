@@ -13,11 +13,19 @@ function findModule<T>(modules: Record<string, T>, suffix: string): T | null {
 }
 
 function getXpackSettingModule(): XpackSettingModule | null {
-    const modules = import.meta.glob('@/xpack/api/modules/setting.ts', { eager: true }) as Record<
+    const xpackModules = import.meta.glob('@/xpack/api/modules/setting.ts', { eager: true }) as Record<
         string,
         XpackSettingModule
     >;
-    return findModule(modules, '/api/modules/setting.ts');
+    const xpackModule = findModule(xpackModules, '/api/modules/setting.ts');
+    if (xpackModule) {
+        return xpackModule;
+    }
+    const xpackEEModules = import.meta.glob('@/xpack-ee/api/modules/setting.ts', { eager: true }) as Record<
+        string,
+        XpackSettingModule
+    >;
+    return findModule(xpackEEModules, '/api/modules/setting.ts');
 }
 
 export async function searchXpackSetting() {
@@ -35,3 +43,6 @@ export async function updateXpackSettingByKey(key: string, value: string) {
     }
     return module.updateXSettingByKey(key, value);
 }
+
+export const searchExtensionSetting = searchXpackSetting;
+export const updateExtensionSettingByKey = updateXpackSettingByKey;
