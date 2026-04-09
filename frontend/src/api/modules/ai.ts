@@ -135,19 +135,19 @@ export const getAgentOverview = (req: AI.AgentOverviewReq) => {
 };
 
 export const createAgentRole = (req: AI.AgentRoleCreateReq) => {
-    return http.post<AI.AgentRoleCreateResp>(`/ai/agents/agent/create`, req);
+    return http.post<AI.AgentRoleCreateResp>(`/ai/agents/agent/create`, req, TimeoutEnum.T_60S);
 };
 
 export const deleteAgentRole = (req: AI.AgentRoleDeleteReq) => {
-    return http.post(`/ai/agents/agent/delete`, req);
+    return http.post(`/ai/agents/agent/delete`, req, TimeoutEnum.T_60S);
 };
 
 export const bindAgentRole = (req: AI.AgentRoleBindReq) => {
-    return http.post(`/ai/agents/agent/bind`, req);
+    return http.post(`/ai/agents/agent/bind`, req, TimeoutEnum.T_60S);
 };
 
 export const unbindAgentRole = (req: AI.AgentRoleBindReq) => {
-    return http.post(`/ai/agents/agent/unbind`, req);
+    return http.post(`/ai/agents/agent/unbind`, req, TimeoutEnum.T_60S);
 };
 
 export const getConfiguredAgentRoles = (req: AI.AgentConfiguredAgentsReq) => {
@@ -155,7 +155,7 @@ export const getConfiguredAgentRoles = (req: AI.AgentConfiguredAgentsReq) => {
 };
 
 export const getAgentRoleChannels = (req: AI.AgentRoleChannelsReq) => {
-    return http.post<AI.AgentRoleChannelItem[]>(`/ai/agents/agent/channels`, req);
+    return http.post<AI.AgentRoleChannelItem[]>(`/ai/agents/agent/channels`, req, TimeoutEnum.T_60S);
 };
 
 export const getAgentRoleMarkdownFiles = (req: AI.AgentRoleMarkdownFilesReq) => {
@@ -163,7 +163,7 @@ export const getAgentRoleMarkdownFiles = (req: AI.AgentRoleMarkdownFilesReq) => 
 };
 
 export const updateAgentRoleMarkdownFile = (req: AI.AgentRoleMarkdownFilesUpdateReq) => {
-    return http.post(`/ai/agents/agent/md/update`, req);
+    return http.post(`/ai/agents/agent/md/update`, req, TimeoutEnum.T_60S);
 };
 
 export const getAgentProviders = () => {
