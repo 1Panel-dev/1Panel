@@ -277,5 +277,3 @@ require (
 	modernc.org/memory v1.11.0 // indirect
 	modernc.org/sqlite v1.48.2 // indirect
 )
-
-replace github.com/1Panel-dev/1Panel-pro/agent => ../../xpack-backend/agent

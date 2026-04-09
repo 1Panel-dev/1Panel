@@ -6,8 +6,10 @@ import (
 	"net/http"
 
 	"github.com/1Panel-dev/1Panel/core/app/dto"
+	"github.com/1Panel-dev/1Panel/core/init/session/psession"
 	"github.com/1Panel-dev/1Panel/core/utils/ssh"
 	edition "github.com/1Panel-dev/1Panel/core/xpack-ee/edition"
+	"github.com/1Panel-dev/1Panel/core/xpack/app/model"
 	"github.com/gin-gonic/gin"
 )
 
@@ -39,6 +41,27 @@ func Login(c *gin.Context, info dto.Login, entrance string) (*dto.UserLoginInfo,
 	return edition.Login(c, info, entrance)
 }
 
-func MFALogin(c *gin.Context, info dto.MFALogin, entrance string) (*dto.UserLoginInfo, string, error) {
-	return edition.MFALogin(c, info, entrance)
+func LoadSessionTimeout(sessionUser psession.SessionUser, defaultTTL int) int {
+	return edition.LoadSessionTimeout(sessionUser, defaultTTL)
+}
+
+func RemoveBindNode(nodeID uint) error { return nil }
+
+func CheckLicenseStatus(isXpack bool, licenseID, nodeID uint) error {
+	return edition.CheckLicenseStatus(isXpack, licenseID, nodeID)
+}
+func LoadLicenseByNodeID(nodeID uint) (bool, model.License, error) {
+	return edition.LoadLicenseByNodeID(nodeID)
+}
+func Bind(node model.Node, license *model.License, withInit, withSync, withDryRun, withDockerRestart bool) error {
+	return edition.Bind(node, license, withInit, withSync, withDryRun, withDockerRestart)
+}
+func BindFree(node model.Node, licenseID uint) error {
+	return edition.BindFree(node, licenseID)
+}
+func Unbind(node model.Node, license model.License, withReset, withSync, withDockerRestart bool) error {
+	return edition.Unbind(node, license, withReset, withSync, withDockerRestart)
+}
+func UnbindFree(node model.Node, licenseID uint) error {
+	return edition.UnbindFree(node, licenseID)
 }

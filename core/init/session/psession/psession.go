@@ -15,6 +15,7 @@ import (
 
 type SessionUser struct {
 	ID   string `json:"id"`
+	Role string `json:"role"`
 	Name string `json:"name"`
 }
 

@@ -16,7 +16,6 @@ import (
 	"github.com/1Panel-dev/1Panel/core/app/repo"
 	"github.com/1Panel-dev/1Panel/core/buserr"
 	"github.com/1Panel-dev/1Panel/core/constant"
-	xpack "github.com/1Panel-dev/1Panel/core/edition"
 	"github.com/1Panel-dev/1Panel/core/global"
 	initauth "github.com/1Panel-dev/1Panel/core/init/auth"
 	"github.com/1Panel-dev/1Panel/core/init/session/psession"
@@ -24,6 +23,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/utils/encrypt"
 	"github.com/1Panel-dev/1Panel/core/utils/mfa"
 	"github.com/1Panel-dev/1Panel/core/utils/passkey"
+	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 	"github.com/gin-gonic/gin"
 	"github.com/go-webauthn/webauthn/protocol"
 	"github.com/go-webauthn/webauthn/webauthn"
@@ -142,12 +142,13 @@ func (u *AuthService) generateSession(c *gin.Context, name string) (*dto.UserLog
 		return nil, err
 	}
 
-	sessionUser := psession.SessionUser{Name: name}
+	sessionUser := psession.SessionUser{Name: name, Role: "ADMIN"}
+	lifeTime = xpack.LoadSessionTimeout(sessionUser, lifeTime)
 	if err := global.SESSION.SetFresh(c, sessionUser, httpsSetting.Value == constant.StatusEnable, lifeTime); err != nil {
 		return nil, err
 	}
 
-	return &dto.UserLoginInfo{Name: name}, nil
+	return &dto.UserLoginInfo{Name: name, Role: "ADMIN"}, nil
 }
 
 func (u *AuthService) LogOut(c *gin.Context) error {
