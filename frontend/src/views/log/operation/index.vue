@@ -42,10 +42,9 @@
                     <el-option :label="$t('commons.status.success')" value="Success" />
                     <el-option :label="$t('commons.status.failed')" value="Failed" />
                 </el-select>
-                <el-select v-model="searchNode" @change="search()" clearable class="p-w-200">
+                <el-select v-if="globalStore.isAdmin" v-model="searchNode" @change="search()" clearable class="p-w-200">
                     <template #prefix>{{ $t('xpack.node.node') }}</template>
                     <el-option :label="$t('commons.table.all')" value="" />
-                    <el-option :label="globalStore.getMasterAlias()" value="local" />
                     <el-option v-for="(node, index) in nodes" :key="index" :label="node.name" :value="node.name" />
                 </el-select>
                 <TableSearch @search="search()" v-model:searchName="searchName" />
@@ -69,7 +68,7 @@
                             <span v-if="globalStore.language === 'en'">{{ row.detailEN }}</span>
                         </template>
                     </el-table-column>
-                    <el-table-column v-if="globalStore.isMasterProductPro" :label="$t('xpack.node.node')" prop="node">
+                    <el-table-column v-if="globalStore.isXpackOrEE()" :label="$t('xpack.node.node')" prop="node">
                         <template #default="{ row }">
                             <span>{{ row.node === 'local' ? globalStore.getMasterAlias() : row.node }}</span>
                         </template>
@@ -102,7 +101,7 @@ import { onMounted, reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { GlobalStore } from '@/store';
-import { listNodeOptions } from '@/api/modules/setting';
+import { listNodes } from '@/utils/node';
 
 const loading = ref();
 const data = ref();
@@ -167,13 +166,9 @@ const loadDetail = (log: string) => {
 };
 
 const loadNodes = async () => {
-    await listNodeOptions('')
+    await listNodes('')
         .then((res) => {
-            if (!res) {
-                nodes.value = [];
-                return;
-            }
-            nodes.value = res.data || [];
+            nodes.value = res || [];
         })
         .catch(() => {
             nodes.value = [];
@@ -288,9 +283,10 @@ const onSubmitClean = async () => {
 };
 
 onMounted(() => {
-    if (globalStore.isMasterProductPro) {
+    if (globalStore.isAdmin && globalStore.isXpackOrEE()) {
         loadNodes();
     }
+    searchNode.value = globalStore.isAdmin ? '' : globalStore.currentNode;
     search();
 });
 </script>

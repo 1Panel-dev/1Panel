@@ -7,7 +7,7 @@
                         <el-col :span="1"><br /></el-col>
                         <el-col :xs="24" :sm="20" :md="15" :lg="12" :xl="12">
                             <el-form-item :label="$t('setting.user')" prop="userName">
-                                <el-input disabled v-model="form.userName">
+                                <el-input type="password" disabled v-model="form.userName">
                                     <template #append>
                                         <el-button @click="onChangeUserName()" icon="Setting">
                                             {{ $t('commons.button.set') }}
@@ -56,7 +56,7 @@
                                     </div>
                                     <div>
                                         <el-button
-                                            v-if="isMasterProductPro"
+                                            v-if="globalStore.isXpackOrEE()"
                                             @click="onChangeThemeColor"
                                             icon="Setting"
                                             class="!h-[32px] sm:!h-[33.5px]"
@@ -78,7 +78,11 @@
                                 </el-radio-group>
                             </el-form-item>
 
-                            <el-form-item :label="$t('setting.watermark')" v-if="isMasterProductPro" prop="watermark">
+                            <el-form-item
+                                :label="$t('setting.watermark')"
+                                v-if="globalStore.isXpackOrEE()"
+                                prop="watermark"
+                            >
                                 <el-radio-group class="w-full" @change="onChangeWatermark" v-model="form.watermarkShow">
                                     <el-radio-button value="Enable">
                                         <span>{{ $t('commons.button.enable') }}</span>
@@ -154,7 +158,7 @@
                                 <span class="input-help">{{ $t('setting.systemIPHelper') }}</span>
                             </el-form-item>
 
-                            <el-form-item :label="$t('setting.proxy')" prop="proxyShow" v-if="isMaster">
+                            <el-form-item :label="$t('setting.proxy')" prop="proxyShow" v-if="globalStore.isMaster">
                                 <el-input disabled v-model="form.proxyShow">
                                     <template #append>
                                         <el-button @click="onChangeProxy" icon="Setting">
@@ -164,7 +168,11 @@
                                 </el-input>
                             </el-form-item>
 
-                            <el-form-item :label="$t('setting.apiInterface')" prop="apiInterface" v-if="isMaster">
+                            <el-form-item
+                                :label="$t('setting.apiInterface')"
+                                prop="apiInterface"
+                                v-if="globalStore.isMaster"
+                            >
                                 <el-switch
                                     @change="onChangeApiInterfaceStatus"
                                     v-model="form.apiInterfaceStatus"
@@ -250,16 +258,12 @@ import PanelName from '@/views/setting/panel/name/index.vue';
 import SystemIP from '@/views/setting/panel/systemip/index.vue';
 import Proxy from '@/views/setting/panel/proxy/index.vue';
 import HideMenu from '@/views/setting/panel/hidemenu/index.vue';
-import Edition from '@/views/setting/panel/edition/index.vue';
-import { storeToRefs } from 'pinia';
 import { getXpackSetting, updateXpackSettingByKey } from '@/utils/xpack';
 import { setPrimaryColor } from '@/utils/theme';
 import i18n from '@/lang';
 
 const loading = ref(false);
 const globalStore = GlobalStore();
-
-const { isMasterProductPro, isMaster } = storeToRefs(globalStore);
 
 const { switchTheme } = useTheme();
 const mobile = computed(() => {
@@ -346,7 +350,7 @@ const search = async () => {
     form.systemIP = agentRes.data.systemIP;
 
     const res = await getSettingInfo();
-    form.userName = res.data.userName;
+    form.userName = '******';
     form.password = '******';
     form.theme = res.data.theme;
     form.menuTabs = res.data.menuTabs;
@@ -374,7 +378,7 @@ const search = async () => {
 
     form.complexityVerification = res.data.complexityVerification;
 
-    if (isMasterProductPro.value) {
+    if (globalStore.isXpackOrEE()) {
         const xpackRes = await getXpackSetting();
         if (xpackRes) {
             form.theme = xpackRes.data.theme || globalStore.themeConfig.theme || 'light';
@@ -401,7 +405,7 @@ const onChangePassword = () => {
     passwordRef.value.acceptParams({ complexityVerification: form.complexityVerification });
 };
 const onChangeUserName = () => {
-    userNameRef.value.acceptParams({ userName: form.userName });
+    userNameRef.value.acceptParams();
 };
 const onChangeTitle = () => {
     panelNameRef.value.acceptParams({ panelName: form.panelName });
@@ -512,7 +516,7 @@ const onChangeApiInterfaceStatus = async () => {
 const handleThemeChange = async (val: string) => {
     globalStore.themeConfig.theme = val;
     switchTheme();
-    if (globalStore.isMasterProductPro) {
+    if (globalStore.isXpackOrEE()) {
         await updateXpackSettingByKey('Theme', val);
         let color: string;
         const themeColor: ThemeColor = JSON.parse(globalStore.themeConfig.themeColor);

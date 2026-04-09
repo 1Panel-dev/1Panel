@@ -41,7 +41,7 @@
                         </template>
                     </el-table-column>
                     <el-table-column
-                        v-if="globalStore.isProductPro"
+                        v-if="globalStore.isXpackNodeOrEE()"
                         :label="$t('setting.scope')"
                         :min-width="80"
                         prop="isPublic"

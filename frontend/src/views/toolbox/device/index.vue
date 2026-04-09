@@ -89,7 +89,7 @@
             </template>
         </LayoutContent>
 
-        <Swap ref="swapRef" @search="search" />
+        <Swap ref="swapRef" />
         <Passwd ref="passwdRef" @search="search" />
         <TimeZone ref="timeZoneRef" @search="search" />
         <Ntp ref="ntpRef" @search="search" />

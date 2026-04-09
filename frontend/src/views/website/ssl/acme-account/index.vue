@@ -25,7 +25,7 @@
                         {{ getKeyName(row.keyType) }}
                     </template>
                 </el-table-column>
-                <el-table-column :label="$t('website.useProxy')" min-width="100px" v-if="globalStore.isProductPro">
+                <el-table-column :label="$t('website.useProxy')" min-width="100px" v-if="globalStore.isXpackNodeOrEE()">
                     <template #default="{ row }">
                         <el-switch v-model="row.useProxy" @change="update(row)"></el-switch>
                     </template>

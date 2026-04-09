@@ -25,6 +25,18 @@ func WithByIDs(ids []uint) global.DBOption {
 		return g.Where("id in (?)", ids)
 	}
 }
+func WithByStringIDs(ids []string) global.DBOption {
+	var idItems []uint
+	for _, id := range ids {
+		var idItem uint
+		if _, err := fmt.Sscanf(id, "%d", &idItem); err == nil && idItem != 0 {
+			idItems = append(idItems, idItem)
+		}
+	}
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("id IN (?)", idItems)
+	}
+}
 func WithByName(name string) global.DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("`name` = ?", name)

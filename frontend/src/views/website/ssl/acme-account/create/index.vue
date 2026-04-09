@@ -6,7 +6,7 @@
                     <el-form-item :label="$t('website.email')" prop="email">
                         <el-input v-model.trim="account.email"></el-input>
                     </el-form-item>
-                    <el-form-item :label="$t('website.useProxy')" prop="useProxy" v-if="globalStore.isProductPro">
+                    <el-form-item :label="$t('website.useProxy')" prop="useProxy" v-if="globalStore.isXpackNodeOrEE()">
                         <el-switch v-model="account.useProxy"></el-switch>
                         <span class="input-help">
                             {{ $t('website.useProxyHelper') }}

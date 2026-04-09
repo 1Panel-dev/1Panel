@@ -1,4 +1,9 @@
-import { getLicenseStatus, getMasterLicenseStatus, getSettingInfo } from '@/api/modules/setting';
+import {
+    getLicenseStatus,
+    getMasterLicenseStatus,
+    getSettingInfo,
+    getXpackEELicenseStatus,
+} from '@/api/modules/setting';
 import { useTheme } from '@/global/use-theme';
 import {
     searchXpackSetting,
@@ -29,7 +34,7 @@ async function getColoredFavicon(url: string, color: string) {
 export async function initFavicon() {
     document.title = globalStore.themeConfig.panelName;
     const favicon = globalStore.themeConfig.favicon;
-    const isPro = globalStore.isMasterProductPro;
+    const isPro = globalStore.isXpackOrEE();
     const themeColor = globalStore.themeConfig.primary;
     const customFaviconUrl = `/api/v2/images/favicon?t=${Date.now()}`;
     const fallbackSvg = isPro ? await getColoredFavicon(faviconUrl, themeColor) : '/public/favicon.png';
@@ -73,23 +78,41 @@ const loadDataFromDB = async () => {
 };
 
 export async function loadProductProFromDB() {
+    if (!globalStore.isXpackEE) {
+        const res = await getLicenseStatus();
+        if (!res || !res.data) {
+            globalStore.isProductPro = false;
+        } else {
+            globalStore.isProductPro = res.data.status === 'Bound';
+            if (globalStore.isProductPro) {
+                globalStore.productProExpires = Number(res.data.productPro);
+            }
+        }
+        return;
+    }
     const res = await getLicenseStatus();
     if (!res || !res.data) {
-        globalStore.isProductPro = false;
+        globalStore.isXpackEELicensed = false;
     } else {
-        globalStore.isProductPro = res.data.status === 'Bound';
-        if (globalStore.isProductPro) {
-            globalStore.productProExpires = Number(res.data.productPro);
-        }
+        globalStore.isXpackEELicensed = res.data.status === 'Bound';
     }
 }
 
 export async function loadMasterProductProFromDB() {
-    const res = await getMasterLicenseStatus();
-    if (!res || !res.data) {
-        globalStore.isMasterProductPro = false;
+    if (!globalStore.isXpackEE) {
+        const res = await getMasterLicenseStatus();
+        if (!res || !res.data) {
+            globalStore.isMasterProductPro = false;
+        } else {
+            globalStore.isMasterProductPro = res.data.status === 'Bound';
+        }
     } else {
-        globalStore.isMasterProductPro = res.data.status === 'Bound';
+        const res = await getXpackEELicenseStatus();
+        if (!res || !res.data) {
+            globalStore.isXpackEELicensed = false;
+        } else {
+            globalStore.isXpackEELicensed = res.data.status === 'Bound';
+        }
     }
     switchTheme();
     initFavicon();

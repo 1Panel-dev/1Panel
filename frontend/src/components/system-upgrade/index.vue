@@ -21,8 +21,11 @@
                     <el-divider direction="vertical" />
                 </span>
                 <div class="flex flex-wrap items-center">
-                    <el-link v-if="isMasterPro" underline="never" type="primary" @click="toLxware">
-                        <span>
+                    <el-link underline="never" type="primary" @click="toLxware">
+                        <span v-if="isXpackEE">
+                            {{ $t('license.ee') }}
+                        </span>
+                        <span v-else-if="isMasterPro">
                             {{ $t('license.pro') }}
                         </span>
                     </el-link>
@@ -39,14 +42,13 @@
                     <el-link underline="never" class="version" type="primary" @click="getVersionLog()">
                         {{ version }}
                     </el-link>
-                    <el-badge is-dot class="-mt-0.5" :hidden="version === 'Waiting' || !globalStore.hasNewVersion">
-                        <el-link
-                            class="ml-2"
-                            underline="never"
-                            type="primary"
-                            @click="onLoadUpgradeInfo"
-                            v-if="!globalStore.isOffLine"
-                        >
+                    <el-badge
+                        is-dot
+                        v-if="globalStore.isAdmin && !globalStore.isOffLine"
+                        class="-mt-0.5"
+                        :hidden="version === 'Waiting' || !globalStore.hasNewVersion"
+                    >
+                        <el-link class="ml-2" underline="never" type="primary" @click="onLoadUpgradeInfo">
                             {{ $t('commons.button.update') }}
                         </el-link>
                     </el-badge>
@@ -76,6 +78,9 @@ const upgradeRef = ref();
 const releasesRef = ref();
 const isMasterPro = computed(() => {
     return globalStore.isMasterPro();
+});
+const isXpackEE = computed(() => {
+    return globalStore.isEE();
 });
 
 const version = ref<string>('');

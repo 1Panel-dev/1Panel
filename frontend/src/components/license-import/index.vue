@@ -59,7 +59,7 @@
 import i18n from '@/lang';
 import { ref } from 'vue';
 import { MsgSuccess } from '@/utils/message';
-import { uploadLicense } from '@/api/modules/setting';
+import { uploadLicense, uploadXpackEELicense } from '@/api/modules/setting';
 import DockerProxy from '@/components/docker-proxy/index.vue';
 import { GlobalStore } from '@/store';
 import { UploadFile, UploadFiles, UploadInstance, UploadProps, UploadRawFile, genFileId } from 'element-plus';
@@ -126,6 +126,19 @@ const submit = async () => {
     const file = uploaderFiles.value[0];
     const formData = new FormData();
     formData.append('file', file.raw);
+    if (globalStore.isXpackEE) {
+        loading.value = true;
+        await uploadXpackEELicense(formData)
+            .then(async () => {
+                handleAfterSubmit();
+            })
+            .catch(() => {
+                loading.value = false;
+                uploadRef.value!.clearFiles();
+                uploaderFiles.value = [];
+            });
+        return;
+    }
     if (oldLicense.value) {
         formData.append('oldLicenseName', oldLicense.value);
     }
@@ -137,29 +150,35 @@ const submit = async () => {
     loading.value = true;
     await uploadLicense(oldLicense.value, formData)
         .then(async () => {
-            loading.value = false;
-            uploadRef.value!.clearFiles();
-            uploaderFiles.value = [];
-            open.value = false;
-            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            if (!isImport.value) {
-                globalStore.isProductPro = true;
-                globalStore.isMasterProductPro = true;
-            }
-            if (!withoutReload.value) {
-                loadMasterProductProFromDB();
-                loadProductProFromDB();
-                getXpackSettingForTheme();
-                window.location.reload();
-            } else {
-                em('search');
-            }
+            handleAfterSubmit();
         })
         .catch(() => {
             loading.value = false;
             uploadRef.value!.clearFiles();
             uploaderFiles.value = [];
         });
+};
+
+const handleAfterSubmit = () => {
+    loading.value = false;
+    uploadRef.value!.clearFiles();
+    uploaderFiles.value = [];
+    open.value = false;
+    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+    if (!isImport.value) {
+        if (!globalStore.isXpackEE) globalStore.isProductPro = true;
+        globalStore.isMasterProductPro = true;
+    } else {
+        globalStore.isXpackEELicensed = true;
+    }
+    if (!withoutReload.value) {
+        loadMasterProductProFromDB();
+        loadProductProFromDB();
+        getXpackSettingForTheme();
+        window.location.reload();
+    } else {
+        em('search');
+    }
 };
 
 defineExpose({
