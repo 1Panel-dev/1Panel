@@ -299,11 +299,11 @@ export const updateAgentConfigFile = (req: AI.AgentConfigFileUpdateReq) => {
 };
 
 export const listAgentSkills = (req: AI.AgentSkillsReq) => {
-    return http.post<AI.AgentSkillItem[]>(`/ai/agents/skills/list`, req);
+    return http.post<AI.AgentSkillItem[]>(`/ai/agents/skills/list`, req, TimeoutEnum.T_60S);
 };
 
 export const searchAgentSkills = (req: AI.AgentSkillSearchReq) => {
-    return http.post<AI.AgentSkillSearchItem[]>(`/ai/agents/skills/search`, req);
+    return http.post<AI.AgentSkillSearchItem[]>(`/ai/agents/skills/search`, req, TimeoutEnum.T_60S);
 };
 
 export const updateAgentSkill = (req: AI.AgentSkillUpdateReq) => {

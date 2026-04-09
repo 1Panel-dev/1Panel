@@ -1617,11 +1617,7 @@ func generateToken() string {
 }
 
 func asyncReportAIProviderInstall(provider string) {
-	if global.CONF.Base.Mode != "stable" {
-		return
-	}
-	provider = provider
-	if provider == "" {
+	if global.CONF.Base.Mode != "stable" || provider == "" {
 		return
 	}
 	go func(provider string) {

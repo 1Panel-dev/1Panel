@@ -48,7 +48,7 @@ func (a AgentService) ListSkills(req dto.AgentIDReq) ([]dto.AgentSkillItem, erro
 	if err := ensureContainerRunning(install.ContainerName); err != nil {
 		return nil, err
 	}
-	output, err := runDockerExecWithStdout(30*time.Second, install.ContainerName, "sh", "-c", "openclaw skills list --json 2>&1")
+	output, err := runDockerExecWithStdout(60*time.Second, install.ContainerName, "sh", "-c", "openclaw skills list --json 2>&1")
 	if err != nil {
 		return nil, err
 	}
@@ -114,7 +114,7 @@ func (a AgentService) InstallSkill(req dto.AgentSkillInstallReq) error {
 		return err
 	}
 	installTask.AddSubTask("Install OpenClaw skill", func(t *task.Task) error {
-		mgr := cmd.NewCommandMgr(cmd.WithTask(*t), cmd.WithContext(t.TaskCtx), cmd.WithTimeout(10*time.Minute))
+		mgr := cmd.NewCommandMgr(cmd.WithTask(*t), cmd.WithContext(t.TaskCtx), cmd.WithTimeout(20*time.Minute))
 		return mgr.Run("docker", "exec", install.ContainerName, "sh", "-c", buildOpenclawSkillInstallCommand(req.Source, req.Slug))
 	}, nil)
 	go func() {
@@ -153,10 +153,10 @@ func parseOpenclawSkillsList(output string) ([]dto.AgentSkillItem, error) {
 func loadOpenclawSkillSearchOutput(containerName, source, keyword string) (string, error) {
 	switch source {
 	case "skillhub":
-		return runDockerExecWithStdout(30*time.Second, containerName, "skillhub", "search", keyword, "--json")
+		return runDockerExecWithStdout(60*time.Second, containerName, "skillhub", "search", keyword, "--json")
 	default:
 		return runDockerExecWithStdout(
-			30*time.Second,
+			60*time.Second,
 			containerName,
 			"sh",
 			"-c",
@@ -238,7 +238,7 @@ func resolveClawhubRegistry(source string) string {
 }
 
 func getOpenclawSkillKey(containerName, name string) (string, error) {
-	output, err := runDockerExecWithStdout(30*time.Second, containerName, "sh", "-c", fmt.Sprintf("openclaw skills info %q --json 2>&1", name))
+	output, err := runDockerExecWithStdout(60*time.Second, containerName, "sh", "-c", fmt.Sprintf("openclaw skills info %q --json 2>&1", name))
 	if err != nil {
 		return "", err
 	}

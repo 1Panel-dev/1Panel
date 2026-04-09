@@ -700,9 +700,10 @@ func setDiscordConfig(conf map[string]interface{}, config dto.AgentDiscordConfig
 	accounts := make(map[string]interface{}, len(config.Bots))
 	for _, bot := range config.Bots {
 		accounts[bot.AccountID] = map[string]interface{}{
-			"enabled": bot.Enabled,
-			"name":    bot.Name,
-			"token":   bot.Token,
+			"enabled":     bot.Enabled,
+			"name":        bot.Name,
+			"token":       bot.Token,
+			"groupPolicy": config.GroupPolicy,
 		}
 	}
 	discord["accounts"] = accounts
