@@ -11,7 +11,7 @@ export const getFilesList = (params: File.ReqFile) => {
 };
 
 export const fileAiSearch = (params: File.FileAISearchReq) => {
-    return http.post<File.FileAISearchResult>('files/ai-search', params, TimeoutEnum.T_5M);
+    return http.post<File.FileAISearchResult>('files/ai-search', params, TimeoutEnum.T_10M);
 };
 
 export const getFilesListByNode = (params: File.ReqNodeFile) => {

@@ -666,7 +666,7 @@
             ref="aiSearchDrawerRef"
             v-model="aiSearchDrawerVisible"
             :list-path="req.path"
-            @pick-directory="fileRef.acceptParams({ dir: false, multiple: true })"
+            @pick-directory="openAiSearchPathPicker"
             @open-editor="onAiSearchOpenEditor"
         />
         <FileList ref="fileRef" @choose="getSearchPath" />
@@ -733,7 +733,7 @@ import Preview from './preview/index.vue';
 import TextPreview from './text-preview/index.vue';
 import VscodeOpenDialog from '@/components/vscode-open/index.vue';
 import Convert from './convert/index.vue';
-import FileAiSearchDrawer from './file-ai-search-drawer.vue';
+import FileAiSearchDrawer from './ai-search/file-ai-search-drawer.vue';
 import FileShare from './share/index.vue';
 import { debounce } from 'lodash-es';
 import TerminalDialog from './terminal/index.vue';
@@ -837,8 +837,12 @@ const openAiSearchDrawer = () => {
     aiSearchDrawerVisible.value = true;
 };
 
-const getSearchPath = (path: string) => {
+const getSearchPath = (path: string | string[]) => {
     aiSearchDrawerRef.value?.applyPathFromPicker(path);
+};
+
+const openAiSearchPathPicker = (path?: string) => {
+    fileRef.value.acceptParams({ path: path || req.path, dir: true, multiple: false });
 };
 
 const createRef = ref();

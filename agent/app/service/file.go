@@ -1167,9 +1167,15 @@ func (f *FileService) AISearch(req request.FileAISearch) (*response.FileAISearch
 	defer cancel()
 
 	llmMaxOut := searchOpts.LlmMaxOutputTokens
-	summary, usage, err := files.RunFileAISearchLLM(runCtx, cfg, clientTimeout, root, query, llmItems, truncated, preFiltered, contentHits, scannedFiles, hitsTrunc, matchDesc, searchOpts.ContentHitsPromptMaxBytes, llmMaxOut)
+	summary, usage, err := files.RunFileAISearchLLM(runCtx, cfg, clientTimeout, root, query, req.ResponseLanguage, llmItems, truncated, preFiltered, contentHits, scannedFiles, hitsTrunc, matchDesc, searchOpts.ContentHitsPromptMaxBytes, llmMaxOut)
 	if err != nil {
-		return nil, err
+		result.Mode = "grep"
+		result.Summary = ""
+		result.Duration = time.Since(start).Round(time.Millisecond).String()
+		if errors.Is(err, context.DeadlineExceeded) || strings.Contains(strings.ToLower(err.Error()), "timeout") {
+			return result, nil
+		}
+		return result, nil
 	}
 	result.Summary = summary
 	result.PromptTokens = usage.PromptTokens
