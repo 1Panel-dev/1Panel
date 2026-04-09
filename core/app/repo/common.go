@@ -42,6 +42,11 @@ func WithByName(name string) global.DBOption {
 		return g.Where("`name` = ?", name)
 	}
 }
+func WithByUserID(userID string) global.DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("user_id = ?", userID)
+	}
+}
 func WithoutByName(name string) global.DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("`name` != ?", name)

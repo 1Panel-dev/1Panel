@@ -34,7 +34,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/utils/firewall"
 	"github.com/1Panel-dev/1Panel/core/utils/passkey"
 	"github.com/1Panel-dev/1Panel/core/utils/req_helper/proxy_local"
-	xpack "github.com/1Panel-dev/1Panel/core/edition"
+	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/net/proxy"
 )
