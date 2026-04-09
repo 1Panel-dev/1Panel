@@ -254,8 +254,8 @@ import { useI18n } from 'vue-i18n';
 import { encryptPassword, base64UrlToBuffer, bufferToBase64Url } from '@/utils/auth';
 import { getXpackSettingForTheme } from '@/utils/xpack';
 import { routerToName } from '@/utils/router';
-import { changeToLocal, setDefaultNodeInfo } from '@/utils/node';
 import { Key } from '@element-plus/icons-vue';
+import { changeToLocal } from '@/utils/node';
 
 const i18n = useI18n();
 const themeConfig = computed(() => globalStore.themeConfig);
@@ -447,9 +447,9 @@ const login = (formEl: FormInstance | undefined) => {
             globalStore.agreeLicense = true;
             menuStore.setMenuList([]);
             tabsStore.removeAllTabs();
-            changeToLocal();
+            globalStore.isAdmin = res.data.role === 'ADMIN';
+            await changeToLocal();
             MsgSuccess(i18n.t('commons.msg.loginSuccess'));
-            setDefaultNodeInfo();
             localStorage.removeItem('dashboardCache');
             localStorage.removeItem('upgradeChecked');
             routerToName('home');
@@ -487,13 +487,13 @@ const mfaLogin = async (auto: boolean) => {
         isLoggingIn = true;
         try {
             errMfaInfo.value = false;
-            await mfaLoginApi(mfaLoginForm);
+            const res = await mfaLoginApi(mfaLoginForm);
             globalStore.isLogin = true;
             menuStore.setMenuList([]);
             tabsStore.removeAllTabs();
             MsgSuccess(i18n.t('commons.msg.loginSuccess'));
-            changeToLocal();
-            setDefaultNodeInfo();
+            globalStore.isAdmin = res.data.role === 'ADMIN';
+            await changeToLocal();
             localStorage.removeItem('dashboardCache');
             localStorage.removeItem('upgradeChecked');
             routerToName('home');
@@ -558,9 +558,8 @@ const passkeyLogin = async () => {
         globalStore.agreeLicense = true;
         menuStore.setMenuList([]);
         tabsStore.removeAllTabs();
-        changeToLocal();
+        await changeToLocal();
         MsgSuccess(i18n.t('commons.msg.loginSuccess'));
-        setDefaultNodeInfo();
         localStorage.removeItem('dashboardCache');
         localStorage.removeItem('upgradeChecked');
         routerToName('home');
@@ -624,6 +623,7 @@ const getSetting = async () => {
         isFxplay.value = res.data.isFxplay;
         globalStore.isFxplay = isFxplay.value;
         globalStore.isOffLine = res.data.isOffLine;
+        globalStore.isXpackEE = res.data.isXpackEE;
         globalStore.ignoreCaptcha = !res.data.needCaptcha;
         passkeySetting.value = res.data.passkeySetting;
         if (!globalStore.ignoreCaptcha) {

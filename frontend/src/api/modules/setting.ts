@@ -43,20 +43,31 @@ export const loadLicenseOptions = () => {
 export const listNodeOptions = (type: string) => {
     return http.post<Array<Setting.NodeItem>>(`/core/nodes/list`, { type: type });
 };
-
 export const listAllNodes = () => {
     return http.get<Array<Setting.NodeItem>>(`/core/nodes/all`);
 };
 export const listAllSimpleNodes = () => {
     return http.get<Array<Setting.SimpleNodeItem>>(`/core/nodes/simple/all`);
 };
-
 export const getLicenseSmsInfo = () => {
     return http.get<Setting.SmsInfo>(`/core/licenses/sms/info`);
 };
-
 export const listAppNodes = () => {
     return http.get<Array<Setting.NodeAppItem>>(`/core/xpack/nodes/apps/update`, {}, { timeout: TimeoutEnum.T_60S });
+};
+
+// xpackee
+export const loadNodeByUser = () => {
+    return http.get<Array<Setting.NodeItem>>(`/core/xpackee/users/nodes`);
+};
+export const uploadXpackEELicense = (params: FormData) => {
+    return http.upload('/core/xpackee/licenses/upload', params);
+};
+export const getXpackEELicense = () => {
+    return http.get<Setting.LicenseEE>(`/core/xpackee/licenses/info`);
+};
+export const getXpackEELicenseStatus = () => {
+    return http.get<Setting.LicenseStatus>(`/core/xpackee/licenses/status`);
 };
 
 // agent

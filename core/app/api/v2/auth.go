@@ -226,7 +226,7 @@ func (b *BaseApi) GetWelcomePage(c *gin.Context) {
 
 // @Tags Auth
 // @Summary Get Setting For Login
-// @Success 200 {object} dto.SystemSetting
+// @Success 200 {object} dto.LoginSetting
 // @Router /core/auth/setting [get]
 func (b *BaseApi) GetLoginSetting(c *gin.Context) {
 	settingInfo, err := settingService.GetSettingInfo()
@@ -241,6 +241,7 @@ func (b *BaseApi) GetLoginSetting(c *gin.Context) {
 		IsIntl:      global.CONF.Base.Edition == "intl",
 		IsFxplay:    global.CONF.Base.IsFxplay,
 		IsOffLine:   global.CONF.Base.IsOffLine,
+		IsXPackEE:   global.CONF.Base.IsXpackEE,
 		Language:    settingInfo.Language,
 		MenuTabs:    settingInfo.MenuTabs,
 		PanelName:   settingInfo.PanelName,

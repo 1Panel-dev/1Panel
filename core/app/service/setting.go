@@ -34,7 +34,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/utils/firewall"
 	"github.com/1Panel-dev/1Panel/core/utils/passkey"
 	"github.com/1Panel-dev/1Panel/core/utils/req_helper/proxy_local"
-	"github.com/1Panel-dev/1Panel/core/utils/xpack"
+	xpack "github.com/1Panel-dev/1Panel/core/edition"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/net/proxy"
 )
@@ -180,7 +180,7 @@ func (u *SettingService) Update(key, value string) error {
 			return err
 		}
 	case "UserName", "Password":
-		_ = global.SESSION.Clean()
+		_ = global.SESSION.DeleteByID("")
 	case "Language":
 		i18n.SetCachedDBLanguage(value)
 		if err := xpack.Sync(constant.SyncLanguage); err != nil {
@@ -566,7 +566,7 @@ func (u *SettingService) UpdatePassword(c *gin.Context, old, new string) error {
 	if err := u.HandlePasswordExpired(c, old, new); err != nil {
 		return err
 	}
-	_ = global.SESSION.Clean()
+	_ = global.SESSION.DeleteByID("")
 	return nil
 }
 

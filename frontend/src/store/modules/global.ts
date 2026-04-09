@@ -10,12 +10,8 @@ const INTL_DOCS_URL = 'https://docs.1panel.pro/v2';
 const GlobalStore = defineStore({
     id: 'GlobalState',
     state: (): GlobalState => ({
-        isLoading: false,
-        loadingText: '',
-        isLogin: false,
-        csrfToken: '',
-        entrance: '',
         language: i18n.global.locale.value,
+        device: DeviceType.Desktop,
         themeConfig: {
             panelName: '',
             primary: '#005eeb',
@@ -31,15 +27,21 @@ const GlobalStore = defineStore({
             loginBgType: '',
             loginBtnLinkColor: '',
         },
+        // ui
+        isFullScreen: false,
+        openMenuTabs: false,
         watermark: null,
         watermarkShow: false,
-        openMenuTabs: false,
-        isFullScreen: false,
-        isOnRestart: false,
-        agreeLicense: false,
-        hasNewVersion: false,
+        isLoading: false,
+        loadingText: '',
+        csrfToken: '',
+        // auth
         ignoreCaptcha: true,
-        device: DeviceType.Desktop,
+        agreeLicense: false,
+        isLogin: false,
+        entrance: '',
+        // context
+        hasNewVersion: false,
         lastFilePath: '',
         currentDB: '',
         currentPgDB: '',
@@ -48,15 +50,20 @@ const GlobalStore = defineStore({
         showEntranceWarn: true,
         defaultNetwork: 'all',
         defaultIO: 'all',
-        isFxplay: false,
-
-        isProductPro: false,
+        isOnRestart: false,
+        // tags
+        isAdmin: false,
+        isXpackEE: false,
         isIntl: false,
         docWithRegion: true,
+        isFxplay: false,
+        isOffLine: false,
+        // license
+        isProductPro: false,
         productProExpires: 0,
         isMasterProductPro: false,
-        isOffLine: false,
-
+        isXpackEELicensed: false,
+        // multi-node
         masterAlias: '',
         currentNode: 'local',
         currentNodeAddr: '',
@@ -93,6 +100,15 @@ const GlobalStore = defineStore({
         },
         getMasterAlias() {
             return this.masterAlias || i18n.global.t('xpack.node.master');
+        },
+        isEE() {
+            return this.isXpackEE && this.isXpackEELicensed;
+        },
+        isXpackOrEE() {
+            return (this.isXpackEE && this.isXpackEELicensed) || this.isMasterProductPro;
+        },
+        isXpackNodeOrEE() {
+            return (this.isXpackEE && this.isXpackEELicensed) || this.isProductPro;
         },
         isMasterPro() {
             return this.isMasterProductPro;

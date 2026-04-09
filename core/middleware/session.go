@@ -30,6 +30,10 @@ func SessionAuth() gin.HandlerFunc {
 			helper.BadAuth(c, "ErrNotLogin", err)
 			return
 		}
+		if len(psession.Name) == 0 {
+			helper.BadAuth(c, "ErrNotLogin", err)
+			return
+		}
 		settingRepo := repo.NewISettingRepo()
 		sessionTimeout, err := settingRepo.GetValueByKey("SessionTimeout")
 		if err != nil {

@@ -87,6 +87,7 @@ func Routers() *gin.Engine {
 	Router.Use(middleware.PasswordExpired())
 	Router.Use(middleware.ApiAuth())
 	Router.Use(middleware.CSRFTokenGuard())
+	Router.Use(Proxy())
 
 	PrivateGroup := Router.Group("/api/v2/core")
 	PrivateGroup.Use(middleware.SetPasswordPublicKey())
@@ -94,7 +95,6 @@ func Routers() *gin.Engine {
 		router.InitRouter(PrivateGroup)
 	}
 
-	Router.Use(Proxy())
 	Router.NoRoute(func(c *gin.Context) {
 		if !security.HandleNotRoute(c) {
 			return

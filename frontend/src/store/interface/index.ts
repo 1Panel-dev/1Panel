@@ -27,22 +27,24 @@ export interface Watermark {
 }
 
 export interface GlobalState {
-    isLoading: boolean;
-    loadingText: string;
-    isLogin: boolean;
-    csrfToken: string;
-    entrance: string;
     language: string; // zh | en | tw
+    device: DeviceType;
     themeConfig: ThemeConfigProp;
+    // ui
     isFullScreen: boolean;
     openMenuTabs: boolean;
     watermark: Watermark | null;
     watermarkShow: boolean;
-    isOnRestart: boolean;
-    agreeLicense: boolean;
-    hasNewVersion: boolean;
+    isLoading: boolean;
+    loadingText: string;
+    // auth
     ignoreCaptcha: boolean;
-    device: DeviceType;
+    agreeLicense: boolean;
+    isLogin: boolean;
+    entrance: string;
+    csrfToken: string;
+    // context
+    hasNewVersion: boolean;
     lastFilePath: string;
     currentDB: string;
     currentPgDB: string;
@@ -51,15 +53,20 @@ export interface GlobalState {
     showEntranceWarn: boolean;
     defaultNetwork: string;
     defaultIO: string;
-    isFxplay: boolean;
-
-    isProductPro: boolean;
+    isOnRestart: boolean;
+    // tags
+    isAdmin: boolean;
+    isXpackEE: boolean;
     isIntl: boolean;
     docWithRegion: boolean;
+    isFxplay: boolean;
+    isOffLine: boolean;
+    // license
+    isProductPro: boolean;
     productProExpires: number;
     isMasterProductPro: boolean;
-    isOffLine: boolean;
-
+    isXpackEELicensed: boolean;
+    // multi-node
     masterAlias: string;
     currentNode: string;
     currentNodeAddr: string;

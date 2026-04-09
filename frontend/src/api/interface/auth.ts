@@ -13,6 +13,7 @@ export namespace Login {
     }
     export interface ResLogin {
         name: string;
+        role: string;
         token: string;
         mfaStatus: string;
         mfaSession: string;
@@ -39,7 +40,20 @@ export namespace Login {
         panelName: string;
         theme: string;
         isOffLine: boolean;
+        isXpackEE: boolean;
         needCaptcha: boolean;
         passkeySetting: boolean;
+    }
+
+    export interface AuthInfo {
+        id: number;
+        name: string;
+        role: string;
+    }
+    export interface AuthInfoUpdate {
+        id: number;
+        oldPassword: string;
+        newPassword: string;
+        retryPassword: string;
     }
 }

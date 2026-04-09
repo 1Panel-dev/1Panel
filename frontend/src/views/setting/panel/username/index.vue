@@ -25,9 +25,6 @@ import router from '@/routers';
 import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();
 
-interface DialogProps {
-    userName: string;
-}
 const drawerVisible = ref();
 const loading = ref();
 
@@ -39,8 +36,7 @@ const rules = reactive({
 });
 const formRef = ref<FormInstance>();
 
-const acceptParams = (params: DialogProps): void => {
-    form.userName = params.userName;
+const acceptParams = (): void => {
     drawerVisible.value = true;
 };
 

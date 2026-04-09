@@ -48,7 +48,7 @@
                                 @change="updateConfig('InstallAllowPort', config.installAllowPort)"
                             />
                         </el-form-item>
-                        <CustomSetting v-if="isProductPro" />
+                        <CustomSetting v-if="globalStore.isMasterProductPro" />
                         <span class="input-help logText" v-else>
                             {{ $t('xpack.customApp.licenseHelper') }}
                             <el-link class="link" @click="toUpload" type="primary">
@@ -70,9 +70,9 @@ import { FormRules } from 'element-plus';
 import { MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
 import { defineAsyncComponent } from 'vue';
-import { useGlobalStore } from '@/composables/useGlobalStore';
 import { loadOptionalComponent } from '@/extensions/optional';
-const { isProductPro, isMasterProductPro } = useGlobalStore();
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
 
 const CustomSetting = defineAsyncComponent(() => loadOptionalComponent('/src/xpack/views/appstore/index.vue'));
 
@@ -111,7 +111,7 @@ const toUpload = () => {
 };
 
 const getNodeConfig = async () => {
-    if (isMasterProductPro.value) {
+    if (globalStore.isXpackOrEE()) {
         return;
     }
     const res = await getCurrentNodeCustomAppConfig();
