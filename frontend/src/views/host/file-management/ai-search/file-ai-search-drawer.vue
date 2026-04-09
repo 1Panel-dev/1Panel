@@ -137,7 +137,9 @@
                                     </el-checkbox>
                                 </template>
                                 <template #append>
-                                    <el-button @click="emit('pick-directory')">
+                                    <el-button
+                                        @click="emit('pick-directory', (aiSearchPath || props.listPath || '').trim())"
+                                    >
                                         <el-icon><Folder /></el-icon>
                                     </el-button>
                                 </template>
@@ -225,114 +227,104 @@
                                 <div class="grid grid-cols-1 items-center gap-x-4 gap-y-3 min-[480px]:grid-cols-2">
                                     <div class="ai-search-field-pair flex min-w-0 items-center gap-2">
                                         <span
-                                            class="w-28 shrink-0 text-sm leading-8 text-[var(--el-text-color-secondary)] sm:w-32"
+                                            class="w-32 shrink-0 text-sm leading-8 text-[var(--el-text-color-secondary)] sm:w-36"
                                         >
                                             {{ $t('file.aiSearchLimitMaxItems') }}
                                         </span>
-                                        <el-tooltip :content="$t('file.aiSearchMaxItems')" placement="top">
-                                            <el-input-number
-                                                v-model="aiSearchMaxItems"
-                                                :min="1"
-                                                :max="2000"
-                                                :controls="true"
-                                                class="min-w-0 flex-1 !max-w-full sm:!w-44"
-                                            >
-                                                <template #suffix>
-                                                    <span class="pr-1 text-xs text-[var(--el-text-color-secondary)]">
-                                                        {{ $t('file.aiSearchLimitUnitEntries') }}
-                                                    </span>
-                                                </template>
-                                            </el-input-number>
-                                        </el-tooltip>
+                                        <el-input-number
+                                            v-model="aiSearchMaxItems"
+                                            :min="1"
+                                            :max="2000"
+                                            :controls="true"
+                                            class="min-w-0 flex-1 !max-w-full sm:!w-52"
+                                        >
+                                            <template #suffix>
+                                                <span class="pr-1 text-xs text-[var(--el-text-color-secondary)]">
+                                                    {{ $t('file.aiSearchLimitUnitEntries') }}
+                                                </span>
+                                            </template>
+                                        </el-input-number>
                                     </div>
                                     <div class="ai-search-field-pair flex min-w-0 items-center gap-2">
                                         <span
-                                            class="w-28 shrink-0 text-sm leading-8 text-[var(--el-text-color-secondary)] sm:w-32"
+                                            class="w-32 shrink-0 text-sm leading-8 text-[var(--el-text-color-secondary)] sm:w-36"
                                         >
                                             {{ $t('file.aiSearchLimitMaxScan') }}
                                         </span>
-                                        <el-tooltip :content="$t('file.aiSearchMaxScanFiles')" placement="top">
-                                            <el-input-number
-                                                v-model="aiSearchMaxScanFiles"
-                                                :min="1"
-                                                :max="500"
-                                                :controls="true"
-                                                class="min-w-0 flex-1 !max-w-full sm:!w-44"
-                                            >
-                                                <template #suffix>
-                                                    <span class="pr-1 text-xs text-[var(--el-text-color-secondary)]">
-                                                        {{ $t('file.aiSearchLimitUnitFiles') }}
-                                                    </span>
-                                                </template>
-                                            </el-input-number>
-                                        </el-tooltip>
+                                        <el-input-number
+                                            v-model="aiSearchMaxScanFiles"
+                                            :min="1"
+                                            :max="500"
+                                            :controls="true"
+                                            class="min-w-0 flex-1 !max-w-full sm:!w-52"
+                                        >
+                                            <template #suffix>
+                                                <span class="pr-1 text-xs text-[var(--el-text-color-secondary)]">
+                                                    {{ $t('file.aiSearchLimitUnitFiles') }}
+                                                </span>
+                                            </template>
+                                        </el-input-number>
                                     </div>
                                     <div class="ai-search-field-pair flex min-w-0 items-center gap-2">
                                         <span
-                                            class="w-28 shrink-0 text-sm leading-8 text-[var(--el-text-color-secondary)] sm:w-32"
+                                            class="w-32 shrink-0 text-sm leading-8 text-[var(--el-text-color-secondary)] sm:w-36"
                                         >
                                             {{ $t('file.aiSearchLimitMaxBytes') }}
                                         </span>
-                                        <el-tooltip :content="$t('file.aiSearchMaxFileBytes')" placement="top">
-                                            <el-input-number
-                                                v-model="aiSearchMaxFileBytes"
-                                                :min="1024"
-                                                :max="4194304"
-                                                :step="1024"
-                                                :controls="true"
-                                                class="min-w-0 flex-1 !max-w-full sm:!w-52"
-                                            >
-                                                <template #suffix>
-                                                    <span class="pr-1 text-xs text-[var(--el-text-color-secondary)]">
-                                                        {{ $t('file.aiSearchLimitUnitBytes') }}
-                                                    </span>
-                                                </template>
-                                            </el-input-number>
-                                        </el-tooltip>
+                                        <el-input-number
+                                            v-model="aiSearchMaxFileBytes"
+                                            :min="1024"
+                                            :max="4194304"
+                                            :step="1024"
+                                            :controls="true"
+                                            class="min-w-0 flex-1 !max-w-full sm:!w-52"
+                                        >
+                                            <template #suffix>
+                                                <span class="pr-1 text-xs text-[var(--el-text-color-secondary)]">
+                                                    {{ $t('file.aiSearchLimitUnitBytes') }}
+                                                </span>
+                                            </template>
+                                        </el-input-number>
                                     </div>
                                     <div class="ai-search-field-pair flex min-w-0 items-center gap-2">
                                         <span
-                                            class="w-28 shrink-0 text-sm leading-8 text-[var(--el-text-color-secondary)] sm:w-32"
+                                            class="w-32 shrink-0 text-sm leading-8 text-[var(--el-text-color-secondary)] sm:w-36"
                                         >
                                             {{ $t('file.aiSearchLimitHitsPerFile') }}
                                         </span>
-                                        <el-tooltip :content="$t('file.aiSearchMaxHitsPerFile')" placement="top">
-                                            <el-input-number
-                                                v-model="aiSearchMaxHitsPerFile"
-                                                :min="1"
-                                                :max="200"
-                                                :controls="true"
-                                                class="min-w-0 flex-1 !max-w-full sm:!w-44"
-                                            >
-                                                <template #suffix>
-                                                    <span class="pr-1 text-xs text-[var(--el-text-color-secondary)]">
-                                                        {{ $t('file.aiSearchLimitUnitLines') }}
-                                                    </span>
-                                                </template>
-                                            </el-input-number>
-                                        </el-tooltip>
+                                        <el-input-number
+                                            v-model="aiSearchMaxHitsPerFile"
+                                            :min="1"
+                                            :max="200"
+                                            :controls="true"
+                                            class="min-w-0 flex-1 !max-w-full sm:!w-52"
+                                        >
+                                            <template #suffix>
+                                                <span class="pr-1 text-xs text-[var(--el-text-color-secondary)]">
+                                                    {{ $t('file.aiSearchLimitUnitLines') }}
+                                                </span>
+                                            </template>
+                                        </el-input-number>
                                     </div>
                                     <div class="ai-search-field-pair flex min-w-0 items-center gap-2">
                                         <span
-                                            class="w-28 shrink-0 text-sm leading-8 text-[var(--el-text-color-secondary)] sm:w-32"
+                                            class="w-32 shrink-0 text-sm leading-8 text-[var(--el-text-color-secondary)] sm:w-36"
                                         >
                                             {{ $t('file.aiSearchLimitTotalHits') }}
                                         </span>
-                                        <el-tooltip :content="$t('file.aiSearchMaxTotalHits')" placement="top">
-                                            <el-input-number
-                                                v-model="aiSearchMaxTotalHits"
-                                                :min="1"
-                                                :max="2000"
-                                                :controls="true"
-                                                class="min-w-0 flex-1 !max-w-full sm:!w-44"
-                                            >
-                                                <template #suffix>
-                                                    <span class="pr-1 text-xs text-[var(--el-text-color-secondary)]">
-                                                        {{ $t('file.aiSearchLimitUnitLines') }}
-                                                    </span>
-                                                </template>
-                                            </el-input-number>
-                                        </el-tooltip>
+                                        <el-input-number
+                                            v-model="aiSearchMaxTotalHits"
+                                            :min="1"
+                                            :max="2000"
+                                            :controls="true"
+                                            class="min-w-0 flex-1 !max-w-full sm:!w-52"
+                                        >
+                                            <template #suffix>
+                                                <span class="pr-1 text-xs text-[var(--el-text-color-secondary)]">
+                                                    {{ $t('file.aiSearchLimitUnitLines') }}
+                                                </span>
+                                            </template>
+                                        </el-input-number>
                                     </div>
                                 </div>
                             </div>
@@ -499,6 +491,7 @@ import { fileAiSearch } from '@/api/modules/files';
 import { getAgentFileManageAIInfo, updateAgentFileManageAIInfo } from '@/api/modules/setting';
 import { pageAgentAccounts } from '@/api/modules/ai';
 import { File } from '@/api/interface/file';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 import i18n from '@/lang';
 import { MsgSuccess, MsgWarning } from '@/utils/message';
 import MkdownEditor from '@/components/mkdown-editor/index.vue';
@@ -522,9 +515,11 @@ const props = defineProps<{
     listPath: string;
 }>();
 
+const { globalStore } = useGlobalStore();
+
 const emit = defineEmits<{
     (e: 'update:modelValue', v: boolean): void;
-    (e: 'pick-directory'): void;
+    (e: 'pick-directory', path: string): void;
     (e: 'open-editor', payload: { path: string; initialLine?: number }): void;
 }>();
 
@@ -814,6 +809,7 @@ const submitAiSearch = async () => {
         const payload: File.FileAISearchReq = {
             path: rootPath,
             query: q,
+            responseLanguage: globalStore.language,
             containSub: aiSearchContainSub.value,
             matchCase: aiSearchMatchCase.value,
             wholeWord: aiSearchWholeWord.value,
@@ -851,8 +847,12 @@ const submitAiSearch = async () => {
     }
 };
 
-function applyPathFromPicker(path: string) {
-    aiSearchPath.value = path;
+function applyPathFromPicker(path: string | string[]) {
+    if (Array.isArray(path)) {
+        aiSearchPath.value = (path[0] || '').trim();
+        return;
+    }
+    aiSearchPath.value = (path || '').trim();
 }
 
 function resetAiSearchLimitsToDefaults() {

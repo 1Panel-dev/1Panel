@@ -63,6 +63,9 @@ func (b *BaseApi) FileAISearch(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
+	if strings.TrimSpace(req.ResponseLanguage) == "" {
+		req.ResponseLanguage = strings.TrimSpace(c.GetHeader("Accept-Language"))
+	}
 	res, err := fileService.AISearch(req)
 	if err != nil {
 		helper.InternalServer(c, err)

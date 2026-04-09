@@ -10,18 +10,19 @@ type FileOption struct {
 }
 
 type FileAISearch struct {
-	Path           string   `json:"path" validate:"required"`
-	Query          string   `json:"query" validate:"required"`
-	ContainSub     *bool    `json:"containSub,omitempty"`
-	MaxItems       int      `json:"maxItems" validate:"omitempty,min=1,max=2000"`
-	MatchCase      bool     `json:"matchCase"`
-	WholeWord      bool     `json:"wholeWord"`
-	UseRegex       bool     `json:"useRegex"`
-	Extensions     []string `json:"extensions,omitempty"`
-	MinSize        int64    `json:"minSize"`
-	MaxSize        int64    `json:"maxSize"`
-	ModifiedAfter  string   `json:"modifiedAfter,omitempty"`
-	ModifiedBefore string   `json:"modifiedBefore,omitempty"`
+	Path             string   `json:"path" validate:"required"`
+	Query            string   `json:"query" validate:"required"`
+	ResponseLanguage string   `json:"responseLanguage,omitempty"`
+	ContainSub       *bool    `json:"containSub,omitempty"`
+	MaxItems         int      `json:"maxItems" validate:"omitempty,min=1,max=2000"`
+	MatchCase        bool     `json:"matchCase"`
+	WholeWord        bool     `json:"wholeWord"`
+	UseRegex         bool     `json:"useRegex"`
+	Extensions       []string `json:"extensions,omitempty"`
+	MinSize          int64    `json:"minSize"`
+	MaxSize          int64    `json:"maxSize"`
+	ModifiedAfter    string   `json:"modifiedAfter,omitempty"`
+	ModifiedBefore   string   `json:"modifiedBefore,omitempty"`
 
 	MaxScanFiles              int   `json:"maxScanFiles"`
 	MaxFileBytes              int64 `json:"maxFileBytes"`

@@ -438,14 +438,45 @@ interface TreeNode {
 }
 
 const pendingInitialLine = ref(0);
+let lineHighlightDecorationIds: string[] = [];
+
+const clearPendingLineHighlight = () => {
+    if (!editor) {
+        lineHighlightDecorationIds = [];
+        return;
+    }
+    lineHighlightDecorationIds = editor.deltaDecorations(lineHighlightDecorationIds, []);
+};
 
 const revealPendingInitialLine = () => {
     const line = pendingInitialLine.value;
     if (!editor || line < 1) {
         return;
     }
-    editor.setPosition({ lineNumber: line, column: 1 });
-    editor.revealLineInCenter(line);
+    const model = editor.getModel();
+    if (!model) {
+        return;
+    }
+    const targetLine = Math.min(line, model.getLineCount());
+    editor.setSelection({
+        startLineNumber: targetLine,
+        startColumn: 1,
+        endLineNumber: targetLine,
+        endColumn: 1,
+    });
+    editor.setPosition({ lineNumber: targetLine, column: 1 });
+    editor.revealLineInCenter(targetLine);
+    lineHighlightDecorationIds = editor.deltaDecorations(lineHighlightDecorationIds, [
+        {
+            range: new monaco.Range(targetLine, 1, targetLine, model.getLineMaxColumn(targetLine)),
+            options: {
+                isWholeLine: true,
+                className: 'ai-search-target-line',
+                linesDecorationsClassName: 'ai-search-target-line-gutter',
+            },
+        },
+    ]);
+    editor.focus();
     pendingInitialLine.value = 0;
 };
 
@@ -722,6 +753,7 @@ const handleClose = () => {
         fileTabs.value = [];
         isEdit.value = false;
         if (editor) {
+            clearPendingLineHighlight();
             editor.dispose();
         }
         em('close', open.value);
@@ -942,6 +974,12 @@ const acceptParams = async (props: EditProps) => {
     saveTabsToStorage();
     nextTick(() => {
         if (editor) {
+            editor.setValue(form.value.content);
+            const model = editor.getModel();
+            if (model) {
+                monaco.editor.setModelLanguage(model, config.language);
+            }
+            isEdit.value = false;
             revealPendingInitialLine();
         }
     });
@@ -1426,5 +1464,13 @@ defineExpose({ acceptParams });
 
 :deep(.el-input__inner:focus) {
     outline: none !important;
+}
+
+:deep(.monaco-editor .ai-search-target-line) {
+    background-color: rgba(64, 158, 255, 0.14);
+}
+
+:deep(.monaco-editor .ai-search-target-line-gutter) {
+    border-left: 3px solid var(--el-color-primary);
 }
 </style>

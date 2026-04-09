@@ -42,6 +42,7 @@ export namespace File {
     export interface FileAISearchReq {
         path: string;
         query: string;
+        responseLanguage?: string;
         containSub?: boolean;
         maxItems?: number;
         matchCase?: boolean;

@@ -11,24 +11,33 @@ import (
 
 const fileAISearchMaxPathRunes = 240
 
-func buildFileAISearchSystemPrompt() string {
-	return strings.Join([]string{
+func buildFileAISearchSystemPrompt(responseLanguage string) string {
+	lines := []string{
 		"You are a file browser assistant for a server panel.",
 		"Answer using Markdown (headings, bullet lists).",
 		"Only mention files and directories that appear in the provided inventory. Do not invent paths.",
 		"If a \"Content line matches\" section is present, you may reference those lines and numbers only; never invent line numbers or snippets that are not listed there.",
 		"If the inventory was truncated or incomplete, say so and suggest narrowing the directory or increasing limits.",
 		"Group or rank results by relevance to the user's question when helpful.",
-		"Prefer responding in the same language as the user's query (e.g. Chinese if the query is in Chinese).",
-	}, "\n")
+	}
+	if lang := normalizeFileAISearchLanguage(responseLanguage); lang != "" {
+		lines = append(lines, "Respond in "+lang+".")
+	} else {
+		lines = append(lines, "Prefer responding in the same language as the user's query (e.g. Chinese if the query is in Chinese).")
+	}
+	return strings.Join(lines, "\n")
 }
 
-func buildFileAISearchUserPrompt(root, query string, items []AISearchInventoryItem, truncated, preFiltered bool, contentHits []FileAIContentHit, contentScannedFiles int, contentHitsTruncated bool, matchDesc string, promptHitMaxBytes int) string {
+func buildFileAISearchUserPrompt(root, query, responseLanguage string, items []AISearchInventoryItem, truncated, preFiltered bool, contentHits []FileAIContentHit, contentScannedFiles int, contentHitsTruncated bool, matchDesc string, promptHitMaxBytes int) string {
 	var b strings.Builder
 	b.WriteString("User question:\n")
 	b.WriteString(strings.TrimSpace(query))
 	b.WriteString("\n\nRoot directory:\n")
 	b.WriteString(root)
+	if lang := normalizeFileAISearchLanguage(responseLanguage); lang != "" {
+		b.WriteString("\n\nPanel reply language:\n")
+		b.WriteString(lang)
+	}
 	b.WriteString("\n\nInventory notes:\n")
 	if truncated {
 		b.WriteString("- Listing was truncated; not all files under the root were included.\n")
@@ -80,7 +89,7 @@ func buildFileAISearchUserPrompt(root, query string, items []AISearchInventoryIt
 	return b.String()
 }
 
-func RunFileAISearchLLM(ctx context.Context, cfg terminalai.GeneratorConfig, clientTimeout time.Duration, root, query string, items []AISearchInventoryItem, truncated, preFiltered bool, contentHits []FileAIContentHit, contentScannedFiles int, contentHitsTruncated bool, matchDesc string, promptHitMaxBytes, llmMaxOutputTokens int) (string, terminalai.ResponseUsage, error) {
+func RunFileAISearchLLM(ctx context.Context, cfg terminalai.GeneratorConfig, clientTimeout time.Duration, root, query, responseLanguage string, items []AISearchInventoryItem, truncated, preFiltered bool, contentHits []FileAIContentHit, contentScannedFiles int, contentHitsTruncated bool, matchDesc string, promptHitMaxBytes, llmMaxOutputTokens int) (string, terminalai.ResponseUsage, error) {
 	timeout := clientTimeout
 	if timeout <= 0 {
 		timeout = 2 * time.Minute
@@ -109,8 +118,8 @@ func RunFileAISearchLLM(ctx context.Context, cfg terminalai.GeneratorConfig, cli
 	}
 	resp, err := client.ChatCompletion(ctx, terminalai.ChatCompletionRequest{
 		Messages: []terminalai.ChatMessage{
-			{Role: "system", Content: buildFileAISearchSystemPrompt()},
-			{Role: "user", Content: buildFileAISearchUserPrompt(root, query, items, truncated, preFiltered, contentHits, contentScannedFiles, contentHitsTruncated, matchDesc, promptHitMaxBytes)},
+			{Role: "system", Content: buildFileAISearchSystemPrompt(responseLanguage)},
+			{Role: "user", Content: buildFileAISearchUserPrompt(root, query, responseLanguage, items, truncated, preFiltered, contentHits, contentScannedFiles, contentHitsTruncated, matchDesc, promptHitMaxBytes)},
 		},
 		MaxTokens: outTokens,
 	})
@@ -122,4 +131,34 @@ func RunFileAISearchLLM(ctx context.Context, cfg terminalai.GeneratorConfig, cli
 		return "", resp.Usage, fmt.Errorf("model returned empty summary")
 	}
 	return summary, resp.Usage, nil
+}
+
+func normalizeFileAISearchLanguage(lang string) string {
+	lang = strings.TrimSpace(strings.ToLower(lang))
+	switch {
+	case lang == "", lang == "*":
+		return "English"
+	case strings.HasPrefix(lang, "zh-hant"), strings.HasPrefix(lang, "zh-tw"), strings.HasPrefix(lang, "zh-hk"):
+		return "Traditional Chinese"
+	case strings.HasPrefix(lang, "zh"):
+		return "Simplified Chinese"
+	case strings.HasPrefix(lang, "en"):
+		return "English"
+	case strings.HasPrefix(lang, "ja"):
+		return "Japanese"
+	case strings.HasPrefix(lang, "ko"):
+		return "Korean"
+	case strings.HasPrefix(lang, "ru"):
+		return "Russian"
+	case strings.HasPrefix(lang, "ms"):
+		return "Malay"
+	case strings.HasPrefix(lang, "tr"):
+		return "Turkish"
+	case strings.HasPrefix(lang, "pt-br"):
+		return "Brazilian Portuguese"
+	case strings.HasPrefix(lang, "es"):
+		return "Spanish"
+	default:
+		return lang
+	}
 }
