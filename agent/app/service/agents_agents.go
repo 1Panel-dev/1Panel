@@ -43,7 +43,7 @@ func (a AgentService) CreateRole(req dto.AgentRoleCreateReq) (*dto.AgentRoleCrea
 	args = append(args, "--agent-dir", agentDir)
 	args = append(args, "--non-interactive", "--json")
 
-	mgr := cmd.NewCommandMgr(cmd.WithTimeout(2 * time.Minute))
+	mgr := cmd.NewCommandMgr(cmd.WithTimeout(5 * time.Minute))
 	output, err := mgr.RunWithStdout("docker", args...)
 	if err != nil {
 		return nil, err
@@ -127,7 +127,7 @@ func (a AgentService) DeleteRole(req dto.AgentRoleDeleteReq) error {
 
 	args := []string{"exec", install.ContainerName, "openclaw", "agents", "delete", req.ID, "--force"}
 
-	mgr := cmd.NewCommandMgr(cmd.WithTimeout(2 * time.Minute))
+	mgr := cmd.NewCommandMgr(cmd.WithTimeout(5 * time.Minute))
 	if _, err = mgr.RunWithStdout("docker", args...); err != nil {
 		return err
 	}
@@ -182,7 +182,7 @@ func (a AgentService) operateRoleBinding(req dto.AgentRoleBindReq, action string
 		binding,
 	}
 	args = append(args, "--json")
-	mgr := cmd.NewCommandMgr(cmd.WithTimeout(2 * time.Minute))
+	mgr := cmd.NewCommandMgr(cmd.WithTimeout(5 * time.Minute))
 	_, err = mgr.RunWithStdout("docker", args...)
 	return err
 }
