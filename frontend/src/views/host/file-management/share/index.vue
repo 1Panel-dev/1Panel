@@ -23,9 +23,9 @@
                     <el-option v-for="opt in expireOptions" :key="opt.value" :label="opt.label" :value="opt.value" />
                 </el-select>
             </el-form-item>
-            <el-form-item :label="$t('file.sharePassword')" prop="password">
+            <el-form-item :label="$t('file.sharePassword')" prop="sharePassword">
                 <el-input
-                    v-model="form.password"
+                    v-model="form.sharePassword"
                     type="password"
                     show-password
                     clearable
@@ -54,7 +54,7 @@
                     </div>
                 </el-form-item>
                 <el-form-item :label="$t('file.shareExpiresAt')">
-                    <span>{{ expiresAtText }}</span>
+                    <el-input :model-value="expiresAtText" readonly />
                 </el-form-item>
             </template>
         </el-form>
@@ -102,7 +102,7 @@ import i18n from '@/lang';
 import { GlobalStore } from '@/store';
 import { buildFileSharePageUrl, buildFileShareQrCodeUrl, copyText, dateFormat as formatDateTime } from '@/utils/util';
 import type { FormInstance, FormRules } from 'element-plus';
-import { computed, reactive, ref } from 'vue';
+import { computed, reactive, ref, watch } from 'vue';
 
 interface ShareProps {
     path: string;
@@ -119,9 +119,12 @@ const expiresAtText = ref('');
 const qrCodeUrl = ref('');
 const qrDialogOpen = ref(false);
 const shareFormRef = ref<FormInstance>();
+const syncingPassword = ref(false);
+const initialSharePassword = ref('');
+const passwordTouched = ref(false);
 const form = reactive({
     expireMinutes: 1440,
-    password: '',
+    sharePassword: '',
 });
 
 const emit = defineEmits(['close']);
@@ -149,8 +152,21 @@ const validatePassword = (_rule, value, callback) => {
 };
 
 const rules = reactive<FormRules>({
-    password: [{ validator: validatePassword, trigger: 'blur' }],
+    sharePassword: [{ validator: validatePassword, trigger: 'blur' }],
 });
+
+watch(
+    () => form.sharePassword,
+    (val) => {
+        if (syncingPassword.value) {
+            return;
+        }
+        if (val === initialSharePassword.value) {
+            return;
+        }
+        passwordTouched.value = true;
+    },
+);
 
 const mapExpireMinutes = (info: File.FileShareInfo) => {
     if (info.permanent || info.expiresAt === 0) {
@@ -169,7 +185,11 @@ const applyShareInfo = (info: File.FileShareInfo | null) => {
         qrCodeUrl.value = '';
         qrDialogOpen.value = false;
         form.expireMinutes = 1440;
-        form.password = '';
+        form.sharePassword = '';
+        syncingPassword.value = true;
+        initialSharePassword.value = '';
+        passwordTouched.value = false;
+        syncingPassword.value = false;
         return;
     }
     shareUrl.value = buildFileSharePageUrl(info.code, globalStore.currentNode);
@@ -178,7 +198,11 @@ const applyShareInfo = (info: File.FileShareInfo | null) => {
         ? i18n.global.t('website.ever')
         : formatDateTime(null, null, info.expiresAt * 1000);
     form.expireMinutes = mapExpireMinutes(info);
-    form.password = '';
+    syncingPassword.value = true;
+    form.sharePassword = info.password || '';
+    initialSharePassword.value = form.sharePassword;
+    passwordTouched.value = false;
+    syncingPassword.value = false;
 };
 
 const loadShareDetail = async () => {
@@ -207,12 +231,21 @@ const generate = async () => {
     }
     loading.value = true;
     try {
-        const pw = form.password.trim();
-        const res = await createFileShare({
+        const pw = form.sharePassword.trim();
+        const payload: File.FileShareCreate = {
             path: filePath.value,
             expireMinutes: form.expireMinutes,
-            ...(pw.length > 0 ? { password: pw } : {}),
-        });
+        };
+
+        // Only send password when user explicitly changes it.
+        if (passwordTouched.value) {
+            payload.password = pw; // empty string means "clear password"
+        } else if (!shareInfo.value?.hasPassword && pw.length > 0) {
+            // New share: allow setting password when it wasn't loaded from server.
+            payload.password = pw;
+        }
+
+        const res = await createFileShare(payload);
         applyShareInfo(res.data as File.FileShareInfo);
         changed.value = true;
     } finally {
@@ -233,7 +266,19 @@ const cancelShare = async () => {
 
 const copyLink = () => {
     if (shareUrl.value) {
-        copyText(shareUrl.value);
+        const password = form.sharePassword.trim();
+        const content = password
+            ? `${i18n.global.t('file.shareLinkLabel')}：${shareUrl.value}，${i18n.global.t(
+                  'file.sharePassword',
+              )}：${password}`
+            : `${i18n.global.t('file.shareLinkLabel')}：${shareUrl.value}`;
+        copyText(content);
+    }
+};
+
+const openShareUrl = () => {
+    if (shareUrl.value) {
+        window.open(shareUrl.value, '_blank', 'noopener,noreferrer');
     }
 };
 

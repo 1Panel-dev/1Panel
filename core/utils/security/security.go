@@ -18,6 +18,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+var publicSharePagePattern = regexp.MustCompile(`^/s/[A-Za-z0-9]{10,16}$`)
+
 func HandleNotRoute(c *gin.Context) bool {
 	if !checkBindDomain(c) {
 		HandleNotSecurity(c, "err_domain")
@@ -137,11 +139,19 @@ func checkFrontendPath(c *gin.Context) bool {
 	if !isFrontendPath(c) {
 		return false
 	}
+	if isPublicFileSharePagePath(c.Request.URL.Path) {
+		return true
+	}
 	authService := service.NewIAuthService()
 	if authService.GetSecurityEntrance() != "" {
 		return authService.IsLogin(c)
 	}
 	return true
+}
+
+func isPublicFileSharePagePath(path string) bool {
+	reqUri := strings.TrimSuffix(path, "/")
+	return publicSharePagePattern.MatchString(reqUri)
 }
 
 func checkBindDomain(c *gin.Context) bool {

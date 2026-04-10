@@ -185,6 +185,7 @@ var DynamicRoutes = []string{
 	`^/databases/mysql/setting/[^/]+/[^/]+$`,
 	`^/databases/postgresql/setting/[^/]+/[^/]+$`,
 	`^/websites/[^/]+/config/[^/]+$`,
+	`^/s/[A-Za-z0-9]{10,16}$`,
 }
 
 var CertStore atomic.Value

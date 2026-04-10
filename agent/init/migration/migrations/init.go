@@ -1220,7 +1220,7 @@ var AddFileManageAISettings = &gormigrate.Migration{
 }
 
 var AddFileShareTable = &gormigrate.Migration{
-	ID: "20260407-add-file-share-table",
+	ID: "20260410-add-file-share-table",
 	Migrate: func(tx *gorm.DB) error {
 		return tx.AutoMigrate(&model.FileShare{})
 	},
