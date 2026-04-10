@@ -170,7 +170,7 @@
 import { ref } from 'vue';
 import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 import { routerToFileWithPath } from '@/utils/router';
-import { copyText } from '@/utils/util';
+import { copyText } from '@/utils/clipboard';
 import i18n from '@/lang';
 
 const visible = ref(false);

@@ -157,7 +157,9 @@
 
 <script lang="ts" setup>
 import { reactive, ref, computed } from 'vue';
-import { dateFormat, newUUID, computeSize2 } from '@/utils/util';
+import { dateFormat } from '@/utils/date';
+import { newUUID } from '@/utils/id';
+import { computeSize2 } from '@/utils/size';
 import { Container } from '@/api/interface/container';
 import Pull from '@/views/container/image/pull/index.vue';
 import Tag from '@/views/container/image/tag/index.vue';

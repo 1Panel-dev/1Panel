@@ -46,7 +46,7 @@
 <script setup lang="ts">
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import LogRouter from '@/views/log/router/index.vue';
-import { dateFormat } from '@/utils/util';
+import { dateFormat } from '@/utils/date';
 import { cleanLogs, getLoginLogs } from '@/api/modules/log';
 import { onMounted, reactive, ref } from 'vue';
 import i18n from '@/lang';

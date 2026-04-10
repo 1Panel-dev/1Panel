@@ -25,8 +25,7 @@
 import { containerPrune } from '@/api/modules/container';
 import TaskLog from '@/components/log/task/index.vue';
 import { ref } from 'vue';
-import { newUUID } from '@/utils/util';
-
+import { newUUID } from '@/utils/id';
 const loading = ref(false);
 const open = ref<boolean>(false);
 const taskLogRef = ref();

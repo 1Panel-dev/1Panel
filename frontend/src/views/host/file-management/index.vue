@@ -691,16 +691,11 @@ import {
     searchFavorite,
     searchHostMount,
 } from '@/api/modules/files';
-import {
-    computeSize,
-    copyText,
-    dateFormat,
-    downloadFile,
-    getFileType,
-    getIcon,
-    getRandomStr,
-    isConvertible,
-} from '@/utils/util';
+import { computeSize } from '@/utils/size';
+import { copyText } from '@/utils/clipboard';
+import { dateFormat } from '@/utils/date';
+import { downloadFile, getFileType, getIcon, isConvertible } from '@/utils/file';
+import { getRandomStr } from '@/utils/id';
 import { File } from '@/api/interface/file';
 import { Languages, Mimetypes } from '@/global/mimetype';
 import { useRouter } from 'vue-router';

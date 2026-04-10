@@ -252,7 +252,7 @@
 import { reactive, ref } from 'vue';
 import { Cronjob } from '@/api/interface/cronjob';
 import { searchRecords, handleOnce, updateStatus, cleanRecords, stopCronjob } from '@/api/modules/cronjob';
-import { dateFormat } from '@/utils/util';
+import { dateFormat } from '@/utils/date';
 import LogFile from '@/components/log/file/index.vue';
 import i18n from '@/lang';
 import { ElMessageBox } from 'element-plus';

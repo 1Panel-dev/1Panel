@@ -210,7 +210,8 @@ import { AI } from '@/api/interface/ai';
 import { App } from '@/api/interface/app';
 import { Website } from '@/api/interface/website';
 import { SearchWithPage } from '@/api/interface';
-import { dateFormat, newUUID } from '@/utils/util';
+import { dateFormat } from '@/utils/date';
+import { newUUID } from '@/utils/id';
 import { MsgSuccess } from '@/utils/message';
 
 import AddDialog from '@/views/ai/agents/agent/add/index.vue';

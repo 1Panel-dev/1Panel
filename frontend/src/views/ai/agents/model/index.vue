@@ -57,7 +57,7 @@ import AddDialog from '@/views/ai/agents/model/add/index.vue';
 import ModelPoolDialog from '@/views/ai/agents/model/pool/index.vue';
 import { ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
-import { dateFormat } from '@/utils/util';
+import { dateFormat } from '@/utils/date';
 import { getAgentProviderDisplayName } from '@/utils/agent';
 
 const items = ref<AI.AgentAccountItem[]>([]);

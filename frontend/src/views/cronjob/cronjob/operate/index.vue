@@ -865,7 +865,7 @@ import { loadContainerUsers } from '@/api/modules/container';
 import { storeToRefs } from 'pinia';
 import { GlobalStore } from '@/store';
 import LicenseImport from '@/components/license-import/index.vue';
-import { splitTimeFromSecond, transferTimeToSecond } from '@/utils/util';
+import { splitTimeFromSecond, transferTimeToSecond } from '@/utils/validate';
 import { getGroupList } from '@/api/modules/group';
 import { routerToName, routerToPath } from '@/utils/router';
 import { loadBaseDir } from '@/api/modules/setting';

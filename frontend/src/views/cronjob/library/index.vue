@@ -120,7 +120,9 @@
 </template>
 
 <script setup lang="ts">
-import { dateFormat, deepCopy, getCurrentDateFormatted, newUUID } from '@/utils/util';
+import { dateFormat, getCurrentDateFormatted } from '@/utils/date';
+import { deepCopy } from '@/utils/misc';
+import { newUUID } from '@/utils/id';
 import GroupDialog from '@/components/group/index.vue';
 import TaskLog from '@/components/log/task/index.vue';
 import OperateDialog from '@/views/cronjob/library/operate/index.vue';

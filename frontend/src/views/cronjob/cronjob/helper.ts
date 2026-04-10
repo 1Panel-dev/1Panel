@@ -1,7 +1,6 @@
 import { Cronjob } from '@/api/interface/cronjob';
 import i18n from '@/lang';
-import { loadZero } from '@/utils/util';
-
+import { loadZero } from '@/utils/date';
 export const specOptions = [
     { label: i18n.global.t('cronjob.perMonth'), value: 'perMonth' },
     { label: i18n.global.t('cronjob.perWeek'), value: 'perWeek' },

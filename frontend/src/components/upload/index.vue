@@ -135,7 +135,9 @@
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
-import { computeSize, newUUID, transferTimeToSecond } from '@/utils/util';
+import { computeSize } from '@/utils/size';
+import { newUUID } from '@/utils/id';
+import { transferTimeToSecond } from '@/utils/validate';
 import i18n from '@/lang';
 import { UploadFile, UploadFiles, UploadInstance, UploadProps, UploadRawFile, genFileId } from 'element-plus';
 import { File } from '@/api/interface/file';

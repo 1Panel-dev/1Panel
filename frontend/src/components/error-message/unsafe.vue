@@ -17,7 +17,7 @@
 </template>
 
 <script setup lang="ts" name="404">
-import { copyText } from '@/utils/util';
+import { copyText } from '@/utils/clipboard';
 </script>
 
 <style scoped lang="scss">

@@ -81,8 +81,7 @@ import Network from '@/views/host/monitor/setting/default-network/index.vue';
 import IO from '@/views/host/monitor/setting/default-io/index.vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import { splitTimeFromSecond, transTimeUnit } from '@/utils/util';
-
+import { splitTimeFromSecond, transTimeUnit } from '@/utils/validate';
 const loading = ref();
 const form = reactive({
     monitorStatus: 'Disable',

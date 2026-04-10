@@ -75,7 +75,7 @@ import { FitAddon } from '@xterm/addon-fit';
 import { Terminal } from '@xterm/xterm';
 import '@xterm/xterm/css/xterm.css';
 import i18n from '@/lang';
-import { dateFormatForName } from '@/utils/util';
+import { dateFormatForName } from '@/utils/date';
 import { computed, nextTick, onMounted, onUnmounted, reactive, ref } from 'vue';
 import { ElMessageBox } from 'element-plus';
 import { MsgError, MsgSuccess } from '@/utils/message';

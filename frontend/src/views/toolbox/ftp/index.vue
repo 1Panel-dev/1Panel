@@ -163,8 +163,7 @@ import LogDialog from '@/views/toolbox/ftp/log/index.vue';
 import { Toolbox } from '@/api/interface/toolbox';
 import { GlobalStore } from '@/store';
 import { routerToFileWithPath } from '@/utils/router';
-import { getRandomStr } from '@/utils/util';
-
+import { getRandomStr } from '@/utils/id';
 const globalStore = GlobalStore();
 
 const loading = ref();

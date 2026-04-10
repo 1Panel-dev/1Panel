@@ -50,7 +50,7 @@
 </template>
 <script lang="ts" setup>
 import { nextTick, onMounted, onUnmounted, reactive, ref, computed } from 'vue';
-import { downloadFile } from '@/utils/util';
+import { downloadFile } from '@/utils/file';
 import { readByLine } from '@/api/modules/files';
 import { GlobalStore } from '@/store';
 import bus from '@/global/bus';

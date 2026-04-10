@@ -193,7 +193,8 @@ import {
 } from '@/api/modules/ai';
 import { AI } from '@/api/interface/ai';
 import { getAppPort } from '@/api/modules/app';
-import { dateFormat, newUUID } from '@/utils/util';
+import { dateFormat } from '@/utils/date';
+import { newUUID } from '@/utils/id';
 import { MsgInfo, MsgSuccess } from '@/utils/message';
 import BindDomain from '@/views/ai/model/ollama/domain/index.vue';
 import { routerToNameWithQuery } from '@/utils/router';

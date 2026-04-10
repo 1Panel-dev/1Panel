@@ -30,8 +30,7 @@
 </template>
 <script lang="ts" setup>
 import { ref } from 'vue';
-import { computeSize } from '@/utils/util';
-
+import { computeSize } from '@/utils/size';
 const dialogVisible = ref();
 const existFiles = ref<DialogProps[]>([]);
 

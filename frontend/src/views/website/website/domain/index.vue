@@ -69,8 +69,7 @@ import { listDomains } from '@/api/modules/website';
 import { Website } from '@/api/interface/website';
 import { routerToNameWithParams } from '@/utils/router';
 import { Rules } from '@/global/form-rules';
-import { GetPunyCodeDomain, isPunycoded } from '@/utils/util';
-
+import { GetPunyCodeDomain, isPunycoded } from '@/utils/misc';
 interface Props {
     row: Website.Website;
     isHovered: boolean;

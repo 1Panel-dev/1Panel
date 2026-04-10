@@ -147,7 +147,8 @@
 
 <script lang="ts" setup>
 import { computed, watch, onMounted, ref } from 'vue';
-import { getAccountName, dateFormatSimple } from '@/utils/util';
+import { getAccountName } from '@/utils/ssl';
+import { dateFormatSimple } from '@/utils/date';
 import WebsiteSSL from '@/views/website/website/components/website-ssl/index.vue';
 import { Website } from '@/api/interface/website';
 import { listSSL, searchAcmeAccount } from '@/api/modules/website';

@@ -101,7 +101,7 @@ import { AI } from '@/api/interface/ai';
 import { deleteMcpServer, operateMcpServer, pageMcpServer } from '@/api/modules/ai';
 import RouterMenu from '@/views/ai/mcp/index.vue';
 import { computed, onMounted, reactive, ref } from 'vue';
-import { dateFormat } from '@/utils/util';
+import { dateFormat } from '@/utils/date';
 import McpServerOperate from './operate/index.vue';
 import ComposeLogs from '@/components/log/compose/index.vue';
 import { GlobalStore } from '@/store';

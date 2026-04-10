@@ -1,4 +1,4 @@
-import { isJson } from './util';
+import { isJson } from './misc';
 
 export function formatImageStdout(stdout: string) {
     let lines = stdout.split('\r\n');

@@ -154,7 +154,7 @@ import Sortable from 'sortablejs';
 import i18n from '@/lang';
 import { ElMessageBox } from 'element-plus';
 import { App } from '@/api/interface/app';
-import { jumpToPath } from '@/utils/util';
+import { jumpToPath } from '@/utils/router';
 import { useRouter } from 'vue-router';
 import { MsgSuccess } from '@/utils/message';
 import { getAgentSettingByKey } from '@/api/modules/setting';

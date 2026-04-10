@@ -61,7 +61,7 @@
 <script lang="ts" setup>
 import OperatorDialog from '@/views/container/repo/operator/index.vue';
 import { reactive, ref } from 'vue';
-import { dateFormat } from '@/utils/util';
+import { dateFormat } from '@/utils/date';
 import { Container } from '@/api/interface/container';
 import { checkRepoStatus, deleteImageRepo, searchImageRepo } from '@/api/modules/container';
 import DockerStatus from '@/views/container/docker-status/index.vue';

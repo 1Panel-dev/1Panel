@@ -35,8 +35,7 @@ import { MsgSuccess } from '@/utils/message';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { updateDaemonJson } from '@/api/modules/container';
 import { FormInstance } from 'element-plus';
-import { emptyLineFilter } from '@/utils/util';
-
+import { emptyLineFilter } from '@/utils/validate';
 const emit = defineEmits<{ (e: 'search'): void }>();
 
 const confirmDialogRef = ref();

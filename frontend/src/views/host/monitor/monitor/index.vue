@@ -220,7 +220,8 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, computed } from 'vue';
 import { loadMonitor, getNetworkOptions, getIOOptions } from '@/api/modules/host';
-import { computeSize, computeSizeFromKBs, dateFormatWithoutYear } from '@/utils/util';
+import { computeSize, computeSizeFromKBs } from '@/utils/size';
+import { dateFormatWithoutYear } from '@/utils/date';
 import i18n from '@/lang';
 import MonitorRouter from '@/views/host/monitor/index.vue';
 import { GlobalStore } from '@/store';

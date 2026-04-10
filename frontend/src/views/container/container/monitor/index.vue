@@ -59,7 +59,7 @@
 <script lang="ts" setup>
 import { onBeforeUnmount, ref } from 'vue';
 import { containerStats } from '@/api/modules/container';
-import { dateFormatForSecond } from '@/utils/util';
+import { dateFormatForSecond } from '@/utils/date';
 import VCharts from '@/components/v-charts/index.vue';
 import i18n from '@/lang';
 

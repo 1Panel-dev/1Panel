@@ -278,7 +278,7 @@ import Backups from '@/components/backup/index.vue';
 import UploadDialog from '@/components/upload/index.vue';
 import PortJumpDialog from '@/components/port-jump/index.vue';
 import Tooltip from '@/components/tooltip/index.vue';
-import { dateFormat } from '@/utils/util';
+import { dateFormat } from '@/utils/date';
 import { ElMessageBox } from 'element-plus';
 import { computed, onMounted, reactive, ref } from 'vue';
 import {

@@ -98,7 +98,7 @@ import { deleteCert, searchCert, syncCert } from '@/api/modules/host';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import Operate from '@/views/host/ssh/ssh/certification/operate/index.vue';
-import { copyText } from '@/utils/util';
+import { copyText } from '@/utils/clipboard';
 import { Base64 } from 'js-base64';
 import { reactive, ref } from 'vue';
 

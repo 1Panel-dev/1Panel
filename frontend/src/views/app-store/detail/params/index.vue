@@ -133,11 +133,11 @@
 </template>
 <script lang="ts" setup>
 import { computed, onMounted, reactive, ref } from 'vue';
-import { getRandomStr } from '@/utils/util';
+import { getRandomStr } from '@/utils/id';
 import { getAppService } from '@/api/modules/app';
 import { Rules } from '@/global/form-rules';
 import { App } from '@/api/interface/app';
-import { getDBName, getLabel, getDescription } from '@/utils/util';
+import { getDBName, getLabel, getDescription } from '@/utils/app-store';
 import { getPathByType } from '@/api/modules/files';
 import { loadFormatCollations } from '@/api/modules/database';
 

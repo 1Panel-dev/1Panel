@@ -100,7 +100,9 @@ import { File } from '@/api/interface/file';
 import { CopyDocument, Download, Picture } from '@element-plus/icons-vue';
 import i18n from '@/lang';
 import { GlobalStore } from '@/store';
-import { buildFileSharePageUrl, buildFileShareQrCodeUrl, copyText, dateFormat as formatDateTime } from '@/utils/util';
+import { buildFileSharePageUrl, buildFileShareQrCodeUrl } from '@/utils/file';
+import { copyText } from '@/utils/clipboard';
+import { dateFormat as formatDateTime } from '@/utils/date';
 import type { FormInstance, FormRules } from 'element-plus';
 import { computed, reactive, ref, watch } from 'vue';
 

@@ -251,7 +251,7 @@ import {
 import { GlobalStore, MenuStore, TabsStore } from '@/store';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { useI18n } from 'vue-i18n';
-import { encryptPassword, base64UrlToBuffer, bufferToBase64Url } from '@/utils/util';
+import { encryptPassword, base64UrlToBuffer, bufferToBase64Url } from '@/utils/auth';
 import { getXpackSettingForTheme } from '@/utils/xpack';
 import { routerToName } from '@/utils/router';
 import { changeToLocal, setDefaultNodeInfo } from '@/utils/node';

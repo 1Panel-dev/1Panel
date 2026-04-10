@@ -213,7 +213,7 @@ import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
 import { reactive, ref } from 'vue';
-import { getLabel } from '@/utils/util';
+import { getLabel } from '@/utils/app-store';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 const { globalStore } = useGlobalStore();
 

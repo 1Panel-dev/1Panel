@@ -37,7 +37,7 @@ import { Runtime } from '@/api/interface/runtime';
 import { GetPHPExtensions, InstallPHPExtension, UnInstallPHPExtension } from '@/api/modules/runtime';
 import i18n from '@/lang';
 import { ref } from 'vue';
-import { newUUID } from '@/utils/util';
+import { newUUID } from '@/utils/id';
 import { MsgSuccess } from '@/utils/message';
 import TaskLog from '@/components/log/task/index.vue';
 

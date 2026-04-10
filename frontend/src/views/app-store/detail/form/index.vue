@@ -154,7 +154,7 @@ import { ref, watch } from 'vue';
 import Params from '../params/index.vue';
 import { Container } from '@/api/interface/container';
 import CodemirrorPro from '@/components/codemirror-pro/index.vue';
-import { computeSizeFromMB } from '@/utils/util';
+import { computeSizeFromMB } from '@/utils/size';
 import { loadResourceLimit } from '@/api/modules/container';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { loadOptionalComponent } from '@/extensions/optional';

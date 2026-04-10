@@ -50,7 +50,7 @@
 import TaskLog from '@/components/log/task/index.vue';
 import NodeSelect from '@/components/node-select/index.vue';
 
-import { dateFormat } from '@/utils/util';
+import { dateFormat } from '@/utils/date';
 import { searchTasks } from '@/api/modules/log';
 import { reactive, ref } from 'vue';
 import { Log } from '@/api/interface/log';

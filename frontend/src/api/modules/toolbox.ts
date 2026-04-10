@@ -3,8 +3,7 @@ import { ReqPage, ResPage, UpdateByFile } from '../interface';
 import { Toolbox } from '../interface/toolbox';
 import { Base64 } from 'js-base64';
 import { TimeoutEnum } from '@/enums/http-enum';
-import { deepCopy } from '@/utils/util';
-
+import { deepCopy } from '@/utils/misc';
 // device
 export const getDeviceBase = () => {
     return http.post<Toolbox.DeviceBaseInfo>(`/toolbox/device/base`, {}, TimeoutEnum.T_60S);

@@ -19,7 +19,7 @@ import { ref } from 'vue';
 import { getAgentSettingInfo } from '@/api/modules/setting';
 import i18n from '@/lang';
 import { MsgError, MsgWarning } from '@/utils/message';
-import { jumpToPath } from '@/utils/util';
+import { jumpToPath } from '@/utils/router';
 import { useRouter } from 'vue-router';
 import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();

@@ -28,7 +28,8 @@
 </template>
 
 <script lang="ts" setup>
-import { dateFormatSimple, getProvider } from '@/utils/util';
+import { dateFormatSimple } from '@/utils/date';
+import { getProvider } from '@/utils/ssl';
 defineProps({
     websiteSSL: {
         type: Object,

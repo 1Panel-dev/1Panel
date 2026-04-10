@@ -46,7 +46,7 @@
 
 <script setup lang="ts">
 import LogRouter from '@/views/log/router/index.vue';
-import { dateFormat } from '@/utils/util';
+import { dateFormat } from '@/utils/date';
 import { searchTasks } from '@/api/modules/log';
 import { onMounted, reactive, ref } from 'vue';
 import { Log } from '@/api/interface/log';

@@ -113,8 +113,7 @@
 <script lang="ts" setup>
 import { ref, computed } from 'vue';
 import CodemirrorPro from '@/components/codemirror-pro/index.vue';
-import { copyText } from '@/utils/util';
-
+import { copyText } from '@/utils/clipboard';
 const visible = ref(false);
 const activeTab = ref('overview');
 const networkData = ref<any>(null);

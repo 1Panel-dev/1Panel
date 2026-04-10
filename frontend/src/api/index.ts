@@ -8,8 +8,7 @@ import { MsgError } from '@/utils/message';
 import { Base64 } from 'js-base64';
 import i18n from '@/lang';
 import { changeToLocal } from '@/utils/node';
-import { getCookie } from '@/utils/util';
-
+import { getCookie } from '@/utils/auth';
 const globalStore = GlobalStore();
 
 const config = {

@@ -418,7 +418,8 @@ import { MsgSuccess, MsgWarning } from '@/utils/message';
 import { GlobalStore } from '@/store';
 import { routerToName, routerToNameWithQuery } from '@/utils/router';
 import router from '@/routers';
-import { computeSize2, computeSizeForDocker, computeCPU, newUUID } from '@/utils/util';
+import { computeSize2, computeSizeForDocker, computeCPU } from '@/utils/size';
+import { newUUID } from '@/utils/id';
 import { updateCommonDescription } from '@/api/modules/setting';
 const globalStore = GlobalStore();
 

@@ -388,8 +388,7 @@ import { getSettingInfo } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
 import { storeToRefs } from 'pinia';
 import { routerToName } from '@/utils/router';
-import { checkCidr, checkCidrV6, checkIpV4V6 } from '@/utils/util';
-
+import { checkCidr, checkCidrV6, checkIpV4V6 } from '@/utils/validate';
 const globalStore = GlobalStore();
 const { isMaster, isProductPro } = storeToRefs(globalStore);
 

@@ -173,7 +173,11 @@
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
-import { computeSize, dateFormat, downloadFile, newUUID, transferTimeToSecond } from '@/utils/util';
+import { computeSize } from '@/utils/size';
+import { dateFormat } from '@/utils/date';
+import { downloadFile } from '@/utils/file';
+import { newUUID } from '@/utils/id';
+import { transferTimeToSecond } from '@/utils/validate';
 import {
     getLocalBackupDir,
     handleBackup,

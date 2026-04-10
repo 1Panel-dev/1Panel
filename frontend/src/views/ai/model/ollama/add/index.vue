@@ -42,8 +42,7 @@ import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { MsgSuccess } from '@/utils/message';
 import { createOllamaModel } from '@/api/modules/ai';
-import { newUUID } from '@/utils/util';
-
+import { newUUID } from '@/utils/id';
 const drawerVisible = ref(false);
 const form = reactive({
     name: '',

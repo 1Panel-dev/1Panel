@@ -45,7 +45,7 @@
 import { containerPrune, imageRemove, listAllImage } from '@/api/modules/container';
 import TaskLog from '@/components/log/task/index.vue';
 import i18n from '@/lang';
-import { newUUID } from '@/utils/util';
+import { newUUID } from '@/utils/id';
 import { ref } from 'vue';
 
 const dialogVisible = ref(false);

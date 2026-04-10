@@ -83,7 +83,7 @@ import PortJumpDialog from '@/components/port-jump/index.vue';
 import PortJump from '@/views/website/runtime/components/port-jump.vue';
 
 import { reactive, onMounted, ref } from 'vue';
-import { dateFormat } from '@/utils/util';
+import { dateFormat } from '@/utils/date';
 import { AI } from '@/api/interface/ai';
 import { deleteTensorRTLLM, operateTensorRTLLM, pageTensorRTLLM } from '@/api/modules/ai';
 import { ElMessageBox } from 'element-plus';

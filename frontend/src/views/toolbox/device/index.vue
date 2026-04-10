@@ -110,7 +110,7 @@ import Hostname from '@/views/toolbox/device/hostname/index.vue';
 import Hosts from '@/views/toolbox/device/hosts/index.vue';
 import { getDeviceBase, updateDevice } from '@/api/modules/toolbox';
 import i18n from '@/lang';
-import { computeSize } from '@/utils/util';
+import { computeSize } from '@/utils/size';
 import { MsgSuccess } from '@/utils/message';
 import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();
