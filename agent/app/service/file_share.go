@@ -19,6 +19,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
+	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
 	"gorm.io/gorm"
 )
 
@@ -86,6 +87,17 @@ func shareModelToInfo(item model.FileShare) response.FileShareInfo {
 		Permanent:   item.ExpiresUnix == 0,
 		HasPassword: item.PasswordHash != "",
 	}
+}
+
+func fillSharePassword(info *response.FileShareInfo, item model.FileShare) {
+	if info == nil || item.PasswordEnc == "" {
+		return
+	}
+	password, err := encrypt.StringDecrypt(item.PasswordEnc)
+	if err != nil {
+		return
+	}
+	info.Password = password
 }
 
 func shareModelToPublicInfo(item model.FileShare) response.FileSharePublicInfo {
@@ -156,19 +168,29 @@ func (s *FileShareService) Create(req request.FileShareCreate) (*response.FileSh
 		item.ExpiresUnix = time.Now().Add(time.Duration(req.ExpireMinutes) * time.Minute).Unix()
 	}
 
-	pw := strings.TrimSpace(req.Password)
-	item.PasswordSalt = ""
-	item.PasswordHash = ""
-	if pw != "" {
-		if utf8.RuneCountInString(pw) < 4 {
-			return nil, buserr.New("ErrFileSharePasswordPolicy")
+	if req.Password != nil {
+		pw := strings.TrimSpace(*req.Password)
+		if pw == "" {
+			item.PasswordEnc = ""
+			item.PasswordSalt = ""
+			item.PasswordHash = ""
+		} else {
+			pwLen := utf8.RuneCountInString(pw)
+			if pwLen < 4 || pwLen > 256 {
+				return nil, buserr.New("ErrFileSharePasswordPolicy")
+			}
+			enc, err := encrypt.StringEncrypt(pw)
+			if err != nil {
+				return nil, err
+			}
+			item.PasswordEnc = enc
+			salt, err := randomSalt()
+			if err != nil {
+				return nil, err
+			}
+			item.PasswordSalt = salt
+			item.PasswordHash = hashPassword(salt, pw)
 		}
-		salt, err := randomSalt()
-		if err != nil {
-			return nil, err
-		}
-		item.PasswordSalt = salt
-		item.PasswordHash = hashPassword(salt, pw)
 	}
 
 	if isNew {
@@ -182,6 +204,7 @@ func (s *FileShareService) Create(req request.FileShareCreate) (*response.FileSh
 	}
 
 	res := shareModelToInfo(item)
+	fillSharePassword(&res, item)
 	return &res, nil
 }
 
@@ -227,6 +250,7 @@ func (s *FileShareService) GetByPath(path string) (*response.FileShareInfo, erro
 		return nil, nil
 	}
 	info := shareModelToInfo(item)
+	fillSharePassword(&info, item)
 	return &info, nil
 }
 

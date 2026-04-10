@@ -93,6 +93,7 @@ type FileShareInfo struct {
 	ExpiresAt   int64  `json:"expiresAt"`
 	Permanent   bool   `json:"permanent"`
 	HasPassword bool   `json:"hasPassword"`
+	Password    string `json:"password,omitempty"`
 }
 
 type FileSharePublicInfo struct {

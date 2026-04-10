@@ -324,6 +324,7 @@ export namespace File {
         expiresAt: number;
         permanent: boolean;
         hasPassword: boolean;
+        password?: string;
     }
 
     export interface FileSharePublicInfo {
