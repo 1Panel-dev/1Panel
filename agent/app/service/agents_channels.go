@@ -390,9 +390,7 @@ func extractFeishuConfig(conf map[string]interface{}) dto.AgentFeishuConfig {
 	if len(feishu) == 0 {
 		return result
 	}
-	if enabled, ok := feishu["enabled"].(bool); ok {
-		result.Enabled = enabled
-	}
+	result.Enabled = extractFeishuPluginEnabled(conf, extractBoolValue(feishu["enabled"], result.Enabled))
 	if threadSession, ok := feishu["threadSession"].(bool); ok {
 		result.ThreadSession = threadSession
 	}
@@ -408,16 +406,34 @@ func extractFeishuConfig(conf map[string]interface{}) dto.AgentFeishuConfig {
 	}
 	result.GroupAllowFrom = extractStringList(feishu["groupAllowFrom"])
 	defaultBot := defaultFeishuBot()
+	defaultBot.Enabled = extractBoolValue(feishu["enabled"], defaultBot.Enabled)
+	defaultBot.Name = extractDisplayName(feishu, "", "default")
 	defaultBot.AppID = extractStringValue(feishu["appId"])
 	defaultBot.AppSecret = extractStringValue(feishu["appSecret"])
-	accounts := childMap(feishu, "accounts")
-	defaultAccount := childMap(accounts, "default")
-	defaultBot.Enabled = extractBoolValue(defaultAccount["enabled"], extractBoolValue(feishu["enabled"], true))
-	defaultBot.Name = extractDisplayName(defaultAccount, extractStringValue(defaultAccount["botName"]), "Default")
-	if dmPolicy := extractStringValue(defaultAccount["dmPolicy"]); dmPolicy != "" {
+	if dmPolicy := extractStringValue(feishu["dmPolicy"]); dmPolicy != "" {
 		defaultBot.DmPolicy = dmPolicy
 	}
-	defaultBot.AllowFrom = extractStringList(defaultAccount["allowFrom"])
+	if _, ok := feishu["allowFrom"]; ok {
+		defaultBot.AllowFrom = extractStringList(feishu["allowFrom"])
+	}
+	accounts := childMap(feishu, "accounts")
+	defaultAccount := childMap(accounts, "default")
+	if defaultBot.Name == "Default" {
+		defaultBot.Name = extractDisplayName(defaultAccount, extractStringValue(defaultAccount["botName"]), "Default")
+	}
+	if defaultBot.DmPolicy == "pairing" {
+		if dmPolicy := extractStringValue(defaultAccount["dmPolicy"]); dmPolicy != "" {
+			defaultBot.DmPolicy = dmPolicy
+		}
+	}
+	if len(defaultBot.AllowFrom) == 0 {
+		if _, ok := defaultAccount["allowFrom"]; ok {
+			defaultBot.AllowFrom = extractStringList(defaultAccount["allowFrom"])
+		}
+	}
+	baseEnabled := defaultBot.Enabled
+	baseDmPolicy := defaultBot.DmPolicy
+	baseAllowFrom := append([]string(nil), defaultBot.AllowFrom...)
 	bots := []dto.AgentFeishuBot{defaultBot}
 	for _, accountID := range sortedChildKeys(accounts) {
 		if accountID == "default" {
@@ -428,14 +444,18 @@ func extractFeishuConfig(conf map[string]interface{}) dto.AgentFeishuConfig {
 			AgentChannelBotBase: dto.AgentChannelBotBase{
 				AccountID: accountID,
 				Name:      extractDisplayName(account, extractStringValue(account["botName"]), accountID),
-				Enabled:   extractBoolValue(account["enabled"], true),
+				Enabled:   extractBoolValue(account["enabled"], baseEnabled),
 			},
 			AppID:     extractStringValue(account["appId"]),
 			AppSecret: extractStringValue(account["appSecret"]),
-			AllowFrom: extractStringList(account["allowFrom"]),
+			DmPolicy:  baseDmPolicy,
+			AllowFrom: append([]string(nil), baseAllowFrom...),
 		}
 		if dmPolicy := extractStringValue(account["dmPolicy"]); dmPolicy != "" {
 			bot.DmPolicy = dmPolicy
+		}
+		if _, ok := account["allowFrom"]; ok {
+			bot.AllowFrom = extractStringList(account["allowFrom"])
 		}
 		bots = append(bots, bot)
 	}
@@ -447,8 +467,7 @@ func setFeishuConfig(conf map[string]interface{}, config dto.AgentFeishuConfig) 
 	channels := ensureChildMap(conf, "channels")
 	feishu := ensureChildMap(channels, "feishu")
 	defaultBot := getDefaultFeishuBot(config.Bots)
-	effectiveEnabled := config.Enabled && hasEnabledBots(config.Bots)
-	feishu["enabled"] = effectiveEnabled
+	feishu["enabled"] = defaultBot.Enabled
 	feishu["threadSession"] = config.ThreadSession
 	feishu["replyMode"] = config.ReplyMode
 	feishu["streaming"] = config.Streaming
@@ -465,9 +484,20 @@ func setFeishuConfig(conf map[string]interface{}, config dto.AgentFeishuConfig) 
 	}
 	feishu["appId"] = defaultBot.AppID
 	feishu["appSecret"] = defaultBot.AppSecret
+	feishu["dmPolicy"] = defaultBot.DmPolicy
+	if defaultBot.Name != "" && defaultBot.Name != "Default" {
+		feishu["name"] = defaultBot.Name
+	} else {
+		delete(feishu, "name")
+	}
+	if defaultBot.DmPolicy == "open" {
+		feishu["allowFrom"] = []string{"*"}
+	} else if defaultBot.DmPolicy == "allowlist" {
+		feishu["allowFrom"] = append([]string(nil), defaultBot.AllowFrom...)
+	} else {
+		delete(feishu, "allowFrom")
+	}
 	delete(feishu, "botName")
-	delete(feishu, "dmPolicy")
-	delete(feishu, "allowFrom")
 	delete(feishu, "connectionMode")
 	delete(feishu, "domain")
 	delete(feishu, "webhookPath")
@@ -476,29 +506,13 @@ func setFeishuConfig(conf map[string]interface{}, config dto.AgentFeishuConfig) 
 	delete(feishu, "resolveSenderNames")
 	delete(feishu, "defaultAccount")
 	accounts := make(map[string]interface{}, len(config.Bots))
-	defaultAccount := map[string]interface{}{}
-	if !defaultBot.Enabled {
-		defaultAccount["enabled"] = false
-	}
-	if defaultBot.Name != "" && defaultBot.Name != "Default" {
-		defaultAccount["botName"] = defaultBot.Name
-	}
-	if defaultBot.DmPolicy != "" {
-		defaultAccount["dmPolicy"] = defaultBot.DmPolicy
-	}
-	if defaultBot.DmPolicy == "open" {
-		defaultAccount["allowFrom"] = []string{"*"}
-	} else if defaultBot.DmPolicy == "allowlist" {
-		defaultAccount["allowFrom"] = append([]string(nil), defaultBot.AllowFrom...)
-	}
-	accounts["default"] = defaultAccount
 	for _, bot := range config.Bots {
 		if bot.AccountID == "default" || bot.IsDefault {
 			continue
 		}
 		account := map[string]interface{}{
 			"enabled":   bot.Enabled,
-			"botName":   bot.Name,
+			"name":      bot.Name,
 			"appId":     bot.AppID,
 			"appSecret": bot.AppSecret,
 		}
@@ -512,7 +526,18 @@ func setFeishuConfig(conf map[string]interface{}, config dto.AgentFeishuConfig) 
 		}
 		accounts[bot.AccountID] = account
 	}
-	feishu["accounts"] = accounts
+	if len(accounts) > 0 {
+		feishu["accounts"] = accounts
+	} else {
+		delete(feishu, "accounts")
+	}
+}
+
+func extractFeishuPluginEnabled(conf map[string]interface{}, defaultValue bool) bool {
+	plugins := childMap(conf, "plugins")
+	entries := childMap(plugins, "entries")
+	lark := childMap(entries, "openclaw-lark")
+	return extractBoolValue(lark["enabled"], defaultValue)
 }
 
 func setFeishuPluginEnabled(conf map[string]interface{}, enabled bool) {
