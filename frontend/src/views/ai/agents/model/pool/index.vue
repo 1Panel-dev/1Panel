@@ -121,7 +121,7 @@ const editorTitle = computed(() =>
 );
 
 const rules = reactive({
-    id: [Rules.noSpace],
+    id: [Rules.requiredInput, Rules.noSpace],
     name: [Rules.requiredInput],
     contextWindow: [Rules.integerNumber],
     maxTokens: [Rules.integerNumber],

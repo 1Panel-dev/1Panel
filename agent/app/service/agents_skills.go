@@ -48,7 +48,7 @@ func (a AgentService) ListSkills(req dto.AgentIDReq) ([]dto.AgentSkillItem, erro
 	if err := ensureContainerRunning(install.ContainerName); err != nil {
 		return nil, err
 	}
-	output, err := runDockerExecWithStdout(60*time.Second, install.ContainerName, "sh", "-c", "openclaw skills list --json 2>&1")
+	output, err := runDockerExecWithStdout(5*time.Minute, install.ContainerName, "sh", "-c", "openclaw skills list --json 2>&1")
 	if err != nil {
 		return nil, err
 	}
@@ -153,10 +153,10 @@ func parseOpenclawSkillsList(output string) ([]dto.AgentSkillItem, error) {
 func loadOpenclawSkillSearchOutput(containerName, source, keyword string) (string, error) {
 	switch source {
 	case "skillhub":
-		return runDockerExecWithStdout(60*time.Second, containerName, "skillhub", "search", keyword, "--json")
+		return runDockerExecWithStdout(2*time.Minute, containerName, "skillhub", "search", keyword, "--json")
 	default:
 		return runDockerExecWithStdout(
-			60*time.Second,
+			2*time.Minute,
 			containerName,
 			"sh",
 			"-c",
@@ -238,7 +238,7 @@ func resolveClawhubRegistry(source string) string {
 }
 
 func getOpenclawSkillKey(containerName, name string) (string, error) {
-	output, err := runDockerExecWithStdout(60*time.Second, containerName, "sh", "-c", fmt.Sprintf("openclaw skills info %q --json 2>&1", name))
+	output, err := runDockerExecWithStdout(2*time.Minute, containerName, "sh", "-c", fmt.Sprintf("openclaw skills info %q --json 2>&1", name))
 	if err != nil {
 		return "", err
 	}
