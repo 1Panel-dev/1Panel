@@ -60,7 +60,7 @@ import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { imageBuild } from '@/api/modules/container';
 import TaskLog from '@/components/log/task/index.vue';
-import { newUUID } from '@/utils/util';
+import { newUUID } from '@/utils/id';
 import { MsgSuccess } from '@/utils/message';
 
 const drawerVisible = ref(false);

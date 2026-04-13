@@ -181,7 +181,7 @@
 </template>
 <script lang="ts" setup>
 import { loadMysqlStatus } from '@/api/modules/database';
-import { computeSize } from '@/utils/util';
+import { computeSize } from '@/utils/size';
 import { reactive } from 'vue';
 
 let mysqlStatus = reactive({

@@ -1,5 +1,5 @@
 import http from '@/api';
-import { deepCopy } from '@/utils/util';
+import { deepCopy } from '@/utils/misc';
 import { Base64 } from 'js-base64';
 import { ResPage, SearchWithPage, DescriptionUpdate, ReqPage } from '../interface';
 import { Setting } from '../interface/setting';

@@ -45,7 +45,7 @@
 <script setup lang="ts">
 import { execComposer, getWebsite } from '@/api/modules/website';
 import i18n from '@/lang';
-import { newUUID } from '@/utils/util';
+import { newUUID } from '@/utils/id';
 import TaskLog from '@/components/log/task/index.vue';
 import FileList from '@/components/file-list/index.vue';
 

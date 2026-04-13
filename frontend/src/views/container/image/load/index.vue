@@ -33,8 +33,7 @@ import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { imageLoad } from '@/api/modules/container';
 import { MsgSuccess } from '@/utils/message';
-import { newUUID } from '@/utils/util';
-
+import { newUUID } from '@/utils/id';
 const loading = ref(false);
 const fileRef = ref();
 const taskLogRef = ref();

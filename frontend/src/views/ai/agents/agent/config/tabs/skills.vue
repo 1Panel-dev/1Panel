@@ -147,7 +147,7 @@ import { AI } from '@/api/interface/ai';
 import { installAgentSkill, listAgentSkills, searchAgentSkills, updateAgentSkill } from '@/api/modules/ai';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { MsgSuccess } from '@/utils/message';
-import { newUUID } from '@/utils/util';
+import { newUUID } from '@/utils/id';
 import { isOpenclawCurrentHTTPVersion } from '@/utils/agent';
 import TaskLog from '@/components/log/task/index.vue';
 import VersionSupport from './components/version-support.vue';

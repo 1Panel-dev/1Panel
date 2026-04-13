@@ -100,7 +100,7 @@
 import { onMounted, reactive, ref } from 'vue';
 import { Runtime } from '@/api/interface/runtime';
 import { RuntimeDeleteCheck, SearchRuntimes, SyncRuntime } from '@/api/modules/runtime';
-import { dateFormat } from '@/utils/util';
+import { dateFormat } from '@/utils/date';
 import OperateNode from '@/views/website/runtime/node/operate/index.vue';
 import Delete from '@/views/website/runtime/delete/index.vue';
 import i18n from '@/lang';

@@ -1,8 +1,7 @@
 import http from '@/api';
 import { ResPage } from '@/api/interface';
 import { Alert } from '../interface/alert';
-import { deepCopy } from '@/utils/util';
-
+import { deepCopy } from '@/utils/misc';
 export const SearchAlerts = (req: Alert.AlertSearch) => {
     return http.post<ResPage<Alert.AlertInfo>>(`/alert/search`, req);
 };

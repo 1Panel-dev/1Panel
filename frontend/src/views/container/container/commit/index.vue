@@ -53,8 +53,7 @@ import i18n from '@/lang';
 import { commitContainer } from '@/api/modules/container';
 import TaskLog from '@/components/log/task/index.vue';
 import { MsgSuccess } from '@/utils/message';
-import { newUUID } from '@/utils/util';
-
+import { newUUID } from '@/utils/id';
 const drawerVisible = ref<boolean>(false);
 const emit = defineEmits<{ (e: 'search'): void }>();
 const loading = ref(false);

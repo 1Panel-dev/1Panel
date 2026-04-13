@@ -3,7 +3,7 @@ import { ReqPage, ResPage } from '../interface';
 import { Website } from '../interface/website';
 import { File } from '../interface/file';
 import { TimeoutEnum } from '@/enums/http-enum';
-import { deepCopy } from '@/utils/util';
+import { deepCopy } from '@/utils/misc';
 import { Base64 } from 'js-base64';
 
 export const searchWebsites = (req: Website.WebSiteSearch, node?: string) => {

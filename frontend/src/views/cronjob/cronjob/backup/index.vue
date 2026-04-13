@@ -54,7 +54,9 @@
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
-import { computeSize, dateFormat, downloadFile } from '@/utils/util';
+import { computeSize } from '@/utils/size';
+import { dateFormat } from '@/utils/date';
+import { downloadFile } from '@/utils/file';
 import i18n from '@/lang';
 import { downloadBackupRecord, loadRecordSize, searchBackupRecordsByCronjob } from '@/api/modules/backup';
 import { Backup } from '@/api/interface/backup';

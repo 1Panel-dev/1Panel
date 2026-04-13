@@ -143,7 +143,7 @@ import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { createNetwork } from '@/api/modules/container';
 import { MsgSuccess } from '@/utils/message';
-import { checkIp, checkIpV6 } from '@/utils/util';
+import { checkIp, checkIpV6 } from '@/utils/validate';
 import { getNetworkOptions } from '@/api/modules/host';
 
 const loading = ref(false);

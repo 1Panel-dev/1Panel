@@ -78,7 +78,7 @@ import MarkDownEditor from '@/components/mkdown-editor/index.vue';
 import { getAppByKey, getAppDetail, getAppIconUrl } from '@/api/modules/app';
 import { ref } from 'vue';
 import Install from './install/index.vue';
-import { computeSizeFromMB } from '@/utils/util';
+import { computeSizeFromMB } from '@/utils/size';
 import { jumpToInstall } from '@/utils/app';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 const { currentNode } = useGlobalStore();

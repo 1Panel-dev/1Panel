@@ -25,7 +25,7 @@ import { useRouter } from 'vue-router';
 import AppInstallForm from '@/views/app-store/detail/form/index.vue';
 import { installApp } from '@/api/modules/app';
 import { MsgError } from '@/utils/message';
-import { newUUID } from '@/utils/util';
+import { newUUID } from '@/utils/id';
 import { routerToName } from '@/utils/router';
 import TaskLog from '@/components/log/task/index.vue';
 import i18n from '@/lang';

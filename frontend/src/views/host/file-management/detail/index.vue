@@ -43,10 +43,9 @@
 
 <script lang="ts" setup>
 import { computeDirSize, getFileContent } from '@/api/modules/files';
-import { computeSize } from '@/utils/util';
+import { computeSize } from '@/utils/size';
 import { ref } from 'vue';
-import { dateFormatSimple } from '@/utils/util';
-
+import { dateFormatSimple } from '@/utils/date';
 interface InfoProps {
     path: string;
 }

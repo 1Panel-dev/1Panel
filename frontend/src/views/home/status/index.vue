@@ -385,7 +385,7 @@
 
 <script setup lang="ts">
 import { Dashboard } from '@/api/interface/dashboard';
-import { computeSize } from '@/utils/util';
+import { computeSize } from '@/utils/size';
 import i18n from '@/lang';
 import { nextTick, onBeforeUnmount, ref } from 'vue';
 import { routerToFileWithPath, routerToName } from '@/utils/router';

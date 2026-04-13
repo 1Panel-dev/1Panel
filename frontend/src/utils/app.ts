@@ -1,4 +1,4 @@
-import { jumpToPath } from './util';
+import { jumpToPath } from './router';
 import router from '@/routers';
 import { GlobalStore } from '@/store';
 

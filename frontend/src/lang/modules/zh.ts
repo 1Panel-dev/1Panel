@@ -1,4 +1,4 @@
-import fit2cloudZhLocale from 'fit2cloud-ui-plus/src/locale/lang/zh-cn';
+import { getFuLocaleMessage } from '@/lang/fu';
 
 const message = {
     commons: {
@@ -4130,6 +4130,6 @@ const message = {
     },
 };
 export default {
-    ...fit2cloudZhLocale,
+    ...getFuLocaleMessage('zh'),
     ...message,
 };

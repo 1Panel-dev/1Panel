@@ -21,7 +21,7 @@
 </template>
 <script lang="ts" setup>
 import Status from '@/components/status/index.vue';
-import { dateFormatSimple } from '@/utils/util';
+import { dateFormatSimple } from '@/utils/date';
 const props = defineProps({
     primaryDomain: {
         type: String,

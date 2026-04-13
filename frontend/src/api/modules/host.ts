@@ -2,7 +2,7 @@ import http from '@/api';
 import { ResPage, ReqPage } from '../interface';
 import { Host } from '../interface/host';
 import { TimeoutEnum } from '@/enums/http-enum';
-import { deepCopy } from '@/utils/util';
+import { deepCopy } from '@/utils/misc';
 import { Base64 } from 'js-base64';
 
 // firewall

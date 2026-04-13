@@ -5,7 +5,7 @@
 import { onMounted, nextTick, watch, onBeforeUnmount, ref } from 'vue';
 import echarts from '@/utils/echarts';
 import { GlobalStore } from '@/store';
-import { computeSizeFromKBs, computeSizeFromKB, computeSizeFromMB } from '@/utils/util';
+import { computeSizeFromKBs, computeSizeFromKB, computeSizeFromMB } from '@/utils/size';
 import i18n from '@/lang';
 const globalStore = GlobalStore();
 const isDarkTheme = ref(false);

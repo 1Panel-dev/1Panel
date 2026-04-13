@@ -55,7 +55,7 @@ import { defaultMenu, updateMenu } from '@/api/modules/setting';
 import { MsgSuccess } from '@/utils/message';
 import { GlobalStore } from '@/store';
 import { ArrowRight } from '@element-plus/icons-vue';
-import { sortMenu } from '@/utils/util';
+import { sortMenu } from '@/utils/misc';
 const globalStore = GlobalStore();
 
 const drawerVisible = ref();

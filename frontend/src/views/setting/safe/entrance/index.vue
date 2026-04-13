@@ -29,7 +29,7 @@ import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { updateSetting } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
-import { getRandomStr } from '@/utils/util';
+import { getRandomStr } from '@/utils/id';
 import { FormInstance } from 'element-plus';
 import { clearDashboardCacheByPrefix } from '@/utils/dashboardCache';
 const globalStore = GlobalStore();

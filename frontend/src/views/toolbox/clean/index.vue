@@ -256,7 +256,7 @@
 </template>
 <script lang="ts" setup>
 import { onMounted, reactive, ref } from 'vue';
-import { computeSize } from '@/utils/util';
+import { computeSize } from '@/utils/size';
 import { getSettingInfo } from '@/api/modules/setting';
 import { clean, scan } from '@/api/modules/toolbox';
 import i18n from '@/lang';

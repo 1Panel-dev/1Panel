@@ -109,7 +109,7 @@ import { createAgent, getAgentProviders, pageAgentAccounts } from '@/api/modules
 import { AI } from '@/api/interface/ai';
 import { getAppByKey, getAppDetail } from '@/api/modules/app';
 import { getAgentSettingByKey } from '@/api/modules/setting';
-import { getRandomStr, newUUID } from '@/utils/util';
+import { getRandomStr, newUUID } from '@/utils/id';
 import {
     buildDefaultAllowedOrigin,
     getAgentProviderDisplayName,

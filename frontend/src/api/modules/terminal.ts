@@ -2,8 +2,7 @@ import http from '@/api';
 import { ResPage } from '../interface';
 import { Host } from '../interface/host';
 import { Base64 } from 'js-base64';
-import { deepCopy } from '@/utils/util';
-
+import { deepCopy } from '@/utils/misc';
 export const searchHosts = (params: Host.SearchWithPage) => {
     return http.postLocalNode<ResPage<Host.Host>>(`/hosts/search`, params);
 };

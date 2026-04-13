@@ -38,8 +38,7 @@ import { Website } from '@/api/interface/website';
 import { deleteDnsAccount, searchDnsAccount } from '@/api/modules/website';
 import { onMounted, reactive, ref } from 'vue';
 import i18n from '@/lang';
-import { getDNSName } from '@/utils/util';
-
+import { getDNSName } from '@/utils/ssl';
 const paginationConfig = reactive({
     cacheSizeKey: 'dns-account-page-size',
     currentPage: 1,

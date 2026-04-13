@@ -124,8 +124,7 @@ import { MsgError, MsgSuccess, MsgWarning } from '@/utils/message';
 import i18n from '@/lang';
 import { ElInput, ElMessageBox, UploadFile, UploadInstance } from 'element-plus';
 import { Document, FolderOpened, HomeFilled } from '@element-plus/icons-vue';
-import { computeSize2 } from '@/utils/util';
-
+import { computeSize2 } from '@/utils/size';
 const visible = ref(false);
 const title = ref('');
 const containerID = ref('');

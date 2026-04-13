@@ -29,7 +29,7 @@
 import i18n from '@/lang';
 import { ref } from 'vue';
 import { File } from '@/api/interface/file';
-import { getIcon } from '@/utils/util';
+import { getIcon } from '@/utils/file';
 import { deleteFile } from '@/api/modules/files';
 import { MsgSuccess } from '@/utils/message';
 

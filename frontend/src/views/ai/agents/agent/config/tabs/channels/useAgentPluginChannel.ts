@@ -1,8 +1,7 @@
 import { ref } from 'vue';
 import { AI } from '@/api/interface/ai';
 import { checkAgentPlugin, installAgentPlugin, uninstallAgentPlugin, upgradeAgentPlugin } from '@/api/modules/ai';
-import { newUUID } from '@/utils/util';
-
+import { newUUID } from '@/utils/id';
 export const useAgentPluginChannel = (pluginType: AI.AgentPluginInstallReq['type']) => {
     const agentId = ref(0);
     const loading = ref(false);

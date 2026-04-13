@@ -73,7 +73,7 @@
 </template>
 
 <script lang="ts" setup>
-import { dateFormat } from '@/utils/util';
+import { dateFormat } from '@/utils/date';
 import { onMounted, reactive, ref } from 'vue';
 import { deleteCheckDatabase, searchDatabases } from '@/api/modules/database';
 import AppResources from '@/views/database/redis/check/index.vue';

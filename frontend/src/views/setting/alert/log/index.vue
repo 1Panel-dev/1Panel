@@ -77,7 +77,7 @@
 
 <script lang="ts" setup>
 import { onMounted, reactive, ref, computed } from 'vue';
-import { dateFormat } from '@/utils/util';
+import { dateFormat } from '@/utils/date';
 import { MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
 import { GlobalStore } from '@/store';

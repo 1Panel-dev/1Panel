@@ -118,8 +118,7 @@ import {
 import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { Setting } from '@/api/interface/setting';
-import { base64UrlToBuffer, bufferToBase64Url } from '@/utils/util';
-
+import { base64UrlToBuffer, bufferToBase64Url } from '@/utils/auth';
 interface DrawerParams {
     bindDomain: string;
 }

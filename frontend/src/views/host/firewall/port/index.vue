@@ -169,8 +169,8 @@ import { MsgSuccess } from '@/utils/message';
 import { ElMessageBox } from 'element-plus';
 import { Expand } from '@element-plus/icons-vue';
 import { routerToName } from '@/utils/router';
-import { downloadWithContent, getCurrentDateFormatted } from '@/utils/util';
-
+import { downloadWithContent } from '@/utils/file';
+import { getCurrentDateFormatted } from '@/utils/date';
 const loading = ref();
 const activeTag = ref('port');
 const selects = ref<any>([]);

@@ -87,7 +87,8 @@ import { reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { updateDeviceSwap, getDeviceBase } from '@/api/modules/toolbox';
-import { computeSize, newUUID, splitSize } from '@/utils/util';
+import { computeSize, splitSize } from '@/utils/size';
+import { newUUID } from '@/utils/id';
 import TaskLog from '@/components/log/task/index.vue';
 import { loadBaseDir } from '@/api/modules/setting';
 

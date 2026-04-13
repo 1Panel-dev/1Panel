@@ -42,7 +42,8 @@
 import { checkFileShare, getPublicFileShareInfo } from '@/api/modules/files';
 import { File } from '@/api/interface/file';
 import i18n, { loadLocaleMessages } from '@/lang';
-import { buildFileShareDownloadUrl, dateFormat } from '@/utils/util';
+import { buildFileShareDownloadUrl } from '@/utils/file';
+import { dateFormat } from '@/utils/date';
 import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 

@@ -357,7 +357,8 @@ import {
 import { Container } from '@/api/interface/container';
 import { MsgError } from '@/utils/message';
 import TaskLog from '@/components/log/task/index.vue';
-import { checkIpV4V6, checkPort, newUUID } from '@/utils/util';
+import { checkIpV4V6, checkPort } from '@/utils/validate';
+import { newUUID } from '@/utils/id';
 import router from '@/routers';
 import TerminalDialog from '@/views/host/file-management/terminal/index.vue';
 import { routerToName, routerToNameWithQuery } from '@/utils/router';

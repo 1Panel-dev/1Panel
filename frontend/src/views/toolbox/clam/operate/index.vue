@@ -241,8 +241,7 @@ import { createClam, updateClam } from '@/api/modules/toolbox';
 import { storeToRefs } from 'pinia';
 import { GlobalStore } from '@/store';
 import { specOptions, transObjToSpec, transSpecToObj, weekOptions } from '@/views/cronjob/cronjob/helper';
-import { splitTimeFromSecond, transferTimeToSecond } from '@/utils/util';
-
+import { splitTimeFromSecond, transferTimeToSecond } from '@/utils/validate';
 const globalStore = GlobalStore();
 const licenseRef = ref();
 const scanDirRef = ref();

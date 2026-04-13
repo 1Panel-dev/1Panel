@@ -197,7 +197,8 @@
 import { containerItemStats, containerPrune, loadContainerStatus, loadDaemonJson } from '@/api/modules/container';
 import DockerStatus from '@/views/container/docker-status/index.vue';
 import { getSettingInfo } from '@/api/modules/setting';
-import { computeSize2, newUUID } from '@/utils/util';
+import { computeSize2 } from '@/utils/size';
+import { newUUID } from '@/utils/id';
 import TaskLog from '@/components/log/task/index.vue';
 import { routerToName } from '@/utils/router';
 import { onMounted, reactive, ref } from 'vue';

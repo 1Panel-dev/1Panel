@@ -27,7 +27,7 @@
 import { removeFileShare, searchFileShare } from '@/api/modules/files';
 import { File } from '@/api/interface/file';
 import i18n from '@/lang';
-import { dateFormat as formatDateTime } from '@/utils/util';
+import { dateFormat as formatDateTime } from '@/utils/date';
 import { computed, reactive, ref } from 'vue';
 
 const paginationConfig = reactive({

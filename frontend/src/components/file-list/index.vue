@@ -178,8 +178,8 @@ import { nextTick, onUpdated, reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgSuccess, MsgWarning } from '@/utils/message';
 import { useSearchableForSelect } from '@/views/host/file-management/hooks/searchable';
-import { computeSize, debounce } from '@/utils/util';
-
+import { computeSize } from '@/utils/size';
+import { debounce } from '@/utils/misc';
 const data = ref([]);
 const loading = ref(false);
 const paths = ref<string[]>([]);

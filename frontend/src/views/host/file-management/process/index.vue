@@ -62,7 +62,7 @@
 
 <script lang="ts" setup>
 import { fileWgetKeys, stopWgetFile } from '@/api/modules/files';
-import { computeSize } from '@/utils/util';
+import { computeSize } from '@/utils/size';
 import { onBeforeUnmount, ref } from 'vue';
 import MsgInfo from '@/components/msg-info/index.vue';
 import { GlobalStore } from '@/store';

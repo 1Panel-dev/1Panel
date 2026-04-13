@@ -236,7 +236,7 @@ import { ElMessageBox } from 'element-plus';
 import { MsgSuccess } from '@/utils/message';
 import { hasBackup, transSpecToStr } from './helper';
 import { GlobalStore } from '@/store';
-import { getCurrentDateFormatted } from '@/utils/util';
+import { getCurrentDateFormatted } from '@/utils/date';
 import { getGroupList } from '@/api/modules/group';
 import { routerToNameWithQuery } from '@/utils/router';
 

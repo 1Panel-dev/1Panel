@@ -30,7 +30,7 @@
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { loginAgentWeixinChannel } from '@/api/modules/ai';
-import { newUUID } from '@/utils/util';
+import { newUUID } from '@/utils/id';
 import TaskLog from '@/components/log/task/index.vue';
 import { isOpenclawCurrentHTTPVersion } from '@/utils/agent';
 import PluginInstall from './components/plugin-install.vue';
