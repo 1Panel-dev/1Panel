@@ -25,6 +25,7 @@
 
 <script lang="ts" setup>
 import { getSettingInfo } from '@/api/modules/setting';
+import { searchXpackSetting } from '@/extensions/xpack';
 
 const open = ref(false);
 const restart = ref(true);
@@ -58,21 +59,16 @@ const acceptParams = async (props: DialogProps): Promise<void> => {
         return;
     }
 
-    let searchXSetting;
-    const xpackModules = import.meta.glob('../../xpack/api/modules/setting.ts', { eager: true });
-    if (xpackModules['../../xpack/api/modules/setting.ts']) {
-        searchXSetting = xpackModules['../../xpack/api/modules/setting.ts']['searchXSetting'] || {};
-        const res = await searchXSetting();
-        if (!res) {
-            emit();
-            return;
-        }
-        if (res.data.proxyDocker === '') {
-            emit();
-            return;
-        }
-        open.value = true;
+    const res = await searchXpackSetting();
+    if (!res) {
+        emit();
+        return;
     }
+    if (res.data.proxyDocker === '') {
+        emit();
+        return;
+    }
+    open.value = true;
 };
 
 const onConfirm = async () => {

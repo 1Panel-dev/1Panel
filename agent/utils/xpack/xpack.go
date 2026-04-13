@@ -1,93 +1,74 @@
-//go:build !xpack && !xpackee
+//go:build xpack
 
 package xpack
 
 import (
-	"crypto/tls"
-	"net"
 	"net/http"
-	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
-	"github.com/1Panel-dev/1Panel/agent/buserr"
-	"github.com/1Panel-dev/1Panel/agent/global"
-	"github.com/1Panel-dev/1Panel/agent/utils/common"
+	edition "github.com/1Panel-dev/1Panel/agent/xpack/edition"
 	"github.com/gin-gonic/gin"
 )
 
-func RemoveTamper(website string) {}
+func RemoveTamper(website string) {
+	edition.RemoveTamper(website)
+}
 
 func StartClam(startClam *model.Clam, isUpdate bool) (int, error) {
-	return 0, buserr.New("ErrXpackNotFound")
+	return edition.StartClam(startClam, isUpdate)
 }
 
 func LoadNodeInfo(isBase bool) (model.NodeInfo, error) {
-	var info model.NodeInfo
-	info.BaseDir = common.LoadParams("BASE_DIR")
-	info.Version = common.LoadParams("ORIGINAL_VERSION")
-	info.Scope = "master"
-	global.IsMaster = true
-	return info, nil
+	return edition.LoadNodeInfo(isBase)
 }
 
 func GetImagePrefix() string {
-	return ""
+	return edition.GetImagePrefix()
 }
 
 func IsUseCustomApp() bool {
-	return false
+	return edition.IsUseCustomApp()
 }
 
 func IsXpack() bool {
-	return false
+	return edition.IsXpack()
 }
 
-func CreateTaskScanSMSAlertLog(alert dto.AlertDTO, alertType string, create dto.AlertLogCreate, pushAlert dto.PushAlert, method string) error {
-	return nil
+func CreateTaskScanSMSAlertLog(info dto.AlertDTO, alertType string, create dto.AlertLogCreate, pushAlert dto.PushAlert, method string) error {
+	return edition.CreateTaskScanSMSAlertLog(info, alertType, create, pushAlert, method)
 }
 
 func CreateSMSAlertLog(alertType string, info dto.AlertDTO, create dto.AlertLogCreate, project string, params []dto.Param, method string) error {
-	return nil
+	return edition.CreateSMSAlertLog(alertType, info, create, project, params, method)
 }
 
 func CreateTaskScanWebhookAlertLog(alert dto.AlertDTO, alertType string, create dto.AlertLogCreate, pushAlert dto.PushAlert, method string, transport *http.Transport, agentInfo *dto.AgentInfo) error {
-	return nil
+	return edition.CreateTaskScanWebhookAlertLog(alert, alertType, create, pushAlert, method, transport, agentInfo)
 }
 
 func CreateWebhookAlertLog(alertType string, info dto.AlertDTO, create dto.AlertLogCreate, project string, params []dto.Param, method string, transport *http.Transport, agentInfo *dto.AgentInfo) error {
-	return nil
+	return edition.CreateWebhookAlertLog(alertType, info, create, project, params, method, transport, agentInfo)
 }
 
 func GetLicenseErrorAlert() (uint, error) {
-	return 0, nil
+	return edition.GetLicenseErrorAlert()
 }
 
 func GetNodeErrorAlert() (uint, error) {
-	return 0, nil
+	return edition.GetNodeErrorAlert()
 }
 
-func LoadRequestTransport() *http.Transport {
-	return &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		DialContext: (&net.Dialer{
-			Timeout:   60 * time.Second,
-			KeepAlive: 60 * time.Second,
-		}).DialContext,
-		TLSHandshakeTimeout:   5 * time.Second,
-		ResponseHeaderTimeout: 10 * time.Second,
-		IdleConnTimeout:       15 * time.Second,
-	}
-}
+func LoadRequestTransport() *http.Transport { return edition.LoadRequestTransport() }
 
 func ValidateCertificate(c *gin.Context) bool {
-	return true
+	return edition.ValidateCertificate(c)
 }
 
 func PushSSLToNode(websiteSSL *model.WebsiteSSL) error {
-	return nil
+	return edition.PushSSLToNode(websiteSSL)
 }
 
 func GetAgentInfo() (*dto.AgentInfo, error) {
-	return nil, nil
+	return edition.GetAgentInfo()
 }

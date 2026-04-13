@@ -180,16 +180,10 @@ import { KeyTypes } from '@/global/mimetype';
 import { getDNSName, getAccountName } from '@/utils/util';
 import { defineAsyncComponent } from 'vue';
 import { useGlobalStore } from '@/composables/useGlobalStore';
+import { loadOptionalComponent } from '@/extensions/optional';
 const { isMasterProductPro, isMaster } = useGlobalStore();
 
-const PushtoNode = defineAsyncComponent(async () => {
-    const modules = import.meta.glob('@/xpack/views/ssl/index.vue');
-    const loader = modules['/src/xpack/views/ssl/index.vue'];
-    if (loader) {
-        return ((await loader()) as any).default;
-    }
-    return { template: '<div></div>' };
-});
+const PushtoNode = defineAsyncComponent(() => loadOptionalComponent('/src/xpack/views/ssl/index.vue'));
 
 const props = defineProps({
     id: {
