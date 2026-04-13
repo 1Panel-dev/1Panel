@@ -44,7 +44,6 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
             alias: {
                 '@': resolve(__dirname, './src'),
                 'vue-i18n': 'vue-i18n/dist/vue-i18n.cjs.js',
-                xpack: resolve(__dirname, './src/xpack'),
             },
         },
         define: {

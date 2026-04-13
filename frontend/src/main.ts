@@ -6,11 +6,9 @@ import '@/styles/common.scss';
 import '@/assets/iconfont/iconfont.css';
 import '@/assets/iconfont/iconfont.js';
 import '@/styles/style.css';
+import { loadXpackStyles } from '@/extensions/theme';
 
-const styleModule = import.meta.glob('xpack/styles/index.scss');
-for (const path in styleModule) {
-    styleModule[path]?.();
-}
+loadXpackStyles();
 
 import router from '@/routers/index';
 import i18n, { ensureFallbackLocale, loadLocaleMessages } from '@/lang/index';

@@ -191,18 +191,12 @@ import TaskLog from '@/components/log/task/index.vue';
 import { routerToFileWithPath } from '@/utils/router';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { mysqlArgs } from '@/views/cronjob/cronjob/helper';
+import { loadOptionalComponent } from '@/extensions/optional';
 const { currentNode } = useGlobalStore();
 
 const emit = defineEmits(['close']);
 
-const PushApp = defineAsyncComponent(async () => {
-    const modules = import.meta.glob('@/xpack/views/appstore/push-app/index.vue');
-    const loader = modules['/src/xpack/views/appstore/push-app/index.vue'];
-    if (loader) {
-        return ((await loader()) as any).default;
-    }
-    return { template: '<div></div>' };
-});
+const PushApp = defineAsyncComponent(() => loadOptionalComponent('/src/xpack/views/appstore/push-app/index.vue'));
 
 const selects = ref<any>([]);
 const args = ref([]);

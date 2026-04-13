@@ -23,11 +23,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, defineAsyncComponent } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import OllamaView from '@/views/ai/model/ollama/index.vue';
 import TensorRTView from '@/views/ai/model/tensorrt/index.vue';
-import VllmView from '@/xpack/views/vllm/index.vue';
+import { loadOptionalComponent } from '@/extensions/optional';
+
+const VllmView = defineAsyncComponent(() => loadOptionalComponent('/src/xpack/views/vllm/index.vue'));
 
 type LocalTab = 'ollama' | 'vllm' | 'tensorrt';
 
