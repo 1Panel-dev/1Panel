@@ -1,6 +1,10 @@
 import { createApp } from 'vue';
 import App from './App.vue';
 
+import ElementPlus from 'element-plus';
+import 'element-plus/dist/index.css';
+import * as Icons from '@element-plus/icons-vue';
+
 import '@/styles/index.scss';
 import '@/styles/common.scss';
 import '@/assets/iconfont/iconfont.css';
@@ -15,9 +19,6 @@ import i18n, { ensureFallbackLocale, loadLocaleMessages } from '@/lang/index';
 import pinia from '@/store/index';
 import SvgIcon from './components/svg-icon/svg-icon.vue';
 import Components from '@/components';
-
-import ElementPlus from 'element-plus';
-import * as Icons from '@element-plus/icons-vue';
 
 import directives from '@/directives/index';
 
