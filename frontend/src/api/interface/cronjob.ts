@@ -39,7 +39,7 @@ export namespace Cronjob {
         files: Array<Item>;
         sourceDir: string;
         snapshotRule: snapshotRule;
-        ignoreAppIDs: Array<Number>;
+        ignoreAppIDs: Array<number>;
         withImage: boolean;
 
         websiteList: Array<string>;
@@ -165,7 +165,7 @@ export namespace Cronjob {
     }
     export interface snapshotRule {
         withImage: boolean;
-        ignoreAppIDs: Array<Number>;
+        ignoreAppIDs: Array<number>;
     }
     export interface SpecObj {
         specType: string;

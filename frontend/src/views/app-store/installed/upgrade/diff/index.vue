@@ -20,34 +20,56 @@
 
 <script setup lang="ts">
 import { nextTick, ref } from 'vue';
-import { setupMonacoEnvironment } from '@/utils/monaco';
-import * as monaco from 'monaco-editor';
+import { loadMonacoLanguageSupport, setupMonacoEnvironment } from '@/utils/monaco';
 
-setupMonacoEnvironment();
+type MonacoEditorApi = typeof import('monaco-editor/esm/vs/editor/editor.api');
 
 const open = ref(false);
 const newContent = ref('');
 const oldContent = ref('');
 const em = defineEmits(['confirm']);
 
-let originalModel = null;
-let modifiedModel = null;
-let editor: monaco.editor.IStandaloneDiffEditor = null;
+let monaco: MonacoEditorApi | null = null;
+let originalModel: MonacoEditorApi['editor']['ITextModel'] | null = null;
+let modifiedModel: MonacoEditorApi['editor']['ITextModel'] | null = null;
+let editor: MonacoEditorApi['editor']['IStandaloneDiffEditor'] | null = null;
 
 const container = ref();
+
+const ensureMonaco = async () => {
+    if (monaco) {
+        return monaco;
+    }
+    setupMonacoEnvironment();
+    const [monacoModule] = await Promise.all([
+        import('monaco-editor/esm/vs/editor/editor.api'),
+        loadMonacoLanguageSupport(),
+    ]);
+    monaco = monacoModule;
+    return monaco;
+};
+
+const disposeModels = () => {
+    originalModel?.dispose();
+    modifiedModel?.dispose();
+    originalModel = null;
+    modifiedModel = null;
+};
 
 const handleClose = () => {
     open.value = false;
     if (editor) {
         editor.dispose();
+        editor = null;
     }
+    disposeModels();
 };
 
-const acceptParams = (oldCompose: string, newCompose: string) => {
+const acceptParams = async (oldCompose: string, newCompose: string) => {
     oldContent.value = oldCompose;
     newContent.value = newCompose;
     open.value = true;
-    initEditor();
+    await initEditor();
 };
 
 const confirm = (useEditor: boolean) => {
@@ -61,24 +83,35 @@ const confirm = (useEditor: boolean) => {
     handleClose();
 };
 
-const initEditor = () => {
-    nextTick(() => {
-        originalModel = monaco.editor.createModel(oldContent.value, 'yaml');
-        modifiedModel = monaco.editor.createModel(newContent.value, 'yaml');
+const initEditor = async () => {
+    const monacoApi = await ensureMonaco();
+    await nextTick();
 
-        editor = monaco.editor.createDiffEditor(container.value, {
-            theme: 'vs-dark',
-            readOnly: false,
-            automaticLayout: true,
-            folding: true,
-            roundedSelection: false,
-            overviewRulerBorder: false,
-        });
+    if (!container.value) {
+        return;
+    }
 
-        editor.setModel({
-            original: originalModel,
-            modified: modifiedModel,
-        });
+    if (editor) {
+        editor.dispose();
+        editor = null;
+    }
+    disposeModels();
+
+    originalModel = monacoApi.editor.createModel(oldContent.value, 'yaml');
+    modifiedModel = monacoApi.editor.createModel(newContent.value, 'yaml');
+
+    editor = monacoApi.editor.createDiffEditor(container.value, {
+        theme: 'vs-dark',
+        readOnly: false,
+        automaticLayout: true,
+        folding: true,
+        roundedSelection: false,
+        overviewRulerBorder: false,
+    });
+
+    editor.setModel({
+        original: originalModel,
+        modified: modifiedModel,
     });
 };
 

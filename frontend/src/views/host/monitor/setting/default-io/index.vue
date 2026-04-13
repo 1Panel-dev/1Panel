@@ -64,7 +64,7 @@ const onSave = async (formEl: FormInstance | undefined) => {
         if (!valid) return;
         await updateMonitorSetting('DefaultIO', form.defaultIO)
             .then(async () => {
-                globalStore.setDefaultIO(form.defaultIO);
+                globalStore.defaultIO = form.defaultIO;
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 loading.value = false;
                 drawerVisible.value = false;

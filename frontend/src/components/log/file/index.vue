@@ -41,10 +41,10 @@
                     :class="['log-item', { 'task-mode': isTaskMode }]"
                     :style="{ height: `${logHeight}px` }"
                 >
-                    <hightlight :log="log" :type="config.colorMode ?? 'nginx'"></hightlight>
+                    <Highlight :log="log" :type="config.colorMode ?? 'nginx'"></Highlight>
                 </div>
             </div>
-            <hightlight v-if="logs.length === 0" :log="$t('commons.log.noLog')" type="system"></hightlight>
+            <Highlight v-if="logs.length === 0" :log="$t('commons.log.noLog')" type="system"></Highlight>
         </div>
     </div>
 </template>
@@ -54,7 +54,7 @@ import { downloadFile } from '@/utils/file';
 import { readByLine } from '@/api/modules/files';
 import { GlobalStore } from '@/store';
 import bus from '@/global/bus';
-import hightlight from '@/components/log/custom-hightlight/index.vue';
+import Highlight from '@/components/log/custom-highlight/index.vue';
 const globalStore = GlobalStore();
 
 interface LogProps {

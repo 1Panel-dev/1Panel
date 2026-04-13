@@ -43,7 +43,7 @@
     <Cache ref="cacheRef" @close="search()" />
 </template>
 
-<script lang="ts" setup name="proxy">
+<script lang="ts" setup>
 import { Website } from '@/api/interface/website';
 import { getProxyConfig, deleteProxyConfig, updateProxyConfigStatus, clearProxyCache } from '@/api/modules/website';
 import { computed, onMounted, ref } from 'vue';
@@ -54,6 +54,7 @@ import { GlobalStore } from '@/store';
 import Create from './create/index.vue';
 import File from './file/index.vue';
 import Cache from './cache/index.vue';
+defineOptions({ name: 'Proxy' });
 const globalStore = GlobalStore();
 
 const props = defineProps({

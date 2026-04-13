@@ -376,7 +376,7 @@ const mysqlName = (appType: string) => {
 
 const goRemoteDB = async () => {
     if (currentDB.value) {
-        globalStore.setCurrentDB(currentDB.value.database);
+        globalStore.currentDB = currentDB.value.database;
     }
     routerToName('MySQL-Remote');
 };
@@ -389,7 +389,7 @@ const passwordRef = ref();
 
 const onSetting = async () => {
     if (currentDB.value) {
-        globalStore.setCurrentDB(currentDB.value.database);
+        globalStore.currentDB = currentDB.value.database;
     }
     routerToNameWithParams('MySQL-Setting', { type: currentDB.value.type, database: currentDB.value.database });
 };
@@ -398,7 +398,7 @@ const changeDatabase = async () => {
     for (const item of dbOptionsLocal.value) {
         if (item.database == currentDBName.value) {
             currentDB.value = item;
-            globalStore.setCurrentDB(currentDB.value.database);
+            globalStore.currentDB = currentDB.value.database;
             appKey.value = item.type;
             appName.value = item.database;
             search();
@@ -410,7 +410,7 @@ const changeDatabase = async () => {
         if (item.database == currentDBName.value) {
             maskShow.value = false;
             currentDB.value = item;
-            globalStore.setCurrentDB(currentDB.value.database);
+            globalStore.currentDB = currentDB.value.database;
             break;
         }
     }

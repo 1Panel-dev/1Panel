@@ -79,6 +79,14 @@ const handleChange = async (target: LocalTab) => {
 </script>
 
 <style lang="scss" scoped>
+.content-container__search {
+    margin-top: 7px;
+
+    :deep(.el-card) {
+        --el-card-padding: 12px;
+    }
+}
+
 .local-model-content {
     :deep(.content-container__app) {
         margin-top: 7px;

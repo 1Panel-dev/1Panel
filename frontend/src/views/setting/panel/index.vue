@@ -539,7 +539,7 @@ const onSave = async (key: string, val: any) => {
                 handleThemeChange(val);
                 break;
             case 'MenuTabs':
-                globalStore.setOpenMenuTabs(val === 'Enable');
+                globalStore.openMenuTabs = val === 'Enable';
                 break;
             case 'Language':
                 await globalStore.updateLanguage(val);

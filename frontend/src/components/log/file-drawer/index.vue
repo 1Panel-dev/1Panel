@@ -78,7 +78,7 @@ onBeforeUnmount(() => {
 defineExpose({ acceptParams });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .fullScreen {
     border: none;
 }

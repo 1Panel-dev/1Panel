@@ -89,7 +89,7 @@ const showBack = computed(() => {
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @use '@/styles/mixins.scss' as *;
 
 .content-container__app {
@@ -106,13 +106,16 @@ const showBack = computed(() => {
 .content-container__title {
     font-weight: 400;
     font-size: 18px;
-    .el-button + .el-button {
+
+    :deep(.el-button + .el-button) {
         margin: 0 !important;
     }
-    .el-button-group > .el-button + .el-button {
+
+    :deep(.el-button-group > .el-button + .el-button) {
         margin-left: 0 !important;
     }
-    .el-button-group > .el-button:not(:last-child) {
+
+    :deep(.el-button-group > .el-button:not(:last-child)) {
         margin-right: -1px !important;
     }
 }

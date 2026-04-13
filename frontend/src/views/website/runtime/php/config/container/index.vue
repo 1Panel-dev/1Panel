@@ -43,7 +43,7 @@
 import PortConfig from '@/views/website/runtime/components/port/index.vue';
 import Environment from '@/views/website/runtime/components/environment/index.vue';
 import Volumes from '@/views/website/runtime/components/volume/index.vue';
-import ExtraHosts from '@/views/website/runtime/components/extra_hosts/index.vue';
+import ExtraHosts from '@/views/website/runtime/components/extra-hosts/index.vue';
 
 import { Runtime } from '@/api/interface/runtime';
 import { getPHPContainerConfig, updatePHPContainerConfig } from '@/api/modules/runtime';

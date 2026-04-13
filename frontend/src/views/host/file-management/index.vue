@@ -1131,12 +1131,12 @@ const jump = async (url: string) => {
     let searchResult = await searchFile();
     if (!searchResult.data.path) {
         req.path = oldUrl;
-        globalStore.setLastFilePath(req.path);
+        globalStore.lastFilePath = req.path;
         MsgWarning(i18n.global.t('commons.res.notFound'));
         return;
     }
     req.path = searchResult.data.path;
-    globalStore.setLastFilePath(req.path);
+    globalStore.lastFilePath = req.path;
     handleSearchResult(searchResult);
     getPaths(req.path);
     updateTab(req.path);
@@ -1453,14 +1453,14 @@ const openBatchRole = (items: File.File[]) => {
     batchRoleRef.value.acceptParams({ files: items });
 };
 
-const closeWget = (submit: Boolean) => {
+const closeWget = (submit: boolean) => {
     search();
     if (submit) {
         openProcess();
     }
 };
 
-const closeMovePage = (submit: Boolean) => {
+const closeMovePage = (submit: boolean) => {
     if (submit) {
         search();
         closeMove();
@@ -1490,7 +1490,7 @@ const getWgetProcess = async () => {
     } catch (error) {}
 };
 
-const openRename = (item: File.File, source: String) => {
+const openRename = (item: File.File, source: string) => {
     fileRename.path = req.path;
     fileRename.oldName = item.name;
     if (source === 'right') {
@@ -2049,14 +2049,14 @@ function getInitialPath(): string {
     if (routePath && typeof routePath === 'string') {
         const p = routePath.trim();
         if (p !== '') {
-            globalStore.setLastFilePath(p);
+            globalStore.lastFilePath = p;
             return p;
         }
     }
     const tab = editableTabs.value.find((t) => t.id === editableTabsKey.value);
     if (tab && typeof tab.path === 'string' && tab.path.trim() !== '') {
         const p = tab.path.trim();
-        globalStore.setLastFilePath(p);
+        globalStore.lastFilePath = p;
         return p;
     }
     if (typeof globalStore.lastFilePath === 'string' && globalStore.lastFilePath.trim() !== '') {
@@ -2151,7 +2151,7 @@ const changeTab = (targetPath: TabPaneName) => {
     saveStorageTabs();
     saveStorageTabsKey();
     req.path = current ? current.path : '';
-    globalStore.setLastFilePath(req.path);
+    globalStore.lastFilePath = req.path;
     getPaths(req.path);
     search();
 };

@@ -48,7 +48,7 @@
     <OpDialog ref="opRef" @search="search()" />
 </template>
 
-<script lang="ts" setup name="proxy">
+<script lang="ts" setup>
 import { Website } from '@/api/interface/website';
 import { operateRedirectConfig, getRedirectConfig } from '@/api/modules/website';
 import { computed, onMounted, ref } from 'vue';
@@ -58,6 +58,7 @@ import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { ElMessageBox } from 'element-plus';
 import { GlobalStore } from '@/store';
+defineOptions({ name: 'Proxy' });
 const globalStore = GlobalStore();
 
 const props = defineProps({

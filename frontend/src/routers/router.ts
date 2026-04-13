@@ -12,7 +12,6 @@ const homeRouter: RouteRecordRaw = {
     component: Layout,
     redirect: '/',
     meta: {
-        keepAlive: true,
         title: 'menu.home',
         icon: 'p-home',
     },
@@ -23,6 +22,7 @@ const homeRouter: RouteRecordRaw = {
             component: () => import('@/views/home/index.vue'),
             meta: {
                 requiresAuth: true,
+                keepAlive: true,
             },
         },
     ],

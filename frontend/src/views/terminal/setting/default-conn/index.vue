@@ -47,7 +47,7 @@ import { Rules } from '@/global/form-rules';
 import { addHost, loadLocalConn, testByInfo } from '@/api/modules/terminal';
 import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';
-import { Base64 } from 'js-base64';
+import { decodeBase64 } from '@/utils/base64';
 
 const loading = ref();
 const isOK = ref(false);
@@ -94,9 +94,9 @@ const search = async () => {
             form.addr = res.data.addr || '127.0.0.1';
             form.port = res.data.port || 22;
             form.authMode = res.data.authMode || 'password';
-            form.password = Base64.decode(res.data.password);
-            form.privateKey = Base64.decode(res.data.privateKey);
-            form.passPhrase = Base64.decode(res.data.passPhrase);
+            form.password = decodeBase64(res.data.password);
+            form.privateKey = decodeBase64(res.data.privateKey);
+            form.passPhrase = decodeBase64(res.data.passPhrase);
         }
     });
 };

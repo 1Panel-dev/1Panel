@@ -21,7 +21,7 @@ import { ref, watch, onBeforeUnmount, nextTick, computed, onMounted } from 'vue'
 import { Terminal } from '@xterm/xterm';
 import '@xterm/xterm/css/xterm.css';
 import { FitAddon } from '@xterm/addon-fit';
-import { Base64 } from 'js-base64';
+import { decodeBase64, encodeBase64 } from '@/utils/base64';
 import { GlobalStore, TerminalStore } from '@/store';
 const globalStore = GlobalStore();
 
@@ -268,7 +268,7 @@ const onWSReceive = (message: MessageEvent) => {
         case 'cmd': {
             term.value.element && term.value.focus();
             if (wsMsg.data) {
-                let receiveMsg = Base64.decode(wsMsg.data);
+                let receiveMsg = decodeBase64(wsMsg.data);
                 if (initCmd.value != '') {
                     receiveMsg = receiveMsg?.replace(initCmd.value.trim(), '').trim();
                     initCmd.value = '';
@@ -356,7 +356,7 @@ function sendMsg(data: string, line: string = '') {
         terminalSocket.value!.send(
             JSON.stringify({
                 type: 'cmd',
-                data: Base64.encode(data),
+                data: encodeBase64(data),
                 line,
             }),
         );
@@ -507,7 +507,9 @@ onBeforeUnmount(() => {
 
 .ai-notice-fade-enter-active,
 .ai-notice-fade-leave-active {
-    transition: opacity 180ms ease, transform 180ms ease;
+    transition:
+        opacity 180ms ease,
+        transform 180ms ease;
 }
 
 .ai-mask-fade-enter-active,

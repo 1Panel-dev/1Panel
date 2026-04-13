@@ -198,7 +198,7 @@ const updateParam = () => {
     emit('update:form', form);
 };
 
-const isMysql = (form: Object, envKey: string) => {
+const isMysql = (form: object, envKey: string) => {
     return form['PANEL_DB_HOST'] != undefined && (form[envKey] == 'mysql' || form[envKey] == 'mariadb');
 };
 

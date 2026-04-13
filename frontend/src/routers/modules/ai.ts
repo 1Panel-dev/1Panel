@@ -1,6 +1,6 @@
 import { Layout } from '@/routers/constant';
 
-const databaseRouter = {
+const aiRouter = {
     sort: 4,
     path: '/ai',
     name: 'AI-Menu',
@@ -76,4 +76,4 @@ const databaseRouter = {
     ],
 };
 
-export default databaseRouter;
+export default aiRouter;

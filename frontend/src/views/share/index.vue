@@ -162,7 +162,8 @@ onMounted(async () => {
     align-items: center;
     justify-content: center;
     padding: 24px;
-    background: radial-gradient(circle at top, rgba(0, 94, 235, 0.14), transparent 32%),
+    background:
+        radial-gradient(circle at top, rgba(0, 94, 235, 0.14), transparent 32%),
         linear-gradient(160deg, #f5f8ff 0%, #eef4ff 42%, #ffffff 100%);
 }
 

@@ -60,7 +60,7 @@ const id = computed(() => {
     return props.id;
 });
 const httpsForm = ref<FormInstance>();
-const form = reactive({
+let form = reactive({
     acmeAccountID: 0,
     enable: false,
     websiteId: id.value,
@@ -182,12 +182,12 @@ onMounted(() => {
     get();
 });
 </script>
-<style lang="scss">
-.el-collapse,
-.el-collapse-item__wrap {
+<style lang="scss" scoped>
+:deep(.el-collapse),
+:deep(.el-collapse-item__wrap) {
     border: none;
 }
-.el-collapse-item__header {
+:deep(.el-collapse-item__header) {
     border: none;
 }
 </style>

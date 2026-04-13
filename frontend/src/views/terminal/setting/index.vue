@@ -149,7 +149,7 @@
 import { ref, reactive, watch, onMounted, onBeforeUnmount } from 'vue';
 import { getTerminalInfo, UpdateTerminalInfo } from '@/api/modules/setting';
 import { Terminal } from '@xterm/xterm';
-import OperateDialog from '@/views/terminal/setting/default_conn/index.vue';
+import OperateDialog from '@/views/terminal/setting/default-conn/index.vue';
 import '@xterm/xterm/css/xterm.css';
 import { FitAddon } from '@xterm/addon-fit';
 import i18n from '@/lang';
@@ -265,7 +265,7 @@ const search = async (withReset?: boolean) => {
             form.cursorStyle = res.data.cursorStyle;
             form.scrollback = Number(res.data.scrollback);
             form.scrollSensitivity = Number(res.data.scrollSensitivity);
-            terminalStore.setFontFamily(res.data.fontFamily || '');
+            terminalStore.fontFamily = res.data.fontFamily || '';
 
             if (withReset) {
                 changeItem();
@@ -409,16 +409,18 @@ const onSave = () => {
             };
             await UpdateTerminalInfo(param);
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            terminalStore.setLineHeight(form.lineHeight);
-            terminalStore.setLetterSpacing(form.letterSpacing);
-            terminalStore.setFontSize(form.fontSize);
-            terminalStore.setFontFamily(form.fontFamily);
-            terminalStore.setBackgroundColor(form.backgroundColor);
-            terminalStore.setForegroundColor(form.foregroundColor);
-            terminalStore.setCursorBlink(form.cursorBlink);
-            terminalStore.setCursorStyle(form.cursorStyle);
-            terminalStore.setScrollback(form.scrollback);
-            terminalStore.setScrollSensitivity(form.scrollSensitivity);
+            terminalStore.$patch({
+                lineHeight: form.lineHeight,
+                letterSpacing: form.letterSpacing,
+                fontSize: form.fontSize,
+                fontFamily: form.fontFamily,
+                backgroundColor: form.backgroundColor,
+                foregroundColor: form.foregroundColor,
+                cursorBlink: form.cursorBlink,
+                cursorStyle: form.cursorStyle,
+                scrollback: form.scrollback,
+                scrollSensitivity: form.scrollSensitivity,
+            });
         } finally {
             loading.value = false;
         }

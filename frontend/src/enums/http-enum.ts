@@ -10,7 +10,7 @@ export enum ResultEnum {
     FORBIDDEN = 403,
     NOTFOUND = 404,
     ERRAUTH = 406,
-    ERRGLOBALLOADDING = 407,
+    ERRGLOBALLOADING = 407,
     ERRXPACK = 410,
     NodeUnBind = 411,
     TIMEOUT = 20000,

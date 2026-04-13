@@ -59,7 +59,7 @@ interface DialogProps {
     names: Array<string>;
 
     api: Function;
-    params: Object;
+    params: object;
     successMsg: string;
     noMsg: boolean;
 }

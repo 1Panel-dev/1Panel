@@ -194,7 +194,7 @@ import { loadResourceLimit } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
 
 interface ParamProps {
-    id: Number;
+    id: number;
     app: any;
 }
 const paramData = ref<ParamProps>({
@@ -470,11 +470,11 @@ const changeUnit = () => {
 defineExpose({ acceptParams });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .change-button {
     margin-top: 5px;
 }
-.system-label {
+:deep(.system-label) {
     width: 40% !important;
     white-space: nowrap !important;
 }

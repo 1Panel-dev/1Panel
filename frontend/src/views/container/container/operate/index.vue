@@ -345,7 +345,7 @@ import { ElForm } from 'element-plus';
 import Confirm from '@/views/container/container/operate/confirm.vue';
 import Volume from '@/views/container/container/operate/volume.vue';
 import Network from '@/views/container/container/operate/network.vue';
-import ExtraHosts from '@/views/website/runtime/components/extra_hosts/index.vue';
+import ExtraHosts from '@/views/website/runtime/components/extra-hosts/index.vue';
 import {
     listImage,
     createContainer,

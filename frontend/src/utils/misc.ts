@@ -39,7 +39,7 @@ export function isJson(str: string) {
     }
 }
 
-function compareById(a: any, b: any) {
+function compareBySort(a: any, b: any) {
     return a.sort - b.sort;
 }
 
@@ -49,10 +49,10 @@ export function sortMenu(arr: any[]) {
     }
     arr.forEach((item) => {
         if (item.children && Array.isArray(item.children)) {
-            item.children.sort(compareById);
+            item.children.sort(compareBySort);
         }
     });
-    arr.sort(compareById);
+    arr.sort(compareBySort);
 }
 
 export function isPunycoded(domain: string): boolean {

@@ -218,7 +218,10 @@
                     <el-option value="Deep_Archive" :label="$t('setting.scDeep_Archive')" />
                 </el-select>
                 <el-alert
-                    v-if="dialogData.rowData!.varsJson['scType'] === 'Archive' || dialogData.rowData!.varsJson['scType'] === 'Deep_Archive'"
+                    v-if="
+                        dialogData.rowData!.varsJson['scType'] === 'Archive' ||
+                        dialogData.rowData!.varsJson['scType'] === 'Deep_Archive'
+                    "
                     class="mt-2.5"
                     :closable="false"
                     type="warning"
@@ -238,7 +241,10 @@
                     <el-option value="ColdArchive" :label="$t('setting.scDeep_Archive')" />
                 </el-select>
                 <el-alert
-                    v-if="dialogData.rowData!.varsJson['scType'] === 'Archive' || dialogData.rowData!.varsJson['scType'] === 'ColdArchive'"
+                    v-if="
+                        dialogData.rowData!.varsJson['scType'] === 'Archive' ||
+                        dialogData.rowData!.varsJson['scType'] === 'ColdArchive'
+                    "
                     class="mt-2.5"
                     :closable="false"
                     type="warning"
@@ -258,7 +264,10 @@
                     <el-option value="DEEP_ARCHIVE" :label="$t('setting.scDeep_Archive')" />
                 </el-select>
                 <el-alert
-                    v-if="dialogData.rowData!.varsJson['scType'] === 'GLACIER' || dialogData.rowData!.varsJson['scType'] === 'DEEP_ARCHIVE'"
+                    v-if="
+                        dialogData.rowData!.varsJson['scType'] === 'GLACIER' ||
+                        dialogData.rowData!.varsJson['scType'] === 'DEEP_ARCHIVE'
+                    "
                     class="mt-2.5"
                     :closable="false"
                     type="warning"

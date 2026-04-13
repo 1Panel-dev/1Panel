@@ -9,7 +9,6 @@ build/1panel-core
 
 # Mac
 .DS_Store
-*/.DS_Store
 
 # VS Code
 .vscode

@@ -182,7 +182,7 @@
                                     :clearable="false"
                                     @change="updateWebsitConfig(row)"
                                     :ref="(el) => setdateRefs(el)"
-                                    @visible-change="(visibility:boolean) => pickerVisibility(visibility, row)"
+                                    @visible-change="(visibility: boolean) => pickerVisibility(visibility, row)"
                                     size="small"
                                     :mounted="initDatePicker(row)"
                                 ></el-date-picker>

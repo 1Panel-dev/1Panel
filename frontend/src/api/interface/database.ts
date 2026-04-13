@@ -185,6 +185,8 @@ export namespace Database {
         format: string;
         username: string;
         password: string;
+        superUser: boolean;
+        isDelete: string;
         description: string;
     }
     export interface PostgresqlConfUpdateByFile {
@@ -200,19 +202,6 @@ export namespace Database {
         username: string;
         password: string;
         superUser: boolean;
-        description: string;
-    }
-    export interface PostgresqlDBInfo {
-        id: number;
-        createdAt: Date;
-        name: string;
-        mysqlName: string;
-        from: string;
-        format: string;
-        username: string;
-        password: string;
-        superUser: boolean;
-        isDelete: string;
         description: string;
     }
     export interface ChangeInfo {

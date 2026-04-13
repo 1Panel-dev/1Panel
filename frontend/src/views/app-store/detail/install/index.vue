@@ -20,7 +20,7 @@
     <TaskLog ref="taskLogRef" />
 </template>
 
-<script lang="ts" setup name="AppInstallPage">
+<script lang="ts" setup>
 import { useRouter } from 'vue-router';
 import AppInstallForm from '@/views/app-store/detail/form/index.vue';
 import { installApp } from '@/api/modules/app';
@@ -30,6 +30,7 @@ import { routerToName } from '@/utils/router';
 import TaskLog from '@/components/log/task/index.vue';
 import i18n from '@/lang';
 import { installAppToNodes } from '@/api/modules/app';
+defineOptions({ name: 'AppInstallPage' });
 
 const router = useRouter();
 const open = ref(false);

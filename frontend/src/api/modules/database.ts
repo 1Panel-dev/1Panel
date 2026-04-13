@@ -1,6 +1,6 @@
 import http from '@/api';
 import { deepCopy } from '@/utils/misc';
-import { Base64 } from 'js-base64';
+import { encodeBase64, encodeBase64Fields } from '@/utils/base64';
 import { ResPage, DescriptionUpdate } from '../interface';
 import { Database } from '../interface/database';
 import { TimeoutEnum } from '@/enums/http-enum';
@@ -19,9 +19,7 @@ export const updateDBFile = (params: Database.DBConfUpdate) => {
 // pg
 export const addPostgresqlDB = (params: Database.PostgresqlDBCreate) => {
     let request = deepCopy(params) as Database.PostgresqlDBCreate;
-    if (request.password) {
-        request.password = Base64.encode(request.password);
-    }
+    encodeBase64Fields(request, ['password']);
     return http.post(`/databases/pg`, request, TimeoutEnum.T_40S);
 };
 export const bindPostgresqlUser = (params: Database.PgBind) => {
@@ -45,9 +43,7 @@ export const deleteCheckPostgresqlDB = (params: Database.PostgresqlDBDeleteCheck
 };
 export const updatePostgresqlPassword = (params: Database.ChangeInfo) => {
     let request = deepCopy(params) as Database.ChangeInfo;
-    if (request.value) {
-        request.value = Base64.encode(request.value);
-    }
+    encodeBase64Fields(request, ['value']);
     return http.post(`/databases/pg/password`, request, TimeoutEnum.T_40S);
 };
 export const deletePostgresqlDB = (params: Database.PostgresqlDBDelete) => {
@@ -61,16 +57,12 @@ export const searchMysqlDBs = (params: Database.SearchDBWithPage, node?: string)
 };
 export const addMysqlDB = (params: Database.MysqlDBCreate) => {
     let request = deepCopy(params) as Database.MysqlDBCreate;
-    if (request.password) {
-        request.password = Base64.encode(request.password);
-    }
+    encodeBase64Fields(request, ['password']);
     return http.post(`/databases`, request);
 };
 export const bindUser = (params: Database.BindUser) => {
     let request = deepCopy(params) as Database.BindUser;
-    if (request.password) {
-        request.password = Base64.encode(request.password);
-    }
+    encodeBase64Fields(request, ['password']);
     return http.post(`/databases/bind`, request);
 };
 export const loadDBFromRemote = (params: Database.MysqlLoadDB) => {
@@ -81,9 +73,7 @@ export const updateMysqlAccess = (params: Database.ChangeInfo) => {
 };
 export const updateMysqlPassword = (params: Database.ChangeInfo) => {
     let request = deepCopy(params) as Database.ChangeInfo;
-    if (request.value) {
-        request.value = Base64.encode(request.value);
-    }
+    encodeBase64Fields(request, ['value']);
     return http.post(`/databases/change/password`, request);
 };
 export const updateMysqlDescription = (params: DescriptionUpdate) => {
@@ -133,7 +123,7 @@ export const installRedisCli = () => {
 };
 export const changeRedisPassword = (database: string, password: string) => {
     if (password) {
-        password = Base64.encode(password);
+        password = encodeBase64(password);
     }
     return http.post(`/databases/redis/password`, { database: database, value: password });
 };
@@ -164,9 +154,7 @@ export const listDbItems = (type: string) => {
 export const checkDatabase = (params: Database.DatabaseCreate) => {
     let request = deepCopy(params) as Database.DatabaseCreate;
     if (request.ssl) {
-        request.clientKey = Base64.encode(request.clientKey);
-        request.clientCert = Base64.encode(request.clientCert);
-        request.rootCert = Base64.encode(request.rootCert);
+        encodeBase64Fields(request, ['clientKey', 'clientCert', 'rootCert']);
     }
 
     return http.post<boolean>(`/databases/db/check`, request, TimeoutEnum.T_60S);
@@ -174,9 +162,7 @@ export const checkDatabase = (params: Database.DatabaseCreate) => {
 export const addDatabase = (params: Database.DatabaseCreate) => {
     let request = deepCopy(params) as Database.DatabaseCreate;
     if (request.ssl) {
-        request.clientKey = Base64.encode(request.clientKey);
-        request.clientCert = Base64.encode(request.clientCert);
-        request.rootCert = Base64.encode(request.rootCert);
+        encodeBase64Fields(request, ['clientKey', 'clientCert', 'rootCert']);
     }
 
     return http.post(`/databases/db`, request, TimeoutEnum.T_60S);
@@ -184,9 +170,7 @@ export const addDatabase = (params: Database.DatabaseCreate) => {
 export const editDatabase = (params: Database.DatabaseUpdate) => {
     let request = deepCopy(params) as Database.DatabaseCreate;
     if (request.ssl) {
-        request.clientKey = Base64.encode(request.clientKey);
-        request.clientCert = Base64.encode(request.clientCert);
-        request.rootCert = Base64.encode(request.rootCert);
+        encodeBase64Fields(request, ['clientKey', 'clientCert', 'rootCert']);
     }
 
     return http.post(`/databases/db/update`, request, TimeoutEnum.T_60S);

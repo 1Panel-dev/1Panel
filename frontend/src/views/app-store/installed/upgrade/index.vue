@@ -135,7 +135,7 @@ const newContent = ref('');
 const em = defineEmits(['close']);
 const handleClose = () => {
     open.value = false;
-    em('close', open);
+    em('close', open.value);
 };
 
 const newCompose = ref('');

@@ -951,7 +951,9 @@ const onOpenLog = (row: any) => {
     opacity: 0;
     max-height: 0;
     overflow: hidden;
-    transition: opacity 0.2s, max-height 0.2s;
+    transition:
+        opacity 0.2s,
+        max-height 0.2s;
 }
 
 .compose-item:hover .compose-actions,
