@@ -205,14 +205,6 @@ const message = {
             errorMfaInfo: 'Información de autenticación inválida, inténtalo nuevamente.',
             captchaHelper: 'Captcha',
             errorCaptcha: 'Código captcha inválido',
-            notSafe: 'Acceso denegado',
-            safeEntrance1: 'El inicio de sesión seguro está habilitado en el entorno actual',
-            safeEntrance2:
-                'Ingrese el siguiente comando en la terminal SSH para ver la entrada al panel: 1pctl user-info',
-            errIP1: 'El acceso mediante dirección IP autorizada está habilitado en el entorno actual',
-            errDomain1: 'La vinculación del nombre de dominio de acceso está habilitada en el entorno actual',
-            errHelper:
-                'Para restablecer la información de vinculación, ejecute el siguiente comando en la terminal SSH: ',
             codeInput: 'Por favor, ingrese el código de verificación de 6 dígitos del validador MFA',
             mfaTitle: 'Autenticación MFA',
             mfaCode: 'Código de verificación MFA',

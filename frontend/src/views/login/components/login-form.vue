@@ -443,8 +443,8 @@ const login = (formEl: FormInstance | undefined) => {
                 });
                 return;
             }
-            globalStore.setLogStatus(true);
-            globalStore.setAgreeLicense(true);
+            globalStore.isLogin = true;
+            globalStore.agreeLicense = true;
             menuStore.setMenuList([]);
             tabsStore.removeAllTabs();
             changeToLocal();
@@ -488,7 +488,7 @@ const mfaLogin = async (auto: boolean) => {
         try {
             errMfaInfo.value = false;
             await mfaLoginApi(mfaLoginForm);
-            globalStore.setLogStatus(true);
+            globalStore.isLogin = true;
             menuStore.setMenuList([]);
             tabsStore.removeAllTabs();
             MsgSuccess(i18n.t('commons.msg.loginSuccess'));
@@ -554,8 +554,8 @@ const passkeyLogin = async () => {
         await passkeyFinishApi(payload, res.data.sessionId);
         enableAutoPasskey();
         globalStore.ignoreCaptcha = true;
-        globalStore.setLogStatus(true);
-        globalStore.setAgreeLicense(true);
+        globalStore.isLogin = true;
+        globalStore.agreeLicense = true;
         menuStore.setMenuList([]);
         tabsStore.removeAllTabs();
         changeToLocal();
@@ -632,8 +632,8 @@ const getSetting = async () => {
 
         document.title = res.data.panelName;
         i18n.warnHtmlMessage = false;
-        globalStore.setOpenMenuTabs(res.data.menuTabs === 'Enable');
-        globalStore.setThemeConfig({ ...themeConfig.value, theme: res.data.theme, panelName: res.data.panelName });
+        globalStore.openMenuTabs = res.data.menuTabs === 'Enable';
+        globalStore.themeConfig = { ...themeConfig.value, theme: res.data.theme, panelName: res.data.panelName };
 
         if (res.data.passkeySetting && !isIntl.value && !isFxplay.value) {
             loginForm.agreeLicense = true;

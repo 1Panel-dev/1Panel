@@ -1,7 +1,7 @@
 import http from '@/api';
 import { ResPage } from '../interface';
 import { Host } from '../interface/host';
-import { Base64 } from 'js-base64';
+import { encodeBase64Fields } from '@/utils/base64';
 import { deepCopy } from '@/utils/misc';
 export const searchHosts = (params: Host.SearchWithPage) => {
     return http.postLocalNode<ResPage<Host.Host>>(`/hosts/search`, params);
@@ -17,12 +17,7 @@ export const updateLocalConn = (param: { withReset: boolean; defaultConn: string
 };
 export const addHost = (params: Host.HostOperate) => {
     let request = deepCopy(params) as Host.HostOperate;
-    if (request.password) {
-        request.password = Base64.encode(request.password);
-    }
-    if (request.privateKey) {
-        request.privateKey = Base64.encode(request.privateKey);
-    }
+    encodeBase64Fields(request, ['password', 'privateKey']);
     if (params.isLocal) {
         return http.post(`/settings/ssh`, request);
     }
@@ -30,12 +25,7 @@ export const addHost = (params: Host.HostOperate) => {
 };
 export const testByInfo = (params: Host.HostConnTest) => {
     let request = deepCopy(params) as Host.HostOperate;
-    if (request.password) {
-        request.password = Base64.encode(request.password);
-    }
-    if (request.privateKey) {
-        request.privateKey = Base64.encode(request.privateKey);
-    }
+    encodeBase64Fields(request, ['password', 'privateKey']);
     if (params.isLocal) {
         return http.post<boolean>(`/settings/ssh/check/info`, request);
     }
@@ -46,12 +36,7 @@ export const testByID = (id: number) => {
 };
 export const editHost = (params: Host.HostOperate) => {
     let request = deepCopy(params) as Host.HostOperate;
-    if (request.password) {
-        request.password = Base64.encode(request.password);
-    }
-    if (request.privateKey) {
-        request.privateKey = Base64.encode(request.privateKey);
-    }
+    encodeBase64Fields(request, ['password', 'privateKey']);
     return http.postLocalNode(`/hosts/update`, request);
 };
 export const editHostGroup = (params: Host.GroupChange) => {

@@ -256,8 +256,8 @@
                                                 baseInfo.prettyDistro
                                                     ? baseInfo.prettyDistro
                                                     : baseInfo.platformVersion
-                                                    ? baseInfo.platform + '-' + baseInfo.platformVersion
-                                                    : baseInfo.platform
+                                                      ? baseInfo.platform + '-' + baseInfo.platformVersion
+                                                      : baseInfo.platform
                                             }}
                                         </el-descriptions-item>
                                         <el-descriptions-item
@@ -830,8 +830,8 @@ const handleCopy = () => {
         (baseInfo.value.prettyDistro
             ? baseInfo.value.prettyDistro
             : baseInfo.value.platformVersion
-            ? baseInfo.value.platform + '-' + baseInfo.value.platformVersion
-            : baseInfo.value.platform) +
+              ? baseInfo.value.platform + '-' + baseInfo.value.platformVersion
+              : baseInfo.value.platform) +
         '\n' +
         i18n.global.t('home.kernelVersion') +
         ': ' +
@@ -943,7 +943,7 @@ const loadData = async () => {
 };
 
 const hideEntrance = () => {
-    globalStore.setShowEntranceWarn(false);
+    globalStore.showEntranceWarn = false;
 };
 
 const loadUpgradeStatus = async () => {
@@ -1089,7 +1089,7 @@ onBeforeUnmount(() => {
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .h-overview {
     text-align: center;
 
@@ -1146,21 +1146,21 @@ onBeforeUnmount(() => {
 
 .my-carousel {
     &.no-indicator {
-        .el-carousel__indicators {
+        :deep(.el-carousel__indicators) {
             display: none;
         }
     }
 
-    .el-carousel__button {
+    :deep(.el-carousel__button) {
         margin-bottom: -4px;
         background-color: var(--el-text-color-regular);
     }
 
-    .el-carousel__indicator.is-active .el-carousel__button {
+    :deep(.el-carousel__indicator.is-active .el-carousel__button) {
         background-color: var(--panel-color-primary);
     }
 
-    .el-descriptions .el-descriptions__body .el-descriptions__table {
+    :deep(.el-descriptions .el-descriptions__body .el-descriptions__table) {
         border-spacing: 0 5px !important;
     }
 }
@@ -1200,7 +1200,7 @@ onBeforeUnmount(() => {
     top: -10px;
     left: 20px;
 
-    .el-tag {
+    :deep(.el-tag) {
         margin-right: 10px;
         margin-bottom: 10px;
     }
@@ -1245,7 +1245,7 @@ onBeforeUnmount(() => {
     word-wrap: break-word;
     white-space: pre-wrap;
 
-    .md-editor {
+    :deep(.md-editor) {
         background-color: transparent;
     }
 }

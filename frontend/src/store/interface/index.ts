@@ -36,7 +36,7 @@ export interface GlobalState {
     themeConfig: ThemeConfigProp;
     isFullScreen: boolean;
     openMenuTabs: boolean;
-    watermark: Watermark;
+    watermark: Watermark | null;
     watermarkShow: boolean;
     isOnRestart: boolean;
     agreeLicense: boolean;

@@ -81,7 +81,7 @@ const em = defineEmits(['close']);
 const handleClose = () => {
     closeSocket();
     open.value = false;
-    em('close', open);
+    em('close', open.value);
 };
 
 const isWsOpen = () => {

@@ -109,7 +109,7 @@ const settingRouter = {
                     component: () => import('@/views/setting/expired.vue'),
                     meta: {
                         requiresAuth: true,
-                        activeMenu: 'Expired',
+                        activeMenu: '/settings',
                         ignoreTab: true,
                     },
                 },

@@ -318,10 +318,13 @@ const loadProviders = async () => {
         value: item.provider,
         label: getAgentProviderDisplayName(item.provider, item.displayName),
     }));
-    providerBaseURL.value = filteredData.reduce((acc, item) => {
-        acc[item.provider] = item.baseUrl || '';
-        return acc;
-    }, {} as Record<string, string>);
+    providerBaseURL.value = filteredData.reduce(
+        (acc, item) => {
+            acc[item.provider] = item.baseUrl || '';
+            return acc;
+        },
+        {} as Record<string, string>,
+    );
     if (!form.provider && providerOptions.value.length > 0) {
         form.provider = providerOptions.value[0].value;
         handleProviderChange();

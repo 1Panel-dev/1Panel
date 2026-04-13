@@ -204,20 +204,20 @@ export namespace Website {
     export interface DnsAccount extends CommonModel {
         name: string;
         type: string;
-        authorization: Object;
+        authorization: object;
     }
 
     export interface DnsAccountCreate {
         name: string;
         type: string;
-        authorization: Object;
+        authorization: object;
     }
 
     export interface DnsAccountUpdate {
         id: number;
         name: string;
         type: string;
-        authorization: Object;
+        authorization: object;
     }
 
     export interface SSL extends CommonModel {
@@ -403,7 +403,7 @@ export namespace Website {
         content: string;
     }
 
-    export interface CustomRewirte {
+    export interface CustomRewrite {
         operate: string;
         name: string;
         content: string;

@@ -16,7 +16,6 @@
 </template>
 
 <script setup>
-import { defineProps, defineEmits } from 'vue';
 import { listAllNodes } from '@/api/modules/setting';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 const { globalStore } = useGlobalStore();

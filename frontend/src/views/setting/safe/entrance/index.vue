@@ -84,7 +84,7 @@ const submitEntrance = async (formEl: FormInstance | undefined) => {
         await updateSetting(param)
             .then(() => {
                 clearDashboardCacheByPrefix(['safeStatus']);
-                globalStore.setShowEntranceWarn(show.value);
+                globalStore.showEntranceWarn = show.value;
                 globalStore.entrance = form.securityEntrance;
                 loading.value = false;
                 drawerVisible.value = false;

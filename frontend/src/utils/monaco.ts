@@ -5,6 +5,7 @@ import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker'
 import EditorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
 
 let initialized = false;
+let languageSupportPromise: Promise<void> | null = null;
 
 export function setupMonacoEnvironment() {
     if (initialized) {
@@ -29,4 +30,18 @@ export function setupMonacoEnvironment() {
             return new EditorWorker();
         },
     };
+}
+
+export async function loadMonacoLanguageSupport() {
+    if (!languageSupportPromise) {
+        languageSupportPromise = Promise.all([
+            import('monaco-editor/esm/vs/basic-languages/monaco.contribution'),
+            import('monaco-editor/esm/vs/language/json/monaco.contribution'),
+            import('monaco-editor/esm/vs/language/css/monaco.contribution'),
+            import('monaco-editor/esm/vs/language/html/monaco.contribution'),
+            import('monaco-editor/esm/vs/language/typescript/monaco.contribution'),
+        ]).then(() => undefined);
+    }
+
+    await languageSupportPromise;
 }

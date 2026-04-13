@@ -39,7 +39,7 @@ const em = defineEmits(['close']);
 
 const handleClose = () => {
     open.value = false;
-    em('close', open);
+    em('close', open.value);
 };
 
 const acceptParams = () => {

@@ -424,7 +424,7 @@
     </DrawerPro>
 </template>
 
-<script lang="ts" setup name="CreateWebSite">
+<script lang="ts" setup>
 import AppInstallForm from '@/views/app-store/detail/form/index.vue';
 import SSLAlert from '@/views/website/website/create/site-alert/index.vue';
 import DomainCreate from '@/views/website/website/domain-create/index.vue';
@@ -461,6 +461,7 @@ import { Website } from '@/api/interface/website';
 import { getPathByType } from '@/api/modules/files';
 import { getWebsiteTypes } from '@/global/mimetype';
 import { compareVersion } from '@/utils/version';
+defineOptions({ name: 'CreateWebSite' });
 
 type SSLItem = Website.SSLDTO & {
     organization?: string;

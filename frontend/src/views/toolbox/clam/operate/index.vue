@@ -118,7 +118,7 @@
                         </div>
                     </el-form-item>
                     <div v-if="globalStore.isIntl">
-                        <el-form-item v-if="(dialogData.rowData!.hasSpec) && !isProductPro">
+                        <el-form-item v-if="dialogData.rowData!.hasSpec && !isProductPro">
                             <span class="input-help logText">
                                 {{ $t('toolbox.clam.alertHelper') }}
                                 <el-link class="link" type="primary" @click="toUpload">

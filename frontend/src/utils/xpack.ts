@@ -69,7 +69,7 @@ const loadDataFromDB = async () => {
     const res = await getSettingInfo();
     document.title = res.data.panelName;
     globalStore.entrance = res.data.securityEntrance;
-    globalStore.setOpenMenuTabs(res.data.menuTabs === 'Enable');
+    globalStore.openMenuTabs = res.data.menuTabs === 'Enable';
 };
 
 export async function loadProductProFromDB() {

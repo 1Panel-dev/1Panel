@@ -335,7 +335,7 @@ const onChangeConn = async () => {
 
 const goRemoteDB = async () => {
     if (currentDB.value) {
-        globalStore.setCurrentPgDB(currentDB.value.database);
+        globalStore.currentPgDB = currentDB.value.database;
     }
     routerToName('PostgreSQL-Remote');
 };
@@ -348,7 +348,7 @@ const passwordRef = ref();
 
 const onSetting = async () => {
     if (currentDB.value) {
-        globalStore.setCurrentPgDB(currentDB.value.database);
+        globalStore.currentPgDB = currentDB.value.database;
     }
     routerToNameWithParams('PostgreSQL-Setting', { type: currentDB.value.type, database: currentDB.value.database });
 };
@@ -357,7 +357,7 @@ const changeDatabase = async () => {
     for (const item of dbOptionsLocal.value) {
         if (item.database == currentDBName.value) {
             currentDB.value = item;
-            globalStore.setCurrentPgDB(currentDB.value.database);
+            globalStore.currentPgDB = currentDB.value.database;
             appKey.value = item.type;
             appName.value = item.database;
             search();
@@ -369,7 +369,7 @@ const changeDatabase = async () => {
         if (item.database == currentDBName.value) {
             maskShow.value = false;
             currentDB.value = item;
-            globalStore.setCurrentPgDB(currentDB.value.database);
+            globalStore.currentPgDB = currentDB.value.database;
             break;
         }
     }

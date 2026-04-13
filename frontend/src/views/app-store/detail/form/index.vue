@@ -144,7 +144,7 @@
     </div>
 </template>
 
-<script lang="ts" setup name="AppInstallForm">
+<script lang="ts" setup>
 import { App } from '@/api/interface/app';
 import { getAppByKey, getAppDetail, getAppInstalledByID } from '@/api/modules/app';
 import { getAppStoreConfig } from '@/api/modules/setting';
@@ -158,6 +158,7 @@ import { computeSizeFromMB } from '@/utils/size';
 import { loadResourceLimit } from '@/api/modules/container';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { loadOptionalComponent } from '@/extensions/optional';
+defineOptions({ name: 'AppInstallForm' });
 const { isOffLine, isMasterProductPro, isMaster } = useGlobalStore();
 
 const PushtoNode = defineAsyncComponent(() => loadOptionalComponent('/src/xpack/views/ssl/index.vue'));

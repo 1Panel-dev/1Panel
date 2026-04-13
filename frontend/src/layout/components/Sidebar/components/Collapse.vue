@@ -1,6 +1,8 @@
 <template>
     <div>
         <el-popover
+            ref="nodeChangeRef"
+            v-model:visible="popoverVisible"
             placement="right-end"
             :show-arrow="false"
             :offset="0"
@@ -87,7 +89,7 @@
 
 <script setup lang="ts">
 import { GlobalStore, MenuStore } from '@/store';
-import { DropdownInstance } from 'element-plus';
+import type { PopoverInstance } from 'element-plus';
 import { countExecutingTask } from '@/api/modules/log';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
@@ -106,7 +108,8 @@ const menuStore = MenuStore();
 const nodes = ref([]);
 const nodeOptions = ref([]);
 const loading = ref();
-const nodeChangeRef = ref<DropdownInstance>();
+const popoverVisible = ref(false);
+const nodeChangeRef = ref<PopoverInstance>();
 const props = defineProps({
     version: String,
 });
@@ -126,7 +129,7 @@ bus.on('refreshTask', () => {
 });
 
 const openChangeNode = () => {
-    nodeChangeRef.value?.handleOpen();
+    popoverVisible.value = true;
 };
 
 const loadCurrentName = () => {
@@ -261,7 +264,7 @@ const logout = () => {
         .then(async () => {
             await logOutApi();
             router.push({ name: 'entrance', params: { code: globalStore.entrance } });
-            globalStore.setLogStatus(false);
+            globalStore.isLogin = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         })
         .catch(() => {});

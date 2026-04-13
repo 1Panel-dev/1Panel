@@ -60,7 +60,7 @@ let setRole = ref(false);
 const fileRef = ref();
 
 interface CreateProps {
-    file: Object;
+    file: object;
 }
 const propData = ref<CreateProps>({
     file: {},
@@ -74,7 +74,7 @@ const handleClose = () => {
     if (fileForm.value) {
         fileForm.value.resetFields();
     }
-    em('close', open);
+    em('close', open.value);
 };
 
 const rules = reactive<FormRules>({

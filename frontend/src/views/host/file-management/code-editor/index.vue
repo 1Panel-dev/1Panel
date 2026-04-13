@@ -389,8 +389,7 @@
 import { batchCheckFiles, createFile, getFileContent, getFilesTree, saveFileContent } from '@/api/modules/files';
 import i18n from '@/lang';
 import { MsgError, MsgSuccess, MsgWarning } from '@/utils/message';
-import { setupMonacoEnvironment } from '@/utils/monaco';
-import * as monaco from 'monaco-editor';
+import { loadMonacoLanguageSupport, setupMonacoEnvironment } from '@/utils/monaco';
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
 import { Languages } from '@/global/mimetype';
 
@@ -407,9 +406,57 @@ import { GlobalStore } from '@/store';
 import CodeTabs from './tabs/index.vue';
 import noUpdateImage from '@/assets/images/no_update_app.svg';
 
-let editor: monaco.editor.IStandaloneCodeEditor | undefined;
+type MonacoEditorApi = typeof import('monaco-editor/esm/vs/editor/editor.api');
 
-setupMonacoEnvironment();
+let monacoApi: MonacoEditorApi | null = null;
+let monacoThemeInitialized = false;
+let editor: MonacoEditorApi['editor']['IStandaloneCodeEditor'] | undefined;
+
+const eolLf = ref(0);
+const eolCrlf = ref(1);
+
+const ensureMonaco = async () => {
+    if (monacoApi) {
+        return monacoApi;
+    }
+
+    setupMonacoEnvironment();
+    const [monacoModule] = await Promise.all([
+        import('monaco-editor/esm/vs/editor/editor.api'),
+        loadMonacoLanguageSupport(),
+    ]);
+    monacoApi = monacoModule;
+    eolLf.value = monacoApi.editor.EndOfLineSequence.LF;
+    eolCrlf.value = monacoApi.editor.EndOfLineSequence.CRLF;
+
+    if (!monacoThemeInitialized) {
+        monacoApi.editor.defineTheme('vs', {
+            base: 'vs',
+            inherit: true,
+            rules: [{ token: '' }],
+            colors: {
+                'editor.background': '#f8f6f6',
+                'minimap.background': '#f4f4f4',
+                'scrollbar.shadow': '#e1e1e1',
+                'scrollbarSlider.background': '#e1e1e1',
+                'scrollbarSlider.hoverBackground': '#cccccc',
+                'scrollbarSlider.activeBackground': '#bfbfbf',
+            },
+        });
+        monacoThemeInitialized = true;
+    }
+
+    return monacoApi;
+};
+
+const disposeEditor = () => {
+    if (!editor) {
+        return;
+    }
+    clearPendingLineHighlight();
+    editor.dispose();
+    editor = undefined;
+};
 interface EditProps {
     language: string;
     content: string;
@@ -451,7 +498,7 @@ const clearPendingLineHighlight = () => {
 
 const revealPendingInitialLine = () => {
     const line = pendingInitialLine.value;
-    if (!editor || line < 1) {
+    if (!editor || !monacoApi || line < 1) {
         return;
     }
     const model = editor.getModel();
@@ -469,7 +516,7 @@ const revealPendingInitialLine = () => {
     editor.revealLineInCenter(targetLine);
     lineHighlightDecorationIds = editor.deltaDecorations(lineHighlightDecorationIds, [
         {
-            range: new monaco.Range(targetLine, 1, targetLine, model.getLineMaxColumn(targetLine)),
+            range: new monacoApi.Range(targetLine, 1, targetLine, model.getLineMaxColumn(targetLine)),
             options: {
                 isWholeLine: true,
                 className: 'ai-search-target-line',
@@ -525,23 +572,9 @@ const isFullscreen = ref(false);
 const config = reactive<EditorConfig>({
     theme: 'vs-dark',
     language: 'plaintext',
-    eol: monaco.editor.EndOfLineSequence.LF,
+    eol: eolLf.value,
     wordWrap: 'on',
     minimap: false,
-});
-
-monaco.editor.defineTheme('vs', {
-    base: 'vs',
-    inherit: true,
-    rules: [{ token: '' }],
-    colors: {
-        'editor.background': '#f8f6f6',
-        'minimap.background': '#f4f4f4',
-        'scrollbar.shadow': '#e1e1e1',
-        'scrollbarSlider.background': '#e1e1e1',
-        'scrollbarSlider.hoverBackground': '#cccccc',
-        'scrollbarSlider.activeBackground': '#bfbfbf',
-    },
 });
 
 const selectTab = ref();
@@ -583,7 +616,7 @@ const removeTab = (targetPath: TabPaneName) => {
         saveTabsToStorage();
         if (fileTabs.value.length === 0) {
             selectTab.value = '';
-            editor.dispose();
+            disposeEditor();
         }
     };
 
@@ -638,7 +671,7 @@ const removeAllTab = (targetPath: string, type: 'left' | 'right' | 'all') => {
 
         if (type === 'all') {
             selectTab.value = '';
-            editor.dispose();
+            disposeEditor();
         } else if (newTabs.length > 0) {
             getContent(activeName, '');
         }
@@ -714,16 +747,16 @@ const changeTab = (targetPath: TabPaneName) => {
     getContent(targetPath.toString(), '');
 };
 
-const eols = [
+const eols = computed(() => [
     {
         label: 'LF (Linux)',
-        value: monaco.editor.EndOfLineSequence.LF,
+        value: eolLf.value,
     },
     {
         label: 'CRLF (Windows)',
-        value: monaco.editor.EndOfLineSequence.CRLF,
+        value: eolCrlf.value,
     },
-];
+]);
 
 const themes = [
     {
@@ -754,8 +787,7 @@ const handleClose = () => {
         fileTabs.value = [];
         isEdit.value = false;
         if (editor) {
-            clearPendingLineHighlight();
-            editor.dispose();
+            disposeEditor();
         }
         em('close', open.value);
     };
@@ -825,13 +857,23 @@ const toggleFullscreen = () => {
 };
 
 const changeLanguage = (command: string) => {
+    if (!editor || !monacoApi) {
+        return;
+    }
     config.language = command;
-    monaco.editor.setModelLanguage(editor.getModel(), config.language);
+    const model = editor.getModel();
+    if (!model) {
+        return;
+    }
+    monacoApi.editor.setModelLanguage(model, config.language);
 };
 
 const changeTheme = (command: string) => {
+    if (!monacoApi) {
+        return;
+    }
     config.theme = command;
-    monaco.editor.setTheme(config.theme);
+    monacoApi.editor.setTheme(config.theme);
     const themes = {
         vs: 'monaco-editor-tree-light',
         'vs-dark': 'monaco-editor-tree-dark',
@@ -851,8 +893,11 @@ const changeTheme = (command: string) => {
 };
 
 const changeEOL = (command: number) => {
+    if (!editor) {
+        return;
+    }
     config.eol = command;
-    editor.getModel().pushEOL(config.eol);
+    editor.getModel()?.pushEOL(config.eol);
 };
 
 const changeWarp = (command: string) => {
@@ -873,44 +918,43 @@ const changeMinimap = (command: boolean) => {
     });
 };
 
-const initEditor = () => {
-    if (editor) {
-        editor.dispose();
-    }
-    nextTick(() => {
-        editor = monaco.editor.create(codeBox.value as HTMLElement, {
-            theme: config.theme,
-            value: form.value.content,
-            readOnly: false,
-            automaticLayout: true,
-            language: config.language,
-            folding: true,
-            roundedSelection: false,
-            overviewRulerBorder: false,
-            wordWrap: config.wordWrap,
-            minimap: {
-                enabled: config.minimap,
-            },
-            lineNumbersMinChars: 6,
-        });
-        if (editor.getModel().getValue() === '') {
-            let defaultContent = '';
-            editor.getModel().setValue(defaultContent);
-        }
+const initEditor = async () => {
+    const monaco = await ensureMonaco();
 
-        editor.getModel().pushEOL(config.eol);
+    disposeEditor();
+    await nextTick();
 
-        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, quickSave);
-
-        editor.onDidChangeModelContent(() => {
-            if (editor) {
-                form.value.content = editor.getValue();
-                isEdit.value = true;
-            }
-        });
-
-        revealPendingInitialLine();
+    editor = monaco.editor.create(codeBox.value as HTMLElement, {
+        theme: config.theme,
+        value: form.value.content,
+        readOnly: false,
+        automaticLayout: true,
+        language: config.language,
+        folding: true,
+        roundedSelection: false,
+        overviewRulerBorder: false,
+        wordWrap: config.wordWrap,
+        minimap: {
+            enabled: config.minimap,
+        },
+        lineNumbersMinChars: 6,
     });
+    if (editor.getModel()?.getValue() === '') {
+        editor.getModel()?.setValue('');
+    }
+
+    editor.getModel()?.pushEOL(config.eol);
+
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, quickSave);
+
+    editor.onDidChangeModelContent(() => {
+        if (editor) {
+            form.value.content = editor.getValue();
+            isEdit.value = true;
+        }
+    });
+
+    revealPendingInitialLine();
 };
 
 const quickSave = () => {
@@ -939,6 +983,8 @@ const saveContent = async () => {
 };
 
 const acceptParams = async (props: EditProps) => {
+    const monaco = await ensureMonaco();
+
     pendingInitialLine.value = props.initialLine && props.initialLine > 0 ? Math.floor(props.initialLine) : 0;
     form.value.content = props.content;
     oldFileContent.value = props.content;
@@ -978,7 +1024,7 @@ const acceptParams = async (props: EditProps) => {
             editor.setValue(form.value.content);
             const model = editor.getModel();
             if (model) {
-                monaco.editor.setModelLanguage(model, config.language);
+                monacoApi?.editor.setModelLanguage(model, config.language);
             }
             isEdit.value = false;
             revealPendingInitialLine();
@@ -1011,8 +1057,8 @@ const getDirectoryPath = (filePath: string) => {
     return directoryPath;
 };
 
-const onOpen = () => {
-    initEditor();
+const onOpen = async () => {
+    await initEditor();
     changeTheme(config.theme);
     search(directoryPath.value).then((res) => {
         handleSearchResult(res);

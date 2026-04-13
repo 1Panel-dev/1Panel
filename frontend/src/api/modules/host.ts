@@ -3,7 +3,7 @@ import { ResPage, ReqPage } from '../interface';
 import { Host } from '../interface/host';
 import { TimeoutEnum } from '@/enums/http-enum';
 import { deepCopy } from '@/utils/misc';
-import { Base64 } from 'js-base64';
+import { encodeBase64Fields } from '@/utils/base64';
 
 // firewall
 export const loadFireBaseInfo = (tab: string) => {
@@ -105,28 +105,12 @@ export const updateSSHByFile = (key: string, value: string, path = '') => {
 };
 export const createCert = (params: Host.RootCert) => {
     let request = deepCopy(params) as Host.RootCert;
-    if (request.passPhrase) {
-        request.passPhrase = Base64.encode(request.passPhrase);
-    }
-    if (request.privateKey) {
-        request.privateKey = Base64.encode(request.privateKey);
-    }
-    if (request.publicKey) {
-        request.publicKey = Base64.encode(request.publicKey);
-    }
+    encodeBase64Fields(request, ['passPhrase', 'privateKey', 'publicKey']);
     return http.post(`/hosts/ssh/cert`, request);
 };
 export const editCert = (params: Host.RootCert) => {
     let request = deepCopy(params) as Host.RootCert;
-    if (request.passPhrase) {
-        request.passPhrase = Base64.encode(request.passPhrase);
-    }
-    if (request.privateKey) {
-        request.privateKey = Base64.encode(request.privateKey);
-    }
-    if (request.publicKey) {
-        request.publicKey = Base64.encode(request.publicKey);
-    }
+    encodeBase64Fields(request, ['passPhrase', 'privateKey', 'publicKey']);
     return http.post(`/hosts/ssh/cert/update`, request);
 };
 export const searchCert = (params: ReqPage) => {

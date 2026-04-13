@@ -1,6 +1,6 @@
 import http from '@/api';
 import { deepCopy } from '@/utils/misc';
-import { Base64 } from 'js-base64';
+import { encodeBase64Fields } from '@/utils/base64';
 import { ResPage, SearchWithPage, DescriptionUpdate, ReqPage } from '../interface';
 import { Setting } from '../interface/setting';
 import { TimeoutEnum } from '@/enums/http-enum';
@@ -119,9 +119,7 @@ export const defaultMenu = () => {
 };
 export const updateProxy = (params: Setting.ProxyUpdate) => {
     let request = deepCopy(params) as Setting.ProxyUpdate;
-    if (request.proxyPasswd) {
-        request.proxyPasswd = Base64.encode(request.proxyPasswd);
-    }
+    encodeBase64Fields(request, ['proxyPasswd']);
     request.proxyType = request.proxyType === 'close' ? '' : request.proxyType;
     return http.post(`/core/settings/proxy/update`, request);
 };

@@ -85,7 +85,7 @@ const handleClose = () => {
     if (fileForm.value) {
         fileForm.value.resetFields();
     }
-    em('close', open);
+    em('close', open.value);
     open.value = false;
 };
 

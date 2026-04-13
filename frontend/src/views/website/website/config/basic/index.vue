@@ -82,7 +82,7 @@
     </div>
 </template>
 
-<script lang="ts" setup name="Basic">
+<script lang="ts" setup>
 import { computed, onMounted, ref, watch } from 'vue';
 
 import Domain from './domain/index.vue';
@@ -94,7 +94,7 @@ import SitePath from './site-folder/index.vue';
 import Rewrite from './rewrite/index.vue';
 import Proxy from './proxy/index.vue';
 import AuthBasic from './auth-basic/index.vue';
-import AntiLeech from './anti-Leech/index.vue';
+import AntiLeech from './anti-leech/index.vue';
 import Redirect from './redirect/index.vue';
 import LoadBalance from './load-balance/index.vue';
 import PHP from './php/index.vue';
@@ -102,6 +102,7 @@ import RealIP from './real-ip/index.vue';
 import Resource from './resource/index.vue';
 import Cors from './cors/index.vue';
 import Stream from './stream/index.vue';
+defineOptions({ name: 'Basic' });
 
 const props = defineProps({
     website: {

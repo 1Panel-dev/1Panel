@@ -255,10 +255,13 @@ const loadProviders = async () => {
         value: item.provider,
         label: getAgentProviderDisplayName(item.provider, item.displayName),
     }));
-    providerModels.value = filteredData.reduce((acc, item) => {
-        acc[item.provider] = item.models || [];
-        return acc;
-    }, {} as Record<string, AI.ProviderModelInfo[]>);
+    providerModels.value = filteredData.reduce(
+        (acc, item) => {
+            acc[item.provider] = item.models || [];
+            return acc;
+        },
+        {} as Record<string, AI.ProviderModelInfo[]>,
+    );
     if (!providerOptions.value.find((item) => item.value === form.provider) && providerOptions.value.length > 0) {
         form.provider = providerOptions.value[0].value;
     }

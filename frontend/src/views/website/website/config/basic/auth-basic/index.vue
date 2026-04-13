@@ -52,7 +52,7 @@
     <OpDialog ref="opRef" @search="searchAll" />
 </template>
 
-<script lang="ts" setup name="proxy">
+<script lang="ts" setup>
 import { Website } from '@/api/interface/website';
 import {
     operateAuthConfig,
@@ -66,6 +66,7 @@ import i18n from '@/lang';
 import Create from './create/index.vue';
 import { MsgSuccess } from '@/utils/message';
 import { GlobalStore } from '@/store';
+defineOptions({ name: 'Proxy' });
 const globalStore = GlobalStore();
 
 const props = defineProps({

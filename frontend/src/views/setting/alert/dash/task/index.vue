@@ -168,7 +168,9 @@
                     </el-form-item>
 
                     <el-form-item
-                        v-if="dialogData.rowData!.type === 'cronJob' && cronjobTypes.includes(dialogData.rowData!.subType)"
+                        v-if="
+                            dialogData.rowData!.type === 'cronJob' && cronjobTypes.includes(dialogData.rowData!.subType)
+                        "
                         :label="$t('xpack.alert.taskName')"
                         prop="project"
                     >
@@ -313,8 +315,8 @@
                                 timeTypes.includes(dialogData.rowData!.type)
                                     ? $t('xpack.alert.sendCountRulesHelper')
                                     : noParamTypes.includes(dialogData.rowData!.type)
-                                    ? $t('xpack.alert.panelUpdateRulesHelper')
-                                    : $t('xpack.alert.oneDaySendCountRulesHelper')
+                                      ? $t('xpack.alert.panelUpdateRulesHelper')
+                                      : $t('xpack.alert.oneDaySendCountRulesHelper')
                             }}
                         </span>
                     </el-form-item>

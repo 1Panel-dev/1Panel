@@ -162,7 +162,7 @@ const getStatus = async () => {
         em('update:loading', true);
         const res = await getSupervisorStatus();
         if (res.data.config) {
-            data.value = res.data.config as HostTool.Supersivor;
+            data.value = res.data.config as HostTool.Supervisor;
         }
 
         const status = {
