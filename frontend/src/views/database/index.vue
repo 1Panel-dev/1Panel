@@ -21,5 +21,9 @@ const buttons = [
         label: 'Redis',
         path: '/databases/redis',
     },
+    {
+        label: 'MongoDB',
+        path: '/databases/mongodb',
+    },
 ];
 </script>

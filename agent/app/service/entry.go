@@ -21,6 +21,7 @@ var (
 
 	mysqlRepo      = repo.NewIMysqlRepo()
 	postgresqlRepo = repo.NewIPostgresqlRepo()
+	mongodbRepo    = repo.NewIMongodbRepo()
 	databaseRepo   = repo.NewIDatabaseRepo()
 
 	imageRepoRepo = repo.NewIImageRepoRepo()

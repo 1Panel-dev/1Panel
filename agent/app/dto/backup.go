@@ -65,7 +65,7 @@ type UploadForRecover struct {
 }
 
 type CommonBackup struct {
-	Type       string   `json:"type" validate:"required,oneof=app mysql mariadb redis website postgresql mysql-cluster postgresql-cluster redis-cluster container compose"`
+	Type       string   `json:"type" validate:"required,oneof=app mysql mariadb redis website postgresql mongodb mysql-cluster postgresql-cluster redis-cluster container compose"`
 	Name       string   `json:"name"`
 	DetailName string   `json:"detailName"`
 	Secret     string   `json:"secret"`
@@ -78,7 +78,7 @@ type CommonBackup struct {
 }
 type CommonRecover struct {
 	DownloadAccountID uint   `json:"downloadAccountID" validate:"required"`
-	Type              string `json:"type" validate:"required,oneof=app mysql mariadb redis website postgresql mysql-cluster postgresql-cluster redis-cluster container compose"`
+	Type              string `json:"type" validate:"required,oneof=app mysql mariadb redis website postgresql mongodb mysql-cluster postgresql-cluster redis-cluster container compose"`
 	Name              string `json:"name"`
 	DetailName        string `json:"detailName"`
 	File              string `json:"file"`

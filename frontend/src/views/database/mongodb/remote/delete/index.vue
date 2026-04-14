@@ -1,0 +1,84 @@
+<template>
+    <DialogPro v-model="open" :title="$t('database.unBindRemoteDB') + ' - ' + deleteReq.database" size="small">
+        <el-form ref="deleteForm" v-loading="loading" @submit.prevent>
+            <el-form-item>
+                <el-checkbox v-model="deleteReq.forceDelete" :label="$t('database.unBindForce')" />
+                <span class="input-help">
+                    {{ $t('database.unBindForceHelper') }}
+                </span>
+            </el-form-item>
+            <el-form-item>
+                <el-checkbox v-model="deleteReq.deleteBackup" :label="$t('app.deleteBackup')" />
+                <span class="input-help">
+                    {{ $t('database.deleteBackupHelper') }}
+                </span>
+            </el-form-item>
+
+            <span style="font-size: 12px">{{ $t('database.unBindRemoteHelper') }}</span>
+        </el-form>
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button @click="open = false" :disabled="loading">
+                    {{ $t('commons.button.cancel') }}
+                </el-button>
+                <el-button type="primary" @click="submit" :disabled="loading">
+                    {{ $t('commons.button.confirm') }}
+                </el-button>
+            </span>
+        </template>
+    </DialogPro>
+</template>
+
+<script lang="ts" setup>
+import { FormInstance } from 'element-plus';
+import { ref } from 'vue';
+import i18n from '@/lang';
+import { deleteDatabase } from '@/api/modules/database';
+import { MsgSuccess } from '@/utils/message';
+
+const deleteReq = ref({
+    id: 0,
+    database: '',
+    deleteBackup: false,
+    forceDelete: false,
+});
+const open = ref(false);
+const loading = ref(false);
+
+const deleteForm = ref<FormInstance>();
+
+interface DialogProps {
+    id: number;
+    database: string;
+}
+
+const emit = defineEmits<{ (e: 'search'): void }>();
+
+const acceptParams = async (prop: DialogProps) => {
+    deleteReq.value = {
+        id: prop.id,
+        database: prop.database,
+        deleteBackup: false,
+        forceDelete: false,
+    };
+    open.value = true;
+};
+
+const submit = async () => {
+    loading.value = true;
+    deleteDatabase(deleteReq.value)
+        .then(() => {
+            loading.value = false;
+            emit('search');
+            MsgSuccess(i18n.global.t('commons.msg.deleteSuccess'));
+            open.value = false;
+        })
+        .catch(() => {
+            loading.value = false;
+        });
+};
+
+defineExpose({
+    acceptParams,
+});
+</script>

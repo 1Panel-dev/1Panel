@@ -551,6 +551,10 @@ const message = {
         version: 'Veritabanı sürümü',
         userHelper:
             'Root kullanıcı veya root yetkilerine sahip bir veritabanı kullanıcısı uzak veritabanına erişebilir.',
+        mongodbPermissionDbOwner: 'Veritabanı sahibi',
+        mongodbPermissionRead: 'Veri okuma',
+        mongodbPermissionReadWrite: 'Veri okuma ve yazma',
+        mongodbPermissionUserAdmin: 'Kullanıcı yöneticisi',
         pgUserHelper: 'Süper kullanıcı yetkilerine sahip veritabanı kullanıcısı.',
         ssl: 'SSL Kullan',
         clientKey: 'İstemci özel anahtarı',

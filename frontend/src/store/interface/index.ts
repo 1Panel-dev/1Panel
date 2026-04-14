@@ -47,6 +47,7 @@ export interface GlobalState {
     currentDB: string;
     currentPgDB: string;
     currentRedisDB: string;
+    currentMongodbDB: string;
     showEntranceWarn: boolean;
     defaultNetwork: string;
     defaultIO: string;

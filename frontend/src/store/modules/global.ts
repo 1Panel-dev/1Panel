@@ -44,6 +44,7 @@ const GlobalStore = defineStore({
         currentDB: '',
         currentPgDB: '',
         currentRedisDB: '',
+        currentMongodbDB: '',
         showEntranceWarn: true,
         defaultNetwork: 'all',
         defaultIO: 'all',

@@ -44,10 +44,13 @@ type IBackupService interface {
 
 	MysqlBackup(db dto.CommonBackup) error
 	PostgresqlBackup(db dto.CommonBackup) error
+	MongodbBackup(db dto.CommonBackup) error
 	MysqlRecover(db dto.CommonRecover) error
 	PostgresqlRecover(db dto.CommonRecover) error
+	MongodbRecover(db dto.CommonRecover) error
 	MysqlRecoverByUpload(req dto.CommonRecover) error
 	PostgresqlRecoverByUpload(req dto.CommonRecover) error
+	MongodbRecoverByUpload(req dto.CommonRecover) error
 
 	RedisBackup(db dto.CommonBackup) error
 	RedisRecover(db dto.CommonRecover) error

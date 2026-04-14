@@ -550,6 +550,10 @@ const message = {
         version: 'Versão do banco de dados',
         userHelper:
             'O usuário root ou um usuário do banco de dados com privilégios de root pode acessar o banco de dados remoto.',
+        mongodbPermissionDbOwner: 'Proprietário do banco de dados',
+        mongodbPermissionRead: 'Ler dados',
+        mongodbPermissionReadWrite: 'Ler e gravar dados',
+        mongodbPermissionUserAdmin: 'Administrador de usuários',
         pgUserHelper: 'Usuário do banco de dados com privilégios de superusuário.',
         ssl: 'Usar SSL',
         clientKey: 'Chave privada do cliente',

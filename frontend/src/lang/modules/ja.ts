@@ -549,6 +549,10 @@ const message = {
         version: 'データベースバージョン',
         userHelper:
             'ルートユーザーまたはルート特権を持つデータベースユーザーは、リモートデータベースにアクセスできます。',
+        mongodbPermissionDbOwner: 'データベース所有者',
+        mongodbPermissionRead: 'データの読み取り',
+        mongodbPermissionReadWrite: 'データの読み取りと書き込み',
+        mongodbPermissionUserAdmin: 'ユーザー管理者',
         pgUserHelper: 'スーパーユーザーの特権を持つデータベースユーザー。',
         ssl: 'SSLを使用します',
         clientKey: 'クライアントの秘密鍵',

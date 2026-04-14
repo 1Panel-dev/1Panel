@@ -31,6 +31,7 @@ var (
 	dbCommonService   = service.NewIDBCommonService()
 	mysqlService      = service.NewIMysqlService()
 	postgresqlService = service.NewIPostgresqlService()
+	mongodbService    = service.NewIMongodbService()
 	databaseService   = service.NewIDatabaseService()
 	redisService      = service.NewIRedisService()
 

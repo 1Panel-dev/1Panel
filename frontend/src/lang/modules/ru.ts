@@ -543,6 +543,10 @@ const message = {
         version: 'Версия базы данных',
         userHelper:
             'Пользователь root или пользователь базы данных с привилегиями root может получить доступ к удаленной базе данных.',
+        mongodbPermissionDbOwner: 'Владелец базы данных',
+        mongodbPermissionRead: 'Чтение данных',
+        mongodbPermissionReadWrite: 'Чтение и запись данных',
+        mongodbPermissionUserAdmin: 'Администратор пользователей',
         pgUserHelper: 'Пользователь базы данных с привилегиями суперпользователя.',
         ssl: 'Использовать SSL',
         clientKey: 'Приватный ключ клиента',

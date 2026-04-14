@@ -165,9 +165,33 @@ func (u *CronjobService) handleDatabase(cronjob model.Cronjob, startTime time.Ti
 			record.DownloadAccountID, record.SourceAccountIDs = cronjob.DownloadAccountID, cronjob.SourceAccountIDs
 
 			backupDir := path.Join(global.Dir.LocalBackupDir, fmt.Sprintf("tmp/database/%s/%s/%s", dbInfo.DBType, record.Name, dbInfo.Name))
-			record.FileName = simplifiedFileName(fmt.Sprintf("db_%s_%s.sql.gz", dbInfo.Name, startTime.Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(5)))
+			switch dbInfo.DBType {
+			case constant.AppMongodb:
+				record.FileName = simplifiedFileName(fmt.Sprintf(
+					"db_%s_%s.gz",
+					dbInfo.Name,
+					startTime.Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(5),
+				))
+			default:
+				record.FileName = simplifiedFileName(fmt.Sprintf(
+					"db_%s_%s.sql.gz",
+					dbInfo.Name,
+					startTime.Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(5),
+				))
+			}
 			if cronjob.DBType == "mysql" || cronjob.DBType == "mariadb" || cronjob.DBType == "mysql-cluster" {
 				if err := doMysqlBackup(dbInfo, backupDir, record.FileName, cronjob.Secret); err != nil {
+					if retry < int(cronjob.RetryTimes) || !cronjob.IgnoreErr {
+						retry++
+						return err
+					} else {
+						task.Log(i18n.GetMsgWithDetail("IgnoreBackupErr", err.Error()))
+						cleanAccountMap(accountMap)
+						return nil
+					}
+				}
+			} else if cronjob.DBType == constant.AppMongodb {
+				if err := doMongodbBackup(dbInfo.Database, dbInfo.DBType, dbInfo.Name, backupDir, record.FileName, cronjob.Secret, task); err != nil {
 					if retry < int(cronjob.RetryTimes) || !cronjob.IgnoreErr {
 						retry++
 						return err
@@ -404,6 +428,18 @@ func loadDbsForJob(cronjob model.Cronjob) []DatabaseHelper {
 					Args:     strings.Split(cronjob.Args, ","),
 				})
 			}
+		} else if cronjob.DBType == constant.AppMongodb {
+			databaseService := NewIDatabaseService()
+			mongodbItems, _ := databaseService.LoadItems(cronjob.DBType)
+			for _, mongodb := range mongodbItems {
+				dbs = append(dbs, DatabaseHelper{
+					ID:       mongodb.ID,
+					DBType:   cronjob.DBType,
+					Database: mongodb.Database,
+					Name:     mongodb.Name,
+					Args:     strings.Split(cronjob.Args, ","),
+				})
+			}
 		} else {
 			pgItems, _ := postgresqlRepo.List()
 			for _, pg := range pgItems {
@@ -428,6 +464,15 @@ func loadDbsForJob(cronjob model.Cronjob) []DatabaseHelper {
 				DBType:   cronjob.DBType,
 				Database: mysqlItem.MysqlName,
 				Name:     mysqlItem.Name,
+				Args:     strings.Split(cronjob.Args, ","),
+			})
+		} else if cronjob.DBType == constant.AppMongodb {
+			mongodbItem, _ := mongodbRepo.Get(repo.WithByID(uint(itemID)))
+			dbs = append(dbs, DatabaseHelper{
+				ID:       mongodbItem.ID,
+				DBType:   cronjob.DBType,
+				Database: mongodbItem.MongodbName,
+				Name:     mongodbItem.Name,
 				Args:     strings.Split(cronjob.Args, ","),
 			})
 		} else {

@@ -1,0 +1,188 @@
+<template>
+    <DrawerPro
+        v-model="drawerVisible"
+        :header="title"
+        @close="handleClose"
+        :resource="dialogData.title === 'create' ? '' : dialogData.rowData?.name"
+        size="large"
+    >
+        <el-form ref="formRef" v-loading="loading" label-position="top" :model="dialogData.rowData" :rules="rules">
+            <el-form-item :label="$t('commons.table.name')" prop="name">
+                <el-input v-if="dialogData.title === 'create'" clearable v-model.trim="dialogData.rowData!.name" />
+                <el-tag v-else>{{ dialogData.rowData!.name }}</el-tag>
+            </el-form-item>
+            <el-form-item :label="$t('database.version')" prop="version">
+                <el-radio-group v-model="dialogData.rowData!.version" @change="isOK = false">
+                    <el-radio label="8.x" value="8.x" />
+                    <el-radio label="7.x" value="7.x" />
+                    <el-radio label="6.x" value="6.x" />
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item :label="$t('database.address')" prop="address">
+                <el-input @change="isOK = false" clearable v-model.trim="dialogData.rowData!.address" />
+            </el-form-item>
+            <el-form-item :label="$t('commons.table.port')" prop="port">
+                <el-input @change="isOK = false" clearable v-model.number="dialogData.rowData!.port" />
+            </el-form-item>
+            <el-form-item :label="$t('database.initialDB')" prop="initialDB">
+                <el-input @change="isOK = false" clearable v-model.trim="dialogData.rowData!.initialDB" />
+            </el-form-item>
+            <el-form-item :label="$t('commons.login.username')" prop="username">
+                <el-input @change="isOK = false" clearable v-model.trim="dialogData.rowData!.username" />
+            </el-form-item>
+            <el-form-item :label="$t('commons.login.password')" prop="password">
+                <el-input
+                    @change="isOK = false"
+                    type="password"
+                    clearable
+                    show-password
+                    v-model.trim="dialogData.rowData!.password"
+                />
+            </el-form-item>
+            <el-form-item :label="$t('database.timeout')" prop="timeout">
+                <el-input-number
+                    class="p-w-200"
+                    :min="1"
+                    :precision="0"
+                    step-strictly
+                    :step="1"
+                    v-model.number="dialogData.rowData!.timeout"
+                />
+            </el-form-item>
+            <el-form-item :label="$t('commons.table.description')" prop="description">
+                <el-input clearable v-model.trim="dialogData.rowData!.description" />
+            </el-form-item>
+        </el-form>
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
+                <el-button @click="onSubmit(formRef, 'check')">
+                    {{ $t('terminal.testConn') }}
+                </el-button>
+                <el-button type="primary" :disabled="!isOK" @click="onSubmit(formRef, dialogData.title)">
+                    {{ $t('commons.button.confirm') }}
+                </el-button>
+            </span>
+        </template>
+    </DrawerPro>
+</template>
+
+<script lang="ts" setup>
+import { reactive, ref } from 'vue';
+import i18n from '@/lang';
+import { ElForm } from 'element-plus';
+import { Database } from '@/api/interface/database';
+import { MsgError, MsgSuccess } from '@/utils/message';
+import { checkNumberRange, Rules } from '@/global/form-rules';
+import { addDatabase, checkDatabase, editDatabase } from '@/api/modules/database';
+
+interface DialogProps {
+    title: string;
+    rowData?: Database.DatabaseInfo;
+    getTableList?: () => Promise<any>;
+}
+
+const title = ref<string>('');
+const drawerVisible = ref(false);
+const dialogData = ref<DialogProps>({
+    title: '',
+});
+const isOK = ref(false);
+const loading = ref();
+
+const acceptParams = (params: DialogProps): void => {
+    dialogData.value = params;
+    isOK.value = false;
+    dialogData.value.rowData.type = 'mongodb';
+    dialogData.value.rowData.from = 'remote';
+    if (!dialogData.value.rowData.initialDB) {
+        dialogData.value.rowData.initialDB = 'admin';
+    }
+    if (dialogData.value.rowData.version.startsWith('6.')) {
+        dialogData.value.rowData.version = '6.x';
+    }
+    if (dialogData.value.rowData.version.startsWith('7.')) {
+        dialogData.value.rowData.version = '7.x';
+    }
+    if (dialogData.value.rowData.version.startsWith('8.')) {
+        dialogData.value.rowData.version = '8.x';
+    }
+    title.value = i18n.global.t('database.' + dialogData.value.title + 'RemoteDB');
+    drawerVisible.value = true;
+};
+
+const emit = defineEmits<{ (e: 'search'): void }>();
+
+const handleClose = () => {
+    drawerVisible.value = false;
+};
+
+const rules = reactive({
+    name: [Rules.simpleName, Rules.noSpace],
+    version: [Rules.requiredSelect],
+    address: [Rules.ipV4V6OrDomain],
+    port: [Rules.port],
+    username: [Rules.requiredInput],
+    password: [Rules.requiredInput],
+    timeout: [Rules.number, checkNumberRange(1, 600)],
+});
+
+type FormInstance = InstanceType<typeof ElForm>;
+const formRef = ref<FormInstance>();
+
+const onSubmit = async (formEl: FormInstance | undefined, operation: string) => {
+    if (!formEl) return;
+    formEl.validate(async (valid) => {
+        if (!valid) return;
+        dialogData.value.rowData.type = 'mongodb';
+        dialogData.value.rowData.from = 'remote';
+        loading.value = true;
+
+        if (operation === 'check') {
+            await checkDatabase(dialogData.value.rowData)
+                .then((res) => {
+                    loading.value = false;
+                    if (res.data) {
+                        isOK.value = true;
+                        MsgSuccess(i18n.global.t('terminal.connTestOk'));
+                    } else {
+                        MsgError(i18n.global.t('terminal.connTestFailed'));
+                    }
+                })
+                .catch(() => {
+                    loading.value = false;
+                    MsgError(i18n.global.t('terminal.connTestFailed'));
+                });
+        }
+
+        if (operation === 'create') {
+            await addDatabase(dialogData.value.rowData)
+                .then(() => {
+                    loading.value = false;
+                    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                    emit('search');
+                    drawerVisible.value = false;
+                })
+                .catch(() => {
+                    loading.value = false;
+                });
+        }
+        if (operation === 'edit') {
+            await editDatabase(dialogData.value.rowData)
+                .then(() => {
+                    loading.value = false;
+                    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                    emit('search');
+                    drawerVisible.value = false;
+                })
+                .catch(() => {
+                    loading.value = false;
+                });
+        }
+    });
+};
+
+defineExpose({
+    acceptParams,
+});
+</script>

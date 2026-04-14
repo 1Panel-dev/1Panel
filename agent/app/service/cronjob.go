@@ -287,6 +287,15 @@ func (u *CronjobService) Import(req []dto.CronjobTrans) error {
 					}
 					dbIDs = append(dbIDs, fmt.Sprintf("%v", dbItem.ID))
 				}
+			} else if cronjob.DBType == constant.AppMongodb {
+				for _, db := range item.DBNames {
+					dbItem, err := mongodbRepo.Get(mongodbRepo.WithByMongodbName(db.Name), repo.WithByName(db.DetailName))
+					if err != nil {
+						hasNotFound = true
+						continue
+					}
+					dbIDs = append(dbIDs, fmt.Sprintf("%v", dbItem.ID))
+				}
 			} else {
 				for _, db := range item.DBNames {
 					dbItem, err := mysqlRepo.Get(mysqlRepo.WithByMysqlName(db.Name), repo.WithByName(db.DetailName))

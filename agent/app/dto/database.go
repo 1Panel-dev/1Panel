@@ -137,6 +137,83 @@ type MysqlStatus struct {
 	Position                     string `json:"Position"`
 }
 
+// mongodb
+type MongodbDBSearch struct {
+	PageInfo
+	Info     string `json:"info"`
+	Database string `json:"database" validate:"required"`
+	OrderBy  string `json:"orderBy" validate:"required,oneof=name createdAt"`
+	Order    string `json:"order" validate:"required,oneof=null ascending descending"`
+}
+
+type MongodbDBInfo struct {
+	ID          uint      `json:"id"`
+	CreatedAt   time.Time `json:"createdAt"`
+	Name        string    `json:"name"`
+	From        string    `json:"from"`
+	MongodbName string    `json:"mongodbName"`
+	Username    string    `json:"username"`
+	Password    string    `json:"password"`
+	IsDelete    bool      `json:"isDelete"`
+	Description string    `json:"description"`
+}
+
+type MongodbDBCreate struct {
+	Name        string `json:"name" validate:"required"`
+	From        string `json:"from" validate:"required,oneof=local remote"`
+	Database    string `json:"database" validate:"required"`
+	Username    string `json:"username" validate:"required"`
+	Password    string `json:"password" validate:"required"`
+	Permission  string `json:"permission" validate:"required,oneof=dbOwner read readWrite userAdmin"`
+	Description string `json:"description"`
+}
+
+type MongodbLoadDB struct {
+	From     string `json:"from" validate:"required,oneof=local remote"`
+	Type     string `json:"type" validate:"required,oneof=mongodb"`
+	Database string `json:"database" validate:"required"`
+}
+
+type MongodbDBDeleteCheck struct {
+	ID       uint   `json:"id" validate:"required"`
+	Type     string `json:"type" validate:"required,oneof=mongodb"`
+	Database string `json:"database" validate:"required"`
+}
+
+type MongodbDBDelete struct {
+	ID           uint   `json:"id" validate:"required"`
+	Type         string `json:"type" validate:"required,oneof=mongodb"`
+	Database     string `json:"database" validate:"required"`
+	ForceDelete  bool   `json:"forceDelete"`
+	DeleteBackup bool   `json:"deleteBackup"`
+}
+
+type MongodbBind struct {
+	Database string `json:"database" validate:"required"`
+	Name     string `json:"name" validate:"required"`
+	Username string `json:"username" validate:"required"`
+	Password string `json:"password" validate:"required"`
+}
+
+type MongodbPassword struct {
+	Database string `json:"database" validate:"required"`
+	Name     string `json:"name" validate:"required"`
+	Password string `json:"password" validate:"required"`
+}
+
+type MongodbPrivileges struct {
+	Database   string `json:"database" validate:"required"`
+	Name       string `json:"name" validate:"required"`
+	Username   string `json:"username" validate:"required"`
+	Permission string `json:"permission" validate:"required,oneof=dbOwner read readWrite userAdmin"`
+}
+
+type MongodbPrivilegesLoad struct {
+	Database string `json:"database" validate:"required"`
+	Name     string `json:"name" validate:"required"`
+	Username string `json:"username" validate:"required"`
+}
+
 type MysqlVariables struct {
 	BinlogCacheSize      string `json:"binlog_cache_size"`
 	InnodbBufferPoolSize string `json:"innodb_buffer_pool_size"`

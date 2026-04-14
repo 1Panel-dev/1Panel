@@ -555,6 +555,10 @@ const message = {
         version: 'Versi pangkalan data',
         userHelper:
             'Pengguna root atau pengguna pangkalan data dengan keistimewaan root boleh mengakses pangkalan data jauh.',
+        mongodbPermissionDbOwner: 'Pemilik pangkalan data',
+        mongodbPermissionRead: 'Baca data',
+        mongodbPermissionReadWrite: 'Baca dan tulis data',
+        mongodbPermissionUserAdmin: 'Pentadbir pengguna',
         pgUserHelper: 'Pengguna pangkalan data dengan keistimewaan superuser.',
         ssl: 'Gunakan SSL',
         clientKey: 'Kunci peribadi klien',
