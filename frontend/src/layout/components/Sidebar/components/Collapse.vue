@@ -231,7 +231,7 @@ const loadNodes = async () => {
             loading.value = false;
         });
 };
-const changeNode = (command: string) => {
+const changeNode = async (command: string) => {
     if (globalStore.currentNode === command) {
         return;
     }
@@ -240,6 +240,9 @@ const changeNode = (command: string) => {
             if (command == 'local') {
                 globalStore.currentNode = 'local';
                 globalStore.currentNodeAddr = item.addr;
+                if (globalStore.isXpackEE) {
+                    await loadCurrentUser();
+                }
                 loadGlobalSetting();
                 localStorage.removeItem('dashboardCache');
                 localStorage.removeItem('upgradeChecked');
@@ -264,6 +267,9 @@ const changeNode = (command: string) => {
             localStorage.removeItem('upgradeChecked');
             globalStore.currentNode = command || 'local';
             globalStore.currentNodeAddr = item.addr;
+            if (globalStore.isXpackEE) {
+                await loadCurrentUser();
+            }
             loadProductProFromDB();
             routerToNameWithQuery('home', { t: Date.now() });
         }
@@ -305,7 +311,8 @@ const logout = () => {
         .then(async () => {
             await logOutApi();
             router.push({ name: 'entrance', params: { code: globalStore.entrance } });
-            globalStore.isLogin = false;
+            globalStore.setLogStatus(false);
+            globalStore.clearAuthInfo();
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         })
         .catch(() => {});
@@ -314,6 +321,12 @@ const logout = () => {
 const loadCurrentUser = async () => {
     await getAuthInfo().then((res) => {
         currentUser.value = res.data;
+        globalStore.setAuthInfo({
+            isAdmin: res.data.role === 'ADMIN',
+            permissions: res.data.permissions || [],
+            nodeScopes: res.data.nodeScopes || [],
+            nodeRoles: res.data.nodeRoles || [],
+        });
     });
 };
 const changeUserInfo = () => {
@@ -341,6 +354,7 @@ const onSubmit = async (formEl: any) => {
                 await logOutApi();
                 router.push({ name: 'entrance', params: { code: globalStore.entrance } });
                 globalStore.setLogStatus(false);
+                globalStore.clearAuthInfo();
             })
             .catch(() => {
                 loading.value = false;

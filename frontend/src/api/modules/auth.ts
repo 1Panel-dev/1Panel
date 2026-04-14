@@ -1,6 +1,6 @@
 import { Login } from '@/api/interface/auth';
 import http from '@/api';
-import { deepCopy } from '@/utils/util';
+import { deepCopy } from '@/utils/misc';
 import { Base64 } from 'js-base64';
 
 export const loginApi = (params: Login.ReqLoginForm) => {

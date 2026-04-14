@@ -44,6 +44,8 @@ ErrFileNotFound: "Fail {{ .name }} tidak wujud"
 
 # backup
 ErrBackupInUsed: 'Akaun sandaran sedang digunakan oleh tugas'
+ErrRolePresetCannotDelete: "System preset roles cannot be deleted"
+ErrRoleBoundToUser: "This role is already bound to users and cannot be deleted"
 ErrBackupCheck: 'Ujian sambungan gagal: {{ .err }}'
 ErrBackupLocal: "Akaun sandaran pelayan tempatan tidak menyokong operasi ini"
 ErrBackupPublic: "Akaun sandaran ini dikesan tidak awam, sila semak semula dan cuba lagi"

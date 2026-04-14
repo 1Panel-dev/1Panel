@@ -54,6 +54,8 @@ AppInstallCheck: 'Verificar entorno de instalación de aplicación'
 
 # backup
 ErrBackupInUsed: 'Cuenta de respaldo en uso por tarea programada'
+ErrRolePresetCannotDelete: "System preset roles cannot be deleted"
+ErrRoleBoundToUser: "This role is already bound to users and cannot be deleted"
 ErrBackupCheck: 'Conexión de respaldo falló: {{ .err }}'
 ErrBackupLocal: "La cuenta de respaldo del servidor local no admite esta operación"
 ErrBackupPublic: "Se detectó que esta cuenta de respaldo no es pública, verifique e intente de nuevo"

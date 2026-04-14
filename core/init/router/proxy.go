@@ -6,8 +6,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/1Panel-dev/1Panel/core/init/proxy"
-
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/core/app/repo"
 	"github.com/1Panel-dev/1Panel/core/cmd/server/res"
@@ -50,16 +48,6 @@ func Proxy() gin.HandlerFunc {
 			return
 		}
 
-		if !strings.HasPrefix(c.Request.URL.Path, "/api/v2/core") && (currentNode == "local" || len(currentNode) == 0) {
-			defer func() {
-				if err := recover(); err != nil && err != http.ErrAbortHandler {
-					global.LOG.Debug(err)
-				}
-			}()
-			proxy.LocalAgentProxy.ServeHTTP(c.Writer, c.Request)
-			c.Abort()
-			return
-		}
 		xpack.Proxy(c, currentNode)
 		c.Abort()
 	}

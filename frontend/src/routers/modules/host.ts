@@ -20,6 +20,7 @@ const hostRouter = {
                 icon: 'p-file-menu',
                 title: 'menu.files',
                 requiresAuth: false,
+                permission: 'host_file_view',
             },
         },
         {
@@ -30,6 +31,7 @@ const hostRouter = {
                 icon: 'p-system-monitor-menu',
                 title: 'menu.monitor',
                 requiresAuth: false,
+                permission: 'host_monitor_view',
             },
         },
         {
@@ -42,6 +44,7 @@ const hostRouter = {
                 title: 'menu.monitor',
                 detail: 'commons.button.set',
                 requiresAuth: false,
+                permission: 'host_monitor_view',
             },
         },
         {
@@ -54,6 +57,7 @@ const hostRouter = {
                 title: 'menu.firewall',
                 detail: 'firewall.portRule',
                 requiresAuth: false,
+                permission: 'host_firewall_view',
             },
         },
         {
@@ -101,6 +105,7 @@ const hostRouter = {
                 icon: 'p-disk-menu',
                 title: 'menu.disk',
                 requiresAuth: false,
+                permission: 'host_disk_view',
             },
         },
         {
@@ -114,6 +119,7 @@ const hostRouter = {
                 activeMenu: '/hosts/process/process',
                 keepAlive: true,
                 requiresAuth: false,
+                permission: 'host_process_view',
             },
         },
         {
@@ -139,6 +145,7 @@ const hostRouter = {
                 activeMenu: '/hosts/ssh/ssh',
                 keepAlive: true,
                 requiresAuth: false,
+                permission: 'host_ssh_view',
             },
         },
         {

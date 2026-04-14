@@ -10,13 +10,29 @@ import (
 	"time"
 
 	baseDto "github.com/1Panel-dev/1Panel/core/app/dto"
+	"github.com/1Panel-dev/1Panel/core/global"
+	"github.com/1Panel-dev/1Panel/core/init/proxy"
 	"github.com/1Panel-dev/1Panel/core/init/session/psession"
 	"github.com/1Panel-dev/1Panel/core/utils/ssh"
 	"github.com/1Panel-dev/1Panel/core/xpack/app/model"
 	"github.com/gin-gonic/gin"
 )
 
-func Proxy(c *gin.Context, currentNode string) {}
+func Proxy(c *gin.Context, currentNode string) {
+	if currentNode != "local" && currentNode != "" {
+		c.Next()
+		return
+	}
+	defer func() {
+		if err := recover(); err != nil && err != http.ErrAbortHandler {
+			global.LOG.Debug(err)
+		}
+	}()
+	proxy.LocalAgentProxy.ServeHTTP(c.Writer, c.Request)
+	c.Abort()
+}
+
+func CoreRBACMiddlewares() []gin.HandlerFunc { return nil }
 
 func ProxyDocker(proxyURL string) error { return nil }
 

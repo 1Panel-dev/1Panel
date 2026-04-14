@@ -42,6 +42,7 @@ const containerRouter = {
                         requiresAuth: false,
                         parent: 'menu.container',
                         title: 'menu.container',
+                        permission: 'container_view',
                     },
                 },
                 {
@@ -66,6 +67,7 @@ const containerRouter = {
                         requiresAuth: false,
                         parent: 'menu.container',
                         title: 'container.image',
+                        permission: 'container_view',
                     },
                 },
                 {
@@ -78,6 +80,7 @@ const containerRouter = {
                         requiresAuth: false,
                         parent: 'menu.container',
                         title: 'container.network',
+                        permission: 'container_view',
                     },
                 },
                 {
@@ -90,6 +93,7 @@ const containerRouter = {
                         requiresAuth: false,
                         parent: 'menu.container',
                         title: 'container.volume',
+                        permission: 'container_view',
                     },
                 },
                 {
@@ -102,6 +106,7 @@ const containerRouter = {
                         requiresAuth: false,
                         parent: 'menu.container',
                         title: 'container.repo',
+                        permission: 'container_view',
                     },
                 },
                 {
@@ -114,6 +119,7 @@ const containerRouter = {
                         requiresAuth: false,
                         parent: 'menu.container',
                         title: 'container.compose',
+                        permission: 'container_view',
                     },
                 },
                 {
@@ -126,6 +132,7 @@ const containerRouter = {
                         requiresAuth: false,
                         parent: 'menu.container',
                         title: 'container.composeTemplate',
+                        permission: 'container_view',
                     },
                 },
                 {
@@ -138,6 +145,7 @@ const containerRouter = {
                         requiresAuth: false,
                         parent: 'menu.container',
                         title: 'container.setting',
+                        permission: 'container_view',
                     },
                 },
             ],

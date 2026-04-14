@@ -49,6 +49,8 @@ AppInstallCheck: 'Uygulama kurulum ortamını kontrol et'
 
 # backup
 ErrBackupInUsed: 'Yedek hesabı görevde kullanılıyor'
+ErrRolePresetCannotDelete: "System preset roles cannot be deleted"
+ErrRoleBoundToUser: "This role is already bound to users and cannot be deleted"
 ErrBackupCheck: 'Bağlantı testi başarısız: {{ .err }}'
 ErrBackupLocal: "Yerel sunucu yedekleme hesabı bu işlemi desteklemiyor"
 ErrBackupPublic: "Bu yedekleme hesabının herkese açık olmadığı tespit edildi, lütfen kontrol edip tekrar deneyin"

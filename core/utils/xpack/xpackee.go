@@ -9,12 +9,17 @@ import (
 	"github.com/1Panel-dev/1Panel/core/init/session/psession"
 	"github.com/1Panel-dev/1Panel/core/utils/ssh"
 	edition "github.com/1Panel-dev/1Panel/core/xpack-ee/edition"
+	xeemiddleware "github.com/1Panel-dev/1Panel/core/xpack-ee/router/middleware"
 	"github.com/1Panel-dev/1Panel/core/xpack/app/model"
 	"github.com/gin-gonic/gin"
 )
 
 func Proxy(c *gin.Context, currentNode string) {
 	edition.Proxy(c, currentNode)
+}
+
+func CoreRBACMiddlewares() []gin.HandlerFunc {
+	return []gin.HandlerFunc{xeemiddleware.RequireRBAC()}
 }
 
 func ProxyDocker(proxyURL string) error { return edition.ProxyDocker(proxyURL) }
