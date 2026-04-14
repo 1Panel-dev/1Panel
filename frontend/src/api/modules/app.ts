@@ -11,6 +11,10 @@ export const syncLocalApp = (req: App.AppStoreSync) => {
     return http.post('apps/sync/local', req);
 };
 
+export const uploadLocalAppPackage = (params: FormData, config?: any) => {
+    return http.upload<{ taskID: string; apps: string[] }>('apps/local/upload', params, config || {});
+};
+
 export const searchApp = (req: App.AppReq) => {
     return http.post<App.AppResPage>('apps/search', req);
 };

@@ -2695,6 +2695,13 @@ const message = {
             'Before installing a custom app store package, please ensure that there are no installed apps.',
         forceUninstall: 'Force Uninstall',
         syncCustomApp: 'Sync Custom App',
+        uploadLocalAppPackage: 'Upload Local App Package',
+        uploadLocalAppPackageHelper:
+            'Upload a .tar.gz local app package. The system will extract it into the local app directory and sync local apps automatically.',
+        overwriteLocalAppPackage: 'Overwrite existing local app packages',
+        uploadLocalAppPackageSelect: 'Please select a local app package',
+        uploadLocalAppPackageFormatError: 'Only .tar.gz format is supported',
+        uploadLocalAppPackageDetected: 'Detected apps',
         ignoreAll: 'Ignore all subsequent versions',
         ignoreVersion: 'Ignore specified version',
         specifyIP: 'Bind Host IP',

@@ -12,6 +12,9 @@
                 <el-button @click="syncLocal" type="primary" plain :disabled="syncing" class="ml-2">
                     {{ $t('app.syncLocalApp') }}
                 </el-button>
+                <el-button @click="openUploadLocalPackage" type="primary" plain :disabled="syncing" class="ml-2">
+                    {{ $t('app.uploadLocalAppPackage') }}
+                </el-button>
             </template>
             <template #rightToolBar>
                 <el-checkbox class="!mr-2.5" v-model="req.showCurrentArch" @change="search(req)">
@@ -65,6 +68,7 @@
     <Install ref="installRef" />
     <Detail ref="detailRef" />
     <TaskLog ref="taskLogRef" @close="refresh" />
+    <UploadLocalPackage ref="uploadLocalPackageRef" @uploaded="handleUploadedLocalPackage" />
 </template>
 
 <script lang="ts" setup>
@@ -73,9 +77,10 @@ import { onMounted, reactive, ref, computed } from 'vue';
 import { searchApp, syncApp, syncCutomAppStore, syncLocalApp, getCurrentNodeCustomAppConfig } from '@/api/modules/app';
 import Install from '../detail/install/index.vue';
 import router from '@/routers';
-import { MsgSuccess } from '@/utils/message';
+import { MsgInfo, MsgSuccess } from '@/utils/message';
 import { newUUID } from '@/utils/id';
 import Detail from '../detail/index.vue';
+import i18n from '@/lang';
 import TaskLog from '@/components/log/task/index.vue';
 import bus from '@/global/bus';
 import Tags from '@/views/app-store/components/tag.vue';
@@ -85,6 +90,7 @@ import AppCard from '@/views/app-store/apps/app/index.vue';
 import MainDiv from '@/components/main-div/index.vue';
 import { jumpToInstall } from '@/utils/app';
 import { useGlobalStore } from '@/composables/useGlobalStore';
+import UploadLocalPackage from './upload-local-package.vue';
 const { globalStore, isProductPro, isOffLine } = useGlobalStore();
 
 const mobile = computed(() => {
@@ -116,6 +122,7 @@ const installKey = ref('');
 const mainHeight = ref(0);
 const detailRef = ref();
 const taskLogRef = ref();
+const uploadLocalPackageRef = ref();
 const syncCustomAppstore = ref(false);
 const isActive = ref(false);
 const isExist = ref(false);
@@ -170,6 +177,19 @@ const openDetail = (key: string) => {
 
 const openTaskLog = (taskID: string) => {
     taskLogRef.value.openWithTaskID(taskID);
+};
+
+const openUploadLocalPackage = () => {
+    uploadLocalPackageRef.value.acceptParams();
+};
+
+const handleUploadedLocalPackage = (payload: { taskID: string; apps: string[] }) => {
+    req.resource = 'all';
+    search(req);
+    if (payload.apps && payload.apps.length > 0) {
+        MsgInfo(`${i18n.global.t('app.uploadLocalAppPackageDetected')}：${payload.apps.join(', ')}`);
+    }
+    openTaskLog(payload.taskID);
 };
 
 const sync = async () => {

@@ -2,13 +2,22 @@ package v2
 
 import (
 	"net/http"
+	"os"
+	"path"
+	"path/filepath"
+	"strconv"
+	"strings"
 
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
+	"github.com/1Panel-dev/1Panel/agent/buserr"
+	"github.com/1Panel-dev/1Panel/agent/constant"
+	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/utils/appicon"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 // @Tags App
@@ -78,6 +87,66 @@ func (b *BaseApi) SyncLocalApp(c *gin.Context) {
 	}
 	go appService.SyncAppListFromLocal(req.TaskID)
 	helper.Success(c)
+}
+
+// @Tags App
+// @Summary Upload local app package and sync local apps
+// @Param file formData file true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /apps/local/upload [post]
+// @x-panel-log {"bodyKeys":["file"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"上传本地应用包","formatEN":"Upload local app package"}
+func (b *BaseApi) UploadLocalAppPackage(c *gin.Context) {
+	form, err := c.MultipartForm()
+	if err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	uploadFiles := form.File["file"]
+	if len(uploadFiles) != 1 {
+		helper.BadRequest(c, buserr.New("ErrInvalidParams"))
+		return
+	}
+
+	file := uploadFiles[0]
+	if !strings.HasSuffix(strings.ToLower(file.Filename), ".tar.gz") {
+		helper.BadRequest(c, buserr.New("CustomAppStoreFileValid"))
+		return
+	}
+
+	taskID := uuid.NewString()
+	if values, ok := form.Value["taskID"]; ok && len(values) > 0 && strings.TrimSpace(values[0]) != "" {
+		taskID = values[0]
+	}
+
+	overwrite := true
+	if values, ok := form.Value["overwrite"]; ok && len(values) > 0 {
+		parsed, parseErr := strconv.ParseBool(values[0])
+		if parseErr == nil {
+			overwrite = parsed
+		}
+	}
+
+	tmpDir := path.Join(global.Dir.TmpDir, "local_app_package", taskID)
+	if err := os.MkdirAll(tmpDir, constant.DirPerm); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	tmpFile := filepath.Join(tmpDir, filepath.Base(file.Filename))
+	if err := c.SaveUploadedFile(file, tmpFile); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+
+	importTaskID, appNames, err := appService.UploadLocalAppPackage(tmpFile, taskID, overwrite)
+	if err != nil {
+		_ = os.RemoveAll(tmpDir)
+		helper.InternalServer(c, err)
+		return
+	}
+
+	helper.SuccessWithData(c, gin.H{"taskID": importTaskID, "apps": appNames})
 }
 
 // @Tags App
