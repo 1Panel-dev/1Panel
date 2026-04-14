@@ -232,9 +232,9 @@ func loadDatabaseInitCmd(c *gin.Context) ([]string, error) {
 	case "mongodb":
 		commands = append(commands, []string{
 			"mongosh",
-			"mongodb://127.0.0.1:27017/admin?authSource=admin",
 			"--username", databaseConn.Username,
 			"--password", databaseConn.Password,
+			"--authenticationDatabase", "admin",
 		}...)
 	case "postgresql", "postgresql-cluster":
 		commands = []string{"exec", "-e", fmt.Sprintf("PGPASSWORD=%s", databaseConn.Password), "-it", databaseConn.ContainerName, "psql", "-t", "-U", databaseConn.Username}
