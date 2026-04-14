@@ -44,7 +44,7 @@ type SettingService struct{}
 type ISettingService interface {
 	GetSettingInfo() (*dto.SettingInfo, error)
 	LoadInterfaceAddr() ([]string, error)
-	Update(key, value string) error
+	Update(c *gin.Context, key, value string) error
 	UpdatePassword(c *gin.Context, old, new string) error
 	UpdatePort(port uint) error
 	UpdateBindInfo(req dto.BindInfo) error
@@ -127,7 +127,7 @@ func sortShowMenus(menus []dto.ShowMenu) {
 	})
 }
 
-func (u *SettingService) Update(key, value string) error {
+func (u *SettingService) Update(c *gin.Context, key, value string) error {
 	oldVal, err := settingRepo.Get(repo.WithByKey(key))
 	if err != nil {
 		return err
@@ -180,7 +180,7 @@ func (u *SettingService) Update(key, value string) error {
 			return err
 		}
 	case "UserName", "Password":
-		_ = global.SESSION.DeleteByID("")
+		u.deleteCurrentSession(c)
 	case "Language":
 		i18n.SetCachedDBLanguage(value)
 		if err := xpack.Sync(constant.SyncLanguage); err != nil {
@@ -566,8 +566,19 @@ func (u *SettingService) UpdatePassword(c *gin.Context, old, new string) error {
 	if err := u.HandlePasswordExpired(c, old, new); err != nil {
 		return err
 	}
-	_ = global.SESSION.DeleteByID("")
+	u.deleteCurrentSession(c)
 	return nil
+}
+
+func (u *SettingService) deleteCurrentSession(c *gin.Context) {
+	if c == nil {
+		return
+	}
+	sessionUser, err := global.SESSION.Get(c)
+	if err != nil || sessionUser.ID == "" {
+		return
+	}
+	_ = global.SESSION.DeleteByID(sessionUser.ID)
 }
 
 func (u *SettingService) clearPasskeySettings() error {

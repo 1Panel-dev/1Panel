@@ -19,6 +19,8 @@ type SessionUser struct {
 	Name string `json:"name"`
 }
 
+const SuperAdminSessionUserID = "__super_admin__"
+
 type sessionItem struct {
 	CreatedAt time.Time
 	CSRFToken string

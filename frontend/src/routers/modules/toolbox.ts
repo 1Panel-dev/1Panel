@@ -9,6 +9,7 @@ const toolboxRouter = {
     meta: {
         title: 'menu.toolbox',
         icon: 'p-toolbox',
+        permission: 'toolbox_view',
     },
     children: [
         {
@@ -28,6 +29,7 @@ const toolboxRouter = {
                         title: 'toolbox.device.toolbox',
                         activeMenu: '/toolbox',
                         requiresAuth: false,
+                        permission: 'toolbox_view',
                     },
                 },
                 {
@@ -40,6 +42,7 @@ const toolboxRouter = {
                         title: 'menu.supervisor',
                         activeMenu: '/toolbox',
                         requiresAuth: false,
+                        permission: 'toolbox_view',
                     },
                 },
                 {
@@ -52,6 +55,7 @@ const toolboxRouter = {
                         title: 'toolbox.clam.clam',
                         activeMenu: '/toolbox',
                         requiresAuth: false,
+                        permission: 'toolbox_view',
                     },
                 },
                 {
@@ -75,6 +79,7 @@ const toolboxRouter = {
                         title: 'FTP',
                         activeMenu: '/toolbox',
                         requiresAuth: false,
+                        permission: 'toolbox_view',
                     },
                 },
                 {
@@ -87,6 +92,7 @@ const toolboxRouter = {
                         title: 'Fail2Ban',
                         activeMenu: '/toolbox',
                         requiresAuth: false,
+                        permission: 'toolbox_view',
                     },
                 },
                 {
@@ -99,6 +105,7 @@ const toolboxRouter = {
                         title: 'setting.diskClean',
                         activeMenu: '/toolbox',
                         requiresAuth: false,
+                        permission: 'toolbox_view',
                     },
                 },
             ],

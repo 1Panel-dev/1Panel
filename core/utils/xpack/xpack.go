@@ -18,6 +18,8 @@ func Proxy(c *gin.Context, currentNode string) {
 	edition.Proxy(c, currentNode)
 }
 
+func CoreRBACMiddlewares() []gin.HandlerFunc { return nil }
+
 func ProxyDocker(proxyURL string) error { return edition.ProxyDocker(proxyURL) }
 
 func UpdateGroup(name string, group, newGroup uint) error {

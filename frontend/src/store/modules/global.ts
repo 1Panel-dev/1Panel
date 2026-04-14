@@ -53,6 +53,9 @@ const GlobalStore = defineStore({
         isOnRestart: false,
         // tags
         isAdmin: false,
+        permissions: [],
+        nodeScopes: [],
+        nodeRoles: [],
         isXpackEE: false,
         isIntl: false,
         docWithRegion: true,
@@ -86,6 +89,38 @@ const GlobalStore = defineStore({
     actions: {
         setScreenFull() {
             this.isFullScreen = !this.isFullScreen;
+        },
+        setLogStatus(login: boolean) {
+            this.isLogin = login;
+        },
+        setAuthInfo(payload: {
+            isAdmin: boolean;
+            permissions: string[];
+            nodeScopes: number[];
+            nodeRoles?: Array<{ nodeId: number; nodeName: string; roleId: number; roleName: string }>;
+        }) {
+            this.isAdmin = !!payload.isAdmin;
+            this.permissions = payload.permissions || [];
+            this.nodeScopes = payload.nodeScopes || [];
+            this.nodeRoles = payload.nodeRoles || [];
+        },
+        clearAuthInfo() {
+            this.permissions = [];
+            this.nodeScopes = [];
+            this.nodeRoles = [];
+            this.isAdmin = false;
+        },
+        hasPermission(permission: string) {
+            return this.isAdmin || this.permissions.includes(permission);
+        },
+        setGlobalLoading(loading: boolean) {
+            this.isLoading = loading;
+        },
+        setLoadingText(text: string) {
+            this.loadingText = text;
+        },
+        setCsrfToken(token: string) {
+            this.csrfToken = token;
         },
         async updateLanguage(language: string) {
             const activeLocale = await setActiveLocale(language);

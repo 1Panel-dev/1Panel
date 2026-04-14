@@ -2,9 +2,9 @@ import i18n from '@/lang';
 import router from '@/routers';
 import { MsgError } from '@/utils/message';
 import { GlobalStore } from '@/store';
-const globalStore = GlobalStore();
 
 export const checkStatus = (status: number, msg: string): void => {
+    const globalStore = GlobalStore();
     switch (status) {
         case 400:
             MsgError(msg ? msg : i18n.global.t('commons.res.paramError'));

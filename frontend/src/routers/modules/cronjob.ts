@@ -27,6 +27,7 @@ const cronRouter = {
                         activeMenu: '/cronjobs',
                         requiresAuth: false,
                         title: 'menu.cronjob',
+                        permission: 'cronjob_task_view',
                     },
                 },
                 {
@@ -49,6 +50,7 @@ const cronRouter = {
                         activeMenu: '/cronjobs',
                         requiresAuth: false,
                         title: 'cronjob.library.library',
+                        permission: 'cronjob_script_view',
                     },
                 },
             ],
