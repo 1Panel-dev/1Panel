@@ -49,6 +49,8 @@ AppInstallCheck: 'Проверить среду установки прилож�
 
 # backup
 ErrBackupInUsed: 'Аккаунт бэкапа занят задачей'
+ErrRolePresetCannotDelete: "System preset roles cannot be deleted"
+ErrRoleBoundToUser: "This role is already bound to users and cannot be deleted"
 ErrBackupCheck: 'Проверка подключения не удалась: {{ .err }}'
 ErrBackupLocal: "Локальная учетная запись резервного копирования не поддерживает эту операцию"
 ErrBackupPublic: "Обнаружено, что эта учетная запись резервного копирования не является публичной, проверьте и повторите попытку"

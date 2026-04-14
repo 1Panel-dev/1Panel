@@ -9,6 +9,7 @@ const logsRouter = {
     meta: {
         title: 'menu.logs',
         icon: 'p-log',
+        permission: 'log_view',
     },
     children: [
         {
@@ -28,6 +29,7 @@ const logsRouter = {
                         title: 'logs.operation',
                         activeMenu: '/logs',
                         requiresAuth: false,
+                        permission: 'log_view',
                     },
                 },
                 {
@@ -40,6 +42,7 @@ const logsRouter = {
                         title: 'logs.login',
                         activeMenu: '/logs',
                         requiresAuth: false,
+                        permission: 'log_view',
                     },
                 },
                 {
@@ -64,6 +67,7 @@ const logsRouter = {
                         title: 'logs.system',
                         activeMenu: '/logs',
                         requiresAuth: false,
+                        permission: 'log_view',
                     },
                 },
                 {

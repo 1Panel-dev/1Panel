@@ -16,6 +16,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/middleware"
 	rou "github.com/1Panel-dev/1Panel/core/router"
 	"github.com/1Panel-dev/1Panel/core/utils/security"
+	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 )
@@ -87,6 +88,7 @@ func Routers() *gin.Engine {
 	Router.Use(middleware.PasswordExpired())
 	Router.Use(middleware.ApiAuth())
 	Router.Use(middleware.CSRFTokenGuard())
+	Router.Use(xpack.CoreRBACMiddlewares()...)
 	Router.Use(Proxy())
 
 	PrivateGroup := Router.Group("/api/v2/core")

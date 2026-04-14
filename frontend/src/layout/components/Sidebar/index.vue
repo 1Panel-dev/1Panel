@@ -28,7 +28,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { RouteRecordRaw, useRoute } from 'vue-router';
 import { loadingSvg } from '@/utils/svg';
 import Logo from './components/Logo.vue';
@@ -38,6 +38,7 @@ import { menuList } from '@/routers/router';
 import { GlobalStore, MenuStore } from '@/store';
 import { getSettingInfo } from '@/api/modules/setting';
 import PrimaryMenu from '@/assets/images/menu-bg.svg?component';
+import { hasPermission } from '@/utils/rbac';
 
 const route = useRoute();
 const menuStore = MenuStore();
@@ -95,24 +96,10 @@ const search = async () => {
         const rstMenuList: RouteRecordRaw[] = [];
         const resMenuList = adjustAndCleanMenu(hideMenu, menuList);
         for (const menu of resMenuList) {
-            let menuItem = JSON.parse(JSON.stringify(menu));
-            if (!showSet.has(menuItem.name as string)) {
-                continue;
-            } else if (menuItem.name === 'Xpack-Menu') {
-                menuItem.meta.hideInSidebar = false;
+            const menuItem = buildVisibleMenu(menu, showSet);
+            if (menuItem) {
+                rstMenuList.push(menuItem);
             }
-            const itemChildren =
-                (menuItem.children ?? []).filter(
-                    (item) =>
-                        item.name && showSet.has(item.name as string) && !(item.name === 'Upage' && globalStore.isIntl),
-                ) || [];
-
-            if (itemChildren.length === 1) {
-                menuItem.meta.icon = itemChildren[0].meta.icon;
-                menuItem.meta.title = itemChildren[0].meta.title;
-            }
-            menuItem.children = itemChildren;
-            rstMenuList.push(menuItem);
         }
         if (!isSameMenuList(menuStore.menuList as RouteRecordRaw[], rstMenuList)) {
             menuStore.setMenuList(rstMenuList);
@@ -126,6 +113,53 @@ const search = async () => {
 
 function isSameMenuList(source: RouteRecordRaw[], target: RouteRecordRaw[]) {
     return JSON.stringify(source) === JSON.stringify(target);
+}
+
+function allowMenuItem(item: RouteRecordRaw) {
+    const permission = item.meta?.permission as string | undefined;
+    if (!permission) {
+        return true;
+    }
+    const allowed = hasPermission(permission);
+    return allowed;
+}
+
+function buildVisibleMenu(menu: RouteRecordRaw, showSet: Set<string>): RouteRecordRaw | null {
+    const menuItem = JSON.parse(JSON.stringify(menu));
+    if (!menuItem?.name || !showSet.has(menuItem.name as string)) {
+        return null;
+    }
+    if (!allowMenuItem(menuItem)) {
+        return null;
+    }
+
+    const children = Array.isArray(menuItem.children) ? menuItem.children : [];
+    if (children.length === 0) {
+        return menuItem;
+    }
+
+    const visibleChildren = children
+        .map((item) => {
+            if (item.name === 'Upage' && globalStore.isIntl) {
+                return null;
+            }
+            return buildVisibleMenu(item, showSet);
+        })
+        .filter(Boolean) as RouteRecordRaw[];
+
+    menuItem.children = visibleChildren;
+    if (menuItem.children.length === 0) {
+        return null;
+    }
+
+    if (menuItem.children.length === 1) {
+        menuItem.meta.icon = menuItem.children[0].meta.icon;
+        menuItem.meta.title = menuItem.children[0].meta.title;
+    }
+    if (menuItem.name === 'Xpack-Menu') {
+        menuItem.meta.hideInSidebar = false;
+    }
+    return menuItem;
 }
 
 function adjustAndCleanMenu(menuItem, list) {
@@ -178,6 +212,13 @@ onMounted(() => {
     }
     search();
 });
+
+watch(
+    () => [globalStore.currentNode, globalStore.permissions.join('|')],
+    () => {
+        search();
+    },
+);
 </script>
 
 <style lang="scss" scoped>

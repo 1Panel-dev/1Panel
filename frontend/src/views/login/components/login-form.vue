@@ -256,6 +256,7 @@ import { getXpackSettingForTheme } from '@/utils/xpack';
 import { routerToName } from '@/utils/router';
 import { Key } from '@element-plus/icons-vue';
 import { changeToLocal } from '@/utils/node';
+import { syncAuthInfo } from '@/utils/rbac';
 
 const i18n = useI18n();
 const themeConfig = computed(() => globalStore.themeConfig);
@@ -448,6 +449,7 @@ const login = (formEl: FormInstance | undefined) => {
             menuStore.setMenuList([]);
             tabsStore.removeAllTabs();
             globalStore.isAdmin = res.data.role === 'ADMIN';
+            await syncAuthInfo();
             await changeToLocal();
             MsgSuccess(i18n.t('commons.msg.loginSuccess'));
             localStorage.removeItem('dashboardCache');
@@ -493,6 +495,7 @@ const mfaLogin = async (auto: boolean) => {
             tabsStore.removeAllTabs();
             MsgSuccess(i18n.t('commons.msg.loginSuccess'));
             globalStore.isAdmin = res.data.role === 'ADMIN';
+            await syncAuthInfo();
             await changeToLocal();
             localStorage.removeItem('dashboardCache');
             localStorage.removeItem('upgradeChecked');
@@ -551,13 +554,15 @@ const passkeyLogin = async () => {
             return;
         }
         const payload = buildPasskeyAssertion(credential);
-        await passkeyFinishApi(payload, res.data.sessionId);
+        const loginRes = await passkeyFinishApi(payload, res.data.sessionId);
         enableAutoPasskey();
         globalStore.ignoreCaptcha = true;
         globalStore.isLogin = true;
         globalStore.agreeLicense = true;
         menuStore.setMenuList([]);
         tabsStore.removeAllTabs();
+        globalStore.isAdmin = loginRes.data.role === 'ADMIN';
+        await syncAuthInfo();
         await changeToLocal();
         MsgSuccess(i18n.t('commons.msg.loginSuccess'));
         localStorage.removeItem('dashboardCache');

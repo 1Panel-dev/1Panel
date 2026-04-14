@@ -13,6 +13,7 @@ export enum ResultEnum {
     ERRGLOBALLOADING = 407,
     ERRXPACK = 410,
     NodeUnBind = 411,
+    ERRRBAC = 412,
     TIMEOUT = 20000,
     TYPE = 'success',
 }
