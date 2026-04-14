@@ -287,7 +287,7 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
     recordShow.value = true;
     dialogData.value = params;
     if (dialogData.value.rowData.type === 'database') {
-        const data = await listDbItems('mysql,mariadb,postgresql');
+        const data = await listDbItems('mysql,mariadb,mysql-cluster,postgresql,postgresql-cluster,mongodb');
         let itemDBs = data.data || [];
         for (const item of itemDBs) {
             if (item.id == dialogData.value.rowData.dbName) {

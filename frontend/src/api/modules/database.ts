@@ -89,6 +89,45 @@ export const deleteMysqlDB = (params: Database.MysqlDBDelete) => {
     return http.post(`/databases/del`, params);
 };
 
+// mongodb
+export const searchMongodbDBs = (params: Database.SearchDBWithPage, node?: string) => {
+    const query = node ? `?operateNode=${node}` : '';
+    return http.post<ResPage<Database.MongodbDBInfo>>(`/databases/mongodb/search${query}`, params);
+};
+export const addMongodbDB = (params: Database.MongodbDBCreate) => {
+    let request = deepCopy(params) as Database.MongodbDBCreate;
+    encodeBase64Fields(request, ['password']);
+    return http.post(`/databases/mongodb`, request, TimeoutEnum.T_40S);
+};
+export const loadMongodbFromRemote = (params: Database.MongodbLoadDB) => {
+    return http.post(`/databases/mongodb/load`, params, TimeoutEnum.T_40S);
+};
+export const bindMongodbUser = (params: Database.MongodbBind) => {
+    let request = deepCopy(params) as Database.MongodbBind;
+    encodeBase64Fields(request, ['password']);
+    return http.post(`/databases/mongodb/bind`, request, TimeoutEnum.T_40S);
+};
+export const updateMongodbPassword = (params: Database.MongodbPassword) => {
+    let request = deepCopy(params) as Database.MongodbPassword;
+    encodeBase64Fields(request, ['password']);
+    return http.post(`/databases/mongodb/password`, request, TimeoutEnum.T_40S);
+};
+export const updateMongodbDescription = (params: DescriptionUpdate) => {
+    return http.post(`/databases/mongodb/description`, params, TimeoutEnum.T_40S);
+};
+export const deleteCheckMongodbDB = (params: Database.MongodbDBDeleteCheck) => {
+    return http.post<Database.DBResource[]>(`/databases/mongodb/del/check`, params, TimeoutEnum.T_40S);
+};
+export const deleteMongodbDB = (params: Database.MongodbDBDelete) => {
+    return http.post(`/databases/mongodb/del`, params, TimeoutEnum.T_40S);
+};
+export const loadMongodbPrivileges = (params: Database.MongodbPrivilegesLoad) => {
+    return http.post<string>(`/databases/mongodb/privileges`, params, TimeoutEnum.T_40S);
+};
+export const changeMongodbPrivileges = (params: Database.MongodbPrivileges) => {
+    return http.post(`/databases/mongodb/privileges/change`, params, TimeoutEnum.T_40S);
+};
+
 export const loadMysqlVariables = (type: string, database: string) => {
     return http.post<Database.MysqlVariables>(`/databases/variables`, { type: type, name: database });
 };

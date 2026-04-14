@@ -415,6 +415,11 @@ func (b *BaseApi) Backup(c *gin.Context) {
 			helper.InternalServer(c, err)
 			return
 		}
+	case "mongodb":
+		if err := backupService.MongodbBackup(req); err != nil {
+			helper.InternalServer(c, err)
+			return
+		}
 	case constant.AppPostgresql, constant.AppPostgresqlCluster:
 		if err := backupService.PostgresqlBackup(req); err != nil {
 			helper.InternalServer(c, err)
@@ -475,6 +480,11 @@ func (b *BaseApi) Recover(c *gin.Context) {
 			helper.InternalServer(c, err)
 			return
 		}
+	case "mongodb":
+		if err := backupService.MongodbRecover(req); err != nil {
+			helper.InternalServer(c, err)
+			return
+		}
 	case constant.AppPostgresql, constant.AppPostgresqlCluster:
 		if err := backupService.PostgresqlRecover(req); err != nil {
 			helper.InternalServer(c, err)
@@ -527,6 +537,11 @@ func (b *BaseApi) RecoverByUpload(c *gin.Context) {
 	switch req.Type {
 	case "mysql", "mariadb", constant.AppMysqlCluster:
 		if err := backupService.MysqlRecoverByUpload(req); err != nil {
+			helper.InternalServer(c, err)
+			return
+		}
+	case "mongodb":
+		if err := backupService.MongodbRecoverByUpload(req); err != nil {
 			helper.InternalServer(c, err)
 			return
 		}

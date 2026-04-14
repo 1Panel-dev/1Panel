@@ -57,6 +57,7 @@ func InitAgentDB() {
 		migrations.UpdateDatabase,
 		migrations.AddGPUMonitor,
 		migrations.UpdateDatabaseMysql,
+		migrations.AddDatabaseMongodb,
 		migrations.InitIptablesStatus,
 		migrations.UpdateWebsite,
 		migrations.AddisIPtoWebsiteSSL,

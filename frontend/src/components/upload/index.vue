@@ -16,7 +16,7 @@
                                     <li v-if="type === 'mysql' || type === 'mariadb' || type === 'mysql-cluster'">
                                         {{ $t('database.formatHelper', [remark]) }}
                                     </li>
-                                    <li v-if="isDb()">{{ $t('database.supportUpType') }}</li>
+                                    <li v-if="isDb() && type !== 'mongodb'">{{ $t('database.supportUpType') }}</li>
                                     <li v-if="type === 'website' || type === 'app'">
                                         {{ $t('website.websiteBackupWarn') }}
                                     </li>
@@ -40,7 +40,7 @@
                                 :limit="1"
                                 class="float-left"
                                 ref="uploadRef"
-                                accept=".tar.gz,.sql,.gz,.zip"
+                                :accept="uploadAccept"
                                 :show-file-list="false"
                                 :on-exceed="handleExceed"
                                 :on-change="fileOnChange"
@@ -90,7 +90,7 @@
 
         <DialogPro
             v-model="recoverDialog"
-            :title="name ? $t('commons.button.recover') + ' - ' + name : $t('commons.button.recover')"
+            :title="title ? $t('commons.button.recover') + ' - ' + title : $t('commons.button.recover')"
             @close="handleRecoverClose"
             size="small"
         >
@@ -134,7 +134,7 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref } from 'vue';
+import { computed, reactive, ref } from 'vue';
 import { computeSize } from '@/utils/size';
 import { newUUID } from '@/utils/id';
 import { transferTimeToSecond } from '@/utils/validate';
@@ -198,6 +198,7 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
         case 'postgresql':
         case 'mysql-cluster':
         case 'postgresql-cluster':
+        case 'mongodb':
             title.value = name.value + ' [ ' + detailName.value + ' ]';
             if (detailName.value) {
                 baseDir.value = `${pathRes.data}/uploads/database/${type.value}/${name.value}/${detailName.value}/`;
@@ -253,10 +254,14 @@ const beforeUpload = (fileName: string) => {
         return false;
     }
     if (isDb()) {
-        const allowedExtensions = ['.sql', '.sql.gz', '.tar.gz', '.zip'];
+        const allowedExtensions = type.value === 'mongodb' ? ['.gz'] : ['.sql', '.sql.gz', '.tar.gz', '.zip'];
         const isValidFile = allowedExtensions.some((ext) => itemName.endsWith(ext));
         if (!isValidFile) {
-            MsgError(i18n.global.t('database.supportUpType'));
+            MsgError(
+                type.value === 'mongodb'
+                    ? i18n.global.t('commons.msg.unSupportType')
+                    : i18n.global.t('database.supportUpType'),
+            );
             return false;
         }
         return true;
@@ -340,6 +345,7 @@ const onRecover = async (row: File.File) => {
 
 const isDb = () => {
     return (
+        type.value === 'mongodb' ||
         type.value === 'mysql' ||
         type.value === 'mariadb' ||
         type.value === 'postgresql' ||
@@ -347,6 +353,9 @@ const isDb = () => {
         type.value === 'postgresql-cluster'
     );
 };
+const uploadAccept = computed(() => {
+    return type.value === 'mongodb' ? '.gz' : '.tar.gz,.sql,.gz,.zip';
+});
 const uploaderFiles = ref<UploadFiles>([]);
 const uploadRef = ref<UploadInstance>();
 

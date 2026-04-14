@@ -49,6 +49,7 @@ var AddTable = &gormigrate.Migration{
 			&model.Cronjob{},
 			&model.Database{},
 			&model.DatabaseMysql{},
+			&model.DatabaseMongodb{},
 			&model.DatabasePostgresql{},
 			&model.Favorite{},
 			&model.FileShare{},
@@ -820,6 +821,13 @@ var UpdateDatabaseMysql = &gormigrate.Migration{
 			}
 		}
 		return nil
+	},
+}
+
+var AddDatabaseMongodb = &gormigrate.Migration{
+	ID: "20260413-add-database-mongodb",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(&model.DatabaseMongodb{})
 	},
 }
 

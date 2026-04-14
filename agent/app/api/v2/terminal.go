@@ -213,12 +213,15 @@ func loadContainerInitCmd(c *gin.Context) ([]string, error) {
 func loadDatabaseInitCmd(c *gin.Context) ([]string, error) {
 	database := c.Query("database")
 	databaseType := c.Query("databaseType")
-	if len(database) == 0 || len(databaseType) == 0 {
+	if len(databaseType) == 0 {
 		return nil, fmt.Errorf("error param of database: %s or database type: %s", database, databaseType)
 	}
 	databaseConn, err := appInstallService.LoadConnInfo(dto.OperationWithNameAndType{Type: databaseType, Name: database})
 	if err != nil {
 		return nil, fmt.Errorf("no such database in db, err: %v", err)
+	}
+	if len(databaseConn.ContainerName) == 0 {
+		return nil, fmt.Errorf("no such database container for database: %s or database type: %s", database, databaseType)
 	}
 	commands := []string{"exec", "-it", databaseConn.ContainerName}
 	switch databaseType {
@@ -226,6 +229,13 @@ func loadDatabaseInitCmd(c *gin.Context) ([]string, error) {
 		commands = append(commands, []string{"mysql", "-uroot", "-p" + databaseConn.Password}...)
 	case "mariadb":
 		commands = append(commands, []string{"mariadb", "-uroot", "-p" + databaseConn.Password}...)
+	case "mongodb":
+		commands = append(commands, []string{
+			"mongosh",
+			"mongodb://127.0.0.1:27017/admin?authSource=admin",
+			"--username", databaseConn.Username,
+			"--password", databaseConn.Password,
+		}...)
 	case "postgresql", "postgresql-cluster":
 		commands = []string{"exec", "-e", fmt.Sprintf("PGPASSWORD=%s", databaseConn.Password), "-it", databaseConn.ContainerName, "psql", "-t", "-U", databaseConn.Username}
 	}

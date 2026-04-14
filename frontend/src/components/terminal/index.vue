@@ -34,6 +34,10 @@ const terminalSocket = ref<WebSocket>();
 const heartbeatTimer = ref<NodeJS.Timer>();
 const latency = ref(0);
 const initCmd = ref('');
+const hideInitCmdEcho = ref(false);
+const initCmdEchoBuffer = ref('');
+const waitForPrompt = ref('');
+const waitForPromptBuffer = ref('');
 const aiNotice = ref({
     visible: false,
     loading: false,
@@ -105,6 +109,7 @@ interface WsProps {
     args: string;
     error: string;
     initCmd: string;
+    waitForPrompt?: string;
 }
 
 interface TerminalBufferLine {
@@ -117,6 +122,8 @@ const acceptParams = (props: WsProps) => {
             initError(props.error);
         } else {
             initCmd.value = props.initCmd || '';
+            waitForPrompt.value = props.waitForPrompt || '';
+            waitForPromptBuffer.value = '';
             init(props.endpoint, props.args);
         }
     });
@@ -258,8 +265,44 @@ const initWebSocket = (endpoint_: string, args: string = '') => {
 const runRealTerminal = () => {
     webSocketReady.value = true;
     if (initCmd.value !== '') {
+        hideInitCmdEcho.value = true;
+        initCmdEchoBuffer.value = '';
         sendMsg(initCmd.value);
     }
+};
+
+const stripInitCmdEchoLine = (message: string) => {
+    if (!hideInitCmdEcho.value) {
+        return message;
+    }
+    initCmdEchoBuffer.value += message;
+    const lineBreakIndex = initCmdEchoBuffer.value.search(/\r?\n/);
+    if (lineBreakIndex === -1) {
+        return '';
+    }
+
+    const lineBreakLength = initCmdEchoBuffer.value[lineBreakIndex] === '\r' ? 2 : 1;
+    const remaining = initCmdEchoBuffer.value.slice(lineBreakIndex + lineBreakLength);
+    hideInitCmdEcho.value = false;
+    initCmdEchoBuffer.value = '';
+    initCmd.value = '';
+    return remaining;
+};
+
+const flushPromptBuffer = (message: string) => {
+    if (!waitForPrompt.value) {
+        return message;
+    }
+    waitForPromptBuffer.value += message;
+    const promptIndex = waitForPromptBuffer.value.indexOf(waitForPrompt.value);
+    if (promptIndex === -1) {
+        return '';
+    }
+
+    const visible = waitForPromptBuffer.value.slice(promptIndex);
+    waitForPrompt.value = '';
+    waitForPromptBuffer.value = '';
+    return visible;
 };
 
 const onWSReceive = (message: MessageEvent) => {
@@ -269,9 +312,14 @@ const onWSReceive = (message: MessageEvent) => {
             term.value.element && term.value.focus();
             if (wsMsg.data) {
                 let receiveMsg = decodeBase64(wsMsg.data);
-                if (initCmd.value != '') {
-                    receiveMsg = receiveMsg?.replace(initCmd.value.trim(), '').trim();
-                    initCmd.value = '';
+                if (hideInitCmdEcho.value) {
+                    receiveMsg = stripInitCmdEchoLine(receiveMsg);
+                }
+                if (receiveMsg && waitForPrompt.value) {
+                    receiveMsg = flushPromptBuffer(receiveMsg);
+                }
+                if (!receiveMsg) {
+                    break;
                 }
                 term.value.write(receiveMsg);
             }
@@ -507,9 +555,7 @@ onBeforeUnmount(() => {
 
 .ai-notice-fade-enter-active,
 .ai-notice-fade-leave-active {
-    transition:
-        opacity 180ms ease,
-        transform 180ms ease;
+    transition: opacity 180ms ease, transform 180ms ease;
 }
 
 .ai-mask-fade-enter-active,
