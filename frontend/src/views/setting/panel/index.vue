@@ -252,6 +252,7 @@ import ThemeColor from '@/views/setting/panel/theme-color/index.vue';
 import ApiInterface from '@/views/setting/panel/api-interface/index.vue';
 import Password from '@/views/setting/panel/password/index.vue';
 import Watermark from '@/views/setting/panel/watermark/index.vue';
+import Edition from '@/views/setting/panel/edition/index.vue';
 import UserName from '@/views/setting/panel/username/index.vue';
 import Timeout from '@/views/setting/panel/timeout/index.vue';
 import PanelName from '@/views/setting/panel/name/index.vue';

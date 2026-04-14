@@ -2,9 +2,10 @@ import { Setting } from '@/api/interface/setting';
 import { listNodeOptions, loadNodeByUser } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
 
-const globalStore = GlobalStore();
+const getGlobalStore = () => GlobalStore();
 
 export const changeToLocal = async () => {
+    const globalStore = getGlobalStore();
     let nodes = await listNodes('all');
     if (nodes.length === 0) {
         setDefaultNodeInfo();
@@ -24,6 +25,7 @@ export const changeToLocal = async () => {
 };
 
 export async function listNodes(type: string): Promise<Array<Setting.NodeItem>> {
+    const globalStore = getGlobalStore();
     try {
         if (globalStore.isAdmin) {
             const res = await listNodeOptions(type);
@@ -38,6 +40,7 @@ export async function listNodes(type: string): Promise<Array<Setting.NodeItem>> 
 }
 
 export const setDefaultNodeInfo = () => {
+    const globalStore = getGlobalStore();
     globalStore.currentNode = 'local';
     globalStore.currentNodeAddr = '127.0.0.1';
 };

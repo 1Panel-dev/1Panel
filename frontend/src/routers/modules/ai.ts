@@ -18,6 +18,7 @@ const aiRouter = {
             meta: {
                 icon: 'p-jiqiren2',
                 title: 'aiTools.agents.agent',
+                permission: 'ai_agent_view',
                 requiresAuth: true,
             },
         },
@@ -28,6 +29,7 @@ const aiRouter = {
             meta: {
                 icon: 'p-moxing-menu',
                 title: 'aiTools.model.model',
+                permission: 'ai_model_view',
                 requiresAuth: true,
             },
         },
@@ -39,6 +41,7 @@ const aiRouter = {
             meta: {
                 title: 'aiTools.model.localModel',
                 activeMenu: '/ai/model/account',
+                permission: 'ai_model_view',
                 requiresAuth: true,
             },
         },
@@ -49,6 +52,7 @@ const aiRouter = {
             meta: {
                 icon: 'p-mcp-menu',
                 title: 'menu.mcp',
+                permission: 'ai_mcp_view',
                 requiresAuth: true,
             },
         },
@@ -60,6 +64,7 @@ const aiRouter = {
                 icon: 'p-gpu-menu',
                 title: 'aiTools.gpu.gpu',
                 activeMenu: '/ai/gpu/current',
+                permission: 'ai_gpu_view',
                 requiresAuth: true,
             },
         },
@@ -70,6 +75,7 @@ const aiRouter = {
             meta: {
                 title: 'aiTools.gpu.history',
                 activeMenu: '/ai/gpu/current',
+                permission: 'ai_gpu_view',
                 requiresAuth: true,
             },
         },

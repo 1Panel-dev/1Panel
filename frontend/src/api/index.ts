@@ -9,7 +9,8 @@ import { encodeBase64 } from '@/utils/base64';
 import i18n from '@/lang';
 import { changeToLocal } from '@/utils/node';
 import { getCookie } from '@/utils/auth';
-const globalStore = GlobalStore();
+
+const getGlobalStore = () => GlobalStore();
 
 const config = {
     baseURL: import.meta.env.VITE_API_URL as string,
@@ -28,6 +29,7 @@ class RequestHttp {
         this.service = axios.create(config);
         this.service.interceptors.request.use(
             (config: AxiosRequestConfig) => {
+                const globalStore = getGlobalStore();
                 let language = globalStore.language;
                 config.headers = {
                     'Accept-Language': language,
@@ -67,6 +69,7 @@ class RequestHttp {
 
         this.service.interceptors.response.use(
             (response: AxiosResponse) => {
+                const globalStore = getGlobalStore();
                 const { data } = response;
                 if (data.code == ResultEnum.OVERDUE || data.code == ResultEnum.FORBIDDEN) {
                     globalStore.isLogin = false;
@@ -74,6 +77,10 @@ class RequestHttp {
                         name: 'entrance',
                         params: { code: globalStore.entrance },
                     });
+                    return Promise.reject(data);
+                }
+                if (data.code == ResultEnum.ERRRBAC) {
+                    MsgError(data.message || i18n.global.t('commons.res.forbidden'));
                     return Promise.reject(data);
                 }
                 if (data.code == ResultEnum.EXPIRED) {

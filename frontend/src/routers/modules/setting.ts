@@ -28,6 +28,7 @@ const settingRouter = {
                         title: 'setting.panel',
                         requiresAuth: true,
                         activeMenu: '/settings',
+                        permission: 'setting_view',
                     },
                 },
                 {
@@ -40,6 +41,7 @@ const settingRouter = {
                         title: 'xpack.alert.alertNotice',
                         requiresAuth: true,
                         activeMenu: '/settings',
+                        permission: 'setting_view',
                     },
                 },
                 {
@@ -52,6 +54,7 @@ const settingRouter = {
                         title: 'setting.backupAccount',
                         requiresAuth: true,
                         activeMenu: '/settings',
+                        permission: 'setting_view',
                     },
                 },
                 {
@@ -64,6 +67,7 @@ const settingRouter = {
                         title: 'setting.license',
                         requiresAuth: true,
                         activeMenu: '/settings',
+                        permission: 'setting_view',
                     },
                 },
                 {
@@ -76,6 +80,7 @@ const settingRouter = {
                         title: 'setting.about',
                         requiresAuth: true,
                         activeMenu: '/settings',
+                        permission: 'setting_view',
                     },
                 },
                 {
@@ -88,6 +93,7 @@ const settingRouter = {
                         title: 'setting.safe',
                         requiresAuth: true,
                         activeMenu: '/settings',
+                        permission: 'setting_view',
                     },
                 },
                 {
@@ -100,6 +106,7 @@ const settingRouter = {
                         title: 'setting.snapshot',
                         requiresAuth: true,
                         activeMenu: '/settings',
+                        permission: 'setting_view',
                     },
                 },
                 {

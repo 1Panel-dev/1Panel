@@ -10,11 +10,13 @@ import {
     updateXpackSettingByKey as updateXpackSettingByKeyFromExtension,
 } from '@/extensions/xpack';
 import { GlobalStore } from '@/store';
-const globalStore = GlobalStore();
 const { switchTheme } = useTheme();
 import faviconUrl from '@/assets/images/favicon.svg';
 
+const getGlobalStore = () => GlobalStore();
+
 export function resetXSetting() {
+    const globalStore = getGlobalStore();
     globalStore.themeConfig.title = '';
     globalStore.themeConfig.logo = '';
     globalStore.themeConfig.logoWithText = '';
@@ -32,6 +34,7 @@ async function getColoredFavicon(url: string, color: string) {
 }
 
 export async function initFavicon() {
+    const globalStore = getGlobalStore();
     document.title = globalStore.themeConfig.panelName;
     const favicon = globalStore.themeConfig.favicon;
     const isPro = globalStore.isXpackOrEE();
@@ -71,6 +74,7 @@ export async function getXpackSetting() {
 }
 
 const loadDataFromDB = async () => {
+    const globalStore = getGlobalStore();
     const res = await getSettingInfo();
     document.title = res.data.panelName;
     globalStore.entrance = res.data.securityEntrance;
@@ -78,6 +82,7 @@ const loadDataFromDB = async () => {
 };
 
 export async function loadProductProFromDB() {
+    const globalStore = getGlobalStore();
     if (!globalStore.isXpackEE) {
         const res = await getLicenseStatus();
         if (!res || !res.data) {
@@ -99,6 +104,7 @@ export async function loadProductProFromDB() {
 }
 
 export async function loadMasterProductProFromDB() {
+    const globalStore = getGlobalStore();
     if (!globalStore.isXpackEE) {
         const res = await getMasterLicenseStatus();
         if (!res || !res.data) {
@@ -120,6 +126,7 @@ export async function loadMasterProductProFromDB() {
 }
 
 export async function getXpackSettingForTheme() {
+    const globalStore = getGlobalStore();
     const res2 = await searchXpackSetting();
     if (res2) {
         globalStore.themeConfig.title = res2.data?.title;

@@ -2,6 +2,9 @@ import router from '@/routers/router';
 import NProgress from '@/config/nprogress';
 import { GlobalStore } from '@/store';
 import { AxiosCanceler } from '@/api/helper/axios-cancel';
+import { hasPermission } from '@/utils/rbac';
+import i18n from '@/lang';
+import { MsgError } from '@/utils/message';
 
 const axiosCanceler = new AxiosCanceler();
 
@@ -62,6 +65,16 @@ router.beforeEach((to, from, next) => {
         return;
     }
 
+    const requiredPermission = [...to.matched].reverse().find((record) => record.meta?.permission)?.meta?.permission as
+        | string
+        | undefined;
+    if (requiredPermission && !hasPermission(requiredPermission)) {
+        MsgError(i18n.global.t('commons.res.forbidden'));
+        next(false);
+        NProgress.done();
+        return;
+    }
+
     if (!to.matched.some((record) => record.meta.requiresAuth)) return next();
 
     return next();
@@ -96,19 +109,46 @@ const xpackEEJumper = (to: any, next: any) => {
     switch (to.name) {
         case 'Panel':
         case 'Safe':
+        case 'Alert':
+            if (hasPermission('setting_view')) {
+                return false;
+            }
+            MsgError(i18n.global.t('commons.res.forbidden'));
+            next(false);
+            NProgress.done();
+            return true;
         case 'License':
-            next({
-                name: 'Alert',
-            });
+            if (hasPermission('setting_view')) {
+                return false;
+            }
+            MsgError(i18n.global.t('commons.res.forbidden'));
+            next(false);
             NProgress.done();
             return true;
         case 'Node':
         case 'SimpleNode':
         case 'NodeAppUpgrade':
+            if (hasPermission('node_view')) {
+                return false;
+            }
+            MsgError(i18n.global.t('commons.res.forbidden'));
+            next(false);
+            NProgress.done();
+            return true;
         case 'UserXpackEEUser':
-            next({
-                name: 'NodeDashboard',
-            });
+            if (hasPermission('setting_view')) {
+                return false;
+            }
+            MsgError(i18n.global.t('commons.res.forbidden'));
+            next(false);
+            NProgress.done();
+            return true;
+        case 'XpackEERole':
+            if (hasPermission('setting_view')) {
+                return false;
+            }
+            MsgError(i18n.global.t('commons.res.forbidden'));
+            next(false);
             NProgress.done();
             return true;
     }

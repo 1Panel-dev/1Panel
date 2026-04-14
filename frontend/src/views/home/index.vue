@@ -244,8 +244,8 @@
                                                 baseInfo.prettyDistro
                                                     ? baseInfo.prettyDistro
                                                     : baseInfo.platformVersion
-                                                      ? baseInfo.platform + '-' + baseInfo.platformVersion
-                                                      : baseInfo.platform
+                                                    ? baseInfo.platform + '-' + baseInfo.platformVersion
+                                                    : baseInfo.platform
                                             }}
                                         </el-descriptions-item>
                                         <el-descriptions-item
@@ -865,8 +865,8 @@ const handleCopy = () => {
         (baseInfo.value.prettyDistro
             ? baseInfo.value.prettyDistro
             : baseInfo.value.platformVersion
-              ? baseInfo.value.platform + '-' + baseInfo.value.platformVersion
-              : baseInfo.value.platform) +
+            ? baseInfo.value.platform + '-' + baseInfo.value.platformVersion
+            : baseInfo.value.platform) +
         '\n' +
         i18n.global.t('home.kernelVersion') +
         ': ' +

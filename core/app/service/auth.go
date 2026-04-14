@@ -142,7 +142,7 @@ func (u *AuthService) generateSession(c *gin.Context, name string) (*dto.UserLog
 		return nil, err
 	}
 
-	sessionUser := psession.SessionUser{Name: name, Role: "ADMIN"}
+	sessionUser := psession.SessionUser{ID: psession.SuperAdminSessionUserID, Name: name, Role: "ADMIN"}
 	lifeTime = xpack.LoadSessionTimeout(sessionUser, lifeTime)
 	if err := global.SESSION.SetFresh(c, sessionUser, httpsSetting.Value == constant.StatusEnable, lifeTime); err != nil {
 		return nil, err

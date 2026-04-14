@@ -49,6 +49,8 @@ AppInstallCheck: '檢查應用安裝環境'
 
 #backup
 ErrBackupInUsed: "該備份帳號已在排程任務中使用，無法刪除"
+ErrRolePresetCannotDelete: "系統預設角色，無法刪除"
+ErrRoleBoundToUser: "角色已被使用者綁定，無法刪除"
 ErrBackupCheck: "備份帳號測試連線失敗 {{ .err }}"
 ErrBackupLocal: "本機伺服器備份帳號暫不支援該操作！"
 ErrBackupPublic: "偵測到該備份帳號為非公用，請檢查後再試。"

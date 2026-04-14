@@ -49,6 +49,9 @@ export namespace Login {
         id: number;
         name: string;
         role: string;
+        permissions: string[];
+        nodeScopes: number[];
+        nodeRoles: Array<{ nodeId: number; nodeName: string; roleId: number; roleName: string }>;
     }
     export interface AuthInfoUpdate {
         id: number;

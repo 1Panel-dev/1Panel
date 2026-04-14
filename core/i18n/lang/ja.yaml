@@ -49,6 +49,8 @@ AppInstallCheck: 'アプリケーションインストール環境を確認'
 
 # backup
 ErrBackupInUsed: 'バックアップアカウントがスケジュールで使用中'
+ErrRolePresetCannotDelete: "System preset roles cannot be deleted"
+ErrRoleBoundToUser: "This role is already bound to users and cannot be deleted"
 ErrBackupCheck: '接続テストに失敗しました: {{ .err }}'
 ErrBackupLocal: "ローカルサーバーバックアップアカウントはこの操作をサポートしていません！"
 ErrBackupPublic: "このバックアップアカウントが公開されていないと検出されました。再確認してください！"

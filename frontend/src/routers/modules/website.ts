@@ -19,6 +19,7 @@ const webSiteRouter = {
                 icon: 'p-website',
                 title: 'menu.website',
                 requiresAuth: false,
+                permission: 'website_view',
             },
         },
         {
@@ -41,6 +42,7 @@ const webSiteRouter = {
                 icon: 'p-ssl-menu',
                 title: 'menu.ssl',
                 requiresAuth: false,
+                permission: 'website_cert_view',
             },
         },
         {
@@ -53,6 +55,7 @@ const webSiteRouter = {
                 detail: 'PHP',
                 activeMenu: '/websites/runtimes/php',
                 requiresAuth: false,
+                permission: 'website_runtime_view',
             },
         },
         {
@@ -65,6 +68,7 @@ const webSiteRouter = {
                 detail: 'Node',
                 activeMenu: '/websites/runtimes/php',
                 requiresAuth: false,
+                permission: 'website_runtime_view',
             },
         },
         {
@@ -77,6 +81,7 @@ const webSiteRouter = {
                 detail: 'Java',
                 activeMenu: '/websites/runtimes/php',
                 requiresAuth: false,
+                permission: 'website_runtime_view',
             },
         },
         {
@@ -89,6 +94,7 @@ const webSiteRouter = {
                 detail: 'Go',
                 activeMenu: '/websites/runtimes/php',
                 requiresAuth: false,
+                permission: 'website_runtime_view',
             },
         },
         {
@@ -101,6 +107,7 @@ const webSiteRouter = {
                 detail: 'Python',
                 activeMenu: '/websites/runtimes/php',
                 requiresAuth: false,
+                permission: 'website_runtime_view',
             },
         },
         {
@@ -113,6 +120,7 @@ const webSiteRouter = {
                 detail: '.Net',
                 activeMenu: '/websites/runtimes/php',
                 requiresAuth: false,
+                permission: 'website_runtime_view',
             },
         },
     ],

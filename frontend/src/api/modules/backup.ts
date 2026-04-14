@@ -5,7 +5,7 @@ import { ResPage } from '../interface';
 import { Backup } from '../interface/backup';
 import { TimeoutEnum } from '@/enums/http-enum';
 import { GlobalStore } from '@/store';
-const globalStore = GlobalStore();
+const getGlobalStore = () => GlobalStore();
 
 // backup-agent
 export const getLocalBackupDir = (node?: string) => {
@@ -16,6 +16,7 @@ export const searchBackup = (params: Backup.SearchWithType) => {
     return http.post<ResPage<Backup.BackupInfo>>(`/backups/search`, params);
 };
 export const checkBackup = (params: Backup.BackupOperate) => {
+    const globalStore = getGlobalStore();
     let request = deepCopy(params) as Backup.BackupOperate;
     encodeBase64Fields(request, ['accessKey', 'credential']);
     if (!params.isPublic || !globalStore.isProductPro) {
@@ -24,6 +25,7 @@ export const checkBackup = (params: Backup.BackupOperate) => {
     return http.post<Backup.CheckResult>(`/backups/conn/check`, request);
 };
 export const listBucket = (params: Backup.ForBucket) => {
+    const globalStore = getGlobalStore();
     let request = deepCopy(params) as Backup.BackupOperate;
     encodeBase64Fields(request, ['accessKey', 'credential']);
     if (!params.isPublic || !globalStore.isProductPro) {
