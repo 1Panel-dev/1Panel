@@ -165,6 +165,9 @@ func (h *HostRepo) SaveFirewallRecord(firewall *model.Firewall) error {
 			firewall.Strategy,
 		).First(&data).Error
 	}
+	if data.ID != 0 {
+		firewall.ID = data.ID
+	}
 	return global.DB.Save(firewall).Error
 }
 
