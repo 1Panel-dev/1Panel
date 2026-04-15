@@ -379,6 +379,17 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 				req     request.AppInstallCreate
 				install *model.AppInstall
 			)
+			appDetail, err := appDetailRepo.GetFirst(repo.WithByID(create.AppInstall.AppDetailId))
+			if err != nil {
+				return err
+			}
+			app, err := appRepo.GetFirst(repo.WithByID(appDetail.AppId))
+			if err != nil {
+				return err
+			}
+			if isAgentAppKey(app.Key) {
+				return fmt.Errorf("%s does not support website deployment", app.Key)
+			}
 			req.Name = create.AppInstall.Name
 			req.AppDetailId = create.AppInstall.AppDetailId
 			req.Params = create.AppInstall.Params

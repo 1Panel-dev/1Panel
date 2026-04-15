@@ -386,6 +386,10 @@ func buildAgentItem(agent *model.Agent, appInstall *model.AppInstall, envMap map
 	return item
 }
 
+func isAgentAppKey(appKey string) bool {
+	return appKey == constant.AppOpenclaw || appKey == constant.AppCopaw || appKey == constant.AppHermesAgent
+}
+
 func isOpenclawLegacyHTTPVersion(version string) bool {
 	return !common.CompareAppVersion(version, openclawHTTPSVersion)
 }
