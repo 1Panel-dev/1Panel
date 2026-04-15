@@ -327,6 +327,21 @@ export namespace AI {
         fallbacks: string[];
     }
 
+    export interface AgentHermesChatSessionItem {
+        id: string;
+        title: string;
+        model: string;
+        messageCount: number;
+        startedAt: string;
+        lastActive: string;
+    }
+
+    export interface AgentHermesChatSessionRenameReq {
+        agentId: number;
+        id: string;
+        title: string;
+    }
+
     export interface AgentOverviewReq {
         agentId: number;
     }

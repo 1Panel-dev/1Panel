@@ -130,6 +130,14 @@ export const updateAgentModelConfig = (req: AI.AgentModelConfigUpdateReq) => {
     return http.post(`/ai/agents/model/update`, req);
 };
 
+export const getAgentHermesChatSessions = (req: AI.AgentIDReq) => {
+    return http.post<AI.AgentHermesChatSessionItem[]>(`/ai/agents/hermes/chat/sessions`, req);
+};
+
+export const renameAgentHermesChatSession = (req: AI.AgentHermesChatSessionRenameReq) => {
+    return http.post(`/ai/agents/hermes/chat/sessions/rename`, req);
+};
+
 export const getAgentOverview = (req: AI.AgentOverviewReq) => {
     return http.post<AI.AgentOverview>(`/ai/agents/overview`, req, TimeoutEnum.T_5M);
 };

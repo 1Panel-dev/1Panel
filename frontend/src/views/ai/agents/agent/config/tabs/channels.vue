@@ -164,7 +164,7 @@ const openHermesWeixinTerminal = () => {
         title: `${t('aiTools.agents.agent')} ${props.agentName}`,
         users: ['hermes', 'root'],
         shell: '/bin/bash',
-        initCmd: 'source /opt/hermes/.venv/bin/activate\ncd /opt/data/workspace\nhermes gateway setup\n',
+        initCmd: 'hermes gateway setup\n',
     });
 };
 
