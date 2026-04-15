@@ -196,6 +196,7 @@
         <AppUpgrade ref="upgradeRef" @close="search" />
         <ComposeLogs ref="composeLogRef" />
         <AgentTerminalDialog ref="dialogTerminalRef" />
+        <HermesChatDialog ref="hermesChatRef" />
         <PortJumpDialog ref="dialogPortJumpRef" />
     </div>
 </template>
@@ -223,6 +224,7 @@ import AppUpgrade from '@/views/app-store/installed/upgrade/index.vue';
 import TaskLog from '@/components/log/task/index.vue';
 import ComposeLogs from '@/components/log/compose/index.vue';
 import AgentTerminalDialog from '@/views/ai/agents/agent/components/terminal.vue';
+import HermesChatDialog from '@/views/ai/agents/agent/components/hermes-chat.vue';
 import i18n from '@/lang';
 import PortJumpDialog from '@/components/port-jump/index.vue';
 import DockerStatus from '@/views/container/docker-status/index.vue';
@@ -251,6 +253,7 @@ const bindWebsiteRef = ref();
 const upgradeRef = ref();
 const composeLogRef = ref();
 const dialogTerminalRef = ref();
+const hermesChatRef = ref();
 const dialogPortJumpRef = ref();
 const route = useRoute();
 const router = useRouter();
@@ -275,6 +278,11 @@ const buttons = [
         click: (row: AI.AgentItem) => openConfig(row),
         show: (row: AI.AgentItem) => supportsAgentModelConfig(row.agentType),
         disabled: (row: AI.AgentItem) => row.status !== 'Running',
+    },
+    {
+        label: i18n.global.t('aiTools.agents.hermesChatAction'),
+        click: (row: AI.AgentItem) => openHermesChat(row),
+        show: (row: AI.AgentItem) => row.agentType === 'hermes-agent' && row.status === 'Running',
     },
     {
         label: i18n.global.t('menu.terminal'),
@@ -464,18 +472,29 @@ const openTerminal = (row: AI.AgentItem) => {
         title,
         users: row.agentType === 'hermes-agent' ? ['hermes', 'root'] : ['node', 'root'],
         shell: '/bin/bash',
-        initCmd:
-            row.agentType === 'hermes-agent' ? 'source /opt/hermes/.venv/bin/activate\ncd /opt/data/workspace\n' : '',
+        initCmd: '',
+    });
+};
+
+const openHermesChat = (row: AI.AgentItem) => {
+    hermesChatRef.value?.acceptParams({
+        agentId: row.id,
+        containerID: row.containerName,
+        title: i18n.global.t('aiTools.agents.hermesChatDialogTitle', [row.name]),
     });
 };
 
 const handleConfigRestartRequired = async (installId: number) => {
     try {
-        await ElMessageBox.confirm(t('aiTools.agents.configFileRestartHelper'), t('database.restartNow'), {
-            confirmButtonText: t('database.restartNow'),
-            cancelButtonText: t('commons.button.cancel'),
-            type: 'info',
-        });
+        await ElMessageBox.confirm(
+            i18n.global.t('aiTools.agents.configFileRestartHelper'),
+            i18n.global.t('database.restartNow'),
+            {
+                confirmButtonText: i18n.global.t('database.restartNow'),
+                cancelButtonText: i18n.global.t('commons.button.cancel'),
+                type: 'info',
+            },
+        );
         await restartInstall(installId);
     } catch {}
 };

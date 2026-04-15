@@ -13,6 +13,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/gin-gonic/gin"
 
@@ -576,7 +577,7 @@ func (a AppService) installWithHooks(req request.AppInstallCreate, executeScript
 		_ = appInstallRepo.Save(context.Background(), appInstall)
 	}
 
-	installTask.AddSubTask(task.GetTaskName(appInstall.Name, task.TaskInstall, task.TaskScopeApp), installApp, handleAppStatus)
+	installTask.AddSubTaskWithOps(task.GetTaskName(appInstall.Name, task.TaskInstall, task.TaskScopeApp), installApp, handleAppStatus, 0, time.Hour)
 
 	go func() {
 		if taskErr := installTask.Execute(); taskErr != nil {

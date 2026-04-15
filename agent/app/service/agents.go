@@ -38,6 +38,8 @@ type IAgentService interface {
 	BindWebsite(req dto.AgentWebsiteBindReq) error
 	GetModelConfig(req dto.AgentIDReq) (*dto.AgentModelConfig, error)
 	UpdateModelConfig(req dto.AgentModelConfigUpdateReq) error
+	GetHermesChatSessions(req dto.AgentIDReq) ([]dto.AgentHermesChatSessionItem, error)
+	RenameHermesChatSession(req dto.AgentHermesChatSessionRenameReq) error
 	GetOverview(req dto.AgentOverviewReq) (*dto.AgentOverview, error)
 	GetProviders() ([]dto.ProviderInfo, error)
 	GetSecurityConfig(req dto.AgentIDReq) (*dto.AgentSecurityConfig, error)

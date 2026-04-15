@@ -555,15 +555,6 @@ func extractHermesEnvBool(envMap map[string]string, key string, defaultValue boo
 	return strings.EqualFold(value, "true")
 }
 
-func buildHermesPairingApproveCommand(containerName string, channel string, pairingCode string) string {
-	return fmt.Sprintf(
-		"docker exec -u hermes -e HOME=/opt/data/home -e HERMES_HOME=/opt/data %s /opt/hermes/.venv/bin/hermes pairing approve %s %q",
-		containerName,
-		channel,
-		pairingCode,
-	)
-}
-
 func validateHermesPairingApproveOutput(output string) error {
 	text := strings.TrimSpace(output)
 	if text == "" {

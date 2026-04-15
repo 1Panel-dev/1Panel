@@ -91,12 +91,27 @@ type AgentModelConfig struct {
 	Fallbacks []string `json:"fallbacks"`
 }
 
+type AgentHermesChatSessionItem struct {
+	ID           string `json:"id"`
+	Title        string `json:"title"`
+	Model        string `json:"model"`
+	MessageCount int64  `json:"messageCount"`
+	StartedAt    string `json:"startedAt"`
+	LastActive   string `json:"lastActive"`
+}
+
 type AgentOverviewReq struct {
 	AgentID uint `json:"agentId" validate:"required"`
 }
 
 type AgentIDReq struct {
 	AgentID uint `json:"agentId" validate:"required"`
+}
+
+type AgentHermesChatSessionRenameReq struct {
+	AgentID uint   `json:"agentId" validate:"required"`
+	ID      string `json:"id" validate:"required"`
+	Title   string `json:"title" validate:"required"`
 }
 
 type AgentOverview struct {

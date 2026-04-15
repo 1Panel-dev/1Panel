@@ -215,6 +215,47 @@ func (b *BaseApi) GetAgentOverview(c *gin.Context) {
 }
 
 // @Tags AI
+// @Summary Get Hermes chat sessions
+// @Accept json
+// @Param request body dto.AgentIDReq true "request"
+// @Success 200 {array} dto.AgentHermesChatSessionItem
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/hermes/chat/sessions [post]
+func (b *BaseApi) GetHermesChatSessions(c *gin.Context) {
+	var req dto.AgentIDReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	res, err := agentService.GetHermesChatSessions(req)
+	if err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.SuccessWithData(c, res)
+}
+
+// @Tags AI
+// @Summary Rename Hermes chat session
+// @Accept json
+// @Param request body dto.AgentHermesChatSessionRenameReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/hermes/chat/sessions/rename [post]
+func (b *BaseApi) RenameHermesChatSession(c *gin.Context) {
+	var req dto.AgentHermesChatSessionRenameReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := agentService.RenameHermesChatSession(req); err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags AI
 // @Summary Get Providers
 // @Success 200 {array} dto.ProviderInfo
 // @Security ApiKeyAuth
