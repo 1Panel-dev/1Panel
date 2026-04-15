@@ -86,6 +86,8 @@ var WebUrlMap = map[string]struct{}{
 	"/databases":                   {},
 	"/databases/mysql":             {},
 	"/databases/mysql/remote":      {},
+	"/databases/mongodb":           {},
+	"/databases/mongodb/remote":    {},
 	"/databases/postgresql":        {},
 	"/databases/postgresql/remote": {},
 	"/databases/redis":             {},
