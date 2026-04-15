@@ -36,7 +36,10 @@ func (a AgentService) RenameHermesChatSession(req dto.AgentHermesChatSessionRena
 		return fmt.Errorf("%s does not support", agent.AgentType)
 	}
 
-	_, err = cmd.RunDefaultWithStdoutBashC(buildHermesSessionRenameCommand(install.ContainerName, req.ID, req.Title))
+	_, err = cmd.NewCommandMgr(cmd.WithTimeout(20*time.Second)).RunWithStdout(
+		"docker",
+		buildHermesDockerExecArgs(install.ContainerName, "sessions", "rename", req.ID, req.Title)...,
+	)
 	return err
 }
 
@@ -106,11 +109,7 @@ func formatHermesSessionTimestamp(value sql.NullFloat64) string {
 	return time.Unix(int64(seconds), int64(fraction*float64(time.Second))).UTC().Format(time.RFC3339)
 }
 
-func buildHermesSessionRenameCommand(containerName string, sessionID string, title string) string {
-	return fmt.Sprintf(
-		"docker exec -u hermes -e HOME=/opt/data/home -e HERMES_HOME=/opt/data %s hermes sessions rename %q %q",
-		containerName,
-		sessionID,
-		title,
-	)
+func buildHermesDockerExecArgs(containerName string, hermesArgs ...string) []string {
+	args := []string{"exec", "-u", "hermes", containerName, "hermes"}
+	return append(args, hermesArgs...)
 }

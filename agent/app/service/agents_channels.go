@@ -505,7 +505,10 @@ func (a AgentService) ApproveChannelPairing(req dto.AgentChannelPairingApproveRe
 		return err
 	}
 	if agent.AgentType == constant.AppHermesAgent {
-		output, err := cmd.RunDefaultWithStdoutBashC(buildHermesPairingApproveCommand(install.ContainerName, req.Type, req.PairingCode))
+		output, err := cmd.NewCommandMgr(cmd.WithTimeout(20*time.Second)).RunWithStdout(
+			"docker",
+			buildHermesDockerExecArgs(install.ContainerName, "pairing", "approve", req.Type, req.PairingCode)...,
+		)
 		if err != nil {
 			return err
 		}
