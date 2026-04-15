@@ -103,5 +103,6 @@ export namespace Backup {
         file: string;
         secret: string;
         taskID: string;
+        dropAllCollections?: boolean;
     }
 }

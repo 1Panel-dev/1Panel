@@ -615,6 +615,9 @@ const message = {
         redisCliHelper: '未偵測到 redis-cli 服務，請先啟用服務',
         redisQuickCmd: 'Redis 快速指令',
         recoverHelper: '即將使用 [{0}] 對資料進行覆蓋，是否繼續？',
+        mongodbRecoverDropAllCollections: '復原前清空目前資料庫',
+        mongodbRecoverDropAllCollectionsHelper:
+            '預設僅覆蓋既有集合，保留新增集合；啟用後將清空目前資料庫，並依備份內容復原。',
         submitIt: '覆蓋資料',
         baseConf: '基本設定',
         allConf: '全部設定',

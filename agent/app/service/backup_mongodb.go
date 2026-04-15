@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"io"
 	"net/url"
 	"os"
 	"os/exec"
@@ -26,6 +27,8 @@ import (
 	dockerImage "github.com/docker/docker/api/types/image"
 	dockerClient "github.com/docker/docker/client"
 )
+
+const opensslSaltedHeader = "Salted__"
 
 func (u *BackupService) MongodbBackup(req dto.CommonBackup) error {
 	timeNow := time.Now().Format(constant.DateTimeSlimLayout)
@@ -123,15 +126,11 @@ func handleMongodbRecover(req dto.CommonRecover, parentTask *task.Task, isRollba
 			return buserr.WithName("ErrFileNotFound", req.File)
 		}
 
-		restoreFile := req.File
-		if len(req.Secret) != 0 {
-			if err := files.OpensslDecrypt(req.File, req.Secret); err != nil {
-				return err
-			}
-			restoreFile = path.Join(path.Dir(req.File), "tmp_"+path.Base(req.File))
-			defer os.Remove(restoreFile)
-			t.LogWithStatus(i18n.GetMsgByKey("Decrypt"), nil)
+		restoreFile, cleanup, err := prepareMongodbBackupFileForRestore(req.File, req.Secret, t)
+		if err != nil {
+			return err
 		}
+		defer cleanup()
 
 		isOk := false
 		if !isRollback {
@@ -153,6 +152,12 @@ func handleMongodbRecover(req dto.CommonRecover, parentTask *task.Task, isRollba
 				}
 				_ = os.RemoveAll(rollbackFile)
 			}()
+		}
+
+		if req.DropAllCollections {
+			if err := clearMongodbDatabase(req.Name, req.Type, req.DetailName, t); err != nil {
+				return err
+			}
 		}
 
 		if err := doMongodbRestore(req.Name, req.Type, req.DetailName, restoreFile, t); err != nil {
@@ -272,6 +277,93 @@ func doMongodbRestore(database, dbType, dbName, sourceFile string, taskItem *tas
 		"--drop",
 	); err != nil {
 		return err
+	}
+	return nil
+}
+
+func prepareMongodbBackupFileForRestore(filePath, secret string, taskItem *task.Task) (string, func(), error) {
+	isEncrypted, err := isOpenSSLEncryptedMongodbBackup(filePath)
+	if err != nil {
+		return "", nil, err
+	}
+	if !isEncrypted {
+		return filePath, func() {}, nil
+	}
+
+	if secret == "" {
+		return "", nil, buserr.New("ErrBadDecrypt")
+	}
+
+	if err := files.OpensslDecrypt(filePath, secret); err != nil {
+		return "", nil, err
+	}
+
+	restoreFile := path.Join(path.Dir(filePath), "tmp_"+path.Base(filePath))
+	taskItem.LogWithStatus(i18n.GetMsgByKey("Decrypt"), nil)
+	return restoreFile, func() { _ = os.Remove(restoreFile) }, nil
+}
+
+func isOpenSSLEncryptedMongodbBackup(filePath string) (bool, error) {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return false, err
+	}
+	defer file.Close()
+
+	header := make([]byte, len(opensslSaltedHeader))
+	n, err := io.ReadFull(file, header)
+	if err != nil {
+		if err == io.EOF || err == io.ErrUnexpectedEOF {
+			return false, nil
+		}
+		return false, err
+	}
+	return n == len(opensslSaltedHeader) && string(header) == opensslSaltedHeader, nil
+}
+
+func clearMongodbDatabase(database, dbType, dbName string, taskItem *task.Task) error {
+	dbItem, err := mongodbRepo.Get(repo.WithByName(dbName), mongodbRepo.WithByMongodbName(database))
+	if err == nil && dbItem.From == constant.AppResourceRemote {
+		return clearRemoteMongodbDatabase(database, dbName, taskItem)
+	}
+
+	appInfo, err := appInstallRepo.LoadBaseInfo(dbType, database)
+	if err != nil {
+		return err
+	}
+	if appInfo.ContainerName == "" {
+		return fmt.Errorf("mongodb container not found for database %s", database)
+	}
+
+	logRemoteMongodbStep(taskItem, fmt.Sprintf("clear local mongodb database %s before restore", dbName))
+	uri := buildMongodbRestoreURI(appInfo.UserName, appInfo.Password)
+	return mongodbCmdMgr(taskItem).Run(
+		"docker",
+		"exec",
+		appInfo.ContainerName,
+		"mongosh",
+		uri,
+		"--quiet",
+		"--eval",
+		fmt.Sprintf(`db.getSiblingDB(%q).dropDatabase()`, dbName),
+	)
+}
+
+func clearRemoteMongodbDatabase(database, dbName string, taskItem *task.Task) error {
+	info, err := loadRemoteMongodbConnection(database)
+	if err != nil {
+		return err
+	}
+	client, ctx, cancel, err := newRemoteMongodbClient(info)
+	if err != nil {
+		return err
+	}
+	defer cancel()
+	defer client.Disconnect(context.Background())
+
+	logRemoteMongodbStep(taskItem, fmt.Sprintf("clear remote mongodb database %s before restore", dbName))
+	if err := client.Database(dbName).Drop(ctx); err != nil {
+		return fmt.Errorf("drop mongodb database %s failed, err: %v", dbName, err)
 	}
 	return nil
 }
@@ -444,6 +536,9 @@ func loadMongodbBackupDBName(sourceFile, defaultDB string) string {
 	if strings.HasSuffix(baseName, ".gz") {
 		baseName = strings.TrimSuffix(baseName, ".gz")
 	}
+	// Encrypted backups are restored from a decrypted temp file like tmp_<original>.
+	// Strip the temp prefix before deriving the original database name.
+	baseName = strings.TrimPrefix(baseName, "tmp_")
 	patterns := []*regexp.Regexp{
 		regexp.MustCompile(`^1panel_mongodb_(.+)_\d{14}[A-Za-z0-9]*$`),
 		regexp.MustCompile(`^db_(.+)_\d{14}[A-Za-z0-9]*$`),

@@ -77,15 +77,16 @@ type CommonBackup struct {
 	Description string `json:"description"`
 }
 type CommonRecover struct {
-	DownloadAccountID uint   `json:"downloadAccountID" validate:"required"`
-	Type              string `json:"type" validate:"required,oneof=app mysql mariadb redis website postgresql mongodb mysql-cluster postgresql-cluster redis-cluster container compose"`
-	Name              string `json:"name"`
-	DetailName        string `json:"detailName"`
-	File              string `json:"file"`
-	Secret            string `json:"secret"`
-	TaskID            string `json:"taskID"`
-	BackupRecordID    uint   `json:"backupRecordID"`
-	Timeout           int    `json:"timeout"`
+	DownloadAccountID  uint   `json:"downloadAccountID" validate:"required"`
+	Type               string `json:"type" validate:"required,oneof=app mysql mariadb redis website postgresql mongodb mysql-cluster postgresql-cluster redis-cluster container compose"`
+	Name               string `json:"name"`
+	DetailName         string `json:"detailName"`
+	File               string `json:"file"`
+	Secret             string `json:"secret"`
+	DropAllCollections bool   `json:"dropAllCollections"`
+	TaskID             string `json:"taskID"`
+	BackupRecordID     uint   `json:"backupRecordID"`
+	Timeout            int    `json:"timeout"`
 }
 
 type RecordSearch struct {

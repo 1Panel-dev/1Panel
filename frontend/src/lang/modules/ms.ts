@@ -652,6 +652,9 @@ const message = {
         redisCliHelper: '"redis-cli" perkhidmatan tidak dikesan. Aktifkan perkhidmatan terlebih dahulu.',
         redisQuickCmd: 'Arahan pantas Redis',
         recoverHelper: 'Ini akan menimpa data dengan [{0}]. Adakah anda mahu meneruskan?',
+        mongodbRecoverDropAllCollections: 'Kosongkan pangkalan data semasa sebelum pemulihan',
+        mongodbRecoverDropAllCollectionsHelper:
+            'Secara lalai, hanya koleksi sedia ada akan ditulis ganti dan koleksi baharu akan dikekalkan. Apabila diaktifkan, pangkalan data semasa akan dikosongkan dan kemudian dipulihkan daripada sandaran.',
         submitIt: 'Tindih data',
         baseConf: 'Asas',
         allConf: 'Semua',

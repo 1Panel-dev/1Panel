@@ -647,6 +647,9 @@ const message = {
         redisCliHelper: '"redis-cli" servisi algılanmadı. Önce servisi etkinleştirin.',
         redisQuickCmd: 'Redis hızlı komutları',
         recoverHelper: 'Bu işlem verileri [{0}] ile üzerine yazacak. Devam etmek istiyor musunuz?',
+        mongodbRecoverDropAllCollections: 'Geri yüklemeden önce mevcut veritabanını temizle',
+        mongodbRecoverDropAllCollectionsHelper:
+            'Varsayılan olarak yalnızca mevcut koleksiyonların üzerine yazılır ve yeni eklenen koleksiyonlar korunur. Etkinleştirildiğinde mevcut veritabanı temizlenir ve ardından yedekten geri yüklenir.',
         submitIt: 'Verilerin üzerine yaz',
         baseConf: 'Temel',
         allConf: 'Tümü',

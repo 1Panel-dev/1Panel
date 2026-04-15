@@ -645,6 +645,9 @@ const message = {
         redisCliHelper: '「Redis-Cli」サービスは検出されません。最初にサービスを有効にします。',
         redisQuickCmd: 'Redis Quickコマンド',
         recoverHelper: 'これにより、[{0}]でデータが上書きされます。続けたいですか？',
+        mongodbRecoverDropAllCollections: '復元前に現在のデータベースを空にする',
+        mongodbRecoverDropAllCollectionsHelper:
+            '既定では既存のコレクションのみを上書きし、新しく追加されたコレクションは保持します。有効にすると、現在のデータベースを空にしてからバックアップ内容で復元します。',
         submitIt: 'データを上書きします',
         baseConf: '基本',
         allConf: '全て',
