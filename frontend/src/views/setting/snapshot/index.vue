@@ -231,7 +231,9 @@ import {
     updateSnapshotDescription,
 } from '@/api/modules/setting';
 import { onMounted, reactive, ref } from 'vue';
-import { computeSize, dateFormat, newUUID } from '@/utils/util';
+import { computeSize } from '@/utils/size';
+import { dateFormat } from '@/utils/date';
+import { newUUID } from '@/utils/id';
 import { ElForm } from 'element-plus';
 import i18n from '@/lang';
 import { Setting } from '@/api/interface/setting';

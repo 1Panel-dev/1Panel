@@ -39,6 +39,15 @@
                                 @change="updateConfig('UpgradeBackup', config.upgradeBackup)"
                             />
                         </el-form-item>
+                        <el-form-item :label="$t('app.installAllowPort')" prop="installAllowPort">
+                            <el-switch
+                                v-model="config.installAllowPort"
+                                active-value="Enable"
+                                inactive-value="Disable"
+                                :loading="loading"
+                                @change="updateConfig('InstallAllowPort', config.installAllowPort)"
+                            />
+                        </el-form-item>
                         <CustomSetting v-if="isProductPro" />
                         <span class="input-help logText" v-else>
                             {{ $t('xpack.customApp.licenseHelper') }}
@@ -62,22 +71,17 @@ import { MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
 import { defineAsyncComponent } from 'vue';
 import { useGlobalStore } from '@/composables/useGlobalStore';
+import { loadOptionalComponent } from '@/extensions/optional';
 const { isProductPro, isMasterProductPro } = useGlobalStore();
 
-const CustomSetting = defineAsyncComponent(async () => {
-    const modules = import.meta.glob('@/xpack/views/appstore/index.vue');
-    const loader = modules['/src/xpack/views/appstore/index.vue'];
-    if (loader) {
-        return ((await loader()) as any).default;
-    }
-    return { template: '<div></div>' };
-});
+const CustomSetting = defineAsyncComponent(() => loadOptionalComponent('/src/xpack/views/appstore/index.vue'));
 
 const rules = ref<FormRules>({});
 const config = ref({
     uninstallDeleteImage: '',
     uninstallDeleteBackup: '',
     upgradeBackup: '',
+    installAllowPort: '',
 });
 const loading = ref(false);
 const configForm = ref();

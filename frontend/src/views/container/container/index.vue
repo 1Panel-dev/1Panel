@@ -418,7 +418,8 @@ import { MsgSuccess, MsgWarning } from '@/utils/message';
 import { GlobalStore } from '@/store';
 import { routerToName, routerToNameWithQuery } from '@/utils/router';
 import router from '@/routers';
-import { computeSize2, computeSizeForDocker, computeCPU, newUUID } from '@/utils/util';
+import { computeSize2, computeSizeForDocker, computeCPU } from '@/utils/size';
+import { newUUID } from '@/utils/id';
 import { updateCommonDescription } from '@/api/modules/setting';
 const globalStore = GlobalStore();
 
@@ -677,9 +678,19 @@ const onTerminal = (row: any) => {
     dialogTerminalRef.value!.acceptParams({ containerID: row.containerID, title: title });
 };
 const dialogFileBrowserRef = ref();
-const onOpenFileBrowser = (row: any) => {
+const onOpenFileBrowser = async (row: any) => {
     const title = i18n.global.t('menu.container') + ' ' + row.name;
-    dialogFileBrowserRef.value!.acceptParams({ containerID: row.containerID, title: title });
+    let workingDir = '/';
+    try {
+        const res = await inspect({ id: row.containerID, type: 'container', detail: '' });
+        const data = typeof res.data === 'string' ? JSON.parse(res.data) : res.data;
+        if (data?.Config?.WorkingDir) {
+            workingDir = data.Config.WorkingDir;
+        }
+    } catch (e) {
+        /* fallback to root */
+    }
+    dialogFileBrowserRef.value!.acceptParams({ containerID: row.containerID, title: title, workingDir: workingDir });
 };
 
 const onInspect = async (row: any) => {

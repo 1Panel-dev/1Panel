@@ -36,7 +36,6 @@ import Collapse from './components/Collapse.vue';
 import SubItem from './components/SubItem.vue';
 import { menuList } from '@/routers/router';
 import { GlobalStore, MenuStore } from '@/store';
-import { isString } from '@vueuse/core';
 import { getSettingInfo } from '@/api/modules/setting';
 import PrimaryMenu from '@/assets/images/menu-bg.svg?component';
 
@@ -47,7 +46,7 @@ const version = ref();
 
 const activeMenu = computed(() => {
     const { meta, path } = route;
-    return isString(meta.activeMenu) ? meta.activeMenu : path;
+    return typeof meta.activeMenu === 'string' ? meta.activeMenu : path;
 });
 const isCollapse = computed((): boolean => menuStore.isCollapse);
 
@@ -181,14 +180,14 @@ onMounted(() => {
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @use 'index';
 
 .background {
     z-index: 20;
 }
 
-.custom-menu .el-menu-item {
+.custom-menu :deep(.el-menu-item) {
     white-space: normal !important;
     word-break: break-word;
     overflow-wrap: break-word;

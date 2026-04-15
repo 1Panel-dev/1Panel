@@ -1,6 +1,6 @@
 module github.com/1Panel-dev/1Panel/core
 
-go 1.24.9
+go 1.25.7
 
 require (
 	github.com/1panel-dev/base64Captcha v1.3.8
@@ -14,8 +14,6 @@ require (
 	github.com/go-resty/resty/v2 v2.15.3
 	github.com/go-webauthn/webauthn v0.15.0
 	github.com/google/uuid v1.6.0
-	github.com/gorilla/securecookie v1.1.2
-	github.com/gorilla/sessions v1.4.0
 	github.com/gorilla/websocket v1.5.3
 	github.com/jinzhu/copier v0.4.0
 	github.com/nicksnyder/go-i18n/v2 v2.4.0
@@ -31,13 +29,12 @@ require (
 	github.com/spf13/viper v1.19.0
 	github.com/swaggo/files/v2 v2.0.2
 	github.com/swaggo/swag v1.16.3
-	github.com/wader/gormstore/v2 v2.0.3
 	github.com/xlzd/gotp v0.1.0
-	golang.org/x/crypto v0.45.0
-	golang.org/x/net v0.47.0
-	golang.org/x/sys v0.38.0
-	golang.org/x/term v0.37.0
-	golang.org/x/text v0.31.0
+	golang.org/x/crypto v0.48.0
+	golang.org/x/net v0.50.0
+	golang.org/x/sys v0.41.0
+	golang.org/x/term v0.40.0
+	golang.org/x/text v0.35.0
 	gopkg.in/yaml.v2 v2.4.0
 	gopkg.in/yaml.v3 v3.0.1
 	gorm.io/gorm v1.30.0
@@ -100,12 +97,11 @@ require (
 	go.uber.org/multierr v1.9.0 // indirect
 	golang.org/x/arch v0.8.0 // indirect
 	golang.org/x/exp v0.0.0-20250620022241-b7579e27df2b // indirect
-	golang.org/x/image v0.28.0 // indirect
-	golang.org/x/tools v0.38.0 // indirect
-	google.golang.org/protobuf v1.34.1 // indirect
+	golang.org/x/image v0.38.0 // indirect
+	golang.org/x/tools v0.42.0 // indirect
+	google.golang.org/protobuf v1.36.10 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
-	gorm.io/driver/sqlite v1.4.4 // indirect
 	modernc.org/libc v1.66.1 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.11.0 // indirect

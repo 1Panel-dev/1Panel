@@ -1,12 +1,6 @@
 <template>
     <div>
-        <el-dialog
-            v-model="dialogVisible"
-            :title="$t('file.existFileTitle')"
-            width="35%"
-            :close-on-click-modal="false"
-            :destroy-on-close="true"
-        >
+        <DialogPro v-model="dialogVisible" :title="$t('file.existFileTitle')" size="normal">
             <el-alert :show-icon="true" type="warning" :closable="false">
                 <div class="whitespace-break-spaces">
                     <span>{{ $t('file.existFileHelper') }}</span>
@@ -31,13 +25,12 @@
                     </el-button>
                 </span>
             </template>
-        </el-dialog>
+        </DialogPro>
     </div>
 </template>
 <script lang="ts" setup>
 import { ref } from 'vue';
-import { computeSize } from '@/utils/util';
-
+import { computeSize } from '@/utils/size';
 const dialogVisible = ref();
 const existFiles = ref<DialogProps[]>([]);
 

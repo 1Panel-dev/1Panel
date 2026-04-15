@@ -1,6 +1,5 @@
 <template>
     <div>
-        <RouterMenu />
         <LayoutContent>
             <template #leftToolBar>
                 <el-button type="primary" @click="openCreate">{{ $t('commons.button.create') }}</el-button>
@@ -17,8 +16,8 @@
                             {{ getAgentProviderDisplayName(row.provider, row.providerName) }}
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('aiTools.agents.baseUrl')" prop="baseUrl" min-width="200" />
-                    <el-table-column :label="$t('aiTools.agents.apiKey')" prop="apiKey" min-width="160">
+                    <el-table-column label="Base URL" prop="baseUrl" min-width="200" />
+                    <el-table-column label="API Key" prop="apiKey" min-width="160">
                         <template #default="{ row }">
                             {{ maskKey(row.apiKey) }}
                         </template>
@@ -36,11 +35,17 @@
                         width="180"
                         :formatter="dateFormat"
                     />
-                    <fu-table-operations :buttons="buttons" :label="$t('commons.table.operate')" fixed="right" />
+                    <fu-table-operations
+                        :buttons="buttons"
+                        :label="$t('commons.table.operate')"
+                        fixed="right"
+                        width="180"
+                    />
                 </ComplexTable>
             </template>
         </LayoutContent>
         <AddDialog ref="addRef" @search="search" />
+        <ModelPoolDialog ref="modelPoolRef" @updated="search" />
     </div>
 </template>
 
@@ -48,21 +53,26 @@
 import { onMounted, reactive, ref } from 'vue';
 import { deleteAgentAccount, pageAgentAccounts } from '@/api/modules/ai';
 import { AI } from '@/api/interface/ai';
-import RouterMenu from '@/views/ai/agents/index.vue';
 import AddDialog from '@/views/ai/agents/model/add/index.vue';
+import ModelPoolDialog from '@/views/ai/agents/model/pool/index.vue';
 import { ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
-import { dateFormat } from '@/utils/util';
+import { dateFormat } from '@/utils/date';
 import { getAgentProviderDisplayName } from '@/utils/agent';
 
 const items = ref<AI.AgentAccountItem[]>([]);
 const addRef = ref();
+const modelPoolRef = ref();
 const searchName = ref('');
 
 const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
         click: (row: AI.AgentAccountItem) => onEdit(row),
+    },
+    {
+        label: i18n.global.t('aiTools.agents.modelPool'),
+        click: (row: AI.AgentAccountItem) => onManageModelPool(row),
     },
     {
         label: i18n.global.t('commons.button.delete'),
@@ -105,12 +115,15 @@ const onEdit = (row: AI.AgentAccountItem) => {
             baseURL: row.baseUrl,
             apiKey: row.apiKey,
             rememberApiKey: row.rememberApiKey,
-            model: row.model,
             apiType: row.apiType,
-            maxTokens: row.maxTokens,
-            contextWindow: row.contextWindow,
             remark: row.remark,
         });
+    }
+};
+
+const onManageModelPool = (row: AI.AgentAccountItem) => {
+    if (modelPoolRef.value?.open) {
+        modelPoolRef.value.open(row);
     }
 };
 

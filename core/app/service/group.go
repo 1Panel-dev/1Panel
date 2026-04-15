@@ -100,10 +100,8 @@ func (u *GroupService) Delete(id uint) error {
 		return err
 	}
 	switch group.Type {
-	case "host":
-		err = hostRepo.UpdateGroup(id, defaultGroup.ID)
 	case "script":
-		err = hostRepo.UpdateGroup(id, defaultGroup.ID)
+		err = scriptRepo.UpdateGroup(id, defaultGroup.ID)
 	case "command":
 		err = commandRepo.UpdateGroup(id, defaultGroup.ID)
 	case "node":

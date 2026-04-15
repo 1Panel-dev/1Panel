@@ -10,8 +10,10 @@ import CopyButton from '@/components/copy-button/index.vue';
 import MsgInfo from '@/components/msg-info/index.vue';
 import DrawerPro from '@/components/drawer-pro/index.vue';
 import DialogPro from '@/components/dialog-pro/index.vue';
+import FuComponents from '@/components/fu';
 export default {
     install(app: App) {
+        app.use(FuComponents);
         app.component(LayoutContent.name, LayoutContent);
         app.component(RouterButton.name, RouterButton);
         app.component(ComplexTable.name, ComplexTable);

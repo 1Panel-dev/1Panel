@@ -62,7 +62,7 @@ const onSavePanelName = async (formEl: FormInstance | undefined) => {
         if (!valid) return;
         await updateSetting({ key: 'PanelName', value: form.panelName })
             .then(async () => {
-                globalStore.setThemeConfig({ ...themeConfig.value, panelName: form.panelName });
+                globalStore.themeConfig = { ...themeConfig.value, panelName: form.panelName };
                 document.title = form.panelName;
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 loading.value = false;

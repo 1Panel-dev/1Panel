@@ -64,8 +64,8 @@ import { ElForm } from 'element-plus';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { Host } from '@/api/interface/host';
 import { operatePortRule, updatePortRule } from '@/api/modules/host';
-import { checkCidr, checkCidrV6, checkIpV4V6, checkPort, deepCopy } from '@/utils/util';
-
+import { checkCidr, checkCidrV6, checkIpV4V6, checkPort } from '@/utils/validate';
+import { deepCopy } from '@/utils/misc';
 const loading = ref();
 const oldRule = ref<Host.RulePort>();
 

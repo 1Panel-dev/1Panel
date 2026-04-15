@@ -12,14 +12,16 @@ var (
 	appInstallResourceRepo = repo.NewIAppInstallResourceRpo()
 	appIgnoreUpgradeRepo   = repo.NewIAppIgnoreUpgradeRepo()
 
-	aiRepo           = repo.NewIAiRepo()
-	mcpServerRepo    = repo.NewIMcpServerRepo()
-	tensorrtLLMRepo  = repo.NewITensorRTLLMRepo()
-	agentRepo        = repo.NewIAgentRepo()
-	agentAccountRepo = repo.NewIAgentAccountRepo()
+	aiRepo                = repo.NewIAiRepo()
+	mcpServerRepo         = repo.NewIMcpServerRepo()
+	tensorrtLLMRepo       = repo.NewITensorRTLLMRepo()
+	agentRepo             = repo.NewIAgentRepo()
+	agentAccountRepo      = repo.NewIAgentAccountRepo()
+	agentAccountModelRepo = repo.NewIAgentAccountModelRepo()
 
 	mysqlRepo      = repo.NewIMysqlRepo()
 	postgresqlRepo = repo.NewIPostgresqlRepo()
+	mongodbRepo    = repo.NewIMongodbRepo()
 	databaseRepo   = repo.NewIDatabaseRepo()
 
 	imageRepoRepo = repo.NewIImageRepoRepo()
@@ -48,7 +50,8 @@ var (
 	runtimeRepo       = repo.NewIRunTimeRepo()
 	phpExtensionsRepo = repo.NewIPHPExtensionsRepo()
 
-	favoriteRepo = repo.NewIFavoriteRepo()
+	favoriteRepo  = repo.NewIFavoriteRepo()
+	fileShareRepo = repo.NewIFileShareRepo()
 
 	taskRepo = repo.NewITaskRepo()
 

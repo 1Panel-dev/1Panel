@@ -30,6 +30,16 @@ func Init() {
 	}
 	LocalAgentProxy = &httputil.ReverseProxy{
 		Director: func(req *http.Request) {
+			if req.Header.Get("X-Forwarded-Proto") == "" {
+				if req.TLS != nil {
+					req.Header.Set("X-Forwarded-Proto", "https")
+				} else {
+					req.Header.Set("X-Forwarded-Proto", "http")
+				}
+			}
+			if req.Header.Get("X-Forwarded-Host") == "" && req.Host != "" {
+				req.Header.Set("X-Forwarded-Host", req.Host)
+			}
 			req.URL.Scheme = "http"
 			req.URL.Host = "unix"
 		},

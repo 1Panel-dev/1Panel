@@ -5,16 +5,21 @@ import { checkStatus } from './helper/check-status';
 import router from '@/routers';
 import { GlobalStore } from '@/store';
 import { MsgError } from '@/utils/message';
-import { Base64 } from 'js-base64';
+import { encodeBase64 } from '@/utils/base64';
 import i18n from '@/lang';
 import { changeToLocal } from '@/utils/node';
-
+import { getCookie } from '@/utils/auth';
 const globalStore = GlobalStore();
 
 const config = {
     baseURL: import.meta.env.VITE_API_URL as string,
     timeout: ResultEnum.TIMEOUT as number,
     withCredentials: true,
+};
+
+const isCsrfForbidden = (response?: AxiosResponse<any>) => {
+    const message = response?.data?.message;
+    return typeof message === 'string' && message.toLowerCase().includes('csrf token invalid');
 };
 
 class RequestHttp {
@@ -39,8 +44,17 @@ class RequestHttp {
                     config.url === '/core/auth/passkey/begin' ||
                     config.url === '/core/auth/passkey/finish'
                 ) {
-                    let entrance = Base64.encode(globalStore.entrance);
+                    let entrance = encodeBase64(globalStore.entrance);
                     config.headers.EntranceCode = entrance;
+                }
+                const method = (config.method || 'get').toUpperCase();
+                const requiresToken = !['GET', 'HEAD', 'OPTIONS', 'TRACE'].includes(method);
+                if (requiresToken) {
+                    const csrfToken = getCookie('pcsrftoken');
+                    if (csrfToken) {
+                        config.headers['X-CSRF-Token'] = csrfToken;
+                        globalStore.csrfToken = csrfToken;
+                    }
                 }
                 return {
                     ...config,
@@ -55,7 +69,7 @@ class RequestHttp {
             (response: AxiosResponse) => {
                 const { data } = response;
                 if (data.code == ResultEnum.OVERDUE || data.code == ResultEnum.FORBIDDEN) {
-                    globalStore.setLogStatus(false);
+                    globalStore.isLogin = false;
                     router.push({
                         name: 'entrance',
                         params: { code: globalStore.entrance },
@@ -76,13 +90,15 @@ class RequestHttp {
                     window.location.reload();
                     return;
                 }
-                if (data.code == ResultEnum.ERRGLOBALLOADDING) {
-                    globalStore.setGlobalLoading(true);
-                    globalStore.setLoadingText(data.message);
+                if (data.code == ResultEnum.ERRGLOBALLOADING) {
+                    globalStore.$patch({
+                        isLoading: true,
+                        loadingText: data.message,
+                    });
                     return;
                 } else {
                     if (globalStore.isLoading) {
-                        globalStore.setGlobalLoading(false);
+                        globalStore.isLoading = false;
                     }
                 }
                 if (data.code == ResultEnum.ERRAUTH) {
@@ -107,6 +123,16 @@ class RequestHttp {
                         case 313:
                             router.push({ name: 'Expired' });
                             return;
+                        case 403:
+                            if (isCsrfForbidden(response)) {
+                                return Promise.reject(error);
+                            }
+                            if (response.data && response.data['message']) {
+                                MsgError(response.data['message']);
+                            } else {
+                                MsgError(i18n.global.t('commons.res.forbidden'));
+                            }
+                            return Promise.reject(error);
                         case 500:
                         case 502:
                         case 524:
@@ -117,7 +143,7 @@ class RequestHttp {
                             );
                             return Promise.reject(error);
                         default:
-                            return;
+                            return Promise.reject(error);
                     }
                 }
                 if (!window.navigator.onLine) router.replace({ path: '/500' });

@@ -251,7 +251,7 @@ import {
 import { GlobalStore, MenuStore, TabsStore } from '@/store';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { useI18n } from 'vue-i18n';
-import { encryptPassword, base64UrlToBuffer, bufferToBase64Url } from '@/utils/util';
+import { encryptPassword, base64UrlToBuffer, bufferToBase64Url } from '@/utils/auth';
 import { getXpackSettingForTheme } from '@/utils/xpack';
 import { routerToName } from '@/utils/router';
 import { changeToLocal, setDefaultNodeInfo } from '@/utils/node';
@@ -325,8 +325,7 @@ const mfaLoginRef = ref();
 const mfaButtonFocused = ref();
 const pendingLoginMethod = ref<'password' | 'passkey'>('password');
 const mfaLoginForm = reactive({
-    name: '',
-    password: '',
+    sessionId: '',
     secret: '',
     code: '',
     authMethod: 'session',
@@ -434,15 +433,18 @@ const login = (formEl: FormInstance | undefined) => {
             const res = await loginApi(requestLoginForm);
             globalStore.ignoreCaptcha = true;
             if (res.data.mfaStatus === 'Enable') {
+                mfaLoginForm.sessionId = res.data.mfaSession || '';
+                mfaLoginForm.code = '';
                 mfaShow.value = true;
                 errMfaInfo.value = false;
+                errCaptcha.value = false;
                 nextTick(() => {
                     mfaLoginRef.value?.focus();
                 });
                 return;
             }
-            globalStore.setLogStatus(true);
-            globalStore.setAgreeLicense(true);
+            globalStore.isLogin = true;
+            globalStore.agreeLicense = true;
             menuStore.setMenuList([]);
             tabsStore.removeAllTabs();
             changeToLocal();
@@ -483,11 +485,10 @@ const mfaLogin = async (auto: boolean) => {
     if (isLoggingIn) return;
     if ((!auto && mfaLoginForm.code) || (auto && mfaLoginForm.code.length === 6)) {
         isLoggingIn = true;
-        mfaLoginForm.name = loginForm.name;
-        mfaLoginForm.password = encryptPassword(loginForm.password);
         try {
+            errMfaInfo.value = false;
             await mfaLoginApi(mfaLoginForm);
-            globalStore.setLogStatus(true);
+            globalStore.isLogin = true;
             menuStore.setMenuList([]);
             tabsStore.removeAllTabs();
             MsgSuccess(i18n.t('commons.msg.loginSuccess'));
@@ -499,10 +500,23 @@ const mfaLogin = async (auto: boolean) => {
             document.onkeydown = null;
         } catch (res) {
             if (res.code === 401) {
-                errMfaInfo.value = true;
+                if (res.message === 'ErrCaptchaCode') {
+                    globalStore.ignoreCaptcha = false;
+                    mfaLoginForm.code = '';
+                    mfaShow.value = false;
+                    loginVerify();
+                    nextTick(() => {
+                        userNameRef.value?.focus();
+                    });
+                } else if (res.message === 'ErrMFA') {
+                    errMfaInfo.value = true;
+                } else if (res.message) {
+                    MsgError(res.message);
+                }
                 isLoggingIn = false;
                 return;
             }
+            loginVerify();
         } finally {
             isLoggingIn = false;
         }
@@ -540,8 +554,8 @@ const passkeyLogin = async () => {
         await passkeyFinishApi(payload, res.data.sessionId);
         enableAutoPasskey();
         globalStore.ignoreCaptcha = true;
-        globalStore.setLogStatus(true);
-        globalStore.setAgreeLicense(true);
+        globalStore.isLogin = true;
+        globalStore.agreeLicense = true;
         menuStore.setMenuList([]);
         tabsStore.removeAllTabs();
         changeToLocal();
@@ -618,8 +632,8 @@ const getSetting = async () => {
 
         document.title = res.data.panelName;
         i18n.warnHtmlMessage = false;
-        globalStore.setOpenMenuTabs(res.data.menuTabs === 'Enable');
-        globalStore.setThemeConfig({ ...themeConfig.value, theme: res.data.theme, panelName: res.data.panelName });
+        globalStore.openMenuTabs = res.data.menuTabs === 'Enable';
+        globalStore.themeConfig = { ...themeConfig.value, theme: res.data.theme, panelName: res.data.panelName };
 
         if (res.data.passkeySetting && !isIntl.value && !isFxplay.value) {
             loginForm.agreeLicense = true;

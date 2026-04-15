@@ -131,8 +131,7 @@ import { snapshotRollback } from '@/api/modules/setting';
 import { MsgSuccess } from '@/utils/message';
 import { loadOsInfo } from '@/api/modules/dashboard';
 import SnapRecover from '@/views/setting/snapshot/recover/index.vue';
-import { newUUID } from '@/utils/util';
-
+import { newUUID } from '@/utils/id';
 const drawerVisible = ref(false);
 const snapInfo = ref();
 const loading = ref();

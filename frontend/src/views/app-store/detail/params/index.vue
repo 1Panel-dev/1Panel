@@ -133,11 +133,11 @@
 </template>
 <script lang="ts" setup>
 import { computed, onMounted, reactive, ref } from 'vue';
-import { getRandomStr } from '@/utils/util';
+import { getRandomStr } from '@/utils/id';
 import { getAppService } from '@/api/modules/app';
 import { Rules } from '@/global/form-rules';
 import { App } from '@/api/interface/app';
-import { getDBName, getLabel, getDescription } from '@/utils/util';
+import { getDBName, getLabel, getDescription } from '@/utils/app-store';
 import { getPathByType } from '@/api/modules/files';
 import { loadFormatCollations } from '@/api/modules/database';
 
@@ -198,7 +198,7 @@ const updateParam = () => {
     emit('update:form', form);
 };
 
-const isMysql = (form: Object, envKey: string) => {
+const isMysql = (form: object, envKey: string) => {
     return form['PANEL_DB_HOST'] != undefined && (form[envKey] == 'mysql' || form[envKey] == 'mariadb');
 };
 

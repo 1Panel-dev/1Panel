@@ -147,7 +147,7 @@ const getRoleNum = (roleStr: string, role: Role) => {
     }
 };
 
-const changeMode = (val: String) => {
+const changeMode = (val: string) => {
     if (val === '' || val.length !== 4) {
         return;
     }

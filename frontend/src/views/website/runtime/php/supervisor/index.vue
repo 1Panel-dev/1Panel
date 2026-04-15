@@ -217,10 +217,13 @@ const mobile = computed(() => {
 const checkStatus = (status: HostTool.ProcessStatus[]): string => {
     if (!status || status.length === 0) return 'STOPPED';
 
-    const statusCounts = status.reduce((acc, curr) => {
-        acc[curr.status] = (acc[curr.status] || 0) + 1;
-        return acc;
-    }, {} as Record<string, number>);
+    const statusCounts = status.reduce(
+        (acc, curr) => {
+            acc[curr.status] = (acc[curr.status] || 0) + 1;
+            return acc;
+        },
+        {} as Record<string, number>,
+    );
 
     if (statusCounts['STARTING']) return 'STARTING';
     if (statusCounts['RUNNING'] === status.length) return 'RUNNING';
@@ -301,53 +304,53 @@ const getFile = (name: string, file: string, runtimeID: number) => {
     fileRef.value.acceptParams(name, file, 'get', runtimeID);
 };
 
-const edit = (row: HostTool.SupersivorProcess) => {
+const edit = (row: HostTool.SupervisorProcess) => {
     createRef.value.acceptParams('update', row, runtimeID.value);
 };
 
 const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
-        click: function (row: HostTool.SupersivorProcess) {
+        click: function (row: HostTool.SupervisorProcess) {
             edit(row);
         },
-        show: function (row: HostTool.SupersivorProcess) {
+        show: function (row: HostTool.SupervisorProcess) {
             return row.name != 'php-fpm';
         },
     },
     {
         label: i18n.global.t('website.sourceFile'),
-        click: function (row: HostTool.SupersivorProcess) {
+        click: function (row: HostTool.SupervisorProcess) {
             getFile(row.name, 'config', runtimeID.value);
         },
-        show: function (row: HostTool.SupersivorProcess) {
+        show: function (row: HostTool.SupervisorProcess) {
             return row.name != 'php-fpm';
         },
     },
     {
         label: i18n.global.t('commons.button.log'),
-        click: function (row: HostTool.SupersivorProcess) {
+        click: function (row: HostTool.SupervisorProcess) {
             getFile(row.name, 'out.log', runtimeID.value);
         },
-        show: function (row: HostTool.SupersivorProcess) {
+        show: function (row: HostTool.SupervisorProcess) {
             return row.name != 'php-fpm';
         },
     },
     {
         label: i18n.global.t('commons.button.restart'),
-        click: function (row: HostTool.SupersivorProcess) {
+        click: function (row: HostTool.SupervisorProcess) {
             operate('restart', row.name);
         },
-        show: function (row: HostTool.SupersivorProcess) {
+        show: function (row: HostTool.SupervisorProcess) {
             return row.name != 'php-fpm';
         },
     },
     {
         label: i18n.global.t('commons.button.delete'),
-        click: function (row: HostTool.SupersivorProcess) {
+        click: function (row: HostTool.SupervisorProcess) {
             operate('delete', row.name);
         },
-        show: function (row: HostTool.SupersivorProcess) {
+        show: function (row: HostTool.SupervisorProcess) {
             return row.name != 'php-fpm';
         },
     },

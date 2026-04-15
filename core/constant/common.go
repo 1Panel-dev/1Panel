@@ -57,17 +57,14 @@ var WebUrlMap = map[string]struct{}{
 	"/apps/upgrade":   {},
 	"/apps/setting":   {},
 
-	"/ai":                {},
-	"/ai/model":          {},
-	"/ai/gpu":            {},
-	"/ai/gpu/current":    {},
-	"/ai/gpu/history":    {},
-	"/ai/mcp":            {},
-	"/ai/model/tensorrt": {},
-	"/ai/model/vllm":     {},
-	"/ai/model/ollama":   {},
-	"/ai/agents/agent":   {},
-	"/ai/agents/model":   {},
+	"/ai":               {},
+	"/ai/model/account": {},
+	"/ai/model/local":   {},
+	"/ai/gpu":           {},
+	"/ai/gpu/current":   {},
+	"/ai/gpu/history":   {},
+	"/ai/mcp":           {},
+	"/ai/agents/agent":  {},
 
 	"/containers":                   {},
 	"/containers/container/operate": {},
@@ -188,6 +185,7 @@ var DynamicRoutes = []string{
 	`^/databases/mysql/setting/[^/]+/[^/]+$`,
 	`^/databases/postgresql/setting/[^/]+/[^/]+$`,
 	`^/websites/[^/]+/config/[^/]+$`,
+	`^/s/[A-Za-z0-9]{10,16}$`,
 }
 
 var CertStore atomic.Value

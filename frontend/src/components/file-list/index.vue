@@ -38,6 +38,32 @@
             {{ $t('file.top') }}
         </el-button>
         <div class="mt-4 float-right">
+            <el-popover placement="bottom-end" :width="300" trigger="click" @show="loadFavorites">
+                <template #reference>
+                    <el-button link type="primary" size="small">
+                        {{ $t('file.favorite') }}
+                    </el-button>
+                </template>
+                <div v-if="favorites.length === 0" class="text-center py-3 text-gray-400 text-sm">
+                    {{ $t('commons.msg.noneData') }}
+                </div>
+                <div v-else class="favorite-list max-h-52 overflow-y-auto">
+                    <div
+                        v-for="item in favorites"
+                        :key="item.id"
+                        class="favorite-item flex items-center cursor-pointer px-2 py-1.5 rounded"
+                        @click="jumpToFavorite(item)"
+                    >
+                        <svg-icon
+                            :iconName="item.isDir ? 'p-file-folder' : 'p-file-normal'"
+                            class="mr-2 flex-shrink-0"
+                        ></svg-icon>
+                        <el-tooltip :content="item.path" placement="top">
+                            <span class="truncate text-sm">{{ item.name }}</span>
+                        </el-tooltip>
+                    </div>
+                </div>
+            </el-popover>
             <el-button link @click="onAddItem(true)" type="primary" size="small">
                 {{ $t('commons.button.createNewFolder') }}
             </el-button>
@@ -147,13 +173,13 @@
 
 <script lang="ts" setup>
 import { File } from '@/api/interface/file';
-import { computeDirSize, createFile, getFileContent, getFilesList } from '@/api/modules/files';
-import { onUpdated, reactive, ref } from 'vue';
+import { computeDirSize, createFile, getFileContent, getFilesList, searchFavorite } from '@/api/modules/files';
+import { nextTick, onUpdated, reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgSuccess, MsgWarning } from '@/utils/message';
 import { useSearchableForSelect } from '@/views/host/file-management/hooks/searchable';
-import { computeSize, debounce } from '@/utils/util';
-
+import { computeSize } from '@/utils/size';
+import { debounce } from '@/utils/misc';
 const data = ref([]);
 const loading = ref(false);
 const paths = ref<string[]>([]);
@@ -165,6 +191,7 @@ const rowRefs = ref();
 const open = ref(false);
 const newFolder = ref();
 const disBtn = ref(false);
+const favorites = ref<File.Favorite[]>([]);
 
 const { searchableStatus, searchablePath, searchableInputRef, searchableInputBlur } = useSearchableForSelect(paths);
 const oldUrl = ref<string>('');
@@ -467,6 +494,25 @@ const removeSelected = (index: number) => {
     selectRows.value.splice(index, 1);
 };
 
+const loadFavorites = async () => {
+    try {
+        const res = await searchFavorite({ page: 1, pageSize: 100 });
+        favorites.value = res.data.items || [];
+    } catch {}
+};
+
+const jumpToFavorite = async (item: File.Favorite) => {
+    const targetPath = item.isDir ? item.path : item.path.substring(0, item.path.lastIndexOf('/')) || '/';
+    oldUrl.value = req.path;
+    req.path = targetPath;
+    getPaths(targetPath);
+    selectRow.value.path = form.dir ? targetPath : '';
+    await search(req);
+    if (!item.isDir && (form.isAll || !form.dir)) {
+        selectRow.value.path = item.path;
+    }
+};
+
 defineExpose({
     acceptParams,
 });
@@ -495,5 +541,12 @@ defineExpose({
 }
 :deep(.dialog-file-list .el-table__body tr.current-row > td.el-table__cell) {
     background-color: var(--panel-main-bg-color-4);
+}
+
+.favorite-item {
+    transition: background-color 0.15s;
+    &:hover {
+        background-color: var(--panel-main-bg-color-4);
+    }
 }
 </style>

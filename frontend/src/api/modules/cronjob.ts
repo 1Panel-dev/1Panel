@@ -9,7 +9,7 @@ export const searchCronjobPage = (params: Cronjob.Search, node?: string) => {
 };
 
 export const loadNextHandle = (spec: string) => {
-    return http.post<Array<String>>(`/cronjobs/next`, { spec: spec });
+    return http.post<Array<string>>(`/cronjobs/next`, { spec: spec });
 };
 
 export const editCronjobGroup = (id: number, groupID: number) => {

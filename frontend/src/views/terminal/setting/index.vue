@@ -111,7 +111,9 @@
                                 <el-button @click="search(true)" plain>{{ $t('commons.button.reset') }}</el-button>
                                 <el-button @click="onSave" type="primary">{{ $t('commons.button.save') }}</el-button>
                             </el-form-item>
+
                             <el-divider border-style="dashed" />
+
                             <el-form-item :label="$t('terminal.defaultConn')">
                                 <el-switch v-model="form.showDefaultConn" @change="changeShow" />
                             </el-form-item>
@@ -147,7 +149,7 @@
 import { ref, reactive, watch, onMounted, onBeforeUnmount } from 'vue';
 import { getTerminalInfo, UpdateTerminalInfo } from '@/api/modules/setting';
 import { Terminal } from '@xterm/xterm';
-import OperateDialog from '@/views/terminal/setting/default_conn/index.vue';
+import OperateDialog from '@/views/terminal/setting/default-conn/index.vue';
 import '@xterm/xterm/css/xterm.css';
 import { FitAddon } from '@xterm/addon-fit';
 import i18n from '@/lang';
@@ -189,12 +191,10 @@ const form = reactive({
     cursorBlink: 'Enable',
     cursorStyle: 'underline',
     scrollback: 1000,
-    scrollSensitivity: 10,
-
+    scrollSensitivity: 6,
     showDefaultConn: false,
     defaultConn: '',
 });
-
 const resetConn = ref(false);
 const opRef = ref();
 
@@ -265,7 +265,7 @@ const search = async (withReset?: boolean) => {
             form.cursorStyle = res.data.cursorStyle;
             form.scrollback = Number(res.data.scrollback);
             form.scrollSensitivity = Number(res.data.scrollSensitivity);
-            terminalStore.setFontFamily(res.data.fontFamily || '');
+            terminalStore.fontFamily = res.data.fontFamily || '';
 
             if (withReset) {
                 changeItem();
@@ -329,7 +329,7 @@ const iniTerm = () => {
         cursorBlink: true,
         cursorStyle: 'block',
         scrollback: 1000,
-        scrollSensitivity: 15,
+        scrollSensitivity: 6,
     });
     term.value.open(terminalElement.value);
     applyPreviewBackground();
@@ -409,16 +409,18 @@ const onSave = () => {
             };
             await UpdateTerminalInfo(param);
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            terminalStore.setLineHeight(form.lineHeight);
-            terminalStore.setLetterSpacing(form.letterSpacing);
-            terminalStore.setFontSize(form.fontSize);
-            terminalStore.setFontFamily(form.fontFamily);
-            terminalStore.setBackgroundColor(form.backgroundColor);
-            terminalStore.setForegroundColor(form.foregroundColor);
-            terminalStore.setCursorBlink(form.cursorBlink);
-            terminalStore.setCursorStyle(form.cursorStyle);
-            terminalStore.setScrollback(form.scrollback);
-            terminalStore.setScrollSensitivity(form.scrollSensitivity);
+            terminalStore.$patch({
+                lineHeight: form.lineHeight,
+                letterSpacing: form.letterSpacing,
+                fontSize: form.fontSize,
+                fontFamily: form.fontFamily,
+                backgroundColor: form.backgroundColor,
+                foregroundColor: form.foregroundColor,
+                cursorBlink: form.cursorBlink,
+                cursorStyle: form.cursorStyle,
+                scrollback: form.scrollback,
+                scrollSensitivity: form.scrollSensitivity,
+            });
         } finally {
             loading.value = false;
         }

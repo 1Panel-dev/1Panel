@@ -168,7 +168,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, computed } from 'vue';
 import { loadGPUMonitor, getGPUOptions } from '@/api/modules/host';
-import { dateFormatWithoutYear } from '@/utils/util';
+import { dateFormatWithoutYear } from '@/utils/date';
 import RouterMenu from '@/views/ai/gpu/index.vue';
 import { GlobalStore } from '@/store';
 import { shortcuts } from '@/utils/shortcuts';

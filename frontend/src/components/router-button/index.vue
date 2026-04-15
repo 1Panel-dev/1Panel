@@ -68,10 +68,11 @@ onMounted(() => {
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .router_card {
     --el-card-padding: 0;
-    .el-card__body {
+
+    :deep(.el-card__body) {
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -79,7 +80,7 @@ onMounted(() => {
 }
 
 .router_card_button {
-    .el-radio-button__inner {
+    :deep(.el-radio-button__inner) {
         min-width: 100px;
         height: 100%;
         background-color: var(--panel-button-active) !important;
@@ -88,7 +89,7 @@ onMounted(() => {
         color: var(--el-text-color-regular) !important;
     }
 
-    .el-radio-button__original-radio:checked + .el-radio-button__inner {
+    :deep(.el-radio-button__original-radio:checked + .el-radio-button__inner) {
         color: var(--panel-button-text-color) !important;
         background-color: var(--panel-button-bg-color) !important;
         border-color: var(--panel-color-primary) !important;

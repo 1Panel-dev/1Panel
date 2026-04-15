@@ -1,0 +1,96 @@
+<template>
+    <DialogPro v-model="open" :title="$t('commons.button.delete') + ' - ' + dbName" size="small">
+        <el-form ref="deleteForm" v-loading="loading" @submit.prevent>
+            <el-form-item>
+                <el-checkbox v-model="deleteReq.forceDelete" :label="$t('app.forceDelete')" />
+                <span class="input-help">
+                    {{ $t('app.forceDeleteHelper') }}
+                </span>
+            </el-form-item>
+            <el-form-item>
+                <el-checkbox v-model="deleteReq.deleteBackup" :label="$t('app.deleteBackup')" />
+                <span class="input-help">
+                    {{ $t('database.deleteBackupHelper') }}
+                </span>
+            </el-form-item>
+            <el-form-item>
+                <div>
+                    <span style="font-size: 12px">{{ $t('database.delete') }}</span>
+                    <span style="font-size: 12px; color: red; font-weight: 500">{{ dbName }}</span>
+                    <span style="font-size: 12px">{{ $t('database.deleteHelper') }}</span>
+                </div>
+                <el-input v-model="deleteInfo" :placeholder="dbName"></el-input>
+            </el-form-item>
+        </el-form>
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button :disabled="loading" @click="open = false">
+                    {{ $t('commons.button.cancel') }}
+                </el-button>
+                <el-button :disabled="deleteInfo != dbName || loading" type="primary" @click="submit">
+                    {{ $t('commons.button.confirm') }}
+                </el-button>
+            </span>
+        </template>
+    </DialogPro>
+</template>
+<script lang="ts" setup>
+import { FormInstance } from 'element-plus';
+import { ref } from 'vue';
+import i18n from '@/lang';
+import { deleteMongodbDB } from '@/api/modules/database';
+import { MsgSuccess } from '@/utils/message';
+
+let deleteReq = ref({
+    id: 0,
+    type: '',
+    database: '',
+    deleteBackup: false,
+    forceDelete: false,
+});
+let open = ref(false);
+let loading = ref(false);
+let deleteInfo = ref('');
+let dbName = ref('');
+
+const deleteForm = ref<FormInstance>();
+
+interface DialogProps {
+    id: number;
+    type: string;
+    name: string;
+    database: string;
+}
+const emit = defineEmits<{ (e: 'search'): void }>();
+
+const acceptParams = async (prop: DialogProps) => {
+    deleteReq.value = {
+        id: prop.id,
+        type: prop.type,
+        database: prop.database,
+        deleteBackup: false,
+        forceDelete: false,
+    };
+    dbName.value = prop.name;
+    deleteInfo.value = '';
+    open.value = true;
+};
+
+const submit = async () => {
+    loading.value = true;
+    deleteMongodbDB(deleteReq.value)
+        .then(() => {
+            loading.value = false;
+            emit('search');
+            MsgSuccess(i18n.global.t('commons.msg.deleteSuccess'));
+            open.value = false;
+        })
+        .catch(() => {
+            loading.value = false;
+        });
+};
+
+defineExpose({
+    acceptParams,
+});
+</script>

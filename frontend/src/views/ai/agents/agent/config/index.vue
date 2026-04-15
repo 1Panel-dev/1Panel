@@ -3,12 +3,18 @@
         <template #content>
             <el-tabs v-model="activeTab" tab-position="left" class="config-tabs" @tab-click="handleTabClick">
                 <el-tab-pane :label="t('aiTools.agents.channelsTab')" name="channels">
-                    <ChannelsTab ref="channelsRef" />
+                    <ChannelsTab ref="channelsRef" :app-version="appVersion" />
                 </el-tab-pane>
                 <el-tab-pane :label="t('aiTools.model.model')" name="model">
                     <ModelTab ref="modelRef" @updated="handleModelUpdated" />
                 </el-tab-pane>
-                <el-tab-pane :label="t('aiTools.agents.settingsTab')" name="settings">
+                <el-tab-pane :label="t('aiTools.agents.agentRoleTab')" name="agent">
+                    <AgentTab ref="agentRef" />
+                </el-tab-pane>
+                <el-tab-pane :label="t('aiTools.agents.skillsTab')" name="skills">
+                    <SkillsTab ref="skillsRef" :app-version="appVersion" />
+                </el-tab-pane>
+                <el-tab-pane :label="t('file.setting')" name="settings">
                     <SettingsTab ref="settingsRef" />
                 </el-tab-pane>
             </el-tabs>
@@ -23,6 +29,8 @@ import { useI18n } from 'vue-i18n';
 import { AI } from '@/api/interface/ai';
 import ChannelsTab from './tabs/channels.vue';
 import ModelTab from './tabs/model.vue';
+import AgentTab from './tabs/agents/index.vue';
+import SkillsTab from './tabs/skills.vue';
 import SettingsTab from './tabs/settings.vue';
 
 const { t } = useI18n();
@@ -31,25 +39,36 @@ const open = ref(false);
 const activeTab = ref('channels');
 const header = ref('');
 const agentId = ref(0);
-const currentAgent = ref<AI.AgentItem>();
+const accountId = ref(0);
+const model = ref('');
+const appVersion = ref('');
+const configPath = ref('');
+const agentType = ref<'openclaw' | 'copaw'>('openclaw');
 const channelsRef = ref();
 const modelRef = ref();
+const agentRef = ref();
+const skillsRef = ref();
 const settingsRef = ref();
 
 const loadSettings = async () => {
-    if (!currentAgent.value) {
+    if (agentId.value <= 0) {
         return;
     }
     await nextTick();
-    await settingsRef.value?.load(currentAgent.value);
+    await settingsRef.value?.load({
+        agentId: agentId.value,
+        appVersion: appVersion.value,
+    });
 };
 
 const loadModel = async () => {
-    if (!currentAgent.value) {
+    if (agentId.value <= 0) {
         return;
     }
     await nextTick();
-    await modelRef.value?.load(currentAgent.value);
+    await modelRef.value?.load({
+        agentId: agentId.value,
+    });
 };
 
 const loadChannels = async () => {
@@ -60,6 +79,28 @@ const loadChannels = async () => {
     await channelsRef.value?.load(agentId.value);
 };
 
+const loadAgent = async () => {
+    if (agentId.value <= 0) {
+        return;
+    }
+    await nextTick();
+    await agentRef.value?.load({
+        agentId: agentId.value,
+        agentType: agentType.value,
+        accountId: accountId.value,
+        model: model.value,
+        configPath: configPath.value,
+    });
+};
+
+const loadSkills = async () => {
+    if (agentId.value <= 0) {
+        return;
+    }
+    await nextTick();
+    await skillsRef.value?.load(agentId.value);
+};
+
 const handleClose = () => {
     activeTab.value = 'channels';
 };
@@ -68,8 +109,14 @@ const handleTabClick = async (pane: TabsPaneContext) => {
     if (pane.paneName === 'settings' && agentId.value > 0) {
         await loadSettings();
     }
-    if (pane.paneName === 'model' && currentAgent.value) {
+    if (pane.paneName === 'model') {
         await loadModel();
+    }
+    if (pane.paneName === 'skills') {
+        await loadSkills();
+    }
+    if (pane.paneName === 'agent') {
+        await loadAgent();
     }
     if (pane.paneName === 'channels' && agentId.value > 0) {
         await loadChannels();
@@ -82,7 +129,11 @@ const handleModelUpdated = () => {
 
 const openDrawer = async (agent: AI.AgentItem) => {
     agentId.value = agent.id;
-    currentAgent.value = agent;
+    accountId.value = agent.accountId;
+    model.value = agent.model;
+    appVersion.value = agent.appVersion;
+    configPath.value = agent.configPath;
+    agentType.value = agent.agentType;
     header.value = `${agent.name} - ${t('menu.config')}`;
     activeTab.value = 'channels';
     open.value = true;

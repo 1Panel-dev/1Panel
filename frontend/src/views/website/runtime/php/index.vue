@@ -133,7 +133,8 @@
 import { onMounted, reactive, ref } from 'vue';
 import { Runtime } from '@/api/interface/runtime';
 import { DeleteRuntime, RuntimeDeleteCheck, SearchRuntimes } from '@/api/modules/runtime';
-import { dateFormat, newUUID } from '@/utils/util';
+import { dateFormat } from '@/utils/date';
+import { newUUID } from '@/utils/id';
 import { ElMessageBox } from 'element-plus';
 import { containerPrune } from '@/api/modules/container';
 import TaskLog from '@/components/log/task/index.vue';

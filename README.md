@@ -1,17 +1,23 @@
 <p align="center"><a href="https://1panel.pro"><img src="https://resource.1panel.pro/img/1panel-logo.png" alt="1Panel" width="300" /></a></p>
-<h3 align="center">Take control of your VPS with 1Panel</h3>
+
+<h3 align="center">The open-source VPS control panel with native AI agent support</h3>
+
+<p align="center">
+  Trusted by <strong>2,000,000+</strong> self-hosters worldwide
+</p>
+
 <p align="center">
   <a href="https://trendshift.io/repositories/2462" target="_blank"><img src="https://trendshift.io/api/badge/repositories/2462" alt="1Panel-dev%2F1Panel | Trendshift" style="width: 240px; height: auto;" /></a>
 </p>
+
 <p align="center">
   <a href="https://www.gnu.org/licenses/gpl-3.0.html"><img src="https://shields.io/github/license/1Panel-dev/1Panel?color=%231890FF" alt="License: GPL v3"></a>
-  <a href="https://app.codacy.com/gh/1Panel-dev/1Panel?utm_source=github.com&utm_medium=referral&utm_content=1Panel-dev/1Panel&utm_campaign=Badge_Grade_Dashboard"><img src="https://app.codacy.com/project/badge/Grade/da67574fd82b473992781d1386b937ef" alt="Codacy"></a>
-  <a href="https://discord.gg/bUpUqWqdRr" target="_blank">
-        <img src="https://img.shields.io/discord/1318846410149335080?logo=discord&labelColor=%20%235462eb&logoColor=%20%23f5f5f5&color=%20%235462eb"
-            alt="chat on Discord"></a>
+  <a href="https://app.codacy.com/gh/1Panel-dev/1Panel"><img src="https://app.codacy.com/project/badge/Grade/da67574fd82b473992781d1386b937ef" alt="Codacy"></a>
+  <a href="https://discord.gg/bUpUqWqdRr"><img src="https://img.shields.io/discord/1318846410149335080?logo=discord&labelColor=%20%235462eb&logoColor=%20%23f5f5f5&color=%20%235462eb" alt="Discord"></a>
   <a href="https://github.com/1Panel-dev/1Panel/releases"><img src="https://img.shields.io/github/v/release/1Panel-dev/1Panel" alt="GitHub release"></a>
-  <a href="https://github.com/1Panel-dev/1Panel"><img src="https://img.shields.io/github/stars/1Panel-dev/1Panel?color=%231890FF&style=flat-square" alt="Stars"></a><br>
+  <a href="https://github.com/1Panel-dev/1Panel"><img src="https://img.shields.io/github/stars/1Panel-dev/1Panel?color=%231890FF&style=flat-square" alt="Stars"></a>
 </p>
+
 <p align="center">
   <a href="/README.md"><img alt="English" src="https://img.shields.io/badge/English-d9d9d9"></a>
   <a href="/docs/README.zh-Hans.md"><img alt="中文(简体)" src="https://img.shields.io/badge/中文(简体)-d9d9d9"></a>
@@ -19,58 +25,91 @@
   <a href="/docs/README.pt-br.md"><img alt="Português (Brasil)" src="https://img.shields.io/badge/Português (Brasil)-d9d9d9"></a>
   <a href="/docs/README.ar.md"><img alt="العربية" src="https://img.shields.io/badge/العربية-d9d9d9"></a>
   <a href="/docs/README.de.md"><img alt="Deutsch" src="https://img.shields.io/badge/Deutsch-d9d9d9"></a>
-  <a href="/docs/README.es.md"><img alt="Español" src="https://img.shields.io/badge/Español-d9d9d9"></a><br>
+  <a href="/docs/README.es.md"><img alt="Español" src="https://img.shields.io/badge/Español-d9d9d9"></a>
   <a href="/docs/README.fr.md"><img alt="français" src="https://img.shields.io/badge/français-d9d9d9"></a>
   <a href="/docs/README.ko.md"><img alt="한국어" src="https://img.shields.io/badge/한국어-d9d9d9"></a>
   <a href="/docs/README.id.md"><img alt="Bahasa Indonesia" src="https://img.shields.io/badge/Bahasa Indonesia-d9d9d9"></a>
   <a href="/docs/README.zh-Hant.md"><img alt="中文(繁體)" src="https://img.shields.io/badge/中文(繁體)-d9d9d9"></a>
   <a href="/docs/README.tr.md"><img alt="Türkçe" src="https://img.shields.io/badge/Türkçe-d9d9d9"></a>
-  <a href="/docs/README.ru.md"><img alt="Русский" src="https://img.shields.io/badge/%D0%A0%D1%83%D1%81%D1%81%D0%BA%D0%B8%D0%B9-d9d9d9"></a>
+  <a href="/docs/README.ru.md"><img alt="Русский" src="https://img.shields.io/badge/Русский-d9d9d9"></a>
   <a href="/docs/README.ms.md"><img alt="Bahasa Melayu" src="https://img.shields.io/badge/Bahasa Melayu-d9d9d9"></a>
 </p>
 
-------------------------------
-## What is 1Panel? 
+---
 
-1Panel is a modern, open-source VPS control panel that streamlines administration through an intuitive, clean web interface. 
+## What is 1Panel?
 
-## Key Features  
+1Panel is a modern, open-source VPS control panel — and the only one with **native AI agent support**. Run Ollama models, deploy OpenClaw agents, and manage your entire server stack from one clean web interface. No CLI memorization required.
 
-- **One-Click OpenClaw Deployment**: Seamlessly deploy OpenClaw agents, host local LLMs using Ollama, and monitor GPU utilization—all within a unified workspace.  
-- **One-Click Website Deployment**: Launch production-ready websites instantly with automatic domain binding, SSL certificate provisioning, and configuration—zero manual setup required.  
-- **Curated App Marketplace**: Discover, install, and update trusted open-source applications (Nextcloud, Bitwarden, Umami, and more) with a single click.  
-- **Centralized Server Management**: Monitor system resources and manage files, databases, containers, and services effortlessly through a unified, intuitive dashboard.  
-- **Enterprise-Grade Security**: Strengthen your defenses with container isolation, firewall controls, audit logging, and secure deployment practices—ensuring compliance and peace of mind.  
-- **Intelligent Backup & Restore**: Schedule automated backups or perform instant restores to local storage or major cloud platforms (AWS S3, Cloudflare R2, and more), with flexible retention and destination options.  
+👉 Watch the [2-minute introduction](https://www.youtube.com/watch?v=Jl_wqp-XA08)
+
+## Why 1Panel?
+
+| | 1Panel | cPanel / Plesk | aaPanel | Webmin |
+|--|--------|----------------|---------|--------|
+| Free & open source | ✅ | ❌ | Partial | ✅ |
+| Native AI agent runtime | ✅ | ❌ | ❌ | ❌ |
+| One-click app marketplace | ✅ 165+ apps | ❌ | ✅ | ❌ |
+| Modern UI (post-2020) | ✅ | ❌ | Partial | ❌ |
+| Docker / container management | ✅ | ❌ | ❌ | ❌ |
+| Active development | ✅ | ✅ | ✅ | Slow |
+
+## Key Features
+
+- **AI Agent Runtime**: Deploy Ollama LLMs, spin up OpenClaw personal agents, and monitor GPU utilization — all from the dashboard. No separate AI stack to manage.
+- **One-Click Website Deployment**: Launch production-ready websites with automatic domain binding, SSL provisioning, and Nginx config — zero manual setup.
+- **App Marketplace**: 165+ trusted open-source apps (Nextcloud, Bitwarden, Umami, NocoBase, and more) installed and updated with a single click.
+- **Docker & Container Management**: Create, start, stop, and inspect containers, images, networks, and volumes through a visual UI — no CLI juggling.
+- **Security Out of the Box**: Firewall rules, fail2ban, container isolation, WAF, and audit logs — configured and running from day one.
+- **Backup & Restore**: Schedule automated backups to AWS S3, Cloudflare R2, or local storage. Restore any snapshot in one click.
 
 ## Quick Start
 
-Execute the script below and follow the prompts to install 1Panel:
+> **Requirements:** Linux VPS (Debian / Ubuntu / CentOS / Rocky), 1 GB RAM, internet access.  
+> Takes ~60 seconds.
 
 ```bash
 bash -c "$(curl -sSL https://resource.1panel.pro/v2/quick_start.sh)"
 ```
 
+After installation, open `http://<your-server-ip>:<port>/<security-path>` in your browser.  
+Run `1pctl user-info` via SSH if you need to retrieve your access credentials.
+
 ## Screenshot
 
-![UI Display](https://resource.1panel.pro/img/overview_en_v2.png)
+![1Panel UI](https://resource.1panel.pro/img/overview_en_v2.png)
+
+## Pro Edition
+
+1Panel OSS is free forever. Pro adds features built for teams and production workloads:
+
+| Feature | OSS | Pro |
+|---------|:---:|:---:|
+| One-click app installs | ✅ | ✅ |
+| AI agents (OpenClaw) | 1 agent | Unlimited |
+| WAF & advanced security | Basic | ✅ |
+| Website tamper protection | ❌ | ✅ |
+| Website uptime monitoring | ❌ | ✅ |
+| Multi-node management | ❌ | ✅ |
+| Custom logo & theme | ❌ | ✅ |
+| Priority support | ❌ | ✅ |
+
+**From $80/year.** [Compare plans & start 30-day free trial →](https://1panel.pro/pricing)
 
 ## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=1Panel-dev/1Panel&type=Date)](https://star-history.com/#1Panel-dev/1Panel&Date)
 
-## Pro Edition
+## Community & Support
 
-Compared to the OSS Edition, 1Panel Pro Edition provides users with a wealth of enhanced features and technical support services. Enhanced features include WAF enhancement, website tamper protection, website monitoring, GPU monitoring, custom logo and theme color, etc. [Click to view the detailed introduction of the Pro Edition](https://1panel.pro/pricing).
+- **Discord** — [Join the community](https://discord.gg/bUpUqWqdRr) for help, feature requests, and show-and-tell
+- **Docs** — [1panel.pro/docs](https://1panel.pro/docs)
+- **Issues** — [GitHub Issues](https://github.com/1Panel-dev/1Panel/issues) for bug reports
 
-## Security Information
+## Security
 
-If you discover any security issues, please refer to [SECURITY.md](/SECURITY.md).
+Found a vulnerability? Please read [SECURITY.md](/SECURITY.md) before disclosing.
 
 ## License
 
-Licensed under The GNU General Public License version 3 (GPLv3)  (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
-
-<https://www.gnu.org/licenses/gpl-3.0.html>
-
-Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+Licensed under the [GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.html).

@@ -48,8 +48,7 @@ import { imageSave } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
 import TaskLog from '@/components/log/task/index.vue';
 import { MsgSuccess } from '@/utils/message';
-import { newUUID } from '@/utils/util';
-
+import { newUUID } from '@/utils/id';
 const loading = ref(false);
 const fileRef = ref();
 const taskLogRef = ref();

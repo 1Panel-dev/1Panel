@@ -25,12 +25,12 @@
     </div>
 </template>
 
-<script setup lang="ts" name="login">
+<script setup lang="ts">
 import LoginForm from './components/login-form.vue';
 import { ref, onMounted } from 'vue';
 import { GlobalStore } from '@/store';
-import { preloadImage } from '@/utils/util';
-
+import { preloadImage } from '@/utils/browser';
+defineOptions({ name: 'Login' });
 const globalStore = GlobalStore();
 const backgroundOpacity = ref(1);
 const defaultLoginImage = new URL('@/assets/images/1panel-login.jpg', import.meta.url).href;

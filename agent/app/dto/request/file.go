@@ -9,6 +9,29 @@ type FileOption struct {
 	files.FileOption
 }
 
+type FileAISearch struct {
+	Path             string   `json:"path" validate:"required"`
+	Query            string   `json:"query" validate:"required"`
+	ResponseLanguage string   `json:"responseLanguage,omitempty"`
+	ContainSub       *bool    `json:"containSub,omitempty"`
+	MaxItems         int      `json:"maxItems" validate:"omitempty,min=1,max=2000"`
+	MatchCase        bool     `json:"matchCase"`
+	WholeWord        bool     `json:"wholeWord"`
+	UseRegex         bool     `json:"useRegex"`
+	Extensions       []string `json:"extensions,omitempty"`
+	MinSize          int64    `json:"minSize"`
+	MaxSize          int64    `json:"maxSize"`
+	ModifiedAfter    string   `json:"modifiedAfter,omitempty"`
+	ModifiedBefore   string   `json:"modifiedBefore,omitempty"`
+
+	MaxScanFiles              int   `json:"maxScanFiles"`
+	MaxFileBytes              int64 `json:"maxFileBytes"`
+	MaxHitsPerFile            int   `json:"maxHitsPerFile"`
+	MaxTotalHits              int   `json:"maxTotalHits"`
+	ContentHitsPromptMaxBytes int   `json:"contentHitsPromptMaxBytes"`
+	LlmMaxOutputTokens        int   `json:"llmMaxOutputTokens"`
+}
+
 type FileContentReq struct {
 	Path     string `json:"path" validate:"required"`
 	IsDetail bool   `json:"isDetail"`
@@ -171,4 +194,10 @@ type FileRemarkBatch struct {
 type FileRemarkUpdate struct {
 	Path   string `json:"path" validate:"required"`
 	Remark string `json:"remark"`
+}
+
+type FileShareCreate struct {
+	Path          string  `json:"path" validate:"required"`
+	ExpireMinutes int     `json:"expireMinutes" validate:"min=0,max=10080"`
+	Password      *string `json:"password"`
 }

@@ -4,7 +4,7 @@
 </template>
 
 <script lang="ts" setup>
-import { copyText } from '@/utils/util';
+import { copyText } from '@/utils/clipboard';
 defineOptions({ name: 'CopyButton' });
 
 defineProps({

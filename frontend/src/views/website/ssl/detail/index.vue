@@ -69,8 +69,8 @@
 <script lang="ts" setup>
 import { getSSL } from '@/api/modules/website';
 import { ref } from 'vue';
-import { dateFormatSimple, getProvider, getDNSName } from '@/utils/util';
-
+import { dateFormatSimple } from '@/utils/date';
+import { getProvider, getDNSName } from '@/utils/ssl';
 const open = ref(false);
 const id = ref(0);
 const curr = ref('detail');

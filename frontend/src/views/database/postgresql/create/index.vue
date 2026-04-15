@@ -49,8 +49,7 @@ import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { addPostgresqlDB } from '@/api/modules/database';
 import { MsgSuccess } from '@/utils/message';
-import { getRandomStr } from '@/utils/util';
-
+import { getRandomStr } from '@/utils/id';
 const loading = ref();
 const createVisible = ref(false);
 const form = reactive({

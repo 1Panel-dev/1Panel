@@ -324,6 +324,68 @@
                             </el-button>
                         </div>
                     </el-card>
+                    <el-card class="rounded-2xl shadow hover:shadow-md transition-all">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="text-lg font-semibold">{{ $t('xpack.alert.bark') }}</div>
+                            <div>
+                                <el-button
+                                    plain
+                                    round
+                                    size="default"
+                                    :disabled="!barkConfig.id"
+                                    @click="onChangeBark(barkConfig.id)"
+                                >
+                                    {{ $t('commons.button.edit') }}
+                                </el-button>
+                                <el-button
+                                    size="default"
+                                    plain
+                                    round
+                                    :disabled="!barkConfig.id"
+                                    @click="onDelete(barkConfig.id)"
+                                >
+                                    {{ $t('commons.button.delete') }}
+                                </el-button>
+                            </div>
+                        </div>
+                        <div class="text-sm mb-2">{{ $t('xpack.alert.barkConfigHelper') }}</div>
+                        <el-divider class="!mb-2 !mt-3" />
+                        <div class="text-sm config-form" v-if="barkConfig.id">
+                            <el-form
+                                @submit.prevent
+                                ref="alertFormRef"
+                                :label-position="mobile ? 'top' : 'left'"
+                                label-width="110px"
+                            >
+                                <el-form-item :label="$t('xpack.alert.webhookName')" prop="displayName">
+                                    {{ barkConfig.config.displayName }}
+                                </el-form-item>
+                                <el-form-item :label="$t('xpack.alert.webhookUrl')" prop="url">
+                                    <div class="webhook-field">
+                                        <template v-if="barkUrlVisible">
+                                            <el-tooltip :content="barkConfig.config.url" placement="top" effect="dark">
+                                                <span class="webhook-text">
+                                                    {{ barkConfig.config.url }}
+                                                </span>
+                                            </el-tooltip>
+                                        </template>
+                                        <template v-else>
+                                            <span class="webhook-text">****************</span>
+                                        </template>
+                                        <el-icon class="webhook-icon" @click="barkUrlVisible = !barkUrlVisible">
+                                            <Hide v-if="!barkUrlVisible" />
+                                            <View v-else />
+                                        </el-icon>
+                                    </div>
+                                </el-form-item>
+                            </el-form>
+                        </div>
+                        <div v-else class="flex items-center justify-center" style="height: 257px">
+                            <el-button size="large" round plain type="primary" @click="onChangeBark(0)">
+                                {{ $t('commons.button.create') }}
+                            </el-button>
+                        </div>
+                    </el-card>
                     <el-card
                         class="rounded-2xl shadow hover:shadow-md transition-all"
                         v-if="globalStore.isProductPro && !globalStore.isIntl"
@@ -453,6 +515,18 @@ const defaultSmsConfig: Alert.SmsConfig = {
 };
 const smsConfig = ref<Alert.SmsConfig>({ ...defaultSmsConfig });
 
+const defaultBarkConfig: Alert.WebhookConfig = {
+    id: undefined,
+    type: 'bark',
+    title: 'xpack.alert.bark',
+    status: 'Enable',
+    config: {
+        displayName: '',
+        url: 'https://api.day.app/YOUR_KEY',
+    },
+};
+const barkConfig = ref<Alert.WebhookConfig>({ ...defaultBarkConfig });
+
 const defaultWeComConfig: Alert.WebhookConfig = {
     id: undefined,
     type: 'weCom',
@@ -492,6 +566,7 @@ const feiShuConfig = ref<Alert.WebhookConfig>({ ...defaultFeiShuConfig });
 const weComUrlVisible = ref(false);
 const dingTalkUrlVisible = ref(false);
 const feiShuUrlVisible = ref(false);
+const barkUrlVisible = ref(false);
 
 const config = ref<Alert.AlertConfigInfo>({
     id: 0,
@@ -566,6 +641,10 @@ const search = async () => {
 
         const feiShuFound = res.data.find((s: any) => s.type === 'feiShu');
         assignConfig(feiShuFound, feiShuConfig, defaultFeiShuConfig);
+
+        const barkFound = res.data.find((s: any) => s.type === 'bark');
+        assignConfig(barkFound, barkConfig, defaultBarkConfig);
+
         isInitialized.value = true;
     } finally {
         loading.value = false;
@@ -677,6 +756,15 @@ const onChangeFeiShu = (id: number) => {
         config: feiShuConfig.value.config,
         type: 'feiShu',
         title: feiShuConfig.value.title,
+    });
+};
+
+const onChangeBark = (id: number) => {
+    webHookRef.value.acceptParams({
+        id: id,
+        config: barkConfig.value.config,
+        type: 'bark',
+        title: barkConfig.value.title,
     });
 };
 

@@ -1,6 +1,5 @@
 <template>
     <div v-loading="loading">
-        <RouterMenu />
         <LayoutContent title="Ollama">
             <template #app>
                 <AppStatus
@@ -179,7 +178,6 @@ import Conn from '@/views/ai/model/ollama/conn/index.vue';
 import TaskLog from '@/components/log/task/index.vue';
 import Terminal from '@/views/ai/model/ollama/terminal/index.vue';
 import Del from '@/views/ai/model/ollama/del/index.vue';
-import RouterMenu from '@/views/ai/model/router-menu.vue';
 import PortJumpDialog from '@/components/port-jump/index.vue';
 import CodemirrorDrawer from '@/components/codemirror-pro/drawer.vue';
 import { computed, onMounted, reactive, ref } from 'vue';
@@ -195,7 +193,8 @@ import {
 } from '@/api/modules/ai';
 import { AI } from '@/api/interface/ai';
 import { getAppPort } from '@/api/modules/app';
-import { dateFormat, newUUID } from '@/utils/util';
+import { dateFormat } from '@/utils/date';
+import { newUUID } from '@/utils/id';
 import { MsgInfo, MsgSuccess } from '@/utils/message';
 import BindDomain from '@/views/ai/model/ollama/domain/index.vue';
 import { routerToNameWithQuery } from '@/utils/router';

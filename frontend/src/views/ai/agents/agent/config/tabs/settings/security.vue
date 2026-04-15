@@ -5,11 +5,8 @@
                 v-model="form.allowedOrigins"
                 type="textarea"
                 :rows="4"
-                :placeholder="t('aiTools.agents.allowedOriginsPlaceholder')"
+                :placeholder="allowedOriginsPlaceholder"
             />
-            <span class="input-help">
-                {{ t('aiTools.agents.allowedOriginsHelper') }}
-            </span>
         </el-form-item>
         <el-form-item>
             <el-button type="primary" :loading="saving" @click="saveConfig">
@@ -20,17 +17,18 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue';
+import { computed, reactive, ref } from 'vue';
 import type { FormInstance } from 'element-plus';
 import { useI18n } from 'vue-i18n';
 import { getAgentSecurityConfig, updateAgentSecurityConfig } from '@/api/modules/ai';
 import { MsgSuccess } from '@/utils/message';
-import { parseAllowedOriginsInput, validateAllowedOriginsInput } from '@/utils/agent';
+import { buildDefaultAllowedOrigin, parseAllowedOriginsInput, validateAllowedOriginsInput } from '@/utils/agent';
 
 const { t } = useI18n();
 const loading = ref(false);
 const saving = ref(false);
 const agentId = ref(0);
+const appVersion = ref('');
 const formRef = ref<FormInstance>();
 
 const form = reactive({
@@ -53,8 +51,11 @@ const rules = reactive({
     ],
 });
 
-const load = async (id: number) => {
+const allowedOriginsPlaceholder = computed(() => buildDefaultAllowedOrigin('192.168.1.2', 18789, appVersion.value));
+
+const load = async (id: number, version: string) => {
     agentId.value = id;
+    appVersion.value = version;
     loading.value = true;
     try {
         const res = await getAgentSecurityConfig({ agentId: id });

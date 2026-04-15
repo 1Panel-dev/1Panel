@@ -30,12 +30,13 @@ export interface GlobalState {
     isLoading: boolean;
     loadingText: string;
     isLogin: boolean;
+    csrfToken: string;
     entrance: string;
     language: string; // zh | en | tw
     themeConfig: ThemeConfigProp;
     isFullScreen: boolean;
     openMenuTabs: boolean;
-    watermark: Watermark;
+    watermark: Watermark | null;
     watermarkShow: boolean;
     isOnRestart: boolean;
     agreeLicense: boolean;
@@ -46,6 +47,7 @@ export interface GlobalState {
     currentDB: string;
     currentPgDB: string;
     currentRedisDB: string;
+    currentMongodbDB: string;
     showEntranceWarn: boolean;
     defaultNetwork: string;
     defaultIO: string;

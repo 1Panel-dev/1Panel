@@ -30,7 +30,6 @@ var AddTable = &gormigrate.Migration{
 			&model.Setting{},
 			&model.BackupAccount{},
 			&model.Group{},
-			&model.Host{},
 			&model.Command{},
 			&model.UpgradeLog{},
 			&model.ScriptLibrary{},
@@ -192,6 +191,9 @@ var InitSetting = &gormigrate.Migration{
 			return err
 		}
 		if err := tx.Create(&model.Setting{Key: "UninstallDeleteBackup", Value: constant.StatusDisable}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "InstallAllowPort", Value: constant.StatusDisable}).Error; err != nil {
 			return err
 		}
 		return nil
@@ -597,7 +599,7 @@ var AddAgentsMenu = &gormigrate.Migration{
 		return helper.AddMenu(dto.ShowMenu{
 			ID:       "44",
 			Disabled: false,
-			Title:    "aiTools.agents.agents",
+			Title:    "aiTools.agents.agent",
 			IsShow:   true,
 			Label:    "Agents",
 			Path:     "/ai/agents/agent",
@@ -768,7 +770,7 @@ var UpdateAiAgentsMenu = &gormigrate.Migration{
 		newItem := dto.ShowMenu{
 			ID:       "44",
 			Disabled: false,
-			Title:    "aiTools.agents.agents",
+			Title:    "aiTools.agents.agent",
 			IsShow:   true,
 			Label:    "Agents",
 			Path:     "/ai/agents/agent",
@@ -855,6 +857,23 @@ var AddDocSourceSetting = &gormigrate.Migration{
 	},
 }
 
+var AddAppStoreInstallAllowPortSetting = &gormigrate.Migration{
+	ID: "20260407-add-app-store-install-allow-port-setting",
+	Migrate: func(tx *gorm.DB) error {
+		var setting model.Setting
+		if err := tx.Where("key = ?", "InstallAllowPort").First(&setting).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return tx.Create(&model.Setting{Key: "InstallAllowPort", Value: constant.StatusDisable}).Error
+			}
+			return err
+		}
+		if setting.Value == "" {
+			return tx.Model(&model.Setting{}).Where("key = ?", "InstallAllowPort").Update("value", constant.StatusDisable).Error
+		}
+		return nil
+	},
+}
+
 var UpdateAiLocalModelMenuTitle = &gormigrate.Migration{
 	ID: "20260307-update-ai-local-model-menu-title",
 	Migrate: func(tx *gorm.DB) error {
@@ -865,4 +884,109 @@ var UpdateAiLocalModelMenuTitle = &gormigrate.Migration{
 			   AND value LIKE '%aiTools.model.model%'`,
 		).Error
 	},
+}
+
+var UpdateAiAgentsHideMenuTitle = &gormigrate.Migration{
+	ID: "20260324-update-ai-agents-hide-menu-title",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.Exec(
+			`UPDATE settings
+			 SET value = REPLACE(value, 'aiTools.agents.agents', 'aiTools.agents.agent')
+			 WHERE key = 'HideMenu'
+			   AND value LIKE '%aiTools.agents.agents%'`,
+		).Error
+	},
+}
+
+var UpdateAiModelMenuStructure = &gormigrate.Migration{
+	ID: "20260403-update-ai-model-menu-structure",
+	Migrate: func(tx *gorm.DB) error {
+		var menuJSON string
+		if err := tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Pluck("value", &menuJSON).Error; err != nil {
+			return err
+		}
+		if menuJSON == "" {
+			return tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Update("value", helper.LoadMenus()).Error
+		}
+
+		var menus []dto.ShowMenu
+		if err := json.Unmarshal([]byte(menuJSON), &menus); err != nil {
+			return tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Update("value", helper.LoadMenus()).Error
+		}
+
+		for i := range menus {
+			if menus[i].Label != "AI-Menu" {
+				continue
+			}
+			menus[i].Path = "/ai/model/account"
+			menus[i].Children = buildAiMenuChildren(menus[i].Children)
+			break
+		}
+
+		updatedJSON, err := json.Marshal(menus)
+		if err != nil {
+			return tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Update("value", helper.LoadMenus()).Error
+		}
+		return tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Update("value", string(updatedJSON)).Error
+	},
+}
+
+func buildAiMenuChildren(children []dto.ShowMenu) []dto.ShowMenu {
+	return []dto.ShowMenu{
+		normalizeAiMenuChild(children, dto.ShowMenu{
+			ID:       "44",
+			Label:    "Agents",
+			Disabled: false,
+			IsShow:   true,
+			Title:    "aiTools.agents.agent",
+			Path:     "/ai/agents/agent",
+			Sort:     50,
+		}, "Agents"),
+		normalizeAiMenuChild(children, dto.ShowMenu{
+			ID:       "41",
+			Label:    "AIModel",
+			Disabled: false,
+			IsShow:   true,
+			Title:    "aiTools.model.model",
+			Path:     "/ai/model/account",
+			Sort:     100,
+		}, "AIModel", "OllamaModel"),
+		normalizeAiMenuChild(children, dto.ShowMenu{
+			ID:       "42",
+			Label:    "MCPServer",
+			Disabled: false,
+			IsShow:   true,
+			Title:    "menu.mcp",
+			Path:     "/ai/mcp",
+			Sort:     200,
+		}, "MCPServer"),
+		normalizeAiMenuChild(children, dto.ShowMenu{
+			ID:       "43",
+			Label:    "GPU",
+			Disabled: false,
+			IsShow:   true,
+			Title:    "aiTools.gpu.gpu",
+			Path:     "/ai/gpu",
+			Sort:     300,
+		}, "GPU"),
+	}
+}
+
+func normalizeAiMenuChild(children []dto.ShowMenu, fallback dto.ShowMenu, labels ...string) dto.ShowMenu {
+	for _, child := range children {
+		for _, label := range labels {
+			if child.Label != label {
+				continue
+			}
+			child.ID = fallback.ID
+			child.Label = fallback.Label
+			child.Disabled = fallback.Disabled
+			child.Title = fallback.Title
+			child.Path = fallback.Path
+			child.Sort = fallback.Sort
+			child.Children = nil
+			return child
+		}
+	}
+	return fallback
 }

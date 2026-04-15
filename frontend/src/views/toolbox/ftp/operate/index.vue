@@ -50,8 +50,8 @@ import { ElForm } from 'element-plus';
 import { MsgSuccess } from '@/utils/message';
 import { Toolbox } from '@/api/interface/toolbox';
 import { createFtp, updateFtp } from '@/api/modules/toolbox';
-import { getRandomStr, isSensitiveLinuxPath } from '@/utils/util';
-
+import { getRandomStr } from '@/utils/id';
+import { isSensitiveLinuxPath } from '@/utils/file';
 interface DialogProps {
     title: string;
     rowData?: Toolbox.FtpInfo;

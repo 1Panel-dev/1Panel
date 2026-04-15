@@ -1,4 +1,4 @@
-import { jumpToPath } from './util';
+import { jumpToPath } from './router';
 import router from '@/routers';
 import { GlobalStore } from '@/store';
 
@@ -32,8 +32,9 @@ export const jumpToInstall = (type: string, key: string) => {
         case 'vllm':
             if (globalStore.isProductPro) {
                 router.push({
-                    path: '/ai/model/vllm',
+                    path: '/ai/model/local',
                     query: {
+                        tab: 'vllm',
                         uncached: 'true',
                         open: 'create',
                     },

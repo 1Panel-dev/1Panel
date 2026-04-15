@@ -27,7 +27,7 @@
 </template>
 <script setup lang="ts">
 import { ref } from 'vue';
-import { getIcon } from '@/utils/util';
+import { getIcon } from '@/utils/file';
 import { reduceFile } from '@/api/modules/files';
 import { MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';

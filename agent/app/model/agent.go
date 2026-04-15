@@ -3,6 +3,7 @@ package model
 type Agent struct {
 	BaseModel
 	Name          string `json:"name" gorm:"not null;unique"`
+	Remark        string `json:"remark"`
 	AgentType     string `json:"agentType" gorm:"default:openclaw"`
 	Provider      string `json:"provider"`
 	Model         string `json:"model"`
@@ -15,6 +16,7 @@ type Agent struct {
 	Status        string `json:"status"`
 	Message       string `json:"message"`
 	AppInstallID  uint   `json:"appInstallId"`
+	WebsiteID     uint   `json:"websiteId"`
 	AccountID     uint   `json:"accountId"`
 	ConfigPath    string `json:"configPath"`
 }

@@ -47,7 +47,7 @@ export const searchAppInstalled = (search: App.AppInstallSearch, node?: string) 
 };
 
 export const listAppInstalled = () => {
-    return http.get<Array<App.AppInstalledInfo>>('apps/installed/list');
+    return http.get<Array<App.AppInstalledOption>>('apps/installed/list');
 };
 
 export const getAppPort = (type: string, name: string) => {

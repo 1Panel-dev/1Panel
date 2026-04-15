@@ -76,6 +76,66 @@ export namespace Database {
         forceDelete: boolean;
         deleteBackup: boolean;
     }
+    export interface MongodbDBInfo {
+        id: number;
+        createdAt: Date;
+        name: string;
+        mongodbName: string;
+        from: string;
+        username: string;
+        password: string;
+        isDelete: boolean;
+        description: string;
+        showPassword?: boolean;
+    }
+    export interface MongodbDBCreate {
+        name: string;
+        from: string;
+        database: string;
+        username: string;
+        password: string;
+        permission: string;
+        description: string;
+    }
+    export interface MongodbLoadDB {
+        from: string;
+        type: string;
+        database: string;
+    }
+    export interface MongodbDBDeleteCheck {
+        id: number;
+        type: string;
+        database: string;
+    }
+    export interface MongodbDBDelete {
+        id: number;
+        type: string;
+        database: string;
+        forceDelete: boolean;
+        deleteBackup: boolean;
+    }
+    export interface MongodbBind {
+        database: string;
+        name: string;
+        username: string;
+        password: string;
+    }
+    export interface MongodbPassword {
+        database: string;
+        name: string;
+        password: string;
+    }
+    export interface MongodbPrivileges {
+        database: string;
+        name: string;
+        username: string;
+        permission: string;
+    }
+    export interface MongodbPrivilegesLoad {
+        database: string;
+        name: string;
+        username: string;
+    }
     export interface MysqlVariables {
         mysqlName: string;
         binlog_cache_size: number;
@@ -185,6 +245,8 @@ export namespace Database {
         format: string;
         username: string;
         password: string;
+        superUser: boolean;
+        isDelete: string;
         description: string;
     }
     export interface PostgresqlConfUpdateByFile {
@@ -200,19 +262,6 @@ export namespace Database {
         username: string;
         password: string;
         superUser: boolean;
-        description: string;
-    }
-    export interface PostgresqlDBInfo {
-        id: number;
-        createdAt: Date;
-        name: string;
-        mysqlName: string;
-        from: string;
-        format: string;
-        username: string;
-        password: string;
-        superUser: boolean;
-        isDelete: string;
         description: string;
     }
     export interface ChangeInfo {
@@ -320,6 +369,7 @@ export namespace Database {
         from: string;
         address: string;
         port: number;
+        initialDB: string;
         username: string;
         password: string;
 
@@ -337,6 +387,7 @@ export namespace Database {
         version: string;
         address: string;
         port: number;
+        initialDB: string;
         username: string;
         password: string;
 

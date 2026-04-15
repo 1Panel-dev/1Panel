@@ -49,9 +49,12 @@ var AddTable = &gormigrate.Migration{
 			&model.Cronjob{},
 			&model.Database{},
 			&model.DatabaseMysql{},
+			&model.DatabaseMongodb{},
 			&model.DatabasePostgresql{},
 			&model.Favorite{},
+			&model.FileShare{},
 			&model.Firewall{},
+			&model.Host{},
 			&model.Ftp{},
 			&model.ImageRepo{},
 			&model.ScriptLibrary{},
@@ -642,7 +645,7 @@ var AddAgentQuickJump = &gormigrate.Migration{
 
 		return tx.Create(&model.QuickJump{
 			Name:      "Agent",
-			Title:     "aiTools.agents.agents",
+			Title:     "aiTools.agents.agent",
 			Recommend: 1,
 			IsShow:    true,
 			Router:    "/ai/agents/agent",
@@ -821,6 +824,13 @@ var UpdateDatabaseMysql = &gormigrate.Migration{
 	},
 }
 
+var AddDatabaseMongodb = &gormigrate.Migration{
+	ID: "20260413-add-database-mongodb",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(&model.DatabaseMongodb{})
+	},
+}
+
 var InitIptablesStatus = &gormigrate.Migration{
 	ID: "20251201-init-iptables-status",
 	Migrate: func(tx *gorm.DB) error {
@@ -893,114 +903,6 @@ var AddAgentTables = &gormigrate.Migration{
 			&model.Agent{},
 			&model.AgentAccount{},
 		)
-	},
-}
-
-var MigrateOpenclawAgents = &gormigrate.Migration{
-	ID: "20260207-migrate-openclaw-agents",
-	Migrate: func(tx *gorm.DB) error {
-		var installs []model.AppInstall
-		if err := tx.Preload("App").Find(&installs).Error; err != nil {
-			return err
-		}
-		for _, install := range installs {
-			appKey := install.App.Key
-			if appKey == "" || install.App.Resource == "" {
-				var app model.App
-				if err := tx.First(&app, install.AppId).Error; err == nil {
-					install.App = app
-					appKey = app.Key
-				}
-			}
-			if appKey != constant.AppOpenclaw {
-				continue
-			}
-			var count int64
-			if err := tx.Model(&model.Agent{}).Where("app_install_id = ?", install.ID).Count(&count).Error; err != nil {
-				return err
-			}
-			if count > 0 {
-				continue
-			}
-			envMap := map[string]interface{}{}
-			if strings.TrimSpace(install.Env) != "" {
-				_ = json.Unmarshal([]byte(install.Env), &envMap)
-			}
-			configPath := path.Join(install.GetPath(), "data", "conf", "openclaw.json")
-			cfgMeta := migrationutils.OpenclawMeta{}
-			if fileData, err := os.ReadFile(configPath); err == nil {
-				cfgMeta = migrationutils.ParseOpenclawMeta(fileData)
-			}
-			provider := strings.ToLower(migrationutils.GetEnvStr(envMap, "PROVIDER"))
-			if provider == "" {
-				provider = strings.ToLower(cfgMeta.Provider)
-			}
-			if provider == "" {
-				continue
-			}
-			provider = migrationutils.NormalizeOpenclawProvider(provider, cfgMeta.BaseURL)
-			modelName := migrationutils.GetEnvStr(envMap, "MODEL")
-			if modelName == "" {
-				modelName = cfgMeta.Model
-			}
-			baseURL := migrationutils.GetEnvStr(envMap, "BASE_URL")
-			if baseURL == "" {
-				baseURL = cfgMeta.BaseURL
-			}
-			apiKey := migrationutils.GetEnvStr(envMap, "API_KEY")
-			if apiKey == "" {
-				apiKey = cfgMeta.APIKey
-			}
-			token := migrationutils.GetEnvStr(envMap, "OPENCLAW_GATEWAY_TOKEN")
-			if token == "" {
-				token = cfgMeta.Token
-			}
-			if provider != "ollama" {
-				if baseURL == "" {
-					if defaultURL, ok := migrationutils.DefaultBaseURL(provider); ok {
-						baseURL = defaultURL
-					}
-				}
-			}
-			if provider == "ollama" && baseURL == "" {
-				continue
-			}
-			var account model.AgentAccount
-			err := tx.Where("provider = ? AND api_key = ? AND base_url = ?", provider, apiKey, baseURL).First(&account).Error
-			if err != nil {
-				if errors.Is(err, gorm.ErrRecordNotFound) {
-					account = model.AgentAccount{
-						Provider: provider,
-						Name:     install.Name,
-						APIKey:   apiKey,
-						BaseURL:  baseURL,
-						Verified: apiKey != "" || provider == "ollama",
-					}
-					if err := tx.Create(&account).Error; err != nil {
-						return err
-					}
-				} else {
-					return err
-				}
-			}
-			agent := model.Agent{
-				Name:         install.Name,
-				Provider:     provider,
-				Model:        modelName,
-				BaseURL:      baseURL,
-				APIKey:       apiKey,
-				Token:        token,
-				Status:       install.Status,
-				Message:      install.Message,
-				AppInstallID: install.ID,
-				AccountID:    account.ID,
-				ConfigPath:   configPath,
-			}
-			if err := tx.Create(&agent).Error; err != nil {
-				return err
-			}
-		}
-		return nil
 	},
 }
 
@@ -1093,5 +995,241 @@ var NormalizeOllamaAccountAPIType = &gormigrate.Migration{
 		return tx.Model(&model.AgentAccount{}).
 			Where("provider = ?", "ollama").
 			Update("api_type", "openai-responses").Error
+	},
+}
+
+var InitAgentAccountModelPool = &gormigrate.Migration{
+	ID: "20260319-init-agent-account-model-pool",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.AgentAccountModel{}); err != nil {
+			return err
+		}
+		return migrationutils.MigrateAgentAccountModelPool(tx)
+	},
+}
+
+var AddHostTable = &gormigrate.Migration{
+	ID: "20260318-add-host-table",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.Host{}); err != nil {
+			return err
+		}
+		if global.CoreDB == nil || !global.CoreDB.Migrator().HasTable("hosts") {
+			if err := tx.Create(&model.Group{Name: "Default", Type: "host", IsDefault: true}).Error; err != nil {
+				return err
+			}
+			return nil
+		}
+
+		var encryptSetting model.Setting
+		if err := global.CoreDB.Where("key = ?", "EncryptKey").First(&encryptSetting).Error; err != nil {
+			global.LOG.Errorf("failed to get encrypt key from core db, err: %v", err)
+			return nil
+		}
+		coreEncryptKey := strings.TrimSpace(encryptSetting.Value)
+		if coreEncryptKey == "" {
+			global.LOG.Error("encrypt key from core db is empty")
+			return nil
+		}
+
+		groupIDMap := make(map[uint]uint)
+		defaultGroupID := uint(0)
+		var coreGroups []model.Group
+		if err := global.CoreDB.Where("type = ?", "host").Order("id asc").Find(&coreGroups).Error; err != nil {
+			return err
+		}
+		for _, coreGroup := range coreGroups {
+			agentGroup := model.Group{
+				Name:      coreGroup.Name,
+				Type:      "host",
+				IsDefault: coreGroup.IsDefault,
+			}
+			if agentGroup.IsDefault {
+				defaultGroupID = coreGroup.ID
+			}
+			if err := tx.Create(&agentGroup).Error; err != nil {
+				global.LOG.Errorf("failed to create group, group id: %v, err: %v", coreGroup.ID, err)
+				continue
+			}
+			groupIDMap[coreGroup.ID] = agentGroup.ID
+		}
+
+		var coreHosts []model.Host
+		if err := global.CoreDB.Order("id asc").Find(&coreHosts).Error; err != nil {
+			return err
+		}
+		for _, coreHost := range coreHosts {
+			password, err := encrypt.StringDecryptWithKey(coreHost.Password, coreEncryptKey)
+			if err != nil {
+				global.LOG.Errorf("failed to decrypt host password, host id: %v, err: %v", coreHost.ID, err)
+				continue
+			}
+			privateKey, err := encrypt.StringDecryptWithKey(coreHost.PrivateKey, coreEncryptKey)
+			if err != nil {
+				global.LOG.Errorf("failed to decrypt host private key, host id: %v, err: %v", coreHost.ID, err)
+				continue
+			}
+			passPhrase, err := encrypt.StringDecryptWithKey(coreHost.PassPhrase, coreEncryptKey)
+			if err != nil {
+				global.LOG.Errorf("failed to decrypt host pass phrase, host id: %v, err: %v", coreHost.ID, err)
+				continue
+			}
+
+			encryptedPassword, err := encrypt.StringEncrypt(password)
+			if err != nil {
+				global.LOG.Errorf("failed to encrypt host password, host id: %v, err: %v", coreHost.ID, err)
+				continue
+			}
+			encryptedPrivateKey, err := encrypt.StringEncrypt(privateKey)
+			if err != nil {
+				global.LOG.Errorf("failed to encrypt host private key, host id: %v, err: %v", coreHost.ID, err)
+				continue
+			}
+			encryptedPassPhrase, err := encrypt.StringEncrypt(passPhrase)
+			if err != nil {
+				global.LOG.Errorf("failed to encrypt host pass phrase, host id: %v, err: %v", coreHost.ID, err)
+				continue
+			}
+
+			groupID := defaultGroupID
+			if mappedGroupID, ok := groupIDMap[coreHost.GroupID]; ok && mappedGroupID != 0 {
+				groupID = mappedGroupID
+			}
+			host := model.Host{
+				GroupID:          groupID,
+				Name:             coreHost.Name,
+				Addr:             coreHost.Addr,
+				Port:             coreHost.Port,
+				User:             coreHost.User,
+				AuthMode:         coreHost.AuthMode,
+				Password:         encryptedPassword,
+				PrivateKey:       encryptedPrivateKey,
+				PassPhrase:       encryptedPassPhrase,
+				RememberPassword: coreHost.RememberPassword,
+				Description:      coreHost.Description,
+			}
+			if err := tx.Create(&host).Error; err != nil {
+				global.LOG.Errorf("failed to create host, host id: %v, err: %v", coreHost.ID, err)
+				continue
+			}
+		}
+		return nil
+	},
+}
+
+var AddAITerminalSettings = &gormigrate.Migration{
+	ID: "20260318-add-ai-terminal-settings",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.Create(&model.Setting{Key: "AIStatus", Value: constant.StatusDisable}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "AIAccountID", Value: ""}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "AIPrefix", Value: constant.DefaultTerminalAIPrefix}).Error; err != nil {
+			return err
+		}
+		return tx.Create(&model.Setting{
+			Key:   "AIRiskCommands",
+			Value: constant.DefaultTerminalAIRiskCommands,
+		}).Error
+	},
+}
+
+var UpdateAgentQuickJumpTitle = &gormigrate.Migration{
+	ID: "20260324-update-agent-quick-jump-title",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.Model(&model.QuickJump{}).
+			Where("title = ?", "aiTools.agents.agents").
+			Update("title", "aiTools.agents.agent").Error
+	},
+}
+
+var FixOpenclaw20260323HTTPPort = &gormigrate.Migration{
+	ID: "20260325-fix-openclaw-20260323-http-port",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.Exec(
+			`UPDATE app_installs
+SET http_port = https_port,
+    https_port = 0
+WHERE version = ?
+  AND https_port > 0
+  AND app_id IN (SELECT id FROM apps WHERE key = ?)`,
+			"2026.3.24",
+			constant.AppOpenclaw,
+		).Error
+	},
+}
+
+var AddAgentRemarkColumn = &gormigrate.Migration{
+	ID: "20260330-add-agent-remark-column",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(&model.Agent{})
+	},
+}
+
+var AddAgentWebsiteBinding = &gormigrate.Migration{
+	ID: "20260403-add-agent-website-binding",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.Agent{}); err != nil {
+			return err
+		}
+
+		var agents []model.Agent
+		if err := tx.Find(&agents).Error; err != nil {
+			return err
+		}
+		if len(agents) == 0 {
+			return nil
+		}
+
+		var websites []model.Website
+		if err := tx.Where("type = ? AND app_install_id > 0", constant.Deployment).Find(&websites).Error; err != nil {
+			return err
+		}
+		websiteMap := service.UniqueDeploymentWebsiteMapForMigration(websites)
+		for _, agent := range agents {
+			if agent.WebsiteID != 0 || agent.AppInstallID == 0 {
+				continue
+			}
+			website, ok := websiteMap[agent.AppInstallID]
+			if !ok {
+				continue
+			}
+			if err := tx.Model(&model.Agent{}).Where("id = ?", agent.ID).Update("website_id", website.ID).Error; err != nil {
+				return err
+			}
+		}
+		return nil
+	},
+}
+
+var AddFileManageAISettings = &gormigrate.Migration{
+	ID: "20260330-add-file-manage-ai-settings",
+	Migrate: func(tx *gorm.DB) error {
+		rows := []model.Setting{
+			{Key: "FileAIStatus", Value: constant.StatusDisable},
+			{Key: "FileAIAccountID", Value: ""},
+		}
+		for i := range rows {
+			var exist model.Setting
+			if err := tx.Where("`key` = ?", rows[i].Key).First(&exist).Error; err != nil {
+				if errors.Is(err, gorm.ErrRecordNotFound) {
+					if err := tx.Create(&rows[i]).Error; err != nil {
+						return err
+					}
+				} else {
+					return err
+				}
+			}
+		}
+		return nil
+	},
+}
+
+var AddFileShareTable = &gormigrate.Migration{
+	ID: "20260410-add-file-share-table",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(&model.FileShare{})
 	},
 }

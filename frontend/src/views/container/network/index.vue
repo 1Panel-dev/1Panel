@@ -96,7 +96,8 @@
 import CreateDialog from '@/views/container/network/create/index.vue';
 import DetailDrawer from '@/views/container/network/detail/index.vue';
 import { reactive, ref } from 'vue';
-import { dateFormat, newUUID } from '@/utils/util';
+import { dateFormat } from '@/utils/date';
+import { newUUID } from '@/utils/id';
 import { deleteNetwork, searchNetwork, inspect, containerPrune } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
 import TaskLog from '@/components/log/task/index.vue';

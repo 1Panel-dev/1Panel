@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import piniaPersistConfig from '@/config/pinia-persist';
-import { GlobalState, ThemeConfigProp } from '../interface';
+import { GlobalState } from '../interface';
 import { DeviceType } from '@/enums/app';
 import i18n, { setActiveLocale } from '@/lang';
 
@@ -13,8 +13,9 @@ const GlobalStore = defineStore({
         isLoading: false,
         loadingText: '',
         isLogin: false,
+        csrfToken: '',
         entrance: '',
-        language: '',
+        language: i18n.global.locale.value,
         themeConfig: {
             panelName: '',
             primary: '#005eeb',
@@ -43,6 +44,7 @@ const GlobalStore = defineStore({
         currentDB: '',
         currentPgDB: '',
         currentRedisDB: '',
+        currentMongodbDB: '',
         showEntranceWarn: true,
         defaultNetwork: 'all',
         defaultIO: 'all',
@@ -75,34 +77,13 @@ const GlobalStore = defineStore({
         isMaster: (state) => state.currentNode === 'local',
     },
     actions: {
-        setOpenMenuTabs(openMenuTabs: boolean) {
-            this.openMenuTabs = openMenuTabs;
-        },
         setScreenFull() {
             this.isFullScreen = !this.isFullScreen;
-        },
-        setLogStatus(login: boolean) {
-            this.isLogin = login;
-        },
-        setGlobalLoading(loading: boolean) {
-            this.isLoading = loading;
-        },
-        setLoadingText(text: string) {
-            this.loadingText = text;
-        },
-        setCsrfToken(token: string) {
-            this.csrfToken = token;
         },
         async updateLanguage(language: string) {
             const activeLocale = await setActiveLocale(language);
             this.language = activeLocale;
             return activeLocale;
-        },
-        setThemeConfig(themeConfig: ThemeConfigProp) {
-            this.themeConfig = themeConfig;
-        },
-        setAgreeLicense(agree: boolean) {
-            this.agreeLicense = agree;
         },
         toggleDevice(value: DeviceType) {
             this.device = value;
@@ -115,27 +96,6 @@ const GlobalStore = defineStore({
         },
         isMasterPro() {
             return this.isMasterProductPro;
-        },
-        setLastFilePath(path: string) {
-            this.lastFilePath = path;
-        },
-        setCurrentDB(name: string) {
-            this.currentDB = name;
-        },
-        setCurrentPgDB(name: string) {
-            this.currentPgDB = name;
-        },
-        setCurrentRedisDB(name: string) {
-            this.currentRedisDB = name;
-        },
-        setShowEntranceWarn(show: boolean) {
-            this.showEntranceWarn = show;
-        },
-        setDefaultNetwork(net: string) {
-            this.defaultNetwork = net;
-        },
-        setDefaultIO(net: string) {
-            this.defaultIO = net;
         },
     },
     persist: piniaPersistConfig('GlobalState'),

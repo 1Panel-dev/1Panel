@@ -135,6 +135,7 @@ func (u *ContainerService) PageCompose(req dto.SearchWithPage) (int64, interface
 
 	for key, value := range mergedMap {
 		value.Name = key
+		value.ComposeFileExists = composeFileExists(value.Workdir, value.ConfigFile)
 		records = append(records, value)
 	}
 	if len(req.Info) != 0 {
@@ -162,6 +163,29 @@ func (u *ContainerService) PageCompose(req dto.SearchWithPage) (int64, interface
 	}
 	listItem := loadEnv(BackDatas)
 	return int64(total), listItem, nil
+}
+
+func composeFileExists(workdir, configFile string) bool {
+	workdir = strings.TrimSpace(workdir)
+	configFile = strings.TrimSpace(configFile)
+	if configFile == "" {
+		return false
+	}
+	for _, item := range strings.Split(configFile, ",") {
+		file := strings.TrimSpace(item)
+		if file == "" {
+			continue
+		}
+		if !filepath.IsAbs(file) && workdir != "" {
+			file = filepath.Join(workdir, file)
+		}
+		file = filepath.Clean(file)
+		info, err := os.Stat(file)
+		if err == nil && !info.IsDir() {
+			return true
+		}
+	}
+	return false
 }
 
 func (u *ContainerService) TestCompose(req dto.ComposeCreate) (bool, error) {
@@ -383,8 +407,11 @@ func (u *ContainerService) loadPath(req *dto.ComposeCreate) error {
 }
 
 func removeContainerForCompose(composeName, composePath string) error {
-	if stdout, err := compose.Operate(composePath, "down"); err != nil {
-		return errors.New(stdout)
+	if _, err := os.Stat(composePath); err == nil {
+		if stdout, err := compose.Operate(composePath, "down"); err != nil {
+			return errors.New(stdout)
+		}
+		return nil
 	}
 	var options container.ListOptions
 	options.All = true

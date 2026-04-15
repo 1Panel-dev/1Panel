@@ -27,6 +27,15 @@ func (b *BaseApi) GetSettingInfo(c *gin.Context) {
 	helper.SuccessWithData(c, setting)
 }
 
+func (b *BaseApi) GetTerminalAISettingInfo(c *gin.Context) {
+	setting, err := settingService.GetTerminalAIInfo()
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, setting)
+}
+
 // @Tags System Setting
 // @Summary Load system available status
 // @Success 200
@@ -53,6 +62,40 @@ func (b *BaseApi) UpdateSetting(c *gin.Context) {
 	}
 
 	if err := settingService.Update(req.Key, req.Value); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+func (b *BaseApi) UpdateTerminalAISetting(c *gin.Context) {
+	var req dto.TerminalAIInfo
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	if err := settingService.UpdateTerminalAI(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+func (b *BaseApi) GetFileManageAISettingInfo(c *gin.Context) {
+	setting, err := settingService.GetFileManageAIInfo()
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, setting)
+}
+
+func (b *BaseApi) UpdateFileManageAISetting(c *gin.Context) {
+	var req dto.FileManageAIInfo
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := settingService.UpdateFileManageAI(req); err != nil {
 		helper.InternalServer(c, err)
 		return
 	}

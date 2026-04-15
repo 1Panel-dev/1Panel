@@ -17,6 +17,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/buserr"
@@ -119,10 +120,11 @@ func (f FileOp) CreateDirWithPath(isDir bool, pathItem string) (string, error) {
 }
 
 func (f FileOp) CreateFile(dst string) error {
-	if _, err := f.Fs.Create(dst); err != nil {
+	file, err := f.Fs.Create(dst)
+	if err != nil {
 		return err
 	}
-	return nil
+	return file.Close()
 }
 
 func (f FileOp) CreateFileWithMode(dst string, mode fs.FileMode) error {
@@ -333,6 +335,17 @@ func (f FileOp) Rename(oldName string, newName string) error {
 	return f.Fs.Rename(oldName, newName)
 }
 
+type downloadTask struct {
+	resp *http.Response
+	file *os.File
+	dst  string
+}
+
+var (
+	downloadMu    sync.Mutex
+	downloadTasks = make(map[string]*downloadTask)
+)
+
 type WriteCounter struct {
 	Total   uint64
 	Written uint64
@@ -382,37 +395,83 @@ func (f FileOp) DownloadFileWithProcess(url, dst, key string, ignoreCertificate 
 		}
 	}
 	defer client.CloseIdleConnections()
+
 	request, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return nil
+		return buserr.WithDetail("ErrWgetRemoteFailed", err.Error(), err)
 	}
 	request.Header.Set("Accept-Encoding", "identity")
+
 	resp, err := client.Do(request)
 	if err != nil {
 		global.LOG.Errorf("get download file [%s] error, err %s", dst, err.Error())
-		return err
+		return buserr.WithDetail("ErrWgetRemoteFailed", err.Error(), err)
 	}
+
+	if resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusMultipleChoices {
+		_, _ = io.Copy(io.Discard, io.LimitReader(resp.Body, 64*1024))
+		_ = resp.Body.Close()
+		global.LOG.Errorf("wget remote returned non-success status %s for url %s", resp.Status, url)
+		return buserr.WithDetail("ErrWgetRemoteFailed", resp.StatusCode, nil)
+	}
+
+	ct := strings.ToLower(resp.Header.Get("Content-Type"))
+	dstExt := strings.ToLower(filepath.Ext(dst))
+	if (strings.Contains(ct, "text/html") || strings.Contains(ct, "text/xml")) &&
+		dstExt != ".html" && dstExt != ".htm" && dstExt != ".xml" && dstExt != ".svg" {
+		_, _ = io.Copy(io.Discard, io.LimitReader(resp.Body, 64*1024))
+		_ = resp.Body.Close()
+		detail := fmt.Sprintf("Content-Type: %s", ct)
+		global.LOG.Errorf("wget got html/xml response for non-html file %s, url %s, %s", dst, url, detail)
+		return buserr.WithDetail("ErrWgetInvalidContentType", detail, nil)
+	}
+
 	out, err := os.Create(dst)
 	if err != nil {
 		global.LOG.Errorf("create download file [%s] error, err %s", dst, err.Error())
+		resp.Body.Close()
 		return err
 	}
+
+	downloadMu.Lock()
+	downloadTasks[key] = &downloadTask{
+		resp: resp,
+		file: out,
+		dst:  dst,
+	}
+	downloadMu.Unlock()
+
 	go func() {
+		defer func() {
+			out.Close()
+			resp.Body.Close()
+
+			downloadMu.Lock()
+			delete(downloadTasks, key)
+			downloadMu.Unlock()
+		}()
+
 		counter := &WriteCounter{}
 		counter.Key = key
 		if resp.ContentLength > 0 {
 			counter.Total = uint64(resp.ContentLength)
 		}
 		counter.Name = filepath.Base(dst)
-		if _, err = io.Copy(out, io.TeeReader(resp.Body, counter)); err != nil {
+
+		if _, err := io.Copy(out, io.TeeReader(resp.Body, counter)); err != nil {
 			global.LOG.Errorf("save download file [%s] error, err %s", dst, err.Error())
+			global.CACHE.Del(counter.Key)
+			return
 		}
-		out.Close()
-		resp.Body.Close()
 
 		value := global.CACHE.Get(counter.Key)
+		if value == "" {
+			return
+		}
 		process := &Process{}
-		_ = json.Unmarshal([]byte(value), process)
+		if err := json.Unmarshal([]byte(value), process); err != nil {
+			return
+		}
 		process.Percent = 100
 		process.Name = counter.Name
 		process.Total = process.Written
@@ -420,6 +479,25 @@ func (f FileOp) DownloadFileWithProcess(url, dst, key string, ignoreCertificate 
 		global.CACHE.Set(counter.Key, string(by))
 	}()
 	return nil
+}
+
+func CancelDownload(key string) {
+	downloadMu.Lock()
+	task, ok := downloadTasks[key]
+	if !ok {
+		downloadMu.Unlock()
+		return
+	}
+	dst := task.dst
+	downloadMu.Unlock()
+
+	_ = task.file.Close()
+	_ = task.resp.Body.Close()
+
+	if dst != "" {
+		_ = os.Remove(dst)
+	}
+	global.CACHE.Del(key)
 }
 
 func (f FileOp) DownloadFile(url, dst string) error {
@@ -464,7 +542,7 @@ func (f FileOp) Cut(oldPaths []string, dst, name string, cover bool) error {
 		quotedPaths = append(quotedPaths, fmt.Sprintf("'%s'", p))
 	}
 	mvCommand := fmt.Sprintf("mv %s %s '%s'", coverFlag, strings.Join(quotedPaths, " "), dstPath)
-	if err := cmd.RunDefaultBashC(mvCommand); err != nil {
+	if err := cmd.RunDefaultBashCf(mvCommand); err != nil {
 		return err
 	}
 	return nil
@@ -527,22 +605,22 @@ func (f FileOp) CopyAndReName(src, dst, name string, cover bool) error {
 		if name != "" && !cover {
 			dstPath = filepath.Join(dst, name)
 		}
-		return cmd.RunDefaultBashCf(`cp -rf '%s' '%s'`, src, dstPath)
+		return cmd.RunDefaultBashCf(`cp -rfp '%s' '%s'`, src, dstPath)
 	} else {
 		dstPath := filepath.Join(dst, name)
 		if cover {
 			dstPath = dst
 		}
-		return cmd.RunDefaultBashCf(`cp -f '%s' '%s'`, src, dstPath)
+		return cmd.RunDefaultBashCf(`cp -fp '%s' '%s'`, src, dstPath)
 	}
 }
 
 func (f FileOp) CopyDirWithNewName(src, dst, newName string) error {
 	if newName == "." || newName == "" {
-		return cmd.RunDefaultBashCf(`cp -rf '%s'/. '%s'`, src, dst)
+		return cmd.RunDefaultBashCf(`cp -rfp '%s'/. '%s'`, src, dst)
 	}
 	dstDir := filepath.Join(dst, newName)
-	return cmd.RunDefaultBashCf(`cp -rf '%s' '%s'`, src, dstDir)
+	return cmd.RunDefaultBashCf(`cp -rfp '%s' '%s'`, src, dstDir)
 }
 
 func (f FileOp) CopyDir(src, dst string) error {
@@ -554,7 +632,7 @@ func (f FileOp) CopyDir(src, dst string) error {
 	if err = f.Fs.MkdirAll(dstDir, srcInfo.Mode()); err != nil {
 		return err
 	}
-	return cmd.NewCommandMgr(cmd.WithIgnoreExist1()).RunBashCf(`cp -rf '%s' '%s'`, src, dst+"/")
+	return cmd.NewCommandMgr(cmd.WithIgnoreExist1()).RunBashCf(`cp -rfp '%s' '%s'`, src, dst+"/")
 }
 
 func (f FileOp) CopyDirWithExclude(src, dst string, excludeNames []string) error {
@@ -567,7 +645,7 @@ func (f FileOp) CopyDirWithExclude(src, dst string, excludeNames []string) error
 		return err
 	}
 	if len(excludeNames) == 0 {
-		return cmd.NewCommandMgr(cmd.WithIgnoreExist1()).RunBashCf(`cp -rf '%s' '%s'`, src, dst+"/")
+		return cmd.NewCommandMgr(cmd.WithIgnoreExist1()).RunBashCf(`cp -rfp '%s' '%s'`, src, dst+"/")
 	}
 	tmpFiles, err := os.ReadDir(src)
 	if err != nil {
@@ -600,7 +678,7 @@ func (f FileOp) CopyDirWithExclude(src, dst string, excludeNames []string) error
 
 func (f FileOp) CopyFile(src, dst string) error {
 	dst = filepath.Clean(dst) + string(filepath.Separator)
-	return cmd.NewCommandMgr(cmd.WithIgnoreExist1()).RunBashCf(`cp -f '%s' '%s'`, src, dst+"/")
+	return cmd.NewCommandMgr(cmd.WithIgnoreExist1()).RunBashCf(`cp -fp '%s' '%s'`, src, dst+"/")
 }
 
 func (f FileOp) GetDirSize(path string) (int64, error) {
@@ -745,6 +823,7 @@ func (f FileOp) Compress(srcRiles []string, dst string, name string, cType Compr
 	if err != nil {
 		return err
 	}
+	defer out.Close()
 
 	switch cType {
 	case Zip:
@@ -797,12 +876,17 @@ func decodeGBK(input string) (string, error) {
 func (f FileOp) decompressWithSDK(srcFile string, dst string, cType CompressType) error {
 	format := getFormat(cType)
 	if cType == Gz {
-		err := f.DecompressGzFile(srcFile, dst)
-		if err != nil {
-			return err
+		if err := f.tryDecompressTarGz(srcFile, dst, format); err == nil {
+			return nil
 		}
-		return nil
+		return f.DecompressGzFile(srcFile, dst)
 	}
+
+	type dirEntry struct {
+		path    string
+		modTime time.Time
+	}
+	var dirs []dirEntry
 
 	handler := func(ctx context.Context, archFile archiver.File) error {
 		info := archFile.FileInfo
@@ -824,6 +908,7 @@ func (f FileOp) decompressWithSDK(srcFile string, dst string, cType CompressType
 			if err := f.Fs.MkdirAll(filePath, info.Mode()); err != nil {
 				return err
 			}
+			dirs = append(dirs, dirEntry{path: filePath, modTime: info.ModTime()})
 			return nil
 		} else {
 			parentDir := path.Dir(filePath)
@@ -846,14 +931,21 @@ func (f FileOp) decompressWithSDK(srcFile string, dst string, cType CompressType
 		if _, err := io.Copy(fw, fr); err != nil {
 			return err
 		}
-
+		_ = os.Chtimes(filePath, info.ModTime(), info.ModTime())
 		return nil
 	}
 	input, err := f.Fs.Open(srcFile)
 	if err != nil {
 		return err
 	}
-	return format.Extract(context.Background(), input, nil, handler)
+	defer input.Close()
+	if err := format.Extract(context.Background(), input, nil, handler); err != nil {
+		return err
+	}
+	for i := len(dirs) - 1; i >= 0; i-- {
+		_ = os.Chtimes(dirs[i].path, dirs[i].modTime, dirs[i].modTime)
+	}
+	return nil
 }
 
 func (f FileOp) Decompress(srcFile string, dst string, cType CompressType, secret string) error {
@@ -918,6 +1010,7 @@ func ZipFile(files []archiver.File, dst afero.File) error {
 				return err
 			}
 			_, err = io.Copy(w, fileReader)
+			fileReader.Close()
 			if err != nil {
 				return err
 			}
@@ -926,7 +1019,75 @@ func ZipFile(files []archiver.File, dst afero.File) error {
 	return nil
 }
 
+func (f FileOp) tryDecompressTarGz(srcFile string, dst string, format archiver.CompressedArchive) error {
+	input, err := f.Fs.Open(srcFile)
+	if err != nil {
+		return err
+	}
+	defer input.Close()
+
+	type dirEntry struct {
+		path    string
+		modTime time.Time
+	}
+	var dirs []dirEntry
+	extracted := false
+
+	handler := func(ctx context.Context, archFile archiver.File) error {
+		info := archFile.FileInfo
+		if isIgnoreFile(archFile.Name()) {
+			return nil
+		}
+		filePath := filepath.Join(dst, archFile.NameInArchive)
+		if info.IsDir() {
+			if err := f.Fs.MkdirAll(filePath, info.Mode()); err != nil {
+				return err
+			}
+			dirs = append(dirs, dirEntry{path: filePath, modTime: info.ModTime()})
+		} else {
+			parentDir := filepath.Dir(filePath)
+			if !f.Stat(parentDir) {
+				if err := f.Fs.MkdirAll(parentDir, info.Mode()); err != nil {
+					return err
+				}
+			}
+			fr, err := archFile.Open()
+			if err != nil {
+				return err
+			}
+			defer fr.Close()
+			fw, err := f.Fs.OpenFile(filePath, os.O_CREATE|os.O_RDWR|os.O_TRUNC, info.Mode())
+			if err != nil {
+				return err
+			}
+			defer fw.Close()
+			if _, err := io.Copy(fw, fr); err != nil {
+				return err
+			}
+			_ = os.Chtimes(filePath, info.ModTime(), info.ModTime())
+		}
+		extracted = true
+		return nil
+	}
+
+	if err := format.Extract(context.Background(), input, nil, handler); err != nil {
+		return err
+	}
+	if !extracted {
+		return fmt.Errorf("no files extracted as tar.gz")
+	}
+	for i := len(dirs) - 1; i >= 0; i-- {
+		_ = os.Chtimes(dirs[i].path, dirs[i].modTime, dirs[i].modTime)
+	}
+	return nil
+}
+
 func (f FileOp) DecompressGzFile(srcFile, dst string) error {
+	var archiveModTime time.Time
+	if st, err := f.Fs.Stat(srcFile); err == nil {
+		archiveModTime = st.ModTime()
+	}
+
 	in, err := f.Fs.Open(srcFile)
 	if err != nil {
 		return fmt.Errorf("open source file failed: %w", err)
@@ -939,7 +1100,13 @@ func (f FileOp) DecompressGzFile(srcFile, dst string) error {
 	}
 	defer gr.Close()
 
-	outName := strings.TrimSuffix(filepath.Base(srcFile), ".gz")
+	outName := ""
+	if gr.Name != "" {
+		outName = filepath.Base(gr.Name)
+	}
+	if outName == "" || outName == "." {
+		outName = strings.TrimSuffix(filepath.Base(srcFile), ".gz")
+	}
 	outPath := filepath.Join(dst, outName)
 	parentDir := filepath.Dir(outPath)
 	if !f.Stat(parentDir) {
@@ -956,6 +1123,10 @@ func (f FileOp) DecompressGzFile(srcFile, dst string) error {
 
 	if _, err := io.Copy(fw, gr); err != nil {
 		return fmt.Errorf("copy content failed: %w", err)
+	}
+
+	if !archiveModTime.IsZero() {
+		_ = os.Chtimes(outPath, archiveModTime, archiveModTime)
 	}
 
 	return nil

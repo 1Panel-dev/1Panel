@@ -51,8 +51,7 @@ import { FormInstance } from 'element-plus';
 import { ref } from 'vue';
 import { MsgSuccess } from '@/utils/message';
 import { Website } from '@/api/interface/website';
-import { getRandomStr } from '@/utils/util';
-
+import { getRandomStr } from '@/utils/id';
 const proxyForm = ref<FormInstance>();
 const rules = ref({
     username: [Rules.requiredInput, Rules.name],

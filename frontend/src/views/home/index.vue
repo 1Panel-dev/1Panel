@@ -434,7 +434,10 @@ import CardWithHeader from '@/components/card-with-header/index.vue';
 import MarkDownEditor from '@/components/mkdown-editor/index.vue';
 import i18n from '@/lang';
 import { Dashboard } from '@/api/interface/dashboard';
-import { dateFormatForSecond, computeSize, computeSizeFromKBs, loadUpTime, jumpToPath, copyText } from '@/utils/util';
+import { dateFormatForSecond, loadUpTime } from '@/utils/date';
+import { computeSize, computeSizeFromKBs } from '@/utils/size';
+import { jumpToPath } from '@/utils/router';
+import { copyText } from '@/utils/clipboard';
 import { useRouter } from 'vue-router';
 import { loadBaseInfo, loadCurrentInfo } from '@/api/modules/dashboard';
 import { getIOOptions, getNetworkOptions } from '@/api/modules/host';
@@ -599,6 +602,7 @@ const currentChartInfo = reactive({
     netBytesSent: 0,
     netBytesRecv: 0,
 });
+const skipNextCurrentInfoDelta = ref(false);
 
 const chartsOption = ref({ ioChart1: null, networkChart: null });
 
@@ -686,6 +690,7 @@ const onLoadBaseInfo = async (isInit: boolean, range: string) => {
     const res = await loadBaseInfo(searchInfo.ioOption, searchInfo.netOption);
     baseInfo.value = res.data;
     updateCurrentInfo(baseInfo.value.currentInfo);
+    skipNextCurrentInfoDelta.value = true;
     onLoadCurrentInfo();
     isStatusInit.value = false;
     statusRef.value?.acceptParams(currentInfo.value, baseInfo.value);
@@ -744,6 +749,19 @@ const jumpPanel = (row: any) => {
 
 const onLoadCurrentInfo = async () => {
     const res = await loadCurrentInfo(searchInfo.ioOption, searchInfo.netOption);
+    if (skipNextCurrentInfoDelta.value) {
+        skipNextCurrentInfoDelta.value = false;
+        currentChartInfo.netBytesSent = 0;
+        currentChartInfo.netBytesRecv = 0;
+        currentChartInfo.ioReadBytes = 0;
+        currentChartInfo.ioWriteBytes = 0;
+        currentChartInfo.ioCount = 0;
+        currentChartInfo.ioTime = 0;
+        updateCurrentInfo(res.data);
+        statusRef.value?.acceptParams(currentInfo.value, baseInfo.value);
+        return;
+    }
+
     currentInfo.value.timeSinceUptime = res.data.timeSinceUptime;
 
     let timeInterval = Number(res.data.uptime - currentInfo.value.uptime) || 3;
@@ -925,7 +943,7 @@ const loadData = async () => {
 };
 
 const hideEntrance = () => {
-    globalStore.setShowEntranceWarn(false);
+    globalStore.showEntranceWarn = false;
 };
 
 const loadUpgradeStatus = async () => {
@@ -984,6 +1002,7 @@ const loadSource = (row: any) => {
 
 const onFocus = () => {
     isActive.value = true;
+    skipNextCurrentInfoDelta.value = true;
 };
 const onBlur = () => {
     isActive.value = false;
@@ -1070,7 +1089,7 @@ onBeforeUnmount(() => {
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .h-overview {
     text-align: center;
 
@@ -1127,21 +1146,21 @@ onBeforeUnmount(() => {
 
 .my-carousel {
     &.no-indicator {
-        .el-carousel__indicators {
+        :deep(.el-carousel__indicators) {
             display: none;
         }
     }
 
-    .el-carousel__button {
+    :deep(.el-carousel__button) {
         margin-bottom: -4px;
         background-color: var(--el-text-color-regular);
     }
 
-    .el-carousel__indicator.is-active .el-carousel__button {
+    :deep(.el-carousel__indicator.is-active .el-carousel__button) {
         background-color: var(--panel-color-primary);
     }
 
-    .el-descriptions .el-descriptions__body .el-descriptions__table {
+    :deep(.el-descriptions .el-descriptions__body .el-descriptions__table) {
         border-spacing: 0 5px !important;
     }
 }
@@ -1181,7 +1200,7 @@ onBeforeUnmount(() => {
     top: -10px;
     left: 20px;
 
-    .el-tag {
+    :deep(.el-tag) {
         margin-right: 10px;
         margin-bottom: 10px;
     }
@@ -1226,7 +1245,7 @@ onBeforeUnmount(() => {
     word-wrap: break-word;
     white-space: pre-wrap;
 
-    .md-editor {
+    :deep(.md-editor) {
         background-color: transparent;
     }
 }

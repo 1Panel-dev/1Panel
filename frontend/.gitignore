@@ -29,3 +29,6 @@ stats.html
 *.sw?
 .vscode
 folder-alias.json
+
+.eslintcache
+/.eslintcache

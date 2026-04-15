@@ -215,7 +215,6 @@ export namespace Host {
     }
     export interface SSHUpdate {
         key: string;
-        oldValue: string;
         newValue: string;
     }
     export interface RootCert {

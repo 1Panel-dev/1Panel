@@ -1,6 +1,6 @@
 import http from '@/api';
-import { deepCopy } from '@/utils/util';
-import { Base64 } from 'js-base64';
+import { deepCopy } from '@/utils/misc';
+import { encodeBase64Fields } from '@/utils/base64';
 import { ResPage } from '../interface';
 import { Backup } from '../interface/backup';
 import { TimeoutEnum } from '@/enums/http-enum';
@@ -17,12 +17,7 @@ export const searchBackup = (params: Backup.SearchWithType) => {
 };
 export const checkBackup = (params: Backup.BackupOperate) => {
     let request = deepCopy(params) as Backup.BackupOperate;
-    if (request.accessKey) {
-        request.accessKey = Base64.encode(request.accessKey);
-    }
-    if (request.credential) {
-        request.credential = Base64.encode(request.credential);
-    }
+    encodeBase64Fields(request, ['accessKey', 'credential']);
     if (!params.isPublic || !globalStore.isProductPro) {
         return http.postLocalNode<Backup.CheckResult>(`/backups/conn/check`, request);
     }
@@ -30,12 +25,7 @@ export const checkBackup = (params: Backup.BackupOperate) => {
 };
 export const listBucket = (params: Backup.ForBucket) => {
     let request = deepCopy(params) as Backup.BackupOperate;
-    if (request.accessKey) {
-        request.accessKey = Base64.encode(request.accessKey);
-    }
-    if (request.credential) {
-        request.credential = Base64.encode(request.credential);
-    }
+    encodeBase64Fields(request, ['accessKey', 'credential']);
     if (!params.isPublic || !globalStore.isProductPro) {
         return http.postLocalNode('/backups/buckets', request, TimeoutEnum.T_40S);
     }
@@ -64,11 +54,11 @@ export const deleteBackupRecord = (params: { ids: number[] }, node?: string) => 
     const query = node ? `?operateNode=${node}` : '';
     return http.post(`/backups/record/del${query}`, params);
 };
-export const updateRecordDescription = (id: Number, description: String, node?: string) => {
+export const updateRecordDescription = (id: number, description: string, node?: string) => {
     const query = node ? `?operateNode=${node}` : '';
     return http.post(`/backups/record/description/update${query}`, { id: id, description: description });
 };
-export const uploadByRecover = (filePath: string, targetDir: String, node?: string) => {
+export const uploadByRecover = (filePath: string, targetDir: string, node?: string) => {
     const query = node ? `?operateNode=${node}` : '';
     return http.post(`/backups/upload${query}`, { filePath: filePath, targetDir: targetDir });
 };
@@ -99,12 +89,7 @@ export const getClientInfo = (clientType: string) => {
 };
 export const addBackup = (params: Backup.BackupOperate) => {
     let request = deepCopy(params) as Backup.BackupOperate;
-    if (request.accessKey) {
-        request.accessKey = Base64.encode(request.accessKey);
-    }
-    if (request.credential) {
-        request.credential = Base64.encode(request.credential);
-    }
+    encodeBase64Fields(request, ['accessKey', 'credential']);
     let urlItem = '/core/backups';
     if (!params.isPublic) {
         urlItem = '/backups';
@@ -113,12 +98,7 @@ export const addBackup = (params: Backup.BackupOperate) => {
 };
 export const editBackup = (params: Backup.BackupOperate) => {
     let request = deepCopy(params) as Backup.BackupOperate;
-    if (request.accessKey) {
-        request.accessKey = Base64.encode(request.accessKey);
-    }
-    if (request.credential) {
-        request.credential = Base64.encode(request.credential);
-    }
+    encodeBase64Fields(request, ['accessKey', 'credential']);
     let urlItem = '/core/backups/update';
     if (!params.isPublic) {
         urlItem = '/backups/update';

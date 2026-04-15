@@ -345,7 +345,7 @@ import { ElForm } from 'element-plus';
 import Confirm from '@/views/container/container/operate/confirm.vue';
 import Volume from '@/views/container/container/operate/volume.vue';
 import Network from '@/views/container/container/operate/network.vue';
-import ExtraHosts from '@/views/website/runtime/components/extra_hosts/index.vue';
+import ExtraHosts from '@/views/website/runtime/components/extra-hosts/index.vue';
 import {
     listImage,
     createContainer,
@@ -357,7 +357,8 @@ import {
 import { Container } from '@/api/interface/container';
 import { MsgError } from '@/utils/message';
 import TaskLog from '@/components/log/task/index.vue';
-import { checkIpV4V6, checkPort, newUUID } from '@/utils/util';
+import { checkIpV4V6, checkPort } from '@/utils/validate';
+import { newUUID } from '@/utils/id';
 import router from '@/routers';
 import TerminalDialog from '@/views/host/file-management/terminal/index.vue';
 import { routerToName, routerToNameWithQuery } from '@/utils/router';

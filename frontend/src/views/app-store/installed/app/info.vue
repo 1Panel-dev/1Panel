@@ -73,8 +73,8 @@
 
 <script lang="ts" setup>
 import { App } from '@/api/interface/app';
-import { getAge, toLink } from '@/utils/util';
-
+import { getAge } from '@/utils/date';
+import { toLink } from '@/utils/browser';
 interface Props {
     installed: App.AppInstalled;
     defaultLink: string;

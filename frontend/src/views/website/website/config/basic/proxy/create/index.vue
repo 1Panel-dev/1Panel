@@ -68,6 +68,14 @@
                         >
                             <el-input v-model.trim="proxy.proxySSLName" />
                         </el-form-item>
+
+                        <div class="flex justify-between items-center py-3">
+                            <div class="flex flex-col gap-1">
+                                <span class="font-medium">{{ $t('website.proxySslVerify') }}</span>
+                                <span class="input-help">{{ $t('website.proxySslVerifyHelper') }}</span>
+                            </div>
+                            <el-switch v-model="proxy.sslVerify" size="large" />
+                        </div>
                     </template>
                 </el-tab-pane>
 
@@ -241,7 +249,7 @@ import { ref, watch } from 'vue';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { Website } from '@/api/interface/website';
 import { Units } from '@/global/mimetype';
-import { isDomain } from '@/utils/util';
+import { isDomain } from '@/utils/validate';
 import { Delete, Plus } from '@element-plus/icons-vue';
 import CorsSetting from '@/views/website/website/cors/index.vue';
 
@@ -279,6 +287,7 @@ const initData = (): Website.ProxyConfig => ({
     proxyProtocol: 'http://',
     sni: false,
     proxySSLName: '',
+    sslVerify: false,
     serverCacheTime: 10,
     serverCacheUnit: 'm',
     browserCache: 'noModify',

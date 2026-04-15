@@ -42,7 +42,16 @@ func SessionAuth() gin.HandlerFunc {
 			global.LOG.Errorf("create operation record failed, err: %v", err)
 			return
 		}
-		_ = global.SESSION.Set(c, psession, ssl == constant.StatusEnable, lifeTime)
+		if _, err := global.SESSION.RefreshIfNeeded(c, psession, ssl == constant.StatusEnable, lifeTime); err != nil {
+			errItem := err.Error()
+			if errItem == "ErrSessionDataFormat" || errItem == "ErrSessionDataNotFound" {
+				helper.BadAuth(c, "ErrNotLogin", buserr.New(errItem))
+				return
+			}
+			global.LOG.Warnf("refresh session failed, path=%s, err=%v", c.Request.URL.Path, err)
+			helper.BadAuth(c, "ErrNotLogin", err)
+			return
+		}
 		c.Next()
 	}
 }

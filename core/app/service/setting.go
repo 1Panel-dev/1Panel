@@ -308,6 +308,7 @@ func (u *SettingService) UpdateSSL(c *gin.Context, req dto.SSLUpdate) error {
 	secretDir := path.Join(global.CONF.Base.InstallDir, "1panel/secret")
 	if req.SSL == constant.StatusDisable {
 		c.SetCookie(constant.SessionName, "", -1, "/", "", false, true)
+		c.SetCookie(constant.CSRFTokenName, "", -1, "/", "", false, false)
 		if err := settingRepo.Update("SSL", constant.StatusDisable); err != nil {
 			return err
 		}
@@ -718,15 +719,19 @@ func (u *SettingService) GetAppstoreConfig() (*dto.AppstoreConfig, error) {
 	res := &dto.AppstoreConfig{}
 	res.UninstallDeleteImage, _ = settingRepo.GetValueByKey("UninstallDeleteImage")
 	if res.UninstallDeleteImage == "" {
-		res.UninstallDeleteImage = "False"
+		res.UninstallDeleteImage = constant.StatusDisable
 	}
 	res.UpgradeBackup, _ = settingRepo.GetValueByKey("UpgradeBackup")
 	if res.UpgradeBackup == "" {
-		res.UpgradeBackup = "False"
+		res.UpgradeBackup = constant.StatusDisable
 	}
 	res.UninstallDeleteBackup, _ = settingRepo.GetValueByKey("UninstallDeleteBackup")
 	if res.UninstallDeleteBackup == "" {
-		res.UninstallDeleteBackup = "False"
+		res.UninstallDeleteBackup = constant.StatusDisable
+	}
+	res.InstallAllowPort, _ = settingRepo.GetValueByKey("InstallAllowPort")
+	if res.InstallAllowPort == "" {
+		res.InstallAllowPort = constant.StatusDisable
 	}
 	return res, nil
 }
@@ -776,6 +781,7 @@ func checkProxy(req dto.ProxyUpdate) error {
 		}
 		transport = http.Transport{DialContext: dialContext}
 	case "", "close":
+		return nil
 	default:
 		return buserr.WithDetail("ErrNotSupportType", req.ProxyType, nil)
 	}

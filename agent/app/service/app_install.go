@@ -337,12 +337,11 @@ func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
 	if err != nil {
 		return err
 	}
-	changePort := false
+	oldInstalled := installed
 	port, ok := req.Params["PANEL_APP_PORT_HTTP"]
 	if ok {
 		portN := int(math.Ceil(port.(float64)))
 		if portN != installed.HttpPort {
-			changePort = true
 			httpPort, err := checkPort("PANEL_APP_PORT_HTTP", req.Params)
 			if err != nil {
 				return err
@@ -428,9 +427,17 @@ func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
 	installed.Status = constant.StatusRunning
 	_ = appInstallRepo.Save(context.Background(), &installed)
 
+	proxyChanged := hasAppInstallProxyPassChanged(&oldInstalled, &installed)
+	currentProxy, currentProxyErr := getAppInstallProxyPass(&installed)
 	website, _ := websiteRepo.GetFirst(websiteRepo.WithAppInstallId(installed.ID))
-	if changePort && website.ID != 0 && website.Status == constant.StatusRunning {
-		go func() {
+	if proxyChanged && website.ID != 0 && currentProxyErr == nil {
+		website.Proxy = currentProxy
+		if err := websiteRepo.SaveWithoutCtx(&website); err != nil {
+			global.LOG.Error(buserr.WithErr("ErrUpdateBuWebsite", err).Error())
+		}
+	}
+	if proxyChanged && website.ID != 0 && website.Status == constant.StatusRunning && currentProxyErr == nil {
+		go func(website model.Website, proxy string) {
 			nginxInstall, err := getNginxFull(&website)
 			if err != nil {
 				global.LOG.Error(buserr.WithErr("ErrUpdateBuWebsite", err).Error())
@@ -443,7 +450,6 @@ func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
 				return
 			}
 			server := servers[0]
-			proxy := fmt.Sprintf("http://127.0.0.1:%d", installed.HttpPort)
 			server.UpdateRootProxy([]string{proxy})
 
 			if err := nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
@@ -454,7 +460,10 @@ func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
 				global.LOG.Error(buserr.WithErr("ErrUpdateBuWebsite", err).Error())
 				return
 			}
-		}()
+		}(website, currentProxy)
+	}
+	if proxyChanged && website.ID != 0 && currentProxyErr != nil {
+		global.LOG.Error(buserr.WithErr("ErrUpdateBuWebsite", currentProxyErr).Error())
 	}
 	return nil
 }
@@ -842,6 +851,10 @@ func syncAppInstallStatus(appInstall *model.AppInstall, force bool) error {
 	}
 	synAppInstall(containersMap, appInstall, force)
 	return nil
+}
+
+func SyncAppInstallStatus(appInstall *model.AppInstall, force bool) error {
+	return syncAppInstallStatus(appInstall, force)
 }
 
 func updateInstallInfoInDB(appKey, appName, param string, value interface{}) error {

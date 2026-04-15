@@ -12,6 +12,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/buserr"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
+	initauth "github.com/1Panel-dev/1Panel/core/init/auth"
 	"github.com/1Panel-dev/1Panel/core/utils/captcha"
 	"github.com/1Panel-dev/1Panel/core/utils/common"
 	"github.com/gin-gonic/gin"
@@ -33,6 +34,10 @@ func (b *BaseApi) Login(c *gin.Context) {
 	}
 
 	ip := common.GetRealClientIP(c)
+	if global.IPTracker.IsLocked(ip) {
+		helper.BadAuth(c, "ErrLoginLocked", nil)
+		return
+	}
 	needCaptcha := global.IPTracker.NeedCaptcha(ip)
 	if needCaptcha {
 		if errMsg := captcha.VerifyCode(req.CaptchaID, req.Captcha); errMsg != "" {
@@ -59,17 +64,21 @@ func (b *BaseApi) Login(c *gin.Context) {
 	}
 	if msgKey == "ErrAuth" || msgKey == "ErrEntrance" {
 		if msgKey == "ErrAuth" {
+			global.IPTracker.RecordFailure(ip)
 			global.IPTracker.SetNeedCaptcha(ip)
 		}
 		helper.BadAuth(c, msgKey, err)
 		return
 	}
 	if err != nil {
+		global.IPTracker.RecordFailure(ip)
 		global.IPTracker.SetNeedCaptcha(ip)
 		helper.InternalServer(c, err)
 		return
 	}
-	global.IPTracker.Clear(ip)
+	if user == nil || user.MfaStatus != constant.StatusEnable {
+		global.IPTracker.Clear(ip)
+	}
 	helper.SuccessWithData(c, user)
 }
 
@@ -85,6 +94,11 @@ func (b *BaseApi) MFALogin(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
+	ip := common.GetRealClientIP(c)
+	if global.IPTracker.IsLocked(ip) {
+		helper.BadAuth(c, "ErrLoginLocked", nil)
+		return
+	}
 
 	entranceItem := c.Request.Header.Get("EntranceCode")
 	var entrance []byte
@@ -94,14 +108,23 @@ func (b *BaseApi) MFALogin(c *gin.Context) {
 
 	user, msgKey, err := authService.MFALogin(c, req, string(entrance))
 	go saveLoginLogs(c, wrapLoginErr(msgKey, err))
-	if msgKey == "ErrAuth" {
+	if msgKey == "ErrMFA" {
+		global.IPTracker.RecordFailure(ip)
+		failures := initauth.GetMFASessionStore().RecordFailure(req.SessionID)
+		if failures >= initauth.MFASessionMaxFailures {
+			global.IPTracker.SetNeedCaptcha(ip)
+			helper.BadAuth(c, "ErrCaptchaCode", nil)
+			return
+		}
 		helper.BadAuth(c, msgKey, err)
 		return
 	}
 	if err != nil {
+		global.IPTracker.RecordFailure(ip)
 		helper.InternalServer(c, err)
 		return
 	}
+	global.IPTracker.Clear(ip)
 	helper.SuccessWithData(c, user)
 }
 

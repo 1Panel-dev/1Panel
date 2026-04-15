@@ -39,6 +39,14 @@
                                         >
                                             <div class="font-medium text-base compose-title">
                                                 {{ row.name }}
+                                                <el-tooltip
+                                                    v-if="!row.composeFileExists"
+                                                    :content="$t('container.composeFileMissing')"
+                                                >
+                                                    <el-button link icon="WarningFilled">
+                                                        <WarningFilled />
+                                                    </el-button>
+                                                </el-tooltip>
                                             </div>
                                             <div class="mb-1">
                                                 <el-text class="w-12" link size="small" type="info">
@@ -72,20 +80,14 @@
                                             </div>
                                             <div class="compose-actions">
                                                 <el-dropdown placement="bottom">
-                                                    <Status
-                                                        v-if="row.containerCount === row.runningCount"
-                                                        status="running"
-                                                        :operate="true"
-                                                    />
-                                                    <Status
-                                                        v-if="row.runningCount === 0"
-                                                        status="exited"
-                                                        :operate="true"
-                                                    />
+                                                    <Status :status="getComposeStatus(row)" :operate="true" />
                                                     <template #dropdown>
                                                         <el-dropdown-menu>
                                                             <el-dropdown-item
-                                                                :disabled="row.containerCount === row.runningCount"
+                                                                :disabled="
+                                                                    row.containerCount === row.runningCount &&
+                                                                    row.runningCount > 0
+                                                                "
                                                                 @click="handleComposeOperate('up', row)"
                                                             >
                                                                 {{ $t('commons.operate.start') }}
@@ -320,7 +322,15 @@
                                 />
                             </el-select>
                             <div v-show="showType === 'compose'">
+                                <el-alert
+                                    v-if="!currentCompose.composeFileExists"
+                                    :title="$t('container.composeFileMissing')"
+                                    type="warning"
+                                    :closable="false"
+                                    show-icon
+                                />
                                 <CodemirrorPro
+                                    v-else
                                     v-model="composeContent"
                                     mode="yaml"
                                     :heightDiff="475"
@@ -329,7 +339,15 @@
                             </div>
 
                             <div v-show="showType === 'log'">
+                                <el-alert
+                                    v-if="!currentCompose.composeFileExists"
+                                    :title="$t('container.composeFileMissing')"
+                                    type="warning"
+                                    :closable="false"
+                                    show-icon
+                                />
                                 <ContainerLog
+                                    v-else
                                     :key="currentCompose.path"
                                     :compose="currentCompose.path"
                                     :resource="currentCompose.name"
@@ -473,7 +491,8 @@ import i18n from '@/lang';
 import { Container } from '@/api/interface/container';
 import { routerToFileWithPath } from '@/utils/router';
 import { MsgError, MsgSuccess } from '@/utils/message';
-import { computeCPU, computeSize2, computeSizeForDocker, newUUID } from '@/utils/util';
+import { computeCPU, computeSize2, computeSizeForDocker } from '@/utils/size';
+import { newUUID } from '@/utils/id';
 import { Rules } from '@/global/form-rules';
 import { loadBaseDir } from '@/api/modules/setting';
 import { ElCheckbox, ElForm } from 'element-plus';
@@ -561,6 +580,16 @@ const loadFrom = (row: any) => {
     }
 };
 
+const getComposeStatus = (row: { containerCount: number; runningCount: number }) => {
+    if (row.runningCount === 0) {
+        return 'exited';
+    }
+    if (row.containerCount === row.runningCount) {
+        return 'running';
+    }
+    return 'partial';
+};
+
 const loadTableHeight = () => {
     if (currentCompose.value?.createdBy === '1Panel') {
         return `calc(100vh - 120px)`;
@@ -621,6 +650,12 @@ const loadDetail = async (row: Container.ComposeInfo, withRefresh: boolean) => {
 };
 
 const inspectCompose = async (name: string, detailPath: string) => {
+    if (!currentCompose.value?.composeFileExists) {
+        composeContent.value = '';
+        loadContainerStats();
+        detailLoading.value = false;
+        return;
+    }
     await inspect({ id: name, type: 'compose', detail: detailPath })
         .then((res) => {
             composeContent.value = res.data;
@@ -916,7 +951,9 @@ const onOpenLog = (row: any) => {
     opacity: 0;
     max-height: 0;
     overflow: hidden;
-    transition: opacity 0.2s, max-height 0.2s;
+    transition:
+        opacity 0.2s,
+        max-height 0.2s;
 }
 
 .compose-item:hover .compose-actions,

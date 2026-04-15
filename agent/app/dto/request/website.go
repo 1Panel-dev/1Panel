@@ -269,6 +269,7 @@ type WebsiteProxyConfig struct {
 	Replaces        map[string]string `json:"replaces"`
 	SNI             bool              `json:"sni"`
 	ProxySSLName    string            `json:"proxySSLName"`
+	SSLVerify       bool              `json:"sslVerify"`
 	CorsConfig
 }
 

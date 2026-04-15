@@ -3,7 +3,7 @@
         "target": "esnext",
         "useDefineForClassFields": true,
         "module": "esnext",
-        "moduleResolution": "node",
+        "moduleResolution": "bundler",
 
         /* Strict Type-Checking Options */
         "strict": false /* Enable all strict type-checking options. */,

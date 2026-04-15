@@ -1,4 +1,5 @@
 import { AI } from '@/api/interface/ai';
+import { App } from '@/api/interface/app';
 import http from '@/api';
 import { ResPage, SearchWithPage } from '../interface';
 import { TimeoutEnum } from '@/enums/http-enum';
@@ -94,11 +95,15 @@ export const operateTensorRTLLM = (req: AI.TensorRTLLMOperate) => {
 };
 
 export const createAgent = (req: AI.AgentCreateReq) => {
-    return http.post<AI.AgentItem>(`/ai/agents`, req, TimeoutEnum.T_60S);
+    return http.post<AI.AgentItem>(`/ai/agents`, req, TimeoutEnum.T_5M);
 };
 
 export const pageAgents = (req: SearchWithPage) => {
     return http.post<ResPage<AI.AgentItem>>(`/ai/agents/search`, req);
+};
+
+export const deleteAgentCheck = (req: AI.AgentIDReq) => {
+    return http.post<App.AppInstallResource[]>(`/ai/agents/delete/check`, req);
 };
 
 export const deleteAgent = (req: AI.AgentDeleteReq) => {
@@ -109,8 +114,56 @@ export const resetAgentToken = (req: AI.AgentTokenResetReq) => {
     return http.post(`/ai/agents/token/reset`, req);
 };
 
+export const updateAgentRemark = (req: AI.AgentRemarkUpdateReq) => {
+    return http.post(`/ai/agents/remark`, req);
+};
+
+export const bindAgentWebsite = (req: AI.AgentWebsiteBindReq) => {
+    return http.post(`/ai/agents/website/bind`, req);
+};
+
+export const getAgentModelConfig = (req: AI.AgentIDReq) => {
+    return http.post<AI.AgentModelConfig>(`/ai/agents/model/get`, req);
+};
+
 export const updateAgentModelConfig = (req: AI.AgentModelConfigUpdateReq) => {
     return http.post(`/ai/agents/model/update`, req);
+};
+
+export const getAgentOverview = (req: AI.AgentOverviewReq) => {
+    return http.post<AI.AgentOverview>(`/ai/agents/overview`, req, TimeoutEnum.T_5M);
+};
+
+export const createAgentRole = (req: AI.AgentRoleCreateReq) => {
+    return http.post<AI.AgentRoleCreateResp>(`/ai/agents/agent/create`, req, TimeoutEnum.T_5M);
+};
+
+export const deleteAgentRole = (req: AI.AgentRoleDeleteReq) => {
+    return http.post(`/ai/agents/agent/delete`, req, TimeoutEnum.T_5M);
+};
+
+export const bindAgentRole = (req: AI.AgentRoleBindReq) => {
+    return http.post(`/ai/agents/agent/bind`, req, TimeoutEnum.T_5M);
+};
+
+export const unbindAgentRole = (req: AI.AgentRoleBindReq) => {
+    return http.post(`/ai/agents/agent/unbind`, req, TimeoutEnum.T_5M);
+};
+
+export const getConfiguredAgentRoles = (req: AI.AgentConfiguredAgentsReq) => {
+    return http.post<AI.AgentConfiguredAgentItem[]>(`/ai/agents/agent/list`, req);
+};
+
+export const getAgentRoleChannels = (req: AI.AgentRoleChannelsReq) => {
+    return http.post<AI.AgentRoleChannelItem[]>(`/ai/agents/agent/channels`, req, TimeoutEnum.T_5M);
+};
+
+export const getAgentRoleMarkdownFiles = (req: AI.AgentRoleMarkdownFilesReq) => {
+    return http.post<AI.AgentRoleMarkdownFileItem[]>(`/ai/agents/agent/md/list`, req);
+};
+
+export const updateAgentRoleMarkdownFile = (req: AI.AgentRoleMarkdownFilesUpdateReq) => {
+    return http.post(`/ai/agents/agent/md/update`, req, TimeoutEnum.T_5M);
 };
 
 export const getAgentProviders = () => {
@@ -127,6 +180,22 @@ export const updateAgentAccount = (req: AI.AgentAccountUpdateReq) => {
 
 export const pageAgentAccounts = (req: AI.AgentAccountSearch) => {
     return http.post<ResPage<AI.AgentAccountItem>>(`/ai/agents/accounts/search`, req);
+};
+
+export const getAgentAccountModels = (req: AI.AgentAccountModelReq) => {
+    return http.post<AI.AgentAccountModel[]>(`/ai/agents/accounts/models`, req);
+};
+
+export const createAgentAccountModel = (req: AI.AgentAccountModelCreateReq) => {
+    return http.post(`/ai/agents/accounts/models/create`, req);
+};
+
+export const updateAgentAccountModel = (req: AI.AgentAccountModelUpdateReq) => {
+    return http.post(`/ai/agents/accounts/models/update`, req);
+};
+
+export const deleteAgentAccountModel = (req: AI.AgentAccountModelDeleteReq) => {
+    return http.post(`/ai/agents/accounts/models/delete`, req);
 };
 
 export const verifyAgentAccount = (req: AI.AgentAccountVerifyReq) => {
@@ -169,6 +238,18 @@ export const updateAgentWecomConfig = (req: AI.AgentWecomConfigUpdateReq) => {
     return http.post(`/ai/agents/channel/wecom/update`, req);
 };
 
+export const getAgentDingTalkConfig = (req: AI.AgentDingTalkConfigReq) => {
+    return http.post<AI.AgentDingTalkConfig>(`/ai/agents/channel/dingtalk/get`, req);
+};
+
+export const updateAgentDingTalkConfig = (req: AI.AgentDingTalkConfigUpdateReq) => {
+    return http.post(`/ai/agents/channel/dingtalk/update`, req);
+};
+
+export const loginAgentWeixinChannel = (req: AI.AgentWeixinLoginReq) => {
+    return http.post(`/ai/agents/channel/weixin/login`, req);
+};
+
 export const getAgentQQBotConfig = (req: AI.AgentQQBotConfigReq) => {
     return http.post<AI.AgentQQBotConfig>(`/ai/agents/channel/qqbot/get`, req);
 };
@@ -179,6 +260,14 @@ export const updateAgentQQBotConfig = (req: AI.AgentQQBotConfigUpdateReq) => {
 
 export const installAgentPlugin = (req: AI.AgentPluginInstallReq) => {
     return http.post(`/ai/agents/plugin/install`, req);
+};
+
+export const upgradeAgentPlugin = (req: AI.AgentPluginUpgradeReq) => {
+    return http.post(`/ai/agents/plugin/upgrade`, req);
+};
+
+export const uninstallAgentPlugin = (req: AI.AgentPluginUninstallReq) => {
+    return http.post(`/ai/agents/plugin/uninstall`, req);
 };
 
 export const checkAgentPlugin = (req: AI.AgentPluginCheckReq) => {
@@ -201,6 +290,30 @@ export const updateAgentOtherConfig = (req: AI.AgentOtherConfigUpdateReq) => {
     return http.post(`/ai/agents/other/update`, req);
 };
 
+export const getAgentConfigFile = (req: AI.AgentConfigFileReq) => {
+    return http.post<AI.AgentConfigFile>(`/ai/agents/config-file/get`, req);
+};
+
+export const updateAgentConfigFile = (req: AI.AgentConfigFileUpdateReq) => {
+    return http.post(`/ai/agents/config-file/update`, req);
+};
+
+export const listAgentSkills = (req: AI.AgentSkillsReq) => {
+    return http.post<AI.AgentSkillItem[]>(`/ai/agents/skills/list`, req, TimeoutEnum.T_5M);
+};
+
+export const searchAgentSkills = (req: AI.AgentSkillSearchReq) => {
+    return http.post<AI.AgentSkillSearchItem[]>(`/ai/agents/skills/search`, req, TimeoutEnum.T_5M);
+};
+
+export const updateAgentSkill = (req: AI.AgentSkillUpdateReq) => {
+    return http.post(`/ai/agents/skills/update`, req);
+};
+
+export const installAgentSkill = (req: AI.AgentSkillInstallReq) => {
+    return http.post(`/ai/agents/skills/install`, req);
+};
+
 export const approveAgentChannelPairing = (req: AI.AgentChannelPairingApproveReq) => {
-    return http.post(`/ai/agents/channel/pairing/approve`, req);
+    return http.post(`/ai/agents/channel/pairing/approve`, req, TimeoutEnum.T_5M);
 };

@@ -187,13 +187,14 @@ import { reactive, ref } from 'vue';
 import { FormInstance } from 'element-plus';
 import { Rules, checkNumberRange } from '@/global/form-rules';
 import { MsgError, MsgSuccess } from '@/utils/message';
-import { getLabel, splitHttp, checkIpV4V6, checkDomain } from '@/utils/util';
+import { getLabel } from '@/utils/app-store';
+import { splitHttp, checkIpV4V6, checkDomain } from '@/utils/validate';
 import i18n from '@/lang';
 import { loadResourceLimit } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
 
 interface ParamProps {
-    id: Number;
+    id: number;
     app: any;
 }
 const paramData = ref<ParamProps>({
@@ -469,11 +470,11 @@ const changeUnit = () => {
 defineExpose({ acceptParams });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .change-button {
     margin-top: 5px;
 }
-.system-label {
+:deep(.system-label) {
     width: 40% !important;
     white-space: nowrap !important;
 }

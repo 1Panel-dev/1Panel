@@ -63,8 +63,8 @@ import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import TaskLog from '@/components/log/task/index.vue';
 import { snapshotRecover, snapshotRollback } from '@/api/modules/setting';
-import { computeSize, newUUID } from '@/utils/util';
-
+import { computeSize } from '@/utils/size';
+import { newUUID } from '@/utils/id';
 let loading = ref(false);
 let open = ref(false);
 const recoverForm = ref<FormInstance>();

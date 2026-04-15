@@ -23,15 +23,17 @@
                 </el-popover>
             </template>
             <template #body>
-                <el-scrollbar height="531px" class="moz-height">
+                <el-scrollbar height="536px" class="moz-height">
                     <div class="h-app-card" v-for="(app, index) in apps" :key="index">
                         <el-row :gutter="5">
-                            <el-col :span="5">
-                                <el-avatar shape="square" :size="55" :src="getAppIconSrc(app)" />
+                            <el-col :span="5" class="h-app-media-col">
+                                <div class="h-app-media">
+                                    <el-avatar shape="square" :size="55" :src="getAppIconSrc(app)" />
+                                </div>
                             </el-col>
-                            <el-col :span="16">
+                            <el-col :span="16" class="h-app-main-col">
                                 <div class="h-app-content" v-if="!app.currentRow">
-                                    <div>
+                                    <div class="h-app-heading">
                                         <span class="h-app-title">{{ app.name }}</span>
                                         <svg-icon class="svg-icon" iconName="p-huobao1"></svg-icon>
                                     </div>
@@ -42,7 +44,7 @@
                                     </div>
                                 </div>
                                 <div class="h-app-content" v-else>
-                                    <div>
+                                    <div class="h-app-heading">
                                         <el-dropdown trigger="hover">
                                             <el-button type="primary" plain size="small" link class="h-app-dropdown">
                                                 {{ app.currentRow.name }}
@@ -61,12 +63,12 @@
                                             </template>
                                         </el-dropdown>
                                     </div>
-                                    <div class="h-app-margin">
+                                    <div class="h-app-meta">
                                         <el-button plain size="small" link class="h-app-desc">
                                             {{ $t('app.version') + ': ' + app.currentRow.version }}
                                         </el-button>
                                     </div>
-                                    <div class="h-app-margin">
+                                    <div class="h-app-actions">
                                         <el-button
                                             size="small"
                                             type="primary"
@@ -100,63 +102,14 @@
                                             size="small"
                                             type="primary"
                                             link
-                                            @click="routerToFileWithPath(app.currentRow.path)"
+                                            @click="routerToName('AppInstalled')"
                                         >
-                                            {{ $t('home.dir') }}
+                                            {{ $t('tabs.more') }}
                                         </el-button>
-                                        <el-popover
-                                            placement="left"
-                                            trigger="hover"
-                                            v-if="app.currentRow.appType == 'website'"
-                                            :width="260"
-                                        >
-                                            <template #reference>
-                                                <el-button
-                                                    link
-                                                    size="small"
-                                                    type="primary"
-                                                    :style="mobile ? 'margin-left: -1px' : ''"
-                                                >
-                                                    {{ $t('app.toLink') }}
-                                                </el-button>
-                                            </template>
-                                            <span v-if="defaultLink == '' && app.currentRow.webUI == ''">
-                                                {{ $t('app.webUIConfig') }}
-                                                <el-link
-                                                    icon="Position"
-                                                    @click="jumpToPath(router, '/settings/panel')"
-                                                    type="primary"
-                                                >
-                                                    {{ $t('firewall.quickJump') }}
-                                                </el-link>
-                                            </span>
-                                            <div v-else>
-                                                <div>
-                                                    <el-button
-                                                        v-if="defaultLink != ''"
-                                                        type="primary"
-                                                        link
-                                                        @click="toLink(defaultLink + ':' + app.currentRow.httpPort)"
-                                                    >
-                                                        {{ defaultLink + ':' + app.currentRow.httpPort }}
-                                                    </el-button>
-                                                </div>
-                                                <div>
-                                                    <el-button
-                                                        v-if="app.currentRow.webUI != ''"
-                                                        type="primary"
-                                                        link
-                                                        @click="toLink(app.currentRow.webUI)"
-                                                    >
-                                                        {{ app.currentRow.webUI }}
-                                                    </el-button>
-                                                </div>
-                                            </div>
-                                        </el-popover>
                                     </div>
                                 </div>
                             </el-col>
-                            <el-col :span="1">
+                            <el-col :span="1" class="h-app-side-col">
                                 <el-button
                                     class="h-app-button"
                                     type="primary"
@@ -170,7 +123,6 @@
                                 </el-button>
                             </el-col>
                         </el-row>
-                        <div class="h-app-divider" />
                     </div>
                 </el-scrollbar>
             </template>
@@ -180,18 +132,14 @@
 
 <script lang="ts" setup>
 import { getAppIconUrl, installedOp } from '@/api/modules/app';
-import { getAgentSettingByKey } from '@/api/modules/setting';
 import { changeLauncherStatus, loadAppLauncher, loadAppLauncherOption } from '@/api/modules/dashboard';
 import i18n from '@/lang';
 import { GlobalStore } from '@/store';
 import { MsgSuccess } from '@/utils/message';
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import { jumpToPath } from '@/utils/util';
+import { computed, ref } from 'vue';
 import { jumpToInstall } from '@/utils/app';
-import { routerToFileWithPath, routerToNameWithQuery } from '@/utils/router';
+import { routerToName, routerToNameWithQuery } from '@/utils/router';
 
-const router = useRouter();
 const globalStore = GlobalStore();
 
 let loading = ref(false);
@@ -201,12 +149,10 @@ const filter = ref();
 const mobile = computed(() => {
     return globalStore.isMobile();
 });
-const defaultLink = ref('');
 
 const acceptParams = (): void => {
     search();
     loadOption();
-    getConfig();
 };
 
 const goInstall = (key: string, type: string) => {
@@ -243,19 +189,6 @@ const onChangeStatus = async (row: any) => {
         .catch(() => {
             loading.value = false;
         });
-};
-
-const toLink = (link: string) => {
-    window.open(link, '_blank');
-};
-
-const getConfig = async () => {
-    try {
-        const res = await getAgentSettingByKey('SystemIP');
-        if (res.data != '') {
-            defaultLink.value = res.data;
-        }
-    } catch (error) {}
 };
 
 const onOperate = async (operation: string, row: any) => {
@@ -306,45 +239,109 @@ defineExpose({
 
 <style lang="scss" scoped>
 .h-app-card {
-    cursor: pointer;
-    padding: 10px 15px;
-    margin-right: 10px;
-    line-height: 18px;
+    padding: 8px 10px;
+    margin: 0 4px 3px 0;
+    min-height: 66px;
+    line-height: 16px;
+    border: 1px solid var(--el-border-color-lighter);
+    border-radius: 10px;
+    transition: border-color 0.18s ease;
 
     .h-app-content {
-        padding-left: 15px;
+        padding-left: 4px;
+
         .h-app-title {
-            font-weight: 500;
-            font-size: 15px;
+            font-weight: 600;
+            font-size: 14px;
             color: var(--panel-text-color);
+            letter-spacing: 0.01em;
         }
 
         .h-app-desc {
-            margin-top: 2px;
+            margin-top: 3px;
+            line-height: 1.4;
+
             span {
                 font-weight: 400;
-                font-size: 12px;
+                font-size: 11px;
                 color: var(--el-text-color-regular);
+                display: -webkit-box;
+                overflow: hidden;
+                -webkit-box-orient: vertical;
+                -webkit-line-clamp: 1;
             }
         }
     }
+
     .h-app-button {
-        margin-top: 10px;
+        padding: 1px 10px;
+        line-height: 1;
+        border-radius: 999px;
     }
+
     &:hover {
-        background-color: rgba(0, 94, 235, 0.03);
+        border-color: var(--el-color-primary);
     }
 }
 
-.h-app-divider {
-    margin-top: 10px;
-    border: 0;
-    border-top: var(--panel-border);
+.h-app-media-col,
+.h-app-side-col {
+    display: flex;
+    align-items: flex-start;
+}
+
+.h-app-side-col {
+    align-items: center;
+    min-height: 58px;
+    justify-content: flex-start;
+    margin-left: -2px;
+}
+
+.h-app-main-col {
+    display: flex;
+    align-items: center;
+    padding-right: 6px;
+}
+
+.h-app-media {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 58px;
+    height: 58px;
+    border-radius: 16px;
+
+    :deep(.el-avatar) {
+        width: 50px !important;
+        height: 50px !important;
+        border-radius: 14px;
+    }
+}
+
+.h-app-heading {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-height: 20px;
+    line-height: 1.2;
+}
+
+.h-app-meta {
+    margin-top: 1px;
+}
+
+.h-app-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0 10px;
+    margin-top: 2px;
+    line-height: 1.2;
 }
 
 .h-app-desc {
     font-weight: 400;
-    font-size: 12px;
+    font-size: 11px;
     color: var(--el-text-color-regular);
 }
 
@@ -361,19 +358,46 @@ defineExpose({
 
 .h-app-dropdown {
     font-weight: 600;
-    font-size: 16px;
-    color: var(--panel-text-color);
-}
-
-.h-app-margin {
-    margin-top: 2px;
-}
-
-.h-app-option {
-    font-weight: 500;
     font-size: 14px;
-    line-height: 20px;
-    color: var(--el-text-color-regular);
+    color: var(--panel-text-color);
+    min-height: 18px;
+}
+
+:deep(.h-app-actions .el-button) {
+    min-height: 16px;
+    margin-left: 0 !important;
+    padding: 0;
+}
+
+@media only screen and (max-width: 768px) {
+    .h-app-card {
+        padding: 12px;
+        margin-right: 0;
+        border-radius: 14px;
+    }
+
+    .h-app-card .h-app-content {
+        padding-left: 0;
+    }
+
+    .h-app-media {
+        width: 56px;
+        height: 56px;
+        border-radius: 16px;
+    }
+
+    .h-app-heading {
+        min-height: 22px;
+    }
+
+    .h-app-dropdown,
+    .h-app-card .h-app-content .h-app-title {
+        font-size: 14px;
+    }
+
+    .h-app-actions {
+        gap: 2px 8px;
+    }
 }
 
 /* FOR MOZILLA */

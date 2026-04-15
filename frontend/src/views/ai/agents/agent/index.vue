@@ -1,6 +1,6 @@
 <template>
     <div>
-        <RouterMenu />
+        <RouterButton :buttons="headerButtons" />
         <DockerStatus v-model:isActive="isActive" v-model:isExist="isExist" />
         <LayoutContent v-loading="loading" v-if="isExist" :class="{ mask: !isActive }">
             <template #leftToolBar>
@@ -41,7 +41,31 @@
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.status')" prop="status" width="120">
                         <template #default="{ row }">
-                            <Status :status="row.status" />
+                            <el-dropdown placement="bottom">
+                                <Status :status="row.status" :operate="true" />
+                                <template #dropdown>
+                                    <el-dropdown-menu>
+                                        <el-dropdown-item
+                                            :disabled="checkStatus('start', row)"
+                                            @click="onOperate(row, 'start')"
+                                        >
+                                            {{ $t('commons.operate.start') }}
+                                        </el-dropdown-item>
+                                        <el-dropdown-item
+                                            :disabled="checkStatus('stop', row)"
+                                            @click="onOperate(row, 'stop')"
+                                        >
+                                            {{ $t('commons.operate.stop') }}
+                                        </el-dropdown-item>
+                                        <el-dropdown-item
+                                            :disabled="checkStatus('restart', row)"
+                                            @click="onOperate(row, 'restart')"
+                                        >
+                                            {{ $t('commons.button.restart') }}
+                                        </el-dropdown-item>
+                                    </el-dropdown-menu>
+                                </template>
+                            </el-dropdown>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('aiTools.agents.appVersion')" prop="appVersion" min-width="140">
@@ -58,7 +82,7 @@
                         :label="$t('aiTools.model.model')"
                         show-overflow-tooltip
                         prop="provider"
-                        min-width="120"
+                        min-width="150"
                     >
                         <template #default="{ row }">
                             <template v-if="row.agentType !== 'copaw'">
@@ -70,11 +94,60 @@
                             <span v-else>-</span>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('commons.table.port')" prop="webUIPort" min-width="150">
+                    <el-table-column :label="$t('commons.table.port')" prop="webUIPort" min-width="180">
                         <template #default="{ row }">
                             <el-button icon="Position" plain size="small" @click="jumpWebUI(row)">
                                 {{ $t('aiTools.agents.webuiPort') }}: {{ row.webUIPort }}
                             </el-button>
+                        </template>
+                    </el-table-column>
+                    <el-table-column :label="$t('menu.website')" min-width="180" show-overflow-tooltip>
+                        <template #default="{ row }">
+                            <div v-if="row.websiteId > 0" class="website-link-cell">
+                                <el-text type="primary" class="cursor-pointer" @click="openWebsite(row)">
+                                    {{ getWebsiteDisplayName(row) }}
+                                </el-text>
+                                <el-popover
+                                    placement="right"
+                                    trigger="hover"
+                                    :width="420"
+                                    @before-enter="loadWebsiteDomains(row.websiteId)"
+                                >
+                                    <template #reference>
+                                        <el-button link icon="Promotion" class="ml-2.5"></el-button>
+                                    </template>
+                                    <table v-if="getWebsiteBaseUrls(row).length > 0">
+                                        <tbody>
+                                            <tr v-for="url in getWebsiteBaseUrls(row)" :key="url">
+                                                <td>
+                                                    <el-button type="primary" link @click="openWebsiteUrl(url, row)">
+                                                        {{ url }}
+                                                    </el-button>
+                                                </td>
+                                                <td>
+                                                    <CopyButton :content="url" />
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <el-empty v-else :image-size="48" :description="$t('commons.msg.noneData')" />
+                                </el-popover>
+                            </div>
+                            <el-button v-else link type="primary" @click="openBindWebsite(row)">
+                                {{ $t('commons.button.bind') }}
+                            </el-button>
+                        </template>
+                    </el-table-column>
+                    <el-table-column :label="$t('website.remark')" prop="remark" min-width="150">
+                        <template #default="{ row }">
+                            <fu-read-write-switch>
+                                <template #read>
+                                    <MsgInfo :info="row.remark" :width="'150'" />
+                                </template>
+                                <template #default="{ read }">
+                                    <el-input v-model="row.remark" @blur="handleUpdateRemark(row, read)" />
+                                </template>
+                            </fu-read-write-switch>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('runtime.workDir')" min-width="90">
@@ -86,7 +159,7 @@
                             </el-button>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('aiTools.agents.token')" min-width="80">
+                    <el-table-column label="Token" min-width="120">
                         <template #default="{ row }">
                             <el-space v-if="row.agentType !== 'copaw'">
                                 <CopyButton :content="row.token" />
@@ -106,7 +179,7 @@
                     />
                     <fu-table-operations
                         :buttons="buttons"
-                        min-width="220"
+                        min-width="200"
                         :label="$t('commons.table.operate')"
                         fixed="right"
                         :ellipsis="3"
@@ -117,10 +190,13 @@
         <AddDialog ref="addRef" @search="search" @task="openTaskLog" />
         <TaskLog ref="taskLogRef" @close="search" />
         <DeleteDialog ref="deleteRef" @close="search" />
+        <AppResources ref="checkRef" @close="search" />
         <ConfigDrawer ref="configRef" @updated="search" />
+        <OverviewDrawer ref="overviewRef" />
+        <BindWebsiteDialog ref="bindWebsiteRef" @success="search" />
         <AppUpgrade ref="upgradeRef" @close="search" />
         <ComposeLogs ref="composeLogRef" />
-        <TerminalDialog ref="dialogTerminalRef" />
+        <AgentTerminalDialog ref="dialogTerminalRef" />
         <PortJumpDialog ref="dialogPortJumpRef" />
     </div>
 </template>
@@ -128,28 +204,32 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { pageAgents, resetAgentToken } from '@/api/modules/ai';
-import { installedOp, searchApp, searchAppInstalled } from '@/api/modules/app';
+import { deleteAgentCheck, pageAgents, resetAgentToken, updateAgentRemark } from '@/api/modules/ai';
+import { checkAppInstalled, installedOp, searchApp, searchAppInstalled } from '@/api/modules/app';
 import { AI } from '@/api/interface/ai';
 import { App } from '@/api/interface/app';
+import { Website } from '@/api/interface/website';
 import { SearchWithPage } from '@/api/interface';
-import { dateFormat, newUUID } from '@/utils/util';
+import { dateFormat } from '@/utils/date';
+import { newUUID } from '@/utils/id';
 import { MsgSuccess } from '@/utils/message';
 
-import RouterMenu from '@/views/ai/agents/index.vue';
 import AddDialog from '@/views/ai/agents/agent/add/index.vue';
 import DeleteDialog from '@/views/ai/agents/agent/delete/index.vue';
+import AppResources from '@/views/app-store/installed/check/index.vue';
 import ConfigDrawer from '@/views/ai/agents/agent/config/index.vue';
+import OverviewDrawer from '@/views/ai/agents/agent/components/overview.vue';
+import BindWebsiteDialog from '@/views/ai/agents/agent/website/index.vue';
 import AppUpgrade from '@/views/app-store/installed/upgrade/index.vue';
 import TaskLog from '@/components/log/task/index.vue';
 import ComposeLogs from '@/components/log/compose/index.vue';
-import TerminalDialog from '@/views/container/container/terminal/index.vue';
+import AgentTerminalDialog from '@/views/ai/agents/agent/components/terminal.vue';
 import i18n from '@/lang';
 import PortJumpDialog from '@/components/port-jump/index.vue';
 import DockerStatus from '@/views/container/docker-status/index.vue';
-import { getAgentProviderDisplayName } from '@/utils/agent';
+import { getAgentProviderDisplayName, getOpenclawAccessScheme } from '@/utils/agent';
 import { routerToFileWithPath } from '@/utils/router';
-import { compareVersion } from '@/utils/version';
+import { listDomains } from '@/api/modules/website';
 import NoApp from '@/views/app-store/apps/no-app/index.vue';
 import openclawIcon from '@/assets/images/ai-agent-openclaw.svg';
 import copawIcon from '@/assets/images/ai-agent-copaw.svg';
@@ -159,7 +239,10 @@ const loading = ref(false);
 const addRef = ref();
 const taskLogRef = ref();
 const deleteRef = ref();
+const checkRef = ref();
 const configRef = ref();
+const overviewRef = ref();
+const bindWebsiteRef = ref();
 const upgradeRef = ref();
 const composeLogRef = ref();
 const dialogTerminalRef = ref();
@@ -170,6 +253,16 @@ const isActive = ref(false);
 const isExist = ref(false);
 const noApp = ref(false);
 const searchName = ref('');
+const defaultHttpsPort = ref(443);
+const openrestyPortLoaded = ref(false);
+const websiteDomainsMap = ref<Record<number, Website.Domain[]>>({});
+
+const headerButtons = [
+    {
+        label: i18n.global.t('aiTools.agents.agent'),
+        path: '/ai/agents/agent',
+    },
+];
 
 const buttons = [
     {
@@ -185,6 +278,11 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.log'),
         click: (row: AI.AgentItem) => openLog(row),
+    },
+    {
+        label: i18n.global.t('menu.home'),
+        click: (row: AI.AgentItem) => openOverview(row),
+        show: (row: AI.AgentItem) => row.agentType !== 'copaw',
     },
     {
         label: i18n.global.t('commons.operate.start'),
@@ -241,9 +339,10 @@ const search = async () => {
             pageSize: paginationConfig.pageSize,
             info: searchName.value || '',
         };
-        const [res] = await Promise.all([pageAgents(req), checkNoApp()]);
+        const [res] = await Promise.all([pageAgents(req), checkNoApp(), loadOpenrestyHttpsPort()]);
         items.value = res.data.items || [];
         paginationConfig.total = res.data.total || 0;
+        await preloadWebsiteDomains(items.value);
     } finally {
         loading.value = false;
     }
@@ -278,6 +377,20 @@ const openTaskLog = (taskID: string) => {
     }
 };
 
+const checkStatus = (operate: string, row: AI.AgentItem) => {
+    const status = row.status.toLowerCase();
+    switch (operate) {
+        case 'start':
+            return status === 'running' || status === 'starting' || status === 'restarting';
+        case 'stop':
+            return status !== 'running';
+        case 'restart':
+            return status === 'starting';
+        default:
+            return false;
+    }
+};
+
 const onOperate = async (row: AI.AgentItem, operate: string) => {
     await ElMessageBox.confirm(
         i18n.global.t('app.operatorHelper', [i18n.global.t('commons.operate.' + operate)]),
@@ -307,7 +420,12 @@ const openLog = (row: AI.AgentItem) => {
 
 const openTerminal = (row: AI.AgentItem) => {
     const title = i18n.global.t('aiTools.agents.agent') + ' ' + row.name;
-    dialogTerminalRef.value?.acceptParams({ containerID: row.containerName, title });
+    dialogTerminalRef.value?.acceptParams({
+        containerID: row.containerName,
+        title,
+        users: ['node', 'root'],
+        shell: '/bin/bash',
+    });
 };
 
 const openWorkDir = (row: AI.AgentItem) => {
@@ -317,31 +435,27 @@ const openWorkDir = (row: AI.AgentItem) => {
     routerToFileWithPath(`${row.path}/data`);
 };
 
-const isOpenClawHttpsVersion = (version: string) => {
-    const target = String(version || '')
-        .trim()
-        .toLowerCase();
-    if (!target || target === 'latest') {
-        return true;
-    }
-    if (!/\d/.test(target)) {
-        return true;
-    }
-    return compareVersion(target, '2026.3.13');
-};
-
 const jumpWebUI = (row: AI.AgentItem) => {
     if (dialogPortJumpRef.value?.acceptParams) {
         dialogPortJumpRef.value.acceptParams({
             port: row.webUIPort,
-            protocol: row.agentType === 'openclaw' && isOpenClawHttpsVersion(row.appVersion) ? 'https' : 'http',
+            protocol: row.agentType === 'openclaw' ? getOpenclawAccessScheme(row.appVersion) : 'http',
             path: row.agentType === 'copaw' ? undefined : '/',
             hash: row.agentType === 'copaw' ? undefined : `token=${row.token}`,
         });
     }
 };
 
-const onDelete = (row: AI.AgentItem) => {
+const onDelete = async (row: AI.AgentItem) => {
+    const res = await deleteAgentCheck({ agentId: row.id });
+    if ((res.data || []).length > 0) {
+        checkRef.value?.acceptParams({
+            items: res.data,
+            installID: row.appInstallId,
+            key: row.agentType,
+        });
+        return;
+    }
     deleteRef.value?.acceptParams(row.id, row.name);
 };
 
@@ -360,11 +474,121 @@ const onResetToken = async (row: AI.AgentItem) => {
     await search();
 };
 
+const handleUpdateRemark = async (row: AI.AgentItem, read: Function) => {
+    read();
+    await updateAgentRemark({ id: row.id, remark: row.remark });
+    MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
+};
+
 const openConfig = (row: AI.AgentItem) => {
-    if (row.agentType === 'copaw') {
+    configRef.value?.open(row);
+};
+
+const openOverview = (row: AI.AgentItem) => {
+    overviewRef.value?.acceptParams(row);
+};
+
+const openBindWebsite = (row: AI.AgentItem) => {
+    bindWebsiteRef.value?.acceptParams(row);
+};
+
+const loadOpenrestyHttpsPort = async () => {
+    if (openrestyPortLoaded.value) {
         return;
     }
-    configRef.value?.open(row);
+    openrestyPortLoaded.value = true;
+    try {
+        const res = await checkAppInstalled('openresty', '');
+        defaultHttpsPort.value = res.data.httpsPort || 443;
+    } catch {
+        defaultHttpsPort.value = 443;
+    }
+};
+
+const sortWebsiteDomains = (domains: Website.Domain[]) => {
+    return [...domains].sort((a, b) => a.id - b.id);
+};
+
+const loadWebsiteDomains = async (websiteId: number) => {
+    if (!websiteId) {
+        return [];
+    }
+    if (websiteDomainsMap.value[websiteId]) {
+        return websiteDomainsMap.value[websiteId];
+    }
+    const res = await listDomains(websiteId);
+    const domains = sortWebsiteDomains(res.data || []);
+    websiteDomainsMap.value = {
+        ...websiteDomainsMap.value,
+        [websiteId]: domains,
+    };
+    return domains;
+};
+
+const preloadWebsiteDomains = async (rows: AI.AgentItem[]) => {
+    const websiteIDs = [...new Set(rows.map((row) => row.websiteId).filter((websiteId) => websiteId > 0))];
+    await Promise.allSettled(websiteIDs.map((websiteId) => loadWebsiteDomains(websiteId)));
+};
+
+const formatWebsiteHost = (domain: string) => {
+    const host = String(domain || '')
+        .trim()
+        .replace(/^\[|\]$/g, '');
+    return host.includes(':') ? `[${host}]` : host;
+};
+
+const buildWebsiteBaseUrl = (domain: Website.Domain, row: AI.AgentItem) => {
+    const protocol = (row.websiteProtocol || 'http').toLowerCase();
+    let url = `${protocol}://${formatWebsiteHost(domain.domain)}`;
+    if (protocol === 'http') {
+        if (domain.port && domain.port !== 80) {
+            url = `${url}:${domain.port}`;
+        }
+        return url;
+    }
+    let port = domain.port;
+    if (!domain.ssl) {
+        port = defaultHttpsPort.value || 443;
+    }
+    if (port && port !== 443) {
+        url = `${url}:${port}`;
+    }
+    return url;
+};
+
+const appendWebsiteAgentToken = (url: string, row: AI.AgentItem) => {
+    if (row.agentType !== 'copaw' && row.token) {
+        const target = new URL(url);
+        target.hash = `token=${row.token}`;
+        return target.toString();
+    }
+    return url;
+};
+
+const getWebsiteBaseUrls = (row: AI.AgentItem) => {
+    const domains = websiteDomainsMap.value[row.websiteId] || [];
+    return domains.map((domain) => buildWebsiteBaseUrl(domain, row));
+};
+
+const getWebsiteDisplayName = (row: AI.AgentItem) => {
+    const domains = websiteDomainsMap.value[row.websiteId] || [];
+    return domains[0]?.domain || row.websitePrimaryDomain || '-';
+};
+
+const openUrl = (url: string) => {
+    window.open(url);
+};
+
+const openWebsiteUrl = (url: string, row: AI.AgentItem) => {
+    openUrl(appendWebsiteAgentToken(url, row));
+};
+
+const openWebsite = async (row: AI.AgentItem) => {
+    const domains = await loadWebsiteDomains(row.websiteId);
+    if (domains.length === 0) {
+        return;
+    }
+    openWebsiteUrl(buildWebsiteBaseUrl(domains[0], row), row);
 };
 
 const openUpgrade = async (row: AI.AgentItem) => {
@@ -400,5 +624,11 @@ onMounted(async () => {
     height: 16px;
     flex: 0 0 16px;
     object-fit: contain;
+}
+
+.website-link-cell {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
 }
 </style>

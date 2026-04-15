@@ -168,7 +168,9 @@
                     </el-form-item>
 
                     <el-form-item
-                        v-if="dialogData.rowData!.type === 'cronJob' && cronjobTypes.includes(dialogData.rowData!.subType)"
+                        v-if="
+                            dialogData.rowData!.type === 'cronJob' && cronjobTypes.includes(dialogData.rowData!.subType)
+                        "
                         :label="$t('xpack.alert.taskName')"
                         prop="project"
                     >
@@ -313,8 +315,8 @@
                                 timeTypes.includes(dialogData.rowData!.type)
                                     ? $t('xpack.alert.sendCountRulesHelper')
                                     : noParamTypes.includes(dialogData.rowData!.type)
-                                    ? $t('xpack.alert.panelUpdateRulesHelper')
-                                    : $t('xpack.alert.oneDaySendCountRulesHelper')
+                                      ? $t('xpack.alert.panelUpdateRulesHelper')
+                                      : $t('xpack.alert.oneDaySendCountRulesHelper')
                             }}
                         </span>
                     </el-form-item>
@@ -322,6 +324,7 @@
                     <el-form-item :label="$t('xpack.alert.alertMethod')" prop="sendMethod">
                         <el-select class="selectClass" v-model="dialogData.rowData!.sendMethod" multiple cleanable>
                             <el-option value="mail" :label="$t('xpack.alert.mail')" />
+                            <el-option v-if="!globalStore.isProductPro" value="bark" :label="$t('xpack.alert.bark')" />
                             <el-option
                                 value="weCom"
                                 v-if="!globalStore.isIntl"
@@ -340,6 +343,7 @@
                                 :disabled="!globalStore.isProductPro"
                                 :label="$t('xpack.alert.feiShu')"
                             />
+                            <el-option v-if="globalStore.isProductPro" value="bark" :label="$t('xpack.alert.bark')" />
                             <el-option
                                 value="sms"
                                 v-if="!globalStore.isIntl"
@@ -386,8 +390,7 @@ import { getSettingInfo } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
 import { storeToRefs } from 'pinia';
 import { routerToName } from '@/utils/router';
-import { checkCidr, checkCidrV6, checkIpV4V6 } from '@/utils/util';
-
+import { checkCidr, checkCidrV6, checkIpV4V6 } from '@/utils/validate';
 const globalStore = GlobalStore();
 const { isMaster, isProductPro } = storeToRefs(globalStore);
 

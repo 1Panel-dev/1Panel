@@ -238,13 +238,14 @@ type TerminalInfo struct {
 }
 
 type AppstoreUpdate struct {
-	Scope  string `json:"scope" validate:"required,oneof=UninstallDeleteImage UpgradeBackup UninstallDeleteBackup"`
+	Scope  string `json:"scope" validate:"required,oneof=UninstallDeleteImage UpgradeBackup UninstallDeleteBackup InstallAllowPort"`
 	Status string `json:"status"  validate:"required,oneof=Disable Enable"`
 }
 type AppstoreConfig struct {
 	UninstallDeleteImage  string `json:"uninstallDeleteImage"`
 	UpgradeBackup         string `json:"upgradeBackup"`
 	UninstallDeleteBackup string `json:"uninstallDeleteBackup"`
+	InstallAllowPort      string `json:"installAllowPort"`
 }
 
 type LoginSetting struct {

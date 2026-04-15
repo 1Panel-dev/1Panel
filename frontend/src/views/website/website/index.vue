@@ -182,7 +182,7 @@
                                     :clearable="false"
                                     @change="updateWebsitConfig(row)"
                                     :ref="(el) => setdateRefs(el)"
-                                    @visible-change="(visibility:boolean) => pickerVisibility(visibility, row)"
+                                    @visible-change="(visibility: boolean) => pickerVisibility(visibility, row)"
                                     size="small"
                                     :mounted="initDatePicker(row)"
                                 ></el-date-picker>
@@ -315,7 +315,8 @@ import { batchOperate, opWebsite, searchWebsites, updateWebsite } from '@/api/mo
 import { Website } from '@/api/interface/website';
 import { App } from '@/api/interface/app';
 import { ElMessageBox } from 'element-plus';
-import { dateFormatSimple, newUUID } from '@/utils/util';
+import { dateFormatSimple } from '@/utils/date';
+import { newUUID } from '@/utils/id';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { useI18n } from 'vue-i18n';
 import { getAgentGroupList } from '@/api/modules/group';

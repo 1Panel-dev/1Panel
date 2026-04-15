@@ -72,8 +72,7 @@ import { ElForm } from 'element-plus';
 import { MsgSuccess } from '@/utils/message';
 import { Host } from '@/api/interface/host';
 import { operateFilterRule } from '@/api/modules/host';
-import { checkCidr, checkCidrV6, checkIpV4V6 } from '@/utils/util';
-
+import { checkCidr, checkCidrV6, checkIpV4V6 } from '@/utils/validate';
 const loading = ref();
 
 interface DialogProps {

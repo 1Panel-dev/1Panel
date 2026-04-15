@@ -120,7 +120,7 @@ import { ElForm, genFileId, UploadFile, UploadProps, UploadRawFile } from 'eleme
 import { Host } from '@/api/interface/host';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { Rules } from '@/global/form-rules';
-import { getRandomStr } from '@/utils/util';
+import { getRandomStr } from '@/utils/id';
 import { createCert, editCert } from '@/api/modules/host';
 import { Base64 } from 'js-base64';
 

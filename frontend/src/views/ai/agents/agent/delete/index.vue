@@ -29,7 +29,7 @@
 import { FormInstance } from 'element-plus';
 import { ref } from 'vue';
 import { deleteAgent } from '@/api/modules/ai';
-import { newUUID } from '@/utils/util';
+import { newUUID } from '@/utils/id';
 import TaskLog from '@/components/log/task/index.vue';
 
 const open = ref(false);

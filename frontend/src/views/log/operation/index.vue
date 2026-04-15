@@ -14,6 +14,7 @@
                     <template #prefix>{{ $t('logs.resource') }}</template>
                     <el-option :label="$t('commons.table.all')" value="" />
                     <el-option :label="$t('logs.detail.apps')" value="apps" />
+                    <el-option :label="$t('logs.detail.openresty')" value="openresty" />
                     <el-option :label="$t('logs.detail.websites')" value="websites" />
                     <el-option :label="$t('logs.detail.runtimes')" value="runtimes" />
                     <el-option :label="$t('logs.detail.ai')" value="ai" />
@@ -95,7 +96,7 @@
 <script setup lang="ts">
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import LogRouter from '@/views/log/router/index.vue';
-import { dateFormat } from '@/utils/util';
+import { dateFormat } from '@/utils/date';
 import { cleanLogs, getOperationLogs } from '@/api/modules/log';
 import { onMounted, reactive, ref } from 'vue';
 import i18n from '@/lang';

@@ -210,7 +210,7 @@ export namespace App {
         linkDB: boolean;
     }
 
-    export interface AppInstalledInfo {
+    export interface AppInstalledOption {
         id: number;
         key: string;
         name: string;
@@ -267,7 +267,7 @@ export namespace App {
     export interface AppService {
         label: string;
         value: string;
-        config?: Object;
+        config?: object;
         from?: string;
         status: string;
     }
@@ -344,6 +344,7 @@ export namespace App {
         uninstallDeleteImage: string;
         uninstallDeleteBackup: string;
         upgradeBackup: string;
+        installAllowPort: string;
     }
 
     export interface AppStoreConfigUpdate {

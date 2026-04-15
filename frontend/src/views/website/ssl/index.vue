@@ -97,7 +97,7 @@
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('commons.button.log')" width="80px">
+                    <el-table-column :label="$t('commons.button.log')" prop="log" width="80px">
                         <template #default="{ row }">
                             <el-button
                                 @click="openSSLLog(row)"
@@ -127,7 +127,7 @@
                             </fu-read-write-switch>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('ssl.autoRenew')" width="200px">
+                    <el-table-column :label="$t('ssl.autoRenew')" prop="autoRenew" width="200px">
                         <template #default="{ row }">
                             <el-switch
                                 :disabled="
@@ -180,7 +180,8 @@ import AcmeAccount from './acme-account/index.vue';
 import CA from './ca/index.vue';
 import Create from './create/index.vue';
 import Detail from './detail/index.vue';
-import { dateFormat, getProvider } from '@/utils/util';
+import { dateFormat } from '@/utils/date';
+import { getProvider } from '@/utils/ssl';
 import i18n from '@/lang';
 import { Website } from '@/api/interface/website';
 import { MsgError, MsgSuccess } from '@/utils/message';

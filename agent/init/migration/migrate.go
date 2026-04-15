@@ -57,6 +57,7 @@ func InitAgentDB() {
 		migrations.UpdateDatabase,
 		migrations.AddGPUMonitor,
 		migrations.UpdateDatabaseMysql,
+		migrations.AddDatabaseMongodb,
 		migrations.InitIptablesStatus,
 		migrations.UpdateWebsite,
 		migrations.AddisIPtoWebsiteSSL,
@@ -65,7 +66,6 @@ func InitAgentDB() {
 		migrations.AddCronjobArgs,
 		migrations.AddWebsiteAcmeAccountColumn,
 		migrations.AddAgentTables,
-		migrations.MigrateOpenclawAgents,
 		migrations.AddAgentCustomModelFields,
 		migrations.AddAppInstallSortOrder,
 		migrations.AddAgentAccountRememberAPIKey,
@@ -73,6 +73,15 @@ func InitAgentDB() {
 		migrations.AddAgentTypeForAgents,
 		migrations.NormalizeAgentAccountVerifiedStatus,
 		migrations.NormalizeOllamaAccountAPIType,
+		migrations.InitAgentAccountModelPool,
+		migrations.AddHostTable,
+		migrations.AddAITerminalSettings,
+		migrations.UpdateAgentQuickJumpTitle,
+		migrations.FixOpenclaw20260323HTTPPort,
+		migrations.AddAgentRemarkColumn,
+		migrations.AddAgentWebsiteBinding,
+		migrations.AddFileManageAISettings,
+		migrations.AddFileShareTable,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

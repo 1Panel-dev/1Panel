@@ -42,7 +42,7 @@ import { Promotion } from '@element-plus/icons-vue';
 import { GlobalStore } from '@/store';
 import { checkAppInstalled } from '@/api/modules/app';
 import { MsgSuccess } from '@/utils/message';
-import { GetPunyCodeDomain, isPunycoded } from '@/utils/util';
+import { GetPunyCodeDomain, isPunycoded } from '@/utils/misc';
 const globalStore = GlobalStore();
 
 const props = defineProps({

@@ -1,10 +1,9 @@
 import http from '@/api';
 import { ReqPage, ResPage, UpdateByFile } from '../interface';
 import { Toolbox } from '../interface/toolbox';
-import { Base64 } from 'js-base64';
+import { encodeBase64, encodeBase64Fields } from '@/utils/base64';
 import { TimeoutEnum } from '@/enums/http-enum';
-import { deepCopy } from '@/utils/util';
-
+import { deepCopy } from '@/utils/misc';
 // device
 export const getDeviceBase = () => {
     return http.post<Toolbox.DeviceBaseInfo>(`/toolbox/device/base`, {}, TimeoutEnum.T_60S);
@@ -22,7 +21,7 @@ export const updateDeviceHost = (param: Array<Toolbox.TimeZoneOptions>) => {
     return http.post(`/toolbox/device/update/host`, param, TimeoutEnum.T_60S);
 };
 export const updateDevicePasswd = (user: string, passwd: string) => {
-    return http.post(`/toolbox/device/update/passwd`, { user: user, passwd: Base64.encode(passwd) }, TimeoutEnum.T_60S);
+    return http.post(`/toolbox/device/update/passwd`, { user: user, passwd: encodeBase64(passwd) }, TimeoutEnum.T_60S);
 };
 export const updateDeviceSwap = (params: Toolbox.SwapHelper) => {
     return http.post(`/toolbox/device/update/swap`, params, TimeoutEnum.T_10M);
@@ -92,17 +91,13 @@ export const syncFtp = () => {
 
 export const createFtp = (params: Toolbox.FtpCreate) => {
     let request = deepCopy(params) as Toolbox.FtpCreate;
-    if (request.password) {
-        request.password = Base64.encode(request.password);
-    }
+    encodeBase64Fields(request, ['password']);
     return http.post(`/toolbox/ftp`, request);
 };
 
 export const updateFtp = (params: Toolbox.FtpUpdate) => {
     let request = deepCopy(params) as Toolbox.FtpUpdate;
-    if (request.password) {
-        request.password = Base64.encode(request.password);
-    }
+    encodeBase64Fields(request, ['password']);
     return http.post(`/toolbox/ftp/update`, request);
 };
 

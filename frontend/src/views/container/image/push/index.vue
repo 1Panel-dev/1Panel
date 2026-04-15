@@ -44,8 +44,7 @@ import { imagePush } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
 import { MsgSuccess } from '@/utils/message';
 import TaskLog from '@/components/log/task/index.vue';
-import { newUUID } from '@/utils/util';
-
+import { newUUID } from '@/utils/id';
 const drawerVisible = ref(false);
 const taskLogRef = ref();
 const form = reactive({

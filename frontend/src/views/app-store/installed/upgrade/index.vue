@@ -43,7 +43,7 @@
                     </el-select>
                 </el-form-item>
                 <el-alert
-                    v-if="showOpenclawHttpsUpgradeNotice"
+                    v-if="showOpenclawHttpRollbackNotice"
                     type="warning"
                     :closable="false"
                     show-icon
@@ -99,7 +99,7 @@ import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 import { App } from '@/api/interface/app';
 import { getAppUpdateVersions, ignoreUpgrade, installedOp } from '@/api/modules/app';
 import { getAppStoreConfig } from '@/api/modules/setting';
-import { compareVersion } from '@/utils/version';
+import { isOpenclawCurrentHTTPVersion, isOpenclawHTTPSWindowVersion } from '@/utils/agent';
 import i18n from '@/lang';
 import { ElMessageBox, FormInstance } from 'element-plus';
 import { computed, onBeforeUnmount, reactive, ref } from 'vue';
@@ -109,7 +109,6 @@ import bus from '@/global/bus';
 import { v4 as uuidv4 } from 'uuid';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 const { currentNode } = useGlobalStore();
-const openclawHttpsVersion = '2026.3.13';
 
 const composeDiffRef = ref();
 const updateRef = ref<FormInstance>();
@@ -136,7 +135,7 @@ const newContent = ref('');
 const em = defineEmits(['close']);
 const handleClose = () => {
     open.value = false;
-    em('close', open);
+    em('close', open.value);
 };
 
 const newCompose = ref('');
@@ -153,35 +152,12 @@ const node = ref('');
 const currentVersion = ref('');
 const currentAppKey = ref('');
 
-const isOpenclawHttpsVersion = (version: string) => {
-    const target = String(version || '')
-        .trim()
-        .toLowerCase();
-    if (!target || target === 'latest') {
-        return true;
-    }
-    if (!/\d/.test(target)) {
-        return false;
-    }
-    return compareVersion(target, openclawHttpsVersion);
-};
-
-const isLegacyOpenclawVersion = (version: string) => {
-    const target = String(version || '')
-        .trim()
-        .toLowerCase();
-    if (!target || target === 'latest' || !/\d/.test(target)) {
-        return false;
-    }
-    return !compareVersion(target, openclawHttpsVersion);
-};
-
-const showOpenclawHttpsUpgradeNotice = computed(() => {
+const showOpenclawHttpRollbackNotice = computed(() => {
     return (
         operateReq.operate === 'upgrade' &&
         currentAppKey.value === 'openclaw' &&
-        isLegacyOpenclawVersion(currentVersion.value) &&
-        isOpenclawHttpsVersion(operateReq.version)
+        isOpenclawHTTPSWindowVersion(currentVersion.value) &&
+        isOpenclawCurrentHTTPVersion(operateReq.version)
     );
 });
 

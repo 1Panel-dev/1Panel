@@ -1,6 +1,5 @@
 <template>
     <div>
-        <RouterMenu />
         <LayoutContent title="vLLM">
             <template #leftToolBar>
                 <el-button type="primary" @click="goLicense">
@@ -40,7 +39,6 @@
 </template>
 
 <script setup lang="ts">
-import RouterMenu from '@/views/ai/model/router-menu.vue';
 import { routerToName } from '@/utils/router';
 
 const features = [

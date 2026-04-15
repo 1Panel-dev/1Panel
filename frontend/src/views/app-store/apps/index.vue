@@ -74,7 +74,7 @@ import { searchApp, syncApp, syncCutomAppStore, syncLocalApp, getCurrentNodeCust
 import Install from '../detail/install/index.vue';
 import router from '@/routers';
 import { MsgSuccess } from '@/utils/message';
-import { newUUID } from '@/utils/util';
+import { newUUID } from '@/utils/id';
 import Detail from '../detail/index.vue';
 import TaskLog from '@/components/log/task/index.vue';
 import bus from '@/global/bus';
@@ -185,7 +185,9 @@ const sync = async () => {
         } else {
             res = await syncApp(syncReq);
         }
+        console.log(res);
         if (res.message != '' && res.message != 'success') {
+            console.log(res.message);
             MsgSuccess(res.message);
         } else {
             openTaskLog(taskID);

@@ -1,5 +1,9 @@
 import { getLicenseStatus, getMasterLicenseStatus, getSettingInfo } from '@/api/modules/setting';
 import { useTheme } from '@/global/use-theme';
+import {
+    searchXpackSetting,
+    updateXpackSettingByKey as updateXpackSettingByKeyFromExtension,
+} from '@/extensions/xpack';
 import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();
 const { switchTheme } = useTheme();
@@ -51,26 +55,21 @@ export async function initFavicon() {
 }
 
 export async function getXpackSetting() {
-    let searchXSetting;
-    const xpackModules = import.meta.glob('../xpack/api/modules/setting.ts', { eager: true });
-    if (xpackModules['../xpack/api/modules/setting.ts']) {
-        searchXSetting = xpackModules['../xpack/api/modules/setting.ts']['searchXSetting'] || {};
-        const res = await searchXSetting();
-        if (!res) {
-            initFavicon();
-            resetXSetting();
-            return;
-        }
+    const res = await searchXpackSetting();
+    if (!res) {
         initFavicon();
-        return res;
+        resetXSetting();
+        return;
     }
+    initFavicon();
+    return res;
 }
 
 const loadDataFromDB = async () => {
     const res = await getSettingInfo();
     document.title = res.data.panelName;
     globalStore.entrance = res.data.securityEntrance;
-    globalStore.setOpenMenuTabs(res.data.menuTabs === 'Enable');
+    globalStore.openMenuTabs = res.data.menuTabs === 'Enable';
 };
 
 export async function loadProductProFromDB() {
@@ -98,44 +97,34 @@ export async function loadMasterProductProFromDB() {
 }
 
 export async function getXpackSettingForTheme() {
-    let searchXSetting;
-    const xpackModules = import.meta.glob('../xpack/api/modules/setting.ts', { eager: true });
-    if (xpackModules['../xpack/api/modules/setting.ts']) {
-        searchXSetting = xpackModules['../xpack/api/modules/setting.ts']['searchXSetting'] || {};
-        const res2 = await searchXSetting();
-        if (res2) {
-            globalStore.themeConfig.title = res2.data?.title;
-            globalStore.themeConfig.logo = res2.data?.logo;
-            globalStore.themeConfig.logoWithText = res2.data?.logoWithText;
-            globalStore.themeConfig.favicon = res2.data?.favicon;
-            globalStore.themeConfig.loginImage = res2.data?.loginImage;
-            globalStore.themeConfig.loginBgType = res2.data?.loginBgType;
-            globalStore.themeConfig.loginBackground = res2.data?.loginBackground;
-            globalStore.themeConfig.loginBtnLinkColor = res2.data?.loginBtnLinkColor;
-            globalStore.themeConfig.themeColor = res2.data?.themeColor;
-            globalStore.masterAlias = res2.data.masterAlias;
-            if (res2.data?.theme) {
-                globalStore.themeConfig.theme = res2.data.theme;
-            }
-            globalStore.watermarkShow = res2.data.watermarkShow === 'Enable';
-            try {
-                globalStore.watermark = JSON.parse(res2.data.watermark);
-            } catch {
-                globalStore.watermark = null;
-            }
-        } else {
-            resetXSetting();
+    const res2 = await searchXpackSetting();
+    if (res2) {
+        globalStore.themeConfig.title = res2.data?.title;
+        globalStore.themeConfig.logo = res2.data?.logo;
+        globalStore.themeConfig.logoWithText = res2.data?.logoWithText;
+        globalStore.themeConfig.favicon = res2.data?.favicon;
+        globalStore.themeConfig.loginImage = res2.data?.loginImage;
+        globalStore.themeConfig.loginBgType = res2.data?.loginBgType;
+        globalStore.themeConfig.loginBackground = res2.data?.loginBackground;
+        globalStore.themeConfig.loginBtnLinkColor = res2.data?.loginBtnLinkColor;
+        globalStore.themeConfig.themeColor = res2.data?.themeColor;
+        globalStore.masterAlias = res2.data.masterAlias;
+        if (res2.data?.theme) {
+            globalStore.themeConfig.theme = res2.data.theme;
         }
+        globalStore.watermarkShow = res2.data.watermarkShow === 'Enable';
+        try {
+            globalStore.watermark = JSON.parse(res2.data.watermark);
+        } catch {
+            globalStore.watermark = null;
+        }
+    } else {
+        resetXSetting();
     }
     switchTheme();
     initFavicon();
 }
 
 export async function updateXpackSettingByKey(key: string, value: string) {
-    let updateXSettingByKey;
-    const xpackModules = import.meta.glob('../xpack/api/modules/setting.ts', { eager: true });
-    if (xpackModules['../xpack/api/modules/setting.ts']) {
-        updateXSettingByKey = xpackModules['../xpack/api/modules/setting.ts']['updateXSettingByKey'] || {};
-        return updateXSettingByKey(key, value);
-    }
+    return updateXpackSettingByKeyFromExtension(key, value);
 }

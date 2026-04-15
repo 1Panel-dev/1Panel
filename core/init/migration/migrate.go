@@ -34,7 +34,10 @@ func Init() {
 		migrations.AddDashboardCarouselSetting,
 		migrations.AddEditionSetting,
 		migrations.UpdateAiLocalModelMenuTitle,
+		migrations.UpdateAiAgentsHideMenuTitle,
+		migrations.UpdateAiModelMenuStructure,
 		migrations.AddDocSourceSetting,
+		migrations.AddAppStoreInstallAllowPortSetting,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

@@ -16,6 +16,7 @@ type IAgentRepo interface {
 	DeleteByID(id uint) error
 	DeleteByAppInstallID(appInstallID uint) error
 	DeleteByAppInstallIDWithCtx(ctx context.Context, appInstallID uint) error
+	ClearWebsiteIDByWebsiteIDWithCtx(ctx context.Context, websiteID uint) error
 	List(opts ...DBOption) ([]model.Agent, error)
 }
 
@@ -64,6 +65,13 @@ func (a AgentRepo) DeleteByAppInstallIDWithCtx(ctx context.Context, appInstallID
 		return nil
 	}
 	return getTx(ctx).Where("app_install_id = ?", appInstallID).Delete(&model.Agent{}).Error
+}
+
+func (a AgentRepo) ClearWebsiteIDByWebsiteIDWithCtx(ctx context.Context, websiteID uint) error {
+	if websiteID == 0 {
+		return nil
+	}
+	return getTx(ctx).Model(&model.Agent{}).Where("website_id = ?", websiteID).Update("website_id", 0).Error
 }
 
 func (a AgentRepo) List(opts ...DBOption) ([]model.Agent, error) {

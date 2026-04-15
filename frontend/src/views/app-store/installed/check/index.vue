@@ -57,7 +57,7 @@ import ErrPrompt from '@/components/error-prompt/index.vue';
 
 interface CheckRrops {
     items: App.AppInstallResource[];
-    installID: Number;
+    installID: number;
     key: string;
 }
 const installData = ref<CheckRrops>({
@@ -121,7 +121,7 @@ const onConfirm = () => {
         installedOp(deleteReq).then(() => {
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             open.value = false;
-            em('close', open);
+            em('close', open.value);
         });
     });
 };

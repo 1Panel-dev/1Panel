@@ -157,10 +157,6 @@ export namespace Container {
         ipv6: string;
         macAddr: string;
     }
-    export interface ContainerInfo {
-        name: string;
-        state: string;
-    }
     export interface ContainerItemStats {
         sizeRw: number;
         sizeRootFs: number;
@@ -335,6 +331,7 @@ export namespace Container {
         runningCount: number;
         configFile: string;
         workdir: string;
+        composeFileExists: boolean;
         path: string;
         containers: Array<ComposeContainer>;
         expand: boolean;

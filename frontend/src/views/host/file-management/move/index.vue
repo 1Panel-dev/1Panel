@@ -74,7 +74,7 @@ import { FormInstance, FormRules } from 'element-plus';
 import { ref, reactive, computed, ComputedRef } from 'vue';
 import FileList from '@/components/file-list/index.vue';
 import { MsgSuccess } from '@/utils/message';
-import { getDateStr } from '@/utils/util';
+import { getDateStr } from '@/utils/date';
 import { File } from '@/api/interface/file';
 
 interface MoveProps {

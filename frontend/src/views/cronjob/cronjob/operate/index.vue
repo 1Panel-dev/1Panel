@@ -308,6 +308,7 @@
                                             <el-option label="Mariadb" value="mariadb" />
                                             <el-option label="PostgreSQL" value="postgresql" />
                                             <el-option label="PostgreSQL-Cluster" value="postgresql-cluster" />
+                                            <el-option label="MongoDB" value="mongodb" />
                                         </el-select>
                                     </el-form-item>
                                 </LayoutCol>
@@ -717,6 +718,11 @@
                                         >
                                             <el-option value="mail" :label="$t('xpack.alert.mail')" />
                                             <el-option
+                                                v-if="!isProductPro"
+                                                value="bark"
+                                                :label="$t('xpack.alert.bark')"
+                                            />
+                                            <el-option
                                                 value="weCom"
                                                 v-if="!globalStore.isIntl"
                                                 :disabled="!form.hasAlert || !isProductPro"
@@ -733,6 +739,11 @@
                                                 v-if="!globalStore.isIntl"
                                                 :disabled="!form.hasAlert || !isProductPro"
                                                 :label="$t('xpack.alert.feiShu')"
+                                            />
+                                            <el-option
+                                                v-if="isProductPro"
+                                                value="bark"
+                                                :label="$t('xpack.alert.bark')"
                                             />
                                             <el-option
                                                 value="sms"
@@ -855,7 +866,7 @@ import { loadContainerUsers } from '@/api/modules/container';
 import { storeToRefs } from 'pinia';
 import { GlobalStore } from '@/store';
 import LicenseImport from '@/components/license-import/index.vue';
-import { splitTimeFromSecond, transferTimeToSecond } from '@/utils/util';
+import { splitTimeFromSecond, transferTimeToSecond } from '@/utils/validate';
 import { getGroupList } from '@/api/modules/group';
 import { routerToName, routerToPath } from '@/utils/router';
 import { loadBaseDir } from '@/api/modules/setting';

@@ -26,8 +26,7 @@ import { operatorFail2banSSHD, searchFail2ban } from '@/api/modules/toolbox';
 import { FormInstance } from 'element-plus';
 import { MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
-import { checkCidr, checkIpV4V6 } from '@/utils/util';
-
+import { checkCidr, checkIpV4V6 } from '@/utils/validate';
 const emit = defineEmits<{ (e: 'search'): void }>();
 
 const drawerVisible = ref(false);

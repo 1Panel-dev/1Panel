@@ -2,12 +2,9 @@ package service
 
 import (
 	"context"
-	"crypto/rand"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"net/http"
-	"net/url"
+	"os"
 	"path"
 	"sort"
 	"strconv"
@@ -19,53 +16,78 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	providercatalog "github.com/1Panel-dev/1Panel/agent/app/provider"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
-	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
-	"github.com/1Panel-dev/1Panel/agent/utils/common"
-	"github.com/1Panel-dev/1Panel/agent/utils/files"
-	"github.com/1Panel-dev/1Panel/agent/utils/req_helper"
+	"github.com/1Panel-dev/1Panel/agent/utils/docker"
+	terminalai "github.com/1Panel-dev/1Panel/agent/utils/terminal/ai"
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
+	"github.com/docker/docker/api/types/container"
+	"gorm.io/gorm"
 )
-
-type AgentService struct{}
 
 type IAgentService interface {
 	Create(req dto.AgentCreateReq) (*dto.AgentItem, error)
 	Page(req dto.SearchWithPage) (int64, []dto.AgentItem, error)
+	DeleteCheck(req dto.AgentIDReq) ([]dto.AppResource, error)
 	Delete(req dto.AgentDeleteReq) error
 	ResetToken(req dto.AgentTokenResetReq) error
+	UpdateRemark(req dto.AgentRemarkUpdateReq) error
+	BindWebsite(req dto.AgentWebsiteBindReq) error
+	GetModelConfig(req dto.AgentIDReq) (*dto.AgentModelConfig, error)
 	UpdateModelConfig(req dto.AgentModelConfigUpdateReq) error
+	GetOverview(req dto.AgentOverviewReq) (*dto.AgentOverview, error)
 	GetProviders() ([]dto.ProviderInfo, error)
+	GetSecurityConfig(req dto.AgentIDReq) (*dto.AgentSecurityConfig, error)
+	UpdateSecurityConfig(req dto.AgentSecurityConfigUpdateReq) error
+	GetOtherConfig(req dto.AgentIDReq) (*dto.AgentOtherConfig, error)
+	UpdateOtherConfig(req dto.AgentOtherConfigUpdateReq) error
+	GetConfigFile(req dto.AgentConfigFileReq) (*dto.AgentConfigFile, error)
+	UpdateConfigFile(req dto.AgentConfigFileUpdateReq) error
+	ListSkills(req dto.AgentIDReq) ([]dto.AgentSkillItem, error)
+	SearchSkills(req dto.AgentSkillSearchReq) ([]dto.AgentSkillSearchItem, error)
+	UpdateSkill(req dto.AgentSkillUpdateReq) error
+	InstallSkill(req dto.AgentSkillInstallReq) error
+
+	CreateRole(req dto.AgentRoleCreateReq) (*dto.AgentRoleCreateResp, error)
+	DeleteRole(req dto.AgentRoleDeleteReq) error
+	BindRole(req dto.AgentRoleBindReq) error
+	UnbindRole(req dto.AgentRoleBindReq) error
+	GetConfiguredAgents(req dto.AgentConfiguredAgentsReq) ([]dto.AgentConfiguredAgentItem, error)
+	GetRoleChannels(req dto.AgentRoleChannelsReq) ([]dto.AgentRoleChannelItem, error)
+	GetRoleMarkdownFiles(req dto.AgentRoleMarkdownFilesReq) ([]dto.AgentRoleMarkdownFileItem, error)
+	UpdateRoleMarkdownFiles(req dto.AgentRoleMarkdownFilesUpdateReq) error
+
 	CreateAccount(req dto.AgentAccountCreateReq) error
 	UpdateAccount(req dto.AgentAccountUpdateReq) error
-	SyncAgentsByAccountID(accountID uint) error
+	SyncAgentsByAccount(account *model.AgentAccount) error
 	PageAccounts(req dto.AgentAccountSearch) (int64, []dto.AgentAccountInfo, error)
+	GetAccountModels(req dto.AgentAccountModelReq) ([]dto.AgentAccountModel, error)
+	CreateAccountModel(req dto.AgentAccountModelCreateReq) error
+	UpdateAccountModel(req dto.AgentAccountModelUpdateReq) error
+	DeleteAccountModel(req dto.AgentAccountModelDeleteReq) error
 	VerifyAccount(req dto.AgentAccountVerifyReq) error
 	DeleteAccount(req dto.AgentAccountDeleteReq) error
+
 	GetFeishuConfig(req dto.AgentFeishuConfigReq) (*dto.AgentFeishuConfig, error)
 	UpdateFeishuConfig(req dto.AgentFeishuConfigUpdateReq) error
 	GetTelegramConfig(req dto.AgentTelegramConfigReq) (*dto.AgentTelegramConfig, error)
 	UpdateTelegramConfig(req dto.AgentTelegramConfigUpdateReq) error
-	GetDiscordConfig(req dto.AgentDiscordConfigReq) (*dto.AgentDiscordConfig, error)
+	GetDiscordConfig(req dto.AgentIDReq) (*dto.AgentDiscordConfig, error)
 	UpdateDiscordConfig(req dto.AgentDiscordConfigUpdateReq) error
-	GetWecomConfig(req dto.AgentWecomConfigReq) (*dto.AgentWecomConfig, error)
+	GetWecomConfig(req dto.AgentIDReq) (*dto.AgentWecomConfig, error)
 	UpdateWecomConfig(req dto.AgentWecomConfigUpdateReq) error
-	GetQQBotConfig(req dto.AgentQQBotConfigReq) (*dto.AgentQQBotConfig, error)
+	GetDingTalkConfig(req dto.AgentIDReq) (*dto.AgentDingTalkConfig, error)
+	UpdateDingTalkConfig(req dto.AgentDingTalkConfigUpdateReq) error
+	LoginWeixinChannel(req dto.AgentWeixinLoginReq) error
+	GetQQBotConfig(req dto.AgentIDReq) (*dto.AgentQQBotConfig, error)
 	UpdateQQBotConfig(req dto.AgentQQBotConfigUpdateReq) error
 	InstallPlugin(req dto.AgentPluginInstallReq) error
+	UpgradePlugin(req dto.AgentPluginUpgradeReq) error
+	UninstallPlugin(req dto.AgentPluginUninstallReq) error
 	CheckPlugin(req dto.AgentPluginCheckReq) (*dto.AgentPluginStatus, error)
-	GetSecurityConfig(req dto.AgentSecurityConfigReq) (*dto.AgentSecurityConfig, error)
-	UpdateSecurityConfig(req dto.AgentSecurityConfigUpdateReq) error
-	GetOtherConfig(req dto.AgentOtherConfigReq) (*dto.AgentOtherConfig, error)
-	UpdateOtherConfig(req dto.AgentOtherConfigUpdateReq) error
 	ApproveChannelPairing(req dto.AgentChannelPairingApproveReq) error
-}
-
-func NewIAgentService() IAgentService {
-	return &AgentService{}
 }
 
 const (
@@ -76,20 +98,18 @@ const (
 	defaultToolsSessionVisibility = "all"
 	maxCommunityAIAgents          = int64(5)
 	openclawPluginBaseDir         = "/home/node/.openclaw/extensions"
+	openclawPluginPackageTmpDir   = "/tmp/openclaw-plugin"
+	openclawManagedSkillsDir      = "/home/node/.openclaw/skills"
 	openclawGatewayPort           = 18789
-	openclawCaddyPort             = 8443
-	openclawCaddyDataPerm         = 0777
-	openclawCaddyLoopbackAddress  = "https://127.0.0.1:8443"
 	openclawAllowedOriginHost     = "127.0.0.1"
 	openclawHTTPSVersion          = "2026.3.13"
+	openclawHTTPVersion           = "2026.3.23"
 	openclawTrustedProxyLoopback  = "127.0.0.1/32"
+	defaultOpenclawNPMRegistry    = "https://registry.npmjs.org/"
 )
 
 func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
-	agentType := normalizeAgentType(req.AgentType)
-	if !isSupportedAgentType(agentType) {
-		return nil, fmt.Errorf("agent type is invalid")
-	}
+	agentType := req.AgentType
 	if err := checkPortExist(req.WebUIPort); err != nil {
 		return nil, err
 	}
@@ -108,11 +128,7 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 			return nil, buserr.WithMap("ErrAgentLimitReached", map[string]interface{}{"max": maxCommunityAIAgents}, nil)
 		}
 	}
-	appKey := constant.AppOpenclaw
-	if agentType == constant.AppCopaw {
-		appKey = constant.AppCopaw
-	}
-	app, err := appRepo.GetFirst(appRepo.WithKey(appKey))
+	app, err := appRepo.GetFirst(appRepo.WithKey(agentType))
 	if err != nil || app.ID == 0 {
 		return nil, buserr.New("ErrRecordNotFound")
 	}
@@ -133,6 +149,8 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 	configPath := ""
 	storedModel := ""
 	var allowedOrigins []string
+	var account *model.AgentAccount
+	var installHooks *appInstallHooks
 
 	if agentType == constant.AppOpenclaw {
 		var err error
@@ -143,67 +161,37 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 		if len(allowedOrigins) == 0 {
 			return nil, fmt.Errorf("allowed origins is required")
 		}
-		provider = strings.ToLower(strings.TrimSpace(req.Provider))
-		if !isSupportedAgentProvider(provider) {
-			return nil, buserr.New("ErrAgentProviderNotSupported")
-		}
 		if req.AccountID == 0 {
 			return nil, buserr.New("ErrAgentAccountRequired")
 		}
-		account, err := agentAccountRepo.GetFirst(repo.WithByID(req.AccountID))
+		account, err = agentAccountRepo.GetFirst(repo.WithByID(req.AccountID))
 		if err != nil {
 			return nil, err
 		}
-		if !account.Verified && !providercatalog.SkipVerification(account.Provider) {
+		if !account.Verified {
 			return nil, buserr.New("ErrAgentAccountNotVerified")
 		}
-		if account.Provider != "" && provider != "" && account.Provider != provider {
-			return nil, buserr.New("ErrAgentProviderMismatch")
+		provider = account.Provider
+		baseURL = account.BaseURL
+		resolvedRuntime, err := resolveOpenclawAccountModelRuntimeByID(account, req.Model)
+		if err != nil {
+			return nil, err
 		}
-		provider = strings.ToLower(strings.TrimSpace(account.Provider))
-		baseURL = strings.TrimSpace(account.BaseURL)
-		if baseURL == "" {
-			if defaultURL, ok := providerDefaultBaseURL(provider); ok {
-				baseURL = defaultURL
-			}
-		}
-		if provider == "ollama" && baseURL == "" {
-			return nil, buserr.New("ErrAgentBaseURLRequired")
-		}
-		if provider != "ollama" && strings.TrimSpace(account.APIKey) == "" {
-			return nil, buserr.New("ErrAgentApiKeyRequired")
-		}
-		apiType, maxTokens, contextWindow = resolveRuntimeParams(provider, account.APIType, account.MaxTokens, account.ContextWindow)
-		runtimeModel = strings.TrimSpace(req.Model)
-		if runtimeModel == "" {
-			return nil, buserr.New("ErrAgentProviderMismatch")
-		}
-		if provider == "custom" || provider == "vllm" {
-			customModelID := normalizeCustomModel(req.Model)
-			runtimeModel = "custom/" + customModelID
-		}
-		if provider == "bailian-coding-plan" {
-			modelID := runtimeModel
-			if parts := strings.SplitN(runtimeModel, "/", 2); len(parts) == 2 {
-				modelID = parts[1]
-			}
-			normalizedID := normalizeBailianCodingPlanModelID(modelID)
-			runtimeModel = "bailian-coding-plan/" + bailianPrimaryModelID(normalizedID)
-		}
-		if provider == "ark-coding-plan" {
-			modelID := runtimeModel
-			if parts := strings.SplitN(runtimeModel, "/", 2); len(parts) == 2 {
-				modelID = parts[1]
-			}
-			normalizedID := normalizeArkCodingPlanModelID(modelID)
-			runtimeModel = "ark-coding-plan/" + normalizedID
-		}
-		storedModel = req.Model
+		storedModel = resolvedRuntime.StoredModel
+		apiType = resolvedRuntime.APIType
+		maxTokens = resolvedRuntime.MaxTokens
+		contextWindow = resolvedRuntime.ContextWindow
+		runtimeModel = resolvedRuntime.PrimaryModel
 		apiKey = account.APIKey
 		accountID = account.ID
 		token = strings.TrimSpace(req.Token)
 		if token == "" {
 			token = generateToken()
+		}
+		installHooks = &appInstallHooks{
+			AfterCopyData: func(appInstall *model.AppInstall) error {
+				return prepareOpenclawInstallFiles(appInstall, account, storedModel, token, allowedOrigins)
+			},
 		}
 	}
 
@@ -213,7 +201,11 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 		constant.HostIP:      "",
 	}
 	if agentType == constant.AppOpenclaw {
-		params["PANEL_APP_PORT_HTTPS"] = req.WebUIPort
+		if isOpenclawHTTPSWindowVersion(detail.Version) {
+			params["PANEL_APP_PORT_HTTPS"] = req.WebUIPort
+		} else {
+			params["PANEL_APP_PORT_HTTP"] = req.WebUIPort
+		}
 		if allowedOrigin := firstAllowedOrigin(allowedOrigins); allowedOrigin != "" {
 			params["ALLOWED_ORIGIN"] = allowedOrigin
 		}
@@ -251,7 +243,7 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 			DockerCompose: req.DockerCompose,
 		},
 	}
-	appInstall, err := NewIAppService().Install(installReq, false)
+	appInstall, err := AppService{}.installWithHooks(installReq, false, installHooks)
 	if err != nil {
 		return nil, err
 	}
@@ -260,6 +252,7 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 	}
 	agent := &model.Agent{
 		Name:          req.Name,
+		Remark:        req.Remark,
 		AgentType:     agentType,
 		Provider:      provider,
 		Model:         storedModel,
@@ -278,21 +271,6 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 	if err := agentRepo.Create(agent); err != nil {
 		return nil, err
 	}
-	if agentType == constant.AppOpenclaw {
-		go a.writeConfigWithRetry(
-			appInstall,
-			provider,
-			req.Model,
-			apiType,
-			maxTokens,
-			contextWindow,
-			baseURL,
-			apiKey,
-			token,
-			agent.ID,
-			allowedOrigins,
-		)
-	}
 
 	item := buildAgentItem(agent, appInstall, nil)
 	return &item, nil
@@ -308,23 +286,36 @@ func (a AgentService) Page(req dto.SearchWithPage) (int64, []dto.AgentItem, erro
 		return 0, nil, err
 	}
 	items := make([]dto.AgentItem, 0, len(list))
+	appInstalls := make([]model.AppInstall, 0, len(list))
 	for _, item := range list {
 		appInstall, _ := appInstallRepo.GetFirst(repo.WithByID(item.AppInstallID))
+		appInstalls = append(appInstalls, appInstall)
+	}
+	syncAgentAppInstalls(appInstalls)
+	for index, item := range list {
+		appInstall := appInstalls[index]
 		envMap := readInstallEnv(appInstall.Env)
 		agentItem := buildAgentItem(&item, &appInstall, envMap)
 		agentItem.Upgradable = checkAgentUpgradable(appInstall)
 		items = append(items, agentItem)
 	}
+	if err := hydrateAgentWebsiteItems(items); err != nil {
+		return 0, nil, err
+	}
 	return count, items, nil
 }
 
 func (a AgentService) Delete(req dto.AgentDeleteReq) error {
-	if req.ID == 0 {
-		return buserr.New("ErrAgentIDRequired")
-	}
 	agent, err := agentRepo.GetFirst(repo.WithByID(req.ID))
 	if err != nil {
 		return err
+	}
+	resources, err := a.deleteCheckByAgent(agent)
+	if err != nil {
+		return err
+	}
+	if len(resources) > 0 {
+		return buserr.New("ErrAgentWebsiteBound")
 	}
 	if agent.AppInstallID == 0 {
 		return agentRepo.DeleteByID(agent.ID)
@@ -338,30 +329,67 @@ func (a AgentService) Delete(req dto.AgentDeleteReq) error {
 	if err := NewIAppInstalledService().Operate(operate); err != nil {
 		return err
 	}
-	go a.waitAndDeleteAgent(agent.ID, agent.AppInstallID)
 	return nil
 }
 
+func (a AgentService) DeleteCheck(req dto.AgentIDReq) ([]dto.AppResource, error) {
+	agent, err := agentRepo.GetFirst(repo.WithByID(req.AgentID))
+	if err != nil {
+		return nil, err
+	}
+	return a.deleteCheckByAgent(agent)
+}
+
+func (a AgentService) deleteCheckByAgent(agent *model.Agent) ([]dto.AppResource, error) {
+	if agent == nil || agent.WebsiteID == 0 {
+		return nil, nil
+	}
+	website, err := websiteRepo.GetFirst(repo.WithByID(agent.WebsiteID))
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
+		return nil, err
+	}
+	websiteName, err := loadAgentWebsiteResourceName(website)
+	if err != nil {
+		return nil, err
+	}
+	return []dto.AppResource{{Type: "website", Name: websiteName}}, nil
+}
+
+func syncAgentAppInstalls(appInstalls []model.AppInstall) {
+	if len(appInstalls) == 0 {
+		return
+	}
+
+	var containersMap map[string]container.Summary
+	cli, err := docker.NewClient()
+	if err == nil {
+		defer cli.Close()
+		containers, err := cli.ListAllContainers()
+		if err == nil {
+			containersMap = make(map[string]container.Summary, len(containers))
+			for _, contain := range containers {
+				containersMap[contain.Names[0]] = contain
+			}
+		}
+	}
+
+	for index := range appInstalls {
+		if appInstalls[index].ID == 0 || doNotNeedSync(appInstalls[index]) {
+			continue
+		}
+		synAppInstall(containersMap, &appInstalls[index], false)
+	}
+}
+
 func (a AgentService) ResetToken(req dto.AgentTokenResetReq) error {
-	agent, err := agentRepo.GetFirst(repo.WithByID(req.ID))
+	agent, err := loadOpenclawAgentByID(req.ID)
 	if err != nil {
 		return err
 	}
-	if normalizeAgentType(agent.AgentType) == constant.AppCopaw {
-		return fmt.Errorf("copaw does not support token")
-	}
-	configPath := strings.TrimSpace(agent.ConfigPath)
-	if configPath == "" && agent.AppInstallID > 0 {
-		install, err := appInstallRepo.GetFirst(repo.WithByID(agent.AppInstallID))
-		if err != nil {
-			return err
-		}
-		configPath = path.Join(install.GetPath(), "data", "conf", "openclaw.json")
-	}
-	if configPath == "" {
-		return buserr.New("ErrRecordNotFound")
-	}
-	conf, err := readOpenclawConfig(configPath)
+	conf, err := readOpenclawConfig(agent.ConfigPath)
 	if err != nil {
 		return err
 	}
@@ -375,91 +403,97 @@ func (a AgentService) ResetToken(req dto.AgentTokenResetReq) error {
 		authMap["mode"] = "token"
 	}
 	authMap["token"] = newToken
-	if err := writeOpenclawConfigRaw(configPath, conf); err != nil {
+	if err := writeOpenclawConfigRaw(agent.ConfigPath, conf); err != nil {
 		return err
 	}
 	agent.Token = newToken
-	if agent.ConfigPath == "" {
-		agent.ConfigPath = configPath
-	}
 	return agentRepo.Save(agent)
 }
 
-func (a AgentService) UpdateModelConfig(req dto.AgentModelConfigUpdateReq) error {
-	agent, err := agentRepo.GetFirst(repo.WithByID(req.AgentID))
+func (a AgentService) UpdateRemark(req dto.AgentRemarkUpdateReq) error {
+	agent, err := agentRepo.GetFirst(repo.WithByID(req.ID))
 	if err != nil {
 		return err
 	}
-	if normalizeAgentType(agent.AgentType) == constant.AppCopaw {
-		return fmt.Errorf("copaw does not support model config")
+	agent.Remark = req.Remark
+	return agentRepo.Save(agent)
+}
+
+func (a AgentService) GetModelConfig(req dto.AgentIDReq) (*dto.AgentModelConfig, error) {
+	agent, _, conf, err := a.loadOpenclawAgentConfig(req.AgentID)
+	if err != nil {
+		return nil, err
+	}
+	account, err := agentAccountRepo.GetFirst(repo.WithByID(agent.AccountID))
+	if err != nil {
+		return nil, err
+	}
+	models, err := loadAgentAccountModels(account)
+	if err != nil {
+		return nil, err
+	}
+	model := extractOpenclawPrimaryModelID(conf, account, models)
+	if model == "" {
+		model = agent.Model
+	}
+	return &dto.AgentModelConfig{
+		AccountID: agent.AccountID,
+		Model:     model,
+		Fallbacks: extractOpenclawFallbackModelIDs(conf, account, models, model),
+	}, nil
+}
+
+func (a AgentService) UpdateModelConfig(req dto.AgentModelConfigUpdateReq) error {
+	agent, err := loadOpenclawAgentByID(req.AgentID)
+	if err != nil {
+		return err
 	}
 	account, err := agentAccountRepo.GetFirst(repo.WithByID(req.AccountID))
 	if err != nil {
 		return err
 	}
-	if !account.Verified && !providercatalog.SkipVerification(account.Provider) {
-		return buserr.New("ErrAgentAccountNotVerified")
-	}
-	provider := strings.ToLower(strings.TrimSpace(account.Provider))
-	if !isSupportedAgentProvider(provider) {
-		return buserr.New("ErrAgentProviderNotSupported")
-	}
-	modelName := strings.TrimSpace(req.Model)
-	if modelName == "" {
-		return buserr.New("ErrAgentProviderMismatch")
-	}
-	if provider != "custom" && provider != "vllm" && !modelMatchesProvider(provider, modelName) {
-		return buserr.New("ErrAgentProviderMismatch")
-	}
-	baseURL := strings.TrimSpace(account.BaseURL)
-	if baseURL == "" {
-		if defaultURL, ok := providerDefaultBaseURL(provider); ok {
-			baseURL = defaultURL
-		}
-	}
-	if provider == "ollama" && baseURL == "" {
-		return buserr.New("ErrAgentBaseURLRequired")
-	}
-	if provider != "ollama" && strings.TrimSpace(account.APIKey) == "" {
-		return buserr.New("ErrAgentApiKeyRequired")
-	}
-	apiType, maxTokens, contextWindow := resolveRuntimeParams(provider, account.APIType, account.MaxTokens, account.ContextWindow)
-	confDir := ""
-	if agent.ConfigPath != "" {
-		confDir = path.Dir(agent.ConfigPath)
-	} else if agent.AppInstallID > 0 {
-		install, errGet := appInstallRepo.GetFirst(repo.WithByID(agent.AppInstallID))
-		if errGet == nil {
-			confDir = path.Join(install.GetPath(), "data", "conf")
-		}
-	}
-	if confDir == "" {
-		return buserr.New("ErrRecordNotFound")
-	}
-	if err := writeOpenclawConfig(confDir, provider, modelName, apiType, maxTokens, contextWindow, baseURL, account.APIKey, agent.Token, nil); err != nil {
+	resolvedRuntime, err := resolveOpenclawAccountModelRuntimeByID(account, req.Model)
+	if err != nil {
 		return err
 	}
-	agent.Provider = provider
+	modelName := resolvedRuntime.StoredModel
+	apiType, maxTokens, contextWindow := resolvedRuntime.APIType, resolvedRuntime.MaxTokens, resolvedRuntime.ContextWindow
+	confDir := path.Dir(agent.ConfigPath)
+	if err := writeOpenclawConfig(confDir, account, modelName, agent.Token, nil, req.Fallbacks); err != nil {
+		return err
+	}
+	agent.Provider = account.Provider
 	agent.Model = modelName
 	agent.APIType = apiType
 	agent.MaxTokens = maxTokens
 	agent.ContextWindow = contextWindow
-	agent.BaseURL = baseURL
+	agent.BaseURL = account.BaseURL
 	agent.APIKey = account.APIKey
 	agent.AccountID = account.ID
 	return agentRepo.Save(agent)
 }
 
 func (a AgentService) GetProviders() ([]dto.ProviderInfo, error) {
-	definitions := providerDefinitions()
+	definitions := providercatalog.All()
 	providers := make([]dto.ProviderInfo, 0, len(definitions))
 	for key, def := range definitions {
+		models := make([]dto.ProviderModelInfo, 0, len(def.Models))
+		for _, item := range def.Models {
+			models = append(models, dto.ProviderModelInfo{
+				ID:            item.ID,
+				Name:          item.Name,
+				ContextWindow: item.ContextWindow,
+				MaxTokens:     item.MaxTokens,
+				Reasoning:     item.Reasoning,
+				Input:         append([]string(nil), item.Input...),
+			})
+		}
 		providers = append(providers, dto.ProviderInfo{
 			Sort:        def.Sort,
 			Provider:    key,
 			DisplayName: def.DisplayName,
-			BaseURL:     def.BaseURL,
-			Models:      def.Models,
+			BaseURL:     def.DefaultBaseURL,
+			Models:      models,
 		})
 	}
 	sort.Slice(providers, func(i, j int) bool {
@@ -469,71 +503,37 @@ func (a AgentService) GetProviders() ([]dto.ProviderInfo, error) {
 }
 
 func (a AgentService) CreateAccount(req dto.AgentAccountCreateReq) error {
-	provider := strings.ToLower(strings.TrimSpace(req.Provider))
-	if !isSupportedAgentProvider(provider) {
-		return buserr.New("ErrAgentProviderNotSupported")
-	}
-	apiKey := strings.TrimSpace(req.APIKey)
-	if apiKey == "" {
-		return buserr.New("ErrAgentApiKeyRequired")
-	}
-	baseURL := strings.TrimSpace(req.BaseURL)
-	if fixedURL, ok := fixedProviderBaseURL(provider); ok {
-		baseURL = fixedURL
-	}
-	if (provider == "custom" || provider == "vllm") && baseURL == "" {
-		return buserr.New("ErrAgentBaseURLRequired")
-	}
-	if provider != "custom" && provider != "vllm" && baseURL == "" {
-		if defaultURL, ok := providerDefaultBaseURL(provider); ok {
-			baseURL = defaultURL
-		}
-	}
-	if provider == "ollama" && baseURL == "" {
-		return buserr.New("ErrAgentBaseURLRequired")
-	}
+	provider := req.Provider
 	if exist, _ := agentAccountRepo.GetFirst(repo.WithByProvider(provider), repo.WithByName(req.Name)); exist != nil && exist.ID > 0 {
 		return buserr.New("ErrRecordExist")
 	}
-	modelName := strings.TrimSpace(req.Model)
-	apiType := normalizeAPIType(req.APIType)
-	if provider == "custom" || provider == "vllm" {
-		if modelName == "" {
-			return fmt.Errorf("model is required")
-		}
-		if !isSupportedAPIType(apiType) {
-			return fmt.Errorf("apiType is invalid")
-		}
-	}
-	if provider == "ollama" {
-		if !isSupportedOllamaAPIType(apiType) {
-			return fmt.Errorf("apiType is invalid")
-		}
-	}
-	if err := a.VerifyAccount(dto.AgentAccountVerifyReq{Provider: provider, BaseURL: baseURL, APIKey: apiKey}); err != nil {
+	resolvedInput, err := resolveAgentAccountInput(provider, req.APIKey, req.BaseURL)
+	if err != nil {
 		return err
 	}
-	verified := !providercatalog.SkipVerification(provider)
-	_, maxTokens, contextWindow := resolveRuntimeParams(provider, apiType, req.MaxTokens, req.ContextWindow)
 	account := &model.AgentAccount{
-		Provider:       provider,
+		Provider:       resolvedInput.Provider,
 		Name:           req.Name,
-		APIKey:         apiKey,
+		APIKey:         resolvedInput.APIKey,
 		RememberAPIKey: req.RememberAPIKey,
-		BaseURL:        baseURL,
-		Model:          "",
-		APIType:        apiType,
-		MaxTokens:      0,
-		ContextWindow:  0,
-		Verified:       verified,
+		BaseURL:        resolvedInput.BaseURL,
+		APIType:        req.APIType,
+		Verified:       true,
 		Remark:         req.Remark,
 	}
-	if provider == "custom" || provider == "vllm" {
-		account.Model = normalizeCustomModel(modelName)
-		account.MaxTokens = maxTokens
-		account.ContextWindow = contextWindow
+	initialModels, err := buildInitialAgentAccountModels(account, req.Models)
+	if err != nil {
+		return err
 	}
-	if err := agentAccountRepo.Create(account); err != nil {
+	if err := global.DB.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Create(account).Error; err != nil {
+			return err
+		}
+		if len(initialModels) == 0 {
+			return nil
+		}
+		return replacePersistedAgentAccountModelsWithTx(tx, account.ID, initialModels)
+	}); err != nil {
 		return err
 	}
 	asyncReportAIProviderInstall(provider)
@@ -545,65 +545,24 @@ func (a AgentService) UpdateAccount(req dto.AgentAccountUpdateReq) error {
 	if err != nil {
 		return err
 	}
-	provider := strings.ToLower(strings.TrimSpace(account.Provider))
-	baseURL := strings.TrimSpace(req.BaseURL)
-	if fixedURL, ok := fixedProviderBaseURL(provider); ok {
-		baseURL = fixedURL
-	}
-	if (provider == "custom" || provider == "vllm") && baseURL == "" {
-		return buserr.New("ErrAgentBaseURLRequired")
-	}
-	if provider != "custom" && provider != "vllm" && baseURL == "" {
-		if defaultURL, ok := providerDefaultBaseURL(provider); ok {
-			baseURL = defaultURL
-		}
-	}
-	if provider == "ollama" && baseURL == "" {
-		return buserr.New("ErrAgentBaseURLRequired")
-	}
-	apiType := normalizeAPIType(req.APIType)
-	rawAPIType := strings.TrimSpace(req.APIType)
-	if (provider == "custom" || provider == "vllm") && strings.TrimSpace(req.Model) == "" {
-		return fmt.Errorf("model is required")
-	}
-	if (provider == "custom" || provider == "vllm") && !isSupportedAPIType(apiType) {
-		return fmt.Errorf("apiType is invalid")
-	}
-	if provider == "ollama" {
-		if rawAPIType == "" {
-			apiType = normalizeAPIType(account.APIType)
-			if !isSupportedOllamaAPIType(apiType) {
-				apiType = "openai-responses"
-			}
-		} else if !isSupportedOllamaAPIType(apiType) {
-			return fmt.Errorf("apiType is invalid")
-		}
-	}
-	if provider != "custom" && provider != "vllm" && provider != "ollama" {
-		apiType = normalizeAPIType(account.APIType)
-	}
-	_, maxTokens, contextWindow := resolveRuntimeParams(provider, apiType, req.MaxTokens, req.ContextWindow)
-	if err := a.VerifyAccount(dto.AgentAccountVerifyReq{Provider: provider, BaseURL: baseURL, APIKey: req.APIKey}); err != nil {
+	provider := account.Provider
+	resolvedInput, err := resolveAgentAccountInput(provider, req.APIKey, req.BaseURL)
+	if err != nil {
 		return err
 	}
-	verified := !providercatalog.SkipVerification(provider)
 	account.Name = req.Name
-	account.APIKey = req.APIKey
+	account.APIKey = resolvedInput.APIKey
 	account.RememberAPIKey = req.RememberAPIKey
-	account.BaseURL = baseURL
-	if provider == "custom" || provider == "vllm" {
-		account.Model = normalizeCustomModel(req.Model)
-	}
-	account.APIType = apiType
-	if provider == "custom" || provider == "vllm" {
-		account.MaxTokens = maxTokens
-		account.ContextWindow = contextWindow
-	}
+	account.BaseURL = resolvedInput.BaseURL
+	account.APIType = req.APIType
 	account.Remark = req.Remark
-	account.Verified = verified
-	if err := agentAccountRepo.Save(account); err != nil {
+	account.Verified = true
+
+	if err := global.DB.Save(account).Error; err != nil {
 		return err
 	}
+	terminalai.InvalidateTerminalRuntimeCache()
+	terminalai.InvalidateFileAIRuntimeCache()
 	if req.SyncAgents {
 		if err := a.syncAgentsByAccount(account); err != nil {
 			return err
@@ -633,242 +592,187 @@ func (a AgentService) PageAccounts(req dto.AgentAccountSearch) (int64, []dto.Age
 		items = append(items, dto.AgentAccountInfo{
 			ID:             item.ID,
 			Provider:       item.Provider,
-			ProviderName:   providerDisplayName(item.Provider),
+			ProviderName:   providercatalog.DisplayName(item.Provider),
 			Name:           item.Name,
 			APIKey:         apiKey,
 			RememberAPIKey: item.RememberAPIKey,
 			BaseURL:        item.BaseURL,
-			Model:          item.Model,
+			Models:         nil,
 			APIType:        item.APIType,
-			MaxTokens:      item.MaxTokens,
-			ContextWindow:  item.ContextWindow,
 			Verified:       item.Verified,
 			Remark:         item.Remark,
 			CreatedAt:      item.CreatedAt,
 		})
 	}
+	for i := range items {
+		models, err := loadAgentAccountModels(&list[i])
+		if err != nil {
+			return 0, nil, err
+		}
+		items[i].Models = models
+	}
 	return count, items, nil
 }
 
-func (a AgentService) SyncAgentsByAccountID(accountID uint) error {
-	if accountID == 0 {
-		return nil
-	}
-	account, err := agentAccountRepo.GetFirst(repo.WithByID(accountID))
+func (a AgentService) GetAccountModels(req dto.AgentAccountModelReq) ([]dto.AgentAccountModel, error) {
+	account, err := agentAccountRepo.GetFirst(repo.WithByID(req.AccountID))
 	if err != nil {
+		return nil, err
+	}
+	return loadAgentAccountModels(account)
+}
+
+func (a AgentService) CreateAccountModel(req dto.AgentAccountModelCreateReq) error {
+	account, err := agentAccountRepo.GetFirst(repo.WithByID(req.AccountID))
+	if err != nil {
+		return err
+	}
+	models, err := loadAgentAccountModels(account)
+	if err != nil {
+		return err
+	}
+	nextModel := cloneAgentAccountModel(req.Model)
+	if _, ok := findAgentAccountModelForProvider(account.Provider, models, nextModel.ID); ok {
+		return buserr.New("ErrRecordExist")
+	}
+	inputPayload, err := json.Marshal(nextModel.Input)
+	if err != nil {
+		return err
+	}
+	sortOrder := len(models) + 1
+	record := &model.AgentAccountModel{
+		AccountID:     account.ID,
+		Model:         nextModel.ID,
+		Name:          nextModel.Name,
+		ContextWindow: nextModel.ContextWindow,
+		MaxTokens:     nextModel.MaxTokens,
+		Reasoning:     nextModel.Reasoning,
+		Input:         string(inputPayload),
+		SortOrder:     sortOrder,
+	}
+	if err := agentAccountModelRepo.Create(record); err != nil {
 		return err
 	}
 	return a.syncAgentsByAccount(account)
 }
 
-func (a AgentService) VerifyAccount(req dto.AgentAccountVerifyReq) error {
-	provider := strings.ToLower(strings.TrimSpace(req.Provider))
-	if !isSupportedAgentProvider(provider) {
-		return buserr.New("ErrAgentProviderNotSupported")
+func (a AgentService) UpdateAccountModel(req dto.AgentAccountModelUpdateReq) error {
+	account, err := agentAccountRepo.GetFirst(repo.WithByID(req.AccountID))
+	if err != nil {
+		return err
 	}
-	apiKey := strings.TrimSpace(req.APIKey)
-	if apiKey == "" {
-		return buserr.New("ErrAgentApiKeyRequired")
+	record, err := agentAccountModelRepo.GetFirst(repo.WithByID(req.Model.RecordID), repo.WithByAccountID(req.AccountID))
+	if err != nil {
+		return err
 	}
-	baseURL := strings.TrimSpace(req.BaseURL)
-	if fixedURL, ok := fixedProviderBaseURL(provider); ok {
-		baseURL = fixedURL
+	models, err := loadAgentAccountModels(account)
+	if err != nil {
+		return err
 	}
-	if baseURL == "" {
-		if defaultURL, ok := providerDefaultBaseURL(provider); ok {
-			baseURL = defaultURL
+	nextModel := cloneAgentAccountModel(req.Model)
+	for _, item := range models {
+		if item.RecordID == req.Model.RecordID {
+			continue
+		}
+		if sameProviderModelID(account.Provider, item.ID, nextModel.ID) {
+			return buserr.New("ErrRecordExist")
 		}
 	}
-	if provider == "ollama" && baseURL == "" {
-		return buserr.New("ErrAgentBaseURLRequired")
+	nextModels := make([]dto.AgentAccountModel, 0, len(models))
+	for _, item := range models {
+		if item.RecordID == req.Model.RecordID {
+			nextModels = append(nextModels, nextModel)
+			continue
+		}
+		nextModels = append(nextModels, item)
 	}
-	if providercatalog.SkipVerification(provider) {
+	if err := ensureAccountModelsNotBound(account, nextModels); err != nil {
+		return err
+	}
+	inputPayload, err := json.Marshal(nextModel.Input)
+	if err != nil {
+		return err
+	}
+	record.Model = nextModel.ID
+	record.Name = nextModel.Name
+	record.ContextWindow = nextModel.ContextWindow
+	record.MaxTokens = nextModel.MaxTokens
+	record.Reasoning = nextModel.Reasoning
+	record.Input = string(inputPayload)
+	if err := agentAccountModelRepo.Save(record); err != nil {
+		return err
+	}
+	terminalai.InvalidateTerminalRuntimeCache()
+	terminalai.InvalidateFileAIRuntimeCache()
+	return a.syncAgentsByAccount(account)
+}
+
+func (a AgentService) DeleteAccountModel(req dto.AgentAccountModelDeleteReq) error {
+	account, err := agentAccountRepo.GetFirst(repo.WithByID(req.AccountID))
+	if err != nil {
+		return err
+	}
+	if _, err := agentAccountModelRepo.GetFirst(repo.WithByID(req.RecordID), repo.WithByAccountID(req.AccountID)); err != nil {
+		return err
+	}
+	models, err := loadAgentAccountModels(account)
+	if err != nil {
+		return err
+	}
+	nextModels := make([]dto.AgentAccountModel, 0, len(models))
+	for _, item := range models {
+		if item.RecordID == req.RecordID {
+			continue
+		}
+		nextModels = append(nextModels, item)
+	}
+	if err := ensureAccountModelsNotBound(account, nextModels); err != nil {
+		return err
+	}
+	if err := agentAccountModelRepo.DeleteByID(req.RecordID); err != nil {
+		return err
+	}
+	if err := compactPersistedAgentAccountModelSortOrder(req.AccountID); err != nil {
+		return err
+	}
+	terminalai.InvalidateTerminalRuntimeCache()
+	terminalai.InvalidateFileAIRuntimeCache()
+	return a.syncAgentsByAccount(account)
+}
+
+func (a AgentService) SyncAgentsByAccount(account *model.AgentAccount) error {
+	if account == nil || account.ID == 0 {
 		return nil
 	}
-	return providercatalog.VerifyAccount(provider, baseURL, apiKey)
+	return a.syncAgentsByAccount(account)
+}
+
+func (a AgentService) VerifyAccount(req dto.AgentAccountVerifyReq) error {
+	_, err := resolveAgentAccountInput(req.Provider, req.APIKey, req.BaseURL)
+	return err
 }
 
 func (a AgentService) DeleteAccount(req dto.AgentAccountDeleteReq) error {
-	if req.ID == 0 {
-		return buserr.New("ErrAgentAccountIDRequired")
-	}
 	if exists, _ := agentRepo.GetFirst(repo.WithByAccountID(req.ID)); exists != nil && exists.ID > 0 {
 		return buserr.New("ErrAgentAccountBound")
 	}
+	if aiStatus, _ := settingRepo.GetValueByKey("AIStatus"); strings.EqualFold(strings.TrimSpace(aiStatus), constant.StatusEnable) {
+		if aiAccountID, _ := settingRepo.GetValueByKey("AIAccountID"); strings.TrimSpace(aiAccountID) == strconv.FormatUint(uint64(req.ID), 10) {
+			return buserr.New("ErrTerminalAIAccountInUse")
+		}
+	}
+	if err := agentAccountModelRepo.Delete(repo.WithByAccountID(req.ID)); err != nil {
+		return err
+	}
+	terminalai.InvalidateTerminalRuntimeCache()
+	terminalai.InvalidateFileAIRuntimeCache()
 	return agentAccountRepo.DeleteByID(req.ID)
 }
 
-func (a AgentService) GetFeishuConfig(req dto.AgentFeishuConfigReq) (*dto.AgentFeishuConfig, error) {
-	_, _, conf, err := a.loadAgentConfig(req.AgentID)
+func (a AgentService) GetSecurityConfig(req dto.AgentIDReq) (*dto.AgentSecurityConfig, error) {
+	agent, _, err := a.loadOpenclawAgentAndInstall(req.AgentID)
 	if err != nil {
 		return nil, err
-	}
-	result := extractFeishuConfig(conf)
-	return &result, nil
-}
-
-func (a AgentService) UpdateFeishuConfig(req dto.AgentFeishuConfigUpdateReq) error {
-	return a.mutateAgentConfig(req.AgentID, func(_ *model.Agent, _ *model.AppInstall, conf map[string]interface{}) error {
-		dmPolicy := req.DmPolicy
-		if dmPolicy == "" {
-			dmPolicy = "pairing"
-		}
-		setFeishuConfig(conf, dto.AgentFeishuConfig{
-			Enabled:   req.Enabled,
-			DmPolicy:  dmPolicy,
-			BotName:   req.BotName,
-			AppID:     req.AppID,
-			AppSecret: req.AppSecret,
-		})
-		setFeishuPluginEnabled(conf, req.Enabled)
-		return nil
-	})
-}
-
-func (a AgentService) GetTelegramConfig(req dto.AgentTelegramConfigReq) (*dto.AgentTelegramConfig, error) {
-	_, _, conf, err := a.loadAgentConfig(req.AgentID)
-	if err != nil {
-		return nil, err
-	}
-	result := extractTelegramConfig(conf)
-	return &result, nil
-}
-
-func (a AgentService) UpdateTelegramConfig(req dto.AgentTelegramConfigUpdateReq) error {
-	return a.mutateAgentConfig(req.AgentID, func(_ *model.Agent, _ *model.AppInstall, conf map[string]interface{}) error {
-		dmPolicy := req.DmPolicy
-		if dmPolicy == "" {
-			dmPolicy = "pairing"
-		}
-		setTelegramConfig(conf, dto.AgentTelegramConfig{
-			Enabled:  req.Enabled,
-			DmPolicy: dmPolicy,
-			BotToken: req.BotToken,
-			Proxy:    req.Proxy,
-		})
-		return nil
-	})
-}
-
-func (a AgentService) GetDiscordConfig(req dto.AgentDiscordConfigReq) (*dto.AgentDiscordConfig, error) {
-	_, _, conf, err := a.loadAgentConfig(req.AgentID)
-	if err != nil {
-		return nil, err
-	}
-	result := extractDiscordConfig(conf)
-	return &result, nil
-}
-
-func (a AgentService) UpdateDiscordConfig(req dto.AgentDiscordConfigUpdateReq) error {
-	return a.mutateAgentConfig(req.AgentID, func(_ *model.Agent, _ *model.AppInstall, conf map[string]interface{}) error {
-		dmPolicy := req.DmPolicy
-		if dmPolicy == "" {
-			dmPolicy = "pairing"
-		}
-		groupPolicy := req.GroupPolicy
-		if groupPolicy == "" {
-			groupPolicy = "open"
-		}
-		setDiscordConfig(conf, dto.AgentDiscordConfig{
-			Enabled:     req.Enabled,
-			DmPolicy:    dmPolicy,
-			GroupPolicy: groupPolicy,
-			Token:       req.Token,
-			Proxy:       req.Proxy,
-		})
-		return nil
-	})
-}
-
-func (a AgentService) GetQQBotConfig(req dto.AgentQQBotConfigReq) (*dto.AgentQQBotConfig, error) {
-	_, install, conf, err := a.loadAgentConfig(req.AgentID)
-	if err != nil {
-		return nil, err
-	}
-	result := extractQQBotConfig(conf)
-	installed, _ := checkPluginInstalled(install.ContainerName, "qqbot")
-	result.Installed = installed
-	return &result, nil
-}
-
-func (a AgentService) UpdateQQBotConfig(req dto.AgentQQBotConfigUpdateReq) error {
-	return a.mutateAgentConfig(req.AgentID, func(_ *model.Agent, _ *model.AppInstall, conf map[string]interface{}) error {
-		setQQBotConfig(conf, dto.AgentQQBotConfig{
-			Enabled:      req.Enabled,
-			AppID:        req.AppID,
-			ClientSecret: req.ClientSecret,
-		})
-		return nil
-	})
-}
-
-func (a AgentService) GetWecomConfig(req dto.AgentWecomConfigReq) (*dto.AgentWecomConfig, error) {
-	_, install, conf, err := a.loadAgentConfig(req.AgentID)
-	if err != nil {
-		return nil, err
-	}
-	result := extractWecomConfig(conf)
-	installed, _ := checkPluginInstalled(install.ContainerName, "wecom")
-	result.Installed = installed
-	return &result, nil
-}
-
-func (a AgentService) UpdateWecomConfig(req dto.AgentWecomConfigUpdateReq) error {
-	return a.mutateAgentConfig(req.AgentID, func(_ *model.Agent, _ *model.AppInstall, conf map[string]interface{}) error {
-		setWecomConfig(conf, dto.AgentWecomConfig{
-			Enabled:  req.Enabled,
-			DmPolicy: req.DmPolicy,
-			BotID:    req.BotID,
-			Secret:   req.Secret,
-		})
-		return nil
-	})
-}
-
-func (a AgentService) InstallPlugin(req dto.AgentPluginInstallReq) error {
-	_, install, err := a.loadAgentAndInstall(req.AgentID)
-	if err != nil {
-		return err
-	}
-	spec, _, err := resolvePluginMeta(req.Type)
-	if err != nil {
-		return err
-	}
-	installTask, err := task.NewTaskWithOps(req.Type, task.TaskInstall, task.TaskScopeAI, req.TaskID, req.AgentID)
-	if err != nil {
-		return err
-	}
-	installTask.AddSubTask("Install OpenClaw plugin", func(t *task.Task) error {
-		mgr := cmd.NewCommandMgr(cmd.WithTask(*t), cmd.WithContext(t.TaskCtx), cmd.WithTimeout(10*time.Minute))
-		return mgr.RunBashCf("docker exec %s openclaw plugins install %s", install.ContainerName, spec)
-	}, nil)
-	go func() {
-		if err := installTask.Execute(); err != nil {
-			global.LOG.Errorf("install openclaw plugin failed: %v", err)
-		}
-	}()
-	return nil
-}
-
-func (a AgentService) CheckPlugin(req dto.AgentPluginCheckReq) (*dto.AgentPluginStatus, error) {
-	_, install, err := a.loadAgentAndInstall(req.AgentID)
-	if err != nil {
-		return nil, err
-	}
-	installed, err := checkPluginInstalled(install.ContainerName, req.Type)
-	if err != nil {
-		return nil, err
-	}
-	return &dto.AgentPluginStatus{Installed: installed}, nil
-}
-
-func (a AgentService) GetSecurityConfig(req dto.AgentSecurityConfigReq) (*dto.AgentSecurityConfig, error) {
-	agent, _, err := a.loadAgentAndInstall(req.AgentID)
-	if err != nil {
-		return nil, err
-	}
-	if normalizeAgentType(agent.AgentType) == constant.AppCopaw {
-		return nil, fmt.Errorf("copaw does not support security config")
 	}
 	conf, err := readOpenclawConfig(agent.ConfigPath)
 	if err != nil {
@@ -879,12 +783,9 @@ func (a AgentService) GetSecurityConfig(req dto.AgentSecurityConfigReq) (*dto.Ag
 }
 
 func (a AgentService) UpdateSecurityConfig(req dto.AgentSecurityConfigUpdateReq) error {
-	agent, install, err := a.loadAgentAndInstall(req.AgentID)
+	agent, install, err := a.loadOpenclawAgentAndInstall(req.AgentID)
 	if err != nil {
 		return err
-	}
-	if normalizeAgentType(agent.AgentType) == constant.AppCopaw {
-		return fmt.Errorf("copaw does not support security config")
 	}
 	allowedOrigins, err := normalizeAllowedOrigins(req.AllowedOrigins)
 	if err != nil {
@@ -901,17 +802,14 @@ func (a AgentService) UpdateSecurityConfig(req dto.AgentSecurityConfigUpdateReq)
 	if err := writeOpenclawConfigRaw(agent.ConfigPath, conf); err != nil {
 		return err
 	}
-	if err := writeOpenclawCaddyfile(agent.ConfigPath, allowedOrigins); err != nil {
-		return err
-	}
 	if err := syncOpenclawAllowedOriginEnv(install, allowedOrigins); err != nil {
 		return err
 	}
 	return appInstallRepo.Save(context.Background(), install)
 }
 
-func (a AgentService) GetOtherConfig(req dto.AgentOtherConfigReq) (*dto.AgentOtherConfig, error) {
-	agent, _, err := a.loadAgentAndInstall(req.AgentID)
+func (a AgentService) GetOtherConfig(req dto.AgentIDReq) (*dto.AgentOtherConfig, error) {
+	agent, install, err := a.loadAgentAndInstall(req.AgentID)
 	if err != nil {
 		return nil, err
 	}
@@ -920,12 +818,19 @@ func (a AgentService) GetOtherConfig(req dto.AgentOtherConfigReq) (*dto.AgentOth
 		return nil, err
 	}
 	result := extractOtherConfig(conf)
+	npmRegistry, err := getOpenclawNPMRegistry(install.ContainerName)
+	if err == nil {
+		result.NPMRegistry = npmRegistry
+	}
 	return &result, nil
 }
 
 func (a AgentService) UpdateOtherConfig(req dto.AgentOtherConfigUpdateReq) error {
-	agent, _, err := a.loadAgentAndInstall(req.AgentID)
+	agent, install, err := a.loadAgentAndInstall(req.AgentID)
 	if err != nil {
+		return err
+	}
+	if err := ensureContainerRunning(install.ContainerName); err != nil {
 		return err
 	}
 	conf, err := readOpenclawConfig(agent.ConfigPath)
@@ -939,30 +844,57 @@ func (a AgentService) UpdateOtherConfig(req dto.AgentOtherConfigUpdateReq) error
 	if err := writeOpenclawConfigRaw(agent.ConfigPath, conf); err != nil {
 		return err
 	}
-	return nil
+	return setOpenclawNPMRegistry(install.ContainerName, req.NPMRegistry)
 }
 
-func (a AgentService) ApproveChannelPairing(req dto.AgentChannelPairingApproveReq) error {
-	_, install, err := a.loadAgentAndInstall(req.AgentID)
+func (a AgentService) GetConfigFile(req dto.AgentConfigFileReq) (*dto.AgentConfigFile, error) {
+	agent, _, err := a.loadOpenclawAgentAndInstall(req.AgentID)
+	if err != nil {
+		return nil, err
+	}
+	content, err := os.ReadFile(agent.ConfigPath)
+	if err != nil {
+		return nil, err
+	}
+	return &dto.AgentConfigFile{Content: string(content)}, nil
+}
+
+func (a AgentService) UpdateConfigFile(req dto.AgentConfigFileUpdateReq) error {
+	agent, install, err := a.loadOpenclawAgentAndInstall(req.AgentID)
 	if err != nil {
 		return err
 	}
-	channelType := strings.ToLower(strings.TrimSpace(req.Type))
-	if channelType == "" {
-		channelType = "feishu"
-	}
-	if channelType != "feishu" && channelType != "telegram" && channelType != "discord" && channelType != "wecom" {
-		return fmt.Errorf("unsupported channel type: %s", channelType)
-	}
-	if err := cmd.RunDefaultBashCf(
-		"docker exec %s openclaw pairing approve %s %q",
-		install.ContainerName,
-		channelType,
-		strings.TrimSpace(req.PairingCode),
-	); err != nil {
+	var payload interface{}
+	if err := json.Unmarshal([]byte(req.Content), &payload); err != nil {
 		return err
 	}
-	return nil
+	info, err := os.Stat(agent.ConfigPath)
+	if err != nil {
+		return err
+	}
+	if err := os.WriteFile(agent.ConfigPath, []byte(req.Content), info.Mode()); err != nil {
+		return err
+	}
+	return NewIAppInstalledService().Operate(request.AppInstalledOperate{
+		InstallId: install.ID,
+		Operate:   constant.Restart,
+	})
+}
+
+func getOpenclawNPMRegistry(containerName string) (string, error) {
+	registry, err := runDockerExecWithStdout(20*time.Second, containerName, "npm", "get", "registry")
+	if err != nil {
+		return "", err
+	}
+	registry = strings.TrimSpace(registry)
+	if registry == "" {
+		return defaultOpenclawNPMRegistry, nil
+	}
+	return registry, nil
+}
+
+func setOpenclawNPMRegistry(containerName, registry string) error {
+	return cmd.RunDefaultBashCf("docker exec %s npm set registry %q", containerName, registry)
 }
 
 func (a AgentService) loadAgentAndInstall(agentID uint) (*model.Agent, *model.AppInstall, error) {
@@ -980,6 +912,17 @@ func (a AgentService) loadAgentAndInstall(agentID uint) (*model.Agent, *model.Ap
 	return agent, &install, nil
 }
 
+func (a AgentService) loadOpenclawAgentAndInstall(agentID uint) (*model.Agent, *model.AppInstall, error) {
+	agent, install, err := a.loadAgentAndInstall(agentID)
+	if err != nil {
+		return nil, nil, err
+	}
+	if agent.AgentType == constant.AppCopaw {
+		return nil, nil, fmt.Errorf("copaw does not support")
+	}
+	return agent, install, nil
+}
+
 func (a AgentService) loadAgentConfig(agentID uint) (*model.Agent, *model.AppInstall, map[string]interface{}, error) {
 	agent, install, err := a.loadAgentAndInstall(agentID)
 	if err != nil {
@@ -988,6 +931,17 @@ func (a AgentService) loadAgentConfig(agentID uint) (*model.Agent, *model.AppIns
 	conf, err := readOpenclawConfig(agent.ConfigPath)
 	if err != nil {
 		return nil, nil, nil, err
+	}
+	return agent, install, conf, nil
+}
+
+func (a AgentService) loadOpenclawAgentConfig(agentID uint) (*model.Agent, *model.AppInstall, map[string]interface{}, error) {
+	agent, install, conf, err := a.loadAgentConfig(agentID)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	if agent.AgentType == constant.AppCopaw {
+		return nil, nil, nil, fmt.Errorf("copaw does not support")
 	}
 	return agent, install, conf, nil
 }
@@ -1003,555 +957,45 @@ func (a AgentService) mutateAgentConfig(agentID uint, fn func(agent *model.Agent
 	return writeOpenclawConfigRaw(agent.ConfigPath, conf)
 }
 
-func readOpenclawConfig(configPath string) (map[string]interface{}, error) {
-	if strings.TrimSpace(configPath) == "" {
-		return nil, buserr.New("ErrRecordNotFound")
-	}
-	fileOp := files.NewFileOp()
-	content, err := fileOp.GetContent(configPath)
-	if err != nil {
-		return nil, err
-	}
-	conf := map[string]interface{}{}
-	if err := json.Unmarshal(content, &conf); err != nil {
-		return nil, err
-	}
-	return conf, nil
-}
-
-func writeOpenclawConfigRaw(configPath string, conf map[string]interface{}) error {
-	ensureGatewaySecurityDefaults(conf)
-	ensureOpenclawUpdateDefaults(conf)
-	payload, err := json.MarshalIndent(conf, "", "  ")
-	if err != nil {
-		return err
-	}
-	fileOp := files.NewFileOp()
-	return fileOp.SaveFile(configPath, string(payload), 0600)
-}
-
-func normalizeAllowedOrigins(origins []string) ([]string, error) {
-	if len(origins) == 0 {
-		return nil, nil
-	}
-	result := make([]string, 0, len(origins))
-	seen := make(map[string]struct{}, len(origins))
-	for _, origin := range origins {
-		origin = strings.TrimSpace(origin)
-		if origin == "" {
-			continue
-		}
-		normalized, err := normalizeAllowedOrigin(origin)
-		if err != nil {
-			return nil, err
-		}
-		if _, ok := seen[normalized]; ok {
-			continue
-		}
-		seen[normalized] = struct{}{}
-		result = append(result, normalized)
-	}
-	return result, nil
-}
-
-func normalizeAllowedOrigin(origin string) (string, error) {
-	parsed, err := url.Parse(strings.TrimSpace(origin))
-	if err != nil {
-		return "", fmt.Errorf("invalid allowed origin: %s", origin)
-	}
-	if parsed.Scheme != "http" && parsed.Scheme != "https" {
-		return "", fmt.Errorf("invalid allowed origin: %s", origin)
-	}
-	if parsed.User != nil || parsed.Host == "" || parsed.Hostname() == "" {
-		return "", fmt.Errorf("invalid allowed origin: %s", origin)
-	}
-	if parsed.RawQuery != "" || parsed.Fragment != "" {
-		return "", fmt.Errorf("invalid allowed origin: %s", origin)
-	}
-	if pathValue := strings.TrimSpace(parsed.EscapedPath()); pathValue != "" && pathValue != "/" {
-		return "", fmt.Errorf("invalid allowed origin: %s", origin)
-	}
-	host := parsed.Hostname()
-	if strings.Contains(host, ":") {
-		host = "[" + host + "]"
-	}
-	normalized := parsed.Scheme + "://" + host
-	if parsed.Port() != "" {
-		normalized += ":" + parsed.Port()
-	}
-	return normalized, nil
-}
-
-func extractSecurityConfig(conf map[string]interface{}) dto.AgentSecurityConfig {
-	result := dto.AgentSecurityConfig{AllowedOrigins: []string{}}
-	gateway, ok := conf["gateway"].(map[string]interface{})
-	if !ok {
-		return result
-	}
-	controlUi, ok := gateway["controlUi"].(map[string]interface{})
-	if !ok {
-		return result
-	}
-	switch values := controlUi["allowedOrigins"].(type) {
-	case []interface{}:
-		for _, value := range values {
-			if text, ok := value.(string); ok && strings.TrimSpace(text) != "" {
-				result.AllowedOrigins = append(result.AllowedOrigins, strings.TrimSpace(text))
-			}
-		}
-	case []string:
-		for _, value := range values {
-			if strings.TrimSpace(value) != "" {
-				result.AllowedOrigins = append(result.AllowedOrigins, strings.TrimSpace(value))
-			}
-		}
-	}
-	return result
-}
-
-func setSecurityConfig(conf map[string]interface{}, config dto.AgentSecurityConfig) {
-	ensureGatewaySecurityDefaults(conf)
-	gateway := ensureChildMap(conf, "gateway")
-	controlUi := ensureChildMap(gateway, "controlUi")
-	allowedOrigins := append([]string(nil), config.AllowedOrigins...)
-	if len(allowedOrigins) > 0 {
-		controlUi["allowedOrigins"] = allowedOrigins
-	} else {
-		delete(controlUi, "allowedOrigins")
-	}
-}
-
-func ensureGatewaySecurityDefaults(conf map[string]interface{}) {
-	gateway := ensureChildMap(conf, "gateway")
-	controlUi := ensureChildMap(gateway, "controlUi")
-	if _, ok := controlUi["dangerouslyDisableDeviceAuth"]; !ok {
-		controlUi["dangerouslyDisableDeviceAuth"] = true
-	}
-	delete(controlUi, "dangerouslyAllowHostHeaderOriginFallback")
-	setTrustedProxies(gateway)
-}
-
-func ensureOpenclawUpdateDefaults(conf map[string]interface{}) {
-	update := ensureChildMap(conf, "update")
-	if _, ok := update["checkOnStart"]; !ok {
-		update["checkOnStart"] = false
-	}
-}
-
-func setTrustedProxies(gateway map[string]interface{}) {
-	proxies := make([]string, 0, 4)
-	seen := map[string]struct{}{}
-	switch values := gateway["trustedProxies"].(type) {
-	case []interface{}:
-		for _, value := range values {
-			text := strings.TrimSpace(fmt.Sprintf("%v", value))
-			if text == "" {
-				continue
-			}
-			if _, ok := seen[text]; ok {
-				continue
-			}
-			seen[text] = struct{}{}
-			proxies = append(proxies, text)
-		}
-	case []string:
-		for _, value := range values {
-			text := strings.TrimSpace(value)
-			if text == "" {
-				continue
-			}
-			if _, ok := seen[text]; ok {
-				continue
-			}
-			seen[text] = struct{}{}
-			proxies = append(proxies, text)
-		}
-	}
-	if _, ok := seen[openclawTrustedProxyLoopback]; !ok {
-		proxies = append(proxies, openclawTrustedProxyLoopback)
-	}
-	gateway["trustedProxies"] = proxies
-}
-
-func extractFeishuConfig(conf map[string]interface{}) dto.AgentFeishuConfig {
-	result := dto.AgentFeishuConfig{Enabled: true, DmPolicy: "pairing"}
-	channels, ok := conf["channels"].(map[string]interface{})
-	if !ok {
-		return result
-	}
-	feishu, ok := channels["feishu"].(map[string]interface{})
-	if !ok {
-		return result
-	}
-	if enabled, ok := feishu["enabled"].(bool); ok {
-		result.Enabled = enabled
-	}
-	if dmPolicy, ok := feishu["dmPolicy"].(string); ok && strings.TrimSpace(dmPolicy) != "" {
-		result.DmPolicy = dmPolicy
-	}
-	accounts, ok := feishu["accounts"].(map[string]interface{})
-	if !ok {
-		return result
-	}
-	main, ok := accounts["main"].(map[string]interface{})
-	if !ok {
-		return result
-	}
-	if appID, ok := main["appId"].(string); ok {
-		result.AppID = appID
-	}
-	if appSecret, ok := main["appSecret"].(string); ok {
-		result.AppSecret = appSecret
-	}
-	if botName, ok := main["botName"].(string); ok {
-		result.BotName = botName
-	}
-	return result
-}
-
-func setFeishuConfig(conf map[string]interface{}, config dto.AgentFeishuConfig) {
-	channels := ensureChildMap(conf, "channels")
-	feishu := ensureChildMap(channels, "feishu")
-	feishu["enabled"] = config.Enabled
-	feishu["dmPolicy"] = config.DmPolicy
-
-	accounts := ensureChildMap(feishu, "accounts")
-	main := ensureChildMap(accounts, "main")
-	main["appId"] = config.AppID
-	main["appSecret"] = config.AppSecret
-	main["botName"] = config.BotName
-
-	if strings.EqualFold(config.DmPolicy, "open") {
-		feishu["allowFrom"] = []string{"*"}
-	}
-}
-
-func setFeishuPluginEnabled(conf map[string]interface{}, enabled bool) {
-	plugins := ensureChildMap(conf, "plugins")
-	entries := ensureChildMap(plugins, "entries")
-	feishu := ensureChildMap(entries, "feishu")
-	feishu["enabled"] = enabled
-}
-
-func extractTelegramConfig(conf map[string]interface{}) dto.AgentTelegramConfig {
-	result := dto.AgentTelegramConfig{Enabled: true, DmPolicy: "pairing"}
-	channels, ok := conf["channels"].(map[string]interface{})
-	if !ok {
-		return result
-	}
-	telegram, ok := channels["telegram"].(map[string]interface{})
-	if !ok {
-		return result
-	}
-	if enabled, ok := telegram["enabled"].(bool); ok {
-		result.Enabled = enabled
-	}
-	if dmPolicy, ok := telegram["dmPolicy"].(string); ok && strings.TrimSpace(dmPolicy) != "" {
-		result.DmPolicy = dmPolicy
-	}
-	if botToken, ok := telegram["botToken"].(string); ok {
-		result.BotToken = botToken
-	}
-	if proxy, ok := telegram["proxy"].(string); ok {
-		result.Proxy = proxy
-	}
-	return result
-}
-
-func setTelegramConfig(conf map[string]interface{}, config dto.AgentTelegramConfig) {
-	channels := ensureChildMap(conf, "channels")
-	telegram := map[string]interface{}{
-		"enabled":  config.Enabled,
-		"dmPolicy": config.DmPolicy,
-		"botToken": config.BotToken,
-	}
-	if strings.EqualFold(config.DmPolicy, "open") {
-		telegram["allowFrom"] = []string{"*"}
-	}
-	if strings.TrimSpace(config.Proxy) != "" {
-		telegram["proxy"] = strings.TrimSpace(config.Proxy)
-	}
-	channels["telegram"] = telegram
-}
-
-func extractDiscordConfig(conf map[string]interface{}) dto.AgentDiscordConfig {
-	result := dto.AgentDiscordConfig{Enabled: true, DmPolicy: "pairing", GroupPolicy: "open"}
-	channels, ok := conf["channels"].(map[string]interface{})
-	if !ok {
-		return result
-	}
-	discord, ok := channels["discord"].(map[string]interface{})
-	if !ok {
-		return result
-	}
-	if enabled, ok := discord["enabled"].(bool); ok {
-		result.Enabled = enabled
-	}
-	if token, ok := discord["token"].(string); ok {
-		result.Token = token
-	}
-	if groupPolicy, ok := discord["groupPolicy"].(string); ok && strings.TrimSpace(groupPolicy) != "" {
-		result.GroupPolicy = groupPolicy
-	}
-	if proxy, ok := discord["proxy"].(string); ok {
-		result.Proxy = proxy
-	}
-	if policy, ok := discord["dmPolicy"].(string); ok && strings.TrimSpace(policy) != "" {
-		result.DmPolicy = policy
-		return result
-	}
-	// backward compatibility: old nested style
-	dm, ok := discord["dm"].(map[string]interface{})
-	if ok {
-		if policy, ok := dm["policy"].(string); ok && strings.TrimSpace(policy) != "" {
-			result.DmPolicy = policy
-		}
-	}
-	return result
-}
-
-func setDiscordConfig(conf map[string]interface{}, config dto.AgentDiscordConfig) {
-	channels := ensureChildMap(conf, "channels")
-	discord := ensureChildMap(channels, "discord")
-	discord["enabled"] = config.Enabled
-	discord["token"] = config.Token
-	discord["dmPolicy"] = config.DmPolicy
-	discord["groupPolicy"] = config.GroupPolicy
-	if strings.EqualFold(config.DmPolicy, "open") {
-		discord["allowFrom"] = []string{"*"}
-	} else {
-		delete(discord, "allowFrom")
-	}
-	if strings.TrimSpace(config.Proxy) != "" {
-		discord["proxy"] = strings.TrimSpace(config.Proxy)
-	} else {
-		delete(discord, "proxy")
-	}
-	delete(discord, "dm")
-}
-
-func extractBrowserConfig(conf map[string]interface{}) browserConfig {
-	result := browserConfig{
-		Enabled:        true,
-		ExecutablePath: defaultBrowserExecutablePath,
-		Headless:       true,
-		NoSandbox:      true,
-		DefaultProfile: defaultBrowserProfile,
-	}
-	browser, ok := conf["browser"].(map[string]interface{})
-	if !ok {
-		return result
-	}
-	if enabled, ok := browser["enabled"].(bool); ok {
-		result.Enabled = enabled
-	}
-	if executablePath, ok := browser["executablePath"].(string); ok && strings.TrimSpace(executablePath) != "" {
-		result.ExecutablePath = executablePath
-	}
-	if headless, ok := browser["headless"].(bool); ok {
-		result.Headless = headless
-	}
-	if noSandbox, ok := browser["noSandbox"].(bool); ok {
-		result.NoSandbox = noSandbox
-	}
-	if defaultProfile, ok := browser["defaultProfile"].(string); ok && strings.TrimSpace(defaultProfile) != "" {
-		result.DefaultProfile = defaultProfile
-	}
-	return result
-}
-
-func setBrowserConfig(conf map[string]interface{}, config browserConfig) {
-	browser := ensureChildMap(conf, "browser")
-	browser["enabled"] = config.Enabled
-	browser["executablePath"] = defaultBrowserExecutablePath
-	browser["headless"] = config.Headless
-	browser["noSandbox"] = config.NoSandbox
-	if strings.TrimSpace(config.DefaultProfile) == "" {
-		browser["defaultProfile"] = defaultBrowserProfile
-	} else {
-		browser["defaultProfile"] = strings.TrimSpace(config.DefaultProfile)
-	}
-}
-
-func extractQQBotConfig(conf map[string]interface{}) dto.AgentQQBotConfig {
-	result := dto.AgentQQBotConfig{Enabled: true}
-	channels, ok := conf["channels"].(map[string]interface{})
-	if !ok {
-		return result
-	}
-	qqbot, ok := channels["qqbot"].(map[string]interface{})
-	if !ok {
-		return result
-	}
-	if enabled, ok := qqbot["enabled"].(bool); ok {
-		result.Enabled = enabled
-	}
-	if appID, ok := qqbot["appId"].(string); ok {
-		result.AppID = appID
-	}
-	if clientSecret, ok := qqbot["clientSecret"].(string); ok {
-		result.ClientSecret = clientSecret
-	}
-	return result
-}
-
-func extractWecomConfig(conf map[string]interface{}) dto.AgentWecomConfig {
-	result := dto.AgentWecomConfig{Enabled: true, DmPolicy: "pairing"}
-	channels, ok := conf["channels"].(map[string]interface{})
-	if !ok {
-		return result
-	}
-	wecom, ok := channels["wecom"].(map[string]interface{})
-	if !ok {
-		return result
-	}
-	if enabled, ok := wecom["enabled"].(bool); ok {
-		result.Enabled = enabled
-	}
-	if dmPolicy, ok := wecom["dmPolicy"].(string); ok && strings.TrimSpace(dmPolicy) != "" {
-		result.DmPolicy = strings.TrimSpace(dmPolicy)
-	}
-	if botID, ok := wecom["botId"].(string); ok {
-		result.BotID = botID
-	}
-	if secret, ok := wecom["secret"].(string); ok {
-		result.Secret = secret
-	}
-	return result
-}
-
-func setWecomConfig(conf map[string]interface{}, config dto.AgentWecomConfig) {
-	channels := ensureChildMap(conf, "channels")
-	wecom := ensureChildMap(channels, "wecom")
-	wecom["enabled"] = config.Enabled
-	wecom["botId"] = strings.TrimSpace(config.BotID)
-	wecom["secret"] = strings.TrimSpace(config.Secret)
-	wecom["dmPolicy"] = strings.TrimSpace(config.DmPolicy)
-	if strings.EqualFold(config.DmPolicy, "open") {
-		wecom["allowFrom"] = []string{"*"}
-	} else {
-		wecom["allowFrom"] = []string{}
-	}
-
-	plugins := ensureChildMap(conf, "plugins")
-	entries := ensureChildMap(plugins, "entries")
-	wecomEntry := ensureChildMap(entries, "wecom-openclaw-plugin")
-	wecomEntry["enabled"] = config.Enabled
-}
-
-func setQQBotConfig(conf map[string]interface{}, config dto.AgentQQBotConfig) {
-	channels := ensureChildMap(conf, "channels")
-	qqbot := ensureChildMap(channels, "qqbot")
-	qqbot["enabled"] = config.Enabled
-	qqbot["allowFrom"] = []string{"*"}
-	qqbot["appId"] = strings.TrimSpace(config.AppID)
-	qqbot["clientSecret"] = strings.TrimSpace(config.ClientSecret)
-
-	plugins := ensureChildMap(conf, "plugins")
-	entries := ensureChildMap(plugins, "entries")
-	qqbotEntry := ensureChildMap(entries, "qqbot")
-	qqbotEntry["enabled"] = config.Enabled
-}
-
-func resolvePluginMeta(pluginType string) (string, string, error) {
-	switch strings.ToLower(strings.TrimSpace(pluginType)) {
-	case "qqbot":
-		return "@sliverp/qqbot@latest", "qqbot", nil
-	case "wecom":
-		return "@wecom/wecom-openclaw-plugin", "wecom-openclaw-plugin", nil
-	default:
-		return "", "", fmt.Errorf("unsupported plugin type")
-	}
-}
-
-func checkPluginInstalled(containerName, pluginType string) (bool, error) {
-	_, pluginDir, err := resolvePluginMeta(pluginType)
-	if err != nil {
-		return false, err
-	}
-	if strings.TrimSpace(containerName) == "" {
-		return false, buserr.New("ErrRecordNotFound")
-	}
-	pluginPath := path.Join(openclawPluginBaseDir, pluginDir)
-	mgr := cmd.NewCommandMgr(cmd.WithTimeout(20 * time.Second))
-	if err := mgr.RunBashCf("docker exec %s test -d %s", containerName, pluginPath); err != nil {
-		return false, nil
-	}
-	return true, nil
-}
-
-func extractOtherConfig(conf map[string]interface{}) dto.AgentOtherConfig {
-	result := dto.AgentOtherConfig{UserTimezone: resolveServerTimezone(), BrowserEnabled: true}
-	agents, ok := conf["agents"].(map[string]interface{})
-	if !ok {
-		browser := extractBrowserConfig(conf)
-		result.BrowserEnabled = browser.Enabled
-		return result
-	}
-	defaults, ok := agents["defaults"].(map[string]interface{})
-	if !ok {
-		browser := extractBrowserConfig(conf)
-		result.BrowserEnabled = browser.Enabled
-		return result
-	}
-	if timezone, ok := defaults["userTimezone"].(string); ok && strings.TrimSpace(timezone) != "" {
-		result.UserTimezone = strings.TrimSpace(timezone)
-	}
-	browser := extractBrowserConfig(conf)
-	result.BrowserEnabled = browser.Enabled
-	return result
-}
-
-func setOtherConfig(conf map[string]interface{}, config dto.AgentOtherConfig) {
-	agents := ensureChildMap(conf, "agents")
-	defaults := ensureChildMap(agents, "defaults")
-	timezone := strings.TrimSpace(config.UserTimezone)
-	if timezone == "" {
-		timezone = resolveServerTimezone()
-	}
-	defaults["userTimezone"] = timezone
-	setBrowserConfig(conf, browserConfig{
-		Enabled:        config.BrowserEnabled,
-		ExecutablePath: defaultBrowserExecutablePath,
-		Headless:       true,
-		NoSandbox:      true,
-		DefaultProfile: defaultBrowserProfile,
-	})
-}
-
 func (a AgentService) syncAgentsByAccount(account *model.AgentAccount) error {
 	agents, err := agentRepo.List(repo.WithByAccountID(account.ID))
 	if err != nil {
 		return err
 	}
-	baseURL := strings.TrimSpace(account.BaseURL)
-	if baseURL == "" {
-		if defaultURL, ok := providerDefaultBaseURL(account.Provider); ok {
-			baseURL = defaultURL
-		}
+	accountModels, err := loadAgentAccountModels(account)
+	if err != nil {
+		return err
+	}
+	if len(accountModels) == 0 {
+		return nil
 	}
 	for _, agent := range agents {
-		confDir := ""
-		if agent.ConfigPath != "" {
-			confDir = path.Dir(agent.ConfigPath)
-		} else if agent.AppInstallID > 0 {
-			install, err := appInstallRepo.GetFirst(repo.WithByID(agent.AppInstallID))
-			if err == nil {
-				confDir = path.Join(install.GetPath(), "data", "conf")
+		confDir := path.Dir(agent.ConfigPath)
+		modelName := strings.TrimSpace(agent.Model)
+		var selectedAccountModel dto.AgentAccountModel
+		if modelName != "" {
+			selectedAccountModel, err = requireAgentAccountModelForProvider(account.Provider, accountModels, modelName)
+			if err != nil {
+				return buserr.WithName("ErrAgentModelInUse", agent.Name)
 			}
+		} else {
+			selectedAccountModel = accountModels[0]
 		}
-		if confDir == "" {
-			continue
-		}
-		apiType, maxTokens, contextWindow := resolveRuntimeParams(account.Provider, account.APIType, account.MaxTokens, account.ContextWindow)
-		modelName := agent.Model
-		if strings.EqualFold(account.Provider, "vllm") && strings.TrimSpace(account.Model) != "" {
-			modelName = account.Model
-		}
-		if err := writeOpenclawConfig(confDir, account.Provider, modelName, apiType, maxTokens, contextWindow, baseURL, account.APIKey, agent.Token, nil); err != nil {
+		conf, err := readOpenclawConfig(agent.ConfigPath)
+		if err != nil {
 			return err
 		}
-		agent.BaseURL = baseURL
+		fallbacks := extractOpenclawFallbackModelIDs(conf, account, accountModels, selectedAccountModel.ID)
+		resolvedRuntime, err := buildOpenclawAccountModelRuntime(account, selectedAccountModel)
+		if err != nil {
+			return err
+		}
+		modelName = resolvedRuntime.StoredModel
+		apiType, maxTokens, contextWindow := resolvedRuntime.APIType, resolvedRuntime.MaxTokens, resolvedRuntime.ContextWindow
+		if err := writeOpenclawConfig(confDir, account, modelName, agent.Token, nil, fallbacks); err != nil {
+			return err
+		}
+		agent.BaseURL = account.BaseURL
 		agent.APIKey = account.APIKey
 		agent.Provider = account.Provider
 		agent.Model = modelName
@@ -1561,915 +1005,4 @@ func (a AgentService) syncAgentsByAccount(account *model.AgentAccount) error {
 		_ = agentRepo.Save(&agent)
 	}
 	return nil
-}
-
-func buildAgentItem(agent *model.Agent, appInstall *model.AppInstall, envMap map[string]interface{}) dto.AgentItem {
-	agentType := normalizeAgentType(agent.AgentType)
-	if appInstall != nil && appInstall.ID > 0 && appInstall.App.Key == constant.AppCopaw {
-		agentType = constant.AppCopaw
-	}
-	item := dto.AgentItem{
-		ID:            agent.ID,
-		Name:          agent.Name,
-		AgentType:     agentType,
-		Provider:      agent.Provider,
-		ProviderName:  providerDisplayName(agent.Provider),
-		Model:         agent.Model,
-		APIType:       agent.APIType,
-		MaxTokens:     agent.MaxTokens,
-		ContextWindow: agent.ContextWindow,
-		BaseURL:       agent.BaseURL,
-		APIKey:        maskKey(agent.APIKey),
-		Token:         agent.Token,
-		Status:        agent.Status,
-		Message:       agent.Message,
-		AppInstallID:  agent.AppInstallID,
-		AccountID:     agent.AccountID,
-		ConfigPath:    agent.ConfigPath,
-		CreatedAt:     agent.CreatedAt,
-	}
-	if appInstall != nil && appInstall.ID > 0 {
-		item.Container = appInstall.ContainerName
-		item.AppVersion = appInstall.Version
-		if agentType == constant.AppOpenclaw {
-			if isOpenclawHTTPSVersion(appInstall.Version) {
-				item.WebUIPort = appInstall.HttpsPort
-			} else {
-				item.WebUIPort = appInstall.HttpPort
-			}
-		} else {
-			item.WebUIPort = appInstall.HttpPort
-		}
-		item.Path = appInstall.GetPath()
-		item.Status = appInstall.Status
-		item.Message = appInstall.Message
-		if envMap != nil {
-			if bridge, ok := envMap["PANEL_APP_PORT_BRIDGE"]; ok {
-				item.BridgePort = toInt(bridge)
-			}
-		}
-	}
-	return item
-}
-
-func isOpenclawHTTPSVersion(version string) bool {
-	target := strings.TrimSpace(strings.ToLower(version))
-	if target == "" || target == "latest" {
-		return true
-	}
-	if !strings.ContainsAny(target, "0123456789") {
-		return true
-	}
-	return common.CompareAppVersion(target, openclawHTTPSVersion)
-}
-
-func shouldMigrateOpenclawHTTPSUpgrade(install *model.AppInstall, fromVersion, toVersion string) bool {
-	if install == nil || install.App.Key != constant.AppOpenclaw {
-		return false
-	}
-	return !isOpenclawHTTPSVersion(fromVersion) && isOpenclawHTTPSVersion(toVersion)
-}
-
-func migrateOpenclawHTTPSUpgrade(install *model.AppInstall, fromVersion, toVersion string) error {
-	systemIP, _ := settingRepo.GetValueByKey("SystemIP")
-	return migrateOpenclawHTTPSUpgradeWithSystemIP(install, fromVersion, toVersion, systemIP)
-}
-
-func migrateOpenclawHTTPSUpgradeWithSystemIP(install *model.AppInstall, fromVersion, toVersion, systemIP string) error {
-	if !shouldMigrateOpenclawHTTPSUpgrade(install, fromVersion, toVersion) {
-		return nil
-	}
-	migrateOpenclawInstallPorts(install)
-	configPath := path.Join(install.GetPath(), "data", "conf", "openclaw.json")
-	var allowedOrigins []string
-	if conf, err := readOpenclawConfig(configPath); err == nil {
-		allowedOrigins = extractSecurityConfig(conf).AllowedOrigins
-	}
-	originHost := strings.TrimSpace(systemIP)
-	if originHost == "" {
-		originHost = openclawAllowedOriginHost
-	}
-	if install.HttpsPort > 0 {
-		allowedOrigin, err := buildOpenclawAllowedOrigin(originHost, install.HttpsPort)
-		if err == nil {
-			conf, err := readOpenclawConfig(configPath)
-			if err != nil {
-				return err
-			}
-			allowedOrigins = []string{allowedOrigin}
-			setSecurityConfig(conf, dto.AgentSecurityConfig{AllowedOrigins: allowedOrigins})
-			if err := writeOpenclawConfigRaw(configPath, conf); err != nil {
-				return err
-			}
-			if err := writeOpenclawCaddyfile(configPath, allowedOrigins); err != nil {
-				return err
-			}
-		}
-	}
-	return migrateOpenclawInstallEnv(install, allowedOrigins)
-}
-
-func migrateOpenclawInstallPorts(install *model.AppInstall) {
-	if install == nil {
-		return
-	}
-	if install.HttpsPort == 0 && install.HttpPort > 0 {
-		install.HttpsPort = install.HttpPort
-	}
-	if install.HttpPort > 0 {
-		install.HttpPort = 0
-	}
-}
-
-func migrateOpenclawInstallEnv(install *model.AppInstall, allowedOrigins []string) error {
-	if install == nil {
-		return nil
-	}
-	envMap := make(map[string]interface{})
-	if strings.TrimSpace(install.Env) != "" {
-		if err := json.Unmarshal([]byte(install.Env), &envMap); err != nil {
-			return err
-		}
-	}
-	if install.HttpsPort > 0 {
-		envMap["PANEL_APP_PORT_HTTPS"] = install.HttpsPort
-	}
-	if allowedOrigin := firstAllowedOrigin(allowedOrigins); allowedOrigin != "" {
-		envMap["ALLOWED_ORIGIN"] = allowedOrigin
-	}
-	delete(envMap, "PANEL_APP_PORT_HTTP")
-	payload, err := json.Marshal(envMap)
-	if err != nil {
-		return err
-	}
-	install.Env = string(payload)
-	return nil
-}
-
-func syncOpenclawAllowedOriginEnv(install *model.AppInstall, allowedOrigins []string) error {
-	if install == nil {
-		return nil
-	}
-	envMap := make(map[string]interface{})
-	if strings.TrimSpace(install.Env) != "" {
-		if err := json.Unmarshal([]byte(install.Env), &envMap); err != nil {
-			return err
-		}
-	}
-	if allowedOrigin := firstAllowedOrigin(allowedOrigins); allowedOrigin != "" {
-		envMap["ALLOWED_ORIGIN"] = allowedOrigin
-	} else {
-		delete(envMap, "ALLOWED_ORIGIN")
-	}
-	payload, err := json.Marshal(envMap)
-	if err != nil {
-		return err
-	}
-	install.Env = string(payload)
-	return nil
-}
-
-func firstAllowedOrigin(allowedOrigins []string) string {
-	for _, origin := range allowedOrigins {
-		trimmed := strings.TrimSpace(origin)
-		if trimmed != "" {
-			return trimmed
-		}
-	}
-	return ""
-}
-
-func buildOpenclawAllowedOrigin(host string, port int) (string, error) {
-	host = strings.TrimSpace(host)
-	if host == "" || port <= 0 {
-		return "", fmt.Errorf("invalid openclaw allowed origin")
-	}
-	if strings.Contains(host, ":") && !strings.HasPrefix(host, "[") && strings.Count(host, ":") > 1 {
-		host = "[" + host + "]"
-	}
-	return normalizeAllowedOrigin(fmt.Sprintf("https://%s:%d", host, port))
-}
-
-func writeOpenclawCaddyfile(configPath string, allowedOrigins []string) error {
-	content, err := buildOpenclawCaddyfile(allowedOrigins)
-	if err != nil {
-		return err
-	}
-	dataDir := path.Dir(path.Dir(configPath))
-	caddyDir := path.Join(dataDir, "caddy")
-	fileOp := files.NewFileOp()
-	if !fileOp.Stat(caddyDir) {
-		if err := fileOp.CreateDir(caddyDir, constant.DirPerm); err != nil {
-			return err
-		}
-	}
-	caddyDataDir := path.Join(caddyDir, "data")
-	if !fileOp.Stat(caddyDataDir) {
-		if err := fileOp.CreateDir(caddyDataDir, constant.DirPerm); err != nil {
-			return err
-		}
-	}
-	if err := fileOp.ChmodR(caddyDataDir, openclawCaddyDataPerm, false); err != nil {
-		return err
-	}
-	return fileOp.SaveFile(path.Join(caddyDir, "Caddyfile"), content, 0644)
-}
-
-func buildOpenclawCaddyfile(allowedOrigins []string) (string, error) {
-	if len(allowedOrigins) == 0 {
-		return "", fmt.Errorf("allowed origins is required")
-	}
-	addresses := make([]string, 0, len(allowedOrigins))
-	seen := make(map[string]struct{}, len(allowedOrigins))
-	for _, origin := range allowedOrigins {
-		normalized, err := normalizeAllowedOrigin(origin)
-		if err != nil {
-			return "", err
-		}
-		parsed, err := url.Parse(normalized)
-		if err != nil {
-			return "", err
-		}
-		host := parsed.Hostname()
-		if strings.Contains(host, ":") {
-			host = "[" + host + "]"
-		}
-		address := fmt.Sprintf("https://%s:%d", host, openclawCaddyPort)
-		if _, ok := seen[address]; ok {
-			continue
-		}
-		seen[address] = struct{}{}
-		addresses = append(addresses, address)
-	}
-	if len(addresses) == 0 {
-		return "", fmt.Errorf("allowed origins is required")
-	}
-	if _, ok := seen[openclawCaddyLoopbackAddress]; !ok {
-		addresses = append(addresses, openclawCaddyLoopbackAddress)
-	}
-	content := `{
-    admin off
-    auto_https disable_redirects
-    default_sni 127.0.0.1
-    skip_install_trust
-    storage file_system {
-        root /data/caddy
-    }
-}
-
-` + strings.Join(addresses, ", ") + ` {
-    bind 0.0.0.0
-    tls internal
-    reverse_proxy 127.0.0.1:` + strconv.Itoa(openclawGatewayPort) + `
-}
-`
-	return content, nil
-}
-
-func checkAgentUpgradable(install model.AppInstall) bool {
-	if install.ID == 0 || install.Version == "" || install.Version == "latest" {
-		return false
-	}
-	if install.App.ID == 0 {
-		return false
-	}
-	details, err := appDetailRepo.GetBy(appDetailRepo.WithAppId(install.App.ID))
-	if err != nil || len(details) == 0 {
-		return false
-	}
-	versions := make([]string, 0, len(details))
-	for _, item := range details {
-		ignores, _ := appIgnoreUpgradeRepo.List(runtimeRepo.WithDetailId(item.ID), appIgnoreUpgradeRepo.WithScope("version"))
-		if len(ignores) > 0 {
-			continue
-		}
-		if common.IsCrossVersion(install.Version, item.Version) && !install.App.CrossVersionUpdate {
-			continue
-		}
-		versions = append(versions, item.Version)
-	}
-	if len(versions) == 0 {
-		return false
-	}
-	versions = common.GetSortedVersions(versions)
-	lastVersion := versions[0]
-	if common.IsCrossVersion(install.Version, lastVersion) {
-		return install.App.CrossVersionUpdate
-	}
-	return common.CompareVersion(lastVersion, install.Version)
-}
-
-func (a AgentService) waitAndDeleteAgent(agentID uint, appInstallID uint) {
-	if appInstallID == 0 {
-		_ = agentRepo.DeleteByID(agentID)
-		return
-	}
-	for i := 0; i < 180; i++ {
-		_, err := appInstallRepo.GetFirst(repo.WithByID(appInstallID))
-		if err != nil {
-			_ = agentRepo.DeleteByID(agentID)
-			return
-		}
-		time.Sleep(2 * time.Second)
-	}
-}
-
-func (a AgentService) writeConfigWithRetry(appInstall *model.AppInstall, provider, modelName, apiType string, maxTokens, contextWindow int, baseURL, apiKey, token string, agentID uint, allowedOrigins []string) {
-	if appInstall == nil {
-		return
-	}
-	fileOp := files.NewFileOp()
-	composePath := appInstall.GetComposePath()
-	for i := 0; i < 60; i++ {
-		if fileOp.Stat(composePath) {
-			break
-		}
-		time.Sleep(time.Second)
-	}
-	confDir := path.Join(appInstall.GetPath(), "data", "conf")
-	if err := writeOpenclawConfig(confDir, provider, modelName, apiType, maxTokens, contextWindow, baseURL, apiKey, token, allowedOrigins); err != nil {
-		global.LOG.Errorf("write openclaw config failed: %v", err)
-		agent, errGet := agentRepo.GetFirst(repo.WithByID(agentID))
-		if errGet == nil && agent != nil {
-			agent.Message = err.Error()
-			agent.Status = constant.StatusError
-			_ = agentRepo.Save(agent)
-		}
-		return
-	}
-	dataDir := path.Join(appInstall.GetPath(), "data")
-	for i := 0; i < 60; i++ {
-		if fileOp.Stat(dataDir) {
-			if err := fileOp.ChownR(dataDir, "1000", "1000", true); err != nil {
-				global.LOG.Errorf("chown data dir failed: %v", err)
-				agent, errGet := agentRepo.GetFirst(repo.WithByID(agentID))
-				if errGet == nil && agent != nil {
-					agent.Message = err.Error()
-					agent.Status = constant.StatusError
-					_ = agentRepo.Save(agent)
-				}
-			}
-			break
-		}
-		time.Sleep(time.Second)
-	}
-}
-
-type openclawConfig struct {
-	Gateway gatewayConfig `json:"gateway"`
-	Agents  agentsConfig  `json:"agents"`
-	Browser browserConfig `json:"browser"`
-	Tools   toolsConfig   `json:"tools"`
-	Update  updateConfig  `json:"update"`
-	Models  *modelsConfig `json:"models,omitempty"`
-}
-
-type toolsConfig struct {
-	Profile  string             `json:"profile,omitempty"`
-	Sessions toolSessionsConfig `json:"sessions,omitempty"`
-}
-
-type toolSessionsConfig struct {
-	Visibility string `json:"visibility,omitempty"`
-}
-
-type updateConfig struct {
-	CheckOnStart bool `json:"checkOnStart"`
-}
-
-type gatewayConfig struct {
-	Mode           string           `json:"mode"`
-	Bind           string           `json:"bind"`
-	Port           int              `json:"port"`
-	Auth           gatewayAuth      `json:"auth"`
-	ControlUi      gatewayControlUi `json:"controlUi"`
-	TrustedProxies []string         `json:"trustedProxies,omitempty"`
-}
-
-type gatewayControlUi struct {
-	DangerouslyDisableDeviceAuth bool     `json:"dangerouslyDisableDeviceAuth"`
-	AllowedOrigins               []string `json:"allowedOrigins,omitempty"`
-}
-
-type gatewayAuth struct {
-	Mode  string `json:"mode"`
-	Token string `json:"token"`
-}
-
-type agentsConfig struct {
-	Defaults agentDefaults `json:"defaults"`
-}
-
-type agentDefaults struct {
-	UserTimezone string   `json:"userTimezone,omitempty"`
-	Model        modelRef `json:"model"`
-}
-
-type modelRef struct {
-	Primary string `json:"primary"`
-}
-
-type modelsConfig struct {
-	Mode      string                   `json:"mode,omitempty"`
-	Providers map[string]modelProvider `json:"providers,omitempty"`
-}
-
-type modelProvider struct {
-	ApiKey  string       `json:"apiKey,omitempty"`
-	BaseUrl string       `json:"baseUrl,omitempty"`
-	Api     string       `json:"api,omitempty"`
-	Models  []modelEntry `json:"models,omitempty"`
-}
-
-type modelEntry struct {
-	ID            string    `json:"id"`
-	Name          string    `json:"name"`
-	Reasoning     bool      `json:"reasoning"`
-	Input         []string  `json:"input"`
-	ContextWindow int       `json:"contextWindow"`
-	MaxTokens     int       `json:"maxTokens"`
-	Cost          modelCost `json:"cost"`
-}
-
-type modelCost struct {
-	Input      float64 `json:"input"`
-	Output     float64 `json:"output"`
-	CacheRead  float64 `json:"cacheRead"`
-	CacheWrite float64 `json:"cacheWrite"`
-}
-
-type browserConfig struct {
-	Enabled        bool   `json:"enabled"`
-	ExecutablePath string `json:"executablePath"`
-	Headless       bool   `json:"headless"`
-	NoSandbox      bool   `json:"noSandbox"`
-	DefaultProfile string `json:"defaultProfile"`
-}
-
-func writeOpenclawConfig(confDir, provider, modelName, apiType string, maxTokens, contextWindow int, baseURL, apiKey, token string, allowedOrigins []string) error {
-	if strings.TrimSpace(confDir) == "" {
-		return fmt.Errorf("config dir is required")
-	}
-	if strings.TrimSpace(modelName) == "" {
-		return fmt.Errorf("model is required")
-	}
-	if strings.TrimSpace(token) == "" {
-		return fmt.Errorf("gateway token is required")
-	}
-	fileOp := files.NewFileOp()
-	if !fileOp.Stat(confDir) {
-		if err := fileOp.CreateDir(confDir, constant.DirPerm); err != nil {
-			return err
-		}
-	}
-
-	cfg := openclawConfig{
-		Gateway: gatewayConfig{
-			Mode: "local",
-			Bind: "lan",
-			Port: openclawGatewayPort,
-			Auth: gatewayAuth{
-				Mode:  "token",
-				Token: token,
-			},
-			ControlUi: gatewayControlUi{
-				DangerouslyDisableDeviceAuth: true,
-				AllowedOrigins:               append([]string(nil), allowedOrigins...),
-			},
-			TrustedProxies: []string{openclawTrustedProxyLoopback},
-		},
-		Agents: agentsConfig{
-			Defaults: agentDefaults{
-				UserTimezone: resolveServerTimezone(),
-				Model:        modelRef{Primary: modelName},
-			},
-		},
-		Browser: browserConfig{
-			Enabled:        true,
-			ExecutablePath: defaultBrowserExecutablePath,
-			Headless:       true,
-			NoSandbox:      true,
-			DefaultProfile: defaultBrowserProfile,
-		},
-		Tools: toolsConfig{
-			Profile: defaultToolsProfile,
-			Sessions: toolSessionsConfig{
-				Visibility: defaultToolsSessionVisibility,
-			},
-		},
-		Update: updateConfig{
-			CheckOnStart: false,
-		},
-	}
-
-	resolvedAPIType, resolvedMaxTokens, resolvedContextWindow := resolveRuntimeParams(provider, apiType, maxTokens, contextWindow)
-	patch, err := providercatalog.BuildOpenClawPatch(provider, modelName, resolvedAPIType, resolvedMaxTokens, resolvedContextWindow, baseURL, apiKey)
-	if err != nil {
-		return err
-	}
-	cfg.Agents.Defaults.Model.Primary = patch.PrimaryModel
-	if patch.Models != nil {
-		modelsMap, err := mapToModelsConfig(patch.Models)
-		if err != nil {
-			return err
-		}
-		cfg.Models = modelsMap
-	}
-
-	configPath := path.Join(confDir, "openclaw.json")
-	conf := map[string]interface{}{}
-	if fileOp.Stat(configPath) {
-		existing, err := readOpenclawConfig(configPath)
-		if err != nil {
-			return err
-		}
-		conf = existing
-	}
-	if len(conf) == 0 {
-		initial, err := structToMap(cfg)
-		if err != nil {
-			return err
-		}
-		conf = initial
-	} else {
-		if cfg.Models != nil {
-			modelsMap, err := structToMap(cfg.Models)
-			if err != nil {
-				return err
-			}
-			conf["models"] = modelsMap
-		}
-		if _, ok := conf["browser"]; !ok {
-			browserMap, err := structToMap(cfg.Browser)
-			if err != nil {
-				return err
-			}
-			conf["browser"] = browserMap
-		}
-		toolsMap := ensureChildMap(conf, "tools")
-		if profile, ok := toolsMap["profile"]; !ok || strings.TrimSpace(fmt.Sprintf("%v", profile)) == "" {
-			toolsMap["profile"] = defaultToolsProfile
-		}
-		sessionsMap := ensureChildMap(toolsMap, "sessions")
-		if visibility, ok := sessionsMap["visibility"]; !ok || strings.TrimSpace(fmt.Sprintf("%v", visibility)) == "" {
-			sessionsMap["visibility"] = defaultToolsSessionVisibility
-		}
-		agentsMap := ensureChildMap(conf, "agents")
-		defaultsMap := ensureChildMap(agentsMap, "defaults")
-		if tz, ok := defaultsMap["userTimezone"]; !ok || strings.TrimSpace(fmt.Sprintf("%v", tz)) == "" {
-			defaultsMap["userTimezone"] = resolveServerTimezone()
-		}
-		modelMap := ensureChildMap(defaultsMap, "model")
-		modelMap["primary"] = cfg.Agents.Defaults.Model.Primary
-
-		ensureGatewaySecurityDefaults(conf)
-		gatewayMap := ensureChildMap(conf, "gateway")
-		if _, ok := gatewayMap["mode"]; !ok {
-			gatewayMap["mode"] = "local"
-		}
-		if _, ok := gatewayMap["bind"]; !ok {
-			gatewayMap["bind"] = "lan"
-		}
-		if _, ok := gatewayMap["port"]; !ok {
-			gatewayMap["port"] = openclawGatewayPort
-		}
-		authMap := ensureChildMap(gatewayMap, "auth")
-		if _, ok := authMap["mode"]; !ok {
-			authMap["mode"] = "token"
-		}
-		authMap["token"] = token
-	}
-	if allowedOrigins != nil {
-		setSecurityConfig(conf, dto.AgentSecurityConfig{AllowedOrigins: allowedOrigins})
-	}
-	if err := writeOpenclawConfigRaw(configPath, conf); err != nil {
-		return err
-	}
-	if allowedOrigins != nil {
-		if err := writeOpenclawCaddyfile(configPath, allowedOrigins); err != nil {
-			return err
-		}
-	}
-
-	envPath := path.Join(confDir, ".env")
-	lines := []string{fmt.Sprintf("OPENCLAW_GATEWAY_TOKEN=%s", token)}
-	if envKey := providerEnvKey(provider); envKey != "" && strings.TrimSpace(apiKey) != "" {
-		lines = append(lines, fmt.Sprintf("%s=%s", envKey, apiKey))
-	}
-	content := strings.Join(lines, "\n") + "\n"
-	return fileOp.SaveFile(envPath, content, 0600)
-}
-
-func resolveServerTimezone() string {
-	timezone := strings.TrimSpace(common.LoadTimeZoneByCmd())
-	if timezone == "" {
-		return defaultUserTimezone
-	}
-	if _, err := time.LoadLocation(timezone); err != nil {
-		return defaultUserTimezone
-	}
-	return timezone
-}
-
-func ensureChildMap(parent map[string]interface{}, key string) map[string]interface{} {
-	if child, ok := parent[key].(map[string]interface{}); ok {
-		return child
-	}
-	child := map[string]interface{}{}
-	parent[key] = child
-	return child
-}
-
-func structToMap(value interface{}) (map[string]interface{}, error) {
-	payload, err := json.Marshal(value)
-	if err != nil {
-		return nil, err
-	}
-	result := map[string]interface{}{}
-	if err := json.Unmarshal(payload, &result); err != nil {
-		return nil, err
-	}
-	return result, nil
-}
-
-func mapToModelsConfig(value map[string]interface{}) (*modelsConfig, error) {
-	payload, err := json.Marshal(value)
-	if err != nil {
-		return nil, err
-	}
-	result := &modelsConfig{}
-	if err := json.Unmarshal(payload, result); err != nil {
-		return nil, err
-	}
-	return result, nil
-}
-
-func providerEnvKey(provider string) string {
-	return providercatalog.EnvKey(provider)
-}
-
-type providerDefinition struct {
-	Sort        uint
-	DisplayName string
-	BaseURL     string
-	Models      []dto.ProviderModelInfo
-}
-
-func providerDefinitions() map[string]providerDefinition {
-	definitions := map[string]providerDefinition{}
-	for key, meta := range providercatalog.All() {
-		if !meta.Enabled {
-			continue
-		}
-		models := make([]dto.ProviderModelInfo, 0, len(meta.Models))
-		for _, m := range meta.Models {
-			models = append(models, dto.ProviderModelInfo{ID: m.ID, Name: m.Name})
-		}
-		definitions[key] = providerDefinition{
-			Sort:        meta.Sort,
-			DisplayName: meta.DisplayName,
-			BaseURL:     meta.DefaultBaseURL,
-			Models:      models,
-		}
-	}
-	return definitions
-}
-
-func providerDefaultBaseURL(provider string) (string, bool) {
-	return providercatalog.DefaultBaseURL(provider)
-}
-
-func fixedProviderBaseURL(provider string) (string, bool) {
-	switch strings.ToLower(strings.TrimSpace(provider)) {
-	case "bailian-coding-plan":
-		return providerDefaultBaseURL(provider)
-	case "ark-coding-plan":
-		return providerDefaultBaseURL(provider)
-	default:
-		return "", false
-	}
-}
-
-func isSupportedAgentProvider(provider string) bool {
-	return providercatalog.IsEnabled(provider)
-}
-
-func providerDisplayName(provider string) string {
-	return providercatalog.DisplayName(provider)
-}
-
-func readInstallEnv(envStr string) map[string]interface{} {
-	if strings.TrimSpace(envStr) == "" {
-		return nil
-	}
-	data := map[string]interface{}{}
-	if err := json.Unmarshal([]byte(envStr), &data); err != nil {
-		return nil
-	}
-	return data
-}
-
-func maskKey(value string) string {
-	trim := strings.TrimSpace(value)
-	if len(trim) <= 6 {
-		return trim
-	}
-	return fmt.Sprintf("%s****%s", trim[:3], trim[len(trim)-3:])
-}
-
-func toInt(value interface{}) int {
-	switch v := value.(type) {
-	case int:
-		return v
-	case int64:
-		return int(v)
-	case float64:
-		return int(v)
-	case string:
-		if v == "" {
-			return 0
-		}
-		parsed, _ := strconv.Atoi(v)
-		return parsed
-	default:
-		return 0
-	}
-}
-
-func normalizeCustomModel(modelName string) string {
-	trim := strings.TrimSpace(modelName)
-	trim = strings.TrimLeft(trim, "/")
-	if parts := strings.SplitN(trim, "/", 2); len(parts) == 2 {
-		if strings.EqualFold(parts[0], "custom") {
-			return strings.TrimLeft(strings.TrimSpace(parts[1]), "/")
-		}
-	}
-	return trim
-}
-
-func normalizeBailianCodingPlanModelID(modelID string) string {
-	trim := strings.TrimSpace(modelID)
-	switch strings.ToLower(trim) {
-	case "minimax-m2.5", "minimax m2.5", "minimax/minimax-m2.5", "minimax/minimax m2.5":
-		return "MiniMax/MiniMax-M2.5"
-	default:
-		return trim
-	}
-}
-
-func normalizeArkCodingPlanModelID(modelID string) string {
-	return strings.ToLower(strings.TrimSpace(modelID))
-}
-
-func zaiModelDisplayName(modelID string) string {
-	switch strings.ToLower(strings.TrimSpace(modelID)) {
-	case "glm-5":
-		return "GLM-5"
-	case "glm-4.7":
-		return "GLM-4.7"
-	case "glm-4.7-flash":
-		return "GLM-4.7-Flash"
-	case "glm-4.7-flashx":
-		return "GLM-4.7-FlashX"
-	default:
-		return strings.TrimSpace(modelID)
-	}
-}
-
-func bailianPrimaryModelID(modelID string) string {
-	trim := strings.TrimSpace(modelID)
-	if trim == "" {
-		return ""
-	}
-	parts := strings.Split(trim, "/")
-	for i := len(parts) - 1; i >= 0; i-- {
-		part := strings.TrimSpace(parts[i])
-		if part != "" {
-			return part
-		}
-	}
-	return trim
-}
-
-func normalizeAgentType(agentType string) string {
-	trim := strings.ToLower(strings.TrimSpace(agentType))
-	if trim == "" {
-		return constant.AppOpenclaw
-	}
-	return trim
-}
-
-func modelMatchesProvider(provider, modelName string) bool {
-	prefix := providerModelPrefix(provider)
-	return prefix != "" && strings.HasPrefix(strings.TrimSpace(modelName), prefix+"/")
-}
-
-func providerModelPrefix(provider string) string {
-	switch strings.ToLower(strings.TrimSpace(provider)) {
-	case "gemini":
-		return "google"
-	default:
-		return strings.ToLower(strings.TrimSpace(provider))
-	}
-}
-
-func isSupportedAgentType(agentType string) bool {
-	switch normalizeAgentType(agentType) {
-	case constant.AppOpenclaw, constant.AppCopaw:
-		return true
-	default:
-		return false
-	}
-}
-
-func normalizeAPIType(apiType string) string {
-	trim := strings.ToLower(strings.TrimSpace(apiType))
-	if trim == "" {
-		return "openai-completions"
-	}
-	return trim
-}
-
-func isSupportedAPIType(apiType string) bool {
-	switch normalizeAPIType(apiType) {
-	case "openai-completions", "openai-responses", "anthropic-messages":
-		return true
-	default:
-		return false
-	}
-}
-
-func isSupportedOllamaAPIType(apiType string) bool {
-	switch normalizeAPIType(apiType) {
-	case "openai-completions", "openai-responses":
-		return true
-	default:
-		return false
-	}
-}
-
-func resolveRuntimeParams(provider, apiType string, maxTokens, contextWindow int) (string, int, int) {
-	resolvedAPI := normalizeAPIType(apiType)
-	if provider == "ollama" && !isSupportedOllamaAPIType(resolvedAPI) {
-		resolvedAPI = "openai-responses"
-	}
-	resolvedMaxTokens := maxTokens
-	resolvedContextWindow := contextWindow
-	if resolvedMaxTokens <= 0 {
-		switch provider {
-		case "deepseek":
-			resolvedMaxTokens = 8192
-		case "zai":
-			resolvedMaxTokens = 131072
-		case "openrouter":
-			resolvedMaxTokens = 8192
-		case "minimax", "kimi-coding", "custom":
-			resolvedMaxTokens = 8192
-		default:
-			resolvedMaxTokens = 8192
-		}
-	}
-	if resolvedContextWindow <= 0 {
-		switch provider {
-		case "deepseek":
-			resolvedContextWindow = 128000
-		case "zai":
-			resolvedContextWindow = 204800
-		case "openrouter":
-			resolvedContextWindow = 128000
-		case "minimax", "kimi-coding":
-			resolvedContextWindow = 200000
-		case "custom", "vllm":
-			resolvedContextWindow = 128000
-		default:
-			resolvedContextWindow = 256000
-		}
-	}
-	return resolvedAPI, resolvedMaxTokens, resolvedContextWindow
-}
-
-func generateToken() string {
-	bytes := make([]byte, 24)
-	if _, err := rand.Read(bytes); err != nil {
-		return ""
-	}
-	return hex.EncodeToString(bytes)
-}
-
-func asyncReportAIProviderInstall(provider string) {
-	if global.CONF.Base.Mode != "stable" {
-		return
-	}
-	provider = strings.ToLower(strings.TrimSpace(provider))
-	if provider == "" {
-		return
-	}
-	go func(provider string) {
-		query := url.Values{}
-		query.Set("product", "ai-provider")
-		query.Set("type", "install")
-		query.Set("version", provider)
-		reqURL := "https://community.fit2cloud.com/installation-analytics?" + query.Encode()
-		_, _, _ = req_helper.HandleRequest(reqURL, http.MethodGet, constant.TimeOut5s)
-	}(provider)
 }

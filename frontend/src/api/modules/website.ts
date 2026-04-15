@@ -3,8 +3,8 @@ import { ReqPage, ResPage } from '../interface';
 import { Website } from '../interface/website';
 import { File } from '../interface/file';
 import { TimeoutEnum } from '@/enums/http-enum';
-import { deepCopy } from '@/utils/util';
-import { Base64 } from 'js-base64';
+import { deepCopy } from '@/utils/misc';
+import { encodeBase64Fields } from '@/utils/base64';
 
 export const searchWebsites = (req: Website.WebSiteSearch, node?: string) => {
     const params = node ? `?operateNode=${node}` : '';
@@ -17,9 +17,7 @@ export const listWebsites = () => {
 
 export const createWebsite = (req: Website.WebSiteCreateReq) => {
     let request = deepCopy(req) as Website.WebSiteCreateReq;
-    if (request.ftpPassword) {
-        request.ftpPassword = Base64.encode(request.ftpPassword);
-    }
+    encodeBase64Fields(request, ['ftpPassword']);
     return http.post<any>(`/websites`, request, TimeoutEnum.T_10M);
 };
 
@@ -41,7 +39,7 @@ export const getWebsite = (id: number) => {
 };
 
 export const getWebsiteOptions = (req: Website.OptionReq) => {
-    return http.post<any>(`/websites/options`, req);
+    return http.post<Website.WebsiteOption[]>(`/websites/options`, req);
 };
 
 export const getWebsiteConfig = (id: number, type: string) => {
@@ -350,7 +348,7 @@ export const changeDatabase = (req: Website.ChangeDatabase) => {
     return http.post(`/websites/databases`, req);
 };
 
-export const operateCustomRewrite = (req: Website.CustomRewirte) => {
+export const operateCustomRewrite = (req: Website.CustomRewrite) => {
     return http.post(`/websites/rewrite/custom`, req);
 };
 

@@ -5,19 +5,55 @@
                 <el-option v-for="item in accountOptions" :key="item.id" :label="item.name" :value="item.id" />
             </el-select>
         </el-form-item>
-        <el-form-item>
-            <el-checkbox v-model="form.manualModel" @change="handleManualModelChange">
-                {{ t('aiTools.agents.manualModel') }}
-            </el-checkbox>
-        </el-form-item>
-        <el-form-item :label="t('aiTools.model.model')" prop="model">
-            <el-input v-if="form.manualModel && isOllamaProvider" v-model="ollamaModelSuffix">
-                <template #prepend>ollama/</template>
-            </el-input>
-            <el-input v-else-if="form.manualModel" v-model="form.model" />
-            <el-select v-else v-model="form.model" filterable>
+        <el-form-item :label="t('aiTools.agents.primaryModel')" prop="model">
+            <el-select v-model="form.model" filterable @change="handleModelChange">
                 <el-option v-for="item in modelOptions" :key="item.id" :label="item.name" :value="item.id" />
             </el-select>
+            <span class="input-help">{{ t('aiTools.agents.accountModelsHelper') }}</span>
+        </el-form-item>
+        <el-form-item :label="t('aiTools.agents.fallbackModels')">
+            <div class="fallback-editor">
+                <div class="fallback-toolbar">
+                    <el-select v-model="fallbackCandidate" filterable clearable class="fallback-select">
+                        <el-option
+                            v-for="item in fallbackCandidateOptions"
+                            :key="item.id"
+                            :label="item.name"
+                            :value="item.id"
+                        />
+                    </el-select>
+                    <el-button type="primary" plain :disabled="!fallbackCandidate" @click="addFallback">
+                        {{ t('aiTools.agents.addFallbackModel') }}
+                    </el-button>
+                </div>
+                <el-table :data="fallbackRows" size="small">
+                    <el-table-column :label="t('aiTools.model.model')" min-width="220">
+                        <template #default="{ row }">
+                            {{ row.name }}
+                        </template>
+                    </el-table-column>
+                    <el-table-column :label="t('commons.table.operate')" width="180" fixed="right">
+                        <template #default="{ $index }">
+                            <el-button
+                                link
+                                :icon="ArrowUp"
+                                :disabled="$index === 0"
+                                @click="moveFallback($index, -1)"
+                            />
+                            <el-button
+                                link
+                                :icon="ArrowDown"
+                                :disabled="$index === fallbackRows.length - 1"
+                                @click="moveFallback($index, 1)"
+                            />
+                            <el-button link :icon="Delete" @click="removeFallback($index)" />
+                        </template>
+                    </el-table-column>
+                    <template #empty>
+                        <div class="fallback-empty">{{ t('aiTools.agents.fallbackModelsEmpty') }}</div>
+                    </template>
+                </el-table>
+            </div>
         </el-form-item>
         <el-form-item>
             <el-button type="primary" :loading="saving" @click="saveModel">
@@ -30,9 +66,10 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue';
 import type { FormInstance } from 'element-plus';
+import { ArrowDown, ArrowUp, Delete } from '@element-plus/icons-vue';
 import { useI18n } from 'vue-i18n';
 import { AI } from '@/api/interface/ai';
-import { getAgentProviders, pageAgentAccounts, updateAgentModelConfig } from '@/api/modules/ai';
+import { getAgentModelConfig, pageAgentAccounts, updateAgentModelConfig } from '@/api/modules/ai';
 import { Rules } from '@/global/form-rules';
 import { MsgSuccess } from '@/utils/message';
 import { useGlobalStore } from '@/composables/useGlobalStore';
@@ -47,164 +84,125 @@ const { isIntl } = useGlobalStore();
 const blockedProviders = new Set(['ark-coding-plan', 'bailian-coding-plan']);
 
 const agentId = ref(0);
-const providerModels = ref<Record<string, AI.ProviderModelInfo[]>>({});
 const accountOptions = ref<AI.AgentAccountItem[]>([]);
-const modelOptions = ref<AI.ProviderModelInfo[]>([]);
-const provdier = ref('');
+const modelOptions = ref<AI.AgentAccountModel[]>([]);
 
-const getModelPrefix = (provider: string) => {
-    switch (provider) {
-        case 'gemini':
-            return 'google';
-        default:
-            return provider;
-    }
-};
+interface AgentModelLoadParams {
+    agentId: number;
+}
 
 const form = reactive({
     accountId: undefined as unknown as number,
-    manualModel: false,
     model: '',
-});
-
-const isOllamaProvider = computed(() => provdier.value === 'ollama');
-
-const ollamaModelSuffix = computed({
-    get: () => {
-        const model = form.model || '';
-        if (model.startsWith('ollama/')) {
-            return model.slice('ollama/'.length);
-        }
-        return model;
-    },
-    set: (value: string) => {
-        form.model = `ollama/${value || ''}`;
-    },
+    fallbacks: [] as string[],
 });
 
 const rules = reactive({
     accountId: [Rules.requiredSelect],
-    model: [Rules.requiredInput],
+    model: [Rules.requiredSelect],
 });
 
-const loadProviders = async () => {
-    if (Object.keys(providerModels.value).length > 0) {
+const fallbackCandidate = ref('');
+
+const fallbackRows = computed(() =>
+    form.fallbacks
+        .map((id) => modelOptions.value.find((item) => item.id === id))
+        .filter((item): item is AI.AgentAccountModel => item !== undefined),
+);
+
+const fallbackCandidateOptions = computed(() =>
+    modelOptions.value.filter((item) => item.id !== form.model && !form.fallbacks.includes(item.id)),
+);
+
+const setModelOptionsByAccount = (accountId: number) => {
+    const selected = accountOptions.value.find((item) => item.id === accountId);
+    modelOptions.value = selected?.models || [];
+};
+
+const ensureSelectedModel = (preferred?: string) => {
+    if (preferred && modelOptions.value.some((item) => item.id === preferred)) {
+        form.model = preferred;
         return;
     }
-    const res = await getAgentProviders();
-    const data = res.data || [];
-    const filteredData = isIntl.value ? data.filter((item) => !blockedProviders.has(item.provider)) : data;
-    providerModels.value = filteredData.reduce((acc, item) => {
-        acc[item.provider] = item.models || [];
-        return acc;
-    }, {} as Record<string, AI.ProviderModelInfo[]>);
+    if (!modelOptions.value.some((item) => item.id === form.model)) {
+        form.model = modelOptions.value[0]?.id || '';
+    }
 };
 
-const loadAccounts = async () => {
-    const res = await pageAgentAccounts({
-        page: 1,
-        pageSize: 200,
-        provider: '',
-        name: '',
-    });
-    const items = res.data.items || [];
-    accountOptions.value = isIntl.value ? items.filter((item) => !blockedProviders.has(item.provider)) : items;
-};
-
-const setModelsByProvider = (provider: string) => {
-    modelOptions.value = providerModels.value[provider] || [];
+const syncFallbacks = (fallbacks?: string[]) => {
+    const current = fallbacks || form.fallbacks;
+    form.fallbacks = current.filter(
+        (id, index) =>
+            id !== form.model &&
+            modelOptions.value.some((item) => item.id === id) &&
+            current.findIndex((item) => item === id) === index,
+    );
+    if (!fallbackCandidateOptions.value.some((item) => item.id === fallbackCandidate.value)) {
+        fallbackCandidate.value = '';
+    }
 };
 
 const handleAccountChange = () => {
-    const selected = accountOptions.value.find((item) => item.id === form.accountId);
-    if (!selected) {
-        modelOptions.value = [];
-        form.model = '';
-        return;
-    }
-    provdier.value = selected.provider;
-    if (selected.provider === 'custom' || selected.provider === 'vllm') {
-        form.manualModel = true;
-        form.model = selected.model || form.model;
-        modelOptions.value = [];
-        return;
-    }
-    if (selected.provider === 'ollama') {
-        form.manualModel = true;
-        if (!form.model.startsWith('ollama/')) {
-            form.model = 'ollama/';
-        }
-        setModelsByProvider(selected.provider);
-        return;
-    }
-    const modelPrefix = getModelPrefix(selected.provider);
-    setModelsByProvider(selected.provider);
-    if (!form.manualModel && (!form.model || !form.model.startsWith(`${modelPrefix}/`))) {
-        form.model = modelOptions.value.length > 0 ? modelOptions.value[0].id : '';
-    }
+    setModelOptionsByAccount(form.accountId);
+    ensureSelectedModel();
+    form.fallbacks = [];
+    fallbackCandidate.value = '';
 };
 
-const handleManualModelChange = (val: unknown) => {
-    const selected = accountOptions.value.find((item) => item.id === form.accountId);
-    if ((selected?.provider === 'custom' || selected?.provider === 'vllm') && !Boolean(val)) {
-        form.manualModel = true;
-        return;
-    }
-    if (selected?.provider === 'ollama' && Boolean(val) && !form.model.startsWith('ollama/')) {
-        form.model = 'ollama/';
-    }
-    if (Boolean(val)) {
-        return;
-    }
-    if (!selected) {
-        form.model = '';
-        return;
-    }
-    const modelPrefix = getModelPrefix(selected.provider);
-    if (!form.model || !form.model.startsWith(`${modelPrefix}/`)) {
-        form.model = modelOptions.value.length > 0 ? modelOptions.value[0].id : '';
-    }
+const handleModelChange = () => {
+    syncFallbacks();
 };
 
-const load = async (agent: AI.AgentItem) => {
+const addFallback = () => {
+    if (!fallbackCandidate.value) {
+        return;
+    }
+    syncFallbacks([...form.fallbacks, fallbackCandidate.value]);
+};
+
+const moveFallback = (index: number, offset: number) => {
+    const target = index + offset;
+    if (target < 0 || target >= form.fallbacks.length) {
+        return;
+    }
+    const next = [...form.fallbacks];
+    [next[index], next[target]] = [next[target], next[index]];
+    form.fallbacks = next;
+};
+
+const removeFallback = (index: number) => {
+    form.fallbacks = form.fallbacks.filter((_, current) => current !== index);
+};
+
+const load = async (params: AgentModelLoadParams) => {
     loading.value = true;
     try {
-        agentId.value = agent.id;
-        await loadProviders();
-        await loadAccounts();
+        agentId.value = params.agentId;
+        const [accountsRes, configRes] = await Promise.all([
+            pageAgentAccounts({
+                page: 1,
+                pageSize: 200,
+                provider: '',
+                name: '',
+            }),
+            getAgentModelConfig({ agentId: params.agentId }),
+        ]);
+        const items = accountsRes.data.items || [];
+        accountOptions.value = isIntl.value ? items.filter((item) => !blockedProviders.has(item.provider)) : items;
         if (accountOptions.value.length === 0) {
             form.accountId = undefined as unknown as number;
             form.model = '';
+            form.fallbacks = [];
             modelOptions.value = [];
             return;
         }
+        const config = configRes.data;
         const currentAccount =
-            accountOptions.value.find((item) => item.id === agent.accountId) || accountOptions.value[0];
+            accountOptions.value.find((item) => item.id === config.accountId) || accountOptions.value[0];
         form.accountId = currentAccount.id;
-        provdier.value = currentAccount.provider;
-        setModelsByProvider(currentAccount.provider);
-        const modelPrefix = getModelPrefix(currentAccount.provider);
-        const inProviderModels = modelOptions.value.some((item) => item.id === agent.model);
-        form.manualModel =
-            currentAccount.provider === 'custom' ||
-            currentAccount.provider === 'vllm' ||
-            currentAccount.provider === 'ollama' ||
-            !inProviderModels;
-        if (agent.model && (form.manualModel || agent.model.startsWith(`${modelPrefix}/`))) {
-            form.model = agent.model;
-        } else {
-            form.model = modelOptions.value.length > 0 ? modelOptions.value[0].id : '';
-        }
-        if (
-            (currentAccount.provider === 'custom' || currentAccount.provider === 'vllm') &&
-            currentAccount.model &&
-            !form.model
-        ) {
-            form.model = currentAccount.model;
-        }
-        if (currentAccount.provider === 'ollama' && !form.model.startsWith('ollama/')) {
-            form.model = 'ollama/';
-        }
+        setModelOptionsByAccount(currentAccount.id);
+        ensureSelectedModel(config.model);
+        syncFallbacks(config.fallbacks || []);
     } finally {
         loading.value = false;
     }
@@ -221,6 +219,7 @@ const saveModel = async () => {
             agentId: agentId.value,
             accountId: form.accountId,
             model: form.model,
+            fallbacks: form.fallbacks,
         });
         MsgSuccess(t('aiTools.agents.switchModelSuccess'));
         emit('updated');
@@ -233,3 +232,24 @@ defineExpose({
     load,
 });
 </script>
+
+<style scoped lang="scss">
+.fallback-editor {
+    width: 100%;
+}
+
+.fallback-toolbar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.fallback-select {
+    width: 360px;
+}
+
+.fallback-empty {
+    padding: 12px 0;
+    color: var(--el-text-color-secondary);
+}
+</style>

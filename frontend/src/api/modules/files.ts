@@ -10,6 +10,10 @@ export const getFilesList = (params: File.ReqFile) => {
     return http.post<File.File>('files/search', params, TimeoutEnum.T_5M);
 };
 
+export const fileAiSearch = (params: File.FileAISearchReq) => {
+    return http.post<File.FileAISearchResult>('files/ai-search', params, TimeoutEnum.T_10M);
+};
+
 export const getFilesListByNode = (params: File.ReqNodeFile) => {
     return http.post<File.File>('files/search?operateNode=' + params.node, params, TimeoutEnum.T_5M);
 };
@@ -98,12 +102,40 @@ export const wgetFile = (params: File.FileWget) => {
     return http.post<File.FileWgetRes>('files/wget', params);
 };
 
+export const stopWgetFile = (key: string) => {
+    return http.post('files/wget/stop', { key });
+};
+
 export const moveFile = (params: File.FileMove) => {
     return http.post<File.File>('files/move', params, TimeoutEnum.T_5M);
 };
 
 export const downloadFile = (params: File.FileDownload) => {
     return http.download<BlobPart>('files/download', params, { responseType: 'blob', timeout: TimeoutEnum.T_40S });
+};
+
+export const createFileShare = (params: File.FileShareCreate) => {
+    return http.post<File.FileShareInfo>('files/share/create', params);
+};
+
+export const searchFileShare = (params: ReqPage) => {
+    return http.post<ResPage<File.FileShareInfo>>('files/share/search', params);
+};
+
+export const getFileShareDetail = (path: string) => {
+    return http.post<File.FileShareInfo | null>('files/share/detail', { path });
+};
+
+export const removeFileShare = (path: string) => {
+    return http.post<any>('files/share/del', { path });
+};
+
+export const getPublicFileShareInfo = (code: string, operateNode: string) => {
+    return http.get<File.FileSharePublicInfo>('files/share/info', { code, operateNode });
+};
+
+export const checkFileShare = (params: File.FileShareCheck) => {
+    return http.get('files/share/check', params);
 };
 
 export const computeDirSize = (params: File.DirSizeReq) => {

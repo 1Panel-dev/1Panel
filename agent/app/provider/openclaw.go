@@ -10,263 +10,160 @@ type OpenClawPatch struct {
 	Models       map[string]interface{}
 }
 
-func BuildOpenClawPatch(provider, modelName, apiType string, maxTokens, contextWindow int, baseURL, apiKey string) (*OpenClawPatch, error) {
-	provider = strings.ToLower(strings.TrimSpace(provider))
+type OpenClawProviderPatch struct {
+	PrimaryModel string
+	ProviderKey  string
+	ModelID      string
+	APIKey       string
+	BaseURL      string
+	APIType      string
+	AuthHeader   bool
+}
+
+func BuildOpenClawPatch(provider, modelName, apiType string, reasoning bool, maxTokens, contextWindow int, baseURL, apiKey string) (*OpenClawPatch, error) {
+	providerPatch, err := BuildOpenClawProviderPatch(provider, modelName, apiType, baseURL, apiKey)
+	if err != nil {
+		return nil, err
+	}
+	_, maxTokens, contextWindow = ResolveRuntimeParams(provider, apiType, maxTokens, contextWindow)
+	return newOpenClawPatch(
+		providerPatch,
+		resolveOpenClawModelName(provider, providerPatch.ModelID),
+		resolveOpenClawModelInput(provider, providerPatch.ModelID),
+		reasoning,
+		contextWindow,
+		maxTokens,
+	), nil
+}
+
+func BuildOpenClawProviderPatch(provider, modelName, apiType, baseURL, apiKey string) (*OpenClawProviderPatch, error) {
 	modelName = strings.TrimSpace(modelName)
 	if modelName == "" {
 		return nil, fmt.Errorf("model is required")
 	}
-	modelID := modelName
-	if parts := strings.SplitN(modelName, "/", 2); len(parts) == 2 {
-		modelID = parts[1]
-	}
-
+	resolvedAPIType, _, _ := ResolveRuntimeParams(provider, apiType, 0, 0)
+	modelID := resolveOpenClawModelID(provider, modelName)
 	switch provider {
 	case "deepseek":
-		return buildDeepseekPatch(modelName, baseURL, apiKey), nil
+		return newOpenClawProviderPatch(modelName, "deepseek", modelID, strings.TrimSpace(apiKey), baseURL, "openai-completions", false), nil
 	case "gemini":
-		return buildGeminiPatch(modelName), nil
+		return newOpenClawProviderPatch("google/"+modelID, "google", modelID, strings.TrimSpace(apiKey), baseURL, resolvedAPIType, false), nil
 	case "moonshot", "kimi":
-		return buildMoonshotPatch(provider, modelName, modelID, baseURL, apiKey), nil
+		return buildMoonshotProviderPatch(provider, modelName, modelID, baseURL, apiKey), nil
 	case "bailian-coding-plan":
-		return buildBailianPatch(modelID, maxTokens, contextWindow, baseURL, apiKey), nil
+		return newOpenClawProviderPatch("bailian-coding-plan/"+modelID, "bailian-coding-plan", modelID, strings.TrimSpace(apiKey), baseURL, "openai-completions", false), nil
 	case "ark-coding-plan":
-		return buildArkPatch(modelID, maxTokens, contextWindow, baseURL, apiKey), nil
+		return newOpenClawProviderPatch("ark-coding-plan/"+modelID, "ark-coding-plan", modelID, strings.TrimSpace(apiKey), baseURL, "openai-completions", false), nil
 	case "minimax":
-		return buildMiniMaxPatch(modelID, baseURL, apiKey), nil
+		return newOpenClawProviderPatch("minimax/"+modelID, "minimax", modelID, strings.TrimSpace(apiKey), baseURL, "anthropic-messages", true), nil
+	case "xiaomi":
+		return newOpenClawProviderPatch("xiaomi/"+modelID, "xiaomi", modelID, strings.TrimSpace(apiKey), baseURL, "openai-completions", false), nil
 	case "custom", "vllm":
-		return buildCustomPatch(provider, modelName, apiType, maxTokens, contextWindow, baseURL, apiKey), nil
+		return newOpenClawProviderPatch(provider+"/"+modelID, provider, modelID, strings.TrimSpace(apiKey), strings.TrimSpace(baseURL), resolvedAPIType, false), nil
 	case "ollama":
-		return buildOllamaPatch(modelName, modelID, apiType, baseURL), nil
+		return newOpenClawProviderPatch(modelName, "ollama", modelID, "ollama", strings.TrimSpace(baseURL), resolvedAPIType, false), nil
 	case "kimi-coding":
-		return buildKimiCodingPatch(modelName, modelID, baseURL, apiKey), nil
+		return newOpenClawProviderPatch(modelName, "kimi-coding", modelID, strings.TrimSpace(apiKey), baseURL, "anthropic-messages", false), nil
 	case "zai":
-		return buildZaiPatch(modelID, maxTokens, contextWindow, baseURL, apiKey), nil
+		return newOpenClawProviderPatch("zai/"+modelID, "zai", modelID, strings.TrimSpace(apiKey), baseURL, "openai-completions", false), nil
 	default:
-		return buildGenericPatch(provider, modelName, modelID, apiType, maxTokens, contextWindow, baseURL, apiKey), nil
+		return newOpenClawProviderPatch(modelName, provider, modelID, strings.TrimSpace(apiKey), baseURL, resolvedAPIType, false), nil
 	}
 }
 
-func buildGeminiPatch(modelName string) *OpenClawPatch {
-	return &OpenClawPatch{PrimaryModel: modelName}
-}
-
-func buildDeepseekPatch(modelName, baseURL, apiKey string) *OpenClawPatch {
-	return &OpenClawPatch{
-		PrimaryModel: modelName,
-		Models: providerModels("deepseek", strings.TrimSpace(apiKey), firstNonEmpty(strings.TrimSpace(baseURL), "https://api.deepseek.com/v1"), "openai-completions", map[string]interface{}{
-			"id":            "deepseek-chat",
-			"name":          "DeepSeek Chat",
-			"reasoning":     false,
-			"input":         []string{"text"},
-			"contextWindow": 128000,
-			"maxTokens":     8192,
-			"cost":          map[string]interface{}{},
-		}),
-	}
-}
-
-func buildMoonshotPatch(provider, modelName, modelID, baseURL, apiKey string) *OpenClawPatch {
-	configProvider := provider
+func buildMoonshotProviderPatch(provider, modelName, modelID, baseURL, apiKey string) *OpenClawProviderPatch {
+	providerKey := provider
 	primaryModel := modelName
 	if provider == "kimi" {
-		configProvider = "moonshot"
+		providerKey = "moonshot"
 		primaryModel = "moonshot/" + modelID
 	}
-	return &OpenClawPatch{
+	return newOpenClawProviderPatch(primaryModel, providerKey, modelID, strings.TrimSpace(apiKey), baseURL, "openai-completions", false)
+}
+
+func newOpenClawProviderPatch(primaryModel, providerKey, modelID, apiKey, baseURL, apiType string, authHeader bool) *OpenClawProviderPatch {
+	return &OpenClawProviderPatch{
 		PrimaryModel: primaryModel,
-		Models: providerModels(configProvider, strings.TrimSpace(apiKey), withCatalogDefault(provider, baseURL), "openai-completions", map[string]interface{}{
-			"id":            modelID,
-			"name":          modelID,
-			"reasoning":     strings.Contains(strings.ToLower(modelID), "thinking"),
-			"input":         []string{"text"},
-			"contextWindow": 256000,
-			"maxTokens":     8192,
-			"cost":          map[string]interface{}{},
-		}),
+		ProviderKey:  providerKey,
+		ModelID:      modelID,
+		APIKey:       apiKey,
+		BaseURL:      baseURL,
+		APIType:      apiType,
+		AuthHeader:   authHeader,
 	}
 }
 
-func buildBailianPatch(modelID string, maxTokens, contextWindow int, baseURL, apiKey string) *OpenClawPatch {
-	normalizedID := normalizeBailianCodingPlanModelID(modelID)
-	return &OpenClawPatch{
-		PrimaryModel: "bailian-coding-plan/" + bailianPrimaryModelID(normalizedID),
-		Models: providerModels("bailian-coding-plan", strings.TrimSpace(apiKey), withCatalogDefault("bailian-coding-plan", baseURL), "openai-completions", map[string]interface{}{
-			"id":            normalizedID,
-			"name":          normalizedID,
-			"reasoning":     isReasoningModel(normalizedID),
-			"input":         []string{"text"},
-			"contextWindow": fallbackInt(contextWindow, 256000),
-			"maxTokens":     fallbackInt(maxTokens, 8192),
-			"cost":          map[string]interface{}{},
-		}),
+func newOpenClawPatch(providerPatch *OpenClawProviderPatch, modelName string, input []string, reasoning bool, contextWindow, maxTokens int) *OpenClawPatch {
+	model := map[string]interface{}{
+		"id":            providerPatch.ModelID,
+		"name":          modelName,
+		"reasoning":     reasoning,
+		"input":         input,
+		"contextWindow": contextWindow,
+		"maxTokens":     maxTokens,
+		"cost":          map[string]interface{}{},
 	}
-}
-
-func buildArkPatch(modelID string, maxTokens, contextWindow int, baseURL, apiKey string) *OpenClawPatch {
-	normalizedID := normalizeArkCodingPlanModelID(modelID)
-	return &OpenClawPatch{
-		PrimaryModel: "ark-coding-plan/" + normalizedID,
-		Models: providerModels("ark-coding-plan", strings.TrimSpace(apiKey), withCatalogDefault("ark-coding-plan", baseURL), "openai-completions", map[string]interface{}{
-			"id":            normalizedID,
-			"name":          normalizedID,
-			"reasoning":     isReasoningModel(normalizedID),
-			"input":         []string{"text"},
-			"contextWindow": fallbackInt(contextWindow, 256000),
-			"maxTokens":     fallbackInt(maxTokens, 8192),
-			"cost":          map[string]interface{}{},
-		}),
+	providerConfig := map[string]interface{}{
+		"apiKey":  providerPatch.APIKey,
+		"baseUrl": providerPatch.BaseURL,
+		"api":     providerPatch.APIType,
+		"models":  []map[string]interface{}{model},
 	}
-}
-
-func buildMiniMaxPatch(modelID, baseURL, apiKey string) *OpenClawPatch {
-	normalizedID := normalizeMiniMaxModelID(modelID)
-	return &OpenClawPatch{
-		PrimaryModel: "minimax-portal/" + normalizedID,
-		Models: providerModels("minimax-portal", strings.TrimSpace(apiKey), firstNonEmpty(strings.TrimSpace(baseURL), "https://api.minimaxi.com/anthropic"), "anthropic-messages", map[string]interface{}{
-			"id":            normalizedID,
-			"name":          strings.ReplaceAll(normalizedID, "-", " "),
-			"reasoning":     false,
-			"input":         []string{"text"},
-			"contextWindow": 200000,
-			"maxTokens":     8192,
-			"cost":          map[string]interface{}{},
-		}),
-	}
-}
-
-func buildCustomPatch(provider, modelName, apiType string, maxTokens, contextWindow int, baseURL, apiKey string) *OpenClawPatch {
-	customModelID := normalizeCustomModel(modelName)
-	return &OpenClawPatch{
-		PrimaryModel: provider + "/" + customModelID,
-		Models: providerModels(provider, strings.TrimSpace(apiKey), strings.TrimSpace(baseURL), apiType, map[string]interface{}{
-			"id":            customModelID,
-			"name":          customModelID,
-			"reasoning":     isReasoningModel(customModelID),
-			"input":         []string{"text"},
-			"contextWindow": fallbackInt(contextWindow, 128000),
-			"maxTokens":     fallbackInt(maxTokens, 8192),
-			"cost":          map[string]interface{}{},
-		}),
-	}
-}
-
-func buildOllamaPatch(modelName, modelID, apiType, baseURL string) *OpenClawPatch {
-	api := normalizeAPIType(apiType)
-	if api != "openai-completions" && api != "openai-responses" {
-		api = "openai-responses"
+	if providerPatch.AuthHeader {
+		providerConfig["authHeader"] = true
 	}
 	return &OpenClawPatch{
-		PrimaryModel: modelName,
-		Models: providerModels("ollama", "ollama", strings.TrimSpace(baseURL), api, map[string]interface{}{
-			"id":            modelID,
-			"name":          modelID,
-			"reasoning":     api != "openai-completions",
-			"input":         []string{"text"},
-			"contextWindow": 160000,
-			"maxTokens":     8192,
-			"cost":          map[string]interface{}{},
-		}),
-	}
-}
-
-func buildKimiCodingPatch(modelName, modelID, baseURL, apiKey string) *OpenClawPatch {
-	return &OpenClawPatch{
-		PrimaryModel: modelName,
-		Models: providerModels("kimi-coding", strings.TrimSpace(apiKey), withCatalogDefault("kimi-coding", baseURL), "anthropic-messages", map[string]interface{}{
-			"id":            modelID,
-			"name":          "Kimi for Coding",
-			"reasoning":     true,
-			"input":         []string{"text", "image"},
-			"contextWindow": 262144,
-			"maxTokens":     32768,
-			"cost":          map[string]interface{}{},
-		}),
-	}
-}
-
-func buildZaiPatch(modelID string, maxTokens, contextWindow int, baseURL, apiKey string) *OpenClawPatch {
-	return &OpenClawPatch{
-		PrimaryModel: "zai/" + modelID,
-		Models: providerModels("zai", strings.TrimSpace(apiKey), withCatalogDefault("zai", baseURL), "openai-completions", map[string]interface{}{
-			"id":            modelID,
-			"name":          zaiModelDisplayName(modelID),
-			"reasoning":     modelID == "glm-5",
-			"input":         []string{"text"},
-			"contextWindow": fallbackInt(contextWindow, 204800),
-			"maxTokens":     fallbackInt(maxTokens, 131072),
-			"cost":          map[string]interface{}{},
-		}),
-	}
-}
-
-func buildGenericPatch(provider, modelName, modelID, apiType string, maxTokens, contextWindow int, baseURL, apiKey string) *OpenClawPatch {
-	providerName := provider
-	primaryModel := modelName
-	if provider == "gemini" {
-		providerName = "google"
-		primaryModel = "google/" + modelID
-	}
-	return &OpenClawPatch{
-		PrimaryModel: primaryModel,
-		Models: providerModels(providerName, strings.TrimSpace(apiKey), withCatalogDefault(provider, baseURL), normalizeAPIType(apiType), map[string]interface{}{
-			"id":            modelID,
-			"name":          modelID,
-			"reasoning":     isReasoningModel(modelID),
-			"input":         []string{"text"},
-			"contextWindow": fallbackInt(contextWindow, 256000),
-			"maxTokens":     fallbackInt(maxTokens, 8192),
-			"cost":          map[string]interface{}{},
-		}),
-	}
-}
-
-func providerModels(provider, apiKey, baseURL, api string, model map[string]interface{}) map[string]interface{} {
-	return map[string]interface{}{
-		"mode": "merge",
-		"providers": map[string]interface{}{
-			provider: map[string]interface{}{
-				"apiKey":  apiKey,
-				"baseUrl": baseURL,
-				"api":     api,
-				"models":  []map[string]interface{}{model},
+		PrimaryModel: providerPatch.PrimaryModel,
+		Models: map[string]interface{}{
+			"mode": "merge",
+			"providers": map[string]interface{}{
+				providerPatch.ProviderKey: providerConfig,
 			},
 		},
 	}
 }
 
-func withCatalogDefault(provider, baseURL string) string {
-	if strings.TrimSpace(baseURL) != "" {
-		return strings.TrimSpace(baseURL)
+func resolveOpenClawModelID(provider, modelName string) string {
+	if provider == "custom" || provider == "vllm" {
+		return normalizeCustomModel(modelName)
 	}
-	if defaultURL, ok := DefaultBaseURL(provider); ok {
-		return defaultURL
+	if parts := strings.SplitN(modelName, "/", 2); len(parts) == 2 {
+		return parts[1]
 	}
-	return ""
+	return modelName
 }
 
-func firstNonEmpty(values ...string) string {
-	for _, value := range values {
-		if strings.TrimSpace(value) != "" {
-			return strings.TrimSpace(value)
+func resolveOpenClawModelName(provider, modelID string) string {
+	if item, ok := resolveOpenClawCatalogModel(provider, modelID); ok {
+		return item.Name
+	}
+	if provider == "kimi-coding" {
+		return "Kimi for Coding"
+	}
+	return modelID
+}
+
+func resolveOpenClawModelInput(provider, modelID string) []string {
+	if item, ok := resolveOpenClawCatalogModel(provider, modelID); ok && len(item.Input) > 0 {
+		return item.Input
+	}
+	if provider == "kimi-coding" {
+		return []string{"text", "image"}
+	}
+	return []string{"text"}
+}
+
+func resolveOpenClawCatalogModel(provider, modelID string) (Model, bool) {
+	candidates := []string{provider + "/" + modelID}
+	if provider == "gemini" {
+		candidates = append(candidates, "google/"+modelID)
+	}
+	for _, candidate := range candidates {
+		if item, ok := FindModel(provider, candidate); ok {
+			return item, true
 		}
 	}
-	return ""
-}
-
-func fallbackInt(value, fallback int) int {
-	if value > 0 {
-		return value
-	}
-	return fallback
-}
-
-func normalizeAPIType(apiType string) string {
-	trim := strings.ToLower(strings.TrimSpace(apiType))
-	if trim == "" {
-		return "openai-completions"
-	}
-	return trim
+	return Model{}, false
 }
 
 func normalizeCustomModel(modelName string) string {
@@ -276,64 +173,4 @@ func normalizeCustomModel(modelName string) string {
 		return strings.TrimLeft(strings.TrimSpace(parts[1]), "/")
 	}
 	return trim
-}
-
-func normalizeBailianCodingPlanModelID(modelID string) string {
-	trim := strings.TrimSpace(modelID)
-	switch strings.ToLower(trim) {
-	case "minimax-m2.5", "minimax m2.5", "minimax/minimax-m2.5", "minimax/minimax m2.5":
-		return "MiniMax/MiniMax-M2.5"
-	default:
-		return trim
-	}
-}
-
-func normalizeArkCodingPlanModelID(modelID string) string {
-	return strings.ToLower(strings.TrimSpace(modelID))
-}
-
-func normalizeMiniMaxModelID(modelID string) string {
-	switch strings.ToLower(strings.TrimSpace(modelID)) {
-	case "minimax-m2.1", "minimax m2.1", "minimax-m2.1-preview", "minimax-m2.1-latest":
-		return "MiniMax-M2.1"
-	case "minimax-m2.1-lightning", "minimax m2.1 lightning":
-		return "MiniMax-M2.1-lightning"
-	default:
-		return modelID
-	}
-}
-
-func zaiModelDisplayName(modelID string) string {
-	switch strings.ToLower(strings.TrimSpace(modelID)) {
-	case "glm-5":
-		return "GLM-5"
-	case "glm-4.7":
-		return "GLM-4.7"
-	case "glm-4.7-flash":
-		return "GLM-4.7-Flash"
-	case "glm-4.7-flashx":
-		return "GLM-4.7-FlashX"
-	default:
-		return strings.TrimSpace(modelID)
-	}
-}
-
-func bailianPrimaryModelID(modelID string) string {
-	trim := strings.TrimSpace(modelID)
-	if trim == "" {
-		return ""
-	}
-	parts := strings.Split(trim, "/")
-	for i := len(parts) - 1; i >= 0; i-- {
-		part := strings.TrimSpace(parts[i])
-		if part != "" {
-			return part
-		}
-	}
-	return trim
-}
-
-func isReasoningModel(modelID string) bool {
-	trim := strings.ToLower(strings.TrimSpace(modelID))
-	return strings.Contains(trim, "reason") || strings.Contains(trim, "thinking")
 }

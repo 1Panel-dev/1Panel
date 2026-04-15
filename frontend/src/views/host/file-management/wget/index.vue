@@ -59,10 +59,28 @@ let open = ref(false);
 let submitData = ref(false);
 const fileRef = ref();
 
+const validateWgetUrl = (_rule: unknown, value: string, callback: (e?: Error) => void) => {
+    const v = (value || '').trim();
+    if (!v) {
+        callback();
+        return;
+    }
+    try {
+        const u = new URL(v);
+        if (u.protocol !== 'http:' && u.protocol !== 'https:') {
+            callback(new Error(i18n.global.t('file.wgetUrlInvalid')));
+            return;
+        }
+        callback();
+    } catch {
+        callback(new Error(i18n.global.t('file.wgetUrlInvalid')));
+    }
+};
+
 const rules = reactive<FormRules>({
     name: [Rules.requiredInput],
     path: [Rules.requiredInput],
-    url: [Rules.requiredInput],
+    url: [Rules.requiredInput, { validator: validateWgetUrl, trigger: 'blur' }],
 });
 
 const addForm = reactive({
@@ -98,6 +116,9 @@ const submit = async (formEl: FormInstance | undefined) => {
                 MsgSuccess(i18n.global.t('file.downloadStart'));
                 submitData.value = true;
                 handleClose();
+            })
+            .catch(() => {
+                submitData.value = false;
             })
             .finally(() => {
                 loading.value = false;

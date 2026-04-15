@@ -138,6 +138,12 @@ export namespace Website {
         types?: string[];
     }
 
+    export interface WebsiteOption {
+        id: number;
+        primaryDomain: string;
+        alias: string;
+    }
+
     export interface WebSiteLog {
         enable: boolean;
         content: string;
@@ -198,20 +204,20 @@ export namespace Website {
     export interface DnsAccount extends CommonModel {
         name: string;
         type: string;
-        authorization: Object;
+        authorization: object;
     }
 
     export interface DnsAccountCreate {
         name: string;
         type: string;
-        authorization: Object;
+        authorization: object;
     }
 
     export interface DnsAccountUpdate {
         id: number;
         name: string;
         type: string;
-        authorization: Object;
+        authorization: object;
     }
 
     export interface SSL extends CommonModel {
@@ -397,7 +403,7 @@ export namespace Website {
         content: string;
     }
 
-    export interface CustomRewirte {
+    export interface CustomRewrite {
         operate: string;
         name: string;
         content: string;
@@ -439,6 +445,7 @@ export namespace Website {
         proxyProtocol?: string;
         sni?: boolean;
         proxySSLName: string;
+        sslVerify?: boolean;
         cors: boolean;
         allowOrigins: string;
         allowMethods: string;

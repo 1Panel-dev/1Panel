@@ -51,6 +51,7 @@ export namespace Toolbox {
         size: number;
         isCheck: boolean;
         isRecommend: boolean;
+        canDelete: boolean;
     }
 
     export interface Fail2banBaseInfo {

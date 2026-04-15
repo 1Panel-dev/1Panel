@@ -173,7 +173,11 @@
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
-import { computeSize, dateFormat, downloadFile, newUUID, transferTimeToSecond } from '@/utils/util';
+import { computeSize } from '@/utils/size';
+import { dateFormat } from '@/utils/date';
+import { downloadFile } from '@/utils/file';
+import { newUUID } from '@/utils/id';
+import { transferTimeToSecond } from '@/utils/validate';
 import {
     getLocalBackupDir,
     handleBackup,
@@ -191,18 +195,12 @@ import TaskLog from '@/components/log/task/index.vue';
 import { routerToFileWithPath } from '@/utils/router';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { mysqlArgs } from '@/views/cronjob/cronjob/helper';
+import { loadOptionalComponent } from '@/extensions/optional';
 const { currentNode } = useGlobalStore();
 
 const emit = defineEmits(['close']);
 
-const PushApp = defineAsyncComponent(async () => {
-    const modules = import.meta.glob('@/xpack/views/appstore/push-app/index.vue');
-    const loader = modules['/src/xpack/views/appstore/push-app/index.vue'];
-    if (loader) {
-        return ((await loader()) as any).default;
-    }
-    return { template: '<div></div>' };
-});
+const PushApp = defineAsyncComponent(() => loadOptionalComponent('/src/xpack/views/appstore/push-app/index.vue'));
 
 const selects = ref<any>([]);
 const args = ref([]);

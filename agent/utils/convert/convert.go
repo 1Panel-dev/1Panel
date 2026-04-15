@@ -54,13 +54,17 @@ func MediaFile(inputFile, outputFile, outputFormat string, deleteSource bool) (s
 	if !flag {
 		return status, fmt.Errorf("ffmpeg not found, cannot convert file")
 	}
-	logFile, logErr := os.OpenFile(filepath.Join(global.Dir.ConvertLogDir, "convert.log"), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	allLogFile, allErr := os.OpenFile(filepath.Join(global.Dir.ConvertLogDir, "convert-all.log"), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-
-	if logErr != nil || allErr != nil {
-		return status, fmt.Errorf("cannot open log file: %w", err)
+	logFile, err := os.OpenFile(filepath.Join(global.Dir.ConvertLogDir, "convert.log"), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		return status, fmt.Errorf("cannot open convert.log: %w", err)
 	}
 	defer logFile.Close()
+
+	allLogFile, err := os.OpenFile(filepath.Join(global.Dir.ConvertLogDir, "convert-all.log"), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		return status, fmt.Errorf("cannot open convert-all.log: %w", err)
+	}
+	defer allLogFile.Close()
 	args, fileType, err := buildFFmpegArgs(inputFile, outputFile, outputFormat)
 	if err != nil {
 		return status, fmt.Errorf("FFmpeg args failed: %w", err)

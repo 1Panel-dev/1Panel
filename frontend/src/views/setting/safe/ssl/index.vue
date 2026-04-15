@@ -118,7 +118,8 @@
 </template>
 <script lang="ts" setup>
 import { Website } from '@/api/interface/website';
-import { dateFormatSimple, getProvider } from '@/utils/util';
+import { dateFormatSimple } from '@/utils/date';
+import { getProvider } from '@/utils/ssl';
 import { listLocalNodeSSL } from '@/api/modules/website';
 import { reactive, ref } from 'vue';
 import i18n from '@/lang';

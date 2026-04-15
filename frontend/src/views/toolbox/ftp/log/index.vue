@@ -40,7 +40,7 @@
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
 import { searchFtpLog } from '@/api/modules/toolbox';
-import { computeSizeFromByte } from '@/utils/util';
+import { computeSizeFromByte } from '@/utils/size';
 import i18n from '@/lang';
 
 const paginationConfig = reactive({

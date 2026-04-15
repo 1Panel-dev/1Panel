@@ -129,8 +129,8 @@ import { Host } from '@/api/interface/host';
 import { ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import { downloadWithContent, getCurrentDateFormatted } from '@/utils/util';
-
+import { downloadWithContent } from '@/utils/file';
+import { getCurrentDateFormatted } from '@/utils/date';
 const loading = ref();
 const activeTag = ref('address');
 const selects = ref<any>([]);

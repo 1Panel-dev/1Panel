@@ -8,22 +8,30 @@
         @close="visible = false"
     >
         <template #content>
-            <el-form label-position="top">
+            <el-form label-position="top" @submit.prevent>
                 <el-form-item>
-                    <div class="path-breadcrumb">
+                    <div v-if="!pathEditing" class="path-breadcrumb" @click="enablePathEditing">
                         <el-breadcrumb separator="/">
                             <el-breadcrumb-item>
-                                <el-link type="primary" @click="navigateToPath('/')">
+                                <el-link type="primary" @click.stop="navigateToPath('/')">
                                     <el-icon><HomeFilled /></el-icon>
                                 </el-link>
                             </el-breadcrumb-item>
                             <el-breadcrumb-item v-for="item in pathSegments" :key="item.path">
-                                <el-link type="primary" @click="navigateToPath(item.path)">
+                                <el-link type="primary" @click.stop="navigateToPath(item.path)">
                                     {{ item.name }}
                                 </el-link>
                             </el-breadcrumb-item>
                         </el-breadcrumb>
                     </div>
+                    <el-input
+                        v-else
+                        ref="pathInputRef"
+                        v-model="pathInput"
+                        class="path-breadcrumb path-input"
+                        @blur="cancelPathEditing"
+                        @keyup.enter.prevent="submitPathInput"
+                    />
                     <el-upload ref="uploadRef" :auto-upload="false" :show-file-list="false" :on-change="onUploadChange">
                         <el-button class="mt-2" :loading="uploading" type="primary" plain>
                             {{ $t('commons.button.upload') }}
@@ -89,7 +97,7 @@
             </el-form>
         </template>
     </DrawerPro>
-    <el-dialog v-model="previewVisible" :title="previewTitle" width="70%" destroy-on-close>
+    <DialogPro v-model="previewVisible" :title="previewTitle" size="w-70" :close-on-click-modal="true">
         <el-alert
             v-if="previewTruncated"
             :title="$t('file.previewTruncated')"
@@ -99,11 +107,11 @@
             class="mb-2"
         />
         <pre class="preview-content">{{ previewContent }}</pre>
-    </el-dialog>
+    </DialogPro>
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
+import { computed, nextTick, ref } from 'vue';
 import {
     deleteContainerFile,
     downloadContainerFile,
@@ -114,22 +122,24 @@ import {
 } from '@/api/modules/container';
 import { MsgError, MsgSuccess, MsgWarning } from '@/utils/message';
 import i18n from '@/lang';
-import { ElMessageBox, UploadFile, UploadInstance } from 'element-plus';
+import { ElInput, ElMessageBox, UploadFile, UploadInstance } from 'element-plus';
 import { Document, FolderOpened, HomeFilled } from '@element-plus/icons-vue';
-import { computeSize2 } from '@/utils/util';
-
+import { computeSize2 } from '@/utils/size';
 const visible = ref(false);
 const title = ref('');
 const containerID = ref('');
 const filePath = ref('/');
 const containerFiles = ref<any[]>([]);
 const uploadRef = ref<UploadInstance>();
+const pathInputRef = ref<InstanceType<typeof ElInput>>();
 const uploading = ref(false);
 const previewVisible = ref(false);
 const previewTitle = ref('');
 const previewContent = ref('');
 const previewTruncated = ref(false);
 const selectedRows = ref<any[]>([]);
+const pathEditing = ref(false);
+const pathInput = ref('/');
 const pathSegments = computed(() => {
     const parts = filePath.value.split('/').filter((item) => item);
     return parts.map((name, index) => ({
@@ -141,23 +151,26 @@ const pathSegments = computed(() => {
 interface DrawerProps {
     containerID: string;
     title: string;
+    workingDir?: string;
 }
 
 const acceptParams = async (params: DrawerProps): Promise<void> => {
     visible.value = true;
     containerID.value = params.containerID;
     title.value = params.title;
-    filePath.value = '/';
+    filePath.value = params.workingDir || '/';
+    pathInput.value = filePath.value;
+    pathEditing.value = false;
     await loadContainerFiles();
 };
 
-const loadContainerFiles = async () => {
-    if (!containerID.value || !filePath.value) {
-        return;
+const fetchContainerFiles = async (path: string) => {
+    if (!containerID.value || !path) {
+        return false;
     }
-    await listContainerFiles({
+    return await listContainerFiles({
         containerID: containerID.value,
-        path: filePath.value,
+        path,
     })
         .then((res) => {
             containerFiles.value = (res.data || []).map((item) => ({
@@ -166,10 +179,16 @@ const loadContainerFiles = async () => {
                 sizeLoading: false,
             }));
             selectedRows.value = [];
+            return true;
         })
         .catch(() => {
             containerFiles.value = [];
+            return false;
         });
+};
+
+const loadContainerFiles = async () => {
+    await fetchContainerFiles(filePath.value);
 };
 
 const enterDir = async (path: string) => {
@@ -179,7 +198,59 @@ const enterDir = async (path: string) => {
 
 const navigateToPath = async (path: string) => {
     filePath.value = path || '/';
+    pathInput.value = filePath.value;
+    pathEditing.value = false;
     await loadContainerFiles();
+};
+
+const getParentPath = (path: string) => {
+    if (!path || path === '/') {
+        return '/';
+    }
+    const segments = path.split('/').filter((item) => item);
+    if (segments.length <= 1) {
+        return '/';
+    }
+    return '/' + segments.slice(0, -1).join('/');
+};
+
+const enablePathEditing = async () => {
+    pathInput.value = filePath.value || '/';
+    pathEditing.value = true;
+    await nextTick();
+    pathInputRef.value?.focus();
+};
+
+const cancelPathEditing = () => {
+    pathEditing.value = false;
+    pathInput.value = filePath.value || '/';
+};
+
+const submitPathInput = async () => {
+    let targetPath = (pathInput.value || '').trim();
+    if (!targetPath) {
+        targetPath = '/';
+    }
+    if (!targetPath.startsWith('/')) {
+        targetPath = '/' + targetPath;
+    }
+    let currentPath = targetPath;
+    while (true) {
+        const success = await fetchContainerFiles(currentPath);
+        if (success) {
+            filePath.value = currentPath;
+            pathInput.value = currentPath;
+            pathEditing.value = false;
+            return;
+        }
+        if (currentPath === '/') {
+            filePath.value = '/';
+            pathInput.value = '/';
+            pathEditing.value = false;
+            return;
+        }
+        currentPath = getParentPath(currentPath);
+    }
 };
 
 const onUploadChange = async (uploadFile: UploadFile) => {
@@ -330,6 +401,11 @@ defineExpose({
     border: 1px solid var(--el-border-color);
     border-radius: 4px;
     overflow-x: auto;
+    cursor: text;
+}
+
+.path-input {
+    overflow: visible;
 }
 
 .preview-content {
