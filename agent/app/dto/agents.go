@@ -6,10 +6,10 @@ type AgentCreateReq struct {
 	Name           string   `json:"name" validate:"required"`
 	Remark         string   `json:"remark"`
 	AppVersion     string   `json:"appVersion" validate:"required"`
-	WebUIPort      int      `json:"webUIPort" validate:"required"`
+	WebUIPort      int      `json:"webUIPort" validate:"required,min=1,max=65535"`
 	BridgePort     int      `json:"bridgePort"`
 	AllowedOrigins []string `json:"allowedOrigins"`
-	AgentType      string   `json:"agentType" validate:"required,oneof=openclaw copaw"`
+	AgentType      string   `json:"agentType" validate:"required,oneof=openclaw copaw hermes-agent"`
 	Model          string   `json:"model"`
 	AccountID      uint     `json:"accountId"`
 	Token          string   `json:"token"`
@@ -298,6 +298,8 @@ type AgentFeishuConfigUpdateReq struct {
 	RequireMention string           `json:"requireMention" validate:"required,oneof=true false open"`
 	GroupPolicy    string           `json:"groupPolicy" validate:"required,oneof=open allowlist disabled"`
 	GroupAllowFrom []string         `json:"groupAllowFrom"`
+	Domain         string           `json:"domain"`
+	ConnectionMode string           `json:"connectionMode"`
 	Bots           []AgentFeishuBot `json:"bots" validate:"required,min=1"`
 }
 
@@ -314,6 +316,8 @@ type AgentFeishuConfig struct {
 	RequireMention string           `json:"requireMention"`
 	GroupPolicy    string           `json:"groupPolicy"`
 	GroupAllowFrom []string         `json:"groupAllowFrom"`
+	Domain         string           `json:"domain"`
+	ConnectionMode string           `json:"connectionMode"`
 	Bots           []AgentFeishuBot `json:"bots"`
 	Installed      bool             `json:"installed"`
 }
@@ -327,6 +331,7 @@ type AgentTelegramConfigUpdateReq struct {
 	Enabled        bool               `json:"enabled"`
 	DmPolicy       string             `json:"dmPolicy" validate:"required,oneof=pairing open allowlist disabled"`
 	AllowFrom      []string           `json:"allowFrom"`
+	RequireMention bool               `json:"requireMention"`
 	GroupPolicy    string             `json:"groupPolicy" validate:"required,oneof=open allowlist disabled"`
 	GroupAllowFrom []string           `json:"groupAllowFrom"`
 	Proxy          string             `json:"proxy"`
@@ -339,6 +344,7 @@ type AgentTelegramConfig struct {
 	Enabled        bool               `json:"enabled"`
 	DmPolicy       string             `json:"dmPolicy"`
 	AllowFrom      []string           `json:"allowFrom"`
+	RequireMention bool               `json:"requireMention"`
 	GroupPolicy    string             `json:"groupPolicy"`
 	GroupAllowFrom []string           `json:"groupAllowFrom"`
 	Proxy          string             `json:"proxy"`
@@ -412,15 +418,23 @@ type AgentWeixinLoginReq struct {
 }
 
 type AgentQQBotConfigUpdateReq struct {
-	AgentID uint            `json:"agentId" validate:"required"`
-	Enabled bool            `json:"enabled"`
-	Bots    []AgentQQBotBot `json:"bots" validate:"required,min=1"`
+	AgentID        uint            `json:"agentId" validate:"required"`
+	Enabled        bool            `json:"enabled"`
+	DmPolicy       string          `json:"dmPolicy"`
+	AllowFrom      []string        `json:"allowFrom"`
+	GroupPolicy    string          `json:"groupPolicy"`
+	GroupAllowFrom []string        `json:"groupAllowFrom"`
+	Bots           []AgentQQBotBot `json:"bots" validate:"required,min=1"`
 }
 
 type AgentQQBotConfig struct {
-	Enabled   bool            `json:"enabled"`
-	Bots      []AgentQQBotBot `json:"bots"`
-	Installed bool            `json:"installed"`
+	Enabled        bool            `json:"enabled"`
+	DmPolicy       string          `json:"dmPolicy"`
+	AllowFrom      []string        `json:"allowFrom"`
+	GroupPolicy    string          `json:"groupPolicy"`
+	GroupAllowFrom []string        `json:"groupAllowFrom"`
+	Bots           []AgentQQBotBot `json:"bots"`
+	Installed      bool            `json:"installed"`
 }
 
 type AgentPluginInstallReq struct {
@@ -458,6 +472,8 @@ type AgentDiscordConfigUpdateReq struct {
 	AgentID        uint              `json:"agentId" validate:"required"`
 	Enabled        bool              `json:"enabled"`
 	DmPolicy       string            `json:"dmPolicy" validate:"required"`
+	AllowFrom      []string          `json:"allowFrom"`
+	RequireMention bool              `json:"requireMention"`
 	GroupPolicy    string            `json:"groupPolicy" validate:"required,oneof=open allowlist disabled"`
 	Proxy          string            `json:"proxy"`
 	DefaultAccount string            `json:"defaultAccount" validate:"required"`
@@ -467,6 +483,8 @@ type AgentDiscordConfigUpdateReq struct {
 type AgentDiscordConfig struct {
 	Enabled        bool              `json:"enabled"`
 	DmPolicy       string            `json:"dmPolicy"`
+	AllowFrom      []string          `json:"allowFrom"`
+	RequireMention bool              `json:"requireMention"`
 	GroupPolicy    string            `json:"groupPolicy"`
 	Proxy          string            `json:"proxy"`
 	DefaultAccount string            `json:"defaultAccount"`

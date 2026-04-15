@@ -24,6 +24,7 @@ import (
 	terminalai "github.com/1Panel-dev/1Panel/agent/utils/terminal/ai"
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 	"github.com/docker/docker/api/types/container"
+	"gopkg.in/yaml.v3"
 	"gorm.io/gorm"
 )
 
@@ -110,6 +111,9 @@ const (
 
 func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 	agentType := req.AgentType
+	if agentType != constant.AppOpenclaw && agentType != constant.AppCopaw && agentType != constant.AppHermesAgent {
+		return nil, fmt.Errorf("unsupported agent type: %s", agentType)
+	}
 	if err := checkPortExist(req.WebUIPort); err != nil {
 		return nil, err
 	}
@@ -152,15 +156,7 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 	var account *model.AgentAccount
 	var installHooks *appInstallHooks
 
-	if agentType == constant.AppOpenclaw {
-		var err error
-		allowedOrigins, err = normalizeAllowedOrigins(req.AllowedOrigins)
-		if err != nil {
-			return nil, err
-		}
-		if len(allowedOrigins) == 0 {
-			return nil, fmt.Errorf("allowed origins is required")
-		}
+	if agentType == constant.AppOpenclaw || agentType == constant.AppHermesAgent {
 		if req.AccountID == 0 {
 			return nil, buserr.New("ErrAgentAccountRequired")
 		}
@@ -184,6 +180,17 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 		runtimeModel = resolvedRuntime.PrimaryModel
 		apiKey = account.APIKey
 		accountID = account.ID
+	}
+
+	if agentType == constant.AppOpenclaw {
+		var err error
+		allowedOrigins, err = normalizeAllowedOrigins(req.AllowedOrigins)
+		if err != nil {
+			return nil, err
+		}
+		if len(allowedOrigins) == 0 {
+			return nil, fmt.Errorf("allowed origins is required")
+		}
 		token = strings.TrimSpace(req.Token)
 		if token == "" {
 			token = generateToken()
@@ -193,6 +200,12 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 				return prepareOpenclawInstallFiles(appInstall, account, storedModel, token, allowedOrigins)
 			},
 		}
+	} else if agentType == constant.AppHermesAgent {
+		installHooks = &appInstallHooks{
+			AfterCopyData: func(appInstall *model.AppInstall) error {
+				return prepareHermesInstallFiles(appInstall, account, storedModel)
+			},
+		}
 	}
 
 	params := map[string]interface{}{
@@ -200,12 +213,8 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 		constant.MemoryLimit: "0",
 		constant.HostIP:      "",
 	}
+	setAgentWebUIParams(params, agentType, detail.Version, req.WebUIPort)
 	if agentType == constant.AppOpenclaw {
-		if isOpenclawHTTPSWindowVersion(detail.Version) {
-			params["PANEL_APP_PORT_HTTPS"] = req.WebUIPort
-		} else {
-			params["PANEL_APP_PORT_HTTP"] = req.WebUIPort
-		}
 		if allowedOrigin := firstAllowedOrigin(allowedOrigins); allowedOrigin != "" {
 			params["ALLOWED_ORIGIN"] = allowedOrigin
 		}
@@ -217,8 +226,6 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 		params["BASE_URL"] = baseURL
 		params["API_KEY"] = apiKey
 		params["OPENCLAW_GATEWAY_TOKEN"] = token
-	} else {
-		params["PANEL_APP_PORT_HTTP"] = req.WebUIPort
 	}
 
 	if req.EditCompose && strings.TrimSpace(req.DockerCompose) == "" {
@@ -250,6 +257,9 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 	if agentType == constant.AppOpenclaw {
 		configPath = path.Join(appInstall.GetPath(), "data", "conf", "openclaw.json")
 	}
+	if agentType == constant.AppHermesAgent {
+		configPath = path.Join(appInstall.GetPath(), "data", "config.yaml")
+	}
 	agent := &model.Agent{
 		Name:          req.Name,
 		Remark:        req.Remark,
@@ -274,6 +284,14 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 
 	item := buildAgentItem(agent, appInstall, nil)
 	return &item, nil
+}
+
+func setAgentWebUIParams(params map[string]interface{}, agentType, appVersion string, webUIPort int) {
+	if agentType == constant.AppOpenclaw && isOpenclawHTTPSWindowVersion(appVersion) {
+		params["PANEL_APP_PORT_HTTPS"] = webUIPort
+		return
+	}
+	params["PANEL_APP_PORT_HTTP"] = webUIPort
 }
 
 func (a AgentService) Page(req dto.SearchWithPage) (int64, []dto.AgentItem, error) {
@@ -420,6 +438,33 @@ func (a AgentService) UpdateRemark(req dto.AgentRemarkUpdateReq) error {
 }
 
 func (a AgentService) GetModelConfig(req dto.AgentIDReq) (*dto.AgentModelConfig, error) {
+	agent, err := agentRepo.GetFirst(repo.WithByID(req.AgentID))
+	if err != nil {
+		return nil, err
+	}
+	if agent.AgentType == constant.AppHermesAgent {
+		cfg, err := readHermesConfig(agent.ConfigPath)
+		if err != nil {
+			return nil, err
+		}
+		account, err := agentAccountRepo.GetFirst(repo.WithByID(agent.AccountID))
+		if err != nil {
+			return nil, err
+		}
+		accountModels, err := loadAgentAccountModels(account)
+		if err != nil {
+			return nil, err
+		}
+		model := resolveHermesConfiguredModelID(account, accountModels, cfg.Model.Default)
+		if model == "" {
+			model = agent.Model
+		}
+		return &dto.AgentModelConfig{
+			AccountID: agent.AccountID,
+			Model:     model,
+			Fallbacks: []string{},
+		}, nil
+	}
 	agent, _, conf, err := a.loadOpenclawAgentConfig(req.AgentID)
 	if err != nil {
 		return nil, err
@@ -444,7 +489,7 @@ func (a AgentService) GetModelConfig(req dto.AgentIDReq) (*dto.AgentModelConfig,
 }
 
 func (a AgentService) UpdateModelConfig(req dto.AgentModelConfigUpdateReq) error {
-	agent, err := loadOpenclawAgentByID(req.AgentID)
+	agent, err := agentRepo.GetFirst(repo.WithByID(req.AgentID))
 	if err != nil {
 		return err
 	}
@@ -459,8 +504,21 @@ func (a AgentService) UpdateModelConfig(req dto.AgentModelConfigUpdateReq) error
 	modelName := resolvedRuntime.StoredModel
 	apiType, maxTokens, contextWindow := resolvedRuntime.APIType, resolvedRuntime.MaxTokens, resolvedRuntime.ContextWindow
 	confDir := path.Dir(agent.ConfigPath)
-	if err := writeOpenclawConfig(confDir, account, modelName, agent.Token, nil, req.Fallbacks); err != nil {
-		return err
+	if agent.AgentType == constant.AppHermesAgent {
+		cfg, err := readHermesConfig(agent.ConfigPath)
+		if err != nil {
+			return err
+		}
+		if err := writeHermesConfig(confDir, account, modelName, cfg.Timezone); err != nil {
+			return err
+		}
+	} else {
+		if agent, err = loadOpenclawAgentByID(req.AgentID); err != nil {
+			return err
+		}
+		if err := writeOpenclawConfig(confDir, account, modelName, agent.Token, nil, req.Fallbacks); err != nil {
+			return err
+		}
 	}
 	agent.Provider = account.Provider
 	agent.Model = modelName
@@ -813,6 +871,17 @@ func (a AgentService) GetOtherConfig(req dto.AgentIDReq) (*dto.AgentOtherConfig,
 	if err != nil {
 		return nil, err
 	}
+	if agent.AgentType == constant.AppHermesAgent {
+		cfg, err := readHermesConfig(agent.ConfigPath)
+		if err != nil {
+			return nil, err
+		}
+		return &dto.AgentOtherConfig{
+			UserTimezone:   cfg.Timezone,
+			BrowserEnabled: true,
+			NPMRegistry:    "https://registry.npmjs.org/",
+		}, nil
+	}
 	conf, err := readOpenclawConfig(agent.ConfigPath)
 	if err != nil {
 		return nil, err
@@ -829,6 +898,13 @@ func (a AgentService) UpdateOtherConfig(req dto.AgentOtherConfigUpdateReq) error
 	agent, install, err := a.loadAgentAndInstall(req.AgentID)
 	if err != nil {
 		return err
+	}
+	if agent.AgentType == constant.AppHermesAgent {
+		account, err := agentAccountRepo.GetFirst(repo.WithByID(agent.AccountID))
+		if err != nil {
+			return err
+		}
+		return writeHermesConfig(path.Dir(agent.ConfigPath), account, agent.Model, strings.TrimSpace(req.UserTimezone))
 	}
 	if err := ensureContainerRunning(install.ContainerName); err != nil {
 		return err
@@ -848,7 +924,7 @@ func (a AgentService) UpdateOtherConfig(req dto.AgentOtherConfigUpdateReq) error
 }
 
 func (a AgentService) GetConfigFile(req dto.AgentConfigFileReq) (*dto.AgentConfigFile, error) {
-	agent, _, err := a.loadOpenclawAgentAndInstall(req.AgentID)
+	agent, _, err := a.loadAgentAndInstall(req.AgentID)
 	if err != nil {
 		return nil, err
 	}
@@ -860,12 +936,11 @@ func (a AgentService) GetConfigFile(req dto.AgentConfigFileReq) (*dto.AgentConfi
 }
 
 func (a AgentService) UpdateConfigFile(req dto.AgentConfigFileUpdateReq) error {
-	agent, install, err := a.loadOpenclawAgentAndInstall(req.AgentID)
+	agent, install, err := a.loadAgentAndInstall(req.AgentID)
 	if err != nil {
 		return err
 	}
-	var payload interface{}
-	if err := json.Unmarshal([]byte(req.Content), &payload); err != nil {
+	if err := validateAgentConfigFileContent(agent.AgentType, req.Content); err != nil {
 		return err
 	}
 	info, err := os.Stat(agent.ConfigPath)
@@ -875,10 +950,30 @@ func (a AgentService) UpdateConfigFile(req dto.AgentConfigFileUpdateReq) error {
 	if err := os.WriteFile(agent.ConfigPath, []byte(req.Content), info.Mode()); err != nil {
 		return err
 	}
+	if agent.AgentType == constant.AppHermesAgent {
+		cfg, err := readHermesConfig(agent.ConfigPath)
+		if err != nil {
+			return err
+		}
+		if cfg.Model.Default != "" {
+			agent.Model = cfg.Model.Default
+			if err := agentRepo.Save(agent); err != nil {
+				return err
+			}
+		}
+	}
 	return NewIAppInstalledService().Operate(request.AppInstalledOperate{
 		InstallId: install.ID,
 		Operate:   constant.Restart,
 	})
+}
+
+func validateAgentConfigFileContent(agentType, content string) error {
+	var payload interface{}
+	if agentType == constant.AppHermesAgent {
+		return yaml.Unmarshal([]byte(content), &payload)
+	}
+	return json.Unmarshal([]byte(content), &payload)
 }
 
 func getOpenclawNPMRegistry(containerName string) (string, error) {
@@ -917,8 +1012,8 @@ func (a AgentService) loadOpenclawAgentAndInstall(agentID uint) (*model.Agent, *
 	if err != nil {
 		return nil, nil, err
 	}
-	if agent.AgentType == constant.AppCopaw {
-		return nil, nil, fmt.Errorf("copaw does not support")
+	if agent.AgentType != constant.AppOpenclaw {
+		return nil, nil, fmt.Errorf("%s does not support", agent.AgentType)
 	}
 	return agent, install, nil
 }
@@ -940,8 +1035,8 @@ func (a AgentService) loadOpenclawAgentConfig(agentID uint) (*model.Agent, *mode
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	if agent.AgentType == constant.AppCopaw {
-		return nil, nil, nil, fmt.Errorf("copaw does not support")
+	if agent.AgentType != constant.AppOpenclaw {
+		return nil, nil, nil, fmt.Errorf("%s does not support", agent.AgentType)
 	}
 	return agent, install, conf, nil
 }
@@ -970,7 +1065,6 @@ func (a AgentService) syncAgentsByAccount(account *model.AgentAccount) error {
 		return nil
 	}
 	for _, agent := range agents {
-		confDir := path.Dir(agent.ConfigPath)
 		modelName := strings.TrimSpace(agent.Model)
 		var selectedAccountModel dto.AgentAccountModel
 		if modelName != "" {
@@ -981,19 +1075,33 @@ func (a AgentService) syncAgentsByAccount(account *model.AgentAccount) error {
 		} else {
 			selectedAccountModel = accountModels[0]
 		}
-		conf, err := readOpenclawConfig(agent.ConfigPath)
-		if err != nil {
-			return err
-		}
-		fallbacks := extractOpenclawFallbackModelIDs(conf, account, accountModels, selectedAccountModel.ID)
 		resolvedRuntime, err := buildOpenclawAccountModelRuntime(account, selectedAccountModel)
 		if err != nil {
 			return err
 		}
 		modelName = resolvedRuntime.StoredModel
 		apiType, maxTokens, contextWindow := resolvedRuntime.APIType, resolvedRuntime.MaxTokens, resolvedRuntime.ContextWindow
-		if err := writeOpenclawConfig(confDir, account, modelName, agent.Token, nil, fallbacks); err != nil {
-			return err
+		confDir := path.Dir(agent.ConfigPath)
+		switch agent.AgentType {
+		case constant.AppOpenclaw:
+			conf, err := readOpenclawConfig(agent.ConfigPath)
+			if err != nil {
+				return err
+			}
+			fallbacks := extractOpenclawFallbackModelIDs(conf, account, accountModels, selectedAccountModel.ID)
+			if err := writeOpenclawConfig(confDir, account, modelName, agent.Token, nil, fallbacks); err != nil {
+				return err
+			}
+		case constant.AppHermesAgent:
+			cfg, err := readHermesConfig(agent.ConfigPath)
+			if err != nil {
+				return err
+			}
+			if err := writeHermesConfig(confDir, account, modelName, cfg.Timezone); err != nil {
+				return err
+			}
+		default:
+			continue
 		}
 		agent.BaseURL = account.BaseURL
 		agent.APIKey = account.APIKey

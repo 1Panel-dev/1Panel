@@ -92,9 +92,9 @@ import { AI } from '@/api/interface/ai';
 import { approveAgentChannelPairing, getAgentFeishuConfig, updateAgentFeishuConfig } from '@/api/modules/ai';
 import { MsgSuccess, MsgWarning } from '@/utils/message';
 import { Rules } from '@/global/form-rules';
-import PluginInstall from './components/plugin-install.vue';
+import PluginInstall from '../components/plugin-install.vue';
 import { useAgentPluginChannel } from './useAgentPluginChannel';
-import ChannelBots from './components/channel-bots.vue';
+import ChannelBots from '../components/channel-bots.vue';
 
 const { t } = useI18n();
 

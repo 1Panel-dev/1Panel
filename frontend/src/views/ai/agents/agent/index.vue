@@ -26,16 +26,10 @@
                             <div class="agent-type-cell">
                                 <img
                                     class="agent-type-icon"
-                                    :src="row.agentType === 'copaw' ? copawIcon : openclawIcon"
-                                    :alt="row.agentType === 'copaw' ? 'CoPaw' : 'OpenClaw'"
+                                    :src="getAgentTypeIcon(row.agentType)"
+                                    :alt="getAgentTypeLabel(row.agentType)"
                                 />
-                                <span>
-                                    {{
-                                        row.agentType === 'copaw'
-                                            ? $t('aiTools.agents.copawType')
-                                            : $t('aiTools.agents.openclawType')
-                                    }}
-                                </span>
+                                <span>{{ getAgentTypeLabel(row.agentType) }}</span>
                             </div>
                         </template>
                     </el-table-column>
@@ -85,7 +79,7 @@
                         min-width="150"
                     >
                         <template #default="{ row }">
-                            <template v-if="row.agentType !== 'copaw'">
+                            <template v-if="row.agentType === 'openclaw' || row.agentType === 'hermes-agent'">
                                 <span>{{ getAgentProviderDisplayName(row.provider, row.providerName) }}</span>
                                 <div>
                                     <span>{{ row.model }}</span>
@@ -161,7 +155,7 @@
                     </el-table-column>
                     <el-table-column label="Token" min-width="120">
                         <template #default="{ row }">
-                            <el-space v-if="row.agentType !== 'copaw'">
+                            <el-space v-if="supportsAgentToken(row.agentType)">
                                 <CopyButton :content="row.token" />
                                 <el-button link type="primary" @click="onResetToken(row)">
                                     {{ $t('commons.button.reset') }}
@@ -191,7 +185,12 @@
         <TaskLog ref="taskLogRef" @close="search" />
         <DeleteDialog ref="deleteRef" @close="search" />
         <AppResources ref="checkRef" @close="search" />
-        <ConfigDrawer ref="configRef" @updated="search" />
+        <ConfigDrawer
+            ref="configRef"
+            @updated="search"
+            @open-terminal="openTerminalDialog"
+            @restart-required="handleConfigRestartRequired"
+        />
         <OverviewDrawer ref="overviewRef" />
         <BindWebsiteDialog ref="bindWebsiteRef" @success="search" />
         <AppUpgrade ref="upgradeRef" @close="search" />
@@ -227,12 +226,18 @@ import AgentTerminalDialog from '@/views/ai/agents/agent/components/terminal.vue
 import i18n from '@/lang';
 import PortJumpDialog from '@/components/port-jump/index.vue';
 import DockerStatus from '@/views/container/docker-status/index.vue';
-import { getAgentProviderDisplayName, getOpenclawAccessScheme } from '@/utils/agent';
+import {
+    getAgentProviderDisplayName,
+    getOpenclawAccessScheme,
+    supportsAgentModelConfig,
+    supportsAgentToken,
+} from '@/utils/agent';
 import { routerToFileWithPath } from '@/utils/router';
 import { listDomains } from '@/api/modules/website';
 import NoApp from '@/views/app-store/apps/no-app/index.vue';
 import openclawIcon from '@/assets/images/ai-agent-openclaw.svg';
 import copawIcon from '@/assets/images/ai-agent-copaw.svg';
+import hermesIcon from '@/assets/images/ai-agent-hermes-agent.svg';
 
 const items = ref<AI.AgentItem[]>([]);
 const loading = ref(false);
@@ -268,7 +273,7 @@ const buttons = [
     {
         label: i18n.global.t('menu.config'),
         click: (row: AI.AgentItem) => openConfig(row),
-        show: (row: AI.AgentItem) => row.agentType !== 'copaw',
+        show: (row: AI.AgentItem) => supportsAgentModelConfig(row.agentType),
         disabled: (row: AI.AgentItem) => row.status !== 'Running',
     },
     {
@@ -282,7 +287,7 @@ const buttons = [
     {
         label: i18n.global.t('menu.home'),
         click: (row: AI.AgentItem) => openOverview(row),
-        show: (row: AI.AgentItem) => row.agentType !== 'copaw',
+        show: (row: AI.AgentItem) => row.agentType === 'openclaw',
     },
     {
         label: i18n.global.t('commons.operate.start'),
@@ -348,11 +353,34 @@ const search = async () => {
     }
 };
 
-const openCreate = (agentType?: 'openclaw' | 'copaw') => {
+const getAgentTypeLabel = (agentType: AI.AgentType) => {
+    switch (agentType) {
+        case 'copaw':
+            return i18n.global.t('aiTools.agents.copawType');
+        case 'hermes-agent':
+            return i18n.global.t('aiTools.agents.hermesType');
+        default:
+            return i18n.global.t('aiTools.agents.openclawType');
+    }
+};
+
+const getAgentTypeIcon = (agentType: AI.AgentType) => {
+    switch (agentType) {
+        case 'copaw':
+            return copawIcon;
+        case 'hermes-agent':
+            return hermesIcon;
+        default:
+            return openclawIcon;
+    }
+};
+
+const openCreate = (agentType?: AI.AgentType) => {
     if (noApp.value) {
         return;
     }
-    const targetType = agentType === 'copaw' ? 'copaw' : 'openclaw';
+    const targetType =
+        agentType === 'copaw' || agentType === 'hermes-agent' || agentType === 'openclaw' ? agentType : 'openclaw';
     if (addRef.value?.open) {
         addRef.value.open(targetType);
     }
@@ -363,7 +391,12 @@ const openCreateFromQuery = async () => {
     if (!shouldOpen) {
         return;
     }
-    const agentType = route.query.agentType === 'copaw' ? 'copaw' : 'openclaw';
+    const agentType =
+        route.query.agentType === 'copaw'
+            ? 'copaw'
+            : route.query.agentType === 'hermes-agent'
+              ? 'hermes-agent'
+              : 'openclaw';
     openCreate(agentType);
     const nextQuery = { ...route.query };
     delete nextQuery.open;
@@ -406,6 +439,12 @@ const onOperate = async (row: AI.AgentItem, operate: string) => {
     await search();
 };
 
+const restartInstall = async (installId: number) => {
+    const taskID = newUUID();
+    await installedOp({ installId, operate: 'restart', taskID });
+    await search();
+};
+
 const openLog = (row: AI.AgentItem) => {
     if (row.status === 'Installing') {
         taskLogRef.value?.openWithResourceID('App', 'TaskInstall', row.appInstallId);
@@ -420,12 +459,35 @@ const openLog = (row: AI.AgentItem) => {
 
 const openTerminal = (row: AI.AgentItem) => {
     const title = i18n.global.t('aiTools.agents.agent') + ' ' + row.name;
-    dialogTerminalRef.value?.acceptParams({
+    openTerminalDialog({
         containerID: row.containerName,
         title,
-        users: ['node', 'root'],
+        users: row.agentType === 'hermes-agent' ? ['hermes', 'root'] : ['node', 'root'],
         shell: '/bin/bash',
+        initCmd:
+            row.agentType === 'hermes-agent' ? 'source /opt/hermes/.venv/bin/activate\ncd /opt/data/workspace\n' : '',
     });
+};
+
+const handleConfigRestartRequired = async (installId: number) => {
+    try {
+        await ElMessageBox.confirm(t('aiTools.agents.configFileRestartHelper'), t('database.restartNow'), {
+            confirmButtonText: t('database.restartNow'),
+            cancelButtonText: t('commons.button.cancel'),
+            type: 'info',
+        });
+        await restartInstall(installId);
+    } catch {}
+};
+
+const openTerminalDialog = (params: {
+    containerID: string;
+    title: string;
+    users: string[];
+    shell: string;
+    initCmd?: string;
+}) => {
+    dialogTerminalRef.value?.acceptParams(params);
 };
 
 const openWorkDir = (row: AI.AgentItem) => {
@@ -440,8 +502,8 @@ const jumpWebUI = (row: AI.AgentItem) => {
         dialogPortJumpRef.value.acceptParams({
             port: row.webUIPort,
             protocol: row.agentType === 'openclaw' ? getOpenclawAccessScheme(row.appVersion) : 'http',
-            path: row.agentType === 'copaw' ? undefined : '/',
-            hash: row.agentType === 'copaw' ? undefined : `token=${row.token}`,
+            path: row.agentType === 'openclaw' ? '/' : undefined,
+            hash: row.agentType === 'openclaw' ? `token=${row.token}` : undefined,
         });
     }
 };
@@ -557,7 +619,7 @@ const buildWebsiteBaseUrl = (domain: Website.Domain, row: AI.AgentItem) => {
 };
 
 const appendWebsiteAgentToken = (url: string, row: AI.AgentItem) => {
-    if (row.agentType !== 'copaw' && row.token) {
+    if (supportsAgentToken(row.agentType) && row.token) {
         const target = new URL(url);
         target.hash = `token=${row.token}`;
         return target.toString();

@@ -192,7 +192,7 @@ func bindDeploymentWebsiteToAgentByAppInstall(website *model.Website) error {
 	if err != nil {
 		return err
 	}
-	if appInstall.App.Key != constant.AppOpenclaw && appInstall.App.Key != constant.AppCopaw {
+	if appInstall.App.Key != constant.AppOpenclaw && appInstall.App.Key != constant.AppCopaw && appInstall.App.Key != constant.AppHermesAgent {
 		return nil
 	}
 
@@ -215,7 +215,7 @@ func bindDeploymentWebsiteToAgentByAppInstall(website *model.Website) error {
 }
 
 func ensureOpenclawWebsiteAllowedOrigin(agent *model.Agent, website *model.Website) error {
-	if agent == nil || website == nil || agent.AgentType == constant.AppCopaw {
+	if agent == nil || website == nil || agent.AgentType != constant.AppOpenclaw {
 		return nil
 	}
 

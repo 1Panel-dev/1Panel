@@ -1,9 +1,9 @@
 <template>
     <el-form ref="formRef" :model="form" :rules="rules" label-position="top" v-loading="loading">
-        <el-form-item :label="t('aiTools.agents.browserEnabled')">
+        <el-form-item v-if="agentType === 'openclaw'" :label="t('aiTools.agents.browserEnabled')">
             <el-switch v-model="form.browserEnabled" />
         </el-form-item>
-        <el-form-item :label="t('aiTools.agents.npmRegistry')" prop="npmRegistry">
+        <el-form-item v-if="agentType === 'openclaw'" :label="t('aiTools.agents.npmRegistry')" prop="npmRegistry">
             <el-select v-model="form.npmRegistry" filterable allow-create default-first-option>
                 <el-option v-for="item in npmRegistryOptions" :key="item" :label="item" :value="item" />
             </el-select>
@@ -33,6 +33,7 @@ const { t } = useI18n();
 const loading = ref(false);
 const saving = ref(false);
 const agentId = ref(0);
+const agentType = ref<AI.AgentType>('openclaw');
 const formRef = ref<FormInstance>();
 const defaultNPMRegistry = 'https://registry.npmjs.org/';
 
@@ -66,11 +67,12 @@ const rules = reactive({
     npmRegistry: [{ validator: validateNPMRegistry, trigger: 'blur' }],
 });
 
-const load = async (id: number) => {
-    agentId.value = id;
+const load = async (params: { agentId: number; agentType: AI.AgentType }) => {
+    agentId.value = params.agentId;
+    agentType.value = params.agentType;
     loading.value = true;
     try {
-        const res = await getAgentOtherConfig({ agentId: id });
+        const res = await getAgentOtherConfig({ agentId: params.agentId });
         Object.assign(form, res.data || {});
     } finally {
         loading.value = false;
@@ -88,7 +90,7 @@ const saveConfig = async () => {
             agentId: agentId.value,
             userTimezone: form.userTimezone,
             browserEnabled: form.browserEnabled,
-            npmRegistry: form.npmRegistry,
+            npmRegistry: agentType.value === 'openclaw' ? form.npmRegistry : defaultNPMRegistry,
         });
         MsgSuccess(t('aiTools.agents.saveSuccess'));
     } finally {

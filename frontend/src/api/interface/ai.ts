@@ -1,6 +1,8 @@
 import { ReqPage } from '.';
 
 export namespace AI {
+    export type AgentType = 'openclaw' | 'copaw' | 'hermes-agent';
+
     export interface OllamaModelInfo {
         id: number;
         name: string;
@@ -243,7 +245,7 @@ export namespace AI {
         webUIPort: number;
         bridgePort?: number;
         allowedOrigins?: string[];
-        agentType: 'openclaw' | 'copaw';
+        agentType: AgentType;
         model?: string;
         accountId?: number;
         token?: string;
@@ -265,7 +267,7 @@ export namespace AI {
         id: number;
         name: string;
         remark: string;
-        agentType: 'openclaw' | 'copaw';
+        agentType: AgentType;
         provider: string;
         providerName: string;
         model: string;
@@ -545,6 +547,8 @@ export namespace AI {
         requireMention: 'true' | 'false' | 'open';
         groupPolicy: 'open' | 'allowlist' | 'disabled';
         groupAllowFrom: string[];
+        domain?: string;
+        connectionMode?: 'websocket' | 'webhook';
         bots: AgentFeishuBot[];
         installed: boolean;
     }
@@ -558,6 +562,8 @@ export namespace AI {
         requireMention: 'true' | 'false' | 'open';
         groupPolicy: 'open' | 'allowlist' | 'disabled';
         groupAllowFrom: string[];
+        domain?: string;
+        connectionMode?: 'websocket' | 'webhook';
         bots: AgentFeishuBot[];
     }
 
@@ -574,6 +580,7 @@ export namespace AI {
         enabled: boolean;
         dmPolicy: 'pairing' | 'open' | 'allowlist' | 'disabled';
         allowFrom: string[];
+        requireMention: boolean;
         groupPolicy: 'open' | 'allowlist' | 'disabled';
         groupAllowFrom: string[];
         proxy: string;
@@ -587,6 +594,7 @@ export namespace AI {
         enabled: boolean;
         dmPolicy: 'pairing' | 'open' | 'allowlist' | 'disabled';
         allowFrom: string[];
+        requireMention: boolean;
         groupPolicy: 'open' | 'allowlist' | 'disabled';
         groupAllowFrom: string[];
         proxy: string;
@@ -680,6 +688,10 @@ export namespace AI {
 
     export interface AgentQQBotConfig {
         enabled: boolean;
+        dmPolicy?: 'open' | 'allowlist' | 'disabled';
+        allowFrom?: string[];
+        groupPolicy?: 'open' | 'allowlist' | 'disabled';
+        groupAllowFrom?: string[];
         bots: AgentQQBotBot[];
         installed: boolean;
     }
@@ -687,6 +699,10 @@ export namespace AI {
     export interface AgentQQBotConfigUpdateReq {
         agentId: number;
         enabled: boolean;
+        dmPolicy?: 'open' | 'allowlist' | 'disabled';
+        allowFrom?: string[];
+        groupPolicy?: 'open' | 'allowlist' | 'disabled';
+        groupAllowFrom?: string[];
         bots: AgentQQBotBot[];
     }
 
@@ -728,6 +744,8 @@ export namespace AI {
     export interface AgentDiscordConfig {
         enabled: boolean;
         dmPolicy: string;
+        allowFrom: string[];
+        requireMention: boolean;
         groupPolicy: string;
         proxy: string;
         defaultAccount: string;
@@ -738,6 +756,8 @@ export namespace AI {
         agentId: number;
         enabled: boolean;
         dmPolicy: string;
+        allowFrom: string[];
+        requireMention: boolean;
         groupPolicy: string;
         proxy: string;
         defaultAccount: string;

@@ -2,19 +2,35 @@
     <DrawerPro v-model="open" :header="header" size="large" @close="handleClose">
         <template #content>
             <el-tabs v-model="activeTab" tab-position="left" class="config-tabs" @tab-click="handleTabClick">
-                <el-tab-pane :label="t('aiTools.agents.channelsTab')" name="channels">
-                    <ChannelsTab ref="channelsRef" :app-version="appVersion" />
+                <el-tab-pane
+                    v-if="agentType === 'openclaw' || agentType === 'hermes-agent'"
+                    :label="t('aiTools.agents.channelsTab')"
+                    name="channels"
+                >
+                    <ChannelsTab
+                        ref="channelsRef"
+                        :app-version="appVersion"
+                        :agent-type="agentType"
+                        :agent-name="agentName"
+                        :container-name="containerName"
+                        @open-terminal="handleOpenTerminal"
+                        @restart-required="handleRestartRequired"
+                    />
                 </el-tab-pane>
                 <el-tab-pane :label="t('aiTools.model.model')" name="model">
                     <ModelTab ref="modelRef" @updated="handleModelUpdated" />
                 </el-tab-pane>
-                <el-tab-pane :label="t('aiTools.agents.agentRoleTab')" name="agent">
+                <el-tab-pane v-if="agentType === 'openclaw'" :label="t('aiTools.agents.agentRoleTab')" name="agent">
                     <AgentTab ref="agentRef" />
                 </el-tab-pane>
-                <el-tab-pane :label="t('aiTools.agents.skillsTab')" name="skills">
+                <el-tab-pane v-if="agentType === 'openclaw'" :label="t('aiTools.agents.skillsTab')" name="skills">
                     <SkillsTab ref="skillsRef" :app-version="appVersion" />
                 </el-tab-pane>
-                <el-tab-pane :label="t('file.setting')" name="settings">
+                <el-tab-pane
+                    v-if="agentType === 'openclaw' || agentType === 'hermes-agent'"
+                    :label="t('file.setting')"
+                    name="settings"
+                >
                     <SettingsTab ref="settingsRef" />
                 </el-tab-pane>
             </el-tabs>
@@ -34,7 +50,7 @@ import SkillsTab from './tabs/skills.vue';
 import SettingsTab from './tabs/settings.vue';
 
 const { t } = useI18n();
-const emit = defineEmits(['updated']);
+const emit = defineEmits(['updated', 'open-terminal', 'restart-required']);
 const open = ref(false);
 const activeTab = ref('channels');
 const header = ref('');
@@ -43,7 +59,10 @@ const accountId = ref(0);
 const model = ref('');
 const appVersion = ref('');
 const configPath = ref('');
-const agentType = ref<'openclaw' | 'copaw'>('openclaw');
+const agentName = ref('');
+const containerName = ref('');
+const appInstallId = ref(0);
+const agentType = ref<AI.AgentType>('openclaw');
 const channelsRef = ref();
 const modelRef = ref();
 const agentRef = ref();
@@ -58,6 +77,7 @@ const loadSettings = async () => {
     await settingsRef.value?.load({
         agentId: agentId.value,
         appVersion: appVersion.value,
+        agentType: agentType.value,
     });
 };
 
@@ -68,6 +88,7 @@ const loadModel = async () => {
     await nextTick();
     await modelRef.value?.load({
         agentId: agentId.value,
+        agentType: agentType.value,
     });
 };
 
@@ -127,17 +148,41 @@ const handleModelUpdated = () => {
     emit('updated');
 };
 
+const handleOpenTerminal = (params: {
+    containerID: string;
+    title: string;
+    users: string[];
+    shell: string;
+    initCmd?: string;
+}) => {
+    emit('open-terminal', params);
+};
+
+const handleRestartRequired = () => {
+    if (!appInstallId.value) {
+        return;
+    }
+    emit('restart-required', appInstallId.value);
+};
+
 const openDrawer = async (agent: AI.AgentItem) => {
     agentId.value = agent.id;
+    appInstallId.value = agent.appInstallId;
+    agentName.value = agent.name;
     accountId.value = agent.accountId;
     model.value = agent.model;
     appVersion.value = agent.appVersion;
     configPath.value = agent.configPath;
+    containerName.value = agent.containerName;
     agentType.value = agent.agentType;
     header.value = `${agent.name} - ${t('menu.config')}`;
-    activeTab.value = 'channels';
+    activeTab.value = agent.agentType === 'openclaw' || agent.agentType === 'hermes-agent' ? 'channels' : 'model';
     open.value = true;
-    await loadChannels();
+    if (agent.agentType === 'openclaw' || agent.agentType === 'hermes-agent') {
+        await loadChannels();
+        return;
+    }
+    await loadModel();
 };
 
 defineExpose({
