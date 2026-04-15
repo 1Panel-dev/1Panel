@@ -447,7 +447,15 @@ func (a AgentService) GetModelConfig(req dto.AgentIDReq) (*dto.AgentModelConfig,
 		if err != nil {
 			return nil, err
 		}
-		model := cfg.Model.Default
+		account, err := agentAccountRepo.GetFirst(repo.WithByID(agent.AccountID))
+		if err != nil {
+			return nil, err
+		}
+		accountModels, err := loadAgentAccountModels(account)
+		if err != nil {
+			return nil, err
+		}
+		model := resolveHermesConfiguredModelID(account, accountModels, cfg.Model.Default)
 		if model == "" {
 			model = agent.Model
 		}

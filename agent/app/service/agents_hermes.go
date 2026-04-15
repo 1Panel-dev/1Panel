@@ -360,6 +360,23 @@ func resolveHermesModel(sourceProvider, targetProvider, modelName string) string
 	return target
 }
 
+func resolveHermesConfiguredModelID(account *model.AgentAccount, accountModels []dto.AgentAccountModel, configuredModel string) string {
+	if account == nil {
+		return ""
+	}
+	configuredModel = strings.TrimSpace(configuredModel)
+	if configuredModel == "" {
+		return ""
+	}
+	provider := resolveHermesProvider(account.Provider)
+	for _, item := range accountModels {
+		if resolveHermesModel(account.Provider, provider, item.ID) == configuredModel {
+			return item.ID
+		}
+	}
+	return ""
+}
+
 func resolveHermesEnvEntries(account *model.AgentAccount) []hermesEnvEntry {
 	if account == nil {
 		return nil

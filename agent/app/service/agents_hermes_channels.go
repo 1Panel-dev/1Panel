@@ -339,14 +339,6 @@ func writeHermesFeishuChannelConfig(confDir string, config dto.AgentFeishuConfig
 		return err
 	}
 	bot := firstHermesFeishuBot(config.Bots)
-	domain := config.Domain
-	if domain == "" {
-		domain = "feishu"
-	}
-	connectionMode := config.ConnectionMode
-	if connectionMode == "" {
-		connectionMode = "websocket"
-	}
 	if bot.AppID != "" {
 		envMap["FEISHU_APP_ID"] = bot.AppID
 	} else {
@@ -357,8 +349,8 @@ func writeHermesFeishuChannelConfig(confDir string, config dto.AgentFeishuConfig
 	} else {
 		delete(envMap, "FEISHU_APP_SECRET")
 	}
-	envMap["FEISHU_DOMAIN"] = domain
-	envMap["FEISHU_CONNECTION_MODE"] = connectionMode
+	envMap["FEISHU_DOMAIN"] = "feishu"
+	envMap["FEISHU_CONNECTION_MODE"] = "websocket"
 	envMap["FEISHU_GROUP_POLICY"] = config.GroupPolicy
 	delete(envMap, "FEISHU_ALLOW_ALL_USERS")
 	delete(envMap, "FEISHU_ALLOWED_USERS")

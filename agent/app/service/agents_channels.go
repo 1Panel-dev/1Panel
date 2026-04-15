@@ -55,8 +55,8 @@ func (a AgentService) UpdateFeishuConfig(req dto.AgentFeishuConfigUpdateReq) err
 			RequireMention: req.RequireMention,
 			GroupPolicy:    req.GroupPolicy,
 			GroupAllowFrom: req.GroupAllowFrom,
-			Domain:         req.Domain,
-			ConnectionMode: req.ConnectionMode,
+			Domain:         "feishu",
+			ConnectionMode: "websocket",
 			Bots:           req.Bots,
 		})
 	}
