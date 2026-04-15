@@ -29,6 +29,16 @@ export const jumpToInstall = (type: string, key: string) => {
                 },
             });
             return true;
+        case 'hermes-agent':
+            router.push({
+                path: '/ai/agents/agent',
+                query: {
+                    uncached: 'true',
+                    open: 'create',
+                    agentType: 'hermes-agent',
+                },
+            });
+            return true;
         case 'vllm':
             if (globalStore.isProductPro) {
                 router.push({

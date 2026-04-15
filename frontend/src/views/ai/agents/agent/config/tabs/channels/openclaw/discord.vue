@@ -47,7 +47,7 @@ import { AI } from '@/api/interface/ai';
 import { approveAgentChannelPairing, getAgentDiscordConfig, updateAgentDiscordConfig } from '@/api/modules/ai';
 import { MsgSuccess, MsgWarning } from '@/utils/message';
 import { Rules } from '@/global/form-rules';
-import ChannelBots from './components/channel-bots.vue';
+import ChannelBots from '../components/channel-bots.vue';
 
 const { t } = useI18n();
 type BotField = {
@@ -64,6 +64,8 @@ const formRef = ref<FormInstance>();
 const form = reactive<AI.AgentDiscordConfig>({
     enabled: true,
     dmPolicy: 'pairing',
+    allowFrom: [],
+    requireMention: false,
     groupPolicy: 'open',
     proxy: '',
     defaultAccount: '',
@@ -109,6 +111,8 @@ const load = async (id: number) => {
     const res = await getAgentDiscordConfig({ agentId: id });
     form.enabled = res.data?.enabled ?? true;
     form.dmPolicy = res.data?.dmPolicy || 'pairing';
+    form.allowFrom = res.data?.allowFrom || [];
+    form.requireMention = res.data?.requireMention || false;
     form.groupPolicy = res.data?.groupPolicy || 'open';
     form.proxy = res.data?.proxy || '';
     form.defaultAccount = res.data?.defaultAccount || '';
@@ -130,6 +134,8 @@ const saveChannel = async (action: 'delete' | 'save' = 'save') => {
             agentId: agentId.value,
             enabled: form.enabled,
             dmPolicy: form.dmPolicy || 'pairing',
+            allowFrom: [],
+            requireMention: form.groupPolicy === 'allowlist',
             groupPolicy: form.groupPolicy || 'open',
             proxy: form.proxy,
             defaultAccount: form.defaultAccount,

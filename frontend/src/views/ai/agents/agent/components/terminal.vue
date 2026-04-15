@@ -44,6 +44,7 @@ const form = reactive({
     users: [] as string[],
     user: '',
     shell: '',
+    initCmd: '',
     node: '',
 });
 
@@ -52,6 +53,7 @@ interface DialogProps {
     title: string;
     users: string[];
     shell: string;
+    initCmd?: string;
     node?: string;
 }
 
@@ -61,6 +63,7 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
     form.users = [...params.users];
     form.user = form.users[0];
     form.shell = params.shell;
+    form.initCmd = params.initCmd || '';
     form.node = params.node || currentNode.value;
     title.value = params.title;
     await reConnect();
@@ -77,7 +80,7 @@ const initTerm = async () => {
         endpoint: '/api/v2/containers/exec',
         args,
         error: '',
-        initCmd: '',
+        initCmd: form.initCmd,
     });
 };
 

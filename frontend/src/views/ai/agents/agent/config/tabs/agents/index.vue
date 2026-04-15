@@ -104,7 +104,7 @@ import DetailDrawer from './detail/index.vue';
 
 interface AgentRoleLoadParams {
     agentId: number;
-    agentType: 'openclaw' | 'copaw';
+    agentType: AI.AgentType;
     accountId: number;
     model: string;
     configPath: string;
@@ -116,7 +116,7 @@ const bindingRef = ref<InstanceType<typeof BindingDialog> | null>(null);
 const detailRef = ref<InstanceType<typeof DetailDrawer> | null>(null);
 const opRef = ref();
 const agentId = ref(0);
-const agentType = ref<'openclaw' | 'copaw'>('openclaw');
+const agentType = ref<AI.AgentType>('openclaw');
 const accountId = ref(0);
 const currentModel = ref('');
 const configuredAgents = ref<AI.AgentConfiguredAgentItem[]>([]);

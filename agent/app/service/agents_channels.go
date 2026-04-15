@@ -13,6 +13,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
+	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
@@ -23,7 +24,14 @@ type openclawPluginPackage struct {
 }
 
 func (a AgentService) GetFeishuConfig(req dto.AgentFeishuConfigReq) (*dto.AgentFeishuConfig, error) {
-	_, install, conf, err := a.loadAgentConfig(req.AgentID)
+	agent, install, err := a.loadAgentAndInstall(req.AgentID)
+	if err != nil {
+		return nil, err
+	}
+	if agent.AgentType == constant.AppHermesAgent {
+		return readHermesFeishuChannelConfig(path.Dir(agent.ConfigPath))
+	}
+	conf, err := readOpenclawConfig(agent.ConfigPath)
 	if err != nil {
 		return nil, err
 	}
@@ -34,6 +42,24 @@ func (a AgentService) GetFeishuConfig(req dto.AgentFeishuConfigReq) (*dto.AgentF
 }
 
 func (a AgentService) UpdateFeishuConfig(req dto.AgentFeishuConfigUpdateReq) error {
+	agent, _, err := a.loadAgentAndInstall(req.AgentID)
+	if err != nil {
+		return err
+	}
+	if agent.AgentType == constant.AppHermesAgent {
+		return writeHermesFeishuChannelConfig(path.Dir(agent.ConfigPath), dto.AgentFeishuConfig{
+			Enabled:        req.Enabled,
+			ThreadSession:  req.ThreadSession,
+			ReplyMode:      req.ReplyMode,
+			Streaming:      req.Streaming,
+			RequireMention: req.RequireMention,
+			GroupPolicy:    req.GroupPolicy,
+			GroupAllowFrom: req.GroupAllowFrom,
+			Domain:         req.Domain,
+			ConnectionMode: req.ConnectionMode,
+			Bots:           req.Bots,
+		})
+	}
 	return a.mutateAgentConfig(req.AgentID, func(_ *model.Agent, _ *model.AppInstall, conf map[string]interface{}) error {
 		config := dto.AgentFeishuConfig{
 			Enabled:        req.Enabled,
@@ -43,6 +69,8 @@ func (a AgentService) UpdateFeishuConfig(req dto.AgentFeishuConfigUpdateReq) err
 			RequireMention: req.RequireMention,
 			GroupPolicy:    req.GroupPolicy,
 			GroupAllowFrom: req.GroupAllowFrom,
+			Domain:         req.Domain,
+			ConnectionMode: req.ConnectionMode,
 			Bots:           req.Bots,
 		}
 		setFeishuConfig(conf, config)
@@ -52,7 +80,14 @@ func (a AgentService) UpdateFeishuConfig(req dto.AgentFeishuConfigUpdateReq) err
 }
 
 func (a AgentService) GetTelegramConfig(req dto.AgentTelegramConfigReq) (*dto.AgentTelegramConfig, error) {
-	_, _, conf, err := a.loadAgentConfig(req.AgentID)
+	agent, _, err := a.loadAgentAndInstall(req.AgentID)
+	if err != nil {
+		return nil, err
+	}
+	if agent.AgentType == constant.AppHermesAgent {
+		return readHermesTelegramChannelConfig(path.Dir(agent.ConfigPath))
+	}
+	conf, err := readOpenclawConfig(agent.ConfigPath)
 	if err != nil {
 		return nil, err
 	}
@@ -61,11 +96,30 @@ func (a AgentService) GetTelegramConfig(req dto.AgentTelegramConfigReq) (*dto.Ag
 }
 
 func (a AgentService) UpdateTelegramConfig(req dto.AgentTelegramConfigUpdateReq) error {
+	agent, _, err := a.loadAgentAndInstall(req.AgentID)
+	if err != nil {
+		return err
+	}
+	if agent.AgentType == constant.AppHermesAgent {
+		return writeHermesTelegramChannelConfig(path.Dir(agent.ConfigPath), dto.AgentTelegramConfig{
+			Enabled:        req.Enabled,
+			DmPolicy:       req.DmPolicy,
+			AllowFrom:      req.AllowFrom,
+			RequireMention: req.RequireMention,
+			GroupPolicy:    req.GroupPolicy,
+			GroupAllowFrom: req.GroupAllowFrom,
+			Proxy:          req.Proxy,
+			Streaming:      req.Streaming,
+			DefaultAccount: req.DefaultAccount,
+			Bots:           req.Bots,
+		})
+	}
 	return a.mutateAgentConfig(req.AgentID, func(_ *model.Agent, _ *model.AppInstall, conf map[string]interface{}) error {
 		setTelegramConfig(conf, dto.AgentTelegramConfig{
 			Enabled:        req.Enabled,
 			DmPolicy:       req.DmPolicy,
 			AllowFrom:      req.AllowFrom,
+			RequireMention: req.RequireMention,
 			GroupPolicy:    req.GroupPolicy,
 			GroupAllowFrom: req.GroupAllowFrom,
 			Proxy:          req.Proxy,
@@ -78,7 +132,14 @@ func (a AgentService) UpdateTelegramConfig(req dto.AgentTelegramConfigUpdateReq)
 }
 
 func (a AgentService) GetDiscordConfig(req dto.AgentIDReq) (*dto.AgentDiscordConfig, error) {
-	_, _, conf, err := a.loadAgentConfig(req.AgentID)
+	agent, _, err := a.loadAgentAndInstall(req.AgentID)
+	if err != nil {
+		return nil, err
+	}
+	if agent.AgentType == constant.AppHermesAgent {
+		return readHermesDiscordChannelConfig(path.Dir(agent.ConfigPath))
+	}
+	conf, err := readOpenclawConfig(agent.ConfigPath)
 	if err != nil {
 		return nil, err
 	}
@@ -87,10 +148,28 @@ func (a AgentService) GetDiscordConfig(req dto.AgentIDReq) (*dto.AgentDiscordCon
 }
 
 func (a AgentService) UpdateDiscordConfig(req dto.AgentDiscordConfigUpdateReq) error {
+	agent, _, err := a.loadAgentAndInstall(req.AgentID)
+	if err != nil {
+		return err
+	}
+	if agent.AgentType == constant.AppHermesAgent {
+		return writeHermesDiscordChannelConfig(path.Dir(agent.ConfigPath), dto.AgentDiscordConfig{
+			Enabled:        req.Enabled,
+			DmPolicy:       req.DmPolicy,
+			AllowFrom:      req.AllowFrom,
+			RequireMention: req.RequireMention,
+			GroupPolicy:    req.GroupPolicy,
+			Proxy:          req.Proxy,
+			DefaultAccount: req.DefaultAccount,
+			Bots:           req.Bots,
+		})
+	}
 	return a.mutateAgentConfig(req.AgentID, func(_ *model.Agent, _ *model.AppInstall, conf map[string]interface{}) error {
 		setDiscordConfig(conf, dto.AgentDiscordConfig{
 			Enabled:        req.Enabled,
 			DmPolicy:       req.DmPolicy,
+			AllowFrom:      req.AllowFrom,
+			RequireMention: req.RequireMention,
 			GroupPolicy:    req.GroupPolicy,
 			Proxy:          req.Proxy,
 			DefaultAccount: req.DefaultAccount,
@@ -101,7 +180,14 @@ func (a AgentService) UpdateDiscordConfig(req dto.AgentDiscordConfigUpdateReq) e
 }
 
 func (a AgentService) GetQQBotConfig(req dto.AgentIDReq) (*dto.AgentQQBotConfig, error) {
-	_, install, conf, err := a.loadAgentConfig(req.AgentID)
+	agent, install, err := a.loadAgentAndInstall(req.AgentID)
+	if err != nil {
+		return nil, err
+	}
+	if agent.AgentType == constant.AppHermesAgent {
+		return readHermesQQBotChannelConfig(path.Dir(agent.ConfigPath))
+	}
+	conf, err := readOpenclawConfig(agent.ConfigPath)
 	if err != nil {
 		return nil, err
 	}
@@ -112,6 +198,20 @@ func (a AgentService) GetQQBotConfig(req dto.AgentIDReq) (*dto.AgentQQBotConfig,
 }
 
 func (a AgentService) UpdateQQBotConfig(req dto.AgentQQBotConfigUpdateReq) error {
+	agent, _, err := a.loadAgentAndInstall(req.AgentID)
+	if err != nil {
+		return err
+	}
+	if agent.AgentType == constant.AppHermesAgent {
+		return writeHermesQQBotChannelConfig(path.Dir(agent.ConfigPath), dto.AgentQQBotConfig{
+			Enabled:        req.Enabled,
+			DmPolicy:       req.DmPolicy,
+			AllowFrom:      req.AllowFrom,
+			GroupPolicy:    req.GroupPolicy,
+			GroupAllowFrom: req.GroupAllowFrom,
+			Bots:           req.Bots,
+		})
+	}
 	return a.mutateAgentConfig(req.AgentID, func(_ *model.Agent, _ *model.AppInstall, conf map[string]interface{}) error {
 		setQQBotConfig(conf, dto.AgentQQBotConfig{
 			Enabled: req.Enabled,
@@ -122,7 +222,14 @@ func (a AgentService) UpdateQQBotConfig(req dto.AgentQQBotConfigUpdateReq) error
 }
 
 func (a AgentService) GetWecomConfig(req dto.AgentIDReq) (*dto.AgentWecomConfig, error) {
-	_, install, conf, err := a.loadAgentConfig(req.AgentID)
+	agent, install, err := a.loadAgentAndInstall(req.AgentID)
+	if err != nil {
+		return nil, err
+	}
+	if agent.AgentType == constant.AppHermesAgent {
+		return readHermesWecomChannelConfig(path.Dir(agent.ConfigPath))
+	}
+	conf, err := readOpenclawConfig(agent.ConfigPath)
 	if err != nil {
 		return nil, err
 	}
@@ -133,6 +240,21 @@ func (a AgentService) GetWecomConfig(req dto.AgentIDReq) (*dto.AgentWecomConfig,
 }
 
 func (a AgentService) UpdateWecomConfig(req dto.AgentWecomConfigUpdateReq) error {
+	agent, _, err := a.loadAgentAndInstall(req.AgentID)
+	if err != nil {
+		return err
+	}
+	if agent.AgentType == constant.AppHermesAgent {
+		return writeHermesWecomChannelConfig(path.Dir(agent.ConfigPath), dto.AgentWecomConfig{
+			Enabled:        req.Enabled,
+			DmPolicy:       req.DmPolicy,
+			AllowFrom:      req.AllowFrom,
+			GroupPolicy:    req.GroupPolicy,
+			GroupAllowFrom: req.GroupAllowFrom,
+			BotID:          req.BotID,
+			Secret:         req.Secret,
+		})
+	}
 	return a.mutateAgentConfig(req.AgentID, func(_ *model.Agent, _ *model.AppInstall, conf map[string]interface{}) error {
 		setWecomConfig(conf, dto.AgentWecomConfig{
 			Enabled:        req.Enabled,
@@ -148,7 +270,14 @@ func (a AgentService) UpdateWecomConfig(req dto.AgentWecomConfigUpdateReq) error
 }
 
 func (a AgentService) GetDingTalkConfig(req dto.AgentIDReq) (*dto.AgentDingTalkConfig, error) {
-	_, install, conf, err := a.loadAgentConfig(req.AgentID)
+	agent, install, err := a.loadAgentAndInstall(req.AgentID)
+	if err != nil {
+		return nil, err
+	}
+	if agent.AgentType == constant.AppHermesAgent {
+		return readHermesDingTalkChannelConfig(path.Dir(agent.ConfigPath))
+	}
+	conf, err := readOpenclawConfig(agent.ConfigPath)
 	if err != nil {
 		return nil, err
 	}
@@ -159,6 +288,20 @@ func (a AgentService) GetDingTalkConfig(req dto.AgentIDReq) (*dto.AgentDingTalkC
 }
 
 func (a AgentService) UpdateDingTalkConfig(req dto.AgentDingTalkConfigUpdateReq) error {
+	agent, _, err := a.loadAgentAndInstall(req.AgentID)
+	if err != nil {
+		return err
+	}
+	if agent.AgentType == constant.AppHermesAgent {
+		return writeHermesDingTalkChannelConfig(path.Dir(agent.ConfigPath), dto.AgentDingTalkConfig{
+			Enabled:        req.Enabled,
+			DmPolicy:       req.DmPolicy,
+			AllowFrom:      req.AllowFrom,
+			GroupPolicy:    req.GroupPolicy,
+			GroupAllowFrom: req.GroupAllowFrom,
+			Bots:           req.Bots,
+		})
+	}
 	return a.mutateAgentConfig(req.AgentID, func(_ *model.Agent, _ *model.AppInstall, conf map[string]interface{}) error {
 		setDingTalkConfig(conf, dto.AgentDingTalkConfig{
 			Enabled:                         req.Enabled,
@@ -299,7 +442,7 @@ func (a AgentService) UninstallPlugin(req dto.AgentPluginUninstallReq) error {
 }
 
 func (a AgentService) LoginWeixinChannel(req dto.AgentWeixinLoginReq) error {
-	_, install, err := a.loadAgentAndInstall(req.AgentID)
+	agent, install, err := a.loadAgentAndInstall(req.AgentID)
 	if err != nil {
 		return err
 	}
@@ -307,8 +450,11 @@ func (a AgentService) LoginWeixinChannel(req dto.AgentWeixinLoginReq) error {
 	if err != nil {
 		return err
 	}
-	loginTask.AddSubTask("Login OpenClaw Weixin channel", func(t *task.Task) error {
+	loginTask.AddSubTask("Login Weixin channel", func(t *task.Task) error {
 		mgr := cmd.NewCommandMgr(cmd.WithTask(*t), cmd.WithContext(t.TaskCtx), cmd.WithTimeout(30*time.Minute))
+		if agent.AgentType == constant.AppHermesAgent {
+			return buserr.New("ErrInvalidParams")
+		}
 		return mgr.RunBashCf("docker exec %s openclaw channels login --channel openclaw-weixin", install.ContainerName)
 	}, nil)
 	go func() {
@@ -354,9 +500,16 @@ func (a AgentService) CheckPlugin(req dto.AgentPluginCheckReq) (*dto.AgentPlugin
 }
 
 func (a AgentService) ApproveChannelPairing(req dto.AgentChannelPairingApproveReq) error {
-	_, install, err := a.loadAgentAndInstall(req.AgentID)
+	agent, install, err := a.loadAgentAndInstall(req.AgentID)
 	if err != nil {
 		return err
+	}
+	if agent.AgentType == constant.AppHermesAgent {
+		output, err := cmd.RunDefaultWithStdoutBashC(buildHermesPairingApproveCommand(install.ContainerName, req.Type, req.PairingCode))
+		if err != nil {
+			return err
+		}
+		return validateHermesPairingApproveOutput(output)
 	}
 	if req.AccountID != "" {
 		return cmd.RunDefaultBashCf(
@@ -552,6 +705,7 @@ func extractTelegramConfig(conf map[string]interface{}) dto.AgentTelegramConfig 
 		Enabled:        true,
 		DmPolicy:       "pairing",
 		AllowFrom:      []string{},
+		RequireMention: false,
 		GroupPolicy:    "open",
 		GroupAllowFrom: []string{},
 		Streaming:      "partial",
@@ -570,6 +724,7 @@ func extractTelegramConfig(conf map[string]interface{}) dto.AgentTelegramConfig 
 	if groupPolicy := extractStringValue(telegram["groupPolicy"]); groupPolicy != "" {
 		result.GroupPolicy = groupPolicy
 	}
+	result.RequireMention = result.GroupPolicy == "allowlist"
 	result.GroupAllowFrom = extractStringList(telegram["groupAllowFrom"])
 	result.Proxy = extractStringValue(telegram["proxy"])
 	if streaming := extractStringValue(telegram["streaming"]); streaming != "" {
@@ -618,6 +773,11 @@ func setTelegramConfig(conf map[string]interface{}, config dto.AgentTelegramConf
 	telegram["dmPolicy"] = config.DmPolicy
 	telegram["groupPolicy"] = config.GroupPolicy
 	telegram["defaultAccount"] = defaultAccount
+	if config.RequireMention {
+		telegram["groupPolicy"] = "allowlist"
+	} else if config.GroupPolicy == "allowlist" {
+		telegram["groupPolicy"] = "allowlist"
+	}
 	if config.DmPolicy == "open" {
 		telegram["allowFrom"] = []string{"*"}
 	} else if config.DmPolicy == "allowlist" {
@@ -656,7 +816,7 @@ func setTelegramConfig(conf map[string]interface{}, config dto.AgentTelegramConf
 }
 
 func extractDiscordConfig(conf map[string]interface{}) dto.AgentDiscordConfig {
-	result := dto.AgentDiscordConfig{Enabled: true, DmPolicy: "pairing", GroupPolicy: "open"}
+	result := dto.AgentDiscordConfig{Enabled: true, DmPolicy: "pairing", AllowFrom: []string{}, RequireMention: false, GroupPolicy: "open"}
 	discord := getChannelConfig(conf, "discord")
 	if len(discord) == 0 {
 		return result
@@ -674,6 +834,8 @@ func extractDiscordConfig(conf map[string]interface{}) dto.AgentDiscordConfig {
 	if groupPolicy := extractStringValue(discord["groupPolicy"]); groupPolicy != "" {
 		result.GroupPolicy = groupPolicy
 	}
+	result.RequireMention = result.GroupPolicy == "allowlist"
+	result.AllowFrom = extractStringList(discord["allowFrom"])
 	result.Proxy = extractStringValue(discord["proxy"])
 	accounts := childMap(discord, "accounts")
 	if len(accounts) == 0 {
@@ -712,8 +874,15 @@ func setDiscordConfig(conf map[string]interface{}, config dto.AgentDiscordConfig
 	discord["dmPolicy"] = config.DmPolicy
 	discord["groupPolicy"] = config.GroupPolicy
 	discord["defaultAccount"] = defaultAccount
+	if config.RequireMention {
+		discord["groupPolicy"] = "allowlist"
+	} else if config.GroupPolicy == "allowlist" {
+		discord["groupPolicy"] = "allowlist"
+	}
 	if config.DmPolicy == "open" {
 		discord["allowFrom"] = []string{"*"}
+	} else if config.DmPolicy == "allowlist" {
+		discord["allowFrom"] = append([]string(nil), config.AllowFrom...)
 	} else {
 		delete(discord, "allowFrom")
 	}

@@ -15,6 +15,14 @@ export const getAgentProviderDisplayName = (provider: string, displayName?: stri
     return displayName || provider;
 };
 
+export const supportsAgentModelConfig = (agentType: string): boolean => {
+    return agentType === 'openclaw' || agentType === 'hermes-agent';
+};
+
+export const supportsAgentToken = (agentType: string): boolean => {
+    return agentType === 'openclaw';
+};
+
 export const isOpenclawHTTPSWindowVersion = (version: string): boolean => {
     return compareVersion(version, openclawHTTPSVersion) && !compareVersion(version, openclawHTTPVersion);
 };

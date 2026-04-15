@@ -81,7 +81,7 @@ import { AI } from '@/api/interface/ai';
 import { approveAgentChannelPairing, getAgentTelegramConfig, updateAgentTelegramConfig } from '@/api/modules/ai';
 import { MsgSuccess, MsgWarning } from '@/utils/message';
 import { Rules } from '@/global/form-rules';
-import ChannelBots from './components/channel-bots.vue';
+import ChannelBots from '../components/channel-bots.vue';
 
 const { t } = useI18n();
 
@@ -110,6 +110,7 @@ const form = reactive<TelegramForm>({
     enabled: true,
     dmPolicy: 'pairing',
     allowFromText: '',
+    requireMention: false,
     groupPolicy: 'open',
     groupAllowFromText: '',
     proxy: '',
@@ -236,6 +237,7 @@ const load = async (id: number) => {
     form.enabled = res.data?.enabled ?? true;
     form.dmPolicy = res.data?.dmPolicy || 'pairing';
     form.allowFromText = (res.data?.allowFrom || []).join('\n');
+    form.requireMention = res.data?.requireMention || false;
     form.groupPolicy = res.data?.groupPolicy || 'open';
     form.groupAllowFromText = (res.data?.groupAllowFrom || []).join('\n');
     form.proxy = res.data?.proxy || '';
@@ -260,6 +262,7 @@ const saveChannel = async (action: 'delete' | 'save' = 'save') => {
             enabled: form.enabled,
             dmPolicy: form.dmPolicy || 'pairing',
             allowFrom: parseTextList(form.allowFromText),
+            requireMention: form.groupPolicy === 'allowlist',
             groupPolicy: form.groupPolicy || 'open',
             groupAllowFrom: parseTextList(form.groupAllowFromText),
             proxy: form.proxy,

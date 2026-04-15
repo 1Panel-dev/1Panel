@@ -106,10 +106,10 @@ import { getAgentDingTalkConfig, updateAgentDingTalkConfig } from '@/api/modules
 import { MsgSuccess, MsgWarning } from '@/utils/message';
 import { Rules } from '@/global/form-rules';
 import { isOpenclawCurrentHTTPVersion } from '@/utils/agent';
-import PluginInstall from './components/plugin-install.vue';
-import VersionSupport from '../components/version-support.vue';
+import PluginInstall from '../components/plugin-install.vue';
+import VersionSupport from '../../components/version-support.vue';
 import { useAgentPluginChannel } from './useAgentPluginChannel';
-import ChannelBots from './components/channel-bots.vue';
+import ChannelBots from '../components/channel-bots.vue';
 
 interface DingTalkForm extends Omit<AI.AgentDingTalkConfig, 'installed' | 'allowFrom' | 'groupAllowFrom'> {
     allowFromText: string;

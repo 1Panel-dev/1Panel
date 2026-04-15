@@ -11,7 +11,7 @@
             </el-select>
             <span class="input-help">{{ t('aiTools.agents.accountModelsHelper') }}</span>
         </el-form-item>
-        <el-form-item :label="t('aiTools.agents.fallbackModels')">
+        <el-form-item v-if="showFallbacks" :label="t('aiTools.agents.fallbackModels')">
             <div class="fallback-editor">
                 <div class="fallback-toolbar">
                     <el-select v-model="fallbackCandidate" filterable clearable class="fallback-select">
@@ -84,11 +84,14 @@ const { isIntl } = useGlobalStore();
 const blockedProviders = new Set(['ark-coding-plan', 'bailian-coding-plan']);
 
 const agentId = ref(0);
+const agentType = ref<AI.AgentType>('openclaw');
 const accountOptions = ref<AI.AgentAccountItem[]>([]);
 const modelOptions = ref<AI.AgentAccountModel[]>([]);
+const showFallbacks = computed(() => agentType.value === 'openclaw');
 
 interface AgentModelLoadParams {
     agentId: number;
+    agentType: AI.AgentType;
 }
 
 const form = reactive({
@@ -178,6 +181,7 @@ const load = async (params: AgentModelLoadParams) => {
     loading.value = true;
     try {
         agentId.value = params.agentId;
+        agentType.value = params.agentType;
         const [accountsRes, configRes] = await Promise.all([
             pageAgentAccounts({
                 page: 1,
@@ -202,7 +206,7 @@ const load = async (params: AgentModelLoadParams) => {
         form.accountId = currentAccount.id;
         setModelOptionsByAccount(currentAccount.id);
         ensureSelectedModel(config.model);
-        syncFallbacks(config.fallbacks || []);
+        syncFallbacks(showFallbacks.value ? config.fallbacks || [] : []);
     } finally {
         loading.value = false;
     }
@@ -219,7 +223,7 @@ const saveModel = async () => {
             agentId: agentId.value,
             accountId: form.accountId,
             model: form.model,
-            fallbacks: form.fallbacks,
+            fallbacks: showFallbacks.value ? form.fallbacks : [],
         });
         MsgSuccess(t('aiTools.agents.switchModelSuccess'));
         emit('updated');

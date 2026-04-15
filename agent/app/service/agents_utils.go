@@ -43,8 +43,8 @@ func loadOpenclawAgentByID(agentID uint) (*model.Agent, error) {
 	if err != nil {
 		return nil, err
 	}
-	if agent.AgentType == constant.AppCopaw {
-		return nil, fmt.Errorf("copaw does not support")
+	if agent.AgentType != constant.AppOpenclaw {
+		return nil, fmt.Errorf("%s does not support", agent.AgentType)
 	}
 	return agent, nil
 }

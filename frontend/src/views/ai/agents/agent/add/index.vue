@@ -12,6 +12,7 @@
                     <el-select v-model="form.agentType" @change="handleAgentTypeChange">
                         <el-option :label="$t('aiTools.agents.openclawType')" value="openclaw" />
                         <el-option :label="$t('aiTools.agents.copawType')" value="copaw" />
+                        <el-option :label="$t('aiTools.agents.hermesType')" value="hermes-agent" />
                     </el-select>
                 </el-form-item>
                 <el-form-item :label="$t('aiTools.agents.appVersion')" prop="appVersion">
@@ -36,7 +37,7 @@
                     />
                 </el-form-item>
             </el-card>
-            <el-card class="form-card" v-if="form.agentType === 'openclaw'">
+            <el-card class="form-card" v-if="showModelConfig">
                 <el-form-item :label="$t('aiTools.agents.provider')" prop="provider">
                     <el-select v-model="form.provider" @change="handleProviderChange">
                         <el-option
@@ -79,7 +80,7 @@
                 <el-form-item label="Base URL" v-if="form.accountId" prop="baseURL">
                     <el-input v-model="form.baseURL" disabled />
                 </el-form-item>
-                <el-form-item label="Token">
+                <el-form-item v-if="form.agentType === 'openclaw'" label="Token">
                     <el-input v-model="form.token" disabled>
                         <template #append>
                             <CopyButton :content="form.token" />
@@ -140,7 +141,7 @@ const { isIntl } = useGlobalStore();
 const form = reactive({
     name: '',
     remark: '',
-    agentType: 'openclaw' as 'openclaw' | 'copaw',
+    agentType: 'openclaw' as AI.AgentType,
     appVersion: '',
     webUIPort: 18789,
     allowedOrigins: '',
@@ -162,8 +163,18 @@ const form = reactive({
     dockerCompose: '',
 });
 
+const showModelConfig = computed(() => form.agentType === 'openclaw' || form.agentType === 'hermes-agent');
+
 const setDefaultWebUIPort = () => {
-    form.webUIPort = form.agentType === 'copaw' ? 8088 : 18789;
+    if (form.agentType === 'copaw') {
+        form.webUIPort = 8088;
+        return;
+    }
+    if (form.agentType === 'hermes-agent') {
+        form.webUIPort = 9119;
+        return;
+    }
+    form.webUIPort = 18789;
 };
 
 const rules = reactive({
@@ -224,12 +235,23 @@ const loadSystemIP = async () => {
     }
 };
 
-const loadVersions = async (appKey: 'openclaw' | 'copaw') => {
+const loadVersions = async (appKey: AI.AgentType) => {
     const res = await getAppByKey(appKey);
     appInfo.value = res.data;
     versions.value = res.data.versions || [];
     if (!form.appVersion && versions.value.length > 0) {
         form.appVersion = versions.value[0];
+    }
+};
+
+const getDefaultAgentName = (agentType: AI.AgentType) => {
+    switch (agentType) {
+        case 'copaw':
+            return 'QwenPaw';
+        case 'hermes-agent':
+            return 'Hermes-Agent';
+        default:
+            return 'OpenClaw';
     }
 };
 
@@ -242,7 +264,7 @@ const loadCompose = async () => {
 };
 
 const loadProviders = async () => {
-    if (form.agentType !== 'openclaw') {
+    if (!showModelConfig.value) {
         providerOptions.value = [];
         providerModels.value = {};
         return;
@@ -284,7 +306,7 @@ const loadProviderAccountCounts = async (providers: string[]) => {
 };
 
 const loadAccounts = async () => {
-    if (form.agentType !== 'openclaw') {
+    if (!showModelConfig.value) {
         accountOptions.value = [];
         return;
     }
@@ -311,7 +333,7 @@ const loadAccounts = async () => {
 };
 
 const handleProviderChange = () => {
-    if (form.agentType !== 'openclaw') {
+    if (!showModelConfig.value) {
         return;
     }
     form.model = '';
@@ -321,8 +343,14 @@ const handleProviderChange = () => {
 };
 
 const handleAgentTypeChange = async () => {
-    if (form.name === '' || form.name === 'OpenClaw' || form.name === 'CoPaw') {
-        form.name = form.agentType === 'copaw' ? 'CoPaw' : 'OpenClaw';
+    if (
+        form.name === '' ||
+        form.name === 'OpenClaw' ||
+        form.name === 'CoPaw' ||
+        form.name === 'QwenPaw' ||
+        form.name === 'Hermes-Agent'
+    ) {
+        form.name = getDefaultAgentName(form.agentType);
     }
     setDefaultWebUIPort();
     form.appVersion = '';
@@ -342,11 +370,19 @@ const handleAgentTypeChange = async () => {
     form.allowedOrigins = '';
     lastAutoAllowedOrigins.value = '';
     allowedOriginsAutoFilled.value = true;
-    await loadVersions('copaw');
+    await loadVersions(form.agentType);
+    if (showModelConfig.value) {
+        await loadProviders();
+        await loadAccounts();
+        return;
+    }
+    providerOptions.value = [];
+    providerModels.value = {};
+    accountOptions.value = [];
 };
 
 const handleAccountChange = () => {
-    if (form.agentType !== 'openclaw') {
+    if (!showModelConfig.value) {
         return;
     }
     const selected = accountOptions.value.find((item) => item.id === form.accountId);
@@ -360,7 +396,7 @@ const handleAccountChange = () => {
 };
 
 const setDefaultModel = () => {
-    if (form.agentType !== 'openclaw') {
+    if (!showModelConfig.value) {
         return;
     }
     const models = filteredModels.value;
@@ -394,8 +430,8 @@ const submit = async () => {
             webUIPort: form.webUIPort,
             allowedOrigins: form.agentType === 'openclaw' ? parseAllowedOriginsInput(form.allowedOrigins) : undefined,
             agentType: form.agentType,
-            model: form.agentType === 'openclaw' ? form.model : undefined,
-            accountId: form.agentType === 'openclaw' ? form.accountId : undefined,
+            model: showModelConfig.value ? form.model : undefined,
+            accountId: showModelConfig.value ? form.accountId : undefined,
             token: form.agentType === 'openclaw' ? form.token : undefined,
             taskID: taskID,
             advanced: form.advanced,
@@ -434,9 +470,10 @@ const handleClose = () => {
     allowedOriginsAutoFilled.value = true;
 };
 
-const openDrawer = async (agentType?: 'openclaw' | 'copaw') => {
-    const targetType = agentType === 'copaw' ? 'copaw' : 'openclaw';
-    form.name = targetType === 'copaw' ? 'CoPaw' : 'OpenClaw';
+const openDrawer = async (agentType?: AI.AgentType) => {
+    const targetType =
+        agentType === 'copaw' || agentType === 'hermes-agent' || agentType === 'openclaw' ? agentType : 'openclaw';
+    form.name = getDefaultAgentName(targetType);
     open.value = true;
     form.agentType = targetType;
     setDefaultWebUIPort();
@@ -451,6 +488,15 @@ const openDrawer = async (agentType?: 'openclaw' | 'copaw') => {
         accountOptions.value = [];
         return;
     }
+    if (form.agentType === 'hermes-agent') {
+        form.allowedOrigins = '';
+        lastAutoAllowedOrigins.value = '';
+        allowedOriginsAutoFilled.value = true;
+        await loadVersions('hermes-agent');
+        await loadProviders();
+        await loadAccounts();
+        return;
+    }
     await loadSystemIP();
     allowedOriginsAutoFilled.value = true;
     syncAllowedOriginsWithDefault(true);
@@ -460,7 +506,7 @@ const openDrawer = async (agentType?: 'openclaw' | 'copaw') => {
 };
 
 const openAccountCreate = () => {
-    if (form.agentType !== 'openclaw') {
+    if (!showModelConfig.value) {
         return;
     }
     if (accountAddRef.value?.open) {

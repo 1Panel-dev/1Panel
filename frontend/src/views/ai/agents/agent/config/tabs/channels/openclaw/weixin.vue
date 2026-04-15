@@ -33,8 +33,8 @@ import { loginAgentWeixinChannel } from '@/api/modules/ai';
 import { newUUID } from '@/utils/id';
 import TaskLog from '@/components/log/task/index.vue';
 import { isOpenclawCurrentHTTPVersion } from '@/utils/agent';
-import PluginInstall from './components/plugin-install.vue';
-import VersionSupport from '../components/version-support.vue';
+import PluginInstall from '../components/plugin-install.vue';
+import VersionSupport from '../../components/version-support.vue';
 import { useAgentPluginChannel } from './useAgentPluginChannel';
 
 const openclawMinSupportedVersion = '2026.3.23';

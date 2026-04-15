@@ -45,9 +45,9 @@ import { useI18n } from 'vue-i18n';
 import { AI } from '@/api/interface/ai';
 import { getAgentQQBotConfig, updateAgentQQBotConfig } from '@/api/modules/ai';
 import { MsgSuccess, MsgWarning } from '@/utils/message';
-import PluginInstall from './components/plugin-install.vue';
+import PluginInstall from '../components/plugin-install.vue';
 import { useAgentPluginChannel } from './useAgentPluginChannel';
-import ChannelBots from './components/channel-bots.vue';
+import ChannelBots from '../components/channel-bots.vue';
 
 type BotField = {
     prop: string;

@@ -94,7 +94,7 @@ import { AI } from '@/api/interface/ai';
 import { approveAgentChannelPairing, getAgentWecomConfig, updateAgentWecomConfig } from '@/api/modules/ai';
 import { MsgSuccess, MsgWarning } from '@/utils/message';
 import { Rules } from '@/global/form-rules';
-import PluginInstall from './components/plugin-install.vue';
+import PluginInstall from '../components/plugin-install.vue';
 import { useAgentPluginChannel } from './useAgentPluginChannel';
 
 interface WecomForm extends Omit<AI.AgentWecomConfig, 'installed' | 'allowFrom' | 'groupAllowFrom'> {
