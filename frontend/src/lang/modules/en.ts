@@ -643,8 +643,6 @@ const message = {
         redisCliHelper: '"redis-cli" not detected. Enable the service first.',
         redisQuickCmd: 'Redis quick commands',
         recoverHelper: 'This will overwrite data with [{0}]. Continue?',
-        mongodbRecoverModeHelper:
-            'By default, only existing collections are overwritten and newly added collections are kept. When enabled, the current database is cleared and then restored from the backup.',
         mongodbRecoverDropAllCollections: 'Clear current database before restore',
         mongodbRecoverDropAllCollectionsHelper:
             'By default, only existing collections are overwritten and newly added collections are kept. When enabled, the current database is cleared and then restored from the backup.',

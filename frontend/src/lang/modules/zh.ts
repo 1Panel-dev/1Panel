@@ -611,7 +611,6 @@ const message = {
         redisQuickCmd: 'Redis 快速命令',
 
         recoverHelper: '即将使用 [{0}] 对数据进行覆盖，是否继续?',
-        mongodbRecoverModeHelper: '默认仅覆盖已有集合，保留新增集合；开启后将清空当前数据库，并按备份内容恢复。',
         mongodbRecoverDropAllCollections: '恢复前清空当前数据库',
         mongodbRecoverDropAllCollectionsHelper:
             '默认仅覆盖已有集合，保留新增集合；开启后将清空当前数据库，并按备份内容恢复。',

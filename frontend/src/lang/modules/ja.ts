@@ -645,11 +645,9 @@ const message = {
         redisCliHelper: '「Redis-Cli」サービスは検出されません。最初にサービスを有効にします。',
         redisQuickCmd: 'Redis Quickコマンド',
         recoverHelper: 'これにより、[{0}]でデータが上書きされます。続けたいですか？',
-        mongodbRecoverModeHelper:
-            'By default, only existing collections are overwritten and newly added collections are kept. When enabled, the current database is cleared and then restored from the backup.',
-        mongodbRecoverDropAllCollections: 'Clear current database before restore',
+        mongodbRecoverDropAllCollections: '復元前に現在のデータベースを空にする',
         mongodbRecoverDropAllCollectionsHelper:
-            'By default, only existing collections are overwritten and newly added collections are kept. When enabled, the current database is cleared and then restored from the backup.',
+            '既定では既存のコレクションのみを上書きし、新しく追加されたコレクションは保持します。有効にすると、現在のデータベースを空にしてからバックアップ内容で復元します。',
         submitIt: 'データを上書きします',
         baseConf: '基本',
         allConf: '全て',

@@ -646,11 +646,9 @@ const message = {
         redisCliHelper: '"redis-cli" não foi detectado. Habilite o serviço primeiro.',
         redisQuickCmd: 'Comandos rápidos Redis',
         recoverHelper: 'Isso sobrescreverá os dados com [{0}]. Deseja continuar?',
-        mongodbRecoverModeHelper:
-            'By default, only existing collections are overwritten and newly added collections are kept. When enabled, the current database is cleared and then restored from the backup.',
-        mongodbRecoverDropAllCollections: 'Clear current database before restore',
+        mongodbRecoverDropAllCollections: 'Limpar o banco de dados atual antes da restauração',
         mongodbRecoverDropAllCollectionsHelper:
-            'By default, only existing collections are overwritten and newly added collections are kept. When enabled, the current database is cleared and then restored from the backup.',
+            'Por padrão, apenas as coleções existentes são sobrescritas e as coleções novas são mantidas. Quando ativado, o banco de dados atual é limpo e depois restaurado a partir do backup.',
         submitIt: 'Sobrescrever os dados',
         baseConf: 'Básico',
         allConf: 'Todos',

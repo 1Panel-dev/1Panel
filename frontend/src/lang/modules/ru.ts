@@ -641,11 +641,9 @@ const message = {
         redisCliHelper: 'Сервис "redis-cli" не обнаружен. Сначала включите сервис.',
         redisQuickCmd: 'Быстрые команды Redis',
         recoverHelper: 'Это перезапишет данные с [{0}]. Хотите продолжить?',
-        mongodbRecoverModeHelper:
-            'By default, only existing collections are overwritten and newly added collections are kept. When enabled, the current database is cleared and then restored from the backup.',
-        mongodbRecoverDropAllCollections: 'Clear current database before restore',
+        mongodbRecoverDropAllCollections: 'Очистить текущую базу данных перед восстановлением',
         mongodbRecoverDropAllCollectionsHelper:
-            'By default, only existing collections are overwritten and newly added collections are kept. When enabled, the current database is cleared and then restored from the backup.',
+            'По умолчанию перезаписываются только существующие коллекции, а новые коллекции сохраняются. При включении текущая база данных очищается, а затем восстанавливается из резервной копии.',
         submitIt: 'Перезаписать данные',
         baseConf: 'Базовая',
         allConf: 'Все',
