@@ -637,6 +637,11 @@ const message = {
         redisCliHelper: '"redis-cli" 서비스가 감지되지 않았습니다. 서비스를 먼저 활성화하십시오.',
         redisQuickCmd: 'Redis 빠른 명령',
         recoverHelper: '이 작업은 데이터를 [{0}]으로 덮어씁니다. 계속하시겠습니까?',
+        mongodbRecoverModeHelper:
+            'By default, only existing collections are overwritten and newly added collections are kept. When enabled, the current database is cleared and then restored from the backup.',
+        mongodbRecoverDropAllCollections: 'Clear current database before restore',
+        mongodbRecoverDropAllCollectionsHelper:
+            'By default, only existing collections are overwritten and newly added collections are kept. When enabled, the current database is cleared and then restored from the backup.',
         submitIt: '데이터 덮어쓰기',
         baseConf: '기본 설정',
         allConf: '모든 설정',

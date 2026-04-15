@@ -615,6 +615,11 @@ const message = {
         redisCliHelper: '未偵測到 redis-cli 服務，請先啟用服務',
         redisQuickCmd: 'Redis 快速指令',
         recoverHelper: '即將使用 [{0}] 對資料進行覆蓋，是否繼續？',
+        mongodbRecoverModeHelper:
+            'By default, only existing collections are overwritten and newly added collections are kept. When enabled, the current database is cleared and then restored from the backup.',
+        mongodbRecoverDropAllCollections: 'Clear current database before restore',
+        mongodbRecoverDropAllCollectionsHelper:
+            'By default, only existing collections are overwritten and newly added collections are kept. When enabled, the current database is cleared and then restored from the backup.',
         submitIt: '覆蓋資料',
         baseConf: '基本設定',
         allConf: '全部設定',

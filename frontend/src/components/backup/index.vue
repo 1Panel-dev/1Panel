@@ -123,6 +123,12 @@
             <el-form-item :label="$t('setting.compressPassword')">
                 <el-input v-model="secret" :placeholder="$t('setting.backupRecoverMessage')" />
             </el-form-item>
+            <el-form-item v-if="!isBackup && type === 'mongodb'">
+                <el-checkbox v-model="dropAllCollections">
+                    {{ $t('database.mongodbRecoverDropAllCollections') }}
+                </el-checkbox>
+                <span class="input-help">{{ $t('database.mongodbRecoverDropAllCollectionsHelper') }}</span>
+            </el-form-item>
             <el-form-item v-if="type === 'mysql' || type === 'mysql-cluster'" :label="$t('cronjob.backupArgs')">
                 <el-select v-model="args" filterable allow-create multiple>
                     <el-option v-for="item in mysqlArgs" :key="item.arg" :value="item.arg" :label="item.arg">
@@ -228,6 +234,7 @@ const timeoutItem = ref(30);
 const timeoutUnit = ref('m');
 const node = ref();
 const stopBefore = ref(false);
+const dropAllCollections = ref(false);
 
 const open = ref();
 const isBackup = ref();
@@ -366,6 +373,7 @@ const recover = async (row?: any) => {
         taskID: taskID,
         backupRecordID: row.id,
         timeout: timeoutItem.value === -1 ? -1 : transferTimeToSecond(timeoutItem.value + timeoutUnit.value),
+        dropAllCollections: type.value === 'mongodb' ? dropAllCollections.value : false,
     };
     loading.value = true;
     await handleRecover(params, node.value)
@@ -390,6 +398,7 @@ const onBackup = async () => {
 
 const onRecover = async (row: Backup.RecordInfo) => {
     secret.value = '';
+    dropAllCollections.value = false;
     isBackup.value = false;
     recordInfo.value = row;
     open.value = true;

@@ -652,6 +652,11 @@ const message = {
         redisCliHelper: '"redis-cli" perkhidmatan tidak dikesan. Aktifkan perkhidmatan terlebih dahulu.',
         redisQuickCmd: 'Arahan pantas Redis',
         recoverHelper: 'Ini akan menimpa data dengan [{0}]. Adakah anda mahu meneruskan?',
+        mongodbRecoverModeHelper:
+            'By default, only existing collections are overwritten and newly added collections are kept. When enabled, the current database is cleared and then restored from the backup.',
+        mongodbRecoverDropAllCollections: 'Clear current database before restore',
+        mongodbRecoverDropAllCollectionsHelper:
+            'By default, only existing collections are overwritten and newly added collections are kept. When enabled, the current database is cleared and then restored from the backup.',
         submitIt: 'Tindih data',
         baseConf: 'Asas',
         allConf: 'Semua',
