@@ -59,6 +59,7 @@ ErrAgentLimitReached: 'Community Edition では AI エージェントを最大 {
 ErrAgentWebsiteBound: 'このエージェントはすでにサイトに関連付けられています'
 ErrAgentWebsiteTypeUnsupported: '関連付けできるのはプロキシサイトまたは静的サイトのみです'
 ErrAgentWebsiteInUse: 'このサイトはすでに別のエージェントに関連付けられています'
+ErrAgentWebsiteUnbindUnsupported: 'ワンクリックデプロイのサイトは手動で関連解除できません'
 Localhost: 'ローカルマシン'
 ErrBackupInUsed: 'バックアップアカウントがスケジュールで使用中'
 ErrBackupCheck: '接続テストに失敗しました: {{ .err }}'

@@ -47,6 +47,7 @@ func (a *AIToolsRouter) InitRouter(Router *gin.RouterGroup) {
 		aiToolsRouter.POST("/agents/token/reset", baseApi.ResetAgentToken)
 		aiToolsRouter.POST("/agents/remark", baseApi.UpdateAgentRemark)
 		aiToolsRouter.POST("/agents/website/bind", baseApi.BindAgentWebsite)
+		aiToolsRouter.POST("/agents/website/unbind", baseApi.UnbindAgentWebsite)
 		aiToolsRouter.POST("/agents/model/get", baseApi.GetAgentModelConfig)
 		aiToolsRouter.POST("/agents/model/update", baseApi.UpdateAgentModelConfig)
 		aiToolsRouter.POST("/agents/hermes/chat/sessions", baseApi.GetHermesChatSessions)

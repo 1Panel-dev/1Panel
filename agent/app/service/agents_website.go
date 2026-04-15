@@ -48,6 +48,27 @@ func (a AgentService) BindWebsite(req dto.AgentWebsiteBindReq) error {
 	return ensureOpenclawWebsiteAllowedOrigin(agent, &website)
 }
 
+func (a AgentService) UnbindWebsite(req dto.AgentIDReq) error {
+	agent, err := agentRepo.GetFirst(repo.WithByID(req.AgentID))
+	if err != nil {
+		return err
+	}
+	if agent.WebsiteID == 0 {
+		return nil
+	}
+
+	website, err := websiteRepo.GetFirst(repo.WithByID(agent.WebsiteID))
+	if err != nil {
+		return err
+	}
+	if website.Type == constant.Deployment {
+		return buserr.New("ErrAgentWebsiteUnbindUnsupported")
+	}
+
+	agent.WebsiteID = 0
+	return agentRepo.Save(agent)
+}
+
 func hydrateAgentWebsiteItems(items []dto.AgentItem) error {
 	explicitWebsiteMap, err := loadAgentWebsiteMapByID(items)
 	if err != nil {
@@ -126,9 +147,11 @@ func fillAgentWebsiteItems(items []dto.AgentItem, explicitWebsiteMap map[uint]mo
 		if !ok {
 			items[index].WebsiteID = 0
 			items[index].WebsitePrimaryDomain = ""
+			items[index].WebsiteType = ""
 			items[index].WebsiteProtocol = ""
 			continue
 		}
+		items[index].WebsiteType = website.Type
 		items[index].WebsiteProtocol = website.Protocol
 		websiteDomains := websiteDomainMap[items[index].WebsiteID]
 		if len(websiteDomains) == 0 {

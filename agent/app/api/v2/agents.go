@@ -153,6 +153,26 @@ func (b *BaseApi) BindAgentWebsite(c *gin.Context) {
 }
 
 // @Tags AI
+// @Summary Unbind Agent website
+// @Accept json
+// @Param request body dto.AgentIDReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/website/unbind [post]
+func (b *BaseApi) UnbindAgentWebsite(c *gin.Context) {
+	var req dto.AgentIDReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := agentService.UnbindWebsite(req); err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags AI
 // @Summary Get Agent model config
 // @Accept json
 // @Param request body dto.AgentIDReq true "request"

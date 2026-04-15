@@ -122,6 +122,10 @@ export const bindAgentWebsite = (req: AI.AgentWebsiteBindReq) => {
     return http.post(`/ai/agents/website/bind`, req);
 };
 
+export const unbindAgentWebsite = (req: AI.AgentIDReq) => {
+    return http.post(`/ai/agents/website/unbind`, req);
+};
+
 export const getAgentModelConfig = (req: AI.AgentIDReq) => {
     return http.post<AI.AgentModelConfig>(`/ai/agents/model/get`, req);
 };

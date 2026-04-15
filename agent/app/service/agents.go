@@ -36,6 +36,7 @@ type IAgentService interface {
 	ResetToken(req dto.AgentTokenResetReq) error
 	UpdateRemark(req dto.AgentRemarkUpdateReq) error
 	BindWebsite(req dto.AgentWebsiteBindReq) error
+	UnbindWebsite(req dto.AgentIDReq) error
 	GetModelConfig(req dto.AgentIDReq) (*dto.AgentModelConfig, error)
 	UpdateModelConfig(req dto.AgentModelConfigUpdateReq) error
 	GetHermesChatSessions(req dto.AgentIDReq) ([]dto.AgentHermesChatSessionItem, error)

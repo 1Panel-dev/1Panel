@@ -59,6 +59,7 @@ ErrAgentLimitReached: 'Edisi Community menyokong sehingga {{ .max }} ejen AI. Na
 ErrAgentWebsiteBound: 'Ejen ini sudah dipautkan ke laman web'
 ErrAgentWebsiteTypeUnsupported: 'Hanya laman web proxy atau statik boleh dipautkan'
 ErrAgentWebsiteInUse: 'Laman web ini sudah dipautkan ke ejen lain'
+ErrAgentWebsiteUnbindUnsupported: 'Laman web one-click deployment tidak menyokong nyahikat manual'
 Localhost: 'Mesin Tempatan'
 ErrBackupInUsed: 'Akaun sandaran sedang digunakan oleh tugas'
 ErrBackupCheck: 'Ujian sambungan gagal: {{ .err }}'

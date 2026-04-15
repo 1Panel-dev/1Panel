@@ -46,6 +46,7 @@ type AgentItem struct {
 	AppInstallID         uint      `json:"appInstallId"`
 	WebsiteID            uint      `json:"websiteId"`
 	WebsitePrimaryDomain string    `json:"websitePrimaryDomain"`
+	WebsiteType          string    `json:"websiteType"`
 	WebsiteProtocol      string    `json:"websiteProtocol"`
 	AccountID            uint      `json:"accountId"`
 	AppVersion           string    `json:"appVersion"`
