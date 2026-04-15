@@ -94,7 +94,7 @@ import SitePath from './site-folder/index.vue';
 import Rewrite from './rewrite/index.vue';
 import Proxy from './proxy/index.vue';
 import AuthBasic from './auth-basic/index.vue';
-import AntiLeech from './anti-leech/index.vue';
+import AntiLeech from './anti-Leech/index.vue';
 import Redirect from './redirect/index.vue';
 import LoadBalance from './load-balance/index.vue';
 import PHP from './php/index.vue';
