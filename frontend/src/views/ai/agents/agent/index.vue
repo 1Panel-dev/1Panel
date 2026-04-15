@@ -126,6 +126,14 @@
                                     </table>
                                     <el-empty v-else :image-size="48" :description="$t('commons.msg.noneData')" />
                                 </el-popover>
+                                <el-button
+                                    v-if="canUnbindWebsite(row)"
+                                    link
+                                    type="primary"
+                                    @click="onUnbindWebsite(row)"
+                                >
+                                    {{ $t('commons.button.unbind') }}
+                                </el-button>
                             </div>
                             <el-button v-else link type="primary" @click="openBindWebsite(row)">
                                 {{ $t('commons.button.bind') }}
@@ -204,7 +212,7 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { deleteAgentCheck, pageAgents, resetAgentToken, updateAgentRemark } from '@/api/modules/ai';
+import { deleteAgentCheck, pageAgents, resetAgentToken, unbindAgentWebsite, updateAgentRemark } from '@/api/modules/ai';
 import { checkAppInstalled, installedOp, searchApp, searchAppInstalled } from '@/api/modules/app';
 import { AI } from '@/api/interface/ai';
 import { App } from '@/api/interface/app';
@@ -571,6 +579,28 @@ const openOverview = (row: AI.AgentItem) => {
 
 const openBindWebsite = (row: AI.AgentItem) => {
     bindWebsiteRef.value?.acceptParams(row);
+};
+
+const canUnbindWebsite = (row: AI.AgentItem) => {
+    return row.websiteType === 'proxy' || row.websiteType === 'static';
+};
+
+const onUnbindWebsite = async (row: AI.AgentItem) => {
+    await ElMessageBox.confirm(
+        i18n.global.t('aiTools.mcp.operatorHelper', [
+            i18n.global.t('menu.website'),
+            i18n.global.t('commons.button.unbind'),
+        ]),
+        i18n.global.t('commons.button.unbind'),
+        {
+            confirmButtonText: i18n.global.t('commons.button.confirm'),
+            cancelButtonText: i18n.global.t('commons.button.cancel'),
+            type: 'info',
+        },
+    );
+    await unbindAgentWebsite({ agentId: row.id });
+    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+    await search();
 };
 
 const loadOpenrestyHttpsPort = async () => {

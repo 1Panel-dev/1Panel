@@ -59,6 +59,7 @@ ErrAgentLimitReached: 'Community sürümü en fazla {{ .max }} AI ajanını dest
 ErrAgentWebsiteBound: 'Bu ajan zaten bir web sitesine bağlı'
 ErrAgentWebsiteTypeUnsupported: 'Yalnızca proxy veya statik web siteleri bağlanabilir'
 ErrAgentWebsiteInUse: 'Bu web sitesi zaten başka bir ajana bağlı'
+ErrAgentWebsiteUnbindUnsupported: 'Tek tıkla dağıtılan web sitelerinin bağlantısı manuel olarak kaldırılamaz'
 Localhost: 'Yerel Makine'
 ErrBackupInUsed: 'Yedek hesabı görevde kullanılıyor'
 ErrBackupCheck: 'Bağlantı testi başarısız: {{ .err }}'

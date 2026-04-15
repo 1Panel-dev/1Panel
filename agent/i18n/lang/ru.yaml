@@ -59,6 +59,7 @@ ErrAgentLimitReached: 'Community Edition поддерживает до {{ .max }
 ErrAgentWebsiteBound: 'Этот агент уже связан с сайтом'
 ErrAgentWebsiteTypeUnsupported: 'Можно связывать только proxy- или static-сайты'
 ErrAgentWebsiteInUse: 'Этот сайт уже связан с другим агентом'
+ErrAgentWebsiteUnbindUnsupported: 'Сайты one-click deployment нельзя отвязать вручную'
 Localhost: 'Локальная машина'
 ErrBackupInUsed: 'Аккаунт бэкапа занят задачей'
 ErrBackupCheck: 'Проверка подключения не удалась: {{ .err }}'

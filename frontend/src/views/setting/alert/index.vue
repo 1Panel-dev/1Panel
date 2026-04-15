@@ -1,18 +1,35 @@
 <template>
     <div>
-        <el-card class="router_card p-2 sm:p-3 mt-2">
-            <div class="flex w-full justify-start items-center">
-                <el-button type="primary" :plain="index !== '0'" @click="changeTab('0')">
-                    {{ $t('xpack.alert.list') }}
-                </el-button>
-                <el-button type="primary" :plain="index !== '1'" @click="changeTab('1')">
-                    {{ $t('xpack.alert.logs') }}
-                </el-button>
-                <el-button type="primary" :plain="index !== '2'" @click="changeTab('2')">
-                    {{ $t('commons.button.set') }}
-                </el-button>
-            </div>
-        </el-card>
+        <div class="content-container__search">
+            <el-card>
+                <div>
+                    <el-button
+                        class="tag-button"
+                        :class="index === '0' ? '' : 'no-active'"
+                        :type="index === '0' ? 'primary' : ''"
+                        @click="changeTab('0')"
+                    >
+                        {{ $t('xpack.alert.list') }}
+                    </el-button>
+                    <el-button
+                        class="tag-button"
+                        :class="index === '1' ? '' : 'no-active'"
+                        :type="index === '1' ? 'primary' : ''"
+                        @click="changeTab('1')"
+                    >
+                        {{ $t('xpack.alert.logs') }}
+                    </el-button>
+                    <el-button
+                        class="tag-button"
+                        :class="index === '2' ? '' : 'no-active'"
+                        :type="index === '2' ? 'primary' : ''"
+                        @click="changeTab('2')"
+                    >
+                        {{ $t('commons.button.set') }}
+                    </el-button>
+                </div>
+            </el-card>
+        </div>
         <AlertDash v-if="index == '0'" />
         <AlertLogs v-if="index == '1'" />
         <AlertSetting v-if="index == '2'" />
@@ -37,3 +54,20 @@ onMounted(async () => {
     }
 });
 </script>
+
+<style scoped lang="scss">
+.content-container__search {
+    margin-top: 7px;
+
+    :deep(.el-card) {
+        --el-card-padding: 12px;
+    }
+}
+
+.tag-button {
+    &.no-active {
+        background: none;
+        border: none;
+    }
+}
+</style>

@@ -59,6 +59,7 @@ ErrAgentLimitReached: 'A edição Community suporta até {{ .max }} agentes de I
 ErrAgentWebsiteBound: 'Este agente já está vinculado a um site'
 ErrAgentWebsiteTypeUnsupported: 'Somente sites proxy ou estáticos podem ser vinculados'
 ErrAgentWebsiteInUse: 'Este site já está vinculado a outro agente'
+ErrAgentWebsiteUnbindUnsupported: 'Sites implantados em um clique não podem ser desvinculados manualmente'
 Localhost: 'Máquina Local'
 ErrBackupInUsed: 'Conta de backup em uso por tarefa'
 ErrBackupCheck: 'Teste de conexão falhou: {{ .err }}'

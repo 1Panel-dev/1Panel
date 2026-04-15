@@ -282,6 +282,7 @@ export namespace AI {
         appInstallId: number;
         websiteId: number;
         websitePrimaryDomain: string;
+        websiteType: string;
         websiteProtocol: string;
         accountId: number;
         appVersion: string;

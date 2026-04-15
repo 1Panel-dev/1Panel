@@ -64,6 +64,7 @@ ErrAgentLimitReached: "社区版最多支持创建 {{ .max }} 个智能体，升
 ErrAgentWebsiteBound: "该智能体已关联网站"
 ErrAgentWebsiteTypeUnsupported: "只能关联反向代理或静态网站"
 ErrAgentWebsiteInUse: "该网站已被其他智能体关联"
+ErrAgentWebsiteUnbindUnsupported: "一键部署网站不支持手动解绑"
 
 #backup
 Localhost: '本机'
