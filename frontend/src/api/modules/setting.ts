@@ -85,6 +85,12 @@ export const getAgentFileManageAIInfo = () => {
 export const updateAgentFileManageAIInfo = (param: Setting.FileManageAIInfo) => {
     return http.post(`/settings/files/ai/update`, param);
 };
+export const getAgentFileHistoryInfo = () => {
+    return http.post<Setting.FileHistoryInfo>(`/settings/file-history/search`);
+};
+export const updateAgentFileHistoryInfo = (param: Setting.FileHistoryInfo) => {
+    return http.post(`/settings/file-history/update`, param);
+};
 export const getAgentSettingByKey = (key: string) => {
     return http.get<string>(`/settings/get/${key}`);
 };

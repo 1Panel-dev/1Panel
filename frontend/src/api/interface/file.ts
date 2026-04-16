@@ -151,6 +151,39 @@ export namespace File {
         content: string;
     }
 
+    export interface FileHistorySearchReq {
+        page: number;
+        pageSize: number;
+        path: string;
+        scope: 'current' | 'all';
+        operation?: string;
+    }
+
+    export interface FileHistoryInfo {
+        id: number;
+        fileId?: string;
+        path: string;
+        currentPath?: string;
+        previousId?: number;
+        sourcePath?: string;
+        targetPath?: string;
+        fileName: string;
+        extension: string;
+        fileMode?: string;
+        operation: string;
+        deleted?: boolean;
+        contentSize: number;
+        contentSHA: string;
+        storagePath?: string;
+        content?: string;
+        createdAt: string;
+        updatedAt: string;
+    }
+
+    export interface FileHistoryDeleteReq {
+        ids: number[];
+    }
+
     export interface FileRename {
         oldName: string;
         newName: string;

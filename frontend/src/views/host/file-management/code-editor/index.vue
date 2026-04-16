@@ -304,6 +304,11 @@
                         </template>
                     </el-dropdown>
                     <el-divider direction="vertical" class="!h-6" />
+                    <el-text class="cursor-pointer inline-flex items-center gap-1" @click="openHistoryDrawer">
+                        <span>{{ $t('file.history') }}</span>
+                        <span class="text-xs text-gray-500">({{ historyVersionCount }})</span>
+                    </el-text>
+                    <el-divider direction="vertical" class="!h-6" />
                     <el-dropdown trigger="click" max-height="300" placement="top" @command="changeLanguage">
                         <span class="el-dropdown-link">
                             {{
@@ -383,10 +388,18 @@
             </div>
         </template>
     </DialogPro>
+    <FileHistoryDrawer ref="historyDrawerRef" @restored="handleHistoryRestored" />
 </template>
 
 <script lang="ts" setup>
-import { batchCheckFiles, createFile, getFileContent, getFilesTree, saveFileContent } from '@/api/modules/files';
+import {
+    batchCheckFiles,
+    createFile,
+    getFileContent,
+    getFilesTree,
+    saveFileContent,
+    searchFileHistory,
+} from '@/api/modules/files';
 import i18n from '@/lang';
 import { MsgError, MsgSuccess, MsgWarning } from '@/utils/message';
 import { loadMonacoLanguageSupport, setupMonacoEnvironment } from '@/utils/monaco';
@@ -399,18 +412,19 @@ import { ResultData } from '@/api/interface';
 import { File } from '@/api/interface/file';
 import { getIcon } from '@/utils/file';
 import { newUUID } from '@/utils/id';
-import { TreeKey, TreeNodeData } from 'element-plus/es/components/tree-v2/src/types';
+import { TreeNodeData } from 'element-plus/es/components/tree-v2/src/types';
 import { DArrowLeft, DArrowRight, Refresh, Top } from '@element-plus/icons-vue';
 import { loadBaseDir } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
 import CodeTabs from './tabs/index.vue';
+import FileHistoryDrawer from './history/index.vue';
 import noUpdateImage from '@/assets/images/no_update_app.svg';
 
 type MonacoEditorApi = typeof import('monaco-editor/esm/vs/editor/editor.api');
 
 let monacoApi: MonacoEditorApi | null = null;
 let monacoThemeInitialized = false;
-let editor: MonacoEditorApi['editor']['IStandaloneCodeEditor'] | undefined;
+let editor: ReturnType<MonacoEditorApi['editor']['create']> | undefined;
 
 const eolLf = ref(0);
 const eolCrlf = ref(1);
@@ -472,17 +486,6 @@ interface EditorConfig {
     eol: number;
     wordWrap: WordWrapOptions;
     minimap: boolean;
-}
-
-interface TreeNode {
-    key: TreeKey;
-    level: number;
-    parent?: TreeNode;
-    children?: File.FileTree[];
-    data: TreeNodeData;
-    disabled?: boolean;
-    name?: string;
-    isLeaf?: boolean;
 }
 
 const pendingInitialLine = ref(0);
@@ -549,7 +552,9 @@ const oldFileContent = ref('');
 const dialogHeader = ref(null);
 const dialogForm = ref(null);
 const dialogFooter = ref(null);
+const historyDrawerRef = ref();
 const currentPath = ref();
+const historyVersionCount = ref(0);
 const rowRefs = ref();
 const isCreate = ref('none');
 const newFolder = ref();
@@ -961,6 +966,46 @@ const quickSave = () => {
     saveContent();
 };
 
+const openHistoryDrawer = () => {
+    if (!form.value.path) {
+        MsgWarning(i18n.global.t('file.historyNeedFile'));
+        return;
+    }
+    if (!historyDrawerRef.value) {
+        return;
+    }
+    historyDrawerRef.value.acceptParams({
+        path: form.value.path,
+        content: form.value.content,
+        language: config.language,
+        extension: fileExtension.value,
+        dirty: isEdit.value,
+    });
+};
+
+const loadHistoryVersionCount = async (path: string) => {
+    if (!path) {
+        historyVersionCount.value = 0;
+        return;
+    }
+
+    try {
+        const res = await searchFileHistory({
+            page: 1,
+            pageSize: 1,
+            path,
+            scope: 'current',
+        });
+        if (form.value.path === path) {
+            historyVersionCount.value = res.data?.total || 0;
+        }
+    } catch {
+        if (form.value.path === path) {
+            historyVersionCount.value = 0;
+        }
+    }
+};
+
 const saveContent = async () => {
     if (isEdit.value) {
         loading.value = true;
@@ -969,6 +1014,7 @@ const saveContent = async () => {
             if (res) {
                 isEdit.value = false;
                 oldFileContent.value = form.value.content;
+                await loadHistoryVersionCount(form.value.path);
                 MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
             } else {
                 MsgError(i18n.global.t('commons.status.failed'));
@@ -989,6 +1035,7 @@ const acceptParams = async (props: EditProps) => {
     form.value.content = props.content;
     oldFileContent.value = props.content;
     form.value.path = props.path;
+    historyVersionCount.value = 0;
     currentPath.value = getDirectoryPath(props.path);
     directoryPath.value = getDirectoryPath(props.path);
     fileExtension.value = props.extension;
@@ -1019,6 +1066,7 @@ const acceptParams = async (props: EditProps) => {
     config.minimap = localStorage.getItem(minimapKey) !== null ? localStorage.getItem(minimapKey) === 'true' : true;
     open.value = true;
     saveTabsToStorage();
+    loadHistoryVersionCount(props.path);
     nextTick(() => {
         if (editor) {
             editor.setValue(form.value.content);
@@ -1092,8 +1140,8 @@ const getRefresh = (path: string) => {
     }
 };
 
-const getContent = (path: string, extension: string) => {
-    if (form.value.path === path || isCreate.value == 'file') {
+const getContent = (path: string, extension: string, forceReload = false) => {
+    if (!forceReload && (form.value.path === path || isCreate.value == 'file')) {
         return;
     }
     const existsInTabs = fileTabs.value.some((tab) => tab.path === path);
@@ -1141,6 +1189,7 @@ const getContent = (path: string, extension: string) => {
                 }
                 saveTabsToStorage();
                 selectTab.value = res.data.path;
+                loadHistoryVersionCount(res.data.path);
             })
             .catch(() => {});
     };
@@ -1161,6 +1210,13 @@ const getContent = (path: string, extension: string) => {
             .finally(() => {});
     } else {
         fetchFileContent();
+    }
+};
+
+const handleHistoryRestored = (path: string) => {
+    if (path === form.value.path) {
+        getContent(path, '', true);
+        loadHistoryVersionCount(path);
     }
 };
 
@@ -1220,7 +1276,7 @@ const treeProps = {
     children: 'children',
 };
 
-const handleNodeCollapse = (data: TreeNodeData, node: TreeNode) => {
+const handleNodeCollapse = (data: TreeNodeData, node: any) => {
     isCreate.value = 'none';
     expandedNodeIds.value.delete(data.id);
 
@@ -1239,7 +1295,7 @@ const handleNodeCollapse = (data: TreeNodeData, node: TreeNode) => {
     }
 };
 
-const handleNodeExpand = async (data: TreeNodeData, node: TreeNode) => {
+const handleNodeExpand = (data: TreeNodeData, node: any) => {
     if (node.data.id == 'new-dir' || node.data.id == 'new-file') {
         return;
     }
@@ -1251,18 +1307,19 @@ const handleNodeExpand = async (data: TreeNodeData, node: TreeNode) => {
         selectedParentNode.value = node;
         expandedNodeIds.value.add(node.data.id);
     }
-    try {
-        const response = await search(data.path);
-        const newTreeData = JSON.parse(JSON.stringify(treeData.value));
-        if (response.data.length > 0 && response.data[0].children) {
-            node.children = response.data[0].children;
-            loadedNodes.value.add(node.data.path);
-            updateNodeChildren(newTreeData, node.data.path, response.data[0].children);
-        } else {
-            node.children = [];
-        }
-        treeData.value = newTreeData;
-    } catch (error) {}
+    search(data.path)
+        .then((response) => {
+            const newTreeData = JSON.parse(JSON.stringify(treeData.value));
+            if (response.data.length > 0 && response.data[0].children) {
+                node.children = response.data[0].children;
+                loadedNodes.value.add(node.data.path);
+                updateNodeChildren(newTreeData, node.data.path, response.data[0].children);
+            } else {
+                node.children = [];
+            }
+            treeData.value = newTreeData;
+        })
+        .catch(() => {});
 };
 
 const updateNodeChildren = (nodes: any[], path: any, newChildren: File.FileTree[]) => {

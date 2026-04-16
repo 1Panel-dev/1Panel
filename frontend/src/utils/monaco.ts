@@ -13,7 +13,9 @@ export function setupMonacoEnvironment() {
     }
     initialized = true;
 
-    self.MonacoEnvironment = {
+    (
+        self as typeof self & { MonacoEnvironment?: { getWorker: (_: string, label: string) => Worker } }
+    ).MonacoEnvironment = {
         getWorker(_: string, label: string) {
             if (label === 'json') {
                 return new jsonWorker();

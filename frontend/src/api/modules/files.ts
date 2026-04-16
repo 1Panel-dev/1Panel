@@ -66,6 +66,22 @@ export const saveFileContent = (params: File.FileEdit) => {
     return http.post<File.File>('files/save', params);
 };
 
+export const searchFileHistory = (params: File.FileHistorySearchReq) => {
+    return http.post<ResPage<File.FileHistoryInfo>>('files/history/search', params);
+};
+
+export const getFileHistoryContent = (id: number) => {
+    return http.post<File.FileHistoryInfo>('files/history/content', { id });
+};
+
+export const deleteFileHistory = (ids: number[]) => {
+    return http.post('files/history/del', { ids: Array.from(ids) });
+};
+
+export const restoreFileHistory = (id: number) => {
+    return http.post<File.File>('files/history/restore', { id });
+};
+
 export const checkFile = (path: string, withInit: boolean) => {
     return http.post<boolean>('files/check', { path: path, withInit: withInit });
 };

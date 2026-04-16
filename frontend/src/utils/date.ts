@@ -84,6 +84,22 @@ export function dateFormatSimple(dataStr: any) {
     return `${String(y)}-${String(m)}-${String(d)}`;
 }
 
+export function dateFormatSimpleWithSecond(dataStr: any) {
+    const date = new Date(dataStr);
+    const y = date.getFullYear();
+    let m: string | number = date.getMonth() + 1;
+    m = m < 10 ? `0${String(m)}` : m;
+    let d: string | number = date.getDate();
+    d = d < 10 ? `0${String(d)}` : d;
+    let h: string | number = date.getHours();
+    h = h < 10 ? `0${String(h)}` : h;
+    let minute: string | number = date.getMinutes();
+    minute = minute < 10 ? `0${String(minute)}` : minute;
+    let second: string | number = date.getSeconds();
+    second = second < 10 ? `0${String(second)}` : second;
+    return `${String(y)}-${String(m)}-${String(d)} ${String(h)}:${String(minute)}:${String(second)}`;
+}
+
 export function dateFormatForName(dataStr: any) {
     const date = new Date(dataStr);
     const y = date.getFullYear();

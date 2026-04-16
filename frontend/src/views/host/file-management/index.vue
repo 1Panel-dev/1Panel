@@ -312,8 +312,28 @@
                                         </el-table>
                                     </div>
                                 </el-popover>
-                                <el-button class="btn" @click="openShareList">
-                                    {{ $t('file.shareList') }}
+
+                                <el-button class="file-tool">
+                                    <el-dropdown>
+                                        <template #default>
+                                            <el-button
+                                                link
+                                                class="!w-full !h-full p-2 focus-visible:!outline-none cursor-pointer transition-colors"
+                                            >
+                                                {{ $t('file.fileTools') }}
+                                            </el-button>
+                                        </template>
+                                        <template #dropdown>
+                                            <el-dropdown-menu>
+                                                <el-dropdown-item @click="openShareList">
+                                                    {{ $t('file.shareList') }}
+                                                </el-dropdown-item>
+                                                <el-dropdown-item @click="openFileHistoryCenter">
+                                                    {{ $t('file.history') }}
+                                                </el-dropdown-item>
+                                            </el-dropdown-menu>
+                                        </template>
+                                    </el-dropdown>
                                 </el-button>
                                 <el-button class="btn" @click="calculateSize(req.path)" :loading="disableBtn">
                                     {{ $t('file.calculate') }}
@@ -655,6 +675,7 @@
         <RecycleBin ref="recycleBinRef" @close="search" />
         <Favorite ref="favoriteRef" @close="search" @jump="jump" @to-favorite="toFavorite" />
         <ShareList ref="shareListRef" @close="search" @detail="openShareDetail" />
+        <FileHistoryDrawer ref="historyDrawerRef" @restored="search" />
         <BatchRole ref="batchRoleRef" @close="search" />
         <VscodeOpenDialog ref="dialogVscodeOpenRef" />
         <Preview ref="previewRef" />
@@ -723,6 +744,7 @@ import Detail from './detail/index.vue';
 import RecycleBin from './recycle-bin/index.vue';
 import Favorite from './favorite/index.vue';
 import ShareList from './share-list/index.vue';
+import FileHistoryDrawer from './code-editor/history/index.vue';
 import BatchRole from './batch-role/index.vue';
 import Preview from './preview/index.vue';
 import TextPreview from './text-preview/index.vue';
@@ -859,6 +881,7 @@ const deleteRef = ref();
 const recycleBinRef = ref();
 const favoriteRef = ref();
 const shareListRef = ref();
+const historyDrawerRef = ref<InstanceType<typeof FileHistoryDrawer> | null>(null);
 const hoveredRowPath = ref(null);
 const favorites = ref([]);
 const batchRoleRef = ref();
@@ -1631,6 +1654,17 @@ const openShareList = () => {
     shareListRef.value.acceptParams();
 };
 
+const openFileHistoryCenter = () => {
+    historyDrawerRef.value?.acceptParams({
+        path: '',
+        content: '',
+        language: 'plaintext',
+        extension: '',
+        dirty: false,
+        scope: 'all',
+    });
+};
+
 const changeSort = ({ prop, order }) => {
     req.sortBy = prop;
     req.sortOrder = order;
@@ -2302,5 +2336,17 @@ onBeforeUnmount(() => {
 }
 :deep(.file-tabs .el-tabs--card .el-tabs__header .el-tabs__nav) {
     border-bottom: none !important;
+}
+:deep(.file-tool) {
+    padding: 0 !important;
+    .el-button.is-link {
+        padding: 8px 15px !important;
+    }
+}
+.file-tool:hover {
+    color: var(--el-color-primary) !important;
+    .el-button {
+        color: var(--el-color-primary) !important;
+    }
 }
 </style>

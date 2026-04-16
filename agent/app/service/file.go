@@ -2,6 +2,7 @@ package service
 
 import (
 	"bufio"
+	"bytes"
 	"context"
 	"encoding/base64"
 	"encoding/json"
@@ -282,16 +283,34 @@ func (f *FileService) Delete(op request.FileDelete) error {
 	if recycleBinStatus.Value == "Disable" {
 		op.ForceDelete = true
 	}
+	var historyTargets []string
 	if op.ForceDelete {
-		if op.IsDir {
-			return fo.DeleteDir(op.Path)
-		} else {
-			return fo.DeleteFile(op.Path)
+		var err error
+		historyTargets, err = f.collectPermanentDeleteTargets(op.Path, op.IsDir)
+		if err != nil {
+			return err
 		}
+	}
+	if op.ForceDelete {
+		var err error
+		if op.IsDir {
+			err = fo.DeleteDir(op.Path)
+		} else {
+			err = fo.DeleteFile(op.Path)
+		}
+		if err != nil {
+			return err
+		}
+		f.cleanupPermanentDeleteHistory(historyTargets)
+		return nil
 	}
 	info, _ := fo.Fs.Stat(op.Path)
 	if info == nil || files.IsSymlink(info.Mode()) {
-		return os.Remove(op.Path)
+		if err := os.Remove(op.Path); err != nil {
+			return err
+		}
+		f.cleanupPermanentDeleteHistory([]string{op.Path})
+		return nil
 	}
 
 	if err := NewIRecycleBinService().Create(request.RecycleBinCreate{SourcePath: op.Path}); err != nil {
@@ -304,15 +323,21 @@ func (f *FileService) BatchDelete(op request.FileBatchDelete) error {
 	fo := files.NewFileOp()
 	if op.IsDir {
 		for _, file := range op.Paths {
+			targets, err := f.collectPermanentDeleteTargets(file, true)
+			if err != nil {
+				return err
+			}
 			if err := fo.DeleteDir(file); err != nil {
 				return err
 			}
+			f.cleanupPermanentDeleteHistory(targets)
 		}
 	} else {
 		for _, file := range op.Paths {
 			if err := fo.DeleteFile(file); err != nil {
 				return err
 			}
+			f.cleanupPermanentDeleteHistory([]string{file})
 		}
 	}
 	return nil
@@ -320,7 +345,10 @@ func (f *FileService) BatchDelete(op request.FileBatchDelete) error {
 
 func (f *FileService) ChangeMode(op request.FileCreate) error {
 	fo := files.NewFileOp()
-	return fo.ChmodR(op.Path, op.Mode, op.Sub)
+	if err := fo.ChmodR(op.Path, op.Mode, op.Sub); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (f *FileService) BatchChangeModeAndOwner(op request.FileRoleReq) error {
@@ -339,9 +367,44 @@ func (f *FileService) BatchChangeModeAndOwner(op request.FileRoleReq) error {
 	return nil
 }
 
+func (f *FileService) collectPermanentDeleteTargets(targetPath string, isDir bool) ([]string, error) {
+	if !isDir {
+		return []string{targetPath}, nil
+	}
+
+	var targets []string
+	if err := filepath.WalkDir(targetPath, func(currentPath string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if d == nil || d.IsDir() {
+			return nil
+		}
+		targets = append(targets, currentPath)
+		return nil
+	}); err != nil {
+		return nil, err
+	}
+	return targets, nil
+}
+
+func (f *FileService) cleanupPermanentDeleteHistory(targets []string) {
+	if len(targets) == 0 {
+		return
+	}
+	for _, target := range targets {
+		if err := historyService.DeleteRelatedHistory(target); err != nil {
+			global.LOG.Warnf("cleanup file history failed for %s: %v", target, err)
+		}
+	}
+}
+
 func (f *FileService) ChangeOwner(req request.FileRoleUpdate) error {
 	fo := files.NewFileOp()
-	return fo.ChownR(req.Path, req.User, req.Group, req.Sub)
+	if err := fo.ChownR(req.Path, req.User, req.Group, req.Sub); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (f *FileService) Compress(c request.FileCompress) error {
@@ -482,7 +545,18 @@ func (f *FileService) SaveContent(edit request.FileEdit) error {
 	}
 
 	fo := files.NewFileOp()
-	return fo.WriteFile(edit.Path, strings.NewReader(edit.Content), info.FileMode)
+	oldContent, _ := os.ReadFile(edit.Path)
+	if bytes.Equal(oldContent, []byte(edit.Content)) {
+		return nil
+	}
+
+	if err := fo.WriteFile(edit.Path, strings.NewReader(edit.Content), info.FileMode); err != nil {
+		return err
+	}
+	if err := historyService.RecordSave(edit.Path, oldContent, info.FileMode); err != nil {
+		global.LOG.Warnf("record file save history failed for %s: %v", edit.Path, err)
+	}
+	return nil
 }
 
 func (f *FileService) ChangeName(req request.FileRename) error {
@@ -490,7 +564,17 @@ func (f *FileService) ChangeName(req request.FileRename) error {
 		return buserr.New("ErrInvalidChar")
 	}
 	fo := files.NewFileOp()
-	return fo.Rename(req.OldName, req.NewName)
+	info, _ := files.NewFileInfo(files.FileOption{Path: req.OldName, Expand: false})
+	content, _ := os.ReadFile(req.OldName)
+	if err := fo.Rename(req.OldName, req.NewName); err != nil {
+		return err
+	}
+	if info != nil && !info.IsDir {
+		if histErr := historyService.RecordOperation(fileHistoryOpRename, req.OldName, content, info.FileMode, req.OldName, req.NewName); histErr != nil {
+			global.LOG.Warnf("record file rename history failed for %s: %v", req.OldName, histErr)
+		}
+	}
+	return nil
 }
 
 func (f *FileService) Wget(w request.FileWget) (string, error) {
@@ -512,6 +596,23 @@ func (f *FileService) MvFile(m request.FileMove) error {
 			return buserr.New("ErrMovePathFailed")
 		}
 	}
+	type moveSnapshot struct {
+		path    string
+		content []byte
+		mode    os.FileMode
+		isDir   bool
+	}
+	snapshots := make([]moveSnapshot, 0, len(m.OldPaths))
+	for _, oldPath := range m.OldPaths {
+		content, _ := os.ReadFile(oldPath)
+		mode := os.FileMode(0640)
+		isDir := false
+		if info, err := files.NewFileInfo(files.FileOption{Path: oldPath, Expand: false}); err == nil {
+			mode = info.FileMode
+			isDir = info.IsDir
+		}
+		snapshots = append(snapshots, moveSnapshot{path: oldPath, content: content, mode: mode, isDir: isDir})
+	}
 	var errs []error
 	if m.Type == "cut" {
 		if len(m.CoverPaths) > 0 {
@@ -522,7 +623,18 @@ func (f *FileService) MvFile(m request.FileMove) error {
 				}
 			}
 		}
-		return fo.Cut(m.OldPaths, m.NewPath, m.Name, m.Cover)
+		if err := fo.Cut(m.OldPaths, m.NewPath, m.Name, m.Cover); err != nil {
+			return err
+		}
+		for _, snapshot := range snapshots {
+			if !snapshot.isDir {
+				targetPath := buildHistoryMoveTargetPath(m.NewPath, m.Name, snapshot.path, len(m.OldPaths))
+				if histErr := historyService.RecordOperation(fileHistoryOpMove, snapshot.path, snapshot.content, snapshot.mode, snapshot.path, targetPath); histErr != nil {
+					global.LOG.Warnf("record file move history failed for %s: %v", snapshot.path, histErr)
+				}
+			}
+		}
+		return nil
 	}
 	if m.Type == "copy" {
 		for _, src := range m.OldPaths {
@@ -539,6 +651,14 @@ func (f *FileService) MvFile(m request.FileMove) error {
 				}
 			}
 		}
+		for _, snapshot := range snapshots {
+			if !snapshot.isDir {
+				targetPath := buildHistoryMoveTargetPath(m.NewPath, m.Name, snapshot.path, len(m.OldPaths))
+				if histErr := historyService.RecordOperation(fileHistoryOpMove, snapshot.path, snapshot.content, snapshot.mode, snapshot.path, targetPath); histErr != nil {
+					global.LOG.Warnf("record file copy history failed for %s: %v", snapshot.path, histErr)
+				}
+			}
+		}
 	}
 
 	var errString string
@@ -549,6 +669,16 @@ func (f *FileService) MvFile(m request.FileMove) error {
 		return errors.New(errString)
 	}
 	return nil
+}
+
+func buildHistoryMoveTargetPath(dst, name, sourcePath string, sourceCount int) string {
+	if strings.TrimSpace(dst) == "" {
+		return sourcePath
+	}
+	if strings.TrimSpace(name) != "" && sourceCount == 1 {
+		return filepath.Join(dst, name)
+	}
+	return filepath.Join(dst, filepath.Base(sourcePath))
 }
 
 func (f *FileService) FileDownload(d request.FileDownload) (string, error) {
