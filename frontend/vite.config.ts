@@ -54,6 +54,7 @@ const __APP_INFO__ = {
 export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
     const env = loadEnv(mode, process.cwd());
     const viteEnv = wrapperEnv(env);
+    const isProduction = mode === 'production';
 
     return {
         resolve: {
@@ -127,7 +128,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
         ],
         esbuild: {
             pure: viteEnv.VITE_DROP_CONSOLE ? ['console.log'] : [],
-            drop: viteEnv.VITE_DROP_CONSOLE && process.env.NODE_ENV === 'production' ? ['debugger'] : [],
+            drop: viteEnv.VITE_DROP_CONSOLE && isProduction ? ['debugger'] : [],
         },
         build: {
             sourcemap: false,
