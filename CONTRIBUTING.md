@@ -12,6 +12,10 @@ Please submit a PR broken down into small changes bit by bit. A PR consisting of
 
 Note: If you split your pull request to small changes, please make sure any of the changes goes to master will not break anything. Otherwise, it can not be merged until this feature complete.
 
+## Add a new translation
+
+If you'd like to help translate 1Panel into a new language, please read the [Translation Contribution Guide](docs/TRANSLATION.md). It lists every file you need to create or modify, along with a reference PR you can use as a concrete example.
+
 ## Report issues
 It is a great way to contribute by reporting an issue. Well-written and complete bug reports are always welcome! Please open an issue and follow the template to fill in required information.
 
