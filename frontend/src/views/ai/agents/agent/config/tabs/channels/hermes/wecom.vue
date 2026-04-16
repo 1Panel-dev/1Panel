@@ -51,6 +51,7 @@
                 {{ t('commons.button.save') }}
             </el-button>
         </el-form-item>
+        <el-alert type="info" :closable="false" :title="t('aiTools.agents.channelAutoRestartHelper')" />
         <template v-if="form.dmPolicy === 'pairing'">
             <el-form-item :label="t('aiTools.agents.pairingCode')">
                 <el-input v-model="pairingCode" :placeholder="t('aiTools.agents.pairingCodePlaceholder')" />
@@ -83,7 +84,6 @@ interface WecomForm {
 }
 
 const { t } = useI18n();
-const emit = defineEmits(['saved']);
 const formRef = ref<FormInstance>();
 const saving = ref(false);
 const approving = ref(false);
@@ -165,8 +165,7 @@ const save = async () => {
             botId: form.botId,
             secret: form.secret,
         });
-        MsgSuccess(t('aiTools.agents.saveSuccess'));
-        emit('saved');
+        MsgSuccess(t('aiTools.agents.saveAndRestartSuccess'));
     } finally {
         saving.value = false;
     }

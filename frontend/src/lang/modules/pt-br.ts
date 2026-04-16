@@ -838,9 +838,13 @@ const message = {
             pairingCodePlaceholder: 'Digite o código de pareamento',
             approvePairing: 'Aprovar pareamento',
             saveSuccess: 'Salvo com sucesso',
+            saveAndRestartSuccess: 'Salvo com sucesso. O contêiner está sendo reiniciado automaticamente.',
             pairingApproveSuccess: 'Pareamento aprovado com sucesso',
             scanConnect: 'Escanear para conectar',
-            scanConnectHelper: 'Clique para iniciar a tarefa de login por QR. O código QR aparecerá no log da tarefa.',
+            scanConnectHelper:
+                'Clique para iniciar a tarefa de login por QR. O código QR aparecerá no log da tarefa e o contêiner será reiniciado automaticamente após a leitura ser concluída.',
+            channelAutoRestartHelper:
+                'Ao salvar, o contêiner será reiniciado automaticamente para que a configuração entre em vigor.',
             customProviderHelper: 'Provedores de modelo personalizados não validam se a conta está disponível',
         },
         model: {

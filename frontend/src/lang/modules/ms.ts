@@ -841,9 +841,13 @@ const message = {
             pairingCodePlaceholder: 'Masukkan kod pasangan',
             approvePairing: 'Luluskan pasangan',
             saveSuccess: 'Berjaya disimpan',
+            saveAndRestartSuccess: 'Berjaya disimpan. Bekas sedang dimulakan semula secara automatik.',
             pairingApproveSuccess: 'Pasangan berjaya diluluskan',
             scanConnect: 'Imbas untuk sambung',
-            scanConnectHelper: 'Klik untuk memulakan tugas log masuk QR. Kod QR akan muncul dalam log tugas.',
+            scanConnectHelper:
+                'Klik untuk memulakan tugas log masuk QR. Kod QR akan dipaparkan dalam log tugas dan bekas akan dimulakan semula secara automatik selepas imbasan berjaya.',
+            channelAutoRestartHelper:
+                'Menyimpan akan memulakan semula bekas secara automatik supaya konfigurasi berkuat kuasa.',
             customProviderHelper: 'Penyedia model tersuai tidak mengesahkan sama ada akaun boleh digunakan',
         },
         model: {

@@ -108,8 +108,3 @@ func formatHermesSessionTimestamp(value sql.NullFloat64) string {
 	seconds, fraction := math.Modf(value.Float64)
 	return time.Unix(int64(seconds), int64(fraction*float64(time.Second))).UTC().Format(time.RFC3339)
 }
-
-func buildHermesDockerExecArgs(containerName string, hermesArgs ...string) []string {
-	args := []string{"exec", "-u", "hermes", containerName, "hermes"}
-	return append(args, hermesArgs...)
-}

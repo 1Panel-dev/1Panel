@@ -2,25 +2,25 @@
     <el-tabs v-model="activeTab" @tab-click="handleTabClick">
         <template v-if="agentType === 'hermes-agent'">
             <el-tab-pane :label="t('aiTools.agents.weixin')" name="weixin">
-                <HermesWeixinTab ref="hermesWeixinRef" @open-terminal="openHermesWeixinTerminal" />
+                <HermesWeixinTab ref="hermesWeixinRef" :agent-id="agentId" />
             </el-tab-pane>
             <el-tab-pane label="QQ" name="qqbot">
-                <HermesQQBotTab ref="hermesQQBotRef" @saved="handleHermesChannelSaved" />
+                <HermesQQBotTab ref="hermesQQBotRef" />
             </el-tab-pane>
             <el-tab-pane :label="t('aiTools.agents.wecom')" name="wecom">
-                <HermesWecomTab ref="hermesWecomRef" @saved="handleHermesChannelSaved" />
+                <HermesWecomTab ref="hermesWecomRef" />
             </el-tab-pane>
             <el-tab-pane :label="t('aiTools.agents.dingtalk')" name="dingtalk">
-                <HermesDingTalkTab ref="hermesDingTalkRef" @saved="handleHermesChannelSaved" />
+                <HermesDingTalkTab ref="hermesDingTalkRef" />
             </el-tab-pane>
             <el-tab-pane :label="t('aiTools.agents.feishu')" name="feishu">
-                <HermesFeishuTab ref="hermesFeishuRef" @saved="handleHermesChannelSaved" />
+                <HermesFeishuTab ref="hermesFeishuRef" />
             </el-tab-pane>
             <el-tab-pane label="Telegram" name="telegram">
-                <HermesTelegramTab ref="hermesTelegramRef" @saved="handleHermesChannelSaved" />
+                <HermesTelegramTab ref="hermesTelegramRef" />
             </el-tab-pane>
             <el-tab-pane label="Discord" name="discord">
-                <HermesDiscordTab ref="hermesDiscordRef" @saved="handleHermesChannelSaved" />
+                <HermesDiscordTab ref="hermesDiscordRef" />
             </el-tab-pane>
         </template>
         <template v-else>
@@ -71,11 +71,7 @@ import DingTalkTab from './channels/openclaw/dingtalk.vue';
 const props = defineProps<{
     appVersion: string;
     agentType: AI.AgentType;
-    agentName: string;
-    containerName: string;
 }>();
-const emit = defineEmits(['open-terminal', 'restart-required']);
-
 const { t } = useI18n();
 const activeTab = ref('weixin');
 const agentId = ref(0);
@@ -156,20 +152,6 @@ const loadCurrentTab = async () => {
 
 const handleTabClick = async () => {
     await loadCurrentTab();
-};
-
-const openHermesWeixinTerminal = () => {
-    emit('open-terminal', {
-        containerID: props.containerName,
-        title: `${t('aiTools.agents.agent')} ${props.agentName}`,
-        users: ['hermes', 'root'],
-        shell: '/bin/bash',
-        initCmd: 'hermes gateway setup\n',
-    });
-};
-
-const handleHermesChannelSaved = () => {
-    emit('restart-required');
 };
 
 const load = async (id: number) => {

@@ -6,6 +6,32 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 )
 
+const hermesWeixinLoginScript = `import asyncio
+from gateway.platforms.weixin import qr_login
+from hermes_cli.config import save_env_value
+
+creds = asyncio.run(qr_login('/opt/data'))
+print('RESULT =', creds)
+
+if not creds:
+    raise SystemExit(1)
+
+save_env_value('WEIXIN_ACCOUNT_ID', creds.get('account_id', ''))
+save_env_value('WEIXIN_TOKEN', creds.get('token', ''))
+if creds.get('base_url'):
+    save_env_value('WEIXIN_BASE_URL', creds['base_url'])
+save_env_value('WEIXIN_CDN_BASE_URL', 'https://novac2c.cdn.weixin.qq.com/c2c')
+save_env_value('WEIXIN_DM_POLICY', 'open')
+save_env_value('WEIXIN_ALLOW_ALL_USERS', 'true')
+save_env_value('WEIXIN_ALLOWED_USERS', '')
+save_env_value('WEIXIN_GROUP_POLICY', 'disabled')
+save_env_value('WEIXIN_GROUP_ALLOWED_USERS', '')
+save_env_value('WEIXIN_HOME_CHANNEL', creds.get('user_id', ''))
+
+print('WEIXIN ENV WRITTEN')
+print('Restart the Hermes-Agent container to apply the new Weixin settings.')
+`
+
 func readHermesQQBotChannelConfig(confDir string) (*dto.AgentQQBotConfig, error) {
 	envMap, err := readHermesEnvMap(path.Join(confDir, ".env"))
 	if err != nil {
@@ -413,4 +439,14 @@ func firstHermesEnvValue(envMap map[string]string, key string, defaultValue stri
 		return envMap[key]
 	}
 	return defaultValue
+}
+
+func buildHermesWeixinLoginArgs(containerName string) []string {
+	return buildHermesDockerExecCommandArgs(
+		containerName,
+		"/opt/hermes/.venv/bin/python",
+		"-u",
+		"-c",
+		hermesWeixinLoginScript,
+	)
 }

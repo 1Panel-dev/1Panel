@@ -23,6 +23,7 @@
                 {{ t('commons.button.save') }}
             </el-button>
         </el-form-item>
+        <el-alert type="info" :closable="false" :title="t('aiTools.agents.channelAutoRestartHelper')" />
     </el-form>
 </template>
 
@@ -42,7 +43,6 @@ interface DingTalkForm {
 }
 
 const { t } = useI18n();
-const emit = defineEmits(['saved']);
 const formRef = ref<FormInstance>();
 const saving = ref(false);
 const agentId = ref(0);
@@ -109,8 +109,7 @@ const save = async () => {
                 },
             ],
         });
-        MsgSuccess(t('aiTools.agents.saveSuccess'));
-        emit('saved');
+        MsgSuccess(t('aiTools.agents.saveAndRestartSuccess'));
     } finally {
         saving.value = false;
     }

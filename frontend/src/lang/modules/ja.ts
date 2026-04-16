@@ -835,9 +835,12 @@ const message = {
             pairingCodePlaceholder: 'ペアリングコードを入力',
             approvePairing: 'ペアリングを承認',
             saveSuccess: '保存しました',
+            saveAndRestartSuccess: '保存しました。コンテナを自動で再起動しています。',
             pairingApproveSuccess: 'ペアリングに成功しました',
             scanConnect: 'スキャンして接続',
-            scanConnectHelper: 'クリックして QR ログインタスクを開始します。QR コードはタスクログに表示されます。',
+            scanConnectHelper:
+                'クリックして QR ログインタスクを開始します。QR コードはタスクログに表示され、スキャン成功後にコンテナが自動で再起動されます。',
+            channelAutoRestartHelper: '保存後、設定を反映するためにコンテナが自動で再起動されます。',
             customProviderHelper: 'カスタムモデルプロバイダーでは、アカウントの有効性を検証しません',
         },
         model: {

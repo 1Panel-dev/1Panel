@@ -820,9 +820,12 @@ const message = {
             pairingCodePlaceholder: '페어링 코드를 입력하세요',
             approvePairing: '페어링 승인',
             saveSuccess: '저장되었습니다',
+            saveAndRestartSuccess: '저장되었습니다. 컨테이너를 자동으로 재시작하는 중입니다.',
             pairingApproveSuccess: '페어링이 승인되었습니다',
             scanConnect: '스캔하여 연결',
-            scanConnectHelper: '클릭하여 QR 로그인 작업을 시작하세요. QR 코드는 작업 로그에 표시됩니다.',
+            scanConnectHelper:
+                '클릭하여 QR 로그인 작업을 시작하세요. QR 코드는 작업 로그에 표시되며 스캔이 완료되면 컨테이너가 자동으로 재시작됩니다.',
+            channelAutoRestartHelper: '저장하면 설정 적용을 위해 컨테이너가 자동으로 재시작됩니다.',
             customProviderHelper: '사용자 정의 모델 공급자는 계정 사용 가능 여부를 검증하지 않습니다',
         },
         model: {
