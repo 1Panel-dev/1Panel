@@ -2,7 +2,7 @@
 
 Thank you for your interest in helping translate 1Panel into a new language! This guide walks through every file you need to create or modify to add full language support across the frontend and backend.
 
-> **Reference PR:** [feat(i18n): add de-DE locale support (#12051)](https://github.com/1Panel-dev/1Panel/pull/12051) — a complete, real-world example of adding a brand-new locale (German).
+> **Reference PR:** [WIP: Dev v2 spanish (#10352)](https://github.com/1Panel-dev/1Panel/pull/10352) — a merged, real-world example of adding a brand-new locale (Spanish `es-ES`).
 
 ---
 
