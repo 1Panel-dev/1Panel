@@ -21,7 +21,7 @@
                         prop="name"
                         min-width="120"
                     />
-                    <el-table-column :label="$t('commons.table.type')" prop="agentType" min-width="120">
+                    <el-table-column :label="$t('commons.table.type')" prop="agentType" min-width="150">
                         <template #default="{ row }">
                             <div class="agent-type-cell">
                                 <img
@@ -702,6 +702,7 @@ onMounted(async () => {
     display: inline-flex;
     align-items: center;
     gap: 6px;
+    white-space: nowrap;
 }
 
 .agent-type-icon {

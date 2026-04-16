@@ -21,7 +21,10 @@
                 :bots="form.bots"
                 :fields="botFields"
                 :create-bot="createBot"
+                :create-preset="defaultBotCreatePreset"
                 summary-label="App ID"
+                unique-field-prop="appId"
+                unique-field-label="App ID"
                 :summary-formatter="getBotSummary"
                 :add-disabled="!installed"
                 :disabled="!installed"
@@ -40,7 +43,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue';
+import { computed, reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { AI } from '@/api/interface/ai';
 import { getAgentQQBotConfig, updateAgentQQBotConfig } from '@/api/modules/ai';
@@ -87,6 +90,16 @@ const {
 const form = reactive<QQBotForm>({
     enabled: true,
     bots: [],
+});
+const defaultBotCreatePreset = computed(() => {
+    if (form.bots.length > 0) {
+        return undefined;
+    }
+    return {
+        accountId: 'default',
+        name: 'Default',
+        isDefault: true,
+    };
 });
 
 const parseTextList = (value: string): string[] => {
@@ -187,6 +200,9 @@ const saveChannel = async (action: 'delete' | 'save' = 'save') => {
             })),
         });
         MsgSuccess(action === 'delete' ? t('commons.msg.deleteSuccess') : t('aiTools.agents.saveSuccess'));
+    } catch (error) {
+        await reload();
+        throw error;
     } finally {
         saving.value = false;
     }

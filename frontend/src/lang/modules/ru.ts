@@ -801,8 +801,11 @@ const message = {
             bots: 'Боты',
             addBot: 'Добавить бота',
             accountId: 'ID аккаунта',
+            accountIdPlaceholder:
+                'Уникальный ID для различения ботов, который после сохранения используется в настройке и маршрутизации.',
             setDefaultBot: 'Сделать по умолчанию',
             botDuplicateAccountId: 'ID аккаунта уже существует',
+            botDuplicateField: '{field} уже существует',
             botRequired: 'Добавьте хотя бы одного бота',
             botId: 'ID бота',
             allowFrom: 'Белый список DM',

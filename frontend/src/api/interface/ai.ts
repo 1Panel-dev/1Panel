@@ -704,7 +704,7 @@ export namespace AI {
 
     export interface AgentQQBotConfig {
         enabled: boolean;
-        dmPolicy?: 'open' | 'allowlist' | 'disabled';
+        dmPolicy?: 'pairing' | 'open' | 'allowlist' | 'disabled';
         allowFrom?: string[];
         groupPolicy?: 'open' | 'allowlist' | 'disabled';
         groupAllowFrom?: string[];
@@ -715,7 +715,7 @@ export namespace AI {
     export interface AgentQQBotConfigUpdateReq {
         agentId: number;
         enabled: boolean;
-        dmPolicy?: 'open' | 'allowlist' | 'disabled';
+        dmPolicy?: 'pairing' | 'open' | 'allowlist' | 'disabled';
         allowFrom?: string[];
         groupPolicy?: 'open' | 'allowlist' | 'disabled';
         groupAllowFrom?: string[];

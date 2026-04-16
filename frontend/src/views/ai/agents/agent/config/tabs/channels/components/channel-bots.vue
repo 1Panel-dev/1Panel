@@ -23,7 +23,13 @@
                     <span>{{ summaryFormatter(row) }}</span>
                 </template>
             </el-table-column>
-            <el-table-column :label="t('commons.table.status')" width="120">
+            <el-table-column
+                :label="t('commons.table.status')"
+                width="120"
+                fixed="right"
+                class-name="channel-bots__status-column"
+                label-class-name="channel-bots__status-column"
+            >
                 <template #default="{ row, $index }">
                     <el-switch
                         :model-value="row.enabled"
@@ -32,11 +38,25 @@
                     />
                 </template>
             </el-table-column>
-            <el-table-column :label="t('commons.table.operate')" width="180" fixed="right">
+            <el-table-column :label="t('commons.table.operate')" width="240" fixed="right">
                 <template #default="{ row, $index }">
                     <div class="channel-bots__actions">
                         <el-button link type="primary" :disabled="disabled" @click="openEdit(row, $index)">
                             {{ t('commons.button.edit') }}
+                        </el-button>
+                        <el-button
+                            v-if="approvable"
+                            link
+                            type="primary"
+                            :disabled="
+                                disabled ||
+                                !row.enabled ||
+                                isBotActionDisabled(row) ||
+                                (approveDisabled ? approveDisabled(row) : false)
+                            "
+                            @click="emit('approve', row)"
+                        >
+                            {{ t('aiTools.agents.approvePairing') }}
                         </el-button>
                         <el-button
                             :disabled="disabled || undeletableAccountIds.includes(row.accountId)"
@@ -63,18 +83,6 @@
                                     >
                                         {{ t('aiTools.agents.setDefaultBot') }}
                                     </el-dropdown-item>
-                                    <el-dropdown-item
-                                        v-if="approvable"
-                                        command="approve"
-                                        :disabled="
-                                            disabled ||
-                                            !row.enabled ||
-                                            isBotActionDisabled(row) ||
-                                            (approveDisabled ? approveDisabled(row) : false)
-                                        "
-                                    >
-                                        {{ t('aiTools.agents.approvePairing') }}
-                                    </el-dropdown-item>
                                 </el-dropdown-menu>
                             </template>
                         </el-dropdown>
@@ -89,7 +97,11 @@
                     <el-input v-model="form.name" :disabled="disabled" />
                 </el-form-item>
                 <el-form-item :label="t('aiTools.agents.accountId')" prop="accountId">
-                    <el-input v-model="form.accountId" :disabled="disabled || accountIdLocked" />
+                    <el-input
+                        v-model="form.accountId"
+                        :disabled="disabled || accountIdLocked"
+                        :placeholder="t('aiTools.agents.accountIdPlaceholder')"
+                    />
                 </el-form-item>
                 <el-form-item :label="t('commons.table.status')">
                     <el-switch v-model="form.enabled" :disabled="disabled" />
@@ -222,6 +234,18 @@ const props = defineProps({
         type: Array as PropType<string[]>,
         default: () => [],
     },
+    uniqueFieldProp: {
+        type: String,
+        default: '',
+    },
+    uniqueFieldLabel: {
+        type: String,
+        default: '',
+    },
+    createPreset: {
+        type: Object as PropType<Partial<ChannelBotItem>>,
+        default: undefined,
+    },
 });
 
 const emit = defineEmits<{
@@ -238,7 +262,9 @@ const formRef = ref<FormInstance>();
 
 const form = reactive<ChannelBotItem>(props.createBot());
 
-const accountIdLocked = computed(() => props.fixedAccountIds.includes(editingAccountId.value));
+const accountIdLocked = computed(() =>
+    props.fixedAccountIds.includes(editingAccountId.value || String(form.accountId || '')),
+);
 const dialogTitle = computed(() => (editIndex.value >= 0 ? t('commons.button.edit') : t('commons.button.create')));
 
 const rules = computed<FormRules>(() => {
@@ -269,6 +295,30 @@ const rules = computed<FormRules>(() => {
         }
         config[field.prop] = [Rules.requiredInput];
     }
+    if (props.uniqueFieldProp) {
+        config[props.uniqueFieldProp] = [
+            ...(config[props.uniqueFieldProp] || []),
+            {
+                validator: (_rule, value, callback) => {
+                    const exists = props.bots.some(
+                        (bot, index) => index !== editIndex.value && bot[props.uniqueFieldProp] === value,
+                    );
+                    if (exists) {
+                        callback(
+                            new Error(
+                                t('aiTools.agents.botDuplicateField', {
+                                    field: props.uniqueFieldLabel || props.uniqueFieldProp,
+                                }),
+                            ),
+                        );
+                        return;
+                    }
+                    callback();
+                },
+                trigger: 'blur',
+            },
+        ];
+    }
     return config;
 });
 
@@ -276,7 +326,7 @@ const resetForm = (bot?: ChannelBotItem) => {
     Object.keys(form).forEach((key) => {
         delete form[key];
     });
-    Object.assign(form, props.createBot(), bot ? { ...bot } : {});
+    Object.assign(form, props.createBot(), bot ? { ...bot } : { ...(props.createPreset || {}) });
 };
 
 const emitBots = (bots: ChannelBotItem[]) => {
@@ -292,7 +342,7 @@ const isBotActionDisabled = (bot: ChannelBotItem) => {
 };
 
 const hasMoreActions = (bot: ChannelBotItem) => {
-    return (props.defaultable && !bot.isDefault) || props.approvable;
+    return props.defaultable && !bot.isDefault;
 };
 
 const openCreate = () => {
@@ -361,10 +411,6 @@ const updateEnabled = (index: number, enabled: boolean | string | number) => {
 const handleMoreCommand = (bot: ChannelBotItem, _index: number, command: string | number | object) => {
     if (command === 'default') {
         setDefault(bot.accountId);
-        return;
-    }
-    if (command === 'approve') {
-        emit('approve', bot);
     }
 };
 </script>
@@ -402,5 +448,9 @@ const handleMoreCommand = (bot: ChannelBotItem, _index: number, command: string 
         margin-left: 0;
         white-space: nowrap;
     }
+}
+
+:deep(.channel-bots__status-column) {
+    box-shadow: inset 1px 0 0 var(--el-table-border-color);
 }
 </style>

@@ -371,7 +371,7 @@ type AgentTelegramConfig struct {
 
 type AgentChannelPairingApproveReq struct {
 	AgentID     uint   `json:"agentId" validate:"required"`
-	Type        string `json:"type" validate:"required,oneof=feishu telegram discord wecom"`
+	Type        string `json:"type" validate:"required,oneof=feishu telegram discord wecom qqbot"`
 	PairingCode string `json:"pairingCode" validate:"required"`
 	AccountID   string `json:"accountId"`
 }

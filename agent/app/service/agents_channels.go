@@ -570,7 +570,7 @@ func extractFeishuConfig(conf map[string]interface{}) dto.AgentFeishuConfig {
 		RequireMention: "true",
 		GroupPolicy:    "open",
 		GroupAllowFrom: []string{},
-		Bots:           []dto.AgentFeishuBot{defaultFeishuBot()},
+		Bots:           []dto.AgentFeishuBot{},
 	}
 	feishu := getChannelConfig(conf, "feishu")
 	if len(feishu) == 0 {
@@ -620,7 +620,10 @@ func extractFeishuConfig(conf map[string]interface{}) dto.AgentFeishuConfig {
 	baseEnabled := defaultBot.Enabled
 	baseDmPolicy := defaultBot.DmPolicy
 	baseAllowFrom := append([]string(nil), defaultBot.AllowFrom...)
-	bots := []dto.AgentFeishuBot{defaultBot}
+	bots := make([]dto.AgentFeishuBot, 0, len(accounts)+1)
+	if defaultBot.AppID != "" || defaultBot.AppSecret != "" {
+		bots = append(bots, defaultBot)
+	}
 	for _, accountID := range sortedChildKeys(accounts) {
 		if accountID == "default" {
 			continue
@@ -942,31 +945,34 @@ func extractQQBotConfig(conf map[string]interface{}) dto.AgentQQBotConfig {
 	result := dto.AgentQQBotConfig{Enabled: true}
 	qqbot := getChannelConfig(conf, "qqbot")
 	if len(qqbot) == 0 {
-		result.Bots = []dto.AgentQQBotBot{defaultQQBot()}
+		result.Bots = []dto.AgentQQBotBot{}
 		return result
 	}
 	if enabled, ok := qqbot["enabled"].(bool); ok {
 		result.Enabled = enabled
 	}
-	bots := []dto.AgentQQBotBot{
-		{
-			AgentChannelBotBase: dto.AgentChannelBotBase{
-				AccountID: "default",
-				Name:      extractStringValue(qqbot["name"]),
-				Enabled:   extractBoolValue(qqbot["enabled"], true),
-				IsDefault: true,
-			},
-			AppID:        extractStringValue(qqbot["appId"]),
-			ClientSecret: extractStringValue(qqbot["clientSecret"]),
-			AllowFrom:    extractStringList(qqbot["allowFrom"]),
-			SystemPrompt: extractStringValue(qqbot["systemPrompt"]),
+	bots := make([]dto.AgentQQBotBot, 0, len(childMap(qqbot, "accounts"))+1)
+	defaultBot := dto.AgentQQBotBot{
+		AgentChannelBotBase: dto.AgentChannelBotBase{
+			AccountID: "default",
+			Name:      extractStringValue(qqbot["name"]),
+			Enabled:   extractBoolValue(qqbot["enabled"], true),
+			IsDefault: true,
 		},
+		AppID:        extractStringValue(qqbot["appId"]),
+		ClientSecret: extractStringValue(qqbot["clientSecret"]),
+		AllowFrom:    extractStringList(qqbot["allowFrom"]),
+		SystemPrompt: extractStringValue(qqbot["systemPrompt"]),
 	}
-	if bots[0].Name == "" {
-		bots[0].Name = "Default"
+	if defaultBot.Name == "" {
+		defaultBot.Name = "Default"
 	}
-	for _, accountID := range sortedChildKeys(childMap(qqbot, "accounts")) {
-		account := childMap(childMap(qqbot, "accounts"), accountID)
+	if defaultBot.AppID != "" || defaultBot.ClientSecret != "" {
+		bots = append(bots, defaultBot)
+	}
+	accounts := childMap(qqbot, "accounts")
+	for _, accountID := range sortedChildKeys(accounts) {
+		account := childMap(accounts, accountID)
 		bots = append(bots, dto.AgentQQBotBot{
 			AgentChannelBotBase: dto.AgentChannelBotBase{
 				AccountID: accountID,

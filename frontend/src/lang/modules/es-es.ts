@@ -811,8 +811,11 @@ const message = {
             bots: 'Bots',
             addBot: 'Agregar bot',
             accountId: 'ID de cuenta',
+            accountIdPlaceholder:
+                'Un ID único para distinguir bots y usarlo después en la configuración y el enrutamiento.',
             setDefaultBot: 'Establecer como predeterminado',
             botDuplicateAccountId: 'El ID de cuenta ya existe',
+            botDuplicateField: '{field} ya existe',
             botRequired: 'Agregue al menos un bot',
             botId: 'ID del bot',
             allowFrom: 'Lista permitida de MD',

@@ -18,70 +18,74 @@
             <el-form-item :label="t('commons.table.status')" class="mt-4">
                 <el-switch v-model="form.enabled" />
             </el-form-item>
-            <el-form-item :label="t('aiTools.agents.dmPolicy')" prop="dmPolicy">
-                <el-select v-model="form.dmPolicy">
-                    <el-option :label="t('aiTools.agents.policyAllowlist')" value="allowlist" />
-                    <el-option :label="t('aiTools.agents.policyOpen')" value="open" />
-                    <el-option :label="t('aiTools.agents.policyDisabled')" value="disabled" />
-                </el-select>
-            </el-form-item>
-            <el-form-item
-                v-if="form.dmPolicy === 'allowlist'"
-                :label="t('aiTools.agents.allowFrom')"
-                prop="allowFromText"
-            >
-                <el-input
-                    v-model="form.allowFromText"
-                    type="textarea"
-                    :rows="3"
-                    :placeholder="t('aiTools.agents.allowFromPlaceholder')"
-                />
-                <span class="input-help">{{ t('aiTools.agents.allowFromHelper') }}</span>
-            </el-form-item>
-            <el-form-item :label="t('aiTools.agents.groupPolicy')" prop="groupPolicy">
-                <el-select v-model="form.groupPolicy">
-                    <el-option :label="t('aiTools.agents.policyOpen')" value="open" />
-                    <el-option :label="t('aiTools.agents.policyAllowlist')" value="allowlist" />
-                    <el-option :label="t('aiTools.agents.policyDisabled')" value="disabled" />
-                </el-select>
-            </el-form-item>
-            <el-form-item
-                v-if="form.groupPolicy === 'allowlist'"
-                :label="t('aiTools.agents.groupAllowFrom')"
-                prop="groupAllowFromText"
-            >
-                <el-input
-                    v-model="form.groupAllowFromText"
-                    type="textarea"
-                    :rows="3"
-                    :placeholder="t('aiTools.agents.groupAllowFromPlaceholder')"
-                />
-                <span class="input-help">{{ t('aiTools.agents.groupAllowFromHelper') }}</span>
-            </el-form-item>
-            <el-form-item :label="t('aiTools.agents.separateSessionByConversation')">
-                <el-switch v-model="form.separateSessionByConversation" />
-            </el-form-item>
-            <el-form-item :label="t('aiTools.agents.groupSessionScope')" prop="groupSessionScope">
-                <el-select v-model="form.groupSessionScope">
-                    <el-option :label="t('aiTools.agents.groupSessionScopeGroup')" value="group" />
-                    <el-option :label="t('aiTools.agents.groupSessionScopeGroupSender')" value="group_sender" />
-                </el-select>
-            </el-form-item>
-            <el-form-item :label="t('aiTools.agents.sharedMemoryAcrossConversations')">
-                <el-switch v-model="form.sharedMemoryAcrossConversations" />
-            </el-form-item>
-            <el-form-item :label="t('aiTools.agents.asyncMode')">
-                <el-switch v-model="form.asyncMode" />
-            </el-form-item>
-            <el-form-item v-if="form.asyncMode" :label="t('aiTools.agents.ackText')">
-                <el-input v-model="form.ackText" />
-            </el-form-item>
+            <div>
+                <el-form-item :label="t('aiTools.agents.dmPolicy')" prop="dmPolicy">
+                    <el-select v-model="form.dmPolicy">
+                        <el-option :label="t('aiTools.agents.policyAllowlist')" value="allowlist" />
+                        <el-option :label="t('aiTools.agents.policyOpen')" value="open" />
+                        <el-option :label="t('aiTools.agents.policyDisabled')" value="disabled" />
+                    </el-select>
+                </el-form-item>
+                <el-form-item
+                    v-if="form.dmPolicy === 'allowlist'"
+                    :label="t('aiTools.agents.allowFrom')"
+                    prop="allowFromText"
+                >
+                    <el-input
+                        v-model="form.allowFromText"
+                        type="textarea"
+                        :rows="3"
+                        :placeholder="t('aiTools.agents.allowFromPlaceholder')"
+                    />
+                    <span class="input-help">{{ t('aiTools.agents.allowFromHelper') }}</span>
+                </el-form-item>
+                <el-form-item :label="t('aiTools.agents.groupPolicy')" prop="groupPolicy">
+                    <el-select v-model="form.groupPolicy">
+                        <el-option :label="t('aiTools.agents.policyOpen')" value="open" />
+                        <el-option :label="t('aiTools.agents.policyAllowlist')" value="allowlist" />
+                        <el-option :label="t('aiTools.agents.policyDisabled')" value="disabled" />
+                    </el-select>
+                </el-form-item>
+                <el-form-item
+                    v-if="form.groupPolicy === 'allowlist'"
+                    :label="t('aiTools.agents.groupAllowFrom')"
+                    prop="groupAllowFromText"
+                >
+                    <el-input
+                        v-model="form.groupAllowFromText"
+                        type="textarea"
+                        :rows="3"
+                        :placeholder="t('aiTools.agents.groupAllowFromPlaceholder')"
+                    />
+                    <span class="input-help">{{ t('aiTools.agents.groupAllowFromHelper') }}</span>
+                </el-form-item>
+                <el-form-item :label="t('aiTools.agents.separateSessionByConversation')">
+                    <el-switch v-model="form.separateSessionByConversation" />
+                </el-form-item>
+                <el-form-item :label="t('aiTools.agents.groupSessionScope')" prop="groupSessionScope">
+                    <el-select v-model="form.groupSessionScope">
+                        <el-option :label="t('aiTools.agents.groupSessionScopeGroup')" value="group" />
+                        <el-option :label="t('aiTools.agents.groupSessionScopeGroupSender')" value="group_sender" />
+                    </el-select>
+                </el-form-item>
+                <el-form-item :label="t('aiTools.agents.sharedMemoryAcrossConversations')">
+                    <el-switch v-model="form.sharedMemoryAcrossConversations" />
+                </el-form-item>
+                <el-form-item :label="t('aiTools.agents.asyncMode')">
+                    <el-switch v-model="form.asyncMode" />
+                </el-form-item>
+                <el-form-item v-if="form.asyncMode" :label="t('aiTools.agents.ackText')">
+                    <el-input v-model="form.ackText" />
+                </el-form-item>
+            </div>
             <ChannelBots
                 :bots="form.bots"
                 :fields="botFields"
                 :create-bot="createBot"
                 :show-name-field="false"
                 summary-label="Client ID"
+                unique-field-prop="clientId"
+                unique-field-label="Client ID"
                 :summary-formatter="getBotSummary"
                 :add-disabled="!installed"
                 :disabled="!installed"
@@ -280,6 +284,9 @@ const saveChannel = async (action: 'delete' | 'save' = 'save') => {
             bots: form.bots,
         });
         MsgSuccess(action === 'delete' ? t('commons.msg.deleteSuccess') : t('aiTools.agents.saveSuccess'));
+    } catch (error) {
+        await reload();
+        throw error;
     } finally {
         saving.value = false;
     }

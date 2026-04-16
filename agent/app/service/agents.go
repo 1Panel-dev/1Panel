@@ -95,7 +95,7 @@ type IAgentService interface {
 }
 
 const (
-	defaultBrowserExecutablePath  = "/home/node/.cache/ms-playwright/chromium-1208/chrome-linux64/chrome"
+	defaultBrowserExecutablePath  = "/home/node/.cache/ms-playwright/openclaw-browser"
 	defaultBrowserProfile         = "openclaw"
 	defaultUserTimezone           = "Asia/Shanghai"
 	defaultToolsProfile           = "full"
@@ -114,9 +114,6 @@ const (
 
 func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 	agentType := req.AgentType
-	if agentType != constant.AppOpenclaw && agentType != constant.AppCopaw && agentType != constant.AppHermesAgent {
-		return nil, fmt.Errorf("unsupported agent type: %s", agentType)
-	}
 	if err := checkPortExist(req.WebUIPort); err != nil {
 		return nil, err
 	}
@@ -516,8 +513,8 @@ func (a AgentService) UpdateModelConfig(req dto.AgentModelConfigUpdateReq) error
 			return err
 		}
 	} else {
-		if agent, err = loadOpenclawAgentByID(req.AgentID); err != nil {
-			return err
+		if agent.AgentType != constant.AppOpenclaw {
+			return fmt.Errorf("%s does not support", agent.AgentType)
 		}
 		if err := writeOpenclawConfig(confDir, account, modelName, agent.Token, nil, req.Fallbacks); err != nil {
 			return err
@@ -1068,21 +1065,15 @@ func (a AgentService) syncAgentsByAccount(account *model.AgentAccount) error {
 		return nil
 	}
 	for _, agent := range agents {
-		modelName := strings.TrimSpace(agent.Model)
-		var selectedAccountModel dto.AgentAccountModel
-		if modelName != "" {
-			selectedAccountModel, err = requireAgentAccountModelForProvider(account.Provider, accountModels, modelName)
-			if err != nil {
-				return buserr.WithName("ErrAgentModelInUse", agent.Name)
-			}
-		} else {
-			selectedAccountModel = accountModels[0]
+		selectedAccountModel, err := requireAgentAccountModelForProvider(account.Provider, accountModels, agent.Model)
+		if err != nil {
+			return buserr.WithName("ErrAgentModelInUse", agent.Name)
 		}
 		resolvedRuntime, err := buildOpenclawAccountModelRuntime(account, selectedAccountModel)
 		if err != nil {
 			return err
 		}
-		modelName = resolvedRuntime.StoredModel
+		modelName := resolvedRuntime.StoredModel
 		apiType, maxTokens, contextWindow := resolvedRuntime.APIType, resolvedRuntime.MaxTokens, resolvedRuntime.ContextWindow
 		confDir := path.Dir(agent.ConfigPath)
 		switch agent.AgentType {

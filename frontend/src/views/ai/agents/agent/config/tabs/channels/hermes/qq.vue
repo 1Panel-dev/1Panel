@@ -11,6 +11,7 @@
         </el-form-item>
         <el-form-item :label="t('aiTools.agents.dmPolicy')" prop="dmPolicy">
             <el-select v-model="form.dmPolicy">
+                <el-option :label="t('aiTools.agents.pairingCode')" value="pairing" />
                 <el-option :label="t('aiTools.agents.policyOpen')" value="open" />
                 <el-option :label="t('aiTools.agents.policyAllowlist')" value="allowlist" />
                 <el-option :label="t('aiTools.agents.policyDisabled')" value="disabled" />
@@ -51,6 +52,16 @@
             </el-button>
         </el-form-item>
         <el-alert type="info" :closable="false" :title="t('aiTools.agents.channelAutoRestartHelper')" />
+        <template v-if="form.dmPolicy === 'pairing'">
+            <el-form-item :label="t('aiTools.agents.pairingCode')">
+                <el-input v-model="pairingCode" :placeholder="t('aiTools.agents.pairingCodePlaceholder')" />
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" plain :loading="approving" @click="approvePairing">
+                    {{ t('aiTools.agents.approvePairing') }}
+                </el-button>
+            </el-form-item>
+        </template>
     </el-form>
 </template>
 
@@ -58,15 +69,15 @@
 import { reactive, ref } from 'vue';
 import type { FormInstance } from 'element-plus';
 import { useI18n } from 'vue-i18n';
-import { getAgentQQBotConfig, updateAgentQQBotConfig } from '@/api/modules/ai';
+import { approveAgentChannelPairing, getAgentQQBotConfig, updateAgentQQBotConfig } from '@/api/modules/ai';
 import { Rules } from '@/global/form-rules';
-import { MsgSuccess } from '@/utils/message';
+import { MsgSuccess, MsgWarning } from '@/utils/message';
 
 interface QQBotForm {
     enabled: boolean;
     appId: string;
     clientSecret: string;
-    dmPolicy: 'open' | 'allowlist' | 'disabled';
+    dmPolicy: 'pairing' | 'open' | 'allowlist' | 'disabled';
     allowFromText: string;
     groupPolicy: 'open' | 'allowlist' | 'disabled';
     groupAllowFromText: string;
@@ -75,7 +86,9 @@ interface QQBotForm {
 const { t } = useI18n();
 const formRef = ref<FormInstance>();
 const saving = ref(false);
+const approving = ref(false);
 const agentId = ref(0);
+const pairingCode = ref('');
 const form = reactive<QQBotForm>({
     enabled: true,
     appId: '',
@@ -130,6 +143,7 @@ const rules = reactive({
 
 const load = async (id: number) => {
     agentId.value = id;
+    pairingCode.value = '';
     const res = await getAgentQQBotConfig({ agentId: id });
     form.enabled = res.data?.enabled ?? true;
     form.appId = res.data?.bots?.[0]?.appId || '';
@@ -170,6 +184,28 @@ const save = async () => {
         MsgSuccess(t('aiTools.agents.saveAndRestartSuccess'));
     } finally {
         saving.value = false;
+    }
+};
+
+const approvePairing = async () => {
+    if (!agentId.value) {
+        return;
+    }
+    if (!pairingCode.value) {
+        MsgWarning(t('aiTools.agents.pairingCodePlaceholder'));
+        return;
+    }
+    approving.value = true;
+    try {
+        await approveAgentChannelPairing({
+            agentId: agentId.value,
+            type: 'qqbot',
+            pairingCode: pairingCode.value,
+        });
+        pairingCode.value = '';
+        MsgSuccess(t('aiTools.agents.pairingApproveSuccess'));
+    } finally {
+        approving.value = false;
     }
 };
 
