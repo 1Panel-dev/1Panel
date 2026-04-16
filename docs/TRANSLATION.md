@@ -218,7 +218,11 @@ Use [BCP 47](https://www.ietf.org/rfc/bcp/bcp47.txt) locale codes. Examples used
 | Brazilian Portuguese | `pt-BR` |
 | Spanish (Spain) | `es-ES` |
 
-Use lowercase for simple codes (`ja`, `ko`) and the standard casing for regional variants (`pt-BR`, `es-ES`, `zh-Hant`). The frontend file name should be the lowercase version of the locale code (e.g. `pt-br.ts`, `es-es.ts`, `zh-hant.ts`), while the YAML file name mirrors the locale code exactly (`pt-BR.yaml`, `es-ES.yaml`, `zh-Hant.yaml`).
+Use lowercase for simple codes (`ja`, `ko`) and the standard BCP 47 casing for regional variants (`pt-BR`, `es-ES`, `zh-Hant`).
+
+**Frontend TypeScript file names** use all-lowercase with hyphens preserved exactly as they appear in the existing `frontend/src/lang/modules/` directory (e.g. `pt-br.ts`, `es-es.ts`, `zh-hant.ts`).
+
+**Backend YAML file names** mirror the locale code exactly, preserving the original casing (e.g. `pt-BR.yaml`, `es-ES.yaml`, `zh-Hant.yaml`).
 
 ---
 
