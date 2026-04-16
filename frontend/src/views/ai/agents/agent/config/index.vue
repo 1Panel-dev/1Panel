@@ -7,15 +7,7 @@
                     :label="t('aiTools.agents.channelsTab')"
                     name="channels"
                 >
-                    <ChannelsTab
-                        ref="channelsRef"
-                        :app-version="appVersion"
-                        :agent-type="agentType"
-                        :agent-name="agentName"
-                        :container-name="containerName"
-                        @open-terminal="handleOpenTerminal"
-                        @restart-required="handleRestartRequired"
-                    />
+                    <ChannelsTab ref="channelsRef" :app-version="appVersion" :agent-type="agentType" />
                 </el-tab-pane>
                 <el-tab-pane :label="t('aiTools.model.model')" name="model">
                     <ModelTab ref="modelRef" @updated="handleModelUpdated" />
@@ -50,7 +42,7 @@ import SkillsTab from './tabs/skills.vue';
 import SettingsTab from './tabs/settings.vue';
 
 const { t } = useI18n();
-const emit = defineEmits(['updated', 'open-terminal', 'restart-required']);
+const emit = defineEmits(['updated']);
 const open = ref(false);
 const activeTab = ref('channels');
 const header = ref('');
@@ -59,9 +51,6 @@ const accountId = ref(0);
 const model = ref('');
 const appVersion = ref('');
 const configPath = ref('');
-const agentName = ref('');
-const containerName = ref('');
-const appInstallId = ref(0);
 const agentType = ref<AI.AgentType>('openclaw');
 const channelsRef = ref();
 const modelRef = ref();
@@ -148,32 +137,12 @@ const handleModelUpdated = () => {
     emit('updated');
 };
 
-const handleOpenTerminal = (params: {
-    containerID: string;
-    title: string;
-    users: string[];
-    shell: string;
-    initCmd?: string;
-}) => {
-    emit('open-terminal', params);
-};
-
-const handleRestartRequired = () => {
-    if (!appInstallId.value) {
-        return;
-    }
-    emit('restart-required', appInstallId.value);
-};
-
 const openDrawer = async (agent: AI.AgentItem) => {
     agentId.value = agent.id;
-    appInstallId.value = agent.appInstallId;
-    agentName.value = agent.name;
     accountId.value = agent.accountId;
     model.value = agent.model;
     appVersion.value = agent.appVersion;
     configPath.value = agent.configPath;
-    containerName.value = agent.containerName;
     agentType.value = agent.agentType;
     header.value = `${agent.name} - ${t('menu.config')}`;
     activeTab.value = agent.agentType === 'openclaw' || agent.agentType === 'hermes-agent' ? 'channels' : 'model';

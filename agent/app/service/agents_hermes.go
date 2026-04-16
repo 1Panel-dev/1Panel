@@ -43,6 +43,15 @@ type hermesEnvEntry struct {
 	Value string
 }
 
+func buildHermesDockerExecCommandArgs(containerName, command string, commandArgs ...string) []string {
+	args := []string{"exec", "-u", "hermes", containerName, command}
+	return append(args, commandArgs...)
+}
+
+func buildHermesDockerExecArgs(containerName string, hermesArgs ...string) []string {
+	return buildHermesDockerExecCommandArgs(containerName, "hermes", hermesArgs...)
+}
+
 func writeHermesConfig(confDir string, account *model.AgentAccount, modelName string, timezone string) error {
 	if strings.TrimSpace(confDir) == "" {
 		return fmt.Errorf("config dir is required")

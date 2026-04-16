@@ -779,9 +779,11 @@ const message = {
             pairingCodePlaceholder: '请输入配对码',
             approvePairing: '批准配对',
             saveSuccess: '保存成功',
+            saveAndRestartSuccess: '保存成功，容器正在自动重启。',
             pairingApproveSuccess: '配对成功',
             scanConnect: '扫码对接',
-            scanConnectHelper: '点击后将在任务日志中显示二维码，扫码确认后即可完成登录',
+            scanConnectHelper: '点击后将在任务日志中显示二维码，扫码确认成功后将自动重启容器。',
+            channelAutoRestartHelper: '保存后将自动重启容器以使配置生效。',
             customProviderHelper: '自定义模型供应商不验证账号是否可用',
         },
         model: {

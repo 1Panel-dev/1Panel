@@ -785,9 +785,11 @@ const message = {
             pairingCodePlaceholder: '請輸入配對碼',
             approvePairing: '批准配對',
             saveSuccess: '保存成功',
+            saveAndRestartSuccess: '保存成功，容器正在自動重新啟動。',
             pairingApproveSuccess: '配對成功',
             scanConnect: '掃碼對接',
-            scanConnectHelper: '點擊後將在任務日誌中顯示 QR Code，掃碼確認後即可完成登入',
+            scanConnectHelper: '點擊後將在任務日誌中顯示 QR Code，掃碼確認成功後將自動重新啟動容器。',
+            channelAutoRestartHelper: '保存後將自動重新啟動容器以使設定生效。',
             customProviderHelper: '自訂模型供應商不驗證帳號是否可用',
         },
         model: {

@@ -842,10 +842,13 @@ const message = {
             pairingCodePlaceholder: 'Introduzca el código de emparejamiento',
             approvePairing: 'Aprobar emparejamiento',
             saveSuccess: 'Guardado correctamente',
+            saveAndRestartSuccess: 'Guardado correctamente. El contenedor se está reiniciando automáticamente.',
             pairingApproveSuccess: 'Emparejamiento aprobado correctamente',
             scanConnect: 'Escanear para conectar',
             scanConnectHelper:
-                'Haga clic para iniciar la tarea de inicio de sesión por QR. El código QR aparecerá en el registro de tareas.',
+                'Haga clic para iniciar la tarea de inicio de sesión por QR. El código QR aparecerá en el registro de tareas y el contenedor se reiniciará automáticamente después de completar el escaneo.',
+            channelAutoRestartHelper:
+                'Al guardar, el contenedor se reiniciará automáticamente para que la configuración surta efecto.',
             customProviderHelper: 'En el proveedor de modelo personalizado no se valida si la cuenta está disponible',
         },
         model: {

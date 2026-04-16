@@ -17,10 +17,19 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
+	"github.com/1Panel-dev/1Panel/agent/utils/compose"
 )
 
 type openclawPluginPackage struct {
 	Version string `json:"version"`
+}
+
+func updateHermesChannelConfig(agent *model.Agent, install *model.AppInstall, write func(confDir string) error) error {
+	if err := write(path.Dir(agent.ConfigPath)); err != nil {
+		return err
+	}
+	_, err := compose.Restart(install.GetComposePath())
+	return err
 }
 
 func (a AgentService) GetFeishuConfig(req dto.AgentFeishuConfigReq) (*dto.AgentFeishuConfig, error) {
@@ -42,22 +51,24 @@ func (a AgentService) GetFeishuConfig(req dto.AgentFeishuConfigReq) (*dto.AgentF
 }
 
 func (a AgentService) UpdateFeishuConfig(req dto.AgentFeishuConfigUpdateReq) error {
-	agent, _, err := a.loadAgentAndInstall(req.AgentID)
+	agent, install, err := a.loadAgentAndInstall(req.AgentID)
 	if err != nil {
 		return err
 	}
 	if agent.AgentType == constant.AppHermesAgent {
-		return writeHermesFeishuChannelConfig(path.Dir(agent.ConfigPath), dto.AgentFeishuConfig{
-			Enabled:        req.Enabled,
-			ThreadSession:  req.ThreadSession,
-			ReplyMode:      req.ReplyMode,
-			Streaming:      req.Streaming,
-			RequireMention: req.RequireMention,
-			GroupPolicy:    req.GroupPolicy,
-			GroupAllowFrom: req.GroupAllowFrom,
-			Domain:         "feishu",
-			ConnectionMode: "websocket",
-			Bots:           req.Bots,
+		return updateHermesChannelConfig(agent, install, func(confDir string) error {
+			return writeHermesFeishuChannelConfig(confDir, dto.AgentFeishuConfig{
+				Enabled:        req.Enabled,
+				ThreadSession:  req.ThreadSession,
+				ReplyMode:      req.ReplyMode,
+				Streaming:      req.Streaming,
+				RequireMention: req.RequireMention,
+				GroupPolicy:    req.GroupPolicy,
+				GroupAllowFrom: req.GroupAllowFrom,
+				Domain:         "feishu",
+				ConnectionMode: "websocket",
+				Bots:           req.Bots,
+			})
 		})
 	}
 	return a.mutateAgentConfig(req.AgentID, func(_ *model.Agent, _ *model.AppInstall, conf map[string]interface{}) error {
@@ -96,22 +107,24 @@ func (a AgentService) GetTelegramConfig(req dto.AgentTelegramConfigReq) (*dto.Ag
 }
 
 func (a AgentService) UpdateTelegramConfig(req dto.AgentTelegramConfigUpdateReq) error {
-	agent, _, err := a.loadAgentAndInstall(req.AgentID)
+	agent, install, err := a.loadAgentAndInstall(req.AgentID)
 	if err != nil {
 		return err
 	}
 	if agent.AgentType == constant.AppHermesAgent {
-		return writeHermesTelegramChannelConfig(path.Dir(agent.ConfigPath), dto.AgentTelegramConfig{
-			Enabled:        req.Enabled,
-			DmPolicy:       req.DmPolicy,
-			AllowFrom:      req.AllowFrom,
-			RequireMention: req.RequireMention,
-			GroupPolicy:    req.GroupPolicy,
-			GroupAllowFrom: req.GroupAllowFrom,
-			Proxy:          req.Proxy,
-			Streaming:      req.Streaming,
-			DefaultAccount: req.DefaultAccount,
-			Bots:           req.Bots,
+		return updateHermesChannelConfig(agent, install, func(confDir string) error {
+			return writeHermesTelegramChannelConfig(confDir, dto.AgentTelegramConfig{
+				Enabled:        req.Enabled,
+				DmPolicy:       req.DmPolicy,
+				AllowFrom:      req.AllowFrom,
+				RequireMention: req.RequireMention,
+				GroupPolicy:    req.GroupPolicy,
+				GroupAllowFrom: req.GroupAllowFrom,
+				Proxy:          req.Proxy,
+				Streaming:      req.Streaming,
+				DefaultAccount: req.DefaultAccount,
+				Bots:           req.Bots,
+			})
 		})
 	}
 	return a.mutateAgentConfig(req.AgentID, func(_ *model.Agent, _ *model.AppInstall, conf map[string]interface{}) error {
@@ -148,20 +161,22 @@ func (a AgentService) GetDiscordConfig(req dto.AgentIDReq) (*dto.AgentDiscordCon
 }
 
 func (a AgentService) UpdateDiscordConfig(req dto.AgentDiscordConfigUpdateReq) error {
-	agent, _, err := a.loadAgentAndInstall(req.AgentID)
+	agent, install, err := a.loadAgentAndInstall(req.AgentID)
 	if err != nil {
 		return err
 	}
 	if agent.AgentType == constant.AppHermesAgent {
-		return writeHermesDiscordChannelConfig(path.Dir(agent.ConfigPath), dto.AgentDiscordConfig{
-			Enabled:        req.Enabled,
-			DmPolicy:       req.DmPolicy,
-			AllowFrom:      req.AllowFrom,
-			RequireMention: req.RequireMention,
-			GroupPolicy:    req.GroupPolicy,
-			Proxy:          req.Proxy,
-			DefaultAccount: req.DefaultAccount,
-			Bots:           req.Bots,
+		return updateHermesChannelConfig(agent, install, func(confDir string) error {
+			return writeHermesDiscordChannelConfig(confDir, dto.AgentDiscordConfig{
+				Enabled:        req.Enabled,
+				DmPolicy:       req.DmPolicy,
+				AllowFrom:      req.AllowFrom,
+				RequireMention: req.RequireMention,
+				GroupPolicy:    req.GroupPolicy,
+				Proxy:          req.Proxy,
+				DefaultAccount: req.DefaultAccount,
+				Bots:           req.Bots,
+			})
 		})
 	}
 	return a.mutateAgentConfig(req.AgentID, func(_ *model.Agent, _ *model.AppInstall, conf map[string]interface{}) error {
@@ -198,18 +213,20 @@ func (a AgentService) GetQQBotConfig(req dto.AgentIDReq) (*dto.AgentQQBotConfig,
 }
 
 func (a AgentService) UpdateQQBotConfig(req dto.AgentQQBotConfigUpdateReq) error {
-	agent, _, err := a.loadAgentAndInstall(req.AgentID)
+	agent, install, err := a.loadAgentAndInstall(req.AgentID)
 	if err != nil {
 		return err
 	}
 	if agent.AgentType == constant.AppHermesAgent {
-		return writeHermesQQBotChannelConfig(path.Dir(agent.ConfigPath), dto.AgentQQBotConfig{
-			Enabled:        req.Enabled,
-			DmPolicy:       req.DmPolicy,
-			AllowFrom:      req.AllowFrom,
-			GroupPolicy:    req.GroupPolicy,
-			GroupAllowFrom: req.GroupAllowFrom,
-			Bots:           req.Bots,
+		return updateHermesChannelConfig(agent, install, func(confDir string) error {
+			return writeHermesQQBotChannelConfig(confDir, dto.AgentQQBotConfig{
+				Enabled:        req.Enabled,
+				DmPolicy:       req.DmPolicy,
+				AllowFrom:      req.AllowFrom,
+				GroupPolicy:    req.GroupPolicy,
+				GroupAllowFrom: req.GroupAllowFrom,
+				Bots:           req.Bots,
+			})
 		})
 	}
 	return a.mutateAgentConfig(req.AgentID, func(_ *model.Agent, _ *model.AppInstall, conf map[string]interface{}) error {
@@ -240,19 +257,21 @@ func (a AgentService) GetWecomConfig(req dto.AgentIDReq) (*dto.AgentWecomConfig,
 }
 
 func (a AgentService) UpdateWecomConfig(req dto.AgentWecomConfigUpdateReq) error {
-	agent, _, err := a.loadAgentAndInstall(req.AgentID)
+	agent, install, err := a.loadAgentAndInstall(req.AgentID)
 	if err != nil {
 		return err
 	}
 	if agent.AgentType == constant.AppHermesAgent {
-		return writeHermesWecomChannelConfig(path.Dir(agent.ConfigPath), dto.AgentWecomConfig{
-			Enabled:        req.Enabled,
-			DmPolicy:       req.DmPolicy,
-			AllowFrom:      req.AllowFrom,
-			GroupPolicy:    req.GroupPolicy,
-			GroupAllowFrom: req.GroupAllowFrom,
-			BotID:          req.BotID,
-			Secret:         req.Secret,
+		return updateHermesChannelConfig(agent, install, func(confDir string) error {
+			return writeHermesWecomChannelConfig(confDir, dto.AgentWecomConfig{
+				Enabled:        req.Enabled,
+				DmPolicy:       req.DmPolicy,
+				AllowFrom:      req.AllowFrom,
+				GroupPolicy:    req.GroupPolicy,
+				GroupAllowFrom: req.GroupAllowFrom,
+				BotID:          req.BotID,
+				Secret:         req.Secret,
+			})
 		})
 	}
 	return a.mutateAgentConfig(req.AgentID, func(_ *model.Agent, _ *model.AppInstall, conf map[string]interface{}) error {
@@ -288,18 +307,20 @@ func (a AgentService) GetDingTalkConfig(req dto.AgentIDReq) (*dto.AgentDingTalkC
 }
 
 func (a AgentService) UpdateDingTalkConfig(req dto.AgentDingTalkConfigUpdateReq) error {
-	agent, _, err := a.loadAgentAndInstall(req.AgentID)
+	agent, install, err := a.loadAgentAndInstall(req.AgentID)
 	if err != nil {
 		return err
 	}
 	if agent.AgentType == constant.AppHermesAgent {
-		return writeHermesDingTalkChannelConfig(path.Dir(agent.ConfigPath), dto.AgentDingTalkConfig{
-			Enabled:        req.Enabled,
-			DmPolicy:       req.DmPolicy,
-			AllowFrom:      req.AllowFrom,
-			GroupPolicy:    req.GroupPolicy,
-			GroupAllowFrom: req.GroupAllowFrom,
-			Bots:           req.Bots,
+		return updateHermesChannelConfig(agent, install, func(confDir string) error {
+			return writeHermesDingTalkChannelConfig(confDir, dto.AgentDingTalkConfig{
+				Enabled:        req.Enabled,
+				DmPolicy:       req.DmPolicy,
+				AllowFrom:      req.AllowFrom,
+				GroupPolicy:    req.GroupPolicy,
+				GroupAllowFrom: req.GroupAllowFrom,
+				Bots:           req.Bots,
+			})
 		})
 	}
 	return a.mutateAgentConfig(req.AgentID, func(_ *model.Agent, _ *model.AppInstall, conf map[string]interface{}) error {
@@ -453,10 +474,19 @@ func (a AgentService) LoginWeixinChannel(req dto.AgentWeixinLoginReq) error {
 	loginTask.AddSubTask("Login Weixin channel", func(t *task.Task) error {
 		mgr := cmd.NewCommandMgr(cmd.WithTask(*t), cmd.WithContext(t.TaskCtx), cmd.WithTimeout(30*time.Minute))
 		if agent.AgentType == constant.AppHermesAgent {
-			return buserr.New("ErrInvalidParams")
+			return mgr.Run("docker", buildHermesWeixinLoginArgs(install.ContainerName)...)
 		}
 		return mgr.RunBashCf("docker exec %s openclaw channels login --channel openclaw-weixin", install.ContainerName)
 	}, nil)
+	if agent.AgentType == constant.AppHermesAgent {
+		loginTask.AddSubTask("Restart Hermes-Agent container", func(t *task.Task) error {
+			output, err := compose.Restart(install.GetComposePath())
+			if output != "" {
+				t.Log(output)
+			}
+			return err
+		}, nil)
+	}
 	go func() {
 		if err := loginTask.Execute(); err != nil {
 			global.LOG.Errorf("login openclaw weixin channel failed: %v", err)

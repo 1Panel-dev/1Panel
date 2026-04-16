@@ -193,12 +193,7 @@
         <TaskLog ref="taskLogRef" @close="search" />
         <DeleteDialog ref="deleteRef" @close="search" />
         <AppResources ref="checkRef" @close="search" />
-        <ConfigDrawer
-            ref="configRef"
-            @updated="search"
-            @open-terminal="openTerminalDialog"
-            @restart-required="handleConfigRestartRequired"
-        />
+        <ConfigDrawer ref="configRef" @updated="search" />
         <OverviewDrawer ref="overviewRef" />
         <BindWebsiteDialog ref="bindWebsiteRef" @success="search" />
         <AppUpgrade ref="upgradeRef" @close="search" />
@@ -455,12 +450,6 @@ const onOperate = async (row: AI.AgentItem, operate: string) => {
     await search();
 };
 
-const restartInstall = async (installId: number) => {
-    const taskID = newUUID();
-    await installedOp({ installId, operate: 'restart', taskID });
-    await search();
-};
-
 const openLog = (row: AI.AgentItem) => {
     if (row.status === 'Installing') {
         taskLogRef.value?.openWithResourceID('App', 'TaskInstall', row.appInstallId);
@@ -490,21 +479,6 @@ const openHermesChat = (row: AI.AgentItem) => {
         containerID: row.containerName,
         title: i18n.global.t('aiTools.agents.hermesChatDialogTitle', [row.name]),
     });
-};
-
-const handleConfigRestartRequired = async (installId: number) => {
-    try {
-        await ElMessageBox.confirm(
-            i18n.global.t('aiTools.agents.configFileRestartHelper'),
-            i18n.global.t('database.restartNow'),
-            {
-                confirmButtonText: i18n.global.t('database.restartNow'),
-                cancelButtonText: i18n.global.t('commons.button.cancel'),
-                type: 'info',
-            },
-        );
-        await restartInstall(installId);
-    } catch {}
 };
 
 const openTerminalDialog = (params: {

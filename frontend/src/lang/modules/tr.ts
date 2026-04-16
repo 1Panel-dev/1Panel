@@ -839,9 +839,13 @@ const message = {
             pairingCodePlaceholder: 'Eşleştirme kodunu girin',
             approvePairing: 'Eşleştirmeyi onayla',
             saveSuccess: 'Başarıyla kaydedildi',
+            saveAndRestartSuccess: 'Başarıyla kaydedildi. Konteyner otomatik olarak yeniden başlatılıyor.',
             pairingApproveSuccess: 'Eşleştirme başarıyla onaylandı',
             scanConnect: 'Tara ve bağlan',
-            scanConnectHelper: 'QR giriş görevini başlatmak için tıklayın. QR kodu görev günlüğünde görünecektir.',
+            scanConnectHelper:
+                'QR giriş görevini başlatmak için tıklayın. QR kodu görev günlüğünde görünecek ve tarama başarılı olduktan sonra konteyner otomatik olarak yeniden başlatılacaktır.',
+            channelAutoRestartHelper:
+                'Kaydettiğinizde ayarların etkili olması için konteyner otomatik olarak yeniden başlatılır.',
             customProviderHelper: 'Özel model sağlayıcısında hesabın kullanılabilirliği doğrulanmaz',
         },
         model: {

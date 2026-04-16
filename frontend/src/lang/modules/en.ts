@@ -831,9 +831,12 @@ const message = {
             pairingCodePlaceholder: 'Enter pairing code',
             approvePairing: 'Approve Pairing',
             saveSuccess: 'Saved successfully',
+            saveAndRestartSuccess: 'Saved successfully. The container is restarting automatically.',
             pairingApproveSuccess: 'Pairing approved successfully',
             scanConnect: 'Scan to Connect',
-            scanConnectHelper: 'Click to start the QR login task. The QR code will appear in the task log.',
+            scanConnectHelper:
+                'Click to start the QR login task. The QR code will appear in the task log, and the container will restart automatically after the scan succeeds.',
+            channelAutoRestartHelper: 'Saving will automatically restart the container so the changes take effect.',
             customProviderHelper: 'Custom model providers do not validate whether the account is available.',
         },
         model: {
