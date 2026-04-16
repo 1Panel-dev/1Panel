@@ -78,7 +78,7 @@ func writeHermesConfig(confDir string, account *model.AgentAccount, modelName st
 	cfg["model"] = map[string]interface{}{
 		"default":  resolveHermesModel(account.Provider, provider, modelName),
 		"provider": provider,
-		"base_url": strings.TrimSpace(account.BaseURL),
+		"base_url": account.BaseURL,
 	}
 	cfg["terminal"] = map[string]interface{}{
 		"backend": "local",
@@ -390,8 +390,8 @@ func resolveHermesEnvEntries(account *model.AgentAccount) []hermesEnvEntry {
 	if account == nil {
 		return nil
 	}
-	apiKey := strings.TrimSpace(account.APIKey)
-	baseURL := strings.TrimSpace(account.BaseURL)
+	apiKey := account.APIKey
+	baseURL := account.BaseURL
 	entries := make([]hermesEnvEntry, 0, 4)
 
 	appendEntry := func(key, value string) {

@@ -56,6 +56,8 @@
             :fields="botFields"
             :create-bot="createBot"
             summary-label="Token"
+            unique-field-prop="botToken"
+            unique-field-label="Bot Token"
             :summary-formatter="getBotSummary"
             defaultable
             approvable

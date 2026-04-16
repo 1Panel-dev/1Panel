@@ -809,8 +809,11 @@ const message = {
             bots: 'Bot',
             addBot: 'Tambah bot',
             accountId: 'ID akaun',
+            accountIdPlaceholder:
+                'ID unik untuk membezakan bot dan digunakan untuk konfigurasi serta penghalaan selepas disimpan.',
             setDefaultBot: 'Tetapkan sebagai lalai',
             botDuplicateAccountId: 'ID akaun sudah wujud',
+            botDuplicateField: '{field} sudah wujud',
             botRequired: 'Tambah sekurang-kurangnya satu bot',
             botId: 'ID bot',
             allowFrom: 'Senarai benarkan DM',

@@ -17,52 +17,57 @@
             <el-form-item :label="t('commons.table.status')" class="mt-4">
                 <el-switch v-model="form.enabled" />
             </el-form-item>
-            <el-form-item :label="t('aiTools.agents.threadSession')">
-                <el-switch v-model="form.threadSession" />
-            </el-form-item>
-            <el-form-item :label="t('aiTools.agents.streaming')">
-                <el-switch v-model="form.streaming" />
-            </el-form-item>
-            <el-form-item :label="t('aiTools.agents.replyMode')" prop="replyMode">
-                <el-input v-model="form.replyMode" placeholder="auto" />
-            </el-form-item>
-            <el-form-item :label="t('aiTools.agents.requireMention')" prop="requireMention">
-                <el-select v-model="form.requireMention">
-                    <el-option :label="t('aiTools.agents.requireMentionTrue')" value="true" />
-                    <el-option :label="t('aiTools.agents.requireMentionFalse')" value="false" />
-                    <el-option :label="t('aiTools.agents.requireMentionOpen')" value="open" />
-                </el-select>
-            </el-form-item>
-            <el-form-item :label="t('aiTools.agents.groupPolicy')" prop="groupPolicy">
-                <el-select v-model="form.groupPolicy">
-                    <el-option :label="t('aiTools.agents.policyOpen')" value="open" />
-                    <el-option :label="t('aiTools.agents.policyAllowlist')" value="allowlist" />
-                    <el-option :label="t('aiTools.agents.policyDisabled')" value="disabled" />
-                </el-select>
-            </el-form-item>
-            <el-form-item
-                v-if="form.groupPolicy === 'allowlist'"
-                :label="t('aiTools.agents.groupAllowFrom')"
-                prop="groupAllowFromText"
-            >
-                <el-input
-                    v-model="form.groupAllowFromText"
-                    type="textarea"
-                    :rows="3"
-                    :placeholder="t('aiTools.agents.groupAllowFromPlaceholder')"
-                />
-                <span class="input-help">{{ t('aiTools.agents.groupAllowFromHelper') }}</span>
-            </el-form-item>
-            <el-form-item>
-                <el-link type="primary" icon="Position" @click="toFeishuDoc">
-                    {{ t('container.mirrorsHelper2') }}
-                </el-link>
-            </el-form-item>
+            <div>
+                <el-form-item :label="t('aiTools.agents.threadSession')">
+                    <el-switch v-model="form.threadSession" />
+                </el-form-item>
+                <el-form-item :label="t('aiTools.agents.streaming')">
+                    <el-switch v-model="form.streaming" />
+                </el-form-item>
+                <el-form-item :label="t('aiTools.agents.replyMode')" prop="replyMode">
+                    <el-input v-model="form.replyMode" placeholder="auto" />
+                </el-form-item>
+                <el-form-item :label="t('aiTools.agents.requireMention')" prop="requireMention">
+                    <el-select v-model="form.requireMention">
+                        <el-option :label="t('aiTools.agents.requireMentionTrue')" value="true" />
+                        <el-option :label="t('aiTools.agents.requireMentionFalse')" value="false" />
+                        <el-option :label="t('aiTools.agents.requireMentionOpen')" value="open" />
+                    </el-select>
+                </el-form-item>
+                <el-form-item :label="t('aiTools.agents.groupPolicy')" prop="groupPolicy">
+                    <el-select v-model="form.groupPolicy">
+                        <el-option :label="t('aiTools.agents.policyOpen')" value="open" />
+                        <el-option :label="t('aiTools.agents.policyAllowlist')" value="allowlist" />
+                        <el-option :label="t('aiTools.agents.policyDisabled')" value="disabled" />
+                    </el-select>
+                </el-form-item>
+                <el-form-item
+                    v-if="form.groupPolicy === 'allowlist'"
+                    :label="t('aiTools.agents.groupAllowFrom')"
+                    prop="groupAllowFromText"
+                >
+                    <el-input
+                        v-model="form.groupAllowFromText"
+                        type="textarea"
+                        :rows="3"
+                        :placeholder="t('aiTools.agents.groupAllowFromPlaceholder')"
+                    />
+                    <span class="input-help">{{ t('aiTools.agents.groupAllowFromHelper') }}</span>
+                </el-form-item>
+                <el-form-item>
+                    <el-link type="primary" icon="Position" @click="toFeishuDoc">
+                        {{ t('container.mirrorsHelper2') }}
+                    </el-link>
+                </el-form-item>
+            </div>
             <ChannelBots
                 :bots="form.bots"
                 :fields="botFields"
                 :create-bot="createBot"
+                :create-preset="defaultBotCreatePreset"
                 summary-label="App ID"
+                unique-field-prop="appId"
+                unique-field-label="App ID"
                 :summary-formatter="getBotSummary"
                 :add-disabled="!installed"
                 :disabled="!installed"
@@ -84,7 +89,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue';
+import { computed, reactive, ref } from 'vue';
 import type { FormInstance } from 'element-plus';
 import { ElMessageBox } from 'element-plus';
 import { useI18n } from 'vue-i18n';
@@ -149,6 +154,16 @@ const form = reactive<FeishuForm>({
     groupAllowFromText: '',
     bots: [],
     installed: false,
+});
+const defaultBotCreatePreset = computed(() => {
+    if (form.bots.length > 0) {
+        return undefined;
+    }
+    return {
+        accountId: 'default',
+        name: 'Default',
+        isDefault: true,
+    };
 });
 
 const parseTextList = (value: string): string[] => {
@@ -309,6 +324,9 @@ const saveChannel = async (action: 'delete' | 'save' = 'save') => {
             bots: buildPayloadBots(),
         });
         MsgSuccess(action === 'delete' ? t('commons.msg.deleteSuccess') : t('aiTools.agents.saveSuccess'));
+    } catch (error) {
+        await reload();
+        throw error;
     } finally {
         saving.value = false;
     }

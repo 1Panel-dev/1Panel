@@ -808,8 +808,11 @@ const message = {
             bots: 'Botlar',
             addBot: 'Bot ekle',
             accountId: 'Hesap ID',
+            accountIdPlaceholder:
+                'Botlari ayirt etmek ve sonraki yapılandırma ile yönlendirme için kullanılan benzersiz kimlik.',
             setDefaultBot: 'Varsayılan yap',
             botDuplicateAccountId: 'Hesap ID zaten mevcut',
+            botDuplicateField: '{field} zaten mevcut',
             botRequired: 'En az bir bot ekleyin',
             botId: 'Bot ID',
             allowFrom: 'DM izin listesi',

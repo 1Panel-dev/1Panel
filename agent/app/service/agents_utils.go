@@ -1006,14 +1006,10 @@ func buildOpenclawModelsFromAccount(account *model.AgentAccount, selectedModel s
 		return "", nil, nil, err
 	}
 	if len(accountModels) == 0 {
-		return "", nil, nil, fmt.Errorf("model is required")
-	}
-	selectedModel = strings.TrimSpace(selectedModel)
-	if selectedModel == "" {
-		selectedModel = strings.TrimSpace(accountModels[0].ID)
+		return "", nil, nil, buserr.New("ErrAgentModelNotInAccount")
 	}
 	if selectedModel == "" {
-		return "", nil, nil, fmt.Errorf("model is required")
+		return "", nil, nil, buserr.New("ErrAgentModelNotInAccount")
 	}
 	selectedAccountModel, err := requireAgentAccountModelForProvider(account.Provider, accountModels, selectedModel)
 	if err != nil {
@@ -1464,9 +1460,6 @@ func ensureAccountModelsNotBound(account *model.AgentAccount, models []dto.Agent
 		return err
 	}
 	for _, agent := range agents {
-		if strings.TrimSpace(agent.Model) == "" {
-			continue
-		}
 		if _, ok := findAgentAccountModelForProvider(account.Provider, models, agent.Model); !ok {
 			return buserr.WithName("ErrAgentModelInUse", agent.Name)
 		}
