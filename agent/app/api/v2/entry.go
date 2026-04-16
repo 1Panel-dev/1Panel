@@ -37,13 +37,14 @@ var (
 
 	cronjobService = service.NewICronjobService()
 
-	fileService      = service.NewIFileService()
-	fileShareService = service.NewIFileShareService()
-	sshService       = service.NewISSHService()
-	firewallService  = service.NewIFirewallService()
-	iptablesService  = service.NewIIptablesService()
-	monitorService   = service.NewIMonitorService()
-	systemService    = service.NewISystemService()
+	fileService        = service.NewIFileService()
+	fileHistoryService = service.NewIFileHistoryService()
+	fileShareService   = service.NewIFileShareService()
+	sshService         = service.NewISSHService()
+	firewallService    = service.NewIFirewallService()
+	iptablesService    = service.NewIIptablesService()
+	monitorService     = service.NewIMonitorService()
+	systemService      = service.NewISystemService()
 
 	deviceService   = service.NewIDeviceService()
 	fail2banService = service.NewIFail2BanService()

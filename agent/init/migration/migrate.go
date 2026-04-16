@@ -82,6 +82,7 @@ func InitAgentDB() {
 		migrations.AddAgentWebsiteBinding,
 		migrations.AddFileManageAISettings,
 		migrations.AddFileShareTable,
+		migrations.AddFileHistoryTable,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

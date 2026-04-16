@@ -8,6 +8,8 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
+	"github.com/1Panel-dev/1Panel/agent/app/dto/response"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
@@ -24,9 +26,11 @@ type ISettingService interface {
 	GetSettingInfo() (*dto.SettingInfo, error)
 	GetTerminalAIInfo() (*dto.TerminalAIInfo, error)
 	GetFileManageAIInfo() (*dto.FileManageAIInfo, error)
+	GetFileHistorySettingInfo() (*response.FileHistorySettingInfo, error)
 	Update(key, value string) error
 	UpdateTerminalAI(req dto.TerminalAIInfo) error
 	UpdateFileManageAI(req dto.FileManageAIInfo) error
+	UpdateFileHistorySetting(req request.FileHistorySettingUpdate) error
 
 	TestConnByInfo(req dto.SSHConnData) bool
 	SaveConnInfo(req dto.SSHConnData) error
@@ -103,6 +107,10 @@ func (u *SettingService) GetFileManageAIInfo() (*dto.FileManageAIInfo, error) {
 	return info, nil
 }
 
+func (u *SettingService) GetFileHistorySettingInfo() (*response.FileHistorySettingInfo, error) {
+	return historyService.GetSettingInfo()
+}
+
 func (u *SettingService) Update(key, value string) error {
 	return settingRepo.UpdateOrCreate(key, value)
 }
@@ -167,6 +175,10 @@ func (u *SettingService) UpdateFileManageAI(req dto.FileManageAIInfo) error {
 	}
 	terminalai.InvalidateFileAIRuntimeCache()
 	return nil
+}
+
+func (u *SettingService) UpdateFileHistorySetting(req request.FileHistorySettingUpdate) error {
+	return historyService.UpdateSetting(req)
 }
 
 func (u *SettingService) TestConnByInfo(req dto.SSHConnData) bool {

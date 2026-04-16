@@ -1233,3 +1233,30 @@ var AddFileShareTable = &gormigrate.Migration{
 		return tx.AutoMigrate(&model.FileShare{})
 	},
 }
+
+var AddFileHistoryTable = &gormigrate.Migration{
+	ID: "20260414-add-file-history-table",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.FileHistory{}); err != nil {
+			return err
+		}
+		defaultRows := []model.Setting{
+			{Key: "FileHistoryStatus", Value: constant.StatusEnable},
+			{Key: "FileHistoryMaxPerPath", Value: "20"},
+			{Key: "FileHistoryDiskQuotaMB", Value: "1024"},
+		}
+		for i := range defaultRows {
+			var exist model.Setting
+			if err := tx.Where("`key` = ?", defaultRows[i].Key).First(&exist).Error; err != nil {
+				if errors.Is(err, gorm.ErrRecordNotFound) {
+					if err := tx.Create(&defaultRows[i]).Error; err != nil {
+						return err
+					}
+				} else {
+					return err
+				}
+			}
+		}
+		return nil
+	},
+}

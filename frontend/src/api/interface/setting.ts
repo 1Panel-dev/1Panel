@@ -94,6 +94,12 @@ export namespace Setting {
         aiStatus: string;
         aiAccountId: string;
     }
+
+    export interface FileHistoryInfo {
+        enable: string;
+        maxPerPath: number;
+        diskQuotaMB: number;
+    }
     export interface SettingUpdate {
         key: string;
         value: string;

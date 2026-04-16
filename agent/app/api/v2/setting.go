@@ -5,6 +5,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/ssh"
@@ -96,6 +97,41 @@ func (b *BaseApi) UpdateFileManageAISetting(c *gin.Context) {
 		return
 	}
 	if err := settingService.UpdateFileManageAI(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags System Setting
+// @Summary Load file history setting info
+// @Success 200 {object} response.FileHistorySettingInfo
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /settings/file-history/search [post]
+func (b *BaseApi) GetFileHistorySettingInfo(c *gin.Context) {
+	setting, err := settingService.GetFileHistorySettingInfo()
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, setting)
+}
+
+// @Tags System Setting
+// @Summary Update file history setting
+// @Accept json
+// @Param request body request.FileHistorySettingUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /settings/file-history/update [post]
+func (b *BaseApi) UpdateFileHistorySetting(c *gin.Context) {
+	var req request.FileHistorySettingUpdate
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := settingService.UpdateFileHistorySetting(req); err != nil {
 		helper.InternalServer(c, err)
 		return
 	}
