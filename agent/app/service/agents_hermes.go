@@ -10,6 +10,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	providercatalog "github.com/1Panel-dev/1Panel/agent/app/provider"
+	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	agentenv "github.com/1Panel-dev/1Panel/agent/utils/env"
@@ -19,6 +20,7 @@ import (
 )
 
 const hermesWorkspaceDir = "/opt/data/workspace"
+const hermesExecutablePath = "/opt/hermes/.venv/bin/hermes"
 
 type hermesConfig struct {
 	Model    hermesModelConfig    `yaml:"model"`
@@ -50,6 +52,17 @@ func buildHermesDockerExecCommandArgs(containerName, command string, commandArgs
 
 func buildHermesDockerExecArgs(containerName string, hermesArgs ...string) []string {
 	return buildHermesDockerExecCommandArgs(containerName, "hermes", hermesArgs...)
+}
+
+func buildHermesSkillUninstallArgs(containerName, skillName string) []string {
+	return buildHermesDockerExecCommandArgs(
+		containerName,
+		"sh",
+		"-lc",
+		fmt.Sprintf(`printf 'y\n' | %s skills uninstall "$1"`, hermesExecutablePath),
+		"sh",
+		skillName,
+	)
 }
 
 func writeHermesConfig(confDir string, account *model.AgentAccount, modelName string, timezone string) error {
@@ -384,6 +397,14 @@ func resolveHermesConfiguredModelID(account *model.AgentAccount, accountModels [
 		}
 	}
 	return ""
+}
+
+func resolveHermesConfiguredModelIDStrict(account *model.AgentAccount, accountModels []dto.AgentAccountModel, configuredModel string) (string, error) {
+	modelID := resolveHermesConfiguredModelID(account, accountModels, configuredModel)
+	if modelID == "" {
+		return "", buserr.New("ErrAgentModelNotInAccount")
+	}
+	return modelID, nil
 }
 
 func resolveHermesEnvEntries(account *model.AgentAccount) []hermesEnvEntry {

@@ -685,6 +685,7 @@ const message = {
             skillsMarketSourceClawhubChina: 'ClawHub（中國）',
             skillsMarketSourceSkillhub: 'SkillHub（騰訊）',
             skillsScore: '評分',
+            skillsMarketSourceOfficial: '官方',
             versionUnsupportedTitle: '當前版本暫不支援該功能',
             versionUnsupportedHelper: '請升級 OpenClaw 到 {0} 或以上版本後使用。',
             skillsStatusDisabled: '已禁用',

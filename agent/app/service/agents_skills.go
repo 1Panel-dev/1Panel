@@ -9,6 +9,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/task"
+	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 )
@@ -41,12 +42,18 @@ var clawhubSearchLinePattern = regexp.MustCompile(`^(\S+)\s+(.+?)\s+\(([\d.]+)\)
 var ansiEscapePattern = regexp.MustCompile(`\x1b\[[0-9;?]*[ -/]*[@-~]`)
 
 func (a AgentService) ListSkills(req dto.AgentIDReq) ([]dto.AgentSkillItem, error) {
-	_, install, err := a.loadOpenclawAgentAndInstall(req.AgentID)
+	agent, install, err := a.loadAgentAndInstall(req.AgentID)
 	if err != nil {
 		return nil, err
 	}
 	if err := ensureContainerRunning(install.ContainerName); err != nil {
 		return nil, err
+	}
+	if agent.AgentType == constant.AppHermesAgent {
+		return listHermesSkills(install.ContainerName)
+	}
+	if agent.AgentType != constant.AppOpenclaw {
+		return nil, fmt.Errorf("%s does not support", agent.AgentType)
 	}
 	output, err := runDockerExecWithStdout(5*time.Minute, install.ContainerName, "sh", "-c", "openclaw skills list --json 2>&1")
 	if err != nil {
@@ -59,12 +66,18 @@ func (a AgentService) ListSkills(req dto.AgentIDReq) ([]dto.AgentSkillItem, erro
 }
 
 func (a AgentService) SearchSkills(req dto.AgentSkillSearchReq) ([]dto.AgentSkillSearchItem, error) {
-	_, install, err := a.loadOpenclawAgentAndInstall(req.AgentID)
+	agent, install, err := a.loadAgentAndInstall(req.AgentID)
 	if err != nil {
 		return nil, err
 	}
 	if err := ensureContainerRunning(install.ContainerName); err != nil {
 		return nil, err
+	}
+	if agent.AgentType == constant.AppHermesAgent {
+		return searchHermesSkills(install.ContainerName, req.Source, req.Keyword)
+	}
+	if agent.AgentType != constant.AppOpenclaw {
+		return nil, fmt.Errorf("%s does not support", agent.AgentType)
 	}
 	output, err := loadOpenclawSkillSearchOutput(install.ContainerName, req.Source, req.Keyword)
 	if err != nil {
@@ -102,7 +115,7 @@ func (a AgentService) UpdateSkill(req dto.AgentSkillUpdateReq) error {
 }
 
 func (a AgentService) InstallSkill(req dto.AgentSkillInstallReq) error {
-	_, install, err := a.loadOpenclawAgentAndInstall(req.AgentID)
+	agent, install, err := a.loadAgentAndInstall(req.AgentID)
 	if err != nil {
 		return err
 	}
@@ -112,6 +125,21 @@ func (a AgentService) InstallSkill(req dto.AgentSkillInstallReq) error {
 	installTask, err := task.NewTaskWithOps(req.Slug, task.TaskInstall, task.TaskScopeAI, req.TaskID, req.AgentID)
 	if err != nil {
 		return err
+	}
+	if agent.AgentType == constant.AppHermesAgent {
+		installTask.AddSubTask("Install Hermes skill", func(t *task.Task) error {
+			mgr := cmd.NewCommandMgr(cmd.WithTask(*t), cmd.WithContext(t.TaskCtx), cmd.WithTimeout(20*time.Minute))
+			return mgr.Run("docker", buildHermesDockerExecArgs(install.ContainerName, "skills", "install", req.Slug, "--yes")...)
+		}, nil)
+		go func() {
+			if err := installTask.Execute(); err != nil {
+				global.LOG.Errorf("install hermes skill failed: %v", err)
+			}
+		}()
+		return nil
+	}
+	if agent.AgentType != constant.AppOpenclaw {
+		return fmt.Errorf("%s does not support", agent.AgentType)
 	}
 	installTask.AddSubTask("Install OpenClaw skill", func(t *task.Task) error {
 		mgr := cmd.NewCommandMgr(cmd.WithTask(*t), cmd.WithContext(t.TaskCtx), cmd.WithTimeout(20*time.Minute))
@@ -123,6 +151,23 @@ func (a AgentService) InstallSkill(req dto.AgentSkillInstallReq) error {
 		}
 	}()
 	return nil
+}
+
+func (a AgentService) UninstallSkill(req dto.AgentSkillUninstallReq) error {
+	agent, install, err := a.loadAgentAndInstall(req.AgentID)
+	if err != nil {
+		return err
+	}
+	if agent.AgentType != constant.AppHermesAgent {
+		return fmt.Errorf("%s does not support", agent.AgentType)
+	}
+	if err := ensureContainerRunning(install.ContainerName); err != nil {
+		return err
+	}
+	return cmd.NewCommandMgr(cmd.WithTimeout(5*time.Minute)).Run(
+		"docker",
+		buildHermesSkillUninstallArgs(install.ContainerName, req.Name)...,
+	)
 }
 
 func parseOpenclawSkillsList(output string) ([]dto.AgentSkillItem, error) {

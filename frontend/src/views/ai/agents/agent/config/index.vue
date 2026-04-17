@@ -15,8 +15,12 @@
                 <el-tab-pane v-if="agentType === 'openclaw'" :label="t('aiTools.agents.agentRoleTab')" name="agent">
                     <AgentTab ref="agentRef" />
                 </el-tab-pane>
-                <el-tab-pane v-if="agentType === 'openclaw'" :label="t('aiTools.agents.skillsTab')" name="skills">
-                    <SkillsTab ref="skillsRef" :app-version="appVersion" />
+                <el-tab-pane
+                    v-if="agentType === 'openclaw' || agentType === 'hermes-agent'"
+                    :label="t('aiTools.agents.skillsTab')"
+                    name="skills"
+                >
+                    <SkillsTab ref="skillsRef" :app-version="appVersion" :agent-type="agentType" />
                 </el-tab-pane>
                 <el-tab-pane
                     v-if="agentType === 'openclaw' || agentType === 'hermes-agent'"

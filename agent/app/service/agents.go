@@ -53,6 +53,7 @@ type IAgentService interface {
 	SearchSkills(req dto.AgentSkillSearchReq) ([]dto.AgentSkillSearchItem, error)
 	UpdateSkill(req dto.AgentSkillUpdateReq) error
 	InstallSkill(req dto.AgentSkillInstallReq) error
+	UninstallSkill(req dto.AgentSkillUninstallReq) error
 
 	CreateRole(req dto.AgentRoleCreateReq) (*dto.AgentRoleCreateResp, error)
 	DeleteRole(req dto.AgentRoleDeleteReq) error
@@ -455,9 +456,9 @@ func (a AgentService) GetModelConfig(req dto.AgentIDReq) (*dto.AgentModelConfig,
 		if err != nil {
 			return nil, err
 		}
-		model := resolveHermesConfiguredModelID(account, accountModels, cfg.Model.Default)
-		if model == "" {
-			model = agent.Model
+		model, err := resolveHermesConfiguredModelIDStrict(account, accountModels, cfg.Model.Default)
+		if err != nil {
+			return nil, err
 		}
 		return &dto.AgentModelConfig{
 			AccountID: agent.AccountID,

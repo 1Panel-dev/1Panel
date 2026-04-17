@@ -288,12 +288,12 @@ const buttons = [
         show: (row: AI.AgentItem) => row.agentType === 'hermes-agent' && row.status === 'Running',
     },
     {
-        label: i18n.global.t('menu.terminal'),
-        click: (row: AI.AgentItem) => openTerminal(row),
-    },
-    {
         label: i18n.global.t('commons.button.log'),
         click: (row: AI.AgentItem) => openLog(row),
+    },
+    {
+        label: i18n.global.t('menu.terminal'),
+        click: (row: AI.AgentItem) => openTerminal(row),
     },
     {
         label: i18n.global.t('menu.home'),
