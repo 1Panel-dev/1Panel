@@ -17,15 +17,21 @@
             <el-card shadow="never" class="history-setting">
                 <el-collapse v-model="activeCollapse" :accordion="true" class="!border-0">
                     <el-collapse-item :title="$t('file.historySettingTitle')" name="history" class="!border-0">
-                        <el-form label-position="top" class="flex items-end gap-6">
-                            <el-form-item :label="$t('file.historyEnable')">
+                        <el-form
+                            ref="historySettingFormRef"
+                            :model="historySetting"
+                            :rules="historySettingRules"
+                            label-position="top"
+                            class="flex items-end gap-6"
+                        >
+                            <el-form-item :label="$t('file.historyEnable')" prop="enable">
                                 <el-switch
                                     v-model="historySetting.enable"
                                     active-value="Enable"
                                     inactive-value="Disable"
                                 />
                             </el-form-item>
-                            <el-form-item :label="$t('file.historyMaxPerPath')">
+                            <el-form-item :label="$t('file.historyMaxPerPath')" prop="maxPerPath">
                                 <el-input-number
                                     v-model="historySetting.maxPerPath"
                                     :min="1"
@@ -33,7 +39,7 @@
                                     class="!w-52"
                                 />
                             </el-form-item>
-                            <el-form-item :label="$t('file.historyDiskQuota')">
+                            <el-form-item :label="$t('file.historyDiskQuota')" prop="diskQuotaMB">
                                 <el-input-number
                                     v-model="historySetting.diskQuotaMB"
                                     :min="1"
@@ -212,7 +218,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, onMounted, onUnmounted, ref } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, onUnmounted, reactive, ref } from 'vue';
 import { dateFormatSimpleWithSecond } from '@/utils/date';
 import { computeSize } from '@/utils/size';
 import { MsgError, MsgSuccess } from '@/utils/message';
@@ -221,7 +227,7 @@ import { getAgentFileHistoryInfo, updateAgentFileHistoryInfo } from '@/api/modul
 import { File } from '@/api/interface/file';
 import { Setting } from '@/api/interface/setting';
 import { loadMonacoLanguageSupport, setupMonacoEnvironment } from '@/utils/monaco';
-import { ElMessageBox } from 'element-plus';
+import { ElMessageBox, type FormInstance, type FormRules } from 'element-plus';
 import { Languages } from '@/global/mimetype';
 import i18n from '@/lang';
 
@@ -241,6 +247,7 @@ const historyLoading = ref(false);
 const deleteLoading = ref(false);
 const settingSaving = ref(false);
 const restoreLoading = ref(false);
+const historySettingFormRef = ref<FormInstance>();
 const scope = ref<'current' | 'all'>('current');
 const operationFilter = ref('');
 const activeCollapse = ref([]);
@@ -256,6 +263,51 @@ const historySetting = ref<Setting.FileHistoryInfo>({
     maxPerPath: 20,
     diskQuotaMB: 1024,
 });
+const historySettingRules = reactive<FormRules<Setting.FileHistoryInfo>>({
+    enable: [
+        {
+            required: true,
+            message: i18n.global.t('commons.rule.requiredInput'),
+            trigger: 'change',
+        },
+    ],
+    maxPerPath: [
+        {
+            required: true,
+            message: i18n.global.t('commons.rule.requiredInput'),
+            trigger: 'change',
+        },
+        {
+            validator: (_, value, callback) => {
+                const parsedValue = Number(value);
+                if (!Number.isInteger(parsedValue) || parsedValue <= 0) {
+                    callback(new Error(i18n.global.t('commons.rule.integer')));
+                    return;
+                }
+                callback();
+            },
+            trigger: 'change',
+        },
+    ],
+    diskQuotaMB: [
+        {
+            required: true,
+            message: i18n.global.t('commons.rule.requiredInput'),
+            trigger: 'change',
+        },
+        {
+            validator: (_, value, callback) => {
+                const parsedValue = Number(value);
+                if (!Number.isInteger(parsedValue) || parsedValue <= 0) {
+                    callback(new Error(i18n.global.t('commons.rule.integer')));
+                    return;
+                }
+                callback();
+            },
+            trigger: 'change',
+        },
+    ],
+});
 const historyItems = ref<File.FileHistoryInfo[]>([]);
 const selected = ref<File.FileHistoryInfo[]>([]);
 const selectedHistory = ref<File.FileHistoryInfo | null>(null);
@@ -267,6 +319,7 @@ const windowWidth = ref(window.innerWidth);
 const operationMap = {
     '': i18n.global.t('app.all'),
     save: i18n.global.t('commons.button.save'),
+    restore: i18n.global.t('commons.button.recover'),
     move: i18n.global.t('file.move'),
     rename: i18n.global.t('file.rename'),
 } as const;
@@ -279,7 +332,7 @@ const operationOptions = Object.entries(operationMap).map(([value, label]) => ({
 const getOperationLabel = (operation: string) => {
     return operationMap[operation as keyof typeof operationMap] || operation;
 };
-const isVersionRecord = (operation: string) => operation === 'save';
+const isVersionRecord = (operation: string) => operation === 'save' || operation === 'restore';
 const canRestoreSelected = computed(() => isVersionRecord(selectedHistory.value?.operation || ''));
 const isRestoringCurrentFile = computed(() => selectedHistory.value?.path === currentFile.value.path);
 const getCurrentTargetPath = (row: File.FileHistoryInfo) => row.currentPath || row.path;
@@ -412,10 +465,23 @@ const loadHistorySetting = async () => {
     historySetting.value = res.data;
 };
 
+const normalizeHistorySettingNumber = (value: number, defaultValue: number) => {
+    const parsedValue = Number(value);
+    return parsedValue > 0 ? parsedValue : defaultValue;
+};
+
 const saveHistorySetting = async () => {
     settingSaving.value = true;
     try {
-        await updateAgentFileHistoryInfo(historySetting.value);
+        const valid = await historySettingFormRef.value?.validate().catch(() => false);
+        if (!valid) {
+            return;
+        }
+        await updateAgentFileHistoryInfo({
+            ...historySetting.value,
+            maxPerPath: normalizeHistorySettingNumber(historySetting.value.maxPerPath, 20),
+            diskQuotaMB: normalizeHistorySettingNumber(historySetting.value.diskQuotaMB, 1024),
+        });
         MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
     } catch (error) {
         MsgError(String(error));

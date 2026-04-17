@@ -30,9 +30,12 @@ const (
 	fileHistorySettingMaxPerPath  = "FileHistoryMaxPerPath"
 	fileHistorySettingDiskQuotaMB = "FileHistoryDiskQuotaMB"
 	fileHistoryOpSave             = "save"
+	fileHistoryOpRestore          = "restore"
 	fileHistoryOpRename           = "rename"
 	fileHistoryOpMove             = "move"
 	fileHistoryRootDirName        = "file-history"
+	defaultFileHistoryMaxPerPath  = 20
+	defaultFileHistoryDiskQuotaMB = 1024
 )
 
 var historyService = NewIFileHistoryService()
@@ -62,8 +65,8 @@ func NewIFileHistoryService() IFileHistoryService {
 func (s *FileHistoryService) GetSettingInfo() (*response.FileHistorySettingInfo, error) {
 	info := &response.FileHistorySettingInfo{
 		Enable:      constant.StatusEnable,
-		MaxPerPath:  20,
-		DiskQuotaMB: 1024,
+		MaxPerPath:  defaultFileHistoryMaxPerPath,
+		DiskQuotaMB: defaultFileHistoryDiskQuotaMB,
 	}
 	if value, err := settingRepo.GetValueByKey(fileHistorySettingEnable); err == nil && value != "" {
 		info.Enable = value
@@ -82,6 +85,12 @@ func (s *FileHistoryService) GetSettingInfo() (*response.FileHistorySettingInfo,
 }
 
 func (s *FileHistoryService) UpdateSetting(req request.FileHistorySettingUpdate) error {
+	if req.MaxPerPath <= 0 {
+		req.MaxPerPath = defaultFileHistoryMaxPerPath
+	}
+	if req.DiskQuotaMB <= 0 {
+		req.DiskQuotaMB = defaultFileHistoryDiskQuotaMB
+	}
 	if err := settingRepo.UpdateOrCreate(fileHistorySettingEnable, req.Enable); err != nil {
 		return err
 	}
@@ -161,13 +170,20 @@ func (s *FileHistoryService) RecordOperation(operation string, filePath string, 
 	}
 
 	previousID := uint(0)
-	if s.isVersionOperation(operation) {
-		contentHash := sha256HexBytes(content)
-		if latestVersion, err := s.getLatestVersionByFileID(fileID); err == nil {
+	if latestVersion, err := s.getLatestVersionByFileID(fileID); err == nil {
+		switch operation {
+		case fileHistoryOpSave:
+			contentHash := sha256HexBytes(content)
 			if latestVersion.ContentSHA == contentHash {
 				return nil
 			}
 			previousID = latestVersion.ID
+		case fileHistoryOpRestore:
+			previousID = latestVersion.ID
+		default:
+			if latestChainRecord.ID != 0 {
+				previousID = latestChainRecord.ID
+			}
 		}
 	} else if latestChainRecord.ID != 0 {
 		previousID = latestChainRecord.ID
@@ -414,6 +430,9 @@ func (s *FileHistoryService) Restore(req request.FileHistoryRestoreReq) (respons
 		_ = s.rollbackRestore(currentPath, rollbackContent, rollbackMode, existedBefore)
 		return response.FileInfo{}, err
 	}
+	if err := historyService.RecordOperation(fileHistoryOpRestore, currentPath, rollbackContent, rollbackMode, "", ""); err != nil {
+		global.LOG.Warnf("record file restore history failed for %s: %v", currentPath, err)
+	}
 
 	info, err := files.NewFileInfo(files.FileOption{
 		Path:   currentPath,
@@ -571,7 +590,7 @@ func (s *FileHistoryService) getLatestActiveRelatedByPath(absPath string) (model
 
 func (s *FileHistoryService) getLatestVersionByFileID(fileID string) (model.FileHistory, error) {
 	var item model.FileHistory
-	db := global.DB.Model(&model.FileHistory{}).Where("file_id = ? AND operation = ?", fileID, fileHistoryOpSave).Order("created_at desc")
+	db := global.DB.Model(&model.FileHistory{}).Where("file_id = ? AND operation IN ?", fileID, []string{fileHistoryOpSave, fileHistoryOpRestore}).Order("created_at desc")
 	err := db.First(&item).Error
 	return item, err
 }
@@ -609,7 +628,7 @@ func (s *FileHistoryService) resolveFileChain(paths ...string) (string, model.Fi
 }
 
 func (s *FileHistoryService) isVersionOperation(operation string) bool {
-	return operation == fileHistoryOpSave
+	return operation == fileHistoryOpSave || operation == fileHistoryOpRestore
 }
 
 func (s *FileHistoryService) totalSize() (int64, error) {
