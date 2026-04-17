@@ -47,6 +47,6 @@ type FileHistoryRestoreReq struct {
 
 type FileHistorySettingUpdate struct {
 	Enable      string `json:"enable" validate:"required,oneof=Enable Disable"`
-	MaxPerPath  int    `json:"maxPerPath" validate:"required,min=1,max=1000"`
-	DiskQuotaMB int    `json:"diskQuotaMB" validate:"required,min=1,max=1048576"`
+	MaxPerPath  int    `json:"maxPerPath" validate:"min=0,max=1000"`
+	DiskQuotaMB int    `json:"diskQuotaMB" validate:"min=0,max=1048576"`
 }
