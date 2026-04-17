@@ -48,6 +48,10 @@ export const Languages = [
         value: ['md'],
     },
     {
+        label: 'dockerfile',
+        value: ['dockerfile'],
+    },
+    {
         label: 'yaml',
         value: ['yml', 'yaml'],
     },

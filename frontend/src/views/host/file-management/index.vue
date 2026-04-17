@@ -718,7 +718,8 @@ import { dateFormat } from '@/utils/date';
 import { downloadFile, getFileType, getIcon, isConvertible } from '@/utils/file';
 import { getRandomStr } from '@/utils/id';
 import { File } from '@/api/interface/file';
-import { Languages, Mimetypes } from '@/global/mimetype';
+import { Mimetypes } from '@/global/mimetype';
+import { resolveEditorLanguage } from '@/utils/file';
 import { useRouter } from 'vue-router';
 import { MsgSuccess, MsgWarning } from '@/utils/message';
 import { useMultipleSearchable } from './hooks/searchable';
@@ -1383,10 +1384,10 @@ const openView = (item: File.File) => {
     }
 
     const actionMap = {
-        text: () => openCodeEditor(path, item.extension),
+        text: () => openCodeEditor(path),
     };
 
-    return actionMap[fileType] ? actionMap[fileType](item) : openCodeEditor(path, item.extension);
+    return actionMap[fileType] ? actionMap[fileType](item) : openCodeEditor(path);
 };
 
 const openPreview = (item: File.File, fileType: string) => {
@@ -1404,36 +1405,17 @@ const openPreview = (item: File.File, fileType: string) => {
     previewRef.value.acceptParams(filePreview);
 };
 
-const extensionFromPath = (p: string) => {
-    const i = p.lastIndexOf('.');
-    if (i <= 0 || i === p.length - 1) {
-        return '';
-    }
-    return p.slice(i);
-};
-
 const openPathInCodeEditor = (
     path: string,
     opts?: {
-        extension?: string;
         initialLine?: number;
     },
 ) => {
     if (!path) {
         return;
     }
-    const extension = opts?.extension && opts.extension !== '' ? opts.extension : extensionFromPath(path);
     codeReq.path = path;
     codeReq.expand = true;
-
-    if (extension !== '') {
-        Languages.forEach((language) => {
-            const ext = extension.substring(1);
-            if (language.value.indexOf(ext) > -1) {
-                fileEdit.language = language.label;
-            }
-        });
-    }
 
     const line = opts?.initialLine && opts.initialLine > 0 ? Math.floor(opts.initialLine) : undefined;
 
@@ -1443,6 +1425,7 @@ const openPathInCodeEditor = (
             fileEdit.path = res.data.path;
             fileEdit.name = res.data.name;
             fileEdit.extension = res.data.extension;
+            fileEdit.language = resolveEditorLanguage(res.data.path, res.data.extension, res.data.name);
             fileEdit.initialLine = line;
             codeEditorRef.value.acceptParams(fileEdit);
             fileEdit.initialLine = undefined;
@@ -1454,8 +1437,8 @@ const onAiSearchOpenEditor = (payload: { path: string; initialLine?: number }) =
     openPathInCodeEditor(payload.path, { initialLine: payload.initialLine });
 };
 
-const openCodeEditor = (path: string, extension: string) => {
-    openPathInCodeEditor(path, { extension });
+const openCodeEditor = (path: string) => {
+    openPathInCodeEditor(path);
 };
 
 const openTextPreview = (path: string, name: string) => {
