@@ -1172,6 +1172,26 @@ func (b *BaseApi) InstallAgentSkill(c *gin.Context) {
 }
 
 // @Tags AI
+// @Summary Uninstall Agent skill
+// @Accept json
+// @Param request body dto.AgentSkillUninstallReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/skills/uninstall [post]
+func (b *BaseApi) UninstallAgentSkill(c *gin.Context) {
+	var req dto.AgentSkillUninstallReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := agentService.UninstallSkill(req); err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags AI
 // @Summary Login Agent Weixin channel
 // @Accept json
 // @Param request body dto.AgentWeixinLoginReq true "request"

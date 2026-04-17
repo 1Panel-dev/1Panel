@@ -726,6 +726,7 @@ const message = {
             skillsMarketSourceClawhubChina: 'ClawHub (China)',
             skillsMarketSourceSkillhub: 'SkillHub (Tencent)',
             skillsScore: 'Puntuación',
+            skillsMarketSourceOfficial: 'Oficial',
             versionUnsupportedTitle: 'Esta función no es compatible con la versión actual',
             versionUnsupportedHelper: 'Actualice OpenClaw a la versión {0} o posterior.',
             skillsStatusDisabled: 'Deshabilitado',

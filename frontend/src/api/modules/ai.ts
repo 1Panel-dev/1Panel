@@ -326,6 +326,10 @@ export const installAgentSkill = (req: AI.AgentSkillInstallReq) => {
     return http.post(`/ai/agents/skills/install`, req);
 };
 
+export const uninstallAgentSkill = (req: AI.AgentSkillUninstallReq) => {
+    return http.post(`/ai/agents/skills/uninstall`, req);
+};
+
 export const approveAgentChannelPairing = (req: AI.AgentChannelPairingApproveReq) => {
     return http.post(`/ai/agents/channel/pairing/approve`, req, TimeoutEnum.T_5M);
 };

@@ -57,13 +57,15 @@ func readHermesQQBotChannelConfig(confDir string) (*dto.AgentQQBotConfig, error)
 	}
 	groupAllowFrom := extractStringList(extra["group_allow_from"])
 
-	return &dto.AgentQQBotConfig{
+	result := &dto.AgentQQBotConfig{
 		Enabled:        extractBoolValue(platform["enabled"], false) && appID != "" && clientSecret != "",
 		DmPolicy:       dmPolicy,
 		AllowFrom:      allowFrom,
 		GroupPolicy:    groupPolicy,
 		GroupAllowFrom: groupAllowFrom,
-		Bots: []dto.AgentQQBotBot{
+	}
+	if appID != "" || clientSecret != "" {
+		result.Bots = []dto.AgentQQBotBot{
 			{
 				AgentChannelBotBase: dto.AgentChannelBotBase{
 					AccountID: "default",
@@ -74,8 +76,9 @@ func readHermesQQBotChannelConfig(confDir string) (*dto.AgentQQBotConfig, error)
 				AppID:        appID,
 				ClientSecret: clientSecret,
 			},
-		},
-	}, nil
+		}
+	}
+	return result, nil
 }
 
 func writeHermesQQBotChannelConfig(confDir string, config dto.AgentQQBotConfig) error {

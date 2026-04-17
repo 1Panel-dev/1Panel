@@ -723,6 +723,7 @@ const message = {
             skillsMarketSourceClawhubChina: 'ClawHub (Çin)',
             skillsMarketSourceSkillhub: 'SkillHub (Tencent)',
             skillsScore: 'Puan',
+            skillsMarketSourceOfficial: 'Resmi',
             versionUnsupportedTitle: 'Bu özellik mevcut sürümde desteklenmiyor',
             versionUnsupportedHelper: 'Lütfen OpenClawı {0} veya üzeri bir sürüme yükseltin.',
             skillsStatusDisabled: 'Devre dışı',

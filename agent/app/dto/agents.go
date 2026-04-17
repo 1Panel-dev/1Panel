@@ -590,25 +590,32 @@ type AgentConfigFile struct {
 
 type AgentSkillSearchReq struct {
 	AgentID uint   `json:"agentId" validate:"required"`
-	Source  string `json:"source" validate:"required,oneof=clawhub-global clawhub-cn skillhub"`
+	Source  string `json:"source" validate:"required,oneof=clawhub-global clawhub-cn skillhub official skills-sh"`
 	Keyword string `json:"keyword" validate:"required"`
 }
 
 type AgentSkillItem struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	Source      string `json:"source"`
-	Bundled     bool   `json:"bundled"`
-	Disabled    bool   `json:"disabled"`
+	Name          string   `json:"name"`
+	Description   string   `json:"description"`
+	Category      string   `json:"category"`
+	Tags          []string `json:"tags"`
+	Source        string   `json:"source"`
+	Trust         string   `json:"trust"`
+	Identifier    string   `json:"identifier"`
+	Bundled       bool     `json:"bundled"`
+	Disabled      bool     `json:"disabled"`
+	Uninstallable bool     `json:"uninstallable"`
 }
 
 type AgentSkillSearchItem struct {
 	Slug        string `json:"slug"`
+	Identifier  string `json:"identifier"`
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	Summary     string `json:"summary"`
 	Version     string `json:"version"`
 	Source      string `json:"source"`
+	Trust       string `json:"trust"`
 	Score       string `json:"score"`
 }
 
@@ -620,7 +627,12 @@ type AgentSkillUpdateReq struct {
 
 type AgentSkillInstallReq struct {
 	AgentID uint   `json:"agentId" validate:"required"`
-	Source  string `json:"source" validate:"required,oneof=clawhub-global clawhub-cn skillhub"`
+	Source  string `json:"source" validate:"required,oneof=clawhub-global clawhub-cn skillhub official skills-sh"`
 	Slug    string `json:"slug" validate:"required"`
 	TaskID  string `json:"taskID" validate:"required"`
+}
+
+type AgentSkillUninstallReq struct {
+	AgentID uint   `json:"agentId" validate:"required"`
+	Name    string `json:"name" validate:"required"`
 }

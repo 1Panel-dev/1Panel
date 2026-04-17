@@ -720,6 +720,7 @@ const message = {
             skillsMarketSourceClawhubChina: 'ClawHub（中国）',
             skillsMarketSourceSkillhub: 'SkillHub（Tencent）',
             skillsScore: 'スコア',
+            skillsMarketSourceOfficial: '公式',
             versionUnsupportedTitle: '現在のバージョンではこの機能はサポートされていません',
             versionUnsupportedHelper: 'OpenClaw をバージョン {0} 以降にアップグレードしてください。',
             skillsStatusDisabled: '無効',

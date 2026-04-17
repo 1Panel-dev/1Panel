@@ -621,7 +621,7 @@ export namespace AI {
 
     export interface AgentChannelPairingApproveReq {
         agentId: number;
-        type: 'feishu' | 'telegram' | 'discord' | 'wecom';
+        type: 'feishu' | 'telegram' | 'discord' | 'wecom' | 'qqbot';
         pairingCode: string;
         accountId?: string;
     }
@@ -845,25 +845,32 @@ export namespace AI {
 
     export interface AgentSkillSearchReq {
         agentId: number;
-        source: 'clawhub-global' | 'clawhub-cn' | 'skillhub';
+        source: 'clawhub-global' | 'clawhub-cn' | 'skillhub' | 'official' | 'skills-sh';
         keyword: string;
     }
 
     export interface AgentSkillItem {
         name: string;
         description: string;
+        category: string;
+        tags: string[];
         source: string;
+        trust: string;
+        identifier: string;
         bundled: boolean;
         disabled: boolean;
+        uninstallable: boolean;
     }
 
     export interface AgentSkillSearchItem {
         slug: string;
+        identifier: string;
         name: string;
         description: string;
         summary: string;
         version: string;
         source: string;
+        trust: string;
         score: string;
     }
 
@@ -875,8 +882,13 @@ export namespace AI {
 
     export interface AgentSkillInstallReq {
         agentId: number;
-        source: 'clawhub-global' | 'clawhub-cn' | 'skillhub';
+        source: 'clawhub-global' | 'clawhub-cn' | 'skillhub' | 'official' | 'skills-sh';
         slug: string;
         taskID: string;
+    }
+
+    export interface AgentSkillUninstallReq {
+        agentId: number;
+        name: string;
     }
 }
