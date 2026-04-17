@@ -187,7 +187,7 @@
                                 <span
                                     v-else
                                     style="display: inline-flex; align-items: center"
-                                    @click="getContent(data.path, data.extension)"
+                                    @click="getContent(data.path)"
                                 >
                                     <template v-if="isCreate == 'file' && data.id == 'new-file'">
                                         <div class="flex justify-between items-center gap-0.5 pr-2">
@@ -405,6 +405,7 @@ import { MsgError, MsgSuccess, MsgWarning } from '@/utils/message';
 import { loadMonacoLanguageSupport, setupMonacoEnvironment } from '@/utils/monaco';
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
 import { Languages } from '@/global/mimetype';
+import { resolveEditorLanguage } from '@/utils/file';
 
 import type { TabPaneName } from 'element-plus';
 import { ElMessageBox, ElTreeV2 } from 'element-plus';
@@ -636,20 +637,20 @@ const removeTab = (targetPath: TabPaneName) => {
                 updateTabs();
                 if (fileTabs.value.length > 0) {
                     saveContent();
-                    getContent(selectTab.value, '');
+                    getContent(selectTab.value);
                 }
             })
             .catch(() => {
                 updateTabs();
                 isEdit.value = false;
                 if (fileTabs.value.length > 0) {
-                    getContent(selectTab.value, '');
+                    getContent(selectTab.value);
                 }
             });
     } else {
         updateTabs();
         if (fileTabs.value.length > 0) {
-            getContent(selectTab.value, '');
+            getContent(selectTab.value);
         }
     }
 };
@@ -678,7 +679,7 @@ const removeAllTab = (targetPath: string, type: 'left' | 'right' | 'all') => {
             selectTab.value = '';
             disposeEditor();
         } else if (newTabs.length > 0) {
-            getContent(activeName, '');
+            getContent(activeName);
         }
     };
 
@@ -719,7 +720,7 @@ const removeOtherTab = (targetPath: string) => {
         fileTabs.value = [targetTab];
         selectTab.value = targetTab.path;
         saveTabsToStorage();
-        getContent(targetTab.path, '');
+        getContent(targetTab.path);
     };
 
     const onConfirm = () => {
@@ -749,7 +750,7 @@ const removeOtherTab = (targetPath: string) => {
 
 const changeTab = (targetPath: TabPaneName) => {
     selectTab.value = targetPath.toString();
-    getContent(targetPath.toString(), '');
+    getContent(targetPath.toString());
 };
 
 const eols = computed(() => [
@@ -1040,6 +1041,7 @@ const acceptParams = async (props: EditProps) => {
     directoryPath.value = getDirectoryPath(props.path);
     fileExtension.value = props.extension;
     fileName.value = props.name;
+    config.language = resolveEditorLanguage(props.path, props.extension, props.name);
 
     let savedTabs = loadTabsFromStorage();
     const withoutCurrent = savedTabs.filter((tab) => tab.path !== props.path);
@@ -1059,7 +1061,9 @@ const acceptParams = async (props: EditProps) => {
     fileTabs.value = merged.slice(-maxTabs);
     selectTab.value = props.path;
 
-    config.language = props.language;
+    if (props.language) {
+        config.language = props.language;
+    }
     config.eol = monaco.editor.EndOfLineSequence.LF;
     config.theme = localStorage.getItem(codeThemeKey) || 'vs-dark';
     config.wordWrap = (localStorage.getItem(warpKey) as WordWrapOptions) || 'on';
@@ -1140,7 +1144,7 @@ const getRefresh = (path: string) => {
     }
 };
 
-const getContent = (path: string, extension: string, forceReload = false) => {
+const getContent = (path: string, forceReload = false) => {
     if (!forceReload && (form.value.path === path || isCreate.value == 'file')) {
         return;
     }
@@ -1152,15 +1156,6 @@ const getContent = (path: string, extension: string, forceReload = false) => {
         codeReq.path = path;
         codeReq.expand = true;
 
-        if (extension !== '') {
-            Languages.forEach((language) => {
-                const ext = extension.substring(1);
-                if (language.value.indexOf(ext) > -1) {
-                    config.language = language.label;
-                }
-            });
-        }
-
         getFileContent(codeReq)
             .then((res) => {
                 form.value.content = res.data.content;
@@ -1168,15 +1163,8 @@ const getContent = (path: string, extension: string, forceReload = false) => {
                 form.value.path = res.data.path;
                 fileExtension.value = res.data.extension;
                 fileName.value = res.data.name;
+                config.language = resolveEditorLanguage(res.data.path, res.data.extension, res.data.name);
                 initEditor();
-                if (extension == '') {
-                    Languages.forEach((language) => {
-                        const ext = fileExtension.value.substring(1);
-                        if (language.value.indexOf(ext) > -1) {
-                            config.language = language.label;
-                        }
-                    });
-                }
                 const exists = fileTabs.value.some((tab) => tab.path === path);
                 if (exists) {
                     const tab = fileTabs.value.find((t) => t.path === path);
@@ -1215,7 +1203,7 @@ const getContent = (path: string, extension: string, forceReload = false) => {
 
 const handleHistoryRestored = (path: string) => {
     if (path === form.value.path) {
-        getContent(path, '', true);
+        getContent(path, true);
         loadHistoryVersionCount(path);
     }
 };

@@ -127,7 +127,6 @@ func ResolveGeneratorConfigFromAgentSettings() (GeneratorConfig, uint, time.Dura
 	return config, uint(accountID), timeout, err
 }
 
-// ResolveGeneratorConfigFromFileSettings loads file-management AI search settings (independent from terminal AI).
 func ResolveGeneratorConfigFromFileSettings() (GeneratorConfig, uint, time.Duration, error) {
 	status, err := loadAgentSettingValue("FileAIStatus")
 	if err != nil {
@@ -151,7 +150,6 @@ func ResolveGeneratorConfigFromFileSettings() (GeneratorConfig, uint, time.Durat
 	return config, uint(accountID), timeout, err
 }
 
-// LoadFileAIRuntimeConfig returns LLM client config for file-management AI search.
 func LoadFileAIRuntimeConfig() (GeneratorConfig, time.Duration, error) {
 	cfg, _, timeout, err := ResolveGeneratorConfigFromFileSettings()
 	return cfg, timeout, err

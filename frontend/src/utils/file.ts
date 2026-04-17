@@ -1,3 +1,5 @@
+import { Languages } from '@/global/mimetype';
+
 const icons = new Map([
     ['.zip', 'p-file-zip'],
     ['.gz', 'p-file-zip'],
@@ -152,3 +154,49 @@ export function downloadWithContent(content: string, fileName: string) {
     const event = new MouseEvent('click');
     a.dispatchEvent(event);
 }
+
+const editorLanguages = new Map(
+    Languages.flatMap((language) => language.value.map((ext) => [ext.toLowerCase(), language.label] as const)),
+);
+
+const specialEditorFileNames = ['dockerfile'];
+
+const normalizeEditorExtension = (value: string) => {
+    const trimmed = value.trim().toLowerCase();
+    if (!trimmed) {
+        return '';
+    }
+    return trimmed.startsWith('.') ? trimmed.slice(1) : trimmed;
+};
+
+const isSpecialEditorFileName = (value: string) => {
+    const normalized = value.trim().toLowerCase();
+    if (!normalized) {
+        return false;
+    }
+    return specialEditorFileNames.some((filename) => normalized === filename || normalized.startsWith(`${filename}.`));
+};
+
+export const resolveEditorLanguage = (path: string, extension = '', name = '') => {
+    if (isSpecialEditorFileName(name)) {
+        return 'dockerfile';
+    }
+
+    const candidates = [extension, path.split('/').pop() || '']
+        .map((value) => normalizeEditorExtension(value))
+        .filter(Boolean);
+
+    for (const ext of candidates) {
+        const language = editorLanguages.get(ext);
+        if (language) {
+            return language;
+        }
+    }
+
+    const fileName = path.split('/').pop() || '';
+    if (isSpecialEditorFileName(fileName)) {
+        return 'dockerfile';
+    }
+
+    return 'yaml';
+};
