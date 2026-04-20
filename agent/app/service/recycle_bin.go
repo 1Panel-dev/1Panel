@@ -62,11 +62,18 @@ func (r RecycleBinService) Page(search dto.PageInfo) (int64, []response.RecycleB
 		result = append(result, collectTrashEntries(clashRoot)...)
 		result = append(result, collectLegacyEntries(clashRoot)...)
 	}
-	startIndex := (search.Page - 1) * search.PageSize
+	if search.PageSize <= 0 {
+		return int64(len(result)), []response.RecycleBinDTO{}, nil
+	}
+	page := search.Page
+	if page < 1 {
+		page = 1
+	}
+	startIndex := (page - 1) * search.PageSize
 	endIndex := startIndex + search.PageSize
 
-	if startIndex > len(result) {
-		return int64(len(result)), result, nil
+	if startIndex >= len(result) {
+		return int64(len(result)), []response.RecycleBinDTO{}, nil
 	}
 	if endIndex > len(result) {
 		endIndex = len(result)
@@ -174,7 +181,7 @@ func (r RecycleBinService) Clear() error {
 		if !op.Stat(dir) {
 			continue
 		}
-		newDir := path.Join(p.Mountpoint, "1panel_clash")
+		newDir := path.Join(p.Mountpoint, recycleBinClashDir+"-"+strings.ReplaceAll(common.GetUuid(), "-", ""))
 		if err := op.Mv(dir, newDir); err != nil {
 			return err
 		}
