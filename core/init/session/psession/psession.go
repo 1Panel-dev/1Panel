@@ -28,7 +28,7 @@ type sessionItem struct {
 type PSession struct {
 	mu              sync.RWMutex
 	sessions        map[string]sessionItem
-	cleanupCursor   uint64
+	cleanupCursor   atomic.Uint64
 	lastFullCleanup time.Time
 }
 
@@ -251,7 +251,7 @@ func (p *PSession) cleanupExpiredSample(now time.Time, limit int) {
 	if total == 0 {
 		return
 	}
-	start := int(atomic.AddUint64(&p.cleanupCursor, uint64(limit)) % uint64(total))
+	start := int(p.cleanupCursor.Add(uint64(limit)) % uint64(total))
 	checked := 0
 
 	idx := 0
