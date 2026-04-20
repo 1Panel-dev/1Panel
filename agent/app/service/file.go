@@ -305,8 +305,8 @@ func (f *FileService) Delete(op request.FileDelete) error {
 		if err != nil {
 			return err
 		}
-		if err := cleanupRecycleBinMetaByEntryPath(op.Path); err != nil {
-			global.LOG.Warnf("cleanup recycle bin metadata failed for %s: %v", op.Path, err)
+		if err := cleanupTrashInfoByEntryPath(op.Path); err != nil {
+			global.LOG.Warnf("cleanup trashinfo failed for %s: %v", op.Path, err)
 		}
 		f.cleanupPermanentDeleteHistory(historyTargets)
 		return nil
@@ -337,12 +337,18 @@ func (f *FileService) BatchDelete(op request.FileBatchDelete) error {
 			if err := fo.DeleteDir(file); err != nil {
 				return err
 			}
+			if err := cleanupTrashInfoByEntryPath(file); err != nil {
+				global.LOG.Warnf("cleanup trashinfo failed for %s: %v", file, err)
+			}
 			f.cleanupPermanentDeleteHistory(targets)
 		}
 	} else {
 		for _, file := range op.Paths {
 			if err := fo.DeleteFile(file); err != nil {
 				return err
+			}
+			if err := cleanupTrashInfoByEntryPath(file); err != nil {
+				global.LOG.Warnf("cleanup trashinfo failed for %s: %v", file, err)
 			}
 			f.cleanupPermanentDeleteHistory([]string{file})
 		}
