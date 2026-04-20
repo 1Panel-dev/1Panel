@@ -146,12 +146,12 @@ export const removeFileShare = (path: string) => {
     return http.post<any>('files/share/del', { path });
 };
 
-export const getPublicFileShareInfo = (code: string, operateNode: string) => {
-    return http.get<File.FileSharePublicInfo>('files/share/info', { code, operateNode });
+export const getPublicFileShareInfo = (code: string, operateNode: string, headers?: AxiosRequestConfig['headers']) => {
+    return http.get<File.FileSharePublicInfo>('files/share/info', { code, operateNode }, { headers });
 };
 
-export const checkFileShare = (params: File.FileShareCheck) => {
-    return http.get('files/share/check', params);
+export const checkFileShare = (params: File.FileShareCheck, headers?: AxiosRequestConfig['headers']) => {
+    return http.get('files/share/check', params, { headers });
 };
 
 export const computeDirSize = (params: File.DirSizeReq) => {

@@ -44,7 +44,7 @@ import { File } from '@/api/interface/file';
 import i18n, { loadLocaleMessages } from '@/lang';
 import { buildFileShareDownloadUrl } from '@/utils/file';
 import { dateFormat } from '@/utils/date';
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 
 const route = useRoute();
@@ -53,6 +53,7 @@ const downloading = ref(false);
 const initializing = ref(true);
 const errorMessage = ref('');
 const shareInfo = ref<File.FileSharePublicInfo | null>(null);
+const shareLocale = ref('en');
 const supportedLocales = ['zh', 'zh-Hant', 'en', 'pt-BR', 'ja', 'ru', 'ms', 'ko', 'tr', 'es-ES'];
 
 const code = computed(() => String(route.params.code || '').trim());
@@ -104,6 +105,7 @@ const applyPublicLocale = async () => {
     const locale = resolveBrowserLocale();
     const loaded = await loadLocaleMessages(locale);
     i18n.global.locale.value = loaded;
+    shareLocale.value = loaded;
 };
 
 const loadShareInfo = async () => {
@@ -111,7 +113,9 @@ const loadShareInfo = async () => {
         errorMessage.value = getFallbackText('invalid');
         return;
     }
-    const res = await getPublicFileShareInfo(code.value, currentNode.value);
+    const res = await getPublicFileShareInfo(code.value, currentNode.value, {
+        'Accept-Language': shareLocale.value,
+    });
     shareInfo.value = res.data;
 };
 
@@ -127,11 +131,16 @@ const downloadWithPassword = async () => {
     downloading.value = true;
     errorMessage.value = '';
     try {
-        await checkFileShare({
-            code: code.value,
-            password: password.value.trim(),
-            operateNode: currentNode.value,
-        });
+        await checkFileShare(
+            {
+                code: code.value,
+                password: password.value.trim(),
+                operateNode: currentNode.value,
+            },
+            {
+                'Accept-Language': shareLocale.value,
+            },
+        );
         triggerDownload(password.value.trim());
     } catch (error) {
         errorMessage.value = (error as { message?: string })?.message || getFallbackText('failed');
