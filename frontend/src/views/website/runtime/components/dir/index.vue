@@ -4,6 +4,7 @@
             <template #prepend>
                 <el-button
                     icon="Folder"
+                    :disabled="mode === 'edit'"
                     @click="fileRef.acceptParams({ path: runtime.codeDir, dir: true, disabled: mode === 'edit' })"
                 />
             </template>
