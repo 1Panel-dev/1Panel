@@ -115,6 +115,11 @@ type AgentHermesChatSessionRenameReq struct {
 	Title   string `json:"title" validate:"required"`
 }
 
+type AgentHermesChatSessionDeleteReq struct {
+	AgentID uint   `json:"agentId" validate:"required"`
+	ID      string `json:"id" validate:"required"`
+}
+
 type AgentOverview struct {
 	Snapshot AgentOverviewSnapshot `json:"snapshot"`
 }

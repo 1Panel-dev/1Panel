@@ -343,6 +343,11 @@ export namespace AI {
         title: string;
     }
 
+    export interface AgentHermesChatSessionDeleteReq {
+        agentId: number;
+        id: string;
+    }
+
     export interface AgentOverviewReq {
         agentId: number;
     }

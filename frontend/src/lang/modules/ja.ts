@@ -786,6 +786,8 @@ const message = {
             hermesChatEmptyHint: '左側のセッションを選択するか、「新しい会話」をクリックしてください',
             hermesChatTitlePlaceholder: 'セッションタイトルを入力してください',
             hermesChatRenameSuccess: 'セッションタイトルを更新しました',
+            hermesChatDeleteConfirm: 'セッション {0} を削除しますか？',
+            hermesChatDeleteSuccess: 'セッションを削除しました',
             weixin: 'Weixin',
             wecom: 'WeCom',
             dingtalk: 'DingTalk',

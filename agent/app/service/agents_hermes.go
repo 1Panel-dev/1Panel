@@ -54,17 +54,6 @@ func buildHermesDockerExecArgs(containerName string, hermesArgs ...string) []str
 	return buildHermesDockerExecCommandArgs(containerName, "hermes", hermesArgs...)
 }
 
-func buildHermesSkillUninstallArgs(containerName, skillName string) []string {
-	return buildHermesDockerExecCommandArgs(
-		containerName,
-		"sh",
-		"-lc",
-		fmt.Sprintf(`printf 'y\n' | %s skills uninstall "$1"`, hermesExecutablePath),
-		"sh",
-		skillName,
-	)
-}
-
 func writeHermesConfig(confDir string, account *model.AgentAccount, modelName string, timezone string) error {
 	if strings.TrimSpace(confDir) == "" {
 		return fmt.Errorf("config dir is required")
@@ -382,29 +371,21 @@ func resolveHermesModel(sourceProvider, targetProvider, modelName string) string
 	return target
 }
 
-func resolveHermesConfiguredModelID(account *model.AgentAccount, accountModels []dto.AgentAccountModel, configuredModel string) string {
+func resolveHermesConfiguredModelID(account *model.AgentAccount, accountModels []dto.AgentAccountModel, configuredModel string) (string, error) {
 	if account == nil {
-		return ""
+		return "", buserr.New("ErrAgentModelNotInAccount")
 	}
 	configuredModel = strings.TrimSpace(configuredModel)
 	if configuredModel == "" {
-		return ""
+		return "", buserr.New("ErrAgentModelNotInAccount")
 	}
 	provider := resolveHermesProvider(account.Provider)
 	for _, item := range accountModels {
 		if resolveHermesModel(account.Provider, provider, item.ID) == configuredModel {
-			return item.ID
+			return item.ID, nil
 		}
 	}
-	return ""
-}
-
-func resolveHermesConfiguredModelIDStrict(account *model.AgentAccount, accountModels []dto.AgentAccountModel, configuredModel string) (string, error) {
-	modelID := resolveHermesConfiguredModelID(account, accountModels, configuredModel)
-	if modelID == "" {
-		return "", buserr.New("ErrAgentModelNotInAccount")
-	}
-	return modelID, nil
+	return "", buserr.New("ErrAgentModelNotInAccount")
 }
 
 func resolveHermesEnvEntries(account *model.AgentAccount) []hermesEnvEntry {

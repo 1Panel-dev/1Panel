@@ -43,7 +43,12 @@
                                 <div v-else class="hermes-chat-dialog__item-title">{{ item.title || item.id }}</div>
                                 <div class="hermes-chat-dialog__item-actions">
                                     <template v-if="editingSessionId === item.id">
-                                        <el-button link type="primary" @click.stop="saveSessionTitle(item)">
+                                        <el-button
+                                            link
+                                            type="primary"
+                                            :disabled="!canSaveSessionTitle"
+                                            @click.stop="saveSessionTitle(item)"
+                                        >
                                             {{ $t('commons.button.save') }}
                                         </el-button>
                                         <el-button link @click.stop="cancelEditSessionTitle">
@@ -57,6 +62,16 @@
                                         class="hermes-chat-dialog__edit-button"
                                         @mousedown.stop
                                         @click.stop="startEditSessionTitle(item)"
+                                    />
+                                    <el-button
+                                        v-if="editingSessionId !== item.id"
+                                        link
+                                        type="danger"
+                                        icon="Delete"
+                                        :disabled="isDeleteDisabled(item)"
+                                        :loading="deletingSessionId === item.id"
+                                        @mousedown.stop
+                                        @click.stop="deleteSession(item)"
                                     />
                                 </div>
                             </div>
@@ -80,11 +95,16 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, ref } from 'vue';
+import { ElMessageBox } from 'element-plus';
+import { computed, nextTick, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import DialogPro from '@/components/dialog-pro/index.vue';
 import Terminal from '@/components/terminal/index.vue';
-import { getAgentHermesChatSessions, renameAgentHermesChatSession } from '@/api/modules/ai';
+import {
+    deleteAgentHermesChatSession,
+    getAgentHermesChatSessions,
+    renameAgentHermesChatSession,
+} from '@/api/modules/ai';
 import { AI } from '@/api/interface/ai';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { dateFormat } from '@/utils/date';
@@ -113,6 +133,8 @@ const sessions = ref<AI.AgentHermesChatSessionItem[]>([]);
 const activeSessionId = ref('');
 const editingSessionId = ref('');
 const editingTitle = ref('');
+const deletingSessionId = ref('');
+const canSaveSessionTitle = computed(() => editingTitle.value.length > 0);
 
 const formatTime = (value: string) => {
     if (!value) {
@@ -192,6 +214,9 @@ const cancelEditSessionTitle = () => {
 };
 
 const saveSessionTitle = async (item: AI.AgentHermesChatSessionItem) => {
+    if (!canSaveSessionTitle.value) {
+        return;
+    }
     await renameAgentHermesChatSession({
         agentId: agentId.value,
         id: item.id,
@@ -200,6 +225,44 @@ const saveSessionTitle = async (item: AI.AgentHermesChatSessionItem) => {
     MsgSuccess(t('aiTools.agents.hermesChatRenameSuccess'));
     cancelEditSessionTitle();
     await loadSessions();
+};
+
+const isDeleteDisabled = (item: AI.AgentHermesChatSessionItem) => {
+    return terminalOpen.value && activeSessionId.value === item.id;
+};
+
+const deleteSession = async (item: AI.AgentHermesChatSessionItem) => {
+    if (isDeleteDisabled(item)) {
+        return;
+    }
+    try {
+        await ElMessageBox.confirm(
+            t('aiTools.agents.hermesChatDeleteConfirm', [item.title || item.id]),
+            t('commons.button.delete'),
+            {
+                confirmButtonText: t('commons.button.delete'),
+                cancelButtonText: t('commons.button.cancel'),
+                type: 'warning',
+            },
+        );
+    } catch {
+        return;
+    }
+    deletingSessionId.value = item.id;
+    try {
+        await deleteAgentHermesChatSession({
+            agentId: agentId.value,
+            id: item.id,
+        });
+        MsgSuccess(t('aiTools.agents.hermesChatDeleteSuccess'));
+        cancelEditSessionTitle();
+        if (activeSessionId.value === item.id) {
+            activeSessionId.value = '';
+        }
+        await loadSessions();
+    } finally {
+        deletingSessionId.value = '';
+    }
 };
 
 const disconnectTerminal = () => {

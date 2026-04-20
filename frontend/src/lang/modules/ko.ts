@@ -772,6 +772,8 @@ const message = {
             hermesChatEmptyHint: '왼쪽 세션을 선택하거나 새 대화를 클릭하세요',
             hermesChatTitlePlaceholder: '세션 제목을 입력하세요',
             hermesChatRenameSuccess: '세션 제목이 업데이트되었습니다',
+            hermesChatDeleteConfirm: '세션 {0}을(를) 삭제하시겠습니까?',
+            hermesChatDeleteSuccess: '세션이 삭제되었습니다',
             weixin: 'Weixin',
             wecom: 'WeCom',
             dingtalk: 'DingTalk',

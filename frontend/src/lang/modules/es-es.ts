@@ -793,6 +793,8 @@ const message = {
             hermesChatEmptyHint: 'Seleccione una sesión a la izquierda o haga clic en Nueva conversación',
             hermesChatTitlePlaceholder: 'Introduzca el título de la sesión',
             hermesChatRenameSuccess: 'El título de la sesión se ha actualizado',
+            hermesChatDeleteConfirm: '¿Eliminar la sesión {0}?',
+            hermesChatDeleteSuccess: 'Sesión eliminada',
             weixin: 'Weixin',
             wecom: 'WeCom',
             dingtalk: 'DingTalk',

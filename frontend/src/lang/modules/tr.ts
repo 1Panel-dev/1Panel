@@ -790,6 +790,8 @@ const message = {
             hermesChatEmptyHint: "Soldan bir oturum seçin veya Yeni sohbet'e tıklayın",
             hermesChatTitlePlaceholder: 'Oturum başlığını girin',
             hermesChatRenameSuccess: 'Oturum başlığı güncellendi',
+            hermesChatDeleteConfirm: '{0} oturumu silinsin mi?',
+            hermesChatDeleteSuccess: 'Oturum silindi',
             weixin: 'Weixin',
             wecom: 'WeCom',
             dingtalk: 'DingTalk',

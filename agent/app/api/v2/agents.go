@@ -276,6 +276,26 @@ func (b *BaseApi) RenameHermesChatSession(c *gin.Context) {
 }
 
 // @Tags AI
+// @Summary Delete Hermes chat session
+// @Accept json
+// @Param request body dto.AgentHermesChatSessionDeleteReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/hermes/chat/sessions/delete [post]
+func (b *BaseApi) DeleteHermesChatSession(c *gin.Context) {
+	var req dto.AgentHermesChatSessionDeleteReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := agentService.DeleteHermesChatSession(req); err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags AI
 // @Summary Get Providers
 // @Success 200 {array} dto.ProviderInfo
 // @Security ApiKeyAuth

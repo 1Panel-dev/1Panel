@@ -41,6 +41,7 @@ type IAgentService interface {
 	UpdateModelConfig(req dto.AgentModelConfigUpdateReq) error
 	GetHermesChatSessions(req dto.AgentIDReq) ([]dto.AgentHermesChatSessionItem, error)
 	RenameHermesChatSession(req dto.AgentHermesChatSessionRenameReq) error
+	DeleteHermesChatSession(req dto.AgentHermesChatSessionDeleteReq) error
 	GetOverview(req dto.AgentOverviewReq) (*dto.AgentOverview, error)
 	GetProviders() ([]dto.ProviderInfo, error)
 	GetSecurityConfig(req dto.AgentIDReq) (*dto.AgentSecurityConfig, error)
@@ -456,7 +457,7 @@ func (a AgentService) GetModelConfig(req dto.AgentIDReq) (*dto.AgentModelConfig,
 		if err != nil {
 			return nil, err
 		}
-		model, err := resolveHermesConfiguredModelIDStrict(account, accountModels, cfg.Model.Default)
+		model, err := resolveHermesConfiguredModelID(account, accountModels, cfg.Model.Default)
 		if err != nil {
 			return nil, err
 		}
@@ -905,7 +906,13 @@ func (a AgentService) UpdateOtherConfig(req dto.AgentOtherConfigUpdateReq) error
 		if err != nil {
 			return err
 		}
-		return writeHermesConfig(path.Dir(agent.ConfigPath), account, agent.Model, strings.TrimSpace(req.UserTimezone))
+		if err := writeHermesConfig(path.Dir(agent.ConfigPath), account, agent.Model, strings.TrimSpace(req.UserTimezone)); err != nil {
+			return err
+		}
+		return NewIAppInstalledService().Operate(request.AppInstalledOperate{
+			InstallId: install.ID,
+			Operate:   constant.Restart,
+		})
 	}
 	if err := ensureContainerRunning(install.ContainerName); err != nil {
 		return err
@@ -921,7 +928,10 @@ func (a AgentService) UpdateOtherConfig(req dto.AgentOtherConfigUpdateReq) error
 	if err := writeOpenclawConfigRaw(agent.ConfigPath, conf); err != nil {
 		return err
 	}
-	return setOpenclawNPMRegistry(install.ContainerName, req.NPMRegistry)
+	if err := setOpenclawNPMRegistry(install.ContainerName, req.NPMRegistry); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a AgentService) GetConfigFile(req dto.AgentConfigFileReq) (*dto.AgentConfigFile, error) {

@@ -142,6 +142,10 @@ export const renameAgentHermesChatSession = (req: AI.AgentHermesChatSessionRenam
     return http.post(`/ai/agents/hermes/chat/sessions/rename`, req);
 };
 
+export const deleteAgentHermesChatSession = (req: AI.AgentHermesChatSessionDeleteReq) => {
+    return http.post(`/ai/agents/hermes/chat/sessions/delete`, req);
+};
+
 export const getAgentOverview = (req: AI.AgentOverviewReq) => {
     return http.post<AI.AgentOverview>(`/ai/agents/overview`, req, TimeoutEnum.T_5M);
 };
