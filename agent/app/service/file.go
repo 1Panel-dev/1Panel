@@ -230,8 +230,12 @@ func (f *FileService) buildChildNode(childNode *response.FileTree, fileInfo *fil
 	return f.buildFileTree(childNode, subInfo.Items, op, level-1)
 }
 
+func hasInvalidFileName(fullPath string) bool {
+	return files.IsInvalidChar(filepath.Base(fullPath))
+}
+
 func (f *FileService) Create(op request.FileCreate) error {
-	if files.IsInvalidChar(op.Path) {
+	if hasInvalidFileName(op.Path) {
 		return buserr.New("ErrInvalidChar")
 	}
 	fo := files.NewFileOp()
@@ -300,6 +304,9 @@ func (f *FileService) Delete(op request.FileDelete) error {
 		}
 		if err != nil {
 			return err
+		}
+		if err := cleanupRecycleBinMetaByEntryPath(op.Path); err != nil {
+			global.LOG.Warnf("cleanup recycle bin metadata failed for %s: %v", op.Path, err)
 		}
 		f.cleanupPermanentDeleteHistory(historyTargets)
 		return nil
@@ -560,7 +567,7 @@ func (f *FileService) SaveContent(edit request.FileEdit) error {
 }
 
 func (f *FileService) ChangeName(req request.FileRename) error {
-	if files.IsInvalidChar(req.NewName) {
+	if hasInvalidFileName(req.NewName) {
 		return buserr.New("ErrInvalidChar")
 	}
 	fo := files.NewFileOp()

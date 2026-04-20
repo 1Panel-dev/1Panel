@@ -1,6 +1,7 @@
 package service
 
 import (
+	"encoding/json"
 	"fmt"
 	"math"
 	"os"
@@ -15,10 +16,20 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/1Panel-dev/1Panel/agent/utils/re"
 	"github.com/shirou/gopsutil/v4/disk"
 )
+
+const recycleBinMetaSuffix = ".1panel-meta.json"
+
+type recycleBinMeta struct {
+	SourcePath string `json:"sourcePath"`
+	Size       int    `json:"size"`
+	DeleteTime int64  `json:"deleteTime"`
+	IsDir      bool   `json:"isDir"`
+}
 
 type RecycleBinService struct {
 }
@@ -53,11 +64,23 @@ func (r RecycleBinService) Page(search dto.PageInfo) (int64, []response.RecycleB
 			return 0, nil, err
 		}
 		for _, file := range clashFiles {
+			if strings.HasSuffix(file.Name(), recycleBinMetaSuffix) {
+				entryName := strings.TrimSuffix(file.Name(), recycleBinMetaSuffix)
+				if !op.Stat(path.Join(dir, entryName)) {
+					continue
+				}
+				recycleDTO, err := loadRecycleBinDTO(dir, entryName)
+				if err == nil {
+					result = append(result, *recycleDTO)
+				}
+				continue
+			}
+
 			if strings.HasPrefix(file.Name(), "_1p_") {
 				recycleDTO, err := getRecycleBinDTOFromName(file.Name())
-				recycleDTO.IsDir = file.IsDir()
-				recycleDTO.From = dir
 				if err == nil {
+					recycleDTO.IsDir = file.IsDir()
+					recycleDTO.From = dir
 					result = append(result, *recycleDTO)
 				}
 			}
@@ -87,13 +110,12 @@ func (r RecycleBinService) Create(create request.RecycleBinCreate) error {
 	if err != nil {
 		return err
 	}
-	paths := strings.Split(create.SourcePath, "/")
-	rNamePre := strings.Join(paths, "_1p_")
 	deleteTime := time.Now()
 	openFile, err := op.OpenFile(create.SourcePath)
 	if err != nil {
 		return err
 	}
+	defer openFile.Close()
 	fileInfo, err := openFile.Stat()
 	if err != nil {
 		return err
@@ -109,8 +131,24 @@ func (r RecycleBinService) Create(create request.RecycleBinCreate) error {
 		size = int(fileInfo.Size())
 	}
 
-	rName := fmt.Sprintf("_1p_%s%s_p_%d_%d", "file", rNamePre, size, deleteTime.Unix())
-	return op.Mv(create.SourcePath, path.Join(clashDir, rName))
+	rName := buildRecycleBinEntryName(deleteTime)
+	meta := recycleBinMeta{
+		SourcePath: create.SourcePath,
+		Size:       size,
+		DeleteTime: deleteTime.Unix(),
+		IsDir:      fileInfo.IsDir(),
+	}
+	targetPath := path.Join(clashDir, rName)
+	if err := op.Mv(create.SourcePath, targetPath); err != nil {
+		return err
+	}
+	if err := saveRecycleBinMeta(clashDir, rName, meta); err != nil {
+		if rollbackErr := op.Mv(targetPath, create.SourcePath); rollbackErr != nil {
+			global.LOG.Warnf("rollback recycle bin create failed for %s: %v", create.SourcePath, rollbackErr)
+		}
+		return err
+	}
+	return nil
 }
 
 func (r RecycleBinService) Reduce(reduce request.RecycleBinReduce) error {
@@ -119,7 +157,7 @@ func (r RecycleBinService) Reduce(reduce request.RecycleBinReduce) error {
 	if !op.Stat(filePath) {
 		return buserr.New("ErrLinkPathNotFound")
 	}
-	recycleBinDTO, err := getRecycleBinDTOFromName(reduce.RName)
+	recycleBinDTO, err := loadRecycleBinDTO(reduce.From, reduce.RName)
 	if err != nil {
 		return err
 	}
@@ -131,7 +169,13 @@ func (r RecycleBinService) Reduce(reduce request.RecycleBinReduce) error {
 			return err
 		}
 	}
-	return op.Mv(filePath, recycleBinDTO.SourcePath)
+	if err := op.Mv(filePath, recycleBinDTO.SourcePath); err != nil {
+		return err
+	}
+	if err := cleanupRecycleBinMetaByEntryPath(filePath); err != nil {
+		global.LOG.Warnf("cleanup recycle bin metadata failed for %s: %v", filePath, err)
+	}
+	return nil
 }
 
 func (r RecycleBinService) Clear() error {
@@ -184,6 +228,80 @@ func createClashDir(clashDir string) error {
 		}
 	}
 	return nil
+}
+
+func buildRecycleBinEntryName(deleteTime time.Time) string {
+	return fmt.Sprintf("_1p_file_%d_%s", deleteTime.Unix(), strings.ReplaceAll(common.GetUuid(), "-", ""))
+}
+
+func getRecycleBinMetaPath(dir, name string) string {
+	return path.Join(dir, name+recycleBinMetaSuffix)
+}
+
+func saveRecycleBinMeta(dir, name string, meta recycleBinMeta) error {
+	content, err := json.Marshal(meta)
+	if err != nil {
+		return err
+	}
+	return files.NewFileOp().SaveFile(getRecycleBinMetaPath(dir, name), string(content), constant.FilePerm)
+}
+
+func loadRecycleBinMeta(dir, name string) (*recycleBinMeta, error) {
+	content, err := os.ReadFile(getRecycleBinMetaPath(dir, name))
+	if err != nil {
+		return nil, err
+	}
+	var meta recycleBinMeta
+	if err := json.Unmarshal(content, &meta); err != nil {
+		return nil, err
+	}
+	return &meta, nil
+}
+
+func getRecycleBinDTOFromMeta(name, from string, meta *recycleBinMeta) *response.RecycleBinDTO {
+	return &response.RecycleBinDTO{
+		Name:       path.Base(meta.SourcePath),
+		Size:       meta.Size,
+		Type:       "file",
+		DeleteTime: time.Unix(meta.DeleteTime, 0),
+		SourcePath: meta.SourcePath,
+		RName:      name,
+		IsDir:      meta.IsDir,
+		From:       from,
+	}
+}
+
+func loadRecycleBinDTO(from, name string) (*response.RecycleBinDTO, error) {
+	meta, err := loadRecycleBinMeta(from, name)
+	if err == nil {
+		return getRecycleBinDTOFromMeta(name, from, meta), nil
+	}
+	if !os.IsNotExist(err) {
+		return nil, err
+	}
+
+	recycleDTO, err := getRecycleBinDTOFromName(name)
+	if err != nil {
+		return nil, err
+	}
+	recycleDTO.From = from
+	return recycleDTO, nil
+}
+
+func cleanupRecycleBinMetaByEntryPath(filePath string) error {
+	if !isRecycleBinEntryPath(filePath) {
+		return nil
+	}
+	metaPath := getRecycleBinMetaPath(path.Dir(filePath), path.Base(filePath))
+	if err := os.Remove(metaPath); err != nil && !os.IsNotExist(err) {
+		return err
+	}
+	return nil
+}
+
+func isRecycleBinEntryPath(filePath string) bool {
+	cleaned := path.Clean(filePath)
+	return path.Base(path.Dir(cleaned)) == ".1panel_clash" && !strings.HasSuffix(cleaned, recycleBinMetaSuffix)
 }
 
 func getRecycleBinDTOFromName(filename string) (*response.RecycleBinDTO, error) {
