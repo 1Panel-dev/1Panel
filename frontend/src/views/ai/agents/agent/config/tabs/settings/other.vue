@@ -17,6 +17,7 @@
                 {{ t('commons.button.save') }}
             </el-button>
         </el-form-item>
+        <span class="input-help">{{ t('aiTools.agents.channelAutoRestartHelper') }}</span>
     </el-form>
 </template>
 

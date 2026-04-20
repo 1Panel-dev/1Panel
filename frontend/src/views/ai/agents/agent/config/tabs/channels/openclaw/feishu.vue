@@ -54,11 +54,6 @@
                     />
                     <span class="input-help">{{ t('aiTools.agents.groupAllowFromHelper') }}</span>
                 </el-form-item>
-                <el-form-item>
-                    <el-link type="primary" icon="Position" @click="toFeishuDoc">
-                        {{ t('container.mirrorsHelper2') }}
-                    </el-link>
-                </el-form-item>
             </div>
             <ChannelBots
                 :bots="form.bots"
@@ -249,10 +244,6 @@ const updateBots = (bots: FeishuBotForm[]) => {
 };
 
 const isApproveDisabled = (bot: FeishuBotForm) => bot.dmPolicy !== 'pairing';
-
-const toFeishuDoc = () => {
-    window.open('https://openclaw.club/guides/feishu-platform', '_blank');
-};
 
 const load = async (id: number) => {
     await loadPlugin(id);

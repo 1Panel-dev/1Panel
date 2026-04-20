@@ -43,6 +43,22 @@ func (a AgentService) RenameHermesChatSession(req dto.AgentHermesChatSessionRena
 	return err
 }
 
+func (a AgentService) DeleteHermesChatSession(req dto.AgentHermesChatSessionDeleteReq) error {
+	agent, install, err := a.loadAgentAndInstall(req.AgentID)
+	if err != nil {
+		return err
+	}
+	if agent.AgentType != constant.AppHermesAgent {
+		return fmt.Errorf("%s does not support", agent.AgentType)
+	}
+
+	_, err = cmd.NewCommandMgr(cmd.WithTimeout(20*time.Second)).RunWithStdout(
+		"docker",
+		buildHermesDockerExecArgs(install.ContainerName, "sessions", "delete", req.ID, "--yes")...,
+	)
+	return err
+}
+
 func listHermesChatSessionsFromStateDB(stateDBPath string) ([]dto.AgentHermesChatSessionItem, error) {
 	if !files.NewFileOp().Stat(stateDBPath) {
 		return []dto.AgentHermesChatSessionItem{}, nil

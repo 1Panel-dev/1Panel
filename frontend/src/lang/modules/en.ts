@@ -783,6 +783,8 @@ const message = {
             hermesChatEmptyHint: 'Select a session or click New Chat',
             hermesChatTitlePlaceholder: 'Enter session title',
             hermesChatRenameSuccess: 'Session title updated',
+            hermesChatDeleteConfirm: 'Delete session {0}?',
+            hermesChatDeleteSuccess: 'Session deleted',
             weixin: 'Weixin',
             wecom: 'WeCom',
             dingtalk: 'DingTalk',

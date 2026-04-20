@@ -783,6 +783,8 @@ const message = {
             hermesChatEmptyHint: 'Выберите сессию слева или нажмите «Новый диалог»',
             hermesChatTitlePlaceholder: 'Введите название сессии',
             hermesChatRenameSuccess: 'Название сессии обновлено',
+            hermesChatDeleteConfirm: 'Удалить сессию {0}?',
+            hermesChatDeleteSuccess: 'Сессия удалена',
             weixin: 'Weixin',
             wecom: 'WeCom',
             dingtalk: 'DingTalk',

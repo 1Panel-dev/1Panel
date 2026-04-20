@@ -788,6 +788,8 @@ const message = {
             hermesChatEmptyHint: 'Selecione uma sessão à esquerda ou clique em Nova conversa',
             hermesChatTitlePlaceholder: 'Digite o título da sessão',
             hermesChatRenameSuccess: 'O título da sessão foi atualizado',
+            hermesChatDeleteConfirm: 'Excluir a sessão {0}?',
+            hermesChatDeleteSuccess: 'Sessão excluída',
             weixin: 'Weixin',
             wecom: 'WeCom',
             dingtalk: 'DingTalk',

@@ -732,6 +732,8 @@ const message = {
             hermesChatEmptyHint: '选择左侧会话或点击新对话',
             hermesChatTitlePlaceholder: '请输入会话标题',
             hermesChatRenameSuccess: '会话标题已更新',
+            hermesChatDeleteConfirm: '确认删除会话 {0}？',
+            hermesChatDeleteSuccess: '会话已删除',
             weixin: '微信',
             wecom: '企业微信',
             dingtalk: '钉钉',

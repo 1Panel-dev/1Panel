@@ -166,7 +166,14 @@ func (a AgentService) UninstallSkill(req dto.AgentSkillUninstallReq) error {
 	}
 	return cmd.NewCommandMgr(cmd.WithTimeout(5*time.Minute)).Run(
 		"docker",
-		buildHermesSkillUninstallArgs(install.ContainerName, req.Name)...,
+		buildHermesDockerExecCommandArgs(
+			install.ContainerName,
+			"sh",
+			"-lc",
+			fmt.Sprintf(`printf 'y\n' | %s skills uninstall "$1"`, hermesExecutablePath),
+			"sh",
+			req.Name,
+		)...,
 	)
 }
 

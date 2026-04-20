@@ -791,6 +791,8 @@ const message = {
             hermesChatEmptyHint: 'Pilih sesi di sebelah kiri atau klik Perbualan baharu',
             hermesChatTitlePlaceholder: 'Masukkan tajuk sesi',
             hermesChatRenameSuccess: 'Tajuk sesi telah dikemas kini',
+            hermesChatDeleteConfirm: 'Padam sesi {0}?',
+            hermesChatDeleteSuccess: 'Sesi berjaya dipadam',
             weixin: 'Weixin',
             wecom: 'WeCom',
             dingtalk: 'DingTalk',
