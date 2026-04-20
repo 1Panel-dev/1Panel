@@ -90,7 +90,6 @@
                         prop="primaryDomain"
                         min-width="250px"
                         sortable
-                        show-overflow-tooltip
                     >
                         <template #default="{ row, $index }">
                             <Domain
