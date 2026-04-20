@@ -2246,10 +2246,39 @@ func isEditCompose(installed model.AppInstall) bool {
 	if rawCompose == "" || err != nil {
 		return false
 	}
-	if rawCompose != installed.DockerCompose {
-		return true
+	equal, err := composeEqualExceptImage(rawCompose, installed.DockerCompose)
+	if err != nil {
+		return false
 	}
-	return false
+	return !equal
+}
+
+func composeEqualExceptImage(expected, current string) (bool, error) {
+	expectedCompose := make(map[string]interface{})
+	if err := yaml.Unmarshal([]byte(expected), &expectedCompose); err != nil {
+		return false, err
+	}
+	currentCompose := make(map[string]interface{})
+	if err := yaml.Unmarshal([]byte(current), &currentCompose); err != nil {
+		return false, err
+	}
+	removeComposeServiceImages(expectedCompose)
+	removeComposeServiceImages(currentCompose)
+	return reflect.DeepEqual(expectedCompose, currentCompose), nil
+}
+
+func removeComposeServiceImages(composeMap map[string]interface{}) {
+	services, ok := composeMap["services"].(map[string]interface{})
+	if !ok {
+		return
+	}
+	for _, service := range services {
+		serviceMap, ok := service.(map[string]interface{})
+		if !ok {
+			continue
+		}
+		delete(serviceMap, "image")
+	}
 }
 
 func getAppVersions(key string, details []model.AppDetail) []string {
