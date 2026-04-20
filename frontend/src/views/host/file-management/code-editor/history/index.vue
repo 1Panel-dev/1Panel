@@ -102,6 +102,7 @@
 
                     <div class="history-table-wrap">
                         <el-table
+                            :pagination-config="paginationConfig"
                             :data="historyItems"
                             v-loading="historyLoading"
                             class="history-table"
@@ -157,8 +158,13 @@
                         <el-pagination
                             v-model:current-page="pagination.currentPage"
                             v-model:page-size="pagination.pageSize"
-                            :page-sizes="[10, 20, 50]"
-                            layout="total, sizes, prev, pager, next, jumper"
+                            :page-sizes="[5, 10, 20, 50, 100, 200, 500]"
+                            :size="mobile || paginationConfig.small ? 'small' : 'default'"
+                            :layout="
+                                mobile || paginationConfig.small
+                                    ? 'total, prev, pager, next'
+                                    : 'total, sizes, prev, pager, next, jumper'
+                            "
                             :total="pagination.total"
                             @current-change="handlePageChange"
                             @size-change="handleSizeChange"
@@ -229,6 +235,7 @@ import { Setting } from '@/api/interface/setting';
 import { loadMonacoLanguageSupport, setupMonacoEnvironment } from '@/utils/monaco';
 import { ElMessageBox, type FormInstance, type FormRules } from 'element-plus';
 import { Languages } from '@/global/mimetype';
+import { GlobalStore } from '@/store';
 import i18n from '@/lang';
 
 type MonacoEditorApi = typeof import('monaco-editor/esm/vs/editor/editor.api');
@@ -251,6 +258,17 @@ const historySettingFormRef = ref<FormInstance>();
 const scope = ref<'current' | 'all'>('current');
 const operationFilter = ref('');
 const activeCollapse = ref([]);
+const globalStore = GlobalStore();
+const mobile = computed(() => {
+    return globalStore.isMobile();
+});
+const paginationConfig = reactive({
+    cacheSizeKey: 'file-history-page-size',
+    currentPage: 1,
+    pageSize: Number(localStorage.getItem('page-size')) || 20,
+    total: 0,
+    small: false,
+});
 const currentFile = ref<HistoryDrawerProps>({
     path: '',
     content: '',
@@ -313,7 +331,6 @@ const selected = ref<File.FileHistoryInfo[]>([]);
 const selectedHistory = ref<File.FileHistoryInfo | null>(null);
 const historyContent = ref('');
 const currentFileContent = ref('');
-const compareTargetLabel = ref('');
 const compareTargetPath = ref('');
 const windowWidth = ref(window.innerWidth);
 const operationMap = {
@@ -336,12 +353,6 @@ const isVersionRecord = (operation: string) => operation === 'save' || operation
 const canRestoreSelected = computed(() => isVersionRecord(selectedHistory.value?.operation || ''));
 const isRestoringCurrentFile = computed(() => selectedHistory.value?.path === currentFile.value.path);
 const getCurrentTargetPath = (row: File.FileHistoryInfo) => row.currentPath || row.path;
-const getLatestVersionHistory = (fileId?: string) => {
-    if (!fileId) {
-        return null;
-    }
-    return historyItems.value.find((item) => item.fileId === fileId && isVersionRecord(item.operation)) || null;
-};
 
 const pagination = ref({
     currentPage: 1,
@@ -441,25 +452,6 @@ const renderDiff = async () => {
     });
 };
 
-const loadCompareTargetContent = async (row: File.FileHistoryInfo) => {
-    const targetPath = getCurrentTargetPath(row);
-    if (scope.value === 'all' || targetPath !== currentFile.value.path) {
-        const latestVersion = getLatestVersionHistory(row.fileId);
-        if (latestVersion) {
-            const latestContent = await loadHistoryContent(latestVersion.id);
-            compareTargetLabel.value = i18n.global.t('file.historyLatestVersion');
-            compareTargetPath.value = targetPath;
-            return latestContent.content || '';
-        }
-        compareTargetLabel.value = i18n.global.t('file.historyLatestVersion');
-        compareTargetPath.value = targetPath;
-        return '';
-    }
-    compareTargetLabel.value = i18n.global.t('file.historyCurrentFile');
-    compareTargetPath.value = currentFile.value.path;
-    return currentFile.value.content || '';
-};
-
 const loadHistorySetting = async () => {
     const res = await getAgentFileHistoryInfo();
     historySetting.value = res.data;
@@ -522,7 +514,6 @@ const loadHistoryList = async (resetPage = false) => {
             selectedHistory.value = null;
             historyContent.value = '';
             currentFileContent.value = '';
-            compareTargetLabel.value = '';
             compareTargetPath.value = '';
             disposeDiffEditor();
         }
@@ -540,8 +531,9 @@ const openHistoryRecord = async (row: File.FileHistoryInfo) => {
     selectedHistory.value = row;
     try {
         const data = await loadHistoryContent(row.id);
-        historyContent.value = data.content || '';
-        currentFileContent.value = await loadCompareTargetContent(row);
+        historyContent.value = data.content ?? '';
+        currentFileContent.value = data.currentContent ?? data.content ?? currentFile.value.content ?? '';
+        compareTargetPath.value = getCurrentTargetPath(row);
         await renderDiff();
     } catch (error) {
         MsgError(String(error));

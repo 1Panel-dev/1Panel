@@ -651,14 +651,6 @@ func (f *FileService) MvFile(m request.FileMove) error {
 				}
 			}
 		}
-		for _, snapshot := range snapshots {
-			if !snapshot.isDir {
-				targetPath := buildHistoryMoveTargetPath(m.NewPath, m.Name, snapshot.path, len(m.OldPaths))
-				if histErr := historyService.RecordOperation(fileHistoryOpMove, snapshot.path, snapshot.content, snapshot.mode, snapshot.path, targetPath); histErr != nil {
-					global.LOG.Warnf("record file copy history failed for %s: %v", snapshot.path, histErr)
-				}
-			}
-		}
 	}
 
 	var errString string
