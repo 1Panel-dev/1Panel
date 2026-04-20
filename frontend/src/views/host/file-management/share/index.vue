@@ -239,11 +239,9 @@ const generate = async () => {
             expireMinutes: form.expireMinutes,
         };
 
-        // Only send password when user explicitly changes it.
         if (passwordTouched.value) {
-            payload.password = pw; // empty string means "clear password"
+            payload.password = pw;
         } else if (!shareInfo.value?.hasPassword && pw.length > 0) {
-            // New share: allow setting password when it wasn't loaded from server.
             payload.password = pw;
         }
 
