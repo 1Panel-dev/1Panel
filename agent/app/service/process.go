@@ -52,7 +52,12 @@ func (ps *ProcessService) GetListeningProcess(c context.Context) ([]ListeningPro
 	if err != nil {
 		return nil, err
 	}
-	procCache := make(map[int32]ListeningProcess, 64)
+	// One cache entry per (PID, socket type) so TCP and UDP sockets are not merged under one Protocol.
+	type procKey struct {
+		pid      int32
+		protocol uint32
+	}
+	procCache := make(map[procKey]ListeningProcess, 64)
 
 	for _, conn := range conn {
 		if conn.Pid == 0 {
@@ -60,7 +65,8 @@ func (ps *ProcessService) GetListeningProcess(c context.Context) ([]ListeningPro
 		}
 
 		if (conn.Status == "LISTEN" && conn.Type == syscall.SOCK_STREAM) || (conn.Type == syscall.SOCK_DGRAM && conn.Raddr.Port == 0) {
-			if _, exists := procCache[conn.Pid]; !exists {
+			key := procKey{pid: conn.Pid, protocol: conn.Type}
+			if _, exists := procCache[key]; !exists {
 				proc, err := process.NewProcess(conn.Pid)
 				if err != nil {
 					continue
@@ -72,11 +78,11 @@ func (ps *ProcessService) GetListeningProcess(c context.Context) ([]ListeningPro
 				procData.Port = make(map[uint32]struct{})
 				procData.Port[conn.Laddr.Port] = struct{}{}
 				procData.Protocol = conn.Type
-				procCache[conn.Pid] = procData
+				procCache[key] = procData
 			} else {
-				p := procCache[conn.Pid]
+				p := procCache[key]
 				p.Port[conn.Laddr.Port] = struct{}{}
-				procCache[conn.Pid] = p
+				procCache[key] = p
 			}
 		}
 	}
