@@ -330,9 +330,7 @@ func collectTrashEntries(clashRoot string) []response.RecycleBinDTO {
 		return nil
 	}
 	var result []response.RecycleBinDTO
-	seen := make(map[string]struct{}, len(entries))
 	for _, entry := range entries {
-		seen[entry.Name()] = struct{}{}
 		dto, err := buildTrashDTO(filesDir, infoDir, entry)
 		if err != nil {
 			global.LOG.Warnf("build recycle dto for %s failed: %v", entry.Name(), err)
@@ -340,7 +338,6 @@ func collectTrashEntries(clashRoot string) []response.RecycleBinDTO {
 		}
 		result = append(result, *dto)
 	}
-	pruneOrphanTrashInfo(infoDir, seen)
 	return result
 }
 
@@ -415,26 +412,6 @@ func trashInfoToDTO(entryName, filesDir string, info *trashInfo) *response.Recyc
 		SourcePath: info.Path,
 		IsDir:      info.IsDir,
 		From:       filesDir,
-	}
-}
-
-func pruneOrphanTrashInfo(infoDir string, validEntries map[string]struct{}) {
-	entries, err := os.ReadDir(infoDir)
-	if err != nil {
-		return
-	}
-	for _, entry := range entries {
-		if !strings.HasSuffix(entry.Name(), trashInfoSuffix) {
-			continue
-		}
-		base := strings.TrimSuffix(entry.Name(), trashInfoSuffix)
-		if _, ok := validEntries[base]; ok {
-			continue
-		}
-		orphan := path.Join(infoDir, entry.Name())
-		if err := os.Remove(orphan); err != nil {
-			global.LOG.Warnf("remove orphan trashinfo %s failed: %v", orphan, err)
-		}
 	}
 }
 
