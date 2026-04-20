@@ -24,24 +24,25 @@
                 clearable
                 @change="updateParam"
             ></el-input>
-            <el-select
-                class="p-w-200"
-                v-model="form[p.envKey]"
-                v-if="p.type == 'service'"
-                @change="changeService(form[p.envKey], p.services)"
-            >
-                <el-option
-                    v-for="service in p.services"
-                    :key="service.label"
-                    :value="service.value"
-                    :label="service.label"
-                ></el-option>
-            </el-select>
-            <span v-if="p.type === 'service' && p.services.length === 0" class="ml-1.5">
-                <el-link type="primary" underline="never" @click="toPage(p.key)">
-                    {{ $t('app.toInstall') }}
-                </el-link>
-            </span>
+            <div v-if="p.type == 'service'" class="service-param-row">
+                <el-select
+                    class="service-param-select p-w-200"
+                    v-model="form[p.envKey]"
+                    @change="changeService(form[p.envKey], p.services)"
+                >
+                    <el-option
+                        v-for="service in p.services"
+                        :key="service.label"
+                        :value="service.value"
+                        :label="service.label"
+                    ></el-option>
+                </el-select>
+                <span v-if="p.services.length === 0" class="service-install-link">
+                    <el-link class="service-install-link__text" type="primary" underline="never" @click="toPage(p.key)">
+                        {{ $t('app.toInstall') }}
+                    </el-link>
+                </span>
+            </div>
             <el-select
                 v-model="form[p.envKey]"
                 v-if="p.type == 'select'"
@@ -56,13 +57,13 @@
                     :label="service.label"
                 ></el-option>
             </el-select>
-            <div v-if="p.type == 'apps'" class="flex space-x-4">
-                <div class="flex-1">
+            <div v-if="p.type == 'apps'" class="app-service-row">
+                <div class="app-service-row__app">
                     <el-form-item :prop="p.prop">
                         <el-select
                             v-model="form[p.envKey]"
                             @change="getServices(p.child.envKey, form[p.envKey], p)"
-                            class="p-w-200"
+                            class="app-service-row__select p-w-200"
                         >
                             <el-option
                                 v-for="service in p.values"
@@ -73,13 +74,13 @@
                         </el-select>
                     </el-form-item>
                 </div>
-                <div class="flex-2">
+                <div class="app-service-row__service">
                     <el-form-item :prop="p.childProp">
                         <el-select
                             v-model="form[p.child.envKey]"
                             v-if="p.child.type == 'service'"
                             @change="changeService(form[p.child.envKey], p.services)"
-                            class="p-w-300"
+                            class="app-service-row__select p-w-300"
                         >
                             <el-option
                                 v-for="service in p.services"
@@ -110,8 +111,13 @@
                         </el-select>
                     </el-form-item>
                 </div>
-                <span v-if="p.child.type === 'service' && p.services.length === 0">
-                    <el-link type="primary" underline="never" @click="toPage(form[p.envKey])">
+                <span v-if="p.child.type === 'service' && p.services.length === 0" class="service-install-link">
+                    <el-link
+                        class="service-install-link__text"
+                        type="primary"
+                        underline="never"
+                        @click="toPage(form[p.envKey])"
+                    >
                         {{ $t('app.toInstall') }}
                     </el-link>
                 </span>
@@ -321,3 +327,54 @@ onMounted(() => {
     handleParams();
 });
 </script>
+
+<style lang="scss" scoped>
+.service-param-row,
+.app-service-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    max-width: 100%;
+    flex-wrap: nowrap;
+}
+
+.service-param-select,
+.app-service-row__app,
+.app-service-row__service {
+    min-width: 0;
+}
+
+.service-param-select {
+    flex: 0 1 200px;
+}
+
+.app-service-row__app {
+    flex: 0 1 200px;
+}
+
+.app-service-row__service {
+    flex: 0 1 300px;
+}
+
+.app-service-row__select {
+    width: 100%;
+}
+
+.app-service-row__app :deep(.el-form-item),
+.app-service-row__service :deep(.el-form-item) {
+    margin-bottom: 0;
+}
+
+.app-service-row__app :deep(.el-form-item__content),
+.app-service-row__service :deep(.el-form-item__content) {
+    width: 100%;
+}
+
+.service-install-link {
+    flex: 0 0 auto;
+}
+
+.service-install-link__text {
+    white-space: nowrap;
+}
+</style>
