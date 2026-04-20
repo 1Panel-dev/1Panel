@@ -176,6 +176,7 @@ export namespace File {
         contentSHA: string;
         storagePath?: string;
         content?: string;
+        currentContent?: string;
         createdAt: string;
         updatedAt: string;
     }

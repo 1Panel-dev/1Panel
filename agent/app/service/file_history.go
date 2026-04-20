@@ -164,9 +164,17 @@ func (s *FileHistoryService) RecordOperation(operation string, filePath string, 
 		}
 	}
 
-	fileID, latestChainRecord, _ := s.resolveFileChain(resolvePaths...)
+	fileID, latestChainRecord, chainErr := s.resolveFileChain(resolvePaths...)
+	if chainErr != nil && !errors.Is(chainErr, gorm.ErrRecordNotFound) {
+		return chainErr
+	}
 	if fileID == "" {
 		fileID = common.GetUuid()
+	}
+	if operation == fileHistoryOpRename || operation == fileHistoryOpMove {
+		if !s.isEditableHistorySnapshot(fileMode, content) {
+			return nil
+		}
 	}
 
 	previousID := uint(0)
@@ -347,6 +355,7 @@ func (s *FileHistoryService) GetContent(req request.FileHistoryContentReq) (resp
 	if err != nil {
 		return response.FileHistoryInfo{}, err
 	}
+	currentContent := s.getCurrentContent(record)
 	return response.FileHistoryInfo{
 		ID:     record.ID,
 		FileID: record.FileID,
@@ -357,20 +366,21 @@ func (s *FileHistoryService) GetContent(req request.FileHistoryContentReq) (resp
 			}
 			return record.Path
 		}(),
-		PreviousID:  record.PreviousID,
-		SourcePath:  record.SourcePath,
-		TargetPath:  record.TargetPath,
-		FileName:    record.FileName,
-		Extension:   record.Extension,
-		FileMode:    record.FileMode,
-		Operation:   record.Operation,
-		Deleted:     record.Deleted,
-		ContentSize: record.ContentSize,
-		ContentSHA:  record.ContentSHA,
-		StoragePath: record.StoragePath,
-		Content:     string(content),
-		CreatedAt:   record.CreatedAt,
-		UpdatedAt:   record.UpdatedAt,
+		PreviousID:     record.PreviousID,
+		SourcePath:     record.SourcePath,
+		TargetPath:     record.TargetPath,
+		FileName:       record.FileName,
+		Extension:      record.Extension,
+		FileMode:       record.FileMode,
+		Operation:      record.Operation,
+		Deleted:        record.Deleted,
+		ContentSize:    record.ContentSize,
+		ContentSHA:     record.ContentSHA,
+		StoragePath:    record.StoragePath,
+		Content:        string(content),
+		CurrentContent: currentContent,
+		CreatedAt:      record.CreatedAt,
+		UpdatedAt:      record.UpdatedAt,
 	}, nil
 }
 
@@ -601,6 +611,41 @@ func (s *FileHistoryService) getCurrentPathByFileID(fileID string) (string, erro
 		return "", err
 	}
 	return record.Path, nil
+}
+
+func (s *FileHistoryService) getCurrentContent(record model.FileHistory) string {
+	currentPath := ""
+	if resolved, err := s.getCurrentPathByFileID(record.FileID); err == nil && strings.TrimSpace(resolved) != "" {
+		currentPath = resolved
+	}
+	candidates := []string{}
+	if strings.TrimSpace(currentPath) != "" {
+		candidates = append(candidates, currentPath)
+	}
+	if strings.TrimSpace(record.Path) != "" && record.Path != currentPath {
+		candidates = append(candidates, record.Path)
+	}
+	for _, candidate := range candidates {
+		content, err := os.ReadFile(candidate)
+		if err == nil {
+			return string(content)
+		}
+	}
+	content, err := os.ReadFile(s.absStoragePath(record.StoragePath))
+	if err == nil {
+		return string(content)
+	}
+	return ""
+}
+
+func (s *FileHistoryService) isEditableHistorySnapshot(fileMode os.FileMode, content []byte) bool {
+	if fileMode.IsDir() || files.IsBlockDevice(fileMode) {
+		return false
+	}
+	if len(content) == 0 {
+		return true
+	}
+	return !files.DetectBinary(content)
 }
 
 func (s *FileHistoryService) getLatestRelatedByFileID(fileID string) (model.FileHistory, error) {
