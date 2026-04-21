@@ -61,6 +61,7 @@ ErrAgentWebsiteTypeUnsupported: 'Hanya laman web proxy atau statik boleh dipautk
 ErrAgentWebsiteInUse: 'Laman web ini sudah dipautkan ke ejen lain'
 ErrAgentWebsiteUnbindUnsupported: 'Laman web one-click deployment tidak menyokong nyahikat manual'
 ErrHermesPairingCodeUnavailable: 'Kod pasangan buat sementara waktu tidak wujud dalam Hermes, mungkin disebabkan masalah rangkaian. Sila cuba lagi sebentar nanti.'
+ErrHermesFeishuGroupAllowlistRequiresAllowlist: 'Apabila dasar kumpulan Feishu ialah senarai benarkan, dasar DM tidak boleh menggunakan kod pasangan.'
 Localhost: 'Mesin Tempatan'
 ErrBackupInUsed: 'Akaun sandaran sedang digunakan oleh tugas'
 ErrBackupCheck: 'Ujian sambungan gagal: {{ .err }}'

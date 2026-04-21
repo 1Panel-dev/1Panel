@@ -61,6 +61,7 @@ ErrAgentWebsiteTypeUnsupported: 'Solo se pueden vincular sitios proxy o estátic
 ErrAgentWebsiteInUse: 'Este sitio web ya está vinculado a otro agente'
 ErrAgentWebsiteUnbindUnsupported: 'Los sitios web de despliegue no se pueden desvincular manualmente'
 ErrHermesPairingCodeUnavailable: 'El código de emparejamiento no está disponible temporalmente en Hermes, posiblemente por un problema de red. Inténtalo de nuevo más tarde.'
+ErrHermesFeishuGroupAllowlistRequiresAllowlist: 'Cuando la política de grupo de Feishu es Lista permitida, la política de MD no puede ser Código de emparejamiento.'
 Localhost: 'Máquina local'
 ErrBackupInUsed: 'Cuenta de respaldo en uso por tarea programada'
 ErrBackupCheck: 'Conexión de respaldo falló: {{ .err }}'

@@ -66,6 +66,7 @@ ErrAgentWebsiteTypeUnsupported: 'Only proxy or static websites can be bound'
 ErrAgentWebsiteInUse: 'This website is already bound to another agent'
 ErrAgentWebsiteUnbindUnsupported: 'Deployment websites cannot be unbound manually'
 ErrHermesPairingCodeUnavailable: 'The pairing code is temporarily unavailable in Hermes, possibly due to network issues. Please try again later.'
+ErrHermesFeishuGroupAllowlistRequiresAllowlist: 'When the Feishu group policy is Allowlist, the DM policy cannot be Pairing Code.'
 
 #backup
 Localhost: 'Local'
