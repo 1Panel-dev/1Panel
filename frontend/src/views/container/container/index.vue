@@ -81,6 +81,7 @@
                     :pagination-config="paginationConfig"
                     v-model:selects="selects"
                     :data="data"
+                    row-key="containerID"
                     @sort-change="search"
                     @search="search"
                     @cell-mouse-enter="showFavorite"
@@ -130,10 +131,15 @@
                     />
                     <el-table-column :label="$t('commons.table.status')" min-width="150" prop="state">
                         <template #default="{ row }">
-                            <el-dropdown placement="bottom">
-                                <Status :key="row.state" :status="row.state" :operate="true"></Status>
+                            <el-dropdown
+                                placement="bottom"
+                                @visible-change="
+                                    (visible) => handleStatusDropdownVisibleChange(row.containerID, visible)
+                                "
+                            >
+                                <Status :status="row.state" :operate="true"></Status>
                                 <template #dropdown>
-                                    <el-dropdown-menu>
+                                    <el-dropdown-menu v-if="activeDropdownContainerId === row.containerID">
                                         <el-dropdown-item
                                             :disabled="checkStatus('start', row)"
                                             @click="onOperate('start', row)"
@@ -430,7 +436,7 @@ const isActive = ref(false);
 const isExist = ref(false);
 
 const loading = ref(false);
-const data = ref();
+const data = ref<any[]>([]);
 const selects = ref<any>([]);
 const paginationConfig = reactive({
     cacheSizeKey: 'container-page-size',
@@ -458,6 +464,101 @@ const tags = ref([]);
 const activeTag = ref('all');
 
 const hoveredRowIndex = ref(-1);
+const activeDropdownContainerId = ref('');
+const statFields = [
+    'cpuTotalUsage',
+    'systemUsage',
+    'cpuPercent',
+    'percpuUsage',
+    'memoryCache',
+    'memoryUsage',
+    'memoryLimit',
+    'memoryPercent',
+] as const;
+
+const assignFields = (target: Record<string, any>, source: Record<string, any>, skipKeys: string[] = []) => {
+    const skipSet = new Set(skipKeys);
+    for (const [key, value] of Object.entries(source)) {
+        if (skipSet.has(key)) {
+            continue;
+        }
+        if (target[key] !== value) {
+            target[key] = value;
+        }
+    }
+};
+
+const syncContainerRows = (containers: Record<string, any>[]) => {
+    const currentMap = new Map(data.value.map((item) => [item.containerID, item]));
+    data.value = containers.map((container) => {
+        const current = currentMap.get(container.containerID);
+        if (!current) {
+            return container;
+        }
+        assignFields(current, container);
+        return current;
+    });
+};
+
+const applyStatsToRows = (stats: Record<string, any>[]) => {
+    if (stats.length === 0 || data.value.length === 0) {
+        return;
+    }
+    const statsMap = new Map(stats.map((item) => [item.containerID, item]));
+    for (const container of data.value) {
+        const stat = statsMap.get(container.containerID);
+        if (!stat) {
+            continue;
+        }
+        if (!container.hasLoad) {
+            container.hasLoad = true;
+        }
+        for (const field of statFields) {
+            if (container[field] !== stat[field]) {
+                container[field] = stat[field];
+            }
+        }
+    }
+};
+
+const updateTags = (status: Record<string, number>) => {
+    const nextTags = [];
+    if (status.containerCount) {
+        nextTags.push({ key: 'all', count: status.containerCount });
+    }
+    if (status.running) {
+        nextTags.push({ key: 'running', count: status.running });
+    }
+    if (status.paused) {
+        nextTags.push({ key: 'paused', count: status.paused });
+    }
+    if (status.restarting) {
+        nextTags.push({ key: 'restarting', count: status.restarting });
+    }
+    if (status.removing) {
+        nextTags.push({ key: 'removing', count: status.removing });
+    }
+    if (status.created) {
+        nextTags.push({ key: 'created', count: status.created });
+    }
+    if (status.dead) {
+        nextTags.push({ key: 'dead', count: status.dead });
+    }
+    if (status.exited) {
+        nextTags.push({ key: 'exited', count: status.exited });
+    }
+    tags.value = nextTags;
+};
+
+const handleStatusDropdownVisibleChange = (containerID: string, visible: boolean) => {
+    if (visible) {
+        activeDropdownContainerId.value = containerID;
+        return;
+    }
+    if (activeDropdownContainerId.value === containerID) {
+        activeDropdownContainerId.value = '';
+    }
+};
 
 const goDashboard = async (port: any) => {
     if (port.indexOf('127.0.0.1') !== -1) {
@@ -507,17 +608,26 @@ const search = async (column?: any) => {
         excludeAppStore: !includeAppStore.value,
     };
     loading.value = true;
-    loadStats();
-    loadContainerCount();
-    await searchContainer(params)
-        .then((res) => {
-            loading.value = false;
-            data.value = res.data.items || [];
-            paginationConfig.total = res.data.total;
-        })
-        .catch(() => {
-            loading.value = false;
-        });
+    const [containerResult, statsResult, statusResult] = await Promise.allSettled([
+        searchContainer(params),
+        containerListStats(),
+        loadContainerStatus(),
+    ]);
+    loading.value = false;
+
+    if (containerResult.status === 'fulfilled') {
+        const containers = containerResult.value.data.items || [];
+        syncContainerRows(containers);
+        paginationConfig.total = containerResult.value.data.total;
+    }
+
+    if (statsResult.status === 'fulfilled') {
+        applyStatsToRows(statsResult.value.data || []);
+    }
+
+    if (statusResult.status === 'fulfilled') {
+        updateTags(statusResult.value.data || {});
+    }
 };
 
 const searchWithStatus = (item: string) => {
@@ -554,36 +664,6 @@ const changePinned = (row: any, isPinned: boolean) => {
     });
 };
 
-const loadContainerCount = async () => {
-    await loadContainerStatus().then((res) => {
-        tags.value = [];
-        if (res.data.containerCount) {
-            tags.value.push({ key: 'all', count: res.data.containerCount });
-        }
-        if (res.data.running) {
-            tags.value.push({ key: 'running', count: res.data.running });
-        }
-        if (res.data.paused) {
-            tags.value.push({ key: 'paused', count: res.data.paused });
-        }
-        if (res.data.restarting) {
-            tags.value.push({ key: 'restarting', count: res.data.restarting });
-        }
-        if (res.data.removing) {
-            tags.value.push({ key: 'removing', count: res.data.removing });
-        }
-        if (res.data.created) {
-            tags.value.push({ key: 'created', count: res.data.created });
-        }
-        if (res.data.dead) {
-            tags.value.push({ key: 'dead', count: res.data.dead });
-        }
-        if (res.data.exited) {
-            tags.value.push({ key: 'exited', count: res.data.exited });
-        }
-    });
-};
-
 const refresh = async () => {
     let filterItem = props.filters ? props.filters : '';
     let params = {
@@ -595,21 +675,9 @@ const refresh = async () => {
         orderBy: paginationConfig.orderBy,
         order: paginationConfig.order,
     };
-    loadStats();
-    const res = await searchContainer(params);
-    let containers = res.data.items || [];
-    for (const container of containers) {
-        for (const c of data.value) {
-            c.hasLoad = true;
-            if (container.containerID == c.containerID) {
-                for (let key in container) {
-                    if (key !== 'cpuPercent' && key !== 'memoryPercent') {
-                        c[key] = container[key];
-                    }
-                }
-            }
-        }
-    }
+    const [containerResult, statsResult] = await Promise.all([searchContainer(params), containerListStats()]);
+    syncContainerRows(containerResult.data.items || []);
+    applyStatsToRows(statsResult.data || []);
 };
 
 const loadSize = async (row: any) => {
@@ -618,30 +686,6 @@ const loadSize = async (row: any) => {
         row.sizeRootFs = res.data.sizeRootFs || 0;
         row.hasLoadSize = true;
     });
-};
-
-const loadStats = async () => {
-    const res = await containerListStats();
-    let stats = res.data || [];
-    if (stats.length === 0) {
-        return;
-    }
-    for (const container of data.value) {
-        for (const item of stats) {
-            if (container.containerID === item.containerID) {
-                container.hasLoad = true;
-                container.cpuTotalUsage = item.cpuTotalUsage;
-                container.systemUsage = item.systemUsage;
-                container.cpuPercent = item.cpuPercent;
-                container.percpuUsage = item.percpuUsage;
-                container.memoryCache = item.memoryCache;
-                container.memoryUsage = item.memoryUsage;
-                container.memoryLimit = item.memoryLimit;
-                container.memoryPercent = item.memoryPercent;
-                break;
-            }
-        }
-    }
 };
 
 const onContainerOperate = async (container: string) => {
