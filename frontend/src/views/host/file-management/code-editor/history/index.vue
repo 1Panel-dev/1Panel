@@ -354,6 +354,25 @@ const canRestoreSelected = computed(() => isVersionRecord(selectedHistory.value?
 const isRestoringCurrentFile = computed(() => selectedHistory.value?.path === currentFile.value.path);
 const getCurrentTargetPath = (row: File.FileHistoryInfo) => row.currentPath || row.path;
 
+const syncCurrentFileContext = (history?: File.FileHistoryInfo | null) => {
+    if (currentFile.value.path) {
+        return;
+    }
+    const target = history || selectedHistory.value || historyItems.value[0];
+    if (!target) {
+        return;
+    }
+    currentFile.value = {
+        ...currentFile.value,
+        path: target.currentPath || target.path || '',
+        content: target.currentContent || currentFileContent.value || currentFile.value.content || '',
+        extension: target.extension || currentFile.value.extension || '',
+        language: currentFile.value.language || '',
+        dirty: false,
+        scope: 'current',
+    };
+};
+
 const pagination = ref({
     currentPage: 1,
     pageSize: 10,
@@ -488,10 +507,17 @@ const loadHistoryList = async (resetPage = false) => {
     }
     historyLoading.value = true;
     try {
+        const currentScopePath =
+            currentFile.value.path ||
+            selectedHistory.value?.currentPath ||
+            selectedHistory.value?.path ||
+            historyItems.value[0]?.currentPath ||
+            historyItems.value[0]?.path ||
+            '';
         const res = await searchFileHistory({
             page: pagination.value.currentPage,
             pageSize: pagination.value.pageSize,
-            path: scope.value === 'current' ? currentFile.value.path : '',
+            path: scope.value === 'current' ? currentScopePath : '',
             scope: scope.value,
             operation: operationFilter.value,
         });
@@ -570,6 +596,9 @@ const deleteSelected = async (row: File.FileHistoryInfo | null) => {
 };
 
 const handleScopeChange = async () => {
+    if (scope.value === 'current') {
+        syncCurrentFileContext();
+    }
     await loadHistoryList(true);
 };
 
@@ -633,6 +662,9 @@ const acceptParams = async (params: HistoryDrawerProps): Promise<void> => {
     operationFilter.value = '';
     scope.value = params.scope || 'current';
     drawerVisible.value = true;
+    if (scope.value === 'current') {
+        syncCurrentFileContext();
+    }
     await loadHistorySetting();
     await loadHistoryList(true);
 };
