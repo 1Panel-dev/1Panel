@@ -95,12 +95,9 @@
                             </el-button>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('menu.website')" min-width="180" show-overflow-tooltip>
+                    <el-table-column :label="$t('menu.website')" min-width="180">
                         <template #default="{ row }">
                             <div v-if="row.websiteId > 0" class="website-link-cell">
-                                <el-text type="primary" class="cursor-pointer" @click="openWebsite(row)">
-                                    {{ getWebsiteDisplayName(row) }}
-                                </el-text>
                                 <el-popover
                                     placement="right"
                                     trigger="hover"
@@ -108,7 +105,13 @@
                                     @before-enter="loadWebsiteDomains(row.websiteId)"
                                 >
                                     <template #reference>
-                                        <el-button link icon="Promotion" class="ml-2.5"></el-button>
+                                        <el-text
+                                            type="primary"
+                                            class="cursor-pointer website-link-cell__name"
+                                            @click="openWebsite(row)"
+                                        >
+                                            {{ getWebsiteDisplayName(row) }}
+                                        </el-text>
                                     </template>
                                     <table v-if="getWebsiteBaseUrls(row).length > 0">
                                         <tbody>
@@ -130,6 +133,7 @@
                                     v-if="canUnbindWebsite(row)"
                                     link
                                     type="primary"
+                                    class="website-link-cell__unbind"
                                     @click="onUnbindWebsite(row)"
                                 >
                                     {{ $t('commons.button.unbind') }}
@@ -714,7 +718,16 @@ onMounted(async () => {
 
 .website-link-cell {
     display: inline-flex;
-    align-items: center;
-    gap: 10px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+}
+
+.website-link-cell__name {
+    white-space: nowrap;
+}
+
+.website-link-cell__unbind {
+    margin-left: 0;
 }
 </style>

@@ -1,7 +1,9 @@
 <template>
-    <el-form ref="formRef" :model="form" :rules="rules" label-position="top">
-        <el-form-item :label="t('commons.table.status')">
-            <el-switch v-model="form.enabled" />
+    <el-form ref="formRef" v-loading="deleting" :model="form" :rules="rules" label-position="top">
+        <el-form-item v-if="configured">
+            <el-button type="danger" plain :loading="deleting" @click="deleteChannel">
+                {{ t('commons.button.delete') }}
+            </el-button>
         </el-form-item>
         <el-form-item label="App ID" prop="appId">
             <el-input v-model="form.appId" />
@@ -53,14 +55,18 @@
 
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
-import type { FormInstance } from 'element-plus';
+import { ElMessageBox, type FormInstance } from 'element-plus';
 import { useI18n } from 'vue-i18n';
-import { approveAgentChannelPairing, getAgentFeishuConfig, updateAgentFeishuConfig } from '@/api/modules/ai';
+import {
+    approveAgentChannelPairing,
+    deleteAgentChannelConfig,
+    getAgentFeishuConfig,
+    updateAgentFeishuConfig,
+} from '@/api/modules/ai';
 import { Rules } from '@/global/form-rules';
 import { MsgSuccess, MsgWarning } from '@/utils/message';
 
 interface FeishuForm {
-    enabled: boolean;
     appId: string;
     appSecret: string;
     dmPolicy: 'pairing' | 'open' | 'allowlist';
@@ -72,10 +78,11 @@ const { t } = useI18n();
 const formRef = ref<FormInstance>();
 const saving = ref(false);
 const approving = ref(false);
+const deleting = ref(false);
 const agentId = ref(0);
 const pairingCode = ref('');
+const configured = ref(false);
 const form = reactive<FeishuForm>({
-    enabled: true,
     appId: '',
     appSecret: '',
     dmPolicy: 'pairing',
@@ -117,7 +124,7 @@ const load = async (id: number) => {
     agentId.value = id;
     pairingCode.value = '';
     const res = await getAgentFeishuConfig({ agentId: id });
-    form.enabled = res.data?.enabled ?? true;
+    configured.value = !!res.data?.enabled;
     form.appId = res.data?.bots?.[0]?.appId || '';
     form.appSecret = res.data?.bots?.[0]?.appSecret || '';
     form.dmPolicy = (res.data?.bots?.[0]?.dmPolicy as FeishuForm['dmPolicy']) || 'pairing';
@@ -135,7 +142,7 @@ const save = async () => {
         const allowFrom = parseTextList(form.allowFromText);
         await updateAgentFeishuConfig({
             agentId: agentId.value,
-            enabled: form.enabled,
+            enabled: true,
             threadSession: true,
             replyMode: 'auto',
             streaming: false,
@@ -156,8 +163,35 @@ const save = async () => {
             ],
         });
         MsgSuccess(t('aiTools.agents.saveAndRestartSuccess'));
+        configured.value = true;
     } finally {
         saving.value = false;
+    }
+};
+
+const deleteChannel = async () => {
+    if (!agentId.value) {
+        return;
+    }
+    await ElMessageBox.confirm(
+        t('aiTools.agents.channelDeleteConfirm', [t('aiTools.agents.feishu')]),
+        t('commons.msg.infoTitle'),
+        {
+            confirmButtonText: t('commons.button.confirm'),
+            cancelButtonText: t('commons.button.cancel'),
+            type: 'warning',
+        },
+    );
+    deleting.value = true;
+    try {
+        await deleteAgentChannelConfig({
+            agentId: agentId.value,
+            type: 'feishu',
+        });
+        await load(agentId.value);
+        MsgSuccess(t('aiTools.agents.deleteAndRestartSuccess'));
+    } finally {
+        deleting.value = false;
     }
 };
 

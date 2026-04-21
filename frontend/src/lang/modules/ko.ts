@@ -775,6 +775,7 @@ const message = {
             hermesChatDeleteConfirm: '세션 {0}을(를) 삭제하시겠습니까?',
             hermesChatDeleteSuccess: '세션이 삭제되었습니다',
             weixin: 'Weixin',
+            qq: 'QQ',
             wecom: 'WeCom',
             dingtalk: 'DingTalk',
             feishu: 'Feishu',
@@ -831,6 +832,8 @@ const message = {
             scanConnectHelper:
                 '클릭하여 QR 로그인 작업을 시작하세요. QR 코드는 작업 로그에 표시되며 스캔이 완료되면 컨테이너가 자동으로 재시작됩니다.',
             channelAutoRestartHelper: '저장하면 설정 적용을 위해 컨테이너가 자동으로 재시작됩니다.',
+            channelDeleteConfirm: '{0} 채널 구성을 삭제하시겠습니까?',
+            deleteAndRestartSuccess: '삭제되었습니다. 컨테이너가 자동으로 다시 시작되고 있습니다.',
             customProviderHelper: '사용자 정의 모델 공급자는 계정 사용 가능 여부를 검증하지 않습니다',
         },
         model: {

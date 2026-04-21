@@ -794,6 +794,7 @@ const message = {
             hermesChatDeleteConfirm: 'Padam sesi {0}?',
             hermesChatDeleteSuccess: 'Sesi berjaya dipadam',
             weixin: 'Weixin',
+            qq: 'QQ',
             wecom: 'WeCom',
             dingtalk: 'DingTalk',
             feishu: 'Feishu',
@@ -854,6 +855,8 @@ const message = {
                 'Klik untuk memulakan tugas log masuk QR. Kod QR akan dipaparkan dalam log tugas dan bekas akan dimulakan semula secara automatik selepas imbasan berjaya.',
             channelAutoRestartHelper:
                 'Menyimpan akan memulakan semula bekas secara automatik supaya konfigurasi berkuat kuasa.',
+            channelDeleteConfirm: 'Padam konfigurasi saluran {0}?',
+            deleteAndRestartSuccess: 'Berjaya dipadam. Bekas sedang dimulakan semula secara automatik.',
             customProviderHelper: 'Penyedia model tersuai tidak mengesahkan sama ada akaun boleh digunakan',
         },
         model: {

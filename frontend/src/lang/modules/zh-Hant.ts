@@ -740,6 +740,7 @@ const message = {
             hermesChatDeleteConfirm: '確認刪除會話 {0}？',
             hermesChatDeleteSuccess: '會話已刪除',
             weixin: '微信',
+            qq: 'QQ',
             wecom: '企業微信',
             dingtalk: '釘釘',
             feishu: '飛書',
@@ -795,6 +796,8 @@ const message = {
             scanConnect: '掃碼對接',
             scanConnectHelper: '點擊後將在任務日誌中顯示 QR Code，掃碼確認成功後將自動重新啟動容器。',
             channelAutoRestartHelper: '保存後將自動重新啟動容器以使設定生效。',
+            channelDeleteConfirm: '確認刪除 {0} 頻道設定？',
+            deleteAndRestartSuccess: '刪除成功，容器正在自動重新啟動。',
             customProviderHelper: '自訂模型供應商不驗證帳號是否可用',
         },
         model: {

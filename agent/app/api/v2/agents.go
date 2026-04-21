@@ -865,6 +865,27 @@ func (b *BaseApi) UpdateAgentDingTalkConfig(c *gin.Context) {
 }
 
 // @Tags AI
+// @Summary Get Agent Weixin channel config
+// @Accept json
+// @Param request body dto.AgentIDReq true "request"
+// @Success 200 {object} dto.AgentWeixinConfig
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/channel/weixin/get [post]
+func (b *BaseApi) GetAgentWeixinConfig(c *gin.Context) {
+	var req dto.AgentIDReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	data, err := agentService.GetWeixinConfig(req)
+	if err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.SuccessWithData(c, data)
+}
+
+// @Tags AI
 // @Summary Get Agent QQ Bot channel config
 // @Accept json
 // @Param request body dto.AgentIDReq true "request"
@@ -899,6 +920,26 @@ func (b *BaseApi) UpdateAgentQQBotConfig(c *gin.Context) {
 		return
 	}
 	if err := agentService.UpdateQQBotConfig(req); err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags AI
+// @Summary Delete Agent channel config
+// @Accept json
+// @Param request body dto.AgentChannelDeleteReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/channel/delete [post]
+func (b *BaseApi) DeleteAgentChannelConfig(c *gin.Context) {
+	var req dto.AgentChannelDeleteReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := agentService.DeleteChannelConfig(req); err != nil {
 		helper.BadRequest(c, err)
 		return
 	}

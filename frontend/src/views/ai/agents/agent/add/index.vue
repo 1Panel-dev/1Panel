@@ -2,18 +2,18 @@
     <DrawerPro v-model="open" :header="$t('commons.button.create')" size="large" @close="handleClose">
         <el-form ref="formRef" :model="form" :rules="rules" label-position="top">
             <el-card class="form-card">
-                <el-form-item :label="$t('commons.table.name')" prop="name">
-                    <el-input v-model="form.name" />
-                </el-form-item>
-                <el-form-item :label="$t('website.remark')" prop="remark">
-                    <el-input v-model="form.remark" />
-                </el-form-item>
                 <el-form-item :label="`${$t('aiTools.agents.agent')}${$t('commons.table.type')}`" prop="agentType">
                     <el-select v-model="form.agentType" @change="handleAgentTypeChange">
                         <el-option :label="$t('aiTools.agents.openclawType')" value="openclaw" />
                         <el-option :label="$t('aiTools.agents.hermesType')" value="hermes-agent" />
                         <el-option :label="$t('aiTools.agents.copawType')" value="copaw" />
                     </el-select>
+                </el-form-item>
+                <el-form-item :label="$t('commons.table.name')" prop="name">
+                    <el-input v-model="form.name" />
+                </el-form-item>
+                <el-form-item :label="$t('website.remark')" prop="remark">
+                    <el-input v-model="form.remark" />
                 </el-form-item>
                 <el-form-item :label="$t('aiTools.agents.appVersion')" prop="appVersion">
                     <el-select v-model="form.appVersion" filterable>

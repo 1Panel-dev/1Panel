@@ -60,6 +60,7 @@ ErrAgentWebsiteBound: 'このエージェントはすでにサイトに関連付
 ErrAgentWebsiteTypeUnsupported: '関連付けできるのはプロキシサイトまたは静的サイトのみです'
 ErrAgentWebsiteInUse: 'このサイトはすでに別のエージェントに関連付けられています'
 ErrAgentWebsiteUnbindUnsupported: 'ワンクリックデプロイのサイトは手動で関連解除できません'
+ErrHermesPairingCodeUnavailable: 'Hermes でペアリングコードが一時的に見つかりません。ネットワーク要因の可能性があるため、しばらくしてから再試行してください。'
 Localhost: 'ローカルマシン'
 ErrBackupInUsed: 'バックアップアカウントがスケジュールで使用中'
 ErrBackupCheck: '接続テストに失敗しました: {{ .err }}'

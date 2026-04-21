@@ -793,6 +793,7 @@ const message = {
             hermesChatDeleteConfirm: '{0} oturumu silinsin mi?',
             hermesChatDeleteSuccess: 'Oturum silindi',
             weixin: 'Weixin',
+            qq: 'QQ',
             wecom: 'WeCom',
             dingtalk: 'DingTalk',
             feishu: 'Feishu',
@@ -852,6 +853,8 @@ const message = {
                 'QR giriş görevini başlatmak için tıklayın. QR kodu görev günlüğünde görünecek ve tarama başarılı olduktan sonra konteyner otomatik olarak yeniden başlatılacaktır.',
             channelAutoRestartHelper:
                 'Kaydettiğinizde ayarların etkili olması için konteyner otomatik olarak yeniden başlatılır.',
+            channelDeleteConfirm: '{0} kanal yapılandırması silinsin mi?',
+            deleteAndRestartSuccess: 'Başarıyla silindi. Konteyner otomatik olarak yeniden başlatılıyor.',
             customProviderHelper: 'Özel model sağlayıcısında hesabın kullanılabilirliği doğrulanmaz',
         },
         model: {

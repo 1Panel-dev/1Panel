@@ -262,6 +262,10 @@ export const updateAgentDingTalkConfig = (req: AI.AgentDingTalkConfigUpdateReq) 
     return http.post(`/ai/agents/channel/dingtalk/update`, req);
 };
 
+export const getAgentWeixinConfig = (req: AI.AgentIDReq) => {
+    return http.post<AI.AgentWeixinConfig>(`/ai/agents/channel/weixin/get`, req);
+};
+
 export const loginAgentWeixinChannel = (req: AI.AgentWeixinLoginReq) => {
     return http.post(`/ai/agents/channel/weixin/login`, req);
 };
@@ -272,6 +276,10 @@ export const getAgentQQBotConfig = (req: AI.AgentQQBotConfigReq) => {
 
 export const updateAgentQQBotConfig = (req: AI.AgentQQBotConfigUpdateReq) => {
     return http.post(`/ai/agents/channel/qqbot/update`, req);
+};
+
+export const deleteAgentChannelConfig = (req: AI.AgentChannelDeleteReq) => {
+    return http.post(`/ai/agents/channel/delete`, req);
 };
 
 export const installAgentPlugin = (req: AI.AgentPluginInstallReq) => {

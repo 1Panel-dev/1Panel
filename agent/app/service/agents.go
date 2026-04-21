@@ -86,9 +86,11 @@ type IAgentService interface {
 	UpdateWecomConfig(req dto.AgentWecomConfigUpdateReq) error
 	GetDingTalkConfig(req dto.AgentIDReq) (*dto.AgentDingTalkConfig, error)
 	UpdateDingTalkConfig(req dto.AgentDingTalkConfigUpdateReq) error
+	GetWeixinConfig(req dto.AgentIDReq) (*dto.AgentWeixinConfig, error)
 	LoginWeixinChannel(req dto.AgentWeixinLoginReq) error
 	GetQQBotConfig(req dto.AgentIDReq) (*dto.AgentQQBotConfig, error)
 	UpdateQQBotConfig(req dto.AgentQQBotConfigUpdateReq) error
+	DeleteChannelConfig(req dto.AgentChannelDeleteReq) error
 	InstallPlugin(req dto.AgentPluginInstallReq) error
 	UpgradePlugin(req dto.AgentPluginUpgradeReq) error
 	UninstallPlugin(req dto.AgentPluginUninstallReq) error

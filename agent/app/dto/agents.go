@@ -376,9 +376,14 @@ type AgentTelegramConfig struct {
 
 type AgentChannelPairingApproveReq struct {
 	AgentID     uint   `json:"agentId" validate:"required"`
-	Type        string `json:"type" validate:"required,oneof=feishu telegram discord wecom qqbot"`
+	Type        string `json:"type" validate:"required,oneof=feishu telegram discord wecom qqbot dingtalk"`
 	PairingCode string `json:"pairingCode" validate:"required"`
 	AccountID   string `json:"accountId"`
+}
+
+type AgentChannelDeleteReq struct {
+	AgentID uint   `json:"agentId" validate:"required"`
+	Type    string `json:"type" validate:"required,oneof=feishu telegram discord wecom qqbot dingtalk weixin"`
 }
 
 type AgentWecomConfigUpdateReq struct {
@@ -406,7 +411,7 @@ type AgentWecomConfig struct {
 type AgentDingTalkConfigUpdateReq struct {
 	AgentID                         uint               `json:"agentId" validate:"required"`
 	Enabled                         bool               `json:"enabled"`
-	DmPolicy                        string             `json:"dmPolicy" validate:"required,oneof=allowlist open disabled"`
+	DmPolicy                        string             `json:"dmPolicy" validate:"required,oneof=pairing allowlist open disabled"`
 	AllowFrom                       []string           `json:"allowFrom"`
 	GroupPolicy                     string             `json:"groupPolicy" validate:"required,oneof=open allowlist disabled"`
 	GroupAllowFrom                  []string           `json:"groupAllowFrom"`
@@ -436,6 +441,10 @@ type AgentDingTalkConfig struct {
 type AgentWeixinLoginReq struct {
 	AgentID uint   `json:"agentId" validate:"required"`
 	TaskID  string `json:"taskID" validate:"required"`
+}
+
+type AgentWeixinConfig struct {
+	Enabled bool `json:"enabled"`
 }
 
 type AgentQQBotConfigUpdateReq struct {

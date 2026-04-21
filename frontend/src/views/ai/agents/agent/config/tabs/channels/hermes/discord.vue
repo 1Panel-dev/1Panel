@@ -1,5 +1,10 @@
 <template>
-    <el-form ref="formRef" :model="form" :rules="rules" label-position="top">
+    <el-form ref="formRef" v-loading="deleting" :model="form" :rules="rules" label-position="top">
+        <el-form-item v-if="configured">
+            <el-button type="danger" plain :loading="deleting" @click="deleteChannel">
+                {{ t('commons.button.delete') }}
+            </el-button>
+        </el-form-item>
         <el-form-item label="Token" prop="token">
             <el-input v-model="form.token" show-password />
         </el-form-item>
@@ -43,9 +48,14 @@
 
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
-import type { FormInstance } from 'element-plus';
+import { ElMessageBox, type FormInstance } from 'element-plus';
 import { useI18n } from 'vue-i18n';
-import { approveAgentChannelPairing, getAgentDiscordConfig, updateAgentDiscordConfig } from '@/api/modules/ai';
+import {
+    approveAgentChannelPairing,
+    deleteAgentChannelConfig,
+    getAgentDiscordConfig,
+    updateAgentDiscordConfig,
+} from '@/api/modules/ai';
 import { Rules } from '@/global/form-rules';
 import { MsgSuccess, MsgWarning } from '@/utils/message';
 
@@ -60,8 +70,10 @@ const { t } = useI18n();
 const formRef = ref<FormInstance>();
 const saving = ref(false);
 const approving = ref(false);
+const deleting = ref(false);
 const agentId = ref(0);
 const pairingCode = ref('');
+const configured = ref(false);
 const form = reactive<DiscordForm>({
     token: '',
     dmPolicy: 'pairing',
@@ -96,7 +108,9 @@ const rules = reactive({
 
 const load = async (id: number) => {
     agentId.value = id;
+    pairingCode.value = '';
     const res = await getAgentDiscordConfig({ agentId: id });
+    configured.value = !!res.data?.enabled;
     form.token = res.data?.bots?.[0]?.token || '';
     form.dmPolicy = (res.data?.dmPolicy as DiscordForm['dmPolicy']) || 'pairing';
     form.allowFromText = (res.data?.allowFrom || []).join('\n');
@@ -132,8 +146,31 @@ const save = async () => {
             ],
         });
         MsgSuccess(t('aiTools.agents.saveAndRestartSuccess'));
+        configured.value = true;
     } finally {
         saving.value = false;
+    }
+};
+
+const deleteChannel = async () => {
+    if (!agentId.value) {
+        return;
+    }
+    await ElMessageBox.confirm(t('aiTools.agents.channelDeleteConfirm', ['Discord']), t('commons.msg.infoTitle'), {
+        confirmButtonText: t('commons.button.confirm'),
+        cancelButtonText: t('commons.button.cancel'),
+        type: 'warning',
+    });
+    deleting.value = true;
+    try {
+        await deleteAgentChannelConfig({
+            agentId: agentId.value,
+            type: 'discord',
+        });
+        await load(agentId.value);
+        MsgSuccess(t('aiTools.agents.deleteAndRestartSuccess'));
+    } finally {
+        deleting.value = false;
     }
 };
 

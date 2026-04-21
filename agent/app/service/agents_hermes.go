@@ -326,6 +326,64 @@ func writeHermesDiscordChannelConfig(confDir string, config dto.AgentDiscordConf
 	return writeHermesConfigMap(configPath, cfg)
 }
 
+func deleteHermesEnvKeys(confDir string, keys ...string) error {
+	envPath := path.Join(confDir, ".env")
+	envMap, err := readHermesEnvMap(envPath)
+	if err != nil {
+		return err
+	}
+	for _, key := range keys {
+		delete(envMap, key)
+	}
+	return writeHermesEnvMap(envPath, envMap, keys)
+}
+
+func deleteHermesConfigSections(confDir string, topLevelKeys []string, platformKeys []string) error {
+	configPath := path.Join(confDir, "config.yaml")
+	cfg, err := readHermesConfigMap(configPath)
+	if err != nil {
+		return err
+	}
+	for _, key := range topLevelKeys {
+		delete(cfg, key)
+	}
+	if len(platformKeys) > 0 {
+		if platforms, ok := cfg["platforms"].(map[string]interface{}); ok {
+			for _, key := range platformKeys {
+				delete(platforms, key)
+			}
+			if len(platforms) == 0 {
+				delete(cfg, "platforms")
+			}
+		}
+	}
+	return writeHermesConfigMap(configPath, cfg)
+}
+
+func deleteHermesTelegramChannelConfig(confDir string) error {
+	if err := deleteHermesEnvKeys(confDir,
+		"TELEGRAM_BOT_TOKEN",
+		"TELEGRAM_ALLOWED_USERS",
+		"TELEGRAM_ALLOW_ALL_USERS",
+		"TELEGRAM_HOME_CHANNEL",
+	); err != nil {
+		return err
+	}
+	return deleteHermesConfigSections(confDir, []string{"telegram"}, []string{"telegram"})
+}
+
+func deleteHermesDiscordChannelConfig(confDir string) error {
+	if err := deleteHermesEnvKeys(confDir,
+		"DISCORD_BOT_TOKEN",
+		"DISCORD_ALLOWED_USERS",
+		"DISCORD_ALLOW_ALL_USERS",
+		"DISCORD_HOME_CHANNEL",
+	); err != nil {
+		return err
+	}
+	return deleteHermesConfigSections(confDir, []string{"discord"}, []string{"discord"})
+}
+
 func normalizeHermesTimezone(timezone string) string {
 	timezone = strings.TrimSpace(timezone)
 	if timezone == "" {
@@ -566,13 +624,21 @@ func extractHermesEnvBool(envMap map[string]string, key string, defaultValue boo
 	return strings.EqualFold(value, "true")
 }
 
-func validateHermesPairingApproveOutput(output string) error {
-	text := strings.TrimSpace(output)
-	if text == "" {
+func validateHermesPairingApproveResult(output string, err error) error {
+	if strings.Contains(output, "Approved!") {
 		return nil
 	}
-	if strings.Contains(text, "not found or expired for platform") {
-		return errors.New(text)
+	if strings.Contains(output, "not found or expired for platform") {
+		return buserr.New("ErrHermesPairingCodeUnavailable")
 	}
-	return nil
+	if err == nil {
+		if strings.TrimSpace(output) == "" {
+			return fmt.Errorf("unexpected hermes pairing approve result")
+		}
+		return errors.New(strings.TrimSpace(output))
+	}
+	if strings.Contains(err.Error(), "not found or expired for platform") {
+		return buserr.New("ErrHermesPairingCodeUnavailable")
+	}
+	return err
 }

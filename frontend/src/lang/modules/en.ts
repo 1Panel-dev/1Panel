@@ -786,6 +786,7 @@ const message = {
             hermesChatDeleteConfirm: 'Delete session {0}?',
             hermesChatDeleteSuccess: 'Session deleted',
             weixin: 'Weixin',
+            qq: 'QQ',
             wecom: 'WeCom',
             dingtalk: 'DingTalk',
             feishu: 'Feishu',
@@ -842,6 +843,8 @@ const message = {
             scanConnectHelper:
                 'Click to start the QR login task. The QR code will appear in the task log, and the container will restart automatically after the scan succeeds.',
             channelAutoRestartHelper: 'Saving will automatically restart the container so the changes take effect.',
+            channelDeleteConfirm: 'Delete the {0} channel configuration?',
+            deleteAndRestartSuccess: 'Deleted successfully. The container is restarting automatically.',
             customProviderHelper: 'Custom model providers do not validate whether the account is available.',
         },
         model: {
