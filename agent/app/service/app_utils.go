@@ -425,6 +425,8 @@ func deleteAppInstall(deleteReq request.AppInstallDelete) error {
 		switch install.App.Key {
 		case constant.AppMysql, constant.AppMariaDB, constant.AppMysqlCluster:
 			_ = mysqlRepo.Delete(ctx, mysqlRepo.WithByMysqlName(install.Name))
+		case constant.AppMongodb:
+			_ = mongodbRepo.Delete(ctx, mongodbRepo.WithByMongodbName(install.Name))
 		case constant.AppPostgresql, constant.AppPostgresqlCluster:
 			_ = postgresqlRepo.Delete(ctx, postgresqlRepo.WithByPostgresqlName(install.Name))
 		}
