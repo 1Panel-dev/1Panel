@@ -789,6 +789,7 @@ const message = {
             hermesChatDeleteConfirm: 'セッション {0} を削除しますか？',
             hermesChatDeleteSuccess: 'セッションを削除しました',
             weixin: 'Weixin',
+            qq: 'QQ',
             wecom: 'WeCom',
             dingtalk: 'DingTalk',
             feishu: 'Feishu',
@@ -846,6 +847,8 @@ const message = {
             scanConnectHelper:
                 'クリックして QR ログインタスクを開始します。QR コードはタスクログに表示され、スキャン成功後にコンテナが自動で再起動されます。',
             channelAutoRestartHelper: '保存後、設定を反映するためにコンテナが自動で再起動されます。',
+            channelDeleteConfirm: '{0} チャンネルの設定を削除しますか？',
+            deleteAndRestartSuccess: '削除に成功しました。コンテナは自動的に再起動しています。',
             customProviderHelper: 'カスタムモデルプロバイダーでは、アカウントの有効性を検証しません',
         },
         model: {

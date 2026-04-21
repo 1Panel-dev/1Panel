@@ -1,7 +1,15 @@
 <template>
-    <el-form ref="formRef" :model="form" :rules="rules" label-position="top">
-        <el-form-item :label="t('commons.table.status')">
-            <el-switch v-model="form.enabled" />
+    <el-form ref="formRef" v-loading="deleting" :model="form" :rules="rules" label-position="top">
+        <el-form-item v-if="configured">
+            <el-button type="danger" plain :loading="deleting" @click="deleteChannel">
+                {{ t('commons.button.delete') }}
+            </el-button>
+        </el-form-item>
+        <el-form-item :label="t('aiTools.agents.botId')" prop="botId">
+            <el-input v-model="form.botId" />
+        </el-form-item>
+        <el-form-item :label="t('setting.secret')" prop="secret">
+            <el-input v-model="form.secret" type="password" show-password />
         </el-form-item>
         <el-form-item :label="t('aiTools.agents.dmPolicy')" prop="dmPolicy">
             <el-select v-model="form.dmPolicy">
@@ -40,12 +48,6 @@
             />
             <span class="input-help">{{ t('aiTools.agents.groupAllowFromHelper') }}</span>
         </el-form-item>
-        <el-form-item :label="t('aiTools.agents.botId')" prop="botId">
-            <el-input v-model="form.botId" />
-        </el-form-item>
-        <el-form-item :label="t('setting.secret')" prop="secret">
-            <el-input v-model="form.secret" type="password" show-password />
-        </el-form-item>
         <el-form-item>
             <el-button type="primary" :loading="saving" @click="save">
                 {{ t('commons.button.save') }}
@@ -67,14 +69,18 @@
 
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
-import type { FormInstance } from 'element-plus';
+import { ElMessageBox, type FormInstance } from 'element-plus';
 import { useI18n } from 'vue-i18n';
-import { approveAgentChannelPairing, getAgentWecomConfig, updateAgentWecomConfig } from '@/api/modules/ai';
+import {
+    approveAgentChannelPairing,
+    deleteAgentChannelConfig,
+    getAgentWecomConfig,
+    updateAgentWecomConfig,
+} from '@/api/modules/ai';
 import { Rules } from '@/global/form-rules';
 import { MsgSuccess, MsgWarning } from '@/utils/message';
 
 interface WecomForm {
-    enabled: boolean;
     dmPolicy: 'pairing' | 'open' | 'allowlist' | 'disabled';
     allowFromText: string;
     groupPolicy: 'open' | 'allowlist' | 'disabled';
@@ -87,10 +93,11 @@ const { t } = useI18n();
 const formRef = ref<FormInstance>();
 const saving = ref(false);
 const approving = ref(false);
+const deleting = ref(false);
 const agentId = ref(0);
 const pairingCode = ref('');
+const configured = ref(false);
 const form = reactive<WecomForm>({
-    enabled: true,
     dmPolicy: 'pairing',
     allowFromText: '',
     groupPolicy: 'open',
@@ -139,7 +146,7 @@ const load = async (id: number) => {
     agentId.value = id;
     pairingCode.value = '';
     const res = await getAgentWecomConfig({ agentId: id });
-    form.enabled = res.data?.enabled ?? true;
+    configured.value = !!res.data?.enabled;
     form.dmPolicy = (res.data?.dmPolicy as WecomForm['dmPolicy']) || 'pairing';
     form.allowFromText = (res.data?.allowFrom || []).join('\n');
     form.groupPolicy = (res.data?.groupPolicy as WecomForm['groupPolicy']) || 'open';
@@ -157,7 +164,7 @@ const save = async () => {
     try {
         await updateAgentWecomConfig({
             agentId: agentId.value,
-            enabled: form.enabled,
+            enabled: true,
             dmPolicy: form.dmPolicy,
             allowFrom: parseTextList(form.allowFromText),
             groupPolicy: form.groupPolicy,
@@ -166,8 +173,35 @@ const save = async () => {
             secret: form.secret,
         });
         MsgSuccess(t('aiTools.agents.saveAndRestartSuccess'));
+        configured.value = true;
     } finally {
         saving.value = false;
+    }
+};
+
+const deleteChannel = async () => {
+    if (!agentId.value) {
+        return;
+    }
+    await ElMessageBox.confirm(
+        t('aiTools.agents.channelDeleteConfirm', [t('aiTools.agents.wecom')]),
+        t('commons.msg.infoTitle'),
+        {
+            confirmButtonText: t('commons.button.confirm'),
+            cancelButtonText: t('commons.button.cancel'),
+            type: 'warning',
+        },
+    );
+    deleting.value = true;
+    try {
+        await deleteAgentChannelConfig({
+            agentId: agentId.value,
+            type: 'wecom',
+        });
+        await load(agentId.value);
+        MsgSuccess(t('aiTools.agents.deleteAndRestartSuccess'));
+    } finally {
+        deleting.value = false;
     }
 };
 

@@ -137,6 +137,23 @@ func writeHermesQQBotChannelConfig(confDir string, config dto.AgentQQBotConfig) 
 	return writeHermesConfigMap(configPath, cfg)
 }
 
+func deleteHermesQQBotChannelConfig(confDir string) error {
+	if err := deleteHermesEnvKeys(confDir,
+		"QQ_APP_ID",
+		"QQ_CLIENT_SECRET",
+		"QQ_ALLOW_ALL_USERS",
+		"QQ_ALLOWED_USERS",
+		"QQ_HOME_CHANNEL",
+		"QQ_HOME_CHANNEL_NAME",
+		"QQ_STT_API_KEY",
+		"QQ_STT_BASE_URL",
+		"QQ_STT_MODEL",
+	); err != nil {
+		return err
+	}
+	return deleteHermesConfigSections(confDir, nil, []string{"qq"})
+}
+
 func readHermesWecomChannelConfig(confDir string) (*dto.AgentWecomConfig, error) {
 	envMap, err := readHermesEnvMap(path.Join(confDir, ".env"))
 	if err != nil {
@@ -243,6 +260,19 @@ func writeHermesWecomChannelConfig(confDir string, config dto.AgentWecomConfig) 
 	return writeHermesConfigMap(configPath, cfg)
 }
 
+func deleteHermesWecomChannelConfig(confDir string) error {
+	if err := deleteHermesEnvKeys(confDir,
+		"WECOM_BOT_ID",
+		"WECOM_SECRET",
+		"WECOM_ALLOW_ALL_USERS",
+		"WECOM_ALLOWED_USERS",
+		"WECOM_HOME_CHANNEL",
+	); err != nil {
+		return err
+	}
+	return deleteHermesConfigSections(confDir, nil, []string{"wecom"})
+}
+
 func readHermesDingTalkChannelConfig(confDir string) (*dto.AgentDingTalkConfig, error) {
 	envMap, err := readHermesEnvMap(path.Join(confDir, ".env"))
 	if err != nil {
@@ -254,10 +284,15 @@ func readHermesDingTalkChannelConfig(confDir string) (*dto.AgentDingTalkConfig, 
 	}
 
 	platform := childMap(childMap(cfg, "platforms"), "dingtalk")
+	extra := childMap(platform, "extra")
 	allowFrom := splitHermesEnvList(envMap["DINGTALK_ALLOWED_USERS"])
-	dmPolicy := "open"
-	if len(allowFrom) > 0 {
+	dmPolicy := "pairing"
+	if extractHermesEnvBool(envMap, "DINGTALK_ALLOW_ALL_USERS", false) {
+		dmPolicy = "open"
+	} else if len(allowFrom) > 0 {
 		dmPolicy = "allowlist"
+	} else if extractStringValue(extra["unauthorized_dm_behavior"]) == "ignore" {
+		dmPolicy = "disabled"
 	}
 	clientID := envMap["DINGTALK_CLIENT_ID"]
 	clientSecret := envMap["DINGTALK_CLIENT_SECRET"]
@@ -292,25 +327,29 @@ func writeHermesDingTalkChannelConfig(confDir string, config dto.AgentDingTalkCo
 		return err
 	}
 	clientID, clientSecret := firstHermesDingTalkBotCredentials(config.Bots)
-	if clientID != "" {
+	if config.Enabled && clientID != "" {
 		envMap["DINGTALK_CLIENT_ID"] = clientID
 	} else {
 		delete(envMap, "DINGTALK_CLIENT_ID")
 	}
-	if clientSecret != "" {
+	if config.Enabled && clientSecret != "" {
 		envMap["DINGTALK_CLIENT_SECRET"] = clientSecret
 	} else {
 		delete(envMap, "DINGTALK_CLIENT_SECRET")
 	}
 	delete(envMap, "DINGTALK_ALLOWED_USERS")
+	delete(envMap, "DINGTALK_ALLOW_ALL_USERS")
 	if config.DmPolicy == "allowlist" {
 		if allow := joinHermesEnvList(config.AllowFrom); allow != "" {
 			envMap["DINGTALK_ALLOWED_USERS"] = allow
 		}
+	} else if config.DmPolicy == "open" {
+		envMap["DINGTALK_ALLOW_ALL_USERS"] = "true"
 	}
 	if err := writeHermesEnvMap(envPath, envMap, []string{
 		"DINGTALK_CLIENT_ID",
 		"DINGTALK_CLIENT_SECRET",
+		"DINGTALK_ALLOW_ALL_USERS",
 		"DINGTALK_ALLOWED_USERS",
 	}); err != nil {
 		return err
@@ -323,7 +362,29 @@ func writeHermesDingTalkChannelConfig(confDir string, config dto.AgentDingTalkCo
 	}
 	platform := ensureChildMap(ensureChildMap(cfg, "platforms"), "dingtalk")
 	platform["enabled"] = config.Enabled && clientID != "" && clientSecret != ""
+	extra := ensureChildMap(platform, "extra")
+	switch config.DmPolicy {
+	case "pairing":
+		extra["unauthorized_dm_behavior"] = "pair"
+	case "disabled":
+		extra["unauthorized_dm_behavior"] = "ignore"
+	default:
+		delete(extra, "unauthorized_dm_behavior")
+	}
 	return writeHermesConfigMap(configPath, cfg)
+}
+
+func deleteHermesDingTalkChannelConfig(confDir string) error {
+	if err := deleteHermesEnvKeys(confDir,
+		"DINGTALK_CLIENT_ID",
+		"DINGTALK_CLIENT_SECRET",
+		"DINGTALK_ALLOW_ALL_USERS",
+		"DINGTALK_ALLOWED_USERS",
+		"DINGTALK_HOME_CHANNEL",
+	); err != nil {
+		return err
+	}
+	return deleteHermesConfigSections(confDir, nil, []string{"dingtalk"})
 }
 
 func readHermesFeishuChannelConfig(confDir string) (*dto.AgentFeishuConfig, error) {
@@ -430,6 +491,52 @@ func writeHermesFeishuChannelConfig(confDir string, config dto.AgentFeishuConfig
 	platform := ensureChildMap(ensureChildMap(cfg, "platforms"), "feishu")
 	platform["enabled"] = config.Enabled && bot.AppID != "" && bot.AppSecret != ""
 	return writeHermesConfigMap(configPath, cfg)
+}
+
+func deleteHermesFeishuChannelConfig(confDir string) error {
+	if err := deleteHermesEnvKeys(confDir,
+		"FEISHU_APP_ID",
+		"FEISHU_APP_SECRET",
+		"FEISHU_DOMAIN",
+		"FEISHU_CONNECTION_MODE",
+		"FEISHU_ALLOW_ALL_USERS",
+		"FEISHU_ALLOWED_USERS",
+		"FEISHU_GROUP_POLICY",
+		"FEISHU_HOME_CHANNEL",
+		"FEISHU_VERIFICATION_TOKEN",
+		"FEISHU_ENCRYPT_KEY",
+	); err != nil {
+		return err
+	}
+	return deleteHermesConfigSections(confDir, nil, []string{"feishu"})
+}
+
+func readHermesWeixinChannelConfig(confDir string) (*dto.AgentWeixinConfig, error) {
+	envMap, err := readHermesEnvMap(path.Join(confDir, ".env"))
+	if err != nil {
+		return nil, err
+	}
+	return &dto.AgentWeixinConfig{
+		Enabled: envMap["WEIXIN_ACCOUNT_ID"] != "" || envMap["WEIXIN_TOKEN"] != "",
+	}, nil
+}
+
+func deleteHermesWeixinChannelConfig(confDir string) error {
+	if err := deleteHermesEnvKeys(confDir,
+		"WEIXIN_ACCOUNT_ID",
+		"WEIXIN_TOKEN",
+		"WEIXIN_BASE_URL",
+		"WEIXIN_CDN_BASE_URL",
+		"WEIXIN_DM_POLICY",
+		"WEIXIN_ALLOW_ALL_USERS",
+		"WEIXIN_ALLOWED_USERS",
+		"WEIXIN_GROUP_POLICY",
+		"WEIXIN_GROUP_ALLOWED_USERS",
+		"WEIXIN_HOME_CHANNEL",
+	); err != nil {
+		return err
+	}
+	return deleteHermesConfigSections(confDir, nil, []string{"weixin"})
 }
 
 func firstHermesDingTalkBotCredentials(bots []dto.AgentDingTalkBot) (string, string) {

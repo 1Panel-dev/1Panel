@@ -626,7 +626,7 @@ export namespace AI {
 
     export interface AgentChannelPairingApproveReq {
         agentId: number;
-        type: 'feishu' | 'telegram' | 'discord' | 'wecom' | 'qqbot';
+        type: 'feishu' | 'telegram' | 'discord' | 'wecom' | 'qqbot' | 'dingtalk';
         pairingCode: string;
         accountId?: string;
     }
@@ -670,7 +670,7 @@ export namespace AI {
 
     export interface AgentDingTalkConfig {
         enabled: boolean;
-        dmPolicy: 'allowlist' | 'open' | 'disabled';
+        dmPolicy: 'pairing' | 'allowlist' | 'open' | 'disabled';
         allowFrom: string[];
         groupPolicy: 'open' | 'allowlist' | 'disabled';
         groupAllowFrom: string[];
@@ -686,7 +686,7 @@ export namespace AI {
     export interface AgentDingTalkConfigUpdateReq {
         agentId: number;
         enabled: boolean;
-        dmPolicy: 'allowlist' | 'open' | 'disabled';
+        dmPolicy: 'pairing' | 'allowlist' | 'open' | 'disabled';
         allowFrom: string[];
         groupPolicy: 'open' | 'allowlist' | 'disabled';
         groupAllowFrom: string[];
@@ -701,6 +701,15 @@ export namespace AI {
     export interface AgentWeixinLoginReq {
         agentId: number;
         taskID: string;
+    }
+
+    export interface AgentWeixinConfig {
+        enabled: boolean;
+    }
+
+    export interface AgentChannelDeleteReq {
+        agentId: number;
+        type: 'feishu' | 'telegram' | 'discord' | 'wecom' | 'qqbot' | 'dingtalk' | 'weixin';
     }
 
     export interface AgentQQBotConfigReq {

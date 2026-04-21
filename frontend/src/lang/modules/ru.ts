@@ -786,6 +786,7 @@ const message = {
             hermesChatDeleteConfirm: 'Удалить сессию {0}?',
             hermesChatDeleteSuccess: 'Сессия удалена',
             weixin: 'Weixin',
+            qq: 'QQ',
             wecom: 'WeCom',
             dingtalk: 'DingTalk',
             feishu: 'Feishu',
@@ -845,6 +846,8 @@ const message = {
                 'Нажмите, чтобы запустить задачу входа по QR-коду. QR-код появится в журнале задач, а после успешного сканирования контейнер будет автоматически перезапущен.',
             channelAutoRestartHelper:
                 'После сохранения контейнер будет автоматически перезапущен, чтобы настройки вступили в силу.',
+            channelDeleteConfirm: 'Удалить конфигурацию канала {0}?',
+            deleteAndRestartSuccess: 'Удаление выполнено. Контейнер автоматически перезапускается.',
             customProviderHelper: 'Для пользовательского провайдера модели доступность учетной записи не проверяется',
         },
         model: {

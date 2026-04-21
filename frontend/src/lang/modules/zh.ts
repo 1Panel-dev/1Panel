@@ -735,6 +735,7 @@ const message = {
             hermesChatDeleteConfirm: '确认删除会话 {0}？',
             hermesChatDeleteSuccess: '会话已删除',
             weixin: '微信',
+            qq: 'QQ',
             wecom: '企业微信',
             dingtalk: '钉钉',
             feishu: '飞书',
@@ -789,6 +790,8 @@ const message = {
             scanConnect: '扫码对接',
             scanConnectHelper: '点击后将在任务日志中显示二维码，扫码确认成功后将自动重启容器。',
             channelAutoRestartHelper: '保存后将自动重启容器以使配置生效。',
+            channelDeleteConfirm: '确认删除 {0} 频道配置？',
+            deleteAndRestartSuccess: '删除成功，容器正在自动重启。',
             customProviderHelper: '自定义模型供应商不验证账号是否可用',
         },
         model: {

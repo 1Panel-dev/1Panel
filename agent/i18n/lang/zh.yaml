@@ -65,6 +65,7 @@ ErrAgentWebsiteBound: "该智能体已关联网站"
 ErrAgentWebsiteTypeUnsupported: "只能关联反向代理或静态网站"
 ErrAgentWebsiteInUse: "该网站已被其他智能体关联"
 ErrAgentWebsiteUnbindUnsupported: "一键部署网站不支持手动解绑"
+ErrHermesPairingCodeUnavailable: "配对码在 hermes 中暂时不存在，可能是由于网络原因，请稍后尝试"
 
 #backup
 Localhost: '本机'

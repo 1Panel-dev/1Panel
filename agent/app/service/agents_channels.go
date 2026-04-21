@@ -306,6 +306,17 @@ func (a AgentService) GetDingTalkConfig(req dto.AgentIDReq) (*dto.AgentDingTalkC
 	return &result, nil
 }
 
+func (a AgentService) GetWeixinConfig(req dto.AgentIDReq) (*dto.AgentWeixinConfig, error) {
+	agent, _, err := a.loadAgentAndInstall(req.AgentID)
+	if err != nil {
+		return nil, err
+	}
+	if agent.AgentType == constant.AppHermesAgent {
+		return readHermesWeixinChannelConfig(path.Dir(agent.ConfigPath))
+	}
+	return nil, fmt.Errorf("%s does not support", agent.AgentType)
+}
+
 func (a AgentService) UpdateDingTalkConfig(req dto.AgentDingTalkConfigUpdateReq) error {
 	agent, install, err := a.loadAgentAndInstall(req.AgentID)
 	if err != nil {
@@ -495,6 +506,36 @@ func (a AgentService) LoginWeixinChannel(req dto.AgentWeixinLoginReq) error {
 	return nil
 }
 
+func (a AgentService) DeleteChannelConfig(req dto.AgentChannelDeleteReq) error {
+	agent, install, err := a.loadAgentAndInstall(req.AgentID)
+	if err != nil {
+		return err
+	}
+	if agent.AgentType != constant.AppHermesAgent {
+		return fmt.Errorf("%s does not support", agent.AgentType)
+	}
+	return updateHermesChannelConfig(agent, install, func(confDir string) error {
+		switch req.Type {
+		case "telegram":
+			return deleteHermesTelegramChannelConfig(confDir)
+		case "discord":
+			return deleteHermesDiscordChannelConfig(confDir)
+		case "qqbot":
+			return deleteHermesQQBotChannelConfig(confDir)
+		case "wecom":
+			return deleteHermesWecomChannelConfig(confDir)
+		case "dingtalk":
+			return deleteHermesDingTalkChannelConfig(confDir)
+		case "feishu":
+			return deleteHermesFeishuChannelConfig(confDir)
+		case "weixin":
+			return deleteHermesWeixinChannelConfig(confDir)
+		default:
+			return fmt.Errorf("unsupported channel type: %s", req.Type)
+		}
+	})
+}
+
 func (a AgentService) CheckPlugin(req dto.AgentPluginCheckReq) (*dto.AgentPluginStatus, error) {
 	_, install, err := a.loadAgentAndInstall(req.AgentID)
 	if err != nil {
@@ -535,14 +576,12 @@ func (a AgentService) ApproveChannelPairing(req dto.AgentChannelPairingApproveRe
 		return err
 	}
 	if agent.AgentType == constant.AppHermesAgent {
-		output, err := cmd.NewCommandMgr(cmd.WithTimeout(20*time.Second)).RunWithStdout(
+		mgr := cmd.NewCommandMgr(cmd.WithTimeout(20 * time.Second))
+		output, err := mgr.RunWithStdout(
 			"docker",
 			buildHermesDockerExecArgs(install.ContainerName, "pairing", "approve", req.Type, req.PairingCode)...,
 		)
-		if err != nil {
-			return err
-		}
-		return validateHermesPairingApproveOutput(output)
+		return validateHermesPairingApproveResult(output, err)
 	}
 	if req.AccountID != "" {
 		return cmd.RunDefaultBashCf(

@@ -791,6 +791,7 @@ const message = {
             hermesChatDeleteConfirm: 'Excluir a sessão {0}?',
             hermesChatDeleteSuccess: 'Sessão excluída',
             weixin: 'Weixin',
+            qq: 'QQ',
             wecom: 'WeCom',
             dingtalk: 'DingTalk',
             feishu: 'Feishu',
@@ -850,6 +851,8 @@ const message = {
                 'Clique para iniciar a tarefa de login por QR. O código QR aparecerá no log da tarefa e o contêiner será reiniciado automaticamente após a leitura ser concluída.',
             channelAutoRestartHelper:
                 'Ao salvar, o contêiner será reiniciado automaticamente para que a configuração entre em vigor.',
+            channelDeleteConfirm: 'Excluir a configuração do canal {0}?',
+            deleteAndRestartSuccess: 'Excluído com sucesso. O contêiner está sendo reiniciado automaticamente.',
             customProviderHelper: 'Provedores de modelo personalizados não validam se a conta está disponível',
         },
         model: {

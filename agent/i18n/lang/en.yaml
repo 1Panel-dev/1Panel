@@ -65,6 +65,7 @@ ErrAgentWebsiteBound: 'This agent is already bound to a website'
 ErrAgentWebsiteTypeUnsupported: 'Only proxy or static websites can be bound'
 ErrAgentWebsiteInUse: 'This website is already bound to another agent'
 ErrAgentWebsiteUnbindUnsupported: 'Deployment websites cannot be unbound manually'
+ErrHermesPairingCodeUnavailable: 'The pairing code is temporarily unavailable in Hermes, possibly due to network issues. Please try again later.'
 
 #backup
 Localhost: 'Local'
