@@ -153,6 +153,12 @@ const onDelete = async (row: Database.DatabaseInfo) => {
 
 const buttons = [
     {
+        label: i18n.global.t('commons.button.edit'),
+        click: (row: Database.DatabaseInfo) => {
+            onOpenDialog('edit', row);
+        },
+    },
+    {
         label: i18n.global.t('commons.button.unbind'),
         click: (row: Database.DatabaseInfo) => {
             onDelete(row);
