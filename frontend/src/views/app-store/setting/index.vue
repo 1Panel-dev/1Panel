@@ -146,8 +146,15 @@ onMounted(() => {
 </script>
 
 <style lang="css" scoped>
+.app-setting-form :deep(.el-form-item) {
+    align-items: flex-start;
+}
+
 .app-setting-form :deep(.el-form-item__label) {
-    white-space: nowrap;
+    white-space: normal;
+    line-height: 20px;
+    word-break: break-word;
+    padding-top: 6px;
 }
 
 .logText {

@@ -9,17 +9,17 @@
 .fu-table-operations {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 5px;
-    justify-content: flex-start;
+    flex-wrap: wrap;
     max-width: 100%;
     vertical-align: middle;
-    flex-wrap: nowrap;
 }
 
 .fu-table-operations__action {
     display: inline-flex;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: center;
     flex: 0 0 auto;
 }
 
