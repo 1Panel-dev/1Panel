@@ -801,7 +801,7 @@ func getFormat(cType CompressType) archiver.CompressedArchive {
 	return format
 }
 
-func (f FileOp) Compress(srcRiles []string, dst string, name string, cType CompressType, secret string) error {
+func (f FileOp) Compress(ctx context.Context, srcRiles []string, dst string, name string, cType CompressType, secret string, progress func(current, total int, message string)) error {
 	format := getFormat(cType)
 
 	fileMaps := make(map[string]string, len(srcRiles))
@@ -819,45 +819,82 @@ func (f FileOp) Compress(srcRiles []string, dst string, name string, cType Compr
 		return err
 	}
 	dstFile := filepath.Join(dst, name)
-	out, err := f.Fs.Create(dstFile)
-	if err != nil {
-		return err
-	}
-	defer out.Close()
 
 	switch cType {
-	case Zip:
-		if err := ZipFile(files, out); err == nil {
+	case Zip, SdkZip:
+		out, err := f.Fs.Create(dstFile)
+		if err != nil {
+			return err
+		}
+		defer out.Close()
+		if err := ZipFile(ctx, files, out, progress); err == nil {
 			return nil
 		}
 		_ = f.DeleteFile(dstFile)
-		return NewZipArchiver().Compress(srcRiles, dstFile, "")
+		return NewZipArchiver().Compress(ctx, srcRiles, dstFile, "")
 	case TarGz:
-		err = NewTarGzArchiver().Compress(srcRiles, dstFile, secret)
+		err = NewTarGzArchiver().Compress(ctx, srcRiles, dstFile, secret)
 		if err != nil {
 			_ = f.DeleteFile(dstFile)
 			return err
 		}
 	case Rar:
-		err = NewRarArchiver().Compress(srcRiles, dstFile, secret)
+		if err := checkCmdAvailability("rar"); err != nil {
+			return err
+		}
+		err = NewRarArchiver().Compress(ctx, srcRiles, dstFile, secret)
 		if err != nil {
 			_ = f.DeleteFile(dstFile)
 			return err
 		}
 	case X7z:
-		err = NewX7zArchiver().Compress(srcRiles, dstFile, secret)
+		if err := checkCmdAvailability("7z"); err != nil {
+			return err
+		}
+		err = NewX7zArchiver().Compress(ctx, srcRiles, dstFile, secret)
 		if err != nil {
 			_ = f.DeleteFile(dstFile)
 			return err
 		}
 	default:
-		err = format.Archive(context.Background(), out, files)
+		tmpFile, err := os.CreateTemp(dst, fmt.Sprintf("temp_*%s", filepath.Ext(name)))
 		if err != nil {
-			_ = f.DeleteFile(dstFile)
 			return err
 		}
+		success := false
+		defer func() {
+			_ = tmpFile.Close()
+			if !success {
+				_ = os.Remove(tmpFile.Name())
+				_ = f.DeleteFile(dstFile)
+			}
+		}()
+
+		err = format.Archive(ctx, &contextAwareWriter{ctx: ctx, writer: tmpFile}, files)
+		if err != nil {
+			return err
+		}
+		if err = tmpFile.Close(); err != nil {
+			return err
+		}
+		if err = os.Rename(tmpFile.Name(), dstFile); err != nil {
+			return err
+		}
+		success = true
 	}
 	return nil
+}
+
+type contextAwareWriter struct {
+	ctx    context.Context
+	writer io.Writer
+}
+
+func (w *contextAwareWriter) Write(p []byte) (int, error) {
+	if err := w.ctx.Err(); err != nil {
+		return 0, err
+	}
+	return w.writer.Write(p)
 }
 
 func isIgnoreFile(name string) bool {
@@ -950,7 +987,7 @@ func (f FileOp) decompressWithSDK(srcFile string, dst string, cType CompressType
 
 func (f FileOp) Decompress(srcFile string, dst string, cType CompressType, secret string) error {
 	if cType == Tar || cType == Zip || cType == TarGz || cType == Rar || cType == X7z {
-		shellArchiver, err := NewShellArchiver(cType)
+		shellArchiver, err := NewExtractShellArchiver(cType)
 		if !f.Stat(dst) {
 			_ = f.CreateDir(dst, 0755)
 		}
@@ -975,11 +1012,19 @@ func (f FileOp) Decompress(srcFile string, dst string, cType CompressType, secre
 	return f.decompressWithSDK(srcFile, dst, cType)
 }
 
-func ZipFile(files []archiver.File, dst afero.File) error {
+func ZipFile(ctx context.Context, files []archiver.File, dst afero.File, progress func(current, total int, message string)) error {
 	zw := zip.NewWriter(dst)
 	defer zw.Close()
 
-	for _, file := range files {
+	total := len(files)
+	for i, file := range files {
+		if ctx != nil {
+			select {
+			case <-ctx.Done():
+				return ctx.Err()
+			default:
+			}
+		}
 		hdr, err := zip.FileInfoHeader(file)
 		if err != nil {
 			return err
@@ -1009,14 +1054,38 @@ func ZipFile(files []archiver.File, dst afero.File) error {
 			if err != nil {
 				return err
 			}
-			_, err = io.Copy(w, fileReader)
+			_, err = io.Copy(w, newContextReader(ctx, fileReader))
 			fileReader.Close()
 			if err != nil {
 				return err
 			}
 		}
+		if progress != nil {
+			progress(i+1, total, file.NameInArchive)
+		}
 	}
 	return nil
+}
+
+type contextReader struct {
+	ctx context.Context
+	r   io.Reader
+}
+
+func newContextReader(ctx context.Context, r io.Reader) io.Reader {
+	if ctx == nil {
+		return r
+	}
+	return &contextReader{ctx: ctx, r: r}
+}
+
+func (r *contextReader) Read(p []byte) (int, error) {
+	select {
+	case <-r.ctx.Done():
+		return 0, r.ctx.Err()
+	default:
+		return r.r.Read(p)
+	}
 }
 
 func (f FileOp) tryDecompressTarGz(srcFile string, dst string, format archiver.CompressedArchive) error {

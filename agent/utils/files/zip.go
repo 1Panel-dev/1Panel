@@ -1,6 +1,7 @@
 package files
 
 import (
+	"context"
 	"fmt"
 	"path"
 	"strings"
@@ -26,7 +27,7 @@ func (z ZipArchiver) Extract(filePath, dstDir string, secret string) error {
 	return cmd.RunDefaultBashCf("unzip -qo %s -d %s", filePath, dstDir)
 }
 
-func (z ZipArchiver) Compress(sourcePaths []string, dstFile string, _ string) error {
+func (z ZipArchiver) Compress(ctx context.Context, sourcePaths []string, dstFile string, _ string) error {
 	var err error
 	tmpFile := path.Join(global.Dir.TmpDir, fmt.Sprintf("%s%s.zip", common.RandStr(50), time.Now().Format(constant.DateTimeSlimLayout)))
 	op := NewFileOp()
@@ -41,7 +42,7 @@ func (z ZipArchiver) Compress(sourcePaths []string, dstFile string, _ string) er
 	for i, sp := range sourcePaths {
 		relativePaths[i] = path.Base(sp)
 	}
-	cmdMgr := cmd.NewCommandMgr(cmd.WithWorkDir(baseDir))
+	cmdMgr := cmd.NewCommandMgr(cmd.WithWorkDir(baseDir), cmd.WithContext(ctx))
 	if err = cmdMgr.Run("zip", "-qr", tmpFile, strings.Join(relativePaths, " ")); err != nil {
 		return err
 	}

@@ -137,6 +137,11 @@ export namespace File {
         name: string;
         replace: boolean;
         secret: string;
+        taskID?: string;
+    }
+
+    export interface FileCompressStopReq {
+        taskID: string;
     }
 
     export interface FileDeCompress {

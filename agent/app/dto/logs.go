@@ -7,6 +7,7 @@ import (
 type SearchTaskLogReq struct {
 	Status string `json:"status"`
 	Type   string `json:"type"`
+	TaskID string `json:"taskID"`
 	PageInfo
 }
 

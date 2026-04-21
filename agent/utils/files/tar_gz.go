@@ -1,13 +1,17 @@
 package files
 
 import (
+	"context"
 	"fmt"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
+	"github.com/1Panel-dev/1Panel/agent/utils/common"
 )
 
 type TarGzArchiver struct {
@@ -37,7 +41,17 @@ func (t TarGzArchiver) Extract(filePath, dstDir string, secret string) error {
 	return nil
 }
 
-func (t TarGzArchiver) Compress(sourcePaths []string, dstFile string, secret string) error {
+func (t TarGzArchiver) Compress(ctx context.Context, sourcePaths []string, dstFile string, secret string) error {
+	tmpFile := path.Join(global.Dir.TmpDir, fmt.Sprintf("%s%s.tar.gz", common.RandStr(50), time.Now().Format("20060102150405")))
+	op := NewFileOp()
+	var err error
+	defer func() {
+		_ = op.DeleteFile(tmpFile)
+		if err != nil {
+			_ = op.DeleteFile(dstFile)
+		}
+	}()
+
 	var itemDirs []string
 	for _, item := range sourcePaths {
 		itemDirs = append(itemDirs, fmt.Sprintf("\"%s\"", filepath.Base(item)))
@@ -49,14 +63,18 @@ func (t TarGzArchiver) Compress(sourcePaths []string, dstFile string, secret str
 	}
 	commands := ""
 	if len(secret) != 0 {
-		extraCmd := fmt.Sprintf("| openssl enc -aes-256-cbc -salt -k '%s' -out '%s'", secret, dstFile)
+		extraCmd := fmt.Sprintf("| openssl enc -aes-256-cbc -salt -k '%s' -out '%s'", secret, tmpFile)
 		commands = fmt.Sprintf("tar -zcf - -C \"%s\" %s %s", aheadDir, itemDir, extraCmd)
 		global.LOG.Debug(strings.ReplaceAll(commands, fmt.Sprintf(" '%s' ", secret), " ****** "))
 	} else {
-		commands = fmt.Sprintf("tar -zcf \"%s\" -C \"%s\" %s", dstFile, aheadDir, itemDir)
+		commands = fmt.Sprintf("tar -zcf \"%s\" -C \"%s\" %s", tmpFile, aheadDir, itemDir)
 		global.LOG.Debug(commands)
 	}
-	if err := cmd.RunDefaultBashC(commands); err != nil {
+	err = cmd.NewCommandMgr(cmd.WithContext(ctx)).RunBashC(commands)
+	if err != nil {
+		return err
+	}
+	if err = op.Mv(tmpFile, dstFile); err != nil {
 		return err
 	}
 	return nil

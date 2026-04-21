@@ -1,6 +1,8 @@
 package files
 
 import (
+	"context"
+
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 )
 
@@ -20,7 +22,7 @@ func (t TarArchiver) Extract(FilePath string, dstDir string, secret string) erro
 	return cmd.RunDefaultBashCf("%s %s \"%s\" -C \"%s\"", t.Cmd, t.getOptionStr("extract"), FilePath, dstDir)
 }
 
-func (t TarArchiver) Compress(sourcePaths []string, dstFile string, secret string) error {
+func (t TarArchiver) Compress(ctx context.Context, sourcePaths []string, dstFile string, secret string) error {
 	return nil
 }
 

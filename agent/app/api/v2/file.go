@@ -251,6 +251,26 @@ func (b *BaseApi) CompressFile(c *gin.Context) {
 }
 
 // @Tags File
+// @Summary Stop compress task
+// @Accept json
+// @Param request body request.FileCompressStopReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /files/compress/stop [post]
+func (b *BaseApi) StopCompressFile(c *gin.Context) {
+	var req request.FileCompressStopReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := fileService.StopCompress(req.TaskID); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags File
 // @Summary Decompress file
 // @Accept json
 // @Param request body request.FileDeCompress true "request"

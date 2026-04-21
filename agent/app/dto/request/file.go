@@ -78,6 +78,11 @@ type FileCompress struct {
 	Name    string   `json:"name" validate:"required"`
 	Replace bool     `json:"replace"`
 	Secret  string   `json:"secret"`
+	TaskID  string   `json:"taskID"`
+}
+
+type FileCompressStopReq struct {
+	TaskID string `json:"taskID" validate:"required"`
 }
 
 type FileDeCompress struct {
