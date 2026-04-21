@@ -139,26 +139,21 @@ const staticVisibleCount = computed(() => {
     return props.buttons.filter((button) => button.show !== false).length;
 });
 
-const hasMoreStatic = computed(() => {
-    return staticVisibleCount.value > props.ellipsis + 1;
-});
-
-const estimatedButtonCount = computed(() => {
+const estimatedVisibleCount = computed(() => {
     if (staticVisibleCount.value === 0) {
         return 0;
     }
-    if (props.ellipsis <= 0) {
-        return 1;
+
+    const renderCap = Math.max(props.ellipsis, 0) + 1;
+    if (hasDynamicShow.value) {
+        return renderCap;
     }
-    if (hasDynamicShow.value || hasMoreStatic.value) {
-        return props.ellipsis + 1;
-    }
-    return staticVisibleCount.value;
+
+    return Math.min(staticVisibleCount.value, renderCap);
 });
 
 const estimatedWidth = computed(() => {
-    const buttonCount = Math.max(estimatedButtonCount.value, 1);
-    const buttonsWidth = 24 + buttonCount * 56 + Math.max(buttonCount - 1, 0) * 5;
+    const buttonsWidth = 35 + estimatedVisibleCount.value * 58 + 58;
     const minWidth = normalizeWidth(props.minWidth);
     if (typeof minWidth === 'number') {
         return Math.max(buttonsWidth, minWidth);
