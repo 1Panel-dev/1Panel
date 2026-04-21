@@ -9,7 +9,7 @@
         >
             <template #content>
                 <div v-loading="loading">
-                    <div>
+                    <div v-if="type !== 'mongodb'">
                         <el-alert :closable="false" type="warning">
                             <template #default>
                                 <ul>
