@@ -29,6 +29,7 @@ type IMongodbService interface {
 	UpdateDescription(req dto.UpdateDescription) error
 	BindUser(req dto.MongodbBind) error
 	ChangePassword(req dto.MongodbPassword) error
+	ChangeRootPassword(req dto.ChangeDBInfo) error
 	LoadPrivileges(req dto.MongodbPrivilegesLoad) (string, error)
 	ChangePrivileges(req dto.MongodbPrivileges) error
 	DeleteCheck(req dto.MongodbDBDeleteCheck) ([]dto.DBResource, error)
@@ -186,6 +187,40 @@ func (u *MongodbService) ChangePassword(req dto.MongodbPassword) error {
 		return fmt.Errorf("encrypt mongodb db %s password failed, err: %v", req.Name, err)
 	}
 	return mongodbRepo.Update(dbItem.ID, map[string]interface{}{"password": pass})
+}
+
+func (u *MongodbService) ChangeRootPassword(req dto.ChangeDBInfo) error {
+	if cmd.CheckIllegal(req.Value) {
+		return buserr.New("ErrCmdIllegal")
+	}
+	if req.From != constant.AppResourceLocal {
+		return buserr.New("ErrRecordNotFound")
+	}
+
+	appInfo, err := appInstallRepo.LoadBaseInfo(req.Type, req.Database)
+	if err != nil {
+		return err
+	}
+	if appInfo.UserName == "" {
+		return buserr.New("ErrRecordNotFound")
+	}
+	if err := updateMongodbPassword(req.From, req.Database, "admin", appInfo.UserName, req.Value); err != nil {
+		return err
+	}
+
+	if err := updateInstallInfoInDB(req.Type, req.Database, "password", req.Value); err != nil {
+		return err
+	}
+	remote, err := databaseRepo.Get(repo.WithByName(req.Database))
+	if err != nil {
+		return err
+	}
+	pass, err := encrypt.StringEncrypt(req.Value)
+	if err != nil {
+		return fmt.Errorf("encrypt mongodb root password failed, err: %v", err)
+	}
+	_ = databaseRepo.Update(remote.ID, map[string]interface{}{"password": pass})
+	return nil
 }
 
 func (u *MongodbService) DeleteCheck(req dto.MongodbDBDeleteCheck) ([]dto.DBResource, error) {

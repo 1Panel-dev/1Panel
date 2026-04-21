@@ -172,6 +172,37 @@ func (b *BaseApi) ChangeMongodbPassword(c *gin.Context) {
 }
 
 // @Tags Database Mongodb
+// @Summary Change mongodb root password
+// @Accept json
+// @Param request body dto.ChangeDBInfo true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /databases/mongodb/root/password [post]
+// @x-panel-log {"bodyKeys":["database"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新 mongodb 数据库 [database] root 密码","formatEN":"update mongodb database [database] root password"}
+func (b *BaseApi) ChangeMongodbRootPassword(c *gin.Context) {
+	var req dto.ChangeDBInfo
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	if len(req.Value) != 0 {
+		value, err := base64.StdEncoding.DecodeString(req.Value)
+		if err != nil {
+			helper.BadRequest(c, err)
+			return
+		}
+		req.Value = string(value)
+	}
+
+	if err := mongodbService.ChangeRootPassword(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags Database Mongodb
 // @Summary Load mongodb privileges
 // @Accept json
 // @Param request body dto.MongodbPrivilegesLoad true "request"

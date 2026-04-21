@@ -112,6 +112,11 @@ export const updateMongodbPassword = (params: Database.MongodbPassword) => {
     encodeBase64Fields(request, ['password']);
     return http.post(`/databases/mongodb/password`, request, TimeoutEnum.T_40S);
 };
+export const updateMongodbRootPassword = (params: Database.ChangeInfo) => {
+    let request = deepCopy(params) as Database.ChangeInfo;
+    encodeBase64Fields(request, ['value']);
+    return http.post(`/databases/mongodb/root/password`, request, TimeoutEnum.T_40S);
+};
 export const updateMongodbDescription = (params: DescriptionUpdate) => {
     return http.post(`/databases/mongodb/description`, params, TimeoutEnum.T_40S);
 };
