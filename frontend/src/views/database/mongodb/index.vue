@@ -534,6 +534,15 @@ const search = (column?: { prop?: string; order?: string }) => {
 
 const buttons = [
     {
+        label: i18n.global.t('database.changePassword'),
+        disabled: (row: Database.MongodbDBInfo) => {
+            return !row.username || row.isDelete;
+        },
+        click: (row: Database.MongodbDBInfo) => {
+            onChangePassword(row);
+        },
+    },
+    {
         label: i18n.global.t('database.permission'),
         disabled: (row: Database.MongodbDBInfo) => {
             return !row.username || row.isDelete;
