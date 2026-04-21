@@ -37,6 +37,8 @@ export function setupMonacoEnvironment() {
 export async function loadMonacoLanguageSupport() {
     if (!languageSupportPromise) {
         languageSupportPromise = Promise.all([
+            import('monaco-editor/esm/vs/base/browser/ui/codicons/codiconStyles.js'),
+            import('monaco-editor/esm/vs/editor/contrib/folding/browser/folding.js'),
             import('monaco-editor/esm/vs/basic-languages/monaco.contribution'),
             import('monaco-editor/esm/vs/language/json/monaco.contribution'),
             import('monaco-editor/esm/vs/language/css/monaco.contribution'),
