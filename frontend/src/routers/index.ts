@@ -64,7 +64,7 @@ router.beforeEach((to, from, next) => {
 });
 
 router.afterEach((to) => {
-    if (to.meta.activeMenu && !isRedirecting) {
+    if (to.meta.activeMenu && !to.meta.ignoreTab && !isRedirecting) {
         let notMathParam = true;
         if (to.matched.some((record) => record.path.includes(':'))) {
             notMathParam = false;
