@@ -57,6 +57,7 @@ type IFileService interface {
 	Delete(op request.FileDelete) error
 	BatchDelete(op request.FileBatchDelete) error
 	Compress(c request.FileCompress) error
+	StopCompress(taskID string) error
 	DeCompress(c request.FileDeCompress) error
 	GetContent(op request.FileContentReq) (response.FileInfo, error)
 	GetPreviewContent(op request.FileContentReq) (response.FileInfo, error)
@@ -425,7 +426,58 @@ func (f *FileService) Compress(c request.FileCompress) error {
 	if !c.Replace && fo.Stat(filepath.Join(c.Dst, c.Name)) {
 		return buserr.New("ErrFileIsExist")
 	}
-	return fo.Compress(c.Files, c.Dst, c.Name, files.CompressType(c.Type), c.Secret)
+	if err := preflightCompressTool(files.CompressType(c.Type)); err != nil {
+		return err
+	}
+	taskItem, err := task.NewTask(c.Name, task.TaskExec, task.TaskScopeTask, c.TaskID, 1)
+	if err != nil {
+		return err
+	}
+	go func() {
+		taskItem.AddSubTask(c.Name, func(t *task.Task) error {
+			t.LogStart(c.Name)
+			compressType := files.CompressType(c.Type)
+			dstFile := filepath.Join(c.Dst, c.Name)
+			success := false
+			defer func() {
+				if !success {
+					_ = os.Remove(dstFile)
+				}
+			}()
+			if err := fo.Compress(t.TaskCtx, c.Files, c.Dst, c.Name, compressType, c.Secret, nil); err != nil {
+				return err
+			}
+			info, err := os.Stat(dstFile)
+			if err != nil {
+				return err
+			}
+			if info.Size() == 0 {
+				return fmt.Errorf("compressed file not generated: %s", dstFile)
+			}
+			success = true
+			return nil
+		}, nil)
+		_ = taskItem.Execute()
+	}()
+	return nil
+}
+
+func preflightCompressTool(compressType files.CompressType) error {
+	switch compressType {
+	case files.TarGz, files.Rar, files.X7z:
+		_, err := files.NewShellArchiver(compressType)
+		return err
+	default:
+		return nil
+	}
+}
+
+func (f *FileService) StopCompress(taskID string) error {
+	if cancel, ok := global.TaskCtxMap[taskID]; ok {
+		cancel()
+		return nil
+	}
+	return buserr.New("TaskNotFound")
 }
 
 func (f *FileService) DeCompress(c request.FileDeCompress) error {
@@ -694,7 +746,7 @@ func (f *FileService) FileDownload(d request.FileDownload) (string, error) {
 			return "", err
 		}
 		fo := files.NewFileOp()
-		if err := fo.Compress(d.Paths, tempPath, d.Name, files.CompressType(d.Type), ""); err != nil {
+		if err := fo.Compress(context.Background(), d.Paths, tempPath, d.Name, files.CompressType(d.Type), "", nil); err != nil {
 			return "", err
 		}
 		filePath = filepath.Join(tempPath, d.Name)

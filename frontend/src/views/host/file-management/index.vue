@@ -660,7 +660,7 @@
 
         <CreateFile ref="createRef" @close="search" />
         <ChangeRole ref="roleRef" @close="search" />
-        <Compress ref="compressRef" @close="search" />
+        <Compress ref="compressRef" @close="search" @task-change="onCompressTaskChange" />
         <Decompress ref="deCompressRef" @close="search" />
         <CodeEditor ref="codeEditorRef" @close="search" />
         <FileRename ref="renameRef" @close="search" />
@@ -883,6 +883,10 @@ const recycleBinRef = ref();
 const favoriteRef = ref();
 const shareListRef = ref();
 const historyDrawerRef = ref<InstanceType<typeof FileHistoryDrawer> | null>(null);
+const compressTaskState = ref<{
+    taskID: string;
+    status: string;
+} | null>(null);
 const hoveredRowPath = ref(null);
 const favorites = ref([]);
 const batchRoleRef = ref();
@@ -921,6 +925,14 @@ const setPathRef = (key: string, el: any) => {
     }
 };
 const getCurrentPath = () => pathRefs.value[editableTabsKey.value];
+
+const onCompressTaskChange = (task: { taskID: string; status: string }) => {
+    if (!task.taskID) {
+        compressTaskState.value = null;
+        return;
+    }
+    compressTaskState.value = task;
+};
 
 const { searchableStatus, searchablePath, setSearchableInputRef, searchableInputBlur } = useMultipleSearchable(paths);
 

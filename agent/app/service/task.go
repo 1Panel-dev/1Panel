@@ -21,6 +21,9 @@ func (u *TaskLogService) Page(req dto.SearchTaskLogReq) (int64, []dto.TaskDTO, e
 	opts := []repo.DBOption{
 		repo.WithOrderDesc("created_at"),
 	}
+	if req.TaskID != "" {
+		opts = append(opts, taskRepo.WithByID(req.TaskID))
+	}
 	if req.Status != "" {
 		opts = append(opts, repo.WithByStatus(req.Status))
 	}

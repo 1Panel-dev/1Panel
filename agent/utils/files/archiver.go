@@ -1,13 +1,15 @@
 package files
 
 import (
+	"context"
+
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 )
 
 type ShellArchiver interface {
 	Extract(filePath, dstDir string, secret string) error
-	Compress(sourcePaths []string, dstFile string, secret string) error
+	Compress(ctx context.Context, sourcePaths []string, dstFile string, secret string) error
 }
 
 func NewShellArchiver(compressType CompressType) (ShellArchiver, error) {
@@ -18,9 +20,44 @@ func NewShellArchiver(compressType CompressType) (ShellArchiver, error) {
 		}
 		return NewTarArchiver(compressType), nil
 	case TarGz:
+		if err := checkCmdAvailability("tar"); err != nil {
+			return nil, err
+		}
 		return NewTarGzArchiver(), nil
 	case Zip:
 		if err := checkCmdAvailability("zip"); err != nil {
+			return nil, err
+		}
+		return NewZipArchiver(), nil
+	case Rar:
+		if err := checkCmdAvailability("rar"); err != nil {
+			return nil, err
+		}
+		return NewRarArchiver(), nil
+	case X7z:
+		if err := checkCmdAvailability("7z"); err != nil {
+			return nil, err
+		}
+		return NewX7zArchiver(), nil
+	default:
+		return nil, buserr.New("unsupported compress type")
+	}
+}
+
+func NewExtractShellArchiver(compressType CompressType) (ShellArchiver, error) {
+	switch compressType {
+	case Tar:
+		if err := checkCmdAvailability("tar"); err != nil {
+			return nil, err
+		}
+		return NewTarArchiver(compressType), nil
+	case TarGz:
+		if err := checkCmdAvailability("tar"); err != nil {
+			return nil, err
+		}
+		return NewTarGzArchiver(), nil
+	case Zip:
+		if err := checkCmdAvailability("unzip"); err != nil {
 			return nil, err
 		}
 		return NewZipArchiver(), nil
@@ -35,7 +72,7 @@ func NewShellArchiver(compressType CompressType) (ShellArchiver, error) {
 		}
 		return NewX7zArchiver(), nil
 	default:
-		return nil, buserr.New("unsupported compress type")
+		return nil, buserr.New("unsupported decompress type")
 	}
 }
 

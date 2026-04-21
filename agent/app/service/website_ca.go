@@ -443,7 +443,7 @@ func (w WebsiteCAService) DownloadFile(id uint) (*os.File, error) {
 		return nil, err
 	}
 	fileName := ca.Name + ".zip"
-	if err = fileOp.Compress([]string{path.Join(dir, "ca.crt"), path.Join(dir, "ca.key")}, dir, fileName, files.SdkZip, ""); err != nil {
+	if err = fileOp.Compress(context.Background(), []string{path.Join(dir, "ca.crt"), path.Join(dir, "ca.key")}, dir, fileName, files.SdkZip, "", nil); err != nil {
 		return nil, err
 	}
 	return os.Open(path.Join(dir, fileName))

@@ -39,6 +39,29 @@ export function isJson(str: string) {
     }
 }
 
+export function getErrorMessage(error: unknown): string {
+    if (typeof error === 'string') {
+        return error;
+    }
+    if (error instanceof Error) {
+        return error.message || String(error);
+    }
+    if (error && typeof error === 'object') {
+        const err = error as Record<string, any>;
+        return (
+            err.message ||
+            err.msg ||
+            err.error?.message ||
+            err.response?.data?.message ||
+            err.response?.data?.msg ||
+            err.data?.message ||
+            err.data?.msg ||
+            JSON.stringify(error)
+        );
+    }
+    return String(error);
+}
+
 function compareBySort(a: any, b: any) {
     return a.sort - b.sort;
 }
