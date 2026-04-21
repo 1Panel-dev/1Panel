@@ -61,6 +61,7 @@ ErrAgentWebsiteTypeUnsupported: 'Yalnızca proxy veya statik web siteleri bağla
 ErrAgentWebsiteInUse: 'Bu web sitesi zaten başka bir ajana bağlı'
 ErrAgentWebsiteUnbindUnsupported: 'Tek tıkla dağıtılan web sitelerinin bağlantısı manuel olarak kaldırılamaz'
 ErrHermesPairingCodeUnavailable: 'Eşleştirme kodu Hermes içinde geçici olarak bulunamıyor; bu durum ağ kaynaklı olabilir. Lütfen daha sonra tekrar deneyin.'
+ErrHermesFeishuGroupAllowlistRequiresAllowlist: 'Feishu grup ilkesi izin listesi olduğunda, DM ilkesi eşleştirme kodu olamaz.'
 Localhost: 'Yerel Makine'
 ErrBackupInUsed: 'Yedek hesabı görevde kullanılıyor'
 ErrBackupCheck: 'Bağlantı testi başarısız: {{ .err }}'

@@ -13,19 +13,14 @@
         </el-form-item>
         <el-form-item :label="t('aiTools.agents.dmPolicy')" prop="dmPolicy">
             <el-select v-model="form.dmPolicy">
-                <el-option :label="t('aiTools.agents.pairingCode')" value="pairing" />
+                <el-option
+                    :label="t('aiTools.agents.pairingCode')"
+                    value="pairing"
+                    :disabled="form.groupPolicy === 'allowlist'"
+                />
                 <el-option :label="t('aiTools.agents.policyOpen')" value="open" />
                 <el-option :label="t('aiTools.agents.policyAllowlist')" value="allowlist" />
             </el-select>
-        </el-form-item>
-        <el-form-item v-if="form.dmPolicy === 'allowlist'" :label="t('aiTools.agents.allowFrom')" prop="allowFromText">
-            <el-input
-                v-model="form.allowFromText"
-                type="textarea"
-                :rows="3"
-                :placeholder="t('aiTools.agents.allowFromPlaceholder')"
-            />
-            <span class="input-help">{{ t('aiTools.agents.allowFromHelper') }}</span>
         </el-form-item>
         <el-form-item :label="t('aiTools.agents.groupPolicy')" prop="groupPolicy">
             <el-select v-model="form.groupPolicy">
@@ -33,6 +28,18 @@
                 <el-option :label="t('aiTools.agents.policyAllowlist')" value="allowlist" />
                 <el-option :label="t('aiTools.agents.policyDisabled')" value="disabled" />
             </el-select>
+        </el-form-item>
+        <el-form-item
+            v-if="form.dmPolicy === 'allowlist' || form.groupPolicy === 'allowlist'"
+            :label="t('aiTools.agents.policyAllowlist')"
+            prop="allowFromText"
+        >
+            <el-input
+                v-model="form.allowFromText"
+                type="textarea"
+                :rows="3"
+                :placeholder="t('aiTools.agents.allowFromPlaceholder')"
+            />
         </el-form-item>
         <el-form-item>
             <el-button type="primary" :loading="saving" @click="save">
@@ -54,7 +61,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue';
+import { reactive, ref, watch } from 'vue';
 import { ElMessageBox, type FormInstance } from 'element-plus';
 import { useI18n } from 'vue-i18n';
 import {
@@ -90,6 +97,15 @@ const form = reactive<FeishuForm>({
     groupPolicy: 'allowlist',
 });
 
+watch(
+    () => form.groupPolicy,
+    (value) => {
+        if (value === 'allowlist' && form.dmPolicy === 'pairing') {
+            form.dmPolicy = 'allowlist';
+        }
+    },
+);
+
 const parseTextList = (value: string): string[] => {
     return Array.from(
         new Set(
@@ -109,7 +125,10 @@ const rules = reactive({
     allowFromText: [
         {
             validator: (_rule, value, callback) => {
-                if (form.dmPolicy === 'allowlist' && parseTextList(String(value || '')).length === 0) {
+                if (
+                    (form.dmPolicy === 'allowlist' || form.groupPolicy === 'allowlist') &&
+                    parseTextList(String(value || '')).length === 0
+                ) {
                     callback(new Error(t('aiTools.agents.allowFromRequired')));
                     return;
                 }
@@ -158,7 +177,7 @@ const save = async () => {
                     appId: form.appId,
                     appSecret: form.appSecret,
                     dmPolicy: form.dmPolicy,
-                    allowFrom: form.dmPolicy === 'allowlist' ? allowFrom : [],
+                    allowFrom: form.dmPolicy === 'allowlist' || form.groupPolicy === 'allowlist' ? allowFrom : [],
                 },
             ],
         });
@@ -222,11 +241,4 @@ defineExpose({
 });
 </script>
 
-<style scoped lang="scss">
-.input-help {
-    display: block;
-    margin-top: 8px;
-    color: var(--el-text-color-secondary);
-    font-size: 12px;
-}
-</style>
+<style scoped lang="scss"></style>

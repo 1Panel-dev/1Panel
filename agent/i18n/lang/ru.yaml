@@ -61,6 +61,7 @@ ErrAgentWebsiteTypeUnsupported: 'Можно связывать только prox
 ErrAgentWebsiteInUse: 'Этот сайт уже связан с другим агентом'
 ErrAgentWebsiteUnbindUnsupported: 'Сайты one-click deployment нельзя отвязать вручную'
 ErrHermesPairingCodeUnavailable: 'Код сопряжения временно недоступен в Hermes, возможно из-за проблем с сетью. Повторите попытку позже.'
+ErrHermesFeishuGroupAllowlistRequiresAllowlist: 'Когда групповая политика Feishu — белый список, политика личных сообщений не может быть кодом сопряжения.'
 Localhost: 'Локальная машина'
 ErrBackupInUsed: 'Аккаунт бэкапа занят задачей'
 ErrBackupCheck: 'Проверка подключения не удалась: {{ .err }}'

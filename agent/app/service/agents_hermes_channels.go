@@ -4,6 +4,7 @@ import (
 	"path"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/1Panel-dev/1Panel/agent/buserr"
 )
 
 const hermesWeixinLoginScript = `import asyncio
@@ -50,12 +51,12 @@ func readHermesQQBotChannelConfig(confDir string) (*dto.AgentQQBotConfig, error)
 	if dmPolicy == "" {
 		dmPolicy = "open"
 	}
-	allowFrom := extractStringList(extra["allow_from"])
+	allowFrom := splitHermesEnvList(envMap["QQ_ALLOWED_USERS"])
 	groupPolicy := extractStringValue(extra["group_policy"])
 	if groupPolicy == "" {
 		groupPolicy = "open"
 	}
-	groupAllowFrom := extractStringList(extra["group_allow_from"])
+	groupAllowFrom := splitHermesEnvList(envMap["QQ_GROUP_ALLOWED_USERS"])
 
 	result := &dto.AgentQQBotConfig{
 		Enabled:        extractBoolValue(platform["enabled"], false) && appID != "" && clientSecret != "",
@@ -92,15 +93,27 @@ func writeHermesQQBotChannelConfig(confDir string, config dto.AgentQQBotConfig) 
 	envMap["QQ_APP_ID"] = defaultBot.AppID
 	envMap["QQ_CLIENT_SECRET"] = defaultBot.ClientSecret
 	delete(envMap, "QQ_ALLOWED_USERS")
+	delete(envMap, "QQ_GROUP_ALLOWED_USERS")
 	delete(envMap, "QQ_ALLOW_ALL_USERS")
 	delete(envMap, "QQ_MARKDOWN_SUPPORT")
 	if config.DmPolicy == "open" {
 		envMap["QQ_ALLOW_ALL_USERS"] = "true"
+	} else if config.DmPolicy == "allowlist" {
+		if allow := joinHermesEnvList(config.AllowFrom); allow != "" {
+			envMap["QQ_ALLOWED_USERS"] = allow
+		}
+	}
+	if config.GroupPolicy == "allowlist" {
+		if allow := joinHermesEnvList(config.GroupAllowFrom); allow != "" {
+			envMap["QQ_GROUP_ALLOWED_USERS"] = allow
+		}
 	}
 	if err := writeHermesEnvMap(envPath, envMap, []string{
 		"QQ_APP_ID",
 		"QQ_CLIENT_SECRET",
 		"QQ_ALLOW_ALL_USERS",
+		"QQ_ALLOWED_USERS",
+		"QQ_GROUP_ALLOWED_USERS",
 		"QQ_HOME_CHANNEL",
 		"QQ_HOME_CHANNEL_NAME",
 		"QQ_STT_API_KEY",
@@ -143,6 +156,7 @@ func deleteHermesQQBotChannelConfig(confDir string) error {
 		"QQ_CLIENT_SECRET",
 		"QQ_ALLOW_ALL_USERS",
 		"QQ_ALLOWED_USERS",
+		"QQ_GROUP_ALLOWED_USERS",
 		"QQ_HOME_CHANNEL",
 		"QQ_HOME_CHANNEL_NAME",
 		"QQ_STT_API_KEY",
@@ -165,21 +179,17 @@ func readHermesWecomChannelConfig(confDir string) (*dto.AgentWecomConfig, error)
 	}
 
 	platform := childMap(childMap(cfg, "platforms"), "wecom")
-	extra := childMap(platform, "extra")
-	allowFrom := extractStringList(extra["allow_from"])
-	if len(allowFrom) == 0 {
-		allowFrom = splitHermesEnvList(envMap["WECOM_ALLOWED_USERS"])
-	}
-	groupAllowFrom := extractStringList(extra["group_allow_from"])
+	allowFrom := splitHermesEnvList(envMap["WECOM_ALLOWED_USERS"])
+	groupAllowFrom := splitHermesEnvList(envMap["WECOM_GROUP_ALLOWED_USERS"])
 	dmPolicy := "pairing"
-	if extractHermesEnvBool(envMap, "WECOM_ALLOW_ALL_USERS", false) {
+	if envMap["WECOM_DM_POLICY"] == "open" {
 		dmPolicy = "open"
 	} else if len(allowFrom) > 0 {
 		dmPolicy = "allowlist"
-	} else if policy := extractStringValue(extra["dm_policy"]); policy != "" {
+	} else if policy := envMap["WECOM_DM_POLICY"]; policy != "" {
 		dmPolicy = policy
 	}
-	groupPolicy := extractStringValue(extra["group_policy"])
+	groupPolicy := envMap["WECOM_GROUP_POLICY"]
 	if groupPolicy == "" {
 		groupPolicy = "open"
 	}
@@ -215,22 +225,33 @@ func writeHermesWecomChannelConfig(confDir string, config dto.AgentWecomConfig) 
 		delete(envMap, "WECOM_SECRET")
 	}
 	delete(envMap, "WECOM_ALLOWED_USERS")
+	delete(envMap, "WECOM_GROUP_ALLOWED_USERS")
 	delete(envMap, "WECOM_ALLOW_ALL_USERS")
 	delete(envMap, "WECOM_DM_POLICY")
 	delete(envMap, "WECOM_GROUP_POLICY")
-	switch config.DmPolicy {
-	case "open":
-		envMap["WECOM_ALLOW_ALL_USERS"] = "true"
-	case "allowlist":
+	if config.DmPolicy != "" {
+		envMap["WECOM_DM_POLICY"] = config.DmPolicy
+	}
+	if config.GroupPolicy != "" {
+		envMap["WECOM_GROUP_POLICY"] = config.GroupPolicy
+	}
+	if config.DmPolicy == "allowlist" {
 		if allow := joinHermesEnvList(config.AllowFrom); allow != "" {
 			envMap["WECOM_ALLOWED_USERS"] = allow
+		}
+	}
+	if config.GroupPolicy == "allowlist" {
+		if allow := joinHermesEnvList(config.GroupAllowFrom); allow != "" {
+			envMap["WECOM_GROUP_ALLOWED_USERS"] = allow
 		}
 	}
 	if err := writeHermesEnvMap(envPath, envMap, []string{
 		"WECOM_BOT_ID",
 		"WECOM_SECRET",
-		"WECOM_ALLOW_ALL_USERS",
+		"WECOM_DM_POLICY",
 		"WECOM_ALLOWED_USERS",
+		"WECOM_GROUP_POLICY",
+		"WECOM_GROUP_ALLOWED_USERS",
 	}); err != nil {
 		return err
 	}
@@ -265,7 +286,10 @@ func deleteHermesWecomChannelConfig(confDir string) error {
 		"WECOM_BOT_ID",
 		"WECOM_SECRET",
 		"WECOM_ALLOW_ALL_USERS",
+		"WECOM_DM_POLICY",
 		"WECOM_ALLOWED_USERS",
+		"WECOM_GROUP_POLICY",
+		"WECOM_GROUP_ALLOWED_USERS",
 		"WECOM_HOME_CHANNEL",
 	); err != nil {
 		return err
@@ -448,6 +472,9 @@ func writeHermesFeishuChannelConfig(confDir string, config dto.AgentFeishuConfig
 		return err
 	}
 	bot := firstHermesFeishuBot(config.Bots)
+	if config.GroupPolicy == "allowlist" && bot.DmPolicy == "pairing" {
+		return buserr.New("ErrHermesFeishuGroupAllowlistRequiresAllowlist")
+	}
 	if bot.AppID != "" {
 		envMap["FEISHU_APP_ID"] = bot.AppID
 	} else {
@@ -467,6 +494,11 @@ func writeHermesFeishuChannelConfig(confDir string, config dto.AgentFeishuConfig
 	case "open":
 		envMap["FEISHU_ALLOW_ALL_USERS"] = "true"
 	case "allowlist":
+		if allow := joinHermesEnvList(bot.AllowFrom); allow != "" {
+			envMap["FEISHU_ALLOWED_USERS"] = allow
+		}
+	}
+	if config.GroupPolicy == "allowlist" {
 		if allow := joinHermesEnvList(bot.AllowFrom); allow != "" {
 			envMap["FEISHU_ALLOWED_USERS"] = allow
 		}

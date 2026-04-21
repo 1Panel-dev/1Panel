@@ -61,6 +61,7 @@ ErrAgentWebsiteTypeUnsupported: '프록시 또는 정적 웹사이트만 연결�
 ErrAgentWebsiteInUse: '이 웹사이트는 이미 다른 에이전트에 연결되어 있습니다'
 ErrAgentWebsiteUnbindUnsupported: '원클릭 배포 웹사이트는 수동으로 연결 해제할 수 없습니다'
 ErrHermesPairingCodeUnavailable: 'Hermes에서 페어링 코드가 일시적으로 존재하지 않습니다. 네트워크 문제일 수 있으니 잠시 후 다시 시도해 주세요.'
+ErrHermesFeishuGroupAllowlistRequiresAllowlist: 'Feishu 그룹 정책이 허용 목록이면 DM 정책을 페어링 코드로 설정할 수 없습니다.'
 Localhost: '로컬 머신'
 ErrBackupInUsed: '백업 계정이 예약에 사용 중'
 ErrBackupCheck: '연결 테스트 실패: {{ .err }}'
