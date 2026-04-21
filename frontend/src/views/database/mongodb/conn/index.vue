@@ -1,6 +1,6 @@
 <template>
     <DrawerPro v-model="dialogVisible" :header="$t('database.databaseConnInfo')" @close="handleClose" size="small">
-        <el-form @submit.prevent v-loading="loading" :model="form" label-position="top">
+        <el-form @submit.prevent v-loading="loading" ref="formRef" :rules="rules" :model="form" label-position="top">
             <el-form-item v-if="form.from === 'local'">
                 <template #label>
                     <div class="conn-label">
@@ -73,21 +73,52 @@
 
             <el-divider border-style="dashed" />
 
-            <el-form-item :label="$t('commons.login.username')">
-                <el-tag>{{ form.username || '-' }}</el-tag>
-                <CopyButton v-if="form.username" :content="form.username" />
-            </el-form-item>
-
-            <el-form-item :label="form.from === 'local' ? $t('database.rootPassword') : $t('commons.login.password')">
-                <el-tag>{{ form.password || '-' }}</el-tag>
-                <CopyButton v-if="form.password" :content="form.password" />
-            </el-form-item>
+            <div v-if="form.from === 'local'">
+                <el-form-item :label="$t('commons.login.username')">
+                    <el-input type="text" style="width: calc(100% - 60px)" readonly disabled v-model="form.username">
+                        <template #append>
+                            <el-button-group>
+                                <CopyButton :content="form.username" :isIcon="false" />
+                            </el-button-group>
+                        </template>
+                    </el-input>
+                </el-form-item>
+                <el-form-item :label="$t('database.rootPassword')" prop="password">
+                    <el-input
+                        style="width: calc(100% - 205px)"
+                        type="password"
+                        show-password
+                        clearable
+                        v-model="form.password"
+                    />
+                    <el-button-group>
+                        <CopyButton :isIcon="false" class="copy_button" :content="form.password" />
+                        <el-button @click="random">
+                            {{ $t('commons.button.random') }}
+                        </el-button>
+                    </el-button-group>
+                    <span class="input-help">{{ $t('commons.rule.illegalChar') }}</span>
+                </el-form-item>
+            </div>
+            <div v-else>
+                <el-form-item :label="$t('commons.login.username')">
+                    <el-tag>{{ form.username || '-' }}</el-tag>
+                    <CopyButton v-if="form.username" :content="form.username" />
+                </el-form-item>
+                <el-form-item :label="$t('commons.login.password')">
+                    <el-tag>{{ form.password || '-' }}</el-tag>
+                    <CopyButton v-if="form.password" :content="form.password" />
+                </el-form-item>
+            </div>
         </el-form>
 
         <template #footer>
             <span class="dialog-footer">
                 <el-button :disabled="loading" @click="dialogVisible = false">
                     {{ $t('commons.button.cancel') }}
+                </el-button>
+                <el-button :disabled="loading || form.status !== 'Running'" type="primary" @click="onSave(formRef)">
+                    {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
         </template>
@@ -96,8 +127,12 @@
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
-import { getDatabase } from '@/api/modules/database';
+import { Rules } from '@/global/form-rules';
+import { ElForm } from 'element-plus';
+import { getDatabase, updateMongodbRootPassword } from '@/api/modules/database';
 import { getAppConnInfo } from '@/api/modules/app';
+import { MsgSuccess } from '@/utils/message';
+import { getRandomStr } from '@/utils/id';
 import { getAgentSettingInfo } from '@/api/modules/setting';
 import { copyText } from '@/utils/clipboard';
 import i18n from '@/lang';
@@ -121,6 +156,13 @@ const form = reactive({
     username: '',
 });
 
+const rules = reactive({
+    password: [Rules.requiredInput, Rules.noSpace, Rules.illegal],
+});
+
+type FormInstance = InstanceType<typeof ElForm>;
+const formRef = ref<FormInstance>();
+
 interface DialogProps {
     from: string;
     type: string;
@@ -128,6 +170,7 @@ interface DialogProps {
 }
 
 const acceptParams = async (params: DialogProps): Promise<void> => {
+    form.password = '';
     form.from = params.from;
     form.type = params.type;
     form.database = params.database;
@@ -137,6 +180,10 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
 
 const handleClose = () => {
     dialogVisible.value = false;
+};
+
+const random = () => {
+    form.password = getRandomStr(16);
 };
 
 const loadSystemIP = async () => {
@@ -187,6 +234,38 @@ const copyConnURL = (isContainer: boolean) => {
     copyText(`mongodb://${user}:${encodedPassword}@${host}:${port}/admin?authSource=admin`);
 };
 
+const onSave = async (formEl: FormInstance | undefined) => {
+    if (!formEl) return;
+    formEl.validate(async (valid) => {
+        if (!valid) return;
+        ElMessageBox.confirm(
+            i18n.global.t('database.changeConnHelper', [i18n.global.t('database.rootPassword')]),
+            i18n.global.t('commons.msg.infoTitle'),
+            {
+                confirmButtonText: i18n.global.t('commons.button.confirm'),
+                cancelButtonText: i18n.global.t('commons.button.cancel'),
+            },
+        ).then(async () => {
+            loading.value = true;
+            await updateMongodbRootPassword({
+                id: 0,
+                from: form.from,
+                type: form.type,
+                database: form.database,
+                value: form.password,
+            })
+                .then(() => {
+                    loading.value = false;
+                    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                    dialogVisible.value = false;
+                })
+                .catch(() => {
+                    loading.value = false;
+                });
+        });
+    });
+};
+
 defineExpose({
     acceptParams,
 });
@@ -199,6 +278,16 @@ defineExpose({
     justify-content: space-between;
     width: 100%;
     gap: 12px;
+}
+
+.copy_button {
+    border-radius: 0px;
+    border-left-width: 0px;
+}
+
+:deep(.el-input__wrapper) {
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
 }
 
 :deep(.el-form-item__label) {

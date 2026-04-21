@@ -874,7 +874,7 @@ func updateInstallInfoInDB(appKey, appName, param string, value interface{}) err
 	envKey := ""
 	switch param {
 	case "password":
-		if appKey == "mysql" || appKey == "mariadb" || appKey == "postgresql" {
+		if appKey == "mysql" || appKey == "mariadb" || appKey == "postgresql" || appKey == "mongodb" {
 			envKey = "PANEL_DB_ROOT_PASSWORD="
 		} else {
 			envKey = "PANEL_REDIS_ROOT_PASSWORD="
@@ -915,7 +915,7 @@ func updateInstallInfoInDB(appKey, appName, param string, value interface{}) err
 			"param": strings.ReplaceAll(appInstall.Param, oldVal, newVal),
 			"env":   strings.ReplaceAll(appInstall.Env, oldVal, newVal),
 		}, repo.WithByID(appInstall.ID))
-		if appKey == "mysql" || appKey == "postgresql" {
+		if appKey == "mysql" || appKey == "postgresql" || appKey == "mongodb" {
 			return nil
 		}
 	}

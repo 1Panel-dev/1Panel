@@ -65,6 +65,7 @@ func (s *DatabaseRouter) InitRouter(Router *gin.RouterGroup) {
 		cmdRouter.POST("/mongodb/load", baseApi.LoadMongodbFromRemote)
 		cmdRouter.POST("/mongodb/bind", baseApi.BindMongodbUser)
 		cmdRouter.POST("/mongodb/password", baseApi.ChangeMongodbPassword)
+		cmdRouter.POST("/mongodb/root/password", baseApi.ChangeMongodbRootPassword)
 		cmdRouter.POST("/mongodb/privileges", baseApi.LoadMongodbPrivileges)
 		cmdRouter.POST("/mongodb/privileges/change", baseApi.ChangeMongodbPrivileges)
 		cmdRouter.POST("/mongodb/del/check", baseApi.DeleteCheckMongodb)
