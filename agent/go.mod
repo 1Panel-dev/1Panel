@@ -29,7 +29,7 @@ require (
 	github.com/jinzhu/gorm v1.9.16
 	github.com/joho/godotenv v1.5.1
 	github.com/klauspost/compress v1.18.5
-	github.com/mholt/archiver/v4 v4.0.0-alpha.8
+	github.com/mholt/archiver/v4 v4.0.0-alpha.9
 	github.com/miekg/dns v1.1.72
 	github.com/minio/minio-go/v7 v7.0.100
 	github.com/nicksnyder/go-i18n/v2 v2.6.1
