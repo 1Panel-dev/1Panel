@@ -3,6 +3,7 @@ base:
   mode: dev
   is_demo: false
   is_offline: false
+  is_fxplay: false
 
 log:
   level: debug
