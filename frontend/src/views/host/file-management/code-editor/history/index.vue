@@ -102,7 +102,7 @@
 
                     <div class="table-box history-table-box">
                         <div class="history-table-wrap">
-                            <el-table
+                            <ComplexTable
                                 :pagination-config="paginationConfig"
                                 :data="historyItems"
                                 v-loading="historyLoading"
@@ -142,7 +142,7 @@
                                         {{ computeSize(row.contentSize) }}
                                     </template>
                                 </el-table-column>
-                                <el-table-column :label="$t('commons.table.operate')" min-width="110" fixed="right">
+                                <el-table-column :label="$t('commons.table.operate')" min-width="150" fixed="right">
                                     <template #default="{ row }">
                                         <el-button link type="primary" @click.stop="openHistoryRecord(row)">
                                             {{ $t('commons.button.view') }}
@@ -152,23 +152,8 @@
                                         </el-button>
                                     </template>
                                 </el-table-column>
-                            </el-table>
+                            </ComplexTable>
                         </div>
-
-                        <el-pagination
-                            v-model:current-page="pagination.currentPage"
-                            v-model:page-size="pagination.pageSize"
-                            :page-sizes="[5, 10, 20, 50, 100, 200, 500]"
-                            :size="mobile || paginationConfig.small ? 'small' : 'default'"
-                            :layout="
-                                mobile || paginationConfig.small
-                                    ? 'total, prev, pager, next'
-                                    : 'total, sizes, prev, pager, next, jumper'
-                            "
-                            :total="pagination.total"
-                            @current-change="handlePageChange"
-                            @size-change="handleSizeChange"
-                        />
                     </div>
                 </el-card>
 
@@ -235,8 +220,8 @@ import { Setting } from '@/api/interface/setting';
 import { loadMonacoLanguageSupport, setupMonacoEnvironment } from '@/utils/monaco';
 import { ElMessageBox, type FormInstance, type FormRules } from 'element-plus';
 import { Languages } from '@/global/mimetype';
-import { GlobalStore } from '@/store';
 import i18n from '@/lang';
+import ComplexTable from '@/components/complex-table/index.vue';
 
 type MonacoEditorApi = typeof import('monaco-editor/esm/vs/editor/editor.api');
 
@@ -258,10 +243,7 @@ const historySettingFormRef = ref<FormInstance>();
 const scope = ref<'current' | 'all'>('current');
 const operationFilter = ref('');
 const activeCollapse = ref([]);
-const globalStore = GlobalStore();
-const mobile = computed(() => {
-    return globalStore.isMobile();
-});
+
 const paginationConfig = reactive({
     cacheSizeKey: 'file-history-page-size',
     currentPage: 1,
@@ -599,15 +581,6 @@ const handleScopeChange = async () => {
     if (scope.value === 'current') {
         syncCurrentFileContext();
     }
-    await loadHistoryList(true);
-};
-
-const handlePageChange = async (page: number) => {
-    pagination.value.currentPage = page;
-    await loadHistoryList();
-};
-
-const handleSizeChange = async () => {
     await loadHistoryList(true);
 };
 
