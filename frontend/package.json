@@ -41,7 +41,7 @@
         "element-plus": "2.11.9",
         "js-base64": "^3.7.7",
         "jsencrypt": "^3.3.2",
-        "md-editor-v3": "^2.11.3",
+        "md-editor-v3": "^6.4.2",
         "monaco-editor": "^0.53.0",
         "nprogress": "^0.2.0",
         "pinia": "^2.1.7",
