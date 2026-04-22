@@ -15,38 +15,14 @@
             <el-select v-model="form.dmPolicy">
                 <el-option :label="t('aiTools.agents.pairingCode')" value="pairing" />
                 <el-option :label="t('aiTools.agents.policyOpen')" value="open" />
-                <el-option :label="t('aiTools.agents.policyAllowlist')" value="allowlist" />
                 <el-option :label="t('aiTools.agents.policyDisabled')" value="disabled" />
             </el-select>
-        </el-form-item>
-        <el-form-item v-if="form.dmPolicy === 'allowlist'" :label="t('aiTools.agents.allowFrom')" prop="allowFromText">
-            <el-input
-                v-model="form.allowFromText"
-                type="textarea"
-                :rows="3"
-                :placeholder="t('aiTools.agents.allowFromPlaceholder')"
-            />
-            <span class="input-help">{{ t('aiTools.agents.allowFromHelper') }}</span>
         </el-form-item>
         <el-form-item :label="t('aiTools.agents.groupPolicy')" prop="groupPolicy">
             <el-select v-model="form.groupPolicy">
                 <el-option :label="t('aiTools.agents.policyOpen')" value="open" />
-                <el-option :label="t('aiTools.agents.policyAllowlist')" value="allowlist" />
                 <el-option :label="t('aiTools.agents.policyDisabled')" value="disabled" />
             </el-select>
-        </el-form-item>
-        <el-form-item
-            v-if="form.groupPolicy === 'allowlist'"
-            :label="t('aiTools.agents.groupAllowFrom')"
-            prop="groupAllowFromText"
-        >
-            <el-input
-                v-model="form.groupAllowFromText"
-                type="textarea"
-                :rows="3"
-                :placeholder="t('aiTools.agents.groupAllowFromPlaceholder')"
-            />
-            <span class="input-help">{{ t('aiTools.agents.groupAllowFromHelper') }}</span>
         </el-form-item>
         <el-form-item>
             <el-button type="primary" :loading="saving" @click="save">
@@ -81,10 +57,8 @@ import { Rules } from '@/global/form-rules';
 import { MsgSuccess, MsgWarning } from '@/utils/message';
 
 interface WecomForm {
-    dmPolicy: 'pairing' | 'open' | 'allowlist' | 'disabled';
-    allowFromText: string;
-    groupPolicy: 'open' | 'allowlist' | 'disabled';
-    groupAllowFromText: string;
+    dmPolicy: 'pairing' | 'open' | 'disabled';
+    groupPolicy: 'open' | 'disabled';
     botId: string;
     secret: string;
 }
@@ -98,46 +72,15 @@ const agentId = ref(0);
 const pairingCode = ref('');
 const configured = ref(false);
 const form = reactive<WecomForm>({
-    dmPolicy: 'pairing',
-    allowFromText: '',
+    dmPolicy: 'open',
     groupPolicy: 'open',
-    groupAllowFromText: '',
     botId: '',
     secret: '',
 });
 
-const parseTextList = (value: string): string[] => {
-    return Array.from(
-        new Set(
-            String(value || '')
-                .split(/\r?\n/)
-                .map((item) => item.trim())
-                .filter(Boolean),
-        ),
-    );
-};
-
-const validateAllowFrom = (_rule: any, value: string, callback: (error?: Error) => void) => {
-    if (form.dmPolicy !== 'allowlist' || parseTextList(value).length > 0) {
-        callback();
-        return;
-    }
-    callback(new Error(t('aiTools.agents.allowFromRequired')));
-};
-
-const validateGroupAllowFrom = (_rule: any, value: string, callback: (error?: Error) => void) => {
-    if (form.groupPolicy !== 'allowlist' || parseTextList(value).length > 0) {
-        callback();
-        return;
-    }
-    callback(new Error(t('aiTools.agents.allowFromRequired')));
-};
-
 const rules = reactive({
     dmPolicy: [Rules.requiredSelect],
-    allowFromText: [{ validator: validateAllowFrom, trigger: 'blur' }],
     groupPolicy: [Rules.requiredSelect],
-    groupAllowFromText: [{ validator: validateGroupAllowFrom, trigger: 'blur' }],
     botId: [Rules.requiredInput],
     secret: [Rules.requiredInput],
 });
@@ -147,10 +90,16 @@ const load = async (id: number) => {
     pairingCode.value = '';
     const res = await getAgentWecomConfig({ agentId: id });
     configured.value = !!res.data?.enabled;
-    form.dmPolicy = (res.data?.dmPolicy as WecomForm['dmPolicy']) || 'pairing';
-    form.allowFromText = (res.data?.allowFrom || []).join('\n');
-    form.groupPolicy = (res.data?.groupPolicy as WecomForm['groupPolicy']) || 'open';
-    form.groupAllowFromText = (res.data?.groupAllowFrom || []).join('\n');
+    if (!configured.value) {
+        form.dmPolicy = 'open';
+        form.groupPolicy = 'open';
+        form.botId = '';
+        form.secret = '';
+        return;
+    }
+    form.dmPolicy =
+        res.data?.dmPolicy === 'disabled' ? 'disabled' : res.data?.dmPolicy === 'pairing' ? 'pairing' : 'open';
+    form.groupPolicy = res.data?.groupPolicy === 'disabled' ? 'disabled' : 'open';
     form.botId = res.data?.botId || '';
     form.secret = res.data?.secret || '';
 };
@@ -166,9 +115,9 @@ const save = async () => {
             agentId: agentId.value,
             enabled: true,
             dmPolicy: form.dmPolicy,
-            allowFrom: parseTextList(form.allowFromText),
+            allowFrom: [],
             groupPolicy: form.groupPolicy,
-            groupAllowFrom: parseTextList(form.groupAllowFromText),
+            groupAllowFrom: [],
             botId: form.botId,
             secret: form.secret,
         });
@@ -231,12 +180,3 @@ defineExpose({
     load,
 });
 </script>
-
-<style scoped lang="scss">
-.input-help {
-    display: block;
-    margin-top: 8px;
-    color: var(--el-text-color-secondary);
-    font-size: 12px;
-}
-</style>

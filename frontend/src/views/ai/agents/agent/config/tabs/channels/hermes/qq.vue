@@ -15,38 +15,14 @@
             <el-select v-model="form.dmPolicy">
                 <el-option :label="t('aiTools.agents.pairingCode')" value="pairing" />
                 <el-option :label="t('aiTools.agents.policyOpen')" value="open" />
-                <el-option :label="t('aiTools.agents.policyAllowlist')" value="allowlist" />
                 <el-option :label="t('aiTools.agents.policyDisabled')" value="disabled" />
             </el-select>
-        </el-form-item>
-        <el-form-item v-if="form.dmPolicy === 'allowlist'" :label="t('aiTools.agents.allowFrom')" prop="allowFromText">
-            <el-input
-                v-model="form.allowFromText"
-                type="textarea"
-                :rows="3"
-                :placeholder="t('aiTools.agents.allowFromPlaceholder')"
-            />
-            <span class="input-help">{{ t('aiTools.agents.allowFromHelper') }}</span>
         </el-form-item>
         <el-form-item :label="t('aiTools.agents.groupPolicy')" prop="groupPolicy">
             <el-select v-model="form.groupPolicy">
                 <el-option :label="t('aiTools.agents.policyOpen')" value="open" />
-                <el-option :label="t('aiTools.agents.policyAllowlist')" value="allowlist" />
                 <el-option :label="t('aiTools.agents.policyDisabled')" value="disabled" />
             </el-select>
-        </el-form-item>
-        <el-form-item
-            v-if="form.groupPolicy === 'allowlist'"
-            :label="t('aiTools.agents.groupAllowFrom')"
-            prop="groupAllowFromText"
-        >
-            <el-input
-                v-model="form.groupAllowFromText"
-                type="textarea"
-                :rows="3"
-                :placeholder="t('aiTools.agents.groupAllowFromPlaceholder')"
-            />
-            <span class="input-help">{{ t('aiTools.agents.groupAllowFromHelper') }}</span>
         </el-form-item>
         <el-form-item>
             <el-button type="primary" :loading="saving" @click="save">
@@ -83,10 +59,8 @@ import { MsgSuccess, MsgWarning } from '@/utils/message';
 interface QQBotForm {
     appId: string;
     clientSecret: string;
-    dmPolicy: 'pairing' | 'open' | 'allowlist' | 'disabled';
-    allowFromText: string;
-    groupPolicy: 'open' | 'allowlist' | 'disabled';
-    groupAllowFromText: string;
+    dmPolicy: 'pairing' | 'open' | 'disabled';
+    groupPolicy: 'open' | 'disabled';
 }
 
 const { t } = useI18n();
@@ -101,51 +75,14 @@ const form = reactive<QQBotForm>({
     appId: '',
     clientSecret: '',
     dmPolicy: 'open',
-    allowFromText: '',
     groupPolicy: 'open',
-    groupAllowFromText: '',
 });
-
-const parseTextList = (value: string): string[] => {
-    return Array.from(
-        new Set(
-            String(value || '')
-                .split(/\r?\n/)
-                .map((item) => item.trim())
-                .filter(Boolean),
-        ),
-    );
-};
 
 const rules = reactive({
     appId: [Rules.requiredInput],
     clientSecret: [Rules.requiredInput],
     dmPolicy: [Rules.requiredSelect],
     groupPolicy: [Rules.requiredSelect],
-    allowFromText: [
-        {
-            validator: (_rule, value, callback) => {
-                if (form.dmPolicy === 'allowlist' && parseTextList(String(value || '')).length === 0) {
-                    callback(new Error(t('aiTools.agents.allowFromRequired')));
-                    return;
-                }
-                callback();
-            },
-            trigger: 'blur',
-        },
-    ],
-    groupAllowFromText: [
-        {
-            validator: (_rule, value, callback) => {
-                if (form.groupPolicy === 'allowlist' && parseTextList(String(value || '')).length === 0) {
-                    callback(new Error(t('aiTools.agents.allowFromRequired')));
-                    return;
-                }
-                callback();
-            },
-            trigger: 'blur',
-        },
-    ],
 });
 
 const load = async (id: number) => {
@@ -153,12 +90,18 @@ const load = async (id: number) => {
     pairingCode.value = '';
     const res = await getAgentQQBotConfig({ agentId: id });
     configured.value = !!res.data?.enabled;
+    if (!configured.value) {
+        form.appId = '';
+        form.clientSecret = '';
+        form.dmPolicy = 'open';
+        form.groupPolicy = 'open';
+        return;
+    }
     form.appId = res.data?.bots?.[0]?.appId || '';
     form.clientSecret = res.data?.bots?.[0]?.clientSecret || '';
-    form.dmPolicy = (res.data?.dmPolicy as QQBotForm['dmPolicy']) || 'open';
-    form.allowFromText = (res.data?.allowFrom || []).join('\n');
-    form.groupPolicy = (res.data?.groupPolicy as QQBotForm['groupPolicy']) || 'open';
-    form.groupAllowFromText = (res.data?.groupAllowFrom || []).join('\n');
+    form.dmPolicy =
+        res.data?.dmPolicy === 'disabled' ? 'disabled' : res.data?.dmPolicy === 'pairing' ? 'pairing' : 'open';
+    form.groupPolicy = res.data?.groupPolicy === 'disabled' ? 'disabled' : 'open';
 };
 
 const save = async () => {
@@ -172,9 +115,9 @@ const save = async () => {
             agentId: agentId.value,
             enabled: true,
             dmPolicy: form.dmPolicy,
-            allowFrom: parseTextList(form.allowFromText),
+            allowFrom: [],
             groupPolicy: form.groupPolicy,
-            groupAllowFrom: parseTextList(form.groupAllowFromText),
+            groupAllowFrom: [],
             bots: [
                 {
                     accountId: 'default',
@@ -247,12 +190,3 @@ defineExpose({
     load,
 });
 </script>
-
-<style scoped lang="scss">
-.input-help {
-    display: block;
-    margin-top: 8px;
-    color: var(--el-text-color-secondary);
-    font-size: 12px;
-}
-</style>
