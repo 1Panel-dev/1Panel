@@ -213,13 +213,7 @@ const responsivePaginationLayout = computed(() => {
 });
 
 const responsivePagerCount = computed(() => {
-    if (mobile.value || props.paginationConfig?.small) {
-        return 5;
-    }
-    if (paginationWidth.value < 520) {
-        return 3;
-    }
-    if (paginationWidth.value < 720) {
+    if (mobile.value || props.paginationConfig?.small || paginationWidth.value < 720) {
         return 5;
     }
     return 7;
