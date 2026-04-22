@@ -1,0 +1,14 @@
+version: 2
+
+updates:
+  - package-ecosystem: "gomod"
+    directories:
+      - "/agent"
+      - "/core"
+    schedule:
+      interval: "daily"
+
+  - package-ecosystem: "npm"
+    directory: "/frontend"
+    schedule:
+      interval: "daily"
