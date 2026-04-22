@@ -100,61 +100,61 @@
                         </div>
                     </template>
 
-                    <div class="history-table-wrap">
-                        <el-table
-                            :pagination-config="paginationConfig"
-                            :data="historyItems"
-                            v-loading="historyLoading"
-                            class="history-table"
-                            @row-click="openHistoryRecord"
-                            @selection-change="handleSelectionChange"
-                        >
-                            <el-table-column type="selection" width="46" />
-                            <el-table-column :label="$t('commons.table.date')" min-width="180">
-                                <template #default="{ row }">
-                                    {{ dateFormatSimpleWithSecond(row.createdAt) }}
-                                </template>
-                            </el-table-column>
-                            <el-table-column
-                                :label="$t('file.fileName')"
-                                prop="fileName"
-                                min-width="160"
-                                show-overflow-tooltip
-                            />
-                            <el-table-column
-                                :label="$t('file.path')"
-                                prop="path"
-                                min-width="260"
-                                show-overflow-tooltip
-                            />
-                            <el-table-column :label="$t('commons.table.type')" min-width="110">
-                                <template #default="{ row }">
-                                    <div class="flex flex-wrap items-center gap-2">
-                                        <el-tag size="small" effect="plain">
-                                            {{ getOperationLabel(row.operation) }}
-                                        </el-tag>
-                                    </div>
-                                </template>
-                            </el-table-column>
-                            <el-table-column :label="$t('file.size')" min-width="110">
-                                <template #default="{ row }">
-                                    {{ computeSize(row.contentSize) }}
-                                </template>
-                            </el-table-column>
-                            <el-table-column :label="$t('commons.table.operate')" min-width="110" fixed="right">
-                                <template #default="{ row }">
-                                    <el-button link type="primary" @click.stop="openHistoryRecord(row)">
-                                        {{ $t('commons.button.view') }}
-                                    </el-button>
-                                    <el-button link type="danger" @click.stop="deleteSelected(row)">
-                                        {{ $t('commons.button.delete') }}
-                                    </el-button>
-                                </template>
-                            </el-table-column>
-                        </el-table>
-                    </div>
+                    <div class="table-box history-table-box">
+                        <div class="history-table-wrap">
+                            <el-table
+                                :pagination-config="paginationConfig"
+                                :data="historyItems"
+                                v-loading="historyLoading"
+                                class="history-table"
+                                @row-click="openHistoryRecord"
+                                @selection-change="handleSelectionChange"
+                            >
+                                <el-table-column type="selection" width="46" />
+                                <el-table-column :label="$t('commons.table.date')" min-width="180">
+                                    <template #default="{ row }">
+                                        {{ dateFormatSimpleWithSecond(row.createdAt) }}
+                                    </template>
+                                </el-table-column>
+                                <el-table-column
+                                    :label="$t('file.fileName')"
+                                    prop="fileName"
+                                    min-width="160"
+                                    show-overflow-tooltip
+                                />
+                                <el-table-column
+                                    :label="$t('file.path')"
+                                    prop="path"
+                                    min-width="260"
+                                    show-overflow-tooltip
+                                />
+                                <el-table-column :label="$t('commons.table.type')" min-width="110">
+                                    <template #default="{ row }">
+                                        <div class="flex flex-wrap items-center gap-2">
+                                            <el-tag size="small" effect="plain">
+                                                {{ getOperationLabel(row.operation) }}
+                                            </el-tag>
+                                        </div>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column :label="$t('file.size')" min-width="110">
+                                    <template #default="{ row }">
+                                        {{ computeSize(row.contentSize) }}
+                                    </template>
+                                </el-table-column>
+                                <el-table-column :label="$t('commons.table.operate')" min-width="110" fixed="right">
+                                    <template #default="{ row }">
+                                        <el-button link type="primary" @click.stop="openHistoryRecord(row)">
+                                            {{ $t('commons.button.view') }}
+                                        </el-button>
+                                        <el-button link type="danger" @click.stop="deleteSelected(row)">
+                                            {{ $t('commons.button.delete') }}
+                                        </el-button>
+                                    </template>
+                                </el-table-column>
+                            </el-table>
+                        </div>
 
-                    <div class="flex justify-end pt-4">
                         <el-pagination
                             v-model:current-page="pagination.currentPage"
                             v-model:page-size="pagination.pageSize"
@@ -692,7 +692,12 @@ onBeforeUnmount(() => {
     min-width: 0;
 }
 
+.history-table-box {
+    min-height: 0;
+}
+
 .history-table-wrap {
+    flex: 1;
     min-width: 0;
     overflow-x: auto;
     max-height: clamp(240px, 36vh, 420px);
@@ -729,6 +734,14 @@ onBeforeUnmount(() => {
     :deep(.el-card__body) {
         padding-top: 2px;
         padding-bottom: 2px;
+    }
+}
+
+.history-list-card {
+    :deep(.el-card__body) {
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
     }
 }
 </style>
